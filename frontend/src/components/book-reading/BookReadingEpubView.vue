@@ -6,18 +6,18 @@
     />
     <router-link
       :to="{ name: 'notebookPage', params: { notebookId: notebookId } }"
-      class="daisy-btn daisy-btn-sm daisy-btn-ghost daisy-shrink-0 daisy-no-underline"
+      class="daisy-btn daisy-btn-sm daisy-btn-ghost shrink-0 no-underline"
     >
       Notebook
     </router-link>
     <span
-      class="daisy-truncate daisy-text-sm daisy-font-medium daisy-min-w-0 daisy-ml-1"
+      class="truncate text-sm font-medium min-w-0 ml-1"
       data-testid="book-reading-epub-global-bar-title"
       :title="book.bookName"
     >
       {{ book.bookName }}
     </span>
-    <span class="daisy-ml-auto daisy-shrink-0" aria-hidden="true" />
+    <span class="ml-auto shrink-0" aria-hidden="true" />
   </GlobalBar>
   <BookReadingBookLayout
     v-model:opened="bookLayoutOpened"
@@ -31,7 +31,7 @@
   >
     <main
       ref="epubMainPaneRef"
-      class="daisy-flex daisy-flex-1 daisy-min-h-0 daisy-min-w-0 daisy-flex-col daisy-relative"
+      class="flex flex-1 min-h-0 min-w-0 flex-col relative"
     >
       <EpubBookViewer
         ref="epubViewerRef"

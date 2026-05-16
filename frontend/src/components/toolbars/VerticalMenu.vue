@@ -1,7 +1,7 @@
 <template>
-  <div class="sidebar-container daisy-w-full daisy-h-full">
-    <div class="daisy-flex daisy-flex-col daisy-h-full">
-      <ul v-if="user" class="top-menu daisy-menu daisy-w-full daisy-flex-1">
+  <div class="sidebar-container w-full h-full">
+    <div class="flex flex-col h-full">
+      <ul v-if="user" class="top-menu daisy-menu w-full flex-1">
         <template v-if="!isHomePage">
           <li v-for="item in upperNavItems" :title="item.label" :key="item.name" class="daisy-menu-item">
             <NavigationItem v-bind="{ ...item }" @resumeRecall="handleResumeRecall" />
@@ -21,14 +21,14 @@
         />
       </ul>
       <LoginButton v-else />
-      <div class="daisy-flex daisy-flex-col daisy-items-center">
+      <div class="flex flex-col items-center">
         <router-link
           to="/"
-          class="brand-text [writing-mode:vertical-lr] daisy-text-center daisy-py-4 daisy-font-bold daisy-text-neutral-400 daisy-whitespace-nowrap daisy-no-underline"
+          class="brand-text [writing-mode:vertical-lr] text-center py-4 font-bold text-neutral-400 whitespace-nowrap no-underline"
         >
           Doughnut by
         </router-link>
-        <a href="https://odd-e.com" target="_blank" class="daisy-mb-4">
+        <a href="https://odd-e.com" target="_blank" class="mb-4">
           <img
             src="/odd-e.png"
             width="35"

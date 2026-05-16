@@ -1,8 +1,8 @@
 <template>
-  <div class="content daisy-h-full">
+  <div class="content h-full">
     <ContentLoader v-if="!currentQuestionFetched || isCurrentMemoryTrackerFetching" />
     <template v-else>
-      <div class="daisy-pt-5 daisy-h-full">
+      <div class="pt-5 h-full">
       <SpellingQuestionDisplay
         v-if="currentMemoryTracker?.spelling"
         v-bind="{
@@ -21,7 +21,7 @@
           />
         </div>
         <template v-else>
-         <div class="notebook-source daisy-mb-4">
+         <div class="notebook-source mb-4">
             <NotebookLink :notebook="currentRecallPrompt.notebook" />
           </div>
           <ContestableQuestion

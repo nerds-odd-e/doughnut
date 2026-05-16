@@ -1,9 +1,9 @@
 <template>
-  <nav class="daisy-navbar daisy-max-w-full daisy-flex daisy-justify-between daisy-relative">
-    <div class="daisy-flex daisy-flex-1 daisy-overflow-x-auto">
+  <nav class="daisy-navbar max-w-full flex justify-between relative">
+    <div class="flex flex-1 overflow-x-auto">
       <slot />
     </div>
-    <div class="daisy-join daisy-join-horizontal daisy-flex-none">
+    <div class="daisy-join daisy-join-horizontal flex-none">
       <slot name="right" />
       <PopButton
         v-if="user"
@@ -14,7 +14,7 @@
         :show-close-button="false"
       >
         <template #button_face>
-          <Search class="daisy-w-6 daisy-h-6" />
+          <Search class="w-6 h-6" />
         </template>
         <template #default="{ closer }">
           <SearchForm :modal-closer="closer" @close-dialog="closer" />
@@ -60,7 +60,7 @@ onUnmounted(() => {
 <style scoped lang="scss">
 @use "@/assets/menu-variables.scss" as *;
 
-@media (max-width: theme('screens.lg')) {
+@media (max-width: 1024px) {
   .daisy-navbar {
     padding-left: $collapsed-menu-width-tablet;
     height: $main-menu-height-tablet;
@@ -68,7 +68,7 @@ onUnmounted(() => {
   }
 }
 
-@media (max-width: theme('screens.md')) {
+@media (max-width: 768px) {
   .daisy-navbar {
     padding-left: $collapsed-menu-width-mobile;
     height: $main-menu-height-mobile;

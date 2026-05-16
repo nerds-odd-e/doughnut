@@ -1,10 +1,10 @@
 <template>
   <GlobalBar>
-    <div class="daisy-flex daisy-items-center daisy-justify-center daisy-w-full">
-      <span class="daisy-text-lg daisy-font-semibold">Assimilate Note</span>
+    <div class="flex items-center justify-center w-full">
+      <span class="text-lg font-semibold">Assimilate Note</span>
     </div>
   </GlobalBar>
-  <div class="daisy-mx-auto daisy-min-w-0 daisy-container daisy-mt-3">
+  <div class="mx-auto min-w-0 container mt-3">
     <ContentLoader v-if="!note" />
     <Assimilation
       v-if="note"

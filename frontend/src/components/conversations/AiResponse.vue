@@ -1,16 +1,16 @@
 <template>
-  <div v-if="currentAiReply" class="daisy-flex daisy-mb-3">
-    <div class="message-avatar daisy-me-2" title="AI Assistant">
-      <Bot class="daisy-w-6 daisy-h-6" />
+  <div v-if="currentAiReply" class="flex mb-3">
+    <div class="message-avatar me-2" title="AI Assistant">
+      <Bot class="w-6 h-6" />
     </div>
-    <div class="daisy-card daisy-py-2 daisy-px-3 daisy-bg-light ai-chat"
+    <div class="daisy-card py-2 px-3 daisy-bg-light ai-chat"
     v-html="markdowntToHtml(currentAiReply)"
     />
   </div>
 
-  <div v-if="currentSuggestion" class="daisy-flex daisy-mb-3">
-    <div class="message-avatar daisy-me-2" title="AI Assistant">
-      <Bot class="daisy-w-6 daisy-h-6" />
+  <div v-if="currentSuggestion" class="flex mb-3">
+    <div class="message-avatar me-2" title="AI Assistant">
+      <Bot class="w-6 h-6" />
     </div>
     <ToolCallHandler
       v-if="currentSuggestion"
@@ -21,15 +21,15 @@
     />
   </div>
 
-  <div v-if="lastErrorMessage" class="last-error-message daisy-text-danger daisy-mb-3">
+  <div v-if="lastErrorMessage" class="last-error-message daisy-text-danger mb-3">
     {{ lastErrorMessage }}
   </div>
 
-  <div v-if="aiStatus" class="daisy-flex daisy-align-items-center status-bar daisy-mb-3">
-    <div class="daisy-spinner-border daisy-spinner-border-sm daisy-me-2" role="status">
-      <span class="daisy-sr-only">Loading...</span>
+  <div v-if="aiStatus" class="flex daisy-align-items-center status-bar mb-3">
+    <div class="daisy-spinner-border daisy-spinner-border-sm me-2" role="status">
+      <span class="sr-only">Loading...</span>
     </div>
-    <small class="daisy-text-secondary">{{ aiStatus }}</small>
+    <small class="text-secondary">{{ aiStatus }}</small>
   </div>
 </template>
 

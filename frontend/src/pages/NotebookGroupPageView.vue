@@ -1,15 +1,15 @@
 <template>
   <GlobalBar>
-    <div class="daisy-flex daisy-min-w-0 daisy-items-center daisy-gap-3">
+    <div class="flex min-w-0 items-center gap-3">
       <button
         type="button"
-        class="daisy-btn daisy-btn-sm daisy-btn-ghost daisy-shrink-0"
+        class="daisy-btn daisy-btn-sm daisy-btn-ghost shrink-0"
         @click="goToNotebooks"
       >
         Back to notebooks
       </button>
       <h1
-        class="daisy-m-0 daisy-truncate daisy-self-center daisy-text-2xl daisy-font-bold daisy-tracking-tight daisy-text-base-content"
+        class="m-0 truncate self-center text-2xl font-bold tracking-tight text-base-content"
       >
         {{ group.name }}
       </h1>
@@ -24,7 +24,7 @@
         :aria-pressed="notebooksLayout === 'list'"
         @click="notebooksLayout = 'list'"
       >
-        <List class="daisy-h-6 daisy-w-6" />
+        <List class="h-6 w-6" />
       </button>
       <button
         type="button"
@@ -35,17 +35,17 @@
         :aria-pressed="notebooksLayout === 'grid'"
         @click="notebooksLayout = 'grid'"
       >
-        <LayoutGrid class="daisy-h-6 daisy-w-6" />
+        <LayoutGrid class="h-6 w-6" />
       </button>
     </template>
   </GlobalBar>
   <main
-    class="daisy-container daisy-mx-auto daisy-px-4 daisy-py-6"
+    class="container mx-auto px-4 py-6"
     :class="
-      notebooksLayout === 'grid' ? 'daisy-max-w-7xl' : 'daisy-max-w-3xl'
+      notebooksLayout === 'grid' ? 'max-w-7xl' : 'max-w-3xl'
     "
   >
-    <section class="daisy-mb-12">
+    <section class="mb-12">
       <NotebookCatalogGroupPanel
         :group="group"
         :layout="notebooksLayout"

@@ -8,20 +8,20 @@
     <div class="daisy-modal-box">
       <h2
         id="book-layout-reorganize-preview-title"
-        class="daisy-text-lg daisy-font-semibold"
+        class="text-lg font-semibold"
       >
         Reorganize layout (preview)
       </h2>
       <div
-        class="daisy-max-h-[min(24rem,50vh)] daisy-overflow-y-auto daisy-py-2"
+        class="max-h-[min(24rem,50vh)] overflow-y-auto py-2"
       >
         <div
           v-for="row in previewRows"
           :key="row.block.id"
           data-testid="book-layout-reorganize-preview-row"
-          class="daisy-rounded daisy-py-1.5 daisy-pr-2 daisy-text-sm daisy-leading-snug"
+          class="rounded py-1.5 pr-2 text-sm leading-snug"
           :class="{
-            'daisy-bg-warning/15': row.depthChanged,
+            'bg-warning/15': row.depthChanged,
           }"
           :data-suggested-depth="row.suggestedDepth"
           :data-depth-changed="row.depthChanged ? 'true' : undefined"

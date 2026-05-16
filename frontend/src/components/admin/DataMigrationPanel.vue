@@ -1,23 +1,23 @@
 <template>
   <div aria-live="polite">
-    <div class="daisy-alert daisy-alert-info daisy-mb-4" role="status">
+    <div class="daisy-alert daisy-alert-info mb-4" role="status">
       Run migration sends bounded batches to the server; the UI keeps calling until the migration
       reports complete or failed. Progress is persisted so you can refresh the page between batches.
     </div>
 
-    <div v-if="error" class="daisy-alert daisy-alert-error daisy-mb-4" role="alert">
+    <div v-if="error" class="daisy-alert daisy-alert-error mb-4" role="alert">
       {{ error }}
     </div>
 
-    <div class="daisy-mb-4" data-testid="data-migration-status">
-      <p class="daisy-text-sm daisy-opacity-90">
+    <div class="mb-4" data-testid="data-migration-status">
+      <p class="text-sm opacity-90">
         {{ summaryLine }}
       </p>
     </div>
 
     <div
       v-if="hasProgressDetail"
-      class="daisy-mb-4 daisy-text-sm daisy-opacity-90"
+      class="mb-4 text-sm opacity-90"
       data-testid="data-migration-progress"
     >
       <p>
@@ -28,12 +28,12 @@
         >
         <span v-if="status?.stepStatus"> · {{ status.stepStatus }}</span>
       </p>
-      <p v-if="status?.lastError" class="daisy-text-error" data-testid="data-migration-last-error">
+      <p v-if="status?.lastError" class="text-error" data-testid="data-migration-last-error">
         {{ status.lastError }}
       </p>
     </div>
 
-    <div class="daisy-flex daisy-flex-wrap daisy-gap-2 daisy-items-center">
+    <div class="flex flex-wrap gap-2 items-center">
       <button
         type="button"
         class="daisy-btn daisy-btn-primary"

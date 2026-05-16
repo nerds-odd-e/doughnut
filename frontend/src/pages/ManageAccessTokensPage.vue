@@ -1,6 +1,6 @@
 <template>
-  <div class="daisy-container daisy-mx-auto daisy-p-4">
-    <h1 class="daisy-text-2xl daisy-font-bold daisy-mb-4">Generate Token</h1>
+  <div class="container mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-4">Generate Token</h1>
 
     <PopButton ref="popbutton" btn-class="daisy-btn daisy-btn-primary daisy-btn-md">
       <template #button_face>
@@ -17,8 +17,8 @@
       </form>
     </PopButton>
 
-    <div v-if="token" class="daisy-flex daisy-items-center daisy-mt-6">
-      <span class="daisy-mr-2 daisy-px-2 daisy-py-1 daisy-bg-base-200 daisy-rounded daisy-font-mono" data-testid="token-result">
+    <div v-if="token" class="flex items-center mt-6">
+      <span class="mr-2 px-2 py-1 bg-base-200 rounded font-mono" data-testid="token-result">
         {{ token }}
       </span>
       <CopyButton
@@ -29,24 +29,24 @@
       />
     </div>
 
-    <h2 class="daisy-text-xl daisy-font-bold daisy-mt-8">Existing Tokens</h2>
-    <table class="daisy-table daisy-table-zebra daisy-mt-8 daisy-w-full">
+    <h2 class="text-xl font-bold mt-8">Existing Tokens</h2>
+    <table class="daisy-table daisy-table-zebra mt-8 w-full">
       <thead>
         <tr>
-          <th class="daisy-text-left daisy-px-4 daisy-py-2">Label</th>
+          <th class="text-left px-4 py-2">Label</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(item, idx) in tokens" :key="idx">
-          <td class="daisy-px-4 daisy-py-2 daisy-font-mono">{{ item.label || 'No Label' }}</td>
-          <td class="daisy-px-4 daisy-py-2 daisy-font-mono">
-            <div class="daisy-flex daisy-justify-end">
+          <td class="px-4 py-2 font-mono">{{ item.label || 'No Label' }}</td>
+          <td class="px-4 py-2 font-mono">
+            <div class="flex justify-end">
               <button class="daisy-btn daisy-btn-error daisy-btn-xs" @click="deleteToken(item.id)">Delete</button>
             </div>
           </td>
         </tr>
         <tr v-if="tokens.length === 0">
-          <td class="daisy-px-4 daisy-py-2 daisy-text-gray-400">No tokens yet</td>
+          <td class="px-4 py-2 text-gray-400">No tokens yet</td>
         </tr>
       </tbody>
     </table>

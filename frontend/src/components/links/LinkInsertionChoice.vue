@@ -1,12 +1,12 @@
 <template>
-  <div class="daisy-flex daisy-flex-col daisy-gap-3">
+  <div class="flex flex-col gap-3">
     <div>
       Link to:
       <strong>
         <NoteTitleComponent v-bind="{ noteTopology: targetNoteTopology }" />
       </strong>
     </div>
-    <div class="daisy-flex daisy-flex-col daisy-gap-2">
+    <div class="flex flex-col gap-2">
       <button class="daisy-btn daisy-btn-primary" @click="onPrimaryClick">
         {{ primaryLabel }}
       </button>
@@ -26,7 +26,7 @@
       </button>
     </div>
     <button class="daisy-btn daisy-btn-ghost go-back-button" @click="$emit('goBack')">
-      <Reply class="daisy-w-6 daisy-h-6" />
+      <Reply class="w-6 h-6" />
     </button>
   </div>
 </template>

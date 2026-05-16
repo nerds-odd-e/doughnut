@@ -1,10 +1,10 @@
 <template>
   <section
     v-if="showSection"
-    class="daisy-mb-3"
+    class="mb-3"
     :class="
       isInteractionLocked
-        ? 'daisy-pointer-events-none daisy-opacity-60'
+        ? 'pointer-events-none opacity-60'
         : ''
     "
     :aria-labelledby="headingVisible ? headingId : undefined"
@@ -12,21 +12,21 @@
   >
     <div
       v-if="headingVisible"
-      class="daisy-flex daisy-items-center daisy-justify-between daisy-gap-2 daisy-mb-2"
+      class="flex items-center justify-between gap-2 mb-2"
     >
       <h4
         :id="headingId"
-        class="daisy-mb-0 daisy-text-sm daisy-font-semibold"
+        class="mb-0 text-sm font-semibold"
       >
         Properties
       </h4>
       <button
         v-if="showInsertChrome && propertyRows.length > 0"
         type="button"
-        class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-inline-flex daisy-shrink-0 daisy-items-center daisy-gap-1"
+        class="daisy-btn daisy-btn-ghost daisy-btn-sm inline-flex shrink-0 items-center gap-1"
         @click="openPropertyInsert"
       >
-        <Plus class="daisy-h-4 daisy-w-4" aria-hidden="true" />
+        <Plus class="h-4 w-4" aria-hidden="true" />
         Add property
       </button>
     </div>
@@ -36,7 +36,7 @@
     />
     <div
       v-else-if="propertyRows.length > 0"
-      class="daisy-flex daisy-flex-col daisy-gap-2 daisy-text-sm"
+      class="flex flex-col gap-2 text-sm"
     >
       <RichFrontmatterEditablePropertyRow
         v-for="(_, idx) in propertyRows"
@@ -61,7 +61,7 @@
       v-if="validationMessage"
       role="alert"
       aria-live="polite"
-      class="daisy-text-error daisy-text-xs daisy-mt-1"
+      class="text-error text-xs mt-1"
       data-testid="rich-note-property-validation"
     >
       {{ validationMessage }}
@@ -69,10 +69,10 @@
     <button
       v-if="showInsertChrome && !insertOpen && propertyRows.length === 0"
       type="button"
-      class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-inline-flex daisy-self-start daisy-items-center daisy-gap-1"
+      class="daisy-btn daisy-btn-ghost daisy-btn-sm inline-flex self-start items-center gap-1"
       @click="openPropertyInsert"
     >
-      <Plus class="daisy-h-4 daisy-w-4" aria-hidden="true" />
+      <Plus class="h-4 w-4" aria-hidden="true" />
       Add property
     </button>
     <RichFrontmatterInsertForm

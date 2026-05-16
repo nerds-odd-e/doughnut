@@ -6,27 +6,27 @@
     >
       <div
         v-if="hit.hitKind === 'NOTE' && hit.noteSearchResult"
-        class="dropdown-hit-row daisy-flex daisy-items-start daisy-gap-2 daisy-py-1 daisy-px-2"
+        class="dropdown-hit-row flex items-start gap-2 py-1 px-2"
       >
         <div
-          class="dropdown-hit-icon-col daisy-flex daisy-w-5 daisy-shrink-0 daisy-items-start daisy-justify-center daisy-mt-0.5"
+          class="dropdown-hit-icon-col flex w-5 shrink-0 items-start justify-center mt-0.5"
         >
           <FileText :size="14" class="dropdown-hit-kind-icon" aria-hidden="true" />
         </div>
-        <div class="daisy-min-w-0 daisy-flex-1">
+        <div class="min-w-0 flex-1">
           <NoteTitleWithLink :note-topology="hit.noteSearchResult.noteTopology" />
         </div>
       </div>
       <div
         v-else-if="hit.hitKind === 'FOLDER'"
-        class="dropdown-hit-row folder-search-hit daisy-flex daisy-items-start daisy-gap-2 daisy-py-1 daisy-px-2"
+        class="dropdown-hit-row folder-search-hit flex items-start gap-2 py-1 px-2"
       >
         <div
-          class="dropdown-hit-icon-col daisy-flex daisy-w-5 daisy-shrink-0 daisy-items-start daisy-justify-center daisy-mt-0.5"
+          class="dropdown-hit-icon-col flex w-5 shrink-0 items-start justify-center mt-0.5"
         >
           <Folder :size="14" class="dropdown-hit-kind-icon" aria-hidden="true" />
         </div>
-        <div class="daisy-min-w-0 daisy-flex-1">
+        <div class="min-w-0 flex-1">
           <router-link
             v-if="hit.folderId != null && hit.notebookId != null"
             :to="{
@@ -36,27 +36,27 @@
                 folderId: hit.folderId,
               },
             }"
-            class="daisy-block daisy-font-medium daisy-text-decoration-none"
+            class="block font-medium daisy-text-decoration-none"
           >{{ hit.folderName }}</router-link>
-          <span v-else class="daisy-font-medium">{{ hit.folderName }}</span>
+          <span v-else class="font-medium">{{ hit.folderName }}</span>
           <span
             v-if="hit.notebookName"
-            class="daisy-block daisy-text-xs daisy-opacity-70"
+            class="block text-xs opacity-70"
           >{{ hit.notebookName }}</span>
         </div>
       </div>
       <div
         v-else-if="hit.hitKind === 'NOTEBOOK' && hit.notebookId != null"
-        class="dropdown-hit-row daisy-flex daisy-items-start daisy-gap-2 daisy-py-1 daisy-px-2"
+        class="dropdown-hit-row flex items-start gap-2 py-1 px-2"
       >
         <div
-          class="dropdown-hit-icon-col daisy-flex daisy-w-5 daisy-shrink-0 daisy-items-start daisy-justify-center daisy-mt-0.5"
+          class="dropdown-hit-icon-col flex w-5 shrink-0 items-start justify-center mt-0.5"
         >
           <BookText :size="14" class="dropdown-hit-kind-icon" aria-hidden="true" />
         </div>
         <router-link
           :to="{ name: 'notebookPage', params: { notebookId: hit.notebookId } }"
-          class="daisy-min-w-0 daisy-flex-1 daisy-text-decoration-none daisy-font-medium"
+          class="min-w-0 flex-1 daisy-text-decoration-none font-medium"
         >{{ hit.notebookName }}</router-link>
       </div>
     </template>

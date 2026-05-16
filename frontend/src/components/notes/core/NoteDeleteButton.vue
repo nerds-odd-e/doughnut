@@ -1,6 +1,6 @@
 <template>
   <button title="Delete note" @click="deleteNote">
-    <Trash2 class="daisy-w-6 daisy-h-6" />Delete note
+    <Trash2 class="w-6 h-6" />Delete note
   </button>
 </template>
 

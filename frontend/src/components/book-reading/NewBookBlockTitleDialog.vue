@@ -5,12 +5,12 @@
     data-testid="new-block-title-dialog"
   >
     <div class="daisy-modal-box">
-      <h2 class="daisy-text-lg daisy-font-semibold">Name the new block</h2>
+      <h2 class="text-lg font-semibold">Name the new block</h2>
       <input
         v-if="open"
         v-model="titleInput"
         data-testid="new-block-title-input"
-        class="daisy-input daisy-input-bordered daisy-w-full daisy-mt-2"
+        class="daisy-input w-full mt-2"
         type="text"
       />
       <div class="daisy-modal-action">

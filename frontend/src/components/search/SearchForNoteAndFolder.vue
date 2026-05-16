@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div class="daisy-flex daisy-items-center daisy-gap-2 daisy-w-full">
+    <div class="flex items-center gap-2 w-full">
       <TextInput
-        class="daisy-flex-1 daisy-min-w-0"
+        class="flex-1 min-w-0"
         scope-name="searchTerm"
         field="searchKey"
         v-model="inputSearchKey"
@@ -61,12 +61,12 @@
         :class="[
           'daisy-btn daisy-btn-ghost daisy-btn-sm daisy-btn-square',
           allMyNotebooksAndSubscriptions
-            ? 'daisy-text-primary'
-            : 'daisy-opacity-30',
+            ? 'text-primary'
+            : 'opacity-30',
         ]"
         @click="allMyNotebooksAndSubscriptions = !allMyNotebooksAndSubscriptions"
       >
-        <BookOpen class="daisy-w-6 daisy-h-6" />
+        <BookOpen class="w-6 h-6" />
       </button>
       <button
         type="button"
@@ -74,11 +74,11 @@
         aria-label="All My Circles"
         :class="[
           'daisy-btn daisy-btn-ghost daisy-btn-sm daisy-btn-square',
-          allMyCircles ? 'daisy-text-primary' : 'daisy-opacity-30',
+          allMyCircles ? 'text-primary' : 'opacity-30',
         ]"
         @click="allMyCircles = !allMyCircles"
       >
-        <Users class="daisy-w-6 daisy-h-6" />
+        <Users class="w-6 h-6" />
       </button>
       <button
         type="button"
@@ -86,11 +86,11 @@
         aria-label="Semantic search"
         :class="[
           'daisy-btn daisy-btn-ghost daisy-btn-sm daisy-btn-square',
-          semanticSearchEnabled ? 'daisy-text-primary' : 'daisy-opacity-30',
+          semanticSearchEnabled ? 'text-primary' : 'opacity-30',
         ]"
         @click="semanticSearchEnabled = !semanticSearchEnabled"
       >
-        <Sparkles class="daisy-w-6 daisy-h-6" />
+        <Sparkles class="w-6 h-6" />
       </button>
       <button
         v-if="modalCloser"
@@ -100,7 +100,7 @@
         class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-btn-square"
         @click="modalCloser()"
       >
-        <X class="daisy-w-6 daisy-h-6" />
+        <X class="w-6 h-6" />
       </button>
     </div>
     <SearchResults

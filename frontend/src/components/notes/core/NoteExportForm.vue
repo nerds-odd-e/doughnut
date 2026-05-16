@@ -2,11 +2,11 @@
   <div class="daisy-card">
     <div class="daisy-card-body">
       <h3 class="daisy-card-title">Export Note Data</h3>
-      <p class="daisy-text-sm daisy-text-base-content/70 daisy-mb-2">
+      <p class="text-sm text-base-content/70 mb-2">
         Focus-context markdown. The token budget limits approximate size of the focus note body plus
         all included related note bodies combined (same value for graph JSON below).
       </p>
-      <div class="daisy-flex daisy-items-center daisy-gap-2 daisy-mb-2">
+      <div class="flex items-center gap-2 mb-2">
         <label for="context-token-limit" class="daisy-label-text">Token budget:</label>
         <input
           id="context-token-limit"
@@ -15,7 +15,7 @@
           max="10000"
           step="100"
           v-model.number="tokenLimit"
-          class="daisy-input daisy-input-sm daisy-w-24"
+          class="daisy-input daisy-input-sm w-24"
           data-testid="token-limit-input"
         />
         <button
@@ -42,19 +42,19 @@
         copy-aria-label="Copy markdown"
         download-aria-label="Download markdown"
       />
-      <details :open="expandedGraph" class="daisy-collapse daisy-bg-base-200 daisy-rounded-box daisy-mt-4">
+      <details :open="expandedGraph" class="daisy-collapse bg-base-200 rounded-box mt-4">
         <summary
-          class="daisy-flex daisy-items-center daisy-gap-2 daisy-underline daisy-cursor-pointer daisy-py-2 daisy-px-1"
+          class="flex items-center gap-2 underline cursor-pointer py-2 px-1"
           @click="toggleGraphExpanded($event)"
         >
-          <svg :class="['daisy-transition-transform', 'daisy-duration-200', expandedGraph ? 'daisy-rotate-90' : '']" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          <svg :class="['transition-transform', 'duration-200', expandedGraph ? 'rotate-90' : '']" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
           Export Note Graph (JSON)
         </summary>
-        <div v-if="expandedGraph" class="daisy-mt-4">
-          <p class="daisy-text-xs daisy-text-base-content/60 daisy-mb-2">
+        <div v-if="expandedGraph" class="mt-4">
+          <p class="text-xs text-base-content/60 mb-2">
             Uses the same combined token budget as above.
           </p>
-          <div class="daisy-flex daisy-items-center daisy-gap-2 daisy-mb-2">
+          <div class="flex items-center gap-2 mb-2">
             <button
               class="daisy-btn daisy-btn-ghost daisy-btn-xs"
               type="button"

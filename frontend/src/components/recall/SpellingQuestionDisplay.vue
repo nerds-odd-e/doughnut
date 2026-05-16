@@ -1,15 +1,15 @@
 <template>
-  <div class="quiz-instruction daisy-relative daisy-h-full daisy-flex daisy-flex-col" data-test="question-section">
+  <div class="quiz-instruction relative h-full flex flex-col" data-test="question-section">
     <InactiveRecallMask :show="isActiveQuestion && isPaused" />
     <ContentLoader v-if="loading" />
     <template v-else>
-      <div class="daisy-flex-1 daisy-overflow-y-auto daisy-pb-4">
-        <div v-if="recallPrompt?.spellingQuestion?.notebook" class="notebook-source daisy-mb-4">
+      <div class="flex-1 overflow-y-auto pb-4">
+        <div v-if="recallPrompt?.spellingQuestion?.notebook" class="notebook-source mb-4">
           <NotebookLink :notebook="recallPrompt.spellingQuestion.notebook" />
         </div>
         <QuestionStem :stem="stem" />
       </div>
-      <form @submit.prevent="submitAnswer" class="daisy-sticky daisy-bottom-0 daisy-bg-base-100 daisy-pt-4 daisy-pb-4">
+      <form @submit.prevent="submitAnswer" class="sticky bottom-0 bg-base-100 pt-4 pb-4">
         <TextInput
           scope-name="memory_tracker"
           field="answer"

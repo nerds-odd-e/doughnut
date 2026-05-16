@@ -1,25 +1,25 @@
 <template>
-  <div class="daisy-w-full" data-testid="folder-selector-search-dialog">
-    <h3 class="daisy-font-bold daisy-text-lg daisy-mb-2">Find folder</h3>
-    <p class="daisy-text-sm daisy-text-base-content/70 daisy-mb-1">
+  <div class="w-full" data-testid="folder-selector-search-dialog">
+    <h3 class="font-bold text-lg mb-2">Find folder</h3>
+    <p class="text-sm text-base-content/70 mb-1">
       Current selection
     </p>
     <p
-      class="daisy-text-sm daisy-mb-4 daisy-break-words daisy-whitespace-normal daisy-max-w-full"
+      class="text-sm mb-4 break-words whitespace-normal max-w-full"
       data-testid="folder-selector-search-current-path"
     >
       {{ currentPathDisplay }}
     </p>
-    <p v-if="indexLoadError" class="daisy-text-error daisy-text-sm daisy-mb-2">
+    <p v-if="indexLoadError" class="text-error text-sm mb-2">
       {{ indexLoadError }}
     </p>
     <div
-      class="daisy-flex daisy-items-center daisy-gap-2 daisy-w-full daisy-mb-3 daisy-input daisy-input-bordered"
+      class="flex items-center gap-2 w-full mb-3 daisy-input"
       :aria-busy="foldersLoading"
     >
       <span
         v-if="foldersLoading"
-        class="daisy-inline-flex daisy-shrink-0 daisy-items-center"
+        class="inline-flex shrink-0 items-center"
         role="status"
         aria-label="Loading folders"
       >
@@ -30,13 +30,13 @@
       </span>
       <Search
         v-else
-        class="daisy-w-4 daisy-h-4 daisy-shrink-0 daisy-opacity-50"
+        class="w-4 h-4 shrink-0 opacity-50"
       />
       <input
         ref="searchInputRef"
         v-model="query"
         type="search"
-        class="daisy-grow daisy-min-w-0 daisy-border-0 daisy-bg-transparent daisy-outline-none"
+        class="grow min-w-0 border-0 bg-transparent outline-none"
         placeholder="Search by name or path"
         data-testid="folder-selector-search-input"
         autocomplete="off"
@@ -44,12 +44,12 @@
       />
     </div>
     <ul
-      class="daisy-menu daisy-flex-nowrap daisy-w-full daisy-bg-base-200 daisy-rounded-box daisy-max-h-64 daisy-overflow-y-auto"
+      class="daisy-menu flex-nowrap w-full bg-base-200 rounded-box max-h-64 overflow-y-auto"
     >
-      <li v-if="showRootRow" class="daisy-w-full">
+      <li v-if="showRootRow" class="w-full">
         <button
           type="button"
-          class="daisy-text-left daisy-w-full daisy-break-words daisy-whitespace-normal"
+          class="text-left w-full break-words whitespace-normal"
           data-testid="folder-selector-search-result"
           data-folder-id="__root__"
           @click="pickRow(null)"
@@ -57,10 +57,10 @@
           Notebook root
         </button>
       </li>
-      <li v-for="r in filteredFolders" :key="r.id" class="daisy-w-full">
+      <li v-for="r in filteredFolders" :key="r.id" class="w-full">
         <button
           type="button"
-          class="daisy-text-left daisy-w-full daisy-break-words daisy-whitespace-normal"
+          class="text-left w-full break-words whitespace-normal"
           data-testid="folder-selector-search-result"
           :data-folder-id="String(r.id)"
           @click="pickRow(r)"
@@ -69,7 +69,7 @@
         </button>
       </li>
     </ul>
-    <div class="daisy-flex daisy-w-full daisy-justify-end daisy-mt-4">
+    <div class="flex w-full justify-end mt-4">
       <button
         type="button"
         class="daisy-btn"

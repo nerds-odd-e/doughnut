@@ -1,17 +1,17 @@
 <template>
   <div
     v-if="!isMdOrLarger && opened"
-    class="daisy-fixed daisy-inset-0 daisy-bg-black/50 daisy-z-30"
+    class="fixed inset-0 bg-black/50 z-30"
     aria-hidden="true"
     @click="closeOverlay"
   />
   <div
-    class="daisy-flex daisy-flex-1 daisy-min-h-0 daisy-relative"
+    class="flex flex-1 min-h-0 relative"
     :aria-busy="fullLayoutBusy ? true : undefined"
   >
     <div
       v-if="fullLayoutBusy"
-      class="book-reading-layout-full-busy daisy-absolute daisy-inset-0 daisy-z-50 daisy-flex daisy-items-center daisy-justify-center daisy-bg-base-100/70"
+      class="book-reading-layout-full-busy absolute inset-0 z-50 flex items-center justify-center bg-base-100/70"
       data-testid="book-reading-layout-full-busy"
       aria-hidden="true"
     >
@@ -24,19 +24,19 @@
       ref="asideRef"
       data-testid="book-reading-book-layout-aside"
       :class="[
-        'daisy-relative daisy-bg-base-200 daisy-w-72 daisy-min-w-[16rem] daisy-max-w-[min(20rem,85vw)] daisy-transition-transform daisy-ease-in-out daisy-duration-200 daisy-overflow-y-auto daisy-overflow-x-hidden',
+        'relative bg-base-200 w-72 min-w-[16rem] max-w-[min(20rem,85vw)] transition-transform ease-in-out duration-200 overflow-y-auto overflow-x-hidden',
         isMdOrLarger
           ? opened
-            ? 'daisy-shrink-0 daisy-border-r daisy-border-base-300'
-            : 'daisy-hidden'
+            ? 'shrink-0 border-r border-base-300'
+            : 'hidden'
           : opened
-            ? 'daisy-translate-x-0 daisy-fixed daisy-top-0 daisy-left-0 daisy-z-40 daisy-h-full daisy-pt-[env(safe-area-inset-top)]'
-            : '-daisy-translate-x-full daisy-fixed daisy-top-0 daisy-left-0 daisy-z-40 daisy-h-full',
+            ? 'translate-x-0 fixed top-0 left-0 z-40 h-full pt-[env(safe-area-inset-top)]'
+            : '-translate-x-full fixed top-0 left-0 z-40 h-full',
       ]"
     >
       <div
         v-if="fullLayoutBusy && !isMdOrLarger && opened"
-        class="book-reading-layout-full-busy daisy-absolute daisy-inset-0 daisy-z-50 daisy-flex daisy-items-center daisy-justify-center daisy-bg-base-200/70"
+        class="book-reading-layout-full-busy absolute inset-0 z-50 flex items-center justify-center bg-base-200/70"
         data-testid="book-reading-layout-aside-full-busy"
         aria-hidden="true"
       >
@@ -46,12 +46,12 @@
       </div>
       <div
         data-testid="book-reading-book-layout"
-        class="daisy-p-3 daisy-pb-8"
+        class="p-3 pb-8"
       >
         <button
           type="button"
           data-testid="book-reading-ai-reorganize-layout"
-          class="daisy-btn daisy-btn-sm daisy-btn-outline daisy-btn-primary daisy-mb-3 daisy-w-full"
+          class="daisy-btn daisy-btn-sm daisy-btn-outline daisy-btn-primary mb-3 w-full"
           :disabled="layoutActionsLocked"
           @click="emit('requestAiReorganize')"
         >
@@ -126,19 +126,19 @@
             {{ block.title }}
             <span
               v-if="dispositionForBlock(block.id) === 'READ'"
-              class="daisy-sr-only"
+              class="sr-only"
             >
               Marked as read
             </span>
             <span
               v-else-if="dispositionForBlock(block.id) === 'SKIMMED'"
-              class="daisy-sr-only"
+              class="sr-only"
             >
               Marked as skimmed
             </span>
             <span
               v-else-if="dispositionForBlock(block.id) === 'SKIPPED'"
-              class="daisy-sr-only"
+              class="sr-only"
             >
               Marked as skipped
             </span>
@@ -376,61 +376,63 @@ watch(
 </script>
 
 <style scoped>
+@reference "@/assets/daisyui.css";
+
 aside {
   max-height: 100%;
 }
 
 .book-reading-book-block--pending {
-  @apply daisy-relative;
+  @apply relative;
 }
 
 .book-reading-book-block-pending-overlay {
-  @apply daisy-absolute daisy-inset-0 daisy-z-[1] daisy-flex daisy-items-center daisy-justify-center daisy-bg-base-200/70;
+  @apply absolute inset-0 z-[1] flex items-center justify-center bg-base-200/70;
 }
 
 .book-reading-book-block {
-  @apply daisy-flex daisy-w-full daisy-min-h-10 daisy-items-stretch daisy-gap-1 daisy-text-left daisy-rounded-none;
-  @apply daisy-border-0 daisy-border-solid daisy-border-l-4 daisy-border-transparent;
-  @apply daisy-py-0 daisy-pr-2 daisy-pl-1 daisy-text-sm daisy-leading-snug daisy-font-normal;
-  @apply daisy-transition-colors daisy-duration-150;
-  @apply hover:daisy-bg-base-300/55;
-  @apply focus:daisy-outline-none focus-visible:daisy-ring-2 focus-visible:daisy-ring-primary/50;
-  @apply focus-visible:daisy-ring-offset-2 focus-visible:daisy-ring-offset-base-200;
+  @apply flex w-full min-h-10 items-stretch gap-1 text-left rounded-none;
+  @apply border-0 border-solid border-l-4 border-transparent;
+  @apply py-0 pr-2 pl-1 text-sm leading-snug font-normal;
+  @apply transition-colors duration-150;
+  @apply hover:bg-base-300/55;
+  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50;
+  @apply focus-visible:ring-offset-2 focus-visible:ring-offset-base-200;
 }
 
 .book-reading-book-block-guides {
-  @apply daisy-flex daisy-shrink-0 daisy-items-stretch;
+  @apply flex shrink-0 items-stretch;
 }
 
 .book-reading-book-block-guide {
-  @apply daisy-flex daisy-w-3 daisy-shrink-0 daisy-flex-col daisy-items-center daisy-self-stretch daisy-min-h-0;
+  @apply flex w-3 shrink-0 flex-col items-center self-stretch min-h-0;
 }
 
 .book-reading-book-block-guide-line {
-  @apply daisy-w-0.5 daisy-min-h-0 daisy-flex-1 daisy-rounded-none daisy-bg-base-content/25;
+  @apply w-0.5 min-h-0 flex-1 rounded-none bg-base-content/25;
 }
 
 .book-reading-book-block-title {
-  @apply daisy-min-w-0 daisy-flex-1 daisy-py-2 daisy-pl-0 daisy-text-left;
+  @apply min-w-0 flex-1 py-2 pl-0 text-left;
 }
 
 .book-reading-book-block[data-current-block="true"] {
-  @apply daisy-bg-primary/35;
+  @apply bg-primary/35;
 }
 
 .book-reading-book-block[data-current-selection="true"] {
-  @apply daisy-border-primary daisy-font-medium;
+  @apply border-primary font-medium;
 }
 
 .book-reading-book-block[data-direct-content-read="true"] {
-  @apply daisy-border-r-4 daisy-border-r-success;
+  @apply border-r-4 border-r-success;
 }
 
 .book-reading-book-block[data-direct-content-skimmed="true"] {
-  @apply daisy-border-r-4 daisy-border-r-warning;
+  @apply border-r-4 border-r-warning;
 }
 
 .book-reading-book-block[data-direct-content-skipped="true"] {
-  @apply daisy-border-r-4 daisy-border-r-neutral;
+  @apply border-r-4 border-r-neutral;
 }
 </style>

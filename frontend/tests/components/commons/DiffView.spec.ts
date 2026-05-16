@@ -471,7 +471,7 @@ describe("DiffView", () => {
       const leftPane = screen.getByTestId("diff-left-pane")
       const table = leftPane.querySelector(".diff-table")
 
-      expect(table?.classList.contains("daisy-font-mono")).toBe(true)
+      expect(table?.classList.contains("font-mono")).toBe(true)
     })
 
     it("displays Current and Will restore to labels", () => {

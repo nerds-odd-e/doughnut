@@ -69,7 +69,7 @@ describe("SearchForm", () => {
       await screen.findByRole("button", {
         name: "All My Notebooks And Subscriptions",
       })
-    ).toHaveClass("daisy-text-primary")
+    ).toHaveClass("text-primary")
     flushPromises()
     ;(
       await screen.findByRole("button", {
@@ -78,7 +78,7 @@ describe("SearchForm", () => {
     ).click()
     expect(
       await screen.findByRole("button", { name: "All My Circles" })
-    ).not.toHaveClass("daisy-text-primary")
+    ).not.toHaveClass("text-primary")
   })
 
   describe("Add link choice step", () => {

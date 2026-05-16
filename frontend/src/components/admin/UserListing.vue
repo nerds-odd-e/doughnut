@@ -25,7 +25,7 @@
 
     <div
       v-if="userPage.totalPages && userPage.totalPages > 1"
-      class="daisy-join daisy-mt-4"
+      class="daisy-join mt-4"
     >
       <button
         class="daisy-join-item daisy-btn"

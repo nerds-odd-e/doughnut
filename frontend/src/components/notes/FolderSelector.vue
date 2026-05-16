@@ -1,15 +1,15 @@
 <template>
-  <div class="daisy-w-full">
-    <p v-if="loadError" class="daisy-text-error daisy-text-sm daisy-mb-2">
+  <div class="w-full">
+    <p v-if="loadError" class="text-error text-sm mb-2">
       {{ loadError }}
     </p>
-    <div class="daisy-join daisy-w-full folder-selector-join">
+    <div class="daisy-join w-full folder-selector-join">
       <div
-        class="folder-selector-join-select daisy-join-item daisy-flex daisy-flex-1 daisy-min-w-0 daisy-items-center daisy-border daisy-border-base-content/20 daisy-bg-base-100 daisy-pl-3 daisy-pr-2 daisy-rounded-l-lg daisy-min-h-[2.75rem]"
+        class="folder-selector-join-select daisy-join-item flex flex-1 min-w-0 items-center border border-base-content/20 bg-base-100 pl-3 pr-2 rounded-l-lg min-h-[2.75rem]"
       >
         <select
           v-model="selectModel"
-          class="daisy-select daisy-select-sm daisy-w-full daisy-min-h-0 daisy-flex-1 daisy-border-0 daisy-bg-transparent daisy-shadow-none focus:daisy-outline-none focus:daisy-ring-0"
+          class="daisy-select daisy-select-sm w-full min-h-0 flex-1 border-0 bg-transparent shadow-none focus:outline-none focus:ring-0"
           data-testid="folder-move-parent-select"
           :disabled="disabled"
         >
@@ -42,18 +42,18 @@
         </select>
       </div>
       <div
-        class="folder-selector-join-append daisy-join-item daisy-flex daisy-shrink-0 daisy-self-stretch daisy-items-stretch"
+        class="folder-selector-join-append daisy-join-item flex shrink-0 self-stretch items-stretch"
       >
         <button
           type="button"
-          class="daisy-btn daisy-btn-outline daisy-btn-neutral daisy-rounded-l-none daisy-rounded-r-lg"
+          class="daisy-btn daisy-btn-outline daisy-btn-neutral rounded-l-none rounded-r-lg"
           :disabled="disabled"
           title="Search folders"
           aria-label="Search folders"
           data-testid="folder-selector-more-button"
           @click="searchOpen = true"
         >
-          <MoreHorizontal class="daisy-w-5 daisy-h-5" />
+          <MoreHorizontal class="w-5 h-5" />
         </button>
       </div>
     </div>

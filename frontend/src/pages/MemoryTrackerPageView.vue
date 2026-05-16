@@ -1,6 +1,6 @@
 <template>
-  <div v-if="isSkipped" class="daisy-alert daisy-alert-warning daisy-mb-4">
-    <div class="daisy-flex daisy-items-center daisy-justify-between">
+  <div v-if="isSkipped" class="daisy-alert daisy-alert-warning mb-4">
+    <div class="flex items-center justify-between">
       <span>This memory tracker is currently skipped and will not appear in recall sessions.</span>
       <button
         class="daisy-btn daisy-btn-sm daisy-btn-primary"
@@ -13,50 +13,50 @@
     </div>
   </div>
   <div>
-    <div v-if="memoryTracker" class="daisy-card daisy-shadow-sm daisy-mb-6">
+    <div v-if="memoryTracker" class="daisy-card shadow-sm mb-6">
       <div class="daisy-card-body">
-        <h2 class="daisy-card-title daisy-text-lg daisy-mb-4">Memory Tracker Information</h2>
-        <div class="daisy-grid daisy-grid-cols-2 daisy-gap-4 daisy-text-sm">
+        <h2 class="daisy-card-title text-lg mb-4">Memory Tracker Information</h2>
+        <div class="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <span class="daisy-font-semibold">Assimilated Time:</span>
-            <span class="daisy-ml-2">
+            <span class="font-semibold">Assimilated Time:</span>
+            <span class="ml-2">
               {{ memoryTracker.assimilatedAt ? new Date(memoryTracker.assimilatedAt).toLocaleString() : 'N/A' }}
             </span>
           </div>
           <div>
-            <span class="daisy-font-semibold">Last Recall Time:</span>
-            <span class="daisy-ml-2">
+            <span class="font-semibold">Last Recall Time:</span>
+            <span class="ml-2">
               {{ memoryTracker.lastRecalledAt ? new Date(memoryTracker.lastRecalledAt).toLocaleString() : 'N/A' }}
             </span>
           </div>
           <div>
-            <span class="daisy-font-semibold">Next Recall Time:</span>
-            <span class="daisy-ml-2">
+            <span class="font-semibold">Next Recall Time:</span>
+            <span class="ml-2">
               {{ new Date(memoryTracker.nextRecallAt).toLocaleString() }}
             </span>
           </div>
           <div>
-            <span class="daisy-font-semibold">Forgetting Curve Index:</span>
-            <span class="daisy-ml-2">
+            <span class="font-semibold">Forgetting Curve Index:</span>
+            <span class="ml-2">
               {{ memoryTracker.forgettingCurveIndex ?? 'N/A' }}
             </span>
           </div>
           <div>
-            <span class="daisy-font-semibold">Recall Count:</span>
-            <span class="daisy-ml-2">
+            <span class="font-semibold">Recall Count:</span>
+            <span class="ml-2">
               {{ memoryTracker.recallCount ?? 'N/A' }}
             </span>
           </div>
           <div>
-            <span class="daisy-font-semibold">Spelling:</span>
-            <span class="daisy-ml-2">
+            <span class="font-semibold">Spelling:</span>
+            <span class="ml-2">
               {{ memoryTracker.spelling ? 'Yes' : 'No' }}
             </span>
           </div>
         </div>
       </div>
     </div>
-    <div class="daisy-mb-4 daisy-flex daisy-justify-end daisy-gap-2">
+    <div class="mb-4 flex justify-end gap-2">
       <button
         v-if="hasUnansweredPrompts"
         class="daisy-btn daisy-btn-error"
@@ -73,11 +73,11 @@
         aria-label="remove this note from recall"
         @click="removeFromRecall"
       >
-        <EyeOff class="daisy-w-6 daisy-h-6" />
+        <EyeOff class="w-6 h-6" />
         <span>Remove from Recall</span>
       </button>
     </div>
-    <div v-if="memoryTracker.note" class="daisy-mb-6">
+    <div v-if="memoryTracker.note" class="mb-6">
       <NoteUnderQuestion
         v-bind="{
           noteTopology: memoryTracker.note.noteTopology,
@@ -93,10 +93,10 @@
       <div
         v-for="prompt in recallPrompts"
         :key="prompt.id"
-        class="daisy-card daisy-shadow-sm daisy-mb-4"
+        class="daisy-card shadow-sm mb-4"
       >
         <div class="daisy-card-body">
-          <div class="daisy-text-sm daisy-text-base-content/70 daisy-mb-2 daisy-flex daisy-gap-2 daisy-flex-wrap">
+          <div class="text-sm text-base-content/70 mb-2 flex gap-2 flex-wrap">
             <span v-if="prompt.questionGeneratedTime">
               Generated: {{ new Date(prompt.questionGeneratedTime).toLocaleString() }}
             </span>
@@ -114,13 +114,13 @@
             </span>
           </div>
           <div v-if="prompt.questionType === 'SPELLING'">
-            <div v-if="prompt.answer" class="daisy-space-y-2">
-              <div class="daisy-flex daisy-items-center daisy-gap-2">
-                <span class="daisy-font-semibold">Your answer:</span>
+            <div v-if="prompt.answer" class="space-y-2">
+              <div class="flex items-center gap-2">
+                <span class="font-semibold">Your answer:</span>
                 <span>{{ prompt.answer.spellingAnswer }}</span>
               </div>
-              <div class="daisy-flex daisy-items-center daisy-gap-2">
-                <span class="daisy-font-semibold">Result:</span>
+              <div class="flex items-center gap-2">
+                <span class="font-semibold">Result:</span>
                 <span
                   :class="{
                     'daisy-badge-success': prompt.answer.correct,

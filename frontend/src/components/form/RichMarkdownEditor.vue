@@ -18,10 +18,10 @@
       role="alert"
       aria-live="polite"
       data-testid="rich-note-frontmatter-parse-error"
-      class="daisy-alert daisy-alert-warning daisy-mb-3 daisy-text-sm"
+      class="daisy-alert daisy-alert-warning mb-3 text-sm"
     >
       <span>{{ frontmatterParseErrorMessage }}</span>
-      <span class="daisy-block daisy-mt-1 daisy-text-xs daisy-opacity-90">
+      <span class="block mt-1 text-xs opacity-90">
         Switch to Markdown mode to fix the frontmatter.
       </span>
     </div>

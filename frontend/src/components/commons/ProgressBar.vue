@@ -1,8 +1,8 @@
 <template>
-  <div class="daisy-flex-shrink-0">
+  <div class="flex-shrink-0">
     <slot name="buttons" />
   </div>
-  <div class="daisy-flex-grow" @click.prevent="$emit('showSettings')">
+  <div class="flex-grow" @click.prevent="$emit('showSettings')">
     <div
       :class="['daisy-progress-bar', { thin : $slots.default !== undefined, 'diligent-mode': diligentMode }]"
       v-if="toRepeatCount !== null"

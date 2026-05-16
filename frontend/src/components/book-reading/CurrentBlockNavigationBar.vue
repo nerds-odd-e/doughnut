@@ -1,15 +1,15 @@
 <template>
   <div
     data-testid="current-block-navigation-bar"
-    class="daisy-pointer-events-none daisy-absolute daisy-left-0 daisy-right-0 daisy-bottom-0 daisy-z-20 daisy-px-2 daisy-pb-[max(0.5rem,env(safe-area-inset-bottom))] daisy-pt-2"
+    class="pointer-events-none absolute left-0 right-0 bottom-0 z-20 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2"
   >
     <div
-      class="daisy-pointer-events-auto daisy-mx-auto daisy-max-w-3xl daisy-rounded-lg daisy-bg-base-100/95 daisy-border daisy-border-base-300 daisy-shadow-lg daisy-px-3 daisy-py-2 daisy-flex daisy-flex-wrap daisy-items-center daisy-gap-2"
+      class="pointer-events-auto mx-auto max-w-3xl rounded-lg bg-base-100/95 border border-base-300 shadow-lg px-3 py-2 flex flex-wrap items-center gap-2"
     >
-      <p class="daisy-text-sm daisy-min-w-0 daisy-flex-1 daisy-basis-full sm:daisy-basis-auto daisy-m-0 daisy-text-base-content/70">
-        Now reading: <span class="daisy-font-medium daisy-text-base-content">{{ currentBlockTitle }}</span>
+      <p class="text-sm min-w-0 flex-1 basis-full sm:basis-auto m-0 text-base-content/70">
+        Now reading: <span class="font-medium text-base-content">{{ currentBlockTitle }}</span>
       </p>
-      <div class="daisy-flex daisy-flex-wrap daisy-items-center daisy-gap-2 daisy-shrink-0">
+      <div class="flex flex-wrap items-center gap-2 shrink-0">
         <button
           type="button"
           data-testid="read-from-here"

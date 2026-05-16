@@ -7,29 +7,29 @@
       :is-active="false"
     >
       <template #dropdown="slotProps">
-        <ul tabindex="0" class="daisy-dropdown-content daisy-menu daisy-p-2 daisy-bg-base-100 daisy-rounded-box daisy-w-52 daisy-shadow daisy-max-w-52 daisy-overflow-hidden daisy-z-[1000]">
-          <li v-if="user?.admin" class="daisy-menu-item hover:daisy-bg-base-200">
-            <router-link :to="{ name: 'adminDashboard' }" class="daisy-menu-title daisy-justify-start daisy-text-primary hover:daisy-text-primary-focus daisy-w-full daisy-text-left daisy-truncate" @click="slotProps.closeDropdown">
+        <ul tabindex="0" class="daisy-dropdown-content daisy-menu p-2 bg-base-100 rounded-box w-52 shadow max-w-52 overflow-hidden z-[1000]">
+          <li v-if="user?.admin" class="daisy-menu-item hover:bg-base-200">
+            <router-link :to="{ name: 'adminDashboard' }" class="daisy-menu-title justify-start text-primary hover:text-primary-focus w-full text-left truncate" @click="slotProps.closeDropdown">
               Admin Dashboard
             </router-link>
           </li>
-          <li class="daisy-menu-item hover:daisy-bg-base-200">
-            <router-link :to="{ name: 'recent' }" class="daisy-menu-title daisy-justify-start daisy-text-primary hover:daisy-text-primary-focus daisy-w-full daisy-text-left daisy-truncate" @click="slotProps.closeDropdown">
-              <CircleCheck class="daisy-mr-2 daisy-w-6 daisy-h-6 daisy-shrink-0" />Recent...
+          <li class="daisy-menu-item hover:bg-base-200">
+            <router-link :to="{ name: 'recent' }" class="daisy-menu-title justify-start text-primary hover:text-primary-focus w-full text-left truncate" @click="slotProps.closeDropdown">
+              <CircleCheck class="mr-2 w-6 h-6 shrink-0" />Recent...
             </router-link>
           </li>
-          <li class="daisy-menu-item hover:daisy-bg-base-200">
-            <a href="#" class="daisy-menu-title daisy-justify-start daisy-text-primary hover:daisy-text-primary-focus daisy-w-full daisy-text-left daisy-truncate" @click="(e) => { e.preventDefault(); showUserSettingsDialog(); slotProps.closeDropdown(); }">
+          <li class="daisy-menu-item hover:bg-base-200">
+            <a href="#" class="daisy-menu-title justify-start text-primary hover:text-primary-focus w-full text-left truncate" @click="(e) => { e.preventDefault(); showUserSettingsDialog(); slotProps.closeDropdown(); }">
               Settings for {{ user.name }}
             </a>
           </li>
-          <li class="daisy-menu-item hover:daisy-bg-base-200">
-            <router-link :to="{ name: 'manageAccessTokens' }" class="daisy-menu-title daisy-justify-start daisy-text-primary hover:daisy-text-primary-focus daisy-w-full daisy-text-left daisy-truncate" @click="slotProps.closeDropdown">
+          <li class="daisy-menu-item hover:bg-base-200">
+            <router-link :to="{ name: 'manageAccessTokens' }" class="daisy-menu-title justify-start text-primary hover:text-primary-focus w-full text-left truncate" @click="slotProps.closeDropdown">
               Manage Access Tokens
             </router-link>
           </li>
-          <li class="daisy-menu-item hover:daisy-bg-base-200">
-            <a href="#" class="daisy-menu-title daisy-justify-start daisy-text-primary hover:daisy-text-primary-focus daisy-w-full daisy-text-left daisy-truncate" @click="(e) => { e.preventDefault(); logout(); slotProps.closeDropdown(); }">
+          <li class="daisy-menu-item hover:bg-base-200">
+            <a href="#" class="daisy-menu-title justify-start text-primary hover:text-primary-focus w-full text-left truncate" @click="(e) => { e.preventDefault(); logout(); slotProps.closeDropdown(); }">
               Logout
             </a>
           </li>

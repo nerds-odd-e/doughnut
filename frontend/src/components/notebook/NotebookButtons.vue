@@ -1,5 +1,5 @@
 <template>
-  <div class="daisy-btn-group daisy-btn-group-sm daisy-flex daisy-align-items-center daisy-flex-wrap">
+  <div class="daisy-btn-group daisy-btn-group-sm flex daisy-align-items-center flex-wrap">
     <BazaarNotebookButtons v-if="notebook.circle" :notebook="notebook" :logged-in="true" />
     <button
       v-if="hasAttachedBook === true"
@@ -10,7 +10,7 @@
       data-testid="notebook-catalog-read-book"
       @click="onReadBook"
     >
-      <BookOpen class="daisy-h-6 daisy-w-6" />
+      <BookOpen class="h-6 w-6" />
     </button>
     <AutoCollapseDropdown
       v-slot="{ closeDropdown }"
@@ -18,19 +18,19 @@
     >
       <summary
         data-cy="notebook-catalog-overflow"
-        class="daisy-btn daisy-btn-ghost daisy-btn-sm list-none daisy-cursor-pointer"
+        class="daisy-btn daisy-btn-ghost daisy-btn-sm list-none cursor-pointer"
         aria-label="Notebook actions"
       >
-        <MoreHorizontal class="daisy-h-6 daisy-w-6" />
+        <MoreHorizontal class="h-6 w-6" />
       </summary>
       <ul
         tabindex="0"
-        class="daisy-dropdown-content daisy-menu daisy-bg-base-100 daisy-rounded-box daisy-w-52 daisy-p-2 daisy-shadow daisy-z-[1000]"
+        class="daisy-dropdown-content daisy-menu bg-base-100 rounded-box w-52 p-2 shadow z-[1000]"
       >
-        <li class="daisy-menu-item daisy-p-0">
+        <li class="daisy-menu-item p-0">
           <button
             type="button"
-            class="daisy-btn daisy-btn-ghost daisy-h-auto daisy-min-h-0 daisy-w-full daisy-justify-start daisy-py-2 daisy-font-normal"
+            class="daisy-btn daisy-btn-ghost h-auto min-h-0 w-full justify-start py-2 font-normal"
             title="Move to group"
             @click="openMoveToGroup(closeDropdown)"
           >

@@ -1,1 +1,1 @@
-export const noteChromeToolbarNavClass = "daisy-navbar daisy-bg-base-200"
+export const noteChromeToolbarNavClass = "daisy-navbar bg-base-200"

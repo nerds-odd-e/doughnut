@@ -1,5 +1,5 @@
 <template>
-  <div class="recall-page daisy-h-full daisy-flex daisy-flex-col">
+  <div class="recall-page h-full flex flex-col">
     <GlobalBar
       v-if="isProgressBarVisible"
       :class="[
@@ -25,7 +25,7 @@
       </RecallProgressBar>
     </GlobalBar>
 
-    <div class="daisy-flex-1 daisy-min-h-0 daisy-overflow-y-auto">
+    <div class="flex-1 min-h-0 overflow-y-auto">
     <template v-if="toRepeat != undefined">
       <Quiz
         v-if="toRepeatCount !== 0 && getCurrentMemoryTracker() && (!treadmillMode || !getCurrentMemoryTracker()?.spelling)"
@@ -48,7 +48,7 @@
         <div class="daisy-alert daisy-alert-success">
           You have finished all recalls for this half a day!
         </div>
-        <div v-if="isLoadingMore" class="daisy-flex daisy-items-center daisy-gap-2 daisy-py-4">
+        <div v-if="isLoadingMore" class="flex items-center gap-2 py-4">
           <span class="daisy-loading daisy-loading-spinner daisy-loading-md"></span>
           <span>Loading more items...</span>
         </div>

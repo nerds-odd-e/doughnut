@@ -1,12 +1,12 @@
 <template>
-  <div class="daisy-grid daisy-gap-3" :class="{
-    'daisy-grid-cols-1': true,
-    'md:daisy-grid-cols-3': columns === 4,
-    'lg:daisy-grid-cols-4': columns === 4,
-    'md:daisy-grid-cols-2': columns === 3,
-    'lg:daisy-grid-cols-3': columns === 3,
-    'md:daisy-grid-cols-1': columns === 2,
-    'lg:daisy-grid-cols-2': columns === 2,
+  <div class="grid gap-3" :class="{
+    'grid-cols-1': true,
+    'md:grid-cols-3': columns === 4,
+    'lg:grid-cols-4': columns === 4,
+    'md:grid-cols-2': columns === 3,
+    'lg:grid-cols-3': columns === 3,
+    'md:grid-cols-1': columns === 2,
+    'lg:grid-cols-2': columns === 2,
   }">
     <div v-for="noteTopology in noteTopologies" :key="noteTopology.id">
       <Card :note-topology="noteTopology">

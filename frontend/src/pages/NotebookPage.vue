@@ -1,6 +1,6 @@
 <template>
   <ContentLoader v-if="notebook === undefined" />
-  <div v-else class="daisy-py-4">
+  <div v-else class="py-4">
     <NotebookPageReadonlySummary
       v-if="isNotebookReadOnly"
       :notebook="notebook"

@@ -6,7 +6,7 @@
     btn-class="daisy-btn daisy-btn-sm daisy-btn-ghost"
   >
     <template #button_face>
-      <Undo2 class="daisy-w-6 daisy-h-6" />
+      <Undo2 class="w-6 h-6" />
     </template>
     <template #default="{ closer }">
       <UndoConfirmationForm

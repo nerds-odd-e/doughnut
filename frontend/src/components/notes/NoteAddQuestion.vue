@@ -23,7 +23,7 @@
       :disabled="
         multipleChoicesQuestion.responseChoices.length >= maximumNumberOfChoices
       "
-      class="daisy-btn daisy-btn-sm daisy-btn-outline daisy-mr-2"
+      class="daisy-btn daisy-btn-sm daisy-btn-outline mr-2"
     >
       +
     </button>
@@ -32,21 +32,21 @@
       :disabled="
         multipleChoicesQuestion.responseChoices.length <= minimumNumberOfChoices
       "
-      class="daisy-btn daisy-btn-sm daisy-btn-outline daisy-mr-2"
+      class="daisy-btn daisy-btn-sm daisy-btn-outline mr-2"
     >
       -
     </button>
     <button
       @click="refineQuestion"
       :disabled="!dirty"
-      class="daisy-btn daisy-btn-sm daisy-btn-secondary daisy-mr-2"
+      class="daisy-btn daisy-btn-sm daisy-btn-secondary mr-2"
     >
       Refine
     </button>
     <button
       @click="generateQuestionByAI"
       :disabled="dirty"
-      class="daisy-btn daisy-btn-sm daisy-btn-accent daisy-mr-2"
+      class="daisy-btn daisy-btn-sm daisy-btn-accent mr-2"
     >
       Generate by AI
     </button>

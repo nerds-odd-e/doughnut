@@ -65,7 +65,7 @@ describe("RecallPromptComponent", () => {
         .vm.$emit("answer", { choiceIndex: 0 })
 
       // Verify loading overlay is shown
-      expect(wrapper.find(".daisy-absolute.daisy-inset-0").exists()).toBe(true)
+      expect(wrapper.find(".absolute.inset-0").exists()).toBe(true)
       expect(
         wrapper.find(".daisy-loading.daisy-loading-spinner").exists()
       ).toBe(true)
@@ -78,7 +78,7 @@ describe("RecallPromptComponent", () => {
         wrapper.find(".daisy-loading.daisy-loading-spinner").exists()
       ).toBe(false)
       // The gray overlay should remain visible after answering (isAnswered stays true)
-      expect(wrapper.find(".daisy-absolute.daisy-inset-0").exists()).toBe(true)
+      expect(wrapper.find(".absolute.inset-0").exists()).toBe(true)
     })
 
     it("allows retrying on API error", async () => {

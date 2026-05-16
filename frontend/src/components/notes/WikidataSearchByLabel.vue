@@ -41,11 +41,7 @@ export default defineComponent({
       return !!this.modelValue && this.modelValue.trim() !== ""
     },
     buttonClasses(): string[] {
-      const baseClasses = [
-        "daisy-btn",
-        "daisy-rounded-l-none",
-        "daisy-rounded-r-lg",
-      ]
+      const baseClasses = ["daisy-btn", "rounded-l-none", "rounded-r-lg"]
       if (this.errorMessage) {
         return [...baseClasses, "daisy-btn-error"]
       }

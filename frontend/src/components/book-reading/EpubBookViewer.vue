@@ -1,12 +1,12 @@
 <template>
   <div
     data-testid="epub-book-viewer"
-    class="epub-book-viewer-root daisy-relative daisy-min-h-0 daisy-min-w-0 daisy-flex-1"
+    class="epub-book-viewer-root relative min-h-0 min-w-0 flex-1"
     :aria-label="book.bookName"
   >
     <div
       ref="renditionHostRef"
-      class="epub-book-viewer-host daisy-absolute daisy-inset-0 daisy-overflow-hidden"
+      class="epub-book-viewer-host absolute inset-0 overflow-hidden"
     />
   </div>
 </template>

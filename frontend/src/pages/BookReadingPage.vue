@@ -1,23 +1,23 @@
 <template>
   <div
     data-testid="book-reading-page"
-    class="book-reading-page daisy-flex daisy-flex-col daisy-h-full daisy-min-h-0"
+    class="book-reading-page flex flex-col h-full min-h-0"
   >
     <template v-if="book">
       <div
         v-if="fileLoading"
-        class="daisy-flex daisy-flex-1 daisy-min-h-0 daisy-flex-col"
+        class="flex flex-1 min-h-0 flex-col"
       >
-        <div class="daisy-px-2 daisy-py-2 sm:daisy-px-4 daisy-flex-1">
+        <div class="px-2 py-2 sm:px-4 flex-1">
           <ContentLoader />
         </div>
       </div>
       <div
         v-else-if="fileError"
-        class="daisy-px-2 daisy-py-2 sm:daisy-px-4"
+        class="px-2 py-2 sm:px-4"
       >
         <div
-          class="daisy-alert daisy-alert-error daisy-mb-2 daisy-mx-2 daisy-mt-2"
+          class="daisy-alert daisy-alert-error mb-2 mx-2 mt-2"
           data-testid="book-reading-book-file-load-error"
         >
           {{ fileError }}

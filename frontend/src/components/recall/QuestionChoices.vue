@@ -1,17 +1,17 @@
 <template>
-  <ol class="choices daisy-grid daisy-grid-cols-1 sm:daisy-grid-cols-2 daisy-list-none daisy-p-0 daisy-gap-4 daisy-mt-4" v-if="choices && choices.length > 0">
+  <ol class="choices grid grid-cols-1 sm:grid-cols-2 list-none p-0 gap-4 mt-4" v-if="choices && choices.length > 0">
     <li
-      class="choice daisy-min-h-[80px]"
+      class="choice min-h-[80px]"
       v-for="(choice, index) in choices"
       :key="index"
     >
       <button
         :class="[
-          'daisy-w-full daisy-h-full daisy-flex daisy-justify-center daisy-items-center',
-          'daisy-rounded-lg daisy-bg-base-200 daisy-p-4',
+          'w-full h-full flex justify-center items-center',
+          'rounded-lg bg-base-200 p-4',
           'choice-button',
-          'focus:daisy-outline-none focus:daisy-ring-2 focus:daisy-ring-primary',
-          'disabled:daisy-opacity-65 daisy-transition-colors',
+          'focus:outline-none focus:ring-2 focus:ring-primary',
+          'disabled:opacity-65 transition-colors',
           {
             'is-correct': isOptionCorrect(index),
             'is-incorrect': !isOptionCorrect(index),
@@ -23,7 +23,7 @@
       >
         <div
           v-html="getChoiceHtml(choice)"
-          class="daisy-whitespace-normal daisy-break-words choice-text"
+          class="whitespace-normal break-words choice-text"
           @click.capture="handleInnerClick"
         />
       </button>

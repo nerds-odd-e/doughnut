@@ -1,9 +1,9 @@
 <template>
   <div
-    class="scoped-index-note-editor daisy-mb-6"
+    class="scoped-index-note-editor mb-6"
     :data-testid="`${testIdPrefix}-body`"
   >
-    <h2 class="daisy-text-lg daisy-font-semibold daisy-text-base-content daisy-mb-2">
+    <h2 class="text-lg font-semibold text-base-content mb-2">
       {{ headingLabel }}
     </h2>
     <div :data-testid="`${testIdPrefix}-editor`">
@@ -19,7 +19,7 @@
     </div>
     <button
       type="button"
-      class="daisy-btn daisy-btn-primary daisy-btn-sm daisy-mt-3"
+      class="daisy-btn daisy-btn-primary daisy-btn-sm mt-3"
       :data-testid="`${testIdPrefix}-save`"
       :disabled="saving"
       @click="save"

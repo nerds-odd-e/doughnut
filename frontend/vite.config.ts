@@ -2,10 +2,9 @@
 import { URL, fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 
+import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
-import autoprefixer from 'autoprefixer'
-import tailwindcss from 'tailwindcss'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import Inspector from 'unplugin-vue-inspector/vite'
@@ -33,16 +32,9 @@ const config = defineConfig({
   css: {
     // Disable sourcemaps during tests (saves ~0.3s)
     devSourcemap: !isTest,
-    postcss: {
-      plugins: [
-        tailwindcss({
-          config: './tailwind.config.ts',
-        }),
-        autoprefixer(),
-      ],
-    },
   },
   plugins: [
+    tailwindcss(),
     vue({
       template: {
         compilerOptions: {

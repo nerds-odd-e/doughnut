@@ -3,24 +3,24 @@
     role="dialog"
     aria-modal="true"
     aria-labelledby="notebook-catalog-move-to-group-title"
-    class="daisy-px-1"
+    class="px-1"
   >
     <h2
       id="notebook-catalog-move-to-group-title"
-      class="daisy-m-0 daisy-mb-4 daisy-text-lg daisy-font-semibold"
+      class="m-0 mb-4 text-lg font-semibold"
     >
       Move to group
     </h2>
-    <div v-if="loadError" class="daisy-text-error daisy-text-sm">
+    <div v-if="loadError" class="text-error text-sm">
       {{ loadError }}
     </div>
-    <form v-else class="daisy-flex daisy-flex-col daisy-gap-3" @submit.prevent="submit">
-      <label class="daisy-form-control daisy-w-full">
+    <form v-else class="flex flex-col gap-3" @submit.prevent="submit">
+      <label class="daisy-form-control w-full">
         <span class="daisy-label-text">Target</span>
         <select
           id="notebook-catalog-move-to-group-target"
           v-model="selectedTarget"
-          class="daisy-select daisy-select-bordered daisy-w-full"
+          class="daisy-select daisy-select w-full"
           :disabled="loadingGroups"
         >
           <option disabled value="">Choose…</option>
@@ -46,10 +46,10 @@
           :error-message="newGroupError"
         />
       </template>
-      <p v-if="submitError" class="daisy-m-0 daisy-text-sm daisy-text-error">
+      <p v-if="submitError" class="m-0 text-sm text-error">
         {{ submitError }}
       </p>
-      <div class="daisy-flex daisy-justify-end daisy-gap-2">
+      <div class="flex justify-end gap-2">
         <button
           type="button"
           class="daisy-btn daisy-btn-ghost daisy-btn-sm"

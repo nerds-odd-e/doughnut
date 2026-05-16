@@ -4,14 +4,14 @@
       <div class="daisy-card">
         <div class="daisy-card-body">
           <h3 class="daisy-card-title">Export Conversation for ChatGPT</h3>
-          <div class="daisy-mt-4">
+          <div class="mt-4">
             <textarea
-              class="daisy-textarea daisy-textarea-bordered daisy-w-full daisy-h-96 daisy-bg-base-100 daisy-font-mono daisy-text-xs"
+              class="daisy-textarea daisy-textarea w-full h-96 bg-base-100 font-mono text-xs"
               readonly
               :value="exportContent"
               data-testid="export-textarea"
             />
-            <div class="daisy-flex daisy-gap-2 daisy-justify-end daisy-mt-2">
+            <div class="flex gap-2 justify-end mt-2">
               <CopyButton
                 :text="exportContent"
                 :disabled="!exportContent"

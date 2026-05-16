@@ -140,7 +140,7 @@ describe("main menu", () => {
 
   const expectNavLinkPrimary = (ariaLabel: string) => {
     const link = screen.getByLabelText(ariaLabel)
-    expect(link.closest(".nav-item")).toHaveClass("daisy-text-primary")
+    expect(link.closest(".nav-item")).toHaveClass("text-primary")
   }
 
   beforeEach(() => {

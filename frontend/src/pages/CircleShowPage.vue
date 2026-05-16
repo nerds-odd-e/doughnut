@@ -11,9 +11,9 @@
 
       <div
         v-if="user && catalogItems.length > 0"
-        class="daisy-mb-4"
+        class="mb-4"
       >
-        <div class="daisy-flex daisy-flex-wrap daisy-items-center daisy-justify-between daisy-gap-2">
+        <div class="flex flex-wrap items-center justify-between gap-2">
           <div class="daisy-join">
             <button
               type="button"
@@ -25,7 +25,7 @@
               :aria-pressed="notebooksLayout === 'list'"
               @click="notebooksLayout = 'list'"
             >
-              <List class="daisy-h-6 daisy-w-6" />
+              <List class="h-6 w-6" />
             </button>
             <button
               type="button"
@@ -37,17 +37,17 @@
               :aria-pressed="notebooksLayout === 'grid'"
               @click="notebooksLayout = 'grid'"
             >
-              <LayoutGrid class="daisy-h-6 daisy-w-6" />
+              <LayoutGrid class="h-6 w-6" />
             </button>
           </div>
-          <div class="daisy-form-control daisy-w-auto">
-            <label class="daisy-label daisy-sr-only" for="circle-notebook-catalog-sort">
+          <div class="daisy-form-control w-auto">
+            <label class="daisy-label sr-only" for="circle-notebook-catalog-sort">
               Sort notebooks
             </label>
             <select
               id="circle-notebook-catalog-sort"
               v-model="notebooksSortOrder"
-              class="daisy-select daisy-select-bordered daisy-select-sm daisy-w-max daisy-max-w-[12rem]"
+              class="daisy-select daisy-select daisy-select-sm w-max max-w-[12rem]"
               title="Sort notebooks"
             >
               <option value="created">By created time</option>
@@ -56,21 +56,21 @@
           </div>
         </div>
         <label
-          class="daisy-label daisy-px-0 daisy-pt-3 daisy-pb-1"
+          class="daisy-label px-0 pt-3 pb-1"
           for="circle-notebook-filter-input"
         >
-          <span class="daisy-label-text daisy-text-sm daisy-text-base-content/70">
+          <span class="daisy-label-text text-sm text-base-content/70">
             Filter notebooks
           </span>
         </label>
-        <div class="daisy-flex daisy-items-center daisy-gap-2">
-          <div class="daisy-input daisy-input-bordered daisy-input-sm daisy-flex daisy-items-center daisy-gap-2 daisy-flex-1">
-            <Search class="daisy-h-4 daisy-w-4 daisy-text-base-content/50" />
+        <div class="flex items-center gap-2">
+          <div class="daisy-input daisy-input-sm flex items-center gap-2 flex-1">
+            <Search class="h-4 w-4 text-base-content/50" />
             <input
               id="circle-notebook-filter-input"
               v-model="filterText"
               type="text"
-              class="daisy-grow"
+              class="grow"
               placeholder="Search by notebook or group name"
             />
           </div>
@@ -81,14 +81,14 @@
             aria-label="Clear filter"
             @click="clearFilter"
           >
-            <X class="daisy-h-4 daisy-w-4" />
+            <X class="h-4 w-4" />
           </button>
         </div>
       </div>
 
       <main
         :class="
-          notebooksLayout === 'grid' ? 'daisy-max-w-7xl' : 'daisy-max-w-3xl'
+          notebooksLayout === 'grid' ? 'max-w-7xl' : 'max-w-3xl'
         "
       >
         <NotebookCatalogSection
@@ -103,14 +103,14 @@
         />
         <div
           v-else-if="user && catalogItems.length > 0"
-          class="daisy-rounded-box daisy-border daisy-border-dashed daisy-border-base-300 daisy-bg-base-200/30 daisy-px-6 daisy-py-10 daisy-text-center"
+          class="rounded-box border border-dashed border-base-300 bg-base-200/30 px-6 py-10 text-center"
         >
-          <p class="daisy-m-0 daisy-text-base daisy-text-base-content/70">
+          <p class="m-0 text-base text-base-content/70">
             No notebooks match
           </p>
           <button
             type="button"
-            class="daisy-btn daisy-btn-link daisy-btn-sm daisy-mt-2"
+            class="daisy-btn daisy-btn-link daisy-btn-sm mt-2"
             @click="clearFilter"
           >
             Clear filter
@@ -118,29 +118,29 @@
         </div>
         <div
           v-else-if="user && catalogItems.length === 0"
-          class="daisy-rounded-box daisy-border daisy-border-dashed daisy-border-base-300 daisy-bg-base-200/30 daisy-px-6 daisy-py-10 daisy-text-center"
+          class="rounded-box border border-dashed border-base-300 bg-base-200/30 px-6 py-10 text-center"
         >
-          <p class="daisy-m-0 daisy-text-base daisy-text-base-content/70">
+          <p class="m-0 text-base text-base-content/70">
             This circle has no notebooks yet.
           </p>
         </div>
       </main>
 
-      <nav class="daisy-flex daisy-justify-end">
+      <nav class="flex justify-end">
         <div
-          class="daisy-flex-none circle-member"
+          class="flex-none circle-member"
           v-for="member in circle.members"
           :key="member.name"
         >
-          <span :title="member.name"> <UserIcon class="daisy-w-6 daisy-h-6" /> </span>
+          <span :title="member.name"> <UserIcon class="w-6 h-6" /> </span>
         </div>
       </nav>
 
       <h2>Invite People To Your Circle</h2>
       Please share this invitation code so that they can join your circle:
 
-      <div class="daisy-hero daisy-bg-base-200">
-        <input id="invitation-code" :value="invitationUrl" readonly class="daisy-input daisy-input-bordered daisy-w-full" />
+      <div class="daisy-hero bg-base-200">
+        <input id="invitation-code" :value="invitationUrl" readonly class="daisy-input w-full" />
       </div>
     </div>
   </ContainerPage>

@@ -4,7 +4,7 @@
     aria-live="polite"
     aria-atomic="true"
     data-testid="book-reading-current-block-live"
-    class="daisy-sr-only"
+    class="sr-only"
   >
     {{ currentBlockLiveText }}
   </div>
@@ -15,18 +15,18 @@
     />
     <router-link
       :to="{ name: 'notebookPage', params: { notebookId: notebookId } }"
-      class="daisy-btn daisy-btn-sm daisy-btn-ghost daisy-shrink-0 daisy-no-underline"
+      class="daisy-btn daisy-btn-sm daisy-btn-ghost shrink-0 no-underline"
     >
       Notebook
     </router-link>
     <span
-      class="daisy-truncate daisy-text-sm daisy-font-medium daisy-min-w-0 daisy-ml-1"
+      class="truncate text-sm font-medium min-w-0 ml-1"
       :title="book.bookName"
     >
       {{ book.bookName }}
     </span>
     <PdfControl
-      class="daisy-ml-auto daisy-mr-2"
+      class="ml-auto mr-2"
       :current-page="pdfBarCurrentPage"
       :pages-total="pdfBarPagesTotal"
       @zoom-in="pdfViewerRef?.zoomIn()"
@@ -50,22 +50,22 @@
     @request-ai-reorganize="requestAiReorganize"
   >
     <main
-      class="daisy-flex daisy-flex-1 daisy-min-h-0 daisy-min-w-0 daisy-flex-col"
+      class="flex flex-1 min-h-0 min-w-0 flex-col"
     >
       <div
         v-if="pdfViewerLoadError"
-        class="daisy-alert daisy-alert-error daisy-mb-2 daisy-mx-2 daisy-mt-2"
+        class="daisy-alert daisy-alert-error mb-2 mx-2 mt-2"
         data-testid="book-reading-pdf-viewer-load-error"
       >
         {{ pdfViewerLoadError }}
       </div>
       <div
         v-else
-        class="daisy-flex daisy-min-h-0 daisy-min-w-0 daisy-flex-1 daisy-flex-col"
+        class="flex min-h-0 min-w-0 flex-1 flex-col"
       >
         <div
           ref="pdfPaneRef"
-          class="daisy-relative daisy-min-h-0 daisy-min-w-0 daisy-flex-1"
+          class="relative min-h-0 min-w-0 flex-1"
         >
           <PdfBookViewer
             ref="pdfViewerRef"

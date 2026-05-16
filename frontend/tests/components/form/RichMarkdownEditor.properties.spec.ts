@@ -451,7 +451,7 @@ Body line`
         .trigger("change")
       await flushPromises()
 
-      const field = rt.find('input[type="text"].daisy-input-bordered')
+      const field = rt.find('input[type="text"].daisy-input')
       expect(field.exists()).toBe(true)
       await field.setValue("novel connector phrase")
       await field.trigger("keydown", { key: "Enter" })
@@ -468,7 +468,7 @@ Body line`
       await flushPromises()
 
       const rt = h.getWrapper().findComponent({ name: "RelationTypeSelect" })
-      const field = rt.find('input[type="text"].daisy-input-bordered')
+      const field = rt.find('input[type="text"].daisy-input')
       expect(field.exists()).toBe(true)
       expect((field.element as HTMLInputElement).value).toBe(
         "xyz-unknown-kebab"
@@ -477,7 +477,7 @@ Body line`
         `label[for="rich-note-relation-property-${CUSTOM_RELATION_RADIO_SENTINEL}"]`
       )
       expect(primaryLabelForCustom.exists()).toBe(true)
-      expect(primaryLabelForCustom.classes()).toContain("daisy-bg-primary")
+      expect(primaryLabelForCustom.classes()).toContain("bg-primary")
     })
   })
 

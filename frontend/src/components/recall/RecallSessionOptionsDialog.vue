@@ -4,19 +4,19 @@
       <h2>Recall Session Options</h2>
     </template>
     <template #body>
-      <div class="daisy-flex daisy-flex-col daisy-gap-4">
-        <div class="daisy-flex daisy-flex-col daisy-gap-2">
-          <p class="daisy-my-2 daisy-text-neutral">Daily Progress: {{ finished }} / {{ finished + toRepeatCount }}</p>
-          <p class="daisy-my-2 daisy-text-neutral">Total assimilated: {{ finished }} / {{ totalAssimilatedCount }}</p>
+      <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-2">
+          <p class="my-2 text-neutral">Daily Progress: {{ finished }} / {{ finished + toRepeatCount }}</p>
+          <p class="my-2 text-neutral">Total assimilated: {{ finished }} / {{ totalAssimilatedCount }}</p>
           <p
             v-if="averageThinkingTime !== null"
-            class="daisy-my-2 daisy-text-neutral"
+            class="my-2 text-neutral"
           >
             Average thinking time: {{ formatThinkingTime(averageThinkingTime) }}
           </p>
         </div>
         <div class="daisy-divider"></div>
-        <div class="daisy-flex daisy-flex-col daisy-gap-2">
+        <div class="flex flex-col gap-2">
           <button
             v-if="canMoveToEnd && previousAnsweredQuestionCursor === undefined"
             class="btn large-btn"
@@ -24,10 +24,10 @@
             aria-label="Move to end of list"
             @click="handleMoveToEnd"
           >
-            <SkipForward class="daisy-w-6 daisy-h-6" />
-            <span class="daisy-ml-2">Move to end of list</span>
+            <SkipForward class="w-6 h-6" />
+            <span class="ml-2">Move to end of list</span>
           </button>
-          <label class="daisy-label daisy-cursor-pointer daisy-flex daisy-items-center daisy-gap-2">
+          <label class="daisy-label cursor-pointer flex items-center gap-2">
             <input
               type="checkbox"
               class="daisy-toggle daisy-toggle-primary"

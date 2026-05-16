@@ -1,12 +1,12 @@
 <template>
-  <div class="daisy-card daisy-w-full" data-testid="folder-new-dialog">
+  <div class="daisy-card w-full" data-testid="folder-new-dialog">
     <div class="daisy-card-body">
       <form @submit.prevent="processForm">
         <fieldset :disabled="processing">
-          <label class="daisy-label daisy-mb-2">
+          <label class="daisy-label mb-2">
             <span class="daisy-label-text">Parent folder</span>
           </label>
-          <div class="daisy-mb-4">
+          <div class="mb-4">
             <FolderSelector
               v-model="selectedParentFolder"
               :notebook-id="notebookId"
@@ -27,7 +27,7 @@
           <input
             type="submit"
             value="Submit"
-            class="daisy-btn daisy-btn-primary daisy-mt-4"
+            class="daisy-btn daisy-btn-primary mt-4"
             data-testid="folder-new-dialog-submit"
           />
         </fieldset>

@@ -1,5 +1,5 @@
 <template>
-  <div class="daisy-join daisy-join-horizontal daisy-items-center">
+  <div class="daisy-join daisy-join-horizontal items-center">
     <button
       type="button"
       class="daisy-btn daisy-btn-sm daisy-btn-ghost daisy-join-item"
@@ -7,12 +7,12 @@
       data-testid="pdf-zoom-out"
       @click="emit('zoomOut')"
     >
-      <ZoomOut class="daisy-w-4 daisy-h-4" />
+      <ZoomOut class="w-4 h-4" />
     </button>
     <span
       v-if="currentPage != null && pagesTotal != null && pagesTotal > 0"
       data-testid="book-reading-page-indicator"
-      class="daisy-shrink-0 daisy-text-sm daisy-text-base-content/70 daisy-tabular-nums daisy-px-1"
+      class="shrink-0 text-sm text-base-content/70 tabular-nums px-1"
       :aria-label="`Page ${currentPage} of ${pagesTotal}`"
     >
       {{ currentPage }} / {{ pagesTotal }}
@@ -24,7 +24,7 @@
       data-testid="pdf-zoom-in"
       @click="emit('zoomIn')"
     >
-      <ZoomIn class="daisy-w-4 daisy-h-4" />
+      <ZoomIn class="w-4 h-4" />
     </button>
   </div>
 </template>

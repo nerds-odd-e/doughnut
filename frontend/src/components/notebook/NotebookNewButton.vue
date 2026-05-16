@@ -1,7 +1,7 @@
 <template>
   <PopButton title="New notebook" :btn-class="btnClass">
     <template #button_face>
-      <BookPlus class="daisy-w-6 daisy-h-6" />
+      <BookPlus class="w-6 h-6" />
       <slot />
     </template>
     <NotebookNewForm :circle="circle" />

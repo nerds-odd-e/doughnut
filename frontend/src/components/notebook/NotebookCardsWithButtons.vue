@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="layout === 'list'"
-    class="notebook-cards-list daisy-flex daisy-flex-col daisy-gap-2"
+    class="notebook-cards-list flex flex-col gap-2"
   >
     <NotebookListRow
       v-for="notebook in notebooks"
@@ -13,7 +13,7 @@
   </div>
   <div
     v-else
-    class="daisy-grid daisy-grid-cols-1 sm:daisy-grid-cols-2 md:daisy-grid-cols-2 lg:daisy-grid-cols-3 xl:daisy-grid-cols-4 daisy-gap-4"
+    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
   >
     <div
       v-for="notebook in notebooks"
@@ -24,7 +24,7 @@
     >
       <NotebookCard :notebook="notebook">
         <template #cardHeader>
-          <span class="daisy-flex daisy-justify-end daisy-p-0">
+          <span class="flex justify-end p-0">
             <slot :notebook="notebook" />
           </span>
         </template>

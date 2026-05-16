@@ -1,17 +1,17 @@
 <template>
-  <div class="diff-view daisy-flex daisy-flex-col md:daisy-flex-row daisy-gap-2">
-    <div class="daisy-flex-1 daisy-flex daisy-flex-col">
-      <div class="daisy-text-sm daisy-font-semibold daisy-mb-2 daisy-text-error">
+  <div class="diff-view flex flex-col md:flex-row gap-2">
+    <div class="flex-1 flex flex-col">
+      <div class="text-sm font-semibold mb-2 text-error">
         Current
       </div>
       <div
         ref="leftPane"
-        class="diff-pane daisy-border daisy-border-base-300 daisy-rounded daisy-bg-base-200 daisy-text-sm daisy-overflow-auto"
+        class="diff-pane border border-base-300 rounded bg-base-200 text-sm overflow-auto"
         :style="{ maxHeight: maxHeight }"
         @scroll="onLeftScroll"
         data-testid="diff-left-pane"
       >
-        <table class="diff-table daisy-font-mono">
+        <table class="diff-table font-mono">
           <tbody>
             <tr
               v-for="(row, index) in pairedRows"
@@ -42,18 +42,18 @@
         </table>
       </div>
     </div>
-    <div class="daisy-flex-1 daisy-flex daisy-flex-col">
-      <div class="daisy-text-sm daisy-font-semibold daisy-mb-2 daisy-text-success">
+    <div class="flex-1 flex flex-col">
+      <div class="text-sm font-semibold mb-2 text-success">
         Will restore to
       </div>
       <div
         ref="rightPane"
-        class="diff-pane daisy-border daisy-border-base-300 daisy-rounded daisy-bg-base-200 daisy-text-sm daisy-overflow-auto"
+        class="diff-pane border border-base-300 rounded bg-base-200 text-sm overflow-auto"
         :style="{ maxHeight: maxHeight }"
         @scroll="onRightScroll"
         data-testid="diff-right-pane"
       >
-        <table class="diff-table daisy-font-mono">
+        <table class="diff-table font-mono">
           <tbody>
             <tr
               v-for="(row, index) in pairedRows"

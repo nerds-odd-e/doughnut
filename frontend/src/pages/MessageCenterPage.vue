@@ -1,10 +1,10 @@
 <template>
-  <div class="message-center-page daisy-h-full daisy-flex daisy-flex-col">
+  <div class="message-center-page h-full flex flex-col">
     <GlobalBar>
-      <h2 class="fs-4 daisy-text-2xl">Message Center</h2>
+      <h2 class="fs-4 text-2xl">Message Center</h2>
     </GlobalBar>
 
-    <div class="daisy-flex-1 daisy-min-h-0 daisy-mx-auto daisy-min-w-0 daisy-w-full">
+    <div class="flex-1 min-h-0 mx-auto min-w-0 w-full">
       <ContentLoader v-if="conversations === undefined" />
       <template v-else>
         <h2 v-if="!conversations?.length" class="info-heading">
@@ -175,7 +175,7 @@ const handleConversationChanged = (conversationId: number) => {
   flex-direction: column;
 }
 
-@media (min-width: theme('screens.md')) {
+@media (min-width: 768px) {
   .message-center-container {
     flex-direction: row;
   }
@@ -242,7 +242,7 @@ const handleConversationChanged = (conversationId: number) => {
   background-color: #e9ecef;
 }
 
-@media (max-width: theme('screens.md')) {
+@media (max-width: 768px) {
   .hide-on-mobile {
     display: none !important;
   }

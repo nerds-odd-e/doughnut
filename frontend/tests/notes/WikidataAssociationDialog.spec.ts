@@ -84,7 +84,7 @@ describe("WikidataAssociationDialog", () => {
     it("displays error message in the input field", async () => {
       mountDialog("Test Title", { errorMessage: "Invalid Wikidata ID" })
       await flushPromises()
-      const errorMessage = getModal()?.querySelector(".daisy-text-error")
+      const errorMessage = getModal()?.querySelector(".text-error")
       expect(errorMessage?.textContent).toContain("Invalid Wikidata ID")
     })
 

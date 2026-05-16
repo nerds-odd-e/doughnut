@@ -7,11 +7,11 @@
     :style="wrapperStyle"
   >
     <CalloutCard ref="cardRef" :show-caret="panelPlacement === 'anchored'">
-      <p class="daisy-text-sm daisy-min-w-0 daisy-flex-1 daisy-basis-full sm:daisy-basis-auto daisy-m-0">
-        <span class="daisy-font-medium">{{ selectedBlockTitle }}</span>
+      <p class="text-sm min-w-0 flex-1 basis-full sm:basis-auto m-0">
+        <span class="font-medium">{{ selectedBlockTitle }}</span>
       </p>
       <div
-        class="daisy-flex daisy-flex-wrap daisy-items-center daisy-gap-2 daisy-shrink-0"
+        class="flex flex-wrap items-center gap-2 shrink-0"
       >
         <button
           type="button"
@@ -64,8 +64,8 @@ const panelPlacement = computed(() =>
 
 const wrapperClass = computed(() => {
   const base =
-    "daisy-pointer-events-none daisy-absolute daisy-left-0 daisy-right-0 daisy-z-20 daisy-px-2 daisy-pb-[max(0.5rem,env(safe-area-inset-bottom))] daisy-pt-2"
-  return props.anchorTopPx === null ? `${base} daisy-bottom-0` : base
+    "pointer-events-none absolute left-0 right-0 z-20 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2"
+  return props.anchorTopPx === null ? `${base} bottom-0` : base
 })
 
 const wrapperStyle = computed(() =>

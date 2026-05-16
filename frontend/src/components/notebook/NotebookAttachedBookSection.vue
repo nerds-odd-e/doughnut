@@ -1,7 +1,7 @@
 <template>
   <section
     v-if="book"
-    class="settings-section daisy-mb-6"
+    class="settings-section mb-6"
     data-testid="notebook-attached-book"
   >
     <div class="section-header">
@@ -10,7 +10,7 @@
         Open the book reader to read and use this notebook's attached book.
       </p>
     </div>
-    <div class="daisy-flex daisy-flex-wrap daisy-gap-2">
+    <div class="flex flex-wrap gap-2">
       <button
         type="button"
         class="daisy-btn daisy-btn-primary daisy-btn-sm"
@@ -31,7 +31,7 @@
 
   <section
     v-else-if="bookLoadFinished && !book"
-    class="settings-section daisy-mb-6"
+    class="settings-section mb-6"
     data-testid="notebook-no-book"
   >
     <div class="section-header">
@@ -43,7 +43,7 @@
     <input
       ref="attachFileInputRef"
       type="file"
-      class="daisy-sr-only"
+      class="sr-only"
       accept=".epub,application/epub+zip"
       @change="onAttachFileSelected"
     />

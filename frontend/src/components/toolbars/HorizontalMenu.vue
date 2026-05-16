@@ -1,15 +1,15 @@
 <template>
-  <div class="sidebar-container daisy-w-full daisy-h-full">
+  <div class="sidebar-container test-probe-class w-full h-full">
     <div
       ref="menuRef"
       tabindex="0"
-      class="menu-wrapper daisy-flex daisy-flex-col daisy-h-full daisy-bg-neutral"
+      class="menu-wrapper flex flex-col h-full bg-neutral"
       :class="{ 'is-expanded': shouldShowExpanded, 'is-collapsed': !shouldShowExpanded }"
       @blur="handleFocusLoss"
       @click="handleMenuWrapperClick"
     >
       <div
-        class="menu-content daisy-flex daisy-flex-row daisy-items-center"
+        class="menu-content flex flex-row items-center"
         :class="{ 'clickable-when-collapsed': !shouldShowExpanded && user }"
         @click="handleMenuContentClick"
       >
@@ -39,7 +39,7 @@
           <ul v-if="!shouldShowExpanded && !hasActiveItem && !isHomePage" class="collapsed-menu daisy-menu">
             <li class="daisy-menu-item active-item-only">
               <div @click.capture.stop.prevent="handleMenuIconClick" class="active-item-wrapper">
-                <div class="nav-item daisy-text-neutral-content daisy-rounded-lg daisy-px-2 daisy-flex daisy-flex-col daisy-items-center" aria-label="Menu">
+                <div class="nav-item text-neutral-content rounded-lg px-2 flex flex-col items-center" aria-label="Menu">
                   <div class="icon-container">
                     <Menu :size="24" />
                   </div>
@@ -50,7 +50,7 @@
           </ul>
 
           <!-- Expanded state: show all items -->
-          <ul v-if="shouldShowExpanded" class="top-menu daisy-menu daisy-flex-1">
+          <ul v-if="shouldShowExpanded" class="top-menu daisy-menu flex-1">
         <template v-if="!isHomePage">
           <li v-for="item in upperNavItems" :title="item.label" :key="item.name" class="daisy-menu-item">
             <NavigationItem v-bind="{ ...item }" @resumeRecall="resumeRecall" />
@@ -238,6 +238,7 @@ onUnmounted(() => {
 
 <style lang="scss" scoped>
 @use "@/assets/menu-variables.scss" as *;
+@reference "@/assets/daisyui.css";
 
 .sidebar-container {
   height: auto;
@@ -256,7 +257,7 @@ onUnmounted(() => {
   border-bottom-right-radius: 1rem;
   margin-right: 0.5rem; // Add space on the right to show rounded border
   overflow: visible; // Allow dropdowns to overflow
-  // Background color comes from daisy-bg-neutral class
+  // Background color comes from bg-neutral class
   flex-direction: row; // Ensure horizontal layout
   flex-wrap: nowrap; // Prevent wrapping
 }
@@ -290,7 +291,7 @@ onUnmounted(() => {
   min-width: $collapsed-menu-width-tablet;
 }
 
-@media (max-width: theme('screens.md')) {
+@media (max-width: 768px) {
   .menu-wrapper.is-collapsed {
     min-width: $collapsed-menu-width-mobile;
   }
@@ -412,11 +413,7 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
-.daisy-dropdown {
-  @apply daisy-dropdown-end;
-}
-
-@media (max-width: theme('screens.md')) {
+@media (max-width: 768px) {
   :deep(.label) {
     display: none;
   }

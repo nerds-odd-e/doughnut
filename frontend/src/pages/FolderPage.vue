@@ -1,14 +1,14 @@
 <template>
   <ContentLoader v-if="folderForView === undefined" />
-  <div v-else class="daisy-py-4">
+  <div v-else class="py-4">
     <NotebookPageReadonlySummary
       v-if="folderForView.notebookRealm.readonly === true"
       :notebook="folderForView.notebookRealm.notebook"
     />
-    <div v-else class="daisy-container daisy-mx-auto daisy-max-w-6xl">
-      <p class="daisy-text-sm daisy-text-base-content/70 daisy-mb-4">
+    <div v-else class="container mx-auto max-w-6xl">
+      <p class="text-sm text-base-content/70 mb-4">
         Folder
-        <span class="daisy-font-semibold daisy-text-base-content">{{
+        <span class="font-semibold text-base-content">{{
           folderForView.folder.name
         }}</span>
       </p>
@@ -24,11 +24,11 @@
         success-toast-saved="Folder index saved"
         @saved="refreshFolderPage"
       />
-      <div class="daisy-card daisy-w-full daisy-mb-6" data-testid="folder-move-dialog">
+      <div class="daisy-card w-full mb-6" data-testid="folder-move-dialog">
         <div class="daisy-card-body">
           <form @submit.prevent="() => submitMove()">
             <fieldset :disabled="processing">
-              <p class="daisy-text-sm daisy-mb-3">
+              <p class="text-sm mb-3">
                 Move folder "{{ folderForView.folder.name }}".
               </p>
               <label class="daisy-label" for="folder-move-destination">
@@ -43,12 +43,12 @@
                   :disabled="processing"
                 />
               </div>
-              <p v-if="moveError" class="daisy-text-error daisy-text-sm daisy-mt-2">
+              <p v-if="moveError" class="text-error text-sm mt-2">
                 {{ moveError }}
               </p>
               <button
                 type="submit"
-                class="daisy-btn daisy-btn-primary daisy-mt-4"
+                class="daisy-btn daisy-btn-primary mt-4"
                 data-testid="folder-move-submit"
                 :disabled="processing"
               >
@@ -56,10 +56,10 @@
               </button>
             </fieldset>
           </form>
-          <div class="daisy-divider daisy-my-4" />
+          <div class="daisy-divider my-4" />
           <form @submit.prevent="submitRename">
             <fieldset :disabled="processing">
-              <p class="daisy-text-sm daisy-mb-3">
+              <p class="text-sm mb-3">
                 Rename folder "{{ folderForView.folder.name }}".
               </p>
               <PathNameEditor
@@ -72,7 +72,7 @@
               />
               <button
                 type="submit"
-                class="daisy-btn daisy-btn-secondary daisy-mt-4"
+                class="daisy-btn daisy-btn-secondary mt-4"
                 data-testid="folder-rename-submit"
                 :disabled="renameSubmitDisabled"
               >
@@ -80,14 +80,14 @@
               </button>
             </fieldset>
           </form>
-          <div class="daisy-divider daisy-my-4">or</div>
-          <p class="daisy-text-sm daisy-mb-2">
+          <div class="daisy-divider my-4">or</div>
+          <p class="text-sm mb-2">
             Dissolve "{{ folderForView.folder.name }}". Notes and subfolders will move to
             {{ dissolveParentLabel }}.
           </p>
           <p
             v-if="dissolveError"
-            class="daisy-text-error daisy-text-sm daisy-mt-2"
+            class="text-error text-sm mt-2"
           >
             {{ dissolveError }}
           </p>
