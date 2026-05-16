@@ -199,6 +199,22 @@ async function routeAfterDissolve(r: FolderRealm) {
 
 const refreshFolderPage = () => props.fetchFolderPage()
 
+function throwIfSdkError(result: {
+  error?: unknown
+  response?: { status?: number }
+}): void {
+  if (!result.error) return
+  const httpStatus = result.response?.status
+  const err = result.error
+  if (typeof httpStatus === "number" && Number.isFinite(httpStatus)) {
+    if (typeof err === "object" && err !== null) {
+      throw { ...(err as Record<string, unknown>), status: httpStatus }
+    }
+    throw { message: String(err), status: httpStatus }
+  }
+  throw err
+}
+
 const submitRename = async () => {
   const r = folderForView.value
   if (processing.value || renameSubmitDisabled.value || r == null) return
@@ -235,7 +251,7 @@ const submitMove = async (merge = false) => {
       selectedParentFolder.value == null
         ? { merge }
         : { newParentFolderId: selectedParentFolder.value.id, merge }
-    const { error } = await apiCallWithLoading(() =>
+    const moveResult = await apiCallWithLoading(() =>
       NotebookController.moveFolder({
         path: {
           notebook: r.notebookRealm.notebook.id,
@@ -244,9 +260,20 @@ const submitMove = async (merge = false) => {
         body,
       })
     )
-    if (error) throw error
+    throwIfSdkError(moveResult)
+    const updatedFolder = moveResult.data
     refreshSidebarStructuralListings()
-    await refreshFolderPage()
+    if (updatedFolder != null && updatedFolder.id !== r.folder.id) {
+      await router.replace({
+        name: "folderPage",
+        params: {
+          notebookId: String(r.notebookRealm.notebook.id),
+          folderId: String(updatedFolder.id),
+        },
+      })
+    } else {
+      await refreshFolderPage()
+    }
   } catch (e: unknown) {
     const apiError = toOpenApiError(e)
     if (
@@ -281,7 +308,7 @@ const dissolve = async (merge = false) => {
   processing.value = true
   dissolveError.value = undefined
   try {
-    const { error } = await apiCallWithLoading(() =>
+    const dissolveResult = await apiCallWithLoading(() =>
       NotebookController.dissolveFolder({
         path: {
           notebook: r.notebookRealm.notebook.id,
@@ -290,7 +317,7 @@ const dissolve = async (merge = false) => {
         query: merge ? { merge: true } : undefined,
       })
     )
-    if (error) throw error
+    throwIfSdkError(dissolveResult)
     refreshSidebarStructuralListings()
     await routeAfterDissolve(r)
   } catch (e: unknown) {

@@ -185,6 +185,7 @@ export const noteSidebar = () => {
 
     expectSidebarNoteUnderOpenFolder(folderLabel: string, noteTitle: string) {
       pageIsNotLoading()
+      expandFolder(folderLabel)
       folderTreitemByLabel(folderLabel)
         .find(`[role="treeitem"].sidebar-note-li[aria-label="${noteTitle}"]`, {
           timeout: sidebarActionTimeoutMs,

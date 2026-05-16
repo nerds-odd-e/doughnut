@@ -59,6 +59,14 @@ export function assumeSidebarFolderOrganizeForm(): SidebarFolderOrganizeForm {
       cy.get('[data-testid="folder-move-submit"]', { timeout: submitTimeoutMs })
         .should('not.be.disabled')
         .click()
+      cy.get('body', { timeout: 8000 }).then(($body) => {
+        if ($body.text().includes('Merge into it?')) {
+          cy.get('dialog')
+            .filter(':visible')
+            .findByRole('button', { name: 'Cancel' })
+            .click()
+        }
+      })
       return assumeSidebarFolderOrganizeForm()
     },
 
