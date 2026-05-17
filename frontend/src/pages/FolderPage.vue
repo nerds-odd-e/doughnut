@@ -204,6 +204,22 @@ async function routeAfterDissolve(r: FolderRealm) {
 
 const refreshFolderPage = () => props.fetchFolderPage()
 
+function throwIfSdkError(result: {
+  error?: unknown
+  response?: { status?: number }
+}): void {
+  if (!result.error) return
+  const httpStatus = result.response?.status
+  const err = result.error
+  if (typeof httpStatus === "number" && Number.isFinite(httpStatus)) {
+    if (typeof err === "object" && err !== null) {
+      throw { ...(err as Record<string, unknown>), status: httpStatus }
+    }
+    throw { message: String(err), status: httpStatus }
+  }
+  throw err
+}
+
 const submitRename = async () => {
   const r = folderForView.value
   if (processing.value || renameSubmitDisabled.value || r == null) return
@@ -249,7 +265,8 @@ const submitMove = async (merge = false) => {
         body,
       })
     )
-    if (error) throw error
+    throwIfSdkError(moveResult)
+    const updatedFolder = moveResult.data
     refreshSidebarStructuralListings()
     const notebookId = r.notebookRealm.notebook.id
     if (merge && data) {
@@ -297,7 +314,7 @@ const dissolve = async (merge = false) => {
   processing.value = true
   dissolveError.value = undefined
   try {
-    const { error } = await apiCallWithLoading(() =>
+    const dissolveResult = await apiCallWithLoading(() =>
       NotebookController.dissolveFolder({
         path: {
           notebook: r.notebookRealm.notebook.id,
@@ -306,7 +323,7 @@ const dissolve = async (merge = false) => {
         query: merge ? { merge: true } : undefined,
       })
     )
-    if (error) throw error
+    throwIfSdkError(dissolveResult)
     refreshSidebarStructuralListings()
     await routeAfterDissolve(r)
   } catch (e: unknown) {
