@@ -1,3 +1,7 @@
+import {
+  expectDaisyDialogBoxVisible,
+  openDaisyDialog,
+} from '../../support/daisyModalHelpers'
 import { pageIsNotLoading } from '../pageBase'
 
 export type BookLayoutRow = { depth: number; title: string }
@@ -646,10 +650,8 @@ const bookReadingPage = () => {
     },
     expectReorganizationPreviewDialog() {
       pageIsNotLoading()
-      cy.get('[data-testid="book-layout-reorganize-preview-dialog"]').should(
-        'have.class',
-        'daisy-modal-open'
-      )
+      const dialog = '[data-testid="book-layout-reorganize-preview-dialog"]'
+      expectDaisyDialogBoxVisible(dialog)
       cy.get('#book-layout-reorganize-preview-title').should(
         'contain',
         'Reorganize layout (preview)'
@@ -661,9 +663,9 @@ const bookReadingPage = () => {
       suggestedDepth: number
     ) {
       pageIsNotLoading()
-      cy.get('[data-testid="book-layout-reorganize-preview-dialog"]')
-        .should('have.class', 'daisy-modal-open')
-        .within(() => {
+      const dialog = '[data-testid="book-layout-reorganize-preview-dialog"]'
+      expectDaisyDialogBoxVisible(dialog)
+      cy.get(`${dialog}.daisy-modal-open .daisy-modal-box`).within(() => {
           cy.contains(
             '[data-testid="book-layout-reorganize-preview-row"]',
             blockTitle
@@ -675,9 +677,10 @@ const bookReadingPage = () => {
     },
     confirmAiReorganizeSuggestion() {
       pageIsNotLoading()
-      cy.get('[data-testid="book-layout-reorganize-preview-confirm"]')
-        .should('be.visible')
-        .click()
+      openDaisyDialog('[data-testid="book-layout-reorganize-preview-dialog"]')
+      cy.get('[data-testid="book-layout-reorganize-preview-confirm"]').click({
+        force: true,
+      })
       pageIsNotLoading()
       return this
     },
@@ -730,18 +733,17 @@ const bookReadingPage = () => {
     },
     expectTitlePromptWithDefaultTitle() {
       pageIsNotLoading()
-      cy.get('[data-testid="new-block-title-dialog"]').should('be.visible')
-      cy.get('[data-testid="new-block-title-input"]').should(
-        'not.have.value',
-        ''
-      )
+      const dialog = '[data-testid="new-block-title-dialog"]'
+      expectDaisyDialogBoxVisible(dialog)
+      cy.get('[data-testid="new-block-title-input"]')
+        .should('exist')
+        .should('not.have.value', '')
       return this
     },
     confirmTitlePrompt() {
       pageIsNotLoading()
-      cy.get('[data-testid="new-block-title-confirm"]')
-        .should('be.visible')
-        .click()
+      openDaisyDialog('[data-testid="new-block-title-dialog"]')
+      cy.get('[data-testid="new-block-title-confirm"]').click({ force: true })
       return this
     },
   }

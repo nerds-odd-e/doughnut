@@ -4,6 +4,7 @@
 // @ts-check
 
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
+import { clickDaisyDialogButton } from '../support/daisyModalHelpers'
 import start from '../start'
 
 When('Someone triggered an exception', () => {
@@ -30,7 +31,7 @@ When('I check the checkbox for the failure report item', () => {
 
 When('I click the delete button', () => {
   cy.get('button').contains('Delete Selected').click()
-  cy.get('.daisy-modal-action').findByRole('button', { name: 'Delete' }).click()
+  clickDaisyDialogButton('dialog.daisy-modal', 'Delete')
 })
 
 Then('the failure report should be empty', () => {

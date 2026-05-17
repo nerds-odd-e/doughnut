@@ -1,3 +1,7 @@
+import {
+  clickPopupConfirmOk,
+  declineMergeConfirmIfShown,
+} from '../../support/daisyModalHelpers'
 import { pageIsNotLoading } from '../pageBase'
 
 const submitTimeoutMs = 20000
@@ -59,6 +63,7 @@ export function assumeSidebarFolderOrganizeForm(): SidebarFolderOrganizeForm {
       cy.get('[data-testid="folder-move-submit"]', { timeout: submitTimeoutMs })
         .should('not.be.disabled')
         .click()
+      declineMergeConfirmIfShown()
       return assumeSidebarFolderOrganizeForm()
     },
 
@@ -66,13 +71,13 @@ export function assumeSidebarFolderOrganizeForm(): SidebarFolderOrganizeForm {
       cy.get('[data-testid="folder-move-submit"]', { timeout: submitTimeoutMs })
         .should('not.be.disabled')
         .click()
-      cy.findByRole('button', { name: 'OK' }).click()
+      clickPopupConfirmOk()
       pageIsNotLoading()
     },
 
     expectErrorText(text: string) {
       cy.get('[data-testid="folder-move-dialog"]')
-        .find('.daisy-text-error')
+        .find('.text-error')
         .should('contain.text', text)
       return assumeSidebarFolderOrganizeForm()
     },
@@ -83,7 +88,7 @@ export function assumeSidebarFolderOrganizeForm(): SidebarFolderOrganizeForm {
       })
         .should('not.be.disabled')
         .click()
-      cy.findByRole('button', { name: 'OK' }).click()
+      clickPopupConfirmOk()
       pageIsNotLoading()
     },
 
@@ -93,8 +98,8 @@ export function assumeSidebarFolderOrganizeForm(): SidebarFolderOrganizeForm {
       })
         .should('not.be.disabled')
         .click()
-      cy.findByRole('button', { name: 'OK' }).click()
-      cy.findByRole('button', { name: 'OK' }).click()
+      clickPopupConfirmOk()
+      clickPopupConfirmOk()
       pageIsNotLoading()
     },
   }

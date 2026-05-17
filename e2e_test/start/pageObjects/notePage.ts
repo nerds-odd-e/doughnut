@@ -360,7 +360,7 @@ export const assumeNotePage = (
           const isWikidata =
             keyNorm === 'wikidata_id' || keyNorm === 'wikidataid'
           if (isWikidata) {
-            cy.contains('.daisy-font-mono', value).should('exist')
+            cy.contains('.font-mono', value).should('exist')
           } else if (keyNorm === 'image') {
             cy.get('[data-testid="rich-note-image-property-path"]').should(
               ($el) => {

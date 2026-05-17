@@ -22,7 +22,7 @@ const assumeQuestionPage = (stem?: string) => {
     skipQuestion() {
       pageIsNotLoading()
       getQuestionSection().should('exist')
-      cy.get('.daisy-progress-bar').first().click()
+      cy.get('.progress-bar').first().click()
       cy.findByRole('button', { name: 'Move to end of list' }).click()
     },
     answerFirstOption() {

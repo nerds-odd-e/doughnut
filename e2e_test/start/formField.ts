@@ -48,11 +48,11 @@ const formField = (label: string) => {
       return self
     },
     expectError(message: string) {
-      formControl(label).find('.daisy-text-error').findByText(message)
+      formControl(label).find('.text-error').findByText(message)
       return self
     },
     expectNoError() {
-      formControl(label).find('.daisy-text-error').should('not.exist')
+      formControl(label).find('.text-error').should('not.exist')
       return self
     },
     type(text: string) {

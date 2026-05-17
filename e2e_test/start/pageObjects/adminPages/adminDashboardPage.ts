@@ -1,3 +1,4 @@
+import { clickDaisyDialogButton } from '../../../support/daisyModalHelpers'
 import { pageIsNotLoading } from '../../pageBase'
 import { submittableForm } from '../../forms'
 
@@ -16,9 +17,7 @@ export function assumeAdminDashboardPage() {
         },
         deleteSelected() {
           cy.get('button').contains('Delete Selected').click()
-          cy.get('.daisy-modal-action')
-            .findByRole('button', { name: 'Delete' })
-            .click()
+          clickDaisyDialogButton('dialog.daisy-modal', 'Delete')
           return this
         },
         shouldBeEmpty() {

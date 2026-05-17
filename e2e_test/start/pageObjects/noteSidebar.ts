@@ -17,16 +17,21 @@ function folderTreitemByLabel(folderLabel: string) {
 
 function expandFolder(label: string) {
   pageIsNotLoading()
+  revealFolderInSidebar(label)
+  folderTreitemByLabel(label)
+    .find('[role="treeitem"]', { timeout: sidebarActionTimeoutMs })
+    .should('have.length.at.least', 1)
+  return
+}
+
+/** Expand a folder row so note children are in the DOM (no subfolder requirement). */
+function revealFolderInSidebar(label: string) {
   folderTreitemByLabel(label).then(($el) => {
     if (($el.attr('aria-expanded') ?? 'false') === 'false') {
       cy.wrap($el).find('.folder-row .chevron-btn').first().click()
     }
   })
-  folderTreitemByLabel(label)
-    .should('have.attr', 'aria-expanded', 'true')
-    .find('[role="treeitem"]', { timeout: sidebarActionTimeoutMs })
-    .should('have.length.at.least', 1)
-  return
+  folderTreitemByLabel(label).should('have.attr', 'aria-expanded', 'true')
 }
 
 function openSidebarIfCollapsed() {
@@ -185,6 +190,7 @@ export const noteSidebar = () => {
 
     expectSidebarNoteUnderOpenFolder(folderLabel: string, noteTitle: string) {
       pageIsNotLoading()
+      revealFolderInSidebar(folderLabel)
       folderTreitemByLabel(folderLabel)
         .find(`[role="treeitem"].sidebar-note-li[aria-label="${noteTitle}"]`, {
           timeout: sidebarActionTimeoutMs,

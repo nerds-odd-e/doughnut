@@ -27,12 +27,12 @@ const recallPage = () => {
       const [recalledTodayCount, toRecallCountForToday, totalCount] =
         numberOfRecalls.split('/')
 
-      cy.get('.daisy-progress-bar').should(
+      cy.get('.progress-bar').should(
         'contain',
         `Recalling: ${recalledTodayCount}/${toRecallCountForToday}`
       )
       // Click progress bar to show recall session options dialog
-      cy.get('.daisy-progress-bar').first().click()
+      cy.get('.progress-bar').first().click()
 
       // Check dialog content
       cy.contains('Recall Session Options').should('be.visible')

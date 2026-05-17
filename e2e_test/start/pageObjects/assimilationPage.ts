@@ -11,7 +11,7 @@ const understandingChecklist = () =>
   cy
     .get('[data-test="refine-note-modal"]')
     .contains('Understanding Checklist:')
-    .closest('.daisy-bg-accent')
+    .closest('.bg-accent')
 
 const mainNoteTitle = () =>
   cy.get('#main-note-content [data-test="note-title"]', { timeout: 15000 })
@@ -21,12 +21,12 @@ export const assumeAssimilationPage = () => ({
     const [assimilatedTodayCount, toAssimilateCountForToday, totalCount] =
       toAssimilateAndTotal.split('/')
 
-    cy.get('.daisy-progress-bar').should(
+    cy.get('.progress-bar').should(
       'contain',
       `Assimilating: ${assimilatedTodayCount}/${toAssimilateCountForToday}`
     )
     // Click progress bar to show tooltip
-    cy.get('.daisy-progress-bar').first().click()
+    cy.get('.progress-bar').first().click()
 
     // Check tooltip content
     cy.get('.tooltip-content').within(() => {
