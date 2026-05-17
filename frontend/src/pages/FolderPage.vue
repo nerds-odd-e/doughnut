@@ -126,6 +126,11 @@ const props = defineProps<{
   fetchFolderPage: () => Promise<void>
 }>()
 
+/** SDK throws the response body; HTTP status is on `result.response`, not on `throw error`. */
+function isHttpConflict(apiError: ReturnType<typeof toOpenApiError>): boolean {
+  return apiError.status === 409 || apiError.errorType === "RESOURCE_CONFLICT"
+}
+
 const router = useRouter()
 const { popups } = usePopups()
 
@@ -235,7 +240,7 @@ const submitMove = async (merge = false) => {
       selectedParentFolder.value == null
         ? { merge }
         : { newParentFolderId: selectedParentFolder.value.id, merge }
-    const { error } = await apiCallWithLoading(() =>
+    const { data, error } = await apiCallWithLoading(() =>
       NotebookController.moveFolder({
         path: {
           notebook: r.notebookRealm.notebook.id,
@@ -246,12 +251,23 @@ const submitMove = async (merge = false) => {
     )
     if (error) throw error
     refreshSidebarStructuralListings()
+    const notebookId = r.notebookRealm.notebook.id
+    if (merge && data) {
+      await router.push({
+        name: "folderPage",
+        params: {
+          notebookId: String(notebookId),
+          folderId: String(data.id),
+        },
+      })
+      return
+    }
     await refreshFolderPage()
   } catch (e: unknown) {
     const apiError = toOpenApiError(e)
     if (
       !merge &&
-      apiError.status === 409 &&
+      isHttpConflict(apiError) &&
       apiError.message === "A folder with this name already exists here."
     ) {
       processing.value = false
@@ -297,7 +313,7 @@ const dissolve = async (merge = false) => {
     const apiError = toOpenApiError(e)
     if (
       !merge &&
-      apiError.status === 409 &&
+      isHttpConflict(apiError) &&
       apiError.message?.startsWith(
         "A folder with this name already exists at the destination:"
       )
