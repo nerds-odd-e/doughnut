@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import NoteUnderQuestion from "./NoteUnderQuestion.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import { testFolderStub } from "@tests/helpers"
+
+function folderStub(id: number, name: string) {
+  return makeMe.aFolder.folder(id, name).please()
+}
 
 const meta = {
   title: "Recall/NoteUnderQuestion",
@@ -29,8 +32,8 @@ export const WithAncestors: Story = {
   args: {
     noteTopology: makeMe.aNote.title("TypeScript").please().noteTopology,
     ancestorFolders: [
-      testFolderStub(1, "Programming"),
-      testFolderStub(2, "Languages"),
+      folderStub(1, "Programming"),
+      folderStub(2, "Languages"),
     ],
     breadcrumbNotebookId: 1,
   },
@@ -41,7 +44,7 @@ export const WithManyAncestors: Story = {
   args: {
     noteTopology: makeMe.aNote.title("TypeScript").please().noteTopology,
     ancestorFolders: Array.from({ length: 10 }, (_, i) =>
-      testFolderStub(i + 1, `Ancestor ${i + 1}`)
+      folderStub(i + 1, `Ancestor ${i + 1}`)
     ),
     breadcrumbNotebookId: 1,
   },
