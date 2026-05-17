@@ -1,6 +1,6 @@
 <template>
   <div class="dialog-bar bg-base-300">
-    <div class="flex daisy-align-items-center gap-2">
+    <div class="flex items-center gap-2">
       <select
         v-if="conversations?.length && conversations.length > 1"
         class="conversation-select"
@@ -17,15 +17,15 @@
       </select>
       <button
         v-if="allowNewConversation"
-        class="daisy-btn daisy-btn-sm daisy-btn-outline-primary"
+        class="daisy-btn daisy-btn-sm daisy-btn-outline daisy-btn-primary"
         @click="$emit('new-conversation')"
         aria-label="New Conversation"
       >
       +
       </button>
     </div>
-    <div class="daisy-spacer"></div>
-    <div class="flex daisy-align-items-center gap-2">
+    <div class="spacer"></div>
+    <div class="flex items-center gap-2">
       <button
         class="export-button"
         @click="showExportDialog = true"

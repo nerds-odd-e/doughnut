@@ -35,7 +35,9 @@
         <div
           class="daisy-card py-2 px-3"
           :class="[
-            isCurrentUser(conversationMessage.sender?.id || 0) ? 'daisy-text-bg-dark' : 'daisy-bg-light',
+            isCurrentUser(conversationMessage.sender?.id || 0)
+              ? 'bg-primary text-primary-content'
+              : 'bg-base-200',
             conversationMessage.sender?.id === undefined ? 'ai-chat' : '',
           ]"
         >

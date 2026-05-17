@@ -47,7 +47,7 @@
             <select
               id="circle-notebook-catalog-sort"
               v-model="notebooksSortOrder"
-              class="daisy-select daisy-select daisy-select-sm w-max max-w-[12rem]"
+              class="daisy-select daisy-select-sm w-max max-w-[12rem]"
               title="Sort notebooks"
             >
               <option value="created">By created time</option>

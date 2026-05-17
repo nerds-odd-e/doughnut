@@ -94,6 +94,7 @@ const config = defineConfig({
   base: '/',
   build: {
     minify: 'terser',
+    cssMinify: 'lightningcss',
     terserOptions: {
       compress: {
         drop_console: true,

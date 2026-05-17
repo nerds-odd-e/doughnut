@@ -27,7 +27,7 @@
       />
     </PopButton>
     <div v-if="featureToggle" class="feature-toggle-alert">
-      <em class="daisy-btn-danger">Feature Toggle is On</em>
+      <em class="text-error">Feature Toggle is On</em>
     </div>
   </div>
 </template>

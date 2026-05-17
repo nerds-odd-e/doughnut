@@ -6,7 +6,7 @@
           <h3 class="daisy-card-title">Export Conversation for ChatGPT</h3>
           <div class="mt-4">
             <textarea
-              class="daisy-textarea daisy-textarea w-full h-96 bg-base-100 font-mono text-xs"
+              class="daisy-textarea w-full h-96 bg-base-100 font-mono text-xs"
               readonly
               :value="exportContent"
               data-testid="export-textarea"

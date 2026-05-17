@@ -36,7 +36,7 @@
                 folderId: hit.folderId,
               },
             }"
-            class="block font-medium daisy-text-decoration-none"
+            class="block font-medium no-underline"
           >{{ hit.folderName }}</router-link>
           <span v-else class="font-medium">{{ hit.folderName }}</span>
           <span
@@ -56,7 +56,7 @@
         </div>
         <router-link
           :to="{ name: 'notebookPage', params: { notebookId: hit.notebookId } }"
-          class="min-w-0 flex-1 daisy-text-decoration-none font-medium"
+          class="min-w-0 flex-1 no-underline font-medium"
         >{{ hit.notebookName }}</router-link>
       </div>
     </template>

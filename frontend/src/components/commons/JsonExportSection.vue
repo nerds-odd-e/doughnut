@@ -1,7 +1,7 @@
 <template>
   <div>
     <textarea
-      class="daisy-textarea daisy-textarea w-full h-48 bg-base-100 font-mono text-xs"
+      class="daisy-textarea w-full h-48 bg-base-100 font-mono text-xs"
       readonly
       :value="jsonData"
       :data-testid="textareaTestId"

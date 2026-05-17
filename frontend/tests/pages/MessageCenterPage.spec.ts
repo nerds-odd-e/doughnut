@@ -80,8 +80,12 @@ describe("MessageCenterPage", () => {
       const listItems = page.getByRole("listitem")
       await expect.element(listItems).toHaveLength(2)
 
-      await expect.element(listItems.nth(1)).toHaveClass("daisy-active")
-      await expect.element(listItems.nth(0)).not.toHaveClass("daisy-active")
+      await expect
+        .element(listItems.nth(1).getByText(conversations[1]!.subject!))
+        .toHaveClass("daisy-menu-active")
+      await expect
+        .element(listItems.nth(0).getByText(conversations[0]!.subject!))
+        .not.toHaveClass("daisy-menu-active")
     })
 
     it("should navigate when conversation clicked", async () => {

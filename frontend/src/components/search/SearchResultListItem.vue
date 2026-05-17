@@ -31,7 +31,7 @@
               folderId: searchHit.folderId,
             },
           }"
-          class="folder-hit-title daisy-text-decoration-none"
+          class="folder-hit-title no-underline"
         >{{ searchHit.folderName }}</router-link>
         <span
           v-else-if="searchHit.hitKind === 'FOLDER'"
@@ -40,7 +40,7 @@
         <router-link
           v-else-if="searchHit.hitKind === 'NOTEBOOK' && searchHit.notebookId != null"
           :to="{ name: 'notebookPage', params: { notebookId: searchHit.notebookId } }"
-          class="notebook-hit-title daisy-text-decoration-none"
+          class="notebook-hit-title no-underline"
         >{{ searchHit.notebookName }}</router-link>
       </div>
       <div

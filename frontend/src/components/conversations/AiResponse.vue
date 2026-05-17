@@ -3,7 +3,7 @@
     <div class="message-avatar me-2" title="AI Assistant">
       <Bot class="w-6 h-6" />
     </div>
-    <div class="daisy-card py-2 px-3 daisy-bg-light ai-chat"
+    <div class="daisy-card py-2 px-3 bg-base-200 ai-chat"
     v-html="markdowntToHtml(currentAiReply)"
     />
   </div>
@@ -21,15 +21,13 @@
     />
   </div>
 
-  <div v-if="lastErrorMessage" class="last-error-message daisy-text-danger mb-3">
+  <div v-if="lastErrorMessage" class="last-error-message text-error mb-3">
     {{ lastErrorMessage }}
   </div>
 
-  <div v-if="aiStatus" class="flex daisy-align-items-center status-bar mb-3">
-    <div class="daisy-spinner-border daisy-spinner-border-sm me-2" role="status">
-      <span class="sr-only">Loading...</span>
-    </div>
-    <small class="text-secondary">{{ aiStatus }}</small>
+  <div v-if="aiStatus" class="flex items-center status-bar mb-3">
+    <span class="daisy-loading daisy-loading-spinner daisy-loading-sm me-2" role="status" />
+    <small class="text-base-content/70">{{ aiStatus }}</small>
   </div>
 </template>
 

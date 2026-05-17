@@ -3,7 +3,7 @@
 @source inline("daisy-input daisy-input-ghost daisy-input-xs daisy-input-sm daisy-input-md daisy-input-lg daisy-input-xl daisy-input-primary daisy-input-secondary daisy-input-accent daisy-input-info daisy-input-success daisy-input-warning daisy-input-error");
 @source inline("daisy-modal daisy-modal-box daisy-modal-action daisy-modal-open daisy-modal-top daisy-modal-middle daisy-modal-bottom daisy-modal-start daisy-modal-end");
 @source inline("daisy-dropdown daisy-dropdown-content daisy-dropdown-end daisy-dropdown-start daisy-dropdown-top daisy-dropdown-bottom daisy-dropdown-left daisy-dropdown-right daisy-dropdown-hover daisy-dropdown-open");
-@source inline("daisy-menu daisy-menu-item daisy-menu-title daisy-menu-horizontal daisy-menu-vertical daisy-navbar daisy-navbar-start daisy-navbar-center daisy-navbar-end");
+@source inline("daisy-menu daisy-menu-item daisy-menu-title daisy-menu-active daisy-menu-horizontal daisy-menu-vertical daisy-navbar daisy-navbar-start daisy-navbar-center daisy-navbar-end");
 @source inline("daisy-badge daisy-badge-primary daisy-badge-secondary daisy-badge-accent daisy-badge-ghost daisy-badge-outline daisy-badge-neutral daisy-badge-info daisy-badge-success daisy-badge-warning daisy-badge-error daisy-badge-xs daisy-badge-sm daisy-badge-md daisy-badge-lg daisy-badge-xl daisy-badge-dash");
 @source inline("daisy-card daisy-card-body daisy-card-title daisy-card-actions daisy-card-side daisy-card-border daisy-card-sm daisy-card-compact daisy-card-normal daisy-card-glass");
 @source inline("daisy-select daisy-textarea daisy-checkbox daisy-radio daisy-toggle daisy-range daisy-file-input daisy-fieldset daisy-label daisy-form-control daisy-validator");
@@ -14,7 +14,7 @@
 @source inline("daisy-avatar daisy-avatar-group daisy-avatar-online daisy-avatar-offline daisy-avatar-placeholder");
 @source inline("daisy-loading daisy-loading-spinner daisy-loading-dots daisy-loading-ring daisy-loading-ball daisy-loading-bars daisy-loading-infinity daisy-loading-xs daisy-loading-sm daisy-loading-md daisy-loading-lg daisy-loading-xl");
 @source inline("daisy-progress daisy-skeleton daisy-countdown daisy-stat daisy-stats daisy-steps daisy-step daisy-step-primary");
-@source inline("daisy-join daisy-join-item daisy-divider daisy-indicator daisy-indicator-item daisy-tooltip daisy-kbd daisy-stack");
+@source inline("daisy-join daisy-join-item daisy-btn-group daisy-btn-group-sm daisy-btn-group-vertical daisy-divider daisy-indicator daisy-indicator-item daisy-tooltip daisy-kbd daisy-stack daisy-breadcrumbs");
 @plugin "daisyui" {
   themes:
     light --default,

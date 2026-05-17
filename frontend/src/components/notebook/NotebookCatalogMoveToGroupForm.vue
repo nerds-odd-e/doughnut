@@ -20,7 +20,7 @@
         <select
           id="notebook-catalog-move-to-group-target"
           v-model="selectedTarget"
-          class="daisy-select daisy-select w-full"
+          class="daisy-select w-full"
           :disabled="loadingGroups"
         >
           <option disabled value="">Choose…</option>

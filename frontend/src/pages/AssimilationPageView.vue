@@ -2,7 +2,7 @@
   <GlobalBar>
     <div class="progress-container relative w-full">
       <div
-        :class="`daisy-progress-bar w-full bg-gray-500 h-[25px] rounded-lg relative cursor-help ${false ? 'h-[5px]' : ''}`"
+        :class="`progress-bar w-full bg-gray-500 h-[25px] rounded-lg relative cursor-help ${false ? 'h-[5px]' : ''}`"
         v-if="remainingAssimilationCountForToday !== null"
         :title="`Daily Progress: ${assimilatedCountOfTheDay || 0} completed out of ${plannedForTheDay} planned for today`"
         @click="showTooltip = true"
@@ -17,7 +17,7 @@
         </span>
       </div>
       <div
-        class="daisy-progress-bar w-full bg-gray-500 h-[5px] rounded-lg relative cursor-help"
+        class="progress-bar w-full bg-gray-500 h-[5px] rounded-lg relative cursor-help"
         v-if="totalUnassimilatedCount !== undefined"
         :title="`Total Progress: ${assimilatedCountOfTheDay || 0} completed out of ${totalPlannedCount} total notes to assimilate`"
         @click="showTooltip = true"

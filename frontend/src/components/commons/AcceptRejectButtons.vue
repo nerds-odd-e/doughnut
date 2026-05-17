@@ -1,5 +1,5 @@
 <template>
-  <div class="daisy-card py-2 px-3 daisy-bg-light ai-chat">
+  <div class="daisy-card py-2 px-3 bg-base-200 ai-chat">
     <div>
       <slot name="title" />
     </div>
@@ -16,7 +16,7 @@
         Accept
       </button>
       <button
-        class="daisy-btn daisy-btn-outline-secondary daisy-btn-sm"
+        class="daisy-btn daisy-btn-outline daisy-btn-secondary daisy-btn-sm"
         @click="$emit('skip')"
         :disabled="disabled"
       >

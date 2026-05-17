@@ -28,8 +28,8 @@ const ariaLabel = computed(() =>
 
 const btnClass = computed(() =>
   props.compact
-    ? "daisy-btn daisy-btn-ghost daisy-btn-xs daisy-square shrink-0"
-    : "daisy-btn daisy-btn-ghost daisy-btn-sm daisy-square shrink-0"
+    ? "daisy-btn daisy-btn-ghost daisy-btn-xs square shrink-0"
+    : "daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
 )
 
 const iconClass = computed(() => (props.compact ? "h-3.5 w-3.5" : "h-4 w-4"))

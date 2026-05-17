@@ -1,7 +1,7 @@
 <template>
   <router-link
     :to="{ name: 'notebookPage', params: { notebookId: notebook.id } }"
-    class="daisy-text-decoration-none"
+    class="no-underline"
   >
     <BookText class="me-1 w-4 h-4 inline-block" />
     <span>{{ notebook.name }}</span>

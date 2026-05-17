@@ -160,7 +160,7 @@
     </div>
     <button
       type="button"
-      class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-square shrink-0"
+      class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
       :aria-label="`Remove note property ${modelValue.key}`"
       data-testid="rich-note-property-row-remove"
       @click="emit('remove')"

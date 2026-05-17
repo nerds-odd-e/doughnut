@@ -16,14 +16,14 @@ Use this rule when writing or modifying Vue components, component SCSS, or Story
 ## Core Technologies
 
 - Vue 3 with TypeScript.
-- DaisyUI + Tailwind for styling, with the `daisy-` prefix.
+- DaisyUI + Tailwind for styling: unprefixed Tailwind utilities (`flex`, `text-primary`, …) and `daisy-`-prefixed DaisyUI component classes (`daisy-btn`, `daisy-card`, …).
 - Vitest for testing with Playwright browser mode.
 - Biome for linting and formatting.
 
 ## Icons
 
 - Prefer Lucide for normal UI icons via `lucide-vue-next` (`import { IconName } from "lucide-vue-next"`). Import only the icons each file needs; rely on `currentColor` so icons follow text/theme color.
-- `lucide-vue-next` defaults to 24x24 via the `size` prop. Use `:size="..."` and/or `daisy-w-*`, `daisy-h-*`, or `daisy-size-*`. Never use bare `w-*` / `h-*`; Tailwind uses the `daisy-` prefix here.
+- `lucide-vue-next` defaults to 24x24 via the `size` prop. Use `:size="..."` and/or Tailwind `w-*`, `h-*`, or `size-*` on icons.
 
 ## Naming Conventions
 

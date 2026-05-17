@@ -6,7 +6,7 @@
     >
       <div
         v-if="showTitleBar"
-        class="result-section-info-row daisy-flex daisy-flex-nowrap daisy-items-center daisy-gap-2 daisy-w-full daisy-min-w-0"
+        class="result-section-info-row flex flex-nowrap items-center gap-2 w-full min-w-0"
       >
         <button
           v-if="embedSemanticToggle"
@@ -15,24 +15,24 @@
           aria-label="Semantic search"
           data-testid="note-new-form-semantic-search-toggle"
           :class="[
-            'daisy-btn daisy-btn-ghost daisy-btn-sm daisy-btn-square daisy-shrink-0',
+            'daisy-btn daisy-btn-ghost daisy-btn-sm daisy-btn-square shrink-0',
             semanticSearchEnabled
-              ? 'daisy-text-primary'
-              : 'daisy-opacity-30',
+              ? 'text-primary'
+              : 'opacity-30',
           ]"
           @click="semanticSearchEnabled = !semanticSearchEnabled"
         >
-          <Sparkles class="daisy-w-6 daisy-h-6" />
+          <Sparkles class="w-6 h-6" />
         </button>
         <span
           v-if="displayState.title"
-          class="result-section-info daisy-shrink-0 daisy-text-sm daisy-font-normal daisy-text-base-content/70"
+          class="result-section-info shrink-0 text-sm font-normal text-base-content/70"
         >
           {{ displayState.title }}
         </span>
         <span
           v-if="isSearchInProgress"
-          class="searching-indicator searching-indicator--title-inline daisy-inline-flex daisy-shrink-0 daisy-items-center"
+          class="searching-indicator searching-indicator--title-inline inline-flex shrink-0 items-center"
           role="status"
           aria-busy="true"
         >

@@ -276,7 +276,7 @@ describe("repeat page", () => {
       expect(vm.toRepeat?.map((t) => t.memoryTrackerId)).toEqual([123, 456, 3])
 
       // Click the progress bar to open the settings dialog
-      await wrapper.find(".daisy-progress-bar").trigger("click")
+      await wrapper.find(".progress-bar").trigger("click")
       await wrapper.vm.$nextTick()
       await flushPromises()
 
@@ -302,7 +302,7 @@ describe("repeat page", () => {
       await wrapper.vm.$nextTick()
 
       // Click the progress bar to open the settings dialog
-      await wrapper.find(".daisy-progress-bar").trigger("click")
+      await wrapper.find(".progress-bar").trigger("click")
       await wrapper.vm.$nextTick()
       await flushPromises()
 
@@ -437,7 +437,7 @@ describe("repeat page", () => {
 
       // If checkbox not found, click progress bar to open dialog
       if (!toggle) {
-        await wrapper.find(".daisy-progress-bar").trigger("click")
+        await wrapper.find(".progress-bar").trigger("click")
         await wrapper.vm.$nextTick()
         await flushPromises()
 
@@ -464,7 +464,7 @@ describe("repeat page", () => {
 
     it("should show treadmill mode toggle in settings", async () => {
       const wrapper = await mountPage()
-      await wrapper.find(".daisy-progress-bar").trigger("click")
+      await wrapper.find(".progress-bar").trigger("click")
       await wrapper.vm.$nextTick()
       await flushPromises()
 
@@ -806,7 +806,7 @@ describe("repeat page", () => {
       const wrapper = renderer.currentRoute({ name: "recall" }).mount()
       await flushPromises()
 
-      const progressBar = wrapper.find(".daisy-progress-bar")
+      const progressBar = wrapper.find(".progress-bar")
       expect(progressBar.exists()).toBe(true)
       expect(progressBar.classes()).toContain("diligent-mode")
     })
@@ -822,7 +822,7 @@ describe("repeat page", () => {
       const wrapper = renderer.currentRoute({ name: "recall" }).mount()
       await flushPromises()
 
-      const progressBar = wrapper.find(".daisy-progress-bar")
+      const progressBar = wrapper.find(".progress-bar")
       expect(progressBar.exists()).toBe(true)
       expect(progressBar.classes()).not.toContain("diligent-mode")
     })

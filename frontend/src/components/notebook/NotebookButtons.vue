@@ -1,5 +1,5 @@
 <template>
-  <div class="daisy-btn-group daisy-btn-group-sm flex daisy-align-items-center flex-wrap">
+  <div class="daisy-btn-group daisy-btn-group-sm flex items-center flex-wrap">
     <BazaarNotebookButtons v-if="notebook.circle" :notebook="notebook" :logged-in="true" />
     <button
       v-if="hasAttachedBook === true"

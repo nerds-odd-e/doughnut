@@ -1,7 +1,7 @@
 <template>
   <router-link
     :to="noteShowLocation(noteTopology.id)"
-    class="daisy-text-decoration-none"
+    class="no-underline"
   >
     <NoteTitleComponent v-bind="{ noteTopology }" />
   </router-link>

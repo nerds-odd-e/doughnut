@@ -59,8 +59,6 @@
     "marked": "^18.0.3",
     "optionator": "^0.9.4",
     "playwright": "^1.60.0",
-    "postcss": ">=8.5.14",
-    "postcss-load-config": "6.0.1",
     "sass": "1.99.0",
     "storybook": "10.4.0",
     "tailwindcss": "4.3.0",

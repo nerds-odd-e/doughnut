@@ -238,7 +238,6 @@ onUnmounted(() => {
 
 <style lang="scss" scoped>
 @use "@/assets/menu-variables.scss" as *;
-@reference "@/assets/daisyui.css";
 
 .sidebar-container {
   height: auto;

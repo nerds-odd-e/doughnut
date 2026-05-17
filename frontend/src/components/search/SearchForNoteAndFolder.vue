@@ -13,35 +13,35 @@
         <template #input_prepend>
           <AutoCollapseDropdown
             v-slot="{ closeDropdown }"
-            class="search-key-history-details daisy-dropdown daisy-dropdown-start daisy-dropdown-bottom daisy-relative daisy-inline-flex daisy-shrink-0"
+            class="search-key-history-details daisy-dropdown daisy-dropdown-start daisy-dropdown-bottom relative inline-flex shrink-0"
             data-testid="search-key-history-dropdown"
             @toggle="onHistoryToggle"
           >
             <summary
               tabindex="-1"
-              class="daisy-input daisy-input-bordered daisy-flex daisy-w-12 daisy-min-w-12 daisy-max-w-12 daisy-shrink-0 daisy-flex-none daisy-items-center daisy-justify-center daisy-rounded-r-none daisy-px-0 daisy-py-0 list-none daisy-cursor-pointer daisy-bg-base-100"
+              class="daisy-input flex w-12 min-w-12 max-w-12 shrink-0 flex-none items-center justify-center rounded-r-none px-0 py-0 list-none cursor-pointer bg-base-100"
               title="Search history"
               aria-label="Search history"
               data-testid="search-key-history-trigger"
               @focus="(ev: FocusEvent) => (ev.currentTarget as HTMLElement).blur()"
             >
-              <Clock class="daisy-w-5 daisy-h-5" />
+              <Clock class="w-5 h-5" />
             </summary>
             <ul
               tabindex="0"
-              class="daisy-dropdown-content daisy-menu daisy-bg-base-100 daisy-rounded-box daisy-min-w-[12rem] daisy-max-w-[20rem] daisy-max-h-60 daisy-overflow-y-auto daisy-p-2 daisy-shadow daisy-z-[1000]"
+              class="daisy-dropdown-content daisy-menu bg-base-100 rounded-box min-w-[12rem] max-w-[20rem] max-h-60 overflow-y-auto p-2 shadow z-[1000]"
             >
-              <li v-if="historyKeys.length === 0" class="daisy-px-2 daisy-py-1 daisy-text-sm daisy-opacity-60">
+              <li v-if="historyKeys.length === 0" class="px-2 py-1 text-sm opacity-60">
                 No search history yet
               </li>
               <li
                 v-for="(key, index) in historyKeys"
                 :key="`${index}-${key}`"
-                class="daisy-menu-item daisy-p-0"
+                class="daisy-menu-item p-0"
               >
                 <button
                   type="button"
-                  class="daisy-btn daisy-btn-ghost daisy-h-auto daisy-min-h-0 daisy-w-full daisy-justify-start daisy-py-2 daisy-font-normal daisy-text-left daisy-whitespace-normal daisy-break-words"
+                  class="daisy-btn daisy-btn-ghost h-auto min-h-0 w-full justify-start py-2 font-normal text-left whitespace-normal break-words"
                   :title="key"
                   :data-testid="`search-key-history-item-${index}`"
                   @click="pickHistoryKey(key, closeDropdown)"
