@@ -1,4 +1,8 @@
-import type { Circle, NoteRealm, Notebook } from "@generated/doughnut-backend-api"
+import type {
+  Circle,
+  NoteRealm,
+  Notebook,
+} from "@generated/doughnut-backend-api"
 import {
   AiController,
   AssimilationController,
@@ -73,7 +77,7 @@ export function mockAssimilationStoryApis(noteRealms: NoteRealm[]) {
     noteRealms.map((r) => r.notebookRealm.notebook.id)
   )
 
-  const showNote: typeof NoteController.showNote = async (options) => {
+  spyMethod(NoteController, "showNote", (async (options) => {
     const realm = byNoteId.get(options.path.note)
     if (realm) return wrapSdkResponse(realm)
     return {
@@ -82,8 +86,7 @@ export function mockAssimilationStoryApis(noteRealms: NoteRealm[]) {
       request: {} as Request,
       response: { status: 404 } as Response,
     }
-  }
-  spyMethod(NoteController, "showNote", showNote)
+  }) as typeof NoteController.showNote)
 
   spyMethod(NoteController, "getNoteInfo", async () =>
     wrapSdkResponse({ memoryTrackers: [] })

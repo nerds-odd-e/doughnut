@@ -31,10 +31,7 @@ export const Simple: Story = {
 export const WithAncestors: Story = {
   args: {
     noteTopology: makeMe.aNote.title("TypeScript").please().noteTopology,
-    ancestorFolders: [
-      folderStub(1, "Programming"),
-      folderStub(2, "Languages"),
-    ],
+    ancestorFolders: [folderStub(1, "Programming"), folderStub(2, "Languages")],
     breadcrumbNotebookId: 1,
   },
 }
