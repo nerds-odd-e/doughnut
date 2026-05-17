@@ -21,7 +21,7 @@ overrides:
   express: '>=5.2.0'
   systeminformation: '>=5.31.6'
   qs: '>=6.14.2'
-  hono: 4.12.18
+  hono: 4.12.19
   '@hono/node-server': 2.0.2
   undici: '>=7.24.0'
   diff: '>=8.0.3'
@@ -85,7 +85,7 @@ importers:
         version: 0.97.1(typescript@6.0.3)
       '@hono/node-server':
         specifier: 2.0.2
-        version: 2.0.2(hono@4.12.18)
+        version: 2.0.2(hono@4.12.19)
       '@mbtest/mountebank':
         specifier: 2.9.4
         version: 2.9.4
@@ -120,8 +120,8 @@ importers:
         specifier: ^15.0.5
         version: 15.0.5
       hono:
-        specifier: 4.12.18
-        version: 4.12.18
+        specifier: 4.12.19
+        version: 4.12.19
       npm-run-all2:
         specifier: ^8.0.4
         version: 8.0.4
@@ -1230,7 +1230,7 @@ packages:
     resolution: {integrity: sha512-tXlTi1h/4V7sDe7i97IVP+9re9ZU7wXZZggnR5ucCRclf1+AX6YhGStrR5w8bLj+3Mlyl0pKfBh9gqTqqnGKfQ==}
     engines: {node: '>=20'}
     peerDependencies:
-      hono: 4.12.18
+      hono: 4.12.19
 
   '@humanwhocodes/momoa@2.0.4':
     resolution: {integrity: sha512-RE815I4arJFtt+FVeU1Tgp9/Xvecacji8w/V6XtXsWWH/wz/eNkNbhb+ny/+PlVZjV0rxQpRSQKNKE3lcktHEA==}
@@ -4145,8 +4145,8 @@ packages:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
     hasBin: true
 
-  hono@4.12.18:
-    resolution: {integrity: sha512-RWzP96k/yv0PQfyXnWjs6zot20TqfpfsNXhOnev8d1InAxubW93L11/oNUc3tQqn2G0bSdAOBpX+2uDFHV7kdQ==}
+  hono@4.12.19:
+    resolution: {integrity: sha512-xa3eYXYXx68XTT4hZ7dRzsXBhaq85ToSrlUJNoR0gwz/1Ap/CNwX47wfvV7pc/xWhjKVVkLT7zBJy8chhNguqQ==}
     engines: {node: '>=16.9.0'}
 
   hookable@5.5.3:
@@ -8075,9 +8075,9 @@ snapshots:
 
   '@hey-api/types@0.1.4': {}
 
-  '@hono/node-server@2.0.2(hono@4.12.18)':
+  '@hono/node-server@2.0.2(hono@4.12.19)':
     dependencies:
-      hono: 4.12.18
+      hono: 4.12.19
 
   '@humanwhocodes/momoa@2.0.4': {}
 
@@ -8317,7 +8317,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.29.0(zod@4.4.3)':
     dependencies:
-      '@hono/node-server': 2.0.2(hono@4.12.18)
+      '@hono/node-server': 2.0.2(hono@4.12.19)
       ajv: 8.20.0
       ajv-formats: 3.0.1(ajv@8.20.0)
       content-type: 1.0.5
@@ -8327,7 +8327,7 @@ snapshots:
       eventsource-parser: 3.0.8
       express: 5.2.1
       express-rate-limit: 8.4.1(express@5.2.1)
-      hono: 4.12.18
+      hono: 4.12.19
       jose: 6.2.3
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
@@ -11186,7 +11186,7 @@ snapshots:
 
   he@1.2.0: {}
 
-  hono@4.12.18: {}
+  hono@4.12.19: {}
 
   hookable@5.5.3: {}
 
