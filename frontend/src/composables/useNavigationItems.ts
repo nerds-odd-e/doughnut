@@ -10,7 +10,7 @@ import {
   Play,
   Store,
   Users,
-} from "lucide-vue-next"
+} from "@lucide/vue"
 import { messageCenterConversations } from "@/store/messageStore"
 
 export function useNavigationItems() {

@@ -81,7 +81,7 @@ import {
   useNoteSidebarPeerSort,
   type SidebarPeerSortSpec,
 } from "@/composables/useNoteSidebarPeerSort"
-import { ArrowDownAZ, FolderPlus, NotebookPen } from "lucide-vue-next"
+import { ArrowDownAZ, FolderPlus, NotebookPen } from "@lucide/vue"
 import { computed } from "vue"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 import FolderNewButton from "./core/FolderNewButton.vue"

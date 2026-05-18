@@ -37,7 +37,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from "vue"
-import { X } from "lucide-vue-next"
+import { X } from "@lucide/vue"
 import { useRoute } from "vue-router"
 import { registerModal } from "./modalStack"
 import { focusAutofocusTargetWithin } from "@/utils/focusTarget"

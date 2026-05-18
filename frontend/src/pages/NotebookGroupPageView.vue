@@ -63,7 +63,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { LayoutGrid, List } from "lucide-vue-next"
+import { LayoutGrid, List } from "@lucide/vue"
 import type {
   Notebook,
   NotebookCatalogGroupItem,

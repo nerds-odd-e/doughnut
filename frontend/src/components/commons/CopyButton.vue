@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
-import { ClipboardCheck } from "lucide-vue-next"
+import { ClipboardCheck } from "@lucide/vue"
 
 const props = withDefaults(
   defineProps<{

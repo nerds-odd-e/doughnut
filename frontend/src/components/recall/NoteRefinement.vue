@@ -68,7 +68,7 @@ import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
 
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
-import { Folders } from "lucide-vue-next"
+import { Folders } from "@lucide/vue"
 import LoadingModal from "../commons/LoadingModal.vue"
 import { onMounted, ref } from "vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"

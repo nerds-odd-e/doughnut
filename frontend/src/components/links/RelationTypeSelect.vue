@@ -72,7 +72,7 @@ import {
   relationTypeOptions,
   type RelationTypeLabel,
 } from "../../models/relationTypeOptions"
-import { CornerDownLeft, PenLine } from "lucide-vue-next"
+import { CornerDownLeft, PenLine } from "@lucide/vue"
 import RadioButtons from "../form/RadioButtons.vue"
 import SvgRelationTypeIcon from "../svgs/SvgRelationTypeIcon.vue"
 

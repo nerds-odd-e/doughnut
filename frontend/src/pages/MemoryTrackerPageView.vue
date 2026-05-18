@@ -176,7 +176,7 @@ import ConversationButton from "@/components/recall/ConversationButton.vue"
 import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "@/components/commons/Popups/usePopups"
-import { EyeOff } from "lucide-vue-next"
+import { EyeOff } from "@lucide/vue"
 
 const props = defineProps({
   recallPrompts: {

@@ -67,7 +67,7 @@ import type {
   ConversationMessage,
   Conversation,
 } from "@generated/doughnut-backend-api"
-import { Bot, User as UserIcon } from "lucide-vue-next"
+import { Bot, User as UserIcon } from "@lucide/vue"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import ConversationTemplate from "./ConversationTemplate.vue"
 import markdownizer from "../form/markdownizer"

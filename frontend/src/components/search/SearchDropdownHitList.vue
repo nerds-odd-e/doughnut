@@ -65,7 +65,7 @@
 
 <script setup lang="ts">
 import type { RelationshipLiteralSearchHit } from "@generated/doughnut-backend-api"
-import { BookText, FileText, Folder } from "lucide-vue-next"
+import { BookText, FileText, Folder } from "@lucide/vue"
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
 import { relationshipLiteralSearchHitKey } from "@/models/relationshipLiteralSearchHitKey"
 

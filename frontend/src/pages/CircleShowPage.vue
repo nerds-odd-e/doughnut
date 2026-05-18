@@ -158,7 +158,7 @@ import {
 import { sortNotebookCatalogAlphabetically } from "@/components/notebook/sortNotebookCatalogAlphabetically"
 import { useNotebooksLayout } from "@/composables/useNotebooksLayout"
 import {} from "@/managedApi/clientSetup"
-import { LayoutGrid, List, Search, User as UserIcon, X } from "lucide-vue-next"
+import { LayoutGrid, List, Search, User as UserIcon, X } from "@lucide/vue"
 import type {
   CircleForUserView,
   Notebook,

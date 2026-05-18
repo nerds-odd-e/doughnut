@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ExternalLink } from "lucide-vue-next"
+import { ExternalLink } from "@lucide/vue"
 import { computed } from "vue"
 import { openRichPropertyUrlInNewWindow } from "@/utils/openRichPropertyUrlInNewWindow"
 import { openWikidataEntityBrowseUrlInNonBlockingPopup } from "@/utils/wikidataEntityBrowseUrl"

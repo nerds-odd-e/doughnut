@@ -75,7 +75,7 @@ import { PredefinedQuestionController } from "@generated/doughnut-backend-api/sd
 import NoteAddQuestion from "./NoteAddQuestion.vue"
 import QuestionExportDialog from "./QuestionExportDialog.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
-import { Upload } from "lucide-vue-next"
+import { Upload } from "@lucide/vue"
 
 const props = defineProps({
   note: {

@@ -14,7 +14,7 @@ import type { PropType } from "vue"
 import { defineComponent } from "vue"
 import PopButton from "../commons/Popups/PopButton.vue"
 import NotebookNewForm from "./NotebookNewForm.vue"
-import { BookPlus } from "lucide-vue-next"
+import { BookPlus } from "@lucide/vue"
 
 export default defineComponent({
   props: {

@@ -171,7 +171,7 @@
 </template>
 
 <script setup lang="ts">
-import { Minus } from "lucide-vue-next"
+import { Minus } from "@lucide/vue"
 import { computed, ref } from "vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import RichFrontmatterPropertyKeyPresets from "@/components/form/RichFrontmatterPropertyKeyPresets.vue"

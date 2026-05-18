@@ -170,7 +170,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { computed, onMounted, ref } from "vue"
-import { ArrowDownAZ, LayoutGrid, List, Search, X } from "lucide-vue-next"
+import { ArrowDownAZ, LayoutGrid, List, Search, X } from "@lucide/vue"
 import type {
   Notebook,
   SubscriptionForNotebooksListing,

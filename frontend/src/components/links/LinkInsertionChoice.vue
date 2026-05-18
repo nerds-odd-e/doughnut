@@ -35,7 +35,7 @@
 import { computed } from "vue"
 import type { NoteTopology } from "@generated/doughnut-backend-api"
 import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
-import { Reply } from "lucide-vue-next"
+import { Reply } from "@lucide/vue"
 
 const props = defineProps<{
   targetNoteTopology: NoteTopology

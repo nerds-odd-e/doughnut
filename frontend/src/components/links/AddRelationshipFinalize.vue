@@ -36,7 +36,7 @@ import type { Note, NoteSearchResult } from "@generated/doughnut-backend-api"
 import RadioButtons from "../form/RadioButtons.vue"
 import RelationTypeSelect from "./RelationTypeSelect.vue"
 import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
-import { Reply } from "lucide-vue-next"
+import { Reply } from "@lucide/vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import {
   formatRelationshipNoteMarkdown,

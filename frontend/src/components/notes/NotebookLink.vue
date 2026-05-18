@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import type { Notebook } from "@generated/doughnut-backend-api"
-import { BookText } from "lucide-vue-next"
+import { BookText } from "@lucide/vue"
 
 defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },

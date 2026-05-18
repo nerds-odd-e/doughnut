@@ -162,7 +162,7 @@
 import { ref, computed } from "vue"
 import type { Conversation } from "@generated/doughnut-backend-api"
 import ConversationExportDialog from "./ConversationExportDialog.vue"
-import { Upload } from "lucide-vue-next"
+import { Upload } from "@lucide/vue"
 
 const { isMaximized, defaultMessages } = defineProps<{
   conversations?: Conversation[]

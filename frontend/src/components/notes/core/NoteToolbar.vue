@@ -92,7 +92,7 @@ import {
   MessageCircle,
   Mic,
   Settings,
-} from "lucide-vue-next"
+} from "@lucide/vue"
 import NoteAudioTools from "../widgets/NoteAudioTools.vue"
 import { useRouter } from "vue-router"
 import NoteMoreOptionsForm from "../widgets/NoteMoreOptionsForm.vue"

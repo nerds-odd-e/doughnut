@@ -34,7 +34,7 @@ import type { PropType } from "vue"
 import { ref } from "vue"
 import type { NoteTopology } from "@generated/doughnut-backend-api"
 import Cards from "./Cards.vue"
-import { ChevronsUpDown } from "lucide-vue-next"
+import { ChevronsUpDown } from "@lucide/vue"
 
 const props = defineProps({
   noteTopologies: { type: Array as PropType<NoteTopology[]>, required: true },

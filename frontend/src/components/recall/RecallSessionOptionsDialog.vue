@@ -44,7 +44,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue"
-import { SkipForward } from "lucide-vue-next"
+import { SkipForward } from "@lucide/vue"
 import Modal from "../commons/Modal.vue"
 import { useRecallData } from "@/composables/useRecallData"
 import type { RecallPrompt } from "@generated/doughnut-backend-api"

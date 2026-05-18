@@ -67,7 +67,7 @@ import type {
   NotebookRealm,
 } from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
-import { PanelLeft, PanelLeftClose } from "lucide-vue-next"
+import { PanelLeft, PanelLeftClose } from "@lucide/vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
 import Sidebar from "@/components/notes/Sidebar.vue"

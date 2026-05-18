@@ -29,7 +29,7 @@
 import type { Ref } from "vue"
 import type { User } from "@generated/doughnut-backend-api"
 import { inject, onMounted, onUnmounted, ref } from "vue"
-import { Search } from "lucide-vue-next"
+import { Search } from "@lucide/vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 
 const user = inject<Ref<User | undefined>>("currentUser")

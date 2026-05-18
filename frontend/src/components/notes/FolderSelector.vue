@@ -74,7 +74,7 @@
 
 <script setup lang="ts">
 import type { Folder } from "@generated/doughnut-backend-api"
-import { MoreHorizontal } from "lucide-vue-next"
+import { MoreHorizontal } from "@lucide/vue"
 import { computed, onMounted, ref } from "vue"
 import Modal from "@/components/commons/Modal.vue"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"

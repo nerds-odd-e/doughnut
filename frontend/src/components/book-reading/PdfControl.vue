@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { ZoomIn, ZoomOut } from "lucide-vue-next"
+import { ZoomIn, ZoomOut } from "@lucide/vue"
 
 defineProps<{
   currentPage: number | null

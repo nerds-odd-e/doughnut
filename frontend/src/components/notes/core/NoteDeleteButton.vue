@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router"
 import usePopups from "../../commons/Popups/usePopups"
-import { Trash2 } from "lucide-vue-next"
+import { Trash2 } from "@lucide/vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import type { NoteDeleteReferenceHandling } from "@/store/StoredApiCollection"
 

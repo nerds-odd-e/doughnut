@@ -35,7 +35,7 @@
 import { ref, computed, watch } from "vue"
 import type { Conversation } from "@generated/doughnut-backend-api"
 import type { ToolCallResult } from "@/models/aiReplyState"
-import { Bot } from "lucide-vue-next"
+import { Bot } from "@lucide/vue"
 import markdownizer from "../form/markdownizer"
 import {
   createAiReplyStates,

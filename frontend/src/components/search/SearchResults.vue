@@ -158,7 +158,7 @@
 
 <script setup lang="ts">
 import type { NoteSearchResult } from "@generated/doughnut-backend-api"
-import { Sparkles } from "lucide-vue-next"
+import { Sparkles } from "@lucide/vue"
 import { computed, toRef } from "vue"
 import SearchDropdownHitList from "./SearchDropdownHitList.vue"
 import SearchResultList from "./SearchResultList.vue"

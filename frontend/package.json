@@ -24,7 +24,7 @@
   "dependencies": {
     "epubjs": "^0.3.93",
     "file-saver": "^2.0.5",
-    "lucide-vue-next": "^1.0.0",
+    "@lucide/vue": "^1.0.0",
     "mini-debounce": "^1.0.8",
     "pdfjs-dist": "5.7.284",
     "quill": "npm:@dotwee/quill@2.0.9",

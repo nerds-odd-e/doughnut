@@ -94,7 +94,7 @@ import { useRoute } from "vue-router"
 import LoginButton from "@/components/toolbars/LoginButton.vue"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import AccountMenuItem from "@/components/toolbars/AccountMenuItem.vue"
-import { ChevronRight, Menu } from "lucide-vue-next"
+import { ChevronRight, Menu } from "@lucide/vue"
 import { useRecallData } from "@/composables/useRecallData"
 
 type NavigationItemType = {

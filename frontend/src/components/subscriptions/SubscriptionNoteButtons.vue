@@ -76,7 +76,7 @@ import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import Modal from "../commons/Modal.vue"
 import AutoCollapseDropdown from "../commons/AutoCollapseDropdown.vue"
 import usePopups from "../commons/Popups/usePopups"
-import { Minus, MoreHorizontal } from "lucide-vue-next"
+import { Minus, MoreHorizontal } from "@lucide/vue"
 import NotebookCatalogMoveToGroupForm from "@/components/notebook/NotebookCatalogMoveToGroupForm.vue"
 import SubscriptionEditForm from "./SubscriptionEditForm.vue"
 

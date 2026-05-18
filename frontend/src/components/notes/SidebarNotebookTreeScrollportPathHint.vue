@@ -35,7 +35,7 @@
 
 <script setup lang="ts">
 import type { Folder } from "@generated/doughnut-backend-api"
-import { ChevronUp } from "lucide-vue-next"
+import { ChevronUp } from "@lucide/vue"
 import { computed, onBeforeUnmount, ref, watch } from "vue"
 import { RouterLink } from "vue-router"
 import { folderIdsWithRowAboveScrollportTop } from "./sidebarActivePathRowsAboveScrollport"

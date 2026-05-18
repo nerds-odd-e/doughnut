@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import { saveAs } from "file-saver"
 import CopyButton from "./CopyButton.vue"
-import { Download } from "lucide-vue-next"
+import { Download } from "@lucide/vue"
 
 const props = withDefaults(
   defineProps<{

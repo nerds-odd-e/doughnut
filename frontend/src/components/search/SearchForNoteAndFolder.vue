@@ -149,7 +149,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
-import { BookOpen, Clock, Sparkles, Users, X } from "lucide-vue-next"
+import { BookOpen, Clock, Sparkles, Users, X } from "@lucide/vue"
 import TextInput from "../form/TextInput.vue"
 import SearchResults from "./SearchResults.vue"
 import type { NoteSearchResult } from "@generated/doughnut-backend-api"

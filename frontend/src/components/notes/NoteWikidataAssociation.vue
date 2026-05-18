@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { Link2 } from "lucide-vue-next"
+import { Link2 } from "@lucide/vue"
 import { WikidataController } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import nonBlockingPopup from "@/managedApi/window/nonBlockingPopup"

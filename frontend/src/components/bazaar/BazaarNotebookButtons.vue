@@ -21,7 +21,7 @@
 import type { PropType } from "vue"
 import type { Notebook } from "@generated/doughnut-backend-api"
 import PopButton from "../commons/Popups/PopButton.vue"
-import { Plus } from "lucide-vue-next"
+import { Plus } from "@lucide/vue"
 import SubscribeForm from "./SubscribeForm.vue"
 
 defineProps({

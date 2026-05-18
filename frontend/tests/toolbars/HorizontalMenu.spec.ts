@@ -12,7 +12,7 @@ import {
   MessageCircle,
   Store,
   Users,
-} from "lucide-vue-next"
+} from "@lucide/vue"
 import type { Component } from "vue"
 
 const useRouteValue = reactive({ name: "", fullPath: "/" })

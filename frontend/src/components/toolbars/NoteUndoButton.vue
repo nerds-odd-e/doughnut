@@ -27,7 +27,7 @@
 <script setup lang="ts">
 import { computed } from "vue"
 import { useRouter } from "vue-router"
-import { Undo2 } from "lucide-vue-next"
+import { Undo2 } from "@lucide/vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import UndoConfirmationForm from "./UndoConfirmationForm.vue"
 import PopButton from "../commons/Popups/PopButton.vue"

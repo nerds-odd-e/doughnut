@@ -43,7 +43,7 @@
 import type { User } from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
-import { CircleCheck, User as UserIcon } from "lucide-vue-next"
+import { CircleCheck, User as UserIcon } from "@lucide/vue"
 
 defineProps({
   user: { type: Object as PropType<User>, required: true },

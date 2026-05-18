@@ -63,12 +63,7 @@
 import type { Note } from "@generated/doughnut-backend-api"
 import PopButton from "../../commons/Popups/PopButton.vue"
 import Questions from "../Questions.vue"
-import {
-  CircleCheck,
-  MessageCircleQuestion,
-  Trash2,
-  Upload,
-} from "lucide-vue-next"
+import { CircleCheck, MessageCircleQuestion, Trash2, Upload } from "@lucide/vue"
 import NoteExportForm from "../core/NoteExportForm.vue"
 import { useRouter } from "vue-router"
 import usePopups from "../../commons/Popups/usePopups"

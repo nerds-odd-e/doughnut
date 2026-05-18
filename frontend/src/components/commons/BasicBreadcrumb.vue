@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import type { Folder } from "@generated/doughnut-backend-api"
-import { Folder as FolderIcon } from "lucide-vue-next"
+import { Folder as FolderIcon } from "@lucide/vue"
 
 const props = defineProps({
   folderSegments: {

@@ -85,7 +85,7 @@
 <script setup lang="ts">
 import type { Folder } from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
-import { Search } from "lucide-vue-next"
+import { Search } from "@lucide/vue"
 import { computed, nextTick, onMounted, ref, watch } from "vue"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"

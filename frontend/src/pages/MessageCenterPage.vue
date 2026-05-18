@@ -59,7 +59,7 @@ import {} from "@/managedApi/clientSetup"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
-import { MessageCircle } from "lucide-vue-next"
+import { MessageCircle } from "@lucide/vue"
 import type {
   Conversation,
   ConversationListItem,

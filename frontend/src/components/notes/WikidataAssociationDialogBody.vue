@@ -110,7 +110,7 @@ import {} from "@/managedApi/clientSetup"
 import RadioButtons from "../form/RadioButtons.vue"
 import TextInput from "../form/TextInput.vue"
 import { openWikidataEntityBrowseUrlInNonBlockingPopup } from "@/utils/wikidataEntityBrowseUrl"
-import { ExternalLink } from "lucide-vue-next"
+import { ExternalLink } from "@lucide/vue"
 
 const props = defineProps<{
   searchKey: string
