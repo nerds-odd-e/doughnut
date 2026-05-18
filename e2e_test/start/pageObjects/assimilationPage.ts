@@ -131,7 +131,10 @@ export const assumeAssimilationPage = () => ({
             if (title) waitForAssimilationNoteTitle(title)
             if (targetNote) waitForAssimilationNoteTitle(targetNote)
             if (relationType) {
-              cy.get(mainNoteHeadingTitleSelector).should('contain', relationType)
+              cy.get(mainNoteHeadingTitleSelector).should(
+                'contain',
+                relationType
+              )
             }
             this.waitForAssimilationReady()
           }
