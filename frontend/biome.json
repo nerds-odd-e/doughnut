@@ -12,6 +12,7 @@
       "**",
       "!**/.github",
       "!**/dist",
+      "!**/storybook-static",
       "!**/node_modules",
       "!**/public",
       "!**/*.cjs",

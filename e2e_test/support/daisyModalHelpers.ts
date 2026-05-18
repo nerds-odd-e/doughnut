@@ -13,10 +13,7 @@ export function openDaisyDialog(selector: string): void {
 
 /** `usePopups().confirm()` via Modal.vue */
 export function clickPopupConfirmOk(): void {
-  cy.get('dialog')
-    .filter(':visible')
-    .contains('button', 'OK')
-    .click()
+  cy.get('dialog').filter(':visible').contains('button', 'OK').click()
 }
 
 /** Decline `usePopups().confirm()` when a merge prompt is shown. */

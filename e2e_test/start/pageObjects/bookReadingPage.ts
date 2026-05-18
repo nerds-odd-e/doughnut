@@ -666,13 +666,13 @@ const bookReadingPage = () => {
       const dialog = '[data-testid="book-layout-reorganize-preview-dialog"]'
       expectDaisyDialogBoxVisible(dialog)
       cy.get(`${dialog}.daisy-modal-open .daisy-modal-box`).within(() => {
-          cy.contains(
-            '[data-testid="book-layout-reorganize-preview-row"]',
-            blockTitle
-          )
-            .should('be.visible')
-            .and('have.attr', 'data-suggested-depth', String(suggestedDepth))
-        })
+        cy.contains(
+          '[data-testid="book-layout-reorganize-preview-row"]',
+          blockTitle
+        )
+          .should('be.visible')
+          .and('have.attr', 'data-suggested-depth', String(suggestedDepth))
+      })
       return this
     },
     confirmAiReorganizeSuggestion() {
