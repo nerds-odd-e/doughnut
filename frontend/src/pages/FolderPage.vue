@@ -256,7 +256,7 @@ const submitMove = async (merge = false) => {
       selectedParentFolder.value == null
         ? { merge }
         : { newParentFolderId: selectedParentFolder.value.id, merge }
-    const { data, error } = await apiCallWithLoading(() =>
+    const moveResult = await apiCallWithLoading(() =>
       NotebookController.moveFolder({
         path: {
           notebook: r.notebookRealm.notebook.id,
@@ -266,15 +266,14 @@ const submitMove = async (merge = false) => {
       })
     )
     throwIfSdkError(moveResult)
-    const updatedFolder = moveResult.data
     refreshSidebarStructuralListings()
     const notebookId = r.notebookRealm.notebook.id
-    if (merge && data) {
+    if (merge && moveResult.data) {
       await router.push({
         name: "folderPage",
         params: {
           notebookId: String(notebookId),
-          folderId: String(data.id),
+          folderId: String(moveResult.data.id),
         },
       })
       return
