@@ -1,9 +1,11 @@
 <template>
   <dialog
+    ref="dialogRef"
     class="daisy-modal"
     :class="{ 'daisy-modal-open': open }"
     aria-labelledby="book-layout-reorganize-preview-title"
     data-testid="book-layout-reorganize-preview-dialog"
+    @close="emit('cancel')"
   >
     <div class="daisy-modal-box">
       <h2
@@ -58,7 +60,10 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+import { useDaisyDialog } from "@/composables/useDaisyDialog"
+import { ref, toRef } from "vue"
+
+const props = defineProps<{
   open: boolean
   previewRows: Array<{
     block: { id: number; title: string }
@@ -71,4 +76,7 @@ const emit = defineEmits<{
   confirm: []
   cancel: []
 }>()
+
+const dialogRef = ref<HTMLDialogElement | null>(null)
+useDaisyDialog(toRef(props, "open"), dialogRef)
 </script>

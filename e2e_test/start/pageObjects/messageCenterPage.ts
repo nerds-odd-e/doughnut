@@ -1,13 +1,25 @@
 import { pageIsNotLoading } from '../pageBase'
 import { mainMenu } from './mainMenu'
 
+function withinConversationList(fn: () => void) {
+  cy.findByText('Message Center').should('be.visible')
+  pageIsNotLoading()
+  cy.get('[data-testid="message-center-conversation-item"]').should(
+    'have.length.at.least',
+    1
+  )
+  cy.get('.message-center-container').within(fn)
+}
+
 export const assumeMessageCenterPage = () => {
   cy.findByText('Message Center').should('be.visible')
 
   return {
     expectConversation(subject: string, partner: string) {
-      cy.findByText(subject).should('be.visible')
-      cy.findByText(partner).should('be.visible')
+      withinConversationList(() => {
+        cy.findByText(subject).should('be.visible')
+        cy.findByText(partner).should('be.visible')
+      })
       return this
     },
     expectMessageDisplayAtUserSide(message: string) {
@@ -22,7 +34,13 @@ export const assumeMessageCenterPage = () => {
       return this
     },
     conversation(conversationSubject: string) {
-      cy.findByText(conversationSubject).parent().should('be.visible').click()
+      withinConversationList(() => {
+        cy.get(
+          `[data-testid="message-center-conversation-item"][data-conversation-subject="${conversationSubject}"]`
+        )
+          .should('be.visible')
+          .click()
+      })
       pageIsNotLoading()
       return {
         expectMessage(message: string) {

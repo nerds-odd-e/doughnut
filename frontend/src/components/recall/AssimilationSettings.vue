@@ -53,9 +53,11 @@
   <Teleport to="body">
     <dialog
       v-if="(note.content ?? '').trim()"
+      ref="refineNoteDialogRef"
       class="daisy-modal"
       :class="{ 'daisy-modal-open': showRefineNoteModal }"
       data-test="refine-note-modal"
+      @close="closeRefineNoteModal"
     >
       <div
         class="daisy-modal-box max-w-4xl max-h-[90vh] overflow-y-auto"
@@ -96,6 +98,7 @@ import type { Note, NoteRecallInfo } from "@generated/doughnut-backend-api"
 import NoteInfoBar from "../notes/NoteInfoBar.vue"
 import AssimilationButtons from "./AssimilationButtons.vue"
 import NoteRefinement from "./NoteRefinement.vue"
+import { useDaisyDialog } from "@/composables/useDaisyDialog"
 import { ref, watch } from "vue"
 
 const { note, noteInfoLoaded, keepForRecallDisabled } = defineProps<{
@@ -113,6 +116,8 @@ const emit = defineEmits<{
 }>()
 
 const showRefineNoteModal = ref(false)
+const refineNoteDialogRef = ref<HTMLDialogElement | null>(null)
+useDaisyDialog(showRefineNoteModal, refineNoteDialogRef)
 
 watch(
   () => note.id,

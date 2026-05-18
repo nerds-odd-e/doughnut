@@ -20,8 +20,9 @@
         :recall-prompt="currentQuestion"
         @answered="onAnswered($event)"
       />
-      <a
-        role="button"
+      <button
+        type="button"
+        aria-label="Doesn't make sense?"
         title="Doesn't make sense?"
         id="try-again"
         v-if="currentQuestion"
@@ -29,7 +30,7 @@
         @click="contestQuestion"
       >
         <Target class="w-6 h-6" />
-      </a>
+      </button>
     </div>
   </div>
 </template>

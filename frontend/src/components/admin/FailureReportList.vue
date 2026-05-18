@@ -154,8 +154,10 @@
     </div>
 
     <dialog
+      ref="deleteDialogRef"
       class="daisy-modal"
       :class="{ 'daisy-modal-open': showDeleteModal }"
+      @close="showDeleteModal = false"
     >
       <div class="daisy-modal-box">
         <h3 class="font-bold text-lg">Confirm Deletion</h3>
@@ -181,6 +183,7 @@
 </template>
 
 <script setup lang="ts">
+import { useDaisyDialog } from "@/composables/useDaisyDialog"
 import { ref, computed, watch, nextTick, onMounted } from "vue"
 import type { FailureReport } from "@generated/doughnut-backend-api"
 import { FailureReportController } from "@generated/doughnut-backend-api/sdk.gen"
@@ -192,6 +195,8 @@ const failureReports = ref<FailureReport[] | null>(null)
 const errorMessage = ref<string | null>(null)
 const selectedFailureReports = ref<number[]>([])
 const showDeleteModal = ref(false)
+const deleteDialogRef = ref<HTMLDialogElement | null>(null)
+useDaisyDialog(showDeleteModal, deleteDialogRef)
 const selectAllCheckboxRef = ref<HTMLInputElement | null>(null)
 
 const allFailureReportsSelected = computed(() => {

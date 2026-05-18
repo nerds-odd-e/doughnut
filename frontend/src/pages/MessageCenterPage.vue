@@ -18,6 +18,8 @@
                 v-for="conversation in conversations"
                 :key="conversation.id"
                 class="daisy-menu-item"
+                data-testid="message-center-conversation-item"
+                :data-conversation-subject="conversation.subject"
                 @click="selectConversation(conversation)"
               >
                 <div

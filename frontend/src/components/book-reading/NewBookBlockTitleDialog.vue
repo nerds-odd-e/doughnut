@@ -1,8 +1,10 @@
 <template>
   <dialog
+    ref="dialogRef"
     class="daisy-modal"
     :class="{ 'daisy-modal-open': open }"
     data-testid="new-block-title-dialog"
+    @close="emit('cancel')"
   >
     <div class="daisy-modal-box">
       <h2 class="text-lg font-semibold">Name the new block</h2>
@@ -34,7 +36,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue"
+import { useDaisyDialog } from "@/composables/useDaisyDialog"
+import { ref, toRef, watch } from "vue"
 
 const props = defineProps<{
   open: boolean
@@ -47,6 +50,8 @@ const emit = defineEmits<{
 }>()
 
 const titleInput = ref(props.defaultTitle ?? "")
+const dialogRef = ref<HTMLDialogElement | null>(null)
+useDaisyDialog(toRef(props, "open"), dialogRef)
 
 watch(
   () => props.defaultTitle,
