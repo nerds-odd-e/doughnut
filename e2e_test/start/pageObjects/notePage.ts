@@ -9,6 +9,7 @@ import { sidebarChildNotePageMethods } from './noteSidebar'
 import { assumeAssociateWikidataDialog } from './associateWikidataDialog'
 import { toolbarButton } from './toolbarButton'
 import { makeSureNoteMoreOptionsFormIsOpen } from './noteMoreOptionsForm'
+import { questionListPage } from './questionListPage'
 import { assumeAssimilationPage } from './assimilationPage'
 
 /** Matches `noteShowHref()` (`/n{id}`), `/n/:id`, or legacy `/d/n/:id` note links. */
@@ -505,7 +506,13 @@ export const assumeNotePage = (
       this.openQuestionList().addQuestionPage().refineQuestion(row)
     },
     expectQuestionsInList(expectedQuestions: Record<string, string>[]) {
-      this.openQuestionList().expectQuestion(expectedQuestions)
+      cy.get('body').then(($body) => {
+        if ($body.find('.question-table').length > 0) {
+          questionListPage().expectQuestion(expectedQuestions)
+        } else {
+          this.openQuestionList().expectQuestion(expectedQuestions)
+        }
+      })
     },
     sendMessageToNoteOwner(message: string) {
       this.toolbarButton('Star a conversation about this note').click()
