@@ -1,5 +1,5 @@
 <template>
-  <nav :class="noteChromeToolbarNavClass">
+  <nav :class="[noteChromeToolbarNavClass, 'relative z-20']">
     <div class="daisy-btn-group daisy-btn-group-sm">
       <PopButton
         v-if="!readonly"
@@ -59,17 +59,15 @@
           ]"
           title="more options"
           aria-label="more options"
-          role="button"
-          tabindex="0"
         >
           <Settings class="w-6 h-6" />
         </summary>
-        <NoteMoreOptionsForm
-          v-if="open"
-          class="daisy-dropdown-content z-[1000] mt-1"
-          v-bind="{ note }"
-          @close-dialog="closeDropdown"
-        />
+        <div class="daisy-dropdown-content z-[1000] mt-1">
+          <NoteMoreOptionsForm
+            v-bind="{ note }"
+            @close-dialog="closeDropdown"
+          />
+        </div>
       </AutoCollapseDropdown>
     </div>
   </nav>

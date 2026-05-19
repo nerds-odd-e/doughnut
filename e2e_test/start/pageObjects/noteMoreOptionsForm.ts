@@ -4,11 +4,13 @@ import { toolbarButton } from './toolbarButton'
 import { questionListPage } from './questionListPage'
 
 export const makeSureNoteMoreOptionsFormIsOpen = () => {
-  cy.findByRole('button', { name: 'more options' }).then(($button) => {
-    if (!$button.hasClass('daisy-btn-active')) {
-      cy.wrap($button).click()
-    }
-  })
+  cy.get('summary[title="more options"]').click()
+  cy.get('details[data-auto-collapse-dropdown]')
+    .filter(':has(summary[title="more options"])')
+    .should('have.prop', 'open', true)
+  cy.findByRole('button', { name: 'Assimilation settings' }).should(
+    'be.visible'
+  )
 
   return noteMoreOptionsPage()
 }
@@ -40,7 +42,9 @@ const noteMoreOptionsPage = () => {
       return questionListPage()
     },
     openAssimilationPage() {
-      toolbarButton('Assimilation settings').click()
+      cy.findByRole('button', { name: 'Assimilation settings' })
+        .scrollIntoView()
+        .click()
       cy.url().should('include', '/assimilate/')
       pageIsNotLoading()
       return assumeAssimilationPage().waitForAssimilationReady()

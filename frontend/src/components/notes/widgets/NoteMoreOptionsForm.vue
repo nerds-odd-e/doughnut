@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-base-200 rounded-b-lg p-5 shadow-lg animate-dropdown relative">
+  <div class="bg-base-200 rounded-b-lg p-5 shadow-lg animate-dropdown">
     <ul class="daisy-menu mt-2 min-w-64 p-0">
       <li>
         <PopButton
