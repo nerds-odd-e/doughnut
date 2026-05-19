@@ -73,3 +73,6 @@ allowBuilds:
   protobufjs: true
   tesseract.js: true
   es5-ext: false
+
+minimumReleaseAgeExclude:
+  - daisyui@5.5.20

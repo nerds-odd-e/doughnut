@@ -22,9 +22,9 @@
     "test": "CI=true vitest run --browser=chromium"
   },
   "dependencies": {
+    "@lucide/vue": "^1.0.0",
     "epubjs": "^0.3.93",
     "file-saver": "^2.0.5",
-    "@lucide/vue": "^1.0.0",
     "mini-debounce": "^1.0.8",
     "pdfjs-dist": "5.7.284",
     "quill": "npm:@dotwee/quill@2.0.9",
@@ -51,7 +51,7 @@
     "@vue/compiler-core": "3.5.34",
     "@vue/server-renderer": "^3.5.34",
     "@vue/test-utils": "2.4.10",
-    "daisyui": "5.5.19",
+    "daisyui": "5.5.20",
     "doughnut-test-fixtures": "workspace:*",
     "es-toolkit": "^1.46.0",
     "esbuild": "0.28.0",
