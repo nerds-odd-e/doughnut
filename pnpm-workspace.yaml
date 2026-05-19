@@ -76,3 +76,4 @@ allowBuilds:
 
 minimumReleaseAgeExclude:
   - daisyui@5.5.20
+  - npm-run-all2@9.0.0
