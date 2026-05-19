@@ -141,7 +141,7 @@ Then(
     if (expectedResult === 'success') {
       start.assumeAssimilationPage().expectPopupClosed()
       start
-        .jumpToNotePage(noteTitle)
+        .jumpToNotePage(noteTitle, true)
         .openAssimilationSettings()
         .expectMemoryTrackerInfo([{ type: 'spelling', 'Recall Count': '0' }])
     } else {

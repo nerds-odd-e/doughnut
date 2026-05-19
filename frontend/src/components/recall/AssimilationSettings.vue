@@ -18,6 +18,7 @@
           >
             <NoteInfoBar
               :note-id="note.id"
+              :note="note"
               @level-changed="emit('levelChanged', $event)"
               @remember-spelling-changed="emit('rememberSpellingChanged', $event)"
               @note-recall-info-loaded="emit('noteRecallInfoLoaded', $event)"

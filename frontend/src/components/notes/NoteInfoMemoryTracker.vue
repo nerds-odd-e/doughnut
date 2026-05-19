@@ -1,16 +1,18 @@
 <template>
-  <td :class="{ 'strikethrough': isSkipped }">
-    {{ localMemoryTracker.spelling ? 'spelling' : 'normal' }}
-  </td>
-  <td :class="{ 'strikethrough': isSkipped }">
-    <span class="statistics-value">{{ localMemoryTracker.recallCount }}</span>
-  </td>
-  <td :class="{ 'strikethrough': isSkipped }">
-    <span class="statistics-value">{{ localMemoryTracker.forgettingCurveIndex }}</span>
-  </td>
-  <td :class="{ 'strikethrough': isSkipped }">
-    <span class="statistics-value">{{ new Date(localMemoryTracker.nextRecallAt).toLocaleString() }}</span>
-  </td>
+  <tr>
+    <td :class="{ 'strikethrough': isSkipped }">
+      {{ localMemoryTracker.spelling ? 'spelling' : 'normal' }}
+    </td>
+    <td :class="{ 'strikethrough': isSkipped }">
+      <span class="statistics-value">{{ localMemoryTracker.recallCount }}</span>
+    </td>
+    <td :class="{ 'strikethrough': isSkipped }">
+      <span class="statistics-value">{{ localMemoryTracker.forgettingCurveIndex }}</span>
+    </td>
+    <td :class="{ 'strikethrough': isSkipped }">
+      <span class="statistics-value">{{ new Date(localMemoryTracker.nextRecallAt).toLocaleString() }}</span>
+    </td>
+  </tr>
 </template>
 
 <script setup lang="ts">
