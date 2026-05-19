@@ -6,7 +6,7 @@
     <br />
     {{ redirectAfterLogin }}
   </p>
-  <div v-if="errorMessage" class="daisy-alert alert-danger">
+  <div v-if="errorMessage" class="daisy-alert daisy-alert-error">
     {{ errorMessage }}
   </div>
 
