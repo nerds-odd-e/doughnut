@@ -19,7 +19,7 @@
   themes:
     light --default,
     dark --prefersdark;
-  prefix: daisy;
+  prefix: daisy-;
 }
 
 svg {

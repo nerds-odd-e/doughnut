@@ -19,7 +19,7 @@
         <div class="flex flex-col gap-2">
           <button
             v-if="canMoveToEnd && previousAnsweredQuestionCursor === undefined"
-            class="btn large-btn"
+            class="daisy-btn large-btn"
             title="Move to end of list"
             aria-label="Move to end of list"
             @click="handleMoveToEnd"

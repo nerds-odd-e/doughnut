@@ -5,10 +5,10 @@
   >
     <template #buttons>
       <div class="btn-group-wrapper relative" style="overflow: visible;">
-        <div class="btn-group">
+        <div class="daisy-btn-group">
           <template v-if="previousAnsweredQuestionCursor !== undefined">
             <button
-              class="btn large-btn"
+              class="daisy-btn large-btn"
               title="view previous answered question"
               :disabled="finished === 0 || previousAnsweredQuestionCursor === 0"
               @click="
@@ -25,7 +25,7 @@
           </template>
           <button
             v-else
-            class="btn large-btn"
+            class="daisy-btn large-btn"
             title="view last answered question"
             :disabled="finished === 0"
             @click="$emit('viewLastAnsweredQuestion', finished - 1)"
