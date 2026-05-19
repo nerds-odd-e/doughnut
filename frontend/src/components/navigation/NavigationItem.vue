@@ -53,7 +53,7 @@
     <AutoCollapseDropdown
       v-if="hasDropdown && !nonClickable"
       v-slot="{ closeDropdown }"
-      class="daisy-dropdown daisy-dropdown-bottom daisy-dropdown-end lg:daisy-dropdown-top lg:daisy-dropdown-right"
+      class="daisy-dropdown daisy-dropdown-bottom daisy-dropdown-end lg:daisy-dropdown-top lg:daisy-dropdown-right overflow-visible"
     >
       <summary
         tabindex="0"

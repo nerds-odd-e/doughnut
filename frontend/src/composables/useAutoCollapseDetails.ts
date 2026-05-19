@@ -1,14 +1,13 @@
 import { onMounted, onUnmounted, type Ref } from "vue"
 
 export function useAutoCollapseDetails(
-  detailsRef: Ref<HTMLDetailsElement | null>
-) {
-  const closeDetails = () => {
+  detailsRef: Ref<HTMLDetailsElement | null>,
+  closeDetails: () => void = () => {
     if (detailsRef.value) {
       detailsRef.value.open = false
     }
   }
-
+) {
   const isInsideAnotherModal = (target: EventTarget | null) => {
     if (!(target instanceof HTMLElement)) return false
     const targetModal = target.closest("dialog.modal-mask")

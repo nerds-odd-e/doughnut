@@ -98,6 +98,8 @@ onMounted(async () => {
   width: $main-menu-width;
   position: fixed; // Sticky for vertical menu on desktop
   flex-shrink: 0;
+  z-index: 10000;
+  overflow: visible;
 }
 
 .main-content {

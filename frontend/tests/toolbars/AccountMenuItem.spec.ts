@@ -5,21 +5,37 @@ import makeMe from "doughnut-test-fixtures/makeMe"
 import { describe, expect, it, vi } from "vitest"
 
 describe("AccountMenuItem", () => {
-  it("calls logout when the user chooses Logout", async () => {
-    const logout = vi.fn()
-    const showUserSettingsDialog = vi.fn()
+  const renderAccountMenuItem = (overrides?: {
+    logout?: () => void
+    showUserSettingsDialog?: () => void
+  }) =>
     helper
       .component(AccountMenuItem)
       .withProps({
         user: makeMe.aUser.please(),
-        showUserSettingsDialog,
-        logout,
+        showUserSettingsDialog: overrides?.showUserSettingsDialog ?? vi.fn(),
+        logout: overrides?.logout ?? vi.fn(),
       })
       .withRouter()
       .render()
 
+  it("calls logout when the user chooses Logout", async () => {
+    const logout = vi.fn()
+    renderAccountMenuItem({ logout })
+
     await fireEvent.click(screen.getByLabelText("Account"))
     await fireEvent.click(screen.getByText("Logout"))
     expect(logout).toHaveBeenCalledOnce()
+  })
+
+  it("opens account actions when the browser click targets the details root", async () => {
+    renderAccountMenuItem()
+
+    const dropdown = document.querySelector("[data-auto-collapse-dropdown]")
+    expect(dropdown).toBeInstanceOf(HTMLDetailsElement)
+
+    await fireEvent.click(dropdown as HTMLDetailsElement)
+
+    expect((dropdown as HTMLDetailsElement).open).toBe(true)
   })
 })
