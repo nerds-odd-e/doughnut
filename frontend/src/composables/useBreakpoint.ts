@@ -9,10 +9,9 @@ export function useBreakpoint() {
   }
 
   onMounted(() => {
-    // Match CSS @media (max-width: theme('screens.lg'))
+    // Match CSS @media (max-width: 1024px) — the lg breakpoint (Tailwind v4: var(--breakpoint-lg))
     // CSS uses max-width: 1024px for tablet, so we need min-width: 1025px for desktop
-    // This ensures at exactly 1024px, both JS and CSS treat it as tablet
-    // Read the actual breakpoint from CSS custom property or use 1025px to match CSS behavior
+    // so that at exactly 1024px both JS and CSS treat it as tablet.
     const lgBreakpoint = 1024
     mediaQuery = window.matchMedia(`(min-width: ${lgBreakpoint + 1}px)`)
     isLgOrLarger.value = mediaQuery.matches
