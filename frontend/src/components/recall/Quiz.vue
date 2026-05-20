@@ -1,5 +1,8 @@
 <template>
-  <div class="content h-full">
+  <div
+    class="content daisy-h-full"
+    :class="{ 'quiz--contestable': showContestableDummyInput }"
+  >
     <ContentLoader v-if="!currentQuestionFetched || isCurrentMemoryTrackerFetching" />
     <template v-else>
       <div class="pt-5 h-full">
@@ -35,6 +38,18 @@
       </template>
       </div>
     </template>
+    <div
+      v-if="showContestableDummyInput"
+      class="contestable-dummy-input-bar"
+      aria-hidden="true"
+    >
+      <input
+        type="text"
+        class="daisy-input daisy-input-bordered daisy-w-full"
+        readonly
+        tabindex="-1"
+      />
+    </div>
   </div>
 </template>
 
@@ -160,6 +175,13 @@ const currentRecallPrompt = computed(() => {
     ? recallPromptCache.value[memoryTrackerId]
     : undefined
 })
+const showContestableDummyInput = computed(
+  () =>
+    currentQuestionFetched.value &&
+    !isCurrentMemoryTrackerFetching.value &&
+    !currentMemoryTracker.value?.spelling &&
+    currentRecallPrompt.value !== undefined
+)
 
 // Methods
 const memoryTrackerAt = (index: number): MemoryTrackerLite | undefined =>
@@ -197,3 +219,31 @@ onMounted(() => {
   fetchQuestion()
 })
 </script>
+
+<style scoped lang="scss">
+@use "@/assets/menu-variables.scss" as *;
+
+$contestable-dummy-input-reserve: calc(
+  0.5rem + 3rem + max(0.75rem, env(safe-area-inset-bottom))
+);
+
+.quiz--contestable {
+  padding-bottom: $contestable-dummy-input-reserve;
+}
+
+.contestable-dummy-input-bar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: $main-menu-width;
+  z-index: 40;
+  padding: 0.5rem 1rem max(0.75rem, env(safe-area-inset-bottom));
+  background-color: hsl(var(--b1));
+}
+
+@media (max-width: theme("screens.lg")) {
+  .contestable-dummy-input-bar {
+    left: 0;
+  }
+}
+</style>
