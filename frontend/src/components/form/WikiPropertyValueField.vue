@@ -157,14 +157,14 @@ defineExpose({
 }
 
 .wiki-property-value-field :deep(a.doughnut-link) {
-  color: oklch(var(--a));
+  color: var(--color-accent);
   text-decoration: underline;
   text-decoration-style: dotted;
   text-underline-offset: 0.15em;
 }
 
 .wiki-property-value-field :deep(a:not(.doughnut-link):not(.dead-link)) {
-  color: oklch(var(--in));
+  color: var(--color-info);
   text-decoration: underline;
   text-underline-offset: 0.15em;
 }
