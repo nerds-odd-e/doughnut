@@ -86,6 +86,20 @@ watch(
   }
 )
 
+function scrollSidebarTreeToTop() {
+  const el = treeScrollRef.value
+  if (el) el.scrollTop = 0
+}
+
+watch(
+  () => props.activeNoteRealm != null || props.activeFolderRealm != null,
+  (hasActiveContext, hadActiveContext) => {
+    if (hadActiveContext && !hasActiveContext) {
+      scrollSidebarTreeToTop()
+    }
+  }
+)
+
 const currentUser = inject<Ref<User | undefined>>("currentUser")
 const sidebarReadonly = computed(() => {
   if (!currentUser?.value) return true

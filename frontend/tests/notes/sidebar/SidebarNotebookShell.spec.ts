@@ -40,6 +40,20 @@ describe("Sidebar notebook shell", () => {
     )
   })
 
+  it("scrolls the tree to the top when returning to the notebook page", async () => {
+    wrapper = mountSidebarSignedIn(
+      helper,
+      fixtures.topNoteRealm,
+      fixtures.topNoteRealm.notebookRealm.notebook.id
+    )
+    await flushPromises()
+    const scrollEl = wrapper.get(".sidebar-tree-scroll").element as HTMLElement
+    scrollEl.scrollTop = 200
+    await wrapper.setProps({ activeNoteRealm: undefined })
+    await flushPromises()
+    expect(scrollEl.scrollTop).toBe(0)
+  })
+
   it("shows notebook root notes and add button when anchor realm is cleared on notebook page", async () => {
     wrapper = mountSidebarSignedIn(
       helper,
