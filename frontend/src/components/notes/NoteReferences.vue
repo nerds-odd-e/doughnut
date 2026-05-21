@@ -1,6 +1,6 @@
 <template>
-  <div v-if="noteTopologies.length > 0" class="daisy-flex">
-    <div class="daisy-w-10 daisy-p-0">
+  <div v-if="noteTopologies.length > 0" class="flex">
+    <div class="w-10 p-0">
       <button
         class="daisy-btn daisy-btn-sm"
         v-if="internalExpandChildren"
@@ -8,7 +8,7 @@
         title="collapse children"
         @click="collapse()"
       >
-        <ChevronsUpDown class="daisy-w-6 daisy-h-6 daisy-rotate-180" />
+        <ChevronsUpDown class="w-6 h-6 rotate-180" />
       </button>
       <button
         class="daisy-btn daisy-btn-sm"
@@ -17,10 +17,10 @@
         title="expand children"
         @click="expand()"
       >
-        <ChevronsUpDown class="daisy-w-6 daisy-h-6" />
+        <ChevronsUpDown class="w-6 h-6" />
       </button>
     </div>
-    <div class="daisy-flex-1">
+    <div class="flex-1">
       <div v-if="!internalExpandChildren">
         <div role="collapsed-children-count">{{ noteTopologies.length }}</div>
       </div>
@@ -34,7 +34,7 @@ import type { PropType } from "vue"
 import { ref } from "vue"
 import type { NoteTopology } from "@generated/doughnut-backend-api"
 import Cards from "./Cards.vue"
-import { ChevronsUpDown } from "lucide-vue-next"
+import { ChevronsUpDown } from "@lucide/vue"
 
 const props = defineProps({
   noteTopologies: { type: Array as PropType<NoteTopology[]>, required: true },

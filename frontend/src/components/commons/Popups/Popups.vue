@@ -19,7 +19,7 @@
 
     <Modal
       v-if="popupInfo.type === 'confirm'"
-      class="popups daisy-z-[9998]"
+      class="popups z-[9998]"
       :isPopup="true"
       @close_request="resolve(false)"
     >
@@ -39,7 +39,7 @@
 
     <Modal
       v-if="popupInfo.type === 'options'"
-      class="popups daisy-z-[9998]"
+      class="popups z-[9998]"
       :isPopup="true"
       @close_request="resolve(null)"
     >
@@ -47,10 +47,10 @@
         <h2>Select an option</h2>
       </template>
       <template #body>
-        <div class="daisy-mb-4">
+        <div class="mb-4">
           <span>{{ popupInfo.message }}</span>
         </div>
-        <div class="daisy-flex daisy-flex-wrap daisy-gap-2">
+        <div class="flex flex-wrap gap-2">
           <button
             v-for="opt in (popupInfo as OptionsPopupInfo).options"
             :key="opt.value"

@@ -12,6 +12,7 @@
       "**",
       "!**/.github",
       "!**/dist",
+      "!**/storybook-static",
       "!**/node_modules",
       "!**/public",
       "!**/*.cjs",
@@ -223,6 +224,11 @@
         "noWith": "error",
         "noVar": "error"
       }
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
     }
   },
   "javascript": {

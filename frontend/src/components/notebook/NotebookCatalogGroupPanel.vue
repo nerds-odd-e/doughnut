@@ -2,7 +2,7 @@
   <div
     v-if="layout === 'list'"
     data-cy="notebook-group-card"
-    class="notebook-catalog-group daisy-rounded-box daisy-border daisy-border-primary/25 daisy-bg-primary/5 daisy-p-4"
+    class="notebook-catalog-group rounded-box border border-primary/25 bg-primary/5 p-4"
     :aria-label="hint.ariaLabel"
   >
     <component
@@ -21,16 +21,16 @@
           : {}
       "
     >
-      <div class="daisy-mb-3 daisy-flex daisy-flex-col daisy-gap-0.5">
-        <h3 class="daisy-m-0 daisy-text-base daisy-font-semibold daisy-text-base-content">
+      <div class="mb-3 flex flex-col gap-0.5">
+        <h3 class="m-0 text-base font-semibold text-base-content">
           {{ group.name }}
         </h3>
-        <p class="daisy-m-0 daisy-text-sm daisy-text-base-content/65">
+        <p class="m-0 text-sm text-base-content/65">
           {{ hint.subtitle }}
         </p>
       </div>
     </component>
-    <div class="daisy-flex daisy-flex-col daisy-gap-2 daisy-border-l-2 daisy-border-primary/30 daisy-pl-3">
+    <div class="flex flex-col gap-2 border-l-2 border-primary/30 pl-3">
       <NotebookListRow
         v-for="nb in previewNotebooks"
         :key="nb.notebook.id"
@@ -58,7 +58,7 @@
   <div
     v-else
     data-cy="notebook-group-card"
-    class="notebook-catalog-group daisy-col-span-full daisy-rounded-box daisy-border daisy-border-primary/25 daisy-bg-primary/5 daisy-p-4"
+    class="notebook-catalog-group col-span-full rounded-box border border-primary/25 bg-primary/5 p-4"
     :aria-label="hint.ariaLabel"
   >
     <component
@@ -77,17 +77,17 @@
           : {}
       "
     >
-      <div class="daisy-mb-4 daisy-flex daisy-flex-col daisy-gap-0.5">
-        <h3 class="daisy-m-0 daisy-text-lg daisy-font-semibold daisy-text-base-content">
+      <div class="mb-4 flex flex-col gap-0.5">
+        <h3 class="m-0 text-lg font-semibold text-base-content">
           {{ group.name }}
         </h3>
-        <p class="daisy-m-0 daisy-text-sm daisy-text-base-content/65">
+        <p class="m-0 text-sm text-base-content/65">
           {{ hint.subtitle }}
         </p>
       </div>
     </component>
     <div
-      class="daisy-grid daisy-grid-cols-1 sm:daisy-grid-cols-2 md:daisy-grid-cols-2 lg:daisy-grid-cols-3 xl:daisy-grid-cols-4 daisy-gap-4"
+      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
     >
       <div
         v-for="nb in previewNotebooks"
@@ -98,7 +98,7 @@
       >
         <NotebookCard :notebook="nb.notebook" :compact="compactMembers">
           <template #cardHeader>
-            <span class="daisy-flex daisy-justify-end daisy-p-0">
+            <span class="flex justify-end p-0">
               <SubscriptionNoteButtons
                 v-if="subscriptionForNotebook(nb.notebook.id)"
                 :subscription="subscriptionForNotebook(nb.notebook.id)!"
@@ -179,7 +179,7 @@ defineEmits<{
 }>()
 
 const headerLinkClassList =
-  "daisy-block daisy-rounded-md daisy-no-underline daisy-text-inherit daisy-outline-offset-2 hover:daisy-bg-primary/10"
+  "block rounded-md no-underline text-inherit outline-offset-2 hover:bg-primary/10"
 
 const previewNotebooks = computed(() => {
   const all = props.group.notebooks

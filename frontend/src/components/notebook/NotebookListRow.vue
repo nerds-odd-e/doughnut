@@ -1,37 +1,37 @@
 <template>
   <div
-    class="notebook-list-row daisy-rounded-box daisy-border daisy-border-base-300/80 daisy-bg-base-100 daisy-transition-colors hover:daisy-border-primary/30 hover:daisy-bg-base-200/40"
+    class="notebook-list-row rounded-box border border-base-300/80 bg-base-100 transition-colors hover:border-primary/30 hover:bg-base-200/40"
     :class="{
       'notebook-list-row--compact': compact,
     }"
     data-cy="notebook-card"
   >
     <div
-      class="notebook-card notebook-list-row__shell daisy-flex daisy-flex-row daisy-items-stretch daisy-gap-3"
+      class="notebook-card notebook-list-row__shell flex flex-row items-stretch gap-3"
       :class="
-        compact ? 'daisy-px-3 daisy-py-2 daisy-gap-2' : 'daisy-px-4 daisy-py-3'
+        compact ? 'px-3 py-2 gap-2' : 'px-4 py-3'
       "
     >
       <router-link
         :to="{ name: 'notebookPage', params: { notebookId: notebook.id } }"
-        class="notebook-list-row__main daisy-flex daisy-min-w-0 daisy-flex-1 daisy-flex-col daisy-justify-center daisy-gap-0.5 daisy-no-underline"
+        class="notebook-list-row__main flex min-w-0 flex-1 flex-col justify-center gap-0.5 no-underline"
       >
         <h5
-          class="daisy-font-semibold daisy-leading-snug daisy-text-base-content daisy-truncate"
-          :class="compact ? 'daisy-text-sm' : 'daisy-text-base'"
+          class="font-semibold leading-snug text-base-content truncate"
+          :class="compact ? 'text-sm' : 'text-base'"
         >
           {{ notebook.name }}
         </h5>
         <p
           v-if="notebook.description"
-          class="daisy-m-0 daisy-line-clamp-2 daisy-leading-relaxed daisy-text-base-content/60"
-          :class="compact ? 'daisy-text-xs' : 'daisy-text-sm'"
+          class="m-0 line-clamp-2 leading-relaxed text-base-content/60"
+          :class="compact ? 'text-xs' : 'text-sm'"
         >
           {{ notebook.description }}
         </p>
       </router-link>
       <div
-        class="notebook-list-row__toolbar daisy-flex daisy-shrink-0 daisy-items-center daisy-self-center"
+        class="notebook-list-row__toolbar flex shrink-0 items-center self-center"
         @click.stop
       >
         <slot />

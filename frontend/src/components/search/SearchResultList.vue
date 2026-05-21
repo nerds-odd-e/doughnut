@@ -1,7 +1,7 @@
 <template>
   <ul
     role="list"
-    class="daisy-m-0 daisy-list-none daisy-p-0 daisy-flex daisy-flex-col"
+    class="m-0 list-none p-0 flex flex-col"
   >
     <SearchResultListItem
       v-for="searchHit in searchHits"

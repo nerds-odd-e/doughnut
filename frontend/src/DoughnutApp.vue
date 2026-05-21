@@ -57,14 +57,14 @@ onMounted(async () => {
 <template>
   <Popups />
   <LoadingThinBar v-if="user && apiStatus.states.length > 0" />
-  <div class="daisy-flex daisy-bg-base-100 daisy-text-base-content app-container">
-    <div class="main-menu daisy-flex daisy-bg-neutral daisy-text-neutral-content daisy-z-[10000]">
+  <div class="flex bg-base-100 text-base-content app-container">
+    <div class="main-menu flex bg-neutral text-neutral-content z-[10000]">
       <MainMenu
         :user="user"
         @update-user="user = $event"
       />
     </div>
-    <div class="daisy-flex daisy-flex-col daisy-flex-grow daisy-overflow-y-auto daisy-overflow-x-hidden main-content">
+    <div class="flex flex-col flex-grow overflow-y-auto overflow-x-hidden main-content">
       <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
       <template v-else-if="userLoaded">
         <router-view v-slot="{ Component }">
@@ -98,6 +98,8 @@ onMounted(async () => {
   width: $main-menu-width;
   position: fixed; // Sticky for vertical menu on desktop
   flex-shrink: 0;
+  z-index: 10000;
+  overflow: visible;
 }
 
 .main-content {
@@ -108,7 +110,7 @@ onMounted(async () => {
   overflow-y: auto; // Only content area scrolls on desktop
 }
 
-@media (max-width: theme('screens.lg')) {
+@media (max-width: 1024px) {
   .app-container {
     height: 100vh; // Keep fixed height for proper page height calculations
     height: 100dvh; // Dynamic viewport height for mobile devices
@@ -136,7 +138,7 @@ onMounted(async () => {
   }
 }
 
-@media (max-width: theme('screens.md')) {
+@media (max-width: 768px) {
   .main-menu {
     height: $main-menu-height-mobile;
     background-color: transparent; // Remove parent background so menu-wrapper background shows

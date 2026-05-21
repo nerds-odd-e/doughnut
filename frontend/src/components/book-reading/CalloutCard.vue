@@ -1,12 +1,12 @@
 <template>
   <div
     ref="rootRef"
-    class="daisy-pointer-events-auto daisy-mx-auto daisy-max-w-3xl daisy-rounded-lg daisy-bg-base-200/95 daisy-border daisy-border-base-300 daisy-shadow-lg daisy-px-3 daisy-py-2 daisy-flex daisy-flex-wrap daisy-items-center daisy-gap-2 daisy-relative"
+    class="pointer-events-auto mx-auto max-w-3xl rounded-lg bg-base-200/95 border border-base-300 shadow-lg px-3 py-2 flex flex-wrap items-center gap-2 relative"
   >
     <span
       v-if="showCaret"
       aria-hidden="true"
-      class="daisy-absolute daisy-left-[30%] -daisy-top-[9px] -daisy-translate-x-1/2 daisy-w-4 daisy-h-4 daisy-bg-base-200/95 daisy-border-l daisy-border-t daisy-border-base-300 -daisy-rotate-45"
+      class="absolute left-[30%] -top-[9px] -translate-x-1/2 w-4 h-4 bg-base-200/95 border-l border-t border-base-300 -rotate-45"
     />
     <slot />
   </div>

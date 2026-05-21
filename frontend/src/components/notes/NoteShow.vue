@@ -1,11 +1,11 @@
 <template>
-  <div class="note-show-container daisy-flex daisy-flex-col daisy-h-full">
+  <div class="note-show-container flex flex-col h-full">
     <NoteRealmLoader v-bind="{ noteId }">
       <template #default="{ noteRealm }">
         <ContentLoader v-if="!noteRealm" />
         <template v-else>
           <template v-if="!isMinimized">
-            <div v-if="showBreadcrumb" class="breadcrumb-wrapper daisy-mb-2">
+            <div v-if="showBreadcrumb" class="breadcrumb-wrapper mb-2">
               <BreadcrumbWithCircle
                 v-bind="{
                   ancestorFolders,
@@ -24,10 +24,10 @@
               @edit-as-markdown="asMarkdown = $event"
             />
             <div
-              class="note-content-wrapper daisy-flex-1 daisy-min-h-0 daisy-overflow-auto daisy-flex daisy-flex-col daisy-gap-4"
+              class="note-content-wrapper flex-1 min-h-0 overflow-auto flex flex-col gap-4"
               :class="{ minimized: isMinimized }"
             >
-              <div id="main-note-content" class="daisy-flex daisy-flex-col daisy-w-full">
+              <div id="main-note-content" class="flex flex-col w-full">
                 <NoteTextContent
                   v-bind="{
                     note: noteRealm.note,
@@ -53,7 +53,7 @@
                   }"
                 >
                   <p>
-                    <span class="daisy-mr-3">
+                    <span class="mr-3">
                       Created: {{ toLocalDateString(noteRealm.note.noteTopology.createdAt) }}
                     </span>
                     <span>
@@ -62,7 +62,7 @@
                   </p>
                 </NoteRecentUpdateIndicator>
                 <template v-if="noteHasInboundWikiReferences(noteRealm)">
-                  <h3 class="daisy-text-lg daisy-font-medium daisy-mb-2">References</h3>
+                  <h3 class="text-lg font-medium mb-2">References</h3>
                   <NoteReferences
                     v-bind="{ expandChildren, readonly: readonly(noteRealm) }"
                     :note-topologies="noteRealm.references ?? []"

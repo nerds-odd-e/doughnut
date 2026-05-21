@@ -1,51 +1,51 @@
 <template>
   <GlobalBar>
-    <div class="progress-container daisy-relative daisy-w-full">
+    <div class="progress-container relative w-full">
       <div
-        :class="`daisy-progress-bar daisy-w-full daisy-bg-gray-500 daisy-h-[25px] daisy-rounded-lg daisy-relative daisy-cursor-help ${false ? 'daisy-h-[5px]' : ''}`"
+        :class="`progress-bar w-full bg-gray-500 h-[25px] rounded-lg relative cursor-help ${false ? 'h-[5px]' : ''}`"
         v-if="remainingAssimilationCountForToday !== null"
         :title="`Daily Progress: ${assimilatedCountOfTheDay || 0} completed out of ${plannedForTheDay} planned for today`"
         @click="showTooltip = true"
       >
         <div
-          class="progress daisy-h-full daisy-bg-blue-500"
+          class="progress h-full bg-blue-500"
           :style="`width: ${(assimilatedCountOfTheDay || 0) * 100 / plannedForTheDay}%`"
         >
         </div>
-        <span class="progress-text daisy-absolute daisy-top-1/2 daisy-left-1/2 daisy-transform daisy--translate-x-1/2 daisy--translate-y-1/2 daisy-text-white">
+        <span class="progress-text absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white">
           Assimilating: {{ assimilatedCountOfTheDay || 0 }}/{{ plannedForTheDay }}
         </span>
       </div>
       <div
-        class="daisy-progress-bar daisy-w-full daisy-bg-gray-500 daisy-h-[5px] daisy-rounded-lg daisy-relative daisy-cursor-help"
+        class="progress-bar w-full bg-gray-500 h-[5px] rounded-lg relative cursor-help"
         v-if="totalUnassimilatedCount !== undefined"
         :title="`Total Progress: ${assimilatedCountOfTheDay || 0} completed out of ${totalPlannedCount} total notes to assimilate`"
         @click="showTooltip = true"
       >
         <span
-          class="progress daisy-block daisy-h-full daisy-bg-green-500"
+          class="progress block h-full bg-green-500"
           :style="`width: ${(assimilatedCountOfTheDay || 0) * 100 / totalPlannedCount}%`"
         >
         </span>
-        <span class="progress-text daisy-hidden">
+        <span class="progress-text hidden">
           Total: {{ assimilatedCountOfTheDay || 0 }}/{{ totalPlannedCount }}
         </span>
       </div>
 
       <!-- Popup tooltip -->
-      <div v-if="showTooltip" class="tooltip-popup daisy-fixed daisy-inset-0 daisy-bg-black/50 daisy-flex daisy-justify-center daisy-items-center daisy-z-[1000]" @click="showTooltip = false">
-        <div class="tooltip-content daisy-bg-white daisy-p-4 daisy-rounded-lg daisy-shadow-lg">
-          <p class="daisy-my-2 daisy-text-neutral">Daily Progress: {{ assimilatedCountOfTheDay || 0 }} / {{ plannedForTheDay }}</p>
-          <p class="daisy-my-2 daisy-text-neutral">Total Progress: {{ assimilatedCountOfTheDay || 0 }} / {{ totalPlannedCount }}</p>
+      <div v-if="showTooltip" class="tooltip-popup fixed inset-0 bg-black/50 flex justify-center items-center z-[1000]" @click="showTooltip = false">
+        <div class="tooltip-content bg-white p-4 rounded-lg shadow-lg">
+          <p class="my-2 text-neutral">Daily Progress: {{ assimilatedCountOfTheDay || 0 }} / {{ plannedForTheDay }}</p>
+          <p class="my-2 text-neutral">Total Progress: {{ assimilatedCountOfTheDay || 0 }} / {{ totalPlannedCount }}</p>
         </div>
       </div>
     </div>
   </GlobalBar>
-  <div class="daisy-mx-auto daisy-min-w-0 daisy-container daisy-mt-3">
+  <div class="mx-auto min-w-0 container mt-3">
     <ContentLoader v-if="notes === undefined" />
     <template v-else>
-      <div v-if="(notes?.length ?? 0) === 0" class="daisy-text-center daisy-py-8">
-        <h1 class="celebration-message daisy-text-3xl daisy-font-bold daisy-text-slate-700 daisy-my-4">
+      <div v-if="(notes?.length ?? 0) === 0" class="text-center py-8">
+        <h1 class="celebration-message text-3xl font-bold text-slate-700 my-4">
           🎉 Congratulations! You've achieved your daily assimilation goal! 🎯
         </h1>
       </div>

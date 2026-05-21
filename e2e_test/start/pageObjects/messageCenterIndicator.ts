@@ -1,4 +1,5 @@
 import { assumeMessageCenterPage } from './messageCenterPage'
+import { pageIsNotLoading } from '../pageBase'
 
 export function messageCenterIndicator() {
   const getMessageInSidebar = (
@@ -21,6 +22,7 @@ export function messageCenterIndicator() {
       getMessageInSidebar(($el) => {
         $el.click()
       })
+      pageIsNotLoading()
       return assumeMessageCenterPage()
     },
   }

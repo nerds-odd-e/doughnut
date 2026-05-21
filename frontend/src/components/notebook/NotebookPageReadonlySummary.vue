@@ -1,7 +1,7 @@
 <template>
-  <div class="daisy-container daisy-mx-auto daisy-py-4 daisy-max-w-6xl">
-    <div class="notebook-page-summary daisy-mb-6" data-testid="notebook-page-summary">
-      <h1 class="daisy-text-xl daisy-font-semibold daisy-text-base-content">
+  <div class="container mx-auto py-4 max-w-6xl">
+    <div class="notebook-page-summary mb-6" data-testid="notebook-page-summary">
+      <h1 class="text-xl font-semibold text-base-content">
         {{ notebook.name }}
       </h1>
       <p v-if="notebook.description" class="notebook-page-summary-description">

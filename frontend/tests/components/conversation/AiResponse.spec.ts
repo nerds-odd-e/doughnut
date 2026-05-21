@@ -378,7 +378,7 @@ describe("AiResponse", () => {
 
       // Skip the suggestion
       await wrapper
-        .find('button[class*="btn-outline-secondary"]')
+        .find("button.daisy-btn-outline.daisy-btn-secondary")
         .trigger("click")
       await flushPromises()
 
@@ -531,7 +531,7 @@ describe("AiResponse", () => {
       vi.clearAllMocks()
 
       await wrapper
-        .find('button[class*="btn-outline-secondary"]')
+        .find("button.daisy-btn-outline.daisy-btn-secondary")
         .trigger("click")
       await flushPromises()
 
@@ -569,7 +569,7 @@ describe("AiResponse", () => {
 
     it("skips the unknown request", async () => {
       await wrapper
-        .find('button[class*="btn-outline-secondary"]')
+        .find("button.daisy-btn-outline.daisy-btn-secondary")
         .trigger("click")
       await flushPromises()
 

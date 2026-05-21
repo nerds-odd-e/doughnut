@@ -3,7 +3,7 @@
     id="wikidata-association-form"
     @submit.prevent="handleSave"
   >
-    <div class="daisy-mb-4">
+    <div class="mb-4">
       <TextInput
         scope-name="wikidataID"
         field="wikidataID"
@@ -16,7 +16,7 @@
         <template #input_append>
           <button
             type="button"
-            class="daisy-btn daisy-rounded-l-none"
+            class="daisy-btn rounded-l-none"
             :class="[
               isLoadingUrl ? 'daisy-btn-disabled' : 'daisy-btn-primary',
             ]"
@@ -25,25 +25,25 @@
             :disabled="isLoadingUrl || !hasValidWikidataId"
             v-show="hasValidWikidataId"
           >
-            <ExternalLink class="daisy-w-6 daisy-h-6" />
+            <ExternalLink class="w-6 h-6" />
           </button>
         </template>
       </TextInput>
     </div>
   </form>
-  <div v-if="loading" class="daisy-text-center daisy-p-4">
+  <div v-if="loading" class="text-center p-4">
     Searching...
   </div>
   <div
     v-else-if="searchResults && searchResults.length === 0 && hasSearched"
-    class="daisy-text-center daisy-p-4"
+    class="text-center p-4"
   >
     <p>No Wikidata entries found for '{{ searchKeyRef }}'</p>
   </div>
   <div v-else-if="searchResults && searchResults.length > 0 && !showTitleOptions">
     <div
       data-testid="wikidata-search-results"
-      class="daisy-border daisy-border-base-300 daisy-rounded-lg daisy-bg-base-100 daisy-w-full"
+      class="border border-base-300 rounded-lg bg-base-100 w-full"
       style="max-height: 300px; overflow-y: auto;"
     >
       <div
@@ -53,18 +53,18 @@
         :data-wikidata-id="suggestion.id"
         @click="onSelectSearchResultItem(suggestion.id)"
         :class="[
-          'daisy-px-4 daisy-py-2 daisy-border-b daisy-border-base-300',
+          'px-4 py-2 border-b border-base-300',
           props.disabled
-            ? 'daisy-cursor-not-allowed daisy-opacity-50'
-            : 'daisy-cursor-pointer hover:daisy-bg-base-200',
-          selectedOption === suggestion.id ? 'daisy-bg-primary daisy-text-primary-content' : '',
+            ? 'cursor-not-allowed opacity-50'
+            : 'cursor-pointer hover:bg-base-200',
+          selectedOption === suggestion.id ? 'bg-primary text-primary-content' : '',
         ]"
       >
         {{ suggestion.label }} - {{ suggestion.description }}
       </div>
     </div>
   </div>
-  <div v-else-if="showTitleOptions" class="daisy-p-4">
+  <div v-else-if="showTitleOptions" class="p-4">
     <label class="daisy-label">
       <span class="daisy-label-text"
         >Suggested Title: {{ selectedItem?.label }}</span
@@ -82,7 +82,7 @@
       />
     </fieldset>
   </div>
-  <div class="daisy-mt-4 daisy-flex daisy-gap-2">
+  <div class="mt-4 flex gap-2">
     <button
       v-if="hasSaveButton"
       type="submit"
@@ -110,7 +110,7 @@ import {} from "@/managedApi/clientSetup"
 import RadioButtons from "../form/RadioButtons.vue"
 import TextInput from "../form/TextInput.vue"
 import { openWikidataEntityBrowseUrlInNonBlockingPopup } from "@/utils/wikidataEntityBrowseUrl"
-import { ExternalLink } from "lucide-vue-next"
+import { ExternalLink } from "@lucide/vue"
 
 const props = defineProps<{
   searchKey: string

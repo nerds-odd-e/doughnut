@@ -21,7 +21,7 @@
     />
     <RouterLink
       :to="noteShowLocation(noteTopology.id)"
-      class="note-row daisy-text-decoration-none"
+      class="note-row no-underline"
     >
       <NoteTitleComponent v-bind="{ noteTopology }" />
     </RouterLink>

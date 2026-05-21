@@ -1,12 +1,12 @@
 <template>
   <div
-    class="daisy-grid daisy-grid-cols-[minmax(8rem,auto)_minmax(0,1fr)_auto] daisy-gap-x-4 daisy-gap-y-1 daisy-items-center"
+    class="grid grid-cols-[minmax(8rem,auto)_minmax(0,1fr)_auto] gap-x-4 gap-y-1 items-center"
     data-testid="rich-note-property-row"
     :data-row-index="idx"
     :data-property-key="modelValue.key"
   >
     <div
-      class="daisy-relative daisy-min-w-[8rem]"
+      class="relative min-w-[8rem]"
       @focusout="onKeyPresetWrapperFocusOut"
     >
       <input
@@ -14,7 +14,7 @@
         :value="modelValue.key"
         type="text"
         autocapitalize="off"
-        class="daisy-input daisy-input-bordered daisy-input-sm daisy-w-full daisy-min-w-[8rem]"
+        class="daisy-input daisy-input-sm w-full min-w-[8rem]"
         :aria-label="`Existing note property key (row ${idx + 1})`"
         :aria-expanded="presetPanelOpen"
         :aria-controls="presetPanelOpen ? presetListId : undefined"
@@ -41,20 +41,20 @@
     />
     <div
       v-else-if="isImagePropertyKey(modelValue.key)"
-      class="daisy-flex daisy-min-w-0 daisy-items-center daisy-gap-2"
+      class="flex min-w-0 items-center gap-2"
     >
       <input
         ref="imageFileInputRef"
         type="file"
         accept="image/*"
-        class="daisy-hidden"
+        class="hidden"
         data-testid="rich-note-image-property-file-input"
         @change="onImageFileSelected"
       />
       <template v-if="modelValue.value.trim()">
         <button
           type="button"
-          class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-h-auto daisy-min-h-0 daisy-min-w-0 daisy-max-w-full daisy-shrink daisy-truncate daisy-justify-start daisy-py-0.5 daisy-px-1 daisy-font-mono daisy-text-sm daisy-font-normal daisy-text-base-content/90 daisy-normal-case"
+          class="daisy-btn daisy-btn-ghost daisy-btn-sm h-auto min-h-0 min-w-0 max-w-full shrink truncate justify-start py-0.5 px-1 font-mono text-sm font-normal text-base-content/90 normal-case"
           :title="modelValue.value.trim()"
           data-testid="rich-note-image-property-path"
         >
@@ -67,14 +67,14 @@
       </template>
       <template v-else>
         <span
-          class="daisy-truncate daisy-font-mono daisy-text-sm daisy-text-base-content/90"
+          class="truncate font-mono text-sm text-base-content/90"
           aria-hidden="true"
           >—</span
         >
       </template>
       <button
         type="button"
-        class="daisy-btn daisy-btn-sm daisy-btn-outline daisy-shrink-0"
+        class="daisy-btn daisy-btn-sm daisy-btn-outline shrink-0"
         data-testid="rich-note-image-property-choose"
         :disabled="!noteId || imageUploading"
         @click="openImageFilePicker"
@@ -83,7 +83,7 @@
       </button>
       <span
         v-if="!noteId"
-        class="daisy-text-xs daisy-text-base-content/70"
+        class="text-xs text-base-content/70"
         data-testid="rich-note-image-upload-requires-note"
       >
         Save the note before attaching an image.
@@ -91,13 +91,13 @@
     </div>
     <div
       v-else-if="isWikidataIdPropertyKey(modelValue.key)"
-      class="daisy-flex daisy-min-w-0 daisy-items-center daisy-gap-2"
-      :class="modelValue.value.trim() ? '' : 'daisy-justify-between'"
+      class="flex min-w-0 items-center gap-2"
+      :class="modelValue.value.trim() ? '' : 'justify-between'"
     >
       <template v-if="modelValue.value.trim()">
         <button
           type="button"
-          class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-h-auto daisy-min-h-0 daisy-min-w-0 daisy-max-w-full daisy-shrink daisy-truncate daisy-justify-start daisy-py-0.5 daisy-px-1 daisy-font-mono daisy-text-sm daisy-font-normal daisy-text-base-content/90 daisy-normal-case"
+          class="daisy-btn daisy-btn-ghost daisy-btn-sm h-auto min-h-0 min-w-0 max-w-full shrink truncate justify-start py-0.5 px-1 font-mono text-sm font-normal text-base-content/90 normal-case"
           :title="modelValue.value.trim()"
           data-testid="rich-note-wikidata-property-edit"
           :aria-label="`Edit Wikidata ID ${modelValue.value.trim()}`"
@@ -112,13 +112,13 @@
       </template>
       <template v-else>
         <span
-          class="daisy-truncate daisy-font-mono daisy-text-sm daisy-text-base-content/90"
+          class="truncate font-mono text-sm text-base-content/90"
           aria-hidden="true"
           >—</span
         >
         <button
           type="button"
-          class="daisy-btn daisy-btn-sm daisy-btn-outline daisy-shrink-0"
+          class="daisy-btn daisy-btn-sm daisy-btn-outline shrink-0"
           data-testid="rich-note-wikidata-property-edit"
           aria-label="Set Wikidata ID"
           @click="emit('wikidata-dialog-open')"
@@ -129,16 +129,16 @@
     </div>
     <div
       v-else
-      class="daisy-min-w-0"
+      class="min-w-0"
       :class="
         isUrlPropertyKey(modelValue.key)
-          ? 'daisy-flex daisy-items-center daisy-gap-2'
+          ? 'flex items-center gap-2'
           : ''
       "
     >
       <div
         :class="
-          isUrlPropertyKey(modelValue.key) ? 'daisy-min-w-0 daisy-flex-1' : ''
+          isUrlPropertyKey(modelValue.key) ? 'min-w-0 flex-1' : ''
         "
       >
         <WikiPropertyValueField
@@ -160,18 +160,18 @@
     </div>
     <button
       type="button"
-      class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-square daisy-shrink-0"
+      class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
       :aria-label="`Remove note property ${modelValue.key}`"
       data-testid="rich-note-property-row-remove"
       @click="emit('remove')"
     >
-      <Minus class="daisy-h-4 daisy-w-4" aria-hidden="true" />
+      <Minus class="h-4 w-4" aria-hidden="true" />
     </button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Minus } from "lucide-vue-next"
+import { Minus } from "@lucide/vue"
 import { computed, ref } from "vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import RichFrontmatterPropertyKeyPresets from "@/components/form/RichFrontmatterPropertyKeyPresets.vue"

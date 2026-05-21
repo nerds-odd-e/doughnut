@@ -1,6 +1,6 @@
 <template>
   <div class="daisy-form-control">
-    <div v-if="beforeLabel" class="daisy-flex daisy-items-center daisy-gap-2">
+    <div v-if="beforeLabel" class="flex items-center gap-2">
       <slot />
       <label
         v-if="showLabel"
@@ -15,26 +15,26 @@
         {{ titlized }}
       </label>
       <i v-if="hint" class="hint" v-text="hint" />
-      <div class="daisy-join daisy-w-full daisy-items-stretch">
+      <div class="daisy-join w-full items-stretch">
         <template v-if="$slots.input_prepend">
-          <div class="daisy-join-item daisy-flex daisy-h-full daisy-items-stretch">
+          <div class="daisy-join-item flex h-full items-stretch">
             <slot name="input_prepend" />
           </div>
         </template>
-        <div v-if="$slots.input_prepend || $slots.input_append" class="daisy-join-item daisy-flex-1">
+        <div v-if="$slots.input_prepend || $slots.input_append" class="daisy-join-item flex-1">
           <slot />
         </div>
         <template v-else>
           <slot />
         </template>
         <template v-if="$slots.input_append">
-          <div class="daisy-join-item daisy-flex daisy-h-full daisy-items-stretch">
+          <div class="daisy-join-item flex h-full items-stretch">
             <slot name="input_append" />
           </div>
         </template>
       </div>
     </template>
-    <div class="daisy-text-error daisy-text-sm" v-if="!!errorMessage">{{ errorMessage }}</div>
+    <div class="text-error text-sm" v-if="!!errorMessage">{{ errorMessage }}</div>
   </div>
 </template>
 

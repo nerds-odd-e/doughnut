@@ -5,13 +5,13 @@
     data-testid="sidebar-scrollport-path-hint-anchor"
   >
     <div
-      class="scrollport-path-hint daisy-flex daisy-flex-row daisy-items-center daisy-gap-1 daisy-min-w-0 daisy-px-1 daisy-py-1 daisy-text-sm"
+      class="scrollport-path-hint flex flex-row items-center gap-1 min-w-0 px-1 py-1 text-sm"
       role="region"
       aria-label="Ancestor folders scrolled out of view"
       data-testid="sidebar-scrollport-path-hint"
     >
-      <ChevronUp :size="14" class="hint-chevron daisy-shrink-0" aria-hidden="true" />
-      <span class="hint-links daisy-min-w-0 daisy-flex daisy-flex-wrap daisy-items-center">
+      <ChevronUp :size="14" class="hint-chevron shrink-0" aria-hidden="true" />
+      <span class="hint-links min-w-0 flex flex-wrap items-center">
         <template v-for="(folder, i) in clippedFolders" :key="folder.id">
           <span v-if="i > 0" class="hint-sep" aria-hidden="true">·</span>
           <RouterLink
@@ -35,7 +35,7 @@
 
 <script setup lang="ts">
 import type { Folder } from "@generated/doughnut-backend-api"
-import { ChevronUp } from "lucide-vue-next"
+import { ChevronUp } from "@lucide/vue"
 import { computed, onBeforeUnmount, ref, watch } from "vue"
 import { RouterLink } from "vue-router"
 import { folderIdsWithRowAboveScrollportTop } from "./sidebarActivePathRowsAboveScrollport"

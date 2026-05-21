@@ -1,5 +1,5 @@
 <template>
-  <nav :class="noteChromeToolbarNavClass">
+  <nav :class="[noteChromeToolbarNavClass, 'relative z-20']">
     <div class="daisy-btn-group daisy-btn-group-sm">
       <PopButton
         v-if="!readonly"
@@ -32,18 +32,18 @@
         })"
         title="Star a conversation about this note"
       >
-        <MessageCircle class="daisy-w-6 daisy-h-6" />
+        <MessageCircle class="w-6 h-6" />
       </a>
 
       <button v-if="!readonly && !asMarkdown" type="button" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as markdown" aria-label="Edit as markdown" @click="$emit('edit-as-markdown', true)">
-        <FileCode class="daisy-w-6 daisy-h-6" />
+        <FileCode class="w-6 h-6" />
       </button>
       <button v-else-if="!readonly" type="button" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as rich content" aria-label="Edit as rich content" @click="$emit('edit-as-markdown', false)">
-        <LayoutTemplate class="daisy-w-6 daisy-h-6" />
+        <LayoutTemplate class="w-6 h-6" />
       </button>
 
       <button v-if="!readonly && !audioTools" type="button" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Audio tools" @click="audioTools = true">
-        <Mic class="daisy-w-6 daisy-h-6" />
+        <Mic class="w-6 h-6" />
       </button>
 
       <AutoCollapseDropdown
@@ -54,22 +54,20 @@
       >
         <summary
           :class="[
-            'daisy-btn daisy-btn-ghost daisy-btn-sm list-none daisy-cursor-pointer',
+            'daisy-btn daisy-btn-ghost daisy-btn-sm list-none cursor-pointer',
             { 'daisy-btn-active': open },
           ]"
           title="more options"
           aria-label="more options"
-          role="button"
-          tabindex="0"
         >
-          <Settings class="daisy-w-6 daisy-h-6" />
+          <Settings class="w-6 h-6" />
         </summary>
-        <NoteMoreOptionsForm
-          v-if="open"
-          class="daisy-dropdown-content daisy-z-[1000] daisy-mt-1"
-          v-bind="{ note }"
-          @close-dialog="closeDropdown"
-        />
+        <div class="daisy-dropdown-content z-[1000] mt-1">
+          <NoteMoreOptionsForm
+            v-bind="{ note }"
+            @close-dialog="closeDropdown"
+          />
+        </div>
       </AutoCollapseDropdown>
     </div>
   </nav>
@@ -92,7 +90,7 @@ import {
   MessageCircle,
   Mic,
   Settings,
-} from "lucide-vue-next"
+} from "@lucide/vue"
 import NoteAudioTools from "../widgets/NoteAudioTools.vue"
 import { useRouter } from "vue-router"
 import NoteMoreOptionsForm from "../widgets/NoteMoreOptionsForm.vue"

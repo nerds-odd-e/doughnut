@@ -22,13 +22,13 @@
       </template>
       <li>
         <router-link
-          class="daisy-inline-flex daisy-items-center daisy-gap-1 daisy-text-base-content"
+          class="inline-flex items-center gap-1 text-base-content"
           :to="{
             name: 'notebookPage',
             params: { notebookId: String(notebookRealm.notebook.id) },
           }"
         >
-          <BookText class="daisy-h-3.5 daisy-w-3.5 daisy-shrink-0" aria-hidden="true" />
+          <BookText class="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
           {{ notebookRealm.notebook.name }}
         </router-link>
       </li>
@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import type { Folder, NotebookRealm } from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
-import { BookText } from "lucide-vue-next"
+import { BookText } from "@lucide/vue"
 import Breadcrumb from "@/components/toolbars/Breadcrumb.vue"
 
 defineProps({

@@ -6,7 +6,7 @@
     btn-class="daisy-btn daisy-btn-sm daisy-btn-ghost"
   >
     <template #button_face>
-      <Undo2 class="daisy-w-6 daisy-h-6" />
+      <Undo2 class="w-6 h-6" />
     </template>
     <template #default="{ closer }">
       <UndoConfirmationForm
@@ -27,7 +27,7 @@
 <script setup lang="ts">
 import { computed } from "vue"
 import { useRouter } from "vue-router"
-import { Undo2 } from "lucide-vue-next"
+import { Undo2 } from "@lucide/vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import UndoConfirmationForm from "./UndoConfirmationForm.vue"
 import PopButton from "../commons/Popups/PopButton.vue"

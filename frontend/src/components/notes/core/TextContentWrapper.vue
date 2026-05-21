@@ -8,14 +8,14 @@
     />
     <div
       v-if="showReferencedTitleSavePanel"
-      class="referenced-title-save daisy-mt-3 daisy-flex daisy-flex-col daisy-gap-3"
+      class="referenced-title-save mt-3 flex flex-col gap-3"
       data-testid="referenced-title-save-panel"
     >
-      <p class="daisy-text-sm daisy-opacity-80">
+      <p class="text-sm opacity-80">
         This note is linked from other notes. Choose how wiki links to this note
         should change:
       </p>
-      <div class="daisy-flex daisy-flex-wrap daisy-gap-2">
+      <div class="flex flex-wrap gap-2">
         <button
           v-for="opt in TITLE_RENAME_REFERENCE_SAVE_OPTIONS"
           :key="opt.value"

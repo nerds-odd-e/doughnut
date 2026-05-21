@@ -1,21 +1,38 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@source inline("daisy-btn daisy-btn-primary daisy-btn-secondary daisy-btn-accent daisy-btn-ghost daisy-btn-link daisy-btn-info daisy-btn-success daisy-btn-warning daisy-btn-error daisy-btn-neutral daisy-btn-outline daisy-btn-dash daisy-btn-soft daisy-btn-xs daisy-btn-sm daisy-btn-md daisy-btn-lg daisy-btn-xl daisy-btn-wide daisy-btn-block daisy-btn-square daisy-btn-circle daisy-btn-disabled daisy-btn-active");
+@source inline("daisy-input daisy-input-ghost daisy-input-xs daisy-input-sm daisy-input-md daisy-input-lg daisy-input-xl daisy-input-primary daisy-input-secondary daisy-input-accent daisy-input-info daisy-input-success daisy-input-warning daisy-input-error");
+@source inline("daisy-modal daisy-modal-box daisy-modal-action daisy-modal-open daisy-modal-top daisy-modal-middle daisy-modal-bottom daisy-modal-start daisy-modal-end");
+@source inline("daisy-dropdown daisy-dropdown-content daisy-dropdown-end daisy-dropdown-start daisy-dropdown-top daisy-dropdown-bottom daisy-dropdown-left daisy-dropdown-right daisy-dropdown-hover daisy-dropdown-open");
+@source inline("daisy-menu daisy-menu-item daisy-menu-title daisy-menu-active daisy-menu-horizontal daisy-menu-vertical daisy-navbar daisy-navbar-start daisy-navbar-center daisy-navbar-end");
+@source inline("daisy-badge daisy-badge-primary daisy-badge-secondary daisy-badge-accent daisy-badge-ghost daisy-badge-outline daisy-badge-neutral daisy-badge-info daisy-badge-success daisy-badge-warning daisy-badge-error daisy-badge-xs daisy-badge-sm daisy-badge-md daisy-badge-lg daisy-badge-xl daisy-badge-dash");
+@source inline("daisy-card daisy-card-body daisy-card-title daisy-card-actions daisy-card-side daisy-card-border daisy-card-sm daisy-card-compact daisy-card-normal daisy-card-glass");
+@source inline("daisy-select daisy-textarea daisy-checkbox daisy-radio daisy-toggle daisy-range daisy-file-input daisy-fieldset daisy-label daisy-form-control daisy-validator");
+@source inline("daisy-alert daisy-alert-info daisy-alert-success daisy-alert-warning daisy-alert-error");
+@source inline("daisy-table daisy-table-xs daisy-table-sm daisy-table-md daisy-table-lg daisy-table-xl daisy-table-pin-rows daisy-table-pin-cols daisy-table-zebra");
+@source inline("daisy-tabs daisy-tab daisy-tab-content daisy-tabs-border daisy-tabs-lift daisy-tabs-box daisy-tab-active");
+@source inline("daisy-collapse daisy-collapse-title daisy-collapse-content daisy-collapse-open daisy-collapse-close daisy-collapse-arrow daisy-collapse-plus");
+@source inline("daisy-avatar daisy-avatar-group daisy-avatar-online daisy-avatar-offline daisy-avatar-placeholder");
+@source inline("daisy-loading daisy-loading-spinner daisy-loading-dots daisy-loading-ring daisy-loading-ball daisy-loading-bars daisy-loading-infinity daisy-loading-xs daisy-loading-sm daisy-loading-md daisy-loading-lg daisy-loading-xl");
+@source inline("daisy-progress daisy-skeleton daisy-countdown daisy-stat daisy-stats daisy-steps daisy-step daisy-step-primary");
+@source inline("daisy-join daisy-join-item daisy-btn-group daisy-btn-group-sm daisy-btn-group-vertical daisy-divider daisy-indicator daisy-indicator-item daisy-tooltip daisy-kbd daisy-stack daisy-breadcrumbs");
+@plugin "daisyui" {
+  themes:
+    light --default,
+    dark --prefersdark;
+  prefix: daisy-;
+}
 
 svg {
   display: initial;
 }
-
 svg.lucide {
   stroke-width: 1.5;
 }
-
 h3 {
   font-size: 1.5rem;
   margin-top: 2rem;
   margin-bottom: 1rem;
 }
-
 h5 {
   font-size: 1.25rem;
   margin-bottom: 0.5rem;

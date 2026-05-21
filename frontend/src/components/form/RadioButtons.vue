@@ -7,7 +7,7 @@
     >
       <template v-for="option in options" :key="option.value">
         <input
-          class="daisy-join-item daisy-hidden"
+          class="daisy-join-item hidden"
           type="radio"
           :value="option.value"
           :id="`${scopeName}-${option.value}`"
@@ -53,8 +53,8 @@ const props = defineProps({
 const radiogroupClassList = computed(() => {
   const base =
     props.variant === "chips"
-      ? "radio-buttons-chips daisy-flex daisy-flex-wrap daisy-gap-2 daisy-content-start"
-      : "radio-buttons-join daisy-join daisy-flex daisy-flex-wrap"
+      ? "radio-buttons-chips flex flex-wrap gap-2 content-start"
+      : "radio-buttons-join daisy-join flex flex-wrap"
   return [base, props.radiogroupClass].filter(Boolean)
 })
 
@@ -63,11 +63,11 @@ function labelClassList(optionValue: string) {
   const classes: (string | Record<string, boolean>)[] = [
     "daisy-btn",
     "daisy-btn-outline",
-    "daisy-text-nowrap",
+    "text-nowrap",
     props.variant === "chips"
-      ? "daisy-btn-sm daisy-inline-flex daisy-items-center daisy-gap-1 daisy-rounded-lg daisy-normal-case"
+      ? "daisy-btn-sm inline-flex items-center gap-1 rounded-lg normal-case"
       : "daisy-join-item",
-    { "daisy-bg-primary daisy-border-primary": selected },
+    { "bg-primary border-primary": selected },
   ]
   return classes
 }

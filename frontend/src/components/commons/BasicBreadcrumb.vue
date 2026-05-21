@@ -1,6 +1,6 @@
 <template>
-  <div class="daisy-text-sm daisy-breadcrumbs daisy-max-w-full">
-    <ul class="daisy-m-0 daisy-pl-0">
+  <div class="text-sm daisy-breadcrumbs max-w-full">
+    <ul class="m-0 pl-0">
       <slot name="topLink" />
       <li
         v-for="segment in folderSegments"
@@ -8,14 +8,14 @@
       >
         <router-link
           v-if="breadcrumbNotebookId != null"
-          class="daisy-inline-flex daisy-items-center daisy-gap-1 daisy-text-base-content"
+          class="inline-flex items-center gap-1 text-base-content"
           :to="folderPageTo(segment.id)"
         >
-          <FolderIcon class="daisy-h-3.5 daisy-w-3.5 daisy-shrink-0" aria-hidden="true" />
+          <FolderIcon class="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
           {{ segment.name }}
         </router-link>
-        <span v-else class="daisy-inline-flex daisy-items-center daisy-gap-1 daisy-text-base-content">
-          <FolderIcon class="daisy-h-3.5 daisy-w-3.5 daisy-shrink-0" aria-hidden="true" />
+        <span v-else class="inline-flex items-center gap-1 text-base-content">
+          <FolderIcon class="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
           {{ segment.name }}
         </span>
       </li>
@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import type { Folder } from "@generated/doughnut-backend-api"
-import { Folder as FolderIcon } from "lucide-vue-next"
+import { Folder as FolderIcon } from "@lucide/vue"
 
 const props = defineProps({
   folderSegments: {

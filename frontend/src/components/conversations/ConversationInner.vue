@@ -16,26 +16,28 @@
       <div
         v-for="conversationMessage in currentConversationMessages"
         :key="conversationMessage.id"
-        class="daisy-flex daisy-mb-3"
-        :class="{ 'daisy-justify-end': isCurrentUser(conversationMessage.sender?.id || 0) }"
+        class="flex mb-3"
+        :class="{ 'justify-end': isCurrentUser(conversationMessage.sender?.id || 0) }"
       >
         <div
           v-if="!isCurrentUser(conversationMessage.sender?.id || 0)"
-          class="message-avatar daisy-me-2"
+          class="message-avatar me-2"
           :title="conversationMessage.sender?.name || 'AI Assistant'"
         >
           <template v-if="conversationMessage.sender?.id === undefined">
-            <Bot class="daisy-w-8 daisy-h-8" />
+            <Bot class="w-8 h-8" />
           </template>
           <template v-else>
-            <UserIcon class="daisy-w-8 daisy-h-8" />
+            <UserIcon class="w-8 h-8" />
           </template>
         </div>
 
         <div
-          class="daisy-card daisy-py-2 daisy-px-3"
+          class="daisy-card py-2 px-3"
           :class="[
-            isCurrentUser(conversationMessage.sender?.id || 0) ? 'daisy-text-bg-dark' : 'daisy-bg-light',
+            isCurrentUser(conversationMessage.sender?.id || 0)
+              ? 'bg-primary text-primary-content'
+              : 'bg-base-200',
             conversationMessage.sender?.id === undefined ? 'ai-chat' : '',
           ]"
         >
@@ -65,7 +67,7 @@ import type {
   ConversationMessage,
   Conversation,
 } from "@generated/doughnut-backend-api"
-import { Bot, User as UserIcon } from "lucide-vue-next"
+import { Bot, User as UserIcon } from "@lucide/vue"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import ConversationTemplate from "./ConversationTemplate.vue"
 import markdownizer from "../form/markdownizer"
@@ -166,6 +168,8 @@ const showDefaultMessages = computed(
 </script>
 
 <style scoped>
+@reference "@/assets/daisyui.css";
+
 .message-avatar {
   width: 32px;
   height: 32px;
@@ -183,7 +187,7 @@ const showDefaultMessages = computed(
 
 .unknown-request {
   font-family: monospace;
-  @apply daisy-bg-base-200;
+  @apply bg-base-200;
   padding: 0.5rem;
   border-radius: 0.25rem;
   white-space: pre-wrap;

@@ -1,13 +1,13 @@
 <template>
-  <div class="daisy-bg-base-200 daisy-rounded-b-lg daisy-p-5 daisy-shadow-lg animate-dropdown daisy-relative">
-    <ul class="daisy-menu daisy-mt-2 daisy-min-w-64 daisy-p-0">
+  <div class="bg-base-200 rounded-b-lg p-5 shadow-lg animate-dropdown">
+    <ul class="daisy-menu mt-2 min-w-64 p-0">
       <li>
         <PopButton
-          btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-h-auto daisy-min-h-0 daisy-w-full daisy-justify-start daisy-gap-2 daisy-py-2 daisy-font-normal"
+          btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm h-auto min-h-0 w-full justify-start gap-2 py-2 font-normal"
           title="Export..."
         >
           <template #button_face>
-            <Upload class="daisy-w-5 daisy-h-5 daisy-shrink-0" aria-hidden="true" />
+            <Upload class="w-5 h-5 shrink-0" aria-hidden="true" />
             <span>Export...</span>
           </template>
           <template #default="{ closer }">
@@ -18,12 +18,12 @@
 
       <li>
         <PopButton
-          btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-h-auto daisy-min-h-0 daisy-w-full daisy-justify-start daisy-gap-2 daisy-py-2 daisy-font-normal"
+          btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm h-auto min-h-0 w-full justify-start gap-2 py-2 font-normal"
           title="Questions for the note"
         >
           <template #button_face>
             <MessageCircleQuestion
-              class="daisy-w-5 daisy-h-5 daisy-shrink-0"
+              class="w-5 h-5 shrink-0"
               aria-hidden="true"
             />
             <span>Questions for the note</span>
@@ -36,22 +36,22 @@
 
       <li>
         <button
-          class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-h-auto daisy-min-h-0 daisy-w-full daisy-justify-start daisy-gap-2 daisy-py-2 daisy-font-normal"
+          class="daisy-btn daisy-btn-ghost daisy-btn-sm h-auto min-h-0 w-full justify-start gap-2 py-2 font-normal"
           title="Assimilation settings"
           @click="assimilateNote"
         >
-          <CircleCheck class="daisy-w-5 daisy-h-5 daisy-shrink-0" aria-hidden="true" />
+          <CircleCheck class="w-5 h-5 shrink-0" aria-hidden="true" />
           <span>Assimilation settings</span>
         </button>
       </li>
 
       <li>
         <button
-          class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-h-auto daisy-min-h-0 daisy-w-full daisy-justify-start daisy-gap-2 daisy-py-2 daisy-font-normal"
+          class="daisy-btn daisy-btn-ghost daisy-btn-sm h-auto min-h-0 w-full justify-start gap-2 py-2 font-normal"
           title="Delete note"
           @click="deleteNote"
         >
-          <Trash2 class="daisy-w-5 daisy-h-5 daisy-shrink-0" aria-hidden="true" />
+          <Trash2 class="w-5 h-5 shrink-0" aria-hidden="true" />
           <span>Delete note</span>
         </button>
       </li>
@@ -63,12 +63,7 @@
 import type { Note } from "@generated/doughnut-backend-api"
 import PopButton from "../../commons/Popups/PopButton.vue"
 import Questions from "../Questions.vue"
-import {
-  CircleCheck,
-  MessageCircleQuestion,
-  Trash2,
-  Upload,
-} from "lucide-vue-next"
+import { CircleCheck, MessageCircleQuestion, Trash2, Upload } from "@lucide/vue"
 import NoteExportForm from "../core/NoteExportForm.vue"
 import { useRouter } from "vue-router"
 import usePopups from "../../commons/Popups/usePopups"

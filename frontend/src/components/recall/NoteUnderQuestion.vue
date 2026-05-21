@@ -1,6 +1,6 @@
 <template>
-  <div class="note-under-question daisy-bg-base-200 daisy-border-base-300">
-    <div class="note-label daisy-bg-base-200 daisy-text-base-content">Note under question</div>
+  <div class="note-under-question bg-base-200 border-base-300">
+    <div class="note-label bg-base-200 text-base-content">Note under question</div>
     <div class="breadcrumb-wrapper">
       <Breadcrumb
         :ancestor-folders="ancestorFolders ?? []"

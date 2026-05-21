@@ -41,6 +41,6 @@ describe("ViewMemoryTrackerLink", () => {
     const button = wrapper.find("button")
     expect(button.classes()).toContain("daisy-btn")
     expect(button.classes()).toContain("daisy-btn-primary")
-    expect(button.classes()).toContain("daisy-mt-4")
+    expect(button.classes()).toContain("mt-4")
   })
 })

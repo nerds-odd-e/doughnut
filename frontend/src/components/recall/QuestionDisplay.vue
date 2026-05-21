@@ -1,5 +1,5 @@
 <template>
-  <div class="quiz-instruction daisy-relative daisy-max-w-6xl daisy-mx-auto" data-test="question-section">
+  <div class="quiz-instruction relative max-w-6xl mx-auto" data-test="question-section">
     <InactiveRecallMask :show="isActiveQuestion && isPaused" />
     <QuestionStem :stem="multipleChoicesQuestion.questionStem" />
     <QuestionChoices
@@ -12,23 +12,23 @@
     />
     <div
       v-if="answeredWithAiNotes"
-      class="daisy-mt-6 daisy-border daisy-border-base-300 daisy-rounded-lg daisy-p-4 daisy-bg-base-200/40"
+      class="mt-6 border border-base-300 rounded-lg p-4 bg-base-200/40"
       data-test="question-ai-notes"
     >
-      <p class="daisy-text-xs daisy-font-semibold daisy-opacity-60 daisy-mb-3 daisy-uppercase daisy-tracking-wide">
+      <p class="text-xs font-semibold opacity-60 mb-3 uppercase tracking-wide">
         Question designer notes
       </p>
-      <div v-if="testedFocus?.trim()" class="daisy-space-y-1">
-        <h3 class="daisy-text-sm daisy-font-semibold">Tested focus</h3>
-        <p class="daisy-text-sm daisy-whitespace-pre-wrap">{{ testedFocus }}</p>
+      <div v-if="testedFocus?.trim()" class="space-y-1">
+        <h3 class="text-sm font-semibold">Tested focus</h3>
+        <p class="text-sm whitespace-pre-wrap">{{ testedFocus }}</p>
       </div>
       <div
         v-if="validationRationale?.trim()"
-        :class="{ 'daisy-mt-4': testedFocus?.trim() }"
-        class="daisy-space-y-1"
+        :class="{ 'mt-4': testedFocus?.trim() }"
+        class="space-y-1"
       >
-        <h3 class="daisy-text-sm daisy-font-semibold">Why the answer fits</h3>
-        <p class="daisy-text-sm daisy-whitespace-pre-wrap">{{ validationRationale }}</p>
+        <h3 class="text-sm font-semibold">Why the answer fits</h3>
+        <p class="text-sm whitespace-pre-wrap">{{ validationRationale }}</p>
       </div>
     </div>
   </div>

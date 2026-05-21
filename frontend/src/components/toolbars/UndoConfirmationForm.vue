@@ -1,7 +1,7 @@
 <template>
   <div class="undo-confirmation">
-    <div class="daisy-mb-4">
-      <h2 class="daisy-text-xl daisy-font-bold daisy-mb-4">Confirm Undo</h2>
+    <div class="mb-4">
+      <h2 class="text-xl font-bold mb-4">Confirm Undo</h2>
       <p>
         {{ message }}
         <NoteTitleWithLink
@@ -16,7 +16,7 @@
       :old="oldContent"
       maxHeight="300px"
     />
-    <div class="daisy-flex daisy-gap-2 daisy-mt-4 daisy-justify-end">
+    <div class="flex gap-2 mt-4 justify-end">
       <button class="daisy-btn daisy-btn-secondary" @click="handleCancel">
         Cancel
       </button>

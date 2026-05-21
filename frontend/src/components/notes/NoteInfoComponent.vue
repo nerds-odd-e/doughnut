@@ -20,17 +20,14 @@
       </tr>
     </thead>
     <tbody>
-      <tr
+      <NoteInfoMemoryTracker
         v-for="memoryTracker in memoryTrackers"
         :key="memoryTracker.id"
+        :model-value="memoryTracker"
         class="clickable-row"
         @click="navigateToMemoryTracker(memoryTracker.id)"
-      >
-        <NoteInfoMemoryTracker
-          :model-value="memoryTracker"
-          @update:model-value="updateMemoryTracker($event)"
-        />
-      </tr>
+        @update:model-value="updateMemoryTracker($event)"
+      />
     </tbody>
   </table>
 </template>

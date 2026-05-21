@@ -3,12 +3,26 @@ import { assumeAssimilationPage } from './assimilationPage'
 import { toolbarButton } from './toolbarButton'
 import { questionListPage } from './questionListPage'
 
+const moreOptionsDetails = () =>
+  cy
+    .get('details[data-auto-collapse-dropdown]')
+    .filter(':has(summary[title="more options"])')
+
+const isMoreOptionsDropdownOpen = ($details: JQuery<HTMLElement>) =>
+  $details.prop('open') === true || $details.hasClass('daisy-dropdown-open')
+
 export const makeSureNoteMoreOptionsFormIsOpen = () => {
-  cy.findByRole('button', { name: 'more options' }).then(($button) => {
-    if (!$button.hasClass('daisy-btn-active')) {
-      cy.wrap($button).click()
+  moreOptionsDetails().then(($details) => {
+    if (!isMoreOptionsDropdownOpen($details)) {
+      cy.wrap($details).find('summary[title="more options"]').click()
     }
   })
+  moreOptionsDetails().should(($details) => {
+    expect(isMoreOptionsDropdownOpen($details)).to.eq(true)
+  })
+  cy.findByRole('button', { name: 'Assimilation settings' }).should(
+    'be.visible'
+  )
 
   return noteMoreOptionsPage()
 }
@@ -40,7 +54,9 @@ const noteMoreOptionsPage = () => {
       return questionListPage()
     },
     openAssimilationPage() {
-      toolbarButton('Assimilation settings').click()
+      cy.findByRole('button', { name: 'Assimilation settings' })
+        .scrollIntoView()
+        .click()
       cy.url().should('include', '/assimilate/')
       pageIsNotLoading()
       return assumeAssimilationPage().waitForAssimilationReady()

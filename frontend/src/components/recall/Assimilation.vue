@@ -24,7 +24,7 @@
     <div
       v-if="showSpellingPopup"
       data-test="opaque-content-blocker"
-      class="fixed inset-0 daisy-bg-black"
+      class="fixed inset-0 bg-black"
       style="z-index: 9989"
       aria-hidden="true"
     />

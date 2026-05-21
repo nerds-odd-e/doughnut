@@ -1,27 +1,29 @@
 <template>
   <dialog
+    ref="dialogRef"
     class="daisy-modal"
     :class="{ 'daisy-modal-open': open }"
     aria-labelledby="book-layout-reorganize-preview-title"
     data-testid="book-layout-reorganize-preview-dialog"
+    @close="emit('cancel')"
   >
     <div class="daisy-modal-box">
       <h2
         id="book-layout-reorganize-preview-title"
-        class="daisy-text-lg daisy-font-semibold"
+        class="text-lg font-semibold"
       >
         Reorganize layout (preview)
       </h2>
       <div
-        class="daisy-max-h-[min(24rem,50vh)] daisy-overflow-y-auto daisy-py-2"
+        class="max-h-[min(24rem,50vh)] overflow-y-auto py-2"
       >
         <div
           v-for="row in previewRows"
           :key="row.block.id"
           data-testid="book-layout-reorganize-preview-row"
-          class="daisy-rounded daisy-py-1.5 daisy-pr-2 daisy-text-sm daisy-leading-snug"
+          class="rounded py-1.5 pr-2 text-sm leading-snug"
           :class="{
-            'daisy-bg-warning/15': row.depthChanged,
+            'bg-warning/15': row.depthChanged,
           }"
           :data-suggested-depth="row.suggestedDepth"
           :data-depth-changed="row.depthChanged ? 'true' : undefined"
@@ -58,7 +60,10 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+import { useDaisyDialog } from "@/composables/useDaisyDialog"
+import { ref, toRef } from "vue"
+
+const props = defineProps<{
   open: boolean
   previewRows: Array<{
     block: { id: number; title: string }
@@ -71,4 +76,7 @@ const emit = defineEmits<{
   confirm: []
   cancel: []
 }>()
+
+const dialogRef = ref<HTMLDialogElement | null>(null)
+useDaisyDialog(toRef(props, "open"), dialogRef)
 </script>

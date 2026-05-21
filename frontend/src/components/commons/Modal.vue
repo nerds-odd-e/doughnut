@@ -2,7 +2,7 @@
   <Teleport to="body">
     <dialog
       ref="dialogRef"
-      class="modal-mask daisy-text-base-content"
+      class="modal-mask text-base-content"
       :class="{ 'modal-align-top': alignTop }"
       @cancel.prevent
     >
@@ -10,7 +10,7 @@
       <div
         :class="[
           sidebarStyle,
-          'daisy-bg-base-200',
+          'bg-base-200',
           { 'modal-panel--no-close': !showCloseButton },
         ]"
       >
@@ -19,7 +19,7 @@
           class="close-button"
           @click="$emit('close_request')"
         >
-          <X class="daisy-w-6 daisy-h-6" />
+          <X class="w-6 h-6" />
         </button>
 
         <div v-if="$slots.header" class="modal-header">
@@ -37,7 +37,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from "vue"
-import { X } from "lucide-vue-next"
+import { X } from "@lucide/vue"
 import { useRoute } from "vue-router"
 import { registerModal } from "./modalStack"
 import { focusAutofocusTargetWithin } from "@/utils/focusTarget"

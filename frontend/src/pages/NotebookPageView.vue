@@ -1,6 +1,6 @@
 <template>
-  <div class="daisy-container daisy-mx-auto daisy-py-4 daisy-max-w-6xl">
-    <div class="notebook-page-summary daisy-mb-6" data-testid="notebook-page-summary">
+  <div class="container mx-auto py-4 max-w-6xl">
+    <div class="notebook-page-summary mb-6" data-testid="notebook-page-summary">
       <NotebookPageNameEditor
         :notebook-id="notebook.id"
         :name="notebook.name ?? ''"
@@ -21,22 +21,22 @@
     <NotebookAttachedBookSection :notebook-id="notebook.id" />
 
     <!-- Notebook Management Section -->
-    <section class="settings-section daisy-mb-6">
+    <section class="settings-section mb-6">
       <div class="section-header">
         <h4 class="section-title">Notebook Management</h4>
         <p class="section-description">
           Manage your notebook's organization and sharing settings.
         </p>
       </div>
-      <div class="daisy-flex daisy-flex-wrap daisy-gap-2">
+      <div class="flex flex-wrap gap-2">
         <PopButton
           title="Move to ..."
           v-if="user?.externalIdentifier === notebook.creatorId"
           btnClass="daisy-btn daisy-btn-outline daisy-btn-sm"
         >
           <template #button_face>
-            <div class="daisy-flex daisy-items-center daisy-gap-2">
-              <GitMerge class="daisy-w-6 daisy-h-6" />
+            <div class="flex items-center gap-2">
+              <GitMerge class="w-6 h-6" />
               <span>Move to ...</span>
             </div>
           </template>
@@ -47,8 +47,8 @@
           @click="shareNotebook()"
           title="Share notebook to bazaar"
         >
-          <div class="daisy-flex daisy-items-center daisy-gap-2">
-            <Share2 class="daisy-w-6 daisy-h-6" />
+          <div class="flex items-center gap-2">
+            <Share2 class="w-6 h-6" />
             <span>Share notebook to bazaar</span>
           </div>
         </button>
@@ -56,7 +56,7 @@
     </section>
     
     <!-- Notebook Settings Section -->
-    <section class="settings-section daisy-mb-6">
+    <section class="settings-section mb-6">
       <div class="section-header">
         <h4 class="section-title">Notebook Settings</h4>
         <p class="section-description">
@@ -91,12 +91,12 @@
           </p>
         </div>
       </div>
-      <button class="daisy-btn daisy-btn-primary daisy-btn-sm daisy-mt-4" @click="processForm">
+      <button class="daisy-btn daisy-btn-primary daisy-btn-sm mt-4" @click="processForm">
         Update Settings
       </button>
     </section>
 
-    <section class="settings-section daisy-mb-6">
+    <section class="settings-section mb-6">
       <div class="section-header">
         <h4 class="section-title">Assistant Management</h4>
         <p class="section-description">
@@ -110,14 +110,14 @@
     </section>
 
     <!-- Notebook Indexing Section -->
-    <section class="settings-section daisy-mb-6">
+    <section class="settings-section mb-6">
       <div class="section-header">
         <h4 class="section-title">Notebook Indexing</h4>
         <p class="section-description">
           Manage the search index for this notebook. Reset to rebuild from scratch, or update to index new content.
         </p>
       </div>
-      <div class="daisy-flex daisy-flex-wrap daisy-gap-2">
+      <div class="flex flex-wrap gap-2">
         <button
           class="daisy-btn daisy-btn-outline daisy-btn-sm"
           @click="reindexNotebook"
@@ -154,7 +154,7 @@ import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { useToast } from "@/composables/useToast"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
-import { GitMerge, Share2 } from "lucide-vue-next"
+import { GitMerge, Share2 } from "@lucide/vue"
 import NotebookMoveForm from "@/components/notebook/NotebookMoveForm.vue"
 import CheckInput from "@/components/form/CheckInput.vue"
 import TextArea from "@/components/form/TextArea.vue"

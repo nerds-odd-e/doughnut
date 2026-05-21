@@ -1,7 +1,7 @@
 <template>
   <button
     @click="navigateToMemoryTracker"
-    class="daisy-btn daisy-btn-primary daisy-mt-4"
+    class="daisy-btn daisy-btn-primary mt-4"
   >
     View Memory Tracker
   </button>

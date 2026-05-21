@@ -1,12 +1,12 @@
 <template>
-  <div class="daisy-card daisy-py-2 daisy-px-3 daisy-bg-light ai-chat">
+  <div class="daisy-card py-2 px-3 bg-base-200 ai-chat">
     <div>
       <slot name="title" />
     </div>
-    <div class="suggestion-content daisy-mb-2">
+    <div class="suggestion-content mb-2">
       <slot name="content" />
     </div>
-    <div class="daisy-flex daisy-gap-2">
+    <div class="flex gap-2">
       <button
         v-if="!hideAccept"
         class="daisy-btn daisy-btn-primary daisy-btn-sm"
@@ -16,7 +16,7 @@
         Accept
       </button>
       <button
-        class="daisy-btn daisy-btn-outline-secondary daisy-btn-sm"
+        class="daisy-btn daisy-btn-outline daisy-btn-secondary daisy-btn-sm"
         @click="$emit('skip')"
         :disabled="disabled"
       >

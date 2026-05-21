@@ -5,7 +5,7 @@
       title="Add to my learning"
     >
       <template #button_face>
-        <Plus class="daisy-w-6 daisy-h-6" />
+        <Plus class="w-6 h-6" />
       </template>
       <template #default="{ closer }">
         <SubscribeForm
@@ -21,7 +21,7 @@
 import type { PropType } from "vue"
 import type { Notebook } from "@generated/doughnut-backend-api"
 import PopButton from "../commons/Popups/PopButton.vue"
-import { Plus } from "lucide-vue-next"
+import { Plus } from "@lucide/vue"
 import SubscribeForm from "./SubscribeForm.vue"
 
 defineProps({

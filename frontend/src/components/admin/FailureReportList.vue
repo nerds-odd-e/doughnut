@@ -2,7 +2,7 @@
   <div v-if="!!errorMessage" class="daisy-alert daisy-alert-error">
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      class="daisy-stroke-current daisy-shrink-0 daisy-h-6 daisy-w-6"
+      class="stroke-current shrink-0 h-6 w-6"
       fill="none"
       viewBox="0 0 24 24"
     >
@@ -16,18 +16,18 @@
     <span>{{ errorMessage }}</span>
   </div>
   <ContainerPage v-else v-bind="{ contentLoaded: failureReports !== undefined }">
-    <div v-if="!!failureReports" class="daisy-space-y-4">
-      <div class="daisy-flex daisy-items-center daisy-justify-between">
-        <h2 class="daisy-text-2xl daisy-font-bold">
+    <div v-if="!!failureReports" class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-2xl font-bold">
           Failure Reports
           <span
             v-if="failureReports.length > 0"
-            class="daisy-badge daisy-badge-error daisy-ml-2"
+            class="daisy-badge daisy-badge-error ml-2"
           >
             {{ failureReports.length }}
           </span>
         </h2>
-        <div class="daisy-flex daisy-gap-2">
+        <div class="flex gap-2">
           <button
             class="daisy-btn daisy-btn-warning daisy-btn-sm"
             @click="triggerFailure"
@@ -41,7 +41,7 @@
           >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="daisy-h-4 daisy-w-4"
+            class="h-4 w-4"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -60,10 +60,10 @@
 
       <div
         v-if="failureReports.length > 0"
-        class="daisy-flex daisy-items-center daisy-gap-2 daisy-px-1"
+        class="flex items-center gap-2 px-1"
       >
         <label
-          class="daisy-label daisy-cursor-pointer daisy-flex daisy-items-center daisy-gap-2 daisy-m-0 daisy-p-0"
+          class="daisy-label cursor-pointer flex items-center gap-2 m-0 p-0"
         >
           <input
             ref="selectAllCheckboxRef"
@@ -76,14 +76,14 @@
         </label>
       </div>
 
-      <div v-if="failureReports.length > 0" class="daisy-space-y-2">
+      <div v-if="failureReports.length > 0" class="space-y-2">
         <div
           v-for="report in failureReports"
           :key="report.id"
-          class="daisy-card daisy-bg-base-100 daisy-shadow-sm daisy-border daisy-border-base-300 hover:daisy-shadow-md daisy-transition-shadow"
+          class="daisy-card bg-base-100 shadow-sm border border-base-300 hover:shadow-md transition-shadow"
         >
           <div
-            class="daisy-card-body daisy-p-4 daisy-flex daisy-flex-row daisy-items-center daisy-gap-4"
+            class="daisy-card-body p-4 flex flex-row items-center gap-4"
           >
             <input
               type="checkbox"
@@ -91,22 +91,22 @@
               v-model="selectedFailureReports"
               class="daisy-checkbox daisy-checkbox-error"
             />
-            <div class="daisy-flex-1 daisy-min-w-0">
+            <div class="flex-1 min-w-0">
               <router-link
                 :to="{
                   name: 'failureReport',
                   params: { failureReportId: report.id },
                 }"
-                class="daisy-link daisy-link-primary daisy-font-medium daisy-text-base hover:daisy-link-hover daisy-truncate daisy-block"
+                class="daisy-link daisy-link-primary font-medium text-base hover:daisy-link-hover truncate block"
               >
                 {{ report.errorName }}
               </router-link>
               <div
-                class="daisy-text-sm daisy-text-base-content/60 daisy-mt-1 daisy-flex daisy-items-center daisy-gap-2"
+                class="text-sm text-base-content/60 mt-1 flex items-center gap-2"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  class="daisy-h-4 daisy-w-4"
+                  class="h-4 w-4"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -130,12 +130,12 @@
 
       <div
         v-else
-        class="daisy-card daisy-bg-base-100 daisy-shadow-sm daisy-border daisy-border-base-300"
+        class="daisy-card bg-base-100 shadow-sm border border-base-300"
       >
-        <div class="daisy-card-body daisy-items-center daisy-text-center">
+        <div class="daisy-card-body items-center text-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="daisy-h-16 daisy-w-16 daisy-text-success daisy-mb-2"
+            class="h-16 w-16 text-success mb-2"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -147,19 +147,21 @@
               d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <h3 class="daisy-text-lg daisy-font-medium">All Clear!</h3>
-          <p class="daisy-text-base-content/60">No failure reports found.</p>
+          <h3 class="text-lg font-medium">All Clear!</h3>
+          <p class="text-base-content/60">No failure reports found.</p>
         </div>
       </div>
     </div>
 
     <dialog
+      ref="deleteDialogRef"
       class="daisy-modal"
       :class="{ 'daisy-modal-open': showDeleteModal }"
+      @close="showDeleteModal = false"
     >
       <div class="daisy-modal-box">
-        <h3 class="daisy-font-bold daisy-text-lg">Confirm Deletion</h3>
-        <p class="daisy-py-4">
+        <h3 class="font-bold text-lg">Confirm Deletion</h3>
+        <p class="py-4">
           Are you sure you want to delete {{ selectedFailureReports.length }}
           failure report{{ selectedFailureReports.length > 1 ? "s" : "" }}? This
           action cannot be undone.
@@ -181,6 +183,7 @@
 </template>
 
 <script setup lang="ts">
+import { useDaisyDialog } from "@/composables/useDaisyDialog"
 import { ref, computed, watch, nextTick, onMounted } from "vue"
 import type { FailureReport } from "@generated/doughnut-backend-api"
 import { FailureReportController } from "@generated/doughnut-backend-api/sdk.gen"
@@ -192,6 +195,8 @@ const failureReports = ref<FailureReport[] | null>(null)
 const errorMessage = ref<string | null>(null)
 const selectedFailureReports = ref<number[]>([])
 const showDeleteModal = ref(false)
+const deleteDialogRef = ref<HTMLDialogElement | null>(null)
+useDaisyDialog(showDeleteModal, deleteDialogRef)
 const selectAllCheckboxRef = ref<HTMLInputElement | null>(null)
 
 const allFailureReportsSelected = computed(() => {

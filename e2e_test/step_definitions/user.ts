@@ -43,13 +43,18 @@ Given("I'm on the login page", () => {
 })
 
 When('I identify myself as a new user', () => {
+  cy.intercept('GET', '/api/healthcheck').as('devLoginHealthcheck')
   cy.get('#username').type('user')
   cy.get('#password').type('password')
-  cy.get('form').submit()
+  cy.get('#login-button').click()
+  cy.wait('@devLoginHealthcheck')
 })
 
-When('I should be asked to create my profile', () => {
-  cy.get('body').should('contain', 'Please create your profile')
+Then('I should be asked to create my profile', () => {
+  cy.findByRole('heading', {
+    name: /Please create your profile/i,
+    timeout: 15000,
+  }).should('be.visible')
 })
 
 When('I save my profile with:', (data: DataTable) => {

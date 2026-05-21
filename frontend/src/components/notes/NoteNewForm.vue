@@ -1,13 +1,13 @@
 <template>
-  <div class="daisy-card daisy-w-full">
+  <div class="daisy-card w-full">
     <div class="daisy-card-body">
       <form data-testid="note-new-form" @submit.prevent="processForm">
         <fieldset :disabled="processing">
-          <div class="daisy-mb-4">
-            <p class="daisy-text-sm daisy-mb-2">
+          <div class="mb-4">
+            <p class="text-sm mb-2">
               Folder
             </p>
-            <p class="daisy-text-xs daisy-opacity-70 daisy-mb-2">
+            <p class="text-xs opacity-70 mb-2">
               {{ parentLocationDescription }}
             </p>
             <FolderSelector
@@ -48,7 +48,7 @@
           <input
             type="submit"
             value="Submit"
-            class="daisy-btn daisy-btn-primary daisy-mt-4"
+            class="daisy-btn daisy-btn-primary mt-4"
           />
         </fieldset>
       </form>

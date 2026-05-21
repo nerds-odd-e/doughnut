@@ -1,11 +1,11 @@
 <template>
   <div
-    class="content daisy-h-full"
+    class="content h-full"
     :class="{ 'quiz--contestable': showContestableDummyInput }"
   >
     <ContentLoader v-if="!currentQuestionFetched || isCurrentMemoryTrackerFetching" />
     <template v-else>
-      <div class="daisy-pt-5 daisy-h-full">
+      <div class="pt-5 h-full">
       <SpellingQuestionDisplay
         v-if="currentMemoryTracker?.spelling"
         v-bind="{
@@ -24,7 +24,7 @@
           />
         </div>
         <template v-else>
-         <div class="notebook-source daisy-mb-4">
+         <div class="notebook-source mb-4">
             <NotebookLink :notebook="currentRecallPrompt.notebook" />
           </div>
           <ContestableQuestion
@@ -45,7 +45,7 @@
     >
       <input
         type="text"
-        class="daisy-input daisy-input-bordered daisy-w-full"
+        class="daisy-input w-full"
         readonly
         tabindex="-1"
       />
@@ -241,7 +241,7 @@ $contestable-dummy-input-reserve: calc(
   background-color: hsl(var(--b1));
 }
 
-@media (max-width: theme("screens.lg")) {
+@media (max-width: 1024px) {
   .contestable-dummy-input-bar {
     left: 0;
   }

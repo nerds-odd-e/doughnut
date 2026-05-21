@@ -4,11 +4,11 @@
     @showSettings="showSettings = !showSettings"
   >
     <template #buttons>
-      <div class="btn-group-wrapper daisy-relative" style="overflow: visible;">
-        <div class="btn-group">
+      <div class="btn-group-wrapper relative" style="overflow: visible;">
+        <div class="daisy-btn-group">
           <template v-if="previousAnsweredQuestionCursor !== undefined">
             <button
-              class="btn large-btn"
+              class="daisy-btn large-btn"
               title="view previous answered question"
               :disabled="finished === 0 || previousAnsweredQuestionCursor === 0"
               @click="
@@ -20,17 +20,17 @@
                 )
               "
             >
-              <SkipBack class="daisy-w-8 daisy-h-8" />
+              <SkipBack class="w-8 h-8" />
             </button>
           </template>
           <button
             v-else
-            class="btn large-btn"
+            class="daisy-btn large-btn"
             title="view last answered question"
             :disabled="finished === 0"
             @click="$emit('viewLastAnsweredQuestion', finished - 1)"
           >
-            <Pause class="daisy-w-8 daisy-h-8 daisy-text-green-600" />
+            <Pause class="w-8 h-8 text-green-600" />
           </button>
         </div>
         <RecallSessionOptionsDialog
@@ -51,7 +51,7 @@
       </div>
     </template>
     <template #cogIcon>
-      <Settings class="daisy-w-6 daisy-h-6" />
+      <Settings class="w-6 h-6" />
     </template>
   </ProgressBar>
 </template>
@@ -59,7 +59,7 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import ProgressBar from "../commons/ProgressBar.vue"
-import { Pause, Settings, SkipBack } from "lucide-vue-next"
+import { Pause, Settings, SkipBack } from "@lucide/vue"
 import RecallSessionOptionsDialog from "./RecallSessionOptionsDialog.vue"
 
 import type { RecallPrompt } from "@generated/doughnut-backend-api"

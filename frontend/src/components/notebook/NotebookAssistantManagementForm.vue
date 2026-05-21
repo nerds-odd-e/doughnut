@@ -1,5 +1,5 @@
 <template>
-  <h4 class="daisy-text-lg">Notebook Assistant Management</h4>
+  <h4 class="text-lg">Notebook Assistant Management</h4>
 
   <!-- AI Instructions Form -->
   <form @submit.prevent="updateAiInstructions">

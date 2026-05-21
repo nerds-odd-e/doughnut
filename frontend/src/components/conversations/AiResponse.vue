@@ -1,16 +1,16 @@
 <template>
-  <div v-if="currentAiReply" class="daisy-flex daisy-mb-3">
-    <div class="message-avatar daisy-me-2" title="AI Assistant">
-      <Bot class="daisy-w-6 daisy-h-6" />
+  <div v-if="currentAiReply" class="flex mb-3">
+    <div class="message-avatar me-2" title="AI Assistant">
+      <Bot class="w-6 h-6" />
     </div>
-    <div class="daisy-card daisy-py-2 daisy-px-3 daisy-bg-light ai-chat"
+    <div class="daisy-card py-2 px-3 bg-base-200 ai-chat"
     v-html="markdowntToHtml(currentAiReply)"
     />
   </div>
 
-  <div v-if="currentSuggestion" class="daisy-flex daisy-mb-3">
-    <div class="message-avatar daisy-me-2" title="AI Assistant">
-      <Bot class="daisy-w-6 daisy-h-6" />
+  <div v-if="currentSuggestion" class="flex mb-3">
+    <div class="message-avatar me-2" title="AI Assistant">
+      <Bot class="w-6 h-6" />
     </div>
     <ToolCallHandler
       v-if="currentSuggestion"
@@ -21,15 +21,13 @@
     />
   </div>
 
-  <div v-if="lastErrorMessage" class="last-error-message daisy-text-danger daisy-mb-3">
+  <div v-if="lastErrorMessage" class="last-error-message text-error mb-3">
     {{ lastErrorMessage }}
   </div>
 
-  <div v-if="aiStatus" class="daisy-flex daisy-align-items-center status-bar daisy-mb-3">
-    <div class="daisy-spinner-border daisy-spinner-border-sm daisy-me-2" role="status">
-      <span class="daisy-sr-only">Loading...</span>
-    </div>
-    <small class="daisy-text-secondary">{{ aiStatus }}</small>
+  <div v-if="aiStatus" class="flex items-center status-bar mb-3">
+    <span class="daisy-loading daisy-loading-spinner daisy-loading-sm me-2" role="status" />
+    <small class="text-base-content/70">{{ aiStatus }}</small>
   </div>
 </template>
 
@@ -37,7 +35,7 @@
 import { ref, computed, watch } from "vue"
 import type { Conversation } from "@generated/doughnut-backend-api"
 import type { ToolCallResult } from "@/models/aiReplyState"
-import { Bot } from "lucide-vue-next"
+import { Bot } from "@lucide/vue"
 import markdownizer from "../form/markdownizer"
 import {
   createAiReplyStates,

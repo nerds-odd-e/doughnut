@@ -1,43 +1,44 @@
 <template>
   <footer
-    class="assimilation-settings-bar daisy-pointer-events-none daisy-z-40"
+    class="assimilation-settings-bar pointer-events-none z-40"
     aria-label="Assimilation settings"
   >
     <div
-      class="assimilation-settings-inner daisy-pointer-events-auto daisy-w-full daisy-px-4 daisy-pb-[max(0.75rem,env(safe-area-inset-bottom))] daisy-pt-0"
+      class="assimilation-settings-inner pointer-events-auto w-full px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-0"
     >
       <div
-        class="daisy-card daisy-bg-base-100 daisy-border daisy-border-base-300 daisy-shadow-xl"
+        class="daisy-card bg-base-100 border border-base-300 shadow-xl"
       >
-        <div class="daisy-card-body daisy-gap-0 daisy-p-4">
-          <h2 class="daisy-card-title daisy-mb-3 daisy-text-base daisy-font-semibold">
+        <div class="daisy-card-body gap-0 p-4">
+          <h2 class="daisy-card-title mb-3 text-base font-semibold">
             Assimilation settings
           </h2>
           <div
-            class="assimilation-settings-scroll daisy-max-h-[min(40vh,22rem)] daisy-overflow-y-auto daisy-pr-1"
+            class="assimilation-settings-scroll max-h-[min(40vh,22rem)] overflow-y-auto pr-1"
           >
             <NoteInfoBar
               :note-id="note.id"
+              :note="note"
               @level-changed="emit('levelChanged', $event)"
               @remember-spelling-changed="emit('rememberSpellingChanged', $event)"
               @note-recall-info-loaded="emit('noteRecallInfoLoaded', $event)"
             />
           </div>
-          <div class="daisy-divider daisy-my-4" />
+          <div class="daisy-divider my-4" />
           <div
-            class="daisy-flex daisy-flex-col daisy-gap-3 sm:daisy-flex-row sm:daisy-items-center sm:daisy-justify-between"
+            class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
           >
             <button
               v-if="(note.content ?? '').trim()"
               type="button"
               data-test="open-refine-note-modal"
-              class="daisy-btn daisy-btn-neutral daisy-shrink-0"
+              class="daisy-btn daisy-btn-neutral shrink-0"
               @click="showRefineNoteModal = true"
             >
               Refine note
             </button>
             <div
-              class="daisy-flex daisy-flex-wrap daisy-items-stretch daisy-justify-end daisy-gap-2 sm:daisy-flex-1"
+              class="flex flex-wrap items-stretch justify-end gap-2 sm:flex-1"
             >
               <AssimilationButtons
                 :disabled="!noteInfoLoaded"
@@ -53,16 +54,18 @@
   <Teleport to="body">
     <dialog
       v-if="(note.content ?? '').trim()"
+      ref="refineNoteDialogRef"
       class="daisy-modal"
       :class="{ 'daisy-modal-open': showRefineNoteModal }"
       data-test="refine-note-modal"
+      @close="closeRefineNoteModal"
     >
       <div
-        class="daisy-modal-box daisy-max-w-4xl daisy-max-h-[90vh] daisy-overflow-y-auto"
+        class="daisy-modal-box max-w-4xl max-h-[90vh] overflow-y-auto"
       >
         <h3
           v-if="showRefineNoteModal"
-          class="daisy-font-bold daisy-text-lg daisy-mb-3"
+          class="font-bold text-lg mb-3"
         >
           Refine note
         </h3>
@@ -73,7 +76,7 @@
           @content-updated="emit('refinementContentUpdated')"
           @understanding-points-ignored="closeRefineNoteModal"
         />
-        <div v-if="showRefineNoteModal" class="daisy-modal-action daisy-mt-4">
+        <div v-if="showRefineNoteModal" class="daisy-modal-action mt-4">
           <button
             type="button"
             class="daisy-btn"
@@ -96,6 +99,7 @@ import type { Note, NoteRecallInfo } from "@generated/doughnut-backend-api"
 import NoteInfoBar from "../notes/NoteInfoBar.vue"
 import AssimilationButtons from "./AssimilationButtons.vue"
 import NoteRefinement from "./NoteRefinement.vue"
+import { useDaisyDialog } from "@/composables/useDaisyDialog"
 import { ref, watch } from "vue"
 
 const { note, noteInfoLoaded, keepForRecallDisabled } = defineProps<{
@@ -113,6 +117,8 @@ const emit = defineEmits<{
 }>()
 
 const showRefineNoteModal = ref(false)
+const refineNoteDialogRef = ref<HTMLDialogElement | null>(null)
+useDaisyDialog(showRefineNoteModal, refineNoteDialogRef)
 
 watch(
   () => note.id,
@@ -147,7 +153,7 @@ const closeRefineNoteModal = () => {
   }
 }
 
-@media (min-height: $assimilation-dock-min-height) and (max-width: theme("screens.lg")) {
+@media (min-height: $assimilation-dock-min-height) and (max-width: 1024px) {
   .assimilation-settings-bar {
     left: 0;
   }

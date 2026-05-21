@@ -162,7 +162,7 @@ describe("Assimilation component", () => {
       const opaqueLayer = getOpaqueContentBlocker()
       expect(opaqueLayer).not.toBeNull()
       expect(opaqueLayer?.style.zIndex).toBe("9989")
-      expect(opaqueLayer?.className).toContain("daisy-bg-black")
+      expect(opaqueLayer?.className).toContain("bg-black")
     })
 
     it("hides opaque layer when spelling popup closes", async () => {

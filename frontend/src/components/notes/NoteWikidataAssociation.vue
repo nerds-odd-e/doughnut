@@ -1,17 +1,17 @@
 <template>
   <button
-    class="daisy-btn daisy-btn-sm daisy-btn-ghost daisy-gap-2"
+    class="daisy-btn daisy-btn-sm daisy-btn-ghost gap-2"
     role="button"
     title="Wiki Association"
     @click="onClickWikidata"
   >
-    <Link2 class="daisy-w-6 daisy-h-6" />
+    <Link2 class="w-6 h-6" />
     Go to Wikidata
   </button>
 </template>
 
 <script setup lang="ts">
-import { Link2 } from "lucide-vue-next"
+import { Link2 } from "@lucide/vue"
 import { WikidataController } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import nonBlockingPopup from "@/managedApi/window/nonBlockingPopup"

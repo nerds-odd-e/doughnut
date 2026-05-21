@@ -1,7 +1,7 @@
 <template>
   <PopButton title="New notebook" :btn-class="btnClass">
     <template #button_face>
-      <BookPlus class="daisy-w-6 daisy-h-6" />
+      <BookPlus class="w-6 h-6" />
       <slot />
     </template>
     <NotebookNewForm :circle="circle" />
@@ -14,7 +14,7 @@ import type { PropType } from "vue"
 import { defineComponent } from "vue"
 import PopButton from "../commons/Popups/PopButton.vue"
 import NotebookNewForm from "./NotebookNewForm.vue"
-import { BookPlus } from "lucide-vue-next"
+import { BookPlus } from "@lucide/vue"
 
 export default defineComponent({
   props: {

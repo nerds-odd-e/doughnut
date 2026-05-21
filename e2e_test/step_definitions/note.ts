@@ -483,7 +483,7 @@ When(
 )
 
 Then('there should be no more undo to do', () => {
-  cy.get('.btn[title="undo"]').should('not.exist')
+  cy.get('.daisy-btn[title^="undo"]').should('not.exist')
 })
 
 Then('I type {string} in the title', (content: string) => {

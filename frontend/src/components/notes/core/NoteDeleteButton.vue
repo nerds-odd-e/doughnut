@@ -1,13 +1,13 @@
 <template>
   <button title="Delete note" @click="deleteNote">
-    <Trash2 class="daisy-w-6 daisy-h-6" />Delete note
+    <Trash2 class="w-6 h-6" />Delete note
   </button>
 </template>
 
 <script setup lang="ts">
 import { useRouter } from "vue-router"
 import usePopups from "../../commons/Popups/usePopups"
-import { Trash2 } from "lucide-vue-next"
+import { Trash2 } from "@lucide/vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import type { NoteDeleteReferenceHandling } from "@/store/StoredApiCollection"
 

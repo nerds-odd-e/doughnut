@@ -20,7 +20,6 @@ if (typeof process === "undefined") {
 
 // Import CSS for proper rendering with Tailwind and DaisyUI
 import "../src/assets/daisyui.css"
-import "../src/index.css"
 
 import { vi } from "vitest"
 import createFetchMock from "vitest-fetch-mock"

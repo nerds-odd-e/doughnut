@@ -11,22 +11,33 @@ const understandingChecklist = () =>
   cy
     .get('[data-test="refine-note-modal"]')
     .contains('Understanding Checklist:')
-    .closest('.daisy-bg-accent')
+    .closest('.bg-accent')
 
-const mainNoteTitle = () =>
-  cy.get('#main-note-content [data-test="note-title"]', { timeout: 15000 })
+const mainNoteHeadingTitleSelector =
+  '#main-note-content h2.path-name-heading [role=title], #main-note-content [data-test="note-title"]'
+
+function waitForAssimilationNoteTitle(expectedTitle?: string) {
+  pageIsNotLoading()
+  cy.get('#main-note-content', { timeout: 15000 }).should('be.visible')
+  const title = cy.get(mainNoteHeadingTitleSelector, { timeout: 15000 })
+  if (expectedTitle !== undefined && expectedTitle.trim() !== '') {
+    title.should('contain', expectedTitle.trim())
+  } else {
+    title.should('exist')
+  }
+}
 
 export const assumeAssimilationPage = () => ({
   expectToAssimilateAndTotal(toAssimilateAndTotal: string) {
     const [assimilatedTodayCount, toAssimilateCountForToday, totalCount] =
       toAssimilateAndTotal.split('/')
 
-    cy.get('.daisy-progress-bar').should(
+    cy.get('.progress-bar').should(
       'contain',
       `Assimilating: ${assimilatedTodayCount}/${toAssimilateCountForToday}`
     )
     // Click progress bar to show tooltip
-    cy.get('.daisy-progress-bar').first().click()
+    cy.get('.progress-bar').first().click()
 
     // Check tooltip content
     cy.get('.tooltip-content').within(() => {
@@ -61,7 +72,8 @@ export const assumeAssimilationPage = () => ({
     return this
   },
   assimilateWithSpellingOption() {
-    cy.get('[data-test="note-title"]')
+    waitForAssimilationNoteTitle()
+    cy.get(mainNoteHeadingTitleSelector)
       .first()
       .invoke('text')
       .then((noteTitle: string) => {
@@ -85,7 +97,8 @@ export const assumeAssimilationPage = () => ({
     } else {
       switch (assimilationType) {
         case 'single note': {
-          if (title) mainNoteTitle().should('contain', title)
+          waitForAssimilationNoteTitle(title)
+          this.waitForAssimilationReady()
           if (additionalInfo) {
             cy.get('.note-content').should('contain', additionalInfo)
           }
@@ -93,6 +106,8 @@ export const assumeAssimilationPage = () => ({
         }
 
         case 'image note': {
+          waitForAssimilationNoteTitle()
+          this.waitForAssimilationReady()
           if (additionalInfo) {
             const [expectedBodyText, expectedImage] = commonSenseSplit(
               additionalInfo,
@@ -113,9 +128,15 @@ export const assumeAssimilationPage = () => ({
               additionalInfo,
               '; '
             )
-            if (title) mainNoteTitle().should('contain', title)
-            if (targetNote) mainNoteTitle().should('contain', targetNote)
-            if (relationType) mainNoteTitle().should('contain', relationType)
+            if (title) waitForAssimilationNoteTitle(title)
+            if (targetNote) waitForAssimilationNoteTitle(targetNote)
+            if (relationType) {
+              cy.get(mainNoteHeadingTitleSelector).should(
+                'contain',
+                relationType
+              )
+            }
+            this.waitForAssimilationReady()
           }
           break
         }
@@ -274,6 +295,7 @@ export const assimilation = () => {
       getAssimilateListItemInSidebar(($el) => {
         $el.click()
       })
+      pageIsNotLoading()
       return assumeAssimilationPage()
     },
   }

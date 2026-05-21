@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import loginOrRegisterAndHaltThisThread from "@/managedApi/window/loginOrRegisterAndHaltThisThread"
-import { KeyRound } from "lucide-vue-next"
+import { KeyRound } from "@lucide/vue"
 import { defineComponent } from "vue"
 
 export default defineComponent({

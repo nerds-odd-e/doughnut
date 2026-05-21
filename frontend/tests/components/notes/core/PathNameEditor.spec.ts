@@ -36,7 +36,7 @@ describe("PathNameEditor.vue", () => {
       attachTo: document.body,
     })
     await emitEditorValue(wrapper, "x/y")
-    const warn = wrapper.find(".daisy-text-warning")
+    const warn = wrapper.find(".text-warning")
     expect(warn.exists()).toBe(true)
     expect(warn.text()).toContain(
       "'/' was replaced with fullwidth '／' (the only separator between alternative title spellings)"
@@ -50,7 +50,7 @@ describe("PathNameEditor.vue", () => {
       attachTo: document.body,
     })
     await emitEditorValue(wrapper, "see #tag")
-    const warn = wrapper.find(".daisy-text-warning")
+    const warn = wrapper.find(".text-warning")
     expect(warn.exists()).toBe(true)
     expect(warn.text()).toContain(
       "Links will not work with names containing any of `#^[]|`"
@@ -67,8 +67,8 @@ describe("PathNameEditor.vue", () => {
       attachTo: document.body,
     })
     await emitEditorValue(wrapper, "bad|name")
-    expect(wrapper.find(".daisy-text-error").text()).toBe("Name already taken")
-    expect(wrapper.find(".daisy-text-warning").exists()).toBe(false)
+    expect(wrapper.find(".text-error").text()).toBe("Name already taken")
+    expect(wrapper.find(".text-warning").exists()).toBe(false)
     wrapper.unmount()
   })
 
@@ -78,9 +78,9 @@ describe("PathNameEditor.vue", () => {
       attachTo: document.body,
     })
     await emitEditorValue(wrapper, "a:b")
-    expect(wrapper.find(".daisy-text-warning").exists()).toBe(true)
+    expect(wrapper.find(".text-warning").exists()).toBe(true)
     await emitEditorValue(wrapper, "a：bx")
-    expect(wrapper.find(".daisy-text-warning").exists()).toBe(false)
+    expect(wrapper.find(".text-warning").exists()).toBe(false)
     wrapper.unmount()
   })
 
@@ -90,7 +90,7 @@ describe("PathNameEditor.vue", () => {
       attachTo: document.body,
     })
     await emitEditorValue(wrapper, "a|b:c")
-    const warn = wrapper.find(".daisy-text-warning").text()
+    const warn = wrapper.find(".text-warning").text()
     expect(warn).toContain("fullwidth")
     expect(warn).toContain("Links will not work")
     wrapper.unmount()
@@ -103,7 +103,7 @@ describe("PathNameEditor.vue", () => {
     })
     await emitEditorValue(wrapper, "x/y:z")
     expect(wrapper.emitted("update:modelValue")?.at(-1)?.[0]).toBe("x/y:z")
-    expect(wrapper.find(".daisy-text-warning").exists()).toBe(false)
+    expect(wrapper.find(".text-warning").exists()).toBe(false)
     wrapper.unmount()
   })
 

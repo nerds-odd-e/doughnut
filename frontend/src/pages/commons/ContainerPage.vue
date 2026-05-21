@@ -1,9 +1,9 @@
 <template>
   <GlobalBar v-if="title">
-    <h2 class="fs-4 daisy-text-2xl">{{ title }}</h2>
+    <h2 class="fs-4 text-2xl">{{ title }}</h2>
   </GlobalBar>
 
-  <div class="daisy-mx-auto daisy-min-w-0 daisy-container daisy-mt-3">
+  <div class="mx-auto min-w-0 container mt-3">
     <ContentLoader v-if="!contentLoaded" />
     <template v-else>
       <slot />

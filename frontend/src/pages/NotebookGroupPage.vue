@@ -10,17 +10,17 @@
   />
   <main
     v-else-if="user !== undefined"
-    class="daisy-container daisy-mx-auto daisy-max-w-3xl daisy-px-4 daisy-py-6"
+    class="container mx-auto max-w-3xl px-4 py-6"
   >
     <div
-      class="daisy-rounded-box daisy-border daisy-border-dashed daisy-border-base-300 daisy-bg-base-200/30 daisy-px-6 daisy-py-10 daisy-text-center"
+      class="rounded-box border border-dashed border-base-300 bg-base-200/30 px-6 py-10 text-center"
     >
-      <p class="daisy-m-0 daisy-text-base daisy-text-base-content/70">
+      <p class="m-0 text-base text-base-content/70">
         This notebook group could not be found.
       </p>
       <router-link
         :to="{ name: 'notebooks' }"
-        class="daisy-btn daisy-btn-link daisy-btn-sm daisy-mt-3 daisy-inline-block"
+        class="daisy-btn daisy-btn-link daisy-btn-sm mt-3 inline-block"
       >
         Back to My notebooks
       </router-link>

@@ -1,11 +1,11 @@
 <template>
   <h1
     v-if="!editingNotebookName"
-    class="daisy-text-xl daisy-font-semibold daisy-text-base-content daisy-m-0 daisy-inline-block daisy-max-w-full"
+    class="text-xl font-semibold text-base-content m-0 inline-block max-w-full"
   >
     <button
       type="button"
-      class="daisy-btn daisy-btn-ghost daisy-h-auto daisy-min-h-0 daisy-p-0 daisy-normal-case daisy-text-xl daisy-font-semibold daisy-text-base-content daisy-justify-start daisy-text-left"
+      class="daisy-btn daisy-btn-ghost h-auto min-h-0 p-0 normal-case text-xl font-semibold text-base-content justify-start text-left"
       title="Click to rename notebook"
       data-testid="notebook-page-name-edit"
       @click="startEditingNotebookName"
@@ -15,12 +15,12 @@
   </h1>
   <div
     v-else
-    class="daisy-flex daisy-flex-col daisy-gap-2 daisy-w-full"
+    class="flex flex-col gap-2 w-full"
     data-testid="notebook-page-name-edit-row"
     @keydown.escape.prevent="cancelEditingNotebookName"
   >
     <p
-      class="daisy-text-sm daisy-text-base-content/80 daisy-m-0"
+      class="text-sm text-base-content/80 m-0"
       data-testid="notebook-page-name-rename-warning"
     >
       If you change this notebook&apos;s name, links from other notebooks to notes here may

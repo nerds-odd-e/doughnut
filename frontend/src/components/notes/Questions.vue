@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="daisy-flex daisy-gap-2">
+    <div class="flex gap-2">
       <PopButton btn-class="daisy-btn daisy-btn-primary" title="Add Question">
         <template #default="{ closer }">
           <NoteAddQuestion
@@ -18,10 +18,10 @@
         aria-label="Export question generation request"
         title="Export question generation request for ChatGPT"
       >
-        <Upload class="daisy-w-6 daisy-h-6" />
+        <Upload class="w-6 h-6" />
       </button>
     </div>
-    <table class="question-table daisy-mt-2" v-if="questions.length">
+    <table class="question-table mt-2" v-if="questions.length">
       <thead>
         <tr>
           <th>Question Text</th>
@@ -56,7 +56,7 @@
         </tr>
       </tbody>
     </table>
-    <div v-else class="daisy-mt-2 daisy-w-full daisy-text-center">
+    <div v-else class="mt-2 w-full text-center">
       <b>No questions</b>
     </div>
   </div>
@@ -75,7 +75,7 @@ import { PredefinedQuestionController } from "@generated/doughnut-backend-api/sd
 import NoteAddQuestion from "./NoteAddQuestion.vue"
 import QuestionExportDialog from "./QuestionExportDialog.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
-import { Upload } from "lucide-vue-next"
+import { Upload } from "@lucide/vue"
 
 const props = defineProps({
   note: {

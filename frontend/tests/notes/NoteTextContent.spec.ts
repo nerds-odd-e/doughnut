@@ -251,7 +251,7 @@ describe("in place edit on title", () => {
     })
 
     it("should display error when saving failed", async () => {
-      expect(wrapper.find(".path-name-editor .daisy-text-error").text()).toBe(
+      expect(wrapper.find(".path-name-editor .text-error").text()).toBe(
         "size must be between 1 and 100"
       )
     })
@@ -259,9 +259,7 @@ describe("in place edit on title", () => {
     it("should clean up errors when editing", async () => {
       await editTitleThenBlur(wrapper)
       await flushPromises()
-      expect(
-        wrapper.findAll(".path-name-editor .daisy-text-error")
-      ).toHaveLength(0)
+      expect(wrapper.findAll(".path-name-editor .text-error")).toHaveLength(0)
       expect(mockedUpdateTitleCall).toBeCalledTimes(2)
     })
   })
@@ -278,9 +276,9 @@ describe("in place edit on title", () => {
     })
 
     it("displays the reserved title error in the title field", async () => {
-      expect(
-        wrapper.find(".path-name-editor .daisy-text-error").text()
-      ).toContain("reserved")
+      expect(wrapper.find(".path-name-editor .text-error").text()).toContain(
+        "reserved"
+      )
     })
   })
 
@@ -330,7 +328,7 @@ describe("in place edit on title", () => {
       )
       await editTitleThenBlur(wrapper)
       await flushPromises()
-      expect(wrapper.find(".path-name-editor .daisy-text-error").text()).toBe(
+      expect(wrapper.find(".path-name-editor .text-error").text()).toBe(
         "You are not authorized to edit this note. Perhaps you are not logged in?"
       )
     })

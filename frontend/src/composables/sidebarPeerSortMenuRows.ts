@@ -5,7 +5,7 @@ import {
   CalendarArrowUp,
   ClockArrowDown,
   ClockArrowUp,
-} from "lucide-vue-next"
+} from "@lucide/vue"
 import type { SidebarPeerSortSpec } from "@/composables/useNoteSidebarPeerSort"
 
 export type SidebarPeerSortMenuRow = {

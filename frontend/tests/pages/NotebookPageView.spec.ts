@@ -90,7 +90,7 @@ describe("NotebookPageView.spec", () => {
       .mount()
 
     await wrapper.find("[name='description']").setValue("Saved blurb")
-    await wrapper.find("button.daisy-btn-primary.daisy-mt-4").trigger("click")
+    await wrapper.find("button.daisy-btn-primary.mt-4").trigger("click")
     await flushPromises()
 
     expect(updateSpy).toHaveBeenCalledWith(

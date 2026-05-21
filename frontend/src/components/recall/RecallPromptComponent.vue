@@ -1,5 +1,5 @@
 <template>
-  <div class="daisy-relative">
+  <div class="relative">
     <QuestionDisplay
       v-if="recallPrompt.multipleChoicesQuestion"
       v-bind="{
@@ -10,13 +10,13 @@
       :disabled="isLoading || isAnswered"
     />
 
-    <div v-if="isAnswered" data-test="answered-overlay" class="daisy-absolute daisy-inset-0 daisy-bg-base-100/80 daisy-z-50">
-      <div v-if="isLoading" class="daisy-flex daisy-justify-center daisy-items-center daisy-h-full">
+    <div v-if="isAnswered" data-test="answered-overlay" class="absolute inset-0 bg-base-100/80 z-50">
+      <div v-if="isLoading" class="flex justify-center items-center h-full">
         <span class="daisy-loading daisy-loading-spinner daisy-loading-lg"></span>
       </div>
     </div>
 
-    <div v-if="error" class="daisy-alert daisy-alert-error daisy-mt-4">
+    <div v-if="error" class="daisy-alert daisy-alert-error mt-4">
       <span>{{ error }}</span>
     </div>
   </div>

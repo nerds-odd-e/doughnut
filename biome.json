@@ -16,6 +16,7 @@
       "!**/.idea",
       "!**/.vscode",
       "!**/dist",
+      "!**/storybook-static",
       "!**/gradle",
       "!**/node_modules",
       "!**/*.md",

@@ -6,10 +6,10 @@
       :to="{ name: 'notebookPage', params: { notebookId: notebook.id } }"
       class="no-underline"
     >
-      <div :class="compact ? 'daisy-p-2' : 'daisy-p-4'">
+      <div :class="compact ? 'p-2' : 'p-4'">
         <h5
-          class="daisy-font-semibold"
-          :class="compact ? 'daisy-text-sm' : 'daisy-text-lg'"
+          class="font-semibold"
+          :class="compact ? 'text-sm' : 'text-lg'"
         >
           {{ notebook.name }}
         </h5>

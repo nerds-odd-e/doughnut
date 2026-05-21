@@ -1,16 +1,16 @@
 <template>
   <div
     role="card"
-    class="daisy-card daisy-bg-base-100 daisy-shadow-xl hover:daisy-shadow-2xl hover:daisy-bg-base-300 daisy-transition-all"
+    class="daisy-card bg-base-100 shadow-xl hover:shadow-2xl hover:bg-base-300 transition-all"
   >
     <slot name="cardHeader" />
-      <div class="daisy-card-body daisy-p-4">
-    <router-link :to="noteShowLocation" class="daisy-no-underline">
+      <div class="daisy-card-body p-4">
+    <router-link :to="noteShowLocation" class="no-underline">
         <h5 class="daisy-card-title">
           <NoteTitleWithLink v-bind="{ noteTopology }" />
         </h5>
     </router-link>
-    <div class="daisy-card-actions daisy-justify-end" v-if="$slots.button">
+    <div class="daisy-card-actions justify-end" v-if="$slots.button">
       <slot name="button" :note-title="noteTopology" />
     </div>
       </div>

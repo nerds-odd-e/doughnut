@@ -1,18 +1,18 @@
 <template>
   <li
     role="listitem"
-    class="daisy-flex daisy-flex-row daisy-items-start daisy-gap-2 daisy-border-b daisy-border-base-300 daisy-py-2 daisy-px-1 last:daisy-border-b-0 hover:daisy-bg-base-200 daisy-transition-colors"
+    class="flex flex-row items-start gap-2 border-b border-base-300 py-2 px-1 last:border-b-0 hover:bg-base-200 transition-colors"
     :class="{
-      'different-notebook-border daisy-border-l-primary': isDifferentNotebook,
+      'different-notebook-border border-l-primary': isDifferentNotebook,
     }"
   >
     <div
-      class="search-hit-kind-icon daisy-flex daisy-w-5 daisy-shrink-0 daisy-items-start daisy-justify-center daisy-pt-0.5 daisy-text-base-content/50"
+      class="search-hit-kind-icon flex w-5 shrink-0 items-start justify-center pt-0.5 text-base-content/50"
       aria-hidden="true"
     >
-      <component :is="kindIcon" :size="14" class="daisy-block" />
+      <component :is="kindIcon" :size="14" class="block" />
     </div>
-    <div class="daisy-min-w-0 daisy-flex-1">
+    <div class="min-w-0 flex-1">
       <div class="search-result-item-title">
         <NoteTitleWithLink
           v-if="searchHit.hitKind === 'NOTE' && searchHit.noteSearchResult"
@@ -31,7 +31,7 @@
               folderId: searchHit.folderId,
             },
           }"
-          class="folder-hit-title daisy-text-decoration-none"
+          class="folder-hit-title no-underline"
         >{{ searchHit.folderName }}</router-link>
         <span
           v-else-if="searchHit.hitKind === 'FOLDER'"
@@ -40,12 +40,12 @@
         <router-link
           v-else-if="searchHit.hitKind === 'NOTEBOOK' && searchHit.notebookId != null"
           :to="{ name: 'notebookPage', params: { notebookId: searchHit.notebookId } }"
-          class="notebook-hit-title daisy-text-decoration-none"
+          class="notebook-hit-title no-underline"
         >{{ searchHit.notebookName }}</router-link>
       </div>
       <div
         v-if="displayNotebookName || displayDistance != null"
-        class="search-hit-meta daisy-flex daisy-flex-row daisy-flex-wrap daisy-items-baseline daisy-gap-1"
+        class="search-hit-meta flex flex-row flex-wrap items-baseline gap-1"
       >
         <span v-if="displayNotebookName" class="notebook-name-label">{{
           displayNotebookName
@@ -54,23 +54,23 @@
       </div>
     </div>
     <div
-      class="daisy-ms-1 daisy-flex daisy-shrink-0 daisy-flex-col daisy-items-end daisy-gap-1 daisy-self-center"
+      class="ms-1 flex shrink-0 flex-col items-end gap-1 self-center"
     >
       <div
         v-if="$slots.button"
-        class="daisy-flex daisy-flex-row daisy-flex-wrap daisy-justify-end daisy-gap-1"
+        class="flex flex-row flex-wrap justify-end gap-1"
       >
         <slot name="button" />
       </div>
       <div
         v-if="$slots.folderButton"
-        class="daisy-flex daisy-flex-row daisy-flex-wrap daisy-justify-end daisy-gap-1"
+        class="flex flex-row flex-wrap justify-end gap-1"
       >
         <slot name="folderButton" />
       </div>
       <div
         v-if="$slots.notebookButton"
-        class="daisy-flex daisy-flex-row daisy-flex-wrap daisy-justify-end daisy-gap-1"
+        class="flex flex-row flex-wrap justify-end gap-1"
       >
         <slot name="notebookButton" />
       </div>
@@ -81,7 +81,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import type { RelationshipLiteralSearchHit } from "@generated/doughnut-backend-api"
-import { BookText, FileText, Folder } from "lucide-vue-next"
+import { BookText, FileText, Folder } from "@lucide/vue"
 import { computed, type Component } from "vue"
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
 

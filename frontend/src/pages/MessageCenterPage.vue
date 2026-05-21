@@ -1,10 +1,10 @@
 <template>
-  <div class="message-center-page daisy-h-full daisy-flex daisy-flex-col">
+  <div class="message-center-page h-full flex flex-col">
     <GlobalBar>
-      <h2 class="fs-4 daisy-text-2xl">Message Center</h2>
+      <h2 class="fs-4 text-2xl">Message Center</h2>
     </GlobalBar>
 
-    <div class="daisy-flex-1 daisy-min-h-0 daisy-mx-auto daisy-min-w-0 daisy-w-full">
+    <div class="flex-1 min-h-0 mx-auto min-w-0 w-full">
       <ContentLoader v-if="conversations === undefined" />
       <template v-else>
         <h2 v-if="!conversations?.length" class="info-heading">
@@ -18,10 +18,15 @@
                 v-for="conversation in conversations"
                 :key="conversation.id"
                 class="daisy-menu-item"
-                :class="{ 'daisy-active': conversationId === conversation.id }"
+                data-testid="message-center-conversation-item"
+                :data-conversation-subject="conversation.subject"
                 @click="selectConversation(conversation)"
               >
-                <div>{{ conversation.subject }}</div>
+                <div
+                  :class="{ 'daisy-menu-active': conversationId === conversation.id }"
+                >
+                  {{ conversation.subject }}
+                </div>
                 <div>{{ conversation.partnerName }}</div>
               </li>
             </ul>
@@ -56,7 +61,7 @@ import {} from "@/managedApi/clientSetup"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
-import { MessageCircle } from "lucide-vue-next"
+import { MessageCircle } from "@lucide/vue"
 import type {
   Conversation,
   ConversationListItem,
@@ -175,7 +180,7 @@ const handleConversationChanged = (conversationId: number) => {
   flex-direction: column;
 }
 
-@media (min-width: theme('screens.md')) {
+@media (min-width: 768px) {
   .message-center-container {
     flex-direction: row;
   }
@@ -242,7 +247,7 @@ const handleConversationChanged = (conversationId: number) => {
   background-color: #e9ecef;
 }
 
-@media (max-width: theme('screens.md')) {
+@media (max-width: 768px) {
   .hide-on-mobile {
     display: none !important;
   }

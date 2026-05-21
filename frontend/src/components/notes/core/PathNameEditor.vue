@@ -5,18 +5,18 @@
     :data-autofocus="autofocus ? 'true' : undefined"
     :data-autofocus-select-all="initialSelectAll ? 'true' : undefined"
   >
-    <div v-if="$slots.append" class="daisy-join daisy-w-full path-name-editor-join">
+    <div v-if="$slots.append" class="daisy-join w-full path-name-editor-join">
       <div
-        class="path-name-editor-join-editor daisy-join-item daisy-flex daisy-flex-1 daisy-min-w-0 daisy-items-center daisy-border daisy-border-base-content/20 daisy-bg-base-100 daisy-px-3 daisy-py-2 daisy-rounded-l-lg"
+        class="path-name-editor-join-editor daisy-join-item flex flex-1 min-w-0 items-center border border-base-content/20 bg-base-100 px-3 py-2 rounded-l-lg"
       >
-        <div class="daisy-w-full daisy-min-w-0">
+        <div class="w-full min-w-0">
           <slot name="title" :bindings="seamlessBindings" :editor="SeamlessTextEditor">
             <SeamlessTextEditor v-bind="seamlessBindings" />
           </slot>
         </div>
       </div>
       <div
-        class="path-name-editor-join-append daisy-join-item daisy-flex daisy-shrink-0 daisy-self-stretch daisy-items-stretch"
+        class="path-name-editor-join-append daisy-join-item flex shrink-0 self-stretch items-stretch"
       >
         <slot name="append" />
       </div>
@@ -24,9 +24,9 @@
 
     <div
       v-else-if="!$slots.title"
-      class="path-name-editor-shell daisy-w-full daisy-min-w-0 daisy-flex daisy-items-center daisy-border daisy-border-base-content/20 daisy-bg-base-100 daisy-px-3 daisy-py-2 daisy-rounded-lg"
+      class="path-name-editor-shell w-full min-w-0 flex items-center border border-base-content/20 bg-base-100 px-3 py-2 rounded-lg"
     >
-      <div class="daisy-w-full daisy-min-w-0">
+      <div class="w-full min-w-0">
         <SeamlessTextEditor v-bind="seamlessBindings" />
       </div>
     </div>
@@ -38,10 +38,10 @@
       :editor="SeamlessTextEditor"
     />
 
-    <div v-if="errorMessage" class="daisy-text-error daisy-text-sm">
+    <div v-if="errorMessage" class="text-error text-sm">
       {{ errorMessage }}
     </div>
-    <div v-else-if="displayWarning" class="daisy-text-warning daisy-text-sm">
+    <div v-else-if="displayWarning" class="text-warning text-sm">
       {{ displayWarning }}
     </div>
   </div>

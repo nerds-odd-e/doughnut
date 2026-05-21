@@ -67,7 +67,7 @@
 
 <script setup lang="ts">
 import type { Folder, NoteTopology } from "@generated/doughnut-backend-api"
-import { ChevronRight } from "lucide-vue-next"
+import { ChevronRight } from "@lucide/vue"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import SidebarInner from "./SidebarInner.vue"
 import { computed, ref, watch } from "vue"

@@ -1,7 +1,7 @@
 <template>
   <div
     data-note-sidebar-root
-    class="daisy-flex daisy-flex-col daisy-flex-1 daisy-min-h-0 daisy-overflow-x-visible"
+    class="flex flex-col flex-1 min-h-0 overflow-x-visible"
   >
     <SidebarToolbar
       v-if="!sidebarReadonly"
@@ -12,7 +12,7 @@
     />
     <div
       ref="treeScrollRef"
-      class="sidebar-tree-scroll daisy-overflow-y-auto daisy-flex-1 daisy-min-h-0"
+      class="sidebar-tree-scroll overflow-y-auto flex-1 min-h-0"
     >
       <SidebarNotebookTreeScrollportPathHint
         v-if="sidebarTreeShown && breadcrumbFolders.length > 0"

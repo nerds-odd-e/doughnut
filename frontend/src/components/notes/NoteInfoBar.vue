@@ -1,7 +1,7 @@
 <template>
   <NoteInfoComponent
-    v-if="noteRecallInfo && note"
-    :note="note"
+    v-if="noteRecallInfo && displayedNote"
+    :note="displayedNote"
     :note-recall-info="noteRecallInfo"
     @level-changed="$emit('levelChanged', $event)"
     @remember-spelling-changed="$emit('rememberSpellingChanged', $event)"
@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import type { NoteRecallInfo } from "@generated/doughnut-backend-api"
+import type { Note, NoteRecallInfo } from "@generated/doughnut-backend-api"
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import NoteInfoComponent from "./NoteInfoComponent.vue"
 import { ref, watch, computed } from "vue"
@@ -18,6 +18,7 @@ import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const props = defineProps<{
   noteId: number
+  note?: Note
 }>()
 
 const emit = defineEmits<{
@@ -29,8 +30,9 @@ const emit = defineEmits<{
 const noteRecallInfo = ref<NoteRecallInfo | undefined>(undefined)
 const storageAccessor = useStorageAccessor()
 
-const note = computed(
+const displayedNote = computed(
   () =>
+    props.note ??
     storageAccessor.value?.storedApi().getNoteRealmRef(props.noteId).value?.note
 )
 

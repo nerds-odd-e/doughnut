@@ -1,7 +1,7 @@
 <template>
   <div class="recently-recalled-notes">
     <ContentLoader v-if="!memoryTrackers" />
-    <table v-else class="table">
+    <table v-else class="daisy-table daisy-table-zebra w-full">
       <thead>
         <tr>
           <th>Note</th>

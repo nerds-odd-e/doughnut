@@ -185,11 +185,11 @@ describe("BookReadingContent AI reorganize suggest", () => {
     expect(rows).toHaveLength(2)
     expect(rows[0]!.text()).toContain("Alpha")
     expect(rows[0]!.attributes("data-suggested-depth")).toBe("0")
-    expect(rows[0]!.classes()).not.toContain("daisy-bg-warning/15")
+    expect(rows[0]!.classes()).not.toContain("bg-warning/15")
 
     expect(rows[1]!.text()).toContain("Beta")
     expect(rows[1]!.attributes("data-suggested-depth")).toBe("1")
-    expect(rows[1]!.classes()).toContain("daisy-bg-warning/15")
+    expect(rows[1]!.classes()).toContain("bg-warning/15")
 
     wrapper.unmount()
   })

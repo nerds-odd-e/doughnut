@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span class="daisy-label daisy-p-0">Relation note location</span>
+    <span class="daisy-label p-0">Relation note location</span>
     <RadioButtons
       field=""
       scope-name="relationship-placement"
@@ -24,7 +24,7 @@
       /></strong>
     </div>
     <button class="daisy-btn daisy-btn-secondary go-back-button" @click="$emit('goBack')">
-      <Reply class="daisy-w-6 daisy-h-6" />
+      <Reply class="w-6 h-6" />
     </button>
   </div>
 </template>
@@ -36,7 +36,7 @@ import type { Note, NoteSearchResult } from "@generated/doughnut-backend-api"
 import RadioButtons from "../form/RadioButtons.vue"
 import RelationTypeSelect from "./RelationTypeSelect.vue"
 import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
-import { Reply } from "lucide-vue-next"
+import { Reply } from "@lucide/vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import {
   formatRelationshipNoteMarkdown,

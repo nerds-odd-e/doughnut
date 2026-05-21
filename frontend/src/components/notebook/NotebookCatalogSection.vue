@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="layout === 'list'"
-    class="notebook-catalog-section notebook-catalog-section--list daisy-flex daisy-flex-col daisy-gap-2"
+    class="notebook-catalog-section notebook-catalog-section--list flex flex-col gap-2"
   >
     <template v-for="item in catalogItems" :key="catalogItemKey(item)">
       <NotebookListRow
@@ -50,7 +50,7 @@
   </div>
   <div
     v-else
-    class="notebook-catalog-section notebook-catalog-section--grid daisy-grid daisy-grid-cols-1 sm:daisy-grid-cols-2 md:daisy-grid-cols-2 lg:daisy-grid-cols-3 xl:daisy-grid-cols-4 daisy-gap-4"
+    class="notebook-catalog-section notebook-catalog-section--grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
   >
     <template v-for="item in catalogItems" :key="catalogItemKey(item)">
       <div
@@ -61,7 +61,7 @@
       >
         <NotebookCard :notebook="item.notebook">
           <template #cardHeader>
-            <span class="daisy-flex daisy-justify-end daisy-p-0">
+            <span class="flex justify-end p-0">
               <NotebookButtons
                 v-bind="{ notebook: item.notebook, user }"
                 :has-attached-book="item.hasAttachedBook"
@@ -80,7 +80,7 @@
       >
         <NotebookCard :notebook="item.notebook">
           <template #cardHeader>
-            <span class="daisy-flex daisy-justify-end daisy-p-0">
+            <span class="flex justify-end p-0">
               <SubscriptionNoteButtons
                 v-if="subscriptionById(item.subscriptionId)"
                 :subscription="subscriptionById(item.subscriptionId)!"

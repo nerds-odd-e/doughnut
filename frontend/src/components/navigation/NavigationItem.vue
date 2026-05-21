@@ -1,16 +1,16 @@
 <template>
   <div
-    class="nav-item daisy-text-neutral-content daisy-rounded-lg daisy-px-2"
+    class="nav-item text-neutral-content rounded-lg px-2"
     :class="{
-      'daisy-text-primary daisy-bg-primary/10': isActive && name !== 'resumeRecall' && !nonClickable,
+      'text-primary bg-primary/10': isActive && name !== 'resumeRecall' && !nonClickable,
       'resume-recall-active': name === 'resumeRecall' && isActive,
-      'hover:daisy-bg-base-content/5': !isActive && !nonClickable,
+      'hover:bg-base-content/5': !isActive && !nonClickable,
       'non-clickable': nonClickable
     }"
   >
     <div
       v-if="nonClickable"
-      class="daisy-flex daisy-flex-col daisy-items-center"
+      class="flex flex-col items-center"
       :aria-label="label"
     >
       <div class="icon-container">
@@ -25,7 +25,7 @@
       v-else-if="name && !hasDropdown && name !== 'resumeRecall'"
       :to="{ name: name }"
       :aria-label="label"
-      class="daisy-flex daisy-flex-col daisy-items-center"
+      class="flex flex-col items-center"
     >
       <div class="icon-container">
         <component :is="icon" :size="24" />
@@ -38,7 +38,7 @@
     <a
       v-else-if="name === 'resumeRecall' && !hasDropdown"
       :aria-label="label"
-      class="daisy-flex daisy-flex-col daisy-items-center"
+      class="flex flex-col items-center"
       @click.prevent="$emit('resumeRecall')"
     >
       <div class="icon-container">
@@ -53,12 +53,12 @@
     <AutoCollapseDropdown
       v-if="hasDropdown && !nonClickable"
       v-slot="{ closeDropdown }"
-      class="daisy-dropdown daisy-dropdown-bottom daisy-dropdown-end lg:daisy-dropdown-top lg:daisy-dropdown-right"
+      class="daisy-dropdown daisy-dropdown-bottom daisy-dropdown-end lg:daisy-dropdown-top lg:daisy-dropdown-right overflow-visible"
     >
       <summary
         tabindex="0"
         role="button"
-        class="daisy-flex daisy-flex-col daisy-items-center cursor-pointer list-none"
+        class="flex flex-col items-center cursor-pointer list-none"
         :aria-label="label"
       >
         <div class="icon-container">

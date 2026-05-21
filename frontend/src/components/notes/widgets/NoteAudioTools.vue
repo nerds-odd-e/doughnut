@@ -88,7 +88,7 @@ import {
 } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import Waveform from "./Waveform.vue"
-import { Mic } from "lucide-vue-next"
+import { Mic } from "@lucide/vue"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
 import FullScreen from "@/components/common/FullScreen.vue"
 

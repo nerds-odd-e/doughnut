@@ -140,7 +140,7 @@ describe("main menu", () => {
 
   const expectNavLinkPrimary = (ariaLabel: string) => {
     const link = screen.getByLabelText(ariaLabel)
-    expect(link.closest(".nav-item")).toHaveClass("daisy-text-primary")
+    expect(link.closest(".nav-item")).toHaveClass("text-primary")
   }
 
   beforeEach(() => {
@@ -355,6 +355,13 @@ describe("main menu", () => {
 
       await fireEvent.click(screen.getByLabelText("Account"))
 
+      const accountDropdown = document.querySelector(
+        "[data-auto-collapse-dropdown]"
+      )
+      expect(accountDropdown).toHaveClass("overflow-visible")
+      expect(getComputedStyle(accountDropdown as Element).overflow).toBe(
+        "visible"
+      )
       expect(assimilateLink).toBeInTheDocument()
       expect(screen.getByText(/Settings for/)).toBeInTheDocument()
       expect(screen.getByText("Recent...")).toBeInTheDocument()

@@ -2,7 +2,7 @@
   <ContainerPage
     v-bind="{ contentLoaded: true, title: `Recent` }"
   >
-    <div class="daisy-tabs daisy-tabs-boxed daisy-bg-base-200 daisy-p-2 daisy-flex daisy-justify-center daisy-mb-4">
+    <div class="daisy-tabs daisy-tabs-box bg-base-200 p-2 flex justify-center mb-4">
       <a
         :class="`daisy-tab daisy-tab-lg ${activePage === 'recentlyLearned' ? 'daisy-tab-active' : ''}`"
         role="button"

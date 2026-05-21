@@ -5,15 +5,15 @@
       title: 'Failure Report',
     }"
   >
-    <div v-if="!!failureReport" class="daisy-space-y-4">
-      <div class="daisy-flex daisy-items-center daisy-gap-2">
+    <div v-if="!!failureReport" class="space-y-4">
+      <div class="flex items-center gap-2">
         <router-link
           :to="{ name: 'adminDashboard', query: { tab: 'failureReport' } }"
           class="daisy-btn daisy-btn-ghost daisy-btn-sm"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="daisy-h-4 daisy-w-4"
+            class="h-4 w-4"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -29,17 +29,17 @@
         </router-link>
       </div>
 
-      <div class="daisy-card daisy-bg-base-100 daisy-shadow-lg daisy-border daisy-border-base-300">
+      <div class="daisy-card bg-base-100 shadow-lg border border-base-300">
         <div class="daisy-card-body">
           <div
-            class="daisy-flex daisy-flex-col sm:daisy-flex-row sm:daisy-items-start sm:daisy-justify-between daisy-gap-2"
+            class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2"
           >
             <h2
-              class="daisy-card-title daisy-text-error daisy-flex daisy-items-center daisy-gap-2"
+              class="daisy-card-title text-error flex items-center gap-2"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="daisy-h-6 daisy-w-6"
+                class="h-6 w-6"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -56,15 +56,15 @@
             <div class="daisy-badge daisy-badge-ghost">#{{ failureReport.id }}</div>
           </div>
 
-          <div class="daisy-divider daisy-my-2"></div>
+          <div class="daisy-divider my-2"></div>
 
           <div
-            class="daisy-grid daisy-grid-cols-1 md:daisy-grid-cols-2 daisy-gap-4 daisy-mb-4"
+            class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"
           >
-            <div class="daisy-flex daisy-items-center daisy-gap-2 daisy-text-base-content/70">
+            <div class="flex items-center gap-2 text-base-content/70">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="daisy-h-5 daisy-w-5"
+                class="h-5 w-5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -76,16 +76,16 @@
                   d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              <span class="daisy-font-medium">Created:</span>
+              <span class="font-medium">Created:</span>
               {{ formatDateTime(failureReport.createDatetime) }}
             </div>
             <div
               v-if="githubIssueUrl"
-              class="daisy-flex daisy-items-center daisy-gap-2"
+              class="flex items-center gap-2"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="daisy-h-5 daisy-w-5"
+                class="h-5 w-5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -101,12 +101,12 @@
                 :href="githubIssueUrl"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="daisy-link daisy-link-primary daisy-flex daisy-items-center daisy-gap-1"
+                class="daisy-link daisy-link-primary flex items-center gap-1"
               >
                 View GitHub Issue
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  class="daisy-h-4 daisy-w-4"
+                  class="h-4 w-4"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -122,12 +122,12 @@
             </div>
           </div>
 
-          <div class="daisy-collapse daisy-collapse-arrow daisy-bg-base-200">
+          <div class="daisy-collapse daisy-collapse-arrow bg-base-200">
             <input type="checkbox" checked />
-            <div class="daisy-collapse-title daisy-font-medium daisy-flex daisy-items-center daisy-gap-2">
+            <div class="daisy-collapse-title font-medium flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="daisy-h-5 daisy-w-5"
+                class="h-5 w-5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -143,7 +143,7 @@
             </div>
             <div class="daisy-collapse-content">
               <pre
-                class="daisy-bg-base-300 daisy-p-4 daisy-rounded-lg daisy-overflow-x-auto daisy-text-sm daisy-whitespace-pre-wrap daisy-break-words"
+                class="bg-base-300 p-4 rounded-lg overflow-x-auto text-sm whitespace-pre-wrap break-words"
               >{{ failureReport.errorDetail }}</pre>
             </div>
           </div>

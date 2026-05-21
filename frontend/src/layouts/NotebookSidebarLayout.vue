@@ -1,5 +1,5 @@
 <template>
-  <div class="daisy-flex daisy-flex-col daisy-h-full">
+  <div class="flex flex-col h-full">
     <GlobalBar>
       <button
         type="button"
@@ -10,12 +10,12 @@
       >
         <PanelLeftClose
           v-if="sidebarOpened"
-          class="daisy-w-6 daisy-h-6"
+          class="w-6 h-6"
           aria-hidden="true"
         />
         <PanelLeft
           v-else
-          class="daisy-w-6 daisy-h-6"
+          class="w-6 h-6"
           aria-hidden="true"
         />
       </button>
@@ -27,11 +27,11 @@
     </GlobalBar>
     <div
       v-if="!isMdOrLarger && sidebarOpened"
-      class="notebook-sidebar-drawer-backdrop daisy-fixed daisy-inset-x-0 daisy-bottom-0 daisy-bg-black/50 daisy-z-30"
+      class="notebook-sidebar-drawer-backdrop fixed inset-x-0 bottom-0 bg-black/50 z-30"
       @click="sidebarOpened = false"
     />
     <div
-      class="daisy-h-full daisy-relative daisy-flex daisy-flex-1 daisy-min-h-0"
+      class="h-full relative flex flex-1 min-h-0"
     >
       <aside :class="sidebarClasses">
         <Sidebar
@@ -45,7 +45,7 @@
         />
       </aside>
       <main
-        class="daisy-flex-1 daisy-px-4 daisy-container daisy-mx-auto daisy-overflow-y-auto"
+        class="flex-1 px-4 container mx-auto overflow-y-auto"
       >
         <slot>
           <RouterView v-slot="{ Component }">
@@ -67,7 +67,7 @@ import type {
   NotebookRealm,
 } from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
-import { PanelLeft, PanelLeftClose } from "lucide-vue-next"
+import { PanelLeft, PanelLeftClose } from "@lucide/vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
 import Sidebar from "@/components/notes/Sidebar.vue"
@@ -123,16 +123,16 @@ watch(
 )
 
 const desktopSidebarClass = computed(() =>
-  sidebarOpened.value ? "daisy-relative" : "daisy-hidden"
+  sidebarOpened.value ? "relative" : "hidden"
 )
 
 const mobileSidebarClass = computed(() => [
-  "notebook-sidebar-drawer daisy-fixed daisy-left-0 daisy-z-40",
-  sidebarOpened.value ? "daisy-translate-x-0" : "-daisy-translate-x-full",
+  "notebook-sidebar-drawer fixed left-0 z-40",
+  sidebarOpened.value ? "translate-x-0" : "-translate-x-full",
 ])
 
 const sidebarClasses = computed(() => [
-  "daisy-bg-base-200 daisy-w-72 daisy-transition-all daisy-ease-in-out daisy-flex daisy-flex-col daisy-overflow-x-visible",
+  "bg-base-200 w-72 transition-all ease-in-out flex flex-col overflow-x-visible",
   ...(isMdOrLarger.value
     ? [desktopSidebarClass.value]
     : mobileSidebarClass.value),
@@ -234,7 +234,7 @@ onBeforeUnmount(() => {
 @use "@/assets/menu-variables.scss" as *;
 
 .notebook-sidebar-drawer {
-  @media (max-width: theme("screens.md")) {
+  @media (max-width: 768px) {
     top: calc(#{$main-menu-height-mobile} + env(safe-area-inset-top, 0px));
     bottom: 0;
     height: auto;
@@ -242,7 +242,7 @@ onBeforeUnmount(() => {
 }
 
 .notebook-sidebar-drawer-backdrop {
-  @media (max-width: theme("screens.md")) {
+  @media (max-width: 768px) {
     top: calc(#{$main-menu-height-mobile} + env(safe-area-inset-top, 0px));
   }
 }

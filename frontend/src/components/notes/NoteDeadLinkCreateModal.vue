@@ -1,11 +1,11 @@
 <template>
   <Modal v-if="modelValue !== null" @close_request="close">
     <template #body>
-      <div v-if="!showCreateForm && !linkingToExisting" class="daisy-flex daisy-flex-col daisy-gap-3">
-        <p class="daisy-text-sm daisy-opacity-70">
+      <div v-if="!showCreateForm && !linkingToExisting" class="flex flex-col gap-3">
+        <p class="text-sm opacity-70">
           Dead link: <strong>{{ modelValue.displayText }}</strong>
         </p>
-        <div class="daisy-flex daisy-flex-col daisy-gap-2">
+        <div class="flex flex-col gap-2">
           <button
             class="daisy-btn daisy-btn-primary"
             @click="showCreateForm = true"

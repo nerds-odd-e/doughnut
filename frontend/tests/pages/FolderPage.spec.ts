@@ -53,6 +53,39 @@ describe("FolderPage move", () => {
     await flushPromises()
   }
 
+  it("shows a merge confirm when move returns RESOURCE_CONFLICT and retries with merge flag", async () => {
+    const { wrapper, folderRealm } = mountFolderPage()
+    await flushPromises()
+
+    const moveSpy = vi
+      .spyOn(NotebookController, "moveFolder")
+      .mockResolvedValue(
+        wrapSdkError({
+          message: "A folder with this name already exists here.",
+          errorType: "RESOURCE_CONFLICT",
+        })
+      )
+
+    await submitMoveForm(wrapper)
+
+    const popup = usePopups().popups.peek()?.[0]
+    expect(popup?.type).toBe("confirm")
+    expect(popup?.message).toContain("Merge into it?")
+
+    moveSpy.mockResolvedValueOnce(wrapSdkResponse(folderRealm.folder) as never)
+    usePopups().popups.done(true)
+    await flushPromises()
+
+    expect(moveSpy).toHaveBeenCalledTimes(2)
+    expect(moveSpy).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        body: expect.objectContaining({ merge: true }),
+      })
+    )
+
+    wrapper.unmount()
+  })
+
   it("shows a merge confirm when move returns 409 and retries with merge flag", async () => {
     const { wrapper, folderRealm } = mountFolderPage()
     await flushPromises()
@@ -105,6 +138,39 @@ describe("FolderPage move", () => {
     expect(wrapper.text()).toContain(
       "A folder with this name already exists here."
     )
+    wrapper.unmount()
+  })
+
+  it("navigates to the destination folder after a confirmed merge move", async () => {
+    const { wrapper, folderRealm } = mountFolderPage(10, "Shared")
+    await flushPromises()
+    const targetFolder = makeMe.aFolder.folder(99, "Shared").please()
+
+    vi.spyOn(NotebookController, "moveFolder")
+      .mockResolvedValueOnce(
+        wrapSdkError({
+          message: "A folder with this name already exists here.",
+          errorType: "RESOURCE_CONFLICT",
+        })
+      )
+      .mockResolvedValueOnce(wrapSdkResponse(targetFolder) as never)
+
+    const pushSpy = vi
+      .spyOn(router, "push")
+      .mockResolvedValue(undefined as never)
+
+    await submitMoveForm(wrapper)
+    usePopups().popups.done(true)
+    await flushPromises()
+
+    expect(pushSpy).toHaveBeenCalledWith({
+      name: "folderPage",
+      params: {
+        notebookId: String(folderRealm.notebookRealm.notebook.id),
+        folderId: String(targetFolder.id),
+      },
+    })
+
     wrapper.unmount()
   })
 })

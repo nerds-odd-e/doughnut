@@ -1,34 +1,34 @@
 <template>
-  <div class="daisy-join daisy-flex daisy-items-center">
+  <div class="daisy-join flex items-center">
     <AutoCollapseDropdown
       v-slot="{ closeDropdown }"
       class="daisy-dropdown daisy-dropdown-end daisy-dropdown-bottom"
     >
       <summary
         data-cy="notebook-catalog-overflow"
-        class="daisy-btn daisy-btn-ghost daisy-btn-sm list-none daisy-cursor-pointer"
+        class="daisy-btn daisy-btn-ghost daisy-btn-sm list-none cursor-pointer"
         aria-label="Notebook actions"
       >
-        <MoreHorizontal class="daisy-w-6 daisy-h-6" />
+        <MoreHorizontal class="w-6 h-6" />
       </summary>
       <ul
         tabindex="0"
-        class="daisy-dropdown-content daisy-menu daisy-bg-base-100 daisy-rounded-box daisy-w-52 daisy-p-2 daisy-shadow daisy-z-[1000]"
+        class="daisy-dropdown-content daisy-menu bg-base-100 rounded-box w-52 p-2 shadow z-[1000]"
       >
-        <li class="daisy-menu-item daisy-p-0">
+        <li class="daisy-menu-item p-0">
           <button
             type="button"
-            class="daisy-btn daisy-btn-ghost daisy-h-auto daisy-min-h-0 daisy-w-full daisy-justify-start daisy-py-2 daisy-font-normal"
+            class="daisy-btn daisy-btn-ghost h-auto min-h-0 w-full justify-start py-2 font-normal"
             title="Edit subscription"
             @click="openEdit(closeDropdown)"
           >
             Edit subscription
           </button>
         </li>
-        <li class="daisy-menu-item daisy-p-0">
+        <li class="daisy-menu-item p-0">
           <button
             type="button"
-            class="daisy-btn daisy-btn-ghost daisy-h-auto daisy-min-h-0 daisy-w-full daisy-justify-start daisy-py-2 daisy-font-normal"
+            class="daisy-btn daisy-btn-ghost h-auto min-h-0 w-full justify-start py-2 font-normal"
             title="Move to group"
             @click="openMoveToGroup(closeDropdown)"
           >
@@ -42,7 +42,7 @@
       title="Unsubscribe"
       @click="processForm"
     >
-      <Minus class="daisy-w-6 daisy-h-6" />
+      <Minus class="w-6 h-6" />
     </button>
     <Modal v-if="showEdit" @close_request="closeEdit">
       <template #body>
@@ -76,7 +76,7 @@ import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import Modal from "../commons/Modal.vue"
 import AutoCollapseDropdown from "../commons/AutoCollapseDropdown.vue"
 import usePopups from "../commons/Popups/usePopups"
-import { Minus, MoreHorizontal } from "lucide-vue-next"
+import { Minus, MoreHorizontal } from "@lucide/vue"
 import NotebookCatalogMoveToGroupForm from "@/components/notebook/NotebookCatalogMoveToGroupForm.vue"
 import SubscriptionEditForm from "./SubscriptionEditForm.vue"
 

@@ -1,6 +1,6 @@
 <template>
   <ContainerPage v-bind="{ title: 'Admin Dashboard' }" />
-  <div class="daisy-tabs daisy-tabs-boxed daisy-bg-base-200 daisy-p-2 daisy-flex daisy-justify-center daisy-mb-4">
+  <div class="daisy-tabs daisy-tabs-box bg-base-200 p-2 flex justify-center mb-4">
     <a
       :class="`daisy-tab daisy-tab-lg ${activePage === 'failureReport' ? 'daisy-tab-active' : ''}`"
       role="button"
@@ -32,7 +32,7 @@
       @click.prevent="setActivePage('dataMigration')"
     >Data migration</a>
   </div>
-  <div class="daisy-container daisy-mx-auto">
+  <div class="container mx-auto">
     <FailureReportList v-if="activePage === 'failureReport'" />
     <ManageModel v-if="activePage === 'manageModel'" />
     <ManageBazaar v-if="activePage === 'manageBazaar'" />

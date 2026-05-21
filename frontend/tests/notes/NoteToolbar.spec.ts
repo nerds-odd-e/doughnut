@@ -139,7 +139,7 @@ describe("NoteToolbar", () => {
     await flushPromises()
 
     // Verify dialog is open
-    let dialog = wrapper.findComponent(NoteMoreOptionsForm)
+    const dialog = wrapper.findComponent(NoteMoreOptionsForm)
     expect(dialog.exists()).toBe(true)
 
     // Change the note id
@@ -149,9 +149,9 @@ describe("NoteToolbar", () => {
     })
     await flushPromises()
 
-    // Verify dialog is closed
-    dialog = wrapper.findComponent(NoteMoreOptionsForm)
-    expect(dialog.exists()).toBe(false)
+    // Verify dialog is closed (still mounted; details hides dropdown content)
+    const details = wrapper.find("[data-auto-collapse-dropdown]")
+    expect((details.element as HTMLDetailsElement).open).toBe(false)
   })
 
   it("opens Link search on Ctrl+Shift+F when not readonly", async () => {

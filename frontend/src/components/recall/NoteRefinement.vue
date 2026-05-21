@@ -1,49 +1,49 @@
 <template>
   <div
     v-if="understandingPoints.length > 0"
-    class="daisy-mb-4 daisy-rounded-lg daisy-bg-accent daisy-p-4"
+    class="mb-4 rounded-lg bg-accent p-4"
     data-test-id="understanding-checklist"
   >
-    <div class="daisy-text-base">
-      <div class="daisy-font-semibold daisy-mb-3 daisy-text-accent-content">
+    <div class="text-base">
+      <div class="font-semibold mb-3 text-accent-content">
         Understanding Checklist:
       </div>
-      <ul class="daisy-space-y-2">
+      <ul class="space-y-2">
         <li
           v-for="(point, index) in understandingPoints"
           :key="index"
-          class="daisy-text-accent-content daisy-flex daisy-items-start daisy-gap-2"
+          class="text-accent-content flex items-start gap-2"
         >
           <label
-            class="daisy-flex daisy-items-start daisy-cursor-pointer daisy-gap-2 daisy-flex-1 daisy-min-w-0"
+            class="flex items-start cursor-pointer gap-2 flex-1 min-w-0"
           >
             <input
               type="checkbox"
               :value="index"
               v-model="selectedPointIndices"
-              class="daisy-checkbox daisy-checkbox-accent daisy-checkbox-sm daisy-mt-1 daisy-border-black dark:daisy-border-white hover:daisy-border-black hover:dark:daisy-border-white checked:daisy-border-black checked:dark:daisy-border-white daisy-border-2 daisy-shrink-0"
+              class="daisy-checkbox daisy-checkbox-accent daisy-checkbox-sm mt-1 border-black dark:border-white hover:border-black hover:dark:border-white checked:border-black checked:dark:border-white border-2 shrink-0"
             />
-            <span class="daisy-break-words">{{ point }}</span>
+            <span class="break-words">{{ point }}</span>
           </label>
-          <div class="daisy-flex daisy-gap-1 daisy-shrink-0">
+          <div class="flex gap-1 shrink-0">
             <button
               class="daisy-btn daisy-btn-xs daisy-btn-ghost"
               @click="promotePointToSiblingNote(point, index)"
               title="Promote to sibling note"
             >
-              <Folders class="daisy-w-4 daisy-h-4" />
+              <Folders class="w-4 h-4" />
               Sibling
             </button>
           </div>
         </li>
       </ul>
 
-      <div class="daisy-flex daisy-gap-2 daisy-mt-4">
+      <div class="flex gap-2 mt-4">
         <button
           data-test-id="delete-understanding-points"
           :disabled="selectedPointIndices.length === 0"
           @click="deleteSelectedPoints"
-          class="daisy-btn daisy-btn-error daisy-btn-sm !daisy-text-white"
+          class="daisy-btn daisy-btn-error daisy-btn-sm !text-white"
         >
           Delete selected points
         </button>
@@ -51,7 +51,7 @@
           data-test-id="ignore-understanding-points"
           :disabled="selectedPointIndices.length === 0"
           @click="ignoreSelectedPoints"
-          class="daisy-btn daisy-btn-warning daisy-btn-sm !daisy-text-white"
+          class="daisy-btn daisy-btn-warning daisy-btn-sm !text-white"
         >
           Ignore questions
         </button>
@@ -68,7 +68,7 @@ import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
 
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
-import { Folders } from "lucide-vue-next"
+import { Folders } from "@lucide/vue"
 import LoadingModal from "../commons/LoadingModal.vue"
 import { onMounted, ref } from "vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"

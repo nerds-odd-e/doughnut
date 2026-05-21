@@ -33,7 +33,7 @@ function ensureAllMyNotebooksAndSubscriptionsScopeOn() {
       if ($btn.is(':disabled')) {
         return
       }
-      if (!$btn.hasClass('daisy-text-primary')) {
+      if (!$btn.hasClass('text-primary')) {
         cy.wrap($btn).click()
       }
     }
@@ -42,7 +42,7 @@ function ensureAllMyNotebooksAndSubscriptionsScopeOn() {
 
 function ensureSemanticSearchOn() {
   cy.findByRole('button', { name: 'Semantic search' }).then(($btn) => {
-    if (!$btn.hasClass('daisy-text-primary')) {
+    if (!$btn.hasClass('text-primary')) {
       cy.wrap($btn).click()
     }
   })

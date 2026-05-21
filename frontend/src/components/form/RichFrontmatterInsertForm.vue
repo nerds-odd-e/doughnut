@@ -1,15 +1,15 @@
 <template>
-  <div class="daisy-mt-1">
+  <div class="mt-1">
     <div
       v-if="insertOpen"
-      class="daisy-flex daisy-flex-wrap daisy-gap-2 daisy-items-end"
+      class="flex flex-wrap gap-2 items-end"
     >
       <label
-        class="daisy-form-control daisy-w-full sm:daisy-w-auto daisy-min-w-[8rem]"
+        class="daisy-form-control w-full sm:w-auto min-w-[8rem]"
       >
-        <span class="daisy-label daisy-text-xs">Property key</span>
+        <span class="daisy-label text-xs">Property key</span>
         <div
-          class="daisy-relative daisy-w-full"
+          class="relative w-full"
           @focusout="onKeyPresetWrapperFocusOut"
         >
           <input
@@ -17,7 +17,7 @@
             :value="draftKey"
             type="text"
             autocapitalize="off"
-            class="daisy-input daisy-input-bordered daisy-input-sm daisy-w-full"
+            class="daisy-input daisy-input-sm w-full"
             aria-label="Property key"
             :aria-expanded="presetPanelOpen"
             :aria-controls="presetPanelOpen ? insertKeyPresetListId : undefined"
@@ -35,14 +35,14 @@
         </div>
       </label>
       <label
-        class="daisy-form-control daisy-w-full sm:daisy-flex-1 daisy-min-w-[8rem]"
+        class="daisy-form-control w-full sm:flex-1 min-w-[8rem]"
       >
-        <span class="daisy-label daisy-text-xs">Property value</span>
+        <span class="daisy-label text-xs">Property value</span>
         <div
           v-if="isWikidataIdPropertyKey(draftKey)"
-          class="daisy-flex daisy-flex-wrap daisy-items-center daisy-gap-2"
+          class="flex flex-wrap items-center gap-2"
         >
-          <span class="daisy-font-mono daisy-text-sm">{{
+          <span class="font-mono text-sm">{{
             draftValue.trim() || "—"
           }}</span>
           <RichFrontmatterPropertyExternalLink
@@ -60,17 +60,17 @@
         </div>
         <div
           v-else-if="isImagePropertyKey(draftKey)"
-          class="daisy-flex daisy-flex-wrap daisy-items-center daisy-gap-2"
+          class="flex flex-wrap items-center gap-2"
         >
           <input
             ref="insertImageFileInputRef"
             type="file"
             accept="image/*"
-            class="daisy-hidden"
+            class="hidden"
             data-testid="rich-note-image-insert-file-input"
             @change="onInsertImageFileSelected"
           />
-          <span class="daisy-font-mono daisy-text-sm">{{
+          <span class="font-mono text-sm">{{
             draftValue.trim() || "—"
           }}</span>
           <RichFrontmatterPropertyExternalLink
@@ -89,7 +89,7 @@
           </button>
           <span
             v-if="!noteId"
-            class="daisy-text-xs daisy-text-base-content/70"
+            class="text-xs text-base-content/70"
             data-testid="rich-note-image-insert-requires-note"
           >
             Save the note before attaching an image.
@@ -99,13 +99,13 @@
           v-else
           :class="
             isUrlPropertyKey(draftKey)
-              ? 'daisy-flex daisy-min-w-0 daisy-items-center daisy-gap-2'
+              ? 'flex min-w-0 items-center gap-2'
               : ''
           "
         >
           <div
             :class="
-              isUrlPropertyKey(draftKey) ? 'daisy-min-w-0 daisy-flex-1' : ''
+              isUrlPropertyKey(draftKey) ? 'min-w-0 flex-1' : ''
             "
           >
             <WikiPropertyValueField

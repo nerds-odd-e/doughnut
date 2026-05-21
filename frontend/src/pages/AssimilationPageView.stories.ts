@@ -1,11 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import AssimilationPageView from "./AssimilationPageView.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
+import { assimilationPageStorageDecorator } from "../../.storybook/decorators/noteStorageDecorator"
 
 const meta = {
   title: "Page Views/AssimilationPageView",
   component: AssimilationPageView,
   tags: ["autodocs"],
+  decorators: [assimilationPageStorageDecorator],
   parameters: {
     test: {
       disable: true,

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ExternalLink } from "lucide-vue-next"
+import { ExternalLink } from "@lucide/vue"
 import { computed } from "vue"
 import { openRichPropertyUrlInNewWindow } from "@/utils/openRichPropertyUrlInNewWindow"
 import { openWikidataEntityBrowseUrlInNonBlockingPopup } from "@/utils/wikidataEntityBrowseUrl"
@@ -28,13 +28,11 @@ const ariaLabel = computed(() =>
 
 const btnClass = computed(() =>
   props.compact
-    ? "daisy-btn daisy-btn-ghost daisy-btn-xs daisy-square daisy-shrink-0"
-    : "daisy-btn daisy-btn-ghost daisy-btn-sm daisy-square daisy-shrink-0"
+    ? "daisy-btn daisy-btn-ghost daisy-btn-xs square shrink-0"
+    : "daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
 )
 
-const iconClass = computed(() =>
-  props.compact ? "daisy-h-3.5 daisy-w-3.5" : "daisy-h-4 daisy-w-4"
-)
+const iconClass = computed(() => (props.compact ? "h-3.5 w-3.5" : "h-4 w-4"))
 
 function onClick() {
   if (!trimmed.value) return
