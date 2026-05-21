@@ -287,9 +287,9 @@ const onTitleChange = () => {
   position: relative !important
   height: 200px
   overflow-y: auto
-  border: 1px solid hsl(var(--bc) / 0.2)
+  border: 1px solid color-mix(in oklch, var(--color-base-content) 20%, transparent)
   border-radius: 4px
-  background: hsl(var(--b1))
+  background: var(--color-base-100)
   box-shadow: 0 2px 4px rgba(0,0,0,0.1)
 
   :deep(.dropdown-style)
@@ -312,7 +312,7 @@ const onTitleChange = () => {
       font-size: 0.75rem
 
       &:hover
-        background-color: hsl(var(--b2))
+        background-color: var(--color-base-200)
 
     em
       font-size: 0.75rem

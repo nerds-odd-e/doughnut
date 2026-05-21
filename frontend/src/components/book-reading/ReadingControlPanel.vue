@@ -108,15 +108,15 @@ watch(
 @keyframes snap-attention {
   0% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 oklch(var(--p) / 0.6);
+    box-shadow: 0 0 0 0 color-mix(in oklch, var(--color-primary) 60%, transparent);
   }
   40% {
     transform: scale(1.02);
-    box-shadow: 0 0 0 8px oklch(var(--p) / 0);
+    box-shadow: 0 0 0 8px transparent;
   }
   100% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 oklch(var(--p) / 0);
+    box-shadow: 0 0 0 0 transparent;
   }
 }
 

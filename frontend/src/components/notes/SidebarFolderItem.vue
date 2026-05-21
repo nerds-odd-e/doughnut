@@ -159,7 +159,7 @@ function toggleExpand() {
   border-radius: 0.25rem;
 
   &:hover {
-    background-color: var(--fallback-b3, oklch(var(--b3) / 1));
+    background-color: var(--color-base-300);
   }
 }
 
@@ -231,16 +231,16 @@ function toggleExpand() {
 }
 
 .active-item > .folder-row {
-  background-color: var(--fallback-b3, oklch(var(--b3) / 1));
+  background-color: var(--color-base-300);
 }
 
 .sidebar-folder-active > .folder-row {
-  color: var(--fallback-bc, oklch(var(--bc) / 1));
+  color: var(--color-base-content);
   background-color: color-mix(
     in oklch,
-    var(--fallback-b2, oklch(var(--b2) / 1)) 78%,
-    var(--fallback-p, oklch(var(--p) / 1)) 22%
+    var(--color-base-200) 78%,
+    var(--color-primary) 22%
   ) !important;
-  box-shadow: inset 2px 0 0 var(--fallback-p, oklch(var(--p) / 1));
+  box-shadow: inset 2px 0 0 var(--color-primary);
 }
 </style>

@@ -22,14 +22,14 @@ defineProps({
 
 <style scoped>
 .notebook-page-summary {
-  background: oklch(var(--b2) / 0.8);
+  background: color-mix(in oklch, var(--color-base-200) 80%, transparent);
   border-radius: 8px;
   margin-bottom: 1.5rem;
   padding: 1.5rem;
 }
 
 .notebook-page-summary-description {
-  color: oklch(var(--bc) / 0.6);
+  color: color-mix(in oklch, var(--color-base-content) 60%, transparent);
   line-height: 1.6;
   margin-top: 0.5rem;
 }

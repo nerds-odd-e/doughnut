@@ -391,8 +391,8 @@ onBeforeUnmount(async () => {
   display: flex;
   gap: 0.5rem;
   padding: 0.5rem;
-  background: var(--fallback-b1, oklch(var(--b1)));
-  border: 1px solid var(--fallback-bc, oklch(var(--bc) / 0.2));
+  background: var(--color-base-100);
+  border: 1px solid color-mix(in oklch, var(--color-base-content) 20%, transparent);
   border-radius: 0.5rem;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   transform: translate(-50%, -110%);

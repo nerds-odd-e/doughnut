@@ -41,7 +41,11 @@ defineProps({
   border-radius: 3px;
   border-left: none;
   box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-  background: linear-gradient(to right, oklch(var(--bc) / 0.2) 0%, oklch(var(--b2) / 0.8) 5%);
+  background: linear-gradient(
+    to right,
+    color-mix(in oklch, var(--color-base-content) 20%, transparent) 0%,
+    color-mix(in oklch, var(--color-base-200) 80%, transparent) 5%
+  );
   overflow: hidden;
   margin-bottom: 1rem;
 }
@@ -52,8 +56,8 @@ defineProps({
   top: 0;
   bottom: 0;
   width: 12px;
-  background: oklch(var(--b3));
-  border-right: 1px solid oklch(var(--bc) / 0.25);
+  background: var(--color-base-300);
+  border-right: 1px solid color-mix(in oklch, var(--color-base-content) 25%, transparent);
   border-radius: 3px 0 0 3px;
 
   /* Add notebook holes */
@@ -65,8 +69,8 @@ defineProps({
     transform: translateX(-50%);
     width: 8px;
     height: 8px;
-    background: oklch(var(--b1));
-    border: 1px solid oklch(var(--bc) / 0.2);
+    background: var(--color-base-100);
+    border: 1px solid color-mix(in oklch, var(--color-base-content) 20%, transparent);
     border-radius: 50%;
   }
 
@@ -80,7 +84,7 @@ defineProps({
 }
 
 .note-short-content {
-  color: oklch(var(--bc) / 0.6);
+  color: color-mix(in oklch, var(--color-base-content) 60%, transparent);
   line-height: 2rem; /* Align with ruled lines */
 }
 

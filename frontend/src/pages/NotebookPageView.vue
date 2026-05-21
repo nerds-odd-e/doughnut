@@ -302,21 +302,21 @@ const updateIndexNotebook = async () => {
 
 <style scoped>
 .notebook-page-summary {
-  background: oklch(var(--b2) / 0.8);
+  background: color-mix(in oklch, var(--color-base-200) 80%, transparent);
   border-radius: 8px;
   margin-bottom: 1.5rem;
   padding: 1.5rem;
 }
 
 .notebook-page-summary-description {
-  color: oklch(var(--bc) / 0.6);
+  color: color-mix(in oklch, var(--color-base-content) 60%, transparent);
   line-height: 1.6;
   margin-top: 0.5rem;
 }
 
 .settings-section {
-  background: oklch(var(--b1));
-  border: 1px solid oklch(var(--b3));
+  background: var(--color-base-100);
+  border: 1px solid var(--color-base-300);
   border-radius: 8px;
   padding: 1.5rem;
 }
@@ -329,12 +329,12 @@ const updateIndexNotebook = async () => {
   font-size: 1.125rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  color: oklch(var(--bc));
+  color: var(--color-base-content);
 }
 
 .section-description {
   font-size: 0.875rem;
-  color: oklch(var(--bc) / 0.7);
+  color: color-mix(in oklch, var(--color-base-content) 70%, transparent);
   line-height: 1.5;
 }
 
@@ -362,7 +362,7 @@ const updateIndexNotebook = async () => {
 
 .field-hint {
   font-size: 0.75rem;
-  color: oklch(var(--bc) / 0.6);
+  color: color-mix(in oklch, var(--color-base-content) 60%, transparent);
   line-height: 1.4;
   margin-top: 0.25rem;
 }

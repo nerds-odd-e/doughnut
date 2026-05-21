@@ -229,7 +229,7 @@ $contestable-dummy-input-reserve: calc(
   left: $main-menu-width;
   z-index: 40;
   padding: 0.5rem 1rem max(0.75rem, env(safe-area-inset-bottom));
-  background-color: hsl(var(--b1));
+  background-color: var(--color-base-100);
 }
 
 @media (max-width: 1024px) {

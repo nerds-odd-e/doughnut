@@ -254,8 +254,8 @@ const handleDefaultMessageClick = (message: string) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: hsl(var(--p) / 1);
-  color: hsl(var(--pc) / 1);
+  background-color: var(--color-primary);
+  color: var(--color-primary-content);
   border: none;
   border-radius: 50%;
   width: 36px;
@@ -266,11 +266,11 @@ const handleDefaultMessageClick = (message: string) => {
 }
 
 .send-button:hover {
-  background-color: hsl(var(--pf) / 1);
+  background-color: color-mix(in oklch, var(--color-primary), black 12%);
 }
 
 .send-button:disabled {
-  background-color: hsl(var(--n) / 1);
+  background-color: var(--color-neutral);
   cursor: not-allowed;
 }
 
@@ -284,7 +284,7 @@ const handleDefaultMessageClick = (message: string) => {
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem 1rem;
-  border-bottom: 1px solid hsl(var(--b3) / 1);
+  border-bottom: 1px solid var(--color-base-300);
 }
 
 .minimize-button,
@@ -303,28 +303,28 @@ const handleDefaultMessageClick = (message: string) => {
 .minimize-button:hover,
 .maximize-button:hover,
 .export-button:hover {
-  background-color: hsl(var(--b3));
+  background-color: var(--color-base-300);
 }
 
 .conversation-select {
   padding: 0.25rem;
   border-radius: 4px;
-  border: 1px solid hsl(var(--b3));
-  background-color: hsl(var(--b1));
+  border: 1px solid var(--color-base-300);
+  background-color: var(--color-base-100);
   font-size: 0.9rem;
 }
 
 .send-button.with-ai {
-  background-color: hsl(var(--su) / 1);
+  background-color: var(--color-success);
 }
 
 .send-button.with-ai:hover {
-  background-color: hsl(var(--su) / 1);
+  background-color: var(--color-success);
   opacity: 0.8;
 }
 
 .send-button.with-ai:disabled {
-  background-color: hsl(var(--n) / 1);
+  background-color: var(--color-neutral);
 }
 
 .bottom-container {
@@ -349,15 +349,15 @@ const handleDefaultMessageClick = (message: string) => {
 .default-message-button {
   text-align: left;
   padding: 0.75rem 1rem;
-  background-color: hsl(var(--b2));
-  border: 1px solid hsl(var(--b3));
+  background-color: var(--color-base-200);
+  border: 1px solid var(--color-base-300);
   border-radius: 0.5rem;
   cursor: pointer;
   transition: background-color 0.2s;
-  color: hsl(var(--nc));
+  color: var(--color-neutral-content);
 }
 
 .default-message-button:hover {
-  background-color: hsl(var(--b3));
+  background-color: var(--color-base-300);
 }
 </style>

@@ -16,7 +16,7 @@ const meta = {
     (story) => ({
       components: { story },
       template:
-        '<div style="width: 100%; max-width: 600px; background: hsl(var(--b1)); padding: 1rem;"><story /></div>',
+        '<div style="width: 100%; max-width: 600px; background: var(--color-base-100); padding: 1rem;"><story /></div>',
     }),
   ],
   argTypes: {

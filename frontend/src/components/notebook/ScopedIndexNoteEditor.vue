@@ -103,7 +103,7 @@ const save = async () => {
 
 <style scoped>
 .scoped-index-note-editor {
-  background: oklch(var(--b2) / 0.8);
+  background: color-mix(in oklch, var(--color-base-200) 80%, transparent);
   border-radius: 8px;
   padding: 1rem 1.25rem;
 }

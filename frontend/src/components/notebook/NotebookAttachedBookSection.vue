@@ -190,8 +190,8 @@ watch(
 
 <style scoped>
 .settings-section {
-  background: oklch(var(--b1));
-  border: 1px solid oklch(var(--b3));
+  background: var(--color-base-100);
+  border: 1px solid var(--color-base-300);
   border-radius: 8px;
   padding: 1.5rem;
 }
@@ -204,12 +204,12 @@ watch(
   font-size: 1.125rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  color: oklch(var(--bc));
+  color: var(--color-base-content);
 }
 
 .section-description {
   font-size: 0.875rem;
-  color: oklch(var(--bc) / 0.7);
+  color: color-mix(in oklch, var(--color-base-content) 70%, transparent);
   line-height: 1.5;
 }
 </style>

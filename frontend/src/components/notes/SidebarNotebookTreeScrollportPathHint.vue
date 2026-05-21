@@ -156,7 +156,7 @@ onBeforeUnmount(() => {
 
 .scrollport-path-hint {
   pointer-events: auto;
-  background-color: var(--fallback-b1, oklch(var(--b1) / 1));
+  background-color: var(--color-base-100);
   border-bottom: 1px solid var(--color-base-300, rgba(0, 0, 0, 0.12));
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
 }

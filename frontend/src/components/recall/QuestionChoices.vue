@@ -106,5 +106,5 @@ button, a, input
 .choice-button
   @media (hover: hover)
     &:hover:not(:disabled)
-      background-color: hsl(var(--b3)) !important
+      background-color: var(--color-base-300) !important
 </style>

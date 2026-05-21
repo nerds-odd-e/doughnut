@@ -269,7 +269,7 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: hsl(var(--n)); // Match the neutral background
+  background-color: var(--color-neutral);
   border-top-right-radius: 1rem;
   border-bottom-right-radius: 1rem;
   z-index: -1; // Behind the content
@@ -401,11 +401,11 @@ onUnmounted(() => {
 }
 
 .expand-button:hover {
-  background-color: hsl(var(--bc) / 0.1);
+  background-color: color-mix(in oklch, var(--color-base-content) 10%, transparent);
 }
 
 .expand-button:active {
-  background-color: hsl(var(--bc) / 0.15);
+  background-color: color-mix(in oklch, var(--color-base-content) 15%, transparent);
 }
 
 .clickable-when-collapsed {
