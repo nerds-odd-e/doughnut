@@ -9,7 +9,7 @@
       >
         <select
           v-model="selectModel"
-          class="daisy-select daisy-select-sm w-full min-h-0 flex-1 border-0 bg-transparent shadow-none focus:outline-none focus:ring-0"
+          class="daisy-select daisy-select-sm w-full min-h-0 flex-1 border-0 bg-base-100 text-base-content shadow-none focus:outline-none focus:ring-0"
           data-testid="folder-move-parent-select"
           :disabled="disabled"
         >
