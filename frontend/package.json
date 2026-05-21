@@ -32,7 +32,7 @@
     "turndown-plugin-gfm": "^1.0.2",
     "vue-content-loader": "2.0.1",
     "vue-toastification": "2.0.0-rc.5",
-    "yaml": "2.9.0"
+    "yaml": ">=2.9.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.15",
