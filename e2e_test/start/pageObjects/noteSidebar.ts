@@ -15,6 +15,11 @@ function folderTreitemByLabel(folderLabel: string) {
     .last()
 }
 
+/** This folder row only (not nested subfolder rows). */
+function folderRowControls(treeitem: Cypress.Chainable<JQuery<HTMLElement>>) {
+  return treeitem.children('.folder-row')
+}
+
 function expandFolder(label: string) {
   pageIsNotLoading()
   revealFolderInSidebar(label)
@@ -113,21 +118,20 @@ export const noteSidebar = () => {
 
     activateFolderUnderOpenParent(parentLabel: string, childLabel: string) {
       pageIsNotLoading()
-      folderTreitemByLabel(parentLabel)
+      const childFolder = folderTreitemByLabel(parentLabel)
         .find(
           `[role="treeitem"].sidebar-folder-li[aria-label="${childLabel}"]`,
           { timeout: sidebarActionTimeoutMs }
         )
         .filter(':visible')
         .last()
-        .findByText(childLabel)
-        .click()
+      folderRowControls(childFolder).find('.folder-label-area').click()
       pageIsNotLoading()
     },
 
     openFolderPageByLabel(folderLabel: string) {
       pageIsNotLoading()
-      folderTreitemByLabel(folderLabel)
+      folderRowControls(folderTreitemByLabel(folderLabel))
         .find('[data-testid="sidebar-folder-open-page-link"]')
         .click()
       pageIsNotLoading()
@@ -135,7 +139,7 @@ export const noteSidebar = () => {
 
     openFolderPageForOrganize(folderLabel: string) {
       pageIsNotLoading()
-      folderTreitemByLabel(folderLabel)
+      folderRowControls(folderTreitemByLabel(folderLabel))
         .find('[data-testid="sidebar-folder-open-page-link"]')
         .click()
       pageIsNotLoading()
@@ -147,13 +151,14 @@ export const noteSidebar = () => {
       childLabel: string
     ) {
       pageIsNotLoading()
-      folderTreitemByLabel(parentLabel)
+      const childFolder = folderTreitemByLabel(parentLabel)
         .find(
           `[role="treeitem"].sidebar-folder-li[aria-label="${childLabel}"]`,
           { timeout: sidebarActionTimeoutMs }
         )
         .filter(':visible')
         .last()
+      folderRowControls(childFolder)
         .find('[data-testid="sidebar-folder-open-page-link"]')
         .click()
       pageIsNotLoading()

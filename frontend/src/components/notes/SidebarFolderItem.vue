@@ -107,10 +107,10 @@ watch(
     ] as const,
   () => {
     if (folderId.value == null) return
-    if (props.activeFolder?.id === folderId.value) {
-      return
-    }
-    if (props.activePathFolderIds.has(folderId.value)) {
+    const shouldExpand =
+      props.activePathFolderIds.has(folderId.value) ||
+      props.activeFolder?.id === folderId.value
+    if (shouldExpand) {
       ensureFolderExpandedById(folderId.value)
     }
   },

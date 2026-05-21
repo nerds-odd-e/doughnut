@@ -11,6 +11,7 @@ function mountFolderItem(
     folderId: number
     notebookId: number
     activeFolder?: Folder | null
+    activePathFolderIds?: Set<number>
   }
 ) {
   const folder = {
@@ -24,7 +25,7 @@ function mountFolderItem(
       folder,
       notebookId: options.notebookId,
       expandedFolderIds: new Set<number>(),
-      activePathFolderIds: new Set<number>(),
+      activePathFolderIds: options.activePathFolderIds ?? new Set<number>(),
       activeFolder: options.activeFolder ?? undefined,
     },
     global: {
@@ -55,6 +56,22 @@ describe("SidebarFolderItem", () => {
   afterEach(() => {
     globalThis.IntersectionObserver = originalIntersectionObserver
     vi.restoreAllMocks()
+  })
+
+  it("requests expansion when it is the active folder on folder page", async () => {
+    const activeFolder = makeMe.aFolder.folder(42, "Alpha").please()
+    const wrapper = mountFolderItem(router, {
+      folderId: 42,
+      notebookId: 7,
+      activeFolder,
+    })
+    await flushPromises()
+    const updates = wrapper.emitted("update:expandedFolderIds") as
+      | [Set<number>][]
+      | undefined
+    expect(updates?.some(([ids]) => ids.has(42))).toBe(true)
+    await wrapper.setProps({ expandedFolderIds: new Set([42]) })
+    expect(wrapper.attributes("aria-expanded")).toBe("true")
   })
 
   it("renders a link to folderPage with encoded ids", async () => {
