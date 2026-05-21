@@ -81,3 +81,4 @@ minimumReleaseAgeExclude:
   - '@redocly/config@0.48.2'
   - '@redocly/openapi-core@2.31.1'
   - '@redocly/respect-core@2.31.1'
+  - vite@8.0.14
