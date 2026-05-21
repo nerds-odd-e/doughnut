@@ -1,7 +1,7 @@
 import SidebarFolderItem from "@/components/notes/SidebarFolderItem.vue"
 import type { Folder } from "@generated/doughnut-backend-api"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import { flushPromises, mount } from "@vue/test-utils"
+import { flushPromises, mount, type VueWrapper } from "@vue/test-utils"
 import { createRouter, createWebHistory } from "vue-router"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -36,6 +36,7 @@ function mountFolderItem(
 
 describe("SidebarFolderItem", () => {
   let router: ReturnType<typeof createRouter>
+  let wrapper: VueWrapper | undefined
   const originalIntersectionObserver = globalThis.IntersectionObserver
 
   beforeEach(async () => {
@@ -54,13 +55,15 @@ describe("SidebarFolderItem", () => {
   })
 
   afterEach(() => {
+    wrapper?.unmount()
+    wrapper = undefined
     globalThis.IntersectionObserver = originalIntersectionObserver
     vi.restoreAllMocks()
   })
 
   it("requests expansion when it is the active folder on folder page", async () => {
     const activeFolder = makeMe.aFolder.folder(42, "Alpha").please()
-    const wrapper = mountFolderItem(router, {
+    wrapper = mountFolderItem(router, {
       folderId: 42,
       notebookId: 7,
       activeFolder,
@@ -75,7 +78,7 @@ describe("SidebarFolderItem", () => {
   })
 
   it("renders a link to folderPage with encoded ids", async () => {
-    const wrapper = mountFolderItem(router, { folderId: 42, notebookId: 7 })
+    wrapper = mountFolderItem(router, { folderId: 42, notebookId: 7 })
     const link = wrapper.get('[data-testid="sidebar-folder-open-page-link"]')
     expect(link.attributes("href")).toContain("notebooks/7")
     expect(link.attributes("href")).toContain("folders/42")
@@ -103,7 +106,11 @@ describe("SidebarFolderItem", () => {
     } as unknown as typeof IntersectionObserver
 
     const activeFolder = makeMe.aFolder.folder(42, "Alpha").please()
-    mountFolderItem(router, { folderId: 42, notebookId: 7, activeFolder })
+    wrapper = mountFolderItem(router, {
+      folderId: 42,
+      notebookId: 7,
+      activeFolder,
+    })
     await flushPromises()
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
     await flushPromises()
@@ -132,11 +139,19 @@ describe("SidebarFolderItem", () => {
     } as unknown as typeof IntersectionObserver
 
     const activeFolder = makeMe.aFolder.folder(42, "Alpha").please()
-    mountFolderItem(router, { folderId: 42, notebookId: 7, activeFolder })
+    wrapper = mountFolderItem(router, {
+      folderId: 42,
+      notebookId: 7,
+      activeFolder,
+    })
     await flushPromises()
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
     await flushPromises()
-    await new Promise<void>((resolve) => setTimeout(resolve, 0))
-    expect(scrollSpy).not.toHaveBeenCalled()
+    await vi.waitFor(
+      () => {
+        expect(scrollSpy).not.toHaveBeenCalled()
+      },
+      { timeout: 100, interval: 10 }
+    )
   })
 })
