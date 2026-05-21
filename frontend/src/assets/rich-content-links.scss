@@ -1,0 +1,22 @@
+.rich-content-links {
+  a {
+    cursor: pointer;
+  }
+
+  a.doughnut-link {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 0.15em;
+  }
+
+  a:not(.doughnut-link):not(.dead-link) {
+    color: var(--color-info);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  a.dead-link {
+    color: red;
+  }
+}

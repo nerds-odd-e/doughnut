@@ -2,7 +2,7 @@
   <div
     ref="root"
     tabindex="0"
-    class="wiki-property-value-field daisy-input daisy-input-sm w-full min-h-0 py-1 px-3 leading-normal"
+    class="wiki-property-value-field rich-content-links daisy-input daisy-input-sm w-full min-h-0 py-1 px-3 leading-normal"
     :class="{ 'daisy-input-disabled': readonly }"
     :contenteditable="!readonly"
     role="textbox"
@@ -150,27 +150,6 @@ defineExpose({
   overflow-x: auto;
   overflow-y: hidden;
   line-height: 1.375rem;
-}
-
-.wiki-property-value-field :deep(a) {
-  cursor: pointer;
-}
-
-.wiki-property-value-field :deep(a.doughnut-link) {
-  color: var(--color-accent);
-  text-decoration: underline;
-  text-decoration-style: dotted;
-  text-underline-offset: 0.15em;
-}
-
-.wiki-property-value-field :deep(a:not(.doughnut-link):not(.dead-link)) {
-  color: var(--color-info);
-  text-decoration: underline;
-  text-underline-offset: 0.15em;
-}
-
-.wiki-property-value-field :deep(a.dead-link) {
-  color: red;
 }
 
 .wiki-property-value-field :deep(.wiki-bracket) {

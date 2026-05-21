@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./rich-content-links.scss";
 @source inline("daisy-btn daisy-btn-primary daisy-btn-secondary daisy-btn-accent daisy-btn-ghost daisy-btn-link daisy-btn-info daisy-btn-success daisy-btn-warning daisy-btn-error daisy-btn-neutral daisy-btn-outline daisy-btn-dash daisy-btn-soft daisy-btn-xs daisy-btn-sm daisy-btn-md daisy-btn-lg daisy-btn-xl daisy-btn-wide daisy-btn-block daisy-btn-square daisy-btn-circle daisy-btn-disabled daisy-btn-active");
 @source inline("daisy-input daisy-input-ghost daisy-input-xs daisy-input-sm daisy-input-md daisy-input-lg daisy-input-xl daisy-input-primary daisy-input-secondary daisy-input-accent daisy-input-info daisy-input-success daisy-input-warning daisy-input-error");
 @source inline("daisy-modal daisy-modal-box daisy-modal-action daisy-modal-open daisy-modal-top daisy-modal-middle daisy-modal-bottom daisy-modal-start daisy-modal-end");

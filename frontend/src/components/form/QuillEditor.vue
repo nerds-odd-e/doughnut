@@ -181,6 +181,7 @@ const options: QuillOptions = {
 onMounted(async () => {
   if (editor.value) {
     quill.value = new Quill(editor.value, options)
+    quill.value.root.classList.add("rich-content-links")
 
     // Set initial content
     updateQuillContent(localValue.value)
@@ -314,21 +315,8 @@ defineExpose({ insertTextAtCursor })
     margin: inherit !important
     white-space: pre-wrap
     word-wrap: break-word
-  a
-    cursor: pointer
-  a.doughnut-link
-    color: oklch(var(--a))
-    text-decoration: underline
-    text-decoration-style: dotted
-    text-underline-offset: 0.15em
-  a:not(.doughnut-link):not(.dead-link)
-    color: oklch(var(--in))
-    text-decoration: underline
-    text-underline-offset: 0.15em
-  a.dead-link
-    color: red
   code
-    background-color: color-mix(in oklch, oklch(var(--bc)) 12%, transparent)
+    background-color: color-mix(in oklch, var(--color-base-content) 12%, transparent)
     padding: 0.1em 0.35em
     border-radius: 0.25em
     font-size: 0.9em
