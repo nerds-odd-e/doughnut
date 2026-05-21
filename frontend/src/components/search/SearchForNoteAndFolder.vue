@@ -156,11 +156,13 @@ import type { NoteSearchResult } from "@generated/doughnut-backend-api"
 import { readSearchKeyHistory } from "@/utils/searchKeyHistoryCookie"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 
-defineProps<{
+const { initialSearchKey } = defineProps<{
   noteId?: number
   notebookId?: number
   /** When set, shows a square close control after the search scope toggles. */
   modalCloser?: () => void
+  /** Pre-fills the search field (e.g. dead wiki link display text). */
+  initialSearchKey?: string
 }>()
 
 const emit = defineEmits<{
@@ -169,7 +171,7 @@ const emit = defineEmits<{
   (e: "moveToNotebookRoot", targetNotebookId: number): void
 }>()
 
-const inputSearchKey = ref("")
+const inputSearchKey = ref(initialSearchKey ?? "")
 const allMyNotebooksAndSubscriptions = ref(true)
 const allMyCircles = ref(false)
 const semanticSearchEnabled = ref(false)

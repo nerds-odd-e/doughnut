@@ -258,6 +258,39 @@ describe("SearchForm", () => {
   })
 
   describe("Dead link - link to existing note", () => {
+    it("prefills search with dead link display text and searches automatically", async () => {
+      const note = MakeMe.aNote.please()
+      const searchSpy = mockSdkService(
+        SearchController,
+        "searchForRelationshipTargetWithin",
+        [makeNoteHit("Selected Note", note.noteTopology.id + 100)]
+      )
+
+      helper
+        .component(SearchForm)
+        .withCleanStorage()
+        .withProps({
+          note,
+          deadLinkPayload: {
+            targetToken: "Ghost Page",
+            displayText: "original text",
+          },
+        })
+        .render()
+
+      const searchInput = await screen.findByPlaceholderText("Search")
+      expect(searchInput).toHaveValue("original text")
+      await new Promise((resolve) => setTimeout(resolve, 1100))
+      await flushPromises()
+
+      expect(searchSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: { note: note.id },
+          body: expect.objectContaining({ searchKey: "original text" }),
+        })
+      )
+    })
+
     it("shows 'Link ... to this note' button when dead link payload is provided", async () => {
       const note = MakeMe.aNote.please()
       mockSdkService(SearchController, "searchForRelationshipTargetWithin", [

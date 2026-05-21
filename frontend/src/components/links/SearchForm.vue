@@ -2,7 +2,12 @@
   <h3 v-if="targetSearchResult">Complete relationship</h3>
   <SearchForNoteAndFolder
     v-if="!selectedSearchResult && !targetSearchResult"
-    v-bind="{ noteId: note?.id, notebookId: notebookId, modalCloser }"
+    v-bind="{
+      noteId: note?.id,
+      notebookId: notebookId,
+      modalCloser,
+      initialSearchKey: deadLinkPayload?.displayText,
+    }"
     @selected="selectedSearchResult = $event"
     @move-under-folder="moveUnderFolder($event)"
     @move-to-notebook-root="moveToNotebookRoot($event)"
