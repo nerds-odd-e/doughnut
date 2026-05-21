@@ -38,17 +38,8 @@
       </template>
       </div>
     </template>
-    <div
-      v-if="showContestableDummyInput"
-      class="contestable-dummy-input-bar"
-      aria-hidden="true"
-    >
-      <input
-        type="text"
-        class="daisy-input w-full"
-        readonly
-        tabindex="-1"
-      />
+    <div v-if="showContestableDummyInput" class="contestable-dummy-input-bar">
+      <input type="text" class="daisy-input daisy-input-bordered daisy-w-full" />
     </div>
   </div>
 </template>
