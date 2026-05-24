@@ -60,7 +60,7 @@
     "optionator": "^0.9.4",
     "playwright": "^1.60.0",
     "sass": "1.99.0",
-    "storybook": "10.4.0",
+    "storybook": "10.4.1",
     "tailwindcss": "4.3.0",
     "terser": "^5.47.1",
     "typescript": "6.0.3",
