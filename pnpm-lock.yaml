@@ -81,7 +81,7 @@ importers:
         version: 0.97.2(typescript@6.0.3)
       '@hono/node-server':
         specifier: 2.0.4
-        version: 2.0.4(hono@4.12.22)
+        version: 2.0.4(hono@4.12.23)
       '@mbtest/mountebank':
         specifier: 2.9.4
         version: 2.9.4
@@ -116,8 +116,8 @@ importers:
         specifier: ^15.0.5
         version: 15.0.5
       hono:
-        specifier: 4.12.22
-        version: 4.12.22
+        specifier: 4.12.23
+        version: 4.12.23
       npm-run-all2:
         specifier: ^9.0.1
         version: 9.0.1
@@ -4141,6 +4141,10 @@ packages:
     resolution: {integrity: sha512-7fvVPbB92zNRsQke+uiRGwtTuef0tB2Dg4hWxYfFNvkQhIltWoyi0ONReM5LWA+jJWS3nfT5lTq+qbsIpX0IQw==}
     engines: {node: '>=16.9.0'}
 
+  hono@4.12.23:
+    resolution: {integrity: sha512-eIaZ9qDgu7XV0pxOCrg7/WhnQ6Ivm22UcxhXx/A3dcbqbbYgBEkc6e/J/s7j2tS96zoB0S9VBdLwQNCWwUo4LA==}
+    engines: {node: '>=16.9.0'}
+
   hookable@5.5.3:
     resolution: {integrity: sha512-Yc+BQe8SvoXH1643Qez1zqLRmbA5rCL+sSmk6TVos0LWVfNIB7PGncdlId77WzLGSIB5KaWgTaNTs2lNVEI6VQ==}
 
@@ -8016,9 +8020,9 @@ snapshots:
     dependencies:
       hono: 4.12.22
 
-  '@hono/node-server@2.0.4(hono@4.12.22)':
+  '@hono/node-server@2.0.4(hono@4.12.23)':
     dependencies:
-      hono: 4.12.22
+      hono: 4.12.23
 
   '@humanwhocodes/momoa@2.0.4': {}
 
@@ -11112,6 +11116,8 @@ snapshots:
   he@1.2.0: {}
 
   hono@4.12.22: {}
+
+  hono@4.12.23: {}
 
   hookable@5.5.3: {}
 
