@@ -13,7 +13,7 @@ description: >-
 
 ## Pre-configured
 
-- Node.js v22.21.1, pnpm 10.22.0 — no nix needed.
+- Node.js v24.16.0, pnpm 11.3.0 — no nix needed.
 
 ## One-Time Setup (backend + E2E)
 
