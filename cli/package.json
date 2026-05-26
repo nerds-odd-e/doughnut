@@ -42,7 +42,7 @@
     "@types/react": "^19.2.15",
     "doughnut-test-fixtures": "workspace:*",
     "esbuild": "0.28.0",
-    "ink": "^7.0.3",
+    "ink": "^7.0.4",
     "ink-testing-library": "^4.0.0",
     "tsx": "4.22.3",
     "typescript": "6.0.3",
