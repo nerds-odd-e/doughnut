@@ -29,11 +29,13 @@ CURSOR_DEV=true nix develop -c pnpm generateTypeScript
 
 ## Commands
 
-Always run repo commands through Nix unless working in a documented Cloud VM path:
+Run repo tooling through Nix unless working in a documented Cloud VM path:
 
 ```bash
 CURSOR_DEV=true nix develop -c <command>
 ```
+
+**Exception:** `git` commands do not need the Nix prefix — run them directly (e.g. `git status`, `git diff`, `git commit`).
 
 Useful focused checks:
 
