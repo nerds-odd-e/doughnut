@@ -33,7 +33,7 @@ function expandFolder(label: string) {
 function revealFolderInSidebar(label: string) {
   folderTreitemByLabel(label).then(($el) => {
     if (($el.attr('aria-expanded') ?? 'false') === 'false') {
-      cy.wrap($el).find('.folder-row .chevron-btn').first().click()
+      $el.find('.folder-row .chevron-btn').first()[0].click()
     }
   })
   folderTreitemByLabel(label).should('have.attr', 'aria-expanded', 'true')
