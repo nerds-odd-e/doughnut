@@ -44,3 +44,6 @@ description: >-
 ## 6. Refactoring and clean up
 
 - The new test might overlap with existing ones. Simplify them.
+- Before commit, run the **post-change-refactor** skill
+  (`.cursor/skills/post-change-refactor/SKILL.md`) on the full uncommitted
+  change for a broader cleanup pass.
