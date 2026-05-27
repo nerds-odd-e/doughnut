@@ -13,18 +13,18 @@ public class AiToolFactory {
     return MCQWithAnswer.class;
   }
 
-  public static InstructionAndSchema mcqWithAnswerAiTool(boolean focusNoteTitleAndContentEmpty) {
+  public static InstructionAndSchema mcqWithAnswerAiTool(boolean focusNoteContentEmpty) {
     return new InstructionAndSchema(
-        getBaseInstruction(focusNoteTitleAndContentEmpty), askSingleAnswerMultipleChoiceQuestion());
+        getBaseInstruction(focusNoteContentEmpty), askSingleAnswerMultipleChoiceQuestion());
   }
 
-  private static String getBaseInstruction(boolean focusNoteTitleAndContentEmpty) {
+  private static String getBaseInstruction(boolean focusNoteContentEmpty) {
     String correctAnswerSupportRule =
-        focusNoteTitleAndContentEmpty
+        focusNoteContentEmpty
             ? "- The correct answer must be supported by its title or direct references."
             : "- The correct answer must be supported by the Focus Note title or content.";
     String verifyGroundingRule =
-        focusNoteTitleAndContentEmpty
+        focusNoteContentEmpty
             ? "- The correct answer is grounded in its title or direct references."
             : "- The correct answer is grounded in the Focus Note.";
     return """

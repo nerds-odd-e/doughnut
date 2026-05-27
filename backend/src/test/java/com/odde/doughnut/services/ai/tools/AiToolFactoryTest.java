@@ -29,7 +29,7 @@ class AiToolFactoryTest {
   }
 
   @Test
-  void questionAiToolWhenFocusNoteEmptyGroundsAnswerInTitleOrDirectReferences() {
+  void questionAiToolWhenFocusNoteContentEmptyGroundsAnswerInTitleOrDirectReferences() {
     InstructionAndSchema result = AiToolFactory.mcqWithAnswerAiTool(true);
 
     assertThat(result.getMessageBody(), containsString("its title or direct references"));

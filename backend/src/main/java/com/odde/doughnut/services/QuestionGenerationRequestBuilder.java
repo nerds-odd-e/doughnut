@@ -44,7 +44,8 @@ public class QuestionGenerationRequestBuilder {
   public StructuredResponseCreateParams<MCQWithAnswer> buildQuestionGenerationResponseRequest(
       Note note, String additionalMessage, Long contextSeed) {
     InstructionAndSchema tool =
-        AiToolFactory.mcqWithAnswerAiTool(isFocusNoteTitleAndContentEmpty(note));
+        AiToolFactory.mcqWithAnswerAiTool(
+            hydrateFocusNoteForQuestionGeneration(note).isBodyContentBlank());
     OpenAIResponseRequestBuilder<MCQWithAnswer> responseRequestBuilder =
         openAiResponseRequestForQuestionGeneration(
             MCQWithAnswer.class, note, additionalMessage, contextSeed);
@@ -62,16 +63,6 @@ public class QuestionGenerationRequestBuilder {
     if (instructions != null && !instructions.trim().isEmpty()) {
       responseRequestBuilder.addInstruction(instructions);
     }
-  }
-
-  public boolean isFocusNoteTitleAndContentEmpty(Note note) {
-    return focusNoteTitleAndContentEmpty(hydrateFocusNoteForQuestionGeneration(note));
-  }
-
-  private static boolean focusNoteTitleAndContentEmpty(Note focus) {
-    String title = focus.getTitle() == null ? "" : focus.getTitle().trim();
-    String content = focus.getContent() == null ? "" : focus.getContent().trim();
-    return title.isEmpty() && content.isEmpty();
   }
 
   private Note hydrateFocusNoteForQuestionGeneration(Note note) {

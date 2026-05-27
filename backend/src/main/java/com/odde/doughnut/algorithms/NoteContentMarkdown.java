@@ -115,6 +115,14 @@ public final class NoteContentMarkdown {
     return splitLeadingFrontmatter(content).map(LeadingFrontmatter::body).orElse(content);
   }
 
+  public static boolean isBodyContentBlank(String content) {
+    String body = bodyWithoutLeadingFrontmatter(content);
+    if (body == null || body.isBlank()) {
+      return true;
+    }
+    return new HtmlOrMarkdown(body).isBlank();
+  }
+
   /**
    * Reads a Wikidata Q-id from the first YAML frontmatter block when present, using {@code
    * wikidata_id} (rich-mode property rows).
