@@ -82,3 +82,4 @@ minimumReleaseAgeExclude:
   - '@redocly/cli@2.31.3'
   - '@redocly/openapi-core@2.31.3'
   - '@redocly/respect-core@2.31.3'
+  - cypress@15.16.0
