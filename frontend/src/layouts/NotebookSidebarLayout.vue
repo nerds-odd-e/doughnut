@@ -63,7 +63,6 @@ import { RouterView, useRoute } from "vue-router"
 import type {
   Folder,
   FolderRealm,
-  NoteRealm,
   NotebookRealm,
 } from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
@@ -71,6 +70,7 @@ import { PanelLeft, PanelLeftClose } from "@lucide/vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
 import Sidebar from "@/components/notes/Sidebar.vue"
+import { useStickyActiveNoteRealmForRoute } from "@/composables/useStickyActiveNoteRealmForRoute"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const route = useRoute()
@@ -88,12 +88,7 @@ const isMdOrLarger = computed(() => windowWidth.value >= SIDEBAR_BREAKPOINT_PX)
 const activeNotebookRealm = ref<NotebookRealm | undefined>(undefined)
 const activeFolderRealm = ref<FolderRealm | undefined>(undefined)
 
-const activeNoteRealm = computed((): NoteRealm | undefined => {
-  if (route.name !== "noteShow") return undefined
-  const id = Number(route.params.noteId)
-  if (!Number.isFinite(id)) return undefined
-  return storageAccessor.value.refOfNoteRealm(id).value
-})
+const activeNoteRealm = useStickyActiveNoteRealmForRoute(route, storageAccessor)
 
 const breadcrumbFolders = computed(
   (): Folder[] =>

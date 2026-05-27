@@ -30,7 +30,11 @@
 </template>
 
 <script setup lang="ts">
-import type { NoteTopology, Folder } from "@generated/doughnut-backend-api"
+import type {
+  FolderListing,
+  NoteTopology,
+  Folder,
+} from "@generated/doughnut-backend-api"
 import SidebarFolderItem from "./SidebarFolderItem.vue"
 import SidebarNoteItem from "./SidebarNoteItem.vue"
 import { sidebarStructuralRefreshKey } from "./sidebarStructuralRefresh"
@@ -41,7 +45,7 @@ import {
 } from "./sidebarStructuralSort"
 import { computed, ref, watch } from "vue"
 import { useNoteSidebarPeerSort } from "@/composables/useNoteSidebarPeerSort"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import { getCachedListing, setCachedListing } from "./sidebarFolderListingCache"
 import { requestNotebookFolderListing } from "@/utils/notebookFolderListingRequest"
 
 const { sortPeerSpec } = useNoteSidebarPeerSort()
@@ -87,15 +91,21 @@ const displayRows = computed(() =>
   sortSidebarStructuralRows(rawRows.value, sortPeerSpec.value)
 )
 
+function applyListing(listing: FolderListing) {
+  const noteTopologies = listing.noteTopologies ?? []
+  rawRows.value = buildUnsortedStructuralRows(noteTopologies, listing.folders)
+  props.onStructuralPeerCount?.(rawRows.value.length)
+}
+
 async function refreshListing() {
   try {
-    const { data: listing, error } = await apiCallWithLoading(() =>
-      requestNotebookFolderListing(props.notebookId, props.folderId ?? null)
+    const { data: listing, error } = await requestNotebookFolderListing(
+      props.notebookId,
+      props.folderId ?? null
     )
     if (error || !listing) throw new Error("Failed to load listing")
-    const noteTopologies = listing.noteTopologies ?? []
-    rawRows.value = buildUnsortedStructuralRows(noteTopologies, listing.folders)
-    props.onStructuralPeerCount?.(rawRows.value.length)
+    applyListing(listing)
+    setCachedListing(props.notebookId, props.folderId ?? null, listing)
   } catch {
     rawRows.value = []
     props.onStructuralPeerCount?.(0)
@@ -104,7 +114,11 @@ async function refreshListing() {
 
 watch(
   () => [props.notebookId, props.folderId] as const,
-  () => {
+  ([notebookId, folderId]) => {
+    const cached = getCachedListing(notebookId, folderId ?? null)
+    if (cached) {
+      applyListing(cached)
+    }
     refreshListing()
   },
   { immediate: true }

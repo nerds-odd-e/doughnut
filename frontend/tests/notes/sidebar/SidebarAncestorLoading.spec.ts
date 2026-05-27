@@ -16,6 +16,7 @@ import {
   folderListingForQueryParent,
   isBefore,
   mountSidebar,
+  neverResolving,
   prepareSidebarDefaultMountContext,
   teardownSidebarComponentTest,
 } from "./sidebarTestSupport"
@@ -103,5 +104,45 @@ describe("Sidebar gradual ancestor population", () => {
       fixtures.firstGenerationSibling.note.noteTopology.title
     )!.element
     expect(isBefore(secondGenEl, siblingEl)).toBe(true)
+  })
+
+  it("shows previously fetched ancestor rows from cache when API is blocked on remount", async () => {
+    mockSdkServiceWithImplementation(
+      NotebookController,
+      "listNotebookFolderListing",
+      (options) =>
+        folderListingForQueryParent(options, fixtures.defaultTreeFolderListings)
+    )
+
+    // First mount: populate the listing cache
+    wrapper = mountSidebar(helper, fixtures.secondGeneration)
+    await flushPromises()
+    teardownSidebarComponentTest(wrapper)
+    wrapper = undefined as unknown as typeof wrapper
+
+    mockSdkServiceWithImplementation(
+      NotebookController,
+      "listNotebookFolderListing",
+      () => neverResolving()
+    )
+
+    // Second mount: flush reactivity but NOT the blocked API responses
+    wrapper = mountSidebar(helper, fixtures.secondGeneration)
+    await flushPromises()
+
+    // Root note visible from cache (not from API which is blocked)
+    expect(
+      findSidebarItem(
+        wrapper,
+        fixtures.topNoteRealm.note.noteTopology.title
+      )?.exists()
+    ).toBe(true)
+    // Nested note visible from cache
+    expect(
+      findSidebarItem(
+        wrapper,
+        fixtures.firstGeneration.note.noteTopology.title
+      )?.exists()
+    ).toBe(true)
   })
 })

@@ -11,6 +11,7 @@ import {
   mountSidebar,
   prepareSidebarDefaultMountContext,
   teardownSidebarComponentTest,
+  withTrackingGlobalApiClient,
 } from "./sidebarTestSupport"
 
 describe("Sidebar folder listing reload", () => {
@@ -29,6 +30,23 @@ describe("Sidebar folder listing reload", () => {
 
   afterEach(() => {
     teardownSidebarComponentTest(wrapper)
+  })
+
+  it("does not trigger the global loading indicator for structural folder listing fetches", async () => {
+    await withTrackingGlobalApiClient(async (apiStatus) => {
+      mockSdkServiceWithImplementation(
+        NotebookController,
+        "listNotebookFolderListing",
+        (options) =>
+          folderListingForQueryParent(
+            options,
+            fixtures.defaultTreeFolderListings
+          )
+      )
+      wrapper = mountSidebar(helper, fixtures.firstGeneration)
+      await flushPromises()
+      expect(apiStatus.states).toHaveLength(0)
+    })
   })
 
   it("does not reload notebook root notes when active note changes within the same notebook", async () => {

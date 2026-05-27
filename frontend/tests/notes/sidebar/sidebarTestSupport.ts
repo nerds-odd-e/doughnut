@@ -1,9 +1,16 @@
 import { NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY } from "@/composables/useNoteSidebarPeerSort"
 import Sidebar from "@/components/notes/Sidebar.vue"
+import { invalidateSidebarListingCache } from "@/components/notes/sidebarFolderListingCache"
+import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
+import {
+  setupGlobalClient,
+  teardownGlobalClientForTesting,
+} from "@/managedApi/clientSetup"
 import createNoteStorage from "@/store/createNoteStorage"
 import type {
   FolderListing,
   NoteRealm,
+  NotebookRealm,
   Options,
   ShowNoteData,
 } from "@generated/doughnut-backend-api"
@@ -301,6 +308,7 @@ export function prepareSidebarDefaultMountContext(options: {
     spyOn: typeof import("vitest").vi.spyOn
   }
 }) {
+  invalidateSidebarListingCache()
   resetSidebarPeerSortSessionStorage()
   options.storageAccessor.value = createNoteStorage()
   seedDefaultTreeRealmsInStorage(options.storageAccessor, options.fixtures)
@@ -314,6 +322,48 @@ export function teardownSidebarComponentTest(
   wrapper?.unmount()
   document.body.innerHTML = ""
   vi.restoreAllMocks()
+}
+
+export function neverResolving<T>(): Promise<T> {
+  return new Promise(() => undefined)
+}
+
+export function stubShowNotePending() {
+  mockSdkServiceWithImplementation(NoteController, "showNote", () =>
+    neverResolving()
+  )
+}
+
+export function uncachedNoteInSameNotebook(
+  notebookRealm: NotebookRealm,
+  title: string
+): NoteRealm {
+  const note = makeMe.aNoteRealm.title(title).please()
+  note.notebookRealm = notebookRealm
+  return note
+}
+
+export function sidebarShowsActiveItem(
+  wrapper: VueWrapper<unknown>,
+  noteTitle: string
+): boolean {
+  return (
+    findSidebarItem(wrapper, noteTitle)?.element.classList.contains(
+      "active-item"
+    ) ?? false
+  )
+}
+
+export async function withTrackingGlobalApiClient<T>(
+  fn: (apiStatus: ApiStatus) => Promise<T>
+): Promise<T> {
+  const apiStatus: ApiStatus = { states: [] }
+  setupGlobalClient(apiStatus)
+  try {
+    return await fn(apiStatus)
+  } finally {
+    teardownGlobalClientForTesting()
+  }
 }
 
 export function setupRootPeersWithFolders(options: {

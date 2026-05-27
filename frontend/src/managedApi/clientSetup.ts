@@ -68,6 +68,11 @@ export async function apiCallWithLoading<T extends SdkResult>(
   }
 }
 
+/** Resets the global API status handler. Use only in tests. */
+export function teardownGlobalClientForTesting() {
+  apiStatusHandler = undefined
+}
+
 /**
  * Sets up the global client.
  * This should be called once during app initialization (e.g., in DoughnutApp.vue).
