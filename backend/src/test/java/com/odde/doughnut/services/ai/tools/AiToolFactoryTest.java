@@ -10,7 +10,7 @@ class AiToolFactoryTest {
 
   @Test
   void questionAiToolContainsMergedQuestionDesignerInstruction() {
-    InstructionAndSchema result = AiToolFactory.questionAiTool();
+    InstructionAndSchema result = AiToolFactory.mcqWithAnswerAiTool(false);
 
     assertThat(result.getMessageBody(), containsString("Question Designer"));
     assertThat(result.getMessageBody(), containsString("focus note"));
@@ -21,7 +21,7 @@ class AiToolFactoryTest {
 
   @Test
   void mcqWithAnswerAiToolShouldContainBaseInstruction() {
-    InstructionAndSchema result = AiToolFactory.mcqWithAnswerAiTool();
+    InstructionAndSchema result = AiToolFactory.mcqWithAnswerAiTool(false);
 
     assertThat(result.getMessageBody(), containsString("Question Designer"));
     assertThat(result.getMessageBody(), containsString("focus note"));
@@ -30,7 +30,7 @@ class AiToolFactoryTest {
 
   @Test
   void questionAiToolWhenFocusNoteEmptyGroundsAnswerInTitleOrDirectReferences() {
-    InstructionAndSchema result = AiToolFactory.questionAiTool(true);
+    InstructionAndSchema result = AiToolFactory.mcqWithAnswerAiTool(true);
 
     assertThat(result.getMessageBody(), containsString("its title or direct references"));
     assertThat(result.getMessageBody(), not(containsString("Focus Note title or content")));

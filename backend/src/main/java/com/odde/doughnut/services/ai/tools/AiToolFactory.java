@@ -13,19 +13,7 @@ public class AiToolFactory {
     return MCQWithAnswer.class;
   }
 
-  public static InstructionAndSchema mcqWithAnswerAiTool() {
-    return mcqWithAnswerAiTool(false);
-  }
-
   public static InstructionAndSchema mcqWithAnswerAiTool(boolean focusNoteTitleAndContentEmpty) {
-    return questionAiTool(focusNoteTitleAndContentEmpty);
-  }
-
-  public static InstructionAndSchema questionAiTool() {
-    return questionAiTool(false);
-  }
-
-  public static InstructionAndSchema questionAiTool(boolean focusNoteTitleAndContentEmpty) {
     return new InstructionAndSchema(
         getBaseInstruction(focusNoteTitleAndContentEmpty), askSingleAnswerMultipleChoiceQuestion());
   }
