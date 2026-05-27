@@ -9,14 +9,19 @@ import org.springframework.stereotype.Service;
 @Service
 public class NoteMotionService {
   private final EntityPersister entityPersister;
+  private final NoteTitlePlacementRules noteTitlePlacementRules;
 
-  public NoteMotionService(EntityPersister entityPersister) {
+  public NoteMotionService(
+      EntityPersister entityPersister, NoteTitlePlacementRules noteTitlePlacementRules) {
     this.entityPersister = entityPersister;
+    this.noteTitlePlacementRules = noteTitlePlacementRules;
   }
 
   /** Places {@code source} in {@code targetFolder}. */
   public void executeMoveIntoFolder(Note source, Folder targetFolder) {
     Notebook targetNotebook = targetFolder.getNotebook();
+    noteTitlePlacementRules.requireNoSoftDeletedTitleAt(
+        targetNotebook, targetFolder, source.getTitle());
     source.assignNotebook(targetNotebook);
     source.setFolder(targetFolder);
     entityPersister.flush();
@@ -31,6 +36,7 @@ public class NoteMotionService {
 
   /** Assigns {@code source} to {@code targetNotebook} and clears folder (notebook root). */
   public void executeMoveToNotebookRoot(Note source, Notebook targetNotebook) {
+    noteTitlePlacementRules.requireNoSoftDeletedTitleAt(targetNotebook, null, source.getTitle());
     source.assignNotebook(targetNotebook);
     source.setFolder(null);
     entityPersister.flush();

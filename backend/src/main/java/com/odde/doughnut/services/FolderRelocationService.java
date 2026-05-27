@@ -24,18 +24,21 @@ public class FolderRelocationService {
   private final FolderSiblingNameValidation folderSiblingNameValidation;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
+  private final NoteTitlePlacementRules noteTitlePlacementRules;
 
   public FolderRelocationService(
       FolderRepository folderRepository,
       NoteRepository noteRepository,
       FolderSiblingNameValidation folderSiblingNameValidation,
       EntityPersister entityPersister,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      NoteTitlePlacementRules noteTitlePlacementRules) {
     this.folderRepository = folderRepository;
     this.noteRepository = noteRepository;
     this.folderSiblingNameValidation = folderSiblingNameValidation;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
+    this.noteTitlePlacementRules = noteTitlePlacementRules;
   }
 
   public Folder moveFolder(Notebook notebook, Folder folder, FolderMoveRequest request) {
@@ -107,6 +110,8 @@ public class FolderRelocationService {
 
     List<Note> srcNotes = noteRepository.findNotesInFolderOrderByIdAsc(source.getId());
     for (Note note : srcNotes) {
+      noteTitlePlacementRules.requireNoSoftDeletedTitleAt(
+          target.getNotebook(), target, note.getTitle());
       note.setFolder(target);
       entityPersister.merge(note);
     }
@@ -181,6 +186,7 @@ public class FolderRelocationService {
 
     List<Note> directNotes = noteRepository.findNotesInFolderOrderByIdAsc(folder.getId());
     for (Note note : directNotes) {
+      noteTitlePlacementRules.requireNoSoftDeletedTitleAt(notebook, destination, note.getTitle());
       note.setFolder(destination);
       entityPersister.merge(note);
     }

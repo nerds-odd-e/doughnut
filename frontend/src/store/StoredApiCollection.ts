@@ -35,6 +35,33 @@ function toErrorMessage(error: unknown, fallback: string): string {
   return error ? (toOpenApiError(error).message ?? fallback) : fallback
 }
 
+function throwStoredApiError(
+  error: unknown,
+  response: { status?: number } | undefined,
+  fallback: string,
+  options?: { attachFieldErrors?: boolean }
+): never {
+  const apiError = new Error(fallback) as Error & {
+    body?: unknown
+    status?: number
+    [key: string]: unknown
+  }
+  if (error) {
+    apiError.body = error
+    if (options?.attachFieldErrors) {
+      setErrorObjectForFieldErrors(apiError)
+    }
+    const errorObj = toOpenApiError(error)
+    apiError.message = errorObj.message || fallback
+    if (response?.status !== undefined) {
+      apiError.status = response.status
+    } else if (errorObj.errors) {
+      apiError.status = 400
+    }
+  }
+  throw apiError
+}
+
 export interface StoredApi {
   getNoteRealmRefAndLoadWhenNeeded(
     noteId: Doughnut.ID
@@ -222,23 +249,9 @@ export default class StoredApiCollection implements StoredApi {
     )
     const { data: nrwp, error, response } = result
     if (error || !nrwp) {
-      const apiError = new Error("Failed to create note") as Error & {
-        body?: unknown
-        status?: number
-        [key: string]: unknown
-      }
-      if (error) {
-        apiError.body = error
-        setErrorObjectForFieldErrors(apiError)
-        const errorObj = toOpenApiError(error)
-        apiError.message = errorObj.message || "Failed to create note"
-        if (response?.status !== undefined) {
-          apiError.status = response.status
-        } else if (errorObj.errors) {
-          apiError.status = 400
-        }
-      }
-      throw apiError
+      throwStoredApiError(error, response, "Failed to create note", {
+        attachFieldErrors: true,
+      })
     }
     const focus = this.storage.refreshNoteRealm(nrwp)
     refreshSidebarStructuralListings()
@@ -499,7 +512,11 @@ export default class StoredApiCollection implements StoredApi {
   async moveNoteToFolder(sourceId: Doughnut.ID, targetFolderId: Doughnut.ID) {
     const undoPlacement = this.placementUndoForNote(sourceId)
 
-    const { data: noteRealms, error } = await apiCallWithLoading(() =>
+    const {
+      data: noteRealms,
+      error,
+      response,
+    } = await apiCallWithLoading(() =>
       RelationController.moveNoteToFolder({
         path: {
           sourceNote: sourceId,
@@ -508,7 +525,7 @@ export default class StoredApiCollection implements StoredApi {
       })
     )
     if (error || !noteRealms) {
-      throw new Error(toErrorMessage(error, "Failed to move note"))
+      throwStoredApiError(error, response, "Failed to move note")
     }
     this.refreshNoteRealms(noteRealms)
 
@@ -523,7 +540,11 @@ export default class StoredApiCollection implements StoredApi {
   ) {
     const undoPlacement = this.placementUndoForNote(sourceId)
 
-    const { data: noteRealms, error } = await apiCallWithLoading(() =>
+    const {
+      data: noteRealms,
+      error,
+      response,
+    } = await apiCallWithLoading(() =>
       RelationController.moveNoteToNotebookRootInNotebook({
         path: {
           sourceNote: sourceId,
@@ -532,7 +553,7 @@ export default class StoredApiCollection implements StoredApi {
       })
     )
     if (error || !noteRealms) {
-      throw new Error(toErrorMessage(error, "Failed to move note"))
+      throwStoredApiError(error, response, "Failed to move note")
     }
     this.refreshNoteRealms(noteRealms)
 

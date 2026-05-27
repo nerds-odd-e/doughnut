@@ -10,7 +10,7 @@ import usePopups from "@/components/commons/Popups/usePopups"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import MakeMe from "doughnut-test-fixtures/makeMe"
-import helper, { mockSdkService } from "@tests/helpers"
+import helper, { mockSdkService, wrapSdkError } from "@tests/helpers"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import createNoteStorage from "@/store/createNoteStorage"
 import {
@@ -197,6 +197,60 @@ describe("SearchForm", () => {
           targetFolder: targetFolderId,
         },
       })
+    })
+
+    it("shows confirm when move is blocked by soft-deleted title at destination", async () => {
+      mockSdkService(NoteController, "getRecentNotes", [])
+      mockSdkService(SearchController, "searchForRelationshipTarget", [])
+      mockSdkService(SearchController, "semanticSearch", [])
+      mockSdkService(SearchController, "semanticSearchWithin", [])
+      const note = MakeMe.aNote.please()
+      const targetFolderId = 42
+      mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
+        {
+          hitKind: "FOLDER",
+          folderId: targetFolderId,
+          folderName: "Archive",
+          notebookId: 1,
+          notebookName: "Nb",
+          distance: 0.9,
+        },
+      ])
+      const conflictMessage =
+        "A note with this title already exists here but was deleted."
+      mockSdkService(
+        RelationController,
+        "moveNoteToFolder",
+        []
+      ).mockResolvedValue(
+        wrapSdkError({
+          status: 409,
+          errorType: "SOFT_DELETED_TITLE_CONFLICT",
+          message: conflictMessage,
+        })
+      )
+
+      helper
+        .component(SearchForm)
+        .withCleanStorage()
+        .withProps({ note })
+        .render()
+
+      await flushPromises()
+
+      fireEvent.update(await screen.findByPlaceholderText("Search"), "Arc")
+      await new Promise((resolve) => setTimeout(resolve, 1100))
+      await flushPromises()
+
+      fireEvent.click(await screen.findByRole("button", { name: "Move Under" }))
+      await flushPromises()
+      usePopups().popups.done(true)
+      await flushPromises()
+
+      const conflictPopup = usePopups().popups.peek()?.[0]
+      expect(conflictPopup?.type).toBe("confirm")
+      expect(conflictPopup?.message).toContain(conflictMessage)
+      expect(conflictPopup?.message).toContain("rename the note you are moving")
     })
   })
 

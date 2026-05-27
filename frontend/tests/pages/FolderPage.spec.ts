@@ -238,4 +238,29 @@ describe("FolderPage dissolve", () => {
 
     wrapper.unmount()
   })
+
+  it("shows inline error when dissolve returns soft-deleted title conflict", async () => {
+    const { wrapper } = mountFolderPage()
+    await flushPromises()
+
+    const conflictMessage =
+      "A note with this title already exists here but was deleted. Restore the deleted note (Undo delete), or choose another title."
+    vi.spyOn(NotebookController, "dissolveFolder").mockResolvedValue(
+      wrapSdkError({
+        status: 409,
+        errorType: "SOFT_DELETED_TITLE_CONFLICT",
+        message: conflictMessage,
+      })
+    )
+
+    const dissolveBtn = wrapper.find('[data-testid="folder-dissolve-button"]')
+    dissolveBtn.trigger("click")
+    await flushPromises()
+    usePopups().popups.done(true)
+    await flushPromises()
+
+    expect(wrapper.text()).toContain(conflictMessage)
+
+    wrapper.unmount()
+  })
 })

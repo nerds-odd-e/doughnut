@@ -9,7 +9,6 @@ import com.odde.doughnut.entities.NoteCreator;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.FolderRepository;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.ai.PointExtractionResult;
@@ -17,9 +16,7 @@ import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -31,36 +28,36 @@ public class NoteConstructionService {
       "'index' is reserved for notebook and folder index content.";
   private final AuthorizationService authorizationService;
   private final TestabilitySettings testabilitySettings;
-  private final NoteRepository noteRepository;
   private final FolderRepository folderRepository;
   private final EntityPersister entityPersister;
   private final NoteRealmService noteRealmService;
   private final WikiTitleCacheService wikiTitleCacheService;
   private final NoteService noteService;
+  private final NoteTitlePlacementRules noteTitlePlacementRules;
 
   @Autowired
   public NoteConstructionService(
       AuthorizationService authorizationService,
       TestabilitySettings testabilitySettings,
-      NoteRepository noteRepository,
       FolderRepository folderRepository,
       EntityPersister entityPersister,
       NoteRealmService noteRealmService,
       WikiTitleCacheService wikiTitleCacheService,
-      NoteService noteService) {
+      NoteService noteService,
+      NoteTitlePlacementRules noteTitlePlacementRules) {
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
-    this.noteRepository = noteRepository;
     this.folderRepository = folderRepository;
     this.entityPersister = entityPersister;
     this.noteRealmService = noteRealmService;
     this.wikiTitleCacheService = wikiTitleCacheService;
     this.noteService = noteService;
+    this.noteTitlePlacementRules = noteTitlePlacementRules;
   }
 
   private Note createNote(Notebook notebook, Folder folderOrNull, String title) {
     throwIfReservedTitle(title);
-    throwIfSoftDeletedTitleBlocks(notebook, folderOrNull, title);
+    noteTitlePlacementRules.requireNoSoftDeletedTitleAt(notebook, folderOrNull, title);
     Note note = new Note();
     Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
     note.initializeNewNote(notebook, ts, title);
@@ -120,28 +117,6 @@ public class NoteConstructionService {
       apiError.add("newTitle", RESERVED_INDEX_TITLE_MESSAGE);
       throw new ApiException(apiError);
     }
-  }
-
-  private void throwIfSoftDeletedTitleBlocks(Notebook notebook, Folder folderOrNull, String title) {
-    String trimmed = title != null ? title.trim() : "";
-    if (trimmed.isEmpty()) {
-      return;
-    }
-    Integer folderId = folderOrNull != null ? folderOrNull.getId() : null;
-    List<Note> matches =
-        noteRepository.findSoftDeletedByNotebookFolderAndTitleOrderByIdAsc(
-            notebook.getId(), folderId, trimmed, PageRequest.of(0, 1));
-    if (matches.isEmpty()) {
-      return;
-    }
-    Note deleted = matches.getFirst();
-    ApiError apiError =
-        new ApiError(
-            "A note with this title already exists here but was deleted. Restore the deleted note"
-                + " (Undo delete), or choose another title.",
-            ApiError.ErrorType.SOFT_DELETED_TITLE_CONFLICT);
-    apiError.add("deletedNoteId", String.valueOf(deleted.getId()));
-    throw new ApiException(apiError);
   }
 
   public NoteRealm createNoteFromPromotedPointToSibling(

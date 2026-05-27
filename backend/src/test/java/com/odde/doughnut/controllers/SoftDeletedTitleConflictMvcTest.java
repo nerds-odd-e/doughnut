@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -114,5 +115,62 @@ class SoftDeletedTitleConflictMvcTest extends ControllerTestBase {
                 .content(objectMapper.writeValueAsString(dto)))
         .andExpect(status().isConflict())
         .andExpect(jsonPath("$.errorType").value("SOFT_DELETED_TITLE_CONFLICT"));
+  }
+
+  @Test
+  void moveNoteToFolderReturns409WhenSoftDeletedNoteHasSameTitleAtDestination() throws Exception {
+    User owner = currentUser.getUser();
+    Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+    makeMe.aRootNote("anchor").notebook(nb).please();
+    Folder folderA = makeMe.aFolder().notebook(nb).name("A").please();
+    Folder folderB = makeMe.aFolder().notebook(nb).name("B").please();
+    Note deleted = makeMe.aNote().folder(folderB).title("DupTitle").please();
+    noteService.destroy(deleted, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, owner);
+    Note mover = makeMe.aNote().folder(folderA).title("DupTitle").please();
+
+    mockMvc
+        .perform(
+            post(
+                "/api/relations/move-to-folder/{sourceNote}/{targetFolder}",
+                mover.getId(),
+                folderB.getId()))
+        .andExpect(status().isConflict())
+        .andExpect(jsonPath("$.errorType").value("SOFT_DELETED_TITLE_CONFLICT"))
+        .andExpect(jsonPath("$.errors.deletedNoteId").value(String.valueOf(deleted.getId())));
+  }
+
+  @Test
+  void moveNoteToNotebookRootReturns409WhenSoftDeletedNoteHasSameTitleAtRoot() throws Exception {
+    User owner = currentUser.getUser();
+    Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+    makeMe.aRootNote("anchor").notebook(nb).please();
+    Folder folder = makeMe.aFolder().notebook(nb).name("Box").please();
+    Note deleted = makeMe.aNote().notebook(nb).title("DupTitle").please();
+    noteService.destroy(deleted, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, owner);
+    Note mover = makeMe.aNote().folder(folder).title("DupTitle").please();
+
+    mockMvc
+        .perform(post("/api/relations/move-to-notebook-root/{sourceNote}", mover.getId()))
+        .andExpect(status().isConflict())
+        .andExpect(jsonPath("$.errorType").value("SOFT_DELETED_TITLE_CONFLICT"))
+        .andExpect(jsonPath("$.errors.deletedNoteId").value(String.valueOf(deleted.getId())));
+  }
+
+  @Test
+  void dissolveFolderReturns409WhenSoftDeletedNoteHasSameTitleAtDestination() throws Exception {
+    User owner = currentUser.getUser();
+    Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+    makeMe.aRootNote("anchor").notebook(nb).please();
+    Folder outer = makeMe.aFolder().notebook(nb).name("Outer").please();
+    Folder mid = makeMe.aFolder().parentFolder(outer).name("Mid").please();
+    Note deleted = makeMe.aNote().folder(outer).title("Loose").please();
+    noteService.destroy(deleted, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, owner);
+    makeMe.aNote().folder(mid).title("Loose").please();
+
+    mockMvc
+        .perform(delete("/api/notebooks/{notebook}/folders/{folder}", nb.getId(), mid.getId()))
+        .andExpect(status().isConflict())
+        .andExpect(jsonPath("$.errorType").value("SOFT_DELETED_TITLE_CONFLICT"))
+        .andExpect(jsonPath("$.errors.deletedNoteId").value(String.valueOf(deleted.getId())));
   }
 }

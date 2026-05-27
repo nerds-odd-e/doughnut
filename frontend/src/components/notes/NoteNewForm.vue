@@ -71,7 +71,7 @@ import WikidataSearchByLabel from "./WikidataSearchByLabel.vue"
 import { useRouter } from "vue-router"
 import { calculateNewTitle } from "@/utils/wikidataTitleActions"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import { toOpenApiError } from "@/managedApi/openApiError"
+import { parseSoftDeletedTitleConflict } from "@/managedApi/softDeletedTitleConflict"
 import usePopups from "@/components/commons/Popups/usePopups"
 
 const router = useRouter()
@@ -163,24 +163,9 @@ function parseCreateNoteFailure(e: unknown): {
   fieldErrors: { newTitle?: string; wikidataId?: string }
   softDeletedNoteId?: number
 } {
-  const err = e as { body?: unknown }
-  const body = err.body
-  if (body && typeof body === "object") {
-    const parsed = toOpenApiError(body)
-    const errorType =
-      "errorType" in body &&
-      typeof (body as { errorType: unknown }).errorType === "string"
-        ? (body as { errorType: string }).errorType
-        : parsed.errorType
-    if (
-      errorType === "SOFT_DELETED_TITLE_CONFLICT" &&
-      parsed.errors?.deletedNoteId
-    ) {
-      const id = Number(parsed.errors.deletedNoteId)
-      if (!Number.isNaN(id)) {
-        return { fieldErrors: {}, softDeletedNoteId: id }
-      }
-    }
+  const conflict = parseSoftDeletedTitleConflict(e)
+  if (conflict?.deletedNoteId != null) {
+    return { fieldErrors: {}, softDeletedNoteId: conflict.deletedNoteId }
   }
   return {
     fieldErrors: {
