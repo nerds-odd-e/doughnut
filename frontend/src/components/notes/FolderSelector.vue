@@ -4,15 +4,12 @@
       {{ loadError }}
     </p>
     <div class="daisy-join w-full folder-selector-join">
-      <div
-        class="folder-selector-join-select daisy-join-item flex flex-1 min-w-0 items-center border border-base-content/20 bg-base-100 pl-3 pr-2 rounded-l-lg min-h-[2.75rem]"
+      <select
+        v-model="selectModel"
+        class="daisy-select daisy-select-sm daisy-join-item min-h-[2.75rem] w-full min-w-0 flex-1"
+        data-testid="folder-move-parent-select"
+        :disabled="disabled"
       >
-        <select
-          v-model="selectModel"
-          class="daisy-select daisy-select-sm w-full min-h-0 flex-1 border-0 bg-base-100 text-base-content shadow-none focus:outline-none focus:ring-0"
-          data-testid="folder-move-parent-select"
-          :disabled="disabled"
-        >
           <optgroup label="Notebook root">
             <option value="__root__">Notebook root</option>
           </optgroup>
@@ -39,8 +36,7 @@
               {{ selectionSummary }}
             </option>
           </optgroup>
-        </select>
-      </div>
+      </select>
       <div
         class="folder-selector-join-append daisy-join-item flex shrink-0 self-stretch items-stretch"
       >

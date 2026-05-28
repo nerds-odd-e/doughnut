@@ -23,6 +23,13 @@
   prefix: daisy-;
 }
 
+/* Same border as daisy-select / daisy-input field controls */
+.daisy-dropdown-content,
+.doughnut-menu-panel {
+  --input-color: color-mix(in oklab, var(--color-base-content) 20%, #0000);
+  border: var(--border) solid var(--input-color);
+}
+
 svg {
   display: initial;
 }
