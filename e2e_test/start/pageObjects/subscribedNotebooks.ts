@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 /// <reference path="../../support/index.d.ts" />
 import { pageIsNotLoading } from '../pageBase'
+import { findDropdownPortalButton } from './dropdownPortal'
 
 /** Bazaar subscriptions appear in the merged notebooks catalog (same list as owned notebooks). */
 export const subscribedNotebooks = () => {
@@ -15,7 +16,7 @@ export const subscribedNotebooks = () => {
           .toArray()
           .some((h) => h.textContent?.trim() === notebookName)
         if (!titleMatch) return false
-        return $card.find('button[title="Edit subscription"]').length > 0
+        return $card.find('button[title="Unsubscribe"]').length > 0
       })
       .first()
       .as('subscribedCatalogCard')
@@ -30,9 +31,7 @@ export const subscribedNotebooks = () => {
         openMoveToGroupDialog() {
           pageIsNotLoading()
           openOverflowOnSubscribedCard(notebookName)
-          cy.get('@subscribedCatalogCard')
-            .findByRole('button', { name: 'Move to group…' })
-            .click()
+          findDropdownPortalButton('Move to group…').click()
         },
       }
     },

@@ -1,5 +1,6 @@
 import { commonSenseSplit } from '../../support/string_util'
 import { pageIsNotLoading } from '../pageBase'
+import { findDropdownPortalButton } from './dropdownPortal'
 import notebookPage from './notebookPage'
 
 export const notebookList = () => {
@@ -107,8 +108,12 @@ export const findNotebookCardButton = (notebook: string, name: string) => {
             .click()
         }
       })
-      .get('@notebookCatalogCard')
-      .findByRole('button', { name: name })
+      .then(() => {
+        if (usesCatalogOverflowMenu(name)) {
+          return findDropdownPortalButton(name)
+        }
+        return cy.get('@notebookCatalogCard').findByRole('button', { name })
+      })
   }
 
   return {
