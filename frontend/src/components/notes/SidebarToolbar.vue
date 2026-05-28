@@ -38,33 +38,9 @@
         >
           <component :is="triggerIcon" class="w-6 h-6" aria-hidden="true" />
         </summary>
-        <ul
-          tabindex="0"
-          class="daisy-dropdown-content daisy-menu bg-base-100 rounded-box min-w-[16rem] w-[17.5rem] max-w-[17.5rem] p-2 shadow z-[1000]"
-        >
-          <li
-            v-for="row in SIDEBAR_PEER_SORT_MENU_ROWS"
-            :key="`${row.spec.field}-${row.spec.direction}`"
-            class="daisy-menu-item p-0"
-          >
-            <button
-              type="button"
-              class="daisy-btn daisy-btn-ghost h-auto min-h-0 w-full justify-start gap-2 py-2 font-normal whitespace-normal items-start text-left"
-              :title="row.label"
-              @click="selectSort(row.spec, closeDropdown)"
-            >
-              <component
-                :is="row.Icon"
-                :size="14"
-                class="mt-0.5 shrink-0"
-                aria-hidden="true"
-              />
-              <span class="min-w-0 text-left leading-snug">{{
-                row.label
-              }}</span>
-            </button>
-          </li>
-        </ul>
+        <SidebarPeerSortDropdownMenu
+          @select="(spec) => selectSort(spec, closeDropdown)"
+        />
       </AutoCollapseDropdown>
     </div>
   </nav>
@@ -77,6 +53,7 @@ import type {
   NoteRealm,
 } from "@generated/doughnut-backend-api"
 import { SIDEBAR_PEER_SORT_MENU_ROWS } from "@/composables/sidebarPeerSortMenuRows"
+import SidebarPeerSortDropdownMenu from "./SidebarPeerSortDropdownMenu.vue"
 import {
   useNoteSidebarPeerSort,
   type SidebarPeerSortSpec,

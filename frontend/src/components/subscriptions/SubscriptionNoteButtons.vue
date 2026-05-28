@@ -11,31 +11,28 @@
       >
         <MoreHorizontal class="w-6 h-6" />
       </summary>
-      <ul
-        tabindex="0"
-        class="daisy-dropdown-content daisy-menu bg-base-100 rounded-box w-52 p-2 shadow z-[1000]"
-      >
-        <li class="daisy-menu-item p-0">
+      <DropdownMenu>
+        <DropdownMenuItem>
           <button
             type="button"
-            class="daisy-btn daisy-btn-ghost h-auto min-h-0 w-full justify-start py-2 font-normal"
+            :class="dropdownMenuButtonClass"
             title="Edit subscription"
             @click="openEdit(closeDropdown)"
           >
             Edit subscription
           </button>
-        </li>
-        <li class="daisy-menu-item p-0">
+        </DropdownMenuItem>
+        <DropdownMenuItem>
           <button
             type="button"
-            class="daisy-btn daisy-btn-ghost h-auto min-h-0 w-full justify-start py-2 font-normal"
+            :class="dropdownMenuButtonClass"
             title="Move to group"
             @click="openMoveToGroup(closeDropdown)"
           >
             Move to group…
           </button>
-        </li>
-      </ul>
+        </DropdownMenuItem>
+      </DropdownMenu>
     </AutoCollapseDropdown>
     <button
       class="daisy-btn daisy-btn-ghost daisy-btn-sm"
@@ -75,6 +72,9 @@ import { SubscriptionController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import Modal from "../commons/Modal.vue"
 import AutoCollapseDropdown from "../commons/AutoCollapseDropdown.vue"
+import DropdownMenu from "../commons/DropdownMenu.vue"
+import DropdownMenuItem from "../commons/DropdownMenuItem.vue"
+import { dropdownMenuButtonClass } from "../commons/dropdownMenuClasses"
 import usePopups from "../commons/Popups/usePopups"
 import { Minus, MoreHorizontal } from "@lucide/vue"
 import NotebookCatalogMoveToGroupForm from "@/components/notebook/NotebookCatalogMoveToGroupForm.vue"

@@ -7,7 +7,7 @@
       :is-active="false"
     >
       <template #dropdown="slotProps">
-        <ul tabindex="0" class="daisy-dropdown-content daisy-menu p-2 bg-base-100 rounded-box w-52 shadow max-w-52 overflow-hidden z-[1000]">
+        <DropdownMenu panel-class="max-w-52 overflow-hidden">
           <li v-if="user?.admin" class="daisy-menu-item hover:bg-base-200">
             <router-link :to="{ name: 'adminDashboard' }" class="daisy-menu-title justify-start text-primary hover:text-primary-focus w-full text-left truncate" @click="slotProps.closeDropdown">
               Admin Dashboard
@@ -33,7 +33,7 @@
               Logout
             </a>
           </li>
-        </ul>
+        </DropdownMenu>
       </template>
     </NavigationItem>
   </li>
@@ -43,6 +43,7 @@
 import type { User } from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
+import DropdownMenu from "@/components/commons/DropdownMenu.vue"
 import { CircleCheck, User as UserIcon } from "@lucide/vue"
 
 defineProps({

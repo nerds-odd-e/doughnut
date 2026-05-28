@@ -23,21 +23,18 @@
       >
         <MoreHorizontal class="h-6 w-6" />
       </summary>
-      <ul
-        tabindex="0"
-        class="daisy-dropdown-content daisy-menu bg-base-100 rounded-box w-52 p-2 shadow z-[1000]"
-      >
-        <li class="daisy-menu-item p-0">
+      <DropdownMenu>
+        <DropdownMenuItem>
           <button
             type="button"
-            class="daisy-btn daisy-btn-ghost h-auto min-h-0 w-full justify-start py-2 font-normal"
+            :class="dropdownMenuButtonClass"
             title="Move to group"
             @click="openMoveToGroup(closeDropdown)"
           >
             Move to group…
           </button>
-        </li>
-      </ul>
+        </DropdownMenuItem>
+      </DropdownMenu>
     </AutoCollapseDropdown>
     <Modal v-if="showMoveToGroup" @close_request="closeMoveToGroup">
       <template #body>
@@ -62,6 +59,9 @@ import { BookOpen, MoreHorizontal } from "@lucide/vue"
 import type { Notebook, User } from "@generated/doughnut-backend-api"
 import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
+import DropdownMenu from "@/components/commons/DropdownMenu.vue"
+import DropdownMenuItem from "@/components/commons/DropdownMenuItem.vue"
+import { dropdownMenuButtonClass } from "@/components/commons/dropdownMenuClasses"
 import Modal from "@/components/commons/Modal.vue"
 import {
   catalogMoveToGroupContextKey,

@@ -27,29 +27,25 @@
             >
               <Clock class="w-5 h-5" />
             </summary>
-            <ul
-              tabindex="0"
-              class="daisy-dropdown-content daisy-menu bg-base-100 rounded-box min-w-[12rem] max-w-[20rem] max-h-60 overflow-y-auto p-2 shadow z-[1000]"
-            >
+            <DropdownMenu size="history">
               <li v-if="historyKeys.length === 0" class="px-2 py-1 text-sm opacity-60">
                 No search history yet
               </li>
-              <li
+              <DropdownMenuItem
                 v-for="(key, index) in historyKeys"
                 :key="`${index}-${key}`"
-                class="daisy-menu-item p-0"
               >
                 <button
                   type="button"
-                  class="daisy-btn daisy-btn-ghost h-auto min-h-0 w-full justify-start py-2 font-normal text-left whitespace-normal break-words"
+                  :class="dropdownMenuButtonMultilineClass"
                   :title="key"
                   :data-testid="`search-key-history-item-${index}`"
                   @click="pickHistoryKey(key, closeDropdown)"
                 >
                   {{ key }}
                 </button>
-              </li>
-            </ul>
+              </DropdownMenuItem>
+            </DropdownMenu>
           </AutoCollapseDropdown>
         </template>
       </TextInput>
@@ -155,6 +151,9 @@ import SearchResults from "./SearchResults.vue"
 import type { NoteSearchResult } from "@generated/doughnut-backend-api"
 import { readSearchKeyHistory } from "@/utils/searchKeyHistoryCookie"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
+import DropdownMenu from "@/components/commons/DropdownMenu.vue"
+import DropdownMenuItem from "@/components/commons/DropdownMenuItem.vue"
+import { dropdownMenuButtonMultilineClass } from "@/components/commons/dropdownMenuClasses"
 
 const { initialSearchKey } = defineProps<{
   noteId?: number

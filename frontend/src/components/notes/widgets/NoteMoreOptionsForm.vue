@@ -1,74 +1,64 @@
 <template>
-  <div class="bg-base-200 rounded-b-lg p-5 shadow-lg animate-dropdown">
-    <ul class="daisy-menu mt-2 min-w-64 p-0">
-      <li>
-        <PopButton
-          btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm h-auto min-h-0 w-full justify-start gap-2 py-2 font-normal"
-          title="Export..."
-        >
-          <template #button_face>
-            <Upload class="w-5 h-5 shrink-0" aria-hidden="true" />
-            <span>Export...</span>
-          </template>
-          <template #default="{ closer }">
-            <NoteExportForm :note="note" @close-dialog="closer" />
-          </template>
-        </PopButton>
-      </li>
+  <DropdownMenu size="wide">
+    <DropdownMenuItem>
+      <PopButton :btn-class="dropdownMenuButtonClass" title="Export...">
+        <template #button_face>
+          <Upload class="shrink-0" :size="20" aria-hidden="true" />
+          <span>Export...</span>
+        </template>
+        <template #default="{ closer }">
+          <NoteExportForm :note="note" @close-dialog="closer" />
+        </template>
+      </PopButton>
+    </DropdownMenuItem>
 
-      <li>
-        <PopButton
-          btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm h-auto min-h-0 w-full justify-start gap-2 py-2 font-normal"
-          title="Questions for the note"
-        >
-          <template #button_face>
-            <MessageCircleQuestion
-              class="w-5 h-5 shrink-0"
-              aria-hidden="true"
-            />
-            <span>Questions for the note</span>
-          </template>
-          <template #default>
-            <Questions v-bind="{ note }" />
-          </template>
-        </PopButton>
-      </li>
+    <DropdownMenuItem>
+      <PopButton
+        :btn-class="dropdownMenuButtonClass"
+        title="Questions for the note"
+      >
+        <template #button_face>
+          <MessageCircleQuestion class="shrink-0" :size="20" aria-hidden="true" />
+          <span>Questions for the note</span>
+        </template>
+        <template #default>
+          <Questions v-bind="{ note }" />
+        </template>
+      </PopButton>
+    </DropdownMenuItem>
 
-      <li>
-        <button
-          class="daisy-btn daisy-btn-ghost daisy-btn-sm h-auto min-h-0 w-full justify-start gap-2 py-2 font-normal"
-          title="Assimilation settings"
-          @click="assimilateNote"
-        >
-          <CircleCheck class="w-5 h-5 shrink-0" aria-hidden="true" />
-          <span>Assimilation settings</span>
-        </button>
-      </li>
+    <DropdownMenuItem>
+      <DropdownMenuActionButton
+        title="Assimilation settings"
+        :icon="CircleCheck"
+        @click="assimilateNote"
+      />
+    </DropdownMenuItem>
 
-      <li>
-        <button
-          class="daisy-btn daisy-btn-ghost daisy-btn-sm h-auto min-h-0 w-full justify-start gap-2 py-2 font-normal"
-          title="Delete note"
-          @click="deleteNote"
-        >
-          <Trash2 class="w-5 h-5 shrink-0" aria-hidden="true" />
-          <span>Delete note</span>
-        </button>
-      </li>
-    </ul>
-  </div>
+    <DropdownMenuItem>
+      <DropdownMenuActionButton
+        title="Delete note"
+        :icon="Trash2"
+        @click="deleteNote"
+      />
+    </DropdownMenuItem>
+  </DropdownMenu>
 </template>
 
 <script setup lang="ts">
 import type { Note } from "@generated/doughnut-backend-api"
-import PopButton from "../../commons/Popups/PopButton.vue"
-import Questions from "../Questions.vue"
+import PopButton from "@/components/commons/Popups/PopButton.vue"
+import Questions from "@/components/notes/Questions.vue"
 import { CircleCheck, MessageCircleQuestion, Trash2, Upload } from "@lucide/vue"
-import NoteExportForm from "../core/NoteExportForm.vue"
+import NoteExportForm from "@/components/notes/core/NoteExportForm.vue"
 import { useRouter } from "vue-router"
-import usePopups from "../../commons/Popups/usePopups"
+import usePopups from "@/components/commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import type { NoteDeleteReferenceHandling } from "@/store/StoredApiCollection"
+import DropdownMenu from "@/components/commons/DropdownMenu.vue"
+import DropdownMenuActionButton from "@/components/commons/DropdownMenuActionButton.vue"
+import DropdownMenuItem from "@/components/commons/DropdownMenuItem.vue"
+import { dropdownMenuButtonClass } from "@/components/commons/dropdownMenuClasses"
 
 const { note } = defineProps<{
   note: Note
@@ -126,21 +116,3 @@ const deleteNote = async () => {
     .deleteNote(router, note.id, referenceHandling)
 }
 </script>
-
-<style scoped>
-@keyframes dropDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-dropdown {
-  animation: dropDown 0.3s ease-out;
-  transform-origin: top;
-}
-</style>

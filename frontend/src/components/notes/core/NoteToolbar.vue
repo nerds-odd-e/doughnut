@@ -62,12 +62,10 @@
         >
           <Settings class="w-6 h-6" />
         </summary>
-        <div class="daisy-dropdown-content z-[1000] mt-1">
-          <NoteMoreOptionsForm
-            v-bind="{ note }"
-            @close-dialog="closeDropdown"
-          />
-        </div>
+        <NoteMoreOptionsForm
+          v-bind="{ note }"
+          @close-dialog="closeDropdown"
+        />
       </AutoCollapseDropdown>
     </div>
   </nav>
