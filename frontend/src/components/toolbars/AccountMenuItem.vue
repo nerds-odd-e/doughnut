@@ -6,33 +6,48 @@
       :has-dropdown="true"
       :is-active="false"
     >
-      <template #dropdown="slotProps">
-        <DropdownMenu panel-class="max-w-52 overflow-hidden">
-          <li v-if="user?.admin" class="daisy-menu-item hover:bg-base-200">
-            <router-link :to="{ name: 'adminDashboard' }" class="daisy-menu-title justify-start text-primary hover:text-primary-focus w-full text-left truncate" @click="slotProps.closeDropdown">
+      <template #dropdown="{ closeDropdown }">
+        <DropdownMenu>
+          <DropdownMenuItem v-if="user?.admin">
+            <router-link
+              :to="{ name: 'adminDashboard' }"
+              :class="dropdownMenuButtonClass"
+              @click="closeDropdown"
+            >
               Admin Dashboard
             </router-link>
-          </li>
-          <li class="daisy-menu-item hover:bg-base-200">
-            <router-link :to="{ name: 'recent' }" class="daisy-menu-title justify-start text-primary hover:text-primary-focus w-full text-left truncate" @click="slotProps.closeDropdown">
-              <CircleCheck class="mr-2 w-6 h-6 shrink-0" />Recent...
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <router-link
+              :to="{ name: 'recent' }"
+              :class="dropdownMenuButtonClass"
+              @click="closeDropdown"
+            >
+              <CircleCheck class="shrink-0" :size="20" aria-hidden="true" />
+              <span>Recent...</span>
             </router-link>
-          </li>
-          <li class="daisy-menu-item hover:bg-base-200">
-            <a href="#" class="daisy-menu-title justify-start text-primary hover:text-primary-focus w-full text-left truncate" @click="(e) => { e.preventDefault(); showUserSettingsDialog(); slotProps.closeDropdown(); }">
-              Settings for {{ user.name }}
-            </a>
-          </li>
-          <li class="daisy-menu-item hover:bg-base-200">
-            <router-link :to="{ name: 'manageAccessTokens' }" class="daisy-menu-title justify-start text-primary hover:text-primary-focus w-full text-left truncate" @click="slotProps.closeDropdown">
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <DropdownMenuActionButton
+              :title="settingsTitle"
+              @click="openSettings(closeDropdown)"
+            />
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <router-link
+              :to="{ name: 'manageAccessTokens' }"
+              :class="dropdownMenuButtonClass"
+              @click="closeDropdown"
+            >
               Manage Access Tokens
             </router-link>
-          </li>
-          <li class="daisy-menu-item hover:bg-base-200">
-            <a href="#" class="daisy-menu-title justify-start text-primary hover:text-primary-focus w-full text-left truncate" @click="(e) => { e.preventDefault(); logout(); slotProps.closeDropdown(); }">
-              Logout
-            </a>
-          </li>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <DropdownMenuActionButton
+              title="Logout"
+              @click="onLogout(closeDropdown)"
+            />
+          </DropdownMenuItem>
         </DropdownMenu>
       </template>
     </NavigationItem>
@@ -41,12 +56,15 @@
 
 <script setup lang="ts">
 import type { User } from "@generated/doughnut-backend-api"
-import type { PropType } from "vue"
+import { computed, type PropType } from "vue"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import DropdownMenu from "@/components/commons/DropdownMenu.vue"
+import DropdownMenuActionButton from "@/components/commons/DropdownMenuActionButton.vue"
+import DropdownMenuItem from "@/components/commons/DropdownMenuItem.vue"
+import { dropdownMenuButtonClass } from "@/components/commons/dropdownMenuClasses"
 import { CircleCheck, User as UserIcon } from "@lucide/vue"
 
-defineProps({
+const props = defineProps({
   user: { type: Object as PropType<User>, required: true },
   showUserSettingsDialog: {
     type: Function as PropType<() => void>,
@@ -54,5 +72,16 @@ defineProps({
   },
   logout: { type: Function as PropType<() => void>, required: true },
 })
-</script>
 
+const settingsTitle = computed(() => `Settings for ${props.user.name}`)
+
+const openSettings = (closeDropdown: () => void) => {
+  props.showUserSettingsDialog()
+  closeDropdown()
+}
+
+const onLogout = (closeDropdown: () => void) => {
+  props.logout()
+  closeDropdown()
+}
+</script>

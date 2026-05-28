@@ -26,11 +26,7 @@ describe("AccountMenuItem", () => {
 
     await fireEvent.click(screen.getByLabelText("Account"))
     await flushPromises()
-    const logoutLink = Array.from(
-      document.querySelectorAll("[data-dropdown-portal-panel] a")
-    ).find((el) => el.textContent?.includes("Logout"))
-    expect(logoutLink).toBeDefined()
-    await fireEvent.click(logoutLink as HTMLElement)
+    await fireEvent.click(screen.getByTitle("Logout"))
     expect(logout).toHaveBeenCalledOnce()
   })
 
