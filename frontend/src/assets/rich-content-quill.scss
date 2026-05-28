@@ -1,0 +1,85 @@
+.ql-editor {
+  @apply rich-content-prose;
+  padding: 0;
+  margin-bottom: 15px;
+
+  &::before {
+    left: 0 !important;
+    right: 0 !important;
+  }
+
+  /* Quill zeroes block margins; restore readable document spacing under prose. */
+  p,
+  blockquote,
+  pre {
+    margin-top: 1.25em;
+    margin-bottom: 1.25em;
+  }
+
+  p:first-child,
+  blockquote:first-child,
+  pre:first-child,
+  h1:first-child,
+  h2:first-child,
+  h3:first-child,
+  h4:first-child,
+  h5:first-child,
+  h6:first-child {
+    margin-top: 0;
+  }
+
+  /* Preserve Quill list UI (data-list + .ql-ui pseudo-bullets). */
+  ol,
+  ul {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 1.25em;
+    margin-bottom: 1.25em;
+  }
+
+  li[data-list] {
+    list-style: none;
+    padding-left: 1.5em;
+    position: relative;
+  }
+
+  .ql-code-block-container {
+    margin-top: 1.25em;
+    margin-bottom: 1.25em;
+    background-color: color-mix(
+      in oklch,
+      var(--color-base-content) 8%,
+      transparent
+    );
+    border-radius: 0.375em;
+    overflow: visible;
+  }
+
+  .ql-code-block {
+    font-family: ui-monospace, monospace;
+    font-size: 0.875em;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  mark {
+    background-color: color-mix(
+      in oklch,
+      var(--color-warning) 35%,
+      transparent
+    );
+    padding: 0.1em 0.2em;
+    border-radius: 0.15em;
+  }
+}
+
+.ql-container.ql-bubble {
+  border: none;
+  font-family: inherit;
+  font-size: inherit !important;
+}

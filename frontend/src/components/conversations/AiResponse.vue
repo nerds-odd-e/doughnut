@@ -3,8 +3,10 @@
     <div class="message-avatar me-2" title="AI Assistant">
       <Bot class="w-6 h-6" />
     </div>
-    <div class="daisy-card py-2 px-3 bg-base-200 ai-chat"
-    v-html="markdowntToHtml(currentAiReply)"
+    <div
+      class="daisy-card py-2 px-3 bg-base-200 ai-chat"
+      :class="RICH_CONTENT_PROSE"
+      v-html="markdowntToHtml(currentAiReply)"
     />
   </div>
 
@@ -37,6 +39,7 @@ import type { Conversation } from "@generated/doughnut-backend-api"
 import type { ToolCallResult } from "@/models/aiReplyState"
 import { Bot } from "@lucide/vue"
 import markdownizer from "../form/markdownizer"
+import { RICH_CONTENT_PROSE } from "@/constants/richContentProse"
 import {
   createAiReplyStates,
   type AiActionContext,

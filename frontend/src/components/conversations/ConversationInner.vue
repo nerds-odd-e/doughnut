@@ -42,7 +42,11 @@
           ]"
         >
           <pre v-if="isCurrentUser(conversationMessage.sender?.id || 0)" class="user-message">{{ formatMessage(conversationMessage.message) }}</pre>
-          <div v-else v-html="markdowntToHtml(formatMessage(conversationMessage.message))" />
+          <div
+            v-else
+            :class="RICH_CONTENT_PROSE"
+            v-html="markdowntToHtml(formatMessage(conversationMessage.message))"
+          />
         </div>
       </div>
 
@@ -71,6 +75,7 @@ import { Bot, User as UserIcon } from "@lucide/vue"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import ConversationTemplate from "./ConversationTemplate.vue"
 import markdownizer from "../form/markdownizer"
+import { RICH_CONTENT_PROSE } from "@/constants/richContentProse"
 
 const { conversation, user, initialAiReply, isMaximized } = defineProps<{
   conversation: Conversation

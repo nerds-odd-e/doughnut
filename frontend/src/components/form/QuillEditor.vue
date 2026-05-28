@@ -181,7 +181,6 @@ const options: QuillOptions = {
 onMounted(async () => {
   if (editor.value) {
     quill.value = new Quill(editor.value, options)
-    quill.value.root.classList.add("rich-content-links")
 
     // Set initial content
     updateQuillContent(localValue.value)
@@ -301,26 +300,3 @@ function insertTextAtCursor(text: string) {
 
 defineExpose({ insertTextAtCursor })
 </script>
-
-<style lang="sass">
-.ql-editor
-  padding: 0
-  margin-bottom: 15px
-  &::before
-    left: 0 !important
-    right: 0 !important
-  p
-    margin: inherit !important
-  pre
-    margin: inherit !important
-    white-space: pre-wrap
-    word-wrap: break-word
-  code
-    background-color: color-mix(in oklch, var(--color-base-content) 12%, transparent)
-    padding: 0.1em 0.35em
-    border-radius: 0.25em
-    font-size: 0.9em
-.ql-container.ql-bubble
-  border: none
-  font-size: inherit !important
-</style>

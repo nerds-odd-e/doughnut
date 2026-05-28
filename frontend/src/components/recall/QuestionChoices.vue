@@ -23,7 +23,7 @@
       >
         <div
           v-html="getChoiceHtml(choice)"
-          class="whitespace-normal break-words choice-text"
+          :class="[RICH_CONTENT_PROSE_SM, 'whitespace-normal break-words choice-text']"
           @click.capture="handleInnerClick"
         />
       </button>
@@ -37,6 +37,7 @@
 import type { AnswerDto } from "@generated/doughnut-backend-api"
 import { defineComponent } from "vue"
 import markdownizer from "../form/markdownizer"
+import { RICH_CONTENT_PROSE_SM } from "@/constants/richContentProse"
 
 export default defineComponent({
   props: {
@@ -48,6 +49,9 @@ export default defineComponent({
     disabled: Boolean,
   },
   emits: ["answer"],
+  setup() {
+    return { RICH_CONTENT_PROSE_SM }
+  },
   methods: {
     handleInnerClick(event: Event) {
       // Prevent any link clicks from navigating, but allow text selection

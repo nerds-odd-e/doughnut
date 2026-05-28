@@ -24,6 +24,7 @@ import type {
 import type { ToolCallResult } from "@/models/aiReplyState"
 import AcceptRejectButtons from "@/components/commons/AcceptRejectButtons.vue"
 import markdownizer from "../form/markdownizer"
+import { RICH_CONTENT_PROSE } from "@/constants/richContentProse"
 import type { Suggestion } from "@/models/suggestions"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { useToast } from "@/composables/useToast"
@@ -62,7 +63,7 @@ const suggestionTitle = computed(() => {
 const suggestionContentClass = computed(() => {
   switch (props.suggestion?.suggestionType) {
     case "completion":
-      return "completion-text"
+      return `completion-text ${RICH_CONTENT_PROSE}`
     case "title":
       return "title-suggestion"
     case "unknown":

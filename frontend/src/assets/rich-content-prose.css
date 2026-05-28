@@ -1,0 +1,7 @@
+@utility rich-content-prose {
+  @apply prose prose-neutral dark:prose-invert max-w-none prose-headings:text-base-content prose-p:text-base-content;
+}
+
+@utility rich-content-prose-sm {
+  @apply prose prose-sm prose-neutral dark:prose-invert max-w-none prose-headings:text-base-content prose-p:text-base-content;
+}
