@@ -1,7 +1,9 @@
 export type DropdownMenuSize = "narrow" | "wide" | "history"
 
-const dropdownMenuPanelBaseClass =
-  "daisy-dropdown-content daisy-menu bg-base-100 rounded-box p-2 shadow z-[1000]"
+/** Above main menu (10000); modals use dialog top layer; Popups stay at 9998. */
+export const dropdownMenuPortalZIndexClass = "z-[10001]"
+
+const dropdownMenuPanelBaseClass = `daisy-dropdown-content daisy-menu bg-base-100 rounded-box p-2 shadow ${dropdownMenuPortalZIndexClass}`
 
 export function dropdownMenuPanelClass(
   size: DropdownMenuSize = "narrow"

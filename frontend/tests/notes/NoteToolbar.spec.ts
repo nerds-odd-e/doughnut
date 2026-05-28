@@ -101,10 +101,13 @@ describe("NoteToolbar", () => {
     const dialog = wrapper.findComponent(NoteMoreOptionsForm)
     expect(dialog.exists()).toBe(true)
 
-    // Check if menu items exist in the dialog (by title attribute for toolbar buttons)
+    // Menu panel is portaled to body
     expect(
-      wrapper.find('button[title="Questions for the note"]').exists()
-    ).toBe(true)
+      document.querySelector("[data-dropdown-portal-panel]")
+    ).not.toBeNull()
+    expect(
+      document.querySelector('button[title="Questions for the note"]')
+    ).not.toBeNull()
   })
 
   it("closes more options dialog when note id changes", async () => {

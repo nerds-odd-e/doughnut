@@ -34,7 +34,7 @@
         <AutoCollapseDropdown
           v-slot="{ closeDropdown }"
           data-testid="notebook-catalog-sort"
-          class="daisy-dropdown daisy-dropdown-start daisy-dropdown-bottom relative z-30 shrink-0"
+          class="daisy-dropdown daisy-dropdown-start daisy-dropdown-bottom shrink-0"
         >
           <summary
             class="daisy-btn daisy-btn-ghost daisy-btn-sm list-none cursor-pointer"

@@ -2,6 +2,7 @@ import AccountMenuItem from "@/components/toolbars/AccountMenuItem.vue"
 import helper from "@tests/helpers"
 import { fireEvent, screen } from "@testing-library/vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
+import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it, vi } from "vitest"
 
 describe("AccountMenuItem", () => {
@@ -24,7 +25,12 @@ describe("AccountMenuItem", () => {
     renderAccountMenuItem({ logout })
 
     await fireEvent.click(screen.getByLabelText("Account"))
-    await fireEvent.click(screen.getByText("Logout"))
+    await flushPromises()
+    const logoutLink = Array.from(
+      document.querySelectorAll("[data-dropdown-portal-panel] a")
+    ).find((el) => el.textContent?.includes("Logout"))
+    expect(logoutLink).toBeDefined()
+    await fireEvent.click(logoutLink as HTMLElement)
     expect(logout).toHaveBeenCalledOnce()
   })
 

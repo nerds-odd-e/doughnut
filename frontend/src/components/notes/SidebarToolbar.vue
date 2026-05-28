@@ -1,6 +1,6 @@
 <template>
   <nav
-    :class="[noteChromeToolbarNavClass, 'overflow-visible relative z-20']"
+    :class="[noteChromeToolbarNavClass, 'overflow-visible']"
     data-note-sidebar-toolbar
   >
     <div
@@ -29,7 +29,7 @@
       <AutoCollapseDropdown
         v-slot="{ closeDropdown }"
         data-note-sidebar-sort
-        class="daisy-dropdown daisy-dropdown-start daisy-dropdown-bottom relative z-30 shrink-0"
+        class="daisy-dropdown daisy-dropdown-start daisy-dropdown-bottom shrink-0"
       >
         <summary
           class="daisy-btn daisy-btn-ghost daisy-btn-sm rounded-none list-none cursor-pointer"

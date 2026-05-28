@@ -76,7 +76,9 @@ describe("Sidebar peer sort", () => {
 
     await wrapper.find("[data-note-sidebar-sort] summary").trigger("click")
     await flushPromises()
-    await wrapper.find('button[title="Title (Z–A)"]').trigger("click")
+    const titleZaButton = document.querySelector('button[title="Title (Z–A)"]')
+    expect(titleZaButton).not.toBeNull()
+    await (titleZaButton as HTMLButtonElement).click()
     await flushPromises()
 
     expect(rootRowLabels(wrapper)).toEqual([
