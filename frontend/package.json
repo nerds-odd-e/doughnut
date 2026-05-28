@@ -22,7 +22,7 @@
     "test": "CI=true vitest run --browser=chromium"
   },
   "dependencies": {
-    "@lucide/vue": "^1.16.0",
+    "@lucide/vue": "^1.17.0",
     "epubjs": "^0.3.93",
     "file-saver": "^2.0.5",
     "mini-debounce": "^1.0.8",
