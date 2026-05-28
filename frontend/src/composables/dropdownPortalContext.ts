@@ -21,3 +21,15 @@ export function isWithinDropdownPortalPanel(
   if (!(target instanceof HTMLElement)) return false
   return target.closest(`[${DROPDOWN_PORTAL_PANEL_ATTR}]`) != null
 }
+
+export function isWithinAutoCollapseDropdownTree(
+  target: EventTarget | null
+): boolean {
+  if (
+    target instanceof HTMLElement &&
+    target.closest("[data-auto-collapse-dropdown]")
+  ) {
+    return true
+  }
+  return isWithinDropdownPortalPanel(target)
+}

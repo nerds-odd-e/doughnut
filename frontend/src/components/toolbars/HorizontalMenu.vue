@@ -95,7 +95,7 @@ import LoginButton from "@/components/toolbars/LoginButton.vue"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import AccountMenuItem from "@/components/toolbars/AccountMenuItem.vue"
 import { ChevronRight, Menu } from "@lucide/vue"
-import { isWithinDropdownPortalPanel } from "@/composables/dropdownPortalContext"
+import { isWithinAutoCollapseDropdownTree } from "@/composables/dropdownPortalContext"
 import { useRecallData } from "@/composables/useRecallData"
 
 type NavigationItemType = {
@@ -186,15 +186,9 @@ const handleMenuIconClick = (event: MouseEvent) => {
   }
 }
 
-const isWithinAutoCollapseDropdown = (target: Node | null): boolean => {
-  if (!(target instanceof HTMLElement)) return false
-  if (target.closest("[data-auto-collapse-dropdown]")) return true
-  return isWithinDropdownPortalPanel(target)
-}
-
 const handleClickOutside = (event: MouseEvent) => {
   const target = event.target as Node
-  if (isWithinAutoCollapseDropdown(target)) {
+  if (isWithinAutoCollapseDropdownTree(target)) {
     return
   }
   if (menuRef.value && !menuRef.value.contains(target)) {
@@ -206,7 +200,7 @@ const handleFocusLoss = () => {
   // Use setTimeout to allow click events to process first
   setTimeout(() => {
     const activeElement = document.activeElement
-    if (isWithinAutoCollapseDropdown(activeElement)) {
+    if (isWithinAutoCollapseDropdownTree(activeElement)) {
       return
     }
     if (menuRef.value && activeElement !== menuRef.value) {

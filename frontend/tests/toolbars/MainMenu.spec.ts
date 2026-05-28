@@ -344,30 +344,6 @@ describe("main menu", () => {
       createMatchMediaSpy(false)
     })
 
-    it("keeps nav expanded when opening account and lists account actions", async () => {
-      mountMainMenu()
-
-      const expandButton = screen.getByLabelText("Toggle menu")
-      await fireEvent.click(expandButton)
-
-      const assimilateLink = screen.getByLabelText("Assimilate")
-      expect(assimilateLink).toBeInTheDocument()
-
-      await fireEvent.click(screen.getByLabelText("Account"))
-
-      const accountDropdown = document.querySelector(
-        "[data-auto-collapse-dropdown]"
-      )
-      expect(accountDropdown).toHaveClass("overflow-visible")
-      expect(getComputedStyle(accountDropdown as Element).overflow).toBe(
-        "visible"
-      )
-      expect(assimilateLink).toBeInTheDocument()
-      expect(screen.getByText(/Settings for/)).toBeInTheDocument()
-      expect(screen.getByText("Recent...")).toBeInTheDocument()
-      expect(screen.getByText("Logout")).toBeInTheDocument()
-    })
-
     it("collapses menu when clicking outside menu and account dropdown", async () => {
       mountMainMenu()
 

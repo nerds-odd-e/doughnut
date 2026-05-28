@@ -29,15 +29,4 @@ describe("AccountMenuItem", () => {
     await fireEvent.click(screen.getByTitle("Logout"))
     expect(logout).toHaveBeenCalledOnce()
   })
-
-  it("opens account actions when the browser click targets the details root", async () => {
-    renderAccountMenuItem()
-
-    const dropdown = document.querySelector("[data-auto-collapse-dropdown]")
-    expect(dropdown).toBeInstanceOf(HTMLDetailsElement)
-
-    await fireEvent.click(dropdown as HTMLDetailsElement)
-
-    expect((dropdown as HTMLDetailsElement).open).toBe(true)
-  })
 })

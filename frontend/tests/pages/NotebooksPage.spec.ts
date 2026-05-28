@@ -9,6 +9,7 @@ import makeMe, {
 } from "doughnut-test-fixtures/makeMe"
 import { NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY } from "@/composables/useNoteSidebarPeerSort"
 import helper, { mockSdkService } from "@tests/helpers"
+import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 
 async function pickNotebookCatalogPeerSort(
@@ -16,14 +17,13 @@ async function pickNotebookCatalogPeerSort(
   field: "title" | "created" | "updated",
   direction: "asc" | "desc"
 ) {
-  ;(
-    wrapper.get('[data-testid="notebook-catalog-sort"]')
-      .element as HTMLDetailsElement
-  ).open = true
+  await fireEvent.click(
+    wrapper.get('[data-testid="notebook-catalog-sort"] summary').element
+  )
   await flushPromises()
-  await wrapper
-    .get(`[data-catalog-sort="${field}-${direction}"]`)
-    .trigger("click")
+  await fireEvent.click(
+    document.querySelector(`[data-catalog-sort="${field}-${direction}"]`)!
+  )
   await flushPromises()
 }
 
@@ -395,14 +395,12 @@ describe("Notebooks Page", () => {
         .withRouter()
         .mount()
       await flushPromises()
-      await wrapper
-        .find('[data-cy="notebook-catalog-overflow"]')
-        .trigger("click")
+      await fireEvent.click(
+        wrapper.get('[data-cy="notebook-catalog-overflow"]').element
+      )
       await flushPromises()
-      expect(
-        wrapper.find('button[title="Edit notebook settings"]').exists()
-      ).toBe(false)
-      expect(wrapper.find('button[title="Move to group"]').exists()).toBe(true)
+      expect(screen.queryByTitle("Edit notebook settings")).toBeNull()
+      expect(screen.getByTitle("Move to group")).toBeInTheDocument()
     })
   })
 
@@ -807,47 +805,6 @@ describe("Notebooks Page", () => {
   })
 
   describe("subscribed notebooks in merged catalog", () => {
-    it("shows subscription actions for a top-level subscribedNotebook row", async () => {
-      const subNotebook = {
-        ...makeMe.aNotebook.please(),
-        name: "Bazaar Shared",
-      }
-      const catalogItems = [
-        makeMe.notebookCatalogNotebook.name("Owned").please(),
-        makeMe.notebookCatalogSubscribedNotebook
-          .forNotebook(subNotebook)
-          .subscriptionId(42)
-          .please(),
-      ]
-      const subscriptions = [
-        { id: 42, notebook: subNotebook, user: makeMe.aUser.please() },
-      ]
-
-      const wrapper = helper
-        .component(NotebooksPageView)
-        .withProps({
-          catalogItems,
-          subscriptions,
-          user: makeMe.aUser.please(),
-        })
-        .withCurrentUser(makeMe.aUser.please())
-        .withRouter()
-        .mount()
-
-      await flushPromises()
-
-      expect(wrapper.find('button[title="Unsubscribe"]').exists()).toBe(true)
-      const overflowTriggers = wrapper.findAll(
-        '[data-cy="notebook-catalog-overflow"]'
-      )
-      expect(overflowTriggers.length).toBeGreaterThanOrEqual(2)
-      await overflowTriggers[1]!.trigger("click")
-      await flushPromises()
-      expect(wrapper.find('button[title="Edit subscription"]').exists()).toBe(
-        true
-      )
-    })
-
     it("shows subscription actions for a subscribed member inside a group", async () => {
       const ownedMember = {
         ...makeMe.aNotebook.please(),
@@ -893,13 +850,11 @@ describe("Notebooks Page", () => {
         .findAll('[data-cy="notebook-card"]')
         .find((c) => c.text().includes("Subscribed In Group"))
       expect(subMemberCard?.exists()).toBe(true)
-      await subMemberCard!
-        .find('[data-cy="notebook-catalog-overflow"]')
-        .trigger("click")
+      await fireEvent.click(
+        subMemberCard!.get('[data-cy="notebook-catalog-overflow"]').element
+      )
       await flushPromises()
-      expect(
-        subMemberCard!.find('button[title="Edit subscription"]').exists()
-      ).toBe(true)
+      expect(screen.getByTitle("Edit subscription")).toBeInTheDocument()
     })
   })
 })

@@ -43,8 +43,6 @@ const usePortal = computed(() => portalContext != null)
 const portalOpen = computed(() => portalContext?.open.value ?? false)
 
 const panelRef = ref<HTMLElement | null>(null)
-const fallbackOpen = ref(false)
-const fallbackDetailsRef = ref<HTMLDetailsElement | null>(null)
 
 const panelClasses = computed(() =>
   [dropdownMenuPanelClass(props.size), props.panelClass]
@@ -52,11 +50,13 @@ const panelClasses = computed(() =>
     .join(" ")
 )
 
-const { positionStyle } = useDropdownPortalPosition({
-  open: portalContext?.open ?? fallbackOpen,
-  detailsRef: portalContext?.detailsRef ?? fallbackDetailsRef,
-  panelRef,
-})
+const { positionStyle } = portalContext
+  ? useDropdownPortalPosition({
+      open: portalContext.open,
+      detailsRef: portalContext.detailsRef,
+      panelRef,
+    })
+  : { positionStyle: ref<{ top: string; left: string } | null>(null) }
 
 const portalPositionStyle = computed((): StyleValue => {
   const pos = positionStyle.value
