@@ -22,7 +22,7 @@ export const mainMenu = () => {
         },
 
         userSettingsButton(userName: string) {
-          return cy.findByRole('link', { name: `Settings for ${userName}` })
+          return cy.findByRole('button', { name: `Settings for ${userName}` })
         },
 
         userSettings(userName: string) {
@@ -37,7 +37,7 @@ export const mainMenu = () => {
         },
 
         logout() {
-          cy.findByRole('link', { name: 'Logout' }).click({ force: true })
+          cy.findByRole('button', { name: 'Logout' }).click({ force: true })
         },
         manageAccessTokens() {
           cy.findByRole('link', { name: 'Manage Access Tokens' }).click({
