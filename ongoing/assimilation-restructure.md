@@ -59,7 +59,7 @@ Step defs touched: `assimilation.ts` (dropdown steps 57–74 in Phase 1; `naviga
 
 ### Phase 3 — keep/skip walk to the next note
 
-- **3.1 (Behavior)** In `AssimilationPanel.vue`, on Keep-for-recall / Skip-recall success call `goToNextAssimilation()` (replaces the Phase 1 interim). Same toasts. Update the new walkthrough scenarios to expect walk-to-next; update any dropdown-entry feature whose post-keep assertion assumed "stay" (re-jump to the specific note where needed — selectors already match). Land production flip + affected feature updates together so the suite stays green.
+- **3.1 (Behavior) — done** In `AssimilationPanel.vue`, on Keep-for-recall / Skip-recall success call `goToNextAssimilation()` (replaces the Phase 1 interim). Same toasts; `goToNextAssimilation` returns whether navigation happened and dismisses the panel when there is no next note. Walkthrough feature extended with keep-walk scenarios; `assimilation_settings_panel.feature` re-opens settings after keep to assert disabled button.
 
 ### Phase 4 — thin progress bar under the "Assimilate" menu item
 
@@ -68,7 +68,7 @@ Step defs touched: `assimilation.ts` (dropdown steps 57–74 in Phase 1; `naviga
 ### Phase 5 — remove old pages, routes, and dead deps
 
 - **5.1 (Structure)** Delete `/assimilate/:noteId` route, `AssimilateSingleNotePage(View).vue` + their specs/stories. Nothing references it after Phase 1.
-- **5.2 (Structure/test)** Rewrite/remove the legacy queue scenarios in `assimilating.feature` (now superseded by the walkthrough feature); remove `assimilation().navigateToAssimilationPage()` and the queue-only helpers (`expectToAssimilateAndTotal`, progress-bar/tooltip, "achieved your daily goal") from `assimilationPage.ts`. Migrate `recall.ts` setup steps to the walkthrough/testability path.
+- **5.2 (Structure/test)** ~~Rewrite/remove the legacy queue scenarios in `assimilating.feature`~~ (removed early; covered by `assimilation_walkthrough.feature`); remove `assimilation().navigateToAssimilationPage()` and the queue-only helpers (`expectToAssimilateAndTotal`, progress-bar/tooltip) from `assimilationPage.ts`. Migrate `recall.ts` setup steps to the walkthrough/testability path.
 - **5.3 (Structure)** Delete `/assimilate` route, `AssimilationPage(View).vue` + specs/stories; drop page-only bits of `useAssimilationCount` and the `assimilationPage*` storybook decorators/scss.
 - **5.4 (Structure, backend)** Remove `GET /api/assimilation/assimilating` + `getNotesToAssimilate()` and now-dead daily-cap-gated streaming once unused; regenerate TS client.
 - **5.5 (Structure)** Collapse `recall/Assimilation.vue` into `AssimilationPanel.vue` if redundant; remove any remaining dead composables/page-objects. Verify: no `/assimilate` references remain; assimilation + recall E2E green.

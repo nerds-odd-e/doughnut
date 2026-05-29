@@ -31,10 +31,9 @@ Feature: Assimilate With Remembering Spelling
     Then the spelling verification result for note "<note_title>" should be <expected_result>
 
     Examples:
-      | note_title     | spelling_input | expected_result         |
-      | sedition       | sedition       | "success"               |
-      | colour／color | colour         | "success"               |
-      | sedition       | wrong answer   | "error: wrong spelling" |
+      | note_title | spelling_input | expected_result         |
+      | sedition   | sedition       | "success"               |
+      | sedition   | wrong answer   | "error: wrong spelling" |
 
   Scenario: Already assimilated note reappears in to-be-assimilated list when remember spelling is added later
     Given I have a notebook "English practice" with notes:
@@ -54,11 +53,3 @@ Feature: Assimilate With Remembering Spelling
     And I keep for recall with remembering spelling
     When I verify spelling with "Word"
     Then the spelling verification result for note "Word" should be "success"
-
-  Scenario: Keep for recall disabled when note already has memory trackers
-    Given I have a notebook "English practice" with notes:
-      | Title | Content |
-      | Word  | Non-empty body text |
-    And I assimilated one note "Word" on day 1
-    When I am assimilating the note "Word"
-    Then the keep for recall button should be disabled

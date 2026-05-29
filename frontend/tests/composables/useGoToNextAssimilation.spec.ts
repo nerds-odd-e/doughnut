@@ -1,6 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { AssimilationController } from "@generated/doughnut-backend-api/sdk.gen"
-import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
+import {
+  DAILY_GOAL_TOAST,
+  NO_MORE_TOAST,
+  useGoToNextAssimilation,
+} from "@/composables/useGoToNextAssimilation"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import {
   resetAssimilationViewForTests,
@@ -56,7 +60,8 @@ describe("useGoToNextAssimilation", () => {
     })
 
     const { goToNextAssimilation } = useGoToNextAssimilation()
-    await goToNextAssimilation()
+    const navigated = await goToNextAssimilation()
+    expect(navigated).toBe(true)
 
     const { dueCount, assimilatedCountOfTheDay, totalUnassimilatedCount } =
       useAssimilationCount()
@@ -87,11 +92,10 @@ describe("useGoToNextAssimilation", () => {
     })
 
     const { goToNextAssimilation } = useGoToNextAssimilation()
-    await goToNextAssimilation()
+    const navigated = await goToNextAssimilation()
+    expect(navigated).toBe(true)
 
-    expect(showSuccessToast).toHaveBeenCalledWith(
-      "You've achieved your daily assimilation goal"
-    )
+    expect(showSuccessToast).toHaveBeenCalledWith(DAILY_GOAL_TOAST)
     expect(routerPush).toHaveBeenCalledWith({
       name: "noteShow",
       params: { noteId: "42" },
@@ -109,13 +113,14 @@ describe("useGoToNextAssimilation", () => {
     })
 
     const { goToNextAssimilation } = useGoToNextAssimilation()
-    await goToNextAssimilation()
+    const navigated = await goToNextAssimilation()
+    expect(navigated).toBe(false)
 
     const { dueCount, assimilatedCountOfTheDay } = useAssimilationCount()
     expect(dueCount.value).toBe(0)
     expect(assimilatedCountOfTheDay.value).toBe(3)
     expect(routerPush).not.toHaveBeenCalled()
-    expect(showSuccessToast).toHaveBeenCalledWith("No more notes to assimilate")
+    expect(showSuccessToast).toHaveBeenCalledWith(NO_MORE_TOAST)
 
     const { showAssimilationSettings } = useAssimilationView()
     expect(showAssimilationSettings.value).toBe(false)

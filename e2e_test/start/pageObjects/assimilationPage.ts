@@ -86,6 +86,12 @@ export const assumeAssimilationPage = () => ({
     pageIsNotLoading()
     return this
   },
+  skipRecallOnPanel() {
+    cy.findByText('Skip recall').click()
+    cy.findByRole('button', { name: 'OK' }).click()
+    pageIsNotLoading()
+    return this
+  },
   proceedWithRememberingSpelling() {
     this.checkRememberSpellingOption()
     this.clickKeepForRecall()
@@ -110,66 +116,57 @@ export const assumeAssimilationPage = () => ({
     'Additional Info': additionalInfo,
     Skip: skip,
   }: Record<string, string>) {
-    if (assimilationType === 'assimilation done') {
-      cy.contains("You've achieved your daily assimilation goal").should(
-        'be.visible'
-      )
+    switch (assimilationType) {
+      case 'single note': {
+        waitForAssimilationNoteTitle(title)
+        this.waitForAssimilationReady()
+        if (additionalInfo) {
+          cy.get('.note-content').should('contain', additionalInfo)
+        }
+        break
+      }
+
+      case 'image note': {
+        waitForAssimilationNoteTitle()
+        this.waitForAssimilationReady()
+        if (additionalInfo) {
+          const [expectedBodyText, expectedImage] = commonSenseSplit(
+            additionalInfo,
+            '; '
+          )
+          cy.get('.note-content').should('contain', expectedBodyText)
+          cy.get('#note-image')
+            .find('img')
+            .should('have.attr', 'src')
+            .should('include', expectedImage)
+        }
+        break
+      }
+
+      case 'link': {
+        if (additionalInfo) {
+          const [relationType, targetNote] = commonSenseSplit(
+            additionalInfo,
+            '; '
+          )
+          if (title) waitForAssimilationNoteTitle(title)
+          if (targetNote) waitForAssimilationNoteTitle(targetNote)
+          if (relationType) {
+            cy.get(mainNoteHeadingTitleSelector).should('contain', relationType)
+          }
+          this.waitForAssimilationReady()
+        }
+        break
+      }
+
+      default:
+        expect(assimilationType).equal('a known assimilation page type')
+    }
+    if (skip === 'yes') {
+      this.skipRecallOnPanel()
     } else {
-      switch (assimilationType) {
-        case 'single note': {
-          waitForAssimilationNoteTitle(title)
-          this.waitForAssimilationReady()
-          if (additionalInfo) {
-            cy.get('.note-content').should('contain', additionalInfo)
-          }
-          break
-        }
-
-        case 'image note': {
-          waitForAssimilationNoteTitle()
-          this.waitForAssimilationReady()
-          if (additionalInfo) {
-            const [expectedBodyText, expectedImage] = commonSenseSplit(
-              additionalInfo,
-              '; '
-            )
-            cy.get('.note-content').should('contain', expectedBodyText)
-            cy.get('#note-image')
-              .find('img')
-              .should('have.attr', 'src')
-              .should('include', expectedImage)
-          }
-          break
-        }
-
-        case 'link': {
-          if (additionalInfo) {
-            const [relationType, targetNote] = commonSenseSplit(
-              additionalInfo,
-              '; '
-            )
-            if (title) waitForAssimilationNoteTitle(title)
-            if (targetNote) waitForAssimilationNoteTitle(targetNote)
-            if (relationType) {
-              cy.get(mainNoteHeadingTitleSelector).should(
-                'contain',
-                relationType
-              )
-            }
-            this.waitForAssimilationReady()
-          }
-          break
-        }
-
-        default:
-          expect(assimilationType).equal('a known assimilation page type')
-      }
-      if (skip === 'yes') {
-        cy.findByText('Skip recall').click()
-        cy.findByRole('button', { name: 'OK' }).click()
-      } else {
-        this.clickKeepForRecall()
-      }
+      this.clickKeepForRecall()
+      pageIsNotLoading()
     }
     return this
   },
@@ -180,13 +177,10 @@ export const assumeAssimilationPage = () => ({
   },
   assimilateNotes(noteTitles: string) {
     return this.assimilate(
-      commonSenseSplit(noteTitles, ', ').map((title: string) => {
-        return {
-          'Assimilation Type':
-            title === 'end' ? 'assimilation done' : 'single note',
-          Title: title,
-        }
-      })
+      commonSenseSplit(noteTitles, ', ').map((title: string) => ({
+        'Assimilation Type': 'single note',
+        Title: title,
+      }))
     )
   },
   expectUnderstandingPointsCount(count: number) {

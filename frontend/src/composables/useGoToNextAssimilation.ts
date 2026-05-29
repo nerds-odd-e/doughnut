@@ -7,16 +7,16 @@ import { useToast } from "@/composables/useToast"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { useRouter } from "vue-router"
 
-const DAILY_GOAL_TOAST = "You've achieved your daily assimilation goal"
-const NO_MORE_TOAST = "No more notes to assimilate"
+export const DAILY_GOAL_TOAST = "You've achieved your daily assimilation goal"
+export const NO_MORE_TOAST = "No more notes to assimilate"
 
 export function useGoToNextAssimilation() {
   const router = useRouter()
-  const { requestOnFor } = useAssimilationView()
+  const { requestOnFor, dismiss } = useAssimilationView()
   const { applyAssimilationCountDto } = useAssimilationCount()
   const { showSuccessToast } = useToast()
 
-  const goToNextAssimilation = async () => {
+  const goToNextAssimilation = async (): Promise<boolean> => {
     const { data, error } = await apiCallWithLoading(() =>
       AssimilationController.next({
         query: { timezone: timezoneParam() },
@@ -24,14 +24,15 @@ export function useGoToNextAssimilation() {
     )
 
     if (error || !data) {
-      return
+      return false
     }
 
     applyAssimilationCountDto(data.counts)
 
     if (data.nextNoteId == null) {
       showSuccessToast(NO_MORE_TOAST)
-      return
+      dismiss()
+      return false
     }
 
     if (data.counts?.dueCount === 0) {
@@ -40,6 +41,7 @@ export function useGoToNextAssimilation() {
 
     requestOnFor(data.nextNoteId)
     await router.push(noteShowLocation(data.nextNoteId))
+    return true
   }
 
   return { goToNextAssimilation }

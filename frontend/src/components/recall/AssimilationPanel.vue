@@ -36,6 +36,7 @@ import SpellingVerificationPopup from "./SpellingVerificationPopup.vue"
 import { computed, ref } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
+import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
 
 const { note } = defineProps<{
   note: Note
@@ -43,11 +44,11 @@ const { note } = defineProps<{
 
 const emit = defineEmits<{
   (e: "reloadNeeded"): void
-  (e: "assimilationDone"): void
 }>()
 
 const { popups } = usePopups()
 const { totalAssimilatedCount, requestDueRecallsRefresh } = useRecallData()
+const { goToNextAssimilation } = useGoToNextAssimilation()
 
 const { incrementAssimilatedCount } = useAssimilationCount()
 
@@ -123,10 +124,9 @@ const doAssimilate = async (skipMemoryTracking: boolean) => {
 
     requestDueRecallsRefresh()
 
-    if (skipMemoryTracking) {
+    const navigated = await goToNextAssimilation()
+    if (!navigated) {
       emit("reloadNeeded")
-    } else {
-      emit("assimilationDone")
     }
   }
 }

@@ -13,7 +13,6 @@
     :key="note.id"
     :note="note"
     @reload-needed="emit('reloadNeeded')"
-    @assimilation-done="emit('assimilationDone')"
   />
 </template>
 
@@ -29,7 +28,6 @@ const { note, ancestorFolders = [] } = defineProps<{
 
 const emit = defineEmits<{
   (e: "reloadNeeded"): void
-  (e: "assimilationDone"): void
 }>()
 </script>
 

@@ -32,7 +32,6 @@
         :key="`${noteForPanel.id}-${panelKey}`"
         :note="noteForPanel"
         @reload-needed="onAssimilationReloadNeeded"
-        @assimilation-done="onAssimilationReloadNeeded"
       />
     </div>
   </div>

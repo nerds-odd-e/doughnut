@@ -18,6 +18,14 @@ import usePopups from "@/components/commons/Popups/usePopups"
 vi.mock("@/composables/useRecallData")
 vi.mock("@/composables/useAssimilationCount")
 
+const mockedGoToNextAssimilation = vi.fn().mockResolvedValue(true)
+
+vi.mock("@/composables/useGoToNextAssimilation", () => ({
+  useGoToNextAssimilation: () => ({
+    goToNextAssimilation: mockedGoToNextAssimilation,
+  }),
+}))
+
 let renderer: RenderingHelper<typeof Assimilation>
 let assimilateSpy: ReturnType<typeof mockSdkService>
 let showNoteSpy: ReturnType<typeof mockSdkService>
@@ -37,6 +45,8 @@ afterEach(() => {
 })
 
 beforeEach(() => {
+  mockedGoToNextAssimilation.mockClear()
+  mockedGoToNextAssimilation.mockResolvedValue(true)
   assimilateSpy = mockSdkService(AssimilationController, "assimilate", [])
   showNoteSpy = mockSdkService(
     NoteController,
@@ -105,7 +115,7 @@ describe("Assimilation component", () => {
   })
 
   describe("normal assimilation", () => {
-    it("emits assimilationDone and increments counts correctly when assimilating normally", async () => {
+    it("calls goToNextAssimilation and increments counts correctly when assimilating normally", async () => {
       assimilateSpy.mockResolvedValue(
         wrapSdkResponse([
           { id: 1, removedFromTracking: false },
@@ -122,7 +132,7 @@ describe("Assimilation component", () => {
       expect(assimilateSpy).toHaveBeenCalledWith({
         body: { noteId: note.id, skipMemoryTracking: false },
       })
-      expect(wrapper.emitted()).toHaveProperty("assimilationDone")
+      expect(mockedGoToNextAssimilation).toHaveBeenCalled()
       expect(mockedTotalAssimilatedCount.value).toBe(2)
       expect(mockedIncrementAssimilatedCount).toHaveBeenCalledWith(2)
       expect(mockedRequestDueRecallsRefresh).toHaveBeenCalled()
@@ -268,7 +278,7 @@ describe("Assimilation component", () => {
       expect(assimilateSpy).toHaveBeenCalledWith({
         body: { noteId: note.id, skipMemoryTracking: false },
       })
-      expect(wrapper.emitted()).toHaveProperty("assimilationDone")
+      expect(mockedGoToNextAssimilation).toHaveBeenCalled()
       expect(mockedRequestDueRecallsRefresh).toHaveBeenCalled()
     })
   })

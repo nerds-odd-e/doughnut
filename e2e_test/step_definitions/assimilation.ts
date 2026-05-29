@@ -49,11 +49,6 @@ Given(
   }
 )
 
-Then('I am assimilating new note on day {int}', (day: number) => {
-  start.testability().backendTimeTravelTo(day, 8)
-  start.assimilation().navigateToAssimilationPage()
-})
-
 When('I am assimilating the note {string}', (noteTitle: string) => {
   start.jumpToNotePage(noteTitle).moreOptions().openAssimilationSettings()
 })
@@ -165,6 +160,10 @@ When('I open assimilation settings from more options', () => {
 
 When('I keep for recall on the assimilation panel', () => {
   start.assumeAssimilationPage().keepForRecallOnPanel()
+})
+
+When('I skip recall on the assimilation panel', () => {
+  start.assumeAssimilationPage().skipRecallOnPanel()
 })
 
 Then(

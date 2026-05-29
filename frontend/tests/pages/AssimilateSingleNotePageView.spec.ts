@@ -70,19 +70,6 @@ describe("AssimilateSingleNotePageView", () => {
   })
 
   describe("events", () => {
-    it("emits assimilation-done when Assimilation emits the event", async () => {
-      const wrapper = renderer.withProps({ note }).mount()
-
-      await flushPromises()
-
-      const assimilation = wrapper.findComponent({ name: "Assimilation" })
-      assimilation.vm.$emit("assimilationDone")
-
-      await flushPromises()
-
-      expect(wrapper.emitted()).toHaveProperty("assimilation-done")
-    })
-
     it("emits reload-needed when Assimilation emits the event", async () => {
       const wrapper = renderer.withProps({ note }).mount()
 

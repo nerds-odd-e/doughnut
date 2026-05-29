@@ -1,27 +1,29 @@
-Feature: Assimilation walkthrough from menu
-  As a learner, I want the Assimilate menu action to walk me through notes
-  with clear feedback when my daily goal is met or nothing remains.
+Feature: Assimilation walkthrough
+  As a learner, I want to walk through assimilation from the menu or note page
+  with keep/skip advancing to the next note, toasts past the daily cap, and
+  clear feedback when nothing remains.
 
   Background:
     Given I am logged in as an existing user
     And my daily new notes to assimilate is set to 2
     And there are notes from Note 1 to Note 5
 
-  Scenario: Past daily cap shows goal toast and loads next note
-    Given the note "Note 1" was assimilated on day 1
-    And the note "Note 2" was assimilated on day 1
-    When I jump to the note page of "Note 2"
-    And I start assimilation from the menu
+  Scenario: Walk through notes with menu, keep, skip, toasts, and panel on note page
+    Given It's day 1
+    When I start assimilation from the menu
+    Then I should be assimilating the note "Note 1"
+    When I keep for recall on the assimilation panel
+    Then I should be assimilating the note "Note 2"
+    When I keep for recall on the assimilation panel
     Then I should see the daily assimilation goal toast
     And I should be assimilating the note "Note 3"
-
-  Scenario: Nothing left shows no-more toast and stays on current note
-    Given the note "Note 1" was assimilated on day 1
-    And the note "Note 2" was assimilated on day 1
-    And the note "Note 3" was assimilated on day 1
-    And the note "Note 4" was assimilated on day 1
-    And the note "Note 5" was assimilated on day 1
-    When I jump to the note page of "Note 5"
-    And I start assimilation from the menu
+    When I skip recall on the assimilation panel
+    Then I should be assimilating the note "Note 4"
+    When I keep for recall on the assimilation panel
+    Then I should be assimilating the note "Note 5"
+    When I keep for recall on the assimilation panel
     Then I should see the no more notes to assimilate toast
     And I should still be on the note page for "Note 5"
+    When I jump to the note page of "Note 1"
+    And I open assimilation settings from more options
+    Then the keep for recall button should be disabled
