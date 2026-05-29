@@ -1,3 +1,4 @@
+import type { AssimilationCountDto } from "@generated/doughnut-backend-api"
 import { ref } from "vue"
 
 const dueCount = ref<number | undefined>(undefined)
@@ -26,6 +27,17 @@ export function useAssimilationCount() {
     }
   }
 
+  const applyAssimilationCountDto = (
+    counts: AssimilationCountDto | undefined
+  ) => {
+    if (!counts) {
+      return
+    }
+    setDueCount(counts.dueCount)
+    setAssimilatedCountOfTheDay(counts.assimilatedCountOfTheDay)
+    setTotalUnassimilatedCount(counts.totalUnassimilatedCount)
+  }
+
   return {
     dueCount,
     setDueCount,
@@ -34,5 +46,6 @@ export function useAssimilationCount() {
     totalUnassimilatedCount,
     setTotalUnassimilatedCount,
     incrementAssimilatedCount,
+    applyAssimilationCountDto,
   }
 }

@@ -79,6 +79,7 @@ beforeEach(() => {
     setAssimilatedCountOfTheDay: vi.fn(),
     totalUnassimilatedCount: ref(0),
     setTotalUnassimilatedCount: vi.fn(),
+    applyAssimilationCountDto: vi.fn(),
   })
 
   renderer = helper.component(Assimilation)

@@ -1,6 +1,7 @@
 import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
 import MainMenu from "@/components/toolbars/MainMenu.vue"
 import { useRecallData } from "@/composables/useRecallData"
+import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import routes from "@/routes/routes"
 import type { MemoryTrackerLite, User } from "@generated/doughnut-backend-api"
@@ -17,6 +18,7 @@ import {
 } from "vue-router"
 
 vi.mock("@/composables/useRecallData")
+vi.mock("@/composables/useGoToNextAssimilation")
 
 // Browser Mode: Use real Vue Router instead of mocking
 const router = createRouter({
@@ -149,6 +151,9 @@ describe("main menu", () => {
     createMatchMediaSpy(true)
     mockSdkService(UserController, "getMenuData", defaultMenuData)
     vi.mocked(useRecallData).mockReturnValue(createUseRecallDataMock())
+    vi.mocked(useGoToNextAssimilation).mockReturnValue({
+      goToNextAssimilation: vi.fn(),
+    })
     user = makeMe.aUser.please()
   })
 
@@ -157,11 +162,20 @@ describe("main menu", () => {
     vi.restoreAllMocks()
   })
 
-  it("shows assimilate link as an anchor in the menu", async () => {
+  it("calls goToNextAssimilation from the assimilate menu action link", async () => {
+    const goToNextSpy = vi.fn()
+    vi.mocked(useGoToNextAssimilation).mockReturnValue({
+      goToNextAssimilation: goToNextSpy,
+    })
+
     await renderComponent()
     const assimilateLink = screen.getByLabelText("Assimilate")
-    expect(assimilateLink).toBeInTheDocument()
     expect(assimilateLink.tagName).toBe("A")
+    expect(assimilateLink.getAttribute("href")).toBeNull()
+
+    await fireEvent.click(assimilateLink)
+
+    expect(goToNextSpy).toHaveBeenCalled()
   })
 
   it.each([

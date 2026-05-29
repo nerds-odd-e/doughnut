@@ -63,8 +63,7 @@ const { upperNavItems, lowerNavItems } = useNavigationItems()
 const isHomePage = computed(() => route.name === "home")
 const showUserSettings = ref(false)
 
-const { setDueCount, setAssimilatedCountOfTheDay, setTotalUnassimilatedCount } =
-  useAssimilationCount()
+const { applyAssimilationCountDto } = useAssimilationCount()
 const { setToRepeat, setCurrentRecallWindowEndAt, setTotalAssimilatedCount } =
   useRecallData()
 
@@ -73,15 +72,7 @@ const fetchMenuData = async () => {
     query: { timezone: timezoneParam() },
   })
   if (!error && menuData) {
-    if (menuData.assimilationCount) {
-      setDueCount(menuData.assimilationCount.dueCount)
-      setAssimilatedCountOfTheDay(
-        menuData.assimilationCount.assimilatedCountOfTheDay
-      )
-      setTotalUnassimilatedCount(
-        menuData.assimilationCount.totalUnassimilatedCount
-      )
-    }
+    applyAssimilationCountDto(menuData.assimilationCount)
     if (menuData.recallStatus) {
       setToRepeat(menuData.recallStatus.toRepeat)
       setCurrentRecallWindowEndAt(

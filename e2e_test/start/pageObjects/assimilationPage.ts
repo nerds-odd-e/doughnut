@@ -296,6 +296,11 @@ export const assimilation = () => {
       return this
     },
     navigateToAssimilationPage() {
+      cy.visit('/assimilate')
+      pageIsNotLoading()
+      return assumeAssimilationPage()
+    },
+    startAssimilationFromMenu() {
       router().toRoot()
       getAssimilateListItemInSidebar(($el) => {
         $el.click()

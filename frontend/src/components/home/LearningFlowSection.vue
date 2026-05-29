@@ -26,6 +26,7 @@
                     v-bind="item"
                     :class="{ 'will-fly': isScrolling }"
                     class="nav-item"
+                    @goToNextAssimilation="goToNextAssimilation"
                   />
                 </div>
                 <div class="note-card">
@@ -43,8 +44,11 @@
 
 <script setup lang="ts">
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
+import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
 import type { Component } from "vue"
 import { onMounted, onUnmounted, ref } from "vue"
+
+const { goToNextAssimilation } = useGoToNextAssimilation()
 
 defineProps<{
   userName: string

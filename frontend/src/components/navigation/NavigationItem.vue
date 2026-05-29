@@ -2,7 +2,7 @@
   <div
     class="nav-item text-neutral-content rounded-lg px-2"
     :class="{
-      'text-primary bg-primary/10': isActive && name !== 'resumeRecall' && !nonClickable,
+      'text-primary bg-primary/10': isActive && !isNavigationActionItem(name) && !nonClickable,
       'resume-recall-active': name === 'resumeRecall' && isActive,
       'hover:bg-base-content/5': !isActive && !nonClickable,
       'non-clickable': nonClickable
@@ -22,7 +22,7 @@
       <span class="label">{{ label }}</span>
     </div>
     <router-link
-      v-else-if="name && !hasDropdown && name !== 'resumeRecall'"
+      v-else-if="name && !hasDropdown && !isNavigationActionItem(name)"
       :to="{ name: name }"
       :aria-label="label"
       class="flex flex-col items-center"
@@ -36,10 +36,10 @@
       <span class="label">{{ label }}</span>
     </router-link>
     <a
-      v-else-if="name === 'resumeRecall' && !hasDropdown"
+      v-else-if="isNavigationActionItem(name) && !hasDropdown"
       :aria-label="label"
       class="flex flex-col items-center"
-      @click.prevent="$emit('resumeRecall')"
+      @click.prevent="onActionClick"
     >
       <div class="icon-container">
         <component :is="icon" :size="24" />
@@ -78,8 +78,9 @@
 <script setup lang="ts">
 import type { Component } from "vue"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
+import { isNavigationActionItem } from "@/components/navigation/navigationActionItems"
 
-defineProps<{
+const { name } = defineProps<{
   name?: string
   label: string
   icon: Component
@@ -90,9 +91,18 @@ defineProps<{
   nonClickable?: boolean
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   (e: "resumeRecall"): void
+  (e: "goToNextAssimilation"): void
 }>()
+
+const onActionClick = () => {
+  if (name === "resumeRecall") {
+    emit("resumeRecall")
+  } else if (name === "assimilate") {
+    emit("goToNextAssimilation")
+  }
+}
 </script>
 
 <style lang="scss" scoped>

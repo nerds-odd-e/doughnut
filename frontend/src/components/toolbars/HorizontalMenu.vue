@@ -22,15 +22,18 @@
           <ul
             v-if="!shouldShowExpanded && hasActiveItem && !isHomePage && activeItem"
             class="collapsed-menu daisy-menu"
-            :class="{ 'pass-through-clicks': activeItem.name !== 'resumeRecall' }"
+            :class="{
+              'pass-through-clicks': !isNavigationActionItem(activeItem.name),
+            }"
           >
             <li class="daisy-menu-item active-item-only">
               <NavigationItem
                 v-bind="{
                   ...activeItem,
-                  nonClickable: activeItem.name !== 'resumeRecall'
+                  nonClickable: !isNavigationActionItem(activeItem.name),
                 }"
                 @resumeRecall="resumeRecall"
+                @goToNextAssimilation="goToNextAssimilation"
               />
             </li>
           </ul>
@@ -53,7 +56,11 @@
           <ul v-if="shouldShowExpanded" class="top-menu daisy-menu flex-1">
         <template v-if="!isHomePage">
           <li v-for="item in upperNavItems" :title="item.label" :key="item.name" class="daisy-menu-item">
-            <NavigationItem v-bind="{ ...item }" @resumeRecall="resumeRecall" />
+            <NavigationItem
+              v-bind="{ ...item }"
+              @resumeRecall="resumeRecall"
+              @goToNextAssimilation="goToNextAssimilation"
+            />
           </li>
         </template>
 
@@ -97,6 +104,8 @@ import AccountMenuItem from "@/components/toolbars/AccountMenuItem.vue"
 import { ChevronRight, Menu } from "@lucide/vue"
 import { isWithinAutoCollapseDropdownTree } from "@/composables/dropdownPortalContext"
 import { useRecallData } from "@/composables/useRecallData"
+import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
+import { isNavigationActionItem } from "@/components/navigation/navigationActionItems"
 
 type NavigationItemType = {
   name?: string
@@ -167,8 +176,8 @@ const handleMenuWrapperClick = (event: MouseEvent) => {
     if (target.closest(".expand-button")) {
       return
     }
-    // Don't expand if clicking resumeRecall link (it should work as a button)
-    if (activeItem.value?.name === "resumeRecall" && target.closest("a")) {
+    // Don't expand if clicking action nav links (they should work as buttons)
+    if (isNavigationActionItem(activeItem.value?.name) && target.closest("a")) {
       return
     }
     expandMenu()
@@ -176,6 +185,7 @@ const handleMenuWrapperClick = (event: MouseEvent) => {
 }
 
 const { resumeRecall } = useRecallData()
+const { goToNextAssimilation } = useGoToNextAssimilation()
 
 const handleMenuIconClick = (event: MouseEvent) => {
   // When collapsed, clicking the menu icon should expand the menu
