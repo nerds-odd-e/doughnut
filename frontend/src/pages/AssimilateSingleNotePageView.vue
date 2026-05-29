@@ -9,7 +9,6 @@
     <Assimilation
       v-if="note"
       v-bind="{ note, ancestorFolders }"
-      @assimilation-done="assimilationDone"
       @reload-needed="onReloadNeeded"
       :key="note.id"
     />
@@ -35,13 +34,8 @@ defineProps({
 })
 
 const emit = defineEmits<{
-  (e: "assimilation-done"): void
   (e: "reload-needed"): void
 }>()
-
-const assimilationDone = () => {
-  emit("assimilation-done")
-}
 
 const onReloadNeeded = () => {
   emit("reload-needed")

@@ -8,6 +8,11 @@ Feature: Assimilation walkthrough
     And my daily new notes to assimilate is set to 2
     And there are notes from Note 1 to Note 5
 
+  Scenario: Menu shows assimilation progress midway through daily plan
+    Given the note "Note 1" was assimilated on day 1
+    When I jump to the note page of "Note 2"
+    Then I should see assimilation menu progress
+
   Scenario: Walk through notes with menu, keep, skip, toasts, and panel on note page
     Given It's day 1
     When I start assimilation from the menu

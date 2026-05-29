@@ -73,6 +73,10 @@ Then('I should still be on the note page for {string}', (noteTitle: string) => {
   start.assumeNotePage(noteTitle).expectWithoutAssimilationPanel()
 })
 
+Then('I should see assimilation menu progress', () => {
+  start.assimilation().expectAssimilationMenuProgress()
+})
+
 Then('I assimilate the note {string} via more options', (noteTitle: string) => {
   start.jumpToNotePage(noteTitle).moreOptions().assimilateNote()
 })

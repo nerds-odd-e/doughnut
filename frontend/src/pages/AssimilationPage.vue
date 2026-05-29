@@ -4,7 +4,6 @@
     :notes="notes"
     :assimilated-count-of-the-day="assimilatedCountOfTheDay"
     :total-unassimilated-count="totalUnassimilatedCount"
-    @assimilation-done="assimilationDone"
     @reload-needed="onReloadNeeded"
   />
 </template>
@@ -25,11 +24,6 @@ const { setDueCount, assimilatedCountOfTheDay, totalUnassimilatedCount } =
 
 const notes = ref<NoteRealm[] | undefined>(undefined)
 const reloadKey = ref(0)
-
-const assimilationDone = () => {
-  notes.value?.shift()
-  setDueCount(notes.value?.length)
-}
 
 const loadAssimilation = async () => {
   const { data: assimilatingNotes, error } = await apiCallWithLoading(() =>

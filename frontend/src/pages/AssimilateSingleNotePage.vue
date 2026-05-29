@@ -3,7 +3,6 @@
     :key="reloadKey"
     :note="noteRealm?.note"
     :ancestor-folders="noteRealm?.ancestorFolders ?? []"
-    @assimilation-done="assimilationDone"
     @reload-needed="onReloadNeeded"
   />
 </template>
@@ -13,14 +12,10 @@ import { onMounted, ref } from "vue"
 import type { NoteRealm } from "@generated/doughnut-backend-api"
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import AssimilateSingleNotePageView from "./AssimilateSingleNotePageView.vue"
-import { useRouter } from "vue-router"
-import { noteShowLocation } from "@/routes/noteShowLocation"
-
 const { noteId } = defineProps<{
   noteId: number
 }>()
 
-const router = useRouter()
 const noteRealm = ref<NoteRealm | undefined>(undefined)
 
 const loadNote = async () => {
@@ -29,13 +24,6 @@ const loadNote = async () => {
   })
   if (!error && loaded) {
     noteRealm.value = loaded
-  }
-}
-
-const assimilationDone = () => {
-  const id = noteRealm.value?.note.id
-  if (id != null) {
-    router.push(noteShowLocation(id))
   }
 }
 

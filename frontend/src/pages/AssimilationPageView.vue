@@ -55,7 +55,6 @@
           note: noteRealm.note,
           ancestorFolders: noteRealm.ancestorFolders ?? [],
         }"
-        @assimilation-done="assimilationDone"
         @reload-needed="onReloadNeeded"
         :key="`${noteRealm.note.id}-${noteRealm.note.noteTopology.updatedAt}`"
       />
@@ -70,6 +69,7 @@ import type { PropType } from "vue"
 import Assimilation from "@/components/recall/Assimilation.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
+import { useAssimilationCount } from "@/composables/useAssimilationCount"
 
 const props = defineProps({
   notes: {
@@ -87,13 +87,14 @@ const props = defineProps({
 })
 
 const emit = defineEmits<{
-  (e: "assimilation-done"): void
   (e: "reload-needed"): void
 }>()
 
+const { dueCount } = useAssimilationCount()
+
 const noteRealm = computed(() => props.notes?.[0])
 const remainingAssimilationCountForToday = computed(
-  () => props.notes?.length || 0
+  () => dueCount.value ?? props.notes?.length ?? 0
 )
 
 const plannedForTheDay = computed(
@@ -106,10 +107,6 @@ const totalPlannedCount = computed(
   () =>
     (props.totalUnassimilatedCount || 0) + (props.assimilatedCountOfTheDay || 0)
 )
-
-const assimilationDone = () => {
-  emit("assimilation-done")
-}
 
 const onReloadNeeded = () => {
   emit("reload-needed")

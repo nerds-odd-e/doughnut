@@ -63,7 +63,7 @@ Step defs touched: `assimilation.ts` (dropdown steps 57–74 in Phase 1; `naviga
 
 ### Phase 4 — thin progress bar under the "Assimilate" menu item
 
-- **4.1 (Behavior)** In `NavigationItem.vue` (assimilate item) render a thin bar only when `assimilatedCountOfTheDay > 0 && dueCount > 0`; width = `assimilated / (assimilated + dueCount)`. Uses existing menu-data counts; no backend change. Unit: hidden at 0 and when complete/empty, visible mid-way. Optional E2E assertion in the walkthrough.
+- **4.1 (Behavior) — done** `AssimilationMenuProgress.vue` in all `NavigationItem` branches: thin bar when `assimilatedCountOfTheDay > 0 && dueCount > 0`; width = `assimilated / (assimilated + dueCount)`. Uses `useAssimilationCount` from menu-data; no backend change. Unit tests in `MainMenu.spec.ts`; E2E scenario in `assimilation_walkthrough.feature`.
 
 ### Phase 5 — remove old pages, routes, and dead deps
 

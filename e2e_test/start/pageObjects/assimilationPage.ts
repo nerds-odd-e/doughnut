@@ -324,5 +324,13 @@ export const assimilation = () => {
       expectSuccessToast(assimilationToastMessages.noMoreNotes)
       return this
     },
+    expectAssimilationMenuProgress() {
+      getAssimilateListItemInSidebar(($el) => {
+        $el
+          .find('[data-testid="assimilation-menu-progress"]')
+          .should('be.visible')
+      })
+      return this
+    },
   }
 }

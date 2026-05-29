@@ -356,7 +356,7 @@ describe("HorizontalMenu", () => {
     })
 
     it("expands menu when clicking on active item when collapsed", async () => {
-      const navItems = createMockNavItems("assimilate")
+      const navItems = createMockNavItems("notebooks")
       helper
         .component(HorizontalMenu)
         .withProps({
@@ -373,7 +373,7 @@ describe("HorizontalMenu", () => {
       expect(menuWrapper).toHaveClass("is-collapsed")
 
       // Click on the active item (which is visible when collapsed)
-      const activeItem = page.getByLabelText("Assimilate")
+      const activeItem = page.getByLabelText("Note")
       await activeItem.click({ force: true })
 
       // Menu should now be expanded

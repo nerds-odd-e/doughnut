@@ -68,24 +68,6 @@ describe("AssimilateSingleNotePage", () => {
     })
   })
 
-  describe("navigation", () => {
-    it("navigates to note show page after assimilation is done", async () => {
-      const wrapper = renderer.withProps({ noteId }).mount()
-
-      await flushPromises()
-
-      const pageView = wrapper.findComponent({
-        name: "AssimilateSingleNotePageView",
-      })
-      pageView.vm.$emit("assimilation-done")
-
-      await flushPromises()
-
-      expect(router.currentRoute.value.name).toBe("noteShow")
-      expect(router.currentRoute.value.params.noteId).toBe(String(noteRealm.id))
-    })
-  })
-
   describe("reload", () => {
     it("reloads note when reload is needed", async () => {
       const wrapper = renderer.withProps({ noteId }).mount()

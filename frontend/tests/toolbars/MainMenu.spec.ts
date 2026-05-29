@@ -238,6 +238,9 @@ describe("main menu", () => {
       const dueCount = getByText("5")
       expect(dueCount).toBeInTheDocument()
       expect(dueCount).toHaveClass("due-count")
+      expect(
+        screen.queryByTestId("assimilation-menu-progress")
+      ).not.toBeInTheDocument()
     })
 
     it("does not show due count when there are no due items", async () => {
@@ -272,6 +275,57 @@ describe("main menu", () => {
       await flushPromises()
 
       expect(getMenuDataSpy).toHaveBeenCalledTimes(2)
+    })
+  })
+
+  describe("assimilate progress bar", () => {
+    it("is hidden when daily plan is complete", async () => {
+      mockSdkService(
+        UserController,
+        "getMenuData",
+        createMenuData({
+          assimilationCount: {
+            dueCount: 0,
+            assimilatedCountOfTheDay: 3,
+            totalUnassimilatedCount: 0,
+          },
+        })
+      )
+
+      await renderComponent()
+      await flushPromises()
+
+      expect(
+        screen.queryByTestId("assimilation-menu-progress")
+      ).not.toBeInTheDocument()
+    })
+
+    it("is visible midway with correct width", async () => {
+      mockSdkService(
+        UserController,
+        "getMenuData",
+        createMenuData({
+          assimilationCount: {
+            dueCount: 3,
+            assimilatedCountOfTheDay: 2,
+            totalUnassimilatedCount: 0,
+          },
+        })
+      )
+
+      await renderComponent()
+      await flushPromises()
+
+      const assimilateLink = screen.getByLabelText("Assimilate")
+      const progressBar = assimilateLink.querySelector(
+        '[data-testid="assimilation-menu-progress"]'
+      )
+      expect(progressBar).toBeTruthy()
+
+      const fill = progressBar?.querySelector(
+        ".assimilation-menu-progress-fill"
+      ) as HTMLElement
+      expect(fill.style.width).toBe("40%")
     })
   })
 

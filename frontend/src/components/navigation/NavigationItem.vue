@@ -20,6 +20,7 @@
         </div>
       </div>
       <span class="label">{{ label }}</span>
+      <AssimilationMenuProgress v-if="name === 'assimilate'" />
     </div>
     <router-link
       v-else-if="name && !hasDropdown && !isNavigationActionItem(name)"
@@ -34,6 +35,7 @@
         </div>
       </div>
       <span class="label">{{ label }}</span>
+      <AssimilationMenuProgress v-if="name === 'assimilate'" />
     </router-link>
     <a
       v-else-if="isNavigationActionItem(name) && !hasDropdown"
@@ -48,6 +50,7 @@
         </div>
       </div>
       <span class="label">{{ label }}</span>
+      <AssimilationMenuProgress v-if="name === 'assimilate'" />
     </a>
 
     <AutoCollapseDropdown
@@ -68,6 +71,7 @@
           </div>
         </div>
         <span class="label">{{ label }}</span>
+        <AssimilationMenuProgress v-if="name === 'assimilate'" />
       </summary>
 
       <slot name="dropdown" :closeDropdown="closeDropdown"></slot>
@@ -78,6 +82,7 @@
 <script setup lang="ts">
 import type { Component } from "vue"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
+import AssimilationMenuProgress from "@/components/navigation/AssimilationMenuProgress.vue"
 import { isNavigationActionItem } from "@/components/navigation/navigationActionItems"
 
 const { name } = defineProps<{

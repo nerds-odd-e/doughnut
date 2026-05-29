@@ -4,7 +4,7 @@ import {
 } from "@generated/doughnut-backend-api/sdk.gen"
 import AssimilateSingleNotePageView from "@/pages/AssimilateSingleNotePageView.vue"
 import { flushPromises } from "@vue/test-utils"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { beforeEach, describe, expect, it } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
@@ -26,10 +26,6 @@ beforeEach(() => {
   )
   mockSdkService(NoteController, "showNote", noteRealm)
   mockSdkService(AiController, "generateUnderstandingChecklist", { points: [] })
-  // Suppress Vue warnings about emitted events (false positives)
-  vi.spyOn(console, "warn").mockImplementation(() => {
-    // Intentionally empty to suppress warnings
-  })
   renderer = helper
     .component(AssimilateSingleNotePageView)
     .withRouter()
@@ -76,7 +72,7 @@ describe("AssimilateSingleNotePageView", () => {
       await flushPromises()
 
       const assimilation = wrapper.findComponent({ name: "Assimilation" })
-      assimilation.vm.$emit("reload-needed")
+      assimilation.vm.$emit("reloadNeeded")
 
       await flushPromises()
 

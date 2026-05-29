@@ -4,6 +4,7 @@ import {
   NoteController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import AssimilationPage from "@/pages/AssimilationPage.vue"
+import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -33,6 +34,15 @@ afterEach(() => {
 mockBrowserTimeZone("Europe/Amsterdam", beforeEach, afterEach)
 
 beforeEach(() => {
+  const {
+    setDueCount,
+    setAssimilatedCountOfTheDay,
+    setTotalUnassimilatedCount,
+  } = useAssimilationCount()
+  setDueCount(undefined)
+  setAssimilatedCountOfTheDay(undefined)
+  setTotalUnassimilatedCount(undefined)
+
   mockSdkService(AssimilationController, "assimilating", [])
   mockSdkService(NoteController, "getNoteInfo", {})
   showNoteSpy = mockSdkService(
