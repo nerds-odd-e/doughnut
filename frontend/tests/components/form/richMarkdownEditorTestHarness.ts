@@ -54,6 +54,27 @@ export function createRichMarkdownEditorTestHarness() {
     ;(addBtn!.element as HTMLButtonElement).click()
   }
 
+  function propertyValueFieldElement() {
+    const valField = wrapper.find(
+      '[data-testid="rich-note-property-row-value-input"]'
+    )
+    expect(valField.exists()).toBe(true)
+    return valField.element as HTMLElement
+  }
+
+  function pointerdownPropertyValueField() {
+    propertyValueFieldElement().dispatchEvent(
+      new PointerEvent("pointerdown", { bubbles: true })
+    )
+  }
+
+  /** Simulates browser focus after pointerdown primer (vitest has no real touch focus). */
+  function completePropertyValueFieldTap() {
+    const el = propertyValueFieldElement()
+    el.dispatchEvent(new PointerEvent("pointerup", { bubbles: true }))
+    el.focus()
+  }
+
   async function openAddProperty() {
     tapAddProperty()
     await flushPromises()
@@ -116,6 +137,9 @@ export function createRichMarkdownEditorTestHarness() {
     quillEditorEl,
     dispatchPasteHtmlToQuill,
     tapAddProperty,
+    pointerdownPropertyValueField,
+    completePropertyValueFieldTap,
+    propertyValueFieldElement,
     openAddProperty,
     flushAnimationFrame,
     assertPresetOptionsVisible,

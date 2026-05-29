@@ -140,6 +140,7 @@
         :class="
           isUrlPropertyKey(modelValue.key) ? 'min-w-0 flex-1' : ''
         "
+        @pointerdown="onValuePointerDown"
       >
         <WikiPropertyValueField
           :model-value="modelValue.value"
@@ -192,6 +193,7 @@ import {
   isKnownRelationKebab,
   relationTypeFromKebab,
 } from "@/models/relationTypeOptions"
+import { primeSoftKeyboard } from "@/utils/focusTarget"
 
 const props = defineProps<{
   modelValue: PropertyRow
@@ -233,6 +235,12 @@ function onKeyInput(event: Event) {
 
 function onValueUpdate(value: string) {
   emit("update:modelValue", { ...props.modelValue, value })
+}
+
+function onValuePointerDown(event: PointerEvent) {
+  const target = event.target as HTMLElement
+  if (target.closest("a")) return
+  primeSoftKeyboard()
 }
 
 function onKeyFocus() {

@@ -31,6 +31,12 @@ status: ok
   },
 ] as const
 
+const existingPropertyValueMarkdown = `---
+topic: training
+---
+
+Workshop body.`
+
 describe("RichMarkdownEditor properties", () => {
   const h = createRichMarkdownEditorTestHarness()
   let matchMediaSpy: ReturnType<typeof mockCoarsePointer> | undefined
@@ -132,6 +138,70 @@ Body`,
 
       expect(document.activeElement).not.toBe(primer)
       await waitUntilFocused('[data-testid="rich-note-property-key"]')
+    })
+
+    describe("existing property value", () => {
+      async function mountForPropertyValuePrimer(coarse: boolean) {
+        matchMediaSpy = mockCoarsePointer(coarse)
+        mountSoftKeyboardPrimer()
+        await h.mountEditor(existingPropertyValueMarkdown)
+        await flushPromises()
+        return softKeyboardPrimerElement()
+      }
+
+      it("focuses primer synchronously when value is pointerdown-tapped on touch device", async () => {
+        const primer = await mountForPropertyValuePrimer(true)
+        expect(primer).toBeTruthy()
+
+        h.pointerdownPropertyValueField()
+
+        expect(document.activeElement).toBe(primer)
+      })
+
+      it("transfers focus to value field after pointerdown on touch device", async () => {
+        await mountForPropertyValuePrimer(true)
+
+        h.pointerdownPropertyValueField()
+        h.completePropertyValueFieldTap()
+
+        await waitUntilFocused(
+          '[data-testid="rich-note-property-row-value-input"]'
+        )
+      })
+
+      it("does not focus primer when pointer is not coarse", async () => {
+        const primer = await mountForPropertyValuePrimer(false)
+
+        h.pointerdownPropertyValueField()
+        h.completePropertyValueFieldTap()
+
+        expect(document.activeElement).not.toBe(primer)
+        await waitUntilFocused(
+          '[data-testid="rich-note-property-row-value-input"]'
+        )
+      })
+
+      it("does not focus primer when pointerdown hits a dead wiki link", async () => {
+        matchMediaSpy = mockCoarsePointer(true)
+        mountSoftKeyboardPrimer()
+        await h.mountEditor(`---
+topic: "[[Missing Note]]"
+---
+
+Body`)
+        await flushPromises()
+        const primer = softKeyboardPrimerElement()
+        const deadLink = h
+          .propertyValueFieldElement()
+          .querySelector("a.dead-link")
+        expect(deadLink).toBeTruthy()
+
+        deadLink!.dispatchEvent(
+          new PointerEvent("pointerdown", { bubbles: true })
+        )
+
+        expect(document.activeElement).not.toBe(primer)
+      })
     })
   })
 

@@ -119,10 +119,9 @@ on mobile. No shared dependency between them, so order is by observed value.
 - **4c — Frontmatter "add property" — 1 commit.** Wire the add-property tap that
   reveals the key input (`RichFrontmatterInsertForm.vue` /
   `RichFrontmatterProperties.vue`). Confirm a single tap reveals the input.
-- **4d — Frontmatter "edit property value" — 1 commit.** Wire the
-  tap-to-edit-value path (`RichFrontmatterEditablePropertyRow.vue`). Split from 4c
-  because it is a different reveal trigger; merge with 4c only if they share one
-  handler.
+- **4d — Frontmatter "edit property value" — 1 commit — **DONE**.** `primeSoftKeyboard()`
+  on `pointerdown` in `RichFrontmatterEditablePropertyRow.vue` (skips anchor taps);
+  tests in `RichMarkdownEditor.properties.spec.ts`.
 - **4e — Spelling recall answer — 1 commit.** `SpellingQuestionDisplay.vue`
   (`v-focus`). Verify first whether the answer field is revealed by a user tap (e.g.
   "next question") vs. an automatic transition — if there is no originating gesture,
