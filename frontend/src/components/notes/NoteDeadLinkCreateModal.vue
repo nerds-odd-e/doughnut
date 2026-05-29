@@ -8,13 +8,13 @@
         <div class="flex flex-col gap-2">
           <button
             class="daisy-btn daisy-btn-primary"
-            @click="showCreateForm = true"
+            @click="onCreateNewNoteClick"
           >
             Create a new note named "{{ modelValue.displayText }}"
           </button>
           <button
             class="daisy-btn daisy-btn-secondary"
-            @click="linkingToExisting = true"
+            @click="onLinkToExistingClick"
           >
             Link to an existing note
           </button>
@@ -48,6 +48,7 @@ import { realmLeafFolder } from "./useNoteSidebarTree"
 import NoteNewForm from "./NoteNewForm.vue"
 import SearchForm from "@/components/links/SearchForm.vue"
 import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
+import { primeSoftKeyboard } from "@/utils/focusTarget"
 
 defineProps<{
   notebookId: number
@@ -62,6 +63,16 @@ const emit = defineEmits<{
 
 const linkingToExisting = ref(false)
 const showCreateForm = ref(false)
+
+const onCreateNewNoteClick = () => {
+  primeSoftKeyboard()
+  showCreateForm.value = true
+}
+
+const onLinkToExistingClick = () => {
+  primeSoftKeyboard()
+  linkingToExisting.value = true
+}
 
 const close = () => {
   linkingToExisting.value = false
