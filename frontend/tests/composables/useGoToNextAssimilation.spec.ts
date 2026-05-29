@@ -9,6 +9,7 @@ import {
 import { mockSdkService } from "@tests/helpers"
 
 const routerPush = vi.fn()
+const showSuccessToast = vi.fn()
 
 vi.mock("vue-router", async (importOriginal) => {
   const actual = await importOriginal<typeof import("vue-router")>()
@@ -22,9 +23,17 @@ vi.mock("@/managedApi/window/timezoneParam", () => ({
   default: () => "Asia/Shanghai",
 }))
 
+vi.mock("@/composables/useToast", () => ({
+  useToast: () => ({
+    showSuccessToast,
+    showErrorToast: vi.fn(),
+  }),
+}))
+
 describe("useGoToNextAssimilation", () => {
   beforeEach(() => {
     routerPush.mockReset()
+    showSuccessToast.mockReset()
     resetAssimilationViewForTests()
     const {
       setDueCount,
@@ -64,6 +73,29 @@ describe("useGoToNextAssimilation", () => {
       name: "noteShow",
       params: { noteId: "42" },
     })
+    expect(showSuccessToast).not.toHaveBeenCalled()
+  })
+
+  it("shows daily goal toast and navigates when dueCount is zero but next note exists", async () => {
+    mockSdkService(AssimilationController, "next", {
+      nextNoteId: 42,
+      counts: {
+        dueCount: 0,
+        assimilatedCountOfTheDay: 2,
+        totalUnassimilatedCount: 3,
+      },
+    })
+
+    const { goToNextAssimilation } = useGoToNextAssimilation()
+    await goToNextAssimilation()
+
+    expect(showSuccessToast).toHaveBeenCalledWith(
+      "You've achieved your daily assimilation goal"
+    )
+    expect(routerPush).toHaveBeenCalledWith({
+      name: "noteShow",
+      params: { noteId: "42" },
+    })
   })
 
   it("updates counts but does not navigate when nextNoteId is null", async () => {
@@ -83,6 +115,7 @@ describe("useGoToNextAssimilation", () => {
     expect(dueCount.value).toBe(0)
     expect(assimilatedCountOfTheDay.value).toBe(3)
     expect(routerPush).not.toHaveBeenCalled()
+    expect(showSuccessToast).toHaveBeenCalledWith("No more notes to assimilate")
 
     const { showAssimilationSettings } = useAssimilationView()
     expect(showAssimilationSettings.value).toBe(false)

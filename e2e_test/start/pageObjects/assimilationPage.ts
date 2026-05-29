@@ -1,7 +1,6 @@
 import { commonSenseSplit } from 'support/string_util'
 import { pageIsNotLoading } from '../pageBase'
 import { form } from '../forms'
-import router from '../router'
 import { assumeMemoryTrackerPage } from './memoryTrackerPage'
 
 export const keepForRecallButton = (options?: { timeout?: number }) =>
@@ -15,6 +14,17 @@ const understandingChecklist = () =>
 
 const mainNoteHeadingTitleSelector =
   '#main-note-content h2.path-name-heading [role=title], #main-note-content [data-test="note-title"]'
+
+const assimilationToastMessages = {
+  dailyGoalMet: "You've achieved your daily assimilation goal",
+  noMoreNotes: 'No more notes to assimilate',
+} as const
+
+function expectSuccessToast(message: string) {
+  cy.contains('.Vue-Toastification__toast--success', message, {
+    timeout: 10000,
+  }).should('be.visible')
+}
 
 function waitForAssimilationNoteTitle(expectedTitle?: string) {
   pageIsNotLoading()
@@ -64,6 +74,11 @@ export const assumeAssimilationPage = () => ({
     keepForRecallButton({ timeout: 10000 })
       .scrollIntoView()
       .should('be.visible')
+    return this
+  },
+  expectAssimilatingNote(title: string) {
+    waitForAssimilationNoteTitle(title)
+    this.waitForAssimilationReady()
     return this
   },
   keepForRecallOnPanel() {
@@ -301,12 +316,19 @@ export const assimilation = () => {
       return assumeAssimilationPage()
     },
     startAssimilationFromMenu() {
-      router().toRoot()
       getAssimilateListItemInSidebar(($el) => {
         $el.click()
       })
       pageIsNotLoading()
-      return assumeAssimilationPage()
+      return this
+    },
+    expectDailyAssimilationGoalToast() {
+      expectSuccessToast(assimilationToastMessages.dailyGoalMet)
+      return this
+    },
+    expectNoMoreNotesToAssimilateToast() {
+      expectSuccessToast(assimilationToastMessages.noMoreNotes)
+      return this
     },
   }
 }

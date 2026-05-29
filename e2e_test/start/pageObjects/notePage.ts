@@ -67,6 +67,11 @@ export const assumeNotePage = (
     findNoteTitle(noteTopology)
   }
   return {
+    expectWithoutAssimilationPanel() {
+      cy.url({ timeout: 15000 }).should('match', noteShowPathInUrl)
+      cy.get('[data-test="keep-for-recall"]').should('not.exist')
+      return this
+    },
     expectNoteTitleDisplayed(title: string) {
       findNoteTitle(title)
       return this

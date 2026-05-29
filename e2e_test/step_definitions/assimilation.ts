@@ -58,6 +58,26 @@ When('I am assimilating the note {string}', (noteTitle: string) => {
   start.jumpToNotePage(noteTitle).moreOptions().openAssimilationSettings()
 })
 
+When('I start assimilation from the menu', () => {
+  start.assimilation().startAssimilationFromMenu()
+})
+
+Then('I should be assimilating the note {string}', (noteTitle: string) => {
+  start.assumeAssimilationPage().expectAssimilatingNote(noteTitle)
+})
+
+Then('I should see the daily assimilation goal toast', () => {
+  start.assimilation().expectDailyAssimilationGoalToast()
+})
+
+Then('I should see the no more notes to assimilate toast', () => {
+  start.assimilation().expectNoMoreNotesToAssimilateToast()
+})
+
+Then('I should still be on the note page for {string}', (noteTitle: string) => {
+  start.assumeNotePage(noteTitle).expectWithoutAssimilationPanel()
+})
+
 Then('I assimilate the note {string} via more options', (noteTitle: string) => {
   start.jumpToNotePage(noteTitle).moreOptions().assimilateNote()
 })
