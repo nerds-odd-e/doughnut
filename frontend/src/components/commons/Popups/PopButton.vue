@@ -4,7 +4,7 @@
     :class="btnClass || 'daisy-btn daisy-btn-ghost daisy-btn-sm'"
     :aria-label="ariaLabel"
     role="button"
-    @click.prevent="show=true"
+    @click.prevent="onTriggerClick"
     :title="title"
   >
     <slot name="button_face" />
@@ -28,6 +28,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { ref } from "vue"
+import { primeSoftKeyboard } from "@/utils/focusTarget"
 import Modal from "../Modal.vue"
 
 defineProps({
@@ -47,6 +48,11 @@ defineProps({
 
 const show = ref(false)
 const buttonRef = ref<HTMLButtonElement | null>(null)
+
+const onTriggerClick = () => {
+  primeSoftKeyboard()
+  openDialog()
+}
 
 const openDialog = () => {
   show.value = true

@@ -1,9 +1,12 @@
 import PopButton from "@/components/commons/Popups/PopButton.vue"
+import SoftKeyboardPrimer from "@/components/commons/SoftKeyboardPrimer.vue"
+import { softKeyboardPrimerId } from "@/utils/focusTarget"
+import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
 import { mount } from "@vue/test-utils"
 import { flushPromises } from "@vue/test-utils"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
-import { vi } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 import { page } from "vitest/browser"
 
 // Browser Mode: Use real Vue Router instead of mocking
@@ -22,25 +25,76 @@ vi.mock("@/managedApi/AiReplyEventSource", () => ({
 }))
 
 describe("PopButton", () => {
+  let matchMediaSpy: ReturnType<typeof mockCoarsePointer> | undefined
+
   afterEach(() => {
+    matchMediaSpy?.mockRestore()
+    matchMediaSpy = undefined
     document.body.innerHTML = ""
   })
 
   // Browser Mode: Use real Teleport instead of stubbing!
   // We attach to document.body so Teleport can render properly
-  const mountWithRealTeleport = () =>
-    mount(PopButton, {
+  const mountWithRealTeleport = (slot = "<div>Test Content</div>") => {
+    mount(SoftKeyboardPrimer, { attachTo: document.body })
+    return mount(PopButton, {
       props: {
         title: "Test Button",
       },
       slots: {
-        default: "<div>Test Content</div>",
+        default: slot,
       },
       global: {
         plugins: [router],
       },
       attachTo: document.body,
     })
+  }
+
+  describe("soft keyboard primer", () => {
+    it("focuses primer synchronously on tap when touch input is primary", () => {
+      matchMediaSpy = mockCoarsePointer(true)
+      const wrapper = mountWithRealTeleport(
+        '<input autofocus id="target-input" />'
+      )
+      const primer = document.getElementById(softKeyboardPrimerId)
+      expect(primer).toBeTruthy()
+
+      wrapper.find("button").trigger("click")
+
+      expect(document.activeElement).toBe(primer)
+      wrapper.unmount()
+    })
+
+    it("transfers focus to autofocus target after modal mounts", async () => {
+      matchMediaSpy = mockCoarsePointer(true)
+      const wrapper = mountWithRealTeleport(
+        '<input autofocus id="target-input" />'
+      )
+
+      await wrapper.find("button").trigger("click")
+
+      await vi.waitUntil(() => document.activeElement?.id === "target-input", {
+        timeout: 1000,
+      })
+
+      expect(document.activeElement?.id).toBe("target-input")
+      wrapper.unmount()
+    })
+
+    it("does not focus primer on tap when pointer is not coarse", () => {
+      matchMediaSpy = mockCoarsePointer(false)
+      const wrapper = mountWithRealTeleport(
+        '<input autofocus id="target-input" />'
+      )
+      const primer = document.getElementById(softKeyboardPrimerId)
+
+      wrapper.find("button").trigger("click")
+
+      expect(document.activeElement).not.toBe(primer)
+      wrapper.unmount()
+    })
+  })
 
   it("blurs button when dialog closes via close_request", async () => {
     const wrapper = mountWithRealTeleport()

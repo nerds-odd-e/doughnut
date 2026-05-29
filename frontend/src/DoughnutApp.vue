@@ -14,6 +14,7 @@ import {
 } from "@generated/doughnut-backend-api/sdk.gen"
 import getEnvironment from "./managedApi/window/getEnvironment"
 import MainMenu from "./components/toolbars/MainMenu.vue"
+import SoftKeyboardPrimer from "./components/commons/SoftKeyboardPrimer.vue"
 import { useFeatureToggle } from "./composables/useFeatureToggle"
 
 const apiStatus: Ref<ApiStatus> = ref({
@@ -55,6 +56,7 @@ onMounted(async () => {
 </script>
 
 <template>
+  <SoftKeyboardPrimer />
   <Popups />
   <LoadingThinBar v-if="user && apiStatus.states.length > 0" />
   <div class="flex bg-base-100 text-base-content app-container">

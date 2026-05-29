@@ -15,6 +15,17 @@ const fallbackFocusableSelector = [
 
 export const autofocusSelector = "[data-autofocus], [autofocus]"
 
+export const softKeyboardPrimerId = "soft-keyboard-primer"
+
+function touchPrimaryInputDevice(): boolean {
+  return window.matchMedia("(pointer: coarse)").matches
+}
+
+export function primeSoftKeyboard(): void {
+  if (!touchPrimaryInputDevice()) return
+  document.getElementById(softKeyboardPrimerId)?.focus()
+}
+
 interface FocusTargetOptions {
   selectAll?: boolean
 }
