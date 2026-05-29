@@ -20,9 +20,9 @@ import type {
 
 declare module 'vue-router' {
   interface TypesConfig {
-    ParamParsers:
-      | never
+    _ParamParsers: {}
     RouteNamedMap: import('vue-router/auto-routes').RouteNamedMap
+    _RouteFileInfoMap: import('vue-router/auto-routes')._RouteFileInfoMap
   }
 }
 
@@ -252,11 +252,15 @@ declare module 'vue-router/auto-routes' {
         | '/AdminDashboardPage'
       views:
         | never
+      pathParamNames:
+        | never
     }
     'src/pages/AssimilateSingleNotePage.vue': {
       routes:
         | '/AssimilateSingleNotePage'
       views:
+        | never
+      pathParamNames:
         | never
     }
     'src/pages/AssimilateSingleNotePageView.vue': {
@@ -264,11 +268,15 @@ declare module 'vue-router/auto-routes' {
         | '/AssimilateSingleNotePageView'
       views:
         | never
+      pathParamNames:
+        | never
     }
     'src/pages/AssimilationPage.vue': {
       routes:
         | '/AssimilationPage'
       views:
+        | never
+      pathParamNames:
         | never
     }
     'src/pages/AssimilationPageView.vue': {
@@ -276,11 +284,15 @@ declare module 'vue-router/auto-routes' {
         | '/AssimilationPageView'
       views:
         | never
+      pathParamNames:
+        | never
     }
     'src/pages/BazaarPage.vue': {
       routes:
         | '/BazaarPage'
       views:
+        | never
+      pathParamNames:
         | never
     }
     'src/pages/BookReadingPage.vue': {
@@ -288,11 +300,15 @@ declare module 'vue-router/auto-routes' {
         | '/BookReadingPage'
       views:
         | never
+      pathParamNames:
+        | never
     }
     'src/pages/CircleJoinPage.vue': {
       routes:
         | '/CircleJoinPage'
       views:
+        | never
+      pathParamNames:
         | never
     }
     'src/pages/CircleShowPage.vue': {
@@ -300,11 +316,15 @@ declare module 'vue-router/auto-routes' {
         | '/CircleShowPage'
       views:
         | never
+      pathParamNames:
+        | never
     }
     'src/pages/CirclesPage.vue': {
       routes:
         | '/CirclesPage'
       views:
+        | never
+      pathParamNames:
         | never
     }
     'src/pages/commons/ContainerPage.vue': {
@@ -312,11 +332,15 @@ declare module 'vue-router/auto-routes' {
         | '/commons/ContainerPage'
       views:
         | never
+      pathParamNames:
+        | never
     }
     'src/pages/FailureReportPage.vue': {
       routes:
         | '/FailureReportPage'
       views:
+        | never
+      pathParamNames:
         | never
     }
     'src/pages/FolderPage.vue': {
@@ -324,11 +348,15 @@ declare module 'vue-router/auto-routes' {
         | '/FolderPage'
       views:
         | never
+      pathParamNames:
+        | never
     }
     'src/pages/HomePage.vue': {
       routes:
         | '/HomePage'
       views:
+        | never
+      pathParamNames:
         | never
     }
     'src/pages/ManageAccessTokensPage.vue': {
@@ -336,11 +364,15 @@ declare module 'vue-router/auto-routes' {
         | '/ManageAccessTokensPage'
       views:
         | never
+      pathParamNames:
+        | never
     }
     'src/pages/MemoryTrackerPage.vue': {
       routes:
         | '/MemoryTrackerPage'
       views:
+        | never
+      pathParamNames:
         | never
     }
     'src/pages/MemoryTrackerPageView.vue': {
@@ -348,11 +380,15 @@ declare module 'vue-router/auto-routes' {
         | '/MemoryTrackerPageView'
       views:
         | never
+      pathParamNames:
+        | never
     }
     'src/pages/MessageCenterPage.vue': {
       routes:
         | '/MessageCenterPage'
       views:
+        | never
+      pathParamNames:
         | never
     }
     'src/pages/NonproductionOnlyLoginPage.vue': {
@@ -360,11 +396,15 @@ declare module 'vue-router/auto-routes' {
         | '/NonproductionOnlyLoginPage'
       views:
         | never
+      pathParamNames:
+        | never
     }
     'src/pages/NotebookGroupPage.vue': {
       routes:
         | '/NotebookGroupPage'
       views:
+        | never
+      pathParamNames:
         | never
     }
     'src/pages/NotebookGroupPageView.vue': {
@@ -372,11 +412,15 @@ declare module 'vue-router/auto-routes' {
         | '/NotebookGroupPageView'
       views:
         | never
+      pathParamNames:
+        | never
     }
     'src/pages/NotebookPage.vue': {
       routes:
         | '/NotebookPage'
       views:
+        | never
+      pathParamNames:
         | never
     }
     'src/pages/NotebookPageView.vue': {
@@ -384,11 +428,15 @@ declare module 'vue-router/auto-routes' {
         | '/NotebookPageView'
       views:
         | never
+      pathParamNames:
+        | never
     }
     'src/pages/NotebooksPage.vue': {
       routes:
         | '/NotebooksPage'
       views:
+        | never
+      pathParamNames:
         | never
     }
     'src/pages/NotebooksPageView.vue': {
@@ -396,11 +444,15 @@ declare module 'vue-router/auto-routes' {
         | '/NotebooksPageView'
       views:
         | never
+      pathParamNames:
+        | never
     }
     'src/pages/NoteShowPage.vue': {
       routes:
         | '/NoteShowPage'
       views:
+        | never
+      pathParamNames:
         | never
     }
     'src/pages/RecallPage.vue': {
@@ -408,17 +460,23 @@ declare module 'vue-router/auto-routes' {
         | '/RecallPage'
       views:
         | never
+      pathParamNames:
+        | never
     }
     'src/pages/RecentPage.vue': {
       routes:
         | '/RecentPage'
       views:
         | never
+      pathParamNames:
+        | never
     }
     'src/pages/UserNewRegisterPage.vue': {
       routes:
         | '/UserNewRegisterPage'
       views:
+        | never
+      pathParamNames:
         | never
     }
   }
