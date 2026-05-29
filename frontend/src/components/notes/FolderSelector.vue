@@ -47,7 +47,7 @@
           title="Search folders"
           aria-label="Search folders"
           data-testid="folder-selector-more-button"
-          @click="searchOpen = true"
+          @click="onSearchFoldersClick"
         >
           <MoreHorizontal class="w-5 h-5" />
         </button>
@@ -76,6 +76,7 @@ import Modal from "@/components/commons/Modal.vue"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { requestNotebookFolderListing } from "@/utils/notebookFolderListingRequest"
 import FolderSearchForm from "./FolderSearchForm.vue"
+import { primeSoftKeyboard } from "@/utils/focusTarget"
 import {
   ancestorsFromChain,
   folderChainWithParentIds,
@@ -211,6 +212,11 @@ const selectModel = computed({
     else emit("update:modelValue", resolveFolderById(Number(v)))
   },
 })
+
+function onSearchFoldersClick() {
+  primeSoftKeyboard()
+  searchOpen.value = true
+}
 
 function onSearchSelect(row: Folder | null) {
   emit("update:modelValue", row)

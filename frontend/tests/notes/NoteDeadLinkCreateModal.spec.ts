@@ -4,12 +4,13 @@ import {
   SearchController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import NoteDeadLinkCreateModal from "@/components/notes/NoteDeadLinkCreateModal.vue"
-import { softKeyboardPrimerId } from "@/utils/focusTarget"
 import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
 import {
   focusDirective,
   modalBodyStub,
   mountSoftKeyboardPrimer,
+  softKeyboardPrimerElement,
+  waitUntilFocused,
 } from "@tests/helpers/softKeyboardPrimerTestSupport"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
@@ -111,18 +112,6 @@ describe("NoteDeadLinkCreateModal", () => {
     await wrapper?.vm.$nextTick()
   }
 
-  const waitUntilFocused = async (selector: string) => {
-    const element = await vi.waitUntil(
-      () => {
-        const el = document.querySelector(selector) as HTMLElement | null
-        return el !== null && document.activeElement === el ? el : null
-      },
-      { timeout: 2000 }
-    )
-    expect(document.activeElement).toBe(element)
-    return element
-  }
-
   describe("soft keyboard primer", () => {
     it.each([
       { branch: "create", label: createNoteLabel },
@@ -133,7 +122,7 @@ describe("NoteDeadLinkCreateModal", () => {
       matchMediaSpy = mockCoarsePointer(true)
       mountModal()
       await waitForChooser()
-      const primer = document.getElementById(softKeyboardPrimerId)
+      const primer = softKeyboardPrimerElement()
       expect(primer).toBeTruthy()
 
       tapChooser(label)
@@ -165,7 +154,7 @@ describe("NoteDeadLinkCreateModal", () => {
       matchMediaSpy = mockCoarsePointer(false)
       mountModal()
       await waitForChooser()
-      const primer = document.getElementById(softKeyboardPrimerId)
+      const primer = softKeyboardPrimerElement()
 
       await tapChooserAndSettle(createNoteLabel)
 
