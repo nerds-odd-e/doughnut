@@ -45,24 +45,38 @@ public class AssimilationService {
     if (remainingDailyCount <= 0) {
       return Stream.empty();
     }
+    return notesEligibleToAssimilate(remainingDailyCount);
+  }
 
-    List<Integer> assimilatedNoteIdsForToday =
-        getNotesAssimilatedToday().stream().map(MemoryTracker::getNote).map(Note::getId).toList();
+  public Optional<Note> getNextNoteToAssimilate() {
+    int remainingDailyCount = getRemainingDailyAssimilationCount();
+    if (remainingDailyCount > 0) {
+      return notesEligibleToAssimilate(remainingDailyCount).findFirst();
+    }
+    return notesEligiblePastUserDailyCap().findFirst();
+  }
 
+  private Stream<Note> notesEligibleToAssimilate(int remainingDailyCount) {
     return Stream.concat(
-            getDueNoteFromSubscription(assimilatedNoteIdsForToday),
+            subscriptionNotesEligibleToday(),
             getDueNoteToAssimilate(userService.getUnassimilatedNotes(user), remainingDailyCount))
         .limit(remainingDailyCount);
   }
 
-  public Optional<Note> getNextNoteToAssimilate() {
-    return unassimilatedNotesInPriorityOrder().findFirst();
+  /** Subscription daily limits still apply; only the user's daily cap is ignored. */
+  private Stream<Note> notesEligiblePastUserDailyCap() {
+    return Stream.concat(subscriptionNotesEligibleToday(), userService.getUnassimilatedNotes(user));
   }
 
-  private Stream<Note> unassimilatedNotesInPriorityOrder() {
-    return Stream.concat(
-        getSubscriptionStream().flatMap(subscriptionService::getUnassimilatedNotes),
-        userService.getUnassimilatedNotes(user));
+  private Stream<Note> subscriptionNotesEligibleToday() {
+    return getDueNoteFromSubscription(assimilatedNoteIdsForToday());
+  }
+
+  private List<Integer> assimilatedNoteIdsForToday() {
+    return getNotesAssimilatedToday().stream()
+        .map(MemoryTracker::getNote)
+        .map(Note::getId)
+        .toList();
   }
 
   private Stream<Note> getDueNoteFromSubscription(List<Integer> todaysAssimilatedNoteIds) {

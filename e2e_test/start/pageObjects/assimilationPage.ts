@@ -176,12 +176,16 @@ export const assumeAssimilationPage = () => ({
     })
   },
   assimilateNotes(noteTitles: string) {
-    return this.assimilate(
-      commonSenseSplit(noteTitles, ', ').map((title: string) => ({
+    commonSenseSplit(noteTitles, ', ').forEach((title: string) => {
+      if (title === 'end') {
+        return
+      }
+      this.assimilateOneNote({
         'Assimilation Type': 'single note',
         Title: title,
-      }))
-    )
+      })
+    })
+    return this
   },
   expectUnderstandingPointsCount(count: number) {
     this.openRefineNoteModal()
