@@ -9,6 +9,7 @@ import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class AssimilationService {
@@ -52,6 +53,16 @@ public class AssimilationService {
             getDueNoteFromSubscription(assimilatedNoteIdsForToday),
             getDueNoteToAssimilate(userService.getUnassimilatedNotes(user), remainingDailyCount))
         .limit(remainingDailyCount);
+  }
+
+  public Optional<Note> getNextNoteToAssimilate() {
+    return unassimilatedNotesInPriorityOrder().findFirst();
+  }
+
+  private Stream<Note> unassimilatedNotesInPriorityOrder() {
+    return Stream.concat(
+        getSubscriptionStream().flatMap(subscriptionService::getUnassimilatedNotes),
+        userService.getUnassimilatedNotes(user));
   }
 
   private Stream<Note> getDueNoteFromSubscription(List<Integer> todaysAssimilatedNoteIds) {

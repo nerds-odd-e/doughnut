@@ -185,6 +185,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 ## Assimilation Controller
 
 - `assimilate`: POST `/api/assimilation` -> `AssimilateResponse` (request: `AssimilateData`; body: AssimilationRequestDto; response body: Array<MemoryTracker>)
+- `next`: GET `/api/assimilation/next` -> `NextResponse` (request: `NextData`; query: timezone; response body: AssimilationNextDto)
 - `assimilating`: GET `/api/assimilation/assimilating` -> `AssimilatingResponse` (request: `AssimilatingData`; query: timezone; response body: Array<NoteRealm>)
 
 ## Ai Controller

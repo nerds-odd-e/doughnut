@@ -873,6 +873,11 @@ export type UserForOtherUserView = {
     name?: string;
 };
 
+export type AssimilationNextDto = {
+    nextNoteId?: number;
+    counts?: AssimilationCountDto;
+};
+
 export type DummyForGeneratingTypes = {
     noteContentCompletion?: NoteContentCompletion;
     titleReplacement?: TitleReplacement;
@@ -3427,6 +3432,24 @@ export type BazaarResponses = {
 };
 
 export type BazaarResponse = BazaarResponses[keyof BazaarResponses];
+
+export type NextData = {
+    body?: never;
+    path?: never;
+    query: {
+        timezone: string;
+    };
+    url: '/api/assimilation/next';
+};
+
+export type NextResponses = {
+    /**
+     * OK
+     */
+    200: AssimilationNextDto;
+};
+
+export type NextResponse = NextResponses[keyof NextResponses];
 
 export type AssimilatingData = {
     body?: never;

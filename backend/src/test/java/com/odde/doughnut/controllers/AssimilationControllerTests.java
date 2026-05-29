@@ -4,11 +4,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.odde.doughnut.controllers.dto.AssimilationNextDTO;
 import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -50,6 +52,64 @@ class AssimilationControllerTests extends ControllerTestBase {
       List<NoteRealm> memoryTrackerWithRecallSettings = controller.assimilating("Etc/Unknown");
       assertThat(memoryTrackerWithRecallSettings, hasSize(1));
       assertThat(memoryTrackerWithRecallSettings.get(0).getNote().getId(), equalTo(n.getId()));
+    }
+  }
+
+  @Nested
+  class Next {
+    @Test
+    void returnsNextNoteIdPastDailyCap() {
+      User user = currentUser.getUser();
+      makeMe.theUser(user).dailyAssimilationCount(1).please();
+      Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
+      testabilitySettings.timeTravelTo(day1);
+
+      Note note1 = makeMe.aNote("note1").notebookOwnedBy(user).please();
+      Note note2 = makeMe.aNote("note2").notebookOwnedBy(user).please();
+      makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(day1).please();
+
+      assertThat(controller.assimilating("Asia/Shanghai"), empty());
+
+      AssimilationNextDTO result = controller.next("Asia/Shanghai");
+      assertThat(result.getNextNoteId(), equalTo(note2.getId()));
+      assertThat(result.getCounts().getDueCount(), equalTo(0));
+    }
+
+    @Test
+    void subscriptionNoteBeforeOwnedNote() {
+      User user = currentUser.getUser();
+      User notebookOwner = makeMe.aUser().please();
+      Notebook subscribedNotebook = makeMe.aNotebook().creatorAndOwner(notebookOwner).please();
+      Note subscriptionNote = makeMe.aNote().notebook(subscribedNotebook).please();
+      makeMe.aNote().notebookOwnedBy(user).please();
+      makeMe.aSubscription().forNotebook(subscribedNotebook).forUser(user).daily(1).please();
+      makeMe.refresh(user);
+
+      AssimilationNextDTO result = controller.next("Asia/Shanghai");
+      assertThat(result.getNextNoteId(), equalTo(subscriptionNote.getId()));
+    }
+
+    @Test
+    void returnsNullWhenNoNotesLeft() {
+      assertThat(controller.next("Asia/Shanghai").getNextNoteId(), nullValue());
+    }
+
+    @Test
+    void countsAreCorrect() {
+      User user = currentUser.getUser();
+      makeMe.aNote("note1").notebookOwnedBy(user).please();
+      makeMe.aNote("note2").notebookOwnedBy(user).please();
+
+      AssimilationNextDTO result = controller.next("Asia/Shanghai");
+      assertThat(result.getCounts().getDueCount(), equalTo(2));
+      assertThat(result.getCounts().getAssimilatedCountOfTheDay(), equalTo(0));
+      assertThat(result.getCounts().getTotalUnassimilatedCount(), equalTo(2));
+    }
+
+    @Test
+    void notLoggedIn() {
+      currentUser.setUser(null);
+      assertThrows(ResponseStatusException.class, () -> controller.next("Asia/Shanghai"));
     }
   }
 

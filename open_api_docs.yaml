@@ -2764,6 +2764,24 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BazaarNotebook"
+  /api/assimilation/next:
+    get:
+      tags:
+      - assimilation-controller
+      operationId: next
+      parameters:
+      - name: timezone
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AssimilationNextDTO"
   /api/assimilation/assimilating:
     get:
       tags:
@@ -4651,6 +4669,14 @@ components:
       properties:
         name:
           type: string
+    AssimilationNextDTO:
+      type: object
+      properties:
+        nextNoteId:
+          type: integer
+          format: int32
+        counts:
+          $ref: "#/components/schemas/AssimilationCountDTO"
     DummyForGeneratingTypes:
       type: object
       properties:

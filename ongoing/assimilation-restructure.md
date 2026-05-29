@@ -5,7 +5,7 @@ Restructure assimilation from two dedicated pages (`/assimilate` queue, `/assimi
 ## Current state (discovered)
 
 - Routes: `/assimilate` (`AssimilationPage` + `AssimilationPageView`, queue) and `/assimilate/:noteId` (`AssimilateSingleNotePage` + `View`). Both render `recall/Assimilation.vue` = `NoteShow` + `AssimilationSettings` dock + spelling popup + assimilate logic.
-- Dropdown "Assimilation settings" (`NoteMoreOptionsForm.vue`) **navigates** to `/assimilate/:noteId`.
+- Dropdown "Assimilation settings" (`NoteMoreOptionsForm.vue`) **toggles** the inline panel on the note page (`useAssimilationView`). `/assimilate/:noteId` route still exists but E2E no longer uses it.
 - Main menu "Assimilate" (`useNavigationItems.ts` + `NavigationItem.vue`) is a **router-link** to `/assimilate`.
 - Backend: `GET /api/assimilation/assimilating?timezone=` → `List<NoteRealm>` via `AssimilationService.getNotesToAssimilate()`. **Returns empty as soon as the daily cap is reached** (`remainingDailyCount <= 0` ⇒ `Stream.empty()`).
 - `POST /api/assimilation` (`AssimilationRequestDTO{noteId, skipMemoryTracking}`) → `List<MemoryTracker>`.
@@ -29,10 +29,10 @@ Restructure assimilation from two dedicated pages (`/assimilate` queue, `/assimi
 Two facts make small, always-green commits possible:
 
 1. **The inline panel reuses the same `data-test` selectors** as today's pages (`keep-for-recall`, `open-refine-note-modal`, the spelling popup, the memory-tracker table, `#main-note-content`). So `assumeAssimilationPage()` helper methods work unchanged against the inline panel; only the **entry navigation** differs.
-2. **Both old pages survive until Phase 5.** `/assimilate` (queue) is reached by `assimilation().navigateToAssimilationPage()` (clicks the sidebar item); `/assimilate/:noteId` (single note) is reached by the dropdown via `noteMoreOptionsForm.openAssimilationPage()` / `notePage.openAssimilationSettings()`.
+2. **Both old pages survive until Phase 5.** `/assimilate` (queue) is reached by `assimilation().navigateToAssimilationPage()` (clicks the sidebar item). Dropdown entry uses `noteMoreOptionsForm.openAssimilationSettings()` / `notePage.openAssimilationSettings()` (inline toggle on `/n{id}`); `/assimilate/:noteId` is unused by tests.
 
 Entry points migrate one at a time:
-- **Phase 1** rewires the **dropdown** page-objects (`openAssimilationPage`, `assimilateNote`, `notePage.openAssimilationSettings`) to the inline toggle. The `/assimilate/:noteId` route still exists but is no longer used by tests.
+- **Phase 1 (done)** rewired the **dropdown** page-objects (`openAssimilationSettings`, `assimilateNote`, `notePage.openAssimilationSettings`) to the inline toggle.
 - **Phase 2** decouples `navigateToAssimilationPage()` from the menu by switching it to `cy.visit('/assimilate')` (queue page still present), so legacy queue scenarios stay green while the menu becomes the new action.
 
 Step defs touched: `assimilation.ts` (dropdown steps 57–74 in Phase 1; `navigateToAssimilationPage` steps in Phase 2/3), `recall.ts` (uses `navigateToAssimilationPage`, handled in Phase 2). Backend setup via `testability.assimilateNote` is unaffected.
@@ -45,14 +45,14 @@ Step defs touched: `assimilation.ts` (dropdown steps 57–74 in Phase 1; `naviga
 
 - **1.1 (Structure) — done** Extract `recall/AssimilationPanel.vue` from `recall/Assimilation.vue` = `AssimilationSettings` + spelling popup + assimilate logic (everything except `NoteShow`). `Assimilation.vue` becomes `NoteShow` + `AssimilationPanel`. No behavior change; existing `Assimilation.spec.ts` and all assimilation E2E stay green. Justified by 1.3.
 - **1.2 (Structure) — done** `DropdownMenuActionButton.vue` gains an optional `checked` prop that renders a check to the left of the icon. Unit test for checked/unchecked; existing usages render identically (default off). Justified by 1.3.
-- **1.3 (Behavior)** Add `composables/useAssimilationView.ts` (singleton: `showAssimilationSettings`, `pendingOnForNoteId`, `toggle`, `requestOnFor(noteId)`, `resetForNote(noteId)`). `NoteMoreOptionsForm.vue`: replace navigation with a toggle bound to the composable + `checked`. `NoteShowPage.vue`: render `AssimilationPanel` at the bottom when on; reset the toggle on note-id change. Interim keep/skip: stay on the note and refresh recall info.
-  - E2E (new `e2e_test/features/assimilation/assimilation_settings_panel.feature`): open a note → toggle on → check visible → Keep for recall → tracker created; navigate to another note → toggle off.
+- **1.3 (Behavior) — done** Add `composables/useAssimilationView.ts` (singleton: `showAssimilationSettings`, `pendingOnForNoteId`, `toggle`, `requestOnFor(noteId)`, `resetForNote(noteId)`). `NoteMoreOptionsForm.vue`: replace navigation with a toggle bound to the composable + `checked`. `NoteShowPage.vue`: render `AssimilationPanel` at the bottom when on; reset the toggle on note-id change. Interim keep/skip: stay on the note and refresh recall info.
+  - E2E (`e2e_test/features/assimilation/assimilation_settings_panel.feature`): open a note → toggle on → check visible → Keep for recall → tracker created; navigate to another note → toggle off.
   - Unit: `NoteMoreOptionsForm.spec.ts` (toggle + check, no route push), `useAssimilationView` reset semantics, panel renders only when on.
-- **1.4 (Behavior/test-migration)** Point the dropdown E2E page-objects at the inline toggle: `noteMoreOptionsForm.openAssimilationPage`→`openAssimilationSettings` (toggle on, wait for `keep-for-recall`, return `assumeAssimilationPage()`), `assimilateNote`, and `notePage.openAssimilationSettings` (drop the `/assimilate/` URL assumption). Keeps `assimilate_with_remembering_spelling.feature`, `understanding_check.feature`, `edit_when_assimilating.feature` green via the inline panel. Pure test-layer commit.
+- **1.4 (Behavior/test-migration) — done** Dropdown E2E page-objects use `openAssimilationSettings` (toggle on, wait for `keep-for-recall`, return `assumeAssimilationPage()`), `assimilateNote`, and `notePage.openAssimilationSettings` (no `/assimilate/` URL). `assimilate_with_remembering_spelling.feature`, `understanding_check.feature`, `edit_when_assimilating.feature` green via inline panel.
 
 ### Phase 2 — "Assimilate" menu navigates to the next note
 
-- **2.1 (Behavior, backend)** `AssimilationService.getNextNoteToAssimilate()` (subscription-first then owned, **ignoring all daily caps**); `AssimilationNextDTO { Integer nextNoteId; AssimilationCountDTO counts; }`; `GET /api/assimilation/next?timezone=`. Controller tests: returns next id past the daily cap, subscription-before-owned ordering, `null` when none, counts correct. Regenerate TS client (same commit).
+- **2.1 (Behavior, backend) — done** `AssimilationService.getNextNoteToAssimilate()` (subscription-first then owned, **ignoring all daily caps**); `AssimilationNextDTO { Integer nextNoteId; AssimilationCountDTO counts; }`; `GET /api/assimilation/next?timezone=`. Controller tests: returns next id past the daily cap, subscription-before-owned ordering, `null` when none, counts correct. Regenerate TS client (same commit).
 - **2.2 (Behavior, frontend)** `goToNextAssimilation()` (calls `/next`, updates `useAssimilationCount`, sets `pendingOnForNoteId`, routes to `noteShow`). Wire the "Assimilate" nav item (and Home `LearningFlowSection` card) to call it instead of routing — `NavigationItem.vue` joins the existing `resumeRecall` click-handler path. Switch `navigateToAssimilationPage()` E2E helper to `cy.visit('/assimilate')`.
   - E2E (new `assimilation_walkthrough.feature`, `@wip`→green): "Assimilate" from the menu lands on the first note with settings on.
 - **2.3 (Behavior, frontend)** Toasts in `goToNextAssimilation()`: daily-goal-met (`nextNoteId != null && counts.dueCount === 0`, navigate anyway) and no-more (`nextNoteId == null`, stay on current note). Extend `assimilation_walkthrough.feature`: past-cap shows the goal toast but still loads a note; nothing-left shows the no-more toast and stays put.

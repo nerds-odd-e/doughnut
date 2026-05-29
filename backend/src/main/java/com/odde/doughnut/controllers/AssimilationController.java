@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.dto.AssimilationNextDTO;
 import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.*;
@@ -14,6 +15,7 @@ import com.odde.doughnut.utils.TimezoneUtils;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -51,16 +53,34 @@ class AssimilationController {
   @GetMapping("/assimilating")
   @Transactional(readOnly = true)
   public List<NoteRealm> assimilating(@RequestParam(value = "timezone") String timezone) {
+    var scope = assimilationScope(timezone);
+    return scope
+        .service()
+        .getNotesToAssimilate()
+        .map(note -> noteRealmService.build(note, scope.user()))
+        .toList();
+  }
+
+  @GetMapping("/next")
+  @Transactional(readOnly = true)
+  public AssimilationNextDTO next(@RequestParam(value = "timezone") String timezone) {
+    var scope = assimilationScope(timezone);
+    Optional<Note> nextNote = scope.service().getNextNoteToAssimilate();
+    return new AssimilationNextDTO(
+        nextNote.map(Note::getId).orElse(null), scope.service().getCounts());
+  }
+
+  private record AssimilationScope(User user, AssimilationService service) {}
+
+  private AssimilationScope assimilationScope(String timezone) {
     authorizationService.assertLoggedIn();
     User user = authorizationService.getCurrentUser();
     ZoneId timeZone = TimezoneUtils.parseTimezone(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-
-    return new AssimilationService(
-            user, userService, subscriptionService, currentUTCTimestamp, timeZone)
-        .getNotesToAssimilate()
-        .map(note -> noteRealmService.build(note, user))
-        .toList();
+    return new AssimilationScope(
+        user,
+        new AssimilationService(
+            user, userService, subscriptionService, currentUTCTimestamp, timeZone));
   }
 
   @PostMapping(path = "")
