@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.AssimilationNextDTO;
 import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
-import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
@@ -29,33 +28,6 @@ class AssimilationControllerTests extends ControllerTestBase {
   }
 
   @Nested
-  class Assimilating {
-    @Test
-    void assimilating() {
-      Note n = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      assertThat(n.getId(), notNullValue());
-      List<NoteRealm> memoryTrackerWithRecallSettings = controller.assimilating("Asia/Shanghai");
-      assertThat(memoryTrackerWithRecallSettings, hasSize(1));
-      assertThat(memoryTrackerWithRecallSettings.get(0).getNote().getId(), equalTo(n.getId()));
-    }
-
-    @Test
-    void notLoggedIn() {
-      currentUser.setUser(null);
-      assertThrows(ResponseStatusException.class, () -> controller.assimilating("Asia/Shanghai"));
-    }
-
-    @Test
-    void shouldHandleInvalidTimezoneByUsingUTC() {
-      Note n = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      assertThat(n.getId(), notNullValue());
-      List<NoteRealm> memoryTrackerWithRecallSettings = controller.assimilating("Etc/Unknown");
-      assertThat(memoryTrackerWithRecallSettings, hasSize(1));
-      assertThat(memoryTrackerWithRecallSettings.get(0).getNote().getId(), equalTo(n.getId()));
-    }
-  }
-
-  @Nested
   class Next {
     @Test
     void returnsNextNoteIdPastDailyCap() {
@@ -67,8 +39,6 @@ class AssimilationControllerTests extends ControllerTestBase {
       Note note1 = makeMe.aNote("note1").notebookOwnedBy(user).please();
       Note note2 = makeMe.aNote("note2").notebookOwnedBy(user).please();
       makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(day1).please();
-
-      assertThat(controller.assimilating("Asia/Shanghai"), empty());
 
       AssimilationNextDTO result = controller.next("Asia/Shanghai");
       assertThat(result.getNextNoteId(), equalTo(note2.getId()));

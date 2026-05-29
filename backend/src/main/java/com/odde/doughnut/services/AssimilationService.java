@@ -40,14 +40,6 @@ public class AssimilationService {
     return user.getSubscriptions().stream();
   }
 
-  public Stream<Note> getNotesToAssimilate() {
-    int remainingDailyCount = getRemainingDailyAssimilationCount();
-    if (remainingDailyCount <= 0) {
-      return Stream.empty();
-    }
-    return notesEligibleToAssimilate(remainingDailyCount);
-  }
-
   public Optional<Note> getNextNoteToAssimilate() {
     int remainingDailyCount = getRemainingDailyAssimilationCount();
     if (remainingDailyCount > 0) {

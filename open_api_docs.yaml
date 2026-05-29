@@ -2782,26 +2782,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AssimilationNextDTO"
-  /api/assimilation/assimilating:
-    get:
-      tags:
-      - assimilation-controller
-      operationId: assimilating
-      parameters:
-      - name: timezone
-        in: query
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/NoteRealm"
   /api/ai/dummy:
     get:
       tags:

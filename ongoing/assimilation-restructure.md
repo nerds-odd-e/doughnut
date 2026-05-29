@@ -69,7 +69,7 @@ Step defs touched: `assimilation.ts` (dropdown steps in Phase 1; walkthrough/men
 - **5.1 (Structure) — done** Delete `/assimilate/:noteId` route, `AssimilateSingleNotePage(View).vue` + their specs/stories. Nothing references it after Phase 1.
 - **5.2 (Structure/test) — done** Removed `navigateToAssimilationPage()` and the queue-only helpers (`expectToAssimilateAndTotal`, progress-bar/tooltip) from `assimilationPage.ts`; migrated `recall.ts`/`assimilation.ts` setup to the walkthrough/testability path. Added `recall/AssimilationProgressSummary.vue` (assimilated/planned/total) inside the inline Assimilation settings panel, asserted in `assimilation_walkthrough.feature`; recall scenarios assert the assimilation due count via menu-data and `RecallPage` now keeps `totalAssimilatedCount` in sync with its recall fetches.
 - **5.3 (Structure) — done** Delete `/assimilate` route, `AssimilationPage(View).vue` + specs/stories; drop page-only bits of `useAssimilationCount` and the `assimilationPage*` storybook decorators/scss.
-- **5.4 (Structure, backend)** Remove `GET /api/assimilation/assimilating` + `getNotesToAssimilate()` and now-dead daily-cap-gated streaming once unused; regenerate TS client.
+- **5.4 (Structure, backend) — done** Remove `GET /api/assimilation/assimilating` + `getNotesToAssimilate()` and now-dead daily-cap-gated streaming once unused; regenerate TS client.
 - **5.5 (Structure) — done** Removed redundant `recall/Assimilation.vue` wrapper (padding already on `NoteShowPage`); retargeted unit tests to `AssimilationPanel.spec.ts`. E2E `assumeAssimilationPage()` name kept (inline panel helper).
 
 ## Behavior change to confirm with stakeholders

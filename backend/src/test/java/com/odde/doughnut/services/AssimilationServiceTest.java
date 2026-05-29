@@ -8,8 +8,9 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,7 @@ public class AssimilationServiceTest {
   @Test
   void whenThereIsNoNotesForUser() {
     makeMe.aNote().notebookOwnedBy(anotherUser).please();
-    assertThat(getFirstNoteToAssimilate(assimilationService), is(nullValue()));
+    assertThat(getNextNoteToAssimilate(assimilationService), is(nullValue()));
     assertThat(assimilationService.getCounts().getDueCount(), equalTo(0));
   }
 
@@ -61,23 +62,23 @@ public class AssimilationServiceTest {
     @Test
     void shouldReturnTheFirstNoteAndThenTheSecondWhenThereAreTwo() {
       assertThat(assimilationService.getCounts().getDueCount(), equalTo(2));
-      assertThat(getFirstNoteToAssimilate(assimilationService), equalTo(note1));
+      assertThat(getNextNoteToAssimilate(assimilationService), equalTo(note1));
       makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(day1).please();
       assertThat(assimilationService.getCounts().getDueCount(), equalTo(1));
-      assertThat(getFirstNoteToAssimilate(assimilationService), equalTo(note2));
+      assertThat(getNextNoteToAssimilate(assimilationService), equalTo(note2));
     }
 
     @Test
     void shouldReturnTheSecondNoteIfItsLevelIsLower() {
       makeMe.theNote(note1).level(2).please();
       makeMe.theNote(note2).level(1).please();
-      assertThat(getFirstNoteToAssimilate(assimilationService), equalTo(note2));
+      assertThat(getNextNoteToAssimilate(assimilationService), equalTo(note2));
     }
 
     @Test
     void shouldNotIncludeNoteThatIsSkippedForRecall() {
       makeMe.theNote(note1).skipMemoryTracking().please();
-      assertThat(getFirstNoteToAssimilate(assimilationService), equalTo(note2));
+      assertThat(getNextNoteToAssimilate(assimilationService), equalTo(note2));
     }
 
     @Nested
@@ -89,8 +90,15 @@ public class AssimilationServiceTest {
         anotherNote = makeMe.aNote("another note").notebookOwnedBy(user).please();
       }
 
-      private List<Note> getAllDueMemoryTrackers() {
-        return assimilationService.getNotesToAssimilate().collect(Collectors.toList());
+      private List<Note> collectNextNotesInOrder() {
+        List<Note> notes = new ArrayList<>();
+        Optional<Note> next;
+        while ((next = assimilationService.getNextNoteToAssimilate()).isPresent()) {
+          Note note = next.get();
+          notes.add(note);
+          makeMe.aMemoryTrackerFor(note).by(user).assimilatedAt(day1).please();
+        }
+        return notes;
       }
 
       @Nested
@@ -103,7 +111,7 @@ public class AssimilationServiceTest {
 
         @Test
         void shouldReturnMemoryTrackerForLowerLevelNoteOrLink() {
-          List<Note> memoryTrackers = getAllDueMemoryTrackers();
+          List<Note> memoryTrackers = collectNextNotesInOrder();
           assertThat(memoryTrackers, hasSize(3));
           assertThat(memoryTrackers.get(0), equalTo(anotherNote));
           assertThat(memoryTrackers.get(1), equalTo(note2));
@@ -113,7 +121,7 @@ public class AssimilationServiceTest {
         @Test
         void shouldNotReturnMemoryTrackerForLinkIfCreatedByOtherPeople() {
           makeMe.theNote(note1).notebookOwnership(makeMe.aUser().please()).please();
-          List<Note> memoryTrackers = getAllDueMemoryTrackers();
+          List<Note> memoryTrackers = collectNextNotesInOrder();
           assertThat(memoryTrackers, hasSize(2));
           assertThat(memoryTrackers.get(0), equalTo(anotherNote));
           assertThat(memoryTrackers.get(1), equalTo(note2));
@@ -131,25 +139,19 @@ public class AssimilationServiceTest {
 
       @Test
       void shouldReturnOneIfUsersDailySettingIsOne() {
-        assertThat(getFirstNoteToAssimilate(assimilationService), equalTo(note1));
-      }
-
-      @Test
-      void shouldNotIncludeNotesThatAreAlreadyRecalled() {
-        makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(day1).please();
-        assertThat(getFirstNoteToAssimilate(assimilationService), is(nullValue()));
+        assertThat(getNextNoteToAssimilate(assimilationService), equalTo(note1));
       }
 
       @Test
       void shouldNotCountSkippedMemoryTracker() {
         makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(day1).removedFromTracking().please();
-        assertThat(getFirstNoteToAssimilate(assimilationService), is(note2));
+        assertThat(getNextNoteToAssimilate(assimilationService), is(note2));
       }
 
       @Test
       void shouldIncludeNotesThatAreRecalledByOtherPeople() {
         makeMe.aMemoryTrackerFor(note1).by(anotherUser).assimilatedAt(day1).please();
-        assertThat(getFirstNoteToAssimilate(assimilationService), equalTo(note1));
+        assertThat(getNextNoteToAssimilate(assimilationService), equalTo(note1));
       }
 
       @Test
@@ -159,7 +161,7 @@ public class AssimilationServiceTest {
         AssimilationService recallService =
             new AssimilationService(
                 user, userService, subscriptionService, day1_23, ZoneId.of("Asia/Shanghai"));
-        assertThat(getFirstNoteToAssimilate(recallService), is(nullValue()));
+        assertThat(getNextNoteToAssimilate(recallService), equalTo(note2));
       }
 
       @Test
@@ -169,7 +171,7 @@ public class AssimilationServiceTest {
         AssimilationService recallService =
             new AssimilationService(
                 user, userService, subscriptionService, day2, ZoneId.of("Asia/Shanghai"));
-        assertThat(getFirstNoteToAssimilate(recallService), equalTo(note2));
+        assertThat(getNextNoteToAssimilate(recallService), equalTo(note2));
       }
     }
   }
@@ -191,7 +193,7 @@ public class AssimilationServiceTest {
 
     @Test
     void shouldReturnMemoryTrackerForNote() {
-      assertThat(getFirstNoteToAssimilate(assimilationService), equalTo(note1));
+      assertThat(getNextNoteToAssimilate(assimilationService), equalTo(note1));
     }
 
     @Test
@@ -210,7 +212,7 @@ public class AssimilationServiceTest {
     void recalledMoreThanPlanned() {
       makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(day1).please();
       makeMe.aMemoryTrackerFor(note2).by(user).assimilatedAt(day1).please();
-      assertThat(getFirstNoteToAssimilate(assimilationService), nullValue());
+      assertThat(getNextNoteToAssimilate(assimilationService), nullValue());
     }
   }
 
@@ -226,7 +228,7 @@ public class AssimilationServiceTest {
 
     @Test
     void shouldNotBeRecalled() {
-      assertThat(getFirstNoteToAssimilate(assimilationService), is(nullValue()));
+      assertThat(getNextNoteToAssimilate(assimilationService), is(nullValue()));
     }
   }
 
@@ -235,7 +237,6 @@ public class AssimilationServiceTest {
     Note note1;
     Note note2;
     Note note3;
-    Note note4;
     AssimilationService earlyMorningService;
     Timestamp earlyMorning;
     Timestamp lateMorning;
@@ -249,7 +250,7 @@ public class AssimilationServiceTest {
       note1 = makeMe.aNote().notebook(topNb).please();
       note2 = makeMe.aNote().notebook(topNb).please();
       note3 = makeMe.aNote().notebook(topNb).please();
-      note4 = makeMe.aNote().notebook(topNb).please();
+      makeMe.aNote().notebook(topNb).please();
 
       // Set up subscription with daily limit of 1
       makeMe.aSubscription().forNotebook(topNb).forUser(user).daily(1).please();
@@ -276,19 +277,18 @@ public class AssimilationServiceTest {
     }
 
     @Test
-    void getDueNotesToAssimilateShouldWorkWithLazyEvaluation() {
-      List<Note> memoryTrackers = earlyMorningService.getNotesToAssimilate().toList();
-      assertThat(memoryTrackers, hasSize(0));
+    void returnsNextNotePastUserDailyCap() {
+      assertThat(earlyMorningService.getNextNoteToAssimilate().isPresent(), is(true));
     }
 
     @Test
-    void getCountsShouldFailWithNegativeCount() {
+    void dueCountIsZeroWhenUserDailyPlanComplete() {
       AssimilationCountDTO counts = earlyMorningService.getCounts();
       assertThat(counts.getDueCount(), equalTo(0));
     }
   }
 
-  private Note getFirstNoteToAssimilate(AssimilationService recallService) {
-    return recallService.getNotesToAssimilate().findFirst().orElse(null);
+  private Note getNextNoteToAssimilate(AssimilationService service) {
+    return service.getNextNoteToAssimilate().orElse(null);
   }
 }

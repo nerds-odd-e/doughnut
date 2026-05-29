@@ -3451,24 +3451,6 @@ export type NextResponses = {
 
 export type NextResponse = NextResponses[keyof NextResponses];
 
-export type AssimilatingData = {
-    body?: never;
-    path?: never;
-    query: {
-        timezone: string;
-    };
-    url: '/api/assimilation/assimilating';
-};
-
-export type AssimilatingResponses = {
-    /**
-     * OK
-     */
-    200: Array<NoteRealm>;
-};
-
-export type AssimilatingResponse = AssimilatingResponses[keyof AssimilatingResponses];
-
 export type DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamData = {
     body?: never;
     path?: never;
