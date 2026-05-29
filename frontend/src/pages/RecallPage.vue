@@ -106,6 +106,7 @@ const {
   currentRecallWindowEndAt,
   setCurrentRecallWindowEndAt,
   totalAssimilatedCount,
+  setTotalAssimilatedCount,
   setIsRecallPaused,
   shouldResumeRecall,
   clearShouldResumeRecall,
@@ -257,6 +258,7 @@ const loadMore = async (dueInDays?: number) => {
     if (!error && response) {
       let trackers = response.toRepeat
       currentIndex.value = 0
+      setTotalAssimilatedCount(response.totalAssimilatedCount)
       setDiligentMode((dueInDays ?? 0) > 0)
       if (trackers?.length === 0) {
         setToRepeat(trackers)

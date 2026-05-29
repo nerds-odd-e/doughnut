@@ -29,13 +29,13 @@ Restructure assimilation from two dedicated pages (`/assimilate` queue, `/assimi
 Two facts make small, always-green commits possible:
 
 1. **The inline panel reuses the same `data-test` selectors** as today's pages (`keep-for-recall`, `open-refine-note-modal`, the spelling popup, the memory-tracker table, `#main-note-content`). So `assumeAssimilationPage()` helper methods work unchanged against the inline panel; only the **entry navigation** differs.
-2. **Queue page survives until Phase 5.3.** `/assimilate` (queue) is reached by `assimilation().navigateToAssimilationPage()` (`cy.visit` since Phase 2). Dropdown entry uses `noteMoreOptionsForm.openAssimilationSettings()` / `notePage.openAssimilationSettings()` (inline toggle on `/n{id}`).
+2. **Queue page survives until Phase 5.3.** `/assimilate` (queue) is no longer used by E2E after Phase 5.2. Dropdown entry uses `noteMoreOptionsForm.openAssimilationSettings()` / `notePage.openAssimilationSettings()` (inline toggle on `/n{id}`).
 
 Entry points migrate one at a time:
 - **Phase 1 (done)** rewired the **dropdown** page-objects (`openAssimilationSettings`, `assimilateNote`, `notePage.openAssimilationSettings`) to the inline toggle.
-- **Phase 2** decouples `navigateToAssimilationPage()` from the menu by switching it to `cy.visit('/assimilate')` (queue page still present), so legacy queue scenarios stay green while the menu becomes the new action.
+- **Phase 2** wires the menu to `goToNextAssimilation()` instead of routing to `/assimilate`.
 
-Step defs touched: `assimilation.ts` (dropdown steps 57–74 in Phase 1; `navigateToAssimilationPage` steps in Phase 2/3), `recall.ts` (uses `navigateToAssimilationPage`, handled in Phase 2). Backend setup via `testability.assimilateNote` is unaffected.
+Step defs touched: `assimilation.ts` (dropdown steps in Phase 1; walkthrough/menu steps in Phase 2+), `recall.ts` (assimilation setup via `testability.assimilateNote` after Phase 5.2). Backend setup via `testability.assimilateNote` is unaffected.
 
 `@wip` budget (max 5 project-wide): write each new scenario `@wip`, drive it red→green within its sub-phase, then drop the tag. Never carry more than one intentionally-failing scenario at a time.
 
@@ -68,7 +68,7 @@ Step defs touched: `assimilation.ts` (dropdown steps 57–74 in Phase 1; `naviga
 ### Phase 5 — remove old pages, routes, and dead deps
 
 - **5.1 (Structure) — done** Delete `/assimilate/:noteId` route, `AssimilateSingleNotePage(View).vue` + their specs/stories. Nothing references it after Phase 1.
-- **5.2 (Structure/test)** ~~Rewrite/remove the legacy queue scenarios in `assimilating.feature`~~ (removed early; covered by `assimilation_walkthrough.feature`); remove `assimilation().navigateToAssimilationPage()` and the queue-only helpers (`expectToAssimilateAndTotal`, progress-bar/tooltip) from `assimilationPage.ts`. Migrate `recall.ts` setup steps to the walkthrough/testability path.
+- **5.2 (Structure/test) — done** Removed `navigateToAssimilationPage()` and the queue-only helpers (`expectToAssimilateAndTotal`, progress-bar/tooltip) from `assimilationPage.ts`; migrated `recall.ts`/`assimilation.ts` setup to the walkthrough/testability path. Added `recall/AssimilationProgressSummary.vue` (assimilated/planned/total) inside the inline Assimilation settings panel, asserted in `assimilation_walkthrough.feature`; recall scenarios assert the assimilation due count via menu-data and `RecallPage` now keeps `totalAssimilatedCount` in sync with its recall fetches.
 - **5.3 (Structure)** Delete `/assimilate` route, `AssimilationPage(View).vue` + specs/stories; drop page-only bits of `useAssimilationCount` and the `assimilationPage*` storybook decorators/scss.
 - **5.4 (Structure, backend)** Remove `GET /api/assimilation/assimilating` + `getNotesToAssimilate()` and now-dead daily-cap-gated streaming once unused; regenerate TS client.
 - **5.5 (Structure)** Collapse `recall/Assimilation.vue` into `AssimilationPanel.vue` if redundant; remove any remaining dead composables/page-objects. Verify: no `/assimilate` references remain; assimilation + recall E2E green.

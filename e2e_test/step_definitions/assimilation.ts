@@ -7,7 +7,8 @@ import type { DataTable } from '@cucumber/cucumber'
 import start from '../start'
 
 Then('I assimilate these in sequence:', (data: DataTable) => {
-  start.assimilation().navigateToAssimilationPage().assimilate(data.hashes())
+  start.assimilation().startAssimilationFromMenu()
+  start.assumeAssimilationPage().assimilate(data.hashes())
 })
 
 Then('I should see {int} due for assimilation', (numberOfNotes: number) => {
@@ -23,10 +24,7 @@ Then(
         .injectNotes([{ Title: noteTopology }], username, noteTopology)
     })
     start.testability().backendTimeTravelTo(day, 8)
-    start
-      .assimilation()
-      .navigateToAssimilationPage()
-      .assimilateNotes(noteTopology)
+    start.testability().assimilateNote(noteTopology)
   }
 )
 
@@ -34,10 +32,7 @@ Then(
   'I assimilated one note {string} on day {int}',
   (noteTopology: string, day: number) => {
     start.testability().backendTimeTravelTo(day, 8)
-    start
-      .assimilation()
-      .navigateToAssimilationPage()
-      .assimilateNotes(noteTopology)
+    start.testability().assimilateNote(noteTopology)
   }
 )
 
@@ -59,6 +54,10 @@ When('I start assimilation from the menu', () => {
 
 Then('I should be assimilating the note {string}', (noteTitle: string) => {
   start.assumeAssimilationPage().expectAssimilatingNote(noteTitle)
+})
+
+Then('I should see assimilation progress {string}', (triple: string) => {
+  start.assumeAssimilationPage().expectAssimilationProgressSummary(triple)
 })
 
 Then('I should see the daily assimilation goal toast', () => {
@@ -140,10 +139,6 @@ When('I keep for recall with remembering spelling', () => {
 
 When('I add remember spelling to the note {string}', (noteTitle: string) => {
   start.jumpToNotePage(noteTitle).setRememberSpelling()
-})
-
-When('I navigate to the assimilation page', () => {
-  start.assimilation().navigateToAssimilationPage()
 })
 
 When('I verify spelling with {string}', (text: string) => {

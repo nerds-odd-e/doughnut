@@ -1,3 +1,5 @@
+import { UserController } from '@generated/doughnut-backend-api/sdk.gen'
+import type { MenuDataDto } from '@generated/doughnut-backend-api'
 import { commonSenseSplit } from 'support/string_util'
 import { pageIsNotLoading } from '../pageBase'
 import { form } from '../forms'
@@ -20,6 +22,11 @@ const assimilationToastMessages = {
   noMoreNotes: 'No more notes to assimilate',
 } as const
 
+function assimilationDueFromTriple(triple: string) {
+  const [assimilated, planned] = triple.split('/').map(Number)
+  return (planned ?? 0) - (assimilated ?? 0)
+}
+
 function expectSuccessToast(message: string) {
   cy.contains('.Vue-Toastification__toast--success', message, {
     timeout: 10000,
@@ -38,27 +45,11 @@ function waitForAssimilationNoteTitle(expectedTitle?: string) {
 }
 
 export const assumeAssimilationPage = () => ({
-  expectToAssimilateAndTotal(toAssimilateAndTotal: string) {
-    const [assimilatedTodayCount, toAssimilateCountForToday, totalCount] =
-      toAssimilateAndTotal.split('/')
-
-    cy.get('.progress-bar').should(
-      'contain',
-      `Assimilating: ${assimilatedTodayCount}/${toAssimilateCountForToday}`
-    )
-    // Click progress bar to show tooltip
-    cy.get('.progress-bar').first().click()
-
-    // Check tooltip content
-    cy.get('.tooltip-content').within(() => {
-      cy.contains(
-        `Daily Progress: ${assimilatedTodayCount} / ${toAssimilateCountForToday}`
-      )
-      cy.contains(`Total Progress: ${assimilatedTodayCount} / ${totalCount}`)
-    })
-
-    // Close tooltip
-    cy.get('.tooltip-popup').click()
+  expectAssimilationProgressSummary(triple: string) {
+    cy.get('[data-test="assimilation-progress-summary"]')
+      .should('be.visible')
+      .and('contain', triple.trim())
+    return this
   },
   clickKeepForRecall() {
     keepForRecallButton().click()
@@ -174,18 +165,6 @@ export const assumeAssimilationPage = () => ({
     assimilations.forEach((assimilation) => {
       this.assimilateOneNote(assimilation)
     })
-  },
-  assimilateNotes(noteTitles: string) {
-    commonSenseSplit(noteTitles, ', ').forEach((title: string) => {
-      if (title === 'end') {
-        return
-      }
-      this.assimilateOneNote({
-        'Assimilation Type': 'single note',
-        Title: title,
-      })
-    })
-    return this
   },
   expectUnderstandingPointsCount(count: number) {
     this.openRefineNoteModal()
@@ -308,10 +287,15 @@ export const assimilation = () => {
       })
       return this
     },
-    navigateToAssimilationPage() {
-      cy.visit('/assimilate')
-      pageIsNotLoading()
-      return assumeAssimilationPage()
+    expectAssimilationDueFromTriple(toAssimilateAndTotal: string) {
+      const expectedDue = assimilationDueFromTriple(toAssimilateAndTotal)
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+      cy.wrap(UserController.getMenuData({ query: { timezone } }), {
+        log: false,
+      }).then((menuData: MenuDataDto) => {
+        expect(menuData.assimilationCount?.dueCount ?? 0).to.eq(expectedDue)
+      })
+      return this
     },
     startAssimilationFromMenu() {
       getAssimilateListItemInSidebar(($el) => {

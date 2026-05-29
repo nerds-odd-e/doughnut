@@ -41,7 +41,7 @@ Feature: Assimilate With Remembering Spelling
       | Relearn | Non-empty body text |
     And I assimilated one note "Relearn" on day 1
     And I add remember spelling to the note "Relearn"
-    When I navigate to the assimilation page
+    When I reload the current page for note "Relearn"
     Then I should see 1 due for assimilation
 
   Scenario: Add only spelling memory tracker when note already has trackers

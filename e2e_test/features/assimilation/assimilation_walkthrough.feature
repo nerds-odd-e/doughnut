@@ -17,8 +17,10 @@ Feature: Assimilation walkthrough
     Given It's day 1
     When I start assimilation from the menu
     Then I should be assimilating the note "Note 1"
+    And I should see assimilation progress "0/2/5"
     When I keep for recall on the assimilation panel
     Then I should be assimilating the note "Note 2"
+    And I should see assimilation progress "1/2/5"
     When I keep for recall on the assimilation panel
     Then I should see the daily assimilation goal toast
     And I should be assimilating the note "Note 3"

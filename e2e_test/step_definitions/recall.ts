@@ -4,6 +4,7 @@
 
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
+import { commonSenseSplit } from 'support/string_util'
 import start from '../start'
 
 Given("It's day {int}, {int} hour", (day: number, hour: number) => {
@@ -31,10 +32,11 @@ Then(
   (day: number, repeatNotes: string, initialNotes: string) => {
     start.testability().timeTravelTo(day, 8)
     start.recall().navigateToRecallPage().recallNotes(repeatNotes)
-    start
-      .assimilation()
-      .navigateToAssimilationPage()
-      .assimilateNotes(initialNotes)
+    commonSenseSplit(initialNotes, ', ').forEach((title) => {
+      if (title !== 'end') {
+        start.testability().assimilateNote(title)
+      }
+    })
   }
 )
 
@@ -50,10 +52,7 @@ Then(
   'On day {int} I should have {string} note for assimilation and {string} for recall',
   (day: number, toAssimilateAndTotal: string, numberOfRecalls: string) => {
     start.testability().backendTimeTravelTo(day, 8)
-    start
-      .assimilation()
-      .navigateToAssimilationPage()
-      .expectToAssimilateAndTotal(toAssimilateAndTotal)
+    start.assimilation().expectAssimilationDueFromTriple(toAssimilateAndTotal)
     start.recall().navigateToRecallPage().expectToRecallCounts(numberOfRecalls)
   }
 )

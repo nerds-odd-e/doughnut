@@ -10,8 +10,9 @@
         class="daisy-card bg-base-100 border border-base-300 shadow-xl"
       >
         <div class="daisy-card-body gap-0 p-4">
-          <h2 class="daisy-card-title mb-3 text-base font-semibold">
+          <h2 class="daisy-card-title mb-3 text-base font-semibold gap-2">
             Assimilation settings
+            <AssimilationProgressSummary />
           </h2>
           <div
             class="assimilation-settings-scroll max-h-[min(40vh,22rem)] overflow-y-auto pr-1"
@@ -98,6 +99,7 @@
 import type { Note, NoteRecallInfo } from "@generated/doughnut-backend-api"
 import NoteInfoBar from "../notes/NoteInfoBar.vue"
 import AssimilationButtons from "./AssimilationButtons.vue"
+import AssimilationProgressSummary from "./AssimilationProgressSummary.vue"
 import NoteRefinement from "./NoteRefinement.vue"
 import { useDaisyDialog } from "@/composables/useDaisyDialog"
 import { ref, watch } from "vue"
