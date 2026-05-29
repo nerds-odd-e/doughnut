@@ -109,8 +109,11 @@ Covers all `PopButton`-based flows at once (they share the trigger component).
 Independent spots; each is its own small commit. Do each only if the UX gap is real
 on mobile. No shared dependency between them, so order is by observed value.
 
-- **4a — Notebooks page filter — 1 commit.** `NotebooksPageView.vue`
-  (`filterInputRef.focus()` after the filter toggle tap). Prime on the toggle tap.
+- **4a — Notebooks page filter — DROPPED.** `NotebooksPageView.vue` has no
+  tap-to-reveal filter toggle: the input is always in the DOM when the catalog is
+  non-empty, so a direct tap opens the keyboard without a primer. `onMounted`
+  `filterInputRef.focus()` is page-load autofocus (out of scope below). Same
+  always-visible pattern on `CircleShowPage.vue` if revisited.
 - **4b — Wikidata association dialog — 1 commit.** `WikidataAssociationDialogBody.vue`
   (`input.focus()`). Prime on the tap that opens the dialog/field.
 - **4c — Frontmatter "add property" — 1 commit.** Wire the add-property tap that

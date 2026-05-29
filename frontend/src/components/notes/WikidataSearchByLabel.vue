@@ -23,6 +23,7 @@
 import type { WikidataSearchEntity } from "@generated/doughnut-backend-api"
 import { defineComponent } from "vue"
 import SvgWikidata from "../svgs/SvgWikidata.vue"
+import { primeSoftKeyboard } from "@/utils/focusTarget"
 import WikidataAssociationDialog from "./WikidataAssociationDialog.vue"
 
 export default defineComponent({
@@ -58,6 +59,7 @@ export default defineComponent({
   },
   methods: {
     openDialog() {
+      primeSoftKeyboard()
       this.showDialog = true
     },
     closeDialog() {

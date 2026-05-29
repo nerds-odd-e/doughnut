@@ -1,7 +1,12 @@
 import WikidataSearchByLabel from "@/components/notes/WikidataSearchByLabel.vue"
 import helper from "@tests/helpers"
-import { describe, it, expect, vi, afterEach } from "vitest"
-import { type VueWrapper } from "@vue/test-utils"
+import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
+import {
+  mountSoftKeyboardPrimer,
+  softKeyboardPrimerElement,
+} from "@tests/helpers/softKeyboardPrimerTestSupport"
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest"
+import { flushPromises, type VueWrapper } from "@vue/test-utils"
 
 vi.mock("vue-router", async (importOriginal) => {
   const actual = await importOriginal<typeof import("vue-router")>()
@@ -16,8 +21,11 @@ vi.mock("vue-router", async (importOriginal) => {
 describe("WikidataSearchByLabel", () => {
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
   let wrapper: VueWrapper<any>
+  let matchMediaSpy: ReturnType<typeof mockCoarsePointer> | undefined
 
   afterEach(() => {
+    matchMediaSpy?.mockRestore()
+    matchMediaSpy = undefined
     wrapper?.unmount()
     document.body.innerHTML = ""
   })
@@ -69,5 +77,34 @@ describe("WikidataSearchByLabel", () => {
     expect(button.classes()).toContain("daisy-btn-primary")
     expect(button.classes()).not.toContain("daisy-btn-outline")
     expect(button.classes()).not.toContain("daisy-btn-neutral")
+  })
+
+  describe("soft keyboard primer", () => {
+    beforeEach(() => {
+      mountSoftKeyboardPrimer()
+    })
+
+    it("focuses primer synchronously when dialog is opened on touch device", () => {
+      matchMediaSpy = mockCoarsePointer(true)
+      const wrapper = mountComponent()
+      const primer = softKeyboardPrimerElement()
+      expect(primer).toBeTruthy()
+
+      getButton(wrapper).element.click()
+
+      expect(document.activeElement).toBe(primer)
+    })
+
+    it("does not focus primer when pointer is not coarse", async () => {
+      matchMediaSpy = mockCoarsePointer(false)
+      const wrapper = mountComponent()
+      const primer = softKeyboardPrimerElement()
+
+      getButton(wrapper).element.click()
+      await flushPromises()
+      await wrapper.vm.$nextTick()
+
+      expect(document.activeElement).not.toBe(primer)
+    })
   })
 })

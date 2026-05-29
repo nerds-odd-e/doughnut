@@ -5,6 +5,7 @@ import type { WikidataSearchEntity } from "@generated/doughnut-backend-api"
 import { WikidataController } from "@generated/doughnut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { calculateNewTitle } from "@/utils/wikidataTitleActions"
+import { primeSoftKeyboard } from "@/utils/focusTarget"
 import {
   validatePropertyRowsForRichEdit,
   type PropertyRow,
@@ -76,6 +77,7 @@ export function useWikidataPropertyDialog({
   })
 
   function openWikidataDialog(ctx: WikidataEditContext) {
+    primeSoftKeyboard()
     wikidataEditContext.value = ctx
     wikidataSavedSnapshot.value =
       ctx.type === "row"

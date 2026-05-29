@@ -1,8 +1,15 @@
 import { WikidataController } from "@generated/doughnut-backend-api/sdk.gen"
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
+import { primeSoftKeyboard } from "@/utils/focusTarget"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
+import {
+  mountSoftKeyboardPrimer,
+  softKeyboardPrimerElement,
+  waitUntilFocused,
+} from "@tests/helpers/softKeyboardPrimerTestSupport"
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 
 vi.mock("vue-router", async (importOriginal) => {
@@ -20,6 +27,7 @@ describe("WikidataAssociationDialog", () => {
   let wrapper: VueWrapper<any>
   let searchWikidataSpy: ReturnType<typeof mockSdkService>
   let fetchWikidataEntitySpy: ReturnType<typeof mockSdkService>
+  let matchMediaSpy: ReturnType<typeof mockCoarsePointer> | undefined
   beforeEach(() => {
     vi.resetAllMocks()
     document.body.innerHTML = ""
@@ -32,6 +40,8 @@ describe("WikidataAssociationDialog", () => {
   })
 
   afterEach(() => {
+    matchMediaSpy?.mockRestore()
+    matchMediaSpy = undefined
     wrapper?.unmount()
     document.body.innerHTML = ""
   })
@@ -562,6 +572,25 @@ describe("WikidataAssociationDialog", () => {
       const saveButton = getSaveButton()
       expect(saveButton).toBeTruthy()
       expect(saveButton.disabled).toBe(true)
+    })
+  })
+
+  describe("soft keyboard primer", () => {
+    beforeEach(() => {
+      mountSoftKeyboardPrimer()
+    })
+
+    it("transfers focus to wikidata ID input after mount when showSaveButton", async () => {
+      matchMediaSpy = mockCoarsePointer(true)
+      const primer = softKeyboardPrimerElement()
+      expect(primer).toBeTruthy()
+      primeSoftKeyboard()
+      expect(document.activeElement).toBe(primer)
+
+      mountDialog("test", { showSaveButton: true })
+      await flushPromises()
+
+      await waitUntilFocused("#wikidataID-wikidataID")
     })
   })
 })
