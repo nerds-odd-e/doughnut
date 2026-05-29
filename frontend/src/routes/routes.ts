@@ -8,7 +8,6 @@ import BazaarPage from "@/pages/BazaarPage.vue"
 import NotebooksPage from "@/pages/NotebooksPage.vue"
 import NoteShowPage from "@/pages/NoteShowPage.vue"
 import RecallPage from "@/pages/RecallPage.vue"
-import AssimilationPage from "@/pages/AssimilationPage.vue"
 import CircleShowPage from "@/pages/CircleShowPage.vue"
 import CircleJoinPage from "@/pages/CircleJoinPage.vue"
 import FailureReportPage from "@/pages/FailureReportPage.vue"
@@ -39,7 +38,6 @@ const componentMap: Record<string, RouteComponent> = {
   adminDashboard: AdminDashboardPage,
   circleJoin: CircleJoinPage,
   messageCenter: MessageCenterPage,
-  assimilate: AssimilationPage,
   recall: RecallPage,
   failureReport: FailureReportPage,
   nonproductionOnlyLogin: NonproductionOnlyLoginPage,

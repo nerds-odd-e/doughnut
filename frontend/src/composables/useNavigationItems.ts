@@ -44,7 +44,7 @@ export function useNavigationItems() {
         icon: CircleCheck,
         badge: dueCount.value,
         badgeClass: "due-count",
-        isActive: ["assimilate"].includes(route.name as string),
+        isActive: false,
       },
       {
         name: "recall",

@@ -3,7 +3,7 @@ import {
   AssimilationController,
   NoteController,
 } from "@generated/doughnut-backend-api/sdk.gen"
-import Assimilation from "@/components/recall/Assimilation.vue"
+import AssimilationPanel from "@/components/recall/AssimilationPanel.vue"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -26,9 +26,8 @@ vi.mock("@/composables/useGoToNextAssimilation", () => ({
   }),
 }))
 
-let renderer: RenderingHelper<typeof Assimilation>
+let renderer: RenderingHelper<typeof AssimilationPanel>
 let assimilateSpy: ReturnType<typeof mockSdkService>
-let showNoteSpy: ReturnType<typeof mockSdkService>
 const mockedIncrementAssimilatedCount = vi.fn()
 const mockedRequestDueRecallsRefresh = vi.fn()
 const mockedTotalAssimilatedCount = ref(0)
@@ -37,7 +36,6 @@ const toRepeat = ref<MemoryTrackerLite[] | undefined>(undefined)
 afterEach(() => {
   document.body.innerHTML = ""
   vi.clearAllMocks()
-  // Clear any remaining popups
   const popups = usePopups()
   while (popups.popups.peek().length) {
     popups.popups.done(false)
@@ -48,11 +46,6 @@ beforeEach(() => {
   mockedGoToNextAssimilation.mockClear()
   mockedGoToNextAssimilation.mockResolvedValue(true)
   assimilateSpy = mockSdkService(AssimilationController, "assimilate", [])
-  showNoteSpy = mockSdkService(
-    NoteController,
-    "showNote",
-    makeMe.aNoteRealm.please()
-  )
   mockSdkService(NoteController, "getNoteInfo", {})
   mockSdkService(AiController, "generateUnderstandingChecklist", {
     points: [],
@@ -92,10 +85,10 @@ beforeEach(() => {
     applyAssimilationCountDto: vi.fn(),
   })
 
-  renderer = helper.component(Assimilation)
+  renderer = helper.component(AssimilationPanel)
 })
 
-describe("Assimilation component", () => {
+describe("AssimilationPanel", () => {
   const noteRealm = makeMe.aNoteRealm.please()
   const memoryTracker = makeMe.aMemoryTracker.ofNote(noteRealm).please()
   const { note } = memoryTracker
@@ -105,14 +98,9 @@ describe("Assimilation component", () => {
       .withCleanStorage()
       .withProps({
         note: overrides?.note ?? note,
-        ancestorFolders: noteRealm.ancestorFolders ?? [],
       })
       .withRouter()
       .mount()
-
-  beforeEach(() => {
-    showNoteSpy.mockResolvedValue(wrapSdkResponse(noteRealm))
-  })
 
   describe("normal assimilation", () => {
     it("calls goToNextAssimilation and increments counts correctly when assimilating normally", async () => {

@@ -60,7 +60,6 @@ public class ApplicationController {
         "/bazaar",
         "/admin-dashboard",
         "/message-center/**",
-        "/assimilate/**",
         "/recall",
         "/failure-report-list/**",
         "/recent",

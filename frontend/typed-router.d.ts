@@ -38,20 +38,6 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '/AssimilationPage': RouteRecordInfo<
-      '/AssimilationPage',
-      '/AssimilationPage',
-      Record<never, never>,
-      Record<never, never>,
-      | never
-    >,
-    '/AssimilationPageView': RouteRecordInfo<
-      '/AssimilationPageView',
-      '/AssimilationPageView',
-      Record<never, never>,
-      Record<never, never>,
-      | never
-    >,
     '/BazaarPage': RouteRecordInfo<
       '/BazaarPage',
       '/BazaarPage',
@@ -236,22 +222,6 @@ declare module 'vue-router/auto-routes' {
     'src/pages/AdminDashboardPage.vue': {
       routes:
         | '/AdminDashboardPage'
-      views:
-        | never
-      pathParamNames:
-        | never
-    }
-    'src/pages/AssimilationPage.vue': {
-      routes:
-        | '/AssimilationPage'
-      views:
-        | never
-      pathParamNames:
-        | never
-    }
-    'src/pages/AssimilationPageView.vue': {
-      routes:
-        | '/AssimilationPageView'
       views:
         | never
       pathParamNames:

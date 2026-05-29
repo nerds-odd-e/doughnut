@@ -4,9 +4,8 @@ Restructure assimilation from two dedicated pages (`/assimilate` queue, `/assimi
 
 ## Current state (discovered)
 
-- Routes: `/assimilate` (`AssimilationPage` + `AssimilationPageView`, queue) renders `recall/Assimilation.vue` = `NoteShow` + assimilation dock + spelling popup + assimilate logic. Inline assimilation on `/n/:noteId` uses `AssimilationPanel` on `NoteShowPage`.
-- Dropdown "Assimilation settings" (`NoteMoreOptionsForm.vue`) **toggles** the inline panel on the note page (`useAssimilationView`). `/assimilate/:noteId` route removed (Phase 5.1).
-- Main menu "Assimilate" (`useNavigationItems.ts` + `NavigationItem.vue`) is a **router-link** to `/assimilate`.
+- Inline assimilation on `/n/:noteId` via `AssimilationPanel` on `NoteShowPage` when `useAssimilationView` is on (toggle in `NoteMoreOptionsForm.vue`, or menu/keep/skip via `goToNextAssimilation`).
+- Main menu "Assimilate" (`NavigationItem.vue`) is a **click action** calling `goToNextAssimilation()` (not a route). Dedicated `/assimilate` pages removed (Phases 5.1, 5.3).
 - Backend: `GET /api/assimilation/assimilating?timezone=` → `List<NoteRealm>` via `AssimilationService.getNotesToAssimilate()`. **Returns empty as soon as the daily cap is reached** (`remainingDailyCount <= 0` ⇒ `Stream.empty()`).
 - `POST /api/assimilation` (`AssimilationRequestDTO{noteId, skipMemoryTracking}`) → `List<MemoryTracker>`.
 - Counts: `GET /api/user/menu-data` → `AssimilationCountDTO{dueCount, assimilatedCountOfTheDay, totalUnassimilatedCount}`. `dueCount = remainingDaily>0 ? min(remainingDaily, total) : 0`.
@@ -22,14 +21,14 @@ Restructure assimilation from two dedicated pages (`/assimilate` queue, `/assimi
 4. **Toggle state:** module composable `useAssimilationView` (singleton), holding `showAssimilationSettings` and a `pendingOnForNoteId`. The note page (`NoteShowPage`) renders the panel when on and resets the toggle to `pendingOnForNoteId === currentNoteId` on each note change (so plain navigation ⇒ off; navigation via menu/keep/skip ⇒ on). Not persisted ⇒ satisfies "not saved anywhere".
 5. **Shared navigation action:** `goToNextAssimilation()` used by both the menu item and keep/skip. It calls `/api/assimilation/next`, updates counts, fires the right toast, sets `pendingOnForNoteId`, and routes to `noteShow`.
 6. **Menu item becomes an action, not a link.** `NavigationItem.vue` already special-cases `resumeRecall` as a click handler; `assimilate` joins that path. The Home page "Assimilate" card uses the same action.
-7. **Old pages can coexist** until the final cleanup phase ⇒ stop-safe ordering.
+7. **Stop-safe ordering** — dedicated assimilation pages removed in Phase 5; backend `assimilating` list endpoint remains until Phase 5.4.
 
 ## E2E coexistence strategy (keeps every commit green)
 
 Two facts make small, always-green commits possible:
 
 1. **The inline panel reuses the same `data-test` selectors** as today's pages (`keep-for-recall`, `open-refine-note-modal`, the spelling popup, the memory-tracker table, `#main-note-content`). So `assumeAssimilationPage()` helper methods work unchanged against the inline panel; only the **entry navigation** differs.
-2. **Queue page survives until Phase 5.3.** `/assimilate` (queue) is no longer used by E2E after Phase 5.2. Dropdown entry uses `noteMoreOptionsForm.openAssimilationSettings()` / `notePage.openAssimilationSettings()` (inline toggle on `/n{id}`).
+2. **E2E entry** — menu uses `startAssimilationFromMenu()`; dropdown uses `openAssimilationSettings()` on `/n/:noteId`. `assumeAssimilationPage()` targets the inline panel selectors.
 
 Entry points migrate one at a time:
 - **Phase 1 (done)** rewired the **dropdown** page-objects (`openAssimilationSettings`, `assimilateNote`, `notePage.openAssimilationSettings`) to the inline toggle.
@@ -69,9 +68,9 @@ Step defs touched: `assimilation.ts` (dropdown steps in Phase 1; walkthrough/men
 
 - **5.1 (Structure) — done** Delete `/assimilate/:noteId` route, `AssimilateSingleNotePage(View).vue` + their specs/stories. Nothing references it after Phase 1.
 - **5.2 (Structure/test) — done** Removed `navigateToAssimilationPage()` and the queue-only helpers (`expectToAssimilateAndTotal`, progress-bar/tooltip) from `assimilationPage.ts`; migrated `recall.ts`/`assimilation.ts` setup to the walkthrough/testability path. Added `recall/AssimilationProgressSummary.vue` (assimilated/planned/total) inside the inline Assimilation settings panel, asserted in `assimilation_walkthrough.feature`; recall scenarios assert the assimilation due count via menu-data and `RecallPage` now keeps `totalAssimilatedCount` in sync with its recall fetches.
-- **5.3 (Structure)** Delete `/assimilate` route, `AssimilationPage(View).vue` + specs/stories; drop page-only bits of `useAssimilationCount` and the `assimilationPage*` storybook decorators/scss.
+- **5.3 (Structure) — done** Delete `/assimilate` route, `AssimilationPage(View).vue` + specs/stories; drop page-only bits of `useAssimilationCount` and the `assimilationPage*` storybook decorators/scss.
 - **5.4 (Structure, backend)** Remove `GET /api/assimilation/assimilating` + `getNotesToAssimilate()` and now-dead daily-cap-gated streaming once unused; regenerate TS client.
-- **5.5 (Structure)** Collapse `recall/Assimilation.vue` into `AssimilationPanel.vue` if redundant; remove any remaining dead composables/page-objects. Verify: no `/assimilate` references remain; assimilation + recall E2E green.
+- **5.5 (Structure) — done** Removed redundant `recall/Assimilation.vue` wrapper (padding already on `NoteShowPage`); retargeted unit tests to `AssimilationPanel.spec.ts`. E2E `assumeAssimilationPage()` name kept (inline panel helper).
 
 ## Behavior change to confirm with stakeholders
 Existing `assimilating.feature` asserts the daily cap (e.g. 2) **stops** assimilation. The new model lets the user **continue past the cap** with a toast; those scenarios are superseded by the walkthrough feature and rewritten/removed in Phase 5.

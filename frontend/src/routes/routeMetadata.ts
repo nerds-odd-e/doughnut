@@ -95,11 +95,6 @@ export const routeMetadata: RouteMetadata[] = [
     meta: { useNoteStorageAccessor: true },
   },
   {
-    path: "/assimilate",
-    name: "assimilate",
-    meta: { useNoteStorageAccessor: true },
-  },
-  {
     path: "/recall",
     name: "recall",
     meta: { useNoteStorageAccessor: true },
