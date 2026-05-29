@@ -1,5 +1,5 @@
 import { pageIsNotLoading } from '../pageBase'
-import { assumeAssimilationPage } from './assimilationPage'
+import { assumeAssimilationPage, keepForRecallButton } from './assimilationPage'
 import { toolbarButton } from './toolbarButton'
 import { questionListPage } from './questionListPage'
 
@@ -53,16 +53,20 @@ const noteMoreOptionsPage = () => {
       toolbarButton('Questions for the note').click()
       return questionListPage()
     },
-    openAssimilationPage() {
-      cy.findByRole('button', { name: 'Assimilation settings' })
-        .scrollIntoView()
-        .click()
-      cy.url().should('include', '/assimilate/')
+    openAssimilationSettings() {
+      cy.document().then((doc) => {
+        if (!doc.querySelector('[data-test="keep-for-recall"]')) {
+          cy.findByRole('button', { name: 'Assimilation settings' })
+            .scrollIntoView()
+            .click()
+        }
+      })
+      keepForRecallButton({ timeout: 15000 }).should('be.visible')
       pageIsNotLoading()
       return assumeAssimilationPage().waitForAssimilationReady()
     },
     assimilateNote() {
-      this.openAssimilationPage().clickKeepForRecall()
+      this.openAssimilationSettings().clickKeepForRecall()
       pageIsNotLoading()
     },
   }

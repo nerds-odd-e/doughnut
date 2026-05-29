@@ -55,7 +55,7 @@ Then('I am assimilating new note on day {int}', (day: number) => {
 })
 
 When('I am assimilating the note {string}', (noteTitle: string) => {
-  start.jumpToNotePage(noteTitle).moreOptions().openAssimilationPage()
+  start.jumpToNotePage(noteTitle).moreOptions().openAssimilationSettings()
 })
 
 Then('I assimilate the note {string} via more options', (noteTitle: string) => {
@@ -68,7 +68,7 @@ Then(
     start
       .jumpToNotePage(noteTitle)
       .moreOptions()
-      .openAssimilationPage()
+      .openAssimilationSettings()
       .assimilateWithSpellingOption()
   }
 )
@@ -133,6 +133,18 @@ When('I verify spelling with {string}', (text: string) => {
 
 Then('the keep for recall button should be disabled', () => {
   start.assumeAssimilationPage().expectKeepForRecallDisabled()
+})
+
+When('I jump to the note page of {string}', (noteTitle: string) => {
+  start.jumpToNotePage(noteTitle)
+})
+
+When('I open assimilation settings from more options', () => {
+  start.assumeNotePage().moreOptions().openAssimilationSettings()
+})
+
+When('I keep for recall on the assimilation panel', () => {
+  start.assumeAssimilationPage().keepForRecallOnPanel()
 })
 
 Then(

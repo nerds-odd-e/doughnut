@@ -9,6 +9,10 @@ import usePopups from "@/components/commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
+import {
+  resetAssimilationViewForTests,
+  useAssimilationView,
+} from "@/composables/useAssimilationView"
 
 let renderer: RenderingHelper<typeof NoteMoreOptionsForm>
 let router: ReturnType<typeof createRouter>
@@ -20,6 +24,7 @@ afterEach(() => {
 })
 
 beforeEach(() => {
+  resetAssimilationViewForTests()
   deleteNoteSpy = mockSdkService(NoteController, "deleteNote", undefined)
   router = createRouter({
     history: createWebHistory(),
@@ -137,8 +142,8 @@ describe("NoteMoreOptionsForm", () => {
     })
   })
 
-  describe("assimilate note", () => {
-    it("navigates to assimilate page when assimilation settings button is clicked", async () => {
+  describe("assimilation settings toggle", () => {
+    it("turns assimilation settings on and shows check without changing route", async () => {
       await router.push("/")
       const wrapper = renderer.withProps({ note }).mount()
 
@@ -151,8 +156,11 @@ describe("NoteMoreOptionsForm", () => {
 
       await flushPromises()
 
-      expect(router.currentRoute.value.name).toBe("assimilateSingleNote")
-      expect(router.currentRoute.value.params.noteId).toBe(String(note.id))
+      expect(router.currentRoute.value.name).not.toBe("assimilateSingleNote")
+      const { showAssimilationSettings, pendingOnForNoteId } =
+        useAssimilationView()
+      expect(showAssimilationSettings.value).toBe(true)
+      expect(pendingOnForNoteId.value).toBe(note.id)
     })
 
     it("emits close-dialog when assimilation settings button is clicked", async () => {
@@ -166,6 +174,25 @@ describe("NoteMoreOptionsForm", () => {
       await assimilateButton.trigger("click")
 
       expect(wrapper.emitted()).toHaveProperty("close-dialog")
+    })
+
+    it("turns assimilation settings off when toggled while already on", async () => {
+      const { requestOnFor } = useAssimilationView()
+      requestOnFor(note.id)
+
+      const wrapper = renderer.withProps({ note }).mount()
+      await flushPromises()
+
+      const assimilateButton = wrapper.find(
+        'button[title="Assimilation settings"]'
+      )
+      await assimilateButton.trigger("click")
+      await flushPromises()
+
+      const { showAssimilationSettings, pendingOnForNoteId } =
+        useAssimilationView()
+      expect(showAssimilationSettings.value).toBe(false)
+      expect(pendingOnForNoteId.value).toBe(null)
     })
   })
 })

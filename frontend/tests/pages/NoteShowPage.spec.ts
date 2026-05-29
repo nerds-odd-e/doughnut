@@ -1,7 +1,13 @@
 import {
+  AiController,
+  AssimilationController,
   ConversationMessageController,
   NoteController,
 } from "@generated/doughnut-backend-api/sdk.gen"
+import {
+  resetAssimilationViewForTests,
+  useAssimilationView,
+} from "@/composables/useAssimilationView"
 import NoteShowPageWithNotebookSidebarLayout from "@tests/fixtures/NoteShowPageWithNotebookSidebarLayout.vue"
 import { within } from "@testing-library/vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -164,6 +170,63 @@ describe("all in note show page", () => {
       await flushPromises()
 
       expect(wrapper.find(".conversation-wrapper").exists()).toBe(true)
+    })
+  })
+
+  describe("inline assimilation panel", () => {
+    const noteRealm = makeMe.aNoteRealm.please()
+
+    beforeEach(() => {
+      resetAssimilationViewForTests()
+      mockSdkService(NoteController, "showNote", noteRealm)
+      mockNotebookGetForNoteRealm(noteRealm, {
+        id: 101,
+        name: "a circle",
+      })
+      mockSdkService(NoteController, "getNoteInfo", {})
+      mockSdkService(AiController, "generateUnderstandingChecklist", {
+        points: [],
+      })
+      mockSdkService(AssimilationController, "assimilate", [])
+    })
+
+    it("renders keep-for-recall when assimilation settings are on", async () => {
+      useAssimilationView().requestOnFor(noteRealm.id)
+
+      const wrapper = helper
+        .component(NoteShowPageWithNotebookSidebarLayout)
+        .withCurrentUser(makeMe.aUser.please())
+        .withCleanStorage()
+        .withProps({ noteId: noteRealm.id })
+        .withRouter(router)
+        .currentRoute(noteShowLocation(noteRealm.id))
+        .mount()
+
+      await flushPromises()
+      await vi.waitFor(() => {
+        expect(wrapper.find('[data-test="keep-for-recall"]').exists()).toBe(
+          true
+        )
+      })
+    })
+
+    it("does not render assimilation panel when settings are off", async () => {
+      helper
+        .component(NoteShowPageWithNotebookSidebarLayout)
+        .withCurrentUser(makeMe.aUser.please())
+        .withCleanStorage()
+        .withProps({ noteId: noteRealm.id })
+        .withRouter(router)
+        .currentRoute(noteShowLocation(noteRealm.id))
+        .render()
+
+      await flushPromises()
+      await vi.waitFor(() => {
+        const main = document.getElementById("main-note-content")
+        expect(main).not.toBeNull()
+      })
+
+      expect(document.querySelector('[data-test="keep-for-recall"]')).toBeNull()
     })
   })
 })

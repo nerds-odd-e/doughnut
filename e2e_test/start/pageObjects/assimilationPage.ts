@@ -4,7 +4,7 @@ import { form } from '../forms'
 import router from '../router'
 import { assumeMemoryTrackerPage } from './memoryTrackerPage'
 
-const keepForRecallButton = (options?: { timeout?: number }) =>
+export const keepForRecallButton = (options?: { timeout?: number }) =>
   cy.get('[data-test="keep-for-recall"]', options ?? {})
 
 const understandingChecklist = () =>
@@ -64,6 +64,11 @@ export const assumeAssimilationPage = () => ({
     keepForRecallButton({ timeout: 10000 })
       .scrollIntoView()
       .should('be.visible')
+    return this
+  },
+  keepForRecallOnPanel() {
+    this.clickKeepForRecall()
+    pageIsNotLoading()
     return this
   },
   proceedWithRememberingSpelling() {

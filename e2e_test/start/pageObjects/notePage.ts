@@ -560,14 +560,7 @@ export const assumeNotePage = (
       return assumeAssociateWikidataDialog()
     },
     openAssimilationSettings() {
-      cy.url().then((href) => {
-        if (!String(href).includes('/assimilate/')) {
-          makeSureNoteMoreOptionsFormIsOpen().openAssimilationPage()
-        } else {
-          assumeAssimilationPage().waitForAssimilationReady()
-        }
-      })
-      cy.url().should('include', '/assimilate/')
+      makeSureNoteMoreOptionsFormIsOpen().openAssimilationSettings()
       pageIsNotLoading()
       return assumeAssimilationPage()
     },

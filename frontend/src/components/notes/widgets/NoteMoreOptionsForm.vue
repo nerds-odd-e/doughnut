@@ -31,7 +31,8 @@
       <DropdownMenuActionButton
         title="Assimilation settings"
         :icon="CircleCheck"
-        @click="assimilateNote"
+        :checked="assimilationChecked"
+        @click="onAssimilationToggle"
       />
     </DropdownMenuItem>
 
@@ -54,11 +55,13 @@ import NoteExportForm from "@/components/notes/core/NoteExportForm.vue"
 import { useRouter } from "vue-router"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useAssimilationView } from "@/composables/useAssimilationView"
 import type { NoteDeleteReferenceHandling } from "@/store/StoredApiCollection"
 import DropdownMenu from "@/components/commons/DropdownMenu.vue"
 import DropdownMenuActionButton from "@/components/commons/DropdownMenuActionButton.vue"
 import DropdownMenuItem from "@/components/commons/DropdownMenuItem.vue"
 import { dropdownMenuButtonClass } from "@/components/commons/dropdownMenuClasses"
+import { computed } from "vue"
 
 const { note } = defineProps<{
   note: Note
@@ -71,13 +74,16 @@ const emit = defineEmits<{
 const router = useRouter()
 const { popups } = usePopups()
 const storageAccessor = useStorageAccessor()
+const { toggle, isOnForNote } = useAssimilationView()
+
+const assimilationChecked = computed(() => isOnForNote(note.id))
 
 const closeDialog = () => {
   emit("close-dialog")
 }
 
-const assimilateNote = () => {
-  router.push({ name: "assimilateSingleNote", params: { noteId: note.id } })
+const onAssimilationToggle = () => {
+  toggle(note.id)
   closeDialog()
 }
 
