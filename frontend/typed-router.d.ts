@@ -38,20 +38,6 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '/AssimilateSingleNotePage': RouteRecordInfo<
-      '/AssimilateSingleNotePage',
-      '/AssimilateSingleNotePage',
-      Record<never, never>,
-      Record<never, never>,
-      | never
-    >,
-    '/AssimilateSingleNotePageView': RouteRecordInfo<
-      '/AssimilateSingleNotePageView',
-      '/AssimilateSingleNotePageView',
-      Record<never, never>,
-      Record<never, never>,
-      | never
-    >,
     '/AssimilationPage': RouteRecordInfo<
       '/AssimilationPage',
       '/AssimilationPage',
@@ -250,22 +236,6 @@ declare module 'vue-router/auto-routes' {
     'src/pages/AdminDashboardPage.vue': {
       routes:
         | '/AdminDashboardPage'
-      views:
-        | never
-      pathParamNames:
-        | never
-    }
-    'src/pages/AssimilateSingleNotePage.vue': {
-      routes:
-        | '/AssimilateSingleNotePage'
-      views:
-        | never
-      pathParamNames:
-        | never
-    }
-    'src/pages/AssimilateSingleNotePageView.vue': {
-      routes:
-        | '/AssimilateSingleNotePageView'
       views:
         | never
       pathParamNames:

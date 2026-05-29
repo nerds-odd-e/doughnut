@@ -9,7 +9,6 @@ import NotebooksPage from "@/pages/NotebooksPage.vue"
 import NoteShowPage from "@/pages/NoteShowPage.vue"
 import RecallPage from "@/pages/RecallPage.vue"
 import AssimilationPage from "@/pages/AssimilationPage.vue"
-import AssimilateSingleNotePage from "@/pages/AssimilateSingleNotePage.vue"
 import CircleShowPage from "@/pages/CircleShowPage.vue"
 import CircleJoinPage from "@/pages/CircleJoinPage.vue"
 import FailureReportPage from "@/pages/FailureReportPage.vue"
@@ -41,7 +40,6 @@ const componentMap: Record<string, RouteComponent> = {
   circleJoin: CircleJoinPage,
   messageCenter: MessageCenterPage,
   assimilate: AssimilationPage,
-  assimilateSingleNote: AssimilateSingleNotePage,
   recall: RecallPage,
   failureReport: FailureReportPage,
   nonproductionOnlyLogin: NonproductionOnlyLoginPage,

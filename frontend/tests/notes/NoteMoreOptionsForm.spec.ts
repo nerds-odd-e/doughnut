@@ -156,7 +156,7 @@ describe("NoteMoreOptionsForm", () => {
 
       await flushPromises()
 
-      expect(router.currentRoute.value.name).not.toBe("assimilateSingleNote")
+      expect(router.currentRoute.value.path).toBe("/")
       const { showAssimilationSettings, pendingOnForNoteId } =
         useAssimilationView()
       expect(showAssimilationSettings.value).toBe(true)
