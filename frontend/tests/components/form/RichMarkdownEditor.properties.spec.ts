@@ -6,14 +6,37 @@ import {
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import { mockSdkService } from "@tests/helpers"
+import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
+import {
+  mountSoftKeyboardPrimer,
+  softKeyboardPrimerElement,
+  waitUntilFocused,
+} from "@tests/helpers/softKeyboardPrimerTestSupport"
 import { nextTick } from "vue"
 import { vi } from "vitest"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
+const addPropertyTapCases = [
+  {
+    case: "no existing rows",
+    markdown: "# Hello Body",
+  },
+  {
+    case: "existing rows",
+    markdown: `---
+status: ok
+---
+
+# Body`,
+  },
+] as const
+
 describe("RichMarkdownEditor properties", () => {
   const h = createRichMarkdownEditorTestHarness()
+  let matchMediaSpy: ReturnType<typeof mockCoarsePointer> | undefined
 
   afterEach(() => {
+    matchMediaSpy?.mockRestore()
     h.cleanup()
   })
 
@@ -63,33 +86,53 @@ Body`,
     }
   })
 
-  it("focuses property key when Add property is clicked", async () => {
-    await h.mountEditor("# Hello Body")
-    await flushPromises()
-    await h.openAddProperty()
-    await h.flushAnimationFrame()
-    const keyInput = h
-      .getWrapper()
-      .find('[data-testid="rich-note-property-key"]')
-      .element as HTMLInputElement
-    expect(document.activeElement).toBe(keyInput)
-  })
+  describe("soft keyboard primer", () => {
+    it.each(
+      addPropertyTapCases
+    )("focuses primer synchronously when Add property is tapped with $case on touch device", async ({
+      markdown,
+    }) => {
+      matchMediaSpy = mockCoarsePointer(true)
+      mountSoftKeyboardPrimer()
+      await h.mountEditor(markdown)
+      await flushPromises()
+      const primer = softKeyboardPrimerElement()
+      expect(primer).toBeTruthy()
 
-  it("focuses property key when Add property is clicked with existing rows", async () => {
-    const markdown = `---
-status: ok
----
+      h.tapAddProperty()
 
-# Body`
-    await h.mountEditor(markdown)
-    await flushPromises()
-    await h.openAddProperty()
-    await h.flushAnimationFrame()
-    const keyInput = h
-      .getWrapper()
-      .find('[data-testid="rich-note-property-key"]')
-      .element as HTMLInputElement
-    expect(document.activeElement).toBe(keyInput)
+      expect(document.activeElement).toBe(primer)
+    })
+
+    it.each(
+      addPropertyTapCases
+    )("transfers focus to property key after insert form mounts with $case", async ({
+      markdown,
+    }) => {
+      matchMediaSpy = mockCoarsePointer(true)
+      mountSoftKeyboardPrimer()
+      await h.mountEditor(markdown)
+      await flushPromises()
+
+      await h.openAddProperty()
+      await h.flushAnimationFrame()
+
+      await waitUntilFocused('[data-testid="rich-note-property-key"]')
+    })
+
+    it("does not focus primer when pointer is not coarse", async () => {
+      matchMediaSpy = mockCoarsePointer(false)
+      mountSoftKeyboardPrimer()
+      await h.mountEditor("# Hello Body")
+      await flushPromises()
+      const primer = softKeyboardPrimerElement()
+
+      await h.openAddProperty()
+      await h.flushAnimationFrame()
+
+      expect(document.activeElement).not.toBe(primer)
+      await waitUntilFocused('[data-testid="rich-note-property-key"]')
+    })
   })
 
   it("inserting a property emits composed frontmatter and preserves body", async () => {

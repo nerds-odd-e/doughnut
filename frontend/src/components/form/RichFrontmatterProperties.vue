@@ -120,6 +120,7 @@ import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDia
 import type { WikiTitle } from "@generated/doughnut-backend-api"
 import { useWikidataPropertyDialog } from "@/composables/useWikidataPropertyDialog"
 import { relationKebabFromLabel } from "@/models/relationTypeOptions"
+import { primeSoftKeyboard } from "@/utils/focusTarget"
 import {
   isRelationPropertyKey,
   isReservedIndexOnlyPropertyKey,
@@ -273,6 +274,7 @@ const showSection = computed(() => {
 const showInsertChrome = computed(() => !isReadOnly.value && parsed.value.ok)
 
 async function openPropertyInsert() {
+  primeSoftKeyboard()
   insertOpen.value = true
   await nextTick()
   requestAnimationFrame(() => {

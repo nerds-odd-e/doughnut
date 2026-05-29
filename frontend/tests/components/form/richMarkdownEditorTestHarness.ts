@@ -46,12 +46,16 @@ export function createRichMarkdownEditorTestHarness() {
     await flushPromises()
   }
 
-  async function openAddProperty() {
+  function tapAddProperty() {
     const addBtn = wrapper
       .findAll("button")
       .find((w) => w.text().includes("Add property"))
     expect(addBtn).toBeDefined()
-    await addBtn!.trigger("click")
+    ;(addBtn!.element as HTMLButtonElement).click()
+  }
+
+  async function openAddProperty() {
+    tapAddProperty()
     await flushPromises()
   }
 
@@ -111,6 +115,7 @@ export function createRichMarkdownEditorTestHarness() {
     lastEmittedMarkdown,
     quillEditorEl,
     dispatchPasteHtmlToQuill,
+    tapAddProperty,
     openAddProperty,
     flushAnimationFrame,
     assertPresetOptionsVisible,
