@@ -1,6 +1,6 @@
 <template>
   <footer
-    class="assimilation-settings-bar pointer-events-none z-40"
+    class="relative w-full mt-4 pointer-events-none z-40"
     aria-label="Assimilation settings"
   >
     <div
@@ -133,31 +133,3 @@ const closeRefineNoteModal = () => {
   showRefineNoteModal.value = false
 }
 </script>
-
-<style scoped lang="scss">
-@use "@/assets/menu-variables.scss" as *;
-
-/* Short viewports: stay in document flow after the note. Taller: dock to bottom. */
-.assimilation-settings-bar {
-  position: relative;
-  width: 100%;
-  margin-top: 1rem;
-}
-
-@media (min-height: $assimilation-dock-min-height) {
-  .assimilation-settings-bar {
-    position: fixed;
-    right: 0;
-    bottom: 0;
-    left: $main-menu-width;
-    width: auto;
-    margin-top: 0;
-  }
-}
-
-@media (min-height: $assimilation-dock-min-height) and (max-width: 1024px) {
-  .assimilation-settings-bar {
-    left: 0;
-  }
-}
-</style>

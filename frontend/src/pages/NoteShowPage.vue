@@ -4,9 +4,9 @@
     <div
       v-else
       class="flex flex-col h-full min-h-0"
-      :class="{ 'note-show-with-assimilation-panel': showAssimilationSettings }"
     >
       <NoteShow
+        class="flex-1 min-h-0"
         v-bind="{
           noteId: resolvedNoteId,
           expandChildren: true,
@@ -27,12 +27,16 @@
           </div>
         </template>
       </NoteShow>
-      <AssimilationPanel
+      <div
         v-if="noteForPanel"
         :key="`${noteForPanel.id}-${panelKey}`"
-        :note="noteForPanel"
-        @reload-needed="onAssimilationReloadNeeded"
-      />
+        class="shrink-0"
+      >
+        <AssimilationPanel
+          :note="noteForPanel"
+          @reload-needed="onAssimilationReloadNeeded"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -109,21 +113,9 @@ const handleCloseConversation = (conversationRealm: NoteRealm) => {
 }
 </script>
 
-<style scoped lang="scss">
-@use "@/assets/menu-variables.scss" as *;
-
+<style scoped>
 .conversation-wrapper {
   max-height: 100%;
   overflow: hidden;
-}
-
-.note-show-with-assimilation-panel {
-  padding-bottom: 1rem;
-}
-
-@media (min-height: $assimilation-dock-min-height) {
-  .note-show-with-assimilation-panel {
-    padding-bottom: clamp(11rem, 32vh, 22rem);
-  }
 }
 </style>
