@@ -117,7 +117,7 @@ For every file touched by the change, check line count:
 wc -l <path>
 ```
 
-- Files **over 250 lines** must be split.
+- Files **over 250 lines** must be split. This rule is applied to test code as well.
 - Split along **cohesive seams** — one concept per module, not arbitrary
   line cuts.
 - Update imports. Keep the public API stable for callers outside the

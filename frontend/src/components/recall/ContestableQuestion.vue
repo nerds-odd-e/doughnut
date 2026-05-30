@@ -18,6 +18,7 @@
       <RecallPromptComponent
         v-if="currentQuestion"
         :recall-prompt="currentQuestion"
+        :next-is-spelling="nextIsSpelling"
         @answered="onAnswered($event)"
       />
       <button
@@ -48,6 +49,10 @@ const props = defineProps({
   recallPrompt: {
     type: Object as PropType<RecallPrompt>,
     required: true,
+  },
+  nextIsSpelling: {
+    type: Boolean,
+    default: false,
   },
 })
 const emit = defineEmits<{

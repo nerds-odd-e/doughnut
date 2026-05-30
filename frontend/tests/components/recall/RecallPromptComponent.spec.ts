@@ -6,10 +6,19 @@ import helper, {
   wrapSdkResponse,
   wrapSdkError,
 } from "@tests/helpers"
+import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
+import {
+  expectSoftKeyboardPrimerIsFocused,
+  expectSoftKeyboardPrimerIsNotFocused,
+  mountSoftKeyboardPrimer,
+  softKeyboardPrimerElement,
+} from "@tests/helpers/softKeyboardPrimerTestSupport"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 
 describe("RecallPromptComponent", () => {
+  let matchMediaSpy: ReturnType<typeof mockCoarsePointer> | undefined
+
   beforeEach(() => {
     vi.useFakeTimers()
     mockSdkService(
@@ -20,11 +29,14 @@ describe("RecallPromptComponent", () => {
   })
 
   afterEach(() => {
+    matchMediaSpy?.mockRestore()
+    matchMediaSpy = undefined
     Object.defineProperty(document, "hidden", { value: false, writable: true })
     vi.useRealTimers()
+    document.body.innerHTML = ""
   })
 
-  const mountComponent = () => {
+  const mountComponent = (nextIsSpelling = false) => {
     const recallPrompt = makeMe.aRecallPrompt
       .withQuestionStem("Test question")
       .withChoices(["A", "B", "C"])
@@ -32,9 +44,62 @@ describe("RecallPromptComponent", () => {
 
     return helper
       .component(RecallPromptComponent)
-      .withProps({ recallPrompt })
-      .mount()
+      .withProps({ recallPrompt, nextIsSpelling })
+      .mount({ attachTo: document.body })
   }
+
+  describe("soft keyboard primer", () => {
+    beforeEach(() => {
+      mountSoftKeyboardPrimer()
+    })
+
+    it.each([
+      {
+        nextIsSpelling: true,
+        expectPrimerFocused: true,
+      },
+      {
+        nextIsSpelling: false,
+        expectPrimerFocused: false,
+      },
+    ])("primer focus on choice when nextIsSpelling=$nextIsSpelling", async ({
+      nextIsSpelling,
+      expectPrimerFocused,
+    }) => {
+      matchMediaSpy = mockCoarsePointer(true)
+      expect(softKeyboardPrimerElement()).toBeTruthy()
+
+      let resolveAnswer: (value: ReturnType<typeof wrapSdkResponse>) => void
+      const answerQuizSpy = mockSdkService(
+        RecallPromptController,
+        "answerQuiz",
+        makeMe.anAnsweredQuestion.please()
+      )
+      if (expectPrimerFocused) {
+        answerQuizSpy.mockImplementation(
+          () =>
+            new Promise((resolve) => {
+              resolveAnswer = resolve
+              // biome-ignore lint/suspicious/noExplicitAny: Promise type requires any for mock implementation
+            }) as any
+        )
+      }
+
+      const wrapper = mountComponent(nextIsSpelling)
+      wrapper
+        .findComponent({ name: "QuestionDisplay" })
+        .vm.$emit("answer", { choiceIndex: 0 })
+
+      if (expectPrimerFocused) {
+        expectSoftKeyboardPrimerIsFocused()
+        resolveAnswer!(wrapSdkResponse(makeMe.anAnsweredQuestion.please()))
+        await flushPromises()
+      } else {
+        expectSoftKeyboardPrimerIsNotFocused()
+      }
+      wrapper.unmount()
+    })
+  })
 
   describe("answer submission", () => {
     it("shows loading state while submitting answer", async () => {

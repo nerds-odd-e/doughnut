@@ -30,6 +30,7 @@ import { RecallPromptController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
 import QuestionDisplay from "./QuestionDisplay.vue"
+import { primeSoftKeyboard } from "@/utils/focusTarget"
 
 const { popups } = usePopups()
 
@@ -41,6 +42,10 @@ const props = defineProps({
   recallPrompt: {
     type: Object as PropType<RecallPrompt>,
     required: true,
+  },
+  nextIsSpelling: {
+    type: Boolean,
+    default: false,
   },
 })
 
@@ -57,6 +62,7 @@ const handleError = async () => {
 
 const submitQuizAnswer = async (answerData: AnswerDto) => {
   if (answerData.choiceIndex === undefined) return
+  if (props.nextIsSpelling) primeSoftKeyboard()
 
   isAnswered.value = true
   isLoading.value = true

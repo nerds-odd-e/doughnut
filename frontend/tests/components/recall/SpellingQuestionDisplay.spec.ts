@@ -1,253 +1,152 @@
-import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
-import { flushPromises } from "@vue/test-utils"
-import helper, { mockSdkService } from "@tests/helpers"
-import SpellingQuestionDisplay from "@/components/recall/SpellingQuestionDisplay.vue"
-import makeMe from "doughnut-test-fixtures/makeMe"
+import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
+import {
+  expectSoftKeyboardPrimerIsFocused,
+  expectSoftKeyboardPrimerIsNotFocused,
+  mountSoftKeyboardPrimer,
+  softKeyboardPrimerElement,
+} from "@tests/helpers/softKeyboardPrimerTestSupport"
+import {
+  captureRequestAnimationFrame,
+  mockSpellingQuestionServices,
+  mountSpellingQuestionDisplay,
+  submitSpellingAnswer,
+} from "./spellingQuestionDisplayTestSupport"
 
 describe("SpellingQuestionDisplay", () => {
   let performanceNowSpy: ReturnType<typeof vi.spyOn>
+  let matchMediaSpy: ReturnType<typeof mockCoarsePointer> | undefined
+  let rafCallbacks: FrameRequestCallback[]
 
   beforeEach(() => {
     vi.useFakeTimers()
     performanceNowSpy = vi.spyOn(performance, "now").mockReturnValue(0)
-    const recallPrompt = makeMe.aRecallPrompt
-      .withQuestionType("SPELLING")
-      .please()
-    mockSdkService(MemoryTrackerController, "askAQuestion", recallPrompt)
-    const memoryTracker = makeMe.aMemoryTracker.please()
-    // Add clozeDescription method to note for stem computation
-    if (memoryTracker.note) {
-      // @ts-expect-error - clozeDescription is a method on Note, not a property
-      memoryTracker.note.clozeDescription = {
-        clozeDetails: () => "<p>Spell the word 'cat'</p>\n",
-      }
-    }
-    mockSdkService(MemoryTrackerController, "showMemoryTracker", memoryTracker)
+    rafCallbacks = captureRequestAnimationFrame()
+    mockSpellingQuestionServices()
   })
 
   afterEach(() => {
+    matchMediaSpy?.mockRestore()
+    matchMediaSpy = undefined
     Object.defineProperty(document, "hidden", { value: false, writable: true })
     vi.useRealTimers()
     vi.restoreAllMocks()
+    document.body.innerHTML = ""
   })
 
-  it("renders spelling question input form", async () => {
-    const wrapper = helper
-      .component(SpellingQuestionDisplay)
-      .withProps({ memoryTrackerId: 1 })
-      .mount()
+  describe("soft keyboard primer", () => {
+    beforeEach(() => {
+      mountSoftKeyboardPrimer()
+    })
 
-    await flushPromises()
+    it.each([
+      { nextIsSpelling: true, expectPrimerFocused: true },
+      { nextIsSpelling: false, expectPrimerFocused: false },
+    ])("primer focus on submit when nextIsSpelling=$nextIsSpelling", async ({
+      nextIsSpelling,
+      expectPrimerFocused,
+    }) => {
+      matchMediaSpy = mockCoarsePointer(true)
+      expect(softKeyboardPrimerElement()).toBeTruthy()
 
-    expect(
-      wrapper.find("input[placeholder='put your answer here']").exists()
-    ).toBe(true)
-    expect(wrapper.find("input[type='submit']").exists()).toBe(true)
-  })
+      const wrapper = await mountSpellingQuestionDisplay(
+        { memoryTrackerId: 1, nextIsSpelling },
+        { attachTo: document.body, rafCallbacks }
+      )
+      await submitSpellingAnswer(wrapper)
 
-  it("emits answer event when form is submitted", async () => {
-    let rafCallbacks: Array<FrameRequestCallback> = []
-    vi.spyOn(window, "requestAnimationFrame").mockImplementation(
-      (callback: FrameRequestCallback) => {
-        rafCallbacks.push(callback)
-        return 1
+      if (expectPrimerFocused) {
+        expectSoftKeyboardPrimerIsFocused()
+      } else {
+        expectSoftKeyboardPrimerIsNotFocused()
       }
-    )
-
-    const wrapper = helper
-      .component(SpellingQuestionDisplay)
-      .withProps({ memoryTrackerId: 1 })
-      .mount()
-
-    await flushPromises()
-    // Flush RAF callbacks
-    const callbacks = [...rafCallbacks]
-    rafCallbacks = []
-    callbacks.forEach((cb) => cb(performance.now()))
-
-    // Set input value
-    const input = wrapper.find("input[placeholder='put your answer here']")
-    await input.setValue("cat")
-
-    // Submit form
-    await wrapper.find("form").trigger("submit")
-
-    // Check emitted event
-    const emitted = wrapper.emitted()
-    expect(emitted.answer).toBeTruthy()
-    expect(emitted.answer![0]).toEqual([
-      {
-        spellingAnswer: "cat",
-        thinkingTimeMs: expect.any(Number),
-        recallPromptId: expect.any(Number),
-      },
-    ])
+      wrapper.unmount()
+    })
   })
 
-  it("includes thinking time in answer submission", async () => {
-    let rafCallbacks: Array<FrameRequestCallback> = []
-    vi.spyOn(window, "requestAnimationFrame").mockImplementation(
-      (callback: FrameRequestCallback) => {
-        rafCallbacks.push(callback)
-        return 1
-      }
+  it("emits answer with thinking time on submit", async () => {
+    const wrapper = await mountSpellingQuestionDisplay(
+      { memoryTrackerId: 1 },
+      { rafCallbacks }
     )
-
-    const wrapper = helper
-      .component(SpellingQuestionDisplay)
-      .withProps({ memoryTrackerId: 1 })
-      .mount()
-
-    await flushPromises()
-    // Flush RAF callbacks
-    const callbacks = [...rafCallbacks]
-    rafCallbacks = []
-    callbacks.forEach((cb) => cb(performance.now()))
 
     performanceNowSpy.mockReturnValue(5000)
     vi.advanceTimersByTime(5000)
+    await submitSpellingAnswer(wrapper)
 
-    const input = wrapper.find("input[placeholder='put your answer here']")
-    await input.setValue("cat")
-    await wrapper.find("form").trigger("submit")
-    await flushPromises()
-
-    const emitted = wrapper.emitted("answer")
-    expect(emitted).toBeTruthy()
-    expect(emitted?.[0]?.[0]).toHaveProperty("thinkingTimeMs")
-    const answerData = emitted?.[0]?.[0] as {
+    const answerData = wrapper.emitted("answer")?.[0]?.[0] as {
       spellingAnswer?: string
       thinkingTimeMs?: number
       recallPromptId?: number
     }
-    expect(answerData?.thinkingTimeMs).toBeGreaterThanOrEqual(5000)
     expect(answerData?.spellingAnswer).toBe("cat")
+    expect(answerData?.thinkingTimeMs).toBeGreaterThanOrEqual(5000)
     expect(answerData?.recallPromptId).toBeDefined()
   })
 
-  it("prevents double submission when form is submitted multiple times", async () => {
-    let rafCallbacks: Array<FrameRequestCallback> = []
-    vi.spyOn(window, "requestAnimationFrame").mockImplementation(
-      (callback: FrameRequestCallback) => {
-        rafCallbacks.push(callback)
-        return 1
-      }
+  it("emits answer only once when submit is triggered multiple times", async () => {
+    const wrapper = await mountSpellingQuestionDisplay(
+      { memoryTrackerId: 1 },
+      { rafCallbacks }
     )
+    await wrapper
+      .find("input[placeholder='put your answer here']")
+      .setValue("cat")
+    const form = wrapper.find("form")
+    await form.trigger("submit")
+    await form.trigger("submit")
+    await form.trigger("submit")
 
-    const wrapper = helper
-      .component(SpellingQuestionDisplay)
-      .withProps({ memoryTrackerId: 1 })
-      .mount()
-
-    await flushPromises()
-    const callbacks = [...rafCallbacks]
-    rafCallbacks = []
-    callbacks.forEach((cb) => cb(performance.now()))
-
-    const input = wrapper.find("input[placeholder='put your answer here']")
-    await input.setValue("cat")
-
-    await wrapper.find("form").trigger("submit")
-    await wrapper.find("form").trigger("submit")
-    await wrapper.find("form").trigger("submit")
-
-    const emitted = wrapper.emitted("answer")
-    expect(emitted).toBeTruthy()
-    expect(emitted!.length).toBe(1)
+    expect(wrapper.emitted("answer")).toHaveLength(1)
   })
 
-  it("shows inactive mask when document is hidden", async () => {
-    let rafCallbacks: Array<FrameRequestCallback> = []
-    vi.spyOn(window, "requestAnimationFrame").mockImplementation(
-      (callback: FrameRequestCallback) => {
-        rafCallbacks.push(callback)
-        return 1
-      }
+  it.each([
+    {
+      case: "document hidden",
+      trigger: async () => {
+        Object.defineProperty(document, "hidden", {
+          value: true,
+          writable: true,
+        })
+        document.dispatchEvent(new Event("visibilitychange"))
+      },
+      expectMessage: true,
+    },
+    {
+      case: "window blur",
+      trigger: async () => {
+        window.dispatchEvent(new Event("blur"))
+      },
+      expectMessage: false,
+    },
+  ])("shows inactive mask when $case", async ({ trigger, expectMessage }) => {
+    const wrapper = await mountSpellingQuestionDisplay(
+      { memoryTrackerId: 1 },
+      { rafCallbacks }
     )
-
-    const wrapper = helper
-      .component(SpellingQuestionDisplay)
-      .withProps({ memoryTrackerId: 1 })
-      .mount()
-
-    await flushPromises()
-    const callbacks = [...rafCallbacks]
-    rafCallbacks = []
-    callbacks.forEach((cb) => cb(performance.now()))
-
     expect(wrapper.find("[data-test='inactive-recall-mask']").exists()).toBe(
       false
     )
 
-    Object.defineProperty(document, "hidden", { value: true, writable: true })
-    document.dispatchEvent(new Event("visibilitychange"))
+    await trigger()
     await wrapper.vm.$nextTick()
 
-    expect(wrapper.find("[data-test='inactive-recall-mask']").exists()).toBe(
-      true
-    )
-    expect(wrapper.find("[data-test='inactive-recall-mask']").text()).toContain(
-      "Focus to activate"
-    )
-  })
-
-  it("shows inactive mask when window loses focus", async () => {
-    let rafCallbacks: Array<FrameRequestCallback> = []
-    vi.spyOn(window, "requestAnimationFrame").mockImplementation(
-      (callback: FrameRequestCallback) => {
-        rafCallbacks.push(callback)
-        return 1
-      }
-    )
-
-    const wrapper = helper
-      .component(SpellingQuestionDisplay)
-      .withProps({ memoryTrackerId: 1 })
-      .mount()
-
-    await flushPromises()
-    const callbacks = [...rafCallbacks]
-    rafCallbacks = []
-    callbacks.forEach((cb) => cb(performance.now()))
-
-    expect(wrapper.find("[data-test='inactive-recall-mask']").exists()).toBe(
-      false
-    )
-
-    window.dispatchEvent(new Event("blur"))
-    await wrapper.vm.$nextTick()
-
-    expect(wrapper.find("[data-test='inactive-recall-mask']").exists()).toBe(
-      true
-    )
+    const mask = wrapper.find("[data-test='inactive-recall-mask']")
+    expect(mask.exists()).toBe(true)
+    if (expectMessage) {
+      expect(mask.text()).toContain("Focus to activate")
+    }
   })
 
   it("disables submit button after form is submitted", async () => {
-    let rafCallbacks: Array<FrameRequestCallback> = []
-    vi.spyOn(window, "requestAnimationFrame").mockImplementation(
-      (callback: FrameRequestCallback) => {
-        rafCallbacks.push(callback)
-        return 1
-      }
+    const wrapper = await mountSpellingQuestionDisplay(
+      { memoryTrackerId: 1 },
+      { rafCallbacks }
     )
-
-    const wrapper = helper
-      .component(SpellingQuestionDisplay)
-      .withProps({ memoryTrackerId: 1 })
-      .mount()
-
-    await flushPromises()
-    const callbacks = [...rafCallbacks]
-    rafCallbacks = []
-    callbacks.forEach((cb) => cb(performance.now()))
-
     const submitButton = wrapper.find("input[type='submit']")
     expect(submitButton.attributes("disabled")).toBeUndefined()
 
-    const input = wrapper.find("input[placeholder='put your answer here']")
-    await input.setValue("cat")
-    await wrapper.find("form").trigger("submit")
+    await submitSpellingAnswer(wrapper)
 
     expect(submitButton.attributes("disabled")).toBeDefined()
   })

@@ -40,11 +40,16 @@ import TextInput from "../form/TextInput.vue"
 import InactiveRecallMask from "./InactiveRecallMask.vue"
 import QuestionStem from "./QuestionStem.vue"
 import { useQuestionThinkingTime } from "@/composables/useQuestionThinkingTime"
+import { primeSoftKeyboard } from "@/utils/focusTarget"
 
 const props = defineProps({
   memoryTrackerId: {
     type: Number,
     required: true,
+  },
+  nextIsSpelling: {
+    type: Boolean,
+    default: false,
   },
 })
 
@@ -73,6 +78,7 @@ const fetchSpellingQuestion = async () => {
 
 const submitAnswer = () => {
   if (submitted.value) return
+  if (props.nextIsSpelling) primeSoftKeyboard()
   submitted.value = true
   const thinkingTimeMs = stop()
   emits("answer", {

@@ -22,6 +22,14 @@ export function softKeyboardPrimerElement() {
   return document.getElementById(softKeyboardPrimerId)
 }
 
+export function expectSoftKeyboardPrimerIsFocused() {
+  expect(document.activeElement).toBe(softKeyboardPrimerElement())
+}
+
+export function expectSoftKeyboardPrimerIsNotFocused() {
+  expect(document.activeElement).not.toBe(softKeyboardPrimerElement())
+}
+
 export async function waitUntilFocused(selector: string) {
   const element = await vi.waitUntil(
     () => {

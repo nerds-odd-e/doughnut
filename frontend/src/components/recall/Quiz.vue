@@ -10,6 +10,7 @@
         v-if="currentMemoryTracker?.spelling"
         v-bind="{
           memoryTrackerId: currentMemoryTrackerId!,
+          nextIsSpelling,
         }"
         @answer="onSpellingAnswer($event)"
         :key="`spelling-${currentMemoryTrackerId}`"
@@ -30,6 +31,7 @@
           <ContestableQuestion
             v-bind="{
               recallPrompt: currentRecallPrompt,
+              nextIsSpelling,
             }"
             @answered="onAnswered($event)"
             :key="currentRecallPrompt.id"
@@ -67,6 +69,7 @@ interface QuizProps {
   memoryTrackers: MemoryTrackerLite[]
   currentIndex: number
   eagerFetchCount: number
+  nextIsSpelling?: boolean
 }
 
 const props = defineProps<QuizProps>()

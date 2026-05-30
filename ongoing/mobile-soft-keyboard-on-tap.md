@@ -122,10 +122,15 @@ on mobile. No shared dependency between them, so order is by observed value.
 - **4d — Frontmatter "edit property value" — 1 commit — **DONE**.** `primeSoftKeyboard()`
   on `pointerdown` in `RichFrontmatterEditablePropertyRow.vue` (skips anchor taps);
   tests in `RichMarkdownEditor.properties.spec.ts`.
-- **4e — Spelling recall answer — 1 commit.** `SpellingQuestionDisplay.vue`
-  (`v-focus`). Verify first whether the answer field is revealed by a user tap (e.g.
-  "next question") vs. an automatic transition — if there is no originating gesture,
-  no primer is possible and this item is **dropped**.
+- **4e — Spelling recall after answer submit — 2 commits.** The answer field is not
+  tap-to-reveal (always in DOM after async fetch), but the **Answer / choice submit**
+  gesture can prime the keyboard when the **next** tracker is spelling
+  (`nextIsSpelling` on `RecallPage` → `Quiz`). First question on session
+  load stays out of scope (no gesture).
+  - **4e-1 — spelling → spelling:** `primeSoftKeyboard()` at top of
+    `SpellingQuestionDisplay.submitAnswer` when `nextIsSpelling`.
+  - **4e-2 — MCQ → spelling:** same in `RecallPromptComponent.submitQuizAnswer`
+    before `await answerQuiz`. Manual device check for both.
 
 - **Out of scope:** Full-page-load autofocus (login/register/profile/circle-join,
   conversation template, access tokens, notebook page name editor) — not
@@ -137,5 +142,3 @@ on mobile. No shared dependency between them, so order is by observed value.
 - Phase 1 doubles as the device de-risk gate: confirm on a real iOS device that
   primer-then-transfer keeps the keyboard open across the deferred `rAF` autofocus
   before committing to Phases 2+ on the same mechanism.
-- Phase 4e (spelling) is conditional on the answer field being revealed by a user
-  tap; resolve during that phase, drop the item if the transition is automatic.

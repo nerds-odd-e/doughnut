@@ -32,6 +32,7 @@
         v-show="!currentAnsweredQuestion && !currentAnsweredSpelling"
         :memory-trackers="memoryTrackers"
         :current-index="getCurrentMemoryTrackerIndex()"
+        :next-is-spelling="nextIsSpelling"
         :eager-fetch-count="eagerFetchCount ?? 5"
         @answered="onAnswered"
         @just-reviewed="onJustReviewed"
@@ -76,10 +77,7 @@ import RecallProgressBar from "@/components/recall/RecallProgressBar.vue"
 import AnsweredQuestionComponent from "@/components/recall/AnsweredQuestionComponent.vue"
 import AnsweredSpellingQuestion from "@/components/recall/AnsweredSpellingQuestion.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
-import type {
-  MemoryTrackerLite,
-  RecallPrompt,
-} from "@generated/doughnut-backend-api"
+import type { RecallPrompt } from "@generated/doughnut-backend-api"
 import {
   RecallsController,
   MemoryTrackerController,
@@ -98,6 +96,7 @@ import {
   watch,
 } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
+import { useRecallTrackerNavigation } from "@/composables/useRecallTrackerNavigation"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 
 const { popups } = usePopups()
@@ -141,32 +140,20 @@ watch(
 // Computed list of memory trackers that should not be modified
 const memoryTrackers = computed(() => toRepeat.value ?? [])
 
-const getCurrentMemoryTracker = (): MemoryTrackerLite | undefined => {
-  if (!toRepeat.value) return undefined
-  if (!treadmillMode.value) {
-    return toRepeat.value[currentIndex.value]
-  }
-  // In treadmill mode, skip spelling trackers
-  for (let i = currentIndex.value; i < toRepeat.value.length; i++) {
-    const t = toRepeat.value[i]!
-    if (!t.spelling) {
-      return t
-    }
-  }
-  return undefined
-}
-
-const getCurrentMemoryTrackerIndex = (): number => {
-  if (!toRepeat.value) return 0
-  if (!treadmillMode.value) return currentIndex.value
-  // In treadmill mode, ensure we're pointing to a non-spelling tracker
-  // If current index points to spelling, find next non-spelling
-  let index = currentIndex.value
-  while (index < toRepeat.value.length && toRepeat.value[index]!.spelling) {
-    index++
-  }
-  return index < toRepeat.value.length ? index : currentIndex.value
-}
+const {
+  nextIsSpelling,
+  toRepeatCount,
+  getCurrentMemoryTracker,
+  getCurrentMemoryTrackerIndex,
+  moveToNextMemoryTracker,
+  moveMemoryTrackerToEnd,
+  handleTreadmillModeChanged,
+} = useRecallTrackerNavigation({
+  toRepeat,
+  currentIndex,
+  treadmillMode,
+  setToRepeat,
+})
 
 const currentAnsweredQuestion = computed(() => {
   if (previousAnsweredQuestionCursor.value === undefined) return undefined
@@ -186,23 +173,6 @@ const currentAnsweredSpelling = computed(() => {
 
 const finished = computed(() => previousAnsweredQuestions.value.length)
 
-const getRemainingNonSpellingCount = (): number => {
-  if (!toRepeat.value) return 0
-  if (!treadmillMode.value) {
-    return toRepeat.value.length - currentIndex.value
-  }
-  // Count non-spelling trackers from current index onwards
-  let count = 0
-  for (let i = currentIndex.value; i < toRepeat.value.length; i++) {
-    if (!toRepeat.value[i]!.spelling) {
-      count++
-    }
-  }
-  return count
-}
-
-const toRepeatCount = computed(() => getRemainingNonSpellingCount())
-
 const viewLastAnsweredQuestion = (cursor: number | undefined) => {
   previousAnsweredQuestionCursor.value = cursor
 }
@@ -213,26 +183,6 @@ watch(
     setIsRecallPaused(cursor !== undefined)
   },
   { immediate: true }
-)
-
-watch(
-  () => treadmillMode.value,
-  () => {
-    if (toRepeat.value) {
-      // Move to first non-spelling tracker if current is spelling and treadmill mode is on
-      if (treadmillMode.value) {
-        const currentTracker = toRepeat.value[currentIndex.value]
-        if (currentTracker !== undefined && currentTracker.spelling) {
-          const firstNonSpelling = toRepeat.value.findIndex(
-            (t, idx) => !t.spelling && idx >= currentIndex.value
-          )
-          if (firstNonSpelling !== -1) {
-            currentIndex.value = firstNonSpelling
-          }
-        }
-      }
-    }
-  }
 )
 
 watch(
@@ -276,23 +226,6 @@ const loadMore = async (dueInDays?: number) => {
   }
 }
 
-const moveToNextMemoryTracker = () => {
-  if (!toRepeat.value) return
-  if (!treadmillMode.value) {
-    currentIndex.value += 1
-    return
-  }
-  // Skip spelling memory trackers in treadmill mode
-  let nextIndex = currentIndex.value + 1
-  while (
-    nextIndex < toRepeat.value.length &&
-    toRepeat.value[nextIndex]!.spelling
-  ) {
-    nextIndex += 1
-  }
-  currentIndex.value = nextIndex
-}
-
 const offerReAssimilation = async (memoryTrackerId: number | undefined) => {
   if (!memoryTrackerId) return
   const confirmed = await popups.confirm(
@@ -328,62 +261,6 @@ const onAnswered = async (answerResult: RecallPrompt) => {
 const onJustReviewed = () => {
   moveToNextMemoryTracker()
   previousAnsweredQuestions.value.push(undefined)
-}
-
-const moveMemoryTrackerToEnd = (index: number) => {
-  const currentToRepeat = toRepeat.value
-  if (!currentToRepeat) return
-
-  const item = currentToRepeat[index]
-  if (item === undefined) return
-  setToRepeat([
-    ...currentToRepeat.slice(0, index),
-    ...currentToRepeat.slice(index + 1),
-    item,
-  ])
-}
-
-const handleTreadmillModeChanged = () => {
-  // Adjust current index based on treadmill mode, but don't reset to 0
-  // This prevents answered questions from being added back to the list
-  if (toRepeat.value) {
-    if (treadmillMode.value) {
-      // In treadmill mode, move to first non-spelling tracker from current position
-      const currentTracker = toRepeat.value[currentIndex.value]
-      if (currentTracker !== undefined && currentTracker.spelling) {
-        const firstNonSpelling = toRepeat.value.findIndex(
-          (t, idx) => !t.spelling && idx >= currentIndex.value
-        )
-        if (firstNonSpelling !== -1) {
-          currentIndex.value = firstNonSpelling
-        }
-      }
-    } else {
-      // When treadmill mode is turned off, move unanswered spelling trackers to the end
-      const unansweredSpellingTrackers: MemoryTrackerLite[] = []
-      const nonSpellingTrackers: MemoryTrackerLite[] = []
-
-      // Separate spelling and non-spelling trackers from currentIndex onwards
-      for (let i = currentIndex.value; i < toRepeat.value.length; i++) {
-        const tracker = toRepeat.value[i]
-        if (!tracker) continue
-        if (tracker.spelling) {
-          unansweredSpellingTrackers.push(tracker)
-        } else {
-          nonSpellingTrackers.push(tracker)
-        }
-      }
-
-      // Rebuild the list: answered trackers (before currentIndex) + non-spelling trackers + spelling trackers
-      if (unansweredSpellingTrackers.length > 0) {
-        setToRepeat([
-          ...toRepeat.value.slice(0, currentIndex.value),
-          ...nonSpellingTrackers,
-          ...unansweredSpellingTrackers,
-        ])
-      }
-    }
-  }
 }
 
 const loadPreviouslyAnsweredRecallPrompts = async () => {
