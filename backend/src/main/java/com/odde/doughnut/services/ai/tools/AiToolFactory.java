@@ -223,7 +223,7 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
       String point, String noteTitle, String noteContent) {
     String instruction =
         """
-        You are helping extract a point from a note to create a new sibling note.
+        You are helping extract a point from a note to create a new note.
 
         Current note title: "%s"
         Current note content:
@@ -234,18 +234,18 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
         Point to extract: "%s"
 
         Tasks:
-        1. Generate a concise, meaningful title for the new sibling note based on this point
+        1. Generate a concise, meaningful title for the new note based on this point
         2. Identify the related content in the current note for this point
-        3. Move that content to the new note's content - keep the original meaning but make it concise and avoid redundancy
+        3. Move that content to the new note's content
         4. Remove the extracted content from the current note
 
         Guidelines:
-        - The new note's content should be based on the extracted content from current note, refined for clarity and conciseness
+        - The new note's content should be based on the extracted content from current note, refined for clarity
         - Do not add new information that was not in the original content
         - Keep all unrelated parts of the current note unchanged
         - Ensure the remaining content in current note still reads naturally
-        - You receive focus-note context plus related notes. When helpful, add a wiki link from the original note to the newly promoted sibling note.
-        - When helpful, add wiki links from the new sibling note back to the original note or to relevant related notes from the provided context.
+        - You receive focus-note context plus related notes. When helpful, add a wiki link from the original note to the newly promoted note.
+        - When helpful, add wiki links from the new note back to the original note or to relevant related notes from the provided context.
         - Wiki links are case-insensitive. Use display text when useful, for example [[Canonical Note Title|visible text]].
         - Do not invent unrelated wiki links.
         """
