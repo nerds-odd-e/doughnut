@@ -8,19 +8,19 @@ import lombok.Data;
 
 @JsonClassDescription(
     """
-    Extract a point from the parent note and generate content for a new child note.
+    Extract a point from the parent note and generate content for a new sibling note.
     The point will be expanded into a complete note with title and content.
-    The parent note's content will be updated with a brief summary replacing the extracted content.
+    The parent note's content will be updated with extracted content removed.
     """)
 @Data
 public class PointExtractionResult {
   @NotNull
-  @JsonPropertyDescription("The title for the new child note")
+  @JsonPropertyDescription("The title for the new sibling note")
   @JsonProperty(required = true)
   public String newNoteTitle;
 
   @NotNull
-  @JsonPropertyDescription("The content for the new child note in markdown format")
+  @JsonPropertyDescription("The content for the new sibling note in markdown format")
   @JsonProperty(required = true)
   public String newNoteContent;
 

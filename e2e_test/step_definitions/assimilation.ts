@@ -112,19 +112,6 @@ When(
   }
 )
 
-When(
-  'I ignore these understanding points and complete assimilation:',
-  (data: DataTable) => {
-    const pointTexts = data
-      .raw()
-      .map((row) => row[0])
-      .filter((s): s is string => s !== undefined)
-    start
-      .assumeAssimilationPage()
-      .ignoreUnderstandingPointsAndComplete(pointTexts)
-  }
-)
-
 Then('remembering spelling should be unavailable', () => {
   start.assumeAssimilationPage().expectRememberingSpellingUnavailable()
 })

@@ -31,12 +31,6 @@ Feature: Understanding Check
     And I delete understanding points 0 and 2
     Then the note content on the current page should be "B. D. E."
 
-  Scenario: Ignored points' questions do not appear on recall page
-    When I am assimilating the note "Sample"
-    And I ignore these understanding points and complete assimilation:
-      | A |
-      | C |
-
   Scenario: Promote a point to sibling note
     Given OpenAI will extract point "B" to sibling note with title "Point B" and content "Extracted" and updated parent content "A. C. D. E."
     When I am assimilating the note "Sample"

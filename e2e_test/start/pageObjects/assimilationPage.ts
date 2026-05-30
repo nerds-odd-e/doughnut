@@ -172,11 +172,6 @@ export const assumeAssimilationPage = () => ({
     understandingChecklist().find('ul li').should('have.length', count)
     return this
   },
-  expectUnderstandingChecklistNotShown() {
-    pageIsNotLoading()
-    cy.contains('Understanding Checklist:').should('not.exist')
-    return this
-  },
   assimilateCurrentNote() {
     pageIsNotLoading()
     this.clickKeepForRecall()
@@ -186,27 +181,11 @@ export const assumeAssimilationPage = () => ({
     understandingChecklist().find('input[type="checkbox"]').eq(index).check()
     return this
   },
-  ignoreUnderstandingPointsAndComplete(pointTexts: string[]) {
-    this.openRefineNoteModal()
-    understandingChecklist().within(() => {
-      pointTexts.forEach((pointText) => {
-        cy.contains('li', pointText).find('input[type="checkbox"]').check()
-      })
-    })
-    this.clickIgnoreQuestionsButton()
-    cy.findByRole('button', { name: 'OK' }).click()
-    this.assimilateCurrentNote()
-    return this
-  },
   deleteUnderstandingPointsAt(indices: number[]) {
     this.openRefineNoteModal()
     indices.forEach((index) => this.checkUnderstandingPoint(index))
     cy.findByRole('button', { name: 'Delete selected points' }).click()
     cy.findByRole('button', { name: 'OK' }).click()
-    return this
-  },
-  clickIgnoreQuestionsButton() {
-    cy.findByRole('button', { name: 'Ignore questions' }).click()
     return this
   },
   /** Requires the refine-note modal to already be open (e.g. after openRefineNoteModal or expectUnderstandingPointsCount). */

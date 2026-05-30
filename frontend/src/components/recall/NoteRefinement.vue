@@ -28,7 +28,7 @@
           <div class="flex gap-1 shrink-0">
             <button
               class="daisy-btn daisy-btn-xs daisy-btn-ghost"
-              @click="promotePointToSiblingNote(point, index)"
+              @click="extractPointToSibling(point, index)"
               title="Promote to sibling note"
             >
               <Folders class="w-4 h-4" />
@@ -47,23 +47,15 @@
         >
           Delete selected points
         </button>
-        <button
-          data-test-id="ignore-understanding-points"
-          :disabled="selectedPointIndices.length === 0"
-          @click="ignoreSelectedPoints"
-          class="daisy-btn daisy-btn-warning daisy-btn-sm !text-white"
-        >
-          Ignore questions
-        </button>
       </div>
     </div>
   </div>
-  <LoadingModal :show="isPromotingPoint" message="AI is creating note..." />
+  <LoadingModal :show="isExtractingToSibling" message="AI is creating note..." />
   <LoadingModal :show="isDeletingPoints" message="AI is removing content..." />
 </template>
 
 <script setup lang="ts">
-import type { Note, NoteRealm } from "@generated/doughnut-backend-api"
+import type { Note } from "@generated/doughnut-backend-api"
 import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
 
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
@@ -79,7 +71,6 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "contentUpdated", newContent: string): void
-  (e: "understandingPointsIgnored"): void
 }>()
 
 const understandingPoints = ref<string[]>([])
@@ -109,7 +100,7 @@ const { popups } = usePopups()
 const storageAccessor = useStorageAccessor()
 
 const selectedPointIndices = ref<number[]>([])
-const isPromotingPoint = ref(false)
+const isExtractingToSibling = ref(false)
 const isDeletingPoints = ref(false)
 
 const deleteSelectedPoints = async () => {
@@ -154,62 +145,31 @@ const deleteSelectedPoints = async () => {
   }
 }
 
-const ignoreSelectedPoints = async () => {
-  if (selectedPointIndices.value.length === 0) {
-    return
-  }
-
-  const confirmed = await popups.confirm(
-    `Ignore ${selectedPointIndices.value.length} selected point(s) so their questions won't appear when recalling?`
-  )
-
-  if (!confirmed) {
-    return
-  }
-
-  selectedPointIndices.value = []
-  emit("understandingPointsIgnored")
-}
-
-const promotePoint = async (index: number, apiCall: () => Promise<unknown>) => {
-  isPromotingPoint.value = true
+const extractPointToSibling = async (point: string, index: number) => {
+  isExtractingToSibling.value = true
   try {
-    const response = (await apiCallWithLoading(
-      apiCall as () => Promise<{
-        data?: NoteRealm
-        error?: unknown
-      }>
-    )) as {
-      data?: NoteRealm
-      error?: unknown
-    }
+    const response = await apiCallWithLoading(() =>
+      AiController.promotePointToSibling({
+        path: { note: props.note.id },
+        body: { points: [point] },
+      })
+    )
 
     if (response.error || !response.data) {
       await popups.alert("Failed to create note with AI")
       return
     }
 
-    const result = response.data
-
     if (storageAccessor.value) {
-      storageAccessor.value.refreshNoteRealm(result)
+      storageAccessor.value.refreshNoteRealm(response.data)
     }
 
     understandingPoints.value.splice(index, 1)
   } catch (err) {
-    console.error("Failed to promote point:", err)
+    console.error("Failed to extract point to sibling:", err)
     await popups.alert(`Error: ${err}`)
   } finally {
-    isPromotingPoint.value = false
+    isExtractingToSibling.value = false
   }
-}
-
-const promotePointToSiblingNote = (point: string, index: number) => {
-  promotePoint(index, () =>
-    AiController.promotePointToSibling({
-      path: { note: props.note.id },
-      body: { points: [point] },
-    })
-  )
 }
 </script>

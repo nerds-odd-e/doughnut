@@ -13,13 +13,13 @@ describe("LoadingModal", () => {
 
   it("should render with spinner and message when show is true", () => {
     const { getByText } = render(LoadingModal, {
-      props: { show: true, message: "AI is creating child note..." },
+      props: { show: true, message: "AI is creating note..." },
     })
 
     // Teleport renders to body, so we need to query document instead of container
     expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
     expect(document.querySelector(".daisy-loading-spinner")).toBeTruthy()
-    expect(getByText("AI is creating child note...")).toBeTruthy()
+    expect(getByText("AI is creating note...")).toBeTruthy()
   })
 
   it("should render with default message when message prop is not provided", () => {

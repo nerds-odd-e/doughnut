@@ -75,7 +75,6 @@
           :key="note.id"
           :note="note"
           @content-updated="emit('refinementContentUpdated')"
-          @understanding-points-ignored="closeRefineNoteModal"
         />
         <div v-if="showRefineNoteModal" class="daisy-modal-action mt-4">
           <button
