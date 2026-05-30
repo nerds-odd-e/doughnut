@@ -59,9 +59,7 @@ public class AiNoteAutomationService {
   }
 
   public PointExtractionResult promotePointToSibling(String point) throws JsonProcessingException {
-    String t = note.getTitle() != null ? note.getTitle() : "";
-    String d = note.getContent() != null ? note.getContent() : "";
-    InstructionAndSchema tool = AiToolFactory.promotePointToSiblingAiTool(point, t, d);
+    InstructionAndSchema tool = AiToolFactory.promotePointToSiblingAiTool(point);
     return executeWithTool(
         tool, PointExtractionResult.class, result -> result, null, PROMOTE_POINT_MAX_OUTPUT_TOKENS);
   }

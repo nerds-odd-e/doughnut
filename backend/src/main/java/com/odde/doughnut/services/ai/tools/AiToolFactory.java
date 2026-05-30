@@ -219,17 +219,10 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
     return QuestionEvaluation.class;
   }
 
-  public static InstructionAndSchema promotePointToSiblingAiTool(
-      String point, String noteTitle, String noteContent) {
+  public static InstructionAndSchema promotePointToSiblingAiTool(String point) {
     String instruction =
         """
         You are helping extract a point from a note to create a new note.
-
-        Current note title: "%s"
-        Current note content:
-        ---
-        %s
-        ---
 
         Point to extract: "%s"
 
@@ -249,7 +242,7 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
         - Wiki links are case-insensitive. Use display text when useful, for example [[Canonical Note Title|visible text]].
         - Do not invent unrelated wiki links.
         """
-            .formatted(noteTitle, noteContent, point);
+            .formatted(point);
 
     return new InstructionAndSchema(instruction, promotePoint());
   }

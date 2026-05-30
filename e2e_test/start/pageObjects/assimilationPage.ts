@@ -14,6 +14,19 @@ const understandingChecklist = () =>
     .contains('Understanding Checklist:')
     .closest('.bg-accent')
 
+const waitForPromotePointToSibling = () => {
+  cy.contains('p.loading-message', 'AI is creating note...', {
+    timeout: 15000,
+  }).should('not.exist')
+}
+
+const closeRefineNoteModal = () => {
+  cy.get('[data-test="refine-note-modal"]')
+    .find('form.daisy-modal-backdrop button')
+    .click({ force: true })
+  pageIsNotLoading()
+}
+
 const mainNoteHeadingTitleSelector =
   '#main-note-content h2.path-name-heading [role=title], #main-note-content [data-test="note-title"]'
 
@@ -195,7 +208,8 @@ export const assumeAssimilationPage = () => ({
         .findByRole('button', { name: 'Sibling' })
         .click()
     })
-    cy.get('[data-test="close-refine-note-modal"]').click()
+    waitForPromotePointToSibling()
+    closeRefineNoteModal()
     return this
   },
   checkRememberSpellingOption() {

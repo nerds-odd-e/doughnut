@@ -27,27 +27,42 @@ function stubOpenAiMcqFromSingleRowTable(questionTable: DataTable) {
     .resetAndStubAskingMCQByResponses(parseSingleRowQuestion(questionTable))
 }
 
-function stubExtractPointResponse(
-  contentPattern: string,
+const PROMOTE_POINT_TO_SIBLING_INSTRUCTION_PATTERN =
+  '.*extract a point from a note to create a new note.*'
+
+const UNDERSTANDING_CHECKLIST_INSTRUCTION_PATTERN =
+  '.*Please generate an understanding checklist.*'
+
+async function stubUnderstandingChecklist(points: string[]) {
+  await mock_services
+    .openAi()
+    .responses()
+    .requestMessageMatches({
+      role: 'developer',
+      content: UNDERSTANDING_CHECKLIST_INSTRUCTION_PATTERN,
+    })
+    .stubOutputText(JSON.stringify({ points }))
+}
+
+async function stubPromotePointToSiblingResponse(
   newNoteTitle: string,
   newNoteContent: string,
   updatedParentContent: string
 ) {
-  const reply = JSON.stringify({
-    newNoteTitle,
-    newNoteContent,
-    updatedParentContent,
-  })
-  cy.then(async () => {
-    await mock_services
-      .openAi()
-      .responses()
-      .requestMessageMatches({
-        role: 'developer',
-        content: contentPattern,
+  await mock_services
+    .openAi()
+    .responses()
+    .requestMessageMatches({
+      role: 'developer',
+      content: PROMOTE_POINT_TO_SIBLING_INSTRUCTION_PATTERN,
+    })
+    .stubOutputText(
+      JSON.stringify({
+        newNoteTitle,
+        newNoteContent,
+        updatedParentContent,
       })
-      .stubOutputText(reply)
-  })
+    )
 }
 
 Given('the OpenAI service is unavailable due to invalid system token', () => {
@@ -195,18 +210,9 @@ Given(
       .raw()
       .flat()
       .filter((point) => point.trim().length > 0)
-    const understandingChecklist = { points }
-    const reply = JSON.stringify(understandingChecklist)
     cy.then(async () => {
       await mock_services.openAi().restartImposter()
-      await mock_services
-        .openAi()
-        .responses()
-        .requestMessageMatches({
-          role: 'developer',
-          content: '.*Please generate an understanding checklist.*',
-        })
-        .stubOutputText(reply)
+      await stubUnderstandingChecklist(points)
     })
   }
 )
@@ -237,11 +243,12 @@ Given(
     newNoteContent: string,
     updatedParentContent: string
   ) => {
-    stubExtractPointResponse(
-      '.*extract.*point.*sibling.*',
-      newNoteTitle,
-      newNoteContent,
-      updatedParentContent
-    )
+    cy.then(async () => {
+      await stubPromotePointToSiblingResponse(
+        newNoteTitle,
+        newNoteContent,
+        updatedParentContent
+      )
+    })
   }
 )
