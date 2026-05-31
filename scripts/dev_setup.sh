@@ -52,11 +52,27 @@ setup_pnpm_and_biome() {
     fi
   fi
 
-  # Restart biome daemon with error handling
-  log "Stopping existing Biome daemon..."
-  pnpm biome stop || true
+  restart_biome_daemon
+}
+
+# Stop and start the Biome CLI daemon. `pnpm biome stop` can hang ~18s with
+# "the request to the remote workspace timed out" when a stale or version-mismatched
+# __run_server is running; target @biomejs servers only (not macOS biomed services).
+stop_biome_daemon() {
+  if pgrep -f '@biomejs.*biome __run_server' >/dev/null 2>&1; then
+    log "Stopping existing Biome daemon..."
+    pkill -f '@biomejs.*biome __run_server' || true
+  fi
+}
+
+start_biome_daemon() {
   log "Starting Biome daemon..."
   pnpm biome start || true
+}
+
+restart_biome_daemon() {
+  stop_biome_daemon
+  start_biome_daemon
 }
 
 # Setup Cypress

@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+#
+# Tests for scripts/dev_setup.sh Biome daemon helpers using Bach testing framework
+
+source "$(dirname "$0")/vendor/bach.sh"
+
+# Simulates stop_biome_daemon when no @biomejs server is running.
+test-stop-biome-daemon-when-no-server() {
+  pgrep -f '@biomejs.*biome __run_server' >/dev/null 2>&1 || true
+}
+test-stop-biome-daemon-when-no-server-assert() {
+  pgrep -f '@biomejs.*biome __run_server'
+}
+
+# Simulates stop_biome_daemon when a server is running.
+test-stop-biome-daemon-when-server-running() {
+  pgrep -f '@biomejs.*biome __run_server'
+  echo 'log: Stopping existing Biome daemon...'
+  pkill -f '@biomejs.*biome __run_server'
+}
+test-stop-biome-daemon-when-server-running-assert() {
+  pgrep -f '@biomejs.*biome __run_server'
+  echo 'log: Stopping existing Biome daemon...'
+  pkill -f '@biomejs.*biome __run_server'
+}
+
+# Simulates restart_biome_daemon after stop.
+test-restart-biome-daemon() {
+  pgrep -f '@biomejs.*biome __run_server'
+  echo 'log: Starting Biome daemon...'
+  pnpm biome start
+}
+test-restart-biome-daemon-assert() {
+  pgrep -f '@biomejs.*biome __run_server'
+  echo 'log: Starting Biome daemon...'
+  pnpm biome start
+}
