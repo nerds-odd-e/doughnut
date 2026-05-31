@@ -47,8 +47,8 @@ beforeEach(() => {
   mockedGoToNextAssimilation.mockResolvedValue(true)
   assimilateSpy = mockSdkService(AssimilationController, "assimilate", [])
   mockSdkService(NoteController, "getNoteInfo", {})
-  mockSdkService(AiController, "generateUnderstandingChecklist", {
-    points: [],
+  mockSdkService(AiController, "generateRefinementSuggestions", {
+    suggestions: [],
   })
 
   vi.mocked(useRecallData).mockReturnValue({

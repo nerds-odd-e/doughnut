@@ -10,17 +10,18 @@ import {
 } from "@tests/helpers"
 import usePopups from "@/components/commons/Popups/usePopups"
 import {
-  extractToSiblingButtonTitle,
+  extractNoteButtonTitle,
   mountNoteRefinement,
   note,
+  refinementSuggestionsApiCall,
   setupNoteRefinementTests,
 } from "./noteRefinementTestSupport"
 
 setupNoteRefinementTests()
 
-describe("NoteRefinement extract to sibling", () => {
-  describe("per-point action", () => {
-    it("displays sibling extract button for each point", async () => {
+describe("NoteRefinement extract note", () => {
+  describe("per-suggestion action", () => {
+    it("displays extract note button for each suggestion", async () => {
       const wrapper = mountNoteRefinement(["Point 1", "Point 2", "Point 3"])
       await flushPromises()
 
@@ -30,16 +31,14 @@ describe("NoteRefinement extract to sibling", () => {
         expect(li.text()).toContain(["Point 1", "Point 2", "Point 3"][index])
         const buttons = li.findAll("button")
         expect(buttons).toHaveLength(1)
-        expect(buttons[0]!.attributes("title")).toBe(
-          extractToSiblingButtonTitle
-        )
+        expect(buttons[0]!.attributes("title")).toBe(extractNoteButtonTitle)
       })
     })
 
-    it("calls promotePointToSibling API when sibling button is clicked", async () => {
-      const promotePointToSiblingSpy = mockSdkService(
+    it("calls extractNote API when extract button is clicked", async () => {
+      const extractNoteSpy = mockSdkService(
         AiController,
-        "promotePointToSibling",
+        "extractNote",
         makeMe.aNoteRealm.please()
       )
       const wrapper = mountNoteRefinement(["Test Point"])
@@ -48,18 +47,13 @@ describe("NoteRefinement extract to sibling", () => {
       await wrapper.find("li button").trigger("click")
       await flushPromises()
 
-      expect(promotePointToSiblingSpy).toHaveBeenCalledWith({
-        path: { note: note.id },
-        body: { points: ["Test Point"] },
-      })
+      expect(extractNoteSpy).toHaveBeenCalledWith(
+        refinementSuggestionsApiCall(note.id, ["Test Point"])
+      )
     })
 
-    it("removes point from checklist after successful extraction", async () => {
-      mockSdkService(
-        AiController,
-        "promotePointToSibling",
-        makeMe.aNoteRealm.please()
-      )
+    it("removes suggestion from list after successful extraction", async () => {
+      mockSdkService(AiController, "extractNote", makeMe.aNoteRealm.please())
       const wrapper = mountNoteRefinement(["Point 1", "Point 2", "Point 3"])
       await flushPromises()
 
@@ -72,12 +66,10 @@ describe("NoteRefinement extract to sibling", () => {
       expect(wrapper.text()).not.toContain("Point 2")
     })
 
-    it("keeps point in checklist when API fails", async () => {
-      mockSdkService(
-        AiController,
-        "promotePointToSibling",
-        undefined
-      ).mockResolvedValue(wrapSdkError("API Error"))
+    it("keeps suggestion in list when API fails", async () => {
+      mockSdkService(AiController, "extractNote", undefined).mockResolvedValue(
+        wrapSdkError("API Error")
+      )
       const wrapper = mountNoteRefinement(["Test Point"])
       await flushPromises()
 
@@ -90,24 +82,24 @@ describe("NoteRefinement extract to sibling", () => {
   })
 
   describe("loading modal", () => {
-    it("shows LoadingModal while extracting to sibling", async () => {
+    it("shows LoadingModal while extracting note", async () => {
       let resolveApi: () => void
       const apiPromise = new Promise<void>((r) => {
         resolveApi = r
       })
       mockSdkServiceWithImplementation(
         AiController,
-        "promotePointToSibling",
+        "extractNote",
         async () => {
           await apiPromise
           return makeMe.aNoteRealm.please()
         }
       )
-      const wrapper = mountNoteRefinement(["Test understanding point"])
+      const wrapper = mountNoteRefinement(["Test refinement suggestion"])
       await flushPromises()
 
       await wrapper
-        .find(`button[title="${extractToSiblingButtonTitle}"]`)
+        .find(`button[title="${extractNoteButtonTitle}"]`)
         .trigger("click")
       await nextTick()
 
@@ -122,7 +114,7 @@ describe("NoteRefinement extract to sibling", () => {
       let resolveApi: () => void
       mockSdkServiceWithImplementation(
         AiController,
-        "promotePointToSibling",
+        "extractNote",
         async () => {
           await new Promise<void>((r) => {
             resolveApi = r
@@ -130,11 +122,11 @@ describe("NoteRefinement extract to sibling", () => {
           return wrapSdkError({})
         }
       )
-      const wrapper = mountNoteRefinement(["Test understanding point"])
+      const wrapper = mountNoteRefinement(["Test refinement suggestion"])
       await flushPromises()
 
       await wrapper
-        .find(`button[title="${extractToSiblingButtonTitle}"]`)
+        .find(`button[title="${extractNoteButtonTitle}"]`)
         .trigger("click")
       await nextTick()
       await flushPromises()

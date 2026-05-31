@@ -8,13 +8,13 @@ import { assumeMemoryTrackerPage } from './memoryTrackerPage'
 export const keepForRecallButton = (options?: { timeout?: number }) =>
   cy.get('[data-test="keep-for-recall"]', options ?? {})
 
-const understandingChecklist = () =>
+const refinementSuggestionsPanel = () =>
   cy
     .get('[data-test="refine-note-modal"]')
-    .contains('Understanding Checklist:')
+    .contains('Refinement suggestions:')
     .closest('.bg-accent')
 
-const waitForPromotePointToSibling = () => {
+const waitForExtractNote = () => {
   cy.contains('p.loading-message', 'AI is creating note...', {
     timeout: 15000,
   }).should('not.exist')
@@ -179,10 +179,10 @@ export const assumeAssimilationPage = () => ({
       this.assimilateOneNote(assimilation)
     })
   },
-  expectUnderstandingPointsCount(count: number) {
+  expectRefinementSuggestionsCount(count: number) {
     this.openRefineNoteModal()
-    understandingChecklist().scrollIntoView().should('be.visible')
-    understandingChecklist().find('ul li').should('have.length', count)
+    refinementSuggestionsPanel().scrollIntoView().should('be.visible')
+    refinementSuggestionsPanel().find('ul li').should('have.length', count)
     return this
   },
   assimilateCurrentNote() {
@@ -190,25 +190,28 @@ export const assumeAssimilationPage = () => ({
     this.clickKeepForRecall()
     return this
   },
-  checkUnderstandingPoint(index: number) {
-    understandingChecklist().find('input[type="checkbox"]').eq(index).check()
+  checkRefinementSuggestion(index: number) {
+    refinementSuggestionsPanel()
+      .find('input[type="checkbox"]')
+      .eq(index)
+      .check()
     return this
   },
-  deleteUnderstandingPointsAt(indices: number[]) {
+  removeRefinementSuggestionsAt(indices: number[]) {
     this.openRefineNoteModal()
-    indices.forEach((index) => this.checkUnderstandingPoint(index))
-    cy.findByRole('button', { name: 'Delete selected points' }).click()
+    indices.forEach((index) => this.checkRefinementSuggestion(index))
+    cy.findByRole('button', { name: 'Remove selected' }).click()
     cy.findByRole('button', { name: 'OK' }).click()
     return this
   },
-  /** Requires the refine-note modal to already be open (e.g. after openRefineNoteModal or expectUnderstandingPointsCount). */
-  promotePointToSiblingNote(pointText: string) {
-    understandingChecklist().within(() => {
-      cy.contains('li', pointText)
-        .findByRole('button', { name: 'Sibling' })
+  /** Requires the refine-note modal to already be open (e.g. after openRefineNoteModal or expectRefinementSuggestionsCount). */
+  extractSuggestionToNewNote(suggestionText: string) {
+    refinementSuggestionsPanel().within(() => {
+      cy.contains('li', suggestionText)
+        .findByRole('button', { name: 'Extract note' })
         .click()
     })
-    waitForPromotePointToSibling()
+    waitForExtractNote()
     closeRefineNoteModal()
     return this
   },

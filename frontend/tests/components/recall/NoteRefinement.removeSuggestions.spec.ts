@@ -13,67 +13,68 @@ import {
 } from "@tests/helpers"
 import usePopups from "@/components/commons/Popups/usePopups"
 import {
-  checklist,
   mountNoteRefinement,
   note,
-  selectFirstCheckpoint,
+  refinementSuggestionsApiCall,
+  refinementSuggestionsPanel,
+  selectFirstSuggestion,
   setupNoteRefinementTests,
 } from "./noteRefinementTestSupport"
 
 setupNoteRefinementTests()
 
-describe("NoteRefinement delete understanding points", () => {
+describe("NoteRefinement remove refinement suggestions", () => {
   describe("selection and confirmation", () => {
-    it("shows checkboxes for each understanding point", async () => {
+    it("shows checkboxes for each refinement suggestion", async () => {
       const wrapper = mountNoteRefinement(["Point 1", "Point 2", "Point 3"])
       await flushPromises()
-      expect(checklist(wrapper).findAll('input[type="checkbox"]')).toHaveLength(
-        3
-      )
+      expect(
+        refinementSuggestionsPanel(wrapper).findAll('input[type="checkbox"]')
+      ).toHaveLength(3)
     })
 
-    it("disables delete button when no points are selected", async () => {
+    it("disables remove button when no suggestions are selected", async () => {
       const wrapper = mountNoteRefinement(["Point 1", "Point 2"])
       await flushPromises()
       expect(
         (
-          wrapper.find('[data-test-id="delete-understanding-points"]')
+          wrapper.find('[data-test-id="remove-refinement-suggestions"]')
             .element as HTMLButtonElement
         ).disabled
       ).toBe(true)
     })
 
-    it("enables delete button when a point is selected", async () => {
+    it("enables remove button when a suggestion is selected", async () => {
       const wrapper = mountNoteRefinement(["Point 1", "Point 2"])
       await flushPromises()
-      await selectFirstCheckpoint(wrapper)
+      await selectFirstSuggestion(wrapper)
       expect(
         (
-          wrapper.find('[data-test-id="delete-understanding-points"]')
+          wrapper.find('[data-test-id="remove-refinement-suggestions"]')
             .element as HTMLButtonElement
         ).disabled
       ).toBe(false)
     })
 
-    it("shows confirmation dialog when delete button is clicked", async () => {
+    it("shows confirmation dialog when remove button is clicked", async () => {
       const wrapper = mountNoteRefinement(["Point 1", "Point 2"])
       await flushPromises()
-      await selectFirstCheckpoint(wrapper)
+      await selectFirstSuggestion(wrapper)
       await wrapper
-        .find('[data-test-id="delete-understanding-points"]')
+        .find('[data-test-id="remove-refinement-suggestions"]')
         .trigger("click")
       await flushPromises()
 
       const popups = usePopups().popups.peek()
       expect(popups).toHaveLength(1)
       expect(popups[0]!.type).toBe("confirm")
-      expect(popups[0]!.message).toContain("delete")
+      expect(popups[0]!.message).toContain("remove")
     })
 
-    it("calls API and emits contentUpdated when deletion is confirmed", async () => {
-      const deletePointsSpy = mockSdkService(
+    it("calls API and emits contentUpdated when removal is confirmed", async () => {
+      const removeSuggestionsSpy = mockSdkService(
         AiController,
-        "removePointFromNote",
+        "removeRefinementSuggestion",
         {
           content: "Updated content",
         }
@@ -85,18 +86,17 @@ describe("NoteRefinement delete understanding points", () => {
       )
       const wrapper = mountNoteRefinement(["Point 1", "Point 2", "Point 3"])
       await flushPromises()
-      await selectFirstCheckpoint(wrapper)
+      await selectFirstSuggestion(wrapper)
       await wrapper
-        .find('[data-test-id="delete-understanding-points"]')
+        .find('[data-test-id="remove-refinement-suggestions"]')
         .trigger("click")
       await flushPromises()
       usePopups().popups.done(true)
       await flushPromises()
 
-      expect(deletePointsSpy).toHaveBeenCalledWith({
-        path: { note: note.id },
-        body: { points: ["Point 1"] },
-      })
+      expect(removeSuggestionsSpy).toHaveBeenCalledWith(
+        refinementSuggestionsApiCall(note.id, ["Point 1"])
+      )
       expect(updateDetailsSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: { content: "Updated content" },
@@ -105,35 +105,35 @@ describe("NoteRefinement delete understanding points", () => {
       expect(wrapper.emitted("contentUpdated")).toEqual([["Updated content"]])
     })
 
-    it("does not call API when deletion is cancelled", async () => {
-      const deletePointsSpy = mockSdkService(
+    it("does not call API when removal is cancelled", async () => {
+      const removeSuggestionsSpy = mockSdkService(
         AiController,
-        "removePointFromNote",
+        "removeRefinementSuggestion",
         {
           content: "Updated content",
         }
       )
       const wrapper = mountNoteRefinement(["Point 1", "Point 2"])
       await flushPromises()
-      await selectFirstCheckpoint(wrapper)
+      await selectFirstSuggestion(wrapper)
       await wrapper
-        .find('[data-test-id="delete-understanding-points"]')
+        .find('[data-test-id="remove-refinement-suggestions"]')
         .trigger("click")
       await flushPromises()
       usePopups().popups.done(false)
       await flushPromises()
 
-      expect(deletePointsSpy).not.toHaveBeenCalled()
+      expect(removeSuggestionsSpy).not.toHaveBeenCalled()
       expect(wrapper.emitted()).not.toHaveProperty("contentUpdated")
     })
   })
 
   describe("loading modal", () => {
-    it("shows LoadingModal while deleting points", async () => {
+    it("shows LoadingModal while removing suggestions", async () => {
       let resolveApi: () => void
       mockSdkServiceWithImplementation(
         AiController,
-        "removePointFromNote",
+        "removeRefinementSuggestion",
         async () => {
           await new Promise<void>((r) => {
             resolveApi = r
@@ -143,9 +143,9 @@ describe("NoteRefinement delete understanding points", () => {
       )
       const wrapper = mountNoteRefinement(["Point 1", "Point 2"])
       await flushPromises()
-      await selectFirstCheckpoint(wrapper)
+      await selectFirstSuggestion(wrapper)
       await wrapper
-        .find('[data-test-id="delete-understanding-points"]')
+        .find('[data-test-id="remove-refinement-suggestions"]')
         .trigger("click")
       await flushPromises()
       usePopups().popups.done(true)
@@ -159,11 +159,11 @@ describe("NoteRefinement delete understanding points", () => {
       expect(document.querySelector(".loading-modal-mask")).toBeNull()
     })
 
-    it("hides LoadingModal when delete API fails", async () => {
+    it("hides LoadingModal when remove API fails", async () => {
       let resolveApi: () => void
       mockSdkServiceWithImplementation(
         AiController,
-        "removePointFromNote",
+        "removeRefinementSuggestion",
         async () => {
           await new Promise<void>((r) => {
             resolveApi = r
@@ -173,9 +173,9 @@ describe("NoteRefinement delete understanding points", () => {
       )
       const wrapper = mountNoteRefinement(["Point 1", "Point 2"])
       await flushPromises()
-      await selectFirstCheckpoint(wrapper)
+      await selectFirstSuggestion(wrapper)
       await wrapper
-        .find('[data-test-id="delete-understanding-points"]')
+        .find('[data-test-id="remove-refinement-suggestions"]')
         .trigger("click")
       await flushPromises()
       usePopups().popups.done(true)

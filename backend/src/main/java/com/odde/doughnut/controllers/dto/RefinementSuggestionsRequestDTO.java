@@ -6,6 +6,6 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class PointsRequestDTO {
-  public List<String> points;
+public class RefinementSuggestionsRequestDTO {
+  public List<String> suggestions;
 }

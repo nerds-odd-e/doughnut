@@ -1530,15 +1530,15 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/SuggestedTitleDTO"
-  /api/ai/remove-point-from-note/{note}:
+  /api/ai/remove-refinement-suggestion/{note}:
     post:
       tags:
       - ai-controller
-      summary: Remove points from note content (response only)
+      summary: Remove refinement suggestions from note content (response only)
       description: Returns AI-regenerated note content in the response. Does not persist
         the note; the client must save the returned text (for example via the note
         update API).
-      operationId: removePointFromNote
+      operationId: removeRefinementSuggestion
       parameters:
       - name: note
         in: path
@@ -1549,7 +1549,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PointsRequestDTO"
+              $ref: "#/components/schemas/RefinementSuggestionsRequestDTO"
         required: true
       responses:
         "200":
@@ -1557,12 +1557,30 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/RemovePointsResponseDTO"
-  /api/ai/promote-point-to-sibling/{note}:
+                $ref: "#/components/schemas/RefinedContentResponseDTO"
+  /api/ai/generate-refinement-suggestions/{note}:
     post:
       tags:
       - ai-controller
-      operationId: promotePointToSibling
+      operationId: generateRefinementSuggestions
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RefinementSuggestionsDTO"
+  /api/ai/extract-note/{note}:
+    post:
+      tags:
+      - ai-controller
+      operationId: extractNote
       parameters:
       - name: note
         in: path
@@ -1573,7 +1591,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PointsRequestDTO"
+              $ref: "#/components/schemas/RefinementSuggestionsRequestDTO"
         required: true
       responses:
         "200":
@@ -1582,24 +1600,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NoteRealm"
-  /api/ai/generate-understanding-checklist/{note}:
-    post:
-      tags:
-      - ai-controller
-      operationId: generateUnderstandingChecklist
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/UnderstandingChecklistDTO"
   /api/admin/data-migration/run-batch:
     post:
       tags:
@@ -4098,22 +4098,22 @@ components:
       properties:
         title:
           type: string
-    PointsRequestDTO:
+    RefinementSuggestionsRequestDTO:
       type: object
       properties:
-        points:
+        suggestions:
           type: array
           items:
             type: string
-    RemovePointsResponseDTO:
+    RefinedContentResponseDTO:
       type: object
       properties:
         content:
           type: string
-    UnderstandingChecklistDTO:
+    RefinementSuggestionsDTO:
       type: object
       properties:
-        points:
+        suggestions:
           type: array
           items:
             type: string

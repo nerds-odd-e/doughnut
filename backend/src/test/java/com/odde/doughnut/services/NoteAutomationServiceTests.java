@@ -6,8 +6,8 @@ import static org.hamcrest.Matchers.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.AiNoteAutomationService;
+import com.odde.doughnut.services.ai.RefinementSuggestions;
 import com.odde.doughnut.services.ai.TitleReplacement;
-import com.odde.doughnut.services.ai.UnderstandingChecklist;
 import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
@@ -78,15 +78,15 @@ class NoteAutomationServiceTests {
   }
 
   @Test
-  void shouldReturnUnderstandingPoints() throws JsonProcessingException {
-    UnderstandingChecklist understandingChecklist = new UnderstandingChecklist();
-    understandingChecklist.setPoints(
+  void shouldReturnRefinementSuggestions() throws JsonProcessingException {
+    RefinementSuggestions refinementSuggestions = new RefinementSuggestions();
+    refinementSuggestions.setSuggestions(
         List.of(
             "English is a language that is spoken in many countries.",
             "It is also the most widely spoken language in the world."));
-    openAiStructuredResponseMock.stubStructuredResponse(understandingChecklist);
+    openAiStructuredResponseMock.stubStructuredResponse(refinementSuggestions);
 
-    List<String> result = service.generateUnderstandingChecklist();
+    List<String> result = service.generateRefinementSuggestions();
 
     assertThat(result, hasSize(2));
     assertThat(
@@ -97,19 +97,10 @@ class NoteAutomationServiceTests {
   }
 
   @Test
-  void shouldHandleNoToolCallWhenGeneratingUnderstandingChecklist() throws JsonProcessingException {
+  void shouldHandleNoToolCallWhenGeneratingRefinementSuggestions() throws JsonProcessingException {
     openAiStructuredResponseMock.stubStructuredResponse(null);
 
-    List<String> result = service.generateUnderstandingChecklist();
-
-    assertThat(result, is(empty()));
-  }
-
-  @Test
-  void shouldReturnEmptyListWhenChecklistIsNull() throws JsonProcessingException {
-    openAiStructuredResponseMock.stubStructuredResponse(null);
-
-    List<String> result = service.generateUnderstandingChecklist();
+    List<String> result = service.generateRefinementSuggestions();
 
     assertThat(result, is(empty()));
   }

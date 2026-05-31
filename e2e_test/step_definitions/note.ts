@@ -704,9 +704,12 @@ Then('the note content should contain a line break', () => {
   start.assumeNotePage().expectNoteContentContainLineBreak()
 })
 
-When('I promote the point {string} to a sibling note', (pointText: string) => {
-  start.assumeAssimilationPage().promotePointToSiblingNote(pointText)
-})
+When(
+  'I extract the suggestion {string} to a new note',
+  (suggestionText: string) => {
+    start.assumeAssimilationPage().extractSuggestionToNewNote(suggestionText)
+  }
+)
 
 Then(
   'the link {string} should link to the note with the same title',

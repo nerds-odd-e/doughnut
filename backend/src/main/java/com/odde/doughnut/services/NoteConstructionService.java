@@ -11,7 +11,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.EntityPersister;
-import com.odde.doughnut.services.ai.PointExtractionResult;
+import com.odde.doughnut.services.ai.NoteExtractionResult;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
@@ -119,8 +119,8 @@ public class NoteConstructionService {
     }
   }
 
-  public NoteRealm createNoteFromPromotedPointToSibling(
-      Note originalNote, PointExtractionResult aiResult) {
+  public NoteRealm createNoteFromExtractedSuggestion(
+      Note originalNote, NoteExtractionResult aiResult) {
     User user = authorizationService.getCurrentUser();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 

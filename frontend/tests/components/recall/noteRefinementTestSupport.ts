@@ -19,7 +19,7 @@ export let renderer: RenderingHelper<typeof NoteRefinement>
 
 export function setupNoteRefinementTests() {
   beforeEach(() => {
-    mockSdkService(AiController, "removePointFromNote", {
+    mockSdkService(AiController, "removeRefinementSuggestion", {
       content: "Updated content",
     })
     mockSdkService(
@@ -28,11 +28,7 @@ export function setupNoteRefinementTests() {
       makeMe.aNoteRealm.please()
     )
     mockSdkService(NoteController, "showNote", makeMe.aNoteRealm.please())
-    mockSdkService(
-      AiController,
-      "promotePointToSibling",
-      makeMe.aNoteRealm.please()
-    )
+    mockSdkService(AiController, "extractNote", makeMe.aNoteRealm.please())
     renderer = helper.component(NoteRefinement)
   })
 
@@ -47,10 +43,10 @@ export function setupNoteRefinementTests() {
 }
 
 export function mountNoteRefinement(
-  points: string[],
+  suggestions: string[],
   overrides?: { note?: typeof note }
 ) {
-  mockSdkService(AiController, "generateUnderstandingChecklist", { points })
+  mockSdkService(AiController, "generateRefinementSuggestions", { suggestions })
   return renderer
     .withCleanStorage()
     .withProps({
@@ -59,20 +55,32 @@ export function mountNoteRefinement(
     .mount()
 }
 
-export function checklist(wrapper: {
+export function refinementSuggestionsPanel(wrapper: {
   find: (s: string) => { findAll: (s: string) => unknown[] }
 }) {
-  return wrapper.find('[data-test-id="understanding-checklist"]')
+  return wrapper.find('[data-test-id="refinement-suggestions"]')
 }
 
-export async function selectFirstCheckpoint(
+export async function selectFirstSuggestion(
   wrapper: ReturnType<typeof mountNoteRefinement>
 ) {
-  const checkboxes = checklist(wrapper).findAll('input[type="checkbox"]') as {
+  const checkboxes = refinementSuggestionsPanel(wrapper).findAll(
+    'input[type="checkbox"]'
+  ) as {
     setValue: (v: boolean) => Promise<void>
   }[]
   await checkboxes[0]?.setValue(true)
   await flushPromises()
 }
 
-export const extractToSiblingButtonTitle = "Promote to sibling note"
+export const extractNoteButtonTitle = "Extract to a new note"
+
+export function refinementSuggestionsApiCall(
+  noteId: number,
+  suggestions: string[]
+) {
+  return {
+    path: { note: noteId },
+    body: { suggestions },
+  }
+}

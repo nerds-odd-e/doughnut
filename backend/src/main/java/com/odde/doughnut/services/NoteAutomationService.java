@@ -2,6 +2,8 @@ package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.services.ai.AiNoteAutomationService;
+import com.odde.doughnut.services.ai.NoteExtractionResult;
+import java.util.List;
 
 public final class NoteAutomationService {
   private final AiNoteAutomationService aiNoteAutomationService;
@@ -14,17 +16,16 @@ public final class NoteAutomationService {
     return aiNoteAutomationService.suggestTitle();
   }
 
-  public java.util.List<String> generateUnderstandingChecklist() throws JsonProcessingException {
-    return aiNoteAutomationService.generateUnderstandingChecklist();
+  public List<String> generateRefinementSuggestions() throws JsonProcessingException {
+    return aiNoteAutomationService.generateRefinementSuggestions();
   }
 
-  public com.odde.doughnut.services.ai.PointExtractionResult promotePointToSibling(String point)
-      throws JsonProcessingException {
-    return aiNoteAutomationService.promotePointToSibling(point);
+  public NoteExtractionResult extractNote(String suggestion) throws JsonProcessingException {
+    return aiNoteAutomationService.extractNote(suggestion);
   }
 
-  public String removePointsAndRegenerateContent(java.util.List<String> pointsToRemove)
+  public String removeSuggestionsAndRegenerateContent(List<String> suggestionsToRemove)
       throws JsonProcessingException {
-    return aiNoteAutomationService.removePointsAndRegenerateContent(pointsToRemove);
+    return aiNoteAutomationService.removeSuggestionsAndRegenerateContent(suggestionsToRemove);
   }
 }

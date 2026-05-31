@@ -5,10 +5,10 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class RemovePointsResponseDTO {
+public class RefinedContentResponseDTO {
   private String content;
 
-  public RemovePointsResponseDTO(String content) {
+  public RefinedContentResponseDTO(String content) {
     this.content = content;
   }
 }

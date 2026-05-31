@@ -149,10 +149,10 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
         suggestNoteTitle());
   }
 
-  public static InstructionAndSchema generateUnderstandingChecklistAiTool() {
+  public static InstructionAndSchema generateRefinementSuggestionsAiTool() {
     return new InstructionAndSchema(
-        "Please generate an understanding checklist of the note content broken down into key points. Each point should be a complete sentence that captures an important aspect of the note. The checklist should help the user check whether they truly understood the important points in the note. There should only be a maximum of 5 points.",
-        generateUnderstandingChecklist());
+        "Please generate refinement suggestions for the note content: decompose the note into key points that could be removed, extracted to a new note, or otherwise refined to make the note more succinct and well-structured. Each suggestion should be a complete sentence. There should be a maximum of 5 suggestions.",
+        refinementSuggestions());
   }
 
   public static InstructionAndSchema bookLayoutReorganizationAiTool() {
@@ -175,23 +175,24 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
     return BookLayoutReorganizationSuggestion.class;
   }
 
-  public static InstructionAndSchema removePointsFromContentAiTool(List<String> pointsToRemove) {
-    String pointsBlock = String.join("\n", pointsToRemove);
+  public static InstructionAndSchema removeSuggestionsFromContentAiTool(
+      List<String> suggestionsToRemove) {
+    String suggestionsBlock = String.join("\n", suggestionsToRemove);
     String message =
         """
-            You need to remove specific points from the note content. Carefully identify and completely remove all content related to each of the following points. After removal, rewrite the remaining content into coherent, well-structured markdown while preserving all other information that is not related to the points to be removed.
+            You need to remove specific refinement suggestions from the note content. Carefully identify and completely remove all content related to each of the following suggestions. After removal, rewrite the remaining content into coherent, well-structured markdown while preserving all other information that is not related to the suggestions to be removed.
 
             Important guidelines:
-            1. Identify content that matches or relates to each point listed below
-            2. Completely remove all sentences, paragraphs, or sections that contain or relate to these points
+            1. Identify content that matches or relates to each suggestion listed below
+            2. Completely remove all sentences, paragraphs, or sections that contain or relate to these suggestions
             3. Ensure the remaining content flows naturally and maintains coherence
-            4. Preserve all other information that is unrelated to the points to be removed
+            4. Preserve all other information that is unrelated to the suggestions to be removed
             5. Output only the new content in markdown format
 
-            Points to remove:
+            Suggestions to remove:
             %s
             """
-            .formatted(pointsBlock);
+            .formatted(suggestionsBlock);
     return new InstructionAndSchema(message, RegeneratedNoteContent.class);
   }
 
@@ -207,8 +208,8 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
     return TitleReplacement.class;
   }
 
-  public static Class<?> generateUnderstandingChecklist() {
-    return UnderstandingChecklist.class;
+  public static Class<?> refinementSuggestions() {
+    return RefinementSuggestions.class;
   }
 
   public static Class<?> completeNoteContent() {
@@ -219,16 +220,16 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
     return QuestionEvaluation.class;
   }
 
-  public static InstructionAndSchema promotePointToSiblingAiTool(String point) {
+  public static InstructionAndSchema extractNoteAiTool(String suggestion) {
     String instruction =
         """
-        You are helping extract a point from a note to create a new note.
+        You are helping extract a refinement suggestion from a note to create a new note.
 
-        Point to extract: "%s"
+        Suggestion to extract: "%s"
 
         Tasks:
-        1. Generate a concise, meaningful title for the new note based on this point
-        2. Identify the related content in the current note for this point
+        1. Generate a concise, meaningful title for the new note based on this suggestion
+        2. Identify the related content in the current note for this suggestion
         3. Move that content to the new note's content
         4. Remove the extracted content from the current note
 
@@ -237,18 +238,18 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
         - Do not add new information that was not in the original content
         - Keep all unrelated parts of the current note unchanged
         - Ensure the remaining content in current note still reads naturally
-        - You receive focus-note context plus related notes. When helpful, add a wiki link from the original note to the newly promoted note.
+        - You receive focus-note context plus related notes. When helpful, add a wiki link from the original note to the new note.
         - When helpful, add wiki links from the new note back to the original note or to relevant related notes from the provided context.
         - Wiki links are case-insensitive. Use display text when useful, for example [[Canonical Note Title|visible text]].
         - Do not invent unrelated wiki links.
         """
-            .formatted(point);
+            .formatted(suggestion);
 
-    return new InstructionAndSchema(instruction, promotePoint());
+    return new InstructionAndSchema(instruction, noteExtractionResult());
   }
 
-  public static Class<?> promotePoint() {
-    return PointExtractionResult.class;
+  public static Class<?> noteExtractionResult() {
+    return NoteExtractionResult.class;
   }
 
   public static String buildRegenerateQuestionMessage(

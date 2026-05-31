@@ -59,17 +59,17 @@ class AiNoteAutomationServiceTest {
   }
 
   @Nested
-  class GenerateUnderstandingChecklist {
+  class GenerateRefinementSuggestions {
     @Test
-    void shouldReturnUnderstandingPoints() throws JsonProcessingException {
-      UnderstandingChecklist understandingChecklist = new UnderstandingChecklist();
-      understandingChecklist.setPoints(
+    void shouldReturnRefinementSuggestions() throws JsonProcessingException {
+      RefinementSuggestions refinementSuggestions = new RefinementSuggestions();
+      refinementSuggestions.setSuggestions(
           List.of(
               "English is a language that is spoken in many countries.",
               "It is also the most widely spoken language in the world."));
-      openAiStructuredResponseMock.stubStructuredResponse(understandingChecklist);
+      openAiStructuredResponseMock.stubStructuredResponse(refinementSuggestions);
 
-      List<String> result = service.generateUnderstandingChecklist();
+      List<String> result = service.generateRefinementSuggestions();
 
       assertThat(result, hasSize(2));
       assertThat(
@@ -83,35 +83,24 @@ class AiNoteAutomationServiceTest {
     void shouldReturnEmptyListWhenNoResponse() throws JsonProcessingException {
       openAiStructuredResponseMock.stubStructuredResponse(null);
 
-      List<String> result = service.generateUnderstandingChecklist();
+      List<String> result = service.generateRefinementSuggestions();
 
       assertThat(result, is(empty()));
     }
 
     @Test
-    void shouldReturnEmptyListWhenChecklistIsEmpty() throws JsonProcessingException {
-      UnderstandingChecklist understandingChecklist = new UnderstandingChecklist();
-      understandingChecklist.setPoints(List.of());
-      openAiStructuredResponseMock.stubStructuredResponse(understandingChecklist);
-
-      List<String> result = service.generateUnderstandingChecklist();
-
-      assertThat(result, is(empty()));
-    }
-
-    @Test
-    void shouldHandleChecklistWithMultiplePoints() throws JsonProcessingException {
-      UnderstandingChecklist understandingChecklist = new UnderstandingChecklist();
-      understandingChecklist.setPoints(
+    void shouldHandleMultipleSuggestions() throws JsonProcessingException {
+      RefinementSuggestions refinementSuggestions = new RefinementSuggestions();
+      refinementSuggestions.setSuggestions(
           List.of(
               "Point 1: First important aspect.",
               "Point 2: Second important aspect.",
               "Point 3: Third important aspect.",
               "Point 4: Fourth important aspect.",
               "Point 5: Fifth important aspect."));
-      openAiStructuredResponseMock.stubStructuredResponse(understandingChecklist);
+      openAiStructuredResponseMock.stubStructuredResponse(refinementSuggestions);
 
-      List<String> result = service.generateUnderstandingChecklist();
+      List<String> result = service.generateRefinementSuggestions();
 
       assertThat(result, hasSize(5));
       assertThat(result, hasItem("Point 1: First important aspect."));
@@ -119,13 +108,13 @@ class AiNoteAutomationServiceTest {
     }
 
     @Test
-    void shouldRespectMaximumOfFivePoints() throws JsonProcessingException {
-      UnderstandingChecklist understandingChecklist = new UnderstandingChecklist();
-      understandingChecklist.setPoints(
+    void shouldReturnAllSuggestionsFromAiResponse() throws JsonProcessingException {
+      RefinementSuggestions refinementSuggestions = new RefinementSuggestions();
+      refinementSuggestions.setSuggestions(
           List.of("Point 1", "Point 2", "Point 3", "Point 4", "Point 5", "Point 6", "Point 7"));
-      openAiStructuredResponseMock.stubStructuredResponse(understandingChecklist);
+      openAiStructuredResponseMock.stubStructuredResponse(refinementSuggestions);
 
-      List<String> result = service.generateUnderstandingChecklist();
+      List<String> result = service.generateRefinementSuggestions();
 
       assertThat(result, hasSize(7));
     }

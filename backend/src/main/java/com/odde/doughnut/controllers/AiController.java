@@ -8,8 +8,8 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
+import com.odde.doughnut.services.ai.NoteExtractionResult;
 import com.odde.doughnut.services.ai.OtherAiServices;
-import com.odde.doughnut.services.ai.PointExtractionResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
@@ -65,36 +65,36 @@ public class AiController {
     return new SuggestedTitleDTO(title);
   }
 
-  @PostMapping("/generate-understanding-checklist/{note}")
+  @PostMapping("/generate-refinement-suggestions/{note}")
   @Transactional
-  public UnderstandingChecklistDTO generateUnderstandingChecklist(
+  public RefinementSuggestionsDTO generateRefinementSuggestions(
       @PathVariable(value = "note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
     authorizationService.assertAuthorization(note);
     String content = note.getContent();
     if (content == null || content.trim().isEmpty()) {
-      return new UnderstandingChecklistDTO(List.of());
+      return new RefinementSuggestionsDTO(List.of());
     }
     try {
-      List<String> points =
+      List<String> suggestions =
           notebookAssistantForNoteServiceFactory
               .createNoteAutomationService(note)
-              .generateUnderstandingChecklist();
-      return new UnderstandingChecklistDTO(points);
+              .generateRefinementSuggestions();
+      return new RefinementSuggestionsDTO(suggestions);
     } catch (OpenAiNotAvailableException e) {
-      return new UnderstandingChecklistDTO(List.of());
+      return new RefinementSuggestionsDTO(List.of());
     }
   }
 
   @Operation(
-      summary = "Remove points from note content (response only)",
+      summary = "Remove refinement suggestions from note content (response only)",
       description =
           "Returns AI-regenerated note content in the response. Does not persist the note; the client must save the returned text (for example via the note update API).")
-  @PostMapping("/remove-point-from-note/{note}")
+  @PostMapping("/remove-refinement-suggestion/{note}")
   @Transactional
-  public RemovePointsResponseDTO removePointFromNote(
+  public RefinedContentResponseDTO removeRefinementSuggestion(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
-      @RequestBody PointsRequestDTO request)
+      @RequestBody RefinementSuggestionsRequestDTO request)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
 
     authorizationService.assertAuthorization(note);
@@ -103,41 +103,42 @@ public class AiController {
     if (content == null || content.trim().isEmpty()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Note content cannot be empty");
     }
-    if (request.getPoints() == null || request.getPoints().isEmpty()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Points to remove cannot be empty");
+    if (request.getSuggestions() == null || request.getSuggestions().isEmpty()) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "Suggestions to remove cannot be empty");
     }
 
     String newContent =
         notebookAssistantForNoteServiceFactory
             .createNoteAutomationService(note)
-            .removePointsAndRegenerateContent(request.getPoints());
+            .removeSuggestionsAndRegenerateContent(request.getSuggestions());
 
-    return new RemovePointsResponseDTO(newContent);
+    return new RefinedContentResponseDTO(newContent);
   }
 
-  @PostMapping("/promote-point-to-sibling/{note}")
+  @PostMapping("/extract-note/{note}")
   @Transactional
-  public NoteRealm promotePointToSibling(
+  public NoteRealm extractNote(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
-      @RequestBody PointsRequestDTO request)
+      @RequestBody RefinementSuggestionsRequestDTO request)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
     authorizationService.assertAuthorization(note);
-    String point = getSinglePoint(request);
+    String suggestion = getSingleSuggestion(request);
     var automation = notebookAssistantForNoteServiceFactory.createNoteAutomationService(note);
-    PointExtractionResult aiResult = automation.promotePointToSibling(point);
+    NoteExtractionResult aiResult = automation.extractNote(suggestion);
     if (aiResult == null) {
       throw new ResponseStatusException(
           HttpStatus.SERVICE_UNAVAILABLE, "AI failed to generate extraction result");
     }
-    return noteConstructionService.createNoteFromPromotedPointToSibling(note, aiResult);
+    return noteConstructionService.createNoteFromExtractedSuggestion(note, aiResult);
   }
 
-  private static String getSinglePoint(PointsRequestDTO request) {
-    List<String> points = request.getPoints();
-    if (points == null || points.size() != 1) {
+  private static String getSingleSuggestion(RefinementSuggestionsRequestDTO request) {
+    List<String> suggestions = request.getSuggestions();
+    if (suggestions == null || suggestions.size() != 1) {
       throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "points must contain exactly one point");
+          HttpStatus.BAD_REQUEST, "suggestions must contain exactly one suggestion");
     }
-    return points.getFirst();
+    return suggestions.getFirst();
   }
 }

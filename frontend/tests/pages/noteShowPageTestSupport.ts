@@ -25,8 +25,8 @@ export function setupNoteShowPageAssimilationPanelMocks() {
     name: "a circle",
   })
   mockSdkService(NoteController, "getNoteInfo", {})
-  mockSdkService(AiController, "generateUnderstandingChecklist", {
-    points: [],
+  mockSdkService(AiController, "generateRefinementSuggestions", {
+    suggestions: [],
   })
   mockSdkService(AssimilationController, "assimilate", [])
   return noteRealm

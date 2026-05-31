@@ -27,24 +27,24 @@ function stubOpenAiMcqFromSingleRowTable(questionTable: DataTable) {
     .resetAndStubAskingMCQByResponses(parseSingleRowQuestion(questionTable))
 }
 
-const PROMOTE_POINT_TO_SIBLING_INSTRUCTION_PATTERN =
-  '.*extract a point from a note to create a new note.*'
+const EXTRACT_NOTE_INSTRUCTION_PATTERN =
+  '.*extract a refinement suggestion from a note to create a new note.*'
 
-const UNDERSTANDING_CHECKLIST_INSTRUCTION_PATTERN =
-  '.*Please generate an understanding checklist.*'
+const REFINEMENT_SUGGESTIONS_INSTRUCTION_PATTERN =
+  '.*Please generate refinement suggestions for the note content.*'
 
-async function stubUnderstandingChecklist(points: string[]) {
+async function stubRefinementSuggestions(suggestions: string[]) {
   await mock_services
     .openAi()
     .responses()
     .requestMessageMatches({
       role: 'developer',
-      content: UNDERSTANDING_CHECKLIST_INSTRUCTION_PATTERN,
+      content: REFINEMENT_SUGGESTIONS_INSTRUCTION_PATTERN,
     })
-    .stubOutputText(JSON.stringify({ points }))
+    .stubOutputText(JSON.stringify({ suggestions }))
 }
 
-async function stubPromotePointToSiblingResponse(
+async function stubExtractNoteResponse(
   newNoteTitle: string,
   newNoteContent: string,
   updatedParentContent: string
@@ -54,7 +54,7 @@ async function stubPromotePointToSiblingResponse(
     .responses()
     .requestMessageMatches({
       role: 'developer',
-      content: PROMOTE_POINT_TO_SIBLING_INSTRUCTION_PATTERN,
+      content: EXTRACT_NOTE_INSTRUCTION_PATTERN,
     })
     .stubOutputText(
       JSON.stringify({
@@ -203,22 +203,19 @@ When('I reject the suggested completion', () => {
   start.assumeConversationAboutNotePage().cancelCompletion()
 })
 
-Given(
-  'OpenAI generates understanding checklist with points:',
-  (data: DataTable) => {
-    const points = data
-      .raw()
-      .flat()
-      .filter((point) => point.trim().length > 0)
-    cy.then(async () => {
-      await mock_services.openAi().restartImposter()
-      await stubUnderstandingChecklist(points)
-    })
-  }
-)
+Given('OpenAI generates refinement suggestions:', (data: DataTable) => {
+  const suggestions = data
+    .raw()
+    .flat()
+    .filter((suggestion) => suggestion.trim().length > 0)
+  cy.then(async () => {
+    await mock_services.openAi().restartImposter()
+    await stubRefinementSuggestions(suggestions)
+  })
+})
 
 Given(
-  'OpenAI returns the following content when requested to delete points:',
+  'OpenAI returns the following content when requested to remove suggestions:',
   (data: DataTable) => {
     const content = data.raw().flat()[0]
     const reply = JSON.stringify({ content })
@@ -228,7 +225,7 @@ Given(
         .responses()
         .requestMessageMatches({
           role: 'developer',
-          content: '.*remove.*points.*',
+          content: '.*remove.*refinement suggestions.*',
         })
         .stubOutputText(reply)
     })
@@ -236,15 +233,15 @@ Given(
 )
 
 Given(
-  'OpenAI will extract point {string} to sibling note with title {string} and content {string} and updated parent content {string}',
+  'OpenAI will extract suggestion {string} to a new note with title {string} and content {string} and updated parent content {string}',
   (
-    _point: string,
+    _suggestion: string,
     newNoteTitle: string,
     newNoteContent: string,
     updatedParentContent: string
   ) => {
     cy.then(async () => {
-      await stubPromotePointToSiblingResponse(
+      await stubExtractNoteResponse(
         newNoteTitle,
         newNoteContent,
         updatedParentContent

@@ -99,16 +99,18 @@ Then(
 )
 
 Then(
-  'I should see an understanding checklist with {int} points',
+  'I should see refinement suggestions with {int} items',
   (count: number) => {
-    start.assumeAssimilationPage().expectUnderstandingPointsCount(count)
+    start.assumeAssimilationPage().expectRefinementSuggestionsCount(count)
   }
 )
 
 When(
-  'I delete understanding points {int} and {int}',
+  'I remove refinement suggestions {int} and {int}',
   (index1: number, index2: number) => {
-    start.assumeAssimilationPage().deleteUnderstandingPointsAt([index1, index2])
+    start
+      .assumeAssimilationPage()
+      .removeRefinementSuggestionsAt([index1, index2])
   }
 )
 

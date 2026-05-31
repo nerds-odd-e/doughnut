@@ -595,16 +595,16 @@ export type SuggestedTitleDto = {
     title?: string;
 };
 
-export type PointsRequestDto = {
-    points?: Array<string>;
+export type RefinementSuggestionsRequestDto = {
+    suggestions?: Array<string>;
 };
 
-export type RemovePointsResponseDto = {
+export type RefinedContentResponseDto = {
     content?: string;
 };
 
-export type UnderstandingChecklistDto = {
-    points?: Array<string>;
+export type RefinementSuggestionsDto = {
+    suggestions?: Array<string>;
 };
 
 export type AdminDataMigrationStatusDto = {
@@ -2299,59 +2299,59 @@ export type SuggestTitleResponses = {
 
 export type SuggestTitleResponse = SuggestTitleResponses[keyof SuggestTitleResponses];
 
-export type RemovePointFromNoteData = {
-    body: PointsRequestDto;
+export type RemoveRefinementSuggestionData = {
+    body: RefinementSuggestionsRequestDto;
     path: {
         note: number;
     };
     query?: never;
-    url: '/api/ai/remove-point-from-note/{note}';
+    url: '/api/ai/remove-refinement-suggestion/{note}';
 };
 
-export type RemovePointFromNoteResponses = {
+export type RemoveRefinementSuggestionResponses = {
     /**
      * OK
      */
-    200: RemovePointsResponseDto;
+    200: RefinedContentResponseDto;
 };
 
-export type RemovePointFromNoteResponse = RemovePointFromNoteResponses[keyof RemovePointFromNoteResponses];
+export type RemoveRefinementSuggestionResponse = RemoveRefinementSuggestionResponses[keyof RemoveRefinementSuggestionResponses];
 
-export type PromotePointToSiblingData = {
-    body: PointsRequestDto;
+export type GenerateRefinementSuggestionsData = {
+    body?: never;
     path: {
         note: number;
     };
     query?: never;
-    url: '/api/ai/promote-point-to-sibling/{note}';
+    url: '/api/ai/generate-refinement-suggestions/{note}';
 };
 
-export type PromotePointToSiblingResponses = {
+export type GenerateRefinementSuggestionsResponses = {
+    /**
+     * OK
+     */
+    200: RefinementSuggestionsDto;
+};
+
+export type GenerateRefinementSuggestionsResponse = GenerateRefinementSuggestionsResponses[keyof GenerateRefinementSuggestionsResponses];
+
+export type ExtractNoteData = {
+    body: RefinementSuggestionsRequestDto;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/ai/extract-note/{note}';
+};
+
+export type ExtractNoteResponses = {
     /**
      * OK
      */
     200: NoteRealm;
 };
 
-export type PromotePointToSiblingResponse = PromotePointToSiblingResponses[keyof PromotePointToSiblingResponses];
-
-export type GenerateUnderstandingChecklistData = {
-    body?: never;
-    path: {
-        note: number;
-    };
-    query?: never;
-    url: '/api/ai/generate-understanding-checklist/{note}';
-};
-
-export type GenerateUnderstandingChecklistResponses = {
-    /**
-     * OK
-     */
-    200: UnderstandingChecklistDto;
-};
-
-export type GenerateUnderstandingChecklistResponse = GenerateUnderstandingChecklistResponses[keyof GenerateUnderstandingChecklistResponses];
+export type ExtractNoteResponse = ExtractNoteResponses[keyof ExtractNoteResponses];
 
 export type RunDataMigrationBatchData = {
     body?: never;

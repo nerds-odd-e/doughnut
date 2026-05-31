@@ -1,16 +1,16 @@
 <template>
   <div
-    v-if="understandingPoints.length > 0"
+    v-if="refinementSuggestions.length > 0"
     class="mb-4 rounded-lg bg-accent p-4"
-    data-test-id="understanding-checklist"
+    data-test-id="refinement-suggestions"
   >
     <div class="text-base">
       <div class="font-semibold mb-3 text-accent-content">
-        Understanding Checklist:
+        Refinement suggestions:
       </div>
       <ul class="space-y-2">
         <li
-          v-for="(point, index) in understandingPoints"
+          v-for="(suggestion, index) in refinementSuggestions"
           :key="index"
           class="text-accent-content flex items-start gap-2"
         >
@@ -20,19 +20,19 @@
             <input
               type="checkbox"
               :value="index"
-              v-model="selectedPointIndices"
+              v-model="selectedSuggestionIndices"
               class="daisy-checkbox daisy-checkbox-accent daisy-checkbox-sm mt-1 border-black dark:border-white hover:border-black hover:dark:border-white checked:border-black checked:dark:border-white border-2 shrink-0"
             />
-            <span class="break-words">{{ point }}</span>
+            <span class="break-words">{{ suggestion }}</span>
           </label>
           <div class="flex gap-1 shrink-0">
             <button
               class="daisy-btn daisy-btn-xs daisy-btn-ghost"
-              @click="extractPointToSibling(point, index)"
-              title="Promote to sibling note"
+              @click="extractNote(suggestion, index)"
+              title="Extract to a new note"
             >
               <Folders class="w-4 h-4" />
-              Sibling
+              Extract note
             </button>
           </div>
         </li>
@@ -40,18 +40,18 @@
 
       <div class="flex gap-2 mt-4">
         <button
-          data-test-id="delete-understanding-points"
-          :disabled="selectedPointIndices.length === 0"
-          @click="deleteSelectedPoints"
+          data-test-id="remove-refinement-suggestions"
+          :disabled="selectedSuggestionIndices.length === 0"
+          @click="removeSelectedSuggestions"
           class="daisy-btn daisy-btn-error daisy-btn-sm !text-white"
         >
-          Delete selected points
+          Remove selected
         </button>
       </div>
     </div>
   </div>
-  <LoadingModal :show="isExtractingToSibling" message="AI is creating note..." />
-  <LoadingModal :show="isDeletingPoints" message="AI is removing content..." />
+  <LoadingModal :show="isExtractingNote" message="AI is creating note..." />
+  <LoadingModal :show="isRemovingSuggestions" message="AI is removing content..." />
 </template>
 
 <script setup lang="ts">
@@ -73,59 +73,56 @@ const emit = defineEmits<{
   (e: "contentUpdated", newContent: string): void
 }>()
 
-const understandingPoints = ref<string[]>([])
+const refinementSuggestions = ref<string[]>([])
 
-const generateUnderstandingChecklist = async () => {
+const loadRefinementSuggestions = async () => {
   try {
     const result = await apiCallWithLoading(() =>
-      AiController.generateUnderstandingChecklist({
+      AiController.generateRefinementSuggestions({
         path: { note: props.note.id },
       })
     )
 
-    if (!result.error && result.data) {
-      understandingPoints.value = result.data.points || []
-    } else {
-      understandingPoints.value = []
-    }
+    refinementSuggestions.value =
+      !result.error && result.data?.suggestions ? result.data.suggestions : []
   } catch (err) {
-    console.error("Failed to generate understanding checklist:", err)
-    understandingPoints.value = []
+    console.error("Failed to generate refinement suggestions:", err)
+    refinementSuggestions.value = []
   }
 }
 
-onMounted(() => generateUnderstandingChecklist())
+onMounted(() => loadRefinementSuggestions())
 
 const { popups } = usePopups()
 const storageAccessor = useStorageAccessor()
 
-const selectedPointIndices = ref<number[]>([])
-const isExtractingToSibling = ref(false)
-const isDeletingPoints = ref(false)
+const selectedSuggestionIndices = ref<number[]>([])
+const isExtractingNote = ref(false)
+const isRemovingSuggestions = ref(false)
 
-const deleteSelectedPoints = async () => {
-  if (selectedPointIndices.value.length === 0) {
+const removeSelectedSuggestions = async () => {
+  if (selectedSuggestionIndices.value.length === 0) {
     return
   }
 
   const confirmed = await popups.confirm(
-    `Are you sure you want to delete ${selectedPointIndices.value.length} selected point(s)? The AI will remove related content from the note.`
+    `Are you sure you want to remove ${selectedSuggestionIndices.value.length} selected suggestion(s)? The AI will remove related content from the note.`
   )
 
   if (!confirmed) {
     return
   }
 
-  const selectedPoints = selectedPointIndices.value.map(
-    (index) => understandingPoints.value[index]!
+  const selectedSuggestions = selectedSuggestionIndices.value.map(
+    (index) => refinementSuggestions.value[index]!
   )
 
-  isDeletingPoints.value = true
+  isRemovingSuggestions.value = true
   try {
     const { data, error } = await apiCallWithLoading(() =>
-      AiController.removePointFromNote({
+      AiController.removeRefinementSuggestion({
         path: { note: props.note.id },
-        body: { points: selectedPoints },
+        body: { suggestions: selectedSuggestions },
       })
     )
 
@@ -141,17 +138,17 @@ const deleteSelectedPoints = async () => {
       emit("contentUpdated", data.content)
     }
   } finally {
-    isDeletingPoints.value = false
+    isRemovingSuggestions.value = false
   }
 }
 
-const extractPointToSibling = async (point: string, index: number) => {
-  isExtractingToSibling.value = true
+const extractNote = async (suggestion: string, index: number) => {
+  isExtractingNote.value = true
   try {
     const response = await apiCallWithLoading(() =>
-      AiController.promotePointToSibling({
+      AiController.extractNote({
         path: { note: props.note.id },
-        body: { points: [point] },
+        body: { suggestions: [suggestion] },
       })
     )
 
@@ -164,12 +161,12 @@ const extractPointToSibling = async (point: string, index: number) => {
       storageAccessor.value.refreshNoteRealm(response.data)
     }
 
-    understandingPoints.value.splice(index, 1)
+    refinementSuggestions.value.splice(index, 1)
   } catch (err) {
-    console.error("Failed to extract point to sibling:", err)
+    console.error("Failed to extract note:", err)
     await popups.alert(`Error: ${err}`)
   } finally {
-    isExtractingToSibling.value = false
+    isExtractingNote.value = false
   }
 }
 </script>

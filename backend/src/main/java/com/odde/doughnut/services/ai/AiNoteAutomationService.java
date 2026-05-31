@@ -18,9 +18,9 @@ import java.util.function.Function;
 public class AiNoteAutomationService {
   private static final String STRUCTURED_RESPONSE_INPUT =
       "Follow the instructions and return the requested structured response.";
-  private static final long UNDERSTANDING_CHECKLIST_MAX_OUTPUT_TOKENS = 1000L;
-  private static final long REMOVE_POINTS_MAX_OUTPUT_TOKENS = 2000L;
-  private static final long PROMOTE_POINT_MAX_OUTPUT_TOKENS = 3000L;
+  private static final long REFINEMENT_SUGGESTIONS_MAX_OUTPUT_TOKENS = 1000L;
+  private static final long REMOVE_SUGGESTIONS_MAX_OUTPUT_TOKENS = 2000L;
+  private static final long EXTRACT_NOTE_MAX_OUTPUT_TOKENS = 3000L;
 
   private final OpenAiApiHandler openAiApiHandler;
   private final GlobalSettingsService globalSettingsService;
@@ -49,19 +49,19 @@ public class AiNoteAutomationService {
         null);
   }
 
-  public List<String> generateUnderstandingChecklist() throws JsonProcessingException {
+  public List<String> generateRefinementSuggestions() throws JsonProcessingException {
     return executeWithTool(
-        AiToolFactory.generateUnderstandingChecklistAiTool(),
-        UnderstandingChecklist.class,
-        UnderstandingChecklist::getPoints,
+        AiToolFactory.generateRefinementSuggestionsAiTool(),
+        RefinementSuggestions.class,
+        RefinementSuggestions::getSuggestions,
         List.of(),
-        UNDERSTANDING_CHECKLIST_MAX_OUTPUT_TOKENS);
+        REFINEMENT_SUGGESTIONS_MAX_OUTPUT_TOKENS);
   }
 
-  public PointExtractionResult promotePointToSibling(String point) throws JsonProcessingException {
-    InstructionAndSchema tool = AiToolFactory.promotePointToSiblingAiTool(point);
+  public NoteExtractionResult extractNote(String suggestion) throws JsonProcessingException {
+    InstructionAndSchema tool = AiToolFactory.extractNoteAiTool(suggestion);
     return executeWithTool(
-        tool, PointExtractionResult.class, result -> result, null, PROMOTE_POINT_MAX_OUTPUT_TOKENS);
+        tool, NoteExtractionResult.class, result -> result, null, EXTRACT_NOTE_MAX_OUTPUT_TOKENS);
   }
 
   private <T, R> R executeWithTool(
@@ -113,16 +113,16 @@ public class AiNoteAutomationService {
     return builder.build();
   }
 
-  public String removePointsAndRegenerateContent(List<String> pointsToRemove)
+  public String removeSuggestionsAndRegenerateContent(List<String> suggestionsToRemove)
       throws JsonProcessingException {
-    if (pointsToRemove == null || pointsToRemove.isEmpty()) {
+    if (suggestionsToRemove == null || suggestionsToRemove.isEmpty()) {
       return note.getContent();
     }
     return executeWithTool(
-        AiToolFactory.removePointsFromContentAiTool(pointsToRemove),
+        AiToolFactory.removeSuggestionsFromContentAiTool(suggestionsToRemove),
         RegeneratedNoteContent.class,
         r -> r.content,
         note.getContent(),
-        REMOVE_POINTS_MAX_OUTPUT_TOKENS);
+        REMOVE_SUGGESTIONS_MAX_OUTPUT_TOKENS);
   }
 }
