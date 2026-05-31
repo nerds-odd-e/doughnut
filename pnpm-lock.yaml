@@ -156,7 +156,7 @@ importers:
     dependencies:
       '@inkjs/ui':
         specifier: 2.0.0
-        version: 2.0.0(ink@7.0.4(@types/react@19.2.15)(react@19.2.6))
+        version: 2.0.0(ink@7.0.5(@types/react@19.2.15)(react@19.2.6))
       chalk:
         specifier: ^5.6.2
         version: 5.6.2
@@ -198,8 +198,8 @@ importers:
         specifier: 0.28.0
         version: 0.28.0
       ink:
-        specifier: ^7.0.4
-        version: 7.0.4(@types/react@19.2.15)(react@19.2.6)
+        specifier: ^7.0.5
+        version: 7.0.5(@types/react@19.2.15)(react@19.2.6)
       ink-testing-library:
         specifier: ^4.0.0
         version: 4.0.0(@types/react@19.2.15)
@@ -4268,8 +4268,8 @@ packages:
       '@types/react':
         optional: true
 
-  ink@7.0.4:
-    resolution: {integrity: sha512-4wsM/gMKOT2ZANNTJibI6I9IcwBfobqv/CgaDcwvOaCREZIQxo3iGQS7qPHa2hmA67NYltZWCMtBDELB/mcbJQ==}
+  ink@7.0.5:
+    resolution: {integrity: sha512-zWNjGHQPxSeiSAmDUOq+QPQ6CfmMhmNi85vrJIuy4prafKKUSoZlXEy4wbM7LuLuF1pDURk7qvF4fxrQlLxv3w==}
     engines: {node: '>=22'}
     peerDependencies:
       '@types/react': '>=19.2.0'
@@ -8028,13 +8028,13 @@ snapshots:
 
   '@humanwhocodes/momoa@2.0.4': {}
 
-  '@inkjs/ui@2.0.0(ink@7.0.4(@types/react@19.2.15)(react@19.2.6))':
+  '@inkjs/ui@2.0.0(ink@7.0.5(@types/react@19.2.15)(react@19.2.6))':
     dependencies:
       chalk: 5.6.2
       cli-spinners: 3.4.0
       deepmerge: 4.3.1
       figures: 6.1.0
-      ink: 7.0.4(@types/react@19.2.15)(react@19.2.6)
+      ink: 7.0.5(@types/react@19.2.15)(react@19.2.6)
 
   '@inquirer/ansi@2.0.6': {}
 
@@ -11231,7 +11231,7 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.15
 
-  ink@7.0.4(@types/react@19.2.15)(react@19.2.6):
+  ink@7.0.5(@types/react@19.2.15)(react@19.2.6):
     dependencies:
       '@alcalzone/ansi-tokenize': 0.3.0
       ansi-escapes: 7.3.0
