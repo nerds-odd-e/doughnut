@@ -1,9 +1,12 @@
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import SidebarToolbar from "@/components/notes/SidebarToolbar.vue"
 import type { NoteRealm } from "@generated/doughnut-backend-api"
 import helper from "@tests/helpers"
+import { notebookSidebarClosedPlugin } from "@tests/helpers/notebookSidebarTestProvide"
 import { flushPromises } from "@vue/test-utils"
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest"
 import { sidebarDefaultTreeFixtures } from "./sidebarDefaultTree"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import {
   mountSidebar,
   mountSidebarSignedIn,
@@ -44,6 +47,25 @@ describe("Sidebar toolbar", () => {
     wrapper = mountSidebar(helper, fixtures.firstGeneration)
     await flushPromises()
     expect(wrapper.find('button[title="New folder"]').exists()).toBe(false)
+  })
+
+  it("hides New note in sidebar toolbar when sidebar is collapsed", async () => {
+    wrapper = helper
+      .component(SidebarToolbar)
+      .withCurrentUser(makeMe.aUser.please())
+      .withPlugin(notebookSidebarClosedPlugin())
+      .withProps({
+        notebookId: fixtures.topNoteRealm.notebookRealm.notebook.id,
+        activeNoteRealm: fixtures.topNoteRealm,
+        breadcrumbFolders: [],
+      })
+      .mount()
+    await flushPromises()
+    expect(
+      wrapper
+        .find('[data-note-sidebar-toolbar] button[title="New note"]')
+        .exists()
+    ).toBe(false)
   })
 
   it("hides New folder when note realm is from bazaar", async () => {

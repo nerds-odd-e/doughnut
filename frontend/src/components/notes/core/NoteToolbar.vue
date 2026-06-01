@@ -1,6 +1,12 @@
 <template>
   <nav :class="[noteChromeToolbarNavClass, 'relative z-20']">
     <div class="daisy-btn-group daisy-btn-group-sm">
+      <NoteCreationNewButton
+        v-if="showRelocatedNewNote"
+        :notebook-id="notebookId"
+        :active-note-realm="activeNoteRealm"
+        :breadcrumb-folders="breadcrumbFolders"
+      />
       <PopButton
         v-if="!readonly"
         ref="linkPopButtonRef"
@@ -77,8 +83,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, onUnmounted } from "vue"
-import type { Note } from "@generated/doughnut-backend-api"
+import { computed, ref, watch, onMounted, onUnmounted } from "vue"
+import type { Folder, Note, NoteRealm } from "@generated/doughnut-backend-api"
 import SvgSearchForLink from "../../svgs/SvgSearchForLink.vue"
 import SearchForm from "../../links/SearchForm.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
@@ -95,13 +101,27 @@ import NoteMoreOptionsForm from "../widgets/NoteMoreOptionsForm.vue"
 import { noteChromeToolbarNavClass } from "../noteChromeToolbarNavClass"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
+import NoteCreationNewButton from "../NoteCreationNewButton.vue"
+import { useNotebookSidebarOpened } from "@/composables/notebookSidebarOpened"
 
-const { note, readonly } = defineProps<{
-  note: Note
-  asMarkdown?: boolean
-  conversationButton?: boolean
-  readonly?: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    note: Note
+    notebookId: number
+    activeNoteRealm?: NoteRealm
+    breadcrumbFolders?: Folder[]
+    asMarkdown?: boolean
+    conversationButton?: boolean
+    readonly?: boolean
+  }>(),
+  { breadcrumbFolders: () => [] }
+)
+
+const sidebarOpened = useNotebookSidebarOpened()
+
+const showRelocatedNewNote = computed(
+  () => !sidebarOpened.value && props.readonly !== true
+)
 
 const audioTools = ref(false)
 const linkPopButtonRef = ref<InstanceType<typeof PopButton> | null>(null)
@@ -123,7 +143,7 @@ function isLinkToolbarShortcut(e: KeyboardEvent): boolean {
 }
 
 function onWindowKeydownCapture(e: KeyboardEvent) {
-  if (readonly || !isLinkToolbarShortcut(e)) return
+  if (props.readonly || !isLinkToolbarShortcut(e)) return
   e.preventDefault()
   linkPopButtonRef.value?.openDialog()
 }
@@ -137,7 +157,7 @@ onUnmounted(() => {
 })
 
 watch(
-  () => note.id,
+  () => props.note.id,
   () => {
     moreOptionsDropdownRef.value?.closeDropdown()
   }

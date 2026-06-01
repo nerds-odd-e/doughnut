@@ -17,6 +17,12 @@
               v-if="currentUser"
               v-bind="{
                 note: noteRealm.note,
+                notebookId: noteRealm.notebookRealm.notebook.id,
+                activeNoteRealm: noteRealm,
+                breadcrumbFolders:
+                  ancestorFolders.length > 0
+                    ? ancestorFolders
+                    : (noteRealm.ancestorFolders ?? []),
                 asMarkdown,
                 conversationButton: noConversationButton,
                 readonly: readonly(noteRealm),

@@ -31,6 +31,32 @@ describe("NotebookPage.spec", () => {
     await flushPromises()
   }
 
+  it("shows New note in main column when sidebar is hidden", async () => {
+    const notebook = makeMe.aNotebook.please()
+    mockSdkService(NotebookController, "get", {
+      notebook,
+      hasAttachedBook: false,
+      readonly: false,
+    })
+    const { unmount } = helper
+      .component(NotebookPageWithNotebookSidebarLayout)
+      .withCleanStorage()
+      .withRouter(router)
+      .withCurrentUser(makeMe.aUser.please())
+      .render()
+    await navigateToNotebookPage(notebook.id)
+
+    const hideSidebar = screen.queryByTitle("Hide sidebar")
+    if (hideSidebar != null) {
+      expect(screen.queryByTestId("note-main-creation-toolbar")).toBeNull()
+      await userEvent.click(hideSidebar)
+    }
+
+    expect(screen.getByTestId("note-main-creation-toolbar")).toBeInTheDocument()
+    expect(screen.getByTestId("note-creation-new-button")).toBeInTheDocument()
+    unmount()
+  })
+
   it("shows index editor when notebook has no indexContent", async () => {
     const notebook = makeMe.aNotebook.please()
     mockSdkService(NotebookController, "get", {

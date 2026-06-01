@@ -2,16 +2,30 @@ import {
   NoteController,
   SearchController,
 } from "@generated/doughnut-backend-api/sdk.gen"
+import type { NoteRealm } from "@generated/doughnut-backend-api"
 import NoteToolbar from "@/components/notes/core/NoteToolbar.vue"
 import NoteMoreOptionsForm from "@/components/notes/widgets/NoteMoreOptionsForm.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import { mockSdkService } from "@tests/helpers"
+import { notebookSidebarClosedPlugin } from "@tests/helpers/notebookSidebarTestProvide"
 import { screen } from "@testing-library/vue"
 import { describe, it, expect, afterEach, vi } from "vitest"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
+
+function noteToolbarProps(
+  noteRealm: NoteRealm,
+  overrides: Record<string, unknown> = {}
+) {
+  return {
+    note: noteRealm.note,
+    notebookId: noteRealm.notebookRealm.notebook.id,
+    activeNoteRealm: noteRealm,
+    ...overrides,
+  }
+}
 
 describe("NoteToolbar", () => {
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
@@ -45,9 +59,7 @@ describe("NoteToolbar", () => {
       .component(NoteToolbar)
       .withRouter(router)
       .withCleanStorage()
-      .withProps({
-        note: noteRealm.note,
-      })
+      .withProps(noteToolbarProps(noteRealm))
       .mount({ attachTo: document.body })
 
     await flushPromises()
@@ -84,9 +96,7 @@ describe("NoteToolbar", () => {
       .component(NoteToolbar)
       .withRouter()
       .withCleanStorage()
-      .withProps({
-        note: noteRealm.note,
-      })
+      .withProps(noteToolbarProps(noteRealm))
       .mount({ attachTo: document.body })
 
     await flushPromises()
@@ -128,9 +138,7 @@ describe("NoteToolbar", () => {
       .component(NoteToolbar)
       .withRouter()
       .withCleanStorage()
-      .withProps({
-        note: noteRealm.note,
-      })
+      .withProps(noteToolbarProps(noteRealm))
       .mount({ attachTo: document.body })
 
     await flushPromises()
@@ -147,9 +155,7 @@ describe("NoteToolbar", () => {
 
     // Change the note id
     const newNote = makeMe.aNoteRealm.title("New Note").please()
-    await wrapper.setProps({
-      note: newNote.note,
-    })
+    await wrapper.setProps(noteToolbarProps(newNote))
     await flushPromises()
 
     // Verify dialog is closed (still mounted; details hides dropdown content)
@@ -179,9 +185,7 @@ describe("NoteToolbar", () => {
       .component(NoteToolbar)
       .withRouter()
       .withCleanStorage()
-      .withProps({
-        note: noteRealm.note,
-      })
+      .withProps(noteToolbarProps(noteRealm))
       .mount({ attachTo: document.body })
 
     await flushPromises()
@@ -220,10 +224,7 @@ describe("NoteToolbar", () => {
       .component(NoteToolbar)
       .withRouter()
       .withCleanStorage()
-      .withProps({
-        note: noteRealm.note,
-        readonly: true,
-      })
+      .withProps(noteToolbarProps(noteRealm, { readonly: true }))
       .mount({ attachTo: document.body })
 
     await flushPromises()
@@ -240,5 +241,31 @@ describe("NoteToolbar", () => {
     await flushPromises()
 
     expect(screen.queryByPlaceholderText("Search")).toBeNull()
+  })
+
+  it("shows New note when sidebar is collapsed", async () => {
+    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
+    mockSdkService(
+      NoteController,
+      "getNoteInfo",
+      makeMe.aNoteRecallInfo
+        .recallSetting({
+          level: 0,
+          rememberSpelling: false,
+          skipMemoryTracking: false,
+        })
+        .please()
+    )
+
+    wrapper = helper
+      .component(NoteToolbar)
+      .withRouter()
+      .withCleanStorage()
+      .withProps(noteToolbarProps(noteRealm))
+      .withPlugin(notebookSidebarClosedPlugin())
+      .mount({ attachTo: document.body })
+
+    await flushPromises()
+    expect(wrapper.find('button[title="New note"]').exists()).toBe(true)
   })
 })

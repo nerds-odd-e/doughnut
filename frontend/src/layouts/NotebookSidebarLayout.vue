@@ -47,6 +47,20 @@
       <main
         class="flex-1 px-4 container mx-auto overflow-y-auto"
       >
+        <nav
+          v-if="showRelocatedNoteCreationInMainColumn && currentNotebookId != null"
+          :class="[noteChromeToolbarNavClass, 'overflow-visible mb-2']"
+          data-testid="note-main-creation-toolbar"
+        >
+          <div class="daisy-btn-group daisy-btn-group-sm overflow-visible">
+            <NoteCreationNewButton
+              :notebook-id="currentNotebookId"
+              :active-note-realm="activeNoteRealm"
+              :active-folder-realm="activeFolderRealm"
+              :breadcrumb-folders="breadcrumbFolders"
+            />
+          </div>
+        </nav>
         <slot>
           <RouterView v-slot="{ Component }">
             <component :is="Component" v-bind="routeViewProps" />
@@ -58,37 +72,34 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
+import { computed, inject, ref, watch, type Ref } from "vue"
 import { RouterView, useRoute } from "vue-router"
 import type {
   Folder,
-  FolderRealm,
   NotebookRealm,
+  User,
 } from "@generated/doughnut-backend-api"
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { PanelLeft, PanelLeftClose } from "@lucide/vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
 import Sidebar from "@/components/notes/Sidebar.vue"
+import NoteCreationNewButton from "@/components/notes/NoteCreationNewButton.vue"
+import { noteChromeToolbarNavClass } from "@/components/notes/noteChromeToolbarNavClass"
 import { useStickyActiveNoteRealmForRoute } from "@/composables/useStickyActiveNoteRealmForRoute"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNotebookSidebarDrawer } from "@/composables/useNotebookSidebarDrawer"
+import { useNotebookSidebarRouteRealms } from "@/composables/useNotebookSidebarRouteRealms"
+import { useRelocatedNoteCreationInMainColumn } from "@/composables/useRelocatedNoteCreationInMainColumn"
+import { useSidebarCreationReadonly } from "@/composables/useSidebarCreationReadonly"
 
 const route = useRoute()
 const storageAccessor = useStorageAccessor()
-const SIDEBAR_BREAKPOINT_PX = 768
-
-const sidebarOpened = ref(false)
-const windowWidth = ref(
-  typeof window !== "undefined" ? window.innerWidth : 1024
-)
-
-const isMdOrLarger = computed(() => windowWidth.value >= SIDEBAR_BREAKPOINT_PX)
-
-// Only populated on notebookPage route
-const activeNotebookRealm = ref<NotebookRealm | undefined>(undefined)
-const activeFolderRealm = ref<FolderRealm | undefined>(undefined)
+const currentUser = inject<Ref<User | undefined>>("currentUser")
 
 const activeNoteRealm = useStickyActiveNoteRealmForRoute(route, storageAccessor)
+
+const { activeNotebookRealm, activeFolderRealm, routeViewProps } =
+  useNotebookSidebarRouteRealms(route)
 
 const breadcrumbFolders = computed(
   (): Folder[] =>
@@ -117,112 +128,21 @@ watch(
   { immediate: true }
 )
 
-const desktopSidebarClass = computed(() =>
-  sidebarOpened.value ? "relative" : "hidden"
-)
+const { sidebarOpened, isMdOrLarger, sidebarClasses } =
+  useNotebookSidebarDrawer(route, currentNotebookId)
 
-const mobileSidebarClass = computed(() => [
-  "notebook-sidebar-drawer fixed left-0 z-40",
-  sidebarOpened.value ? "translate-x-0" : "-translate-x-full",
-])
+const noteCreationReadonly = useSidebarCreationReadonly(currentUser, () => ({
+  activeNoteRealm: activeNoteRealm.value,
+  notebookReadonly: currentNotebookRealm.value?.readonly === true,
+}))
 
-const sidebarClasses = computed(() => [
-  "bg-base-200 w-72 transition-all ease-in-out flex flex-col overflow-x-visible",
-  ...(isMdOrLarger.value
-    ? [desktopSidebarClass.value]
-    : mobileSidebarClass.value),
-])
-
-const routeViewProps = computed(() => {
-  if (route.name === "notebookPage") {
-    return { notebookRealm: activeNotebookRealm.value, fetchNotebookPage }
-  }
-  if (route.name === "folderPage") {
-    return { folderRealm: activeFolderRealm.value, fetchFolderPage }
-  }
-  return {}
-})
-
-async function fetchNotebookPage() {
-  const notebookId = Number(route.params.notebookId)
-  const { data, error } = await NotebookController.get({
-    path: { notebook: notebookId },
-  })
-  activeNotebookRealm.value = !error && data ? data : undefined
-}
-
-async function fetchFolderPage() {
-  const notebookId = Number(route.params.notebookId)
-  const folderId = Number(route.params.folderId)
-  const { data: page, error } = await NotebookController.getFolderPage({
-    path: { notebook: notebookId, folder: folderId },
-  })
-  if (!error && page?.notebookRealm?.notebook) {
-    activeFolderRealm.value = page
-    return
-  }
-  activeFolderRealm.value = undefined
-}
-
-watch(
-  () => ({
-    isNotebookPage: route.name === "notebookPage",
-    notebookId: route.params.notebookId,
-  }),
-  async ({ isNotebookPage }) => {
-    if (!isNotebookPage) {
-      activeNotebookRealm.value = undefined
-      return
-    }
-    await fetchNotebookPage()
-  },
-  { immediate: true }
-)
-
-watch(
-  () => ({
-    isFolderPage: route.name === "folderPage",
-    notebookId: route.params.notebookId,
-    folderId: route.params.folderId,
-  }),
-  async ({ isFolderPage }) => {
-    if (!isFolderPage) {
-      activeFolderRealm.value = undefined
-      return
-    }
-    await fetchFolderPage()
-  },
-  { immediate: true }
-)
-
-const handleResize = () => {
-  windowWidth.value = window.innerWidth
-}
-
-const closeSidebarOnMobile = () => {
-  if (!isMdOrLarger.value) {
-    sidebarOpened.value = false
-  }
-}
-
-watch(
-  () => [
-    currentNotebookId.value,
-    route.name === "noteShow" ? route.params.noteId : undefined,
-  ],
-  closeSidebarOnMobile
-)
-
-onMounted(() => {
-  window.addEventListener("resize", handleResize)
-  if (windowWidth.value >= SIDEBAR_BREAKPOINT_PX) {
-    sidebarOpened.value = true
-  }
-})
-
-onBeforeUnmount(() => {
-  window.removeEventListener("resize", handleResize)
-})
+const showRelocatedNoteCreationInMainColumn =
+  useRelocatedNoteCreationInMainColumn(
+    sidebarOpened,
+    route,
+    currentNotebookId,
+    noteCreationReadonly
+  )
 </script>
 
 <style scoped lang="scss">

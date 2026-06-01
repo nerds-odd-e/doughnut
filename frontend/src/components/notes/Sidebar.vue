@@ -45,6 +45,7 @@ import type {
 import SidebarToolbar from "./SidebarToolbar.vue"
 import SidebarInner from "./SidebarInner.vue"
 import SidebarNotebookTreeScrollportPathHint from "./SidebarNotebookTreeScrollportPathHint.vue"
+import { useSidebarCreationReadonly } from "@/composables/useSidebarCreationReadonly"
 
 const props = withDefaults(
   defineProps<{
@@ -101,13 +102,10 @@ watch(
 )
 
 const currentUser = inject<Ref<User | undefined>>("currentUser")
-const sidebarReadonly = computed(() => {
-  if (!currentUser?.value) return true
-  const realmReadonly = props.activeNoteRealm?.notebookRealm.readonly
-  if (realmReadonly === true) return true
-  if (props.activeNoteRealm != null) return false
-  return props.notebookReadonly === true
-})
+const sidebarReadonly = useSidebarCreationReadonly(currentUser, () => ({
+  activeNoteRealm: props.activeNoteRealm,
+  notebookReadonly: props.notebookReadonly,
+}))
 
 /** Notebook overview pages may load root notes without an anchor note (e.g. no index note). */
 const sidebarTreeShown = computed(

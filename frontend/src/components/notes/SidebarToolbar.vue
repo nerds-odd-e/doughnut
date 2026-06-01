@@ -7,15 +7,13 @@
       class="flex flex-row items-center overflow-visible min-w-0"
     >
       <div class="daisy-btn-group daisy-btn-group-sm overflow-visible">
-        <NoteNewButton
+        <NoteCreationNewButton
+          v-if="sidebarOpened"
           :notebook-id="notebookId"
-          :initial-folder="parentFolderForCreation ?? undefined"
-          :title-search-anchor-note="anchorNote"
-          :ancestor-folders="breadcrumbFolders"
-          :initial-title="initialTitle"
-        >
-          <NotebookPen class="w-6 h-6" />
-        </NoteNewButton>
+          :active-note-realm="activeNoteRealm"
+          :active-folder-realm="activeFolderRealm"
+          :breadcrumb-folders="breadcrumbFolders"
+        />
         <FolderNewButton
           :notebook-id="notebookId"
           :ancestor-folders="breadcrumbFolders"
@@ -58,15 +56,14 @@ import {
   useNoteSidebarPeerSort,
   type SidebarPeerSortSpec,
 } from "@/composables/useNoteSidebarPeerSort"
-import { ArrowDownAZ, FolderPlus, NotebookPen } from "@lucide/vue"
+import { ArrowDownAZ, FolderPlus } from "@lucide/vue"
 import { computed } from "vue"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 import FolderNewButton from "./core/FolderNewButton.vue"
-import NoteNewButton from "./core/NoteNewButton.vue"
+import NoteCreationNewButton from "./NoteCreationNewButton.vue"
 import { noteChromeToolbarNavClass } from "./noteChromeToolbarNavClass"
-import { realmLeafFolder } from "./useNoteSidebarTree"
-import { titlePatternFromNoteMarkdown } from "@/utils/noteContentFrontmatter"
-import { renderTitleFromPattern } from "@/utils/titlePatternRender"
+import { useNoteCreationToolbarContext } from "@/composables/useNoteCreationToolbarContext"
+import { useNotebookSidebarOpened } from "@/composables/notebookSidebarOpened"
 
 const props = defineProps<{
   notebookId: number
@@ -75,22 +72,12 @@ const props = defineProps<{
   breadcrumbFolders: Folder[]
 }>()
 
-const initialTitle = computed(() => {
-  const markdown =
-    props.activeNoteRealm?.indexNoteContent ??
-    props.activeFolderRealm?.indexNoteContent ??
-    null
-  const pattern = titlePatternFromNoteMarkdown(markdown)
-  if (pattern == null || pattern === "") return undefined
-  return renderTitleFromPattern(pattern)
-})
+const sidebarOpened = useNotebookSidebarOpened()
 
-const parentFolderForCreation = computed((): Folder | null => {
-  if (props.activeFolderRealm) return props.activeFolderRealm.folder
-  return realmLeafFolder(props.activeNoteRealm) ?? null
-})
-
-const anchorNote = computed(() => props.activeNoteRealm?.note)
+const { parentFolderForCreation } = useNoteCreationToolbarContext(() => ({
+  activeNoteRealm: props.activeNoteRealm,
+  activeFolderRealm: props.activeFolderRealm,
+}))
 
 const { sortPeerSpec, setSortPeerSpec } = useNoteSidebarPeerSort()
 
