@@ -16,6 +16,7 @@ import getEnvironment from "./managedApi/window/getEnvironment"
 import MainMenu from "./components/toolbars/MainMenu.vue"
 import SoftKeyboardPrimer from "./components/commons/SoftKeyboardPrimer.vue"
 import { useFeatureToggle } from "./composables/useFeatureToggle"
+import { useGlobalNoteSearchKeyboardShortcut } from "./composables/useGlobalNoteSearchKeyboardShortcut"
 
 const apiStatus: Ref<ApiStatus> = ref({
   states: [],
@@ -31,6 +32,8 @@ const environment = ref("production")
 const userLoaded = ref(false)
 
 const newUser = computed(() => !user.value && !!externalIdentifier.value)
+
+useGlobalNoteSearchKeyboardShortcut(user)
 
 onMounted(async () => {
   environment.value = getEnvironment()

@@ -28,33 +28,31 @@
 <script setup lang="ts">
 import type { Ref } from "vue"
 import type { User } from "@generated/doughnut-backend-api"
-import { inject, onMounted, onUnmounted, ref } from "vue"
+import { inject, ref, watch } from "vue"
 import { Search } from "@lucide/vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
+import {
+  registerGlobalNoteSearchOpener,
+  unregisterGlobalNoteSearchOpener,
+} from "@/utils/globalNoteSearchShortcut"
 
 const user = inject<Ref<User | undefined>>("currentUser")
 
 const searchNotePopButtonRef = ref<InstanceType<typeof PopButton> | null>(null)
 
-function isBrowserFindShortcut(e: KeyboardEvent): boolean {
-  if (!e.ctrlKey && !e.metaKey) return false
-  if (e.shiftKey || e.altKey) return false
-  return e.code === "KeyF" || e.key === "f" || e.key === "F"
-}
-
-function onWindowKeydownCapture(e: KeyboardEvent) {
-  if (!user?.value || !isBrowserFindShortcut(e)) return
-  e.preventDefault()
+const openNoteSearch = () => {
   searchNotePopButtonRef.value?.openDialog()
 }
 
-onMounted(() => {
-  window.addEventListener("keydown", onWindowKeydownCapture, true)
-})
-
-onUnmounted(() => {
-  window.removeEventListener("keydown", onWindowKeydownCapture, true)
-})
+watch(
+  () => user?.value,
+  (loggedIn, _, onCleanup) => {
+    if (!loggedIn) return
+    registerGlobalNoteSearchOpener(openNoteSearch)
+    onCleanup(() => unregisterGlobalNoteSearchOpener(openNoteSearch))
+  },
+  { immediate: true }
+)
 </script>
 
 <style scoped lang="scss">

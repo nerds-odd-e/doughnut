@@ -18,9 +18,10 @@ import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { beforeEach, vi, describe, it, expect, afterEach } from "vitest"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import { defineComponent, ref } from "vue"
+import { defineComponent, h, provide, ref } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
+import { useGlobalNoteSearchKeyboardShortcut } from "@/composables/useGlobalNoteSearchKeyboardShortcut"
 
 const mockedPush = vi.fn()
 vi.mock("vue-router", async (importOriginal) => {
@@ -33,6 +34,30 @@ vi.mock("vue-router", async (importOriginal) => {
     }),
   }
 })
+
+function dispatchNoteSearchShortcut(modifiers: KeyboardEventInit) {
+  document.dispatchEvent(
+    new KeyboardEvent("keydown", {
+      key: "f",
+      code: "KeyF",
+      bubbles: true,
+      cancelable: true,
+      ...modifiers,
+    })
+  )
+}
+
+function renderGlobalBarWithSearchShortcut(loggedInUser?: User) {
+  const userRef = ref(loggedInUser)
+  const Harness = defineComponent({
+    setup() {
+      provide("currentUser", userRef)
+      useGlobalNoteSearchKeyboardShortcut(userRef)
+      return () => h(GlobalBar)
+    },
+  })
+  return helper.component(Harness).withCleanStorage().render()
+}
 
 describe("global bar", () => {
   let noteEditingHistory: NoteEditingHistory
@@ -72,33 +97,26 @@ describe("global bar", () => {
     expect(await screen.findByTitle("undo delete note")).not.toBeDisabled()
   })
 
-  it("opens note search on Ctrl+F when logged in", async () => {
-    helper.component(GlobalBar).withCurrentUser(user).render()
+  it.each([
+    { label: "Ctrl+F", modifiers: { ctrlKey: true } },
+    { label: "Cmd+F", modifiers: { metaKey: true } },
+  ])("opens note search on $label when logged in", async ({ modifiers }) => {
+    renderGlobalBarWithSearchShortcut(user)
     expect(screen.queryByPlaceholderText("Search")).toBeNull()
-    window.dispatchEvent(
-      new KeyboardEvent("keydown", {
-        key: "f",
-        code: "KeyF",
-        ctrlKey: true,
-        bubbles: true,
-        cancelable: true,
-      })
-    )
+    dispatchNoteSearchShortcut(modifiers)
     expect(await screen.findByPlaceholderText("Search")).toBeInTheDocument()
   })
 
-  it("does not open note search on Ctrl+F when logged out", async () => {
-    helper.component(GlobalBar).render()
+  it("does not open note search on Ctrl+Shift+F when logged in", async () => {
+    renderGlobalBarWithSearchShortcut(user)
+    dispatchNoteSearchShortcut({ ctrlKey: true, shiftKey: true })
     expect(screen.queryByPlaceholderText("Search")).toBeNull()
-    window.dispatchEvent(
-      new KeyboardEvent("keydown", {
-        key: "f",
-        code: "KeyF",
-        ctrlKey: true,
-        bubbles: true,
-        cancelable: true,
-      })
-    )
+  })
+
+  it("does not open note search on Ctrl+F when logged out", async () => {
+    renderGlobalBarWithSearchShortcut()
+    expect(screen.queryByPlaceholderText("Search")).toBeNull()
+    dispatchNoteSearchShortcut({ ctrlKey: true })
     expect(screen.queryByPlaceholderText("Search")).toBeNull()
   })
 
