@@ -1,107 +1,31 @@
-import {
-  AiController,
-  AssimilationController,
-  NoteController,
-} from "@generated/doughnut-backend-api/sdk.gen"
-import AssimilationPanel from "@/components/recall/AssimilationPanel.vue"
+import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
-import RenderingHelper from "@tests/helpers/RenderingHelper"
-import { useRecallData } from "@/composables/useRecallData"
-import { useAssimilationCount } from "@/composables/useAssimilationCount"
-import type { MemoryTrackerLite } from "@generated/doughnut-backend-api"
-import { computed, ref } from "vue"
-import usePopups from "@/components/commons/Popups/usePopups"
+import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+import { mockedGoToNextAssimilation } from "./assimilationPanelMocks"
+import {
+  assimilateSpy,
+  clickKeepForRecall,
+  mountAssimilationPanel,
+  mockedIncrementAssimilatedCount,
+  mockedRequestDueRecallsRefresh,
+  mockedTotalAssimilatedCount,
+  note,
+  setupAssimilationPanelTests,
+} from "./assimilationPanelTestSupport"
 
 vi.mock("@/composables/useRecallData")
 vi.mock("@/composables/useAssimilationCount")
-
-const mockedGoToNextAssimilation = vi.fn().mockResolvedValue(true)
-
 vi.mock("@/composables/useGoToNextAssimilation", () => ({
   useGoToNextAssimilation: () => ({
     goToNextAssimilation: mockedGoToNextAssimilation,
   }),
 }))
 
-let renderer: RenderingHelper<typeof AssimilationPanel>
-let assimilateSpy: ReturnType<typeof mockSdkService>
-const mockedIncrementAssimilatedCount = vi.fn()
-const mockedRequestDueRecallsRefresh = vi.fn()
-const mockedTotalAssimilatedCount = ref(0)
-const toRepeat = ref<MemoryTrackerLite[] | undefined>(undefined)
-
-afterEach(() => {
-  document.body.innerHTML = ""
-  vi.clearAllMocks()
-  const popups = usePopups()
-  while (popups.popups.peek().length) {
-    popups.popups.done(false)
-  }
-})
-
-beforeEach(() => {
-  mockedGoToNextAssimilation.mockClear()
-  mockedGoToNextAssimilation.mockResolvedValue(true)
-  assimilateSpy = mockSdkService(AssimilationController, "assimilate", [])
-  mockSdkService(NoteController, "getNoteInfo", {})
-  mockSdkService(AiController, "generateRefinementSuggestions", {
-    suggestions: [],
-  })
-
-  vi.mocked(useRecallData).mockReturnValue({
-    totalAssimilatedCount: mockedTotalAssimilatedCount,
-    toRepeatCount: computed(() => toRepeat.value?.length ?? 0),
-    toRepeat: ref(undefined),
-    currentRecallWindowEndAt: ref(undefined),
-    isRecallPaused: ref(false),
-    shouldResumeRecall: ref(false),
-    treadmillMode: ref(false),
-    currentIndex: ref(0),
-    diligentMode: ref(false),
-    setToRepeat: vi.fn(),
-    setCurrentRecallWindowEndAt: vi.fn(),
-    setTotalAssimilatedCount: vi.fn(),
-    setIsRecallPaused: vi.fn(),
-    resumeRecall: vi.fn(),
-    clearShouldResumeRecall: vi.fn(),
-    setTreadmillMode: vi.fn(),
-    setCurrentIndex: vi.fn(),
-    setDiligentMode: vi.fn(),
-    dueRecallsRefreshNonce: ref(0),
-    requestDueRecallsRefresh: mockedRequestDueRecallsRefresh,
-  })
-
-  vi.mocked(useAssimilationCount).mockReturnValue({
-    incrementAssimilatedCount: mockedIncrementAssimilatedCount,
-    dueCount: ref(0),
-    setDueCount: vi.fn(),
-    assimilatedCountOfTheDay: ref(0),
-    setAssimilatedCountOfTheDay: vi.fn(),
-    totalUnassimilatedCount: ref(0),
-    setTotalUnassimilatedCount: vi.fn(),
-    applyAssimilationCountDto: vi.fn(),
-  })
-
-  renderer = helper.component(AssimilationPanel)
-})
+setupAssimilationPanelTests()
 
 describe("AssimilationPanel", () => {
-  const noteRealm = makeMe.aNoteRealm.please()
-  const memoryTracker = makeMe.aMemoryTracker.ofNote(noteRealm).please()
-  const { note } = memoryTracker
-
-  const mount = (overrides?: { note?: typeof note }) =>
-    renderer
-      .withCleanStorage()
-      .withProps({
-        note: overrides?.note ?? note,
-      })
-      .withRouter()
-      .mount()
-
   describe("normal assimilation", () => {
     it("calls goToNextAssimilation and increments counts correctly when assimilating normally", async () => {
       assimilateSpy.mockResolvedValue(
@@ -111,11 +35,10 @@ describe("AssimilationPanel", () => {
           { id: 3, removedFromTracking: false },
         ])
       )
-      const wrapper = mount()
+      const wrapper = mountAssimilationPanel()
 
       await flushPromises()
-      await wrapper.find('[data-test="keep-for-recall"]').trigger("click")
-      await flushPromises()
+      await clickKeepForRecall(wrapper)
 
       expect(assimilateSpy).toHaveBeenCalledWith({
         body: { noteId: note.id, skipMemoryTracking: false },
@@ -129,7 +52,7 @@ describe("AssimilationPanel", () => {
 
   describe("NoteInfoBar", () => {
     it("loads note recall info for settings", async () => {
-      const wrapper = mount()
+      const wrapper = mountAssimilationPanel()
       await flushPromises()
       expect(
         wrapper.findComponent({ name: "NoteRecallSettingForm" }).exists()
@@ -150,13 +73,12 @@ describe("AssimilationPanel", () => {
       ) as HTMLElement | null
 
     it("shows opaque layer to hide note content behind spelling verification", async () => {
-      const wrapper = mount()
+      const wrapper = mountAssimilationPanel()
       await flushPromises()
 
       expect(getOpaqueContentBlocker()).toBeNull()
 
-      await wrapper.find('[data-test="keep-for-recall"]').trigger("click")
-      await flushPromises()
+      await clickKeepForRecall(wrapper)
 
       const opaqueLayer = getOpaqueContentBlocker()
       expect(opaqueLayer).not.toBeNull()
@@ -165,11 +87,10 @@ describe("AssimilationPanel", () => {
     })
 
     it("hides opaque layer when spelling popup closes", async () => {
-      const wrapper = mount()
+      const wrapper = mountAssimilationPanel()
       await flushPromises()
 
-      await wrapper.find('[data-test="keep-for-recall"]').trigger("click")
-      await flushPromises()
+      await clickKeepForRecall(wrapper)
       expect(getOpaqueContentBlocker()).not.toBeNull()
 
       const closeButton = document
@@ -183,11 +104,10 @@ describe("AssimilationPanel", () => {
     })
 
     it("closes popup and returns to original state when user closes it", async () => {
-      const wrapper = mount()
+      const wrapper = mountAssimilationPanel()
       await flushPromises()
 
-      await wrapper.find('[data-test="keep-for-recall"]').trigger("click")
-      await flushPromises()
+      await clickKeepForRecall(wrapper)
 
       expect(document.body.textContent).toContain("Verify Spelling")
       expect(assimilateSpy).not.toHaveBeenCalled()
@@ -212,7 +132,7 @@ describe("AssimilationPanel", () => {
           { ...makeMe.aMemoryTracker.please(), id: 1, spelling: false },
         ],
       })
-      const wrapper = mount()
+      const wrapper = mountAssimilationPanel()
       await flushPromises()
 
       const keepButton = wrapper.find('[data-test="keep-for-recall"]')
@@ -226,7 +146,7 @@ describe("AssimilationPanel", () => {
           { ...makeMe.aMemoryTracker.please(), id: 1, spelling: false },
         ],
       })
-      const wrapper = mount()
+      const wrapper = mountAssimilationPanel()
       await flushPromises()
 
       const keepButton = wrapper.find('[data-test="keep-for-recall"]')
@@ -251,11 +171,10 @@ describe("AssimilationPanel", () => {
           },
         ])
       )
-      const wrapper = mount()
+      const wrapper = mountAssimilationPanel()
       await flushPromises()
 
-      await wrapper.find('[data-test="keep-for-recall"]').trigger("click")
-      await flushPromises()
+      await clickKeepForRecall(wrapper)
 
       const verifyButton = document.querySelector(
         '[data-test="verify-spelling"]'

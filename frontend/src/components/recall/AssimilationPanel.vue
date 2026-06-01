@@ -24,6 +24,7 @@
     @cancel="handleSpellingCancel"
     @verified="handleSpellingVerified"
   />
+  <LoadingModal :show="isAssimilating" message="Assimilating..." />
 </template>
 
 <script setup lang="ts">
@@ -31,6 +32,7 @@ import type { Note } from "@generated/doughnut-backend-api"
 import { AssimilationController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
+import LoadingModal from "../commons/LoadingModal.vue"
 import AssimilationSettings from "./AssimilationSettings.vue"
 import SpellingVerificationPopup from "./SpellingVerificationPopup.vue"
 import { computed, ref } from "vue"
@@ -53,6 +55,7 @@ const { goToNextAssimilation } = useGoToNextAssimilation()
 const { incrementAssimilatedCount } = useAssimilationCount()
 
 const showSpellingPopup = ref(false)
+const isAssimilating = ref(false)
 
 const rememberSpelling = ref(false)
 const noteInfoLoaded = ref(false)
@@ -104,36 +107,41 @@ const processForm = async (skipMemoryTracking: boolean) => {
 }
 
 const doAssimilate = async (skipMemoryTracking: boolean) => {
-  const { data: memoryTrackers, error } = await apiCallWithLoading(() =>
-    AssimilationController.assimilate({
-      body: {
-        noteId: note.id,
-        skipMemoryTracking,
-      },
-    })
-  )
+  isAssimilating.value = true
+  try {
+    const { data: memoryTrackers, error } = await apiCallWithLoading(() =>
+      AssimilationController.assimilate({
+        body: {
+          noteId: note.id,
+          skipMemoryTracking,
+        },
+      })
+    )
 
-  if (!error && memoryTrackers) {
-    const newTrackerCount = memoryTrackers.filter(
-      (t) => !t.removedFromTracking
-    ).length
-    if (totalAssimilatedCount.value !== undefined) {
-      totalAssimilatedCount.value += newTrackerCount
+    if (!error && memoryTrackers) {
+      const newTrackerCount = memoryTrackers.filter(
+        (t) => !t.removedFromTracking
+      ).length
+      if (totalAssimilatedCount.value !== undefined) {
+        totalAssimilatedCount.value += newTrackerCount
+      }
+      incrementAssimilatedCount(newTrackerCount)
+
+      requestDueRecallsRefresh()
+
+      const navigated = await goToNextAssimilation()
+      if (!navigated) {
+        emit("reloadNeeded")
+      }
     }
-    incrementAssimilatedCount(newTrackerCount)
-
-    requestDueRecallsRefresh()
-
-    const navigated = await goToNextAssimilation()
-    if (!navigated) {
-      emit("reloadNeeded")
-    }
+  } finally {
+    isAssimilating.value = false
   }
 }
 
-const handleSpellingVerified = () => {
+const handleSpellingVerified = async () => {
   showSpellingPopup.value = false
-  doAssimilate(false)
+  await doAssimilate(false)
 }
 
 const handleSpellingCancel = () => {
