@@ -21,3 +21,4 @@ Use the `phased-planning` skill for decomposition details, examples, and test-dr
 - Run targeted E2E for touched behavior, not the full suite unless explicitly required.
 - Do not leave failing tests at a phase boundary; remove `@wip` once scenarios pass.
 - Clean up dead code and update the plan before closing a phase.
+- **Deploy gate** — Commit, push, and let **CD deploy** before the next phase. When using the **execute-plan** skill this is automatic; otherwise usually manual.

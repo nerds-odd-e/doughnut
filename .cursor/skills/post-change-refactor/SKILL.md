@@ -15,7 +15,8 @@ description: >-
 
 ## When to use
 
-- After implementation of a phase / sub-phase finishes and **before** commit.
+- After the implementation of a phase / sub-phase finishes and **before**
+  the commit (invoked from the `execute-plan` skill).
 - On demand, when the developer asks to clean up or refactor the current
   uncommitted change.
 

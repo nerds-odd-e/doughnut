@@ -13,3 +13,11 @@ Repo conventions live in `.cursor/rules/`; use the relevant rule for backend, fr
 For local MySQL or Redis failures, inspect `mysql/mysql.log` or `redis/redis.log`; the Nix shell setup is defined by `process-compose.yaml` and `scripts/shell_setup.sh`.
 
 Planning notes belong in `ongoing/`, which is excluded from default indexing. Read it explicitly only for active planning or history tasks.
+
+## Planning and phased delivery
+
+- Informal plans for active work: `ongoing/<short-name>.md`
+- **Phase principles, testing strategy, TDD workflow, deploy gate:** `.cursor/rules/planning.mdc` and the **phased-planning** skill (`.cursor/skills/phased-planning/SKILL.md`)
+- **Executing plans:** **execute-plan** skill (`.cursor/skills/execute-plan/SKILL.md`). Delegates each phase to a **fresh sub-agent** (Task tool) so context does not accumulate. Each sub-agent commits and pushes before the next starts. Trigger: "do @ongoing/…", "execute plan", "run @ongoing/…".
+- **Codebase friction retrospective:** **codebase-retrospective** skill (`.cursor/skills/codebase-retrospective/SKILL.md`); auto-triggered by timer hook after 5 minutes
+- **Task decomposition into phases:** **phased-planning** skill; auto-triggered by timer hook after 10 minutes
