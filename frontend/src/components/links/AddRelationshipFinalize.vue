@@ -32,6 +32,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { ref } from "vue"
+import { useRouter } from "vue-router"
 import type { Note, NoteSearchResult } from "@generated/doughnut-backend-api"
 import RadioButtons from "../form/RadioButtons.vue"
 import RelationTypeSelect from "./RelationTypeSelect.vue"
@@ -49,6 +50,7 @@ import {
 } from "@/utils/relationshipFolderResolve"
 
 const storageAccessor = useStorageAccessor()
+const router = useRouter()
 
 const props = defineProps({
   note: { type: Object as PropType<Note>, required: true },
@@ -99,8 +101,6 @@ const relationTypeSelected = async (relationType: string | undefined) => {
   try {
     if (relationType === undefined) return
 
-    const { useRouter } = await import("vue-router")
-    const router = useRouter()
     const realm = storageAccessor.value.refOfNoteRealm(props.note.id).value
     const notebookId = realm?.notebookRealm.notebook.id
     if (realm == null || notebookId == null) {
@@ -153,12 +153,12 @@ const relationTypeSelected = async (relationType: string | undefined) => {
     )
 
     emit("success")
-  } catch (res) {
-    relationshipFormErrors.value = res as {
-      asFirstChild: string | undefined
-      relationType: string | undefined
-      moveUnder: string | undefined
-    }
+  } catch (e: unknown) {
+    const relationTypeError =
+      e instanceof Error
+        ? ((e as { relationType?: string }).relationType ?? e.message)
+        : undefined
+    relationshipFormErrors.value = { relationType: relationTypeError }
   }
 }
 </script>
