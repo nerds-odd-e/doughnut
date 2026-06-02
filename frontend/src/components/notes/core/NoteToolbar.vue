@@ -1,5 +1,9 @@
 <template>
-  <nav :class="[noteChromeToolbarNavClass, 'relative z-20']">
+  <nav
+    ref="toolbarNavRef"
+    data-note-toolbar
+    :class="[noteChromeToolbarNavClass, 'relative z-20']"
+  >
     <div class="daisy-btn-group daisy-btn-group-sm">
       <NoteCreationNewButton
         v-if="showRelocatedNewNote"
@@ -52,27 +56,12 @@
         <Mic class="w-6 h-6" />
       </button>
 
-      <AutoCollapseDropdown
+      <NoteToolbarMoreOptions
         v-if="!readonly"
-        v-slot="{ closeDropdown, open }"
-        ref="moreOptionsDropdownRef"
-        class="daisy-dropdown daisy-dropdown-end daisy-dropdown-bottom"
-      >
-        <summary
-          :class="[
-            'daisy-btn daisy-btn-ghost daisy-btn-sm list-none cursor-pointer',
-            { 'daisy-btn-active': open },
-          ]"
-          title="more options"
-          aria-label="more options"
-        >
-          <Settings class="w-6 h-6" />
-        </summary>
-        <NoteMoreOptionsForm
-          v-bind="{ note }"
-          @close-dialog="closeDropdown"
-        />
-      </AutoCollapseDropdown>
+        ref="moreOptionsRef"
+        :note="note"
+        :inline="showMoreOptionsInline"
+      />
     </div>
   </nav>
   <NoteAudioTools
@@ -88,19 +77,13 @@ import type { Folder, Note, NoteRealm } from "@generated/doughnut-backend-api"
 import SvgSearchForLink from "../../svgs/SvgSearchForLink.vue"
 import SearchForm from "../../links/SearchForm.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
-import {
-  FileCode,
-  LayoutTemplate,
-  MessageCircle,
-  Mic,
-  Settings,
-} from "@lucide/vue"
+import { FileCode, LayoutTemplate, MessageCircle, Mic } from "@lucide/vue"
 import NoteAudioTools from "../widgets/NoteAudioTools.vue"
 import { useRouter } from "vue-router"
-import NoteMoreOptionsForm from "../widgets/NoteMoreOptionsForm.vue"
+import NoteToolbarMoreOptions from "../widgets/NoteToolbarMoreOptions.vue"
+import { useNoteToolbarMoreOptionsInline } from "@/composables/useNoteToolbarMoreOptionsInline"
 import { noteChromeToolbarNavClass } from "../noteChromeToolbarNavClass"
 import { noteShowLocation } from "@/routes/noteShowLocation"
-import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 import NoteCreationNewButton from "../NoteCreationNewButton.vue"
 import { useNotebookSidebarOpened } from "@/composables/notebookSidebarOpened"
 
@@ -124,10 +107,12 @@ const showRelocatedNewNote = computed(
 )
 
 const audioTools = ref(false)
+const toolbarNavRef = ref<HTMLElement | null>(null)
+const { showMoreOptionsInline } = useNoteToolbarMoreOptionsInline(toolbarNavRef)
 const linkPopButtonRef = ref<InstanceType<typeof PopButton> | null>(null)
-const moreOptionsDropdownRef = ref<InstanceType<
-  typeof AutoCollapseDropdown
-> | null>(null)
+const moreOptionsRef = ref<InstanceType<typeof NoteToolbarMoreOptions> | null>(
+  null
+)
 
 const router = useRouter()
 
@@ -159,7 +144,7 @@ onUnmounted(() => {
 watch(
   () => props.note.id,
   () => {
-    moreOptionsDropdownRef.value?.closeDropdown()
+    moreOptionsRef.value?.closeOverflowMenu()
   }
 )
 </script>

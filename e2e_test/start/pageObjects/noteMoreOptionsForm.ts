@@ -1,64 +1,78 @@
 import { pageIsNotLoading } from '../pageBase'
 import { assumeAssimilationPage, keepForRecallButton } from './assimilationPage'
-import { toolbarButton } from './toolbarButton'
 import { questionListPage } from './questionListPage'
 
-const moreOptionsDetails = () =>
-  cy
-    .get('details[data-auto-collapse-dropdown]')
-    .filter(':has(summary[title="more options"])')
+const titles = {
+  assimilation: 'Assimilation settings',
+  delete: 'Delete note',
+  questions: 'Questions for the note',
+  overflowMenu: 'more options',
+} as const
 
-const isMoreOptionsDropdownOpen = ($details: JQuery<HTMLElement>) =>
-  $details.prop('open') === true || $details.hasClass('daisy-dropdown-open')
+const noteShowToolbar = () => cy.get('[data-note-toolbar]', { timeout: 15000 })
 
-export const makeSureNoteMoreOptionsFormIsOpen = () => {
-  moreOptionsDetails().then(($details) => {
-    if (!isMoreOptionsDropdownOpen($details)) {
-      cy.wrap($details).find('summary[title="more options"]').click()
+const visibleMoreOptionsButton = (title: string) =>
+  cy.get(`button[title="${title}"]:visible`, { timeout: 15000 }).first()
+
+const assimilationSettingsButton = () =>
+  visibleMoreOptionsButton(titles.assimilation)
+
+const openOverflowMenuIfNeeded = () => {
+  cy.get(`button[title="${titles.assimilation}"]`, { timeout: 15000 }).then(
+    ($buttons) => {
+      if ($buttons.filter(':visible').length > 0) {
+        return
+      }
+
+      noteShowToolbar()
+        .find(`summary[title="${titles.overflowMenu}"]`)
+        .should('be.visible')
+        .click()
     }
-  })
-  moreOptionsDetails().should(($details) => {
-    expect(isMoreOptionsDropdownOpen($details)).to.eq(true)
-  })
-  cy.findByRole('button', { name: 'Assimilation settings' }).should(
-    'be.visible'
   )
+}
+
+/**
+ * Ensures Export / Questions / Assimilation / Delete are reachable — either on the
+ * toolbar (wide note column) or inside the overflow menu (narrow).
+ */
+export const makeSureNoteMoreOptionsFormIsOpen = () => {
+  noteShowToolbar().should('exist')
+  openOverflowMenuIfNeeded()
+  assimilationSettingsButton().should('be.visible')
 
   return noteMoreOptionsPage()
 }
 
 const noteMoreOptionsPage = () => {
   return {
-    toolbarButton,
     deleteNote() {
-      toolbarButton('Delete note').click()
+      visibleMoreOptionsButton(titles.delete).click()
       cy.findByRole('button', { name: 'OK' }).click()
       pageIsNotLoading()
     },
     deleteNoteAndLeaveReferencesAsDeadLinks() {
-      toolbarButton('Delete note').click()
+      visibleMoreOptionsButton(titles.delete).click()
       cy.findByRole('button', {
         name: 'Leave all references as dead link',
       }).click()
       pageIsNotLoading()
     },
     deleteNoteAndRemoveFromReferenceProperties() {
-      toolbarButton('Delete note').click()
+      visibleMoreOptionsButton(titles.delete).click()
       cy.findByRole('button', {
         name: 'Remove from properties of references (undo will not recover the removed property)',
       }).click()
       pageIsNotLoading()
     },
     openQuestionList() {
-      toolbarButton('Questions for the note').click()
+      visibleMoreOptionsButton(titles.questions).click()
       return questionListPage()
     },
     openAssimilationSettings() {
       cy.document().then((doc) => {
         if (!doc.querySelector('[data-test="keep-for-recall"]')) {
-          cy.findByRole('button', { name: 'Assimilation settings' })
-            .scrollIntoView()
-            .click()
+          assimilationSettingsButton().scrollIntoView().click()
         }
       })
       keepForRecallButton({ timeout: 15000 }).should('be.visible')

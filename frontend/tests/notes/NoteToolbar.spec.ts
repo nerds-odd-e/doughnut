@@ -1,34 +1,14 @@
-import {
-  NoteController,
-  SearchController,
-} from "@generated/doughnut-backend-api/sdk.gen"
-import type { NoteRealm } from "@generated/doughnut-backend-api"
-import NoteToolbar from "@/components/notes/core/NoteToolbar.vue"
-import NoteMoreOptionsForm from "@/components/notes/widgets/NoteMoreOptionsForm.vue"
+import { SearchController } from "@generated/doughnut-backend-api/sdk.gen"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import helper from "@tests/helpers"
 import { mockSdkService } from "@tests/helpers"
 import { notebookSidebarClosedPlugin } from "@tests/helpers/notebookSidebarTestProvide"
+import { installMockResizeObserver } from "@tests/helpers/mockNoteToolbarNavWidth"
+import { mountNoteToolbar } from "@tests/notes/noteToolbarTestHelpers"
 import { screen } from "@testing-library/vue"
-import { describe, it, expect, afterEach, vi } from "vitest"
+import { describe, it, expect, afterEach, beforeEach, vi } from "vitest"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
-import { page } from "vitest/browser"
-
-const aiMarkdownStub = { markdown: "# AI context\n\nHello **world**." }
-
-function noteToolbarProps(
-  noteRealm: NoteRealm,
-  overrides: Record<string, unknown> = {}
-) {
-  return {
-    note: noteRealm.note,
-    notebookId: noteRealm.notebookRealm.notebook.id,
-    activeNoteRealm: noteRealm,
-    ...overrides,
-  }
-}
 
 describe("NoteToolbar", () => {
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
@@ -40,6 +20,10 @@ describe("NoteToolbar", () => {
     vi.unstubAllGlobals()
   })
 
+  beforeEach(() => {
+    installMockResizeObserver()
+  })
+
   it("routes to note show by id when starting a conversation about the note", async () => {
     const router = createRouter({
       history: createWebHistory(),
@@ -47,27 +31,8 @@ describe("NoteToolbar", () => {
     })
     const pushSpy = vi.spyOn(router, "push")
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
-    mockSdkService(
-      NoteController,
-      "getNoteInfo",
-      makeMe.aNoteRecallInfo
-        .recallSetting({
-          level: 0,
-          rememberSpelling: false,
-          skipMemoryTracking: false,
-        })
-        .please()
-    )
 
-    wrapper = helper
-      .component(NoteToolbar)
-      .withRouter(router)
-      .withCleanStorage()
-      .withProps(noteToolbarProps(noteRealm))
-      .mount({ attachTo: document.body })
-
-    await flushPromises()
-
+    wrapper = await mountNoteToolbar(noteRealm, { router })
     await wrapper
       .find('[title="Star a conversation about this note"]')
       .trigger("click")
@@ -82,167 +47,14 @@ describe("NoteToolbar", () => {
     })
   })
 
-  it("copies export markdown while keeping the export dialog open", async () => {
-    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
-    mockSdkService(NoteController, "getAiContextMarkdown", aiMarkdownStub)
-    mockSdkService(
-      NoteController,
-      "getNoteInfo",
-      makeMe.aNoteRecallInfo
-        .recallSetting({
-          level: 0,
-          rememberSpelling: false,
-          skipMemoryTracking: false,
-        })
-        .please()
-    )
-    const writeText = vi.fn().mockResolvedValue(undefined)
-    vi.stubGlobal("navigator", {
-      ...navigator,
-      clipboard: { writeText },
-    })
-
-    wrapper = helper
-      .component(NoteToolbar)
-      .withRouter()
-      .withCleanStorage()
-      .withProps(noteToolbarProps(noteRealm))
-      .mount({ attachTo: document.body })
-
-    await flushPromises()
-
-    await wrapper.find('[title="more options"]').trigger("click")
-    await flushPromises()
-
-    await page.getByTitle("Export...").click()
-    await flushPromises()
-
-    await vi.waitUntil(() => document.querySelector("dialog"), {
-      timeout: 1000,
-    })
-    const dialog = document.querySelector("dialog") as HTMLDialogElement
-    expect(dialog.open).toBe(true)
-
-    await page.getByTestId("copy-ai-context-md-btn").click()
-    await flushPromises()
-
-    expect(writeText).toHaveBeenCalledWith(
-      expect.stringContaining("AI context")
-    )
-    expect(dialog.open).toBe(true)
-  })
-
-  it("displays menu items when dropdown is open", async () => {
-    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
-    mockSdkService(
-      NoteController,
-      "getNoteInfo",
-      makeMe.aNoteRecallInfo
-        .recallSetting({
-          level: 0,
-          rememberSpelling: false,
-          skipMemoryTracking: false,
-        })
-        .please()
-    )
-
-    wrapper = helper
-      .component(NoteToolbar)
-      .withRouter()
-      .withCleanStorage()
-      .withProps(noteToolbarProps(noteRealm))
-      .mount({ attachTo: document.body })
-
-    await flushPromises()
-
-    const moreOptionsButton = wrapper.find('[title="more options"]')
-
-    // Simulate a click event on the button to open the dialog
-    await moreOptionsButton.trigger("click")
-    await flushPromises()
-
-    // Check if the dialog component exists
-    const dialog = wrapper.findComponent(NoteMoreOptionsForm)
-    expect(dialog.exists()).toBe(true)
-
-    // Menu panel is portaled to body
-    expect(
-      document.querySelector("[data-dropdown-portal-panel]")
-    ).not.toBeNull()
-    expect(
-      document.querySelector('button[title="Questions for the note"]')
-    ).not.toBeNull()
-  })
-
-  it("closes more options dialog when note id changes", async () => {
-    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
-    mockSdkService(
-      NoteController,
-      "getNoteInfo",
-      makeMe.aNoteRecallInfo
-        .recallSetting({
-          level: 0,
-          rememberSpelling: false,
-          skipMemoryTracking: false,
-        })
-        .please()
-    )
-
-    wrapper = helper
-      .component(NoteToolbar)
-      .withRouter()
-      .withCleanStorage()
-      .withProps(noteToolbarProps(noteRealm))
-      .mount({ attachTo: document.body })
-
-    await flushPromises()
-
-    const moreOptionsButton = wrapper.find('[title="more options"]')
-
-    // Open the dialog
-    await moreOptionsButton.trigger("click")
-    await flushPromises()
-
-    // Verify dialog is open
-    const dialog = wrapper.findComponent(NoteMoreOptionsForm)
-    expect(dialog.exists()).toBe(true)
-
-    // Change the note id
-    const newNote = makeMe.aNoteRealm.title("New Note").please()
-    await wrapper.setProps(noteToolbarProps(newNote))
-    await flushPromises()
-
-    // Verify dialog is closed (still mounted; details hides dropdown content)
-    const details = wrapper.find("[data-auto-collapse-dropdown]")
-    expect((details.element as HTMLDetailsElement).open).toBe(false)
-  })
-
   it("opens Link search on Ctrl+Shift+F when not readonly", async () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
-    mockSdkService(
-      NoteController,
-      "getNoteInfo",
-      makeMe.aNoteRecallInfo
-        .recallSetting({
-          level: 0,
-          rememberSpelling: false,
-          skipMemoryTracking: false,
-        })
-        .please()
-    )
     mockSdkService(SearchController, "searchForRelationshipTarget", [])
     mockSdkService(SearchController, "searchForRelationshipTargetWithin", [])
     mockSdkService(SearchController, "semanticSearch", [])
     mockSdkService(SearchController, "semanticSearchWithin", [])
 
-    wrapper = helper
-      .component(NoteToolbar)
-      .withRouter()
-      .withCleanStorage()
-      .withProps(noteToolbarProps(noteRealm))
-      .mount({ attachTo: document.body })
-
-    await flushPromises()
+    wrapper = await mountNoteToolbar(noteRealm)
     expect(screen.queryByPlaceholderText("Search")).toBeNull()
 
     window.dispatchEvent(
@@ -262,26 +74,10 @@ describe("NoteToolbar", () => {
 
   it("does not open Link search on Ctrl+Shift+F when readonly", async () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
-    mockSdkService(
-      NoteController,
-      "getNoteInfo",
-      makeMe.aNoteRecallInfo
-        .recallSetting({
-          level: 0,
-          rememberSpelling: false,
-          skipMemoryTracking: false,
-        })
-        .please()
-    )
 
-    wrapper = helper
-      .component(NoteToolbar)
-      .withRouter()
-      .withCleanStorage()
-      .withProps(noteToolbarProps(noteRealm, { readonly: true }))
-      .mount({ attachTo: document.body })
-
-    await flushPromises()
+    wrapper = await mountNoteToolbar(noteRealm, {
+      propsOverrides: { readonly: true },
+    })
     window.dispatchEvent(
       new KeyboardEvent("keydown", {
         key: "f",
@@ -299,27 +95,10 @@ describe("NoteToolbar", () => {
 
   it("shows New note when sidebar is collapsed", async () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
-    mockSdkService(
-      NoteController,
-      "getNoteInfo",
-      makeMe.aNoteRecallInfo
-        .recallSetting({
-          level: 0,
-          rememberSpelling: false,
-          skipMemoryTracking: false,
-        })
-        .please()
-    )
 
-    wrapper = helper
-      .component(NoteToolbar)
-      .withRouter()
-      .withCleanStorage()
-      .withProps(noteToolbarProps(noteRealm))
-      .withPlugin(notebookSidebarClosedPlugin())
-      .mount({ attachTo: document.body })
-
-    await flushPromises()
+    wrapper = await mountNoteToolbar(noteRealm, {
+      plugin: notebookSidebarClosedPlugin(),
+    })
     expect(wrapper.find('button[title="New note"]').exists()).toBe(true)
   })
 })
