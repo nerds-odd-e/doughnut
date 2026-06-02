@@ -4,7 +4,6 @@ import makeMe from "doughnut-test-fixtures/makeMe"
 import NoteExportForm from "@/components/notes/core/NoteExportForm.vue"
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { saveAs } from "file-saver"
-import { page } from "vitest/browser"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import type { Note } from "@generated/doughnut-backend-api"
 
@@ -39,8 +38,11 @@ describe("NoteExportForm", () => {
     return note
   }
 
+  const graphSummary = () =>
+    document.querySelector("details summary") as HTMLElement | null
+
   const expandGraphSection = async () => {
-    await page.getByText("Export Note Graph (JSON)").click()
+    graphSummary()?.click()
     await flushPromises()
   }
 
@@ -48,6 +50,22 @@ describe("NoteExportForm", () => {
     document.querySelector(
       '[data-testid="graph-json-textarea"]'
     ) as HTMLTextAreaElement | null
+
+  const aiMarkdownTextarea = () =>
+    document.querySelector(
+      '[data-testid="ai-context-markdown-textarea"]'
+    ) as HTMLTextAreaElement | null
+
+  const clickTestId = async (testId: string) => {
+    await wrapper.find(`[data-testid="${testId}"]`).trigger("click")
+    await flushPromises()
+  }
+
+  const setTokenLimit = async (value: string) => {
+    const input = wrapper.find('[data-testid="token-limit-input"]')
+    await input.setValue(value)
+    await flushPromises()
+  }
 
   it("fetches AI markdown on open and downloads from primary button", async () => {
     const note = mountForm()
@@ -58,20 +76,18 @@ describe("NoteExportForm", () => {
       query: { tokenLimit: 2000 },
     })
 
-    const textarea = document.querySelector(
-      '[data-testid="ai-context-markdown-textarea"]'
-    ) as HTMLTextAreaElement
-    expect(textarea.value).toContain("AI context")
+    expect(aiMarkdownTextarea()?.value).toContain("AI context")
 
-    await page.getByTestId("download-ai-context-md-btn").click()
+    await clickTestId("download-ai-context-md-btn")
     expect(saveAs).toHaveBeenCalled()
     const blobArg = vi.mocked(saveAs).mock.calls[0][0] as Blob
     expect(blobArg.type).toContain("markdown")
   })
 
-  it("fetches graph JSON when expanded and downloads on button click", async () => {
+  it("fetches graph JSON once, downloads, and keeps cache when toggling", async () => {
     const note = mountForm()
-    const getGraphSpy = mockSdkService(
+    await flushPromises()
+    const getGraphMock = mockSdkService(
       NoteController,
       "getGraph",
       minimalGraph(note.id)
@@ -81,33 +97,19 @@ describe("NoteExportForm", () => {
 
     await expandGraphSection()
 
-    expect(getGraphSpy).toHaveBeenCalledWith({
+    expect(getGraphMock).toHaveBeenCalledWith({
       path: { note: note.id },
       query: { tokenLimit: 2000 },
     })
     expect(graphTextarea()?.value).toContain('"focusNote"')
 
-    await page.getByTestId("download-json-btn-graph").click()
+    await clickTestId("download-json-btn-graph")
     expect(saveAs).toHaveBeenCalled()
-  })
-
-  it("does not refetch graph JSON if already loaded when toggling open/close", async () => {
-    const note = mountForm()
-    const getGraphMock = mockSdkService(
-      NoteController,
-      "getGraph",
-      minimalGraph(note.id)
-    )
-
-    const toggleBtn = page.getByText("Export Note Graph (JSON)")
-    await toggleBtn.click()
-    await flushPromises()
-    expect(graphTextarea()).toBeTruthy()
 
     getGraphMock.mockClear()
 
-    await toggleBtn.click()
-    await toggleBtn.click()
+    graphSummary()?.click()
+    graphSummary()?.click()
     await flushPromises()
 
     expect(graphTextarea()).toBeTruthy()
@@ -129,9 +131,8 @@ describe("NoteExportForm", () => {
     await expandGraphSection()
     expect(graphTextarea()).toBeTruthy()
 
-    await page.getByTestId("token-limit-input").fill("1234")
-    await page.getByTestId("refresh-graph-btn").click()
-    await flushPromises()
+    await setTokenLimit("1234")
+    await clickTestId("refresh-graph-btn")
 
     expect(graphTextarea()?.value).toContain('"token": 1234')
     expect(getGraphMock).toHaveBeenLastCalledWith({
@@ -151,14 +152,10 @@ describe("NoteExportForm", () => {
     mountForm(note)
     await flushPromises()
 
-    await page.getByTestId("token-limit-input").fill("3000")
-    await page.getByTestId("refresh-context-md-btn").click()
-    await flushPromises()
+    await setTokenLimit("3000")
+    await clickTestId("refresh-context-md-btn")
 
-    const textarea = document.querySelector(
-      '[data-testid="ai-context-markdown-textarea"]'
-    ) as HTMLTextAreaElement
-    expect(textarea.value).toContain("second-budget")
+    expect(aiMarkdownTextarea()?.value).toContain("second-budget")
     expect(NoteController.getAiContextMarkdown).toHaveBeenLastCalledWith({
       path: { note: note.id },
       query: { tokenLimit: 3000 },

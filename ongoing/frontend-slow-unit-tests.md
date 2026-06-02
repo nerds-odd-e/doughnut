@@ -32,9 +32,11 @@ Optimized `frontend/tests/common/FullScreen.spec.ts`: dropped vitest/browser `pa
 Verify: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/common/FullScreen.spec.ts`
 
 ### Group 2: NoteExportForm.spec.ts
-Status: planned
+Status: done
 
-Optimize 3 slow tests in `frontend/tests/notes/NoteExportForm.spec.ts`.
+Optimized `frontend/tests/notes/NoteExportForm.spec.ts`: dropped `vitest/browser` `page` queries for wrapper/DOM; merged graph download + cache-toggle into one test (4 tests total).
+
+Verify: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteExportForm.spec.ts`
 
 ### Group 3: singleton slow tests batch
 Status: planned
