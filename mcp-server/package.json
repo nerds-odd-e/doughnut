@@ -25,7 +25,7 @@
     "doughnut-test-fixtures": "workspace:*",
     "esbuild": "0.28.0",
     "typescript": "6.0.3",
-    "vitest": "4.1.7",
+    "vitest": "4.1.8",
     "zod": "^4.4.3"
   }
 }
