@@ -10,32 +10,32 @@
         data-testid="folder-move-parent-select"
         :disabled="disabled"
       >
-          <optgroup label="Notebook root">
-            <option value="__root__">Notebook root</option>
-          </optgroup>
-          <optgroup v-if="ancestorIds.length > 0" label="Ancestor folders">
-            <option
-              v-for="id in ancestorIds"
-              :key="`a-${id}`"
-              :value="String(id)"
-            >
-              {{ quickPathLabel(id) }}
-            </option>
-          </optgroup>
-          <optgroup v-if="neighbourIds.length > 0" label="Neighbour folders">
-            <option
-              v-for="id in neighbourIds"
-              :key="`n-${id}`"
-              :value="String(id)"
-            >
-              {{ quickPathLabel(id) }}
-            </option>
-          </optgroup>
-          <optgroup v-if="needsSyntheticOption && modelValue != null" label="Selected">
-            <option :value="String(modelValue.id)">
-              {{ selectionSummary }}
-            </option>
-          </optgroup>
+        <optgroup label="Notebook root">
+          <option value="__root__">Notebook root</option>
+        </optgroup>
+        <optgroup v-if="ancestorIds.length > 0" label="Ancestor folders">
+          <option
+            v-for="id in ancestorIds"
+            :key="`a-${id}`"
+            :value="String(id)"
+          >
+            {{ quickPathLabel(id) }}
+          </option>
+        </optgroup>
+        <optgroup v-if="neighbourIds.length > 0" label="Neighbour folders">
+          <option
+            v-for="id in neighbourIds"
+            :key="`n-${id}`"
+            :value="String(id)"
+          >
+            {{ quickPathLabel(id) }}
+          </option>
+        </optgroup>
+        <optgroup v-if="needsSyntheticOption && modelValue != null" label="Selected">
+          <option :value="String(modelValue.id)">
+            {{ selectionSummary }}
+          </option>
+        </optgroup>
       </select>
       <div
         class="folder-selector-join-append flex shrink-0 self-stretch items-stretch"
@@ -71,10 +71,9 @@
 <script setup lang="ts">
 import type { Folder } from "@generated/doughnut-backend-api"
 import { MoreHorizontal } from "@lucide/vue"
-import { computed, onMounted, ref } from "vue"
+import { computed, ref, toRef, watch } from "vue"
 import Modal from "@/components/commons/Modal.vue"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import { requestNotebookFolderListing } from "@/utils/notebookFolderListingRequest"
+import { useFolderSelectorNeighbourListing } from "@/composables/useFolderSelectorNeighbourListing"
 import FolderSearchForm from "./FolderSearchForm.vue"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
 import {
@@ -82,6 +81,7 @@ import {
   folderChainWithParentIds,
   folderPathLabel,
   folderRowsById,
+  siblingFoldersForQuickPick,
 } from "./folderSelectorUtils"
 
 const props = defineProps<{
@@ -106,54 +106,45 @@ const emit = defineEmits<{
   "update:modelValue": [value: Folder | null]
 }>()
 
-const loadError = ref<string | undefined>(undefined)
 const searchOpen = ref(false)
 
 // Rows loaded only for the search dialog (full index, lazy)
 const searchIndexRows = ref<Folder[]>([])
 
-// Neighbour folders loaded via one cheap listing call (full rows for v-model)
-const neighbourFolders = ref<Folder[]>([])
-
-const neighbourRows = computed((): Folder[] =>
-  neighbourFolders.value.map((f) => ({
-    ...f,
-    parentFolderId: parentFolderId.value ?? undefined,
-  }))
-)
-
 const contextFolderId = computed(() => props.contextFolder?.id ?? null)
 
-const ancestorRows = computed(() => {
-  if (contextFolderId.value == null) return []
-  return ancestorsFromChain(contextFolderId.value, props.ancestorFolders)
-    .ancestorFolders
-})
-
-const parentFolderId = computed(() => {
+const contextChain = computed(() => {
   if (contextFolderId.value == null) return null
   return ancestorsFromChain(contextFolderId.value, props.ancestorFolders)
-    .parentFolderId
 })
+
+const ancestorRows = computed(() => contextChain.value?.ancestorFolders ?? [])
+
+const parentFolderId = computed(
+  () => contextChain.value?.parentFolderId ?? null
+)
 
 /** Omit when null so folder search does not exclude a subtree (new folder at root). */
 const searchContextFolderId = computed(() => contextFolderId.value ?? undefined)
 
-onMounted(async () => {
-  const pid = parentFolderId.value
-  try {
-    const { data: listing, error } = await apiCallWithLoading(() =>
-      requestNotebookFolderListing(props.notebookId, pid)
-    )
-    if (error || !listing)
-      throw new Error("Failed to load neighbouring folders")
-    neighbourFolders.value = (listing.folders ?? []).filter(
-      (f) => f.id !== contextFolderId.value
-    )
-  } catch {
-    loadError.value = "Failed to load neighbouring folders"
-  }
-})
+const notebookIdRef = toRef(props, "notebookId")
+const { neighbourFolders, loadError, loadNeighbourFolders } =
+  useFolderSelectorNeighbourListing(notebookIdRef, parentFolderId)
+
+const neighbourRows = computed(() =>
+  siblingFoldersForQuickPick(
+    neighbourFolders.value.filter((f) => f.id !== contextFolderId.value),
+    parentFolderId.value
+  )
+)
+
+watch(
+  parentFolderId,
+  () => {
+    loadNeighbourFolders()
+  },
+  { immediate: true }
+)
 
 /** Minimal byId map built from quick-pick data only. Used for path display in the dropdown. */
 const quickPickById = computed(() => {

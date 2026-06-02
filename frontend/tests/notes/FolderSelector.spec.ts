@@ -114,4 +114,32 @@ describe("FolderSelector", () => {
       await waitUntilFocused('[data-testid="folder-selector-search-input"]')
     })
   })
+
+  it("renders neighbour labels after the folder parent context changes", async () => {
+    const alpha = testFolderStub(1, "Alpha")
+    const beta = testFolderStub(2, "Beta")
+    mockSdkService(NotebookController, "listNotebookFolderListing", {
+      folders: [alpha],
+    })
+
+    wrapper = mount(FolderSelector, {
+      props: {
+        notebookId: 1,
+        contextFolder: beta,
+        ancestorFolders: [],
+        modelValue: alpha,
+      },
+      attachTo: document.body,
+      global: { plugins: [router] },
+    })
+    await flushPromises()
+
+    await wrapper.setProps({ ancestorFolders: [alpha, beta] })
+    await flushPromises()
+
+    const alphaOption = wrapper
+      .get('[data-testid="folder-move-parent-select"]')
+      .find('option[value="1"]')
+    expect(alphaOption.text()).toBe("Alpha")
+  })
 })

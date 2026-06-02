@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, {
   mockSdkService,
+  testFolderStub,
   wrapSdkError,
   wrapSdkResponse,
 } from "@tests/helpers"
@@ -138,6 +139,57 @@ describe("FolderPage move", () => {
     expect(wrapper.text()).toContain(
       "A folder with this name already exists here."
     )
+    wrapper.unmount()
+  })
+
+  it("re-enables organize controls after moving into a neighbour folder", async () => {
+    const alpha = testFolderStub(1, "Alpha")
+    const beta = testFolderStub(2, "Beta")
+    const realmAtRoot = makeMe.aFolderRealm.folder(2, "Beta").please()
+
+    mockSdkService(NotebookController, "listNotebookFolderListing", {
+      folders: [alpha],
+    })
+
+    const realmUnderAlpha: typeof realmAtRoot = {
+      ...realmAtRoot,
+      ancestorFolders: [alpha, beta],
+    }
+    let wrapper: ReturnType<typeof mountFolderPage>["wrapper"]
+    const fetchFolderPage = vi.fn(async () => {
+      await wrapper.setProps({ folderRealm: realmUnderAlpha })
+    })
+
+    wrapper = helper
+      .component(FolderPage)
+      .withCleanStorage()
+      .withRouter(router)
+      .withProps({
+        folderRealm: realmAtRoot,
+        fetchFolderPage,
+      })
+      .mount({ attachTo: document.body })
+    await flushPromises()
+
+    await wrapper.get('[data-testid="folder-move-parent-select"]').setValue("1")
+    await flushPromises()
+
+    vi.spyOn(NotebookController, "moveFolder").mockResolvedValue(
+      wrapSdkResponse(beta) as never
+    )
+
+    await submitMoveForm(wrapper)
+
+    expect(fetchFolderPage).toHaveBeenCalled()
+    expect(
+      wrapper.find('[data-testid="folder-move-submit"]').attributes("disabled")
+    ).toBeUndefined()
+    expect(
+      wrapper
+        .find('[data-testid="folder-dissolve-button"]')
+        .attributes("disabled")
+    ).toBeUndefined()
+
     wrapper.unmount()
   })
 
