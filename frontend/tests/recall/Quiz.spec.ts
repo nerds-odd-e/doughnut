@@ -196,6 +196,28 @@ describe("repeat page", () => {
     })
   })
 
+  describe("contestable dummy input", () => {
+    it("clears when advancing to the next question", async () => {
+      const secondRecallPrompt = makeMe.aRecallPrompt
+        .withQuestionStem("Second question")
+        .please()
+      askAQuestionSpy
+        .mockResolvedValueOnce(wrapSdkResponse(recallPrompt))
+        .mockResolvedValueOnce(wrapSdkResponse(secondRecallPrompt))
+
+      const wrapper = await mountPage([1, 2], 2)
+      const dummyInput = wrapper.find<HTMLTextAreaElement>(
+        "[data-testid='contestable-dummy-input']"
+      )
+      await dummyInput.setValue("notes from previous question")
+
+      await wrapper.setProps({ currentIndex: 1 })
+      await flushPromises()
+
+      expect(dummyInput.element.value).toBe("")
+    })
+  })
+
   describe("loading state when fetching recall prompt", () => {
     it("should show ContentLoader, not JustReview, when navigating to a memory tracker that previously failed", async () => {
       askAQuestionSpy.mockResolvedValueOnce(wrapSdkError("Failed to fetch"))

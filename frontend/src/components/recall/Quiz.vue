@@ -41,7 +41,12 @@
       </div>
     </template>
     <div v-if="showContestableDummyInput" class="contestable-dummy-input-bar">
-      <input type="text" class="daisy-input daisy-input-bordered daisy-w-full" />
+      <textarea
+        v-model="contestableDummyInput"
+        rows="2"
+        class="daisy-textarea daisy-textarea-bordered w-full resize-none"
+        data-testid="contestable-dummy-input"
+      />
     </div>
   </div>
 </template>
@@ -83,7 +88,6 @@ const emit = defineEmits<{
 // Composable for question fetching logic
 const useQuestionFetching = (props: QuizProps) => {
   const recallPromptCache = ref<Record<number, RecallPrompt | undefined>>({})
-  const eagerFetchUntil = ref(0)
   const fetching = ref(false)
   const fetchingMemoryTrackerIds = ref<Set<number>>(new Set())
 
@@ -122,8 +126,6 @@ const useQuestionFetching = (props: QuizProps) => {
   }
 
   const fetchQuestion = async () => {
-    eagerFetchUntil.value = props.currentIndex + props.eagerFetchCount
-
     if (!fetching.value) {
       fetching.value = true
       try {
@@ -176,6 +178,7 @@ const showContestableDummyInput = computed(
     !currentMemoryTracker.value?.spelling &&
     currentRecallPrompt.value !== undefined
 )
+const contestableDummyInput = ref("")
 
 // Methods
 const memoryTrackerAt = (index: number): MemoryTrackerLite | undefined =>
@@ -206,7 +209,13 @@ const onAnswered = (answerResult: RecallPrompt) => {
 }
 
 // Watchers
-watch(() => currentMemoryTrackerId.value, fetchQuestion)
+watch(
+  () => currentMemoryTrackerId.value,
+  () => {
+    contestableDummyInput.value = ""
+    fetchQuestion()
+  }
+)
 
 // Lifecycle hooks
 onMounted(() => {
@@ -218,7 +227,7 @@ onMounted(() => {
 @use "@/assets/menu-variables.scss" as *;
 
 $contestable-dummy-input-reserve: calc(
-  0.5rem + 3rem + max(0.75rem, env(safe-area-inset-bottom))
+  0.5rem + 4.5rem + max(0.75rem, env(safe-area-inset-bottom))
 );
 
 .quiz--contestable {
