@@ -385,7 +385,7 @@ describe('MainInteractivePrompt user input history (↑↓ recall)', () => {
     await waitUntilLastFrame(
       (f) => f.includes('/help') && f.includes('List available commands')
     )
-    stdin.write('\x1b')
+    await pressEscape(stdin)
     await waitUntilLastFrame(
       (f) => f.includes('/ commands') && mainPromptDraftAfterArrow(f) === '/he'
     )
@@ -406,7 +406,7 @@ describe('MainInteractivePrompt user input history (↑↓ recall)', () => {
     stdin.write('/re')
     await waitUntilLastFrame((f) => f.includes('/recall'))
 
-    stdin.write('\x1b')
+    await pressEscape(stdin)
     await waitUntilLastFrame(
       (f) => f.includes('/ commands') && mainPromptDraftAfterArrow(f) === '/re'
     )
