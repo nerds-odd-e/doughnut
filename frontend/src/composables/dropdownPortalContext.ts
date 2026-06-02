@@ -15,20 +15,24 @@ export function dropdownPortalPanelSelector(portalId: string): string {
   return `[data-dropdown-portal-for="${CSS.escape(portalId)}"]`
 }
 
+/** Lucide icons and other controls often report SVG targets, not HTMLElement. */
+export function eventClickTarget(target: EventTarget | null): Element | null {
+  return target instanceof Element ? target : null
+}
+
 export function isWithinDropdownPortalPanel(
   target: EventTarget | null
 ): boolean {
-  if (!(target instanceof HTMLElement)) return false
-  return target.closest(`[${DROPDOWN_PORTAL_PANEL_ATTR}]`) != null
+  return (
+    eventClickTarget(target)?.closest(`[${DROPDOWN_PORTAL_PANEL_ATTR}]`) != null
+  )
 }
 
 export function isWithinAutoCollapseDropdownTree(
   target: EventTarget | null
 ): boolean {
-  if (
-    target instanceof HTMLElement &&
-    target.closest("[data-auto-collapse-dropdown]")
-  ) {
+  const element = eventClickTarget(target)
+  if (element?.closest("[data-auto-collapse-dropdown]")) {
     return true
   }
   return isWithinDropdownPortalPanel(target)

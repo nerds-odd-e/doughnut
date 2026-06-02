@@ -1,5 +1,6 @@
 <template>
   <button
+    type="button"
     :class="btnClass || 'daisy-btn daisy-btn-secondary daisy-btn-circle'"
     @click="copyToClipboard"
     :disabled="disabled || !text"

@@ -14,6 +14,9 @@ import { describe, it, expect, afterEach, vi } from "vitest"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
+import { page } from "vitest/browser"
+
+const aiMarkdownStub = { markdown: "# AI context\n\nHello **world**." }
 
 function noteToolbarProps(
   noteRealm: NoteRealm,
@@ -34,6 +37,7 @@ describe("NoteToolbar", () => {
   afterEach(() => {
     wrapper?.unmount()
     document.body.innerHTML = ""
+    vi.unstubAllGlobals()
   })
 
   it("routes to note show by id when starting a conversation about the note", async () => {
@@ -76,6 +80,56 @@ describe("NoteToolbar", () => {
       },
       query: { conversation: "true" },
     })
+  })
+
+  it("copies export markdown while keeping the export dialog open", async () => {
+    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
+    mockSdkService(NoteController, "getAiContextMarkdown", aiMarkdownStub)
+    mockSdkService(
+      NoteController,
+      "getNoteInfo",
+      makeMe.aNoteRecallInfo
+        .recallSetting({
+          level: 0,
+          rememberSpelling: false,
+          skipMemoryTracking: false,
+        })
+        .please()
+    )
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    vi.stubGlobal("navigator", {
+      ...navigator,
+      clipboard: { writeText },
+    })
+
+    wrapper = helper
+      .component(NoteToolbar)
+      .withRouter()
+      .withCleanStorage()
+      .withProps(noteToolbarProps(noteRealm))
+      .mount({ attachTo: document.body })
+
+    await flushPromises()
+
+    await wrapper.find('[title="more options"]').trigger("click")
+    await flushPromises()
+
+    await page.getByTitle("Export...").click()
+    await flushPromises()
+
+    await vi.waitUntil(() => document.querySelector("dialog"), {
+      timeout: 1000,
+    })
+    const dialog = document.querySelector("dialog") as HTMLDialogElement
+    expect(dialog.open).toBe(true)
+
+    await page.getByTestId("copy-ai-context-md-btn").click()
+    await flushPromises()
+
+    expect(writeText).toHaveBeenCalledWith(
+      expect.stringContaining("AI context")
+    )
+    expect(dialog.open).toBe(true)
   })
 
   it("displays menu items when dropdown is open", async () => {

@@ -14,6 +14,7 @@
         :aria-label="copyAriaLabel"
       />
       <button
+        type="button"
         class="daisy-btn daisy-btn-secondary daisy-btn-circle"
         @click="downloadFile"
         :disabled="!jsonData || loading"

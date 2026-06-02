@@ -1,5 +1,8 @@
 import { onMounted, onUnmounted, type Ref } from "vue"
-import { dropdownPortalPanelSelector } from "./dropdownPortalContext"
+import {
+  dropdownPortalPanelSelector,
+  eventClickTarget,
+} from "./dropdownPortalContext"
 
 export function useAutoCollapseDetails(
   detailsRef: Ref<HTMLDetailsElement | null>,
@@ -11,15 +14,20 @@ export function useAutoCollapseDetails(
   portalId?: string
 ) {
   const isInsideAnotherModal = (target: EventTarget | null) => {
-    if (!(target instanceof HTMLElement)) return false
-    const targetModal = target.closest("dialog.modal-mask")
+    const element = eventClickTarget(target)
+    if (!element) return false
+    const targetModal = element.closest("dialog.modal-mask")
     const ownModal = detailsRef.value?.closest("dialog.modal-mask")
     return targetModal != null && targetModal !== ownModal
   }
 
   const isInsidePortaledPanel = (target: EventTarget | null) => {
-    if (!(target instanceof HTMLElement) || portalId == null) return false
-    return target.closest(dropdownPortalPanelSelector(portalId)) != null
+    if (portalId == null) return false
+    return (
+      eventClickTarget(target)?.closest(
+        dropdownPortalPanelSelector(portalId)
+      ) != null
+    )
   }
 
   const shouldCloseForTarget = (target: EventTarget | null) =>
