@@ -16,6 +16,10 @@ import makeMe from 'doughnut-test-fixtures/makeMe'
 import * as doughnutBackendClient from '../src/backendApi/doughnutBackendClient.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import { renderInkWhenCommandLineReady } from './inkTestHelpers.js'
+import {
+  openTopMathsNotebook,
+  waitNotebookSlashGuidance,
+} from './useNotebookInteractive.waits.js'
 
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'
 
@@ -55,17 +59,10 @@ describe('InteractiveCliApp /use notebook integration', () => {
       data: { notebooks: [myNotebooksApiRow('Top Maths')] },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
 
-    const { stdin, waitForFramesToInclude, waitForLastFrameToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-    stdin.write('/use Top Maths\r')
-    await waitForFramesToInclude('Active notebook: Top Maths')
-    stdin.write('/')
-    await waitForLastFrameToInclude('/attach <path to .pdf or .epub>')
-    await waitForLastFrameToInclude('Attach a book file to the active notebook')
-    await waitForLastFrameToInclude('(POST attach-book)')
-    await waitForLastFrameToInclude('/exit, exit')
-    await waitForLastFrameToInclude('Leave notebook context')
+    const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+    await openTopMathsNotebook(ink.stdin, ink)
+    ink.stdin.write('/')
+    await waitNotebookSlashGuidance(ink)
   })
 
   test('after nested plain line and /exit, root up-arrow recalls /exit not stale root prefix', async () => {
@@ -73,18 +70,14 @@ describe('InteractiveCliApp /use notebook integration', () => {
       data: { notebooks: [myNotebooksApiRow('Top Maths')] },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
 
-    const { stdin, waitForFramesToInclude, waitForLastFrameToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-    stdin.write('/use Top Maths\r')
-    await waitForFramesToInclude('Active notebook: Top Maths')
-    stdin.write('nested-history-marker\r')
-    await waitForFramesToInclude('Not supported')
-    stdin.write('/exit\r')
-    await waitForLastFrameToInclude('`exit` to quit.')
-
-    stdin.write('\x1b[A')
-    await waitForLastFrameToInclude('/exit')
+    const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+    await openTopMathsNotebook(ink.stdin, ink)
+    ink.stdin.write('nested-history-marker\r')
+    await ink.waitForLastFrameToInclude('Not supported')
+    ink.stdin.write('/exit\r')
+    await ink.waitForLastFrameToInclude('`exit` to quit.')
+    ink.stdin.write('\x1b[A')
+    await ink.waitForLastFrameToInclude('/exit')
   })
 
   describe('notebook stage /attach', () => {
@@ -127,31 +120,15 @@ describe('InteractiveCliApp /use notebook integration', () => {
       fs.rmSync(attachWorkDir, { recursive: true, force: true })
     })
 
-    test('shows spinner while attach is pending', async () => {
+    test('shows attach spinner and ignores input until attach completes', async () => {
       attachBookSpy.mockImplementation(() => new Promise(() => undefined))
 
-      const { stdin, waitForFramesToInclude } =
-        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-      stdin.write('/use Top Maths\r')
-      await waitForFramesToInclude('Active notebook: Top Maths')
-      stdin.write(`/attach ${attachPdfPath}\r`)
-      await waitForFramesToInclude('Attaching book')
-    })
-
-    test('blocks input while attach spinner is visible', async () => {
-      attachBookSpy.mockImplementation(() => new Promise(() => undefined))
-
-      const { stdin, waitForFramesToInclude, waitForLastFrameToInclude } =
-        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-      stdin.write('/use Top Maths\r')
-      await waitForFramesToInclude('Active notebook: Top Maths')
-      stdin.write(`/attach ${attachPdfPath}\r`)
-      await waitForFramesToInclude('Attaching book')
-
-      stdin.write('should-not-appear\r')
-      await waitForLastFrameToInclude('Attaching book')
+      const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+      await openTopMathsNotebook(ink.stdin, ink)
+      ink.stdin.write(`/attach ${attachPdfPath}\r`)
+      await ink.waitForLastFrameToInclude('Attaching book')
+      ink.stdin.write('should-not-appear\r')
+      await ink.waitForLastFrameToInclude('Attaching book')
     })
 
     test('attaches PDF and shows structure excerpt from API book', async () => {
@@ -177,18 +154,18 @@ describe('InteractiveCliApp /use notebook integration', () => {
           .do()
       )
 
-      const { stdin, waitForFramesToInclude } =
-        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-      stdin.write('/use Top Maths\r')
-      await waitForFramesToInclude('Active notebook: Top Maths')
-      stdin.write(`/attach ${attachPdfPath}\r`)
-      await waitForFramesToInclude('Attached "top-maths" to this notebook.')
-      await waitForFramesToInclude('Part One')
-      await waitForFramesToInclude('Part One Child')
+      const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+      await openTopMathsNotebook(ink.stdin, ink)
+      ink.stdin.write(`/attach ${attachPdfPath}\r`)
+      await ink.waitUntilLastFrame(
+        (f) =>
+          f.includes('Attached "top-maths" to this notebook.') &&
+          f.includes('Part One') &&
+          f.includes('Part One Child')
+      )
     })
 
-    test('attaches EPUB and shows structure excerpt from API book', async () => {
+    test('attaches EPUB with API metadata, structure excerpt, and no MinerU', async () => {
       attachBookSpy.mockResolvedValue(
         makeMe.aBook
           .id(100)
@@ -211,29 +188,15 @@ describe('InteractiveCliApp /use notebook integration', () => {
           .do()
       )
 
-      const { stdin, waitForFramesToInclude } =
-        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-      stdin.write('/use Top Maths\r')
-      await waitForFramesToInclude('Active notebook: Top Maths')
-      stdin.write(`/attach ${attachEpubPath}\r`)
-      await waitForFramesToInclude('Attached "my-book" to this notebook.')
-      await waitForFramesToInclude('Chapter Alpha')
-      await waitForFramesToInclude('Chapter Beta')
-    })
-
-    test('EPUB attach calls attachNotebookBookFile with epub metadata and resolved path', async () => {
-      attachBookSpy.mockResolvedValue(
-        makeMe.aBook.id(102).bookName('my-book').format('epub').do()
+      const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+      await openTopMathsNotebook(ink.stdin, ink)
+      ink.stdin.write(`/attach ${attachEpubPath}\r`)
+      await ink.waitUntilLastFrame(
+        (f) =>
+          f.includes('Attached "my-book" to this notebook.') &&
+          f.includes('Chapter Alpha') &&
+          f.includes('Chapter Beta')
       )
-
-      const { stdin, waitForFramesToInclude } =
-        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-      stdin.write('/use Top Maths\r')
-      await waitForFramesToInclude('Active notebook: Top Maths')
-      stdin.write(`/attach ${attachEpubPath}\r`)
-      await waitForFramesToInclude('Attached "my-book" to this notebook.')
 
       const expectedAbsPath = pathResolve(process.cwd(), attachEpubPath)
       expect(attachBookSpy).toHaveBeenCalledWith(
@@ -241,20 +204,6 @@ describe('InteractiveCliApp /use notebook integration', () => {
         { bookName: 'my-book', format: 'epub' },
         expectedAbsPath
       )
-    })
-
-    test('EPUB attach does not invoke MinerU', async () => {
-      attachBookSpy.mockResolvedValue(
-        makeMe.aBook.id(101).bookName('only-epub').format('epub').do()
-      )
-
-      const { stdin, waitForFramesToInclude } =
-        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-      stdin.write('/use Top Maths\r')
-      await waitForFramesToInclude('Active notebook: Top Maths')
-      stdin.write(`/attach ${attachEpubPath}\r`)
-      await waitForFramesToInclude('Attached "only-epub" to this notebook.')
       expect(runMineruOutlineSubprocess).not.toHaveBeenCalled()
     })
 
@@ -265,13 +214,10 @@ describe('InteractiveCliApp /use notebook integration', () => {
         })
       )
 
-      const { stdin, waitForFramesToInclude } =
-        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-      stdin.write('/use Top Maths\r')
-      await waitForFramesToInclude('Active notebook: Top Maths')
-      stdin.write(`/attach ${attachPdfPath}\r`)
-      await waitForFramesToInclude(
+      const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+      await openTopMathsNotebook(ink.stdin, ink)
+      ink.stdin.write(`/attach ${attachPdfPath}\r`)
+      await ink.waitForLastFrameToInclude(
         'Access token does not have permission for this operation.'
       )
     })
@@ -283,13 +229,10 @@ describe('InteractiveCliApp /use notebook integration', () => {
         })
       )
 
-      const { stdin, waitForFramesToInclude } =
-        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-      stdin.write('/use Top Maths\r')
-      await waitForFramesToInclude('Active notebook: Top Maths')
-      stdin.write(`/attach ${attachPdfPath}\r`)
-      await waitForFramesToInclude('Invalid layout roots')
+      const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+      await openTopMathsNotebook(ink.stdin, ink)
+      ink.stdin.write(`/attach ${attachPdfPath}\r`)
+      await ink.waitForLastFrameToInclude('Invalid layout roots')
     })
 
     test('shows generic guidance for HTTP 400 without body message', async () => {
@@ -299,13 +242,10 @@ describe('InteractiveCliApp /use notebook integration', () => {
         })
       )
 
-      const { stdin, waitForFramesToInclude } =
-        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-      stdin.write('/use Top Maths\r')
-      await waitForFramesToInclude('Active notebook: Top Maths')
-      stdin.write(`/attach ${attachPdfPath}\r`)
-      await waitForFramesToInclude(
+      const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+      await openTopMathsNotebook(ink.stdin, ink)
+      ink.stdin.write(`/attach ${attachPdfPath}\r`)
+      await ink.waitForLastFrameToInclude(
         'The server rejected this request. Check your input or try again in the web app.'
       )
     })
@@ -317,13 +257,10 @@ describe('InteractiveCliApp /use notebook integration', () => {
         })
       )
 
-      const { stdin, waitForFramesToInclude } =
-        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-      stdin.write('/use Top Maths\r')
-      await waitForFramesToInclude('Active notebook: Top Maths')
-      stdin.write(`/attach ${attachPdfPath}\r`)
-      await waitForFramesToInclude(
+      const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+      await openTopMathsNotebook(ink.stdin, ink)
+      ink.stdin.write(`/attach ${attachPdfPath}\r`)
+      await ink.waitForLastFrameToInclude(
         'The resource was not found. It may have been removed, or the link is wrong.'
       )
     })
@@ -338,13 +275,12 @@ describe('InteractiveCliApp /use notebook integration', () => {
         })
       )
 
-      const { stdin, waitForFramesToInclude } =
-        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-      stdin.write('/use Top Maths\r')
-      await waitForFramesToInclude('Active notebook: Top Maths')
-      stdin.write(`/attach ${attachPdfPath}\r`)
-      await waitForFramesToInclude('This notebook already has a book attached')
+      const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+      await openTopMathsNotebook(ink.stdin, ink)
+      ink.stdin.write(`/attach ${attachPdfPath}\r`)
+      await ink.waitForLastFrameToInclude(
+        'This notebook already has a book attached'
+      )
     })
 
     test('shows outline subprocess error when MinerU script returns ok: false', async () => {
@@ -353,26 +289,22 @@ describe('InteractiveCliApp /use notebook integration', () => {
         error: 'outline script reported a parse failure',
       })
 
-      const { stdin, waitForFramesToInclude } =
-        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-      stdin.write('/use Top Maths\r')
-      await waitForFramesToInclude('Active notebook: Top Maths')
-      stdin.write(`/attach ${attachPdfPath}\r`)
-      await waitForFramesToInclude('outline script reported a parse failure')
+      const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+      await openTopMathsNotebook(ink.stdin, ink)
+      ink.stdin.write(`/attach ${attachPdfPath}\r`)
+      await ink.waitForLastFrameToInclude(
+        'outline script reported a parse failure'
+      )
     })
 
     test('rejects attach when path is not a file', async () => {
       const dirNamedPdf = join(attachWorkDir, 'folder.pdf')
       fs.mkdirSync(dirNamedPdf)
 
-      const { stdin, waitForFramesToInclude } =
-        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-      stdin.write('/use Top Maths\r')
-      await waitForFramesToInclude('Active notebook: Top Maths')
-      stdin.write(`/attach ${dirNamedPdf}\r`)
-      await waitForFramesToInclude(
+      const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+      await openTopMathsNotebook(ink.stdin, ink)
+      ink.stdin.write(`/attach ${dirNamedPdf}\r`)
+      await ink.waitForLastFrameToInclude(
         'Attach expects a book file path, not a directory.'
       )
     })
@@ -381,37 +313,21 @@ describe('InteractiveCliApp /use notebook integration', () => {
       const txtPath = join(attachWorkDir, 'notes.txt')
       fs.writeFileSync(txtPath, 'x')
 
-      const { stdin, waitForFramesToInclude } =
-        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-      stdin.write('/use Top Maths\r')
-      await waitForFramesToInclude('Active notebook: Top Maths')
-      stdin.write(`/attach ${txtPath}\r`)
-      await waitForFramesToInclude('Attach supports .pdf or .epub files.')
+      const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+      await openTopMathsNotebook(ink.stdin, ink)
+      ink.stdin.write(`/attach ${txtPath}\r`)
+      await ink.waitForLastFrameToInclude(
+        'Attach supports .pdf or .epub files.'
+      )
     })
 
-    test('rejects attach when PDF path is missing', async () => {
+    test('rejects attach when book file path is missing', async () => {
       const missing = join(attachWorkDir, 'missing.pdf')
 
-      const { stdin, waitForFramesToInclude } =
-        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-      stdin.write('/use Top Maths\r')
-      await waitForFramesToInclude('Active notebook: Top Maths')
-      stdin.write(`/attach ${missing}\r`)
-      await waitForFramesToInclude('file not found or not readable:')
-    })
-
-    test('rejects attach when EPUB path is missing', async () => {
-      const missing = join(attachWorkDir, 'missing.epub')
-
-      const { stdin, waitForFramesToInclude } =
-        await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-      stdin.write('/use Top Maths\r')
-      await waitForFramesToInclude('Active notebook: Top Maths')
-      stdin.write(`/attach ${missing}\r`)
-      await waitForFramesToInclude('file not found or not readable:')
+      const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+      await openTopMathsNotebook(ink.stdin, ink)
+      ink.stdin.write(`/attach ${missing}\r`)
+      await ink.waitForLastFrameToInclude('file not found or not readable:')
     })
   })
 })

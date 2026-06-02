@@ -40,9 +40,9 @@ Top-10 hits: #3 (789ms), #5 (677ms). `lastFrame` waits via `recallSpellingIntera
 Verify: `CURSOR_DEV=true nix develop -c bash -c 'cd cli && pnpm exec vitest run tests/recallSpellingInteractive.test.tsx'`
 
 ### Group 3: InteractiveCliApp.useNotebook.test.tsx
-Status: planned
+Status: done
 
-Top-10 hits: #4 (771ms), #8 (626ms). Optimize `cli/tests/InteractiveCliApp.useNotebook.test.tsx`.
+Top-10 hits: #4 (771ms), #8 (626ms). `lastFrame` waits via `useNotebookInteractive.waits.ts`; merged redundant attach/spinner/EPUB tests (17→14).
 
 Verify: `CURSOR_DEV=true nix develop -c bash -c 'cd cli && pnpm exec vitest run tests/InteractiveCliApp.useNotebook.test.tsx'`
 
