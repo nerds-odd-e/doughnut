@@ -1,7 +1,11 @@
 import MemoryTrackerPage from "@/pages/MemoryTrackerPage.vue"
 import { flushPromises } from "@vue/test-utils"
 import { vi, describe, it, expect } from "vitest"
-import helper, { mockSdkService, wrapSdkError } from "@tests/helpers"
+import helper, {
+  mockSdkService,
+  wrapSdkError,
+  wrapSdkResponse,
+} from "@tests/helpers"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 
@@ -253,5 +257,49 @@ describe("MemoryTrackerPage", () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain("Unanswered")
+  })
+
+  it("refetches tracker after revive and leaves skipped state", async () => {
+    const recallPrompts = [makeMe.aRecallPrompt.please()]
+    const skippedTracker = makeMe.aMemoryTracker
+      .removedFromTracking(true)
+      .please()
+    const activeTracker = makeMe.aMemoryTracker
+      .removedFromTracking(false)
+      .please()
+
+    mockSdkService(MemoryTrackerController, "getRecallPrompts", recallPrompts)
+    let showMemoryTrackerFetchCount = 0
+    vi.spyOn(MemoryTrackerController, "showMemoryTracker").mockImplementation(
+      async () => {
+        showMemoryTrackerFetchCount += 1
+        const tracker =
+          showMemoryTrackerFetchCount === 1 ? skippedTracker : activeTracker
+        return wrapSdkResponse(tracker) as never
+      }
+    )
+    mockSdkService(MemoryTrackerController, "reEnable", activeTracker)
+
+    const wrapper = helper
+      .component(MemoryTrackerPage)
+      .withProps({ memoryTrackerId })
+      .mount()
+
+    await flushPromises()
+
+    expect(wrapper.text()).toContain("This memory tracker is currently skipped")
+
+    const reviveButton = wrapper.find(
+      'button[title="Revive this memory tracker"]'
+    )
+    await reviveButton.trigger("click")
+    await flushPromises()
+
+    expect(wrapper.text()).not.toContain(
+      "This memory tracker is currently skipped and will not appear in recall sessions."
+    )
+    expect(
+      wrapper.find('button[title="remove this note from recall"]').exists()
+    ).toBe(true)
   })
 })

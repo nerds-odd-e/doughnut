@@ -439,7 +439,11 @@ describe("MemoryTrackerPageView", () => {
   })
 
   describe("skipped memory tracker", () => {
-    it("shows skipped indicator at the top when memory tracker is skipped", async () => {
+    const reviveButtonSelector = 'button[title="Revive this memory tracker"]'
+    const skippedBannerText =
+      "This memory tracker is currently skipped and will not appear in recall sessions."
+
+    it("shows skipped banner and revive button when memory tracker is skipped", async () => {
       const memoryTracker = makeMe.aMemoryTracker
         .removedFromTracking(true)
         .please()
@@ -458,35 +462,10 @@ describe("MemoryTrackerPageView", () => {
 
       await flushPromises()
 
-      expect(wrapper.text()).toContain(
-        "This memory tracker is currently skipped and will not appear in recall sessions."
-      )
-    })
-
-    it("shows re-enable button when memory tracker is skipped", async () => {
-      const memoryTracker = makeMe.aMemoryTracker
-        .removedFromTracking(true)
-        .please()
-      const recallPrompt = makeMe.aRecallPrompt
-        .withQuestionStem("Test question")
-        .please()
-
-      const wrapper = helper
-        .component(MemoryTrackerPageView)
-        .withProps({
-          recallPrompts: [recallPrompt],
-          memoryTracker,
-          memoryTrackerId: 1,
-        })
-        .mount()
-
-      await flushPromises()
-
-      const reEnableButton = wrapper.find(
-        'button[title="Re-enable this memory tracker"]'
-      )
-      expect(reEnableButton.exists()).toBe(true)
-      expect(reEnableButton.text()).toContain("Re-enable")
+      expect(wrapper.text()).toContain(skippedBannerText)
+      const reviveButton = wrapper.find(reviveButtonSelector)
+      expect(reviveButton.exists()).toBe(true)
+      expect(reviveButton.text()).toContain("Revive")
     })
 
     it("shows recall prompts even when memory tracker is skipped", async () => {
@@ -540,7 +519,7 @@ describe("MemoryTrackerPageView", () => {
       expect(removeButton.exists()).toBe(false)
     })
 
-    it("calls re-enable endpoint and emits refresh when re-enable button is clicked", async () => {
+    it("calls re-enable endpoint and emits refresh when revive button is clicked", async () => {
       const memoryTracker = makeMe.aMemoryTracker
         .removedFromTracking(true)
         .please()
@@ -564,11 +543,9 @@ describe("MemoryTrackerPageView", () => {
 
       await flushPromises()
 
-      const reEnableButton = wrapper.find(
-        'button[title="Re-enable this memory tracker"]'
-      )
-      expect(reEnableButton.exists()).toBe(true)
-      await reEnableButton.trigger("click")
+      const reviveButton = wrapper.find(reviveButtonSelector)
+      expect(reviveButton.exists()).toBe(true)
+      await reviveButton.trigger("click")
       await flushPromises()
 
       expect(reEnableSpy).toHaveBeenCalledWith({
@@ -600,10 +577,8 @@ describe("MemoryTrackerPageView", () => {
       expect(wrapper.text()).not.toContain(
         "This memory tracker is currently skipped"
       )
-      const reEnableButton = wrapper.find(
-        'button[title="Re-enable this memory tracker"]'
-      )
-      expect(reEnableButton.exists()).toBe(false)
+      const reviveButton = wrapper.find(reviveButtonSelector)
+      expect(reviveButton.exists()).toBe(false)
     })
   })
 

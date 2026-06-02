@@ -4,11 +4,11 @@
       <span>This memory tracker is currently skipped and will not appear in recall sessions.</span>
       <button
         class="daisy-btn daisy-btn-sm daisy-btn-primary"
-        title="Re-enable this memory tracker"
-        aria-label="Re-enable this memory tracker"
-        @click="reEnable"
+        title="Revive this memory tracker"
+        aria-label="Revive this memory tracker"
+        @click="revive"
       >
-        Re-enable
+        Revive
       </button>
     </div>
   </div>
@@ -265,7 +265,7 @@ const removeFromRecall = async () => {
   }
 }
 
-const reEnable = async () => {
+const revive = async () => {
   const { data: memoryTracker, error } = await apiCallWithLoading(() =>
     MemoryTrackerController.reEnable({
       path: { memoryTracker: props.memoryTrackerId },

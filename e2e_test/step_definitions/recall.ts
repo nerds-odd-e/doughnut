@@ -6,6 +6,7 @@ import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
 import { commonSenseSplit } from 'support/string_util'
 import start from '../start'
+import { assumeMemoryTrackerPage } from '../start/pageObjects/memoryTrackerPage'
 
 Given("It's day {int}, {int} hour", (day: number, hour: number) => {
   start.testability().backendTimeTravelTo(day, hour)
@@ -163,6 +164,10 @@ Then('choose to remove the last memory tracker from recalls', () => {
     .goToLastAnsweredQuestion()
     .showMemoryTracker()
     .removeMemoryTrackerFromRecall('normal')
+})
+
+When('I revive the memory tracker on this page', () => {
+  assumeMemoryTrackerPage().reviveMemoryTracker()
 })
 
 Then('I should see the resume recall menu item', () => {
