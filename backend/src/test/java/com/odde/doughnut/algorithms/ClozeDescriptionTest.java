@@ -133,6 +133,23 @@ class ClozeDescriptionTest {
   }
 
   @Test
+  void clozeShouldMaskPronunciationBeforeMarkdownBlockquote() {
+    String markdown =
+        """
+        「多大\u3000/ただい/」とは、数や量。
+
+        > **例文:**<br>
+        > 「お客様に**多大なる**ご迷惑を」
+        """;
+    String result =
+        new ClozedString(clozeReplacement, markdown)
+            .hide(new NoteTitle("多大"))
+            .maskedContentAsMarkdown();
+    assertThat(result, not(containsString("/ただい/")));
+    assertThat(result, containsString("/.../"));
+  }
+
+  @Test
   void clozeShouldMaskPronunciationFollowedByJapaneseParticle() {
     String markdown = "/あしかが よしみつ/は、室町時代前期の室町幕府第3代将軍（在職：1369年 - 1395年）である。";
     String result =

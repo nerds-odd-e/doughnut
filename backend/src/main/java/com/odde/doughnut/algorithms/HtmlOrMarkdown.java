@@ -14,7 +14,7 @@ public record HtmlOrMarkdown(String htmlOrMarkdown) {
   }
 
   public String replaceTextWithContext(BiFunction<String, Boolean, String> callback) {
-    Pattern pattern = Pattern.compile("(?s)(?<=^|>)[^><]+?(?=<|$)");
+    Pattern pattern = Pattern.compile("(?s)(?<=^|>)[^<]+?(?=<|$)");
     Matcher matcher = pattern.matcher(htmlOrMarkdown);
     return matcher.replaceAll(
         matchResult -> {
