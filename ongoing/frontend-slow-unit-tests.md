@@ -38,7 +38,7 @@ Verify: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/composables/use
 ---
 
 ### Phase 2: Speed up FullScreen.spec.ts
-Status: planned
+Status: done
 
 Target: `frontend/tests/common/FullScreen.spec.ts` — `enters fullscreen mode when button is clicked` (~2.08s).
 
