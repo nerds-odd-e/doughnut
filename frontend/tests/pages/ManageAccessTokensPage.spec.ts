@@ -1,20 +1,19 @@
 import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
-import { describe, it, expect, beforeEach, vi } from "vitest"
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import ManageAccessTokensPage from "@/pages/ManageAccessTokensPage.vue"
 import helper, { mockSdkService } from "@tests/helpers"
-import { createRouter, createWebHistory } from "vue-router"
-import routes from "@/routes/routes"
-import { page } from "vitest/browser"
+import { flushPromises, type VueWrapper } from "@vue/test-utils"
 
 describe("ManageAccessTokensPage", () => {
-  let router: ReturnType<typeof createRouter>
+  let wrapper: VueWrapper
 
   beforeEach(() => {
-    router = createRouter({
-      history: createWebHistory(),
-      routes,
-    })
     vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    wrapper?.unmount()
+    document.body.innerHTML = ""
   })
 
   it('displays "No Label" when token label is empty', async () => {
@@ -25,11 +24,26 @@ describe("ManageAccessTokensPage", () => {
     })
     mockSdkService(UserController, "getTokens", [])
 
-    helper.component(ManageAccessTokensPage).withRouter(router).render()
+    wrapper = helper
+      .component(ManageAccessTokensPage)
+      .withRouter()
+      .mount({ attachTo: document.body })
+    await flushPromises()
 
-    await page.getByRole("button", { name: "Generate Token" }).click()
-    await page.getByRole("button", { name: "Submit" }).click()
+    const generateBtn = wrapper
+      .findAll("button")
+      .find((b) => b.text().includes("Generate Token"))
+    expect(generateBtn).toBeDefined()
+    await generateBtn!.trigger("click")
+    await flushPromises()
 
-    await expect.element(page.getByText("No Label")).toBeVisible()
+    const submit = document.body.querySelector(
+      'input[type="submit"]'
+    ) as HTMLInputElement
+    expect(submit).toBeTruthy()
+    submit.click()
+    await flushPromises()
+
+    expect(wrapper.text()).toContain("No Label")
   })
 })

@@ -391,27 +391,17 @@ describe("BookReadingPage", () => {
     ).toBe("My EPUB")
   })
 
-  it("shows error when PDF bytes are not valid", async () => {
+  it("shows error when PDF viewer reports invalid PDF", async () => {
     stubGetBookPlain(notebookId)
-    vi.spyOn(globalThis, "fetch").mockResolvedValue(
-      new Response(new TextEncoder().encode("not a pdf").buffer, {
-        status: 200,
-        headers: { "Content-Type": "text/plain" },
-      })
-    )
+    mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
 
     const wrapper = mountBookReadingPage(notebookId)
+    await waitForPdfViewer(wrapper)
 
-    await vi.waitFor(
-      () => {
-        expect(
-          wrapper
-            .find('[data-testid="book-reading-pdf-viewer-load-error"]')
-            .exists()
-        ).toBe(true)
-      },
-      { timeout: 5000 }
-    )
+    wrapper
+      .findComponent(PdfBookViewer)
+      .vm.$emit("loadError", "This file is not a valid PDF.")
+    await flushPromises()
 
     expect(
       wrapper.find('[data-testid="book-reading-pdf-viewer-load-error"]').text()

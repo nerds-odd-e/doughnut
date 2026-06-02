@@ -39,10 +39,14 @@ Optimized `frontend/tests/notes/NoteExportForm.spec.ts`: dropped `vitest/browser
 Verify: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteExportForm.spec.ts`
 
 ### Group 3: singleton slow tests batch
-Status: planned
+Status: done
 
-Optimize slow tests in:
-- `frontend/tests/pages/ManageAccessTokensPage.spec.ts`
-- `frontend/tests/notes/NoteToolbar.moreOptions.spec.ts`
-- `frontend/tests/commons/Popups/PopButton.spec.ts`
-- `frontend/tests/pages/BookReadingPage.spec.ts`
+Optimized singleton slow tests: dropped `getByRole` / `vitest/browser` `page` where possible; DOM `querySelector` / wrapper clicks; PopButton close via `getByText` + close button; BookReadingPage invalid PDF via `loadError` emit after viewer mount (pdf.js parse moved out of page test).
+
+Verify each file:
+- `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/ManageAccessTokensPage.spec.ts`
+- `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteToolbar.moreOptions.spec.ts`
+- `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/commons/Popups/PopButton.spec.ts`
+- `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/BookReadingPage.spec.ts`
+
+**Plan complete** — all three groups done.

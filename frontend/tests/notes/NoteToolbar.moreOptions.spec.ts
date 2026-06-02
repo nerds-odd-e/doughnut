@@ -15,7 +15,6 @@ import {
 } from "@tests/notes/noteToolbarTestHelpers"
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
-import { page } from "vitest/browser"
 
 const aiMarkdownStub = { markdown: "# AI context\n\nHello **world**." }
 const titles = noteMoreOptionsTitles
@@ -50,16 +49,21 @@ describe("NoteToolbar more options", () => {
     await wrapper.find(`[title="${titles.overflowMenu}"]`).trigger("click")
     await flushPromises()
 
-    await page.getByTitle(titles.export).click()
+    const exportBtn = document.querySelector(
+      `button[title="${titles.export}"]`
+    ) as HTMLButtonElement
+    expect(exportBtn).toBeTruthy()
+    exportBtn.click()
     await flushPromises()
 
-    await vi.waitUntil(() => document.querySelector("dialog"), {
-      timeout: 1000,
-    })
     const dialog = document.querySelector("dialog") as HTMLDialogElement
-    expect(dialog.open).toBe(true)
+    expect(dialog?.open).toBe(true)
 
-    await page.getByTestId("copy-ai-context-md-btn").click()
+    const copyBtn = document.querySelector(
+      '[data-testid="copy-ai-context-md-btn"]'
+    ) as HTMLButtonElement
+    expect(copyBtn).toBeTruthy()
+    copyBtn.click()
     await flushPromises()
 
     expect(writeText).toHaveBeenCalledWith(
