@@ -1,6 +1,7 @@
 <template>
   <li
     role="listitem"
+    :data-testid="searchResultItemTestId"
     class="flex flex-row items-start gap-2 border-b border-base-300 py-2 px-1 last:border-b-0 hover:bg-base-200 transition-colors"
     :class="{
       'different-notebook-border border-l-primary': isDifferentNotebook,
@@ -84,6 +85,7 @@ import type { RelationshipLiteralSearchHit } from "@generated/doughnut-backend-a
 import { BookText, FileText, Folder } from "@lucide/vue"
 import { computed, type Component } from "vue"
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
+import { searchResultItemTestId } from "@/utils/searchDialogKeyboard"
 
 const props = defineProps({
   searchHit: {

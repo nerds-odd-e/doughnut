@@ -10,7 +10,10 @@ import {
 import { flushPromises, mount, type VueWrapper } from "@vue/test-utils"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
+import { folderSearchResultTestId } from "@/utils/searchDialogKeyboard"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+
+const folderSearchResultSelector = `[data-testid="${folderSearchResultTestId}"]`
 
 const router = createRouter({
   history: createWebHistory(),
@@ -70,6 +73,39 @@ describe("FolderSelector", () => {
     await flushPromises()
     await wrapper?.vm.$nextTick()
   }
+
+  describe("keyboard navigation", () => {
+    it("moves focus to first folder result on ArrowDown from search input", async () => {
+      matchMediaSpy = mockCoarsePointer(false)
+      mountSelector()
+      await flushPromises()
+
+      await clickSearchMoreButtonAndSettle()
+
+      await vi.waitUntil(
+        () =>
+          document.querySelector(
+            '[data-testid="folder-selector-search-input"]'
+          ) !== null,
+        { timeout: 2000 }
+      )
+
+      const searchInput = document.querySelector(
+        '[data-testid="folder-selector-search-input"]'
+      ) as HTMLInputElement
+      searchInput.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          key: "ArrowDown",
+          code: "ArrowDown",
+          bubbles: true,
+        })
+      )
+
+      const firstResult = document.querySelector(folderSearchResultSelector)
+      expect(firstResult).toBeTruthy()
+      expect(document.activeElement).toBe(firstResult)
+    })
+  })
 
   describe("soft keyboard primer", () => {
     it("focuses primer synchronously when search is opened on touch device", async () => {

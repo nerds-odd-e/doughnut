@@ -1,6 +1,7 @@
 <template>
   <ul
     role="list"
+    :data-testid="searchResultListTestId"
     class="m-0 list-none p-0 flex flex-col"
   >
     <SearchResultListItem
@@ -52,6 +53,7 @@ import type { PropType } from "vue"
 import type { RelationshipLiteralSearchHit } from "@generated/doughnut-backend-api"
 import SearchResultListItem from "./SearchResultListItem.vue"
 import { relationshipLiteralSearchHitKey } from "@/models/relationshipLiteralSearchHitKey"
+import { searchResultListTestId } from "@/utils/searchDialogKeyboard"
 
 defineProps({
   searchHits: {

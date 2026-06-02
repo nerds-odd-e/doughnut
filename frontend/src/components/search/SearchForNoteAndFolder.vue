@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div ref="rootRef">
     <div class="flex items-center gap-2 w-full">
       <TextInput
         class="flex-1 min-w-0"
@@ -9,6 +9,7 @@
         placeholder="Search"
         hide-label
         v-focus
+        @keydown="onSearchFieldKeydown"
       >
         <template #input_prepend>
           <AutoCollapseDropdown
@@ -150,6 +151,10 @@ import TextInput from "../form/TextInput.vue"
 import SearchResults from "./SearchResults.vue"
 import type { NoteSearchResult } from "@generated/doughnut-backend-api"
 import { readSearchKeyHistory } from "@/utils/searchKeyHistoryCookie"
+import {
+  handleSearchFieldArrowDownToFirstResult,
+  searchResultListRowSelector,
+} from "@/utils/searchDialogKeyboard"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 import DropdownMenu from "@/components/commons/DropdownMenu.vue"
 import DropdownMenuItem from "@/components/commons/DropdownMenuItem.vue"
@@ -170,6 +175,8 @@ const emit = defineEmits<{
   (e: "moveToNotebookRoot", targetNotebookId: number): void
 }>()
 
+const rootRef = ref<HTMLElement | null>(null)
+
 const inputSearchKey = ref(initialSearchKey ?? "")
 const allMyNotebooksAndSubscriptions = ref(true)
 const allMyCircles = ref(false)
@@ -187,6 +194,14 @@ function onHistoryToggle(event: Event) {
 function pickHistoryKey(key: string, closeDropdown: () => void) {
   inputSearchKey.value = key
   closeDropdown()
+}
+
+function onSearchFieldKeydown(event: KeyboardEvent) {
+  handleSearchFieldArrowDownToFirstResult(
+    event,
+    rootRef.value,
+    searchResultListRowSelector
+  )
 }
 </script>
 

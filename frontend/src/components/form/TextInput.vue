@@ -18,6 +18,7 @@
       autocapitalize="off"
       @blur="$emit('blur')"
       @focus="$emit('focus')"
+      @keydown="$emit('keydown', $event)"
       :disabled="disabled"
     />
     <template #input_append v-if="$slots.input_append">
@@ -49,6 +50,7 @@ defineEmits<{
   "update:modelValue": [value: string]
   blur: []
   focus: []
+  keydown: [event: KeyboardEvent]
 }>()
 
 const input = ref<HTMLInputElement | null>(null)

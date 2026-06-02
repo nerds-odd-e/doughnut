@@ -1,5 +1,9 @@
 <template>
-  <div class="w-full" data-testid="folder-selector-search-dialog">
+  <div
+    ref="dialogRootRef"
+    class="w-full"
+    data-testid="folder-selector-search-dialog"
+  >
     <h3 class="font-bold text-lg mb-2">Find folder</h3>
     <p class="text-sm text-base-content/70 mb-1">
       Current selection
@@ -41,6 +45,7 @@
         data-testid="folder-selector-search-input"
         autocomplete="off"
         :disabled="foldersLoading"
+        @keydown="onSearchFieldKeydown"
       />
     </div>
     <ul
@@ -50,7 +55,7 @@
         <button
           type="button"
           class="text-left w-full break-words whitespace-normal"
-          data-testid="folder-selector-search-result"
+          :data-testid="folderSearchResultTestId"
           data-folder-id="__root__"
           @click="pickRow(null)"
         >
@@ -61,7 +66,7 @@
         <button
           type="button"
           class="text-left w-full break-words whitespace-normal"
-          data-testid="folder-selector-search-result"
+          :data-testid="folderSearchResultTestId"
           :data-folder-id="String(r.id)"
           @click="pickRow(r)"
         >
@@ -94,6 +99,11 @@ import {
   folderPathLabel,
   folderRowsById,
 } from "./folderSelectorUtils"
+import {
+  folderSearchResultRowSelector,
+  folderSearchResultTestId,
+  handleSearchFieldArrowDownToFirstResult,
+} from "@/utils/searchDialogKeyboard"
 
 const props = defineProps<{
   notebookId: number
@@ -117,6 +127,7 @@ const indexRows = ref<Folder[]>([])
 const indexLoadError = ref<string | undefined>(undefined)
 const query = ref("")
 const foldersLoading = ref(true)
+const dialogRootRef = ref<HTMLElement | null>(null)
 const searchInputRef = ref<HTMLInputElement | null>(null)
 
 watch(foldersLoading, async (loading) => {
@@ -191,5 +202,14 @@ function pickRow(row: Folder | null) {
 
 function close() {
   emit("close")
+}
+
+function onSearchFieldKeydown(event: KeyboardEvent) {
+  handleSearchFieldArrowDownToFirstResult(
+    event,
+    dialogRootRef.value,
+    folderSearchResultRowSelector,
+    { when: !foldersLoading.value }
+  )
 }
 </script>

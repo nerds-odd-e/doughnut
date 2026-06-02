@@ -18,8 +18,11 @@ import {
   clearSearchKeyHistoryCookie,
   readSearchKeyHistory,
 } from "@/utils/searchKeyHistoryCookie"
+import { searchResultItemTestId } from "@/utils/searchDialogKeyboard"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { defineComponent } from "vue"
+
+const searchResultItemSelector = `[data-testid="${searchResultItemTestId}"]`
 
 function makeNoteHit(title: string, notebookId: number) {
   return {
@@ -59,6 +62,31 @@ describe("SearchForm", () => {
         name: "All My Notebooks And Subscriptions",
       })
     ).toBeDisabled()
+  })
+
+  describe("keyboard navigation", () => {
+    it("moves focus to first result on ArrowDown from search input", async () => {
+      const recentNote = MakeMe.aNoteSearchResult.title("Recent Note").please()
+      mockSdkService(NoteController, "getRecentNotes", [recentNote])
+      helper
+        .component(SearchForm)
+        .withCleanStorage()
+        .withProps({ note: null })
+        .render()
+      await flushPromises()
+
+      const searchInput = await screen.findByPlaceholderText("Search")
+      await vi.waitUntil(
+        () => document.querySelector(searchResultItemSelector) !== null,
+        { timeout: 2000 }
+      )
+
+      fireEvent.keyDown(searchInput, { key: "ArrowDown", code: "ArrowDown" })
+
+      const firstItem = document.querySelector(searchResultItemSelector)
+      expect(firstItem).toBeTruthy()
+      expect(firstItem!.contains(document.activeElement)).toBe(true)
+    })
   })
 
   it("toggle search settings", async () => {
