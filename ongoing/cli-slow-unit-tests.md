@@ -33,9 +33,9 @@ Top-10 hits: #2 (827ms), #6 (656ms), #9 (595ms). Optimized `cli/tests/recallJust
 Verify: `CURSOR_DEV=true nix develop -c bash -c 'cd cli && pnpm exec vitest run tests/recallJustReviewInteractive'`
 
 ### Group 2: recallSpellingInteractive.test.tsx
-Status: planned
+Status: done
 
-Top-10 hits: #3 (789ms), #5 (677ms). Optimize `cli/tests/recallSpellingInteractive.test.tsx`.
+Top-10 hits: #3 (789ms), #5 (677ms). `lastFrame` waits via `recallSpellingInteractive.waits.ts`; dropped redundant Esc-only and duplicate mixed-case tests (9→7).
 
 Verify: `CURSOR_DEV=true nix develop -c bash -c 'cd cli && pnpm exec vitest run tests/recallSpellingInteractive.test.tsx'`
 
