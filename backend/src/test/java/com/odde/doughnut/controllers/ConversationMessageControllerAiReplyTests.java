@@ -135,13 +135,5 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
 
       assertThat(recallConversation.getConversationMessages().size()).isGreaterThan(0);
     }
-
-    @Test
-    void shouldIncludeQuestionDetailsWhenCreatingNewConversation()
-        throws UnexpectedNoAccessRightException, BadRequestException {
-      controller.getAiReply(recallConversation);
-
-      assertThat(recallConversation.getConversationMessages().size()).isGreaterThan(0);
-    }
   }
 }

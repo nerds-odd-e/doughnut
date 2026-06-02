@@ -5,7 +5,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -38,11 +37,7 @@ class OpenApiDocsTests {
     ResultActions perform = this.mockMvc.perform(get("/api-docs.yaml"));
     String currentApiDocs = perform.andReturn().getResponse().getContentAsString();
 
-    Path tempFile = Files.createTempFile("api-docs-current", ".yaml");
-    String trueCopyPath = "../open_api_docs.yaml";
-
-    Files.writeString(tempFile, currentApiDocs);
-    String trueCopy = new String(Files.readAllBytes(Paths.get(trueCopyPath)));
+    String trueCopy = Files.readString(Path.of("../open_api_docs.yaml"));
 
     if (!trueCopy.equals(currentApiDocs)) {
       String diffMessage = generateDiffMessage(trueCopy, currentApiDocs);

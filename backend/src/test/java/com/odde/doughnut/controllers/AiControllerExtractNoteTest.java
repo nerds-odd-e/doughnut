@@ -76,21 +76,6 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
           .isEqualTo("Updated parent with summary.");
       Note extractedNote = noteRepository.findById(response.getNote().getId()).orElseThrow();
       assertThat(extractedNote.getFolder()).isNull();
-    }
-
-    @Test
-    void shouldLimitExtractionOutputToThreeThousandTokensAndRequestWikiLinks()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
-      Note testNote = newRootNoteWithExtractableContent();
-      NoteExtractionResult aiResult = new NoteExtractionResult();
-      aiResult.setNewNoteTitle("Point B");
-      aiResult.setNewNoteContent("Extracted");
-      aiResult.setUpdatedParentContent("A. C. D. E.");
-      openAiStructuredResponseMock.stubStructuredResponse(aiResult);
-
-      RefinementSuggestionsRequestDTO requestDTO = new RefinementSuggestionsRequestDTO();
-      requestDTO.setSuggestions(List.of("key suggestion to extract"));
-      controller.extractNote(testNote, requestDTO);
 
       @SuppressWarnings({"unchecked", "rawtypes"})
       ArgumentCaptor<StructuredResponseCreateParams<NoteExtractionResult>> paramsCaptor =

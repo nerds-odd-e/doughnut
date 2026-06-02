@@ -1,62 +1,76 @@
 package com.odde.doughnut.configs;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
-import com.odde.doughnut.entities.MemoryTracker;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.User;
-import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
-import com.openai.client.OpenAIClient;
-import org.junit.jupiter.api.BeforeEach;
+import com.odde.doughnut.entities.RecallPrompt;
+import java.lang.reflect.Method;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.convention.TestBean;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.core.MethodParameter;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.http.server.ServletServerHttpResponse;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.server.ResponseStatusException;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@ActiveProfiles("test")
-@Transactional
+@SuppressWarnings("removal")
 class NullToNotFoundResponseBodyAdviceTest {
-  @Autowired private MockMvc mockMvc;
 
-  @MockitoBean(name = "officialOpenAiClient")
-  OpenAIClient officialClient;
+  private final NullToNotFoundResponseBodyAdvice advice = new NullToNotFoundResponseBodyAdvice();
 
-  @Autowired MakeMe makeMe;
-
-  @TestBean protected CurrentUser currentUser;
-
-  static CurrentUser currentUser() {
-    return new CurrentUser();
-  }
-
-  OpenAiStructuredResponseMock openAiStructuredResponseMock;
-
-  @BeforeEach
-  void setup() {
-    currentUser.setUser(makeMe.aUser().please());
-    openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
-    // Stub null Responses result so askAQuestion returns null
-    openAiStructuredResponseMock.stubStructuredResponse(null);
+  @Test
+  void supportsRecallPromptReturnType() throws NoSuchMethodException {
+    Method method = SampleController.class.getDeclaredMethod("returnsRecallPrompt");
+    MethodParameter returnType = new MethodParameter(method, -1);
+    assertThat(advice.supports(returnType, MappingJackson2HttpMessageConverter.class)).isTrue();
   }
 
   @Test
-  void shouldReturn404WhenAskAQuestionReturnsNull() throws Exception {
-    Note note = makeMe.aNote().content("description long enough.").rememberSpelling().please();
-    User user = currentUser.getUser();
-    MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
+  void convertsNullBodyToNotFound() throws NoSuchMethodException {
+    Method method = SampleController.class.getDeclaredMethod("returnsRecallPrompt");
+    MethodParameter returnType = new MethodParameter(method, -1);
+    ServerHttpRequest request =
+        new ServletServerHttpRequest(new MockHttpServletRequest("GET", "/api/example"));
+    ServerHttpResponse response = new ServletServerHttpResponse(new MockHttpServletResponse());
 
-    this.mockMvc
-        .perform(get("/api/recall-prompts/{memoryTracker}/question", memoryTracker.getId()))
-        .andExpect(status().isNotFound());
+    ResponseStatusException ex =
+        assertThrows(
+            ResponseStatusException.class,
+            () ->
+                advice.beforeBodyWrite(
+                    null,
+                    returnType,
+                    MediaType.APPLICATION_JSON,
+                    MappingJackson2HttpMessageConverter.class,
+                    request,
+                    response));
+
+    assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    assertThat(ex.getReason()).isEqualTo("Resource not found");
+  }
+
+  @Test
+  void doesNotApplyToResponseEntityReturnType() throws NoSuchMethodException {
+    Method method = SampleController.class.getDeclaredMethod("returnsResponseEntity");
+    MethodParameter returnType = new MethodParameter(method, -1);
+    assertThat(advice.supports(returnType, MappingJackson2HttpMessageConverter.class)).isFalse();
+  }
+
+  static class SampleController {
+    @GetMapping
+    RecallPrompt returnsRecallPrompt() {
+      return null;
+    }
+
+    @GetMapping
+    org.springframework.http.ResponseEntity<String> returnsResponseEntity() {
+      return org.springframework.http.ResponseEntity.ok("ok");
+    }
   }
 }

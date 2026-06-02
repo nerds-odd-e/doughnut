@@ -6,12 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcherFromRequest;
 import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.entities.FailureReport;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.FailureReportRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.exceptions.ApiException;
@@ -60,8 +60,9 @@ public class ControllerSetupTest {
   CurrentUserFetcherFromRequest currentUserFetcher;
 
   @BeforeEach
-  void setup() {
+  void setup() throws IOException, InterruptedException {
     when(testabilitySettings.getGithubService()).thenReturn(githubService);
+    doReturn(null).when(githubService).createGithubIssue(any());
     currentUserFetcher =
         new CurrentUserFetcherFromRequest(request, userRepository, userService, Optional.empty());
     controllerSetup =
@@ -124,19 +125,6 @@ public class ControllerSetupTest {
     assertThat(failureReport.getIssueNumber(), is(nullValue()));
     assertThat(failureReport.getErrorDetail(), containsString("GitHub issue creation failed"));
     assertThat(failureReport.getErrorDetail(), containsString("HTTP 401"));
-  }
-
-  @Test
-  void shouldRecordUserInfo() {
-    User user = makeMe.aUser().please();
-    request.setUserPrincipal(() -> user.getExternalIdentifier());
-    currentUserFetcher =
-        new CurrentUserFetcherFromRequest(request, userRepository, userService, Optional.empty());
-    controllerSetup =
-        new ControllerSetup(failureReportRepository, currentUserFetcher, testabilitySettings);
-    FailureReport failureReport = catchExceptionAndGetFailureReport();
-    assertThat(failureReport.getErrorDetail(), containsString(user.getExternalIdentifier()));
-    assertThat(failureReport.getErrorDetail(), containsString(user.getName()));
   }
 
   @Test

@@ -38,7 +38,7 @@ Verify: `CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring
 ---
 
 ### Phase 2: Speed up OpenApiDocsTests
-Status: planned
+Status: done
 
 Target: `backend/src/test/java/com/odde/doughnut/integration/OpenApiDocsTests.java` — `openApiDocsApprovalTest()` (~0.58s).
 
@@ -49,7 +49,7 @@ Verify: `--tests "com.odde.doughnut.integration.OpenApiDocsTests"`
 ---
 
 ### Phase 3: Speed up ControllerSetupTest
-Status: planned
+Status: done
 
 Target: `backend/src/test/java/com/odde/doughnut/configs/ControllerSetupTest.java` — `shouldRecordUserInfo()` (~0.48s).
 
@@ -60,7 +60,7 @@ Verify: `--tests "com.odde.doughnut.configs.ControllerSetupTest"`
 ---
 
 ### Phase 4: Speed up ConversationMessageControllerAiReplyTests recall prompt
-Status: planned
+Status: done
 
 Target: `ConversationMessageControllerAiReplyTests` nested `RecallPromptConversationTests#shouldUseNoteFromRecallPrompt` (~0.21s).
 
@@ -71,7 +71,7 @@ Verify: `--tests "com.odde.doughnut.controllers.ConversationMessageControllerAiR
 ---
 
 ### Phase 5: Speed up AiAudioControllerTests convert audio
-Status: planned
+Status: done
 
 Target: `AiAudioControllerTests$ConvertAudioToTextTests#convertAudioToText` (~0.19s).
 
@@ -82,7 +82,7 @@ Verify: `--tests "com.odde.doughnut.controllers.AiAudioControllerTests"`
 ---
 
 ### Phase 6: Speed up NullToNotFoundResponseBodyAdviceTest
-Status: planned
+Status: done
 
 Target: `NullToNotFoundResponseBodyAdviceTest#shouldReturn404WhenAskAQuestionReturnsNull` (~0.17s).
 
@@ -93,7 +93,9 @@ Verify: `--tests "com.odde.doughnut.configs.NullToNotFoundResponseBodyAdviceTest
 ---
 
 ### Phase 7: Speed up ConversationMessageControllerTest ordering
-Status: planned
+Status: done
+
+No change: 51 persisted conversations is the minimum to assert the page size of 50; test already uses direct controller call.
 
 Target: `ConversationMessageControllerTest$ConversationOrderingTests#returnsAtMost50Conversations` (~0.09s).
 
@@ -104,7 +106,9 @@ Verify: `--tests "com.odde.doughnut.controllers.ConversationMessageControllerTes
 ---
 
 ### Phase 8: Speed up GcsBookStorageTest delete
-Status: planned
+Status: done
+
+No change: already a pure Mockito unit test; remaining time is JVM noise.
 
 Target: `GcsBookStorageTest#delete_callsStorageDeleteForAllowedRef` (~0.08s).
 
@@ -115,7 +119,9 @@ Verify: `--tests "com.odde.doughnut.services.book.GcsBookStorageTest"`
 ---
 
 ### Phase 9: Speed up AiControllerTest model versions
-Status: planned
+Status: done
+
+No change: already mocks OpenAI; cost is shared Spring context per class.
 
 Target: `AiControllerTest$GetModelVersions#shouldGetModelVersionsCorrectly` (~0.08s).
 
@@ -126,7 +132,7 @@ Verify: `--tests "com.odde.doughnut.controllers.AiControllerTest"`
 ---
 
 ### Phase 10: Speed up AiControllerExtractNoteTest extraction limit
-Status: planned
+Status: done
 
 Target: `AiControllerExtractNoteTest$ExtractNote#shouldLimitExtractionOutputToThreeThousandTokensAndRequestWikiLinks` (~0.08s).
 

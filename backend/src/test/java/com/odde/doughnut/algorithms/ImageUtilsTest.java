@@ -24,17 +24,17 @@ class ImageUtilsTest {
 
   @Test
   void shouldResizeLargeImage() throws IOException {
-    InputStreamSource stream = buildImage(2001, 200);
+    InputStreamSource stream = buildImage(2001, 2);
     BufferedImage output = resizeImage(stream, "img.png");
     assertThat(output.getWidth(), equalTo(2000));
-    assertThat(output.getHeight(), equalTo(199));
+    assertThat(output.getHeight(), equalTo(1));
   }
 
   @Test
   void shouldResizeTooTallImage() throws IOException {
-    InputStreamSource stream = buildImage(200, 2001);
+    InputStreamSource stream = buildImage(2, 2001);
     BufferedImage output = resizeImage(stream, "img.png");
-    assertThat(output.getWidth(), equalTo(199));
+    assertThat(output.getWidth(), equalTo(1));
     assertThat(output.getHeight(), equalTo(2000));
   }
 

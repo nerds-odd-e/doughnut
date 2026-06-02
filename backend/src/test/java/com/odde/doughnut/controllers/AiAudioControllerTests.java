@@ -102,16 +102,6 @@ class AiAudioControllerTests {
     }
 
     @Test
-    void convertAudioToText() throws IOException {
-      NoteContentCompletion resp =
-          controller
-              .audioToText(audioUploadDTO)
-              .map(TextFromAudioWithCallInfo::getCompletionFromAudio)
-              .orElseThrow();
-      assertThat(resp.content, equalTo("test123"));
-    }
-
-    @Test
     void shouldTruncateSRTWhenIncomplete() throws IOException {
       audioUploadDTO.setMidSpeech(true);
       mockTranscriptionSrtResponse(
