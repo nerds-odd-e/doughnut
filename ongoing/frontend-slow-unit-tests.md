@@ -82,7 +82,7 @@ Verify: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/links/SearchDia
 ---
 
 ### Phase 6: Speed up InsertWikiLink.spec.ts (top-10 cases)
-Status: planned
+Status: done
 
 Target: `frontend/tests/links/InsertWikiLink.spec.ts` — three top-10 cases (~1.12s each).
 

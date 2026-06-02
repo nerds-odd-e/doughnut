@@ -2,26 +2,29 @@ import {
   NoteController,
   SearchController,
 } from "@generated/doughnut-backend-api/sdk.gen"
+import type { Note, NoteSearchResult } from "@generated/doughnut-backend-api"
 import SearchForm from "@/components/links/SearchForm.vue"
 import { useContentCursorInserter } from "@/composables/useContentCursorInserter"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import MakeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { nextTick } from "vue"
+
+const SEARCH_DEBOUNCE_MS = 1000
 
 describe("InsertWikiLink", () => {
   const insertedTexts: string[] = []
   const wikiPropertyInserted: string[] = []
 
-  beforeEach(() => {
-    vi.clearAllMocks()
-    insertedTexts.length = 0
-    wikiPropertyInserted.length = 0
-    mockSdkService(NoteController, "getRecentNotes", [])
-    mockSdkService(SearchController, "searchForRelationshipTarget", [])
-    mockSdkService(SearchController, "semanticSearch", [])
-    mockSdkService(SearchController, "semanticSearchWithin", [])
+  async function waitForSearchDebounce() {
+    await nextTick()
+    vi.advanceTimersByTime(SEARCH_DEBOUNCE_MS + 100)
+    await flushPromises()
+  }
+
+  function setupInserters(wikiPropertyCanInsert = false) {
     const {
       registerInserter,
       registerWikiPropertyInserter,
@@ -30,31 +33,65 @@ describe("InsertWikiLink", () => {
     unregisterInserter()
     registerInserter((text) => insertedTexts.push(text))
     registerWikiPropertyInserter({
-      canInsert: () => false,
+      canInsert: () => wikiPropertyCanInsert,
       insert: (text) => wikiPropertyInserted.push(text),
     })
+  }
+
+  function mockRelationshipSearch(targetResult: NoteSearchResult) {
+    mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
+      { hitKind: "NOTE" as const, noteSearchResult: targetResult },
+    ])
+  }
+
+  function mountSearchForm(note: Note, options?: { withRouter?: boolean }) {
+    let builder = helper
+      .component(SearchForm)
+      .withCleanStorage()
+      .withProps({ note })
+    if (options?.withRouter) {
+      builder = builder.withRouter()
+    }
+    return builder.render()
+  }
+
+  async function searchAndOpenLinkChoice(searchKey: string) {
+    const searchInput = await screen.findByPlaceholderText("Search")
+    fireEvent.update(searchInput, searchKey)
+    await waitForSearchDebounce()
+    fireEvent.click(screen.getByText("Add link"))
+    await flushPromises()
+  }
+
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.clearAllMocks()
+    insertedTexts.length = 0
+    wikiPropertyInserted.length = 0
+    mockSdkService(NoteController, "getRecentNotes", [])
+    mockSdkService(SearchController, "searchForRelationshipTarget", [])
+    mockSdkService(SearchController, "semanticSearch", [])
+    mockSdkService(SearchController, "semanticSearchWithin", [])
+    setupInserters()
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
   })
 
   it("calls the registered inserter with a wiki link text when Insert as a wiki link is clicked", async () => {
     const note = MakeMe.aNote.please()
     const targetResult = MakeMe.aNoteSearchResult.title("Target CI").please()
-    mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
-      { hitKind: "NOTE" as const, noteSearchResult: targetResult },
-    ])
+    mockRelationshipSearch(targetResult)
+    mountSearchForm(note)
 
-    helper.component(SearchForm).withCleanStorage().withProps({ note }).render()
+    await searchAndOpenLinkChoice("CI")
 
-    const searchInput = await screen.findByPlaceholderText("Search")
-    fireEvent.update(searchInput, "CI")
-    await new Promise((resolve) => setTimeout(resolve, 1100))
-    await flushPromises()
+    expect(
+      screen.queryByText("Add wiki link as a new property")
+    ).not.toBeInTheDocument()
 
-    fireEvent.click(await screen.findByRole("button", { name: "Add link" }))
-    await flushPromises()
-
-    fireEvent.click(
-      await screen.findByRole("button", { name: "Insert as a wiki link" })
-    )
+    fireEvent.click(screen.getByText("Insert as a wiki link"))
     await flushPromises()
 
     expect(insertedTexts).toContain("[[Target CI]]")
@@ -63,95 +100,32 @@ describe("InsertWikiLink", () => {
   it("does not call the inserter when Add a new relationship note is clicked", async () => {
     const note = MakeMe.aNote.please()
     const targetResult = MakeMe.aNoteSearchResult.title("Sedation").please()
-    mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
-      { hitKind: "NOTE" as const, noteSearchResult: targetResult },
-    ])
+    mockRelationshipSearch(targetResult)
+    mountSearchForm(note, { withRouter: true })
 
-    helper
-      .component(SearchForm)
-      .withCleanStorage()
-      .withRouter()
-      .withProps({ note })
-      .render()
+    await searchAndOpenLinkChoice("Sed")
 
-    const searchInput = await screen.findByPlaceholderText("Search")
-    fireEvent.update(searchInput, "Sed")
-    await new Promise((resolve) => setTimeout(resolve, 1100))
-    await flushPromises()
-
-    fireEvent.click(await screen.findByRole("button", { name: "Add link" }))
-    await flushPromises()
-
-    fireEvent.click(
-      await screen.findByRole("button", {
-        name: "Add a new relationship note",
-      })
-    )
+    fireEvent.click(screen.getByText("Add a new relationship note"))
     await flushPromises()
 
     expect(insertedTexts).toHaveLength(0)
-    expect(await screen.findByText("Complete relationship")).toBeInTheDocument()
+    expect(screen.getByText("Complete relationship")).toBeInTheDocument()
   })
 
   it("calls the wiki-property inserter when Add wiki link as a new property is clicked", async () => {
-    const {
-      registerInserter,
-      registerWikiPropertyInserter,
-      unregisterInserter,
-    } = useContentCursorInserter()
-    unregisterInserter()
-    registerInserter((text) => insertedTexts.push(text))
-    registerWikiPropertyInserter({
-      canInsert: () => true,
-      insert: (text) => wikiPropertyInserted.push(text),
-    })
+    setupInserters(true)
 
     const note = MakeMe.aNote.please()
     const targetResult = MakeMe.aNoteSearchResult.title("PropTarget").please()
-    mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
-      { hitKind: "NOTE" as const, noteSearchResult: targetResult },
-    ])
+    mockRelationshipSearch(targetResult)
+    mountSearchForm(note)
 
-    helper.component(SearchForm).withCleanStorage().withProps({ note }).render()
+    await searchAndOpenLinkChoice("Prop")
 
-    const searchInput = await screen.findByPlaceholderText("Search")
-    fireEvent.update(searchInput, "Prop")
-    await new Promise((resolve) => setTimeout(resolve, 1100))
-    await flushPromises()
-
-    fireEvent.click(await screen.findByRole("button", { name: "Add link" }))
-    await flushPromises()
-
-    fireEvent.click(
-      await screen.findByRole("button", {
-        name: "Add wiki link as a new property",
-      })
-    )
+    fireEvent.click(screen.getByText("Add wiki link as a new property"))
     await flushPromises()
 
     expect(wikiPropertyInserted).toContain("[[PropTarget]]")
     expect(insertedTexts).toHaveLength(0)
-  })
-
-  it("does not offer Add wiki link as a new property when the wiki-property inserter is unavailable", async () => {
-    const note = MakeMe.aNote.please()
-    const targetResult = MakeMe.aNoteSearchResult.title("NoPropBtn").please()
-    mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
-      { hitKind: "NOTE" as const, noteSearchResult: targetResult },
-    ])
-
-    helper.component(SearchForm).withCleanStorage().withProps({ note }).render()
-
-    const searchInput = await screen.findByPlaceholderText("Search")
-    fireEvent.update(searchInput, "NoProp")
-    await new Promise((resolve) => setTimeout(resolve, 1100))
-    await flushPromises()
-
-    fireEvent.click(await screen.findByRole("button", { name: "Add link" }))
-    await flushPromises()
-
-    expect(
-      screen.queryByRole("button", { name: "Add wiki link as a new property" })
-    ).not.toBeInTheDocument()
   })
 })
