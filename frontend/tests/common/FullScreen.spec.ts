@@ -1,9 +1,9 @@
 import FullScreen from "@/components/common/FullScreen.vue"
 import { flushPromises, mount, type VueWrapper } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { page } from "vitest/browser"
 
 const TOGGLE_FULL_SCREEN_TITLE = "Toggle Full Screen"
+const SLOT_CONTENT = "Test Error Message"
 
 describe("FullScreen", () => {
   let wrapper: VueWrapper | undefined
@@ -47,47 +47,54 @@ describe("FullScreen", () => {
     vi.restoreAllMocks()
   })
 
-  const mountFullScreen = () => {
-    wrapper = mount(FullScreen, { attachTo: document.body })
+  const mountFullScreen = (slot?: string) => {
+    wrapper = mount(FullScreen, {
+      attachTo: document.body,
+      slots: slot ? { default: slot } : undefined,
+    })
     return wrapper
   }
 
   const fullscreenOverlay = () =>
     document.body.querySelector(".fullscreen-overlay")
 
-  const clickToggleFullScreen = async () => {
-    const button = page.getByTitle(TOGGLE_FULL_SCREEN_TITLE)
-    await expect.element(button).toBeVisible()
-    await button.click()
+  const clickToggleFullScreen = async (w: VueWrapper) => {
+    await w.find(".fullscreen-btn").trigger("click")
     await flushPromises()
   }
 
   const enterFullscreen = async (w: VueWrapper) => {
-    await clickToggleFullScreen()
-    await w.vm.$nextTick()
-    await flushPromises()
+    await clickToggleFullScreen(w)
     expect(fullscreenOverlay()).toBeTruthy()
   }
 
+  const clickExitFullScreen = async () => {
+    const exitButton = document.body.querySelector(".exit-fullscreen-btn")
+    expect(exitButton).toBeTruthy()
+    ;(exitButton as HTMLButtonElement).click()
+    await flushPromises()
+  }
+
   it("enters fullscreen mode when button is clicked", async () => {
-    const w = mountFullScreen()
+    const w = mountFullScreen(`<div class="test-error">${SLOT_CONTENT}</div>`)
     expect(w.find(".fullscreen-btn").attributes("title")).toBe(
       TOGGLE_FULL_SCREEN_TITLE
     )
 
-    await clickToggleFullScreen()
+    await enterFullscreen(w)
 
     expect(document.documentElement.requestFullscreen).toHaveBeenCalled()
     expect(document.documentElement.requestPointerLock).toHaveBeenCalled()
-    expect(fullscreenOverlay()).toBeTruthy()
+    expect(fullscreenOverlay()?.querySelector(".test-error")?.textContent).toBe(
+      SLOT_CONTENT
+    )
   })
 
   it("exits fullscreen mode when exit button is clicked", async () => {
     const w = mountFullScreen()
     await enterFullscreen(w)
 
-    await page.getByText("Exit Full Screen").click()
-    await flushPromises()
+    await clickExitFullScreen()
 
     expect(document.exitFullscreen).toHaveBeenCalled()
     expect(document.exitPointerLock).toHaveBeenCalled()
@@ -106,24 +113,5 @@ describe("FullScreen", () => {
     expect(document.exitFullscreen).toHaveBeenCalled()
     expect(document.exitPointerLock).toHaveBeenCalled()
     expect(fullscreenOverlay()).toBeFalsy()
-  })
-
-  it("renders slot content when in fullscreen", async () => {
-    const TestComponent = {
-      template: `
-        <FullScreen>
-          <div class="test-error">Test Error Message</div>
-        </FullScreen>
-      `,
-      components: { FullScreen },
-    }
-
-    wrapper = mount(TestComponent, { attachTo: document.body })
-    await enterFullscreen(wrapper)
-
-    const errorElement = document.body.querySelector(
-      ".fullscreen-overlay .test-error"
-    )
-    expect(errorElement?.textContent).toBe("Test Error Message")
   })
 })

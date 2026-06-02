@@ -1,93 +1,46 @@
 # Frontend slow unit test optimization
 
-Profiled with `CI=true npx vitest run --browser=chromium --reporter=json` (JSON at `/tmp/frontend-vitest-profile.json`).
-Suite wall time ~25s; 1370 tests.
+Profiled with `CI=true npx vitest run --browser=chromium --reporter=json` (2026-06-03).
 
-**Grouping:** per test file (6 groups for top 10 — smaller batch than one group of 10).
-
-**Optimization rules (all phases):**
+## Rules
 
 - Remove or simplify redundant tests first.
-- Strictly no fixed-time waits (`sleep`, `setTimeout` used only to wait a duration, `vi.waitFor` with excessive timeout as a substitute for sleep).
-- Flaky = failure; tests must be deterministic.
+- Strictly no fixed-time waits (`sleep`).
+- Flaky tests are failures — fix or remove.
 
-| # | Time | File :: test |
-|---|------|----------------|
-| 1 | 2.106s | `useThinkingTimeTracker.spec.ts` :: starts timer after nextTick and requestAnimationFrame |
-| 2 | 2.076s | `FullScreen.spec.ts` :: enters fullscreen mode when button is clicked |
-| 3 | 1.902s | `TextArea.spec.ts` :: expands based on content up to 'autoExtendUntil' limit |
-| 4 | 1.208s | `NoteExportForm.spec.ts` :: downloads graph JSON when download button is clicked |
-| 5 | 1.123s | `SearchDialog.spec.ts` :: calls moveNoteToNotebookRootInNotebook with notebook id after confirm |
-| 6 | 1.123s | `SearchDialog.spec.ts` :: calls moveNoteToFolder with folder id after confirm |
-| 7 | 1.122s | `InsertWikiLink.spec.ts` :: does not call the inserter when Add a new relationship note is clicked |
-| 8 | 1.122s | `SearchDialog.spec.ts` :: shows confirm when move is blocked by soft-deleted title at destination |
-| 9 | 1.120s | `InsertWikiLink.spec.ts` :: calls the registered inserter with a wiki link text when Insert as a wiki link is clicked |
-| 10 | 1.119s | `InsertWikiLink.spec.ts` :: calls the wiki-property inserter when Add wiki link as a new property is clicked |
+## Top 10 slowest (ms)
 
----
+| # | ms | file | test |
+|---|-----|------|------|
+| 1 | 2956 | FullScreen.spec.ts | enters fullscreen mode when button is clicked |
+| 2 | 2219 | ManageAccessTokensPage.spec.ts | displays "No Label" when token label is empty |
+| 3 | 2206 | NoteToolbar.moreOptions.spec.ts | copies export markdown while keeping export dialog open |
+| 4 | 1789 | FullScreen.spec.ts | exits fullscreen mode when exit button is clicked |
+| 5 | 1738 | NoteExportForm.spec.ts | fetches AI markdown on open and downloads from primary button |
+| 6 | 979 | NoteExportForm.spec.ts | fetches graph JSON when expanded and downloads on button click |
+| 7 | 958 | PopButton.spec.ts | blurs button when dialog closes via close_request |
+| 8 | 928 | NoteExportForm.spec.ts | does not refetch graph JSON if already loaded when toggling open/close |
+| 9 | 752 | BookReadingPage.spec.ts | shows error when PDF bytes are not valid |
 
-### Phase 1: Speed up useThinkingTimeTracker.spec.ts
+Grouping: per test file where multiple top-10 hits; singleton files batched (4 cases &lt; 10).
+
+### Group 1: FullScreen.spec.ts
 Status: done
 
-Target: `frontend/tests/composables/useThinkingTimeTracker.spec.ts` — slowest case ~2.1s (`starts timer after nextTick and requestAnimationFrame`; also `resumes when window gains focus` ~0.93s).
-
-Remove redundant timing/rAF tests if covered elsewhere; mock timers (`vi.useFakeTimers`) instead of real rAF waits; no sleep.
-
-Verify: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/composables/useThinkingTimeTracker.spec.ts`
-
----
-
-### Phase 2: Speed up FullScreen.spec.ts
-Status: done
-
-Target: `frontend/tests/common/FullScreen.spec.ts` — `enters fullscreen mode when button is clicked` (~2.08s).
-
-Slim browser fullscreen setup; remove duplicate fullscreen coverage; no sleep.
+Optimized `frontend/tests/common/FullScreen.spec.ts`: dropped vitest/browser `page` polling, use wrapper/DOM clicks; merged slot-content test into enter-fullscreen test (3 tests total).
 
 Verify: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/common/FullScreen.spec.ts`
 
----
+### Group 2: NoteExportForm.spec.ts
+Status: planned
 
-### Phase 3: Speed up TextArea.spec.ts
-Status: done
+Optimize 3 slow tests in `frontend/tests/notes/NoteExportForm.spec.ts`.
 
-Target: `frontend/tests/components/form/TextArea.spec.ts` — `expands based on content up to 'autoExtendUntil' limit` (~1.9s).
+### Group 3: singleton slow tests batch
+Status: planned
 
-Reduce DOM churn / large content fixtures; merge redundant resize tests; no sleep.
-
-Verify: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/TextArea.spec.ts`
-
----
-
-### Phase 4: Speed up NoteExportForm.spec.ts
-Status: done
-
-Target: `frontend/tests/notes/NoteExportForm.spec.ts` — `downloads graph JSON when download button is clicked` (~1.21s).
-
-Mock download / graph build; avoid heavy graph fixtures; dedupe export tests.
-
-Verify: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteExportForm.spec.ts`
-
----
-
-### Phase 5: Speed up SearchDialog.spec.ts (top-10 cases)
-Status: done
-
-Target: `frontend/tests/links/SearchDialog.spec.ts` — three top-10 cases (~1.12s each) plus other ~1.1s cases in same file.
-
-Shared setup helper; remove redundant dialog flow tests; no debounce sleep — use fake timers or trigger completion directly.
-
-Verify: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/links/SearchDialog.spec.ts`
-
----
-
-### Phase 6: Speed up InsertWikiLink.spec.ts (top-10 cases)
-Status: done
-
-Target: `frontend/tests/links/InsertWikiLink.spec.ts` — three top-10 cases (~1.12s each).
-
-Shared mount helper; remove redundant inserter tests; no sleep.
-
-Verify: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/links/InsertWikiLink.spec.ts`
-
----
+Optimize slow tests in:
+- `frontend/tests/pages/ManageAccessTokensPage.spec.ts`
+- `frontend/tests/notes/NoteToolbar.moreOptions.spec.ts`
+- `frontend/tests/commons/Popups/PopButton.spec.ts`
+- `frontend/tests/pages/BookReadingPage.spec.ts`
