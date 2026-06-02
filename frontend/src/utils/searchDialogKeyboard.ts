@@ -7,9 +7,16 @@ export const searchResultListRowSelector = `[data-testid="${searchResultListTest
 export const folderSearchResultTestId = "folder-selector-search-result"
 export const folderSearchResultRowSelector = `[data-testid="${folderSearchResultTestId}"]`
 
-function isArrowDownToFirstResult(event: KeyboardEvent): boolean {
+export interface SearchDialogListKeydownOptions {
+  container: Element | null
+  rowSelector: string
+  searchInput: HTMLElement | null
+  when?: boolean
+}
+
+function isVerticalListNavigationKey(event: KeyboardEvent): boolean {
   return (
-    event.key === "ArrowDown" &&
+    (event.key === "ArrowDown" || event.key === "ArrowUp") &&
     !event.isComposing &&
     !event.altKey &&
     !event.ctrlKey &&
@@ -18,24 +25,82 @@ function isArrowDownToFirstResult(event: KeyboardEvent): boolean {
   )
 }
 
-function focusFirstRow(
-  container: Element | null,
-  rowSelector: string
-): boolean {
-  if (!container) return false
-  const firstRow = container.querySelector(rowSelector)
-  return focusTargetWithin(firstRow)
+function listRows(container: Element | null, rowSelector: string): Element[] {
+  if (!container) return []
+  return Array.from(container.querySelectorAll(rowSelector))
 }
 
-export function handleSearchFieldArrowDownToFirstResult(
+function isFocusInSearchField(searchInput: HTMLElement | null): boolean {
+  return searchInput != null && document.activeElement === searchInput
+}
+
+function isFocusInRows(rows: Element[]): boolean {
+  const active = document.activeElement
+  if (!active) return false
+  return rows.some((row) => row.contains(active))
+}
+
+function focusedRowIndex(rows: Element[]): number {
+  const active = document.activeElement
+  if (!active) return -1
+  return rows.findIndex((row) => row.contains(active))
+}
+
+function focusRow(row: Element): boolean {
+  return focusTargetWithin(row)
+}
+
+export function handleSearchDialogListKeydown(
   event: KeyboardEvent,
-  container: Element | null,
-  rowSelector: string,
-  options?: { when?: boolean }
+  options: SearchDialogListKeydownOptions
 ): boolean {
-  if (options?.when === false) return false
-  if (!isArrowDownToFirstResult(event)) return false
-  if (!focusFirstRow(container, rowSelector)) return false
-  event.preventDefault()
-  return true
+  if (options.when === false) return false
+  if (!isVerticalListNavigationKey(event)) return false
+
+  const { container, rowSelector, searchInput } = options
+  const rows = listRows(container, rowSelector)
+  if (rows.length === 0) return false
+
+  const inSearch = isFocusInSearchField(searchInput)
+  const inList = isFocusInRows(rows)
+  if (!inSearch && !inList) return false
+
+  const currentIndex = focusedRowIndex(rows)
+
+  if (event.key === "ArrowDown") {
+    if (inSearch) {
+      const firstRow = rows[0]
+      if (!firstRow || !focusRow(firstRow)) return false
+      event.preventDefault()
+      return true
+    }
+    if (inList && currentIndex >= 0 && currentIndex < rows.length - 1) {
+      const nextRow = rows[currentIndex + 1]
+      if (!nextRow || !focusRow(nextRow)) return false
+      event.preventDefault()
+      return true
+    }
+    return false
+  }
+
+  if (event.key === "ArrowUp") {
+    if (!inList || currentIndex === -1) return false
+    if (currentIndex === 0) {
+      searchInput?.focus()
+      event.preventDefault()
+      return true
+    }
+    const previousRow = rows[currentIndex - 1]
+    if (!previousRow || !focusRow(previousRow)) return false
+    event.preventDefault()
+    return true
+  }
+
+  return false
+}
+
+export function bindSearchDialogListKeydown(
+  getOptions: () => SearchDialogListKeydownOptions
+): (event: KeyboardEvent) => void {
+  return (event) => handleSearchDialogListKeydown(event, getOptions())
 }

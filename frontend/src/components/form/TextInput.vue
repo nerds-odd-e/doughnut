@@ -59,7 +59,7 @@ function focus() {
   input.value?.focus()
 }
 
-defineExpose({ focus })
+defineExpose({ focus, input })
 
 onMounted(() => {
   if (props.autofocus) {

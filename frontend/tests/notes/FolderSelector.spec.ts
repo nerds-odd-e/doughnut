@@ -11,9 +11,19 @@ import { flushPromises, mount, type VueWrapper } from "@vue/test-utils"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
 import { folderSearchResultTestId } from "@/utils/searchDialogKeyboard"
+import {
+  dispatchArrowKey,
+  testIdSelector,
+} from "@tests/helpers/searchDialogKeyboardTestSupport"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
-const folderSearchResultSelector = `[data-testid="${folderSearchResultTestId}"]`
+const folderSearchResultSelector = testIdSelector(folderSearchResultTestId)
+
+function allFolderSearchResults(): HTMLButtonElement[] {
+  return Array.from(
+    document.querySelectorAll<HTMLButtonElement>(folderSearchResultSelector)
+  )
+}
 
 const router = createRouter({
   history: createWebHistory(),
@@ -75,13 +85,11 @@ describe("FolderSelector", () => {
   }
 
   describe("keyboard navigation", () => {
-    it("moves focus to first folder result on ArrowDown from search input", async () => {
+    async function openFolderSearchDialog() {
       matchMediaSpy = mockCoarsePointer(false)
       mountSelector()
       await flushPromises()
-
       await clickSearchMoreButtonAndSettle()
-
       await vi.waitUntil(
         () =>
           document.querySelector(
@@ -89,21 +97,29 @@ describe("FolderSelector", () => {
           ) !== null,
         { timeout: 2000 }
       )
-
-      const searchInput = document.querySelector(
+      return document.querySelector(
         '[data-testid="folder-selector-search-input"]'
       ) as HTMLInputElement
-      searchInput.dispatchEvent(
-        new KeyboardEvent("keydown", {
-          key: "ArrowDown",
-          code: "ArrowDown",
-          bubbles: true,
-        })
-      )
+    }
 
-      const firstResult = document.querySelector(folderSearchResultSelector)
-      expect(firstResult).toBeTruthy()
+    it("moves focus through folder results and back to search input with ArrowDown and ArrowUp", async () => {
+      const searchInput = await openFolderSearchDialog()
+      const results = allFolderSearchResults()
+      expect(results.length).toBeGreaterThanOrEqual(2)
+
+      const [firstResult, secondResult] = results
+
+      dispatchArrowKey("ArrowDown", searchInput)
       expect(document.activeElement).toBe(firstResult)
+
+      dispatchArrowKey("ArrowDown")
+      expect(document.activeElement).toBe(secondResult)
+
+      dispatchArrowKey("ArrowUp")
+      expect(document.activeElement).toBe(firstResult)
+
+      dispatchArrowKey("ArrowUp")
+      expect(document.activeElement).toBe(searchInput)
     })
   })
 

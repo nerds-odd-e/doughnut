@@ -3,6 +3,7 @@
     role="list"
     :data-testid="searchResultListTestId"
     class="m-0 list-none p-0 flex flex-col"
+    @keydown="$emit('keydown', $event)"
   >
     <SearchResultListItem
       v-for="searchHit in searchHits"
@@ -62,4 +63,8 @@ defineProps({
   },
   notebookId: { type: Number, default: undefined },
 })
+
+defineEmits<{
+  keydown: [event: KeyboardEvent]
+}>()
 </script>

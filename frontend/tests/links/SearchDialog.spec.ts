@@ -19,10 +19,19 @@ import {
   readSearchKeyHistory,
 } from "@/utils/searchKeyHistoryCookie"
 import { searchResultItemTestId } from "@/utils/searchDialogKeyboard"
+import {
+  dispatchArrowKey,
+  testIdSelector,
+} from "@tests/helpers/searchDialogKeyboardTestSupport"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { defineComponent } from "vue"
 
-const searchResultItemSelector = `[data-testid="${searchResultItemTestId}"]`
+const searchResultItemSelector = testIdSelector(searchResultItemTestId)
+const searchInputId = "searchTerm-searchKey"
+
+function allSearchResultItems(): Element[] {
+  return Array.from(document.querySelectorAll(searchResultItemSelector))
+}
 
 function makeNoteHit(title: string, notebookId: number) {
   return {
@@ -65,27 +74,46 @@ describe("SearchForm", () => {
   })
 
   describe("keyboard navigation", () => {
-    it("moves focus to first result on ArrowDown from search input", async () => {
-      const recentNote = MakeMe.aNoteSearchResult.title("Recent Note").please()
-      mockSdkService(NoteController, "getRecentNotes", [recentNote])
+    async function renderSearchWithRecentNotes(count: number) {
+      const recentNotes = Array.from({ length: count }, (_, i) =>
+        MakeMe.aNoteSearchResult.title(`Recent Note ${i + 1}`).please()
+      )
+      mockSdkService(NoteController, "getRecentNotes", recentNotes)
       helper
         .component(SearchForm)
         .withCleanStorage()
         .withProps({ note: null })
         .render()
       await flushPromises()
-
       const searchInput = await screen.findByPlaceholderText("Search")
-      await vi.waitUntil(
-        () => document.querySelector(searchResultItemSelector) !== null,
-        { timeout: 2000 }
-      )
+      await vi.waitUntil(() => allSearchResultItems().length >= count, {
+        timeout: 2000,
+      })
+      return searchInput
+    }
 
-      fireEvent.keyDown(searchInput, { key: "ArrowDown", code: "ArrowDown" })
-
-      const firstItem = document.querySelector(searchResultItemSelector)
+    it("moves focus through results and back to search input with ArrowDown and ArrowUp", async () => {
+      const searchInput = await renderSearchWithRecentNotes(2)
+      const [firstItem, secondItem] = allSearchResultItems()
       expect(firstItem).toBeTruthy()
+      expect(secondItem).toBeTruthy()
+
+      searchInput.focus()
+      expect(document.activeElement).toBe(searchInput)
+
+      dispatchArrowKey("ArrowDown", searchInput)
       expect(firstItem!.contains(document.activeElement)).toBe(true)
+
+      dispatchArrowKey("ArrowDown")
+      expect(secondItem!.contains(document.activeElement)).toBe(true)
+
+      dispatchArrowKey("ArrowUp")
+      expect(firstItem!.contains(document.activeElement)).toBe(true)
+
+      dispatchArrowKey("ArrowUp")
+      expect(document.activeElement).toBe(
+        document.getElementById(searchInputId)
+      )
     })
   })
 

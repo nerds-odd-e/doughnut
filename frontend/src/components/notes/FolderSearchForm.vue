@@ -3,6 +3,7 @@
     ref="dialogRootRef"
     class="w-full"
     data-testid="folder-selector-search-dialog"
+    @keydown="onSearchDialogKeydown"
   >
     <h3 class="font-bold text-lg mb-2">Find folder</h3>
     <p class="text-sm text-base-content/70 mb-1">
@@ -45,7 +46,6 @@
         data-testid="folder-selector-search-input"
         autocomplete="off"
         :disabled="foldersLoading"
-        @keydown="onSearchFieldKeydown"
       />
     </div>
     <ul
@@ -100,9 +100,9 @@ import {
   folderRowsById,
 } from "./folderSelectorUtils"
 import {
+  bindSearchDialogListKeydown,
   folderSearchResultRowSelector,
   folderSearchResultTestId,
-  handleSearchFieldArrowDownToFirstResult,
 } from "@/utils/searchDialogKeyboard"
 
 const props = defineProps<{
@@ -204,12 +204,10 @@ function close() {
   emit("close")
 }
 
-function onSearchFieldKeydown(event: KeyboardEvent) {
-  handleSearchFieldArrowDownToFirstResult(
-    event,
-    dialogRootRef.value,
-    folderSearchResultRowSelector,
-    { when: !foldersLoading.value }
-  )
-}
+const onSearchDialogKeydown = bindSearchDialogListKeydown(() => ({
+  container: dialogRootRef.value,
+  rowSelector: folderSearchResultRowSelector,
+  searchInput: searchInputRef.value,
+  when: !foldersLoading.value,
+}))
 </script>

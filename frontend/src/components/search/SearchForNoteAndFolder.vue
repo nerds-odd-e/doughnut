@@ -2,6 +2,7 @@
   <div ref="rootRef">
     <div class="flex items-center gap-2 w-full">
       <TextInput
+        ref="searchInputRef"
         class="flex-1 min-w-0"
         scope-name="searchTerm"
         field="searchKey"
@@ -9,7 +10,7 @@
         placeholder="Search"
         hide-label
         v-focus
-        @keydown="onSearchFieldKeydown"
+        @keydown="onSearchDialogKeydown"
       >
         <template #input_prepend>
           <AutoCollapseDropdown
@@ -109,6 +110,7 @@
       }"
       v-model:all-my-notebooks-and-subscriptions="allMyNotebooksAndSubscriptions"
       v-model:all-my-circles="allMyCircles"
+      @keydown="onSearchDialogKeydown"
     >
       <template v-if="noteId" #button="{ noteSearchResult }">
         <button
@@ -152,7 +154,7 @@ import SearchResults from "./SearchResults.vue"
 import type { NoteSearchResult } from "@generated/doughnut-backend-api"
 import { readSearchKeyHistory } from "@/utils/searchKeyHistoryCookie"
 import {
-  handleSearchFieldArrowDownToFirstResult,
+  bindSearchDialogListKeydown,
   searchResultListRowSelector,
 } from "@/utils/searchDialogKeyboard"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
@@ -176,6 +178,7 @@ const emit = defineEmits<{
 }>()
 
 const rootRef = ref<HTMLElement | null>(null)
+const searchInputRef = ref<InstanceType<typeof TextInput> | null>(null)
 
 const inputSearchKey = ref(initialSearchKey ?? "")
 const allMyNotebooksAndSubscriptions = ref(true)
@@ -196,13 +199,20 @@ function pickHistoryKey(key: string, closeDropdown: () => void) {
   closeDropdown()
 }
 
-function onSearchFieldKeydown(event: KeyboardEvent) {
-  handleSearchFieldArrowDownToFirstResult(
-    event,
-    rootRef.value,
-    searchResultListRowSelector
+function noteSearchInputElement(): HTMLInputElement | null {
+  const fromRef = searchInputRef.value?.input
+  if (fromRef instanceof HTMLInputElement) return fromRef
+  return (
+    rootRef.value?.querySelector<HTMLInputElement>("#searchTerm-searchKey") ??
+    null
   )
 }
+
+const onSearchDialogKeydown = bindSearchDialogListKeydown(() => ({
+  container: rootRef.value,
+  rowSelector: searchResultListRowSelector,
+  searchInput: noteSearchInputElement(),
+}))
 </script>
 
 <style scoped>

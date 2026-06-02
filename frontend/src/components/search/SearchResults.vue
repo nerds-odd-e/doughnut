@@ -62,6 +62,7 @@
           class="search-result"
           :search-hits="recentNotesAsHits"
           :notebook-id="notebookId"
+          @keydown="onListKeydown"
         >
           <template #button="{ searchResult: result }">
             <slot name="button" :note-search-result="result" />
@@ -109,6 +110,7 @@
           class="search-result"
           :search-hits="searchResult"
           :notebook-id="notebookId"
+          @keydown="onListKeydown"
         >
           <template #button="{ searchResult: result }">
             <slot name="button" :note-search-result="result" />
@@ -185,6 +187,14 @@ const allMyNotebooksAndSubscriptions = defineModel<boolean>(
   { default: true }
 )
 const allMyCircles = defineModel<boolean>("allMyCircles", { default: false })
+
+const emit = defineEmits<{
+  keydown: [event: KeyboardEvent]
+}>()
+
+function onListKeydown(event: KeyboardEvent) {
+  emit("keydown", event)
+}
 
 defineSlots<{
   button: (props: { noteSearchResult: NoteSearchResult }) => void
