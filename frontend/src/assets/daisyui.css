@@ -34,6 +34,16 @@
   border: var(--border) solid var(--input-color);
 }
 
+/* Outline neutral buttons in a join beside field controls */
+.daisy-join .daisy-btn-outline.daisy-btn-neutral {
+  --btn-border: color-mix(in oklab, var(--color-base-content) 20%, #0000);
+  --btn-fg: var(--color-base-content);
+  box-shadow:
+    0 1px color-mix(in oklab, var(--btn-border) calc(var(--depth) * 10%), #0000)
+    inset,
+    0 -1px oklch(100% 0 0 / calc(var(--depth) * 0.1)) inset;
+}
+
 svg {
   display: initial;
 }

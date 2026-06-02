@@ -38,11 +38,11 @@
           </optgroup>
       </select>
       <div
-        class="folder-selector-join-append daisy-join-item flex shrink-0 self-stretch items-stretch"
+        class="folder-selector-join-append flex shrink-0 self-stretch items-stretch"
       >
         <button
           type="button"
-          class="daisy-btn daisy-btn-outline daisy-btn-neutral rounded-l-none rounded-r-lg"
+          class="daisy-btn daisy-btn-outline daisy-btn-neutral daisy-join-item"
           :disabled="disabled"
           title="Search folders"
           aria-label="Search folders"
