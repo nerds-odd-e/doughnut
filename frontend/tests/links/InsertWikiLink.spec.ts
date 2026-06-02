@@ -67,7 +67,12 @@ describe("InsertWikiLink", () => {
       { hitKind: "NOTE" as const, noteSearchResult: targetResult },
     ])
 
-    helper.component(SearchForm).withCleanStorage().withProps({ note }).render()
+    helper
+      .component(SearchForm)
+      .withCleanStorage()
+      .withRouter()
+      .withProps({ note })
+      .render()
 
     const searchInput = await screen.findByPlaceholderText("Search")
     fireEvent.update(searchInput, "Sed")

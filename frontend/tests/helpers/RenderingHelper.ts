@@ -37,7 +37,7 @@ class RenderingHelper<T = DefineComponent> {
         "router-view": true,
         "router-link": {
           props: ["to"],
-          template: `<a class="router-link" href="#"><slot/></a>`,
+          template: `<a class="router-link" :to='JSON.stringify(to)' href="#"><slot/></a>`,
         },
       },
     }

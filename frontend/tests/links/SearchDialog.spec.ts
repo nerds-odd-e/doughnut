@@ -176,6 +176,7 @@ describe("SearchForm", () => {
       helper
         .component(SearchForm)
         .withCleanStorage()
+        .withRouter()
         .withProps({ note })
         .render()
 
