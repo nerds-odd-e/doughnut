@@ -1,7 +1,6 @@
 <template>
   <PopButton
-    ref="popButtonRef"
-    title="New note (Ctrl+N / Cmd+N)"
+    title="New note"
     aria-label="New note"
     align-modal-top
   >
@@ -22,7 +21,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
 import PopButton from "../../commons/Popups/PopButton.vue"
 import type { Folder, Note } from "@generated/doughnut-backend-api"
 import NoteNewForm from "../NoteNewForm.vue"
@@ -35,14 +33,4 @@ defineProps<{
   ancestorFolders?: Folder[]
   initialTitle?: string
 }>()
-
-const popButtonRef = ref<InstanceType<typeof PopButton> | null>(null)
-
-const openDialog = () => {
-  popButtonRef.value?.openDialog()
-}
-
-defineExpose({
-  openDialog,
-})
 </script>
