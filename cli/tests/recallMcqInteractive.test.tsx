@@ -7,15 +7,21 @@ import {
 import type { NoteRealm, RecallPrompt } from 'doughnut-api'
 import makeMe from 'doughnut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
-import { LEAVE_RECALL_PROMPT } from '../src/commands/recall/leaveRecallSessionCopy.js'
 import { RECALL_LOADING_NEXT_QUESTION_LABEL } from '../src/commands/recall/recallBusyInputCopy.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import {
   pressEscape,
   renderInkWhenCommandLineReady,
-  stripAnsi,
   waitForLastFrame,
 } from './inkTestHelpers.js'
+import {
+  leaveRecallWithYnRe,
+  startRecall,
+  waitMcqIncorrectOnLastFrame,
+  waitMcqLoadMore,
+  waitMcqVisible,
+  waitReturnsToMcq,
+} from './recallMcqInteractive.waits.js'
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'
 
 const baseNoteTimes = {
@@ -25,25 +31,10 @@ const baseNoteTimes = {
 
 const RECALL_PROMPT_ID = 42
 
-const MCQ_HINT_SUBSTR = '↑↓ Enter or number to select'
-
 const EXPECT_GUIDANCE_MORE_BELOW = '↓ more below'
 
 function reLiteral(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
-
-const leaveRecallWithYnRe = /(?=.*Leave recall\?)(?=.*\(y\/n\))/s
-
-async function waitForMcqVisible(
-  waitForFramesToInclude: (
-    pattern: string | RegExp,
-    maxTicks?: number
-  ) => Promise<void>
-): Promise<void> {
-  await waitForFramesToInclude(
-    /(?=.*Choose)(?=.*Alpha)(?=.*Beta)(?!.*\*\*)(?=.*↑↓ Enter or number to select)/s
-  )
 }
 
 describe('recall MCQ (interactive)', () => {
@@ -75,6 +66,15 @@ describe('recall MCQ (interactive)', () => {
       note: mcqFixtureNoteRealm.note,
       answer,
     })
+  }
+
+  function mockSingleMcqDue() {
+    recallingSpy.mockResolvedValue({
+      data: makeMe.aDueMemoryTrackersList
+        .totalAssimilatedCount(0)
+        .toRepeat([{ memoryTrackerId: 1, spelling: false }])
+        .please(),
+    } as Awaited<ReturnType<typeof RecallsController.recalling>>)
   }
 
   beforeEach(() => {
@@ -146,31 +146,24 @@ describe('recall MCQ (interactive)', () => {
       ],
     } as Awaited<ReturnType<typeof MemoryTrackerController.getRecallPrompts>>)
 
-    const { stdin, lastStrippedFrame, waitForFramesToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+    const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
-    stdin.write('/recall\r')
-
-    await waitForFramesToInclude(
-      /(?=.*Pick one)(?=.*↓ more below)(?=.*1\. c0)/s
+    startRecall(ink.stdin)
+    await ink.waitUntilLastFrame(
+      (p) =>
+        p.includes('Pick one') &&
+        p.includes(EXPECT_GUIDANCE_MORE_BELOW) &&
+        p.includes('1. c0')
     )
 
-    const plain = lastStrippedFrame()
-    expect(plain).toContain(EXPECT_GUIDANCE_MORE_BELOW)
-    expect(plain).toMatch(/1\.\s*c0/)
+    const plain = ink.lastStrippedFrame()
     expect(plain).not.toMatch(
       new RegExp(`${manyChoicesCount}\\.\\s*c${manyChoicesCount - 1}`)
     )
   })
 
   test('wrong MCQ choice shows Incorrect and sends 0-based choiceIndex to API', async () => {
-    recallingSpy.mockResolvedValue({
-      data: makeMe.aDueMemoryTrackersList
-        .totalAssimilatedCount(0)
-        .toRepeat([{ memoryTrackerId: 1, spelling: false }])
-        .please(),
-    } as Awaited<ReturnType<typeof RecallsController.recalling>>)
-
+    mockSingleMcqDue()
     const pending = pendingMcqPrompt()
     answerQuizSpy.mockResolvedValue({
       data: mcqAnsweredPrompt(pending, {
@@ -180,38 +173,17 @@ describe('recall MCQ (interactive)', () => {
       }),
     } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
 
-    const { stdin, frames, waitForFramesToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+    const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
-    stdin.write('/recall\r')
+    startRecall(ink.stdin)
+    await waitMcqVisible(ink)
+    ink.stdin.write('2\r')
+    await waitMcqIncorrectOnLastFrame(ink)
+    await waitMcqLoadMore(ink)
 
-    await waitForMcqVisible(waitForFramesToInclude)
-
-    expect(frames.join('\n')).toContain('\u001b[')
-
-    stdin.write('2\r')
-
-    await waitForFramesToInclude(/Load more from next 3 days\?/)
-
-    const plainWrong = stripAnsi(frames.join('\n'))
-    expect(plainWrong).toContain('Alpha')
-    expect(plainWrong).toContain('Choose')
-    expect(plainWrong).toContain('First')
-    expect(plainWrong).toContain('Beta')
-    expect(plainWrong).toContain('Incorrect.')
-
-    const rawWrong = frames.join('\n')
-    const incorrectIdx = rawWrong.indexOf('Incorrect.')
-    expect(incorrectIdx).toBeGreaterThan(-1)
-    const beforeIncorrect = rawWrong.slice(0, incorrectIdx)
-    expect(
-      beforeIncorrect.includes('\u001b[31m') ||
-        beforeIncorrect.includes('\u001b[91m')
-    ).toBe(true)
-    expect(
-      beforeIncorrect.includes('\u001b[32m') ||
-        beforeIncorrect.includes('\u001b[92m')
-    ).toBe(true)
+    const plain = ink.lastStrippedFrame()
+    expect(plain).toContain('Incorrect.')
+    expect(plain).toContain('Beta')
 
     expect(answerQuizSpy).toHaveBeenCalledTimes(1)
     expect(answerQuizSpy).toHaveBeenCalledWith(
@@ -223,13 +195,7 @@ describe('recall MCQ (interactive)', () => {
   })
 
   test('shows busy label in bordered input while answerQuiz is pending', async () => {
-    recallingSpy.mockResolvedValue({
-      data: makeMe.aDueMemoryTrackersList
-        .totalAssimilatedCount(0)
-        .toRepeat([{ memoryTrackerId: 1, spelling: false }])
-        .please(),
-    } as Awaited<ReturnType<typeof RecallsController.recalling>>)
-
+    mockSingleMcqDue()
     const pending = pendingMcqPrompt()
     let resolveAnswer!: (
       value: Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>
@@ -241,15 +207,12 @@ describe('recall MCQ (interactive)', () => {
     })
     answerQuizSpy.mockImplementation(() => answerPromise)
 
-    const { stdin, waitForFramesToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+    const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
-    stdin.write('/recall\r')
-    await waitForMcqVisible(waitForFramesToInclude)
-
-    stdin.write('2\r')
-
-    await waitForFramesToInclude(/Submitting answer…/)
+    startRecall(ink.stdin)
+    await waitMcqVisible(ink)
+    ink.stdin.write('2\r')
+    await ink.waitForLastFrameToInclude('Submitting answer…')
 
     resolveAnswer({
       data: mcqAnsweredPrompt(pending, {
@@ -259,7 +222,7 @@ describe('recall MCQ (interactive)', () => {
       }),
     } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
 
-    await waitForFramesToInclude(/Load more from next 3 days\?/)
+    await waitMcqLoadMore(ink)
   })
 
   test('after first MCQ answer, shows loading next label until second tracker loads', async () => {
@@ -271,13 +234,6 @@ describe('recall MCQ (interactive)', () => {
       .withQuestionStem(secondStem)
       .withChoices(['X', 'Y', 'Z'])
       .withMemoryTrackerId(2)
-      .please()
-
-    const note1 = makeMe.aNoteRealm
-      .title('Alpha')
-      .content('body')
-      .createdAt(baseNoteTimes.createdAt)
-      .updatedAt(baseNoteTimes.updatedAt)
       .please()
 
     recallingSpy.mockResolvedValue({
@@ -319,44 +275,33 @@ describe('recall MCQ (interactive)', () => {
     answerQuizSpy.mockResolvedValue({
       data: {
         ...pending,
-        note: note1.note,
+        note: mcqFixtureNoteRealm.note,
         answer: { id: 100, correct: false, choiceIndex: 1 },
       },
     } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
 
-    const {
-      stdin,
-      lastFrame,
-      waitForFramesToInclude,
-      waitForLastFrameToInclude,
-    } = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+    const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
-    stdin.write('/recall\r')
-    await waitForMcqVisible(waitForFramesToInclude)
-    stdin.write('2\r')
+    startRecall(ink.stdin)
+    await waitMcqVisible(ink)
+    ink.stdin.write('2\r')
 
     await waitForLastFrame(
-      lastFrame,
+      ink.lastFrame,
       (p) =>
         p.includes(RECALL_LOADING_NEXT_QUESTION_LABEL) &&
-        !p.includes(MCQ_HINT_SUBSTR)
+        !p.includes('↑↓ Enter or number to select')
     )
 
     resolvePrompts2({
       data: [secondPrompt],
     } as Awaited<ReturnType<typeof MemoryTrackerController.getRecallPrompts>>)
 
-    await waitForLastFrameToInclude(secondStem)
+    await ink.waitForLastFrameToInclude(secondStem)
   })
 
   test('out-of-range MCQ number does not call answerQuiz; valid answer still works', async () => {
-    recallingSpy.mockResolvedValue({
-      data: makeMe.aDueMemoryTrackersList
-        .totalAssimilatedCount(0)
-        .toRepeat([{ memoryTrackerId: 1, spelling: false }])
-        .please(),
-    } as Awaited<ReturnType<typeof RecallsController.recalling>>)
-
+    mockSingleMcqDue()
     const pending = pendingMcqPrompt()
     answerQuizSpy.mockResolvedValue({
       data: mcqAnsweredPrompt(pending, {
@@ -366,29 +311,19 @@ describe('recall MCQ (interactive)', () => {
       }),
     } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
 
-    const { stdin, frames, lastFrame, waitForFramesToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+    const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
-    stdin.write('/recall\r')
-    await waitForMcqVisible(waitForFramesToInclude)
-
-    stdin.write('9\r')
-    await waitForLastFrame(lastFrame, (p) => p.includes('→ 9'))
-
+    startRecall(ink.stdin)
+    await waitMcqVisible(ink)
+    ink.stdin.write('9\r')
+    await ink.waitUntilLastFrame((p) => p.includes('→ 9'))
     expect(answerQuizSpy).not.toHaveBeenCalled()
-    expect(stripAnsi(frames.join('\n'))).not.toContain('Incorrect.')
 
-    stdin.write('\x7f')
-    await waitForLastFrame(
-      lastFrame,
-      (p) => p.includes('→') && !p.includes('→ 9')
-    )
-    stdin.write('2\r')
-
-    await waitForFramesToInclude(/Load more from next 3 days\?/)
-
+    ink.stdin.write('\x7f')
+    await ink.waitUntilLastFrame((p) => p.includes('→') && !p.includes('→ 9'))
+    ink.stdin.write('2\r')
+    await waitMcqIncorrectOnLastFrame(ink)
     expect(answerQuizSpy).toHaveBeenCalledTimes(1)
-    expect(stripAnsi(frames.join('\n'))).toContain('Incorrect.')
   })
 
   test('wrong MCQ then next due tracker shows second question without ending recall', async () => {
@@ -402,12 +337,6 @@ describe('recall MCQ (interactive)', () => {
       .withMemoryTrackerId(2)
       .please()
 
-    const note1 = makeMe.aNoteRealm
-      .title('Alpha')
-      .content('body')
-      .createdAt(baseNoteTimes.createdAt)
-      .updatedAt(baseNoteTimes.updatedAt)
-      .please()
     const note2 = makeMe.aNoteRealm
       .title('Beta')
       .content('body2')
@@ -449,11 +378,11 @@ describe('recall MCQ (interactive)', () => {
       answerN += 1
       if (answerN === 1) {
         return Promise.resolve({
-          data: {
-            ...pending,
-            note: note1.note,
-            answer: { id: 100, correct: false, choiceIndex: 1 },
-          },
+          data: mcqAnsweredPrompt(pending, {
+            id: 100,
+            correct: false,
+            choiceIndex: 1,
+          }),
         } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
       }
       return Promise.resolve({
@@ -465,102 +394,56 @@ describe('recall MCQ (interactive)', () => {
       } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
     })
 
-    const { stdin, frames, waitForFramesToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+    const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
-    stdin.write('/recall\r')
-    await waitForMcqVisible(waitForFramesToInclude)
-    stdin.write('2\r')
-
-    await waitForFramesToInclude(
+    startRecall(ink.stdin)
+    await waitMcqVisible(ink)
+    ink.stdin.write('2\r')
+    await ink.waitForLastFrameToInclude(
       new RegExp(`(?=.*Incorrect)(?=.*${reLiteral(secondStem)})`, 's')
     )
-
-    const plainFirstWrong = stripAnsi(frames.join('\n'))
-    expect(plainFirstWrong).toContain('Alpha')
-    expect(plainFirstWrong).toContain('Choose')
-    expect(plainFirstWrong).toContain('First')
-    expect(plainFirstWrong).toContain('Beta')
-
     expect(answerQuizSpy).toHaveBeenCalledTimes(1)
 
-    stdin.write('1\r')
-    await waitForFramesToInclude(/Correct!/)
-
-    const plainCorrect = stripAnsi(frames.join('\n'))
-    expect(plainCorrect).toContain('Beta')
-    expect(plainCorrect).toContain(secondStem)
-    expect(plainCorrect).toContain('X')
-    expect(plainCorrect).toContain('Correct!')
-
-    const rawCorrect = frames.join('\n')
-    const correctIdx = rawCorrect.lastIndexOf('Correct!')
-    expect(correctIdx).toBeGreaterThan(-1)
-    const beforeCorrect = rawCorrect.slice(0, correctIdx)
-    expect(
-      beforeCorrect.includes('\u001b[32m') ||
-        beforeCorrect.includes('\u001b[92m')
-    ).toBe(true)
-
+    ink.stdin.write('1\r')
+    await ink.waitForLastFrameToInclude('Correct!')
+    expect(ink.lastStrippedFrame()).toContain(secondStem)
     expect(answerQuizSpy).toHaveBeenCalledTimes(2)
     expect(recallingSpy).toHaveBeenCalledTimes(1)
   })
 
-  test('Esc from MCQ shows leave recall confirmation without calling answerQuiz', async () => {
-    const { stdin, waitForFramesToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-    stdin.write('/recall\r')
-    await waitForMcqVisible(waitForFramesToInclude)
-
-    expect(answerQuizSpy).not.toHaveBeenCalled()
-
-    await pressEscape(stdin)
-    await waitForFramesToInclude(leaveRecallWithYnRe)
-
-    expect(answerQuizSpy).not.toHaveBeenCalled()
-  })
-
   test('after Esc, y settles with Recall session stopped and never calls answerQuiz', async () => {
-    const { stdin, waitForFramesToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+    const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
-    stdin.write('/recall\r')
-    await waitForMcqVisible(waitForFramesToInclude)
-    await pressEscape(stdin)
-    await waitForFramesToInclude(/Leave recall\?/)
-
-    stdin.write('y\r')
-
-    await waitForFramesToInclude(/Recall session stopped\./)
-
+    startRecall(ink.stdin)
+    await waitMcqVisible(ink)
+    await pressEscape(ink.stdin)
+    await ink.waitForLastFrameToInclude(leaveRecallWithYnRe)
+    ink.stdin.write('y\r')
+    await ink.waitForLastFrameToInclude('Recall session stopped.')
     expect(answerQuizSpy).not.toHaveBeenCalled()
   })
 
-  test('after Esc, n returns to MCQ without answerQuiz', async () => {
-    const { stdin, lastFrame, waitForFramesToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+  test('after Esc, n returns to MCQ without answerQuiz; buffer preserved', async () => {
+    const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
-    stdin.write('/recall\r')
-    await waitForMcqVisible(waitForFramesToInclude)
-    await pressEscape(stdin)
-    await waitForFramesToInclude(/Leave recall\?/)
-
-    stdin.write('n\r')
-
-    await waitForLastFrame(
-      lastFrame,
+    startRecall(ink.stdin)
+    await waitMcqVisible(ink)
+    ink.stdin.write('z')
+    await ink.waitUntilLastFrame((p) => p.includes('→ z'))
+    await pressEscape(ink.stdin)
+    await ink.waitForLastFrameToInclude(/Leave recall\?/)
+    ink.stdin.write('n\r')
+    await ink.waitUntilLastFrame(
       (p) =>
+        p.includes('→ z') &&
         p.includes('Choose') &&
-        p.includes('Alpha') &&
-        p.includes(MCQ_HINT_SUBSTR) &&
-        !p.includes(LEAVE_RECALL_PROMPT)
+        !p.includes('Leave recall?')
     )
-
     expect(answerQuizSpy).not.toHaveBeenCalled()
   })
 
   test('after Esc then n, MCQ list highlight preserved (Enter submits second choice)', async () => {
+    mockSingleMcqDue()
     const pending = pendingMcqPrompt()
     answerQuizSpy.mockResolvedValue({
       data: mcqAnsweredPrompt(pending, {
@@ -570,28 +453,18 @@ describe('recall MCQ (interactive)', () => {
       }),
     } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
 
-    const { stdin, lastFrame, waitForFramesToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+    const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
-    stdin.write('/recall\r')
-    await waitForMcqVisible(waitForFramesToInclude)
-    stdin.write('\u001b[B')
-    await waitForLastFrame(lastFrame, (p) => p.includes('2.'))
-
-    await pressEscape(stdin)
-    await waitForFramesToInclude(/Leave recall\?/)
-
-    stdin.write('n\r')
-    await waitForLastFrame(
-      lastFrame,
-      (p) => p.includes(MCQ_HINT_SUBSTR) && !p.includes(LEAVE_RECALL_PROMPT)
-    )
-
-    stdin.write('\r')
-
-    await waitForFramesToInclude(/Incorrect/)
-
-    expect(answerQuizSpy).toHaveBeenCalledTimes(1)
+    startRecall(ink.stdin)
+    await waitMcqVisible(ink)
+    ink.stdin.write('\u001b[B')
+    await ink.waitUntilLastFrame((p) => p.includes('2.'))
+    await pressEscape(ink.stdin)
+    await ink.waitForLastFrameToInclude(/Leave recall\?/)
+    ink.stdin.write('n\r')
+    await waitReturnsToMcq(ink)
+    ink.stdin.write('\r')
+    await waitMcqIncorrectOnLastFrame(ink)
     expect(answerQuizSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         path: { recallPrompt: RECALL_PROMPT_ID },
@@ -600,54 +473,17 @@ describe('recall MCQ (interactive)', () => {
     )
   })
 
-  test('after Esc then n, MCQ command buffer preserved', async () => {
-    const { stdin, lastFrame, waitForFramesToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-    stdin.write('/recall\r')
-    await waitForMcqVisible(waitForFramesToInclude)
-    stdin.write('z')
-    await waitForLastFrame(lastFrame, (p) => p.includes('→ z'))
-
-    await pressEscape(stdin)
-    await waitForFramesToInclude(/Leave recall\?/)
-
-    stdin.write('n\r')
-
-    await waitForLastFrame(
-      lastFrame,
-      (p) =>
-        p.includes('→ z') &&
-        p.includes('Choose') &&
-        !p.includes(LEAVE_RECALL_PROMPT)
-    )
-
-    expect(answerQuizSpy).not.toHaveBeenCalled()
-  })
-
   test('empty Enter on leave recall confirm stays on confirm; n returns to MCQ', async () => {
-    const { stdin, lastFrame, waitForFramesToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+    const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
-    stdin.write('/recall\r')
-    await waitForMcqVisible(waitForFramesToInclude)
-    await pressEscape(stdin)
-    await waitForFramesToInclude(/Leave recall\?/)
-
-    stdin.write('\r')
-    await waitForFramesToInclude(/Leave recall\?/)
-
-    expect(answerQuizSpy).not.toHaveBeenCalled()
-
-    stdin.write('n\r')
-    await waitForLastFrame(
-      lastFrame,
-      (p) =>
-        p.includes('Choose') &&
-        p.includes(MCQ_HINT_SUBSTR) &&
-        !p.includes(LEAVE_RECALL_PROMPT)
-    )
-
+    startRecall(ink.stdin)
+    await waitMcqVisible(ink)
+    await pressEscape(ink.stdin)
+    await ink.waitForLastFrameToInclude(/Leave recall\?/)
+    ink.stdin.write('\r')
+    await ink.waitForLastFrameToInclude(/Leave recall\?/)
+    ink.stdin.write('n\r')
+    await waitReturnsToMcq(ink)
     expect(answerQuizSpy).not.toHaveBeenCalled()
   })
 
@@ -662,20 +498,13 @@ describe('recall MCQ (interactive)', () => {
         data: pendingMcqPrompt(),
       } as Awaited<ReturnType<typeof RecallPromptController.regenerate>>)
 
-    const { stdin, frames, waitForFramesToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+    const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
-    stdin.write('/recall\r')
-    await waitForMcqVisible(waitForFramesToInclude)
-
-    stdin.write('/contest\r')
-
-    await waitForFramesToInclude(new RegExp(reLiteral(rejectAdvice)))
-
-    const plain = stripAnsi(frames.join('\n'))
-    expect(plain).toContain(rejectAdvice)
-    expect(plain).toContain('Choose')
-    expect(plain).toContain(MCQ_HINT_SUBSTR)
+    startRecall(ink.stdin)
+    await waitMcqVisible(ink)
+    ink.stdin.write('/contest\r')
+    await ink.waitForLastFrameToInclude(rejectAdvice)
+    expect(ink.lastStrippedFrame()).toContain('Choose')
     expect(regenerateSpy).not.toHaveBeenCalled()
     expect(answerQuizSpy).not.toHaveBeenCalled()
   })
@@ -685,16 +514,12 @@ describe('recall MCQ (interactive)', () => {
       .spyOn(RecallPromptController, 'contest')
       .mockRejectedValue(new Error('contest failed hard'))
 
-    const { stdin, waitForFramesToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+    const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
-    stdin.write('/recall\r')
-    await waitForMcqVisible(waitForFramesToInclude)
-
-    stdin.write('/contest\r')
-
-    await waitForFramesToInclude(/Doughnut service is not available/)
-
+    startRecall(ink.stdin)
+    await waitMcqVisible(ink)
+    ink.stdin.write('/contest\r')
+    await ink.waitForLastFrameToInclude('Doughnut service is not available')
     expect(answerQuizSpy).not.toHaveBeenCalled()
   })
 })

@@ -15,12 +15,14 @@ import {
 } from '../src/sessionScrollback/sessionScrollbackAppendContext.js'
 import {
   extendInkRenderForInteractiveTests,
-  inkCommandLineProbeUndelete,
   pressEscapeAndWait,
   StageKeyRoot,
   stripAnsi,
-  waitForFrames,
 } from './inkTestHelpers.js'
+import {
+  readyNotebookStageRender,
+  waitNotebookPickerVisible,
+} from './useNotebookSlashCommand.waits.js'
 
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'
 
@@ -91,32 +93,16 @@ function notebookStageTestAppElement(argument?: string) {
   )
 }
 
-/** Mounts `useNotebookSlashCommand` stage with real scrollback + stage key forwarding; waits for the nested shell prompt. */
 async function renderNotebookStageWhenPromptReady(notebookArgument: string) {
-  const element = notebookStageTestAppElement(notebookArgument)
-  const result = render(element)
-  await waitForFrames(
-    () => stripAnsi(result.frames.join('\n')),
-    (c) => c.includes('Active notebook:')
-  )
-  await inkCommandLineProbeUndelete(result, {
-    probeChar: '|',
-    probeVisible: (f) => f.includes('→ |') || f.includes('> |'),
-    probeHidden: (f) =>
-      (f.includes('→') && !f.includes('→ |')) ||
-      (f.includes('>') && !f.includes('> |')),
-  })
-  return { ...result, ...extendInkRenderForInteractiveTests(result) }
+  const result = render(notebookStageTestAppElement(notebookArgument))
+  return readyNotebookStageRender(result, notebookArgument)
 }
 
 async function renderNotebookStageWhenPickerVisible() {
   const result = render(notebookStageTestAppElement(undefined))
-  const extended = extendInkRenderForInteractiveTests(result)
-  await waitForFrames(
-    () => stripAnsi(result.frames.join('\n')),
-    (c) => c.includes('Pick a notebook')
-  )
-  return { ...result, ...extended }
+  const ink = extendInkRenderForInteractiveTests(result)
+  await waitNotebookPickerVisible(ink)
+  return { ...result, ...ink }
 }
 
 describe('useNotebookSlashCommand stage', () => {
@@ -146,12 +132,11 @@ describe('useNotebookSlashCommand stage', () => {
       data: { notebooks: [myNotebooksApiRow('Top Maths')] },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
 
-    const { stdin, lastStrippedFrame, waitForFramesToInclude } =
+    const { stdin, lastStrippedFrame, waitForLastFrameToInclude } =
       await renderNotebookStageWhenPromptReady('Top Maths')
 
     stdin.write('/exit\r')
-    await waitForFramesToInclude('Left notebook context.')
-
+    await waitForLastFrameToInclude('Left notebook context.')
     expect(lastStrippedFrame()).not.toContain('Active notebook: Top Maths')
   })
 
@@ -263,17 +248,13 @@ describe('useNotebookSlashCommand stage', () => {
       },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
 
-    const { stdin, waitForFramesToInclude } =
+    const { stdin, waitForLastFrameToInclude, waitUntilLastFrame } =
       await renderNotebookStageWhenPickerVisible()
 
     stdin.write('\u001b[B')
-    for (let i = 0; i < 10; i += 1) {
-      await new Promise<void>((resolve) => {
-        setImmediate(resolve)
-      })
-    }
+    await waitUntilLastFrame((f) => f.includes('Beta') && f.includes('2.'))
     stdin.write('\r')
-    await waitForFramesToInclude('Active notebook: Beta')
+    await waitForLastFrameToInclude('Active notebook: Beta')
   })
 
   test('bare /use with empty notebook list shows error', async () => {

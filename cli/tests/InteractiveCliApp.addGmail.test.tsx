@@ -152,18 +152,20 @@ async function submitAndCompleteOAuth(
 
 async function submitCommandAndExpectError(
   stdin: { write: (s: string) => void },
-  frames: string[],
-  lastFrame: () => string | undefined,
+  waitForLastFrameRaw: (
+    predicate: (raw: string) => boolean,
+    maxTicks?: number
+  ) => Promise<void>,
+  lastStrippedFrame: () => string,
   command: string,
   errorSnippet: string
 ) {
   stdin.write(`${command}\r`)
-  await waitForFrames(
-    () => frames.join('\n'),
-    (c) =>
-      c.includes(command) && c.includes(errorSnippet) && c.includes('\x1b[100m')
+  await waitForLastFrameRaw(
+    (f) =>
+      f.includes(errorSnippet) && f.includes('\x1b[100m') && f.includes('→ ')
   )
-  await waitForLastFrame(lastFrame, (f) => f.includes('→ '))
+  expect(lastStrippedFrame()).toContain(errorSnippet)
 }
 
 describe('InteractiveCliApp /add gmail (missing credentials)', () => {
@@ -178,15 +180,14 @@ describe('InteractiveCliApp /add gmail (missing credentials)', () => {
   afterEach(() => cleanupTestEnv(configDir))
 
   test('shows missing-credentials error in transcript after /add gmail', async () => {
-    const { stdin, frames, lastFrame } = await renderApp()
+    const { stdin, lastStrippedFrame, waitForLastFrameRaw } = await renderApp()
     await submitCommandAndExpectError(
       stdin,
-      frames,
-      lastFrame,
+      waitForLastFrameRaw,
+      lastStrippedFrame,
       '/add gmail',
       MISSING_OAUTH_SNIPPET
     )
-    expect(frames.join('\n')).toContain(MISSING_OAUTH_SNIPPET)
   })
 })
 
@@ -376,11 +377,11 @@ describe('InteractiveCliApp /last email (mocked HTTP APIs)', () => {
   test('shows no-account error in transcript after /last email', async () => {
     writeGmailConfig(configDir, { accounts: [] })
 
-    const { stdin, frames, lastFrame } = await renderApp()
+    const { stdin, lastStrippedFrame, waitForLastFrameRaw } = await renderApp()
     await submitCommandAndExpectError(
       stdin,
-      frames,
-      lastFrame,
+      waitForLastFrameRaw,
+      lastStrippedFrame,
       '/last email',
       'No Gmail account configured.'
     )

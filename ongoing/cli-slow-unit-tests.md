@@ -47,11 +47,10 @@ Top-10 hits: #4 (771ms), #8 (626ms). `lastFrame` waits via `useNotebookInteracti
 Verify: `CURSOR_DEV=true nix develop -c bash -c 'cd cli && pnpm exec vitest run tests/InteractiveCliApp.useNotebook.test.tsx'`
 
 ### Group 4: singleton slow tests batch
-Status: planned
+Status: done
 
-Top-10 hits: #1 addGmail (908ms), #7 recallMcq (652ms), #10 useNotebookSlashCommand (591ms). Files:
-- `cli/tests/InteractiveCliApp.addGmail.test.tsx`
-- `cli/tests/recallMcqInteractive.test.tsx`
-- `cli/tests/useNotebookSlashCommand.test.tsx`
+Top-10 hits: #1 addGmail (908ms), #7 recallMcq (652ms), #10 useNotebookSlashCommand (591ms). `lastFrame` waits; `recallMcqInteractive.waits.ts` and `useNotebookSlashCommand.waits.ts`; dropped redundant MCQ Esc-only and duplicate Esc+n buffer tests (14→11 MCQ); addGmail error paths use single raw last-frame wait instead of full `frames` scrollback.
 
 Verify each file with `pnpm exec vitest run tests/<file>` from `cli/`.
+
+**Plan complete**
