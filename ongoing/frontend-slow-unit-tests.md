@@ -60,7 +60,7 @@ Verify: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form
 ---
 
 ### Phase 4: Speed up NoteExportForm.spec.ts
-Status: planned
+Status: done
 
 Target: `frontend/tests/notes/NoteExportForm.spec.ts` — `downloads graph JSON when download button is clicked` (~1.21s).
 
@@ -71,7 +71,7 @@ Verify: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteExpor
 ---
 
 ### Phase 5: Speed up SearchDialog.spec.ts (top-10 cases)
-Status: planned
+Status: done
 
 Target: `frontend/tests/links/SearchDialog.spec.ts` — three top-10 cases (~1.12s each) plus other ~1.1s cases in same file.
 

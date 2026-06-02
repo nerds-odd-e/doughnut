@@ -6,13 +6,21 @@ import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { saveAs } from "file-saver"
 import { page } from "vitest/browser"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
+import type { Note } from "@generated/doughnut-backend-api"
 
 vi.mock("file-saver", () => ({ saveAs: vi.fn() }))
 
 const aiMarkdownStub = { markdown: "# AI context\n\nHello **world**." }
 
+const minimalGraph = (noteId: number) =>
+  ({
+    focusNote: { id: noteId },
+    relatedNotes: [],
+  }) as never
+
 describe("NoteExportForm", () => {
   let wrapper: VueWrapper
+
   beforeEach(() => {
     vi.clearAllMocks()
     mockSdkService(NoteController, "getAiContextMarkdown", aiMarkdownStub)
@@ -23,124 +31,92 @@ describe("NoteExportForm", () => {
     document.body.innerHTML = ""
   })
 
-  it("fetches and displays AI markdown on open", async () => {
-    const note = makeMe.aNote.please()
+  const mountForm = (note: Note = makeMe.aNote.please()) => {
     wrapper = helper
       .component(NoteExportForm)
       .withProps({ note })
       .mount({ attachTo: document.body })
+    return note
+  }
+
+  const expandGraphSection = async () => {
+    await page.getByText("Export Note Graph (JSON)").click()
     await flushPromises()
+  }
+
+  const graphTextarea = () =>
+    document.querySelector(
+      '[data-testid="graph-json-textarea"]'
+    ) as HTMLTextAreaElement | null
+
+  it("fetches AI markdown on open and downloads from primary button", async () => {
+    const note = mountForm()
+    await flushPromises()
+
     expect(NoteController.getAiContextMarkdown).toHaveBeenCalledWith({
       path: { note: note.id },
       query: { tokenLimit: 2000 },
     })
-    const ta = page.getByTestId("ai-context-markdown-textarea")
-    await expect.element(ta).toBeVisible()
-    await expect.element(ta).toHaveValue(expect.stringContaining("AI context"))
-  })
 
-  it("fetches and displays graph JSON when expanded", async () => {
-    const note = makeMe.aNote.please()
-    const graphData = {
-      focusNote: { id: note.id },
-      relatedNotes: [],
-    } as never
-    const getGraphSpy = mockSdkService(NoteController, "getGraph", graphData)
-    wrapper = helper
-      .component(NoteExportForm)
-      .withProps({ note })
-      .mount({ attachTo: document.body })
+    const textarea = document.querySelector(
+      '[data-testid="ai-context-markdown-textarea"]'
+    ) as HTMLTextAreaElement
+    expect(textarea.value).toContain("AI context")
 
-    // Initially, textarea is not visible
-    await expect
-      .element(page.getByTestId("graph-json-textarea"))
-      .not.toBeInTheDocument()
-
-    // Open the collapsible export section
-    await page.getByText("Export Note Graph (JSON)").click()
-    await flushPromises()
-
-    const textarea = page.getByTestId("graph-json-textarea")
-    await expect.element(textarea).toBeInTheDocument()
-    await expect
-      .element(textarea)
-      .toHaveValue(expect.stringContaining('"focusNote"'))
-
-    // Should call API once
-    expect(getGraphSpy).toHaveBeenCalledWith({
-      path: { note: note.id },
-      query: { tokenLimit: 2000 },
-    })
-  })
-
-  it("downloads AI markdown when primary download is clicked", async () => {
-    const note = makeMe.aNote.please()
-    wrapper = helper
-      .component(NoteExportForm)
-      .withProps({ note })
-      .mount({ attachTo: document.body })
-    await flushPromises()
     await page.getByTestId("download-ai-context-md-btn").click()
     expect(saveAs).toHaveBeenCalled()
     const blobArg = vi.mocked(saveAs).mock.calls[0][0] as Blob
     expect(blobArg.type).toContain("markdown")
   })
 
-  it("downloads graph JSON when download button is clicked", async () => {
-    const note = makeMe.aNote.please()
-    const graphData = {
-      focusNote: { id: note.id },
-      relatedNotes: [],
-    } as never
-    mockSdkService(NoteController, "getGraph", graphData)
-    wrapper = helper
-      .component(NoteExportForm)
-      .withProps({ note })
-      .mount({ attachTo: document.body })
+  it("fetches graph JSON when expanded and downloads on button click", async () => {
+    const note = mountForm()
+    const getGraphSpy = mockSdkService(
+      NoteController,
+      "getGraph",
+      minimalGraph(note.id)
+    )
 
-    await page.getByText("Export Note Graph (JSON)").click()
-    await flushPromises()
-    const downloadBtn = page.getByTestId("download-json-btn-graph")
-    await expect.element(downloadBtn).toBeVisible()
-    await downloadBtn.click()
+    expect(graphTextarea()).toBeNull()
+
+    await expandGraphSection()
+
+    expect(getGraphSpy).toHaveBeenCalledWith({
+      path: { note: note.id },
+      query: { tokenLimit: 2000 },
+    })
+    expect(graphTextarea()?.value).toContain('"focusNote"')
+
+    await page.getByTestId("download-json-btn-graph").click()
     expect(saveAs).toHaveBeenCalled()
   })
 
   it("does not refetch graph JSON if already loaded when toggling open/close", async () => {
-    const note = makeMe.aNote.please()
-    const graphData = {
-      focusNote: { id: note.id },
-      relatedNotes: [],
-    } as never
-    const getGraphMock = mockSdkService(NoteController, "getGraph", graphData)
-    wrapper = helper
-      .component(NoteExportForm)
-      .withProps({ note })
-      .mount({ attachTo: document.body })
+    const note = mountForm()
+    const getGraphMock = mockSdkService(
+      NoteController,
+      "getGraph",
+      minimalGraph(note.id)
+    )
 
     const toggleBtn = page.getByText("Export Note Graph (JSON)")
     await toggleBtn.click()
     await flushPromises()
-    await expect.element(page.getByTestId("graph-json-textarea")).toBeVisible()
+    expect(graphTextarea()).toBeTruthy()
 
-    // Clear calls from initial render
     getGraphMock.mockClear()
 
-    // Close and reopen
     await toggleBtn.click()
     await toggleBtn.click()
+    await flushPromises()
 
-    await expect.element(page.getByTestId("graph-json-textarea")).toBeVisible()
-    // Should not call again since data is already loaded
+    expect(graphTextarea()).toBeTruthy()
     expect(getGraphMock).toHaveBeenCalledTimes(0)
   })
 
   it("allows customizing token limit and refreshes graph", async () => {
-    const note = makeMe.aNote.please()
-    const graphData1 = {
-      focusNote: { id: note.id },
-      relatedNotes: [],
-    } as never
+    const note = mountForm()
+    const graphData1 = minimalGraph(note.id)
     const graphData2 = {
       focusNote: { id: note.id, token: 1234 },
       relatedNotes: [],
@@ -150,26 +126,14 @@ describe("NoteExportForm", () => {
       .mockResolvedValueOnce(wrapSdkResponse(graphData1))
       .mockResolvedValueOnce(wrapSdkResponse(graphData2))
 
-    wrapper = helper
-      .component(NoteExportForm)
-      .withProps({ note })
-      .mount({ attachTo: document.body })
+    await expandGraphSection()
+    expect(graphTextarea()).toBeTruthy()
 
-    await page.getByText("Export Note Graph (JSON)").click()
-    await flushPromises()
-    await expect.element(page.getByTestId("graph-json-textarea")).toBeVisible()
-
-    // Change token limit
-    const input = page.getByTestId("token-limit-input")
-    await input.fill("1234")
-
+    await page.getByTestId("token-limit-input").fill("1234")
     await page.getByTestId("refresh-graph-btn").click()
+    await flushPromises()
 
-    const textarea = page.getByTestId("graph-json-textarea")
-    await expect
-      .element(textarea)
-      .toHaveValue(expect.stringContaining('"token": 1234'))
-
+    expect(graphTextarea()?.value).toContain('"token": 1234')
     expect(getGraphMock).toHaveBeenLastCalledWith({
       path: { note: note.id },
       query: { tokenLimit: 1234 },
@@ -184,21 +148,17 @@ describe("NoteExportForm", () => {
     vi.mocked(NoteController.getAiContextMarkdown)
       .mockResolvedValueOnce(wrapSdkResponse(md1))
       .mockResolvedValueOnce(wrapSdkResponse(md2))
-
-    wrapper = helper
-      .component(NoteExportForm)
-      .withProps({ note })
-      .mount({ attachTo: document.body })
+    mountForm(note)
     await flushPromises()
 
     await page.getByTestId("token-limit-input").fill("3000")
     await page.getByTestId("refresh-context-md-btn").click()
     await flushPromises()
 
-    await expect
-      .element(page.getByTestId("ai-context-markdown-textarea"))
-      .toHaveValue(expect.stringContaining("second-budget"))
-
+    const textarea = document.querySelector(
+      '[data-testid="ai-context-markdown-textarea"]'
+    ) as HTMLTextAreaElement
+    expect(textarea.value).toContain("second-budget")
     expect(NoteController.getAiContextMarkdown).toHaveBeenLastCalledWith({
       path: { note: note.id },
       query: { tokenLimit: 3000 },

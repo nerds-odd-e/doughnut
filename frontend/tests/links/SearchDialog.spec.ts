@@ -4,6 +4,7 @@ import {
   SearchController,
   TextContentController,
 } from "@generated/doughnut-backend-api/sdk.gen"
+import type { Note } from "@generated/doughnut-backend-api"
 import SearchForm from "@/components/links/SearchForm.vue"
 import Modal from "@/components/commons/Modal.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
@@ -23,9 +24,10 @@ import {
   dispatchArrowKey,
   testIdSelector,
 } from "@tests/helpers/searchDialogKeyboardTestSupport"
-import { beforeEach, describe, expect, it, vi } from "vitest"
-import { defineComponent } from "vue"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { defineComponent, nextTick } from "vue"
 
+const SEARCH_DEBOUNCE_MS = 1000
 const searchResultItemSelector = testIdSelector(searchResultItemTestId)
 const searchInputId = "searchTerm-searchKey"
 
@@ -43,17 +45,79 @@ function makeNoteHit(title: string, notebookId: number) {
   }
 }
 
+function makeFolderHit(folderId: number, folderName: string) {
+  return {
+    hitKind: "FOLDER" as const,
+    folderId,
+    folderName,
+    notebookId: 1,
+    notebookName: "Nb",
+    distance: 0.9,
+  }
+}
+
+function makeNotebookHit(notebookId: number, notebookName: string) {
+  return {
+    hitKind: "NOTEBOOK" as const,
+    notebookId,
+    notebookName,
+    distance: 0,
+  }
+}
+
+function setupSearchFormSdkMocks() {
+  mockSdkService(NoteController, "getRecentNotes", [])
+  mockSdkService(SearchController, "searchForRelationshipTarget", [])
+  mockSdkService(SearchController, "searchForRelationshipTargetWithin", [])
+  mockSdkService(SearchController, "semanticSearch", [])
+  mockSdkService(SearchController, "semanticSearchWithin", [])
+}
+
+async function waitForSearchDebounce() {
+  await nextTick()
+  vi.advanceTimersByTime(SEARCH_DEBOUNCE_MS + 100)
+  await flushPromises()
+}
+
+async function typeInSearch(input: HTMLElement, value: string) {
+  fireEvent.update(input, value)
+  await waitForSearchDebounce()
+}
+
+async function renderSearchForm(
+  props: {
+    note?: Note | null
+    deadLinkPayload?: {
+      targetToken: string
+      displayText: string
+    }
+  },
+  options?: { router?: boolean; cleanStorage?: boolean }
+) {
+  let chain = helper.component(SearchForm)
+  if (options?.cleanStorage !== false) {
+    chain = chain.withCleanStorage()
+  }
+  if (options?.router) {
+    chain = chain.withRouter()
+  }
+  chain.withProps(props).render()
+  await flushPromises()
+  return screen.findByPlaceholderText("Search")
+}
+
+async function confirmMovePopup() {
+  usePopups().popups.done(true)
+  await flushPromises()
+}
+
 describe("SearchForm", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     clearSearchKeyHistoryCookie()
-    // Mock services used by SearchResults component
-    mockSdkService(NoteController, "getRecentNotes", [])
-    mockSdkService(SearchController, "searchForRelationshipTarget", [])
-    mockSdkService(SearchController, "searchForRelationshipTargetWithin", [])
-    mockSdkService(SearchController, "semanticSearch", [])
-    mockSdkService(SearchController, "semanticSearchWithin", [])
+    setupSearchFormSdkMocks()
   })
+
   it("Search at the top level with no note", async () => {
     helper
       .component(SearchForm)
@@ -137,354 +201,261 @@ describe("SearchForm", () => {
     ).not.toHaveClass("text-primary")
   })
 
-  describe("Add link choice step", () => {
-    it("shows choice buttons when Add link is clicked on a note hit", async () => {
-      const note = MakeMe.aNote.please()
-      mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
-        makeNoteHit("Target Note", note.noteTopology.id + 100),
-      ])
-      helper
-        .component(SearchForm)
-        .withCleanStorage()
-        .withProps({ note })
-        .render()
-
-      const searchInput = await screen.findByPlaceholderText("Search")
-      fireEvent.update(searchInput, "Target")
-      await new Promise((resolve) => setTimeout(resolve, 1100))
-      await flushPromises()
-
-      const addLinkBtn = await screen.findByRole("button", { name: "Add link" })
-      fireEvent.click(addLinkBtn)
-      await flushPromises()
-
-      expect(
-        await screen.findByRole("button", { name: "Insert as a wiki link" })
-      ).toBeInTheDocument()
-      expect(
-        await screen.findByRole("button", {
-          name: "Add a new relationship note",
-        })
-      ).toBeInTheDocument()
+  describe("debounced search flows", () => {
+    beforeEach(() => {
+      vi.useFakeTimers()
     })
 
-    it("shows relationship form when Add a new relationship note is clicked", async () => {
-      const note = MakeMe.aNote.please()
-      mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
-        makeNoteHit("Target Note", note.noteTopology.id + 100),
-      ])
-      helper
-        .component(SearchForm)
-        .withCleanStorage()
-        .withRouter()
-        .withProps({ note })
-        .render()
-
-      const searchInput = await screen.findByPlaceholderText("Search")
-      fireEvent.update(searchInput, "Target")
-      await new Promise((resolve) => setTimeout(resolve, 1100))
-      await flushPromises()
-
-      fireEvent.click(await screen.findByRole("button", { name: "Add link" }))
-      await flushPromises()
-      fireEvent.click(
-        await screen.findByRole("button", {
-          name: "Add a new relationship note",
-        })
-      )
-      await flushPromises()
-
-      expect(
-        await screen.findByText("Complete relationship")
-      ).toBeInTheDocument()
+    afterEach(() => {
+      vi.runOnlyPendingTimers()
+      vi.useRealTimers()
     })
-  })
 
-  describe("Move Under folder hit", () => {
-    it("calls moveNoteToFolder with folder id after confirm", async () => {
-      mockSdkService(NoteController, "getRecentNotes", [])
-      mockSdkService(SearchController, "searchForRelationshipTarget", [])
-      mockSdkService(SearchController, "semanticSearch", [])
-      mockSdkService(SearchController, "semanticSearchWithin", [])
-      const note = MakeMe.aNote.please()
-      const targetFolderId = 42
-      mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
-        {
-          hitKind: "FOLDER",
-          folderId: targetFolderId,
-          folderName: "Archive",
-          notebookId: 1,
-          notebookName: "Nb",
-          distance: 0.9,
-        },
-      ])
-      const moveNoteToFolderSpy = mockSdkService(
-        RelationController,
-        "moveNoteToFolder",
-        []
-      )
+    describe("Add link choice step", () => {
+      async function openAddLinkChoice(
+        note: Note,
+        options?: { router?: boolean }
+      ) {
+        mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
+          makeNoteHit("Target Note", note.noteTopology.id + 100),
+        ])
+        const searchInput = await renderSearchForm({ note }, options)
+        await typeInSearch(searchInput, "Target")
+        fireEvent.click(await screen.findByRole("button", { name: "Add link" }))
+        await flushPromises()
+      }
 
-      helper
-        .component(SearchForm)
-        .withCleanStorage()
-        .withProps({ note })
-        .render()
+      it("shows choice buttons when Add link is clicked on a note hit", async () => {
+        const note = MakeMe.aNote.please()
+        await openAddLinkChoice(note)
 
-      await flushPromises()
+        expect(
+          await screen.findByRole("button", { name: "Insert as a wiki link" })
+        ).toBeInTheDocument()
+        expect(
+          await screen.findByRole("button", {
+            name: "Add a new relationship note",
+          })
+        ).toBeInTheDocument()
+      })
 
-      const searchInput = await screen.findByPlaceholderText("Search")
-      fireEvent.update(searchInput, "Arc")
+      it("shows relationship form when Add a new relationship note is clicked", async () => {
+        const note = MakeMe.aNote.please()
+        await openAddLinkChoice(note, { router: true })
 
-      await new Promise((resolve) => setTimeout(resolve, 1100))
-      await flushPromises()
+        fireEvent.click(
+          await screen.findByRole("button", {
+            name: "Add a new relationship note",
+          })
+        )
+        await flushPromises()
 
-      expect(moveNoteToFolderSpy).not.toHaveBeenCalled()
-
-      await screen.findByRole("button", { name: "Move Under" })
-      fireEvent.click(screen.getByRole("button", { name: "Move Under" }))
-      await flushPromises()
-
-      usePopups().popups.done(true)
-      await flushPromises()
-
-      expect(moveNoteToFolderSpy).toHaveBeenCalledTimes(1)
-      expect(moveNoteToFolderSpy).toHaveBeenCalledWith({
-        path: {
-          sourceNote: note.id,
-          targetFolder: targetFolderId,
-        },
+        expect(
+          await screen.findByText("Complete relationship")
+        ).toBeInTheDocument()
       })
     })
 
-    it("shows confirm when move is blocked by soft-deleted title at destination", async () => {
-      mockSdkService(NoteController, "getRecentNotes", [])
-      mockSdkService(SearchController, "searchForRelationshipTarget", [])
-      mockSdkService(SearchController, "semanticSearch", [])
-      mockSdkService(SearchController, "semanticSearchWithin", [])
-      const note = MakeMe.aNote.please()
+    describe("Move Under folder hit", () => {
       const targetFolderId = 42
-      mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
-        {
-          hitKind: "FOLDER",
-          folderId: targetFolderId,
-          folderName: "Archive",
-          notebookId: 1,
-          notebookName: "Nb",
-          distance: 0.9,
-        },
-      ])
-      const conflictMessage =
-        "A note with this title already exists here but was deleted."
-      mockSdkService(
-        RelationController,
-        "moveNoteToFolder",
-        []
-      ).mockResolvedValue(
-        wrapSdkError({
-          status: 409,
-          errorType: "SOFT_DELETED_TITLE_CONFLICT",
-          message: conflictMessage,
+
+      async function searchAndClickMoveUnder(note: Note) {
+        mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
+          makeFolderHit(targetFolderId, "Archive"),
+        ])
+        const searchInput = await renderSearchForm({ note })
+        await typeInSearch(searchInput, "Arc")
+        fireEvent.click(
+          await screen.findByRole("button", { name: "Move Under" })
+        )
+        await flushPromises()
+      }
+
+      it("calls moveNoteToFolder with folder id after confirm", async () => {
+        const note = MakeMe.aNote.please()
+        const moveNoteToFolderSpy = mockSdkService(
+          RelationController,
+          "moveNoteToFolder",
+          []
+        )
+
+        await searchAndClickMoveUnder(note)
+        expect(moveNoteToFolderSpy).not.toHaveBeenCalled()
+
+        await confirmMovePopup()
+
+        expect(moveNoteToFolderSpy).toHaveBeenCalledTimes(1)
+        expect(moveNoteToFolderSpy).toHaveBeenCalledWith({
+          path: {
+            sourceNote: note.id,
+            targetFolder: targetFolderId,
+          },
         })
-      )
+      })
 
-      helper
-        .component(SearchForm)
-        .withCleanStorage()
-        .withProps({ note })
-        .render()
+      it("shows confirm when move is blocked by soft-deleted title at destination", async () => {
+        const note = MakeMe.aNote.please()
+        const conflictMessage =
+          "A note with this title already exists here but was deleted."
+        mockSdkService(
+          RelationController,
+          "moveNoteToFolder",
+          []
+        ).mockResolvedValue(
+          wrapSdkError({
+            status: 409,
+            errorType: "SOFT_DELETED_TITLE_CONFLICT",
+            message: conflictMessage,
+          })
+        )
 
-      await flushPromises()
+        await searchAndClickMoveUnder(note)
+        await confirmMovePopup()
 
-      fireEvent.update(await screen.findByPlaceholderText("Search"), "Arc")
-      await new Promise((resolve) => setTimeout(resolve, 1100))
-      await flushPromises()
-
-      fireEvent.click(await screen.findByRole("button", { name: "Move Under" }))
-      await flushPromises()
-      usePopups().popups.done(true)
-      await flushPromises()
-
-      const conflictPopup = usePopups().popups.peek()?.[0]
-      expect(conflictPopup?.type).toBe("confirm")
-      expect(conflictPopup?.message).toContain(conflictMessage)
-      expect(conflictPopup?.message).toContain("rename the note you are moving")
-    })
-  })
-
-  describe("Move to notebook root on NOTEBOOK hit", () => {
-    it("calls moveNoteToNotebookRootInNotebook with notebook id after confirm", async () => {
-      mockSdkService(NoteController, "getRecentNotes", [])
-      mockSdkService(SearchController, "searchForRelationshipTarget", [])
-      mockSdkService(SearchController, "semanticSearch", [])
-      mockSdkService(SearchController, "semanticSearchWithin", [])
-      const note = MakeMe.aNote.please()
-      const targetNotebookId = 99
-      mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
-        {
-          hitKind: "NOTEBOOK",
-          notebookId: targetNotebookId,
-          notebookName: "Other NB",
-          distance: 0,
-        },
-      ])
-      const spy = mockSdkService(
-        RelationController,
-        "moveNoteToNotebookRootInNotebook",
-        []
-      )
-
-      helper
-        .component(SearchForm)
-        .withCleanStorage()
-        .withProps({ note })
-        .render()
-
-      await flushPromises()
-
-      const searchInput = await screen.findByPlaceholderText("Search")
-      fireEvent.update(searchInput, "Other")
-
-      await new Promise((resolve) => setTimeout(resolve, 1100))
-      await flushPromises()
-
-      expect(spy).not.toHaveBeenCalled()
-
-      await screen.findByRole("button", { name: "Move to notebook root" })
-      fireEvent.click(
-        screen.getByRole("button", { name: "Move to notebook root" })
-      )
-      await flushPromises()
-
-      usePopups().popups.done(true)
-      await flushPromises()
-
-      expect(spy).toHaveBeenCalledTimes(1)
-      expect(spy).toHaveBeenCalledWith({
-        path: {
-          sourceNote: note.id,
-          targetNotebook: targetNotebookId,
-        },
+        const conflictPopup = usePopups().popups.peek()?.[0]
+        expect(conflictPopup?.type).toBe("confirm")
+        expect(conflictPopup?.message).toContain(conflictMessage)
+        expect(conflictPopup?.message).toContain(
+          "rename the note you are moving"
+        )
       })
     })
-  })
 
-  describe("Dead link - link to existing note", () => {
-    it("prefills search with dead link display text and searches automatically", async () => {
-      const note = MakeMe.aNote.please()
-      const searchSpy = mockSdkService(
-        SearchController,
-        "searchForRelationshipTargetWithin",
-        [makeNoteHit("Selected Note", note.noteTopology.id + 100)]
-      )
+    describe("Move to notebook root on NOTEBOOK hit", () => {
+      it("calls moveNoteToNotebookRootInNotebook with notebook id after confirm", async () => {
+        const note = MakeMe.aNote.please()
+        const targetNotebookId = 99
+        mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
+          makeNotebookHit(targetNotebookId, "Other NB"),
+        ])
+        const spy = mockSdkService(
+          RelationController,
+          "moveNoteToNotebookRootInNotebook",
+          []
+        )
 
-      helper
-        .component(SearchForm)
-        .withCleanStorage()
-        .withProps({
-          note,
-          deadLinkPayload: {
-            targetToken: "Ghost Page",
-            displayText: "original text",
+        const searchInput = await renderSearchForm({ note })
+        await typeInSearch(searchInput, "Other")
+
+        expect(spy).not.toHaveBeenCalled()
+
+        fireEvent.click(
+          await screen.findByRole("button", { name: "Move to notebook root" })
+        )
+        await flushPromises()
+        await confirmMovePopup()
+
+        expect(spy).toHaveBeenCalledTimes(1)
+        expect(spy).toHaveBeenCalledWith({
+          path: {
+            sourceNote: note.id,
+            targetNotebook: targetNotebookId,
           },
         })
-        .render()
-
-      const searchInput = await screen.findByPlaceholderText("Search")
-      expect(searchInput).toHaveValue("original text")
-      await new Promise((resolve) => setTimeout(resolve, 1100))
-      await flushPromises()
-
-      expect(searchSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          path: { note: note.id },
-          body: expect.objectContaining({ searchKey: "original text" }),
-        })
-      )
+      })
     })
 
-    it("shows 'Link ... to this note' button when dead link payload is provided", async () => {
-      const note = MakeMe.aNote.please()
-      mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
-        makeNoteHit("Selected Note", note.noteTopology.id + 100),
-      ])
+    describe("Dead link - link to existing note", () => {
+      const deadLinkPayload = {
+        targetToken: "original text",
+        displayText: "original text",
+      }
 
-      helper
-        .component(SearchForm)
-        .withCleanStorage()
-        .withProps({
-          note,
-          deadLinkPayload: {
-            targetToken: "original text",
-            displayText: "original text",
-          },
-        })
-        .render()
+      it("prefills search with dead link display text and searches automatically", async () => {
+        const note = MakeMe.aNote.please()
+        const searchSpy = mockSdkService(
+          SearchController,
+          "searchForRelationshipTargetWithin",
+          [makeNoteHit("Selected Note", note.noteTopology.id + 100)]
+        )
 
-      const searchInput = await screen.findByPlaceholderText("Search")
-      fireEvent.update(searchInput, "Selected")
-      await new Promise((resolve) => setTimeout(resolve, 1100))
-      await flushPromises()
+        helper
+          .component(SearchForm)
+          .withCleanStorage()
+          .withProps({ note, deadLinkPayload })
+          .render()
 
-      fireEvent.click(await screen.findByText("Add link"))
-      await flushPromises()
+        const searchInput = await screen.findByPlaceholderText("Search")
+        expect(searchInput).toHaveValue("original text")
+        await waitForSearchDebounce()
 
-      expect(
-        await screen.findByText('Link "original text" to this note')
-      ).toBeInTheDocument()
+        expect(searchSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            path: { note: note.id },
+            body: expect.objectContaining({ searchKey: "original text" }),
+          })
+        )
+      })
+
+      it("shows 'Link ... to this note' button when dead link payload is provided", async () => {
+        const note = MakeMe.aNote.please()
+        mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
+          makeNoteHit("Selected Note", note.noteTopology.id + 100),
+        ])
+
+        const searchInput = await renderSearchForm({ note, deadLinkPayload })
+        await typeInSearch(searchInput, "Selected")
+
+        fireEvent.click(await screen.findByText("Add link"))
+        await flushPromises()
+
+        expect(
+          await screen.findByText('Link "original text" to this note')
+        ).toBeInTheDocument()
+      })
+
+      it("rewrites note content when linking dead link to existing note", async () => {
+        const noteRealm = MakeMe.aNoteRealm
+          .content("See [[original text]] for details.")
+          .please()
+        const note = noteRealm.note
+        const targetNotebookId = note.noteTopology.id + 100
+        mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
+          makeNoteHit("Selected Note", targetNotebookId),
+        ])
+        const updateSpy = mockSdkService(
+          TextContentController,
+          "updateNoteContent",
+          MakeMe.aNoteRealm.please()
+        )
+
+        const storageAccessor = useStorageAccessor()
+        storageAccessor.value = createNoteStorage()
+        storageAccessor.value.refreshNoteRealm(noteRealm)
+
+        const searchInput = await renderSearchForm(
+          { note, deadLinkPayload },
+          { cleanStorage: false }
+        )
+        await typeInSearch(searchInput, "Selected")
+
+        fireEvent.click(await screen.findByText("Add link"))
+        await flushPromises()
+        fireEvent.click(
+          await screen.findByText('Link "original text" to this note')
+        )
+        await flushPromises()
+
+        expect(updateSpy).toHaveBeenCalledTimes(1)
+        expect(updateSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            body: expect.objectContaining({
+              content: "See [[Selected Note|original text]] for details.",
+            }),
+          })
+        )
+      })
     })
 
-    it("rewrites note content when linking dead link to existing note", async () => {
-      const noteRealm = MakeMe.aNoteRealm
-        .content("See [[original text]] for details.")
-        .please()
-      const note = noteRealm.note
-      const targetNotebookId = note.noteTopology.id + 100
+    it("records trimmed search key after debounced search completes", async () => {
+      clearSearchKeyHistoryCookie()
+      const note = MakeMe.aNote.please()
       mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
-        makeNoteHit("Selected Note", targetNotebookId),
+        makeNoteHit("Hit", note.noteTopology.id + 1),
       ])
-      const updateSpy = mockSdkService(
-        TextContentController,
-        "updateNoteContent",
-        MakeMe.aNoteRealm.please()
-      )
-
-      // Reset storage and pre-populate with the note realm so content is accessible
-      const storageAccessor = useStorageAccessor()
-      storageAccessor.value = createNoteStorage()
-      storageAccessor.value.refreshNoteRealm(noteRealm)
-
-      helper
-        .component(SearchForm)
-        .withProps({
-          note,
-          deadLinkPayload: {
-            targetToken: "original text",
-            displayText: "original text",
-          },
-        })
-        .render()
-
-      const searchInput = await screen.findByPlaceholderText("Search")
-      fireEvent.update(searchInput, "Selected")
-      await new Promise((resolve) => setTimeout(resolve, 1100))
-      await flushPromises()
-
-      fireEvent.click(await screen.findByText("Add link"))
-      await flushPromises()
-
-      fireEvent.click(
-        await screen.findByText('Link "original text" to this note')
-      )
-      await flushPromises()
-
-      expect(updateSpy).toHaveBeenCalledTimes(1)
-      expect(updateSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          body: expect.objectContaining({
-            content: "See [[Selected Note|original text]] for details.",
-          }),
-        })
-      )
+      const searchInput = await renderSearchForm({ note })
+      await typeInSearch(searchInput, "  debounced-term  ")
+      expect(readSearchKeyHistory()).toEqual(["debounced-term"])
     })
   })
 
@@ -599,24 +570,6 @@ describe("SearchForm", () => {
       await flushPromises()
 
       expect(dropdown.open).toBe(false)
-    })
-
-    it("records trimmed search key after debounced search completes", async () => {
-      clearSearchKeyHistoryCookie()
-      const note = MakeMe.aNote.please()
-      mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
-        makeNoteHit("Hit", note.noteTopology.id + 1),
-      ])
-      helper
-        .component(SearchForm)
-        .withCleanStorage()
-        .withProps({ note })
-        .render()
-      const searchInput = await screen.findByPlaceholderText("Search")
-      fireEvent.update(searchInput, "  debounced-term  ")
-      await new Promise((resolve) => setTimeout(resolve, 1100))
-      await flushPromises()
-      expect(readSearchKeyHistory()).toEqual(["debounced-term"])
     })
   })
 })
