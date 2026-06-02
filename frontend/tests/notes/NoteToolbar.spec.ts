@@ -99,6 +99,6 @@ describe("NoteToolbar", () => {
     wrapper = await mountNoteToolbar(noteRealm, {
       plugin: notebookSidebarClosedPlugin(),
     })
-    expect(wrapper.find('button[title="New note"]').exists()).toBe(true)
+    expect(wrapper.find('button[title^="New note"]').exists()).toBe(true)
   })
 })

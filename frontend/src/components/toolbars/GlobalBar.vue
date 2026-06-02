@@ -34,7 +34,7 @@ import PopButton from "@/components/commons/Popups/PopButton.vue"
 import {
   registerGlobalNoteSearchOpener,
   unregisterGlobalNoteSearchOpener,
-} from "@/utils/globalNoteSearchShortcut"
+} from "@/utils/globalKeyboardShortcut"
 
 const user = inject<Ref<User | undefined>>("currentUser")
 

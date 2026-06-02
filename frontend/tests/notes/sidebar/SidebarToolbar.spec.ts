@@ -39,7 +39,7 @@ describe("Sidebar toolbar", () => {
       fixtures.topNoteRealm.notebookRealm.notebook.id
     )
     await flushPromises()
-    expect(wrapper.find('button[title="New note"]').exists()).toBe(true)
+    expect(wrapper.find('button[title^="New note"]').exists()).toBe(true)
     expect(wrapper.find('button[title="New folder"]').exists()).toBe(true)
   })
 
@@ -63,7 +63,7 @@ describe("Sidebar toolbar", () => {
     await flushPromises()
     expect(
       wrapper
-        .find('[data-note-sidebar-toolbar] button[title="New note"]')
+        .find('[data-note-sidebar-toolbar] button[title^="New note"]')
         .exists()
     ).toBe(false)
   })

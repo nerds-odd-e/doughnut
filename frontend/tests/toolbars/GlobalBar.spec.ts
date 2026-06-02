@@ -21,7 +21,7 @@ import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { defineComponent, h, provide, ref } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
-import { useGlobalNoteSearchKeyboardShortcut } from "@/composables/useGlobalNoteSearchKeyboardShortcut"
+import { useGlobalKeyboardShortcuts } from "@/composables/useGlobalKeyboardShortcuts"
 
 const mockedPush = vi.fn()
 vi.mock("vue-router", async (importOriginal) => {
@@ -52,7 +52,7 @@ function renderGlobalBarWithSearchShortcut(loggedInUser?: User) {
   const Harness = defineComponent({
     setup() {
       provide("currentUser", userRef)
-      useGlobalNoteSearchKeyboardShortcut(userRef)
+      useGlobalKeyboardShortcuts(userRef)
       return () => h(GlobalBar)
     },
   })
