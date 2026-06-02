@@ -49,7 +49,7 @@ Verify: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/common/FullScre
 ---
 
 ### Phase 3: Speed up TextArea.spec.ts
-Status: planned
+Status: done
 
 Target: `frontend/tests/components/form/TextArea.spec.ts` — `expands based on content up to 'autoExtendUntil' limit` (~1.9s).
 
