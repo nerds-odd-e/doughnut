@@ -17,7 +17,7 @@ Feature: Creating circles
     When I save my profile with:
       | Name      |
       | Learner A |
-    And I am re-logged in as "user"
     And I visit the invitation link
+    And I identify myself as a new user
     And I join the circle
     Then I should see the circle "Odd-e SG Team" and it has two members in it

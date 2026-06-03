@@ -49,6 +49,7 @@ Feature: Wiki links in notes
     Then I should see the rich content elements in the note content:
       | Tag               | Content               |
       | a:not(.dead-link) | WikiLinks E2E Missing |
+      | a:not(.dead-link) | WikiLinks E2E Tech    |
 
   @mockBrowserTime
   Scenario: A dead wiki link can be relinked to an existing note

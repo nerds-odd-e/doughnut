@@ -45,8 +45,13 @@ When('I join the circle', () => {
     .invoke('val')
     .should('not.be.empty')
   cy.intercept('POST', '**/api/circles/join').as('joinCircle')
-  cy.get('form').submit()
-  cy.wait('@joinCircle').its('response.statusCode').should('eq', 200)
+  cy.get('input[value="Join"]').click()
+  cy.wait('@joinCircle').then(({ response }) => {
+    expect(
+      response?.statusCode,
+      `join circle failed: ${JSON.stringify(response?.body)}`
+    ).to.equal(200)
+  })
   cy.url({ timeout: 15000 }).should('match', /\/circles\/\d+/)
   start.pageIsNotLoading()
 })

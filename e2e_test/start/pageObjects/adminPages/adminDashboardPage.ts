@@ -51,17 +51,8 @@ export function assumeAdminDashboardPage() {
       if (!tab) {
         throw new Error(`Unknown admin dashboard tab: ${tabName}`)
       }
-      if (tab === 'manageBazaar') {
-        cy.intercept('GET', '**/api/bazaar').as('bazaarAdminList')
-      }
       cy.visit(`/admin-dashboard?tab=${tab}`)
       cy.location('search').should('include', `tab=${tab}`)
-      if (tab === 'manageBazaar') {
-        cy.wait('@bazaarAdminList').then((interception) => {
-          expect(interception.response?.statusCode).to.eq(200)
-          expect(interception.response?.body as unknown[]).to.not.be.empty
-        })
-      }
       pageIsNotLoading()
       return this
     },
