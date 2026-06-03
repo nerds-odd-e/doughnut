@@ -72,6 +72,14 @@ describe("AssimilationPanel", () => {
         '[data-test="opaque-content-blocker"]'
       ) as HTMLElement | null
 
+    const closeSpellingVerificationPopup = () => {
+      const closeButton = document
+        .querySelector('[data-test="spelling-verification-popup"]')
+        ?.closest(".modal-mask")
+        ?.querySelector(".close-button") as HTMLElement
+      closeButton.click()
+    }
+
     it("shows opaque layer to hide note content behind spelling verification", async () => {
       const wrapper = mountAssimilationPanel()
       await flushPromises()
@@ -93,14 +101,11 @@ describe("AssimilationPanel", () => {
       await clickKeepForRecall(wrapper)
       expect(getOpaqueContentBlocker()).not.toBeNull()
 
-      const closeButton = document
-        .querySelector('[data-test="spelling-verification-popup"]')
-        ?.closest(".modal-mask")
-        ?.querySelector(".close-button") as HTMLElement
-      closeButton.click()
+      closeSpellingVerificationPopup()
       await flushPromises()
 
       expect(getOpaqueContentBlocker()).toBeNull()
+      wrapper.unmount()
     })
 
     it("closes popup and returns to original state when user closes it", async () => {
@@ -108,15 +113,10 @@ describe("AssimilationPanel", () => {
       await flushPromises()
 
       await clickKeepForRecall(wrapper)
-
       expect(document.body.textContent).toContain("Verify Spelling")
       expect(assimilateSpy).not.toHaveBeenCalled()
 
-      const closeButton = document
-        .querySelector('[data-test="spelling-verification-popup"]')
-        ?.closest(".modal-mask")
-        ?.querySelector(".close-button") as HTMLElement
-      closeButton.click()
+      closeSpellingVerificationPopup()
       await flushPromises()
 
       expect(document.body.textContent).not.toContain("Verify Spelling")

@@ -84,6 +84,31 @@ describe("WikidataAssociationDialog", () => {
       (item) => item.getAttribute("data-wikidata-id") === wikidataId
     ) as HTMLElement
 
+  const mockSearchResult = (label: string, id: string) => {
+    const searchResult = makeMe.aWikidataSearchEntity
+      .label(label)
+      .id(id)
+      .please()
+    searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
+    return searchResult
+  }
+
+  const clickSearchResult = async (wikidataId: string) => {
+    const selectItem = getSelectItem(wikidataId)
+    expect(selectItem).toBeTruthy()
+    selectItem.click()
+    await flushPromises()
+  }
+
+  const clickTitleAction = async (action: "Replace" | "Append") => {
+    const label = getModal()?.querySelector(
+      `label[for="wikidataTitleAction-${action}"]`
+    ) as HTMLLabelElement
+    expect(label).toBeTruthy()
+    label.click()
+    await flushPromises()
+  }
+
   describe("basic functionality", () => {
     it("shows the current wikidata ID in the input field", async () => {
       mountDialog("Test Title", { modelValue: "Q123" })
@@ -271,24 +296,12 @@ describe("WikidataAssociationDialog", () => {
     })
 
     it("emits selected with append action", async () => {
-      const searchResult = makeMe.aWikidataSearchEntity
-        .label("Canine")
-        .id("Q11399")
-        .please()
-      searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
+      const searchResult = mockSearchResult("Canine", "Q11399")
       const wrapper = mountDialog("dog")
       await flushPromises()
 
-      const selectItem = getSelectItem("Q11399")
-      expect(selectItem).toBeTruthy()
-      selectItem.click()
-      await flushPromises()
-
-      const appendLabel = getModal()?.querySelector(
-        'label[for="wikidataTitleAction-Append"]'
-      ) as HTMLLabelElement
-      appendLabel.click()
-      await flushPromises()
+      await clickSearchResult("Q11399")
+      await clickTitleAction("Append")
 
       const emitted = wrapper.emitted("selected")?.[0]
       expect(emitted?.[0]).toEqual(searchResult)
@@ -426,26 +439,14 @@ describe("WikidataAssociationDialog", () => {
     })
 
     it("saves when clicking Save button after selecting from result list", async () => {
-      const searchResult = makeMe.aWikidataSearchEntity
-        .label("dog")
-        .id("Q11399")
-        .please()
-      searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
+      mockSearchResult("dog", "Q11399")
       const wrapper = mountDialog("dog", { showSaveButton: true })
       await flushPromises()
 
-      const selectItem = getSelectItem("Q11399")
-      expect(selectItem).toBeTruthy()
-      selectItem.click()
+      await clickSearchResult("Q11399")
+      getSaveButton().click()
       await flushPromises()
 
-      // Click Save button
-      const saveButton = getSaveButton()
-      expect(saveButton).toBeTruthy()
-      saveButton.click()
-      await flushPromises()
-
-      // Should emit save with the wikidata ID
       expect(wrapper.emitted("save")?.[0]).toEqual(["Q11399"])
     })
 
@@ -499,29 +500,13 @@ describe("WikidataAssociationDialog", () => {
     })
 
     it("saves with append action immediately when user selects Append", async () => {
-      const searchResult = makeMe.aWikidataSearchEntity
-        .label("Canine")
-        .id("Q11399")
-        .please()
-      searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
+      const searchResult = mockSearchResult("Canine", "Q11399")
       const wrapper = mountDialog("dog", { showSaveButton: true })
       await flushPromises()
 
-      const selectItem = getSelectItem("Q11399")
-      expect(selectItem).toBeTruthy()
-      selectItem.click()
-      await flushPromises()
+      await clickSearchResult("Q11399")
+      await clickTitleAction("Append")
 
-      // Select Append option - this should immediately emit selected
-      const appendLabel = getModal()?.querySelector(
-        'label[for*="Append"]'
-      ) as HTMLLabelElement
-      expect(appendLabel).toBeTruthy()
-      appendLabel.click()
-      await flushPromises()
-
-      // Should emit selected with append action immediately
-      expect(wrapper.emitted("selected")).toBeTruthy()
       const emitted = wrapper.emitted("selected")?.[0]
       expect(emitted?.[0]).toEqual(searchResult)
       expect(emitted?.[1]).toBe("append")
@@ -542,7 +527,6 @@ describe("WikidataAssociationDialog", () => {
       await flushPromises()
 
       const saveButton = getSaveButton()
-      expect(saveButton).toBeTruthy()
       expect(saveButton.disabled).toBe(false)
       saveButton.click()
       await flushPromises()

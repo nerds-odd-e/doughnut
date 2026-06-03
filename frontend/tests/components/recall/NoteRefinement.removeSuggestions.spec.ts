@@ -118,7 +118,6 @@ describe("NoteRefinement remove refinement suggestions", () => {
         .find('[data-test-id="remove-refinement-suggestions"]')
         .trigger("click")
       usePopups().popups.done(false)
-      await flushPromises()
 
       expect(removeSuggestionsSpy).not.toHaveBeenCalled()
       expect(wrapper.emitted()).not.toHaveProperty("contentUpdated")

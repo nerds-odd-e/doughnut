@@ -511,14 +511,12 @@ beta: two
 
 Body line`
     const wrapper = await h.mountEditor(markdown)
-    await flushPromises()
 
     const removeBtns = wrapper.findAll(
       '[data-testid="rich-note-property-row-remove"]'
     )
     expect(removeBtns.length).toBe(2)
     await removeBtns[0]!.trigger("click")
-    await flushPromises()
 
     const last = h.lastEmittedMarkdown()
     expect(last).not.toContain("alpha:")
@@ -622,7 +620,6 @@ image: /attachments/images/1/old.png
 
 # Hi`
       const wrapper = await h.mountEditor(markdown, { noteId: 42 })
-      await flushPromises()
 
       const fileInput = wrapper.find(
         '[data-testid="rich-note-image-property-file-input"]'
@@ -634,7 +631,6 @@ image: /attachments/images/1/old.png
         configurable: true,
       })
       await fileInput.trigger("change")
-      await flushPromises()
 
       expect(uploadSpy).toHaveBeenCalled()
       const last = h.lastEmittedMarkdown()

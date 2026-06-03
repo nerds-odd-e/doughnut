@@ -198,22 +198,26 @@ Status: done
 ---
 
 ### Phase 13: Wikidata / assimilation batch
-Status: planned
+Status: done
+
+**Result (2026-06-03):** Shared Wikidata DOM click helpers; NoteNewForm wikidata/cancel/semantic paths use modal queries instead of `findComponent`/vm; trimmed redundant `flushPromises` on property remove and removal cancel; AssimilationPanel spelling-close helper; FolderPage move uses `nextTick` after parent select. **105** scoped tests; full suite **1370** pass (~24s wall).
 
 **Scope:** `tests/components/form/RichMarkdownEditor.properties.spec.ts`, `tests/components/recall/NoteRefinement.removeSuggestions.spec.ts`, `tests/notes/WikidataAssociationDialog.spec.ts`, `tests/components/recall/AssimilationPanel.spec.ts`, `tests/notes/NoteNewForm.spec.ts`, `tests/pages/FolderPage.spec.ts`
 
-**Tests (10):** batch 13 from profiling.
+**Tests (10):** remove property row; removeSuggestions cancel; Wikidata save from list; AssimilationPanel close popup; pasteComplete frontmatter; semantic search toggle; Wikidata save empty clear; NoteNewForm cancel dialog; FolderPage re-enable organize; Wikidata append action.
 
 **Verify:** scoped files then full suite.
 
 ---
 
 ### Phase 14: Final slow batch
-Status: planned
+Status: done
+
+**Result (2026-06-03):** Added `folderPageTestSupport` and `noteContentDebounceTestSupport` (fake-timer debounce advance). Consolidated FolderPage move/dissolve describes; RichMarkdownEditor dead-link/linkify tests drop redundant flushes; NoteEditableContent debounce/normalization use shared mount helpers without `attachTo: document.body`; PdfBookViewer pinch asserts scale synchronously. **74** scoped tests; full suite **1370** pass.
 
 **Scope:** `tests/pages/FolderPage.spec.ts`, `tests/components/form/RichMarkdownEditor.spec.ts`, `tests/notes/NoteEditableContent.spec.ts`, `tests/components/book-reading/PdfBookViewer.gestureZoom.spec.ts`, `tests/components/form/RichMarkdownEditor.properties.spec.ts`
 
-**Tests (7):** batch 14 from profiling.
+**Tests (7):** FolderPage soft-deleted inline error; RichMarkdownEditor dead link echo; NoteEditableContent auto-save debounce; RichMarkdownEditor linkify wikilinks; PdfBookViewer pinch zoom; FolderPage merge navigate; RichMarkdownEditor image upload path.
 
 **Verify:** scoped files then full suite.
 

@@ -1,6 +1,7 @@
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import FolderPage from "@/pages/FolderPage.vue"
 import { flushPromises } from "@vue/test-utils"
+import { nextTick } from "vue"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, {
@@ -149,7 +150,7 @@ describe("FolderPage move", () => {
     await flushPromises()
 
     await wrapper.get('[data-testid="folder-move-parent-select"]').setValue("1")
-    await flushPromises()
+    await nextTick()
 
     vi.spyOn(NotebookController, "moveFolder").mockResolvedValue(
       wrapSdkResponse(beta) as never

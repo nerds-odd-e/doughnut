@@ -6,8 +6,6 @@ import {
 } from "@generated/doughnut-backend-api/sdk.gen"
 import NoteNewForm from "@/components/notes/NoteNewForm.vue"
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
-import WikidataAssociationDialogBody from "@/components/notes/WikidataAssociationDialogBody.vue"
-import WikidataSearchByLabel from "@/components/notes/WikidataSearchByLabel.vue"
 import { VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -242,10 +240,9 @@ describe("adding new note", () => {
       .component(NoteNewForm)
       .withCleanStorage()
       .withProps(notebookRootProps)
-      .mount({ attachTo: document.body })
+      .mount()
     await setNoteNewFormTitle(wrapper, "myth")
     vi.runOnlyPendingTimers()
-    await flushPromises()
 
     semanticSearchWithinSpy.mockClear()
     searchForRelationshipTargetWithinSpy.mockClear()
@@ -254,7 +251,6 @@ describe("adding new note", () => {
       .find('[data-testid="note-new-form-semantic-search-toggle"]')
       .trigger("click")
     vi.runOnlyPendingTimers()
-    await flushPromises()
 
     expect(semanticSearchWithinSpy).toHaveBeenCalledWith({
       path: { note: note.id },
@@ -447,67 +443,41 @@ describe("adding new note", () => {
       vi.useFakeTimers()
     })
 
+    const wikidataModal = () =>
+      document.querySelector(".modal-container") as HTMLElement | null
+
     const openWikidataDialog = async (key: string) => {
       await setNoteNewFormTitle(wrapper, key)
       await wrapper.find("button[title='Wikidata Id']").trigger("click")
       await flushPromises()
     }
 
-    const selectMatchingWikidataResult = async (wikidataId: string) => {
-      const bodyComponent = wrapper.findComponent(WikidataAssociationDialogBody)
-      expect(bodyComponent.exists()).toBe(true)
-
-      // biome-ignore lint/suspicious/noExplicitAny: accessing Vue component internals in test
-      const vm = bodyComponent.vm as any
-      expect(vm.searchResults.length).toBeGreaterThan(0)
-
-      // biome-ignore lint/suspicious/noExplicitAny: accessing Vue component internals in test
-      const selected = vm.searchResults.find((r: any) => r.id === wikidataId)
-      expect(selected).toBeDefined()
-
-      bodyComponent.vm.$emit("selected", selected)
+    const clickWikidataSearchResult = async (wikidataId: string) => {
+      const item = wikidataModal()?.querySelector(
+        `[data-wikidata-id="${wikidataId}"]`
+      ) as HTMLElement
+      expect(item).toBeTruthy()
+      item.click()
       await flushPromises()
     }
 
-    const selectFromDropdown = async (
+    const clickWikidataTitleAction = async (action: "Replace" | "Append") => {
+      const label = wikidataModal()?.querySelector(
+        `label[for="wikidataTitleAction-${action}"]`
+      ) as HTMLLabelElement
+      expect(label).toBeTruthy()
+      label.click()
+      await flushPromises()
+    }
+
+    const applyWikidataSelection = async (
       wikidataId: string,
-      action: "Replace" | "Append"
+      titleAction?: "Replace" | "Append"
     ) => {
-      const bodyComponent = wrapper.findComponent(WikidataAssociationDialogBody)
-      // biome-ignore lint/suspicious/noExplicitAny: accessing Vue component internals in test
-      const vm = bodyComponent.vm as any
-      expect(vm.searchResults.length).toBeGreaterThan(0)
-
-      // biome-ignore lint/suspicious/noExplicitAny: accessing Vue component internals in test
-      const selected = vm.searchResults.find((r: any) => r.id === wikidataId)
-      expect(selected).toBeDefined()
-
-      vm.selectedOption = wikidataId
-      vm.selectedItem = selected
-      await selectTitleAction(action)
-    }
-
-    const selectTitleAction = async (
-      action: "Replace" | "Append" | undefined
-    ): Promise<void> => {
-      if (!action) return
-
-      const bodyComponent = wrapper.findComponent(WikidataAssociationDialogBody)
-      // biome-ignore lint/suspicious/noExplicitAny: accessing Vue component internals in test
-      const vm = bodyComponent.vm as any
-      expect(vm.selectedItem).toBeDefined()
-
-      vm.titleAction = action
-      const actionValueMap: Record<string, "replace" | "append"> = {
-        Replace: "replace",
-        Append: "append",
+      await clickWikidataSearchResult(wikidataId)
+      if (titleAction) {
+        await clickWikidataTitleAction(titleAction)
       }
-      bodyComponent.vm.$emit(
-        "selected",
-        vm.selectedItem,
-        actionValueMap[action]
-      )
-      await flushPromises()
     }
 
     it("opens dialog when clicking search button", async () => {
@@ -522,31 +492,25 @@ describe("adding new note", () => {
     })
 
     it("closes dialog when cancel is clicked", async () => {
-      const searchResult = makeMe.aWikidataSearchEntity.label("dog").please()
-      searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
+      searchWikidataSpy.mockResolvedValue(
+        wrapSdkResponse([makeMe.aWikidataSearchEntity.label("dog").please()])
+      )
       await openWikidataDialog("dog")
 
-      // Verify dialog is open
-      let dialogComponent = wrapper.findComponent(WikidataAssociationDialog)
-      expect(dialogComponent.exists()).toBe(true)
-
-      // Find the WikidataSearchByLabel component and call closeDialog method
-      const searchByLabelComponent = wrapper.findComponent(
-        WikidataSearchByLabel
+      expect(wrapper.findComponent(WikidataAssociationDialog).exists()).toBe(
+        true
       )
-      expect(searchByLabelComponent.exists()).toBe(true)
-      // biome-ignore lint/suspicious/noExplicitAny: accessing Vue component internals in test
-      const vm = searchByLabelComponent.vm as any
-      expect(vm.showDialog).toBe(true)
-      vm.closeDialog()
 
+      const closeButton = wikidataModal()?.querySelector(
+        "button.daisy-btn-secondary"
+      ) as HTMLButtonElement
+      expect(closeButton).toBeTruthy()
+      closeButton.click()
       await flushPromises()
 
-      expect(vm.showDialog).toBe(false)
-
-      // Check that the WikidataAssociationDialog component no longer exists
-      dialogComponent = wrapper.findComponent(WikidataAssociationDialog)
-      expect(dialogComponent.exists()).toBe(false)
+      expect(wrapper.findComponent(WikidataAssociationDialog).exists()).toBe(
+        false
+      )
     })
 
     it.each`
@@ -571,16 +535,14 @@ describe("adding new note", () => {
 
         searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
         await openWikidataDialog(searchTitle)
-        if (titleAction) {
-          await selectFromDropdown(
-            wikidataId,
-            (titleAction.charAt(0).toUpperCase() + titleAction.slice(1)) as
-              | "Replace"
-              | "Append"
-          )
-        } else {
-          await selectMatchingWikidataResult(wikidataId)
-        }
+        await applyWikidataSelection(
+          wikidataId,
+          titleAction
+            ? ((titleAction.charAt(0).toUpperCase() + titleAction.slice(1)) as
+                | "Replace"
+                | "Append")
+            : undefined
+        )
 
         expect(wrapper.findComponent(WikidataAssociationDialog).exists()).toBe(
           false
