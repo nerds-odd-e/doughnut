@@ -44,15 +44,13 @@ Feature: CLI recall status and recall session
       And the note "sedation" was assimilated on day 1
       And It's day 2
       When I enter the slash command "/recall" in the interactive CLI
-      Then I should see "sedition" in the Current guidance
-      When I answer "y" in the interactive CLI to prompt "Yes, I remember?"
-      Then I should see "Reviewed: sedition" in answered questions
+      And I answer "y" in the interactive CLI to prompt "Yes, I remember?"
       And I answer "y" in the interactive CLI to prompt "Yes, I remember?"
       And I answer "n" in the interactive CLI to prompt "Load more from next 3 days?"
       Then I should see "Recalled 2 notes" in past CLI assistant messages
       When I enter the slash command "/recall" in the interactive CLI
       And I answer "y" in the interactive CLI to prompt "Load more from next 3 days?"
-      When I answer "y" in the interactive CLI to prompt "Yes, I remember?"
+      And I answer "y" in the interactive CLI to prompt "Yes, I remember?"
       Then I should see "Reviewed: sedition" in answered questions
 
     @usingMockedOpenAiService

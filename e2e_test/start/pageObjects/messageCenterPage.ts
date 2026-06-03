@@ -1,5 +1,20 @@
 import { pageIsNotLoading } from '../pageBase'
-import { mainMenu } from './mainMenu'
+import router from 'start/router'
+
+function conversationPane() {
+  return {
+    expectMessage(message: string) {
+      cy.findByText(message).should('be.visible')
+      return this
+    },
+    reply(message: string) {
+      cy.get('textarea').type(message)
+      cy.findByRole('button', { name: 'Send message' }).click()
+      cy.findByText(message).should('be.visible')
+      return this
+    },
+  }
+}
 
 function withinConversationList(fn: () => void) {
   cy.findByText('Message Center').should('be.visible')
@@ -22,6 +37,19 @@ export const assumeMessageCenterPage = () => {
       })
       return this
     },
+    openConversation(subject: string, partner: string) {
+      withinConversationList(() => {
+        cy.findByText(subject).should('be.visible')
+        cy.findByText(partner).should('be.visible')
+        cy.get(
+          `[data-testid="message-center-conversation-item"][data-conversation-subject="${subject}"]`
+        )
+          .should('be.visible')
+          .click()
+      })
+      pageIsNotLoading()
+      return conversationPane()
+    },
     expectMessageDisplayAtUserSide(message: string) {
       cy.findByText(message).parents('.justify-end').should('be.visible')
       return this
@@ -42,22 +70,13 @@ export const assumeMessageCenterPage = () => {
           .click()
       })
       pageIsNotLoading()
-      return {
-        expectMessage(message: string) {
-          cy.findByText(message).should('be.visible')
-          return this
-        },
-        reply(message: string) {
-          cy.get('textarea').type(message)
-          cy.findByRole('button', { name: 'Send message' }).click()
-          cy.findByText(message).should('be.visible')
-          return this
-        },
-      }
+      return conversationPane()
     },
   }
 }
 
 export const navigateToMessageCenter = () => {
-  return mainMenu().myMessageCenter()
+  router().toMessageCenter()
+  pageIsNotLoading()
+  return assumeMessageCenterPage()
 }

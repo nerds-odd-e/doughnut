@@ -67,7 +67,7 @@ Status: done
 ---
 
 ### Phase 3: cli_recall (complete session) + message_for_note (bazaar)
-Status: planned
+Status: done
 
 **Specs:** `cli/cli_recall.feature`, `messages/message_for_note.feature` (bazaar scenario only if file has multiple — run full file if cheaper).
 

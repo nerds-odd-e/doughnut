@@ -50,12 +50,7 @@ When('I enter {string} in the interactive CLI', (line: string) => {
 When(
   'I answer {string} in the interactive CLI to prompt {string}',
   (answer: string, prompt: string) =>
-    new Cypress.Promise<void>((resolve) => {
-      cli
-        .interactiveCli()
-        .answerWhenPromptVisible(answer, prompt)
-        .then(() => resolve())
-    })
+    cli.interactiveCli().answerWhenPromptVisible(answer, prompt)
 )
 
 When(
@@ -75,12 +70,7 @@ When(
 When(
   'I input down-arrow selection for {string} in the interactive CLI',
   (command: string) =>
-    new Cypress.Promise<void>((resolve) => {
-      cli
-        .interactiveCli()
-        .inputDownArrowSelectionForSlashCommand(command)
-        .then(() => resolve())
-    })
+    cli.interactiveCli().inputDownArrowSelectionForSlashCommand(command)
 )
 
 When(
@@ -102,19 +92,17 @@ When(
 
 When(
   'I set the access token for {string} in the interactive CLI',
-  (userIdentifier: string) =>
-    new Cypress.Promise<void>((resolve) => {
-      const token = `access-token-of-${userIdentifier}`
-      const interactive = cli.interactiveCli()
-      interactive
-        .enterSlashCommandInInteractiveCli(`/set-access-token ${token}`)
-        .then(() => {
-          interactive
-            .pastCliAssistantMessages()
-            .expectContains('Access token saved')
-            .then(() => resolve())
-        })
-    })
+  (userIdentifier: string) => {
+    const token = `access-token-of-${userIdentifier}`
+    const interactive = cli.interactiveCli()
+    interactive
+      .enterSlashCommandInInteractiveCli(`/set-access-token ${token}`)
+      .then(() =>
+        interactive
+          .pastCliAssistantMessages()
+          .expectContains('Access token saved')
+      )
+  }
 )
 
 Then('I should see {string} in the Current guidance', (expected: string) =>

@@ -51,7 +51,8 @@ export type CliE2ePluginTasksOptions = {
 
 const INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING = 'doughnut 0.2.0'
 const INSTALLED_CLI_INTERACTIVE_STARTUP_TIMEOUT_MS = 20_000
-const INSTALLED_CLI_INTERACTIVE_WRITE_SETTLE_MS = 500
+const CLI_INTERACTIVE_WRITE_IDLE_MS = 40
+const CLI_INTERACTIVE_WRITE_IDLE_TIMEOUT_MS = 15_000
 
 /** Interactive CLI PTY size for Cypress (failure PNG/GIF); smaller than tty-assert defaults (120×48). */
 const CLI_E2E_INTERACTIVE_PTY_COLS = 80
@@ -68,6 +69,32 @@ type PtyWithOnExit = {
   onExit: (listener: (e: { exitCode: number; signal?: number }) => void) => {
     dispose: () => void
   }
+}
+
+async function waitForInteractiveCliTranscriptIdle(
+  handle: ManagedTtySession,
+  timeoutMs = CLI_INTERACTIVE_WRITE_IDLE_TIMEOUT_MS
+): Promise<void> {
+  const deadline = Date.now() + timeoutMs
+  let last = handle.session.buf.text
+  let stableSince = Date.now()
+  while (Date.now() < deadline) {
+    await new Promise<void>((resolve) =>
+      setTimeout(resolve, CLI_INTERACTIVE_WRITE_IDLE_MS)
+    )
+    const current = handle.session.buf.text
+    if (current !== last) {
+      last = current
+      stableSince = Date.now()
+      continue
+    }
+    if (Date.now() - stableSince >= CLI_INTERACTIVE_WRITE_IDLE_MS) {
+      return
+    }
+  }
+  throw new Error(
+    `Timeout after ${timeoutMs}ms waiting for interactive CLI transcript to settle`
+  )
 }
 
 function waitForPtyExit(
@@ -368,9 +395,7 @@ export function createCliE2ePluginTasks(
         )
       }
       interactiveCliPtyHandle.submit(line)
-      await new Promise<void>((resolve) =>
-        setTimeout(resolve, INSTALLED_CLI_INTERACTIVE_WRITE_SETTLE_MS)
-      )
+      await waitForInteractiveCliTranscriptIdle(interactiveCliPtyHandle)
       return null
     },
     async cliInteractiveWriteRaw({
@@ -382,9 +407,7 @@ export function createCliE2ePluginTasks(
         )
       }
       interactiveCliPtyHandle.write(data)
-      await new Promise<void>((resolve) =>
-        setTimeout(resolve, INSTALLED_CLI_INTERACTIVE_WRITE_SETTLE_MS)
-      )
+      await waitForInteractiveCliTranscriptIdle(interactiveCliPtyHandle)
       return null
     },
   }

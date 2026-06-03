@@ -27,21 +27,17 @@ Then(
 Then(
   'I read the conversation with {string} for the subject {string} in the message center',
   (partner: string, subject: string) => {
-    start
-      .navigateToMessageCenter()
-      .expectConversation(subject, partner)
-      .conversation(subject)
+    start.navigateToMessageCenter().openConversation(subject, partner)
   }
 )
 
 Then(
   '{string} can see the conversation with {string} for the subject {string} in the message center:',
   (user: string, partner: string, subject: string, data: DataTable) => {
-    start.reloginAndEnsureHomePage(user)
+    start.reloginAs(user)
     start
       .navigateToMessageCenter()
-      .expectConversation(subject, partner)
-      .conversation(subject)
+      .openConversation(subject, partner)
       .expectMessage(data.hashes()[0].message!)
   }
 )
@@ -71,8 +67,8 @@ Then(
 When(
   '{string} start a conversation about the note {string} with a message {string}',
   (externalIdentifier: string, note: string, conversation: string) => {
-    start.reloginAndEnsureHomePage(externalIdentifier)
-    start.jumpToNotePage(note).sendMessageToNoteOwner(conversation)
+    start.reloginAs(externalIdentifier)
+    start.jumpToNotePage(note, true).sendMessageToNoteOwner(conversation)
   }
 )
 

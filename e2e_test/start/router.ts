@@ -48,6 +48,9 @@ const router = () => {
     toRoot() {
       push('/', 'root', {})
     },
+    toMessageCenter() {
+      push('/message-center', 'messageCenter', {})
+    },
   }
 }
 
