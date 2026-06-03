@@ -109,6 +109,7 @@ export const assumeAssimilationPage = () => ({
       .then((noteTitle: string) => {
         this.proceedWithRememberingSpelling()
         this.verifySpellingWith(noteTitle.trim())
+        this.expectPopupClosed()
         pageIsNotLoading()
       })
     return this
@@ -226,9 +227,6 @@ export const assumeAssimilationPage = () => ({
       .clear()
       .type(text)
     cy.get('[data-test="verify-spelling"]').click()
-    cy.get('[data-test="spelling-verification-popup"]', {
-      timeout: 15000,
-    }).should('not.exist')
   },
   expectPopupClosed() {
     cy.get('[data-test="spelling-verification-popup"]', {

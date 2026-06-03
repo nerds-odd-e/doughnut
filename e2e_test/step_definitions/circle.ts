@@ -63,12 +63,39 @@ When('I join the circle', () => {
       .then((url) => {
         cy.visit(url)
         start.pageIsNotLoading()
-        cy.get('body').then(($body) => {
-          const typeAndJoin = () => {
-            cy.url().should('include', '/circles/join/')
-            cy.get('#join-circle-invitationCode', { timeout: 15000 })
-              .clear()
-              .type(code)
+        cy.get('#username, #join-circle-invitationCode', {
+          timeout: 15000,
+        }).should('exist')
+        cy.get('body')
+          .then(($body) => {
+            if ($body.find('#username').length === 0) {
+              return cy
+                .get('#join-circle-invitationCode', { timeout: 15000 })
+                .clear()
+                .type(code)
+            }
+            return cy.get<string>('@currentLoginUser').then((loginUser) => {
+              expect(loginUser, 'login before join')
+                .to.be.a('string')
+                .and.not.equal('none')
+              cy.intercept('GET', '**/api/healthcheck').as('devLogin')
+              cy.get('#username').clear().type(loginUser)
+              cy.get('#password').clear().type('password')
+              cy.get('#login-button').click()
+              cy.wait('@devLogin').then(({ response }) => {
+                expect(response?.statusCode, 'dev login before join').to.equal(
+                  200
+                )
+              })
+              cy.url({ timeout: 15000 }).should('include', '/circles/join/')
+              start.pageIsNotLoading()
+              return cy
+                .get('#join-circle-invitationCode', { timeout: 15000 })
+                .clear()
+                .type(code)
+            })
+          })
+          .then(() => {
             cy.get('input[value="Join"]').click()
             cy.wait('@joinCircle').then(({ response }) => {
               expect(
@@ -78,31 +105,7 @@ When('I join the circle', () => {
             })
             cy.url({ timeout: 15000 }).should('match', /\/circles\/\d+/)
             start.pageIsNotLoading()
-          }
-
-          if ($body.find('#username').length === 0) {
-            typeAndJoin()
-            return
-          }
-
-          cy.get<string>('@currentLoginUser').then((loginUser) => {
-            expect(loginUser, 'login before join')
-              .to.be.a('string')
-              .and.not.equal('none')
-            cy.intercept('GET', '**/api/healthcheck').as('devLogin')
-            cy.get('#username').clear().type(loginUser)
-            cy.get('#password').clear().type('password')
-            cy.get('#login-button').click()
-            cy.wait('@devLogin').then(({ response }) => {
-              expect(response?.statusCode, 'dev login before join').to.equal(
-                200
-              )
-            })
-            cy.url({ timeout: 15000 }).should('include', '/circles/join/')
-            start.pageIsNotLoading()
-            typeAndJoin()
           })
-        })
       })
   })
 })
