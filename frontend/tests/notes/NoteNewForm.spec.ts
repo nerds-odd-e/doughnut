@@ -425,6 +425,7 @@ describe("adding new note", () => {
     let searchWikidataSpy: ReturnType<typeof mockSdkService>
 
     beforeEach(() => {
+      vi.useRealTimers()
       searchForRelationshipTargetWithinSpy.mockResolvedValue(
         wrapSdkResponse([])
       )
@@ -442,6 +443,7 @@ describe("adding new note", () => {
 
     afterEach(() => {
       wrapper?.unmount()
+      vi.useFakeTimers()
     })
 
     const openWikidataDialog = async (key: string) => {
@@ -451,16 +453,11 @@ describe("adding new note", () => {
     }
 
     const selectFromDropdown = async (wikidataId: string) => {
-      await flushPromises()
-
-      const dialogComponent = wrapper.findComponent(WikidataAssociationDialog)
-      expect(dialogComponent.exists()).toBe(true)
       const bodyComponent = wrapper.findComponent(WikidataAssociationDialogBody)
       expect(bodyComponent.exists()).toBe(true)
 
       // biome-ignore lint/suspicious/noExplicitAny: accessing Vue component internals in test
       const vm = bodyComponent.vm as any
-      expect(vm.searchResults).toBeDefined()
       expect(vm.searchResults.length).toBeGreaterThan(0)
 
       // biome-ignore lint/suspicious/noExplicitAny: accessing Vue component internals in test
@@ -486,32 +483,26 @@ describe("adding new note", () => {
     ): Promise<void> => {
       if (!action) return
 
-      await flushPromises()
-
       const bodyComponent = wrapper.findComponent(WikidataAssociationDialogBody)
       // biome-ignore lint/suspicious/noExplicitAny: accessing Vue component internals in test
       const vm = bodyComponent.vm as any
-
-      // Set the title action and trigger the handler
-      vm.titleAction = action
-      await flushPromises()
-
-      // Manually call handleTitleAction to emit the event
       expect(vm.selectedItem).toBeDefined()
 
+      vm.titleAction = action
       const actionValueMap: Record<string, "replace" | "append"> = {
         Replace: "replace",
         Append: "append",
       }
-      const actionValue = actionValueMap[action]
-
-      bodyComponent.vm.$emit("selected", vm.selectedItem, actionValue)
+      bodyComponent.vm.$emit(
+        "selected",
+        vm.selectedItem,
+        actionValueMap[action]
+      )
       await flushPromises()
     }
 
     const waitForDialogToClose = async () => {
       await flushPromises()
-      await nextTick()
       expect(wrapper.findComponent(WikidataAssociationDialog).exists()).toBe(
         false
       )

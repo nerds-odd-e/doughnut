@@ -77,7 +77,9 @@ describe("useBookReadingBootstrap", () => {
         initialSelectedBlockId: number | null
       } | null
     }
-    await vi.waitFor(() => expect(vm.bootstrap).not.toBeNull())
+    await vi.waitFor(() => expect(vm.bootstrap).not.toBeNull(), {
+      timeout: 1000,
+    })
     expect(vm.bootstrap?.kind).toBe("pdf")
     expect(vm.bootstrap?.initialLastRead).toEqual({
       pageIndexZeroBased: 2,
@@ -123,7 +125,9 @@ describe("useBookReadingBootstrap", () => {
         initialSelectedBlockId: number | null
       } | null
     }
-    await vi.waitFor(() => expect(vm.bootstrap).not.toBeNull())
+    await vi.waitFor(() => expect(vm.bootstrap).not.toBeNull(), {
+      timeout: 1000,
+    })
     expect(vm.bootstrap?.kind).toBe("epub")
     expect(vm.bootstrap?.initialLocator).toBeNull()
     expect(vm.bootstrap?.initialSelectedBlockId).toBeNull()
@@ -157,7 +161,7 @@ describe("useBookReadingBootstrap", () => {
       fileError: string | null
       fileLoading: boolean
     }
-    await vi.waitFor(() => expect(vm.fileLoading).toBe(false))
+    expect(vm.fileLoading).toBe(false)
     expect(vm.fileError).toBe("Could not load the book file.")
     expect(vm.bootstrap).toBeNull()
   })

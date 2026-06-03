@@ -107,11 +107,13 @@ Status: done
 ---
 
 ### Phase 6: BookReading bootstrap/modal batch
-Status: planned
+Status: done
+
+**Result (2026-06-03):** `waitForPdfViewer` tries `flushPromises` before polling; PDF loading test waits on viewer mount instead of spinner polling. Replaced selection/nav-bar `vi.waitFor` with `clickBookBlockAndExpectSelection` / `expectCurrentSelection`. Modal autofocus uses `flushPromises` + dialog + `requestAnimationFrame` instead of `activeElement` polling. Wikidata flow uses real timers and leaner dialog helpers. Bootstrap keeps short `vi.waitFor` only where async bootstrap is still in flight. **83** scoped tests; full suite **1369** pass (~20s wall).
 
 **Scope:** `tests/pages/BookReadingPage.spec.ts`, `tests/notes/NoteNewForm.spec.ts`, `tests/commons/Modal.spec.ts`, `tests/composables/useBookReadingBootstrap.spec.ts`, `tests/notes/QuestionExportDialog.spec.ts`
 
-**Tests (10):** batch 6 from profiling.
+**Tests (10):** shows panel when last content bottom visible; NoteNewForm search replace; PDF loading indicator; hides nav bar; Modal autofocus; useBookReadingBootstrap pdf; QuestionExportDialog API fail; PDF invalid error; hides panel obstruction; data-snap-animating on snap.
 
 **Verify:** scoped files then full suite.
 

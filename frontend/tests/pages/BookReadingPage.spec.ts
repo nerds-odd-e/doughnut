@@ -114,6 +114,10 @@ function mountBookReadingPage(id: number) {
 type BookReadingPageWrapper = ReturnType<typeof mountBookReadingPage>
 
 async function waitForPdfViewer(wrapper: BookReadingPageWrapper) {
+  await flushPromises()
+  if (wrapper.find('[data-testid="pdf-book-viewer"]').exists()) {
+    return
+  }
   await vi.waitFor(
     () =>
       expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(
@@ -335,11 +339,8 @@ describe("BookReadingPage", () => {
       })
     )
 
-    await flushPromises()
-    await vi.waitFor(
-      () => expect(wrapper.find(".daisy-loading-spinner").exists()).toBe(false),
-      { timeout: 5000 }
-    )
+    await waitForPdfViewer(wrapper)
+    expect(wrapper.find(".daisy-loading-spinner").exists()).toBe(false)
   })
 
   it("loads PDF into viewer", async () => {
@@ -831,20 +832,12 @@ describe("BookReadingPage", () => {
 
     it("defaults selection to the first book block in reading order on load", async () => {
       const wrapper = await mountLoadedBookWithBlocks(notebookId)
-      await vi.waitFor(() =>
-        expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-          "Section 1"
-        )
-      )
+      expectCurrentSelection(wrapper, "Section 1")
     })
 
     it("hides the Reading Control Panel when the default-selected first block is viewport current", async () => {
       const wrapper = await mountLoadedBookWithBlocks(notebookId)
-      await vi.waitFor(() =>
-        expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-          "Section 1"
-        )
-      )
+      expectCurrentSelection(wrapper, "Section 1")
 
       await emitViewportAndSettleCurrentBlock(wrapper, {
         anchorPageIndexZeroBased: 0,
@@ -1570,12 +1563,7 @@ describe("BookReadingPage", () => {
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
 
-        await clickBookBlockByTitle(wrapper, "Section 1")
-        await vi.waitFor(() =>
-          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-            "Section 1"
-          )
-        )
+        await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
         // successor becomes current → fallback path (no bbox): panel shows if successor is current
         await emitViewportAndSettleCurrentBlock(wrapper, {
@@ -2078,12 +2066,7 @@ describe("BookReadingPage", () => {
       it("hides navigation bar when current block equals selected block", async () => {
         const wrapper = await mountLoadedBookWithBlocks(notebookId)
         spyOnScrollToBookNavTarget(wrapper)
-        await clickBookBlockByTitle(wrapper, "Section 1")
-        await vi.waitFor(() =>
-          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-            "Section 1"
-          )
-        )
+        await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
         // mid=10: Section 1 y0=0, y1=0 (page-only bbox, never "visible" by y1>top check)
         // gap case: only y0<=mid blocks → Section 1 (y0=0 <= 10) wins as gapBest
@@ -2123,12 +2106,7 @@ describe("BookReadingPage", () => {
       it("Back to selected scrolls to selected block and hides nav bar", async () => {
         const wrapper = await mountLoadedBookWithBlocks(notebookId)
         spyOnScrollToBookNavTarget(wrapper)
-        await clickBookBlockByTitle(wrapper, "Section 1")
-        await vi.waitFor(() =>
-          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-            "Section 1"
-          )
-        )
+        await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
         await emitViewportAndSettleCurrentBlock(wrapper, {
           anchorPageIndexZeroBased: 0,
@@ -2142,12 +2120,8 @@ describe("BookReadingPage", () => {
           .vm.$emit("backToSelected")
         await flushPromises()
 
-        await vi.waitFor(() =>
-          expect(currentBlockNavBar(wrapper).exists()).toBe(false)
-        )
-        expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-          "Section 1"
-        )
+        expect(currentBlockNavBar(wrapper).exists()).toBe(false)
+        expectCurrentSelection(wrapper, "Section 1")
       })
     })
   })

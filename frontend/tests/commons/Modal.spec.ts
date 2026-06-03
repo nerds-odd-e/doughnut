@@ -1,6 +1,6 @@
 import Modal from "@/components/commons/Modal.vue"
 import routes from "@/routes/routes"
-import { mount, type VueWrapper } from "@vue/test-utils"
+import { flushPromises, mount, type VueWrapper } from "@vue/test-utils"
 import { vi, afterEach, describe, it, expect } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import { reactive } from "vue"
@@ -16,6 +16,12 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
 })
+
+async function settleModalAutofocus() {
+  await flushPromises()
+  await vi.waitUntil(() => document.querySelector("dialog"), { timeout: 500 })
+  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+}
 
 describe("Modal", () => {
   const Comp = Modal
@@ -122,10 +128,7 @@ describe("Modal", () => {
       attachTo: document.body,
     })
 
-    await vi.waitUntil(() => document.activeElement?.id === "target-input", {
-      timeout: 1000,
-    })
-
+    await settleModalAutofocus()
     expect(document.activeElement?.id).toBe("target-input")
   })
 
@@ -149,10 +152,7 @@ describe("Modal", () => {
       attachTo: document.body,
     })
 
-    await vi.waitUntil(() => document.activeElement?.id === "search-input", {
-      timeout: 1000,
-    })
-
+    await settleModalAutofocus()
     expect(document.activeElement?.id).toBe("search-input")
   })
 
