@@ -72,11 +72,13 @@ Status: done
 ---
 
 ### Phase 3: BookReading panel/sidebar batch
-Status: planned
+Status: done
+
+**Result (2026-06-03):** Removed redundant page-level layout depth test (covered in `BookReadingBookLayout.spec.ts`). Replaced `vi.waitFor`/`vi.waitUntil` with sync selection checks, `flushPromises`, and `mountSidebarFirstGenReady`. **70** scoped tests; full suite **1369** pass (~21s wall).
 
 **Scope:** `tests/pages/BookReadingPage.spec.ts`, `tests/notes/sidebar/SidebarActiveFolder.spec.ts`
 
-**Tests (10):** batch 3 from profiling.
+**Tests (10):** debounces PATCH; snap fourth crossing; API depth (moved to layout spec); panel unmount after Read; PUT SKIMMED; sidebar folder activate/navigate; Read from here; PATCH selectedBookBlockId; successor panel visibility.
 
 **Verify:** scoped files then full suite.
 

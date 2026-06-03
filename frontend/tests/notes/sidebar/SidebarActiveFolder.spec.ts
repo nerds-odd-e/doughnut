@@ -5,8 +5,7 @@ import helper from "@tests/helpers"
 import { sidebarDefaultTreeFixtures } from "./sidebarDefaultTree"
 import {
   FOLDER_TOP_NOTE_CHILDREN_ID,
-  findSidebarItem,
-  mountSidebar,
+  mountSidebarFirstGenReady,
   prepareSidebarDefaultMountContext,
   teardownSidebarComponentTest,
 } from "./sidebarTestSupport"
@@ -39,18 +38,8 @@ describe("Sidebar active folder", () => {
     return li != null ? new DOMWrapper(li) : undefined
   }
 
-  async function mountFirstGenSidebarAndWaitNoteRow() {
-    wrapper = mountSidebar(helper, fixtures.firstGeneration)
-    await vi.waitUntil(() =>
-      findSidebarItem(
-        wrapper,
-        fixtures.firstGeneration.note.noteTopology.title
-      )?.exists()
-    )
-  }
-
   it("navigates to folderPage when the folder label is clicked", async () => {
-    await mountFirstGenSidebarAndWaitNoteRow()
+    wrapper = await mountSidebarFirstGenReady(helper, fixtures)
     const folderRow = findRootFolderRowByTopTitle()
     expect(folderRow?.exists()).toBe(true)
     const router = wrapper.vm.$router
@@ -67,7 +56,7 @@ describe("Sidebar active folder", () => {
   })
 
   it("activates folder and toggles expand when the folder label area is clicked", async () => {
-    await mountFirstGenSidebarAndWaitNoteRow()
+    wrapper = await mountSidebarFirstGenReady(helper, fixtures)
     const folderRow = findRootFolderRowByTopTitle()
     expect(folderRow?.exists()).toBe(true)
     const expandedBefore = folderRow!.attributes("aria-expanded")

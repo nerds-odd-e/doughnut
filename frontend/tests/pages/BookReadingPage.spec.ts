@@ -151,6 +151,13 @@ async function withFakeTimers(run: () => Promise<void>) {
   }
 }
 
+async function advanceSnapHoldMs(ms = 500) {
+  await withFakeTimers(async () => {
+    await vi.advanceTimersByTimeAsync(ms)
+    await flushPromises()
+  })
+}
+
 function stubGetBookPlain(notebookId: number) {
   return vi
     .spyOn(NotebookBooksController, "getBook")
@@ -333,39 +340,6 @@ describe("BookReadingPage", () => {
       () => expect(wrapper.find(".daisy-loading-spinner").exists()).toBe(false),
       { timeout: 5000 }
     )
-  })
-
-  it("uses API depth for nested preorder blocks in the layout list", async () => {
-    const blocks = [
-      makeMe.aBookBlock
-        .id(101)
-        .depth(0)
-        .title("Parent Section")
-        .contentLocators([makeMe.pdfLocator.withBbox(0, [48, 72, 564, 200])])
-        .please(),
-      makeMe.aBookBlock
-        .id(102)
-        .depth(1)
-        .title("Child Section")
-        .contentLocators([makeMe.pdfLocator.withBbox(0, [48, 200, 564, 400])])
-        .please(),
-    ]
-    vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
-      wrapSdkResponse(
-        makeMe.aBook
-          .id(bookId)
-          .notebookId(String(notebookId))
-          .blocks(blocks)
-          .please()
-      )
-    )
-    mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
-    const wrapper = mountBookReadingPage(notebookId)
-    await waitForPdfViewer(wrapper)
-    const rows = wrapper.findAll('[data-testid="book-reading-book-block"]')
-    expect(rows).toHaveLength(2)
-    expect(rows[0]!.attributes("data-book-block-depth")).toBe("0")
-    expect(rows[1]!.attributes("data-book-block-depth")).toBe("1")
   })
 
   it("loads PDF into viewer", async () => {
@@ -737,6 +711,13 @@ describe("BookReadingPage", () => {
       return wrapper.find('[data-current-selection="true"]').text()
     }
 
+    function expectCurrentSelection(
+      wrapper: BookReadingPageWrapper,
+      title: string
+    ) {
+      expect(currentSelectionText(wrapper)).toBe(title)
+    }
+
     async function clickBookBlockByTitle(
       wrapper: BookReadingPageWrapper,
       title: string
@@ -779,12 +760,7 @@ describe("BookReadingPage", () => {
 
     it("shows the panel when the selected block’s successor is the viewport current block", async () => {
       const wrapper = await mountLoadedBookWithBlocks(notebookId)
-      await clickBookBlockByTitle(wrapper, "Section 1")
-      await vi.waitFor(() =>
-        expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-          "Section 1"
-        )
-      )
+      await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
       await emitViewportAndSettleCurrentBlock(wrapper, {
         anchorPageIndexZeroBased: 0,
@@ -1108,12 +1084,7 @@ describe("BookReadingPage", () => {
           ])
         })
       const wrapper = await mountLoadedBookWithBlocks(notebookId)
-      await clickBookBlockByTitle(wrapper, "Section 1")
-      await vi.waitFor(() =>
-        expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-          "Section 1"
-        )
-      )
+      await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
       await emitViewportAndSettleCurrentBlock(wrapper, {
         anchorPageIndexZeroBased: 0,
@@ -1192,12 +1163,7 @@ describe("BookReadingPage", () => {
         return wrapSdkResponse(readRecord)
       })
       const wrapper = await mountLoadedBookWithBlocks(notebookId)
-      await clickBookBlockByTitle(wrapper, "Section 1")
-      await vi.waitFor(() =>
-        expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-          "Section 1"
-        )
-      )
+      await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
       await emitViewportAndSettleCurrentBlock(wrapper, {
         anchorPageIndexZeroBased: 0,
@@ -1570,12 +1536,7 @@ describe("BookReadingPage", () => {
         mockIsLastContentBottomVisible(wrapper, true)
         mockSnapBackContentFitsInViewport(wrapper, true)
 
-        await clickBookBlockByTitle(wrapper, "Section 1")
-        await vi.waitFor(() =>
-          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-            "Section 1"
-          )
-        )
+        await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
         // geometry passes
         await emitViewportAndSettleCurrentBlock(wrapper, {
@@ -1591,10 +1552,7 @@ describe("BookReadingPage", () => {
           viewport: { top: 0, mid: 200, bottom: 600 },
           pagesCount: 10,
         })
-        await withFakeTimers(async () => {
-          await vi.advanceTimersByTimeAsync(500)
-          await flushPromises()
-        })
+        await advanceSnapHoldMs()
 
         // second crossing → snap 2
         await emitViewportAndSettleCurrentBlock(wrapper, {
@@ -1602,10 +1560,7 @@ describe("BookReadingPage", () => {
           viewport: { top: 0, mid: 200, bottom: 600 },
           pagesCount: 10,
         })
-        await withFakeTimers(async () => {
-          await vi.advanceTimersByTimeAsync(500)
-          await flushPromises()
-        })
+        await advanceSnapHoldMs()
 
         // third crossing → no snap (commit goes through, panel hides, current block advances)
         await emitViewportAndSettleCurrentBlock(wrapper, {
@@ -2255,12 +2210,7 @@ describe("BookReadingPage", () => {
       it("Read from here makes current block the selected block and hides nav bar", async () => {
         const wrapper = await mountLoadedBookWithBlocks(notebookId)
         spyOnScrollToBookNavTarget(wrapper)
-        await clickBookBlockByTitle(wrapper, "Section 1")
-        await vi.waitFor(() =>
-          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-            "Section 1"
-          )
-        )
+        await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
         await emitViewportAndSettleCurrentBlock(wrapper, {
           anchorPageIndexZeroBased: 0,
@@ -2274,11 +2224,7 @@ describe("BookReadingPage", () => {
           .vm.$emit("readFromHere")
         await flushPromises()
 
-        await vi.waitFor(() =>
-          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-            "Section 2"
-          )
-        )
+        expectCurrentSelection(wrapper, "Section 2")
         expect(currentBlockNavBar(wrapper).exists()).toBe(false)
       })
 

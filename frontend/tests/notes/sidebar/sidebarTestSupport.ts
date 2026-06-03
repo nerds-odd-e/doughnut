@@ -23,7 +23,7 @@ import {
   mockSdkServiceWithImplementation,
   testFolderStub,
 } from "@tests/helpers"
-import { type VueWrapper, DOMWrapper } from "@vue/test-utils"
+import { type VueWrapper, DOMWrapper, flushPromises } from "@vue/test-utils"
 import { computed, defineComponent } from "vue"
 import { useRouter, type RouteLocationRaw } from "vue-router"
 import { expect, vi } from "vitest"
@@ -194,6 +194,20 @@ export function installSidebarDomMeasurementStubs(vi: {
 }
 
 export type SidebarTestHelper = typeof import("@tests/helpers").default
+
+/** Mount first-generation sidebar and assert the active note row is in the DOM. */
+export async function mountSidebarFirstGenReady(
+  h: SidebarTestHelper,
+  fixtures: SidebarTreeFixtures
+) {
+  const wrapper = mountSidebar(h, fixtures.firstGeneration)
+  await flushPromises()
+  const title = fixtures.firstGeneration.note.noteTopology.title
+  const item = findSidebarItem(wrapper, title)
+  expect(item, `sidebar note row "${title}"`).toBeDefined()
+  expect(item!.exists()).toBe(true)
+  return wrapper
+}
 
 export function mountSidebar(
   h: SidebarTestHelper,

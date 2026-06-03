@@ -64,6 +64,17 @@ function pointerMouse(
 }
 
 describe("BookReadingBookLayout", () => {
+  it("sets data-book-block-depth from each block depth in preorder list", () => {
+    const parent = blockStub({ id: 101, depth: 0, title: "Parent Section" })
+    const child = blockStub({ id: 102, depth: 1, title: "Child Section" })
+    const wrapper = mountLayout([parent, child])
+    const rows = wrapper.findAll('[data-testid="book-reading-book-block"]')
+    expect(rows).toHaveLength(2)
+    expect(rows[0]!.attributes("data-book-block-depth")).toBe("0")
+    expect(rows[1]!.attributes("data-book-block-depth")).toBe("1")
+    wrapper.unmount()
+  })
+
   it("emits blockIndent after horizontal drag right past threshold", () => {
     const block = blockStub({ id: 1, depth: 0, title: "A" })
     const wrapper = mountLayout([block])
