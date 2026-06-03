@@ -480,17 +480,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void shouldExportConversationWithContext() throws UnexpectedNoAccessRightException {
-      java.util.Map<String, Object> request = controller.exportConversation(conversation);
-      String export = formatExportResponse(request);
-      assertThat(export).contains("## Context");
-      assertThat(export).contains("# Focus Context");
-      assertThat(export).contains("There are 42 prefectures in Japan");
-      assertThat(export).contains("Make tool calls when user asks to update the note.");
-    }
-
-    @Test
-    void shouldExportConversationWithHistory() throws UnexpectedNoAccessRightException {
+    void shouldExportConversationWithContextAndHistory() throws UnexpectedNoAccessRightException {
       makeMe
           .aConversationMessage(conversation)
           .sender(currentUser.getUser())
@@ -499,7 +489,12 @@ class ConversationMessageControllerTest extends ControllerTestBase {
 
       java.util.Map<String, Object> request = controller.exportConversation(conversation);
       String export = formatExportResponse(request);
+      assertThat(export).contains("## Context");
+      assertThat(export).contains("# Focus Context");
+      assertThat(export).contains("There are 42 prefectures in Japan");
+      assertThat(export).contains("Make tool calls when user asks to update the note.");
       assertThat(export).contains("## Conversation History");
+      assertThat(export).contains("Is Naba one of them?");
     }
   }
 }

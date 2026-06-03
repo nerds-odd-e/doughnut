@@ -208,14 +208,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
 
     @Test
     void shouldThrowWhenOpenAiNotAvailableAndGeneratingQuestion() {
-      Note note =
-          makeMe
-              .aNote("moon")
-              .content("partner of earth")
-              .notebookOwnedBy(currentUser.getUser())
-              .rememberSpelling()
-              .please();
-      makeMe.aNote().please();
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
       testabilitySettings.setOpenAiTokenOverride("");
       assertThrows(OpenAiNotAvailableException.class, () -> controller.askAQuestion(memoryTracker));

@@ -5,43 +5,66 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.entities.Conversation;
+import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.services.ConversationService;
+import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.focusContext.FocusContextFocusNote;
+import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
+import com.odde.doughnut.services.focusContext.FocusContextResult;
+import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
-import com.odde.doughnut.testability.MakeMe;
-import com.openai.client.OpenAIClient;
 import com.openai.models.responses.ResponseCreateParams;
 import io.reactivex.Flowable;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.transaction.annotation.Transactional;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
+@ExtendWith(MockitoExtension.class)
 class NoteConversationAiReplyServiceTest {
 
-  @Autowired MakeMe makeMe;
-  @MockitoBean OpenAiApiHandler openAiApiHandler;
-
-  @MockitoBean(name = "officialOpenAiClient")
-  OpenAIClient officialClient;
-
-  @Autowired NoteConversationAiReplyService service;
+  @Mock OpenAiApiHandler openAiApiHandler;
+  @Mock GlobalSettingsService globalSettingsService;
+  @Mock FocusContextRetrievalService focusContextRetrievalService;
+  @Mock FocusContextMarkdownRenderer focusContextMarkdownRenderer;
   @Mock ConversationService conversationService;
+  @Mock GlobalSettingsService.GlobalSettingsKeyValue evaluationModelSetting;
+  @Mock Note note;
+  @Mock User user;
+  @Mock Conversation conversation;
+
+  NoteConversationAiReplyService service;
+
+  @BeforeEach
+  void setup() {
+    service =
+        new NoteConversationAiReplyService(
+            openAiApiHandler,
+            globalSettingsService,
+            focusContextRetrievalService,
+            focusContextMarkdownRenderer);
+    when(globalSettingsService.globalSettingEvaluation()).thenReturn(evaluationModelSetting);
+    when(evaluationModelSetting.getValue()).thenReturn("gpt-4.1-mini");
+    when(focusContextRetrievalService.retrieve(any(Note.class), any(User.class), any()))
+        .thenReturn(minimalFocusContextResult());
+    when(focusContextMarkdownRenderer.render(any(), any())).thenReturn("# Focus Context");
+    when(note.getNotebookAssistantInstructions()).thenReturn(null);
+    when(conversation.getSubjectNote()).thenReturn(note);
+    when(conversation.getConversationInitiator()).thenReturn(user);
+    when(conversation.getAdditionalContextForSubject()).thenReturn(null);
+  }
 
   @Test
   void shouldGenerateStreamingResponseForConversation() {
-    Note note = makeMe.aNote().please();
-    User user = makeMe.aUser().please();
-    Conversation conversation = makeMe.aConversation().forANote(note).from(user).please();
-    makeMe.aConversationMessage(conversation).sender(user).message("Tell me more").please();
+    ConversationMessage conversationMessage = new ConversationMessage();
+    conversationMessage.setSender(user);
+    conversationMessage.setMessage("Tell me more");
+    when(conversation.getConversationMessages()).thenReturn(List.of(conversationMessage));
 
     when(openAiApiHandler.streamResponseAsLegacyChatChunks(any(ResponseCreateParams.class)))
         .thenReturn(Flowable.empty());
@@ -50,5 +73,11 @@ class NoteConversationAiReplyServiceTest {
 
     assertNotNull(result);
     verify(openAiApiHandler).streamResponseAsLegacyChatChunks(any(ResponseCreateParams.class));
+  }
+
+  private static FocusContextResult minimalFocusContextResult() {
+    return new FocusContextResult(
+        new FocusContextFocusNote(
+            "notebook", "title", "", 0, List.of(), List.of(), List.of(), null, "content", false));
   }
 }

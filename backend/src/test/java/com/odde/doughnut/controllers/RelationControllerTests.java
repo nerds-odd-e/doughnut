@@ -80,48 +80,24 @@ class RelationControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void moveNoteIntoFolder_collectsPeersInFolder() throws Throwable {
+    void moveNoteIntoFolder_collectsPeersAndIsIdempotent() throws Throwable {
       User u = currentUser.getUser();
       Notebook notebook = makeMe.aNotebook().creatorAndOwner(u).please();
       makeMe.aRootNote("top").notebook(notebook).please();
       Folder folder = makeMe.aFolder().notebook(notebook).name("F").please();
-      Note peerA = makeMe.aNote("A").notebook(notebook).please();
-      Note peerB = makeMe.aNote("B").notebook(notebook).please();
+      Note peer = makeMe.aNote("A").notebook(notebook).please();
       Note mover = makeMe.aNote("M").notebook(notebook).please();
       makeMe.entityPersister.flush();
-      controller.moveNoteToFolder(peerA, folder);
-      controller.moveNoteToFolder(peerB, folder);
-      makeMe.entityPersister.flush();
-
+      controller.moveNoteToFolder(peer, folder);
       controller.moveNoteToFolder(mover, folder);
       makeMe.refresh(mover);
       assertThat(mover.getFolder().getId(), equalTo(folder.getId()));
-      List<Note> ordered = noteRepository.findNotesInFolderOrderByIdAsc(folder.getId());
-      assertThat(
-          ordered.stream().map(Note::getId).toList(),
-          containsInAnyOrder(peerA.getId(), peerB.getId(), mover.getId()));
-    }
-
-    @Test
-    void moveNoteToSameFolder_isIdempotent() throws Throwable {
-      User u = currentUser.getUser();
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(u).please();
-      makeMe.aRootNote("top2").notebook(notebook).please();
-      Folder folder = makeMe.aFolder().notebook(notebook).name("F2").please();
-      Note peerA = makeMe.aNote("A2").notebook(notebook).please();
-      Note peerB = makeMe.aNote("B2").notebook(notebook).please();
-      Note mover = makeMe.aNote("M2").notebook(notebook).please();
-      makeMe.entityPersister.flush();
-      controller.moveNoteToFolder(peerA, folder);
-      controller.moveNoteToFolder(peerB, folder);
-      controller.moveNoteToFolder(mover, folder);
-      makeMe.entityPersister.flush();
 
       controller.moveNoteToFolder(mover, folder);
       List<Note> ordered = noteRepository.findNotesInFolderOrderByIdAsc(folder.getId());
       assertThat(
           ordered.stream().map(Note::getId).toList(),
-          containsInAnyOrder(peerA.getId(), peerB.getId(), mover.getId()));
+          containsInAnyOrder(peer.getId(), mover.getId()));
     }
   }
 

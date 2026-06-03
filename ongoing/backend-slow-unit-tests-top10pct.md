@@ -156,7 +156,9 @@ Status: done
 ---
 
 ### Phase 7: Optimize slow tests rank 61–70 (max 0.019s)
-Status: planned
+Status: done
+
+**Result (2026-06-03):** Fewer redundant tests and lighter fixtures (1145 invocations): merged folder peer-collection and idempotent move into one two-note test; removed redundant contest null-response DB test (service handles null); `NoteConversationAiReplyServiceTest` mock-only; parameterized frontmatter image updates; merged export context/history assertions; slimmer OpenAI-unavailable memory-tracker fixture; dropped duplicate wikidata human country case; conversation-instructions AI reply test already removed in phase 6.
 
 **Scope:**
 - `com.odde.doughnut.controllers.RelationControllerTests$MoveNoteToFolderTest#moveNoteToSameFolder_isIdempotent()` (0.019s)

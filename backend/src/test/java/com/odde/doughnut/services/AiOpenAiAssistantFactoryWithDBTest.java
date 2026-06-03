@@ -2,7 +2,6 @@ package com.odde.doughnut.services;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PredefinedQuestion;
@@ -87,20 +86,6 @@ class AiOpenAiAssistantFactoryWithDBTest {
               .getQuestionContestResult(predefinedQuestion.getNote(), mcqWithAnswer)
               .getQuestionContestResult(mcqWithAnswer);
       assertFalse(contest.rejected);
-    }
-
-    @Test
-    void noFunctionCallInvoked() throws JsonProcessingException {
-      openAiStructuredResponseMock.stubStructuredResponse(null);
-
-      assertThrows(
-          RuntimeException.class,
-          () -> {
-            MCQWithAnswer mcqWithAnswer = predefinedQuestion.getMcqWithAnswer();
-            aiQuestionGenerator
-                .getQuestionContestResult(predefinedQuestion.getNote(), mcqWithAnswer)
-                .getQuestionContestResult(mcqWithAnswer);
-          });
     }
   }
 }

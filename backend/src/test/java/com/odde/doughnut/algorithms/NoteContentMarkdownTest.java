@@ -173,20 +173,26 @@ class NoteContentMarkdownTest {
                 + "Body"));
   }
 
-  @Test
-  void mergeNoteImageScalarsIntoContent_replaces_existing_image_lines() {
-    String in = "---\nimage: /old\nwikidata_id: Q1\n---\nB";
-    assertThat(
-        NoteContentMarkdown.mergeNoteImageScalarsIntoContent(
-            in, true, "/attachments/images/2/n.png", ""),
-        equalTo("---\nwikidata_id: Q1\nimage: /attachments/images/2/n.png\n---\nB"));
+  static Stream<Arguments> existingFrontmatterImageUpdates() {
+    return Stream.of(
+        Arguments.of(
+            "---\nimage: /old\nwikidata_id: Q1\n---\nB",
+            true,
+            "/attachments/images/2/n.png",
+            "",
+            "---\nwikidata_id: Q1\nimage: /attachments/images/2/n.png\n---\nB"),
+        Arguments.of(
+            "---\nimage: /x\ntopic: t\n---\nBody", false, "", "", "---\ntopic: t\n---\nBody"),
+        Arguments.of("---\nimage: /x\nimage_mask: 1 2 3 4\n---\nBody", false, "", "", "Body"));
   }
 
-  @Test
-  void mergeNoteImageScalarsIntoContent_removes_image_when_hasImage_false() {
-    String in = "---\nimage: /x\nimage_mask: 1 2 3 4\n---\nBody";
+  @ParameterizedTest
+  @MethodSource("existingFrontmatterImageUpdates")
+  void mergeNoteImageScalarsIntoContent_updates_existing_frontmatter(
+      String input, boolean hasImage, String imageUrl, String imageMask, String expected) {
     assertThat(
-        NoteContentMarkdown.mergeNoteImageScalarsIntoContent(in, false, "", ""), equalTo("Body"));
+        NoteContentMarkdown.mergeNoteImageScalarsIntoContent(input, hasImage, imageUrl, imageMask),
+        equalTo(expected));
   }
 
   @Test
@@ -202,13 +208,5 @@ class NoteContentMarkdownTest {
     String plain = "No frontmatter";
     assertThat(
         NoteContentMarkdown.mergeNoteImageScalarsIntoContent(plain, false, "", ""), equalTo(plain));
-  }
-
-  @Test
-  void mergeNoteImageScalarsIntoContent_clears_image_but_keeps_other_frontmatter() {
-    String in = "---\nimage: /x\ntopic: t\n---\nBody";
-    assertThat(
-        NoteContentMarkdown.mergeNoteImageScalarsIntoContent(in, false, "", ""),
-        equalTo("---\ntopic: t\n---\nBody"));
   }
 }
