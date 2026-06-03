@@ -82,7 +82,7 @@ When(
   (noteTopology: string, circleName: string) => {
     start.navigateToCircle(circleName).creatingNotebook(noteTopology)
     cy.url().should('match', /\/notebooks\/\d+/)
-    start.pageIsNotLoading()
+    start.pageIsNotLoading().assumeNotePage().expectBreadcrumb(circleName)
   }
 )
 
