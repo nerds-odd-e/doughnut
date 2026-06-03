@@ -21,7 +21,7 @@ Specs:
 - `e2e_test/features/ai_generated_content/note_content_completion.feature` — "OpenAI Service Unavailability" (4.84s)
 
 ### Group 2: note edit + message center unread
-Status: planned
+Status: done
 
 - `note_edit.feature` — "Note YAML properties round-trip through markdown and rich editing" (4.80s)
 - `message_center_with_unread_message_count.feature` — "The receiver's reply should increase the unread count of the sender" (4.76s)

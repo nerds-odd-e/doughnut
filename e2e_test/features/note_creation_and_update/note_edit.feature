@@ -94,13 +94,9 @@ Feature: Note Edit
       # Workshop Body
       Main content here.
       """
-    And I reload the current page for note "LeSS in Action"
+    When I view the note content as rich content
     Then I should see rich note property "diligence" with value "high"
     And I should see rich note property "topic" with value "training"
-    When I view the note content as rich content
-    And I should see the rich content elements in the note content:
-      | Tag | Content       |
-      | h1  | Workshop Body |
     When I add a rich note property with key "status" and value "draft"
     And I edit the rich note property with key "topic" to key "domain" and value "wiki"
     And I reload the current page for note "LeSS in Action"

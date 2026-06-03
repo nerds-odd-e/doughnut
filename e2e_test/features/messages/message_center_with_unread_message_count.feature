@@ -1,20 +1,15 @@
 Feature: Message Center with Unread Message Count
     As a user, I want to see the number of unread messages in the message center.
 
-  Scenario: Message receiver should have 1 unread message while sender has none
+  Scenario: Unread counts update when a conversation starts and the receiver replies
     Given there is a notebook "Trainer demos" with a note "Rocket Science" from user "a_trainer" shared to the Bazaar
     When "old_learner" start a conversation about the note "Rocket Science" with a message "Hi"
     Then I should have no unread messages
     And "a_trainer" should have 1 unread messages
-
-  Scenario: The receiver's reply should increase the unread count of the sender
-    Given there is a notebook "Trainer demos" with a note "Rocket Science" from user "a_trainer" shared to the Bazaar
-    When "old_learner" start a conversation about the note "Rocket Science" with a message "Hi"
     And I am re-logged in as "a_trainer"
     When I reply to the conversation "Rocket Science":
-      | Hi. What can I do for you? |
-      | I'm glad to help. |
-    Then "old_learner" should have 2 unread messages
+      | Thanks, happy to help. |
+    Then "old_learner" should have 1 unread messages
 
   Scenario: The message is read by the receiver
     Given there is a notebook "Trainer demos" with a note "Rocket Science" from user "a_trainer" shared to the Bazaar

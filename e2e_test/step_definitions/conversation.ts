@@ -70,9 +70,9 @@ Then('I should have no unread messages', () => {
 Then(
   '{string} should have {int} unread messages',
   (user: string, unreadMessageCount: number) => {
+    cy.intercept('GET', '**/api/user/menu-data**').as('menuDataForUnreadCount')
     start.reloginAs(user)
-    cy.reload()
-    start.pageIsNotLoading()
+    cy.wait('@menuDataForUnreadCount')
     start.messageCenterIndicator().expectCount(unreadMessageCount)
   }
 )
