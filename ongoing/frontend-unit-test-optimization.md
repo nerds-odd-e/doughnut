@@ -183,11 +183,13 @@ Status: planned
 ---
 
 ### Phase 12: NoteEditable / refinement / failure batch
-Status: planned
+Status: done
+
+**Result (2026-06-03):** Added `mountMarkdownTextarea`/`setTextareaValue` helpers; dropped `attachTo: document.body` where unnecessary. QuestionDisplay mask tests use `mountActiveQuestion` + `nextTick` instead of extra `flushPromises`. SeamlessTextEditor paste uses caret/paste helpers without focus churn. FailureReportList gets `data-testid` selectors and shared mount/delete-modal helpers. NoteNewForm folder submits use a dedicated nested describe (no mid-test remount). RichMarkdownEditor compose/pasteComplete tests drop redundant flushes after mount/emit. **121** scoped tests; full suite **1370** pass (~20s wall).
 
 **Scope:** `tests/notes/NoteEditableContent.spec.ts`, `tests/components/recall/QuestionDisplay.spec.ts`, `tests/components/recall/NoteRefinement.removeSuggestions.spec.ts`, `tests/components/form/SeamlessTextEditor.spec.ts`, `tests/components/recall/NoteRefinement.extractNote.spec.ts`, `tests/notes/NoteNewForm.spec.ts`, `tests/components/admin/FailureReportList.spec.ts`, `tests/components/form/RichMarkdownEditor.properties.spec.ts`
 
-**Tests (10):** batch 12 from profiling.
+**Tests (10):** preserve unsaved edits; QuestionDisplay focus mask; removeSuggestions API confirm; SeamlessTextEditor paste; extractNote API fail; NoteNewForm pre-selected folder; FailureReportList cancel; delete reports; compose body frontmatter; preserve second edit race.
 
 **Verify:** scoped files then full suite.
 

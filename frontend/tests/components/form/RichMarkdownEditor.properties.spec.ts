@@ -359,12 +359,10 @@ topic: training
 ---
 
 # Original`
-    const wrapper = await h.mountEditor(markdown)
-    await flushPromises()
+    await h.mountEditor(markdown)
 
-    const quill = wrapper.findComponent({ name: "QuillEditor" })
+    const quill = h.getWrapper().findComponent({ name: "QuillEditor" })
     quill.vm.$emit("update:modelValue", "<h1>Edited Heading</h1>")
-    await flushPromises()
 
     const last = h.lastEmittedMarkdown()
     expect(last).toContain("diligence:")
@@ -379,14 +377,12 @@ topic: training
 
 Hello`
     const wrapper = await h.mountEditor(markdown)
-    await flushPromises()
 
     const quill = wrapper.findComponent({ name: "QuillEditor" })
     quill.vm.$emit(
       "pasteComplete",
       '<p>Hello <a href="https://example.com" rel="noopener noreferrer" target="_blank">x</a></p>'
     )
-    await flushPromises()
 
     const emitted = wrapper.emitted("pasteComplete")
     expect(emitted?.length).toBeGreaterThan(0)

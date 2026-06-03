@@ -1,6 +1,6 @@
 import { flushPromises } from "@vue/test-utils"
 import { vi, beforeEach, afterEach, describe, it, expect } from "vitest"
-import { defineComponent, KeepAlive } from "vue"
+import { defineComponent, KeepAlive, nextTick } from "vue"
 import helper from "@tests/helpers"
 import QuestionDisplay from "@/components/recall/QuestionDisplay.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -39,6 +39,23 @@ describe("QuestionDisplay", () => {
     performanceNowSpy.mockReturnValue(ms)
     vi.advanceTimersByTime(ms)
   }
+
+  const activeQuestion = () =>
+    makeMe.aMultipleChoicesQuestion
+      .withStem("Test question")
+      .withChoices(["A", "B", "C"])
+      .please()
+
+  async function mountActiveQuestion() {
+    const wrapper = helper
+      .component(QuestionDisplay)
+      .withProps({ multipleChoicesQuestion: activeQuestion() })
+      .mount()
+    await flushPromises()
+    flushRAF()
+    return wrapper
+  }
+
   it("renders multiple choice question when choices are provided", async () => {
     const multipleChoicesQuestion = makeMe.aMultipleChoicesQuestion
       .withStem("What is the capital of France?")
@@ -52,7 +69,6 @@ describe("QuestionDisplay", () => {
 
     await flushPromises()
 
-    // Find choices using class selectors
     const choices = wrapper.findAll("li.choice button")
     expect(choices.length).toBe(3)
     expect(choices[0]?.text()).toBe("Paris")
@@ -76,7 +92,6 @@ describe("QuestionDisplay", () => {
 
     const stem = wrapper.find("[data-test='stem']")
     const expectedHtml = markdownizer.markdownToHtml(markdownStem)
-    // Remove all HTML tags to compare just the content
     const actualText = stem.text().replace(/\s+/g, " ").trim()
     const expectedText = expectedHtml
       .replace(/<[^>]*>/g, "")
@@ -113,18 +128,7 @@ describe("QuestionDisplay", () => {
   })
 
   it("includes thinking time in answer submission", async () => {
-    const multipleChoicesQuestion = makeMe.aMultipleChoicesQuestion
-      .withStem("Test question")
-      .withChoices(["A", "B", "C"])
-      .please()
-
-    const wrapper = helper
-      .component(QuestionDisplay)
-      .withProps({ multipleChoicesQuestion })
-      .mount()
-
-    await flushPromises()
-    flushRAF()
+    const wrapper = await mountActiveQuestion()
     setTime(5000)
 
     await wrapper.find("li.choice button").trigger("click")
@@ -137,18 +141,7 @@ describe("QuestionDisplay", () => {
   })
 
   it("only records thinking time once per submission", async () => {
-    const multipleChoicesQuestion = makeMe.aMultipleChoicesQuestion
-      .withStem("Test question")
-      .withChoices(["A", "B", "C"])
-      .please()
-
-    const wrapper = helper
-      .component(QuestionDisplay)
-      .withProps({ multipleChoicesQuestion })
-      .mount()
-
-    await flushPromises()
-    flushRAF()
+    const wrapper = await mountActiveQuestion()
     setTime(1000)
 
     await wrapper.find("li.choice button").trigger("click")
@@ -161,19 +154,7 @@ describe("QuestionDisplay", () => {
   })
 
   it("shows inactive mask when document is hidden", async () => {
-    const multipleChoicesQuestion = makeMe.aMultipleChoicesQuestion
-      .withStem("Test question")
-      .withChoices(["A", "B", "C"])
-      .please()
-
-    const wrapper = helper
-      .component(QuestionDisplay)
-      .withProps({ multipleChoicesQuestion })
-      .mount()
-
-    await flushPromises()
-    flushRAF()
-    await flushPromises()
+    const wrapper = await mountActiveQuestion()
 
     expect(wrapper.find("[data-test='inactive-recall-mask']").exists()).toBe(
       false
@@ -181,37 +162,22 @@ describe("QuestionDisplay", () => {
 
     Object.defineProperty(document, "hidden", { value: true, writable: true })
     document.dispatchEvent(new Event("visibilitychange"))
-    await flushPromises()
+    await nextTick()
 
-    expect(wrapper.find("[data-test='inactive-recall-mask']").exists()).toBe(
-      true
-    )
-    expect(wrapper.find("[data-test='inactive-recall-mask']").text()).toContain(
-      "Focus to activate"
-    )
+    const mask = wrapper.find("[data-test='inactive-recall-mask']")
+    expect(mask.exists()).toBe(true)
+    expect(mask.text()).toContain("Focus to activate")
   })
 
   it("shows inactive mask when window loses focus", async () => {
-    const multipleChoicesQuestion = makeMe.aMultipleChoicesQuestion
-      .withStem("Test question")
-      .withChoices(["A", "B", "C"])
-      .please()
-
-    const wrapper = helper
-      .component(QuestionDisplay)
-      .withProps({ multipleChoicesQuestion })
-      .mount()
-
-    await flushPromises()
-    flushRAF()
-    await flushPromises()
+    const wrapper = await mountActiveQuestion()
 
     expect(wrapper.find("[data-test='inactive-recall-mask']").exists()).toBe(
       false
     )
 
     window.dispatchEvent(new Event("blur"))
-    await flushPromises()
+    await nextTick()
 
     expect(wrapper.find("[data-test='inactive-recall-mask']").exists()).toBe(
       true
@@ -219,37 +185,23 @@ describe("QuestionDisplay", () => {
   })
 
   it("hides inactive mask when window regains focus", async () => {
-    const multipleChoicesQuestion = makeMe.aMultipleChoicesQuestion
-      .withStem("Test question")
-      .withChoices(["A", "B", "C"])
-      .please()
+    const wrapper = await mountActiveQuestion()
 
-    const wrapper = helper
-      .component(QuestionDisplay)
-      .withProps({ multipleChoicesQuestion })
-      .mount()
-
-    await flushPromises()
-    flushRAF()
-    await flushPromises()
     window.dispatchEvent(new Event("blur"))
-    await flushPromises()
+    await nextTick()
     expect(wrapper.find("[data-test='inactive-recall-mask']").exists()).toBe(
       true
     )
 
     window.dispatchEvent(new Event("focus"))
-    await flushPromises()
+    await nextTick()
     expect(wrapper.find("[data-test='inactive-recall-mask']").exists()).toBe(
       false
     )
   })
 
   it("pauses timer when component is deactivated (KeepAlive)", async () => {
-    const multipleChoicesQuestion = makeMe.aMultipleChoicesQuestion
-      .withStem("Test question")
-      .withChoices(["A", "B", "C"])
-      .please()
+    const multipleChoicesQuestion = activeQuestion()
 
     const WrapperComponent = defineComponent({
       components: { QuestionDisplay, KeepAlive },
@@ -290,7 +242,6 @@ describe("QuestionDisplay", () => {
     const answerData = questionComponent.emitted("answer")?.[0]?.[0] as {
       thinkingTimeMs?: number
     }
-    // Should be ~1500ms (1000ms before + 500ms after), not 2500ms
     expect(answerData?.thinkingTimeMs).toBeLessThan(2000)
     expect(answerData?.thinkingTimeMs).toBeGreaterThanOrEqual(1000)
   })

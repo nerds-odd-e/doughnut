@@ -296,62 +296,65 @@ describe("adding new note", () => {
       expect(createArgs.body).not.toHaveProperty("folderId")
     })
 
-    it("sends folderId when a target folder is pre-selected", async () => {
-      wrapper.unmount()
-      mockSdkService(NotebookController, "listNotebookFolderIndex", [
-        testFolderStub(42, "Alpha"),
-      ])
-      wrapper = helper
-        .component(NoteNewForm)
-        .withCleanStorage()
-        .withProps({
-          ...notebookRootProps,
-          initialFolder: testFolderStub(42, "Alpha"),
-        })
-        .mount({ attachTo: document.body })
-      await setNoteNewFormTitle(wrapper, "in folder")
-
-      await wrapper.find('[data-testid="note-new-form"]').trigger("submit")
-      expect(mockedCreateNoteAtRoot).toHaveBeenCalledWith({
-        path: { notebook: realm.notebookRealm.notebook.id },
-        body: expect.objectContaining({
-          newTitle: "in folder",
-          folderId: 42,
-        }),
+    describe("folder target on submit", () => {
+      beforeEach(() => {
+        wrapper?.unmount()
       })
-    })
 
-    it("sends folderId after user picks a folder in FolderSelector", async () => {
-      wrapper.unmount()
-      mockSdkService(NotebookController, "listNotebookFolderListing", {
-        folders: [testFolderStub(7, "One"), testFolderStub(8, "Two")],
-      })
-      mockSdkService(NotebookController, "listNotebookFolderIndex", [
-        testFolderStub(7, "One"),
-        testFolderStub(8, "Two"),
-      ])
-      wrapper = helper
-        .component(NoteNewForm)
-        .withCleanStorage()
-        .withProps({
-          ...notebookRootProps,
-          initialFolder: testFolderStub(7, "One"),
+      it("sends folderId when a target folder is pre-selected", async () => {
+        mockSdkService(NotebookController, "listNotebookFolderIndex", [
+          testFolderStub(42, "Alpha"),
+        ])
+        wrapper = helper
+          .component(NoteNewForm)
+          .withCleanStorage()
+          .withProps({
+            ...notebookRootProps,
+            initialFolder: testFolderStub(42, "Alpha"),
+          })
+          .mount()
+        await setNoteNewFormTitle(wrapper, "in folder")
+
+        await wrapper.find('[data-testid="note-new-form"]').trigger("submit")
+        expect(mockedCreateNoteAtRoot).toHaveBeenCalledWith({
+          path: { notebook: realm.notebookRealm.notebook.id },
+          body: expect.objectContaining({
+            newTitle: "in folder",
+            folderId: 42,
+          }),
         })
-        .mount({ attachTo: document.body })
-      await setNoteNewFormTitle(wrapper, "moved")
-      await flushPromises()
+      })
 
-      const select = wrapper.find('[data-testid="folder-move-parent-select"]')
-      await select.setValue("8")
-      await flushPromises()
+      it("sends folderId after user picks a folder in FolderSelector", async () => {
+        mockSdkService(NotebookController, "listNotebookFolderListing", {
+          folders: [testFolderStub(7, "One"), testFolderStub(8, "Two")],
+        })
+        mockSdkService(NotebookController, "listNotebookFolderIndex", [
+          testFolderStub(7, "One"),
+          testFolderStub(8, "Two"),
+        ])
+        wrapper = helper
+          .component(NoteNewForm)
+          .withCleanStorage()
+          .withProps({
+            ...notebookRootProps,
+            initialFolder: testFolderStub(7, "One"),
+          })
+          .mount()
+        await setNoteNewFormTitle(wrapper, "moved")
 
-      await wrapper.find('[data-testid="note-new-form"]').trigger("submit")
-      expect(mockedCreateNoteAtRoot).toHaveBeenCalledWith({
-        path: { notebook: realm.notebookRealm.notebook.id },
-        body: expect.objectContaining({
-          newTitle: "moved",
-          folderId: 8,
-        }),
+        await wrapper
+          .find('[data-testid="folder-move-parent-select"]')
+          .setValue("8")
+
+        await wrapper.find('[data-testid="note-new-form"]').trigger("submit")
+        expect(mockedCreateNoteAtRoot).toHaveBeenCalledWith({
+          path: { notebook: realm.notebookRealm.notebook.id },
+          body: expect.objectContaining({
+            newTitle: "moved",
+            folderId: 8,
+          }),
+        })
       })
     })
 

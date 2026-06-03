@@ -36,6 +36,7 @@
           </button>
           <button
             v-if="selectedFailureReports.length > 0"
+            data-testid="failure-report-delete-selected"
             class="daisy-btn daisy-btn-error daisy-btn-sm"
             @click="showDeleteModal = true"
           >
@@ -67,6 +68,7 @@
         >
           <input
             ref="selectAllCheckboxRef"
+            data-testid="failure-report-select-all"
             type="checkbox"
             class="daisy-checkbox daisy-checkbox-error"
             :checked="allFailureReportsSelected"
@@ -86,6 +88,7 @@
             class="daisy-card-body p-4 flex flex-row items-center gap-4"
           >
             <input
+              data-testid="failure-report-row-select"
               type="checkbox"
               :value="report.id"
               v-model="selectedFailureReports"
@@ -167,10 +170,18 @@
           action cannot be undone.
         </p>
         <div class="daisy-modal-action">
-          <button class="daisy-btn" @click="showDeleteModal = false">
+          <button
+            data-testid="failure-report-delete-cancel"
+            class="daisy-btn"
+            @click="showDeleteModal = false"
+          >
             Cancel
           </button>
-          <button class="daisy-btn daisy-btn-error" @click="deleteSelected">
+          <button
+            data-testid="failure-report-delete-confirm"
+            class="daisy-btn daisy-btn-error"
+            @click="deleteSelected"
+          >
             Delete
           </button>
         </div>

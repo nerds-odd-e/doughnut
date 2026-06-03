@@ -4,7 +4,7 @@ import type {
 } from "@generated/doughnut-backend-api"
 import { FailureReportController } from "@generated/doughnut-backend-api/sdk.gen"
 import FailureReportList from "@/components/admin/FailureReportList.vue"
-import { flushPromises } from "@vue/test-utils"
+import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { describe, expect, it } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
@@ -15,6 +15,27 @@ function mockFailureReportsList(reports: FailureReport[]) {
     "failureReports",
     reports as unknown as FailureReportsResponse
   )
+}
+
+async function mountWithReports(reports: FailureReport[]) {
+  mockFailureReportsList(reports)
+  const wrapper = helper.component(FailureReportList).withRouter().mount()
+  await flushPromises()
+  return wrapper
+}
+
+async function openDeleteModalForFirstReports(
+  wrapper: VueWrapper,
+  count: number
+) {
+  const rowChecks = wrapper.findAll('[data-testid="failure-report-row-select"]')
+  for (let i = 0; i < count; i++) {
+    await rowChecks[i]!.setValue(true)
+  }
+  await wrapper
+    .find('[data-testid="failure-report-delete-selected"]')
+    .trigger("click")
+  await flushPromises()
 }
 
 describe("FailureReportList", () => {
@@ -28,10 +49,7 @@ describe("FailureReportList", () => {
         .withId(2)
         .withErrorName("NullPointerException")
         .please()
-      mockFailureReportsList([report1, report2])
-
-      const wrapper = helper.component(FailureReportList).withRouter().mount()
-      await flushPromises()
+      const wrapper = await mountWithReports([report1, report2])
 
       expect(wrapper.text()).toContain("RuntimeException")
       expect(wrapper.text()).toContain("NullPointerException")
@@ -42,19 +60,13 @@ describe("FailureReportList", () => {
         makeMe.aFailureReport.withId(1).please(),
         makeMe.aFailureReport.withId(2).please(),
       ]
-      mockFailureReportsList(reports)
-
-      const wrapper = helper.component(FailureReportList).withRouter().mount()
-      await flushPromises()
+      const wrapper = await mountWithReports(reports)
 
       expect(wrapper.find(".daisy-badge-error").text()).toBe("2")
     })
 
     it("shows empty state when no failure reports exist", async () => {
-      mockFailureReportsList([])
-
-      const wrapper = helper.component(FailureReportList).withRouter().mount()
-      await flushPromises()
+      const wrapper = await mountWithReports([])
 
       expect(wrapper.text()).toContain("All Clear!")
       expect(wrapper.text()).toContain("No failure reports found.")
@@ -65,10 +77,7 @@ describe("FailureReportList", () => {
         .withId(1)
         .withCreateDatetime("2026-03-01T10:30:00Z")
         .please()
-      mockFailureReportsList([report])
-
-      const wrapper = helper.component(FailureReportList).withRouter().mount()
-      await flushPromises()
+      const wrapper = await mountWithReports([report])
 
       expect(wrapper.text()).toContain("Mar")
       expect(wrapper.text()).toContain("2026")
@@ -76,10 +85,7 @@ describe("FailureReportList", () => {
 
     it("shows report ID badge", async () => {
       const report = makeMe.aFailureReport.withId(42).please()
-      mockFailureReportsList([report])
-
-      const wrapper = helper.component(FailureReportList).withRouter().mount()
-      await flushPromises()
+      const wrapper = await mountWithReports([report])
 
       expect(wrapper.text()).toContain("#42")
     })
@@ -88,39 +94,26 @@ describe("FailureReportList", () => {
   describe("selecting and deleting reports", () => {
     it("shows delete button when reports are selected", async () => {
       const report = makeMe.aFailureReport.withId(1).please()
-      mockFailureReportsList([report])
+      const wrapper = await mountWithReports([report])
 
-      const wrapper = helper.component(FailureReportList).withRouter().mount()
+      expect(
+        wrapper.find('[data-testid="failure-report-delete-selected"]').exists()
+      ).toBe(false)
+
+      await wrapper
+        .find('[data-testid="failure-report-row-select"]')
+        .setValue(true)
       await flushPromises()
 
-      const deleteButtonInHeader = wrapper
-        .findAll(".daisy-btn-error")
-        .find((btn) => btn.text().includes("Delete Selected"))
-      expect(deleteButtonInHeader).toBeUndefined()
-
-      const checkbox = wrapper.find('input[type="checkbox"]')
-      await checkbox.setValue(true)
-      await flushPromises()
-
-      const deleteButton = wrapper
-        .findAll(".daisy-btn-error")
-        .find((btn) => btn.text().includes("Delete Selected"))
-      expect(deleteButton?.text()).toContain("Delete Selected (1)")
+      expect(
+        wrapper.find('[data-testid="failure-report-delete-selected"]').text()
+      ).toContain("Delete Selected (1)")
     })
 
     it("opens confirmation modal when delete button is clicked", async () => {
       const report = makeMe.aFailureReport.withId(1).please()
-      mockFailureReportsList([report])
-
-      const wrapper = helper.component(FailureReportList).withRouter().mount()
-      await flushPromises()
-
-      const checkbox = wrapper.find('input[type="checkbox"]')
-      await checkbox.setValue(true)
-      await flushPromises()
-
-      await wrapper.find(".daisy-btn-error").trigger("click")
-      await flushPromises()
+      const wrapper = await mountWithReports([report])
+      await openDeleteModalForFirstReports(wrapper, 1)
 
       expect(wrapper.find(".daisy-modal-open").exists()).toBe(true)
       expect(wrapper.text()).toContain("Confirm Deletion")
@@ -136,22 +129,14 @@ describe("FailureReportList", () => {
         undefined
       )
 
-      const wrapper = helper.component(FailureReportList).withRouter().mount()
-      await flushPromises()
-
-      const checkbox = wrapper.find('input[type="checkbox"]')
-      await checkbox.setValue(true)
-      await flushPromises()
-
-      await wrapper.find(".daisy-btn-error").trigger("click")
-      await flushPromises()
+      const wrapper = await mountWithReports([report])
+      await openDeleteModalForFirstReports(wrapper, 1)
 
       failureReportsSpy.mockResolvedValue(wrapSdkResponse([]))
 
-      const confirmButton = wrapper
-        .findAll(".daisy-modal-action button")
-        .find((b) => b.text() === "Delete")
-      await confirmButton!.trigger("click")
+      await wrapper
+        .find('[data-testid="failure-report-delete-confirm"]')
+        .trigger("click")
       await flushPromises()
 
       expect(deleteSpy).toHaveBeenCalledWith({
@@ -161,22 +146,14 @@ describe("FailureReportList", () => {
 
     it("closes modal when cancel is clicked", async () => {
       const report = makeMe.aFailureReport.withId(1).please()
-      mockFailureReportsList([report])
-
-      const wrapper = helper.component(FailureReportList).withRouter().mount()
-      await flushPromises()
-
-      const checkbox = wrapper.find('input[type="checkbox"]')
-      await checkbox.setValue(true)
-      await wrapper.find(".daisy-btn-error").trigger("click")
-      await flushPromises()
+      const wrapper = await mountWithReports([report])
+      await openDeleteModalForFirstReports(wrapper, 1)
 
       expect(wrapper.find(".daisy-modal-open").exists()).toBe(true)
 
-      const cancelButton = wrapper
-        .findAll(".daisy-modal-action button")
-        .find((b) => b.text() === "Cancel")
-      await cancelButton!.trigger("click")
+      await wrapper
+        .find('[data-testid="failure-report-delete-cancel"]')
+        .trigger("click")
       await flushPromises()
 
       expect(wrapper.find(".daisy-modal-open").exists()).toBe(false)
@@ -185,28 +162,24 @@ describe("FailureReportList", () => {
     it("allows selecting multiple reports", async () => {
       const report1 = makeMe.aFailureReport.withId(1).please()
       const report2 = makeMe.aFailureReport.withId(2).please()
-      mockFailureReportsList([report1, report2])
+      const wrapper = await mountWithReports([report1, report2])
 
-      const wrapper = helper.component(FailureReportList).withRouter().mount()
-      await flushPromises()
-
-      const checkboxes = wrapper.findAll('input[type="checkbox"]')
-      await checkboxes[0]!.setValue(true)
-      await checkboxes[1]!.setValue(true)
-      await flushPromises()
-
-      expect(wrapper.find(".daisy-btn-error").text()).toContain(
-        "Delete Selected (2)"
+      const rowChecks = wrapper.findAll(
+        '[data-testid="failure-report-row-select"]'
       )
+      await rowChecks[0]!.setValue(true)
+      await rowChecks[1]!.setValue(true)
+      await flushPromises()
+
+      expect(
+        wrapper.find('[data-testid="failure-report-delete-selected"]').text()
+      ).toContain("Delete Selected (2)")
     })
   })
 
   describe("trigger test exception", () => {
     it("shows trigger button", async () => {
-      mockFailureReportsList([])
-
-      const wrapper = helper.component(FailureReportList).withRouter().mount()
-      await flushPromises()
+      const wrapper = await mountWithReports([])
 
       const triggerButton = wrapper
         .findAll("button")
@@ -222,9 +195,7 @@ describe("FailureReportList", () => {
         undefined
       )
 
-      const wrapper = helper.component(FailureReportList).withRouter().mount()
-      await flushPromises()
-
+      const wrapper = await mountWithReports([])
       const triggerButton = wrapper
         .findAll("button")
         .find((btn) => btn.text().includes("Trigger Test Exception"))

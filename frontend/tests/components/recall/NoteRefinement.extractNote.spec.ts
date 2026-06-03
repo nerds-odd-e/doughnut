@@ -8,7 +8,6 @@ import {
   mockSdkServiceWithImplementation,
   wrapSdkError,
 } from "@tests/helpers"
-import usePopups from "@/components/commons/Popups/usePopups"
 import {
   extractNoteButtonTitle,
   mountNoteRefinement,
@@ -112,13 +111,14 @@ describe("NoteRefinement extract note", () => {
 
     it("hides LoadingModal when API fails", async () => {
       let resolveApi: () => void
+      const apiGate = new Promise<void>((r) => {
+        resolveApi = r
+      })
       mockSdkServiceWithImplementation(
         AiController,
         "extractNote",
         async () => {
-          await new Promise<void>((r) => {
-            resolveApi = r
-          })
+          await apiGate
           return wrapSdkError({})
         }
       )
@@ -129,12 +129,9 @@ describe("NoteRefinement extract note", () => {
         .find(`button[title="${extractNoteButtonTitle}"]`)
         .trigger("click")
       await nextTick()
-      await flushPromises()
 
       expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
       resolveApi!()
-      await flushPromises()
-      usePopups().popups.done(true)
       await flushPromises()
       expect(document.querySelector(".loading-modal-mask")).toBeNull()
     })

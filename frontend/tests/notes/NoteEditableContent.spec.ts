@@ -39,6 +39,41 @@ describe("NoteEditableContent", () => {
     document.body.innerHTML = ""
   })
 
+  const markdownTextareaDefaults = {
+    readonly: false,
+    asMarkdown: true,
+    wikiTitles: [] as string[],
+  }
+
+  async function mountMarkdownTextarea(props: {
+    noteId: number
+    noteContent: string
+  }) {
+    const wrapper = helper
+      .component(NoteEditableContent)
+      .withCleanStorage()
+      .withRouter()
+      .withProps({ ...markdownTextareaDefaults, ...props })
+      .mount()
+    await flushPromises()
+    return wrapper
+  }
+
+  function textareaEl(wrapper: VueWrapper<ComponentPublicInstance>) {
+    return wrapper.find("textarea").element as HTMLTextAreaElement
+  }
+
+  async function setTextareaValue(
+    wrapper: VueWrapper<ComponentPublicInstance>,
+    value: string
+  ) {
+    const el = textareaEl(wrapper)
+    el.value = value
+    el.dispatchEvent(new Event("input"))
+    await flushPromises()
+    return el
+  }
+
   it("should not save previous note's content to the new note when navigating", async () => {
     const firstNoteId = 1
     const secondNoteId = 2
@@ -132,37 +167,14 @@ describe("NoteEditableContent", () => {
     const noteId = 1
     const noteContent = "Original content"
 
-    const wrapper: VueWrapper<ComponentPublicInstance> = helper
-      .component(NoteEditableContent)
-      .withCleanStorage()
-      .withRouter()
-      .withProps({
-        noteId,
-        noteContent,
-        readonly: false,
-        asMarkdown: true,
-        wikiTitles: [],
-      })
-      .mount({ attachTo: document.body })
+    const wrapper = await mountMarkdownTextarea({ noteId, noteContent })
+    await setTextareaValue(wrapper, "Edited content")
 
-    await flushPromises()
+    await wrapper.setProps({ noteId, noteContent, readonly: false })
 
-    const contentTextarea = wrapper.find("textarea")
-      .element as HTMLTextAreaElement
-    contentTextarea.value = "Edited content"
-    contentTextarea.dispatchEvent(new Event("input"))
-    await flushPromises()
+    expect(textareaEl(wrapper).value).toBe("Edited content")
 
-    await wrapper.setProps({
-      noteId,
-      noteContent,
-      readonly: false,
-    })
-    await flushPromises()
-
-    expect(contentTextarea.value).toBe("Edited content")
-
-    contentTextarea.dispatchEvent(new Event("blur"))
+    await wrapper.find("textarea").trigger("blur")
     await flushPromises()
 
     expect(updateNoteContentSpy).toHaveBeenCalledWith({
@@ -341,38 +353,23 @@ describe("NoteEditableContent", () => {
       // biome-ignore lint/suspicious/noExplicitAny: Vitest mock typing requires any for implementation functions
     }) as any)
 
-    const wrapper = helper
-      .component(NoteEditableContent)
-      .withCleanStorage()
-      .withRouter()
-      .withProps({
-        noteId,
-        noteContent: "Original",
-        readonly: false,
-        asMarkdown: true,
-        wikiTitles: [],
-      })
-      .mount({ attachTo: document.body })
+    const wrapper = await mountMarkdownTextarea({
+      noteId,
+      noteContent: "Original",
+    })
 
-    await flushPromises()
-    const contentTextarea = wrapper.find("textarea")
-      .element as HTMLTextAreaElement
-
-    contentTextarea.value = "First edit"
-    contentTextarea.dispatchEvent(new Event("input"))
-    contentTextarea.dispatchEvent(new Event("blur"))
+    await setTextareaValue(wrapper, "First edit")
+    await wrapper.find("textarea").trigger("blur")
     await flushPromises()
 
-    contentTextarea.value = "Second edit"
-    contentTextarea.dispatchEvent(new Event("input"))
-    await flushPromises()
-    expect(contentTextarea.value).toBe("Second edit")
+    await setTextareaValue(wrapper, "Second edit")
+    expect(textareaEl(wrapper).value).toBe("Second edit")
 
     resolveFirstSave!()
     await wrapper.setProps({ noteContent: "First edit" })
     await flushPromises()
 
-    expect(contentTextarea.value).toBe("Second edit")
+    expect(textareaEl(wrapper).value).toBe("Second edit")
     wrapper.unmount()
   })
 

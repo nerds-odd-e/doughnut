@@ -11,17 +11,43 @@ describe("SeamlessTextEditor", () => {
     document.body.innerHTML = ""
   })
 
-  const mountEditor = async (initialValue: string, options = {}) => {
+  const mountEditor = async (
+    initialValue: string,
+    options = {},
+    mountOpts?: { attachTo?: HTMLElement }
+  ) => {
     wrapper = helper
       .component(SeamlessTextEditor)
       .withProps({
         modelValue: initialValue,
         ...options,
       })
-      .mount({ attachTo: document.body })
+      .mount(mountOpts?.attachTo ? { attachTo: mountOpts.attachTo } : undefined)
     await flushPromises()
-    await nextTick()
     return wrapper
+  }
+
+  function setCaretInEditor(editor: HTMLElement, offset: number) {
+    const textNode = editor.firstChild as Text
+    const selection = window.getSelection()
+    const range = document.createRange()
+    range.setStart(textNode, offset)
+    range.setEnd(textNode, offset)
+    selection?.removeAllRanges()
+    selection?.addRange(range)
+  }
+
+  async function pastePlainText(editor: HTMLElement, text: string) {
+    const clipboardData = new DataTransfer()
+    clipboardData.setData("text/plain", text)
+    editor.dispatchEvent(
+      new ClipboardEvent("paste", {
+        bubbles: true,
+        cancelable: true,
+        clipboardData,
+      })
+    )
+    await nextTick()
   }
 
   it("does not emit update when the change is from initial value", async () => {
@@ -30,7 +56,7 @@ describe("SeamlessTextEditor", () => {
   })
 
   it("keeps caret offset when modelValue is synced with same-length text", async () => {
-    await mountEditor("x:y")
+    await mountEditor("x:y", {}, { attachTo: document.body })
     const editor = wrapper.find(".seamless-editor").element as HTMLElement
     editor.focus()
     await nextTick()
@@ -90,47 +116,14 @@ describe("SeamlessTextEditor", () => {
 
   it("pastes plain text at cursor position", async () => {
     await mountEditor("existing text")
-    await flushPromises()
-    await nextTick()
 
     const editor = wrapper.find(".seamless-editor").element as HTMLElement
-    // Browser Mode: Real focus() method!
-    editor.focus()
-    await nextTick()
-    await flushPromises()
-
-    // Browser Mode: Real Selection API!
-    // Set cursor position after "existing" (8 characters)
-    const textNode = editor.firstChild as Text
-    expect(textNode).toBeTruthy()
-
-    // Browser Mode: Use real window.getSelection() and document.createRange()
-    const selection = window.getSelection()
-    const range = document.createRange()
-    if (textNode) {
-      range.setStart(textNode, 8) // After "existing"
-      range.setEnd(textNode, 8)
-      selection?.removeAllRanges()
-      selection?.addRange(range)
-    }
-
-    // Browser Mode: Real ClipboardEvent!
-    const clipboardData = new DataTransfer()
-    clipboardData.setData("text/plain", " inserted")
-    const pasteEvent = new ClipboardEvent("paste", {
-      bubbles: true,
-      cancelable: true,
-      clipboardData,
-    })
-
-    editor.dispatchEvent(pasteEvent)
-    await nextTick()
-    await flushPromises()
+    setCaretInEditor(editor, 8)
+    await pastePlainText(editor, " inserted")
 
     const emitted = wrapper.emitted()["update:modelValue"]
     expect(emitted).toBeDefined()
     expect(emitted?.length).toBeGreaterThan(0)
-    // Verify paste worked - text should contain both original and pasted content
     const finalText = emitted?.[emitted.length - 1]?.[0] as string
     expect(finalText).toContain("existing")
     expect(finalText).toContain("inserted")

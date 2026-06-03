@@ -83,13 +83,12 @@ describe("NoteRefinement remove refinement suggestions", () => {
         "updateNoteContent",
         makeMe.aNoteRealm.please()
       )
-      const wrapper = mountNoteRefinement(["Point 1", "Point 2", "Point 3"])
+      const wrapper = mountNoteRefinement(["Point 1", "Point 2"])
       await flushPromises()
       await selectFirstSuggestion(wrapper)
       await wrapper
         .find('[data-test-id="remove-refinement-suggestions"]')
         .trigger("click")
-      await flushPromises()
       usePopups().popups.done(true)
       await flushPromises()
 
@@ -118,7 +117,6 @@ describe("NoteRefinement remove refinement suggestions", () => {
       await wrapper
         .find('[data-test-id="remove-refinement-suggestions"]')
         .trigger("click")
-      await flushPromises()
       usePopups().popups.done(false)
       await flushPromises()
 
