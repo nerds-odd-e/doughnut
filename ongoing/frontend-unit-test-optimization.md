@@ -85,13 +85,11 @@ Status: done
 ---
 
 ### Phase 4: BookReading snap geometry batch
-Status: planned
+Status: done
+
+**Result (2026-06-03):** Added `mountFirstBlockBboxScenario` helper; replaced `vi.waitFor`/`vi.waitUntil` with `clickBookBlockAndExpectSelection`, sync selection checks, and `flushPromises`. Zoom test uses plain book mount (no blocks). Questions table test drops body attach + polling. **54** scoped tests; full suite **1369** pass (~22s wall).
 
 **Scope:** `tests/pages/BookReadingPage.spec.ts`, `tests/notes/Questions.spec.ts`
-
-**Tests (10):** batch 4 from profiling.
-
-**Verify:** scoped files then full suite.
 
 ---
 

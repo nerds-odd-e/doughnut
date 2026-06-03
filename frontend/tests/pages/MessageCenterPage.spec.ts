@@ -3,7 +3,6 @@ import MessageCenterPage from "@/pages/MessageCenterPage.vue"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import helper, { mockSdkService } from "@tests/helpers"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import { page } from "vitest/browser"
 import { flushPromises } from "@vue/test-utils"
 
 const { mockedPush } = vi.hoisted(() => ({ mockedPush: vi.fn() }))
@@ -45,9 +44,8 @@ describe("MessageCenterPage", () => {
       .withCleanStorage()
       .withProps({})
       .render()
-    await expect
-      .element(page.getByText("No conversation selected"))
-      .toBeInTheDocument()
+    await flushPromises()
+    expect(document.body.textContent).toContain("No conversation selected")
   })
 
   describe("highlighting the selected conversation", () => {

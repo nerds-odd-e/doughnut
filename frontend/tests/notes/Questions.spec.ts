@@ -45,12 +45,9 @@ describe("Questions", () => {
   })
 
   it("renders questions table when questions exist", async () => {
-    wrapper = helper
-      .component(Questions)
-      .withProps({ note })
-      .mount({ attachTo: document.body })
+    wrapper = helper.component(Questions).withProps({ note }).mount()
 
-    await vi.waitUntil(() => wrapper.text().includes("What is 2+2?"))
+    await flushPromises()
     expect(wrapper.text()).toContain("What is 2+2?")
   })
 

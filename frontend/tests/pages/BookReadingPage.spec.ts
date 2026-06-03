@@ -425,7 +425,10 @@ describe("BookReadingPage", () => {
   })
 
   it("zoom buttons exist with accessible names and page indicator shows via PdfControl", async () => {
-    const wrapper = await mountLoadedBookWithBlocks(notebookId)
+    stubGetBookPlain(notebookId)
+    mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
+    const wrapper = mountBookReadingPage(notebookId)
+    await waitForPdfViewer(wrapper)
     expect(
       wrapper.find('[data-testid="pdf-zoom-in"]').attributes("aria-label")
     ).toBe("Zoom in")
@@ -531,7 +534,7 @@ describe("BookReadingPage", () => {
         viewport: null,
         pagesCount: 10,
       })
-      await vi.advanceTimersByTimeAsync(LAST_READ_POSITION_PATCH_DEBOUNCE_MS)
+      vi.advanceTimersByTime(LAST_READ_POSITION_PATCH_DEBOUNCE_MS)
       await flushPromises()
     })
 
@@ -738,6 +741,21 @@ describe("BookReadingPage", () => {
       expect(currentSelectionText(wrapper)).toBe(title)
     }
 
+    async function clickBookBlockStartingWithAndExpectSelection(
+      wrapper: BookReadingPageWrapper,
+      titlePrefix: string
+    ) {
+      const row = wrapper
+        .findAll('[data-testid="book-reading-book-block"]')
+        .find((w) => w.text().startsWith(titlePrefix))
+      expect(row, `book block row "${titlePrefix}"`).toBeDefined()
+      await row!.trigger("click")
+      await flushPromises()
+      expect(currentSelectionText(wrapper)).toMatch(
+        new RegExp(`^${titlePrefix}`)
+      )
+    }
+
     it("shows read border for blocks returned as READ from reading-records on load", async () => {
       vi.spyOn(
         NotebookBooksController,
@@ -842,12 +860,7 @@ describe("BookReadingPage", () => {
 
     it("hides the panel when the current block is not the immediate successor of the selection", async () => {
       const wrapper = await mountLoadedBookWithBlocks(notebookId)
-      await clickBookBlockByTitle(wrapper, "Section 1")
-      await vi.waitFor(() =>
-        expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-          "Section 1"
-        )
-      )
+      await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
       await emitViewportAndSettleCurrentBlock(wrapper, {
         anchorPageIndexZeroBased: 0,
@@ -866,12 +879,7 @@ describe("BookReadingPage", () => {
         lastBlockHasDirectContent: true,
       })
       mockIsLastContentBottomVisible(wrapper, false)
-      await clickBookBlockByTitle(wrapper, "Section 6")
-      await vi.waitFor(() =>
-        expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-          "Section 6"
-        )
-      )
+      await clickBookBlockAndExpectSelection(wrapper, "Section 6")
 
       await emitViewportAndSettleCurrentBlock(wrapper, {
         anchorPageIndexZeroBased: 1,
@@ -890,12 +898,7 @@ describe("BookReadingPage", () => {
         lastBlockHasDirectContent: true,
       })
       mockIsLastContentBottomVisible(wrapper, true)
-      await clickBookBlockByTitle(wrapper, "Section 6")
-      await vi.waitFor(() =>
-        expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-          "Section 6"
-        )
-      )
+      await clickBookBlockAndExpectSelection(wrapper, "Section 6")
 
       await emitViewportAndSettleCurrentBlock(wrapper, {
         anchorPageIndexZeroBased: 1,
@@ -963,11 +966,7 @@ describe("BookReadingPage", () => {
       expect(section1Row, "book block row Section 1").toBeDefined()
       await section1Row!.trigger("click")
       await flushPromises()
-      await vi.waitFor(() =>
-        expect(wrapper.find('[data-current-selection="true"]').text()).toMatch(
-          /^Section 1/
-        )
-      )
+      expect(currentSelectionText(wrapper)).toMatch(/^Section 1/)
 
       await emitViewportAndSettleCurrentBlock(wrapper, {
         anchorPageIndexZeroBased: 0,
@@ -1279,53 +1278,59 @@ describe("BookReadingPage", () => {
         )
       }
 
-      it("shows the panel when last content bottom is visible and above obstruction", async () => {
+      async function mountFirstBlockBboxScenario(options?: {
+        contentFitsInViewport?: boolean
+        lastContentBottomVisible?: boolean
+      }) {
         stubGetBookWithFirstBlockHavingBbox()
         mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
         const wrapper = mountBookReadingPage(notebookId)
         await waitForPdfViewer(wrapper)
-        mockIsLastContentBottomVisible(wrapper, true)
-
-        await clickBookBlockByTitle(wrapper, "Section 1")
-        await vi.waitFor(() =>
-          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-            "Section 1"
-          )
+        mockIsLastContentBottomVisible(
+          wrapper,
+          options?.lastContentBottomVisible ?? true
         )
+        if (options?.contentFitsInViewport !== undefined) {
+          mockSnapBackContentFitsInViewport(
+            wrapper,
+            options.contentFitsInViewport
+          )
+        }
+        return wrapper
+      }
 
-        const pdf = wrapper.findComponent(PdfBookViewer)
-        pdf.vm.$emit("viewportAnchorPage", {
+      async function mountCrossPageBboxScenario() {
+        stubGetBookWithFirstBlockHavingCrossPageBbox()
+        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
+        const wrapper = mountBookReadingPage(notebookId)
+        await waitForPdfViewer(wrapper)
+        mockIsLastContentBottomVisible(wrapper, true)
+        return wrapper
+      }
+
+      it("shows the panel when last content bottom is visible and above obstruction", async () => {
+        const wrapper = await mountFirstBlockBboxScenario()
+        await clickBookBlockAndExpectSelection(wrapper, "Section 1")
+
+        await emitViewportAndSettleCurrentBlock(wrapper, {
           anchorPageIndexZeroBased: 0,
           viewport: { top: 0, mid: 200, bottom: 600 },
           pagesCount: 10,
         })
-        await flushPromises()
 
         expect(readingControlPanel(wrapper).exists()).toBe(true)
       })
 
       it("anchors panel when last content bottom is visible and anchor px is returned", async () => {
-        stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
-        const wrapper = mountBookReadingPage(notebookId)
-        await waitForPdfViewer(wrapper)
-        mockIsLastContentBottomVisible(wrapper, true)
+        const wrapper = await mountFirstBlockBboxScenario()
         mockReadingPanelAnchorTopPx(wrapper, 120)
+        await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
-        await clickBookBlockByTitle(wrapper, "Section 1")
-        await vi.waitFor(() =>
-          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-            "Section 1"
-          )
-        )
-
-        const pdf = wrapper.findComponent(PdfBookViewer)
-        pdf.vm.$emit("viewportAnchorPage", {
+        await emitViewportAndSettleCurrentBlock(wrapper, {
           anchorPageIndexZeroBased: 0,
           viewport: { top: 0, mid: 200, bottom: 600 },
           pagesCount: 10,
         })
-        await flushPromises()
 
         const panel = readingControlPanel(wrapper)
         expect(panel.exists()).toBe(true)
@@ -1335,43 +1340,23 @@ describe("BookReadingPage", () => {
       })
 
       it("hides the panel when last content bottom is not yet above obstruction", async () => {
-        stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
-        const wrapper = mountBookReadingPage(notebookId)
-        await waitForPdfViewer(wrapper)
-        mockIsLastContentBottomVisible(wrapper, false)
+        const wrapper = await mountFirstBlockBboxScenario({
+          lastContentBottomVisible: false,
+        })
+        await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
-        await clickBookBlockByTitle(wrapper, "Section 1")
-        await vi.waitFor(() =>
-          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-            "Section 1"
-          )
-        )
-
-        const pdf = wrapper.findComponent(PdfBookViewer)
-        pdf.vm.$emit("viewportAnchorPage", {
+        await emitViewportAndSettleCurrentBlock(wrapper, {
           anchorPageIndexZeroBased: 0,
           viewport: { top: 0, mid: 200, bottom: 600 },
           pagesCount: 10,
         })
-        await flushPromises()
 
         expect(readingControlPanel(wrapper).exists()).toBe(false)
       })
 
       it("keeps panel visible after geometry becomes false while successor is not yet current", async () => {
-        stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
-        const wrapper = mountBookReadingPage(notebookId)
-        await waitForPdfViewer(wrapper)
-        mockIsLastContentBottomVisible(wrapper, true)
-
-        await clickBookBlockByTitle(wrapper, "Section 1")
-        await vi.waitFor(() =>
-          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-            "Section 1"
-          )
-        )
+        const wrapper = await mountFirstBlockBboxScenario()
+        await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
         // mid=40 → Section 1 is current (before Section 2's y0=72); geometry passes → panel shows
         await emitViewportAndSettleCurrentBlock(wrapper, {
@@ -1396,21 +1381,13 @@ describe("BookReadingPage", () => {
       })
 
       it("snaps back and keeps panel visible on first boundary crossing (same-page: scrolls to block start)", async () => {
-        stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
-        const wrapper = mountBookReadingPage(notebookId)
-        await waitForPdfViewer(wrapper)
-        mockIsLastContentBottomVisible(wrapper, true)
-        mockSnapBackContentFitsInViewport(wrapper, true)
+        const wrapper = await mountFirstBlockBboxScenario({
+          contentFitsInViewport: true,
+        })
         const snapToBottomSpy =
           spyOnScrollPageNormalizedYToReadingClearance(wrapper)
 
-        await clickBookBlockByTitle(wrapper, "Section 1")
-        await vi.waitFor(() =>
-          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-            "Section 1"
-          )
-        )
+        await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
         // mid=40 → Section 1 current; geometry passes → panel shows
         await emitViewportAndSettleCurrentBlock(wrapper, {
@@ -1436,19 +1413,11 @@ describe("BookReadingPage", () => {
       })
 
       it("snaps back when scrolling lands two or more blocks ahead (not just immediate successor)", async () => {
-        stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
-        const wrapper = mountBookReadingPage(notebookId)
-        await waitForPdfViewer(wrapper)
-        mockIsLastContentBottomVisible(wrapper, true)
-        mockSnapBackContentFitsInViewport(wrapper, true)
+        const wrapper = await mountFirstBlockBboxScenario({
+          contentFitsInViewport: true,
+        })
 
-        await clickBookBlockByTitle(wrapper, "Section 1")
-        await vi.waitFor(() =>
-          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-            "Section 1"
-          )
-        )
+        await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
         // geometry passes while Section 1 is current
         await emitViewportAndSettleCurrentBlock(wrapper, {
@@ -1623,19 +1592,11 @@ describe("BookReadingPage", () => {
       })
 
       it("does not snap when geometry was never visible for the selection", async () => {
-        stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
-        const wrapper = mountBookReadingPage(notebookId)
-        await waitForPdfViewer(wrapper)
-        // geometry never becomes true
-        mockIsLastContentBottomVisible(wrapper, false)
+        const wrapper = await mountFirstBlockBboxScenario({
+          lastContentBottomVisible: false,
+        })
 
-        await clickBookBlockByTitle(wrapper, "Section 1")
-        await vi.waitFor(() =>
-          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-            "Section 1"
-          )
-        )
+        await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
         // successor becomes current without geometry ever passing
         await emitViewportAndSettleCurrentBlock(wrapper, {
@@ -1664,24 +1625,8 @@ describe("BookReadingPage", () => {
             },
           ])
         )
-        stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
-        const wrapper = mountBookReadingPage(notebookId)
-        await waitForPdfViewer(wrapper)
-        mockIsLastContentBottomVisible(wrapper, true)
-
-        // Block 1 is READ so its text is "Section 1 Marked as read"; click directly
-        const section1Row = wrapper
-          .findAll('[data-testid="book-reading-book-block"]')
-          .find((w) => w.text().startsWith("Section 1"))
-        expect(section1Row, "book block row Section 1").toBeDefined()
-        await section1Row!.trigger("click")
-        await flushPromises()
-        await vi.waitFor(() =>
-          expect(
-            wrapper.find('[data-current-selection="true"]').text()
-          ).toMatch(/^Section 1/)
-        )
+        const wrapper = await mountFirstBlockBboxScenario()
+        await clickBookBlockStartingWithAndExpectSelection(wrapper, "Section 1")
 
         await emitViewportAndSettleCurrentBlock(wrapper, {
           anchorPageIndexZeroBased: 0,
@@ -1701,19 +1646,11 @@ describe("BookReadingPage", () => {
       })
 
       it("snap state resets when selection changes to a different block", async () => {
-        stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
-        const wrapper = mountBookReadingPage(notebookId)
-        await waitForPdfViewer(wrapper)
-        mockIsLastContentBottomVisible(wrapper, true)
-        mockSnapBackContentFitsInViewport(wrapper, true)
+        const wrapper = await mountFirstBlockBboxScenario({
+          contentFitsInViewport: true,
+        })
 
-        await clickBookBlockByTitle(wrapper, "Section 1")
-        await vi.waitFor(() =>
-          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-            "Section 1"
-          )
-        )
+        await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
         // geometry passes for Section 1, then first crossing fires snap
         await emitViewportAndSettleCurrentBlock(wrapper, {
@@ -1730,31 +1667,17 @@ describe("BookReadingPage", () => {
         expect(snapHoldActivateMock.fn).toHaveBeenCalledTimes(1)
 
         // Select Section 2 (resets snap state), geometry passes, then Section 3 crossing
-        await clickBookBlockByTitle(wrapper, "Section 2")
-        await vi.waitFor(() =>
-          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-            "Section 2"
-          )
-        )
+        await clickBookBlockAndExpectSelection(wrapper, "Section 2")
         // Section 2 has no PDF locators so no snap for it — just confirm state cleared
         expect(snapHoldActivateMock.fn).toHaveBeenCalledTimes(1)
       })
 
       it("snaps to last bbox bottom when start anchor and last content bbox are on different pages", async () => {
-        stubGetBookWithFirstBlockHavingCrossPageBbox()
-        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
-        const wrapper = mountBookReadingPage(notebookId)
-        await waitForPdfViewer(wrapper)
-        mockIsLastContentBottomVisible(wrapper, true)
+        const wrapper = await mountCrossPageBboxScenario()
         const snapToBottomSpy =
           spyOnScrollPageNormalizedYToReadingClearance(wrapper)
 
-        await clickBookBlockByTitle(wrapper, "Section 1")
-        await vi.waitFor(() =>
-          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-            "Section 1"
-          )
-        )
+        await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
         // geometry passes for Section 1
         await emitViewportAndSettleCurrentBlock(wrapper, {
@@ -1777,21 +1700,13 @@ describe("BookReadingPage", () => {
       })
 
       it("same-page-too-tall: snaps to last content bottom when content does not fit with panel", async () => {
-        stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
-        const wrapper = mountBookReadingPage(notebookId)
-        await waitForPdfViewer(wrapper)
-        mockIsLastContentBottomVisible(wrapper, true)
-        mockSnapBackContentFitsInViewport(wrapper, false)
+        const wrapper = await mountFirstBlockBboxScenario({
+          contentFitsInViewport: false,
+        })
         const snapToBottomSpy =
           spyOnScrollPageNormalizedYToReadingClearance(wrapper)
 
-        await clickBookBlockByTitle(wrapper, "Section 1")
-        await vi.waitFor(() =>
-          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-            "Section 1"
-          )
-        )
+        await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
         // geometry passes for Section 1
         await emitViewportAndSettleCurrentBlock(wrapper, {
@@ -1814,19 +1729,10 @@ describe("BookReadingPage", () => {
       })
 
       it("sets data-snap-animating on panel when snap fires", async () => {
-        stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
-        const wrapper = mountBookReadingPage(notebookId)
-        await waitForPdfViewer(wrapper)
-        mockIsLastContentBottomVisible(wrapper, true)
-        mockSnapBackContentFitsInViewport(wrapper, true)
-
-        await clickBookBlockByTitle(wrapper, "Section 1")
-        await vi.waitFor(() =>
-          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-            "Section 1"
-          )
-        )
+        const wrapper = await mountFirstBlockBboxScenario({
+          contentFitsInViewport: true,
+        })
+        await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
         await emitViewportAndSettleCurrentBlock(wrapper, {
           anchorPageIndexZeroBased: 0,
@@ -1847,19 +1753,10 @@ describe("BookReadingPage", () => {
       })
 
       it("clears data-snap-animating after animationend on the inner card", async () => {
-        stubGetBookWithFirstBlockHavingBbox()
-        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
-        const wrapper = mountBookReadingPage(notebookId)
-        await waitForPdfViewer(wrapper)
-        mockIsLastContentBottomVisible(wrapper, true)
-        mockSnapBackContentFitsInViewport(wrapper, true)
-
-        await clickBookBlockByTitle(wrapper, "Section 1")
-        await vi.waitFor(() =>
-          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-            "Section 1"
-          )
-        )
+        const wrapper = await mountFirstBlockBboxScenario({
+          contentFitsInViewport: true,
+        })
+        await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
         await emitViewportAndSettleCurrentBlock(wrapper, {
           anchorPageIndexZeroBased: 0,
@@ -2162,12 +2059,7 @@ describe("BookReadingPage", () => {
       it("shows navigation bar when current block differs from selected block", async () => {
         const wrapper = await mountLoadedBookWithBlocks(notebookId)
         spyOnScrollToBookNavTarget(wrapper)
-        await clickBookBlockByTitle(wrapper, "Section 1")
-        await vi.waitFor(() =>
-          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-            "Section 1"
-          )
-        )
+        await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
         // mid=500 puts Section 2 (y0=72) as current while Section 1 stays selected
         await emitViewportAndSettleCurrentBlock(wrapper, {
