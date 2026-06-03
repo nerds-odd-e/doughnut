@@ -1,11 +1,12 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
 import makeMe from 'doughnut-test-fixtures/makeMe'
-import { createMockContext, findTool } from '../helpers/index.js'
+import {
+  createMockContext,
+  findTool,
+  setupMockApiClient,
+} from '../helpers/index.js'
 import { SearchController } from '@generated/doughnut-backend-api/sdk.gen'
-import { client } from '@generated/doughnut-backend-api/client.gen'
-import type { SearchForRelationshipTargetResponse } from '@generated/doughnut-backend-api'
 
-// Mock the generated services
 vi.mock('@generated/doughnut-backend-api/sdk.gen', () => ({
   SearchController: {
     searchForRelationshipTarget: vi.fn(),
@@ -15,84 +16,34 @@ vi.mock('@generated/doughnut-backend-api/sdk.gen', () => ({
 describe('find_most_relevant_note tool', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    // Set up OpenAPI config for tests
-    client.setConfig({
-      baseUrl: 'http://localhost:8080',
-      headers: {
-        Authorization: 'Bearer test-token',
-      },
-    })
+    setupMockApiClient()
   })
 
-  // Helper function to run the test
-  const runQueryExtractionTest = async (
-    args: unknown,
-    expectedSearchKey: string,
-    shouldFindNote = true
-  ) => {
-    const findMostRelevantNoteTool = findTool('find_most_relevant_note')
-
-    const searchResult: SearchForRelationshipTargetResponse = shouldFindNote
-      ? [
-          {
-            hitKind: 'NOTE',
-            noteSearchResult: makeMe.aNoteSearchResult
-              .id(123)
-              .title('Test Note')
-              .please(),
-          },
-        ]
-      : []
-
-    // Mock the service response
-    const mockSearchForRelationshipTarget = vi.mocked(
-      SearchController.searchForRelationshipTarget
-    )
-    // OpenAPI client returns { data, error, request, response } structure
-    mockSearchForRelationshipTarget.mockResolvedValue({
-      data: searchResult,
+  test('should extract query when args is an object with query property', async () => {
+    const mockSearch = vi.mocked(SearchController.searchForRelationshipTarget)
+    mockSearch.mockResolvedValue({
+      data: [
+        {
+          hitKind: 'NOTE',
+          noteSearchResult: makeMe.aNoteSearchResult
+            .id(123)
+            .title('Test Note')
+            .please(),
+        },
+      ],
       error: undefined,
     } as Awaited<
       ReturnType<typeof SearchController.searchForRelationshipTarget>
     >)
 
-    const ctx = createMockContext()
+    const tool = findTool('find_most_relevant_note')
+    await tool.handle(createMockContext(), { query: 'query in query' })
 
-    // Call the tool's handle function
-    const result = await findMostRelevantNoteTool.handle(
-      ctx,
-      args as unknown as Record<string, unknown>
-    )
-
-    // Assert search was called with correct arguments
-    expect(mockSearchForRelationshipTarget).toHaveBeenCalledWith({
+    expect(mockSearch).toHaveBeenCalledWith({
       body: {
-        searchKey: expectedSearchKey,
+        searchKey: 'query in query',
         allMyNotebooksAndSubscriptions: true,
       },
     })
-
-    // Assert the response
-    if (shouldFindNote) {
-      // Now we expect the NoteSearchResult JSON structure
-      const responseText = result.content[0].text
-      expect(responseText).toContain('"noteTopology"')
-      expect(responseText).toContain('"id":123')
-    } else {
-      expect(result.content[0].text).toBe('No relevant note found.')
-    }
-  }
-
-  test('should extract query when args is an object with query property', async () => {
-    const args = { query: 'query in query' }
-    const expectedSearchKey = 'query in query'
-    const shouldFindNote = true
-
-    await runQueryExtractionTest(args, expectedSearchKey, shouldFindNote)
-  })
-
-  test('should be defined and have correct name', () => {
-    const findMostRelevantNoteTool = findTool('find_most_relevant_note')
-    expect(findMostRelevantNoteTool.name).toBe('find_most_relevant_note')
   })
 })

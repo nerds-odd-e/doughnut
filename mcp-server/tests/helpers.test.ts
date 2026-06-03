@@ -1,61 +1,23 @@
-import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest'
+import { describe, test, expect, beforeEach, afterEach } from 'vitest'
 import { createErrorResponse } from '../src/helpers.js'
 import { getApiConfig } from 'doughnut-api'
 
 describe('createErrorResponse', () => {
-  test('should handle Error objects', () => {
-    const error = new Error('Test error')
-    const result = createErrorResponse(error)
+  test.each([
+    ['Error objects', new Error('Test error'), 'ERROR:', 'ERROR: Test error'],
+    ['string errors', 'String error', 'ERROR:', 'ERROR: String error'],
+    [
+      'unknown error types',
+      { code: 500, message: 'Server error' },
+      'ERROR:',
+      'ERROR: {"code":500,"message":"Server error"}',
+    ],
+    ['custom prefix', 'Test error', 'CUSTOM:', 'CUSTOM: Test error'],
+  ])('should handle %s', (_, error, prefix, expectedText) => {
+    const result = createErrorResponse(error, prefix)
 
     expect(result).toEqual({
-      content: [
-        {
-          type: 'text',
-          text: 'ERROR: Test error',
-        },
-      ],
-    })
-  })
-
-  test('should handle string errors', () => {
-    const error = 'String error'
-    const result = createErrorResponse(error)
-
-    expect(result).toEqual({
-      content: [
-        {
-          type: 'text',
-          text: 'ERROR: String error',
-        },
-      ],
-    })
-  })
-
-  test('should handle unknown error types', () => {
-    const error = { code: 500, message: 'Server error' }
-    const result = createErrorResponse(error)
-
-    expect(result).toEqual({
-      content: [
-        {
-          type: 'text',
-          text: 'ERROR: {"code":500,"message":"Server error"}',
-        },
-      ],
-    })
-  })
-
-  test('should use custom prefix', () => {
-    const error = 'Test error'
-    const result = createErrorResponse(error, 'CUSTOM:')
-
-    expect(result).toEqual({
-      content: [
-        {
-          type: 'text',
-          text: 'CUSTOM: Test error',
-        },
-      ],
+      content: [{ type: 'text', text: expectedText }],
     })
   })
 })
@@ -64,7 +26,6 @@ describe('getApiConfig', () => {
   const originalEnv = process.env
 
   beforeEach(() => {
-    vi.resetModules()
     process.env = { ...originalEnv }
   })
 
@@ -72,33 +33,30 @@ describe('getApiConfig', () => {
     process.env = originalEnv
   })
 
-  test('should return config with valid environment variables', () => {
-    process.env.DOUGHNUT_API_BASE_URL = 'http://localhost:8080'
-    process.env.DOUGHNUT_API_AUTH_TOKEN = 'test-token'
-
-    const config = getApiConfig()
-
-    expect(config.apiBaseUrl).toBe('http://localhost:8080')
-    expect(config.authToken).toBe('test-token')
-  })
-
-  test('should return config with missing environment variables', () => {
+  test.each([
+    [
+      'valid environment variables',
+      {
+        DOUGHNUT_API_BASE_URL: 'http://localhost:8080',
+        DOUGHNUT_API_AUTH_TOKEN: 'test-token',
+      },
+      { apiBaseUrl: 'http://localhost:8080', authToken: 'test-token' },
+    ],
+    [
+      'missing environment variables',
+      {},
+      { apiBaseUrl: 'https://doughnut.odd-e.com', authToken: undefined },
+    ],
+    [
+      'empty environment variables',
+      { DOUGHNUT_API_BASE_URL: '', DOUGHNUT_API_AUTH_TOKEN: '' },
+      { apiBaseUrl: 'https://doughnut.odd-e.com', authToken: '' },
+    ],
+  ])('should return config with %s', (_, env, expected) => {
     delete process.env.DOUGHNUT_API_BASE_URL
     delete process.env.DOUGHNUT_API_AUTH_TOKEN
+    Object.assign(process.env, env)
 
-    const config = getApiConfig()
-
-    expect(config.apiBaseUrl).toBe('https://doughnut.odd-e.com')
-    expect(config.authToken).toBeUndefined()
-  })
-
-  test('should return config with empty environment variables', () => {
-    process.env.DOUGHNUT_API_BASE_URL = ''
-    process.env.DOUGHNUT_API_AUTH_TOKEN = ''
-
-    const config = getApiConfig()
-
-    expect(config.apiBaseUrl).toBe('https://doughnut.odd-e.com')
-    expect(config.authToken).toBe('')
+    expect(getApiConfig()).toEqual(expected)
   })
 })

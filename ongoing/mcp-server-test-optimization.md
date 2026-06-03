@@ -74,7 +74,9 @@ Status: done
 ---
 
 ### Phase 3: Optimize tool unit tests
-Status: planned
+Status: done
+
+**Result (2026-06-03):** Removed redundant name tests (covered by `server.test.ts` registry); added shared `setupMockApiClient()` helper; simplified query-extraction test to assert search args only; table-drove token-limit errors. **8 → 5** tests in this scope; full suite **17 → 15** tests.
 
 **Scope:** `find-most-relevant-note.test.ts`, `get-note-graph.test.ts`, `tool-builder.test.ts` (8 tests).
 
@@ -88,7 +90,9 @@ Status: planned
 ---
 
 ### Phase 4: Optimize helpers tests
-Status: planned
+Status: done
+
+**Result (2026-06-03):** Table-driven `test.each` for `createErrorResponse` (4 cases) and `getApiConfig` (3 cases); removed per-test `vi.resetModules()` (not needed — `getApiConfig` reads `process.env` at call time). **7 tests** in this file (unchanged count, shorter file); full suite **15** tests.
 
 **Scope:** `mcp-server/tests/helpers.test.ts` (10 tests).
 
