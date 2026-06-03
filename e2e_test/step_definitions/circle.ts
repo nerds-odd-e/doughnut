@@ -22,27 +22,6 @@ When('I visit the invitation link', () => {
         start.pageIsNotLoading()
         cy.get('body').then(($body) => {
           if ($body.find('#username').length > 0) {
-            cy.get<string>('@currentLoginUser').then((loginUser) => {
-              if (!loginUser || loginUser === 'none') {
-                return
-              }
-              cy.intercept('GET', '**/api/healthcheck').as('devLogin')
-              cy.get('#username').clear().type(loginUser)
-              cy.get('#password').clear().type('password')
-              cy.get('#login-button').click()
-              cy.wait('@devLogin').then(({ response }) => {
-                expect(response?.statusCode, 'dev login on invite').to.equal(
-                  200
-                )
-              })
-              cy.url({ timeout: 15000 }).should('include', '/circles/join/')
-              start.pageIsNotLoading()
-              cy.get('#join-circle-invitationCode', {
-                timeout: 15000,
-              }).should(($input) => {
-                expect($input.val()).to.equal(code)
-              })
-            })
             return
           }
           cy.get('#join-circle-invitationCode', { timeout: 15000 }).should(
@@ -58,55 +37,18 @@ When('I visit the invitation link', () => {
 When('I join the circle', () => {
   cy.intercept('POST', '**/api/circles/join').as('joinCircle')
   cy.get<string>('@circleInvitationCode').then((code) => {
-    cy.get('@savedInvitationCode')
-      .invoke('toString')
-      .then((url) => {
-        cy.visit(url)
-        start.pageIsNotLoading()
-        cy.get('#username, #join-circle-invitationCode', {
-          timeout: 15000,
-        }).should('exist')
-        cy.get('body')
-          .then(($body) => {
-            if ($body.find('#username').length === 0) {
-              return cy
-                .get('#join-circle-invitationCode', { timeout: 15000 })
-                .clear()
-                .type(code)
-            }
-            return cy.get<string>('@currentLoginUser').then((loginUser) => {
-              expect(loginUser, 'login before join')
-                .to.be.a('string')
-                .and.not.equal('none')
-              cy.intercept('GET', '**/api/healthcheck').as('devLogin')
-              cy.get('#username').clear().type(loginUser)
-              cy.get('#password').clear().type('password')
-              cy.get('#login-button').click()
-              cy.wait('@devLogin').then(({ response }) => {
-                expect(response?.statusCode, 'dev login before join').to.equal(
-                  200
-                )
-              })
-              cy.url({ timeout: 15000 }).should('include', '/circles/join/')
-              start.pageIsNotLoading()
-              return cy
-                .get('#join-circle-invitationCode', { timeout: 15000 })
-                .clear()
-                .type(code)
-            })
-          })
-          .then(() => {
-            cy.get('input[value="Join"]').click()
-            cy.wait('@joinCircle').then(({ response }) => {
-              expect(
-                response?.statusCode,
-                `join circle failed: ${JSON.stringify(response?.body)}`
-              ).to.equal(200)
-            })
-            cy.url({ timeout: 15000 }).should('match', /\/circles\/\d+/)
-            start.pageIsNotLoading()
-          })
-      })
+    expect(code, 'circle invitation code from inject').to.be.a('string').and.not
+      .be.empty
+    cy.get('#join-circle-invitationCode', { timeout: 15000 }).clear().type(code)
+    cy.get('input[value="Join"]').click()
+    cy.wait('@joinCircle').then(({ response }) => {
+      expect(
+        response?.statusCode,
+        `join circle failed: ${JSON.stringify(response?.body)}`
+      ).to.equal(200)
+    })
+    cy.url({ timeout: 15000 }).should('match', /\/circles\/\d+/)
+    start.pageIsNotLoading()
   })
 })
 

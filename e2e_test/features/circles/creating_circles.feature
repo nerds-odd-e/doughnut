@@ -18,5 +18,6 @@ Feature: Creating circles
       | Name      |
       | Learner A |
     And I am re-logged in as "user"
+    And I visit the invitation link
     And I join the circle
     Then I should see the circle "Odd-e New User Circle" and it has two members in it
