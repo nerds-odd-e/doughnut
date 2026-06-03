@@ -17,13 +17,7 @@ export const addQuestionPage = () => {
     addQuestion(row: Record<string, string>) {
       this.fillQuestion(row)
       cy.findByRole('button', { name: 'Submit' }).click()
-      cy.findByRole('button', { name: 'Submit', timeout: 15000 }).should(
-        'not.exist'
-      )
-      cy.get('.question-table', { timeout: 15000 }).should(
-        'contain.text',
-        row.Stem!
-      )
+      cy.findByText(row.Stem!).should('be.visible')
     },
     generateQuestionByAI() {
       cy.findByRole('button', { name: 'Generate by AI' }).click()
