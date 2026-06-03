@@ -1,6 +1,6 @@
 # Backend slow unit test optimization (top 10%)
 
-Status: in-progress
+Status: done
 
 ## Profiling baseline (2026-06-03)
 
@@ -291,8 +291,43 @@ Status: done
 ---
 
 ### Phase 13: Re-profile and close
-Status: planned
+Status: done
 
-**Next:** Re-run `pnpm backend:test_only`, document before/after top 10%, mark plan done.
+**Result (2026-06-03):** Re-profiled with `CURSOR_DEV=true nix develop -c backend/gradlew -p backend cleanTest test -Dspring.profiles.active=test --no-parallel`. See **After optimization** below.
 
-Re-run full suite, document before/after top 10%, mark plan done.
+---
+
+## After optimization
+
+Command: `CURSOR_DEV=true nix develop -c backend/gradlew -p backend cleanTest test -Dspring.profiles.active=test --no-parallel`
+
+#### Summary
+
+| Metric | Before (baseline) | After |
+|--------|-------------------|-------|
+| Test count | 1163 | **1133** (−30) |
+| Sum of testcase times | — | **9.536s** |
+| Top 10% count | 117 | **114** |
+| Top 10% threshold | ≥ 0.014s | **≥ 0.011s** |
+
+#### Top 15 slowest (post-optimization)
+
+| # | s | test |
+|---|-----|------|
+| 1 | 1.047 | `OpenApiDocsTests#openApiDocsApprovalTest()` |
+| 2 | 0.481 | `ControllerSetupMultipartExceptionTest#returnsPayloadTooLargeForMaxUploadSizeExceeded()` |
+| 3 | 0.273 | `NoteConversationAiReplyServiceTest#shouldGenerateStreamingResponseForConversation()` |
+| 4 | 0.232 | `AiAudioControllerTests$ConvertAudioToTextTests#shouldNotTruncateSRTWhenComplete()` |
+| 5 | 0.211 | `AiQuestionGeneratorShuffleTest#shouldShuffleChoicesInSpecificOrder()` |
+| 6 | 0.186 | `NoteControllerTests$UploadNoteImage#shouldNotAllowUploadForNoteBelongingToAnotherUser()` |
+| 7 | 0.186 | `ConversationMessageControllerAiReplyTests$NewChatTests#chatWithAIAndGetResponse()` |
+| 8 | 0.153 | `DuplicateNoteTitleMvcTest#createNoteAtNotebookRootReturns409WhenTitleDuplicatesAtRoot()` |
+| 9 | 0.149 | `ImageUtilsTest#[2] width = "2001", height = "2", …` |
+| 10 | 0.130 | `PredefinedQuestionServiceRegenerationTest#savesOriginalAsContestedThenRegeneratedQuestion()` |
+| 11 | 0.092 | `ControllerSetupTest#[1] exception = ResponseStatusException: 401 …` |
+| 12 | 0.085 | `AiControllerTest$GetModelVersions#shouldGetModelVersionsCorrectly()` |
+| 13 | 0.082 | `GcsBookStorageTest#get_emptyWhenNoBlob()` |
+| 14 | 0.082 | `ApplicationControllerProdDeepLinkTests#prodDeepLinkRoutesReturnHtmlFromConfiguredSpaOrigin()` |
+| 15 | 0.075 | `ConversationMessageControllerTest$ConversationOrderingTests#returnsAtMost50Conversations()` |
+
+**Commits (phases 1–12):** `0dc92dc4b9`, `01465f1a3c`, `d6b713599b`, `5a3f7c34b3`, `4022a1c088`, `f73fbbdffa`, `f240529b30`, `a34f5320b8`, `dd5d8b1b8e`, `2186637fe4`, `34ad90bd72`, `d8d678b48a`, `e91813d279`.
