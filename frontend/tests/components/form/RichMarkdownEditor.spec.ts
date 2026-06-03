@@ -18,7 +18,7 @@ describe("RichMarkdownEditor", () => {
   })
 
   it("converts pasted HTML to markdown", async () => {
-    await h.mountEditor("")
+    await h.mountEditor("", { attachToBody: true })
     await h.dispatchPasteHtmlToQuill("<p><strong>Bold text</strong></p>")
     const emitted = h.getWrapper().emitted()["update:modelValue"]
     expect(emitted?.length).toBeGreaterThan(0)

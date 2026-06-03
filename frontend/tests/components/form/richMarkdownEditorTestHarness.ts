@@ -104,16 +104,20 @@ export function createRichMarkdownEditorTestHarness() {
     await flushPromises()
   }
 
-  async function mountEditor(initialValue: string, options = {}) {
+  async function mountEditor(
+    initialValue: string,
+    options: Record<string, unknown> & { attachToBody?: boolean } = {}
+  ) {
+    const { attachToBody = false, ...props } = options
     wrapper = helper
       .component(RichMarkdownEditor)
       .withRouter()
       .withProps({
         modelValue: initialValue,
         wikiTitles: [],
-        ...options,
+        ...props,
       })
-      .mount({ attachTo: document.body })
+      .mount(attachToBody ? { attachTo: document.body } : undefined)
     await flushPromises()
     return wrapper
   }

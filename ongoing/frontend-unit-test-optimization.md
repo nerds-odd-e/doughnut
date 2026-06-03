@@ -172,11 +172,13 @@ Status: done
 ---
 
 ### Phase 11: FolderPage / SearchDialog / InsertWikiLink batch
-Status: planned
+Status: done
+
+**Result (2026-06-03):** Added `searchDebounceTestSupport` with exact debounce advance. Merged duplicate FolderPage merge-conflict tests into `it.each`; dropped `attachTo: document.body` where popups do not need it. Replaced `findByRole`/`findByPlaceholderText`/`vi.waitUntil` with `getByText`/`getByTitle`/`getByPlaceholderText` and sync assertions in SearchDialog and InsertWikiLink. RichMarkdownEditor harness uses `attachToBody` only for focus/preset/paste paths; readonly Properties uses scoped `h4`/`dl` queries; property-key focus uses sync `activeElement` after one rAF. **62** scoped tests; full suite **1370** pass (~21s wall).
 
 **Scope:** `tests/pages/FolderPage.spec.ts`, `tests/links/InsertWikiLink.spec.ts`, `tests/links/SearchDialog.spec.ts`, `tests/components/form/RichMarkdownEditor.properties.spec.ts`
 
-**Tests (10):** batch 11 from profiling.
+**Tests (10):** FolderPage merge confirm 409; InsertWikiLink wiki property; SearchDialog moveNoteToFolder; moveNoteToNotebookRoot; read-only Properties YAML; preset dropdown excludes keys; focus property key after insert; rewrite dead link; soft-deleted move confirm; FolderPage move 409 cancel.
 
 **Verify:** scoped files then full suite.
 

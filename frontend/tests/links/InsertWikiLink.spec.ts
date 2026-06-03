@@ -9,20 +9,12 @@ import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import MakeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
+import { advanceSearchDebounce } from "@tests/helpers/searchDebounceTestSupport"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { nextTick } from "vue"
-
-const SEARCH_DEBOUNCE_MS = 1000
 
 describe("InsertWikiLink", () => {
   const insertedTexts: string[] = []
   const wikiPropertyInserted: string[] = []
-
-  async function waitForSearchDebounce() {
-    await nextTick()
-    vi.advanceTimersByTime(SEARCH_DEBOUNCE_MS + 100)
-    await flushPromises()
-  }
 
   function setupInserters(wikiPropertyCanInsert = false) {
     const {
@@ -44,7 +36,10 @@ describe("InsertWikiLink", () => {
     ])
   }
 
-  function mountSearchForm(note: Note, options?: { withRouter?: boolean }) {
+  async function mountSearchForm(
+    note: Note,
+    options?: { withRouter?: boolean }
+  ) {
     let builder = helper
       .component(SearchForm)
       .withCleanStorage()
@@ -52,15 +47,9 @@ describe("InsertWikiLink", () => {
     if (options?.withRouter) {
       builder = builder.withRouter()
     }
-    return builder.render()
-  }
-
-  async function searchAndOpenLinkChoice(searchKey: string) {
-    const searchInput = await screen.findByPlaceholderText("Search")
-    fireEvent.update(searchInput, searchKey)
-    await waitForSearchDebounce()
-    fireEvent.click(screen.getByText("Add link"))
+    builder.render()
     await flushPromises()
+    return screen.getByPlaceholderText("Search")
   }
 
   beforeEach(() => {
@@ -83,9 +72,12 @@ describe("InsertWikiLink", () => {
     const note = MakeMe.aNote.please()
     const targetResult = MakeMe.aNoteSearchResult.title("Target CI").please()
     mockRelationshipSearch(targetResult)
-    mountSearchForm(note)
+    const searchInput = await mountSearchForm(note)
 
-    await searchAndOpenLinkChoice("CI")
+    fireEvent.update(searchInput, "CI")
+    await advanceSearchDebounce()
+    fireEvent.click(screen.getByText("Add link"))
+    await flushPromises()
 
     expect(
       screen.queryByText("Add wiki link as a new property")
@@ -101,9 +93,12 @@ describe("InsertWikiLink", () => {
     const note = MakeMe.aNote.please()
     const targetResult = MakeMe.aNoteSearchResult.title("Sedation").please()
     mockRelationshipSearch(targetResult)
-    mountSearchForm(note, { withRouter: true })
+    const searchInput = await mountSearchForm(note, { withRouter: true })
 
-    await searchAndOpenLinkChoice("Sed")
+    fireEvent.update(searchInput, "Sed")
+    await advanceSearchDebounce()
+    fireEvent.click(screen.getByText("Add link"))
+    await flushPromises()
 
     fireEvent.click(screen.getByText("Add a new relationship note"))
     await flushPromises()
@@ -118,9 +113,12 @@ describe("InsertWikiLink", () => {
     const note = MakeMe.aNote.please()
     const targetResult = MakeMe.aNoteSearchResult.title("PropTarget").please()
     mockRelationshipSearch(targetResult)
-    mountSearchForm(note)
+    const searchInput = await mountSearchForm(note)
 
-    await searchAndOpenLinkChoice("Prop")
+    fireEvent.update(searchInput, "Prop")
+    await advanceSearchDebounce()
+    fireEvent.click(screen.getByText("Add link"))
+    await flushPromises()
 
     fireEvent.click(screen.getByText("Add wiki link as a new property"))
     await flushPromises()

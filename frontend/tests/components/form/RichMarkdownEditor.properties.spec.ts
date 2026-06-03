@@ -56,13 +56,15 @@ topic: training
 
 Main content here.`
     const wrapper = await h.mountEditor(markdown, { readonly: true })
-    await flushPromises()
 
-    expect(wrapper.text()).toContain("Properties")
-    expect(wrapper.text()).toContain("diligence")
-    expect(wrapper.text()).toContain("high")
-    expect(wrapper.text()).toContain("topic")
-    expect(wrapper.text()).toContain("training")
+    const propertiesHeading = wrapper.find("h4")
+    expect(propertiesHeading.exists()).toBe(true)
+    expect(propertiesHeading.text()).toBe("Properties")
+    const readOnlyList = wrapper.find("dl")
+    expect(readOnlyList.text()).toContain("diligence")
+    expect(readOnlyList.text()).toContain("high")
+    expect(readOnlyList.text()).toContain("topic")
+    expect(readOnlyList.text()).toContain("training")
 
     const quill = wrapper.findComponent({ name: "QuillEditor" })
     const html = String(quill.props("modelValue"))
@@ -100,7 +102,7 @@ Body`,
     }) => {
       matchMediaSpy = mockCoarsePointer(true)
       mountSoftKeyboardPrimer()
-      await h.mountEditor(markdown)
+      await h.mountEditor(markdown, { attachToBody: true })
       await flushPromises()
       const primer = softKeyboardPrimerElement()
       expect(primer).toBeTruthy()
@@ -117,19 +119,21 @@ Body`,
     }) => {
       matchMediaSpy = mockCoarsePointer(true)
       mountSoftKeyboardPrimer()
-      await h.mountEditor(markdown)
+      await h.mountEditor(markdown, { attachToBody: true })
       await flushPromises()
 
       await h.openAddProperty()
       await h.flushAnimationFrame()
-
-      await waitUntilFocused('[data-testid="rich-note-property-key"]')
+      const keyInput = document.querySelector(
+        '[data-testid="rich-note-property-key"]'
+      )
+      expect(document.activeElement).toBe(keyInput)
     })
 
     it("does not focus primer when pointer is not coarse", async () => {
       matchMediaSpy = mockCoarsePointer(false)
       mountSoftKeyboardPrimer()
-      await h.mountEditor("# Hello Body")
+      await h.mountEditor("# Hello Body", { attachToBody: true })
       await flushPromises()
       const primer = softKeyboardPrimerElement()
 
@@ -144,7 +148,9 @@ Body`,
       async function mountForPropertyValuePrimer(coarse: boolean) {
         matchMediaSpy = mockCoarsePointer(coarse)
         mountSoftKeyboardPrimer()
-        await h.mountEditor(existingPropertyValueMarkdown)
+        await h.mountEditor(existingPropertyValueMarkdown, {
+          attachToBody: true,
+        })
         await flushPromises()
         return softKeyboardPrimerElement()
       }
@@ -184,11 +190,14 @@ Body`,
       it("does not focus primer when pointerdown hits a dead wiki link", async () => {
         matchMediaSpy = mockCoarsePointer(true)
         mountSoftKeyboardPrimer()
-        await h.mountEditor(`---
+        await h.mountEditor(
+          `---
 topic: "[[Missing Note]]"
 ---
 
-Body`)
+Body`,
+          { attachToBody: true }
+        )
         await flushPromises()
         const primer = softKeyboardPrimerElement()
         const deadLink = h
@@ -247,7 +256,7 @@ status: ok
     keyInputTestId,
     existingRows,
   }) => {
-    await h.mountEditor(markdown)
+    await h.mountEditor(markdown, { attachToBody: true })
     if (keyInputTestId === "rich-note-property-key") {
       await h.openAddProperty()
     }
@@ -284,7 +293,7 @@ status: ok
     keyInputTestId,
     presetKey,
   }) => {
-    await h.mountEditor(markdown)
+    await h.mountEditor(markdown, { attachToBody: true })
     if (keyInputTestId === "rich-note-property-key") {
       await h.openAddProperty()
     }
@@ -308,8 +317,7 @@ image: /x.png
 ---
 
 # Body`
-    await h.mountEditor(markdown)
-    await flushPromises()
+    await h.mountEditor(markdown, { attachToBody: true })
     await h.openAddProperty()
     ;(
       h.getWrapper().find('[data-testid="rich-note-property-key"]')

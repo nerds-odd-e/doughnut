@@ -41,7 +41,7 @@ describe("FolderPage move", () => {
         folderRealm,
         fetchFolderPage: vi.fn().mockResolvedValue(undefined),
       })
-      .mount({ attachTo: document.body })
+      .mount()
     return { wrapper, folderRealm }
   }
 
@@ -54,51 +54,29 @@ describe("FolderPage move", () => {
     await flushPromises()
   }
 
-  it("shows a merge confirm when move returns RESOURCE_CONFLICT and retries with merge flag", async () => {
+  it.each([
+    {
+      case: "RESOURCE_CONFLICT",
+      error: {
+        message: "A folder with this name already exists here.",
+        errorType: "RESOURCE_CONFLICT",
+      },
+    },
+    {
+      case: "409 status",
+      error: {
+        status: 409,
+        message: "A folder with this name already exists here.",
+      },
+    },
+  ] as const)("shows merge confirm when move returns $case and retries with merge flag", async ({
+    error,
+  }) => {
     const { wrapper, folderRealm } = mountFolderPage()
-    await flushPromises()
 
     const moveSpy = vi
       .spyOn(NotebookController, "moveFolder")
-      .mockResolvedValue(
-        wrapSdkError({
-          message: "A folder with this name already exists here.",
-          errorType: "RESOURCE_CONFLICT",
-        })
-      )
-
-    await submitMoveForm(wrapper)
-
-    const popup = usePopups().popups.peek()?.[0]
-    expect(popup?.type).toBe("confirm")
-    expect(popup?.message).toContain("Merge into it?")
-
-    moveSpy.mockResolvedValueOnce(wrapSdkResponse(folderRealm.folder) as never)
-    usePopups().popups.done(true)
-    await flushPromises()
-
-    expect(moveSpy).toHaveBeenCalledTimes(2)
-    expect(moveSpy).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        body: expect.objectContaining({ merge: true }),
-      })
-    )
-
-    wrapper.unmount()
-  })
-
-  it("shows a merge confirm when move returns 409 and retries with merge flag", async () => {
-    const { wrapper, folderRealm } = mountFolderPage()
-    await flushPromises()
-
-    const moveSpy = vi
-      .spyOn(NotebookController, "moveFolder")
-      .mockResolvedValue(
-        wrapSdkError({
-          status: 409,
-          message: "A folder with this name already exists here.",
-        })
-      )
+      .mockResolvedValue(wrapSdkError(error))
 
     await submitMoveForm(wrapper)
 
@@ -122,7 +100,6 @@ describe("FolderPage move", () => {
 
   it("shows error message when move 409 and user cancels merge", async () => {
     const { wrapper } = mountFolderPage()
-    await flushPromises()
 
     vi.spyOn(NotebookController, "moveFolder").mockResolvedValue(
       wrapSdkError({
@@ -168,7 +145,7 @@ describe("FolderPage move", () => {
         folderRealm: realmAtRoot,
         fetchFolderPage,
       })
-      .mount({ attachTo: document.body })
+      .mount()
     await flushPromises()
 
     await wrapper.get('[data-testid="folder-move-parent-select"]').setValue("1")
@@ -195,7 +172,6 @@ describe("FolderPage move", () => {
 
   it("navigates to the destination folder after a confirmed merge move", async () => {
     const { wrapper, folderRealm } = mountFolderPage(10, "Shared")
-    await flushPromises()
     const targetFolder = makeMe.aFolder.folder(99, "Shared").please()
 
     vi.spyOn(NotebookController, "moveFolder")
@@ -250,13 +226,12 @@ describe("FolderPage dissolve", () => {
         folderRealm,
         fetchFolderPage: vi.fn().mockResolvedValue(undefined),
       })
-      .mount({ attachTo: document.body })
+      .mount()
     return { wrapper, folderRealm }
   }
 
   it("shows merge confirm when dissolve returns 409 and retries with merge=true", async () => {
     const { wrapper } = mountFolderPage()
-    await flushPromises()
 
     const dissolveSpy = vi
       .spyOn(NotebookController, "dissolveFolder")
@@ -268,9 +243,9 @@ describe("FolderPage dissolve", () => {
         })
       )
 
-    const dissolveBtn = wrapper.find('[data-testid="folder-dissolve-button"]')
-
-    dissolveBtn.trigger("click")
+    await wrapper
+      .find('[data-testid="folder-dissolve-button"]')
+      .trigger("click")
     await flushPromises()
     usePopups().popups.done(true)
     await flushPromises()
@@ -293,7 +268,6 @@ describe("FolderPage dissolve", () => {
 
   it("shows inline error when dissolve returns soft-deleted title conflict", async () => {
     const { wrapper } = mountFolderPage()
-    await flushPromises()
 
     const conflictMessage =
       "A note with this title already exists here but was deleted. Restore the deleted note (Undo delete), or choose another title."
@@ -305,8 +279,9 @@ describe("FolderPage dissolve", () => {
       })
     )
 
-    const dissolveBtn = wrapper.find('[data-testid="folder-dissolve-button"]')
-    dissolveBtn.trigger("click")
+    await wrapper
+      .find('[data-testid="folder-dissolve-button"]')
+      .trigger("click")
     await flushPromises()
     usePopups().popups.done(true)
     await flushPromises()

@@ -24,10 +24,9 @@ import {
   dispatchArrowKey,
   testIdSelector,
 } from "@tests/helpers/searchDialogKeyboardTestSupport"
+import { advanceSearchDebounce } from "@tests/helpers/searchDebounceTestSupport"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { defineComponent, nextTick } from "vue"
-
-const SEARCH_DEBOUNCE_MS = 1000
+import { defineComponent } from "vue"
 const searchResultItemSelector = testIdSelector(searchResultItemTestId)
 const searchInputId = "searchTerm-searchKey"
 
@@ -73,15 +72,9 @@ function setupSearchFormSdkMocks() {
   mockSdkService(SearchController, "semanticSearchWithin", [])
 }
 
-async function waitForSearchDebounce() {
-  await nextTick()
-  vi.advanceTimersByTime(SEARCH_DEBOUNCE_MS + 100)
-  await flushPromises()
-}
-
 async function typeInSearch(input: HTMLElement, value: string) {
   fireEvent.update(input, value)
-  await waitForSearchDebounce()
+  await advanceSearchDebounce()
 }
 
 async function renderSearchForm(
@@ -103,7 +96,7 @@ async function renderSearchForm(
   }
   chain.withProps(props).render()
   await flushPromises()
-  return screen.findByPlaceholderText("Search")
+  return screen.getByPlaceholderText("Search")
 }
 
 async function confirmMovePopup() {
@@ -124,16 +117,11 @@ describe("SearchForm", () => {
       .withCleanStorage()
       .withProps({ note: null })
       .render()
-    await screen.findByPlaceholderText("Search")
+    await flushPromises()
+    screen.getByPlaceholderText("Search")
+    expect(screen.getByTitle("Semantic search")).toBeInTheDocument()
     expect(
-      await screen.findByRole("button", {
-        name: "Semantic search",
-      })
-    ).toBeInTheDocument()
-    expect(
-      await screen.findByRole("button", {
-        name: "All My Notebooks And Subscriptions",
-      })
+      screen.getByTitle("All My Notebooks And Subscriptions")
     ).toBeDisabled()
   })
 
@@ -149,10 +137,8 @@ describe("SearchForm", () => {
         .withProps({ note: null })
         .render()
       await flushPromises()
-      const searchInput = await screen.findByPlaceholderText("Search")
-      await vi.waitUntil(() => allSearchResultItems().length >= count, {
-        timeout: 2000,
-      })
+      const searchInput = screen.getByPlaceholderText("Search")
+      expect(allSearchResultItems().length).toBeGreaterThanOrEqual(count)
       return searchInput
     }
 
@@ -184,21 +170,13 @@ describe("SearchForm", () => {
   it("toggle search settings", async () => {
     const note = MakeMe.aNote.please()
     helper.component(SearchForm).withCleanStorage().withProps({ note }).render()
-    ;(await screen.findByRole("button", { name: "All My Circles" })).click()
-    expect(
-      await screen.findByRole("button", {
-        name: "All My Notebooks And Subscriptions",
-      })
-    ).toHaveClass("text-primary")
-    flushPromises()
-    ;(
-      await screen.findByRole("button", {
-        name: "All My Notebooks And Subscriptions",
-      })
-    ).click()
-    expect(
-      await screen.findByRole("button", { name: "All My Circles" })
-    ).not.toHaveClass("text-primary")
+    await flushPromises()
+    screen.getByTitle("All My Circles").click()
+    expect(screen.getByTitle("All My Notebooks And Subscriptions")).toHaveClass(
+      "text-primary"
+    )
+    screen.getByTitle("All My Notebooks And Subscriptions").click()
+    expect(screen.getByTitle("All My Circles")).not.toHaveClass("text-primary")
   })
 
   describe("debounced search flows", () => {
@@ -221,7 +199,7 @@ describe("SearchForm", () => {
         ])
         const searchInput = await renderSearchForm({ note }, options)
         await typeInSearch(searchInput, "Target")
-        fireEvent.click(await screen.findByRole("button", { name: "Add link" }))
+        fireEvent.click(screen.getByText("Add link"))
         await flushPromises()
       }
 
@@ -229,13 +207,9 @@ describe("SearchForm", () => {
         const note = MakeMe.aNote.please()
         await openAddLinkChoice(note)
 
+        expect(screen.getByText("Insert as a wiki link")).toBeInTheDocument()
         expect(
-          await screen.findByRole("button", { name: "Insert as a wiki link" })
-        ).toBeInTheDocument()
-        expect(
-          await screen.findByRole("button", {
-            name: "Add a new relationship note",
-          })
+          screen.getByText("Add a new relationship note")
         ).toBeInTheDocument()
       })
 
@@ -243,16 +217,10 @@ describe("SearchForm", () => {
         const note = MakeMe.aNote.please()
         await openAddLinkChoice(note, { router: true })
 
-        fireEvent.click(
-          await screen.findByRole("button", {
-            name: "Add a new relationship note",
-          })
-        )
+        fireEvent.click(screen.getByText("Add a new relationship note"))
         await flushPromises()
 
-        expect(
-          await screen.findByText("Complete relationship")
-        ).toBeInTheDocument()
+        expect(screen.getByText("Complete relationship")).toBeInTheDocument()
       })
     })
 
@@ -265,9 +233,7 @@ describe("SearchForm", () => {
         ])
         const searchInput = await renderSearchForm({ note })
         await typeInSearch(searchInput, "Arc")
-        fireEvent.click(
-          await screen.findByRole("button", { name: "Move Under" })
-        )
+        fireEvent.click(screen.getByText("Move Under"))
         await flushPromises()
       }
 
@@ -339,9 +305,7 @@ describe("SearchForm", () => {
 
         expect(spy).not.toHaveBeenCalled()
 
-        fireEvent.click(
-          await screen.findByRole("button", { name: "Move to notebook root" })
-        )
+        fireEvent.click(screen.getByText("Move to notebook root"))
         await flushPromises()
         await confirmMovePopup()
 
@@ -374,10 +338,11 @@ describe("SearchForm", () => {
           .withCleanStorage()
           .withProps({ note, deadLinkPayload })
           .render()
+        await flushPromises()
 
-        const searchInput = await screen.findByPlaceholderText("Search")
+        const searchInput = screen.getByPlaceholderText("Search")
         expect(searchInput).toHaveValue("original text")
-        await waitForSearchDebounce()
+        await advanceSearchDebounce()
 
         expect(searchSpy).toHaveBeenCalledWith(
           expect.objectContaining({
@@ -396,11 +361,11 @@ describe("SearchForm", () => {
         const searchInput = await renderSearchForm({ note, deadLinkPayload })
         await typeInSearch(searchInput, "Selected")
 
-        fireEvent.click(await screen.findByText("Add link"))
+        fireEvent.click(screen.getByText("Add link"))
         await flushPromises()
 
         expect(
-          await screen.findByText('Link "original text" to this note')
+          screen.getByText('Link "original text" to this note')
         ).toBeInTheDocument()
       })
 
@@ -429,11 +394,9 @@ describe("SearchForm", () => {
         )
         await typeInSearch(searchInput, "Selected")
 
-        fireEvent.click(await screen.findByText("Add link"))
+        fireEvent.click(screen.getByText("Add link"))
         await flushPromises()
-        fireEvent.click(
-          await screen.findByText('Link "original text" to this note')
-        )
+        fireEvent.click(screen.getByText('Link "original text" to this note'))
         await flushPromises()
 
         expect(updateSpy).toHaveBeenCalledTimes(1)
