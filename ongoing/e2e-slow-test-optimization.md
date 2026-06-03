@@ -99,8 +99,7 @@ Status: done
 
 ---
 
-### Phase 8: creating_circles + predefined_questions_management
-Status: planned
+ongoing/e2e-slow-test-optimization.md
 
 ---
 

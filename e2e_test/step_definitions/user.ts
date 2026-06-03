@@ -35,7 +35,7 @@ Given('I am re-logged in as an admin', (_tabName: string) => {
 })
 
 Given('my session is logged out', () => {
-  start.pageIsNotLoading().logout()
+  return start.pageIsNotLoading().logout()
 })
 
 Given("I'm on the login page", () => {
@@ -64,6 +64,7 @@ When('I save my profile with:', (data: DataTable) => {
   cy.get('input[value="Submit"]').click()
   cy.findByRole('heading', {
     name: /Please create your profile/i,
+    timeout: 15000,
   }).should('not.exist')
   start.pageIsNotLoading()
 })

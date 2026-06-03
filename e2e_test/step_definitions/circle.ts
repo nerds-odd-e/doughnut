@@ -44,7 +44,9 @@ When('I join the circle', () => {
   cy.get('#join-circle-invitationCode', { timeout: 15000 })
     .invoke('val')
     .should('not.be.empty')
-  cy.get('input[value="Join"]').click()
+  cy.intercept('POST', '**/api/circles/join').as('joinCircle')
+  cy.get('form').submit()
+  cy.wait('@joinCircle').its('response.statusCode').should('eq', 200)
   cy.url({ timeout: 15000 }).should('match', /\/circles\/\d+/)
   start.pageIsNotLoading()
 })
@@ -60,9 +62,9 @@ Then(
 Given(
   'circle {string} exists for {string} with invitation link saved',
   (circleName: string, memberExternalId: string) => {
-    start.testability().injectCircle({ circleName, members: memberExternalId })
-    start.loginAs(memberExternalId)
-    start.testability().saveCircleInvitationLink(circleName)
+    return start
+      .testability()
+      .injectCircle({ circleName, members: memberExternalId })
   }
 )
 

@@ -46,6 +46,26 @@ export function assumeAdminDashboardPage() {
       }
     },
 
+    openAdminDashboardTab(tabName: string) {
+      const tab = ADMIN_DASHBOARD_TAB_QUERY[tabName]
+      if (!tab) {
+        throw new Error(`Unknown admin dashboard tab: ${tabName}`)
+      }
+      if (tab === 'manageBazaar') {
+        cy.intercept('GET', '**/api/bazaar').as('bazaarAdminList')
+      }
+      cy.visit(`/admin-dashboard?tab=${tab}`)
+      cy.location('search').should('include', `tab=${tab}`)
+      if (tab === 'manageBazaar') {
+        cy.wait('@bazaarAdminList').then((interception) => {
+          expect(interception.response?.statusCode).to.eq(200)
+          expect(interception.response?.body as unknown[]).to.not.be.empty
+        })
+      }
+      pageIsNotLoading()
+      return this
+    },
+
     goToTabInAdminDashboard(tabName: string) {
       const tab = ADMIN_DASHBOARD_TAB_QUERY[tabName]
       if (!tab) {
@@ -53,6 +73,10 @@ export function assumeAdminDashboardPage() {
       }
       cy.findByRole('button', { name: tabName }).click()
       cy.location('search').should('include', `tab=${tab}`)
+      cy.findByRole('button', { name: tabName }).should(
+        'have.class',
+        'daisy-tab-active'
+      )
       pageIsNotLoading()
       return this
     },
@@ -68,12 +92,17 @@ export function assumeAdminDashboardPage() {
 
     expectBazaarAdminNotebooks(notebooks: string) {
       pageIsNotLoading()
+      cy.location('pathname').should('include', 'admin-dashboard')
       cy.location('search').should('include', 'tab=manageBazaar')
       const expected = commonSenseSplit(notebooks, ',')
+      cy.get('[data-testid="manage-bazaar-table"] tbody tr', {
+        timeout: 15000,
+      }).should('have.length', expected.length)
       for (const name of expected) {
-        cy.get('.daisy-table tbody tr').contains('a', name)
+        cy.get('[data-testid="manage-bazaar-table"] tbody tr')
+          .contains('a', name)
+          .should('be.visible')
       }
-      cy.get('.daisy-table tbody tr').should('have.length', expected.length)
       return this
     },
 
