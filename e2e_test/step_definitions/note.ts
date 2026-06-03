@@ -425,11 +425,17 @@ When('I navigate to {notepath} note', (notePath: NotePath) => {
   start.navigateToNoteFromPath(notePath)
 })
 
-When('I open note {string}', (noteTitle: string) => {
-  start.jumpToNotePage(noteTitle, true)
-  start.pageIsNotLoading()
-  start.assumeNotePage(noteTitle).switchToRichContent()
-})
+Then(
+  'note {string} should show the rich content elements in the note content:',
+  (noteTitle: string, data: DataTable) => {
+    start.jumpToNotePage(noteTitle, true)
+    start.pageIsNotLoading()
+    start
+      .assumeNotePage(noteTitle)
+      .switchToRichContent()
+      .expectRichContent(data.hashes())
+  }
+)
 
 // This step definition is for demo purpose
 Then(
@@ -746,7 +752,7 @@ Then(
   (linkTitle: string) => {
     start.assumeNotePage().followDeadLink(linkTitle).createNote()
     start.testability().rememberUiCreatedNote(linkTitle)
-    start.assumeNotePage(linkTitle)
+    start.assumeNotePage(linkTitle).expectNoteTitleDisplayed(linkTitle)
   }
 )
 

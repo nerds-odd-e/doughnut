@@ -31,6 +31,20 @@ const assumeMemoryTrackerPage = () => {
       }).should('be.visible')
       return assumeMemoryTrackerPage()
     },
+    expectRecallCount(count: number) {
+      expectMemoryTrackerPage()
+      cy.contains('span.font-semibold', 'Recall Count:')
+        .parent()
+        .should('contain', String(count))
+      return assumeMemoryTrackerPage()
+    },
+    expectSpellingEnabled() {
+      expectMemoryTrackerPage()
+      cy.contains('span.font-semibold', 'Spelling:')
+        .parent()
+        .should('contain', 'Yes')
+      return assumeMemoryTrackerPage()
+    },
   }
 }
 

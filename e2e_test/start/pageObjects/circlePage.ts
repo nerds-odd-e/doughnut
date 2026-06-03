@@ -10,6 +10,9 @@ import notebookCreationForm from './forms/notebookCreationForm'
 export const circleIdAlias = (circleName: string) =>
   `circleId-${circleName.replace(/\s+/g, '-')}`
 
+export const circleNotebookIdAlias = (notebookTitle: string) =>
+  `circleNotebookId-${notebookTitle.replace(/\s+/g, '-')}`
+
 const completeMoveNotebookToNewGroupDialog = (newGroupName: string) => {
   cy.findByRole('dialog', { name: 'Move to group' }).within(() => {
     cy.get('#notebook-catalog-move-to-group-target').select('new')

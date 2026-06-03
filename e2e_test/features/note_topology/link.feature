@@ -45,10 +45,10 @@ Feature: Wiki links in notes
       | a.dead-link       | WikiLinks E2E Missing |
       | a:not(.dead-link) | WikiLinks E2E Tech |
     And I should be able to create a new note by following the dead link "WikiLinks E2E Missing"
-    When I open note "WikiLinks E2E CI"
-    Then I should see the rich content elements in the note content:
+    Then note "WikiLinks E2E CI" should show the rich content elements in the note content:
       | Tag               | Content               |
       | a:not(.dead-link) | WikiLinks E2E Missing |
+      | a:not(.dead-link) | WikiLinks E2E Tech    |
 
   @mockBrowserTime
   Scenario: A dead wiki link can be relinked to an existing note

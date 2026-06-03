@@ -5,6 +5,9 @@
 
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
+import { pageIsNotLoading } from '../start/pageBase'
+import { circleNotebookIdAlias } from '../start/pageObjects/circlePage'
+import notebookPage from '../start/pageObjects/notebookPage'
 
 When(
   'I create a new circle {string} and copy the invitation code',
@@ -86,6 +89,14 @@ When(
   (noteTopology: string, circleName: string) => {
     start.navigateToCircle(circleName).creatingNotebook(noteTopology)
     cy.url().should('match', /\/notebooks\/\d+/)
+    cy.url().then((url) => {
+      const notebookId = url.match(/\/notebooks\/(\d+)/)?.[1]
+      expect(
+        notebookId,
+        `expected notebook id in URL after creating "${noteTopology}"`
+      ).to.exist
+      cy.wrap(notebookId).as(circleNotebookIdAlias(noteTopology))
+    })
     start.pageIsNotLoading().assumeNotePage().expectBreadcrumb(circleName)
   }
 )
@@ -100,11 +111,28 @@ Then(
 When(
   'I add a note {string} under {string}',
   (noteTopology: string, parentNoteTitle: string) => {
-    start
-      .assumeCirclePage()
-      .navigateToNotebook(parentNoteTitle)
-      .addingNewNoteFromToolbar()
-      .createNoteWithTitle(noteTopology)
+    const notebookAlias = circleNotebookIdAlias(parentNoteTitle)
+    cy.wrap(null).then(() => {
+      const aliases = Cypress.state('aliases') as
+        | Record<string, unknown>
+        | undefined
+      if (aliases?.[notebookAlias]) {
+        return cy
+          .get(`@${notebookAlias}`, { log: false })
+          .then((notebookId) => {
+            cy.visit(`/notebooks/${notebookId}`)
+            pageIsNotLoading()
+            return notebookPage()
+              .addingNewNoteFromToolbar()
+              .createNoteWithTitle(noteTopology)
+          })
+      }
+      return start
+        .assumeCirclePage()
+        .navigateToNotebook(parentNoteTitle)
+        .addingNewNoteFromToolbar()
+        .createNoteWithTitle(noteTopology)
+    })
   }
 )
 

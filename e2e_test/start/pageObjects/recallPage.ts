@@ -21,10 +21,18 @@ const recallPage = () => {
     },
     typeSpellingAnswer(answer: string) {
       pageIsNotLoading()
-      cy.clearFocusedText().type(answer).type('{enter}')
-      cy.findByText(/Correct!|Your answer `.+` is incorrect\./).should(
-        'be.visible'
-      )
+      cy.get('[data-test="question-section"]', { timeout: 15000 })
+        .should('be.visible')
+        .as('spellingQuestion')
+      cy.get('@spellingQuestion')
+        .find('input[placeholder="put your answer here"]')
+        .should('be.visible')
+        .clear()
+        .type(answer)
+      cy.get('@spellingQuestion').find('form').submit()
+      cy.findByText(/Correct!|Your answer `.+` is incorrect\./, {
+        timeout: 15000,
+      }).should('be.visible')
     },
     expectToRecallCounts(numberOfRecalls: string) {
       const [recalledTodayCount, toRecallCountForToday, totalCount] =

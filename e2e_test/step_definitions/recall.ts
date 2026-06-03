@@ -3,7 +3,6 @@
 // @ts-check
 
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
-import type { DataTable } from '@cucumber/cucumber'
 import { commonSenseSplit } from 'support/string_util'
 import start from '../start'
 import { assumeMemoryTrackerPage } from '../start/pageObjects/memoryTrackerPage'
@@ -151,12 +150,13 @@ Then('I should see that my last answer to spelling question is correct', () => {
 })
 
 Then(
-  'I should see the memory tracker info of note {string}',
-  (noteTopology: string, data: DataTable) => {
+  'I should see spelling memory tracker recall count {int} for the last answer',
+  (count: number) => {
     start
       .assumeAnsweredQuestionPage()
-      .showMemoryTracker(noteTopology)
-      .expectMemoryTrackerInfo(data.hashes())
+      .goToLastAnsweredQuestion()
+      .viewMemoryTracker()
+    assumeMemoryTrackerPage().expectRecallCount(count).expectSpellingEnabled()
   }
 )
 

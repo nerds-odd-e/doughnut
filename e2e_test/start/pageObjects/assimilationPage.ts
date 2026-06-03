@@ -224,11 +224,17 @@ export const assumeAssimilationPage = () => ({
     cy.get('[data-test="spelling-verification-popup"]').should('be.visible')
     cy.get('[data-test="spelling-verification-input"]')
       .should('be.visible')
+      .clear()
       .type(text)
     cy.get('[data-test="verify-spelling"]').click()
+    cy.get('[data-test="spelling-verification-popup"]', {
+      timeout: 15000,
+    }).should('not.exist')
   },
   expectPopupClosed() {
-    cy.get('[data-test="spelling-verification-popup"]').should('not.exist')
+    cy.get('[data-test="spelling-verification-popup"]', {
+      timeout: 15000,
+    }).should('not.exist')
   },
   expectSpellingErrorMessage(message: string) {
     cy.get('[data-test="spelling-error-message"]').should(

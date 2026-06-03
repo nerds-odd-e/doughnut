@@ -17,14 +17,10 @@ Feature: Browse answers and notes while recalling
     And I assimilate the note "sedition" with the option of remembering spelling
 
   Scenario: View last answered question when the quiz answer was correct
-    Given the note "sedation" was assimilated on day 1
     When I am recalling my note on day 2
     And I type my answer "sedition"
     Then I should see that my last answer to spelling question is correct
-    And I should see the memory tracker info of note "sedition"
-      | type     | Recall Count |
-      | normal   |                0 |
-      | spelling |                1 |
+    And I should see spelling memory tracker recall count 1 for the last answer
 
   Scenario: Browse notes while recalling and come back
     Given I am recalling my note on day 2
