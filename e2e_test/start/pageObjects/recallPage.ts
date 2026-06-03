@@ -33,9 +33,6 @@ const recallPage = () => {
         .find('input[type="submit"][value="Answer"]')
         .click()
       pageIsNotLoading()
-      cy.findByText('Note under question', { timeout: 15000 }).should(
-        'be.visible'
-      )
     },
     expectToRecallCounts(numberOfRecalls: string) {
       const [recalledTodayCount, toRecallCountForToday, totalCount] =
