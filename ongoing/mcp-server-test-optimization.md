@@ -1,6 +1,6 @@
 # MCP server unit test optimization
 
-Status: in-progress
+Status: done
 
 ## Profiling baseline (2026-06-03)
 
@@ -105,6 +105,31 @@ Status: done
 ---
 
 ### Phase 5: Re-profile and close
-Status: planned
+Status: done
 
-Re-run JSON reporter; record new top 10 and total test count in this file. Mark plan complete.
+**After (2026-06-03):** `pnpm mcp-server:test` — **15 tests**, 6 files, Vitest **~219ms** (tests 15ms, import 571ms). No sleeps in tests.
+
+#### Top 10 slowest (post-optimization)
+
+| # | ms | file | test |
+|---|-----|------|------|
+| 1 | 2 | tests/tools/tool-builder.test.ts | checks draft-07 in generated schema… |
+| 2 | 2 | tests/tools/find-most-relevant-note.test.ts | should extract query when args is an object with query property |
+| 3 | 1 | tests/helpers.test.ts | should handle Error objects (test.each row) |
+| 4 | 1 | tests/tool-schemas.test.ts | each tool has JSON object input schema |
+| 5 | 1 | tests/server.test.ts | exposes expected tools with required shape |
+| 6 | 1 | tests/tools/get-note-graph.test.ts | returns error when tokenLimit is 0 |
+| 7 | 1 | tests/tools/get-note-graph.test.ts | returns error when tokenLimit is 5 |
+| 8 | 1 | tests/tools/get-note-graph.test.ts | should successfully fetch graph with valid tokenLimit |
+| 9 | 0 | tests/tool-schemas.test.ts | each tool exposes an async handler |
+| 10 | 0 | tests/helpers.test.ts | remaining test.each rows |
+
+#### Summary
+
+| Metric | Before | After |
+|--------|--------|-------|
+| Test count | 29 | **15** |
+| Test files | 7 | **6** (`server-config.test.ts` removed) |
+| Redundant handler invocations | yes | **no** |
+
+**Commits:** `0c05d56ef2` (phase 1), `c23398aaa3` (phase 2), `95ab1de53d` (phases 3–4).
