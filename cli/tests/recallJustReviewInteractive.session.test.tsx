@@ -1,4 +1,8 @@
 import { describeRecallJustReviewInteractive } from './recallJustReviewInteractive.suite.js'
+import {
+  waitBusyRecordReview,
+  waitLoadingNextQuestion,
+} from './recallInteractiveShared.js'
 
 describeRecallJustReviewInteractive((api) => {
   const {
@@ -8,10 +12,11 @@ describeRecallJustReviewInteractive((api) => {
     MemoryTrackerController,
     RecallsController,
     InteractiveCliApp,
-    RECALL_LOADING_NEXT_QUESTION_LABEL,
     renderInkWhenCommandLineReady,
     waitForLastFrame,
     waitRememberCard,
+    mockDeferredMarkAsRecalled,
+    mockShowMemoryTrackerSecondCardDelayed,
     waitLoadMore,
     waitRecalledSummary,
     emptyEnterAndInvalidLineStayOnRemember,
@@ -25,15 +30,7 @@ describeRecallJustReviewInteractive((api) => {
   } = api
   test('shows busy label in bordered input while markAsRecalled is pending', async () => {
     mockShowMemoryTrackerCardForRealm(alphaNoteRealm())
-    let resolveMark!: (
-      value: Awaited<ReturnType<typeof MemoryTrackerController.markAsRecalled>>
-    ) => void
-    const markPromise = new Promise<
-      Awaited<ReturnType<typeof MemoryTrackerController.markAsRecalled>>
-    >((resolve) => {
-      resolveMark = resolve
-    })
-    api.markAsRecalledSpy.mockImplementation(() => markPromise)
+    const { resolveMark } = mockDeferredMarkAsRecalled()
 
     const { stdin, ...ink } = await renderInkWhenCommandLineReady(
       <InteractiveCliApp />
@@ -43,7 +40,7 @@ describeRecallJustReviewInteractive((api) => {
     await waitRememberCard(ink, 'Alpha', { ynHint: true })
     stdin.write('y\r')
 
-    await ink.waitForLastFrameToInclude(/Recording review…/)
+    await waitBusyRecordReview(ink)
 
     resolveMark({
       data: makeMe.aMemoryTracker.please(),
@@ -75,36 +72,12 @@ describeRecallJustReviewInteractive((api) => {
       .updatedAt(baseNoteTimes.updatedAt)
       .please()
 
-    let resolveMt2!: (
-      value: Awaited<
-        ReturnType<typeof MemoryTrackerController.showMemoryTracker>
-      >
-    ) => void
-    const mt2Promise = new Promise<
-      Awaited<ReturnType<typeof MemoryTrackerController.showMemoryTracker>>
-    >((resolve) => {
-      resolveMt2 = resolve
-    })
+    const { resolveSecondCard } = mockShowMemoryTrackerSecondCardDelayed(
+      noteRealmAlpha,
+      noteRealmBeta
+    )
 
-    api.showMemoryTrackerSpy.mockImplementation(async (opts) => {
-      const id = opts.path.memoryTracker
-      if (id === 1) {
-        return {
-          data: makeMe.aMemoryTracker
-            .nextRecallAt('2026-06-01T00:00:00Z')
-            .ofNote(noteRealmAlpha)
-            .please(),
-        } as Awaited<
-          ReturnType<typeof MemoryTrackerController.showMemoryTracker>
-        >
-      }
-      if (id === 2) {
-        return mt2Promise
-      }
-      throw new Error(`unexpected memoryTracker ${String(id)}`)
-    })
-
-    const { stdin, lastFrame, ...ink } = await renderInkWhenCommandLineReady(
+    const { stdin, ...ink } = await renderInkWhenCommandLineReady(
       <InteractiveCliApp />
     )
 
@@ -112,13 +85,9 @@ describeRecallJustReviewInteractive((api) => {
     await waitRememberCard(ink, 'Alpha', { ynHint: true })
     stdin.write('y\r')
 
-    await waitForLastFrame(
-      lastFrame,
-      (p) =>
-        p.includes(RECALL_LOADING_NEXT_QUESTION_LABEL) && !p.includes('(y/n)')
-    )
+    await waitLoadingNextQuestion(ink)
 
-    resolveMt2({
+    resolveSecondCard({
       data: makeMe.aMemoryTracker
         .nextRecallAt('2026-06-01T00:00:00Z')
         .ofNote(noteRealmBeta)

@@ -7,8 +7,12 @@ import {
 import type { NoteRealm, RecallPrompt } from 'doughnut-api'
 import makeMe from 'doughnut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
-import { RECALL_LOADING_NEXT_QUESTION_LABEL } from '../src/commands/recall/recallBusyInputCopy.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
+import {
+  deferred,
+  waitBusySubmitAnswer,
+  waitLoadingNextQuestion,
+} from './recallInteractiveShared.js'
 import { pressEscape, renderInkWhenCommandLineReady } from './inkTestHelpers.js'
 import {
   leaveRecallWithYnRe,
@@ -177,10 +181,7 @@ describe('recall MCQ (interactive)', () => {
     await waitMcqIncorrectOnLastFrame(ink)
     await waitMcqLoadMore(ink)
 
-    const plain = ink.lastStrippedFrame()
-    expect(plain).toContain('Incorrect.')
-    expect(plain).toContain('Beta')
-
+    expect(ink.lastStrippedFrame()).toContain('Beta')
     expect(answerQuizSpy).toHaveBeenCalledTimes(1)
     expect(answerQuizSpy).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -193,14 +194,8 @@ describe('recall MCQ (interactive)', () => {
   test('shows busy label in bordered input while answerQuiz is pending', async () => {
     mockSingleMcqDue()
     const pending = pendingMcqPrompt()
-    let resolveAnswer!: (
-      value: Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>
-    ) => void
-    const answerPromise = new Promise<
-      Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>
-    >((resolve) => {
-      resolveAnswer = resolve
-    })
+    const { promise: answerPromise, resolve: resolveAnswer } =
+      deferred<Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>>()
     answerQuizSpy.mockImplementation(() => answerPromise)
 
     const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
@@ -208,7 +203,7 @@ describe('recall MCQ (interactive)', () => {
     startRecall(ink.stdin)
     await waitMcqVisible(ink)
     ink.stdin.write('2\r')
-    await ink.waitForLastFrameToInclude('Submitting answer…')
+    await waitBusySubmitAnswer(ink)
 
     resolveAnswer({
       data: mcqAnsweredPrompt(pending, {
@@ -282,7 +277,7 @@ describe('recall MCQ (interactive)', () => {
     await waitMcqVisible(ink)
     ink.stdin.write('2\r')
 
-    await ink.waitForLastFrameToInclude(RECALL_LOADING_NEXT_QUESTION_LABEL)
+    await waitLoadingNextQuestion(ink)
 
     resolvePrompts2({
       data: [secondPrompt],

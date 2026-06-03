@@ -7,13 +7,13 @@ import {
 import type { NoteRealm, RecallPrompt } from 'doughnut-api'
 import makeMe from 'doughnut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
-import { RECALL_LOADING_NEXT_QUESTION_LABEL } from '../src/commands/recall/recallBusyInputCopy.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import {
-  pressEscape,
-  renderInkWhenCommandLineReady,
-  stripAnsi,
-} from './inkTestHelpers.js'
+  deferred,
+  waitBusySubmitAnswer,
+  waitLoadingSpellingNext,
+} from './recallInteractiveShared.js'
+import { pressEscape, renderInkWhenCommandLineReady } from './inkTestHelpers.js'
 import {
   leaveRecallWithYnRe,
   startRecall,
@@ -148,8 +148,9 @@ describe('recall spelling (interactive)', () => {
       }),
     } as Awaited<ReturnType<typeof RecallPromptController.answerSpelling>>)
 
-    const { stdin, lastFrame, waitForLastFrameRaw, ...ink } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+    const { stdin, ...ink } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
 
     startRecall(stdin)
     await waitSpellingPromptVisible(ink)
@@ -157,19 +158,7 @@ describe('recall spelling (interactive)', () => {
     stdin.write('typo\r')
     await waitSpellingIncorrect(ink, 'typo')
 
-    await waitForLastFrameRaw((raw) => {
-      const incorrectIdx = raw.indexOf('Incorrect.')
-      if (incorrectIdx < 0) {
-        return false
-      }
-      const beforeIncorrect = raw.slice(0, incorrectIdx)
-      return (
-        beforeIncorrect.includes('\u001b[31m') ||
-        beforeIncorrect.includes('\u001b[91m')
-      )
-    })
-
-    const plain = stripAnsi(lastFrame() ?? '')
+    const plain = ink.lastStrippedFrame()
     expect(plain).not.toContain('Correct!')
     expect(plain).not.toContain('Recalled successfully')
 
@@ -186,14 +175,10 @@ describe('recall spelling (interactive)', () => {
     mockRecallingFirstThenEmpty()
 
     const pending = pendingSpellingPrompt()
-    let resolveAnswer!: (
-      value: Awaited<ReturnType<typeof RecallPromptController.answerSpelling>>
-    ) => void
-    const answerPromise = new Promise<
-      Awaited<ReturnType<typeof RecallPromptController.answerSpelling>>
-    >((resolve) => {
-      resolveAnswer = resolve
-    })
+    const { promise: answerPromise, resolve: resolveAnswer } =
+      deferred<
+        Awaited<ReturnType<typeof RecallPromptController.answerSpelling>>
+      >()
     answerSpellingSpy.mockImplementation(() => answerPromise)
 
     const { stdin, ...ink } = await renderInkWhenCommandLineReady(
@@ -205,7 +190,7 @@ describe('recall spelling (interactive)', () => {
 
     stdin.write('typo\r')
 
-    await ink.waitForLastFrameToInclude(/Submitting answer…/)
+    await waitBusySubmitAnswer(ink)
 
     resolveAnswer({
       data: spellingAnsweredPrompt(pending, {
@@ -275,12 +260,7 @@ describe('recall spelling (interactive)', () => {
 
     stdin.write('typo\r')
 
-    await ink.waitUntilLastFrame(
-      (p) =>
-        (p.includes('Loading spelling question') ||
-          p.includes(RECALL_LOADING_NEXT_QUESTION_LABEL)) &&
-        !p.includes(SPELL_PLACEHOLDER_SUBSTR)
-    )
+    await waitLoadingSpellingNext(ink, SPELL_PLACEHOLDER_SUBSTR)
 
     resolveAsk2({
       data: pending2,

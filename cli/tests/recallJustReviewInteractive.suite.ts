@@ -25,13 +25,17 @@ import {
 } from './recallJustReviewInteractive.fixtures.js'
 import {
   mockAlphaBetaNoteCards,
+  mockDeferredMarkAsRecalled,
   mockMarkAsRecalledCounting,
   mockShowMemoryTrackerCardForRealm,
+  mockShowMemoryTrackerSecondCardDelayed,
+  mockTwoDueThenEmptyExtendedRecalling,
   setupTwoDueJustReviewItemsMocks,
 } from './recallJustReviewInteractive.mocks.js'
 import {
   emptyEnterAndInvalidLineStayOnRemember,
   recallSingleAlphaToLoadMore,
+  reachLeaveRecallOnRemember,
   startRecall,
   waitLoadMore,
   waitRecalledSummary,
@@ -73,6 +77,7 @@ export type RecallJustReviewInteractiveApi = {
   waitReturnsToSingleRememberCard: typeof waitReturnsToSingleRememberCard
   emptyEnterAndInvalidLineStayOnRemember: typeof emptyEnterAndInvalidLineStayOnRemember
   recallSingleAlphaToLoadMore: typeof recallSingleAlphaToLoadMore
+  reachLeaveRecallOnRemember: typeof reachLeaveRecallOnRemember
   startRecall: typeof startRecall
   alphaNoteRealm: typeof alphaNoteRealm
   childNoteUnderEnglish: typeof childNoteUnderEnglish
@@ -81,6 +86,22 @@ export type RecallJustReviewInteractiveApi = {
   ) => void
   mockMarkAsRecalledCounting: () => { n: number }
   setupTwoDueJustReviewItemsMocks: () => void
+  mockTwoDueThenEmptyExtendedRecalling: () => void
+  mockDeferredMarkAsRecalled: () => {
+    resolveMark: (
+      value: Awaited<ReturnType<typeof MemoryTrackerController.markAsRecalled>>
+    ) => void
+  }
+  mockShowMemoryTrackerSecondCardDelayed: (
+    firstNoteRealm: ReturnType<typeof alphaNoteRealm>,
+    secondNoteRealm: ReturnType<typeof alphaNoteRealm>
+  ) => {
+    resolveSecondCard: (
+      value: Awaited<
+        ReturnType<typeof MemoryTrackerController.showMemoryTracker>
+      >
+    ) => void
+  }
   mockAlphaBetaNoteCards: () => void
 }
 
@@ -194,6 +215,7 @@ export function describeRecallJustReviewInteractive(
       waitReturnsToSingleRememberCard,
       emptyEnterAndInvalidLineStayOnRemember,
       recallSingleAlphaToLoadMore,
+      reachLeaveRecallOnRemember,
       startRecall,
       alphaNoteRealm,
       childNoteUnderEnglish,
@@ -202,6 +224,11 @@ export function describeRecallJustReviewInteractive(
       mockMarkAsRecalledCounting: () => mockMarkAsRecalledCounting(spies()),
       setupTwoDueJustReviewItemsMocks: () =>
         setupTwoDueJustReviewItemsMocks(spies()),
+      mockTwoDueThenEmptyExtendedRecalling: () =>
+        mockTwoDueThenEmptyExtendedRecalling(spies()),
+      mockDeferredMarkAsRecalled: () => mockDeferredMarkAsRecalled(spies()),
+      mockShowMemoryTrackerSecondCardDelayed: (first, second) =>
+        mockShowMemoryTrackerSecondCardDelayed(spies(), first, second),
       mockAlphaBetaNoteCards: () => mockAlphaBetaNoteCards(spies()),
     })
   })

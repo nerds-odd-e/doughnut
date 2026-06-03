@@ -55,7 +55,7 @@ Status: done
 ---
 
 ### Phase 2: Recall escape + busy states (10 tests)
-Status: planned
+Status: done
 
 **Scope files:**
 - `cli/tests/recallJustReviewInteractive.session.test.tsx` (2)
@@ -77,6 +77,8 @@ Status: planned
 - 649 — escape: Esc + n returns to remember card
 
 **Goals:** Share helpers for “busy label” and “loading next” patterns; table-drive escape confirm variants if shorter; remove duplicate API mock trees.
+
+**Result (2026-06-03):** Added `recallInteractiveShared.ts` (`deferred`, `waitBusyRecordReview`, `waitBusySubmitAnswer`, `waitLoadingNextQuestion`, `waitLoadingSpellingNext`); just-review mocks for deferred mark, delayed second card, and two-due-then-empty extended recalling; `reachLeaveRecallOnRemember` + `test.each` for three escape confirm cases; dropped redundant raw-frame red ANSI poll on wrong spelling and duplicate Incorrect assertion on wrong MCQ. Phase 2 target tests ~133–309ms each in local profile (was ~649–774ms baseline).
 
 ---
 

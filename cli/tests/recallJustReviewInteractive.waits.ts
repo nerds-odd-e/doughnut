@@ -1,4 +1,5 @@
 import { LEAVE_RECALL_PROMPT } from '../src/commands/recall/leaveRecallSessionCopy.js'
+import { pressEscape } from './inkTestHelpers.js'
 
 export type InkWaitHelpers = {
   waitForLastFrameToInclude: (
@@ -99,4 +100,14 @@ export async function recallSingleAlphaToLoadMore(
 
 export function startRecall(stdin: { write(data: string): void }) {
   stdin.write('/recall\r')
+}
+
+export async function reachLeaveRecallOnRemember(
+  stdin: { write(data: string): void },
+  ink: InkWaitHelpers,
+  noteTitle: string
+) {
+  await waitRememberCard(ink, noteTitle)
+  await pressEscape(stdin)
+  await ink.waitForLastFrameToInclude(/Leave recall\?/)
 }

@@ -17,7 +17,7 @@ describeRecallJustReviewInteractive((api) => {
     alphaNoteRealm,
     mockShowMemoryTrackerCardForRealm,
     mockMarkAsRecalledCounting,
-    mockAlphaBetaNoteCards,
+    mockTwoDueThenEmptyExtendedRecalling,
   } = api
   test('load more empty Enter uses default yes → Recalled 1 note', async () => {
     const markAsRecalledCount = mockMarkAsRecalledCounting()
@@ -105,27 +105,7 @@ describeRecallJustReviewInteractive((api) => {
   })
 
   test('load more y with empty extended window after two recalls → Recalled 2 notes', async () => {
-    let recallingN = 0
-    api.recallingSpy.mockImplementation(
-      async (opts: Parameters<typeof RecallsController.recalling>[0]) => {
-        recallingN += 1
-        const due = opts.query.dueindays ?? 0
-        const trackers =
-          recallingN === 1 && due === 0
-            ? [
-                { memoryTrackerId: 1, spelling: false },
-                { memoryTrackerId: 2, spelling: false },
-              ]
-            : []
-        return {
-          data: makeMe.aDueMemoryTrackersList
-            .totalAssimilatedCount(0)
-            .toRepeat(trackers)
-            .please(),
-        } as Awaited<ReturnType<typeof RecallsController.recalling>>
-      }
-    )
-    mockAlphaBetaNoteCards()
+    mockTwoDueThenEmptyExtendedRecalling()
     const markAsRecalledCount = mockMarkAsRecalledCounting()
 
     const { stdin, ...ink } = await renderInkWhenCommandLineReady(

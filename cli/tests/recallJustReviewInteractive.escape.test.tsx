@@ -1,4 +1,5 @@
 import { describeRecallJustReviewInteractive } from './recallJustReviewInteractive.suite.js'
+import type { InkWaitHelpers } from './recallJustReviewInteractive.waits.js'
 
 describeRecallJustReviewInteractive((api) => {
   const {
@@ -6,9 +7,7 @@ describeRecallJustReviewInteractive((api) => {
     expect,
     InteractiveCliApp,
     RECALL_SESSION_STOPPED_LINE,
-    leaveRecallWithYnRe,
     renderInkWhenCommandLineReady,
-    pressEscape,
     pressEscapeAndWaitForCancelledLine,
     stripAnsi,
     waitForFrames,
@@ -17,65 +16,56 @@ describeRecallJustReviewInteractive((api) => {
     alphaNoteRealm,
     mockShowMemoryTrackerCardForRealm,
     mockMarkAsRecalledCounting,
+    reachLeaveRecallOnRemember,
     waitReturnsToSingleRememberCard,
   } = api
-  test('after Esc on remember card, y settles Recall session stopped without markAsRecalled', async () => {
+
+  async function inkAtLeaveRecallConfirm() {
     mockMarkAsRecalledCounting()
     mockShowMemoryTrackerCardForRealm(alphaNoteRealm())
-
-    const { stdin, waitForFramesToInclude, ...ink } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-    startRecall(stdin)
-    await waitRememberCard(ink, 'Alpha')
-    await pressEscape(stdin)
-    await waitForFramesToInclude(leaveRecallWithYnRe)
+    const rendered = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+    startRecall(rendered.stdin)
+    await reachLeaveRecallOnRemember(rendered.stdin, rendered, 'Alpha')
     expect(api.markAsRecalledSpy).not.toHaveBeenCalled()
+    return rendered
+  }
 
-    stdin.write('y\r')
-    await ink.waitForLastFrameToInclude(RECALL_SESSION_STOPPED_LINE)
-
-    expect(api.markAsRecalledSpy).not.toHaveBeenCalled()
-  })
-
-  test('after Esc on remember card, n returns to Yes, I remember without markAsRecalled', async () => {
-    mockMarkAsRecalledCounting()
-    mockShowMemoryTrackerCardForRealm(alphaNoteRealm())
-
-    const { stdin, waitForFramesToInclude, ...ink } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-    startRecall(stdin)
-    await waitRememberCard(ink, 'Alpha')
-    await pressEscape(stdin)
-    await waitForFramesToInclude(/Leave recall\?/)
-
-    stdin.write('n\r')
-    await waitReturnsToSingleRememberCard(ink, 'Alpha')
-
-    expect(api.markAsRecalledSpy).not.toHaveBeenCalled()
-  })
-
-  test('empty Enter on leave recall confirm stays on confirm; n returns to remember card', async () => {
-    mockMarkAsRecalledCounting()
-    mockShowMemoryTrackerCardForRealm(alphaNoteRealm())
-
-    const { stdin, waitForFramesToInclude, ...ink } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-    startRecall(stdin)
-    await waitRememberCard(ink, 'Alpha')
-    await pressEscape(stdin)
-    await waitForFramesToInclude(/Leave recall\?/)
-
-    stdin.write('\r')
-    await waitForFramesToInclude(/Leave recall\?/)
-
-    expect(api.markAsRecalledSpy).not.toHaveBeenCalled()
-
-    stdin.write('n\r')
-    await waitReturnsToSingleRememberCard(ink, 'Alpha')
-
+  test.each([
+    {
+      name: 'after Esc on remember card, y settles Recall session stopped without markAsRecalled',
+      run: async (
+        stdin: { write: (s: string) => void },
+        ink: InkWaitHelpers
+      ) => {
+        stdin.write('y\r')
+        await ink.waitForLastFrameToInclude(RECALL_SESSION_STOPPED_LINE)
+      },
+    },
+    {
+      name: 'after Esc on remember card, n returns to Yes, I remember without markAsRecalled',
+      run: async (
+        _stdin: { write: (s: string) => void },
+        ink: InkWaitHelpers
+      ) => {
+        _stdin.write('n\r')
+        await waitReturnsToSingleRememberCard(ink, 'Alpha')
+      },
+    },
+    {
+      name: 'empty Enter on leave recall confirm stays on confirm; n returns to remember card',
+      run: async (
+        stdin: { write: (s: string) => void },
+        ink: InkWaitHelpers
+      ) => {
+        stdin.write('\r')
+        await ink.waitForLastFrameToInclude(/Leave recall\?/)
+        stdin.write('n\r')
+        await waitReturnsToSingleRememberCard(ink, 'Alpha')
+      },
+    },
+  ])('$name', async ({ run }) => {
+    const { stdin, ...ink } = await inkAtLeaveRecallConfirm()
+    await run(stdin, ink)
     expect(api.markAsRecalledSpy).not.toHaveBeenCalled()
   })
 
