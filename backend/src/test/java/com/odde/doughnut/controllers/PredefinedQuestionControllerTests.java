@@ -114,35 +114,29 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
 
   @Nested
   class RefineQuestion {
-    @Test
-    void authorization() {
-      Note note = makeMe.aNote().please();
-      PredefinedQuestion mcqWithAnswer = makeMe.aPredefinedQuestion().please();
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.addQuestionManually(note, mcqWithAnswer));
+    Note note;
+    PredefinedQuestion predefinedQuestion;
+
+    @BeforeEach
+    void refineSetup() {
+      note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      predefinedQuestion = makeMe.aPredefinedQuestion().please();
     }
 
     @Test
     void givenQuestion_thenReturnRefineQuestion() throws UnexpectedNoAccessRightException {
-      // Setup
-      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      PredefinedQuestion predefinedQuestion = makeMe.aPredefinedQuestion().please();
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       openAiStructuredResponseMock.stubStructuredResponse(mcqWithAnswer);
 
-      // Execute & Verify
       PredefinedQuestion result = controller.refineQuestion(note, predefinedQuestion);
       assertThat(result.getMcqWithAnswer(), equalTo(mcqWithAnswer));
     }
 
     @Test
     void refineQuestionFailedWithGpt35WillNotTryAgain() {
-      PredefinedQuestion mcqWithAnswer = makeMe.aPredefinedQuestion().please();
-      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      // Mock a response with malformed JSON content to trigger a RuntimeException
       openAiStructuredResponseMock.stubStructuredResponseMalformed("{invalid json}");
-      assertThrows(RuntimeException.class, () -> controller.refineQuestion(note, mcqWithAnswer));
+      assertThrows(
+          RuntimeException.class, () -> controller.refineQuestion(note, predefinedQuestion));
       verify(openAiStructuredResponseMock.responseService(), Mockito.times(1))
           .create(ArgumentMatchers.any(StructuredResponseCreateParams.class));
     }

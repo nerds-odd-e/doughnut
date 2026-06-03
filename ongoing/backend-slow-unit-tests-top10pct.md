@@ -271,7 +271,9 @@ Status: done
 ---
 
 ### Phase 12: Optimize slow tests rank 111–117 (max 0.014s)
-Status: planned
+Status: done
+
+**Result (2026-06-03):** Fewer redundant tests and lighter fixtures (1133 invocations): shared default folder for simple note-creation cases; RefineQuestion shared setup and dropped duplicate authorization; contested flag folded into acceptTheContest and removed ContestQuestion nested class; same-notebook move drops root note; wiki-link replace merged into initial cache refresh test.
 
 **Scope:**
 - `com.odde.doughnut.controllers.NotebookRootNoteCreationWithWikidataTests$createNoteInFolderTest#shouldBeAbleToSaveNoteWithWikidataIdWhenValid()` (0.014s)
@@ -290,5 +292,7 @@ Status: planned
 
 ### Phase 13: Re-profile and close
 Status: planned
+
+**Next:** Re-run `pnpm backend:test_only`, document before/after top 10%, mark plan done.
 
 Re-run full suite, document before/after top 10%, mark plan done.

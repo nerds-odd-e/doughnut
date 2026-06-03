@@ -62,12 +62,16 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
   @Nested
   class createNoteInFolderTest {
     Notebook notebook;
+    Folder defaultFolder;
     NoteCreationDTO noteCreation = new NoteCreationDTO();
 
     @BeforeEach
     void setup() {
       notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      defaultFolder = makeMe.aFolder().notebook(notebook).name("Default").please();
       noteCreation.setNewTitle("new title");
+      noteCreation.setContent(null);
+      noteCreation.setFolderId(defaultFolder.getId());
     }
 
     @Test
@@ -142,8 +146,6 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
     @Test
     void shouldBeAbleToSaveNoteWhenValid()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      Folder folder = makeMe.aFolder().notebook(notebook).name("Placement").please();
-      noteCreation.setFolderId(folder.getId());
       NoteRealm response = notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
       assertThat(response.getId(), not(nullValue()));
       Note created = noteRepository.findById(response.getId()).orElseThrow();
@@ -154,8 +156,6 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
     @Test
     void shouldBeAbleToCreateAThing()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      Folder folder = makeMe.aFolder().notebook(notebook).name("Rootish").please();
-      noteCreation.setFolderId(folder.getId());
       long beforeThingCount = noteRepository.count();
       notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
       long afterThingCount = noteRepository.count();
@@ -165,8 +165,6 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
     @Test
     void shouldBeAbleToSaveNoteWithWikidataIdWhenValid()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      Folder folder = makeMe.aFolder().notebook(notebook).name("WikidataHome").please();
-      noteCreation.setFolderId(folder.getId());
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(new MakeMeWithoutDB().wikidataEntityJson().entityId("Q12345").please());
       noteCreation.setContent("---\nwikidata_id: Q12345\n---\n");
@@ -177,8 +175,6 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
     @Test
     void shouldBeAbleToSaveNoteWithoutWikidataIdWhenValid()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      Folder folder = makeMe.aFolder().notebook(notebook).name("PlainHome").please();
-      noteCreation.setFolderId(folder.getId());
       NoteRealm response = notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
       assertThat(response.getNote().getNoteTopology().getTitle(), equalTo("new title"));
     }

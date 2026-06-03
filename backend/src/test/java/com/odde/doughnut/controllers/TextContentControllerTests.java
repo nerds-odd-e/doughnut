@@ -307,24 +307,27 @@ class TextContentControllerTests extends ControllerTestBase {
         throws UnexpectedNoAccessRightException {
       Notebook notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       Note onlyA = makeMe.aNote().title("OnlyA").notebook(notebook).please();
-      makeMe.aNote().title("OnlyB").notebook(notebook).please();
+      Note onlyB = makeMe.aNote().title("OnlyB").notebook(notebook).please();
       Note carrier = makeMe.aNote().notebook(notebook).please();
 
       noteUpdateContentDTO.setContent("[[OnlyA]]");
+      controller.updateNoteContent(carrier, noteUpdateContentDTO);
+
+      noteUpdateContentDTO.setContent("[[OnlyB]]");
       NoteRealm response = controller.updateNoteContent(carrier, noteUpdateContentDTO);
 
       assertThat(response.getWikiTitles(), hasSize(1));
       WikiTitle wt = response.getWikiTitles().getFirst();
-      assertThat(wt.getLinkText(), equalTo("OnlyA"));
-      assertThat(wt.getTargetToken(), equalTo("OnlyA"));
-      assertThat(wt.getDisplayText(), equalTo("OnlyA"));
-      assertThat(wt.getNoteId(), equalTo(onlyA.getId()));
+      assertThat(wt.getLinkText(), equalTo("OnlyB"));
+      assertThat(wt.getTargetToken(), equalTo("OnlyB"));
+      assertThat(wt.getDisplayText(), equalTo("OnlyB"));
+      assertThat(wt.getNoteId(), equalTo(onlyB.getId()));
 
       List<NoteWikiTitleCache> rows =
           noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
       assertThat(rows, hasSize(1));
-      assertThat(rows.getFirst().getLinkText(), equalTo("OnlyA"));
-      assertThat(rows.getFirst().getTargetNote().getId(), equalTo(onlyA.getId()));
+      assertThat(rows.getFirst().getLinkText(), equalTo("OnlyB"));
+      assertThat(rows.getFirst().getTargetNote().getId(), equalTo(onlyB.getId()));
     }
 
     @Test
@@ -349,34 +352,6 @@ class TextContentControllerTests extends ControllerTestBase {
       assertThat(rows, hasSize(1));
       assertThat(rows.getFirst().getLinkText(), equalTo("OnlyA|alias label"));
       assertThat(rows.getFirst().getTargetNote().getId(), equalTo(onlyA.getId()));
-    }
-
-    @Test
-    void replacingWikiLinkUpdatesNoteRealmWikiTitlesAndPersistedCache()
-        throws UnexpectedNoAccessRightException {
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      makeMe.aNote().title("OnlyA").notebook(notebook).please();
-      Note onlyB = makeMe.aNote().title("OnlyB").notebook(notebook).please();
-      Note carrier = makeMe.aNote().notebook(notebook).please();
-
-      noteUpdateContentDTO.setContent("[[OnlyA]]");
-      controller.updateNoteContent(carrier, noteUpdateContentDTO);
-
-      noteUpdateContentDTO.setContent("[[OnlyB]]");
-      NoteRealm response = controller.updateNoteContent(carrier, noteUpdateContentDTO);
-
-      assertThat(response.getWikiTitles(), hasSize(1));
-      WikiTitle wt = response.getWikiTitles().getFirst();
-      assertThat(wt.getLinkText(), equalTo("OnlyB"));
-      assertThat(wt.getTargetToken(), equalTo("OnlyB"));
-      assertThat(wt.getDisplayText(), equalTo("OnlyB"));
-      assertThat(wt.getNoteId(), equalTo(onlyB.getId()));
-
-      List<NoteWikiTitleCache> rows =
-          noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
-      assertThat(rows, hasSize(1));
-      assertThat(rows.getFirst().getLinkText(), equalTo("OnlyB"));
-      assertThat(rows.getFirst().getTargetNote().getId(), equalTo(onlyB.getId()));
     }
 
     @Test

@@ -212,7 +212,6 @@ class RelationControllerTests extends ControllerTestBase {
     void sameNotebookMove_doesNotRewriteReferrer() throws UnexpectedNoAccessRightException {
       User u = currentUser.getUser();
       Notebook nb1 = makeMe.aNotebook().name("SameNb").creatorAndOwner(u).please();
-      makeMe.aRootNote("root").notebook(nb1).please();
       Folder folder = makeMe.aFolder().notebook(nb1).name("F").please();
       Note target = makeMe.aNote("MyNote").notebook(nb1).please();
       Note referrer = makeMe.aNote("Carrier").notebook(nb1).please();

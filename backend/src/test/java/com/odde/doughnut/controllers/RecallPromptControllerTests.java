@@ -333,6 +333,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
       QuestionContestResult contestResult = controller.contest(recallPrompt);
       assertFalse(contestResult.rejected);
+      assertThat(recallPrompt.getPredefinedQuestion().isContested(), equalTo(true));
 
       @SuppressWarnings({"unchecked", "rawtypes"})
       ArgumentCaptor<StructuredResponseCreateParams<QuestionEvaluation>> paramsCaptor =
@@ -550,34 +551,6 @@ class RecallPromptControllerTests extends ControllerTestBase {
                 TimestampOperations.addHoursToTimestamp(
                     testabilitySettings.getCurrentUTCTimestamp(), 25)));
       }
-    }
-  }
-
-  @Nested
-  class ContestQuestion {
-    RecallPrompt recallPrompt;
-    Note note;
-    QuestionEvaluation questionEvaluation = new QuestionEvaluation();
-
-    @BeforeEach
-    void setUp() {
-      note = makeMe.aNote().please();
-      recallPrompt = makeMe.aRecallPrompt().withPredefinedQuestionForNote(note).please();
-      questionEvaluation.correctChoices = new int[] {0};
-      questionEvaluation.feasibleQuestion = false;
-      questionEvaluation.improvementAdvices = "This is a valid contest";
-    }
-
-    @Test
-    void shouldMarkQuestionAsContestedWhenContestIsAccepted() {
-      openAiStructuredResponseMock.stubStructuredResponse(questionEvaluation);
-
-      // When
-      QuestionContestResult result = controller.contest(recallPrompt);
-
-      // Then
-      assertThat(result.rejected, equalTo(false));
-      assertThat(recallPrompt.getPredefinedQuestion().isContested(), equalTo(true));
     }
   }
 }
