@@ -131,11 +131,13 @@ Status: planned
 ---
 
 ### Phase 8: BookReading restore/format batch
-Status: planned
+Status: done
+
+**Result (2026-06-03):** Added `waitForEpubViewer` and `stubReadingPositionSnapshot` helpers; merged read/skimmed border tests into `it.each`; replaced HorizontalMenu `vi.waitUntil` with sync `nextTick` toggles; converted NoteAddQuestion to `it.each` with `getByLabelText`; split RichMarkdownEditor preset-key visibility into lean `it.each` cases; leaner Wikidata matching-label flow in NoteNewForm. **128** scoped tests; full suite **1370** pass (~23s wall).
 
 **Scope:** `tests/pages/BookReadingPage.spec.ts`, `tests/toolbars/HorizontalMenu.spec.ts`, `tests/notes/NoteAddQuestion.spec.ts`, `tests/notes/NoteNewForm.spec.ts`, `tests/components/form/RichMarkdownEditor.properties.spec.ts`
 
-**Tests (10):** batch 8 from profiling.
+**Tests (10):** restores selected book block; restores reading position; skimmed border on load; loads EPUB; no restore without snapshot; read border on load; HorizontalMenu collapse expand again; NoteAddQuestion only allow generation; NoteNewForm search dog undefined; RichMarkdownEditor preset keys on focus.
 
 **Verify:** scoped files then full suite.
 

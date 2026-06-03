@@ -227,37 +227,40 @@ Body`)
     expect(last).toContain("Hello Body")
   })
 
-  it("shows preset keys when insert or row key input is focused", async () => {
-    await h.mountEditor("# Hello Body")
-    await flushPromises()
-    await h.openAddProperty()
-    ;(
-      h.getWrapper().find('[data-testid="rich-note-property-key"]')
-        .element as HTMLInputElement
-    ).focus()
-    await nextTick()
-    await flushPromises()
-    await h.assertPresetOptionsVisible(
-      richModeKeyDropdownPresetKeysForPropertyRows(false, [])
-    )
-
-    const markdown = `---
+  it.each([
+    {
+      case: "insert row",
+      markdown: "# Hello Body",
+      keyInputTestId: "rich-note-property-key",
+      existingRows: [] as { key: string; value: string }[],
+    },
+    {
+      case: "existing row",
+      markdown: `---
 status: ok
 ---
 
-# Body`
+# Body`,
+      keyInputTestId: "rich-note-property-row-key-input",
+      existingRows: [{ key: "status", value: "ok" }],
+    },
+  ] as const)("shows preset keys when $case key input is focused", async ({
+    markdown,
+    keyInputTestId,
+    existingRows,
+  }) => {
     await h.mountEditor(markdown)
-    await flushPromises()
+    if (keyInputTestId === "rich-note-property-key") {
+      await h.openAddProperty()
+    }
     ;(
-      h.getWrapper().find('[data-testid="rich-note-property-row-key-input"]')
+      h.getWrapper().find(`[data-testid="${keyInputTestId}"]`)
         .element as HTMLInputElement
     ).focus()
     await nextTick()
     await flushPromises()
     await h.assertPresetOptionsVisible(
-      richModeKeyDropdownPresetKeysForPropertyRows(false, [
-        { key: "status", value: "ok" },
-      ])
+      richModeKeyDropdownPresetKeysForPropertyRows(false, existingRows)
     )
   })
 

@@ -34,6 +34,13 @@ describe("useBookReadingBootstrap", () => {
     return mount(Root, { props: { nid: notebookId } })
   }
 
+  async function expectBootstrapReady<T>(w: ReturnType<typeof mountBootstrap>) {
+    await flushPromises()
+    const vm = w.vm as { bootstrap: T | null }
+    expect(vm.bootstrap).not.toBeNull()
+    return vm.bootstrap as T
+  }
+
   it("sets pdf bootstrap with initial last-read when position includes a PDF locator", async () => {
     vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
       wrapSdkResponse(
@@ -68,24 +75,18 @@ describe("useBookReadingBootstrap", () => {
     )
 
     const w = mountBootstrap()
-    await flushPromises()
+    const bootstrap = await expectBootstrapReady<{
+      kind: string
+      initialLastRead: { pageIndexZeroBased: number; normalizedY: number }
+      initialSelectedBlockId: number | null
+    }>(w)
 
-    const vm = w.vm as {
-      bootstrap: {
-        kind: string
-        initialLastRead: { pageIndexZeroBased: number; normalizedY: number }
-        initialSelectedBlockId: number | null
-      } | null
-    }
-    await vi.waitFor(() => expect(vm.bootstrap).not.toBeNull(), {
-      timeout: 1000,
-    })
-    expect(vm.bootstrap?.kind).toBe("pdf")
-    expect(vm.bootstrap?.initialLastRead).toEqual({
+    expect(bootstrap.kind).toBe("pdf")
+    expect(bootstrap.initialLastRead).toEqual({
       pageIndexZeroBased: 2,
       normalizedY: 750,
     })
-    expect(vm.bootstrap?.initialSelectedBlockId).toBe(42)
+    expect(bootstrap.initialSelectedBlockId).toBe(42)
   })
 
   it("sets epub bootstrap with null initial locator when no reading position", async () => {
@@ -116,21 +117,15 @@ describe("useBookReadingBootstrap", () => {
     )
 
     const w = mountBootstrap()
-    await flushPromises()
+    const bootstrap = await expectBootstrapReady<{
+      kind: string
+      initialLocator: unknown
+      initialSelectedBlockId: number | null
+    }>(w)
 
-    const vm = w.vm as {
-      bootstrap: {
-        kind: string
-        initialLocator: unknown
-        initialSelectedBlockId: number | null
-      } | null
-    }
-    await vi.waitFor(() => expect(vm.bootstrap).not.toBeNull(), {
-      timeout: 1000,
-    })
-    expect(vm.bootstrap?.kind).toBe("epub")
-    expect(vm.bootstrap?.initialLocator).toBeNull()
-    expect(vm.bootstrap?.initialSelectedBlockId).toBeNull()
+    expect(bootstrap.kind).toBe("epub")
+    expect(bootstrap.initialLocator).toBeNull()
+    expect(bootstrap.initialSelectedBlockId).toBeNull()
   })
 
   it("sets file error and leaves bootstrap null when file fetch is not ok", async () => {

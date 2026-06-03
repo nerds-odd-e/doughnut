@@ -90,6 +90,15 @@ const noop = () => {
   // No-op function
 }
 
+function menuWrapperEl() {
+  return document.querySelector(".menu-wrapper")
+}
+
+async function clickToggleMenu() {
+  await page.getByLabelText("Toggle menu").click()
+  await nextTick()
+}
+
 describe("HorizontalMenu", () => {
   let user: User
 
@@ -399,33 +408,11 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      const expandButton = page.getByLabelText("Toggle menu")
+      await clickToggleMenu()
+      expect(menuWrapperEl()).toHaveClass("is-expanded")
 
-      // Expand
-      await expandButton.click()
-      await vi.waitUntil(
-        () =>
-          document
-            .querySelector(".menu-wrapper")
-            ?.classList.contains("is-expanded"),
-        { timeout: 1000 }
-      )
-
-      let menuWrapper = document.querySelector(".menu-wrapper")
-      expect(menuWrapper).toHaveClass("is-expanded")
-
-      // Collapse
-      await expandButton.click()
-      await vi.waitUntil(
-        () =>
-          document
-            .querySelector(".menu-wrapper")
-            ?.classList.contains("is-collapsed"),
-        { timeout: 1000 }
-      )
-
-      menuWrapper = document.querySelector(".menu-wrapper")
-      expect(menuWrapper).toHaveClass("is-collapsed")
+      await clickToggleMenu()
+      expect(menuWrapperEl()).toHaveClass("is-collapsed")
     })
 
     it("shows all menu items when expanded", async () => {

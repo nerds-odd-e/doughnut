@@ -452,6 +452,22 @@ describe("adding new note", () => {
       await flushPromises()
     }
 
+    const selectMatchingWikidataResult = async (wikidataId: string) => {
+      const bodyComponent = wrapper.findComponent(WikidataAssociationDialogBody)
+      expect(bodyComponent.exists()).toBe(true)
+
+      // biome-ignore lint/suspicious/noExplicitAny: accessing Vue component internals in test
+      const vm = bodyComponent.vm as any
+      expect(vm.searchResults.length).toBeGreaterThan(0)
+
+      // biome-ignore lint/suspicious/noExplicitAny: accessing Vue component internals in test
+      const selected = vm.searchResults.find((r: any) => r.id === wikidataId)
+      expect(selected).toBeDefined()
+
+      bodyComponent.vm.$emit("selected", selected)
+      await flushPromises()
+    }
+
     const selectFromDropdown = async (wikidataId: string) => {
       const bodyComponent = wrapper.findComponent(WikidataAssociationDialogBody)
       expect(bodyComponent.exists()).toBe(true)
@@ -471,10 +487,11 @@ describe("adding new note", () => {
       const newLabel = selected.label.toUpperCase()
 
       if (currentLabel === newLabel) {
-        bodyComponent.vm.$emit("selected", selected)
-      } else {
-        vm.showTitleOptions = true
+        await selectMatchingWikidataResult(wikidataId)
+        return
       }
+
+      vm.showTitleOptions = true
       await flushPromises()
     }
 
@@ -499,13 +516,6 @@ describe("adding new note", () => {
         actionValueMap[action]
       )
       await flushPromises()
-    }
-
-    const waitForDialogToClose = async () => {
-      await flushPromises()
-      expect(wrapper.findComponent(WikidataAssociationDialog).exists()).toBe(
-        false
-      )
     }
 
     it("opens dialog when clicking search button", async () => {
@@ -572,17 +582,19 @@ describe("adding new note", () => {
 
         searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
         await openWikidataDialog(searchTitle)
-        await selectFromDropdown(wikidataId)
+        if (titleAction) {
+          await selectFromDropdown(wikidataId)
+          const titleActionCapitalized = (titleAction.charAt(0).toUpperCase() +
+            titleAction.slice(1)) as "Replace" | "Append"
+          await selectTitleAction(titleActionCapitalized)
+        } else {
+          await selectMatchingWikidataResult(wikidataId)
+        }
 
-        const titleActionCapitalized = titleAction
-          ? ((titleAction.charAt(0).toUpperCase() + titleAction.slice(1)) as
-              | "Replace"
-              | "Append")
-          : undefined
-
-        await selectTitleAction(titleActionCapitalized)
-
-        await waitForDialogToClose()
+        await flushPromises()
+        expect(wrapper.findComponent(WikidataAssociationDialog).exists()).toBe(
+          false
+        )
 
         expect(searchWikidataSpy).toHaveBeenCalledWith({
           query: { search: searchTitle },

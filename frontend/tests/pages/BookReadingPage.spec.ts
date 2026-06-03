@@ -127,6 +127,44 @@ async function waitForPdfViewer(wrapper: BookReadingPageWrapper) {
   )
 }
 
+async function waitForEpubViewer(wrapper: BookReadingPageWrapper) {
+  await flushPromises()
+  if (wrapper.find('[data-testid="epub-book-viewer"]').exists()) {
+    return
+  }
+  await vi.waitFor(
+    () =>
+      expect(wrapper.find('[data-testid="epub-book-viewer"]').exists()).toBe(
+        true
+      ),
+    { timeout: 8000 }
+  )
+}
+
+function stubReadingPositionSnapshot(options: {
+  pageIndex?: number
+  bboxTop?: number
+  selectedBookBlockId?: number
+}) {
+  return vi
+    .spyOn(NotebookBooksController, "getNotebookBookReadingPosition")
+    .mockResolvedValue(
+      wrapSdkResponse({
+        id: 1,
+        locator: {
+          type: "PdfLocator_Full",
+          pageIndex: options.pageIndex ?? 2,
+          bbox: [0, options.bboxTop ?? 750, 100, 600],
+          contentBlockId: null,
+          derivedTitle: null,
+        },
+        ...(options.selectedBookBlockId !== undefined
+          ? { selectedBookBlockId: options.selectedBookBlockId }
+          : {}),
+      })
+    )
+}
+
 async function withStubbedInnerWidth<T>(
   width: number,
   run: () => Promise<T>
@@ -320,11 +358,13 @@ describe("BookReadingPage", () => {
   it("shows loading indicator while PDF is loading, hides it after render", async () => {
     stubGetBookPlain(notebookId)
     let resolveFetch!: (r: Response) => void
-    vi.spyOn(globalThis, "fetch").mockReturnValue(
-      new Promise<Response>((resolve) => {
+    let fetchInit: RequestInit | undefined
+    vi.spyOn(globalThis, "fetch").mockImplementation((_input, init) => {
+      fetchInit = init
+      return new Promise<Response>((resolve) => {
         resolveFetch = resolve
       })
-    )
+    })
 
     const wrapper = mountBookReadingPage(notebookId)
     await flushPromises()
@@ -340,17 +380,9 @@ describe("BookReadingPage", () => {
     )
 
     await waitForPdfViewer(wrapper)
+    expect(fetchInit?.credentials).toBe("same-origin")
+    expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(true)
     expect(wrapper.find(".daisy-loading-spinner").exists()).toBe(false)
-  })
-
-  it("loads PDF into viewer", async () => {
-    stubGetBookPlain(notebookId)
-    mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes, {
-      assertSameOriginCredentials: true,
-    })
-
-    const wrapper = mountBookReadingPage(notebookId)
-    await waitForPdfViewer(wrapper)
   })
 
   it("loads EPUB into viewer with book title in bar, no PDF viewer", async () => {
@@ -368,13 +400,7 @@ describe("BookReadingPage", () => {
     mockNotebookBookFileEpubOk(bookId, epubMinimalBytes)
 
     const wrapper = mountBookReadingPage(notebookId)
-    await vi.waitFor(
-      () =>
-        expect(wrapper.find('[data-testid="epub-book-viewer"]').exists()).toBe(
-          true
-        ),
-      { timeout: 25000 }
-    )
+    await waitForEpubViewer(wrapper)
 
     expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(false)
     expect(
@@ -544,21 +570,7 @@ describe("BookReadingPage", () => {
 
   it("restores reading position from stored snapshot on open", async () => {
     stubGetBookPlain(notebookId)
-    vi.spyOn(
-      NotebookBooksController,
-      "getNotebookBookReadingPosition"
-    ).mockResolvedValue(
-      wrapSdkResponse({
-        id: 1,
-        locator: {
-          type: "PdfLocator_Full",
-          pageIndex: 2,
-          bbox: [0, 750, 100, 600],
-          contentBlockId: null,
-          derivedTitle: null,
-        },
-      })
-    )
+    stubReadingPositionSnapshot({ pageIndex: 2, bboxTop: 750 })
     mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
 
     const wrapper = mountBookReadingPage(notebookId)
@@ -587,22 +599,7 @@ describe("BookReadingPage", () => {
 
   it("restores selected book block from stored reading snapshot", async () => {
     stubGetBookWithTopMathsBlocks(notebookId)
-    vi.spyOn(
-      NotebookBooksController,
-      "getNotebookBookReadingPosition"
-    ).mockResolvedValue(
-      wrapSdkResponse({
-        id: 1,
-        locator: {
-          type: "PdfLocator_Full",
-          pageIndex: 2,
-          bbox: [0, 750, 100, 600],
-          contentBlockId: null,
-          derivedTitle: null,
-        },
-        selectedBookBlockId: 102,
-      })
-    )
+    stubReadingPositionSnapshot({ selectedBookBlockId: 102 })
     mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
 
     const wrapper = mountBookReadingPage(notebookId)
@@ -650,7 +647,10 @@ describe("BookReadingPage", () => {
 
   it("book layout toggle exposes aria-expanded and aria-controls", async () => {
     await withStubbedInnerWidth(1024, async () => {
-      const wrapper = await mountLoadedBookWithBlocks(notebookId)
+      stubGetBookPlain(notebookId)
+      mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
+      const wrapper = mountBookReadingPage(notebookId)
+      await waitForPdfViewer(wrapper)
 
       const toggle = wrapper.find(
         '[data-testid="book-reading-book-layout-toggle"]'
@@ -757,7 +757,33 @@ describe("BookReadingPage", () => {
       )
     }
 
-    it("shows read border for blocks returned as READ from reading-records on load", async () => {
+    function bookBlockRowStartingWith(
+      wrapper: BookReadingPageWrapper,
+      titlePrefix: string
+    ) {
+      const row = wrapper
+        .findAll('[data-testid="book-reading-book-block"]')
+        .find((w) => w.text().trim().startsWith(titlePrefix))
+      expect(row, `book block row "${titlePrefix}"`).toBeDefined()
+      return row!
+    }
+
+    it.each([
+      {
+        status: "READ" as const,
+        expectRead: "true",
+        expectSkimmed: undefined,
+      },
+      {
+        status: "SKIMMED" as const,
+        expectRead: undefined,
+        expectSkimmed: "true",
+      },
+    ])("shows $status border for blocks returned as $status from reading-records on load", async ({
+      status,
+      expectRead,
+      expectSkimmed,
+    }) => {
       vi.spyOn(
         NotebookBooksController,
         "getNotebookBookReadingRecords"
@@ -765,16 +791,19 @@ describe("BookReadingPage", () => {
         wrapSdkResponse([
           {
             bookBlockId: "101",
-            status: "READ",
+            status,
             completedAt: "2020-01-01T00:00:00Z",
           },
         ])
       )
       const wrapper = await mountLoadedBookWithBlocks(notebookId)
-      const section1Row = wrapper
-        .findAll('[data-testid="book-reading-book-block"]')
-        .find((w) => w.text().trim().startsWith("Section 1"))
-      expect(section1Row?.attributes("data-direct-content-read")).toBe("true")
+      const section1Row = bookBlockRowStartingWith(wrapper, "Section 1")
+      expect(section1Row.attributes("data-direct-content-read")).toBe(
+        expectRead
+      )
+      expect(section1Row.attributes("data-direct-content-skimmed")).toBe(
+        expectSkimmed
+      )
     })
 
     it("shows the panel when the selected block’s successor is the viewport current block", async () => {
@@ -803,36 +832,6 @@ describe("BookReadingPage", () => {
       expect(
         wrapper.find('[data-testid="book-reading-mark-as-skipped"]').exists()
       ).toBe(true)
-    })
-
-    it("shows skimmed border for blocks returned as SKIMMED from reading-records on load", async () => {
-      vi.spyOn(
-        NotebookBooksController,
-        "getNotebookBookReadingRecords"
-      ).mockResolvedValue(
-        wrapSdkResponse([
-          {
-            bookBlockId: "101",
-            status: "SKIMMED",
-            completedAt: "2020-01-01T00:00:00Z",
-          },
-        ])
-      )
-      const wrapper = await mountLoadedBookWithBlocks(notebookId)
-      const section1Row = wrapper
-        .findAll('[data-testid="book-reading-book-block"]')
-        .find((w) => w.text().trim().startsWith("Section 1"))
-      expect(section1Row?.attributes("data-direct-content-skimmed")).toBe(
-        "true"
-      )
-      expect(
-        section1Row?.attributes("data-direct-content-read")
-      ).toBeUndefined()
-    })
-
-    it("defaults selection to the first book block in reading order on load", async () => {
-      const wrapper = await mountLoadedBookWithBlocks(notebookId)
-      expectCurrentSelection(wrapper, "Section 1")
     })
 
     it("hides the Reading Control Panel when the default-selected first block is viewport current", async () => {
@@ -1301,6 +1300,29 @@ describe("BookReadingPage", () => {
         return wrapper
       }
 
+      async function mountNoDirectContentBboxScenario() {
+        const blocks = makeMe.bookReading
+          .topMathsLikeFlatBlocks()
+          .map((b, i) =>
+            i === 0
+              ? { ...b, contentLocators: [makeMe.pdfLocator.pageIndexOnly(0)] }
+              : b
+          )
+        vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
+          wrapSdkResponse(
+            makeMe.aBook
+              .id(bookId)
+              .notebookId(String(notebookId))
+              .blocks(blocks)
+              .please()
+          )
+        )
+        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
+        const wrapper = mountBookReadingPage(notebookId)
+        await waitForPdfViewer(wrapper)
+        return wrapper
+      }
+
       it("shows the panel when last content bottom is visible and above obstruction", async () => {
         const wrapper = await mountFirstBlockBboxScenario()
         await clickBookBlockAndExpectSelection(wrapper, "Section 1")
@@ -1543,25 +1565,7 @@ describe("BookReadingPage", () => {
       })
 
       it("does not snap when block has no recorded direct-content bbox", async () => {
-        const blocks = makeMe.bookReading
-          .topMathsLikeFlatBlocks()
-          .map((b, i) =>
-            i === 0
-              ? { ...b, contentLocators: [makeMe.pdfLocator.pageIndexOnly(0)] }
-              : b
-          )
-        vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
-          wrapSdkResponse(
-            makeMe.aBook
-              .id(bookId)
-              .notebookId(String(notebookId))
-              .blocks(blocks)
-              .please()
-          )
-        )
-        mockNotebookBookFilePdfOk(bookId, topMathsPdfBytes)
-        const wrapper = mountBookReadingPage(notebookId)
-        await waitForPdfViewer(wrapper)
+        const wrapper = await mountNoDirectContentBboxScenario()
 
         await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
