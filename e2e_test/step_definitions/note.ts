@@ -48,11 +48,9 @@ Given(
 )
 
 Given('I have a notebook {string}', (notebookName: string) => {
-  return cy
-    .get<string>('@currentLoginUser')
-    .then((username) =>
-      start.testability().injectNotes([], username, notebookName)
-    )
+  cy.get<string>('@currentLoginUser').then((username) =>
+    start.testability().injectNotes([], username, notebookName)
+  )
 })
 
 Given(

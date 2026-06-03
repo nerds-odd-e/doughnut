@@ -1,6 +1,5 @@
 import router from '../router'
 import { assumeNotePage } from '../pageObjects/notePage'
-import { pageIsNotLoading } from '../pageBase'
 import testability from '../testability'
 
 export const navigationActions = {
@@ -11,7 +10,6 @@ export const navigationActions = {
         const url = `/n${noteId}`
         if (forceLoadPage) cy.visit(url)
         else router().push(url, 'noteShow', { noteId })
-        pageIsNotLoading()
       })
 
     return assumeNotePage(noteTopology)

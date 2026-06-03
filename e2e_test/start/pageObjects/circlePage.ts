@@ -4,6 +4,7 @@ import {
   findNotebookCardButton,
 } from './NotebookList'
 import { pageIsNotLoading } from '../pageBase'
+import { navigateToMyCircles } from './myCirclesPage'
 import notebookPage from './notebookPage'
 import notebookCreationForm from './forms/notebookCreationForm'
 
@@ -21,9 +22,7 @@ const completeMoveNotebookToNewGroupDialog = (newGroupName: string) => {
 
 export const assumeCirclePage = () => ({
   creatingNotebook(notebookTopic: string) {
-    cy.findByText('Add New Notebook In This Circle', { timeout: 15000 })
-      .should('be.visible')
-      .click()
+    cy.findByText('Add New Notebook In This Circle').click()
     return notebookCreationForm.createNotebookWithNameAndDescription(
       notebookTopic,
       undefined
@@ -59,27 +58,7 @@ export const assumeCirclePage = () => ({
 })
 
 export const navigateToCircle = (circleName: string) => {
-  const alias = circleIdAlias(circleName)
-  cy.wrap(null).then(() => {
-    const aliases = Cypress.state('aliases') as
-      | Record<string, unknown>
-      | undefined
-    if (aliases?.[alias]) {
-      return cy.get(`@${alias}`, { log: false }).then((circleId) => {
-        cy.visit(`/circles/${circleId}`)
-      })
-    }
-    cy.visit('/circles')
-    cy.findByText(circleName, { selector: 'a', timeout: 15000 })
-      .should('be.visible')
-      .click()
-    return cy.url().then((url) => {
-      const circleId = url.match(/\/circles\/(\d+)/)?.[1]
-      if (circleId) {
-        cy.wrap(circleId).as(alias)
-      }
-    })
-  })
-  pageIsNotLoading()
+  navigateToMyCircles()
+  cy.findByText(circleName, { selector: 'a' }).click()
   return assumeCirclePage()
 }

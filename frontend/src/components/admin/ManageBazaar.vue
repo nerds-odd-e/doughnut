@@ -1,9 +1,5 @@
 <template>
-  <table
-    v-if="notebooks"
-    class="daisy-table"
-    data-testid="manage-bazaar-table"
-  >
+  <table v-if="notebooks" class="daisy-table">
     <tbody>
       <tr v-for="bazaarNotebook in notebooks" :key="bazaarNotebook.id">
         <td>

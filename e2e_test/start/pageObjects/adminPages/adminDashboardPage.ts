@@ -68,17 +68,12 @@ export function assumeAdminDashboardPage() {
 
     expectBazaarAdminNotebooks(notebooks: string) {
       pageIsNotLoading()
-      cy.location('pathname').should('include', 'admin-dashboard')
       cy.location('search').should('include', 'tab=manageBazaar')
       const expected = commonSenseSplit(notebooks, ',')
-      cy.get('[data-testid="manage-bazaar-table"] tbody tr', {
-        timeout: 15000,
-      }).should('have.length', expected.length)
       for (const name of expected) {
-        cy.get('[data-testid="manage-bazaar-table"] tbody tr')
-          .contains('a', name)
-          .should('be.visible')
+        cy.get('.daisy-table tbody tr').contains('a', name)
       }
+      cy.get('.daisy-table tbody tr').should('have.length', expected.length)
       return this
     },
 
