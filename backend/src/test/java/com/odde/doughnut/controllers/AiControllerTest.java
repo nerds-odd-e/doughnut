@@ -50,20 +50,14 @@ class AiControllerTest extends ControllerTestBase {
       ModelService modelService = Mockito.mock(ModelService.class);
       when(officialClient.models()).thenReturn(modelService);
 
-      com.openai.models.models.Model officialModel1 =
+      com.openai.models.models.Model officialModel =
           com.openai.models.models.Model.builder()
               .id("gpt-4")
-              .created(System.currentTimeMillis() / 1000)
-              .ownedBy("openai")
-              .build();
-      com.openai.models.models.Model officialModel2 =
-          com.openai.models.models.Model.builder()
-              .id("any-model")
-              .created(System.currentTimeMillis() / 1000)
+              .created(1L)
               .ownedBy("openai")
               .build();
 
-      var modelsList = List.of(officialModel1, officialModel2);
+      var modelsList = List.of(officialModel);
       ModelListPage mockListPage = Mockito.mock(ModelListPage.class);
       when(modelService.list()).thenReturn(mockListPage);
       when(mockListPage.data()).thenReturn(modelsList);

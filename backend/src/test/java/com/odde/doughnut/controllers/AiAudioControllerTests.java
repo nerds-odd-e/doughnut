@@ -152,18 +152,6 @@ class AiAudioControllerTests {
     }
 
     @Test
-    void shouldWorkWithoutAdditionalInstructions() throws IOException {
-      controller.audioToText(audioUploadDTO);
-
-      @SuppressWarnings({"unchecked", "rawtypes"})
-      ArgumentCaptor<StructuredResponseCreateParams<NoteContentCompletion>> paramsCaptor =
-          ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
-      verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
-      String instructions = paramsCaptor.getValue().rawParams().instructions().orElse("");
-      assertFalse(instructions.contains("Additional instruction"));
-    }
-
-    @Test
     void shouldIncludePreviousContentAsUserMessage() throws IOException {
       String previousContent = "Previous text with trailing space ";
       audioUploadDTO.setPreviousNoteContentToAppendTo(previousContent);
@@ -188,8 +176,10 @@ class AiAudioControllerTests {
       ArgumentCaptor<StructuredResponseCreateParams<NoteContentCompletion>> paramsCaptor =
           ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
       verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
-      String input = paramsCaptor.getValue().rawParams().input().flatMap(i -> i.text()).orElse("");
+      StructuredResponseCreateParams<NoteContentCompletion> params = paramsCaptor.getValue();
+      String input = params.rawParams().input().flatMap(i -> i.text()).orElse("");
       assertFalse(input.contains("Previous note content (in JSON format):"));
+      assertFalse(params.rawParams().instructions().orElse("").contains("Additional instruction"));
     }
   }
 }

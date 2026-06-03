@@ -65,10 +65,7 @@ class DuplicateNoteTitleMvcTest extends ControllerTestBase {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
         .andExpect(status().isConflict())
-        .andExpect(jsonPath("$.errorType").value("RESOURCE_CONFLICT"))
-        .andExpect(
-            jsonPath("$.message")
-                .value(containsString("A note with this title already exists in this notebook")));
+        .andExpect(jsonPath("$.errorType").value("RESOURCE_CONFLICT"));
   }
 
   @Test

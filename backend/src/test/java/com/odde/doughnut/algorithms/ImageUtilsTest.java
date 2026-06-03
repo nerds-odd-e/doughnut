@@ -3,49 +3,41 @@ package com.odde.doughnut.algorithms;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-import com.odde.doughnut.testability.MakeMeWithoutDB;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import javax.imageio.ImageIO;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.core.io.InputStreamSource;
 
 class ImageUtilsTest {
-  MakeMeWithoutDB makeMe = new MakeMeWithoutDB();
 
-  @Test
-  void shouldNotTouchSmallImage() throws IOException {
-    InputStreamSource stream = buildImage(300, 300);
-    BufferedImage output = resizeImage(stream, "img.png");
-    assertThat(output.getWidth(), equalTo(300));
-    assertThat(output.getHeight(), equalTo(300));
-  }
-
-  @Test
-  void shouldResizeLargeImage() throws IOException {
-    InputStreamSource stream = buildImage(2001, 2);
-    BufferedImage output = resizeImage(stream, "img.png");
-    assertThat(output.getWidth(), equalTo(2000));
-    assertThat(output.getHeight(), equalTo(1));
-  }
-
-  @Test
-  void shouldResizeTooTallImage() throws IOException {
-    InputStreamSource stream = buildImage(2, 2001);
-    BufferedImage output = resizeImage(stream, "img.png");
-    assertThat(output.getWidth(), equalTo(1));
-    assertThat(output.getHeight(), equalTo(2000));
+  @ParameterizedTest
+  @CsvSource({
+    "300, 300, 300, 300",
+    "2001, 2, 2000, 1",
+    "2, 2001, 1, 2000",
+  })
+  void resizeImageDimensions(int width, int height, int expectedWidth, int expectedHeight)
+      throws IOException {
+    BufferedImage output = resizeImage(buildImage(width, height), "img.jpg");
+    assertThat(output.getWidth(), equalTo(expectedWidth));
+    assertThat(output.getHeight(), equalTo(expectedHeight));
   }
 
   private BufferedImage resizeImage(InputStreamSource stream, String originalFilename)
       throws IOException {
     byte[] bytes = new ImageUtils().toResizedImageByteArray(stream, originalFilename);
-    BufferedImage output = ImageIO.read(new ByteArrayInputStream(bytes));
-    return output;
+    return ImageIO.read(new ByteArrayInputStream(bytes));
   }
 
   private InputStreamSource buildImage(int width, int height) throws IOException {
-    return makeMe.anUploadedImage().metrics(width, height).toInputSteamSource();
+    BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+    ImageIO.write(image, "jpg", stream);
+    byte[] bytes = stream.toByteArray();
+    return () -> new ByteArrayInputStream(bytes);
   }
 }

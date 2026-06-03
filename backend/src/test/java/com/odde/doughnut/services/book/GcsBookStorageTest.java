@@ -16,6 +16,8 @@ import com.google.cloud.storage.Storage;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 
 class GcsBookStorageTest {
@@ -96,20 +98,20 @@ class GcsBookStorageTest {
     assertTrue(cut.get("a.pdf").isEmpty());
   }
 
-  @Test
-  void delete_callsStorageDeleteForAllowedRef() {
+  @ParameterizedTest
+  @CsvSource({
+    "pre/, pre/obj.pdf, true",
+    "safe/, safe/../evil, false",
+  })
+  void delete_respectsRefPrefix(String prefix, String ref, boolean callsStorage) {
     Storage storage = mock(Storage.class);
-    GcsBookStorage cut = new GcsBookStorage(storage, "b", "pre/");
-    cut.delete("pre/obj.pdf");
-    verify(storage).delete(BlobId.of("b", "pre/obj.pdf"));
-    verifyNoMoreInteractions(storage);
-  }
-
-  @Test
-  void delete_noOpWhenInvalidRef() {
-    Storage storage = mock(Storage.class);
-    GcsBookStorage cut = new GcsBookStorage(storage, "b", "safe/");
-    cut.delete("safe/../evil");
-    verifyNoInteractions(storage);
+    GcsBookStorage cut = new GcsBookStorage(storage, "b", prefix);
+    cut.delete(ref);
+    if (callsStorage) {
+      verify(storage).delete(BlobId.of("b", ref));
+      verifyNoMoreInteractions(storage);
+    } else {
+      verifyNoInteractions(storage);
+    }
   }
 }

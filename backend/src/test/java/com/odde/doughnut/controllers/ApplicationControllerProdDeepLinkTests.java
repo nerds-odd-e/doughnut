@@ -58,33 +58,22 @@ class ApplicationControllerProdDeepLinkTests {
   }
 
   @Test
-  void prodDeepLinkUnderNotebooksReturnsHtmlFromConfiguredSpaOrigin() throws Exception {
-    String shell = "<!DOCTYPE html><html><head></head><body>spa-shell</body></html>";
-    mockUpstream
-        .expect(requestTo("http://127.0.0.1:18888/"))
-        .andExpect(method(HttpMethod.GET))
-        .andRespond(withSuccess(shell, MediaType.TEXT_HTML));
+  void prodDeepLinkRoutesReturnHtmlFromConfiguredSpaOrigin() throws Exception {
+    String shell = "<!DOCTYPE html><html><body>spa-shell</body></html>";
+    for (int i = 0; i < 2; i++) {
+      mockUpstream
+          .expect(requestTo("http://127.0.0.1:18888/"))
+          .andExpect(method(HttpMethod.GET))
+          .andRespond(withSuccess(shell, MediaType.TEXT_HTML));
+    }
 
-    mockMvc
-        .perform(get("/notebooks/1"))
-        .andExpect(status().isOk())
-        .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
-        .andExpect(content().string(containsString("spa-shell")));
-  }
-
-  @Test
-  void prodDeepLinkUnderNReturnsHtmlFromConfiguredSpaOrigin() throws Exception {
-    String shell = "<html lang=\"en\"><title>t</title></html>";
-    mockUpstream
-        .expect(requestTo("http://127.0.0.1:18888/"))
-        .andExpect(method(HttpMethod.GET))
-        .andRespond(withSuccess(shell, MediaType.TEXT_HTML));
-
-    mockMvc
-        .perform(get("/n42"))
-        .andExpect(status().isOk())
-        .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
-        .andExpect(content().string(containsString("<html lang=\"en\">")));
+    for (String path : new String[] {"/notebooks/1", "/n42"}) {
+      mockMvc
+          .perform(get(path))
+          .andExpect(status().isOk())
+          .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+          .andExpect(content().string(containsString("spa-shell")));
+    }
   }
 
   @Test

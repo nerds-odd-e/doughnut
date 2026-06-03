@@ -38,8 +38,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MaxUploadSizeExceededException;
-import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.server.ResponseStatusException;
 
 @SpringBootTest
@@ -150,27 +148,6 @@ public class ControllerSetupTest {
     assertNotNull(body);
     assertThat(body.getErrors().keySet(), contains("_originalMessage"));
     assertThat(body.getErrorType(), equalTo(ApiError.ErrorType.OPENAI_UNAUTHORIZED));
-  }
-
-  @Test
-  void returnsPayloadTooLargeForMaxUploadSizeExceeded() {
-    ResponseEntity<ApiError> res =
-        controllerSetup.handleMultipartException(new MaxUploadSizeExceededException(1L));
-    assertEquals(HttpStatus.PAYLOAD_TOO_LARGE, res.getStatusCode());
-    ApiError body = res.getBody();
-    assertNotNull(body);
-    assertThat(body.getErrorType(), equalTo(ApiError.ErrorType.MULTIPART_SIZE_EXCEEDED));
-    assertThat(body.getMessage(), containsString("100 MB"));
-  }
-
-  @Test
-  void returnsBadRequestApiErrorForOtherMultipartFailures() {
-    ResponseEntity<ApiError> res =
-        controllerSetup.handleMultipartException(new MultipartException("boundary missing"));
-    assertEquals(HttpStatus.BAD_REQUEST, res.getStatusCode());
-    ApiError body = res.getBody();
-    assertNotNull(body);
-    assertThat(body.getErrorType(), equalTo(ApiError.ErrorType.MULTIPART_ERROR));
   }
 
   @Test

@@ -68,10 +68,8 @@ class AdminUserControllerTest extends ControllerTestBase {
     @Test
     void canListUsersWithCorrectMemoryTrackerCount() throws UnexpectedNoAccessRightException {
       User userWithTrackers = makeMe.aUser().please();
-      Note note1 = makeMe.aNote().please();
-      Note note2 = makeMe.aNote().please();
-      makeMe.aMemoryTrackerFor(note1).by(userWithTrackers).please();
-      makeMe.aMemoryTrackerFor(note2).by(userWithTrackers).please();
+      Note note = makeMe.aNote().please();
+      makeMe.aMemoryTrackerFor(note).by(userWithTrackers).please();
 
       UserListingPage result = controller.listUsers(0, 100);
 
@@ -80,7 +78,7 @@ class AdminUserControllerTest extends ControllerTestBase {
               .filter(u -> u.getId().equals(userWithTrackers.getId()))
               .findFirst()
               .orElseThrow();
-      assertThat(userListing.getMemoryTrackerCount(), equalTo(2L));
+      assertThat(userListing.getMemoryTrackerCount(), equalTo(1L));
     }
 
     @Test

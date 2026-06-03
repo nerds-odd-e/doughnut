@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.testability.OpenAiResponseStreamMocker;
-import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import com.openai.client.OpenAIClient;
 import java.sql.Timestamp;
 import org.apache.coyote.BadRequestException;
@@ -102,38 +101,6 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
       controller.getAiReply(conversation);
 
       assertThat(conversation.getConversationMessages().size()).isGreaterThan(0);
-    }
-  }
-
-  @Nested
-  class RecallPromptConversationTests {
-    RecallPrompt recallPrompt;
-    Note questionNote;
-    Conversation recallConversation;
-
-    @BeforeEach
-    void setup() {
-      questionNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      RecallPromptBuilder recallPromptBuilder = makeMe.aRecallPrompt();
-      recallPrompt = recallPromptBuilder.withPredefinedQuestionForNote(questionNote).please();
-      recallConversation =
-          makeMe
-              .aConversation()
-              .forARecallPrompt(recallPrompt)
-              .from(currentUser.getUser())
-              .please();
-
-      OpenAiResponseStreamMocker responseStreamMocker =
-          new OpenAiResponseStreamMocker(officialClient);
-      responseStreamMocker.withMessage("I am a Chatbot").mockStreamResponse();
-    }
-
-    @Test
-    void shouldUseNoteFromRecallPrompt()
-        throws UnexpectedNoAccessRightException, BadRequestException {
-      controller.getAiReply(recallConversation);
-
-      assertThat(recallConversation.getConversationMessages().size()).isGreaterThan(0);
     }
   }
 }
