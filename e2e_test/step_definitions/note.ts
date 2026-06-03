@@ -518,7 +518,7 @@ Then(
   }
 )
 
-Given(
+When(
   'I request to complete the content for the note {string}',
   (noteTopology: string) => {
     start

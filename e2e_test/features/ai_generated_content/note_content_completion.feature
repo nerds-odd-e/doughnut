@@ -5,10 +5,8 @@ Feature: Note content completion
   Background:
     Given I am logged in as an existing user
     And I have a notebook "Taiwan primer" with notes:
-      | Title   | Folder       | Content |
-      | Taiwan | | |
-      | Taipei  | Taiwan       | It is a    |
-      | Weather | Taiwan/Taipei | It rains a |
+      | Title  | Content    |
+      | Taipei | It is a    |
 
   Scenario: OpenAI Service Unavailability
     Given the OpenAI service is unavailable due to invalid system token

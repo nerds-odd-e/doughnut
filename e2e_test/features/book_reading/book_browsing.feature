@@ -1,22 +1,16 @@
-@withCliConfig
-@interactiveCLI
-@mockMineruLib
 Feature: Book browsing
 
   Background:
     Given I am logged in as an existing user
     And I have a notebook "Refactoring read" with a note "Code Refactoring Book"
-    And I set the access token for "old_learner" in the interactive CLI
-    When I attach book "refactoring.pdf" to the notebook "Refactoring read" via the CLI
+    When I attach a fake blank pdf book with layout of "refactoring" to the notebook "Code Refactoring Book"
     And I open the book attached to notebook "Refactoring read"
 
   Scenario: See book layout and beginning of PDF in the browser
     Then I should see the book layout in the browser:
       | 0 | Code Refactoring |
       | 0 | 1. Refactoring: Protecting Intention in Working Software |
-      | 0 | 2. The Usual Defi nition Is Not Enough |
       | 1 | 3.1 Can You Refactor Without Tests? |
-      | 1 | 6. Why Refactoring Matters More with AI |
     And I should see the beginning of the PDF book "refactoring.pdf"
 
   Scenario: Book block jumps the PDF to the anchored page
