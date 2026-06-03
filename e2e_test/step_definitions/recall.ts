@@ -53,7 +53,7 @@ Then(
   (day: number, toAssimilateAndTotal: string, numberOfRecalls: string) => {
     start.testability().backendTimeTravelTo(day, 8)
     start.assimilation().expectAssimilationDueFromTriple(toAssimilateAndTotal)
-    start.recall().expectRecallProgressFromTriple(numberOfRecalls)
+    start.recall().visitRecallPage().expectToRecallCounts(numberOfRecalls)
   }
 )
 

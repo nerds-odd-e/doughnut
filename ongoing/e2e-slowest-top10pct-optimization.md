@@ -51,7 +51,7 @@ Status: done
 - `creating_circles.feature` — "New user via circle invitation" (3.61s)
 
 ### Group 7: browse while recalling + note edit markdown
-Status: planned
+Status: done
 
 - `browse_answer_and_notes_while_recalling.feature` — "View last answered question when the quiz answer was correct" (3.51s)
 - `note_edit.feature` — "Edit a note's content as markdown" (3.48s)

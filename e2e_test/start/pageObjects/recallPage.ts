@@ -1,16 +1,6 @@
-import { RecallsController } from '@generated/doughnut-backend-api/sdk.gen'
 import { commonSenseSplit } from 'support/string_util'
 import { pageIsNotLoading } from '../pageBase'
 import router from '../router'
-
-function recallProgressFromTriple(triple: string) {
-  const [finished, dailyTotal, totalAssimilated] = triple.split('/').map(Number)
-  return {
-    finished,
-    toRepeatCount: (dailyTotal ?? 0) - (finished ?? 0),
-    totalAssimilated,
-  }
-}
 
 const recallPage = () => {
   return {
@@ -67,36 +57,6 @@ const recallPage = () => {
       // Close dialog
       cy.get('.close-button').click()
     },
-    expectRecallProgressFromTriple(numberOfRecalls: string) {
-      const { finished, toRepeatCount, totalAssimilated } =
-        recallProgressFromTriple(numberOfRecalls)
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-      cy.wrap(
-        RecallsController.recalling({ query: { timezone, dueindays: 0 } }),
-        {
-          log: false,
-        }
-      ).then((dueMemoryTrackers) => {
-        return cy
-          .wrap(RecallsController.previouslyAnswered({ query: { timezone } }), {
-            log: false,
-          })
-          .then((previouslyAnswered) => {
-            expect(
-              previouslyAnswered?.length ?? 0,
-              `recall finished today for ${numberOfRecalls}`
-            ).to.eq(finished)
-            expect(
-              dueMemoryTrackers?.toRepeat?.length ?? 0,
-              `recall queue length for ${numberOfRecalls}`
-            ).to.eq(toRepeatCount)
-            expect(
-              dueMemoryTrackers?.totalAssimilatedCount,
-              `total assimilated memory trackers for ${numberOfRecalls}`
-            ).to.eq(totalAssimilated)
-          })
-      })
-    },
     repeatMore() {
       cy.findByRole('button', { name: 'Load more from next 3 days' }).click()
     },
@@ -149,10 +109,6 @@ export const recall = () => {
     },
     assumeRecallPage() {
       return recallPage()
-    },
-    expectRecallProgressFromTriple(numberOfRecalls: string) {
-      recallPage().expectRecallProgressFromTriple(numberOfRecalls)
-      return this
     },
   }
 }
