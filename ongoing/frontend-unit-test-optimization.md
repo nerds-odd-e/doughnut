@@ -146,7 +146,9 @@ Status: done
 ---
 
 ### Phase 9: NoteNewForm / RichMarkdownEditor batch
-Status: planned
+Status: done
+
+**Result (2026-06-03):** Replaced `waitUntilFocused` polling with single rAF + sync assert; HorizontalMenu drops `vi.waitUntil`/`expect.element` for sync `querySelector`/`nextTick`; NoteAddQuestion uses direct input instead of `userEvent.type`; removed redundant NoteEditableContent multi-scenario normalization test; leaner Wikidata dropdown helpers and relation `it.each`; split RichMarkdownEditor paste readonly case. **105** scoped tests; full suite **1369** pass (~23s wall).
 
 **Scope:** `tests/notes/NoteNewForm.spec.ts`, `tests/notes/NoteEditableContent.spec.ts`, `tests/components/form/RichMarkdownEditor.properties.spec.ts`, `tests/toolbars/HorizontalMenu.spec.ts`, `tests/components/form/RichMarkdownEditor.spec.ts`, `tests/notes/NoteAddQuestion.spec.ts`
 
@@ -157,11 +159,13 @@ Status: planned
 ---
 
 ### Phase 10: RichMarkdownEditor properties / toolbar batch
-Status: planned
+Status: done
+
+**Result (2026-06-03):** Replaced HorizontalMenu `expect.element`/`vi.waitUntil` with sync `ariaLabelEl`/`querySelector` and `nextTick`. Split relation button label into `it.each`; trimmed redundant `flushPromises`. NoteToolbar export uses wide inline toolbar. NoteRefinement loading modal shares deferred-API helper. Quiz ContentLoader uses tracker-scoped pending retry mock. `waitUntilFocused` uses rAF instead of `vi.waitUntil`. **94** scoped tests; full suite **1370** pass (~22s wall).
 
 **Scope:** `tests/components/form/RichMarkdownEditor.properties.spec.ts`, `tests/notes/NoteToolbar.moreOptions.spec.ts`, `tests/components/recall/NoteRefinement.removeSuggestions.spec.ts`, `tests/toolbars/HorizontalMenu.spec.ts`, `tests/notes/NoteNewForm.spec.ts`, `tests/recall/Quiz.spec.ts`
 
-**Tests (10):** batch 10 from profiling.
+**Tests (10):** relation button label; copy export markdown; LoadingModal removing suggestions; hides menu icon; LoadingModal API fail; collapses outside click; NoteNewForm folderId; unknown relation dialog; Quiz ContentLoader; remove all property rows.
 
 **Verify:** scoped files then full suite.
 

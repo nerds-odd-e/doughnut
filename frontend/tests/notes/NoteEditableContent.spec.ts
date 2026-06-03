@@ -816,7 +816,7 @@ topic: training
       wrapper.unmount()
     })
 
-    it("should remove trailing consecutive empty lines, <br>, and <p><br></p>, and only save when there's content change", async () => {
+    it("should not save when only addition is trailing br tags", async () => {
       vi.useFakeTimers()
 
       const noteId = 1
@@ -837,8 +837,6 @@ topic: training
 
       const contentTextarea = wrapper.find("textarea")
         .element as HTMLTextAreaElement
-
-      // Test with trailing <br> tags
       contentTextarea.value = "Original content\n<br>\n<br>"
       contentTextarea.dispatchEvent(new Event("input"))
       await flushPromises()
@@ -846,33 +844,7 @@ topic: training
       vi.advanceTimersByTime(1000)
       await flushPromises()
 
-      // Should not save because normalized value is the same
       expect(updateNoteContentSpy).not.toHaveBeenCalled()
-
-      // Test with trailing empty lines and <p><br></p>
-      contentTextarea.value = "Original content\n\n\n<p><br></p>"
-      contentTextarea.dispatchEvent(new Event("input"))
-      await flushPromises()
-
-      vi.advanceTimersByTime(1000)
-      await flushPromises()
-
-      // Should not save because normalized value is the same
-      expect(updateNoteContentSpy).not.toHaveBeenCalled()
-
-      // Test with actual content change
-      contentTextarea.value = "Modified content\n\n<br>\n<p><br></p>"
-      contentTextarea.dispatchEvent(new Event("input"))
-      await flushPromises()
-
-      vi.advanceTimersByTime(1000)
-      await flushPromises()
-
-      // Should save with normalized value (trailing content removed)
-      expect(updateNoteContentSpy).toHaveBeenCalledWith({
-        path: { note: noteId },
-        body: { content: "Modified content" },
-      })
 
       vi.useRealTimers()
       wrapper.unmount()

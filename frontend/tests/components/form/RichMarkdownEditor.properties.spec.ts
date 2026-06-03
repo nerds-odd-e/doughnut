@@ -207,7 +207,6 @@ Body`)
 
   it("inserting a property emits composed frontmatter and preserves body", async () => {
     await h.mountEditor("# Hello Body")
-    await flushPromises()
     await h.openAddProperty()
 
     const keyInput = h
@@ -219,7 +218,6 @@ Body`)
     await keyInput.setValue("status")
     await h.setWikiPropertyValueField(valInput, "draft")
     await valInput.trigger("blur")
-    await flushPromises()
 
     const last = h.lastEmittedMarkdown()
     expect(last).toContain("---")
@@ -446,7 +444,6 @@ topic: training
 
 Workshop body.`
     const wrapper = await h.mountEditor(markdown)
-    await flushPromises()
 
     const keyInput = wrapper.find(
       '[data-testid="rich-note-property-row-key-input"]'
@@ -456,10 +453,8 @@ Workshop body.`
     )
     await keyInput.setValue("domain")
     await keyInput.trigger("blur")
-    await flushPromises()
     await h.setWikiPropertyValueField(valInput, "wiki")
     await valInput.trigger("blur")
-    await flushPromises()
 
     const last = h.lastEmittedMarkdown()
     expect(last).toContain("domain:")
@@ -535,22 +530,32 @@ Body line`
       await flushPromises()
     }
 
-    it("relation button shows human label for known kebab and raw text for unknown", async () => {
-      await mountRelation("similar-to")
-      let btn = h.getWrapper().find('[aria-label="Relation Type"]')
-      expect(btn.text()).toContain("similar to")
-      expect(btn.text()).not.toContain("similar-to")
-
-      await mountRelation("my-custom-relation")
-      btn = h.getWrapper().find('[aria-label="Relation Type"]')
-      expect(btn.text()).toContain("my-custom-relation")
-      expect(btn.text()).not.toContain("related to")
+    it.each([
+      {
+        relation: "similar-to",
+        expectedLabel: "similar to",
+        notExpected: "similar-to",
+      },
+      {
+        relation: "my-custom-relation",
+        expectedLabel: "my-custom-relation",
+        notExpected: "related to",
+      },
+    ])("relation button shows $expectedLabel for $relation", async ({
+      relation,
+      expectedLabel,
+      notExpected,
+    }) => {
+      await mountRelation(relation)
+      const btn = h.getWrapper().find('[aria-label="Relation Type"]')
+      expect(btn.text()).toContain(expectedLabel)
+      expect(btn.text()).not.toContain(notExpected)
     })
 
     it("opens relation dialog for unknown relation with Custom option", async () => {
       await mountRelation("my-custom-relation")
       await h.getWrapper().find('[aria-label="Relation Type"]').trigger("click")
-      await flushPromises()
+
       const rt = h.getWrapper().findComponent({ name: "RelationTypeSelect" })
       expect(rt.exists()).toBe(true)
       expect(rt.text()).toContain("Custom…")
@@ -559,19 +564,16 @@ Body line`
     it("commits custom relationship text from the dialog and emits updated frontmatter", async () => {
       await mountRelation("similar-to")
       await h.getWrapper().find('[aria-label="Relation Type"]').trigger("click")
-      await flushPromises()
 
       const rt = h.getWrapper().findComponent({ name: "RelationTypeSelect" })
       await rt
         .find(`input[value="${CUSTOM_RELATION_RADIO_SENTINEL}"]`)
         .trigger("change")
-      await flushPromises()
 
       const field = rt.find('input[type="text"].daisy-input')
       expect(field.exists()).toBe(true)
       await field.setValue("novel connector phrase")
       await field.trigger("keydown", { key: "Enter" })
-      await flushPromises()
 
       expect(h.lastEmittedMarkdown()).toContain(
         "relation: novel-connector-phrase"
@@ -581,7 +583,6 @@ Body line`
     it("opens dialog with custom text prefilled for an unknown relation", async () => {
       await mountRelation("xyz-unknown-kebab")
       await h.getWrapper().find('[aria-label="Relation Type"]').trigger("click")
-      await flushPromises()
 
       const rt = h.getWrapper().findComponent({ name: "RelationTypeSelect" })
       const field = rt.find('input[type="text"].daisy-input')
@@ -645,21 +646,18 @@ only: x
 
 Paragraph.\n`
     const wrapper = await h.mountEditor(markdown)
-    await flushPromises()
 
     expect(wrapper.text()).toContain("Properties")
 
     await wrapper
       .find('[data-testid="rich-note-property-row-remove"]')
       .trigger("click")
-    await flushPromises()
 
     const last = h.lastEmittedMarkdown()
     expect(last.startsWith("---")).toBe(false)
     expect(last).toContain("Paragraph.")
 
     await wrapper.setProps({ modelValue: last })
-    await flushPromises()
 
     expect(wrapper.find("h4").exists()).toBe(false)
     expect(wrapper.text()).not.toContain("Properties")

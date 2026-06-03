@@ -1,7 +1,6 @@
 import RichMarkdownEditor from "@/components/form/RichMarkdownEditor.vue"
 import helper from "@tests/helpers"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
-import { nextTick } from "vue"
 
 export function createRichMarkdownEditorTestHarness() {
   let wrapper: VueWrapper
@@ -31,8 +30,6 @@ export function createRichMarkdownEditorTestHarness() {
   async function dispatchPasteHtmlToQuill(html: string) {
     const qlEditor = quillEditorEl()
     qlEditor.focus()
-    await nextTick()
-    await flushPromises()
     const clipboardData = new DataTransfer()
     clipboardData.setData("text/html", html)
     qlEditor.dispatchEvent(
@@ -42,7 +39,6 @@ export function createRichMarkdownEditorTestHarness() {
         clipboardData,
       })
     )
-    await nextTick()
     await flushPromises()
   }
 

@@ -1,5 +1,4 @@
 import NoteAddQuestion from "@/components/notes/NoteAddQuestion.vue"
-import { userEvent } from "@testing-library/user-event"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -16,6 +15,12 @@ async function mountNoteAddQuestion() {
     })
     .render()
   await flushPromises()
+}
+
+function fillLabelText(label: string, value: string) {
+  const ctrl = screen.getByLabelText(label) as HTMLInputElement
+  ctrl.value = value
+  ctrl.dispatchEvent(new Event("input", { bubbles: true }))
 }
 
 describe("NoteAddQuestion", () => {
@@ -45,9 +50,7 @@ describe("NoteAddQuestion", () => {
   }) => {
     await mountNoteAddQuestion()
     for (const key of Object.keys(question)) {
-      const ctrl = screen.getByLabelText(key)
-      // eslint-disable-next-line no-await-in-loop
-      await userEvent.type(ctrl, question[key]!)
+      fillLabelText(key, question[key]!)
     }
     await flushPromises()
     const refineButton = screen.getByText(/refine/i) as HTMLButtonElement

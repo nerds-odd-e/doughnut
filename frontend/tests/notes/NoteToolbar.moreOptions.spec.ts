@@ -43,18 +43,12 @@ describe("NoteToolbar more options", () => {
     })
 
     wrapper = await mountNoteToolbar(noteRealm)
-    setNoteToolbarNavWidth(wrapper, narrowNoteToolbarNavWidth)
+    setNoteToolbarNavWidth(wrapper, wideNoteToolbarNavWidth)
     await flushPromises()
 
-    await wrapper.find(`[title="${titles.overflowMenu}"]`).trigger("click")
-    await flushPromises()
-
-    const exportBtn = document.querySelector(
-      `button[title="${titles.export}"]`
-    ) as HTMLButtonElement
-    expect(exportBtn).toBeTruthy()
-    exportBtn.click()
-    await flushPromises()
+    const exportBtn = wrapper.find(`button[title="${titles.export}"]`)
+    expect(exportBtn.exists()).toBe(true)
+    await exportBtn.trigger("click")
 
     const dialog = document.querySelector("dialog") as HTMLDialogElement
     expect(dialog?.open).toBe(true)

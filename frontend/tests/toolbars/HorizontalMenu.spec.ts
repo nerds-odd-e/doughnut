@@ -94,6 +94,10 @@ function menuWrapperEl() {
   return document.querySelector(".menu-wrapper")
 }
 
+function ariaLabelEl(label: string) {
+  return document.querySelector(`[aria-label="${label}"]`)
+}
+
 async function clickToggleMenu() {
   await page.getByLabelText("Toggle menu").click()
   await nextTick()
@@ -123,16 +127,9 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      // Use vi.waitUntil to wait for class change
-      await vi.waitUntil(
-        () =>
-          document
-            .querySelector(".menu-wrapper")
-            ?.classList.contains("is-collapsed"),
-        { timeout: 1000 }
-      )
+      await nextTick()
 
-      const menuWrapper = document.querySelector(".menu-wrapper")
+      const menuWrapper = menuWrapperEl()
       expect(menuWrapper).toHaveClass("is-collapsed")
       expect(menuWrapper).not.toHaveClass("is-expanded")
     })
@@ -150,8 +147,7 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      const expandButton = page.getByLabelText("Toggle menu")
-      await expect.element(expandButton).toBeInTheDocument()
+      expect(ariaLabelEl("Toggle menu")).toBeTruthy()
     })
   })
 
@@ -169,8 +165,7 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      const activeItem = page.getByLabelText("Assimilate")
-      await expect.element(activeItem).toBeInTheDocument()
+      expect(ariaLabelEl("Assimilate")).toBeTruthy()
     })
 
     it("shows menu icon when collapsed and no active item exists", async () => {
@@ -186,8 +181,7 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      const menuIcon = page.getByLabelText("Menu", { exact: true })
-      await expect.element(menuIcon).toBeInTheDocument()
+      expect(ariaLabelEl("Menu")).toBeTruthy()
     })
 
     it("hides menu icon when expanded", async () => {
@@ -203,19 +197,12 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      // Menu icon should be visible when collapsed
-      await expect
-        .element(page.getByLabelText("Menu", { exact: true }))
-        .toBeInTheDocument()
+      expect(ariaLabelEl("Menu")).toBeTruthy()
 
-      // Expand the menu
-      const expandButton = page.getByLabelText("Toggle menu")
-      await expandButton.click()
+      ;(ariaLabelEl("Toggle menu") as HTMLElement).click()
+      await nextTick()
 
-      // Menu icon should not be visible when expanded
-      await expect
-        .element(page.getByLabelText("Menu", { exact: true }))
-        .not.toBeInTheDocument()
+      expect(ariaLabelEl("Menu")).toBeNull()
     })
 
     it("hides menu icon when there is an active item", async () => {
@@ -231,14 +218,8 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      // Active item should be visible
-      await expect
-        .element(page.getByLabelText("Assimilate"))
-        .toBeInTheDocument()
-      // Menu icon should not be visible
-      await expect
-        .element(page.getByLabelText("Menu", { exact: true }))
-        .not.toBeInTheDocument()
+      expect(ariaLabelEl("Assimilate")).toBeTruthy()
+      expect(ariaLabelEl("Menu")).toBeNull()
     })
 
     it("hides menu icon on home page", async () => {
@@ -254,10 +235,7 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      // Menu icon should not be visible on home page
-      await expect
-        .element(page.getByLabelText("Menu", { exact: true }))
-        .not.toBeInTheDocument()
+      expect(ariaLabelEl("Menu")).toBeNull()
     })
 
     it("expands menu when clicking menu icon", async () => {
@@ -273,31 +251,13 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      // Menu should start collapsed
-      await vi.waitUntil(
-        () =>
-          document
-            .querySelector(".menu-wrapper")
-            ?.classList.contains("is-collapsed"),
-        { timeout: 1000 }
-      )
-      let menuWrapper = document.querySelector(".menu-wrapper")
-      expect(menuWrapper).toHaveClass("is-collapsed")
+      await nextTick()
+      expect(menuWrapperEl()).toHaveClass("is-collapsed")
 
-      // Click on the menu icon
-      const menuIcon = page.getByLabelText("Menu", { exact: true })
-      await menuIcon.click()
+      await page.getByLabelText("Menu", { exact: true }).click()
+      await nextTick()
 
-      // Menu should now be expanded
-      await vi.waitUntil(
-        () =>
-          document
-            .querySelector(".menu-wrapper")
-            ?.classList.contains("is-expanded"),
-        { timeout: 1000 }
-      )
-      menuWrapper = document.querySelector(".menu-wrapper")
-      expect(menuWrapper).toHaveClass("is-expanded")
+      expect(menuWrapperEl()).toHaveClass("is-expanded")
     })
 
     it("shows active item icon and label correctly when collapsed", async () => {
@@ -313,8 +273,7 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      const noteLink = page.getByLabelText("Note")
-      await expect.element(noteLink).toBeInTheDocument()
+      expect(ariaLabelEl("Note")).toBeTruthy()
     })
   })
 
@@ -428,18 +387,19 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      const expandButton = page.getByLabelText("Toggle menu")
-      await expandButton.click()
+      await page.getByLabelText("Toggle menu").click()
+      await nextTick()
 
-      // All items should be visible
-      await expect.element(page.getByLabelText("Note")).toBeInTheDocument()
-      await expect
-        .element(page.getByLabelText("Assimilate"))
-        .toBeInTheDocument()
-      await expect.element(page.getByLabelText("Recall")).toBeInTheDocument()
-      await expect.element(page.getByLabelText("Circles")).toBeInTheDocument()
-      await expect.element(page.getByLabelText("Bazaar")).toBeInTheDocument()
-      await expect.element(page.getByLabelText("Messages")).toBeInTheDocument()
+      for (const label of [
+        "Note",
+        "Assimilate",
+        "Recall",
+        "Circles",
+        "Bazaar",
+        "Messages",
+      ]) {
+        expect(ariaLabelEl(label)).toBeTruthy()
+      }
     })
   })
 
@@ -457,18 +417,13 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      const expandButton = page.getByLabelText("Toggle menu")
-      await expandButton.click()
+      await clickToggleMenu()
+      expect(menuWrapperEl()).toHaveClass("is-expanded")
 
-      let menuWrapper = document.querySelector(".menu-wrapper")
-      expect(menuWrapper).toHaveClass("is-expanded")
-
-      // Click outside
       document.body.click()
       await nextTick()
 
-      menuWrapper = document.querySelector(".menu-wrapper")
-      expect(menuWrapper).toHaveClass("is-collapsed")
+      expect(menuWrapperEl()).toHaveClass("is-collapsed")
     })
   })
 
@@ -522,9 +477,7 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      // LoginButton should be visible
-      const loginButton = page.getByLabelText("Login via Github")
-      await expect.element(loginButton).toBeInTheDocument()
+      expect(ariaLabelEl("Login via Github")).toBeTruthy()
     })
 
     it("login button is always visible when no user and menu is expanded", async () => {
@@ -540,17 +493,12 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      // Menu should be expanded when no user
-      const menuWrapper = document.querySelector(".menu-wrapper")
+      const menuWrapper = menuWrapperEl()
       expect(menuWrapper).toHaveClass("is-expanded")
       expect(menuWrapper).not.toHaveClass("is-collapsed")
 
-      const loginButton = page.getByLabelText("Login via Github")
-      await expect.element(loginButton).toBeInTheDocument()
-
-      // Chevron should not be visible when no user
-      const expandButton = page.getByLabelText("Toggle menu")
-      await expect.element(expandButton).not.toBeInTheDocument()
+      expect(ariaLabelEl("Login via Github")).toBeTruthy()
+      expect(ariaLabelEl("Toggle menu")).toBeNull()
     })
   })
 
@@ -568,11 +516,8 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      // Navigation items should not be visible
-      await expect.element(page.getByLabelText("Note")).not.toBeInTheDocument()
-      await expect
-        .element(page.getByLabelText("Assimilate"))
-        .not.toBeInTheDocument()
+      expect(ariaLabelEl("Note")).toBeNull()
+      expect(ariaLabelEl("Assimilate")).toBeNull()
     })
   })
 
@@ -618,27 +563,13 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      // Menu should start collapsed
-      const menuWrapper = document.querySelector(".menu-wrapper")
-      expect(menuWrapper).toHaveClass("is-collapsed")
+      expect(menuWrapperEl()).toHaveClass("is-collapsed")
 
-      // Simulate route change
       useRouteValue.fullPath = "/notebooks"
       useRouteValue.name = "notebooks"
+      await nextTick()
 
-      // Wait for watcher to process
-      // Use vi.waitUntil to wait for class change
-      await vi.waitUntil(
-        () =>
-          document
-            .querySelector(".menu-wrapper")
-            ?.classList.contains("is-collapsed"),
-        { timeout: 1000 }
-      )
-
-      expect(document.querySelector(".menu-wrapper")).toHaveClass(
-        "is-collapsed"
-      )
+      expect(menuWrapperEl()).toHaveClass("is-collapsed")
     })
   })
 })

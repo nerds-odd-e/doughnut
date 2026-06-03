@@ -220,7 +220,25 @@ describe("repeat page", () => {
 
   describe("loading state when fetching recall prompt", () => {
     it("should show ContentLoader, not JustReview, when navigating to a memory tracker that previously failed", async () => {
-      askAQuestionSpy.mockResolvedValueOnce(wrapSdkError("Failed to fetch"))
+      vi.useRealTimers()
+      let finishRetry!: () => void
+      let tracker1Calls = 0
+      askAQuestionSpy.mockImplementation(async (options) => {
+        const memoryTracker = (options as { path: { memoryTracker: number } })
+          .path.memoryTracker
+        if (memoryTracker === 1) {
+          tracker1Calls += 1
+          if (tracker1Calls === 1) {
+            return wrapSdkError("Failed to fetch")
+          }
+          await new Promise<void>((resolve) => {
+            finishRetry = resolve
+          })
+          return wrapSdkResponse(recallPrompt)
+        }
+        return wrapSdkResponse(recallPrompt)
+      })
+
       const wrapper = await mountPage([1, 2], 1)
       await flushPromises()
 
@@ -235,6 +253,7 @@ describe("repeat page", () => {
         true
       )
 
+      finishRetry()
       await flushPromises()
     })
   })

@@ -10,7 +10,6 @@ import WikidataAssociationDialogBody from "@/components/notes/WikidataAssociatio
 import WikidataSearchByLabel from "@/components/notes/WikidataSearchByLabel.vue"
 import { VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
-import { nextTick } from "vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, {
   mockSdkService,
@@ -311,7 +310,6 @@ describe("adding new note", () => {
         })
         .mount({ attachTo: document.body })
       await setNoteNewFormTitle(wrapper, "in folder")
-      await flushPromises()
 
       await wrapper.find('[data-testid="note-new-form"]').trigger("submit")
       expect(mockedCreateNoteAtRoot).toHaveBeenCalledWith({
@@ -468,10 +466,11 @@ describe("adding new note", () => {
       await flushPromises()
     }
 
-    const selectFromDropdown = async (wikidataId: string) => {
+    const selectFromDropdown = async (
+      wikidataId: string,
+      action: "Replace" | "Append"
+    ) => {
       const bodyComponent = wrapper.findComponent(WikidataAssociationDialogBody)
-      expect(bodyComponent.exists()).toBe(true)
-
       // biome-ignore lint/suspicious/noExplicitAny: accessing Vue component internals in test
       const vm = bodyComponent.vm as any
       expect(vm.searchResults.length).toBeGreaterThan(0)
@@ -482,17 +481,7 @@ describe("adding new note", () => {
 
       vm.selectedOption = wikidataId
       vm.selectedItem = selected
-
-      const currentLabel = (vm.searchKeyRef || vm.searchKey || "").toUpperCase()
-      const newLabel = selected.label.toUpperCase()
-
-      if (currentLabel === newLabel) {
-        await selectMatchingWikidataResult(wikidataId)
-        return
-      }
-
-      vm.showTitleOptions = true
-      await flushPromises()
+      await selectTitleAction(action)
     }
 
     const selectTitleAction = async (
@@ -548,11 +537,8 @@ describe("adding new note", () => {
       expect(vm.showDialog).toBe(true)
       vm.closeDialog()
 
-      await nextTick()
       await flushPromises()
-      await nextTick()
 
-      // Check that showDialog is now false
       expect(vm.showDialog).toBe(false)
 
       // Check that the WikidataAssociationDialog component no longer exists
@@ -583,15 +569,16 @@ describe("adding new note", () => {
         searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
         await openWikidataDialog(searchTitle)
         if (titleAction) {
-          await selectFromDropdown(wikidataId)
-          const titleActionCapitalized = (titleAction.charAt(0).toUpperCase() +
-            titleAction.slice(1)) as "Replace" | "Append"
-          await selectTitleAction(titleActionCapitalized)
+          await selectFromDropdown(
+            wikidataId,
+            (titleAction.charAt(0).toUpperCase() + titleAction.slice(1)) as
+              | "Replace"
+              | "Append"
+          )
         } else {
           await selectMatchingWikidataResult(wikidataId)
         }
 
-        await flushPromises()
         expect(wrapper.findComponent(WikidataAssociationDialog).exists()).toBe(
           false
         )

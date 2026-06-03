@@ -3,7 +3,6 @@ import {
   TextContentController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
-import { nextTick } from "vue"
 import { describe, expect, it } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import {
@@ -129,16 +128,22 @@ describe("NoteRefinement remove refinement suggestions", () => {
   })
 
   describe("loading modal", () => {
-    it("shows LoadingModal while removing suggestions", async () => {
-      let resolveApi: () => void
+    function deferApiCompletion() {
+      let resolveApi!: () => void
+      const apiGate = new Promise<void>((resolve) => {
+        resolveApi = resolve
+      })
+      return { apiGate, finishApi: () => resolveApi() }
+    }
+
+    async function startRemovingWithPendingApi(apiResult: { content: string }) {
+      const { apiGate, finishApi } = deferApiCompletion()
       mockSdkServiceWithImplementation(
         AiController,
         "removeRefinementSuggestion",
         async () => {
-          await new Promise<void>((r) => {
-            resolveApi = r
-          })
-          return { content: "Updated content" }
+          await apiGate
+          return apiResult
         }
       )
       const wrapper = mountNoteRefinement(["Point 1", "Point 2"])
@@ -150,24 +155,28 @@ describe("NoteRefinement remove refinement suggestions", () => {
       await flushPromises()
       usePopups().popups.done(true)
       await flushPromises()
-      await nextTick()
+      return { wrapper, finishApi }
+    }
+
+    it("shows LoadingModal while removing suggestions", async () => {
+      const { finishApi } = await startRemovingWithPendingApi({
+        content: "Updated content",
+      })
 
       expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
       expect(document.body.textContent).toContain("AI is removing content...")
-      resolveApi!()
+      finishApi()
       await flushPromises()
       expect(document.querySelector(".loading-modal-mask")).toBeNull()
     })
 
     it("hides LoadingModal when remove API fails", async () => {
-      let resolveApi: () => void
+      const { apiGate, finishApi } = deferApiCompletion()
       mockSdkServiceWithImplementation(
         AiController,
         "removeRefinementSuggestion",
         async () => {
-          await new Promise<void>((r) => {
-            resolveApi = r
-          })
+          await apiGate
           return wrapSdkError("API Error")
         }
       )
@@ -180,10 +189,9 @@ describe("NoteRefinement remove refinement suggestions", () => {
       await flushPromises()
       usePopups().popups.done(true)
       await flushPromises()
-      await nextTick()
 
       expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
-      resolveApi!()
+      finishApi()
       await flushPromises()
       expect(document.querySelector(".loading-modal-mask")).toBeNull()
     })

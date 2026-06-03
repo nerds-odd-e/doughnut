@@ -17,18 +17,16 @@ describe("RichMarkdownEditor", () => {
     expect(h.getWrapper().emitted()["update:modelValue"]).toBeUndefined()
   })
 
-  it("converts pasted HTML to markdown and does not paste when readonly", async () => {
+  it("converts pasted HTML to markdown", async () => {
     await h.mountEditor("")
-    await flushPromises()
-    await nextTick()
     await h.dispatchPasteHtmlToQuill("<p><strong>Bold text</strong></p>")
     const emitted = h.getWrapper().emitted()["update:modelValue"]
-    if (emitted?.length) {
-      expect(emitted[emitted.length - 1]![0]).toContain("Bold text")
-    }
+    expect(emitted?.length).toBeGreaterThan(0)
+    expect(emitted![emitted!.length - 1]![0]).toContain("Bold text")
+  })
 
+  it("does not paste when readonly", async () => {
     await h.mountEditor("", { readonly: true })
-    await flushPromises()
     await h.dispatchPasteHtmlToQuill("<p>Test</p>")
     expect(h.getWrapper().emitted()["update:modelValue"]).toBeUndefined()
   })
