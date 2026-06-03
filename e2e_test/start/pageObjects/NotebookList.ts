@@ -22,9 +22,10 @@ export const notebookList = () => {
     },
     expectNotebooks: (notebooks: string) => {
       pageIsNotLoading()
-      cy.get('.notebook-card h5').then(($els) => {
+      const expected = commonSenseSplit(notebooks, ',')
+      cy.get('.notebook-card h5', { timeout: 15000 }).should(($els) => {
         const cardTitles = Array.from($els, (el) => el.innerText)
-        expect(cardTitles).to.deep.eq(commonSenseSplit(notebooks, ','))
+        expect(cardTitles, `circle notebook catalog`).to.deep.eq(expected)
       })
     },
     navigateToNotebook(notebookName: string) {

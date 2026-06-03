@@ -15,12 +15,15 @@ export const addQuestionPage = () => {
       })
     },
     addQuestion(row: Record<string, string>) {
+      cy.intercept('POST', '**/api/predefined-questions/**/note-questions').as(
+        'addQuestionManually'
+      )
       this.fillQuestion(row)
       cy.findByRole('button', { name: 'Submit' }).click()
-      cy.get('.question-table', { timeout: 15000 }).should(
-        'contain.text',
-        row.Stem!
-      )
+      cy.wait('@addQuestionManually').then(({ response }) => {
+        expect(response?.statusCode, 'add question manually').to.equal(200)
+      })
+      cy.get('.question-table').should('contain.text', row.Stem!)
     },
     generateQuestionByAI() {
       cy.findByRole('button', { name: 'Generate by AI' }).click()

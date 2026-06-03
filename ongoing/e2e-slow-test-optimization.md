@@ -99,7 +99,12 @@ Status: done
 
 ---
 
-ongoing/e2e-slow-test-optimization.md
+### Phase 8: creating_circles (new user) + predefined_questions (manual add)
+Status: done
+
+**Specs:** `e2e_test/features/circles/creating_circles.feature`, `e2e_test/features/note_creation_and_update/predefined_questions_management.feature` (Manually add scenario)
+
+**Verify:** `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/circles/creating_circles.feature,e2e_test/features/note_creation_and_update/predefined_questions_management.feature`
 
 ---
 

@@ -45,9 +45,13 @@ Given("I'm on the login page", () => {
 })
 
 When('I identify myself as a new user', () => {
+  cy.intercept('GET', '**/api/healthcheck').as('devLogin')
   cy.get('#username').type('user')
   cy.get('#password').type('password')
   cy.get('#login-button').click()
+  cy.wait('@devLogin').then(({ response }) => {
+    expect(response?.statusCode, 'dev login healthcheck').to.equal(200)
+  })
 })
 
 Then('I should be asked to create my profile', () => {
@@ -58,17 +62,22 @@ Then('I should be asked to create my profile', () => {
 })
 
 When('I save my profile with:', (data: DataTable) => {
+  cy.intercept('POST', '**/api/user').as('createUser')
   data.hashes().forEach((elem) => {
     for (const propName in elem) {
       start.form.getField(propName).assignValue(elem[propName] ?? '')
     }
   })
   cy.get('input[value="Submit"]').click()
+  cy.wait('@createUser').then(({ response }) => {
+    expect(response?.statusCode, 'create user profile').to.equal(200)
+  })
   cy.findByRole('heading', {
     name: /Please create your profile/i,
     timeout: 15000,
   }).should('not.exist')
   start.pageIsNotLoading()
+  cy.get('#join-circle-invitationCode', { timeout: 15000 }).should('exist')
 })
 
 Then(

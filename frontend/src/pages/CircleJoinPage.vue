@@ -16,7 +16,7 @@ import ContainerPage from "./commons/ContainerPage.vue"
 export default defineComponent({
   components: { CircleJoinForm, ContainerPage },
   props: {
-    invitationCode: Number,
+    invitationCode: String,
   },
   beforeRouteEnter(
     _to: RouteLocationNormalized,

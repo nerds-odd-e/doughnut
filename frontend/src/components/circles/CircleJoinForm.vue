@@ -26,14 +26,14 @@ import TextInput from "@/components/form/TextInput.vue"
 export default defineComponent({
   components: { TextInput },
   props: {
-    invitationCode: Number,
+    invitationCode: String,
   },
 
   data() {
     return {
       circle: null as Circle | null,
       formData: {
-        invitationCode: this.invitationCode?.toString() ?? "",
+        invitationCode: this.invitationCode ?? "",
       } as CircleJoiningByInvitation,
       errors: {} as Record<string, string>,
     }

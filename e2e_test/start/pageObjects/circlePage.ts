@@ -82,5 +82,9 @@ export const navigateToCircle = (circleName: string) => {
     })
   })
   pageIsNotLoading()
+  cy.findByText(`Circle: ${circleName}`)
+  cy.findByText('Add New Notebook In This Circle', { timeout: 15000 }).should(
+    'be.visible'
+  )
   return assumeCirclePage()
 }

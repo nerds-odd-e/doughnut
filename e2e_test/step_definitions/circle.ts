@@ -23,10 +23,9 @@ When('I visit the invitation link', () => {
         if ($body.find('#username').length > 0) {
           return
         }
-        cy.findByRole('heading', {
-          name: 'Joining a Circle',
-          timeout: 15000,
-        }).should('be.visible')
+        cy.get('#join-circle-invitationCode', { timeout: 15000 }).should(
+          'exist'
+        )
         const code = url.split('/circles/join/')[1]?.split(/[/?#]/)[0]
         if (code) {
           cy.get('#join-circle-invitationCode').should(($input) => {
