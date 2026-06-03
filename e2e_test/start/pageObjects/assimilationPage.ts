@@ -97,6 +97,7 @@ export const assumeAssimilationPage = () => ({
     return this
   },
   proceedWithRememberingSpelling() {
+    this.waitForAssimilationReady()
     this.checkRememberSpellingOption()
     this.clickKeepForRecall()
     return this

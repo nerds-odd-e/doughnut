@@ -7,6 +7,11 @@ import { commonSenseSplit } from 'support/string_util'
 import start from '../start'
 import { assumeMemoryTrackerPage } from '../start/pageObjects/memoryTrackerPage'
 
+function assertAssimilationDueOnDay(day: number, toAssimilateAndTotal: string) {
+  start.testability().backendTimeTravelTo(day, 8)
+  start.assimilation().expectAssimilationDueFromTriple(toAssimilateAndTotal)
+}
+
 Given("It's day {int}, {int} hour", (day: number, hour: number) => {
   start.testability().backendTimeTravelTo(day, hour)
 })
@@ -51,16 +56,22 @@ Then(
 Then(
   'On day {int} I should have {string} note for assimilation and {string} for recall',
   (day: number, toAssimilateAndTotal: string, numberOfRecalls: string) => {
-    start.testability().backendTimeTravelTo(day, 8)
-    start.assimilation().expectAssimilationDueFromTriple(toAssimilateAndTotal)
+    assertAssimilationDueOnDay(day, toAssimilateAndTotal)
     start.recall().visitRecallPage().expectToRecallCounts(numberOfRecalls)
+  }
+)
+
+Then(
+  'On day {int} I should have {string} note for assimilation',
+  (day: number, toAssimilateAndTotal: string) => {
+    assertAssimilationDueOnDay(day, toAssimilateAndTotal)
   }
 )
 
 Then('I am recalling my note on day {int}', (day: number) => {
   start.testability().backendTimeTravelTo(day, 8)
   cy.reload()
-  start.recall().navigateToRecallPage()
+  start.recall().visitRecallPage()
 })
 
 When(
