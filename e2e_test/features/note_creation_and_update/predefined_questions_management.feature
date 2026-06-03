@@ -4,7 +4,9 @@ Feature: Quiz Question Management
 
   Scenario: Manually add a question to the note successfully
     Given I am logged in as an existing user
-    And I have a notebook "Cow jokes" with a note "The cow joke"
+    And I have a notebook "Cow jokes" with note "The cow joke" and predefined questions in the notebook:
+      | Note Title   | Question             | Answer | One Wrong Choice |
+      | The cow joke | What does a cow say? | moo    | woo              |
     When I add the following question for the note "The cow joke":
       | Stem                                 | Choice 0    | Choice 1 | Choice 2 | Correct Choice Index |
       | What do you call a cow with not leg? | Ground beef | Cowboy   | Oxford   | 0                    |
@@ -15,7 +17,8 @@ Feature: Quiz Question Management
   @usingMockedOpenAiService
   Scenario: Can generate the question by AI
     Given I am logged in as an existing user
-    And I have a notebook "Cow jokes" with note "The cow joke" and predefined questions in the notebook:
+    And I have a notebook "Cow jokes" with a note "The cow joke"
+    And there are questions in the notebook "Cow jokes" for the note:
       | Note Title   | Question             | Answer | One Wrong Choice |
       | The cow joke | What does a cow say? | moo    | woo              |
     And OpenAI generates this question:
@@ -29,7 +32,8 @@ Feature: Quiz Question Management
   @usingMockedOpenAiService
   Scenario: Can refine the question by AI
     Given I am logged in as an existing user
-    And I have a notebook "Cow jokes" with note "The cow joke" and predefined questions in the notebook:
+    And I have a notebook "Cow jokes" with a note "The cow joke"
+    And there are questions in the notebook "Cow jokes" for the note:
       | Note Title   | Question             | Answer | One Wrong Choice |
       | The cow joke | What does a cow say? | moo    | woo              |
     And OpenAI now refines the question to become:
