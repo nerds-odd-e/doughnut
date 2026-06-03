@@ -15,13 +15,14 @@ import {
 } from '../src/sessionScrollback/sessionScrollbackAppendContext.js'
 import {
   extendInkRenderForInteractiveTests,
-  pressEscapeAndWait,
+  pendingUntilAbort,
+  pressEscapeAndWaitForCancelledLine,
   StageKeyRoot,
   stripAnsi,
 } from './inkTestHelpers.js'
 import {
-  readyNotebookStageRender,
   waitNotebookPickerVisible,
+  waitNotebookStageActive,
 } from './useNotebookSlashCommand.waits.js'
 
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'
@@ -93,11 +94,6 @@ function notebookStageTestAppElement(argument?: string) {
   )
 }
 
-async function renderNotebookStageWhenPromptReady(notebookArgument: string) {
-  const result = render(notebookStageTestAppElement(notebookArgument))
-  return readyNotebookStageRender(result, notebookArgument)
-}
-
 async function renderNotebookStageWhenPickerVisible() {
   const result = render(notebookStageTestAppElement(undefined))
   const ink = extendInkRenderForInteractiveTests(result)
@@ -132,12 +128,13 @@ describe('useNotebookSlashCommand stage', () => {
       data: { notebooks: [myNotebooksApiRow('Top Maths')] },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
 
-    const { stdin, lastStrippedFrame, waitForLastFrameToInclude } =
-      await renderNotebookStageWhenPromptReady('Top Maths')
+    const result = render(notebookStageTestAppElement('Top Maths'))
+    const ink = extendInkRenderForInteractiveTests(result)
+    await waitNotebookStageActive(ink, 'Top Maths')
 
-    stdin.write('/exit\r')
-    await waitForLastFrameToInclude('Left notebook context.')
-    expect(lastStrippedFrame()).not.toContain('Active notebook: Top Maths')
+    result.stdin.write('/exit\r')
+    await ink.waitForLastFrameToInclude('Left notebook context.')
+    expect(ink.lastStrippedFrame()).not.toContain('Active notebook: Top Maths')
   })
 
   test('unknown notebook name shows error and does not enter stage', async () => {
@@ -180,34 +177,21 @@ describe('useNotebookSlashCommand stage', () => {
         if (signal === undefined) {
           throw new Error('expected AbortSignal from /use notebook resolve')
         }
-        await new Promise<never>((_, reject) => {
-          signal.addEventListener(
-            'abort',
-            () => {
-              reject(new DOMException('Aborted', 'AbortError'))
-            },
-            { once: true }
-          )
-        })
+        await pendingUntilAbort(signal)
       }
     )
 
     const result = render(notebookStageTestAppElement('Top Maths'))
-    const { stdin, frames, waitForFramesToInclude } = {
+    const { stdin, lastStrippedFrame, waitForFramesToInclude } = {
       ...result,
       ...extendInkRenderForInteractiveTests(result),
     }
 
     await waitForFramesToInclude('Loading notebooks')
 
-    await pressEscapeAndWait(
-      stdin,
-      () => frames.join('\n'),
-      (c) => stripAnsi(c).includes('Cancelled.')
-    )
+    await pressEscapeAndWaitForCancelledLine(stdin, lastStrippedFrame)
 
-    const combined = stripAnsi(frames.join('\n'))
-    expect(combined).toContain('Cancelled.')
+    expect(lastStrippedFrame()).toContain('Cancelled.')
   })
 
   test('duplicate notebook names show ambiguity error', async () => {
@@ -278,16 +262,10 @@ describe('useNotebookSlashCommand stage', () => {
       },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
 
-    const { stdin, frames, waitForFramesToInclude } =
+    const { stdin, lastStrippedFrame } =
       await renderNotebookStageWhenPickerVisible()
 
-    await pressEscapeAndWait(
-      stdin,
-      () => frames.join('\n'),
-      (c) => stripAnsi(c).includes('Cancelled.')
-    )
-
-    await waitForFramesToInclude('Cancelled.')
+    await pressEscapeAndWaitForCancelledLine(stdin, lastStrippedFrame)
   })
 
   test('bare /use picker: typing filters list; Enter selects highlighted match', async () => {

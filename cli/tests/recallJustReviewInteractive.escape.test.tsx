@@ -1,4 +1,5 @@
 import { describeRecallJustReviewInteractive } from './recallJustReviewInteractive.suite.js'
+import { pendingUntilAbort } from './inkTestHelpers.js'
 import type { InkWaitHelpers } from './recallJustReviewInteractive.waits.js'
 
 describeRecallJustReviewInteractive((api) => {
@@ -9,7 +10,6 @@ describeRecallJustReviewInteractive((api) => {
     RECALL_SESSION_STOPPED_LINE,
     renderInkWhenCommandLineReady,
     pressEscapeAndWaitForCancelledLine,
-    stripAnsi,
     waitForFrames,
     waitRememberCard,
     startRecall,
@@ -76,28 +76,18 @@ describeRecallJustReviewInteractive((api) => {
         if (signal === undefined) {
           throw new Error('expected AbortSignal from recall load')
         }
-        await new Promise<never>((_, reject) => {
-          signal.addEventListener(
-            'abort',
-            () => {
-              reject(new DOMException('Aborted', 'AbortError'))
-            },
-            { once: true }
-          )
-        })
+        await pendingUntilAbort(signal)
       }
     )
 
-    const { stdin, frames, waitForFramesToInclude } =
+    const { stdin, lastStrippedFrame, waitForLastFrameToInclude } =
       await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     startRecall(stdin)
-    await waitForFramesToInclude('Loading recall')
+    await waitForLastFrameToInclude('Loading recall')
 
-    await pressEscapeAndWaitForCancelledLine(stdin, () => frames.join('\n'), {
-      normalize: stripAnsi,
-    })
-    await waitForFramesToInclude('/recall')
+    await pressEscapeAndWaitForCancelledLine(stdin, lastStrippedFrame)
+    await waitForLastFrameToInclude('/recall')
   })
 
   test('Escape during mark as recalled shows Cancelled when mark honors signal', async () => {
@@ -110,33 +100,19 @@ describeRecallJustReviewInteractive((api) => {
           throw new Error('expected AbortSignal from markAsRecalled')
         }
         markEntered = true
-        await new Promise<never>((_, reject) => {
-          signal.addEventListener(
-            'abort',
-            () => {
-              reject(new DOMException('Aborted', 'AbortError'))
-            },
-            { once: true }
-          )
-        })
+        await pendingUntilAbort(signal)
       }
     )
 
-    const { stdin, frames, ...ink } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
+    const { stdin, lastStrippedFrame, ...ink } =
+      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
 
     startRecall(stdin)
     await waitRememberCard(ink, 'Alpha')
 
     stdin.write('y\r')
-    await waitForFrames(
-      () => ink.lastStrippedFrame(),
-      () => markEntered
-    )
+    await waitForFrames(lastStrippedFrame, () => markEntered)
 
-    await pressEscapeAndWaitForCancelledLine(stdin, () => frames.join('\n'), {
-      normalize: stripAnsi,
-    })
+    await pressEscapeAndWaitForCancelledLine(stdin, lastStrippedFrame)
   })
 })

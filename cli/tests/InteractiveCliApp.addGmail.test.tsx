@@ -6,7 +6,6 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import {
   pressEscapeAndWaitForCancelledLine,
   renderInkWhenCommandLineReady,
-  stripAnsi,
   waitForFrames,
   waitForLastFrame,
 } from './inkTestHelpers.js'
@@ -243,7 +242,7 @@ describe('InteractiveCliApp /add gmail (mocked HTTP APIs)', () => {
   })
 
   test('Escape during OAuth wait settles Cancelled and returns prompt', async () => {
-    const { stdin, frames, lastFrame } = await renderApp()
+    const { stdin, lastStrippedFrame, lastFrame } = await renderApp()
 
     stdin.write('/add gmail\r')
     await waitForFrames(
@@ -258,9 +257,7 @@ describe('InteractiveCliApp /add gmail (mocked HTTP APIs)', () => {
         !f.includes('→ ')
     )
 
-    await pressEscapeAndWaitForCancelledLine(stdin, () => frames.join('\n'), {
-      normalize: stripAnsi,
-    })
+    await pressEscapeAndWaitForCancelledLine(stdin, lastStrippedFrame)
     await waitForLastFrame(lastFrame, (f) => f.includes('→ '))
   })
 })
@@ -323,7 +320,7 @@ describe('InteractiveCliApp /last email (mocked HTTP APIs)', () => {
       })
     )
 
-    const { stdin, frames, lastFrame } = await renderApp()
+    const { stdin, lastStrippedFrame, lastFrame } = await renderApp()
 
     stdin.write('/last email\r')
     await waitForLastFrame(
@@ -334,9 +331,7 @@ describe('InteractiveCliApp /last email (mocked HTTP APIs)', () => {
         !f.includes('→ ')
     )
 
-    await pressEscapeAndWaitForCancelledLine(stdin, () => frames.join('\n'), {
-      normalize: stripAnsi,
-    })
+    await pressEscapeAndWaitForCancelledLine(stdin, lastStrippedFrame)
     await waitForLastFrame(lastFrame, (f) => f.includes('→ '))
   })
 

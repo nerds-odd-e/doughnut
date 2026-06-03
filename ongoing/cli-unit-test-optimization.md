@@ -83,7 +83,7 @@ Status: done
 ---
 
 ### Phase 3: Notebook shell + remaining slow tests (8 tests)
-Status: planned
+Status: done
 
 **Scope files:**
 - `cli/tests/InteractiveCliApp.useNotebook.test.tsx` (2)
@@ -106,7 +106,7 @@ Status: planned
 
 **Goals:** Merge overlapping /exit and notebook-stage tests; simplify attach-spinner test if over-driving UI; keep behavior coverage.
 
----
+**Result (2026-06-03):** Merged notebook slash-guidance + /exit history into one render; folded `/exit` no-repaint check into one-chunk test via `waitTurnsWithoutRepaint`; dropped redundant green-ANSI poll on correct spelling; `pendingUntilAbort` + `lastStrippedFrame` for escape/cancel waits (no `frames.join`); stage `/exit` skips command-line probe; attach spinner asserts ignored input in one wait; MCQ out-of-range uses combined backspace+answer write. Target tests ~201–500ms each (was ~525–608ms baseline); suite 278 tests (−2 redundant cases).
 
 ### Phase 4: Re-profile and close
 Status: planned

@@ -54,7 +54,7 @@ describe('InteractiveCliApp /use notebook integration', () => {
     fs.rmSync(configDir, { recursive: true, force: true })
   })
 
-  test('full app: /use opens notebook stage; / shows nested slash guidance', async () => {
+  test('notebook stage: slash guidance, nested line, /exit history recall', async () => {
     myNotebooksSpy.mockResolvedValue({
       data: { notebooks: [myNotebooksApiRow('Top Maths')] },
     } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
@@ -63,15 +63,8 @@ describe('InteractiveCliApp /use notebook integration', () => {
     await openTopMathsNotebook(ink.stdin, ink)
     ink.stdin.write('/')
     await waitNotebookSlashGuidance(ink)
-  })
-
-  test('after nested plain line and /exit, root up-arrow recalls /exit not stale root prefix', async () => {
-    myNotebooksSpy.mockResolvedValue({
-      data: { notebooks: [myNotebooksApiRow('Top Maths')] },
-    } as Awaited<ReturnType<typeof NotebookController.myNotebooks>>)
-
-    const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-    await openTopMathsNotebook(ink.stdin, ink)
+    ink.stdin.write('\x7f')
+    await ink.waitUntilLastFrame((f) => !f.includes('→ /'))
     ink.stdin.write('nested-history-marker\r')
     await ink.waitForLastFrameToInclude('Not supported')
     ink.stdin.write('/exit\r')
@@ -130,7 +123,9 @@ describe('InteractiveCliApp /use notebook integration', () => {
       ink.stdin.write(`/attach ${attachPdfPath}\r`)
       await ink.waitForLastFrameToInclude('Attaching book')
       ink.stdin.write('should-not-appear\r')
-      await ink.waitForLastFrameToInclude('Attaching book')
+      await ink.waitUntilLastFrame(
+        (f) => f.includes('Attaching book') && !f.includes('should-not-appear')
+      )
     })
 
     test('attaches PDF and shows structure excerpt from API book', async () => {

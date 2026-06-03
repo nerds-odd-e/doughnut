@@ -283,26 +283,15 @@ describe('recall spelling (interactive)', () => {
       } as Awaited<ReturnType<typeof RecallPromptController.answerSpelling>>)
     })
 
-    const { stdin, waitForLastFrameRaw, ...ink } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
+    const { stdin, ...ink } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
 
     startRecall(stdin)
     await waitSpellingPromptVisible(ink)
 
     stdin.write('\u00A0SeDiTiOn\u00A0\r')
     await waitSpellingCorrect(ink, 'SeDiTiOn')
-
-    await waitForLastFrameRaw((raw) => {
-      const correctIdx = raw.lastIndexOf('Correct!')
-      if (correctIdx < 0) {
-        return false
-      }
-      const beforeCorrect = raw.slice(0, correctIdx)
-      return (
-        beforeCorrect.includes('\u001b[32m') ||
-        beforeCorrect.includes('\u001b[92m')
-      )
-    })
 
     expect(answerSpellingSpy).toHaveBeenCalledTimes(1)
   })

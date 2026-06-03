@@ -20,12 +20,7 @@ export function stripAnsi(s: string): string {
 /** Raw TTY ESC byte for Ink `useInput` and interactive tests. */
 export const TTY_ESCAPE = '\u001b'
 
-/**
- * Write ESC to stdin and flush Ink 7's deferred lone-ESC timer (~20ms).
- * Ink buffers a lone ESC via `setTimeout` before emitting; `setImmediate` spins
- * in `waitForFrames` do not advance wall-clock time, so on fast CI the timer
- * never fires. We briefly install fake timers to guarantee the flush.
- */
+/** Write ESC and advance fake timers so Ink 7's deferred lone-ESC (~20ms) fires on fast CI. */
 export async function pressEscape(stdin: {
   write(data: string): void
 }): Promise<void> {
@@ -79,6 +74,37 @@ export async function pressEscapeAndWaitForCancelledLine(
   await waitForCancelledLine(getCombined, options, maxTicks)
 }
 
+/** Reject when `signal` aborts (for mocked fetch that honors AbortSignal). */
+export function pendingUntilAbort(signal: AbortSignal): Promise<never> {
+  return new Promise<never>((_, reject) => {
+    signal.addEventListener(
+      'abort',
+      () => {
+        reject(new DOMException('Aborted', 'AbortError'))
+      },
+      { once: true }
+    )
+  })
+}
+
+/** Spin event-loop turns; fail if `offending(lastStrippedFrame())` (e.g. `→` after "Bye."). */
+export async function waitTurnsWithoutRepaint(
+  lastStrippedFrame: () => string,
+  offending: (stripped: string) => boolean,
+  turns = 80
+): Promise<void> {
+  for (let i = 0; i < turns; i++) {
+    if (offending(lastStrippedFrame())) {
+      throw new Error(
+        `Unexpected repaint within ${turns} turns. Last frame:\n${lastStrippedFrame()}`
+      )
+    }
+    await new Promise<void>((resolve) => {
+      setImmediate(resolve)
+    })
+  }
+}
+
 /** Advance the event loop until `predicate` holds or `maxTicks` is exhausted (no fixed wall-clock sleep). */
 export async function waitForFrames(
   getCombined: () => string,
@@ -101,11 +127,14 @@ export async function waitForFrames(
 
 export function waitForLastFrame(
   lastFrame: () => string | undefined,
-  predicate: (frame: string) => boolean,
+  predicate: (stripped: string) => boolean,
   maxTicks = 5000
 ): Promise<void> {
   return waitForFrames(() => stripAnsi(lastFrame() ?? ''), predicate, maxTicks)
 }
+
+/** Alias for {@link waitForLastFrame}. */
+export const waitUntilInkLastFrameStripped = waitForLastFrame
 
 function strippedOutputMatches(
   haystack: string,
@@ -117,14 +146,6 @@ function strippedOutputMatches(
 }
 
 export type InkTestRenderResult = ReturnType<typeof render>
-
-export async function waitUntilInkLastFrameStripped(
-  lastFrame: () => string | undefined,
-  predicate: (stripped: string) => boolean,
-  maxTicks = 5000
-): Promise<void> {
-  return waitForFrames(() => stripAnsi(lastFrame() ?? ''), predicate, maxTicks)
-}
 
 /**
  * `useInput` attaches after `useEffect`; writing to stdin immediately after `render()` can race.

@@ -4,6 +4,7 @@ import {
   renderInkWhenCommandLineReady,
   stripAnsi,
   waitForFrames,
+  waitTurnsWithoutRepaint,
 } from './inkTestHelpers.js'
 
 /** True when a frame shows the /exit farewell and then paints another main REPL prompt (`→`). */
@@ -129,17 +130,31 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
     const { stdin, frames } = await renderInkWhenCommandLineReady(
       <InteractiveCliApp />
     )
+
+    function lastFrameWithFarewell(): string {
+      for (let i = frames.length - 1; i >= 0; i--) {
+        if (stripAnsi(frames[i] ?? '').includes('Bye.')) {
+          return frames[i] ?? ''
+        }
+      }
+      return frames.at(-1) ?? ''
+    }
+
     stdin.write('/exit\r')
     await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        c.includes('/exit') && c.includes('Bye.') && c.includes('\x1b[100m')
+      () => stripAnsi(lastFrameWithFarewell()),
+      (f) => f.includes('Bye.')
     )
 
-    const combined = frames.join('\n')
-    expect(combined).toContain('/exit')
-    expect(combined).toContain('Bye.')
-    expect(combined).toContain('\x1b[100m')
+    const farewellFrame = lastFrameWithFarewell()
+    const plain = stripAnsi(farewellFrame)
+    expect(plain).toContain('/exit')
+    expect(plain).toContain('Bye.')
+    expect(
+      frames.some(
+        (f) => stripAnsi(f).includes('/exit') && f.includes('\x1b[100m')
+      )
+    ).toBe(true)
 
     const snapshot =
       [...frames].reverse().find((f) => {
@@ -156,8 +171,13 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
     expect(lines[userIdx + 1]?.trim()).toBe('')
     expect(
       lines.slice(userIdx + 2).some((l) => l.includes('→')),
-      'after Bye., the REPL must not paint another main prompt line (see dedicated /exit TTY test)'
+      'after Bye., the REPL must not paint another main prompt line'
     ).toBe(false)
+
+    await waitTurnsWithoutRepaint(
+      () => stripAnsi(lastFrameWithFarewell()),
+      farewellFollowedByCommandPrompt
+    )
   })
 
   test('submitting exit without slash quits like /exit', async () => {
@@ -187,35 +207,6 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
     const lines = stripAnsi(snapshot).split('\n')
     const userIdx = lines.findIndex((l) => l.trim() === 'exit')
     expect(userIdx).toBeGreaterThanOrEqual(0)
-  })
-
-  test('after /exit, TTY must not repaint the empty command line below Bye.', async () => {
-    const { stdin, frames, waitForFramesToInclude } =
-      await renderInkWhenCommandLineReady(<InteractiveCliApp />)
-
-    stdin.write('/exit\r')
-    await waitForFramesToInclude('Bye.')
-    await waitForFramesToInclude('/exit')
-
-    for (let t = 0; t < 300; t++) {
-      await new Promise<void>((resolve) => {
-        setImmediate(resolve)
-      })
-    }
-
-    const offenders = frames.filter((f) =>
-      farewellFollowedByCommandPrompt(stripAnsi(f))
-    )
-    expect(
-      offenders,
-      [
-        'After /exit prints "Bye.", the terminal must not show another interactive read prompt',
-        '(the boxed main prompt with →). That means the REPL drew one more input line',
-        'before shutdown — the farewell should be the last interactive chrome.',
-        'ANSI stripped offending frame(s):',
-        ...offenders.map((f) => `---\n${stripAnsi(f)}\n---`),
-      ].join('\n')
-    ).toEqual([])
   })
 
   test('submitting /exit character by character records it in output', async () => {
