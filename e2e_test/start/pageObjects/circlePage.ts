@@ -60,5 +60,6 @@ export const assumeCirclePage = () => ({
 export const navigateToCircle = (circleName: string) => {
   navigateToMyCircles()
   cy.findByText(circleName, { selector: 'a' }).click()
+  pageIsNotLoading()
   return assumeCirclePage()
 }

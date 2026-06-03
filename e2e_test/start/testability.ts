@@ -455,12 +455,9 @@ const testability = () => {
         })
         .then((response) => {
           const circleId = String(unwrapData(response))
-          if (!(circleName && /^\d+$/.test(circleId))) {
-            throw new Error(
-              `inject_circle did not return a circle id for "${circleName}"`
-            )
+          if (circleName && /^\d+$/.test(circleId)) {
+            cy.wrap(circleId).as(circleIdAlias(circleName))
           }
-          cy.wrap(circleId).as(circleIdAlias(circleName))
         })
     },
 

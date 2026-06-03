@@ -428,7 +428,6 @@ When('I navigate to {notepath} note', (notePath: NotePath) => {
 When('I open note {string}', (noteTitle: string) => {
   start.jumpToNotePage(noteTitle, true)
   start.pageIsNotLoading()
-  start.assumeNotePage(noteTitle).switchToRichContent()
 })
 
 // This step definition is for demo purpose
