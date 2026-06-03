@@ -31,7 +31,7 @@ When(
     assumeAssociateWikidataDialog().confirmAssociationWithDifferentLabel(
       wikidataTitle
     )
-    start.assumeNotePage().flushPendingContentSave()
+    start.assumeNotePage(wikidataTitle).flushPendingContentSave()
   }
 )
 
@@ -89,11 +89,17 @@ Then(
 
 Then(
   'the Wiki association of note {string} should link to {string}',
-  (ttile: string, associationUrl: string) => {
+  (noteTitle: string, associationUrl: string) => {
     start
-      .assumeNotePage(ttile)
-      .associateWikidataDialog()
-      .expectOpenLinkButtonToOpenUrl(associationUrl)
+      .jumpToNotePage(noteTitle, true)
+      .expectWikidataBrowseLinkOpensUrl(associationUrl)
+  }
+)
+
+Then(
+  'the Wiki association on the current note should link to {string}',
+  (associationUrl: string) => {
+    start.assumeNotePage().expectWikidataBrowseLinkOpensUrl(associationUrl)
   }
 )
 
