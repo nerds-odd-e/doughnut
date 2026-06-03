@@ -3,10 +3,28 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
+import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import type NotePath from '../support/NotePath'
 import start from '../start'
 import { commonSenseSplit } from '../support/string_util'
+
+function givenInjectedRelationshipNote(
+  relationType: string,
+  fromNoteTopic: string,
+  toNoteTopic: string,
+  notebookName: string,
+  bodySuffix?: string
+) {
+  start
+    .testability()
+    .injectRelationshipNote(
+      notebookName,
+      relationType,
+      fromNoteTopic,
+      toNoteTopic,
+      bodySuffix
+    )
+}
 
 When('I start searching from all my notebooks page', () => {
   start.navigateToNotebooksPage()
@@ -53,7 +71,7 @@ When(
   }
 )
 
-When(
+Given(
   'there is {string} relationship between note {string} and {string} in notebook {string}',
   (
     relationType: string,
@@ -61,14 +79,31 @@ When(
     toNoteTopic: string,
     notebookName: string
   ) => {
-    start
-      .testability()
-      .injectRelationshipNote(
-        notebookName,
-        relationType,
-        fromNoteTopic,
-        toNoteTopic
-      )
+    givenInjectedRelationshipNote(
+      relationType,
+      fromNoteTopic,
+      toNoteTopic,
+      notebookName
+    )
+  }
+)
+
+Given(
+  'there is {string} relationship between note {string} and {string} in notebook {string} with body suffix:',
+  (
+    relationType: string,
+    fromNoteTopic: string,
+    toNoteTopic: string,
+    notebookName: string,
+    bodySuffix: string
+  ) => {
+    givenInjectedRelationshipNote(
+      relationType,
+      fromNoteTopic,
+      toNoteTopic,
+      notebookName,
+      bodySuffix
+    )
   }
 )
 

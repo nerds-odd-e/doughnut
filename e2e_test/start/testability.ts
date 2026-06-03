@@ -89,11 +89,12 @@ function relationshipNoteTitle(
   return composed
 }
 
-/** Same markdown shape as new relationship notes from the app (frontmatter only). */
+/** Same markdown shape as new relationship notes from the app (frontmatter plus optional body). */
 function relationshipNoteMarkdown(
   relationLabel: string,
   sourceTitle: string,
-  targetTitle: string
+  targetTitle: string,
+  bodySuffix?: string
 ): string {
   const relationKebab = relationKebabFromLabel(relationLabel)
   const UNTITLED = 'Untitled'
@@ -105,14 +106,14 @@ function relationshipNoteMarkdown(
   const targetLink = `[[${targetDisplay}]]`
   const yamlEscape = (s: string) =>
     s.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+  const suffix = bodySuffix?.trim() ? `\n${bodySuffix.trim()}\n` : ''
   return `---
 type: relationship
 relation: ${relationKebab}
 source: "${yamlEscape(sourceLink)}"
 target: "${yamlEscape(targetLink)}"
 ---
-
-`
+${suffix}`
 }
 
 /** Must match page count in `e2e_test/fixtures/book_reading/blank_5_pages.pdf`. */
@@ -333,7 +334,8 @@ const testability = () => {
       notebookName: string,
       relationTypeLabel: string,
       fromNoteTopic: string,
-      toNoteTopic: string
+      toNoteTopic: string,
+      bodySuffix?: string
     ) {
       return cy
         .get<string>('@injectNotesExternalIdentifier')
@@ -346,7 +348,8 @@ const testability = () => {
           const content = relationshipNoteMarkdown(
             relationTypeLabel,
             fromNoteTopic,
-            toNoteTopic
+            toNoteTopic,
+            bodySuffix
           )
           return this.injectNotes(
             [{ Title: title, Content: content }],

@@ -152,6 +152,23 @@ Given(
   }
 )
 
+Given(
+  'I have a notebook {string} with note {string} and predefined questions in the notebook:',
+  (notebookName: string, noteTitle: string, data: DataTable) => {
+    cy.get<string>('@currentLoginUser').then((username) =>
+      start
+        .testability()
+        .injectNotes([{ Title: noteTitle }], username, notebookName)
+        .then(() =>
+          start.testability().injectPredefinedQuestionsToNotebook({
+            notebookName,
+            predefinedQuestionTestData: data.hashes(),
+          })
+        )
+    )
+  }
+)
+
 When(
   'I add the following question for the note {string}:',
   (noteTopology: string, data: DataTable) => {

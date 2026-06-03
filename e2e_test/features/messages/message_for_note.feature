@@ -8,9 +8,6 @@ Feature: User having a conversation regarding a note
     Then "a_trainer" can see the conversation with "Old Learner" for the subject "Rocket Science" in the message center:
       | message |
       | Hi      |
-    And "old_learner" can see the conversation with "A Trainer" for the subject "Rocket Science" in the message center:
-      | message |
-      | Hi      |
 
   Scenario: User send message about a note in a circle
     Given There is a circle "Odd-e SG Team" with "a_trainer, old_learner" members

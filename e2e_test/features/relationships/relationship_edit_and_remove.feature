@@ -8,28 +8,17 @@ Feature: relationship edit and remove
       | Moon |
       | Earth |
       | Mars |
-    And there is "a part of" relationship between note "Moon" and "Earth" in notebook "Space topics"
 
   Scenario: change relation type
+    Given there is "a part of" relationship between note "Moon" and "Earth" in notebook "Space topics"
     When I change the relationship from "Moon" to "Earth" to "a specialization of"
-    When I open the relationship from "Moon" to "Earth"
     When I open the note content markdown editor
     Then the note content markdown source should contain "relation: a-specialization-of"
     And the note content markdown source should not contain "relation: a-part-of"
 
   Scenario: change relation type keeps user-authored content suffix
-    When I open the relationship from "Moon" to "Earth"
-    And I update the current note content using markdown to become:
+    Given there is "a part of" relationship between note "Moon" and "Earth" in notebook "Space topics" with body suffix:
       """
-      ---
-      type: relationship
-      relation: a-part-of
-      source: "[[Moon]]"
-      target: "[[Earth]]"
-      ---
-
-      [[Moon]] a part of [[Earth]].
-
       Observations from orbit.
       """
     When I change the relationship from "Moon" to "Earth" to "a specialization of"
@@ -39,5 +28,6 @@ Feature: relationship edit and remove
     And the note content markdown source should not contain "relation: a-part-of"
 
   Scenario: delete relationship
+    Given there is "a part of" relationship between note "Moon" and "Earth" in notebook "Space topics"
     When I delete the relationship from "Moon" to "Earth"
     Then I should see "Moon" has no relationship to "Earth"

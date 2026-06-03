@@ -1,7 +1,25 @@
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import mock_services from '../start/mock_services/index'
 import start from '../start'
+import { pageIsNotLoading } from '../start/pageBase'
 import type { DataTable } from '@cucumber/cucumber'
+
+function openMessageCenter() {
+  cy.intercept('GET', '**/api/conversation/all').as('conversationList')
+  cy.visit('/message-center')
+  cy.wait('@conversationList').then(({ response }) => {
+    expect(response?.statusCode, 'load message center conversations').to.equal(
+      200
+    )
+  })
+  pageIsNotLoading()
+}
+
+function reloginAndOpenMessageCenter(user: string) {
+  return start.reloginAs(user).then(() => {
+    openMessageCenter()
+  })
+}
 
 When(
   'I reply to the conversation {string}:',
@@ -35,9 +53,9 @@ Then(
 Then(
   '{string} can see the conversation with {string} for the subject {string} in the message center:',
   (user: string, partner: string, subject: string, data: DataTable) => {
-    start.reloginAs(user)
+    reloginAndOpenMessageCenter(user)
     start
-      .navigateToMessageCenter()
+      .assumeMessageCenterPage()
       .openConversation(subject, partner)
       .expectMessage(data.hashes()[0].message!)
   }
@@ -46,8 +64,9 @@ Then(
 Then(
   'I can see the conversation with {string} for the subject {string} in the message center:',
   (partner: string, subject: string, data: DataTable) => {
+    openMessageCenter()
     start
-      .navigateToMessageCenter()
+      .assumeMessageCenterPage()
       .openConversation(subject, partner)
       .expectMessage(data.hashes()[0].message!)
   }

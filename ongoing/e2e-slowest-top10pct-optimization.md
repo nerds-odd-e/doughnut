@@ -39,13 +39,13 @@ Status: done
 - `link.feature` — "A dead wiki link is shown and can create the missing note" (3.96s)
 
 ### Group 5: message for note + predefined questions
-Status: planned
+Status: done
 
 - `message_for_note.feature` — "User send message about a note shared to a bazaar" (3.83s)
 - `predefined_questions_management.feature` — "Manually add a question to the note successfully" (3.71s)
 
 ### Group 6: relationship edit + creating circles
-Status: planned
+Status: done
 
 - `relationship_edit_and_remove.feature` — "change relation type keeps user-authored content suffix" (3.64s)
 - `creating_circles.feature` — "New user via circle invitation" (3.61s)

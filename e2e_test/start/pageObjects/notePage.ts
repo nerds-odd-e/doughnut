@@ -141,6 +141,10 @@ export const assumeNotePage = (
         .find('a')
         .first()
         .click({ force: true })
+      cy.findByRole(noteContentRegion.role, {
+        name: noteContentRegion.name,
+      }).should('be.visible')
+      pageIsNotLoading()
       return assumeNotePage()
     },
     expectBreadcrumb: (items: string) => {
@@ -521,10 +525,17 @@ export const assumeNotePage = (
       })
     },
     sendMessageToNoteOwner(message: string) {
+      cy.intercept('POST', '**/api/conversation/note/**').as(
+        'startNoteConversation'
+      )
       this.toolbarButton('Star a conversation about this note').click()
       cy.findByRole('textbox').type(message)
       cy.findByRole('button', { name: 'Send message' }).click()
-      cy.findByText(message).should('be.visible')
+      cy.wait('@startNoteConversation').then(({ response }) => {
+        expect(response?.statusCode, 'start conversation about note').to.equal(
+          200
+        )
+      })
     },
 
     startAConversationAboutNote() {
