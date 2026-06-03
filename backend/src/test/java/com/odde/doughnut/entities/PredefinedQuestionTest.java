@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
 
-import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.PredefinedQuestionService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -20,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -31,12 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class PredefinedQuestionTest {
   @Autowired MakeMe makeMe;
-  @Autowired EntityPersister entityPersister;
   @Autowired PredefinedQuestionService predefinedQuestionService;
   @MockitoBean AiQuestionGenerator aiQuestionGenerator;
-
-  @Value("${question.regeneration.times:1}")
-  int regenerationTimes;
 
   User user;
 
@@ -136,60 +130,9 @@ class PredefinedQuestionTest {
 
       assertThat(result.getMcqWithAnswer(), equalTo(regeneratedQuestion));
     }
-
-    @Test
-    void shouldSaveBothOriginalAndRegeneratedQuestions() {
-      // Setup
-      MCQWithAnswer regeneratedQuestion = makeMe.aMCQWithAnswer().please();
-      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any(), any()))
-          .thenReturn(mcqWithAnswer);
-      contestResult.feasibleQuestion = true;
-      when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(contestResult);
-      when(aiQuestionGenerator.regenerateQuestion(any(), any(), any(), any()))
-          .thenReturn(regeneratedQuestion);
-
-      // Use ArgumentCaptor to capture questions being saved
-      EntityPersister mockEntityPersister = mock(EntityPersister.class);
-      ArgumentCaptor<PredefinedQuestion> questionCaptor =
-          ArgumentCaptor.forClass(PredefinedQuestion.class);
-      when(mockEntityPersister.save(questionCaptor.capture())).thenAnswer(i -> i.getArgument(0));
-
-      // Execute
-      PredefinedQuestionService service = createPredefinedQuestionService(mockEntityPersister);
-      PredefinedQuestion result = service.generateAFeasibleQuestion(note);
-
-      // Verify
-      // Should have captured two questions (original and regenerated)
-      assertThat(questionCaptor.getAllValues().size(), equalTo(2));
-
-      // The first saved question should be the original with contested=true
-      PredefinedQuestion firstSavedQuestion = questionCaptor.getAllValues().get(0);
-      assertThat(
-          firstSavedQuestion.getMcqWithAnswer().getQuestion(),
-          equalTo(mcqWithAnswer.getQuestion()));
-      assertThat(
-          "First question should be marked as contested",
-          firstSavedQuestion.isContested(),
-          is(true));
-
-      // The second saved question should be the regenerated one
-      PredefinedQuestion secondSavedQuestion = questionCaptor.getAllValues().get(1);
-      assertThat(
-          secondSavedQuestion.getMcqWithAnswer().getQuestion(),
-          equalTo(regeneratedQuestion.getQuestion()));
-      assertThat(secondSavedQuestion.isContested(), is(false));
-
-      // The result should be the regenerated question
-      assertThat(
-          result.getMcqWithAnswer().getQuestion(), equalTo(regeneratedQuestion.getQuestion()));
-    }
   }
 
   private PredefinedQuestion generateQuizQuestionEntity(@NotNull Note note) {
     return predefinedQuestionService.generateAFeasibleQuestion(note);
-  }
-
-  private PredefinedQuestionService createPredefinedQuestionService(EntityPersister persister) {
-    return new PredefinedQuestionService(persister, aiQuestionGenerator, regenerationTimes);
   }
 }

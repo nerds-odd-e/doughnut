@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.web.server.ResponseStatusException;
 
 class SearchControllerSemanticTests extends ControllerTestBase {
   @MockitoBean(name = "officialOpenAiClient")
@@ -48,27 +47,9 @@ class SearchControllerSemanticTests extends ControllerTestBase {
   class SemanticSearch {
     @Test
     void shouldReturnEmptyListWhenNoMatchingNotes() throws UnexpectedNoAccessRightException {
-      SearchTerm searchTerm = new SearchTerm();
-      searchTerm.setSearchKey("nonexistent");
-      searchTerm.setAllMyNotebooksAndSubscriptions(true);
-
-      var result = controller.semanticSearch(searchTerm);
+      var result = controller.semanticSearch(searchTerm("nonexistent"));
 
       assertThat(result, empty());
-    }
-
-    @Test
-    void shouldRespectSearchScopeSettings() throws UnexpectedNoAccessRightException {}
-
-    @Test
-    void shouldNotAllowSearchWhenNotLoggedIn() {
-      currentUser.setUser(null);
-
-      SearchTerm searchTerm = new SearchTerm();
-      searchTerm.setSearchKey("test");
-      searchTerm.setAllMyNotebooksAndSubscriptions(true);
-
-      assertThrows(ResponseStatusException.class, () -> controller.semanticSearch(searchTerm));
     }
   }
 
@@ -85,49 +66,21 @@ class SearchControllerSemanticTests extends ControllerTestBase {
     @Test
     void shouldReturnEmptyListWhenNoMatchingNotesInRelation()
         throws UnexpectedNoAccessRightException {
-      SearchTerm searchTerm = new SearchTerm();
-      searchTerm.setSearchKey("nonexistent");
-      searchTerm.setAllMyNotebooksAndSubscriptions(true);
-
-      var result = controller.semanticSearchWithin(referenceNote, searchTerm);
+      var result = controller.semanticSearchWithin(referenceNote, searchTerm("nonexistent"));
 
       assertThat(result, empty());
     }
 
     @Test
-    void shouldRespectSearchScopeSettingsWithinRelation() throws UnexpectedNoAccessRightException {}
-
-    @Test
-    void shouldNotAllowSearchWhenNotLoggedIn() {
-      currentUser.setUser(null);
-
-      SearchTerm searchTerm = new SearchTerm();
-      searchTerm.setSearchKey("test");
-      searchTerm.setAllMyNotebooksAndSubscriptions(true);
-
-      assertThrows(
-          ResponseStatusException.class,
-          () -> controller.semanticSearchWithin(referenceNote, searchTerm));
-    }
-
-    @Test
     void shouldHandleEmptySearchKey() throws UnexpectedNoAccessRightException {
-      SearchTerm searchTerm = new SearchTerm();
-      searchTerm.setSearchKey("");
-      searchTerm.setAllMyNotebooksAndSubscriptions(true);
-
-      var result = controller.semanticSearchWithin(referenceNote, searchTerm);
+      var result = controller.semanticSearchWithin(referenceNote, searchTerm(""));
 
       assertThat(result, empty());
     }
 
     @Test
     void shouldHandleWhitespaceOnlySearchKey() throws UnexpectedNoAccessRightException {
-      SearchTerm searchTerm = new SearchTerm();
-      searchTerm.setSearchKey("   ");
-      searchTerm.setAllMyNotebooksAndSubscriptions(true);
-
-      var result = controller.semanticSearchWithin(referenceNote, searchTerm);
+      var result = controller.semanticSearchWithin(referenceNote, searchTerm("   "));
 
       assertThat(result, empty());
     }
@@ -154,5 +107,12 @@ class SearchControllerSemanticTests extends ControllerTestBase {
           IllegalArgumentException.class,
           () -> controller.semanticSearchWithin(referenceNote, null));
     }
+  }
+
+  private static SearchTerm searchTerm(String searchKey) {
+    SearchTerm searchTerm = new SearchTerm();
+    searchTerm.setSearchKey(searchKey);
+    searchTerm.setAllMyNotebooksAndSubscriptions(true);
+    return searchTerm;
   }
 }

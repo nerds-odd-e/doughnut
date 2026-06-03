@@ -93,13 +93,6 @@ public class ControllerSetupTest {
   }
 
   @Test
-  void shouldRecordExceptionDetails() {
-    FailureReport failureReport = catchExceptionAndGetFailureReport();
-    assertEquals("java.lang.RuntimeException", failureReport.getErrorName());
-    assertThat(failureReport.getErrorDetail(), containsString("ControllerSetupTest.java"));
-  }
-
-  @Test
   void shouldCreateGithubIssue() throws IOException, InterruptedException {
     when(githubService.createGithubIssue(any())).thenReturn(123);
     FailureReport failureReport = catchExceptionAndGetFailureReport();

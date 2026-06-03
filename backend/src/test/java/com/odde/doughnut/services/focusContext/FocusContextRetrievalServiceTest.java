@@ -156,7 +156,7 @@ class FocusContextRetrievalServiceTest {
       viewer = makeMe.aUser().please();
       Notebook nb = notebookReadableBy(viewer);
       focusNote = makeMe.aNote().notebook(nb).title("HubFocus").please();
-      for (int i = 0; i < 10; i++) {
+      for (int i = 0; i < 7; i++) {
         Note r =
             makeMe
                 .aNote()
@@ -169,31 +169,19 @@ class FocusContextRetrievalServiceTest {
     }
 
     @Test
-    void depth1InboundCappedAtSix() {
+    void depth1InboundCappedAtSixWithStableSeed() {
       RetrievalConfig cfg = RetrievalConfig.forQuestionGeneration(1L);
-      FocusContextResult result = service.retrieve(focusNote, viewer, cfg);
-
-      long inboundCount =
-          result.getRelatedNotes().stream()
-              .filter(n -> n.getEdgeType() == FocusContextEdgeType.InboundWikiReference)
-              .count();
-      assertThat(inboundCount, equalTo(6L));
+      List<String> first = inboundReferrerTitles(cfg);
+      List<String> second = inboundReferrerTitles(cfg);
+      assertThat(first.size(), equalTo(6));
+      assertThat(first, equalTo(second));
     }
 
-    @Test
-    void sameSeedProducesSameInboundSelection() {
-      RetrievalConfig cfg = RetrievalConfig.forQuestionGeneration(1L);
-      List<String> first =
-          service.retrieve(focusNote, viewer, cfg).getRelatedNotes().stream()
-              .filter(n -> n.getEdgeType() == FocusContextEdgeType.InboundWikiReference)
-              .map(FocusContextNote::getTitle)
-              .toList();
-      List<String> second =
-          service.retrieve(focusNote, viewer, cfg).getRelatedNotes().stream()
-              .filter(n -> n.getEdgeType() == FocusContextEdgeType.InboundWikiReference)
-              .map(FocusContextNote::getTitle)
-              .toList();
-      assertThat(first, equalTo(second));
+    private List<String> inboundReferrerTitles(RetrievalConfig cfg) {
+      return service.retrieve(focusNote, viewer, cfg).getRelatedNotes().stream()
+          .filter(n -> n.getEdgeType() == FocusContextEdgeType.InboundWikiReference)
+          .map(FocusContextNote::getTitle)
+          .toList();
     }
 
     @Test
@@ -221,7 +209,7 @@ class FocusContextRetrievalServiceTest {
 
     @Test
     void focusInboundUriListCappedAtTwenty() {
-      for (int i = 10; i < 25; i++) {
+      for (int i = 7; i < 25; i++) {
         Note r =
             makeMe
                 .aNote()
@@ -285,7 +273,7 @@ class FocusContextRetrievalServiceTest {
               .content("Links to [[HubFocus]].")
               .please();
       refreshWikiCache(depth1Ref, viewer);
-      for (int i = 0; i < 5; i++) {
+      for (int i = 0; i < 3; i++) {
         Note d2 =
             makeMe
                 .aNote()
@@ -351,10 +339,7 @@ class FocusContextRetrievalServiceTest {
   class TokenBudget {
     @Test
     void relatedNotesBudgetCapsNumberOfIncludedNotes() {
-      List<String> titles =
-          List.of(
-              "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q",
-              "R", "S", "T");
+      List<String> titles = List.of("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L");
       StringBuilder linkLine = new StringBuilder("See ");
       for (String t : titles) {
         linkLine.append("[[").append(t).append("]] ");
@@ -368,7 +353,7 @@ class FocusContextRetrievalServiceTest {
               .title("Focus")
               .content(linkLine.toString().trim() + ".")
               .please();
-      String largeDetails = "x".repeat(3500);
+      String largeDetails = "x".repeat(3000);
       for (String title : titles) {
         makeMe.aNote().underSameNotebookAs(focusNote).title(title).content(largeDetails).please();
       }
@@ -650,7 +635,7 @@ class FocusContextRetrievalServiceTest {
     @Test
     void largeFolderSampleSiblingsCappedAtSix() {
       User viewer = makeMe.aUser().please();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(viewer).please();
+      Notebook nb = notebookReadableBy(viewer);
       Folder folder = makeMe.aFolder().notebook(nb).please();
       Note focus = makeMe.aNote().folder(folder).please();
       for (int i = 0; i < 25; i++) {
@@ -666,7 +651,7 @@ class FocusContextRetrievalServiceTest {
     @Test
     void differentSeedsProduceDifferentSampleSiblingsSelection() {
       User viewer = makeMe.aUser().please();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(viewer).please();
+      Notebook nb = notebookReadableBy(viewer);
       Folder folder = makeMe.aFolder().notebook(nb).please();
       Note focus = makeMe.aNote().folder(folder).please();
       for (int i = 0; i < 15; i++) {
@@ -703,7 +688,7 @@ class FocusContextRetrievalServiceTest {
     @Test
     void largeNotebookRootSampleSiblingsCappedAtSix() {
       User viewer = makeMe.aUser().please();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(viewer).please();
+      Notebook nb = notebookReadableBy(viewer);
       Note focus = makeMe.aNote().notebook(nb).please();
       for (int i = 0; i < 22; i++) {
         makeMe.aNote().notebook(nb).please();
@@ -718,7 +703,7 @@ class FocusContextRetrievalServiceTest {
     @Test
     void graphApiWithTightBudgetOmitsFolderPeersAndSampleSiblings() {
       User viewer = makeMe.aUser().please();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(viewer).please();
+      Notebook nb = notebookReadableBy(viewer);
       Folder folder = makeMe.aFolder().notebook(nb).please();
       Note focus = makeMe.aNote().folder(folder).please();
       makeMe.aNote().folder(folder).please();
@@ -732,7 +717,7 @@ class FocusContextRetrievalServiceTest {
     @Test
     void folderSiblingsIncludeStructuralPeersInSameFolder() {
       User viewer = makeMe.aUser().please();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(viewer).please();
+      Notebook nb = notebookReadableBy(viewer);
       Folder folder = makeMe.aFolder().notebook(nb).please();
       Note focus = makeMe.aNote().folder(folder).title("FocusF").content("See [[LinkT]].").please();
       Note linkT = makeMe.aNote().folder(folder).title("LinkT").content("target").please();
@@ -765,7 +750,7 @@ class FocusContextRetrievalServiceTest {
     @Test
     void folderSiblingIsNotWikiExpansionFrontier() {
       User viewer = makeMe.aUser().please();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(viewer).please();
+      Notebook nb = notebookReadableBy(viewer);
       Note focus = makeMe.aNote().title("RootFS").content("[[MidFS]].").notebook(nb).please();
       Folder folderB = makeMe.aFolder().notebook(nb).please();
       Note mid = makeMe.aNote().folder(folderB).title("MidFS").content("no link to deep").please();

@@ -64,7 +64,9 @@ Status: done
 ---
 
 ### Phase 3: Optimize slow tests rank 21–30 (max 0.054s)
-Status: planned
+Status: done
+
+**Result (2026-06-03):** Fewer and lighter tests: regeneration save path moved to mock-only `PredefinedQuestionServiceRegenerationTest`; failure-report exception details tested in `FailureReportFactoryTest`; `CurrentUserInfoControllerTest` no longer uses Spring/DB; removed redundant semantic-search auth and empty scope stubs; parameterized `OwnershipTest`; slimmer soft-delete undo and focus-context fixtures (merged inbound cap+seed stability, fewer referrers/linked notes).
 
 **Scope:**
 - `com.odde.doughnut.entities.PredefinedQuestionTest$AutoEvaluateAndRegenerate#shouldSaveBothOriginalAndRegeneratedQuestions()` (0.054s)

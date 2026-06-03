@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -81,19 +82,10 @@ class SoftDeletedTitleConflictMvcTest extends ControllerTestBase {
     Note n = makeMe.aNote().notebook(nb).title("RestoreMe").please();
     noteService.destroy(n, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, owner);
 
-    NoteCreationDTO dto = new NoteCreationDTO();
-    dto.setNewTitle("RestoreMe");
-    mockMvc
-        .perform(
-            post("/api/notebooks/{notebookId}/create-note", nb.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-        .andExpect(status().isConflict());
-
     mockMvc.perform(patch("/api/notes/{noteId}/undo-delete", n.getId())).andExpect(status().isOk());
 
     Note reloaded = noteRepository.findById(n.getId()).orElseThrow();
-    org.junit.jupiter.api.Assertions.assertNull(reloaded.getDeletedAt());
+    assertNull(reloaded.getDeletedAt());
   }
 
   @Test
