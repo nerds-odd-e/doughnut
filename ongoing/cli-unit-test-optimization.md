@@ -1,6 +1,6 @@
 # CLI unit test optimization
 
-Status: in-progress
+Status: done
 
 ## Profiling baseline (2026-06-03)
 
@@ -109,6 +109,33 @@ Status: done
 **Result (2026-06-03):** Merged notebook slash-guidance + /exit history into one render; folded `/exit` no-repaint check into one-chunk test via `waitTurnsWithoutRepaint`; dropped redundant green-ANSI poll on correct spelling; `pendingUntilAbort` + `lastStrippedFrame` for escape/cancel waits (no `frames.join`); stage `/exit` skips command-line probe; attach spinner asserts ignored input in one wait; MCQ out-of-range uses combined backspace+answer write. Target tests ~201–500ms each (was ~525–608ms baseline); suite 278 tests (−2 redundant cases).
 
 ### Phase 4: Re-profile and close
-Status: planned
+Status: done
 
-Re-run JSON reporter; document before/after counts and top 10 slowest.
+**After (2026-06-03):** `pnpm exec vitest run --reporter=json` — **278 tests** (−2 merged redundant cases), suite wall ~9.5s (was ~10s). No sleeps in `cli/tests/`.
+
+#### Top 10 slowest (post-optimization, full-suite JSON profile)
+
+| # | ms | file | test |
+|---|-----|------|------|
+| 1 | 1280 | recallJustReviewInteractive.session.test.tsx | empty Enter and non-y/n… two-item session completes |
+| 2 | 1112 | InteractiveCliApp.useNotebook.test.tsx | notebook stage: slash guidance, nested line, /exit history recall (merged) |
+| 3 | 949 | recallSpellingInteractive.test.tsx | loading spelling until second question |
+| 4 | 899 | recallJustReviewInteractive.loadMoreShuffle.test.tsx | shuffled first card |
+| 5 | 890 | InteractiveCliApp.useNotebook.test.tsx | attach PDF structure excerpt |
+| 6 | 884 | recallJustReviewInteractive.loadMore.test.tsx | empty Enter default yes |
+| 7 | 877 | InteractiveCliApp.addGmail.test.tsx | missing-credentials after /add gmail |
+| 8 | 871 | recallJustReviewInteractive.loadMore.test.tsx | Loading more… in flight |
+| 9 | 869 | recallMcqInteractive.test.tsx | loading next after first MCQ |
+| 10 | 855 | recallJustReviewInteractive.session.test.tsx | busy label while markAsRecalled pending |
+
+#### Summary
+
+| Metric | Before | After |
+|--------|--------|-------|
+| Vitest test count | 280 | **278** |
+| Suite wall (JSON `startTime`→max `endTime`) | ~6.3s | **~6.1s** |
+| Top-28 matched cases (5 renamed/merged) | 17.0s CPU sum | **17.6s** (full-suite profile; isolated runs were faster) |
+
+Shared helpers: `recallInteractiveShared.ts`, `recallJustReviewInteractive.waits.ts`, `recallJustReviewInteractive.mocks.ts`, extended `inkTestHelpers.ts`.
+
+**Commits:** `4f00b1729d` (phase 1), `ee03b94e78` (phase 2), `44866e3dde` (phase 3).
