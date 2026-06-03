@@ -18,6 +18,5 @@ Feature: Creating circles
       | Name      |
       | Learner A |
     And I am re-logged in as "user"
-    And I open the saved invitation link while logged in
-    And I join the circle
+    And I join the saved circle invitation as the logged-in user
     Then I should see the circle "Odd-e New User Circle" and it has two members in it

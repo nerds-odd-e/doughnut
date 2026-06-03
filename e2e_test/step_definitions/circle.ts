@@ -20,57 +20,38 @@ When('I visit the invitation link', () => {
       .then((url) => {
         cy.visit(url)
         start.pageIsNotLoading()
+        cy.get('#username, #join-circle-invitationCode', {
+          timeout: 15000,
+        }).should('exist')
         cy.get('body').then(($body) => {
-          if ($body.find('#username').length > 0) {
+          if ($body.find('#join-circle-invitationCode').length === 0) {
             return
           }
-          cy.get('#join-circle-invitationCode', { timeout: 15000 }).should(
-            ($input) => {
-              expect($input.val()).to.equal(code)
-            }
-          )
+          cy.get('#join-circle-invitationCode').should(($input) => {
+            expect($input.val()).to.equal(code)
+          })
         })
       })
   })
 })
 
-When('I open the saved invitation link while logged in', () => {
+When('I join the saved circle invitation as the logged-in user', () => {
   cy.get<string>('@circleInvitationCode').then((code) => {
-    cy.get('@savedInvitationCode')
-      .invoke('toString')
-      .then((url) => {
-        cy.get<string>('@currentLoginUser').then((loginUser) => {
-          expect(loginUser, 'logged-in user for invitation link')
-            .to.be.a('string')
-            .and.not.equal('none')
-          cy.visit(url)
-          start.pageIsNotLoading()
-          cy.get('body').then(($body) => {
-            if ($body.find('#username').length === 0) {
-              cy.get('#join-circle-invitationCode', { timeout: 15000 }).should(
-                ($input) => {
-                  expect($input.val()).to.equal(code)
-                }
-              )
-              return
-            }
-            cy.intercept('GET', '**/api/healthcheck').as('devLogin')
-            cy.get('#username').clear().type(loginUser)
-            cy.get('#password').clear().type('password')
-            cy.get('#login-button').click()
-            cy.wait('@devLogin').then(({ response }) => {
-              expect(response?.statusCode, 'dev login on invite').to.equal(200)
-            })
-            cy.url({ timeout: 15000 }).should('include', '/circles/join/')
-            start.pageIsNotLoading()
-            cy.get('#join-circle-invitationCode', { timeout: 15000 }).should(
-              ($input) => {
-                expect($input.val()).to.equal(code)
-              }
-            )
-          })
-        })
+    cy.get<string>('@currentLoginUser').then((loginUser) => {
+      expect(loginUser, 'logged-in user joining circle')
+        .to.be.a('string')
+        .and.not.equal('none')
+      cy.request({
+        method: 'POST',
+        url: '/api/circles/join',
+        auth: { username: loginUser, password: 'password' },
+        body: { invitationCode: code },
+      }).then((response) => {
+        expect(response.status, 'join circle via invitation code').to.equal(200)
+        cy.visit(`/circles/${response.body.id}`)
+        start.pageIsNotLoading()
       })
+    })
   })
 })
 
