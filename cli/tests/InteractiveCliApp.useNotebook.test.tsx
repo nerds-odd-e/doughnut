@@ -75,9 +75,11 @@ describe('InteractiveCliApp /use notebook integration', () => {
     ink.stdin.write('nested-history-marker\r')
     await ink.waitForLastFrameToInclude('Not supported')
     ink.stdin.write('/exit\r')
-    await ink.waitForLastFrameToInclude('`exit` to quit.')
+    await ink.waitForLastFrameToInclude(/`exit` to quit\./)
     ink.stdin.write('\x1b[A')
-    await ink.waitForLastFrameToInclude('/exit')
+    await ink.waitUntilLastFrame(
+      (f) => f.includes('/exit') && !f.includes('→ /')
+    )
   })
 
   describe('notebook stage /attach', () => {
@@ -157,11 +159,8 @@ describe('InteractiveCliApp /use notebook integration', () => {
       const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
       await openTopMathsNotebook(ink.stdin, ink)
       ink.stdin.write(`/attach ${attachPdfPath}\r`)
-      await ink.waitUntilLastFrame(
-        (f) =>
-          f.includes('Attached "top-maths" to this notebook.') &&
-          f.includes('Part One') &&
-          f.includes('Part One Child')
+      await ink.waitForLastFrameToInclude(
+        /(?=.*Attached "top-maths" to this notebook\.)(?=.*Part One)(?=.*Part One Child)/s
       )
     })
 

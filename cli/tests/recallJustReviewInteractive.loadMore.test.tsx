@@ -12,6 +12,7 @@ describeRecallJustReviewInteractive((api) => {
     waitRememberCard,
     waitLoadMore,
     waitRecalledSummary,
+    recallSingleAlphaToLoadMore,
     startRecall,
     alphaNoteRealm,
     mockShowMemoryTrackerCardForRealm,
@@ -26,10 +27,7 @@ describeRecallJustReviewInteractive((api) => {
       <InteractiveCliApp />
     )
 
-    startRecall(stdin)
-    await waitRememberCard(ink, 'Alpha')
-    stdin.write('y\r')
-    await waitLoadMore(ink)
+    await recallSingleAlphaToLoadMore(stdin, ink)
     stdin.write('\r')
     await waitRecalledSummary(ink, 'Recalled 1 note')
     expect(markAsRecalledCount.n).toBe(1)
@@ -76,10 +74,7 @@ describeRecallJustReviewInteractive((api) => {
       <InteractiveCliApp />
     )
 
-    startRecall(stdin)
-    await waitRememberCard(ink, 'Alpha')
-    stdin.write('y\r')
-    await waitLoadMore(ink)
+    await recallSingleAlphaToLoadMore(stdin, ink)
     stdin.write('y\r')
 
     await ink.waitForLastFrameToInclude('Loading more…')
@@ -103,10 +98,7 @@ describeRecallJustReviewInteractive((api) => {
       <InteractiveCliApp />
     )
 
-    startRecall(stdin)
-    await waitRememberCard(ink, 'Alpha')
-    stdin.write('y\r')
-    await waitLoadMore(ink)
+    await recallSingleAlphaToLoadMore(stdin, ink)
     await pressEscape(stdin)
     await waitRecalledSummary(ink, 'Recalled 1 note')
     expect(markAsRecalledCount.n).toBe(1)
@@ -175,10 +167,7 @@ describeRecallJustReviewInteractive((api) => {
       <InteractiveCliApp />
     )
 
-    startRecall(stdin)
-    await waitRememberCard(ink, 'Alpha')
-    stdin.write('y\r')
-    await waitLoadMore(ink)
+    await recallSingleAlphaToLoadMore(stdin, ink)
     stdin.write('n\r')
     await waitRecalledSummary(ink, 'Recalled 1 note')
 

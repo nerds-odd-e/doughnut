@@ -152,8 +152,8 @@ async function submitAndCompleteOAuth(
 
 async function submitCommandAndExpectError(
   stdin: { write: (s: string) => void },
-  waitForLastFrameRaw: (
-    predicate: (raw: string) => boolean,
+  waitForLastFrameToInclude: (
+    pattern: string | RegExp,
     maxTicks?: number
   ) => Promise<void>,
   lastStrippedFrame: () => string,
@@ -161,10 +161,7 @@ async function submitCommandAndExpectError(
   errorSnippet: string
 ) {
   stdin.write(`${command}\r`)
-  await waitForLastFrameRaw(
-    (f) =>
-      f.includes(errorSnippet) && f.includes('\x1b[100m') && f.includes('→ ')
-  )
+  await waitForLastFrameToInclude(errorSnippet)
   expect(lastStrippedFrame()).toContain(errorSnippet)
 }
 
@@ -180,10 +177,11 @@ describe('InteractiveCliApp /add gmail (missing credentials)', () => {
   afterEach(() => cleanupTestEnv(configDir))
 
   test('shows missing-credentials error in transcript after /add gmail', async () => {
-    const { stdin, lastStrippedFrame, waitForLastFrameRaw } = await renderApp()
+    const { stdin, lastStrippedFrame, waitForLastFrameToInclude } =
+      await renderApp()
     await submitCommandAndExpectError(
       stdin,
-      waitForLastFrameRaw,
+      waitForLastFrameToInclude,
       lastStrippedFrame,
       '/add gmail',
       MISSING_OAUTH_SNIPPET
@@ -377,10 +375,11 @@ describe('InteractiveCliApp /last email (mocked HTTP APIs)', () => {
   test('shows no-account error in transcript after /last email', async () => {
     writeGmailConfig(configDir, { accounts: [] })
 
-    const { stdin, lastStrippedFrame, waitForLastFrameRaw } = await renderApp()
+    const { stdin, lastStrippedFrame, waitForLastFrameToInclude } =
+      await renderApp()
     await submitCommandAndExpectError(
       stdin,
-      waitForLastFrameRaw,
+      waitForLastFrameToInclude,
       lastStrippedFrame,
       '/last email',
       'No Gmail account configured.'

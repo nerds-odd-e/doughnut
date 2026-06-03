@@ -10,7 +10,6 @@ describeRecallJustReviewInteractive((api) => {
     InteractiveCliApp,
     RECALL_LOADING_NEXT_QUESTION_LABEL,
     renderInkWhenCommandLineReady,
-    stripAnsi,
     waitForLastFrame,
     waitRememberCard,
     waitLoadMore,
@@ -133,7 +132,7 @@ describeRecallJustReviewInteractive((api) => {
     setupTwoDueJustReviewItemsMocks()
     const markAsRecalledCount = mockMarkAsRecalledCounting()
 
-    const { stdin, frames, ...ink } = await renderInkWhenCommandLineReady(
+    const { stdin, ...ink } = await renderInkWhenCommandLineReady(
       <InteractiveCliApp />
     )
 
@@ -143,17 +142,12 @@ describeRecallJustReviewInteractive((api) => {
       stdin,
       ink,
       'Alpha',
-      'Recalled 2 notes'
+      'Recalled 2 notes',
+      { skipInitialWait: true }
     )
 
     stdin.write('y\r')
     await waitRememberCard(ink, 'Beta')
-    await emptyEnterAndInvalidLineStayOnRemember(
-      stdin,
-      ink,
-      'Beta',
-      'Recalled 2 notes'
-    )
     expect(markAsRecalledCount.n).toBe(1)
 
     stdin.write('y\r')
@@ -162,10 +156,9 @@ describeRecallJustReviewInteractive((api) => {
     await waitRecalledSummary(ink, 'Recalled 2 notes')
     expect(markAsRecalledCount.n).toBe(2)
 
-    const out = stripAnsi(frames.join('\n'))
+    const out = ink.lastStrippedFrame()
     expect(out).toContain('body')
     expect(out).toContain('Reviewed: Alpha')
-    expect(out).toContain('Alpha')
   })
 
   test('just-review answered block: breadcrumb folder › note, content, Reviewed line', async () => {

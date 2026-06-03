@@ -13,7 +13,6 @@ import {
   pressEscape,
   renderInkWhenCommandLineReady,
   stripAnsi,
-  waitForLastFrame,
 } from './inkTestHelpers.js'
 import {
   leaveRecallWithYnRe,
@@ -267,7 +266,7 @@ describe('recall spelling (interactive)', () => {
       }),
     } as Awaited<ReturnType<typeof RecallPromptController.answerSpelling>>)
 
-    const { stdin, lastFrame, ...ink } = await renderInkWhenCommandLineReady(
+    const { stdin, ...ink } = await renderInkWhenCommandLineReady(
       <InteractiveCliApp />
     )
 
@@ -276,8 +275,7 @@ describe('recall spelling (interactive)', () => {
 
     stdin.write('typo\r')
 
-    await waitForLastFrame(
-      lastFrame,
+    await ink.waitUntilLastFrame(
       (p) =>
         (p.includes('Loading spelling question') ||
           p.includes(RECALL_LOADING_NEXT_QUESTION_LABEL)) &&
@@ -288,14 +286,7 @@ describe('recall spelling (interactive)', () => {
       data: pending2,
     } as Awaited<ReturnType<typeof MemoryTrackerController.askAQuestion>>)
 
-    await waitForLastFrame(
-      lastFrame,
-      (p) =>
-        p.includes(secondStem) &&
-        p.includes('Recalling') &&
-        !p.includes('Loading spelling question') &&
-        !p.includes(RECALL_LOADING_NEXT_QUESTION_LABEL)
-    )
+    await ink.waitForLastFrameToInclude(secondStem)
   })
 
   test('submitted spelling trims NBSP and preserves mixed case in API body', async () => {

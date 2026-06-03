@@ -69,19 +69,32 @@ export async function emptyEnterAndInvalidLineStayOnRemember(
   stdin: { write(data: string): void },
   ink: InkWaitHelpers,
   noteTitle: string,
-  summaryNotYet: string
+  summaryNotYet: string,
+  opts?: { readonly skipInitialWait?: boolean }
 ) {
   const onRemember = (f: string) =>
     f.includes('Yes, I remember?') &&
     f.includes(noteTitle) &&
     !f.includes(summaryNotYet)
 
-  await ink.waitUntilLastFrame(onRemember)
+  if (!opts?.skipInitialWait) {
+    await ink.waitUntilLastFrame(onRemember)
+  }
   stdin.write('\r')
   await ink.waitUntilLastFrame(onRemember)
   stdin.write('q\r')
   await ink.waitUntilLastFrame(onRemember)
   await backspaceClearsTyped(stdin, ink, '→ q')
+}
+
+export async function recallSingleAlphaToLoadMore(
+  stdin: { write(data: string): void },
+  ink: InkWaitHelpers
+) {
+  startRecall(stdin)
+  await waitRememberCard(ink, 'Alpha')
+  stdin.write('y\r')
+  await waitLoadMore(ink)
 }
 
 export function startRecall(stdin: { write(data: string): void }) {

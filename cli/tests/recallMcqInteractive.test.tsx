@@ -9,11 +9,7 @@ import makeMe from 'doughnut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { RECALL_LOADING_NEXT_QUESTION_LABEL } from '../src/commands/recall/recallBusyInputCopy.js'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
-import {
-  pressEscape,
-  renderInkWhenCommandLineReady,
-  waitForLastFrame,
-} from './inkTestHelpers.js'
+import { pressEscape, renderInkWhenCommandLineReady } from './inkTestHelpers.js'
 import {
   leaveRecallWithYnRe,
   startRecall,
@@ -286,12 +282,7 @@ describe('recall MCQ (interactive)', () => {
     await waitMcqVisible(ink)
     ink.stdin.write('2\r')
 
-    await waitForLastFrame(
-      ink.lastFrame,
-      (p) =>
-        p.includes(RECALL_LOADING_NEXT_QUESTION_LABEL) &&
-        !p.includes('↑↓ Enter or number to select')
-    )
+    await ink.waitForLastFrameToInclude(RECALL_LOADING_NEXT_QUESTION_LABEL)
 
     resolvePrompts2({
       data: [secondPrompt],

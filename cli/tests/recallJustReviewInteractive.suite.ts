@@ -31,6 +31,7 @@ import {
 } from './recallJustReviewInteractive.mocks.js'
 import {
   emptyEnterAndInvalidLineStayOnRemember,
+  recallSingleAlphaToLoadMore,
   startRecall,
   waitLoadMore,
   waitRecalledSummary,
@@ -71,6 +72,7 @@ export type RecallJustReviewInteractiveApi = {
   waitRecalledSummary: typeof waitRecalledSummary
   waitReturnsToSingleRememberCard: typeof waitReturnsToSingleRememberCard
   emptyEnterAndInvalidLineStayOnRemember: typeof emptyEnterAndInvalidLineStayOnRemember
+  recallSingleAlphaToLoadMore: typeof recallSingleAlphaToLoadMore
   startRecall: typeof startRecall
   alphaNoteRealm: typeof alphaNoteRealm
   childNoteUnderEnglish: typeof childNoteUnderEnglish
@@ -191,6 +193,7 @@ export function describeRecallJustReviewInteractive(
       waitRecalledSummary,
       waitReturnsToSingleRememberCard,
       emptyEnterAndInvalidLineStayOnRemember,
+      recallSingleAlphaToLoadMore,
       startRecall,
       alphaNoteRealm,
       childNoteUnderEnglish,
