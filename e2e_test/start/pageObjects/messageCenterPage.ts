@@ -8,9 +8,14 @@ function conversationPane() {
       return this
     },
     reply(message: string) {
-      cy.get('textarea').type(message)
+      cy.get('textarea')
+        .should('be.visible')
+        .and('be.enabled')
+        .clear()
+        .type(message)
       cy.findByRole('button', { name: 'Send message' }).click()
       cy.findByText(message).should('be.visible')
+      pageIsNotLoading()
       return this
     },
   }
@@ -71,6 +76,23 @@ export const assumeMessageCenterPage = () => {
       })
       pageIsNotLoading()
       return conversationPane()
+    },
+    replyToConversation(
+      conversationSubject: string,
+      messages: readonly string[]
+    ) {
+      this.conversation(conversationSubject)
+      cy.wrap(messages).each((message: string) => {
+        cy.get('textarea')
+          .should('be.visible')
+          .and('be.enabled')
+          .clear()
+          .type(message)
+        cy.findByRole('button', { name: 'Send message' }).click()
+        cy.findByText(message).should('be.visible')
+        pageIsNotLoading()
+      })
+      return this
     },
   }
 }

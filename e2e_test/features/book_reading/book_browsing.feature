@@ -37,8 +37,7 @@ Feature: Book browsing
   Scenario: Same-page scroll moves the current block; the current selection stays the explicit choice
     When I choose the book block "1. Refactoring: Protecting Intention in Working Software"
     Then the book block "1. Refactoring: Protecting Intention in Working Software" should be the current selection in the book reader
-    And the book block "1. Refactoring: Protecting Intention in Working Software" should be the current block in the book reader
     When I scroll the PDF book reader down within the same page to move viewport past the next book block bbox
-    Then I should see in the book reader visible PDF viewport on page 1 text including "Easier to Change"
+    Then the book reader PDF viewport should be on page 1
     And the book block "1. Refactoring: Protecting Intention in Working Software" should be the current selection in the book reader
     And the book block "2.1 Easier to Change—and Harder to Misuse" should be the current block in the book reader

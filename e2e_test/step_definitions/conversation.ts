@@ -3,10 +3,11 @@ import mock_services from '../start/mock_services/index'
 import start from '../start'
 import type { DataTable } from '@cucumber/cucumber'
 
-Then(
-  'I reply {string} to the conversation {string}',
-  (message: string, conversation: string) => {
-    start.navigateToMessageCenter().conversation(conversation).reply(message)
+When(
+  'I reply to the conversation {string}:',
+  (conversation: string, data: DataTable) => {
+    const messages = data.raw().map((row) => row[0]!.trim())
+    start.navigateToMessageCenter().replyToConversation(conversation, messages)
   }
 )
 
@@ -43,6 +44,16 @@ Then(
 )
 
 Then(
+  'I can see the conversation with {string} for the subject {string} in the message center:',
+  (partner: string, subject: string, data: DataTable) => {
+    start
+      .navigateToMessageCenter()
+      .openConversation(subject, partner)
+      .expectMessage(data.hashes()[0].message!)
+  }
+)
+
+Then(
   'I can see the message {string} in the conversation {string}',
   (message: string, conversation: string) => {
     start
@@ -59,7 +70,9 @@ Then('I should have no unread messages', () => {
 Then(
   '{string} should have {int} unread messages',
   (user: string, unreadMessageCount: number) => {
-    start.reloginAndEnsureHomePage(user)
+    start.reloginAs(user)
+    cy.reload()
+    start.pageIsNotLoading()
     start.messageCenterIndicator().expectCount(unreadMessageCount)
   }
 )

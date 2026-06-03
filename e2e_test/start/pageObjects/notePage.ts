@@ -523,6 +523,7 @@ export const assumeNotePage = (
       this.toolbarButton('Star a conversation about this note').click()
       cy.findByRole('textbox').type(message)
       cy.findByRole('button', { name: 'Send message' }).click()
+      cy.findByText(message).should('be.visible')
     },
 
     startAConversationAboutNote() {

@@ -110,6 +110,31 @@ When(
   }
 )
 
+Given(
+  'There is a circle {string} with {string} members and notebook {string} shared to the Bazaar by {string}',
+  (
+    circleName: string,
+    members: string,
+    notebookTitle: string,
+    externalIdentifier: string
+  ) => {
+    start
+      .testability()
+      .injectCircle({ circleName, members })
+      .then(() =>
+        start
+          .testability()
+          .injectNotes(
+            [{ Title: notebookTitle }],
+            externalIdentifier,
+            notebookTitle,
+            circleName
+          )
+      )
+      .then(() => start.testability().shareToBazaar(notebookTitle))
+  }
+)
+
 Then(
   'I move the notebook {string} from {string} to {string}',
   (notebook: string, fromCircle: string, toCircle: string) => {

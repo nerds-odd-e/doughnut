@@ -81,12 +81,12 @@ Status: done
 ---
 
 ### Phase 5: message_center (reply unread) + book_browsing (same-page scroll)
-Status: planned
+Status: done
 
 ---
 
 ### Phase 6: message_for_note (circle) + message_center (circle read)
-Status: planned
+Status: done
 
 ---
 
