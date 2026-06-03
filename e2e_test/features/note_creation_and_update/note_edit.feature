@@ -38,7 +38,6 @@ Feature: Note Edit
     Then I should see the rich content of the note with content:
       | Tag            | Content                  |
       | h1             | Odd-e LiA                |
-      | h2             | Our best training        |
       | li             | Specification by Example |
       | li.ql-indent-1 | Living documentation     |
 

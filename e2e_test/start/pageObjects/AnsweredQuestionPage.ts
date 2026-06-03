@@ -12,6 +12,7 @@ const assumeAnsweredQuestionPage = () => {
     },
     expectSpellingAnswerToBeCorrect() {
       cy.findByText('Correct!').should('exist')
+      return this
     },
     expectMCQAnswerToBeIncorrect(answer: string) {
       cy.contains('button', answer).should('have.class', 'is-selected')

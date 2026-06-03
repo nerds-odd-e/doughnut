@@ -4,21 +4,45 @@ import start from '../start'
 import { pageIsNotLoading } from '../start/pageBase'
 import type { DataTable } from '@cucumber/cucumber'
 
-function openMessageCenter() {
+function openMessageCenter(expectedSubject: string) {
   cy.intercept('GET', '**/api/conversation/all').as('conversationList')
   cy.visit('/message-center')
-  cy.wait('@conversationList').then(({ response }) => {
+  cy.wait('@conversationList').should(({ response }) => {
     expect(response?.statusCode, 'load message center conversations').to.equal(
       200
     )
+    const conversations = response?.body as
+      | Array<{ subject: string }>
+      | undefined
+    expect(
+      conversations?.some((item) => item.subject === expectedSubject),
+      `conversation list should include subject "${expectedSubject}"`
+    ).to.be.true
   })
   pageIsNotLoading()
 }
 
-function reloginAndOpenMessageCenter(user: string) {
+function reloginAndOpenMessageCenter(user: string, subject: string) {
   return start.reloginAs(user).then(() => {
-    openMessageCenter()
+    openMessageCenter(subject)
   })
+}
+
+function expectConversationInMessageCenter(
+  subject: string,
+  partner: string,
+  message: string,
+  options: { reloginAs?: string } = {}
+) {
+  if (options.reloginAs) {
+    reloginAndOpenMessageCenter(options.reloginAs, subject)
+  } else {
+    openMessageCenter(subject)
+  }
+  start
+    .assumeMessageCenterPage()
+    .openConversation(subject, partner)
+    .expectMessage(message)
 }
 
 When(
@@ -53,22 +77,23 @@ Then(
 Then(
   '{string} can see the conversation with {string} for the subject {string} in the message center:',
   (user: string, partner: string, subject: string, data: DataTable) => {
-    reloginAndOpenMessageCenter(user)
-    start
-      .assumeMessageCenterPage()
-      .openConversation(subject, partner)
-      .expectMessage(data.hashes()[0].message!)
+    expectConversationInMessageCenter(
+      subject,
+      partner,
+      data.hashes()[0].message!,
+      { reloginAs: user }
+    )
   }
 )
 
 Then(
   'I can see the conversation with {string} for the subject {string} in the message center:',
   (partner: string, subject: string, data: DataTable) => {
-    openMessageCenter()
-    start
-      .assumeMessageCenterPage()
-      .openConversation(subject, partner)
-      .expectMessage(data.hashes()[0].message!)
+    expectConversationInMessageCenter(
+      subject,
+      partner,
+      data.hashes()[0].message!
+    )
   }
 )
 

@@ -143,16 +143,6 @@ Given(
 )
 
 Given(
-  'there are questions in the notebook {string} for the note:',
-  (notebook: string, data: DataTable) => {
-    start.testability().injectPredefinedQuestionsToNotebook({
-      notebookName: notebook,
-      predefinedQuestionTestData: data.hashes(),
-    })
-  }
-)
-
-Given(
   'I have a notebook {string} with note {string} and predefined questions in the notebook:',
   (notebookName: string, noteTitle: string, data: DataTable) => {
     cy.get<string>('@currentLoginUser').then((username) =>

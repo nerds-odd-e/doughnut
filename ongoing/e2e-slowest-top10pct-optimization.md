@@ -57,7 +57,7 @@ Status: planned
 - `note_edit.feature` — "Edit a note's content as markdown" (3.48s)
 
 ### Group 8: browse remove recall + spelling quiz
-Status: planned
+Status: done
 
 - `browse_answer_and_notes_while_recalling.feature` — "I can remove a note from further recalls" (3.36s)
 - `recall_quiz_spelling_question.feature` — "Spelling quiz - incorrect answer" (3.31s)

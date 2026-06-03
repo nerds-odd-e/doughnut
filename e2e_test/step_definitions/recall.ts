@@ -53,7 +53,7 @@ Then(
   (day: number, toAssimilateAndTotal: string, numberOfRecalls: string) => {
     start.testability().backendTimeTravelTo(day, 8)
     start.assimilation().expectAssimilationDueFromTriple(toAssimilateAndTotal)
-    start.recall().navigateToRecallPage().expectToRecallCounts(numberOfRecalls)
+    start.recall().expectRecallProgressFromTriple(numberOfRecalls)
   }
 )
 
@@ -157,6 +157,18 @@ Then(
     start
       .assumeAnsweredQuestionPage()
       .goToLastAnsweredQuestion()
+      .viewMemoryTracker()
+    assumeMemoryTrackerPage().expectRecallCount(count).expectSpellingEnabled()
+  }
+)
+
+Then(
+  'I should see that my last spelling answer was correct with recall count {int}',
+  (count: number) => {
+    start
+      .assumeAnsweredQuestionPage()
+      .goToLastAnsweredQuestion()
+      .expectSpellingAnswerToBeCorrect()
       .viewMemoryTracker()
     assumeMemoryTrackerPage().expectRecallCount(count).expectSpellingEnabled()
   }

@@ -531,7 +531,7 @@ export const assumeNotePage = (
       this.toolbarButton('Star a conversation about this note').click()
       cy.findByRole('textbox').type(message)
       cy.findByRole('button', { name: 'Send message' }).click()
-      cy.wait('@startNoteConversation').then(({ response }) => {
+      cy.wait('@startNoteConversation').should(({ response }) => {
         expect(response?.statusCode, 'start conversation about note').to.equal(
           200
         )

@@ -8,7 +8,7 @@ Feature: Browse answers and notes while recalling
   Background:
     Given I am logged in as an existing user
     And I have a notebook "English practice" with notes:
-      | Title    | Content | Skip Memory Tracking |
+      | Title    | Content                        | Skip Memory Tracking |
       | English  |                                | true                 |
       | sedition | Sedition means incite violence |                      |
       | sedation | Put to sleep is sedation       |                      |
@@ -19,8 +19,7 @@ Feature: Browse answers and notes while recalling
   Scenario: View last answered question when the quiz answer was correct
     When I am recalling my note on day 2
     And I type my answer "sedition"
-    Then I should see that my last answer to spelling question is correct
-    And I should see spelling memory tracker recall count 1 for the last answer
+    Then I should see that my last spelling answer was correct with recall count 1
 
   Scenario: Browse notes while recalling and come back
     Given I am recalling my note on day 2
