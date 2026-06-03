@@ -661,35 +661,29 @@ class FocusContextRetrievalServiceTest {
       Notebook nb = notebookReadableBy(viewer);
       Folder folder = makeMe.aFolder().notebook(nb).please();
       Note focus = makeMe.aNote().folder(folder).please();
-      for (int i = 0; i < 15; i++) {
+      for (int i = 0; i < 10; i++) {
         makeMe.aNote().folder(folder).please();
       }
 
-      List<String> baseline =
-          service
-              .retrieve(focus, viewer, RetrievalConfig.forQuestionGeneration(1L))
-              .getFocusNote()
-              .getSampleSiblings()
-              .stream()
-              .sorted()
-              .toList();
+      List<String> baseline = sortedSampleSiblingTitles(focus, viewer, 1L);
       boolean foundDistinct =
           LongStream.rangeClosed(2, 10)
-              .anyMatch(
-                  seed ->
-                      !baseline.equals(
-                          service
-                              .retrieve(focus, viewer, RetrievalConfig.forQuestionGeneration(seed))
-                              .getFocusNote()
-                              .getSampleSiblings()
-                              .stream()
-                              .sorted()
-                              .toList()));
+              .anyMatch(seed -> !baseline.equals(sortedSampleSiblingTitles(focus, viewer, seed)));
 
       assertThat(
           "CRC32(concat(noteId, seed)) can yield the same sibling sample for two arbitrary seeds",
           foundDistinct,
           is(true));
+    }
+
+    private List<String> sortedSampleSiblingTitles(Note focus, User viewer, long seed) {
+      return service
+          .retrieve(focus, viewer, RetrievalConfig.forQuestionGeneration(seed))
+          .getFocusNote()
+          .getSampleSiblings()
+          .stream()
+          .sorted()
+          .toList();
     }
 
     @Test

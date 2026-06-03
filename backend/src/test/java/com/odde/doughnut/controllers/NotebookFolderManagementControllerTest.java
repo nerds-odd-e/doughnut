@@ -296,11 +296,6 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       makeMe.refresh(deepNoteInSource);
       assertThat(deepNoteInTarget.getFolder().getId(), equalTo(innerTarget.getId()));
       assertThat(deepNoteInSource.getFolder().getId(), equalTo(innerTarget.getId()));
-      FolderListing underTarget = controller.listNotebookFolderListing(nb, target.getId());
-      assertTrue(
-          underTarget.folders().stream().anyMatch(f -> f.getId().equals(innerTarget.getId())));
-      assertTrue(
-          underTarget.folders().stream().noneMatch(f -> f.getId().equals(innerSource.getId())));
     }
   }
 

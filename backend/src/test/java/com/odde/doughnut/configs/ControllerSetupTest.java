@@ -92,23 +92,29 @@ public class ControllerSetupTest {
             new UnexpectedNoAccessRightException(), UnexpectedNoAccessRightException.class));
   }
 
-  @Test
-  void shouldCreateGithubIssue() throws IOException, InterruptedException {
-    when(githubService.createGithubIssue(any())).thenReturn(123);
+  @ParameterizedTest
+  @MethodSource("githubIssueCreationOutcomes")
+  void recordsGithubIssueCreationOutcome(
+      boolean githubSucceeds, Integer expectedIssueNumber, String expectedErrorFragment)
+      throws IOException, InterruptedException {
+    if (githubSucceeds) {
+      when(githubService.createGithubIssue(any())).thenReturn(123);
+    } else {
+      when(githubService.createGithubIssue(any()))
+          .thenThrow(
+              new IOException("GitHub API returned HTTP 401: {\"message\":\"Bad credentials\"}"));
+    }
     FailureReport failureReport = catchExceptionAndGetFailureReport();
-    assertEquals(123, failureReport.getIssueNumber());
+    assertEquals(expectedIssueNumber, failureReport.getIssueNumber());
+    if (expectedErrorFragment != null) {
+      assertThat(failureReport.getErrorDetail(), containsString(expectedErrorFragment));
+      assertThat(failureReport.getErrorDetail(), containsString("HTTP 401"));
+    }
   }
 
-  @Test
-  void shouldRecordGithubErrorInFailureReportWhenGithubFails()
-      throws IOException, InterruptedException {
-    when(githubService.createGithubIssue(any()))
-        .thenThrow(
-            new IOException("GitHub API returned HTTP 401: {\"message\":\"Bad credentials\"}"));
-    FailureReport failureReport = catchExceptionAndGetFailureReport();
-    assertThat(failureReport.getIssueNumber(), is(nullValue()));
-    assertThat(failureReport.getErrorDetail(), containsString("GitHub issue creation failed"));
-    assertThat(failureReport.getErrorDetail(), containsString("HTTP 401"));
+  static Stream<Arguments> githubIssueCreationOutcomes() {
+    return Stream.of(
+        Arguments.of(true, 123, null), Arguments.of(false, null, "GitHub issue creation failed"));
   }
 
   @Test

@@ -312,6 +312,29 @@ class NoteControllerTests extends ControllerTestBase {
   }
 
   @Nested
+  class DeleteNoteReferrerPropertyCleanup {
+    @Test
+    void shouldRemoveDeletedNoteLinksFromReferrerPropertiesOnly()
+        throws UnexpectedNoAccessRightException {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      Note target = makeMe.aNote("Target").notebook(nb).please();
+      Note referrer =
+          makeMe
+              .aNote("Referrer")
+              .notebook(nb)
+              .content(
+                  "---\nsource: \"[[Referrer]]\"\ntarget: \"[[Target]]\"\n---\nBody [[Target]]")
+              .please();
+      wikiTitleCacheService.refreshForNote(referrer, currentUser.getUser());
+
+      controller.deleteNote(target, removeFromPropertiesDeleteRequest());
+
+      assertThat(
+          referrer.getContent(), equalTo("---\nsource: '[[Referrer]]'\n---\nBody [[Target]]"));
+    }
+  }
+
+  @Nested
   class DeleteNoteTest {
     Note subject;
     Note child;
@@ -335,26 +358,6 @@ class NoteControllerTests extends ControllerTestBase {
     void shouldSoftDeleteNoteWhenDeleted() throws UnexpectedNoAccessRightException {
       controller.deleteNote(subject, leaveDeadLinksDeleteRequest());
       assertThat(subject.getDeletedAt(), is(not(nullValue())));
-    }
-
-    @Test
-    void shouldRemoveDeletedNoteLinksFromReferrerPropertiesOnly()
-        throws UnexpectedNoAccessRightException {
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      Note target = makeMe.aNote("Target").notebook(nb).please();
-      Note referrer =
-          makeMe
-              .aNote("Referrer")
-              .notebook(nb)
-              .content(
-                  "---\nsource: \"[[Referrer]]\"\ntarget: \"[[Target]]\"\n---\nBody [[Target]]")
-              .please();
-      wikiTitleCacheService.refreshForNote(referrer, currentUser.getUser());
-
-      controller.deleteNote(target, removeFromPropertiesDeleteRequest());
-
-      assertThat(
-          referrer.getContent(), equalTo("---\nsource: '[[Referrer]]'\n---\nBody [[Target]]"));
     }
 
     @Nested

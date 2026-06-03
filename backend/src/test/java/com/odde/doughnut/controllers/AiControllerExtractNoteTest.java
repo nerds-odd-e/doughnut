@@ -179,8 +179,7 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
     }
 
     @Test
-    void shouldThrowWhenAiReturnsNull()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
+    void shouldThrowWhenAiReturnsNull() {
       Note testNote = newRootNoteWithExtractableContent();
       openAiStructuredResponseMock.stubStructuredResponse(null);
       RefinementSuggestionsRequestDTO requestDTO = new RefinementSuggestionsRequestDTO();

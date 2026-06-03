@@ -75,7 +75,8 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
       openAiStructuredResponseMock.stubStructuredResponse(refinementSuggestions);
       testNote.setContent("Some note content");
 
-      controller.generateRefinementSuggestions(testNote);
+      RefinementSuggestionsDTO result = controller.generateRefinementSuggestions(testNote);
+      assertThat(result.getSuggestions()).containsExactly("Point 1", "Point 2");
 
       @SuppressWarnings({"unchecked", "rawtypes"})
       ArgumentCaptor<StructuredResponseCreateParams<RefinementSuggestions>> paramsCaptor =

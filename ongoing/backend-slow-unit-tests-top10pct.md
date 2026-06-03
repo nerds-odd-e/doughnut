@@ -179,7 +179,9 @@ Status: done
 ---
 
 ### Phase 8: Optimize slow tests rank 71–80 (max 0.017s)
-Status: planned
+Status: done
+
+**Result (2026-06-03):** Fewer redundant tests and lighter fixtures (1143 invocations): delete-referrer property test moved out of heavy `DeleteNoteTest` setup; merged PDF full-view JSON checks into nested-outline attach test; slimmed EPUB attach to layout persistence (locators covered by retrieval test); dropped recursive-merge folder listing round-trip; parameterized GCS put pdf/epub; fewer folder peers for sibling seed test; parameterized GitHub issue success/failure in `ControllerSetupTest`; refinement suggestions test asserts return value in API-shape test. `ImageUtilsTest#shouldNotTouchSmallImage` already covered by Phase 1 `resizeImageDimensions` parameter.
 
 **Scope:**
 - `com.odde.doughnut.controllers.NoteControllerTests$DeleteNoteTest#shouldRemoveDeletedNoteLinksFromReferrerPropertiesOnly()` (0.017s)

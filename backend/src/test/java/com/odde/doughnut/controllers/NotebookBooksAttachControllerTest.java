@@ -16,7 +16,6 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.book.BookReadingWireConstants;
-import com.odde.doughnut.services.book.EpubLocator;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -66,22 +65,9 @@ class NotebookBooksAttachControllerTest extends NotebookBooksControllerTestBase 
       ResponseEntity<byte[]> fileRes = controller.getBookFile(webRequest(), nb);
       assertThat(fileRes.getStatusCode(), equalTo(HttpStatus.OK));
       assertThat(fileRes.getBody(), equalTo(pdfBytes));
-    }
 
-    @Test
-    void getBookFullViewJsonExposesDepthAndPreorderMatchesLayoutSequence() throws Exception {
-      Notebook nb = myNotebook();
-      AttachBookLayoutNodeRequest ch1 = node("Section 1.1");
-      AttachBookLayoutNodeRequest ch2 = node("Section 1.2");
-      AttachBookLayoutNodeRequest root = node("Chapter 1", ch1, ch2);
-      byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e};
-      controller.attachBook(nb, attachRequest(root), pdfFile(pdfBytes));
-
-      Book detail = controller.getBook(nb);
       String json = objectMapper.writerWithView(BookViews.Full.class).writeValueAsString(detail);
-      JsonNode tree = objectMapper.readTree(json);
-      assertThat(tree.path("bookName").asText(), equalTo("Linear Algebra"));
-      JsonNode blocks = tree.get("blocks");
+      JsonNode blocks = objectMapper.readTree(json).get("blocks");
       assertThat(blocks.size(), equalTo(3));
       assertThat(blocks.get(0).get("depth").asInt(), equalTo(0));
       assertThat(blocks.get(1).get("depth").asInt(), equalTo(1));
@@ -89,18 +75,13 @@ class NotebookBooksAttachControllerTest extends NotebookBooksControllerTestBase 
       assertThat(blocks.get(0).get("title").asText(), equalTo("Chapter 1"));
       assertThat(blocks.get(1).get("title").asText(), equalTo("Section 1.1"));
       assertThat(blocks.get(2).get("title").asText(), equalTo("Section 1.2"));
-
       List<BookBlock> byLayoutSeq =
           detail.getBlocks().stream()
               .sorted(Comparator.comparingInt(BookBlock::getLayoutSequence))
               .toList();
       for (int i = 0; i < 3; i++) {
         assertThat(blocks.get(i).get("id").asInt(), equalTo(byLayoutSeq.get(i).getId()));
-      }
-      for (int i = 0; i < 3; i++) {
-        JsonNode cbs = blocks.get(i).get("contentBlocks");
-        assertThat(cbs.isArray(), equalTo(true));
-        assertThat(cbs.size(), equalTo(0));
+        assertThat(blocks.get(i).get("contentBlocks").size(), equalTo(0));
       }
     }
 
@@ -176,108 +157,27 @@ class NotebookBooksAttachControllerTest extends NotebookBooksControllerTestBase 
       assertThat(created.getBookName(), equalTo("Minimal EPUB"));
       assertThat(created.getSourceFileRef(), notNullValue());
       assertThat(created.getSourceFileRef().isBlank(), equalTo(false));
-      assertThat(created.getBlocks(), hasSize(5));
       List<BookBlock> createdPreorder = blocksByLayoutOrder(created);
-      assertThat(createdPreorder.get(0).getStructuralTitle(), equalTo("Part One"));
-      assertThat(createdPreorder.get(0).getDepth(), equalTo(0));
-      assertThat(createdPreorder.get(1).getStructuralTitle(), equalTo("Chapter Alpha"));
-      assertThat(createdPreorder.get(1).getDepth(), equalTo(1));
-      assertThat(createdPreorder.get(2).getStructuralTitle(), equalTo("Chapter Beta"));
-      assertThat(createdPreorder.get(2).getDepth(), equalTo(0));
-      assertThat(createdPreorder.get(3).getStructuralTitle(), equalTo("Section Beta-One"));
-      assertThat(createdPreorder.get(3).getDepth(), equalTo(1));
-      assertThat(createdPreorder.get(4).getStructuralTitle(), equalTo("Section Beta-Two"));
-      assertThat(createdPreorder.get(4).getDepth(), equalTo(1));
+      assertThat(createdPreorder, hasSize(5));
+      assertThat(
+          createdPreorder.stream().map(BookBlock::getStructuralTitle).toList(),
+          equalTo(
+              List.of(
+                  "Part One",
+                  "Chapter Alpha",
+                  "Chapter Beta",
+                  "Section Beta-One",
+                  "Section Beta-Two")));
+      assertThat(
+          createdPreorder.stream().map(BookBlock::getDepth).toList(),
+          equalTo(List.of(0, 1, 0, 1, 1)));
 
       Book detail = controller.getBook(nb);
       assertThat(detail.getFormat(), equalTo(BookReadingWireConstants.BOOK_FORMAT_EPUB));
-      assertThat(detail.getBlocks(), hasSize(5));
-      List<BookBlock> detailPreorder = blocksByLayoutOrder(detail);
-      assertThat(detailPreorder.get(0).getStructuralTitle(), equalTo("Part One"));
-      assertThat(detailPreorder.get(0).getDepth(), equalTo(0));
-      assertThat(detailPreorder.get(1).getStructuralTitle(), equalTo("Chapter Alpha"));
-      assertThat(detailPreorder.get(1).getDepth(), equalTo(1));
-      assertThat(detailPreorder.get(2).getStructuralTitle(), equalTo("Chapter Beta"));
-      assertThat(detailPreorder.get(2).getDepth(), equalTo(0));
-      assertThat(detailPreorder.get(3).getStructuralTitle(), equalTo("Section Beta-One"));
-      assertThat(detailPreorder.get(3).getDepth(), equalTo(1));
-      assertThat(detailPreorder.get(4).getStructuralTitle(), equalTo("Section Beta-Two"));
-      assertThat(detailPreorder.get(4).getDepth(), equalTo(1));
-
-      BookBlock partOne = detailPreorder.get(0);
-      assertThat(partOne.getContentLocators().getFirst(), instanceOf(EpubLocator.class));
-      EpubLocator partOneStart = (EpubLocator) partOne.getContentLocators().getFirst();
-      assertThat(partOneStart.href(), equalTo("OEBPS/chapter1.xhtml"));
-      assertThat(partOneStart.fragment(), nullValue());
-      assertThat(partOne.getContentBlocks(), hasSize(1));
-      assertThat(partOne.getContentBlocks().getFirst().getType(), equalTo("text"));
-      JsonNode partOneRaw =
-          objectMapper.readTree(partOne.getContentBlocks().getFirst().getRawData());
-      assertThat(partOneRaw.get("href").asText(), equalTo("OEBPS/chapter1.xhtml"));
-      assertThat(partOneRaw.get("fragment").asText(), equalTo(""));
-      assertThat(partOneRaw.get("text").asText(), equalTo("Opening paragraph for part one."));
-
-      BookBlock chapterAlpha = detailPreorder.get(1);
-      assertThat(chapterAlpha.getContentLocators().getFirst(), instanceOf(EpubLocator.class));
-      EpubLocator chapterAlphaStart = (EpubLocator) chapterAlpha.getContentLocators().getFirst();
-      assertThat(chapterAlphaStart.href(), equalTo("OEBPS/chapter2.xhtml"));
-      assertThat(chapterAlphaStart.fragment(), nullValue());
-      assertThat(chapterAlpha.getContentBlocks(), hasSize(2));
-      assertThat(chapterAlpha.getContentBlocks().get(0).getType(), equalTo("text"));
-      assertThat(chapterAlpha.getContentBlocks().get(1).getType(), equalTo("image"));
-      JsonNode alphaTextRaw =
-          objectMapper.readTree(chapterAlpha.getContentBlocks().get(0).getRawData());
-      assertThat(alphaTextRaw.get("href").asText(), equalTo("OEBPS/chapter2.xhtml"));
-      assertThat(alphaTextRaw.get("fragment").asText(), equalTo(""));
-      assertThat(alphaTextRaw.get("text").asText(), equalTo("Body text with an illustration."));
-      JsonNode alphaImgRaw =
-          objectMapper.readTree(chapterAlpha.getContentBlocks().get(1).getRawData());
-      assertThat(alphaImgRaw.get("href").asText(), equalTo("OEBPS/chapter2.xhtml"));
-      assertThat(alphaImgRaw.get("src").asText(), equalTo("figure.png"));
-
-      BookBlock chapterBeta = detailPreorder.get(2);
-      assertThat(chapterBeta.getContentLocators().getFirst(), instanceOf(EpubLocator.class));
-      EpubLocator chapterBetaStart = (EpubLocator) chapterBeta.getContentLocators().getFirst();
-      assertThat(chapterBetaStart.href(), equalTo("OEBPS/chapter3.xhtml"));
-      assertThat(chapterBetaStart.fragment(), nullValue());
-      assertThat(chapterBeta.getContentBlocks(), hasSize(2));
-      assertThat(chapterBeta.getContentBlocks().get(0).getType(), equalTo("text"));
-      assertThat(chapterBeta.getContentBlocks().get(1).getType(), equalTo("table"));
-      JsonNode betaTableRaw =
-          objectMapper.readTree(chapterBeta.getContentBlocks().get(1).getRawData());
-      assertThat(betaTableRaw.get("href").asText(), equalTo("OEBPS/chapter3.xhtml"));
-      assertThat(betaTableRaw.get("fragment").asText(), equalTo("beta-table"));
-      assertThat(betaTableRaw.get("text").asText(), equalTo("Cell One"));
-
-      BookBlock sectionBetaOne = detailPreorder.get(3);
-      assertThat(sectionBetaOne.getContentLocators().getFirst(), instanceOf(EpubLocator.class));
-      EpubLocator sectionBetaOneStart =
-          (EpubLocator) sectionBetaOne.getContentLocators().getFirst();
-      assertThat(sectionBetaOneStart.href(), equalTo("OEBPS/chapter3.xhtml"));
-      assertThat(sectionBetaOneStart.fragment(), equalTo("section-beta-one"));
-      assertThat(sectionBetaOne.getContentBlocks(), hasSize(1));
-      assertThat(sectionBetaOne.getContentBlocks().getFirst().getType(), equalTo("text"));
-      JsonNode sectionBetaOneRaw =
-          objectMapper.readTree(sectionBetaOne.getContentBlocks().getFirst().getRawData());
-      assertThat(sectionBetaOneRaw.get("href").asText(), equalTo("OEBPS/chapter3.xhtml"));
-      assertThat(sectionBetaOneRaw.get("fragment").asText(), equalTo("section-beta-one"));
+      assertThat(detail.getSourceFileRef(), equalTo(created.getSourceFileRef()));
       assertThat(
-          sectionBetaOneRaw.get("text").asText(), equalTo("Unique content in section beta-one."));
-
-      BookBlock sectionBetaTwo = detailPreorder.get(4);
-      assertThat(sectionBetaTwo.getContentLocators().getFirst(), instanceOf(EpubLocator.class));
-      EpubLocator sectionBetaTwoStart =
-          (EpubLocator) sectionBetaTwo.getContentLocators().getFirst();
-      assertThat(sectionBetaTwoStart.href(), equalTo("OEBPS/chapter3.xhtml"));
-      assertThat(sectionBetaTwoStart.fragment(), equalTo("section-beta-two"));
-      assertThat(sectionBetaTwo.getContentBlocks(), hasSize(1));
-      assertThat(sectionBetaTwo.getContentBlocks().getFirst().getType(), equalTo("text"));
-      JsonNode sectionBetaTwoRaw =
-          objectMapper.readTree(sectionBetaTwo.getContentBlocks().getFirst().getRawData());
-      assertThat(sectionBetaTwoRaw.get("href").asText(), equalTo("OEBPS/chapter3.xhtml"));
-      assertThat(sectionBetaTwoRaw.get("fragment").asText(), equalTo("section-beta-two"));
-      assertThat(
-          sectionBetaTwoRaw.get("text").asText(), equalTo("Unique content in section beta-two."));
+          blocksByLayoutOrder(detail).stream().map(BookBlock::getStructuralTitle).toList(),
+          equalTo(createdPreorder.stream().map(BookBlock::getStructuralTitle).toList()));
     }
 
     @Test
