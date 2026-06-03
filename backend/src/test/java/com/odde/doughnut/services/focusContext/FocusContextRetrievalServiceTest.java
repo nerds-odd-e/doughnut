@@ -474,20 +474,15 @@ class FocusContextRetrievalServiceTest {
               .aNote()
               .notebook(nb)
               .title("ShortFocus")
-              .content("[[DirectShort]] [[ViaBridge]].")
+              .content("[[DirectShort]] [[ViaBridge]]")
               .please();
-      makeMe
-          .aNote()
-          .underSameNotebookAs(focus)
-          .title("DirectShort")
-          .content("direct body")
-          .please();
+      makeMe.aNote().underSameNotebookAs(focus).title("DirectShort").please();
       Note bridge =
           makeMe
               .aNote()
               .underSameNotebookAs(focus)
               .title("ViaBridge")
-              .content("See [[DirectShort]].")
+              .content("[[DirectShort]]")
               .please();
       refreshWikiCache(focus, viewer);
       refreshWikiCache(bridge, viewer);

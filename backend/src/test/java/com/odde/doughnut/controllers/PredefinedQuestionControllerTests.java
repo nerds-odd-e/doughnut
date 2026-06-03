@@ -150,11 +150,10 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
     @Test
     void shouldThrowWhenOpenAiNotAvailable() {
       Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      PredefinedQuestion predefinedQuestion = makeMe.aPredefinedQuestion().please();
       testabilitySettings.setOpenAiTokenOverride("");
       assertThrows(
           OpenAiNotAvailableException.class,
-          () -> controller.refineQuestion(note, predefinedQuestion));
+          () -> controller.refineQuestion(note, makeMe.aPredefinedQuestion().please()));
     }
   }
 

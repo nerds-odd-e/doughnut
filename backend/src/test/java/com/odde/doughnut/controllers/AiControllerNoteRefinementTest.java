@@ -120,37 +120,22 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       openAiStructuredResponseMock.stubStructuredResponse(
           new RegeneratedNoteContent("Remaining content."));
-      String originalContent =
-          "English is a language that is spoken in many countries. It is also the most widely spoken language in the world.";
+      String originalContent = "Original with a suggestion to remove.";
       testNote.setContent(originalContent);
       RefinementSuggestionsRequestDTO requestDTO = new RefinementSuggestionsRequestDTO();
-      requestDTO.suggestions = List.of("English is a language that is spoken in many countries.");
+      requestDTO.suggestions = List.of("suggestion to remove");
       RefinedContentResponseDTO response =
           controller.removeRefinementSuggestion(testNote, requestDTO);
-      assertThat(response.getContent()).isNotEqualTo(originalContent);
       assertThat(response.getContent()).isEqualTo("Remaining content.");
-      makeMe.entityPersister.flush();
       makeMe.entityPersister.refresh(testNote);
       assertThat(testNote.getContent()).isEqualTo(originalContent);
-    }
-
-    @Test
-    void shouldLimitRemovalOutputToTwoThousandTokens()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
-      openAiStructuredResponseMock.stubStructuredResponse(
-          new RegeneratedNoteContent("Remaining content."));
-      testNote.setContent("Original content with suggestion to remove.");
-      RefinementSuggestionsRequestDTO requestDTO = new RefinementSuggestionsRequestDTO();
-      requestDTO.suggestions = List.of("suggestion to remove");
-
-      controller.removeRefinementSuggestion(testNote, requestDTO);
 
       @SuppressWarnings({"unchecked", "rawtypes"})
       ArgumentCaptor<StructuredResponseCreateParams<RegeneratedNoteContent>> paramsCaptor =
           ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
       verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
-      StructuredResponseCreateParams<RegeneratedNoteContent> params = paramsCaptor.getValue();
-      assertThat(params.rawParams().maxOutputTokens()).isEqualTo(Optional.of(2000L));
+      assertThat(paramsCaptor.getValue().rawParams().maxOutputTokens())
+          .isEqualTo(Optional.of(2000L));
     }
 
     @Test

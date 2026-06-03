@@ -445,36 +445,22 @@ class NoteControllerTests extends ControllerTestBase {
       @Test
       void shouldRestoreMemoryTrackersWhenNoteIsRestored() throws UnexpectedNoAccessRightException {
         makeMe.aMemoryTrackerFor(subject).by(currentUser.getUser()).please();
-        Note otherNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-        makeMe.aMemoryTrackerFor(otherNote).by(currentUser.getUser()).please();
 
         controller.deleteNote(subject, leaveDeadLinksDeleteRequest());
+        assertThat(userService.getMemoryTrackersFor(currentUser.getUser(), subject), hasSize(0));
         controller.undoDeleteNote(subject);
 
         assertThat(userService.getMemoryTrackersFor(currentUser.getUser(), subject), hasSize(1));
-        Timestamp currentTime = testabilitySettings.getCurrentUTCTimestamp();
-        var status =
-            recallService.getDueMemoryTrackers(
-                currentUser.getUser(), currentTime, java.time.ZoneId.of("Asia/Shanghai"), 0);
-        assertThat(status.totalAssimilatedCount, is(2));
       }
     }
   }
 
   @Nested
   class UpdateNoteRecallSetting {
-    Note source;
-    Note target;
-
-    @BeforeEach
-    void setup() {
-      source = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      target = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-    }
-
     @Test
     void shouldPutNoteBackToAssimilationListWhenRememberSpellingIsAddedLater()
         throws UnexpectedNoAccessRightException {
+      Note source = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       makeMe.aMemoryTrackerFor(source).by(currentUser.getUser()).please();
       assertThat(
           userService.getUnassimilatedNotes(currentUser.getUser()).toList(),

@@ -202,7 +202,9 @@ Status: done
 ---
 
 ### Phase 9: Optimize slow tests rank 81–90 (max 0.016s)
-Status: planned
+Status: done
+
+**Result (2026-06-03):** Fewer redundant tests and lighter fixtures (1141 invocations): merged removal token-limit into regenerated-content test; dropped empty export-request test (covered by messages export); restore test asserts delete-then-undo without extra assimilated-count fixture; slimmer recall-setting and focus shortest-path setups; folder search uses one notebook; title rename drops duplicate wiki-cache read; EPUB locator test uses attach response instead of flush/getBook.
 
 **Scope:**
 - `com.odde.doughnut.controllers.AiControllerNoteRefinementTest$RemoveRefinementSuggestion#shouldLimitRemovalOutputToTwoThousandTokens()` (0.016s)

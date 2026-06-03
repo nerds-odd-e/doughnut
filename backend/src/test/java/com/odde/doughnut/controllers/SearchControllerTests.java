@@ -114,7 +114,7 @@ class SearchControllerTests extends ControllerTestBase {
     void shouldReturnFolderHitsAlongsideNoteHits() throws UnexpectedNoAccessRightException {
       var notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       makeMe.aFolder().notebook(notebook).name("Trip Planning").please();
-      makeMe.aNote("My Trip Planning Ideas").notebookOwnedBy(currentUser.getUser()).please();
+      makeMe.aNote("My Trip Planning Ideas").notebook(notebook).please();
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("Plann");

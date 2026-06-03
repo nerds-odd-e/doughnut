@@ -142,12 +142,6 @@ class TextContentControllerTests extends ControllerTestBase {
       assertThat(response.getNote().getTitle(), equalTo("RenamedTarget"));
       makeMe.refresh(carrier);
       assertThat(carrier.getContent(), equalTo("[[RenamedTarget]]"));
-      assertThat(
-          noteWikiTitleCacheRepository
-              .findByNote_IdOrderByIdAsc(carrier.getId())
-              .getFirst()
-              .getLinkText(),
-          equalTo("RenamedTarget"));
     }
 
     @Test

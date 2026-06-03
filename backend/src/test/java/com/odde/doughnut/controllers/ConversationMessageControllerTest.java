@@ -451,13 +451,6 @@ class ConversationMessageControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void shouldExportConversationWithRequest() throws UnexpectedNoAccessRightException {
-      java.util.Map<String, Object> request = controller.exportConversation(conversation);
-      assertThat(request).isNotNull();
-      assertThat(extractMessagesForExport(request).size()).isGreaterThan(0);
-    }
-
-    @Test
     void shouldExportConversationWithMessages() throws UnexpectedNoAccessRightException {
       makeMe
           .aConversationMessage(conversation)
@@ -466,8 +459,9 @@ class ConversationMessageControllerTest extends ControllerTestBase {
           .please();
       makeMe.aConversationMessage(conversation).sender(null).message("No. It is not.").please();
 
-      List<java.util.Map<String, Object>> messages =
-          extractMessagesForExport(controller.exportConversation(conversation));
+      java.util.Map<String, Object> request = controller.exportConversation(conversation);
+      assertThat(request).isNotNull();
+      List<java.util.Map<String, Object>> messages = extractMessagesForExport(request);
 
       assertThat(messages.stream().filter(m -> "user".equals(m.get("role"))).findFirst())
           .get()

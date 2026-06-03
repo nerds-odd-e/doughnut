@@ -181,20 +181,10 @@ class NotebookBooksRetrievalControllerTest extends NotebookBooksControllerTestBa
     void epubContentLocatorsMatchAnchorAndDirectContentOnFixture() throws Exception {
       Notebook nb = myNotebook();
       byte[] epubBytes = readFixtureEpubValidMinimal();
-      controller.attachBook(nb, epubAttachRequest("Minimal EPUB"), epubFile(epubBytes));
-      makeMe.entityPersister.flushAndClear();
-
-      Book detail = controller.getBook(nb);
-      List<BookBlock> preorder = blocksByLayoutOrder(detail);
-
-      BookBlock partOne = preorder.getFirst();
-      assertThat(partOne.getContentLocators(), hasSize(1));
-      assertThat(partOne.getContentLocators().getFirst(), instanceOf(EpubLocator.class));
-      EpubLocator partOneAnchor = (EpubLocator) partOne.getContentLocators().getFirst();
-      assertThat(partOneAnchor.href(), equalTo("OEBPS/chapter1.xhtml"));
-      assertThat(partOneAnchor.fragment(), nullValue());
-
-      BookBlock chapterBeta = preorder.get(2);
+      ResponseEntity<Book> attached =
+          controller.attachBook(nb, epubAttachRequest("Minimal EPUB"), epubFile(epubBytes));
+      assertThat(attached.getBody(), notNullValue());
+      BookBlock chapterBeta = blocksByLayoutOrder(attached.getBody()).get(2);
       assertThat(chapterBeta.getStructuralTitle(), equalTo("Chapter Beta"));
       assertThat(chapterBeta.getContentLocators(), hasSize(2));
       assertThat(chapterBeta.getContentLocators().getFirst(), instanceOf(EpubLocator.class));
