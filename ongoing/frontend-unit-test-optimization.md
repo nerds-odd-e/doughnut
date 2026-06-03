@@ -1,6 +1,6 @@
 # Frontend unit test optimization
 
-Status: in-progress
+Status: done
 
 ## Profiling baseline (2026-06-03)
 
@@ -224,6 +224,32 @@ Status: done
 ---
 
 ### Phase 15: Re-profile and close
-Status: planned
+Status: done
 
-Re-run JSON reporter, compare top 10% and total wall time, mark plan done.
+**After (2026-06-03):** `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vitest run --reporter=json`
+
+| Metric | Before | After |
+|--------|--------|-------|
+| Test count | 1369 | **1370** (+1 from `it.each` splits) |
+| Full suite wall | ~57s | **~52s** |
+| Top 10 slowest total CPU | 949ms | **597ms** (−37%) |
+| Top 10% (137 tests) total CPU | 5911ms | **4443ms** (−25%) |
+
+#### Top 10 slowest (post-optimization)
+
+| # | ms | file | test |
+|---|-----|------|------|
+| 1 | 81 | HorizontalMenu.spec.ts | expands menu when clicking menu icon |
+| 2 | 66 | BookReadingPage.spec.ts | updates current block while book layout drawer is closed |
+| 3 | 62 | PopButton.spec.ts | blurs button when dialog closes via close_request |
+| 4–12 | 54–57 | BookReadingPage.spec.ts | reading control panel / PATCH / geometry tests |
+
+**Dominant file in top 10% after:** `BookReadingPage.spec.ts` (49 of 137, down from 52).
+
+#### Summary
+
+- Removed or merged redundant tests (HorizontalMenu expand-when-expanded, BookReading default-selection/PDF-load duplicates, NoteEditableContent multi-scenario normalization, etc.).
+- Replaced `getByRole`/`findByRole`, `vi.waitUntil`, and long `vi.waitFor` polls with `data-testid`, sync DOM queries, `flushPromises`/`nextTick`, and fake timers for debounce/snap-hold.
+- Added shared helpers: BookReading selection/viewport, sidebar mount, search debounce, folder page, note content debounce, Wikidata dialog clicks.
+
+**Commits:** `0e82333346` (batch 1) through `ae58276268` (batch 14); plan close in this commit.
