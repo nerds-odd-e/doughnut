@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.notNullValue;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
-import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +22,6 @@ class RecallQuestionServiceTest {
 
   @Autowired MakeMe makeMe;
   @Autowired RecallQuestionService recallQuestionService;
-  @Autowired RecallPromptRepository recallPromptRepository;
   private Note note;
   private MemoryTracker memoryTracker;
 
@@ -35,16 +33,13 @@ class RecallQuestionServiceTest {
 
   @Test
   void shouldReturnMostRecentUnansweredRecallPromptWhenMultipleExist() {
-    // Create 5 unanswered recall prompts with the same memory tracker
-    for (int i = 0; i < 5; i++) {
-      makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).please();
-    }
+    makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).please();
+    RecallPrompt mostRecent = makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).please();
     makeMe.entityPersister.flush();
 
-    RecallPrompt result =
-        recallPromptRepository.findUnansweredByMemoryTracker(memoryTracker.getId()).orElse(null);
-    assertThat("Should return a recall prompt", result, notNullValue());
-    assertThat(
-        "Should return one of the 5 prompts", result.getMemoryTracker(), equalTo(memoryTracker));
+    RecallPrompt result = recallQuestionService.generateAQuestion(memoryTracker);
+
+    assertThat(result, notNullValue());
+    assertThat(result.getId(), equalTo(mostRecent.getId()));
   }
 }

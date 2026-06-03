@@ -615,22 +615,18 @@ class FocusContextRetrievalServiceTest {
       }
 
       @Test
-      void nullSeedRepeatRetrieveSameSiblingOrder() {
-        RetrievalConfig cfg = RetrievalConfig.forQuestionGeneration(null);
-        List<String> first = folderSiblingTitles(service.retrieve(focus, viewer, cfg));
-        List<String> second = folderSiblingTitles(service.retrieve(focus, viewer, cfg));
-
-        assertThat(first, equalTo(second));
-        assertThat(first.size(), lessThanOrEqualTo(FocusContextConstants.sampleCapAtGraphDepth(1)));
-      }
-
-      @Test
-      void fixedSeedRepeatRetrieveSameSiblingOrder() {
-        RetrievalConfig cfg = RetrievalConfig.forQuestionGeneration(42L);
-        List<String> a = folderSiblingTitles(service.retrieve(focus, viewer, cfg));
-        List<String> b = folderSiblingTitles(service.retrieve(focus, viewer, cfg));
-
-        assertThat(a, equalTo(b));
+      void repeatRetrieveSameSiblingOrderForNullAndFixedSeed() {
+        for (Long seed : new Long[] {null, 42L}) {
+          RetrievalConfig cfg = RetrievalConfig.forQuestionGeneration(seed);
+          List<String> first = folderSiblingTitles(service.retrieve(focus, viewer, cfg));
+          List<String> second = folderSiblingTitles(service.retrieve(focus, viewer, cfg));
+          assertThat(first, equalTo(second));
+        }
+        assertThat(
+            folderSiblingTitles(
+                    service.retrieve(focus, viewer, RetrievalConfig.forQuestionGeneration(null)))
+                .size(),
+            lessThanOrEqualTo(FocusContextConstants.sampleCapAtGraphDepth(1)));
       }
     }
 

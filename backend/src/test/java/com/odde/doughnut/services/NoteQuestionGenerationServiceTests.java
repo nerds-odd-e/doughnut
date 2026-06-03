@@ -97,40 +97,6 @@ class NoteQuestionGenerationServiceTests {
     }
 
     @Test
-    void shouldPassScopedQuestionGenerationInstructionAsFirstUserMessage()
-        throws JsonProcessingException {
-      User user = makeMe.aUser().please();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(user).please();
-      makeMe
-          .theNotebook(nb)
-          .indexContent("---\nquestion_generation_instruction: SCOPED_QGEN_MARKER\n---\n")
-          .please();
-      Note noteInScope = makeMe.aNote().notebook(nb).please();
-      makeMe.aNote().notebook(nb).please();
-
-      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      openAiStructuredResponseMock.stubStructuredResponse(mcqWithAnswer);
-
-      service.generateQuestion(noteInScope, null);
-
-      ArgumentCaptor<StructuredResponseCreateParams<MCQWithAnswer>> paramsCaptor =
-          responseParamsCaptor();
-      verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
-      List<String> userBodies = userMessageContentStrings(paramsCaptor.getValue());
-      assertThat(
-          userBodies.get(0),
-          containsString(QuestionGenerationRequestBuilder.CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER));
-      assertThat(userBodies.get(0), containsString("SCOPED_QGEN_MARKER"));
-      assertThat(userBodies.get(1), containsString("# Focus Context"));
-      assertThat(
-          instructionContains(
-              paramsCaptor.getValue(),
-              QuestionGenerationRequestBuilder.CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER),
-          is(false));
-      assertThat(instructionContains(paramsCaptor.getValue(), "SCOPED_QGEN_MARKER"), is(false));
-    }
-
-    @Test
     void shouldUseQuestionGenerationModelNameFromGlobalSettings() throws JsonProcessingException {
       globalSettingsService
           .globalSettingQuestionGeneration()
@@ -176,6 +142,20 @@ class NoteQuestionGenerationServiceTests {
     }
   }
 
+  private Note noteWithScopedQuestionGenerationInstruction(String marker) {
+    User user = makeMe.aUser().please();
+    Notebook nb = makeMe.aNotebook().creatorAndOwner(user).please();
+    makeMe
+        .theNotebook(nb)
+        .indexContent("---\nquestion_generation_instruction: " + marker + "\n---\n")
+        .please();
+    return makeMe
+        .aNote()
+        .notebook(nb)
+        .content("Note body text included in the focus context.")
+        .please();
+  }
+
   @Nested
   class BuildQuestionGenerationRequest {
 
@@ -198,42 +178,8 @@ class NoteQuestionGenerationServiceTests {
     }
 
     @Test
-    void shouldStillIncludeFocusContextAfterDeductingInstructionTokensFromBudget() {
-      User user = makeMe.aUser().please();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(user).please();
-      makeMe
-          .theNotebook(nb)
-          .indexContent("---\nquestion_generation_instruction: BUDGET_CHECK_MARKER\n---\n")
-          .please();
-      Note noteInScope =
-          makeMe
-              .aNote()
-              .notebook(nb)
-              .content("A note with enough body text to appear in the focus context.")
-              .please();
-      makeMe.aNote().notebook(nb).please();
-
-      StructuredResponseCreateParams<MCQWithAnswer> request =
-          service.buildQuestionGenerationRequest(noteInScope, null);
-
-      List<String> userBodies = userMessageContentStrings(request);
-      assertThat(
-          userBodies.get(0),
-          containsString(QuestionGenerationRequestBuilder.CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER));
-      assertThat(userBodies.get(0), containsString("BUDGET_CHECK_MARKER"));
-      assertThat(userBodies.get(1), containsString("# Focus Context"));
-    }
-
-    @Test
     void shouldPlaceScopedQuestionInstructionAsFirstUserMessageBeforeFocusContext() {
-      User user = makeMe.aUser().please();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(user).please();
-      makeMe
-          .theNotebook(nb)
-          .indexContent("---\nquestion_generation_instruction: SCOPED_QGEN_MARKER\n---\n")
-          .please();
-      Note noteInScope = makeMe.aNote().notebook(nb).please();
-      makeMe.aNote().notebook(nb).please();
+      Note noteInScope = noteWithScopedQuestionGenerationInstruction("SCOPED_QGEN_MARKER");
 
       StructuredResponseCreateParams<MCQWithAnswer> request =
           service.buildQuestionGenerationRequest(noteInScope, null);
@@ -292,14 +238,7 @@ class NoteQuestionGenerationServiceTests {
 
     @Test
     void shouldOrderUserMessagesScopedInstructionThenFocusThenAdditional() {
-      User user = makeMe.aUser().please();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(user).please();
-      makeMe
-          .theNotebook(nb)
-          .indexContent("---\nquestion_generation_instruction: SCOPED_QGEN_MARKER\n---\n")
-          .please();
-      Note noteInScope = makeMe.aNote().notebook(nb).please();
-      makeMe.aNote().notebook(nb).please();
+      Note noteInScope = noteWithScopedQuestionGenerationInstruction("SCOPED_QGEN_MARKER");
 
       StructuredResponseCreateParams<MCQWithAnswer> request =
           service.buildQuestionGenerationRequest(

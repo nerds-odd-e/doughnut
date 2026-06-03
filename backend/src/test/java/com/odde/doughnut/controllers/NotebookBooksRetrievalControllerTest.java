@@ -236,12 +236,16 @@ class NotebookBooksRetrievalControllerTest extends NotebookBooksControllerTestBa
     }
 
     @Test
-    void returnsEpubZipWhenBookFormatIsEpub() throws Exception {
-      Notebook nb = myNotebook();
-      byte[] epubBytes = readFixtureEpubValidMinimal();
-      controller.attachBook(nb, epubAttachRequest("Minimal EPUB"), epubFile(epubBytes));
-      makeMe.entityPersister.flushAndClear();
-      String ref = bookOf(nb).getSourceFileRef();
+    void returnsEpubZipWhenBookFormatIsEpub() throws UnexpectedNoAccessRightException {
+      Notebook nb = notebookWithBook();
+      Book book = bookOf(nb);
+      byte[] epubBytes = new byte[] {0x50, 0x4b, 0x03, 0x04};
+      String ref = bookStorage.put(epubBytes, BookReadingWireConstants.BOOK_FORMAT_EPUB);
+      book.setFormat(BookReadingWireConstants.BOOK_FORMAT_EPUB);
+      book.setBookName("Minimal EPUB");
+      book.setSourceFileRef(ref);
+      makeMe.entityPersister.save(book);
+      makeMe.entityPersister.flush();
       String expectedEtag =
           "\"" + DigestUtils.md5DigestAsHex(ref.getBytes(StandardCharsets.UTF_8)) + "\"";
 

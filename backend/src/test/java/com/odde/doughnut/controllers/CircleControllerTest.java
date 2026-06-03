@@ -138,14 +138,12 @@ class CircleControllerTest extends ControllerTestBase {
     void notebooksViewIncludesCatalogWithCircleOwnedGroups()
         throws UnexpectedNoAccessRightException {
       User user = currentUser.getUser();
-      Circle circle = makeMe.aCircle().please();
-      circleService.joinAndSave(circle, user);
+      Circle circle = makeMe.aCircle().hasMember(user).please();
       Notebook inGroup = makeMe.aNotebook().creatorAndOwner(user).owner(circle).please();
       Notebook ungrouped = makeMe.aNotebook().creatorAndOwner(user).owner(circle).please();
       NotebookGroup group =
           notebookGroupService.createGroup(user, circle.getOwnership(), "Circle group");
       notebookGroupService.assignNotebookToGroup(user, inGroup, group);
-      makeMe.refresh(circle);
 
       CircleForUserView view = controller.showCircle(circle);
       var notebooksView = view.getNotebooks();

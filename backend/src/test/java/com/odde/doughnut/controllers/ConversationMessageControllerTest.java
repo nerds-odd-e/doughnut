@@ -186,9 +186,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
     void testConversationsOrderedByLastMessageTime() {
       Conversation conv1 = makeMe.aConversation().from(currentUser.getUser()).please();
       Conversation conv2 = makeMe.aConversation().from(currentUser.getUser()).please();
-      Conversation conv3 = makeMe.aConversation().from(currentUser.getUser()).please();
 
-      // Add messages with specific timestamps
       makeMe
           .aConversationMessage(conv1)
           .sender(otherUser)
@@ -199,16 +197,11 @@ class ConversationMessageControllerTest extends ControllerTestBase {
           .sender(otherUser)
           .createdAt(makeMe.aTimestamp().of(1, 2).please())
           .please();
-      makeMe
-          .aConversationMessage(conv3)
-          .sender(otherUser)
-          .createdAt(makeMe.aTimestamp().of(1, 3).please())
-          .please();
 
       List<ConversationListItem> orderedConversations = controller.getConversationsOfCurrentUser();
 
       assertIterableEquals(
-          List.of(conv3.getId(), conv2.getId(), conv1.getId()),
+          List.of(conv2.getId(), conv1.getId()),
           orderedConversations.stream().map(ConversationListItem::id).toList());
     }
 

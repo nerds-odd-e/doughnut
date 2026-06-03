@@ -248,7 +248,9 @@ Status: done
 ---
 
 ### Phase 11: Optimize slow tests rank 101–110 (max 0.015s)
-Status: planned
+Status: done
+
+**Result (2026-06-03):** Fewer redundant tests and lighter fixtures (1134 invocations): removed duplicate scoped-instruction generate/build tests and budget-only build case; shared scoped-notebook helper; recall-prompt test uses service with two prompts and asserts latest id; merged null/fixed sibling seed stability; dropped unused bazaar search fixture; circle catalog test uses member circle without refresh; conversation ordering uses two conversations; EPUB file download uses direct storage ref like PDF.
 
 **Scope:**
 - `com.odde.doughnut.services.NoteQuestionGenerationServiceTests$BuildQuestionGenerationRequest#shouldStillIncludeFocusContextAfterDeductingInstructionTokensFromBudget()` (0.015s)

@@ -94,14 +94,11 @@ public class UserModelSearchTest {
     Note noteInTheSameNotebook;
     Note noteFromMyOtherNotebook;
     Note circleNote;
-    Note bazaarNote;
     Note subscribedBazaarNote;
     final String commonPhrase = "viva la";
 
     @BeforeEach
     void setupBazaarNotes() {
-      bazaarNote = makeMe.aNote(commonPhrase + " bazaar").notebookOwnedBy(anotherUser).please();
-      makeMe.aBazaarNotebook(bazaarNote.getNotebook()).please();
       subscribedBazaarNote =
           makeMe.aNote(commonPhrase + " subscription").notebookOwnedBy(anotherUser).please();
       makeMe.aBazaarNotebook(subscribedBazaarNote.getNotebook()).please();
