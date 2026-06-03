@@ -87,7 +87,9 @@ Status: done
 ---
 
 ### Phase 4: Optimize slow tests rank 31–40 (max 0.043s)
-Status: planned
+Status: done
+
+**Result (2026-06-03):** Slimmer fixtures and fewer tests (1162 invocations): InboundSampling split by concern with minimal referrers (21 for URI cap, 7 for outgoing exclusion); merged null-seed cap into parameterized depth-1 test; BooksController epub download uses direct storage ref instead of attach+fixture; extract-note placement parameterized with separate instruction-shape test; NullToNotFound supports cases merged; removed stray note in MCQ recall test.
 
 **Scope:**
 - `com.odde.doughnut.services.focusContext.FocusContextRetrievalServiceTest$InboundSampling#focusInboundUriListCappedAtTwenty()` (0.043s)

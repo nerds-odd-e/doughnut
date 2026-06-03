@@ -14,6 +14,9 @@ import java.util.stream.LongStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -148,164 +151,168 @@ class FocusContextRetrievalServiceTest {
 
   @Nested
   class InboundSampling {
-    private Note focusNote;
-    private User viewer;
-
-    @BeforeEach
-    void setup() {
-      viewer = makeMe.aUser().please();
-      Notebook nb = notebookReadableBy(viewer);
-      focusNote = makeMe.aNote().notebook(nb).title("HubFocus").please();
-      for (int i = 0; i < 7; i++) {
-        Note r =
-            makeMe
-                .aNote()
-                .underSameNotebookAs(focusNote)
-                .title("Ref" + i)
-                .content("Links to [[HubFocus]].")
-                .please();
-        refreshWikiCache(r, viewer);
-      }
-    }
-
-    @Test
-    void depth1InboundCappedAtSixWithStableSeed() {
-      RetrievalConfig cfg = RetrievalConfig.forQuestionGeneration(1L);
-      List<String> first = inboundReferrerTitles(cfg);
-      List<String> second = inboundReferrerTitles(cfg);
-      assertThat(first.size(), equalTo(6));
-      assertThat(first, equalTo(second));
-    }
-
-    private List<String> inboundReferrerTitles(RetrievalConfig cfg) {
-      return service.retrieve(focusNote, viewer, cfg).getRelatedNotes().stream()
+    private List<String> inboundReferrerTitles(Note focus, User viewer, RetrievalConfig cfg) {
+      return service.retrieve(focus, viewer, cfg).getRelatedNotes().stream()
           .filter(n -> n.getEdgeType() == FocusContextEdgeType.InboundWikiReference)
           .map(FocusContextNote::getTitle)
           .toList();
     }
 
-    @Test
-    void differentSeedsProduceDifferentInboundSelection() {
-      List<String> baseline = sortedInboundReferrerTitles(1L);
-      boolean foundDistinct =
-          LongStream.rangeClosed(2, 10)
-              .anyMatch(seed -> !baseline.equals(sortedInboundReferrerTitles(seed)));
-      assertThat(
-          "CRC32(concat(noteId, seed)) can rank the same six referrers for two arbitrary seeds; "
-              + "expect some seed in range to change the capped set",
-          foundDistinct,
-          is(true));
-    }
-
-    @Test
-    void noSeedTakesFirstSixInStableOrder() {
-      RetrievalConfig cfg = RetrievalConfig.forQuestionGeneration(null);
-      long count =
-          service.retrieve(focusNote, viewer, cfg).getRelatedNotes().stream()
-              .filter(n -> n.getEdgeType() == FocusContextEdgeType.InboundWikiReference)
-              .count();
-      assertThat(count, equalTo(6L));
-    }
-
-    @Test
-    void focusInboundUriListCappedAtTwenty() {
-      for (int i = 7; i < 25; i++) {
+    private void addInboundReferrers(Note focus, User viewer, int count, String titlePrefix) {
+      for (int i = 0; i < count; i++) {
         Note r =
             makeMe
                 .aNote()
-                .underSameNotebookAs(focusNote)
-                .title("Extra" + i)
-                .content("Links to [[HubFocus]].")
+                .underSameNotebookAs(focus)
+                .title(titlePrefix + i)
+                .content("Links to [[" + focus.getTitle() + "]].")
                 .please();
         refreshWikiCache(r, viewer);
       }
-      RetrievalConfig cfg = RetrievalConfig.forQuestionGeneration(1L);
-      FocusContextResult result = service.retrieve(focusNote, viewer, cfg);
-
-      assertThat(result.getFocusNote().getInboundReferences(), hasSize(20));
     }
 
-    @Test
-    void depth1InboundExcludesOutgoingTargetsBeforeCap() {
-      Note hub = makeMe.aNote().underSameNotebookAs(focusNote).title("XHub").please();
-      Note shared =
+    @Nested
+    class Depth1CapAndSeed {
+      private Note focusNote;
+      private User viewer;
+
+      @BeforeEach
+      void setup() {
+        viewer = makeMe.aUser().please();
+        Notebook nb = notebookReadableBy(viewer);
+        focusNote = makeMe.aNote().notebook(nb).title("HubFocus").please();
+        addInboundReferrers(focusNote, viewer, 7, "Ref");
+      }
+
+      @ParameterizedTest
+      @NullSource
+      @ValueSource(longs = {1L})
+      void depth1InboundCappedAtSixWithStableSeed(Long seed) {
+        RetrievalConfig cfg = RetrievalConfig.forQuestionGeneration(seed);
+        List<String> first = inboundReferrerTitles(focusNote, viewer, cfg);
+        List<String> second = inboundReferrerTitles(focusNote, viewer, cfg);
+        assertThat(first.size(), equalTo(6));
+        assertThat(first, equalTo(second));
+      }
+
+      @Test
+      void differentSeedsProduceDifferentInboundSelection() {
+        List<String> baseline = sortedInboundReferrerTitles(1L);
+        boolean foundDistinct =
+            LongStream.rangeClosed(2, 10)
+                .anyMatch(seed -> !baseline.equals(sortedInboundReferrerTitles(seed)));
+        assertThat(
+            "CRC32(concat(noteId, seed)) can rank the same six referrers for two arbitrary seeds; "
+                + "expect some seed in range to change the capped set",
+            foundDistinct,
+            is(true));
+      }
+
+      private List<String> sortedInboundReferrerTitles(long seed) {
+        return inboundReferrerTitles(focusNote, viewer, RetrievalConfig.forQuestionGeneration(seed))
+            .stream()
+            .sorted()
+            .toList();
+      }
+    }
+
+    @Nested
+    class FocusInboundUriListCap {
+      @Test
+      void focusInboundUriListCappedAtTwenty() {
+        User viewer = makeMe.aUser().please();
+        Notebook nb = notebookReadableBy(viewer);
+        Note focusNote = makeMe.aNote().notebook(nb).title("UriCapHub").please();
+        addInboundReferrers(focusNote, viewer, 21, "UriRef");
+
+        FocusContextResult result =
+            service.retrieve(focusNote, viewer, RetrievalConfig.forQuestionGeneration(1L));
+
+        assertThat(result.getFocusNote().getInboundReferences(), hasSize(20));
+      }
+    }
+
+    @Nested
+    class OutgoingExclusionBeforeCap {
+      @Test
+      void depth1InboundExcludesOutgoingTargetsBeforeCap() {
+        User viewer = makeMe.aUser().please();
+        Notebook nb = notebookReadableBy(viewer);
+        Note hub = makeMe.aNote().notebook(nb).title("XHub").please();
+        Note shared =
+            makeMe
+                .aNote()
+                .underSameNotebookAs(hub)
+                .title("XShared")
+                .content("Links to [[XHub]].")
+                .please();
+        hub.setContent("[[XShared]].");
+        makeMe.entityPersister.merge(hub);
+        for (int i = 0; i < 7; i++) {
           makeMe
               .aNote()
-              .underSameNotebookAs(focusNote)
-              .title("XShared")
+              .underSameNotebookAs(hub)
+              .title("XRef" + i)
               .content("Links to [[XHub]].")
               .please();
-      hub.setContent("[[XShared]].");
-      makeMe.entityPersister.merge(hub);
-      for (int i = 0; i < 8; i++) {
-        makeMe
-            .aNote()
-            .underSameNotebookAs(focusNote)
-            .title("XRef" + i)
-            .content("Links to [[XHub]].")
-            .please();
+        }
+        refreshWikiCache(hub, viewer);
+        refreshWikiCache(shared, viewer);
+
+        FocusContextResult result =
+            service.retrieve(hub, viewer, RetrievalConfig.forQuestionGeneration(null));
+
+        assertThat(
+            result.getRelatedNotes().stream()
+                .filter(n -> "XShared".equals(n.getTitle()))
+                .noneMatch(n -> n.getEdgeType() == FocusContextEdgeType.InboundWikiReference),
+            is(true));
+        assertThat(
+            result.getRelatedNotes().stream()
+                .filter(n -> "XShared".equals(n.getTitle()))
+                .anyMatch(n -> n.getEdgeType() == FocusContextEdgeType.OutgoingWikiLink),
+            is(true));
       }
-      refreshWikiCache(hub, viewer);
-      refreshWikiCache(shared, viewer);
-
-      FocusContextResult result =
-          service.retrieve(hub, viewer, RetrievalConfig.forQuestionGeneration(null));
-
-      assertThat(
-          result.getRelatedNotes().stream()
-              .filter(n -> "XShared".equals(n.getTitle()))
-              .noneMatch(n -> n.getEdgeType() == FocusContextEdgeType.InboundWikiReference),
-          is(true));
-      assertThat(
-          result.getRelatedNotes().stream()
-              .filter(n -> "XShared".equals(n.getTitle()))
-              .anyMatch(n -> n.getEdgeType() == FocusContextEdgeType.OutgoingWikiLink),
-          is(true));
     }
 
-    @Test
-    void depth2InboundCappedAtTwo() {
-      Note depth1Ref =
-          makeMe
-              .aNote()
-              .underSameNotebookAs(focusNote)
-              .title("Depth1Hub")
-              .content("Links to [[HubFocus]].")
-              .please();
-      refreshWikiCache(depth1Ref, viewer);
-      for (int i = 0; i < 3; i++) {
-        Note d2 =
+    @Nested
+    class Depth2InboundCap {
+      @Test
+      void depth2InboundCappedAtTwo() {
+        User viewer = makeMe.aUser().please();
+        Notebook nb = notebookReadableBy(viewer);
+        Note focusNote = makeMe.aNote().notebook(nb).title("HubFocus").please();
+        Note depth1Ref =
             makeMe
                 .aNote()
                 .underSameNotebookAs(focusNote)
-                .title("D2Ref" + i)
-                .content("Links to [[Depth1Hub]].")
+                .title("Depth1Hub")
+                .content("Links to [[HubFocus]].")
                 .please();
-        refreshWikiCache(d2, viewer);
+        refreshWikiCache(depth1Ref, viewer);
+        for (int i = 0; i < 3; i++) {
+          Note d2 =
+              makeMe
+                  .aNote()
+                  .underSameNotebookAs(focusNote)
+                  .title("D2Ref" + i)
+                  .content("Links to [[Depth1Hub]].")
+                  .please();
+          refreshWikiCache(d2, viewer);
+        }
+
+        FocusContextResult result =
+            service.retrieve(focusNote, viewer, RetrievalConfig.forQuestionGeneration(1L));
+
+        long depth2InboundCount =
+            result.getRelatedNotes().stream()
+                .filter(
+                    n ->
+                        n.getDepth() == 2
+                            && n.getEdgeType() == FocusContextEdgeType.InboundWikiReference)
+                .count();
+        assertThat(depth2InboundCount, lessThanOrEqualTo(2L));
       }
-
-      FocusContextResult result =
-          service.retrieve(focusNote, viewer, RetrievalConfig.forQuestionGeneration(1L));
-
-      long depth2InboundCount =
-          result.getRelatedNotes().stream()
-              .filter(
-                  n ->
-                      n.getDepth() == 2
-                          && n.getEdgeType() == FocusContextEdgeType.InboundWikiReference)
-              .count();
-      assertThat(depth2InboundCount, lessThanOrEqualTo(2L));
-    }
-
-    private List<String> sortedInboundReferrerTitles(long seed) {
-      return service
-          .retrieve(focusNote, viewer, RetrievalConfig.forQuestionGeneration(seed))
-          .getRelatedNotes()
-          .stream()
-          .filter(n -> n.getEdgeType() == FocusContextEdgeType.InboundWikiReference)
-          .map(FocusContextNote::getTitle)
-          .sorted()
-          .toList();
     }
   }
 

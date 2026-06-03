@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -56,26 +57,24 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
       return note;
     }
 
+    private void stubExtractionResult(String newTitle, String newContent, String updatedParent) {
+      NoteExtractionResult aiResult = new NoteExtractionResult();
+      aiResult.setNewNoteTitle(newTitle);
+      aiResult.setNewNoteContent(newContent);
+      aiResult.setUpdatedParentContent(updatedParent);
+      openAiStructuredResponseMock.stubStructuredResponse(aiResult);
+    }
+
     @Test
-    void shouldReturnCreatedNoteAtNotebookRootWhenSourceNoteHasNoFolder()
+    void shouldCallExtractNoteWithStructuredInstructions()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       Note testNote = newRootNoteWithExtractableContent();
-      NoteExtractionResult aiResult = new NoteExtractionResult();
-      aiResult.setNewNoteTitle("Extracted Note");
-      aiResult.setNewNoteContent("Expanded content for the new note.");
-      aiResult.setUpdatedParentContent("Updated parent with summary.");
-      openAiStructuredResponseMock.stubStructuredResponse(aiResult);
+      stubExtractionResult(
+          "Extracted Note", "Expanded content for the new note.", "Updated parent with summary.");
 
       RefinementSuggestionsRequestDTO requestDTO = new RefinementSuggestionsRequestDTO();
       requestDTO.setSuggestions(List.of("key suggestion to extract"));
-      NoteRealm response = controller.extractNote(testNote, requestDTO);
-
-      assertThat(response.getNote().getTitle()).isEqualTo("Extracted Note");
-      assertThat(response.getNote().getContent()).isEqualTo("Expanded content for the new note.");
-      assertThat(noteRepository.findById(testNote.getId()).orElseThrow().getContent())
-          .isEqualTo("Updated parent with summary.");
-      Note extractedNote = noteRepository.findById(response.getNote().getId()).orElseThrow();
-      assertThat(extractedNote.getFolder()).isNull();
+      controller.extractNote(testNote, requestDTO);
 
       @SuppressWarnings({"unchecked", "rawtypes"})
       ArgumentCaptor<StructuredResponseCreateParams<NoteExtractionResult>> paramsCaptor =
@@ -89,6 +88,45 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
       assertThat(instructions).contains("[[Canonical Note Title|visible text]]");
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void shouldPlaceExtractedNoteAtExpectedLocation(boolean sourceInFolder)
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      Note sourceNote;
+      Folder expectedFolder = null;
+      if (sourceInFolder) {
+        Notebook notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+        expectedFolder = makeMe.aFolder().notebook(notebook).name("Context").please();
+        sourceNote =
+            makeMe
+                .aNote()
+                .title("Sample")
+                .folder(expectedFolder)
+                .content("Original content with a key suggestion to extract.")
+                .please();
+      } else {
+        sourceNote = newRootNoteWithExtractableContent();
+      }
+
+      stubExtractionResult(
+          sourceInFolder ? "Point B" : "Extracted Note",
+          sourceInFolder ? "Extracted" : "Expanded content for the new note.",
+          sourceInFolder ? "A. C. D. E." : "Updated parent with summary.");
+
+      RefinementSuggestionsRequestDTO requestDTO = new RefinementSuggestionsRequestDTO();
+      requestDTO.setSuggestions(List.of("key suggestion to extract"));
+      NoteRealm response = controller.extractNote(sourceNote, requestDTO);
+
+      Note persistedNote = noteRepository.findById(response.getNote().getId()).orElseThrow();
+      if (sourceInFolder) {
+        assertThat(persistedNote.getFolder().getId()).isEqualTo(expectedFolder.getId());
+      } else {
+        assertThat(persistedNote.getFolder()).isNull();
+        assertThat(noteRepository.findById(sourceNote.getId()).orElseThrow().getContent())
+            .isEqualTo("Updated parent with summary.");
+      }
+    }
+
     @Test
     void shouldRefreshWikiLinkCacheForOriginalAndNewNoteAfterExtraction()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
@@ -99,11 +137,10 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
               .notebookOwnedBy(currentUser.getUser())
               .content("A. B. C.")
               .please();
-      NoteExtractionResult aiResult = new NoteExtractionResult();
-      aiResult.setNewNoteTitle("Point B");
-      aiResult.setNewNoteContent("Extracted from [[sample|the original note]].");
-      aiResult.setUpdatedParentContent("A. See [[point b|the extracted note]]. C.");
-      openAiStructuredResponseMock.stubStructuredResponse(aiResult);
+      stubExtractionResult(
+          "Point B",
+          "Extracted from [[sample|the original note]].",
+          "A. See [[point b|the extracted note]]. C.");
 
       RefinementSuggestionsRequestDTO requestDTO = new RefinementSuggestionsRequestDTO();
       requestDTO.setSuggestions(List.of("B"));
@@ -115,34 +152,6 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
                   wikiTitle.getTargetToken().equals("sample")
                       && wikiTitle.getDisplayText().equals("the original note")
                       && wikiTitle.getNoteId().equals(testNote.getId()));
-    }
-
-    @Test
-    void shouldPlaceExtractedNoteInSameFolderWhenSourceNoteIsInFolder()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      Folder folder = makeMe.aFolder().notebook(notebook).name("Context").please();
-      Note noteInFolder =
-          makeMe
-              .aNote()
-              .title("Sample")
-              .folder(folder)
-              .content("Original content with a key suggestion to extract.")
-              .please();
-
-      NoteExtractionResult aiResult = new NoteExtractionResult();
-      aiResult.setNewNoteTitle("Point B");
-      aiResult.setNewNoteContent("Extracted");
-      aiResult.setUpdatedParentContent("A. C. D. E.");
-      openAiStructuredResponseMock.stubStructuredResponse(aiResult);
-
-      RefinementSuggestionsRequestDTO requestDTO = new RefinementSuggestionsRequestDTO();
-      requestDTO.setSuggestions(List.of("key suggestion to extract"));
-      NoteRealm response = controller.extractNote(noteInFolder, requestDTO);
-
-      assertThat(response.getNote().getTitle()).isEqualTo("Point B");
-      Note persistedNote = noteRepository.findById(response.getNote().getId()).orElseThrow();
-      assertThat(persistedNote.getFolder().getId()).isEqualTo(folder.getId());
     }
 
     @Test

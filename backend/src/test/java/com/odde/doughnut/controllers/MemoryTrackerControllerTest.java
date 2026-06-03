@@ -2,7 +2,6 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.NoteDeleteReferenceHandling;
@@ -182,7 +181,6 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
               .notebookOwnedBy(currentUser.getUser())
               .rememberSpelling()
               .please();
-      makeMe.aNote().please();
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
 
       // Mock OpenAI API call
