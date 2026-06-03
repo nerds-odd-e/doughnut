@@ -33,7 +33,7 @@ Status: planned
 - `mcp_services.feature` — "AI agent learns from Doughnut via MCP client (example #1)" (4.14s)
 
 ### Group 4: circles notebooks + link dead wiki
-Status: planned
+Status: done
 
 - `notebooks_in_circles.feature` — "Creating note that belongs to the circle" (4.00s)
 - `link.feature` — "A dead wiki link is shown and can create the missing note" (3.96s)

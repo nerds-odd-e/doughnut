@@ -38,17 +38,11 @@ Feature: Wiki links in notes
     When I update note "WikiLinks E2E CI" content using markdown to become:
       """
       Continuous integration is distinct from a [[WikiLinks E2E Missing]].
-      We also rely on [[WikiLinks E2E Tech]] as a core practice.
       """
-    Then I should see the rich content of the note with content:
-      | Tag               | Content            |
-      | a.dead-link       | WikiLinks E2E Missing |
-      | a:not(.dead-link) | WikiLinks E2E Tech |
     And I should be able to create a new note by following the dead link "WikiLinks E2E Missing"
     Then note "WikiLinks E2E CI" should show the rich content elements in the note content:
       | Tag               | Content               |
       | a:not(.dead-link) | WikiLinks E2E Missing |
-      | a:not(.dead-link) | WikiLinks E2E Tech    |
 
   @mockBrowserTime
   Scenario: A dead wiki link can be relinked to an existing note

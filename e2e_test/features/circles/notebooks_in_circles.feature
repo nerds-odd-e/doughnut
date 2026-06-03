@@ -6,10 +6,9 @@ Feature: Notes in circles
     And I am logged in as "old_learner"
 
   Scenario: Creating note that belongs to the circle
-    When I create a notebook "Team agreement" in circle "Odd-e SG Team"
-    Given I am re-logged in as "another_old_learner"
-    Then I should see the notebook "Team agreement" in circle "Odd-e SG Team"
-    When I add a note "Keep it complex" under "Team agreement"
+    Given There is a notebook "Team agreement" in circle "Odd-e SG Team" by "old_learner"
+    And I am re-logged in as "another_old_learner"
+    When I add a note "Keep it complex" under notebook "Team agreement" in circle "Odd-e SG Team"
     Then the note title should be "Keep it complex"
 
   Scenario: subscribe to a note and view

@@ -456,6 +456,7 @@ export const assumeNotePage = (
       return this
     },
     followDeadLink(linkTitle: string) {
+      this.switchToRichContent()
       cy.findByRole(noteContentRegion.role, { name: noteContentRegion.name })
         .find('a.dead-link')
         .contains(linkTitle)

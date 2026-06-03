@@ -114,10 +114,10 @@ Then(
 )
 
 When(
-  'I add a note {string} under {string}',
-  (noteTopology: string, parentNoteTitle: string) => {
+  'I add a note {string} under notebook {string} in circle {string}',
+  (noteTopology: string, parentNoteTitle: string, circleName: string) => {
     start
-      .assumeCirclePage()
+      .navigateToCircle(circleName)
       .navigateToNotebook(parentNoteTitle)
       .addingNewNoteFromToolbar()
       .createNoteWithTitle(noteTopology)
