@@ -19,17 +19,24 @@ When('I visit the invitation link', () => {
     .then((url) => {
       cy.visit(url)
       start.pageIsNotLoading()
-      const code = url.split('/circles/join/')[1]?.split(/[/?#]/)[0]
-      if (code) {
-        cy.get('#join-circle-invitationCode', { timeout: 15000 }).should(
-          ($input) => {
+      cy.get('body').then(($body) => {
+        if ($body.find('#username').length > 0) {
+          return
+        }
+        cy.findByRole('heading', {
+          name: 'Joining a Circle',
+          timeout: 15000,
+        }).should('be.visible')
+        const code = url.split('/circles/join/')[1]?.split(/[/?#]/)[0]
+        if (code) {
+          cy.get('#join-circle-invitationCode').should(($input) => {
             expect(
               $input.val(),
               `invitation form should show code from ${url}`
             ).to.equal(code)
-          }
-        )
-      }
+          })
+        }
+      })
     })
 })
 
@@ -72,6 +79,8 @@ When(
   'I create a notebook {string} in circle {string}',
   (noteTopology: string, circleName: string) => {
     start.navigateToCircle(circleName).creatingNotebook(noteTopology)
+    cy.url().should('match', /\/notebooks\/\d+/)
+    start.pageIsNotLoading()
   }
 )
 

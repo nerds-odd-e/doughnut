@@ -110,7 +110,7 @@ Status: planned
 ---
 
 ### Phase 10: browse_answer_while_recalling + cli_recall (MCQ)
-Status: planned
+Status: done
 
 ---
 

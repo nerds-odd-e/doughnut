@@ -18,6 +18,7 @@ import {
   NotebookBooksController,
   TestabilityRestController,
 } from '@generated/doughnut-backend-api/sdk.gen'
+import { circleIdAlias } from './pageObjects/circlePage'
 
 const hourOfDay = (days: number, hours: number) => {
   return new Date(1976, 5, 1 + days, hours)
@@ -447,55 +448,80 @@ const testability = () => {
     },
 
     injectCircle(circleInfo: Record<string, string>) {
-      return cy.wrap(
-        TestabilityRestController.injectCircle({ body: circleInfo }),
-        {
+      const circleName = circleInfo.circleName
+      return cy
+        .wrap(TestabilityRestController.injectCircle({ body: circleInfo }), {
           log: false,
-        }
-      )
+        })
+        .then((response) => {
+          const circleId = String(unwrapData(response))
+          if (circleName && /^\d+$/.test(circleId)) {
+            cy.wrap(circleId).as(circleIdAlias(circleName))
+          }
+        })
     },
 
     saveCircleInvitationLink(circleName: string) {
       return cy.get<string>('@currentLoginUser').then((username) => {
-        const auth = {
-          headers: {
-            Authorization: `Basic ${btoa(`${username}:password`)}`,
-          },
+        const authHeaders = {
+          Authorization: `Basic ${btoa(`${username}:password`)}`,
         }
-        return cy
-          .wrap(CircleController.index(auth), { log: false })
-          .then((response) => {
-            const circles =
-              unwrapData<Array<{ id: number; name: string }>>(response)
-            const circle = circles.find((c) => c.name === circleName)
-            if (!circle?.id) {
-              throw new Error(
-                `Circle "${circleName}" not found for user "${username}"`
+        const saveFromCircleId = (circleId: number) =>
+          cy
+            .request({
+              method: 'GET',
+              url: `/api/circles/${circleId}`,
+              headers: authHeaders,
+            })
+            .then((response) => {
+              const invitationCode = (
+                response.body as { invitationCode?: string }
+              ).invitationCode
+              if (!invitationCode) {
+                throw new Error(
+                  `Invitation code missing for circle "${circleName}" (id ${circleId})`
+                )
+              }
+              const origin =
+                Cypress.config('baseUrl')?.toString() ?? 'http://localhost:5173'
+              cy.wrap(`${origin}/circles/join/${invitationCode}`).as(
+                'savedInvitationCode'
               )
-            }
-            return cy.wrap(
-              CircleController.showCircle({
-                path: { circle: circle.id },
-                ...auth,
-              }),
-              { log: false }
-            )
-          })
-          .then((response) => {
-            const invitationCode = unwrapData<{ invitationCode: string }>(
-              response
-            ).invitationCode
-            if (!invitationCode) {
-              throw new Error(
-                `Invitation code missing for circle "${circleName}"`
+            })
+
+        const resolveCircleId = (): Cypress.Chainable<number> =>
+          cy
+            .get(`@${circleIdAlias(circleName)}`, { log: false })
+            .then((circleId) => Number(circleId))
+
+        return resolveCircleId().then((circleId) => {
+          if (Number.isFinite(circleId) && circleId > 0) {
+            return saveFromCircleId(circleId)
+          }
+          return cy
+            .wrap(CircleController.index({ headers: authHeaders }), {
+              log: false,
+            })
+            .then((response) => {
+              const circles =
+                unwrapData<Array<{ id: number; name: string }>>(response)
+              const matches = circles.filter((c) => c.name === circleName)
+              const circle = matches.reduce<{
+                id: number
+                name: string
+              } | null>(
+                (latest, c) =>
+                  latest === null || c.id > latest.id ? c : latest,
+                null
               )
-            }
-            const origin =
-              Cypress.config('baseUrl')?.toString() ?? 'http://localhost:5173'
-            cy.wrap(`${origin}/circles/join/${invitationCode}`).as(
-              'savedInvitationCode'
-            )
-          })
+              if (!circle?.id) {
+                throw new Error(
+                  `Circle "${circleName}" not found for user "${username}"`
+                )
+              }
+              return saveFromCircleId(circle.id)
+            })
+        })
       })
     },
 

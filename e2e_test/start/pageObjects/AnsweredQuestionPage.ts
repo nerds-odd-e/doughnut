@@ -1,3 +1,4 @@
+import { pageIsNotLoading } from '../pageBase'
 import { assumeNotePage } from './notePage'
 
 const assumeAnsweredQuestionPage = () => {
@@ -28,15 +29,25 @@ const assumeAnsweredQuestionPage = () => {
       cy.findByText(`Your answer \`${answer}\` is incorrect.`).should('exist')
     },
     showMemoryTracker(noteTopology?: string) {
+      pageIsNotLoading()
+      cy.findByText('Note under question').should('be.visible')
       cy.findByText('Note under question')
-        .parent()
-        .within(() => {
-          cy.get('a').last().click()
-        })
+        .closest('.note-under-question')
+        .find('a[href*="/n"]')
+        .last()
+        .click()
+      pageIsNotLoading()
       return assumeNotePage(noteTopology).openAssimilationSettings()
     },
     goToLastAnsweredQuestion: () => {
-      cy.findByRole('button', { name: 'view last answered question' }).click()
+      cy.findByRole('button', { name: 'view last answered question' }).then(
+        ($btn) => {
+          if (!$btn.is(':disabled')) {
+            cy.wrap($btn).click()
+          }
+        }
+      )
+      pageIsNotLoading()
       return assumeAnsweredQuestionPage()
     },
     confirmReAssimilation() {

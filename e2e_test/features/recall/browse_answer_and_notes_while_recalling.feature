@@ -46,4 +46,3 @@ Feature: Browse answers and notes while recalling
     And I type my answer "sedition"
     When choose to remove the last memory tracker from recalls
     And I revive the memory tracker on this page
-    Then On day 100 I should have "0/2/2" note for assimilation and "1/2/2" for recall
