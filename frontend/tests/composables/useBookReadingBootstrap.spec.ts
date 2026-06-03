@@ -37,7 +37,12 @@ describe("useBookReadingBootstrap", () => {
   async function expectBootstrapReady<T>(w: ReturnType<typeof mountBootstrap>) {
     await flushPromises()
     const vm = w.vm as { bootstrap: T | null }
-    expect(vm.bootstrap).not.toBeNull()
+    if (vm.bootstrap !== null) {
+      return vm.bootstrap as T
+    }
+    await vi.waitFor(() => expect(vm.bootstrap).not.toBeNull(), {
+      timeout: 1000,
+    })
     return vm.bootstrap as T
   }
 

@@ -120,7 +120,9 @@ Status: done
 ---
 
 ### Phase 7: BookReading load/restore batch
-Status: planned
+Status: done
+
+**Result (2026-06-03):** Removed redundant default-selection and standalone PDF-load tests (credentials merged into loading-indicator test). Book layout toggle uses plain PDF mount without blocks. Added `mountNoDirectContentBboxScenario`; PathNameEditor autofocus uses `flushPromises` + `requestAnimationFrame`; bootstrap tests try sync read before short `vi.waitFor`. **61** scoped tests; full suite **1368** pass (~22s wall).
 
 **Scope:** `tests/pages/BookReadingPage.spec.ts`, `tests/components/notes/core/PathNameEditor.spec.ts`, `tests/composables/useBookReadingBootstrap.spec.ts`
 
