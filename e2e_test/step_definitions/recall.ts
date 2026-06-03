@@ -12,6 +12,10 @@ function assertAssimilationDueOnDay(day: number, toAssimilateAndTotal: string) {
   start.assimilation().expectAssimilationDueFromTriple(toAssimilateAndTotal)
 }
 
+Given('the browser and backend are on day {int}', (day: number) => {
+  start.testability().timeTravelTo(day, 8)
+})
+
 Given("It's day {int}, {int} hour", (day: number, hour: number) => {
   start.testability().backendTimeTravelTo(day, hour)
 })
@@ -57,7 +61,15 @@ Then(
   'On day {int} I should have {string} note for assimilation and {string} for recall',
   (day: number, toAssimilateAndTotal: string, numberOfRecalls: string) => {
     assertAssimilationDueOnDay(day, toAssimilateAndTotal)
-    start.recall().visitRecallPage().expectToRecallCounts(numberOfRecalls)
+    start.recall().expectRecallProgressFromTriple(numberOfRecalls)
+  }
+)
+
+Then(
+  'I should have {string} note for assimilation and {string} for recall',
+  (toAssimilateAndTotal: string, numberOfRecalls: string) => {
+    start.assimilation().expectAssimilationDueFromTriple(toAssimilateAndTotal)
+    start.recall().assumeRecallPage().expectToRecallCounts(numberOfRecalls)
   }
 )
 

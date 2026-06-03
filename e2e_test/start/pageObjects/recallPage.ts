@@ -1,6 +1,16 @@
+import { RecallsController } from '@generated/doughnut-backend-api/sdk.gen'
 import { commonSenseSplit } from 'support/string_util'
 import { pageIsNotLoading } from '../pageBase'
 import router from '../router'
+
+function recallProgressFromTriple(triple: string) {
+  const [finished, dailyTotal, totalAssimilated] = triple.split('/').map(Number)
+  return {
+    finished,
+    toRepeatCount: (dailyTotal ?? 0) - (finished ?? 0),
+    totalAssimilated,
+  }
+}
 
 const recallPage = () => {
   return {
@@ -34,13 +44,44 @@ const recallPage = () => {
         .click()
       pageIsNotLoading()
     },
+    expectRecallProgressFromTriple(numberOfRecalls: string) {
+      const { finished, toRepeatCount, totalAssimilated } =
+        recallProgressFromTriple(numberOfRecalls)
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+      cy.wrap(
+        RecallsController.recalling({ query: { timezone, dueindays: 0 } }),
+        {
+          log: false,
+        }
+      ).then((dueMemoryTrackers) => {
+        return cy
+          .wrap(RecallsController.previouslyAnswered({ query: { timezone } }), {
+            log: false,
+          })
+          .then((previouslyAnswered) => {
+            expect(
+              previouslyAnswered?.length ?? 0,
+              `recall finished today for ${numberOfRecalls}`
+            ).to.eq(finished)
+            expect(
+              dueMemoryTrackers?.toRepeat?.length ?? 0,
+              `recall queue length for ${numberOfRecalls}`
+            ).to.eq(toRepeatCount)
+            expect(
+              dueMemoryTrackers?.totalAssimilatedCount,
+              `total assimilated memory trackers for ${numberOfRecalls}`
+            ).to.eq(totalAssimilated)
+          })
+      })
+    },
     expectToRecallCounts(numberOfRecalls: string) {
-      const [recalledTodayCount, toRecallCountForToday, totalCount] =
-        numberOfRecalls.split('/')
+      const { finished, toRepeatCount, totalAssimilated } =
+        recallProgressFromTriple(numberOfRecalls)
+      const dailyTotal = finished + toRepeatCount
 
       cy.get('.progress-bar').should(
         'contain',
-        `Recalling: ${recalledTodayCount}/${toRecallCountForToday}`
+        `Recalling: ${finished}/${dailyTotal}`
       )
       // Click progress bar to show recall session options dialog
       cy.get('.progress-bar').first().click()
@@ -48,10 +89,8 @@ const recallPage = () => {
       // Check dialog content
       cy.contains('Recall Session Options').should('be.visible')
       cy.get('.modal-body').within(() => {
-        cy.contains(
-          `Daily Progress: ${recalledTodayCount} / ${toRecallCountForToday}`
-        )
-        cy.contains(`Total assimilated: ${recalledTodayCount} / ${totalCount}`)
+        cy.contains(`Daily Progress: ${finished} / ${dailyTotal}`)
+        cy.contains(`Total assimilated: ${finished} / ${totalAssimilated}`)
       })
 
       // Close dialog
@@ -109,6 +148,10 @@ export const recall = () => {
     },
     assumeRecallPage() {
       return recallPage()
+    },
+    expectRecallProgressFromTriple(numberOfRecalls: string) {
+      recallPage().expectRecallProgressFromTriple(numberOfRecalls)
+      return this
     },
   }
 }
