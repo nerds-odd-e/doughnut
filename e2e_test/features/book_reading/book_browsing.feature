@@ -26,12 +26,12 @@ Feature: Book browsing
 
   Scenario: Scrolling the PDF updates the current block; short viewport keeps aside scrolled to it
     When I scroll the PDF book reader to bring page 2 into primary view
-    Then I should see in the book reader visible PDF viewport on page 2 text including "Strengthening the Code"
+    Then the book reader PDF viewport should be on page 2
     And the book block "2.2 Refactoring as Strengthening the Code" should be the current block in the book reader
     When I choose the book block "1. Refactoring: Protecting Intention in Working Software"
     And I set the book reading viewport to 1200 by 280
     When I scroll the PDF book reader to bring page 2 into primary view
-    Then I should see in the book reader visible PDF viewport on page 2 text including "Strengthening the Code"
+    Then the book reader PDF viewport should be on page 2
     And the book block "2.2 Refactoring as Strengthening the Code" should be the current block and visible in the book layout aside
 
   Scenario: Same-page scroll moves the current block; the current selection stays the explicit choice

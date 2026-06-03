@@ -74,7 +74,7 @@ Status: planned
 ---
 
 ### Phase 4: book_browsing (scroll) + message_center (receiver unread)
-Status: planned
+Status: done
 
 **Specs:** `book_reading/book_browsing.feature`, `messages/message_center_with_unread_message_count.feature`
 

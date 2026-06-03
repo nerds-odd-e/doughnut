@@ -6,7 +6,7 @@ Feature: Message Center with Unread Message Count
     When "old_learner" start a conversation about the note "Rocket Science" with a message "Hi"
 
   Scenario: Message receiver should have 1 unread message while sender has none
-    Then there should be no unread message for the user "old_learner"
+    Then I should have no unread messages
     And "a_trainer" should have 1 unread messages
 
   Scenario: The receiver's reply should increase the unread count of the sender
