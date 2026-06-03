@@ -95,16 +95,11 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       b.setFolderId(f.getId());
       controller.createNoteAtNotebookRoot(nb, b);
 
-      NoteCreationDTO c = new NoteCreationDTO();
-      c.setNewTitle("C");
-      c.setFolderId(f.getId());
-      controller.createNoteAtNotebookRoot(nb, c);
-
       List<String> titles =
           noteRepository.findNotesInFolderOrderByIdAsc(f.getId()).stream()
               .map(Note::getTitle)
               .toList();
-      assertThat(titles, contains("A", "B", "C"));
+      assertThat(titles, contains("A", "B"));
     }
 
     @Test

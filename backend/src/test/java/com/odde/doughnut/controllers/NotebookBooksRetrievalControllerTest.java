@@ -9,6 +9,7 @@ import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.BookBlock;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.services.book.BookReadingWireConstants;
 import com.odde.doughnut.services.book.EpubLocator;
 import com.odde.doughnut.services.book.PdfLocator;
 import java.nio.charset.StandardCharsets;
@@ -316,11 +317,16 @@ class NotebookBooksRetrievalControllerTest extends NotebookBooksControllerTestBa
     }
 
     @Test
-    void removesEpubBookRowAndStoredBytes() throws Exception {
-      Notebook nb = myNotebook();
-      byte[] epubBytes = readFixtureEpubValidMinimal();
-      controller.attachBook(nb, epubAttachRequest("Minimal EPUB"), epubFile(epubBytes));
-      String ref = bookOf(nb).getSourceFileRef();
+    void removesEpubBookRowAndStoredBytes() throws UnexpectedNoAccessRightException {
+      Notebook nb = notebookWithBook();
+      Book book = bookOf(nb);
+      byte[] epubBytes = new byte[] {0x50, 0x4b, 0x03, 0x04};
+      String ref = bookStorage.put(epubBytes, BookReadingWireConstants.BOOK_FORMAT_EPUB);
+      book.setFormat(BookReadingWireConstants.BOOK_FORMAT_EPUB);
+      book.setBookName("Minimal EPUB");
+      book.setSourceFileRef(ref);
+      makeMe.entityPersister.save(book);
+      makeMe.entityPersister.flush();
 
       controller.deleteBook(nb);
 

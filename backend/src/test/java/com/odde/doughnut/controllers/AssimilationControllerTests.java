@@ -65,7 +65,6 @@ class AssimilationControllerTests extends ControllerTestBase {
       User notebookOwner = makeMe.aUser().please();
       Notebook subscribedNotebook = makeMe.aNotebook().creatorAndOwner(notebookOwner).please();
       Note subscriptionNote = makeMe.aNote("sub").notebook(subscribedNotebook).please();
-      makeMe.aNote("other sub").notebook(subscribedNotebook).please();
       Note ownedNote = makeMe.aNote("owned").notebookOwnedBy(user).please();
       makeMe.aSubscription().forNotebook(subscribedNotebook).forUser(user).daily(1).please();
       Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();

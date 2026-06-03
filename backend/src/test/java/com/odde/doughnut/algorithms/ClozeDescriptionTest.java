@@ -76,6 +76,7 @@ class ClozeDescriptionTest {
     "高い,      もはや高くありませんでした, もはや[..~]ありませんでした",
     "試みる,   わたしが試みてみよう。,  わたしが[..~]てみよう。",
     "熟す,      この語はまだ熟していない。,  この語はまだ[..~]ていない。",
+    "bona fide, _Bona fides_ is a Latin phrase meaning \"good faith\"., [...]",
   })
   void clozeDescription(String title, String markdown, String expectedClozeDescription) {
     assertThat(
@@ -157,15 +158,6 @@ class ClozeDescriptionTest {
             .hide(new NoteTitle("足利義満"))
             .maskedContentAsMarkdown();
     assertThat(result, containsString("/.../"));
-  }
-
-  @Test
-  void clozeShouldMaskBonaFideWithFidesVariantAndMarkdownEmphasis() {
-    String result =
-        new ClozedString(clozeReplacement, "_Bona fides_ is a Latin phrase meaning \"good faith\".")
-            .hide(new NoteTitle("bona fide"))
-            .maskedContentAsMarkdown();
-    assertThat(result, containsString("[...]"));
   }
 
   @Test

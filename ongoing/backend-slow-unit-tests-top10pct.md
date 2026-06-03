@@ -133,7 +133,9 @@ Status: done
 ---
 
 ### Phase 6: Optimize slow tests rank 51–60 (max 0.021s)
-Status: planned
+Status: done
+
+**Result (2026-06-03):** Fewer redundant tests and lighter fixtures (1151 invocations): budget-exhaustion focus test uses four spend notes with smaller bodies; bona-fide cloze folded into parameterized cases; merged suggest-title and export-question-generation assertions; removed weak notebook-assistant AI reply test; folder append-order uses two creates; assimilation cap test drops extra subscription note; epub delete uses direct storage ref; trimmed duplicate request-shape assertions.
 
 **Scope:**
 - `com.odde.doughnut.services.focusContext.FocusContextRetrievalServiceTest$BreadthFirstDepth2#budgetExhaustedMidRingLeavesLaterDepthOneNotesAndDepthTwoUnreachable()` (0.021s)

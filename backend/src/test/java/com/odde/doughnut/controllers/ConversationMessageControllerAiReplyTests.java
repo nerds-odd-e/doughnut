@@ -7,7 +7,6 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.testability.OpenAiResponseStreamMocker;
 import com.openai.client.OpenAIClient;
-import java.sql.Timestamp;
 import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -60,24 +59,6 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
       ConversationMessage aiMessage = conversation.getConversationMessages().get(1);
       assertEquals("I am a Chatbot", aiMessage.getMessage());
       assertNull(aiMessage.getSender()); // AI has no sender
-    }
-
-    @Test
-    void shouldIncludeNotebookAiAssistantInstructionsInRun()
-        throws UnexpectedNoAccessRightException, BadRequestException {
-      // Setup notebook AI assistant with custom instructions
-      Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-      NotebookAiAssistant notebookAiAssistant = new NotebookAiAssistant();
-      notebookAiAssistant.setNotebook(note.getNotebook());
-      notebookAiAssistant.setAdditionalInstructionsToAi("Always use Spanish.");
-      notebookAiAssistant.setCreatedAt(currentUTCTimestamp);
-      notebookAiAssistant.setUpdatedAt(currentUTCTimestamp);
-      makeMe.entityPersister.save(notebookAiAssistant);
-      makeMe.refresh(note.getNotebook());
-
-      controller.getAiReply(conversation);
-
-      assertThat(conversation.getConversationMessages().size()).isGreaterThan(0);
     }
   }
 }

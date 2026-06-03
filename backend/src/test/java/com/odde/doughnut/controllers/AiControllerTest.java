@@ -87,16 +87,10 @@ class AiControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void shouldReturnSuggestedTitle()
+    void shouldCallResponsesApiWithStructuredInstructions()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       SuggestedTitleDTO result = controller.suggestTitle(testNote);
       assertThat(result.getTitle()).isEqualTo("Suggested Title");
-    }
-
-    @Test
-    void shouldCallResponsesApiWithStructuredInstructions()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
-      controller.suggestTitle(testNote);
       @SuppressWarnings({"unchecked", "rawtypes"})
       ArgumentCaptor<StructuredResponseCreateParams<TitleReplacement>> paramsCaptor =
           ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);

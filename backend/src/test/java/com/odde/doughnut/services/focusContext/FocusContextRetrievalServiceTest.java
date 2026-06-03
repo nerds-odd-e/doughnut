@@ -549,7 +549,7 @@ class FocusContextRetrievalServiceTest {
 
     @Test
     void budgetExhaustedMidRingLeavesLaterDepthOneNotesAndDepthTwoUnreachable() {
-      String maxChunk = "z".repeat(2400);
+      String heavyBody = "z".repeat(600);
       User viewer = makeMe.aUser().please();
       Notebook nb = notebookReadableBy(viewer);
       Note focus =
@@ -557,10 +557,10 @@ class FocusContextRetrievalServiceTest {
               .aNote()
               .notebook(nb)
               .title("BudgetRoot")
-              .content("[[Spend1]] [[Spend2]] [[Spend3]] [[Spend4]] [[Spend5]] [[BridgeBudget]]")
+              .content("[[Spend1]] [[Spend2]] [[Spend3]] [[Spend4]] [[BridgeBudget]]")
               .please();
-      for (int i = 1; i <= 5; i++) {
-        makeMe.aNote().underSameNotebookAs(focus).title("Spend" + i).content(maxChunk).please();
+      for (int i = 1; i <= 4; i++) {
+        makeMe.aNote().underSameNotebookAs(focus).title("Spend" + i).content(heavyBody).please();
       }
       Note bridge =
           makeMe

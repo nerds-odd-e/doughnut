@@ -210,12 +210,6 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
       String jsonString = new ObjectMapperConfig().objectMapper().writeValueAsString(request);
       assertThat(jsonString, not(equalTo("{}")));
       assertThat(jsonString.length(), greaterThan(10));
-    }
-
-    @Test
-    void shouldNotContainValidFieldsInExportedQuestionGeneration()
-        throws UnexpectedNoAccessRightException {
-      java.util.Map<String, Object> request = controller.exportQuestionGeneration(note);
       java.util.List<String> validFields = findValidFields(request);
       assertThat(
           "Exported question generation should not contain 'valid' fields, but found: "

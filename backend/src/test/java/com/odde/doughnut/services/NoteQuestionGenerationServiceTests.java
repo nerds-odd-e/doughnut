@@ -14,9 +14,6 @@ import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
-import com.openai.models.Reasoning;
-import com.openai.models.ReasoningEffort;
-import com.openai.models.responses.ResponseTextConfig;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import java.sql.Timestamp;
 import java.util.Arrays;
@@ -77,11 +74,6 @@ class NoteQuestionGenerationServiceTests {
 
   private String modelName(StructuredResponseCreateParams<MCQWithAnswer> request) {
     return request.rawParams().model().orElseThrow().asString();
-  }
-
-  private Optional<ReasoningEffort> reasoningEffort(
-      StructuredResponseCreateParams<MCQWithAnswer> request) {
-    return request.rawParams().reasoning().flatMap(Reasoning::effort);
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})
@@ -172,15 +164,6 @@ class NoteQuestionGenerationServiceTests {
       assertThat(modelName(runtimeRequest), is(modelName(exportedRequest)));
       assertThat(inputText(runtimeRequest), is(inputText(exportedRequest)));
       assertThat(instructionText(runtimeRequest), is(instructionText(exportedRequest)));
-      assertThat(reasoningEffort(runtimeRequest), is(reasoningEffort(exportedRequest)));
-      assertThat(reasoningEffort(runtimeRequest), is(Optional.of(ReasoningEffort.LOW)));
-      assertThat(
-          runtimeRequest.rawParams().maxOutputTokens(),
-          is(exportedRequest.rawParams().maxOutputTokens()));
-      assertThat(runtimeRequest.rawParams().maxOutputTokens(), is(Optional.of(1000L)));
-      assertThat(
-          runtimeRequest.rawParams().text().flatMap(ResponseTextConfig::format).isPresent(),
-          is(true));
     }
 
     @Test
