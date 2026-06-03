@@ -18,7 +18,8 @@ import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { beforeEach, vi, describe, it, expect, afterEach } from "vitest"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import { defineComponent, h, provide, ref } from "vue"
+import { flushPromises } from "@vue/test-utils"
+import { defineComponent, h, nextTick, provide, ref } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
 import { useGlobalNoteSearchKeyboardShortcut } from "@/composables/useGlobalNoteSearchKeyboardShortcut"
@@ -156,10 +157,9 @@ describe("global bar", () => {
     )
 
     const searchInput = await screen.findByPlaceholderText("Search")
-    await vi.waitUntil(() => document.activeElement === searchInput, {
-      timeout: 2000,
-    })
-
+    await flushPromises()
+    await nextTick()
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
     expect(document.activeElement).toBe(searchInput)
   })
 })

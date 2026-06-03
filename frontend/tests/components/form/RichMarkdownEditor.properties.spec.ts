@@ -261,44 +261,44 @@ status: ok
     )
   })
 
-  it("sets property key when a preset is chosen (insert and existing row)", async () => {
-    await h.mountEditor("# Hello Body")
-    await flushPromises()
-    await h.openAddProperty()
-    ;(
-      h.getWrapper().find('[data-testid="rich-note-property-key"]')
-        .element as HTMLInputElement
-    ).focus()
-    await nextTick()
-    await flushPromises()
-    await h.selectPresetKey("wikidata_id")
-    expect(
-      (
-        h.getWrapper().find('[data-testid="rich-note-property-key"]')
-          .element as HTMLInputElement
-      ).value
-    ).toBe("wikidata_id")
-
-    const markdown = `---
+  it.each([
+    {
+      case: "insert",
+      markdown: "# Hello Body",
+      keyInputTestId: "rich-note-property-key",
+      presetKey: "wikidata_id",
+    },
+    {
+      case: "existing row",
+      markdown: `---
 status: ok
 ---
 
-# Body`
+# Body`,
+      keyInputTestId: "rich-note-property-row-key-input",
+      presetKey: "url",
+    },
+  ] as const)("sets property key when a preset is chosen ($case)", async ({
+    markdown,
+    keyInputTestId,
+    presetKey,
+  }) => {
     await h.mountEditor(markdown)
-    await flushPromises()
+    if (keyInputTestId === "rich-note-property-key") {
+      await h.openAddProperty()
+    }
     ;(
-      h.getWrapper().find('[data-testid="rich-note-property-row-key-input"]')
+      h.getWrapper().find(`[data-testid="${keyInputTestId}"]`)
         .element as HTMLInputElement
     ).focus()
     await nextTick()
-    await flushPromises()
-    await h.selectPresetKey("url")
+    await h.selectPresetKey(presetKey)
     expect(
       (
-        h.getWrapper().find('[data-testid="rich-note-property-row-key-input"]')
+        h.getWrapper().find(`[data-testid="${keyInputTestId}"]`)
           .element as HTMLInputElement
       ).value
-    ).toBe("url")
+    ).toBe(presetKey)
   })
 
   it("property key preset dropdown excludes keys already in frontmatter", async () => {

@@ -733,6 +733,10 @@ describe("BookReadingPage", () => {
       vi.spyOn(exposed, "readingPanelAnchorTopPx").mockReturnValue(returnValue)
     }
 
+    function currentSelectionText(wrapper: BookReadingPageWrapper): string {
+      return wrapper.find('[data-current-selection="true"]').text()
+    }
+
     async function clickBookBlockByTitle(
       wrapper: BookReadingPageWrapper,
       title: string
@@ -743,6 +747,14 @@ describe("BookReadingPage", () => {
       expect(row, `book block row "${title}"`).toBeDefined()
       await row!.trigger("click")
       await flushPromises()
+    }
+
+    async function clickBookBlockAndExpectSelection(
+      wrapper: BookReadingPageWrapper,
+      title: string
+    ) {
+      await clickBookBlockByTitle(wrapper, title)
+      expect(currentSelectionText(wrapper)).toBe(title)
     }
 
     it("shows read border for blocks returned as READ from reading-records on load", async () => {
@@ -1075,12 +1087,7 @@ describe("BookReadingPage", () => {
           path: expect.objectContaining({ bookBlock: 102 }),
         })
       )
-      // Selection should advance to Section 3
-      await vi.waitFor(() =>
-        expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-          "Section 3"
-        )
-      )
+      expect(currentSelectionText(wrapper)).toBe("Section 3")
     })
 
     it("calls PUT with SKIMMED when Skim is used", async () => {
@@ -1148,12 +1155,7 @@ describe("BookReadingPage", () => {
         return wrapSdkResponse(readRecord)
       })
       const wrapper = await mountLoadedBookWithBlocks(notebookId)
-      await clickBookBlockByTitle(wrapper, "Section 1")
-      await vi.waitFor(() =>
-        expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-          "Section 1"
-        )
-      )
+      await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
       await emitViewportAndSettleCurrentBlock(wrapper, {
         anchorPageIndexZeroBased: 0,
@@ -1164,9 +1166,7 @@ describe("BookReadingPage", () => {
       await wrapper.findComponent(ReadingControlPanel).vm.$emit("markAsRead")
       await flushPromises()
 
-      expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-        "Section 2"
-      )
+      expect(currentSelectionText(wrapper)).toBe("Section 2")
       expect(wrapper.find('[data-current-block="true"]').text()).toBe(
         "Section 2"
       )
@@ -1511,12 +1511,7 @@ describe("BookReadingPage", () => {
         mockIsLastContentBottomVisible(wrapper, true)
         mockSnapBackContentFitsInViewport(wrapper, true)
 
-        await clickBookBlockByTitle(wrapper, "Section 1")
-        await vi.waitFor(() =>
-          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-            "Section 1"
-          )
-        )
+        await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
         // geometry passes
         await emitViewportAndSettleCurrentBlock(wrapper, {
@@ -1958,12 +1953,7 @@ describe("BookReadingPage", () => {
         mockIsLastContentBottomVisible(wrapper, true)
         mockSnapBackContentFitsInViewport(wrapper, true)
 
-        await clickBookBlockByTitle(wrapper, "Section 1")
-        await vi.waitFor(() =>
-          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-            "Section 1"
-          )
-        )
+        await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
         // geometry passes
         await emitViewportAndSettleCurrentBlock(wrapper, {
@@ -1984,9 +1974,7 @@ describe("BookReadingPage", () => {
         // mark as READ → selection advances to Section 2
         await wrapper.findComponent(ReadingControlPanel).vm.$emit("markAsRead")
         await flushPromises()
-        expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-          "Section 2"
-        )
+        expect(currentSelectionText(wrapper)).toBe("Section 2")
 
         // re-select Section 1 (now READ; text includes "Marked as read")
         const section1Row = wrapper
@@ -2051,12 +2039,7 @@ describe("BookReadingPage", () => {
         mockSnapBackContentFitsInViewport(wrapper, true)
 
         // --- exhaust Section 1's two snap budget ---
-        await clickBookBlockByTitle(wrapper, "Section 1")
-        await vi.waitFor(() =>
-          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-            "Section 1"
-          )
-        )
+        await clickBookBlockAndExpectSelection(wrapper, "Section 1")
 
         await emitViewportAndSettleCurrentBlock(wrapper, {
           anchorPageIndexZeroBased: 0,
@@ -2098,12 +2081,7 @@ describe("BookReadingPage", () => {
         expect(snapHoldActivateMock.fn).toHaveBeenCalledTimes(2)
 
         // --- Section 2 gets its own fresh snap budget ---
-        await clickBookBlockByTitle(wrapper, "Section 2")
-        await vi.waitFor(() =>
-          expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
-            "Section 2"
-          )
-        )
+        await clickBookBlockAndExpectSelection(wrapper, "Section 2")
 
         // establish geometry for Section 2 (mid=140 keeps Section 2 as current block)
         mockIsLastContentBottomVisible(wrapper, true)

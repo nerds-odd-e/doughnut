@@ -512,9 +512,9 @@ describe("adding new note", () => {
     const waitForDialogToClose = async () => {
       await flushPromises()
       await nextTick()
-      await flushPromises()
-      await nextTick()
-      await flushPromises()
+      expect(wrapper.findComponent(WikidataAssociationDialog).exists()).toBe(
+        false
+      )
     }
 
     it("opens dialog when clicking search button", async () => {

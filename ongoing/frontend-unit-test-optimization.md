@@ -59,11 +59,13 @@ Status: done
 ---
 
 ### Phase 2: BookReading snap/menu batch
-Status: planned
+Status: done
+
+**Result (2026-06-03):** Removed redundant HorizontalMenu expand-button-when-expanded test. Replaced `vi.waitFor`/`vi.waitUntil` with sync selection checks, `flushPromises`, and `requestAnimationFrame` for focus. Split RichMarkdownEditor preset-key test into lean `it.each` cases. **134** scoped tests; full suite **1369** pass (~19s wall).
 
 **Scope:** `tests/pages/BookReadingPage.spec.ts`, `tests/toolbars/HorizontalMenu.spec.ts`, `tests/components/form/RichMarkdownEditor.properties.spec.ts`, `tests/toolbars/GlobalBar.spec.ts`, `tests/notes/NoteNewForm.spec.ts`, `tests/notes/QuestionExportDialog.spec.ts`
 
-**Tests (10):** see profiling batch 2 in plan history.
+**Tests (10):** different unread blocks snap budgets; expand button when expanded (removed as redundant); preset key insert/existing row; GlobalBar touch search focus; READ clears snap; snap second/third crossing; successor panel selection; NoteNewForm append title; QuestionExportDialog fetch; successor block after Read.
 
 **Verify:** scoped files then full suite.
 

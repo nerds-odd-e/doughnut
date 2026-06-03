@@ -4,6 +4,7 @@ import helper, { mockSdkService, wrapSdkError } from "../helpers"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import QuestionExportDialog from "@/components/notes/QuestionExportDialog.vue"
 import { type VueWrapper } from "@vue/test-utils"
+import { flushPromises } from "@vue/test-utils"
 import { reactive } from "vue"
 
 const mockRoute = reactive({ name: "", path: "", params: {}, query: {} })
@@ -51,12 +52,7 @@ describe("QuestionExportDialog", () => {
       .withProps({ noteId: note.id })
       .mount({ attachTo: document.body })
 
-    await vi.waitUntil(() => {
-      const el = document.body.querySelector(
-        '[data-testid="export-textarea"]'
-      ) as HTMLTextAreaElement
-      return el && el.value.includes('"model"')
-    })
+    await flushPromises()
     const textarea = document.body.querySelector(
       '[data-testid="export-textarea"]'
     ) as HTMLTextAreaElement
@@ -86,12 +82,7 @@ describe("QuestionExportDialog", () => {
       .withProps({ noteId: note.id })
       .mount({ attachTo: document.body })
 
-    await vi.waitUntil(() => {
-      const el = document.body.querySelector(
-        '[data-testid="export-textarea"]'
-      ) as HTMLTextAreaElement
-      return el && el.value === "Failed to load export content"
-    })
+    await flushPromises()
     const textarea = document.body.querySelector(
       '[data-testid="export-textarea"]'
     ) as HTMLTextAreaElement

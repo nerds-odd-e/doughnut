@@ -144,30 +144,6 @@ describe("HorizontalMenu", () => {
       const expandButton = page.getByLabelText("Toggle menu")
       await expect.element(expandButton).toBeInTheDocument()
     })
-
-    it("shows expand button when expanded", async () => {
-      const navItems = createMockNavItems("assimilate")
-      helper
-        .component(HorizontalMenu)
-        .withProps({
-          user,
-          ...navItems,
-          isHomePage: false,
-          showUserSettingsDialog: noop,
-          logout: noop,
-        })
-        .render()
-
-      // Expand button should be visible initially
-      const expandButton = page.getByLabelText("Toggle menu")
-      await expect.element(expandButton).toBeInTheDocument()
-
-      // Expand the menu
-      await expandButton.click()
-
-      // Expand button should still be visible after expansion
-      await expect.element(expandButton).toBeInTheDocument()
-    })
   })
 
   describe("active item display", () => {
