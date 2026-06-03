@@ -94,11 +94,13 @@ Status: done
 ---
 
 ### Phase 5: BookReading panel visibility batch
-Status: planned
+Status: done
+
+**Result (2026-06-03):** Added `mountFirstBlockBboxScenario`, `mountCrossPageBboxScenario`, and `clickBookBlockStartingWithAndExpectSelection`. Replaced `vi.waitFor` selection polls with sync `clickBookBlockAndExpectSelection` / `emitViewportAndSettleCurrentBlock`. MessageCenter default state uses `flushPromises` + `textContent` instead of `expect.element`. **56** scoped tests; full suite **1369** pass (~21s wall).
 
 **Scope:** `tests/pages/BookReadingPage.spec.ts`, `tests/pages/MessageCenterPage.spec.ts`
 
-**Tests (10):** batch 5 from profiling.
+**Tests (10):** anchors panel; keeps panel visible after geometry false; last-block panel visible; no snap when disposition recorded; cross-page bbox snap; nav bar when current ≠ selected; no PATCH when viewport null; clears snap-animating on animationend; MessageCenter no selection default; PATCH uses last viewport top in debounce window.
 
 **Verify:** scoped files then full suite.
 
