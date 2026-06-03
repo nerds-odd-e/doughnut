@@ -58,7 +58,9 @@ Status: done
 ---
 
 ### Phase 2: Simplify tool-schemas tests
-Status: planned
+Status: done
+
+**Result (2026-06-03):** Removed tautological tests; merged input-schema and handler checks into two loop tests; async verified via `AsyncFunction` without invoking handlers. **7 → 2** tests in this file; full suite **21 → 17** tests.
 
 **Scope:** `mcp-server/tests/tool-schemas.test.ts` (7 tests).
 
