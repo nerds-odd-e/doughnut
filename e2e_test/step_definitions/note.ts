@@ -175,7 +175,7 @@ When(
     expect(data.hashes().length, 'please add one question at a time.').to.equal(
       1
     )
-    start.jumpToNotePage(noteTopology).addQuestion(data.hashes()[0]!)
+    start.jumpToNotePage(noteTopology, true).addQuestion(data.hashes()[0]!)
   }
 )
 
@@ -185,7 +185,7 @@ Given(
     expect(data.hashes().length, 'please add one question at a time.').to.equal(
       1
     )
-    start.jumpToNotePage(noteTopology).refineQuestion(data.hashes()[0]!)
+    start.jumpToNotePage(noteTopology, true).refineQuestion(data.hashes()[0]!)
   }
 )
 
@@ -580,7 +580,7 @@ Then(
 
 When('I generate question by AI for note {string}', (noteName: string) => {
   start
-    .jumpToNotePage(noteName)
+    .jumpToNotePage(noteName, true)
     .openQuestionList()
     .addQuestionPage()
     .generateQuestionByAI()
