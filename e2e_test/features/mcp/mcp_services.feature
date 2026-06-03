@@ -9,12 +9,10 @@ Feature: MCP (Model Context Protocol) Services
     And I have a valid Doughnut Access Token with label "For MCP services"
     And I connect to an MCP client that connects to Doughnut MCP service
     And I have a notebook "CS concepts" with notes:
-      | Title           | Folder                               |
-      | Programming Concepts | |
-      | Object Oriented | Programming Concepts                  |
-      | Functional      | Programming Concepts                  |
-      | Classes         | Programming Concepts/Object Oriented  |
-      | Inheritance     | Programming Concepts/Object Oriented |
+      | Title                | Folder               |
+      | Programming Concepts |                      |
+      | Object Oriented      | Programming Concepts |
+      | Functional           | Programming Concepts |
 
   Scenario Outline: AI agent learns from Doughnut via MCP client
     When AI agent searches for relevant notes using MCP tool with the term "<search_term>"

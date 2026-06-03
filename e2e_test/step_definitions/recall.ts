@@ -74,23 +74,25 @@ When(
   ) => {
     const days = Array.from({ length: numDays }, (_, i) => startDay + i)
 
-    const runIteration = (index: number) => {
+    const submitWrongAnswerForDay = (index: number) => {
       if (index >= days.length) {
         return
       }
       const day = days[index]!
       const isLast = index === days.length - 1
       start.testability().backendTimeTravelTo(day, 8)
-      start.recall().visitRecallPage()
-      start.assumeQuestionPage(questionStem).answer(wrongAnswer)
       if (isLast) {
+        start.recall().visitRecallPage()
+        start.assumeQuestionPage(questionStem).answer(wrongAnswer)
         start
           .assumeAnsweredQuestionPage()
           .expectMCQAnswerToBeIncorrect(wrongAnswer)
+      } else {
+        start.testability().submitWrongMcqRecallAnswer(wrongAnswer)
       }
-      cy.then(() => runIteration(index + 1))
+      cy.then(() => submitWrongAnswerForDay(index + 1))
     }
-    runIteration(0)
+    submitWrongAnswerForDay(0)
   }
 )
 

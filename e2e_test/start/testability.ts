@@ -13,8 +13,11 @@ import type {
 import type { NotesTestDataWritable } from '@generated/doughnut-backend-api'
 import {
   AssimilationController,
+  MemoryTrackerController,
   NoteController,
   NotebookBooksController,
+  RecallPromptController,
+  RecallsController,
   TestabilityRestController,
 } from '@generated/doughnut-backend-api/sdk.gen'
 import { circleIdAlias } from './pageObjects/circlePage'
@@ -374,6 +377,47 @@ const testability = () => {
           { log: false }
         )
       })
+    },
+
+    submitWrongMcqRecallAnswer(wrongChoiceText: string) {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+      return cy
+        .wrap(
+          RecallsController.recalling({
+            query: { timezone, dueindays: 0 },
+          }),
+          { log: false }
+        )
+        .then((dueMemoryTrackers) => {
+          const trackerId = dueMemoryTrackers?.toRepeat?.[0]?.memoryTrackerId
+          expect(trackerId, 'expected one due memory tracker for recall').to
+            .exist
+          return cy.wrap(
+            MemoryTrackerController.askAQuestion({
+              path: { memoryTracker: trackerId! },
+            }),
+            { log: false }
+          )
+        })
+        .then((recallPrompt) => {
+          const choices =
+            recallPrompt?.multipleChoicesQuestion?.responseChoices ??
+            recallPrompt?.predefinedQuestion?.multipleChoicesQuestion
+              ?.responseChoices
+          expect(choices, 'expected MCQ response choices').to.exist
+          const choiceIndex = choices!.indexOf(wrongChoiceText)
+          expect(
+            choiceIndex,
+            `expected choice "${wrongChoiceText}" in ${JSON.stringify(choices)}`
+          ).to.be.at.least(0)
+          return cy.wrap(
+            RecallPromptController.answerQuiz({
+              path: { recallPrompt: recallPrompt!.id },
+              body: { choiceIndex, thinkingTimeMs: 1000 },
+            }),
+            { log: false }
+          )
+        })
     },
 
     timeTravelTo(day: number, hour: number) {

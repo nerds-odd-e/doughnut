@@ -165,6 +165,10 @@ const commonConfig = {
         },
         async bundleMcpServer() {
           const mcpServerDir = join(repoRoot, 'mcp-server')
+          const bundlePath = join(mcpServerDir, 'dist', 'mcp-server.bundle.mjs')
+          if (existsSync(bundlePath)) {
+            return true
+          }
           try {
             runShellCommandSync('pnpm bundle', {
               cwd: mcpServerDir,

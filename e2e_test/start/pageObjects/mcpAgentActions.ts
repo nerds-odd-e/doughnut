@@ -18,6 +18,7 @@ const getResponseText = (alias: string) => {
 export const mcpAgentActions = () => {
   return {
     connect() {
+      cy.task('disconnectMcpServer')
       cy.get('@savedAccessToken').then((accessToken) => {
         cy.task('spawnAndConnectMcpServer', {
           baseUrl: e2eAppBaseUrl(),
@@ -35,19 +36,11 @@ export const mcpAgentActions = () => {
     },
 
     searchForNote(searchTerm: string) {
-      cy.task('callMcpToolWithParams', {
-        apiName: 'find_most_relevant_note',
-        params: { query: searchTerm },
-      }).then((response) => {
-        cy.wrap(response).as('MCPApiResponse')
-      })
-      return this
+      return this.callTool('find_most_relevant_note', { query: searchTerm })
     },
 
     getNoteGraphFromLastSearch(tokenLimit: number) {
-      cy.get('@MCPApiResponse').then((searchResponse) => {
-        const responseData = searchResponse as unknown as ApiResponse
-        const responseText = responseData.content[0]?.text || ''
+      getResponseText('@MCPApiResponse').then((responseText) => {
         const searchResult = JSON.parse(responseText)
 
         // Check if noteTopology exists and has id

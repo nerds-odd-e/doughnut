@@ -27,7 +27,7 @@ Status: done
 - `message_center_with_unread_message_count.feature` — "The receiver's reply should increase the unread count of the sender" (4.76s)
 
 ### Group 3: re-assimilate + MCP services
-Status: planned
+Status: done
 
 - `re_assimilate.feature` — "Note returns to assimilation after 5 wrong answers" (4.56s)
 - `mcp_services.feature` — "AI agent learns from Doughnut via MCP client (example #1)" (4.14s)

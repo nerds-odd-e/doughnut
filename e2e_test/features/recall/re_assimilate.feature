@@ -6,9 +6,8 @@ Feature: Re-assimilate note after too many wrong answers
   Background:
     Given I am logged in as an existing user
     And I have a notebook "English practice" with notes:
-      | Title    | Content | Skip Memory Tracking |
-      | English  |                                | true                 |
-      | sedition | Sedition means incite violence |                      |
+      | Title    | Content                        |
+      | sedition | Sedition means incite violence |
     And OpenAI generates this question:
       | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
