@@ -43,9 +43,10 @@ Given("I'm on the login page", () => {
 })
 
 When('I identify myself as a new user', () => {
-  cy.get('#username').type('user')
+  cy.get('#username', { timeout: 15000 }).type('user')
   cy.get('#password').type('password')
   cy.get('#login-button').click()
+  cy.url().should('not.include', '/users/identify')
 })
 
 Then('I should be asked to create my profile', () => {

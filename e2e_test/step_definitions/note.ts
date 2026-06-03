@@ -48,9 +48,11 @@ Given(
 )
 
 Given('I have a notebook {string}', (notebookName: string) => {
-  cy.get<string>('@currentLoginUser').then((username) =>
-    start.testability().injectNotes([], username, notebookName)
-  )
+  return cy
+    .get<string>('@currentLoginUser')
+    .then((username) =>
+      start.testability().injectNotes([], username, notebookName)
+    )
 })
 
 Given(
@@ -428,6 +430,7 @@ When('I navigate to {notepath} note', (notePath: NotePath) => {
 When('I open note {string}', (noteTitle: string) => {
   start.jumpToNotePage(noteTitle, true)
   start.pageIsNotLoading()
+  start.assumeNotePage(noteTitle).switchToRichContent()
 })
 
 // This step definition is for demo purpose

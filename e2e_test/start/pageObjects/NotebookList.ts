@@ -22,7 +22,7 @@ export const notebookList = () => {
     },
     expectNotebooks: (notebooks: string) => {
       pageIsNotLoading()
-      cy.get('.notebook-card h5').then(($els) => {
+      cy.get('.notebook-card h5', { timeout: 15000 }).then(($els) => {
         const cardTitles = Array.from($els, (el) => el.innerText)
         expect(cardTitles).to.deep.eq(commonSenseSplit(notebooks, ','))
       })

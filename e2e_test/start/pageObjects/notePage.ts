@@ -511,13 +511,8 @@ export const assumeNotePage = (
       this.openQuestionList().addQuestionPage().refineQuestion(row)
     },
     expectQuestionsInList(expectedQuestions: Record<string, string>[]) {
-      cy.get('body').then(($body) => {
-        if ($body.find('.question-table').length > 0) {
-          questionListPage().expectQuestion(expectedQuestions)
-        } else {
-          this.openQuestionList().expectQuestion(expectedQuestions)
-        }
-      })
+      cy.get('.question-table', { timeout: 15000 }).should('be.visible')
+      questionListPage().expectQuestion(expectedQuestions)
     },
     sendMessageToNoteOwner(message: string) {
       this.toolbarButton('Star a conversation about this note').click()

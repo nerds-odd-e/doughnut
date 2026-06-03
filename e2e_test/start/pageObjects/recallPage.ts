@@ -22,6 +22,9 @@ const recallPage = () => {
     typeSpellingAnswer(answer: string) {
       pageIsNotLoading()
       cy.clearFocusedText().type(answer).type('{enter}')
+      cy.findByText(/Correct!|Your answer `.+` is incorrect\./).should(
+        'be.visible'
+      )
     },
     expectToRecallCounts(numberOfRecalls: string) {
       const [recalledTodayCount, toRecallCountForToday, totalCount] =

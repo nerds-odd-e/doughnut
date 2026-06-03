@@ -164,8 +164,8 @@ Then('choose to remove the last memory tracker from recalls', () => {
   start
     .assumeAnsweredQuestionPage()
     .goToLastAnsweredQuestion()
-    .showMemoryTracker()
-    .removeMemoryTrackerFromRecall('normal')
+    .viewMemoryTracker()
+    .removeFromRecall()
 })
 
 When('I revive the memory tracker on this page', () => {

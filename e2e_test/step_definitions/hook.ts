@@ -14,8 +14,12 @@ import { cli } from '../start/pageObjects/cli'
 
 Before(() => {
   cy.task('clearTestState')
-  start.testability().cleanDBAndResetTestabilitySettings()
-  cy.wrap('no').as('firstVisited')
+  return start
+    .testability()
+    .cleanDBAndResetTestabilitySettings()
+    .then(() => {
+      cy.wrap('no').as('firstVisited')
+    })
 })
 
 After(() => {

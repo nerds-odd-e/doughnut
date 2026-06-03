@@ -13,7 +13,6 @@ import type {
 import type { NotesTestDataWritable } from '@generated/doughnut-backend-api'
 import {
   AssimilationController,
-  CircleController,
   NoteController,
   NotebookBooksController,
   TestabilityRestController,
@@ -454,75 +453,33 @@ const testability = () => {
           log: false,
         })
         .then((response) => {
-          const circleId = String(unwrapData(response))
-          if (circleName && /^\d+$/.test(circleId)) {
-            cy.wrap(circleId).as(circleIdAlias(circleName))
+          const [circleId, invitationCode] = String(unwrapData(response)).split(
+            ',',
+            2
+          )
+          if (
+            !(
+              circleName &&
+              circleId &&
+              /^\d+$/.test(circleId) &&
+              invitationCode
+            )
+          ) {
+            throw new Error(
+              `inject_circle did not return id and invitation code for "${circleName}"`
+            )
           }
-        })
-    },
-
-    saveCircleInvitationLink(circleName: string) {
-      return cy.get<string>('@currentLoginUser').then((username) => {
-        const authHeaders = {
-          Authorization: `Basic ${btoa(`${username}:password`)}`,
-        }
-        const saveFromCircleId = (circleId: number) =>
-          cy
-            .request({
-              method: 'GET',
-              url: `/api/circles/${circleId}`,
-              headers: authHeaders,
-            })
-            .then((response) => {
-              const invitationCode = (
-                response.body as { invitationCode?: string }
-              ).invitationCode
-              if (!invitationCode) {
-                throw new Error(
-                  `Invitation code missing for circle "${circleName}" (id ${circleId})`
-                )
-              }
-              const origin =
-                Cypress.config('baseUrl')?.toString() ?? 'http://localhost:5173'
-              cy.wrap(`${origin}/circles/join/${invitationCode}`).as(
-                'savedInvitationCode'
-              )
-            })
-
-        const resolveCircleId = (): Cypress.Chainable<number> =>
-          cy
-            .get(`@${circleIdAlias(circleName)}`, { log: false })
-            .then((circleId) => Number(circleId))
-
-        return resolveCircleId().then((circleId) => {
-          if (Number.isFinite(circleId) && circleId > 0) {
-            return saveFromCircleId(circleId)
-          }
+          const origin =
+            Cypress.config('baseUrl')?.toString() ?? 'http://localhost:5173'
           return cy
-            .wrap(CircleController.index({ headers: authHeaders }), {
-              log: false,
-            })
-            .then((response) => {
-              const circles =
-                unwrapData<Array<{ id: number; name: string }>>(response)
-              const matches = circles.filter((c) => c.name === circleName)
-              const circle = matches.reduce<{
-                id: number
-                name: string
-              } | null>(
-                (latest, c) =>
-                  latest === null || c.id > latest.id ? c : latest,
-                null
-              )
-              if (!circle?.id) {
-                throw new Error(
-                  `Circle "${circleName}" not found for user "${username}"`
-                )
-              }
-              return saveFromCircleId(circle.id)
-            })
+            .wrap(circleId)
+            .as(circleIdAlias(circleName))
+            .then(() =>
+              cy
+                .wrap(`${origin}/circles/join/${invitationCode}`)
+                .as('savedInvitationCode')
+            )
         })
-      })
     },
 
     updateCurrentUserSettingsWith(hash: Record<string, string>) {
