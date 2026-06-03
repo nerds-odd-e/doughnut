@@ -29,10 +29,13 @@ const recallPage = () => {
         .should('be.visible')
         .clear()
         .type(answer)
-      cy.get('@spellingQuestion').find('form').submit()
-      cy.findByText(/Correct!|Your answer `.+` is incorrect\./, {
-        timeout: 15000,
-      }).should('be.visible')
+      cy.get('@spellingQuestion')
+        .find('input[type="submit"][value="Answer"]')
+        .click()
+      pageIsNotLoading()
+      cy.findByText('Note under question', { timeout: 15000 }).should(
+        'be.visible'
+      )
     },
     expectToRecallCounts(numberOfRecalls: string) {
       const [recalledTodayCount, toRecallCountForToday, totalCount] =

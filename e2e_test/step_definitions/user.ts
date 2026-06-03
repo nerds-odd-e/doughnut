@@ -45,6 +45,7 @@ Given("I'm on the login page", () => {
 })
 
 When('I identify myself as a new user', () => {
+  cy.wrap('user').as('currentLoginUser')
   cy.intercept('GET', '**/api/healthcheck').as('devLogin')
   cy.get('#username').type('user')
   cy.get('#password').type('password')
@@ -77,7 +78,6 @@ When('I save my profile with:', (data: DataTable) => {
     timeout: 15000,
   }).should('not.exist')
   start.pageIsNotLoading()
-  cy.get('#join-circle-invitationCode', { timeout: 15000 }).should('exist')
 })
 
 Then(

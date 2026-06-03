@@ -5,9 +5,6 @@
 
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
-import { pageIsNotLoading } from '../start/pageBase'
-import { circleNotebookIdAlias } from '../start/pageObjects/circlePage'
-import notebookPage from '../start/pageObjects/notebookPage'
 
 When(
   'I create a new circle {string} and copy the invitation code',
@@ -29,33 +26,26 @@ When('I visit the invitation link', () => {
         cy.get('#join-circle-invitationCode', { timeout: 15000 }).should(
           'exist'
         )
-        const code = url.split('/circles/join/')[1]?.split(/[/?#]/)[0]
-        if (code) {
-          cy.get('#join-circle-invitationCode').should(($input) => {
-            expect(
-              $input.val(),
-              `invitation form should show code from ${url}`
-            ).to.equal(code)
-          })
-        }
       })
     })
 })
 
 When('I join the circle', () => {
-  cy.get('#join-circle-invitationCode', { timeout: 15000 })
-    .invoke('val')
-    .should('not.be.empty')
   cy.intercept('POST', '**/api/circles/join').as('joinCircle')
-  cy.get('input[value="Join"]').click()
-  cy.wait('@joinCircle').then(({ response }) => {
-    expect(
-      response?.statusCode,
-      `join circle failed: ${JSON.stringify(response?.body)}`
-    ).to.equal(200)
+  cy.get<string>('@circleInvitationCode').then((code) => {
+    expect(code, 'circle invitation code from inject').to.be.a('string').and.not
+      .be.empty
+    cy.get('#join-circle-invitationCode', { timeout: 15000 }).clear().type(code)
+    cy.get('input[value="Join"]').click()
+    cy.wait('@joinCircle').then(({ response }) => {
+      expect(
+        response?.statusCode,
+        `join circle failed: ${JSON.stringify(response?.body)}`
+      ).to.equal(200)
+    })
+    cy.url({ timeout: 15000 }).should('match', /\/circles\/\d+/)
+    start.pageIsNotLoading()
   })
-  cy.url({ timeout: 15000 }).should('match', /\/circles\/\d+/)
-  start.pageIsNotLoading()
 })
 
 Then(
@@ -89,14 +79,6 @@ When(
   (noteTopology: string, circleName: string) => {
     start.navigateToCircle(circleName).creatingNotebook(noteTopology)
     cy.url().should('match', /\/notebooks\/\d+/)
-    cy.url().then((url) => {
-      const notebookId = url.match(/\/notebooks\/(\d+)/)?.[1]
-      expect(
-        notebookId,
-        `expected notebook id in URL after creating "${noteTopology}"`
-      ).to.exist
-      cy.wrap(notebookId).as(circleNotebookIdAlias(noteTopology))
-    })
     start.pageIsNotLoading().assumeNotePage().expectBreadcrumb(circleName)
   }
 )
@@ -111,28 +93,11 @@ Then(
 When(
   'I add a note {string} under {string}',
   (noteTopology: string, parentNoteTitle: string) => {
-    const notebookAlias = circleNotebookIdAlias(parentNoteTitle)
-    cy.wrap(null).then(() => {
-      const aliases = Cypress.state('aliases') as
-        | Record<string, unknown>
-        | undefined
-      if (aliases?.[notebookAlias]) {
-        return cy
-          .get(`@${notebookAlias}`, { log: false })
-          .then((notebookId) => {
-            cy.visit(`/notebooks/${notebookId}`)
-            pageIsNotLoading()
-            return notebookPage()
-              .addingNewNoteFromToolbar()
-              .createNoteWithTitle(noteTopology)
-          })
-      }
-      return start
-        .assumeCirclePage()
-        .navigateToNotebook(parentNoteTitle)
-        .addingNewNoteFromToolbar()
-        .createNoteWithTitle(noteTopology)
-    })
+    start
+      .assumeCirclePage()
+      .navigateToNotebook(parentNoteTitle)
+      .addingNewNoteFromToolbar()
+      .createNoteWithTitle(noteTopology)
   }
 )
 

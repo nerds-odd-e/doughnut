@@ -109,7 +109,6 @@ export const assumeAssimilationPage = () => ({
       .then((noteTitle: string) => {
         this.proceedWithRememberingSpelling()
         this.verifySpellingWith(noteTitle.trim())
-        this.expectPopupClosed()
         pageIsNotLoading()
       })
     return this

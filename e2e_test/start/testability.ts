@@ -474,6 +474,7 @@ const testability = () => {
           return cy
             .wrap(circleId)
             .as(circleIdAlias(circleName))
+            .then(() => cy.wrap(invitationCode).as('circleInvitationCode'))
             .then(() =>
               cy
                 .wrap(`${origin}/circles/join/${invitationCode}`)
