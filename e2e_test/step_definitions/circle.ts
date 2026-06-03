@@ -5,9 +5,6 @@
 
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
-import { pageIsNotLoading } from '../start/pageBase'
-import { circleNotebookIdAlias } from '../start/pageObjects/circlePage'
-import notebookPage from '../start/pageObjects/notebookPage'
 
 When(
   'I create a new circle {string} and copy the invitation code',
@@ -17,37 +14,96 @@ When(
 )
 
 When('I visit the invitation link', () => {
-  cy.get('@savedInvitationCode')
-    .invoke('toString')
-    .then((url) => {
-      cy.visit(url)
-      start.pageIsNotLoading()
-      cy.get('body').then(($body) => {
-        if ($body.find('#username').length > 0) {
-          return
-        }
-        cy.get('#join-circle-invitationCode', { timeout: 15000 }).should(
-          'exist'
-        )
+  cy.get<string>('@circleInvitationCode').then((code) => {
+    cy.get('@savedInvitationCode')
+      .invoke('toString')
+      .then((url) => {
+        cy.visit(url)
+        start.pageIsNotLoading()
+        cy.get('body').then(($body) => {
+          if ($body.find('#username').length > 0) {
+            cy.get<string>('@currentLoginUser').then((loginUser) => {
+              if (!loginUser || loginUser === 'none') {
+                return
+              }
+              cy.intercept('GET', '**/api/healthcheck').as('devLogin')
+              cy.get('#username').clear().type(loginUser)
+              cy.get('#password').clear().type('password')
+              cy.get('#login-button').click()
+              cy.wait('@devLogin').then(({ response }) => {
+                expect(response?.statusCode, 'dev login on invite').to.equal(
+                  200
+                )
+              })
+              cy.url({ timeout: 15000 }).should('include', '/circles/join/')
+              start.pageIsNotLoading()
+              cy.get('#join-circle-invitationCode', {
+                timeout: 15000,
+              }).should(($input) => {
+                expect($input.val()).to.equal(code)
+              })
+            })
+            return
+          }
+          cy.get('#join-circle-invitationCode', { timeout: 15000 }).should(
+            ($input) => {
+              expect($input.val()).to.equal(code)
+            }
+          )
+        })
       })
-    })
+  })
 })
 
 When('I join the circle', () => {
   cy.intercept('POST', '**/api/circles/join').as('joinCircle')
   cy.get<string>('@circleInvitationCode').then((code) => {
-    expect(code, 'circle invitation code from inject').to.be.a('string').and.not
-      .be.empty
-    cy.get('#join-circle-invitationCode', { timeout: 15000 }).clear().type(code)
-    cy.get('input[value="Join"]').click()
-    cy.wait('@joinCircle').then(({ response }) => {
-      expect(
-        response?.statusCode,
-        `join circle failed: ${JSON.stringify(response?.body)}`
-      ).to.equal(200)
-    })
-    cy.url({ timeout: 15000 }).should('match', /\/circles\/\d+/)
-    start.pageIsNotLoading()
+    cy.get('@savedInvitationCode')
+      .invoke('toString')
+      .then((url) => {
+        cy.visit(url)
+        start.pageIsNotLoading()
+        cy.get('body').then(($body) => {
+          const typeAndJoin = () => {
+            cy.url().should('include', '/circles/join/')
+            cy.get('#join-circle-invitationCode', { timeout: 15000 })
+              .clear()
+              .type(code)
+            cy.get('input[value="Join"]').click()
+            cy.wait('@joinCircle').then(({ response }) => {
+              expect(
+                response?.statusCode,
+                `join circle failed: ${JSON.stringify(response?.body)}`
+              ).to.equal(200)
+            })
+            cy.url({ timeout: 15000 }).should('match', /\/circles\/\d+/)
+            start.pageIsNotLoading()
+          }
+
+          if ($body.find('#username').length === 0) {
+            typeAndJoin()
+            return
+          }
+
+          cy.get<string>('@currentLoginUser').then((loginUser) => {
+            expect(loginUser, 'login before join')
+              .to.be.a('string')
+              .and.not.equal('none')
+            cy.intercept('GET', '**/api/healthcheck').as('devLogin')
+            cy.get('#username').clear().type(loginUser)
+            cy.get('#password').clear().type('password')
+            cy.get('#login-button').click()
+            cy.wait('@devLogin').then(({ response }) => {
+              expect(response?.statusCode, 'dev login before join').to.equal(
+                200
+              )
+            })
+            cy.url({ timeout: 15000 }).should('include', '/circles/join/')
+            start.pageIsNotLoading()
+            typeAndJoin()
+          })
+        })
+      })
   })
 })
 
@@ -82,14 +138,6 @@ When(
   (noteTopology: string, circleName: string) => {
     start.navigateToCircle(circleName).creatingNotebook(noteTopology)
     cy.url().should('match', /\/notebooks\/\d+/)
-    cy.url().then((url) => {
-      const notebookId = url.match(/\/notebooks\/(\d+)/)?.[1]
-      expect(
-        notebookId,
-        `expected notebook id in URL after creating "${noteTopology}"`
-      ).to.exist
-      cy.wrap(notebookId).as(circleNotebookIdAlias(noteTopology))
-    })
     start.pageIsNotLoading().assumeNotePage().expectBreadcrumb(circleName)
   }
 )
@@ -104,28 +152,11 @@ Then(
 When(
   'I add a note {string} under {string}',
   (noteTopology: string, parentNoteTitle: string) => {
-    const notebookAlias = circleNotebookIdAlias(parentNoteTitle)
-    cy.wrap(null).then(() => {
-      const aliases = Cypress.state('aliases') as
-        | Record<string, unknown>
-        | undefined
-      if (aliases?.[notebookAlias]) {
-        return cy
-          .get(`@${notebookAlias}`, { log: false })
-          .then((notebookId) => {
-            cy.visit(`/notebooks/${notebookId}`)
-            pageIsNotLoading()
-            return notebookPage()
-              .addingNewNoteFromToolbar()
-              .createNoteWithTitle(noteTopology)
-          })
-      }
-      return start
-        .assumeCirclePage()
-        .navigateToNotebook(parentNoteTitle)
-        .addingNewNoteFromToolbar()
-        .createNoteWithTitle(noteTopology)
-    })
+    start
+      .assumeCirclePage()
+      .navigateToNotebook(parentNoteTitle)
+      .addingNewNoteFromToolbar()
+      .createNoteWithTitle(noteTopology)
   }
 )
 

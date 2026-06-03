@@ -360,6 +360,7 @@ class TestabilityRestController {
             s -> {
               circleService.joinAndSave(entity, getUserModelByExternalIdentifier(s));
             });
+    entityPersister.flush();
     return entity.getId() + "," + entity.getInvitationCode();
   }
 

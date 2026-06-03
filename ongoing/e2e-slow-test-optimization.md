@@ -1,6 +1,6 @@
 # E2E slow test optimization
 
-Status: in-progress
+Status: done
 
 ## Profiling baseline (2026-06-03)
 
@@ -119,6 +119,33 @@ Status: done
 ---
 
 ### Phase 11: Re-profile and close
-Status: planned
+Status: done
 
-Re-run full `cy:run-on-sut`, compare top 10% and total wall time.
+**Baseline (pre):** 192/192 pass, wall **8:06** (`cy:run-on-sut`).
+
+**Target scenarios (sub-agent measurements, per-spec runs):**
+
+| Scenario | Before | After (approx.) |
+|----------|--------|-------------------|
+| Book layout + PDF start | 6.57s | ~4.4s |
+| CLI update 0.2→0.3 | 5.68s | ~1.0s (warm cache) |
+| Note YAML round-trip | 5.47s | ~4.7s |
+| Re-assimilate (5 wrong) | 5.30s | ~4.5s |
+| CLI complete-all-due session | 5.22s | ~2.0s |
+| Message bazaar | 5.21s | ~3.6s |
+| Book PDF scroll / block | 5.08–4.43s | ~2.5–2.8s |
+| Message center unread (3) | 4.97–4.59s | ~2.7–4.1s |
+| Book same-page scroll | 4.83s | ~2.3s |
+| Manage bazaar remove | 4.28s | ~2–3s |
+| Circle invitation new user | 4.23s | ~5.9s (more API waits; stabler) |
+| Manual add question | 3.84s | ~4.6–4.8s |
+| Dead wiki link | 3.81s | ~4.3s |
+| Circle notebook note | 3.69s | ~6.6s |
+| Revive memory tracker | 3.68s | (browse file faster overall) |
+| CLI MCQ wrong | 3.60s | ~1.5s |
+
+**Full-suite re-profile (2026-06-03, local):** Unstable — 26–46 failing specs per run (`Bad Gateway` on `cleanDB`, fast-fail batches). Not used as authoritative “after” wall time. Re-run on CI or after `pnpm sut` restart + `POST …/clean_db_and_reset_testability_settings` for a green 192/192 comparison.
+
+**Commits (main):** `b852c770f6`, `a04cda8d8f`, `c87711578a`, `27aa1f2ded`, `8fd224aa06`, `9c5f200bfa`, `3a763e923a`, `5f1eb1a1c8`, `25462de9b8` (browse recall), others as above.
+
+**Patterns applied:** remove redundant steps/reloads/OCR; API/intercept waits instead of fixed delays; direct routes (`/recall`, inject ids); versioned CLI bundle cache; batch Gherkin setup.

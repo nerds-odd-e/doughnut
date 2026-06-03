@@ -23,16 +23,16 @@ export default defineComponent({
     _from: RouteLocationNormalized,
     next: NavigationGuardNext
   ) {
-    next(async () => {
-      const { data: userInfo, error } =
-        await CurrentUserInfoController.currentUserInfo({})
-      if (error || !userInfo?.externalIdentifier) {
-        loginOrRegisterAndHaltThisThread()
-        next(false)
-      } else {
-        next()
+    CurrentUserInfoController.currentUserInfo({}).then(
+      ({ data: userInfo, error }) => {
+        if (error || !userInfo?.externalIdentifier) {
+          loginOrRegisterAndHaltThisThread()
+          next(false)
+        } else {
+          next()
+        }
       }
-    })
+    )
   },
 })
 </script>
