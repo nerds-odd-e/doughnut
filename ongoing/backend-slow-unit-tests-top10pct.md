@@ -43,7 +43,7 @@ Status: done
 ### Phase 2: Optimize slow tests rank 11–20 (max 0.074s)
 Status: done
 
-**Result (2026-06-03):** Slimmer fixtures and fewer redundant tests (1158 → 1155): GCS get invalid-ref cases parameterized; conversation cap test simplified; admin listing uses one note and smaller page; shuffle test extracted to mock-only `AiQuestionGeneratorShuffleTest` (removed redundant random-shuffle integration test); wiki-link extract test drops duplicate reference assertion; embedding job setup drops unused notes; export-messages asserts parsed messages directly; ControllerSetup “do not record” cases merged into one parameterized test.
+**Result (2026-06-03):** Slimmer fixtures and fewer redundant tests (1158 → 1161 invocations, −1 redundant shuffle integration test): GCS get invalid-ref cases parameterized; conversation cap test simplified; admin listing uses one note and smaller page; shuffle test extracted to mock-only `AiQuestionGeneratorShuffleTest`; wiki-link extract test drops duplicate reference assertion; embedding job setup drops unused notes; export-messages asserts parsed messages directly; ControllerSetup “do not record” cases merged into one parameterized test.
 
 **Scope:**
 - `com.odde.doughnut.services.book.GcsBookStorageTest#get_returnsBytesWhenBlobExists()` (0.074s)
