@@ -252,9 +252,9 @@ describe("PdfBookViewer gesture zoom (mocked pdf.js)", () => {
   it("two-finger pinch touchmove updates scale around the midpoint", async () => {
     const { wrapper } = mountViewerHost()
     await flushPromises()
-    await flushRafs()
 
     const viewer = harness.lastViewer
+    expect(viewer).not.toBeNull()
     const baseline = viewer!.currentScale
 
     const container = wrapper.find('[data-testid="pdf-book-viewer"]').element
@@ -297,7 +297,6 @@ describe("PdfBookViewer gesture zoom (mocked pdf.js)", () => {
       })
     )
 
-    await flushRafs()
     expect(viewer!.currentScale).toBeGreaterThan(baseline)
 
     wrapper.unmount()

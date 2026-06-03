@@ -1,10 +1,14 @@
 import { wikiTitleFromInnerAndNoteId } from "@/utils/wikiPropertyValueField"
-import { flushPromises } from "@vue/test-utils"
 import { nextTick } from "vue"
+import type { VueWrapper } from "@vue/test-utils"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 describe("RichMarkdownEditor", () => {
   const h = createRichMarkdownEditorTestHarness()
+
+  function quillFrom(wrapper: VueWrapper) {
+    return wrapper.findComponent({ name: "QuillEditor" })
+  }
 
   afterEach(() => {
     h.cleanup()
@@ -34,13 +38,10 @@ describe("RichMarkdownEditor", () => {
   it("linkifies wikilinks in Quill HTML while model matches the interval", async () => {
     const wikiTitles = [wikiTitleFromInnerAndNoteId("MyNote", 42)]
     const wrapper = await h.mountEditor("", { wikiTitles })
-    await flushPromises()
-
-    const quill = wrapper.findComponent({ name: "QuillEditor" })
+    const quill = quillFrom(wrapper)
     quill.vm.$emit("update:modelValue", "<p>[[MyNote]]</p>")
     await wrapper.setProps({ modelValue: "[[MyNote]]" })
     await nextTick()
-    await flushPromises()
 
     expect(String(quill.props("modelValue"))).toContain(
       '<a href="/n42" class="doughnut-link" data-wiki-title="MyNote"'
@@ -49,32 +50,21 @@ describe("RichMarkdownEditor", () => {
 
   it("keeps canonical dead-link HTML identical to Quill internal HTML", async () => {
     const wrapper = await h.mountEditor("[[Missing Note]]")
-    await flushPromises()
-    await nextTick()
-
-    const quill = wrapper.findComponent({ name: "QuillEditor" })
+    const quill = quillFrom(wrapper)
     const translatedHtml = String(quill.props("modelValue"))
-    const quillInternalHtml = h.quillEditorEl().innerHTML
 
     expect(translatedHtml).toContain('class="dead-link"')
-    expect(quillInternalHtml).toContain('class="dead-link"')
-    expect(quillInternalHtml).toBe(translatedHtml)
+    expect(h.quillEditorEl().innerHTML).toBe(translatedHtml)
   })
 
   it("keeps active Quill HTML identical when saved markdown with a dead link is echoed back", async () => {
     const wrapper = await h.mountEditor("Hello")
-    await flushPromises()
-    await nextTick()
-
-    const quillWrapper = wrapper.findComponent({ name: "QuillEditor" })
-    quillWrapper.vm.$emit("update:modelValue", "<p>Hello [[Missing Note]]</p>")
+    const quill = quillFrom(wrapper)
+    quill.vm.$emit("update:modelValue", "<p>Hello [[Missing Note]]</p>")
     await wrapper.setProps({ modelValue: "Hello [[Missing Note]]" })
-    await flushPromises()
     await nextTick()
 
-    expect(String(quillWrapper.props("modelValue"))).toContain(
-      'class="dead-link"'
-    )
-    expect(quillWrapper.props("modelValue")).toBe(h.quillEditorEl().innerHTML)
+    expect(String(quill.props("modelValue"))).toContain('class="dead-link"')
+    expect(quill.props("modelValue")).toBe(h.quillEditorEl().innerHTML)
   })
 })

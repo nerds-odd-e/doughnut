@@ -5,6 +5,7 @@ import type { ComponentPublicInstance } from "vue"
 import { vi, describe, it, expect, beforeEach } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDebounceTestSupport"
 import type { UpdateNoteContentData } from "@generated/doughnut-backend-api"
 import usePopups from "@/components/commons/Popups/usePopups"
 
@@ -216,117 +217,71 @@ describe("NoteEditableContent", () => {
     wrapper.unmount()
   })
 
-  it("should auto-save edited content after debounce timeout without blur", async () => {
-    vi.useFakeTimers()
+  describe("debounced save", () => {
+    afterEach(() => {
+      vi.useRealTimers()
+    })
 
-    const noteId = 1
-    const wrapper: VueWrapper<ComponentPublicInstance> = helper
-      .component(NoteEditableContent)
-      .withCleanStorage()
-      .withRouter()
-      .withProps({
+    it("should auto-save edited content after debounce timeout without blur", async () => {
+      vi.useFakeTimers()
+      const noteId = 1
+      const wrapper = await mountMarkdownTextarea({
         noteId,
         noteContent: "Original content",
-        readonly: false,
-        asMarkdown: true,
-        wikiTitles: [],
       })
-      .mount({ attachTo: document.body })
 
-    await flushPromises()
+      await setTextareaValue(wrapper, "Edited content")
+      expect(wrapper.find(".dirty").exists()).toBe(true)
 
-    const contentTextarea = wrapper.find("textarea")
-      .element as HTMLTextAreaElement
-    contentTextarea.value = "Edited content"
-    contentTextarea.dispatchEvent(new Event("input"))
-    await flushPromises()
+      await advanceNoteContentSaveDebounce()
 
-    expect(wrapper.find(".dirty").exists()).toBe(true)
+      expect(updateNoteContentSpy).toHaveBeenCalledWith({
+        path: { note: noteId },
+        body: { content: "Edited content" },
+      })
+      expect(wrapper.find(".dirty").exists()).toBe(false)
 
-    vi.advanceTimersByTime(1000)
-    await flushPromises()
-
-    expect(updateNoteContentSpy).toHaveBeenCalledWith({
-      path: { note: noteId },
-      body: { content: "Edited content" },
+      wrapper.unmount()
     })
-    expect(wrapper.find(".dirty").exists()).toBe(false)
 
-    vi.useRealTimers()
-    wrapper.unmount()
-  })
-
-  it("should save content immediately when a new wiki link appears (flush debounce)", async () => {
-    vi.useFakeTimers()
-
-    const noteId = 1
-    const wrapper: VueWrapper<ComponentPublicInstance> = helper
-      .component(NoteEditableContent)
-      .withCleanStorage()
-      .withRouter()
-      .withProps({
+    it("should save content immediately when a new wiki link appears (flush debounce)", async () => {
+      vi.useFakeTimers()
+      const noteId = 1
+      const wrapper = await mountMarkdownTextarea({
         noteId,
         noteContent: "Hello",
-        readonly: false,
-        asMarkdown: true,
-        wikiTitles: [],
       })
-      .mount({ attachTo: document.body })
 
-    await flushPromises()
+      await setTextareaValue(wrapper, "Hello [[OtherNote]]")
 
-    const contentTextarea = wrapper.find("textarea")
-      .element as HTMLTextAreaElement
-    contentTextarea.value = "Hello [[OtherNote]]"
-    contentTextarea.dispatchEvent(new Event("input"))
-    await flushPromises()
+      expect(updateNoteContentSpy).toHaveBeenCalledWith({
+        path: { note: noteId },
+        body: { content: "Hello [[OtherNote]]" },
+      })
 
-    expect(updateNoteContentSpy).toHaveBeenCalledWith({
-      path: { note: noteId },
-      body: { content: "Hello [[OtherNote]]" },
+      wrapper.unmount()
     })
 
-    vi.useRealTimers()
-    wrapper.unmount()
-  })
-
-  it("should not save until debounce when edit adds no new wiki link", async () => {
-    vi.useFakeTimers()
-
-    const noteId = 1
-    const wrapper: VueWrapper<ComponentPublicInstance> = helper
-      .component(NoteEditableContent)
-      .withCleanStorage()
-      .withRouter()
-      .withProps({
+    it("should not save until debounce when edit adds no new wiki link", async () => {
+      vi.useFakeTimers()
+      const noteId = 1
+      const wrapper = await mountMarkdownTextarea({
         noteId,
         noteContent: "Hello",
-        readonly: false,
-        asMarkdown: true,
-        wikiTitles: [],
       })
-      .mount({ attachTo: document.body })
 
-    await flushPromises()
+      await setTextareaValue(wrapper, "Hello world")
+      expect(updateNoteContentSpy).not.toHaveBeenCalled()
 
-    const contentTextarea = wrapper.find("textarea")
-      .element as HTMLTextAreaElement
-    contentTextarea.value = "Hello world"
-    contentTextarea.dispatchEvent(new Event("input"))
-    await flushPromises()
+      await advanceNoteContentSaveDebounce()
 
-    expect(updateNoteContentSpy).not.toHaveBeenCalled()
+      expect(updateNoteContentSpy).toHaveBeenCalledWith({
+        path: { note: noteId },
+        body: { content: "Hello world" },
+      })
 
-    vi.advanceTimersByTime(1000)
-    await flushPromises()
-
-    expect(updateNoteContentSpy).toHaveBeenCalledWith({
-      path: { note: noteId },
-      body: { content: "Hello world" },
+      wrapper.unmount()
     })
-
-    vi.useRealTimers()
-    wrapper.unmount()
   })
 
   it("should preserve second edit when first save response arrives after second edit", async () => {
@@ -671,179 +626,85 @@ topic: training
   })
 
   describe("HTML content normalization", () => {
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
     it("should not save when value contains only <p><br></p> and last saved was also empty", async () => {
       vi.useFakeTimers()
-
       const noteId = 1
-      const wrapper: VueWrapper<ComponentPublicInstance> = helper
-        .component(NoteEditableContent)
-        .withCleanStorage()
-        .withRouter()
-        .withProps({
-          noteId,
-          noteContent: "",
-          readonly: false,
-          asMarkdown: true,
-          wikiTitles: [],
-        })
-        .mount({ attachTo: document.body })
+      const wrapper = await mountMarkdownTextarea({ noteId, noteContent: "" })
 
-      await flushPromises()
-
-      const contentTextarea = wrapper.find("textarea")
-        .element as HTMLTextAreaElement
-      contentTextarea.value = "<p><br></p>"
-      contentTextarea.dispatchEvent(new Event("input"))
-      await flushPromises()
-
-      vi.advanceTimersByTime(1000)
-      await flushPromises()
+      await setTextareaValue(wrapper, "<p><br></p>")
+      await advanceNoteContentSaveDebounce()
 
       expect(updateNoteContentSpy).not.toHaveBeenCalled()
-
-      vi.useRealTimers()
       wrapper.unmount()
     })
 
     it("should save when clearing content (from non-empty to <p><br></p>)", async () => {
       vi.useFakeTimers()
-
       const noteId = 1
-      const wrapper: VueWrapper<ComponentPublicInstance> = helper
-        .component(NoteEditableContent)
-        .withCleanStorage()
-        .withRouter()
-        .withProps({
-          noteId,
-          noteContent: "Original content",
-          readonly: false,
-          asMarkdown: true,
-          wikiTitles: [],
-        })
-        .mount({ attachTo: document.body })
+      const wrapper = await mountMarkdownTextarea({
+        noteId,
+        noteContent: "Original content",
+      })
 
-      await flushPromises()
-
-      const contentTextarea = wrapper.find("textarea")
-        .element as HTMLTextAreaElement
-      contentTextarea.value = "<p><br></p>"
-      contentTextarea.dispatchEvent(new Event("input"))
-      await flushPromises()
-
-      vi.advanceTimersByTime(1000)
-      await flushPromises()
+      await setTextareaValue(wrapper, "<p><br></p>")
+      await advanceNoteContentSaveDebounce()
 
       expect(updateNoteContentSpy).toHaveBeenCalledWith({
         path: { note: noteId },
         body: { content: "" },
       })
-
-      vi.useRealTimers()
       wrapper.unmount()
     })
 
     it("should not save when only addition is empty lines and <p><br></p> at the end", async () => {
       vi.useFakeTimers()
-
       const noteId = 1
-      const wrapper: VueWrapper<ComponentPublicInstance> = helper
-        .component(NoteEditableContent)
-        .withCleanStorage()
-        .withRouter()
-        .withProps({
-          noteId,
-          noteContent: "Original content",
-          readonly: false,
-          asMarkdown: true,
-          wikiTitles: [],
-        })
-        .mount({ attachTo: document.body })
+      const wrapper = await mountMarkdownTextarea({
+        noteId,
+        noteContent: "Original content",
+      })
 
-      await flushPromises()
-
-      const contentTextarea = wrapper.find("textarea")
-        .element as HTMLTextAreaElement
-      contentTextarea.value = "Original content\n\n<p><br></p>"
-      contentTextarea.dispatchEvent(new Event("input"))
-      await flushPromises()
-
-      vi.advanceTimersByTime(1000)
-      await flushPromises()
+      await setTextareaValue(wrapper, "Original content\n\n<p><br></p>")
+      await advanceNoteContentSaveDebounce()
 
       expect(updateNoteContentSpy).not.toHaveBeenCalled()
-
-      vi.useRealTimers()
       wrapper.unmount()
     })
 
     it("should save with trailing empty lines and <p><br></p> removed when change is not only at the end", async () => {
       vi.useFakeTimers()
-
       const noteId = 1
-      const wrapper: VueWrapper<ComponentPublicInstance> = helper
-        .component(NoteEditableContent)
-        .withCleanStorage()
-        .withRouter()
-        .withProps({
-          noteId,
-          noteContent: "Original content",
-          readonly: false,
-          asMarkdown: true,
-          wikiTitles: [],
-        })
-        .mount({ attachTo: document.body })
+      const wrapper = await mountMarkdownTextarea({
+        noteId,
+        noteContent: "Original content",
+      })
 
-      await flushPromises()
-
-      const contentTextarea = wrapper.find("textarea")
-        .element as HTMLTextAreaElement
-      contentTextarea.value = "Modified content\n\n<p><br></p>"
-      contentTextarea.dispatchEvent(new Event("input"))
-      await flushPromises()
-
-      vi.advanceTimersByTime(1000)
-      await flushPromises()
+      await setTextareaValue(wrapper, "Modified content\n\n<p><br></p>")
+      await advanceNoteContentSaveDebounce()
 
       expect(updateNoteContentSpy).toHaveBeenCalledWith({
         path: { note: noteId },
         body: { content: "Modified content" },
       })
-
-      vi.useRealTimers()
       wrapper.unmount()
     })
 
     it("should not save when only addition is trailing br tags", async () => {
       vi.useFakeTimers()
-
       const noteId = 1
-      const wrapper: VueWrapper<ComponentPublicInstance> = helper
-        .component(NoteEditableContent)
-        .withCleanStorage()
-        .withRouter()
-        .withProps({
-          noteId,
-          noteContent: "Original content",
-          readonly: false,
-          asMarkdown: true,
-          wikiTitles: [],
-        })
-        .mount({ attachTo: document.body })
+      const wrapper = await mountMarkdownTextarea({
+        noteId,
+        noteContent: "Original content",
+      })
 
-      await flushPromises()
-
-      const contentTextarea = wrapper.find("textarea")
-        .element as HTMLTextAreaElement
-      contentTextarea.value = "Original content\n<br>\n<br>"
-      contentTextarea.dispatchEvent(new Event("input"))
-      await flushPromises()
-
-      vi.advanceTimersByTime(1000)
-      await flushPromises()
+      await setTextareaValue(wrapper, "Original content\n<br>\n<br>")
+      await advanceNoteContentSaveDebounce()
 
       expect(updateNoteContentSpy).not.toHaveBeenCalled()
-
-      vi.useRealTimers()
       wrapper.unmount()
     })
   })
