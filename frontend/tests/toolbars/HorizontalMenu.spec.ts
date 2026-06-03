@@ -527,25 +527,18 @@ describe("HorizontalMenu", () => {
       await expandButton.click()
 
       let menuWrapper = document.querySelector(".menu-wrapper")
+      expect(menuWrapper).toBeTruthy()
       expect(menuWrapper).toHaveClass("is-expanded")
 
-      // Trigger blur event
-      const menuContent = document.querySelector(".menu-wrapper")
-      if (menuContent) {
-        ;(menuContent as HTMLElement).focus()
-        ;(menuContent as HTMLElement).blur()
+      vi.useFakeTimers()
+      try {
+        ;(menuWrapper as HTMLElement).focus()
+        ;(menuWrapper as HTMLElement).blur()
+        await vi.advanceTimersByTimeAsync(0)
         await nextTick()
+      } finally {
+        vi.useRealTimers()
       }
-
-      // Wait for handleFocusLoss to process
-      // Use vi.waitUntil to wait for class change
-      await vi.waitUntil(
-        () =>
-          document
-            .querySelector(".menu-wrapper")
-            ?.classList.contains("is-collapsed"),
-        { timeout: 1000 }
-      )
 
       menuWrapper = document.querySelector(".menu-wrapper")
       expect(menuWrapper).toHaveClass("is-collapsed")
@@ -634,26 +627,15 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      // Expand the menu first
       const expandButton = page.getByLabelText("Toggle menu")
       await expandButton.click()
 
       const menuWrapper = document.querySelector(".menu-wrapper")
       expect(menuWrapper).toHaveClass("is-expanded")
 
-      // Simulate route change by updating the mocked route fullPath
       useRouteValue.fullPath = "/recall"
       useRouteValue.name = "recall"
-
-      // Wait for watcher to process
-      // Use vi.waitUntil to wait for class change
-      await vi.waitUntil(
-        () =>
-          document
-            .querySelector(".menu-wrapper")
-            ?.classList.contains("is-collapsed"),
-        { timeout: 1000 }
-      )
+      await nextTick()
 
       expect(document.querySelector(".menu-wrapper")).toHaveClass(
         "is-collapsed"

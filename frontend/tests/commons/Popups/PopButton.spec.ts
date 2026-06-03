@@ -104,10 +104,9 @@ describe("PopButton", () => {
     await page.getByText("Test Button").click()
     await flushPromises()
 
-    await vi.waitUntil(() => document.body.querySelector(".close-button"), {
-      timeout: 1000,
-    })
-    ;(document.body.querySelector(".close-button") as HTMLElement).click()
+    const closeButton = document.body.querySelector(".close-button")
+    expect(closeButton).toBeTruthy()
+    ;(closeButton as HTMLElement).click()
     await flushPromises()
 
     expect(blurSpy).toHaveBeenCalled()

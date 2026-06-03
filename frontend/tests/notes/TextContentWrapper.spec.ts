@@ -138,7 +138,6 @@ describe("TextContentWrapper referenced title rename", () => {
       })
     )
     await flushPromises()
-    await waitForAnimationFrames()
     await nextTick()
 
     expect(input.value).toBe("Edited")

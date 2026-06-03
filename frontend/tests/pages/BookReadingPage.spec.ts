@@ -239,6 +239,22 @@ async function mountPatchDebounceScenario() {
   return { wrapper, patchSpy }
 }
 
+async function emitViewportAndSettleCurrentBlock(
+  wrapper: BookReadingPageWrapper,
+  payload: {
+    anchorPageIndexZeroBased: number
+    viewport: { top: number; mid: number; bottom: number } | null
+    pagesCount: number
+  }
+) {
+  const pdf = wrapper.findComponent(PdfBookViewer)
+  await withFakeTimers(async () => {
+    pdf.vm.$emit("viewportAnchorPage", payload)
+    await vi.advanceTimersByTimeAsync(CURRENT_BLOCK_ANCHOR_DEBOUNCE_MS)
+    await flushPromises()
+  })
+}
+
 describe("BookReadingPage", () => {
   beforeAll(async () => {
     fetchMock.disableMocks()
@@ -413,26 +429,23 @@ describe("BookReadingPage", () => {
     const wrapper = await mountLoadedBookWithBlocks(notebookId, {
       innerWidth: 500,
     })
-    const pdf = wrapper.findComponent(PdfBookViewer)
+    expect(
+      wrapper
+        .find('[data-testid="book-reading-book-layout-toggle"]')
+        .attributes("aria-expanded")
+    ).toBe("false")
 
-    await withFakeTimers(async () => {
-      pdf.vm.$emit("viewportAnchorPage", {
-        anchorPageIndexZeroBased: 0,
-        viewport: null,
-        pagesCount: 10,
-      })
-      await vi.advanceTimersByTimeAsync(CURRENT_BLOCK_ANCHOR_DEBOUNCE_MS)
-      await flushPromises()
+    await emitViewportAndSettleCurrentBlock(wrapper, {
+      anchorPageIndexZeroBased: 0,
+      viewport: null,
+      pagesCount: 10,
     })
 
-    const indicator = wrapper.find(
-      '[data-testid="book-reading-page-indicator"]'
-    )
-    expect(indicator.exists()).toBe(true)
-    expect(indicator.text().trim()).toBe("1 / 10")
+    expect(
+      wrapper.find('[data-testid="book-reading-page-indicator"]').text().trim()
+    ).toBe("1 / 10")
 
     const current = wrapper.find('[data-current-block="true"]')
-    expect(current.exists()).toBe(true)
     expect(current.attributes("aria-current")).toBe("location")
     expect(current.text()).toBe("Section 3")
   })
@@ -730,22 +743,6 @@ describe("BookReadingPage", () => {
       expect(row, `book block row "${title}"`).toBeDefined()
       await row!.trigger("click")
       await flushPromises()
-    }
-
-    async function emitViewportAndSettleCurrentBlock(
-      wrapper: BookReadingPageWrapper,
-      payload: {
-        anchorPageIndexZeroBased: number
-        viewport: { top: number; mid: number; bottom: number } | null
-        pagesCount: number
-      }
-    ) {
-      const pdf = wrapper.findComponent(PdfBookViewer)
-      await withFakeTimers(async () => {
-        pdf.vm.$emit("viewportAnchorPage", payload)
-        await vi.advanceTimersByTimeAsync(CURRENT_BLOCK_ANCHOR_DEBOUNCE_MS)
-        await flushPromises()
-      })
     }
 
     it("shows read border for blocks returned as READ from reading-records on load", async () => {

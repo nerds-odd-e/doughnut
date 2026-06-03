@@ -124,7 +124,7 @@ describe("NotebookPage.spec", () => {
     const quill = editorRoot.querySelector(".ql-editor") as HTMLElement | null
     expect(quill).toBeTruthy()
     await userEvent.click(quill!)
-    await userEvent.keyboard("New notebook index")
+    await userEvent.paste("New notebook index")
 
     await userEvent.click(screen.getByTestId("notebook-index-save"))
     await flushPromises()

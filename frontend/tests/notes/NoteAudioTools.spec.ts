@@ -909,11 +909,7 @@ describe("NoteAudioTools", () => {
     })
 
     afterEach(() => {
-      // Restore fake timers after fullscreen tests
       vi.useFakeTimers()
-    })
-
-    afterEach(() => {
       document.body.innerHTML = ""
     })
 
@@ -925,40 +921,24 @@ describe("NoteAudioTools", () => {
     })
 
     it("displays error message in fullscreen overlay when errors exist", async () => {
-      wrapper = helper
-        .component(NoteAudioTools)
-        .withCleanStorage()
-        .withProps({ note })
-        .mount({ attachTo: document.body })
-
       const advancedButton = findButtonByTitle(wrapper, "Advanced Options")
       await advancedButton.trigger("click")
-      await wrapper.vm.$nextTick()
-
-      // Set an error
-      wrapper.vm.errors = { someError: "Test error message" }
-      await wrapper.vm.$nextTick()
-
-      const fullscreenComponent = wrapper.findComponent(FullScreen)
-      expect(fullscreenComponent.exists()).toBe(true)
-
-      // Browser Mode: Click fullscreen button
-      const fullscreenBtn = fullscreenComponent.find(".fullscreen-btn")
-      await fullscreenBtn.trigger("click")
-      await wrapper.vm.$nextTick()
-      // Browser Mode: Wait for fullscreen state to update using requestAnimationFrame
-      await new Promise((resolve) =>
-        requestAnimationFrame(() => resolve(undefined))
-      )
       await flushPromises()
 
-      // Browser Mode: Error should be in fullscreen overlay
+      wrapper.vm.errors = { someError: "Test error message" }
+      await flushPromises()
+
+      const fullscreenBtn = wrapper
+        .findComponent(FullScreen)
+        .find(".fullscreen-btn")
+      await fullscreenBtn.trigger("click")
+      await flushPromises()
+
       const errorElement = document.body.querySelector(
         ".fullscreen-overlay .fullscreen-error"
       )
-      expect(errorElement).toBeTruthy()
       expect(errorElement?.textContent?.trim()).toBe("Test error message")
-    }, 20000) // Increase timeout to 20 seconds
+    })
   })
 
   describe("Previous content handling", () => {
