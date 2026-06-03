@@ -7,7 +7,7 @@ import start from '../start'
 When(
   'I navigate to the {string} section in the admin dashboard',
   (tabName: string) => {
-    return start.goToAdminDashboard().goToTabInAdminDashboard(tabName)
+    return start.assumeAdminDashboardPage().openAdminDashboardTab(tabName)
   }
 )
 

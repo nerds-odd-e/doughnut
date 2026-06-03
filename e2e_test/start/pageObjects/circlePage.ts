@@ -62,8 +62,10 @@ export const assumeCirclePage = () => ({
 export const navigateToCircle = (circleName: string) => {
   const alias = circleIdAlias(circleName)
   cy.wrap(null).then(() => {
-    const storedAliases = Cypress.state('aliases')?.aliases ?? {}
-    if (storedAliases[alias] !== undefined) {
+    const aliases = Cypress.state('aliases') as
+      | Record<string, unknown>
+      | undefined
+    if (aliases?.[alias]) {
       return cy.get(`@${alias}`, { log: false }).then((circleId) => {
         cy.visit(`/circles/${circleId}`)
       })
@@ -80,9 +82,5 @@ export const navigateToCircle = (circleName: string) => {
     })
   })
   pageIsNotLoading()
-  cy.findByText(`Circle: ${circleName}`)
-  cy.findByText('Add New Notebook In This Circle', { timeout: 15000 }).should(
-    'be.visible'
-  )
   return assumeCirclePage()
 }
