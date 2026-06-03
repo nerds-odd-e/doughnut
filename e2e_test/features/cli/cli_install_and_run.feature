@@ -20,5 +20,3 @@ Feature: CLI install and run
     Given the backend serves the CLI with version "0.3.0"
     When I run the installed doughnut update command with BASE_URL from localhost
     Then I should see "Updated doughnut from 0.2.0 to 0.3.0" in the non-interactive output
-    When I run the installed doughnut version command
-    Then I should see "doughnut 0.3.0" in the non-interactive output

@@ -3,7 +3,13 @@
  */
 
 import { spawnSync } from 'node:child_process'
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
+import {
+  copyFileSync,
+  existsSync,
+  readFileSync,
+  readdirSync,
+  statSync,
+} from 'node:fs'
 import { join } from 'node:path'
 import {
   GMAIL_E2E_GOOGLE_CLIENT_ID,
@@ -41,6 +47,14 @@ export const CLI_E2E_INSTALL_BUNDLE_RELATIVE_PATH =
 
 const CLI_E2E_INSTALL_BUNDLE_OUTFILE =
   './dist/e2e-install-doughnut-cli.bundle.mjs'
+
+function cliE2eInstallBundleVersion(env?: NodeJS.ProcessEnv): string {
+  return env?.CLI_VERSION ?? process.env.CLI_VERSION ?? '0.2.0'
+}
+
+function cliE2eInstallBundleCacheRelativePath(version: string): string {
+  return `cli/dist/e2e-install-doughnut-cli-${version}.bundle.mjs`
+}
 
 /** Env: set to `1` to spawn `tsx src/index.ts` instead of the bundle (debug only). */
 export const CLI_E2E_USE_TSX_ENV = 'DOUGHNUT_CLI_E2E_USE_TSX' as const
@@ -136,6 +150,16 @@ export function runShellCommandSync(
 }
 
 export function bundleCliE2eInstall(repoRoot: string, env?: NodeJS.ProcessEnv) {
+  const version = cliE2eInstallBundleVersion(env)
+  const installBundle = join(repoRoot, CLI_E2E_INSTALL_BUNDLE_RELATIVE_PATH)
+  const cacheBundle = join(
+    repoRoot,
+    cliE2eInstallBundleCacheRelativePath(version)
+  )
+  if (existsSync(cacheBundle)) {
+    copyFileSync(cacheBundle, installBundle)
+    return
+  }
   runShellCommandSync('pnpm -C cli bundle', {
     cwd: repoRoot,
     env: {
@@ -143,14 +167,15 @@ export function bundleCliE2eInstall(repoRoot: string, env?: NodeJS.ProcessEnv) {
       ...CLI_E2E_PNPM_SPAWN_ENV,
       ...env,
       CLI_BUNDLE_OUTFILE: CLI_E2E_INSTALL_BUNDLE_OUTFILE,
+      CLI_VERSION: version,
     },
   })
-  const bundle = join(repoRoot, CLI_E2E_INSTALL_BUNDLE_RELATIVE_PATH)
-  if (!existsSync(bundle)) {
+  if (!existsSync(installBundle)) {
     throw new Error(
-      `Missing E2E install CLI bundle at ${bundle} after pnpm -C cli bundle`
+      `Missing E2E install CLI bundle at ${installBundle} after pnpm -C cli bundle`
     )
   }
+  copyFileSync(installBundle, cacheBundle)
 }
 
 export function cliRepoSpawnFromRoot(repoRoot: string): CliRepoSpawn {

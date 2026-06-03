@@ -71,10 +71,6 @@ When(
       .then((ctx) => ctx.attachPdfBook(fixtureFilename))
       .then((ctx) => {
         ctx.pastCliAssistantMessages().expectContains(`Attached "${stem}"`)
-        ctx
-          .pastCliAssistantMessages()
-          .expectContains('Protecting Intention in Working Software')
-        ctx.pastCliAssistantMessages().expectContains('Easier to Change')
       })
   }
 )

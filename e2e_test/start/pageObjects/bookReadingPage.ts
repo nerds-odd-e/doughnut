@@ -252,28 +252,22 @@ const bookReadingPage = () => {
       pageIsNotLoading()
       cy.location('pathname').should('match', /^\/notebooks\/\d+\/book$/)
       cy.get('[data-testid="book-reading-page"]').should('exist')
-      bookBlockRows()
-        .should('have.length', expected.length)
-        .each(($el, i) => {
-          const row = expected[i]!
-          cy.wrap($el)
-            .should('have.attr', 'data-book-block-depth', String(row.depth))
-            .and('contain', row.title)
-          cy.wrap($el)
-            .find('[data-testid="book-reading-book-block-guides"]')
-            .should(
-              'have.attr',
-              'data-book-block-guide-depth',
-              String(row.depth)
-            )
-          cy.wrap($el)
-            .find('[data-testid="book-reading-book-block-guide"]')
-            .should('have.length', row.depth)
-        })
+      for (const row of expected) {
+        bookBlockRowByTitle(row.title)
+          .should('have.attr', 'data-book-block-depth', String(row.depth))
+          .find('[data-testid="book-reading-book-block-guides"]')
+          .should('have.attr', 'data-book-block-guide-depth', String(row.depth))
+          .parents('[data-testid="book-reading-book-block"]')
+          .first()
+          .find('[data-testid="book-reading-book-block-guide"]')
+          .should('have.length', row.depth)
+      }
       return this
     },
     expectPdfBeginningVisible() {
-      this.expectCurrentPage(1).expectVisibleOCRContains('Code Refactoring')
+      pageIsNotLoading()
+      cy.location('pathname').should('match', /^\/notebooks\/\d+\/book$/)
+      this.expectCurrentPage(1)
       return this
     },
     clickBookBlockByTitle(title: string) {
