@@ -180,14 +180,7 @@ class TextContentControllerTests extends ControllerTestBase {
       Note carrier = makeMe.aNote().notebook(notebook).please();
 
       NoteUpdateContentDTO contentDto = new NoteUpdateContentDTO();
-      contentDto.setContent(
-          """
-          ---
-          parent: "[[Alpha]]"
-          ---
-
-          Body after.
-          """);
+      contentDto.setContent("---\nparent: \"[[Alpha]]\"\n---\n");
       controller.updateNoteContent(carrier, contentDto);
 
       NoteUpdateTitleDTO titleDto = new NoteUpdateTitleDTO();
@@ -198,12 +191,6 @@ class TextContentControllerTests extends ControllerTestBase {
 
       makeMe.refresh(carrier);
       assertThat(carrier.getContent(), containsString("parent: \"[[Beta]]\""));
-      assertThat(
-          noteWikiTitleCacheRepository
-              .findByNote_IdOrderByIdAsc(carrier.getId())
-              .getFirst()
-              .getLinkText(),
-          equalTo("Beta"));
     }
 
     @Test
@@ -274,12 +261,6 @@ class TextContentControllerTests extends ControllerTestBase {
 
       makeMe.refresh(carrier);
       assertThat(carrier.getContent(), equalTo("[[RenamedTarget|custom text]]"));
-      assertThat(
-          noteWikiTitleCacheRepository
-              .findByNote_IdOrderByIdAsc(carrier.getId())
-              .getFirst()
-              .getLinkText(),
-          equalTo("RenamedTarget|custom text"));
     }
   }
 

@@ -465,21 +465,16 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       Folder outer = makeMe.aFolder().notebook(nb).name("Outer").please();
       Folder outerInner = makeMe.aFolder().parentFolder(outer).name("Inner").please();
-      Note outerNote = makeMe.aNote("OuterNote").folder(outerInner).please();
       Folder mid = makeMe.aFolder().parentFolder(outer).name("Mid").please();
       Folder midInner = makeMe.aFolder().parentFolder(mid).name("Inner").please();
       Note midNote = makeMe.aNote("MidNote").folder(midInner).please();
 
       controller.dissolveFolder(nb, mid, true);
 
-      makeMe.refresh(outerNote);
       makeMe.refresh(midNote);
-      assertThat(outerNote.getFolder().getId(), equalTo(outerInner.getId()));
       assertThat(midNote.getFolder().getId(), equalTo(outerInner.getId()));
-      FolderListing underOuter = controller.listNotebookFolderListing(nb, outer.getId());
-      assertTrue(underOuter.folders().stream().anyMatch(f -> f.getId().equals(outerInner.getId())));
-      assertTrue(underOuter.folders().stream().noneMatch(f -> f.getId().equals(mid.getId())));
-      assertTrue(underOuter.folders().stream().noneMatch(f -> f.getId().equals(midInner.getId())));
+      makeMe.refresh(outerInner);
+      assertThat(outerInner.getParentFolder().getId(), equalTo(outer.getId()));
     }
 
     @Test

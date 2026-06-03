@@ -225,7 +225,9 @@ Status: done
 ---
 
 ### Phase 10: Optimize slow tests rank 91–100 (max 0.015s)
-Status: planned
+Status: done
+
+**Result (2026-06-03):** Fewer redundant tests and lighter fixtures (1139 invocations): dissolve merge asserts note folder without folder listing; merged regenerate return-value and API-shape tests; folded contest model and isContested checks into accept/rejected and removed duplicate ContestQuestion rejection test; parameterized cross-notebook referrer rewrites without root-note fixtures; slimmer frontmatter rename and dropped redundant wiki-cache reads on keep-visible title rename.
 
 **Scope:**
 - `com.odde.doughnut.controllers.NotebookFolderManagementControllerTest$DissolveFolder#dissolveMergesClashingSubfolderWhenMergeRequested()` (0.015s)

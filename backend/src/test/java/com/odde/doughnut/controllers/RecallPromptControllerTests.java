@@ -245,7 +245,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void createQuizQuestion() throws JsonProcessingException {
+    void shouldPassOldQuestionAndContestResultToOpenAiApi() throws JsonProcessingException {
       MCQWithAnswer jsonQuestion =
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 
@@ -258,19 +258,6 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
       Assertions.assertThat(regeneratedQuestion.getMultipleChoicesQuestion().getQuestionStem())
           .contains("What is the first color in the rainbow?");
-    }
-
-    @Test
-    void shouldPassOldQuestionAndContestResultToOpenAiApi() throws JsonProcessingException {
-      MCQWithAnswer jsonQuestion =
-          makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
-
-      // Mock the Responses API calls
-      openAiStructuredResponseMock.stubStructuredResponse(jsonQuestion);
-
-      QuestionContestResult contestResult = new QuestionContestResult();
-      contestResult.advice = "test";
-      controller.regenerate(recallPrompt, contestResult);
 
       @SuppressWarnings({"unchecked", "rawtypes"})
       ArgumentCaptor<StructuredResponseCreateParams<MCQWithAnswer>> paramsCaptor =
@@ -333,18 +320,19 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
       QuestionContestResult contest = controller.contest(recallPrompt);
       assertTrue(contest.rejected);
+      assertThat(recallPrompt.getPredefinedQuestion().isContested(), equalTo(false));
     }
 
     @Test
-    void useTheRightModel() {
+    void acceptTheContest() {
       globalSettingsService
           .globalSettingEvaluation()
           .setKeyValue(makeMe.aTimestamp().please(), "gpt-new");
-
-      questionEvaluation.feasibleQuestion = true;
+      questionEvaluation.feasibleQuestion = false;
       openAiStructuredResponseMock.stubStructuredResponse(questionEvaluation);
 
-      controller.contest(recallPrompt);
+      QuestionContestResult contestResult = controller.contest(recallPrompt);
+      assertFalse(contestResult.rejected);
 
       @SuppressWarnings({"unchecked", "rawtypes"})
       ArgumentCaptor<StructuredResponseCreateParams<QuestionEvaluation>> paramsCaptor =
@@ -352,15 +340,6 @@ class RecallPromptControllerTests extends ControllerTestBase {
       verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
       assertThat(
           paramsCaptor.getValue().rawParams().model().orElseThrow().asString(), equalTo("gpt-new"));
-    }
-
-    @Test
-    void acceptTheContest() {
-      questionEvaluation.feasibleQuestion = false;
-      openAiStructuredResponseMock.stubStructuredResponse(questionEvaluation);
-
-      QuestionContestResult contestResult = controller.contest(recallPrompt);
-      assertFalse(contestResult.rejected);
     }
 
     @Test
@@ -599,19 +578,6 @@ class RecallPromptControllerTests extends ControllerTestBase {
       // Then
       assertThat(result.rejected, equalTo(false));
       assertThat(recallPrompt.getPredefinedQuestion().isContested(), equalTo(true));
-    }
-
-    @Test
-    void shouldNotMarkQuestionAsContestedWhenContestIsRejected() {
-      questionEvaluation.feasibleQuestion = true;
-      openAiStructuredResponseMock.stubStructuredResponse(questionEvaluation);
-
-      // When
-      QuestionContestResult result = controller.contest(recallPrompt);
-
-      // Then
-      assertThat(result.rejected, equalTo(true));
-      assertThat(recallPrompt.getPredefinedQuestion().isContested(), equalTo(false));
     }
   }
 }
