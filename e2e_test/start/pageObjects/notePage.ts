@@ -11,6 +11,7 @@ import { toolbarButton } from './toolbarButton'
 import { makeSureNoteMoreOptionsFormIsOpen } from './noteMoreOptionsForm'
 import { questionListPage } from './questionListPage'
 import { assumeAssimilationPage } from './assimilationPage'
+import testability from '../testability'
 
 /** Matches `noteShowHref()` (`/n{id}`), `/n/:id`, or legacy `/d/n/:id` note links. */
 const noteShowHref = /^\/d\/n\/\d+$|^\/n\/\d+$|^\/n\d+$/
@@ -40,6 +41,16 @@ function wikiLinkInNoteContentFluent(linkText: string) {
   return {
     expectNoteShowHref() {
       locator().should('have.attr', 'href').and('match', noteShowHref)
+      return this
+    },
+    expectHrefPointsToNote(noteTitle: string) {
+      testability()
+        .getInjectedNoteIdByTitle(noteTitle)
+        .then((noteId) => {
+          locator()
+            .should('have.attr', 'href')
+            .and('match', new RegExp(`/n${noteId}$|/n/${noteId}$`))
+        })
       return this
     },
     followAndAssumeNote(noteTitle: string) {
@@ -208,6 +219,7 @@ export const assumeNotePage = (
         .first()
         .should('contain', newTitle)
       pageIsNotLoading()
+      testability().renameInjectedNoteTitleForNoteOnPage(newTitle)
     },
     editTextContent: (noteAttributes: Record<string, string>) => {
       const parseSpecialKeys = (text: string): string => {
@@ -483,6 +495,37 @@ export const assumeNotePage = (
     },
     wikiLinkInNoteContent(linkText: string) {
       return wikiLinkInNoteContentFluent(linkText)
+    },
+    expectWikidataBrowseLinkOpensUrl(expectedUrl: string) {
+      this.switchToRichContent()
+      cy.findByRole(noteContentRegion.role, {
+        name: noteContentRegion.name,
+      }).within(() => {
+        cy.get('[data-testid="rich-note-property-row"]')
+          .filter((_, row) => {
+            const key = row.getAttribute('data-property-key')?.toLowerCase()
+            return key === 'wikidata_id' || key === 'wikidataid'
+          })
+          .find('[data-testid="rich-note-property-external-link"]')
+          .should('be.visible')
+          .then(($btn) => {
+            cy.window().then((win) => {
+              const popupWindowStub = {
+                location: { href: undefined as string | undefined },
+                focus: cy.stub(),
+              }
+              cy.stub(win, 'open').as('open').returns(popupWindowStub)
+              cy.wrap($btn).click()
+              cy.get('@open').should('have.been.called')
+              cy.wrap(() => popupWindowStub.location.href)
+                .should((cb) => expect(cb()).equal(expectedUrl))
+                .then(() => {
+                  expect(popupWindowStub.focus).to.have.been.called
+                })
+            })
+          })
+      })
+      return this
     },
 
     startSearchingAndAddRelationship() {

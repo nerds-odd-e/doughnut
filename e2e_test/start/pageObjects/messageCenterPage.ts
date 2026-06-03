@@ -97,8 +97,33 @@ export const assumeMessageCenterPage = () => {
   }
 }
 
-export const navigateToMessageCenter = () => {
-  router().toMessageCenter()
+export const interceptConversationList = () => {
+  cy.intercept('GET', '**/api/conversation/all').as('conversationList')
+}
+
+export const waitForConversationList = (options?: {
+  expectedSubject?: string
+}) => {
+  cy.wait('@conversationList').should(({ response }) => {
+    expect(response?.statusCode, 'load message center conversations').to.equal(
+      200
+    )
+    if (options?.expectedSubject) {
+      const conversations = response?.body as
+        | Array<{ subject: string }>
+        | undefined
+      expect(
+        conversations?.some((item) => item.subject === options.expectedSubject),
+        `conversation list should include subject "${options.expectedSubject}"`
+      ).to.be.true
+    }
+  })
   pageIsNotLoading()
+}
+
+export const navigateToMessageCenter = () => {
+  interceptConversationList()
+  router().toMessageCenter()
+  waitForConversationList()
   return assumeMessageCenterPage()
 }

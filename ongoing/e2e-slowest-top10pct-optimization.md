@@ -63,13 +63,13 @@ Status: done
 - `recall_quiz_spelling_question.feature` — "Spelling quiz - incorrect answer" (3.31s)
 
 ### Group 9: wikidata associate + link rename update
-Status: planned
+Status: done
 
 - `associate_wikidata.feature` — "Associate note to wikipedia via wikidata using real service" (3.29s)
 - `link.feature` — "Renaming a referenced note while updating visible reference text" (3.28s)
 
 ### Group 10: message read + link rename keep text
-Status: planned
+Status: done
 
 - `message_center_with_unread_message_count.feature` — "The message is read by the receiver" (3.28s)
 - `link.feature` — "Renaming a referenced note while keeping visible reference text" (3.23s)

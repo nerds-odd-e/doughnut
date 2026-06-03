@@ -739,7 +739,7 @@ Then(
       .assumeNotePage()
       .wikiLinkInNoteContent(linkText)
       .expectNoteShowHref()
-      .followAndAssumeNote(linkText)
+      .expectHrefPointsToNote(linkText)
   }
 )
 

@@ -1,25 +1,16 @@
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import mock_services from '../start/mock_services/index'
 import start from '../start'
-import { pageIsNotLoading } from '../start/pageBase'
+import {
+  interceptConversationList,
+  waitForConversationList,
+} from '../start/pageObjects/messageCenterPage'
 import type { DataTable } from '@cucumber/cucumber'
 
 function openMessageCenter(expectedSubject: string) {
-  cy.intercept('GET', '**/api/conversation/all').as('conversationList')
+  interceptConversationList()
   cy.visit('/message-center')
-  cy.wait('@conversationList').should(({ response }) => {
-    expect(response?.statusCode, 'load message center conversations').to.equal(
-      200
-    )
-    const conversations = response?.body as
-      | Array<{ subject: string }>
-      | undefined
-    expect(
-      conversations?.some((item) => item.subject === expectedSubject),
-      `conversation list should include subject "${expectedSubject}"`
-    ).to.be.true
-  })
-  pageIsNotLoading()
+  waitForConversationList({ expectedSubject })
 }
 
 function reloginAndOpenMessageCenter(user: string, subject: string) {

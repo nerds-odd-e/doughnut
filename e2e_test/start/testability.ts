@@ -47,6 +47,18 @@ const cleanAndReset = (cy: Cypress.cy & CyEventEmitter, countdown: number) => {
 
 const injectedNoteIdMapAliasName = 'injectedNoteIdMap'
 
+function noteIdFromUrl(url: string): number {
+  const match =
+    url.match(/\/n(\d+)/) ??
+    url.match(/\/n\/(\d+)/) ??
+    url.match(/\/d\/n\/(\d+)/)
+  expect(
+    match,
+    `could not parse note id from URL (expected /n<id>, /n/<id>, or legacy /d/n/<id>): ${url}`
+  ).to.not.be.null
+  return Number(match![1])
+}
+
 const unwrapData = <T>(result: T | { data: T } | undefined): T => {
   if (result && typeof result === 'object' && 'data' in result) {
     return (result as { data: T }).data
@@ -369,6 +381,23 @@ const testability = () => {
           ).to.have.property(noteTopology)
           return injectedNoteIdMap[noteTopology]
         })
+    },
+
+    renameInjectedNoteTitleForNoteOnPage(newTitle: string) {
+      return cy.url().then((url) => {
+        const noteId = noteIdFromUrl(url)
+        return cy.get(`@${injectedNoteIdMapAliasName}`).then((existingMap) => {
+          const map = existingMap as Record<string, number>
+          const oldKey = Object.keys(map).find((key) => map[key] === noteId)
+          if (!oldKey || oldKey === newTitle) {
+            return
+          }
+          const { [oldKey]: _removed, ...rest } = map
+          return cy
+            .wrap({ ...rest, [newTitle]: noteId })
+            .as(injectedNoteIdMapAliasName)
+        })
+      })
     },
 
     assimilateNote(noteTitle: string) {

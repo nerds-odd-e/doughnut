@@ -74,9 +74,9 @@ Feature: Wiki links in notes
       """
       See [[WikiLinks E2E CI]] for process.
       """
-    When I navigate to "WikiLinks E2E NB/WikiLinks E2E Root/WikiLinks E2E CI" note
+    When I route to the note "WikiLinks E2E CI"
     When I set the note title to "WikiLinks E2E CI Renamed" keeping visible reference text
-    When I navigate to "WikiLinks E2E NB/WikiLinks E2E Root/WikiLinks E2E Tech" note
+    When I route to the note "WikiLinks E2E Tech"
     Then I should see the rich content of the note with content:
       | Tag | Content          |
       | a   | WikiLinks E2E CI |
@@ -87,9 +87,9 @@ Feature: Wiki links in notes
       """
       See [[WikiLinks E2E CI]] for process.
       """
-    When I navigate to "WikiLinks E2E NB/WikiLinks E2E Root/WikiLinks E2E CI" note
+    When I route to the note "WikiLinks E2E CI"
     When I set the note title to "WikiLinks E2E CI Renamed" updating visible reference text
-    When I navigate to "WikiLinks E2E NB/WikiLinks E2E Root/WikiLinks E2E Tech" note
+    When I route to the note "WikiLinks E2E Tech"
     Then I should see the rich content of the note with content:
       | Tag | Content                    |
       | a   | WikiLinks E2E CI Renamed   |
