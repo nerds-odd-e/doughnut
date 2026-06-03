@@ -58,7 +58,7 @@ Status: done
 ---
 
 ### Phase 2: note_edit (YAML) + re_assimilate
-Status: planned
+Status: done
 
 **Specs:** `note_creation_and_update/note_edit.feature`, `recall/re_assimilate.feature`
 

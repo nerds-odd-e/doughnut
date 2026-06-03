@@ -95,21 +95,19 @@ Feature: Note Edit
       Main content here.
       """
     And I reload the current page for note "LeSS in Action"
-    And I open the note content markdown editor
-    Then the note content markdown source should contain "diligence: high"
-    And the note content markdown source should contain "topic: training"
+    Then I should see rich note property "diligence" with value "high"
+    And I should see rich note property "topic" with value "training"
     When I view the note content as rich content
     And I should see the rich content elements in the note content:
       | Tag | Content       |
       | h1  | Workshop Body |
     When I add a rich note property with key "status" and value "draft"
+    And I edit the rich note property with key "topic" to key "domain" and value "wiki"
     And I reload the current page for note "LeSS in Action"
     Then I should see rich note property "status" with value "draft"
-    When I edit the rich note property with key "topic" to key "domain" and value "wiki"
-    And I reload the current page for note "LeSS in Action"
-    Then I should not see rich note property "topic"
+    And I should not see rich note property "topic"
     And I should see rich note property "domain" with value "wiki"
-    And I should see rich note property "status" with value "draft"
+    And I should see rich note property "diligence" with value "high"
     When I open the note content markdown editor
     Then the note content markdown source should contain "domain: wiki"
     And the note content markdown source should contain "diligence: high"

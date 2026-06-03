@@ -80,13 +80,15 @@ When(
         return
       }
       const day = days[index]!
+      const isLast = index === days.length - 1
       start.testability().backendTimeTravelTo(day, 8)
-      cy.reload()
-      start.recall().navigateToRecallPage()
+      start.recall().visitRecallPage()
       start.assumeQuestionPage(questionStem).answer(wrongAnswer)
-      start
-        .assumeAnsweredQuestionPage()
-        .expectMCQAnswerToBeIncorrect(wrongAnswer)
+      if (isLast) {
+        start
+          .assumeAnsweredQuestionPage()
+          .expectMCQAnswerToBeIncorrect(wrongAnswer)
+      }
       cy.then(() => runIteration(index + 1))
     }
     runIteration(0)

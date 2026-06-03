@@ -83,6 +83,11 @@ export const recall = () => {
       })
       return this
     },
+    visitRecallPage() {
+      cy.visit('/recall')
+      pageIsNotLoading()
+      return recallPage()
+    },
     navigateToRecallPage() {
       router().toRoot()
       getRecallListItemInSidebar(($el) => {
