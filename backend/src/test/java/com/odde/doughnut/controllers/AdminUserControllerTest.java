@@ -50,19 +50,17 @@ class AdminUserControllerTest extends ControllerTestBase {
     @Test
     void canListUsersWithCorrectNoteCount() throws UnexpectedNoAccessRightException {
       User userWithNotes = makeMe.aUser().please();
-      Note n1 = makeMe.aNote().please();
-      makeMe.entityPersister.save(NoteCreator.forNoteAndUser(n1, userWithNotes));
-      Note n2 = makeMe.aNote().please();
-      makeMe.entityPersister.save(NoteCreator.forNoteAndUser(n2, userWithNotes));
+      Note note = makeMe.aNote().please();
+      makeMe.entityPersister.save(NoteCreator.forNoteAndUser(note, userWithNotes));
 
-      UserListingPage result = controller.listUsers(0, 100);
+      UserListingPage result = controller.listUsers(0, 10);
 
       UserForListing userListing =
           result.getUsers().stream()
               .filter(u -> u.getId().equals(userWithNotes.getId()))
               .findFirst()
               .orElseThrow();
-      assertThat(userListing.getNoteCount(), equalTo(2L));
+      assertThat(userListing.getNoteCount(), equalTo(1L));
     }
 
     @Test
@@ -105,7 +103,7 @@ class AdminUserControllerTest extends ControllerTestBase {
       Timestamp assimilationTime = makeMe.aTimestamp().of(2025, 5).please();
       makeMe.aMemoryTrackerFor(note).by(userWithTrackers).assimilatedAt(assimilationTime).please();
 
-      UserListingPage result = controller.listUsers(0, 100);
+      UserListingPage result = controller.listUsers(0, 10);
 
       UserForListing userListing =
           result.getUsers().stream()

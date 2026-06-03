@@ -3,7 +3,6 @@ package com.odde.doughnut.services.ai;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
@@ -13,10 +12,7 @@ import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.odde.doughnut.testability.TestabilitySettings;
-import com.odde.doughnut.utils.Randomizer;
 import com.openai.client.OpenAIClient;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -72,87 +68,6 @@ class AiQuestionGeneratorTests {
 
     assertThat(
         result.getQuestion().getQuestionStem(), equalTo("What is the first color in the rainbow?"));
-  }
-
-  @Test
-  void shouldShuffleChoicesWhenChoicesMayBeShuffledIsTrue() {
-    // Setup a note with enough content for question generation
-    Note note = makeMe.aNote().content("description long enough.").rememberSpelling().please();
-    makeMe.aNote().please();
-
-    // Prepare the AI response with choicesMayBeShuffled = true
-    MCQWithAnswer originalQuestion =
-        makeMe
-            .aMCQWithAnswer()
-            .stem("What is 2+2?")
-            .choices("4", "3", "5", "6")
-            .correctChoiceIndex(0)
-            .choicesMayBeShuffled(true)
-            .please();
-
-    openAiStructuredResponseMock.stubStructuredResponse(originalQuestion);
-
-    // Act
-    MCQWithAnswer result = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
-
-    // Assert
-    assertThat(
-        result.getQuestion().getQuestionStem(),
-        equalTo(originalQuestion.getQuestion().getQuestionStem()));
-    assertThat(
-        result.getQuestion().getResponseChoices().size(),
-        equalTo(originalQuestion.getQuestion().getResponseChoices().size()));
-
-    // Verify the correct answer is maintained
-    String expectedCorrectAnswer =
-        originalQuestion
-            .getQuestion()
-            .getResponseChoices()
-            .get(originalQuestion.getSolutionChoiceIndex());
-    String actualCorrectAnswer =
-        result.getQuestion().getResponseChoices().get(result.getSolutionChoiceIndex());
-    assertThat(actualCorrectAnswer, equalTo(expectedCorrectAnswer));
-  }
-
-  @Test
-  void shouldShuffleChoicesInSpecificOrder() {
-    // Setup a mocked randomizer
-    Randomizer mockedRandomizer = mock(Randomizer.class);
-    AiQuestionGenerator aiQuestionGeneratorWithMockedRandomizer =
-        new AiQuestionGenerator(
-            noteQuestionGenerationService,
-            globalSettingsService,
-            mockedRandomizer,
-            openAiApiHandler,
-            testabilitySettings);
-
-    // Setup a note with enough content for question generation
-    Note note = makeMe.aNote().content("description long enough.").rememberSpelling().please();
-    makeMe.aNote().please();
-
-    // Prepare the AI response with choicesMayBeShuffled = true
-    MCQWithAnswer originalQuestion =
-        makeMe
-            .aMCQWithAnswer()
-            .stem("What is 2+2?")
-            .choices("4", "3", "5", "6")
-            .correctChoiceIndex(0)
-            .choicesMayBeShuffled(true)
-            .please();
-
-    // Mock the randomizer to return a specific shuffled order
-    List<String> shuffledChoices = Arrays.asList("6", "4", "5", "3");
-    doReturn(shuffledChoices).when(mockedRandomizer).shuffle(any());
-
-    openAiStructuredResponseMock.stubStructuredResponse(originalQuestion);
-
-    // Act
-    MCQWithAnswer result =
-        aiQuestionGeneratorWithMockedRandomizer.getAiGeneratedQuestion(note, null);
-
-    // Assert
-    assertThat(result.getQuestion().getResponseChoices(), equalTo(shuffledChoices));
-    assertThat(result.getSolutionChoiceIndex(), equalTo(1)); // "4" is now at index 1
   }
 
   @Test

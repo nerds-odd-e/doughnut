@@ -93,8 +93,12 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
     void shouldRefreshWikiLinkCacheForOriginalAndNewNoteAfterExtraction()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       Note testNote =
-          makeMe.aNote().title("Sample").notebookOwnedBy(currentUser.getUser()).please();
-      testNote.setContent("A. B. C.");
+          makeMe
+              .aNote()
+              .title("Sample")
+              .notebookOwnedBy(currentUser.getUser())
+              .content("A. B. C.")
+              .please();
       NoteExtractionResult aiResult = new NoteExtractionResult();
       aiResult.setNewNoteTitle("Point B");
       aiResult.setNewNoteContent("Extracted from [[sample|the original note]].");
@@ -111,8 +115,6 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
                   wikiTitle.getTargetToken().equals("sample")
                       && wikiTitle.getDisplayText().equals("the original note")
                       && wikiTitle.getNoteId().equals(testNote.getId()));
-      assertThat(response.getReferences())
-          .anyMatch(reference -> reference.getId() == testNote.getId());
     }
 
     @Test

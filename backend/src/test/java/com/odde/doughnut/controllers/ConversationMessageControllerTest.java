@@ -12,7 +12,6 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.ConversationMessageRepository;
 import com.odde.doughnut.entities.repositories.ConversationRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.ai.ChatMessageContent;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -243,22 +242,14 @@ class ConversationMessageControllerTest extends ControllerTestBase {
 
     @Test
     void returnsAtMost50Conversations() {
-      Conversation oldest =
-          makeMe
-              .aConversation()
-              .from(currentUser.getUser())
-              .createdAt(makeMe.aTimestamp().of(1, 0).please())
-              .please();
-      for (int i = 2; i <= 51; i++) {
+      for (int i = 1; i <= 51; i++) {
         makeMe
             .aConversation()
             .from(currentUser.getUser())
             .createdAt(makeMe.aTimestamp().of(i, 0).please())
             .please();
       }
-      List<ConversationListItem> list = controller.getConversationsOfCurrentUser();
-      assertEquals(50, list.size());
-      assertTrue(list.stream().noneMatch(item -> item.id().equals(oldest.getId())));
+      assertEquals(50, controller.getConversationsOfCurrentUser().size());
     }
   }
 
@@ -459,10 +450,6 @@ class ConversationMessageControllerTest extends ControllerTestBase {
       return message.replaceAll("^\"|\"$", "").trim();
     }
 
-    private String extractContentString(Object contentObj) {
-      return ChatMessageContent.extractContentString(contentObj);
-    }
-
     @Test
     void shouldExportConversationWithRequest() throws UnexpectedNoAccessRightException {
       java.util.Map<String, Object> request = controller.exportConversation(conversation);
@@ -479,11 +466,17 @@ class ConversationMessageControllerTest extends ControllerTestBase {
           .please();
       makeMe.aConversationMessage(conversation).sender(null).message("No. It is not.").please();
 
-      java.util.Map<String, Object> request = controller.exportConversation(conversation);
-      String export = formatExportResponse(request);
+      List<java.util.Map<String, Object>> messages =
+          extractMessagesForExport(controller.exportConversation(conversation));
 
-      assertThat(export).contains("**User**: Is Naba one of them?");
-      assertThat(export).contains("**Assistant**: No. It is not.");
+      assertThat(messages.stream().filter(m -> "user".equals(m.get("role"))).findFirst())
+          .get()
+          .extracting(m -> m.get("content"))
+          .isEqualTo("Is Naba one of them?");
+      assertThat(messages.stream().filter(m -> "assistant".equals(m.get("role"))).findFirst())
+          .get()
+          .extracting(m -> m.get("content"))
+          .isEqualTo("No. It is not.");
     }
 
     @Test

@@ -24,9 +24,13 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -67,36 +71,25 @@ public class ControllerSetupTest {
         new ControllerSetup(failureReportRepository, currentUserFetcher, testabilitySettings);
   }
 
-  @Test
-  void shouldNotRecordResponseStatusException() {
+  @ParameterizedTest
+  @MethodSource("exceptionsNotRecorded")
+  void shouldNotRecordExcludedExceptions(
+      Exception exception, Class<? extends Throwable> expectedType) {
     long count = failureReportRepository.count();
-    assertThrows(
-        ResponseStatusException.class,
-        () ->
-            controllerSetup.handleSystemException(
-                request, new ResponseStatusException(HttpStatus.UNAUTHORIZED, "xx")));
+    assertThrows(expectedType, () -> controllerSetup.handleSystemException(request, exception));
     assertThat(failureReportRepository.count(), equalTo(count));
   }
 
-  @Test
-  void shouldNotRecordApiException() {
-    long count = failureReportRepository.count();
-    assertThrows(
-        ApiException.class,
-        () ->
-            controllerSetup.handleSystemException(
-                request, new ApiException("x", ApiError.ErrorType.BINDING_ERROR, "client error")));
-    assertThat(failureReportRepository.count(), equalTo(count));
-  }
-
-  @Test
-  void shouldNotRecordUnexpectedNoAccessRightException() {
-    long count = failureReportRepository.count();
-    assertThrows(
-        UnexpectedNoAccessRightException.class,
-        () ->
-            controllerSetup.handleSystemException(request, new UnexpectedNoAccessRightException()));
-    assertThat(failureReportRepository.count(), equalTo(count));
+  static Stream<Arguments> exceptionsNotRecorded() {
+    return Stream.of(
+        Arguments.of(
+            new ResponseStatusException(HttpStatus.UNAUTHORIZED, "xx"),
+            ResponseStatusException.class),
+        Arguments.of(
+            new ApiException("x", ApiError.ErrorType.BINDING_ERROR, "client error"),
+            ApiException.class),
+        Arguments.of(
+            new UnexpectedNoAccessRightException(), UnexpectedNoAccessRightException.class));
   }
 
   @Test

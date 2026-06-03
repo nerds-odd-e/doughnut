@@ -72,13 +72,16 @@ class GcsBookStorageTest {
     assertEquals(Optional.of(content), cut.get("pre/x.pdf"));
   }
 
-  @Test
-  void get_emptyWhenInvalidRef() {
+  @ParameterizedTest
+  @CsvSource({
+    "safe/../evil",
+    "/safe/x",
+    "safe\\x",
+  })
+  void get_emptyWhenInvalidRef(String ref) {
     Storage storage = mock(Storage.class);
     GcsBookStorage cut = new GcsBookStorage(storage, "b", "safe/");
-    assertTrue(cut.get("safe/../evil").isEmpty());
-    assertTrue(cut.get("/safe/x").isEmpty());
-    assertTrue(cut.get("safe\\x").isEmpty());
+    assertTrue(cut.get(ref).isEmpty());
     verifyNoInteractions(storage);
   }
 
