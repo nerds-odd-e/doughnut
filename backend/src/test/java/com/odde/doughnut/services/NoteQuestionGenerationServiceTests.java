@@ -50,7 +50,6 @@ class NoteQuestionGenerationServiceTests {
   void setup() {
     openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
     testNote = makeMe.aNote().please();
-    makeMe.aNote().please();
   }
 
   private boolean instructionContains(

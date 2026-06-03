@@ -63,29 +63,6 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
     }
 
     @Test
-    void shouldAddMessageToConversationWhenMessageCompleted()
-        throws UnexpectedNoAccessRightException, BadRequestException {
-      int initialMessageCount = conversation.getConversationMessages().size();
-
-      controller.getAiReply(conversation);
-
-      // Verify a new message was added to the conversation
-      assertThat(conversation.getConversationMessages().size()).isEqualTo(initialMessageCount + 1);
-
-      // Verify the content of the added message
-      ConversationMessage lastMessage = conversation.getConversationMessages().getLast();
-      assertThat(lastMessage.getSender()).isNull(); // AI message should have no user
-    }
-
-    @Test
-    void shouldSetConversationInstructionsForRun()
-        throws UnexpectedNoAccessRightException, BadRequestException {
-      controller.getAiReply(conversation);
-
-      assertThat(conversation.getConversationMessages().size()).isGreaterThan(0);
-    }
-
-    @Test
     void shouldIncludeNotebookAiAssistantInstructionsInRun()
         throws UnexpectedNoAccessRightException, BadRequestException {
       // Setup notebook AI assistant with custom instructions

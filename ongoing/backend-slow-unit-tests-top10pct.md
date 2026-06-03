@@ -110,7 +110,9 @@ Status: done
 ---
 
 ### Phase 5: Optimize slow tests rank 41–50 (max 0.024s)
-Status: planned
+Status: done
+
+**Result (2026-06-03):** Fewer redundant tests and lighter fixtures (1156 invocations): merged admin pagination into one test with smaller page fixtures; dropped duplicate AI reply message-count/instructions tests; merged note non-persistence assert into regeneration test and removed redundant controller refinement-suggestions happy path (covered by structured-instructions test + service tests); depth-limit split uses shallow attach with depth set to MAX−1 instead of 63-node tree; dropped extra note from question-generation service setup.
 
 **Scope:**
 - `com.odde.doughnut.controllers.AdminUserControllerTest$AdminAccessUserListing#paginationWorksCorrectly()` (0.024s)

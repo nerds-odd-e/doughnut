@@ -36,18 +36,6 @@ class AdminUserControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void canListUsersWithPagination() throws UnexpectedNoAccessRightException {
-      makeMe.aUser().please();
-      makeMe.aUser().please();
-
-      UserListingPage result = controller.listUsers(0, 10);
-
-      assertThat(result.getUsers().size(), greaterThanOrEqualTo(3));
-      assertThat(result.getPageIndex(), equalTo(0));
-      assertThat(result.getPageSize(), equalTo(10));
-    }
-
-    @Test
     void canListUsersWithCorrectNoteCount() throws UnexpectedNoAccessRightException {
       User userWithNotes = makeMe.aUser().please();
       Note note = makeMe.aNote().please();
@@ -69,7 +57,7 @@ class AdminUserControllerTest extends ControllerTestBase {
       Note note = makeMe.aNote().please();
       makeMe.aMemoryTrackerFor(note).by(userWithTrackers).please();
 
-      UserListingPage result = controller.listUsers(0, 100);
+      UserListingPage result = controller.listUsers(0, 10);
 
       UserForListing userListing =
           result.getUsers().stream()
@@ -86,7 +74,7 @@ class AdminUserControllerTest extends ControllerTestBase {
       Note note = makeMe.aNote().createdAt(noteTime).please();
       makeMe.entityPersister.save(NoteCreator.forNoteAndUser(note, userWithNotes));
 
-      UserListingPage result = controller.listUsers(0, 100);
+      UserListingPage result = controller.listUsers(0, 10);
 
       UserForListing userListing =
           result.getUsers().stream()
@@ -115,7 +103,7 @@ class AdminUserControllerTest extends ControllerTestBase {
 
     @Test
     void paginationWorksCorrectly() throws UnexpectedNoAccessRightException {
-      for (int i = 0; i < 5; i++) {
+      for (int i = 0; i < 3; i++) {
         makeMe.aUser().please();
       }
 
@@ -123,8 +111,9 @@ class AdminUserControllerTest extends ControllerTestBase {
       UserListingPage secondPage = controller.listUsers(1, 3);
 
       assertThat(firstPage.getUsers().size(), equalTo(3));
-      assertThat(secondPage.getUsers().size(), greaterThanOrEqualTo(1));
       assertThat(firstPage.getPageIndex(), equalTo(0));
+      assertThat(firstPage.getPageSize(), equalTo(3));
+      assertThat(secondPage.getUsers().size(), greaterThanOrEqualTo(1));
       assertThat(secondPage.getPageIndex(), equalTo(1));
     }
   }

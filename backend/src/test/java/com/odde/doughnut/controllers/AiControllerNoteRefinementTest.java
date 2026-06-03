@@ -55,25 +55,6 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
       openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
     }
 
-    @Test
-    void shouldReturnRefinementSuggestions()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
-      RefinementSuggestions refinementSuggestions = new RefinementSuggestions();
-      refinementSuggestions.setSuggestions(
-          List.of(
-              "English is a language that is spoken in many countries.",
-              "It is also the most widely spoken language in the world."));
-      openAiStructuredResponseMock.stubStructuredResponse(refinementSuggestions);
-      testNote.setContent("English is a language that is spoken in many countries.");
-
-      RefinementSuggestionsDTO result = controller.generateRefinementSuggestions(testNote);
-
-      assertThat(result.getSuggestions())
-          .containsExactly(
-              "English is a language that is spoken in many countries.",
-              "It is also the most widely spoken language in the world.");
-    }
-
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {"   "})
@@ -147,6 +128,9 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
           controller.removeRefinementSuggestion(testNote, requestDTO);
       assertThat(response.getContent()).isNotEqualTo(originalContent);
       assertThat(response.getContent()).isEqualTo("Remaining content.");
+      makeMe.entityPersister.flush();
+      makeMe.entityPersister.refresh(testNote);
+      assertThat(testNote.getContent()).isEqualTo(originalContent);
     }
 
     @Test
@@ -166,21 +150,6 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
       verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
       StructuredResponseCreateParams<RegeneratedNoteContent> params = paramsCaptor.getValue();
       assertThat(params.rawParams().maxOutputTokens()).isEqualTo(Optional.of(2000L));
-    }
-
-    @Test
-    void shouldNotModifyNoteInDatabase()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
-      openAiStructuredResponseMock.stubStructuredResponse(
-          new RegeneratedNoteContent("Remaining content."));
-      String originalContent = "Original content with suggestion to remove.";
-      testNote.setContent(originalContent);
-      RefinementSuggestionsRequestDTO requestDTO = new RefinementSuggestionsRequestDTO();
-      requestDTO.suggestions = List.of("suggestion to remove");
-      controller.removeRefinementSuggestion(testNote, requestDTO);
-      makeMe.entityPersister.flush();
-      makeMe.entityPersister.refresh(testNote);
-      assertThat(testNote.getContent()).isEqualTo(originalContent);
     }
 
     @Test

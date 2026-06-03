@@ -19,6 +19,7 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.services.book.BookReadingWireConstants;
 import com.openai.models.responses.ResponseTextConfig;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import jakarta.validation.Validation;
@@ -233,22 +234,14 @@ class NotebookBooksBlockContentControllerTest extends NotebookBooksControllerTes
       Map<String, Object> bodyItem2 = new LinkedHashMap<>();
       bodyItem2.put("type", "text");
       bodyItem2.put("text", "b");
-      var leaf = node("Leaf");
-      leaf.setContentBlocks(new ArrayList<>(List.of(bodyItem1, bodyItem2)));
-      var cur = leaf;
-      for (int i = 0; i < 63; i++) {
-        cur = node("B" + i, cur);
-      }
-      controller.attachBook(nb, attachRequest(cur), pdfFile(STUB_PDF_BYTES));
-      Book book = bookOf(nb);
-      BookBlock deepestLeaf =
-          book.getBlocks().stream()
-              .filter(b -> b.getStructuralTitle().equals("Leaf"))
-              .findFirst()
-              .orElseThrow();
-      assertThat(deepestLeaf.getDepth(), equalTo(63));
+      var root = node("Leaf");
+      root.setContentBlocks(new ArrayList<>(List.of(bodyItem1, bodyItem2)));
+      controller.attachBook(nb, attachRequest(root), pdfFile(STUB_PDF_BYTES));
+      BookBlock leaf = rootBlocksSorted(bookOf(nb)).getFirst();
+      leaf.setDepth(BookReadingWireConstants.MAX_LAYOUT_DEPTH - 1);
+      entityManager.flush();
       List<BookContentBlock> cbs =
-          bookContentBlockRepository.findAllByBookBlock_IdOrderBySiblingOrder(deepestLeaf.getId());
+          bookContentBlockRepository.findAllByBookBlock_IdOrderBySiblingOrder(leaf.getId());
       int secondId = cbs.get(1).getId();
 
       var ex =
