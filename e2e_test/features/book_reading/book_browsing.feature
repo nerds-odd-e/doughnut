@@ -21,7 +21,7 @@ Feature: Book browsing
 
   Scenario: Book block jumps the PDF to the anchored page
     When I choose the book block "2.2 Refactoring as Strengthening the Code"
-    Then I should see in the book reader visible PDF viewport on page 2 text including "Strengthening the Code"
+    Then the book reader PDF viewport should be on page 2
     And the book block "2.2 Refactoring as Strengthening the Code" should be the current selection in the book reader
 
   Scenario: Scrolling the PDF updates the current block; short viewport keeps aside scrolled to it

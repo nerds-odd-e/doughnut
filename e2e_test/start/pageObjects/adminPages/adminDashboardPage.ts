@@ -1,6 +1,25 @@
 import { clickDaisyDialogButton } from '../../../support/daisyModalHelpers'
+import { commonSenseSplit } from '../../../support/string_util'
 import { pageIsNotLoading } from '../../pageBase'
 import { submittableForm } from '../../forms'
+
+const ADMIN_DASHBOARD_TAB_QUERY: Record<string, string> = {
+  'Failure Reports': 'failureReport',
+  'Manage Models': 'manageModel',
+  'Manage Bazaar': 'manageBazaar',
+  Users: 'users',
+  'Data migration': 'dataMigration',
+}
+
+function removeNotebookFromBazaarTableRow(notebook: string) {
+  cy.findByText(notebook)
+    .parentsUntil('tr')
+    .parent()
+    .findByRole('button', { name: 'Remove' })
+    .click()
+  cy.findByRole('button', { name: 'OK' }).click()
+  pageIsNotLoading()
+}
 
 export function assumeAdminDashboardPage() {
   return {
@@ -28,7 +47,14 @@ export function assumeAdminDashboardPage() {
     },
 
     goToTabInAdminDashboard(tabName: string) {
+      const tab = ADMIN_DASHBOARD_TAB_QUERY[tabName]
+      if (!tab) {
+        throw new Error(`Unknown admin dashboard tab: ${tabName}`)
+      }
       cy.findByRole('button', { name: tabName }).click()
+      cy.location('search').should('include', `tab=${tab}`)
+      pageIsNotLoading()
+      return this
     },
 
     goToModelManagement() {
@@ -40,19 +66,20 @@ export function assumeAdminDashboardPage() {
       }
     },
 
-    goToBazaarManagement() {
-      this.goToTabInAdminDashboard('Manage Bazaar')
-      return {
-        removeFromBazaar(notebook: string) {
-          cy.findByText(notebook)
-            .parentsUntil('tr')
-            .parent()
-            .findByRole('button', { name: 'Remove' })
-            .click()
-          cy.findByRole('button', { name: 'OK' }).click()
-          pageIsNotLoading()
-        },
+    expectBazaarAdminNotebooks(notebooks: string) {
+      pageIsNotLoading()
+      cy.location('search').should('include', 'tab=manageBazaar')
+      const expected = commonSenseSplit(notebooks, ',')
+      for (const name of expected) {
+        cy.get('.daisy-table tbody tr').contains('a', name)
       }
+      cy.get('.daisy-table tbody tr').should('have.length', expected.length)
+      return this
+    },
+
+    removeNotebookFromBazaarAdminList(notebook: string) {
+      removeNotebookFromBazaarTableRow(notebook)
+      return this
     },
   }
 }

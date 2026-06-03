@@ -43,17 +43,13 @@ function interactiveCli() {
         writeInteractiveLineToPty(answer)
       )
     },
-    inputDownArrowSelectionForSlashCommand(
-      command: string
-    ): Cypress.Chainable<null> {
-      return writeInteractiveLineToPty(command).then(() =>
-        whenCurrentGuidanceContainsThen(
-          'What is the meaning of sedition?',
-          () =>
-            writeInteractiveRawToPty('\u001b[B').then(() =>
-              writeInteractiveRawToPty('\r')
-            )
-        )
+    selectNextMcqChoiceWithDownArrowAndEnter(): Cypress.Chainable<null> {
+      return whenCurrentGuidanceContainsThen(
+        'What is the meaning of sedition?',
+        () =>
+          writeInteractiveRawToPty('\u001b[B').then(() =>
+            writeInteractiveRawToPty('\r')
+          )
       )
     },
     pastCliAssistantMessages,

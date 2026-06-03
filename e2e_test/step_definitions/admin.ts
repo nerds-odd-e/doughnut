@@ -1,10 +1,10 @@
 /// <reference types="cypress" />
 /// <reference types="../support" />
 // @ts-check
-import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
+import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 
-Given(
+When(
   'I navigate to the {string} section in the admin dashboard',
   (tabName: string) => {
     return start.goToAdminDashboard().goToTabInAdminDashboard(tabName)
@@ -22,9 +22,15 @@ When('I choose model {string} for {string}', (model: string, task: string) => {
     .chooseModel(model, task)
 })
 
-When('I remove the notebook {string} from the bazaar', (notebook: string) => {
-  return start
-    .goToAdminDashboard()
-    .goToBazaarManagement()
-    .removeFromBazaar(notebook)
+Then('I should see {string} in the bazaar admin list', (notebooks: string) => {
+  return start.assumeAdminDashboardPage().expectBazaarAdminNotebooks(notebooks)
 })
+
+When(
+  'I remove the notebook {string} from the bazaar admin list',
+  (notebook: string) => {
+    return start
+      .assumeAdminDashboardPage()
+      .removeNotebookFromBazaarAdminList(notebook)
+  }
+)

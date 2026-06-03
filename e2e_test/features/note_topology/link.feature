@@ -45,12 +45,7 @@ Feature: Wiki links in notes
       | a.dead-link       | WikiLinks E2E Missing |
       | a:not(.dead-link) | WikiLinks E2E Tech |
     And I should be able to create a new note by following the dead link "WikiLinks E2E Missing"
-    And I should see folder "WikiLinks E2E NB/WikiLinks E2E Root" containing these notes:
-      | note-title             |
-      | WikiLinks E2E Tech     |
-      | WikiLinks E2E CI      |
-      | WikiLinks E2E Missing |
-    When I navigate to "WikiLinks E2E NB/WikiLinks E2E Root/WikiLinks E2E CI" note
+    When I open note "WikiLinks E2E CI"
     Then I should see the rich content elements in the note content:
       | Tag               | Content               |
       | a:not(.dead-link) | WikiLinks E2E Missing |

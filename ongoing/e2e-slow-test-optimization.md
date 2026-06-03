@@ -91,9 +91,11 @@ Status: done
 ---
 
 ### Phase 7: book_browsing (block jump) + manage_bazaar
-Status: planned
+Status: done
 
 **Specs:** `book_reading/book_browsing.feature`, `user_admin/manage_bazaar.feature`
+
+**Verify:** `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/book_reading/book_browsing.feature,e2e_test/features/user_admin/manage_bazaar.feature`
 
 ---
 

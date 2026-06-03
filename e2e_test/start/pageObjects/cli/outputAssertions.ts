@@ -22,12 +22,14 @@ const transcriptPollBase: Pick<ManagedTtyAssertInput, 'strict'> = {
 }
 
 function currentGuidanceContainsAssertRequest(
-  expected: string
+  expected: string,
+  timeoutMs = 15_000
 ): ManagedTtyAssertInput {
   return {
     ...guidanceBase,
     needle: expected,
     messagePrefix: 'Current guidance assertion failed.',
+    timeoutMs,
   }
 }
 

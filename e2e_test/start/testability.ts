@@ -13,6 +13,7 @@ import type {
 import type { NotesTestDataWritable } from '@generated/doughnut-backend-api'
 import {
   AssimilationController,
+  CircleController,
   NoteController,
   NotebookBooksController,
   TestabilityRestController,
@@ -452,6 +453,50 @@ const testability = () => {
           log: false,
         }
       )
+    },
+
+    saveCircleInvitationLink(circleName: string) {
+      return cy.get<string>('@currentLoginUser').then((username) => {
+        const auth = {
+          headers: {
+            Authorization: `Basic ${btoa(`${username}:password`)}`,
+          },
+        }
+        return cy
+          .wrap(CircleController.index(auth), { log: false })
+          .then((response) => {
+            const circles =
+              unwrapData<Array<{ id: number; name: string }>>(response)
+            const circle = circles.find((c) => c.name === circleName)
+            if (!circle?.id) {
+              throw new Error(
+                `Circle "${circleName}" not found for user "${username}"`
+              )
+            }
+            return cy.wrap(
+              CircleController.showCircle({
+                path: { circle: circle.id },
+                ...auth,
+              }),
+              { log: false }
+            )
+          })
+          .then((response) => {
+            const invitationCode = unwrapData<{ invitationCode: string }>(
+              response
+            ).invitationCode
+            if (!invitationCode) {
+              throw new Error(
+                `Invitation code missing for circle "${circleName}"`
+              )
+            }
+            const origin =
+              Cypress.config('baseUrl')?.toString() ?? 'http://localhost:5173'
+            cy.wrap(`${origin}/circles/join/${invitationCode}`).as(
+              'savedInvitationCode'
+            )
+          })
+      })
     },
 
     updateCurrentUserSettingsWith(hash: Record<string, string>) {

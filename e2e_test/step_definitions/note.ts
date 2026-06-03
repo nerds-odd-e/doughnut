@@ -110,7 +110,9 @@ Given(
           Object.entries(row).map(([key, value]) => [key.trim(), value])
         )
       )
-    start.testability().injectNotes(hashes, externalIdentifier, notebookName)
+    return start
+      .testability()
+      .injectNotes(hashes, externalIdentifier, notebookName)
   }
 )
 
@@ -150,13 +152,13 @@ Given(
   }
 )
 
-Given(
+When(
   'I add the following question for the note {string}:',
   (noteTopology: string, data: DataTable) => {
     expect(data.hashes().length, 'please add one question at a time.').to.equal(
       1
     )
-    start.jumpToNotePage(noteTopology).addQuestion(data.hashes()[0]!)
+    start.jumpToNotePage(noteTopology, true).addQuestion(data.hashes()[0]!)
   }
 )
 
@@ -423,6 +425,11 @@ When('I navigate to {notepath} note', (notePath: NotePath) => {
   start.navigateToNoteFromPath(notePath)
 })
 
+When('I open note {string}', (noteTitle: string) => {
+  start.jumpToNotePage(noteTitle, true)
+  start.pageIsNotLoading()
+})
+
 // This step definition is for demo purpose
 Then(
   '*for demo* I should see there are {int} descendants',
@@ -540,10 +547,10 @@ When('I route to the note {string}', (noteTopology: string) => {
   start.jumpToNotePage(noteTopology)
 })
 
-When(
+Then(
   'I should see the questions in the question list of the note {string}:',
-  (noteTopology: string, data: DataTable) => {
-    start.jumpToNotePage(noteTopology).expectQuestionsInList(data.hashes())
+  (_noteTopology: string, data: DataTable) => {
+    start.assumeNotePage().expectQuestionsInList(data.hashes())
   }
 )
 
@@ -737,6 +744,7 @@ Then(
   'I should be able to create a new note by following the dead link {string}',
   (linkTitle: string) => {
     start.assumeNotePage().followDeadLink(linkTitle).createNote()
+    start.testability().rememberUiCreatedNote(linkTitle)
     start.assumeNotePage(linkTitle)
   }
 )

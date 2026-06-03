@@ -18,18 +18,44 @@ When('I visit the invitation link', () => {
     .invoke('toString')
     .then((url) => {
       cy.visit(url)
+      start.pageIsNotLoading()
+      const code = url.split('/circles/join/')[1]?.split(/[/?#]/)[0]
+      if (code) {
+        cy.get('#join-circle-invitationCode', { timeout: 15000 }).should(
+          ($input) => {
+            expect(
+              $input.val(),
+              `invitation form should show code from ${url}`
+            ).to.equal(code)
+          }
+        )
+      }
     })
 })
 
 When('I join the circle', () => {
+  cy.get('#join-circle-invitationCode', { timeout: 15000 })
+    .invoke('val')
+    .should('not.be.empty')
   cy.get('input[value="Join"]').click()
-  cy.url().should('match', /\/circles\/\d+/)
+  cy.url({ timeout: 15000 }).should('match', /\/circles\/\d+/)
+  start.pageIsNotLoading()
 })
 
-When(
+Then(
   'I should see the circle {string} and it has two members in it',
   (circleName: string) => {
-    start.navigateToCircle(circleName).haveMembers(2)
+    cy.findByText(`Circle: ${circleName}`)
+    start.assumeCirclePage().haveMembers(2)
+  }
+)
+
+Given(
+  'circle {string} exists for {string} with invitation link saved',
+  (circleName: string, memberExternalId: string) => {
+    start.testability().injectCircle({ circleName, members: memberExternalId })
+    start.loginAs(memberExternalId)
+    start.testability().saveCircleInvitationLink(circleName)
   }
 )
 
@@ -49,7 +75,7 @@ When(
   }
 )
 
-When(
+Then(
   'I should see the notebook {string} in circle {string}',
   (notebook: string, circleName: string) => {
     start.navigateToCircle(circleName).expectNotebooks(notebook)

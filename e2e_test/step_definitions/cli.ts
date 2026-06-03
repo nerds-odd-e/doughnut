@@ -68,9 +68,8 @@ When(
 )
 
 When(
-  'I input down-arrow selection for {string} in the interactive CLI',
-  (command: string) =>
-    cli.interactiveCli().inputDownArrowSelectionForSlashCommand(command)
+  'I select the next MCQ choice with down arrow and Enter in the interactive CLI',
+  () => cli.interactiveCli().selectNextMcqChoiceWithDownArrowAndEnter()
 )
 
 When(

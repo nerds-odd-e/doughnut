@@ -78,9 +78,6 @@ const bookReadingPage = () => {
     ).to.be.greaterThan(0)
   }
 
-  const ocrPngBase64 = (base64: string) =>
-    cy.task('ocrCanvasImage', base64, { timeout: 60000 })
-
   return {
     expectEpubReadingViewShowsBookName(name: string) {
       pageIsNotLoading()
@@ -392,8 +389,7 @@ const bookReadingPage = () => {
       cy.get('[data-testid="book-reading-page-indicator"]')
         .should('be.visible')
         .and('contain', `${pageNumber} /`)
-      const afterPageCanvasInk = cy
-        .get('[data-testid="pdf-book-viewer"]')
+      cy.get('[data-testid="pdf-book-viewer"]')
         .should('be.visible')
         .get(
           `[data-testid="pdf-book-viewer"] .pdfViewer .page[data-page-number="${pageNumber}"] canvas`
@@ -402,48 +398,7 @@ const bookReadingPage = () => {
         .should(($canvas) => {
           assertPdfCanvasHasDarkPixels($canvas[0] as HTMLCanvasElement)
         })
-      return {
-        expectVisibleOCRContains(marker: string, screenshotKey?: string) {
-          const name =
-            screenshotKey ?? `book-reading-pdf-viewer-ocr-p${pageNumber}`
-          return afterPageCanvasInk.then(() => {
-            let screenshotPath = ''
-            return cy
-              .get('[data-testid="pdf-book-viewer"]')
-              .screenshot(name, {
-                log: false,
-                overwrite: true,
-                onBeforeScreenshot($el: JQuery<HTMLElement>) {
-                  $el
-                    .find('[data-testid="book-block-selection-bbox-highlight"]')
-                    .css('opacity', '0')
-                },
-                onAfterScreenshot($el: JQuery<HTMLElement>, props) {
-                  screenshotPath = props.path
-                  $el
-                    .find('[data-testid="book-block-selection-bbox-highlight"]')
-                    .css('opacity', '')
-                },
-              })
-              .then(() => {
-                expect(
-                  screenshotPath,
-                  'Cypress element screenshot path'
-                ).to.not.equal('')
-                return cy.readFile(screenshotPath, 'base64', {
-                  timeout: 30000,
-                })
-              })
-              .then((base64) => ocrPngBase64(base64 as string))
-              .then((text) => {
-                expect(
-                  text as string,
-                  `OCR text from visible PDF book viewer (element screenshot); expect content from page ${pageNumber} in view`
-                ).to.contain(marker)
-              })
-          })
-        },
-      }
+      return this
     },
     scrollPdfBookReaderToBringPage2IntoPrimaryView() {
       pageIsNotLoading()

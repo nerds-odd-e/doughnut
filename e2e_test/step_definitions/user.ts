@@ -8,11 +8,11 @@ import type { DataTable } from '@cucumber/cucumber'
 import start from '../start'
 
 Given('I am logged in as {string}', (externalIdentifier: string) => {
-  start.loginAs(externalIdentifier)
+  return start.loginAs(externalIdentifier)
 })
 
 Given('I am re-logged in as {string}', (externalIdentifier: string) => {
-  start.reloginAs(externalIdentifier)
+  return start.reloginAs(externalIdentifier)
 })
 
 Given(
@@ -43,11 +43,9 @@ Given("I'm on the login page", () => {
 })
 
 When('I identify myself as a new user', () => {
-  cy.intercept('GET', '/api/healthcheck').as('devLoginHealthcheck')
   cy.get('#username').type('user')
   cy.get('#password').type('password')
   cy.get('#login-button').click()
-  cy.wait('@devLoginHealthcheck')
 })
 
 Then('I should be asked to create my profile', () => {
@@ -64,6 +62,10 @@ When('I save my profile with:', (data: DataTable) => {
     }
   })
   cy.get('input[value="Submit"]').click()
+  cy.findByRole('heading', {
+    name: /Please create your profile/i,
+  }).should('not.exist')
+  start.pageIsNotLoading()
 })
 
 Then(

@@ -2,14 +2,12 @@ Feature: Quiz Question Management
   As a trainer, I want to manage the quiz questions for the notes of a notebook,
   so that learners can practice with consistent multiple-choice questions tied to each note.
 
-  Background:
+  Scenario: Manually add a question to the note successfully
     Given I am logged in as an existing user
     And I have a notebook "Cow jokes" with a note "The cow joke"
     And there are questions in the notebook "Cow jokes" for the note:
       | Note Title   | Question             | Answer | One Wrong Choice |
       | The cow joke | What does a cow say? | moo    | woo              |
-
-  Scenario: Manually add a question to the note successfully
     When I add the following question for the note "The cow joke":
       | Stem                                 | Choice 0    | Choice 1 | Choice 2 | Correct Choice Index |
       | What do you call a cow with not leg? | Ground beef | Cowboy   | Oxford   | 0                    |
@@ -20,7 +18,12 @@ Feature: Quiz Question Management
 
   @usingMockedOpenAiService
   Scenario: Can generate the question by AI
-    Given OpenAI generates this question:
+    Given I am logged in as an existing user
+    And I have a notebook "Cow jokes" with a note "The cow joke"
+    And there are questions in the notebook "Cow jokes" for the note:
+      | Note Title   | Question             | Answer | One Wrong Choice |
+      | The cow joke | What does a cow say? | moo    | woo              |
+    And OpenAI generates this question:
       | Question Stem                            | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | Why do cows have hooves instead of feet? | they lactose   | they moo           | they have          |
     When I generate question by AI for note "The cow joke"
@@ -30,7 +33,12 @@ Feature: Quiz Question Management
 
   @usingMockedOpenAiService
   Scenario: Can refine the question by AI
-    Given OpenAI now refines the question to become:
+    Given I am logged in as an existing user
+    And I have a notebook "Cow jokes" with a note "The cow joke"
+    And there are questions in the notebook "Cow jokes" for the note:
+      | Note Title   | Question             | Answer | One Wrong Choice |
+      | The cow joke | What does a cow say? | moo    | woo              |
+    And OpenAI now refines the question to become:
       | Question Stem                   | Correct Choice           | Incorrect Choice 1 | Incorrect Choice 2 |
       | Why did the cow cross the road? | To get to the udder side | To see the chicken | To find grass      |
     When I refine the following question for the note "The cow joke":

@@ -11,7 +11,7 @@ Then('I should see {string} shared in the Bazaar', (notebooks: string) => {
 })
 
 Then('notebook {string} is shared to the Bazaar', (notebookName: string) => {
-  start.testability().shareToBazaar(notebookName)
+  return start.testability().shareToBazaar(notebookName)
 })
 
 Then("there shouldn't be any note edit button", () => {

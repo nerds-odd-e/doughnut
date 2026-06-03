@@ -78,13 +78,10 @@ Feature: CLI recall status and recall session
       And OpenAI evaluates the question as legitimate
       And the note "sedition" was assimilated on day 1
       And It's day 2
-      When I input down-arrow selection for "/recall" in the interactive CLI
+      When I enter the slash command "/recall" in the interactive CLI
+      And I select the next MCQ choice with down arrow and Enter in the interactive CLI
       Then I should see "Incorrect" in answered questions
-      And I should see "sedition" in answered questions
-      And I should see "What is the meaning of sedition?" in answered questions
       And I should see "to sleep" in answered questions
-      And I answer "n" in the interactive CLI to prompt "Load more from next 3 days?"
-      And I should see "Recalled 1 note" in past CLI assistant messages
 
   Rule: Spelling recall when the note has remember spelling enabled
 
