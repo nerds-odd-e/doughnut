@@ -655,9 +655,23 @@ When('I reload the current page for note {string}', (noteTopology: string) => {
   start.assumeNotePage(noteTopology)
 })
 
+const openNoteMarkdownEditor = (noteTopology?: string) => {
+  ;(noteTopology
+    ? start.jumpToNotePage(noteTopology)
+    : start.assumeNotePage()
+  ).openMarkdownContentEditor()
+}
+
 When('I open the note content markdown editor', () => {
-  start.assumeNotePage().openMarkdownContentEditor()
+  openNoteMarkdownEditor()
 })
+
+When(
+  'I open the note content markdown editor on note {string}',
+  (noteTopology: string) => {
+    openNoteMarkdownEditor(noteTopology)
+  }
+)
 
 Then(
   'the note content markdown source should contain {string}',

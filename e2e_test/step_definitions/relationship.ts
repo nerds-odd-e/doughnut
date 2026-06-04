@@ -8,6 +8,10 @@ import type NotePath from '../support/NotePath'
 import start from '../start'
 import { commonSenseSplit } from '../support/string_util'
 
+function onRelationshipNote(noteTopology: string, targetTitle: string) {
+  return start.jumpToNotePage(noteTopology).navigateToReference(targetTitle)
+}
+
 function givenInjectedRelationshipNote(
   relationType: string,
   fromNoteTopic: string,
@@ -56,7 +60,7 @@ When(
 When(
   'I open the relationship from {string} to {string}',
   (sourceNoteTopology: string, targetTitle: string) => {
-    start.jumpToNotePage(sourceNoteTopology).navigateToReference(targetTitle)
+    onRelationshipNote(sourceNoteTopology, targetTitle)
   }
 )
 
@@ -220,10 +224,9 @@ Then(
 When(
   'I change the relationship from {string} to {string} to {string}',
   (noteTopology: string, targetTitle: string, relationType: string) => {
-    start
-      .jumpToNotePage(noteTopology)
-      .navigateToReference(targetTitle)
-      .changeRelationType(relationType)
+    onRelationshipNote(noteTopology, targetTitle).changeRelationType(
+      relationType
+    )
   }
 )
 
@@ -234,9 +237,16 @@ Then('I should be able to delete the relationship', () => {
 When(
   'I delete the relationship from {string} to {string}',
   (noteTopology: string, targetTitle: string) => {
-    start
-      .jumpToNotePage(noteTopology)
-      .navigateToReference(targetTitle)
-      .deleteNote()
+    onRelationshipNote(noteTopology, targetTitle).deleteNote()
+  }
+)
+
+When(
+  'I delete the relationship from {string} to {string} and reduce it to a property of the source',
+  (noteTopology: string, targetTitle: string) => {
+    onRelationshipNote(
+      noteTopology,
+      targetTitle
+    ).deleteNoteAndReduceToSourceProperty()
   }
 )

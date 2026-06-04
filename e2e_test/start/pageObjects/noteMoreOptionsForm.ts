@@ -44,26 +44,27 @@ export const makeSureNoteMoreOptionsFormIsOpen = () => {
   return noteMoreOptionsPage()
 }
 
+const deleteNoteWithConfirmation = (confirmButtonName: string) => {
+  visibleMoreOptionsButton(titles.delete).click()
+  cy.findByRole('button', { name: confirmButtonName }).click()
+  pageIsNotLoading()
+}
+
 const noteMoreOptionsPage = () => {
   return {
     deleteNote() {
-      visibleMoreOptionsButton(titles.delete).click()
-      cy.findByRole('button', { name: 'OK' }).click()
-      pageIsNotLoading()
+      deleteNoteWithConfirmation('OK')
     },
     deleteNoteAndLeaveReferencesAsDeadLinks() {
-      visibleMoreOptionsButton(titles.delete).click()
-      cy.findByRole('button', {
-        name: 'Leave all references as dead link',
-      }).click()
-      pageIsNotLoading()
+      deleteNoteWithConfirmation('Leave all references as dead link')
     },
     deleteNoteAndRemoveFromReferenceProperties() {
-      visibleMoreOptionsButton(titles.delete).click()
-      cy.findByRole('button', {
-        name: 'Remove from properties of references (undo will not recover the removed property)',
-      }).click()
-      pageIsNotLoading()
+      deleteNoteWithConfirmation(
+        'Remove from properties of references (undo will not recover the removed property)'
+      )
+    },
+    deleteNoteAndReduceToSourceProperty() {
+      deleteNoteWithConfirmation('Reduce to a property of the source')
     },
     openQuestionList() {
       visibleMoreOptionsButton(titles.questions).click()

@@ -95,7 +95,7 @@ End state: choosing reduce when "Moon" already has an `a part of` property shows
 
 ## Status
 
-- Phase 1 — planned
+- Phase 1 — done
 - Phase 2 — planned
 - Phase 3 — planned
 - Phase 4 — planned

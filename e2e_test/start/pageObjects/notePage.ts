@@ -549,6 +549,9 @@ export const assumeNotePage = (
     deleteNoteAndRemoveFromReferenceProperties() {
       this.moreOptions().deleteNoteAndRemoveFromReferenceProperties()
     },
+    deleteNoteAndReduceToSourceProperty() {
+      this.moreOptions().deleteNoteAndReduceToSourceProperty()
+    },
     openQuestionList() {
       return this.moreOptions().openQuestionList()
     },
