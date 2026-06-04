@@ -99,7 +99,7 @@ End state: choosing reduce when "Moon" already has an `a part of` property shows
 - Phase 2 — done
 - Phase 3 — done
 - Phase 4 — done
-- Phase 5 — planned
+- Phase 5 — done
 
 ## Notes for executor
 

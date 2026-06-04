@@ -29,3 +29,15 @@ Feature: relationship edit and remove
     When I open the note content markdown editor on note "Moon"
     Then the note content markdown source should contain "a part of: '[[Earth]]'"
     And I should see "Moon" has no relationship to "Earth"
+
+  Scenario: reduce to source property fails when source already has that property
+    When I update note "Moon" content using markdown to become:
+      """
+      ---
+      a part of: "[[Mars]]"
+      ---
+
+      """
+    When I delete the relationship from "Moon" to "Earth" and reduce it to a property of the source
+    Then I should see an error toast containing 'already has a property named "a part of"'
+    And I should see "Moon" has relationship "a part of" "Earth"

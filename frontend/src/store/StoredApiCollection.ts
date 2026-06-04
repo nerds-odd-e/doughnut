@@ -494,7 +494,7 @@ export default class StoredApiCollection implements StoredApi {
       })
     )
     if (error || !res) {
-      throw new Error(toErrorMessage(error, "Failed to delete note"))
+      return
     }
     this.noteEditingHistory.deleteNote(noteId)
     this.storage.removeNoteRealm(noteId)

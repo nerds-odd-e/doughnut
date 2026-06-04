@@ -696,6 +696,15 @@ When('I view the note content as markdown', () => {
 })
 
 Then(
+  'I should see an error toast containing {string}',
+  (messageSubstring: string) => {
+    cy.contains('.Vue-Toastification__toast--error', messageSubstring, {
+      timeout: 10000,
+    }).should('be.visible')
+  }
+)
+
+Then(
   'I should see the rich content elements in the note content:',
   (data: DataTable) => {
     start.assumeNotePage().expectRichContent(data.hashes())

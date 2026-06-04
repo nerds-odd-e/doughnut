@@ -3,7 +3,11 @@ import NoteMoreOptionsForm from "@/components/notes/widgets/NoteMoreOptionsForm.
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+import helper, {
+  mockSdkService,
+  wrapSdkError,
+  wrapSdkResponse,
+} from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
@@ -14,10 +18,22 @@ import {
   useAssimilationView,
 } from "@/composables/useAssimilationView"
 import { wikiTitleFromInnerAndNoteId } from "@/utils/wikiPropertyValueField"
+import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
+import { setupGlobalClient } from "@/managedApi/clientSetup"
+
+const mockToast = {
+  error: vi.fn(),
+  warning: vi.fn(),
+}
+
+vi.mock("vue-toastification", () => ({
+  useToast: () => mockToast,
+}))
 
 let renderer: RenderingHelper<typeof NoteMoreOptionsForm>
 let router: ReturnType<typeof createRouter>
 let deleteNoteSpy: ReturnType<typeof mockSdkService>
+const apiStatus: ApiStatus = { states: [] }
 
 afterEach(() => {
   document.body.innerHTML = ""
@@ -27,6 +43,9 @@ afterEach(() => {
 beforeEach(() => {
   resetAssimilationViewForTests()
   usePopups().popups.register({ popupInfo: [] })
+  setupGlobalClient(apiStatus)
+  mockToast.error.mockClear()
+  mockToast.warning.mockClear()
   deleteNoteSpy = mockSdkService(NoteController, "deleteNote", undefined)
   router = createRouter({
     history: createWebHistory(),
@@ -128,6 +147,53 @@ describe("NoteMoreOptionsForm", () => {
           sourcePropertyKey: "a part of",
         },
       })
+    })
+
+    it("shows conflict message when reduce-to-property delete returns 409", async () => {
+      const conflictMessage =
+        'The source note already has a property named "a part of".'
+      deleteNoteSpy.mockResolvedValue({
+        ...wrapSdkError({
+          message: conflictMessage,
+          errorType: "RESOURCE_CONFLICT",
+        }),
+        response: { status: 409 } as Response,
+      })
+      const moonId = 501
+      const earthId = 502
+      const relationRealm = {
+        ...makeMe.aNoteRealm
+          .content(
+            relationshipNoteContent("a-part-of", "[[Moon]]", "[[Earth]]")
+          )
+          .please(),
+        wikiTitles: [
+          wikiTitleFromInnerAndNoteId("Moon", moonId),
+          wikiTitleFromInnerAndNoteId("Earth", earthId),
+        ],
+      }
+      useStorageAccessor().value.refreshNoteRealm({
+        ...relationRealm,
+        references: [makeMe.aNoteRealm.please().note.noteTopology],
+      })
+      const wrapper = renderer.withProps({ note: relationRealm.note }).mount()
+
+      await flushPromises()
+
+      const deleteButton = wrapper.find('button[title="Delete note"]')
+      await deleteButton.trigger("click")
+      await flushPromises()
+
+      usePopups().popups.done("REDUCE_TO_SOURCE_PROPERTY")
+      await flushPromises()
+
+      expect(mockToast.error).toHaveBeenCalledWith(
+        conflictMessage,
+        expect.objectContaining({ timeout: 3000 })
+      )
+      expect(
+        useStorageAccessor().value.refOfNoteRealm(relationRealm.id).value
+      ).toBeDefined()
     })
 
     it("uses confirm when relationship note source does not resolve", async () => {
