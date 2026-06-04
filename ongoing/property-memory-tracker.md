@@ -88,7 +88,7 @@ Capability-named permanent artifacts:
 
 **Outcome:** Generating a question for a property tracker instructs the AI to **focus on that one property**, inferring its meaning from the **property name, note content, and link targets** (`wikiTitles`). Replaces the Phase-1 interim note-level question.
 
-- **2a — Prompt focuses on the property** *(behavior)*
+- **2a — Prompt focuses on the property** *(behavior)* — **Status: done**
   - Thread `propertyKey` from `MemoryTracker` through `RecallQuestionService` → `AiQuestionGenerator` → `NoteQuestionGenerationService` → `QuestionGenerationRequestBuilder` (single commit so the value is consumed, not dead).
   - In `QuestionGenerationRequestBuilder`, when a property key is present, add an instruction block: focus on property `"<key>"` of the focus note; infer meaning from the property name, the note content, and the listed link targets. Confirm link targets (`wikiTitles`) are in the focus context (extend the context if missing).
   - **Tests (this commit):** backend unit on the builder (black-box: note + property key → request contains the focus-on-property instruction, the property key/value, and link targets). **Commit.**

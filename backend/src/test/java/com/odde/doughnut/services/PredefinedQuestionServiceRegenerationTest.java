@@ -43,10 +43,11 @@ class PredefinedQuestionServiceRegenerationTest {
 
   @Test
   void savesOriginalAsContestedThenRegeneratedQuestion() {
-    when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any(), any())).thenReturn(originalMcq);
+    when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any(), any(), any()))
+        .thenReturn(originalMcq);
     contestResult.feasibleQuestion = true;
     when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(contestResult);
-    when(aiQuestionGenerator.regenerateQuestion(any(), any(), any(), any()))
+    when(aiQuestionGenerator.regenerateQuestion(any(), any(), any(), any(), any()))
         .thenReturn(regeneratedMcq);
 
     ArgumentCaptor<PredefinedQuestion> questionCaptor =

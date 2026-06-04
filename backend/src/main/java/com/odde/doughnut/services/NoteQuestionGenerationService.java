@@ -28,17 +28,29 @@ public class NoteQuestionGenerationService {
 
   public MCQWithAnswer generateQuestion(Note note, String additionalMessage)
       throws JsonProcessingException {
-    return generateQuestion(note, additionalMessage, null);
+    return generateQuestion(note, additionalMessage, null, null);
   }
 
   public MCQWithAnswer generateQuestion(Note note, String additionalMessage, Long contextSeed)
       throws JsonProcessingException {
-    return generateQuestionWithResponses(note, additionalMessage, contextSeed);
+    return generateQuestion(note, additionalMessage, contextSeed, null);
+  }
+
+  public MCQWithAnswer generateQuestion(
+      Note note, String additionalMessage, Long contextSeed, String propertyKey)
+      throws JsonProcessingException {
+    return generateQuestionWithResponses(note, additionalMessage, contextSeed, propertyKey);
   }
 
   public StructuredResponseCreateParams<MCQWithAnswer> buildQuestionGenerationRequest(
       Note note, String additionalMessage) {
-    return requestBuilder.buildQuestionGenerationResponseRequest(note, additionalMessage, null);
+    return buildQuestionGenerationRequest(note, additionalMessage, null);
+  }
+
+  public StructuredResponseCreateParams<MCQWithAnswer> buildQuestionGenerationRequest(
+      Note note, String additionalMessage, String propertyKey) {
+    return requestBuilder.buildQuestionGenerationResponseRequest(
+        note, additionalMessage, null, propertyKey);
   }
 
   public <T> OpenAIResponseRequestBuilder<T> openAiResponseRequestForSharedNoteContext(
@@ -48,9 +60,10 @@ public class NoteQuestionGenerationService {
   }
 
   private MCQWithAnswer generateQuestionWithResponses(
-      Note note, String additionalMessage, Long contextSeed) {
+      Note note, String additionalMessage, Long contextSeed, String propertyKey) {
     StructuredResponseCreateParams<MCQWithAnswer> responseRequest =
-        requestBuilder.buildQuestionGenerationResponseRequest(note, additionalMessage, contextSeed);
+        requestBuilder.buildQuestionGenerationResponseRequest(
+            note, additionalMessage, contextSeed, propertyKey);
 
     return openAiApiHandler
         .requestAndGetStructuredResponseResult(responseRequest)

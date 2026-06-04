@@ -64,9 +64,13 @@ public class PredefinedQuestionService {
   }
 
   public PredefinedQuestion generateAFeasibleQuestion(Note note) {
+    return generateAFeasibleQuestion(note, null);
+  }
+
+  public PredefinedQuestion generateAFeasibleQuestion(Note note, String propertyKey) {
     Long contextSeedBoxed = Long.valueOf(ThreadLocalRandom.current().nextLong());
     MCQWithAnswer mcqWithAnswer =
-        aiQuestionGenerator.getAiGeneratedQuestion(note, null, contextSeedBoxed);
+        aiQuestionGenerator.getAiGeneratedQuestion(note, null, contextSeedBoxed, propertyKey);
     if (mcqWithAnswer == null) {
       return null;
     }
@@ -85,7 +89,8 @@ public class PredefinedQuestionService {
 
       Long regSeedBoxed = Long.valueOf(ThreadLocalRandom.current().nextLong());
       MCQWithAnswer regeneratedQuestion =
-          aiQuestionGenerator.regenerateQuestion(contestResult, note, mcqWithAnswer, regSeedBoxed);
+          aiQuestionGenerator.regenerateQuestion(
+              contestResult, note, mcqWithAnswer, regSeedBoxed, propertyKey);
       if (regeneratedQuestion != null) {
         PredefinedQuestion regenerated =
             PredefinedQuestion.fromMCQWithAnswer(regeneratedQuestion, note, regSeedBoxed);

@@ -58,7 +58,8 @@ public class RecallQuestionService {
 
   private RecallPrompt generateNewRecallPrompt(MemoryTracker memoryTracker) {
     Note note = memoryTracker.getNote();
-    PredefinedQuestion question = predefinedQuestionService.generateAFeasibleQuestion(note);
+    PredefinedQuestion question =
+        predefinedQuestionService.generateAFeasibleQuestion(note, memoryTracker.getPropertyKey());
     if (question == null) {
       return null;
     }
@@ -72,16 +73,16 @@ public class RecallQuestionService {
       RecallPrompt existingRecallPrompt) {
     long contextSeed = ThreadLocalRandom.current().nextLong();
     Long contextSeedBoxed = Long.valueOf(contextSeed);
+    MemoryTracker memoryTracker = existingRecallPrompt.getMemoryTracker();
     MCQWithAnswer MCQWithAnswer =
         aiQuestionGenerator.regenerateQuestion(
-            contestResult, note, mcqWithAnswer, contextSeedBoxed);
+            contestResult, note, mcqWithAnswer, contextSeedBoxed, memoryTracker.getPropertyKey());
     if (MCQWithAnswer == null) {
       return null;
     }
     PredefinedQuestion question =
         PredefinedQuestion.fromMCQWithAnswer(MCQWithAnswer, note, contextSeedBoxed);
     entityPersister.save(question);
-    MemoryTracker memoryTracker = existingRecallPrompt.getMemoryTracker();
     return createARecallPromptFromQuestion(question, memoryTracker);
   }
 

@@ -10,6 +10,7 @@ import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.NoteRealmService;
 import com.odde.doughnut.services.PredefinedQuestionService;
 import com.odde.doughnut.services.QuestionGenerationRequestBuilder;
+import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
@@ -37,6 +38,7 @@ class PredefinedQuestionController {
   private final FocusContextMarkdownRenderer focusContextMarkdownRenderer;
   private final NoteRealmService noteRealmService;
   private final NoteRepository noteRepository;
+  private final WikiTitleCacheService wikiTitleCacheService;
 
   @Autowired
   public PredefinedQuestionController(
@@ -48,12 +50,14 @@ class PredefinedQuestionController {
       FocusContextRetrievalService focusContextRetrievalService,
       FocusContextMarkdownRenderer focusContextMarkdownRenderer,
       NoteRealmService noteRealmService,
-      NoteRepository noteRepository) {
+      NoteRepository noteRepository,
+      WikiTitleCacheService wikiTitleCacheService) {
     this.predefinedQuestionService = predefinedQuestionService;
     this.focusContextRetrievalService = focusContextRetrievalService;
     this.focusContextMarkdownRenderer = focusContextMarkdownRenderer;
     this.noteRealmService = noteRealmService;
     this.noteRepository = noteRepository;
+    this.wikiTitleCacheService = wikiTitleCacheService;
     this.objectMapper = objectMapper;
     this.authorizationService = authorizationService;
     this.globalSettingsService = globalSettingsService;
@@ -110,9 +114,11 @@ class PredefinedQuestionController {
             focusContextRetrievalService,
             focusContextMarkdownRenderer,
             noteRealmService,
-            noteRepository);
+            noteRepository,
+            wikiTitleCacheService,
+            authorizationService);
     StructuredResponseCreateParams<MCQWithAnswer> params =
-        requestBuilder.buildQuestionGenerationResponseRequest(note, null, null);
+        requestBuilder.buildQuestionGenerationResponseRequest(note, null, null, null);
     return serializeResponseCreateParams(params);
   }
 

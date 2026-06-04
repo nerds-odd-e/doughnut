@@ -49,7 +49,7 @@ class AiQuestionGeneratorShuffleTest {
 
     List<String> shuffledChoices = Arrays.asList("6", "4", "5", "3");
     doReturn(shuffledChoices).when(mockedRandomizer).shuffle(any());
-    when(noteQuestionGenerationService.generateQuestion(eq(note), eq(null), eq(null)))
+    when(noteQuestionGenerationService.generateQuestion(eq(note), eq(null), eq(null), eq(null)))
         .thenReturn(originalQuestion);
 
     MCQWithAnswer result = generator.getAiGeneratedQuestion(note, null);

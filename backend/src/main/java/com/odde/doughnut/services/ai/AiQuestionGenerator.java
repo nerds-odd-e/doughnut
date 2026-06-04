@@ -51,14 +51,20 @@ public class AiQuestionGenerator {
   }
 
   public MCQWithAnswer getAiGeneratedQuestion(Note note, String additionalMessage) {
-    return getAiGeneratedQuestion(note, additionalMessage, null);
+    return getAiGeneratedQuestion(note, additionalMessage, null, null);
   }
 
   public MCQWithAnswer getAiGeneratedQuestion(
       Note note, String additionalMessage, Long contextSeed) {
+    return getAiGeneratedQuestion(note, additionalMessage, contextSeed, null);
+  }
+
+  public MCQWithAnswer getAiGeneratedQuestion(
+      Note note, String additionalMessage, Long contextSeed, String propertyKey) {
     try {
       MCQWithAnswer original =
-          noteQuestionGenerationService.generateQuestion(note, additionalMessage, contextSeed);
+          noteQuestionGenerationService.generateQuestion(
+              note, additionalMessage, contextSeed, propertyKey);
       if (original != null && original.isChoicesMayBeShuffled()) {
         return shuffleChoices(original);
       }
@@ -113,8 +119,17 @@ public class AiQuestionGenerator {
       Note note,
       MCQWithAnswer mcqWithAnswer,
       Long contextSeed) {
+    return regenerateQuestion(contestResult, note, mcqWithAnswer, contextSeed, null);
+  }
+
+  public MCQWithAnswer regenerateQuestion(
+      QuestionContestResult contestResult,
+      Note note,
+      MCQWithAnswer mcqWithAnswer,
+      Long contextSeed,
+      String propertyKey) {
     String additionalMessage =
         AiToolFactory.buildRegenerateQuestionMessage(contestResult, mcqWithAnswer);
-    return getAiGeneratedQuestion(note, additionalMessage, contextSeed);
+    return getAiGeneratedQuestion(note, additionalMessage, contextSeed, propertyKey);
   }
 }
