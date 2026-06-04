@@ -105,7 +105,7 @@ Capability-named permanent artifacts:
 
 **Outcome:** The memory tracker detail page and the recall "note under question" header indicate the note **and** the focused property prominently (e.g. a `Focused property: a part of` badge), distinct from note-level trackers. `propertyKey` already rides on the `MemoryTracker` payload from Phase 1, so this is display-only.
 
-- **3a — Detail page indicator** *(behavior)*
+- **3a — Detail page indicator** *(behavior)* — **Status: done**
   - Render a focused-property indicator in `MemoryTrackerPageView.vue` for property trackers; omit for note-level.
   - **Tests (this commit):** frontend unit — indicator shown for a property tracker, absent for a note-level tracker. **Commit.**
 

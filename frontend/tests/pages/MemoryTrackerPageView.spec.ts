@@ -26,6 +26,47 @@ describe("MemoryTrackerPageView", () => {
     )
   })
 
+  it("shows focused property indicator for property memory trackers", async () => {
+    const memoryTracker = makeMe.aMemoryTracker.please()
+    memoryTracker.propertyKey = "a part of"
+
+    const wrapper = helper
+      .component(MemoryTrackerPageView)
+      .withProps({
+        recallPrompts: [],
+        memoryTracker,
+        memoryTrackerId: 1,
+      })
+      .mount()
+
+    await flushPromises()
+
+    expect(
+      wrapper.find('[data-testid="focused-property-indicator"]').exists()
+    ).toBe(true)
+    expect(wrapper.text()).toContain("Focused property: a part of")
+  })
+
+  it("omits focused property indicator for note-level memory trackers", async () => {
+    const memoryTracker = makeMe.aMemoryTracker.please()
+
+    const wrapper = helper
+      .component(MemoryTrackerPageView)
+      .withProps({
+        recallPrompts: [],
+        memoryTracker,
+        memoryTrackerId: 1,
+      })
+      .mount()
+
+    await flushPromises()
+
+    expect(
+      wrapper.find('[data-testid="focused-property-indicator"]').exists()
+    ).toBe(false)
+    expect(wrapper.text()).not.toContain("Focused property:")
+  })
+
   it("displays thinking time for answered questions", async () => {
     const recallPrompt = makeMe.aRecallPrompt
       .withQuestionStem("Test question")

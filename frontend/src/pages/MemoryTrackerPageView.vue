@@ -77,6 +77,13 @@
         <span>Remove from Recall</span>
       </button>
     </div>
+    <p
+      v-if="focusedPropertyKey"
+      class="mb-4 text-sm font-medium"
+      data-testid="focused-property-indicator"
+    >
+      Focused property: {{ focusedPropertyKey }}
+    </p>
     <div v-if="memoryTracker.note" class="mb-6">
       <NoteUnderQuestion
         v-bind="{
@@ -196,6 +203,11 @@ const props = defineProps({
 const memoryTrackerBreadcrumbNotebookId = computed(
   () => props.recallPrompts.find((p) => p.notebook)?.notebook.id
 )
+
+const focusedPropertyKey = computed(() => {
+  const key = props.memoryTracker.propertyKey
+  return key ? key : undefined
+})
 
 const emit = defineEmits<{
   (e: "removedFromTracking"): void
