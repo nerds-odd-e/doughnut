@@ -1,7 +1,7 @@
 <template>
   <tr>
     <td :class="{ 'strikethrough': isSkipped }">
-      {{ localMemoryTracker.spelling ? 'spelling' : 'normal' }}
+      {{ trackerTypeLabel }}
     </td>
     <td :class="{ 'strikethrough': isSkipped }">
       <span class="statistics-value">{{ localMemoryTracker.recallCount }}</span>
@@ -34,6 +34,14 @@ const localMemoryTracker = ref<MemoryTracker>(props.modelValue)
 const isSkipped = computed(
   () => localMemoryTracker.value.removedFromTracking === true
 )
+
+const trackerTypeLabel = computed(() => {
+  const { propertyKey, spelling } = localMemoryTracker.value
+  if (propertyKey) {
+    return `property: ${propertyKey}`
+  }
+  return spelling ? "spelling" : "normal"
+})
 
 watch(
   () => props.modelValue,

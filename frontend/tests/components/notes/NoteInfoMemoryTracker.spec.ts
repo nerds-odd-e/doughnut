@@ -32,6 +32,22 @@ describe("NoteInfoMemoryTracker", () => {
     expect(wrapper.text()).toContain("3")
   })
 
+  it("should display property memory tracker type", () => {
+    const memoryTracker = makeMe.aMemoryTracker
+      .removedFromTracking(false)
+      .please()
+    memoryTracker.propertyKey = "topic"
+
+    wrapper = helper
+      .component(NoteInfoMemoryTracker)
+      .withProps({
+        modelValue: memoryTracker,
+      })
+      .mount({ attachTo: document.body })
+
+    expect(wrapper.text()).toContain("property: topic")
+  })
+
   it("should display spelling memory tracker", () => {
     const memoryTracker = makeMe.aMemoryTracker
       .removedFromTracking(false)

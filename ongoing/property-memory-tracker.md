@@ -76,9 +76,11 @@ Capability-named permanent artifacts:
   - Add an expandable **Properties** section to `AssimilationSettings.vue` listing **all** frontmatter properties (via `noteContentFrontmatter.ts`), each with an **Assimilate** button that calls `AssimilationController.assimilate({ noteId, propertyKey })` and refreshes note-info.
   - **Tests (this commit):** frontend unit — section renders a row + button per property; clicking calls the API with the right `propertyKey`. **Commit.**
 
-- **1e — Tracker-list property label + close E2E** *(behavior)*
+- **1e — Tracker-list property label + close E2E** *(behavior)* — **Status: done**
   - `NoteInfoMemoryTracker.vue` Type column shows `property: <key>` when `propertyKey` is set (else `normal`/`spelling` as today).
   - **Tests (this commit):** frontend unit for the label; rerun `property_memory_tracker.feature --spec` until green, then **remove `@wip`**. **Commit.** → **Phase 1 deploy gate.**
+
+**Phase 1 — Status: complete** (deploy gate: let CD deploy before Phase 2).
 
 ---
 

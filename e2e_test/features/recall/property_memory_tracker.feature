@@ -1,4 +1,3 @@
-@wip
 @disableOpenAiService
 @mockBrowserTime
 Feature: Property memory tracker
