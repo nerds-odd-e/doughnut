@@ -91,7 +91,10 @@ class NoteController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
     noteService.destroy(
-        note, noteDeleteDTO.getReferenceHandling(), authorizationService.getCurrentUser());
+        note,
+        noteDeleteDTO.getReferenceHandling(),
+        noteDeleteDTO.getSourcePropertyKey(),
+        authorizationService.getCurrentUser());
     entityPersister.flush();
     return List.of();
   }

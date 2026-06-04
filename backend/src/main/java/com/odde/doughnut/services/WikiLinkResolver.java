@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,10 @@ public class WikiLinkResolver {
   }
 
   public record ResolvedWikiLink(String linkText, Note targetNote) {}
+
+  public Optional<Note> resolveWikiLinkToken(String token, Note focusNote, User viewer) {
+    return Optional.ofNullable(resolveToken(token, viewer, focusNote));
+  }
 
   public List<ResolvedWikiLink> resolveWikiLinksForCache(Note focusNote, User viewer) {
     String content = focusNote.getContent();

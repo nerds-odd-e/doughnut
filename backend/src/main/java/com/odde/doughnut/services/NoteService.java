@@ -1,6 +1,8 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.Frontmatter;
 import com.odde.doughnut.algorithms.NoteContentMarkdown;
+import com.odde.doughnut.algorithms.WikiLinkMarkdown;
 import com.odde.doughnut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.doughnut.controllers.dto.NoteImageUploadDTO;
 import com.odde.doughnut.controllers.dto.NoteImageUploadResult;
@@ -13,6 +15,7 @@ import com.odde.doughnut.entities.repositories.ImageRepository;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.ImageBuilder;
@@ -24,7 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class NoteService {
@@ -32,15 +37,21 @@ public class NoteService {
   private final MemoryTrackerRepository memoryTrackerRepository;
   private final NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
   private final WikiTitleCacheService wikiTitleCacheService;
+  private final WikiLinkResolver wikiLinkResolver;
+  private final AuthorizationService authorizationService;
   private final ImageRepository imageRepository;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
+
+  private static final String RELATIONSHIP_NOTE_TYPE = "relationship";
 
   public NoteService(
       NoteRepository noteRepository,
       MemoryTrackerRepository memoryTrackerRepository,
       NoteWikiTitleCacheRepository noteWikiTitleCacheRepository,
       WikiTitleCacheService wikiTitleCacheService,
+      WikiLinkResolver wikiLinkResolver,
+      AuthorizationService authorizationService,
       ImageRepository imageRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings) {
@@ -48,6 +59,8 @@ public class NoteService {
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.noteWikiTitleCacheRepository = noteWikiTitleCacheRepository;
     this.wikiTitleCacheService = wikiTitleCacheService;
+    this.wikiLinkResolver = wikiLinkResolver;
+    this.authorizationService = authorizationService;
     this.imageRepository = imageRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
@@ -133,8 +146,18 @@ public class NoteService {
   }
 
   public void destroy(Note note, NoteDeleteReferenceHandling referenceHandling, User viewer) {
+    destroy(note, referenceHandling, null, viewer);
+  }
+
+  public void destroy(
+      Note note,
+      NoteDeleteReferenceHandling referenceHandling,
+      String sourcePropertyKey,
+      User viewer) {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    if (referenceHandling == NoteDeleteReferenceHandling.REMOVE_FROM_PROPERTIES) {
+    if (referenceHandling == NoteDeleteReferenceHandling.REDUCE_TO_SOURCE_PROPERTY) {
+      reduceRelationNoteToSourceProperty(note, sourcePropertyKey, viewer, currentUTCTimestamp);
+    } else if (referenceHandling == NoteDeleteReferenceHandling.REMOVE_FROM_PROPERTIES) {
       removeNoteLinksFromReferrerProperties(note, viewer, currentUTCTimestamp);
     }
     note.setUpdatedAt(currentUTCTimestamp);
@@ -144,6 +167,79 @@ public class NoteService {
       mt.setDeletedAt(currentUTCTimestamp);
       entityPersister.merge(mt);
     }
+  }
+
+  private void reduceRelationNoteToSourceProperty(
+      Note relationNote, String propertyKey, User viewer, Timestamp updatedAt) {
+    if (propertyKey == null || propertyKey.isBlank()) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "Property key is required to reduce a relationship note.");
+    }
+    RelationshipFrontmatter relationship =
+        parseRelationshipFrontmatter(relationNote.getContent())
+            .orElseThrow(
+                () ->
+                    new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "This note is not a relationship note."));
+    Note sourceNote =
+        resolveRelationshipSourceNote(relationNote, relationship.sourceScalar(), viewer)
+            .orElseThrow(
+                () ->
+                    new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Could not resolve the relationship source note."));
+    try {
+      authorizationService.assertAuthorization(viewer, sourceNote);
+    } catch (UnexpectedNoAccessRightException e) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "Could not resolve the relationship source note.");
+    }
+    NoteContentMarkdown.LeadingFrontmatterAddPropertyResult addResult =
+        NoteContentMarkdown.addPropertyToLeadingFrontmatter(
+            sourceNote.getContent(), propertyKey, relationship.targetScalar());
+    switch (addResult) {
+      case NoteContentMarkdown.LeadingFrontmatterAddPropertyResult.ExistingKeyConflict ignored ->
+          throw new ResponseStatusException(
+              HttpStatus.CONFLICT,
+              "The source note already has a property named \"" + propertyKey + "\".");
+      case NoteContentMarkdown.LeadingFrontmatterAddPropertyResult.Updated updated -> {
+        sourceNote.setContent(updated.content());
+        sourceNote.setUpdatedAt(updatedAt);
+        entityPersister.merge(sourceNote);
+        deleteOrphanImagesForPersistedContent(sourceNote);
+        wikiTitleCacheService.refreshForNote(sourceNote, viewer);
+      }
+    }
+  }
+
+  private record RelationshipFrontmatter(String sourceScalar, String targetScalar) {}
+
+  private Optional<RelationshipFrontmatter> parseRelationshipFrontmatter(String content) {
+    return NoteContentMarkdown.splitLeadingFrontmatter(content == null ? "" : content)
+        .flatMap(
+            lf -> {
+              Frontmatter fm = lf.frontmatter();
+              if (!RELATIONSHIP_NOTE_TYPE.equalsIgnoreCase(
+                  fm.getString("type").map(String::trim).orElse(""))) {
+                return Optional.empty();
+              }
+              Optional<String> source =
+                  fm.getString("source").map(String::trim).filter(s -> !s.isEmpty());
+              Optional<String> target =
+                  fm.getString("target").map(String::trim).filter(s -> !s.isEmpty());
+              if (source.isEmpty() || target.isEmpty()) {
+                return Optional.empty();
+              }
+              return Optional.of(new RelationshipFrontmatter(source.get(), target.get()));
+            });
+  }
+
+  private Optional<Note> resolveRelationshipSourceNote(
+      Note relationNote, String sourceScalar, User viewer) {
+    List<String> linkTokens = WikiLinkMarkdown.innerTitlesInOccurrenceOrder(sourceScalar);
+    if (linkTokens.isEmpty()) {
+      return Optional.empty();
+    }
+    return wikiLinkResolver.resolveWikiLinkToken(linkTokens.getFirst(), relationNote, viewer);
   }
 
   private void removeNoteLinksFromReferrerProperties(

@@ -25,8 +25,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.web.server.ResponseStatusException;
 
 class NoteControllerTests extends ControllerTestBase {
   @Autowired NoteRepository noteRepository;
@@ -55,6 +57,26 @@ class NoteControllerTests extends ControllerTestBase {
     NoteDeleteDTO dto = new NoteDeleteDTO();
     dto.setReferenceHandling(NoteDeleteReferenceHandling.REMOVE_FROM_PROPERTIES);
     return dto;
+  }
+
+  private NoteDeleteDTO reduceToSourcePropertyDeleteRequest(String sourcePropertyKey) {
+    NoteDeleteDTO dto = new NoteDeleteDTO();
+    dto.setReferenceHandling(NoteDeleteReferenceHandling.REDUCE_TO_SOURCE_PROPERTY);
+    dto.setSourcePropertyKey(sourcePropertyKey);
+    return dto;
+  }
+
+  private static String relationshipNoteContent(String sourceTitle, String targetTitle) {
+    return "---\n"
+        + "type: relationship\n"
+        + "relation: a-part-of\n"
+        + "source: \"[["
+        + sourceTitle
+        + "]]\"\n"
+        + "target: \"[["
+        + targetTitle
+        + "]]\"\n"
+        + "---\n\n";
   }
 
   @Nested
@@ -308,6 +330,50 @@ class NoteControllerTests extends ControllerTestBase {
                 "uploadImage", "x.pdf", "application/pdf", "not-empty".getBytes()));
         assertThat(factory.getValidator().validate(dto), is(not(empty())));
       }
+    }
+  }
+
+  @Nested
+  class DeleteNoteReduceToSourceProperty {
+    @Test
+    void shouldAddRelationLabelPropertyToSourceAndSoftDeleteRelationNote()
+        throws UnexpectedNoAccessRightException {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      Note moon = makeMe.aNote("Moon").notebook(nb).please();
+      Note earth = makeMe.aNote("Earth").notebook(nb).please();
+      Note relation =
+          makeMe.aNote().notebook(nb).content(relationshipNoteContent("Moon", "Earth")).please();
+      wikiTitleCacheService.refreshForNote(relation, currentUser.getUser());
+
+      controller.deleteNote(relation, reduceToSourcePropertyDeleteRequest("a part of"));
+
+      assertThat(relation.getDeletedAt(), is(not(nullValue())));
+      assertThat(moon.getContent(), containsString("a part of"));
+      assertThat(moon.getContent(), containsString("[[Earth]]"));
+      assertThat(earth.getContent(), not(containsString("a part of")));
+    }
+
+    @Test
+    void shouldAbortReduceWhenSourceAlreadyHasPropertyKey() {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      Note moon =
+          makeMe.aNote("Moon").notebook(nb).content("---\na part of: \"[[Mars]]\"\n---\n").please();
+      makeMe.aNote("Earth").notebook(nb).please();
+      Note relation =
+          makeMe.aNote().notebook(nb).content(relationshipNoteContent("Moon", "Earth")).please();
+      String moonContentBefore = moon.getContent();
+
+      ResponseStatusException ex =
+          assertThrows(
+              ResponseStatusException.class,
+              () ->
+                  controller.deleteNote(
+                      relation, reduceToSourcePropertyDeleteRequest("a part of")));
+
+      assertThat(ex.getStatusCode(), equalTo(HttpStatus.CONFLICT));
+      assertThat(ex.getReason(), containsString("a part of"));
+      assertThat(relation.getDeletedAt(), is(nullValue()));
+      assertThat(moon.getContent(), equalTo(moonContentBefore));
     }
   }
 

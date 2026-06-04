@@ -3645,6 +3645,9 @@ components:
           enum:
           - REMOVE_FROM_PROPERTIES
           - LEAVE_DEAD_LINKS
+          - REDUCE_TO_SOURCE_PROPERTY
+        sourcePropertyKey:
+          type: string
       required:
       - referenceHandling
     NotebookUpdateRequest:

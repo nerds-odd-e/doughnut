@@ -371,7 +371,8 @@ export type NoteImageUploadResult = {
 };
 
 export type NoteDeleteDto = {
-    referenceHandling: 'REMOVE_FROM_PROPERTIES' | 'LEAVE_DEAD_LINKS';
+    referenceHandling: 'REMOVE_FROM_PROPERTIES' | 'LEAVE_DEAD_LINKS' | 'REDUCE_TO_SOURCE_PROPERTY';
+    sourcePropertyKey?: string;
 };
 
 export type NotebookUpdateRequest = {
