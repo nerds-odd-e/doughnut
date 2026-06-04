@@ -183,6 +183,39 @@ public final class NoteContentMarkdown {
                     .map(updated -> updated.isEmpty() ? lf.body() : updated.fenced(lf.body())));
   }
 
+  /** Outcome of {@link #addPropertyToLeadingFrontmatter(String, String, String)}. */
+  public sealed interface LeadingFrontmatterAddPropertyResult
+      permits LeadingFrontmatterAddPropertyResult.Updated,
+          LeadingFrontmatterAddPropertyResult.ExistingKeyConflict {
+
+    record Updated(String content) implements LeadingFrontmatterAddPropertyResult {}
+
+    record ExistingKeyConflict() implements LeadingFrontmatterAddPropertyResult {}
+  }
+
+  /**
+   * Appends a scalar property to the first leading YAML frontmatter block, or creates one when
+   * absent. Fails with {@link LeadingFrontmatterAddPropertyResult.ExistingKeyConflict} when a key
+   * already exists (case-insensitive).
+   */
+  public static LeadingFrontmatterAddPropertyResult addPropertyToLeadingFrontmatter(
+      String content, String key, String value) {
+    if (content == null) {
+      content = "";
+    }
+    Optional<LeadingFrontmatter> split = splitLeadingFrontmatter(content);
+    if (split.isPresent()) {
+      LeadingFrontmatter lf = split.get();
+      if (lf.frontmatter().containsKeyIgnoreCase(key)) {
+        return new LeadingFrontmatterAddPropertyResult.ExistingKeyConflict();
+      }
+      return new LeadingFrontmatterAddPropertyResult.Updated(
+          lf.frontmatter().set(key, value).fenced(lf.body()));
+    }
+    return new LeadingFrontmatterAddPropertyResult.Updated(
+        Frontmatter.empty().set(key, value).fenced(content));
+  }
+
   private static String trimOrNull(String s) {
     return s == null ? null : s.trim();
   }

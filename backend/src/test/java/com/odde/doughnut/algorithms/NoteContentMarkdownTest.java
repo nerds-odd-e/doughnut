@@ -209,4 +209,56 @@ class NoteContentMarkdownTest {
     assertThat(
         NoteContentMarkdown.mergeNoteImageScalarsIntoContent(plain, false, "", ""), equalTo(plain));
   }
+
+  @Test
+  void addPropertyToLeadingFrontmatter_appends_to_existing_frontmatter() {
+    String content = "---\nsource: \"[[Moon]]\"\n---\nBody";
+
+    NoteContentMarkdown.LeadingFrontmatterAddPropertyResult result =
+        NoteContentMarkdown.addPropertyToLeadingFrontmatter(content, "a part of", "[[Earth]]");
+
+    assertThat(
+        result,
+        equalTo(
+            new NoteContentMarkdown.LeadingFrontmatterAddPropertyResult.Updated(
+                "---\n" + "source: '[[Moon]]'\n" + "a part of: '[[Earth]]'\n" + "---\n" + "Body")));
+  }
+
+  @Test
+  void addPropertyToLeadingFrontmatter_creates_frontmatter_when_none() {
+    String content = "Hello";
+
+    NoteContentMarkdown.LeadingFrontmatterAddPropertyResult result =
+        NoteContentMarkdown.addPropertyToLeadingFrontmatter(content, "a part of", "[[Earth]]");
+
+    assertThat(
+        result,
+        equalTo(
+            new NoteContentMarkdown.LeadingFrontmatterAddPropertyResult.Updated(
+                "---\n" + "a part of: '[[Earth]]'\n" + "---\n" + "Hello")));
+  }
+
+  @Test
+  void addPropertyToLeadingFrontmatter_reports_conflict_when_key_exists() {
+    String content = "---\na part of: \"[[Earth]]\"\n---\nBody";
+
+    NoteContentMarkdown.LeadingFrontmatterAddPropertyResult result =
+        NoteContentMarkdown.addPropertyToLeadingFrontmatter(content, "a part of", "[[Mars]]");
+
+    assertThat(
+        result,
+        equalTo(new NoteContentMarkdown.LeadingFrontmatterAddPropertyResult.ExistingKeyConflict()));
+  }
+
+  @Test
+  void addPropertyToLeadingFrontmatter_reports_conflict_case_insensitively() {
+    String content = "---\nA part of: \"[[Earth]]\"\n---\nBody";
+
+    NoteContentMarkdown.LeadingFrontmatterAddPropertyResult result =
+        NoteContentMarkdown.addPropertyToLeadingFrontmatter(content, "a part of", "[[Mars]]");
+
+    assertThat(
+        result,
+        equalTo(new NoteContentMarkdown.LeadingFrontmatterAddPropertyResult.ExistingKeyConflict()));
+  }
 }
