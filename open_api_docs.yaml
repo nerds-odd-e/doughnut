@@ -3977,6 +3977,8 @@ components:
           type: boolean
         spelling:
           type: boolean
+        propertyKey:
+          type: string
         ancestorFolders:
           type: array
           items:

@@ -25,6 +25,12 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     return entity;
   }
 
+  public static MemoryTracker buildMemoryTrackerForProperty(Note note, String propertyKey) {
+    MemoryTracker entity = buildMemoryTrackerForNote(note);
+    entity.setPropertyKey(propertyKey);
+    return entity;
+  }
+
   @Override
   public String toString() {
     return "MemoryTracker{" + "id=" + id + '}';
@@ -79,6 +85,11 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   private Boolean spelling = false;
+
+  @Column(name = "property_key")
+  @Getter
+  @Setter
+  private String propertyKey = "";
 
   @Column(name = "deleted_at")
   @JsonIgnore

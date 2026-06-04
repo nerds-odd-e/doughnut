@@ -531,6 +531,7 @@ export type MemoryTracker = {
     forgettingCurveIndex?: number;
     removedFromTracking?: boolean;
     spelling?: boolean;
+    propertyKey?: string;
     ancestorFolders?: Array<Folder>;
 };
 
@@ -973,6 +974,7 @@ export type MemoryTrackerWritable = {
     forgettingCurveIndex?: number;
     removedFromTracking?: boolean;
     spelling?: boolean;
+    propertyKey?: string;
     ancestorFolders?: Array<Folder>;
 };
 
