@@ -118,6 +118,18 @@ Then(
   }
 )
 
+Then(
+  'OpenAI Responses POST bodies include property focus for {string} with value {string}',
+  (propertyKey: string, propertyValue: string) => {
+    mock_services
+      .openAi()
+      .expectResponsesPostBodiesIncludePropertyFocusInstruction(
+        propertyKey,
+        propertyValue
+      )
+  }
+)
+
 Given(
   'OpenAI generates this as first question:',
   stubOpenAiMcqFromSingleRowTable

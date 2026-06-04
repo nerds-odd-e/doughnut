@@ -93,9 +93,11 @@ Capability-named permanent artifacts:
   - In `QuestionGenerationRequestBuilder`, when a property key is present, add an instruction block: focus on property `"<key>"` of the focus note; infer meaning from the property name, the note content, and the listed link targets. Confirm link targets (`wikiTitles`) are in the focus context (extend the context if missing).
   - **Tests (this commit):** backend unit on the builder (black-box: note + property key → request contains the focus-on-property instruction, the property key/value, and link targets). **Commit.**
 
-- **2b — E2E: property recall sends property focus** *(behavior, `@wip`→green)*
+- **2b — E2E: property recall sends property focus** *(behavior, `@wip`→green)* — **Status: done**
   - Extend `property_memory_tracker.feature`: recalling a property tracker produces an MCQ; assert (via mountebank stub) the model request includes the property focus instruction. `@wip` first, then green and remove tag.
   - **Commit.** → **Phase 2 deploy gate.**
+
+**Phase 2 — Status: complete** (deploy gate: let CD deploy before Phase 3).
 
 ---
 
