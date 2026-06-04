@@ -207,8 +207,25 @@ public class NoteService {
         entityPersister.merge(sourceNote);
         deleteOrphanImagesForPersistedContent(sourceNote);
         wikiTitleCacheService.refreshForNote(sourceNote, viewer);
+        rehomeNoteLevelMemoryTrackerToSourceProperty(relationNote, sourceNote, propertyKey, viewer);
       }
     }
+  }
+
+  private void rehomeNoteLevelMemoryTrackerToSourceProperty(
+      Note relationNote, Note sourceNote, String propertyKey, User viewer) {
+    memoryTrackerRepository.findByNote_IdIn(List.of(relationNote.getId())).stream()
+        .filter(MemoryTracker::isActive)
+        .filter(mt -> mt.getUser().getId().equals(viewer.getId()))
+        .filter(mt -> !Boolean.TRUE.equals(mt.getSpelling()))
+        .filter(mt -> mt.getPropertyKey() == null || mt.getPropertyKey().isEmpty())
+        .findFirst()
+        .ifPresent(
+            tracker -> {
+              tracker.setNote(sourceNote);
+              tracker.setPropertyKey(propertyKey);
+              entityPersister.merge(tracker);
+            });
   }
 
   private record RelationshipFrontmatter(String sourceScalar, String targetScalar) {}

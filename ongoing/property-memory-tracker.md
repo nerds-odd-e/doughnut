@@ -124,7 +124,7 @@ Capability-named permanent artifacts:
 
 **Outcome:** When reducing a relation note to a source property (the **successful** path), a normal memory tracker on the relation note is **moved to be a property tracker** on the source note with `property_key = sourcePropertyKey` instead of being soft-deleted. (A duplicate-key reduce still 409s before any change and leaves the relation note + tracker intact. A spelling tracker on the relation note is soft-deleted as today, since property trackers are normal-only.)
 
-- **4a — Re-home tracker on reduce** *(behavior)*
+- **4a — Re-home tracker on reduce** *(behavior)* — **Status: done**
   - In `NoteService.reduceRelationNoteToSourceProperty`, after the frontmatter property is added, move the relation note's normal memory tracker to the source note with the property key, preserving schedule/stats, instead of soft-deleting it.
   - **Tests (this commit):** extend `NoteControllerTests` reduce cases — a tracked relation note reduced yields a property tracker on the source with the relation-label key and preserved schedule; the existing duplicate-key 409 case still leaves the relation note + tracker intact. **Commit.**
 

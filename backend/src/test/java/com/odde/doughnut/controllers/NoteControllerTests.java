@@ -21,6 +21,7 @@ import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import jakarta.validation.Validation;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -354,6 +355,47 @@ class NoteControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void shouldRehomeRelationNoteLevelTrackerAsPropertyTrackerOnSource()
+        throws UnexpectedNoAccessRightException {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      Note moon = makeMe.aNote("Moon").notebook(nb).please();
+      makeMe.aNote("Earth").notebook(nb).please();
+      Note relation =
+          makeMe.aNote().notebook(nb).content(relationshipNoteContent("Moon", "Earth")).please();
+      wikiTitleCacheService.refreshForNote(relation, currentUser.getUser());
+      MemoryTracker relationTracker =
+          makeMe
+              .aMemoryTrackerFor(relation)
+              .by(currentUser.getUser())
+              .afterNthStrictRecall(3)
+              .forgettingCurveAndNextRecallAt(5.5f)
+              .please();
+      int trackerId = relationTracker.getId();
+      int recallCountBefore = relationTracker.getRecallCount();
+      float forgettingCurveBefore = relationTracker.getForgettingCurveIndex();
+      Timestamp nextRecallBefore = relationTracker.getNextRecallAt();
+
+      controller.deleteNote(relation, reduceToSourcePropertyDeleteRequest("a part of"));
+
+      MemoryTracker reloaded = memoryTrackerRepository.findById(trackerId).orElseThrow();
+      assertThat(reloaded.getDeletedAt(), is(nullValue()));
+      assertThat(reloaded.getNote().getId(), equalTo(moon.getId()));
+      assertThat(reloaded.getPropertyKey(), equalTo("a part of"));
+      assertThat(reloaded.getSpelling(), equalTo(false));
+      assertThat(reloaded.getRecallCount(), equalTo(recallCountBefore));
+      assertThat(reloaded.getForgettingCurveIndex(), equalTo(forgettingCurveBefore));
+      assertThat(reloaded.getNextRecallAt(), equalTo(nextRecallBefore));
+      assertThat(
+          memoryTrackerRepository.findByUserAndNote(
+              currentUser.getUser().getId(), relation.getId()),
+          empty());
+      List<MemoryTracker> sourceTrackers =
+          memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), moon.getId());
+      assertThat(sourceTrackers, hasSize(1));
+      assertThat(sourceTrackers.getFirst().getId(), equalTo(trackerId));
+    }
+
+    @Test
     void shouldAbortReduceWhenSourceAlreadyHasPropertyKey() {
       Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       Note moon =
@@ -374,6 +416,31 @@ class NoteControllerTests extends ControllerTestBase {
       assertThat(ex.getReason(), containsString("a part of"));
       assertThat(relation.getDeletedAt(), is(nullValue()));
       assertThat(moon.getContent(), equalTo(moonContentBefore));
+    }
+
+    @Test
+    void shouldLeaveRelationTrackerIntactWhenReduceAbortsOnDuplicatePropertyKey() {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      Note moon =
+          makeMe.aNote("Moon").notebook(nb).content("---\na part of: \"[[Mars]]\"\n---\n").please();
+      makeMe.aNote("Earth").notebook(nb).please();
+      Note relation =
+          makeMe.aNote().notebook(nb).content(relationshipNoteContent("Moon", "Earth")).please();
+      MemoryTracker relationTracker =
+          makeMe.aMemoryTrackerFor(relation).by(currentUser.getUser()).please();
+      int trackerId = relationTracker.getId();
+
+      assertThrows(
+          ResponseStatusException.class,
+          () -> controller.deleteNote(relation, reduceToSourcePropertyDeleteRequest("a part of")));
+
+      MemoryTracker reloaded = memoryTrackerRepository.findById(trackerId).orElseThrow();
+      assertThat(reloaded.getDeletedAt(), is(nullValue()));
+      assertThat(reloaded.getNote().getId(), equalTo(relation.getId()));
+      assertThat(reloaded.getPropertyKey(), equalTo(""));
+      assertThat(
+          memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), moon.getId()),
+          empty());
     }
   }
 
