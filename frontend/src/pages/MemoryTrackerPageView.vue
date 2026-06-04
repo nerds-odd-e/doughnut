@@ -77,19 +77,13 @@
         <span>Remove from Recall</span>
       </button>
     </div>
-    <p
-      v-if="focusedPropertyKey"
-      class="mb-4 text-sm font-medium"
-      data-testid="focused-property-indicator"
-    >
-      Focused property: {{ focusedPropertyKey }}
-    </p>
     <div v-if="memoryTracker.note" class="mb-6">
       <NoteUnderQuestion
         v-bind="{
           noteTopology: memoryTracker.note.noteTopology,
           ancestorFolders: memoryTracker.ancestorFolders ?? [],
           breadcrumbNotebookId: memoryTrackerBreadcrumbNotebookId,
+          focusedPropertyKey,
         }"
       />
     </div>

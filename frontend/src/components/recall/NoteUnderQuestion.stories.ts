@@ -36,6 +36,13 @@ export const WithAncestors: Story = {
   },
 }
 
+export const WithFocusedProperty: Story = {
+  args: {
+    noteTopology: makeMe.aNote.title("TypeScript").please().noteTopology,
+    focusedPropertyKey: "a part of",
+  },
+}
+
 // Long folder trail (testing horizontal scroll)
 export const WithManyAncestors: Story = {
   args: {

@@ -283,6 +283,7 @@ export type RecallPrompt = {
     predefinedQuestion?: PredefinedQuestion;
     answer?: Answer;
     spellingQuestion?: SpellingQuestion;
+    propertyKey?: string;
 };
 
 export type SpellingQuestion = {
@@ -963,6 +964,7 @@ export type RecallPromptWritable = {
     predefinedQuestion?: PredefinedQuestion;
     answer?: Answer;
     spellingQuestion?: SpellingQuestion;
+    propertyKey?: string;
 };
 
 export type MemoryTrackerWritable = {

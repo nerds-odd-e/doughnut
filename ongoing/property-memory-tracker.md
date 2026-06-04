@@ -109,7 +109,7 @@ Capability-named permanent artifacts:
   - Render a focused-property indicator in `MemoryTrackerPageView.vue` for property trackers; omit for note-level.
   - **Tests (this commit):** frontend unit — indicator shown for a property tracker, absent for a note-level tracker. **Commit.**
 
-- **3b — Recall session header indicator** *(behavior)*
+- **3b — Recall session header indicator** *(behavior)* — **Status: done**
   - Show the focused property in the recall `NoteUnderQuestion.vue` header.
   - **Tests (this commit):** frontend unit for the header. **Commit.**
 

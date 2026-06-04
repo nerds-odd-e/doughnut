@@ -3507,6 +3507,8 @@ components:
           $ref: "#/components/schemas/Answer"
         spellingQuestion:
           $ref: "#/components/schemas/SpellingQuestion"
+        propertyKey:
+          type: string
       required:
       - id
       - notebook

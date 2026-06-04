@@ -5,6 +5,7 @@
         noteTopology: note.noteTopology,
         ancestorFolders: answeredQuestion.ancestorFolders ?? [],
         breadcrumbNotebookId: answeredQuestion.notebook.id,
+        focusedPropertyKey: answeredQuestion.propertyKey,
       }"
     />
     <ViewMemoryTrackerLink

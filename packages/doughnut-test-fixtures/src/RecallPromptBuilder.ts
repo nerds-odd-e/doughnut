@@ -22,6 +22,7 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
   private isContestedToUse?: boolean
   private questionTypeToUse?: string
   private memoryTrackerIdToUse?: number
+  private propertyKeyToUse?: string
   private spellingStemToUse?: string
 
   withId(id: number) {
@@ -84,6 +85,11 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
     return this
   }
 
+  withPropertyKey(propertyKey: string) {
+    this.propertyKeyToUse = propertyKey
+    return this
+  }
+
   withSpellingStem(stem: string) {
     this.spellingStemToUse = stem
     this.questionTypeToUse = 'SPELLING'
@@ -96,6 +102,7 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
       return {
         id: this.idToUse ?? generateId(),
         memoryTrackerId: this.memoryTrackerIdToUse,
+        propertyKey: this.propertyKeyToUse,
         questionType: 'SPELLING',
         notebook,
         note: this.noteToUse,
@@ -111,6 +118,7 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
     return {
       id: this.idToUse ?? generateId(),
       memoryTrackerId: this.memoryTrackerIdToUse,
+      propertyKey: this.propertyKeyToUse,
       questionType: (this.questionTypeToUse ?? 'MCQ') as 'MCQ' | 'SPELLING',
       multipleChoicesQuestion: predefinedQuestion.multipleChoicesQuestion,
       notebook,

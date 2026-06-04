@@ -1,6 +1,13 @@
 <template>
   <div class="note-under-question bg-base-200 border-base-300">
     <div class="note-label bg-base-200 text-base-content">Note under question</div>
+    <p
+      v-if="focusedPropertyKey"
+      class="focused-property text-sm font-medium mb-2"
+      data-testid="focused-property-indicator"
+    >
+      Focused property: {{ focusedPropertyKey }}
+    </p>
     <div class="breadcrumb-wrapper">
       <Breadcrumb
         :ancestor-folders="ancestorFolders ?? []"
@@ -31,6 +38,10 @@ defineProps({
   },
   breadcrumbNotebookId: {
     type: Number as PropType<number | undefined>,
+    default: undefined,
+  },
+  focusedPropertyKey: {
+    type: String as PropType<string | undefined>,
     default: undefined,
   },
 })

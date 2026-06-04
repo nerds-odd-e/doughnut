@@ -37,7 +37,8 @@ import lombok.Setter;
   "answerTime",
   "predefinedQuestion",
   "answer",
-  "spellingQuestion"
+  "spellingQuestion",
+  "propertyKey"
 })
 public class RecallPrompt extends EntityIdentifiedByIdOnly {
   @ManyToOne
@@ -49,6 +50,15 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
   @JsonProperty
   public Integer getMemoryTrackerId() {
     return memoryTracker != null ? memoryTracker.getId() : null;
+  }
+
+  @JsonProperty
+  public String getPropertyKey() {
+    if (memoryTracker == null) {
+      return null;
+    }
+    String key = memoryTracker.getPropertyKey();
+    return key == null || key.isEmpty() ? null : key;
   }
 
   @ManyToOne
