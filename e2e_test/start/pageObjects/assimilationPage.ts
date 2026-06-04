@@ -268,6 +268,12 @@ export const assumeAssimilationPage = () => ({
     ])
     return this
   },
+  openPropertyMemoryTracker(propertyKey: string) {
+    cy.contains('tr', `property: ${propertyKey}`).click()
+    cy.url().should('include', '/memory-trackers/')
+    pageIsNotLoading()
+    return assumeMemoryTrackerPage()
+  },
   expectMemoryTrackerInfo(expected: { [key: string]: string }[]) {
     for (const k in expected) {
       cy.contains('tr', expected[k]?.type ?? '').within(() => {

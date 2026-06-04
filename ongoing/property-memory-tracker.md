@@ -113,8 +113,10 @@ Capability-named permanent artifacts:
   - Show the focused property in the recall `NoteUnderQuestion.vue` header.
   - **Tests (this commit):** frontend unit for the header. **Commit.**
 
-- **3c — E2E: open property tracker page** *(behavior, `@wip`→green)*
+- **3c — E2E: open property tracker page** *(behavior, `@wip`→green)* — **Status: done**
   - Extend `property_memory_tracker.feature`: open the property tracker's page and see the note + focused property. **Commit.** → **Phase 3 deploy gate.**
+
+**Phase 3 — Status: complete** (deploy gate: let CD deploy before Phase 4).
 
 ---
 

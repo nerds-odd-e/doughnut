@@ -46,3 +46,20 @@ Feature: Property memory tracker
     When I am recalling my note on day 2
     Then I should be asked "What does the topic property mean?"
     And OpenAI Responses POST bodies include property focus for "topic" with value "micronutrients"
+
+  Scenario: Property memory tracker page shows note and focused property
+    When I update note "Vitamins" content using markdown to become:
+      """
+      ---
+      topic: micronutrients
+      ---
+
+      Vitamin notes body.
+      """
+    And It's day 1, 8 hour
+    And I am assimilating the note "Vitamins"
+    And I expand assimilation properties on the assimilation settings panel
+    And I assimilate the property "topic" on the assimilation settings panel
+    When I open the property memory tracker for "topic" from the assimilation settings panel
+    Then I should see note "Vitamins" on the memory tracker page
+    And I should see focused property "topic" on the memory tracker page

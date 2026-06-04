@@ -4,6 +4,7 @@
 
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
+import { assumeMemoryTrackerPage } from '../start/pageObjects/memoryTrackerPage'
 import start from '../start'
 
 Then('I assimilate these in sequence:', (data: DataTable) => {
@@ -172,6 +173,27 @@ Then(
   'I should see a property memory tracker for {string} on the assimilation settings panel',
   (propertyKey: string) => {
     start.assumeAssimilationPage().expectPropertyMemoryTracker(propertyKey)
+  }
+)
+
+When(
+  'I open the property memory tracker for {string} from the assimilation settings panel',
+  (propertyKey: string) => {
+    start.assumeAssimilationPage().openPropertyMemoryTracker(propertyKey)
+  }
+)
+
+Then(
+  'I should see note {string} on the memory tracker page',
+  (noteTitle: string) => {
+    assumeMemoryTrackerPage().expectNoteTitle(noteTitle)
+  }
+)
+
+Then(
+  'I should see focused property {string} on the memory tracker page',
+  (propertyKey: string) => {
+    assumeMemoryTrackerPage().expectFocusedProperty(propertyKey)
   }
 )
 
