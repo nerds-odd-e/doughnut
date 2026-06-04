@@ -24,9 +24,8 @@ Feature: relationship edit and remove
     When I delete the relationship from "Moon" to "Earth"
     Then I should see "Moon" has no relationship to "Earth"
 
-  @wip
   Scenario: reduce relationship to source property on delete
     When I delete the relationship from "Moon" to "Earth" and reduce it to a property of the source
     When I open the note content markdown editor on note "Moon"
-    Then the note content markdown source should contain 'a part of: "[[Earth]]"'
+    Then the note content markdown source should contain "a part of: '[[Earth]]'"
     And I should see "Moon" has no relationship to "Earth"

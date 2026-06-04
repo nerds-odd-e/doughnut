@@ -55,6 +55,10 @@ const noteMoreOptionsPage = () => {
     deleteNote() {
       deleteNoteWithConfirmation('OK')
     },
+    /** Plain delete for a relationship note (reduce vs delete options dialog). */
+    deleteRelationshipNote() {
+      deleteNoteWithConfirmation('Delete this note')
+    },
     deleteNoteAndLeaveReferencesAsDeadLinks() {
       deleteNoteWithConfirmation('Leave all references as dead link')
     },

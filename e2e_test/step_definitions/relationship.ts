@@ -237,7 +237,7 @@ Then('I should be able to delete the relationship', () => {
 When(
   'I delete the relationship from {string} to {string}',
   (noteTopology: string, targetTitle: string) => {
-    onRelationshipNote(noteTopology, targetTitle).deleteNote()
+    onRelationshipNote(noteTopology, targetTitle).deleteRelationshipNote()
   }
 )
 

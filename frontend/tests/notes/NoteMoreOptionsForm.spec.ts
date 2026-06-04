@@ -13,6 +13,7 @@ import {
   resetAssimilationViewForTests,
   useAssimilationView,
 } from "@/composables/useAssimilationView"
+import { wikiTitleFromInnerAndNoteId } from "@/utils/wikiPropertyValueField"
 
 let renderer: RenderingHelper<typeof NoteMoreOptionsForm>
 let router: ReturnType<typeof createRouter>
@@ -25,6 +26,7 @@ afterEach(() => {
 
 beforeEach(() => {
   resetAssimilationViewForTests()
+  usePopups().popups.register({ popupInfo: [] })
   deleteNoteSpy = mockSdkService(NoteController, "deleteNote", undefined)
   router = createRouter({
     history: createWebHistory(),
@@ -35,6 +37,20 @@ beforeEach(() => {
     .withRouter(router)
     .withCleanStorage()
 })
+
+function relationshipNoteContent(
+  relationKebab: string,
+  sourceLink: string,
+  targetLink: string
+): string {
+  return `---
+type: relationship
+relation: ${relationKebab}
+source: "${sourceLink.replace(/"/g, '\\"')}"
+target: "${targetLink.replace(/"/g, '\\"')}"
+---
+`
+}
 
 describe("NoteMoreOptionsForm", () => {
   const note = makeMe.aNote.please()
@@ -60,6 +76,82 @@ describe("NoteMoreOptionsForm", () => {
 
       expect(deleteNoteSpy).toHaveBeenCalledWith({
         path: { note: note.id },
+        body: { referenceHandling: "LEAVE_DEAD_LINKS" },
+      })
+    })
+
+    it("offers reduce-to-property when deleting a qualifying relationship note", async () => {
+      deleteNoteSpy.mockResolvedValue(wrapSdkResponse([]))
+      const moonId = 501
+      const earthId = 502
+      const relationRealm = {
+        ...makeMe.aNoteRealm
+          .content(
+            relationshipNoteContent("a-part-of", "[[Moon]]", "[[Earth]]")
+          )
+          .please(),
+        wikiTitles: [
+          wikiTitleFromInnerAndNoteId("Moon", moonId),
+          wikiTitleFromInnerAndNoteId("Earth", earthId),
+        ],
+      }
+      useStorageAccessor().value.refreshNoteRealm({
+        ...relationRealm,
+        references: [makeMe.aNoteRealm.please().note.noteTopology],
+      })
+      const wrapper = renderer.withProps({ note: relationRealm.note }).mount()
+
+      await flushPromises()
+
+      const deleteButton = wrapper.find('button[title="Delete note"]')
+      await deleteButton.trigger("click")
+      await flushPromises()
+
+      const popups = usePopups().popups.peek()
+      expect(popups?.length).toBe(1)
+      const popup = popups?.[0]
+      expect(popup?.type).toBe("options")
+      if (popup?.type !== "options") throw new Error("Expected options popup")
+      expect(popup.message).toBe(
+        "This note is a relationship. What should happen?"
+      )
+      expect(popup.options[0]?.label).toBe("Reduce to a property of the source")
+      expect(popup.options[1]?.label).toBe("Delete this note")
+
+      usePopups().popups.done("REDUCE_TO_SOURCE_PROPERTY")
+      await flushPromises()
+
+      expect(deleteNoteSpy).toHaveBeenCalledWith({
+        path: { note: relationRealm.id },
+        body: {
+          referenceHandling: "REDUCE_TO_SOURCE_PROPERTY",
+          sourcePropertyKey: "a part of",
+        },
+      })
+    })
+
+    it("uses confirm when relationship note source does not resolve", async () => {
+      deleteNoteSpy.mockResolvedValue(wrapSdkResponse([]))
+      const relationRealm = makeMe.aNoteRealm
+        .content(relationshipNoteContent("a-part-of", "[[Moon]]", "[[Earth]]"))
+        .please()
+      useStorageAccessor().value.refreshNoteRealm(relationRealm)
+      const wrapper = renderer.withProps({ note: relationRealm.note }).mount()
+
+      await flushPromises()
+
+      const deleteButton = wrapper.find('button[title="Delete note"]')
+      await deleteButton.trigger("click")
+      await flushPromises()
+
+      const popups = usePopups().popups.peek()
+      expect(popups?.[0]?.type).toBe("confirm")
+
+      usePopups().popups.done(true)
+      await flushPromises()
+
+      expect(deleteNoteSpy).toHaveBeenCalledWith({
+        path: { note: relationRealm.id },
         body: { referenceHandling: "LEAVE_DEAD_LINKS" },
       })
     })

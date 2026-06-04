@@ -113,7 +113,8 @@ export interface StoredApi {
   deleteNote(
     router: Router,
     noteId: Doughnut.ID,
-    referenceHandling: NoteDeleteReferenceHandling
+    referenceHandling: NoteDeleteReferenceHandling,
+    sourcePropertyKey?: string
   ): Promise<NoteRealm | undefined>
 
   moveNoteToFolder(
@@ -478,13 +479,18 @@ export default class StoredApiCollection implements StoredApi {
   async deleteNote(
     router: Router,
     noteId: Doughnut.ID,
-    referenceHandling: NoteDeleteReferenceHandling
+    referenceHandling: NoteDeleteReferenceHandling,
+    sourcePropertyKey?: string
   ) {
     const cachedRealm = this.storage.refOfNoteRealm(noteId).value
+    const body: NoteDeleteDto = { referenceHandling }
+    if (sourcePropertyKey !== undefined) {
+      body.sourcePropertyKey = sourcePropertyKey
+    }
     const { data: res, error } = await apiCallWithLoading(() =>
       NoteController.deleteNote({
         path: { note: noteId },
-        body: { referenceHandling },
+        body,
       })
     )
     if (error || !res) {

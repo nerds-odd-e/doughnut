@@ -543,6 +543,9 @@ export const assumeNotePage = (
     deleteNote() {
       this.moreOptions().deleteNote()
     },
+    deleteRelationshipNote() {
+      this.moreOptions().deleteRelationshipNote()
+    },
     deleteNoteAndLeaveReferencesAsDeadLinks() {
       this.moreOptions().deleteNoteAndLeaveReferencesAsDeadLinks()
     },
