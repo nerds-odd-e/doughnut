@@ -41,3 +41,12 @@ Feature: relationship edit and remove
     When I delete the relationship from "Moon" to "Earth" and reduce it to a property of the source
     Then I should see an error toast containing 'already has a property named "a part of"'
     And I should see "Moon" has relationship "a part of" "Earth"
+
+  Scenario: tracked relationship reduced keeps property memory tracker on source
+    Given the note "Moon a part of Earth" was assimilated on day 1
+    When I delete the relationship from "Moon" to "Earth" and reduce it to a property of the source
+    When I open the note content markdown editor on note "Moon"
+    Then the note content markdown source should contain "a part of: '[[Earth]]'"
+    And I should see "Moon" has no relationship to "Earth"
+    When I am assimilating the note "Moon"
+    Then I should see a property memory tracker for "a part of" on the assimilation settings panel

@@ -128,8 +128,12 @@ Capability-named permanent artifacts:
   - In `NoteService.reduceRelationNoteToSourceProperty`, after the frontmatter property is added, move the relation note's normal memory tracker to the source note with the property key, preserving schedule/stats, instead of soft-deleting it.
   - **Tests (this commit):** extend `NoteControllerTests` reduce cases — a tracked relation note reduced yields a property tracker on the source with the relation-label key and preserved schedule; the existing duplicate-key 409 case still leaves the relation note + tracker intact. **Commit.**
 
-- **4b — E2E: tracked relationship reduced keeps tracking** *(behavior, `@wip`→green)*
+- **4b — E2E: tracked relationship reduced keeps tracking** *(behavior, `@wip`→green)* — **Status: done**
   - Extend `relationship_edit_and_remove.feature`: a tracked relationship reduced to a property leaves the source note with a **property memory tracker** for that relation. **Commit.** → **Phase 4 deploy gate.**
+
+**Phase 4 — Status: complete** (deploy gate: let CD deploy).
+
+**Plan — Status: complete.**
 
 ---
 
