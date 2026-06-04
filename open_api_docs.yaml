@@ -4098,6 +4098,8 @@ components:
           format: int32
         skipMemoryTracking:
           type: boolean
+        propertyKey:
+          type: string
     SuggestedTitleDTO:
       type: object
       properties:

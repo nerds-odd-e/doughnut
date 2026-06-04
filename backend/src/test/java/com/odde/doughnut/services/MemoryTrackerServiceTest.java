@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 
@@ -70,6 +71,58 @@ public class MemoryTrackerServiceTest {
 
       assertThat(result, empty());
       assertThat(memoryTrackerRepository.findByUserAndNote(user.getId(), note.getId()), hasSize(1));
+    }
+
+    @Test
+    void shouldCreatePropertyTrackerWhenPropertyKeyProvided() {
+      Note note = makeMe.aNote().notebookOwnedBy(user).please();
+      AssimilationRequestDTO request = new AssimilationRequestDTO();
+      request.noteId = note.getId();
+      request.propertyKey = "a part of";
+
+      List<MemoryTracker> result = memoryTrackerService.assimilate(request, user, day1);
+
+      assertThat(result, hasSize(1));
+      assertThat(result.get(0).getPropertyKey(), equalTo("a part of"));
+      assertThat(result.get(0).getSpelling(), equalTo(false));
+      assertThat(memoryTrackerRepository.findByUserAndNote(user.getId(), note.getId()), hasSize(1));
+    }
+
+    @Test
+    void shouldReturnEmptyWhenPropertyTrackerAlreadyExists() {
+      Note note = makeMe.aNote().notebookOwnedBy(user).please();
+      AssimilationRequestDTO request = new AssimilationRequestDTO();
+      request.noteId = note.getId();
+      request.propertyKey = "a part of";
+      memoryTrackerService.assimilate(request, user, day1);
+
+      List<MemoryTracker> secondResult = memoryTrackerService.assimilate(request, user, day1);
+
+      assertThat(secondResult, empty());
+      assertThat(memoryTrackerRepository.findByUserAndNote(user.getId(), note.getId()), hasSize(1));
+    }
+
+    @Test
+    void shouldCoexistNoteLevelAndPropertyTrackersOnSameNote() {
+      Note note = makeMe.aNote().notebookOwnedBy(user).please();
+      AssimilationRequestDTO noteRequest = new AssimilationRequestDTO();
+      noteRequest.noteId = note.getId();
+      memoryTrackerService.assimilate(noteRequest, user, day1);
+
+      AssimilationRequestDTO propertyRequest = new AssimilationRequestDTO();
+      propertyRequest.noteId = note.getId();
+      propertyRequest.propertyKey = "a part of";
+      List<MemoryTracker> propertyResult =
+          memoryTrackerService.assimilate(propertyRequest, user, day1);
+
+      assertThat(propertyResult, hasSize(1));
+      assertThat(propertyResult.get(0).getPropertyKey(), equalTo("a part of"));
+      List<MemoryTracker> allTrackers =
+          memoryTrackerRepository.findByUserAndNote(user.getId(), note.getId());
+      assertThat(allTrackers, hasSize(2));
+      assertThat(allTrackers.stream().map(MemoryTracker::getPropertyKey).toList(), hasItem(""));
+      assertThat(
+          allTrackers.stream().map(MemoryTracker::getPropertyKey).toList(), hasItem("a part of"));
     }
 
     @Test

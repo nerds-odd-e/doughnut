@@ -591,6 +591,7 @@ export type TextFromAudioWithCallInfo = {
 export type AssimilationRequestDto = {
     noteId?: number;
     skipMemoryTracking?: boolean;
+    propertyKey?: string;
 };
 
 export type SuggestedTitleDto = {

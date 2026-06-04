@@ -62,7 +62,7 @@ Capability-named permanent artifacts:
   - Regenerate `docs/database-erd.md` (`pnpm export:database-erd`).
   - **Green check:** existing backend tests pass unchanged (`backend:verify`). No observable change. **Commit.**
 
-- **1b — Backend assimilate accepts `propertyKey`** *(behavior)*
+- **1b — Backend assimilate accepts `propertyKey`** *(behavior)* — **Status: done**
   - Add optional `propertyKey` to `AssimilationRequestDTO`.
   - `MemoryTrackerService.assimilate`: when `propertyKey` is present and non-empty, create one property tracker (`spelling=false`, no spelling sibling) scoped by `(note, propertyKey)`; idempotent per property; coexists with the note-level tracker.
   - Regenerate the TS API client (`pnpm generateTypeScript`) so `MemoryTracker` + request types carry `propertyKey`.

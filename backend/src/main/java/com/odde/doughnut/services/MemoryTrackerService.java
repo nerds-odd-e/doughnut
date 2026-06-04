@@ -56,10 +56,26 @@ public class MemoryTrackerService {
     boolean skipMemoryTracking =
         request.skipMemoryTracking != null ? request.skipMemoryTracking : false;
 
+    if (request.propertyKey != null && !request.propertyKey.isEmpty()) {
+      boolean propertyTrackerExists =
+          existingTrackers.stream().anyMatch(mt -> request.propertyKey.equals(mt.getPropertyKey()));
+      if (propertyTrackerExists) {
+        return List.of();
+      }
+      MemoryTracker propertyTracker =
+          createPropertyMemoryTracker(
+              note, currentUser, currentTime, skipMemoryTracking, request.propertyKey);
+      return List.of(propertyTracker);
+    }
+
+    List<MemoryTracker> existingNoteLevelTrackers =
+        existingTrackers.stream().filter(MemoryTrackerService::isNoteLevelTracker).toList();
+
     boolean addSpellingOnly =
-        !existingTrackers.isEmpty()
+        !existingNoteLevelTrackers.isEmpty()
             && Boolean.TRUE.equals(note.getRecallSetting().getRememberSpelling())
-            && existingTrackers.stream().noneMatch(mt -> Boolean.TRUE.equals(mt.getSpelling()));
+            && existingNoteLevelTrackers.stream()
+                .noneMatch(mt -> Boolean.TRUE.equals(mt.getSpelling()));
 
     if (addSpellingOnly) {
       MemoryTracker spellingTracker =
@@ -67,7 +83,7 @@ public class MemoryTrackerService {
       return List.of(spellingTracker);
     }
 
-    if (!existingTrackers.isEmpty()) {
+    if (!existingNoteLevelTrackers.isEmpty()) {
       return List.of();
     }
 
@@ -85,6 +101,11 @@ public class MemoryTrackerService {
     return trackers;
   }
 
+  private static boolean isNoteLevelTracker(MemoryTracker memoryTracker) {
+    String propertyKey = memoryTracker.getPropertyKey();
+    return propertyKey == null || propertyKey.isEmpty();
+  }
+
   private MemoryTracker createMemoryTracker(
       Note note,
       User currentUser,
@@ -94,6 +115,22 @@ public class MemoryTrackerService {
     MemoryTracker memoryTracker = MemoryTracker.buildMemoryTrackerForNote(note);
     memoryTracker.setRemovedFromTracking(skipMemoryTracking);
     memoryTracker.setSpelling(isSpelling);
+    memoryTracker.setUser(currentUser);
+    memoryTracker.setAssimilatedAt(currentTime);
+    memoryTracker.setLastRecalledAt(currentTime);
+    updateForgettingCurve(memoryTracker, 0.0f);
+    return memoryTracker;
+  }
+
+  private MemoryTracker createPropertyMemoryTracker(
+      Note note,
+      User currentUser,
+      Timestamp currentTime,
+      boolean skipMemoryTracking,
+      String propertyKey) {
+    MemoryTracker memoryTracker = MemoryTracker.buildMemoryTrackerForProperty(note, propertyKey);
+    memoryTracker.setRemovedFromTracking(skipMemoryTracking);
+    memoryTracker.setSpelling(false);
     memoryTracker.setUser(currentUser);
     memoryTracker.setAssimilatedAt(currentTime);
     memoryTracker.setLastRecalledAt(currentTime);
