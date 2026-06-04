@@ -29,7 +29,7 @@ export function setupNoteRefinementTests() {
     )
     mockSdkService(NoteController, "showNote", makeMe.aNoteRealm.please())
     mockSdkService(AiController, "extractNote", makeMe.aNoteRealm.please())
-    renderer = helper.component(NoteRefinement)
+    renderer = helper.component(NoteRefinement).withRouter()
   })
 
   afterEach(() => {
