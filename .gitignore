@@ -1,3 +1,6 @@
+# test optimization profiles (local only)
+ongoing/*-profile-results.json
+
 # Miscellaneous
 .doughnut-pnpm-lock.sha256
 *.class
@@ -15,6 +18,7 @@
 
 # cypress
 e2e_test/tsconfig.tsbuildinfo
+e2e_test/reports/
 e2e_test/downloads/
 e2e_test/screenshots/
 e2e_test/videos/
