@@ -149,13 +149,13 @@ jobs:
             e2e_test/features/b*/**
             e2e_test/features/f*/**
             e2e_test/features/l*/**
-            e2e_test/features/m*/**
           - |
             e2e_test/features/n*/**
           - |
             e2e_test/features/r*/**
             e2e_test/features/w*/**
           - |
+            e2e_test/features/m*/**
             e2e_test/features/t*/**
             e2e_test/features/u*/**
           - |
