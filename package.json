@@ -6,7 +6,7 @@
   "author": "Terry Yin <terry.yinzhe@gmail.com>",
   "license": "MIT",
   "engines": {
-    "node": ">=24.16",
+    "node": ">=26.3",
     "pnpm": ">=11.5.1"
   },
   "scripts": {

@@ -2,7 +2,7 @@
   description = "doughnut development environment";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -30,21 +30,33 @@
         inherit (pkgs) stdenv lib;
         apple_sdk = pkgs.darwin.apple_sdk.frameworks;
 
-        # Python 3.12: stable on nixos-25.11; pydantic-core in the lockfile does not build on 3.13 yet.
-        python312 = pkgs.python312;
-        pythonWithTools = python312.withPackages (ps: with ps; [ pip setuptools wheel ]);
+        # Python 3.14: stable on nixos-26.05; pydantic-core in the lockfile does not build on 3.13 yet.
+        python314 = pkgs.python314;
+        pythonWithTools = python314.withPackages (ps: with ps; [ pip setuptools wheel ]);
         # Poetry runs pytest in installCheck; one test flakes on darwin (full stderr pipe).
         poetryPkg =
-          (pkgs.poetry.override { python3 = python312; }).overrideAttrs (_: {
+          (pkgs.poetry.override { python3 = python314; }).overrideAttrs (_: {
             doInstallCheck = false;
           });
         poetryPath = "${poetryPkg}/bin";
         pythonPackages = [ pythonWithTools poetryPkg ];
 
+        # Node 26 removed bundled corepack, and nixpkgs has no corepack_26.
+        # Provide pnpm directly instead: pin the exact version from package.json's
+        # `packageManager`/`engines` (11.5.1) and run it under nodejs_26 so the
+        # engine check passes. See scripts/dev_setup.sh (no longer calls corepack).
+        pnpmPkg = (pkgs.pnpm.override { nodejs = pkgs.nodejs_26; }).overrideAttrs (_: rec {
+          version = "11.5.1";
+          src = pkgs.fetchurl {
+            url = "https://registry.npmjs.org/pnpm/-/pnpm-${version}.tgz";
+            hash = "sha256-3npcG+2DAYBRg6h5l/4XIM1crvtXvoOFNaS/xKFZaVk=";
+          };
+        });
+
         basePackages = with pkgs; [
           zulu25
-          nodejs_24
-          corepack_24
+          nodejs_26
+          pnpmPkg
           lsof
           fzf
           git-secret
@@ -55,7 +67,7 @@
           mariadb.client
           redis
           yamllint
-          nixfmt-classic
+          nixfmt
           hclfmt
           trash-cli
           process-compose
