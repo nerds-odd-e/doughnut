@@ -72,7 +72,7 @@ Capability-named permanent artifacts:
   - Author `property_memory_tracker.feature`: assimilate a property → it shows under the note's Memory Trackers labeled with the property → it appears in a recall session. Add step defs / page-object hooks. Tag `@wip`.
   - **Green check:** `@wip` is skipped in CI (green); run locally with `--spec` to confirm it fails for the right reason (UI not built). **Commit.**
 
-- **1d — Frontend Properties section + assimilate** *(behavior)*
+- **1d — Frontend Properties section + assimilate** *(behavior)* — **Status: done**
   - Add an expandable **Properties** section to `AssimilationSettings.vue` listing **all** frontmatter properties (via `noteContentFrontmatter.ts`), each with an **Assimilate** button that calls `AssimilationController.assimilate({ noteId, propertyKey })` and refreshes note-info.
   - **Tests (this commit):** frontend unit — section renders a row + button per property; clicking calls the API with the right `propertyKey`. **Commit.**
 

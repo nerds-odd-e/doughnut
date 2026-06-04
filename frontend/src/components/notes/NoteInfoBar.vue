@@ -59,4 +59,6 @@ watch(
   },
   { immediate: true }
 )
+
+defineExpose({ reload: fetchData })
 </script>

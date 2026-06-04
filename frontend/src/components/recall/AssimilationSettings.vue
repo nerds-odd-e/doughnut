@@ -18,12 +18,55 @@
             class="assimilation-settings-scroll max-h-[min(40vh,22rem)] overflow-y-auto pr-1"
           >
             <NoteInfoBar
+              ref="noteInfoBarRef"
               :note-id="note.id"
               :note="note"
               @level-changed="emit('levelChanged', $event)"
               @remember-spelling-changed="emit('rememberSpellingChanged', $event)"
               @note-recall-info-loaded="emit('noteRecallInfoLoaded', $event)"
             />
+            <section
+              v-if="propertyRows.length > 0"
+              data-test="assimilation-properties-section"
+              class="mt-4"
+            >
+              <div
+                class="daisy-collapse daisy-collapse-arrow border border-base-300 bg-base-200/50 rounded-lg"
+              >
+                <input
+                  type="checkbox"
+                  data-test="assimilation-properties-toggle"
+                />
+                <div class="daisy-collapse-title min-h-0 py-3 text-sm font-medium">
+                  Properties
+                </div>
+                <div class="daisy-collapse-content">
+                  <ul class="flex flex-col gap-2 pb-3">
+                    <li
+                      v-for="row in propertyRows"
+                      :key="row.key"
+                      data-test="assimilation-property-row"
+                      :data-property-key="row.key"
+                      class="flex flex-wrap items-center gap-2 gap-y-1 border-t border-base-300 pt-2 first:border-t-0 first:pt-0"
+                    >
+                      <span class="font-medium shrink-0">{{ row.key }}</span>
+                      <span
+                        class="min-w-0 flex-1 truncate text-sm text-base-content/70"
+                        :title="row.value"
+                      >{{ row.value }}</span>
+                      <button
+                        type="button"
+                        class="daisy-btn daisy-btn-sm daisy-btn-primary shrink-0"
+                        :disabled="assimilatingPropertyKey === row.key"
+                        @click="assimilateProperty(row.key)"
+                      >
+                        Assimilate
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </section>
           </div>
           <div class="daisy-divider my-4" />
           <div
@@ -96,12 +139,18 @@
 
 <script setup lang="ts">
 import type { Note, NoteRecallInfo } from "@generated/doughnut-backend-api"
+import { AssimilationController } from "@generated/doughnut-backend-api/sdk.gen"
 import NoteInfoBar from "../notes/NoteInfoBar.vue"
 import AssimilationButtons from "./AssimilationButtons.vue"
 import AssimilationProgressSummary from "./AssimilationProgressSummary.vue"
 import NoteRefinement from "./NoteRefinement.vue"
 import { useDaisyDialog } from "@/composables/useDaisyDialog"
-import { ref, watch } from "vue"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import {
+  parseNoteContentMarkdown,
+  sortedPropertyRowsFromRecord,
+} from "@/utils/noteContentFrontmatter"
+import { computed, ref, watch } from "vue"
 
 const { note, noteInfoLoaded, keepForRecallDisabled } = defineProps<{
   note: Note
@@ -119,7 +168,34 @@ const emit = defineEmits<{
 
 const showRefineNoteModal = ref(false)
 const refineNoteDialogRef = ref<HTMLDialogElement | null>(null)
+const noteInfoBarRef = ref<InstanceType<typeof NoteInfoBar> | null>(null)
+const assimilatingPropertyKey = ref<string | null>(null)
 useDaisyDialog(showRefineNoteModal, refineNoteDialogRef)
+
+const propertyRows = computed(() => {
+  const parsed = parseNoteContentMarkdown(note.content ?? "")
+  if (!parsed.ok) return []
+  return sortedPropertyRowsFromRecord(parsed.properties)
+})
+
+const assimilateProperty = async (propertyKey: string) => {
+  assimilatingPropertyKey.value = propertyKey
+  try {
+    const { error } = await apiCallWithLoading(() =>
+      AssimilationController.assimilate({
+        body: {
+          noteId: note.id,
+          propertyKey,
+        },
+      })
+    )
+    if (!error) {
+      await noteInfoBarRef.value?.reload()
+    }
+  } finally {
+    assimilatingPropertyKey.value = null
+  }
+}
 
 watch(
   () => note.id,
