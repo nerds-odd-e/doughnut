@@ -68,7 +68,7 @@ Capability-named permanent artifacts:
   - Regenerate the TS API client (`pnpm generateTypeScript`) so `MemoryTracker` + request types carry `propertyKey`.
   - **Tests (this commit):** backend unit — creates a property tracker; second assimilate of same property is a no-op; note-level + property trackers coexist on one note. **Commit.**
 
-- **1c — E2E scenario (red, `@wip`)** *(behavior, test-first)*
+- **1c — E2E scenario (red, `@wip`)** *(behavior, test-first)* — **Status: done**
   - Author `property_memory_tracker.feature`: assimilate a property → it shows under the note's Memory Trackers labeled with the property → it appears in a recall session. Add step defs / page-object hooks. Tag `@wip`.
   - **Green check:** `@wip` is skipped in CI (green); run locally with `--spec` to confirm it fails for the right reason (UI not built). **Commit.**
 

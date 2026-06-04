@@ -247,6 +247,27 @@ export const assumeAssimilationPage = () => ({
     keepForRecallButton().should('be.disabled')
     return this
   },
+  expandAssimilationPropertiesSection() {
+    cy.get('[data-test="assimilation-properties-section"]').within(() => {
+      cy.get('[data-test="assimilation-properties-toggle"]').click()
+    })
+    return this
+  },
+  assimilateProperty(propertyKey: string) {
+    cy.get(
+      `[data-test="assimilation-property-row"][data-property-key="${propertyKey}"]`
+    ).within(() => {
+      cy.findByRole('button', { name: 'Assimilate' }).click()
+    })
+    pageIsNotLoading()
+    return this
+  },
+  expectPropertyMemoryTracker(propertyKey: string) {
+    this.expectMemoryTrackerInfo([
+      { type: `property: ${propertyKey}`, 'Recall Count': '0' },
+    ])
+    return this
+  },
   expectMemoryTrackerInfo(expected: { [key: string]: string }[]) {
     for (const k in expected) {
       cy.contains('tr', expected[k]?.type ?? '').within(() => {

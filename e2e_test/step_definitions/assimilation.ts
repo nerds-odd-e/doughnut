@@ -154,6 +154,27 @@ When('I skip recall on the assimilation panel', () => {
   start.assumeAssimilationPage().skipRecallOnPanel()
 })
 
+When(
+  'I expand assimilation properties on the assimilation settings panel',
+  () => {
+    start.assumeAssimilationPage().expandAssimilationPropertiesSection()
+  }
+)
+
+When(
+  'I assimilate the property {string} on the assimilation settings panel',
+  (propertyKey: string) => {
+    start.assumeAssimilationPage().assimilateProperty(propertyKey)
+  }
+)
+
+Then(
+  'I should see a property memory tracker for {string} on the assimilation settings panel',
+  (propertyKey: string) => {
+    start.assumeAssimilationPage().expectPropertyMemoryTracker(propertyKey)
+  }
+)
+
 Then(
   'the spelling verification result for note {string} should be {string}',
   (noteTitle: string, expectedResult: string) => {
