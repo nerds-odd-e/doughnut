@@ -85,6 +85,9 @@ export interface StoredApi {
   /** PATCH undo-delete for a soft-deleted note; refreshes storage and navigates to the note. */
   restoreDeletedNote(router: Router, noteId: Doughnut.ID): Promise<NoteRealm>
 
+  /** Refresh storage, sidebar listings, and navigate to this note (replace route). */
+  focusNoteRealm(router: Router, noteRealm: NoteRealm): Promise<NoteRealm>
+
   updateTextField(
     noteId: Doughnut.ID,
     field: "edit title" | "edit content",
@@ -227,6 +230,17 @@ export default class StoredApiCollection implements StoredApi {
     return this.storage.refOfNoteRealm(noteId)
   }
 
+  private async navigateToFocusedNote(router: Router, focus: NoteRealm) {
+    refreshSidebarStructuralListings()
+    await this.routerReplaceFocus(router, focus)
+    return focus
+  }
+
+  async focusNoteRealm(router: Router, noteRealm: NoteRealm) {
+    const focus = this.storage.refreshNoteRealm(noteRealm)
+    return this.navigateToFocusedNote(router, focus)
+  }
+
   async createRootNoteAtNotebook(
     router: Router,
     notebookId: number,
@@ -254,15 +268,13 @@ export default class StoredApiCollection implements StoredApi {
       })
     }
     const focus = this.storage.refreshNoteRealm(nrwp)
-    refreshSidebarStructuralListings()
     this.noteEditingHistory.createNote(focus.id)
     if (refreshWikiTitleCacheForNoteIds) {
       for (const id of refreshWikiTitleCacheForNoteIds) {
         await this.refreshWikiLinkCacheForNote(id)
       }
     }
-    await this.routerReplaceFocus(router, focus)
-    return focus
+    return this.navigateToFocusedNote(router, focus)
   }
 
   async restoreDeletedNote(router: Router, noteId: Doughnut.ID) {
@@ -274,10 +286,7 @@ export default class StoredApiCollection implements StoredApi {
     if (error || !noteRealm) {
       throw new Error(toErrorMessage(error, "Failed to restore note"))
     }
-    const focus = this.storage.refreshNoteRealm(noteRealm)
-    refreshSidebarStructuralListings()
-    await this.routerReplaceFocus(router, focus)
-    return focus
+    return this.focusNoteRealm(router, noteRealm)
   }
 
   private refreshNoteRealms(noteRealms: NoteRealm[]) {

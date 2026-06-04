@@ -20,13 +20,6 @@ const waitForExtractNote = () => {
   }).should('not.exist')
 }
 
-const closeRefineNoteModal = () => {
-  cy.get('[data-test="refine-note-modal"]')
-    .find('form.daisy-modal-backdrop button')
-    .click({ force: true })
-  pageIsNotLoading()
-}
-
 const mainNoteHeadingTitleSelector =
   '#main-note-content h2.path-name-heading [role=title], #main-note-content [data-test="note-title"]'
 
@@ -213,7 +206,6 @@ export const assumeAssimilationPage = () => ({
         .click()
     })
     waitForExtractNote()
-    closeRefineNoteModal()
     return this
   },
   checkRememberSpellingOption() {

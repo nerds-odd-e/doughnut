@@ -35,7 +35,8 @@ Feature: Note refinement
     When I am assimilating the note "Sample"
     And I should see refinement suggestions with 5 items
     And I extract the suggestion "B" to a new note
-    Then I should see folder "Sample tree/Context" containing these notes:
+    Then the note title should be "Point B"
+    And I should see folder "Sample tree/Context" containing these notes:
       | note-title |
       | Sample     |
       | Point B    |

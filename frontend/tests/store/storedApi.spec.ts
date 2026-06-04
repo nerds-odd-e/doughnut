@@ -4,6 +4,7 @@ import {
   TextContentController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import type { Router } from "vue-router"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 import createNoteStorage from "@/store/createNoteStorage"
 import NoteEditingHistory from "@/store/NoteEditingHistory"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -241,6 +242,19 @@ describe("storedApiCollection", () => {
       const sa = storageAccessor.value.storedApi()
       await sa.moveNoteToNotebookRoot(note.id, note.notebookRealm.notebook.id)
       expect(sidebarStructuralRefreshKey.value).toBe(before + 1)
+    })
+  })
+
+  describe("focusNoteRealm", () => {
+    it("refreshes cache, sidebar listings, and navigates to the note", async () => {
+      const sa = storageAccessor.value.storedApi()
+      const before = sidebarStructuralRefreshKey.value
+
+      await sa.focusNoteRealm(router, note)
+
+      expect(storageAccessor.value.refOfNoteRealm(note.id).value).toBeTruthy()
+      expect(sidebarStructuralRefreshKey.value).toBe(before + 1)
+      expect(routerReplace).toHaveBeenCalledWith(noteShowLocation(note.id))
     })
   })
 

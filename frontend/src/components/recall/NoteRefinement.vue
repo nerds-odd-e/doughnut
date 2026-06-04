@@ -28,7 +28,7 @@
           <div class="flex gap-1 shrink-0">
             <button
               class="daisy-btn daisy-btn-xs daisy-btn-ghost"
-              @click="extractNote(suggestion, index)"
+              @click="extractNote(suggestion)"
               title="Extract to a new note"
             >
               <Folders class="w-4 h-4" />
@@ -63,6 +63,7 @@ import usePopups from "../commons/Popups/usePopups"
 import { Folders } from "@lucide/vue"
 import LoadingModal from "../commons/LoadingModal.vue"
 import { onMounted, ref } from "vue"
+import { useRouter } from "vue-router"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const props = defineProps<{
@@ -94,6 +95,7 @@ const loadRefinementSuggestions = async () => {
 onMounted(() => loadRefinementSuggestions())
 
 const { popups } = usePopups()
+const router = useRouter()
 const storageAccessor = useStorageAccessor()
 
 const selectedSuggestionIndices = ref<number[]>([])
@@ -142,7 +144,7 @@ const removeSelectedSuggestions = async () => {
   }
 }
 
-const extractNote = async (suggestion: string, index: number) => {
+const extractNote = async (suggestion: string) => {
   isExtractingNote.value = true
   try {
     const response = await apiCallWithLoading(() =>
@@ -157,11 +159,9 @@ const extractNote = async (suggestion: string, index: number) => {
       return
     }
 
-    if (storageAccessor.value) {
-      storageAccessor.value.refreshNoteRealm(response.data)
-    }
-
-    refinementSuggestions.value.splice(index, 1)
+    await storageAccessor.value
+      .storedApi()
+      .focusNoteRealm(router, response.data)
   } catch (err) {
     console.error("Failed to extract note:", err)
     await popups.alert(`Error: ${err}`)

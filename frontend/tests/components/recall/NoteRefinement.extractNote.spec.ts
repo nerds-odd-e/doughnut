@@ -1,7 +1,8 @@
 import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 import { flushPromises } from "@vue/test-utils"
 import { nextTick } from "vue"
-import { describe, expect, it } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import {
   mockSdkService,
@@ -16,9 +17,25 @@ import {
   setupNoteRefinementTests,
 } from "./noteRefinementTestSupport"
 
+const routerReplace = vi.fn()
+
+vi.mock("vue-router", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("vue-router")>()
+  return {
+    ...actual,
+    useRouter: () => ({
+      replace: routerReplace,
+    }),
+  }
+})
+
 setupNoteRefinementTests()
 
 describe("NoteRefinement extract note", () => {
+  beforeEach(() => {
+    routerReplace.mockResolvedValue(undefined)
+  })
+
   describe("per-suggestion action", () => {
     it("displays extract note button for each suggestion", async () => {
       const wrapper = mountNoteRefinement(["Point 1", "Point 2", "Point 3"])
@@ -34,35 +51,26 @@ describe("NoteRefinement extract note", () => {
       })
     })
 
-    it("calls extractNote API when extract button is clicked", async () => {
+    it("extracts suggestion and navigates to the new note", async () => {
+      const createdRealm = makeMe.aNoteRealm.please()
       const extractNoteSpy = mockSdkService(
         AiController,
         "extractNote",
-        makeMe.aNoteRealm.please()
+        createdRealm
       )
-      const wrapper = mountNoteRefinement(["Test Point"])
-      await flushPromises()
-
-      await wrapper.find("li button").trigger("click")
-      await flushPromises()
-
-      expect(extractNoteSpy).toHaveBeenCalledWith(
-        refinementSuggestionsApiCall(note.id, ["Test Point"])
-      )
-    })
-
-    it("removes suggestion from list after successful extraction", async () => {
-      mockSdkService(AiController, "extractNote", makeMe.aNoteRealm.please())
       const wrapper = mountNoteRefinement(["Point 1", "Point 2", "Point 3"])
       await flushPromises()
 
       await wrapper.findAll("li")[1]!.find("button").trigger("click")
       await flushPromises()
 
-      expect(wrapper.findAll("li")).toHaveLength(2)
-      expect(wrapper.text()).toContain("Point 1")
-      expect(wrapper.text()).toContain("Point 3")
-      expect(wrapper.text()).not.toContain("Point 2")
+      expect(extractNoteSpy).toHaveBeenCalledWith(
+        refinementSuggestionsApiCall(note.id, ["Point 2"])
+      )
+      expect(wrapper.findAll("li")).toHaveLength(3)
+      expect(routerReplace).toHaveBeenCalledWith(
+        noteShowLocation(createdRealm.id)
+      )
     })
 
     it("keeps suggestion in list when API fails", async () => {
