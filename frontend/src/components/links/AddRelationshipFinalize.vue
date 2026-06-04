@@ -1,5 +1,9 @@
 <template>
   <div>
+    <LoadingModal
+      :show="isCreatingRelationshipNote"
+      message="Creating relationship note..."
+    />
     <span class="daisy-label p-0">Relation note location</span>
     <RadioButtons
       field=""
@@ -37,6 +41,7 @@ import type { Note, NoteSearchResult } from "@generated/doughnut-backend-api"
 import RadioButtons from "../form/RadioButtons.vue"
 import RelationTypeSelect from "./RelationTypeSelect.vue"
 import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
+import LoadingModal from "../commons/LoadingModal.vue"
 import { Reply } from "@lucide/vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import {
@@ -97,10 +102,13 @@ const relationshipFormErrors = ref({
   relationType: undefined as string | undefined,
 })
 
-const relationTypeSelected = async (relationType: string | undefined) => {
-  try {
-    if (relationType === undefined) return
+const isCreatingRelationshipNote = ref(false)
 
+const relationTypeSelected = async (relationType: string | undefined) => {
+  if (relationType === undefined || isCreatingRelationshipNote.value) return
+
+  isCreatingRelationshipNote.value = true
+  try {
     const realm = storageAccessor.value.refOfNoteRealm(props.note.id).value
     const notebookId = realm?.notebookRealm.notebook.id
     if (realm == null || notebookId == null) {
@@ -159,6 +167,8 @@ const relationTypeSelected = async (relationType: string | undefined) => {
         ? ((e as { relationType?: string }).relationType ?? e.message)
         : undefined
     relationshipFormErrors.value = { relationType: relationTypeError }
+  } finally {
+    isCreatingRelationshipNote.value = false
   }
 }
 </script>

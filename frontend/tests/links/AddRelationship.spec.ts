@@ -13,9 +13,14 @@ import type {
   NoteRealm,
   NoteSearchResult,
 } from "@generated/doughnut-backend-api"
-import helper, { mockSdkService, testFolderStub } from "@tests/helpers"
+import helper, {
+  mockSdkService,
+  mockSdkServiceWithImplementation,
+  testFolderStub,
+} from "@tests/helpers"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
+import { nextTick } from "vue"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 
 const routerReplace = vi.fn()
@@ -62,15 +67,32 @@ async function selectRelationType(wrapper: VueWrapper, relationType: string) {
 
 function mockRelationshipNoteCreation(
   sourceRealm: NoteRealm,
-  createdRealm: NoteRealm
+  createdRealm: NoteRealm,
+  holdCreate?: Promise<void>
 ) {
   mockSdkService(NoteController, "showNote", sourceRealm)
   mockSdkService(TextContentController, "updateNoteContent", sourceRealm)
+  if (holdCreate) {
+    return mockSdkServiceWithImplementation(
+      NotebookController,
+      "createNoteAtNotebookRoot",
+      async () => {
+        await holdCreate
+        return createdRealm
+      }
+    )
+  }
   return mockSdkService(
     NotebookController,
     "createNoteAtNotebookRoot",
     createdRealm
   )
+}
+
+function sourceAndCreatedRelationshipRealms() {
+  const sourceRealm = makeMe.aNoteRealm.title("Source").please()
+  const createdRealm = makeMe.aNoteRealm.title("Created relationship").please()
+  return { sourceRealm, note: sourceRealm.note, createdRealm }
 }
 
 describe("AddRelationshipFinalize", () => {
@@ -112,13 +134,37 @@ describe("AddRelationshipFinalize", () => {
     expect(wrapper.emitted().goBack).toHaveLength(1)
   })
 
+  it("shows LoadingModal while creating relationship note", async () => {
+    const { sourceRealm, note, createdRealm } =
+      sourceAndCreatedRelationshipRealms()
+    let resolveCreate: () => void
+    const createHeld = new Promise<void>((r) => {
+      resolveCreate = r
+    })
+    mockRelationshipNoteCreation(sourceRealm, createdRealm, createHeld)
+
+    const wrapper = mountAddRelationshipFinalize({
+      note,
+      targetSearchResult: targetSearchResult(),
+      seedRealm: sourceRealm,
+    })
+
+    const selectPromise = selectRelationType(wrapper, "related to")
+    await nextTick()
+
+    expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
+    expect(document.body.textContent).toContain("Creating relationship note...")
+
+    resolveCreate!()
+    await selectPromise
+
+    expect(document.querySelector(".loading-modal-mask")).toBeNull()
+  })
+
   it("creates relationship note, navigates, and emits success", async () => {
-    const sourceRealm = makeMe.aNoteRealm.title("Source").please()
-    const note = sourceRealm.note
+    const { sourceRealm, note, createdRealm } =
+      sourceAndCreatedRelationshipRealms()
     const target = targetSearchResult()
-    const createdRealm = makeMe.aNoteRealm
-      .title("Created relationship")
-      .please()
     const createNoteSpy = mockRelationshipNoteCreation(
       sourceRealm,
       createdRealm
