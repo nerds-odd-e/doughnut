@@ -43,13 +43,18 @@
 
         # Node 26 removed bundled corepack, and nixpkgs has no corepack_26.
         # Provide pnpm directly instead: pin the exact version from package.json's
-        # `packageManager`/`engines` (11.5.1) and run it under nodejs_26 so the
+        # `packageManager`/`engines` (11.5.2) and run it under nodejs_26 so the
         # engine check passes. See scripts/dev_setup.sh (no longer calls corepack).
+        #
+        # To bump the version: set `version` below, set `hash = lib.fakeHash;`,
+        # then run `nix build '.#devShells.aarch64-darwin.default' --no-link` and
+        # copy the real hash from the "got:" line of the mismatch error into `hash`.
+        # (Alternatively: `nix store prefetch-file <url>` prints the SRI hash directly.)
         pnpmPkg = (pkgs.pnpm.override { nodejs = pkgs.nodejs_26; }).overrideAttrs (_: rec {
-          version = "11.5.1";
+          version = "11.5.2";
           src = pkgs.fetchurl {
             url = "https://registry.npmjs.org/pnpm/-/pnpm-${version}.tgz";
-            hash = "sha256-3npcG+2DAYBRg6h5l/4XIM1crvtXvoOFNaS/xKFZaVk=";
+            hash = "sha256-dJ3FT709zenkFLquMsF3yoR3DT/NaciBbVea3D5qLJk=";
           };
         });
 
