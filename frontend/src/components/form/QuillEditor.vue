@@ -9,85 +9,15 @@ import Quill, { type QuillOptions, type Range } from "quill"
 import "quill/dist/quill.bubble.css"
 import markdownizer from "./markdownizer"
 import {
-  deadLinkPayloadFromAnchor,
+  doughnutQuillBrMatcher,
+  registerDoughnutQuillBlots,
+} from "./registerDoughnutQuillBlots"
+import {
+  handleRichContentAnchorClick,
   type DeadLinkPayload,
 } from "@/utils/wikiPropertyValueField"
 
-// Define soft line break blot
-// Quill.import returns dynamic types that aren't fully typed in the Quill library
-interface EmbedBlotInstance {
-  // Blot instance interface
-}
-type EmbedBlotConstructor = new (
-  node: Node,
-  value?: unknown
-) => EmbedBlotInstance
-
-interface DeltaInstance {
-  insert(content: unknown): DeltaInstance
-}
-type DeltaConstructor = new (ops?: unknown) => DeltaInstance
-
-const Embed = Quill.import("blots/embed") as unknown as EmbedBlotConstructor
-const BlockEmbed = Quill.import(
-  "blots/block/embed"
-) as unknown as EmbedBlotConstructor
-const Delta = Quill.import("delta") as unknown as DeltaConstructor
-
-class SoftLineBreakBlot extends Embed {
-  static blotName = "softbreak"
-  static tagName = "br"
-  static className = "softbreak"
-}
-
-class HorizontalRuleBlot extends Embed {
-  static blotName = "horizontalrule"
-  static tagName = "hr"
-}
-
-class TableBlot extends BlockEmbed {
-  static blotName = "table"
-  static tagName = "table"
-
-  static create(value: string | { html: string }) {
-    // Quill.import returns dynamic types - use type assertion for static methods
-    // @ts-expect-error - Quill's BlockEmbed class has static create method but types don't reflect it
-    const node = super.create() as HTMLElement
-    const html = typeof value === "string" ? value : value.html
-    node.innerHTML = html
-    node.setAttribute("contenteditable", "false")
-    return node
-  }
-
-  static value(node: HTMLElement) {
-    return { html: node.innerHTML }
-  }
-}
-
-// Quill.register accepts dynamic blot classes - the type system can't fully validate this
-Quill.register(
-  SoftLineBreakBlot as unknown as Parameters<typeof Quill.register>[0],
-  true
-)
-Quill.register(
-  HorizontalRuleBlot as unknown as Parameters<typeof Quill.register>[0],
-  true
-)
-Quill.register(
-  TableBlot as unknown as Parameters<typeof Quill.register>[0],
-  true
-)
-
-/** Preserves `<mark>` cloze masks from recall stems when loading HTML into Quill. */
-const Inline = Quill.import("blots/inline") as typeof SoftLineBreakBlot
-class MarkBlot extends Inline {
-  static blotName = "mark"
-  static tagName = "mark"
-}
-Quill.register(
-  MarkBlot as unknown as Parameters<typeof Quill.register>[0],
-  true
-)
+registerDoughnutQuillBlots()
 
 const props = defineProps({
   modelValue: String,
@@ -130,9 +60,6 @@ const shiftEnterHandler = function (
   this.quill.setSelection(range.index + 1, Quill.sources.SILENT)
 }
 
-// BR matcher for clipboard operations
-const brMatcher = () => new Delta().insert({ softbreak: true })
-
 const toolbarRows = [
   ["bold", "italic", "underline", "code"],
   [{ header: 1 }, { header: 2 }],
@@ -154,7 +81,7 @@ const options: QuillOptions = {
       },
     },
     clipboard: {
-      matchers: [["BR", brMatcher]],
+      matchers: [["BR", doughnutQuillBrMatcher]],
       matchVisual: false,
     },
   },
@@ -219,22 +146,31 @@ onMounted(async () => {
     }
 
     quill.value.root.addEventListener(
+      "mousedown",
+      (event: MouseEvent) => {
+        if (props.readonly) return
+        const anchor = (event.target as HTMLElement).closest("a.dead-link")
+        if (anchor) event.preventDefault()
+      },
+      true
+    )
+
+    quill.value.root.addEventListener(
       "click",
       (event: MouseEvent) => {
         const anchor = (event.target as HTMLElement).closest("a")
         if (!anchor) return
         event.preventDefault()
-        const href = anchor.getAttribute("href")
-        if (!href) return
-        if (!props.readonly && anchor.classList.contains("dead-link")) {
-          emits("deadLinkClick", deadLinkPayloadFromAnchor(anchor))
-          return
-        }
-        if (/^https?:\/\//i.test(href) || href.startsWith("//")) {
-          window.open(href, "_blank", "noopener,noreferrer")
-          return
-        }
-        router?.push(href)
+        handleRichContentAnchorClick(
+          anchor,
+          {
+            onDeadLink: (payload) => emits("deadLinkClick", payload),
+            navigateInApp: (href) => {
+              router?.push(href)
+            },
+          },
+          { deadLinksEnabled: !props.readonly }
+        )
       },
       true
     )
@@ -258,8 +194,12 @@ onMounted(async () => {
       }
     })
 
-    // Strangely, Quill does not emit a blur event when the inner editor receives a blur event
-    quill.value.root.addEventListener("blur", () => {
+    // Forward DOM blur to Quill only when focus leaves the editor (not to a link inside it).
+    quill.value.root.addEventListener("blur", (event: FocusEvent) => {
+      const related = event.relatedTarget
+      if (related instanceof Node && quill.value?.root.contains(related)) {
+        return
+      }
       quill.value?.blur()
     })
   }

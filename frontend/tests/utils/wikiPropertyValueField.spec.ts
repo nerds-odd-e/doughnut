@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 import {
   deadLinkCreateTitleFromAnchor,
   escapeHtmlForWikiPropertyValue,
+  handleRichContentAnchorClick,
   markdownWikiTokenFromDeadLinkPayload,
   propertyValuePlainToDisplayHtml,
   serializeWikiPropertyValueFieldRoot,
@@ -9,6 +10,27 @@ import {
 } from "@/utils/wikiPropertyValueField"
 
 describe("wikiPropertyValueField utils", () => {
+  it("handleRichContentAnchorClick emits dead link before checking href", () => {
+    const anchor = document.createElement("a")
+    anchor.className = "dead-link"
+    anchor.setAttribute("data-wiki-title", "Ghost")
+    anchor.textContent = "Ghost"
+    let payload: { targetToken: string; displayText: string } | undefined
+    handleRichContentAnchorClick(
+      anchor,
+      {
+        onDeadLink: (p) => {
+          payload = p
+        },
+        navigateInApp: () => {
+          throw new Error("should not navigate")
+        },
+      },
+      { deadLinksEnabled: true }
+    )
+    expect(payload).toEqual({ targetToken: "Ghost", displayText: "Ghost" })
+  })
+
   it("markdownWikiTokenFromDeadLinkPayload matches simple and piped stored tokens", () => {
     expect(
       markdownWikiTokenFromDeadLinkPayload({

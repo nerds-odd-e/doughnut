@@ -204,4 +204,32 @@ describe("QuillEditor.vue", () => {
     openSpy.mockRestore()
     pushSpy.mockRestore()
   })
+
+  it.each([
+    { case: "hash href", href: "#" },
+    { case: "empty href", href: "" },
+  ])("emits deadLinkClick when a dead wiki link with $case is clicked", async ({
+    href,
+  }) => {
+    const html = `<p><a href="${href}" class="dead-link" data-wiki-title="Ghost">Ghost</a></p>`
+    wrapper = mount(QuillEditor, {
+      props: { modelValue: html, readonly: false },
+      attachTo: document.body,
+      global: { plugins: [router] },
+    })
+    await nextTick()
+    await vi.waitUntil(() => document.querySelector(".ql-editor a.dead-link"))
+
+    const dead = document.querySelector(
+      ".ql-editor a.dead-link"
+    ) as HTMLAnchorElement
+    dead.dispatchEvent(
+      new MouseEvent("click", { bubbles: true, cancelable: true })
+    )
+    await nextTick()
+
+    expect(wrapper.emitted("deadLinkClick")?.[0]).toEqual([
+      { targetToken: "Ghost", displayText: "Ghost" },
+    ])
+  })
 })

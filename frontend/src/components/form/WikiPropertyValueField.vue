@@ -21,7 +21,7 @@ import { ref, watch, onMounted, type PropType } from "vue"
 import { useRouter } from "vue-router"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
 import {
-  deadLinkPayloadFromAnchor,
+  handleRichContentAnchorClick,
   type DeadLinkPayload,
   propertyValuePlainToDisplayHtml,
   serializeWikiPropertyValueFieldRoot,
@@ -95,17 +95,14 @@ function onClickCapture(event: MouseEvent) {
   const anchor = (event.target as HTMLElement).closest("a")
   if (!anchor || !root.value.contains(anchor)) return
   event.preventDefault()
-  const href = anchor.getAttribute("href")
-  if (!href) return
-  if (!props.readonly && anchor.classList.contains("dead-link")) {
-    emit("deadLinkClick", deadLinkPayloadFromAnchor(anchor))
-    return
-  }
-  if (/^https?:\/\//i.test(href) || href.startsWith("//")) {
-    window.open(href, "_blank", "noopener,noreferrer")
-    return
-  }
-  router.push(href)
+  handleRichContentAnchorClick(
+    anchor,
+    {
+      onDeadLink: (payload) => emit("deadLinkClick", payload),
+      navigateInApp: (href) => router.push(href),
+    },
+    { deadLinksEnabled: true }
+  )
 }
 
 function onEnter() {

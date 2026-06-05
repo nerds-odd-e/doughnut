@@ -128,6 +128,28 @@ export function markdownWikiTokenFromDeadLinkPayload(
   return `[[${targetToken}|${displayText}]]`
 }
 
+/** Handles click on a rich-content anchor: dead wiki links, external URLs, in-app routes. */
+export function handleRichContentAnchorClick(
+  anchor: HTMLAnchorElement,
+  handlers: {
+    onDeadLink: (payload: DeadLinkPayload) => void
+    navigateInApp: (href: string) => void
+  },
+  options: { deadLinksEnabled: boolean }
+): void {
+  if (options.deadLinksEnabled && anchor.classList.contains("dead-link")) {
+    handlers.onDeadLink(deadLinkPayloadFromAnchor(anchor))
+    return
+  }
+  const href = anchor.getAttribute("href")
+  if (!href) return
+  if (/^https?:\/\//i.test(href) || href.startsWith("//")) {
+    window.open(href, "_blank", "noopener,noreferrer")
+    return
+  }
+  handlers.navigateInApp(href)
+}
+
 /** Extracts target token and display text from a dead-link anchor element. */
 export function deadLinkPayloadFromAnchor(
   anchor: HTMLElement
