@@ -95,3 +95,4 @@ minimumReleaseAgeExclude:
   - '@biomejs/cli-win32-x64@2.4.16'
   - '@lucide/vue@1.17.0'
   - vue-router@5.1.0
+  - '@vue/test-utils@2.4.11'

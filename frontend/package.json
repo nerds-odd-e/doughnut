@@ -51,7 +51,7 @@
     "@vitest/ui": "4.1.8",
     "@vue/compiler-core": "3.5.35",
     "@vue/server-renderer": "^3.5.35",
-    "@vue/test-utils": "2.4.10",
+    "@vue/test-utils": "2.4.11",
     "daisyui": "5.5.20",
     "doughnut-test-fixtures": "workspace:*",
     "es-toolkit": "^1.47.0",
