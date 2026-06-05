@@ -2679,16 +2679,6 @@ packages:
   '@vue/shared@3.5.35':
     resolution: {integrity: sha512-zSbjL7gRXwks2ZQLRGCajBtBXEOXW9Ddhn/HvSdrGkE2dqGnumzW8XtusRrxrE9LvqtiqDXQ+A60Hp6mvdYxfA==}
 
-  '@vue/test-utils@2.4.10':
-    resolution: {integrity: sha512-SmoZ5EA1kYiAFs9NkYdiFFQF+cSnUwnvlYEbY+DogWQZUiqOm/Y29eSbc5T6yi75SgSF9863SBeXniIEoPajCA==}
-    peerDependencies:
-      '@vue/compiler-dom': 3.x
-      '@vue/server-renderer': 3.x
-      vue: 3.x
-    peerDependenciesMeta:
-      '@vue/server-renderer':
-        optional: true
-
   '@vue/test-utils@2.4.11':
     resolution: {integrity: sha512-GDqaqZsA6m2E5vNzej0aYiIb6BX8xV9pNSbbbXKOfEYwg7ZNblVX8suyqmUBThq8VIrgAJNxn+z72hVtUeiWHA==}
     peerDependencies:
@@ -3607,8 +3597,8 @@ packages:
     engines: {node: '>=0.12.18'}
     hasBin: true
 
-  electron-to-chromium@1.5.366:
-    resolution: {integrity: sha512-OlRuhb688YTCzzU3gXPLn6nGyd+F+53INE1qaKKlu6kETErE8FYsyDh0XqXEU+uBRn0MpCzz2vfNwORhkap8qg==}
+  electron-to-chromium@1.5.367:
+    resolution: {integrity: sha512-4Mk/mrynCNQ+atY40D3UpmhLWB6AHMbYMlIrPhHcMF6x0L7O0b052FCAsxw1LlaR++UFuNg3D/A6XCuGDa0guQ==}
 
   emoji-regex@10.6.0:
     resolution: {integrity: sha512-toUI84YS5YmxW219erniWD0CIVOo46xGKColeNQRgOzDorgBi1v4D71/OFzgD9GO2UGKIv1C3Sp8DAn0+j5w7A==}
@@ -3629,10 +3619,6 @@ packages:
 
   end-of-stream@1.4.5:
     resolution: {integrity: sha512-ooEGc6HP26xXq/N+GCGOT0JKCLDGrq2bQUZrQ7gyrJiZANJ/8YDTxTpQBXGMn+WbIQXNVpyWymm7KYVICQnyOg==}
-
-  enhanced-resolve@5.22.1:
-    resolution: {integrity: sha512-6QEuw3zoX1SJQc7b87aBXke/no+mG2bTBgw29gWMQonLmpEkWoCAVkl+M49e48AZlWzxiDzDZzYdp6kobcyLww==}
-    engines: {node: '>=10.13.0'}
 
   enhanced-resolve@5.22.2:
     resolution: {integrity: sha512-0rxICaFZ7NQho/sHely2bvOPRP0Eu2B0NZ9zM54YvRvWMn7jfz3DmnOZDR9LlXDdDcqntAVc6Hfy4gr/tdH/Ag==}
@@ -9061,7 +9047,7 @@ snapshots:
   '@tailwindcss/node@4.3.0':
     dependencies:
       '@jridgewell/remapping': 2.3.5
-      enhanced-resolve: 5.22.1
+      enhanced-resolve: 5.22.2
       jiti: 2.7.0
       lightningcss: 1.32.0
       magic-string: 0.30.21
@@ -9178,7 +9164,7 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.29.7
       '@testing-library/dom': 9.3.4
-      '@vue/test-utils': 2.4.10(@vue/compiler-dom@3.5.35)(@vue/server-renderer@3.5.35(vue@3.5.35(typescript@6.0.3)))(vue@3.5.35(typescript@6.0.3))
+      '@vue/test-utils': 2.4.11(@vue/compiler-dom@3.5.35)(@vue/server-renderer@3.5.35(vue@3.5.35(typescript@6.0.3)))(vue@3.5.35(typescript@6.0.3))
       vue: 3.5.35(typescript@6.0.3)
     optionalDependencies:
       '@vue/compiler-sfc': 3.5.35
@@ -9614,15 +9600,6 @@ snapshots:
 
   '@vue/shared@3.5.35': {}
 
-  '@vue/test-utils@2.4.10(@vue/compiler-dom@3.5.35)(@vue/server-renderer@3.5.35(vue@3.5.35(typescript@6.0.3)))(vue@3.5.35(typescript@6.0.3))':
-    dependencies:
-      '@vue/compiler-dom': 3.5.35
-      js-beautify: 1.15.4
-      vue: 3.5.35(typescript@6.0.3)
-      vue-component-type-helpers: 3.3.3
-    optionalDependencies:
-      '@vue/server-renderer': 3.5.35(vue@3.5.35(typescript@6.0.3))
-
   '@vue/test-utils@2.4.11(@vue/compiler-dom@3.5.35)(@vue/server-renderer@3.5.35(vue@3.5.35(typescript@6.0.3)))(vue@3.5.35(typescript@6.0.3))':
     dependencies:
       '@vue/compiler-dom': 3.5.35
@@ -9862,7 +9839,7 @@ snapshots:
     dependencies:
       baseline-browser-mapping: 2.10.33
       caniuse-lite: 1.0.30001793
-      electron-to-chromium: 1.5.366
+      electron-to-chromium: 1.5.367
       node-releases: 2.0.47
       update-browserslist-db: 1.2.3(browserslist@4.28.2)
 
@@ -10531,7 +10508,7 @@ snapshots:
 
   ejs@6.0.1: {}
 
-  electron-to-chromium@1.5.366: {}
+  electron-to-chromium@1.5.367: {}
 
   emoji-regex@10.6.0: {}
 
@@ -10546,11 +10523,6 @@ snapshots:
   end-of-stream@1.4.5:
     dependencies:
       once: 1.4.0
-
-  enhanced-resolve@5.22.1:
-    dependencies:
-      graceful-fs: 4.2.11
-      tapable: 2.3.3
 
   enhanced-resolve@5.22.2:
     dependencies:
@@ -14171,7 +14143,7 @@ snapshots:
 
   vitest-browser-vue@2.1.0(@vue/compiler-dom@3.5.35)(@vue/server-renderer@3.5.35(vue@3.5.35(typescript@6.0.3)))(vitest@4.1.8)(vue@3.5.35(typescript@6.0.3)):
     dependencies:
-      '@vue/test-utils': 2.4.10(@vue/compiler-dom@3.5.35)(@vue/server-renderer@3.5.35(vue@3.5.35(typescript@6.0.3)))(vue@3.5.35(typescript@6.0.3))
+      '@vue/test-utils': 2.4.11(@vue/compiler-dom@3.5.35)(@vue/server-renderer@3.5.35(vue@3.5.35(typescript@6.0.3)))(vue@3.5.35(typescript@6.0.3))
       vitest: 4.1.8(@opentelemetry/api@1.9.1)(@types/node@25.9.1)(@vitest/browser-playwright@4.1.8)(@vitest/ui@4.1.8)(jsdom@26.1.0(canvas@3.2.3))(vite@8.0.16(@types/node@25.9.1)(esbuild@0.28.0)(jiti@2.7.0)(sass@1.100.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       vue: 3.5.35(typescript@6.0.3)
     transitivePeerDependencies:
