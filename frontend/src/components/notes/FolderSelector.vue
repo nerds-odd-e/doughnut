@@ -3,7 +3,7 @@
     <p v-if="loadError" class="text-error text-sm mb-2">
       {{ loadError }}
     </p>
-    <div class="daisy-join w-full folder-selector-join">
+    <div class="daisy-join w-full">
       <select
         v-model="selectModel"
         class="daisy-select daisy-select-sm daisy-join-item min-h-[2.75rem] w-full min-w-0 flex-1"
@@ -37,21 +37,17 @@
           </option>
         </optgroup>
       </select>
-      <div
-        class="folder-selector-join-append flex shrink-0 self-stretch items-stretch"
+      <button
+        type="button"
+        :class="FIELD_JOIN_APPEND_BUTTON_CLASS"
+        :disabled="disabled"
+        title="Search folders"
+        aria-label="Search folders"
+        data-testid="folder-selector-more-button"
+        @click="onSearchFoldersClick"
       >
-        <button
-          type="button"
-          class="daisy-btn daisy-btn-outline daisy-btn-neutral daisy-join-item"
-          :disabled="disabled"
-          title="Search folders"
-          aria-label="Search folders"
-          data-testid="folder-selector-more-button"
-          @click="onSearchFoldersClick"
-        >
-          <MoreHorizontal class="w-5 h-5" />
-        </button>
-      </div>
+        <MoreHorizontal class="w-5 h-5" />
+      </button>
     </div>
     <Modal v-if="searchOpen" align-top @close_request="searchOpen = false">
       <template #body>
@@ -76,6 +72,7 @@ import Modal from "@/components/commons/Modal.vue"
 import { useFolderSelectorNeighbourListing } from "@/composables/useFolderSelectorNeighbourListing"
 import FolderSearchForm from "./FolderSearchForm.vue"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
+import { FIELD_JOIN_APPEND_BUTTON_CLASS } from "@/utils/fieldJoinAppendButtonClass"
 import {
   ancestorsFromChain,
   folderChainWithParentIds,
@@ -219,9 +216,3 @@ function onIndexLoaded(rows: Folder[]) {
 }
 </script>
 
-<style scoped>
-.folder-selector-join-append :deep(button) {
-  height: 100%;
-  min-height: 2.75rem;
-}
-</style>

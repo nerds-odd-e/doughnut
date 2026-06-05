@@ -20,6 +20,7 @@
 @source inline("daisy-loading daisy-loading-spinner daisy-loading-dots daisy-loading-ring daisy-loading-ball daisy-loading-bars daisy-loading-infinity daisy-loading-xs daisy-loading-sm daisy-loading-md daisy-loading-lg daisy-loading-xl");
 @source inline("daisy-progress daisy-skeleton daisy-countdown daisy-stat daisy-stats daisy-steps daisy-step daisy-step-primary");
 @source inline("daisy-join daisy-join-item daisy-btn-group daisy-btn-group-sm daisy-btn-group-vertical daisy-divider daisy-indicator daisy-indicator-item daisy-tooltip daisy-kbd daisy-stack daisy-breadcrumbs");
+@source inline("doughnut-field-control-surface doughnut-field-join-append-btn");
 @plugin "daisyui" {
   themes:
     light --default,
@@ -29,19 +30,65 @@
 
 /* Same border as daisy-select / daisy-input field controls */
 .daisy-dropdown-content,
-.doughnut-menu-panel {
+.doughnut-menu-panel,
+.doughnut-field-control-surface,
+.daisy-join
+  .doughnut-field-join-append-btn.daisy-btn-outline.daisy-btn-neutral {
   --input-color: color-mix(in oklab, var(--color-base-content) 20%, #0000);
+}
+
+.daisy-dropdown-content,
+.doughnut-menu-panel {
   border: var(--border) solid var(--input-color);
 }
 
-/* Outline neutral buttons in a join beside field controls */
-.daisy-join .daisy-btn-outline.daisy-btn-neutral {
-  --btn-border: color-mix(in oklab, var(--color-base-content) 20%, #0000);
-  --btn-fg: var(--color-base-content);
+.doughnut-field-control-surface {
+  border: var(--border) solid var(--input-color);
+  background-color: var(--color-base-100);
   box-shadow:
-    0 1px color-mix(in oklab, var(--btn-border) calc(var(--depth) * 10%), #0000)
+    0 1px
+    color-mix(in oklab, var(--input-color) calc(var(--depth) * 10%), #0000)
     inset,
     0 -1px oklch(100% 0 0 / calc(var(--depth) * 0.1)) inset;
+}
+
+/* Append control in a join: match field surface (not transparent btn-outline) */
+.daisy-join
+.doughnut-field-join-append-btn.daisy-btn-outline.daisy-btn-neutral {
+  --btn-color: var(--color-base-content);
+  --btn-fg: var(--color-base-content);
+  --btn-border: var(--input-color);
+  --btn-bg: var(--color-base-100);
+  --btn-shadow: "";
+  background-color: var(--color-base-100);
+  border-color: var(--input-color);
+  color: var(--color-base-content);
+  box-shadow:
+    0 1px
+    color-mix(in oklab, var(--input-color) calc(var(--depth) * 10%), #0000)
+    inset,
+    0 -1px oklch(100% 0 0 / calc(var(--depth) * 0.1)) inset;
+}
+
+@media (hover: hover) {
+  .daisy-join
+    .doughnut-field-join-append-btn.daisy-btn-outline.daisy-btn-neutral:hover:not(
+      :disabled,
+      [disabled],
+      .daisy-btn-disabled
+    ) {
+    --btn-bg: color-mix(
+      in oklab,
+      var(--color-base-content) 8%,
+      var(--color-base-100)
+    );
+    background-color: color-mix(
+      in oklab,
+      var(--color-base-content) 8%,
+      var(--color-base-100)
+    );
+    border-color: var(--input-color);
+  }
 }
 
 svg {

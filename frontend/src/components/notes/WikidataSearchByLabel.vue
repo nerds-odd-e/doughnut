@@ -25,6 +25,7 @@ import { defineComponent } from "vue"
 import SvgWikidata from "../svgs/SvgWikidata.vue"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
 import WikidataAssociationDialog from "./WikidataAssociationDialog.vue"
+import { FIELD_JOIN_APPEND_BUTTON_CLASS } from "@/utils/fieldJoinAppendButtonClass"
 
 export default defineComponent({
   props: {
@@ -41,15 +42,14 @@ export default defineComponent({
     hasWikidataId(): boolean {
       return !!this.modelValue && this.modelValue.trim() !== ""
     },
-    buttonClasses(): string[] {
-      const baseClasses = ["daisy-btn", "daisy-join-item"]
+    buttonClasses(): string {
       if (this.errorMessage) {
-        return [...baseClasses, "daisy-btn-error"]
+        return "daisy-btn daisy-join-item daisy-btn-error"
       }
       if (this.hasWikidataId) {
-        return [...baseClasses, "daisy-btn-primary"]
+        return "daisy-btn daisy-join-item daisy-btn-primary"
       }
-      return [...baseClasses, "daisy-btn-outline", "daisy-btn-neutral"]
+      return FIELD_JOIN_APPEND_BUTTON_CLASS
     },
   },
   data() {
