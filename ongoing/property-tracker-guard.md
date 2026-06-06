@@ -2,7 +2,7 @@
 
 When a note property is deleted or its key is renamed, detect linked property memory trackers, ask the user to confirm, then soft-delete or update the tracker before persisting the content change. Covers rich property rows and raw Markdown save.
 
-**Status:** planned (implementation reverted; this plan incorporates lessons from the first attempt)
+**Status:** in progress — Phase 1a done
 
 ---
 
@@ -69,7 +69,7 @@ Permanent artifacts (capability-named): `property_memory_tracker.feature`, `useP
 
 **Depends on:** existing `softDelete` API only (no new backend endpoint).
 
-- **1a — Guard composable (removal only)** *(structure, minimal)*
+- **1a — Guard composable (removal only)** *(structure, minimal)* ✅
   - Add `usePropertyMemoryTrackerGuard` with `confirmAndApplyRemoval` only (+ `getNoteInfo` load/cache).
   - Frontend unit tests for: no `noteId` → proceed; no tracker → no confirm; confirm → `softDelete`; cancel → abort.
   - **Commit.**
