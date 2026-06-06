@@ -226,12 +226,14 @@ onMounted(() => {
 <style scoped lang="scss">
 @use "@/assets/menu-variables.scss" as *;
 
+$contestable-dummy-textarea-height: 4.5rem;
 $contestable-dummy-input-reserve: calc(
-  0.5rem + 4.5rem + max(0.75rem, env(safe-area-inset-bottom))
+  0.5rem + $contestable-dummy-textarea-height +
+    max(0.75rem, env(safe-area-inset-bottom))
 );
 
 .quiz--contestable {
-  padding-bottom: $contestable-dummy-input-reserve;
+  margin-bottom: $contestable-dummy-input-reserve;
 }
 
 .contestable-dummy-input-bar {
@@ -242,6 +244,10 @@ $contestable-dummy-input-reserve: calc(
   z-index: 40;
   padding: 0.5rem 1rem max(0.75rem, env(safe-area-inset-bottom));
   background-color: var(--color-base-100);
+
+  :deep(textarea) {
+    min-height: $contestable-dummy-textarea-height;
+  }
 }
 
 @media (max-width: 1024px) {
