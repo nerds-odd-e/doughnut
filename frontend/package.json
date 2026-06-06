@@ -57,7 +57,7 @@
     "es-toolkit": "^1.47.0",
     "esbuild": "0.28.0",
     "gsap": "^3.15.0",
-    "marked": "^18.0.4",
+    "marked": "^18.0.5",
     "optionator": "^0.9.4",
     "playwright": "^1.60.0",
     "sass": "1.100.0",
