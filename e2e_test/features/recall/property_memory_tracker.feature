@@ -51,6 +51,14 @@ Feature: Property memory tracker
     Then I should see a property memory tracker for "subject" on the assimilation settings panel
     And the property memory tracker for "topic" should be absent on the assimilation settings panel
 
+  Scenario: Removing tracked property in markdown mode deletes property memory tracker
+    Then I should see a property memory tracker for "topic" on the assimilation settings panel
+    When I visit note "Vitamins"
+    And I remove markdown note property "topic" confirming memory tracker change
+    And I reload the current page for note "Vitamins"
+    And I open assimilation settings from more options
+    Then the property memory tracker for "topic" should be absent on the assimilation settings panel
+
   Scenario: Property memory tracker page shows note and focused property
     When I open the property memory tracker for "topic" from the assimilation settings panel
     Then I should see note "Vitamins" on the memory tracker page

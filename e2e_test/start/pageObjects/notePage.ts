@@ -298,7 +298,12 @@ export const assumeNotePage = (
       return this
     },
     openMarkdownContentEditor() {
-      this.toolbarButton('Edit as markdown').click()
+      cy.get('body').then(($body) => {
+        const toMarkdown = $body.find('button[aria-label="Edit as markdown"]')
+        if (toMarkdown.length > 0) {
+          cy.wrap(toMarkdown.first()).click()
+        }
+      })
       return this
     },
     expectMarkdownContentSourceContains(fragment: string) {
@@ -450,6 +455,28 @@ export const assumeNotePage = (
       })
       confirmPropertyMemoryTrackerChange()
       return this.flushPendingContentSave()
+    },
+    removeMarkdownNotePropertyConfirmingMemoryTrackerChange(key: string) {
+      this.openMarkdownContentEditor()
+      cy.get('textarea').then(($ta) => {
+        const lines = String($ta.val() ?? '').split('\n')
+        const withoutProperty = lines
+          .filter((line) => !new RegExp(`^\\s*${key}\\s*:`).test(line))
+          .join('\n')
+        cy.wrap($ta).clear().invoke('val', withoutProperty).trigger('input')
+      })
+      cy.findByRole(noteContentRegion.role, {
+        name: noteContentRegion.name,
+      })
+        .find('textarea')
+        .filter(':visible')
+        .first()
+        .blur()
+      cy.get('body').click(0, 0, { force: true })
+      confirmPropertyMemoryTrackerChange()
+      cy.get('.dirty').should('not.exist')
+      pageIsNotLoading()
+      return this
     },
     renameRichNotePropertyKey(oldKey: string, newKey: string) {
       this.switchToRichContent()

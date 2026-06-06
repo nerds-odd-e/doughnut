@@ -642,6 +642,15 @@ When(
   }
 )
 
+When(
+  'I remove markdown note property {string} confirming memory tracker change',
+  (key: string) => {
+    start
+      .assumeNotePage()
+      .removeMarkdownNotePropertyConfirmingMemoryTrackerChange(key)
+  }
+)
+
 When('I visit note {string}', (noteTopology: string) => {
   start.jumpToNotePage(noteTopology)
 })

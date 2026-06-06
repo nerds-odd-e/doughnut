@@ -2,7 +2,7 @@
 
 When a note property is deleted or its key is renamed, detect linked property memory trackers, ask the user to confirm, then soft-delete or update the tracker before persisting the content change. Covers rich property rows and raw Markdown save.
 
-**Status:** Phase 2 complete — deploy gate pending CD
+**Status:** Complete — Phase 3 deploy gate pending CD
 
 ---
 
@@ -133,9 +133,8 @@ Permanent artifacts (capability-named): `property_memory_tracker.feature`, `useP
   - `NoteEditableContent.spec.ts`: remove key / rename key / cancel → no `updateNoteContent`.
   - **Commit.**
 
-- **3c — E2E: Markdown mode remove tracked property** *(behavior, optional)*
+- **3c — E2E: Markdown mode remove tracked property** *(behavior)* ✅
   - Switch to Markdown, delete `topic:` line, save, confirm, tracker gone.
-  - Only if rich-mode E2E is stable; otherwise defer.
   - **Commit.** → **Phase 3 deploy gate.**
 
 ---
