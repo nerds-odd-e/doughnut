@@ -98,7 +98,7 @@ Permanent artifacts (capability-named): `property_memory_tracker.feature`, `useP
   - Controller tests: rename preserves stats; conflict `409`; reject note-level tracker.
   - **Commit.**
 
-- **2b — `diffFrontmatterPropertyKeyChanges` helper** *(structure)*
+- **2b — `diffFrontmatterPropertyKeyChanges` helper** *(structure)* ✅
   - Pure function in `noteContentFrontmatter.ts` + unit tests (removal, rename-by-value, ambiguous same-value pairs, invalid frontmatter).
   - **Commit.**
 

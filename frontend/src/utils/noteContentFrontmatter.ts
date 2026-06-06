@@ -91,3 +91,70 @@ export function composeNoteContentMarkdown(input: {
 export function isRelationPropertyKey(key: string): boolean {
   return key.trim().toLowerCase() === "relation"
 }
+
+export type PropertyKeyChange =
+  | { type: "removal"; key: string }
+  | { type: "rename"; fromKey: string; toKey: string }
+
+/** Detects property key removals and renames between two note Markdown snapshots. */
+export function diffFrontmatterPropertyKeyChanges(
+  oldMarkdown: string,
+  newMarkdown: string
+): PropertyKeyChange[] {
+  const oldParsed = parseNoteContentMarkdown(oldMarkdown)
+  const newParsed = parseNoteContentMarkdown(newMarkdown)
+  if (!oldParsed.ok || !newParsed.ok) return []
+
+  const oldProps = oldParsed.properties
+  const newProps = newParsed.properties
+
+  const removedKeys: string[] = []
+  for (const key of Object.keys(oldProps)) {
+    if (!(key in newProps)) removedKeys.push(key)
+  }
+
+  const addedKeys: string[] = []
+  for (const key of Object.keys(newProps)) {
+    if (!(key in oldProps)) addedKeys.push(key)
+  }
+
+  const removedByValue = new Map<string, string[]>()
+  for (const key of removedKeys) {
+    const value = (oldProps[key] ?? "").trim()
+    const list = removedByValue.get(value) ?? []
+    list.push(key)
+    removedByValue.set(value, list)
+  }
+
+  const addedByValue = new Map<string, string[]>()
+  for (const key of addedKeys) {
+    const value = (newProps[key] ?? "").trim()
+    const list = addedByValue.get(value) ?? []
+    list.push(key)
+    addedByValue.set(value, list)
+  }
+
+  const renames: PropertyKeyChange[] = []
+  const pairedRemovedKeys = new Set<string>()
+
+  for (const [value, removedList] of removedByValue) {
+    const addedList = addedByValue.get(value)
+    if (addedList && removedList.length === 1 && addedList.length === 1) {
+      renames.push({
+        type: "rename",
+        fromKey: removedList[0]!,
+        toKey: addedList[0]!,
+      })
+      pairedRemovedKeys.add(removedList[0]!)
+    }
+  }
+
+  const removals: PropertyKeyChange[] = []
+  for (const key of removedKeys) {
+    if (!pairedRemovedKeys.has(key)) {
+      removals.push({ type: "removal", key })
+    }
+  }
+
+  return [...renames, ...removals]
+}
