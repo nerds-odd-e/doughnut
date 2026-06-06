@@ -2,6 +2,7 @@
   <TextContentWrapper
     :value="noteContent"
     field="edit content"
+    :before-save-content="beforeSaveContent"
   >
     <template #default="{ value, update, blur }">
       <TextArea
@@ -48,8 +49,10 @@ import TextArea from "@/components/form/TextArea.vue"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
 import { usePasteWithLinkImageOptions } from "@/composables/usePasteWithLinkImageOptions"
 import { useContentCursorInserter } from "@/composables/useContentCursorInserter"
+import { usePropertyMemoryTrackerGuard } from "@/composables/usePropertyMemoryTrackerGuard"
 import {
   composeNoteContentFromPropertyRows,
+  diffFrontmatterPropertyKeyChanges,
   parseNoteContentMarkdown,
   sortedPropertyRowsFromRecord,
   validatePropertyRowsForRichEdit,
@@ -69,6 +72,24 @@ const props = defineProps({
   noteTitleForWikidataSearch: { type: String, default: "" },
   isIndexContext: { type: Boolean, default: false },
 })
+
+const propertyMemoryTrackerGuard = usePropertyMemoryTrackerGuard(
+  () => props.noteId
+)
+
+async function beforeSaveContent(
+  lastSaved: string,
+  newValue: string
+): Promise<boolean> {
+  if (!props.asMarkdown) {
+    return true
+  }
+  const changes = diffFrontmatterPropertyKeyChanges(lastSaved, newValue)
+  if (changes.length === 0) {
+    return true
+  }
+  return propertyMemoryTrackerGuard.confirmAndApplyPropertyKeyChanges(changes)
+}
 
 const textareaRef = ref<InstanceType<typeof TextArea> | null>(null)
 const richEditorRef = ref<InstanceType<typeof RichMarkdownEditor> | null>(null)

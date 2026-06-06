@@ -1,4 +1,8 @@
-import { TextContentController } from "@generated/doughnut-backend-api/sdk.gen"
+import {
+  MemoryTrackerController,
+  NoteController,
+  TextContentController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import NoteEditableContent from "@/components/notes/core/NoteEditableContent.vue"
 import { VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
@@ -621,6 +625,149 @@ topic: training
       expect(
         rfp.findComponent({ name: "RelationTypeSelectCompact" }).exists()
       ).toBe(false)
+      wrapper.unmount()
+    })
+  })
+
+  describe("property memory tracker guard on markdown", () => {
+    const noteId = 42
+    const trackedPropertyMarkdown = `---
+topic: training
+---
+
+Workshop body.`
+
+    let getNoteInfoSpy: ReturnType<typeof mockSdkService>
+    let softDeleteSpy: ReturnType<typeof mockSdkService>
+    let updatePropertyKeySpy: ReturnType<typeof mockSdkService>
+    let confirmMock: ReturnType<typeof vi.fn<(msg: string) => Promise<boolean>>>
+
+    beforeEach(() => {
+      vi.useFakeTimers()
+      getNoteInfoSpy = mockSdkService(NoteController, "getNoteInfo", {
+        memoryTrackers: [],
+      })
+      softDeleteSpy = mockSdkService(
+        MemoryTrackerController,
+        "softDelete",
+        undefined
+      )
+      updatePropertyKeySpy = mockSdkService(
+        MemoryTrackerController,
+        "updatePropertyKey",
+        undefined
+      )
+      confirmMock = vi.fn<(msg: string) => Promise<boolean>>()
+      vi.mocked(usePopups).mockReturnValue({
+        popups: {
+          options: mockPopupsOptions,
+          alert: vi.fn(),
+          confirm: confirmMock,
+          done: vi.fn(),
+          register: vi.fn(),
+          peek: vi.fn(),
+        },
+      })
+    })
+
+    afterEach(() => {
+      vi.restoreAllMocks()
+      vi.useRealTimers()
+    })
+
+    function mockNoteInfoWithPropertyTracker(key: string, id: number) {
+      const tracker = makeMe.aMemoryTracker.please()
+      tracker.id = id
+      tracker.propertyKey = key
+      getNoteInfoSpy.mockResolvedValue(
+        wrapSdkResponse(
+          makeMe.aNoteRecallInfo.memoryTrackers([tracker]).please()
+        )
+      )
+      return tracker
+    }
+
+    it("soft-deletes the tracker and saves when the user confirms removing a tracked property", async () => {
+      const tracker = mockNoteInfoWithPropertyTracker("topic", 99)
+      confirmMock.mockImplementationOnce(() => Promise.resolve(true))
+
+      const withoutTopic = `---
+---
+
+Workshop body.`
+      const wrapper = await mountMarkdownTextarea({
+        noteId,
+        noteContent: trackedPropertyMarkdown,
+      })
+
+      await setTextareaValue(wrapper, withoutTopic)
+      await advanceNoteContentSaveDebounce()
+
+      expect(confirmMock).toHaveBeenCalledWith(
+        'Property "topic" has a memory tracker. Deleting it will also delete that tracker. Continue?'
+      )
+      expect(softDeleteSpy).toHaveBeenCalledWith({
+        path: { memoryTracker: tracker.id },
+      })
+      expect(updateNoteContentSpy).toHaveBeenCalledWith({
+        path: { note: noteId },
+        body: { content: withoutTopic },
+      })
+      wrapper.unmount()
+    })
+
+    it("updates the tracker property key and saves when the user confirms renaming", async () => {
+      const tracker = mockNoteInfoWithPropertyTracker("topic", 99)
+      confirmMock.mockImplementationOnce(() => Promise.resolve(true))
+
+      const renamedMarkdown = `---
+subject: training
+---
+
+Workshop body.`
+      const wrapper = await mountMarkdownTextarea({
+        noteId,
+        noteContent: trackedPropertyMarkdown,
+      })
+
+      await setTextareaValue(wrapper, renamedMarkdown)
+      await advanceNoteContentSaveDebounce()
+
+      expect(confirmMock).toHaveBeenCalledWith(
+        'Property "topic" has a memory tracker. Renaming it to "subject" will update the tracker. Continue?'
+      )
+      expect(updatePropertyKeySpy).toHaveBeenCalledWith({
+        path: { memoryTracker: tracker.id },
+        body: { propertyKey: "subject" },
+      })
+      expect(updateNoteContentSpy).toHaveBeenCalledWith({
+        path: { note: noteId },
+        body: { content: renamedMarkdown },
+      })
+      wrapper.unmount()
+    })
+
+    it("does not save when the user cancels", async () => {
+      mockNoteInfoWithPropertyTracker("topic", 99)
+      confirmMock.mockImplementationOnce(() => Promise.resolve(false))
+
+      const wrapper = await mountMarkdownTextarea({
+        noteId,
+        noteContent: trackedPropertyMarkdown,
+      })
+
+      await setTextareaValue(
+        wrapper,
+        `---
+---
+
+Workshop body.`
+      )
+      await advanceNoteContentSaveDebounce()
+
+      expect(confirmMock).toHaveBeenCalledOnce()
+      expect(softDeleteSpy).not.toHaveBeenCalled()
+      expect(updateNoteContentSpy).not.toHaveBeenCalled()
       wrapper.unmount()
     })
   })

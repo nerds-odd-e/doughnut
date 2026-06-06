@@ -128,7 +128,7 @@ Permanent artifacts (capability-named): `property_memory_tracker.feature`, `useP
   - No observable change until wired.
   - **Commit.**
 
-- **3b — Wire `NoteEditableContent`** *(behavior)*
+- **3b — Wire `NoteEditableContent`** *(behavior)* ✅
   - `usePropertyMemoryTrackerGuard` + `diffFrontmatterPropertyKeyChanges` in `beforeSaveContent` when `asMarkdown`.
   - `NoteEditableContent.spec.ts`: remove key / rename key / cancel → no `updateNoteContent`.
   - **Commit.**
