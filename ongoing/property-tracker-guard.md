@@ -102,7 +102,7 @@ Permanent artifacts (capability-named): `property_memory_tracker.feature`, `useP
   - Pure function in `noteContentFrontmatter.ts` + unit tests (removal, rename-by-value, ambiguous same-value pairs, invalid frontmatter).
   - **Commit.**
 
-- **2c — Extend composable with `confirmAndApplyRename`** *(behavior)*
+- **2c — Extend composable with `confirmAndApplyRename`** *(behavior)* ✅
   - Call `MemoryTrackerController.updatePropertyKey`; alert on error.
   - Unit tests.
   - **Commit.**
