@@ -27,6 +27,7 @@
         v-if="presetPanelOpen"
         :list-id="presetListId"
         :property-rows="propertyRows"
+        :exclude-row-index="idx"
         @select="onPresetSelected"
       />
     </div>

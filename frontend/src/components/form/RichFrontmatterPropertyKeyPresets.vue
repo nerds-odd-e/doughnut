@@ -11,6 +11,7 @@ const props = withDefaults(
   defineProps<{
     listId: string
     propertyRows?: PropertyRow[]
+    excludeRowIndex?: number
   }>(),
   { propertyRows: () => [] }
 )
@@ -23,7 +24,8 @@ const isIndexContextRef = inject(
 const presetKeys = computed(() =>
   richModeKeyDropdownPresetKeysForPropertyRows(
     unref(isIndexContextRef),
-    props.propertyRows
+    props.propertyRows,
+    { excludeRowIndex: props.excludeRowIndex }
   )
 )
 
