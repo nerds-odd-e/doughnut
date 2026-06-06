@@ -255,6 +255,72 @@ describe("NoteMoreOptionsForm", () => {
       })
     })
 
+    it("uses the current note id when note prop changes without remount", async () => {
+      deleteNoteSpy.mockResolvedValue(wrapSdkResponse([]))
+      const moonId = 501
+      const relationId = 503
+      const moonNote = {
+        ...makeMe.aNote.please(),
+        id: moonId,
+        noteTopology: {
+          ...makeMe.aNote.please().noteTopology,
+          id: moonId,
+          title: "Moon",
+        },
+      }
+      const relationRealm = {
+        ...makeMe.aNoteRealm
+          .content(
+            relationshipNoteContent("a-part-of", "[[Moon]]", "[[Earth]]")
+          )
+          .please(),
+        id: relationId,
+        wikiTitles: [
+          wikiTitleFromInnerAndNoteId("Moon", moonId),
+          wikiTitleFromInnerAndNoteId("Earth", 502),
+        ],
+      }
+      const relationNote = {
+        ...relationRealm.note,
+        id: relationId,
+        noteTopology: {
+          ...relationRealm.note.noteTopology,
+          id: relationId,
+        },
+      }
+      useStorageAccessor().value.refreshNoteRealm({
+        ...makeMe.aNoteRealm.title("Moon").please(),
+        id: moonId,
+      })
+      useStorageAccessor().value.refreshNoteRealm(relationRealm)
+
+      const wrapper = renderer.withProps({ note: moonNote }).mount()
+      await flushPromises()
+      await wrapper.setProps({ note: relationNote })
+      await flushPromises()
+
+      await wrapper.find('button[title="Delete note"]').trigger("click")
+      await flushPromises()
+
+      const popups = usePopups().popups.peek()
+      expect(popups?.length).toBe(1)
+      expect(popups?.[0]?.type).toBe("options")
+      if (popups?.[0]?.type !== "options") {
+        throw new Error("Expected relationship delete options")
+      }
+      expect(popups[0].message).toBe(
+        `"${relationNote.noteTopology.title}" is a relationship. What should happen?`
+      )
+
+      usePopups().popups.done("LEAVE_DEAD_LINKS")
+      await flushPromises()
+
+      expect(deleteNoteSpy).toHaveBeenCalledWith({
+        path: { note: relationId },
+        body: { referenceHandling: "LEAVE_DEAD_LINKS" },
+      })
+    })
+
     it("does not call deleteNote when confirmation is cancelled", async () => {
       const wrapper = renderer.withProps({ note }).mount()
 

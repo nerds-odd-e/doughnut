@@ -3,14 +3,19 @@ import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import type { NoteDeleteReferenceHandling } from "@/store/StoredApiCollection"
 import { qualifyRelationNoteForReduceOnDelete } from "@/utils/relationNoteReduceOnDelete"
 import { quotedNoteLabel } from "@/utils/quotedNoteLabel"
+import { toValue, type MaybeRefOrGetter } from "vue"
 import { useRouter } from "vue-router"
 
-export function useNoteDeleteFlow(noteId: number, noteTitle: string) {
+export function useNoteDeleteFlow(
+  noteId: MaybeRefOrGetter<number>,
+  noteTitle: MaybeRefOrGetter<string>
+) {
   const router = useRouter()
   const { popups } = usePopups()
   const storageAccessor = useStorageAccessor()
 
-  const noteRealm = () => storageAccessor.value.refOfNoteRealm(noteId).value
+  const noteRealm = () =>
+    storageAccessor.value.refOfNoteRealm(toValue(noteId)).value
 
   const noteHasReferences = () => (noteRealm()?.references?.length ?? 0) > 0
 
@@ -18,9 +23,11 @@ export function useNoteDeleteFlow(noteId: number, noteTitle: string) {
     referenceHandling: NoteDeleteReferenceHandling
     sourcePropertyKey?: string
   } | null> => {
-    const label = quotedNoteLabel(noteTitle, noteId)
+    const id = toValue(noteId)
+    const title = toValue(noteTitle)
+    const label = quotedNoteLabel(title, id)
     const reduceQualification = qualifyRelationNoteForReduceOnDelete(
-      noteRealm()
+      storageAccessor.value.refOfNoteRealm(id).value
     )
     if (reduceQualification) {
       const choice = await popups.options(
@@ -75,7 +82,7 @@ export function useNoteDeleteFlow(noteId: number, noteTitle: string) {
       .storedApi()
       .deleteNote(
         router,
-        noteId,
+        toValue(noteId),
         deleteChoice.referenceHandling,
         deleteChoice.sourcePropertyKey
       )

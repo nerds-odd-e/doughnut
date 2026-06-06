@@ -113,10 +113,9 @@ const emit = defineEmits<{
 }>()
 
 const { toggle, isOnForNote } = useAssimilationView()
-const { deleteNote } = useNoteDeleteFlow(
-  props.note.id,
-  props.note.noteTopology.title
-)
+const noteId = computed(() => props.note.id)
+const noteTitle = computed(() => props.note.noteTopology.title)
+const { deleteNote } = useNoteDeleteFlow(noteId, noteTitle)
 
 const assimilationChecked = computed(() => isOnForNote(props.note.id))
 
