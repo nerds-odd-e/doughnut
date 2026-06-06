@@ -88,7 +88,7 @@ describe("NoteMoreOptionsForm", () => {
       const popups = usePopups().popups.peek()
       expect(popups?.length).toBe(1)
       expect(popups?.[0]?.type).toBe("confirm")
-      expect(popups?.[0]?.message).toBe("Confirm to delete this note?")
+      expect(popups?.[0]?.message).toBe('Confirm to delete "Note1.1.1"?')
 
       usePopups().popups.done(true)
       await flushPromises()
@@ -132,10 +132,10 @@ describe("NoteMoreOptionsForm", () => {
       expect(popup?.type).toBe("options")
       if (popup?.type !== "options") throw new Error("Expected options popup")
       expect(popup.message).toBe(
-        "This note is a relationship. What should happen?"
+        '"Note1.1.1" is a relationship. What should happen?'
       )
       expect(popup.options[0]?.label).toBe("Reduce to a property of the source")
-      expect(popup.options[1]?.label).toBe("Delete this note")
+      expect(popup.options[1]?.label).toBe('Delete "Note1.1.1"')
 
       usePopups().popups.done("REDUCE_TO_SOURCE_PROPERTY")
       await flushPromises()

@@ -44,7 +44,7 @@ export const makeSureNoteMoreOptionsFormIsOpen = () => {
   return noteMoreOptionsPage()
 }
 
-const deleteNoteWithConfirmation = (confirmButtonName: string) => {
+const deleteNoteWithConfirmation = (confirmButtonName: string | RegExp) => {
   visibleMoreOptionsButton(titles.delete).click()
   cy.findByRole('button', { name: confirmButtonName }).click()
   pageIsNotLoading()
@@ -57,7 +57,7 @@ const noteMoreOptionsPage = () => {
     },
     /** Plain delete for a relationship note (reduce vs delete options dialog). */
     deleteRelationshipNote() {
-      deleteNoteWithConfirmation('Delete this note')
+      deleteNoteWithConfirmation(/^Delete "/)
     },
     deleteNoteAndLeaveReferencesAsDeadLinks() {
       deleteNoteWithConfirmation('Leave all references as dead link')

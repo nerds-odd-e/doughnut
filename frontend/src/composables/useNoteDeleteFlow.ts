@@ -2,9 +2,10 @@ import usePopups from "@/components/commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import type { NoteDeleteReferenceHandling } from "@/store/StoredApiCollection"
 import { qualifyRelationNoteForReduceOnDelete } from "@/utils/relationNoteReduceOnDelete"
+import { quotedNoteLabel } from "@/utils/quotedNoteLabel"
 import { useRouter } from "vue-router"
 
-export function useNoteDeleteFlow(noteId: number) {
+export function useNoteDeleteFlow(noteId: number, noteTitle: string) {
   const router = useRouter()
   const { popups } = usePopups()
   const storageAccessor = useStorageAccessor()
@@ -17,19 +18,20 @@ export function useNoteDeleteFlow(noteId: number) {
     referenceHandling: NoteDeleteReferenceHandling
     sourcePropertyKey?: string
   } | null> => {
+    const label = quotedNoteLabel(noteTitle, noteId)
     const reduceQualification = qualifyRelationNoteForReduceOnDelete(
       noteRealm()
     )
     if (reduceQualification) {
       const choice = await popups.options(
-        "This note is a relationship. What should happen?",
+        `${label} is a relationship. What should happen?`,
         [
           {
             label: "Reduce to a property of the source",
             value: "REDUCE_TO_SOURCE_PROPERTY",
           },
           {
-            label: "Delete this note",
+            label: `Delete ${label}`,
             value: "LEAVE_DEAD_LINKS",
           },
         ]
@@ -45,12 +47,12 @@ export function useNoteDeleteFlow(noteId: number) {
     }
 
     if (!noteHasReferences()) {
-      return (await popups.confirm(`Confirm to delete this note?`))
+      return (await popups.confirm(`Confirm to delete ${label}?`))
         ? { referenceHandling: "LEAVE_DEAD_LINKS" }
         : null
     }
     const referenceHandling = (await popups.options(
-      "This note has references. How should they be handled?",
+      `${label} has references. How should they be handled?`,
       [
         {
           label:

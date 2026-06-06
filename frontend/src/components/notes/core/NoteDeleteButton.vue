@@ -10,7 +10,8 @@ import { useNoteDeleteFlow } from "@/composables/useNoteDeleteFlow"
 
 const props = defineProps({
   noteId: { type: Number, required: true },
+  noteTitle: { type: String, required: true },
 })
 
-const { deleteNote } = useNoteDeleteFlow(props.noteId)
+const { deleteNote } = useNoteDeleteFlow(props.noteId, props.noteTitle)
 </script>

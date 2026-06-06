@@ -29,6 +29,7 @@ import { computed } from "vue"
 import { useRouter } from "vue-router"
 import { Undo2 } from "@lucide/vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { quotedNoteLabel } from "@/utils/quotedNoteLabel"
 import UndoConfirmationForm from "./UndoConfirmationForm.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
 
@@ -56,11 +57,9 @@ const getNoteTopology = () => {
 }
 
 const getNoteIdentifier = (noteId: Doughnut.ID): string => {
-  const noteRealm = storageAccessor.value.refOfNoteRealm(noteId).value
-  if (noteRealm?.note) {
-    return `"${noteRealm.note.noteTopology.title}"`
-  }
-  return `note id: ${noteId}`
+  const title =
+    storageAccessor.value.refOfNoteRealm(noteId).value?.note?.noteTopology.title
+  return quotedNoteLabel(title, noteId)
 }
 
 const getCurrentContent = (): string => {
