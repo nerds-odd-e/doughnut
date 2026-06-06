@@ -4,6 +4,7 @@ import {
   isImagePropertyKey,
   isUrlPropertyKey,
   isWikidataIdPropertyKey,
+  nextAvailablePropertyKeyForBase,
   nextAvailablePropertyKeyForPreset,
   propertyKeyBaseAndSuffix,
   richModeKeyDropdownPresetKeys,
@@ -24,6 +25,27 @@ describe("propertyKeyBaseAndSuffix", () => {
       base: "example of",
       suffix: 2,
     })
+  })
+})
+
+describe("nextAvailablePropertyKeyForBase", () => {
+  it("returns the base key when the family is unused", () => {
+    expect(nextAvailablePropertyKeyForBase("a part of", [])).toBe("a part of")
+  })
+
+  it("returns the next suffixed key when the base is taken", () => {
+    expect(nextAvailablePropertyKeyForBase("a part of", ["a part of"])).toBe(
+      "a part of 2"
+    )
+    expect(
+      nextAvailablePropertyKeyForBase("a part of", ["a part of", "a part of 2"])
+    ).toBe("a part of 3")
+  })
+
+  it("treats existing keys case-insensitively", () => {
+    expect(nextAvailablePropertyKeyForBase("a part of", ["A part of"])).toBe(
+      "a part of 2"
+    )
   })
 })
 

@@ -183,37 +183,38 @@ public final class NoteContentMarkdown {
                     .map(updated -> updated.isEmpty() ? lf.body() : updated.fenced(lf.body())));
   }
 
-  /** Outcome of {@link #addPropertyToLeadingFrontmatter(String, String, String)}. */
-  public sealed interface LeadingFrontmatterAddPropertyResult
-      permits LeadingFrontmatterAddPropertyResult.Updated,
-          LeadingFrontmatterAddPropertyResult.ExistingKeyConflict {
+  public record AddPropertyWithAvailableKeyResult(String content, String resolvedKey) {}
 
-    record Updated(String content) implements LeadingFrontmatterAddPropertyResult {}
-
-    record ExistingKeyConflict() implements LeadingFrontmatterAddPropertyResult {}
+  /**
+   * Appends a scalar property using the next free key in {@code basePropertyKey}'s family (`key 2`,
+   * `key 3`, … when the base is taken).
+   */
+  public static AddPropertyWithAvailableKeyResult addPropertyWithAvailableKeyToLeadingFrontmatter(
+      String content, String basePropertyKey, String value) {
+    Set<String> existingKeys =
+        splitLeadingFrontmatter(content == null ? "" : content)
+            .map(lf -> lf.frontmatter().keys())
+            .orElse(Set.of());
+    String resolvedKey =
+        PropertyKeyNaming.nextAvailablePropertyKeyForBase(basePropertyKey, existingKeys);
+    return new AddPropertyWithAvailableKeyResult(
+        addPropertyToLeadingFrontmatter(content, resolvedKey, value), resolvedKey);
   }
 
   /**
    * Appends a scalar property to the first leading YAML frontmatter block, or creates one when
-   * absent. Fails with {@link LeadingFrontmatterAddPropertyResult.ExistingKeyConflict} when a key
-   * already exists (case-insensitive).
+   * absent. Caller must ensure {@code key} is not already present (case-insensitive).
    */
-  public static LeadingFrontmatterAddPropertyResult addPropertyToLeadingFrontmatter(
-      String content, String key, String value) {
+  public static String addPropertyToLeadingFrontmatter(String content, String key, String value) {
     if (content == null) {
       content = "";
     }
     Optional<LeadingFrontmatter> split = splitLeadingFrontmatter(content);
     if (split.isPresent()) {
       LeadingFrontmatter lf = split.get();
-      if (lf.frontmatter().containsKeyIgnoreCase(key)) {
-        return new LeadingFrontmatterAddPropertyResult.ExistingKeyConflict();
-      }
-      return new LeadingFrontmatterAddPropertyResult.Updated(
-          lf.frontmatter().set(key, value).fenced(lf.body()));
+      return lf.frontmatter().set(key, value).fenced(lf.body());
     }
-    return new LeadingFrontmatterAddPropertyResult.Updated(
-        Frontmatter.empty().set(key, value).fenced(content));
+    return Frontmatter.empty().set(key, value).fenced(content);
   }
 
   private static String trimOrNull(String s) {

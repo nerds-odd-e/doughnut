@@ -26,10 +26,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.web.server.ResponseStatusException;
 
 class NoteControllerTests extends ControllerTestBase {
   @Autowired NoteRepository noteRepository;
@@ -396,30 +394,25 @@ class NoteControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void shouldAbortReduceWhenSourceAlreadyHasPropertyKey() {
+    void shouldUseSuffixedPropertyKeyWhenSourceAlreadyHasPropertyKey()
+        throws UnexpectedNoAccessRightException {
       Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       Note moon =
           makeMe.aNote("Moon").notebook(nb).content("---\na part of: \"[[Mars]]\"\n---\n").please();
       makeMe.aNote("Earth").notebook(nb).please();
       Note relation =
           makeMe.aNote().notebook(nb).content(relationshipNoteContent("Moon", "Earth")).please();
-      String moonContentBefore = moon.getContent();
 
-      ResponseStatusException ex =
-          assertThrows(
-              ResponseStatusException.class,
-              () ->
-                  controller.deleteNote(
-                      relation, reduceToSourcePropertyDeleteRequest("a part of")));
+      controller.deleteNote(relation, reduceToSourcePropertyDeleteRequest("a part of"));
 
-      assertThat(ex.getStatusCode(), equalTo(HttpStatus.CONFLICT));
-      assertThat(ex.getReason(), containsString("a part of"));
-      assertThat(relation.getDeletedAt(), is(nullValue()));
-      assertThat(moon.getContent(), equalTo(moonContentBefore));
+      assertThat(relation.getDeletedAt(), is(not(nullValue())));
+      assertThat(moon.getContent(), containsString("a part of 2"));
+      assertThat(moon.getContent(), containsString("[[Earth]]"));
     }
 
     @Test
-    void shouldLeaveRelationTrackerIntactWhenReduceAbortsOnDuplicatePropertyKey() {
+    void shouldRehomeTrackerWithSuffixedPropertyKeyWhenSourceAlreadyHasPropertyKey()
+        throws UnexpectedNoAccessRightException {
       Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       Note moon =
           makeMe.aNote("Moon").notebook(nb).content("---\na part of: \"[[Mars]]\"\n---\n").please();
@@ -430,17 +423,15 @@ class NoteControllerTests extends ControllerTestBase {
           makeMe.aMemoryTrackerFor(relation).by(currentUser.getUser()).please();
       int trackerId = relationTracker.getId();
 
-      assertThrows(
-          ResponseStatusException.class,
-          () -> controller.deleteNote(relation, reduceToSourcePropertyDeleteRequest("a part of")));
+      controller.deleteNote(relation, reduceToSourcePropertyDeleteRequest("a part of"));
 
       MemoryTracker reloaded = memoryTrackerRepository.findById(trackerId).orElseThrow();
       assertThat(reloaded.getDeletedAt(), is(nullValue()));
-      assertThat(reloaded.getNote().getId(), equalTo(relation.getId()));
-      assertThat(reloaded.getPropertyKey(), equalTo(""));
+      assertThat(reloaded.getNote().getId(), equalTo(moon.getId()));
+      assertThat(reloaded.getPropertyKey(), equalTo("a part of 2"));
       assertThat(
           memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), moon.getId()),
-          empty());
+          hasSize(1));
     }
   }
 

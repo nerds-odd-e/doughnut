@@ -30,7 +30,7 @@ Feature: relationship edit and remove
     Then the note content markdown source should contain "a part of: '[[Earth]]'"
     And I should see "Moon" has no relationship to "Earth"
 
-  Scenario: reduce to source property fails when source already has that property
+  Scenario: reduce to source property uses suffixed key when source already has that property
     When I update note "Moon" content using markdown to become:
       """
       ---
@@ -39,8 +39,9 @@ Feature: relationship edit and remove
 
       """
     When I delete the relationship from "Moon" to "Earth" and reduce it to a property of the source
-    Then I should see an error toast containing 'already has a property named "a part of"'
-    And I should see "Moon" has relationship "a part of" "Earth"
+    When I open the note content markdown editor on note "Moon"
+    Then the note content markdown source should contain "a part of 2: '[[Earth]]'"
+    And I should see "Moon" has no relationship to "Earth"
 
   Scenario: tracked relationship reduced keeps property memory tracker on source
     Given the note "Moon a part of Earth" was assimilated on day 1

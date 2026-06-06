@@ -193,23 +193,16 @@ public class NoteService {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "Could not resolve the relationship source note.");
     }
-    NoteContentMarkdown.LeadingFrontmatterAddPropertyResult addResult =
-        NoteContentMarkdown.addPropertyToLeadingFrontmatter(
+    NoteContentMarkdown.AddPropertyWithAvailableKeyResult addResult =
+        NoteContentMarkdown.addPropertyWithAvailableKeyToLeadingFrontmatter(
             sourceNote.getContent(), propertyKey, relationship.targetScalar());
-    switch (addResult) {
-      case NoteContentMarkdown.LeadingFrontmatterAddPropertyResult.ExistingKeyConflict ignored ->
-          throw new ResponseStatusException(
-              HttpStatus.CONFLICT,
-              "The source note already has a property named \"" + propertyKey + "\".");
-      case NoteContentMarkdown.LeadingFrontmatterAddPropertyResult.Updated updated -> {
-        sourceNote.setContent(updated.content());
-        sourceNote.setUpdatedAt(updatedAt);
-        entityPersister.merge(sourceNote);
-        deleteOrphanImagesForPersistedContent(sourceNote);
-        wikiTitleCacheService.refreshForNote(sourceNote, viewer);
-        rehomeNoteLevelMemoryTrackerToSourceProperty(relationNote, sourceNote, propertyKey, viewer);
-      }
-    }
+    sourceNote.setContent(addResult.content());
+    sourceNote.setUpdatedAt(updatedAt);
+    entityPersister.merge(sourceNote);
+    deleteOrphanImagesForPersistedContent(sourceNote);
+    wikiTitleCacheService.refreshForNote(sourceNote, viewer);
+    rehomeNoteLevelMemoryTrackerToSourceProperty(
+        relationNote, sourceNote, addResult.resolvedKey(), viewer);
   }
 
   private void rehomeNoteLevelMemoryTrackerToSourceProperty(

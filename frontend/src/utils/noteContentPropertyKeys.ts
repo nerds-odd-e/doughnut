@@ -127,25 +127,54 @@ export function propertyKeyMatchesPresetFamily(
   }
 }
 
+function propertyKeyBaseMatchesBaseKey(key: string, baseKey: string): boolean {
+  const { base } = propertyKeyBaseAndSuffix(key)
+  return base.trim().toLowerCase() === baseKey.trim().toLowerCase()
+}
+
+function nextAvailablePropertyKeyFromFamilyKeys(
+  baseKey: string,
+  familyKeys: readonly string[]
+): string {
+  const occupied = new Set<number>()
+  for (const k of familyKeys) {
+    const trimmed = k.trim()
+    if (!trimmed) continue
+    const { suffix } = propertyKeyBaseAndSuffix(trimmed)
+    occupied.add(suffix ?? 1)
+  }
+  if (!occupied.has(1)) return baseKey
+  let n = 2
+  while (occupied.has(n)) n++
+  return `${baseKey} ${n}`
+}
+
+/** Next free key in a base-key family, using `key 2`, `key 3`, … when the base is taken. */
+export function nextAvailablePropertyKeyForBase(
+  baseKey: string,
+  existingKeys: readonly string[]
+): string {
+  const familyKeys = existingKeys.filter((k) =>
+    propertyKeyBaseMatchesBaseKey(k, baseKey)
+  )
+  return nextAvailablePropertyKeyFromFamilyKeys(baseKey, familyKeys)
+}
+
 /** Next free key for a preset family, using `key 2`, `key 3`, … when the base is taken. */
 export function nextAvailablePropertyKeyForPreset(
   presetKey: string,
   rows: readonly PropertyRow[],
   options?: { excludeRowIndex?: number }
 ): string {
-  const occupied = new Set<number>()
+  const familyKeys: string[] = []
   for (let i = 0; i < rows.length; i++) {
     if (options?.excludeRowIndex === i) continue
     const k = rows[i]!.key.trim()
     if (!k) continue
     if (!propertyKeyMatchesPresetFamily(k, presetKey)) continue
-    const { suffix } = propertyKeyBaseAndSuffix(k)
-    occupied.add(suffix ?? 1)
+    familyKeys.push(k)
   }
-  if (!occupied.has(1)) return presetKey
-  let n = 2
-  while (occupied.has(n)) n++
-  return `${presetKey} ${n}`
+  return nextAvailablePropertyKeyFromFamilyKeys(presetKey, familyKeys)
 }
 
 /** Keys offered in the rich-mode property key dropdown (insert and row key fields). */

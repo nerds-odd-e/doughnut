@@ -1,10 +1,7 @@
 import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
 import { apiCallWithLoading, setupGlobalClient } from "@/managedApi/clientSetup"
 import loginOrRegisterAndHaltThisThread from "@/managedApi/window/loginOrRegisterAndHaltThisThread"
-import {
-  NoteController,
-  UserController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import createFetchMock from "vitest-fetch-mock"
 
@@ -107,31 +104,6 @@ describe("clientSetup", () => {
         expect.objectContaining({
           timeout: 3000,
         })
-      )
-    })
-
-    it("shows reduce-to-property conflict message for 409 responses", async () => {
-      const message =
-        'The source note already has a property named "a part of".'
-      fetchMock.mockResponse(
-        JSON.stringify({ message, errorType: "RESOURCE_CONFLICT" }),
-        { url: `${baseUrl}/api/notes/1/delete`, status: 409 }
-      )
-
-      const { error } = await apiCallWithLoading(() =>
-        NoteController.deleteNote({
-          path: { note: 1 },
-          body: {
-            referenceHandling: "REDUCE_TO_SOURCE_PROPERTY",
-            sourcePropertyKey: "a part of",
-          },
-        })
-      )
-
-      expect(error).toBeDefined()
-      expect(mockToast.error).toHaveBeenCalledWith(
-        message,
-        expect.objectContaining({ timeout: 3000 })
       )
     })
 

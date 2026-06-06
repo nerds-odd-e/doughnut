@@ -53,6 +53,11 @@ public final class Frontmatter {
     return Optional.empty();
   }
 
+  /** Key names in insertion order. */
+  public Set<String> keys() {
+    return Set.copyOf(data.keySet());
+  }
+
   /** Case-insensitive key presence (including entries whose value is null). */
   public boolean containsKeyIgnoreCase(String key) {
     for (String k : data.keySet()) {
