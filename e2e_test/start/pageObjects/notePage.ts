@@ -23,6 +23,15 @@ const noteContentRegion = { role: 'region' as const, name: 'Note content' }
 const richNotePropertyRow = (key: string) =>
   `[data-testid="rich-note-property-row"][data-property-key="${key}"]`
 
+function confirmPropertyMemoryTrackerChange() {
+  cy.get('dialog', { timeout: 15000 })
+    .filter(':visible')
+    .contains('memory tracker')
+    .should('be.visible')
+  clickPopupConfirmOk()
+  pageIsNotLoading()
+}
+
 const mainNoteHeadingTitleSelector =
   '#main-note-content h2.path-name-heading [role=title]'
 
@@ -439,12 +448,22 @@ export const assumeNotePage = (
           .find('[data-testid="rich-note-property-row-remove"]')
           .click()
       })
-      cy.get('dialog', { timeout: 15000 })
-        .filter(':visible')
-        .contains('memory tracker')
-        .should('be.visible')
-      clickPopupConfirmOk()
-      pageIsNotLoading()
+      confirmPropertyMemoryTrackerChange()
+      return this.flushPendingContentSave()
+    },
+    renameRichNotePropertyKey(oldKey: string, newKey: string) {
+      this.switchToRichContent()
+      cy.findByRole(noteContentRegion.role, {
+        name: noteContentRegion.name,
+      }).within(() => {
+        cy.get(richNotePropertyRow(oldKey), { timeout: 15000 }).within(() => {
+          cy.get('[data-testid="rich-note-property-row-key-input"]')
+            .clear()
+            .type(newKey)
+            .blur()
+        })
+      })
+      confirmPropertyMemoryTrackerChange()
       return this.flushPendingContentSave()
     },
     expectDeadWikiLink(linkText: string) {

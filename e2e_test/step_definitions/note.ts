@@ -642,6 +642,17 @@ When(
   }
 )
 
+When('I visit note {string}', (noteTopology: string) => {
+  start.jumpToNotePage(noteTopology)
+})
+
+When(
+  'I rename rich note property key from {string} to {string} confirming memory tracker change',
+  (oldKey: string, newKey: string) => {
+    start.assumeNotePage().renameRichNotePropertyKey(oldKey, newKey)
+  }
+)
+
 When(
   'I update note {string} content using markdown to become:',
   (noteTopology: string, newContent: string) => {

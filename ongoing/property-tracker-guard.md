@@ -2,7 +2,7 @@
 
 When a note property is deleted or its key is renamed, detect linked property memory trackers, ask the user to confirm, then soft-delete or update the tracker before persisting the content change. Covers rich property rows and raw Markdown save.
 
-**Status:** Phase 1 complete — deploy gate pending CD
+**Status:** Phase 2 complete — deploy gate pending CD
 
 ---
 
@@ -112,7 +112,7 @@ Permanent artifacts (capability-named): `property_memory_tracker.feature`, `useP
   - Frontend tests: rename confirm/cancel/no-tracker.
   - **Commit.**
 
-- **2e — E2E: rename tracked property key in rich mode** *(behavior, `@wip` → green)*
+- **2e — E2E: rename tracked property key in rich mode** *(behavior)* ✅
   - Scenario: rename `topic` → `subject` with confirm → assimilation shows `property: subject`, not `topic`.
   - Page object: `renameRichNotePropertyKey`.
   - **Commit.** → **Phase 2 deploy gate.**
