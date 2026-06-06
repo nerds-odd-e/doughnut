@@ -118,6 +118,7 @@ import RichFrontmatterInsertForm from "@/components/form/RichFrontmatterInsertFo
 import { richFrontmatterIsIndexContextKey } from "@/components/form/richFrontmatterProvide"
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
+import { usePropertyMemoryTrackerGuard } from "@/composables/usePropertyMemoryTrackerGuard"
 import { useWikidataPropertyDialog } from "@/composables/useWikidataPropertyDialog"
 import { relationKebabFromLabel } from "@/models/relationTypeOptions"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
@@ -152,6 +153,10 @@ const emits = defineEmits<{
   deadLinkClick: [payload: DeadLinkPayload]
   "image-upload-state": [inProgress: boolean]
 }>()
+
+const { confirmAndApplyRemoval } = usePropertyMemoryTrackerGuard(
+  () => props.noteId
+)
 
 const isInteractionLocked = computed(() => props.interactionLocked ?? false)
 
@@ -310,7 +315,13 @@ function onRowFocus(idx: number) {
   }
 }
 
-function removeRow(idx: number) {
+async function removeRow(idx: number) {
+  const key = propertyRows.value[idx]?.key.trim() ?? ""
+  const proceed = await confirmAndApplyRemoval(key)
+  if (!proceed) {
+    return
+  }
+
   propertyRows.value = removePropertyRowAt(propertyRows.value, idx)
   validationMessage.value = ""
   emits("properties-changed", filterForEmit([...propertyRows.value]))

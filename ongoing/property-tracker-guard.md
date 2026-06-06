@@ -2,7 +2,7 @@
 
 When a note property is deleted or its key is renamed, detect linked property memory trackers, ask the user to confirm, then soft-delete or update the tracker before persisting the content change. Covers rich property rows and raw Markdown save.
 
-**Status:** in progress — Phase 1a done
+**Status:** in progress — Phase 1a–1b done
 
 ---
 
@@ -74,7 +74,7 @@ Permanent artifacts (capability-named): `property_memory_tracker.feature`, `useP
   - Frontend unit tests for: no `noteId` → proceed; no tracker → no confirm; confirm → `softDelete`; cancel → abort.
   - **Commit.**
 
-- **1b — Wire `removeRow` in `RichFrontmatterProperties.vue`** *(behavior)*
+- **1b — Wire `removeRow` in `RichFrontmatterProperties.vue`** *(behavior)* ✅
   - `await confirmAndApplyRemoval(key)` before `removePropertyRowAt`.
   - Extend `RichMarkdownEditor.properties.spec.ts` (mock APIs + `usePopups`).
   - **Commit.**
