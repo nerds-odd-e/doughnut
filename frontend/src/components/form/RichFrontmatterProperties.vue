@@ -154,9 +154,8 @@ const emits = defineEmits<{
   "image-upload-state": [inProgress: boolean]
 }>()
 
-const { confirmAndApplyRemoval } = usePropertyMemoryTrackerGuard(
-  () => props.noteId
-)
+const { confirmAndApplyRemoval, confirmAndApplyRename } =
+  usePropertyMemoryTrackerGuard(() => props.noteId)
 
 const isInteractionLocked = computed(() => props.interactionLocked ?? false)
 
@@ -327,7 +326,7 @@ async function removeRow(idx: number) {
   emits("properties-changed", filterForEmit([...propertyRows.value]))
 }
 
-function commitRow(idx: number) {
+async function commitRow(idx: number) {
   const snapshot = rowSnapshots.value[idx]
   const rows = propertyRows.value.map((r, i) =>
     i === idx ? { key: r.key.trim(), value: r.value.trim() } : r
@@ -343,6 +342,20 @@ function commitRow(idx: number) {
       )
     }
     return
+  }
+
+  const newKey = rows[idx]?.key ?? ""
+  const oldKey = snapshot?.key.trim() ?? ""
+  if (oldKey !== "" && oldKey !== newKey) {
+    const proceed = await confirmAndApplyRename(oldKey, newKey)
+    if (!proceed) {
+      if (snapshot) {
+        propertyRows.value = propertyRows.value.map((r, i) =>
+          i === idx ? { ...snapshot } : r
+        )
+      }
+      return
+    }
   }
 
   validationMessage.value = ""

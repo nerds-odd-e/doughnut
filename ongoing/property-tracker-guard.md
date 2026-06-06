@@ -107,7 +107,7 @@ Permanent artifacts (capability-named): `property_memory_tracker.feature`, `useP
   - Unit tests.
   - **Commit.**
 
-- **2d — Wire `commitRow` key-change path** *(behavior)*
+- **2d — Wire `commitRow` key-change path** *(behavior)* ✅
   - Compare snapshot key vs committed key; `await confirmAndApplyRename`.
   - Frontend tests: rename confirm/cancel/no-tracker.
   - **Commit.**
