@@ -26,6 +26,12 @@ import type NoteStorage from "./NoteStorage"
 
 export type NoteDeleteReferenceHandling = NoteDeleteDto["referenceHandling"]
 
+export type NoteDeleteOptions = {
+  referenceHandling: NoteDeleteReferenceHandling
+  sourcePropertyKey?: string
+  sourceNoteId?: number
+}
+
 export type TitleRenameReferenceHandling = NonNullable<
   NoteUpdateTitleDto["referenceHandling"]
 >
@@ -113,8 +119,7 @@ export interface StoredApi {
   deleteNote(
     router: Router,
     noteId: Doughnut.ID,
-    referenceHandling: NoteDeleteReferenceHandling,
-    sourcePropertyKey?: string
+    options: NoteDeleteOptions
   ): Promise<NoteRealm | undefined>
 
   moveNoteToFolder(
@@ -479,9 +484,9 @@ export default class StoredApiCollection implements StoredApi {
   async deleteNote(
     router: Router,
     noteId: Doughnut.ID,
-    referenceHandling: NoteDeleteReferenceHandling,
-    sourcePropertyKey?: string
+    options: NoteDeleteOptions
   ) {
+    const { referenceHandling, sourcePropertyKey, sourceNoteId } = options
     const cachedRealm = this.storage.refOfNoteRealm(noteId).value
     const body: NoteDeleteDto = { referenceHandling }
     if (sourcePropertyKey !== undefined) {
@@ -498,6 +503,14 @@ export default class StoredApiCollection implements StoredApi {
     }
     this.noteEditingHistory.deleteNote(noteId)
     this.storage.removeNoteRealm(noteId)
+    if (
+      referenceHandling === "REDUCE_TO_SOURCE_PROPERTY" &&
+      sourceNoteId !== undefined
+    ) {
+      refreshSidebarStructuralListings()
+      await router.replace(noteShowLocation(sourceNoteId))
+      return
+    }
     let notebookId = cachedRealm?.notebookRealm.notebook.id
     let focusRealm: NoteRealm | undefined
     if (res.length > 0) {

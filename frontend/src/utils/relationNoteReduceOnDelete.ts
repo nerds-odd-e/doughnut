@@ -10,6 +10,7 @@ const RELATIONSHIP_NOTE_TYPE = "relationship"
 
 export type RelationNoteReduceOnDeleteQualification = {
   sourcePropertyKey: string
+  sourceNoteId: number
 }
 
 function frontmatterScalar(
@@ -67,7 +68,8 @@ export function qualifyRelationNoteForReduceOnDelete(
   if (!sourceInner) return
 
   const wikiTitles = noteRealm.wikiTitles ?? []
-  if (noteIdForWikiLinkInner(sourceInner, wikiTitles) === undefined) return
+  const sourceNoteId = noteIdForWikiLinkInner(sourceInner, wikiTitles)
+  if (sourceNoteId === undefined) return
 
-  return { sourcePropertyKey }
+  return { sourcePropertyKey, sourceNoteId }
 }

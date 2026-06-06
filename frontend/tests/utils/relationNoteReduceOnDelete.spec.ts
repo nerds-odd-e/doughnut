@@ -2,20 +2,7 @@ import { describe, expect, it } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { qualifyRelationNoteForReduceOnDelete } from "@/utils/relationNoteReduceOnDelete"
 import { wikiTitleFromInnerAndNoteId } from "@/utils/wikiPropertyValueField"
-
-function relationshipNoteContent(
-  relationKebab: string,
-  sourceLink: string,
-  targetLink: string
-): string {
-  return `---
-type: relationship
-relation: ${relationKebab}
-source: "${sourceLink.replace(/"/g, '\\"')}"
-target: "${targetLink.replace(/"/g, '\\"')}"
----
-`
-}
+import { relationshipNoteContent } from "@tests/notes/relationshipNoteTestContent"
 
 describe("qualifyRelationNoteForReduceOnDelete", () => {
   const moonId = 101
@@ -34,6 +21,7 @@ describe("qualifyRelationNoteForReduceOnDelete", () => {
 
     expect(qualifyRelationNoteForReduceOnDelete(realm)).toEqual({
       sourcePropertyKey: "a part of",
+      sourceNoteId: moonId,
     })
   })
 
