@@ -12,12 +12,16 @@ import { makeSureNoteMoreOptionsFormIsOpen } from './noteMoreOptionsForm'
 import { questionListPage } from './questionListPage'
 import { assumeAssimilationPage } from './assimilationPage'
 import testability from '../testability'
+import { clickPopupConfirmOk } from '../../support/daisyModalHelpers'
 
 /** Matches `noteShowHref()` (`/n{id}`), `/n/:id`, or legacy `/d/n/:id` note links. */
 const noteShowHref = /^\/d\/n\/\d+$|^\/n\/\d+$|^\/n\d+$/
 const noteShowPathInUrl = /\/d\/n\/\d+|\/n\/\d+|\/n\d+/
 
 const noteContentRegion = { role: 'region' as const, name: 'Note content' }
+
+const richNotePropertyRow = (key: string) =>
+  `[data-testid="rich-note-property-row"][data-property-key="${key}"]`
 
 const mainNoteHeadingTitleSelector =
   '#main-note-content h2.path-name-heading [role=title]'
@@ -422,11 +426,26 @@ export const assumeNotePage = (
       cy.findByRole(noteContentRegion.role, {
         name: noteContentRegion.name,
       }).within(() => {
-        cy.get(
-          `[data-testid="rich-note-property-row"][data-property-key="${key}"]`
-        ).should('not.exist')
+        cy.get(richNotePropertyRow(key)).should('not.exist')
       })
       return this
+    },
+    removeRichNoteProperty(key: string) {
+      this.switchToRichContent()
+      cy.findByRole(noteContentRegion.role, {
+        name: noteContentRegion.name,
+      }).within(() => {
+        cy.get(richNotePropertyRow(key))
+          .find('[data-testid="rich-note-property-row-remove"]')
+          .click()
+      })
+      cy.get('dialog', { timeout: 15000 })
+        .filter(':visible')
+        .contains('memory tracker')
+        .should('be.visible')
+      clickPopupConfirmOk()
+      pageIsNotLoading()
+      return this.flushPendingContentSave()
     },
     expectDeadWikiLink(linkText: string) {
       cy.findByRole(noteContentRegion.role, { name: noteContentRegion.name })

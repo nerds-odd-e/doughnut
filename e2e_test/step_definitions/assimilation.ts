@@ -176,6 +176,15 @@ Then(
   }
 )
 
+Then(
+  'the property memory tracker for {string} should be absent on the assimilation settings panel',
+  (propertyKey: string) => {
+    start
+      .assumeAssimilationPage()
+      .expectPropertyMemoryTrackerAbsent(propertyKey)
+  }
+)
+
 When(
   'I open the property memory tracker for {string} from the assimilation settings panel',
   (propertyKey: string) => {

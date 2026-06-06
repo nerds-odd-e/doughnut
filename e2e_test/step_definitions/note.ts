@@ -636,6 +636,13 @@ When(
 )
 
 When(
+  'I remove rich note property {string} confirming memory tracker change',
+  (key: string) => {
+    start.assumeNotePage().removeRichNoteProperty(key)
+  }
+)
+
+When(
   'I update note {string} content using markdown to become:',
   (noteTopology: string, newContent: string) => {
     start.jumpToNotePage(noteTopology).updateContentAsMarkdown(newContent)

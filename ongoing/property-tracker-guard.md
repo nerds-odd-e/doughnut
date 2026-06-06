@@ -2,7 +2,7 @@
 
 When a note property is deleted or its key is renamed, detect linked property memory trackers, ask the user to confirm, then soft-delete or update the tracker before persisting the content change. Covers rich property rows and raw Markdown save.
 
-**Status:** in progress — Phase 1a–1b done
+**Status:** Phase 1 complete — deploy gate pending CD
 
 ---
 
@@ -79,8 +79,8 @@ Permanent artifacts (capability-named): `property_memory_tracker.feature`, `useP
   - Extend `RichMarkdownEditor.properties.spec.ts` (mock APIs + `usePopups`).
   - **Commit.**
 
-- **1c — E2E: delete tracked property in rich mode** *(behavior, `@wip` → green)*
-  - Scenario in `property_memory_tracker.feature`: assimilate property → visit note → remove property → confirm → tracker absent on assimilation panel.
+- **1c — E2E: delete tracked property in rich mode** *(behavior)* ✅
+  - Scenario in `property_memory_tracker.feature`: assimilate property → remove property with confirm → reload + re-open assimilation → tracker absent.
   - Page object: `removeRichNoteProperty` with explicit dialog wait + `clickPopupConfirmOk()` + `flushPendingContentSave()`.
   - Step defs + `expectPropertyMemoryTrackerAbsent` on assimilation page.
   - **Commit.** → **Phase 1 deploy gate.**

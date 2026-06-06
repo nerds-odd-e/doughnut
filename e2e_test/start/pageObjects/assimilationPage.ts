@@ -39,6 +39,10 @@ function expectSuccessToast(message: string) {
   }).should('be.visible')
 }
 
+function propertyMemoryTrackerRowLabel(propertyKey: string) {
+  return `property: ${propertyKey}`
+}
+
 function waitForAssimilationNoteTitle(expectedTitle?: string) {
   pageIsNotLoading()
   cy.get('#main-note-content', { timeout: 15000 }).should('be.visible')
@@ -264,12 +268,18 @@ export const assumeAssimilationPage = () => ({
   },
   expectPropertyMemoryTracker(propertyKey: string) {
     this.expectMemoryTrackerInfo([
-      { type: `property: ${propertyKey}`, 'Recall Count': '0' },
+      { type: propertyMemoryTrackerRowLabel(propertyKey), 'Recall Count': '0' },
     ])
     return this
   },
+  expectPropertyMemoryTrackerAbsent(propertyKey: string) {
+    cy.contains('tr', propertyMemoryTrackerRowLabel(propertyKey)).should(
+      'not.exist'
+    )
+    return this
+  },
   openPropertyMemoryTracker(propertyKey: string) {
-    cy.contains('tr', `property: ${propertyKey}`).click()
+    cy.contains('tr', propertyMemoryTrackerRowLabel(propertyKey)).click()
     cy.url().should('include', '/memory-trackers/')
     pageIsNotLoading()
     return assumeMemoryTrackerPage()
