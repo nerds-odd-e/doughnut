@@ -123,7 +123,7 @@ Permanent artifacts (capability-named): `property_memory_tracker.feature`, `useP
 
 **Outcome:** Editing raw Markdown that removes or renames a tracked property key triggers the same confirmations on debounced save; cancel blocks the API save.
 
-- **3a — `beforeSaveContent` hook on `TextContentWrapper`** *(structure)*
+- **3a — `beforeSaveContent` hook on `TextContentWrapper`** *(structure)* ✅
   - Optional prop `(lastSaved, newValue) => Promise<boolean>`; call in `changerInner` before `updateTextField` for `edit content`.
   - No observable change until wired.
   - **Commit.**

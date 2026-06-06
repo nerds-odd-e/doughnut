@@ -1,6 +1,7 @@
 import { TextContentController } from "@generated/doughnut-backend-api/sdk.gen"
 import TextContentWrapper from "@/components/notes/core/TextContentWrapper.vue"
 import helper, { mockSdkService } from "@tests/helpers"
+import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDebounceTestSupport"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
 import { describe, it, expect, vi, afterEach } from "vitest"
@@ -144,6 +145,67 @@ describe("TextContentWrapper referenced title rename", () => {
     expect(
       document.querySelector("[data-testid=referenced-title-save-panel]")
     ).toBeTruthy()
+
+    wrapper.unmount()
+  })
+})
+
+describe("TextContentWrapper beforeSaveContent", () => {
+  afterEach(() => {
+    document.body.innerHTML = ""
+    vi.restoreAllMocks()
+    vi.useRealTimers()
+  })
+
+  const contentSlot = (slotProps: {
+    value: string
+    update: (noteId: number, v: string) => void
+    blur: () => void
+  }) =>
+    h("textarea", {
+      "data-testid": "content-slot-textarea",
+      value: slotProps.value,
+      onInput: (e: Event) =>
+        slotProps.update(1, (e.target as HTMLTextAreaElement).value),
+      onBlur: slotProps.blur,
+    })
+
+  it("blocks save when beforeSaveContent returns false", async () => {
+    vi.useFakeTimers()
+    const beforeSaveContent = vi.fn().mockResolvedValue(false)
+    const updateSpy = mockSdkService(
+      TextContentController,
+      "updateNoteContent",
+      makeMe.aNoteRealm.please()
+    )
+
+    const wrapper = helper
+      .component(TextContentWrapper)
+      .withCleanStorage()
+      .withProps({
+        field: "edit content",
+        value: "Original content",
+        beforeSaveContent,
+      })
+      .mount({
+        slots: { default: contentSlot },
+        attachTo: document.body,
+      })
+    await flushPromises()
+
+    const textarea = document.querySelector(
+      "[data-testid=content-slot-textarea]"
+    ) as HTMLTextAreaElement
+    textarea.value = "Edited content"
+    textarea.dispatchEvent(new Event("input", { bubbles: true }))
+    await flushPromises()
+    await advanceNoteContentSaveDebounce()
+
+    expect(beforeSaveContent).toHaveBeenCalledWith(
+      "Original content",
+      "Edited content"
+    )
+    expect(updateSpy).not.toHaveBeenCalled()
 
     wrapper.unmount()
   })

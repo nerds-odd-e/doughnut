@@ -72,6 +72,12 @@ const props = defineProps({
   },
   titleRenameNeedsExplicitReferenceChoice: { type: Boolean, default: false },
   titleEditNoteId: { type: Number, required: false },
+  beforeSaveContent: {
+    type: Function as PropType<
+      (lastSaved: string, newValue: string) => Promise<boolean>
+    >,
+    required: false,
+  },
 })
 
 const savedVersion = ref(0)
@@ -88,6 +94,15 @@ const changerInner = async (
   version: number,
   errorHander: (errs: unknown) => void
 ) => {
+  if (props.field === "edit content" && props.beforeSaveContent) {
+    const proceed = await props.beforeSaveContent(
+      lastSavedValue.value ?? "",
+      newValue
+    )
+    if (!proceed) {
+      return
+    }
+  }
   pendingSaveValues.add(newValue)
   try {
     await storageAccessor.value
