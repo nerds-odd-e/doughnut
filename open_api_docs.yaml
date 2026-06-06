@@ -2000,6 +2000,30 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebookAiAssistant"
+  /api/memory-trackers/{memoryTracker}/property-key:
+    patch:
+      tags:
+      - memory-tracker-controller
+      operationId: updatePropertyKey
+      parameters:
+      - name: memoryTracker
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateMemoryTrackerPropertyKeyDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MemoryTracker"
   /api/memory-trackers/{memoryTracker}/mark-as-recalled:
     patch:
       tags:
@@ -4269,6 +4293,16 @@ components:
           format: date-time
       required:
       - id
+    UpdateMemoryTrackerPropertyKeyDTO:
+      type: object
+      description: Rename a property memory tracker's frontmatter key in place.
+      properties:
+        propertyKey:
+          type: string
+          description: New frontmatter property key for this tracker
+          minLength: 1
+      required:
+      - propertyKey
     WikidataSearchEntity:
       type: object
       properties:

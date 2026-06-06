@@ -91,7 +91,7 @@ Permanent artifacts (capability-named): `property_memory_tracker.feature`, `useP
 
 **Outcome:** User renames a property key in the rich editor; confirm updates tracker `property_key`; cancel reverts the key.
 
-- **2a — Backend `PATCH /api/memory-trackers/{id}/property-key`** *(structure)*
+- **2a — Backend `PATCH /api/memory-trackers/{id}/property-key`** *(structure)* ✅
   - `UpdateMemoryTrackerPropertyKeyDTO`, `MemoryTrackerService.updatePropertyKey`, controller endpoint.
   - `MemoryTrackerBuilder.propertyKey()` for tests.
   - Regenerate TS client + OpenAPI.

@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.doughnut.controllers.dto.ThresholdExceededResult;
+import com.odde.doughnut.controllers.dto.UpdateMemoryTrackerPropertyKeyDTO;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -622,6 +624,86 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       assertThat(
           conversation.getSubject() == null || conversation.getSubject().getRecallPrompt() == null,
           is(true));
+    }
+  }
+
+  @Nested
+  class UpdatePropertyKey {
+    private UpdateMemoryTrackerPropertyKeyDTO renameTo(String propertyKey) {
+      UpdateMemoryTrackerPropertyKeyDTO dto = new UpdateMemoryTrackerPropertyKeyDTO();
+      dto.setPropertyKey(propertyKey);
+      return dto;
+    }
+
+    @Test
+    void shouldRenamePropertyKeyWhilePreservingStats() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      MemoryTracker tracker =
+          makeMe
+              .aMemoryTrackerFor(note)
+              .by(currentUser.getUser())
+              .propertyKey("topic")
+              .afterNthStrictRecall(2)
+              .please();
+      Integer recallCount = tracker.getRecallCount();
+      Float forgettingCurve = tracker.getForgettingCurveIndex();
+      Timestamp nextRecallAt = tracker.getNextRecallAt();
+
+      MemoryTracker result = controller.updatePropertyKey(tracker, renameTo("subject"));
+
+      assertThat(result.getPropertyKey(), equalTo("subject"));
+      assertThat(result.getRecallCount(), equalTo(recallCount));
+      assertThat(result.getForgettingCurveIndex(), equalTo(forgettingCurve));
+      assertThat(result.getNextRecallAt(), equalTo(nextRecallAt));
+    }
+
+    @Test
+    void shouldRejectRenameWhenPropertyKeyAlreadyTaken() {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).propertyKey("subject").please();
+      MemoryTracker tracker =
+          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).propertyKey("topic").please();
+
+      ResponseStatusException ex =
+          assertThrows(
+              ResponseStatusException.class,
+              () -> controller.updatePropertyKey(tracker, renameTo("subject")));
+
+      assertThat(ex.getStatusCode(), equalTo(HttpStatus.CONFLICT));
+    }
+
+    @Test
+    void shouldRejectRenameForNoteLevelTracker() {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      MemoryTracker tracker = makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+
+      ResponseStatusException ex =
+          assertThrows(
+              ResponseStatusException.class,
+              () -> controller.updatePropertyKey(tracker, renameTo("topic")));
+
+      assertThat(ex.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
+    }
+
+    @Test
+    void shouldNotBeAbleToRenameOthersMemoryTracker() {
+      MemoryTracker tracker =
+          makeMe.aMemoryTrackerBy(makeMe.aUser().please()).propertyKey("topic").please();
+
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.updatePropertyKey(tracker, renameTo("subject")));
+    }
+
+    @Test
+    void shouldRequireUserToBeLoggedIn() {
+      currentUser.setUser(null);
+      MemoryTracker tracker =
+          makeMe.aMemoryTrackerBy(makeMe.aUser().please()).propertyKey("topic").please();
+
+      assertThrows(
+          ResponseStatusException.class,
+          () -> controller.updatePropertyKey(tracker, renameTo("subject")));
     }
   }
 }

@@ -54,4 +54,9 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
     entity.setSpelling(true);
     return this;
   }
+
+  public MemoryTrackerBuilder propertyKey(String propertyKey) {
+    entity.setPropertyKey(propertyKey);
+    return this;
+  }
 }

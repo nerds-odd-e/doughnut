@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.ThresholdExceededResult;
+import com.odde.doughnut.controllers.dto.UpdateMemoryTrackerPropertyKeyDTO;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -10,6 +11,7 @@ import com.odde.doughnut.services.MemoryTrackerService;
 import com.odde.doughnut.services.RecallQuestionService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -145,5 +147,17 @@ class MemoryTrackerController {
     authorizationService.assertLoggedIn();
     authorizationService.assertReadAuthorization(memoryTracker);
     memoryTrackerService.softDelete(memoryTracker);
+  }
+
+  @PatchMapping(path = "/{memoryTracker}/property-key")
+  @Transactional
+  public MemoryTracker updatePropertyKey(
+      @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker,
+      @Valid @RequestBody UpdateMemoryTrackerPropertyKeyDTO dto)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertLoggedIn();
+    authorizationService.assertReadAuthorization(memoryTracker);
+    memoryTrackerService.updatePropertyKey(memoryTracker, dto.getPropertyKey());
+    return memoryTracker;
   }
 }

@@ -697,6 +697,16 @@ export type NotebookAiAssistant = {
     updatedAt?: string;
 };
 
+/**
+ * Rename a property memory tracker's frontmatter key in place.
+ */
+export type UpdateMemoryTrackerPropertyKeyDto = {
+    /**
+     * New frontmatter property key for this tracker
+     */
+    propertyKey: string;
+};
+
 export type WikidataSearchEntity = {
     id?: string;
     label: string;
@@ -2671,6 +2681,24 @@ export type UpdateAiAssistantResponses = {
 };
 
 export type UpdateAiAssistantResponse = UpdateAiAssistantResponses[keyof UpdateAiAssistantResponses];
+
+export type UpdatePropertyKeyData = {
+    body: UpdateMemoryTrackerPropertyKeyDto;
+    path: {
+        memoryTracker: number;
+    };
+    query?: never;
+    url: '/api/memory-trackers/{memoryTracker}/property-key';
+};
+
+export type UpdatePropertyKeyResponses = {
+    /**
+     * OK
+     */
+    200: MemoryTracker;
+};
+
+export type UpdatePropertyKeyResponse = UpdatePropertyKeyResponses[keyof UpdatePropertyKeyResponses];
 
 export type MarkAsRecalledData = {
     body?: never;
