@@ -1,6 +1,8 @@
 -- Reduces every non-deleted relationship note with relation: an-example-of into a property
 -- on its resolved source note (key family: "an example of", "an example of 2", …).
--- Re-homes active note-level memory trackers; hard-deletes the relation note.
+-- Re-homes active note-level memory trackers; clears recall_prompt rows that
+-- reference the relation note's predefined_question rows (no ON DELETE CASCADE);
+-- hard-deletes the relation note.
 -- Then drops all empty folders (no non-deleted notes, no child folders), preserving
 -- folders with non-blank index_content.
 
@@ -340,6 +342,11 @@ BEGIN
           AND existing.deleted_at IS NULL
           AND existing.removed_from_tracking = 0
       );
+
+    DELETE rp
+    FROM recall_prompt rp
+    INNER JOIN predefined_question pq ON pq.id = rp.predefined_question_id
+    WHERE pq.note_id = v_relation_note_id;
 
     DELETE FROM note WHERE id = v_relation_note_id;
   END LOOP;
