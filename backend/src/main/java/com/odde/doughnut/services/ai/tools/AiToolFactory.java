@@ -115,7 +115,7 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
       4. Vary the lengths of the choice texts so that the correct answer isn't consistently the longest.
       5. Provide a better question based on my question and the note. Please correct any grammar.
 
-      Note: The specific focus note and retrieved neighbors are not shown to the user. Focus on memory reinforcement and recall across various subjects.
+      Note: The focus note and retrieved neighbors are not shown to the user. Focus on memory reinforcement and recall across various subjects.
 %s
 
 """
