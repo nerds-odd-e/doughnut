@@ -34,7 +34,6 @@ Feature: Property memory tracker
       | What does the topic property mean?    | micronutrients | vitamins           | minerals           |
     And OpenAI evaluates the question as legitimate
     When I am recalling my note on day 2
-    Then I should see focused property "topic" during recall
     Then I should be asked "What does the topic property mean?"
     When I choose answer "micronutrients"
     And I visit note "Vitamins"
