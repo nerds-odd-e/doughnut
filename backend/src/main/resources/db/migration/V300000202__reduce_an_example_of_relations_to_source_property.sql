@@ -330,10 +330,7 @@ BEGIN
       AND mt.property_key = ''
       AND NOT EXISTS (
         SELECT 1
-        FROM (
-          SELECT user_id, note_id, spelling, property_key, deleted_at, removed_from_tracking
-          FROM memory_tracker
-        ) existing
+        FROM memory_tracker existing
         WHERE existing.user_id = mt.user_id
           AND existing.note_id = v_source_note_id
           AND existing.spelling = 0
@@ -342,21 +339,29 @@ BEGIN
           AND existing.removed_from_tracking = 0
       );
 
+    DELETE FROM conversation WHERE note_id = v_relation_note_id;
+
     DELETE c
     FROM conversation c
-    LEFT JOIN recall_prompt rp ON rp.id = c.recall_prompt_id
-    LEFT JOIN memory_tracker mt ON mt.id = rp.memory_tracker_id
-    LEFT JOIN predefined_question pq ON pq.id = rp.predefined_question_id
-    WHERE c.note_id = v_relation_note_id
-       OR mt.note_id = v_relation_note_id
-       OR pq.note_id = v_relation_note_id;
+    INNER JOIN recall_prompt rp ON rp.id = c.recall_prompt_id
+    INNER JOIN memory_tracker mt ON mt.id = rp.memory_tracker_id
+    WHERE mt.note_id = v_relation_note_id;
+
+    DELETE c
+    FROM conversation c
+    INNER JOIN recall_prompt rp ON rp.id = c.recall_prompt_id
+    INNER JOIN predefined_question pq ON pq.id = rp.predefined_question_id
+    WHERE pq.note_id = v_relation_note_id;
 
     DELETE rp
     FROM recall_prompt rp
-    LEFT JOIN memory_tracker mt ON mt.id = rp.memory_tracker_id
-    LEFT JOIN predefined_question pq ON pq.id = rp.predefined_question_id
-    WHERE mt.note_id = v_relation_note_id
-       OR pq.note_id = v_relation_note_id;
+    INNER JOIN memory_tracker mt ON mt.id = rp.memory_tracker_id
+    WHERE mt.note_id = v_relation_note_id;
+
+    DELETE rp
+    FROM recall_prompt rp
+    INNER JOIN predefined_question pq ON pq.id = rp.predefined_question_id
+    WHERE pq.note_id = v_relation_note_id;
 
     DELETE FROM note WHERE id = v_relation_note_id;
   END LOOP;
