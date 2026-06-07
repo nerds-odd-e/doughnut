@@ -12,7 +12,6 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.ConversationMessageRepository;
 import com.odde.doughnut.entities.repositories.ConversationRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -305,8 +304,14 @@ class ConversationMessageControllerTest extends ControllerTestBase {
     @BeforeEach
     void setup() {
       Note note = makeMe.aNote().please();
-      RecallPromptBuilder recallPromptBuilder = makeMe.aRecallPrompt();
-      recallPrompt = recallPromptBuilder.withPredefinedQuestionForNote(note).please();
+      MemoryTracker memoryTracker =
+          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+      recallPrompt =
+          makeMe
+              .aRecallPrompt()
+              .forMemoryTracker(memoryTracker)
+              .withPredefinedQuestionForNote(note)
+              .please();
     }
 
     @Test

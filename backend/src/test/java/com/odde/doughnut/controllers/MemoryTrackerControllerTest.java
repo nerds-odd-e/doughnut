@@ -117,6 +117,34 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
     }
 
     @Test
+    void shouldScopeWrongAnswersPerMemoryTrackerNotPerNote()
+        throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      MemoryTracker noteLevelTracker =
+          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+      MemoryTracker propertyTracker =
+          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).propertyKey("topic").please();
+      Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
+
+      for (int i = 0; i < 5; i++) {
+        makeMe
+            .aRecallPrompt()
+            .withPredefinedQuestionForNote(note)
+            .forMemoryTracker(propertyTracker)
+            .answerChoiceIndex(1)
+            .answerTimestamp(day1)
+            .please();
+      }
+
+      testabilitySettings.timeTravelTo(day1);
+
+      assertThat(
+          controller.getThresholdExceeded(noteLevelTracker).thresholdExceeded(), equalTo(false));
+      assertThat(
+          controller.getThresholdExceeded(propertyTracker).thresholdExceeded(), equalTo(true));
+    }
+
+    @Test
     void shouldNotBeAbleToGetForOthersMemoryTracker() {
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
       assertThrows(

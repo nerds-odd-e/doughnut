@@ -54,12 +54,12 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
       value =
           "SELECT COUNT(*) FROM recall_prompt rp "
               + "JOIN quiz_answer qa ON rp.quiz_answer_id = qa.id "
-              + "JOIN predefined_question pq ON rp.predefined_question_id = pq.id "
-              + "WHERE pq.note_id = :noteId "
+              + "WHERE rp.memory_tracker_id = :memoryTrackerId "
               + "AND qa.correct = false "
               + "AND qa.created_at >= :since",
       nativeQuery = true)
-  int countWrongAnswersSince(@Param("noteId") Integer noteId, @Param("since") Timestamp since);
+  int countWrongAnswersSinceForMemoryTracker(
+      @Param("memoryTrackerId") Integer memoryTrackerId, @Param("since") Timestamp since);
 
   void deleteByMemoryTracker_Id(Integer memoryTrackerId);
 }

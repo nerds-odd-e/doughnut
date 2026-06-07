@@ -51,9 +51,7 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
       entity.setAnswer(answer);
     }
     if (entity.getMemoryTracker() == null && memoryTracker == null) {
-      Note note =
-          entity.getPredefinedQuestion() != null ? entity.getPredefinedQuestion().getNote() : null;
-      memoryTracker = makeMe.aMemoryTrackerFor(note).please(needPersist);
+      throw new IllegalStateException("call forMemoryTracker() before please()");
     }
     entity.setMemoryTracker(memoryTracker);
   }

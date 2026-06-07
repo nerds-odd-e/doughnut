@@ -38,10 +38,12 @@ public class RecallPromptRepositoryTest {
   }
 
   @Nested
-  class CountWrongAnswersSince {
+  class CountWrongAnswersSinceForMemoryTracker {
     @Test
     void shouldReturnZeroWhenNoAnswers() {
-      int count = recallPromptRepository.countWrongAnswersSince(note.getId(), twoWeeksAgo);
+      int count =
+          recallPromptRepository.countWrongAnswersSinceForMemoryTracker(
+              memoryTracker.getId(), twoWeeksAgo);
       assertThat(count, equalTo(0));
     }
 
@@ -56,7 +58,9 @@ public class RecallPromptRepositoryTest {
           .answerTimestamp(now)
           .please();
 
-      int count = recallPromptRepository.countWrongAnswersSince(note.getId(), twoWeeksAgo);
+      int count =
+          recallPromptRepository.countWrongAnswersSinceForMemoryTracker(
+              memoryTracker.getId(), twoWeeksAgo);
       assertThat(count, equalTo(1));
     }
 
@@ -70,7 +74,9 @@ public class RecallPromptRepositoryTest {
           .answerTimestamp(now)
           .please();
 
-      int count = recallPromptRepository.countWrongAnswersSince(note.getId(), twoWeeksAgo);
+      int count =
+          recallPromptRepository.countWrongAnswersSinceForMemoryTracker(
+              memoryTracker.getId(), twoWeeksAgo);
       assertThat(count, equalTo(0));
     }
 
@@ -85,7 +91,9 @@ public class RecallPromptRepositoryTest {
           .answerTimestamp(beforePeriod)
           .please();
 
-      int count = recallPromptRepository.countWrongAnswersSince(note.getId(), twoWeeksAgo);
+      int count =
+          recallPromptRepository.countWrongAnswersSinceForMemoryTracker(
+              memoryTracker.getId(), twoWeeksAgo);
       assertThat(count, equalTo(0));
     }
 
@@ -109,12 +117,14 @@ public class RecallPromptRepositoryTest {
           .answerTimestamp(day10)
           .please();
 
-      int count = recallPromptRepository.countWrongAnswersSince(note.getId(), twoWeeksAgo);
+      int count =
+          recallPromptRepository.countWrongAnswersSinceForMemoryTracker(
+              memoryTracker.getId(), twoWeeksAgo);
       assertThat(count, equalTo(2));
     }
 
     @Test
-    void shouldOnlyCountAnswersForSpecificNote() {
+    void shouldOnlyCountAnswersForSpecificMemoryTracker() {
       Note otherNote = makeMe.aNote().notebookOwnedBy(user).please();
       MemoryTracker otherTracker = makeMe.aMemoryTrackerFor(otherNote).by(user).please();
 
@@ -133,8 +143,29 @@ public class RecallPromptRepositoryTest {
           .answerTimestamp(now)
           .please();
 
-      int count = recallPromptRepository.countWrongAnswersSince(note.getId(), twoWeeksAgo);
+      int count =
+          recallPromptRepository.countWrongAnswersSinceForMemoryTracker(
+              memoryTracker.getId(), twoWeeksAgo);
       assertThat(count, equalTo(1));
+    }
+
+    @Test
+    void shouldNotCountWrongAnswersFromOtherTrackersOnSameNote() {
+      MemoryTracker propertyTracker =
+          makeMe.aMemoryTrackerFor(note).by(user).propertyKey("topic").please();
+
+      makeMe
+          .aRecallPrompt()
+          .withPredefinedQuestionForNote(note)
+          .forMemoryTracker(propertyTracker)
+          .answerChoiceIndex(1)
+          .answerTimestamp(now)
+          .please();
+
+      int count =
+          recallPromptRepository.countWrongAnswersSinceForMemoryTracker(
+              memoryTracker.getId(), twoWeeksAgo);
+      assertThat(count, equalTo(0));
     }
   }
 }

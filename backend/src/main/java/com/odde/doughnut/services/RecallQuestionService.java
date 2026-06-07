@@ -73,7 +73,7 @@ public class RecallQuestionService {
       RecallPrompt existingRecallPrompt) {
     long contextSeed = ThreadLocalRandom.current().nextLong();
     Long contextSeedBoxed = Long.valueOf(contextSeed);
-    MemoryTracker memoryTracker = existingRecallPrompt.getMemoryTracker();
+    MemoryTracker memoryTracker = existingRecallPrompt.requireMemoryTracker();
     MCQWithAnswer MCQWithAnswer =
         aiQuestionGenerator.regenerateQuestion(
             contestResult, note, mcqWithAnswer, contextSeedBoxed, memoryTracker.getPropertyKey());

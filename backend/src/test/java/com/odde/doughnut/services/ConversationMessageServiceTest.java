@@ -4,11 +4,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.entities.Conversation;
+import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
-import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -40,9 +40,15 @@ class ConversationMessageServiceTest {
     @BeforeEach
     void setup() {
       note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      RecallPromptBuilder recallPromptBuilder = makeMe.aRecallPrompt();
+      MemoryTracker memoryTracker =
+          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
       recallPrompt =
-          recallPromptBuilder.withPredefinedQuestionForNote(note).answerChoiceIndex(1).please();
+          makeMe
+              .aRecallPrompt()
+              .forMemoryTracker(memoryTracker)
+              .withPredefinedQuestionForNote(note)
+              .answerChoiceIndex(1)
+              .please();
     }
 
     @Test

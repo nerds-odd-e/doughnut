@@ -148,10 +148,7 @@ public class MemoryTrackerService {
 
   public boolean updateMemoryTrackerAfterAnsweringQuestion(
       Timestamp currentUTCTimestamp, Boolean correct, RecallPrompt recallPrompt) {
-    MemoryTracker memoryTracker = recallPrompt.getMemoryTracker();
-    if (memoryTracker == null) {
-      return false;
-    }
+    MemoryTracker memoryTracker = recallPrompt.requireMemoryTracker();
     Integer thinkingTimeMs =
         recallPrompt.getAnswer() != null ? recallPrompt.getAnswer().getThinkingTimeMs() : null;
     return markAsRecalled(currentUTCTimestamp, correct, memoryTracker, thinkingTimeMs);
@@ -167,10 +164,7 @@ public class MemoryTrackerService {
 
     if (!correct) {
       return hasExceededWrongAnswerThreshold(
-          memoryTracker.getNote(),
-          currentUTCTimestamp,
-          WRONG_ANSWER_PERIOD_DAYS,
-          WRONG_ANSWER_THRESHOLD);
+          memoryTracker, currentUTCTimestamp, WRONG_ANSWER_PERIOD_DAYS, WRONG_ANSWER_THRESHOLD);
     }
     return false;
   }
@@ -274,7 +268,7 @@ public class MemoryTrackerService {
     if (recallPrompt.getAnswer() != null) {
       throw new IllegalArgumentException("Recall prompt is already answered");
     }
-    MemoryTracker memoryTracker = recallPrompt.getMemoryTracker();
+    MemoryTracker memoryTracker = recallPrompt.requireMemoryTracker();
     String spellingAnswer = answerSpellingDTO.getSpellingAnswer();
     Note note = memoryTracker.getNote();
     Boolean correct = note.matchAnswer(spellingAnswer);
@@ -292,15 +286,16 @@ public class MemoryTrackerService {
   }
 
   public boolean hasExceededWrongAnswerThreshold(
-      Note note, Timestamp currentTime, int periodDays, int threshold) {
+      MemoryTracker memoryTracker, Timestamp currentTime, int periodDays, int threshold) {
     Timestamp since =
         new Timestamp(currentTime.getTime() - (long) periodDays * 24 * 60 * 60 * 1000);
-    int wrongCount = recallPromptRepository.countWrongAnswersSince(note.getId(), since);
+    int wrongCount =
+        recallPromptRepository.countWrongAnswersSinceForMemoryTracker(memoryTracker.getId(), since);
     return wrongCount >= threshold;
   }
 
   public boolean isThresholdExceeded(MemoryTracker memoryTracker, Timestamp currentTime) {
     return hasExceededWrongAnswerThreshold(
-        memoryTracker.getNote(), currentTime, WRONG_ANSWER_PERIOD_DAYS, WRONG_ANSWER_THRESHOLD);
+        memoryTracker, currentTime, WRONG_ANSWER_PERIOD_DAYS, WRONG_ANSWER_THRESHOLD);
   }
 }

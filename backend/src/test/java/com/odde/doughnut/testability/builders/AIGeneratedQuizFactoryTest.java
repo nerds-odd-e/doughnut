@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -24,11 +25,13 @@ class AIGeneratedQuizFactoryTest {
 
   @Autowired MakeMe makeMe;
   Note note;
+  MemoryTracker memoryTracker;
   MCQWithAnswer mcqWithAnswer;
 
   @BeforeEach
   void setup() {
     note = makeMe.aNote("saying").content("Rome is not built in a day").please();
+    memoryTracker = makeMe.aMemoryTrackerFor(note).please();
     mcqWithAnswer =
         makeMe
             .aMCQWithAnswer()
@@ -64,7 +67,10 @@ class AIGeneratedQuizFactoryTest {
   }
 
   private RecallPromptBuilder questionBuilder() {
-    return makeMe.aRecallPrompt().ofAIGeneratedQuestion(mcqWithAnswer, note);
+    return makeMe
+        .aRecallPrompt()
+        .forMemoryTracker(memoryTracker)
+        .ofAIGeneratedQuestion(mcqWithAnswer, note);
   }
 
   private RecallPrompt buildQuestion() {

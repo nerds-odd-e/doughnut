@@ -10,6 +10,7 @@ import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
+import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -46,6 +47,10 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
 
   @Column(name = "created_at")
   private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+
+  public MemoryTracker requireMemoryTracker() {
+    return Objects.requireNonNull(memoryTracker, "recall prompt requires a memory tracker");
+  }
 
   public String getPropertyKey() {
     if (memoryTracker == null) {

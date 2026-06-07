@@ -270,7 +270,14 @@ class RecallPromptControllerTests extends ControllerTestBase {
     @BeforeEach
     void setUp() {
       note = makeMe.aNote().please();
-      recallPrompt = makeMe.aRecallPrompt().withPredefinedQuestionForNote(note).please();
+      MemoryTracker memoryTracker =
+          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+      recallPrompt =
+          makeMe
+              .aRecallPrompt()
+              .forMemoryTracker(memoryTracker)
+              .withPredefinedQuestionForNote(note)
+              .please();
     }
 
     @Test
@@ -340,8 +347,14 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
       MCQWithAnswer aiGeneratedQuestion = makeMe.aMCQWithAnswer().please();
       Note note = makeMe.aNote().please();
+      MemoryTracker memoryTracker =
+          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
       recallPrompt =
-          makeMe.aRecallPrompt().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
+          makeMe
+              .aRecallPrompt()
+              .forMemoryTracker(memoryTracker)
+              .ofAIGeneratedQuestion(aiGeneratedQuestion, note)
+              .please();
     }
 
     @Test

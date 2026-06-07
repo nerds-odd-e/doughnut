@@ -34,7 +34,7 @@ public class AnsweredQuestion {
     AnsweredQuestion answeredQuestion = new AnsweredQuestion();
     answeredQuestion.setId(recallPrompt.getId());
     answeredQuestion.setQuestionType(recallPrompt.getQuestionType());
-    answeredQuestion.setMemoryTrackerId(recallPrompt.getMemoryTracker().getId());
+    answeredQuestion.setMemoryTrackerId(recallPrompt.requireMemoryTracker().getId());
     answeredQuestion.setRecalledNote(
         RecalledNote.from(recallPrompt.getNote(), recallPrompt.getPropertyKey()));
     answeredQuestion.setAnswer(recallPrompt.getAnswer());

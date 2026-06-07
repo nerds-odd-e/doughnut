@@ -83,7 +83,7 @@ class RecallPromptController {
       @Valid @RequestBody AnswerSpellingDTO answerDTO)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
-    authorizationService.assertReadAuthorization(recallPrompt.getMemoryTracker());
+    authorizationService.assertReadAuthorization(recallPrompt.requireMemoryTracker());
     RecallPrompt answered =
         memoryTrackerService.answerSpelling(
             recallPrompt,
