@@ -3,6 +3,7 @@ import type {
   Answer,
   Note,
   PredefinedQuestion,
+  RecallPromptHistoryItem,
 } from '@generated/doughnut-backend-api'
 import Builder from './Builder'
 import generateId from './generateId'
@@ -56,6 +57,18 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
 
   withAnswer(answer: Answer): this {
     this.answerToUse = answer
+    return this
+  }
+
+  fromMcqHistoryItem(
+    pending: RecallPromptHistoryItem,
+    note: Note,
+    memoryTrackerId: number
+  ): this {
+    this.idToUse = pending.id
+    this.noteToUse = note
+    this.predefinedQuestionToUse = pending.predefinedQuestion
+    this.memoryTrackerIdToUse = memoryTrackerId
     return this
   }
 

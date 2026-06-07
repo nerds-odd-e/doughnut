@@ -80,11 +80,8 @@ describe('recall MCQ (interactive)', () => {
     memoryTrackerId = 1
   ): AnsweredQuestion {
     return makeMe.anAnsweredQuestion
-      .withId(pending.id)
-      .withNote(mcqFixtureNoteRealm.note)
-      .withPredefinedQuestion(pending.predefinedQuestion!)
+      .fromMcqHistoryItem(pending, mcqFixtureNoteRealm.note, memoryTrackerId)
       .withAnswer(answer)
-      .withMemoryTrackerId(memoryTrackerId)
       .please()
   }
 
@@ -388,11 +385,8 @@ describe('recall MCQ (interactive)', () => {
       }
       return Promise.resolve({
         data: makeMe.anAnsweredQuestion
-          .withId(secondPrompt.id)
-          .withNote(note2.note)
-          .withPredefinedQuestion(secondPrompt.predefinedQuestion!)
+          .fromMcqHistoryItem(secondPrompt, note2.note, 2)
           .withAnswer({ id: 101, correct: true, choiceIndex: 0 })
-          .withMemoryTrackerId(2)
           .please(),
       } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
     })

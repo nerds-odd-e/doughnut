@@ -70,7 +70,7 @@ function recallJustReviewPayloadFromMemoryTracker(
     contentMarkdown,
     breadcrumbTitles: noteBreadcrumbTrailTitles(
       note,
-      mt.ancestorFolders,
+      mt.recalledNote?.ancestorFolders,
       undefined
     ),
   }
@@ -90,20 +90,33 @@ function firstPendingMcq(
   return prompts.find((p) => p.questionType === 'MCQ' && p.answer == null)
 }
 
+function recallMcqPayload(
+  memoryTrackerId: number,
+  recallPromptId: number,
+  multipleChoicesQuestion: RecallQuestion['multipleChoicesQuestion'],
+  notebookName: string
+): RecallMcqCardPayload | null {
+  const choices = multipleChoicesQuestion?.responseChoices
+  if (choices === undefined || choices.length === 0) return null
+  return {
+    memoryTrackerId,
+    recallPromptId,
+    stem: multipleChoicesQuestion?.questionStem?.trim() ?? '',
+    choices,
+    notebookName: notebookName.trim(),
+  }
+}
+
 export function recallMcqPayloadFromRecallQuestion(
   memoryTrackerId: number,
   prompt: RecallQuestion
 ): RecallMcqCardPayload | null {
-  const mq = prompt.multipleChoicesQuestion
-  const choices = mq?.responseChoices
-  if (choices === undefined || choices.length === 0) return null
-  return {
+  return recallMcqPayload(
     memoryTrackerId,
-    recallPromptId: prompt.id,
-    stem: mq?.questionStem?.trim() ?? '',
-    choices,
-    notebookName: prompt.notebook.name.trim(),
-  }
+    prompt.id,
+    prompt.multipleChoicesQuestion,
+    prompt.notebook.name
+  )
 }
 
 export function recallMcqPayloadFromRecallPromptHistoryItem(
@@ -112,16 +125,12 @@ export function recallMcqPayloadFromRecallPromptHistoryItem(
   notebookName: string
 ): RecallMcqCardPayload | null {
   if (prompt.questionType !== 'MCQ' || prompt.answer != null) return null
-  const mq = prompt.multipleChoicesQuestion
-  const choices = mq?.responseChoices
-  if (choices === undefined || choices.length === 0) return null
-  return {
+  return recallMcqPayload(
     memoryTrackerId,
-    recallPromptId: prompt.id,
-    stem: mq?.questionStem?.trim() ?? '',
-    choices,
-    notebookName: notebookName.trim(),
-  }
+    prompt.id,
+    prompt.multipleChoicesQuestion,
+    notebookName
+  )
 }
 
 /**

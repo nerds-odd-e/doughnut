@@ -5,7 +5,7 @@ type FolderTrailLike = { name?: string }
 
 /**
  * Titles for recall scrollback: notebook, folder path (outer→inner), then note title.
- * Pass `ancestorFolders` from `MemoryTracker` / `RecallPrompt` when available.
+ * Pass `ancestorFolders` from `RecalledNote` when available.
  */
 export function breadcrumbTrailFromRecalledNote(
   recalledNote: RecalledNote,

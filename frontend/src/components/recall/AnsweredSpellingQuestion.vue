@@ -5,12 +5,7 @@
     </strong>
   </div>
   <NoteUnderQuestion
-    v-bind="{
-      noteTopology: answeredQuestion.recalledNote.noteTopology,
-      ancestorFolders: answeredQuestion.recalledNote.ancestorFolders ?? [],
-      breadcrumbNotebookId: answeredQuestion.recalledNote.notebookId,
-      focusedPropertyKey: answeredQuestion.recalledNote.propertyKey,
-    }"
+    v-bind="recalledNoteUnderQuestionProps(answeredQuestion.recalledNote)"
   />
   <ViewMemoryTrackerLink
     :memory-tracker-id="answeredQuestion.memoryTrackerId"
@@ -27,6 +22,7 @@ import type { AnsweredQuestion } from "@generated/doughnut-backend-api"
 import NoteShow from "@/components/notes/NoteShow.vue"
 import NoteUnderQuestion from "./NoteUnderQuestion.vue"
 import ViewMemoryTrackerLink from "./ViewMemoryTrackerLink.vue"
+import { recalledNoteUnderQuestionProps } from "./recalledNoteUnderQuestionProps"
 
 defineProps({
   answeredQuestion: {

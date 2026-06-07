@@ -1,4 +1,3 @@
-import type { RecallPromptHistoryItem } from '@generated/doughnut-backend-api'
 import ApiErrorBuilder from './ApiErrorBuilder'
 import BookBlockFullBuilder from './BookBlockFullBuilder'
 import BookFullBuilder from './BookFullBuilder'
@@ -78,13 +77,6 @@ class MakeMe {
 
   static get aRecallQuestion(): RecallQuestionBuilder {
     return new RecallQuestionBuilder()
-  }
-
-  static recallPromptFrom(
-    base: RecallPromptHistoryItem,
-    overrides: Partial<RecallPromptHistoryItem>
-  ): RecallPromptHistoryItem {
-    return { ...base, ...overrides }
   }
 
   static get aPredefinedQuestion(): PredefinedQuestionBuilder {

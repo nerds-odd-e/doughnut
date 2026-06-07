@@ -79,12 +79,7 @@
     </div>
     <div v-if="memoryTracker.recalledNote" class="mb-6">
       <NoteUnderQuestion
-        v-bind="{
-          noteTopology: memoryTracker.recalledNote.noteTopology,
-          ancestorFolders: memoryTracker.recalledNote.ancestorFolders ?? [],
-          breadcrumbNotebookId: memoryTracker.recalledNote.notebookId,
-          focusedPropertyKey: memoryTracker.recalledNote.propertyKey,
-        }"
+        v-bind="recalledNoteUnderQuestionProps(memoryTracker.recalledNote)"
       />
     </div>
     <div v-if="recallPrompts.length === 0" class="daisy-alert daisy-alert-info">
@@ -172,6 +167,7 @@ import type {
   MemoryTracker,
 } from "@generated/doughnut-backend-api"
 import NoteUnderQuestion from "@/components/recall/NoteUnderQuestion.vue"
+import { recalledNoteUnderQuestionProps } from "@/components/recall/recalledNoteUnderQuestionProps"
 import QuestionDisplay from "@/components/recall/QuestionDisplay.vue"
 import ConversationButton from "@/components/recall/ConversationButton.vue"
 import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
