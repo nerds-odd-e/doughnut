@@ -100,10 +100,10 @@ public class RecallQuestionService {
   }
 
   public RecallPrompt answerQuestion(
-      RecallPrompt recallPrompt, AnswerDTO answerDTO, User user, Timestamp currentUTCTimestamp) {
+      RecallPrompt recallPrompt, AnswerDTO answerDTO, Timestamp currentUTCTimestamp) {
     Answer answer = answerService.createAnswerForQuestion(recallPrompt, answerDTO);
     memoryTrackerService.updateMemoryTrackerAfterAnsweringQuestion(
-        user, currentUTCTimestamp, answer.getCorrect(), recallPrompt);
+        currentUTCTimestamp, answer.getCorrect(), recallPrompt);
     return recallPrompt;
   }
 }

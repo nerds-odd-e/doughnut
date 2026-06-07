@@ -78,7 +78,11 @@ class RecallPromptControllerTests extends ControllerTestBase {
               .please();
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       recallPrompt =
-          makeMe.aRecallPrompt().ofAIGeneratedQuestion(mcqWithAnswer, answerNote).please();
+          makeMe
+              .aRecallPrompt()
+              .forMemoryTracker(memoryTracker)
+              .ofAIGeneratedQuestion(mcqWithAnswer, answerNote)
+              .please();
       answerDTO.setChoiceIndex(0);
     }
 
@@ -88,6 +92,43 @@ class RecallPromptControllerTests extends ControllerTestBase {
       AnsweredQuestion answerResult = controller.answerQuiz(recallPrompt, answerDTO);
       assertThat(answerResult.getAnswer().getCorrect(), is(true));
       assertThat(memoryTracker.getRecallCount(), greaterThan(oldRecallCount));
+    }
+
+    @Test
+    void shouldUpdateLinkedPropertyMemoryTrackerWhenAnsweringPropertyQuestion() {
+      Note note = makeMe.aNote().please();
+      MemoryTracker noteLevelTracker =
+          makeMe
+              .aMemoryTrackerFor(note)
+              .by(currentUser.getUser())
+              .forgettingCurveAndNextRecallAt(200.0f)
+              .please();
+      MemoryTracker propertyTracker =
+          makeMe
+              .aMemoryTrackerFor(note)
+              .by(currentUser.getUser())
+              .propertyKey("topic")
+              .forgettingCurveAndNextRecallAt(200.0f)
+              .please();
+      testabilitySettings.timeTravelTo(propertyTracker.getNextRecallAt());
+
+      Integer noteLevelRecallCountBefore = noteLevelTracker.getRecallCount();
+      Float noteLevelIndexBefore = noteLevelTracker.getForgettingCurveIndex();
+      Integer propertyRecallCountBefore = propertyTracker.getRecallCount();
+
+      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
+      RecallPrompt propertyRecallPrompt =
+          makeMe
+              .aRecallPrompt()
+              .forMemoryTracker(propertyTracker)
+              .ofAIGeneratedQuestion(mcqWithAnswer, note)
+              .please();
+
+      controller.answerQuiz(propertyRecallPrompt, answerDTO);
+
+      assertThat(noteLevelTracker.getRecallCount(), equalTo(noteLevelRecallCountBefore));
+      assertThat(noteLevelTracker.getForgettingCurveIndex(), equalTo(noteLevelIndexBefore));
+      assertThat(propertyTracker.getRecallCount(), greaterThan(propertyRecallCountBefore));
     }
 
     @Test

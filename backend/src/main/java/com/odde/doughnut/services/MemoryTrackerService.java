@@ -147,22 +147,14 @@ public class MemoryTrackerService {
   }
 
   public boolean updateMemoryTrackerAfterAnsweringQuestion(
-      User user, Timestamp currentUTCTimestamp, Boolean correct, RecallPrompt recallPrompt) {
-    List<MemoryTracker> memoryTrackers =
-        userService.getMemoryTrackersFor(user, recallPrompt.getPredefinedQuestion().getNote());
+      Timestamp currentUTCTimestamp, Boolean correct, RecallPrompt recallPrompt) {
+    MemoryTracker memoryTracker = recallPrompt.getMemoryTracker();
+    if (memoryTracker == null) {
+      return false;
+    }
     Integer thinkingTimeMs =
         recallPrompt.getAnswer() != null ? recallPrompt.getAnswer().getThinkingTimeMs() : null;
-    return memoryTrackers.stream()
-        .filter(
-            tracker -> {
-              Boolean trackerSpelling = tracker.getSpelling();
-              return !Boolean.TRUE.equals(trackerSpelling);
-            })
-        .findFirst()
-        .map(
-            memoryTracker ->
-                markAsRecalled(currentUTCTimestamp, correct, memoryTracker, thinkingTimeMs))
-        .orElse(false);
+    return markAsRecalled(currentUTCTimestamp, correct, memoryTracker, thinkingTimeMs);
   }
 
   public boolean markAsRecalled(

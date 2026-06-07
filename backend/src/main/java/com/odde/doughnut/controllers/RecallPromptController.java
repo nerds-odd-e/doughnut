@@ -72,10 +72,7 @@ class RecallPromptController {
     authorizationService.assertLoggedIn();
     RecallPrompt answered =
         recallQuestionService.answerQuestion(
-            recallPrompt,
-            answerDTO,
-            authorizationService.getCurrentUser(),
-            testabilitySettings.getCurrentUTCTimestamp());
+            recallPrompt, answerDTO, testabilitySettings.getCurrentUTCTimestamp());
     return AnsweredQuestion.from(answered);
   }
 
