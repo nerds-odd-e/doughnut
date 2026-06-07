@@ -4,7 +4,7 @@ import {
   RecallPromptController,
   RecallsController,
 } from 'doughnut-api'
-import type { NoteRealm, RecallPrompt } from 'doughnut-api'
+import type { AnsweredQuestion, NoteRealm, RecallQuestion } from 'doughnut-api'
 import makeMe from 'doughnut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
@@ -45,11 +45,10 @@ describe('recall spelling (interactive)', () => {
   let answerSpellingSpy: ReturnType<typeof vi.spyOn>
   let spellingFixtureNoteRealm: NoteRealm
 
-  function pendingSpellingPrompt(): RecallPrompt {
-    return makeMe.aRecallPrompt
+  function pendingSpellingPrompt(): RecallQuestion {
+    return makeMe.aRecallQuestion
       .withId(SPELL_PROMPT_ID)
       .withSpellingStem('Spell the title')
-      .withMemoryTrackerId(MEMORY_TRACKER_ID)
       .please()
   }
 
@@ -61,13 +60,20 @@ describe('recall spelling (interactive)', () => {
   }
 
   function spellingAnsweredPrompt(
-    pending: RecallPrompt,
+    pending: RecallQuestion,
     answer: { correct: boolean; spellingAnswer: string }
-  ): RecallPrompt {
-    return makeMe.recallPromptFrom(pending, {
-      note: spellingFixtureNoteRealm.note,
-      answer,
-    })
+  ): AnsweredQuestion {
+    return makeMe.anAnsweredQuestion
+      .withId(pending.id)
+      .withNote(spellingFixtureNoteRealm.note)
+      .withAnswer({
+        id: 1,
+        correct: answer.correct,
+        spellingAnswer: answer.spellingAnswer,
+      })
+      .spelling()
+      .withMemoryTrackerId(MEMORY_TRACKER_ID)
+      .please()
   }
 
   function mockRecallingFirstThenEmpty() {
@@ -205,10 +211,9 @@ describe('recall spelling (interactive)', () => {
   test('after first spelling answer, shows loading spelling until second question loads', async () => {
     const secondStem = 'Second spell stem loading next unique'
     const pending1 = pendingSpellingPrompt()
-    const pending2 = makeMe.aRecallPrompt
+    const pending2 = makeMe.aRecallQuestion
       .withId(SPELL_PROMPT_ID_2)
       .withSpellingStem(secondStem)
-      .withMemoryTrackerId(2)
       .please()
 
     recallingSpy.mockResolvedValue({

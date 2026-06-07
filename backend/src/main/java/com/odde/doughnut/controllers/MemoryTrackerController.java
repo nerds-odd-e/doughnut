@@ -1,5 +1,7 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.dto.RecallPromptHistoryItem;
+import com.odde.doughnut.controllers.dto.RecallQuestion;
 import com.odde.doughnut.controllers.dto.ThresholdExceededResult;
 import com.odde.doughnut.controllers.dto.UpdateMemoryTrackerPropertyKeyDTO;
 import com.odde.doughnut.entities.MemoryTracker;
@@ -42,15 +44,18 @@ class MemoryTrackerController {
 
   @GetMapping("/{memoryTracker}/question")
   @Transactional
-  public RecallPrompt askAQuestion(
+  public RecallQuestion askAQuestion(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
     authorizationService.assertReadAuthorization(memoryTracker);
+    RecallPrompt recallPrompt;
     if (Boolean.TRUE.equals(memoryTracker.getSpelling())) {
-      return memoryTrackerService.getSpellingQuestion(memoryTracker);
+      recallPrompt = memoryTrackerService.getSpellingQuestion(memoryTracker);
+    } else {
+      recallPrompt = recallQuestionService.generateAQuestion(memoryTracker);
     }
-    return recallQuestionService.generateAQuestion(memoryTracker);
+    return RecallQuestion.from(recallPrompt);
   }
 
   @GetMapping("/{memoryTracker}/threshold-exceeded")
@@ -121,12 +126,14 @@ class MemoryTrackerController {
   }
 
   @GetMapping("/{memoryTracker}/recall-prompts")
-  public List<RecallPrompt> getRecallPrompts(
+  public List<RecallPromptHistoryItem> getRecallPrompts(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
     authorizationService.assertReadAuthorization(memoryTracker);
-    return memoryTrackerService.getAllRecallPrompts(memoryTracker);
+    return memoryTrackerService.getAllRecallPrompts(memoryTracker).stream()
+        .map(RecallPromptHistoryItem::from)
+        .toList();
   }
 
   @DeleteMapping("/{memoryTracker}/recall-prompts/unanswered")

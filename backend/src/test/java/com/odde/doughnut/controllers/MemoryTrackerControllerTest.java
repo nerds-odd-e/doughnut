@@ -5,12 +5,13 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.NoteDeleteReferenceHandling;
+import com.odde.doughnut.controllers.dto.RecallPromptHistoryItem;
+import com.odde.doughnut.controllers.dto.RecallQuestion;
 import com.odde.doughnut.controllers.dto.ThresholdExceededResult;
 import com.odde.doughnut.controllers.dto.UpdateMemoryTrackerPropertyKeyDTO;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuestionType;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.ConversationRepository;
@@ -145,10 +146,9 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
               .please();
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).spelling().please();
 
-      RecallPrompt recallPrompt = controller.askAQuestion(memoryTracker);
-      assertThat(recallPrompt.getQuestionType(), equalTo(QuestionType.SPELLING));
-      assertThat(recallPrompt.getMemoryTracker(), equalTo(memoryTracker));
-      assertThat(recallPrompt.getPredefinedQuestion(), nullValue());
+      RecallQuestion recallQuestion = controller.askAQuestion(memoryTracker);
+      assertThat(recallQuestion.getSpellingQuestion(), notNullValue());
+      assertThat(recallQuestion.getMultipleChoicesQuestion(), nullValue());
     }
 
     @Test
@@ -167,10 +167,9 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
           makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
 
       // Ask question again - should return the existing unanswered prompt
-      RecallPrompt recallPrompt = controller.askAQuestion(memoryTracker);
-      assertThat(recallPrompt.getId(), equalTo(existingPrompt.getId()));
-      assertThat(recallPrompt.getQuestionType(), equalTo(QuestionType.SPELLING));
-      assertThat(recallPrompt.getMemoryTracker(), equalTo(memoryTracker));
+      RecallQuestion recallQuestion = controller.askAQuestion(memoryTracker);
+      assertThat(recallQuestion.getId(), equalTo(existingPrompt.getId()));
+      assertThat(recallQuestion.getSpellingQuestion(), notNullValue());
     }
 
     @Test
@@ -188,10 +187,9 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       // Mock OpenAI API call
       openAiStructuredResponseMock.stubStructuredResponse(makeMe.aMCQWithAnswer().please());
 
-      RecallPrompt recallPrompt = controller.askAQuestion(memoryTracker);
-      assertThat(recallPrompt, notNullValue());
-      assertThat(recallPrompt.getQuestionType(), equalTo(QuestionType.MCQ));
-      assertThat(recallPrompt.getMemoryTracker(), equalTo(memoryTracker));
+      RecallQuestion recallQuestion = controller.askAQuestion(memoryTracker);
+      assertThat(recallQuestion, notNullValue());
+      assertThat(recallQuestion.getMultipleChoicesQuestion(), notNullValue());
     }
 
     @Test
@@ -234,6 +232,18 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       void shouldBeAbleToSeeOwn() throws UnexpectedNoAccessRightException {
         MemoryTracker memoryTracker = controller.showMemoryTracker(rp);
         assertThat(memoryTracker, equalTo(rp));
+      }
+
+      @Test
+      void shouldExposeRecalledNote() throws UnexpectedNoAccessRightException {
+        MemoryTracker memoryTracker = controller.showMemoryTracker(rp);
+        assertThat(memoryTracker.getRecalledNote(), is(notNullValue()));
+        assertThat(
+            memoryTracker.getRecalledNote().getNoteTopology().getId(),
+            equalTo(rp.getNote().getId()));
+        assertThat(
+            memoryTracker.getRecalledNote().getNotebookId(),
+            equalTo(rp.getNote().getNotebook().getId()));
       }
 
       @Test
@@ -418,7 +428,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
               .forMemoryTracker(memoryTracker)
               .please();
 
-      List<RecallPrompt> prompts = controller.getRecallPrompts(memoryTracker);
+      List<RecallPromptHistoryItem> prompts = controller.getRecallPrompts(memoryTracker);
 
       assertThat(prompts, hasSize(3));
       assertThat(prompts.get(0).getId(), equalTo(prompt3.getId()));
@@ -432,7 +442,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       MemoryTracker memoryTracker =
           makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 
-      List<RecallPrompt> prompts = controller.getRecallPrompts(memoryTracker);
+      List<RecallPromptHistoryItem> prompts = controller.getRecallPrompts(memoryTracker);
 
       assertThat(prompts, empty());
     }
@@ -457,7 +467,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
               .answerChoiceIndex(0)
               .please();
 
-      List<RecallPrompt> prompts = controller.getRecallPrompts(memoryTracker);
+      List<RecallPromptHistoryItem> prompts = controller.getRecallPrompts(memoryTracker);
 
       assertThat(prompts, hasSize(2));
       assertThat(prompts.get(0).getId(), equalTo(answeredPrompt.getId()));
@@ -509,7 +519,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
 
       controller.deleteUnansweredRecallPrompts(memoryTracker);
 
-      List<RecallPrompt> remainingPrompts = controller.getRecallPrompts(memoryTracker);
+      List<RecallPromptHistoryItem> remainingPrompts = controller.getRecallPrompts(memoryTracker);
       assertThat(remainingPrompts, hasSize(1));
       assertThat(remainingPrompts.get(0).getId(), equalTo(answeredPrompt.getId()));
     }
@@ -537,9 +547,11 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
 
       controller.deleteUnansweredRecallPrompts(memoryTracker);
 
-      List<RecallPrompt> remainingPrompts = controller.getRecallPrompts(memoryTracker);
+      List<RecallPromptHistoryItem> remainingPrompts = controller.getRecallPrompts(memoryTracker);
       assertThat(remainingPrompts, hasSize(2));
-      assertThat(remainingPrompts, containsInAnyOrder(answeredPrompt1, answeredPrompt2));
+      assertThat(
+          remainingPrompts.stream().map(RecallPromptHistoryItem::getId).toList(),
+          containsInAnyOrder(answeredPrompt1.getId(), answeredPrompt2.getId()));
     }
 
     @Test
@@ -550,7 +562,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
 
       controller.deleteUnansweredRecallPrompts(memoryTracker);
 
-      List<RecallPrompt> remainingPrompts = controller.getRecallPrompts(memoryTracker);
+      List<RecallPromptHistoryItem> remainingPrompts = controller.getRecallPrompts(memoryTracker);
       assertThat(remainingPrompts, empty());
     }
 
@@ -593,7 +605,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
 
       controller.deleteUnansweredRecallPrompts(memoryTracker);
 
-      List<RecallPrompt> remainingPrompts = controller.getRecallPrompts(memoryTracker);
+      List<RecallPromptHistoryItem> remainingPrompts = controller.getRecallPrompts(memoryTracker);
       assertThat(remainingPrompts, hasSize(1));
       assertThat(remainingPrompts.get(0).getId(), equalTo(contestedPrompt.getId()));
     }

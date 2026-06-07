@@ -37,7 +37,10 @@
 </template>
 
 <script setup lang="ts">
-import type { RecallPrompt } from "@generated/doughnut-backend-api"
+import type {
+  AnsweredQuestion,
+  RecallQuestion,
+} from "@generated/doughnut-backend-api"
 import { RecallPromptController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { PropType } from "vue"
@@ -47,7 +50,7 @@ import RecallPromptComponent from "./RecallPromptComponent.vue"
 import QuestionDisplay from "./QuestionDisplay.vue"
 const props = defineProps({
   recallPrompt: {
-    type: Object as PropType<RecallPrompt>,
+    type: Object as PropType<RecallQuestion>,
     required: true,
   },
   nextIsSpelling: {
@@ -57,7 +60,7 @@ const props = defineProps({
 })
 const emit = defineEmits<{
   (e: "need-scroll"): void
-  (e: "answered", result: RecallPrompt): void
+  (e: "answered", result: AnsweredQuestion): void
 }>()
 const regenerating = ref(false)
 const contesting = ref(false)
@@ -65,7 +68,7 @@ const currentQuestionLegitMessage = ref<string | undefined>(undefined)
 const currentQuestion = ref(props.recallPrompt)
 const prevQuestions = ref<
   {
-    quizeQuestion: RecallPrompt
+    quizeQuestion: RecallQuestion
     badQuestionReason: string | undefined
   }[]
 >([])
@@ -114,7 +117,7 @@ const contestQuestion = async () => {
   }
 }
 
-const onAnswered = (answer: RecallPrompt) => {
+const onAnswered = (answer: AnsweredQuestion) => {
   emit("answered", answer)
 }
 </script>

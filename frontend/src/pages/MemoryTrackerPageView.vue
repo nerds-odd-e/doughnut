@@ -77,13 +77,13 @@
         <span>Remove from Recall</span>
       </button>
     </div>
-    <div v-if="memoryTracker.note" class="mb-6">
+    <div v-if="memoryTracker.recalledNote" class="mb-6">
       <NoteUnderQuestion
         v-bind="{
-          noteTopology: memoryTracker.note.noteTopology,
-          ancestorFolders: memoryTracker.ancestorFolders ?? [],
-          breadcrumbNotebookId: memoryTrackerBreadcrumbNotebookId,
-          focusedPropertyKey,
+          noteTopology: memoryTracker.recalledNote.noteTopology,
+          ancestorFolders: memoryTracker.recalledNote.ancestorFolders ?? [],
+          breadcrumbNotebookId: memoryTracker.recalledNote.notebookId,
+          focusedPropertyKey: memoryTracker.recalledNote.propertyKey,
         }"
       />
     </div>
@@ -168,7 +168,7 @@
 <script setup lang="ts">
 import { computed, type PropType } from "vue"
 import type {
-  RecallPrompt,
+  RecallPromptHistoryItem,
   MemoryTracker,
 } from "@generated/doughnut-backend-api"
 import NoteUnderQuestion from "@/components/recall/NoteUnderQuestion.vue"
@@ -181,7 +181,7 @@ import { EyeOff } from "@lucide/vue"
 
 const props = defineProps({
   recallPrompts: {
-    type: Array as PropType<RecallPrompt[]>,
+    type: Array as PropType<RecallPromptHistoryItem[]>,
     required: true,
   },
   memoryTracker: {
@@ -192,15 +192,6 @@ const props = defineProps({
     type: Number,
     required: true,
   },
-})
-
-const memoryTrackerBreadcrumbNotebookId = computed(
-  () => props.recallPrompts.find((p) => p.notebook)?.notebook.id
-)
-
-const focusedPropertyKey = computed(() => {
-  const key = props.memoryTracker.propertyKey
-  return key ? key : undefined
 })
 
 const emit = defineEmits<{

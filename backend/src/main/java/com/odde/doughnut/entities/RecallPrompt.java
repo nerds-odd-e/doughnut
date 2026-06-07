@@ -1,20 +1,15 @@
 package com.odde.doughnut.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.odde.doughnut.configs.ObjectMapperConfig;
-import com.odde.doughnut.controllers.dto.FolderTrailSegments;
 import com.odde.doughnut.controllers.dto.SpellingQuestion;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
-import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -24,35 +19,34 @@ import lombok.Setter;
 @Table(name = "recall_prompt")
 @Data
 @EqualsAndHashCode(callSuper = false)
-@JsonPropertyOrder({
-  "id",
-  "memoryTrackerId",
-  "questionType",
-  "multipleChoicesQuestion",
-  "notebook",
-  "note",
-  "ancestorFolders",
-  "questionGeneratedTime",
-  "isContested",
-  "answerTime",
-  "predefinedQuestion",
-  "answer",
-  "spellingQuestion",
-  "propertyKey"
-})
+@JsonAutoDetect(
+    fieldVisibility = JsonAutoDetect.Visibility.NONE,
+    getterVisibility = JsonAutoDetect.Visibility.NONE,
+    isGetterVisibility = JsonAutoDetect.Visibility.NONE)
 public class RecallPrompt extends EntityIdentifiedByIdOnly {
   @ManyToOne
   @JoinColumn(name = "memory_tracker_id", referencedColumnName = "id")
   @NotNull
-  @JsonIgnore
   private MemoryTracker memoryTracker;
 
-  @JsonProperty
-  public Integer getMemoryTrackerId() {
-    return memoryTracker != null ? memoryTracker.getId() : null;
-  }
+  @ManyToOne
+  @JoinColumn(name = "predefined_question_id", referencedColumnName = "id")
+  private PredefinedQuestion predefinedQuestion;
 
-  @JsonProperty
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "quiz_answer_id", referencedColumnName = "id")
+  @Getter
+  @Setter
+  private Answer answer;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "question_type")
+  @NotNull
+  private QuestionType questionType;
+
+  @Column(name = "created_at")
+  private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+
   public String getPropertyKey() {
     if (memoryTracker == null) {
       return null;
@@ -61,35 +55,6 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
     return key == null || key.isEmpty() ? null : key;
   }
 
-  @ManyToOne
-  @JoinColumn(name = "predefined_question_id", referencedColumnName = "id")
-  @JsonIgnore
-  private PredefinedQuestion predefinedQuestion;
-
-  @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "quiz_answer_id", referencedColumnName = "id")
-  @Getter
-  @Setter
-  @JsonIgnore
-  Answer answer;
-
-  @Enumerated(EnumType.STRING)
-  @Column(name = "question_type")
-  @NotNull
-  @JsonProperty
-  private QuestionType questionType;
-
-  @Column(name = "created_at")
-  @JsonIgnore
-  private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
-
-  @JsonProperty
-  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  public Notebook getNotebook() {
-    return getMemoryTracker().getNote().getNotebook();
-  }
-
-  @JsonIgnore
   public String getQuestionDetails() {
     if (getPredefinedQuestion() == null) {
       return "{}";
@@ -107,7 +72,6 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
     return questionDetails.toPrettyString();
   }
 
-  @JsonProperty
   public Timestamp getAnswerTime() {
     if (getAnswer() != null) {
       return getAnswer().getCreatedAt();
@@ -115,7 +79,6 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
     return null;
   }
 
-  @JsonProperty
   public Note getNote() {
     if (getPredefinedQuestion() != null) {
       return getPredefinedQuestion().getNote();
@@ -126,31 +89,10 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
     return null;
   }
 
-  @JsonProperty
-  public List<Folder> getAncestorFolders() {
-    Note n = getNote();
-    if (n == null) {
-      return List.of();
-    }
-    return FolderTrailSegments.fromRootToContainingFolder(n);
+  public Notebook getNotebook() {
+    return getMemoryTracker().getNote().getNotebook();
   }
 
-  @JsonProperty("predefinedQuestion")
-  public PredefinedQuestion getPredefinedQuestionExposed() {
-    return getPredefinedQuestion();
-  }
-
-  @JsonProperty("answer")
-  public Answer getAnswerExposed() {
-    return getAnswer();
-  }
-
-  @JsonProperty
-  public Timestamp getQuestionGeneratedTime() {
-    return getCreatedAt();
-  }
-
-  @JsonProperty
   public Boolean getIsContested() {
     if (getPredefinedQuestion() == null) {
       return null;
@@ -158,7 +100,6 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
     return getPredefinedQuestion().isContested();
   }
 
-  @JsonProperty
   public MultipleChoicesQuestion getMultipleChoicesQuestion() {
     if (getPredefinedQuestion() == null) {
       return null;
@@ -166,7 +107,6 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
     return getPredefinedQuestion().getMultipleChoicesQuestion();
   }
 
-  @JsonProperty
   public SpellingQuestion getSpellingQuestion() {
     if (questionType != QuestionType.SPELLING) {
       return null;

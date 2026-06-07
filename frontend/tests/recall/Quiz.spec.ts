@@ -13,12 +13,12 @@ import helper, {
   wrapSdkError,
 } from "@tests/helpers"
 import type {
+  AnsweredQuestion,
   MemoryTrackerLite,
-  RecallPrompt,
 } from "@generated/doughnut-backend-api"
 
 describe("repeat page", () => {
-  const recallPrompt = makeMe.aRecallPrompt.please()
+  const recallPrompt = makeMe.aRecallQuestion.please()
   let askAQuestionSpy: ReturnType<typeof mockSdkService>
   let wrapper: VueWrapper
 
@@ -120,8 +120,8 @@ describe("repeat page", () => {
 
   describe("spelling questions", () => {
     it("shows spelling question input when question has no choices", async () => {
-      const recallPromptWithoutChoices = makeMe.aRecallPrompt
-        .withQuestionStem("Spell the word 'cat'")
+      const recallPromptWithoutChoices = makeMe.aRecallQuestion
+        .withSpellingStem("Spell the word 'cat'")
         .please()
       askAQuestionSpy.mockResolvedValue(
         wrapSdkResponse(recallPromptWithoutChoices)
@@ -138,15 +138,15 @@ describe("repeat page", () => {
     })
 
     it("submits spelling answer correctly", async () => {
-      const recallPromptWithoutChoices = makeMe.aRecallPrompt
-        .withQuestionStem("Spell the word 'cat'")
+      const recallPromptWithoutChoices = makeMe.aRecallQuestion
+        .withSpellingStem("Spell the word 'cat'")
         .please()
       askAQuestionSpy.mockResolvedValue(
         wrapSdkResponse(recallPromptWithoutChoices)
       )
 
-      const spellingRecallPrompt = makeMe.aRecallPrompt
-        .withQuestionType("SPELLING")
+      const spellingRecallPrompt = makeMe.aRecallQuestion
+        .withSpellingStem("Spell the word 'cat'")
         .please()
       askAQuestionSpy.mockResolvedValue(wrapSdkResponse(spellingRecallPrompt))
       const memoryTracker = makeMe.aMemoryTracker.please()
@@ -163,8 +163,8 @@ describe("repeat page", () => {
         memoryTracker
       )
 
-      const answerResult: RecallPrompt = makeMe.aRecallPrompt
-        .withQuestionType("SPELLING")
+      const answerResult: AnsweredQuestion = makeMe.anAnsweredQuestion
+        .spelling()
         .withAnswer({ id: 1, correct: true, spellingAnswer: "cat" })
         .please()
       const mockedAnswerSpelling = mockSdkService(
@@ -198,7 +198,7 @@ describe("repeat page", () => {
 
   describe("contestable dummy input", () => {
     it("clears when advancing to the next question", async () => {
-      const secondRecallPrompt = makeMe.aRecallPrompt
+      const secondRecallPrompt = makeMe.aRecallQuestion
         .withQuestionStem("Second question")
         .please()
       askAQuestionSpy

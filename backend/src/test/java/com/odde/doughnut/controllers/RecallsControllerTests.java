@@ -4,11 +4,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.odde.doughnut.controllers.dto.AnsweredQuestion;
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
@@ -145,7 +145,7 @@ class RecallsControllerTests extends ControllerTestBase {
 
     @Test
     void shouldReturnEmptyListWhenNoAnsweredRecallPrompts() {
-      List<RecallPrompt> results = controller.previouslyAnswered("Asia/Shanghai");
+      List<AnsweredQuestion> results = controller.previouslyAnswered("Asia/Shanghai");
       assertThat(results, hasSize(0));
     }
 
@@ -168,7 +168,7 @@ class RecallsControllerTests extends ControllerTestBase {
           .answerTimestamp(currentTime)
           .please();
 
-      List<RecallPrompt> results = controller.previouslyAnswered("Asia/Shanghai");
+      List<AnsweredQuestion> results = controller.previouslyAnswered("Asia/Shanghai");
 
       assertThat(results, hasSize(1));
       assertEquals(com.odde.doughnut.entities.QuestionType.MCQ, results.get(0).getQuestionType());
@@ -196,7 +196,7 @@ class RecallsControllerTests extends ControllerTestBase {
       Timestamp currentTime = makeMe.aTimestamp().of(1, 2).fromShanghai().please();
       testabilitySettings.timeTravelTo(currentTime);
 
-      List<RecallPrompt> results = controller.previouslyAnswered("Asia/Shanghai");
+      List<AnsweredQuestion> results = controller.previouslyAnswered("Asia/Shanghai");
 
       assertThat(results, hasSize(0));
     }
@@ -219,7 +219,7 @@ class RecallsControllerTests extends ControllerTestBase {
           .answerTimestamp(currentTime)
           .please();
 
-      List<RecallPrompt> results = controller.previouslyAnswered("Asia/Shanghai");
+      List<AnsweredQuestion> results = controller.previouslyAnswered("Asia/Shanghai");
 
       assertThat(results, hasSize(1));
       assertEquals(

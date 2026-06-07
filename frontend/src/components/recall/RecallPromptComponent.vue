@@ -25,7 +25,11 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import type { PropType } from "vue"
-import type { AnswerDto, RecallPrompt } from "@generated/doughnut-backend-api"
+import type {
+  AnsweredQuestion,
+  AnswerDto,
+  RecallQuestion,
+} from "@generated/doughnut-backend-api"
 import { RecallPromptController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
@@ -40,7 +44,7 @@ const error = ref("")
 
 const props = defineProps({
   recallPrompt: {
-    type: Object as PropType<RecallPrompt>,
+    type: Object as PropType<RecallQuestion>,
     required: true,
   },
   nextIsSpelling: {
@@ -50,7 +54,7 @@ const props = defineProps({
 })
 
 const emits = defineEmits<{
-  (e: "answered", result: RecallPrompt): void
+  (e: "answered", result: AnsweredQuestion): void
 }>()
 
 const handleError = async () => {

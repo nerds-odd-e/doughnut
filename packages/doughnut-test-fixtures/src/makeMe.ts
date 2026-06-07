@@ -1,4 +1,4 @@
-import type { RecallPrompt } from '@generated/doughnut-backend-api'
+import type { RecallPromptHistoryItem } from '@generated/doughnut-backend-api'
 import ApiErrorBuilder from './ApiErrorBuilder'
 import BookBlockFullBuilder from './BookBlockFullBuilder'
 import BookFullBuilder from './BookFullBuilder'
@@ -35,6 +35,7 @@ import NotebookCatalogNotebookItemBuilder from './NotebookCatalogNotebookItemBui
 import NotebookCatalogSubscribedNotebookItemBuilder from './NotebookCatalogSubscribedNotebookItemBuilder'
 import PredefinedQuestionBuilder from './PredefinedQuestionBuilder'
 import RecallPromptBuilder from './RecallPromptBuilder'
+import RecallQuestionBuilder from './RecallQuestionBuilder'
 import NoteSearchResultBuilder from './NoteSearchResultBuilder'
 import UserBuilder from './UserBuilder'
 import UserForListingBuilder from './UserForListingBuilder'
@@ -75,10 +76,14 @@ class MakeMe {
     return new RecallPromptBuilder()
   }
 
+  static get aRecallQuestion(): RecallQuestionBuilder {
+    return new RecallQuestionBuilder()
+  }
+
   static recallPromptFrom(
-    base: RecallPrompt,
-    overrides: Partial<RecallPrompt>
-  ): RecallPrompt {
+    base: RecallPromptHistoryItem,
+    overrides: Partial<RecallPromptHistoryItem>
+  ): RecallPromptHistoryItem {
     return { ...base, ...overrides }
   }
 

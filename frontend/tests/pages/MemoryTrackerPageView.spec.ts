@@ -27,8 +27,9 @@ describe("MemoryTrackerPageView", () => {
   })
 
   it("shows focused property indicator for property memory trackers", async () => {
-    const memoryTracker = makeMe.aMemoryTracker.please()
-    memoryTracker.propertyKey = "a part of"
+    const memoryTracker = makeMe.aMemoryTracker
+      .withPropertyKey("a part of")
+      .please()
 
     const wrapper = helper
       .component(MemoryTrackerPageView)

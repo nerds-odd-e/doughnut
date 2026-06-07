@@ -57,7 +57,8 @@ import ContentLoader from "@/components/commons/ContentLoader.vue"
 import type {
   AnswerSpellingDto,
   MemoryTrackerLite,
-  RecallPrompt,
+  AnsweredQuestion,
+  RecallQuestion,
 } from "@generated/doughnut-backend-api"
 import {
   MemoryTrackerController,
@@ -81,13 +82,13 @@ const props = defineProps<QuizProps>()
 
 // Emits definition
 const emit = defineEmits<{
-  (e: "answered", result: RecallPrompt): void
-  (e: "just-reviewed", result: RecallPrompt | undefined): void
+  (e: "answered", result: AnsweredQuestion): void
+  (e: "just-reviewed", result: undefined): void
 }>()
 
 // Composable for question fetching logic
 const useQuestionFetching = (props: QuizProps) => {
-  const recallPromptCache = ref<Record<number, RecallPrompt | undefined>>({})
+  const recallPromptCache = ref<Record<number, RecallQuestion | undefined>>({})
   const fetching = ref(false)
   const fetchingMemoryTrackerIds = ref<Set<number>>(new Set())
 
@@ -204,7 +205,7 @@ const onSpellingAnswer = async (
   }
 }
 
-const onAnswered = (answerResult: RecallPrompt) => {
+const onAnswered = (answerResult: AnsweredQuestion) => {
   emit("answered", answerResult)
 }
 

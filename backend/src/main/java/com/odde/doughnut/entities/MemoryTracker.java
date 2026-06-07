@@ -2,7 +2,7 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.odde.doughnut.controllers.dto.FolderTrailSegments;
+import com.odde.doughnut.controllers.dto.RecalledNote;
 import com.odde.doughnut.utils.TimestampOperations;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -12,7 +12,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
-import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -139,11 +138,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   }
 
   @JsonProperty
-  public List<Folder> getAncestorFolders() {
-    Note n = getNote();
-    if (n == null) {
-      return List.of();
-    }
-    return FolderTrailSegments.fromRootToContainingFolder(n);
+  public RecalledNote getRecalledNote() {
+    return RecalledNote.from(getNote(), getPropertyKey());
   }
 }

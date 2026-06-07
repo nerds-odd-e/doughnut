@@ -4,7 +4,8 @@ import {
   type DueMemoryTrackers,
   type MemoryTracker,
   type MemoryTrackerLite,
-  type RecallPrompt,
+  type RecallPromptHistoryItem,
+  type RecallQuestion,
 } from 'doughnut-api'
 import {
   doughnutSdkOptions,
@@ -83,15 +84,16 @@ export type RecallMcqCardPayload = {
   readonly notebookName: string
 }
 
-function firstPendingMcq(prompts: RecallPrompt[]): RecallPrompt | undefined {
+function firstPendingMcq(
+  prompts: RecallPromptHistoryItem[]
+): RecallPromptHistoryItem | undefined {
   return prompts.find((p) => p.questionType === 'MCQ' && p.answer == null)
 }
 
-export function recallMcqPayloadFromRecallPrompt(
+export function recallMcqPayloadFromRecallQuestion(
   memoryTrackerId: number,
-  prompt: RecallPrompt
+  prompt: RecallQuestion
 ): RecallMcqCardPayload | null {
-  if (prompt.questionType !== 'MCQ' || prompt.answer != null) return null
   const mq = prompt.multipleChoicesQuestion
   const choices = mq?.responseChoices
   if (choices === undefined || choices.length === 0) return null
@@ -104,33 +106,62 @@ export function recallMcqPayloadFromRecallPrompt(
   }
 }
 
+export function recallMcqPayloadFromRecallPromptHistoryItem(
+  memoryTrackerId: number,
+  prompt: RecallPromptHistoryItem,
+  notebookName: string
+): RecallMcqCardPayload | null {
+  if (prompt.questionType !== 'MCQ' || prompt.answer != null) return null
+  const mq = prompt.multipleChoicesQuestion
+  const choices = mq?.responseChoices
+  if (choices === undefined || choices.length === 0) return null
+  return {
+    memoryTrackerId,
+    recallPromptId: prompt.id,
+    stem: mq?.questionStem?.trim() ?? '',
+    choices,
+    notebookName: notebookName.trim(),
+  }
+}
+
 /**
  * If this due memory tracker has a pending MCQ (existing or from askAQuestion), return it;
  * otherwise null so the session can show just-review instead.
  */
 async function tryLoadMcqPayload(
   memoryTrackerId: number,
-  existingPrompts: RecallPrompt[],
+  existingPrompts: RecallPromptHistoryItem[],
+  notebookName: string,
   signal?: AbortSignal
 ): Promise<RecallMcqCardPayload | null> {
-  let mcqPrompt = firstPendingMcq(existingPrompts)
+  const mcqPrompt = firstPendingMcq(existingPrompts)
   if (mcqPrompt === undefined) {
     try {
-      const asked = await runDefaultBackendJson<RecallPrompt>(() =>
+      const asked = await runDefaultBackendJson<RecallQuestion>(() =>
         MemoryTrackerController.askAQuestion({
           path: { memoryTracker: memoryTrackerId },
           ...doughnutSdkOptions(signal),
         })
       )
-      if (asked.questionType === 'MCQ' && asked.answer == null) {
-        mcqPrompt = asked
+      if (asked.multipleChoicesQuestion != null) {
+        const mapped = recallMcqPayloadFromRecallQuestion(
+          memoryTrackerId,
+          asked
+        )
+        if (mapped !== null) {
+          return mapped
+        }
       }
     } catch {
       // No quiz (e.g. OpenAI off): same as web Quiz.vue → just-review path.
     }
   }
   if (mcqPrompt === undefined) return null
-  return recallMcqPayloadFromRecallPrompt(memoryTrackerId, mcqPrompt)
+  return recallMcqPayloadFromRecallPromptHistoryItem(
+    memoryTrackerId,
+    mcqPrompt,
+    notebookName
+  )
 }
 
 /** Spelling memory tracker: server spelling question first (same order as web recall). */
@@ -163,15 +194,15 @@ export async function loadRecallCardForMemoryTrackerId(
 ): Promise<RecallCard> {
   if (spelling) {
     try {
-      const prompt = await runDefaultBackendJson<RecallPrompt>(() =>
+      const prompt = await runDefaultBackendJson<RecallQuestion>(() =>
         MemoryTrackerController.askAQuestion({
           path: { memoryTracker: memoryTrackerId },
           ...doughnutSdkOptions(signal),
         })
       )
-      if (prompt.questionType === 'SPELLING' && prompt.id !== undefined) {
+      if (prompt.spellingQuestion != null) {
         const fromPrompt =
-          prompt.spellingQuestion?.notebook?.name ?? prompt.notebook?.name
+          prompt.spellingQuestion.notebook?.name ?? prompt.notebook?.name
         const notebookName = fromPrompt?.trim()
         return {
           variant: 'spelling-session',
@@ -183,7 +214,7 @@ export async function loadRecallCardForMemoryTrackerId(
                 : undefined,
             contentMarkdown: '',
             recallPromptId: prompt.id,
-            stemMarkdown: prompt.spellingQuestion?.stem ?? '',
+            stemMarkdown: prompt.spellingQuestion.stem ?? '',
           },
         }
       }
@@ -199,14 +230,19 @@ export async function loadRecallCardForMemoryTrackerId(
     }
   }
 
-  const prompts = await runDefaultBackendJson<RecallPrompt[]>(() =>
+  const prompts = await runDefaultBackendJson<RecallPromptHistoryItem[]>(() =>
     MemoryTrackerController.getRecallPrompts({
       path: { memoryTracker: memoryTrackerId },
       ...doughnutSdkOptions(signal),
     })
   )
 
-  const mcqPayload = await tryLoadMcqPayload(memoryTrackerId, prompts, signal)
+  const mcqPayload = await tryLoadMcqPayload(
+    memoryTrackerId,
+    prompts,
+    '',
+    signal
+  )
   if (mcqPayload !== null) {
     return { variant: 'mcq', payload: mcqPayload }
   }

@@ -4,7 +4,12 @@ import {
   RecallPromptController,
   RecallsController,
 } from 'doughnut-api'
-import type { NoteRealm, RecallPrompt } from 'doughnut-api'
+import type {
+  AnsweredQuestion,
+  NoteRealm,
+  RecallPromptHistoryItem,
+  RecallQuestion,
+} from 'doughnut-api'
 import makeMe from 'doughnut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
@@ -49,23 +54,38 @@ describe('recall MCQ (interactive)', () => {
   let regenerateSpy: ReturnType<typeof vi.spyOn> | undefined
   let mcqFixtureNoteRealm: NoteRealm
 
-  function pendingMcqPrompt(): RecallPrompt {
+  function pendingMcqPrompt(): RecallPromptHistoryItem {
     return makeMe.aRecallPrompt
       .withId(RECALL_PROMPT_ID)
       .withQuestionStem('Choose **Alpha**?')
       .withChoices(['First', '**Beta**', 'Third'])
-      .withMemoryTrackerId(1)
+      .please()
+  }
+
+  function pendingMcqQuestion(
+    id = RECALL_PROMPT_ID,
+    stem = 'Choose **Alpha**?',
+    choices: string[] = ['First', '**Beta**', 'Third']
+  ): RecallQuestion {
+    return makeMe.aRecallQuestion
+      .withId(id)
+      .withQuestionStem(stem)
+      .withChoices(choices)
       .please()
   }
 
   function mcqAnsweredPrompt(
-    pending: RecallPrompt,
-    answer: { id: number; correct: boolean; choiceIndex: number }
-  ): RecallPrompt {
-    return makeMe.recallPromptFrom(pending, {
-      note: mcqFixtureNoteRealm.note,
-      answer,
-    })
+    pending: RecallPromptHistoryItem,
+    answer: { id: number; correct: boolean; choiceIndex: number },
+    memoryTrackerId = 1
+  ): AnsweredQuestion {
+    return makeMe.anAnsweredQuestion
+      .withId(pending.id)
+      .withNote(mcqFixtureNoteRealm.note)
+      .withPredefinedQuestion(pending.predefinedQuestion!)
+      .withAnswer(answer)
+      .withMemoryTrackerId(memoryTrackerId)
+      .please()
   }
 
   function mockSingleMcqDue() {
@@ -141,7 +161,6 @@ describe('recall MCQ (interactive)', () => {
           .withChoices(
             Array.from({ length: manyChoicesCount }, (_, i) => `c${i}`)
           )
-          .withMemoryTrackerId(1)
           .please(),
       ],
     } as Awaited<ReturnType<typeof MemoryTrackerController.getRecallPrompts>>)
@@ -224,7 +243,6 @@ describe('recall MCQ (interactive)', () => {
       .withId(SECOND_PROMPT_ID)
       .withQuestionStem(secondStem)
       .withChoices(['X', 'Y', 'Z'])
-      .withMemoryTrackerId(2)
       .please()
 
     recallingSpy.mockResolvedValue({
@@ -264,11 +282,11 @@ describe('recall MCQ (interactive)', () => {
     })
 
     answerQuizSpy.mockResolvedValue({
-      data: {
-        ...pending,
-        note: mcqFixtureNoteRealm.note,
-        answer: { id: 100, correct: false, choiceIndex: 1 },
-      },
+      data: mcqAnsweredPrompt(pending, {
+        id: 100,
+        correct: false,
+        choiceIndex: 1,
+      }),
     } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
 
     const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)
@@ -318,7 +336,6 @@ describe('recall MCQ (interactive)', () => {
       .withId(SECOND_PROMPT_ID)
       .withQuestionStem(secondStem)
       .withChoices(['X', 'Y', 'Z'])
-      .withMemoryTrackerId(2)
       .please()
 
     const note2 = makeMe.aNoteRealm
@@ -370,11 +387,13 @@ describe('recall MCQ (interactive)', () => {
         } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
       }
       return Promise.resolve({
-        data: {
-          ...secondPrompt,
-          note: note2.note,
-          answer: { id: 101, correct: true, choiceIndex: 0 },
-        },
+        data: makeMe.anAnsweredQuestion
+          .withId(secondPrompt.id)
+          .withNote(note2.note)
+          .withPredefinedQuestion(secondPrompt.predefinedQuestion!)
+          .withAnswer({ id: 101, correct: true, choiceIndex: 0 })
+          .withMemoryTrackerId(2)
+          .please(),
       } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>)
     })
 
@@ -479,7 +498,7 @@ describe('recall MCQ (interactive)', () => {
     regenerateSpy = vi
       .spyOn(RecallPromptController, 'regenerate')
       .mockResolvedValue({
-        data: pendingMcqPrompt(),
+        data: pendingMcqQuestion(),
       } as Awaited<ReturnType<typeof RecallPromptController.regenerate>>)
 
     const ink = await renderInkWhenCommandLineReady(<InteractiveCliApp />)

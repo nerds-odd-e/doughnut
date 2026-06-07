@@ -70,10 +70,10 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 
 ## Recall Prompt Controller
 
-- `regenerate`: POST `/api/recall-prompts/{recallPrompt}/regenerate` -> `RegenerateResponse` (request: `RegenerateData`; path: recallPrompt; body: QuestionContestResult; response body: RecallPrompt)
+- `regenerate`: POST `/api/recall-prompts/{recallPrompt}/regenerate` -> `RegenerateResponse` (request: `RegenerateData`; path: recallPrompt; body: QuestionContestResult; response body: RecallQuestion)
 - `contest`: POST `/api/recall-prompts/{recallPrompt}/contest` -> `ContestResponse` (request: `ContestData`; path: recallPrompt; response body: QuestionContestResult)
-- `answerQuiz`: POST `/api/recall-prompts/{recallPrompt}/answer` -> `AnswerQuizResponse` (request: `AnswerQuizData`; path: recallPrompt; body: AnswerDto; response body: RecallPrompt)
-- `answerSpelling`: POST `/api/recall-prompts/{recallPrompt}/answer-spelling` -> `AnswerSpellingResponse` (request: `AnswerSpellingData`; path: recallPrompt; body: AnswerSpellingDto; response body: RecallPrompt)
+- `answerQuiz`: POST `/api/recall-prompts/{recallPrompt}/answer` -> `AnswerQuizResponse` (request: `AnswerQuizData`; path: recallPrompt; body: AnswerDto; response body: AnsweredQuestion)
+- `answerSpelling`: POST `/api/recall-prompts/{recallPrompt}/answer-spelling` -> `AnswerSpellingResponse` (request: `AnswerSpellingData`; path: recallPrompt; body: AnswerSpellingDto; response body: AnsweredQuestion)
 
 ## Predefined Question Controller
 
@@ -140,8 +140,8 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `markAsRecalled`: PATCH `/api/memory-trackers/{memoryTracker}/mark-as-recalled` -> `MarkAsRecalledResponse` (request: `MarkAsRecalledData`; path: memoryTracker; query: successful; response body: MemoryTracker)
 - `showMemoryTracker`: GET `/api/memory-trackers/{memoryTracker}` -> `ShowMemoryTrackerResponse` (request: `ShowMemoryTrackerData`; path: memoryTracker; response body: MemoryTracker)
 - `getThresholdExceeded`: GET `/api/memory-trackers/{memoryTracker}/threshold-exceeded` -> `GetThresholdExceededResponse` (request: `GetThresholdExceededData`; path: memoryTracker; response body: ThresholdExceededResult)
-- `getRecallPrompts`: GET `/api/memory-trackers/{memoryTracker}/recall-prompts` -> `GetRecallPromptsResponse` (request: `GetRecallPromptsData`; path: memoryTracker; response body: Array<RecallPrompt>)
-- `askAQuestion`: GET `/api/memory-trackers/{memoryTracker}/question` -> `AskAQuestionResponse` (request: `AskAQuestionData`; path: memoryTracker; response body: RecallPrompt)
+- `getRecallPrompts`: GET `/api/memory-trackers/{memoryTracker}/recall-prompts` -> `GetRecallPromptsResponse` (request: `GetRecallPromptsData`; path: memoryTracker; response body: Array<RecallPromptHistoryItem>)
+- `askAQuestion`: GET `/api/memory-trackers/{memoryTracker}/question` -> `AskAQuestionResponse` (request: `AskAQuestionData`; path: memoryTracker; response body: RecallQuestion)
 - `getRecentlyRecalled`: GET `/api/memory-trackers/recently-recalled` -> `GetRecentlyRecalledResponse` (request: none; response body: Array<MemoryTracker>)
 - `getRecentMemoryTrackers`: GET `/api/memory-trackers/recent` -> `GetRecentMemoryTrackersResponse` (request: none; response body: Array<MemoryTracker>)
 - `deleteUnansweredRecallPrompts`: DELETE `/api/memory-trackers/{memoryTracker}/recall-prompts/unanswered` -> `DeleteUnansweredRecallPromptsResponse` (request: `DeleteUnansweredRecallPromptsData`; path: memoryTracker; response body: void)
@@ -223,7 +223,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 ## Recalls Controller
 
 - `recalling`: GET `/api/recalls/recalling` -> `RecallingResponse` (request: `RecallingData`; query: timezone, dueindays; response body: DueMemoryTrackers)
-- `previouslyAnswered`: GET `/api/recalls/previously-answered` -> `PreviouslyAnsweredResponse` (request: `PreviouslyAnsweredData`; query: timezone; response body: Array<RecallPrompt>)
+- `previouslyAnswered`: GET `/api/recalls/previously-answered` -> `PreviouslyAnsweredResponse` (request: `PreviouslyAnsweredData`; query: timezone; response body: Array<AnsweredQuestion>)
 
 ## Health Check Controller
 

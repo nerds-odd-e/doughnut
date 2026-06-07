@@ -3,7 +3,9 @@ package com.odde.doughnut.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
+import com.odde.doughnut.controllers.dto.AnsweredQuestion;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
+import com.odde.doughnut.controllers.dto.RecallQuestion;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
@@ -40,16 +42,18 @@ class RecallPromptController {
 
   @PostMapping("/{recallPrompt}/regenerate")
   @Transactional
-  public RecallPrompt regenerate(
+  public RecallQuestion regenerate(
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
       @RequestBody QuestionContestResult contestResult)
       throws JsonProcessingException {
     authorizationService.assertLoggedIn();
-    return recallQuestionService.regenerateAQuestion(
-        contestResult,
-        recallPrompt.getPredefinedQuestion().getNote(),
-        recallPrompt.getPredefinedQuestion().getMcqWithAnswer(),
-        recallPrompt);
+    RecallPrompt regenerated =
+        recallQuestionService.regenerateAQuestion(
+            contestResult,
+            recallPrompt.getPredefinedQuestion().getNote(),
+            recallPrompt.getPredefinedQuestion().getMcqWithAnswer(),
+            recallPrompt);
+    return RecallQuestion.from(regenerated);
   }
 
   @PostMapping("/{recallPrompt}/contest")
@@ -62,29 +66,33 @@ class RecallPromptController {
 
   @PostMapping("/{recallPrompt}/answer")
   @Transactional
-  public RecallPrompt answerQuiz(
+  public AnsweredQuestion answerQuiz(
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
       @Valid @RequestBody AnswerDTO answerDTO) {
     authorizationService.assertLoggedIn();
-    return recallQuestionService.answerQuestion(
-        recallPrompt,
-        answerDTO,
-        authorizationService.getCurrentUser(),
-        testabilitySettings.getCurrentUTCTimestamp());
+    RecallPrompt answered =
+        recallQuestionService.answerQuestion(
+            recallPrompt,
+            answerDTO,
+            authorizationService.getCurrentUser(),
+            testabilitySettings.getCurrentUTCTimestamp());
+    return AnsweredQuestion.from(answered);
   }
 
   @PostMapping("/{recallPrompt}/answer-spelling")
   @Transactional
-  public RecallPrompt answerSpelling(
+  public AnsweredQuestion answerSpelling(
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
       @Valid @RequestBody AnswerSpellingDTO answerDTO)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
     authorizationService.assertReadAuthorization(recallPrompt.getMemoryTracker());
-    return memoryTrackerService.answerSpelling(
-        recallPrompt,
-        answerDTO,
-        authorizationService.getCurrentUser(),
-        testabilitySettings.getCurrentUTCTimestamp());
+    RecallPrompt answered =
+        memoryTrackerService.answerSpelling(
+            recallPrompt,
+            answerDTO,
+            authorizationService.getCurrentUser(),
+            testabilitySettings.getCurrentUTCTimestamp());
+    return AnsweredQuestion.from(answered);
   }
 }

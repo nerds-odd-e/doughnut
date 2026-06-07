@@ -77,7 +77,7 @@ import RecallProgressBar from "@/components/recall/RecallProgressBar.vue"
 import AnsweredQuestionComponent from "@/components/recall/AnsweredQuestionComponent.vue"
 import AnsweredSpellingQuestion from "@/components/recall/AnsweredSpellingQuestion.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
-import type { RecallPrompt } from "@generated/doughnut-backend-api"
+import type { AnsweredQuestion } from "@generated/doughnut-backend-api"
 import {
   RecallsController,
   MemoryTrackerController,
@@ -123,7 +123,7 @@ defineProps({
 })
 
 const currentIndex = ref(0)
-const previousAnsweredQuestions = ref<(RecallPrompt | undefined)[]>([])
+const previousAnsweredQuestions = ref<(AnsweredQuestion | undefined)[]>([])
 const previousAnsweredQuestionCursor = ref<number | undefined>(undefined)
 const isProgressBarVisible = ref(true)
 const isLoadingMore = ref(false)
@@ -239,7 +239,7 @@ const offerReAssimilation = async (memoryTrackerId: number | undefined) => {
   }
 }
 
-const onAnswered = async (answerResult: RecallPrompt) => {
+const onAnswered = async (answerResult: AnsweredQuestion) => {
   moveToNextMemoryTracker()
   previousAnsweredQuestions.value.push(answerResult)
   if (!answerResult.answer?.correct) {

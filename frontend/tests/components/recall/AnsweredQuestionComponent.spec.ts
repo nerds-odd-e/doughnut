@@ -2,7 +2,17 @@ import AnsweredQuestionComponent from "@/components/recall/AnsweredQuestionCompo
 import { flushPromises } from "@vue/test-utils"
 import helper from "@tests/helpers"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import { describe, it, expect } from "vitest"
+import { describe, it, expect, vi } from "vitest"
+
+vi.mock("vue-router", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("vue-router")>()
+  return {
+    ...actual,
+    useRouter: () => ({
+      push: vi.fn(),
+    }),
+  }
+})
 
 describe("AnsweredQuestionComponent", () => {
   describe("note under question", () => {

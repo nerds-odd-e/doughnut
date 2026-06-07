@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue"
-import type { RecallPrompt } from "@generated/doughnut-backend-api"
+import type { RecallQuestion } from "@generated/doughnut-backend-api"
 import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import ContentLoader from "../commons/ContentLoader.vue"
 import TextInput from "../form/TextInput.vue"
@@ -55,7 +55,7 @@ const props = defineProps({
 
 const emits = defineEmits(["answer"])
 const spellingAnswer = ref("")
-const recallPrompt = ref<RecallPrompt>()
+const recallPrompt = ref<RecallQuestion>()
 const loading = ref(true)
 const submitted = ref(false)
 

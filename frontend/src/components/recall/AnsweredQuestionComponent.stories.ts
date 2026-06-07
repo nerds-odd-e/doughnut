@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/vue3-vite"
 import AnsweredQuestionComponent from "./AnsweredQuestionComponent.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import type { RecallPrompt } from "@generated/doughnut-backend-api"
+import type { AnsweredQuestion } from "@generated/doughnut-backend-api"
 
 const meta = {
   title: "Recall/AnsweredQuestionComponent",
@@ -26,8 +26,11 @@ const createAnsweredQuestionWithQuestion = (opts: {
   correctIndex: number
   answerIndex: number
   isCorrect: boolean
-}): RecallPrompt =>
-  makeMe.aRecallPrompt
+  noteTitle: string
+}): AnsweredQuestion => {
+  const note = makeMe.aNote.title(opts.noteTitle).please()
+  return makeMe.anAnsweredQuestion
+    .withNote(note)
     .withPredefinedQuestion(
       makeMe.aPredefinedQuestion
         .withQuestionStem(opts.stem)
@@ -35,162 +38,101 @@ const createAnsweredQuestionWithQuestion = (opts: {
         .correctAnswerIndex(opts.correctIndex)
         .please()
     )
-    .withNote(makeMe.aNote.please())
     .withAnswer({
       id: 1,
       correct: opts.isCorrect,
       choiceIndex: opts.answerIndex,
     })
     .withId(1)
+    .withMemoryTrackerId(1)
     .please()
+}
 
 export const CorrectAnswer: Story = {
   args: {
-    answeredQuestion: (() => {
-      const question = createAnsweredQuestionWithQuestion({
-        stem: "What is the capital of France?",
-        choices: ["Paris", "London", "Berlin", "Madrid"],
-        correctIndex: 0,
-        answerIndex: 0,
-        isCorrect: true,
-      })
-      return {
-        ...question,
-        note: makeMe.aNote
-          .title("France")
-          .content(
-            "France is a country in Western Europe. Paris is its capital and largest city."
-          )
-          .please(),
-      }
-    })(),
+    answeredQuestion: createAnsweredQuestionWithQuestion({
+      stem: "What is the capital of France?",
+      choices: ["Paris", "London", "Berlin", "Madrid"],
+      correctIndex: 0,
+      answerIndex: 0,
+      isCorrect: true,
+      noteTitle: "France",
+    }),
     conversationButton: true,
   },
 }
 
 export const IncorrectAnswer: Story = {
   args: {
-    answeredQuestion: (() => {
-      const question = createAnsweredQuestionWithQuestion({
-        stem: "What is the capital of France?",
-        choices: ["Paris", "London", "Berlin", "Madrid"],
-        correctIndex: 0,
-        answerIndex: 1,
-        isCorrect: false,
-      })
-      return {
-        ...question,
-        note: makeMe.aNote
-          .title("France")
-          .content(
-            "France is a country in Western Europe. Paris is its capital and largest city."
-          )
-          .please(),
-      }
-    })(),
+    answeredQuestion: createAnsweredQuestionWithQuestion({
+      stem: "What is the capital of France?",
+      choices: ["Paris", "London", "Berlin", "Madrid"],
+      correctIndex: 0,
+      answerIndex: 1,
+      isCorrect: false,
+      noteTitle: "France",
+    }),
     conversationButton: true,
   },
 }
 
 export const NoteWithManyAncestors: Story = {
   args: {
-    answeredQuestion: (() => {
-      const question = createAnsweredQuestionWithQuestion({
-        stem: "What is TypeScript?",
-        choices: [
-          "A programming language",
-          "A database",
-          "A framework",
-          "A browser",
-        ],
-        correctIndex: 0,
-        answerIndex: 0,
-        isCorrect: true,
-      })
-
-      return {
-        ...question,
-        note: makeMe.aNote
-          .title("TypeScript")
-          .content(
-            "TypeScript is a typed superset of JavaScript that compiles to plain JavaScript."
-          )
-          .please(),
-      }
-    })(),
+    answeredQuestion: createAnsweredQuestionWithQuestion({
+      stem: "What is TypeScript?",
+      choices: [
+        "A programming language",
+        "A database",
+        "A framework",
+        "A browser",
+      ],
+      correctIndex: 0,
+      answerIndex: 0,
+      isCorrect: true,
+      noteTitle: "TypeScript",
+    }),
     conversationButton: true,
   },
 }
 
 export const InSequence: Story = {
   args: {
-    answeredQuestion: (() => {
-      const question = createAnsweredQuestionWithQuestion({
-        stem: "Which of the following is a JavaScript framework?",
-        choices: ["React", "Python", "Java", "C++"],
-        correctIndex: 0,
-        answerIndex: 0,
-        isCorrect: true,
-      })
-      return {
-        ...question,
-        id: 1,
-        note: makeMe.aNote
-          .title("React")
-          .content(
-            "React is a JavaScript library for building user interfaces, particularly web applications."
-          )
-          .please(),
-      }
-    })(),
+    answeredQuestion: createAnsweredQuestionWithQuestion({
+      stem: "Which of the following is a JavaScript framework?",
+      choices: ["React", "Python", "Java", "C++"],
+      correctIndex: 0,
+      answerIndex: 0,
+      isCorrect: true,
+      noteTitle: "React",
+    }),
     conversationButton: true,
   },
 }
 
 export const WithoutConversationButton: Story = {
   args: {
-    answeredQuestion: (() => {
-      const question = createAnsweredQuestionWithQuestion({
-        stem: "What is 2 + 2?",
-        choices: ["3", "4", "5", "6"],
-        correctIndex: 1,
-        answerIndex: 1,
-        isCorrect: true,
-      })
-      return {
-        ...question,
-        note: makeMe.aNote
-          .title("Basic Arithmetic")
-          .content(
-            "Addition is one of the four basic operations of arithmetic. 2 + 2 equals 4."
-          )
-          .please(),
-      }
-    })(),
+    answeredQuestion: createAnsweredQuestionWithQuestion({
+      stem: "What is 2 + 2?",
+      choices: ["3", "4", "5", "6"],
+      correctIndex: 1,
+      answerIndex: 1,
+      isCorrect: true,
+      noteTitle: "Basic Arithmetic",
+    }),
     conversationButton: false,
   },
 }
 
 export const CustomQuestion: Story = {
   args: {
-    answeredQuestion: (() => {
-      const question = createAnsweredQuestionWithQuestion({
-        stem: "Which data structure follows LIFO principle?",
-        choices: ["Queue", "Stack", "Array", "Linked List"],
-        correctIndex: 1,
-        answerIndex: 2,
-        isCorrect: false,
-      })
-      return {
-        ...question,
-        note: makeMe.aNote
-          .title("Data Structures")
-          .content(
-            "A stack is a linear data structure that follows the Last In First Out (LIFO) principle."
-          )
-          .please(),
-      }
-    })(),
+    answeredQuestion: createAnsweredQuestionWithQuestion({
+      stem: "Which data structure follows LIFO principle?",
+      choices: ["Queue", "Stack", "Array", "Linked List"],
+      correctIndex: 1,
+      answerIndex: 2,
+      isCorrect: false,
+      noteTitle: "Data Structures",
+    }),
     conversationButton: true,
   },
   decorators: [

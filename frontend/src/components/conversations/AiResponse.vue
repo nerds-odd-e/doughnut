@@ -125,9 +125,7 @@ const handleToolCallRejected = (error: Error) => {
   clearToolCallState()
 }
 
-const currentNote = computed(
-  () => conversation.subject?.note || conversation.subject?.recallPrompt?.note
-)
+const currentNote = computed(() => conversation.subject?.note)
 
 const getAiReply = async () => {
   const states = createAiReplyStates(createAiActionContext())

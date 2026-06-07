@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
 import type {
-  RecallPrompt,
+  RecallPromptHistoryItem,
   MemoryTracker,
 } from "@generated/doughnut-backend-api"
 import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
@@ -32,7 +32,7 @@ const props = defineProps<{
   memoryTrackerId: number
 }>()
 
-const recallPrompts = ref<RecallPrompt[] | undefined>(undefined)
+const recallPrompts = ref<RecallPromptHistoryItem[] | undefined>(undefined)
 const memoryTracker = ref<MemoryTracker | undefined>(undefined)
 const error = ref(false)
 

@@ -15,7 +15,8 @@ import { Spinner } from '@inkjs/ui'
 import {
   MemoryTrackerController,
   RecallPromptController,
-  type RecallPrompt,
+  type AnsweredQuestion,
+  type RecallQuestion,
 } from 'doughnut-api'
 import { BorderedSingleLinePromptInputInk } from '../../commonUIComponents/borderedSingleLinePromptInputInk.js'
 import { renderMarkdownToTerminal } from '../../markdown.js'
@@ -33,10 +34,7 @@ import { LeaveRecallConfirmPrompt } from './LeaveRecallConfirmPrompt.js'
 import { RECALL_BUSY_SUBMIT_ANSWER_LABEL } from './recallBusyInputCopy.js'
 import { normalizeSpellingLineForSubmit } from './spellingAnswerLine.js'
 import type { SpellingRecallSessionPayload } from './nextRecallCardLoad.js'
-import {
-  noteBreadcrumbTrailTitles,
-  noteContentMarkdownOrFallback,
-} from './recallNoteContext.js'
+import { breadcrumbTrailFromRecalledNote } from './recallNoteContext.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
 import {
   RecallAnsweredBlockShell,
@@ -49,19 +47,16 @@ async function fetchSpellingRecallPrompt(
   memoryTrackerId: number,
   signal?: AbortSignal
 ): Promise<{ readonly recallPromptId: number; readonly stemMarkdown: string }> {
-  const prompt = await runDefaultBackendJson<RecallPrompt>(() =>
+  const prompt = await runDefaultBackendJson<RecallQuestion>(() =>
     MemoryTrackerController.askAQuestion({
       path: { memoryTracker: memoryTrackerId },
       ...doughnutSdkOptions(signal),
     })
   )
-  if (prompt.questionType !== 'SPELLING') {
+  if (prompt.spellingQuestion == null) {
     throw new Error('Expected a spelling recall prompt from the server.')
   }
   const recallPromptId = prompt.id
-  if (recallPromptId === undefined) {
-    throw new Error('Spelling recall prompt has no id.')
-  }
   return {
     recallPromptId,
     stemMarkdown: prompt.spellingQuestion?.stem ?? '',
@@ -72,8 +67,8 @@ async function submitSpellingAnswer(
   recallPromptId: number,
   spellingAnswer: string,
   signal?: AbortSignal
-): Promise<RecallPrompt> {
-  return runDefaultBackendJson<RecallPrompt>(() =>
+): Promise<AnsweredQuestion> {
+  return runDefaultBackendJson<AnsweredQuestion>(() =>
     RecallPromptController.answerSpelling({
       path: { recallPrompt: recallPromptId },
       body: { spellingAnswer },
@@ -83,28 +78,25 @@ async function submitSpellingAnswer(
 }
 
 function recallAnsweredSpellingInk(args: {
-  readonly answeredPrompt: RecallPrompt
+  readonly answeredPrompt: AnsweredQuestion
   readonly contentMarkdownFallback: string
   readonly spellingAnswerDisplay: string
+  readonly notebookName?: string
 }): ReactElement {
   const width = resolvedTerminalWidth()
   const crumb = recallAnsweredBreadcrumbText(
-    noteBreadcrumbTrailTitles(
-      args.answeredPrompt.note,
-      args.answeredPrompt.ancestorFolders,
-      args.answeredPrompt.notebook?.name
+    breadcrumbTrailFromRecalledNote(
+      args.answeredPrompt.recalledNote,
+      args.notebookName
     )
   )
-  const contentMarkdown = noteContentMarkdownOrFallback(
-    args.answeredPrompt.note,
-    args.contentMarkdownFallback
-  )
+  const contentMarkdown = args.contentMarkdownFallback
   const detailLines = recallAnsweredMarkdownToDisplayLines(
     contentMarkdown,
     width
   )
   const ans = args.spellingAnswerDisplay
-  const correct = args.answeredPrompt.answer?.correct === true
+  const correct = args.answeredPrompt.answer.correct === true
   return (
     <RecallAnsweredBlockShell>
       <Text>{crumb}</Text>
@@ -221,6 +213,7 @@ export function SpellingRecallStage({
         answeredPrompt: updated,
         contentMarkdownFallback: payload.contentMarkdown,
         spellingAnswerDisplay,
+        notebookName: payload.notebookName,
       })
       if (!correct) {
         bufferRef.current = ''

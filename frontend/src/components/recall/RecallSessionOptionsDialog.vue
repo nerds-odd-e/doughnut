@@ -47,7 +47,7 @@ import { computed } from "vue"
 import { SkipForward } from "@lucide/vue"
 import Modal from "../commons/Modal.vue"
 import { useRecallData } from "@/composables/useRecallData"
-import type { RecallPrompt } from "@generated/doughnut-backend-api"
+import type { AnsweredQuestion } from "@generated/doughnut-backend-api"
 
 const props = defineProps({
   canMoveToEnd: { type: Boolean, required: true },
@@ -57,7 +57,7 @@ const props = defineProps({
   toRepeatCount: { type: Number, required: true },
   totalAssimilatedCount: { type: Number, default: 0 },
   previousAnsweredQuestions: {
-    type: Array as () => (RecallPrompt | undefined)[],
+    type: Array as () => (AnsweredQuestion | undefined)[],
     required: true,
   },
 })
@@ -86,8 +86,8 @@ const handleTreadmillModeToggle = (event: Event) => {
 }
 
 const isQuestionResultWithThinkingTime = (
-  result: RecallPrompt | undefined
-): result is RecallPrompt => {
+  result: AnsweredQuestion | undefined
+): result is AnsweredQuestion => {
   if (result === undefined || result.questionType !== "MCQ") return false
   return result.answer?.thinkingTimeMs !== undefined
 }

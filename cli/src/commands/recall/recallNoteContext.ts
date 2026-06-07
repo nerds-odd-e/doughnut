@@ -1,4 +1,4 @@
-import type { Note, NoteTopology } from 'doughnut-api'
+import type { Note, NoteTopology, RecalledNote } from 'doughnut-api'
 
 /** Minimal shape for folder breadcrumb rows (matches API `Folder` name field). */
 type FolderTrailLike = { name?: string }
@@ -7,6 +7,17 @@ type FolderTrailLike = { name?: string }
  * Titles for recall scrollback: notebook, folder path (outer→inner), then note title.
  * Pass `ancestorFolders` from `MemoryTracker` / `RecallPrompt` when available.
  */
+export function breadcrumbTrailFromRecalledNote(
+  recalledNote: RecalledNote,
+  notebookName?: string | undefined
+): readonly string[] {
+  return titlesFromTopologyAndFolders(
+    recalledNote.noteTopology,
+    notebookName,
+    recalledNote.ancestorFolders
+  )
+}
+
 export function noteBreadcrumbTrailTitles(
   note: Note | undefined,
   ancestorFolders?: readonly FolderTrailLike[] | undefined,

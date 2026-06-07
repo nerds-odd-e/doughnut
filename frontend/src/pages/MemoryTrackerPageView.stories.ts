@@ -24,13 +24,6 @@ const createRecallPromptWithAnswer = (opts: {
   answerIndex: number
   isCorrect: boolean
 }) => {
-  const note = makeMe.aNote
-    .title("France")
-    .content(
-      "France is a country in Western Europe. Paris is its capital and largest city."
-    )
-    .please()
-
   const predefinedQuestion = makeMe.aPredefinedQuestion
     .withQuestionStem(opts.stem)
     .withChoices(opts.choices)
@@ -38,7 +31,6 @@ const createRecallPromptWithAnswer = (opts: {
     .please()
 
   return makeMe.aRecallPrompt
-    .withNote(note)
     .withPredefinedQuestion(predefinedQuestion)
     .withAnswer({
       id: 1,
@@ -85,29 +77,28 @@ export const WithIncorrectAnswer: Story = {
 
 // Question with note that has many ancestors
 export const NoteWithManyAncestors: Story = {
-  args: {
-    recallPrompts: [
-      (() => {
-        const note = makeMe.aNote
-          .title("TypeScript")
-          .content(
-            "TypeScript is a typed superset of JavaScript that compiles to plain JavaScript."
-          )
-          .please()
+  args: (() => {
+    const note = makeMe.aNote
+      .title("TypeScript")
+      .content(
+        "TypeScript is a typed superset of JavaScript that compiles to plain JavaScript."
+      )
+      .please()
 
-        const predefinedQuestion = makeMe.aPredefinedQuestion
-          .withQuestionStem("What is TypeScript?")
-          .withChoices([
-            "A programming language",
-            "A database",
-            "A framework",
-            "A browser",
-          ])
-          .correctAnswerIndex(0)
-          .please()
+    const predefinedQuestion = makeMe.aPredefinedQuestion
+      .withQuestionStem("What is TypeScript?")
+      .withChoices([
+        "A programming language",
+        "A database",
+        "A framework",
+        "A browser",
+      ])
+      .correctAnswerIndex(0)
+      .please()
 
-        return makeMe.aRecallPrompt
-          .withNote(note)
+    return {
+      recallPrompts: [
+        makeMe.aRecallPrompt
           .withPredefinedQuestion(predefinedQuestion)
           .withAnswer({
             id: 1,
@@ -115,12 +106,12 @@ export const NoteWithManyAncestors: Story = {
             choiceIndex: 0,
           })
           .withAnswerTime(new Date().toISOString())
-          .please()
-      })(),
-    ],
-    memoryTracker: makeMe.aMemoryTracker.please(),
-    memoryTrackerId: 1,
-  },
+          .please(),
+      ],
+      memoryTracker: makeMe.aMemoryTracker.ofLink(note).please(),
+      memoryTrackerId: 1,
+    }
+  })(),
 }
 
 // No recall prompts found

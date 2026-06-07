@@ -62,7 +62,7 @@ import ProgressBar from "../commons/ProgressBar.vue"
 import { Pause, Settings, SkipBack } from "@lucide/vue"
 import RecallSessionOptionsDialog from "./RecallSessionOptionsDialog.vue"
 
-import type { RecallPrompt } from "@generated/doughnut-backend-api"
+import type { AnsweredQuestion } from "@generated/doughnut-backend-api"
 
 const props = defineProps({
   finished: { type: Number, required: true },
@@ -73,7 +73,7 @@ const props = defineProps({
   totalAssimilatedCount: { type: Number, default: 0 },
   diligentMode: { type: Boolean, default: false },
   previousAnsweredQuestions: {
-    type: Array as () => (RecallPrompt | undefined)[],
+    type: Array as () => (AnsweredQuestion | undefined)[],
     required: true,
   },
 })

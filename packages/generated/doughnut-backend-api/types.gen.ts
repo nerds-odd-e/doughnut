@@ -261,29 +261,11 @@ export type QuestionContestResult = {
     rejected?: boolean;
 };
 
-export type Answer = {
+export type RecallQuestion = {
     id: number;
-    choiceIndex?: number;
-    correct: boolean;
-    thinkingTimeMs?: number;
-    spellingAnswer?: string;
-};
-
-export type RecallPrompt = {
-    id: number;
-    memoryTrackerId?: number;
-    questionType: 'MCQ' | 'SPELLING';
-    multipleChoicesQuestion?: MultipleChoicesQuestion;
     notebook: Notebook;
-    note?: Note;
-    ancestorFolders?: Array<Folder>;
-    questionGeneratedTime?: string;
-    isContested?: boolean;
-    answerTime?: string;
-    predefinedQuestion?: PredefinedQuestion;
-    answer?: Answer;
+    multipleChoicesQuestion?: MultipleChoicesQuestion;
     spellingQuestion?: SpellingQuestion;
-    propertyKey?: string;
 };
 
 export type SpellingQuestion = {
@@ -294,6 +276,30 @@ export type SpellingQuestion = {
 export type AnswerDto = {
     choiceIndex?: number;
     thinkingTimeMs?: number;
+};
+
+export type Answer = {
+    id: number;
+    choiceIndex?: number;
+    correct: boolean;
+    thinkingTimeMs?: number;
+    spellingAnswer?: string;
+};
+
+export type AnsweredQuestion = {
+    id: number;
+    questionType: 'MCQ' | 'SPELLING';
+    memoryTrackerId: number;
+    recalledNote: RecalledNote;
+    answer: Answer;
+    predefinedQuestion?: PredefinedQuestion;
+};
+
+export type RecalledNote = {
+    noteTopology: NoteTopology;
+    notebookId: number;
+    ancestorFolders?: Array<Folder>;
+    propertyKey?: string;
 };
 
 export type AnswerSpellingDto = {
@@ -533,7 +539,7 @@ export type MemoryTracker = {
     removedFromTracking?: boolean;
     spelling?: boolean;
     propertyKey?: string;
-    ancestorFolders?: Array<Folder>;
+    recalledNote?: RecalledNote;
 };
 
 export type ConversationMessage = {
@@ -559,7 +565,7 @@ export type Conversation = {
 
 export type ConversationSubject = {
     note?: Note;
-    recallPrompt?: RecallPrompt;
+    recallPrompt?: AnsweredQuestion;
 };
 
 export type CircleJoiningByInvitation = {
@@ -850,6 +856,17 @@ export type ThresholdExceededResult = {
     thresholdExceeded?: boolean;
 };
 
+export type RecallPromptHistoryItem = {
+    id: number;
+    questionType: 'MCQ' | 'SPELLING';
+    questionGeneratedTime: string;
+    isContested?: boolean;
+    answerTime?: string;
+    answer?: Answer;
+    predefinedQuestion?: PredefinedQuestion;
+    multipleChoicesQuestion?: MultipleChoicesQuestion;
+};
+
 export type FailureReport = {
     id?: number;
     errorName: string;
@@ -960,23 +977,6 @@ export type NoteRealmWritable = {
     indexNoteContent?: string;
 };
 
-export type RecallPromptWritable = {
-    id: number;
-    memoryTrackerId?: number;
-    questionType: 'MCQ' | 'SPELLING';
-    multipleChoicesQuestion?: MultipleChoicesQuestion;
-    notebook: Notebook;
-    note?: NoteWritable;
-    ancestorFolders?: Array<Folder>;
-    questionGeneratedTime?: string;
-    isContested?: boolean;
-    answerTime?: string;
-    predefinedQuestion?: PredefinedQuestion;
-    answer?: Answer;
-    spellingQuestion?: SpellingQuestion;
-    propertyKey?: string;
-};
-
 export type MemoryTrackerWritable = {
     id: number;
     note: NoteWritable;
@@ -988,7 +988,7 @@ export type MemoryTrackerWritable = {
     removedFromTracking?: boolean;
     spelling?: boolean;
     propertyKey?: string;
-    ancestorFolders?: Array<Folder>;
+    recalledNote?: RecalledNote;
 };
 
 export type ConversationWritable = {
@@ -1002,7 +1002,7 @@ export type ConversationWritable = {
 
 export type ConversationSubjectWritable = {
     note?: NoteWritable;
-    recallPrompt?: RecallPromptWritable;
+    recallPrompt?: AnsweredQuestion;
 };
 
 export type NoteRecallInfoWritable = {
@@ -1501,7 +1501,7 @@ export type RegenerateResponses = {
     /**
      * OK
      */
-    200: RecallPrompt;
+    200: RecallQuestion;
 };
 
 export type RegenerateResponse = RegenerateResponses[keyof RegenerateResponses];
@@ -1537,7 +1537,7 @@ export type AnswerQuizResponses = {
     /**
      * OK
      */
-    200: RecallPrompt;
+    200: AnsweredQuestion;
 };
 
 export type AnswerQuizResponse = AnswerQuizResponses[keyof AnswerQuizResponses];
@@ -1555,7 +1555,7 @@ export type AnswerSpellingResponses = {
     /**
      * OK
      */
-    200: RecallPrompt;
+    200: AnsweredQuestion;
 };
 
 export type AnswerSpellingResponse = AnswerSpellingResponses[keyof AnswerSpellingResponses];
@@ -2922,7 +2922,7 @@ export type PreviouslyAnsweredResponses = {
     /**
      * OK
      */
-    200: Array<RecallPrompt>;
+    200: Array<AnsweredQuestion>;
 };
 
 export type PreviouslyAnsweredResponse = PreviouslyAnsweredResponses[keyof PreviouslyAnsweredResponses];
@@ -3220,7 +3220,7 @@ export type GetRecallPromptsResponses = {
     /**
      * OK
      */
-    200: Array<RecallPrompt>;
+    200: Array<RecallPromptHistoryItem>;
 };
 
 export type GetRecallPromptsResponse = GetRecallPromptsResponses[keyof GetRecallPromptsResponses];
@@ -3238,7 +3238,7 @@ export type AskAQuestionResponses = {
     /**
      * OK
      */
-    200: RecallPrompt;
+    200: RecallQuestion;
 };
 
 export type AskAQuestionResponse = AskAQuestionResponses[keyof AskAQuestionResponses];

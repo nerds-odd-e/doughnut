@@ -7,8 +7,8 @@ import {
 import { useRecallData } from "@/composables/useRecallData"
 import RecallPage from "@/pages/RecallPage.vue"
 import type {
+  AnsweredQuestion,
   MemoryTrackerLite,
-  RecallPrompt,
 } from "@generated/doughnut-backend-api"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, {
@@ -118,7 +118,7 @@ beforeEach(() => {
   mockSdkService(
     MemoryTrackerController,
     "askAQuestion",
-    makeMe.aRecallPrompt.withQuestionType("SPELLING").please()
+    makeMe.aRecallQuestion.withSpellingStem("Spell").please()
   )
   vi.mocked(useRecallData).mockReturnValue(createUseRecallDataMock())
   renderer = helper
@@ -156,7 +156,7 @@ describe("repeat page", () => {
 
     it("should prepend previously answered recall prompts to the list", async () => {
       const note = makeMe.aNote.please()
-      const previousQuestionResult: RecallPrompt = makeMe.aRecallPrompt
+      const previousQuestionResult: AnsweredQuestion = makeMe.anAnsweredQuestion
         .withId(1)
         .withNote(note)
         .withPredefinedQuestion(makeMe.aPredefinedQuestion.please())
@@ -217,7 +217,7 @@ describe("repeat page", () => {
       askAQuestionSpy = mockSdkService(
         MemoryTrackerController,
         "askAQuestion",
-        makeMe.aRecallPrompt.please()
+        makeMe.aRecallQuestion.please()
       )
       askAQuestionSpy.mockResolvedValueOnce(wrapSdkError("API Error"))
       const trackers = [
@@ -248,7 +248,7 @@ describe("repeat page", () => {
         "markAsRecalled",
         makeMe.aMemoryTracker.please()
       )
-      const recallPrompt = makeMe.aRecallPrompt.please()
+      const recallPrompt = makeMe.aRecallQuestion.please()
       askAQuestionSpy.mockResolvedValueOnce(wrapSdkResponse(recallPrompt))
       vi.runOnlyPendingTimers()
       await flushPromises()
@@ -327,7 +327,7 @@ describe("repeat page", () => {
       mockSdkService(
         MemoryTrackerController,
         "askAQuestion",
-        makeMe.aRecallPrompt.please()
+        makeMe.aRecallQuestion.please()
       )
 
       const trackers = [createMemoryTrackerLite(firstMemoryTrackerId, true)]
@@ -339,9 +339,10 @@ describe("repeat page", () => {
     it("should handle spelling questions correctly", async () => {
       const note = makeMe.aNote.please()
       note.id = 42
-      const answerResult: RecallPrompt = makeMe.aRecallPrompt
+      note.noteTopology.id = 42
+      const answerResult: AnsweredQuestion = makeMe.anAnsweredQuestion
         .withNote(note)
-        .withQuestionType("SPELLING")
+        .spelling()
         .withAnswer({ id: 1, correct: false, spellingAnswer: "test answer" })
         .withMemoryTrackerId(123)
         .please()
@@ -408,7 +409,7 @@ describe("repeat page", () => {
       askAQuestionSpy = mockSdkService(
         MemoryTrackerController,
         "askAQuestion",
-        makeMe.aRecallPrompt.please()
+        makeMe.aRecallQuestion.please()
       )
       const trackers = [
         createMemoryTrackerLite(normalMemoryTrackerId, false),
@@ -657,7 +658,7 @@ describe("repeat page", () => {
       mockSdkService(
         MemoryTrackerController,
         "askAQuestion",
-        makeMe.aRecallPrompt.please()
+        makeMe.aRecallQuestion.please()
       )
       getThresholdExceededSpy = mockSdkService(
         MemoryTrackerController,
@@ -674,7 +675,7 @@ describe("repeat page", () => {
 
     it("should NOT call getThresholdExceeded when answer is correct", async () => {
       const note = makeMe.aNote.please()
-      const correctAnswerResult: RecallPrompt = makeMe.aRecallPrompt
+      const correctAnswerResult: AnsweredQuestion = makeMe.anAnsweredQuestion
         .withNote(note)
         .withPredefinedQuestion(makeMe.aPredefinedQuestion.please())
         .withAnswer({ id: 1, correct: true, choiceIndex: 0 })
@@ -694,7 +695,7 @@ describe("repeat page", () => {
 
     it("should call getThresholdExceeded when answer is wrong", async () => {
       const note = makeMe.aNote.please()
-      const wrongAnswerResult: RecallPrompt = makeMe.aRecallPrompt
+      const wrongAnswerResult: AnsweredQuestion = makeMe.anAnsweredQuestion
         .withNote(note)
         .withPredefinedQuestion(makeMe.aPredefinedQuestion.please())
         .withAnswer({ id: 1, correct: false, choiceIndex: 1 })
@@ -728,7 +729,7 @@ describe("repeat page", () => {
       mockSdkService(
         MemoryTrackerController,
         "askAQuestion",
-        makeMe.aRecallPrompt.please()
+        makeMe.aRecallQuestion.please()
       )
     })
 

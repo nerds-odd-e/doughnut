@@ -12,7 +12,7 @@ export function mockSpellingQuestionServices() {
   mockSdkService(
     MemoryTrackerController,
     "askAQuestion",
-    makeMe.aRecallPrompt.withQuestionType("SPELLING").please()
+    makeMe.aRecallQuestion.withSpellingStem("Spell the word").please()
   )
   const memoryTracker = makeMe.aMemoryTracker.please()
   if (memoryTracker.note) {

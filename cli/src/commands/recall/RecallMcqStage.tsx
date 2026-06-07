@@ -13,7 +13,8 @@ import { Box, Text, useInput, useStdout } from 'ink'
 import {
   RecallPromptController,
   type QuestionContestResult,
-  type RecallPrompt,
+  type AnsweredQuestion,
+  type RecallQuestion,
 } from 'doughnut-api'
 import {
   choiceIndexFromSelectListSubmitLine,
@@ -42,11 +43,11 @@ import {
 } from './recallBusyInputCopy.js'
 import { numberedMcqMarkdownLinesForTerminal } from './numberedMcqMarkdownLines.js'
 import {
-  recallMcqPayloadFromRecallPrompt,
+  recallMcqPayloadFromRecallQuestion,
   type RecallCard,
   type RecallMcqCardPayload,
 } from './nextRecallCardLoad.js'
-import { noteBreadcrumbTrailTitles } from './recallNoteContext.js'
+import { breadcrumbTrailFromRecalledNote } from './recallNoteContext.js'
 import type { RecallQuestionAnswerOutcome } from './recallQuestionAnswerOutcome.js'
 import {
   RecallAnsweredBlockShell,
@@ -64,26 +65,26 @@ const CONTEST_REJECTED_FALLBACK =
   'Contest was not accepted. Please answer the question.'
 
 function recallAnsweredMcqInk(args: {
-  readonly answeredPrompt: RecallPrompt
+  readonly answeredPrompt: AnsweredQuestion
   readonly stem: string
   readonly choices: readonly string[]
   readonly selectedChoiceIndex: number
+  readonly notebookName: string
 }): ReactElement {
   const width = resolvedTerminalWidth()
   const crumb = recallAnsweredBreadcrumbText(
-    noteBreadcrumbTrailTitles(
-      args.answeredPrompt.note,
-      args.answeredPrompt.ancestorFolders,
-      args.answeredPrompt.notebook?.name
+    breadcrumbTrailFromRecalledNote(
+      args.answeredPrompt.recalledNote,
+      args.notebookName
     )
   )
-  const correct = args.answeredPrompt.answer?.correct === true
+  const correct = args.answeredPrompt.answer.correct === true
   const fromPredefined =
     args.answeredPrompt.predefinedQuestion?.correctAnswerIndex
   const correctChoiceIndex =
     fromPredefined !== undefined && fromPredefined !== null
       ? fromPredefined
-      : correct && args.answeredPrompt.answer?.choiceIndex !== undefined
+      : correct && args.answeredPrompt.answer.choiceIndex !== undefined
         ? args.answeredPrompt.answer.choiceIndex
         : undefined
 
@@ -137,14 +138,17 @@ export async function contestAndRegenerateMcq(
     const message = contestResult.advice?.trim() || CONTEST_REJECTED_FALLBACK
     return { outcome: 'rejected', message }
   }
-  const regenerated = await runDefaultBackendJson<RecallPrompt>(() =>
+  const regenerated = await runDefaultBackendJson<RecallQuestion>(() =>
     RecallPromptController.regenerate({
       path: { recallPrompt: currentRecallPromptId },
       body: contestResult,
       ...doughnutSdkOptions(signal),
     })
   )
-  const mapped = recallMcqPayloadFromRecallPrompt(memoryTrackerId, regenerated)
+  const mapped = recallMcqPayloadFromRecallQuestion(
+    memoryTrackerId,
+    regenerated
+  )
   if (mapped === null) {
     throw new Error('Regenerated recall prompt is not a pending MCQ.')
   }
@@ -155,8 +159,8 @@ export async function submitMcqAnswer(
   recallPromptId: number,
   choiceIndex: number,
   signal?: AbortSignal
-): Promise<RecallPrompt> {
-  return runDefaultBackendJson<RecallPrompt>(() =>
+): Promise<AnsweredQuestion> {
+  return runDefaultBackendJson<AnsweredQuestion>(() =>
     RecallPromptController.answerQuiz({
       path: { recallPrompt: recallPromptId },
       body: { choiceIndex },
@@ -235,6 +239,7 @@ export function RecallMcqStage({
                 stem: payload.stem,
                 choices: payload.choices,
                 selectedChoiceIndex: choiceIdx,
+                notebookName: payload.notebookName,
               }),
             ],
           })
@@ -248,6 +253,7 @@ export function RecallMcqStage({
               stem: payload.stem,
               choices: payload.choices,
               selectedChoiceIndex: choiceIdx,
+              notebookName: payload.notebookName,
             }),
           ],
         })

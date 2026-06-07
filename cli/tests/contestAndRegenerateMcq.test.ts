@@ -43,7 +43,7 @@ describe('contestAndRegenerateMcq', () => {
       data: { advice: 'proceed' },
     } as Awaited<ReturnType<typeof RecallPromptController.contest>>)
     vi.spyOn(RecallPromptController, 'regenerate').mockResolvedValue({
-      data: makeMe.aRecallPrompt.withId(7).withSpellingStem('spell').please(),
+      data: makeMe.aRecallQuestion.withId(7).withSpellingStem('spell').please(),
     } as Awaited<ReturnType<typeof RecallPromptController.regenerate>>)
 
     await expect(contestAndRegenerateMcq(1, 7)).rejects.toThrow(

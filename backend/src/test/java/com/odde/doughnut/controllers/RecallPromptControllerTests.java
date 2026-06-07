@@ -85,7 +85,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     @Test
     void shouldValidateTheAnswerAndUpdateMemoryTracker() {
       Integer oldRecallCount = memoryTracker.getRecallCount();
-      RecallPrompt answerResult = controller.answerQuiz(recallPrompt, answerDTO);
+      AnsweredQuestion answerResult = controller.answerQuiz(recallPrompt, answerDTO);
       assertThat(answerResult.getAnswer().getCorrect(), is(true));
       assertThat(memoryTracker.getRecallCount(), greaterThan(oldRecallCount));
     }
@@ -93,7 +93,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     @Test
     void shouldSaveThinkingTimeMs() {
       answerDTO.setThinkingTimeMs(5000);
-      RecallPrompt answerResult = controller.answerQuiz(recallPrompt, answerDTO);
+      AnsweredQuestion answerResult = controller.answerQuiz(recallPrompt, answerDTO);
       assertThat(answerResult.getAnswer().getThinkingTimeMs(), equalTo(5000));
     }
 
@@ -194,7 +194,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       void shouldValidateTheWrongAnswer() {
         testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
         Integer oldRecallCount = memoryTracker.getRecallCount();
-        RecallPrompt answerResult = controller.answerQuiz(recallPrompt, answerDTO);
+        AnsweredQuestion answerResult = controller.answerQuiz(recallPrompt, answerDTO);
         assertThat(answerResult.getAnswer().getCorrect(), is(false));
         assertThat(memoryTracker.getRecallCount(), greaterThan(oldRecallCount));
       }
@@ -254,7 +254,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
       QuestionContestResult contestResult = new QuestionContestResult();
       contestResult.advice = "test";
-      RecallPrompt regeneratedQuestion = controller.regenerate(recallPrompt, contestResult);
+      RecallQuestion regeneratedQuestion = controller.regenerate(recallPrompt, contestResult);
 
       Assertions.assertThat(regeneratedQuestion.getMultipleChoicesQuestion().getQuestionStem())
           .contains("What is the first color in the rainbow?");
@@ -388,7 +388,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     @Test
     void shouldValidateTheAnswerAndUpdateMemoryTracker() throws UnexpectedNoAccessRightException {
       Integer oldRecallCount = memoryTracker.getRecallCount();
-      RecallPrompt answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
       assertTrue(answerResult.getAnswer().getCorrect());
       assertThat(memoryTracker.getRecallCount(), greaterThan(oldRecallCount));
     }
@@ -396,7 +396,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     @Test
     void shouldAcceptThinkingTimeMs() throws UnexpectedNoAccessRightException {
       answerDTO.setThinkingTimeMs(5000);
-      RecallPrompt answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
       assertTrue(answerResult.getAnswer().getCorrect());
       RecallPrompt reloadedPrompt = makeMe.refresh(recallPrompt);
       Answer answer = reloadedPrompt.getAnswer();
@@ -527,7 +527,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       void shouldValidateTheWrongAnswer() throws UnexpectedNoAccessRightException {
         testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
         Integer oldRecallCount = memoryTracker.getRecallCount();
-        RecallPrompt answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+        AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
         assertFalse(answerResult.getAnswer().getCorrect());
         assertThat(memoryTracker.getRecallCount(), greaterThan(oldRecallCount));
       }

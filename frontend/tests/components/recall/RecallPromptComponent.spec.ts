@@ -37,7 +37,7 @@ describe("RecallPromptComponent", () => {
   })
 
   const mountComponent = (nextIsSpelling = false) => {
-    const recallPrompt = makeMe.aRecallPrompt
+    const recallPrompt = makeMe.aRecallQuestion
       .withQuestionStem("Test question")
       .withChoices(["A", "B", "C"])
       .please()

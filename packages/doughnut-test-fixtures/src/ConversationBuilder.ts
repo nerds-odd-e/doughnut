@@ -1,7 +1,7 @@
 import type {
+  AnsweredQuestion,
   Conversation,
   Note,
-  RecallPrompt,
 } from '@generated/doughnut-backend-api'
 import Builder from './Builder'
 import generateId from './generateId'
@@ -24,8 +24,8 @@ class ConversationBuilder extends Builder<Conversation> {
     this.data.subject!.note = note
     return this
   }
-  forAnsweredQuestion(recallPrompt: RecallPrompt) {
-    this.data.subject!.recallPrompt = recallPrompt
+  forAnsweredQuestion(answeredQuestion: AnsweredQuestion) {
+    this.data.subject!.recallPrompt = answeredQuestion
     return this
   }
   withoutId() {
