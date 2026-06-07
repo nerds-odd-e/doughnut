@@ -96,3 +96,4 @@ minimumReleaseAgeExclude:
   - '@lucide/vue@1.17.0'
   - vue-router@5.1.0
   - '@vue/test-utils@2.4.11'
+  - daisyui@5.5.23
