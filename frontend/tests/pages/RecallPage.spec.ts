@@ -18,11 +18,13 @@ import helper, {
 } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
+import usePopups from "@/components/commons/Popups/usePopups"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { computed, ref } from "vue"
 
 vi.mock("@/composables/useRecallData")
+vi.mock("@/components/commons/Popups/usePopups")
 
 vi.mock("vue-router", async (importOriginal) => {
   const actual = await importOriginal<typeof import("vue-router")>()
@@ -647,9 +649,21 @@ describe("repeat page", () => {
   describe("re-assimilation threshold check", () => {
     const memoryTrackerId = 123
     let getThresholdExceededSpy: ReturnType<typeof mockSdkService>
+    let confirmMock: ReturnType<typeof vi.fn<(msg: string) => Promise<boolean>>>
 
     beforeEach(() => {
       vi.useFakeTimers()
+      confirmMock = vi.fn<(msg: string) => Promise<boolean>>()
+      vi.mocked(usePopups).mockReturnValue({
+        popups: {
+          options: vi.fn().mockResolvedValue(null),
+          alert: vi.fn(),
+          confirm: confirmMock,
+          done: vi.fn(),
+          register: vi.fn(),
+          peek: vi.fn(),
+        },
+      })
       mockSdkService(
         MemoryTrackerController,
         "showMemoryTracker",
@@ -714,6 +728,33 @@ describe("repeat page", () => {
         expect.objectContaining({
           path: { memoryTracker: memoryTrackerId },
         })
+      )
+    })
+
+    it("should offer property-aware re-assimilation when threshold exceeded", async () => {
+      getThresholdExceededSpy.mockResolvedValue(
+        wrapSdkResponse({ thresholdExceeded: true })
+      )
+      confirmMock.mockResolvedValueOnce(false)
+
+      const note = makeMe.aNote.please()
+      const wrongAnswerResult: AnsweredQuestion = makeMe.anAnsweredQuestion
+        .withNote(note)
+        .withPredefinedQuestion(makeMe.aPredefinedQuestion.please())
+        .withAnswer({ id: 1, correct: false, choiceIndex: 1 })
+        .withMemoryTrackerId(memoryTrackerId)
+        .withPropertyKey("topic")
+        .please()
+
+      const wrapper = await mountPage()
+      await flushPromises()
+
+      const quiz = wrapper.findComponent({ name: "Quiz" })
+      quiz.vm.$emit("answered", wrongAnswerResult)
+      await flushPromises()
+
+      expect(confirmMock).toHaveBeenCalledWith(
+        'You have answered the "topic" property incorrectly too many times. Would you like to re-assimilate it?'
       )
     })
   })

@@ -53,6 +53,9 @@ public class RecallService {
                   MemoryTrackerLite lite = new MemoryTrackerLite();
                   lite.setMemoryTrackerId(mt.getId());
                   lite.setSpelling(mt.getSpelling() != null && mt.getSpelling());
+                  String propertyKey = mt.getPropertyKey();
+                  lite.setPropertyKey(
+                      propertyKey == null || propertyKey.isEmpty() ? null : propertyKey);
                   return lite;
                 })
             .toList();

@@ -1,13 +1,7 @@
 <template>
   <div class="note-under-question bg-base-200 border-base-300">
     <div class="note-label bg-base-200 text-base-content">Note under question</div>
-    <p
-      v-if="focusedPropertyKey"
-      class="focused-property text-sm font-medium mb-2"
-      data-testid="focused-property-indicator"
-    >
-      Focused property: {{ focusedPropertyKey }}
-    </p>
+    <FocusedPropertyIndicator :property-key="focusedPropertyKey" />
     <div class="breadcrumb-wrapper">
       <Breadcrumb
         :ancestor-folders="ancestorFolders ?? []"
@@ -26,6 +20,7 @@ import type { PropType } from "vue"
 import type { Folder, NoteTopology } from "@generated/doughnut-backend-api"
 import Breadcrumb from "@/components/toolbars/Breadcrumb.vue"
 import NoteTitleWithLink from "@/components/notes/NoteTitleWithLink.vue"
+import FocusedPropertyIndicator from "./FocusedPropertyIndicator.vue"
 
 defineProps({
   noteTopology: {

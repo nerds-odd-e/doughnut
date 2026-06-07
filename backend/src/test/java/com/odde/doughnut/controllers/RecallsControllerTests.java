@@ -71,6 +71,24 @@ class RecallsControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void shouldIncludePropertyKeyOnDueMemoryTrackerLite() {
+      Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
+      testabilitySettings.timeTravelTo(currentTime);
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      makeMe
+          .aMemoryTrackerFor(note)
+          .by(currentUser.getUser())
+          .propertyKey("topic")
+          .nextRecallAt(currentTime)
+          .please();
+
+      DueMemoryTrackers dueMemoryTrackers = controller.recalling("Asia/Shanghai", 0);
+
+      assertThat(dueMemoryTrackers.getToRepeat(), hasSize(1));
+      assertEquals("topic", dueMemoryTrackers.getToRepeat().get(0).getPropertyKey());
+    }
+
+    @Test
     void shouldIncludeRecallStatusInDueMemoryTrackers() {
       Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
       testabilitySettings.timeTravelTo(currentTime);

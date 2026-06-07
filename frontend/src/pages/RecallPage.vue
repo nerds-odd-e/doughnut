@@ -226,11 +226,14 @@ const loadMore = async (dueInDays?: number) => {
   }
 }
 
-const offerReAssimilation = async (memoryTrackerId: number | undefined) => {
-  if (!memoryTrackerId) return
-  const confirmed = await popups.confirm(
-    "You have answered this note incorrectly too many times. Would you like to re-assimilate it?"
-  )
+const offerReAssimilation = async (answerResult: AnsweredQuestion) => {
+  const memoryTrackerId = answerResult.memoryTrackerId
+  if (memoryTrackerId === undefined) return
+  const propertyKey = answerResult.recalledNote?.propertyKey
+  const message = propertyKey
+    ? `You have answered the "${propertyKey}" property incorrectly too many times. Would you like to re-assimilate it?`
+    : "You have answered this note incorrectly too many times. Would you like to re-assimilate it?"
+  const confirmed = await popups.confirm(message)
   if (confirmed) {
     await MemoryTrackerController.softDelete({
       path: { memoryTracker: memoryTrackerId },
@@ -252,7 +255,7 @@ const onAnswered = async (answerResult: AnsweredQuestion) => {
         })
       )
       if (data?.thresholdExceeded) {
-        await offerReAssimilation(memoryTrackerId)
+        await offerReAssimilation(answerResult)
       }
     }
   }

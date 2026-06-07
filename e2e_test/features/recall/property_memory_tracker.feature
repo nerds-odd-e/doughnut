@@ -26,6 +26,23 @@ Feature: Property memory tracker
     Then I should see that I have 1 notes to recall
 
   @usingMockedOpenAiService
+  Scenario: Answering a property recall question updates only the property tracker
+    And It's day 1, 20 hour
+    And I assimilated one note "Vitamins" at the current time
+    And OpenAI generates this question:
+      | Question Stem                         | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
+      | What does the topic property mean?    | micronutrients | vitamins           | minerals           |
+    And OpenAI evaluates the question as legitimate
+    When I am recalling my note on day 2
+    Then I should see focused property "topic" during recall
+    Then I should be asked "What does the topic property mean?"
+    When I choose answer "micronutrients"
+    And I visit note "Vitamins"
+    And I open assimilation settings from more options
+    Then the note memory tracker should have recall count 0
+    And the property memory tracker for "topic" should have recall count 1
+
+  @usingMockedOpenAiService
   Scenario: Recalling a property tracker sends property focus to OpenAI
     And OpenAI generates this question:
       | Question Stem                         | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |

@@ -266,9 +266,12 @@ export const assumeAssimilationPage = () => ({
     pageIsNotLoading()
     return this
   },
-  expectPropertyMemoryTracker(propertyKey: string) {
+  expectPropertyMemoryTracker(propertyKey: string, recallCount = 0) {
     this.expectMemoryTrackerInfo([
-      { type: propertyMemoryTrackerRowLabel(propertyKey), 'Recall Count': '0' },
+      {
+        type: propertyMemoryTrackerRowLabel(propertyKey),
+        'Recall Count': String(recallCount),
+      },
     ])
     return this
   },

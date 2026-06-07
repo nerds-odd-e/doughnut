@@ -12,4 +12,6 @@ public class MemoryTrackerLite {
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private boolean spelling;
+
+  private String propertyKey;
 }

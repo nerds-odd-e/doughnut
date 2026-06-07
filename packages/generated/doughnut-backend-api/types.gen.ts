@@ -746,6 +746,7 @@ export type DueMemoryTrackers = {
 export type MemoryTrackerLite = {
     memoryTrackerId: number;
     spelling: boolean;
+    propertyKey?: string;
 };
 
 export type MenuDataDto = {

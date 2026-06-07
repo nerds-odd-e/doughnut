@@ -46,10 +46,12 @@ describe("repeat page", () => {
 
   const createMemoryTrackerLite = (
     id: number,
-    spelling = false
+    spelling = false,
+    propertyKey?: string
   ): MemoryTrackerLite => ({
     memoryTrackerId: id,
     spelling,
+    propertyKey,
   })
 
   const mountPage = async (
@@ -75,6 +77,26 @@ describe("repeat page", () => {
   }
 
   describe('repeat page with "just review" quiz', () => {
+    it("shows focused property indicator when memory tracker has propertyKey", async () => {
+      wrapper = helper
+        .component(Quiz)
+        .withRouter()
+        .withCleanStorage()
+        .withProps({
+          memoryTrackers: [createMemoryTrackerLite(1, false, "topic")],
+          currentIndex: 0,
+          eagerFetchCount: 1,
+        })
+        .mount({ attachTo: document.body })
+      await flushPromises()
+
+      const indicator = wrapper.find(
+        '[data-testid="focused-property-indicator"]'
+      )
+      expect(indicator.exists()).toBe(true)
+      expect(indicator.text()).toBe("Focused property: topic")
+    })
+
     it("fetch the first 1 question when mount", async () => {
       await mountPage([1, 2, 3], 1)
       expect(askAQuestionSpy).toHaveBeenCalledWith(

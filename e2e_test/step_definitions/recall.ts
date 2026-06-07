@@ -138,6 +138,16 @@ Then('I type my answer {string}', (answer: string) => {
   start.recall().assumeRecallPage().typeSpellingAnswer(answer)
 })
 
+Then(
+  'I should see focused property {string} during recall',
+  (propertyKey: string) => {
+    cy.findByTestId('focused-property-indicator').should(
+      'contain',
+      `Focused property: ${propertyKey}`
+    )
+  }
+)
+
 Then('I choose answer {string}', (answer: string) => {
   start.assumeQuestionPage().answer(answer)
 })

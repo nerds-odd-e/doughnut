@@ -45,8 +45,8 @@ class RecallPromptController {
   public RecallQuestion regenerate(
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
       @RequestBody QuestionContestResult contestResult)
-      throws JsonProcessingException {
-    authorizationService.assertLoggedIn();
+      throws JsonProcessingException, UnexpectedNoAccessRightException {
+    assertCanMutateRecallPrompt(recallPrompt);
     RecallPrompt regenerated =
         recallQuestionService.regenerateAQuestion(
             contestResult,
@@ -59,8 +59,9 @@ class RecallPromptController {
   @PostMapping("/{recallPrompt}/contest")
   @Transactional
   public QuestionContestResult contest(
-      @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt) {
-    authorizationService.assertLoggedIn();
+      @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt)
+      throws UnexpectedNoAccessRightException {
+    assertCanMutateRecallPrompt(recallPrompt);
     return recallQuestionService.contest(recallPrompt);
   }
 
@@ -68,8 +69,9 @@ class RecallPromptController {
   @Transactional
   public AnsweredQuestion answerQuiz(
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
-      @Valid @RequestBody AnswerDTO answerDTO) {
-    authorizationService.assertLoggedIn();
+      @Valid @RequestBody AnswerDTO answerDTO)
+      throws UnexpectedNoAccessRightException {
+    assertCanMutateRecallPrompt(recallPrompt);
     RecallPrompt answered =
         recallQuestionService.answerQuestion(
             recallPrompt, answerDTO, testabilitySettings.getCurrentUTCTimestamp());
@@ -82,8 +84,7 @@ class RecallPromptController {
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
       @Valid @RequestBody AnswerSpellingDTO answerDTO)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertLoggedIn();
-    authorizationService.assertReadAuthorization(recallPrompt.requireMemoryTracker());
+    assertCanMutateRecallPrompt(recallPrompt);
     RecallPrompt answered =
         memoryTrackerService.answerSpelling(
             recallPrompt,
@@ -91,5 +92,11 @@ class RecallPromptController {
             authorizationService.getCurrentUser(),
             testabilitySettings.getCurrentUTCTimestamp());
     return AnsweredQuestion.from(answered);
+  }
+
+  private void assertCanMutateRecallPrompt(RecallPrompt recallPrompt)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertLoggedIn();
+    authorizationService.assertReadAuthorization(recallPrompt.requireMemoryTracker());
   }
 }

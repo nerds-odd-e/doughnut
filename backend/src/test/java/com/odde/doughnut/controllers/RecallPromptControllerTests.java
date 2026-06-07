@@ -61,6 +61,10 @@ class RecallPromptControllerTests extends ControllerTestBase {
     return controller;
   }
 
+  MemoryTracker memoryTrackerOwnedByAnotherUser() {
+    return makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
+  }
+
   @Nested
   class answerQuizQuestion {
     MemoryTracker memoryTracker;
@@ -87,7 +91,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void shouldValidateTheAnswerAndUpdateMemoryTracker() {
+    void shouldValidateTheAnswerAndUpdateMemoryTracker() throws UnexpectedNoAccessRightException {
       Integer oldRecallCount = memoryTracker.getRecallCount();
       AnsweredQuestion answerResult = controller.answerQuiz(recallPrompt, answerDTO);
       assertThat(answerResult.getAnswer().getCorrect(), is(true));
@@ -95,7 +99,8 @@ class RecallPromptControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void shouldUpdateLinkedPropertyMemoryTrackerWhenAnsweringPropertyQuestion() {
+    void shouldUpdateLinkedPropertyMemoryTrackerWhenAnsweringPropertyQuestion()
+        throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().please();
       MemoryTracker noteLevelTracker =
           makeMe
@@ -132,14 +137,14 @@ class RecallPromptControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void shouldSaveThinkingTimeMs() {
+    void shouldSaveThinkingTimeMs() throws UnexpectedNoAccessRightException {
       answerDTO.setThinkingTimeMs(5000);
       AnsweredQuestion answerResult = controller.answerQuiz(recallPrompt, answerDTO);
       assertThat(answerResult.getAnswer().getThinkingTimeMs(), equalTo(5000));
     }
 
     @Test
-    void shouldNoteIncreaseIndexIfRepeatImmediately() {
+    void shouldNoteIncreaseIndexIfRepeatImmediately() throws UnexpectedNoAccessRightException {
       testabilitySettings.timeTravelTo(memoryTracker.getLastRecalledAt());
       Float oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
       controller.answerQuiz(recallPrompt, answerDTO);
@@ -147,7 +152,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void shouldIncreaseTheIndex() {
+    void shouldIncreaseTheIndex() throws UnexpectedNoAccessRightException {
       testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
       Float oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
       controller.answerQuiz(recallPrompt, answerDTO);
@@ -157,7 +162,8 @@ class RecallPromptControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void fastAnswer_shouldIncreaseIndexMoreThanSlowAnswer() {
+    void fastAnswer_shouldIncreaseIndexMoreThanSlowAnswer()
+        throws UnexpectedNoAccessRightException {
       testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
       Float baseIndex = memoryTracker.getForgettingCurveIndex();
       Timestamp baseLastRecalledAt = memoryTracker.getLastRecalledAt();
@@ -187,7 +193,8 @@ class RecallPromptControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void answerWithBaseThinkingTime_shouldHaveNoThinkingTimeAdjustment() {
+    void answerWithBaseThinkingTime_shouldHaveNoThinkingTimeAdjustment()
+        throws UnexpectedNoAccessRightException {
       testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
       Float baseIndex = memoryTracker.getForgettingCurveIndex();
       Timestamp baseLastRecalledAt = memoryTracker.getLastRecalledAt();
@@ -224,6 +231,20 @@ class RecallPromptControllerTests extends ControllerTestBase {
           () -> nullUserController().answerQuiz(recallPrompt, answer));
     }
 
+    @Test
+    void shouldNotBeAbleToAnswerQuizForOthersMemoryTracker() {
+      MemoryTracker othersTracker = memoryTrackerOwnedByAnotherUser();
+      RecallPrompt othersPrompt =
+          makeMe
+              .aRecallPrompt()
+              .forMemoryTracker(othersTracker)
+              .withPredefinedQuestionForNote(othersTracker.getNote())
+              .please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.answerQuiz(othersPrompt, answerDTO));
+    }
+
     @Nested
     class WrongAnswer {
       @BeforeEach
@@ -232,7 +253,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       }
 
       @Test
-      void shouldValidateTheWrongAnswer() {
+      void shouldValidateTheWrongAnswer() throws UnexpectedNoAccessRightException {
         testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
         Integer oldRecallCount = memoryTracker.getRecallCount();
         AnsweredQuestion answerResult = controller.answerQuiz(recallPrompt, answerDTO);
@@ -241,7 +262,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       }
 
       @Test
-      void shouldNotChangeTheLastRecalledAtTime() {
+      void shouldNotChangeTheLastRecalledAtTime() throws UnexpectedNoAccessRightException {
         testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
         Timestamp lastRecalledAt = memoryTracker.getLastRecalledAt();
         Float oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
@@ -251,7 +272,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       }
 
       @Test
-      void shouldRepeatTheNextDay() {
+      void shouldRepeatTheNextDay() throws UnexpectedNoAccessRightException {
         controller.answerQuiz(recallPrompt, answerDTO);
         assertThat(
             memoryTracker.getNextRecallAt(),
@@ -293,7 +314,24 @@ class RecallPromptControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void shouldPassOldQuestionAndContestResultToOpenAiApi() throws JsonProcessingException {
+    void shouldNotBeAbleToRegenerateForOthersMemoryTracker() {
+      MemoryTracker othersTracker = memoryTrackerOwnedByAnotherUser();
+      RecallPrompt othersPrompt =
+          makeMe
+              .aRecallPrompt()
+              .forMemoryTracker(othersTracker)
+              .withPredefinedQuestionForNote(othersTracker.getNote())
+              .please();
+      QuestionContestResult contestResult = new QuestionContestResult();
+      contestResult.advice = "test";
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.regenerate(othersPrompt, contestResult));
+    }
+
+    @Test
+    void shouldPassOldQuestionAndContestResultToOpenAiApi()
+        throws JsonProcessingException, UnexpectedNoAccessRightException {
       MCQWithAnswer jsonQuestion =
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 
@@ -368,7 +406,20 @@ class RecallPromptControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void rejected() {
+    void shouldNotBeAbleToContestForOthersMemoryTracker() {
+      MemoryTracker othersTracker = memoryTrackerOwnedByAnotherUser();
+      MCQWithAnswer aiGeneratedQuestion = makeMe.aMCQWithAnswer().please();
+      RecallPrompt othersPrompt =
+          makeMe
+              .aRecallPrompt()
+              .forMemoryTracker(othersTracker)
+              .ofAIGeneratedQuestion(aiGeneratedQuestion, othersTracker.getNote())
+              .please();
+      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.contest(othersPrompt));
+    }
+
+    @Test
+    void rejected() throws UnexpectedNoAccessRightException {
       questionEvaluation.feasibleQuestion = true;
       openAiStructuredResponseMock.stubStructuredResponse(questionEvaluation);
 
@@ -378,7 +429,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void acceptTheContest() {
+    void acceptTheContest() throws UnexpectedNoAccessRightException {
       globalSettingsService
           .globalSettingEvaluation()
           .setKeyValue(makeMe.aTimestamp().please(), "gpt-new");

@@ -37,6 +37,13 @@ Then(
   }
 )
 
+Then(
+  'I assimilated one note {string} at the current time',
+  (noteTitle: string) => {
+    start.testability().assimilateNote(noteTitle)
+  }
+)
+
 Given(
   'the note {string} was assimilated on day {int}',
   (noteTitle: string, day: number) => {
@@ -166,6 +173,26 @@ When(
   'I assimilate the property {string} on the assimilation settings panel',
   (propertyKey: string) => {
     start.assumeAssimilationPage().assimilateProperty(propertyKey)
+  }
+)
+
+Then(
+  'the note memory tracker should have recall count {int}',
+  (count: number) => {
+    start
+      .assumeAssimilationPage()
+      .expectMemoryTrackerInfo([
+        { type: 'normal', 'Recall Count': String(count) },
+      ])
+  }
+)
+
+Then(
+  'the property memory tracker for {string} should have recall count {int}',
+  (propertyKey: string, count: number) => {
+    start
+      .assumeAssimilationPage()
+      .expectPropertyMemoryTracker(propertyKey, count)
   }
 )
 

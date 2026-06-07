@@ -4388,6 +4388,8 @@ components:
           format: int32
         spelling:
           type: boolean
+        propertyKey:
+          type: string
       required:
       - memoryTrackerId
       - spelling
