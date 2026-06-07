@@ -98,7 +98,6 @@ function createTestConfigDir(): string {
 function cleanupTestEnv(configDir: string) {
   vi.unstubAllGlobals()
   vi.unstubAllEnvs()
-  vi.resetModules()
   fs.rmSync(configDir, { recursive: true, force: true })
 }
 

@@ -4,8 +4,8 @@ import * as http from 'node:http'
 import * as path from 'node:path'
 import { spawn } from 'node:child_process'
 import {
-  GOOGLE_CLIENT_ID as BUILTIN_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET as BUILTIN_CLIENT_SECRET,
+  googleClientIdFromEnv,
+  googleClientSecretFromEnv,
 } from '../../credentials.js'
 import { getConfigDir } from '../../configDir.js'
 
@@ -71,6 +71,17 @@ export function saveConfig(config: GmailConfig, configPath?: string): void {
   const dir = path.dirname(p)
   fs.mkdirSync(dir, { recursive: true })
   fs.writeFileSync(p, JSON.stringify(config, null, 2), 'utf-8')
+}
+
+function resolvedOAuthClientCredentials(config: GmailConfig): {
+  clientId?: string
+  clientSecret?: string
+} {
+  return {
+    clientId: config.clientId || googleClientIdFromEnv() || undefined,
+    clientSecret:
+      config.clientSecret || googleClientSecretFromEnv() || undefined,
+  }
 }
 
 function openBrowser(url: string): void {
@@ -196,8 +207,7 @@ export async function addGmailAccount(
 
   const config = loadConfig(configPath)
 
-  const clientId = config.clientId || BUILTIN_CLIENT_ID || undefined
-  const clientSecret = config.clientSecret || BUILTIN_CLIENT_SECRET || undefined
+  const { clientId, clientSecret } = resolvedOAuthClientCredentials(config)
 
   if (!(clientId && clientSecret)) {
     throw new Error(
@@ -264,8 +274,7 @@ async function refreshAccessToken(
   config: GmailConfig,
   signal?: AbortSignal
 ): Promise<string> {
-  const clientId = config.clientId || BUILTIN_CLIENT_ID || undefined
-  const clientSecret = config.clientSecret || BUILTIN_CLIENT_SECRET || undefined
+  const { clientId, clientSecret } = resolvedOAuthClientCredentials(config)
   if (!(clientId && clientSecret)) {
     throw new Error('Missing client credentials for Gmail OAuth.')
   }

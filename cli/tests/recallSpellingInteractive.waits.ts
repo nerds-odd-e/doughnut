@@ -5,10 +5,18 @@ export type InkWaitHelpers = {
     pattern: string | RegExp,
     maxTicks?: number
   ) => Promise<void>
+  waitForFramesToInclude: (
+    pattern: string | RegExp,
+    maxTicks?: number
+  ) => Promise<void>
   waitUntilLastFrame: (
     predicate: (stripped: string) => boolean,
     maxTicks?: number
   ) => Promise<void>
+}
+
+function reLiteral(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
 export const leaveRecallWithYnRe = /(?=.*Leave recall\?)(?=.*\(y\/n\))/s
@@ -30,20 +38,14 @@ export async function waitSpellingIncorrect(
   ink: InkWaitHelpers,
   answer: string
 ) {
-  await ink.waitForLastFrameToInclude(
-    new RegExp(
-      `(?=.*Incorrect\\.)(?=.*Your answer: ${answer.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})(?=.*body)`,
-      's'
-    )
+  await ink.waitForFramesToInclude(
+    new RegExp(`(?=.*Incorrect\\.)(?=.*Your answer: ${reLiteral(answer)})`, 's')
   )
 }
 
 export async function waitSpellingCorrect(ink: InkWaitHelpers, answer: string) {
-  await ink.waitForLastFrameToInclude(
-    new RegExp(
-      `(?=.*Correct!)(?=.*Your answer: ${answer.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})(?=.*body)`,
-      's'
-    )
+  await ink.waitForFramesToInclude(
+    new RegExp(`(?=.*Correct!)(?=.*Your answer: ${reLiteral(answer)})`, 's')
   )
 }
 
