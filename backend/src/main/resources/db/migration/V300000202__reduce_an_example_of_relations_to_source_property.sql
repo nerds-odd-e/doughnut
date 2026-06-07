@@ -330,13 +330,16 @@ BEGIN
       AND mt.property_key = ''
       AND NOT EXISTS (
         SELECT 1
-        FROM memory_tracker existing
+        FROM (
+          SELECT user_id
+          FROM memory_tracker
+          WHERE note_id = v_source_note_id
+            AND spelling = 0
+            AND property_key = (v_resolved_key COLLATE utf8mb4_0900_ai_ci)
+            AND deleted_at IS NULL
+            AND removed_from_tracking = 0
+        ) existing
         WHERE existing.user_id = mt.user_id
-          AND existing.note_id = v_source_note_id
-          AND existing.spelling = 0
-          AND existing.property_key = (v_resolved_key COLLATE utf8mb4_0900_ai_ci)
-          AND existing.deleted_at IS NULL
-          AND existing.removed_from_tracking = 0
       );
 
     DELETE FROM conversation WHERE note_id = v_relation_note_id;
