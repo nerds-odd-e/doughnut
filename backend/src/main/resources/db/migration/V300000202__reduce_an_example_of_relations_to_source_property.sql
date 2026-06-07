@@ -1,8 +1,7 @@
 -- Reduces every non-deleted relationship note with relation: an-example-of into a property
 -- on its resolved source note (key family: "an example of", "an example of 2", …).
--- Re-homes active note-level memory trackers; clears recall_prompt rows that
--- reference the relation note's predefined_question rows (no ON DELETE CASCADE);
--- hard-deletes the relation note.
+-- Re-homes active note-level memory trackers; clears conversations and recall_prompt
+-- rows tied to the relation note (no ON DELETE CASCADE on those FKs); hard-deletes the note.
 -- Then drops all empty folders (no non-deleted notes, no child folders), preserving
 -- folders with non-blank index_content.
 
@@ -343,10 +342,21 @@ BEGIN
           AND existing.removed_from_tracking = 0
       );
 
+    DELETE c
+    FROM conversation c
+    LEFT JOIN recall_prompt rp ON rp.id = c.recall_prompt_id
+    LEFT JOIN memory_tracker mt ON mt.id = rp.memory_tracker_id
+    LEFT JOIN predefined_question pq ON pq.id = rp.predefined_question_id
+    WHERE c.note_id = v_relation_note_id
+       OR mt.note_id = v_relation_note_id
+       OR pq.note_id = v_relation_note_id;
+
     DELETE rp
     FROM recall_prompt rp
-    INNER JOIN predefined_question pq ON pq.id = rp.predefined_question_id
-    WHERE pq.note_id = v_relation_note_id;
+    LEFT JOIN memory_tracker mt ON mt.id = rp.memory_tracker_id
+    LEFT JOIN predefined_question pq ON pq.id = rp.predefined_question_id
+    WHERE mt.note_id = v_relation_note_id
+       OR pq.note_id = v_relation_note_id;
 
     DELETE FROM note WHERE id = v_relation_note_id;
   END LOOP;
