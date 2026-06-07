@@ -75,7 +75,10 @@ class RecallPromptBuilder extends Builder<RecallPromptHistoryItem> {
   }
 
   do(): RecallPromptHistoryItem {
-    if (this.spellingStemToUse !== undefined || this.questionTypeToUse === 'SPELLING') {
+    if (
+      this.spellingStemToUse !== undefined ||
+      this.questionTypeToUse === 'SPELLING'
+    ) {
       return {
         id: this.idToUse ?? generateId(),
         questionType: 'SPELLING',
