@@ -108,6 +108,9 @@ setup_python() {
       if [ ! -f pyproject.toml ]; then
         log "No pyproject.toml found. You can initialize a new Python project with 'poetry init'"
       else
+        # Poetry itself runs on the cached 3.13 build; pin the project venv to
+        # the 3.14 interpreter on PATH so pyproject's `python = "^3.14"` is met.
+        poetry env use python3.14
         log "Installing Python dependencies..."
         poetry install
       fi

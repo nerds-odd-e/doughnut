@@ -31,13 +31,16 @@
         apple_sdk = pkgs.darwin.apple_sdk.frameworks;
 
         # Python 3.14: stable on nixos-26.05; pydantic-core in the lockfile does not build on 3.13 yet.
+        # The project venv is built against 3.14 (see pyproject `python = "^3.14"`);
+        # dev_setup.sh runs `poetry env use python3.14` before `poetry install`.
         python314 = pkgs.python314;
         pythonWithTools = python314.withPackages (ps: with ps; [ pip setuptools wheel ]);
-        # Poetry runs pytest in installCheck; one test flakes on darwin (full stderr pipe).
-        poetryPkg =
-          (pkgs.poetry.override { python3 = python314; }).overrideAttrs (_: {
-            doInstallCheck = false;
-          });
+        # Use upstream poetry (built against the branch-default python 3.13) so it
+        # is a cached binary substitute. Poetry only manages the venv — it does not
+        # need to *run* on 3.14, and the 3.14 interpreter above is on PATH for it to
+        # create the project venv. Overriding python3 here would force a from-source
+        # build of poetry's entire closure (incl. the flaky `sh` test suite).
+        poetryPkg = pkgs.poetry;
         poetryPath = "${poetryPkg}/bin";
         pythonPackages = [ pythonWithTools poetryPkg ];
 
