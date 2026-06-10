@@ -99,7 +99,7 @@
     "cypress-file-upload": "^5.0.8",
     "github_action_sound": "^1.0.8",
     "got": "^15.0.5",
-    "hono": "4.12.23",
+    "hono": "4.12.25",
     "npm-run-all2": "^9.0.1",
     "process": "^0.11.10",
     "slugify": "1.6.9",
