@@ -78,4 +78,15 @@ class PropertyKeyNamingTest {
     assertThat(PropertyKeyNaming.isImagePropertyKey("image_mask"), is(false));
     assertThat(PropertyKeyNaming.isImageMaskPropertyKey("image_mask"), is(true));
   }
+
+  @ParameterizedTest
+  @CsvSource({
+    "example of, true",
+    "Example Of 2, true",
+    "example, false",
+    "topic, false",
+  })
+  void isExampleOfFamily_matches_example_of_family_only(String key, boolean exampleOf) {
+    assertThat(PropertyKeyNaming.isExampleOfFamily(key), is(exampleOf));
+  }
 }

@@ -69,6 +69,14 @@ public final class PropertyKeyNaming {
     return propertyKeyBaseMatches(key, "example of");
   }
 
+  /**
+   * {@code example of} family keys (suffix- and case-aware); alias of {@link
+   * #isExampleOfPropertyKey}.
+   */
+  public static boolean isExampleOfFamily(String key) {
+    return isExampleOfPropertyKey(key);
+  }
+
   public static boolean isTitlePatternPropertyKey(String key) {
     return "titlepattern".equals(normalizedBaseWithoutUnderscores(key));
   }

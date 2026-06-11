@@ -154,7 +154,7 @@ and every existing non-`example of` property without a tracker has a **skipped**
 for the notebook owner (visible in `note-info`), while `example of` properties remain
 pending and pre-existing trackers are untouched.
 
-- **B3a — Pure decision helpers + unit tests** *(structure)*
+- **B3a — Pure decision helpers + unit tests** *(structure)* ✅
   - Add `PropertyKeyNaming.isExampleOfFamily(key)` (suffix/case-aware).
   - Add a pure planner (e.g. `PropertyTrackingBackfillPlan.forNote(frontmatterKeys,
     existingNonDeletedPropertyKeys)`) returning `keysToIndex` (non-reserved, via
