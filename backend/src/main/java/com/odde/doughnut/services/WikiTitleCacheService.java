@@ -38,18 +38,21 @@ public class WikiTitleCacheService {
   private final AuthorizationService authorizationService;
   private final JdbcTemplate jdbcTemplate;
   private final EntityPersister entityPersister;
+  private final NotePropertyIndexService notePropertyIndexService;
 
   public WikiTitleCacheService(
       WikiLinkResolver wikiLinkResolver,
       NoteWikiTitleCacheRepository noteWikiTitleCacheRepository,
       AuthorizationService authorizationService,
       JdbcTemplate jdbcTemplate,
-      EntityPersister entityPersister) {
+      EntityPersister entityPersister,
+      NotePropertyIndexService notePropertyIndexService) {
     this.wikiLinkResolver = wikiLinkResolver;
     this.noteWikiTitleCacheRepository = noteWikiTitleCacheRepository;
     this.authorizationService = authorizationService;
     this.jdbcTemplate = jdbcTemplate;
     this.entityPersister = entityPersister;
+    this.notePropertyIndexService = notePropertyIndexService;
   }
 
   public List<WikiTitle> wikiTitlesForViewer(Note focusNote, User viewer) {
@@ -289,6 +292,7 @@ public class WikiTitleCacheService {
   @Transactional
   public void refreshForNote(Note note, User viewer) {
     rebuildWikiTitleCache(note, viewer);
+    notePropertyIndexService.refreshForNote(note);
   }
 
   private void rebuildWikiTitleCache(Note note, User viewer) {

@@ -134,7 +134,7 @@ Enables B2 (the immediate next phase). No observable behavior on its own.
   `title_pattern`, `question_generation_instruction` + camelCase aliases), suffix/case-aware.
   Unit tests: inputs→outputs incl. suffix and alias variants; `example of` and arbitrary
   content keys are **not** reserved. **Commit.**
-- **B2b — Sync service + wiring** *(behavior)*: `NotePropertyIndexService.refreshForNote(note)`
+- **B2b — Sync service + wiring** *(behavior)* ✅: `NotePropertyIndexService.refreshForNote(note)`
   pessimistic-locks the note, bulk-deletes its rows, and reinserts one row per
   `Frontmatter.keys()` entry **where `!isReservedStructuralKey(key)`** (empty when no
   frontmatter). Call it next to **every** `wikiTitleCacheService.refreshForNote(...)` site
