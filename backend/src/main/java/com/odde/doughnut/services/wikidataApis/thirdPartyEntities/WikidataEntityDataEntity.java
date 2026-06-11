@@ -8,10 +8,21 @@ public class WikidataEntityDataEntity {
 
   public String GetEnglishWikipediaUrl() {
     String englishWikipediaTag = "enwiki";
-    if (this.sitelinks != null && this.sitelinks.containsKey(englishWikipediaTag)) {
-      return this.sitelinks.get(englishWikipediaTag).url;
+    if (this.sitelinks == null || !this.sitelinks.containsKey(englishWikipediaTag)) {
+      return "";
+    }
+    WikiSiteLinkModel enwiki = this.sitelinks.get(englishWikipediaTag);
+    if (enwiki.url != null && !enwiki.url.isBlank()) {
+      return enwiki.url;
+    }
+    if (enwiki.title != null && !enwiki.title.isBlank()) {
+      return englishWikipediaUrlFromTitle(enwiki.title);
     }
     return "";
+  }
+
+  private static String englishWikipediaUrlFromTitle(String title) {
+    return "https://en.wikipedia.org/wiki/" + title.trim().replace(" ", "_");
   }
 
   public String GetEnglishTitle() {
@@ -28,6 +39,7 @@ public class WikidataEntityDataEntity {
   }
 
   public static class WikiSiteLinkModel {
+    public String title;
     public String url;
   }
 }

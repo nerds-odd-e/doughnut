@@ -4,6 +4,7 @@ public class WikidataEntityJsonBuilder {
   private String id = "1";
   private String title = "abc";
   private String enwikiUrl = null;
+  private String enwikiTitle = null;
 
   public WikidataEntityJsonBuilder entityId(String id) {
     this.id = id;
@@ -20,6 +21,11 @@ public class WikidataEntityJsonBuilder {
     return this;
   }
 
+  public WikidataEntityJsonBuilder enwikiTitleOnly(String enwikiTitle) {
+    this.enwikiTitle = enwikiTitle;
+    return this;
+  }
+
   public String please() {
     return "{\"entities\":{\""
         + id
@@ -31,9 +37,14 @@ public class WikidataEntityJsonBuilder {
   }
 
   private String enwikiJson() {
-    if (enwikiUrl == null) return "";
-    return "\"enwiki\":{\"site\":\"enwiki\",\"title\":\"Mohawk language\",\"badges\":[],\"url\":\""
-        + enwikiUrl
-        + "\"}";
+    if (enwikiUrl != null) {
+      return "\"enwiki\":{\"site\":\"enwiki\",\"title\":\"Mohawk language\",\"badges\":[],\"url\":\""
+          + enwikiUrl
+          + "\"}";
+    }
+    if (enwikiTitle != null) {
+      return "\"enwiki\":{\"site\":\"enwiki\",\"title\":\"" + enwikiTitle + "\",\"badges\":[]}";
+    }
+    return "";
   }
 }

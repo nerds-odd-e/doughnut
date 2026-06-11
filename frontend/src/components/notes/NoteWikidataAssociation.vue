@@ -12,34 +12,13 @@
 
 <script setup lang="ts">
 import { Link2 } from "@lucide/vue"
-import { WikidataController } from "@generated/doughnut-backend-api/sdk.gen"
-import {} from "@/managedApi/clientSetup"
-import nonBlockingPopup from "@/managedApi/window/nonBlockingPopup"
+import { openWikidataEntityBrowseUrlInNonBlockingPopup } from "@/utils/wikidataEntityBrowseUrl"
 
 const props = defineProps<{
   wikidataId: string
 }>()
 
-const getWikidataItem = async () => {
-  const { data: entityData, error } =
-    await WikidataController.fetchWikidataEntityDataById({
-      path: { wikidataId: props.wikidataId },
-    })
-  if (!error && entityData) {
-    return entityData.WikipediaEnglishUrl
-  }
-  return ""
-}
-
-const wikiUrl = async () => {
-  const wikipediaEnglishUrl = await getWikidataItem()
-  if (wikipediaEnglishUrl !== "") {
-    return wikipediaEnglishUrl
-  }
-  return `https://www.wikidata.org/wiki/${props.wikidataId}`
-}
-
 const onClickWikidata = () => {
-  nonBlockingPopup(wikiUrl())
+  openWikidataEntityBrowseUrlInNonBlockingPopup(props.wikidataId)
 }
 </script>

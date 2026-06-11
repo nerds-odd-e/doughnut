@@ -86,6 +86,22 @@ class WikidataControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void shouldBuildEnglishWikipediaLinkFromSitelinkTitleWhenUrlIsAbsent()
+        throws IOException, InterruptedException, BindException {
+      Mockito.when(httpClientAdapter.getResponseString(any()))
+          .thenReturn(
+              makeMe
+                  .wikidataEntityJson()
+                  .entityId("Q12345")
+                  .entitleTitle("Count von Count")
+                  .enwikiTitleOnly("Count von Count")
+                  .please());
+      WikidataEntityData result = controller.fetchWikidataEntityDataByID("Q12345").get();
+      assertThat(
+          result.WikipediaEnglishUrl, equalTo("https://en.wikipedia.org/wiki/Count_von_Count"));
+    }
+
+    @Test
     void shouldReturnEmptyIfEnglishWikipediaLinkNotExist()
         throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))

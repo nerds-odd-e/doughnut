@@ -11,8 +11,8 @@ export async function resolveWikidataEntityBrowseUrl(
       path: { wikidataId: id },
     })
   if (!error && entityData) {
-    const wikipediaEnglishUrl = entityData.WikipediaEnglishUrl
-    if (wikipediaEnglishUrl !== "") {
+    const wikipediaEnglishUrl = entityData.WikipediaEnglishUrl?.trim()
+    if (wikipediaEnglishUrl) {
       return wikipediaEnglishUrl
     }
   }
