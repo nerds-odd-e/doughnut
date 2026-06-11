@@ -1,6 +1,7 @@
 package com.odde.doughnut.services.ai;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.doughnut.algorithms.WikiLinkMarkdown;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.builder.OpenAIResponseRequestBuilder;
@@ -11,6 +12,7 @@ import com.odde.doughnut.services.focusContext.FocusContextResult;
 import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
 import com.odde.doughnut.services.focusContext.RetrievalConfig;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
+import com.odde.doughnut.validators.DisplayNamePathSeparators;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import java.util.List;
 import java.util.function.Function;
@@ -42,11 +44,12 @@ public class AiNoteAutomationService {
   }
 
   public String suggestTitle() throws JsonProcessingException {
-    return executeWithTool(
-        AiToolFactory.suggestNoteTitleAiTool(),
-        TitleReplacement.class,
-        TitleReplacement::getNewTitle,
-        null);
+    return DisplayNamePathSeparators.toFullwidthPathSeparators(
+        executeWithTool(
+            AiToolFactory.suggestNoteTitleAiTool(),
+            TitleReplacement.class,
+            TitleReplacement::getNewTitle,
+            null));
   }
 
   public List<String> generateRefinementSuggestions() throws JsonProcessingException {
@@ -60,8 +63,22 @@ public class AiNoteAutomationService {
 
   public NoteExtractionResult extractNote(String suggestion) throws JsonProcessingException {
     InstructionAndSchema tool = AiToolFactory.extractNoteAiTool(suggestion);
-    return executeWithTool(
-        tool, NoteExtractionResult.class, result -> result, null, EXTRACT_NOTE_MAX_OUTPUT_TOKENS);
+    NoteExtractionResult result =
+        executeWithTool(
+            tool, NoteExtractionResult.class, r -> r, null, EXTRACT_NOTE_MAX_OUTPUT_TOKENS);
+    return sanitizeExtractionResult(result);
+  }
+
+  private static NoteExtractionResult sanitizeExtractionResult(NoteExtractionResult result) {
+    if (result == null) {
+      return null;
+    }
+    result.newNoteTitle = DisplayNamePathSeparators.toFullwidthPathSeparators(result.newNoteTitle);
+    result.newNoteContent =
+        WikiLinkMarkdown.sanitizePathSeparatorsInWikiLinks(result.newNoteContent);
+    result.updatedParentContent =
+        WikiLinkMarkdown.sanitizePathSeparatorsInWikiLinks(result.updatedParentContent);
+    return result;
   }
 
   private <T, R> R executeWithTool(

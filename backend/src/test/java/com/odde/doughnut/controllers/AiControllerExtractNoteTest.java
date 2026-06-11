@@ -128,6 +128,27 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
     }
 
     @Test
+    void shouldSanitizePathSeparatorsInExtractedNoteTitleAndWikiLinks()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      Note testNote = newRootNoteWithExtractableContent();
+      stubExtractionResult(
+          "foo/bar: baz",
+          "See [[foo/bar: baz|link]] and [[MyNb:foo/bar|nb]].",
+          "Back to [[foo/bar: baz]].");
+
+      RefinementSuggestionsRequestDTO requestDTO = new RefinementSuggestionsRequestDTO();
+      requestDTO.setSuggestions(List.of("key suggestion to extract"));
+      NoteRealm response = controller.extractNote(testNote, requestDTO);
+
+      Note persistedNote = noteRepository.findById(response.getNote().getId()).orElseThrow();
+      assertThat(persistedNote.getTitle()).isEqualTo("foo／bar： baz");
+      assertThat(persistedNote.getContent())
+          .isEqualTo("See [[foo／bar： baz|link]] and [[MyNb:foo／bar|nb]].");
+      assertThat(noteRepository.findById(testNote.getId()).orElseThrow().getContent())
+          .isEqualTo("Back to [[foo／bar： baz]].");
+    }
+
+    @Test
     void shouldRefreshWikiLinkCacheForOriginalAndNewNoteAfterExtraction()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       Note testNote =

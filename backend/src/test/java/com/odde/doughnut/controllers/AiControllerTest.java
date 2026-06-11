@@ -87,6 +87,18 @@ class AiControllerTest extends ControllerTestBase {
     }
 
     @Test
+    void shouldSanitizePathSeparatorsInSuggestedTitle()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      TitleReplacement suggestedTopic = new TitleReplacement();
+      suggestedTopic.setNewTitle("TCP/IP: Overview");
+      openAiStructuredResponseMock.stubStructuredResponse(suggestedTopic);
+
+      SuggestedTitleDTO result = controller.suggestTitle(testNote);
+
+      assertThat(result.getTitle()).isEqualTo("TCP／IP： Overview");
+    }
+
+    @Test
     void shouldCallResponsesApiWithStructuredInstructions()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       SuggestedTitleDTO result = controller.suggestTitle(testNote);

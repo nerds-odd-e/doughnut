@@ -1,5 +1,6 @@
 package com.odde.doughnut.algorithms;
 
+import com.odde.doughnut.validators.DisplayNamePathSeparators;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.UnaryOperator;
@@ -135,6 +136,35 @@ public final class WikiLinkMarkdown {
             ? targetToken.substring(colon + 1).trim()
             : targetToken;
     return newNotebookName + ":" + noteTitle;
+  }
+
+  public static String sanitizePathSeparatorsInWikiLinks(String markdown) {
+    if (markdown == null || markdown.isEmpty()) {
+      return markdown;
+    }
+    Matcher matcher = INNER_LINK_PATTERN.matcher(markdown);
+    StringBuilder out = new StringBuilder();
+    int last = 0;
+    while (matcher.find()) {
+      out.append(markdown, last, matcher.start());
+      String rawInner = matcher.group(1);
+      int pipeIdx = rawInner.indexOf('|');
+      String rawTarget = pipeIdx == -1 ? rawInner : rawInner.substring(0, pipeIdx);
+      String sanitizedTarget =
+          DisplayNamePathSeparators.toFullwidthPathSeparatorsInWikiLinkTarget(rawTarget.trim());
+      if (pipeIdx == -1) {
+        out.append("[[").append(sanitizedTarget).append("]]");
+      } else {
+        out.append("[[")
+            .append(sanitizedTarget)
+            .append("|")
+            .append(rawInner.substring(pipeIdx + 1))
+            .append("]]");
+      }
+      last = matcher.end();
+    }
+    out.append(markdown.substring(last));
+    return out.toString();
   }
 
   public static String replaceWikiLinksMatchingTrimmedInner(
