@@ -23,6 +23,7 @@ Feature: Property memory tracker
   Scenario: Note-level assimilation stays available after property-only assimilation
     Then the keep for recall button should be enabled
     When I keep for recall on the assimilation panel
+    And I open assimilation settings from more options
     Then the note memory tracker should have recall count 0
     And I should see a property memory tracker for "topic" on the assimilation settings panel
 
