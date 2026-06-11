@@ -21,6 +21,7 @@ erDiagram
     "note" ||--o{ image : "note_id"
     "note" ||--o{ memory_tracker : "note_id"
     "note" ||--o{ note_creator : "note_id"
+    "note" ||--o{ note_property_index : "note_id"
     "note" ||--o{ note_wiki_title_cache : "note_id"
     "note" ||--o{ note_wiki_title_cache : "target_note_id"
     "note" ||--o{ predefined_question : "note_id"
@@ -134,6 +135,10 @@ erDiagram
     }
     note_embeddings {
         bigint id PK
+    }
+    note_property_index {
+        int id PK
+        int note_id FK
     }
     note_wiki_title_cache {
         int id PK

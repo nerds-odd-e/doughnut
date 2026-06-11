@@ -113,7 +113,7 @@ touched tests green. Push after each. Deploy gate at each **phase** boundary. Ba
 
 ---
 
-### Phase B1 — `note_property_index` table + entity/repository  *(structure)*
+### Phase B1 — `note_property_index` table + entity/repository  *(structure)* ✅
 
 Enables B2 (the immediate next phase). No observable behavior on its own.
 
