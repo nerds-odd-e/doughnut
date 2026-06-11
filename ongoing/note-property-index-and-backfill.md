@@ -163,7 +163,7 @@ pending and pre-existing trackers are untouched.
   - **Tests:** inputs→outputs — reserved keys excluded from both sets; `example of`/`example
     of 2` indexed but never skip-seeded; case-insensitive already-tracked skip; empty
     frontmatter. **Commit.**
-- **B3b — Backfill runner + Java migration + integration test** *(behavior/data)*
+- **B3b — Backfill runner + Java migration + integration test** *(behavior/data)* ✅
   - Static `NotePropertyTrackingBackfill.run(Connection, Timestamp now)`: iterate
     non-deleted notes; parse keys via `NoteContentMarkdown`/`Frontmatter`; apply the B3a
     planner; `INSERT IGNORE` index rows for `keysToIndex`; resolve owner `user_id` via
@@ -180,7 +180,7 @@ pending and pre-existing trackers are untouched.
     (`removed_from_tracking=true`, `assimilated_at == now`); reserved keys neither indexed
     nor seeded; `example of` indexed but left with no tracker; pre-existing trackers
     unchanged; circle-owned notes get index rows but no seeded trackers.
-  - **Commit.** → **Phase B3 deploy gate.**
+  - **Commit.** → **Phase B3 deploy gate.** ✅
 
 ---
 
