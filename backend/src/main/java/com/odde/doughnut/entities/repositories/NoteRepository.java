@@ -1,5 +1,6 @@
 package com.odde.doughnut.entities.repositories;
 
+import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import java.util.List;
 import java.util.stream.Stream;
@@ -119,7 +120,10 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
           + "   AND n.deletedAt IS NULL ";
 
   String joinMemoryTracker =
-      " LEFT JOIN n.memoryTrackers rp ON rp.user.id = :userId AND rp.deletedAt IS NULL";
+      " LEFT JOIN n.memoryTrackers rp ON rp.user.id = :userId"
+          + " AND rp.deletedAt IS NULL"
+          + " AND "
+          + MemoryTracker.JPA_WHERE_NOTE_LEVEL_TRACKER;
 
   String recallOrderByDate = " ORDER BY n.recallSetting.level, n.createdAt, n.id";
 

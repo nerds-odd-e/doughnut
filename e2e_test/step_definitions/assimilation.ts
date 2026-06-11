@@ -146,6 +146,10 @@ Then('the keep for recall button should be disabled', () => {
   start.assumeAssimilationPage().expectKeepForRecallDisabled()
 })
 
+Then('the keep for recall button should be enabled', () => {
+  start.assumeAssimilationPage().expectKeepForRecallEnabled()
+})
+
 When('I jump to the note page of {string}', (noteTitle: string) => {
   start.jumpToNotePage(noteTitle)
 })

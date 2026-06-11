@@ -177,6 +177,23 @@ public class AssimilationServiceTest {
   }
 
   @Nested
+  class WhenNoteHasOnlyPropertyTracker {
+    Note note;
+
+    @BeforeEach
+    void setup() {
+      note = makeMe.aNote("vitamins").notebookOwnedBy(user).please();
+      makeMe.aMemoryTrackerFor(note).by(user).propertyKey("topic").assimilatedAt(day1).please();
+    }
+
+    @Test
+    void shouldAppearInUnassimilatedNotes() {
+      assertThat(
+          userService.getUnassimilatedNotes(user).map(Note::getId).toList(), hasItem(note.getId()));
+    }
+  }
+
+  @Nested
   class RecallSubscribedNote {
     Note note1;
     Note note2;

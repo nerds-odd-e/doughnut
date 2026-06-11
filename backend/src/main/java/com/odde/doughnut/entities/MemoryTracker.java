@@ -90,6 +90,13 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   @Setter
   private String propertyKey = "";
 
+  /**
+   * JPQL fragment for joined alias {@code rp}; must stay aligned with {@link
+   * #isNoteLevelTracker()}.
+   */
+  public static final String JPA_WHERE_NOTE_LEVEL_TRACKER =
+      "(rp.propertyKey IS NULL OR rp.propertyKey = '')";
+
   @Column(name = "deleted_at")
   @JsonIgnore
   @Getter
@@ -135,6 +142,12 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public boolean isActive() {
     return deletedAt == null && !Boolean.TRUE.equals(removedFromTracking);
+  }
+
+  @JsonIgnore
+  public boolean isNoteLevelTracker() {
+    String key = getPropertyKey();
+    return key == null || key.isEmpty();
   }
 
   @JsonProperty

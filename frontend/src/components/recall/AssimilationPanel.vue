@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Note } from "@generated/doughnut-backend-api"
+import type { Note, NoteRecallInfo } from "@generated/doughnut-backend-api"
 import { AssimilationController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
@@ -59,23 +59,20 @@ const isAssimilating = ref(false)
 
 const rememberSpelling = ref(false)
 const noteInfoLoaded = ref(false)
-const noteRecallInfo = ref<{
-  memoryTrackers?: Array<{ spelling?: boolean }>
-} | null>(null)
+const noteRecallInfo = ref<NoteRecallInfo | null>(null)
 
 const onRememberSpellingChanged = (value: boolean) => {
   rememberSpelling.value = value
 }
 
-const onNoteRecallInfoLoaded = (info: {
-  memoryTrackers?: Array<{ spelling?: boolean }>
-}) => {
+const onNoteRecallInfoLoaded = (info: NoteRecallInfo) => {
   noteRecallInfo.value = info
   noteInfoLoaded.value = true
 }
 
-const hasMemoryTrackers = computed(
-  () => (noteRecallInfo.value?.memoryTrackers?.length ?? 0) > 0
+const hasNoteLevelMemoryTrackers = computed(
+  () =>
+    noteRecallInfo.value?.memoryTrackers?.some((mt) => !mt.propertyKey) ?? false
 )
 const hasSpellingMemoryTracker = computed(
   () =>
@@ -84,7 +81,7 @@ const hasSpellingMemoryTracker = computed(
 )
 const keepForRecallDisabled = computed(
   () =>
-    hasMemoryTrackers.value &&
+    hasNoteLevelMemoryTrackers.value &&
     !(rememberSpelling.value && !hasSpellingMemoryTracker.value)
 )
 

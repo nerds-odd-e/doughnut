@@ -71,7 +71,7 @@ public class MemoryTrackerService {
     }
 
     List<MemoryTracker> existingNoteLevelTrackers =
-        existingTrackers.stream().filter(MemoryTrackerService::isNoteLevelTracker).toList();
+        existingTrackers.stream().filter(MemoryTracker::isNoteLevelTracker).toList();
 
     boolean addSpellingOnly =
         !existingNoteLevelTrackers.isEmpty()
@@ -101,11 +101,6 @@ public class MemoryTrackerService {
     }
 
     return trackers;
-  }
-
-  private static boolean isNoteLevelTracker(MemoryTracker memoryTracker) {
-    String propertyKey = memoryTracker.getPropertyKey();
-    return propertyKey == null || propertyKey.isEmpty();
   }
 
   private MemoryTracker createMemoryTracker(
@@ -178,7 +173,7 @@ public class MemoryTrackerService {
     if (memoryTracker.getDeletedAt() != null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Memory tracker is deleted");
     }
-    if (isNoteLevelTracker(memoryTracker)) {
+    if (memoryTracker.isNoteLevelTracker()) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "Cannot rename note-level memory tracker");
     }

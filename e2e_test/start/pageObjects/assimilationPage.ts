@@ -251,6 +251,10 @@ export const assumeAssimilationPage = () => ({
     keepForRecallButton().should('be.disabled')
     return this
   },
+  expectKeepForRecallEnabled() {
+    keepForRecallButton().should('not.be.disabled')
+    return this
+  },
   expandAssimilationPropertiesSection() {
     cy.get('[data-test="assimilation-properties-section"]').within(() => {
       cy.get('[data-test="assimilation-properties-toggle"]').click()

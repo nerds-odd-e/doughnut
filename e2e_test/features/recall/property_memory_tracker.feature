@@ -20,6 +20,13 @@ Feature: Property memory tracker
     And I assimilate the property "topic" on the assimilation settings panel
 
   @disableOpenAiService
+  Scenario: Note-level assimilation stays available after property-only assimilation
+    Then the keep for recall button should be enabled
+    When I keep for recall on the assimilation panel
+    Then the note memory tracker should have recall count 0
+    And I should see a property memory tracker for "topic" on the assimilation settings panel
+
+  @disableOpenAiService
   Scenario: Assimilating a property shows a labeled tracker and recall item
     Then I should see a property memory tracker for "topic" on the assimilation settings panel
     When It's day 2, 9 hour

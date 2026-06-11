@@ -126,6 +126,24 @@ describe("AssimilationPanel", () => {
   })
 
   describe("keep for repetition when note has memory trackers", () => {
+    it("enables keep for repetition when note has only a property memory tracker", async () => {
+      mockSdkService(NoteController, "getNoteInfo", {
+        memoryTrackers: [
+          {
+            ...makeMe.aMemoryTracker.please(),
+            id: 1,
+            propertyKey: "topic",
+            spelling: false,
+          },
+        ],
+      })
+      const wrapper = mountAssimilationPanel()
+      await flushPromises()
+
+      const keepButton = wrapper.find('[data-test="keep-for-recall"]')
+      expect(keepButton.attributes("disabled")).toBeUndefined()
+    })
+
     it("disables keep for repetition when note has memory trackers and no add-spelling-only mode", async () => {
       mockSdkService(NoteController, "getNoteInfo", {
         memoryTrackers: [
