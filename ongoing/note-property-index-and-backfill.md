@@ -129,7 +129,7 @@ Enables B2 (the immediate next phase). No observable behavior on its own.
 **Outcome:** after any note content save, the note's index rows exactly match its current
 **non-reserved** frontmatter keys; deleting the note cascades the rows away.
 
-- **B2a — Reserved-key matcher** *(structure)*: add `PropertyKeyNaming.isReservedStructuralKey(key)`
+- **B2a — Reserved-key matcher** *(structure)* ✅: add `PropertyKeyNaming.isReservedStructuralKey(key)`
   mirroring the frontend reserved set (`image`, `image_mask`, `wikidata_id`, `url`,
   `title_pattern`, `question_generation_instruction` + camelCase aliases), suffix/case-aware.
   Unit tests: inputs→outputs incl. suffix and alias variants; `example of` and arbitrary

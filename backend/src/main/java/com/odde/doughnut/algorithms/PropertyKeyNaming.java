@@ -32,6 +32,64 @@ public final class PropertyKeyNaming {
     return parts.base().trim().equalsIgnoreCase(baseKey.trim());
   }
 
+  private static boolean propertyKeyBaseMatchesAny(String key, String... baseKeys) {
+    for (String baseKey : baseKeys) {
+      if (propertyKeyBaseMatches(key, baseKey)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private static String normalizedBaseWithoutUnderscores(String key) {
+    BaseAndSuffix parts = propertyKeyBaseAndSuffix(key);
+    return parts.base().trim().toLowerCase().replace("_", "");
+  }
+
+  /** Rich-mode property key for header image upload ({@code image:} only). */
+  public static boolean isImagePropertyKey(String key) {
+    return propertyKeyBaseMatches(key, "image");
+  }
+
+  /** Rich-mode property key for image mask ({@code image_mask:}). */
+  public static boolean isImageMaskPropertyKey(String key) {
+    return "imagemask".equals(normalizedBaseWithoutUnderscores(key));
+  }
+
+  /** Rich-mode property key for Wikidata Q-id ({@code wikidata_id} or {@code wikidataId}). */
+  public static boolean isWikidataIdPropertyKey(String key) {
+    return propertyKeyBaseMatchesAny(key, "wikidata_id", "wikidataId");
+  }
+
+  public static boolean isUrlPropertyKey(String key) {
+    return propertyKeyBaseMatches(key, "url");
+  }
+
+  public static boolean isExampleOfPropertyKey(String key) {
+    return propertyKeyBaseMatches(key, "example of");
+  }
+
+  public static boolean isTitlePatternPropertyKey(String key) {
+    return "titlepattern".equals(normalizedBaseWithoutUnderscores(key));
+  }
+
+  public static boolean isQuestionGenerationInstructionPropertyKey(String key) {
+    return "questiongenerationinstruction".equals(normalizedBaseWithoutUnderscores(key));
+  }
+
+  /**
+   * Structural frontmatter keys excluded from {@code note_property_index} and automatic property
+   * tracker seeding.
+   */
+  public static boolean isReservedStructuralKey(String key) {
+    return isImagePropertyKey(key)
+        || isImageMaskPropertyKey(key)
+        || isWikidataIdPropertyKey(key)
+        || isUrlPropertyKey(key)
+        || isTitlePatternPropertyKey(key)
+        || isQuestionGenerationInstructionPropertyKey(key);
+  }
+
   /**
    * Next free key in a base-key family: returns {@code baseKey} when slot 1 is free, otherwise
    * {@code baseKey N} for the smallest free {@code N >= 2}.

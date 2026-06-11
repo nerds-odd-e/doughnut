@@ -2,9 +2,12 @@ package com.odde.doughnut.algorithms;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 class PropertyKeyNamingTest {
 
@@ -44,5 +47,35 @@ class PropertyKeyNamingTest {
     assertThat(
         PropertyKeyNaming.nextAvailablePropertyKeyForBase("a part of", List.of("A part of")),
         equalTo("a part of 2"));
+  }
+
+  @ParameterizedTest
+  @CsvSource({
+    "image, true",
+    "Image, true",
+    "image 2, true",
+    "image_mask, true",
+    "imageMask, true",
+    "wikidata_id, true",
+    "wikidataId, true",
+    "url, true",
+    "URL 2, true",
+    "title_pattern, true",
+    "titlePattern, true",
+    "question_generation_instruction, true",
+    "questionGenerationInstruction, true",
+    "example of, false",
+    "example of 2, false",
+    "topic, false",
+    "a part of, false",
+  })
+  void isReservedStructuralKey_matches_structural_keys_only(String key, boolean reserved) {
+    assertThat(PropertyKeyNaming.isReservedStructuralKey(key), is(reserved));
+  }
+
+  @Test
+  void isImagePropertyKey_does_not_match_image_mask() {
+    assertThat(PropertyKeyNaming.isImagePropertyKey("image_mask"), is(false));
+    assertThat(PropertyKeyNaming.isImageMaskPropertyKey("image_mask"), is(true));
   }
 }
