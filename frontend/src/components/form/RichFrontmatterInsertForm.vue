@@ -58,43 +58,23 @@
             Set…
           </button>
         </div>
-        <div
+        <RichFrontmatterImagePropertyValue
           v-else-if="isImagePropertyKey(draftKey)"
-          class="flex flex-wrap items-center gap-2"
-        >
-          <input
-            ref="insertImageFileInputRef"
-            type="file"
-            accept="image/*"
-            class="hidden"
-            data-testid="rich-note-image-insert-file-input"
-            @change="onInsertImageFileSelected"
-          />
-          <span class="font-mono text-sm">{{
-            draftValue.trim() || "—"
-          }}</span>
-          <RichFrontmatterPropertyExternalLink
-            v-if="draftValue.trim()"
-            kind="url"
-            :value="draftValue"
-          />
-          <button
-            type="button"
-            class="daisy-btn daisy-btn-sm daisy-btn-outline"
-            data-testid="rich-note-image-insert-choose"
-            :disabled="!noteId || insertImageUploading"
-            @click="openInsertImageFilePicker"
-          >
-            {{ draftValue.trim() ? "Replace…" : "Choose image…" }}
-          </button>
-          <span
-            v-if="!noteId"
-            class="text-xs text-base-content/70"
-            data-testid="rich-note-image-insert-requires-note"
-          >
-            Save the note before attaching an image.
-          </span>
-        </div>
+          ref="valueInputRef"
+          :model-value="draftValue"
+          :wiki-titles="wikiTitles"
+          :note-id="noteId"
+          ariaLabel="Property value"
+          value-test-id="rich-note-property-value"
+          file-input-test-id="rich-note-image-insert-file-input"
+          choose-button-test-id="rich-note-image-insert-choose"
+          requires-note-test-id="rich-note-image-insert-requires-note"
+          value-wrapper-class="min-w-0 flex-1 basis-48"
+          @update:model-value="emit('update:draftValue', $event)"
+          @commit="emit('value-blur')"
+          @dead-link-click="emit('dead-link-click', $event)"
+          @image-upload-state="emit('image-upload-state', $event)"
+        />
         <div
           v-else
           :class="
@@ -132,12 +112,11 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
+import RichFrontmatterImagePropertyValue from "@/components/form/RichFrontmatterImagePropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import RichFrontmatterPropertyKeyPresets from "@/components/form/RichFrontmatterPropertyKeyPresets.vue"
 import WikiPropertyValueField from "@/components/form/WikiPropertyValueField.vue"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import {
   isImagePropertyKey,
   isUrlPropertyKey,
@@ -167,11 +146,7 @@ const emit = defineEmits<{
 }>()
 
 const presetPanelOpen = ref(false)
-const valueInputRef = ref<InstanceType<typeof WikiPropertyValueField> | null>(
-  null
-)
-const insertImageFileInputRef = ref<HTMLInputElement | null>(null)
-const insertImageUploading = ref(false)
+const valueInputRef = ref<{ focus: () => void } | null>(null)
 
 function onKeyInput(event: Event) {
   emit("update:draftKey", (event.target as HTMLInputElement).value)
@@ -194,36 +169,6 @@ function onPresetSelected(key: string) {
 
 function focusValueInput() {
   valueInputRef.value?.focus()
-}
-
-function openInsertImageFilePicker() {
-  insertImageFileInputRef.value?.click()
-}
-
-async function onInsertImageFileSelected(event: Event) {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0]
-  input.value = ""
-  const noteId = props.noteId
-  if (!file || noteId === undefined) return
-
-  emit("image-upload-state", true)
-  insertImageUploading.value = true
-  try {
-    const { data, error } = await apiCallWithLoading(() =>
-      NoteController.uploadNoteImage({
-        path: { note: noteId },
-        body: { uploadImage: file },
-      })
-    )
-    if (!error && data?.imagePath) {
-      emit("update:draftValue", data.imagePath)
-      emit("value-blur")
-    }
-  } finally {
-    insertImageUploading.value = false
-    emit("image-upload-state", false)
-  }
 }
 
 defineExpose({ focusValueInput })

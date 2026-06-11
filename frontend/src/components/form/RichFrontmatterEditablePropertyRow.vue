@@ -40,56 +40,23 @@
       :inverse-icon="true"
       @update:model-value="emit('relation-type-selected', $event)"
     />
-    <div
+    <RichFrontmatterImagePropertyValue
       v-else-if="isImagePropertyKey(modelValue.key)"
-      class="flex min-w-0 items-center gap-2"
-    >
-      <input
-        ref="imageFileInputRef"
-        type="file"
-        accept="image/*"
-        class="hidden"
-        data-testid="rich-note-image-property-file-input"
-        @change="onImageFileSelected"
-      />
-      <template v-if="modelValue.value.trim()">
-        <button
-          type="button"
-          class="daisy-btn daisy-btn-ghost daisy-btn-sm h-auto min-h-0 min-w-0 max-w-full shrink truncate justify-start py-0.5 px-1 font-mono text-sm font-normal text-base-content/90 normal-case"
-          :title="modelValue.value.trim()"
-          data-testid="rich-note-image-property-path"
-        >
-          {{ modelValue.value.trim() }}
-        </button>
-        <RichFrontmatterPropertyExternalLink
-          kind="url"
-          :value="modelValue.value"
-        />
-      </template>
-      <template v-else>
-        <span
-          class="truncate font-mono text-sm text-base-content/90"
-          aria-hidden="true"
-          >—</span
-        >
-      </template>
-      <button
-        type="button"
-        class="daisy-btn daisy-btn-sm daisy-btn-outline shrink-0"
-        data-testid="rich-note-image-property-choose"
-        :disabled="!noteId || imageUploading"
-        @click="openImageFilePicker"
-      >
-        {{ modelValue.value.trim() ? "Replace…" : "Choose image…" }}
-      </button>
-      <span
-        v-if="!noteId"
-        class="text-xs text-base-content/70"
-        data-testid="rich-note-image-upload-requires-note"
-      >
-        Save the note before attaching an image.
-      </span>
-    </div>
+      :model-value="modelValue.value"
+      :wiki-titles="wikiTitles"
+      :note-id="noteId"
+      :ariaLabel="`Existing note image property value (row ${idx + 1})`"
+      value-test-id="rich-note-property-row-value-input"
+      file-input-test-id="rich-note-image-property-file-input"
+      choose-button-test-id="rich-note-image-property-choose"
+      requires-note-test-id="rich-note-image-upload-requires-note"
+      path-test-id="rich-note-image-property-path"
+      @update:model-value="onValueUpdate"
+      @focus="emit('row-focus')"
+      @commit="emit('commit')"
+      @dead-link-click="emit('dead-link-click', $event)"
+      @image-upload-state="emit('image-upload-state', $event)"
+    />
     <div
       v-else-if="isWikidataIdPropertyKey(modelValue.key)"
       class="flex min-w-0 items-center gap-2"
@@ -175,13 +142,12 @@
 <script setup lang="ts">
 import { Minus } from "@lucide/vue"
 import { computed, ref } from "vue"
+import RichFrontmatterImagePropertyValue from "@/components/form/RichFrontmatterImagePropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import RichFrontmatterPropertyKeyPresets from "@/components/form/RichFrontmatterPropertyKeyPresets.vue"
 import WikiPropertyValueField from "@/components/form/WikiPropertyValueField.vue"
 import RelationTypeSelectCompact from "@/components/links/RelationTypeSelectCompact.vue"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import {
   isImagePropertyKey,
   isRelationPropertyKey,
@@ -218,8 +184,6 @@ const emit = defineEmits<{
 }>()
 
 const presetPanelOpen = ref(false)
-const imageFileInputRef = ref<HTMLInputElement | null>(null)
-const imageUploading = ref(false)
 
 const relationModelValue = computed(() => {
   const v = props.modelValue.value
@@ -262,38 +226,5 @@ function onPresetSelected(key: string) {
   requestAnimationFrame(() => {
     document.getElementById(props.keyInputId)?.focus()
   })
-}
-
-function openImageFilePicker() {
-  imageFileInputRef.value?.click()
-}
-
-async function onImageFileSelected(event: Event) {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0]
-  input.value = ""
-  const noteId = props.noteId
-  if (!file || noteId === undefined) return
-
-  emit("image-upload-state", true)
-  imageUploading.value = true
-  try {
-    const { data, error } = await apiCallWithLoading(() =>
-      NoteController.uploadNoteImage({
-        path: { note: noteId },
-        body: { uploadImage: file },
-      })
-    )
-    if (!error && data?.imagePath) {
-      emit("update:modelValue", {
-        ...props.modelValue,
-        value: data.imagePath,
-      })
-      emit("commit")
-    }
-  } finally {
-    imageUploading.value = false
-    emit("image-upload-state", false)
-  }
 }
 </script>

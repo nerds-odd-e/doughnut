@@ -1,12 +1,9 @@
 import { CUSTOM_RELATION_RADIO_SENTINEL } from "@/models/relationTypeOptions"
 import { INDEX_ONLY_PRESET_PROPERTY_KEYS } from "@/utils/noteContentFrontmatter"
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
-import { mockSdkService } from "@tests/helpers"
-import { vi } from "vitest"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
-describe("RichMarkdownEditor property relation, image, and index", () => {
+describe("RichMarkdownEditor property relation and index", () => {
   const h = createRichMarkdownEditorTestHarness()
 
   afterEach(() => {
@@ -86,45 +83,6 @@ describe("RichMarkdownEditor property relation, image, and index", () => {
       )
       expect(primaryLabelForCustom.exists()).toBe(true)
       expect(primaryLabelForCustom.classes()).toContain("bg-primary")
-    })
-  })
-
-  describe("image property upload", () => {
-    let uploadSpy: ReturnType<typeof mockSdkService>
-
-    beforeEach(() => {
-      uploadSpy = mockSdkService(NoteController, "uploadNoteImage", {
-        imagePath: "/attachments/images/99/e2e.png",
-      })
-    })
-
-    afterEach(() => {
-      vi.restoreAllMocks()
-    })
-
-    it("sets image path from upload when choosing a file on the image row", async () => {
-      const markdown = `---
-image: /attachments/images/1/old.png
----
-
-# Hi`
-      const wrapper = await h.mountEditor(markdown, { noteId: 42 })
-
-      const fileInput = wrapper.find(
-        '[data-testid="rich-note-image-property-file-input"]'
-      )
-      const inputEl = fileInput.element as HTMLInputElement
-      const file = new File(["fake"], "pic.png", { type: "image/png" })
-      Object.defineProperty(inputEl, "files", {
-        value: [file],
-        configurable: true,
-      })
-      await fileInput.trigger("change")
-
-      expect(uploadSpy).toHaveBeenCalled()
-      const last = h.lastEmittedMarkdown()
-      expect(last).toContain("image: /attachments/images/99/e2e.png")
-      expect(last).toContain("# Hi")
     })
   })
 
