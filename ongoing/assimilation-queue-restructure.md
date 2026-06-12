@@ -1,5 +1,7 @@
 # Assimilation queue restructure
 
+**Status: complete** (all 8 phases done).
+
 Follow-up to commit `d019af86fd` (property assimilation queue consumer). Addresses the
 review findings: subscription-cap bug, eager-sort performance regression, count/queue
 drift, construction shotgun surgery, Tell-Don't-Ask violations, naming, and file size.
@@ -127,7 +129,7 @@ Enables Phase 4 and removes the "add a unit kind = touch five layers" shotgun.
 - Update usages: `AssimilationSettings.vue`, `usePendingAssimilationProperty`,
   `useGoToNextAssimilation`, specs. Verified by existing frontend tests. Commit.
 
-### Phase 8 — Split oversized files (structure) [planned]
+### Phase 8 — Split oversized files (structure) [done]
 
 - `e2e_test/start/pageObjects/assimilationPage.ts` (373 lines) → cohesive modules by
   capability (e.g. assimilation flow vs memory-tracker expectations), stable import

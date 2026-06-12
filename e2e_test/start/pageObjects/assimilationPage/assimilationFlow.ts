@@ -1,60 +1,17 @@
-import { UserController } from '@generated/doughnut-backend-api/sdk.gen'
-import type { MenuDataDto } from '@generated/doughnut-backend-api'
 import { commonSenseSplit } from 'support/string_util'
-import { pageIsNotLoading } from '../pageBase'
-import { form } from '../forms'
-import { assumeMemoryTrackerPage } from './memoryTrackerPage'
-
-export const keepForRecallButton = (options?: { timeout?: number }) =>
-  cy.get('[data-test="keep-for-recall"]', options ?? {})
-
-const refinementSuggestionsPanel = () =>
-  cy
-    .get('[data-test="refine-note-modal"]')
-    .contains('Refinement suggestions:')
-    .closest('.bg-accent')
-
-const waitForExtractNote = () => {
-  cy.contains('p.loading-message', 'AI is creating note...', {
-    timeout: 15000,
-  }).should('not.exist')
-}
-
-const mainNoteHeadingTitleSelector =
-  '#main-note-content h2.path-name-heading [role=title], #main-note-content [data-test="note-title"]'
-
-const assimilationToastMessages = {
-  dailyGoalMet: "You've achieved your daily assimilation goal",
-  noMoreNotes: 'No more notes to assimilate',
-} as const
-
-function assimilationDueFromTriple(triple: string) {
-  const [assimilated, planned] = triple.split('/').map(Number)
-  return (planned ?? 0) - (assimilated ?? 0)
-}
-
-function expectSuccessToast(message: string) {
-  cy.contains('.Vue-Toastification__toast--success', message, {
-    timeout: 10000,
-  }).should('be.visible')
-}
-
-function propertyMemoryTrackerRowLabel(propertyKey: string) {
-  return `property: ${propertyKey}`
-}
-
-function waitForAssimilationNoteTitle(expectedTitle?: string) {
-  pageIsNotLoading()
-  cy.get('#main-note-content', { timeout: 15000 }).should('be.visible')
-  const title = cy.get(mainNoteHeadingTitleSelector, { timeout: 15000 })
-  if (expectedTitle !== undefined && expectedTitle.trim() !== '') {
-    title.should('contain', expectedTitle.trim())
-  } else {
-    title.should('exist')
-  }
-}
+import { pageIsNotLoading } from '../../pageBase'
+import { form } from '../../forms'
+import { assimilationPropertyMemoryTrackerExpectations } from './propertyMemoryTrackerExpectations'
+import {
+  keepForRecallButton,
+  mainNoteHeadingTitleSelector,
+  refinementSuggestionsPanel,
+  waitForAssimilationNoteTitle,
+  waitForExtractNote,
+} from './shared'
 
 export const assumeAssimilationPage = () => ({
+  ...assimilationPropertyMemoryTrackerExpectations(),
   expectAssimilationProgressSummary(triple: string) {
     cy.get('[data-test="assimilation-progress-summary"]')
       .should('be.visible')
@@ -283,91 +240,4 @@ export const assumeAssimilationPage = () => ({
     pageIsNotLoading()
     return this
   },
-  expectPropertyMemoryTracker(propertyKey: string, recallCount = 0) {
-    this.expectMemoryTrackerInfo([
-      {
-        type: propertyMemoryTrackerRowLabel(propertyKey),
-        'Recall Count': String(recallCount),
-      },
-    ])
-    return this
-  },
-  expectPropertyMemoryTrackerAbsent(propertyKey: string) {
-    cy.contains('tr', propertyMemoryTrackerRowLabel(propertyKey)).should(
-      'not.exist'
-    )
-    return this
-  },
-  openPropertyMemoryTracker(propertyKey: string) {
-    cy.contains('tr', propertyMemoryTrackerRowLabel(propertyKey)).click()
-    cy.url().should('include', '/memory-trackers/')
-    pageIsNotLoading()
-    return assumeMemoryTrackerPage()
-  },
-  expectMemoryTrackerInfo(expected: { [key: string]: string }[]) {
-    for (const k in expected) {
-      cy.contains('tr', expected[k]?.type ?? '').within(() => {
-        for (const attr in expected[k]) {
-          if (expected[k][attr] !== undefined) {
-            cy.contains('td', expected[k][attr])
-          }
-        }
-      })
-    }
-    return this
-  },
-  removeMemoryTrackerFromRecall(type: 'normal' | 'spelling') {
-    cy.contains('tr', type).click()
-    cy.url().should('include', '/memory-trackers/')
-    pageIsNotLoading()
-    return assumeMemoryTrackerPage().removeFromRecall()
-  },
 })
-
-export const assimilation = () => {
-  const getAssimilateListItemInSidebar = (
-    fn: ($el: Cypress.Chainable<JQuery<HTMLElement>>) => void
-  ) => cy.get('.main-menu').within(() => fn(cy.get('li[title="Assimilate"]')))
-
-  return {
-    expectCount(numberOfNotes: number) {
-      getAssimilateListItemInSidebar(($el) => {
-        $el.findByText(`${numberOfNotes}`, { selector: '.due-count' })
-      })
-      return this
-    },
-    expectAssimilationDueFromTriple(toAssimilateAndTotal: string) {
-      const expectedDue = assimilationDueFromTriple(toAssimilateAndTotal)
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-      cy.wrap(UserController.getMenuData({ query: { timezone } }), {
-        log: false,
-      }).then((menuData: MenuDataDto) => {
-        expect(menuData.assimilationCount?.dueCount ?? 0).to.eq(expectedDue)
-      })
-      return this
-    },
-    startAssimilationFromMenu() {
-      getAssimilateListItemInSidebar(($el) => {
-        $el.click()
-      })
-      pageIsNotLoading()
-      return this
-    },
-    expectDailyAssimilationGoalToast() {
-      expectSuccessToast(assimilationToastMessages.dailyGoalMet)
-      return this
-    },
-    expectNoMoreNotesToAssimilateToast() {
-      expectSuccessToast(assimilationToastMessages.noMoreNotes)
-      return this
-    },
-    expectAssimilationMenuProgress() {
-      getAssimilateListItemInSidebar(($el) => {
-        $el
-          .find('[data-testid="assimilation-menu-progress"]')
-          .should('be.visible')
-      })
-      return this
-    },
-  }
-}
