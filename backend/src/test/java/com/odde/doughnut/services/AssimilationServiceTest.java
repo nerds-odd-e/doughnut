@@ -255,6 +255,44 @@ public class AssimilationServiceTest {
   }
 
   @Nested
+  class QueueOrdering {
+    Notebook subscribedNotebook;
+
+    @BeforeEach
+    void setupSubscribedNotebook() {
+      User notebookOwner = makeMe.aUser().please();
+      subscribedNotebook = makeMe.aNotebook().creatorAndOwner(notebookOwner).please();
+      makeMe.aSubscription().forNotebook(subscribedNotebook).forUser(user).daily(10).please();
+    }
+
+    @Test
+    void owned_and_subscribed_notes_interleave_by_level_not_subscription_first() {
+      makeMe.aNote("subscribed").notebook(subscribedNotebook).level(5).please();
+      Note ownedNote = makeMe.aNote("owned").notebookOwnedBy(user).level(1).please();
+      makeMe.refresh(user);
+
+      assertThat(getNextNoteToAssimilate(assimilationService), equalTo(ownedNote));
+    }
+
+    @Test
+    void owned_and_subscribed_notes_interleave_by_created_at_when_levels_equal() {
+      Timestamp earlier = makeMe.aTimestamp().of(0, 8).fromShanghai().please();
+      Timestamp later = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
+      Note subscribedNote =
+          makeMe
+              .aNote("subscribed")
+              .notebook(subscribedNotebook)
+              .level(1)
+              .createdAt(earlier)
+              .please();
+      makeMe.aNote("owned").notebookOwnedBy(user).level(1).createdAt(later).please();
+      makeMe.refresh(user);
+
+      assertThat(getNextNoteToAssimilate(assimilationService), equalTo(subscribedNote));
+    }
+  }
+
+  @Nested
   class WhenRecalledMoreThanDailyLimitLastNight {
     Note note1;
     Note note2;

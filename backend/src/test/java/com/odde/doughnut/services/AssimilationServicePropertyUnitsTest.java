@@ -11,6 +11,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.time.ZoneId;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,6 +121,40 @@ class AssimilationServicePropertyUnitsTest {
     AssimilationUnit nextDay = day2Service.getNextAssimilationUnit().orElseThrow();
     assertThat(nextDay.note(), equalTo(note));
     assertThat(nextDay.propertyKey(), equalTo("example of"));
+  }
+
+  @Test
+  void note_level_unit_before_property_on_same_note() {
+    Note note =
+        makeMe
+            .aNote()
+            .notebookOwnedBy(user)
+            .content("---\nexample of: \"[[Word]]\"\n---\n\nbody")
+            .please();
+    notePropertyIndexService.refreshForNote(note);
+
+    AssimilationUnit next = assimilationService.getNextAssimilationUnit().orElseThrow();
+    assertThat(next.note(), equalTo(note));
+    assertThat(next.propertyKey(), nullValue());
+  }
+
+  @Test
+  void multiple_untracked_properties_ordered_by_property_key() {
+    Note note =
+        makeMe
+            .aNote()
+            .notebookOwnedBy(user)
+            .content("---\ntopic: physics\nexample of: \"[[Word]]\"\ndefinition: foo\n---\n\nbody")
+            .please();
+    notePropertyIndexService.refreshForNote(note);
+    makeMe.aMemoryTrackerFor(note).by(user).assimilatedAt(day1).please();
+
+    for (String expectedKey : List.of("definition", "example of", "topic")) {
+      AssimilationUnit next = assimilationService.getNextAssimilationUnit().orElseThrow();
+      assertThat(next.note(), equalTo(note));
+      assertThat(next.propertyKey(), equalTo(expectedKey));
+      makeMe.aMemoryTrackerFor(note).by(user).propertyKey(expectedKey).assimilatedAt(day1).please();
+    }
   }
 
   @Test

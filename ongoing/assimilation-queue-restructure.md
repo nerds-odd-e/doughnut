@@ -47,7 +47,7 @@ drift, construction shotgun surgery, Tell-Don't-Ask violations, naming, and file
   next day the property surfaces. `totalUnassimilatedCount` stays uncapped.
 - Commit → deploy gate.
 
-### Phase 2 — Pin queue ordering with regression tests (regression) [planned]
+### Phase 2 — Pin queue ordering with regression tests (regression) [done]
 
 Existing behavior, no automated test (skill: dedicated regression phase). Protects
 Phases 3–4.
