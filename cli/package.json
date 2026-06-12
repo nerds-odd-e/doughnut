@@ -41,7 +41,7 @@
     "@types/node": "25.9.3",
     "@types/react": "^19.2.17",
     "doughnut-test-fixtures": "workspace:*",
-    "esbuild": "0.28.0",
+    "esbuild": "0.28.1",
     "ink": "^7.0.5",
     "ink-testing-library": "^4.0.0",
     "tsx": "4.22.4",
