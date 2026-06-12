@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -44,27 +45,45 @@ public class AssimilationService {
   }
 
   public Optional<AssimilationUnit> getNextAssimilationUnit() {
-    return allCandidateUnits().sorted(AssimilationUnit.ORDER).findFirst();
+    List<Stream<AssimilationUnit>> ownedStreams =
+        unitSources.stream().map(source -> source.streamForUser(user)).toList();
+    try {
+      List<Optional<AssimilationUnit>> heads = new ArrayList<>();
+      ownedStreams.forEach(stream -> heads.add(headOf(stream)));
+
+      List<Integer> todaysAssimilatedNoteIds = assimilatedNoteIdsForToday();
+      getSubscriptionStream()
+          .forEach(
+              sub -> {
+                int budget =
+                    subscriptionService.needToLearnCountToday(sub, todaysAssimilatedNoteIds);
+                if (budget > 0) {
+                  heads.add(headOfSubscription(sub));
+                }
+              });
+
+      return minOf(heads);
+    } finally {
+      ownedStreams.forEach(Stream::close);
+    }
   }
 
-  private Stream<AssimilationUnit> allCandidateUnits() {
-    return Stream.of(subscriptionUnits(), ownedUnits()).flatMap(stream -> stream);
+  private Optional<AssimilationUnit> headOfSubscription(Subscription sub) {
+    List<Stream<AssimilationUnit>> streams =
+        unitSources.stream().map(source -> source.streamForSubscription(sub)).toList();
+    try {
+      return minOf(streams.stream().map(this::headOf).toList());
+    } finally {
+      streams.forEach(Stream::close);
+    }
   }
 
-  private Stream<AssimilationUnit> ownedUnits() {
-    return unitSources.stream().flatMap(source -> source.streamForUser(user));
+  private Optional<AssimilationUnit> headOf(Stream<AssimilationUnit> stream) {
+    return stream.findFirst();
   }
 
-  private Stream<AssimilationUnit> subscriptionUnits() {
-    List<Integer> todaysAssimilatedNoteIds = assimilatedNoteIdsForToday();
-    return getSubscriptionStream()
-        .flatMap(
-            sub -> {
-              int budget = subscriptionService.needToLearnCountToday(sub, todaysAssimilatedNoteIds);
-              Stream<AssimilationUnit> candidates =
-                  unitSources.stream().flatMap(source -> source.streamForSubscription(sub));
-              return candidates.sorted(AssimilationUnit.ORDER).limit(budget);
-            });
+  private Optional<AssimilationUnit> minOf(List<Optional<AssimilationUnit>> heads) {
+    return heads.stream().flatMap(Optional::stream).min(AssimilationUnit.ORDER);
   }
 
   private List<Integer> assimilatedNoteIdsForToday() {

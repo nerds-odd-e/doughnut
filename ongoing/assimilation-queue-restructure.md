@@ -82,7 +82,7 @@ Enables Phase 4 and removes the "add a unit kind = touch five layers" shotgun.
 - Verified externally unchanged: existing service/controller tests pass unmodified
   (except mechanical renames). Commit.
 
-### Phase 4 — Lazy "next": stop materializing the backlog (structure, performance) [planned]
+### Phase 4 — Lazy "next": stop materializing the backlog (structure, performance) [done]
 
 - Replace `allCandidateUnits().sorted(ORDER).findFirst()` with a min-over-heads merge:
   take the head of each SQL-ordered source stream (per-subscription merged streams from
