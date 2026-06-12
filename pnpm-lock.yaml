@@ -66,7 +66,7 @@ importers:
         version: 1.8.0
       '@badeball/cypress-cucumber-preprocessor':
         specifier: ^24.0.1
-        version: 24.0.1(@babel/core@7.29.7)(cypress@15.17.0)(typescript@6.0.3)
+        version: 24.0.1(@babel/core@7.29.7)(cypress@15.16.0)(typescript@6.0.3)
       '@bahmutov/cypress-esbuild-preprocessor':
         specifier: ^2.2.8
         version: 2.2.8(esbuild@0.28.0)
@@ -93,7 +93,7 @@ importers:
         version: 2.32.0(@opentelemetry/api@1.9.1)(core-js@3.49.0)
       '@testing-library/cypress':
         specifier: 10.1.3
-        version: 10.1.3(cypress@15.17.0)
+        version: 10.1.3(cypress@15.16.0)
       '@types/cypress-cucumber-preprocessor':
         specifier: ^4.0.5
         version: 4.0.5
@@ -104,11 +104,11 @@ importers:
         specifier: 25.9.3
         version: 25.9.3
       cypress:
-        specifier: 15.17.0
-        version: 15.17.0
+        specifier: 15.16.0
+        version: 15.16.0
       cypress-file-upload:
         specifier: ^5.0.8
-        version: 5.0.8(cypress@15.17.0)
+        version: 5.0.8(cypress@15.16.0)
       github_action_sound:
         specifier: ^1.0.8
         version: 1.0.8(canvas@3.2.3)
@@ -3320,8 +3320,8 @@ packages:
     peerDependencies:
       cypress: '>3.0.0'
 
-  cypress@15.17.0:
-    resolution: {integrity: sha512-WL5Gcqi1GaDWozBwXmkSAtOPafTsVSRS764iX6xvuz3DPzvBAxbkRyEi4BreVdVWxLDpiYRgZCyJUafBw44njw==}
+  cypress@15.16.0:
+    resolution: {integrity: sha512-fy0M0c9xDLEp4v9y7LLKFeAQhIdDsobxDSKpD3JcZpqQefjy9TSzEyVV3HA0zu7hUi0bGHlSYlI7ASub8wgR9A==}
     engines: {node: ^20.1.0 || ^22.0.0 || >=24.0.0}
     hasBin: true
 
@@ -7380,7 +7380,7 @@ snapshots:
       '@babel/helper-string-parser': 8.0.0-rc.6
       '@babel/helper-validator-identifier': 8.0.0-rc.6
 
-  '@badeball/cypress-cucumber-preprocessor@24.0.1(@babel/core@7.29.7)(cypress@15.17.0)(typescript@6.0.3)':
+  '@badeball/cypress-cucumber-preprocessor@24.0.1(@babel/core@7.29.7)(cypress@15.16.0)(typescript@6.0.3)':
     dependencies:
       '@cucumber/ci-environment': 13.0.0
       '@cucumber/cucumber': 12.9.0
@@ -7396,7 +7396,7 @@ snapshots:
       cli-table: 0.3.11
       common-ancestor-path: 2.0.0
       cosmiconfig: 9.0.2(typescript@6.0.3)
-      cypress: 15.17.0
+      cypress: 15.16.0
       debug: 4.4.3
       error-stack-parser: 2.1.4
       find-cypress-specs: 1.54.12(@babel/core@7.29.7)
@@ -8977,11 +8977,11 @@ snapshots:
 
   '@teppeis/multimaps@3.0.0': {}
 
-  '@testing-library/cypress@10.1.3(cypress@15.17.0)':
+  '@testing-library/cypress@10.1.3(cypress@15.16.0)':
     dependencies:
       '@babel/runtime': 7.29.7
       '@testing-library/dom': 10.4.1
-      cypress: 15.17.0
+      cypress: 15.16.0
 
   '@testing-library/dom@10.4.1':
     dependencies:
@@ -10031,11 +10031,11 @@ snapshots:
 
   csv-parse@5.6.0: {}
 
-  cypress-file-upload@5.0.8(cypress@15.17.0):
+  cypress-file-upload@5.0.8(cypress@15.16.0):
     dependencies:
-      cypress: 15.17.0
+      cypress: 15.16.0
 
-  cypress@15.17.0:
+  cypress@15.16.0:
     dependencies:
       '@cypress/request': 4.0.1
       '@cypress/xvfb': 1.2.4(supports-color@8.1.1)
