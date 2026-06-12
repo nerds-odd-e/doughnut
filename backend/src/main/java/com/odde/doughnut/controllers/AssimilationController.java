@@ -4,9 +4,11 @@ import com.odde.doughnut.controllers.dto.AssimilationNextDTO;
 import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.AssimilationService;
+import com.odde.doughnut.services.AssimilationUnit;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.MemoryTrackerService;
 import com.odde.doughnut.services.SubscriptionService;
+import com.odde.doughnut.services.UnassimilatedPropertyService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.TimezoneUtils;
@@ -26,6 +28,7 @@ class AssimilationController {
   private final MemoryTrackerService memoryTrackerService;
   private final SubscriptionService subscriptionService;
   private final UserService userService;
+  private final UnassimilatedPropertyService unassimilatedPropertyService;
 
   private final TestabilitySettings testabilitySettings;
 
@@ -37,21 +40,28 @@ class AssimilationController {
       SubscriptionService subscriptionService,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService,
-      UserService userService) {
+      UserService userService,
+      UnassimilatedPropertyService unassimilatedPropertyService) {
     this.memoryTrackerService = memoryTrackerService;
     this.subscriptionService = subscriptionService;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
     this.userService = userService;
+    this.unassimilatedPropertyService = unassimilatedPropertyService;
   }
 
   @GetMapping("/next")
   @Transactional(readOnly = true)
   public AssimilationNextDTO next(@RequestParam(value = "timezone") String timezone) {
     var scope = assimilationScope(timezone);
-    Optional<Note> nextNote = scope.service().getNextNoteToAssimilate();
+    Optional<AssimilationUnit> nextUnit = scope.service().getNextAssimilationUnit();
     return new AssimilationNextDTO(
-        nextNote.map(Note::getId).orElse(null), scope.service().getCounts());
+        nextUnit.map(unit -> unit.note().getId()).orElse(null),
+        nextUnit
+            .filter(AssimilationUnit::isPropertyLevel)
+            .map(AssimilationUnit::propertyKey)
+            .orElse(null),
+        scope.service().getCounts());
   }
 
   private record AssimilationScope(User user, AssimilationService service) {}
@@ -64,7 +74,12 @@ class AssimilationController {
     return new AssimilationScope(
         user,
         new AssimilationService(
-            user, userService, subscriptionService, currentUTCTimestamp, timeZone));
+            user,
+            userService,
+            subscriptionService,
+            unassimilatedPropertyService,
+            currentUTCTimestamp,
+            timeZone));
   }
 
   @PostMapping(path = "")

@@ -2,9 +2,11 @@ import { ref } from "vue"
 
 const showAssimilationSettings = ref(false)
 const pendingOnForNoteId = ref<number | null>(null)
+const pendingPropertyKey = ref<string | null>(null)
 
 function clearAssimilationView() {
   pendingOnForNoteId.value = null
+  pendingPropertyKey.value = null
   showAssimilationSettings.value = false
 }
 
@@ -12,8 +14,9 @@ export function useAssimilationView() {
   const isOnForNote = (noteId: number) =>
     showAssimilationSettings.value && pendingOnForNoteId.value === noteId
 
-  const requestOnFor = (noteId: number) => {
+  const requestOnFor = (noteId: number, propertyKey?: string | null) => {
     pendingOnForNoteId.value = noteId
+    pendingPropertyKey.value = propertyKey ?? null
     showAssimilationSettings.value = true
   }
 
@@ -36,6 +39,7 @@ export function useAssimilationView() {
   return {
     showAssimilationSettings,
     pendingOnForNoteId,
+    pendingPropertyKey,
     isOnForNote,
     requestOnFor,
     resetForNote,

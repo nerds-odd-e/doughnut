@@ -39,7 +39,7 @@ export function useGoToNextAssimilation() {
       showSuccessToast(DAILY_GOAL_TOAST)
     }
 
-    requestOnFor(data.nextNoteId)
+    requestOnFor(data.nextNoteId, data.nextPropertyKey)
     await router.push(noteShowLocation(data.nextNoteId))
     return true
   }

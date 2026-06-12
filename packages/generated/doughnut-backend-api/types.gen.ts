@@ -907,6 +907,7 @@ export type UserForOtherUserView = {
 
 export type AssimilationNextDto = {
     nextNoteId?: number;
+    nextPropertyKey?: string;
     counts?: AssimilationCountDto;
 };
 

@@ -34,6 +34,7 @@
                 class="daisy-collapse daisy-collapse-arrow border border-base-300 bg-base-200/50 rounded-lg"
               >
                 <input
+                  v-model="propertiesSectionOpen"
                   type="checkbox"
                   data-test="assimilation-properties-toggle"
                 />
@@ -45,9 +46,17 @@
                     <li
                       v-for="row in propertyRows"
                       :key="row.key"
+                      :ref="(el) => setPropertyRowRef(row.key, el)"
                       data-test="assimilation-property-row"
                       :data-property-key="row.key"
+                      :data-test-pending="
+                        isPendingProperty(row.key) ? 'true' : undefined
+                      "
                       class="flex flex-wrap items-center gap-2 gap-y-1 border-t border-base-300 pt-2 first:border-t-0 first:pt-0"
+                      :class="{
+                        'rounded bg-primary/10 ring-1 ring-primary/30':
+                          isPendingProperty(row.key),
+                      }"
                     >
                       <span class="font-medium shrink-0">{{ row.key }}</span>
                       <span
@@ -150,7 +159,8 @@ import {
   parseNoteContentMarkdown,
   sortedPropertyRowsFromRecord,
 } from "@/utils/noteContentFrontmatter"
-import { computed, ref, watch } from "vue"
+import { usePendingAssimilationProperty } from "@/composables/usePendingAssimilationProperty"
+import { computed, ref, toRef, watch } from "vue"
 
 const { note, noteInfoLoaded, keepForRecallDisabled } = defineProps<{
   note: Note
@@ -170,6 +180,8 @@ const showRefineNoteModal = ref(false)
 const refineNoteDialogRef = ref<HTMLDialogElement | null>(null)
 const noteInfoBarRef = ref<InstanceType<typeof NoteInfoBar> | null>(null)
 const assimilatingPropertyKey = ref<string | null>(null)
+const { propertiesSectionOpen, isPendingProperty, setPropertyRowRef } =
+  usePendingAssimilationProperty(toRef(() => note.id))
 useDaisyDialog(showRefineNoteModal, refineNoteDialogRef)
 
 const propertyRows = computed(() => {

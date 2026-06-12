@@ -20,6 +20,24 @@ Feature: Property memory tracker
     And I assimilate the property "topic" on the assimilation settings panel
 
   @disableOpenAiService
+  Scenario: Untracked example of property appears in assimilation queue
+    Given I am logged in as an existing user
+    And I have a notebook "Property queue" with a note "Kanji"
+    And I update note "Kanji" content using markdown to become:
+      """
+      ---
+      example of: "[[Sentence]]"
+      ---
+
+      Body.
+      """
+    And It's day 1, 8 hour
+    And I assimilated one note "Kanji" at the current time
+    When I start assimilation from the menu
+    Then I should see assimilation progress "1/2/2"
+    And I should see pending assimilation property "example of"
+
+  @disableOpenAiService
   Scenario: Note-level assimilation stays available after property-only assimilation
     Then the keep for recall button should be enabled
     When I keep for recall on the assimilation panel

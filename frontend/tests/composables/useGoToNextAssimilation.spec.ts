@@ -69,16 +69,36 @@ describe("useGoToNextAssimilation", () => {
     expect(assimilatedCountOfTheDay.value).toBe(1)
     expect(totalUnassimilatedCount.value).toBe(5)
 
-    const { showAssimilationSettings, pendingOnForNoteId } =
+    const { showAssimilationSettings, pendingOnForNoteId, pendingPropertyKey } =
       useAssimilationView()
     expect(showAssimilationSettings.value).toBe(true)
     expect(pendingOnForNoteId.value).toBe(42)
+    expect(pendingPropertyKey.value).toBeNull()
 
     expect(routerPush).toHaveBeenCalledWith({
       name: "noteShow",
       params: { noteId: "42" },
     })
     expect(showSuccessToast).not.toHaveBeenCalled()
+  })
+
+  it("stores pending property key when nextPropertyKey is returned", async () => {
+    mockSdkService(AssimilationController, "next", {
+      nextNoteId: 42,
+      nextPropertyKey: "example of",
+      counts: {
+        dueCount: 1,
+        assimilatedCountOfTheDay: 1,
+        totalUnassimilatedCount: 1,
+      },
+    })
+
+    const { goToNextAssimilation } = useGoToNextAssimilation()
+    await goToNextAssimilation()
+
+    const { pendingOnForNoteId, pendingPropertyKey } = useAssimilationView()
+    expect(pendingOnForNoteId.value).toBe(42)
+    expect(pendingPropertyKey.value).toBe("example of")
   })
 
   it("shows daily goal toast and navigates when dueCount is zero but next note exists", async () => {

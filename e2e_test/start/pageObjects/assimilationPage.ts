@@ -261,6 +261,19 @@ export const assumeAssimilationPage = () => ({
     })
     return this
   },
+  expectPendingAssimilationProperty(propertyKey: string) {
+    cy.get('[data-test="assimilation-properties-section"]').within(() => {
+      cy.get('[data-test="assimilation-properties-toggle"]').should(
+        'be.checked'
+      )
+      cy.get(
+        `[data-test="assimilation-property-row"][data-property-key="${propertyKey}"]`
+      )
+        .should('have.attr', 'data-test-pending', 'true')
+        .and('be.visible')
+    })
+    return this
+  },
   assimilateProperty(propertyKey: string) {
     cy.get(
       `[data-test="assimilation-property-row"][data-property-key="${propertyKey}"]`

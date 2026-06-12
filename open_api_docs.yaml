@@ -4741,6 +4741,8 @@ components:
         nextNoteId:
           type: integer
           format: int32
+        nextPropertyKey:
+          type: string
         counts:
           $ref: "#/components/schemas/AssimilationCountDTO"
     DummyForGeneratingTypes:

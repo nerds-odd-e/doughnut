@@ -26,6 +26,7 @@ public class AssimilationServiceTest {
   @Autowired MakeMe makeMe;
   @Autowired SubscriptionService subscriptionService;
   @Autowired UserService userService;
+  @Autowired UnassimilatedPropertyService unassimilatedPropertyService;
   User user;
   User anotherUser;
   Timestamp day1;
@@ -36,9 +37,17 @@ public class AssimilationServiceTest {
     user = makeMe.aUser().please();
     anotherUser = makeMe.aUser().please();
     day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
-    assimilationService =
-        new AssimilationService(
-            user, userService, subscriptionService, day1, ZoneId.of("Asia/Shanghai"));
+    assimilationService = assimilationServiceFor(user, day1);
+  }
+
+  private AssimilationService assimilationServiceFor(User forUser, Timestamp at) {
+    return new AssimilationService(
+        forUser,
+        userService,
+        subscriptionService,
+        unassimilatedPropertyService,
+        at,
+        ZoneId.of("Asia/Shanghai"));
   }
 
   @Test
@@ -158,9 +167,7 @@ public class AssimilationServiceTest {
       void theDailyCountShouldNotBeResetOnSameDayDifferentHour() {
         makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(day1).please();
         Timestamp day1_23 = makeMe.aTimestamp().of(1, 23).fromShanghai().please();
-        AssimilationService recallService =
-            new AssimilationService(
-                user, userService, subscriptionService, day1_23, ZoneId.of("Asia/Shanghai"));
+        AssimilationService recallService = assimilationServiceFor(user, day1_23);
         assertThat(getNextNoteToAssimilate(recallService), equalTo(note2));
       }
 
@@ -168,9 +175,7 @@ public class AssimilationServiceTest {
       void theDailyCountShouldBeResetOnNextDay() {
         makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(day1).please();
         Timestamp day2 = makeMe.aTimestamp().of(2, 1).fromShanghai().please();
-        AssimilationService recallService =
-            new AssimilationService(
-                user, userService, subscriptionService, day2, ZoneId.of("Asia/Shanghai"));
+        AssimilationService recallService = assimilationServiceFor(user, day2);
         assertThat(getNextNoteToAssimilate(recallService), equalTo(note2));
       }
     }
@@ -288,9 +293,7 @@ public class AssimilationServiceTest {
       makeMe.aMemoryTrackerFor(note3).by(user).assimilatedAt(earlyMorning).please();
 
       // Create service for early morning check
-      earlyMorningService =
-          new AssimilationService(
-              user, userService, subscriptionService, lateMorning, ZoneId.of("Asia/Shanghai"));
+      earlyMorningService = assimilationServiceFor(user, lateMorning);
     }
 
     @Test

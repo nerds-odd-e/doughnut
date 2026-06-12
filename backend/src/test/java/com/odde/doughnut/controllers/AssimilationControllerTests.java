@@ -9,6 +9,7 @@ import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.services.NotePropertyIndexService;
 import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +22,7 @@ class AssimilationControllerTests extends ControllerTestBase {
   @Autowired private NoteRepository noteRepository;
   @Autowired private MemoryTrackerRepository memoryTrackerRepository;
   @Autowired AssimilationController controller;
+  @Autowired NotePropertyIndexService notePropertyIndexService;
 
   @BeforeEach
   void setup() {
@@ -97,6 +99,26 @@ class AssimilationControllerTests extends ControllerTestBase {
     void notLoggedIn() {
       currentUser.setUser(null);
       assertThrows(ResponseStatusException.class, () -> controller.next("Asia/Shanghai"));
+    }
+
+    @Test
+    void returns_next_property_key_for_untracked_example_of() {
+      User user = currentUser.getUser();
+      Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
+      testabilitySettings.timeTravelTo(day1);
+      Note note =
+          makeMe
+              .aNote()
+              .notebookOwnedBy(user)
+              .content("---\nexample of: \"[[Word]]\"\n---\n\nbody")
+              .please();
+      notePropertyIndexService.refreshForNote(note);
+      makeMe.aMemoryTrackerFor(note).by(user).assimilatedAt(day1).please();
+
+      AssimilationNextDTO result = controller.next("Asia/Shanghai");
+      assertThat(result.getNextNoteId(), equalTo(note.getId()));
+      assertThat(result.getNextPropertyKey(), equalTo("example of"));
+      assertThat(result.getCounts().getTotalUnassimilatedCount(), equalTo(1));
     }
   }
 

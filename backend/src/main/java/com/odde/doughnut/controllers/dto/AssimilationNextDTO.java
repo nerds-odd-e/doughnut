@@ -7,5 +7,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class AssimilationNextDTO {
   private Integer nextNoteId;
+  private String nextPropertyKey;
   private AssimilationCountDTO counts;
 }

@@ -68,6 +68,15 @@ Then('I should see assimilation progress {string}', (triple: string) => {
   start.assumeAssimilationPage().expectAssimilationProgressSummary(triple)
 })
 
+Then(
+  'I should see pending assimilation property {string}',
+  (propertyKey: string) => {
+    start
+      .assumeAssimilationPage()
+      .expectPendingAssimilationProperty(propertyKey)
+  }
+)
+
 Then('I should see the daily assimilation goal toast', () => {
   start.assimilation().expectDailyAssimilationGoalToast()
 })
