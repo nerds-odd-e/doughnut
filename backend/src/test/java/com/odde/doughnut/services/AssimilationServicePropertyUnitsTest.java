@@ -24,9 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class AssimilationServicePropertyUnitsTest {
   @Autowired MakeMe makeMe;
-  @Autowired SubscriptionService subscriptionService;
-  @Autowired UserService userService;
-  @Autowired List<AssimilationUnitSource> unitSources;
+  @Autowired AssimilationServiceFactory assimilationServiceFactory;
   @Autowired NotePropertyIndexService notePropertyIndexService;
 
   User user;
@@ -41,8 +39,7 @@ class AssimilationServicePropertyUnitsTest {
   }
 
   private AssimilationService assimilationServiceFor(User forUser, Timestamp at) {
-    return new AssimilationService(
-        forUser, userService, subscriptionService, unitSources, at, ZoneId.of("Asia/Shanghai"));
+    return assimilationServiceFactory.create(forUser, at, ZoneId.of("Asia/Shanghai"));
   }
 
   @Test

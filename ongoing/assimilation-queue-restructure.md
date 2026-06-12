@@ -93,7 +93,7 @@ Enables Phase 4 and removes the "add a unit kind = touch five layers" shotgun.
   that single query, but the backlog itself is no longer fully materialized.
 - Verified externally unchanged. Commit.
 
-### Phase 5 — Collapse `AssimilationService` construction shotgun (structure) [planned]
+### Phase 5 — Collapse `AssimilationService` construction shotgun (structure) [done]
 
 - Spring-managed `AssimilationServiceFactory` (collaborators injected once) with
   `create(User, Timestamp, ZoneId)`; `AssimilationController`, `UserController`, and the

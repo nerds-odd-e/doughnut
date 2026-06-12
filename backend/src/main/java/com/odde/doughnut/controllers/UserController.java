@@ -8,12 +8,10 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
-import com.odde.doughnut.services.AssimilationService;
-import com.odde.doughnut.services.AssimilationUnitSource;
+import com.odde.doughnut.services.AssimilationServiceFactory;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.RecallService;
-import com.odde.doughnut.services.SubscriptionService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.TestAccessTokenResolver;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -38,8 +36,7 @@ class UserController {
   private final EntityPersister entityPersister;
   private final AuthorizationService authorizationService;
   private final UserService userService;
-  private final SubscriptionService subscriptionService;
-  private final List<AssimilationUnitSource> unitSources;
+  private final AssimilationServiceFactory assimilationServiceFactory;
   private final RecallService recallService;
   private final ConversationService conversationService;
   private final TestabilitySettings testabilitySettings;
@@ -50,8 +47,7 @@ class UserController {
       EntityPersister entityPersister,
       AuthorizationService authorizationService,
       UserService userService,
-      SubscriptionService subscriptionService,
-      List<AssimilationUnitSource> unitSources,
+      AssimilationServiceFactory assimilationServiceFactory,
       RecallService recallService,
       ConversationService conversationService,
       TestabilitySettings testabilitySettings,
@@ -59,8 +55,7 @@ class UserController {
     this.entityPersister = entityPersister;
     this.authorizationService = authorizationService;
     this.userService = userService;
-    this.subscriptionService = subscriptionService;
-    this.unitSources = unitSources;
+    this.assimilationServiceFactory = assimilationServiceFactory;
     this.recallService = recallService;
     this.conversationService = conversationService;
     this.testabilitySettings = testabilitySettings;
@@ -187,8 +182,7 @@ class UserController {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
     var assimilationService =
-        new AssimilationService(
-            user, userService, subscriptionService, unitSources, currentUTCTimestamp, timeZone);
+        assimilationServiceFactory.create(user, currentUTCTimestamp, timeZone);
     var assimilationCount = assimilationService.getCounts();
     var recallStatus = recallService.getDueMemoryTrackers(user, currentUTCTimestamp, timeZone, 0);
     var unreadConversations = conversationService.getUnreadConversations(user);

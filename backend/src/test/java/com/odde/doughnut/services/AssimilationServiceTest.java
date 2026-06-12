@@ -26,7 +26,7 @@ public class AssimilationServiceTest {
   @Autowired MakeMe makeMe;
   @Autowired SubscriptionService subscriptionService;
   @Autowired UserService userService;
-  @Autowired List<AssimilationUnitSource> unitSources;
+  @Autowired AssimilationServiceFactory assimilationServiceFactory;
   User user;
   User anotherUser;
   Timestamp day1;
@@ -41,8 +41,7 @@ public class AssimilationServiceTest {
   }
 
   private AssimilationService assimilationServiceFor(User forUser, Timestamp at) {
-    return new AssimilationService(
-        forUser, userService, subscriptionService, unitSources, at, ZoneId.of("Asia/Shanghai"));
+    return assimilationServiceFactory.create(forUser, at, ZoneId.of("Asia/Shanghai"));
   }
 
   @Test
