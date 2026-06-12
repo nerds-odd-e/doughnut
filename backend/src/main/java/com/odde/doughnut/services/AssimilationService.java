@@ -35,10 +35,6 @@ public class AssimilationService {
     this.timeZone = timeZone;
   }
 
-  private Stream<Note> getDueNoteToAssimilate(Stream<Note> notes, int count) {
-    return notes.limit(count);
-  }
-
   private Stream<Subscription> getSubscriptionStream() {
     return user.getSubscriptions().stream();
   }
@@ -66,30 +62,25 @@ public class AssimilationService {
 
   private Stream<AssimilationUnit> allCandidateUnits() {
     return Stream.of(
-            subscriptionNoteUnits(),
+            subscriptionUnits(),
             userService.getUnassimilatedNotes(user).map(AssimilationUnit::forNote),
-            unassimilatedPropertyService.streamUnassimilatedPropertiesForUser(user),
-            subscriptionPropertyUnits())
+            unassimilatedPropertyService.streamUnassimilatedPropertiesForUser(user))
         .flatMap(stream -> stream);
   }
 
-  private Stream<AssimilationUnit> subscriptionNoteUnits() {
+  private Stream<AssimilationUnit> subscriptionUnits() {
     List<Integer> todaysAssimilatedNoteIds = assimilatedNoteIdsForToday();
     return getSubscriptionStream()
         .flatMap(
-            sub ->
-                getDueNoteToAssimilate(
-                        subscriptionService.getUnassimilatedNotes(sub),
-                        subscriptionService.needToLearnCountToday(sub, todaysAssimilatedNoteIds))
-                    .map(AssimilationUnit::forNote));
-  }
-
-  private Stream<AssimilationUnit> subscriptionPropertyUnits() {
-    return getSubscriptionStream()
-        .flatMap(
-            sub ->
-                unassimilatedPropertyService.streamUnassimilatedPropertiesForNotebook(
-                    user, sub.getNotebook().getId()));
+            sub -> {
+              int budget = subscriptionService.needToLearnCountToday(sub, todaysAssimilatedNoteIds);
+              Stream<AssimilationUnit> candidates =
+                  Stream.concat(
+                      subscriptionService.getUnassimilatedNotes(sub).map(AssimilationUnit::forNote),
+                      unassimilatedPropertyService.streamUnassimilatedPropertiesForNotebook(
+                          user, sub.getNotebook().getId()));
+              return candidates.sorted(AssimilationUnit.ORDER).limit(budget);
+            });
   }
 
   private List<Integer> assimilatedNoteIdsForToday() {
