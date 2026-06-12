@@ -14,7 +14,7 @@ buildscript {
 
 plugins {
   id 'java'
-  id 'org.springframework.boot' version '4.0.6'
+  id 'org.springframework.boot' version '4.0.7'
   // Spotless for the code style
   id "com.diffplug.spotless" version "8.6.0"
   id "com.github.ben-manes.versions" version "0.54.0"
@@ -73,7 +73,7 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-security'
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
   implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:3.0.3'
-  implementation 'com.openai:openai-java:4.38.0'
+  implementation 'com.openai:openai-java:4.39.1'
   implementation 'org.yaml:snakeyaml:2.6'
   // RxJava2 for Flowable streaming support
   implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
