@@ -10,18 +10,18 @@ import org.springframework.data.repository.query.Param;
 
 public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyIndex, Integer> {
 
-  String untrackedJoinMemoryTracker =
+  String unassimilatedJoinMemoryTracker =
       " LEFT JOIN n.memoryTrackers mt ON mt.user.id = :userId"
           + " AND mt.deletedAt IS NULL"
           + " AND COALESCE(mt.spelling, FALSE) = FALSE"
           + " AND mt.propertyKey = i.propertyKey";
 
-  String untrackedWhereClause =
+  String unassimilatedWhereClause =
       " WHERE mt IS NULL"
           + " AND COALESCE(n.recallSetting.skipMemoryTracking, FALSE) = FALSE"
           + " AND n.deletedAt IS NULL ";
 
-  String untrackedOrderBy = " ORDER BY n.recallSetting.level, n.createdAt, n.id, i.propertyKey";
+  String unassimilatedOrderBy = " ORDER BY n.recallSetting.level, n.createdAt, n.id, i.propertyKey";
 
   @Modifying
   @Query("DELETE FROM NotePropertyIndex i WHERE i.note.id = :noteId")
@@ -34,9 +34,9 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
           "SELECT COUNT(i) FROM NotePropertyIndex i"
               + " JOIN i.note n"
               + " JOIN n.notebook nb ON nb.ownership.id = :ownershipId"
-              + untrackedJoinMemoryTracker
-              + untrackedWhereClause)
-  int countUntrackedPropertiesForOwnership(
+              + unassimilatedJoinMemoryTracker
+              + unassimilatedWhereClause)
+  int countUnassimilatedPropertiesForOwnership(
       @Param("userId") Integer userId, @Param("ownershipId") Integer ownershipId);
 
   @Query(
@@ -44,10 +44,10 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
           "SELECT COUNT(i) FROM NotePropertyIndex i"
               + " JOIN i.note n"
               + " JOIN n.notebook nb"
-              + untrackedJoinMemoryTracker
-              + untrackedWhereClause
+              + unassimilatedJoinMemoryTracker
+              + unassimilatedWhereClause
               + " AND nb.id = :notebookId")
-  int countUntrackedPropertiesForNotebook(
+  int countUnassimilatedPropertiesForNotebook(
       @Param("userId") Integer userId, @Param("notebookId") Integer notebookId);
 
   @Query(
@@ -55,10 +55,10 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
           "SELECT i FROM NotePropertyIndex i"
               + " JOIN FETCH i.note n"
               + " JOIN n.notebook nb ON nb.ownership.id = :ownershipId"
-              + untrackedJoinMemoryTracker
-              + untrackedWhereClause
-              + untrackedOrderBy)
-  Stream<NotePropertyIndex> streamUntrackedPropertiesForOwnership(
+              + unassimilatedJoinMemoryTracker
+              + unassimilatedWhereClause
+              + unassimilatedOrderBy)
+  Stream<NotePropertyIndex> streamUnassimilatedPropertiesForOwnership(
       @Param("userId") Integer userId, @Param("ownershipId") Integer ownershipId);
 
   @Query(
@@ -66,10 +66,10 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
           "SELECT i FROM NotePropertyIndex i"
               + " JOIN FETCH i.note n"
               + " JOIN n.notebook nb"
-              + untrackedJoinMemoryTracker
-              + untrackedWhereClause
+              + unassimilatedJoinMemoryTracker
+              + unassimilatedWhereClause
               + " AND nb.id = :notebookId"
-              + untrackedOrderBy)
-  Stream<NotePropertyIndex> streamUntrackedPropertiesForNotebook(
+              + unassimilatedOrderBy)
+  Stream<NotePropertyIndex> streamUnassimilatedPropertiesForNotebook(
       @Param("userId") Integer userId, @Param("notebookId") Integer notebookId);
 }

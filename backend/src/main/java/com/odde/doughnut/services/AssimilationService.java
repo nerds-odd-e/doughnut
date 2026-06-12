@@ -16,7 +16,7 @@ public class AssimilationService {
   private final User user;
   private final UserService userService;
   private final SubscriptionService subscriptionService;
-  private final UnassimilatedPropertyService unassimilatedPropertyService;
+  private final List<AssimilationUnitSource> unitSources;
   private final Timestamp currentUTCTimestamp;
   private final ZoneId timeZone;
 
@@ -24,13 +24,13 @@ public class AssimilationService {
       User user,
       UserService userService,
       SubscriptionService subscriptionService,
-      UnassimilatedPropertyService unassimilatedPropertyService,
+      List<AssimilationUnitSource> unitSources,
       Timestamp currentUTCTimestamp,
       ZoneId timeZone) {
     this.user = user;
     this.userService = userService;
     this.subscriptionService = subscriptionService;
-    this.unassimilatedPropertyService = unassimilatedPropertyService;
+    this.unitSources = unitSources;
     this.currentUTCTimestamp = currentUTCTimestamp;
     this.timeZone = timeZone;
   }
@@ -44,28 +44,15 @@ public class AssimilationService {
   }
 
   public Optional<AssimilationUnit> getNextAssimilationUnit() {
-    int remainingDailyCount = getRemainingDailyAssimilationCount();
-    if (remainingDailyCount > 0) {
-      return unitsEligibleToAssimilate(remainingDailyCount).findFirst();
-    }
-    return unitsEligiblePastUserDailyCap().findFirst();
-  }
-
-  private Stream<AssimilationUnit> unitsEligibleToAssimilate(int remainingDailyCount) {
-    return allCandidateUnits().sorted(AssimilationUnit.ORDER).limit(remainingDailyCount);
-  }
-
-  /** Subscription daily limits still apply; only the user's daily cap is ignored. */
-  private Stream<AssimilationUnit> unitsEligiblePastUserDailyCap() {
-    return allCandidateUnits().sorted(AssimilationUnit.ORDER);
+    return allCandidateUnits().sorted(AssimilationUnit.ORDER).findFirst();
   }
 
   private Stream<AssimilationUnit> allCandidateUnits() {
-    return Stream.of(
-            subscriptionUnits(),
-            userService.getUnassimilatedNotes(user).map(AssimilationUnit::forNote),
-            unassimilatedPropertyService.streamUnassimilatedPropertiesForUser(user))
-        .flatMap(stream -> stream);
+    return Stream.of(subscriptionUnits(), ownedUnits()).flatMap(stream -> stream);
+  }
+
+  private Stream<AssimilationUnit> ownedUnits() {
+    return unitSources.stream().flatMap(source -> source.streamForUser(user));
   }
 
   private Stream<AssimilationUnit> subscriptionUnits() {
@@ -75,10 +62,7 @@ public class AssimilationService {
             sub -> {
               int budget = subscriptionService.needToLearnCountToday(sub, todaysAssimilatedNoteIds);
               Stream<AssimilationUnit> candidates =
-                  Stream.concat(
-                      subscriptionService.getUnassimilatedNotes(sub).map(AssimilationUnit::forNote),
-                      unassimilatedPropertyService.streamUnassimilatedPropertiesForNotebook(
-                          user, sub.getNotebook().getId()));
+                  unitSources.stream().flatMap(source -> source.streamForSubscription(sub));
               return candidates.sorted(AssimilationUnit.ORDER).limit(budget);
             });
   }
@@ -90,29 +74,26 @@ public class AssimilationService {
         .toList();
   }
 
-  private int getRemainingDailyAssimilationCount() {
-    return user.getDailyAssimilationCount() - getAssimilatedCountOfTheDay();
-  }
-
   public AssimilationCountDTO getCounts() {
     AssimilationCounter counter =
         new AssimilationCounter(
-            calculateSubscribedCount(),
-            userService.getUnassimilatedNoteCount(user)
-                + unassimilatedPropertyService.countUnassimilatedPropertiesForUser(user),
+            calculateSubscribedUnitCount(),
+            calculateOwnedUnitCount(),
             getAssimilatedCountOfTheDay(),
             user.getDailyAssimilationCount());
     return counter.toDTO();
   }
 
-  private int calculateSubscribedCount() {
-    return getSubscriptionStream()
-        .mapToInt(
-            sub ->
-                subscriptionService.getUnassimilatedNoteCount(sub)
-                    + unassimilatedPropertyService.countUnassimilatedPropertiesForNotebook(
-                        user, sub.getNotebook().getId()))
-        .sum();
+  private int calculateSubscribedUnitCount() {
+    return getSubscriptionStream().mapToInt(this::subscribedUnitCount).sum();
+  }
+
+  private int subscribedUnitCount(Subscription subscription) {
+    return unitSources.stream().mapToInt(source -> source.countForSubscription(subscription)).sum();
+  }
+
+  private int calculateOwnedUnitCount() {
+    return unitSources.stream().mapToInt(source -> source.countForUser(user)).sum();
   }
 
   private int getAssimilatedCountOfTheDay() {

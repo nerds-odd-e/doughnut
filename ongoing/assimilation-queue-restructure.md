@@ -24,7 +24,7 @@ drift, construction shotgun surgery, Tell-Don't-Ask violations, naming, and file
 
 - SQL ordering of every source stream already matches `AssimilationUnit.ORDER`:
   `NoteRepository.recallOrderByDate` = `level, createdAt, id`;
-  `NotePropertyIndexRepository.untrackedOrderBy` = `level, createdAt, id, propertyKey`.
+  `NotePropertyIndexRepository.unassimilatedOrderBy` = `level, createdAt, id, propertyKey`.
   → a lazy min-over-stream-heads "next" is correct without in-memory sorting.
 - `note.level` is `tinyint NOT NULL DEFAULT 0` (baseline migration) → no comparator
   NPE risk; no null-safety change needed (review finding #5 closed, no action).
@@ -59,7 +59,7 @@ Phases 3–4.
   - Multiple untracked properties on one note ordered by `propertyKey`.
 - No production change expected. Commit.
 
-### Phase 3 — One candidate-source seam; kill count/queue parallel wiring (structure) [planned]
+### Phase 3 — One candidate-source seam; kill count/queue parallel wiring (structure) [done]
 
 Enables Phase 4 and removes the "add a unit kind = touch five layers" shotgun.
 

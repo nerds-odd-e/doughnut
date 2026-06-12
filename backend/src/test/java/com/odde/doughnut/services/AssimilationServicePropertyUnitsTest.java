@@ -26,7 +26,7 @@ class AssimilationServicePropertyUnitsTest {
   @Autowired MakeMe makeMe;
   @Autowired SubscriptionService subscriptionService;
   @Autowired UserService userService;
-  @Autowired UnassimilatedPropertyService unassimilatedPropertyService;
+  @Autowired List<AssimilationUnitSource> unitSources;
   @Autowired NotePropertyIndexService notePropertyIndexService;
 
   User user;
@@ -42,12 +42,7 @@ class AssimilationServicePropertyUnitsTest {
 
   private AssimilationService assimilationServiceFor(User forUser, Timestamp at) {
     return new AssimilationService(
-        forUser,
-        userService,
-        subscriptionService,
-        unassimilatedPropertyService,
-        at,
-        ZoneId.of("Asia/Shanghai"));
+        forUser, userService, subscriptionService, unitSources, at, ZoneId.of("Asia/Shanghai"));
   }
 
   @Test

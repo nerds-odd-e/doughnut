@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.NotePropertyIndex;
+import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NotePropertyIndexRepository;
 import java.util.stream.Stream;
@@ -16,25 +17,26 @@ public class UnassimilatedPropertyService {
   }
 
   public int countUnassimilatedPropertiesForUser(User user) {
-    return notePropertyIndexRepository.countUntrackedPropertiesForOwnership(
+    return notePropertyIndexRepository.countUnassimilatedPropertiesForOwnership(
         user.getId(), user.getOwnership().getId());
   }
 
-  public int countUnassimilatedPropertiesForNotebook(User user, Integer notebookId) {
-    return notePropertyIndexRepository.countUntrackedPropertiesForNotebook(
-        user.getId(), notebookId);
+  public int countUnassimilatedPropertiesForSubscription(Subscription subscription) {
+    return notePropertyIndexRepository.countUnassimilatedPropertiesForNotebook(
+        subscription.getUser().getId(), subscription.getNotebook().getId());
   }
 
   public Stream<AssimilationUnit> streamUnassimilatedPropertiesForUser(User user) {
     return notePropertyIndexRepository
-        .streamUntrackedPropertiesForOwnership(user.getId(), user.getOwnership().getId())
+        .streamUnassimilatedPropertiesForOwnership(user.getId(), user.getOwnership().getId())
         .map(UnassimilatedPropertyService::toPropertyUnit);
   }
 
-  public Stream<AssimilationUnit> streamUnassimilatedPropertiesForNotebook(
-      User user, Integer notebookId) {
+  public Stream<AssimilationUnit> streamUnassimilatedPropertiesForSubscription(
+      Subscription subscription) {
     return notePropertyIndexRepository
-        .streamUntrackedPropertiesForNotebook(user.getId(), notebookId)
+        .streamUnassimilatedPropertiesForNotebook(
+            subscription.getUser().getId(), subscription.getNotebook().getId())
         .map(UnassimilatedPropertyService::toPropertyUnit);
   }
 

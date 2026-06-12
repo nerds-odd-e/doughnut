@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -97,14 +98,15 @@ class UnassimilatedPropertyServiceTest {
             .content("---\nexample of: \"[[Word]]\"\n---\n\nbody")
             .please();
     notePropertyIndexService.refreshForNote(note);
+    makeMe.refresh(subscriber);
 
+    Subscription subscription = subscriber.getSubscriptions().stream().findFirst().orElseThrow();
     assertThat(
-        unassimilatedPropertyService.countUnassimilatedPropertiesForNotebook(
-            subscriber, notebook.getId()),
+        unassimilatedPropertyService.countUnassimilatedPropertiesForSubscription(subscription),
         equalTo(1));
     List<AssimilationUnit> pending =
         unassimilatedPropertyService
-            .streamUnassimilatedPropertiesForNotebook(subscriber, notebook.getId())
+            .streamUnassimilatedPropertiesForSubscription(subscription)
             .toList();
     assertThat(pending, hasSize(1));
     assertThat(pending.get(0).propertyKey(), equalTo("example of"));

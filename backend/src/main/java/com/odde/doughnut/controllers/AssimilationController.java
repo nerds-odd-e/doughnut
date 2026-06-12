@@ -5,10 +5,10 @@ import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.AssimilationService;
 import com.odde.doughnut.services.AssimilationUnit;
+import com.odde.doughnut.services.AssimilationUnitSource;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.MemoryTrackerService;
 import com.odde.doughnut.services.SubscriptionService;
-import com.odde.doughnut.services.UnassimilatedPropertyService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.TimezoneUtils;
@@ -28,7 +28,7 @@ class AssimilationController {
   private final MemoryTrackerService memoryTrackerService;
   private final SubscriptionService subscriptionService;
   private final UserService userService;
-  private final UnassimilatedPropertyService unassimilatedPropertyService;
+  private final List<AssimilationUnitSource> unitSources;
 
   private final TestabilitySettings testabilitySettings;
 
@@ -41,13 +41,13 @@ class AssimilationController {
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService,
       UserService userService,
-      UnassimilatedPropertyService unassimilatedPropertyService) {
+      List<AssimilationUnitSource> unitSources) {
     this.memoryTrackerService = memoryTrackerService;
     this.subscriptionService = subscriptionService;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
     this.userService = userService;
-    this.unassimilatedPropertyService = unassimilatedPropertyService;
+    this.unitSources = unitSources;
   }
 
   @GetMapping("/next")
@@ -74,12 +74,7 @@ class AssimilationController {
     return new AssimilationScope(
         user,
         new AssimilationService(
-            user,
-            userService,
-            subscriptionService,
-            unassimilatedPropertyService,
-            currentUTCTimestamp,
-            timeZone));
+            user, userService, subscriptionService, unitSources, currentUTCTimestamp, timeZone));
   }
 
   @PostMapping(path = "")

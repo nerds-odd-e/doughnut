@@ -3,21 +3,21 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.controllers.dto.AssimilationCountDTO;
 
 public class AssimilationCounter {
-  private final int subscribedCount;
-  private final int userCount;
+  private final int subscribedUnitCount;
+  private final int ownedUnitCount;
   private final int assimilatedToday;
   private final int dailyLimit;
 
   public AssimilationCounter(
-      int subscribedCount, int userCount, int assimilatedToday, int dailyLimit) {
-    this.subscribedCount = subscribedCount;
-    this.userCount = userCount;
+      int subscribedUnitCount, int ownedUnitCount, int assimilatedToday, int dailyLimit) {
+    this.subscribedUnitCount = subscribedUnitCount;
+    this.ownedUnitCount = ownedUnitCount;
     this.assimilatedToday = assimilatedToday;
     this.dailyLimit = dailyLimit;
   }
 
   public int getTotalUnassimilated() {
-    return subscribedCount + userCount;
+    return subscribedUnitCount + ownedUnitCount;
   }
 
   public int getDueCount() {
