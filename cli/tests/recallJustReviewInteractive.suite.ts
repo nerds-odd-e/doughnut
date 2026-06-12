@@ -108,7 +108,10 @@ export type RecallJustReviewInteractiveApi = {
 export function describeRecallJustReviewInteractive(
   register: (api: RecallJustReviewInteractiveApi) => void
 ): void {
-  describe('recall just-review (interactive)', () => {
+  // These Ink interactive tests advance via frame-tick polling waits; the
+  // default 5s per-test timeout is too tight under full-suite parallel load
+  // (CPU contention) and flakes. Give the whole suite a generous timeout.
+  describe('recall just-review (interactive)', { timeout: 30_000 }, () => {
     let configDir: string
     let savedConfigDir: string | undefined
     let recallingSpy: ReturnType<typeof vi.spyOn>

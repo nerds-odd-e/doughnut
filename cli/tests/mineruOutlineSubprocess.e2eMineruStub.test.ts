@@ -68,5 +68,8 @@ describe('mineru_book_outline.py with E2E shadow mineru (PYTHONPATH)', () => {
     expect(firstBodyBlock?.type).toBe('text')
     expect(firstBodyBlock?.text_level).toBeUndefined()
     expect(firstBodyBlock?.text).toMatch(/^Refactoring is often explained/)
-  })
+    // Spawns a real python3 subprocess; the default 5s per-test timeout is too
+    // tight under full-suite parallel load (cold interpreter start + CPU
+    // contention), so this test flakes. Give it a generous explicit timeout.
+  }, 30_000)
 })

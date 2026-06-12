@@ -164,8 +164,8 @@ importers:
         specifier: workspace:*
         version: link:../packages/doughnut-api
       markdansi:
-        specifier: 0.2.1
-        version: 0.2.1
+        specifier: 0.3.0
+        version: 0.3.0
       react:
         specifier: ^19.2.7
         version: 19.2.7
@@ -4896,8 +4896,8 @@ packages:
   mark.js@8.11.1:
     resolution: {integrity: sha512-1I+1qpDt4idfgLQG+BNWmrqku+7/2bi5nLf4YwF8y8zXvmfiTBY3PV3ZibfrjBueCByROpuBjLLFCajqkgYoLQ==}
 
-  markdansi@0.2.1:
-    resolution: {integrity: sha512-ri9ce2cmpcbL0A0FJ5a3WtIxMBRE8fPNEnSAz1CZGCfZ7MazmBEGmreOpBhXiaQZ31FXT+GYUi+86bxYpCTo8w==}
+  markdansi@0.3.0:
+    resolution: {integrity: sha512-M6Nc2awN0jCBWcMO79ahKmel5IksN0qcHtIeokJhJPVgfaH8SJF2sf4XEuK8xCtmNhNO1Tod6pZL+7+2E9x77w==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -11915,7 +11915,7 @@ snapshots:
 
   mark.js@8.11.1: {}
 
-  markdansi@0.2.1:
+  markdansi@0.3.0:
     dependencies:
       chalk: 5.6.2
       mdast-util-from-markdown: 2.0.3
@@ -11923,6 +11923,7 @@ snapshots:
       micromark: 4.0.2
       micromark-extension-gfm: 3.0.0
       micromark-util-combine-extensions: 2.0.1
+      slice-ansi: 9.0.0
       string-width: 8.2.1
       strip-ansi: 7.2.0
       supports-hyperlinks: 4.4.0
