@@ -117,7 +117,7 @@ Enables Phase 4 and removes the "add a unit kind = touch five layers" shotgun.
 - Lowest-risk point to stop before: Phases 7–8 don't depend on it.
 - Commit → deploy gate.
 
-### Phase 7 — Frontend assimilation-view naming (structure) [planned]
+### Phase 7 — Frontend assimilation-view naming (structure) [done]
 
 - `useAssimilationView`: `requestOnFor` → `openForNote(noteId, pendingPropertyKey?)`,
   `pendingOnForNoteId` → `targetNoteId`, `isOnForNote` → `isOpenForNote` (keep

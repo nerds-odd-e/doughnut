@@ -114,7 +114,7 @@ const emit = defineEmits<{
   (e: "close-dialog"): void
 }>()
 
-const { toggle, isOnForNote } = useAssimilationView()
+const { toggle, isOpenForNote } = useAssimilationView()
 const noteId = computed(() => props.note.id)
 const noteTitle = computed(() => props.note.noteTopology.title)
 const { deleteNote, isDeletingNote, deleteLoadingMessage } = useNoteDeleteFlow(
@@ -122,7 +122,7 @@ const { deleteNote, isDeletingNote, deleteLoadingMessage } = useNoteDeleteFlow(
   noteTitle
 )
 
-const assimilationChecked = computed(() => isOnForNote(props.note.id))
+const assimilationChecked = computed(() => isOpenForNote(props.note.id))
 
 const onAssimilationToggle = () => {
   toggle(props.note.id)

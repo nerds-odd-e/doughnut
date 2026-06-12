@@ -10,10 +10,10 @@ import {
 export function usePendingAssimilationProperty(noteId: Ref<number>) {
   const propertiesSectionOpen = ref(false)
   const propertyRowElements = new Map<string, HTMLElement>()
-  const { pendingOnForNoteId, pendingPropertyKey } = useAssimilationView()
+  const { targetNoteId, pendingPropertyKey } = useAssimilationView()
 
   const isPendingProperty = (propertyKey: string) =>
-    pendingOnForNoteId.value === noteId.value &&
+    targetNoteId.value === noteId.value &&
     pendingPropertyKey.value === propertyKey
 
   const setPropertyRowRef = (
@@ -29,7 +29,7 @@ export function usePendingAssimilationProperty(noteId: Ref<number>) {
 
   const scrollPendingPropertyIntoView = async () => {
     const key = pendingPropertyKey.value
-    if (pendingOnForNoteId.value !== noteId.value || !key) {
+    if (targetNoteId.value !== noteId.value || !key) {
       return
     }
     propertiesSectionOpen.value = true
@@ -41,7 +41,7 @@ export function usePendingAssimilationProperty(noteId: Ref<number>) {
   }
 
   watch(
-    [pendingPropertyKey, pendingOnForNoteId, noteId],
+    [pendingPropertyKey, targetNoteId, noteId],
     () => {
       scrollPendingPropertyIntoView().catch(() => undefined)
     },

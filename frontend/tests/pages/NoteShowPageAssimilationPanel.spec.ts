@@ -22,7 +22,7 @@ describe("note show page inline assimilation panel", () => {
 
   it("keeps assimilation settings within main column when sidebar is open", async () => {
     await withStubbedInnerWidth(1024, async () => {
-      useAssimilationView().requestOnFor(noteRealm.id)
+      useAssimilationView().openForNote(noteRealm.id)
 
       helper
         .component(NoteShowPageWithNotebookSidebarLayout)
@@ -49,7 +49,7 @@ describe("note show page inline assimilation panel", () => {
   })
 
   it("renders keep-for-recall when assimilation settings are on", async () => {
-    useAssimilationView().requestOnFor(noteRealm.id)
+    useAssimilationView().openForNote(noteRealm.id)
 
     const wrapper = helper
       .component(NoteShowPageWithNotebookSidebarLayout)

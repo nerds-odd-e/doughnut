@@ -6,10 +6,7 @@ import {
   useGoToNextAssimilation,
 } from "@/composables/useGoToNextAssimilation"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
-import {
-  resetAssimilationViewForTests,
-  useAssimilationView,
-} from "@/composables/useAssimilationView"
+import { useAssimilationView } from "@/composables/useAssimilationView"
 import { mockSdkService } from "@tests/helpers"
 
 const routerPush = vi.fn()
@@ -38,7 +35,7 @@ describe("useGoToNextAssimilation", () => {
   beforeEach(() => {
     routerPush.mockReset()
     showSuccessToast.mockReset()
-    resetAssimilationViewForTests()
+    useAssimilationView().dismiss()
     const {
       setDueCount,
       setAssimilatedCountOfTheDay,
@@ -69,10 +66,10 @@ describe("useGoToNextAssimilation", () => {
     expect(assimilatedCountOfTheDay.value).toBe(1)
     expect(totalUnassimilatedCount.value).toBe(5)
 
-    const { showAssimilationSettings, pendingOnForNoteId, pendingPropertyKey } =
+    const { showAssimilationSettings, targetNoteId, pendingPropertyKey } =
       useAssimilationView()
     expect(showAssimilationSettings.value).toBe(true)
-    expect(pendingOnForNoteId.value).toBe(42)
+    expect(targetNoteId.value).toBe(42)
     expect(pendingPropertyKey.value).toBeNull()
 
     expect(routerPush).toHaveBeenCalledWith({
@@ -95,8 +92,8 @@ describe("useGoToNextAssimilation", () => {
     const { goToNextAssimilation } = useGoToNextAssimilation()
     await goToNextAssimilation()
 
-    const { pendingOnForNoteId, pendingPropertyKey } = useAssimilationView()
-    expect(pendingOnForNoteId.value).toBe(42)
+    const { targetNoteId, pendingPropertyKey } = useAssimilationView()
+    expect(targetNoteId.value).toBe(42)
     expect(pendingPropertyKey.value).toBe("example of")
   })
 

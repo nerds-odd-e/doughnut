@@ -8,10 +8,7 @@ import RenderingHelper from "@tests/helpers/RenderingHelper"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
-import {
-  resetAssimilationViewForTests,
-  useAssimilationView,
-} from "@/composables/useAssimilationView"
+import { useAssimilationView } from "@/composables/useAssimilationView"
 import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
 import { setupGlobalClient } from "@/managedApi/clientSetup"
 
@@ -34,7 +31,7 @@ afterEach(() => {
 })
 
 beforeEach(() => {
-  resetAssimilationViewForTests()
+  useAssimilationView().dismiss()
   usePopups().popups.register({ popupInfo: [] })
   setupGlobalClient(apiStatus)
   mockToast.error.mockClear()
@@ -89,10 +86,9 @@ describe("NoteMoreOptionsForm", () => {
       await flushPromises()
 
       expect(router.currentRoute.value.path).toBe("/")
-      const { showAssimilationSettings, pendingOnForNoteId } =
-        useAssimilationView()
+      const { showAssimilationSettings, targetNoteId } = useAssimilationView()
       expect(showAssimilationSettings.value).toBe(true)
-      expect(pendingOnForNoteId.value).toBe(note.id)
+      expect(targetNoteId.value).toBe(note.id)
     })
 
     it("emits close-dialog when assimilation settings button is clicked", async () => {
@@ -109,8 +105,8 @@ describe("NoteMoreOptionsForm", () => {
     })
 
     it("turns assimilation settings off when toggled while already on", async () => {
-      const { requestOnFor } = useAssimilationView()
-      requestOnFor(note.id)
+      const { openForNote } = useAssimilationView()
+      openForNote(note.id)
 
       const wrapper = renderer.withProps({ note }).mount()
       await flushPromises()
@@ -121,10 +117,9 @@ describe("NoteMoreOptionsForm", () => {
       await assimilateButton.trigger("click")
       await flushPromises()
 
-      const { showAssimilationSettings, pendingOnForNoteId } =
-        useAssimilationView()
+      const { showAssimilationSettings, targetNoteId } = useAssimilationView()
       expect(showAssimilationSettings.value).toBe(false)
-      expect(pendingOnForNoteId.value).toBe(null)
+      expect(targetNoteId.value).toBe(null)
     })
   })
 })

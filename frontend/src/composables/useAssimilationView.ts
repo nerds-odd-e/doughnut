@@ -1,27 +1,27 @@
 import { ref } from "vue"
 
 const showAssimilationSettings = ref(false)
-const pendingOnForNoteId = ref<number | null>(null)
+const targetNoteId = ref<number | null>(null)
 const pendingPropertyKey = ref<string | null>(null)
 
 function clearAssimilationView() {
-  pendingOnForNoteId.value = null
+  targetNoteId.value = null
   pendingPropertyKey.value = null
   showAssimilationSettings.value = false
 }
 
 export function useAssimilationView() {
-  const isOnForNote = (noteId: number) =>
-    showAssimilationSettings.value && pendingOnForNoteId.value === noteId
+  const isOpenForNote = (noteId: number) =>
+    showAssimilationSettings.value && targetNoteId.value === noteId
 
-  const requestOnFor = (noteId: number, propertyKey?: string | null) => {
-    pendingOnForNoteId.value = noteId
+  const openForNote = (noteId: number, propertyKey?: string | null) => {
+    targetNoteId.value = noteId
     pendingPropertyKey.value = propertyKey ?? null
     showAssimilationSettings.value = true
   }
 
   const resetForNote = (noteId: number) => {
-    showAssimilationSettings.value = pendingOnForNoteId.value === noteId
+    showAssimilationSettings.value = targetNoteId.value === noteId
   }
 
   const dismiss = () => {
@@ -29,26 +29,21 @@ export function useAssimilationView() {
   }
 
   const toggle = (noteId: number) => {
-    if (showAssimilationSettings.value && pendingOnForNoteId.value === noteId) {
+    if (showAssimilationSettings.value && targetNoteId.value === noteId) {
       dismiss()
       return
     }
-    requestOnFor(noteId)
+    openForNote(noteId)
   }
 
   return {
     showAssimilationSettings,
-    pendingOnForNoteId,
+    targetNoteId,
     pendingPropertyKey,
-    isOnForNote,
-    requestOnFor,
+    isOpenForNote,
+    openForNote,
     resetForNote,
     dismiss,
     toggle,
   }
-}
-
-/** @internal test-only reset of module singleton state */
-export function resetAssimilationViewForTests() {
-  clearAssimilationView()
 }

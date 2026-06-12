@@ -3,7 +3,7 @@ import {
   AssimilationController,
   NoteController,
 } from "@generated/doughnut-backend-api/sdk.gen"
-import { resetAssimilationViewForTests } from "@/composables/useAssimilationView"
+import { useAssimilationView } from "@/composables/useAssimilationView"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -18,7 +18,7 @@ export function createNoteShowPageRouter() {
 
 export function setupNoteShowPageAssimilationPanelMocks() {
   const noteRealm = makeMe.aNoteRealm.please()
-  resetAssimilationViewForTests()
+  useAssimilationView().dismiss()
   mockSdkService(NoteController, "showNote", noteRealm)
   mockNotebookGetForNoteRealm(noteRealm, {
     id: 101,

@@ -12,7 +12,7 @@ export const NO_MORE_TOAST = "No more notes to assimilate"
 
 export function useGoToNextAssimilation() {
   const router = useRouter()
-  const { requestOnFor, dismiss } = useAssimilationView()
+  const { openForNote, dismiss } = useAssimilationView()
   const { applyAssimilationCountDto } = useAssimilationCount()
   const { showSuccessToast } = useToast()
 
@@ -41,7 +41,7 @@ export function useGoToNextAssimilation() {
     }
 
     const { noteId, propertyKey } = nextUnit
-    requestOnFor(noteId, propertyKey)
+    openForNote(noteId, propertyKey)
     await router.push(noteShowLocation(noteId))
     return true
   }
