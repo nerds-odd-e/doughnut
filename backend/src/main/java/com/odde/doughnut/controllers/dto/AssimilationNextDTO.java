@@ -8,18 +8,12 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class AssimilationNextDTO {
-  private Integer nextNoteId;
-  private String nextPropertyKey;
+  private AssimilationNextUnitDTO nextUnit;
   private AssimilationCountDTO counts;
 
   public static AssimilationNextDTO from(
       Optional<AssimilationUnit> nextUnit, AssimilationCountDTO counts) {
     return new AssimilationNextDTO(
-        nextUnit.map(unit -> unit.note().getId()).orElse(null),
-        nextUnit
-            .filter(AssimilationUnit::isPropertyLevel)
-            .map(AssimilationUnit::propertyKey)
-            .orElse(null),
-        counts);
+        nextUnit.map(AssimilationNextUnitDTO::from).orElse(null), counts);
   }
 }

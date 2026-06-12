@@ -49,9 +49,9 @@ describe("useGoToNextAssimilation", () => {
     setTotalUnassimilatedCount(undefined)
   })
 
-  it("updates counts, enables settings, and navigates when nextNoteId is returned", async () => {
+  it("updates counts, enables settings, and navigates when nextUnit is returned", async () => {
     mockSdkService(AssimilationController, "next", {
-      nextNoteId: 42,
+      nextUnit: { noteId: 42 },
       counts: {
         dueCount: 2,
         assimilatedCountOfTheDay: 1,
@@ -82,10 +82,9 @@ describe("useGoToNextAssimilation", () => {
     expect(showSuccessToast).not.toHaveBeenCalled()
   })
 
-  it("stores pending property key when nextPropertyKey is returned", async () => {
+  it("stores pending property key when nextUnit includes propertyKey", async () => {
     mockSdkService(AssimilationController, "next", {
-      nextNoteId: 42,
-      nextPropertyKey: "example of",
+      nextUnit: { noteId: 42, propertyKey: "example of" },
       counts: {
         dueCount: 1,
         assimilatedCountOfTheDay: 1,
@@ -101,9 +100,9 @@ describe("useGoToNextAssimilation", () => {
     expect(pendingPropertyKey.value).toBe("example of")
   })
 
-  it("shows daily goal toast and navigates when dueCount is zero but next note exists", async () => {
+  it("shows daily goal toast and navigates when dueCount is zero but next unit exists", async () => {
     mockSdkService(AssimilationController, "next", {
-      nextNoteId: 42,
+      nextUnit: { noteId: 42 },
       counts: {
         dueCount: 0,
         assimilatedCountOfTheDay: 2,
@@ -122,9 +121,9 @@ describe("useGoToNextAssimilation", () => {
     })
   })
 
-  it("updates counts but does not navigate when nextNoteId is null", async () => {
+  it("updates counts but does not navigate when nextUnit is null", async () => {
     mockSdkService(AssimilationController, "next", {
-      nextNoteId: undefined,
+      nextUnit: undefined,
       counts: {
         dueCount: 0,
         assimilatedCountOfTheDay: 3,

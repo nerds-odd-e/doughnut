@@ -4738,13 +4738,18 @@ components:
     AssimilationNextDTO:
       type: object
       properties:
-        nextNoteId:
-          type: integer
-          format: int32
-        nextPropertyKey:
-          type: string
+        nextUnit:
+          $ref: "#/components/schemas/AssimilationNextUnitDTO"
         counts:
           $ref: "#/components/schemas/AssimilationCountDTO"
+    AssimilationNextUnitDTO:
+      type: object
+      properties:
+        noteId:
+          type: integer
+          format: int32
+        propertyKey:
+          type: string
     DummyForGeneratingTypes:
       type: object
       properties:

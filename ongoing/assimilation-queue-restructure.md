@@ -105,7 +105,7 @@ Enables Phase 4 and removes the "add a unit kind = touch five layers" shotgun.
   `nextUnit.filter(isPropertyLevel).map(propertyKey)`.
 - Verified externally unchanged. Commit.
 
-### Phase 6 — API models the assimilation unit as one object (behavior, API contract) [planned]
+### Phase 6 — API models the assimilation unit as one object (behavior, API contract) [done]
 
 - `AssimilationNextDTO`: replace flat `nextNoteId` + `nextPropertyKey` with a nullable
   `nextUnit { noteId, propertyKey? }` object, preserving the domain concept across the

@@ -29,7 +29,8 @@ export function useGoToNextAssimilation() {
 
     applyAssimilationCountDto(data.counts)
 
-    if (data.nextNoteId == null) {
+    const { nextUnit } = data
+    if (nextUnit?.noteId == null) {
       showSuccessToast(NO_MORE_TOAST)
       dismiss()
       return false
@@ -39,8 +40,9 @@ export function useGoToNextAssimilation() {
       showSuccessToast(DAILY_GOAL_TOAST)
     }
 
-    requestOnFor(data.nextNoteId, data.nextPropertyKey)
-    await router.push(noteShowLocation(data.nextNoteId))
+    const { noteId, propertyKey } = nextUnit
+    requestOnFor(noteId, propertyKey)
+    await router.push(noteShowLocation(noteId))
     return true
   }
 

@@ -906,9 +906,13 @@ export type UserForOtherUserView = {
 };
 
 export type AssimilationNextDto = {
-    nextNoteId?: number;
-    nextPropertyKey?: string;
+    nextUnit?: AssimilationNextUnitDto;
     counts?: AssimilationCountDto;
+};
+
+export type AssimilationNextUnitDto = {
+    noteId?: number;
+    propertyKey?: string;
 };
 
 export type DummyForGeneratingTypes = {

@@ -43,7 +43,7 @@ class AssimilationControllerTests extends ControllerTestBase {
       makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(day1).please();
 
       AssimilationNextDTO result = controller.next("Asia/Shanghai");
-      assertThat(result.getNextNoteId(), equalTo(note2.getId()));
+      assertThat(result.getNextUnit().getNoteId(), equalTo(note2.getId()));
       assertThat(result.getCounts().getDueCount(), equalTo(0));
     }
 
@@ -58,7 +58,7 @@ class AssimilationControllerTests extends ControllerTestBase {
       makeMe.refresh(user);
 
       AssimilationNextDTO result = controller.next("Asia/Shanghai");
-      assertThat(result.getNextNoteId(), equalTo(subscriptionNote.getId()));
+      assertThat(result.getNextUnit().getNoteId(), equalTo(subscriptionNote.getId()));
     }
 
     @Test
@@ -75,12 +75,12 @@ class AssimilationControllerTests extends ControllerTestBase {
       makeMe.refresh(user);
 
       AssimilationNextDTO result = controller.next("Asia/Shanghai");
-      assertThat(result.getNextNoteId(), equalTo(ownedNote.getId()));
+      assertThat(result.getNextUnit().getNoteId(), equalTo(ownedNote.getId()));
     }
 
     @Test
     void returnsNullWhenNoNotesLeft() {
-      assertThat(controller.next("Asia/Shanghai").getNextNoteId(), nullValue());
+      assertThat(controller.next("Asia/Shanghai").getNextUnit(), nullValue());
     }
 
     @Test
@@ -116,8 +116,8 @@ class AssimilationControllerTests extends ControllerTestBase {
       makeMe.aMemoryTrackerFor(note).by(user).assimilatedAt(day1).please();
 
       AssimilationNextDTO result = controller.next("Asia/Shanghai");
-      assertThat(result.getNextNoteId(), equalTo(note.getId()));
-      assertThat(result.getNextPropertyKey(), equalTo("example of"));
+      assertThat(result.getNextUnit().getNoteId(), equalTo(note.getId()));
+      assertThat(result.getNextUnit().getPropertyKey(), equalTo("example of"));
       assertThat(result.getCounts().getTotalUnassimilatedCount(), equalTo(1));
     }
   }
