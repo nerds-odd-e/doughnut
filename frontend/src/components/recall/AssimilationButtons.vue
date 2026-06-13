@@ -3,7 +3,7 @@
     type="submit"
     name="submit"
     value="Keep for recall"
-    class="daisy-btn daisy-btn-primary"
+    :class="['daisy-btn daisy-btn-primary', sizeClass]"
     data-test="keep-for-recall"
     :disabled="disabled || keepForRecallDisabled"
     @click="$emit('assimilate', false)"
@@ -12,7 +12,7 @@
     type="submit"
     name="skip"
     value="Skip recall"
-    class="daisy-btn daisy-btn-secondary"
+    :class="['daisy-btn daisy-btn-secondary', sizeClass]"
     :disabled="disabled"
     @click="$emit('assimilate', true)"
   />
@@ -31,7 +31,17 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    size: {
+      type: String as () => "default" | "sm",
+      default: "default",
+      validator: (value: string) => ["default", "sm"].includes(value),
+    },
   },
   emits: ["assimilate"],
+  computed: {
+    sizeClass(): string {
+      return this.size === "sm" ? "daisy-btn-sm" : ""
+    },
+  },
 })
 </script>

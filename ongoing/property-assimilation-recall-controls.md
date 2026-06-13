@@ -68,7 +68,7 @@ Align property-level assimilation actions in **Assimilation settings → Propert
 
 **Outcome:** Each property row shows **Keep for recall** (not "Assimilate"); clicking still assimilates the property.
 
-- **1a — `AssimilationButtons` small size** *(structure)* — **Status: planned**
+- **1a — `AssimilationButtons` small size** *(structure)* — **Status: done**
   - Add optional `size` prop (`"default"` | `"sm"`) to `AssimilationButtons.vue`; when `sm`, apply `daisy-btn-sm`.
   - Note-level usage unchanged (default size).
   - **Green check:** existing frontend tests for note assimilation pass. No observable change. **Commit.**
