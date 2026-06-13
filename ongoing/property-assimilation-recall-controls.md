@@ -108,7 +108,7 @@ Align property-level assimilation actions in **Assimilation settings → Propert
 
 **Outcome:** Each property row has **Skip recall**; confirming hides the property from future recalls, clears it from the unassimilated queue, and advances the assimilation walkthrough.
 
-- **3a — Backend unit for property skip** *(behavior)* — **Status: planned**
+- **3a — Backend unit for property skip** *(behavior)* — **Status: done**
   - `MemoryTrackerServiceTest`: assimilate with `propertyKey` + `skipMemoryTracking: true` → tracker created with `removedFromTracking: true`.
   - **Green check:** `backend:verify` (or `backend:test_only`). **Commit.**
 
