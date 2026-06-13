@@ -3,7 +3,7 @@ import ServiceMocker from '../../support/ServiceMocker'
 import testability from '../testability'
 import createOpenAiResponsesMock from './createOpenAiResponsesMock'
 import { pollUntilFocusContextRetrievalPromptShapesMatch } from './openAiFocusContextRecallAssertions'
-import { pollUntilPropertyFocusInstructionMatches } from './openAiPropertyFocusRecallAssertions'
+import { pollUntilPropertyFocusInFocusContextMatches } from './openAiPropertyFocusRecallAssertions'
 import {
   cyFetchOpenAiImposterRequests,
   OPEN_AI_IMPOSTER_PORT,
@@ -123,11 +123,11 @@ const openAiService = () => {
       pollUntilFocusContextRetrievalPromptShapesMatch()
     },
 
-    expectResponsesPostBodiesIncludePropertyFocusInstruction(
+    expectResponsesPostBodiesIncludePropertyFocusInFocusContext(
       propertyKey: string,
       propertyValue: string
     ) {
-      pollUntilPropertyFocusInstructionMatches(propertyKey, propertyValue)
+      pollUntilPropertyFocusInFocusContextMatches(propertyKey, propertyValue)
     },
 
     stubConversationAiReplyStream(messages: Record<string, string>[]) {

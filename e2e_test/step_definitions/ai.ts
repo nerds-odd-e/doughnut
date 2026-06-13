@@ -123,7 +123,7 @@ Then(
   (propertyKey: string, propertyValue: string) => {
     mock_services
       .openAi()
-      .expectResponsesPostBodiesIncludePropertyFocusInstruction(
+      .expectResponsesPostBodiesIncludePropertyFocusInFocusContext(
         propertyKey,
         propertyValue
       )

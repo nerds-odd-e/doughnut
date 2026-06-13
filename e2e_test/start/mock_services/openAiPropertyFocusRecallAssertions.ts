@@ -7,27 +7,26 @@ import {
 const PROPERTY_FOCUS_POST_POLL_MS = 250
 const PROPERTY_FOCUS_POST_POLL_ATTEMPTS = 40
 
-const PROPERTY_FOCUS_INSTRUCTION_HEADER =
-  'Focus on one property of the focus note:'
+const PROPERTY_FOCUS_CONTEXT_HEADER = 'Focus on one property of the focus note:'
 
 export const propertyFocusQuestionGenerationPostBodies = (
   requests: RecordedImposterRequest[]
 ): string[] =>
   responsesPostBodies(requests).filter((b) =>
-    b.includes(PROPERTY_FOCUS_INSTRUCTION_HEADER)
+    b.includes(PROPERTY_FOCUS_CONTEXT_HEADER)
   )
 
-const instructionsFromResponsesPostBodies = (bodies: string[]): string[] =>
+const inputFromResponsesPostBodies = (bodies: string[]): string[] =>
   bodies.flatMap((body) => {
     try {
-      const parsed = JSON.parse(body) as { instructions?: string }
-      return parsed.instructions ? [parsed.instructions] : []
+      const parsed = JSON.parse(body) as { input?: string }
+      return parsed.input ? [parsed.input] : []
     } catch {
       return []
     }
   })
 
-export const assertPropertyFocusInstructionInPostBodies = (
+export const assertPropertyFocusInFocusContextPostBodies = (
   bodies: string[],
   propertyKey: string,
   propertyValue: string
@@ -36,31 +35,31 @@ export const assertPropertyFocusInstructionInPostBodies = (
     bodies.length,
     [
       'Property focus recall E2E: expected at least one OpenAI Responses POST body',
-      'whose instructions include the property-focus block.',
+      'whose input includes the property-focus block in Focus Context.',
       'Fewer bodies usually means recall did not trigger question generation,',
       'Mountebank stubs did not match, or the assertion ran before eager-fetch finished.',
       `Found ${bodies.length} matching body/bodies.`,
     ].join('\n')
   ).to.be.at.least(1)
 
-  const instructions = instructionsFromResponsesPostBodies(bodies)
+  const inputs = inputFromResponsesPostBodies(bodies)
   expect(
-    instructions.length,
-    'Property focus recall E2E: could not parse instructions from matching POST bodies'
+    inputs.length,
+    'Property focus recall E2E: could not parse input from matching POST bodies'
   ).to.be.at.least(1)
 
-  const combined = instructions.join('\n')
+  const combined = inputs.join('\n')
   expect(
     combined,
-    `Property focus recall E2E: instructions should name property "${propertyKey}"`
+    `Property focus recall E2E: Focus Context input should name property "${propertyKey}"`
   ).to.include(`Focus on property "${propertyKey}"`)
   expect(
     combined,
-    'Property focus recall E2E: instructions should include property key'
+    'Property focus recall E2E: Focus Context input should include property key'
   ).to.include(`Property key: ${propertyKey}`)
   expect(
     combined,
-    `Property focus recall E2E: instructions should include property value "${propertyValue}"`
+    `Property focus recall E2E: Focus Context input should include property value "${propertyValue}"`
   ).to.include(`Property value: ${propertyValue}`)
 }
 
@@ -72,7 +71,7 @@ const pollPropertyFocusQuestionGenerationPostBodies = (
   cyFetchOpenAiImposterRequests().then((requests) => {
     const bodies = propertyFocusQuestionGenerationPostBodies(requests)
     if (bodies.length >= 1 || attempt >= PROPERTY_FOCUS_POST_POLL_ATTEMPTS) {
-      assertPropertyFocusInstructionInPostBodies(
+      assertPropertyFocusInFocusContextPostBodies(
         bodies,
         propertyKey,
         propertyValue
@@ -88,7 +87,7 @@ const pollPropertyFocusQuestionGenerationPostBodies = (
   })
 }
 
-export const pollUntilPropertyFocusInstructionMatches = (
+export const pollUntilPropertyFocusInFocusContextMatches = (
   propertyKey: string,
   propertyValue: string
 ): void => {

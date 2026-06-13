@@ -48,7 +48,7 @@ class QuestionGenerationRequestBuilderTests {
   }
 
   @Test
-  void shouldIncludePropertyFocusInstructionKeyValueAndLinkTargets() {
+  void shouldIncludePropertyFocusInFocusContextKeyValueAndLinkTargets() {
     Note target = makeMe.aNote().title("Heart").notebookOwnedBy(user).please();
     String markdown =
         "---\n"
@@ -64,13 +64,16 @@ class QuestionGenerationRequestBuilderTests {
     String instructions = instructionText(request);
     assertThat(
         instructions,
-        containsString(QuestionGenerationRequestBuilder.PROPERTY_FOCUS_INSTRUCTION_HEADER));
-    assertThat(instructions, containsString("Focus on property \"a part of\""));
-    assertThat(instructions, containsString("Property key: a part of"));
-    assertThat(
-        instructions, containsString("Property value: Circulatory system includes [[Heart]]"));
+        not(containsString(QuestionGenerationRequestBuilder.PROPERTY_FOCUS_CONTEXT_HEADER)));
 
     String focusContext = inputText(request);
+    assertThat(
+        focusContext,
+        containsString(QuestionGenerationRequestBuilder.PROPERTY_FOCUS_CONTEXT_HEADER));
+    assertThat(focusContext, containsString("Focus on property \"a part of\""));
+    assertThat(focusContext, containsString("Property key: a part of"));
+    assertThat(
+        focusContext, containsString("Property value: Circulatory system includes [[Heart]]"));
     assertThat(focusContext, containsString("# Focus Context"));
     assertThat(focusContext, containsString("Heart"));
   }
