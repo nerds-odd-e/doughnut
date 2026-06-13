@@ -77,6 +77,15 @@ Then(
   }
 )
 
+Then(
+  'I should not see pending assimilation property {string}',
+  (propertyKey: string) => {
+    start
+      .assumeAssimilationPage()
+      .expectPendingAssimilationPropertyAbsent(propertyKey)
+  }
+)
+
 Then('I should see the daily assimilation goal toast', () => {
   start.assimilation().expectDailyAssimilationGoalToast()
 })
@@ -186,6 +195,13 @@ When(
   'I assimilate the property {string} on the assimilation settings panel',
   (propertyKey: string) => {
     start.assumeAssimilationPage().assimilateProperty(propertyKey)
+  }
+)
+
+When(
+  'I skip recall on property {string} on the assimilation settings panel',
+  (propertyKey: string) => {
+    start.assumeAssimilationPage().skipRecallProperty(propertyKey)
   }
 )
 

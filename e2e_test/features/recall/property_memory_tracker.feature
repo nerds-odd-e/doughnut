@@ -37,6 +37,28 @@ Feature: Property memory tracker
     Then I should see assimilation progress "1/2/2"
     And I should see pending assimilation property "example of"
 
+  @wip
+  @disableOpenAiService
+  Scenario: Skipping recall on property clears unassimilated queue
+    Given I am re-logged in as "another_old_learner"
+    And I have a notebook "Property skip" with a note "Minerals"
+    And I update note "Minerals" content using markdown to become:
+      """
+      ---
+      topic: calcium
+      ---
+
+      Body.
+      """
+    And It's day 1, 8 hour
+    And I assimilated one note "Minerals" at the current time
+    When I start assimilation from the menu
+    Then I should see pending assimilation property "topic"
+    When I expand assimilation properties on the assimilation settings panel
+    And I skip recall on property "topic" on the assimilation settings panel
+    Then I should not see pending assimilation property "topic"
+    And keep for recall for property "topic" should be disabled
+
   Scenario: Property keep for recall disabled after assimilation
     Then keep for recall for property "topic" should be disabled
 

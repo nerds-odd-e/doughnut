@@ -112,7 +112,7 @@ Align property-level assimilation actions in **Assimilation settings → Propert
   - `MemoryTrackerServiceTest`: assimilate with `propertyKey` + `skipMemoryTracking: true` → tracker created with `removedFromTracking: true`.
   - **Green check:** `backend:verify` (or `backend:test_only`). **Commit.**
 
-- **3b — E2E scenario (red, `@wip`)** *(behavior, test-first)* — **Status: planned**
+- **3b — E2E scenario (red, `@wip`)** *(behavior, test-first)* — **Status: done**
   - Add scenario to `property_memory_tracker.feature`: fresh note with one untracked property → skip recall on property → property tracker absent from recall queue / unassimilated count drops.
   - Add `skipRecallProperty(propertyKey)` to `assimilationFlow.ts` + step def (confirm dialog, same pattern as note skip).
   - Tag `@wip`.

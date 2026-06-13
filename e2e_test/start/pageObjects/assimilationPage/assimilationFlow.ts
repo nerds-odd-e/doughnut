@@ -231,12 +231,28 @@ export const assumeAssimilationPage = () => ({
     })
     return this
   },
+  expectPendingAssimilationPropertyAbsent(propertyKey: string) {
+    cy.get(
+      `[data-test="assimilation-property-row"][data-property-key="${propertyKey}"]`
+    ).should('not.have.attr', 'data-test-pending', 'true')
+    return this
+  },
   assimilateProperty(propertyKey: string) {
     cy.get(
       `[data-test="assimilation-property-row"][data-property-key="${propertyKey}"]`
     ).within(() => {
       cy.get('[data-test="keep-for-recall"]').click()
     })
+    pageIsNotLoading()
+    return this
+  },
+  skipRecallProperty(propertyKey: string) {
+    cy.get(
+      `[data-test="assimilation-property-row"][data-property-key="${propertyKey}"]`
+    ).within(() => {
+      cy.findByText('Skip recall').click()
+    })
+    cy.findByRole('button', { name: 'OK' }).click()
     pageIsNotLoading()
     return this
   },

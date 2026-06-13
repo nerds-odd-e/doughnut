@@ -89,6 +89,22 @@ public class MemoryTrackerServiceTest {
     }
 
     @Test
+    void shouldCreatePropertyTrackerRemovedFromTrackingWhenSkipMemoryTracking() {
+      Note note = makeMe.aNote().notebookOwnedBy(user).please();
+      AssimilationRequestDTO request = new AssimilationRequestDTO();
+      request.noteId = note.getId();
+      request.propertyKey = "a part of";
+      request.skipMemoryTracking = true;
+
+      List<MemoryTracker> result = memoryTrackerService.assimilate(request, user, day1);
+
+      assertThat(result, hasSize(1));
+      assertThat(result.get(0).getPropertyKey(), equalTo("a part of"));
+      assertThat(result.get(0).getRemovedFromTracking(), equalTo(true));
+      assertThat(memoryTrackerRepository.findByUserAndNote(user.getId(), note.getId()), hasSize(1));
+    }
+
+    @Test
     void shouldReturnEmptyWhenPropertyTrackerAlreadyExists() {
       Note note = makeMe.aNote().notebookOwnedBy(user).please();
       AssimilationRequestDTO request = new AssimilationRequestDTO();
