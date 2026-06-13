@@ -1,7 +1,11 @@
 import { pageIsNotLoading } from '../../pageBase'
 
 export const keepForRecallButton = (options?: { timeout?: number }) =>
-  cy.get('[data-test="keep-for-recall"]', options ?? {})
+  cy
+    .get('[data-test="keep-for-recall"]', options ?? {})
+    .filter(
+      (_, el) => el.closest('[data-test="assimilation-property-row"]') === null
+    )
 
 export const refinementSuggestionsPanel = () =>
   cy

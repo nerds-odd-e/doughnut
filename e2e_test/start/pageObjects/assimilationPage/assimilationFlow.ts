@@ -235,7 +235,7 @@ export const assumeAssimilationPage = () => ({
     cy.get(
       `[data-test="assimilation-property-row"][data-property-key="${propertyKey}"]`
     ).within(() => {
-      cy.findByRole('button', { name: 'Assimilate' }).click()
+      cy.get('[data-test="keep-for-recall"]').click()
     })
     pageIsNotLoading()
     return this

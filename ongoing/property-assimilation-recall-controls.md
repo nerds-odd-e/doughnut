@@ -77,7 +77,7 @@ Align property-level assimilation actions in **Assimilation settings → Propert
   - Replace the property row `<button>Assimilate</button>` in `AssimilationSettings.vue` with `<AssimilationButtons size="sm" … @assimilate="(skip) => assimilateProperty(row.key, skip)" />` — initially only the `skip === false` path is reachable because skip button wiring comes in Phase 3.
   - **Tests (this commit):** update `AssimilationSettings.spec.ts` — row shows **Keep for recall**; click still calls API with `{ noteId, propertyKey }` (no `skipMemoryTracking`). **Commit.**
 
-- **1c — E2E page object** *(behavior)* — **Status: planned**
+- **1c — E2E page object** *(behavior)* — **Status: done**
   - Update `assimilationFlow.ts` `assimilateProperty` to click **Keep for recall** instead of **Assimilate**.
   - **Green check:** run `property_memory_tracker.feature --spec`; all scenarios green. **Commit.** → **Phase 1 deploy gate.**
 
