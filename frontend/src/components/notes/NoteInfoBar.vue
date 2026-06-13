@@ -60,5 +60,5 @@ watch(
   { immediate: true }
 )
 
-defineExpose({ reload: fetchData })
+defineExpose({ reload: fetchData, noteRecallInfo })
 </script>

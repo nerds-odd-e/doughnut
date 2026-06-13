@@ -23,7 +23,7 @@
               :note="note"
               @level-changed="emit('levelChanged', $event)"
               @remember-spelling-changed="emit('rememberSpellingChanged', $event)"
-              @note-recall-info-loaded="emit('noteRecallInfoLoaded', $event)"
+              @note-recall-info-loaded="onNoteRecallInfoLoaded"
             />
             <section
               v-if="propertyRows.length > 0"
@@ -179,6 +179,7 @@ const emit = defineEmits<{
 const showRefineNoteModal = ref(false)
 const refineNoteDialogRef = ref<HTMLDialogElement | null>(null)
 const noteInfoBarRef = ref<InstanceType<typeof NoteInfoBar> | null>(null)
+const noteRecallInfo = ref<NoteRecallInfo | null>(null)
 const assimilatingPropertyKey = ref<string | null>(null)
 const { propertiesSectionOpen, isPendingProperty, setPropertyRowRef } =
   usePendingAssimilationProperty(toRef(() => note.id))
@@ -189,6 +190,11 @@ const propertyRows = computed(() => {
   if (!parsed.ok) return []
   return sortedPropertyRowsFromRecord(parsed.properties)
 })
+
+const onNoteRecallInfoLoaded = (info: NoteRecallInfo) => {
+  noteRecallInfo.value = info
+  emit("noteRecallInfoLoaded", info)
+}
 
 const assimilateProperty = async (
   propertyKey: string,
@@ -207,6 +213,8 @@ const assimilateProperty = async (
     )
     if (!error) {
       await noteInfoBarRef.value?.reload()
+      noteRecallInfo.value =
+        noteInfoBarRef.value?.noteRecallInfo ?? noteRecallInfo.value
     }
   } finally {
     assimilatingPropertyKey.value = null

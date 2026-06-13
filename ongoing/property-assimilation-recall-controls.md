@@ -87,7 +87,7 @@ Align property-level assimilation actions in **Assimilation settings → Propert
 
 **Outcome:** Once a property memory tracker exists (kept or skipped), **Keep for recall** for that property is disabled. **Skip recall** (added in Phase 3) stays enabled when note info is loaded — matching note-level rules.
 
-- **2a — Hold `noteRecallInfo` in settings** *(structure)* — **Status: planned**
+- **2a — Hold `noteRecallInfo` in settings** *(structure)* — **Status: done**
   - Add `noteRecallInfo` ref in `AssimilationSettings.vue`; set it on `noteRecallInfoLoaded` and after successful `noteInfoBarRef.reload()`.
   - No UI change yet.
   - **Green check:** existing tests pass unchanged. **Commit.**
