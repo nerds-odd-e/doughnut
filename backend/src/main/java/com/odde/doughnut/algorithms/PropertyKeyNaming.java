@@ -77,6 +77,18 @@ public final class PropertyKeyNaming {
     return isExampleOfPropertyKey(key);
   }
 
+  /** Normalizes example-of property keys when reducing relationship notes to source properties. */
+  public static String canonicalExampleOfFamilyKey(String key) {
+    if (!propertyKeyBaseMatches(key, "an example of")) {
+      return key;
+    }
+    BaseAndSuffix parts = propertyKeyBaseAndSuffix(key);
+    if (parts.suffix() == null) {
+      return "example of";
+    }
+    return "example of " + parts.suffix();
+  }
+
   public static boolean isTitlePatternPropertyKey(String key) {
     return "titlepattern".equals(normalizedBaseWithoutUnderscores(key));
   }

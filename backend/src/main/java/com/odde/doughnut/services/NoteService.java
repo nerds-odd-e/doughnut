@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.algorithms.Frontmatter;
 import com.odde.doughnut.algorithms.NoteContentMarkdown;
+import com.odde.doughnut.algorithms.PropertyKeyNaming;
 import com.odde.doughnut.algorithms.WikiLinkMarkdown;
 import com.odde.doughnut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.doughnut.controllers.dto.NoteImageUploadDTO;
@@ -193,9 +194,10 @@ public class NoteService {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "Could not resolve the relationship source note.");
     }
+    String canonicalPropertyKey = PropertyKeyNaming.canonicalExampleOfFamilyKey(propertyKey);
     NoteContentMarkdown.AddPropertyWithAvailableKeyResult addResult =
         NoteContentMarkdown.addPropertyWithAvailableKeyToLeadingFrontmatter(
-            sourceNote.getContent(), propertyKey, relationship.targetScalar());
+            sourceNote.getContent(), canonicalPropertyKey, relationship.targetScalar());
     sourceNote.setContent(addResult.content());
     sourceNote.setUpdatedAt(updatedAt);
     entityPersister.merge(sourceNote);

@@ -66,9 +66,16 @@ class NoteControllerTests extends ControllerTestBase {
   }
 
   private static String relationshipNoteContent(String sourceTitle, String targetTitle) {
+    return relationshipNoteContent("a-part-of", sourceTitle, targetTitle);
+  }
+
+  private static String relationshipNoteContent(
+      String relationKebab, String sourceTitle, String targetTitle) {
     return "---\n"
         + "type: relationship\n"
-        + "relation: a-part-of\n"
+        + "relation: "
+        + relationKebab
+        + "\n"
         + "source: \"[["
         + sourceTitle
         + "]]\"\n"
@@ -432,6 +439,33 @@ class NoteControllerTests extends ControllerTestBase {
       assertThat(
           memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), moon.getId()),
           hasSize(1));
+    }
+
+    @Test
+    void shouldUseExampleOfPropertyKeyWhenReducingExampleOfRelation()
+        throws UnexpectedNoAccessRightException {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      Note word = makeMe.aNote("Word").notebook(nb).please();
+      Note earth = makeMe.aNote("Earth").notebook(nb).please();
+      Note relation =
+          makeMe
+              .aNote()
+              .notebook(nb)
+              .content(relationshipNoteContent("an-example-of", "Word", "Earth"))
+              .please();
+      wikiTitleCacheService.refreshForNote(relation, currentUser.getUser());
+      MemoryTracker relationTracker =
+          makeMe.aMemoryTrackerFor(relation).by(currentUser.getUser()).please();
+      int trackerId = relationTracker.getId();
+
+      controller.deleteNote(relation, reduceToSourcePropertyDeleteRequest("an example of"));
+
+      assertThat(relation.getDeletedAt(), is(not(nullValue())));
+      assertThat(word.getContent(), containsString("example of:"));
+      assertThat(word.getContent(), containsString("[[Earth]]"));
+      MemoryTracker reloaded = memoryTrackerRepository.findById(trackerId).orElseThrow();
+      assertThat(reloaded.getNote().getId(), equalTo(word.getId()));
+      assertThat(reloaded.getPropertyKey(), equalTo("example of"));
     }
   }
 
