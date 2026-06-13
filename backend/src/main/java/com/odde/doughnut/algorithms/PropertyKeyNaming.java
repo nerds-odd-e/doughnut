@@ -86,6 +86,14 @@ public final class PropertyKeyNaming {
   }
 
   /**
+   * Frontmatter keys that define relationship note structure ({@code type: relationship},
+   * endpoints).
+   */
+  public static boolean isRelationshipNoteStructuralPropertyKey(String key) {
+    return propertyKeyBaseMatchesAny(key, "type", "relation", "source", "target");
+  }
+
+  /**
    * Structural frontmatter keys excluded from {@code note_property_index} and automatic property
    * tracker seeding.
    */
@@ -95,7 +103,8 @@ public final class PropertyKeyNaming {
         || isWikidataIdPropertyKey(key)
         || isUrlPropertyKey(key)
         || isTitlePatternPropertyKey(key)
-        || isQuestionGenerationInstructionPropertyKey(key);
+        || isQuestionGenerationInstructionPropertyKey(key)
+        || isRelationshipNoteStructuralPropertyKey(key);
   }
 
   /**

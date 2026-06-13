@@ -21,7 +21,7 @@ Feature: Property memory tracker
 
   @disableOpenAiService
   Scenario: Untracked example of property appears in assimilation queue
-    Given I am logged in as an existing user
+    Given I am re-logged in as "another_old_learner"
     And I have a notebook "Property queue" with a note "Kanji"
     And I update note "Kanji" content using markdown to become:
       """
