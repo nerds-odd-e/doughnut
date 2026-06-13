@@ -118,7 +118,7 @@ Align property-level assimilation actions in **Assimilation settings → Propert
   - Tag `@wip`.
   - **Green check:** `@wip` skipped in CI; run locally with `--spec` — fails for right reason (skip button missing). **Commit.**
 
-- **3c — Wire property skip in UI** *(behavior)* — **Status: planned**
+- **3c — Wire property skip in UI** *(behavior)* — **Status: done**
   - In `assimilateProperty(key, skipMemoryTracking)`: when `skip`, show confirm *"Confirm to hide this property from recalls in the future?"*; call API with `{ noteId, propertyKey, skipMemoryTracking: true }`; reload note info on success.
   - Keep path unchanged (`skipMemoryTracking: false`, no confirm).
   - **Tests (this commit):** `AssimilationSettings.spec.ts` — skip click → confirm → API body includes `skipMemoryTracking: true`. Rerun `@wip` scenario locally until skip + tracker semantics pass (queue advance not required yet). **Commit.**

@@ -66,7 +66,6 @@
                       <span class="shrink-0">
                         <AssimilationButtons
                           size="sm"
-                          :show-skip="false"
                           :disabled="assimilatingPropertyKey === row.key"
                           :keep-for-recall-disabled="
                             keepForRecallDisabledForProperty(row.key)
@@ -163,6 +162,7 @@ import {
   sortedPropertyRowsFromRecord,
 } from "@/utils/noteContentFrontmatter"
 import { usePendingAssimilationProperty } from "@/composables/usePendingAssimilationProperty"
+import usePopups from "../commons/Popups/usePopups"
 import { computed, ref, toRef, watch } from "vue"
 
 const { note, noteInfoLoaded, keepForRecallDisabled } = defineProps<{
@@ -186,6 +186,7 @@ const noteRecallInfo = ref<NoteRecallInfo | null>(null)
 const assimilatingPropertyKey = ref<string | null>(null)
 const { propertiesSectionOpen, isPendingProperty, setPropertyRowRef } =
   usePendingAssimilationProperty(toRef(() => note.id))
+const { popups } = usePopups()
 useDaisyDialog(showRefineNoteModal, refineNoteDialogRef)
 
 const propertyRows = computed(() => {
@@ -208,7 +209,14 @@ const assimilateProperty = async (
   propertyKey: string,
   skipMemoryTracking?: boolean
 ) => {
-  if (skipMemoryTracking) return
+  if (skipMemoryTracking) {
+    const confirmed = await popups.confirm(
+      "Confirm to hide this property from recalls in the future?"
+    )
+    if (!confirmed) {
+      return
+    }
+  }
   assimilatingPropertyKey.value = propertyKey
   try {
     const { error } = await apiCallWithLoading(() =>
@@ -216,6 +224,7 @@ const assimilateProperty = async (
         body: {
           noteId: note.id,
           propertyKey,
+          ...(skipMemoryTracking ? { skipMemoryTracking: true } : {}),
         },
       })
     )

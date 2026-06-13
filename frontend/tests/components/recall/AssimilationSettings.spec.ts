@@ -6,6 +6,7 @@ import AssimilationSettings from "@/components/recall/AssimilationSettings.vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+import usePopups from "@/components/commons/Popups/usePopups"
 import { afterEach, beforeEach, describe, expect, it } from "vitest"
 
 const noteRealm = makeMe.aNoteRealm
@@ -33,6 +34,10 @@ describe("AssimilationSettings", () => {
   afterEach(() => {
     wrapper?.unmount()
     document.body.innerHTML = ""
+    const popups = usePopups()
+    while (popups.popups.peek().length) {
+      popups.popups.done(false)
+    }
   })
 
   const mountSettings = () => {
@@ -131,5 +136,39 @@ describe("AssimilationSettings", () => {
 
     expect(topicKeepForRecall.disabled).toBe(true)
     expect(urlKeepForRecall.disabled).toBe(false)
+  })
+
+  it("calls assimilate with skipMemoryTracking when skip recall is confirmed", async () => {
+    mountSettings()
+    await flushPromises()
+    await expandPropertiesSection()
+
+    const topicRow = document.querySelector(
+      '[data-test="assimilation-property-row"][data-property-key="topic"]'
+    )!
+    const skipRecall = topicRow.querySelector(
+      '[value="Skip recall"]'
+    ) as HTMLInputElement
+    skipRecall.click()
+    await flushPromises()
+
+    const popupStack = usePopups().popups.peek()
+    expect(popupStack).toHaveLength(1)
+    expect(popupStack?.[0]?.type).toBe("confirm")
+    expect(popupStack?.[0]?.message).toBe(
+      "Confirm to hide this property from recalls in the future?"
+    )
+
+    usePopups().popups.done(true)
+    await flushPromises()
+
+    expect(assimilateSpy).toHaveBeenCalledWith({
+      body: {
+        noteId: note.id,
+        propertyKey: "topic",
+        skipMemoryTracking: true,
+      },
+    })
+    expect(getNoteInfoSpy.mock.calls.length).toBeGreaterThanOrEqual(2)
   })
 })
