@@ -240,4 +240,20 @@ export const assumeAssimilationPage = () => ({
     pageIsNotLoading()
     return this
   },
+  expectPropertyKeepForRecallDisabled(propertyKey: string) {
+    cy.get(
+      `[data-test="assimilation-property-row"][data-property-key="${propertyKey}"]`
+    ).within(() => {
+      cy.get('[data-test="keep-for-recall"]').should('be.disabled')
+    })
+    return this
+  },
+  expectPropertyKeepForRecallEnabled(propertyKey: string) {
+    cy.get(
+      `[data-test="assimilation-property-row"][data-property-key="${propertyKey}"]`
+    ).within(() => {
+      cy.get('[data-test="keep-for-recall"]').should('not.be.disabled')
+    })
+    return this
+  },
 })

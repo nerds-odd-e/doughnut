@@ -37,6 +37,9 @@ Feature: Property memory tracker
     Then I should see assimilation progress "1/2/2"
     And I should see pending assimilation property "example of"
 
+  Scenario: Property keep for recall disabled after assimilation
+    Then keep for recall for property "topic" should be disabled
+
   @disableOpenAiService
   Scenario: Note-level assimilation stays available after property-only assimilation
     Then the keep for recall button should be enabled

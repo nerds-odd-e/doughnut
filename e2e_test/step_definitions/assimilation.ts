@@ -190,6 +190,24 @@ When(
 )
 
 Then(
+  'keep for recall for property {string} should be disabled',
+  (propertyKey: string) => {
+    start
+      .assumeAssimilationPage()
+      .expectPropertyKeepForRecallDisabled(propertyKey)
+  }
+)
+
+Then(
+  'keep for recall for property {string} should be enabled',
+  (propertyKey: string) => {
+    start
+      .assumeAssimilationPage()
+      .expectPropertyKeepForRecallEnabled(propertyKey)
+  }
+)
+
+Then(
   'the note memory tracker should have recall count {int}',
   (count: number) => {
     start

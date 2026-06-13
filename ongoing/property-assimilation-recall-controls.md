@@ -97,7 +97,7 @@ Align property-level assimilation actions in **Assimilation settings → Propert
   - Pass `:keep-for-recall-disabled` per property row into `AssimilationButtons`.
   - **Tests (this commit):** `AssimilationSettings.spec.ts` — mock `getNoteInfo` with a `topic` property tracker; keep disabled for `topic`, still enabled for `url`. **Commit.**
 
-- **2c — E2E disabled assertion** *(behavior)* — **Status: planned**
+- **2c — E2E disabled assertion** *(behavior)* — **Status: done**
   - Add page-object helper `expectPropertyKeepForRecallDisabled(propertyKey)` (and optionally `expectPropertyKeepForRecallEnabled`).
   - Add step def + scenario beat in `property_memory_tracker.feature`: after Background assimilates `"topic"`, keep for `"topic"` is disabled.
   - **Green check:** targeted E2E green. **Commit.** → **Phase 2 deploy gate.**
