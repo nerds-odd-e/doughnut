@@ -37,7 +37,6 @@ Feature: Property memory tracker
     Then I should see assimilation progress "1/2/2"
     And I should see pending assimilation property "example of"
 
-  @wip
   @disableOpenAiService
   Scenario: Skipping recall on property clears unassimilated queue
     Given I am re-logged in as "another_old_learner"

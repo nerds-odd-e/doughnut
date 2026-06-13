@@ -123,7 +123,7 @@ Align property-level assimilation actions in **Assimilation settings → Propert
   - Keep path unchanged (`skipMemoryTracking: false`, no confirm).
   - **Tests (this commit):** `AssimilationSettings.spec.ts` — skip click → confirm → API body includes `skipMemoryTracking: true`. Rerun `@wip` scenario locally until skip + tracker semantics pass (queue advance not required yet). **Commit.**
 
-- **3d — Queue advancement on property skip** *(behavior)* — **Status: planned**
+- **3d — Queue advancement on property skip** *(behavior)* — **Status: done**
   - On successful property skip: call `goToNextAssimilation()` (import from `useGoToNextAssimilation`, same as note skip in `AssimilationPanel`).
   - Do **not** add queue advance to property keep (out of scope).
   - **Tests (this commit):** frontend unit or extend `AssimilationSettings.spec.ts` to assert navigation hook called on skip success; rerun `property_memory_tracker.feature --spec` until all scenarios green; **remove `@wip`**. **Commit.** → **Phase 3 deploy gate.**

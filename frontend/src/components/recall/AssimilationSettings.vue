@@ -161,7 +161,11 @@ import {
   parseNoteContentMarkdown,
   sortedPropertyRowsFromRecord,
 } from "@/utils/noteContentFrontmatter"
+import { useAssimilationCount } from "@/composables/useAssimilationCount"
+import { useAssimilationView } from "@/composables/useAssimilationView"
+import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
 import { usePendingAssimilationProperty } from "@/composables/usePendingAssimilationProperty"
+import { useRecallData } from "@/composables/useRecallData"
 import usePopups from "../commons/Popups/usePopups"
 import { computed, ref, toRef, watch } from "vue"
 
@@ -186,7 +190,11 @@ const noteRecallInfo = ref<NoteRecallInfo | null>(null)
 const assimilatingPropertyKey = ref<string | null>(null)
 const { propertiesSectionOpen, isPendingProperty, setPropertyRowRef } =
   usePendingAssimilationProperty(toRef(() => note.id))
+const { openForNote } = useAssimilationView()
 const { popups } = usePopups()
+const { totalAssimilatedCount, requestDueRecallsRefresh } = useRecallData()
+const { goToNextAssimilation } = useGoToNextAssimilation()
+const { incrementAssimilatedCount } = useAssimilationCount()
 useDaisyDialog(showRefineNoteModal, refineNoteDialogRef)
 
 const propertyRows = computed(() => {
@@ -219,7 +227,7 @@ const assimilateProperty = async (
   }
   assimilatingPropertyKey.value = propertyKey
   try {
-    const { error } = await apiCallWithLoading(() =>
+    const { data: memoryTrackers, error } = await apiCallWithLoading(() =>
       AssimilationController.assimilate({
         body: {
           noteId: note.id,
@@ -232,6 +240,21 @@ const assimilateProperty = async (
       await noteInfoBarRef.value?.reload()
       noteRecallInfo.value =
         noteInfoBarRef.value?.noteRecallInfo ?? noteRecallInfo.value
+
+      if (skipMemoryTracking && memoryTrackers) {
+        const newTrackerCount = memoryTrackers.filter(
+          (t) => !t.removedFromTracking
+        ).length
+        if (totalAssimilatedCount.value !== undefined) {
+          totalAssimilatedCount.value += newTrackerCount
+        }
+        incrementAssimilatedCount(newTrackerCount)
+        requestDueRecallsRefresh()
+        const navigated = await goToNextAssimilation()
+        if (!navigated) {
+          openForNote(note.id, null)
+        }
+      }
     }
   } finally {
     assimilatingPropertyKey.value = null

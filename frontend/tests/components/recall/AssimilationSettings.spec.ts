@@ -7,7 +7,15 @@ import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import usePopups from "@/components/commons/Popups/usePopups"
-import { afterEach, beforeEach, describe, expect, it } from "vitest"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+
+const mockedGoToNextAssimilation = vi.fn().mockResolvedValue(true)
+
+vi.mock("@/composables/useGoToNextAssimilation", () => ({
+  useGoToNextAssimilation: () => ({
+    goToNextAssimilation: mockedGoToNextAssimilation,
+  }),
+}))
 
 const noteRealm = makeMe.aNoteRealm
   .content(
@@ -27,6 +35,7 @@ describe("AssimilationSettings", () => {
   let getNoteInfoSpy: ReturnType<typeof mockSdkService>
 
   beforeEach(() => {
+    mockedGoToNextAssimilation.mockClear()
     assimilateSpy = mockSdkService(AssimilationController, "assimilate", [])
     getNoteInfoSpy = mockSdkService(NoteController, "getNoteInfo", {})
   })
@@ -107,6 +116,7 @@ describe("AssimilationSettings", () => {
       body: { noteId: note.id, propertyKey: "topic" },
     })
     expect(getNoteInfoSpy.mock.calls.length).toBeGreaterThanOrEqual(2)
+    expect(mockedGoToNextAssimilation).not.toHaveBeenCalled()
   })
 
   it("disables Keep for recall per property when a property memory tracker exists", async () => {
@@ -139,6 +149,9 @@ describe("AssimilationSettings", () => {
   })
 
   it("calls assimilate with skipMemoryTracking when skip recall is confirmed", async () => {
+    assimilateSpy.mockResolvedValue(
+      wrapSdkResponse([{ id: 1, removedFromTracking: true }])
+    )
     mountSettings()
     await flushPromises()
     await expandPropertiesSection()
@@ -170,5 +183,6 @@ describe("AssimilationSettings", () => {
       },
     })
     expect(getNoteInfoSpy.mock.calls.length).toBeGreaterThanOrEqual(2)
+    expect(mockedGoToNextAssimilation).toHaveBeenCalled()
   })
 })
