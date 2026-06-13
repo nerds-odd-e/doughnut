@@ -56,7 +56,7 @@ describe("AssimilationSettings", () => {
     await flushPromises()
   }
 
-  it("renders a property row and assimilate button per frontmatter key", async () => {
+  it("renders a property row and Keep for recall control per frontmatter key", async () => {
     mountSettings()
     await flushPromises()
     await expandPropertiesSection()
@@ -75,11 +75,13 @@ describe("AssimilationSettings", () => {
         '[data-test="assimilation-property-row"][data-property-key="url"]'
       )
     ).not.toBeNull()
-    expect(
-      document.querySelectorAll(
-        '[data-test="assimilation-property-row"] button'
-      )
-    ).toHaveLength(2)
+    const keepForRecallControls = document.querySelectorAll(
+      '[data-test="assimilation-property-row"] [data-test="keep-for-recall"]'
+    )
+    expect(keepForRecallControls).toHaveLength(2)
+    for (const control of keepForRecallControls) {
+      expect((control as HTMLInputElement).value).toBe("Keep for recall")
+    }
   })
 
   it("calls assimilate with propertyKey and reloads note info", async () => {
@@ -90,8 +92,10 @@ describe("AssimilationSettings", () => {
     const topicRow = document.querySelector(
       '[data-test="assimilation-property-row"][data-property-key="topic"]'
     )!
-    const assimilateButton = topicRow.querySelector("button")!
-    assimilateButton.click()
+    const keepForRecall = topicRow.querySelector(
+      '[data-test="keep-for-recall"]'
+    ) as HTMLInputElement
+    keepForRecall.click()
     await flushPromises()
 
     expect(assimilateSpy).toHaveBeenCalledWith({

@@ -9,6 +9,7 @@
     @click="$emit('assimilate', false)"
   />
   <input
+    v-if="showSkip"
     type="submit"
     name="skip"
     value="Skip recall"
@@ -35,6 +36,10 @@ export default defineComponent({
       type: String as () => "default" | "sm",
       default: "default",
       validator: (value: string) => ["default", "sm"].includes(value),
+    },
+    showSkip: {
+      type: Boolean,
+      default: true,
     },
   },
   emits: ["assimilate"],

@@ -63,14 +63,14 @@
                         class="min-w-0 flex-1 truncate text-sm text-base-content/70"
                         :title="row.value"
                       >{{ row.value }}</span>
-                      <button
-                        type="button"
-                        class="daisy-btn daisy-btn-sm daisy-btn-primary shrink-0"
-                        :disabled="assimilatingPropertyKey === row.key"
-                        @click="assimilateProperty(row.key)"
-                      >
-                        Assimilate
-                      </button>
+                      <span class="shrink-0">
+                        <AssimilationButtons
+                          size="sm"
+                          :show-skip="false"
+                          :disabled="assimilatingPropertyKey === row.key"
+                          @assimilate="(skip) => assimilateProperty(row.key, skip)"
+                        />
+                      </span>
                     </li>
                   </ul>
                 </div>
@@ -190,7 +190,11 @@ const propertyRows = computed(() => {
   return sortedPropertyRowsFromRecord(parsed.properties)
 })
 
-const assimilateProperty = async (propertyKey: string) => {
+const assimilateProperty = async (
+  propertyKey: string,
+  skipMemoryTracking?: boolean
+) => {
+  if (skipMemoryTracking) return
   assimilatingPropertyKey.value = propertyKey
   try {
     const { error } = await apiCallWithLoading(() =>

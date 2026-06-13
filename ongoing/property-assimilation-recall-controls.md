@@ -73,7 +73,7 @@ Align property-level assimilation actions in **Assimilation settings → Propert
   - Note-level usage unchanged (default size).
   - **Green check:** existing frontend tests for note assimilation pass. No observable change. **Commit.**
 
-- **1b — Property row uses `AssimilationButtons` (keep only)** *(behavior)* — **Status: planned**
+- **1b — Property row uses `AssimilationButtons` (keep only)** *(behavior)* — **Status: done**
   - Replace the property row `<button>Assimilate</button>` in `AssimilationSettings.vue` with `<AssimilationButtons size="sm" … @assimilate="(skip) => assimilateProperty(row.key, skip)" />` — initially only the `skip === false` path is reachable because skip button wiring comes in Phase 3.
   - **Tests (this commit):** update `AssimilationSettings.spec.ts` — row shows **Keep for recall**; click still calls API with `{ noteId, propertyKey }` (no `skipMemoryTracking`). **Commit.**
 
