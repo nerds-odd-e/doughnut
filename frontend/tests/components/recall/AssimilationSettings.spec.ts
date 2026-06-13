@@ -5,7 +5,7 @@ import {
 import AssimilationSettings from "@/components/recall/AssimilationSettings.vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import helper, { mockSdkService } from "@tests/helpers"
+import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { afterEach, beforeEach, describe, expect, it } from "vitest"
 
 const noteRealm = makeMe.aNoteRealm
@@ -102,5 +102,34 @@ describe("AssimilationSettings", () => {
       body: { noteId: note.id, propertyKey: "topic" },
     })
     expect(getNoteInfoSpy.mock.calls.length).toBeGreaterThanOrEqual(2)
+  })
+
+  it("disables Keep for recall per property when a property memory tracker exists", async () => {
+    getNoteInfoSpy.mockResolvedValue(
+      wrapSdkResponse(
+        makeMe.aNoteRecallInfo
+          .memoryTrackers([
+            {
+              ...makeMe.aMemoryTracker.please(),
+              id: 1,
+              propertyKey: "topic",
+            },
+          ])
+          .please()
+      )
+    )
+    mountSettings()
+    await flushPromises()
+    await expandPropertiesSection()
+
+    const topicKeepForRecall = document.querySelector(
+      '[data-test="assimilation-property-row"][data-property-key="topic"] [data-test="keep-for-recall"]'
+    ) as HTMLInputElement
+    const urlKeepForRecall = document.querySelector(
+      '[data-test="assimilation-property-row"][data-property-key="url"] [data-test="keep-for-recall"]'
+    ) as HTMLInputElement
+
+    expect(topicKeepForRecall.disabled).toBe(true)
+    expect(urlKeepForRecall.disabled).toBe(false)
   })
 })

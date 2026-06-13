@@ -68,6 +68,9 @@
                           size="sm"
                           :show-skip="false"
                           :disabled="assimilatingPropertyKey === row.key"
+                          :keep-for-recall-disabled="
+                            keepForRecallDisabledForProperty(row.key)
+                          "
                           @assimilate="(skip) => assimilateProperty(row.key, skip)"
                         />
                       </span>
@@ -195,6 +198,11 @@ const onNoteRecallInfoLoaded = (info: NoteRecallInfo) => {
   noteRecallInfo.value = info
   emit("noteRecallInfoLoaded", info)
 }
+
+const keepForRecallDisabledForProperty = (propertyKey: string) =>
+  noteRecallInfo.value?.memoryTrackers?.some(
+    (mt) => mt.propertyKey === propertyKey
+  ) ?? false
 
 const assimilateProperty = async (
   propertyKey: string,

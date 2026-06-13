@@ -92,7 +92,7 @@ Align property-level assimilation actions in **Assimilation settings → Propert
   - No UI change yet.
   - **Green check:** existing tests pass unchanged. **Commit.**
 
-- **2b — Per-property `keepForRecallDisabled`** *(behavior)* — **Status: planned**
+- **2b — Per-property `keepForRecallDisabled`** *(behavior)* — **Status: done**
   - `keepForRecallDisabledForProperty(key)` → `noteRecallInfo?.memoryTrackers?.some(mt => mt.propertyKey === key)`.
   - Pass `:keep-for-recall-disabled` per property row into `AssimilationButtons`.
   - **Tests (this commit):** `AssimilationSettings.spec.ts` — mock `getNoteInfo` with a `topic` property tracker; keep disabled for `topic`, still enabled for `url`. **Commit.**
