@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.PropertyKeyNaming;
 import com.odde.doughnut.entities.NotePropertyIndex;
 import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.entities.User;
@@ -17,27 +18,41 @@ public class UnassimilatedPropertyService {
   }
 
   public int countUnassimilatedPropertiesForUser(User user) {
-    return notePropertyIndexRepository.countUnassimilatedPropertiesForOwnership(
-        user.getId(), user.getOwnership().getId());
+    return countAssimilable(
+        notePropertyIndexRepository.streamUnassimilatedPropertiesForOwnership(
+            user.getId(), user.getOwnership().getId()));
   }
 
   public int countUnassimilatedPropertiesForSubscription(Subscription subscription) {
-    return notePropertyIndexRepository.countUnassimilatedPropertiesForNotebook(
-        subscription.getUser().getId(), subscription.getNotebook().getId());
+    return countAssimilable(
+        notePropertyIndexRepository.streamUnassimilatedPropertiesForNotebook(
+            subscription.getUser().getId(), subscription.getNotebook().getId()));
   }
 
   public Stream<AssimilationUnit> streamUnassimilatedPropertiesForUser(User user) {
-    return notePropertyIndexRepository
-        .streamUnassimilatedPropertiesForOwnership(user.getId(), user.getOwnership().getId())
+    return streamAssimilable(
+            notePropertyIndexRepository.streamUnassimilatedPropertiesForOwnership(
+                user.getId(), user.getOwnership().getId()))
         .map(UnassimilatedPropertyService::toPropertyUnit);
   }
 
   public Stream<AssimilationUnit> streamUnassimilatedPropertiesForSubscription(
       Subscription subscription) {
-    return notePropertyIndexRepository
-        .streamUnassimilatedPropertiesForNotebook(
-            subscription.getUser().getId(), subscription.getNotebook().getId())
+    return streamAssimilable(
+            notePropertyIndexRepository.streamUnassimilatedPropertiesForNotebook(
+                subscription.getUser().getId(), subscription.getNotebook().getId()))
         .map(UnassimilatedPropertyService::toPropertyUnit);
+  }
+
+  private static int countAssimilable(Stream<NotePropertyIndex> unfiltered) {
+    try (Stream<NotePropertyIndex> stream = streamAssimilable(unfiltered)) {
+      return (int) stream.count();
+    }
+  }
+
+  private static Stream<NotePropertyIndex> streamAssimilable(Stream<NotePropertyIndex> unfiltered) {
+    return unfiltered.filter(
+        index -> !PropertyKeyNaming.isReservedStructuralKey(index.getPropertyKey()));
   }
 
   private static AssimilationUnit toPropertyUnit(NotePropertyIndex index) {

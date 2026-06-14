@@ -4,9 +4,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NotePropertyIndex;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.NotePropertyIndexRepository;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -22,6 +24,7 @@ class UnassimilatedPropertyServiceTest {
 
   @Autowired MakeMe makeMe;
   @Autowired NotePropertyIndexService notePropertyIndexService;
+  @Autowired NotePropertyIndexRepository notePropertyIndexRepository;
   @Autowired UnassimilatedPropertyService unassimilatedPropertyService;
 
   @Test
@@ -86,6 +89,42 @@ class UnassimilatedPropertyServiceTest {
   }
 
   @Test
+  void does_not_count_stale_reserved_structural_keys_for_subscription() {
+    User owner = makeMe.aUser().please();
+    User subscriber = makeMe.aUser().please();
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
+    makeMe.aSubscription().forNotebook(notebook).forUser(subscriber).please();
+    Note note = noteWithExampleOfAndUrl(notebook);
+    insertStaleReservedIndexRow(note, "url");
+    makeMe.refresh(subscriber);
+
+    Subscription subscription = subscriber.getSubscriptions().stream().findFirst().orElseThrow();
+    assertThat(
+        unassimilatedPropertyService.countUnassimilatedPropertiesForSubscription(subscription),
+        equalTo(1));
+    List<AssimilationUnit> pending =
+        unassimilatedPropertyService
+            .streamUnassimilatedPropertiesForSubscription(subscription)
+            .toList();
+    assertThat(pending, hasSize(1));
+    assertThat(pending.get(0).propertyKey(), equalTo("example of"));
+  }
+
+  @Test
+  void does_not_count_stale_reserved_structural_keys_for_owner() {
+    User user = makeMe.aUser().please();
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+    Note note = noteWithExampleOfAndUrl(notebook);
+    insertStaleReservedIndexRow(note, "url");
+
+    assertThat(unassimilatedPropertyService.countUnassimilatedPropertiesForUser(user), equalTo(1));
+    List<AssimilationUnit> pending =
+        unassimilatedPropertyService.streamUnassimilatedPropertiesForUser(user).toList();
+    assertThat(pending, hasSize(1));
+    assertThat(pending.get(0).propertyKey(), equalTo("example of"));
+  }
+
+  @Test
   void counts_unassimilated_properties_in_subscribed_notebook() {
     User owner = makeMe.aUser().please();
     User subscriber = makeMe.aUser().please();
@@ -110,5 +149,23 @@ class UnassimilatedPropertyServiceTest {
             .toList();
     assertThat(pending, hasSize(1));
     assertThat(pending.get(0).propertyKey(), equalTo("example of"));
+  }
+
+  private Note noteWithExampleOfAndUrl(Notebook notebook) {
+    Note note =
+        makeMe
+            .aNote()
+            .notebook(notebook)
+            .content("---\nexample of: \"[[Word]]\"\nurl: https://example.com\n---\n\nbody")
+            .please();
+    notePropertyIndexService.refreshForNote(note);
+    return note;
+  }
+
+  private void insertStaleReservedIndexRow(Note note, String propertyKey) {
+    NotePropertyIndex staleReservedKey = new NotePropertyIndex();
+    staleReservedKey.setNote(note);
+    staleReservedKey.setPropertyKey(propertyKey);
+    notePropertyIndexRepository.save(staleReservedKey);
   }
 }

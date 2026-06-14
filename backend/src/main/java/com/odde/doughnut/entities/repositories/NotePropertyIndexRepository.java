@@ -31,27 +31,6 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
 
   @Query(
       value =
-          "SELECT COUNT(i) FROM NotePropertyIndex i"
-              + " JOIN i.note n"
-              + " JOIN n.notebook nb ON nb.ownership.id = :ownershipId"
-              + unassimilatedJoinMemoryTracker
-              + unassimilatedWhereClause)
-  int countUnassimilatedPropertiesForOwnership(
-      @Param("userId") Integer userId, @Param("ownershipId") Integer ownershipId);
-
-  @Query(
-      value =
-          "SELECT COUNT(i) FROM NotePropertyIndex i"
-              + " JOIN i.note n"
-              + " JOIN n.notebook nb"
-              + unassimilatedJoinMemoryTracker
-              + unassimilatedWhereClause
-              + " AND nb.id = :notebookId")
-  int countUnassimilatedPropertiesForNotebook(
-      @Param("userId") Integer userId, @Param("notebookId") Integer notebookId);
-
-  @Query(
-      value =
           "SELECT i FROM NotePropertyIndex i"
               + " JOIN FETCH i.note n"
               + " JOIN n.notebook nb ON nb.ownership.id = :ownershipId"
