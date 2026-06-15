@@ -7,6 +7,7 @@ packages:
   - packages/generated/doughnut-backend-api
 
 overrides:
+  esbuild: '>=0.28.1'
   ejs: '>=3.1.10'
   'jsonpath-plus@<10.0.0': '>=10.2.0'
   nodemailer: '>=8.0.5'

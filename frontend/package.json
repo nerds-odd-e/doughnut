@@ -55,7 +55,7 @@
     "daisyui": "5.5.23",
     "doughnut-test-fixtures": "workspace:*",
     "es-toolkit": "^1.47.1",
-    "esbuild": "0.28.1",
+    "esbuild": ">=0.28.1",
     "gsap": "^3.15.0",
     "marked": "^18.0.5",
     "optionator": "^0.9.4",
