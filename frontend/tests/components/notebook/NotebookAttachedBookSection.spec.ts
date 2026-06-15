@@ -1,21 +1,25 @@
 import { client } from "@generated/doughnut-backend-api/client.gen"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
-import NotebookAttachedBookSection from "@/components/notebook/NotebookAttachedBookSection.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
+import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import helper, { wrapSdkError, wrapSdkResponse } from "@tests/helpers"
+import { wrapSdkError, wrapSdkResponse } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { nextTick } from "vue"
+import {
+  mountNotebookAttachedBookSection,
+  notebookId,
+  selectAttachBookFile,
+} from "./notebookAttachedBookSectionTestSupport"
 
 describe("NotebookAttachedBookSection", () => {
-  const notebookId = 77
-
   afterEach(() => {
     while (usePopups().popups.peek()?.length) {
       usePopups().popups.done(false)
     }
     vi.restoreAllMocks()
+    teardownGlobalClientForTesting()
   })
 
   beforeEach(() => {
@@ -32,11 +36,7 @@ describe("NotebookAttachedBookSection", () => {
       wrapSdkResponse(attached)
     )
 
-    const wrapper = helper
-      .component(NotebookAttachedBookSection)
-      .withRouter()
-      .withProps({ notebookId })
-      .mount()
+    const wrapper = mountNotebookAttachedBookSection()
     await flushPromises()
 
     const removeBtn = wrapper.find('button[title="Remove attached book"]')
@@ -50,11 +50,7 @@ describe("NotebookAttachedBookSection", () => {
       wrapSdkResponse(attached)
     )
 
-    const wrapper = helper
-      .component(NotebookAttachedBookSection)
-      .withRouter()
-      .withProps({ notebookId })
-      .mount()
+    const wrapper = mountNotebookAttachedBookSection()
     await flushPromises()
 
     const desc = wrapper.find(".section-description")
@@ -68,11 +64,7 @@ describe("NotebookAttachedBookSection", () => {
       wrapSdkResponse(attached)
     )
 
-    const wrapper = helper
-      .component(NotebookAttachedBookSection)
-      .withRouter()
-      .withProps({ notebookId })
-      .mount()
+    const wrapper = mountNotebookAttachedBookSection()
     await flushPromises()
 
     await wrapper.find('button[title="Remove attached book"]').trigger("click")
@@ -94,11 +86,7 @@ describe("NotebookAttachedBookSection", () => {
     )
     const deleteSpy = vi.spyOn(NotebookBooksController, "deleteBook")
 
-    const wrapper = helper
-      .component(NotebookAttachedBookSection)
-      .withRouter()
-      .withProps({ notebookId })
-      .mount()
+    const wrapper = mountNotebookAttachedBookSection()
     await flushPromises()
 
     await wrapper.find('button[title="Remove attached book"]').trigger("click")
@@ -130,11 +118,7 @@ describe("NotebookAttachedBookSection", () => {
         >
       )
 
-    const wrapper = helper
-      .component(NotebookAttachedBookSection)
-      .withRouter()
-      .withProps({ notebookId })
-      .mount()
+    const wrapper = mountNotebookAttachedBookSection()
     await flushPromises()
 
     await wrapper.find('button[title="Remove attached book"]').trigger("click")
@@ -172,23 +156,13 @@ describe("NotebookAttachedBookSection", () => {
         wrapSdkResponse(attached) as Awaited<ReturnType<typeof client.post>>
       )
 
-    const wrapper = helper
-      .component(NotebookAttachedBookSection)
-      .withRouter()
-      .withProps({ notebookId })
-      .mount()
+    const wrapper = mountNotebookAttachedBookSection()
     await flushPromises()
 
     const file = new File(["epub"], "My Epub.epub", {
       type: "application/epub+zip",
     })
-    const input = wrapper.find('input[type="file"]').element as HTMLInputElement
-    Object.defineProperty(input, "files", {
-      value: [file],
-      writable: false,
-      configurable: true,
-    })
-    await wrapper.find('input[type="file"]').trigger("change")
+    await selectAttachBookFile(wrapper, file)
     await flushPromises()
 
     expect(postSpy).toHaveBeenCalledWith(
@@ -233,23 +207,13 @@ describe("NotebookAttachedBookSection", () => {
       >
     })
 
-    const wrapper = helper
-      .component(NotebookAttachedBookSection)
-      .withRouter()
-      .withProps({ notebookId })
-      .mount()
+    const wrapper = mountNotebookAttachedBookSection()
     await flushPromises()
 
     const file = new File(["epub"], "Deferred Epub.epub", {
       type: "application/epub+zip",
     })
-    const input = wrapper.find('input[type="file"]').element as HTMLInputElement
-    Object.defineProperty(input, "files", {
-      value: [file],
-      writable: false,
-      configurable: true,
-    })
-    await wrapper.find('input[type="file"]').trigger("change")
+    await selectAttachBookFile(wrapper, file)
     await nextTick()
 
     expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
@@ -267,21 +231,11 @@ describe("NotebookAttachedBookSection", () => {
     )
     const postSpy = vi.spyOn(client, "post")
 
-    const wrapper = helper
-      .component(NotebookAttachedBookSection)
-      .withRouter()
-      .withProps({ notebookId })
-      .mount()
+    const wrapper = mountNotebookAttachedBookSection()
     await flushPromises()
 
     const file = new File(["%PDF"], "Report.pdf", { type: "application/pdf" })
-    const input = wrapper.find('input[type="file"]').element as HTMLInputElement
-    Object.defineProperty(input, "files", {
-      value: [file],
-      writable: false,
-      configurable: true,
-    })
-    await wrapper.find('input[type="file"]').trigger("change")
+    await selectAttachBookFile(wrapper, file)
     await flushPromises()
 
     expect(postSpy).not.toHaveBeenCalled()

@@ -1,9 +1,5 @@
 <template>
   <div>
-    <LoadingModal
-      :show="isCreatingRelationshipNote"
-      message="Creating relationship note..."
-    />
     <span class="daisy-label p-0">Relation note location</span>
     <RadioButtons
       field=""
@@ -41,9 +37,9 @@ import type { Note, NoteSearchResult } from "@generated/doughnut-backend-api"
 import RadioButtons from "../form/RadioButtons.vue"
 import RelationTypeSelect from "./RelationTypeSelect.vue"
 import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
-import LoadingModal from "../commons/LoadingModal.vue"
 import { Reply } from "@lucide/vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { runWithBlockingApiLoading } from "@/managedApi/clientSetup"
 import {
   formatRelationshipNoteMarkdown,
   formatRelationshipNoteTitle,
@@ -102,12 +98,9 @@ const relationshipFormErrors = ref({
   relationType: undefined as string | undefined,
 })
 
-const isCreatingRelationshipNote = ref(false)
-
 const relationTypeSelected = async (relationType: string | undefined) => {
-  if (relationType === undefined || isCreatingRelationshipNote.value) return
+  if (relationType === undefined) return
 
-  isCreatingRelationshipNote.value = true
   try {
     const realm = storageAccessor.value.refOfNoteRealm(props.note.id).value
     const notebookId = realm?.notebookRealm.notebook.id
@@ -119,46 +112,48 @@ const relationTypeSelected = async (relationType: string | undefined) => {
     const sourceFolderId = realmLeafFolder(realm)?.id
     const sourceTitle = props.note.noteTopology.title
 
-    const api = storageAccessor.value.storedApi()
-    const folderId = await resolveRelationshipNoteFolderId({
-      notebookId,
-      sourceFolderId,
-      sourceTitle,
-      placement: formData.value.relationshipNotePlacement,
-    })
-
-    const metaTitle = formatRelationshipNoteTitle(
-      sourceTitle,
-      relationType,
-      props.targetSearchResult.noteTopology.title
-    )
-    const markdown = formatRelationshipNoteMarkdown({
-      relationLabel: relationType,
-      sourceEndpoint: {
-        title: sourceTitle,
+    await runWithBlockingApiLoading(async () => {
+      const api = storageAccessor.value.storedApi()
+      const folderId = await resolveRelationshipNoteFolderId({
         notebookId,
-        notebookName: sourceNotebookName,
-      },
-      targetEndpoint: {
-        title: props.targetSearchResult.noteTopology.title,
-        notebookId: props.targetSearchResult.notebookId,
-        notebookName: props.targetSearchResult.notebookName,
-      },
-      relationshipNotebookId: notebookId,
-    })
+        sourceFolderId,
+        sourceTitle,
+        placement: formData.value.relationshipNotePlacement,
+      })
 
-    await api.createRootNoteAtNotebook(
-      router,
-      notebookId,
-      { newTitle: metaTitle, content: markdown },
-      {
-        folderId: folderId ?? undefined,
-        refreshWikiTitleCacheForNoteIds: [
-          props.note.id,
-          props.targetSearchResult.noteTopology.id,
-        ],
-      }
-    )
+      const metaTitle = formatRelationshipNoteTitle(
+        sourceTitle,
+        relationType,
+        props.targetSearchResult.noteTopology.title
+      )
+      const markdown = formatRelationshipNoteMarkdown({
+        relationLabel: relationType,
+        sourceEndpoint: {
+          title: sourceTitle,
+          notebookId,
+          notebookName: sourceNotebookName,
+        },
+        targetEndpoint: {
+          title: props.targetSearchResult.noteTopology.title,
+          notebookId: props.targetSearchResult.notebookId,
+          notebookName: props.targetSearchResult.notebookName,
+        },
+        relationshipNotebookId: notebookId,
+      })
+
+      await api.createRootNoteAtNotebook(
+        router,
+        notebookId,
+        { newTitle: metaTitle, content: markdown },
+        {
+          folderId: folderId ?? undefined,
+          refreshWikiTitleCacheForNoteIds: [
+            props.note.id,
+            props.targetSearchResult.noteTopology.id,
+          ],
+        }
+      )
+    }, "Creating relationship note...")
 
     emit("success")
   } catch (e: unknown) {
@@ -167,8 +162,6 @@ const relationTypeSelected = async (relationType: string | undefined) => {
         ? ((e as { relationType?: string }).relationType ?? e.message)
         : undefined
     relationshipFormErrors.value = { relationType: relationTypeError }
-  } finally {
-    isCreatingRelationshipNote.value = false
   }
 }
 </script>

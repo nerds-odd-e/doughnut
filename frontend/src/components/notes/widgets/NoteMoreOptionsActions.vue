@@ -84,12 +84,10 @@
       <Trash2 class="w-6 h-6" aria-hidden="true" />
     </button>
   </template>
-  <LoadingModal :show="isDeletingNote" :message="deleteLoadingMessage" />
 </template>
 
 <script setup lang="ts">
 import type { Note } from "@generated/doughnut-backend-api"
-import LoadingModal from "@/components/commons/LoadingModal.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import Questions from "@/components/notes/Questions.vue"
 import { CircleCheck, MessageCircleQuestion, Trash2, Upload } from "@lucide/vue"
@@ -117,10 +115,7 @@ const emit = defineEmits<{
 const { toggle, isOpenForNote } = useAssimilationView()
 const noteId = computed(() => props.note.id)
 const noteTitle = computed(() => props.note.noteTopology.title)
-const { deleteNote, isDeletingNote, deleteLoadingMessage } = useNoteDeleteFlow(
-  noteId,
-  noteTitle
-)
+const { deleteNote } = useNoteDeleteFlow(noteId, noteTitle)
 
 const assimilationChecked = computed(() => isOpenForNote(props.note.id))
 

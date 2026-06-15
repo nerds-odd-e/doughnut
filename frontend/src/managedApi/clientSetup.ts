@@ -26,9 +26,14 @@ let apiStatusHandler: ApiStatusHandler | undefined
 export const nonReloadingClient = createClient()
 
 type SdkResult = {
+  data?: unknown
   error?: unknown
   response?: { url?: string; status?: number }
   request?: { method?: string; url?: string }
+}
+
+type CompositeSdkResult<T> = SdkResult & {
+  data: T
 }
 
 /**
@@ -50,11 +55,12 @@ export async function apiCallWithLoading<T extends SdkResult>(
   apiCall: () => Promise<T>,
   options: ApiLoadingOptions = {}
 ): Promise<T> {
-  if (!apiStatusHandler) {
+  const statusHandler = apiStatusHandler
+  if (!statusHandler) {
     return await apiCall()
   }
 
-  const loadingState = apiStatusHandler.startLoading(options)
+  const loadingState = statusHandler.startLoading(options)
   try {
     const result = await apiCall()
 
@@ -65,8 +71,19 @@ export async function apiCallWithLoading<T extends SdkResult>(
 
     return result
   } finally {
-    apiStatusHandler.finishLoading(loadingState)
+    statusHandler.finishLoading(loadingState)
   }
+}
+
+export async function runWithBlockingApiLoading<T>(
+  operation: () => Promise<T>,
+  message: string
+): Promise<T> {
+  const { data } = await apiCallWithLoading<CompositeSdkResult<T>>(
+    async () => ({ data: await operation() }),
+    { blockUi: true, message }
+  )
+  return data
 }
 
 /** Resets the global API status handler. Use only in tests. */

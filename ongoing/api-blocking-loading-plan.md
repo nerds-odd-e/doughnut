@@ -17,6 +17,7 @@ Make whole-UI blocking spinners a cohesive API-call concern instead of local com
 - Existing whole-screen blocking users include relationship-note creation, note deletion/reduction, book upload, and note refinement AI actions.
 - Subtle partial blockers exist in book reading layout mutation/reorganization. They are API waits, but currently block only a row or the book-layout area; include them only if the product decision is that every mutating API wait should block the whole UI.
 - Phase 2 confirmed `assimilatingPropertyKey` still drives property-row disabled/pending state in `AssimilationSettings.vue`, so it remains local even after the whole-screen blocker moved to the API loading state.
+- Phase 3 uses API blocking state for existing whole-screen blockers. Composite flows (relationship note creation, delete navigation, book upload plus reload, and note refinement AI plus follow-up storage updates) use a small blocking API-loading wrapper so the global modal stays visible across the full operation while inner API calls keep standard loading/error behavior.
 
 ## Key design decisions
 
@@ -64,7 +65,7 @@ Tests:
 
 ### Phase 3 - Migrate existing whole-screen blockers to the same API option
 
-Status: planned
+Status: done
 
 Behavior: Existing whole-screen blocking interactions still block the UI, but the blocking is driven by API-call options rather than manual local refs.
 
