@@ -3,7 +3,7 @@ import {
   createClient,
   type Config,
 } from "@generated/doughnut-backend-api/client"
-import type { ApiStatus } from "./ApiStatusHandler"
+import type { ApiLoadingOptions, ApiStatus } from "./ApiStatusHandler"
 import ApiStatusHandler from "./ApiStatusHandler"
 import assignBadRequestProperties from "./window/assignBadRequestProperties"
 import loginOrRegisterAndHaltThisThread from "./window/loginOrRegisterAndHaltThisThread"
@@ -47,13 +47,14 @@ type SdkResult = {
  * )
  */
 export async function apiCallWithLoading<T extends SdkResult>(
-  apiCall: () => Promise<T>
+  apiCall: () => Promise<T>,
+  options: ApiLoadingOptions = {}
 ): Promise<T> {
   if (!apiStatusHandler) {
     return await apiCall()
   }
 
-  apiStatusHandler.assignLoading(true)
+  const loadingState = apiStatusHandler.startLoading(options)
   try {
     const result = await apiCall()
 
@@ -64,7 +65,7 @@ export async function apiCallWithLoading<T extends SdkResult>(
 
     return result
   } finally {
-    apiStatusHandler.assignLoading(false)
+    apiStatusHandler.finishLoading(loadingState)
   }
 }
 

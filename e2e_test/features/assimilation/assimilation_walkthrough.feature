@@ -15,7 +15,7 @@ Feature: Assimilation walkthrough
 
   Scenario: Walk through notes with menu, keep, skip, toasts, and panel on note page
     Given It's day 1
-    When I start assimilation from the menu
+    When I start assimilation from the menu and observe blocking loading
     Then I should be assimilating the note "Note 1"
     And I should see assimilation progress "0/2/5"
     When I keep for recall on the assimilation panel

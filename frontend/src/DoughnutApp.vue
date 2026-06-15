@@ -4,9 +4,13 @@ import { computed, onMounted, provide, ref } from "vue"
 import Popups from "./components/commons/Popups/Popups.vue"
 import TestMenu from "./components/commons/TestMenu.vue"
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue"
-import type { ApiStatus } from "./managedApi/ApiStatusHandler"
+import {
+  currentBlockingApiState,
+  type ApiStatus,
+} from "./managedApi/ApiStatusHandler"
 import { setupGlobalClient, nonReloadingClient } from "./managedApi/clientSetup"
 import LoadingThinBar from "./components/commons/LoadingThinBar.vue"
+import LoadingModal from "./components/commons/LoadingModal.vue"
 import type { User } from "@generated/doughnut-backend-api"
 import {
   CurrentUserInfoController,
@@ -25,6 +29,9 @@ const apiStatus: Ref<ApiStatus> = ref({
 setupGlobalClient(apiStatus.value)
 const user = ref<User | undefined>()
 provide("currentUser", user)
+const blockingApiState = computed(() =>
+  currentBlockingApiState(apiStatus.value)
+)
 
 const externalIdentifier = ref<string | undefined>()
 const { featureToggle, setFeatureToggle } = useFeatureToggle()
@@ -62,6 +69,11 @@ onMounted(async () => {
   <SoftKeyboardPrimer />
   <Popups />
   <LoadingThinBar v-if="user && apiStatus.states.length > 0" />
+  <LoadingModal
+    v-if="user"
+    :show="!!blockingApiState"
+    :message="blockingApiState?.message"
+  />
   <div class="flex bg-base-100 text-base-content app-container">
     <div class="main-menu flex bg-neutral text-neutral-content z-[10000]">
       <MainMenu

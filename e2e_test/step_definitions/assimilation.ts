@@ -4,7 +4,6 @@
 
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
-import { assumeMemoryTrackerPage } from '../start/pageObjects/memoryTrackerPage'
 import start from '../start'
 
 Then('I assimilate these in sequence:', (data: DataTable) => {
@@ -58,6 +57,10 @@ When('I am assimilating the note {string}', (noteTitle: string) => {
 
 When('I start assimilation from the menu', () => {
   start.assimilation().startAssimilationFromMenu()
+})
+
+When('I start assimilation from the menu and observe blocking loading', () => {
+  start.assimilation().startAssimilationFromMenuAndObserveBlockingLoading()
 })
 
 Then('I should be assimilating the note {string}', (noteTitle: string) => {
@@ -220,78 +223,5 @@ Then(
     start
       .assumeAssimilationPage()
       .expectPropertyKeepForRecallEnabled(propertyKey)
-  }
-)
-
-Then(
-  'the note memory tracker should have recall count {int}',
-  (count: number) => {
-    start
-      .assumeAssimilationPage()
-      .expectMemoryTrackerInfo([
-        { type: 'normal', 'Recall Count': String(count) },
-      ])
-  }
-)
-
-Then(
-  'the property memory tracker for {string} should have recall count {int}',
-  (propertyKey: string, count: number) => {
-    start
-      .assumeAssimilationPage()
-      .expectPropertyMemoryTracker(propertyKey, count)
-  }
-)
-
-Then(
-  'I should see a property memory tracker for {string} on the assimilation settings panel',
-  (propertyKey: string) => {
-    start.assumeAssimilationPage().expectPropertyMemoryTracker(propertyKey)
-  }
-)
-
-Then(
-  'the property memory tracker for {string} should be absent on the assimilation settings panel',
-  (propertyKey: string) => {
-    start
-      .assumeAssimilationPage()
-      .expectPropertyMemoryTrackerAbsent(propertyKey)
-  }
-)
-
-When(
-  'I open the property memory tracker for {string} from the assimilation settings panel',
-  (propertyKey: string) => {
-    start.assumeAssimilationPage().openPropertyMemoryTracker(propertyKey)
-  }
-)
-
-Then(
-  'I should see note {string} on the memory tracker page',
-  (noteTitle: string) => {
-    assumeMemoryTrackerPage().expectNoteTitle(noteTitle)
-  }
-)
-
-Then(
-  'I should see focused property {string} on the memory tracker page',
-  (propertyKey: string) => {
-    assumeMemoryTrackerPage().expectFocusedProperty(propertyKey)
-  }
-)
-
-Then(
-  'the spelling verification result for note {string} should be {string}',
-  (noteTitle: string, expectedResult: string) => {
-    if (expectedResult === 'success') {
-      start.assumeAssimilationPage().expectPopupClosed()
-      start
-        .jumpToNotePage(noteTitle, true)
-        .openAssimilationSettings()
-        .expectMemoryTrackerInfo([{ type: 'spelling', 'Recall Count': '0' }])
-    } else {
-      const errorMessage = expectedResult.replace(/^error: /, '')
-      start.assumeAssimilationPage().expectSpellingErrorMessage(errorMessage)
-    }
   }
 )
