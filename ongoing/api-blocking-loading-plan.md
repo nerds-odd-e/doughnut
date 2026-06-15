@@ -16,6 +16,7 @@ Make whole-UI blocking spinners a cohesive API-call concern instead of local com
 - The assimilation walkthrough now observes the start-assimilation blocker by delaying `/api/assimilation/next` once in the menu-start page object.
 - Existing whole-screen blocking users include relationship-note creation, note deletion/reduction, book upload, and note refinement AI actions.
 - Subtle partial blockers exist in book reading layout mutation/reorganization. They are API waits, but currently block only a row or the book-layout area; include them only if the product decision is that every mutating API wait should block the whole UI.
+- Phase 2 confirmed `assimilatingPropertyKey` still drives property-row disabled/pending state in `AssimilationSettings.vue`, so it remains local even after the whole-screen blocker moved to the API loading state.
 
 ## Key design decisions
 
@@ -46,7 +47,7 @@ Tests:
 
 ### Phase 2 - Move assimilation keep/skip blocking onto the API mechanism
 
-Status: planned
+Status: done
 
 Behavior: After clicking keep-for-recall or skip-recall on the assimilation panel, the whole UI remains blocked through the assimilate API and the next-assimilation API. The next item is not interactable before it is fully shown.
 

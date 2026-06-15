@@ -36,14 +36,18 @@ export function useAssimilateUnit() {
   const assimilateUnit = async (
     request: AssimilateUnitRequest
   ): Promise<AssimilateUnitResult> => {
-    const { data: memoryTrackers, error } = await apiCallWithLoading(() =>
-      AssimilationController.assimilate({
-        body: {
-          noteId: request.noteId,
-          ...(request.propertyKey ? { propertyKey: request.propertyKey } : {}),
-          ...(request.skipMemoryTracking ? { skipMemoryTracking: true } : {}),
-        },
-      })
+    const { data: memoryTrackers, error } = await apiCallWithLoading(
+      () =>
+        AssimilationController.assimilate({
+          body: {
+            noteId: request.noteId,
+            ...(request.propertyKey
+              ? { propertyKey: request.propertyKey }
+              : {}),
+            ...(request.skipMemoryTracking ? { skipMemoryTracking: true } : {}),
+          },
+        }),
+      { blockUi: true, message: "Assimilating..." }
     )
 
     if (error || !memoryTrackers) {

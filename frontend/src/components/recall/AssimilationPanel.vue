@@ -26,13 +26,11 @@
     @cancel="handleSpellingCancel"
     @verified="handleSpellingVerified"
   />
-  <LoadingModal :show="isAssimilating" message="Assimilating..." />
 </template>
 
 <script setup lang="ts">
 import type { Note, NoteRecallInfo } from "@generated/doughnut-backend-api"
 import usePopups from "../commons/Popups/usePopups"
-import LoadingModal from "../commons/LoadingModal.vue"
 import AssimilationSettings from "./AssimilationSettings.vue"
 import SpellingVerificationPopup from "./SpellingVerificationPopup.vue"
 import { computed, ref } from "vue"
@@ -58,7 +56,6 @@ const { openForNote } = useAssimilationView()
 const settingsRef = ref<InstanceType<typeof AssimilationSettings> | null>(null)
 
 const showSpellingPopup = ref(false)
-const isAssimilating = ref(false)
 const assimilatingPropertyKey = ref<string | null>(null)
 
 const rememberSpelling = ref(false)
@@ -114,7 +111,6 @@ const doAssimilate = async ({
   skipMemoryTracking,
   propertyKey,
 }: AssimilateEvent) => {
-  isAssimilating.value = true
   assimilatingPropertyKey.value = propertyKey ?? null
   try {
     const result = await assimilateUnit({
@@ -139,7 +135,6 @@ const doAssimilate = async ({
       }
     }
   } finally {
-    isAssimilating.value = false
     assimilatingPropertyKey.value = null
   }
 }
