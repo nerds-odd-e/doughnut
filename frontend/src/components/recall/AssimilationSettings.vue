@@ -70,7 +70,13 @@
                           :keep-for-recall-disabled="
                             keepForRecallDisabledForProperty(row.key)
                           "
-                          @assimilate="(skip) => assimilateProperty(row.key, skip)"
+                          @assimilate="
+                            (skip) =>
+                              emit('assimilate', {
+                                skipMemoryTracking: skip,
+                                propertyKey: row.key,
+                              })
+                          "
                         />
                       </span>
                     </li>
@@ -98,7 +104,9 @@
               <AssimilationButtons
                 :disabled="!noteInfoLoaded"
                 :keep-for-recall-disabled="keepForRecallDisabled"
-                @assimilate="emit('assimilate', $event)"
+                @assimilate="
+                  (skip) => emit('assimilate', { skipMemoryTracking: skip })
+                "
               />
             </div>
           </div>
@@ -150,36 +158,32 @@
 
 <script setup lang="ts">
 import type { Note, NoteRecallInfo } from "@generated/doughnut-backend-api"
-import { AssimilationController } from "@generated/doughnut-backend-api/sdk.gen"
 import NoteInfoBar from "../notes/NoteInfoBar.vue"
 import AssimilationButtons from "./AssimilationButtons.vue"
 import AssimilationProgressSummary from "./AssimilationProgressSummary.vue"
 import NoteRefinement from "./NoteRefinement.vue"
 import { useDaisyDialog } from "@/composables/useDaisyDialog"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import type { AssimilateEvent } from "@/composables/useAssimilateUnit"
 import {
   parseNoteContentMarkdown,
   sortedPropertyRowsFromRecord,
 } from "@/utils/noteContentFrontmatter"
-import { useAssimilationCount } from "@/composables/useAssimilationCount"
-import { useAssimilationView } from "@/composables/useAssimilationView"
-import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
 import { usePendingAssimilationProperty } from "@/composables/usePendingAssimilationProperty"
-import { useRecallData } from "@/composables/useRecallData"
-import usePopups from "../commons/Popups/usePopups"
 import { computed, ref, toRef, watch } from "vue"
 
-const { note, noteInfoLoaded, keepForRecallDisabled } = defineProps<{
-  note: Note
-  noteInfoLoaded: boolean
-  keepForRecallDisabled: boolean
-}>()
+const { note, noteInfoLoaded, keepForRecallDisabled, assimilatingPropertyKey } =
+  defineProps<{
+    note: Note
+    noteInfoLoaded: boolean
+    keepForRecallDisabled: boolean
+    assimilatingPropertyKey?: string | null
+  }>()
 
 const emit = defineEmits<{
   (e: "levelChanged", value: unknown): void
   (e: "rememberSpellingChanged", value: boolean): void
   (e: "noteRecallInfoLoaded", value: NoteRecallInfo): void
-  (e: "assimilate", skipMemoryTracking: boolean): void
+  (e: "assimilate", request: AssimilateEvent): void
   (e: "refinementContentUpdated"): void
 }>()
 
@@ -187,14 +191,8 @@ const showRefineNoteModal = ref(false)
 const refineNoteDialogRef = ref<HTMLDialogElement | null>(null)
 const noteInfoBarRef = ref<InstanceType<typeof NoteInfoBar> | null>(null)
 const noteRecallInfo = ref<NoteRecallInfo | null>(null)
-const assimilatingPropertyKey = ref<string | null>(null)
 const { propertiesSectionOpen, isPendingProperty, setPropertyRowRef } =
   usePendingAssimilationProperty(toRef(() => note.id))
-const { openForNote } = useAssimilationView()
-const { popups } = usePopups()
-const { totalAssimilatedCount, requestDueRecallsRefresh } = useRecallData()
-const { goToNextAssimilation } = useGoToNextAssimilation()
-const { incrementAssimilatedCount } = useAssimilationCount()
 useDaisyDialog(showRefineNoteModal, refineNoteDialogRef)
 
 const propertyRows = computed(() => {
@@ -213,53 +211,13 @@ const keepForRecallDisabledForProperty = (propertyKey: string) =>
     (mt) => mt.propertyKey === propertyKey
   ) ?? false
 
-const assimilateProperty = async (
-  propertyKey: string,
-  skipMemoryTracking?: boolean
-) => {
-  if (skipMemoryTracking) {
-    const confirmed = await popups.confirm(
-      "Confirm to hide this property from recalls in the future?"
-    )
-    if (!confirmed) {
-      return
-    }
-  }
-  assimilatingPropertyKey.value = propertyKey
-  try {
-    const { data: memoryTrackers, error } = await apiCallWithLoading(() =>
-      AssimilationController.assimilate({
-        body: {
-          noteId: note.id,
-          propertyKey,
-          ...(skipMemoryTracking ? { skipMemoryTracking: true } : {}),
-        },
-      })
-    )
-    if (!error) {
-      await noteInfoBarRef.value?.reload()
-      noteRecallInfo.value =
-        noteInfoBarRef.value?.noteRecallInfo ?? noteRecallInfo.value
-
-      if (skipMemoryTracking && memoryTrackers) {
-        const newTrackerCount = memoryTrackers.filter(
-          (t) => !t.removedFromTracking
-        ).length
-        if (totalAssimilatedCount.value !== undefined) {
-          totalAssimilatedCount.value += newTrackerCount
-        }
-        incrementAssimilatedCount(newTrackerCount)
-        requestDueRecallsRefresh()
-        const navigated = await goToNextAssimilation()
-        if (!navigated) {
-          openForNote(note.id, null)
-        }
-      }
-    }
-  } finally {
-    assimilatingPropertyKey.value = null
-  }
+const reloadNoteInfo = async () => {
+  await noteInfoBarRef.value?.reload()
+  noteRecallInfo.value =
+    noteInfoBarRef.value?.noteRecallInfo ?? noteRecallInfo.value
 }
+
+defineExpose({ reloadNoteInfo })
 
 watch(
   () => note.id,

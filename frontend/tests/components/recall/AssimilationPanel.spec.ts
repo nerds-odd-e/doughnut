@@ -41,7 +41,7 @@ describe("AssimilationPanel", () => {
       await clickKeepForRecall(wrapper)
 
       expect(assimilateSpy).toHaveBeenCalledWith({
-        body: { noteId: note.id, skipMemoryTracking: false },
+        body: { noteId: note.id },
       })
       expect(mockedGoToNextAssimilation).toHaveBeenCalled()
       expect(mockedTotalAssimilatedCount.value).toBe(2)
@@ -201,7 +201,7 @@ describe("AssimilationPanel", () => {
       await flushPromises()
 
       expect(assimilateSpy).toHaveBeenCalledWith({
-        body: { noteId: note.id, skipMemoryTracking: false },
+        body: { noteId: note.id },
       })
       expect(mockedGoToNextAssimilation).toHaveBeenCalled()
       expect(mockedRequestDueRecallsRefresh).toHaveBeenCalled()

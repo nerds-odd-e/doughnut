@@ -1,12 +1,14 @@
 <template>
   <AssimilationSettings
+    ref="settingsRef"
     :note="note"
     :note-info-loaded="noteInfoLoaded"
     :keep-for-recall-disabled="keepForRecallDisabled"
+    :assimilating-property-key="assimilatingPropertyKey"
     @level-changed="emit('reloadNeeded')"
     @remember-spelling-changed="onRememberSpellingChanged"
     @note-recall-info-loaded="onNoteRecallInfoLoaded"
-    @assimilate="processForm"
+    @assimilate="processAssimilate"
     @refinement-content-updated="emit('reloadNeeded')"
   />
   <Teleport to="body">
@@ -29,16 +31,17 @@
 
 <script setup lang="ts">
 import type { Note, NoteRecallInfo } from "@generated/doughnut-backend-api"
-import { AssimilationController } from "@generated/doughnut-backend-api/sdk.gen"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
 import LoadingModal from "../commons/LoadingModal.vue"
 import AssimilationSettings from "./AssimilationSettings.vue"
 import SpellingVerificationPopup from "./SpellingVerificationPopup.vue"
 import { computed, ref } from "vue"
-import { useRecallData } from "@/composables/useRecallData"
-import { useAssimilationCount } from "@/composables/useAssimilationCount"
-import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
+import {
+  skipRecallConfirmMessage,
+  useAssimilateUnit,
+  type AssimilateEvent,
+} from "@/composables/useAssimilateUnit"
+import { useAssimilationView } from "@/composables/useAssimilationView"
 
 const { note } = defineProps<{
   note: Note
@@ -49,13 +52,14 @@ const emit = defineEmits<{
 }>()
 
 const { popups } = usePopups()
-const { totalAssimilatedCount, requestDueRecallsRefresh } = useRecallData()
-const { goToNextAssimilation } = useGoToNextAssimilation()
+const { assimilateUnit } = useAssimilateUnit()
+const { openForNote } = useAssimilationView()
 
-const { incrementAssimilatedCount } = useAssimilationCount()
+const settingsRef = ref<InstanceType<typeof AssimilationSettings> | null>(null)
 
 const showSpellingPopup = ref(false)
 const isAssimilating = ref(false)
+const assimilatingPropertyKey = ref<string | null>(null)
 
 const rememberSpelling = ref(false)
 const noteInfoLoaded = ref(false)
@@ -85,60 +89,64 @@ const keepForRecallDisabled = computed(
     !(rememberSpelling.value && !hasSpellingMemoryTracker.value)
 )
 
-const processForm = async (skipMemoryTracking: boolean) => {
+const processAssimilate = async ({
+  skipMemoryTracking,
+  propertyKey,
+}: AssimilateEvent) => {
   if (skipMemoryTracking) {
     const confirmed = await popups.confirm(
-      "Confirm to hide this note from recalls in the future?"
+      skipRecallConfirmMessage(propertyKey)
     )
     if (!confirmed) {
       return
     }
   }
 
-  if (!skipMemoryTracking && rememberSpelling.value) {
+  if (!propertyKey && !skipMemoryTracking && rememberSpelling.value) {
     showSpellingPopup.value = true
     return
   }
 
-  await doAssimilate(skipMemoryTracking)
+  await doAssimilate({ skipMemoryTracking, propertyKey })
 }
 
-const doAssimilate = async (skipMemoryTracking: boolean) => {
+const doAssimilate = async ({
+  skipMemoryTracking,
+  propertyKey,
+}: AssimilateEvent) => {
   isAssimilating.value = true
+  assimilatingPropertyKey.value = propertyKey ?? null
   try {
-    const { data: memoryTrackers, error } = await apiCallWithLoading(() =>
-      AssimilationController.assimilate({
-        body: {
-          noteId: note.id,
-          skipMemoryTracking,
-        },
-      })
-    )
+    const result = await assimilateUnit({
+      noteId: note.id,
+      skipMemoryTracking,
+      propertyKey,
+    })
 
-    if (!error && memoryTrackers) {
-      const newTrackerCount = memoryTrackers.filter(
-        (t) => !t.removedFromTracking
-      ).length
-      if (totalAssimilatedCount.value !== undefined) {
-        totalAssimilatedCount.value += newTrackerCount
-      }
-      incrementAssimilatedCount(newTrackerCount)
+    if (!result.success) {
+      return
+    }
 
-      requestDueRecallsRefresh()
+    if (propertyKey) {
+      await settingsRef.value?.reloadNoteInfo()
+    }
 
-      const navigated = await goToNextAssimilation()
-      if (!navigated) {
+    if (!result.navigated) {
+      if (propertyKey && skipMemoryTracking) {
+        openForNote(note.id, null)
+      } else {
         emit("reloadNeeded")
       }
     }
   } finally {
     isAssimilating.value = false
+    assimilatingPropertyKey.value = null
   }
 }
 
 const handleSpellingVerified = async () => {
   showSpellingPopup.value = false
-  await doAssimilate(false)
+  await doAssimilate({ skipMemoryTracking: false })
 }
 
 const handleSpellingCancel = () => {
