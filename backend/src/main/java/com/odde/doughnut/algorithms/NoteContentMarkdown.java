@@ -1,5 +1,7 @@
 package com.odde.doughnut.algorithms;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -135,6 +137,28 @@ public final class NoteContentMarkdown {
   public static Optional<LeadingFrontmatter> splitLeadingFrontmatter(String content) {
     return NoteLeadingFrontmatter.split(content)
         .map(s -> new LeadingFrontmatter(s.frontmatter(), s.body()));
+  }
+
+  /**
+   * Wiki link inner titles in document order: parsed frontmatter scalar values first, then the
+   * body. Raw YAML escapes (e.g. {@code \"} inside double-quoted scalars) must not leak into link
+   * tokens.
+   */
+  public static List<String> wikiLinkInnersInOccurrenceOrder(String content) {
+    if (content == null || content.isEmpty()) {
+      return List.of();
+    }
+    return splitLeadingFrontmatter(content)
+        .map(
+            lf -> {
+              List<String> titles = new ArrayList<>();
+              for (String value : lf.frontmatter().stringValuesInInsertionOrder()) {
+                titles.addAll(WikiLinkMarkdown.innerTitlesInOccurrenceOrder(value));
+              }
+              titles.addAll(WikiLinkMarkdown.innerTitlesInOccurrenceOrder(lf.body()));
+              return List.copyOf(titles);
+            })
+        .orElseGet(() -> WikiLinkMarkdown.innerTitlesInOccurrenceOrder(content));
   }
 
   /**

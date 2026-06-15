@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.algorithms.WikiLinkMarkdown;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
@@ -37,7 +38,7 @@ public class WikiLinkResolver {
     if (content == null || content.isBlank()) {
       return List.of();
     }
-    List<String> linkTitlesOrdered = WikiLinkMarkdown.innerTitlesInOccurrenceOrder(content);
+    List<String> linkTitlesOrdered = NoteContentMarkdown.wikiLinkInnersInOccurrenceOrder(content);
     if (linkTitlesOrdered.isEmpty()) {
       return List.of();
     }

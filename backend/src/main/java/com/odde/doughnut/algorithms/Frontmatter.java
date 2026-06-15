@@ -1,6 +1,8 @@
 package com.odde.doughnut.algorithms;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -56,6 +58,17 @@ public final class Frontmatter {
   /** Key names in insertion order. */
   public Set<String> keys() {
     return Set.copyOf(data.keySet());
+  }
+
+  /** String values in key insertion order (YAML document order when parsed via SnakeYAML). */
+  public List<String> stringValuesInInsertionOrder() {
+    List<String> out = new ArrayList<>();
+    for (Object v : data.values()) {
+      if (v != null) {
+        out.add(v.toString());
+      }
+    }
+    return List.copyOf(out);
   }
 
   /** Case-insensitive key presence (including entries whose value is null). */

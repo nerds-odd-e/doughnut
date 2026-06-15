@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -117,6 +118,15 @@ class NoteContentMarkdownTest {
   void bodyWithoutLeadingFrontmatter_preserves_crlf_when_no_frontmatter() {
     String s = "Line1\r\nLine2";
     assertThat(NoteContentMarkdown.bodyWithoutLeadingFrontmatter(s), equalTo(s));
+  }
+
+  @Test
+  void wikiLinkInnersInOccurrenceOrder_readsWikiLinkFromParsedFrontmatterScalar() {
+    String title = "In volitional (\"let's\" or \"I shall\") statements";
+    String content = Frontmatter.empty().set("example of", "[[" + title + "]]").fenced("");
+
+    assertThat(
+        NoteContentMarkdown.wikiLinkInnersInOccurrenceOrder(content), equalTo(List.of(title)));
   }
 
   @Test
