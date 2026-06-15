@@ -91,7 +91,7 @@ Tests:
 
 ### Phase 4 - Decide and migrate subtle partial blockers
 
-Status: planned
+Status: done
 
 Behavior: If the desired product rule is "mutating API calls block the whole UI", book-layout row/panel blockers move to the same global API blocking mechanism. If the desired rule is narrower, document why these remain local.
 

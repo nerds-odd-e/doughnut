@@ -40,8 +40,6 @@
     :blocks="bookBlocks"
     :current-block-id="currentBlockId"
     :selected-block-id="selectedBlockId"
-    :pending-layout-block-id="pendingLayoutBlockId"
-    :full-layout-busy="aiSuggestPending"
     :disposition-for-block="bookReading.dispositionForBlock"
     @block-click="onBookBlockClick"
     @block-indent="onBlockIndent"
@@ -235,7 +233,6 @@ const bookBlocks = computed(() => props.book.blocks)
 const selectedBlockId = ref<number | null>(props.initialSelectedBlockId ?? null)
 
 const {
-  suggestPending: aiSuggestPending,
   suggestion: aiSuggestion,
   previewRows: aiPreviewRows,
   requestSuggest: requestAiReorganize,
@@ -326,15 +323,16 @@ const { readingPanelAnchorTopPx, updateReadingPanelAnchor } =
     mainPaneRef: pdfPaneRef,
   })
 
-const { pendingLayoutBlockId, onBlockIndent, onBlockOutdent, onBlockCancel } =
-  useBookLayoutMutations({
+const { onBlockIndent, onBlockOutdent, onBlockCancel } = useBookLayoutMutations(
+  {
     notebookId,
     bookBlocks,
     getPropBook: () => props.book,
     selectedBlockId,
     applyBookBlockSelection,
     onBookUpdated: (book) => emit("update:book", book),
-  })
+  }
+)
 
 function commitCurrentBlockId(id: number | null): boolean {
   if (shouldSnapBack(id)) {

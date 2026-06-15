@@ -5,20 +5,7 @@
     aria-hidden="true"
     @click="closeOverlay"
   />
-  <div
-    class="flex flex-1 min-h-0 relative"
-    :aria-busy="fullLayoutBusy ? true : undefined"
-  >
-    <div
-      v-if="fullLayoutBusy"
-      class="book-reading-layout-full-busy absolute inset-0 z-50 flex items-center justify-center bg-base-100/70"
-      data-testid="book-reading-layout-full-busy"
-      aria-hidden="true"
-    >
-      <span
-        class="daisy-loading daisy-loading-spinner daisy-loading-lg"
-      />
-    </div>
+  <div class="flex flex-1 min-h-0 relative">
     <aside
       :id="panelId"
       ref="asideRef"
@@ -35,16 +22,6 @@
       ]"
     >
       <div
-        v-if="fullLayoutBusy && !isMdOrLarger && opened"
-        class="book-reading-layout-full-busy absolute inset-0 z-50 flex items-center justify-center bg-base-200/70"
-        data-testid="book-reading-layout-aside-full-busy"
-        aria-hidden="true"
-      >
-        <span
-          class="daisy-loading daisy-loading-spinner daisy-loading-lg"
-        />
-      </div>
-      <div
         data-testid="book-reading-book-layout"
         class="p-3 pb-8"
       >
@@ -52,7 +29,6 @@
           type="button"
           data-testid="book-reading-ai-reorganize-layout"
           class="daisy-btn daisy-btn-sm daisy-btn-outline daisy-btn-primary mb-3 w-full"
-          :disabled="layoutActionsLocked"
           @click="emit('requestAiReorganize')"
         >
           AI Reorganize
@@ -63,10 +39,6 @@
           type="button"
           data-testid="book-reading-book-block"
           class="book-reading-book-block"
-          :class="{
-            'book-reading-book-block--pending':
-              block.id === pendingLayoutBlockId,
-          }"
           :data-epub-start-href="blockStartEpubDisplayHref(block) ?? undefined"
           :data-book-block-depth="block.depth"
           :data-current-block="
@@ -87,7 +59,6 @@
           :aria-current="
             block.id === currentBlockId ? 'location' : undefined
           "
-          :aria-busy="block.id === pendingLayoutBlockId ? true : undefined"
           @click="onBlockRowClick(block, $event)"
           @pointerdown="onBlockPointerDown(block, $event)"
           @pointermove="onBlockPointerMove(block, $event)"
@@ -97,16 +68,6 @@
           @keydown.tab.exact.prevent="onBlockKeyIndent(block)"
           @keydown.delete.prevent="onBlockKeyCancel(block)"
         >
-          <span
-            v-if="block.id === pendingLayoutBlockId"
-            class="book-reading-book-block-pending-overlay"
-            data-testid="book-reading-book-block-layout-pending"
-            aria-hidden="true"
-          >
-            <span
-              class="daisy-loading daisy-loading-spinner daisy-loading-md"
-            />
-          </span>
           <span
             class="book-reading-book-block-guides"
             data-testid="book-reading-book-block-guides"
@@ -159,7 +120,7 @@ import {
 } from "@/lib/book-reading/bookLayoutBlockDragIntent"
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
 import type { BookBlockFull } from "@generated/doughnut-backend-api"
-import { computed, ref, watch } from "vue"
+import { ref, watch } from "vue"
 
 const opened = defineModel<boolean>("opened", { required: true })
 
@@ -170,16 +131,11 @@ const props = withDefaults(
     blocks: BookBlockFull[]
     currentBlockId: number | null
     selectedBlockId: number | null
-    pendingLayoutBlockId?: number | null
     dispositionForBlock: (
       blockId: number
     ) => BookBlockReadingDisposition | undefined
-    fullLayoutBusy?: boolean
   }>(),
-  {
-    pendingLayoutBlockId: null,
-    fullLayoutBusy: false,
-  }
+  {}
 )
 
 const emit = defineEmits<{
@@ -191,10 +147,6 @@ const emit = defineEmits<{
 }>()
 
 const asideRef = ref<HTMLElement | null>(null)
-
-const layoutActionsLocked = computed(
-  () => props.pendingLayoutBlockId !== null || props.fullLayoutBusy
-)
 
 const dragThresholdOpts = { thresholdPx: BOOK_LAYOUT_BLOCK_DRAG_THRESHOLD_PX }
 
@@ -213,32 +165,18 @@ function closeOverlay() {
 }
 
 function onBlockKeyIndent(block: BookBlockFull) {
-  if (layoutActionsLocked.value) {
-    return
-  }
   emit("blockIndent", block)
 }
 
 function onBlockKeyOutdent(block: BookBlockFull) {
-  if (layoutActionsLocked.value) {
-    return
-  }
   emit("blockOutdent", block)
 }
 
 function onBlockKeyCancel(block: BookBlockFull) {
-  if (layoutActionsLocked.value) {
-    return
-  }
   emit("blockCancel", block)
 }
 
 function onBlockRowClick(block: BookBlockFull, e: MouseEvent) {
-  if (layoutActionsLocked.value) {
-    e.preventDefault()
-    e.stopPropagation()
-    return
-  }
   if (suppressNextBlockClick.value) {
     suppressNextBlockClick.value = false
     e.preventDefault()
@@ -249,9 +187,6 @@ function onBlockRowClick(block: BookBlockFull, e: MouseEvent) {
 }
 
 function onBlockPointerDown(block: BookBlockFull, e: PointerEvent) {
-  if (layoutActionsLocked.value) {
-    return
-  }
   if (e.pointerType === "mouse" && e.button !== 0) {
     return
   }
@@ -265,9 +200,6 @@ function onBlockPointerDown(block: BookBlockFull, e: PointerEvent) {
 }
 
 function onBlockPointerMove(block: BookBlockFull, e: PointerEvent) {
-  if (layoutActionsLocked.value) {
-    return
-  }
   const s = blockPointerDrag.value
   if (!s || s.pointerId !== e.pointerId || s.blockId !== block.id) {
     return
@@ -288,10 +220,6 @@ function onBlockPointerMove(block: BookBlockFull, e: PointerEvent) {
 }
 
 function onBlockPointerUp(block: BookBlockFull, e: PointerEvent) {
-  if (layoutActionsLocked.value) {
-    blockPointerDrag.value = null
-    return
-  }
   const s = blockPointerDrag.value
   if (!s || s.pointerId !== e.pointerId || s.blockId !== block.id) {
     return
@@ -318,10 +246,6 @@ function onBlockPointerUp(block: BookBlockFull, e: PointerEvent) {
 }
 
 function onBlockPointerCancel(block: BookBlockFull, e: PointerEvent) {
-  if (layoutActionsLocked.value) {
-    blockPointerDrag.value = null
-    return
-  }
   const s = blockPointerDrag.value
   if (!s || s.pointerId !== e.pointerId || s.blockId !== block.id) {
     return
@@ -380,14 +304,6 @@ watch(
 
 aside {
   max-height: 100%;
-}
-
-.book-reading-book-block--pending {
-  @apply relative;
-}
-
-.book-reading-book-block-pending-overlay {
-  @apply absolute inset-0 z-[1] flex items-center justify-center bg-base-200/70;
 }
 
 .book-reading-book-block {

@@ -7,11 +7,13 @@ import type {
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
 import { computed, ref, toValue, type MaybeRefOrGetter } from "vue"
 
+const BOOK_LAYOUT_SUGGEST_LOADING_MESSAGE = "Analyzing book layout…"
+const BOOK_LAYOUT_APPLY_LOADING_MESSAGE = "Applying layout changes…"
+
 export function useBookLayoutAiReorganize(
   notebookId: MaybeRefOrGetter<number>,
   bookBlocks: MaybeRefOrGetter<BookBlockFull[]>
 ) {
-  const suggestPending = ref(false)
   const suggestion = ref<BookLayoutReorganizationSuggestion | null>(null)
 
   const previewRows = computed(() => {
@@ -34,18 +36,15 @@ export function useBookLayoutAiReorganize(
 
   async function requestSuggest() {
     suggestion.value = null
-    suggestPending.value = true
-    try {
-      const { data, error } = await apiCallWithLoading(() =>
+    const { data, error } = await apiCallWithLoading(
+      () =>
         NotebookBooksController.suggestBookLayoutReorganization({
           path: { notebook: toValue(notebookId) },
-        })
-      )
-      if (!error && data) {
-        suggestion.value = data
-      }
-    } finally {
-      suggestPending.value = false
+        }),
+      { blockUi: true, message: BOOK_LAYOUT_SUGGEST_LOADING_MESSAGE }
+    )
+    if (!error && data) {
+      suggestion.value = data
     }
   }
 
@@ -53,11 +52,13 @@ export function useBookLayoutAiReorganize(
     BookMutationResponseFull | undefined
   > {
     if (!suggestion.value) return
-    const { data, error } = await apiCallWithLoading(() =>
-      NotebookBooksController.applyBookLayoutReorganization({
-        path: { notebook: toValue(notebookId) },
-        body: suggestion.value!,
-      })
+    const { data, error } = await apiCallWithLoading(
+      () =>
+        NotebookBooksController.applyBookLayoutReorganization({
+          path: { notebook: toValue(notebookId) },
+          body: suggestion.value!,
+        }),
+      { blockUi: true, message: BOOK_LAYOUT_APPLY_LOADING_MESSAGE }
     )
     if (!error && data) {
       suggestion.value = null
@@ -71,7 +72,6 @@ export function useBookLayoutAiReorganize(
   }
 
   return {
-    suggestPending,
     suggestion,
     previewRows,
     requestSuggest,
