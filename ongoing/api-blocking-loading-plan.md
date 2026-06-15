@@ -1,5 +1,7 @@
 # API-driven blocking loading plan
 
+**Plan complete.** Whole-UI blocking is now an `apiCallWithLoading` concern; conventions are documented in `.cursor/rules/frontend-api.mdc`.
+
 ## Goal
 
 Make whole-UI blocking spinners a cohesive API-call concern instead of local component state. The first user-facing target is assimilation: the UI should be blocked while fetching the next item to assimilate and while keep/skip assimilation calls are in flight.
@@ -109,7 +111,7 @@ Tests:
 
 ### Phase 5 - Documentation and guardrails
 
-Status: planned
+Status: done
 
 Behavior: Future frontend API work has a clear convention for when to use blocking versus non-blocking loading.
 
