@@ -405,6 +405,8 @@ Tests:
 
 ## Phase 16: Resume Work After Backend Restart
 
+Status: done
+
 Type: Behavior
 
 Precondition: persisted submitted/completed/importable batch rows exist from before service startup.
