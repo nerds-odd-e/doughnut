@@ -504,6 +504,8 @@ Tests:
 
 ## Phase 20: Make Single-Row Import Atomic
 
+Status: done
+
 Type: Behavior
 
 Precondition: `QuestionGenerationBatchRowImportService.importRow` saves the `PredefinedQuestion`, then the `RecallPrompt`, then flips the row to `IMPORTED` in three separate writes with no surrounding transaction, so a crash mid-row can create a question/prompt while leaving the row `OUTPUT_READY` and re-importable.

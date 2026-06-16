@@ -12,6 +12,7 @@ import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class QuestionGenerationBatchRowImportService {
@@ -28,6 +29,7 @@ public class QuestionGenerationBatchRowImportService {
     this.openAiApiHandler = openAiApiHandler;
   }
 
+  @Transactional
   public boolean importRow(QuestionGenerationBatchRequest request) {
     if (request.getStatus() == QuestionGenerationBatchRequestStatus.IMPORTED) {
       return false;

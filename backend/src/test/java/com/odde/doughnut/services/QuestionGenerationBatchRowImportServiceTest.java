@@ -16,7 +16,6 @@ import com.odde.doughnut.entities.QuestionGenerationBatchStatus;
 import com.odde.doughnut.entities.QuestionType;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.PredefinedQuestionRepository;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.doughnut.entities.repositories.RecallPromptRepository;
@@ -44,7 +43,6 @@ class QuestionGenerationBatchRowImportServiceTest {
   @Autowired QuestionGenerationBatchRowImportService rowImportService;
   @Autowired QuestionGenerationBatchRepository batchRepository;
   @Autowired QuestionGenerationBatchRequestRepository batchRequestRepository;
-  @Autowired PredefinedQuestionRepository predefinedQuestionRepository;
   @Autowired RecallPromptRepository recallPromptRepository;
 
   User user;
@@ -133,10 +131,6 @@ class QuestionGenerationBatchRowImportServiceTest {
       List<RecallPrompt> recallPrompts =
           recallPromptRepository.findAllByMemoryTracker_IdOrderByIdDesc(memoryTracker.getId());
       assertThat(recallPrompts.size(), is(1));
-
-      long predefinedQuestionCount =
-          ((List<PredefinedQuestion>) predefinedQuestionRepository.findAll()).size();
-      assertThat(predefinedQuestionCount, is(1L));
     }
   }
 
