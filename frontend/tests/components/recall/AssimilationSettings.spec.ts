@@ -116,4 +116,51 @@ describe("AssimilationSettings", () => {
       [{ skipMemoryTracking: true, propertyKey: "topic" }],
     ])
   })
+
+  describe("skipped property tracker", () => {
+    beforeEach(() => {
+      getNoteInfoSpy.mockResolvedValue(
+        wrapSdkResponse(
+          makeMe.aNoteRecallInfo
+            .memoryTrackers([
+              {
+                ...makeMe.aMemoryTracker.please(),
+                id: 1,
+                propertyKey: "topic",
+                removedFromTracking: true,
+              },
+            ])
+            .please()
+        )
+      )
+    })
+
+    it("shows Revive instead of Skip recall when property tracker is skipped", async () => {
+      mountSettings()
+      await flushPromises()
+      await expandAssimilationPropertiesSection()
+
+      const topicRow = assimilationPropertyRow("topic")
+      expect(topicRow.querySelector('[value="Revive"]')).not.toBeNull()
+      expect(topicRow.querySelector('[value="Skip recall"]')).toBeNull()
+
+      const urlRow = assimilationPropertyRow("url")
+      expect(urlRow.querySelector('[value="Skip recall"]')).not.toBeNull()
+      expect(urlRow.querySelector('[value="Revive"]')).toBeNull()
+    })
+
+    it("emits revive with propertyKey when Revive is clicked on a skipped property", async () => {
+      mountSettings()
+      await flushPromises()
+      await expandAssimilationPropertiesSection()
+
+      const revive = assimilationPropertyRow("topic").querySelector(
+        '[data-test="revive"]'
+      ) as HTMLInputElement
+      revive.click()
+      await flushPromises()
+
+      expect(wrapper.emitted("revive")).toEqual([[{ propertyKey: "topic" }]])
+    })
+  })
 })

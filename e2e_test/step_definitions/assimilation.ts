@@ -208,6 +208,17 @@ When(
   }
 )
 
+When(
+  'I revive recall for property {string} on the assimilation settings panel',
+  (propertyKey: string) => {
+    start.assumeAssimilationPage().reviveRecallProperty(propertyKey)
+  }
+)
+
+When('I revive recall on the assimilation panel', () => {
+  start.assumeAssimilationPage().reviveRecallOnPanel()
+})
+
 Then(
   'assimilate for property {string} should be disabled',
   (propertyKey: string) => {
@@ -221,3 +232,25 @@ Then(
     start.assumeAssimilationPage().expectPropertyAssimilateEnabled(propertyKey)
   }
 )
+
+Then(
+  'I should see Revive for property {string} on the assimilation settings panel',
+  (propertyKey: string) => {
+    start.assumeAssimilationPage().expectReviveForProperty(propertyKey)
+  }
+)
+
+Then(
+  'I should see Skip recall for property {string} on the assimilation settings panel',
+  (propertyKey: string) => {
+    start.assumeAssimilationPage().expectSkipRecallForProperty(propertyKey)
+  }
+)
+
+Then('I should see Revive on the assimilation panel', () => {
+  start.assumeAssimilationPage().expectReviveOnPanel()
+})
+
+Then('I should see Skip recall on the assimilation panel', () => {
+  start.assumeAssimilationPage().expectSkipRecallOnPanel()
+})

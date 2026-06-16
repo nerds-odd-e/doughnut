@@ -34,3 +34,8 @@ Feature: Assimilation walkthrough
     When I jump to the note page of "Note 1"
     And I open assimilation settings from more options
     Then the assimilate button should be disabled
+    When I jump to the note page of "Note 3"
+    And I open assimilation settings from more options
+    Then I should see Revive on the assimilation panel
+    When I revive recall on the assimilation panel
+    Then I should see Skip recall on the assimilation panel

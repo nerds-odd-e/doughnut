@@ -1,5 +1,9 @@
 import { pageIsNotLoading } from '../../pageBase'
-import { assimilationPropertyRow, assimilateButtonSelector } from './shared'
+import {
+  assimilationPropertyRow,
+  assimilateButtonSelector,
+  reviveButtonSelector,
+} from './shared'
 
 export function assimilationPropertyFlow() {
   return {
@@ -41,6 +45,31 @@ export function assimilationPropertyFlow() {
       })
       cy.findByRole('button', { name: 'OK' }).click()
       pageIsNotLoading()
+      return this
+    },
+    reviveRecallProperty(propertyKey: string) {
+      assimilationPropertyRow(propertyKey).within(() => {
+        cy.get(reviveButtonSelector).click()
+      })
+      pageIsNotLoading()
+      return this
+    },
+    expectReviveForProperty(propertyKey: string) {
+      assimilationPropertyRow(propertyKey).within(() => {
+        cy.get(reviveButtonSelector).should('exist')
+        cy.root().then(($root) => {
+          expect($root.find('[value="Skip recall"]').length).to.equal(0)
+        })
+      })
+      return this
+    },
+    expectSkipRecallForProperty(propertyKey: string) {
+      assimilationPropertyRow(propertyKey).within(() => {
+        cy.get('[value="Skip recall"]').should('exist')
+        cy.root().then(($root) => {
+          expect($root.find(reviveButtonSelector).length).to.equal(0)
+        })
+      })
       return this
     },
     expectPropertyAssimilateDisabled(propertyKey: string) {

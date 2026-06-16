@@ -6,7 +6,10 @@ import { assimilationPropertyFlow } from './assimilationPropertyFlow'
 import {
   assimilateButton,
   mainNoteHeadingTitleSelector,
+  noteLevelReviveElements,
   refinementSuggestionsPanel,
+  reviveButton,
+  skipRecallOnPanel,
   waitForAssimilationNoteTitle,
   waitForExtractNote,
 } from './shared'
@@ -48,6 +51,22 @@ export const assumeAssimilationPage = () => ({
     cy.findByText('Skip recall').click()
     cy.findByRole('button', { name: 'OK' }).click()
     pageIsNotLoading()
+    return this
+  },
+  reviveRecallOnPanel() {
+    reviveButton().click()
+    pageIsNotLoading()
+    return this
+  },
+  expectReviveOnPanel() {
+    reviveButton().should('exist')
+    return this
+  },
+  expectSkipRecallOnPanel() {
+    skipRecallOnPanel().should('exist')
+    cy.document().then((doc) => {
+      expect(noteLevelReviveElements(doc)).to.have.length(0)
+    })
     return this
   },
   proceedWithRememberingSpelling() {

@@ -70,6 +70,9 @@
                           :assimilate-disabled="
                             assimilateDisabledForProperty(row.key)
                           "
+                          :skipped-for-recall="
+                            isSkippedForRecall(noteRecallInfo, row.key)
+                          "
                           @assimilate="
                             (skip) =>
                               emit('assimilate', {
@@ -77,6 +80,7 @@
                                 propertyKey: row.key,
                               })
                           "
+                          @revive="emit('revive', { propertyKey: row.key })"
                         />
                       </span>
                     </li>
@@ -104,9 +108,11 @@
               <AssimilationButtons
                 :disabled="!noteInfoLoaded"
                 :assimilate-disabled="assimilateDisabled"
+                :skipped-for-recall="isSkippedForRecall(noteRecallInfo)"
                 @assimilate="
                   (skip) => emit('assimilate', { skipMemoryTracking: skip })
                 "
+                @revive="emit('revive', {})"
               />
             </div>
           </div>
@@ -164,6 +170,7 @@ import AssimilationProgressSummary from "./AssimilationProgressSummary.vue"
 import NoteRefinement from "./NoteRefinement.vue"
 import { useDaisyDialog } from "@/composables/useDaisyDialog"
 import type { AssimilateEvent } from "@/composables/useAssimilateUnit"
+import { isSkippedForRecall } from "@/composables/useReviveMemoryTracker"
 import {
   parseNoteContentMarkdown,
   sortedPropertyRowsFromRecord,
@@ -184,6 +191,7 @@ const emit = defineEmits<{
   (e: "rememberSpellingChanged", value: boolean): void
   (e: "noteRecallInfoLoaded", value: NoteRecallInfo): void
   (e: "assimilate", request: AssimilateEvent): void
+  (e: "revive", request: { propertyKey?: string }): void
   (e: "refinementContentUpdated"): void
 }>()
 

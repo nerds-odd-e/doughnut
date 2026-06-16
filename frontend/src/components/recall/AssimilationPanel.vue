@@ -9,6 +9,7 @@
     @remember-spelling-changed="onRememberSpellingChanged"
     @note-recall-info-loaded="onNoteRecallInfoLoaded"
     @assimilate="processAssimilate"
+    @revive="processRevive"
     @refinement-content-updated="emit('reloadNeeded')"
   />
   <Teleport to="body">
@@ -39,6 +40,10 @@ import {
   useAssimilateUnit,
   type AssimilateEvent,
 } from "@/composables/useAssimilateUnit"
+import {
+  trackersToRevive,
+  useReviveMemoryTracker,
+} from "@/composables/useReviveMemoryTracker"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 
 const { note } = defineProps<{
@@ -51,6 +56,7 @@ const emit = defineEmits<{
 
 const { popups } = usePopups()
 const { assimilateUnit } = useAssimilateUnit()
+const { reviveMemoryTrackers } = useReviveMemoryTracker()
 const { openForNote } = useAssimilationView()
 
 const settingsRef = ref<InstanceType<typeof AssimilationSettings> | null>(null)
@@ -105,6 +111,18 @@ const processAssimilate = async ({
   }
 
   await doAssimilate({ skipMemoryTracking, propertyKey })
+}
+
+const processRevive = async ({ propertyKey }: { propertyKey?: string }) => {
+  const trackers = trackersToRevive(noteRecallInfo.value, propertyKey)
+  if (trackers.length === 0) {
+    return
+  }
+
+  const success = await reviveMemoryTrackers(trackers)
+  if (success) {
+    await settingsRef.value?.reloadNoteInfo()
+  }
 }
 
 const doAssimilate = async ({
