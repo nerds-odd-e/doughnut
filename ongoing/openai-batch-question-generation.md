@@ -1,6 +1,6 @@
 # OpenAI Batch Question Generation
 
-Status: done
+Status: in-progress (Phases 1-18 done; Phases 19+ are post-review follow-ups)
 
 ## Refined Requirement
 
@@ -473,6 +473,207 @@ Tests:
 - Run `CURSOR_DEV=true nix develop -c pnpm backend:verify`.
 - If migrations changed schema, run `CURSOR_DEV=true nix develop -c pnpm export:database-erd`.
 
+# Post-Review Follow-Ups
+
+These phases come from a review of the Phase 1-18 implementation. They are ordered by value: correctness bugs first, then robustness, then hardening, then verification. Each is stop-safe — completed value is proportional to completed work.
+
+## Phase 19: Retry Failed/Expired Batches On The Next Hourly Cron
+
+Status: done
+
+Type: Behavior
+
+Precondition: `findUsersEligibleForBatchSubmission` applies both `isUserEligibleForNewBatchSubmission` and `isUserDueInCurrentCronHour` with AND semantics, so the failed/expired retry branch in `isUserEligibleForNewBatchSubmission` is shadowed by the once-per-day cron-hour gate. Failed local submissions and failed/expired OpenAI batches therefore wait ~24h instead of retrying on the next hourly cron, contradicting the Phase 12 intent.
+
+Trigger: an hourly cron runs while a user has a failed local submission or a failed/expired OpenAI batch within the 23-hour window, outside their daily target hour.
+
+Postcondition: a user with a retry-eligible failed/expired batch (or a failed local submission with no successful-submission marker advance) is selected on the next hourly cron regardless of the cron-hour gate, while users who have never failed are still only selected during their daily target hour. No duplicate in-progress submission is created (an existing `SUBMITTED` batch still blocks).
+
+Design decision: hourly retry for OpenAI `FAILED`/`EXPIRED` batches (bypass cron-hour gate only for retry-eligible users). Failed local submissions remain gated to the daily target hour.
+
+Implementation notes:
+
+- Split selection so the cron-hour gate applies to first-time-of-day submissions, but retry-eligible users (failed/expired OpenAI batch, or no successful marker after a local failure) bypass it.
+- Keep the `SUBMITTED`-batch existence guard so retries never overlap an in-flight batch.
+- Keep the 23-hour successful-submission gate unchanged.
+
+Tests:
+
+- Backend service tests: failed/expired batch retried in a non-target hour; first-time user still gated to target hour; in-flight `SUBMITTED` batch blocks retry; 23-hour gate still suppresses a recently successful user.
+- Run `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
+
+## Phase 20: Make Single-Row Import Atomic
+
+Type: Behavior
+
+Precondition: `QuestionGenerationBatchRowImportService.importRow` saves the `PredefinedQuestion`, then the `RecallPrompt`, then flips the row to `IMPORTED` in three separate writes with no surrounding transaction, so a crash mid-row can create a question/prompt while leaving the row `OUTPUT_READY` and re-importable.
+
+Trigger: import a single output-ready row.
+
+Postcondition: a row's question creation, prompt creation, and status flip to `IMPORTED` commit atomically; a failure rolls back all three so a re-run does not create duplicate entities for that row.
+
+Implementation notes:
+
+- Wrap one row's import in a transaction so the entity creation and status flip are all-or-nothing.
+- Keep per-row failure isolation at the batch level (one bad row must not roll back successful rows in the same batch).
+
+Tests:
+
+- Backend test: a forced failure after question creation leaves no orphaned `PredefinedQuestion`/`RecallPrompt` and the row stays re-importable without duplicating on retry.
+- Existing import idempotency tests still pass.
+- Run `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
+
+## Phase 21: Persist OpenAI Output/Error File Ids During Polling
+
+Type: Behavior
+
+Precondition: polling calls `retrieveBatch` to read status, then output collection calls `retrieveBatch` again only to read `outputFileId`/`errorFileId`, doubling OpenAI round-trips per completed batch.
+
+Trigger: poll a batch that OpenAI reports as completed.
+
+Postcondition: when polling transitions a batch to `COMPLETED`, it persists the OpenAI output and error file ids, and output collection reuses the persisted ids without a second `retrieveBatch` call.
+
+Implementation notes:
+
+- Set `openaiOutputFileId`/`openaiErrorFileId` on the `COMPLETED` transition in the polling service.
+- Output collection downloads directly from persisted file ids; only call `retrieveBatch` as a fallback when ids are absent (e.g. older rows).
+
+Tests:
+
+- Backend test: completed batch stores file ids during polling; output collection downloads without a second retrieve.
+- Existing polling and collection tests still pass.
+- Run `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
+
+## Phase 22: Prune Terminal Batches After A Retention Window
+
+Type: Behavior
+
+Precondition: `FAILED`/`EXPIRED`/imported `COMPLETED` batches and their request rows (including large `LONGTEXT` payloads) are never deleted, so `question_generation_batch_request` grows unbounded.
+
+Trigger: invoke batch retention cleanup with a current timestamp, then run it from the hourly maintenance job.
+
+Postcondition: terminal batches (`FAILED`, `EXPIRED`, or imported `COMPLETED`) older than a defined retention window are deleted along with their request rows, while non-terminal and recent batches are retained.
+
+Implementation notes:
+
+- Add a narrow cleanup method with a configurable retention window (choose a sensible default, e.g. 30 days).
+- Rely on `ON DELETE CASCADE` for request rows, or delete children explicitly.
+- Wire cleanup into the hourly maintenance flow after import.
+
+Tests:
+
+- Backend tests: old terminal batches and their rows removed; recent terminal batches retained; non-terminal batches never removed.
+- Run `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
+
+## Phase 23: Index Recent-Recall User Selection
+
+Type: Structure
+
+Precondition: `findUserIdsWithAnsweredRecallsInTimeRange` scans all users' `quiz_answer`/`recall_prompt` over a 7-day window every hour with no user filter; without an index on `quiz_answer.created_at` this degrades as data grows.
+
+Trigger: add a Flyway migration with the supporting index.
+
+Postcondition: the recent-recall selection query is index-supported on `quiz_answer.created_at` (and confirm join columns are indexed), with no change to query results.
+
+Why structure: this is a non-behavioral performance hardening for the existing hourly selection; verified by unchanged query results and existing selection tests.
+
+Implementation notes:
+
+- Confirm whether an index on `quiz_answer.created_at` already exists before adding one.
+- Add the index only if missing; follow `db-migration.mdc`.
+
+Tests:
+
+- Existing recent-recall selection tests still pass.
+- Run `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
+- If a migration is added, run `CURSOR_DEV=true nix develop -c pnpm export:database-erd`.
+
+## Phase 24: Remove The Submission/Transaction Circular Dependency
+
+Type: Structure
+
+Precondition: `QuestionGenerationBatchSubmissionService` and `QuestionGenerationBatchUserSubmissionTx` depend on each other, with the cycle broken by `@Lazy`.
+
+Trigger: refactor the per-user transactional boundary so the cycle is removed.
+
+Postcondition: due-user submission keeps the same behavior and per-user `REQUIRES_NEW` isolation, but no class depends on a class that depends back on it, and `@Lazy` is no longer needed for this cycle.
+
+Why structure: pure internal reorganization; verified by unchanged submission behavior and existing tests.
+
+Implementation notes:
+
+- Extract the orchestration that loops due users into a component that depends on both the planning/submission services and the per-user transaction, rather than the two depending on each other.
+
+Tests:
+
+- Existing `submitDueUsers` tests (success/failure isolation, skip-with-no-candidates) still pass unchanged.
+- Run `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
+
+## Phase 25: Narrow Structured-Output Schema Field Stripping
+
+Type: Structure
+
+Precondition: `StructuredResponseCreateParamsSerializer` reflects on `_body()` and recursively removes every field named `valid` anywhere in the request body, which is fragile against a legitimately named `valid` field and against SDK renames of `_body`.
+
+Trigger: render the batch JSONL body for a request row.
+
+Postcondition: the synthetic `valid` property is removed only where it is the MCQ schema artifact, the rendered body is otherwise identical, and a test fails clearly if the OpenAI SDK changes the `_body` accessor.
+
+Why structure: keeps the rendered batch body identical for current inputs; protects an existing fragile mechanism without changing output.
+
+Implementation notes:
+
+- Constrain stripping to the structured-output schema location instead of a global recursive removal, or document precisely why global removal is safe.
+- Add a guard/test that detects a missing/renamed `_body` accessor rather than silently throwing a generic error.
+
+Tests:
+
+- Unit test: rendered body matches current shape; the `valid` artifact is absent; SDK accessor guard fails loudly if `_body` is unavailable.
+- Run `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
+
+## Phase 26: Add Batch Lifecycle Metrics
+
+Type: Behavior
+
+Precondition: the hourly job logs counts but exposes no metrics, so stuck/failed batches are only visible via log-grepping and the runbook SQL.
+
+Trigger: run submission, polling, collection, and import.
+
+Postcondition: counters for submitted, failed, expired, completed, and imported batches (and failed rows) are exported through the app's existing metrics mechanism, so stuck-batch conditions are observable without log inspection.
+
+Implementation notes:
+
+- Reuse whatever metrics/health facility the backend already exposes; do not introduce a new stack.
+- Keep note content out of metric labels.
+
+Tests:
+
+- Backend test verifies counters increment for representative outcomes.
+- Run `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
+
+## Phase 27: Verify A Live OpenAI Batch Round-Trip
+
+Type: Behavior
+
+Precondition: every batch path is mock-tested; no real batch JSONL body, file upload, retrieve, output download, or success-line parse has been validated against the live OpenAI Batch + Responses API.
+
+Trigger: submit a single real batch in a controlled environment and run it through to import.
+
+Postcondition: a real batch is accepted by OpenAI, completes, and its output parses into a `PredefinedQuestion`/`RecallPrompt`, confirming the `/v1/responses` body shape (including schema field stripping) and the `response.body.output[].content[].text` success-line parser.
+
+Design/authentication note: requires real OpenAI credentials and budget; coordinate with the developer before running. This is a manual verification phase, not an automated CI test.
+
+Implementation notes:
+
+- Use a tiny fixture (one or two trackers) to bound cost.
+- Capture the real success/error JSONL as a fixture for future regression parsing tests if shape differs from current mocks.
+
+Tests:
+
+- Manual: observe one real batch reach `IMPORTED`; record any body/parse adjustments needed.
+- If the real shape differs, fold corrections back into the relevant phase's automated tests.
+
 ## Open Items
 
-None blocking.
+- Document the prod JVM timezone assumption behind `RecallTimeOfDay` (silent-period time-of-day is server-zone, by design ignoring user timezone). Can be folded into Phase 18's runbook when Phase 19+ work touches it.
+- Confirm whether permanently marking still-`PENDING` rows as `FAILED` ("missing batch output line") during output collection is acceptable, or whether such rows should be retried.

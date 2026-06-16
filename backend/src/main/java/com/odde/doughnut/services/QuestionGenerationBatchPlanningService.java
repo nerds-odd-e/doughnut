@@ -59,7 +59,10 @@ public class QuestionGenerationBatchPlanningService {
         .map(userRepository::findById)
         .flatMap(Optional::stream)
         .filter(user -> isUserEligibleForNewBatchSubmission(user, currentTime))
-        .filter(user -> isUserDueInCurrentCronHour(user, currentTime, windowStart))
+        .filter(
+            user ->
+                isUserEligibleViaOpenAiFailureRetryPath(user, currentTime)
+                    || isUserDueInCurrentCronHour(user, currentTime, windowStart))
         .toList();
   }
 
@@ -129,8 +132,13 @@ public class QuestionGenerationBatchPlanningService {
         user.getId(), QuestionGenerationBatchStatus.SUBMITTED)) {
       return false;
     }
+    return isUserPastSubmissionGate(user, currentTime)
+        || isUserEligibleViaOpenAiFailureRetryPath(user, currentTime);
+  }
+
+  private boolean isUserEligibleViaOpenAiFailureRetryPath(User user, Timestamp currentTime) {
     if (isUserPastSubmissionGate(user, currentTime)) {
-      return true;
+      return false;
     }
     return batchRepository.existsByUser_IdAndOpenaiBatchIdIsNotNullAndStatusIn(
         user.getId(), QuestionGenerationBatchStatus.openAiFailureRetryStatuses());

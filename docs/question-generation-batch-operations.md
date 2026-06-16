@@ -45,8 +45,8 @@ Batch-level terminal states are `COMPLETED`, `FAILED`, and `EXPIRED`. A complete
 ## Retry Behavior
 
 - **23-hour gate:** A user gets at most one *accepted* OpenAI submission per 23 hours. The gate uses `question_generation_batch_user_state.last_successful_submitted_at`, not batch terminal status.
-- **Failed local submission** (`PLANNED` → `FAILED` before OpenAI acceptance): gate is **not** updated; user can retry on the next due cron hour.
-- **OpenAI `FAILED` / `EXPIRED`:** Gate **was** updated at acceptance. User is blocked until 23 hours pass **unless** they have a batch with `openai_batch_id` set and status `FAILED` or `EXPIRED` — then they may submit again even inside the gate (retry path in `QuestionGenerationBatchPlanningService`).
+- **Failed local submission** (`PLANNED` → `FAILED` before OpenAI acceptance): gate is **not** updated; user can retry on the next **target cron hour** (same once-per-day gate as first-time submissions).
+- **OpenAI `FAILED` / `EXPIRED`:** Gate **was** updated at acceptance. User is blocked until 23 hours pass **unless** they have a batch with `openai_batch_id` set and status `FAILED` or `EXPIRED` — then they may submit again even inside the gate on the **next hourly cron**, bypassing the target cron-hour gate (retry path in `QuestionGenerationBatchPlanningService`).
 - **In-flight work:** User is not eligible for a new submission while any batch has status `SUBMITTED`.
 - **Row import:** Failed rows stay `FAILED`; other rows in the same batch can still import. Re-running maintenance is safe: already `IMPORTED` rows are skipped.
 
