@@ -163,6 +163,8 @@ Tests:
 
 ## Phase 6: Select Candidate Memory Trackers
 
+Status: done
+
 Type: Behavior
 
 Precondition: a user can be selected as due for batch generation.

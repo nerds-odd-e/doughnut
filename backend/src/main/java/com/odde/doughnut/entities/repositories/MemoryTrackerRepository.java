@@ -94,4 +94,24 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
               + "   AND rp.deleted_at IS NULL",
       nativeQuery = true)
   long countByUser(@Param("userId") Integer userId);
+
+  @Query(
+      value =
+          "SELECT mt.* FROM memory_tracker mt "
+              + "WHERE mt.user_id = :userId "
+              + "  AND mt.removed_from_tracking IS FALSE "
+              + "  AND mt.deleted_at IS NULL "
+              + "  AND mt.spelling IS FALSE "
+              + "  AND mt.next_recall_at <= :dueBy "
+              + "  AND NOT EXISTS ("
+              + "    SELECT 1 FROM recall_prompt rp "
+              + "    LEFT JOIN predefined_question pq ON rp.predefined_question_id = pq.id "
+              + "    WHERE rp.memory_tracker_id = mt.id "
+              + "      AND rp.quiz_answer_id IS NULL "
+              + "      AND (pq.id IS NULL OR pq.is_contested = false)"
+              + "  ) "
+              + "ORDER BY mt.next_recall_at",
+      nativeQuery = true)
+  List<MemoryTracker> findBatchQuestionGenerationCandidatesByUser(
+      @Param("userId") Integer userId, @Param("dueBy") Timestamp dueBy);
 }
