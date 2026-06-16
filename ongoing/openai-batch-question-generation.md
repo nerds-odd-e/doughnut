@@ -212,6 +212,8 @@ Tests:
 
 ## Phase 8: Persist Batch And Request Rows Before Submission
 
+Status: done
+
 Type: Behavior
 
 Precondition: due users and candidate trackers can be found, and background request building works.

@@ -4,18 +4,26 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.QuestionGenerationBatch;
+import com.odde.doughnut.entities.QuestionGenerationBatchRequest;
+import com.odde.doughnut.entities.QuestionGenerationBatchStatus;
 import com.odde.doughnut.entities.QuestionGenerationBatchUserState;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository;
+import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchUserStateRepository;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -33,6 +41,8 @@ class QuestionGenerationBatchPlanningServiceTest {
   @Autowired MakeMe makeMe;
   @Autowired QuestionGenerationBatchPlanningService planningService;
   @Autowired QuestionGenerationBatchUserStateRepository userStateRepository;
+  @Autowired QuestionGenerationBatchRepository batchRepository;
+  @Autowired QuestionGenerationBatchRequestRepository batchRequestRepository;
 
   User user;
   Timestamp currentTime;
@@ -415,6 +425,79 @@ class QuestionGenerationBatchPlanningServiceTest {
       assertThat(
           candidates.stream().map(MemoryTracker::getId).toList(),
           containsInAnyOrder(dueTracker.getId(), propertyTracker.getId()));
+    }
+  }
+
+  @Nested
+  class PlanLocalBatchForUser {
+    Note note;
+    MemoryTracker dueTracker;
+    MemoryTracker secondDueTracker;
+
+    @BeforeEach
+    void setupTrackerFixtures() {
+      note = makeMe.aNote().notebookOwnedBy(user).please();
+      dueTracker =
+          makeMe
+              .aMemoryTrackerFor(note)
+              .by(user)
+              .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(24)))
+              .please();
+      secondDueTracker =
+          makeMe
+              .aMemoryTrackerFor(makeMe.aNote().notebookOwnedBy(user).please())
+              .by(user)
+              .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(12)))
+              .please();
+    }
+
+    @Test
+    void createsPlannedBatchWithOneRequestPerCandidateTracker() {
+      Optional<QuestionGenerationBatch> plannedBatch =
+          planningService.planLocalBatchForUser(user, currentTime);
+
+      assertThat(plannedBatch.isPresent(), is(true));
+      QuestionGenerationBatch batch = plannedBatch.get();
+      assertThat(batch.getStatus(), is(QuestionGenerationBatchStatus.PLANNED));
+      assertThat(batch.getUser().getId(), is(user.getId()));
+      assertThat(batch.getPlannedAt(), is(currentTime));
+
+      List<QuestionGenerationBatchRequest> requests =
+          batchRequestRepository.findByBatch_Id(batch.getId());
+      assertThat(requests, hasSize(2));
+      assertThat(
+          requests.stream().map(request -> request.getMemoryTracker().getId()).toList(),
+          containsInAnyOrder(dueTracker.getId(), secondDueTracker.getId()));
+
+      for (QuestionGenerationBatchRequest request : requests) {
+        assertThat(request.getContextSeed(), is(notNullValue()));
+        assertThat(
+            request.getCustomId(),
+            is(
+                QuestionGenerationBatchRequest.customIdFor(
+                    batch.getId(), request.getMemoryTracker().getId())));
+      }
+    }
+
+    @Test
+    void createsNoBatchWhenUserHasNoCandidateTrackers() {
+      makeMe
+          .aRecallPrompt()
+          .withPredefinedQuestionForNote(note)
+          .forMemoryTracker(dueTracker)
+          .please();
+      makeMe
+          .aRecallPrompt()
+          .withPredefinedQuestionForNote(secondDueTracker.getNote())
+          .forMemoryTracker(secondDueTracker)
+          .please();
+
+      Optional<QuestionGenerationBatch> plannedBatch =
+          planningService.planLocalBatchForUser(user, currentTime);
+
+      assertThat(plannedBatch, is(Optional.empty()));
+      assertThat(batchRepository.count(), is(0L));
+      assertThat(batchRequestRepository.count(), is(0L));
     }
   }
 }

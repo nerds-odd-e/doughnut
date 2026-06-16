@@ -3,9 +3,14 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.algorithms.CronHourTargetDueSelector;
 import com.odde.doughnut.algorithms.RecallSilentPeriodTargetSelector;
 import com.odde.doughnut.entities.MemoryTracker;
+import com.odde.doughnut.entities.QuestionGenerationBatch;
+import com.odde.doughnut.entities.QuestionGenerationBatchRequest;
+import com.odde.doughnut.entities.QuestionGenerationBatchStatus;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
+import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository;
+import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchUserStateRepository;
 import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
@@ -14,6 +19,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Service;
 
@@ -24,16 +30,22 @@ public class QuestionGenerationBatchPlanningService {
   private static final long CANDIDATE_TRACKER_WINDOW_MILLIS = TimeUnit.HOURS.toMillis(48);
 
   private final QuestionGenerationBatchUserStateRepository userStateRepository;
+  private final QuestionGenerationBatchRepository batchRepository;
+  private final QuestionGenerationBatchRequestRepository batchRequestRepository;
   private final RecallPromptRepository recallPromptRepository;
   private final MemoryTrackerRepository memoryTrackerRepository;
   private final UserRepository userRepository;
 
   public QuestionGenerationBatchPlanningService(
       QuestionGenerationBatchUserStateRepository userStateRepository,
+      QuestionGenerationBatchRepository batchRepository,
+      QuestionGenerationBatchRequestRepository batchRequestRepository,
       RecallPromptRepository recallPromptRepository,
       MemoryTrackerRepository memoryTrackerRepository,
       UserRepository userRepository) {
     this.userStateRepository = userStateRepository;
+    this.batchRepository = batchRepository;
+    this.batchRequestRepository = batchRequestRepository;
     this.recallPromptRepository = recallPromptRepository;
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.userRepository = userRepository;
@@ -55,6 +67,37 @@ public class QuestionGenerationBatchPlanningService {
       User user, Timestamp currentTime) {
     Timestamp dueBy = new Timestamp(currentTime.getTime() + CANDIDATE_TRACKER_WINDOW_MILLIS);
     return memoryTrackerRepository.findBatchQuestionGenerationCandidatesByUser(user.getId(), dueBy);
+  }
+
+  public Optional<QuestionGenerationBatch> planLocalBatchForUser(User user, Timestamp currentTime) {
+    List<MemoryTracker> candidates =
+        findCandidateMemoryTrackersForBatchGeneration(user, currentTime);
+    if (candidates.isEmpty()) {
+      return Optional.empty();
+    }
+
+    QuestionGenerationBatch batch = new QuestionGenerationBatch();
+    batch.setUser(user);
+    batch.setStatus(QuestionGenerationBatchStatus.PLANNED);
+    batch.setPlannedAt(currentTime);
+    final QuestionGenerationBatch savedBatch = batchRepository.saveAndFlush(batch);
+    final Integer batchId = savedBatch.getId();
+    List<QuestionGenerationBatchRequest> requests =
+        candidates.stream()
+            .map(
+                tracker -> {
+                  QuestionGenerationBatchRequest request = new QuestionGenerationBatchRequest();
+                  request.setBatch(savedBatch);
+                  request.setMemoryTracker(tracker);
+                  request.setContextSeed(ThreadLocalRandom.current().nextLong());
+                  request.setCustomId(
+                      QuestionGenerationBatchRequest.customIdFor(batchId, tracker.getId()));
+                  return request;
+                })
+            .toList();
+    batchRequestRepository.saveAll(requests);
+
+    return Optional.of(savedBatch);
   }
 
   private boolean isUserDueInCurrentCronHour(
