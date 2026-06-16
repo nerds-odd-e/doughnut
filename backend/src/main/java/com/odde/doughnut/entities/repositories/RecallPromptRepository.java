@@ -52,6 +52,17 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
 
   @Query(
       value =
+          "SELECT DISTINCT mt.user_id FROM recall_prompt rp "
+              + "JOIN quiz_answer qa ON rp.quiz_answer_id = qa.id "
+              + "JOIN memory_tracker mt ON rp.memory_tracker_id = mt.id "
+              + "WHERE qa.created_at >= :startTime "
+              + "AND qa.created_at < :endTime",
+      nativeQuery = true)
+  List<Integer> findUserIdsWithAnsweredRecallsInTimeRange(
+      @Param("startTime") Timestamp startTime, @Param("endTime") Timestamp endTime);
+
+  @Query(
+      value =
           "SELECT COUNT(*) FROM recall_prompt rp "
               + "JOIN quiz_answer qa ON rp.quiz_answer_id = qa.id "
               + "WHERE rp.memory_tracker_id = :memoryTrackerId "

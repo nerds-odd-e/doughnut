@@ -93,6 +93,8 @@ Tests:
 
 ## Phase 3: Find Users With Recent Recall Activity
 
+Status: done
+
 Type: Behavior
 
 Precondition: the 23-hour gate exists.
