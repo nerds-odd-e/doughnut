@@ -51,32 +51,18 @@ public class OpenAIResponseRequestBuilder<T> {
   }
 
   public StructuredResponseCreateParams<T> build() {
-    return build(true);
+    return createParams(ResponseTextConfig.Verbosity.LOW, true);
   }
 
   /** Batch API requests omit reasoning and use medium verbosity for model compatibility. */
   public StructuredResponseCreateParams<T> buildForBatchApi() {
-    StructuredResponseTextConfig<T> textConfig =
-        StructuredResponseTextConfig.<T>builder()
-            .format(responseType)
-            .verbosity(ResponseTextConfig.Verbosity.MEDIUM)
-            .build();
-
-    return StructuredResponseCreateParams.<T>builder()
-        .model(modelName)
-        .instructions(buildInstructions())
-        .input(buildInput())
-        .maxOutputTokens(maxOutputTokens)
-        .text(textConfig)
-        .build();
+    return createParams(ResponseTextConfig.Verbosity.MEDIUM, false);
   }
 
-  private StructuredResponseCreateParams<T> build(boolean includeReasoning) {
+  private StructuredResponseCreateParams<T> createParams(
+      ResponseTextConfig.Verbosity verbosity, boolean includeReasoning) {
     StructuredResponseTextConfig<T> textConfig =
-        StructuredResponseTextConfig.<T>builder()
-            .format(responseType)
-            .verbosity(ResponseTextConfig.Verbosity.LOW)
-            .build();
+        StructuredResponseTextConfig.<T>builder().format(responseType).verbosity(verbosity).build();
 
     StructuredResponseCreateParams.Builder<T> paramsBuilder =
         StructuredResponseCreateParams.<T>builder()

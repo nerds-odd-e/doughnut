@@ -689,7 +689,7 @@ Tests:
 - Manual: observe one real batch reach `IMPORTED`; record any body/parse adjustments needed.
 - If the real shape differs, fold corrections back into the relevant phase's automated tests.
 
-**Done:** Live round-trip verified with `gpt-4.1-mini` via `QuestionGenerationBatchLiveRoundTripTest`. Batch JSONL was adjusted to omit `reasoning.effort` and use `text.verbosity: medium` for batch model compatibility. Fixture + regression test added.
+**Done:** Live round-trip verified manually with `gpt-4.1-mini`. Batch JSONL was adjusted to omit `reasoning.effort` and use `text.verbosity: medium` for batch model compatibility. Captured output fixture + regression test added.
 
 ## Open Items
 

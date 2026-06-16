@@ -14,15 +14,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
 
-/** Regression test using JSONL captured from a live OpenAI batch round-trip (Phase 27). */
+/** Regression test for OpenAI batch success-line parsing using a captured fixture. */
 @SpringBootTest
 @ActiveProfiles("test")
-class QuestionGenerationBatchLiveOutputFixtureTest {
+class QuestionGenerationBatchOutputFixtureTest {
 
   @Autowired OpenAiApiHandler openAiApiHandler;
 
   @Test
-  void parsesCapturedLiveOpenAiBatchSuccessLine() throws IOException {
+  void parsesCapturedOpenAiBatchSuccessLine() throws IOException {
     String line =
         new ClassPathResource("openai-batch-fixtures/live_batch_success_line.json")
             .getContentAsString(StandardCharsets.UTF_8);
