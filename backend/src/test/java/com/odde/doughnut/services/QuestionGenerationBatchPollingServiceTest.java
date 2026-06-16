@@ -96,15 +96,21 @@ class QuestionGenerationBatchPollingServiceTest {
     }
 
     @Test
-    void completedUpdatesLocalBatch() {
+    void completedUpdatesLocalBatchAndPersistsFileIds() {
       when(openAiApiHandler.retrieveBatch("batch-openai-1"))
-          .thenReturn(openAiBatchWithStatus(Batch.Status.COMPLETED));
+          .thenReturn(
+              openAiBatchWithStatus(Batch.Status.COMPLETED).toBuilder()
+                  .outputFileId("file-output")
+                  .errorFileId("file-error")
+                  .build());
 
       pollingService.pollSubmittedBatches();
 
       QuestionGenerationBatch batch =
           batchRepository.findById(submittedBatch.getId()).orElseThrow();
       assertThat(batch.getStatus(), is(QuestionGenerationBatchStatus.COMPLETED));
+      assertThat(batch.getOpenaiOutputFileId(), is("file-output"));
+      assertThat(batch.getOpenaiErrorFileId(), is("file-error"));
     }
 
     @Test

@@ -1,6 +1,6 @@
 # OpenAI Batch Question Generation
 
-Status: in-progress (Phases 1-18 done; Phases 19+ are post-review follow-ups)
+Status: in-progress (Phases 1-21 done; Phases 22+ are post-review follow-ups)
 
 ## Refined Requirement
 
@@ -527,6 +527,8 @@ Tests:
 
 ## Phase 21: Persist OpenAI Output/Error File Ids During Polling
 
+Status: done
+
 Type: Behavior
 
 Precondition: polling calls `retrieveBatch` to read status, then output collection calls `retrieveBatch` again only to read `outputFileId`/`errorFileId`, doubling OpenAI round-trips per completed batch.
@@ -547,6 +549,8 @@ Tests:
 - Run `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
 
 ## Phase 22: Prune Terminal Batches After A Retention Window
+
+Status: done
 
 Type: Behavior
 

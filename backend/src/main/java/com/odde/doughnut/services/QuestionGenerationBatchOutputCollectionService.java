@@ -69,9 +69,11 @@ public class QuestionGenerationBatchOutputCollectionService {
   }
 
   private void collectOutputForBatch(QuestionGenerationBatch batch, Timestamp collectedAt) {
-    Batch openAiBatch = openAiApiHandler.retrieveBatch(batch.getOpenaiBatchId());
-    batch.setOpenaiOutputFileId(openAiBatch.outputFileId().orElse(null));
-    batch.setOpenaiErrorFileId(openAiBatch.errorFileId().orElse(null));
+    if (batch.getOpenaiOutputFileId() == null) {
+      Batch openAiBatch = openAiApiHandler.retrieveBatch(batch.getOpenaiBatchId());
+      batch.setOpenaiOutputFileId(openAiBatch.outputFileId().orElse(null));
+      batch.setOpenaiErrorFileId(openAiBatch.errorFileId().orElse(null));
+    }
 
     List<QuestionGenerationBatchRequest> requests =
         batchRequestRepository.findByBatch_Id(batch.getId());
@@ -80,10 +82,10 @@ public class QuestionGenerationBatchOutputCollectionService {
       requestsByCustomId.put(request.getCustomId(), request);
     }
 
-    openAiBatch
-        .outputFileId()
+    Optional.ofNullable(batch.getOpenaiOutputFileId())
         .ifPresent(fileId -> applyOutputFileLines(fileId, requestsByCustomId));
-    openAiBatch.errorFileId().ifPresent(fileId -> applyErrorFileLines(fileId, requestsByCustomId));
+    Optional.ofNullable(batch.getOpenaiErrorFileId())
+        .ifPresent(fileId -> applyErrorFileLines(fileId, requestsByCustomId));
 
     for (QuestionGenerationBatchRequest request : requests) {
       if (request.getStatus() == QuestionGenerationBatchRequestStatus.PENDING) {

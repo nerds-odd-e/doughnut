@@ -238,6 +238,27 @@ class QuestionGenerationBatchOutputCollectionServiceTest {
   }
 
   @Nested
+  class PersistedFileIds {
+    @Test
+    void downloadsFromPersistedFileIdsWithoutRetrieveBatch() {
+      completedBatch.setOpenaiOutputFileId("file-output");
+      completedBatch.setOpenaiErrorFileId("file-error");
+      batchRepository.saveAndFlush(completedBatch);
+
+      when(openAiApiHandler.downloadFileContent("file-output"))
+          .thenReturn(
+              successLine(secondRequest.getCustomId())
+                  + "\n"
+                  + successLine(firstRequest.getCustomId()));
+      when(openAiApiHandler.downloadFileContent("file-error")).thenReturn("");
+
+      outputCollectionService.collectOutputForCompletedBatches(currentTime);
+
+      verify(openAiApiHandler, never()).retrieveBatch(anyString());
+    }
+  }
+
+  @Nested
   class CollectionScope {
     @Test
     void doesNotCollectAlreadyCollectedBatches() {

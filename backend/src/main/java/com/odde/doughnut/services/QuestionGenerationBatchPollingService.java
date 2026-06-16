@@ -64,7 +64,12 @@ public class QuestionGenerationBatchPollingService {
       return false;
     }
 
-    batch.setStatus(mappedStatus.get());
+    QuestionGenerationBatchStatus newStatus = mappedStatus.get();
+    batch.setStatus(newStatus);
+    if (newStatus == QuestionGenerationBatchStatus.COMPLETED) {
+      batch.setOpenaiOutputFileId(openAiBatch.outputFileId().orElse(null));
+      batch.setOpenaiErrorFileId(openAiBatch.errorFileId().orElse(null));
+    }
     batchRepository.saveAndFlush(batch);
     return true;
   }
