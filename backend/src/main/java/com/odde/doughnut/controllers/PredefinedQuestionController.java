@@ -1,7 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -15,10 +13,10 @@ import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
+import com.odde.doughnut.services.openAiApis.StructuredResponseCreateParamsSerializer;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +29,6 @@ class PredefinedQuestionController {
   private final PredefinedQuestionService predefinedQuestionService;
 
   private final AiQuestionGenerator aiQuestionGenerator;
-  private final ObjectMapper objectMapper;
   private final AuthorizationService authorizationService;
   private final GlobalSettingsService globalSettingsService;
   private final FocusContextRetrievalService focusContextRetrievalService;
@@ -39,11 +36,11 @@ class PredefinedQuestionController {
   private final NoteRealmService noteRealmService;
   private final NoteRepository noteRepository;
   private final WikiTitleCacheService wikiTitleCacheService;
+  private final StructuredResponseCreateParamsSerializer paramsSerializer;
 
   @Autowired
   public PredefinedQuestionController(
       PredefinedQuestionService predefinedQuestionService,
-      ObjectMapper objectMapper,
       AuthorizationService authorizationService,
       GlobalSettingsService globalSettingsService,
       AiQuestionGenerator aiQuestionGenerator,
@@ -51,17 +48,18 @@ class PredefinedQuestionController {
       FocusContextMarkdownRenderer focusContextMarkdownRenderer,
       NoteRealmService noteRealmService,
       NoteRepository noteRepository,
-      WikiTitleCacheService wikiTitleCacheService) {
+      WikiTitleCacheService wikiTitleCacheService,
+      StructuredResponseCreateParamsSerializer paramsSerializer) {
     this.predefinedQuestionService = predefinedQuestionService;
     this.focusContextRetrievalService = focusContextRetrievalService;
     this.focusContextMarkdownRenderer = focusContextMarkdownRenderer;
     this.noteRealmService = noteRealmService;
     this.noteRepository = noteRepository;
     this.wikiTitleCacheService = wikiTitleCacheService;
-    this.objectMapper = objectMapper;
     this.authorizationService = authorizationService;
     this.globalSettingsService = globalSettingsService;
     this.aiQuestionGenerator = aiQuestionGenerator;
+    this.paramsSerializer = paramsSerializer;
   }
 
   @PostMapping("/generate-question-without-save")
@@ -119,43 +117,6 @@ class PredefinedQuestionController {
             authorizationService);
     StructuredResponseCreateParams<MCQWithAnswer> params =
         requestBuilder.buildQuestionGenerationResponseRequest(note, null, null, null);
-    return serializeResponseCreateParams(params);
-  }
-
-  private Map<String, Object> serializeResponseCreateParams(
-      StructuredResponseCreateParams<?> params) {
-    try {
-      Method bodyMethod = params.rawParams().getClass().getMethod("_body");
-      Object body = bodyMethod.invoke(params.rawParams());
-      // Serialize the Body using ObjectMapper, which handles JsonField properly
-      String jsonString = objectMapper.writeValueAsString(body);
-      // Convert back to Map to ensure all non-empty fields are included
-      Map<String, Object> result =
-          objectMapper.readValue(jsonString, new TypeReference<Map<String, Object>>() {});
-      // Remove internal "valid" fields from the SDK
-      removeValidFields(result);
-      return result;
-    } catch (Exception e) {
-      throw new RuntimeException("Failed to serialize ResponseCreateParams", e);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  private void removeValidFields(Object obj) {
-    if (obj == null) {
-      return;
-    }
-    if (obj instanceof Map) {
-      Map<String, Object> map = (Map<String, Object>) obj;
-      map.remove("valid");
-      for (Object value : map.values()) {
-        removeValidFields(value);
-      }
-    } else if (obj instanceof List) {
-      List<?> list = (List<?>) obj;
-      for (Object item : list) {
-        removeValidFields(item);
-      }
-    }
+    return paramsSerializer.toBodyMap(params);
   }
 }

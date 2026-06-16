@@ -237,6 +237,8 @@ Tests:
 
 ## Phase 9: Build Batch JSONL Payload
 
+Status: done
+
 Type: Behavior
 
 Precondition: local batch/request rows exist for candidate trackers.
