@@ -427,6 +427,8 @@ Tests:
 
 ## Phase 17: Wire The Hourly Prod Job
 
+Status: done
+
 Type: Behavior
 
 Precondition: direct service invocation can submit due users and resume/import existing batches.
