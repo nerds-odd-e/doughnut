@@ -78,9 +78,8 @@ Feature: Note deletion
     Given I have a notebook "Reference cleanup suite" with notes:
       | Title  | Folder            |
       | Reference Cleanup | |
-      | source | Reference Cleanup |
       | target | Reference Cleanup |
-    And I update note "source" content using markdown to become:
+    And I have a note "source" under notebook "Reference cleanup suite" in folder "Reference Cleanup" with content:
       """
       ---
       target: "[[target]]"

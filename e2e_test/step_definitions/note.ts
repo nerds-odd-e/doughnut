@@ -37,6 +37,19 @@ function omitBlankOptionalInjectionFields(rows: Record<string, string>[]) {
   })
 }
 
+function injectNoteWithContentForCurrentUser(
+  notebookName: string,
+  noteTitle: string,
+  content: string,
+  folder?: string
+) {
+  cy.get<string>('@currentLoginUser').then((username) =>
+    start
+      .testability()
+      .injectNoteWithContent(noteTitle, content, username, notebookName, folder)
+  )
+}
+
 Given(
   'I have a notebook {string} with notes:',
   (notebookName: string, data: DataTable) => {
@@ -85,20 +98,37 @@ Given(
 Given(
   'I have a notebook {string} with a note {string} and content {string}',
   (notebookName: string, noteTitle: string, content: string) => {
-    cy.get<string>('@currentLoginUser').then((username) =>
-      start.testability().injectNotes(
-        [
-          {
-            Title: noteTitle,
-            Content: content,
-          },
-        ],
-        username,
-        notebookName
-      )
+    injectNoteWithContentForCurrentUser(notebookName, noteTitle, content)
+  }
+)
+
+Given(
+  'I have a note {string} under notebook {string} with content:',
+  (noteTitle: string, notebookName: string, content: string) => {
+    injectNoteWithContentForCurrentUser(notebookName, noteTitle, content)
+  }
+)
+
+Given(
+  'I have a note {string} under notebook {string} in folder {string} with content:',
+  (
+    noteTitle: string,
+    notebookName: string,
+    folder: string,
+    content: string
+  ) => {
+    injectNoteWithContentForCurrentUser(
+      notebookName,
+      noteTitle,
+      content,
+      folder
     )
   }
 )
+
+Given('note {string} has content:', (noteTitle: string, content: string) => {
+  start.testability().setInjectedNoteContent(noteTitle, content)
+})
 
 Given(
   'there are some notes for existing user {string} in notebook {string}',

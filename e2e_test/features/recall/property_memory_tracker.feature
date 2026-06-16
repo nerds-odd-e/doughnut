@@ -5,8 +5,8 @@ Feature: Property memory tracker
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook "Property recall" with a note "Vitamins"
-    And I update note "Vitamins" content using markdown to become:
+    And I have a notebook "Property recall"
+    And I have a note "Vitamins" under notebook "Property recall" with content:
       """
       ---
       topic: micronutrients
@@ -22,8 +22,8 @@ Feature: Property memory tracker
   @disableOpenAiService
   Scenario: Untracked example of property appears in assimilation queue
     Given I am re-logged in as "another_old_learner"
-    And I have a notebook "Property queue" with a note "Kanji"
-    And I update note "Kanji" content using markdown to become:
+    And I have a notebook "Property queue"
+    And I have a note "Kanji" under notebook "Property queue" with content:
       """
       ---
       example of: "[[Sentence]]"
@@ -40,8 +40,8 @@ Feature: Property memory tracker
   @disableOpenAiService
   Scenario: Skipping recall on property clears unassimilated queue
     Given I am re-logged in as "another_old_learner"
-    And I have a notebook "Property skip" with a note "Minerals"
-    And I update note "Minerals" content using markdown to become:
+    And I have a notebook "Property skip"
+    And I have a note "Minerals" under notebook "Property skip" with content:
       """
       ---
       topic: calcium

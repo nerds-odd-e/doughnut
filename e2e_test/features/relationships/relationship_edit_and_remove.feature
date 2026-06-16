@@ -31,7 +31,7 @@ Feature: relationship edit and remove
     And I should see "Moon" has no relationship to "Earth"
 
   Scenario: reduce to source property uses suffixed key when source already has that property
-    When I update note "Moon" content using markdown to become:
+    Given note "Moon" has content:
       """
       ---
       a part of: "[[Mars]]"
