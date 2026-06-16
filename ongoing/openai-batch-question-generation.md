@@ -116,6 +116,8 @@ Tests:
 
 ## Phase 4: Compute Rolling 24-Hour Silent Target
 
+Status: done
+
 Type: Behavior
 
 Precondition: users with recent recall activity can be selected.
