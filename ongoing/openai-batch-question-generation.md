@@ -284,6 +284,8 @@ Tests:
 
 ## Phase 11: Submit Due Users End To End
 
+Status: done
+
 Type: Behavior
 
 Precondition: due users can be selected and planned local batches can be submitted.
