@@ -14,6 +14,9 @@ public interface QuestionGenerationBatchRepository
   List<QuestionGenerationBatch> findByStatusAndOutputCollectedAtIsNull(
       QuestionGenerationBatchStatus status);
 
+  List<QuestionGenerationBatch> findByStatusAndOutputCollectedAtIsNotNullAndImportedAtIsNull(
+      QuestionGenerationBatchStatus status);
+
   boolean existsByUser_IdAndStatus(Integer userId, QuestionGenerationBatchStatus status);
 
   boolean existsByUser_IdAndOpenaiBatchIdIsNotNullAndStatusIn(

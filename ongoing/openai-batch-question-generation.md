@@ -381,6 +381,8 @@ Tests:
 
 ## Phase 15: Import Completed Batches End To End
 
+Status: done
+
 Type: Behavior
 
 Precondition: completed local batches have output/error rows available.

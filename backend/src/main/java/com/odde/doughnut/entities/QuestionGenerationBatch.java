@@ -45,4 +45,7 @@ public class QuestionGenerationBatch extends EntityIdentifiedByIdOnly {
 
   @Column(name = "output_collected_at")
   private Timestamp outputCollectedAt;
+
+  @Column(name = "imported_at")
+  private Timestamp importedAt;
 }
