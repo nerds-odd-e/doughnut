@@ -2,10 +2,10 @@
   <input
     type="submit"
     name="submit"
-    value="Keep for recall"
+    value="Assimilate"
     :class="['daisy-btn daisy-btn-primary', sizeClass]"
-    data-test="keep-for-recall"
-    :disabled="disabled || keepForRecallDisabled"
+    data-test="assimilate"
+    :disabled="disabled || assimilateDisabled"
     @click="$emit('assimilate', false)"
   />
   <input
@@ -28,7 +28,7 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
-    keepForRecallDisabled: {
+    assimilateDisabled: {
       type: Boolean,
       default: false,
     },

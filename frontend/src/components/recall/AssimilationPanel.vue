@@ -3,7 +3,7 @@
     ref="settingsRef"
     :note="note"
     :note-info-loaded="noteInfoLoaded"
-    :keep-for-recall-disabled="keepForRecallDisabled"
+    :assimilate-disabled="assimilateDisabled"
     :assimilating-property-key="assimilatingPropertyKey"
     @level-changed="emit('reloadNeeded')"
     @remember-spelling-changed="onRememberSpellingChanged"
@@ -80,7 +80,7 @@ const hasSpellingMemoryTracker = computed(
     noteRecallInfo.value?.memoryTrackers?.some((mt) => mt.spelling === true) ??
     false
 )
-const keepForRecallDisabled = computed(
+const assimilateDisabled = computed(
   () =>
     hasNoteLevelMemoryTrackers.value &&
     !(rememberSpelling.value && !hasSpellingMemoryTracker.value)

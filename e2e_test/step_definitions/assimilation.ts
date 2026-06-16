@@ -151,7 +151,7 @@ Then('remembering spelling should be available', () => {
   start.assumeAssimilationPage().expectRememberingSpellingAvailable()
 })
 
-When('I keep for recall with remembering spelling', () => {
+When('I assimilate with remembering spelling', () => {
   start.assumeAssimilationPage().proceedWithRememberingSpelling()
 })
 
@@ -163,12 +163,12 @@ When('I verify spelling with {string}', (text: string) => {
   start.assumeAssimilationPage().verifySpellingWith(text)
 })
 
-Then('the keep for recall button should be disabled', () => {
-  start.assumeAssimilationPage().expectKeepForRecallDisabled()
+Then('the assimilate button should be disabled', () => {
+  start.assumeAssimilationPage().expectAssimilateDisabled()
 })
 
-Then('the keep for recall button should be enabled', () => {
-  start.assumeAssimilationPage().expectKeepForRecallEnabled()
+Then('the assimilate button should be enabled', () => {
+  start.assumeAssimilationPage().expectAssimilateEnabled()
 })
 
 When('I jump to the note page of {string}', (noteTitle: string) => {
@@ -179,8 +179,8 @@ When('I open assimilation settings from more options', () => {
   start.assumeNotePage().moreOptions().openAssimilationSettings()
 })
 
-When('I keep for recall on the assimilation panel', () => {
-  start.assumeAssimilationPage().keepForRecallOnPanel()
+When('I assimilate on the assimilation panel', () => {
+  start.assumeAssimilationPage().assimilateOnPanel()
 })
 
 When('I skip recall on the assimilation panel', () => {
@@ -209,19 +209,15 @@ When(
 )
 
 Then(
-  'keep for recall for property {string} should be disabled',
+  'assimilate for property {string} should be disabled',
   (propertyKey: string) => {
-    start
-      .assumeAssimilationPage()
-      .expectPropertyKeepForRecallDisabled(propertyKey)
+    start.assumeAssimilationPage().expectPropertyAssimilateDisabled(propertyKey)
   }
 )
 
 Then(
-  'keep for recall for property {string} should be enabled',
+  'assimilate for property {string} should be enabled',
   (propertyKey: string) => {
-    start
-      .assumeAssimilationPage()
-      .expectPropertyKeepForRecallEnabled(propertyKey)
+    start.assumeAssimilationPage().expectPropertyAssimilateEnabled(propertyKey)
   }
 )

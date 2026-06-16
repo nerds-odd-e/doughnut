@@ -6,7 +6,8 @@ import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { mockedGoToNextAssimilation } from "./assimilationPanelMocks"
 import {
   assimilateSpy,
-  clickKeepForRecall,
+  assimilateButtonSelector,
+  clickAssimilate,
   mountAssimilationPanel,
   mockedIncrementAssimilatedCount,
   mockedRequestDueRecallsRefresh,
@@ -38,7 +39,7 @@ describe("AssimilationPanel", () => {
       const wrapper = mountAssimilationPanel()
 
       await flushPromises()
-      await clickKeepForRecall(wrapper)
+      await clickAssimilate(wrapper)
 
       expect(assimilateSpy).toHaveBeenCalledWith({
         body: { noteId: note.id },
@@ -86,7 +87,7 @@ describe("AssimilationPanel", () => {
 
       expect(getOpaqueContentBlocker()).toBeNull()
 
-      await clickKeepForRecall(wrapper)
+      await clickAssimilate(wrapper)
 
       const opaqueLayer = getOpaqueContentBlocker()
       expect(opaqueLayer).not.toBeNull()
@@ -98,7 +99,7 @@ describe("AssimilationPanel", () => {
       const wrapper = mountAssimilationPanel()
       await flushPromises()
 
-      await clickKeepForRecall(wrapper)
+      await clickAssimilate(wrapper)
       expect(getOpaqueContentBlocker()).not.toBeNull()
 
       closeSpellingVerificationPopup()
@@ -112,7 +113,7 @@ describe("AssimilationPanel", () => {
       const wrapper = mountAssimilationPanel()
       await flushPromises()
 
-      await clickKeepForRecall(wrapper)
+      await clickAssimilate(wrapper)
       expect(document.body.textContent).toContain("Verify Spelling")
       expect(assimilateSpy).not.toHaveBeenCalled()
 
@@ -121,12 +122,12 @@ describe("AssimilationPanel", () => {
 
       expect(document.body.textContent).not.toContain("Verify Spelling")
       expect(assimilateSpy).not.toHaveBeenCalled()
-      expect(wrapper.find('[data-test="keep-for-recall"]').exists()).toBe(true)
+      expect(wrapper.find(assimilateButtonSelector).exists()).toBe(true)
     })
   })
 
-  describe("keep for repetition when note has memory trackers", () => {
-    it("enables keep for repetition when note has only a property memory tracker", async () => {
+  describe("assimilate when note has memory trackers", () => {
+    it("enables assimilate when note has only a property memory tracker", async () => {
       mockSdkService(NoteController, "getNoteInfo", {
         memoryTrackers: [
           {
@@ -140,11 +141,11 @@ describe("AssimilationPanel", () => {
       const wrapper = mountAssimilationPanel()
       await flushPromises()
 
-      const keepButton = wrapper.find('[data-test="keep-for-recall"]')
-      expect(keepButton.attributes("disabled")).toBeUndefined()
+      const assimilateButton = wrapper.find(assimilateButtonSelector)
+      expect(assimilateButton.attributes("disabled")).toBeUndefined()
     })
 
-    it("disables keep for repetition when note has memory trackers and no add-spelling-only mode", async () => {
+    it("disables assimilate when note has memory trackers and no add-spelling-only mode", async () => {
       mockSdkService(NoteController, "getNoteInfo", {
         memoryTrackers: [
           { ...makeMe.aMemoryTracker.please(), id: 1, spelling: false },
@@ -153,11 +154,11 @@ describe("AssimilationPanel", () => {
       const wrapper = mountAssimilationPanel()
       await flushPromises()
 
-      const keepButton = wrapper.find('[data-test="keep-for-recall"]')
-      expect(keepButton.attributes("disabled")).toBeDefined()
+      const assimilateButton = wrapper.find(assimilateButtonSelector)
+      expect(assimilateButton.attributes("disabled")).toBeDefined()
     })
 
-    it("enables keep for repetition when remember spelling on and no spelling tracker", async () => {
+    it("enables assimilate when remember spelling on and no spelling tracker", async () => {
       mockSdkService(NoteController, "getNoteInfo", {
         recallSetting: { rememberSpelling: true },
         memoryTrackers: [
@@ -167,8 +168,8 @@ describe("AssimilationPanel", () => {
       const wrapper = mountAssimilationPanel()
       await flushPromises()
 
-      const keepButton = wrapper.find('[data-test="keep-for-recall"]')
-      expect(keepButton.attributes("disabled")).toBeUndefined()
+      const assimilateButton = wrapper.find(assimilateButtonSelector)
+      expect(assimilateButton.attributes("disabled")).toBeUndefined()
     })
 
     it("adds only spelling memory tracker when in add-spelling-only mode", async () => {
@@ -192,7 +193,7 @@ describe("AssimilationPanel", () => {
       const wrapper = mountAssimilationPanel()
       await flushPromises()
 
-      await clickKeepForRecall(wrapper)
+      await clickAssimilate(wrapper)
 
       const verifyButton = document.querySelector(
         '[data-test="verify-spelling"]'

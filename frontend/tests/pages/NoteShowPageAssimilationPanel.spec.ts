@@ -8,6 +8,7 @@ import {
   setupNoteShowPageAssimilationPanelMocks,
   withStubbedInnerWidth,
 } from "@tests/pages/noteShowPageTestSupport"
+import { assimilateButtonSelector } from "@tests/components/recall/assimilationPanelTestSupport"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -48,7 +49,7 @@ describe("note show page inline assimilation panel", () => {
     })
   })
 
-  it("renders keep-for-recall when assimilation settings are on", async () => {
+  it("renders assimilate button when assimilation settings are on", async () => {
     useAssimilationView().openForNote(noteRealm.id)
 
     const wrapper = helper
@@ -62,7 +63,7 @@ describe("note show page inline assimilation panel", () => {
 
     await flushPromises()
     await vi.waitFor(() => {
-      expect(wrapper.find('[data-test="keep-for-recall"]').exists()).toBe(true)
+      expect(wrapper.find(assimilateButtonSelector).exists()).toBe(true)
     })
   })
 
@@ -82,6 +83,6 @@ describe("note show page inline assimilation panel", () => {
       expect(main).not.toBeNull()
     })
 
-    expect(document.querySelector('[data-test="keep-for-recall"]')).toBeNull()
+    expect(document.querySelector(assimilateButtonSelector)).toBeNull()
   })
 })

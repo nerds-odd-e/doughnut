@@ -10,7 +10,10 @@ import { assumeAssociateWikidataDialog } from './associateWikidataDialog'
 import { toolbarButton } from './toolbarButton'
 import { makeSureNoteMoreOptionsFormIsOpen } from './noteMoreOptionsForm'
 import { questionListPage } from './questionListPage'
-import { assumeAssimilationPage } from './assimilationPage'
+import {
+  assumeAssimilationPage,
+  assimilateButtonSelector,
+} from './assimilationPage'
 import testability from '../testability'
 import { clickPopupConfirmOk } from '../../support/daisyModalHelpers'
 
@@ -93,7 +96,7 @@ export const assumeNotePage = (
   return {
     expectWithoutAssimilationPanel() {
       cy.url({ timeout: 15000 }).should('match', noteShowPathInUrl)
-      cy.get('[data-test="keep-for-recall"]').should('not.exist')
+      cy.get(assimilateButtonSelector).should('not.exist')
       return this
     },
     expectNoteTitleDisplayed(title: string) {

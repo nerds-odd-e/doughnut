@@ -17,6 +17,7 @@ import { afterEach, describe, expect, it, vi } from "vitest"
 import { computed, defineComponent, ref } from "vue"
 import {
   assimilateSpy,
+  assimilateButtonSelector,
   note,
   setupAssimilationPanelTests,
 } from "./assimilationPanelTestSupport"
@@ -123,9 +124,9 @@ describe("AssimilationPanel loading modal", () => {
     expect(loadingModal()).toBeNull()
   }
 
-  it("keeps the global modal open from keep-for-recall through loading the next unit", async () => {
+  it("keeps the global modal open from assimilate through loading the next unit", async () => {
     await expectGlobalModalThroughNextUnit(async (wrapper) => {
-      await wrapper.find('[data-test="keep-for-recall"]').trigger("click")
+      await wrapper.find(assimilateButtonSelector).trigger("click")
     })
   })
 
@@ -151,7 +152,7 @@ describe("AssimilationPanel loading modal", () => {
     const wrapper = mountPanelWithGlobalLoadingModal()
     await flushPromises()
 
-    await wrapper.find('[data-test="keep-for-recall"]').trigger("click")
+    await wrapper.find(assimilateButtonSelector).trigger("click")
 
     expect(loadingModal()).toBeTruthy()
     resolveApi()

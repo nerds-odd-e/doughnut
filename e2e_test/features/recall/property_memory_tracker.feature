@@ -56,15 +56,15 @@ Feature: Property memory tracker
     When I expand assimilation properties on the assimilation settings panel
     And I skip recall on property "topic" on the assimilation settings panel
     Then I should not see pending assimilation property "topic"
-    And keep for recall for property "topic" should be disabled
+    And assimilate for property "topic" should be disabled
 
-  Scenario: Property keep for recall disabled after assimilation
-    Then keep for recall for property "topic" should be disabled
+  Scenario: Property assimilate disabled after assimilation
+    Then assimilate for property "topic" should be disabled
 
   @disableOpenAiService
   Scenario: Note-level assimilation stays available after property-only assimilation
-    Then the keep for recall button should be enabled
-    When I keep for recall on the assimilation panel
+    Then the assimilate button should be enabled
+    When I assimilate on the assimilation panel
     And I open assimilation settings from more options
     Then the note memory tracker should have recall count 0
     And I should see a property memory tracker for "topic" on the assimilation settings panel

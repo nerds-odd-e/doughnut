@@ -8,6 +8,7 @@ import {
   expandAssimilationPropertiesSection,
   noteWithAssimilationProperties,
 } from "./assimilationPropertyTestSupport"
+import { assimilateButtonSelector } from "./assimilationPanelTestSupport"
 import { afterEach, beforeEach, describe, expect, it } from "vitest"
 
 describe("AssimilationSettings", () => {
@@ -29,13 +30,13 @@ describe("AssimilationSettings", () => {
       .withProps({
         note: noteWithAssimilationProperties,
         noteInfoLoaded: true,
-        keepForRecallDisabled: false,
+        assimilateDisabled: false,
       })
       .withRouter()
       .mount({ attachTo: document.body })
   }
 
-  it("renders a property row and Keep for recall control per frontmatter key", async () => {
+  it("renders a property row and Assimilate control per frontmatter key", async () => {
     mountSettings()
     await flushPromises()
     await expandAssimilationPropertiesSection()
@@ -46,24 +47,24 @@ describe("AssimilationSettings", () => {
     expect(rows).toHaveLength(2)
     expect(assimilationPropertyRow("topic")).not.toBeNull()
     expect(assimilationPropertyRow("url")).not.toBeNull()
-    const keepForRecallControls = document.querySelectorAll(
-      '[data-test="assimilation-property-row"] [data-test="keep-for-recall"]'
+    const assimilateControls = document.querySelectorAll(
+      `[data-test="assimilation-property-row"] ${assimilateButtonSelector}`
     )
-    expect(keepForRecallControls).toHaveLength(2)
-    for (const control of keepForRecallControls) {
-      expect((control as HTMLInputElement).value).toBe("Keep for recall")
+    expect(assimilateControls).toHaveLength(2)
+    for (const control of assimilateControls) {
+      expect((control as HTMLInputElement).value).toBe("Assimilate")
     }
   })
 
-  it("emits assimilate with propertyKey when keeping a property for recall", async () => {
+  it("emits assimilate with propertyKey when assimilating a property", async () => {
     mountSettings()
     await flushPromises()
     await expandAssimilationPropertiesSection()
 
-    const keepForRecall = assimilationPropertyRow("topic").querySelector(
-      '[data-test="keep-for-recall"]'
+    const assimilate = assimilationPropertyRow("topic").querySelector(
+      assimilateButtonSelector
     ) as HTMLInputElement
-    keepForRecall.click()
+    assimilate.click()
     await flushPromises()
 
     expect(wrapper.emitted("assimilate")).toEqual([
@@ -71,7 +72,7 @@ describe("AssimilationSettings", () => {
     ])
   })
 
-  it("disables Keep for recall per property when a property memory tracker exists", async () => {
+  it("disables Assimilate per property when a property memory tracker exists", async () => {
     getNoteInfoSpy.mockResolvedValue(
       wrapSdkResponse(
         makeMe.aNoteRecallInfo
@@ -89,15 +90,15 @@ describe("AssimilationSettings", () => {
     await flushPromises()
     await expandAssimilationPropertiesSection()
 
-    const topicKeepForRecall = assimilationPropertyRow("topic").querySelector(
-      '[data-test="keep-for-recall"]'
+    const topicAssimilate = assimilationPropertyRow("topic").querySelector(
+      assimilateButtonSelector
     ) as HTMLInputElement
-    const urlKeepForRecall = assimilationPropertyRow("url").querySelector(
-      '[data-test="keep-for-recall"]'
+    const urlAssimilate = assimilationPropertyRow("url").querySelector(
+      assimilateButtonSelector
     ) as HTMLInputElement
 
-    expect(topicKeepForRecall.disabled).toBe(true)
-    expect(urlKeepForRecall.disabled).toBe(false)
+    expect(topicAssimilate.disabled).toBe(true)
+    expect(urlAssimilate.disabled).toBe(false)
   })
 
   it("emits assimilate with skipMemoryTracking and propertyKey when skip recall is clicked", async () => {

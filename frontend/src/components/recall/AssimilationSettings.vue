@@ -67,8 +67,8 @@
                         <AssimilationButtons
                           size="sm"
                           :disabled="assimilatingPropertyKey === row.key"
-                          :keep-for-recall-disabled="
-                            keepForRecallDisabledForProperty(row.key)
+                          :assimilate-disabled="
+                            assimilateDisabledForProperty(row.key)
                           "
                           @assimilate="
                             (skip) =>
@@ -103,7 +103,7 @@
             >
               <AssimilationButtons
                 :disabled="!noteInfoLoaded"
-                :keep-for-recall-disabled="keepForRecallDisabled"
+                :assimilate-disabled="assimilateDisabled"
                 @assimilate="
                   (skip) => emit('assimilate', { skipMemoryTracking: skip })
                 "
@@ -171,11 +171,11 @@ import {
 import { usePendingAssimilationProperty } from "@/composables/usePendingAssimilationProperty"
 import { computed, ref, toRef, watch } from "vue"
 
-const { note, noteInfoLoaded, keepForRecallDisabled, assimilatingPropertyKey } =
+const { note, noteInfoLoaded, assimilateDisabled, assimilatingPropertyKey } =
   defineProps<{
     note: Note
     noteInfoLoaded: boolean
-    keepForRecallDisabled: boolean
+    assimilateDisabled: boolean
     assimilatingPropertyKey?: string | null
   }>()
 
@@ -206,7 +206,7 @@ const onNoteRecallInfoLoaded = (info: NoteRecallInfo) => {
   emit("noteRecallInfoLoaded", info)
 }
 
-const keepForRecallDisabledForProperty = (propertyKey: string) =>
+const assimilateDisabledForProperty = (propertyKey: string) =>
   noteRecallInfo.value?.memoryTrackers?.some(
     (mt) => mt.propertyKey === propertyKey
   ) ?? false

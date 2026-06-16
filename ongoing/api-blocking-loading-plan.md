@@ -52,7 +52,7 @@ Tests:
 
 Status: done
 
-Behavior: After clicking keep-for-recall or skip-recall on the assimilation panel, the whole UI remains blocked through the assimilate API and the next-assimilation API. The next item is not interactable before it is fully shown.
+Behavior: After clicking assimilate or skip-recall on the assimilation panel, the whole UI remains blocked through the assimilate API and the next-assimilation API. The next item is not interactable before it is fully shown.
 
 Implementation notes:
 - Mark `AssimilationController.assimilate` in `useAssimilateUnit()` as blocking.
