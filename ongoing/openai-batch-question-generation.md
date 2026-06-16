@@ -308,6 +308,8 @@ Tests:
 
 ## Phase 12: Poll OpenAI Batch Status
 
+Status: done
+
 Type: Behavior
 
 Precondition: submitted local batches with OpenAI batch ids exist.

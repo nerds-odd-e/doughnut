@@ -161,4 +161,9 @@ public class OpenAiApiHandler {
     Batch batch = officialClient.batches().create(params);
     return batch.id();
   }
+
+  public Batch retrieveBatch(String batchId) {
+    assertOpenAiAvailable();
+    return officialClient.batches().retrieve(batchId);
+  }
 }

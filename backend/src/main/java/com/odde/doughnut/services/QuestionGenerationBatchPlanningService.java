@@ -58,7 +58,7 @@ public class QuestionGenerationBatchPlanningService {
         .stream()
         .map(userRepository::findById)
         .flatMap(Optional::stream)
-        .filter(user -> isUserPastSubmissionGate(user, currentTime))
+        .filter(user -> isUserEligibleForNewBatchSubmission(user, currentTime))
         .filter(user -> isUserDueInCurrentCronHour(user, currentTime, windowStart))
         .toList();
   }
@@ -122,6 +122,18 @@ public class QuestionGenerationBatchPlanningService {
         .findByUser_Id(user.getId())
         .map(state -> isPastGate(state.getLastSuccessfulSubmittedAt(), currentTime))
         .orElse(true);
+  }
+
+  public boolean isUserEligibleForNewBatchSubmission(User user, Timestamp currentTime) {
+    if (batchRepository.existsByUser_IdAndStatus(
+        user.getId(), QuestionGenerationBatchStatus.SUBMITTED)) {
+      return false;
+    }
+    if (isUserPastSubmissionGate(user, currentTime)) {
+      return true;
+    }
+    return batchRepository.existsByUser_IdAndOpenaiBatchIdIsNotNullAndStatusIn(
+        user.getId(), QuestionGenerationBatchStatus.openAiFailureRetryStatuses());
   }
 
   private boolean isPastGate(Timestamp lastSubmittedAt, Timestamp currentTime) {
