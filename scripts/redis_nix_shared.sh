@@ -28,5 +28,6 @@ EOF
 }
 
 redis_nix_exec_redis_foreground() {
+  exec >> "${REDIS_LOG_FILE}" 2>&1
   exec "${REDIS_BASEDIR}/bin/redis-server" "${REDIS_CONF_FILE}"
 }

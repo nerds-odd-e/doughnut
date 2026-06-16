@@ -103,14 +103,15 @@ if [ "$CURSOR_DEV_MODE" != "true" ]; then
     [ "$needs_mysql" = true ] && services_to_start+=("mysql")
     [ "$needs_redis" = true ] && services_to_start+=("redis")
 
+    pc_log="${PWD}/process-compose.log"
     if lsof -i :8080 -sTCP:LISTEN >/dev/null 2>&1; then
       for svc in "${services_to_start[@]}"; do
         log "Starting ${svc} via existing process-compose server..."
-        process-compose process start "$svc"
+        start_detached "${pc_log}" process-compose process start "$svc"
       done
     else
       log "Starting process-compose with: ${services_to_start[*]}..."
-      process-compose -f "${PWD}/process-compose.yaml" up -D "${services_to_start[@]}"
+      start_detached "${pc_log}" process-compose -f "${PWD}/process-compose.yaml" up -D "${services_to_start[@]}"
     fi
 
     if [ "$needs_mysql" = true ]; then

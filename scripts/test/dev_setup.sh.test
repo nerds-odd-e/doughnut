@@ -2,7 +2,42 @@
 #
 # Tests for scripts/dev_setup.sh Biome daemon helpers using Bach testing framework
 
+# Captured before Bach rewrites PATH so the real-execution test below can spawn a
+# clean bash that sources the real dev_setup.sh (see start_detached test).
+DOUGHNUT_TEST_REAL_PATH="$PATH"
+DOUGHNUT_TEST_REAL_BASH="$(command -v bash)"
+DOUGHNUT_TEST_DEV_SETUP_SH="$(cd "$(dirname "$0")/.." && pwd)/dev_setup.sh"
+
 source "$(dirname "$0")/vendor/bach.sh"
+
+# start_detached must shield direnv from daemon FD inheritance (direnv/direnv#755):
+# it closes FD 3 and redirects the command's stdio to the log. Run the real
+# function in a clean bash subprocess and probe both guarantees at once:
+#   - writing to FD 3 from the child leaves the FD-3 file empty (FD 3 was closed)
+#   - the child's stdout lands in the log file (stdio was redirected)
+test-start-detached-closes-fd3-and-redirects-stdio() {
+    local work fd3 out probe
+    work="$(@mktemp -d)"
+    fd3="${work}/fd3.txt"
+    out="${work}/out.log"
+    probe="${work}/probe.sh"
+
+    @cat >"${probe}" <<'PROBE'
+export PATH="$1"
+source "$2"
+exec 3>"$3"
+start_detached "$4" sh -c 'echo leaked 2>/dev/null >&3 || true; echo redirected'
+PROBE
+
+    # env -i clears Bach's exported mock functions so the child bash sources the
+    # real dev_setup.sh instead of Bach's `source` stub.
+    @real env -i "PATH=${DOUGHNUT_TEST_REAL_PATH}" \
+        "${DOUGHNUT_TEST_REAL_BASH}" "${probe}" \
+        "${DOUGHNUT_TEST_REAL_PATH}" "${DOUGHNUT_TEST_DEV_SETUP_SH}" "${fd3}" "${out}" \
+        >/dev/null 2>&1
+
+    @assert-equals "fd3=[] out=[redirected]" "fd3=[$(@cat "${fd3}")] out=[$(@cat "${out}")]"
+}
 
 # Simulates stop_biome_daemon when no @biomejs server is running.
 test-stop-biome-daemon-when-no-server() {

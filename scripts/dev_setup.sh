@@ -5,6 +5,18 @@ deactivate_nvm() {
   command -v nvm >/dev/null 2>&1 && { nvm deactivate; }
 }
 
+# Run a command that may leave a long-lived daemon behind without leaking
+# direnv's file descriptors. direnv waits for EOF on the stdout/stderr pipe it
+# captures from the nix shell hook; a daemon that keeps that pipe — or FD 3 —
+# open makes `direnv reload` / `nix develop` hang forever (direnv/direnv#755).
+# Detach stdin from the terminal, redirect stdout/stderr to a log, and close
+# FD 3 so any daemon the command spawns inherits no direnv file descriptors.
+start_detached() {
+  local log_file="$1"
+  shift
+  "$@" </dev/null >>"${log_file}" 2>&1 3>&-
+}
+
 # Skip the pnpm install when direnv/nix runs the shell hook more than once per cd.
 DOUGHNUT_PNPM_FINGERPRINT_FILE="${DOUGHNUT_PNPM_FINGERPRINT_FILE:-.doughnut-pnpm-lock.sha256}"
 
