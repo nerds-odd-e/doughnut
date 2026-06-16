@@ -1,6 +1,6 @@
 # OpenAI Batch Question Generation
 
-Status: in-progress (Phases 1-24 done; Phases 25+ are post-review follow-ups)
+Status: in-progress (Phases 1-25 done; Phases 26+ are post-review follow-ups)
 
 ## Refined Requirement
 
@@ -620,6 +620,8 @@ Tests:
 - Run `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
 
 ## Phase 25: Narrow Structured-Output Schema Field Stripping
+
+Status: done
 
 Type: Structure
 
