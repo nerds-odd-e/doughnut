@@ -16,6 +16,7 @@ erDiagram
     folder ||--o{ folder : "parent_folder_id"
     folder ||--o{ "note" : "folder_id"
     image ||--o{ "note" : "image_id"
+    memory_tracker ||--o{ question_generation_batch_request : "memory_tracker_id"
     memory_tracker ||--o{ recall_prompt : "memory_tracker_id"
     "note" ||--o{ conversation : "note_id"
     "note" ||--o{ image : "note_id"
@@ -36,6 +37,7 @@ erDiagram
     ownership ||--o{ notebook : "ownership_id"
     ownership ||--o{ notebook_group : "ownership_id"
     predefined_question ||--o{ recall_prompt : "predefined_question_id"
+    question_generation_batch ||--o{ question_generation_batch_request : "batch_id"
     quiz_answer ||--o{ recall_prompt : "quiz_answer_id"
     recall_prompt ||--o{ conversation : "recall_prompt_id"
     "user" ||--o{ book_block_reading_record : "user_id"
@@ -48,6 +50,8 @@ erDiagram
     "user" ||--o{ note_creator : "user_id"
     "user" ||--o{ notebook : "creator_id"
     "user" ||--o{ ownership : "user_id"
+    "user" ||--o{ question_generation_batch : "user_id"
+    "user" ||--o{ question_generation_batch_user_state : "user_id"
     "user" ||--o{ subscription : "user_id"
     "user" ||--o{ user_token : "user_id"
     attachment_blob {
@@ -167,6 +171,20 @@ erDiagram
     predefined_question {
         int id PK
         int note_id FK
+    }
+    question_generation_batch {
+        int id PK
+        int user_id FK
+    }
+    question_generation_batch_request {
+        int id PK
+        int batch_id FK
+        int memory_tracker_id FK
+        string custom_id UK
+    }
+    question_generation_batch_user_state {
+        int id PK
+        int user_id UK FK
     }
     quiz_answer {
         int id PK

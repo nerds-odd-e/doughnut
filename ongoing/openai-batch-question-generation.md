@@ -1,6 +1,6 @@
 # OpenAI Batch Question Generation
 
-Status: planned
+Status: done
 
 ## Refined Requirement
 
@@ -451,6 +451,8 @@ Tests:
 
 ## Phase 18: Operational Notes And Verification
 
+Status: done
+
 Type: Behavior
 
 Precondition: hourly job is wired.
@@ -461,6 +463,7 @@ Postcondition: operational notes explain state tables, retry behavior, restart b
 
 Implementation notes:
 
+- Operational runbook: `docs/question-generation-batch-operations.md`.
 - Regenerate database ERD if migrations changed schema.
 - Keep generated API docs untouched unless an endpoint was added.
 - Remove dead/interim code.
