@@ -48,7 +48,7 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": false,
+      "preset": "none",
       "complexity": {
         "noBannedTypes": "error",
         "noExtraBooleanCast": "error",
@@ -239,18 +239,13 @@
   },
   "overrides": [
     {
-      "includes": [
-        "**/vitest.config.ts",
-        "**/src/assets/daisyui.css"
-      ],
+      "includes": ["**/vitest.config.ts", "**/src/assets/daisyui.css"],
       "linter": {
         "enabled": false
       }
     },
     {
-      "includes": [
-        "**/*.vue"
-      ],
+      "includes": ["**/*.vue"],
       "linter": {
         "rules": {
           "correctness": {
@@ -261,10 +256,7 @@
       }
     },
     {
-      "includes": [
-        "**/*.ts",
-        "**/*.tsx"
-      ],
+      "includes": ["**/*.ts", "**/*.tsx"],
       "linter": {
         "rules": {
           "correctness": {
@@ -274,12 +266,7 @@
       }
     },
     {
-      "includes": [
-        "**/*.ts",
-        "**/*.tsx",
-        "**/*.mts",
-        "**/*.cts"
-      ],
+      "includes": ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
       "linter": {
         "rules": {
           "correctness": {
