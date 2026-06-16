@@ -357,6 +357,8 @@ Tests:
 
 ## Phase 14: Import One Successful Batch Result Row
 
+Status: done
+
 Type: Behavior
 
 Precondition: a request row has a successful raw Responses result payload.

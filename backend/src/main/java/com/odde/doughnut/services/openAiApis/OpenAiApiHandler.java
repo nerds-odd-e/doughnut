@@ -1,6 +1,7 @@
 package com.odde.doughnut.services.openAiApis;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
@@ -175,6 +176,37 @@ public class OpenAiApiHandler {
       return new String(response.body().readAllBytes(), StandardCharsets.UTF_8);
     } catch (IOException e) {
       throw new RuntimeException("Failed to download OpenAI file " + fileId, e);
+    }
+  }
+
+  public <T> Optional<T> parseStructuredOutputFromBatchSuccessLine(
+      String rawSuccessLine, Class<T> responseType) {
+    if (rawSuccessLine == null || rawSuccessLine.isBlank()) {
+      return Optional.empty();
+    }
+    try {
+      JsonNode bodyNode = objectMapper.readTree(rawSuccessLine).path("response").path("body");
+      if (bodyNode.isMissingNode() || bodyNode.isNull()) {
+        return Optional.empty();
+      }
+      for (JsonNode outputItem : bodyNode.path("output")) {
+        if (!"message".equals(outputItem.path("type").asText())) {
+          continue;
+        }
+        for (JsonNode content : outputItem.path("content")) {
+          if (!"output_text".equals(content.path("type").asText())) {
+            continue;
+          }
+          String text = content.path("text").asText(null);
+          if (text == null || text.isBlank()) {
+            continue;
+          }
+          return Optional.of(objectMapper.readValue(text, responseType));
+        }
+      }
+      return Optional.empty();
+    } catch (JsonProcessingException e) {
+      return Optional.empty();
     }
   }
 }
