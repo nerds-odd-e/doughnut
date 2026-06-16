@@ -70,6 +70,8 @@ Tests:
 
 ## Phase 2: Enforce 23-Hour User Submission Gate
 
+Status: done
+
 Type: Behavior
 
 Precondition: a user's last successful batch submission can be persisted.
