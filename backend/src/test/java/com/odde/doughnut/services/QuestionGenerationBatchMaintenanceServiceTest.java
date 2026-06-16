@@ -44,6 +44,7 @@ class QuestionGenerationBatchMaintenanceServiceTest {
   @Autowired QuestionGenerationBatchRepository batchRepository;
   @Autowired QuestionGenerationBatchRequestRepository batchRequestRepository;
   @Autowired QuestionGenerationBatchRowImportService rowImportService;
+  @Autowired QuestionGenerationBatchRetentionService retentionService;
   @Autowired RecallPromptRepository recallPromptRepository;
 
   User user;
@@ -61,7 +62,8 @@ class QuestionGenerationBatchMaintenanceServiceTest {
             new QuestionGenerationBatchOutputCollectionService(
                 batchRepository, batchRequestRepository, openAiApiHandler),
             new QuestionGenerationBatchImportService(
-                batchRepository, batchRequestRepository, rowImportService));
+                batchRepository, batchRequestRepository, rowImportService),
+            retentionService);
 
     user = makeMe.aUser().please();
     currentTime = makeMe.aTimestamp().please();

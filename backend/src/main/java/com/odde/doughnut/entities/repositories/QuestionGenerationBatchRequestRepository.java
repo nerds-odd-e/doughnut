@@ -8,4 +8,6 @@ public interface QuestionGenerationBatchRequestRepository
     extends JpaRepository<QuestionGenerationBatchRequest, Integer> {
 
   List<QuestionGenerationBatchRequest> findByBatch_Id(Integer batchId);
+
+  void deleteByBatch_Id(Integer batchId);
 }
