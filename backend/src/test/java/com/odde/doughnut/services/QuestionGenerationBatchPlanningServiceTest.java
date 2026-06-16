@@ -12,6 +12,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchUserStateRepository;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
@@ -157,6 +158,92 @@ class QuestionGenerationBatchPlanningServiceTest {
       makeMe.entityPersister.flush();
 
       List<User> candidates = planningService.findUsersEligibleForBatchSubmission(currentTime);
+
+      assertThat(candidates, empty());
+    }
+  }
+
+  @Nested
+  class FindUsersDueInCurrentCronHour {
+    Note note;
+    MemoryTracker memoryTracker;
+
+    @BeforeEach
+    void setupRecallFixtures() {
+      note = makeMe.aNote().notebookOwnedBy(user).please();
+      memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
+    }
+
+    @Test
+    void includesUserWhoseTargetFallsInCurrentCronHour() {
+      Timestamp cronTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 10, 30));
+      Timestamp recallTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 30));
+      makeMe
+          .aRecallPrompt()
+          .withPredefinedQuestionForNote(note)
+          .forMemoryTracker(memoryTracker)
+          .answerChoiceIndex(0)
+          .answerTimestamp(recallTime)
+          .please();
+
+      List<User> candidates = planningService.findUsersEligibleForBatchSubmission(cronTime);
+
+      assertThat(candidates.stream().map(User::getId).toList(), contains(user.getId()));
+    }
+
+    @Test
+    void excludesUserWhoseTargetFallsInAdjacentCronHour() {
+      Timestamp cronTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 11, 15));
+      Timestamp recallTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 30));
+      makeMe
+          .aRecallPrompt()
+          .withPredefinedQuestionForNote(note)
+          .forMemoryTracker(memoryTracker)
+          .answerChoiceIndex(0)
+          .answerTimestamp(recallTime)
+          .please();
+
+      List<User> candidates = planningService.findUsersEligibleForBatchSubmission(cronTime);
+
+      assertThat(candidates, empty());
+    }
+
+    @Test
+    void includesUserWhoseTargetCrossesMidnightWhenCronHourMatches() {
+      Timestamp cronTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 16, 0, 30));
+      Timestamp recallTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 23, 45));
+      makeMe
+          .aRecallPrompt()
+          .withPredefinedQuestionForNote(note)
+          .forMemoryTracker(memoryTracker)
+          .answerChoiceIndex(0)
+          .answerTimestamp(recallTime)
+          .please();
+
+      List<User> candidates = planningService.findUsersEligibleForBatchSubmission(cronTime);
+
+      assertThat(candidates.stream().map(User::getId).toList(), contains(user.getId()));
+    }
+
+    @Test
+    void excludesUserPastSubmissionGateEvenWhenDueInCurrentCronHour() {
+      Timestamp cronTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 10, 30));
+      Timestamp recallTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 30));
+      makeMe
+          .aRecallPrompt()
+          .withPredefinedQuestionForNote(note)
+          .forMemoryTracker(memoryTracker)
+          .answerChoiceIndex(0)
+          .answerTimestamp(recallTime)
+          .please();
+      QuestionGenerationBatchUserState state = new QuestionGenerationBatchUserState();
+      state.setUser(user);
+      state.setLastSuccessfulSubmittedAt(
+          new Timestamp(cronTime.getTime() - TimeUnit.HOURS.toMillis(1)));
+      userStateRepository.save(state);
+      makeMe.entityPersister.flush();
+
+      List<User> candidates = planningService.findUsersEligibleForBatchSubmission(cronTime);
 
       assertThat(candidates, empty());
     }

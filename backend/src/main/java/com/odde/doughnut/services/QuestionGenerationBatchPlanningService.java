@@ -1,11 +1,16 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.CronHourTargetDueSelector;
+import com.odde.doughnut.algorithms.RecallSilentPeriodTargetSelector;
+import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchUserStateRepository;
 import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import java.sql.Timestamp;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Service;
@@ -36,7 +41,25 @@ public class QuestionGenerationBatchPlanningService {
         .map(userRepository::findById)
         .flatMap(Optional::stream)
         .filter(user -> isUserPastSubmissionGate(user, currentTime))
+        .filter(user -> isUserDueInCurrentCronHour(user, currentTime, windowStart))
         .toList();
+  }
+
+  private boolean isUserDueInCurrentCronHour(
+      User user, Timestamp currentTime, Timestamp windowStart) {
+    List<Timestamp> answerTimestamps =
+        recallPromptRepository
+            .findAnsweredRecallPromptsInTimeRange(user.getId(), windowStart, currentTime)
+            .stream()
+            .map(RecallPrompt::getAnswerTime)
+            .filter(Objects::nonNull)
+            .toList();
+    if (answerTimestamps.isEmpty()) {
+      return false;
+    }
+    LocalTime targetTimeOfDay =
+        RecallSilentPeriodTargetSelector.targetTimeOfDayFromTimestamps(answerTimestamps);
+    return CronHourTargetDueSelector.isTargetDueInCronHour(targetTimeOfDay, currentTime);
   }
 
   public boolean isUserPastSubmissionGate(User user, Timestamp currentTime) {

@@ -140,6 +140,8 @@ Tests:
 
 ## Phase 5: Select Users Due In The Current Cron Hour
 
+Status: done
+
 Type: Behavior
 
 Precondition: candidate users and target time-of-day can be computed.

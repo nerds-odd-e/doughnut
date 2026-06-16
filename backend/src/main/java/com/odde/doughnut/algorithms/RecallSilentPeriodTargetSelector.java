@@ -10,9 +10,6 @@ import java.util.TreeSet;
  */
 public final class RecallSilentPeriodTargetSelector {
 
-  private static final long NANOS_PER_DAY = 24L * 60 * 60 * 1_000_000_000;
-  private static final long NANOS_PER_HOUR = 60L * 60 * 1_000_000_000;
-
   private RecallSilentPeriodTargetSelector() {}
 
   public static LocalTime targetTimeOfDay(Collection<LocalTime> recallTimesOfDay) {
@@ -32,9 +29,10 @@ public final class RecallSilentPeriodTargetSelector {
       Long nextRecallNano = recallNanos.higher(recallNano);
       long gapNanos =
           nextRecallNano == null
-              ? NANOS_PER_DAY - recallNano + recallNanos.first()
+              ? RecallTimeOfDay.NANOS_PER_DAY - recallNano + recallNanos.first()
               : nextRecallNano - recallNano;
-      long targetNanos = (recallNano + NANOS_PER_HOUR) % NANOS_PER_DAY;
+      long targetNanos =
+          (recallNano + RecallTimeOfDay.NANOS_PER_HOUR) % RecallTimeOfDay.NANOS_PER_DAY;
       if (gapNanos > longestGapNanos
           || (gapNanos == longestGapNanos && targetNanos < earliestTargetNanos)) {
         longestGapNanos = gapNanos;
@@ -49,12 +47,6 @@ public final class RecallSilentPeriodTargetSelector {
     if (recallTimestamps == null || recallTimestamps.isEmpty()) {
       throw new IllegalArgumentException("At least one recall timestamp is required");
     }
-    return targetTimeOfDay(
-        recallTimestamps.stream().map(RecallSilentPeriodTargetSelector::timeOfDayFrom).toList());
-  }
-
-  private static LocalTime timeOfDayFrom(Timestamp timestamp) {
-    return LocalTime.of(
-        timestamp.getHours(), timestamp.getMinutes(), timestamp.getSeconds(), timestamp.getNanos());
+    return targetTimeOfDay(recallTimestamps.stream().map(RecallTimeOfDay::fromTimestamp).toList());
   }
 }
