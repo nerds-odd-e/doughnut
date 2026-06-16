@@ -24,6 +24,7 @@ class QuestionGenerationRequestBuilderTests {
 
   @Autowired MakeMe makeMe;
   @Autowired NoteQuestionGenerationService noteQuestionGenerationService;
+  @Autowired QuestionGenerationRequestBuilder questionGenerationRequestBuilder;
   @Autowired WikiTitleCacheService wikiTitleCacheService;
   @TestBean CurrentUser currentUser;
 
@@ -76,5 +77,28 @@ class QuestionGenerationRequestBuilderTests {
         focusContext, containsString("Property value: Circulatory system includes [[Heart]]"));
     assertThat(focusContext, containsString("# Focus Context"));
     assertThat(focusContext, containsString("Heart"));
+  }
+
+  @Test
+  void shouldUseExplicitViewerForWikiTitlesWithoutSessionCurrentUser() {
+    User viewer = makeMe.aUser().please();
+    User stranger = makeMe.aUser().please();
+    currentUser.setUser(stranger);
+    Note target = makeMe.aNote().title("Heart").notebookOwnedBy(viewer).please();
+    String markdown =
+        "---\n"
+            + "a part of: Circulatory system includes [[Heart]]\n"
+            + "---\n"
+            + "The human body overview.\n";
+    Note focus = makeMe.aNote().notebook(target.getNotebook()).content(markdown).please();
+    wikiTitleCacheService.refreshForNote(focus, viewer);
+
+    StructuredResponseCreateParams<MCQWithAnswer> request =
+        questionGenerationRequestBuilder.buildQuestionGenerationResponseRequest(
+            focus, null, null, "a part of", viewer);
+
+    String focusContext = inputText(request);
+    assertThat(focusContext, containsString("## Retrieved Note"));
+    assertThat(focusContext, containsString("Title: Heart"));
   }
 }

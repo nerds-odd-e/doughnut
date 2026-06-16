@@ -59,12 +59,18 @@ public class QuestionGenerationRequestBuilder {
 
   public StructuredResponseCreateParams<MCQWithAnswer> buildQuestionGenerationResponseRequest(
       Note note, String additionalMessage, Long contextSeed, String propertyKey) {
+    return buildQuestionGenerationResponseRequest(
+        note, additionalMessage, contextSeed, propertyKey, authorizationService.getCurrentUser());
+  }
+
+  public StructuredResponseCreateParams<MCQWithAnswer> buildQuestionGenerationResponseRequest(
+      Note note, String additionalMessage, Long contextSeed, String propertyKey, User viewer) {
     InstructionAndSchema tool =
         AiToolFactory.mcqWithAnswerAiTool(
             hydrateFocusNoteForQuestionGeneration(note).isBodyContentBlank());
     OpenAIResponseRequestBuilder<MCQWithAnswer> responseRequestBuilder =
         openAiResponseRequestForQuestionGeneration(
-            MCQWithAnswer.class, note, additionalMessage, contextSeed, propertyKey);
+            MCQWithAnswer.class, note, additionalMessage, contextSeed, propertyKey, viewer);
     responseRequestBuilder.addInstruction(tool.getMessageBody());
     addNotebookAssistantInstructionsIfPresent(responseRequestBuilder, note);
     return responseRequestBuilder
@@ -101,16 +107,38 @@ public class QuestionGenerationRequestBuilder {
       String additionalMessage,
       Long contextSeed,
       String propertyKey) {
+    return openAiResponseRequestForQuestionGeneration(
+        responseType,
+        note,
+        additionalMessage,
+        contextSeed,
+        propertyKey,
+        authorizationService.getCurrentUser());
+  }
+
+  public <T> OpenAIResponseRequestBuilder<T> openAiResponseRequestForQuestionGeneration(
+      Class<T> responseType,
+      Note note,
+      String additionalMessage,
+      Long contextSeed,
+      String propertyKey,
+      User viewer) {
     String modelName = globalSettingsService.globalSettingQuestionGeneration().getValue();
     return openAiResponseRequestForQuestionGeneration(
-        responseType, note, additionalMessage, contextSeed, modelName, propertyKey);
+        responseType, note, additionalMessage, contextSeed, modelName, propertyKey, viewer);
   }
 
   public <T> OpenAIResponseRequestBuilder<T> openAiResponseRequestForQuestionEvaluation(
       Class<T> responseType, Note note, String additionalMessage, Long contextSeed) {
     String modelName = globalSettingsService.globalSettingEvaluation().getValue();
     return openAiResponseRequestForQuestionGeneration(
-        responseType, note, additionalMessage, contextSeed, modelName, null);
+        responseType,
+        note,
+        additionalMessage,
+        contextSeed,
+        modelName,
+        null,
+        authorizationService.getCurrentUser());
   }
 
   private <T> OpenAIResponseRequestBuilder<T> openAiResponseRequestForQuestionGeneration(
@@ -119,7 +147,8 @@ public class QuestionGenerationRequestBuilder {
       String additionalMessage,
       Long contextSeed,
       String modelName,
-      String propertyKey) {
+      String propertyKey,
+      User viewer) {
     Note focus = hydrateFocusNoteForQuestionGeneration(note);
 
     String instruction =
@@ -146,12 +175,12 @@ public class QuestionGenerationRequestBuilder {
                 - propertyFocusTokens);
     RetrievalConfig config = RetrievalConfig.forQuestionGeneration(contextSeed, focusBudget);
 
-    FocusContextResult focusContextResult = focusContextRetrievalService.retrieve(focus, config);
+    FocusContextResult focusContextResult =
+        focusContextRetrievalService.retrieve(focus, viewer, config);
     String focusContextMarkdown = focusContextMarkdownRenderer.render(focusContextResult, config);
     if (propertyFocusBlock != null) {
       focusContextMarkdown =
           embedPropertyFocusInFocusContext(focusContextMarkdown, propertyFocusBlock);
-      User viewer = authorizationService.getCurrentUser();
       List<WikiTitle> wikiTitles = wikiTitleCacheService.wikiTitlesForViewer(focus, viewer);
       focusContextMarkdown = ensureWikiTitlesInFocusContext(focusContextMarkdown, wikiTitles);
     }

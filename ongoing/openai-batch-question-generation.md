@@ -186,6 +186,8 @@ Tests:
 
 ## Phase 7: Make Question Request Building Work For Background User
 
+Status: done
+
 Type: Structure
 
 Precondition: candidate trackers can be selected, but request construction currently relies on `AuthorizationService.getCurrentUser()` in focus-context/wiki-title paths.

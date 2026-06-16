@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.services.ai.builder.OpenAIResponseRequestBuilder;
@@ -51,6 +52,12 @@ public class NoteQuestionGenerationService {
       Note note, String additionalMessage, String propertyKey) {
     return requestBuilder.buildQuestionGenerationResponseRequest(
         note, additionalMessage, null, propertyKey);
+  }
+
+  public StructuredResponseCreateParams<MCQWithAnswer> buildQuestionGenerationRequest(
+      Note note, String additionalMessage, Long contextSeed, String propertyKey, User viewer) {
+    return requestBuilder.buildQuestionGenerationResponseRequest(
+        note, additionalMessage, contextSeed, propertyKey, viewer);
   }
 
   public <T> OpenAIResponseRequestBuilder<T> openAiResponseRequestForSharedNoteContext(
