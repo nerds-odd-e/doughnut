@@ -17,16 +17,19 @@ public class QuestionGenerationBatchSubmissionService {
   private final OpenAiApiHandler openAiApiHandler;
   private final QuestionGenerationBatchRepository batchRepository;
   private final QuestionGenerationBatchUserStateRepository userStateRepository;
+  private final QuestionGenerationBatchMetrics batchMetrics;
 
   public QuestionGenerationBatchSubmissionService(
       QuestionGenerationBatchJsonlRenderer jsonlRenderer,
       OpenAiApiHandler openAiApiHandler,
       QuestionGenerationBatchRepository batchRepository,
-      QuestionGenerationBatchUserStateRepository userStateRepository) {
+      QuestionGenerationBatchUserStateRepository userStateRepository,
+      QuestionGenerationBatchMetrics batchMetrics) {
     this.jsonlRenderer = jsonlRenderer;
     this.openAiApiHandler = openAiApiHandler;
     this.batchRepository = batchRepository;
     this.userStateRepository = userStateRepository;
+    this.batchMetrics = batchMetrics;
   }
 
   public boolean submitPlannedBatch(QuestionGenerationBatch batch, Timestamp submissionTime) {
@@ -51,10 +54,12 @@ public class QuestionGenerationBatchSubmissionService {
       batchRepository.saveAndFlush(batch);
 
       recordSuccessfulSubmission(batch.getUser(), submissionTime);
+      batchMetrics.recordSubmittedBatch();
       return true;
     } catch (RuntimeException e) {
       batch.setStatus(QuestionGenerationBatchStatus.FAILED);
       batchRepository.saveAndFlush(batch);
+      batchMetrics.recordFailedBatch();
       return false;
     }
   }

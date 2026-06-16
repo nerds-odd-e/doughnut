@@ -69,6 +69,7 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-flyway'
   implementation 'org.flywaydb:flyway-mysql'
   implementation 'org.springframework.session:spring-session-core'
+  implementation 'io.micrometer:micrometer-core'
   implementation 'org.springframework.boot:spring-boot-starter-validation'
   implementation 'org.springframework.boot:spring-boot-starter-security'
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'

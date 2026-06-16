@@ -19,14 +19,17 @@ public class QuestionGenerationBatchRowImportService {
   private final QuestionGenerationBatchRequestRepository batchRequestRepository;
   private final EntityPersister entityPersister;
   private final OpenAiApiHandler openAiApiHandler;
+  private final QuestionGenerationBatchMetrics batchMetrics;
 
   public QuestionGenerationBatchRowImportService(
       QuestionGenerationBatchRequestRepository batchRequestRepository,
       EntityPersister entityPersister,
-      OpenAiApiHandler openAiApiHandler) {
+      OpenAiApiHandler openAiApiHandler,
+      QuestionGenerationBatchMetrics batchMetrics) {
     this.batchRequestRepository = batchRequestRepository;
     this.entityPersister = entityPersister;
     this.openAiApiHandler = openAiApiHandler;
+    this.batchMetrics = batchMetrics;
   }
 
   @Transactional
@@ -48,6 +51,7 @@ public class QuestionGenerationBatchRowImportService {
       request.setStatus(QuestionGenerationBatchRequestStatus.FAILED);
       request.setErrorDetail("invalid batch success payload");
       batchRequestRepository.save(request);
+      batchMetrics.recordFailedRow();
       return false;
     }
 

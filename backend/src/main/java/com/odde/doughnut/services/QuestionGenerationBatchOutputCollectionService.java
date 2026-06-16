@@ -29,15 +29,18 @@ public class QuestionGenerationBatchOutputCollectionService {
   private final QuestionGenerationBatchRepository batchRepository;
   private final QuestionGenerationBatchRequestRepository batchRequestRepository;
   private final OpenAiApiHandler openAiApiHandler;
+  private final QuestionGenerationBatchMetrics batchMetrics;
   private final ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
 
   public QuestionGenerationBatchOutputCollectionService(
       QuestionGenerationBatchRepository batchRepository,
       QuestionGenerationBatchRequestRepository batchRequestRepository,
-      OpenAiApiHandler openAiApiHandler) {
+      OpenAiApiHandler openAiApiHandler,
+      QuestionGenerationBatchMetrics batchMetrics) {
     this.batchRepository = batchRepository;
     this.batchRequestRepository = batchRequestRepository;
     this.openAiApiHandler = openAiApiHandler;
+    this.batchMetrics = batchMetrics;
   }
 
   public void collectOutputForCompletedBatches(Timestamp collectedAt) {
@@ -91,6 +94,7 @@ public class QuestionGenerationBatchOutputCollectionService {
       if (request.getStatus() == QuestionGenerationBatchRequestStatus.PENDING) {
         request.setStatus(QuestionGenerationBatchRequestStatus.FAILED);
         request.setErrorDetail("missing batch output line");
+        batchMetrics.recordFailedRow();
       }
     }
     batchRequestRepository.saveAll(requests);
@@ -136,6 +140,7 @@ public class QuestionGenerationBatchOutputCollectionService {
       request.setRawSuccessPayload(null);
       request.setRawErrorPayload(outputLine.rawLine());
       request.setErrorDetail(outputLine.errorDetail());
+      batchMetrics.recordFailedRow();
     }
   }
 
@@ -156,6 +161,7 @@ public class QuestionGenerationBatchOutputCollectionService {
     request.setRawSuccessPayload(null);
     request.setRawErrorPayload(errorLine.rawLine());
     request.setErrorDetail(errorLine.errorDetail());
+    batchMetrics.recordFailedRow();
   }
 
   private Optional<OutputLine> parseOutputLine(String line) {

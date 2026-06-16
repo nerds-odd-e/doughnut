@@ -20,14 +20,17 @@ public class QuestionGenerationBatchImportService {
   private final QuestionGenerationBatchRepository batchRepository;
   private final QuestionGenerationBatchRequestRepository batchRequestRepository;
   private final QuestionGenerationBatchRowImportService rowImportService;
+  private final QuestionGenerationBatchMetrics batchMetrics;
 
   public QuestionGenerationBatchImportService(
       QuestionGenerationBatchRepository batchRepository,
       QuestionGenerationBatchRequestRepository batchRequestRepository,
-      QuestionGenerationBatchRowImportService rowImportService) {
+      QuestionGenerationBatchRowImportService rowImportService,
+      QuestionGenerationBatchMetrics batchMetrics) {
     this.batchRepository = batchRepository;
     this.batchRequestRepository = batchRequestRepository;
     this.rowImportService = rowImportService;
+    this.batchMetrics = batchMetrics;
   }
 
   public void importCompletedBatches(Timestamp importedAt) {
@@ -74,6 +77,7 @@ public class QuestionGenerationBatchImportService {
 
     batch.setImportedAt(importedAt);
     batchRepository.saveAndFlush(batch);
+    batchMetrics.recordImportedBatch();
     return true;
   }
 
@@ -88,6 +92,7 @@ public class QuestionGenerationBatchImportService {
         reloadedRequest.setStatus(QuestionGenerationBatchRequestStatus.FAILED);
         reloadedRequest.setErrorDetail("import failed: " + e.getMessage());
         batchRequestRepository.save(reloadedRequest);
+        batchMetrics.recordFailedRow();
       }
     }
   }

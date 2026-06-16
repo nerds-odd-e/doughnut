@@ -18,11 +18,15 @@ public class QuestionGenerationBatchPollingService {
 
   private final QuestionGenerationBatchRepository batchRepository;
   private final OpenAiApiHandler openAiApiHandler;
+  private final QuestionGenerationBatchMetrics batchMetrics;
 
   public QuestionGenerationBatchPollingService(
-      QuestionGenerationBatchRepository batchRepository, OpenAiApiHandler openAiApiHandler) {
+      QuestionGenerationBatchRepository batchRepository,
+      OpenAiApiHandler openAiApiHandler,
+      QuestionGenerationBatchMetrics batchMetrics) {
     this.batchRepository = batchRepository;
     this.openAiApiHandler = openAiApiHandler;
+    this.batchMetrics = batchMetrics;
   }
 
   public void pollSubmittedBatches() {
@@ -71,7 +75,17 @@ public class QuestionGenerationBatchPollingService {
       batch.setOpenaiErrorFileId(openAiBatch.errorFileId().orElse(null));
     }
     batchRepository.saveAndFlush(batch);
+    recordBatchStatusMetric(newStatus);
     return true;
+  }
+
+  private void recordBatchStatusMetric(QuestionGenerationBatchStatus status) {
+    switch (status) {
+      case COMPLETED -> batchMetrics.recordCompletedBatch();
+      case FAILED -> batchMetrics.recordFailedBatch();
+      case EXPIRED -> batchMetrics.recordExpiredBatch();
+      default -> {}
+    }
   }
 
   private Optional<QuestionGenerationBatchStatus> mapOpenAiStatus(Batch.Status openAiStatus) {

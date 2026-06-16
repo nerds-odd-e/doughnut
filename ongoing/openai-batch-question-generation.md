@@ -1,6 +1,6 @@
 # OpenAI Batch Question Generation
 
-Status: in-progress (Phases 1-25 done; Phases 26+ are post-review follow-ups)
+Status: in-progress (Phases 1-26 done; Phases 27+ are post-review follow-ups)
 
 ## Refined Requirement
 
@@ -644,6 +644,8 @@ Tests:
 - Run `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
 
 ## Phase 26: Add Batch Lifecycle Metrics
+
+Status: done
 
 Type: Behavior
 
