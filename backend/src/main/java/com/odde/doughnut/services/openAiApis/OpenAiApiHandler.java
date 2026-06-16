@@ -7,6 +7,7 @@ import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.openai.client.OpenAIClient;
 import com.openai.core.MultipartField;
+import com.openai.core.http.HttpResponse;
 import com.openai.models.batches.Batch;
 import com.openai.models.batches.BatchCreateParams;
 import com.openai.models.files.FileCreateParams;
@@ -20,6 +21,7 @@ import io.reactivex.Flowable;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -165,5 +167,14 @@ public class OpenAiApiHandler {
   public Batch retrieveBatch(String batchId) {
     assertOpenAiAvailable();
     return officialClient.batches().retrieve(batchId);
+  }
+
+  public String downloadFileContent(String fileId) {
+    assertOpenAiAvailable();
+    try (HttpResponse response = officialClient.files().content(fileId)) {
+      return new String(response.body().readAllBytes(), StandardCharsets.UTF_8);
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to download OpenAI file " + fileId, e);
+    }
   }
 }

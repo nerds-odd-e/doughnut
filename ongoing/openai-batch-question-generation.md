@@ -332,6 +332,8 @@ Tests:
 
 ## Phase 13: Download And Store Batch Output Metadata
 
+Status: done
+
 Type: Behavior
 
 Precondition: a local batch is marked completed and OpenAI exposes output/error files.

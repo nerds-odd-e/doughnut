@@ -36,4 +36,13 @@ public class QuestionGenerationBatch extends EntityIdentifiedByIdOnly {
 
   @Column(name = "submitted_at")
   private Timestamp submittedAt;
+
+  @Column(name = "openai_output_file_id")
+  private String openaiOutputFileId;
+
+  @Column(name = "openai_error_file_id")
+  private String openaiErrorFileId;
+
+  @Column(name = "output_collected_at")
+  private Timestamp outputCollectedAt;
 }
