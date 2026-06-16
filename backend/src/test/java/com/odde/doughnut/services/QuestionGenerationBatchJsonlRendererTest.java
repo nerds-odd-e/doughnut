@@ -82,7 +82,7 @@ class QuestionGenerationBatchJsonlRendererTest {
       propertyKey = null;
     }
     StructuredResponseCreateParams<MCQWithAnswer> params =
-        requestBuilder.buildQuestionGenerationResponseRequest(
+        requestBuilder.buildQuestionGenerationResponseRequestForBatch(
             tracker.getNote(), null, request.getContextSeed(), propertyKey, batch.getUser());
     return paramsSerializer.toBodyMap(params);
   }
@@ -136,6 +136,7 @@ class QuestionGenerationBatchJsonlRendererTest {
         assertThat(body, is(expectedBody));
         assertThat(body.get("model"), is("gpt-batch-question-generation"));
         assertThat(body.get("max_output_tokens"), is(1000));
+        assertThat(body.containsKey("reasoning"), is(false));
         assertThat(body.containsKey("text"), is(true));
         @SuppressWarnings("unchecked")
         Map<String, Object> text = (Map<String, Object>) body.get("text");

@@ -109,6 +109,17 @@ JOIN user u ON u.id = s.user_id
 WHERE s.last_successful_submitted_at > NOW() - INTERVAL 23 HOUR;
 ```
 
+## OpenAI Batch Request Compatibility
+
+Batch JSONL uses a separate request shape from synchronous question generation (`buildQuestionGenerationResponseRequestForBatch`):
+
+- **No `reasoning.effort`** — batch model variants reject reasoning parameters that sync generation uses (`ReasoningEffort.LOW`).
+- **`text.verbosity: medium`** — batch model variants reject `low` verbosity; sync generation still uses `low`.
+
+Live verification: opt-in test `QuestionGenerationBatchLiveRoundTripTest` with `OPENAI_BATCH_LIVE_VERIFY=true` and `OPENAI_API_TOKEN` set. Captured success JSONL is stored at `backend/src/test/resources/openai-batch-fixtures/live_batch_success_line.json` and covered by `QuestionGenerationBatchLiveOutputFixtureTest`.
+
+Silent-period target time-of-day uses the JVM default timezone (`RecallTimeOfDay.fromTimestamp`); user timezones are intentionally ignored.
+
 ## Code Entry Points
 
 | Concern | Class |

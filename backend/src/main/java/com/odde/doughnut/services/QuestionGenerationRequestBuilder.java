@@ -65,6 +65,25 @@ public class QuestionGenerationRequestBuilder {
 
   public StructuredResponseCreateParams<MCQWithAnswer> buildQuestionGenerationResponseRequest(
       Note note, String additionalMessage, Long contextSeed, String propertyKey, User viewer) {
+    return buildQuestionGenerationResponseRequestInternal(
+        note, additionalMessage, contextSeed, propertyKey, viewer, true);
+  }
+
+  public StructuredResponseCreateParams<MCQWithAnswer>
+      buildQuestionGenerationResponseRequestForBatch(
+          Note note, String additionalMessage, Long contextSeed, String propertyKey, User viewer) {
+    return buildQuestionGenerationResponseRequestInternal(
+        note, additionalMessage, contextSeed, propertyKey, viewer, false);
+  }
+
+  private StructuredResponseCreateParams<MCQWithAnswer>
+      buildQuestionGenerationResponseRequestInternal(
+          Note note,
+          String additionalMessage,
+          Long contextSeed,
+          String propertyKey,
+          User viewer,
+          boolean includeReasoning) {
     InstructionAndSchema tool =
         AiToolFactory.mcqWithAnswerAiTool(
             hydrateFocusNoteForQuestionGeneration(note).isBodyContentBlank());
@@ -73,10 +92,11 @@ public class QuestionGenerationRequestBuilder {
             MCQWithAnswer.class, note, additionalMessage, contextSeed, propertyKey, viewer);
     responseRequestBuilder.addInstruction(tool.getMessageBody());
     addNotebookAssistantInstructionsIfPresent(responseRequestBuilder, note);
-    return responseRequestBuilder
-        .reasoningEffort(ReasoningEffort.LOW)
-        .maxOutputTokens(1000L)
-        .build();
+    responseRequestBuilder.maxOutputTokens(1000L);
+    if (includeReasoning) {
+      return responseRequestBuilder.reasoningEffort(ReasoningEffort.LOW).build();
+    }
+    return responseRequestBuilder.buildForBatchApi();
   }
 
   private static void addNotebookAssistantInstructionsIfPresent(

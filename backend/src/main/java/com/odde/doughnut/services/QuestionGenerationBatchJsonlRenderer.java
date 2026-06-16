@@ -58,7 +58,7 @@ public class QuestionGenerationBatchJsonlRenderer {
   private String renderLine(User viewer, QuestionGenerationBatchRequest request) {
     MemoryTracker tracker = request.getMemoryTracker();
     StructuredResponseCreateParams<MCQWithAnswer> params =
-        requestBuilder.buildQuestionGenerationResponseRequest(
+        requestBuilder.buildQuestionGenerationResponseRequestForBatch(
             tracker.getNote(),
             null,
             request.getContextSeed(),

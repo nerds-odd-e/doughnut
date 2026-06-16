@@ -1,6 +1,6 @@
 # OpenAI Batch Question Generation
 
-Status: in-progress (Phases 1-26 done; Phases 27+ are post-review follow-ups)
+Status: done (Phases 1-27 complete)
 
 ## Refined Requirement
 
@@ -667,6 +667,8 @@ Tests:
 
 ## Phase 27: Verify A Live OpenAI Batch Round-Trip
 
+Status: done
+
 Type: Behavior
 
 Precondition: every batch path is mock-tested; no real batch JSONL body, file upload, retrieve, output download, or success-line parse has been validated against the live OpenAI Batch + Responses API.
@@ -687,7 +689,8 @@ Tests:
 - Manual: observe one real batch reach `IMPORTED`; record any body/parse adjustments needed.
 - If the real shape differs, fold corrections back into the relevant phase's automated tests.
 
+**Done:** Live round-trip verified with `gpt-4.1-mini` via `QuestionGenerationBatchLiveRoundTripTest`. Batch JSONL was adjusted to omit `reasoning.effort` and use `text.verbosity: medium` for batch model compatibility. Fixture + regression test added.
+
 ## Open Items
 
-- Document the prod JVM timezone assumption behind `RecallTimeOfDay` (silent-period time-of-day is server-zone, by design ignoring user timezone). Can be folded into Phase 18's runbook when Phase 19+ work touches it.
 - Confirm whether permanently marking still-`PENDING` rows as `FAILED` ("missing batch output line") during output collection is acceptable, or whether such rows should be retried.
