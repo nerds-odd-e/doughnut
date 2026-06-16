@@ -9,19 +9,19 @@ import org.springframework.stereotype.Service;
 @Profile("prod")
 public class QuestionGenerationBatchMaintenanceJob {
   private final QuestionGenerationBatchMaintenanceService maintenanceService;
-  private final QuestionGenerationBatchSubmissionService submissionService;
+  private final QuestionGenerationBatchSubmitDueUsersService submitDueUsersService;
 
   public QuestionGenerationBatchMaintenanceJob(
       QuestionGenerationBatchMaintenanceService maintenanceService,
-      QuestionGenerationBatchSubmissionService submissionService) {
+      QuestionGenerationBatchSubmitDueUsersService submitDueUsersService) {
     this.maintenanceService = maintenanceService;
-    this.submissionService = submissionService;
+    this.submitDueUsersService = submitDueUsersService;
   }
 
   @Scheduled(cron = "0 0 * * * *")
   public void runHourlyMaintenance() {
     Timestamp currentTime = new Timestamp(System.currentTimeMillis());
     maintenanceService.resumeExistingBatches(currentTime);
-    submissionService.submitDueUsers(currentTime);
+    submitDueUsersService.submitDueUsers(currentTime);
   }
 }

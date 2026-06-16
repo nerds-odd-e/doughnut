@@ -15,21 +15,21 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class QuestionGenerationBatchMaintenanceJobTests {
 
   @Mock QuestionGenerationBatchMaintenanceService maintenanceService;
-  @Mock QuestionGenerationBatchSubmissionService submissionService;
+  @Mock QuestionGenerationBatchSubmitDueUsersService submitDueUsersService;
 
   QuestionGenerationBatchMaintenanceJob job;
 
   @BeforeEach
   void setup() {
-    job = new QuestionGenerationBatchMaintenanceJob(maintenanceService, submissionService);
+    job = new QuestionGenerationBatchMaintenanceJob(maintenanceService, submitDueUsersService);
   }
 
   @Test
   void shouldResumeExistingBatchesBeforeSubmittingDueUsers() {
     job.runHourlyMaintenance();
 
-    InOrder inOrder = inOrder(maintenanceService, submissionService);
+    InOrder inOrder = inOrder(maintenanceService, submitDueUsersService);
     inOrder.verify(maintenanceService).resumeExistingBatches(any(Timestamp.class));
-    inOrder.verify(submissionService).submitDueUsers(any(Timestamp.class));
+    inOrder.verify(submitDueUsersService).submitDueUsers(any(Timestamp.class));
   }
 }

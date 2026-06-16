@@ -1,6 +1,6 @@
 # OpenAI Batch Question Generation
 
-Status: in-progress (Phases 1-21 done; Phases 22+ are post-review follow-ups)
+Status: in-progress (Phases 1-24 done; Phases 25+ are post-review follow-ups)
 
 ## Refined Requirement
 
@@ -573,6 +573,8 @@ Tests:
 
 ## Phase 23: Index Recent-Recall User Selection
 
+Status: done
+
 Type: Structure
 
 Precondition: `findUserIdsWithAnsweredRecallsInTimeRange` scans all users' `quiz_answer`/`recall_prompt` over a 7-day window every hour with no user filter; without an index on `quiz_answer.created_at` this degrades as data grows.
@@ -595,6 +597,8 @@ Tests:
 - If a migration is added, run `CURSOR_DEV=true nix develop -c pnpm export:database-erd`.
 
 ## Phase 24: Remove The Submission/Transaction Circular Dependency
+
+Status: done
 
 Type: Structure
 

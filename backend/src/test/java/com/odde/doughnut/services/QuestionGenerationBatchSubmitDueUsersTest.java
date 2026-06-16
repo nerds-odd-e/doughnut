@@ -80,7 +80,7 @@ class QuestionGenerationBatchSubmitDueUsersTest
         .thenReturn("batch-ok")
         .thenThrow(new RuntimeException("batch create failed"));
 
-    inCommittedTransaction(() -> submissionService.submitDueUsers(cronTime));
+    inCommittedTransaction(() -> submitDueUsersService.submitDueUsers(cronTime));
 
     inCommittedTransaction(
         () -> {
@@ -150,7 +150,7 @@ class QuestionGenerationBatchSubmitDueUsersTest
         .when(planningService)
         .findUsersEligibleForBatchSubmission(cronTime);
 
-    inCommittedTransaction(() -> submissionService.submitDueUsers(cronTime));
+    inCommittedTransaction(() -> submitDueUsersService.submitDueUsers(cronTime));
 
     inCommittedTransaction(
         () -> {

@@ -34,7 +34,7 @@ abstract class QuestionGenerationBatchSubmitDueUsersTestBase {
 
   @Autowired MakeMe makeMe;
   @MockitoSpyBean QuestionGenerationBatchPlanningService planningService;
-  @Autowired QuestionGenerationBatchSubmissionService submissionService;
+  @Autowired QuestionGenerationBatchSubmitDueUsersService submitDueUsersService;
   @Autowired QuestionGenerationBatchRepository batchRepository;
   @Autowired QuestionGenerationBatchUserStateRepository userStateRepository;
   @Autowired EntityManager entityManager;
