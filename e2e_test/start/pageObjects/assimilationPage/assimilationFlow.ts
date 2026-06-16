@@ -2,24 +2,29 @@ import { commonSenseSplit } from 'support/string_util'
 import { pageIsNotLoading } from '../../pageBase'
 import { form } from '../../forms'
 import { assimilationPropertyMemoryTrackerExpectations } from './propertyMemoryTrackerExpectations'
+import { assimilationPropertyFlow } from './assimilationPropertyFlow'
 import {
-  keepForRecallButton,
+  assimilateButton,
   mainNoteHeadingTitleSelector,
+  noteLevelReviveElements,
   refinementSuggestionsPanel,
+  reviveButton,
+  skipRecallOnPanel,
   waitForAssimilationNoteTitle,
   waitForExtractNote,
 } from './shared'
 
 export const assumeAssimilationPage = () => ({
   ...assimilationPropertyMemoryTrackerExpectations(),
+  ...assimilationPropertyFlow(),
   expectAssimilationProgressSummary(triple: string) {
     cy.get('[data-test="assimilation-progress-summary"]')
       .should('be.visible')
       .and('contain', triple.trim())
     return this
   },
-  clickKeepForRecall() {
-    keepForRecallButton().click()
+  clickAssimilate() {
+    assimilateButton().click()
     return this
   },
   openRefineNoteModal() {
@@ -29,9 +34,7 @@ export const assumeAssimilationPage = () => ({
     return this
   },
   waitForAssimilationReady() {
-    keepForRecallButton({ timeout: 10000 })
-      .scrollIntoView()
-      .should('be.visible')
+    assimilateButton({ timeout: 10000 }).scrollIntoView().should('be.visible')
     return this
   },
   expectAssimilatingNote(title: string) {
@@ -39,8 +42,8 @@ export const assumeAssimilationPage = () => ({
     this.waitForAssimilationReady()
     return this
   },
-  keepForRecallOnPanel() {
-    this.clickKeepForRecall()
+  assimilateOnPanel() {
+    this.clickAssimilate()
     pageIsNotLoading()
     return this
   },
@@ -50,10 +53,26 @@ export const assumeAssimilationPage = () => ({
     pageIsNotLoading()
     return this
   },
+  reviveRecallOnPanel() {
+    reviveButton().click()
+    pageIsNotLoading()
+    return this
+  },
+  expectReviveOnPanel() {
+    reviveButton().should('exist')
+    return this
+  },
+  expectSkipRecallOnPanel() {
+    skipRecallOnPanel().should('exist')
+    cy.document().then((doc) => {
+      expect(noteLevelReviveElements(doc)).to.have.length(0)
+    })
+    return this
+  },
   proceedWithRememberingSpelling() {
     this.waitForAssimilationReady()
     this.checkRememberSpellingOption()
-    this.clickKeepForRecall()
+    this.clickAssimilate()
     return this
   },
   assimilateWithSpellingOption() {
@@ -124,7 +143,7 @@ export const assumeAssimilationPage = () => ({
     if (skip === 'yes') {
       this.skipRecallOnPanel()
     } else {
-      this.clickKeepForRecall()
+      this.clickAssimilate()
       pageIsNotLoading()
     }
     return this
@@ -142,7 +161,7 @@ export const assumeAssimilationPage = () => ({
   },
   assimilateCurrentNote() {
     pageIsNotLoading()
-    this.clickKeepForRecall()
+    this.clickAssimilate()
     return this
   },
   checkRefinementSuggestion(index: number) {
@@ -204,72 +223,12 @@ export const assumeAssimilationPage = () => ({
     form.getField('Remember Spelling').expectNoError().shouldNotBeDisabled()
     return this
   },
-  expectKeepForRecallDisabled() {
-    keepForRecallButton().should('be.disabled')
+  expectAssimilateDisabled() {
+    assimilateButton().should('be.disabled')
     return this
   },
-  expectKeepForRecallEnabled() {
-    keepForRecallButton().should('not.be.disabled')
-    return this
-  },
-  expandAssimilationPropertiesSection() {
-    cy.get('[data-test="assimilation-properties-section"]').within(() => {
-      cy.get('[data-test="assimilation-properties-toggle"]').click()
-    })
-    return this
-  },
-  expectPendingAssimilationProperty(propertyKey: string) {
-    cy.get('[data-test="assimilation-properties-section"]').within(() => {
-      cy.get('[data-test="assimilation-properties-toggle"]').should(
-        'be.checked'
-      )
-      cy.get(
-        `[data-test="assimilation-property-row"][data-property-key="${propertyKey}"]`
-      )
-        .should('have.attr', 'data-test-pending', 'true')
-        .and('be.visible')
-    })
-    return this
-  },
-  expectPendingAssimilationPropertyAbsent(propertyKey: string) {
-    cy.get(
-      `[data-test="assimilation-property-row"][data-property-key="${propertyKey}"]`
-    ).should('not.have.attr', 'data-test-pending', 'true')
-    return this
-  },
-  assimilateProperty(propertyKey: string) {
-    cy.get(
-      `[data-test="assimilation-property-row"][data-property-key="${propertyKey}"]`
-    ).within(() => {
-      cy.get('[data-test="keep-for-recall"]').click()
-    })
-    pageIsNotLoading()
-    return this
-  },
-  skipRecallProperty(propertyKey: string) {
-    cy.get(
-      `[data-test="assimilation-property-row"][data-property-key="${propertyKey}"]`
-    ).within(() => {
-      cy.findByText('Skip recall').click()
-    })
-    cy.findByRole('button', { name: 'OK' }).click()
-    pageIsNotLoading()
-    return this
-  },
-  expectPropertyKeepForRecallDisabled(propertyKey: string) {
-    cy.get(
-      `[data-test="assimilation-property-row"][data-property-key="${propertyKey}"]`
-    ).within(() => {
-      cy.get('[data-test="keep-for-recall"]').should('be.disabled')
-    })
-    return this
-  },
-  expectPropertyKeepForRecallEnabled(propertyKey: string) {
-    cy.get(
-      `[data-test="assimilation-property-row"][data-property-key="${propertyKey}"]`
-    ).within(() => {
-      cy.get('[data-test="keep-for-recall"]').should('not.be.disabled')
-    })
+  expectAssimilateEnabled() {
+    assimilateButton().should('not.be.disabled')
     return this
   },
 })

@@ -4,7 +4,7 @@ import { describe, expect, it, vi, beforeEach } from "vitest"
 import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { mockedGoToNextAssimilation } from "./assimilationPanelMocks"
 import {
-  clickPropertyKeepForRecall,
+  clickPropertyAssimilate,
   expandAssimilationPropertiesSection,
   noteWithAssimilationProperties,
 } from "./assimilationPropertyTestSupport"
@@ -40,14 +40,14 @@ describe("AssimilationPanel property assimilation", () => {
       .withRouter()
       .mount({ attachTo: document.body })
 
-  it("advances to the next unit and reloads note info when keeping a property for recall", async () => {
+  it("advances to the next unit and reloads note info when assimilating a property", async () => {
     assimilateSpy.mockResolvedValue(
       wrapSdkResponse([{ id: 1, removedFromTracking: false }])
     )
     const wrapper = mountPanelWithProperties()
     await flushPromises()
     await expandAssimilationPropertiesSection()
-    await clickPropertyKeepForRecall("topic")
+    await clickPropertyAssimilate("topic")
 
     expect(assimilateSpy).toHaveBeenCalledWith({
       body: {

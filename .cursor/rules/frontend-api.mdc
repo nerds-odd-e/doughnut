@@ -1,5 +1,5 @@
 ---
-description: Frontend API integration for files importing @generated/doughnut-backend-api/sdk.gen, apiCallWithLoading, wrapped responses, toOpenApiError
+description: Frontend API integration for files importing @generated/doughnut-backend-api/sdk.gen, apiCallWithLoading, blockUi loading, wrapped responses, toOpenApiError
 alwaysApply: false
 ---
 # Frontend API Rules
@@ -27,6 +27,34 @@ const { data: newUser, error } = await apiCallWithLoading(() =>
 
 const { data: users, error: loadError } = await UserController.getUserProfile()
 ```
+
+## Loading indicators
+
+`apiCallWithLoading` drives two global surfaces mounted from `DoughnutApp.vue`:
+
+- **Thin loading bar** — shown while any wrapped call is in flight.
+- **Whole-UI blocking modal** — shown when an in-flight call passed `{ blockUi: true }`; its message comes from the latest blocking state. Each call pushes/pops a state by id, so concurrent blockers clean up correctly.
+
+Use `{ blockUi: true, message?: string }` when a user action must finish before the rest of the UI is usable — view transitions that depend on a result, or mutations where partial interaction would confuse state. Show the blocker only after any confirmation step. Do **not** add component-local `LoadingModal` refs; the global modal is the single whole-UI blocker.
+
+```typescript
+const { data, error } = await apiCallWithLoading(
+  () => AssimilationController.next({ query: { timezone: timezoneParam() } }),
+  { blockUi: true, message: "Loading next note..." }
+)
+```
+
+For one continuous blocker across multiple calls, wrap them in `runWithBlockingApiLoading(operation, message)`; inner `apiCallWithLoading` calls keep thin bar + toasts only.
+
+Keep local loading state (inline spinner, disabled control, row-level pending) when the user should stay able to interact with the rest of the page — e.g. search, pagination, single form-field upload, recall prompt internals. These can still call `apiCallWithLoading` without `blockUi`.
+
+| Concern | Mechanism |
+| --- | --- |
+| Thin top loading bar | Any `apiCallWithLoading` call |
+| Whole-UI modal | `apiCallWithLoading(..., { blockUi: true, message? })` or `runWithBlockingApiLoading` |
+| Inline / partial progress | Local component state |
+| Error toasts | `apiCallWithLoading` (handled in `clientSetup.ts`) |
+| Silent background fetch | Direct SDK call without `apiCallWithLoading` |
 
 ## API Return Value Usage
 

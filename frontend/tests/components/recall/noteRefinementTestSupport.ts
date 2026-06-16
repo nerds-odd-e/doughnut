@@ -7,15 +7,34 @@ import NoteRefinement from "@/components/recall/NoteRefinement.vue"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
+import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import usePopups from "@/components/commons/Popups/usePopups"
+import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
+import type { Note } from "@generated/doughnut-backend-api"
 import { afterEach, beforeEach, vi } from "vitest"
+import { defineComponent, type PropType } from "vue"
 
 export const noteRealm = makeMe.aNoteRealm.please()
 export const memoryTracker = makeMe.aMemoryTracker.ofNote(noteRealm).please()
 export const { note } = memoryTracker
 
-export let renderer: RenderingHelper<typeof NoteRefinement>
+const NoteRefinementWithGlobalLoading = defineComponent({
+  components: { GlobalApiLoadingModal, NoteRefinement },
+  props: {
+    note: { type: Object as PropType<Note>, required: true },
+  },
+  emits: ["contentUpdated"],
+  template: `
+    <NoteRefinement
+      :note="note"
+      @contentUpdated="$emit('contentUpdated', $event)"
+    />
+    <GlobalApiLoadingModal />
+  `,
+})
+
+export let renderer: RenderingHelper<typeof NoteRefinementWithGlobalLoading>
 
 export function setupNoteRefinementTests() {
   beforeEach(() => {
@@ -29,12 +48,13 @@ export function setupNoteRefinementTests() {
     )
     mockSdkService(NoteController, "showNote", makeMe.aNoteRealm.please())
     mockSdkService(AiController, "extractNote", makeMe.aNoteRealm.please())
-    renderer = helper.component(NoteRefinement).withRouter()
+    renderer = helper.component(NoteRefinementWithGlobalLoading).withRouter()
   })
 
   afterEach(() => {
     document.body.innerHTML = ""
     vi.clearAllMocks()
+    teardownGlobalClientForTesting()
     const popups = usePopups()
     while (popups.popups.peek().length) {
       popups.popups.done(false)

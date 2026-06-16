@@ -1,12 +1,13 @@
 import usePopups from "@/components/commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { runWithBlockingApiLoading } from "@/managedApi/clientSetup"
 import type {
   NoteDeleteOptions,
   NoteDeleteReferenceHandling,
 } from "@/store/StoredApiCollection"
 import { qualifyRelationNoteForReduceOnDelete } from "@/utils/relationNoteReduceOnDelete"
 import { quotedNoteLabel } from "@/utils/quotedNoteLabel"
-import { ref, toValue, type MaybeRefOrGetter } from "vue"
+import { toValue, type MaybeRefOrGetter } from "vue"
 import { useRouter } from "vue-router"
 
 const REDUCE_DELETE_LOADING_MESSAGE = "Reducing to source property..."
@@ -27,9 +28,6 @@ export function useNoteDeleteFlow(
   const router = useRouter()
   const { popups } = usePopups()
   const storageAccessor = useStorageAccessor()
-
-  const isDeletingNote = ref(false)
-  const deleteLoadingMessage = ref(DELETE_LOADING_MESSAGE)
 
   const noteRealm = () =>
     storageAccessor.value.refOfNoteRealm(toValue(noteId)).value
@@ -95,19 +93,12 @@ export function useNoteDeleteFlow(
     const deleteChoice = await chooseDeleteReferenceHandling()
     if (!deleteChoice) return
 
-    deleteLoadingMessage.value = deleteLoadingMessageFor(
-      deleteChoice.referenceHandling
-    )
-
-    isDeletingNote.value = true
-    try {
+    await runWithBlockingApiLoading(async () => {
       await storageAccessor.value
         .storedApi()
         .deleteNote(router, toValue(noteId), deleteChoice)
-    } finally {
-      isDeletingNote.value = false
-    }
+    }, deleteLoadingMessageFor(deleteChoice.referenceHandling))
   }
 
-  return { deleteNote, isDeletingNote, deleteLoadingMessage }
+  return { deleteNote }
 }

@@ -67,8 +67,11 @@
                         <AssimilationButtons
                           size="sm"
                           :disabled="assimilatingPropertyKey === row.key"
-                          :keep-for-recall-disabled="
-                            keepForRecallDisabledForProperty(row.key)
+                          :assimilate-disabled="
+                            assimilateDisabledForProperty(row.key)
+                          "
+                          :skipped-for-recall="
+                            isSkippedForRecall(noteRecallInfo, row.key)
                           "
                           @assimilate="
                             (skip) =>
@@ -77,6 +80,7 @@
                                 propertyKey: row.key,
                               })
                           "
+                          @revive="emit('revive', { propertyKey: row.key })"
                         />
                       </span>
                     </li>
@@ -103,10 +107,12 @@
             >
               <AssimilationButtons
                 :disabled="!noteInfoLoaded"
-                :keep-for-recall-disabled="keepForRecallDisabled"
+                :assimilate-disabled="assimilateDisabled"
+                :skipped-for-recall="isSkippedForRecall(noteRecallInfo)"
                 @assimilate="
                   (skip) => emit('assimilate', { skipMemoryTracking: skip })
                 "
+                @revive="emit('revive', {})"
               />
             </div>
           </div>
@@ -164,6 +170,7 @@ import AssimilationProgressSummary from "./AssimilationProgressSummary.vue"
 import NoteRefinement from "./NoteRefinement.vue"
 import { useDaisyDialog } from "@/composables/useDaisyDialog"
 import type { AssimilateEvent } from "@/composables/useAssimilateUnit"
+import { isSkippedForRecall } from "@/composables/useReviveMemoryTracker"
 import {
   parseNoteContentMarkdown,
   sortedPropertyRowsFromRecord,
@@ -171,11 +178,11 @@ import {
 import { usePendingAssimilationProperty } from "@/composables/usePendingAssimilationProperty"
 import { computed, ref, toRef, watch } from "vue"
 
-const { note, noteInfoLoaded, keepForRecallDisabled, assimilatingPropertyKey } =
+const { note, noteInfoLoaded, assimilateDisabled, assimilatingPropertyKey } =
   defineProps<{
     note: Note
     noteInfoLoaded: boolean
-    keepForRecallDisabled: boolean
+    assimilateDisabled: boolean
     assimilatingPropertyKey?: string | null
   }>()
 
@@ -184,6 +191,7 @@ const emit = defineEmits<{
   (e: "rememberSpellingChanged", value: boolean): void
   (e: "noteRecallInfoLoaded", value: NoteRecallInfo): void
   (e: "assimilate", request: AssimilateEvent): void
+  (e: "revive", request: { propertyKey?: string }): void
   (e: "refinementContentUpdated"): void
 }>()
 
@@ -206,7 +214,7 @@ const onNoteRecallInfoLoaded = (info: NoteRecallInfo) => {
   emit("noteRecallInfoLoaded", info)
 }
 
-const keepForRecallDisabledForProperty = (propertyKey: string) =>
+const assimilateDisabledForProperty = (propertyKey: string) =>
   noteRecallInfo.value?.memoryTrackers?.some(
     (mt) => mt.propertyKey === propertyKey
   ) ?? false

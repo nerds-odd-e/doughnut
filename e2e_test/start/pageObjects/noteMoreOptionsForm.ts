@@ -1,5 +1,9 @@
 import { pageIsNotLoading } from '../pageBase'
-import { assumeAssimilationPage, keepForRecallButton } from './assimilationPage'
+import {
+  assumeAssimilationPage,
+  assimilateButton,
+  assimilateButtonSelector,
+} from './assimilationPage'
 import { questionListPage } from './questionListPage'
 
 const titles = {
@@ -76,16 +80,16 @@ const noteMoreOptionsPage = () => {
     },
     openAssimilationSettings() {
       cy.document().then((doc) => {
-        if (!doc.querySelector('[data-test="keep-for-recall"]')) {
+        if (!doc.querySelector(assimilateButtonSelector)) {
           assimilationSettingsButton().scrollIntoView().click()
         }
       })
-      keepForRecallButton({ timeout: 15000 }).should('be.visible')
+      assimilateButton({ timeout: 15000 }).should('be.visible')
       pageIsNotLoading()
       return assumeAssimilationPage().waitForAssimilationReady()
     },
     assimilateNote() {
-      this.openAssimilationSettings().clickKeepForRecall()
+      this.openAssimilationSettings().clickAssimilate()
       pageIsNotLoading()
     },
   }

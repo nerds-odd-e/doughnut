@@ -17,10 +17,12 @@ export function useGoToNextAssimilation() {
   const { showSuccessToast } = useToast()
 
   const goToNextAssimilation = async (): Promise<boolean> => {
-    const { data, error } = await apiCallWithLoading(() =>
-      AssimilationController.next({
-        query: { timezone: timezoneParam() },
-      })
+    const { data, error } = await apiCallWithLoading(
+      () =>
+        AssimilationController.next({
+          query: { timezone: timezoneParam() },
+        }),
+      { blockUi: true, message: "Loading next note..." }
     )
 
     if (error || !data) {

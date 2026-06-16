@@ -2,14 +2,24 @@
   <input
     type="submit"
     name="submit"
-    value="Keep for recall"
+    value="Assimilate"
     :class="['daisy-btn daisy-btn-primary', sizeClass]"
-    data-test="keep-for-recall"
-    :disabled="disabled || keepForRecallDisabled"
+    data-test="assimilate"
+    :disabled="disabled || assimilateDisabled"
     @click="$emit('assimilate', false)"
   />
   <input
-    v-if="showSkip"
+    v-if="showSkip && skippedForRecall"
+    type="submit"
+    name="revive"
+    value="Revive"
+    :class="['daisy-btn daisy-btn-secondary', sizeClass]"
+    data-test="revive"
+    :disabled="disabled"
+    @click="$emit('revive')"
+  />
+  <input
+    v-else-if="showSkip"
     type="submit"
     name="skip"
     value="Skip recall"
@@ -28,7 +38,7 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
-    keepForRecallDisabled: {
+    assimilateDisabled: {
       type: Boolean,
       default: false,
     },
@@ -41,8 +51,12 @@ export default defineComponent({
       type: Boolean,
       default: true,
     },
+    skippedForRecall: {
+      type: Boolean,
+      default: false,
+    },
   },
-  emits: ["assimilate"],
+  emits: ["assimilate", "revive"],
   computed: {
     sizeClass(): string {
       return this.size === "sm" ? "daisy-btn-sm" : ""

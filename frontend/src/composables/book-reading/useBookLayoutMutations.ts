@@ -1,4 +1,4 @@
-import { ref, type ComputedRef, type Ref } from "vue"
+import { type ComputedRef, type Ref, ref } from "vue"
 import type {
   BookBlockFull,
   BookFull,
@@ -29,6 +29,8 @@ export function bookFullAfterLayoutMutation(
   return { ...previous, ...mutation, blocks: updatedBlocks }
 }
 
+const BOOK_LAYOUT_MUTATION_LOADING_MESSAGE = "Updating book layout…"
+
 export function useBookLayoutMutations(opts: {
   notebookId: ComputedRef<number>
   bookBlocks: ComputedRef<BookBlockFull[]>
@@ -37,22 +39,27 @@ export function useBookLayoutMutations(opts: {
   applyBookBlockSelection: (block: BookBlockFull) => Promise<void>
   onBookUpdated: (book: BookFull) => void
 }) {
-  const pendingLayoutBlockId = ref<number | null>(null)
+  const layoutMutationInFlight = ref(false)
 
-  async function onBlockIndent(block: BookBlockFull) {
-    if (pendingLayoutBlockId.value !== null) {
+  async function changeBlockDepth(
+    block: BookBlockFull,
+    direction: "INDENT" | "OUTDENT"
+  ) {
+    if (layoutMutationInFlight.value) {
       return
     }
-    pendingLayoutBlockId.value = block.id
+    layoutMutationInFlight.value = true
     try {
-      const { data, error } = await apiCallWithLoading(() =>
-        NotebookBooksController.changeBookBlockDepth({
-          path: {
-            notebook: opts.notebookId.value,
-            bookBlock: block.id,
-          },
-          body: { direction: "INDENT" },
-        })
+      const { data, error } = await apiCallWithLoading(
+        () =>
+          NotebookBooksController.changeBookBlockDepth({
+            path: {
+              notebook: opts.notebookId.value,
+              bookBlock: block.id,
+            },
+            body: { direction },
+          }),
+        { blockUi: true, message: BOOK_LAYOUT_MUTATION_LOADING_MESSAGE }
       )
       if (!error && data) {
         opts.onBookUpdated(
@@ -61,49 +68,35 @@ export function useBookLayoutMutations(opts: {
         opts.selectedBlockId.value = block.id
       }
     } finally {
-      pendingLayoutBlockId.value = null
+      layoutMutationInFlight.value = false
     }
+  }
+
+  async function onBlockIndent(block: BookBlockFull) {
+    await changeBlockDepth(block, "INDENT")
   }
 
   async function onBlockOutdent(block: BookBlockFull) {
-    if (pendingLayoutBlockId.value !== null) {
-      return
-    }
-    pendingLayoutBlockId.value = block.id
-    try {
-      const { data, error } = await apiCallWithLoading(() =>
-        NotebookBooksController.changeBookBlockDepth({
-          path: {
-            notebook: opts.notebookId.value,
-            bookBlock: block.id,
-          },
-          body: { direction: "OUTDENT" },
-        })
-      )
-      if (!error && data) {
-        opts.onBookUpdated(
-          bookFullAfterLayoutMutation(opts.getPropBook(), data)
-        )
-        opts.selectedBlockId.value = block.id
-      }
-    } finally {
-      pendingLayoutBlockId.value = null
-    }
+    await changeBlockDepth(block, "OUTDENT")
   }
 
   async function onBlockCancel(block: BookBlockFull) {
-    if (pendingLayoutBlockId.value !== null) {
+    if (layoutMutationInFlight.value) {
       return
     }
-    pendingLayoutBlockId.value = block.id
+    layoutMutationInFlight.value = true
     try {
       const predecessorId = predecessorBookBlockIdInPreorder(
         opts.bookBlocks.value,
         block.id
       )
-      const { data, error } = await NotebookBooksController.cancelBookBlock({
-        path: { notebook: opts.notebookId.value, bookBlock: block.id },
-      })
+      const { data, error } = await apiCallWithLoading(
+        () =>
+          NotebookBooksController.cancelBookBlock({
+            path: { notebook: opts.notebookId.value, bookBlock: block.id },
+          }),
+        { blockUi: true, message: BOOK_LAYOUT_MUTATION_LOADING_MESSAGE }
+      )
       if (!error && data) {
         const merged = bookFullAfterLayoutMutation(opts.getPropBook(), data)
         if (
@@ -120,9 +113,9 @@ export function useBookLayoutMutations(opts: {
         }
       }
     } finally {
-      pendingLayoutBlockId.value = null
+      layoutMutationInFlight.value = false
     }
   }
 
-  return { pendingLayoutBlockId, onBlockIndent, onBlockOutdent, onBlockCancel }
+  return { onBlockIndent, onBlockOutdent, onBlockCancel }
 }

@@ -12,6 +12,12 @@ export const assimilation = () => {
     fn: ($el: Cypress.Chainable<JQuery<HTMLElement>>) => void
   ) => cy.get('.main-menu').within(() => fn(cy.get('li[title="Assimilate"]')))
 
+  const clickAssimilateListItemInSidebar = () => {
+    getAssimilateListItemInSidebar(($el) => {
+      $el.click()
+    })
+  }
+
   return {
     expectCount(numberOfNotes: number) {
       getAssimilateListItemInSidebar(($el) => {
@@ -30,9 +36,26 @@ export const assimilation = () => {
       return this
     },
     startAssimilationFromMenu() {
-      getAssimilateListItemInSidebar(($el) => {
-        $el.click()
-      })
+      clickAssimilateListItemInSidebar()
+      pageIsNotLoading()
+      return this
+    },
+    startAssimilationFromMenuAndObserveBlockingLoading() {
+      cy.intercept(
+        { method: 'GET', url: '/api/assimilation/next*', times: 1 },
+        (req) => {
+          req.continue((res) => {
+            res.setDelay(300)
+          })
+        }
+      ).as('nextAssimilation')
+
+      clickAssimilateListItemInSidebar()
+      cy.get('.loading-modal-mask', { timeout: 10000 }).should('be.visible')
+      cy.contains('p.loading-message', 'Loading next note...').should(
+        'be.visible'
+      )
+      cy.wait('@nextAssimilation')
       pageIsNotLoading()
       return this
     },

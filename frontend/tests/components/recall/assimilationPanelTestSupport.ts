@@ -85,6 +85,8 @@ export function setupAssimilationPanelTests() {
   })
 }
 
+export const assimilateButtonSelector = '[data-test="assimilate"]' as const
+
 export function mountAssimilationPanel(overrides?: { note?: typeof note }) {
   return renderer
     .withCleanStorage()
@@ -95,9 +97,9 @@ export function mountAssimilationPanel(overrides?: { note?: typeof note }) {
     .mount()
 }
 
-export async function clickKeepForRecall(
+export async function clickAssimilate(
   wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
 ) {
-  await wrapper.find('[data-test="keep-for-recall"]').trigger("click")
+  await wrapper.find(assimilateButtonSelector).trigger("click")
   await flushPromises()
 }

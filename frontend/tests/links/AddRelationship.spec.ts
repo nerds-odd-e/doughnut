@@ -18,10 +18,12 @@ import helper, {
   mockSdkServiceWithImplementation,
   testFolderStub,
 } from "@tests/helpers"
+import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
-import { nextTick } from "vue"
-import { describe, it, expect, beforeEach, vi } from "vitest"
+import { defineComponent, nextTick, type PropType } from "vue"
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 
 const routerReplace = vi.fn()
 
@@ -48,14 +50,33 @@ function mountAddRelationshipFinalize({
   targetSearchResult: NoteSearchResult
   seedRealm?: NoteRealm
 }) {
-  helper.component(AddRelationshipFinalize).withCleanStorage()
+  const Host = defineComponent({
+    components: { AddRelationshipFinalize, GlobalApiLoadingModal },
+    props: {
+      note: { type: Object as PropType<Note>, required: true },
+      targetSearchResult: {
+        type: Object as PropType<NoteSearchResult>,
+        required: true,
+      },
+    },
+    emits: ["success", "goBack"],
+    template: `
+      <AddRelationshipFinalize
+        :note="note"
+        :target-search-result="targetSearchResult"
+        @success="$emit('success')"
+        @goBack="$emit('goBack')"
+      />
+      <GlobalApiLoadingModal />
+    `,
+  })
+  const renderer = helper.component(Host).withCleanStorage()
   if (seedRealm) {
     useStorageAccessor().value.refreshNoteRealm(seedRealm)
   }
-  return helper
-    .component(AddRelationshipFinalize)
+  return renderer
     .withProps({ note, targetSearchResult })
-    .mount()
+    .mount({ attachTo: document.body })
 }
 
 async function selectRelationType(wrapper: VueWrapper, relationType: string) {
@@ -107,6 +128,10 @@ describe("AddRelationshipFinalize", () => {
       "createFolder",
       testFolderStub(77, "relations")
     )
+  })
+
+  afterEach(() => {
+    teardownGlobalClientForTesting()
   })
 
   it("shows placement options with relations subfolder selected by default", () => {

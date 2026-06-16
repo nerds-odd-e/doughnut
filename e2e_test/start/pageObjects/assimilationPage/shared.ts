@@ -1,11 +1,36 @@
 import { pageIsNotLoading } from '../../pageBase'
 
-export const keepForRecallButton = (options?: { timeout?: number }) =>
+export const assimilateButtonSelector = '[data-test="assimilate"]'
+export const reviveButtonSelector = '[data-test="revive"]'
+
+export const assimilationPropertyRow = (propertyKey: string) =>
+  cy.get(
+    `[data-test="assimilation-property-row"][data-property-key="${propertyKey}"]`
+  )
+
+export const isNoteLevelAssimilationControl = (el: Element) =>
+  el.closest('[data-test="assimilation-property-row"]') === null
+
+export const assimilateButton = (options?: { timeout?: number }) =>
   cy
-    .get('[data-test="keep-for-recall"]', options ?? {})
-    .filter(
-      (_, el) => el.closest('[data-test="assimilation-property-row"]') === null
-    )
+    .get(assimilateButtonSelector, options ?? {})
+    .filter((_, el) => isNoteLevelAssimilationControl(el))
+
+export const reviveButton = (options?: { timeout?: number }) =>
+  cy
+    .get(reviveButtonSelector, options ?? {})
+    .filter((_, el) => isNoteLevelAssimilationControl(el))
+
+export const skipRecallOnPanel = (options?: { timeout?: number }) =>
+  cy
+    .get('[value="Skip recall"]', options ?? {})
+    .filter((_, el) => isNoteLevelAssimilationControl(el))
+
+export function noteLevelReviveElements(doc: Document | ParentNode): Element[] {
+  return [...doc.querySelectorAll(reviveButtonSelector)].filter(
+    (el) => !el.closest('[data-test="assimilation-property-row"]')
+  )
+}
 
 export const refinementSuggestionsPanel = () =>
   cy

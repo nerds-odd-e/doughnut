@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
+import type { AssimilationNextDto } from "@generated/doughnut-backend-api"
 import { AssimilationController } from "@generated/doughnut-backend-api/sdk.gen"
 import {
   DAILY_GOAL_TOAST,
@@ -7,7 +8,19 @@ import {
 } from "@/composables/useGoToNextAssimilation"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import { useAssimilationView } from "@/composables/useAssimilationView"
-import { mockSdkService } from "@tests/helpers"
+import LoadingModal from "@/components/commons/LoadingModal.vue"
+import {
+  currentBlockingApiState,
+  type ApiStatus,
+} from "@/managedApi/ApiStatusHandler"
+import {
+  setupGlobalClient,
+  teardownGlobalClientForTesting,
+} from "@/managedApi/clientSetup"
+import { fireEvent, render } from "@testing-library/vue"
+import { flushPromises } from "@vue/test-utils"
+import { computed, defineComponent, ref } from "vue"
+import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 
 const routerPush = vi.fn()
 const showSuccessToast = vi.fn()
@@ -44,6 +57,7 @@ describe("useGoToNextAssimilation", () => {
     setDueCount(undefined)
     setAssimilatedCountOfTheDay(undefined)
     setTotalUnassimilatedCount(undefined)
+    teardownGlobalClientForTesting()
   })
 
   it("updates counts, enables settings, and navigates when nextUnit is returned", async () => {
@@ -140,5 +154,59 @@ describe("useGoToNextAssimilation", () => {
 
     const { showAssimilationSettings } = useAssimilationView()
     expect(showAssimilationSettings.value).toBe(false)
+  })
+
+  it("shows the global loading modal while the next assimilation API is pending", async () => {
+    let resolveNext: (
+      value: ReturnType<typeof wrapSdkResponse<AssimilationNextDto>>
+    ) => void = () => undefined
+
+    vi.spyOn(AssimilationController, "next").mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveNext = resolve
+        }) as ReturnType<typeof AssimilationController.next>
+    )
+
+    const Starter = defineComponent({
+      components: { LoadingModal },
+      setup() {
+        const apiStatus = ref<ApiStatus>({ states: [] })
+        setupGlobalClient(apiStatus.value)
+        const blockingApiState = computed(() =>
+          currentBlockingApiState(apiStatus.value)
+        )
+        const { goToNextAssimilation } = useGoToNextAssimilation()
+        return { blockingApiState, goToNextAssimilation }
+      },
+      template: `
+        <button @click="goToNextAssimilation">Start assimilation</button>
+        <LoadingModal
+          :show="!!blockingApiState"
+          :message="blockingApiState?.message"
+        />
+      `,
+    })
+
+    const { getByText } = render(Starter)
+
+    await fireEvent.click(getByText("Start assimilation"))
+
+    expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
+    expect(getByText("Loading next note...")).toBeTruthy()
+
+    resolveNext(
+      wrapSdkResponse({
+        nextUnit: { noteId: 42 },
+        counts: {
+          dueCount: 1,
+          assimilatedCountOfTheDay: 0,
+          totalUnassimilatedCount: 1,
+        },
+      })
+    )
+    await flushPromises()
+
+    expect(document.querySelector(".loading-modal-mask")).toBeNull()
   })
 })

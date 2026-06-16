@@ -1,4 +1,5 @@
 import type { Note } from "@generated/doughnut-backend-api"
+import { assimilateButtonSelector } from "./assimilationPanelTestSupport"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { expect } from "vitest"
@@ -30,10 +31,10 @@ export function assimilationPropertyRow(propertyKey: string) {
   )!
 }
 
-export async function clickPropertyKeepForRecall(propertyKey: string) {
-  const keepForRecall = assimilationPropertyRow(propertyKey).querySelector(
-    '[data-test="keep-for-recall"]'
+export async function clickPropertyAssimilate(propertyKey: string) {
+  const assimilate = assimilationPropertyRow(propertyKey).querySelector(
+    assimilateButtonSelector
   ) as HTMLInputElement
-  keepForRecall.click()
+  assimilate.click()
   await flushPromises()
 }

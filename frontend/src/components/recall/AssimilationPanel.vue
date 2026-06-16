@@ -3,12 +3,13 @@
     ref="settingsRef"
     :note="note"
     :note-info-loaded="noteInfoLoaded"
-    :keep-for-recall-disabled="keepForRecallDisabled"
+    :assimilate-disabled="assimilateDisabled"
     :assimilating-property-key="assimilatingPropertyKey"
     @level-changed="emit('reloadNeeded')"
     @remember-spelling-changed="onRememberSpellingChanged"
     @note-recall-info-loaded="onNoteRecallInfoLoaded"
     @assimilate="processAssimilate"
+    @revive="processRevive"
     @refinement-content-updated="emit('reloadNeeded')"
   />
   <Teleport to="body">
@@ -26,13 +27,11 @@
     @cancel="handleSpellingCancel"
     @verified="handleSpellingVerified"
   />
-  <LoadingModal :show="isAssimilating" message="Assimilating..." />
 </template>
 
 <script setup lang="ts">
 import type { Note, NoteRecallInfo } from "@generated/doughnut-backend-api"
 import usePopups from "../commons/Popups/usePopups"
-import LoadingModal from "../commons/LoadingModal.vue"
 import AssimilationSettings from "./AssimilationSettings.vue"
 import SpellingVerificationPopup from "./SpellingVerificationPopup.vue"
 import { computed, ref } from "vue"
@@ -41,6 +40,10 @@ import {
   useAssimilateUnit,
   type AssimilateEvent,
 } from "@/composables/useAssimilateUnit"
+import {
+  trackersToRevive,
+  useReviveMemoryTracker,
+} from "@/composables/useReviveMemoryTracker"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 
 const { note } = defineProps<{
@@ -53,12 +56,12 @@ const emit = defineEmits<{
 
 const { popups } = usePopups()
 const { assimilateUnit } = useAssimilateUnit()
+const { reviveMemoryTrackers } = useReviveMemoryTracker()
 const { openForNote } = useAssimilationView()
 
 const settingsRef = ref<InstanceType<typeof AssimilationSettings> | null>(null)
 
 const showSpellingPopup = ref(false)
-const isAssimilating = ref(false)
 const assimilatingPropertyKey = ref<string | null>(null)
 
 const rememberSpelling = ref(false)
@@ -83,7 +86,7 @@ const hasSpellingMemoryTracker = computed(
     noteRecallInfo.value?.memoryTrackers?.some((mt) => mt.spelling === true) ??
     false
 )
-const keepForRecallDisabled = computed(
+const assimilateDisabled = computed(
   () =>
     hasNoteLevelMemoryTrackers.value &&
     !(rememberSpelling.value && !hasSpellingMemoryTracker.value)
@@ -110,11 +113,22 @@ const processAssimilate = async ({
   await doAssimilate({ skipMemoryTracking, propertyKey })
 }
 
+const processRevive = async ({ propertyKey }: { propertyKey?: string }) => {
+  const trackers = trackersToRevive(noteRecallInfo.value, propertyKey)
+  if (trackers.length === 0) {
+    return
+  }
+
+  const success = await reviveMemoryTrackers(trackers)
+  if (success) {
+    await settingsRef.value?.reloadNoteInfo()
+  }
+}
+
 const doAssimilate = async ({
   skipMemoryTracking,
   propertyKey,
 }: AssimilateEvent) => {
-  isAssimilating.value = true
   assimilatingPropertyKey.value = propertyKey ?? null
   try {
     const result = await assimilateUnit({
@@ -139,7 +153,6 @@ const doAssimilate = async ({
       }
     }
   } finally {
-    isAssimilating.value = false
     assimilatingPropertyKey.value = null
   }
 }

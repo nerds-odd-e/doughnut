@@ -19,6 +19,7 @@ import {
   RecallPromptController,
   RecallsController,
   TestabilityRestController,
+  TextContentController,
 } from '@generated/doughnut-backend-api/sdk.gen'
 import { circleIdAlias } from './pageObjects/circlePage'
 
@@ -261,6 +262,20 @@ const testability = () => {
         )
     },
 
+    injectNoteWithContent(
+      noteTitle: string,
+      content: string,
+      externalIdentifier: string,
+      notebookName: string,
+      folder?: string
+    ) {
+      const note: NoteTestData = { Title: noteTitle, Content: content }
+      if (folder !== undefined) {
+        note.Folder = folder
+      }
+      return this.injectNotes([note], externalIdentifier, notebookName)
+    },
+
     rememberUiCreatedNote(noteTitle: string) {
       return cy.get(`@${injectedNoteIdMapAliasName}`).then((existingMap) => {
         return cy.url().then((url) => {
@@ -381,6 +396,18 @@ const testability = () => {
           ).to.have.property(noteTopology)
           return injectedNoteIdMap[noteTopology]
         })
+    },
+
+    setInjectedNoteContent(noteTitle: string, content: string) {
+      return this.getInjectedNoteIdByTitle(noteTitle).then((noteId) =>
+        cy.wrap(
+          TextContentController.updateNoteContent({
+            path: { note: noteId },
+            body: { content },
+          }),
+          { log: false }
+        )
+      )
     },
 
     renameInjectedNoteTitleForNoteOnPage(newTitle: string) {

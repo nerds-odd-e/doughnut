@@ -50,18 +50,18 @@
       </div>
     </div>
   </div>
-  <LoadingModal :show="isExtractingNote" message="AI is creating note..." />
-  <LoadingModal :show="isRemovingSuggestions" message="AI is removing content..." />
 </template>
 
 <script setup lang="ts">
 import type { Note } from "@generated/doughnut-backend-api"
 import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
 
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import {
+  apiCallWithLoading,
+  runWithBlockingApiLoading,
+} from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
 import { Folders } from "@lucide/vue"
-import LoadingModal from "../commons/LoadingModal.vue"
 import { onMounted, ref } from "vue"
 import { useRouter } from "vue-router"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
@@ -99,8 +99,6 @@ const router = useRouter()
 const storageAccessor = useStorageAccessor()
 
 const selectedSuggestionIndices = ref<number[]>([])
-const isExtractingNote = ref(false)
-const isRemovingSuggestions = ref(false)
 
 const removeSelectedSuggestions = async () => {
   if (selectedSuggestionIndices.value.length === 0) {
@@ -119,8 +117,7 @@ const removeSelectedSuggestions = async () => {
     (index) => refinementSuggestions.value[index]!
   )
 
-  isRemovingSuggestions.value = true
-  try {
+  await runWithBlockingApiLoading(async () => {
     const { data, error } = await apiCallWithLoading(() =>
       AiController.removeRefinementSuggestion({
         path: { note: props.note.id },
@@ -139,34 +136,31 @@ const removeSelectedSuggestions = async () => {
       }
       emit("contentUpdated", data.content)
     }
-  } finally {
-    isRemovingSuggestions.value = false
-  }
+  }, "AI is removing content...")
 }
 
 const extractNote = async (suggestion: string) => {
-  isExtractingNote.value = true
   try {
-    const response = await apiCallWithLoading(() =>
-      AiController.extractNote({
-        path: { note: props.note.id },
-        body: { suggestions: [suggestion] },
-      })
-    )
+    await runWithBlockingApiLoading(async () => {
+      const response = await apiCallWithLoading(() =>
+        AiController.extractNote({
+          path: { note: props.note.id },
+          body: { suggestions: [suggestion] },
+        })
+      )
 
-    if (response.error || !response.data) {
-      await popups.alert("Failed to create note with AI")
-      return
-    }
+      if (response.error || !response.data) {
+        await popups.alert("Failed to create note with AI")
+        return
+      }
 
-    await storageAccessor.value
-      .storedApi()
-      .focusNoteRealm(router, response.data)
+      await storageAccessor.value
+        .storedApi()
+        .focusNoteRealm(router, response.data)
+    }, "AI is creating note...")
   } catch (err) {
     console.error("Failed to extract note:", err)
     await popups.alert(`Error: ${err}`)
-  } finally {
-    isExtractingNote.value = false
   }
 }
 </script>

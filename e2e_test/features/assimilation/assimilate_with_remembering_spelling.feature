@@ -1,6 +1,6 @@
 @disableOpenAiService
 Feature: Assimilate With Remembering Spelling
-  As a learner, I want to keep notes for recall with spelling verification.
+  As a learner, I want to assimilate notes with spelling verification.
   Spelling is only available for notes with content.
 
   Background:
@@ -21,12 +21,12 @@ Feature: Assimilate With Remembering Spelling
       | note has no content      |                         | unavailable  |
       | note has definition      | Definition content      | available    |
 
-  Scenario Outline: Verify spelling proceeds with keep for recall
+  Scenario Outline: Verify spelling proceeds with assimilate
     Given I have a notebook "English practice" with notes:
       | Title        | Content |
       | <note_title> | Non-empty body text |
     And I am assimilating the note "<note_title>"
-    And I keep for recall with remembering spelling
+    And I assimilate with remembering spelling
     When I verify spelling with "<spelling_input>"
     Then the spelling verification result for note "<note_title>" should be <expected_result>
 
@@ -50,6 +50,6 @@ Feature: Assimilate With Remembering Spelling
       | Word  | Non-empty body text |
     And I assimilated one note "Word" on day 1
     When I am assimilating the note "Word"
-    And I keep for recall with remembering spelling
+    And I assimilate with remembering spelling
     When I verify spelling with "Word"
     Then the spelling verification result for note "Word" should be "success"
