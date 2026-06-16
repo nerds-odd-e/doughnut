@@ -260,6 +260,8 @@ Tests:
 
 ## Phase 10: Submit Planned Batch To OpenAI
 
+Status: done
+
 Type: Behavior
 
 Precondition: JSONL can be rendered for a planned local batch.

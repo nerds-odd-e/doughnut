@@ -6,12 +6,20 @@ import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.openai.client.OpenAIClient;
+import com.openai.core.MultipartField;
+import com.openai.models.batches.Batch;
+import com.openai.models.batches.BatchCreateParams;
+import com.openai.models.files.FileCreateParams;
+import com.openai.models.files.FileObject;
+import com.openai.models.files.FilePurpose;
 import com.openai.models.responses.ResponseCreateParams;
 import com.openai.models.responses.StructuredResponse;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -125,5 +133,32 @@ public class OpenAiApiHandler {
         .flatMap(message -> message.content().stream())
         .flatMap(content -> content.outputText().stream())
         .findFirst();
+  }
+
+  public String uploadBatchInputFile(byte[] jsonlBytes) {
+    assertOpenAiAvailable();
+    FileCreateParams params =
+        FileCreateParams.builder()
+            .purpose(FilePurpose.BATCH)
+            .file(
+                MultipartField.<InputStream>builder()
+                    .value(new ByteArrayInputStream(jsonlBytes))
+                    .filename("batch-input.jsonl")
+                    .build())
+            .build();
+    FileObject fileObject = officialClient.files().create(params);
+    return fileObject.id();
+  }
+
+  public String createResponsesBatch(String inputFileId) {
+    assertOpenAiAvailable();
+    BatchCreateParams params =
+        BatchCreateParams.builder()
+            .inputFileId(inputFileId)
+            .endpoint(BatchCreateParams.Endpoint.V1_RESPONSES)
+            .completionWindow(BatchCreateParams.CompletionWindow._24H)
+            .build();
+    Batch batch = officialClient.batches().create(params);
+    return batch.id();
   }
 }

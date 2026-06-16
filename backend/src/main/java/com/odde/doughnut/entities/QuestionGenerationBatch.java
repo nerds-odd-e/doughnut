@@ -27,4 +27,13 @@ public class QuestionGenerationBatch extends EntityIdentifiedByIdOnly {
 
   @Column(name = "planned_at", nullable = false)
   private Timestamp plannedAt;
+
+  @Column(name = "openai_input_file_id")
+  private String openaiInputFileId;
+
+  @Column(name = "openai_batch_id")
+  private String openaiBatchId;
+
+  @Column(name = "submitted_at")
+  private Timestamp submittedAt;
 }
