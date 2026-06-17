@@ -108,3 +108,9 @@ minimumReleaseAgeExclude:
   - '@vue/server-renderer@3.5.38'
   - '@vue/shared@3.5.38'
   - vue@3.5.38
+  - '@redocly/cli@2.33.2'
+  - '@redocly/openapi-core@2.33.2'
+  - '@redocly/respect-core@2.33.2'
+  - '@redocly/cli@2.33.0'
+  - '@redocly/openapi-core@2.33.0'
+  - '@redocly/respect-core@2.33.0'
