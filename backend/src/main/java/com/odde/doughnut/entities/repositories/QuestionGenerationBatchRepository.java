@@ -38,4 +38,7 @@ public interface QuestionGenerationBatchRepository
       @Param("failureStatuses") Collection<QuestionGenerationBatchStatus> failureStatuses,
       @Param("completedStatus") QuestionGenerationBatchStatus completedStatus,
       @Param("cutoff") Timestamp cutoff);
+
+  @Query("SELECT b.status, COUNT(b) FROM QuestionGenerationBatch b GROUP BY b.status")
+  List<Object[]> countByStatus();
 }

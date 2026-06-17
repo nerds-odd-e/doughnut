@@ -237,3 +237,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 ## Admin User Controller
 
 - `listUsers`: GET `/api/admin/users` -> `ListUsersResponse` (request: `ListUsersData`; query: pageIndex, pageSize; response body: UserListingPage)
+
+## Admin Question Generation Batch Controller
+
+- `getQuestionGenerationBatchStatus`: GET `/api/admin/question-generation-batch/status` -> `GetQuestionGenerationBatchStatusResponse` (request: none; response body: QuestionGenerationBatchAdminStatusDto)

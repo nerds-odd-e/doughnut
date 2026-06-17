@@ -942,6 +942,17 @@ export type UserListingPage = {
     totalPages?: number;
 };
 
+export type QuestionGenerationBatchAdminStatusDto = {
+    batchCountsByStatus?: {
+        [key: string]: number;
+    };
+    requestCountsByStatus?: {
+        [key: string]: number;
+    };
+    openAiTokenConfigured?: boolean;
+    schedulerActive?: boolean;
+};
+
 export type NotesTestDataWritable = {
     noteTestData?: Array<NoteTestData>;
     externalIdentifier?: string;
@@ -3541,6 +3552,22 @@ export type ListUsersResponses = {
 };
 
 export type ListUsersResponse = ListUsersResponses[keyof ListUsersResponses];
+
+export type GetQuestionGenerationBatchStatusData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/admin/question-generation-batch/status';
+};
+
+export type GetQuestionGenerationBatchStatusResponses = {
+    /**
+     * OK
+     */
+    200: QuestionGenerationBatchAdminStatusDto;
+};
+
+export type GetQuestionGenerationBatchStatusResponse = GetQuestionGenerationBatchStatusResponses[keyof GetQuestionGenerationBatchStatusResponses];
 
 export type GetAdminDataMigrationStatusData = {
     body?: never;

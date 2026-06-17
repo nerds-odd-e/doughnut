@@ -2859,6 +2859,18 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/UserListingPage"
+  /api/admin/question-generation-batch/status:
+    get:
+      tags:
+      - admin-question-generation-batch-controller
+      operationId: getQuestionGenerationBatchStatus
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/QuestionGenerationBatchAdminStatusDTO"
   /api/admin/data-migration/status:
     get:
       tags:
@@ -4808,3 +4820,20 @@ components:
         totalPages:
           type: integer
           format: int32
+    QuestionGenerationBatchAdminStatusDTO:
+      type: object
+      properties:
+        batchCountsByStatus:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int64
+        requestCountsByStatus:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int64
+        openAiTokenConfigured:
+          type: boolean
+        schedulerActive:
+          type: boolean
