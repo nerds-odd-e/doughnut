@@ -197,7 +197,7 @@ export class UserController {
     public static getQuestionGenerationBatchSchedule<ThrowOnError extends boolean = false>(options?: Options<GetQuestionGenerationBatchScheduleData, ThrowOnError>): RequestResult<GetQuestionGenerationBatchScheduleResponses, unknown, ThrowOnError> {
         return (options?.client ?? client).get<GetQuestionGenerationBatchScheduleResponses, unknown, ThrowOnError>({ url: '/api/user/question-generation-batch-schedule', ...options });
     }
-
+    
     public static getMenuData<ThrowOnError extends boolean = false>(options: Options<GetMenuDataData, ThrowOnError>): RequestResult<GetMenuDataResponses, unknown, ThrowOnError> {
         return (options.client ?? client).get<GetMenuDataResponses, unknown, ThrowOnError>({ url: '/api/user/menu-data', ...options });
     }
