@@ -27,6 +27,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `updateUser`: PATCH `/api/user/{user}` -> `UpdateUserResponse` (request: `UpdateUserData`; path: user; body: UserDto; response body: User)
 - `getTokenInfo`: GET `/api/user/token-info` -> `GetTokenInfoResponse` (request: none; response body: UserToken)
 - `revokeToken`: DELETE `/api/user/token-info` -> `RevokeTokenResponse` (request: none; response body: void)
+- `getQuestionGenerationBatchSchedule`: GET `/api/user/question-generation-batch-schedule` -> `GetQuestionGenerationBatchScheduleResponse` (request: none; response body: QuestionGenerationBatchUserScheduleDto)
 - `getMenuData`: GET `/api/user/menu-data` -> `GetMenuDataResponse` (request: `GetMenuDataData`; query: timezone; response body: MenuDataDto)
 - `getTokens`: GET `/api/user/get-tokens` -> `GetTokensResponse` (request: none; response body: Array<UserToken>)
 - `deleteToken`: DELETE `/api/user/token/{tokenId}` -> `DeleteTokenResponse` (request: `DeleteTokenData`; path: tokenId; response body: void)

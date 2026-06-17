@@ -730,6 +730,11 @@ export type UserToken = {
     label: string;
 };
 
+export type QuestionGenerationBatchUserScheduleDto = {
+    nextScheduledAt?: string;
+    reason?: string;
+};
+
 export type AssimilationCountDto = {
     dueCount?: number;
     assimilatedCountOfTheDay?: number;
@@ -2838,6 +2843,22 @@ export type GetTokenInfoResponses = {
 };
 
 export type GetTokenInfoResponse = GetTokenInfoResponses[keyof GetTokenInfoResponses];
+
+export type GetQuestionGenerationBatchScheduleData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/user/question-generation-batch-schedule';
+};
+
+export type GetQuestionGenerationBatchScheduleResponses = {
+    /**
+     * OK
+     */
+    200: QuestionGenerationBatchUserScheduleDto;
+};
+
+export type GetQuestionGenerationBatchScheduleResponse = GetQuestionGenerationBatchScheduleResponses[keyof GetQuestionGenerationBatchScheduleResponses];
 
 export type GetMenuDataData = {
     body?: never;

@@ -26,6 +26,19 @@
           v-model="formData.spaceIntervals"
           :error-message="errors.spaceIntervals"
         />
+        <section class="my-4">
+          <h3 class="mb-2 text-base font-semibold">Batch questions</h3>
+          <div class="text-sm" data-testid="batch-question-schedule">
+            <span class="font-medium">Next batch question generation: </span>
+            <span v-if="formattedNextScheduledAt">
+              {{ formattedNextScheduledAt }}
+            </span>
+            <span v-else-if="batchSchedule">
+              No batch question generation is scheduled yet
+            </span>
+            <span v-else>Loading...</span>
+          </div>
+        </section>
         <input type="submit" value="Submit" class="daisy-btn daisy-btn-primary" />
       </form>
     </div>
@@ -34,22 +47,39 @@
 
 <script setup lang="ts">
 import TextInput from "@/components/form/TextInput.vue"
-import type { User } from "@generated/doughnut-backend-api"
+import type {
+  QuestionGenerationBatchUserScheduleDto,
+  User,
+} from "@generated/doughnut-backend-api"
 import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
-import { onMounted, ref } from "vue"
+import { computed, onMounted, ref } from "vue"
 import { toOpenApiError } from "@/managedApi/openApiError"
 
 const emits = defineEmits(["user-updated"])
 
 const formData = ref<User | undefined>()
+const batchSchedule = ref<QuestionGenerationBatchUserScheduleDto | undefined>()
 const errors = ref<Record<string, string>>({})
+
+const formattedNextScheduledAt = computed(() => {
+  if (!batchSchedule.value?.nextScheduledAt) return undefined
+  return new Date(batchSchedule.value.nextScheduledAt).toLocaleString()
+})
 
 const fetchData = async () => {
   const { data, error } = await UserController.getUserProfile({})
   if (!error && data) {
     formData.value = data
+  }
+}
+
+const fetchBatchSchedule = async () => {
+  const { data, error } =
+    await UserController.getQuestionGenerationBatchSchedule({})
+  if (!error) {
+    batchSchedule.value = data
   }
 }
 
@@ -73,5 +103,8 @@ const processForm = async () => {
   }
 }
 
-onMounted(() => fetchData())
+onMounted(() => {
+  fetchData()
+  fetchBatchSchedule()
+})
 </script>

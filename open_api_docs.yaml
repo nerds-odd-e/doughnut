@@ -2143,6 +2143,18 @@ paths:
       responses:
         "200":
           description: OK
+  /api/user/question-generation-batch-schedule:
+    get:
+      tags:
+      - user-controller
+      operationId: getQuestionGenerationBatchSchedule
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/QuestionGenerationBatchUserScheduleDTO"
   /api/user/menu-data:
     get:
       tags:
@@ -4362,6 +4374,14 @@ components:
       required:
       - id
       - label
+    QuestionGenerationBatchUserScheduleDTO:
+      type: object
+      properties:
+        nextScheduledAt:
+          type: string
+          format: date-time
+        reason:
+          type: string
     AssimilationCountDTO:
       type: object
       properties:

@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.GeneratedTokenDTO;
 import com.odde.doughnut.controllers.dto.MenuDataDTO;
+import com.odde.doughnut.controllers.dto.QuestionGenerationBatchUserScheduleDTO;
 import com.odde.doughnut.controllers.dto.TokenConfigDTO;
 import com.odde.doughnut.controllers.dto.UserDTO;
 import com.odde.doughnut.entities.User;
@@ -11,6 +12,7 @@ import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AssimilationServiceFactory;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.ConversationService;
+import com.odde.doughnut.services.QuestionGenerationBatchPlanningService;
 import com.odde.doughnut.services.RecallService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.TestAccessTokenResolver;
@@ -39,6 +41,7 @@ class UserController {
   private final AssimilationServiceFactory assimilationServiceFactory;
   private final RecallService recallService;
   private final ConversationService conversationService;
+  private final QuestionGenerationBatchPlanningService questionGenerationBatchPlanningService;
   private final TestabilitySettings testabilitySettings;
   private final Optional<TestAccessTokenResolver> testAccessTokenResolver;
 
@@ -50,6 +53,7 @@ class UserController {
       AssimilationServiceFactory assimilationServiceFactory,
       RecallService recallService,
       ConversationService conversationService,
+      QuestionGenerationBatchPlanningService questionGenerationBatchPlanningService,
       TestabilitySettings testabilitySettings,
       Optional<TestAccessTokenResolver> testAccessTokenResolver) {
     this.entityPersister = entityPersister;
@@ -58,6 +62,7 @@ class UserController {
     this.assimilationServiceFactory = assimilationServiceFactory;
     this.recallService = recallService;
     this.conversationService = conversationService;
+    this.questionGenerationBatchPlanningService = questionGenerationBatchPlanningService;
     this.testabilitySettings = testabilitySettings;
     this.testAccessTokenResolver = testAccessTokenResolver;
   }
@@ -188,5 +193,16 @@ class UserController {
     var unreadConversations = conversationService.getUnreadConversations(user);
 
     return new MenuDataDTO(assimilationCount, recallStatus, unreadConversations);
+  }
+
+  @GetMapping("/question-generation-batch-schedule")
+  @Transactional(readOnly = true)
+  public QuestionGenerationBatchUserScheduleDTO getQuestionGenerationBatchSchedule() {
+    authorizationService.assertLoggedIn();
+    User user = authorizationService.getCurrentUser();
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+
+    return questionGenerationBatchPlanningService.getNextBatchQuestionSchedule(
+        user, currentUTCTimestamp);
   }
 }
