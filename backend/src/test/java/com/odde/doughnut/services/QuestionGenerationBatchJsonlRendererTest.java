@@ -157,5 +157,31 @@ class QuestionGenerationBatchJsonlRendererTest {
       assertThat(jsonl, is(""));
       assertThat(parseJsonl(jsonl), empty());
     }
+
+    @Test
+    void includesHighReasoningEffortForReasoningModel() throws Exception {
+      globalSettingsService.globalSettingQuestionGeneration().setKeyValue(currentTime, "o3-mini");
+      Note note = makeMe.aNote().notebookOwnedBy(user).please();
+      makeMe
+          .aMemoryTrackerFor(note)
+          .by(user)
+          .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(24)))
+          .please();
+
+      QuestionGenerationBatch batch =
+          planningService.planLocalBatchForUser(user, currentTime).orElseThrow();
+      List<QuestionGenerationBatchRequest> requests =
+          batchRequestRepository.findByBatch_Id(batch.getId());
+      String jsonl = jsonlRenderer.renderInputJsonl(batch);
+      List<Map<String, Object>> lines = parseJsonl(jsonl);
+
+      assertThat(lines, hasSize(1));
+      @SuppressWarnings("unchecked")
+      Map<String, Object> body = (Map<String, Object>) lines.get(0).get("body");
+      assertThat(body, is(expectedBodyForRequest(batch, requests.get(0))));
+      @SuppressWarnings("unchecked")
+      Map<String, Object> reasoning = (Map<String, Object>) body.get("reasoning");
+      assertThat(reasoning.get("effort"), is("high"));
+    }
   }
 }

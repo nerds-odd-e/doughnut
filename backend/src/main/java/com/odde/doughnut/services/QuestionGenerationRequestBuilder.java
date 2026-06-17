@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.OpenAiModelCapabilities;
 import com.odde.doughnut.services.ai.builder.OpenAIResponseRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
@@ -66,14 +67,14 @@ public class QuestionGenerationRequestBuilder {
   public StructuredResponseCreateParams<MCQWithAnswer> buildQuestionGenerationResponseRequest(
       Note note, String additionalMessage, Long contextSeed, String propertyKey, User viewer) {
     return buildQuestionGenerationResponseRequestInternal(
-        note, additionalMessage, contextSeed, propertyKey, viewer, true);
+        note, additionalMessage, contextSeed, propertyKey, viewer, false);
   }
 
   public StructuredResponseCreateParams<MCQWithAnswer>
       buildQuestionGenerationResponseRequestForBatch(
           Note note, String additionalMessage, Long contextSeed, String propertyKey, User viewer) {
     return buildQuestionGenerationResponseRequestInternal(
-        note, additionalMessage, contextSeed, propertyKey, viewer, false);
+        note, additionalMessage, contextSeed, propertyKey, viewer, true);
   }
 
   private StructuredResponseCreateParams<MCQWithAnswer>
@@ -83,7 +84,11 @@ public class QuestionGenerationRequestBuilder {
           Long contextSeed,
           String propertyKey,
           User viewer,
-          boolean includeReasoning) {
+          boolean batch) {
+    String modelName = globalSettingsService.globalSettingQuestionGeneration().getValue();
+    ReasoningEffort reasoningEffort =
+        OpenAiModelCapabilities.questionGenerationReasoningEffort(modelName, batch);
+
     InstructionAndSchema tool =
         AiToolFactory.mcqWithAnswerAiTool(
             hydrateFocusNoteForQuestionGeneration(note).isBodyContentBlank());
@@ -92,11 +97,13 @@ public class QuestionGenerationRequestBuilder {
             MCQWithAnswer.class, note, additionalMessage, contextSeed, propertyKey, viewer);
     responseRequestBuilder.addInstruction(tool.getMessageBody());
     addNotebookAssistantInstructionsIfPresent(responseRequestBuilder, note);
-    responseRequestBuilder.maxOutputTokens(1000L);
-    if (includeReasoning) {
-      return responseRequestBuilder.reasoningEffort(ReasoningEffort.LOW).build();
+    responseRequestBuilder.reasoningEffort(reasoningEffort);
+    responseRequestBuilder.maxOutputTokens(
+        OpenAiModelCapabilities.questionGenerationMaxOutputTokens(reasoningEffort, batch));
+    if (batch) {
+      return responseRequestBuilder.buildForBatchApi();
     }
-    return responseRequestBuilder.buildForBatchApi();
+    return responseRequestBuilder.build();
   }
 
   private static void addNotebookAssistantInstructionsIfPresent(

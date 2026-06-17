@@ -11,6 +11,7 @@ import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
+import com.odde.doughnut.services.openAiApis.StructuredResponseCreateParamsSerializer;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
@@ -18,6 +19,7 @@ import com.openai.models.responses.StructuredResponseCreateParams;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -40,6 +42,7 @@ class NoteQuestionGenerationServiceTests {
   @Autowired MakeMe makeMe;
   @Autowired GlobalSettingsService globalSettingsService;
   @Autowired NoteQuestionGenerationService service;
+  @Autowired StructuredResponseCreateParamsSerializer paramsSerializer;
   OpenAiStructuredResponseMock openAiStructuredResponseMock;
   private Note testNote;
 
@@ -281,6 +284,33 @@ class NoteQuestionGenerationServiceTests {
           service.buildQuestionGenerationRequest(testNote, null);
 
       assertThat(instructionContains(request, "Special Instruction for Relation Note"), is(false));
+    }
+
+    @Test
+    void omitsReasoningForNonReasoningModel() {
+      StructuredResponseCreateParams<MCQWithAnswer> request =
+          service.buildQuestionGenerationRequest(testNote, null);
+      Map<String, Object> body = paramsSerializer.toBodyMap(request);
+
+      assertThat(body.containsKey("reasoning"), is(false));
+      assertThat(body.get("max_output_tokens"), is(1000));
+    }
+
+    @Test
+    void usesMediumReasoningForReasoningModel() {
+      globalSettingsService
+          .globalSettingQuestionGeneration()
+          .setKeyValue(makeMe.aTimestamp().please(), "o3-mini");
+
+      StructuredResponseCreateParams<MCQWithAnswer> request =
+          service.buildQuestionGenerationRequest(testNote, null);
+      Map<String, Object> body = paramsSerializer.toBodyMap(request);
+
+      assertThat(body.get("max_output_tokens"), is(2000));
+      @SuppressWarnings("unchecked")
+      Map<String, Object> reasoning = (Map<String, Object>) body.get("reasoning");
+      assertThat(reasoning, is(notNullValue()));
+      assertThat(reasoning.get("effort"), is("medium"));
     }
   }
 

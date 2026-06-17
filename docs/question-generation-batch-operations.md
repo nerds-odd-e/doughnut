@@ -113,8 +113,9 @@ WHERE s.last_successful_submitted_at > NOW() - INTERVAL 23 HOUR;
 
 Batch JSONL uses a separate request shape from synchronous question generation (`buildQuestionGenerationResponseRequestForBatch`):
 
-- **No `reasoning.effort`** — batch model variants reject reasoning parameters that sync generation uses (`ReasoningEffort.LOW`).
-- **`text.verbosity: medium`** — batch model variants reject `low` verbosity; sync generation still uses `low`.
+- **`reasoning.effort`** — included at **HIGH** when the configured question-generation model supports reasoning (`OpenAiModelCapabilities.supportsReasoningEffort`: `o1`, `o3`, `o4`, `gpt-5` prefixes); omitted for non-reasoning models such as `gpt-4.1-mini`.
+- **Sync generation** uses the same model detection with **MEDIUM** effort when supported; no `reasoning` key otherwise.
+- **`text.verbosity: medium`** — batch requests always use medium verbosity (non-reasoning batch models reject `low`); sync generation uses `low`.
 
 Captured success JSONL from manual verification is at `backend/src/test/resources/openai-batch-fixtures/live_batch_success_line.json`, covered by `QuestionGenerationBatchOutputFixtureTest`.
 
