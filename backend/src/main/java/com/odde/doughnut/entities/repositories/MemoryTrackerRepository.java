@@ -110,6 +110,16 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
               + "      AND rp.quiz_answer_id IS NULL "
               + "      AND (pq.id IS NULL OR pq.is_contested = false)"
               + "  ) "
+              + "  AND NOT EXISTS ("
+              + "    SELECT 1 FROM question_generation_batch_request qgbr "
+              + "    JOIN question_generation_batch qgb ON qgbr.batch_id = qgb.id "
+              + "    WHERE qgbr.memory_tracker_id = mt.id "
+              + "      AND qgbr.status IN ('PENDING', 'OUTPUT_READY') "
+              + "      AND ("
+              + "        qgb.status IN ('PLANNED', 'SUBMITTED') "
+              + "        OR (qgb.status = 'COMPLETED' AND qgb.imported_at IS NULL)"
+              + "      )"
+              + "  ) "
               + "ORDER BY mt.next_recall_at",
       nativeQuery = true)
   List<MemoryTracker> findBatchQuestionGenerationCandidatesByUser(
