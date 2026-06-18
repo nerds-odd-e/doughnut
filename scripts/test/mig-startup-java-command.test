@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+#
+# Guard the production MIG startup command. JVM -D flags must appear before -jar.
+
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+
+fail() {
+	echo "FAIL: $*" >&2
+	exit 1
+}
+
+assert_startup_script_command() {
+	local script=$1
+	local command
+	command=$(sed -n '/bash -c "java /,/\.jar" &/p' "$script" | tr '\n' ' ')
+
+	[[ "$command" == *" -Dspring.profiles.active=prod "* ]] \
+		|| fail "$script does not set spring.profiles.active before launch"
+	[[ "$command" == *" -jar /opt/doughnut_app/"* ]] \
+		|| fail "$script does not pass the application jar immediately after -jar"
+	[[ "$command" != *" -jar         -D"* && "$command" != *" -jar \\         -D"* ]] \
+		|| fail "$script places JVM -D flags after -jar"
+
+	local before_jar="${command%% -jar *}"
+	[[ "$before_jar" == *" -Dspring.datasource.url="* ]] \
+		|| fail "$script must pass datasource properties before -jar"
+}
+
+main() {
+	assert_startup_script_command "$REPO_ROOT/infra/gcp/scripts/mig-zulu25-openai-app-instance-startup.sh"
+	assert_startup_script_command "$REPO_ROOT/infra/gcp/scripts/mig-zulu24-openai-app-instance-startup.sh"
+	echo "ok mig startup java command tests"
+}
+
+main "$@"

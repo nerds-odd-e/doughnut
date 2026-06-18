@@ -92,7 +92,7 @@ export JAVA_OPTS="-XX:InitialRAMPercentage=75.0 \
         -Dspring.jmx.enabled=false \
         -Dspring.liveBeansView.mbeanDomain=false"
 
-bash -c "java ${JAVA_OPTS} -jar \
+bash -c "java ${JAVA_OPTS} \
         -Dspring-boot.run.profiles=prod \
         -Dspring.profiles.active=prod \
         -Dspring.datasource.url='jdbc:mysql://db-server:3306/doughnut' \
@@ -101,4 +101,4 @@ bash -c "java ${JAVA_OPTS} -jar \
         -Dspring.openai.token=${OPENAI_API_TOKEN} \
         -Dlogging.level.com.zaxxer.hikari=WARN \
         -Dlogging.level.com.zaxxer.hikari.HikariConfig=WARN \
-        /opt/doughnut_app/${ARTIFACT}-${VERSION}.jar" &
+        -jar /opt/doughnut_app/${ARTIFACT}-${VERSION}.jar" &

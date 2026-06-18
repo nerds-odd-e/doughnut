@@ -1,7 +1,9 @@
 package com.odde.doughnut.services;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.verify;
 
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,5 +33,16 @@ class QuestionGenerationBatchMaintenanceJobTests {
     InOrder inOrder = inOrder(maintenanceService, submitDueUsersService);
     inOrder.verify(maintenanceService).resumeExistingBatches(any(Timestamp.class));
     inOrder.verify(submitDueUsersService).submitDueUsers(any(Timestamp.class));
+  }
+
+  @Test
+  void shouldStillSubmitDueUsersWhenResumeExistingBatchesFails() {
+    doThrow(new RuntimeException("resume failed"))
+        .when(maintenanceService)
+        .resumeExistingBatches(any(Timestamp.class));
+
+    job.runHourlyMaintenance();
+
+    verify(submitDueUsersService).submitDueUsers(any(Timestamp.class));
   }
 }
