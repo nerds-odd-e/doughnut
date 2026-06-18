@@ -201,6 +201,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 ## Admin Question Generation Batch Controller
 
 - `submitRecentRecallUsersForQuestionGenerationBatch`: POST `/api/admin/question-generation-batch/submit-recent-recall-users` -> `SubmitRecentRecallUsersForQuestionGenerationBatchResponse` (request: none; response body: QuestionGenerationBatchSubmissionSummaryDto)
+- `resumeExistingQuestionGenerationBatches`: POST `/api/admin/question-generation-batch/resume-existing-batches` -> `ResumeExistingQuestionGenerationBatchesResponse` (request: none; response body: QuestionGenerationBatchAdminStatusDto)
 - `getQuestionGenerationBatchStatus`: GET `/api/admin/question-generation-batch/status` -> `GetQuestionGenerationBatchStatusResponse` (request: none; response body: QuestionGenerationBatchAdminStatusDto)
 
 ## Admin Data Migration Controller

@@ -12,6 +12,15 @@
         >
           Generate for recent recall users
         </button>
+        <button
+          type="button"
+          class="daisy-btn daisy-btn-primary"
+          data-testid="resume-existing-batches-button"
+          :disabled="maintenanceInFlight"
+          @click="resumeExistingBatches"
+        >
+          Resume existing batches
+        </button>
       </div>
       <div
         v-if="submissionSummaryText"
@@ -20,6 +29,22 @@
         data-testid="submission-summary"
       >
         {{ submissionSummaryText }}
+      </div>
+      <div
+        v-if="maintenanceSummaryText"
+        class="daisy-alert daisy-alert-success mt-4"
+        role="status"
+        data-testid="maintenance-summary"
+      >
+        {{ maintenanceSummaryText }}
+      </div>
+      <div
+        v-if="maintenanceFailed"
+        class="daisy-alert daisy-alert-error mt-4"
+        role="alert"
+        data-testid="maintenance-error"
+      >
+        Resume existing batches failed
       </div>
     </section>
 
@@ -34,12 +59,26 @@
           {{ status.openAiTokenConfigured ? "configured" : "not configured" }}
         </span>
         <span
+          data-testid="prod-profile-badge"
+          :class="availabilityBadgeClass(status.prodProfileActive)"
+        >
+          Prod profile:
+          {{ status.prodProfileActive ? "active" : "inactive" }}
+        </span>
+        <span
           data-testid="scheduler-badge"
           :class="availabilityBadgeClass(status.schedulerActive)"
         >
-          Hourly scheduler:
-          {{ status.schedulerActive ? "active (prod)" : "inactive" }}
+          Hourly maintenance:
+          {{ status.schedulerActive ? "registered" : "not registered" }}
         </span>
+      </div>
+      <div
+        class="mt-3 text-sm"
+        data-testid="maintenance-run-state"
+      >
+        Last maintenance:
+        {{ lastMaintenanceRunText }}
       </div>
     </section>
 
@@ -98,12 +137,22 @@ import type {
   QuestionGenerationBatchSubmissionSummaryDto,
 } from "@generated/doughnut-backend-api"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import {
+  formatLastMaintenanceRun,
+  formatMaintenanceSummary,
+  formatSubmissionSummary,
+} from "./questionGenerationBatchStatusText"
 
 const status = ref<QuestionGenerationBatchAdminStatusDto | undefined>(undefined)
 const submissionSummary = ref<
   QuestionGenerationBatchSubmissionSummaryDto | undefined
 >(undefined)
+const maintenanceSummary = ref<
+  QuestionGenerationBatchAdminStatusDto | undefined
+>(undefined)
 const submissionInFlight = ref(false)
+const maintenanceInFlight = ref(false)
+const maintenanceFailed = ref(false)
 
 const batchStatusEntries = computed(
   () =>
@@ -130,16 +179,17 @@ const fetchStatus = async () => {
   }
 }
 
-const submissionSummaryText = computed(() => {
-  const summary = submissionSummary.value
-  if (!summary) return undefined
-  return [
-    `Considered ${summary.consideredUserCount ?? 0}`,
-    `submitted ${summary.submittedCount ?? 0}`,
-    `failed ${summary.failedCount ?? 0}`,
-    `skipped ${summary.skippedCount ?? 0}`,
-  ].join(", ")
-})
+const submissionSummaryText = computed(() =>
+  formatSubmissionSummary(submissionSummary.value)
+)
+
+const maintenanceSummaryText = computed(() =>
+  formatMaintenanceSummary(maintenanceSummary.value)
+)
+
+const lastMaintenanceRunText = computed(() =>
+  formatLastMaintenanceRun(status.value)
+)
 
 const submitRecentRecallUsers = async () => {
   submissionInFlight.value = true
@@ -153,6 +203,25 @@ const submitRecentRecallUsers = async () => {
     }
   } finally {
     submissionInFlight.value = false
+  }
+}
+
+const resumeExistingBatches = async () => {
+  maintenanceInFlight.value = true
+  maintenanceFailed.value = false
+  try {
+    const { data, error } = await apiCallWithLoading(() =>
+      AdminQuestionGenerationBatchController.resumeExistingQuestionGenerationBatches()
+    )
+    if (!error) {
+      maintenanceSummary.value = data
+      status.value = data
+      await fetchStatus()
+    } else {
+      maintenanceFailed.value = true
+    }
+  } finally {
+    maintenanceInFlight.value = false
   }
 }
 

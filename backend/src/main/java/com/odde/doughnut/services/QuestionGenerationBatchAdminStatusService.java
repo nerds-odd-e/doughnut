@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.config.ScheduledTask;
+import org.springframework.scheduling.config.ScheduledTaskHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,16 +21,22 @@ public class QuestionGenerationBatchAdminStatusService {
   private final QuestionGenerationBatchRequestRepository batchRequestRepository;
   private final String openAiToken;
   private final Environment environment;
+  private final List<ScheduledTaskHolder> scheduledTaskHolders;
+  private final QuestionGenerationBatchMaintenanceRunState maintenanceRunState;
 
   public QuestionGenerationBatchAdminStatusService(
       QuestionGenerationBatchRepository batchRepository,
       QuestionGenerationBatchRequestRepository batchRequestRepository,
       @Value("${spring.openai.token}") String openAiToken,
-      Environment environment) {
+      Environment environment,
+      List<ScheduledTaskHolder> scheduledTaskHolders,
+      QuestionGenerationBatchMaintenanceRunState maintenanceRunState) {
     this.batchRepository = batchRepository;
     this.batchRequestRepository = batchRequestRepository;
     this.openAiToken = openAiToken;
     this.environment = environment;
+    this.scheduledTaskHolders = scheduledTaskHolders;
+    this.maintenanceRunState = maintenanceRunState;
   }
 
   public QuestionGenerationBatchAdminStatusDTO getStatus() {
@@ -39,8 +47,28 @@ public class QuestionGenerationBatchAdminStatusService {
         toStatusCountMap(
             batchRequestRepository.countByStatus(), QuestionGenerationBatchRequestStatus.values()));
     dto.setOpenAiTokenConfigured(openAiToken != null && !openAiToken.isBlank());
-    dto.setSchedulerActive(Arrays.stream(environment.getActiveProfiles()).anyMatch("prod"::equals));
+    dto.setProdProfileActive(isProdProfileActive());
+    dto.setSchedulerActive(isQuestionGenerationBatchMaintenanceScheduled());
+    dto.setLastMaintenanceStartedAt(maintenanceRunState.getLastMaintenanceStartedAt());
+    dto.setLastMaintenanceFinishedAt(maintenanceRunState.getLastMaintenanceFinishedAt());
+    dto.setLastMaintenanceError(maintenanceRunState.getLastMaintenanceError());
     return dto;
+  }
+
+  private boolean isProdProfileActive() {
+    return Arrays.stream(environment.getActiveProfiles()).anyMatch("prod"::equals);
+  }
+
+  private boolean isQuestionGenerationBatchMaintenanceScheduled() {
+    return scheduledTaskHolders.stream()
+        .flatMap(holder -> holder.getScheduledTasks().stream())
+        .anyMatch(this::isQuestionGenerationBatchMaintenanceTask);
+  }
+
+  private boolean isQuestionGenerationBatchMaintenanceTask(ScheduledTask task) {
+    String description = task.toString();
+    return description.contains(QuestionGenerationBatchMaintenanceJob.class.getName())
+        && description.contains("runHourlyMaintenance");
   }
 
   private static <E extends Enum<E>> Map<String, Long> toStatusCountMap(

@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.QuestionGenerationBatchAdminStatusDTO;
@@ -97,6 +98,27 @@ class AdminQuestionGenerationBatchControllerTest extends ControllerTestBase {
 
     assertThrows(
         UnexpectedNoAccessRightException.class, () -> controller.submitRecentRecallUsers());
+  }
+
+  @Test
+  void adminCanResumeExistingBatchesAndReceivesRefreshedStatus()
+      throws UnexpectedNoAccessRightException {
+    currentUser.setUser(makeMe.anAdmin().please());
+    testabilitySettings.timeTravelTo(currentTime);
+
+    QuestionGenerationBatchAdminStatusDTO status = controller.resumeExistingBatches();
+
+    assertThat(status.getBatchCountsByStatus().get("SUBMITTED"), equalTo(0L));
+    assertThat(status.getRequestCountsByStatus().get("PENDING"), equalTo(0L));
+    assertThat(status.getLastMaintenanceStartedAt(), equalTo(currentTime));
+    assertThat(status.getLastMaintenanceFinishedAt(), notNullValue());
+  }
+
+  @Test
+  void nonAdminCannotResumeExistingBatches() {
+    currentUser.setUser(makeMe.aUser().please());
+
+    assertThrows(UnexpectedNoAccessRightException.class, () -> controller.resumeExistingBatches());
   }
 
   private void seedPlannedBatchWithPendingRequest() {

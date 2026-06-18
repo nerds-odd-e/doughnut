@@ -2,17 +2,17 @@
 
 **See also:** [prod-frontend-static-lb.md](prod-frontend-static-lb.md) for SPA/CLI buckets, URL map, and frontend rollback (Deploy always applies the URL map; jar rollout is what this page describes).
 
-On a green `main` pipeline, the **Deploy** job runs `infra/gcp/scripts/deploy-backend-jar-to-gcp-mig.sh`. That script compares the built fat jar’s SHA-256 to `gs://<bucket>/deploy/last-successful-deploy.json`. When they match, it **skips** uploading the jar and **skips** the MIG rolling replace, and leaves the record unchanged.
+On a green `main` pipeline, the **Deploy** job runs `infra/gcp/scripts/deploy-backend-jar-to-gcp-mig.sh`. That script compares the built fat jar’s SHA-256 and the MIG startup script SHA-256 to `gs://<bucket>/deploy/last-successful-deploy.json`. When both match, it **skips** uploading the jar and **skips** the MIG rolling replace, and leaves the record unchanged.
 
 ## Last successful deploy record
 
-After a **full** deploy (upload + rolling replace), CI writes JSON to `deploy/last-successful-deploy.json` with `sha256`, `git_sha`, and `recorded_at`. The record is updated only when both steps succeed.
+After a **full** deploy (upload + rolling replace), CI writes JSON to `deploy/last-successful-deploy.json` with `sha256`, `startup_script_sha256`, `git_sha`, and `recorded_at`. The record is updated only when both steps succeed.
 
 ## MIG template / startup changes without a new jar
 
-The deploy script only compares the **fat jar** hash to the record. Changes that affect VMs but **not** the built jar—startup scripts, instance templates, metadata, or edits made only in the GCP console—do **not** change that comparison. A green pipeline can still **skip** uploading the jar and **skip** the MIG rolling replace.
+The deploy script compares the **fat jar** hash and committed startup script hash to the record. Changes to `infra/gcp/scripts/mig-zulu25-openai-app-instance-startup.sh` trigger a full deploy even when the jar is unchanged.
 
-To roll the MIG in those cases, use **force full deploy** (next section: `force-deployment: true` on the tip of `main`), run the deploy script with **`FORCE_FULL_DEPLOY=1`**, or perform a **manual** rolling replace / template update in GCP.
+Changes made only in the GCP console, instance templates, or other metadata still do not change either committed hash. To roll the MIG in those cases, use **force full deploy** (next section: `force-deployment: true` on the tip of `main`), run the deploy script with **`FORCE_FULL_DEPLOY=1`**, or perform a **manual** rolling replace / template update in GCP.
 
 ## Force a full deploy: `force-deployment: true`
 
@@ -50,9 +50,9 @@ Use normal GCP credentials and a jar path the script can find (or set `DEPLOY_JA
 
 ## Other recovery
 
-If prod already runs the intended jar but `deploy/last-successful-deploy.json` in **`GCS_BUCKET`** is wrong or missing, either:
+If prod already runs the intended jar/startup script but `deploy/last-successful-deploy.json` in **`GCS_BUCKET`** is wrong or missing, either:
 
-- Upload a corrected JSON object with the matching `sha256` (and consistent `git_sha` / `recorded_at` if you use them), or
+- Upload a corrected JSON object with matching `sha256` and `startup_script_sha256` (and consistent `git_sha` / `recorded_at` if you use them), or
 - Remove the object so the next deploy treats the record as absent and performs a full upload + MIG rollout (coordinate with the team; traffic impact depends on template changes).
 
 Do not confuse this object with frontend trees under **`GCS_FRONTEND_BUCKET`**; only the deploy bucket holds the jar deploy record.

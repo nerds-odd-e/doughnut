@@ -624,6 +624,21 @@ export type QuestionGenerationBatchSubmissionSummaryDto = {
     skippedCount?: number;
 };
 
+export type QuestionGenerationBatchAdminStatusDto = {
+    batchCountsByStatus?: {
+        [key: string]: number;
+    };
+    requestCountsByStatus?: {
+        [key: string]: number;
+    };
+    openAiTokenConfigured?: boolean;
+    prodProfileActive?: boolean;
+    schedulerActive?: boolean;
+    lastMaintenanceStartedAt?: string;
+    lastMaintenanceFinishedAt?: string;
+    lastMaintenanceError?: string;
+};
+
 export type AdminDataMigrationStatusDto = {
     message?: string;
     dataMigrationComplete?: boolean;
@@ -952,17 +967,6 @@ export type UserListingPage = {
     pageSize?: number;
     totalCount?: number;
     totalPages?: number;
-};
-
-export type QuestionGenerationBatchAdminStatusDto = {
-    batchCountsByStatus?: {
-        [key: string]: number;
-    };
-    requestCountsByStatus?: {
-        [key: string]: number;
-    };
-    openAiTokenConfigured?: boolean;
-    schedulerActive?: boolean;
 };
 
 export type NotesTestDataWritable = {
@@ -2413,6 +2417,22 @@ export type SubmitRecentRecallUsersForQuestionGenerationBatchResponses = {
 };
 
 export type SubmitRecentRecallUsersForQuestionGenerationBatchResponse = SubmitRecentRecallUsersForQuestionGenerationBatchResponses[keyof SubmitRecentRecallUsersForQuestionGenerationBatchResponses];
+
+export type ResumeExistingQuestionGenerationBatchesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/admin/question-generation-batch/resume-existing-batches';
+};
+
+export type ResumeExistingQuestionGenerationBatchesResponses = {
+    /**
+     * OK
+     */
+    200: QuestionGenerationBatchAdminStatusDto;
+};
+
+export type ResumeExistingQuestionGenerationBatchesResponse = ResumeExistingQuestionGenerationBatchesResponses[keyof ResumeExistingQuestionGenerationBatchesResponses];
 
 export type RunDataMigrationBatchData = {
     body?: never;

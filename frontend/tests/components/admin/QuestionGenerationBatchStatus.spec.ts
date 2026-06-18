@@ -1,51 +1,20 @@
 import QuestionGenerationBatchStatus from "@/components/admin/QuestionGenerationBatchStatus.vue"
 import { AdminQuestionGenerationBatchController } from "@generated/doughnut-backend-api/sdk.gen"
-import type {
-  QuestionGenerationBatchAdminStatusDto,
-  QuestionGenerationBatchSubmissionSummaryDto,
-} from "@generated/doughnut-backend-api/types.gen"
+import type { QuestionGenerationBatchSubmissionSummaryDto } from "@generated/doughnut-backend-api/types.gen"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, expect, it } from "vitest"
 import helper, {
   mockSdkService,
   mockSdkServiceWithImplementation,
 } from "@tests/helpers"
+import {
+  mockQuestionGenerationBatchStatusApis,
+  sampleQuestionGenerationBatchStatus,
+} from "./questionGenerationBatchStatusTestHelper"
 
 describe("QuestionGenerationBatchStatus", () => {
-  const sampleStatus: QuestionGenerationBatchAdminStatusDto = {
-    batchCountsByStatus: {
-      PLANNED: 2,
-      SUBMITTED: 1,
-      COMPLETED: 5,
-      FAILED: 0,
-      EXPIRED: 0,
-    },
-    requestCountsByStatus: {
-      PENDING: 3,
-      OUTPUT_READY: 1,
-      FAILED: 0,
-      IMPORTED: 10,
-    },
-    openAiTokenConfigured: true,
-    schedulerActive: false,
-  }
-
   beforeEach(() => {
-    mockSdkService(
-      AdminQuestionGenerationBatchController,
-      "getQuestionGenerationBatchStatus",
-      sampleStatus
-    )
-    mockSdkService(
-      AdminQuestionGenerationBatchController,
-      "submitRecentRecallUsersForQuestionGenerationBatch",
-      {
-        consideredUserCount: 3,
-        submittedCount: 2,
-        failedCount: 0,
-        skippedCount: 1,
-      }
-    )
+    mockQuestionGenerationBatchStatusApis()
   })
 
   it("displays loading message initially", async () => {
@@ -79,8 +48,14 @@ describe("QuestionGenerationBatchStatus", () => {
       "configured"
     )
     expect(wrapper.get('[data-testid="scheduler-badge"]').text()).toContain(
+      "not registered"
+    )
+    expect(wrapper.get('[data-testid="prod-profile-badge"]').text()).toContain(
       "inactive"
     )
+    expect(
+      wrapper.get('[data-testid="maintenance-run-state"]').text()
+    ).toContain("never")
   })
 
   it("renders the manual generation button", async () => {
@@ -92,11 +67,20 @@ describe("QuestionGenerationBatchStatus", () => {
     ).toContain("Generate for recent recall users")
   })
 
+  it("renders the resume existing batches button", async () => {
+    const wrapper = helper.component(QuestionGenerationBatchStatus).mount()
+    await flushPromises()
+
+    expect(
+      wrapper.get('[data-testid="resume-existing-batches-button"]').text()
+    ).toContain("Resume existing batches")
+  })
+
   it("triggers manual generation and refreshes status with summary", async () => {
     const statusSpy = mockSdkService(
       AdminQuestionGenerationBatchController,
       "getQuestionGenerationBatchStatus",
-      sampleStatus
+      sampleQuestionGenerationBatchStatus
     )
     const submitSpy = mockSdkService(
       AdminQuestionGenerationBatchController,
@@ -172,8 +156,9 @@ describe("QuestionGenerationBatchStatus", () => {
       AdminQuestionGenerationBatchController,
       "getQuestionGenerationBatchStatus",
       {
-        ...sampleStatus,
+        ...sampleQuestionGenerationBatchStatus,
         openAiTokenConfigured: false,
+        prodProfileActive: true,
         schedulerActive: true,
       }
     )
@@ -184,7 +169,10 @@ describe("QuestionGenerationBatchStatus", () => {
       "not configured"
     )
     expect(wrapper.get('[data-testid="scheduler-badge"]').text()).toContain(
-      "active (prod)"
+      "registered"
+    )
+    expect(wrapper.get('[data-testid="prod-profile-badge"]').text()).toContain(
+      "active"
     )
   })
 })

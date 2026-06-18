@@ -81,7 +81,7 @@ gcloud sql instances describe doughnut-db-instance \
 
 ## 5. CI/CD: conditional backend deploy
 
-Green `main` builds may **skip** GCS jar upload and MIG rollout when the jar hash matches the last successful deploy record. To **force** upload + rolling replace anyway, use the commit-message token and merge caveats in [conditional-backend-deploy.md](conditional-backend-deploy.md).
+Green `main` builds may **skip** GCS jar upload and MIG rollout when the jar hash and startup script hash match the last successful deploy record. To **force** upload + rolling replace anyway, use the commit-message token and merge caveats in [conditional-backend-deploy.md](conditional-backend-deploy.md).
 
 ## 6. Frontend static in GCS (CI publish + prod LB)
 

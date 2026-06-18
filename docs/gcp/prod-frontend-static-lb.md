@@ -10,7 +10,7 @@ Runbook for production static hosting: one browser-facing hostname, HTTPS load b
 |------|----------------|
 | Green `main` **Package-artifacts** | SPA → `gs://<GCS_FRONTEND_BUCKET>/frontend/<GITHUB_SHA>/`; CLI → same bucket; fat jar + `deploy/last-successful-deploy.json` → `GCS_BUCKET` only. |
 | Green `main` **Deploy** | Always runs [`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh) so the LB serves that pipeline’s `frontend/<GITHUB_SHA>/` (including frontend-only commits). |
-| Backend MIG | Jar upload + rolling replace only when the jar hash differs from the record — [conditional-backend-deploy.md](conditional-backend-deploy.md). |
+| Backend MIG | Jar upload + rolling replace when the jar hash or startup script hash differs from the record — [conditional-backend-deploy.md](conditional-backend-deploy.md). |
 | Routing edits | Change [`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json); CI must pass `pnpm validate:path-routing`. |
 | **Frontend rollback** | Render + validate + `gcloud url-maps import` for an older SHA whose `frontend/<SHA>/` still exists (commands under [Recovery / manual import](#cutover-checklist-new-frontend-bucket) below). |
 | **Backend rollback / bad record** | Redeploy a known-good jar, use `force-deployment: true`, or fix `deploy/last-successful-deploy.json` in `GCS_BUCKET` — [conditional-backend-deploy.md](conditional-backend-deploy.md). |
