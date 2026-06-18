@@ -32,7 +32,7 @@ export class NotebookBooksController {
             }
         });
     }
-
+    
     /**
      * Change depth of a book block
      */
@@ -46,7 +46,7 @@ export class NotebookBooksController {
             }
         });
     }
-
+    
     /**
      * Suggest book layout depths via AI (preview only, does not persist)
      */
@@ -1099,7 +1099,7 @@ export class AdminQuestionGenerationBatchController {
     public static submitRecentRecallUsersForQuestionGenerationBatch<ThrowOnError extends boolean = false>(options?: Options<SubmitRecentRecallUsersForQuestionGenerationBatchData, ThrowOnError>): RequestResult<SubmitRecentRecallUsersForQuestionGenerationBatchResponses, unknown, ThrowOnError> {
         return (options?.client ?? client).post<SubmitRecentRecallUsersForQuestionGenerationBatchResponses, unknown, ThrowOnError>({ url: '/api/admin/question-generation-batch/submit-recent-recall-users', ...options });
     }
-
+    
     public static getQuestionGenerationBatchStatus<ThrowOnError extends boolean = false>(options?: Options<GetQuestionGenerationBatchStatusData, ThrowOnError>): RequestResult<GetQuestionGenerationBatchStatusResponses, unknown, ThrowOnError> {
         return (options?.client ?? client).get<GetQuestionGenerationBatchStatusResponses, unknown, ThrowOnError>({ url: '/api/admin/question-generation-batch/status', ...options });
     }
