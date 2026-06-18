@@ -216,8 +216,8 @@ importers:
   frontend:
     dependencies:
       '@lucide/vue':
-        specifier: ^1.18.0
-        version: 1.18.0(vue@3.5.38(typescript@6.0.3))
+        specifier: ^1.20.0
+        version: 1.20.0(vue@3.5.38(typescript@6.0.3))
       epubjs:
         specifier: ^0.3.93
         version: 0.3.93
@@ -1267,8 +1267,8 @@ packages:
   '@keyv/serialize@1.1.1':
     resolution: {integrity: sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA==}
 
-  '@lucide/vue@1.18.0':
-    resolution: {integrity: sha512-DmnUpDB85PlMZ+ofjZLcKq3JoJnaD1bk7SIj9xwUvqerfNqA6hCLa0/m3gIybH6rdrErABbqvTD8yYJdNqiZ3Q==}
+  '@lucide/vue@1.20.0':
+    resolution: {integrity: sha512-fy0XKdMPSGhhmfTp6evMN69ts7AJnopqflzbYM60a6vbnINhD5H/PbT+VeO9EQCHfSxQQiYBwUcBflbfKU57ng==}
     peerDependencies:
       vue: '>=3.0.1'
 
@@ -7893,7 +7893,7 @@ snapshots:
 
   '@keyv/serialize@1.1.1': {}
 
-  '@lucide/vue@1.18.0(vue@3.5.38(typescript@6.0.3))':
+  '@lucide/vue@1.20.0(vue@3.5.38(typescript@6.0.3))':
     dependencies:
       vue: 3.5.38(typescript@6.0.3)
 
