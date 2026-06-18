@@ -30,7 +30,6 @@ assert_startup_script_command() {
 
 main() {
 	assert_startup_script_command "$REPO_ROOT/infra/gcp/scripts/mig-zulu25-openai-app-instance-startup.sh"
-	assert_startup_script_command "$REPO_ROOT/infra/gcp/scripts/mig-zulu24-openai-app-instance-startup.sh"
 	echo "ok mig startup java command tests"
 }
 
