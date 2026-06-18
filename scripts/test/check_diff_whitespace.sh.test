@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_UNDER_TEST="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/scripts/check_diff_whitespace.sh"
+
+fail() {
+	echo "FAIL: $*" >&2
+	exit 1
+}
+
+init_repo() {
+	local work=$1
+	git -C "$work" init -q
+	git -C "$work" config user.email test@example.com
+	git -C "$work" config user.name "Test User"
+}
+
+test_fails_for_hand_maintained_whitespace() {
+	local work
+	work=$(mktemp -d)
+	trap 'rm -rf "$work"' EXIT
+	init_repo "$work"
+	printf 'clean\n' >"$work/app.ts"
+	git -C "$work" add app.ts
+	git -C "$work" commit -qm initial
+	printf 'bad   \n' >>"$work/app.ts"
+
+	if (cd "$work" && "$SCRIPT_UNDER_TEST") >/dev/null 2>&1; then
+		fail "expected whitespace check to fail for hand-maintained file"
+	fi
+
+	trap - EXIT
+	rm -rf "$work"
+}
+
+test_ignores_generated_api_whitespace() {
+	local work
+	work=$(mktemp -d)
+	trap 'rm -rf "$work"' EXIT
+	init_repo "$work"
+	mkdir -p "$work/packages/generated/doughnut-backend-api"
+	printf 'clean\n' >"$work/packages/generated/doughnut-backend-api/sdk.gen.ts"
+	printf 'openapi: clean\n' >"$work/open_api_docs.yaml"
+	git -C "$work" add .
+	git -C "$work" commit -qm initial
+	printf 'generated   \n' >>"$work/packages/generated/doughnut-backend-api/sdk.gen.ts"
+	printf 'openapi: generated   \n' >>"$work/open_api_docs.yaml"
+
+	(cd "$work" && "$SCRIPT_UNDER_TEST")
+
+	trap - EXIT
+	rm -rf "$work"
+}
+
+test_supports_cached_diff() {
+	local work
+	work=$(mktemp -d)
+	trap 'rm -rf "$work"' EXIT
+	init_repo "$work"
+	printf 'clean\n' >"$work/app.ts"
+	git -C "$work" add app.ts
+	git -C "$work" commit -qm initial
+	printf 'bad   \n' >>"$work/app.ts"
+	git -C "$work" add app.ts
+
+	if (cd "$work" && "$SCRIPT_UNDER_TEST" --cached) >/dev/null 2>&1; then
+		fail "expected cached whitespace check to fail"
+	fi
+
+	trap - EXIT
+	rm -rf "$work"
+}
+
+main() {
+	test_fails_for_hand_maintained_whitespace
+	test_ignores_generated_api_whitespace
+	test_supports_cached_diff
+	echo "ok check_diff_whitespace.sh tests"
+}
+
+main "$@"

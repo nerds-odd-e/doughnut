@@ -33,6 +33,8 @@ git diff
 git diff --cached
 ```
 
+For whitespace hygiene, run `scripts/check_diff_whitespace.sh` instead of raw `git diff --check`. The wrapper excludes generated API artifacts so cleanup does not turn into manual edits under `packages/generated/doughnut-backend-api/**` or `open_api_docs.yaml`.
+
 **Git does not use the Nix prefix.** All other repo tooling does.
 
 All refactoring work is scoped to those files and the files that

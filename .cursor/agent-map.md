@@ -27,6 +27,8 @@ For frontend calls, import services from `@generated/doughnut-backend-api/sdk.ge
 CURSOR_DEV=true nix develop -c pnpm generateTypeScript
 ```
 
+Never hand-edit `packages/generated/doughnut-backend-api/**` or `open_api_docs.yaml`; regenerate them. For whitespace hygiene, use `scripts/check_diff_whitespace.sh` instead of raw `git diff --check` so generated artifacts are not manually "fixed".
+
 ## Commands
 
 Run repo tooling through Nix unless working in a documented Cloud VM path:
@@ -43,6 +45,7 @@ Useful focused checks:
 - Frontend single file: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/path/to/TestFile.spec.ts`
 - E2E single feature: `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/path/to.feature`
 - Log inspection: `CURSOR_DEV=true nix develop -c pnpm logs:tail backend-e2e` (targets: `sut`, `backend-e2e`, `mountebank`)
+- Diff whitespace: `scripts/check_diff_whitespace.sh` or `scripts/check_diff_whitespace.sh --cached`
 - Lint all: `CURSOR_DEV=true nix develop -c pnpm lint:all`
 - Format all: `CURSOR_DEV=true nix develop -c pnpm format:all`
 

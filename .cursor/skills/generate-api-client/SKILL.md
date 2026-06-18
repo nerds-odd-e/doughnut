@@ -9,7 +9,7 @@ description: >-
 
 # Generate Frontend API Client
 
-The frontend API client at `packages/generated/doughnut-backend-api` is auto-generated from the backend OpenAPI spec. **Never edit generated code directly.**
+The frontend API client at `packages/generated/doughnut-backend-api` is auto-generated from the backend OpenAPI spec. **Never edit generated code directly.** This includes whitespace-only cleanup in `sdk.gen.ts`, `types.gen.ts`, and `open_api_docs.yaml`; if generated output changes, accept it or fix the generator path.
 
 ## When to regenerate
 
@@ -26,6 +26,8 @@ The frontend API client at `packages/generated/doughnut-backend-api` is auto-gen
 ```bash
 CURSOR_DEV=true nix develop -c pnpm generateTypeScript
 ```
+
+Do not run raw `git diff --check` as a generated-client cleanup gate. Use `scripts/check_diff_whitespace.sh`, which excludes generated API artifacts from manual whitespace fixes.
 
 3. Check if the change affected frontend usage — run frontend tests:
 
