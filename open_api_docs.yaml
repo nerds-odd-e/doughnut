@@ -1600,6 +1600,18 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NoteRealm"
+  /api/admin/question-generation-batch/submit-recent-recall-users:
+    post:
+      tags:
+      - admin-question-generation-batch-controller
+      operationId: submitRecentRecallUsersForQuestionGenerationBatch
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/QuestionGenerationBatchSubmissionSummaryDTO"
   /api/admin/data-migration/run-batch:
     post:
       tags:
@@ -4186,6 +4198,21 @@ components:
           type: array
           items:
             type: string
+    QuestionGenerationBatchSubmissionSummaryDTO:
+      type: object
+      properties:
+        consideredUserCount:
+          type: integer
+          format: int32
+        submittedCount:
+          type: integer
+          format: int32
+        failedCount:
+          type: integer
+          format: int32
+        skippedCount:
+          type: integer
+          format: int32
     AdminDataMigrationStatusDTO:
       type: object
       properties:

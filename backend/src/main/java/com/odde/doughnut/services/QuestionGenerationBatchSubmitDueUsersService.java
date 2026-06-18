@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.controllers.dto.QuestionGenerationBatchSubmissionSummaryDTO;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.services.QuestionGenerationBatchUserSubmissionTx.DueUserSubmissionOutcome;
 import java.sql.Timestamp;
@@ -23,15 +24,26 @@ public class QuestionGenerationBatchSubmitDueUsersService {
     this.userSubmissionTx = userSubmissionTx;
   }
 
-  public void submitDueUsers(Timestamp currentTime) {
+  public QuestionGenerationBatchSubmissionSummaryDTO submitDueUsers(Timestamp currentTime) {
     List<User> dueUsers = planningService.findUsersEligibleForBatchSubmission(currentTime);
-    logger.info("Submitting question generation batches for {} due users", dueUsers.size());
+    return submitUsers(dueUsers, currentTime);
+  }
+
+  public QuestionGenerationBatchSubmissionSummaryDTO submitUsersWithRecentRecalls(
+      Timestamp currentTime) {
+    List<User> users = planningService.findUsersEligibleForManualBatchSubmission(currentTime);
+    return submitUsers(users, currentTime);
+  }
+
+  private QuestionGenerationBatchSubmissionSummaryDTO submitUsers(
+      List<User> users, Timestamp currentTime) {
+    logger.info("Submitting question generation batches for {} users", users.size());
 
     int submittedCount = 0;
     int failedCount = 0;
     int skippedCount = 0;
 
-    for (User user : dueUsers) {
+    for (User user : users) {
       try {
         DueUserSubmissionOutcome outcome = userSubmissionTx.processDueUser(user, currentTime);
         switch (outcome.kind()) {
@@ -71,5 +83,7 @@ public class QuestionGenerationBatchSubmitDueUsersService {
         submittedCount,
         failedCount,
         skippedCount);
+    return new QuestionGenerationBatchSubmissionSummaryDTO(
+        users.size(), submittedCount, failedCount, skippedCount);
   }
 }

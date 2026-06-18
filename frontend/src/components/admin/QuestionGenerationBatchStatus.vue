@@ -1,6 +1,29 @@
 <template>
   <div v-if="status">
     <section class="mb-6">
+      <h2 class="text-lg font-semibold mb-2">Manual generation</h2>
+      <div class="flex flex-wrap gap-2 items-center">
+        <button
+          type="button"
+          class="daisy-btn daisy-btn-primary"
+          data-testid="submit-recent-recall-users-button"
+          :disabled="submissionInFlight"
+          @click="submitRecentRecallUsers"
+        >
+          Generate for recent recall users
+        </button>
+      </div>
+      <div
+        v-if="submissionSummaryText"
+        class="daisy-alert daisy-alert-success mt-4"
+        role="status"
+        data-testid="submission-summary"
+      >
+        {{ submissionSummaryText }}
+      </div>
+    </section>
+
+    <section class="mb-6">
       <h2 class="text-lg font-semibold mb-2">Availability</h2>
       <div class="flex flex-wrap gap-2">
         <span
@@ -70,10 +93,17 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref } from "vue"
 import { AdminQuestionGenerationBatchController } from "@generated/doughnut-backend-api/sdk.gen"
-import type { QuestionGenerationBatchAdminStatusDto } from "@generated/doughnut-backend-api"
+import type {
+  QuestionGenerationBatchAdminStatusDto,
+  QuestionGenerationBatchSubmissionSummaryDto,
+} from "@generated/doughnut-backend-api"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const status = ref<QuestionGenerationBatchAdminStatusDto | undefined>(undefined)
+const submissionSummary = ref<
+  QuestionGenerationBatchSubmissionSummaryDto | undefined
+>(undefined)
+const submissionInFlight = ref(false)
 
 const batchStatusEntries = computed(
   () =>
@@ -97,6 +127,32 @@ const fetchStatus = async () => {
   )
   if (!error) {
     status.value = data
+  }
+}
+
+const submissionSummaryText = computed(() => {
+  const summary = submissionSummary.value
+  if (!summary) return undefined
+  return [
+    `Considered ${summary.consideredUserCount ?? 0}`,
+    `submitted ${summary.submittedCount ?? 0}`,
+    `failed ${summary.failedCount ?? 0}`,
+    `skipped ${summary.skippedCount ?? 0}`,
+  ].join(", ")
+})
+
+const submitRecentRecallUsers = async () => {
+  submissionInFlight.value = true
+  try {
+    const { data, error } = await apiCallWithLoading(() =>
+      AdminQuestionGenerationBatchController.submitRecentRecallUsersForQuestionGenerationBatch()
+    )
+    if (!error) {
+      submissionSummary.value = data
+      await fetchStatus()
+    }
+  } finally {
+    submissionInFlight.value = false
   }
 }
 

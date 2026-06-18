@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.QuestionGenerationBatchAdminStatusDTO;
+import com.odde.doughnut.controllers.dto.QuestionGenerationBatchSubmissionSummaryDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuestionGenerationBatch;
 import com.odde.doughnut.entities.QuestionGenerationBatchRequestStatus;
@@ -76,6 +77,26 @@ class AdminQuestionGenerationBatchControllerTest extends ControllerTestBase {
     assertThrows(
         UnexpectedNoAccessRightException.class,
         () -> controller.getQuestionGenerationBatchStatus());
+  }
+
+  @Test
+  void adminCanTriggerRecentRecallUsersSubmission() throws UnexpectedNoAccessRightException {
+    currentUser.setUser(makeMe.anAdmin().please());
+
+    QuestionGenerationBatchSubmissionSummaryDTO summary = controller.submitRecentRecallUsers();
+
+    assertThat(summary.getConsideredUserCount(), equalTo(0));
+    assertThat(summary.getSubmittedCount(), equalTo(0));
+    assertThat(summary.getFailedCount(), equalTo(0));
+    assertThat(summary.getSkippedCount(), equalTo(0));
+  }
+
+  @Test
+  void nonAdminCannotTriggerRecentRecallUsersSubmission() {
+    currentUser.setUser(makeMe.aUser().please());
+
+    assertThrows(
+        UnexpectedNoAccessRightException.class, () -> controller.submitRecentRecallUsers());
   }
 
   private void seedPlannedBatchWithPendingRequest() {

@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
+import com.odde.doughnut.controllers.dto.QuestionGenerationBatchSubmissionSummaryDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuestionGenerationBatch;
 import com.odde.doughnut.entities.QuestionGenerationBatchStatus;
@@ -80,10 +81,17 @@ class QuestionGenerationBatchSubmitDueUsersTest
         .thenReturn("batch-ok")
         .thenThrow(new RuntimeException("batch create failed"));
 
-    inCommittedTransaction(() -> submitDueUsersService.submitDueUsers(cronTime));
+    QuestionGenerationBatchSubmissionSummaryDTO[] summary =
+        new QuestionGenerationBatchSubmissionSummaryDTO[1];
+    inCommittedTransaction(() -> summary[0] = submitDueUsersService.submitDueUsers(cronTime));
 
     inCommittedTransaction(
         () -> {
+          assertThat(summary[0].getConsideredUserCount(), equalTo(2));
+          assertThat(summary[0].getSubmittedCount(), equalTo(1));
+          assertThat(summary[0].getFailedCount(), equalTo(1));
+          assertThat(summary[0].getSkippedCount(), equalTo(0));
+
           List<QuestionGenerationBatch> testBatches =
               batchRepository.findAll().stream()
                   .filter(
@@ -150,10 +158,17 @@ class QuestionGenerationBatchSubmitDueUsersTest
         .when(planningService)
         .findUsersEligibleForBatchSubmission(cronTime);
 
-    inCommittedTransaction(() -> submitDueUsersService.submitDueUsers(cronTime));
+    QuestionGenerationBatchSubmissionSummaryDTO[] summary =
+        new QuestionGenerationBatchSubmissionSummaryDTO[1];
+    inCommittedTransaction(() -> summary[0] = submitDueUsersService.submitDueUsers(cronTime));
 
     inCommittedTransaction(
         () -> {
+          assertThat(summary[0].getConsideredUserCount(), equalTo(1));
+          assertThat(summary[0].getSubmittedCount(), equalTo(0));
+          assertThat(summary[0].getFailedCount(), equalTo(0));
+          assertThat(summary[0].getSkippedCount(), equalTo(1));
+
           assertThat(
               batchRepository.findAll().stream()
                   .anyMatch(batch -> batch.getUser().getId().equals(dueUser[0].getId())),

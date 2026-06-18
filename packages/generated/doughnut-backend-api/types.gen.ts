@@ -617,6 +617,13 @@ export type RefinementSuggestionsDto = {
     suggestions?: Array<string>;
 };
 
+export type QuestionGenerationBatchSubmissionSummaryDto = {
+    consideredUserCount?: number;
+    submittedCount?: number;
+    failedCount?: number;
+    skippedCount?: number;
+};
+
 export type AdminDataMigrationStatusDto = {
     message?: string;
     dataMigrationComplete?: boolean;
@@ -2390,6 +2397,22 @@ export type ExtractNoteResponses = {
 };
 
 export type ExtractNoteResponse = ExtractNoteResponses[keyof ExtractNoteResponses];
+
+export type SubmitRecentRecallUsersForQuestionGenerationBatchData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/admin/question-generation-batch/submit-recent-recall-users';
+};
+
+export type SubmitRecentRecallUsersForQuestionGenerationBatchResponses = {
+    /**
+     * OK
+     */
+    200: QuestionGenerationBatchSubmissionSummaryDto;
+};
+
+export type SubmitRecentRecallUsersForQuestionGenerationBatchResponse = SubmitRecentRecallUsersForQuestionGenerationBatchResponses[keyof SubmitRecentRecallUsersForQuestionGenerationBatchResponses];
 
 export type RunDataMigrationBatchData = {
     body?: never;

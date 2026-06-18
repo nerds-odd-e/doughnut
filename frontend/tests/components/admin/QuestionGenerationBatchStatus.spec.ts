@@ -1,9 +1,15 @@
 import QuestionGenerationBatchStatus from "@/components/admin/QuestionGenerationBatchStatus.vue"
 import { AdminQuestionGenerationBatchController } from "@generated/doughnut-backend-api/sdk.gen"
-import type { QuestionGenerationBatchAdminStatusDto } from "@generated/doughnut-backend-api/types.gen"
+import type {
+  QuestionGenerationBatchAdminStatusDto,
+  QuestionGenerationBatchSubmissionSummaryDto,
+} from "@generated/doughnut-backend-api/types.gen"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, expect, it } from "vitest"
-import helper, { mockSdkService } from "@tests/helpers"
+import helper, {
+  mockSdkService,
+  mockSdkServiceWithImplementation,
+} from "@tests/helpers"
 
 describe("QuestionGenerationBatchStatus", () => {
   const sampleStatus: QuestionGenerationBatchAdminStatusDto = {
@@ -29,6 +35,16 @@ describe("QuestionGenerationBatchStatus", () => {
       AdminQuestionGenerationBatchController,
       "getQuestionGenerationBatchStatus",
       sampleStatus
+    )
+    mockSdkService(
+      AdminQuestionGenerationBatchController,
+      "submitRecentRecallUsersForQuestionGenerationBatch",
+      {
+        consideredUserCount: 3,
+        submittedCount: 2,
+        failedCount: 0,
+        skippedCount: 1,
+      }
     )
   })
 
@@ -65,6 +81,90 @@ describe("QuestionGenerationBatchStatus", () => {
     expect(wrapper.get('[data-testid="scheduler-badge"]').text()).toContain(
       "inactive"
     )
+  })
+
+  it("renders the manual generation button", async () => {
+    const wrapper = helper.component(QuestionGenerationBatchStatus).mount()
+    await flushPromises()
+
+    expect(
+      wrapper.get('[data-testid="submit-recent-recall-users-button"]').text()
+    ).toContain("Generate for recent recall users")
+  })
+
+  it("triggers manual generation and refreshes status with summary", async () => {
+    const statusSpy = mockSdkService(
+      AdminQuestionGenerationBatchController,
+      "getQuestionGenerationBatchStatus",
+      sampleStatus
+    )
+    const submitSpy = mockSdkService(
+      AdminQuestionGenerationBatchController,
+      "submitRecentRecallUsersForQuestionGenerationBatch",
+      {
+        consideredUserCount: 3,
+        submittedCount: 2,
+        failedCount: 0,
+        skippedCount: 1,
+      }
+    )
+    const wrapper = helper.component(QuestionGenerationBatchStatus).mount()
+    await flushPromises()
+    const statusCallCountBeforeSubmit = statusSpy.mock.calls.length
+
+    await wrapper
+      .get('[data-testid="submit-recent-recall-users-button"]')
+      .trigger("click")
+    await flushPromises()
+
+    expect(submitSpy).toHaveBeenCalled()
+    expect(statusSpy.mock.calls.length).toBeGreaterThan(
+      statusCallCountBeforeSubmit
+    )
+    expect(wrapper.get('[data-testid="submission-summary"]').text()).toContain(
+      "Considered 3, submitted 2, failed 0, skipped 1"
+    )
+  })
+
+  it("disables the manual generation button while submitting", async () => {
+    let resolveSubmission:
+      | ((summary: QuestionGenerationBatchSubmissionSummaryDto) => void)
+      | undefined
+    mockSdkServiceWithImplementation(
+      AdminQuestionGenerationBatchController,
+      "submitRecentRecallUsersForQuestionGenerationBatch",
+      () =>
+        new Promise<QuestionGenerationBatchSubmissionSummaryDto>((resolve) => {
+          resolveSubmission = resolve
+        })
+    )
+    const wrapper = helper.component(QuestionGenerationBatchStatus).mount()
+    await flushPromises()
+
+    await wrapper
+      .get('[data-testid="submit-recent-recall-users-button"]')
+      .trigger("click")
+    await flushPromises()
+
+    expect(
+      wrapper
+        .get('[data-testid="submit-recent-recall-users-button"]')
+        .attributes("disabled")
+    ).toBeDefined()
+
+    resolveSubmission?.({
+      consideredUserCount: 1,
+      submittedCount: 1,
+      failedCount: 0,
+      skippedCount: 0,
+    })
+    await flushPromises()
+
+    expect(
+      wrapper
+        .get('[data-testid="submit-recent-recall-users-button"]')
+        .attributes("disabled")
+    ).toBeUndefined()
   })
 
   it("shows warning badge when OpenAI token is not configured", async () => {

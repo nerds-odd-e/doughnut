@@ -60,16 +60,28 @@ public class QuestionGenerationBatchPlanningService {
 
   public List<User> findUsersEligibleForBatchSubmission(Timestamp currentTime) {
     Timestamp windowStart = new Timestamp(currentTime.getTime() - RECENT_RECALL_WINDOW_MILLIS);
-    return recallPromptRepository
-        .findUserIdsWithAnsweredRecallsInTimeRange(windowStart, currentTime)
-        .stream()
-        .map(userRepository::findById)
-        .flatMap(Optional::stream)
+    return findUsersWithRecentRecallActivity(windowStart, currentTime).stream()
         .filter(user -> isUserEligibleForNewBatchSubmission(user, currentTime))
         .filter(
             user ->
                 isUserEligibleViaOpenAiFailureRetryPath(user, currentTime)
                     || isUserDueInCurrentCronHour(user, currentTime, windowStart))
+        .toList();
+  }
+
+  public List<User> findUsersEligibleForManualBatchSubmission(Timestamp currentTime) {
+    Timestamp windowStart = new Timestamp(currentTime.getTime() - RECENT_RECALL_WINDOW_MILLIS);
+    return findUsersWithRecentRecallActivity(windowStart, currentTime).stream()
+        .filter(user -> isUserEligibleForNewBatchSubmission(user, currentTime))
+        .toList();
+  }
+
+  private List<User> findUsersWithRecentRecallActivity(Timestamp windowStart, Timestamp endTime) {
+    return recallPromptRepository
+        .findUserIdsWithAnsweredRecallsInTimeRange(windowStart, endTime)
+        .stream()
+        .map(userRepository::findById)
+        .flatMap(Optional::stream)
         .toList();
   }
 

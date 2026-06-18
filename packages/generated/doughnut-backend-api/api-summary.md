@@ -198,6 +198,11 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `dummyEntryToGenerateDataTypesThatAreRequiredInEventStream`: GET `/api/ai/dummy` -> `DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamResponse` (request: none; response body: DummyForGeneratingTypes)
 - `getAvailableGptModels`: GET `/api/ai/available-gpt-models` -> `GetAvailableGptModelsResponse` (request: none; response body: Array<string>)
 
+## Admin Question Generation Batch Controller
+
+- `submitRecentRecallUsersForQuestionGenerationBatch`: POST `/api/admin/question-generation-batch/submit-recent-recall-users` -> `SubmitRecentRecallUsersForQuestionGenerationBatchResponse` (request: none; response body: QuestionGenerationBatchSubmissionSummaryDto)
+- `getQuestionGenerationBatchStatus`: GET `/api/admin/question-generation-batch/status` -> `GetQuestionGenerationBatchStatusResponse` (request: none; response body: QuestionGenerationBatchAdminStatusDto)
+
 ## Admin Data Migration Controller
 
 - `runDataMigrationBatch`: POST `/api/admin/data-migration/run-batch` -> `RunDataMigrationBatchResponse` (request: none; response body: AdminDataMigrationStatusDto)
@@ -238,7 +243,3 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 ## Admin User Controller
 
 - `listUsers`: GET `/api/admin/users` -> `ListUsersResponse` (request: `ListUsersData`; query: pageIndex, pageSize; response body: UserListingPage)
-
-## Admin Question Generation Batch Controller
-
-- `getQuestionGenerationBatchStatus`: GET `/api/admin/question-generation-batch/status` -> `GetQuestionGenerationBatchStatusResponse` (request: none; response body: QuestionGenerationBatchAdminStatusDto)
