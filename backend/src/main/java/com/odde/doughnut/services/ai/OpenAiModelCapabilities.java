@@ -30,6 +30,6 @@ public final class OpenAiModelCapabilities {
     if (reasoningEffort == ReasoningEffort.NONE) {
       return 1000L;
     }
-    return batch ? 4000L : 2000L;
+    return batch ? 12000L : 2000L;
   }
 }

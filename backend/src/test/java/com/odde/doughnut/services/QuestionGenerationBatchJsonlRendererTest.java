@@ -179,6 +179,7 @@ class QuestionGenerationBatchJsonlRendererTest {
       @SuppressWarnings("unchecked")
       Map<String, Object> body = (Map<String, Object>) lines.get(0).get("body");
       assertThat(body, is(expectedBodyForRequest(batch, requests.get(0))));
+      assertThat(body.get("max_output_tokens"), is(12000));
       @SuppressWarnings("unchecked")
       Map<String, Object> reasoning = (Map<String, Object>) body.get("reasoning");
       assertThat(reasoning.get("effort"), is("high"));

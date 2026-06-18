@@ -70,7 +70,7 @@ class OpenAiModelCapabilitiesTest {
           is(2000L));
       assertThat(
           OpenAiModelCapabilities.questionGenerationMaxOutputTokens(ReasoningEffort.HIGH, true),
-          is(4000L));
+          is(12000L));
     }
   }
 }
