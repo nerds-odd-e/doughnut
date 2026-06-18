@@ -101,17 +101,35 @@ describe("richModeKeyDropdownPresetKeysForPropertyRows", () => {
       richModeKeyDropdownPresetKeysForPropertyRows(false, [
         { key: "image", value: "/a.png" },
       ])
-    ).toEqual(["image 2", "wikidata_id", "url", "example of"])
+    ).toEqual([
+      "image 2",
+      "wikidata_id",
+      "url",
+      "example of",
+      "question_generation_instruction",
+    ])
     expect(
       richModeKeyDropdownPresetKeysForPropertyRows(false, [
         { key: "wikidataId", value: "Q1" },
       ])
-    ).toEqual(["image", "wikidata_id 2", "url", "example of"])
+    ).toEqual([
+      "image",
+      "wikidata_id 2",
+      "url",
+      "example of",
+      "question_generation_instruction",
+    ])
     expect(
       richModeKeyDropdownPresetKeysForPropertyRows(false, [
         { key: "url", value: "https://x" },
       ])
-    ).toEqual(["image", "wikidata_id", "url 2", "example of"])
+    ).toEqual([
+      "image",
+      "wikidata_id",
+      "url 2",
+      "example of",
+      "question_generation_instruction",
+    ])
   })
 
   it("ignores rows with empty keys", () => {
@@ -125,20 +143,24 @@ describe("richModeKeyDropdownPresetKeysForPropertyRows", () => {
 })
 
 describe("richModeKeyDropdownPresetKeys", () => {
-  it("appends index-only keys when isIndexContext is true", () => {
+  it("includes question_generation_instruction in default presets", () => {
     expect(richModeKeyDropdownPresetKeys(false)).toEqual([
       "image",
       "wikidata_id",
       "url",
       "example of",
+      "question_generation_instruction",
     ])
+  })
+
+  it("appends index-only keys when isIndexContext is true", () => {
     expect(richModeKeyDropdownPresetKeys(true)).toEqual([
       "image",
       "wikidata_id",
       "url",
       "example of",
-      "title_pattern",
       "question_generation_instruction",
+      "title_pattern",
     ])
   })
 })

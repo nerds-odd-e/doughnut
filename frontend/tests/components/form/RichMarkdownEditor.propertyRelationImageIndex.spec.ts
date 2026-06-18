@@ -137,7 +137,6 @@ Paragraph.\n`
 
       const last = h.lastEmittedMarkdown()
       expect(last).not.toContain("title_pattern")
-      expect(last).not.toContain("question_generation_instruction")
       expect(last).toContain("Updated Body")
     })
 

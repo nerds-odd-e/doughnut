@@ -16,6 +16,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -338,6 +339,27 @@ class NoteRealmServiceTest {
     assertThat(realm.getIndexNoteContent(), nullValue());
     assertThat(
         noteRealmService.resolveScopedQuestionGenerationInstruction(normal), is(Optional.empty()));
+  }
+
+  @Test
+  void resolve_question_generation_instructions_returns_note_frontmatter_only() {
+    Note note =
+        makeMe
+            .aNote()
+            .notebook(notebook)
+            .content("---\nquestion_generation_instruction: Note-level text\n---\nBody")
+            .please();
+
+    assertThat(
+        noteRealmService.resolveQuestionGenerationInstructions(note),
+        equalTo(List.of("Note-level text")));
+  }
+
+  @Test
+  void resolve_question_generation_instructions_empty_when_absent() {
+    Note note = makeMe.aNote().notebook(notebook).content("Body").please();
+
+    assertThat(noteRealmService.resolveQuestionGenerationInstructions(note), empty());
   }
 
   private void persistWikiLink(Note carrier, Note target, String linkText) {

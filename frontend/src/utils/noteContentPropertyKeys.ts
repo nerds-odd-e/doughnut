@@ -6,16 +6,14 @@ export const RICH_MODE_PRESET_PROPERTY_KEYS = [
   "wikidata_id",
   "url",
   "example of",
+  "question_generation_instruction",
 ] as const
 
 /**
  * Predefined property keys shown only when editing a designated index note
  * (notebook index, folder index, or direct /n<noteId> for those notes).
  */
-export const INDEX_ONLY_PRESET_PROPERTY_KEYS = [
-  "title_pattern",
-  "question_generation_instruction",
-] as const
+export const INDEX_ONLY_PRESET_PROPERTY_KEYS = ["title_pattern"] as const
 
 /** Splits a property key into its base name and optional numeric suffix (`url 2` → suffix 2). */
 export function propertyKeyBaseAndSuffix(key: string): {
@@ -84,8 +82,7 @@ export function isQuestionGenerationInstructionPropertyKey(
 export function isReservedIndexOnlyPropertyKey(key: string): boolean {
   return (
     (INDEX_ONLY_PRESET_PROPERTY_KEYS as readonly string[]).includes(key) ||
-    isTitlePatternPropertyKey(key) ||
-    isQuestionGenerationInstructionPropertyKey(key)
+    isTitlePatternPropertyKey(key)
   )
 }
 
@@ -97,9 +94,6 @@ export function rowFillsIndexOnlyPresetSlot(
   if (rowKey === canonicalPresetKey) return true
   if (canonicalPresetKey === "title_pattern") {
     return isTitlePatternPropertyKey(rowKey)
-  }
-  if (canonicalPresetKey === "question_generation_instruction") {
-    return isQuestionGenerationInstructionPropertyKey(rowKey)
   }
   return false
 }
@@ -121,7 +115,7 @@ export function propertyKeyMatchesPresetFamily(
     case "title_pattern":
       return rowFillsIndexOnlyPresetSlot(key, "title_pattern")
     case "question_generation_instruction":
-      return rowFillsIndexOnlyPresetSlot(key, "question_generation_instruction")
+      return isQuestionGenerationInstructionPropertyKey(key)
     default:
       return false
   }

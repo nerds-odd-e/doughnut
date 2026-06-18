@@ -9,6 +9,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,6 +77,17 @@ public class NoteRealmService {
       }
     }
     return questionGenerationInstructionFromContent(focus.getNotebook().getIndexContent());
+  }
+
+  /**
+   * Container-scoped instruction (nearest folder → notebook), then note frontmatter, omitting
+   * blanks.
+   */
+  public List<String> resolveQuestionGenerationInstructions(Note focus) {
+    List<String> instructions = new ArrayList<>();
+    resolveScopedQuestionGenerationInstruction(focus).ifPresent(instructions::add);
+    questionGenerationInstructionFromContent(focus.getContent()).ifPresent(instructions::add);
+    return instructions;
   }
 
   private String resolveIndexNoteContentForNote(Note focus) {

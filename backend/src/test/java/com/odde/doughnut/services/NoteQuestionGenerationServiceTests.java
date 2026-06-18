@@ -145,18 +145,23 @@ class NoteQuestionGenerationServiceTests {
     }
   }
 
-  private Note noteWithScopedQuestionGenerationInstruction(String marker) {
+  private Note noteWithQuestionGenerationInstructions(
+      String containerInstruction, String noteInstruction) {
     User user = makeMe.aUser().please();
     Notebook nb = makeMe.aNotebook().creatorAndOwner(user).please();
-    makeMe
-        .theNotebook(nb)
-        .indexContent("---\nquestion_generation_instruction: " + marker + "\n---\n")
-        .please();
-    return makeMe
-        .aNote()
-        .notebook(nb)
-        .content("Note body text included in the focus context.")
-        .please();
+    if (containerInstruction != null) {
+      makeMe
+          .theNotebook(nb)
+          .indexContent("---\nquestion_generation_instruction: " + containerInstruction + "\n---\n")
+          .please();
+    }
+    String content =
+        noteInstruction != null
+            ? "---\nquestion_generation_instruction: "
+                + noteInstruction
+                + "\n---\nNote body text included in the focus context."
+            : "Note body text included in the focus context.";
+    return makeMe.aNote().notebook(nb).content(content).please();
   }
 
   @Nested
@@ -182,7 +187,7 @@ class NoteQuestionGenerationServiceTests {
 
     @Test
     void shouldPlaceScopedQuestionInstructionAsFirstUserMessageBeforeFocusContext() {
-      Note noteInScope = noteWithScopedQuestionGenerationInstruction("SCOPED_QGEN_MARKER");
+      Note noteInScope = noteWithQuestionGenerationInstructions("SCOPED_QGEN_MARKER", null);
 
       StructuredResponseCreateParams<MCQWithAnswer> request =
           service.buildQuestionGenerationRequest(noteInScope, null);
@@ -199,6 +204,25 @@ class NoteQuestionGenerationServiceTests {
               request, QuestionGenerationRequestBuilder.CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER),
           is(false));
       assertThat(instructionContains(request, "focus note"), is(true));
+    }
+
+    @Test
+    void shouldPlaceContainerThenNoteQuestionInstructionsInFirstUserMessage() {
+      Note note = noteWithQuestionGenerationInstructions("FOLDER_INSTRUCTION", "NOTE_INSTRUCTION");
+
+      StructuredResponseCreateParams<MCQWithAnswer> request =
+          service.buildQuestionGenerationRequest(note, null);
+
+      List<String> userBodies = userMessageContentStrings(request);
+      String instructionMessage = userBodies.get(0);
+      assertThat(
+          instructionMessage,
+          containsString(QuestionGenerationRequestBuilder.CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER));
+      assertThat(instructionMessage, containsString("FOLDER_INSTRUCTION"));
+      assertThat(instructionMessage, containsString("NOTE_INSTRUCTION"));
+      assertThat(
+          instructionMessage.indexOf("FOLDER_INSTRUCTION"),
+          lessThan(instructionMessage.indexOf("NOTE_INSTRUCTION")));
     }
 
     @Test
@@ -241,7 +265,7 @@ class NoteQuestionGenerationServiceTests {
 
     @Test
     void shouldOrderUserMessagesScopedInstructionThenFocusThenAdditional() {
-      Note noteInScope = noteWithScopedQuestionGenerationInstruction("SCOPED_QGEN_MARKER");
+      Note noteInScope = noteWithQuestionGenerationInstructions("SCOPED_QGEN_MARKER", null);
 
       StructuredResponseCreateParams<MCQWithAnswer> request =
           service.buildQuestionGenerationRequest(
