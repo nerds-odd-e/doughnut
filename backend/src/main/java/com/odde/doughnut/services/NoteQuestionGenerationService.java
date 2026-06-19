@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.MCQWithAnswerForRefinement;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.services.ai.builder.OpenAIResponseRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
@@ -60,12 +61,6 @@ public class NoteQuestionGenerationService {
         note, additionalMessage, contextSeed, propertyKey, viewer);
   }
 
-  public <T> OpenAIResponseRequestBuilder<T> openAiResponseRequestForSharedNoteContext(
-      Class<T> responseType, Note note, String additionalMessage) {
-    return requestBuilder.openAiResponseRequestForQuestionGeneration(
-        responseType, note, additionalMessage, null);
-  }
-
   private MCQWithAnswer generateQuestionWithResponses(
       Note note, String additionalMessage, Long contextSeed, String propertyKey) {
     StructuredResponseCreateParams<MCQWithAnswer> responseRequest =
@@ -76,6 +71,18 @@ public class NoteQuestionGenerationService {
         .requestAndGetStructuredResponseResult(responseRequest)
         .map(question -> question != null && question.isValid() ? question : null)
         .orElse(null);
+  }
+
+  public Optional<MCQWithAnswer> refineQuestion(Note note, MCQWithAnswer question) {
+    InstructionAndSchema tool = AiToolFactory.questionRefineAiTool(question);
+    OpenAIResponseRequestBuilder<MCQWithAnswerForRefinement> responseRequestBuilder =
+        requestBuilder.openAiResponseRequestForQuestionGeneration(
+            MCQWithAnswerForRefinement.class, note, null, null);
+    responseRequestBuilder.addInstruction(tool.getMessageBody());
+
+    return openAiApiHandler
+        .requestAndGetStructuredResponseResult(responseRequestBuilder.build())
+        .map(refined -> (MCQWithAnswer) refined);
   }
 
   public Optional<QuestionEvaluation> evaluateQuestion(Note note, MCQWithAnswer question)

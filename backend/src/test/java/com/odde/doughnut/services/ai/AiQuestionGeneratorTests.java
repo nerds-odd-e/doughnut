@@ -6,9 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
-import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.NoteQuestionGenerationService;
-import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -32,9 +29,6 @@ class AiQuestionGeneratorTests {
   OpenAIClient officialClient;
 
   @Autowired MakeMe makeMe;
-  @Autowired GlobalSettingsService globalSettingsService;
-  @Autowired OpenAiApiHandler openAiApiHandler;
-  @Autowired NoteQuestionGenerationService noteQuestionGenerationService;
   @Autowired AiQuestionGenerator aiQuestionGenerator;
   @Autowired TestabilitySettings testabilitySettings;
   OpenAiStructuredResponseMock openAiStructuredResponseMock;

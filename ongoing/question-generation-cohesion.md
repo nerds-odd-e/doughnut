@@ -91,7 +91,7 @@ Tests:
 
 ## Phase 3: Clarify Question Generation Service Boundaries
 
-Status: planned
+Status: done
 
 Type: Structure
 
@@ -114,6 +114,10 @@ Implementation notes:
 - Remove unused or misleading fields from `AiQuestionGenerator` if extraction makes them unnecessary.
 - Consider whether `AiQuestionGeneratorForNote` still pulls its weight or whether its behavior is clearer folded into `AiQuestionGenerator`; do this only if it reduces indirection without widening behavior.
 - Do not move request construction or OpenAI transport behavior into the post-processor.
+
+Discovery:
+
+- `QuestionGenerationRequestBuilder.openAiResponseRequestForQuestionGeneration(...)` already applies `globalSettingQuestionGeneration()`, so folding refinement request execution into `NoteQuestionGenerationService` keeps the selected model behavior unchanged without `AiQuestionGenerator` depending on `GlobalSettingsService`.
 
 Tests:
 

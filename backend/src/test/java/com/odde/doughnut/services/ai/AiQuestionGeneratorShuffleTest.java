@@ -9,9 +9,7 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.NoteQuestionGenerationService;
-import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -21,17 +19,11 @@ class AiQuestionGeneratorShuffleTest {
   void shouldReturnPostProcessedGeneratedQuestion() throws JsonProcessingException {
     NoteQuestionGenerationService noteQuestionGenerationService =
         mock(NoteQuestionGenerationService.class);
-    GlobalSettingsService globalSettingsService = mock(GlobalSettingsService.class);
-    OpenAiApiHandler openAiApiHandler = mock(OpenAiApiHandler.class);
     GeneratedQuestionPostProcessor generatedQuestionPostProcessor =
         mock(GeneratedQuestionPostProcessor.class);
 
     AiQuestionGenerator generator =
-        new AiQuestionGenerator(
-            noteQuestionGenerationService,
-            globalSettingsService,
-            openAiApiHandler,
-            generatedQuestionPostProcessor);
+        new AiQuestionGenerator(noteQuestionGenerationService, generatedQuestionPostProcessor);
 
     Note note = mock(Note.class);
     MCQWithAnswer originalQuestion =

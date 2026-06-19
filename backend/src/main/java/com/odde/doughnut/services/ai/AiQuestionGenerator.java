@@ -3,30 +3,21 @@ package com.odde.doughnut.services.ai;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.NoteQuestionGenerationService;
-import com.odde.doughnut.services.ai.builder.OpenAIResponseRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
-import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AiQuestionGenerator {
   private final NoteQuestionGenerationService noteQuestionGenerationService;
-  private final GlobalSettingsService globalSettingsService;
-  private final OpenAiApiHandler openAiApiHandler;
   private final GeneratedQuestionPostProcessor generatedQuestionPostProcessor;
 
   @Autowired
   public AiQuestionGenerator(
       NoteQuestionGenerationService noteQuestionGenerationService,
-      GlobalSettingsService globalSettingsService,
-      OpenAiApiHandler openAiApiHandler,
       GeneratedQuestionPostProcessor generatedQuestionPostProcessor) {
     this.noteQuestionGenerationService = noteQuestionGenerationService;
-    this.globalSettingsService = globalSettingsService;
-    this.openAiApiHandler = openAiApiHandler;
     this.generatedQuestionPostProcessor = generatedQuestionPostProcessor;
   }
 
@@ -52,8 +43,8 @@ public class AiQuestionGenerator {
   }
 
   public MCQWithAnswer getAiGeneratedRefineQuestion(Note note, MCQWithAnswer mcqWithAnswer) {
-    return forNote(note, globalSettingsService.globalSettingQuestionGeneration().getValue())
-        .refineQuestion(mcqWithAnswer)
+    return noteQuestionGenerationService
+        .refineQuestion(note, mcqWithAnswer)
         .map(generatedQuestionPostProcessor::postProcess)
         .orElse(null);
   }
@@ -64,14 +55,6 @@ public class AiQuestionGenerator {
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  private AiQuestionGeneratorForNote forNote(Note note, String modelName1) {
-    OpenAIResponseRequestBuilder<MCQWithAnswerForRefinement> responseRequestBuilder =
-        noteQuestionGenerationService.openAiResponseRequestForSharedNoteContext(
-            MCQWithAnswerForRefinement.class, note, null);
-    responseRequestBuilder.model(modelName1);
-    return new AiQuestionGeneratorForNote(openAiApiHandler, responseRequestBuilder);
   }
 
   public MCQWithAnswer regenerateQuestion(
