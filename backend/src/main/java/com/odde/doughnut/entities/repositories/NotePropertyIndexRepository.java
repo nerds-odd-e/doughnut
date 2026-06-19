@@ -1,5 +1,6 @@
 package com.odde.doughnut.entities.repositories;
 
+import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.NotePropertyIndex;
 import java.util.List;
 import java.util.stream.Stream;
@@ -10,21 +11,26 @@ import org.springframework.data.repository.query.Param;
 
 public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyIndex, Integer> {
 
-  String unassimilatedJoinMemoryTracker =
+  String unassimilatedJoinPropertyTracker =
       " LEFT JOIN n.memoryTrackers mt ON mt.user.id = :userId"
           + " AND mt.deletedAt IS NULL"
           + " AND COALESCE(mt.spelling, FALSE) = FALSE"
-          + " AND mt.propertyKey = i.propertyKey"
-          + " LEFT JOIN i.targetNote t"
+          + " AND mt.propertyKey = i.propertyKey";
+
+  String targetNoteGateJoin =
+      " LEFT JOIN i.targetNote t"
           + " LEFT JOIN t.memoryTrackers tmt ON tmt.user.id = :userId"
           + " AND tmt.deletedAt IS NULL"
-          + " AND (tmt.propertyKey IS NULL OR tmt.propertyKey = '')";
+          + " AND "
+          + MemoryTracker.JPA_WHERE_NOTE_LEVEL_TARGET_TRACKER;
 
   String unassimilatedWhereClause =
       " WHERE mt IS NULL"
           + " AND COALESCE(n.recallSetting.skipMemoryTracking, FALSE) = FALSE"
-          + " AND n.deletedAt IS NULL"
-          + " AND (t IS NULL OR t.deletedAt IS NOT NULL"
+          + " AND n.deletedAt IS NULL ";
+
+  String targetNoteGateWhere =
+      " AND (t IS NULL OR t.deletedAt IS NOT NULL"
           + " OR COALESCE(t.recallSetting.skipMemoryTracking, FALSE) = TRUE"
           + " OR tmt IS NOT NULL) ";
 
@@ -41,8 +47,10 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
           "SELECT i FROM NotePropertyIndex i"
               + " JOIN FETCH i.note n"
               + " JOIN n.notebook nb ON nb.ownership.id = :ownershipId"
-              + unassimilatedJoinMemoryTracker
+              + unassimilatedJoinPropertyTracker
+              + targetNoteGateJoin
               + unassimilatedWhereClause
+              + targetNoteGateWhere
               + unassimilatedOrderBy)
   Stream<NotePropertyIndex> streamUnassimilatedPropertiesForOwnership(
       @Param("userId") Integer userId, @Param("ownershipId") Integer ownershipId);
@@ -52,8 +60,10 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
           "SELECT i FROM NotePropertyIndex i"
               + " JOIN FETCH i.note n"
               + " JOIN n.notebook nb"
-              + unassimilatedJoinMemoryTracker
+              + unassimilatedJoinPropertyTracker
+              + targetNoteGateJoin
               + unassimilatedWhereClause
+              + targetNoteGateWhere
               + " AND nb.id = :notebookId"
               + unassimilatedOrderBy)
   Stream<NotePropertyIndex> streamUnassimilatedPropertiesForNotebook(

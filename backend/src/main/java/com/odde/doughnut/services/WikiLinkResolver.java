@@ -1,7 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.algorithms.NoteContentMarkdown;
-import com.odde.doughnut.algorithms.WikiLinkMarkdown;
+import com.odde.doughnut.algorithms.WikiLinkTargetReference;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
@@ -71,20 +71,11 @@ public class WikiLinkResolver {
 
   private Note resolveParsedLink(
       String token, Note focusNote, BiFunction<String, String, Note> notebookMatcher) {
-    var parts = WikiLinkMarkdown.splitInner(token);
-    String resolutionKey = parts.target();
-    if (resolutionKey == null || resolutionKey.isBlank()) {
-      return null;
-    }
-    Qualified qualified = Qualified.tryParse(resolutionKey);
-    if (qualified != null) {
-      return notebookMatcher.apply(qualified.notebookName(), qualified.noteTitle());
-    }
-    Notebook focusNotebook = focusNote.getNotebook();
-    if (focusNotebook == null) {
-      return null;
-    }
-    return notebookMatcher.apply(focusNotebook.getName(), resolutionKey);
+    String focusNotebookName =
+        focusNote.getNotebook() == null ? null : focusNote.getNotebook().getName();
+    return WikiLinkTargetReference.forToken(token, focusNotebookName)
+        .map(ref -> notebookMatcher.apply(ref.notebookName(), ref.noteTitle()))
+        .orElse(null);
   }
 
   private Note firstNotebookMatch(String notebookName, String noteTitle) {
@@ -104,21 +95,6 @@ public class WikiLinkResolver {
 
   private List<Note> noteCandidates(String notebookName, String noteTitle) {
     return noteRepository.findByNotebookNameAndNoteTitleOrderByIdAsc(notebookName, noteTitle);
-  }
-
-  private record Qualified(String notebookName, String noteTitle) {
-    static Qualified tryParse(String token) {
-      int i = token.indexOf(':');
-      if (i <= 0 || i >= token.length() - 1) {
-        return null;
-      }
-      String nb = token.substring(0, i).trim();
-      String nt = token.substring(i + 1).trim();
-      if (nb.isEmpty() || nt.isEmpty()) {
-        return null;
-      }
-      return new Qualified(nb, nt);
-    }
   }
 
   private static List<String> dedupePreserveOrder(List<String> titles) {

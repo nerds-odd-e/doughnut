@@ -25,7 +25,7 @@ public class NotePropertyIndex extends EntityIdentifiedByIdOnly {
   @Setter
   private String propertyKey;
 
-  @ManyToOne(fetch = FetchType.LAZY, optional = true)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "target_note_id", referencedColumnName = "id")
   @JsonIgnore
   @Getter
