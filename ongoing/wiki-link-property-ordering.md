@@ -1,6 +1,6 @@
 # Order wiki-link properties after their target note
 
-**Status: in progress (Phase 2 done).**
+**Status: complete.**
 
 A frontmatter property whose value is a wiki link (e.g. `example of: "[[Word]]"`) must be
 assimilated *after* its target note. Implemented as a **gate**: while the resolved target
@@ -107,6 +107,8 @@ Delivers the core value for all notes saved/edited after deploy.
 4. Commit, push, deploy gate.
 
 ## Phase 3 (Data) — Backfill existing property rows
+
+**Done.**
 
 Retrofits pre-existing data so the gate applies without requiring a re-save.
 
