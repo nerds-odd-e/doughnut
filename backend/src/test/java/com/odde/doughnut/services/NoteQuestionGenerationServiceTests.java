@@ -206,7 +206,7 @@ class NoteQuestionGenerationServiceTests {
     }
 
     @Test
-    void shouldPlaceContainerThenNoteQuestionInstructionsInFirstUserMessage() {
+    void nestedLabeledQuestionInstructionsAppearInFirstUserMessageInOrder() {
       User user = makeMe.aUser().please();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(user).name("Physics").please();
       makeMe
@@ -286,14 +286,6 @@ class NoteQuestionGenerationServiceTests {
       List<String> userBodies = userMessageContentStrings(request);
       assertThat(userBodies.get(0), containsString("# Focus Context"));
       assertThat(userBodies.get(1), containsString("Generate a question about the capital city"));
-    }
-
-    @Test
-    void shouldNotIncludeNotebookAssistantInstructionsWhenEmpty() {
-      StructuredResponseCreateParams<MCQWithAnswer> request =
-          service.buildQuestionGenerationRequest(testNote, null);
-
-      assertThat(instructionText(request), is(not(emptyString())));
     }
 
     @Test

@@ -8,7 +8,6 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
 import com.openai.models.responses.EasyInputMessage;
-import com.openai.models.responses.ResponseCreateParams;
 import com.openai.models.responses.ResponseInputItem;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
@@ -39,11 +38,7 @@ class ConversationAiRequestBuilderTest {
       Note note = makeMe.aNote().please();
       Conversation conversation = makeMe.aConversation().forANote(note).please();
 
-      ConversationAiRequestBuilder builder =
-          new ConversationAiRequestBuilder(
-              focusContextRetrievalService, focusContextMarkdownRenderer);
-      ResponseCreateParams params = builder.buildResponseCreateParams(conversation, "gpt-4.1-mini");
-      List<ResponseInputItem> items = params.input().flatMap(i -> i.response()).orElseThrow();
+      List<ResponseInputItem> items = inputItems(conversation);
 
       assertFalse(items.isEmpty());
       ResponseInputItem firstMessage = items.getFirst();
@@ -60,12 +55,7 @@ class ConversationAiRequestBuilderTest {
       Note note = makeMe.aNote().content("description").please();
       Conversation conversation = makeMe.aConversation().forANote(note).please();
 
-      ConversationAiRequestBuilder builder =
-          new ConversationAiRequestBuilder(
-              focusContextRetrievalService, focusContextMarkdownRenderer);
-      ResponseCreateParams params = builder.buildResponseCreateParams(conversation, "gpt-4.1-mini");
-      List<ResponseInputItem> items = params.input().flatMap(i -> i.response()).orElseThrow();
-      String body = items.getFirst().easyInputMessage().orElseThrow().content().asTextInput();
+      String body = firstDeveloperMessageBody(conversation);
 
       assertTrue(body.contains("## Focus Note"));
       assertTrue(body.contains("Notebook:"));
@@ -83,11 +73,7 @@ class ConversationAiRequestBuilderTest {
       makeMe.aConversationMessage(conversation).sender(null).message("AI response").please();
       makeMe.aConversationMessage(conversation).sender(user).message("Follow up question").please();
 
-      ConversationAiRequestBuilder builder =
-          new ConversationAiRequestBuilder(
-              focusContextRetrievalService, focusContextMarkdownRenderer);
-      ResponseCreateParams params = builder.buildResponseCreateParams(conversation, "gpt-4.1-mini");
-      List<ResponseInputItem> items = params.input().flatMap(i -> i.response()).orElseThrow();
+      List<ResponseInputItem> items = inputItems(conversation);
 
       assertEquals(5, items.size());
       assertEquals(
@@ -113,22 +99,7 @@ class ConversationAiRequestBuilderTest {
       Note note = makeMe.aNote().notebook(notebook).please();
       Conversation conversation = makeMe.aConversation().forANote(note).from(user).please();
 
-      ConversationAiRequestBuilder builder =
-          new ConversationAiRequestBuilder(
-              focusContextRetrievalService, focusContextMarkdownRenderer);
-      ResponseCreateParams params = builder.buildResponseCreateParams(conversation, "gpt-4.1-mini");
-      String body =
-          params
-              .input()
-              .flatMap(i -> i.response())
-              .orElseThrow()
-              .getFirst()
-              .easyInputMessage()
-              .orElseThrow()
-              .content()
-              .asTextInput();
-
-      assertFalse(body.contains("NOT_FOR_CHAT"));
+      assertFalse(firstDeveloperMessageBody(conversation).contains("NOT_FOR_CHAT"));
     }
 
     @Test
@@ -136,17 +107,35 @@ class ConversationAiRequestBuilderTest {
       Note note = makeMe.aNote().please();
       Conversation conversation = makeMe.aConversation().forANote(note).please();
 
-      ConversationAiRequestBuilder builder =
-          new ConversationAiRequestBuilder(
-              focusContextRetrievalService, focusContextMarkdownRenderer);
-      ResponseCreateParams params = builder.buildResponseCreateParams(conversation, "gpt-4.1-mini");
-      List<ResponseInputItem> items = params.input().flatMap(i -> i.response()).orElseThrow();
+      List<ResponseInputItem> items = inputItems(conversation);
 
       assertEquals(2, items.size());
       assertEquals(
           EasyInputMessage.Role.DEVELOPER, items.get(0).easyInputMessage().orElseThrow().role());
       assertEquals(
           EasyInputMessage.Role.DEVELOPER, items.get(1).easyInputMessage().orElseThrow().role());
+    }
+
+    private ConversationAiRequestBuilder builder() {
+      return new ConversationAiRequestBuilder(
+          focusContextRetrievalService, focusContextMarkdownRenderer);
+    }
+
+    private List<ResponseInputItem> inputItems(Conversation conversation) {
+      return builder()
+          .buildResponseCreateParams(conversation, "gpt-4.1-mini")
+          .input()
+          .flatMap(i -> i.response())
+          .orElseThrow();
+    }
+
+    private String firstDeveloperMessageBody(Conversation conversation) {
+      return inputItems(conversation)
+          .getFirst()
+          .easyInputMessage()
+          .orElseThrow()
+          .content()
+          .asTextInput();
     }
   }
 }
