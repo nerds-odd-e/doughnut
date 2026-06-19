@@ -66,7 +66,7 @@ Tests:
 
 ## Phase 2: Refined AI Questions Use The Same Post-Processing Contract
 
-Status: planned
+Status: done
 
 Type: Behavior
 

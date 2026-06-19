@@ -54,6 +54,7 @@ public class AiQuestionGenerator {
   public MCQWithAnswer getAiGeneratedRefineQuestion(Note note, MCQWithAnswer mcqWithAnswer) {
     return forNote(note, globalSettingsService.globalSettingQuestionGeneration().getValue())
         .refineQuestion(mcqWithAnswer)
+        .map(generatedQuestionPostProcessor::postProcess)
         .orElse(null);
   }
 
