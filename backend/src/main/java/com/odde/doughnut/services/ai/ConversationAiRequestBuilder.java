@@ -71,12 +71,18 @@ public class ConversationAiRequestBuilder {
             ? focusContextRetrievalService.retrieve(note, viewer, config)
             : focusContextRetrievalService.retrieve(note, config);
     String noteDescription = focusContextMarkdownRenderer.render(focusContextResult, config);
+    String notebookInstructions = note.getNotebookAssistantInstructions();
+
+    String systemMessageContent = noteDescription;
+    if (notebookInstructions != null && !notebookInstructions.trim().isEmpty()) {
+      systemMessageContent += "\n\n" + notebookInstructions;
+    }
 
     items.add(
         ResponseInputItem.ofEasyInputMessage(
             EasyInputMessage.builder()
                 .role(EasyInputMessage.Role.DEVELOPER)
-                .content(noteDescription)
+                .content(systemMessageContent)
                 .build()));
 
     String additionalContext = conversation.getAdditionalContextForSubject();

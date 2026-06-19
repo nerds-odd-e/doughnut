@@ -96,6 +96,19 @@
       </button>
     </section>
 
+    <section class="settings-section mb-6">
+      <div class="section-header">
+        <h4 class="section-title">Assistant Management</h4>
+        <p class="section-description">
+          Configure AI assistant settings and instructions for this notebook.
+        </p>
+      </div>
+      <NotebookAssistantManagementForm 
+        :notebook="notebook" 
+        :additional-instructions="additionalInstructions"
+      />
+    </section>
+
     <!-- Notebook Indexing Section -->
     <section class="settings-section mb-6">
       <div class="section-header">
@@ -128,9 +141,13 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { ref, watch } from "vue"
+import { ref, watch, computed } from "vue"
 import { useRouter } from "vue-router"
-import type { Notebook, User } from "@generated/doughnut-backend-api"
+import type {
+  Notebook,
+  User,
+  NotebookAiAssistant,
+} from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
@@ -142,6 +159,7 @@ import NotebookMoveForm from "@/components/notebook/NotebookMoveForm.vue"
 import CheckInput from "@/components/form/CheckInput.vue"
 import TextArea from "@/components/form/TextArea.vue"
 import NotebookAttachedBookSection from "@/components/notebook/NotebookAttachedBookSection.vue"
+import NotebookAssistantManagementForm from "@/components/notebook/NotebookAssistantManagementForm.vue"
 import NotebookPageNameEditor from "@/components/notebook/NotebookPageNameEditor.vue"
 import ScopedIndexNoteEditor from "@/components/notebook/ScopedIndexNoteEditor.vue"
 
@@ -158,6 +176,31 @@ const props = defineProps({
     default: null,
   },
 })
+
+const aiAssistant = ref<NotebookAiAssistant | undefined>(undefined)
+
+const additionalInstructions = computed(
+  () => aiAssistant.value?.additionalInstructionsToAi || ""
+)
+
+const fetchAiAssistant = async () => {
+  const { data: assistant, error } = await apiCallWithLoading(() =>
+    NotebookController.getAiAssistant({
+      path: { notebook: props.notebook.id },
+    })
+  )
+  if (!error) {
+    aiAssistant.value = assistant!
+  }
+}
+
+watch(
+  () => props.notebook.id,
+  () => {
+    fetchAiAssistant()
+  },
+  { immediate: true }
+)
 
 const emit = defineEmits<{
   (e: "notebook-updated", notebook: Notebook): void

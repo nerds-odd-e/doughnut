@@ -96,6 +96,7 @@ public class QuestionGenerationRequestBuilder {
         openAiResponseRequestForQuestionGeneration(
             MCQWithAnswer.class, note, additionalMessage, contextSeed, propertyKey, viewer);
     responseRequestBuilder.addInstruction(tool.getMessageBody());
+    addNotebookAssistantInstructionsIfPresent(responseRequestBuilder, note);
     responseRequestBuilder.reasoningEffort(reasoningEffort);
     responseRequestBuilder.maxOutputTokens(
         OpenAiModelCapabilities.questionGenerationMaxOutputTokens(reasoningEffort, batch));
@@ -103,6 +104,14 @@ public class QuestionGenerationRequestBuilder {
       return responseRequestBuilder.buildForBatchApi();
     }
     return responseRequestBuilder.build();
+  }
+
+  private static void addNotebookAssistantInstructionsIfPresent(
+      OpenAIResponseRequestBuilder<?> responseRequestBuilder, Note note) {
+    String instructions = note.getNotebookAssistantInstructions();
+    if (instructions != null && !instructions.trim().isEmpty()) {
+      responseRequestBuilder.addInstruction(instructions);
+    }
   }
 
   private Note hydrateFocusNoteForQuestionGeneration(Note note) {
@@ -169,9 +178,8 @@ public class QuestionGenerationRequestBuilder {
       User viewer) {
     Note focus = hydrateFocusNoteForQuestionGeneration(note);
 
-    List<String> instructionBlocks = noteRealmService.questionGenerationInstructionBlocks(focus);
-    String instruction =
-        instructionBlocks.isEmpty() ? null : String.join("\n\n", instructionBlocks);
+    List<String> instructions = noteRealmService.resolveQuestionGenerationInstructions(focus);
+    String instruction = instructions.isEmpty() ? null : String.join("\n\n", instructions);
     String instructionUserBlock =
         instruction != null ? CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER + "\n" + instruction : null;
     int instructionTokens =

@@ -110,7 +110,8 @@ public class AiQuestionGenerator {
         noteQuestionGenerationService.openAiResponseRequestForSharedNoteContext(
             MCQWithAnswerForRefinement.class, note, null);
     responseRequestBuilder.model(modelName1);
-    return new AiQuestionGeneratorForNote(openAiApiHandler, responseRequestBuilder);
+    return new AiQuestionGeneratorForNote(
+        openAiApiHandler, responseRequestBuilder, note.getNotebookAssistantInstructions());
   }
 
   public MCQWithAnswer regenerateQuestion(

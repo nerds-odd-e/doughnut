@@ -14,6 +14,7 @@ import com.odde.doughnut.controllers.dto.NotebookCreationRequest;
 import com.odde.doughnut.controllers.dto.NotebookRealm;
 import com.odde.doughnut.controllers.dto.NotebookUpdateRequest;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
+import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.controllers.dto.UpdateNotebookGroupRequest;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.FolderRepository;
@@ -286,6 +287,37 @@ class NotebookController {
     notebook.setOwnership(circle.getOwnership());
     entityPersister.save(notebook);
     return notebook;
+  }
+
+  @PatchMapping("/{notebook}/ai-assistant")
+  @Transactional
+  public NotebookAiAssistant updateAiAssistant(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @RequestBody UpdateAiAssistantRequest request)
+      throws UnexpectedNoAccessRightException {
+
+    authorizationService.assertAuthorization(notebook);
+
+    NotebookAiAssistant assistant = notebookService.findByNotebookId(notebook.getId());
+    if (assistant == null) {
+      assistant = new NotebookAiAssistant();
+      assistant.setNotebook(notebook);
+      assistant.setCreatedAt(testabilitySettings.getCurrentUTCTimestamp());
+    }
+
+    assistant.setAdditionalInstructionsToAi(request.getAdditionalInstructions());
+    assistant.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
+
+    return notebookService.save(assistant);
+  }
+
+  @GetMapping("/{notebook}/ai-assistant")
+  public NotebookAiAssistant getAiAssistant(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException {
+
+    authorizationService.assertAuthorization(notebook);
+    return notebookService.findByNotebookId(notebook.getId());
   }
 
   @Operation(

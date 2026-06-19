@@ -53,6 +53,7 @@ class NoteConversationAiReplyServiceTest {
     when(focusContextRetrievalService.retrieve(any(Note.class), any(User.class), any()))
         .thenReturn(minimalFocusContextResult());
     when(focusContextMarkdownRenderer.render(any(), any())).thenReturn("# Focus Context");
+    when(note.getNotebookAssistantInstructions()).thenReturn(null);
     when(conversation.getSubjectNote()).thenReturn(note);
     when(conversation.getConversationInitiator()).thenReturn(user);
     when(conversation.getAdditionalContextForSubject()).thenReturn(null);

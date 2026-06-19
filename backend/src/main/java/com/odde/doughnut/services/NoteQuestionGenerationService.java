@@ -90,6 +90,10 @@ public class NoteQuestionGenerationService {
         requestBuilder.openAiResponseRequestForQuestionEvaluation(
             QuestionEvaluation.class, note, null, null);
     responseRequestBuilder.addInstruction(tool.getMessageBody());
+    if (note.getNotebookAssistantInstructions() != null
+        && !note.getNotebookAssistantInstructions().isBlank()) {
+      responseRequestBuilder.addInstruction(note.getNotebookAssistantInstructions());
+    }
     StructuredResponseCreateParams<QuestionEvaluation> responseRequest =
         responseRequestBuilder.reasoningEffort(ReasoningEffort.LOW).maxOutputTokens(500L).build();
 

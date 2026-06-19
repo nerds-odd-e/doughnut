@@ -1,10 +1,10 @@
 package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.controllers.dto.NoteRealm;
@@ -17,6 +17,7 @@ import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -217,10 +218,9 @@ class NoteRealmServiceTest {
     NoteRealm realm = noteRealmService.build(normal, user);
 
     assertThat(realm.getIndexNoteContent(), equalTo(indexContent));
-    List<String> blocks = noteRealmService.questionGenerationInstructionBlocks(normal);
-    assertThat(blocks, hasSize(1));
-    assertThat(blocks.get(0), containsString("Instruction from notebook"));
-    assertThat(blocks.get(0), containsString("Focus on definitions"));
+    assertThat(
+        noteRealmService.resolveScopedQuestionGenerationInstruction(normal),
+        equalTo(Optional.of("Focus on definitions")));
   }
 
   @ParameterizedTest
@@ -245,29 +245,28 @@ class NoteRealmServiceTest {
     makeMe.theNotebook(notebook).indexContent("---\n" + key + ": \"" + text + "\"\n---\n").please();
     Note normal = makeMe.aNote().notebook(notebook).please();
 
-    List<String> blocks = noteRealmService.questionGenerationInstructionBlocks(normal);
-    assertThat(blocks, hasSize(1));
-    assertThat(blocks.get(0), containsString("Instruction from notebook"));
-    assertThat(blocks.get(0), containsString(text));
+    assertThat(
+        noteRealmService.resolveScopedQuestionGenerationInstruction(normal),
+        equalTo(Optional.of(text)));
   }
 
   @Test
-  void question_instruction_includes_every_level_ordered_notebook_then_folders_no_override() {
+  void inner_folder_index_wins_for_title_pattern_and_question_instruction() {
     makeMe
         .theNotebook(notebook)
-        .indexContent("---\ntitle_pattern: \"nb\"\nquestion_generation_instruction: nb-text\n---\n")
+        .indexContent("---\ntitle_pattern: \"nb\"\nquestion_generation_instruction: nb\n---\n")
         .please();
 
     Folder outer = makeMe.aFolder().notebook(notebook).name("Outer").please();
     makeMe
         .theFolder(outer)
         .indexContent(
-            "---\ntitle_pattern: \"outer\"\nquestion_generation_instruction: outer-text\n---\n")
+            "---\ntitle_pattern: \"outer\"\nquestion_generation_instruction: outer\n---\n")
         .please();
 
     Folder inner = makeMe.aFolder().parentFolder(outer).name("Inner").please();
     String innerIndex =
-        "---\ntitle_pattern: \"inner\"\nquestion_generation_instruction: inner-text\n---\n";
+        "---\ntitle_pattern: \"inner\"\nquestion_generation_instruction: inner\n---\n";
     makeMe.theFolder(inner).indexContent(innerIndex).please();
 
     Note inInner = makeMe.aNote().folder(inner).please();
@@ -275,18 +274,13 @@ class NoteRealmServiceTest {
     NoteRealm realm = noteRealmService.build(inInner, user);
 
     assertThat(realm.getIndexNoteContent(), equalTo(innerIndex));
-    List<String> blocks = noteRealmService.questionGenerationInstructionBlocks(inInner);
-    assertThat(blocks, hasSize(3));
-    assertThat(blocks.get(0), containsString("Instruction from notebook"));
-    assertThat(blocks.get(0), containsString("nb-text"));
-    assertThat(blocks.get(1), containsString("Instruction from folder \"Outer\":"));
-    assertThat(blocks.get(1), containsString("outer-text"));
-    assertThat(blocks.get(2), containsString("Instruction from folder \"Inner\":"));
-    assertThat(blocks.get(2), containsString("inner-text"));
+    assertThat(
+        noteRealmService.resolveScopedQuestionGenerationInstruction(inInner),
+        equalTo(Optional.of("inner")));
   }
 
   @Test
-  void question_instruction_omits_levels_without_instruction() {
+  void scoped_resolution_skips_inner_without_title_pattern_or_instruction_and_uses_parent() {
     Folder outer = makeMe.aFolder().notebook(notebook).name("Outer").please();
     String outerIndex =
         "---\ntitle_pattern: \"outer\"\nquestion_generation_instruction: outer-only\n---\n";
@@ -300,10 +294,9 @@ class NoteRealmServiceTest {
     NoteRealm realm = noteRealmService.build(inInner, user);
 
     assertThat(realm.getIndexNoteContent(), equalTo(outerIndex));
-    List<String> blocks = noteRealmService.questionGenerationInstructionBlocks(inInner);
-    assertThat(blocks, hasSize(1));
-    assertThat(blocks.get(0), containsString("Instruction from folder \"Outer\":"));
-    assertThat(blocks.get(0), containsString("outer-only"));
+    assertThat(
+        noteRealmService.resolveScopedQuestionGenerationInstruction(inInner),
+        equalTo(Optional.of("outer-only")));
   }
 
   @Test
@@ -326,7 +319,8 @@ class NoteRealmServiceTest {
     NoteRealm realm = noteRealmService.build(normal, user);
 
     assertThat(realm.getIndexNoteContent(), nullValue());
-    assertThat(noteRealmService.questionGenerationInstructionBlocks(normal), empty());
+    assertThat(
+        noteRealmService.resolveScopedQuestionGenerationInstruction(normal), is(Optional.empty()));
   }
 
   @Test
@@ -343,11 +337,12 @@ class NoteRealmServiceTest {
     NoteRealm realm = noteRealmService.build(normal, user);
 
     assertThat(realm.getIndexNoteContent(), nullValue());
-    assertThat(noteRealmService.questionGenerationInstructionBlocks(normal), empty());
+    assertThat(
+        noteRealmService.resolveScopedQuestionGenerationInstruction(normal), is(Optional.empty()));
   }
 
   @Test
-  void question_instruction_blocks_label_the_focus_note_frontmatter() {
+  void resolve_question_generation_instructions_returns_note_frontmatter_only() {
     Note note =
         makeMe
             .aNote()
@@ -355,17 +350,16 @@ class NoteRealmServiceTest {
             .content("---\nquestion_generation_instruction: Note-level text\n---\nBody")
             .please();
 
-    List<String> blocks = noteRealmService.questionGenerationInstructionBlocks(note);
-    assertThat(blocks, hasSize(1));
-    assertThat(blocks.get(0), containsString("Instruction from the focus note:"));
-    assertThat(blocks.get(0), containsString("Note-level text"));
+    assertThat(
+        noteRealmService.resolveQuestionGenerationInstructions(note),
+        equalTo(List.of("Note-level text")));
   }
 
   @Test
-  void question_instruction_blocks_empty_when_absent() {
+  void resolve_question_generation_instructions_empty_when_absent() {
     Note note = makeMe.aNote().notebook(notebook).content("Body").please();
 
-    assertThat(noteRealmService.questionGenerationInstructionBlocks(note), empty());
+    assertThat(noteRealmService.resolveQuestionGenerationInstructions(note), empty());
   }
 
   private void persistWikiLink(Note carrier, Note target, String linkText) {

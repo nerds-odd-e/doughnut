@@ -1983,6 +1983,47 @@ paths:
       responses:
         "204":
           description: No Content
+  /api/notebooks/{notebook}/ai-assistant:
+    get:
+      tags:
+      - notebook-controller
+      operationId: getAiAssistant
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NotebookAiAssistant"
+    patch:
+      tags:
+      - notebook-controller
+      operationId: updateAiAssistant
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAiAssistantRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NotebookAiAssistant"
   /api/memory-trackers/{memoryTracker}/property-key:
     patch:
       tags:
@@ -4331,6 +4372,29 @@ components:
           format: int32
           description: Selected book block id for reading UI; omit or null to leave
             the stored value unchanged
+    UpdateAiAssistantRequest:
+      type: object
+      properties:
+        additionalInstructions:
+          type: string
+    NotebookAiAssistant:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        notebook:
+          $ref: "#/components/schemas/Notebook"
+        additionalInstructionsToAi:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+      - id
     UpdateMemoryTrackerPropertyKeyDTO:
       type: object
       description: Rename a property memory tracker's frontmatter key in place.

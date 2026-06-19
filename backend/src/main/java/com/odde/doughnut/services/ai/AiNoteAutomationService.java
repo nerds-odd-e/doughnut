@@ -118,6 +118,10 @@ public class AiNoteAutomationService {
         new OpenAIResponseRequestBuilder<>(resultClass).model(modelName);
     builder.addInstruction(OpenAIResponseRequestBuilder.systemInstruction);
     builder.addInstruction(focusMarkdown);
+    String notebookAssistant = note.getNotebookAssistantInstructions();
+    if (notebookAssistant != null && !notebookAssistant.trim().isEmpty()) {
+      builder.addInstruction(notebookAssistant);
+    }
     if (maxOutputTokens != null) {
       builder.maxOutputTokens(maxOutputTokens);
     }

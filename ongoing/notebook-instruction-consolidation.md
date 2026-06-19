@@ -152,6 +152,44 @@ are now dead.
 
 ## Status
 
+**REVERTED (2026-06-19).** Phases 1–3 (`1d3eacc9c5`, `7fa680ace4`, `7b99ea7565`) were reverted in
+the working tree before redo. The intervening unrelated commit `66359deaac` (a different plan doc)
+was left untouched. Reverted backend compiles clean. Re-plan addressing the findings below before
+re-executing.
+
+### Bugs found
+
+1. **Data loss — no migration of existing instructions.** Phase 3 `DROP TABLE notebook_ai_assistant`
+   discards every `additional_instructions_to_ai` value with no step copying it into the target
+   notebook-index `question_generation_instruction` property. After deploy, notebooks that relied on
+   "Additional Instructions to AI" silently lose it **everywhere**, including question generation —
+   the plan claims question generation "relies on the notebook-index property," but nothing populates
+   that property from the old data. This is irreversible once the migration runs.
+2. **Silent behavior regression in four AI flows.** Phase 2 removed the notebook-level instruction
+   injection from chat, evaluation, automation, and refinement with no replacement and no negative
+   test. The plan "confirmed" this, but it is a real loss of capability and should be an explicit,
+   tested decision (assert the instruction is *absent*), not an untested deletion.
+3. **No de-duplication across levels.** `questionGenerationInstructionBlocks` emits one block per
+   level with identical text repeated verbatim when the same instruction appears at multiple levels
+   (e.g. notebook + folder), wasting prompt tokens. "No override" was intended; "no de-dup" was not
+   considered.
+
+### Improvements needed
+
+- **Token budget:** deeply nested folders each contributing an instruction block can crowd out the
+  focus-context budget (it is subtracted whole). Add a cap or prioritization for the combined block.
+- **Consistency:** only question generation consumes the nested labeled blocks; evaluation /
+  refinement now get nothing. Decide deliberately whether they should share the same nested source.
+- **Labeling:** notebook block is labeled with `Notebook.getName()`, but the instruction text comes
+  from the notebook *index note* — reconcile the label source with the content source.
+- **Test gaps:** convert the removed assistant cases into negative assertions (instruction absent in
+  chat/eval); add de-dup and token-budget coverage.
+- **Green-suite gate:** these phases were committed while the full backend suite was flaky
+  (`Duplicate entry 'userNN'`), relying on isolated runs. Stabilize that collision so phases close on
+  a fully green suite.
+
+### Original (now reverted) phase notes
+
 - Phase 1 — done. `NoteRealmService.questionGenerationInstructionBlocks(Note)` now returns ordered,
   source-labeled instruction blocks (notebook index → folders outermost→innermost → focus note,
   blanks omitted, no override); `QuestionGenerationRequestBuilder` renders them into the single
