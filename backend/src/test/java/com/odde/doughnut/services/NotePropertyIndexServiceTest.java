@@ -3,7 +3,9 @@ package com.odde.doughnut.services;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NotePropertyIndex;
@@ -107,6 +109,57 @@ class NotePropertyIndexServiceTest {
       notePropertyIndexService.refreshForNote(note);
 
       assertThat(notePropertyIndexRepository.findByNote_IdOrderByIdAsc(note.getId()), empty());
+    }
+
+    @Test
+    void stores_target_note_id_when_property_value_is_a_resolvable_wiki_link() {
+      User user = makeMe.aUser().please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      Note existing = makeMe.aNote().title("Existing").notebook(notebook).please();
+      Note note =
+          makeMe
+              .aNote()
+              .notebook(notebook)
+              .content("---\nexample of: \"[[Existing]]\"\n---\n")
+              .please();
+
+      notePropertyIndexService.refreshForNote(note);
+
+      NotePropertyIndex row =
+          notePropertyIndexRepository.findByNote_IdOrderByIdAsc(note.getId()).getFirst();
+      assertThat(row.getPropertyKey(), equalTo("example of"));
+      assertThat(row.getTargetNote().getId(), equalTo(existing.getId()));
+    }
+
+    @Test
+    void stores_null_target_when_property_value_is_not_a_wiki_link() {
+      User user = makeMe.aUser().please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      Note note = makeMe.aNote().notebook(notebook).content("---\ntopic: physics\n---\n").please();
+
+      notePropertyIndexService.refreshForNote(note);
+
+      NotePropertyIndex row =
+          notePropertyIndexRepository.findByNote_IdOrderByIdAsc(note.getId()).getFirst();
+      assertThat(row.getTargetNote(), nullValue());
+    }
+
+    @Test
+    void stores_null_target_when_wiki_link_does_not_resolve() {
+      User user = makeMe.aUser().please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      Note note =
+          makeMe
+              .aNote()
+              .notebook(notebook)
+              .content("---\nexample of: \"[[Missing]]\"\n---\n")
+              .please();
+
+      notePropertyIndexService.refreshForNote(note);
+
+      NotePropertyIndex row =
+          notePropertyIndexRepository.findByNote_IdOrderByIdAsc(note.getId()).getFirst();
+      assertThat(row.getTargetNote(), nullValue());
     }
 
     @Test

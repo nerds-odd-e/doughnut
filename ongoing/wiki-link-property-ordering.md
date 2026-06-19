@@ -1,6 +1,6 @@
 # Order wiki-link properties after their target note
 
-**Status: planned.**
+**Status: in progress (Phase 1 done).**
 
 A frontmatter property whose value is a wiki link (e.g. `example of: "[[Word]]"`) must be
 assimilated *after* its target note. Implemented as a **gate**: while the resolved target
@@ -57,6 +57,8 @@ suppressed from the queue; once the target is assimilated (or the target is null
 ---
 
 ## Phase 1 (Structure) — Persist the wiki-link target on the property index
+
+**Done.**
 
 Enables the gate; no externally observable change.
 
