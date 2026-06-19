@@ -5,9 +5,9 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
@@ -16,7 +16,6 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
 import com.openai.models.responses.StructuredResponseCreateParams;
-import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -208,7 +207,28 @@ class NoteQuestionGenerationServiceTests {
 
     @Test
     void shouldPlaceContainerThenNoteQuestionInstructionsInFirstUserMessage() {
-      Note note = noteWithQuestionGenerationInstructions("FOLDER_INSTRUCTION", "NOTE_INSTRUCTION");
+      User user = makeMe.aUser().please();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(user).name("Physics").please();
+      makeMe
+          .theNotebook(nb)
+          .indexContent("---\nquestion_generation_instruction: NOTEBOOK_INSTRUCTION\n---\n")
+          .please();
+      Folder outer = makeMe.aFolder().notebook(nb).name("Mechanics").please();
+      makeMe
+          .theFolder(outer)
+          .indexContent("---\nquestion_generation_instruction: OUTER_INSTRUCTION\n---\n")
+          .please();
+      Folder inner = makeMe.aFolder().parentFolder(outer).name("Kinematics").please();
+      makeMe
+          .theFolder(inner)
+          .indexContent("---\nquestion_generation_instruction: INNER_INSTRUCTION\n---\n")
+          .please();
+      Note note =
+          makeMe
+              .aNote()
+              .folder(inner)
+              .content("---\nquestion_generation_instruction: NOTE_INSTRUCTION\n---\nBody")
+              .please();
 
       StructuredResponseCreateParams<MCQWithAnswer> request =
           service.buildQuestionGenerationRequest(note, null);
@@ -218,49 +238,23 @@ class NoteQuestionGenerationServiceTests {
       assertThat(
           instructionMessage,
           containsString(QuestionGenerationRequestBuilder.CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER));
-      assertThat(instructionMessage, containsString("FOLDER_INSTRUCTION"));
+      assertThat(instructionMessage, containsString("Instruction from notebook \"Physics\":"));
+      assertThat(instructionMessage, containsString("NOTEBOOK_INSTRUCTION"));
+      assertThat(instructionMessage, containsString("Instruction from folder \"Mechanics\":"));
+      assertThat(instructionMessage, containsString("OUTER_INSTRUCTION"));
+      assertThat(instructionMessage, containsString("Instruction from folder \"Kinematics\":"));
+      assertThat(instructionMessage, containsString("INNER_INSTRUCTION"));
+      assertThat(instructionMessage, containsString("Instruction from the focus note:"));
       assertThat(instructionMessage, containsString("NOTE_INSTRUCTION"));
       assertThat(
-          instructionMessage.indexOf("FOLDER_INSTRUCTION"),
-          lessThan(instructionMessage.indexOf("NOTE_INSTRUCTION")));
-    }
-
-    @Test
-    void shouldIncludeNotebookAssistantInstructionsWhenPresent() {
-      NotebookAiAssistant notebookAiAssistant = new NotebookAiAssistant();
-      notebookAiAssistant.setNotebook(testNote.getNotebook());
-      notebookAiAssistant.setAdditionalInstructionsToAi("Custom notebook instructions");
-      Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-      notebookAiAssistant.setCreatedAt(currentTime);
-      notebookAiAssistant.setUpdatedAt(currentTime);
-      makeMe.entityPersister.save(notebookAiAssistant);
-      makeMe.refresh(testNote.getNotebook());
-
-      StructuredResponseCreateParams<MCQWithAnswer> request =
-          service.buildQuestionGenerationRequest(testNote, null);
-
-      assertThat(instructionContains(request, "Custom notebook instructions"), is(true));
-    }
-
-    @Test
-    void shouldPlaceNotebookAssistantInstructionsAfterMainQuestionDesignerInstruction() {
-      NotebookAiAssistant notebookAiAssistant = new NotebookAiAssistant();
-      notebookAiAssistant.setNotebook(testNote.getNotebook());
-      notebookAiAssistant.setAdditionalInstructionsToAi("Custom notebook instructions");
-      Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-      notebookAiAssistant.setCreatedAt(currentTime);
-      notebookAiAssistant.setUpdatedAt(currentTime);
-      makeMe.entityPersister.save(notebookAiAssistant);
-      makeMe.refresh(testNote.getNotebook());
-
-      StructuredResponseCreateParams<MCQWithAnswer> request =
-          service.buildQuestionGenerationRequest(testNote, null);
-      String developerBody = instructionText(request);
-
-      assertThat(developerBody.indexOf("Question Designer"), greaterThan(-1));
+          instructionMessage.indexOf("NOTEBOOK_INSTRUCTION"),
+          lessThan(instructionMessage.indexOf("OUTER_INSTRUCTION")));
       assertThat(
-          developerBody.indexOf("Question Designer"),
-          lessThan(developerBody.indexOf("Custom notebook instructions")));
+          instructionMessage.indexOf("OUTER_INSTRUCTION"),
+          lessThan(instructionMessage.indexOf("INNER_INSTRUCTION")));
+      assertThat(
+          instructionMessage.indexOf("INNER_INSTRUCTION"),
+          lessThan(instructionMessage.indexOf("NOTE_INSTRUCTION")));
     }
 
     @Test
@@ -364,6 +358,28 @@ class NoteQuestionGenerationServiceTests {
       assertThat(result.isPresent(), is(true));
       assertThat(result.get().feasibleQuestion, is(true));
       assertThat(result.get().correctChoices, equalTo(new int[] {0}));
+    }
+
+    @Test
+    void shouldNotIncludeNotebookQuestionGenerationInstructionInEvaluation()
+        throws JsonProcessingException {
+      makeMe
+          .theNotebook(testNote.getNotebook())
+          .indexContent("---\nquestion_generation_instruction: NOT_FOR_EVALUATION\n---\n")
+          .please();
+      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
+      QuestionEvaluation evaluation = new QuestionEvaluation();
+      evaluation.feasibleQuestion = true;
+      openAiStructuredResponseMock.stubStructuredResponse(evaluation);
+
+      service.evaluateQuestion(testNote, mcqWithAnswer);
+
+      @SuppressWarnings({"unchecked", "rawtypes"})
+      ArgumentCaptor<StructuredResponseCreateParams<QuestionEvaluation>> paramsCaptor =
+          ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
+      verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
+      String instructions = paramsCaptor.getValue().rawParams().instructions().orElse("");
+      assertThat(instructions, not(containsString("NOT_FOR_EVALUATION")));
     }
   }
 }

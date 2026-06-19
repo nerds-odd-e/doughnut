@@ -17,10 +17,6 @@ describe("NotebookPage.spec", () => {
       history: createWebHistory(),
       routes,
     })
-    mockSdkService(NotebookController, "getAiAssistant", {
-      id: 1,
-      additionalInstructionsToAi: "",
-    })
   })
 
   async function navigateToNotebookPage(notebookId: number) {

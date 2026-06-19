@@ -167,13 +167,4 @@ public class Note extends EntityIdentifiedByIdOnly {
     setTitle(title != null ? title : "");
     setCreatedAt(currentUTCTimestamp);
   }
-
-  @JsonIgnore
-  public String getNotebookAssistantInstructions() {
-    NotebookAiAssistant notebookAiAssistant = getNotebook().getNotebookAiAssistant();
-    if (notebookAiAssistant == null) {
-      return null;
-    }
-    return notebookAiAssistant.getAdditionalInstructionsToAi();
-  }
 }

@@ -6,21 +6,13 @@ import {
 import NotebookPageView from "@/pages/NotebookPageView.vue"
 import SeamlessTextEditor from "@/components/form/SeamlessTextEditor.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import helper, {
-  mockSdkService,
-  wrapSdkError,
-  wrapSdkResponse,
-} from "@tests/helpers"
+import helper, { wrapSdkError, wrapSdkResponse } from "@tests/helpers"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, it, expect, vi } from "vitest"
 
 describe("NotebookPageView.spec", () => {
   beforeEach(() => {
-    mockSdkService(NotebookController, "getAiAssistant", {
-      id: 1,
-      additionalInstructionsToAi: "",
-    })
     vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
       wrapSdkError("Not found") as Awaited<
         ReturnType<typeof NotebookBooksController.getBook>

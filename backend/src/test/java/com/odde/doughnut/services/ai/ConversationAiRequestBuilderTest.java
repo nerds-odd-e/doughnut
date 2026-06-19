@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
 import com.openai.models.responses.EasyInputMessage;
@@ -99,6 +100,35 @@ class ConversationAiRequestBuilderTest {
           EasyInputMessage.Role.ASSISTANT, items.get(3).easyInputMessage().orElseThrow().role());
       assertEquals(
           EasyInputMessage.Role.USER, items.get(4).easyInputMessage().orElseThrow().role());
+    }
+
+    @Test
+    void firstDeveloperMessageDoesNotIncludeNotebookIndexQuestionGenerationInstruction() {
+      User user = makeMe.aUser().please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      makeMe
+          .theNotebook(notebook)
+          .indexContent("---\nquestion_generation_instruction: NOT_FOR_CHAT\n---\n")
+          .please();
+      Note note = makeMe.aNote().notebook(notebook).please();
+      Conversation conversation = makeMe.aConversation().forANote(note).from(user).please();
+
+      ConversationAiRequestBuilder builder =
+          new ConversationAiRequestBuilder(
+              focusContextRetrievalService, focusContextMarkdownRenderer);
+      ResponseCreateParams params = builder.buildResponseCreateParams(conversation, "gpt-4.1-mini");
+      String body =
+          params
+              .input()
+              .flatMap(i -> i.response())
+              .orElseThrow()
+              .getFirst()
+              .easyInputMessage()
+              .orElseThrow()
+              .content()
+              .asTextInput();
+
+      assertFalse(body.contains("NOT_FOR_CHAT"));
     }
 
     @Test

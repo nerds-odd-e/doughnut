@@ -10,10 +10,12 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -61,33 +63,39 @@ public class NoteRealmService {
   }
 
   /**
-   * Nearest non-blank {@code question_generation_instruction} from container {@code indexContent}:
-   * inner folder → parent folders → notebook root.
+   * Every distinct {@code question_generation_instruction} on the trail to {@code focus}, each
+   * rendered as a source-labeled block. Order: notebook index, folders outermost → innermost, then
+   * the focus note. Levels without a non-blank instruction are omitted; no level overrides another;
+   * identical instruction text appears only once (outermost occurrence wins).
    */
-  public Optional<String> resolveScopedQuestionGenerationInstruction(Note focus) {
-    if (focus.getNotebook() == null) {
-      return Optional.empty();
-    }
-    List<Folder> outerToInner = FolderTrailSegments.fromRootToContainingFolder(focus);
-    for (int i = outerToInner.size() - 1; i >= 0; i--) {
-      Optional<String> instruction =
-          questionGenerationInstructionFromContent(outerToInner.get(i).getIndexContent());
-      if (instruction.isPresent()) {
-        return instruction;
+  public List<String> questionGenerationInstructionBlocks(Note focus) {
+    List<String> blocks = new ArrayList<>();
+    Set<String> seenInstructionText = new HashSet<>();
+    Notebook notebook = focus.getNotebook();
+    if (notebook != null) {
+      addLabeledInstructionBlockIfDistinct(
+          blocks,
+          seenInstructionText,
+          notebook.getIndexContent(),
+          "Instruction from notebook \"" + notebook.getName() + "\":");
+      for (Folder folder : FolderTrailSegments.fromRootToContainingFolder(focus)) {
+        addLabeledInstructionBlockIfDistinct(
+            blocks,
+            seenInstructionText,
+            folder.getIndexContent(),
+            "Instruction from folder \"" + folder.getName() + "\":");
       }
     }
-    return questionGenerationInstructionFromContent(focus.getNotebook().getIndexContent());
+    addLabeledInstructionBlockIfDistinct(
+        blocks, seenInstructionText, focus.getContent(), "Instruction from the focus note:");
+    return blocks;
   }
 
-  /**
-   * Container-scoped instruction (nearest folder → notebook), then note frontmatter, omitting
-   * blanks.
-   */
-  public List<String> resolveQuestionGenerationInstructions(Note focus) {
-    List<String> instructions = new ArrayList<>();
-    resolveScopedQuestionGenerationInstruction(focus).ifPresent(instructions::add);
-    questionGenerationInstructionFromContent(focus.getContent()).ifPresent(instructions::add);
-    return instructions;
+  private void addLabeledInstructionBlockIfDistinct(
+      List<String> blocks, Set<String> seenInstructionText, String content, String label) {
+    questionGenerationInstructionFromContent(content)
+        .filter(instruction -> seenInstructionText.add(instruction))
+        .ifPresent(instruction -> blocks.add(label + "\n" + instruction));
   }
 
   private String resolveIndexNoteContentForNote(Note focus) {
