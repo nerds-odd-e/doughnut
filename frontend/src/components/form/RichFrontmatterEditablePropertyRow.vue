@@ -43,18 +43,15 @@
     <RichFrontmatterImagePropertyValue
       v-else-if="isImagePropertyKey(modelValue.key)"
       :model-value="modelValue.value"
-      :wiki-titles="wikiTitles"
       :note-id="noteId"
       :ariaLabel="`Existing note image property value (row ${idx + 1})`"
       value-test-id="rich-note-property-row-value-input"
       file-input-test-id="rich-note-image-property-file-input"
       choose-button-test-id="rich-note-image-property-choose"
       requires-note-test-id="rich-note-image-upload-requires-note"
-      path-test-id="rich-note-image-property-path"
       @update:model-value="onValueUpdate"
       @focus="emit('row-focus')"
       @commit="emit('commit')"
-      @dead-link-click="emit('dead-link-click', $event)"
       @image-upload-state="emit('image-upload-state', $event)"
     />
     <div

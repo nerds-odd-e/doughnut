@@ -8,24 +8,22 @@
       :data-testid="fileInputTestId"
       @change="onImageFileSelected"
     />
-    <div
+    <input
+      ref="valueInputRef"
+      type="text"
+      class="daisy-input daisy-input-sm w-full"
       :class="valueWrapperClass"
+      :value="modelValue"
       :title="modelValue.trim()"
-      :data-testid="pathTestId"
-      @pointerdown="onValuePointerDown"
-    >
-      <WikiPropertyValueField
-        ref="valueInputRef"
-        :model-value="modelValue"
-        :wiki-titles="wikiTitles"
-        :aria-label="ariaLabel"
-        :data-testid="valueTestId"
-        @update:model-value="emit('update:modelValue', $event)"
-        @focus="emit('focus')"
-        @blur="emit('commit')"
-        @dead-link-click="emit('dead-link-click', $event)"
-      />
-    </div>
+      :aria-label="ariaLabel"
+      :data-testid="valueTestId"
+      placeholder="Full url of existing image."
+      autocapitalize="off"
+      autocomplete="off"
+      @input="onValueInput"
+      @focus="emit('focus')"
+      @blur="emit('commit')"
+    />
     <RichFrontmatterPropertyExternalLink
       v-if="modelValue.trim()"
       kind="url"
@@ -45,7 +43,7 @@
       class="text-xs text-base-content/70"
       :data-testid="requiresNoteTestId"
     >
-      Save the note before attaching an image.
+      Save the note before uploading an image.
     </span>
   </div>
 </template>
@@ -53,47 +51,36 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
-import WikiPropertyValueField from "@/components/form/WikiPropertyValueField.vue"
-import type { WikiTitle } from "@generated/doughnut-backend-api"
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import { primeSoftKeyboard } from "@/utils/focusTarget"
-import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
 
 const props = withDefaults(
   defineProps<{
     modelValue: string
-    wikiTitles: WikiTitle[]
     noteId?: number
     ariaLabel: string
     valueTestId: string
     fileInputTestId: string
     chooseButtonTestId: string
     requiresNoteTestId: string
-    pathTestId?: string
     valueWrapperClass?: string
   }>(),
-  { pathTestId: undefined, valueWrapperClass: "min-w-0 flex-1" }
+  { valueWrapperClass: "min-w-0 flex-1" }
 )
 
 const emit = defineEmits<{
   "update:modelValue": [value: string]
   focus: []
   commit: []
-  "dead-link-click": [payload: DeadLinkPayload]
   "image-upload-state": [inProgress: boolean]
 }>()
 
-const valueInputRef = ref<InstanceType<typeof WikiPropertyValueField> | null>(
-  null
-)
+const valueInputRef = ref<HTMLInputElement | null>(null)
 const imageFileInputRef = ref<HTMLInputElement | null>(null)
 const imageUploading = ref(false)
 
-function onValuePointerDown(event: PointerEvent) {
-  const target = event.target as HTMLElement
-  if (target.closest("a")) return
-  primeSoftKeyboard()
+function onValueInput(event: Event) {
+  emit("update:modelValue", (event.target as HTMLInputElement).value)
 }
 
 function openImageFilePicker() {

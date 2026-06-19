@@ -62,7 +62,6 @@
           v-else-if="isImagePropertyKey(draftKey)"
           ref="valueInputRef"
           :model-value="draftValue"
-          :wiki-titles="wikiTitles"
           :note-id="noteId"
           ariaLabel="Property value"
           value-test-id="rich-note-property-value"
@@ -72,7 +71,6 @@
           value-wrapper-class="min-w-0 flex-1 basis-48"
           @update:model-value="emit('update:draftValue', $event)"
           @commit="emit('value-blur')"
-          @dead-link-click="emit('dead-link-click', $event)"
           @image-upload-state="emit('image-upload-state', $event)"
         />
         <div

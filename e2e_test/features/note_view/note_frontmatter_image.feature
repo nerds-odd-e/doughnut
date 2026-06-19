@@ -21,3 +21,9 @@ Feature: Note header image from frontmatter
     Then the rich note property "image" should show an attachment image path
     When I open the note content markdown editor
     Then the note content markdown source should contain "image: /attachments/images/"
+
+  Scenario: Rich editor sets image property from URL in frontmatter
+    When I set rich note image property URL "https://example.com/a.png" on note "shown"
+    And I reload the current page for note "shown"
+    Then I should see note "shown" has an image
+    And I should see rich note property "image" with value "https://example.com/a.png"

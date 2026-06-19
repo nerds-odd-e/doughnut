@@ -29,7 +29,7 @@ describe("RichMarkdownEditor image property value and upload", () => {
     await flushPromises()
 
     const valInput = wrapper.find('[data-testid="rich-note-property-value"]')
-    await h.setWikiPropertyValueField(valInput, "https://example.com/a.png")
+    await valInput.setValue("https://example.com/a.png")
     await valInput.trigger("blur")
 
     expect(uploadSpy).not.toHaveBeenCalled()
@@ -49,7 +49,7 @@ image: https://example.com/old.png
     const valInput = wrapper.find(
       '[data-testid="rich-note-property-row-value-input"]'
     )
-    await h.setWikiPropertyValueField(valInput, "https://example.com/new.png")
+    await valInput.setValue("https://example.com/new.png")
     await valInput.trigger("blur")
 
     expect(uploadSpy).not.toHaveBeenCalled()

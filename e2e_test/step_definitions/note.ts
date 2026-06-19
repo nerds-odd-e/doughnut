@@ -630,6 +630,16 @@ When(
 )
 
 When(
+  'I set rich note image property URL {string} on note {string}',
+  (url: string, noteTopology: string) => {
+    start
+      .jumpToNotePage(noteTopology)
+      .switchToRichContentMode()
+      .setRichNoteImagePropertyUrl(url)
+  }
+)
+
+When(
   'I add a rich note property with key {string} and value {string}',
   (key: string, value: string) => {
     start.assumeNotePage().addRichNoteProperty(key, value)

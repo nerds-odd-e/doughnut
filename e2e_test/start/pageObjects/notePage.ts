@@ -387,6 +387,14 @@ export const assumeNotePage = (
       ).should('exist')
       return this.flushPendingContentSave()
     },
+    setRichNoteImagePropertyUrl(url: string) {
+      this.addRichNoteProperty('image', url)
+      cy.get(
+        `[data-testid="rich-note-property-row"][data-property-key="image"]`,
+        { timeout: 20000 }
+      ).should('exist')
+      return this.flushPendingContentSave()
+    },
     expectRichNotePropertyDisplayed(key: string, value: string) {
       cy.findByRole(noteContentRegion.role, {
         name: noteContentRegion.name,
@@ -405,10 +413,9 @@ export const assumeNotePage = (
           if (isWikidata) {
             cy.contains('.font-mono', value).should('exist')
           } else if (keyNorm === 'image') {
-            cy.get('[data-testid="rich-note-image-property-path"]').should(
-              ($el) => {
-                expect($el.text().trim()).to.eq(value.trim())
-              }
+            cy.get('[data-testid="rich-note-property-row-value-input"]').should(
+              'have.value',
+              value.trim()
             )
           } else {
             cy.get('[data-testid="rich-note-property-row-value-input"]').should(
@@ -428,9 +435,9 @@ export const assumeNotePage = (
         cy.get(
           `[data-testid="rich-note-property-row"][data-property-key="${key}"]`
         ).within(() => {
-          cy.get('[data-testid="rich-note-image-property-path"]').should(
-            ($el) => {
-              expect($el.text().trim()).to.match(
+          cy.get('[data-testid="rich-note-property-row-value-input"]').should(
+            ($input) => {
+              expect(String($input.val() ?? '').trim()).to.match(
                 /^\/attachments\/images\/\d+\/.+/
               )
             }
