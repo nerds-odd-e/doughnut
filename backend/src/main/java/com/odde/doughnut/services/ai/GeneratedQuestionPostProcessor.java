@@ -14,7 +14,13 @@ public class GeneratedQuestionPostProcessor {
   }
 
   public MCQWithAnswer postProcess(MCQWithAnswer original) {
-    if (original == null || !original.isChoicesMayBeShuffled()) {
+    if (original == null) {
+      return original;
+    }
+    if (!original.isValid()) {
+      throw new IllegalArgumentException("generated question must be valid before post-processing");
+    }
+    if (!original.isChoicesMayBeShuffled()) {
       return original;
     }
 

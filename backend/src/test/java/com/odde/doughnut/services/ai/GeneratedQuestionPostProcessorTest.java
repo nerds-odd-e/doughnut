@@ -15,6 +15,26 @@ import org.junit.jupiter.api.Test;
 class GeneratedQuestionPostProcessorTest {
 
   @Test
+  void preservesChoiceOrderWhenChoicesMayNotBeShuffled() {
+    TestabilitySettings testabilitySettings = mock(TestabilitySettings.class);
+    GeneratedQuestionPostProcessor postProcessor =
+        new GeneratedQuestionPostProcessor(testabilitySettings);
+    MCQWithAnswer originalQuestion =
+        new MCQWithAnswer(
+            new MultipleChoicesQuestion(
+                "Which ordered choice is correct?",
+                List.of("first choice", "second choice", "third choice")),
+            1,
+            false,
+            "focus",
+            "rationale");
+
+    MCQWithAnswer result = postProcessor.postProcess(originalQuestion);
+
+    assertThat(result, equalTo(originalQuestion));
+  }
+
+  @Test
   void preservesCorrectChoiceIndexWhenShuffledChoicesHaveDuplicateText() {
     TestabilitySettings testabilitySettings = mock(TestabilitySettings.class);
     when(testabilitySettings.getRandomizer()).thenReturn(new ReorderingRandomizer(0, 2, 1, 3));

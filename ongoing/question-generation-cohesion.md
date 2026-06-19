@@ -2,11 +2,11 @@
 
 Status: done
 
-## Problem
+## Original Problem
 
 Batch-generated multiple-choice questions preserve the model's choice order when imported, while synchronous generation shuffles choices when `choicesMayBeShuffled` is true. This is a bug, but it also exposes a cohesion problem: post-processing of AI-generated MCQs is owned by the synchronous `AiQuestionGenerator` path instead of by the domain concept "an AI-generated MCQ result is ready for use".
 
-## Current Divergence
+## Original Divergence
 
 - Synchronous generation:
   - `AiQuestionGenerator.getAiGeneratedQuestion(...)` calls `NoteQuestionGenerationService.generateQuestion(...)`.
@@ -17,6 +17,13 @@ Batch-generated multiple-choice questions preserve the model's choice order when
 - Refinement:
   - `AiQuestionGeneratorForNote.refineQuestion(...)` returns an `MCQWithAnswer`.
   - `PredefinedQuestionService.refineAIQuestion(...)` persists it directly, so it also bypasses the synchronous shuffle behavior.
+
+## Outcome
+
+- Synchronous generation, batch import, and refinement now share `GeneratedQuestionPostProcessor`.
+- `NoteQuestionGenerationService` owns OpenAI question/refinement execution and validates generated MCQs before post-processing.
+- `AiQuestionGeneratorForNote` was removed after refinement request execution moved into `NoteQuestionGenerationService`.
+- `PredefinedQuestionController.exportQuestionGeneration(...)` delegates request construction through `NoteQuestionGenerationService` instead of manually wiring `QuestionGenerationRequestBuilder`.
 
 ## Design Direction
 

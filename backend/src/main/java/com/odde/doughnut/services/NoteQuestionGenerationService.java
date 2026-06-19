@@ -69,7 +69,7 @@ public class NoteQuestionGenerationService {
 
     return openAiApiHandler
         .requestAndGetStructuredResponseResult(responseRequest)
-        .map(question -> question != null && question.isValid() ? question : null)
+        .flatMap(this::validQuestion)
         .orElse(null);
   }
 
@@ -82,7 +82,14 @@ public class NoteQuestionGenerationService {
 
     return openAiApiHandler
         .requestAndGetStructuredResponseResult(responseRequestBuilder.build())
-        .map(refined -> (MCQWithAnswer) refined);
+        .flatMap(this::validQuestion);
+  }
+
+  private Optional<MCQWithAnswer> validQuestion(MCQWithAnswer question) {
+    if (question == null || !question.isValid()) {
+      return Optional.empty();
+    }
+    return Optional.of(question);
   }
 
   public Optional<QuestionEvaluation> evaluateQuestion(Note note, MCQWithAnswer question)

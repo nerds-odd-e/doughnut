@@ -69,6 +69,22 @@ class PredefinedQuestionRefinementControllerTests extends ControllerTestBase {
   }
 
   @Test
+  void invalidRefinedQuestionIsRejected() throws UnexpectedNoAccessRightException {
+    MCQWithAnswer invalidQuestion =
+        makeMe
+            .aMCQWithAnswer()
+            .choices("Blue", "Green", "Red")
+            .correctChoiceIndex(3)
+            .choicesMayBeShuffled(true)
+            .please();
+    openAiStructuredResponseMock.stubStructuredResponse(invalidQuestion);
+
+    PredefinedQuestion result = controller.refineQuestion(note, predefinedQuestion);
+
+    assertThat(result, equalTo(null));
+  }
+
+  @Test
   void refineQuestionFailedWithGpt35WillNotTryAgain() {
     openAiStructuredResponseMock.stubStructuredResponseMalformed("{invalid json}");
     assertThrows(RuntimeException.class, () -> controller.refineQuestion(note, predefinedQuestion));
