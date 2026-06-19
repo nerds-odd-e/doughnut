@@ -143,6 +143,8 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
       assertThat(request.get("instructions"), notNullValue());
       assertThat(request.containsKey("input"), is(true));
       assertThat(request.get("input"), notNullValue());
+      assertThat(
+          request.get("input").toString(), containsString("There are 42 prefectures in Japan"));
       assertThat(request.containsKey("text"), is(true));
       assertThat(request.get("text"), notNullValue());
       assertThat(request.containsKey("max_output_tokens"), is(true));

@@ -1,6 +1,6 @@
 # Question Generation Cohesion
 
-Status: planned
+Status: done
 
 ## Problem
 
@@ -126,7 +126,7 @@ Tests:
 
 ## Phase 4: Reduce Request-Building Ownership Leakage
 
-Status: planned
+Status: done
 
 Type: Structure
 
@@ -143,6 +143,10 @@ Implementation notes:
 - Inject `QuestionGenerationRequestBuilder` or delegate export construction through an existing service.
 - Keep the response body identical.
 - Avoid touching generated API files unless a controller signature changes, which should not be necessary.
+
+Discovery:
+
+- `PredefinedQuestionController.exportQuestionGeneration(...)` can reuse `NoteQuestionGenerationService.buildQuestionGenerationRequest(...)`, so the controller no longer needs to duplicate `QuestionGenerationRequestBuilder` collaborator wiring.
 
 Tests:
 

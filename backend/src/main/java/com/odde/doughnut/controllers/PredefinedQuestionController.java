@@ -1,18 +1,12 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
-import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.NoteRealmService;
+import com.odde.doughnut.services.NoteQuestionGenerationService;
 import com.odde.doughnut.services.PredefinedQuestionService;
-import com.odde.doughnut.services.QuestionGenerationRequestBuilder;
-import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
-import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
-import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
 import com.odde.doughnut.services.openAiApis.StructuredResponseCreateParamsSerializer;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -30,35 +24,20 @@ class PredefinedQuestionController {
 
   private final AiQuestionGenerator aiQuestionGenerator;
   private final AuthorizationService authorizationService;
-  private final GlobalSettingsService globalSettingsService;
-  private final FocusContextRetrievalService focusContextRetrievalService;
-  private final FocusContextMarkdownRenderer focusContextMarkdownRenderer;
-  private final NoteRealmService noteRealmService;
-  private final NoteRepository noteRepository;
-  private final WikiTitleCacheService wikiTitleCacheService;
+  private final NoteQuestionGenerationService noteQuestionGenerationService;
   private final StructuredResponseCreateParamsSerializer paramsSerializer;
 
   @Autowired
   public PredefinedQuestionController(
       PredefinedQuestionService predefinedQuestionService,
       AuthorizationService authorizationService,
-      GlobalSettingsService globalSettingsService,
       AiQuestionGenerator aiQuestionGenerator,
-      FocusContextRetrievalService focusContextRetrievalService,
-      FocusContextMarkdownRenderer focusContextMarkdownRenderer,
-      NoteRealmService noteRealmService,
-      NoteRepository noteRepository,
-      WikiTitleCacheService wikiTitleCacheService,
+      NoteQuestionGenerationService noteQuestionGenerationService,
       StructuredResponseCreateParamsSerializer paramsSerializer) {
     this.predefinedQuestionService = predefinedQuestionService;
-    this.focusContextRetrievalService = focusContextRetrievalService;
-    this.focusContextMarkdownRenderer = focusContextMarkdownRenderer;
-    this.noteRealmService = noteRealmService;
-    this.noteRepository = noteRepository;
-    this.wikiTitleCacheService = wikiTitleCacheService;
     this.authorizationService = authorizationService;
-    this.globalSettingsService = globalSettingsService;
     this.aiQuestionGenerator = aiQuestionGenerator;
+    this.noteQuestionGenerationService = noteQuestionGenerationService;
     this.paramsSerializer = paramsSerializer;
   }
 
@@ -106,17 +85,8 @@ class PredefinedQuestionController {
       @PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
-    QuestionGenerationRequestBuilder requestBuilder =
-        new QuestionGenerationRequestBuilder(
-            globalSettingsService,
-            focusContextRetrievalService,
-            focusContextMarkdownRenderer,
-            noteRealmService,
-            noteRepository,
-            wikiTitleCacheService,
-            authorizationService);
     StructuredResponseCreateParams<MCQWithAnswer> params =
-        requestBuilder.buildQuestionGenerationResponseRequest(note, null, null, null);
+        noteQuestionGenerationService.buildQuestionGenerationRequest(note, null);
     return paramsSerializer.toBodyMap(params);
   }
 }
