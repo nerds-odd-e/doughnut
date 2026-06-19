@@ -191,7 +191,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 
 - `suggestTitle`: POST `/api/ai/suggest-title/{note}` -> `SuggestTitleResponse` (request: `SuggestTitleData`; path: note; response body: SuggestedTitleDto)
 - `removeRefinementSuggestion`: POST `/api/ai/remove-refinement-suggestion/{note}` -> `RemoveRefinementSuggestionResponse` (request: `RemoveRefinementSuggestionData`; path: note; body: RefinementSuggestionsRequestDto; response body: RefinedContentResponseDto)
-- `generateRefinementSuggestions`: POST `/api/ai/generate-refinement-suggestions/{note}` -> `GenerateRefinementSuggestionsResponse` (request: `GenerateRefinementSuggestionsData`; path: note; response body: RefinementSuggestionsDto)
+- `generateRefinementSuggestions`: POST `/api/ai/generate-refinement-suggestions/{note}` -> `GenerateRefinementSuggestionsResponse` (request: `GenerateRefinementSuggestionsData`; path: note; response body: NoteRefinementLayoutDto)
 - `extractNote`: POST `/api/ai/extract-note/{note}` -> `ExtractNoteResponse` (request: `ExtractNoteData`; path: note; body: RefinementSuggestionsRequestDto; response body: NoteRealm)
 - `dummyEntryToGenerateDataTypesThatAreRequiredInEventStream`: GET `/api/ai/dummy` -> `DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamResponse` (request: none; response body: DummyForGeneratingTypes)
 - `getAvailableGptModels`: GET `/api/ai/available-gpt-models` -> `GetAvailableGptModelsResponse` (request: none; response body: Array<string>)

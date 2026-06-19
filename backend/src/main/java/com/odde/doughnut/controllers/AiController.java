@@ -9,6 +9,7 @@ import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.NoteExtractionResult;
+import com.odde.doughnut.services.ai.NoteRefinementLayout;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -67,22 +68,22 @@ public class AiController {
 
   @PostMapping("/generate-refinement-suggestions/{note}")
   @Transactional
-  public RefinementSuggestionsDTO generateRefinementSuggestions(
+  public NoteRefinementLayoutDTO generateRefinementSuggestions(
       @PathVariable(value = "note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
     authorizationService.assertAuthorization(note);
     String content = note.getContent();
     if (content == null || content.trim().isEmpty()) {
-      return new RefinementSuggestionsDTO(List.of());
+      return new NoteRefinementLayoutDTO(NoteRefinementLayout.empty());
     }
     try {
-      List<String> suggestions =
+      NoteRefinementLayout layout =
           notebookAssistantForNoteServiceFactory
               .createNoteAutomationService(note)
               .generateRefinementSuggestions();
-      return new RefinementSuggestionsDTO(suggestions);
+      return new NoteRefinementLayoutDTO(layout);
     } catch (OpenAiNotAvailableException e) {
-      return new RefinementSuggestionsDTO(List.of());
+      return new NoteRefinementLayoutDTO(NoteRefinementLayout.empty());
     }
   }
 

@@ -5,12 +5,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.doughnut.controllers.dto.NoteRefinementLayoutDTO;
 import com.odde.doughnut.controllers.dto.RefinedContentResponseDTO;
-import com.odde.doughnut.controllers.dto.RefinementSuggestionsDTO;
 import com.odde.doughnut.controllers.dto.RefinementSuggestionsRequestDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.ai.RefinementSuggestions;
+import com.odde.doughnut.services.ai.NoteRefinementLayout;
+import com.odde.doughnut.services.ai.NoteRefinementLayoutItem;
 import com.odde.doughnut.services.ai.RegeneratedNoteContent;
 import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
@@ -62,31 +63,55 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       testNote.setContent(content);
 
-      RefinementSuggestionsDTO result = controller.generateRefinementSuggestions(testNote);
+      NoteRefinementLayoutDTO result = controller.generateRefinementSuggestions(testNote);
 
-      assertThat(result.getSuggestions()).isEmpty();
+      assertThat(result.getItems()).isEmpty();
     }
 
     @Test
     void shouldCallResponsesApiWithStructuredInstructions()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
-      RefinementSuggestions refinementSuggestions = new RefinementSuggestions();
-      refinementSuggestions.setSuggestions(List.of("Point 1", "Point 2"));
-      openAiStructuredResponseMock.stubStructuredResponse(refinementSuggestions);
+      NoteRefinementLayout layout =
+          new NoteRefinementLayout(
+              List.of(
+                  new NoteRefinementLayoutItem(
+                      "p1",
+                      "Point 1",
+                      false,
+                      List.of(
+                          new NoteRefinementLayoutItem(
+                              "p1-1", "[[Already extracted note]]", true, List.of()))),
+                  new NoteRefinementLayoutItem("p2", "Point 2", false, List.of())));
+      openAiStructuredResponseMock.stubStructuredResponse(layout);
       testNote.setContent("Some note content");
 
-      RefinementSuggestionsDTO result = controller.generateRefinementSuggestions(testNote);
-      assertThat(result.getSuggestions()).containsExactly("Point 1", "Point 2");
+      NoteRefinementLayoutDTO result = controller.generateRefinementSuggestions(testNote);
+      assertThat(result.getItems()).hasSize(2);
+      assertThat(result.getItems().getFirst().getText()).isEqualTo("Point 1");
+      assertThat(result.getItems().getFirst().getChildren().getFirst().isAlreadyExtracted())
+          .isTrue();
 
       @SuppressWarnings({"unchecked", "rawtypes"})
-      ArgumentCaptor<StructuredResponseCreateParams<RefinementSuggestions>> paramsCaptor =
+      ArgumentCaptor<StructuredResponseCreateParams<NoteRefinementLayout>> paramsCaptor =
           ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
       verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
-      StructuredResponseCreateParams<RefinementSuggestions> params = paramsCaptor.getValue();
+      StructuredResponseCreateParams<NoteRefinementLayout> params = paramsCaptor.getValue();
       String instructions = params.rawParams().instructions().orElse("");
       MatcherAssert.assertThat(
-          "Instructions should contain the refinement suggestions prompt",
-          instructions.contains("Please generate refinement suggestions for the note content"),
+          "Instructions should request one current-content layout",
+          instructions.contains("Return one current-content layout for the note content"),
+          Matchers.is(true));
+      MatcherAssert.assertThat(
+          "Instructions should prohibit alternative breakdown suggestions",
+          instructions.contains("not alternative breakdown suggestions"),
+          Matchers.is(true));
+      MatcherAssert.assertThat(
+          "Instructions should prohibit grandchildren",
+          instructions.contains("Do not create grandchildren"),
+          Matchers.is(true));
+      MatcherAssert.assertThat(
+          "Instructions should describe wiki-link-only extracted markers",
+          instructions.contains("simple standalone wiki-link-only lines"),
           Matchers.is(true));
       MatcherAssert.assertThat(
           "Should use Responses structured text format",
@@ -94,6 +119,22 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
           Matchers.is(true));
       assertThat(params.rawParams().input().flatMap(input -> input.text()).orElse("")).isNotBlank();
       assertThat(params.rawParams().maxOutputTokens()).isEqualTo(Optional.of(1000L));
+    }
+
+    @Test
+    void shouldReturnEmptyLayoutWhenAiReturnsInvalidLayout()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      NoteRefinementLayout layoutWithDuplicateIds =
+          new NoteRefinementLayout(
+              List.of(
+                  new NoteRefinementLayoutItem("same", "Point 1", false, List.of()),
+                  new NoteRefinementLayoutItem("same", "Point 2", false, List.of())));
+      openAiStructuredResponseMock.stubStructuredResponse(layoutWithDuplicateIds);
+      testNote.setContent("Some note content");
+
+      NoteRefinementLayoutDTO result = controller.generateRefinementSuggestions(testNote);
+
+      assertThat(result.getItems()).isEmpty();
     }
 
     @Test

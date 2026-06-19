@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.services.ai.AiNoteAutomationService;
 import com.odde.doughnut.services.ai.NoteExtractionResult;
+import com.odde.doughnut.services.ai.NoteRefinementLayout;
 import java.util.List;
 
 public final class NoteAutomationService {
@@ -16,7 +17,7 @@ public final class NoteAutomationService {
     return aiNoteAutomationService.suggestTitle();
   }
 
-  public List<String> generateRefinementSuggestions() throws JsonProcessingException {
+  public NoteRefinementLayout generateRefinementSuggestions() throws JsonProcessingException {
     return aiNoteAutomationService.generateRefinementSuggestions();
   }
 

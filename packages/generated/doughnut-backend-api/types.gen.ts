@@ -613,8 +613,15 @@ export type RefinedContentResponseDto = {
     content?: string;
 };
 
-export type RefinementSuggestionsDto = {
-    suggestions?: Array<string>;
+export type NoteRefinementLayoutDto = {
+    items?: Array<NoteRefinementLayoutItem>;
+};
+
+export type NoteRefinementLayoutItem = {
+    id: string;
+    text: string;
+    alreadyExtracted: boolean;
+    children: Array<NoteRefinementLayoutItem>;
 };
 
 export type QuestionGenerationBatchSubmissionSummaryDto = {
@@ -2367,7 +2374,7 @@ export type GenerateRefinementSuggestionsResponses = {
     /**
      * OK
      */
-    200: RefinementSuggestionsDto;
+    200: NoteRefinementLayoutDto;
 };
 
 export type GenerateRefinementSuggestionsResponse = GenerateRefinementSuggestionsResponses[keyof GenerateRefinementSuggestionsResponses];

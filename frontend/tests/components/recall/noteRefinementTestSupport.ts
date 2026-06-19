@@ -11,7 +11,10 @@ import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
-import type { Note } from "@generated/doughnut-backend-api"
+import type {
+  Note,
+  NoteRefinementLayoutItem,
+} from "@generated/doughnut-backend-api"
 import { afterEach, beforeEach, vi } from "vitest"
 import { defineComponent, type PropType } from "vue"
 
@@ -66,7 +69,9 @@ export function mountNoteRefinement(
   suggestions: string[],
   overrides?: { note?: typeof note }
 ) {
-  mockSdkService(AiController, "generateRefinementSuggestions", { suggestions })
+  mockSdkService(AiController, "generateRefinementSuggestions", {
+    items: refinementLayoutItems(suggestions),
+  })
   return renderer
     .withCleanStorage()
     .withProps({
@@ -94,6 +99,17 @@ export async function selectFirstSuggestion(
 }
 
 export const extractNoteButtonTitle = "Extract to a new note"
+
+export function refinementLayoutItems(
+  suggestions: string[]
+): NoteRefinementLayoutItem[] {
+  return suggestions.map((text, index) => ({
+    id: `p${index + 1}`,
+    text,
+    alreadyExtracted: false,
+    children: [],
+  }))
+}
 
 export function refinementSuggestionsApiCall(
   noteId: number,

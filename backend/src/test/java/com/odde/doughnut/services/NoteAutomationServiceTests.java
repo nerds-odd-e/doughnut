@@ -6,7 +6,8 @@ import static org.hamcrest.Matchers.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.AiNoteAutomationService;
-import com.odde.doughnut.services.ai.RefinementSuggestions;
+import com.odde.doughnut.services.ai.NoteRefinementLayout;
+import com.odde.doughnut.services.ai.NoteRefinementLayoutItem;
 import com.odde.doughnut.services.ai.TitleReplacement;
 import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
@@ -78,30 +79,35 @@ class NoteAutomationServiceTests {
   }
 
   @Test
-  void shouldReturnRefinementSuggestions() throws JsonProcessingException {
-    RefinementSuggestions refinementSuggestions = new RefinementSuggestions();
-    refinementSuggestions.setSuggestions(
+  void shouldReturnNoteRefinementLayout() throws JsonProcessingException {
+    NoteRefinementLayout layout = new NoteRefinementLayout();
+    layout.setItems(
         List.of(
-            "English is a language that is spoken in many countries.",
-            "It is also the most widely spoken language in the world."));
-    openAiStructuredResponseMock.stubStructuredResponse(refinementSuggestions);
+            new NoteRefinementLayoutItem(
+                "p1", "English is a language that is spoken in many countries.", false, List.of()),
+            new NoteRefinementLayoutItem(
+                "p2",
+                "It is also the most widely spoken language in the world.",
+                false,
+                List.of())));
+    openAiStructuredResponseMock.stubStructuredResponse(layout);
 
-    List<String> result = service.generateRefinementSuggestions();
+    NoteRefinementLayout result = service.generateRefinementSuggestions();
 
-    assertThat(result, hasSize(2));
+    assertThat(result.getItems(), hasSize(2));
     assertThat(
-        result,
+        result.getItems().stream().map(NoteRefinementLayoutItem::getText).toList(),
         contains(
             "English is a language that is spoken in many countries.",
             "It is also the most widely spoken language in the world."));
   }
 
   @Test
-  void shouldHandleNoToolCallWhenGeneratingRefinementSuggestions() throws JsonProcessingException {
+  void shouldReturnEmptyLayoutWhenNoResponse() throws JsonProcessingException {
     openAiStructuredResponseMock.stubStructuredResponse(null);
 
-    List<String> result = service.generateRefinementSuggestions();
+    NoteRefinementLayout result = service.generateRefinementSuggestions();
 
-    assertThat(result, is(empty()));
+    assertThat(result.getItems(), is(empty()));
   }
 }

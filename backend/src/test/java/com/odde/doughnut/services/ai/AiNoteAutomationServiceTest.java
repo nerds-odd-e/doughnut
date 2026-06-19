@@ -59,64 +59,88 @@ class AiNoteAutomationServiceTest {
   }
 
   @Nested
-  class GenerateRefinementSuggestions {
+  class GenerateNoteRefinementLayout {
     @Test
-    void shouldReturnRefinementSuggestions() throws JsonProcessingException {
-      RefinementSuggestions refinementSuggestions = new RefinementSuggestions();
-      refinementSuggestions.setSuggestions(
+    void shouldReturnNoteRefinementLayout() throws JsonProcessingException {
+      NoteRefinementLayout layout = new NoteRefinementLayout();
+      layout.setItems(
           List.of(
-              "English is a language that is spoken in many countries.",
-              "It is also the most widely spoken language in the world."));
-      openAiStructuredResponseMock.stubStructuredResponse(refinementSuggestions);
+              new NoteRefinementLayoutItem(
+                  "p1",
+                  "English is a language that is spoken in many countries.",
+                  false,
+                  List.of()),
+              new NoteRefinementLayoutItem(
+                  "p2",
+                  "It is also the most widely spoken language in the world.",
+                  false,
+                  List.of())));
+      openAiStructuredResponseMock.stubStructuredResponse(layout);
 
-      List<String> result = service.generateRefinementSuggestions();
+      NoteRefinementLayout result = service.generateRefinementSuggestions();
 
-      assertThat(result, hasSize(2));
+      assertThat(result.getItems(), hasSize(2));
       assertThat(
-          result,
+          result.getItems().stream().map(NoteRefinementLayoutItem::getText).toList(),
           contains(
               "English is a language that is spoken in many countries.",
               "It is also the most widely spoken language in the world."));
     }
 
     @Test
-    void shouldReturnEmptyListWhenNoResponse() throws JsonProcessingException {
+    void shouldReturnEmptyLayoutWhenNoResponse() throws JsonProcessingException {
       openAiStructuredResponseMock.stubStructuredResponse(null);
 
-      List<String> result = service.generateRefinementSuggestions();
+      NoteRefinementLayout result = service.generateRefinementSuggestions();
 
-      assertThat(result, is(empty()));
+      assertThat(result.getItems(), is(empty()));
     }
 
     @Test
-    void shouldHandleMultipleSuggestions() throws JsonProcessingException {
-      RefinementSuggestions refinementSuggestions = new RefinementSuggestions();
-      refinementSuggestions.setSuggestions(
+    void shouldHandleMultipleLayoutItems() throws JsonProcessingException {
+      NoteRefinementLayout layout = new NoteRefinementLayout();
+      layout.setItems(
           List.of(
-              "Point 1: First important aspect.",
-              "Point 2: Second important aspect.",
-              "Point 3: Third important aspect.",
-              "Point 4: Fourth important aspect.",
-              "Point 5: Fifth important aspect."));
-      openAiStructuredResponseMock.stubStructuredResponse(refinementSuggestions);
+              new NoteRefinementLayoutItem(
+                  "p1", "Point 1: First important aspect.", false, List.of()),
+              new NoteRefinementLayoutItem(
+                  "p2", "Point 2: Second important aspect.", false, List.of()),
+              new NoteRefinementLayoutItem(
+                  "p3", "Point 3: Third important aspect.", false, List.of()),
+              new NoteRefinementLayoutItem(
+                  "p4", "Point 4: Fourth important aspect.", false, List.of()),
+              new NoteRefinementLayoutItem(
+                  "p5", "Point 5: Fifth important aspect.", false, List.of())));
+      openAiStructuredResponseMock.stubStructuredResponse(layout);
 
-      List<String> result = service.generateRefinementSuggestions();
+      NoteRefinementLayout result = service.generateRefinementSuggestions();
 
-      assertThat(result, hasSize(5));
-      assertThat(result, hasItem("Point 1: First important aspect."));
-      assertThat(result, hasItem("Point 5: Fifth important aspect."));
+      assertThat(result.getItems(), hasSize(5));
+      assertThat(
+          result.getItems().stream().map(NoteRefinementLayoutItem::getText).toList(),
+          hasItem("Point 1: First important aspect."));
+      assertThat(
+          result.getItems().stream().map(NoteRefinementLayoutItem::getText).toList(),
+          hasItem("Point 5: Fifth important aspect."));
     }
 
     @Test
-    void shouldReturnAllSuggestionsFromAiResponse() throws JsonProcessingException {
-      RefinementSuggestions refinementSuggestions = new RefinementSuggestions();
-      refinementSuggestions.setSuggestions(
-          List.of("Point 1", "Point 2", "Point 3", "Point 4", "Point 5", "Point 6", "Point 7"));
-      openAiStructuredResponseMock.stubStructuredResponse(refinementSuggestions);
+    void shouldReturnAllLayoutItemsFromAiResponse() throws JsonProcessingException {
+      NoteRefinementLayout layout = new NoteRefinementLayout();
+      layout.setItems(
+          List.of(
+              new NoteRefinementLayoutItem("p1", "Point 1", false, List.of()),
+              new NoteRefinementLayoutItem("p2", "Point 2", false, List.of()),
+              new NoteRefinementLayoutItem("p3", "Point 3", false, List.of()),
+              new NoteRefinementLayoutItem("p4", "Point 4", false, List.of()),
+              new NoteRefinementLayoutItem("p5", "Point 5", false, List.of()),
+              new NoteRefinementLayoutItem("p6", "Point 6", false, List.of()),
+              new NoteRefinementLayoutItem("p7", "Point 7", false, List.of())));
+      openAiStructuredResponseMock.stubStructuredResponse(layout);
 
-      List<String> result = service.generateRefinementSuggestions();
+      NoteRefinementLayout result = service.generateRefinementSuggestions();
 
-      assertThat(result, hasSize(7));
+      assertThat(result.getItems(), hasSize(7));
     }
   }
 }

@@ -53,7 +53,10 @@
 </template>
 
 <script setup lang="ts">
-import type { Note } from "@generated/doughnut-backend-api"
+import type {
+  Note,
+  NoteRefinementLayoutItem,
+} from "@generated/doughnut-backend-api"
 import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
 
 import {
@@ -76,6 +79,12 @@ const emit = defineEmits<{
 
 const refinementSuggestions = ref<string[]>([])
 
+const flattenLayoutItems = (items: NoteRefinementLayoutItem[]): string[] =>
+  items.flatMap((item) => [
+    item.text,
+    ...flattenLayoutItems(item.children ?? []),
+  ])
+
 const loadRefinementSuggestions = async () => {
   try {
     const result = await apiCallWithLoading(() =>
@@ -85,7 +94,9 @@ const loadRefinementSuggestions = async () => {
     )
 
     refinementSuggestions.value =
-      !result.error && result.data?.suggestions ? result.data.suggestions : []
+      !result.error && result.data?.items
+        ? flattenLayoutItems(result.data.items)
+        : []
   } catch (err) {
     console.error("Failed to generate refinement suggestions:", err)
     refinementSuggestions.value = []

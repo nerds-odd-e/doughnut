@@ -31,9 +31,15 @@ const EXTRACT_NOTE_INSTRUCTION_PATTERN =
   '.*extract a refinement suggestion from a note to create a new note.*'
 
 const REFINEMENT_SUGGESTIONS_INSTRUCTION_PATTERN =
-  '.*Please generate refinement suggestions for the note content.*'
+  '.*Return one current-content layout for the note content.*'
 
 async function stubRefinementSuggestions(suggestions: string[]) {
+  const items = suggestions.map((text, index) => ({
+    id: `p${index + 1}`,
+    text,
+    alreadyExtracted: false,
+    children: [],
+  }))
   await mock_services
     .openAi()
     .responses()
@@ -41,7 +47,7 @@ async function stubRefinementSuggestions(suggestions: string[]) {
       role: 'developer',
       content: REFINEMENT_SUGGESTIONS_INSTRUCTION_PATTERN,
     })
-    .stubOutputText(JSON.stringify({ suggestions }))
+    .stubOutputText(JSON.stringify({ items }))
 }
 
 async function stubExtractNoteResponse(

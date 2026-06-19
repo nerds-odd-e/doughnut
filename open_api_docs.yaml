@@ -1575,7 +1575,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/RefinementSuggestionsDTO"
+                $ref: "#/components/schemas/NoteRefinementLayoutDTO"
   /api/ai/extract-note/{note}:
     post:
       tags:
@@ -4162,13 +4162,33 @@ components:
       properties:
         content:
           type: string
-    RefinementSuggestionsDTO:
+    NoteRefinementLayoutDTO:
       type: object
       properties:
-        suggestions:
+        items:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/NoteRefinementLayoutItem"
+    NoteRefinementLayoutItem:
+      type: object
+      properties:
+        id:
+          type: string
+          minLength: 1
+        text:
+          type: string
+          minLength: 1
+        alreadyExtracted:
+          type: boolean
+        children:
+          type: array
+          items:
+            $ref: "#/components/schemas/NoteRefinementLayoutItem"
+      required:
+      - alreadyExtracted
+      - children
+      - id
+      - text
     QuestionGenerationBatchSubmissionSummaryDTO:
       type: object
       properties:

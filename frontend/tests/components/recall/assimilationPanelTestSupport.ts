@@ -15,6 +15,7 @@ import { computed, ref } from "vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { afterEach, beforeEach, vi } from "vitest"
 import { mockedGoToNextAssimilation } from "./assimilationPanelMocks"
+import { refinementLayoutItems } from "./noteRefinementTestSupport"
 
 export const noteRealm = makeMe.aNoteRealm.please()
 export const memoryTracker = makeMe.aMemoryTracker.ofNote(noteRealm).please()
@@ -44,7 +45,7 @@ export function setupAssimilationPanelTests() {
     assimilateSpy = mockSdkService(AssimilationController, "assimilate", [])
     mockSdkService(NoteController, "getNoteInfo", {})
     mockSdkService(AiController, "generateRefinementSuggestions", {
-      suggestions: [],
+      items: refinementLayoutItems([]),
     })
 
     vi.mocked(useRecallData).mockReturnValue({

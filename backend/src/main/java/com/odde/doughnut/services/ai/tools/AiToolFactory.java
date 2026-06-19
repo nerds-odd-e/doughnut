@@ -151,7 +151,14 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
 
   public static InstructionAndSchema generateRefinementSuggestionsAiTool() {
     return new InstructionAndSchema(
-        "Please generate refinement suggestions for the note content: decompose the note into key points that could be removed, extracted to a new note, or otherwise refined to make the note more succinct and well-structured. Each suggestion should be a complete sentence. There should be a maximum of 5 suggestions.",
+        """
+        Return one current-content layout for the note content, not alternative breakdown suggestions.
+
+        The layout must have at most two levels: top-level items and optional child items. Do not create grandchildren.
+        Each item text should describe the current note content represented by that point.
+        Give every item a stable id that is unique within the layout.
+        Set alreadyExtracted to true only for simple standalone wiki-link-only lines that point to content already extracted into another note, for example [[Target note]] or [[Target note|Label]]. These items should be marked Already extracted in the UI but remain selectable.
+        """,
         refinementSuggestions());
   }
 
@@ -209,7 +216,7 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
   }
 
   public static Class<?> refinementSuggestions() {
-    return RefinementSuggestions.class;
+    return NoteRefinementLayout.class;
   }
 
   public static Class<?> completeNoteContent() {

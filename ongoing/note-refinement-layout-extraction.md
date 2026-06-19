@@ -84,7 +84,7 @@ Validation rules:
 
 ### Phase 1 - Return a nested note layout from AI
 
-Status: planned
+Status: done
 
 Behavior: When a user opens note refinement for a non-empty note, the backend returns one note layout with at most two levels, including **Already extracted** flags for simple wiki-link-only lines.
 
@@ -103,6 +103,12 @@ Tests:
 Targeted checks:
 - `CURSOR_DEV=true nix develop -c pnpm backend:test_only -- --tests com.odde.doughnut.controllers.AiControllerNoteRefinementTest`
 - `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`
+
+Completion notes:
+- The backend now returns `NoteRefinementLayoutDTO` from the existing `generate-refinement-suggestions` endpoint and validates AI layouts for unique ids, non-blank text, non-null children, and no grandchildren.
+- The old flat AI response schema and DTO were removed. The existing extraction/removal request DTO remains flat until later phases change those request bodies.
+- `NoteRefinement.vue` temporarily flattens returned layout items into the existing flat suggestion UI so Phase 1 can ship without implementing Phase 2 UI behavior early.
+- Local verification required resetting a stale `doughnut_test` database row that conflicted with generated test user ids; after migrating the clean test DB, targeted backend tests passed.
 
 ### Phase 2 - Show the layout with tri-state selection
 
@@ -196,4 +202,3 @@ Targeted checks:
 - Adding a persisted extraction marker beyond the simple wiki-link-line heuristic.
 - Building arbitrary-depth outlines.
 - Reworking the broader assimilation panel outside note refinement.
-

@@ -52,12 +52,12 @@ public class AiNoteAutomationService {
             null));
   }
 
-  public List<String> generateRefinementSuggestions() throws JsonProcessingException {
+  public NoteRefinementLayout generateRefinementSuggestions() throws JsonProcessingException {
     return executeWithTool(
         AiToolFactory.generateRefinementSuggestionsAiTool(),
-        RefinementSuggestions.class,
-        RefinementSuggestions::getSuggestions,
-        List.of(),
+        NoteRefinementLayout.class,
+        NoteRefinementLayoutValidator::validOrEmpty,
+        NoteRefinementLayout.empty(),
         REFINEMENT_SUGGESTIONS_MAX_OUTPUT_TOKENS);
   }
 

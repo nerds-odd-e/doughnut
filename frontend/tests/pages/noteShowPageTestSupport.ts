@@ -8,6 +8,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { mockNotebookGetForNoteRealm, mockSdkService } from "@tests/helpers"
+import { refinementLayoutItems } from "../components/recall/noteRefinementTestSupport"
 
 export function createNoteShowPageRouter() {
   return createRouter({
@@ -26,7 +27,7 @@ export function setupNoteShowPageAssimilationPanelMocks() {
   })
   mockSdkService(NoteController, "getNoteInfo", {})
   mockSdkService(AiController, "generateRefinementSuggestions", {
-    suggestions: [],
+    items: refinementLayoutItems([]),
   })
   mockSdkService(AssimilationController, "assimilate", [])
   return noteRealm
