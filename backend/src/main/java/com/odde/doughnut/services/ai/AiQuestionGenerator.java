@@ -8,10 +8,6 @@ import com.odde.doughnut.services.NoteQuestionGenerationService;
 import com.odde.doughnut.services.ai.builder.OpenAIResponseRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
-import com.odde.doughnut.testability.TestabilitySettings;
-import com.odde.doughnut.utils.Randomizer;
-import java.util.ArrayList;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,35 +15,19 @@ import org.springframework.stereotype.Service;
 public class AiQuestionGenerator {
   private final NoteQuestionGenerationService noteQuestionGenerationService;
   private final GlobalSettingsService globalSettingsService;
-  private final Randomizer randomizer;
   private final OpenAiApiHandler openAiApiHandler;
-  private final TestabilitySettings testabilitySettings;
+  private final GeneratedQuestionPostProcessor generatedQuestionPostProcessor;
 
   @Autowired
   public AiQuestionGenerator(
       NoteQuestionGenerationService noteQuestionGenerationService,
       GlobalSettingsService globalSettingsService,
-      TestabilitySettings testabilitySettings,
-      OpenAiApiHandler openAiApiHandler) {
-    this.noteQuestionGenerationService = noteQuestionGenerationService;
-    this.globalSettingsService = globalSettingsService;
-    this.randomizer = testabilitySettings.getRandomizer();
-    this.openAiApiHandler = openAiApiHandler;
-    this.testabilitySettings = testabilitySettings;
-  }
-
-  // Test-only constructor for injecting Randomizer directly
-  public AiQuestionGenerator(
-      NoteQuestionGenerationService noteQuestionGenerationService,
-      GlobalSettingsService globalSettingsService,
-      Randomizer randomizer,
       OpenAiApiHandler openAiApiHandler,
-      TestabilitySettings testabilitySettings) {
+      GeneratedQuestionPostProcessor generatedQuestionPostProcessor) {
     this.noteQuestionGenerationService = noteQuestionGenerationService;
     this.globalSettingsService = globalSettingsService;
-    this.randomizer = randomizer;
     this.openAiApiHandler = openAiApiHandler;
-    this.testabilitySettings = testabilitySettings;
+    this.generatedQuestionPostProcessor = generatedQuestionPostProcessor;
   }
 
   public MCQWithAnswer getAiGeneratedQuestion(Note note, String additionalMessage) {
@@ -65,30 +45,10 @@ public class AiQuestionGenerator {
       MCQWithAnswer original =
           noteQuestionGenerationService.generateQuestion(
               note, additionalMessage, contextSeed, propertyKey);
-      if (original != null && original.isChoicesMayBeShuffled()) {
-        return shuffleChoices(original);
-      }
-      return original;
+      return generatedQuestionPostProcessor.postProcess(original);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  private MCQWithAnswer shuffleChoices(MCQWithAnswer original) {
-    List<String> choices = new ArrayList<>(original.getQuestion().getResponseChoices());
-    String correctChoice = choices.get(original.getSolutionChoiceIndex());
-    choices = randomizer.shuffle(choices);
-    int newCorrectIndex = choices.indexOf(correctChoice);
-
-    MultipleChoicesQuestion shuffledQuestion =
-        new MultipleChoicesQuestion(original.getQuestion().getQuestionStem(), choices);
-
-    return new MCQWithAnswer(
-        shuffledQuestion,
-        newCorrectIndex,
-        true,
-        original.getTestedFocus(),
-        original.getValidationRationale());
   }
 
   public MCQWithAnswer getAiGeneratedRefineQuestion(Note note, MCQWithAnswer mcqWithAnswer) {

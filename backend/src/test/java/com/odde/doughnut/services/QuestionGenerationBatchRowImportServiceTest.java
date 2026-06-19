@@ -1,11 +1,14 @@
 package com.odde.doughnut.services;
 
+import static com.odde.doughnut.controllers.dto.Randomization.RandomStrategy.first;
+import static com.odde.doughnut.controllers.dto.Randomization.RandomStrategy.last;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.configs.ObjectMapperConfig;
+import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PredefinedQuestion;
@@ -21,9 +24,11 @@ import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRequestRep
 import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -44,6 +49,7 @@ class QuestionGenerationBatchRowImportServiceTest {
   @Autowired QuestionGenerationBatchRepository batchRepository;
   @Autowired QuestionGenerationBatchRequestRepository batchRequestRepository;
   @Autowired RecallPromptRepository recallPromptRepository;
+  @Autowired TestabilitySettings testabilitySettings;
 
   User user;
   Timestamp currentTime;
@@ -90,10 +96,17 @@ class QuestionGenerationBatchRowImportServiceTest {
     batchRequestRepository.saveAndFlush(outputReadyRequest);
   }
 
+  @AfterEach
+  void cleanup() {
+    testabilitySettings.setRandomization(new Randomization(first, 0));
+  }
+
   @Nested
   class ImportOutputReadyRow {
     @Test
-    void createsPredefinedQuestionAndRecallPromptFromBatchOutput() {
+    void createsPostProcessedPredefinedQuestionAndRecallPromptFromBatchOutput() {
+      testabilitySettings.setRandomization(new Randomization(last, 0));
+
       assertThat(rowImportService.importRow(outputReadyRequest), is(true));
 
       QuestionGenerationBatchRequest reloadedRequest =
@@ -118,9 +131,8 @@ class QuestionGenerationBatchRowImportServiceTest {
           importedMcq.getQuestion().getQuestionStem(),
           is(mcqWithAnswer.getQuestion().getQuestionStem()));
       assertThat(
-          importedMcq.getQuestion().getResponseChoices(),
-          is(mcqWithAnswer.getQuestion().getResponseChoices()));
-      assertThat(importedMcq.getSolutionChoiceIndex(), is(mcqWithAnswer.getSolutionChoiceIndex()));
+          importedMcq.getQuestion().getResponseChoices(), is(List.of("Red", "Green", "Blue")));
+      assertThat(importedMcq.getSolutionChoiceIndex(), is(2));
     }
 
     @Test

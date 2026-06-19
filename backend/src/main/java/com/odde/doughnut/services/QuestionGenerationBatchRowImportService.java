@@ -9,6 +9,7 @@ import com.odde.doughnut.entities.QuestionType;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
+import com.odde.doughnut.services.ai.GeneratedQuestionPostProcessor;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import org.springframework.stereotype.Service;
@@ -20,16 +21,19 @@ public class QuestionGenerationBatchRowImportService {
   private final EntityPersister entityPersister;
   private final OpenAiApiHandler openAiApiHandler;
   private final QuestionGenerationBatchMetrics batchMetrics;
+  private final GeneratedQuestionPostProcessor generatedQuestionPostProcessor;
 
   public QuestionGenerationBatchRowImportService(
       QuestionGenerationBatchRequestRepository batchRequestRepository,
       EntityPersister entityPersister,
       OpenAiApiHandler openAiApiHandler,
-      QuestionGenerationBatchMetrics batchMetrics) {
+      QuestionGenerationBatchMetrics batchMetrics,
+      GeneratedQuestionPostProcessor generatedQuestionPostProcessor) {
     this.batchRequestRepository = batchRequestRepository;
     this.entityPersister = entityPersister;
     this.openAiApiHandler = openAiApiHandler;
     this.batchMetrics = batchMetrics;
+    this.generatedQuestionPostProcessor = generatedQuestionPostProcessor;
   }
 
   @Transactional
@@ -57,8 +61,9 @@ public class QuestionGenerationBatchRowImportService {
 
     MemoryTracker memoryTracker = request.getMemoryTracker();
     Note note = memoryTracker.getNote();
+    MCQWithAnswer postProcessedQuestion = generatedQuestionPostProcessor.postProcess(mcqWithAnswer);
     PredefinedQuestion predefinedQuestion =
-        PredefinedQuestion.fromMCQWithAnswer(mcqWithAnswer, note, request.getContextSeed());
+        PredefinedQuestion.fromMCQWithAnswer(postProcessedQuestion, note, request.getContextSeed());
     entityPersister.save(predefinedQuestion);
 
     RecallPrompt recallPrompt = new RecallPrompt();

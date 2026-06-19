@@ -39,7 +39,7 @@ Non-goals:
 
 ## Phase 1: Batch Imported Questions Use The Shared AI MCQ Post-Processor
 
-Status: planned
+Status: done
 
 Type: Behavior
 
