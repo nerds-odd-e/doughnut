@@ -155,10 +155,6 @@ erDiagram
         int creator_id FK
         int notebook_group_id FK
     }
-    notebook_ai_assistant {
-        bigint id PK
-        int notebook_id UK
-    }
     notebook_group {
         int id PK
         int ownership_id FK

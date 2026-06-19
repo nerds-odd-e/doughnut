@@ -174,4 +174,12 @@ are now dead.
   in the baseline DDL and `docs/database-erd.md`; Phase 3 adds the DROP migration + ERD regen. The
   full backend suite remains flaky via the pre-existing `Duplicate entry 'userNN'` test-user
   collision (touched classes verified green in isolation).
-- Phase 3 — planned
+- Phase 3 — done. Added Flyway migration `V300000217__drop_notebook_ai_assistant.sql`
+  (`DROP TABLE IF EXISTS notebook_ai_assistant;`) without touching the immutable baseline, and
+  regenerated `docs/database-erd.md` so the `notebook_ai_assistant` table no longer appears.
+  Migration applied cleanly (`backend:verify` ran Flyway to `300000217` and dropped the table); on a
+  freshly recreated `doughnut_test` schema the full backend suite passes (the earlier 34 failures
+  were the known pre-existing `Duplicate entry 'userNN'` test-user collision, unrelated). Final
+  reference sweep is clean — the only remaining hits are the new DROP migration, the immutable
+  baseline `CREATE TABLE`, and the unrelated `AiOpenAiAssistantFactory*` legacy tests /
+  `OtherAiServices.getTextFromAudio` audio `additionalInstructions` param. Feature removal complete.
