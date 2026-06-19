@@ -8,7 +8,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
@@ -17,7 +16,6 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
 import com.openai.models.responses.StructuredResponseCreateParams;
-import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -260,44 +258,6 @@ class NoteQuestionGenerationServiceTests {
     }
 
     @Test
-    void shouldIncludeNotebookAssistantInstructionsWhenPresent() {
-      NotebookAiAssistant notebookAiAssistant = new NotebookAiAssistant();
-      notebookAiAssistant.setNotebook(testNote.getNotebook());
-      notebookAiAssistant.setAdditionalInstructionsToAi("Custom notebook instructions");
-      Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-      notebookAiAssistant.setCreatedAt(currentTime);
-      notebookAiAssistant.setUpdatedAt(currentTime);
-      makeMe.entityPersister.save(notebookAiAssistant);
-      makeMe.refresh(testNote.getNotebook());
-
-      StructuredResponseCreateParams<MCQWithAnswer> request =
-          service.buildQuestionGenerationRequest(testNote, null);
-
-      assertThat(instructionContains(request, "Custom notebook instructions"), is(true));
-    }
-
-    @Test
-    void shouldPlaceNotebookAssistantInstructionsAfterMainQuestionDesignerInstruction() {
-      NotebookAiAssistant notebookAiAssistant = new NotebookAiAssistant();
-      notebookAiAssistant.setNotebook(testNote.getNotebook());
-      notebookAiAssistant.setAdditionalInstructionsToAi("Custom notebook instructions");
-      Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-      notebookAiAssistant.setCreatedAt(currentTime);
-      notebookAiAssistant.setUpdatedAt(currentTime);
-      makeMe.entityPersister.save(notebookAiAssistant);
-      makeMe.refresh(testNote.getNotebook());
-
-      StructuredResponseCreateParams<MCQWithAnswer> request =
-          service.buildQuestionGenerationRequest(testNote, null);
-      String developerBody = instructionText(request);
-
-      assertThat(developerBody.indexOf("Question Designer"), greaterThan(-1));
-      assertThat(
-          developerBody.indexOf("Question Designer"),
-          lessThan(developerBody.indexOf("Custom notebook instructions")));
-    }
-
-    @Test
     void shouldOrderUserMessagesScopedInstructionThenFocusThenAdditional() {
       Note noteInScope = noteWithQuestionGenerationInstructions("SCOPED_QGEN_MARKER", null);
 
@@ -326,14 +286,6 @@ class NoteQuestionGenerationServiceTests {
       List<String> userBodies = userMessageContentStrings(request);
       assertThat(userBodies.get(0), containsString("# Focus Context"));
       assertThat(userBodies.get(1), containsString("Generate a question about the capital city"));
-    }
-
-    @Test
-    void shouldNotIncludeNotebookAssistantInstructionsWhenEmpty() {
-      StructuredResponseCreateParams<MCQWithAnswer> request =
-          service.buildQuestionGenerationRequest(testNote, null);
-
-      assertThat(instructionText(request), is(not(emptyString())));
     }
 
     @Test

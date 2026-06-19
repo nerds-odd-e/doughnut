@@ -17,11 +17,6 @@ const notebookPage = () => {
       clickButton('Update Settings')
       pageIsNotLoading()
     },
-    updateAiAssistantInstructions(instruction: string) {
-      form.getField('Additional Instructions to AI').type(instruction)
-      clickButton('Update Notebook AI Assistant Settings')
-      pageIsNotLoading()
-    },
     attachEpubFixture(relativePath: string) {
       cy.get('[data-testid="notebook-no-book"]')
         .find('input[type="file"]')

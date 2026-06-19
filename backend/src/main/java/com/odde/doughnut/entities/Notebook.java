@@ -65,11 +65,6 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @NonNull
   private Timestamp createdAt;
 
-  @OneToOne(mappedBy = "notebook", fetch = FetchType.LAZY)
-  @JsonIgnore
-  @Getter
-  private NotebookAiAssistant notebookAiAssistant;
-
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "notebook_group_id")
   @JsonIgnore

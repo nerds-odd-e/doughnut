@@ -8,19 +8,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.controllers.dto.NotebookCatalogGroupItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogSubscribedNotebookItem;
-import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.controllers.dto.UpdateNotebookGroupRequest;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.entities.NotebookGroup;
 import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import java.sql.Timestamp;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -292,101 +289,6 @@ class NotebookSharingGroupControllerTest extends NotebookControllerTestBase {
               .findFirst()
               .orElseThrow();
       assertThat(withoutRow.hasAttachedBook, equalTo(false));
-    }
-  }
-
-  @Nested
-  class UpdateNotebookAiAssistant {
-    private Notebook notebook;
-
-    @BeforeEach
-    void setup() {
-      testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
-      notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-    }
-
-    @Test
-    void shouldCreateNewAiAssistantWhenNotExists() throws UnexpectedNoAccessRightException {
-      String instructions = "Some AI instructions";
-      UpdateAiAssistantRequest request = new UpdateAiAssistantRequest();
-      request.setAdditionalInstructions(instructions);
-
-      NotebookAiAssistant result = controller.updateAiAssistant(notebook, request);
-
-      assertThat(result.getNotebook().getId(), equalTo(notebook.getId()));
-      assertThat(result.getAdditionalInstructionsToAi(), equalTo(instructions));
-      assertThat(result.getCreatedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
-      assertThat(result.getUpdatedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
-    }
-
-    @Test
-    void shouldUpdateExistingAiAssistant() throws UnexpectedNoAccessRightException {
-      String initialInstructions = "Initial instructions";
-      UpdateAiAssistantRequest initialRequest = new UpdateAiAssistantRequest();
-      initialRequest.setAdditionalInstructions(initialInstructions);
-      NotebookAiAssistant initial = controller.updateAiAssistant(notebook, initialRequest);
-
-      String newInstructions = "New instructions";
-      UpdateAiAssistantRequest newRequest = new UpdateAiAssistantRequest();
-      newRequest.setAdditionalInstructions(newInstructions);
-      NotebookAiAssistant result = controller.updateAiAssistant(notebook, newRequest);
-
-      assertThat(result.getId(), equalTo(initial.getId()));
-      assertThat(result.getAdditionalInstructionsToAi(), equalTo(newInstructions));
-      assertThat(result.getCreatedAt(), equalTo(initial.getCreatedAt()));
-      assertThat(result.getUpdatedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
-    }
-
-    @Test
-    void shouldNotAllowUnauthorizedUpdate() {
-      User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().notebookOwnedBy(anotherUser).please();
-
-      UpdateAiAssistantRequest request = new UpdateAiAssistantRequest();
-      request.setAdditionalInstructions("Some instructions");
-
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.updateAiAssistant(note.getNotebook(), request));
-    }
-  }
-
-  @Nested
-  class GetNotebookAiAssistant {
-    private Notebook notebook;
-
-    @BeforeEach
-    void setup() {
-      testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
-      notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-    }
-
-    @Test
-    void shouldReturnNullWhenAssistantNotExists() throws UnexpectedNoAccessRightException {
-      NotebookAiAssistant result = controller.getAiAssistant(notebook);
-      assertThat(result, equalTo(null));
-    }
-
-    @Test
-    void shouldReturnExistingAssistant() throws UnexpectedNoAccessRightException {
-      String instructions = "Initial instructions";
-      UpdateAiAssistantRequest request = new UpdateAiAssistantRequest();
-      request.setAdditionalInstructions(instructions);
-      NotebookAiAssistant created = controller.updateAiAssistant(notebook, request);
-
-      NotebookAiAssistant result = controller.getAiAssistant(notebook);
-      assertThat(result.getId(), equalTo(created.getId()));
-      assertThat(result.getAdditionalInstructionsToAi(), equalTo(instructions));
-    }
-
-    @Test
-    void shouldNotAllowUnauthorizedAccess() {
-      User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().notebookOwnedBy(anotherUser).please();
-
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.getAiAssistant(note.getNotebook()));
     }
   }
 }

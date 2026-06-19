@@ -160,5 +160,18 @@ are now dead.
   Discovery for later phases: the full backend suite is currently flaky due to a pre-existing
   `Duplicate entry 'userNN' for key 'user.user_external_identifier'` collision in test user
   creation (reproduces on clean `main`); unrelated to these phases.
-- Phase 2 — planned
+- Phase 2 — done. Removed the notebook "Assistant Management" feature from app code: deleted the
+  `NotebookAiAssistant` entity, `NotebookAiAssistantRepository`, `UpdateAiAssistantRequest`, the
+  `/{notebook}/ai-assistant` GET/PATCH endpoints, `NotebookService.findByNotebookId/save` (and its
+  now-dead repo field), `Notebook.notebookAiAssistant`, and `Note.getNotebookAssistantInstructions()`.
+  Cut the notebook-level instruction injection from all five AI flows (question generation,
+  evaluation, automation, conversation, refinement — including the `notebookAssistantInstructions`
+  param on `AiQuestionGeneratorForNote`). Deleted `NotebookAssistantManagementForm.vue` and its spec,
+  removed the "Assistant Management" wiring from `NotebookPageView.vue`, dropped the dead e2e method
+  `notebookPage.updateAiAssistantInstructions`, and removed assistant test cases/mocks. Also deleted
+  the stray scratch file `backend/src/main/resources/api.yml` (it only held the removed snippet).
+  Regenerated the API client. Discovery for Phase 3: the `notebook_ai_assistant` table still exists
+  in the baseline DDL and `docs/database-erd.md`; Phase 3 adds the DROP migration + ERD regen. The
+  full backend suite remains flaky via the pre-existing `Duplicate entry 'userNN'` test-user
+  collision (touched classes verified green in isolation).
 - Phase 3 — planned

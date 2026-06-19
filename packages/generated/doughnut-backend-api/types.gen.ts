@@ -713,18 +713,6 @@ export type BookLastReadPositionRequest = {
     selectedBookBlockId?: number | null;
 };
 
-export type UpdateAiAssistantRequest = {
-    additionalInstructions?: string;
-};
-
-export type NotebookAiAssistant = {
-    id: number;
-    notebook?: Notebook;
-    additionalInstructionsToAi?: string;
-    createdAt?: string;
-    updatedAt?: string;
-};
-
 /**
  * Rename a property memory tracker's frontmatter key in place.
  */
@@ -2710,42 +2698,6 @@ export type PatchNotebookBookReadingPositionResponses = {
 };
 
 export type PatchNotebookBookReadingPositionResponse = PatchNotebookBookReadingPositionResponses[keyof PatchNotebookBookReadingPositionResponses];
-
-export type GetAiAssistantData = {
-    body?: never;
-    path: {
-        notebook: number;
-    };
-    query?: never;
-    url: '/api/notebooks/{notebook}/ai-assistant';
-};
-
-export type GetAiAssistantResponses = {
-    /**
-     * OK
-     */
-    200: NotebookAiAssistant;
-};
-
-export type GetAiAssistantResponse = GetAiAssistantResponses[keyof GetAiAssistantResponses];
-
-export type UpdateAiAssistantData = {
-    body: UpdateAiAssistantRequest;
-    path: {
-        notebook: number;
-    };
-    query?: never;
-    url: '/api/notebooks/{notebook}/ai-assistant';
-};
-
-export type UpdateAiAssistantResponses = {
-    /**
-     * OK
-     */
-    200: NotebookAiAssistant;
-};
-
-export type UpdateAiAssistantResponse = UpdateAiAssistantResponses[keyof UpdateAiAssistantResponses];
 
 export type UpdatePropertyKeyData = {
     body: UpdateMemoryTrackerPropertyKeyDto;

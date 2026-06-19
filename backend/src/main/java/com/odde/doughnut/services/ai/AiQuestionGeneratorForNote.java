@@ -8,16 +8,11 @@ import java.util.Optional;
 
 public record AiQuestionGeneratorForNote(
     OpenAiApiHandler openAiApiHandler,
-    OpenAIResponseRequestBuilder<MCQWithAnswerForRefinement> responseRequestBuilder,
-    String notebookAssistantInstructionsAfterSchema) {
+    OpenAIResponseRequestBuilder<MCQWithAnswerForRefinement> responseRequestBuilder) {
 
   public Optional<MCQWithAnswer> refineQuestion(MCQWithAnswer question) {
     InstructionAndSchema questionEvaluationAiTool = AiToolFactory.questionRefineAiTool(question);
     responseRequestBuilder.addInstruction(questionEvaluationAiTool.getMessageBody());
-    if (notebookAssistantInstructionsAfterSchema != null
-        && !notebookAssistantInstructionsAfterSchema.isBlank()) {
-      responseRequestBuilder.addInstruction(notebookAssistantInstructionsAfterSchema);
-    }
     return openAiApiHandler
         .requestAndGetStructuredResponseResult(responseRequestBuilder.build())
         .map(refined -> (MCQWithAnswer) refined);
