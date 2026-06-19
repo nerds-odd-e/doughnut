@@ -50,7 +50,7 @@ overrides:
   serialize-javascript: '>=7.0.5'
   systeminformation: '>=5.31.6'
   tmp: '>=0.2.6'
-  undici: '>=7.24.0'
+  undici: '>=8.5.0'
   uuid: '>=14.0.0'
   yaml: '>=2.9.0'
   yauzl: '>=3.2.1'
