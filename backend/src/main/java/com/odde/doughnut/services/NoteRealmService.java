@@ -61,33 +61,32 @@ public class NoteRealmService {
   }
 
   /**
-   * Nearest non-blank {@code question_generation_instruction} from container {@code indexContent}:
-   * inner folder → parent folders → notebook root.
+   * Every {@code question_generation_instruction} on the trail to {@code focus}, each rendered as a
+   * source-labeled block. Order: notebook index, folders outermost → innermost, then the focus
+   * note. Levels without a non-blank instruction are omitted; no level overrides another.
    */
-  public Optional<String> resolveScopedQuestionGenerationInstruction(Note focus) {
-    if (focus.getNotebook() == null) {
-      return Optional.empty();
-    }
-    List<Folder> outerToInner = FolderTrailSegments.fromRootToContainingFolder(focus);
-    for (int i = outerToInner.size() - 1; i >= 0; i--) {
-      Optional<String> instruction =
-          questionGenerationInstructionFromContent(outerToInner.get(i).getIndexContent());
-      if (instruction.isPresent()) {
-        return instruction;
+  public List<String> questionGenerationInstructionBlocks(Note focus) {
+    List<String> blocks = new ArrayList<>();
+    Notebook notebook = focus.getNotebook();
+    if (notebook != null) {
+      addLabeledInstructionBlock(
+          blocks,
+          notebook.getIndexContent(),
+          "Instruction from notebook \"" + notebook.getName() + "\":");
+      for (Folder folder : FolderTrailSegments.fromRootToContainingFolder(focus)) {
+        addLabeledInstructionBlock(
+            blocks,
+            folder.getIndexContent(),
+            "Instruction from folder \"" + folder.getName() + "\":");
       }
     }
-    return questionGenerationInstructionFromContent(focus.getNotebook().getIndexContent());
+    addLabeledInstructionBlock(blocks, focus.getContent(), "Instruction from the focus note:");
+    return blocks;
   }
 
-  /**
-   * Container-scoped instruction (nearest folder → notebook), then note frontmatter, omitting
-   * blanks.
-   */
-  public List<String> resolveQuestionGenerationInstructions(Note focus) {
-    List<String> instructions = new ArrayList<>();
-    resolveScopedQuestionGenerationInstruction(focus).ifPresent(instructions::add);
-    questionGenerationInstructionFromContent(focus.getContent()).ifPresent(instructions::add);
-    return instructions;
+  private void addLabeledInstructionBlock(List<String> blocks, String content, String label) {
+    questionGenerationInstructionFromContent(content)
+        .ifPresent(instruction -> blocks.add(label + "\n" + instruction));
   }
 
   private String resolveIndexNoteContentForNote(Note focus) {

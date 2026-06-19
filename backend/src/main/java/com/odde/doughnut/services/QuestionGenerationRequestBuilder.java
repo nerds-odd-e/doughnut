@@ -178,8 +178,9 @@ public class QuestionGenerationRequestBuilder {
       User viewer) {
     Note focus = hydrateFocusNoteForQuestionGeneration(note);
 
-    List<String> instructions = noteRealmService.resolveQuestionGenerationInstructions(focus);
-    String instruction = instructions.isEmpty() ? null : String.join("\n\n", instructions);
+    List<String> instructionBlocks = noteRealmService.questionGenerationInstructionBlocks(focus);
+    String instruction =
+        instructionBlocks.isEmpty() ? null : String.join("\n\n", instructionBlocks);
     String instructionUserBlock =
         instruction != null ? CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER + "\n" + instruction : null;
     int instructionTokens =
