@@ -14,12 +14,19 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
       " LEFT JOIN n.memoryTrackers mt ON mt.user.id = :userId"
           + " AND mt.deletedAt IS NULL"
           + " AND COALESCE(mt.spelling, FALSE) = FALSE"
-          + " AND mt.propertyKey = i.propertyKey";
+          + " AND mt.propertyKey = i.propertyKey"
+          + " LEFT JOIN i.targetNote t"
+          + " LEFT JOIN t.memoryTrackers tmt ON tmt.user.id = :userId"
+          + " AND tmt.deletedAt IS NULL"
+          + " AND (tmt.propertyKey IS NULL OR tmt.propertyKey = '')";
 
   String unassimilatedWhereClause =
       " WHERE mt IS NULL"
           + " AND COALESCE(n.recallSetting.skipMemoryTracking, FALSE) = FALSE"
-          + " AND n.deletedAt IS NULL ";
+          + " AND n.deletedAt IS NULL"
+          + " AND (t IS NULL OR t.deletedAt IS NOT NULL"
+          + " OR COALESCE(t.recallSetting.skipMemoryTracking, FALSE) = TRUE"
+          + " OR tmt IS NOT NULL) ";
 
   String unassimilatedOrderBy = " ORDER BY n.recallSetting.level, n.createdAt, n.id, i.propertyKey";
 

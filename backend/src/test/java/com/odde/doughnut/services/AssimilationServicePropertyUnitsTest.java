@@ -59,8 +59,9 @@ class AssimilationServicePropertyUnitsTest {
 
   @Test
   void does_not_count_property_with_skipped_tracker() {
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
     Note note =
-        makeMe.aNote().notebookOwnedBy(user).content("---\ntopic: physics\n---\n\nbody").please();
+        makeMe.aNote().notebook(notebook).content("---\ntopic: physics\n---\n\nbody").please();
     notePropertyIndexService.refreshForNote(note);
     makeMe.aMemoryTrackerFor(note).by(user).assimilatedAt(day1).please();
     makeMe.aMemoryTrackerFor(note).by(user).propertyKey("topic").removedFromTracking().please();
