@@ -48,10 +48,12 @@ class QuestionGenerationBatchManualEligibilityTest {
   }
 
   @Test
-  void includesRecentRecallUserOutsideSilentPeriodTargetHour() {
-    Timestamp cronTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 11, 15));
+  void includesRecentRecallUserBeforeTodaysTargetWhenAlreadySubmittedSinceLastDueInstant() {
+    Timestamp cronTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 10, 0));
     Timestamp recallTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 30));
     createAnsweredRecall(recallTime);
+    saveRecentSuccessfulSubmission(Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 0)));
+    makeMe.entityPersister.flush();
 
     List<User> scheduledCandidates = planningService.findUsersEligibleForBatchSubmission(cronTime);
     List<User> manualCandidates =
@@ -69,7 +71,7 @@ class QuestionGenerationBatchManualEligibilityTest {
   }
 
   @Test
-  void excludesUserWithRecentSuccessfulSubmissionStillInsideGate() {
+  void includesUserWithRecentSuccessfulSubmissionRegardlessOfOverdueRule() {
     Timestamp oneHourAgo = new Timestamp(currentTime.getTime() - TimeUnit.HOURS.toMillis(1));
     createAnsweredRecall(oneHourAgo);
     saveRecentSuccessfulSubmission(oneHourAgo);
@@ -77,7 +79,7 @@ class QuestionGenerationBatchManualEligibilityTest {
 
     List<User> candidates = planningService.findUsersEligibleForManualBatchSubmission(currentTime);
 
-    assertThat(candidates, empty());
+    assertThat(candidates.stream().map(User::getId).toList(), contains(user.getId()));
   }
 
   @Test
@@ -97,7 +99,7 @@ class QuestionGenerationBatchManualEligibilityTest {
   }
 
   @Test
-  void includesUserInsideGateWhenOpenAiFailureRetryPolicyAllowsIt() {
+  void includesUserWithOpenAiFailureBatchWhenNoSubmittedBatchInFlight() {
     Timestamp oneHourAgo = new Timestamp(currentTime.getTime() - TimeUnit.HOURS.toMillis(1));
     createAnsweredRecall(oneHourAgo);
     saveRecentSuccessfulSubmission(oneHourAgo);

@@ -13,7 +13,6 @@ import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class QuestionGenerationBatchCronHourEligibilityTest {
+class QuestionGenerationBatchOverdueEligibilityTest {
 
   @Autowired MakeMe makeMe;
   @Autowired QuestionGenerationBatchPlanningService planningService;
@@ -42,7 +41,7 @@ class QuestionGenerationBatchCronHourEligibilityTest {
   }
 
   @Test
-  void includesUserWhoseTargetFallsInCurrentCronHour() {
+  void includesUserWhenOverdueAfterTargetTimePassed() {
     Timestamp cronTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 10, 30));
     Timestamp recallTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 30));
     createAnsweredRecall(recallTime);
@@ -53,18 +52,18 @@ class QuestionGenerationBatchCronHourEligibilityTest {
   }
 
   @Test
-  void excludesUserWhoseTargetFallsInAdjacentCronHour() {
-    Timestamp cronTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 11, 15));
+  void includesUserWhenOverdueHoursAfterTargetTime() {
+    Timestamp cronTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 12, 15));
     Timestamp recallTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 30));
     createAnsweredRecall(recallTime);
 
     List<User> candidates = planningService.findUsersEligibleForBatchSubmission(cronTime);
 
-    assertThat(candidates, empty());
+    assertThat(candidates.stream().map(User::getId).toList(), contains(user.getId()));
   }
 
   @Test
-  void includesUserWhoseTargetCrossesMidnightWhenCronHourMatches() {
+  void includesUserWhoseTargetCrossesMidnightWhenOverdue() {
     Timestamp cronTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 16, 0, 30));
     Timestamp recallTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 23, 45));
     createAnsweredRecall(recallTime);
@@ -75,14 +74,13 @@ class QuestionGenerationBatchCronHourEligibilityTest {
   }
 
   @Test
-  void excludesUserPastSubmissionGateEvenWhenDueInCurrentCronHour() {
+  void excludesUserWhoSubmittedAfterDueInstant() {
     Timestamp cronTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 10, 30));
-    Timestamp recallTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 30));
+    Timestamp recallTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 0));
     createAnsweredRecall(recallTime);
     QuestionGenerationBatchUserState state = new QuestionGenerationBatchUserState();
     state.setUser(user);
-    state.setLastSuccessfulSubmittedAt(
-        new Timestamp(cronTime.getTime() - TimeUnit.HOURS.toMillis(1)));
+    state.setLastSuccessfulSubmittedAt(Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 10, 0)));
     userStateRepository.save(state);
     makeMe.entityPersister.flush();
 

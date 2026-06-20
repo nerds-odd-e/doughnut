@@ -7,9 +7,7 @@ import static org.hamcrest.Matchers.is;
 
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuestionGenerationBatchUserState;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.QuestionGenerationBatchUserStateRepository;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.util.List;
@@ -29,7 +27,6 @@ class QuestionGenerationBatchPlanningServiceTest {
 
   @Autowired MakeMe makeMe;
   @Autowired QuestionGenerationBatchPlanningService planningService;
-  @Autowired QuestionGenerationBatchUserStateRepository userStateRepository;
 
   User user;
   Timestamp currentTime;
@@ -41,53 +38,8 @@ class QuestionGenerationBatchPlanningServiceTest {
   }
 
   @Test
-  void userIsPastSubmissionGateWhenNoSuccessfulSubmissionExists() {
-    assertThat(planningService.isUserPastSubmissionGate(user, currentTime), is(true));
-  }
-
-  @Nested
-  class WithLastSuccessfulSubmission {
-    Timestamp lastSuccessfulSubmission;
-
-    @BeforeEach
-    void setup() {
-      lastSuccessfulSubmission = makeMe.aTimestamp().of(9, 8).fromShanghai().please();
-      QuestionGenerationBatchUserState state = new QuestionGenerationBatchUserState();
-      state.setUser(user);
-      state.setLastSuccessfulSubmittedAt(lastSuccessfulSubmission);
-      userStateRepository.save(state);
-      makeMe.entityPersister.flush();
-    }
-
-    @Test
-    void userIsNotPastSubmissionGateWhenLastSubmissionIs22Hours59MinutesOld() {
-      Timestamp at =
-          new Timestamp(
-              lastSuccessfulSubmission.getTime()
-                  + TimeUnit.HOURS.toMillis(22)
-                  + TimeUnit.MINUTES.toMillis(59));
-
-      assertThat(planningService.isUserPastSubmissionGate(user, at), is(false));
-    }
-
-    @Test
-    void userIsPastSubmissionGateWhenLastSubmissionIsExactly23HoursOld() {
-      Timestamp at =
-          new Timestamp(lastSuccessfulSubmission.getTime() + TimeUnit.HOURS.toMillis(23));
-
-      assertThat(planningService.isUserPastSubmissionGate(user, at), is(true));
-    }
-
-    @Test
-    void userIsPastSubmissionGateWhenLastSubmissionIsJustOver23HoursOld() {
-      Timestamp at =
-          new Timestamp(
-              lastSuccessfulSubmission.getTime()
-                  + TimeUnit.HOURS.toMillis(23)
-                  + TimeUnit.MINUTES.toMillis(1));
-
-      assertThat(planningService.isUserPastSubmissionGate(user, at), is(true));
-    }
+  void userIsEligibleForNewBatchSubmissionWhenNoSubmittedBatchInFlight() {
+    assertThat(planningService.isUserEligibleForNewBatchSubmission(user), is(true));
   }
 
   @Nested
@@ -134,27 +86,6 @@ class QuestionGenerationBatchPlanningServiceTest {
           .answerChoiceIndex(0)
           .answerTimestamp(eightDaysAgo)
           .please();
-
-      List<User> candidates = planningService.findUsersEligibleForBatchSubmission(currentTime);
-
-      assertThat(candidates, empty());
-    }
-
-    @Test
-    void excludesUserWithRecentRecallButRecentSuccessfulSubmission() {
-      Timestamp oneHourAgo = new Timestamp(currentTime.getTime() - TimeUnit.HOURS.toMillis(1));
-      makeMe
-          .aRecallPrompt()
-          .withPredefinedQuestionForNote(note)
-          .forMemoryTracker(memoryTracker)
-          .answerChoiceIndex(0)
-          .answerTimestamp(oneHourAgo)
-          .please();
-      QuestionGenerationBatchUserState state = new QuestionGenerationBatchUserState();
-      state.setUser(user);
-      state.setLastSuccessfulSubmittedAt(oneHourAgo);
-      userStateRepository.save(state);
-      makeMe.entityPersister.flush();
 
       List<User> candidates = planningService.findUsersEligibleForBatchSubmission(currentTime);
 

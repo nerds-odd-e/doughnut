@@ -64,8 +64,8 @@ class QuestionGenerationBatchUserScheduleTest {
   }
 
   @Test
-  void delaysUntilSubmissionGateAndTargetCronHourBothMatch() {
-    Timestamp now = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 0));
+  void catchesUpSameDayWhenOverdueAfterMissedTargetHour() {
+    Timestamp now = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 11, 0));
     givenAnsweredRecallAt(Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 8, 30)));
     givenLastSuccessfulSubmissionAt(Timestamp.valueOf(LocalDateTime.of(2024, 6, 14, 11, 30)));
 
@@ -73,7 +73,7 @@ class QuestionGenerationBatchUserScheduleTest {
         planningService.getNextBatchQuestionSchedule(user, now);
 
     assertThat(
-        schedule.getNextScheduledAt(), is(Timestamp.valueOf(LocalDateTime.of(2024, 6, 16, 9, 0))));
+        schedule.getNextScheduledAt(), is(Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 11, 0))));
   }
 
   @Test

@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -58,11 +56,19 @@ class QuestionGenerationBatchRetryEligibilityTest {
         .please();
   }
 
-  @ParameterizedTest
-  @EnumSource(
-      value = QuestionGenerationBatchStatus.class,
-      names = {"FAILED", "EXPIRED"})
-  void includesUserWithOpenAiFailureBatchOutsideTargetCronHour(
+  @Test
+  void includesUserWithFailedOpenAiBatchWhenSubmittedSinceDueInstant() {
+    assertUserEligibleForOpenAiFailureRetryWhenSubmittedSinceDueInstant(
+        QuestionGenerationBatchStatus.FAILED);
+  }
+
+  @Test
+  void includesUserWithExpiredOpenAiBatchWhenSubmittedSinceDueInstant() {
+    assertUserEligibleForOpenAiFailureRetryWhenSubmittedSinceDueInstant(
+        QuestionGenerationBatchStatus.EXPIRED);
+  }
+
+  private void assertUserEligibleForOpenAiFailureRetryWhenSubmittedSinceDueInstant(
       QuestionGenerationBatchStatus terminalStatus) {
     saveRecentSuccessfulSubmission();
     QuestionGenerationBatch failedBatch = new QuestionGenerationBatch();
@@ -79,8 +85,13 @@ class QuestionGenerationBatchRetryEligibilityTest {
   }
 
   @Test
-  void excludesFirstTimeUserOutsideTargetCronHour() {
-    List<User> candidates = planningService.findUsersEligibleForBatchSubmission(cronTime);
+  void excludesUserWhoSubmittedSinceLastDueInstantBeforeTodaysTarget() {
+    saveRecentSuccessfulSubmissionAt(Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 0)));
+    makeMe.entityPersister.flush();
+
+    List<User> candidates =
+        planningService.findUsersEligibleForBatchSubmission(
+            Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 10, 0)));
 
     assertThat(candidates, empty());
   }
@@ -109,7 +120,7 @@ class QuestionGenerationBatchRetryEligibilityTest {
 
   @Test
   void excludesRecentlySuccessfulUserWithoutOpenAiFailureRetryBatch() {
-    saveRecentSuccessfulSubmission();
+    saveRecentSuccessfulSubmissionAt(Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 10, 45)));
     QuestionGenerationBatch failedBatch = new QuestionGenerationBatch();
     failedBatch.setUser(user);
     failedBatch.setStatus(QuestionGenerationBatchStatus.FAILED);
@@ -123,10 +134,14 @@ class QuestionGenerationBatchRetryEligibilityTest {
   }
 
   private void saveRecentSuccessfulSubmission() {
+    saveRecentSuccessfulSubmissionAt(
+        new Timestamp(cronTime.getTime() - TimeUnit.HOURS.toMillis(1)));
+  }
+
+  private void saveRecentSuccessfulSubmissionAt(Timestamp submittedAt) {
     QuestionGenerationBatchUserState state = new QuestionGenerationBatchUserState();
     state.setUser(user);
-    state.setLastSuccessfulSubmittedAt(
-        new Timestamp(cronTime.getTime() - TimeUnit.HOURS.toMillis(1)));
+    state.setLastSuccessfulSubmittedAt(submittedAt);
     userStateRepository.save(state);
   }
 }

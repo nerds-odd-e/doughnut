@@ -95,7 +95,7 @@ Schedule (`getNextBatchQuestionSchedule`):
 
 ### Phase 1 — Behavior: overdue catch-up triggering
 
-Status: planned
+Status: done
 
 Behavior: When a user's silent-window target time has passed and no batch has been submitted since
 that time, the next hourly run generates a batch — even if the exact target hour was missed — and

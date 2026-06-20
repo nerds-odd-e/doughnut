@@ -1,7 +1,7 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.algorithms.CronHourTargetDueSelector;
 import com.odde.doughnut.algorithms.RecallSilentPeriodTargetSelector;
+import com.odde.doughnut.algorithms.RecallSilentWindowDueInstant;
 import com.odde.doughnut.controllers.dto.QuestionGenerationBatchUserScheduleDTO;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.QuestionGenerationBatch;
@@ -16,6 +16,7 @@ import com.odde.doughnut.entities.repositories.QuestionGenerationBatchUserStateR
 import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
@@ -26,7 +27,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class QuestionGenerationBatchPlanningService {
-  private static final long SUBMISSION_GATE_MILLIS = TimeUnit.HOURS.toMillis(23);
   private static final long RECENT_RECALL_WINDOW_MILLIS = TimeUnit.DAYS.toMillis(7);
   private static final long CANDIDATE_TRACKER_WINDOW_MILLIS = TimeUnit.HOURS.toMillis(48);
   private static final int MAX_SCHEDULE_SCAN_HOURS = 7 * 24;
@@ -61,18 +61,18 @@ public class QuestionGenerationBatchPlanningService {
   public List<User> findUsersEligibleForBatchSubmission(Timestamp currentTime) {
     Timestamp windowStart = new Timestamp(currentTime.getTime() - RECENT_RECALL_WINDOW_MILLIS);
     return findUsersWithRecentRecallActivity(windowStart, currentTime).stream()
-        .filter(user -> isUserEligibleForNewBatchSubmission(user, currentTime))
+        .filter(user -> isUserEligibleForNewBatchSubmission(user))
         .filter(
             user ->
-                isUserEligibleViaOpenAiFailureRetryPath(user, currentTime)
-                    || isUserDueInCurrentCronHour(user, currentTime, windowStart))
+                isUserOverdueForBatch(user, currentTime, windowStart)
+                    || isUserEligibleViaOpenAiFailureRetryPath(user, currentTime, windowStart))
         .toList();
   }
 
   public List<User> findUsersEligibleForManualBatchSubmission(Timestamp currentTime) {
     Timestamp windowStart = new Timestamp(currentTime.getTime() - RECENT_RECALL_WINDOW_MILLIS);
     return findUsersWithRecentRecallActivity(windowStart, currentTime).stream()
-        .filter(user -> isUserEligibleForNewBatchSubmission(user, currentTime))
+        .filter(user -> isUserEligibleForNewBatchSubmission(user))
         .toList();
   }
 
@@ -154,7 +154,17 @@ public class QuestionGenerationBatchPlanningService {
     return dto;
   }
 
-  private boolean isUserDueInCurrentCronHour(
+  private boolean isUserOverdueForBatch(User user, Timestamp currentTime, Timestamp windowStart) {
+    return dueInstantForUser(user, currentTime, windowStart)
+        .flatMap(
+            dueInstant ->
+                lastSuccessfulSubmissionAt(user)
+                    .map(lastSubmission -> isSubmissionBeforeDueInstant(lastSubmission, dueInstant))
+                    .or(() -> Optional.of(true)))
+        .orElse(false);
+  }
+
+  private Optional<LocalDateTime> dueInstantForUser(
       User user, Timestamp currentTime, Timestamp windowStart) {
     List<Timestamp> answerTimestamps =
         recallPromptRepository
@@ -164,11 +174,19 @@ public class QuestionGenerationBatchPlanningService {
             .filter(Objects::nonNull)
             .toList();
     if (answerTimestamps.isEmpty()) {
-      return false;
+      return Optional.empty();
     }
     LocalTime targetTimeOfDay =
         RecallSilentPeriodTargetSelector.targetTimeOfDayFromTimestamps(answerTimestamps);
-    return CronHourTargetDueSelector.isTargetDueInCronHour(targetTimeOfDay, currentTime);
+    return Optional.of(
+        RecallSilentWindowDueInstant.lastDueInstantAtOrBefore(
+            targetTimeOfDay, currentTime.toLocalDateTime()));
+  }
+
+  private Optional<Timestamp> lastSuccessfulSubmissionAt(User user) {
+    return userStateRepository
+        .findByUser_Id(user.getId())
+        .map(state -> state.getLastSuccessfulSubmittedAt());
   }
 
   private boolean hasRecentRecallActivity(User user, Timestamp currentTime) {
@@ -185,39 +203,36 @@ public class QuestionGenerationBatchPlanningService {
         .isEmpty()) {
       return false;
     }
-    if (!isUserEligibleForNewBatchSubmission(user, candidateTime)) {
+    if (!isUserEligibleForNewBatchSubmission(user)) {
       return false;
     }
-    return isUserEligibleViaOpenAiFailureRetryPath(user, candidateTime)
-        || isUserDueInCurrentCronHour(user, candidateTime, windowStart);
+    return isUserOverdueForBatch(user, candidateTime, windowStart)
+        || isUserEligibleViaOpenAiFailureRetryPath(user, candidateTime, windowStart);
   }
 
-  public boolean isUserPastSubmissionGate(User user, Timestamp currentTime) {
-    return userStateRepository
-        .findByUser_Id(user.getId())
-        .map(state -> isPastGate(state.getLastSuccessfulSubmittedAt(), currentTime))
-        .orElse(true);
+  public boolean isUserEligibleForNewBatchSubmission(User user) {
+    return !batchRepository.existsByUser_IdAndStatus(
+        user.getId(), QuestionGenerationBatchStatus.SUBMITTED);
   }
 
-  public boolean isUserEligibleForNewBatchSubmission(User user, Timestamp currentTime) {
-    if (batchRepository.existsByUser_IdAndStatus(
-        user.getId(), QuestionGenerationBatchStatus.SUBMITTED)) {
+  private static boolean isSubmissionBeforeDueInstant(
+      Timestamp lastSubmission, LocalDateTime dueInstant) {
+    return lastSubmission.toLocalDateTime().isBefore(dueInstant);
+  }
+
+  private boolean isUserEligibleViaOpenAiFailureRetryPath(
+      User user, Timestamp currentTime, Timestamp windowStart) {
+    Optional<LocalDateTime> dueInstant = dueInstantForUser(user, currentTime, windowStart);
+    if (dueInstant.isEmpty()) {
       return false;
     }
-    return isUserPastSubmissionGate(user, currentTime)
-        || isUserEligibleViaOpenAiFailureRetryPath(user, currentTime);
-  }
-
-  private boolean isUserEligibleViaOpenAiFailureRetryPath(User user, Timestamp currentTime) {
-    if (isUserPastSubmissionGate(user, currentTime)) {
+    Optional<Timestamp> lastSubmission = lastSuccessfulSubmissionAt(user);
+    if (lastSubmission.isEmpty()
+        || isSubmissionBeforeDueInstant(lastSubmission.get(), dueInstant.get())) {
       return false;
     }
     return batchRepository.existsByUser_IdAndOpenaiBatchIdIsNotNullAndStatusIn(
         user.getId(), QuestionGenerationBatchStatus.openAiFailureRetryStatuses());
-  }
-
-  private boolean isPastGate(Timestamp lastSubmittedAt, Timestamp currentTime) {
-    return currentTime.getTime() - lastSubmittedAt.getTime() >= SUBMISSION_GATE_MILLIS;
   }
 
   private Timestamp nextSchedulerTimeAtOrAfter(Timestamp currentTime) {
