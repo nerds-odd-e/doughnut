@@ -151,6 +151,10 @@ const removeSelectedLayoutItems = async () => {
     )
 
     if (!error && data?.content !== undefined) {
+      if (data.content === props.note.content) {
+        return
+      }
+
       const storedApi = storageAccessor.value?.storedApi()
       if (storedApi) {
         await storedApi.updateTextField(

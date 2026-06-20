@@ -250,6 +250,16 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
           () -> controller.extractNote(testNote, extractRequest(layout, List.of("p1"))),
           HttpStatus.SERVICE_UNAVAILABLE);
     }
+
+    @Test
+    void shouldRejectBlankNoteContent() {
+      Note testNote = newRootNoteWithExtractableContent();
+      testNote.setContent("");
+      NoteRefinementLayout layout = layoutWithItem("p1", "a suggestion");
+      assertResponseStatus(
+          () -> controller.extractNote(testNote, extractRequest(layout, List.of("p1"))),
+          HttpStatus.BAD_REQUEST);
+    }
   }
 
   private static void assertResponseStatus(Executable action, HttpStatus expected) {

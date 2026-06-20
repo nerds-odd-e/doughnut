@@ -161,6 +161,36 @@ describe("NoteRefinement remove layout points", () => {
       ).toHaveLength(1)
     })
 
+    it("does not save or emit contentUpdated when removal returns unchanged content", async () => {
+      const noteWithContent = makeMe.aNote.content("Original content").please()
+      const removeLayoutSpy = mockSdkService(
+        AiController,
+        "removeRefinementSuggestion",
+        {
+          content: "Original content",
+        }
+      )
+      const updateDetailsSpy = mockSdkService(
+        TextContentController,
+        "updateNoteContent",
+        makeMe.aNoteRealm.please()
+      )
+      const wrapper = mountNoteRefinement(["Point 1", "Point 2"], {
+        note: noteWithContent,
+      })
+      await flushPromises()
+      await selectFirstLayoutItem(wrapper)
+      await wrapper
+        .find('[data-test-id="remove-refinement-layout"]')
+        .trigger("click")
+      usePopups().popups.done(true)
+      await flushPromises()
+
+      expect(removeLayoutSpy).toHaveBeenCalled()
+      expect(updateDetailsSpy).not.toHaveBeenCalled()
+      expect(wrapper.emitted()).not.toHaveProperty("contentUpdated")
+    })
+
     it("does not call API when removal is cancelled", async () => {
       const removeLayoutSpy = mockSdkService(
         AiController,

@@ -101,10 +101,7 @@ public class AiController {
 
     authorizationService.assertAuthorization(note);
 
-    String content = note.getContent();
-    if (content == null || content.trim().isEmpty()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Note content cannot be empty");
-    }
+    assertNoteContentNotEmpty(note);
     NoteRefinementLayout layout =
         validateLayoutSelectionRequest(request.getLayout(), request.getSelectedItemIds());
 
@@ -123,6 +120,9 @@ public class AiController {
       @RequestBody NoteRefinementExtractRequestDTO request)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
     authorizationService.assertAuthorization(note);
+
+    assertNoteContentNotEmpty(note);
+
     NoteRefinementLayout layout =
         validateLayoutSelectionRequest(request.getLayout(), request.getSelectedItemIds());
     var automation = notebookAssistantForNoteServiceFactory.createNoteAutomationService(note);
@@ -132,6 +132,13 @@ public class AiController {
           HttpStatus.SERVICE_UNAVAILABLE, "AI failed to generate extraction result");
     }
     return noteConstructionService.createNoteFromExtractedSuggestion(note, aiResult);
+  }
+
+  private static void assertNoteContentNotEmpty(Note note) {
+    String content = note.getContent();
+    if (content == null || content.trim().isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Note content cannot be empty");
+    }
   }
 
   private static NoteRefinementLayout validateLayoutSelectionRequest(

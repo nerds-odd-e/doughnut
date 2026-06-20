@@ -292,7 +292,7 @@ Targeted checks:
 
 ### Phase 8 - Align extract and remove edge-case handling
 
-Status: planned
+Status: done
 
 Type: Behavior
 
