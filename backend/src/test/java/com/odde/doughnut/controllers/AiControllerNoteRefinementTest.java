@@ -4,6 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.NoteRefinementLayoutDTO;
 import com.odde.doughnut.controllers.dto.NoteRefinementLayoutSelectionRequestDTO;
@@ -12,6 +17,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.ai.NoteRefinementLayout;
 import com.odde.doughnut.services.ai.NoteRefinementLayoutItem;
+import com.odde.doughnut.services.ai.NoteRefinementLayoutValidator;
 import com.odde.doughnut.services.ai.RegeneratedNoteContent;
 import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
@@ -29,6 +35,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -124,17 +131,36 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
     @Test
     void shouldReturnEmptyLayoutWhenAiReturnsInvalidLayout()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
-      NoteRefinementLayout layoutWithDuplicateIds =
-          new NoteRefinementLayout(
-              List.of(
-                  new NoteRefinementLayoutItem("same", "Point 1", false, List.of()),
-                  new NoteRefinementLayoutItem("same", "Point 2", false, List.of())));
-      openAiStructuredResponseMock.stubStructuredResponse(layoutWithDuplicateIds);
-      testNote.setContent("Some note content");
+      LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+      Logger validatorLogger = loggerContext.getLogger(NoteRefinementLayoutValidator.class);
+      Level originalLevel = validatorLogger.getLevel();
+      validatorLogger.setLevel(Level.ALL);
+      ListAppender<ILoggingEvent> logAppender = new ListAppender<>();
+      logAppender.setContext(loggerContext);
+      logAppender.start();
+      validatorLogger.addAppender(logAppender);
+      try {
+        NoteRefinementLayout layoutWithDuplicateIds =
+            new NoteRefinementLayout(
+                List.of(
+                    new NoteRefinementLayoutItem("same", "Point 1", false, List.of()),
+                    new NoteRefinementLayoutItem("same", "Point 2", false, List.of())));
+        openAiStructuredResponseMock.stubStructuredResponse(layoutWithDuplicateIds);
+        testNote.setContent("Some note content");
 
-      NoteRefinementLayoutDTO result = controller.generateRefinementSuggestions(testNote);
+        NoteRefinementLayoutDTO result = controller.generateRefinementSuggestions(testNote);
 
-      assertThat(result.getItems()).isEmpty();
+        assertThat(result.getItems()).isEmpty();
+        assertThat(logAppender.list)
+            .anyMatch(
+                event ->
+                    event.getLevel() == Level.WARN
+                        && event.getFormattedMessage().contains("duplicate item id"));
+      } finally {
+        logAppender.stop();
+        validatorLogger.detachAppender(logAppender);
+        validatorLogger.setLevel(originalLevel);
+      }
     }
 
     @Test

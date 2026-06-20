@@ -317,7 +317,7 @@ Targeted checks:
 
 ### Phase 9 - Make invalid AI layout diagnosable
 
-Status: planned
+Status: done
 
 Type: Behavior
 

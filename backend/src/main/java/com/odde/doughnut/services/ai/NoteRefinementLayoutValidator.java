@@ -5,35 +5,78 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NoteRefinementLayoutValidator {
+  private static final Logger logger = LoggerFactory.getLogger(NoteRefinementLayoutValidator.class);
+
   public static NoteRefinementLayout validOrEmpty(NoteRefinementLayout layout) {
-    return isValid(layout) ? layout : NoteRefinementLayout.empty();
+    Optional<String> reason = firstInvalidReason(layout);
+    if (reason.isPresent()) {
+      logger.warn("Rejecting invalid note refinement layout: {}", reason.get());
+      return NoteRefinementLayout.empty();
+    }
+    return layout;
   }
 
   public static boolean isValid(NoteRefinementLayout layout) {
-    if (layout == null || layout.items == null) {
-      return false;
-    }
-    Set<String> ids = new HashSet<>();
-    return layout.items.stream().allMatch(item -> isValidItem(item, 1, ids));
+    return firstInvalidReason(layout).isEmpty();
   }
 
-  private static boolean isValidItem(NoteRefinementLayoutItem item, int depth, Set<String> ids) {
-    if (item == null
-        || item.id == null
-        || item.id.isBlank()
-        || item.text == null
-        || item.text.isBlank()
-        || !ids.add(item.id)) {
-      return false;
+  private static Optional<String> firstInvalidReason(NoteRefinementLayout layout) {
+    if (layout == null) {
+      return Optional.of("layout is null");
+    }
+    if (layout.items == null) {
+      return Optional.of("layout items is null");
+    }
+    Set<String> ids = new HashSet<>();
+    for (NoteRefinementLayoutItem item : layout.items) {
+      Optional<String> itemReason = invalidReasonForItem(item, 1, ids);
+      if (itemReason.isPresent()) {
+        return itemReason;
+      }
+    }
+    return Optional.empty();
+  }
+
+  private static Optional<String> invalidReasonForItem(
+      NoteRefinementLayoutItem item, int depth, Set<String> ids) {
+    if (item == null) {
+      return Optional.of("item is null");
+    }
+    if (item.id == null) {
+      return Optional.of("item id is null");
+    }
+    if (item.id.isBlank()) {
+      return Optional.of("item id is blank");
+    }
+    if (item.text == null) {
+      return Optional.of("item text is null");
+    }
+    if (item.text.isBlank()) {
+      return Optional.of("item text is blank");
+    }
+    if (!ids.add(item.id)) {
+      return Optional.of("duplicate item id: " + item.id);
     }
     List<NoteRefinementLayoutItem> children = item.children;
-    if (children == null || depth > 2) {
-      return false;
+    if (children == null) {
+      return Optional.of("item children is null");
     }
-    return children.stream().allMatch(child -> isValidItem(child, depth + 1, ids));
+    if (depth > 2) {
+      return Optional.of("layout exceeds maximum depth");
+    }
+    for (NoteRefinementLayoutItem child : children) {
+      Optional<String> childReason = invalidReasonForItem(child, depth + 1, ids);
+      if (childReason.isPresent()) {
+        return childReason;
+      }
+    }
+    return Optional.empty();
   }
 
   public static List<NoteRefinementLayoutItem> selectedItems(
