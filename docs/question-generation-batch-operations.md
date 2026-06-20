@@ -17,9 +17,9 @@ See `docs/database-erd.md` for foreign keys and column types.
 
 | Table | Purpose |
 |-------|---------|
-| `question_generation_batch_user_state` | Per-user **23-hour gate**: `last_successful_submitted_at` is set only when OpenAI accepts a batch (returns a batch id). One row per user. |
-| `question_generation_batch` | One local batch per submission attempt. Tracks OpenAI file/batch ids, batch-level status, and lifecycle timestamps. |
+| `question_generation_batch` | One local batch per submission attempt. Tracks OpenAI file/batch ids, batch-level status, lifecycle timestamps, and the per-user **23-hour gate** via `submitted_at` (set when OpenAI accepts a batch). |
 | `question_generation_batch_request` | One row per memory tracker in a batch. Correlates OpenAI results via `custom_id` (`qgb-{batchId}-mt-{trackerId}`). Stores raw success/error payloads and row-level `error_detail`. |
+| `question_generation_batch_maintenance_run` | Durable record of each scheduled or manual maintenance run (start/finish timestamps, trigger type). Survives backend restart. |
 
 ### Batch status (`question_generation_batch.status`)
 
@@ -44,7 +44,7 @@ Batch-level terminal states are `COMPLETED`, `FAILED`, and `EXPIRED`. A complete
 
 ## Retry Behavior
 
-- **23-hour gate:** A user gets at most one *accepted* OpenAI submission per 23 hours. The gate uses `question_generation_batch_user_state.last_successful_submitted_at`, not batch terminal status.
+- **23-hour gate:** A user gets at most one *accepted* OpenAI submission per 23 hours. The gate is derived from the latest `question_generation_batch.submitted_at` for that user, not batch terminal status.
 - **Failed local submission** (`PLANNED` → `FAILED` before OpenAI acceptance): gate is **not** updated; user can retry on the next **target cron hour** (same once-per-day gate as first-time submissions).
 - **OpenAI `FAILED` / `EXPIRED`:** Gate **was** updated at acceptance. User is blocked until 23 hours pass **unless** they have a batch with `openai_batch_id` set and status `FAILED` or `EXPIRED` — then they may submit again even inside the gate on the **next hourly cron**, bypassing the target cron-hour gate (retry path in `QuestionGenerationBatchPlanningService`).
 - **In-flight work:** User is not eligible for a new submission while any batch has status `SUBMITTED`.
@@ -101,12 +101,17 @@ ORDER BY r.batch_id, r.id;
 
 ```sql
 SELECT u.id AS user_id,
-       s.last_successful_submitted_at,
+       latest.submitted_at AS last_submitted_at,
        (SELECT status FROM question_generation_batch
         WHERE user_id = u.id AND status = 'SUBMITTED' LIMIT 1) AS in_flight_status
-FROM question_generation_batch_user_state s
-JOIN user u ON u.id = s.user_id
-WHERE s.last_successful_submitted_at > NOW() - INTERVAL 23 HOUR;
+FROM (
+  SELECT user_id, MAX(submitted_at) AS submitted_at
+  FROM question_generation_batch
+  WHERE submitted_at IS NOT NULL
+  GROUP BY user_id
+) latest
+JOIN user u ON u.id = latest.user_id
+WHERE latest.submitted_at > NOW() - INTERVAL 23 HOUR;
 ```
 
 ## OpenAI Batch Request Compatibility
@@ -119,7 +124,13 @@ Batch JSONL uses a separate request shape from synchronous question generation (
 
 Captured success JSONL from manual verification is at `backend/src/test/resources/openai-batch-fixtures/live_batch_success_line.json`, covered by `QuestionGenerationBatchOutputFixtureTest`.
 
-Silent-period target time-of-day uses the JVM default timezone (`RecallTimeOfDay.fromTimestamp`); user timezones are intentionally ignored.
+### Timezone
+
+Production JVM runs in **UTC** (`-Duser.timezone=UTC` and `TZ=UTC` in the instance startup script). Logs and scheduler timestamps use UTC.
+
+The hourly cron (`0 0 * * * *`) and silent-window due-instant logic are **timezone-invariant** for whole-hour offsets: shifting the JVM timezone does not change which cron hours fire or how hourly due windows align.
+
+Silent-period target time-of-day is computed from recall answer timestamps in the JVM timezone (`RecallTimeOfDay.fromTimestamp`); per-user timezones are intentionally ignored.
 
 ## Code Entry Points
 

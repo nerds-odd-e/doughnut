@@ -56,11 +56,11 @@ Outcome: admin shows last scheduled vs manual run from DB, surviving restart.
 - Admin DTO + Vue: distinguish scheduled vs manual.
 - Tests: `QuestionGenerationBatchMaintenanceRunRepositoryTest`, extend admin status tests.
 
-### Phase 3 (behavior) — Production runs in UTC — PLANNED
+### Phase 3 (behavior) — Production runs in UTC — DONE
 
 Outcome: JVM and logs use UTC; remove misleading `TZ=Asia/Singapore` from startup script.
 
-- [infra/gcp/scripts/mig-zulu25-openai-app-instance-startup.sh](../infra/gcp/scripts/mig-zulu25-openai-app-instance-startup.sh): `-Duser.timezone=UTC` (or `TZ=UTC`).
+- [infra/gcp/scripts/mig-zulu25-openai-app-instance-startup.sh](../infra/gcp/scripts/mig-zulu25-openai-app-instance-startup.sh): `-Duser.timezone=UTC` and `TZ=UTC`.
 - Update [docs/question-generation-batch-operations.md](../docs/question-generation-batch-operations.md).
 
 ### Phase 4 (behavior) — Safe under two instances — PLANNED

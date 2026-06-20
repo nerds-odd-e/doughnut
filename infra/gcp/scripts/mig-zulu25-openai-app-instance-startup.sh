@@ -64,7 +64,7 @@ export OPENAI_API_TOKEN=$(curl "https://secretmanager.googleapis.com/v1/projects
   jq -r ".payload.data" | base64 --decode)
 
 # Start server
-export TZ="Asia/Singapore"
+export TZ=UTC
 export TERM=xterm
 export DEBIAN_FRONTEND=noninteractive
 export JAVA_OPTS="-XX:InitialRAMPercentage=75.0 \
@@ -90,7 +90,8 @@ export JAVA_OPTS="-XX:InitialRAMPercentage=75.0 \
         -Djava.security.egd=file:/dev/./urandom \
         -Dspring.output.ansi.enabled=never \
         -Dspring.jmx.enabled=false \
-        -Dspring.liveBeansView.mbeanDomain=false"
+        -Dspring.liveBeansView.mbeanDomain=false \
+        -Duser.timezone=UTC"
 
 # Start Spring Boot app
 # Write directly to stdout/stderr - Cloud Logging agent automatically captures these
