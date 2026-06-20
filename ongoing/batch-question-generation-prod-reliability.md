@@ -63,9 +63,14 @@ Outcome: JVM and logs use UTC; remove misleading `TZ=Asia/Singapore` from startu
 - [infra/gcp/scripts/mig-zulu25-openai-app-instance-startup.sh](../infra/gcp/scripts/mig-zulu25-openai-app-instance-startup.sh): `-Duser.timezone=UTC` and `TZ=UTC`.
 - Update [docs/question-generation-batch-operations.md](../docs/question-generation-batch-operations.md).
 
-### Phase 4 (behavior) — Safe under two instances — PLANNED
+### Phase 4 (behavior) — Safe under two instances — DONE
 
 Outcome: ShedLock on `runHourlyMaintenance` so autoscaler max=2 cannot double-submit.
+
+- ShedLock 7.7.0 (`shedlock-spring`, `shedlock-provider-jdbc-template`), Flyway `shedlock` table, `ShedLockConfig` (`@Profile("prod")`), `@SchedulerLock` on hourly job.
+- `QuestionGenerationBatchMaintenanceConcurrencyTest` verifies annotation, lock table, duplicate-lock behavior, prod `LockProvider` bean.
+
+**Plan complete** — all four phases delivered.
 
 ---
 

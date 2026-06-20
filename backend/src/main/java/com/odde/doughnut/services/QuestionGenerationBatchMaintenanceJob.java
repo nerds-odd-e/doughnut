@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.QuestionGenerationBatchMaintenanceTriggerSource;
 import java.sql.Timestamp;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
@@ -28,6 +29,10 @@ public class QuestionGenerationBatchMaintenanceJob {
   }
 
   @Scheduled(cron = "0 0 * * * *")
+  @SchedulerLock(
+      name = "questionGenerationBatchHourlyMaintenance",
+      lockAtMostFor = "55m",
+      lockAtLeastFor = "1m")
   public void runHourlyMaintenance() {
     Timestamp currentTime = new Timestamp(System.currentTimeMillis());
     maintenanceRunService.recordStarted(

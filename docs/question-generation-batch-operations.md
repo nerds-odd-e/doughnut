@@ -11,6 +11,10 @@ Production-only hourly job that pre-generates recall questions via the OpenAI Ba
 
 Resume runs before submission so completed work becomes visible as soon as possible.
 
+### Multi-instance safety
+
+Production may run up to two backend instances (autoscaler `max=2`). The hourly job uses [ShedLock](https://github.com/lukas-krecan/ShedLock) (`@SchedulerLock` on `runHourlyMaintenance`, JDBC lock table `shedlock`) so only one instance executes maintenance per hour. Manual admin **"Resume existing batches"** is unchanged and not ShedLock-guarded.
+
 ## State Tables
 
 See `docs/database-erd.md` for foreign keys and column types.
