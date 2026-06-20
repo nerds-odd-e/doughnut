@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.QuestionGenerationBatchAdminStatusDTO;
+import com.odde.doughnut.entities.QuestionGenerationBatchMaintenanceTriggerSource;
 import com.odde.doughnut.entities.QuestionGenerationBatchRequestStatus;
 import com.odde.doughnut.entities.QuestionGenerationBatchStatus;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository;
@@ -22,7 +23,7 @@ public class QuestionGenerationBatchAdminStatusService {
   private final String openAiToken;
   private final Environment environment;
   private final List<ScheduledTaskHolder> scheduledTaskHolders;
-  private final QuestionGenerationBatchMaintenanceRunState maintenanceRunState;
+  private final QuestionGenerationBatchMaintenanceRunService maintenanceRunService;
 
   public QuestionGenerationBatchAdminStatusService(
       QuestionGenerationBatchRepository batchRepository,
@@ -30,13 +31,13 @@ public class QuestionGenerationBatchAdminStatusService {
       @Value("${spring.openai.token}") String openAiToken,
       Environment environment,
       List<ScheduledTaskHolder> scheduledTaskHolders,
-      QuestionGenerationBatchMaintenanceRunState maintenanceRunState) {
+      QuestionGenerationBatchMaintenanceRunService maintenanceRunService) {
     this.batchRepository = batchRepository;
     this.batchRequestRepository = batchRequestRepository;
     this.openAiToken = openAiToken;
     this.environment = environment;
     this.scheduledTaskHolders = scheduledTaskHolders;
-    this.maintenanceRunState = maintenanceRunState;
+    this.maintenanceRunService = maintenanceRunService;
   }
 
   public QuestionGenerationBatchAdminStatusDTO getStatus() {
@@ -49,9 +50,22 @@ public class QuestionGenerationBatchAdminStatusService {
     dto.setOpenAiTokenConfigured(openAiToken != null && !openAiToken.isBlank());
     dto.setProdProfileActive(isProdProfileActive());
     dto.setSchedulerActive(isQuestionGenerationBatchMaintenanceScheduled());
-    dto.setLastMaintenanceStartedAt(maintenanceRunState.getLastMaintenanceStartedAt());
-    dto.setLastMaintenanceFinishedAt(maintenanceRunState.getLastMaintenanceFinishedAt());
-    dto.setLastMaintenanceError(maintenanceRunState.getLastMaintenanceError());
+    maintenanceRunService
+        .findLatestRun(QuestionGenerationBatchMaintenanceTriggerSource.SCHEDULED)
+        .ifPresent(
+            run -> {
+              dto.setLastScheduledMaintenanceStartedAt(run.getStartedAt());
+              dto.setLastScheduledMaintenanceFinishedAt(run.getFinishedAt());
+              dto.setLastScheduledMaintenanceError(run.getError());
+            });
+    maintenanceRunService
+        .findLatestRun(QuestionGenerationBatchMaintenanceTriggerSource.MANUAL_RESUME)
+        .ifPresent(
+            run -> {
+              dto.setLastManualMaintenanceStartedAt(run.getStartedAt());
+              dto.setLastManualMaintenanceFinishedAt(run.getFinishedAt());
+              dto.setLastManualMaintenanceError(run.getError());
+            });
     return dto;
   }
 

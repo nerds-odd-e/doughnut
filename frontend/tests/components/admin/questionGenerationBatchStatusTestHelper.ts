@@ -20,9 +20,12 @@ export const sampleQuestionGenerationBatchStatus: QuestionGenerationBatchAdminSt
     openAiTokenConfigured: true,
     prodProfileActive: false,
     schedulerActive: false,
-    lastMaintenanceStartedAt: undefined,
-    lastMaintenanceFinishedAt: undefined,
-    lastMaintenanceError: undefined,
+    lastScheduledMaintenanceStartedAt: undefined,
+    lastScheduledMaintenanceFinishedAt: undefined,
+    lastScheduledMaintenanceError: undefined,
+    lastManualMaintenanceStartedAt: undefined,
+    lastManualMaintenanceFinishedAt: undefined,
+    lastManualMaintenanceError: undefined,
   }
 
 export const resumedQuestionGenerationBatchStatus: QuestionGenerationBatchAdminStatusDto =
@@ -39,8 +42,8 @@ export const resumedQuestionGenerationBatchStatus: QuestionGenerationBatchAdminS
       OUTPUT_READY: 0,
       IMPORTED: 13,
     },
-    lastMaintenanceStartedAt: "2026-06-18T05:00:00.000Z",
-    lastMaintenanceFinishedAt: "2026-06-18T05:01:00.000Z",
+    lastManualMaintenanceStartedAt: "2026-06-18T05:00:00.000Z",
+    lastManualMaintenanceFinishedAt: "2026-06-18T05:01:00.000Z",
   }
 
 export const mockQuestionGenerationBatchStatusApis = () => {

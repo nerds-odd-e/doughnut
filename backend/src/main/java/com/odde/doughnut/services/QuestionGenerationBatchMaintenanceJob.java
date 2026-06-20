@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.entities.QuestionGenerationBatchMaintenanceTriggerSource;
 import java.sql.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,35 +16,36 @@ public class QuestionGenerationBatchMaintenanceJob {
 
   private final QuestionGenerationBatchMaintenanceService maintenanceService;
   private final QuestionGenerationBatchSubmitDueUsersService submitDueUsersService;
-  private final QuestionGenerationBatchMaintenanceRunState maintenanceRunState;
+  private final QuestionGenerationBatchMaintenanceRunService maintenanceRunService;
 
   public QuestionGenerationBatchMaintenanceJob(
       QuestionGenerationBatchMaintenanceService maintenanceService,
       QuestionGenerationBatchSubmitDueUsersService submitDueUsersService,
-      QuestionGenerationBatchMaintenanceRunState maintenanceRunState) {
+      QuestionGenerationBatchMaintenanceRunService maintenanceRunService) {
     this.maintenanceService = maintenanceService;
     this.submitDueUsersService = submitDueUsersService;
-    this.maintenanceRunState = maintenanceRunState;
+    this.maintenanceRunService = maintenanceRunService;
   }
 
   @Scheduled(cron = "0 0 * * * *")
   public void runHourlyMaintenance() {
     Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-    maintenanceRunState.recordStarted(currentTime);
+    maintenanceRunService.recordStarted(
+        QuestionGenerationBatchMaintenanceTriggerSource.SCHEDULED, currentTime);
     logger.info("Question generation batch hourly maintenance started at {}", currentTime);
     try {
       maintenanceService.resumeExistingBatches(currentTime);
     } catch (RuntimeException e) {
-      maintenanceRunState.recordError(e);
+      maintenanceRunService.recordError(e);
       logger.warn("Question generation batch resume step failed; continuing to due submissions", e);
     }
     try {
       submitDueUsersService.submitDueUsers(currentTime);
     } catch (RuntimeException e) {
-      maintenanceRunState.recordError(e);
+      maintenanceRunService.recordError(e);
       throw e;
     } finally {
-      maintenanceRunState.recordFinished(new Timestamp(System.currentTimeMillis()));
+      maintenanceRunService.recordFinished(new Timestamp(System.currentTimeMillis()));
       logger.info("Question generation batch hourly maintenance finished at {}", currentTime);
     }
   }

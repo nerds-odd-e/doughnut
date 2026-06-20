@@ -101,6 +101,17 @@ class AdminQuestionGenerationBatchControllerTest extends ControllerTestBase {
   }
 
   @Test
+  void adminGetsNullMaintenanceRunTimestampsWhenNoRunsExist()
+      throws UnexpectedNoAccessRightException {
+    currentUser.setUser(makeMe.anAdmin().please());
+
+    QuestionGenerationBatchAdminStatusDTO status = controller.getQuestionGenerationBatchStatus();
+
+    assertThat(status.getLastScheduledMaintenanceStartedAt(), equalTo(null));
+    assertThat(status.getLastManualMaintenanceStartedAt(), equalTo(null));
+  }
+
+  @Test
   void adminCanResumeExistingBatchesAndReceivesRefreshedStatus()
       throws UnexpectedNoAccessRightException {
     currentUser.setUser(makeMe.anAdmin().please());
@@ -110,8 +121,8 @@ class AdminQuestionGenerationBatchControllerTest extends ControllerTestBase {
 
     assertThat(status.getBatchCountsByStatus().get("SUBMITTED"), equalTo(0L));
     assertThat(status.getRequestCountsByStatus().get("PENDING"), equalTo(0L));
-    assertThat(status.getLastMaintenanceStartedAt(), equalTo(currentTime));
-    assertThat(status.getLastMaintenanceFinishedAt(), notNullValue());
+    assertThat(status.getLastManualMaintenanceStartedAt(), equalTo(currentTime));
+    assertThat(status.getLastManualMaintenanceFinishedAt(), notNullValue());
   }
 
   @Test

@@ -2,10 +2,11 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.QuestionGenerationBatchAdminStatusDTO;
 import com.odde.doughnut.controllers.dto.QuestionGenerationBatchSubmissionSummaryDTO;
+import com.odde.doughnut.entities.QuestionGenerationBatchMaintenanceTriggerSource;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.QuestionGenerationBatchAdminStatusService;
-import com.odde.doughnut.services.QuestionGenerationBatchMaintenanceRunState;
+import com.odde.doughnut.services.QuestionGenerationBatchMaintenanceRunService;
 import com.odde.doughnut.services.QuestionGenerationBatchMaintenanceService;
 import com.odde.doughnut.services.QuestionGenerationBatchSubmitDueUsersService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -23,7 +24,7 @@ class AdminQuestionGenerationBatchController {
   private final AuthorizationService authorizationService;
   private final QuestionGenerationBatchAdminStatusService adminStatusService;
   private final QuestionGenerationBatchMaintenanceService maintenanceService;
-  private final QuestionGenerationBatchMaintenanceRunState maintenanceRunState;
+  private final QuestionGenerationBatchMaintenanceRunService maintenanceRunService;
   private final QuestionGenerationBatchSubmitDueUsersService submitDueUsersService;
   private final TestabilitySettings testabilitySettings;
 
@@ -31,13 +32,13 @@ class AdminQuestionGenerationBatchController {
       AuthorizationService authorizationService,
       QuestionGenerationBatchAdminStatusService adminStatusService,
       QuestionGenerationBatchMaintenanceService maintenanceService,
-      QuestionGenerationBatchMaintenanceRunState maintenanceRunState,
+      QuestionGenerationBatchMaintenanceRunService maintenanceRunService,
       QuestionGenerationBatchSubmitDueUsersService submitDueUsersService,
       TestabilitySettings testabilitySettings) {
     this.authorizationService = authorizationService;
     this.adminStatusService = adminStatusService;
     this.maintenanceService = maintenanceService;
-    this.maintenanceRunState = maintenanceRunState;
+    this.maintenanceRunService = maintenanceRunService;
     this.submitDueUsersService = submitDueUsersService;
     this.testabilitySettings = testabilitySettings;
   }
@@ -68,14 +69,15 @@ class AdminQuestionGenerationBatchController {
     authorizationService.assertLoggedIn();
     authorizationService.assertAdminAuthorization();
     Timestamp currentTime = testabilitySettings.getCurrentUTCTimestamp();
-    maintenanceRunState.recordStarted(currentTime);
+    maintenanceRunService.recordStarted(
+        QuestionGenerationBatchMaintenanceTriggerSource.MANUAL_RESUME, currentTime);
     try {
       maintenanceService.resumeExistingBatches(currentTime);
     } catch (RuntimeException e) {
-      maintenanceRunState.recordError(e);
+      maintenanceRunService.recordError(e);
       throw e;
     } finally {
-      maintenanceRunState.recordFinished(testabilitySettings.getCurrentUTCTimestamp());
+      maintenanceRunService.recordFinished(testabilitySettings.getCurrentUTCTimestamp());
     }
     return adminStatusService.getStatus();
   }

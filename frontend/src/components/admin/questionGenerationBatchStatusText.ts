@@ -29,18 +29,39 @@ export const formatMaintenanceSummary = (
   ].join(", ")
 }
 
-export const formatLastMaintenanceRun = (
-  status: QuestionGenerationBatchAdminStatusDto | undefined
+const formatMaintenanceRun = (
+  label: string,
+  startedAt: string | undefined,
+  finishedAt: string | undefined,
+  error: string | undefined
 ): string => {
-  const startedAt = status?.lastMaintenanceStartedAt
-  const finishedAt = status?.lastMaintenanceFinishedAt
-  const error = status?.lastMaintenanceError
-  if (!startedAt && !finishedAt) return "never"
+  if (!startedAt && !finishedAt) return `${label}: never`
   return [
+    `${label}:`,
     startedAt ? `started ${startedAt}` : undefined,
     finishedAt ? `finished ${finishedAt}` : undefined,
     error ? `error ${error}` : undefined,
   ]
     .filter(Boolean)
-    .join(", ")
+    .join(" ")
 }
+
+export const formatLastScheduledMaintenanceRun = (
+  status: QuestionGenerationBatchAdminStatusDto | undefined
+): string =>
+  formatMaintenanceRun(
+    "Scheduled",
+    status?.lastScheduledMaintenanceStartedAt,
+    status?.lastScheduledMaintenanceFinishedAt,
+    status?.lastScheduledMaintenanceError
+  )
+
+export const formatLastManualMaintenanceRun = (
+  status: QuestionGenerationBatchAdminStatusDto | undefined
+): string =>
+  formatMaintenanceRun(
+    "Manual",
+    status?.lastManualMaintenanceStartedAt,
+    status?.lastManualMaintenanceFinishedAt,
+    status?.lastManualMaintenanceError
+  )

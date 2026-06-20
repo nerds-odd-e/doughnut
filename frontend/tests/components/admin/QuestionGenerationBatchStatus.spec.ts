@@ -54,8 +54,11 @@ describe("QuestionGenerationBatchStatus", () => {
       "inactive"
     )
     expect(
-      wrapper.get('[data-testid="maintenance-run-state"]').text()
-    ).toContain("never")
+      wrapper.get('[data-testid="scheduled-maintenance-run-state"]').text()
+    ).toContain("Scheduled: never")
+    expect(
+      wrapper.get('[data-testid="manual-maintenance-run-state"]').text()
+    ).toContain("Manual: never")
   })
 
   it("renders the manual generation button", async () => {

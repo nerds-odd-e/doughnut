@@ -646,9 +646,12 @@ export type QuestionGenerationBatchAdminStatusDto = {
     openAiTokenConfigured?: boolean;
     prodProfileActive?: boolean;
     schedulerActive?: boolean;
-    lastMaintenanceStartedAt?: string;
-    lastMaintenanceFinishedAt?: string;
-    lastMaintenanceError?: string;
+    lastScheduledMaintenanceStartedAt?: string;
+    lastScheduledMaintenanceFinishedAt?: string;
+    lastScheduledMaintenanceError?: string;
+    lastManualMaintenanceStartedAt?: string;
+    lastManualMaintenanceFinishedAt?: string;
+    lastManualMaintenanceError?: string;
 };
 
 export type AdminDataMigrationStatusDto = {

@@ -47,7 +47,7 @@ Outcome: scheduled maintenance runs every hour without hanging on logging, is no
 
 Verification: after deploy, prod log shows maintenance at `:00:00` UTC each hour; batch #2 (or next stuck batch) advances from `SUBMITTED` to `COMPLETED`/`IMPORTED` without manual resume.
 
-### Phase 2 (behavior) — Durable, accurate maintenance run-state — PLANNED
+### Phase 2 (behavior) — Durable, accurate maintenance run-state — DONE
 
 Outcome: admin shows last scheduled vs manual run from DB, surviving restart.
 

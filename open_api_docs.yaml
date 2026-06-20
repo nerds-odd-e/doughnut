@@ -4234,13 +4234,21 @@ components:
           type: boolean
         schedulerActive:
           type: boolean
-        lastMaintenanceStartedAt:
+        lastScheduledMaintenanceStartedAt:
           type: string
           format: date-time
-        lastMaintenanceFinishedAt:
+        lastScheduledMaintenanceFinishedAt:
           type: string
           format: date-time
-        lastMaintenanceError:
+        lastScheduledMaintenanceError:
+          type: string
+        lastManualMaintenanceStartedAt:
+          type: string
+          format: date-time
+        lastManualMaintenanceFinishedAt:
+          type: string
+          format: date-time
+        lastManualMaintenanceError:
           type: string
     AdminDataMigrationStatusDTO:
       type: object

@@ -11,7 +11,10 @@ public class QuestionGenerationBatchAdminStatusDTO {
   private boolean openAiTokenConfigured;
   private boolean prodProfileActive;
   private boolean schedulerActive;
-  private Timestamp lastMaintenanceStartedAt;
-  private Timestamp lastMaintenanceFinishedAt;
-  private String lastMaintenanceError;
+  private Timestamp lastScheduledMaintenanceStartedAt;
+  private Timestamp lastScheduledMaintenanceFinishedAt;
+  private String lastScheduledMaintenanceError;
+  private Timestamp lastManualMaintenanceStartedAt;
+  private Timestamp lastManualMaintenanceFinishedAt;
+  private String lastManualMaintenanceError;
 }

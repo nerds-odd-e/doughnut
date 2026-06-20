@@ -52,7 +52,6 @@ erDiagram
     "user" ||--o{ notebook : "creator_id"
     "user" ||--o{ ownership : "user_id"
     "user" ||--o{ question_generation_batch : "user_id"
-    "user" ||--o{ question_generation_batch_user_state : "user_id"
     "user" ||--o{ subscription : "user_id"
     "user" ||--o{ user_token : "user_id"
     attachment_blob {
@@ -174,15 +173,14 @@ erDiagram
         int id PK
         int user_id FK
     }
+    question_generation_batch_maintenance_run {
+        int id PK
+    }
     question_generation_batch_request {
         int id PK
         int batch_id FK
         int memory_tracker_id FK
         string custom_id UK
-    }
-    question_generation_batch_user_state {
-        int id PK
-        int user_id UK FK
     }
     quiz_answer {
         int id PK

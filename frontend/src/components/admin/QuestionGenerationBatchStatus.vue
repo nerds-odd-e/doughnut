@@ -75,10 +75,15 @@
       </div>
       <div
         class="mt-3 text-sm"
-        data-testid="maintenance-run-state"
+        data-testid="scheduled-maintenance-run-state"
       >
-        Last maintenance:
-        {{ lastMaintenanceRunText }}
+        {{ lastScheduledMaintenanceRunText }}
+      </div>
+      <div
+        class="mt-1 text-sm"
+        data-testid="manual-maintenance-run-state"
+      >
+        {{ lastManualMaintenanceRunText }}
       </div>
     </section>
 
@@ -138,7 +143,8 @@ import type {
 } from "@generated/doughnut-backend-api"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import {
-  formatLastMaintenanceRun,
+  formatLastManualMaintenanceRun,
+  formatLastScheduledMaintenanceRun,
   formatMaintenanceSummary,
   formatSubmissionSummary,
 } from "./questionGenerationBatchStatusText"
@@ -187,8 +193,12 @@ const maintenanceSummaryText = computed(() =>
   formatMaintenanceSummary(maintenanceSummary.value)
 )
 
-const lastMaintenanceRunText = computed(() =>
-  formatLastMaintenanceRun(status.value)
+const lastScheduledMaintenanceRunText = computed(() =>
+  formatLastScheduledMaintenanceRun(status.value)
+)
+
+const lastManualMaintenanceRunText = computed(() =>
+  formatLastManualMaintenanceRun(status.value)
 )
 
 const submitRecentRecallUsers = async () => {

@@ -6,12 +6,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.controllers.dto.QuestionGenerationBatchAdminStatusDTO;
+import com.odde.doughnut.entities.QuestionGenerationBatchMaintenanceRun;
+import com.odde.doughnut.entities.QuestionGenerationBatchMaintenanceTriggerSource;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,14 +29,14 @@ class QuestionGenerationBatchAdminStatusServiceTest {
   QuestionGenerationBatchRepository batchRepository;
   QuestionGenerationBatchRequestRepository requestRepository;
   Environment environment;
-  QuestionGenerationBatchMaintenanceRunState maintenanceRunState;
+  QuestionGenerationBatchMaintenanceRunService maintenanceRunService;
 
   @BeforeEach
   void setup() {
     batchRepository = mock(QuestionGenerationBatchRepository.class);
     requestRepository = mock(QuestionGenerationBatchRequestRepository.class);
     environment = mock(Environment.class);
-    maintenanceRunState = new QuestionGenerationBatchMaintenanceRunState();
+    maintenanceRunService = mock(QuestionGenerationBatchMaintenanceRunService.class);
     when(batchRepository.countByStatus()).thenReturn(List.of());
     when(requestRepository.countByStatus()).thenReturn(List.of());
     when(environment.getActiveProfiles()).thenReturn(new String[] {});
@@ -45,7 +48,7 @@ class QuestionGenerationBatchAdminStatusServiceTest {
         new QuestionGenerationBatchMaintenanceJob(
             mock(QuestionGenerationBatchMaintenanceService.class),
             mock(QuestionGenerationBatchSubmitDueUsersService.class),
-            maintenanceRunState);
+            maintenanceRunService);
     ScheduledTask scheduledTask = scheduledTaskFor(job);
     ScheduledTaskHolder taskHolder = () -> Set.of(scheduledTask);
 
@@ -64,21 +67,41 @@ class QuestionGenerationBatchAdminStatusServiceTest {
   }
 
   @Test
-  void reportsProdProfileAndLastMaintenanceStateSeparately() {
-    Timestamp startedAt = Timestamp.valueOf("2026-06-18 05:00:00");
-    Timestamp finishedAt = Timestamp.valueOf("2026-06-18 05:01:00");
+  void reportsProdProfileAndLatestScheduledAndManualMaintenanceRunsSeparately() {
+    Timestamp scheduledStartedAt = Timestamp.valueOf("2026-06-18 05:00:00");
+    Timestamp scheduledFinishedAt = Timestamp.valueOf("2026-06-18 05:01:00");
+    Timestamp manualStartedAt = Timestamp.valueOf("2026-06-18 06:00:00");
+    Timestamp manualFinishedAt = Timestamp.valueOf("2026-06-18 06:02:00");
     when(environment.getActiveProfiles()).thenReturn(new String[] {"prod"});
-    maintenanceRunState.recordStarted(startedAt);
-    maintenanceRunState.recordError(new RuntimeException("poll failed"));
-    maintenanceRunState.recordFinished(finishedAt);
+    when(maintenanceRunService.findLatestRun(
+            QuestionGenerationBatchMaintenanceTriggerSource.SCHEDULED))
+        .thenReturn(
+            Optional.of(
+                maintenanceRun(
+                    QuestionGenerationBatchMaintenanceTriggerSource.SCHEDULED,
+                    scheduledStartedAt,
+                    scheduledFinishedAt,
+                    "poll failed")));
+    when(maintenanceRunService.findLatestRun(
+            QuestionGenerationBatchMaintenanceTriggerSource.MANUAL_RESUME))
+        .thenReturn(
+            Optional.of(
+                maintenanceRun(
+                    QuestionGenerationBatchMaintenanceTriggerSource.MANUAL_RESUME,
+                    manualStartedAt,
+                    manualFinishedAt,
+                    null)));
 
     QuestionGenerationBatchAdminStatusDTO status =
         statusServiceWithTaskHolders(List.of()).getStatus();
 
     assertThat(status.isProdProfileActive(), equalTo(true));
-    assertThat(status.getLastMaintenanceStartedAt(), equalTo(startedAt));
-    assertThat(status.getLastMaintenanceFinishedAt(), equalTo(finishedAt));
-    assertThat(status.getLastMaintenanceError(), equalTo("poll failed"));
+    assertThat(status.getLastScheduledMaintenanceStartedAt(), equalTo(scheduledStartedAt));
+    assertThat(status.getLastScheduledMaintenanceFinishedAt(), equalTo(scheduledFinishedAt));
+    assertThat(status.getLastScheduledMaintenanceError(), equalTo("poll failed"));
+    assertThat(status.getLastManualMaintenanceStartedAt(), equalTo(manualStartedAt));
+    assertThat(status.getLastManualMaintenanceFinishedAt(), equalTo(manualFinishedAt));
+    assertThat(status.getLastManualMaintenanceError(), equalTo(null));
   }
 
   private QuestionGenerationBatchAdminStatusService statusServiceWithTaskHolders(
@@ -89,7 +112,7 @@ class QuestionGenerationBatchAdminStatusServiceTest {
         "configured-token",
         environment,
         taskHolders,
-        maintenanceRunState);
+        maintenanceRunService);
   }
 
   private ScheduledTask scheduledTaskFor(QuestionGenerationBatchMaintenanceJob job)
@@ -99,5 +122,18 @@ class QuestionGenerationBatchAdminStatusServiceTest {
     Constructor<ScheduledTask> constructor = ScheduledTask.class.getDeclaredConstructor(Task.class);
     constructor.setAccessible(true);
     return constructor.newInstance(task);
+  }
+
+  private static QuestionGenerationBatchMaintenanceRun maintenanceRun(
+      QuestionGenerationBatchMaintenanceTriggerSource triggerSource,
+      Timestamp startedAt,
+      Timestamp finishedAt,
+      String error) {
+    QuestionGenerationBatchMaintenanceRun run = new QuestionGenerationBatchMaintenanceRun();
+    run.setTriggerSource(triggerSource);
+    run.setStartedAt(startedAt);
+    run.setFinishedAt(finishedAt);
+    run.setError(error);
+    return run;
   }
 }

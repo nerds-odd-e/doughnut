@@ -2,14 +2,15 @@ package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 
+import com.odde.doughnut.entities.QuestionGenerationBatchMaintenanceTriggerSource;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,16 +24,15 @@ class QuestionGenerationBatchMaintenanceJobTests {
 
   @Mock QuestionGenerationBatchMaintenanceService maintenanceService;
   @Mock QuestionGenerationBatchSubmitDueUsersService submitDueUsersService;
-  QuestionGenerationBatchMaintenanceRunState maintenanceRunState;
+  @Mock QuestionGenerationBatchMaintenanceRunService maintenanceRunService;
 
   QuestionGenerationBatchMaintenanceJob job;
 
   @BeforeEach
   void setup() {
-    maintenanceRunState = new QuestionGenerationBatchMaintenanceRunState();
     job =
         new QuestionGenerationBatchMaintenanceJob(
-            maintenanceService, submitDueUsersService, maintenanceRunState);
+            maintenanceService, submitDueUsersService, maintenanceRunService);
   }
 
   @Test
@@ -56,11 +56,12 @@ class QuestionGenerationBatchMaintenanceJobTests {
   }
 
   @Test
-  void recordsStartedAndFinishedTimestamps() {
+  void recordsStartedAndFinishedTimestampsForScheduledRuns() {
     job.runHourlyMaintenance();
 
-    assertThat(maintenanceRunState.getLastMaintenanceStartedAt(), notNullValue());
-    assertThat(maintenanceRunState.getLastMaintenanceFinishedAt(), notNullValue());
+    verify(maintenanceRunService)
+        .recordStarted(eq(QuestionGenerationBatchMaintenanceTriggerSource.SCHEDULED), any());
+    verify(maintenanceRunService).recordFinished(any(Timestamp.class));
   }
 
   @Test
@@ -72,7 +73,7 @@ class QuestionGenerationBatchMaintenanceJobTests {
     job.runHourlyMaintenance();
 
     verify(submitDueUsersService).submitDueUsers(any(Timestamp.class));
-    assertThat(maintenanceRunState.getLastMaintenanceError(), containsString("resume failed"));
+    verify(maintenanceRunService).recordError(any(RuntimeException.class));
   }
 
   @Test
@@ -84,9 +85,11 @@ class QuestionGenerationBatchMaintenanceJobTests {
         .when(submitDueUsersService)
         .submitDueUsers(any(Timestamp.class));
 
-    assertThrows(RuntimeException.class, () -> job.runHourlyMaintenance());
+    RuntimeException thrown =
+        assertThrows(RuntimeException.class, () -> job.runHourlyMaintenance());
 
-    assertThat(maintenanceRunState.getLastMaintenanceError(), containsString("submit failed"));
-    assertThat(maintenanceRunState.getLastMaintenanceFinishedAt(), notNullValue());
+    assertThat(thrown.getMessage(), containsString("submit failed"));
+    verify(maintenanceRunService).recordError(any(RuntimeException.class));
+    verify(maintenanceRunService).recordFinished(any(Timestamp.class));
   }
 }
