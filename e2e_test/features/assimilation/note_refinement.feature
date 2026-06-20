@@ -33,9 +33,20 @@ Feature: Note refinement
   Scenario: Remove selected refinement layout points
     Given OpenAI returns the following content when requested to remove layout points:
       | A. C. E. |
+    And OpenAI reloads refinement layout after removal:
+      | id   | text | parent | alreadyExtracted |
+      | p1   | A    |        |                  |
+      | p1-2 | C    | p1     | true             |
+      | p3   | E    |        |                  |
     When I am assimilating the note "Sample"
     And I remove refinement layout items 1 and 3
     Then the note content on the current page should be "A. C. E."
+    And no refinement layout points should be selected
+    And I should see the refinement layout:
+      | text | level | alreadyExtracted |
+      | A    | 1     |                  |
+      | C    | 2     | true             |
+      | E    | 1     |                  |
 
   Scenario: Extract selected layout points to one new note
     Given OpenAI will extract layout points "B and D" to a new note with title "Point B and D" and content "Combined B and D" and updated parent content "A. C. E."

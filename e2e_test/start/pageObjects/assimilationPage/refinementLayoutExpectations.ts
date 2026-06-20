@@ -1,10 +1,21 @@
-import { refinementLayoutPanel, waitForExtractNote } from './shared'
+import { pageIsNotLoading } from '../../pageBase'
+import {
+  refinementLayoutPanel,
+  removeRefinementLayoutButton,
+  waitForExtractNote,
+} from './shared'
 
 export function assimilationRefinementLayoutExpectations() {
+  const showRefinementLayout = function (this: {
+    openRefineNoteModal(): unknown
+  }) {
+    this.openRefineNoteModal()
+    refinementLayoutPanel().scrollIntoView().should('be.visible')
+  }
+
   return {
     expectRefinementLayout(rows: Record<string, string>[]) {
-      this.openRefineNoteModal()
-      refinementLayoutPanel().scrollIntoView().should('be.visible')
+      showRefinementLayout.call(this)
       rows.forEach((row) => {
         refinementLayoutPanel()
           .contains(`[data-layout-level="${row.level}"] > label`, row.text)
@@ -25,10 +36,19 @@ export function assimilationRefinementLayoutExpectations() {
       return this
     },
     removeRefinementLayoutItemsAt(indices: number[]) {
-      this.openRefineNoteModal()
+      showRefinementLayout.call(this)
       indices.forEach((index) => this.checkRefinementLayoutItem(index))
-      cy.findByRole('button', { name: 'Remove selected' }).click()
+      removeRefinementLayoutButton().click()
       cy.findByRole('button', { name: 'OK' }).click()
+      pageIsNotLoading()
+      return this
+    },
+    expectNoRefinementLayoutSelection() {
+      showRefinementLayout.call(this)
+      refinementLayoutPanel()
+        .find('input[type="checkbox"]:checked')
+        .should('have.length', 0)
+      removeRefinementLayoutButton().should('be.disabled')
       return this
     },
     extractLayoutPointsToNewNote(...layoutPointTexts: string[]) {

@@ -1,12 +1,19 @@
 import type ServiceMocker from '../../support/ServiceMocker'
 import type { MessageToMatch } from './MessageToMatch'
 
+export const REFINEMENT_LAYOUT_INSTRUCTION_PATTERN =
+  '.*Return one current-content layout for the note content.*'
+
+export const refinementLayoutBodyToMatch = {
+  instructions: REFINEMENT_LAYOUT_INSTRUCTION_PATTERN,
+}
+
 type BodyToMatch = {
   input?: string
   instructions?: string
 }
 
-const responseBody = (outputText: string) => ({
+export const responseBody = (outputText: string) => ({
   id: 'resp-mock',
   object: 'response',
   created_at: Math.floor(Date.now() / 1000),
@@ -75,6 +82,20 @@ const openAiResponsesStubber = (
 const createOpenAiResponsesMock = (serviceMocker: ServiceMocker) => ({
   requestMessageMatches(message: MessageToMatch) {
     return openAiResponsesStubber(serviceMocker, bodyToMatchForMessage(message))
+  },
+  replaceRefinementLayoutStubWithSequence(...outputTexts: string[]) {
+    if (outputTexts.length < 2) {
+      throw new Error(
+        'replaceRefinementLayoutStubWithSequence requires at least initial and reload outputs'
+      )
+    }
+    return serviceMocker.replacePostMatchStubAt(
+      0,
+      `/responses`,
+      refinementLayoutBodyToMatch,
+      undefined,
+      outputTexts.map(responseBody)
+    )
   },
 })
 

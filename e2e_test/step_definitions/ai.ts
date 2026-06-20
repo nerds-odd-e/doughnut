@@ -10,6 +10,7 @@ import {
 } from '@badeball/cypress-cucumber-preprocessor'
 import '../support/string_util'
 import start, { mock_services } from '../start'
+import { REFINEMENT_LAYOUT_INSTRUCTION_PATTERN } from '../start/mock_services/createOpenAiResponsesMock'
 
 function parseSingleRowQuestion(questionTable: DataTable) {
   const hashes = questionTable.hashes()
@@ -33,8 +34,7 @@ const EXTRACT_NOTE_INSTRUCTION_PATTERN =
 const REMOVE_LAYOUT_POINTS_INSTRUCTION_PATTERN =
   '.*remove selected layout points from the note content.*'
 
-const REFINEMENT_LAYOUT_INSTRUCTION_PATTERN =
-  '.*Return one current-content layout for the note content.*'
+let refinementLayoutInitialOutput: string | null = null
 
 type RefinementLayoutItem = {
   id: string
@@ -256,6 +256,8 @@ When('I reject the suggested completion', () => {
 Given('OpenAI generates refinement layout:', (data: DataTable) => {
   cy.then(async () => {
     await mock_services.openAi().restartImposter()
+    const items = refinementLayoutFromTable(data)
+    refinementLayoutInitialOutput = JSON.stringify({ items })
     await mock_services
       .openAi()
       .responses()
@@ -263,8 +265,26 @@ Given('OpenAI generates refinement layout:', (data: DataTable) => {
         role: 'developer',
         content: REFINEMENT_LAYOUT_INSTRUCTION_PATTERN,
       })
-      .stubOutputText(
-        JSON.stringify({ items: refinementLayoutFromTable(data) })
+      .stubOutputText(refinementLayoutInitialOutput)
+  })
+})
+
+Given('OpenAI reloads refinement layout after removal:', (data: DataTable) => {
+  cy.then(async () => {
+    if (!refinementLayoutInitialOutput) {
+      throw new Error(
+        'OpenAI reloads refinement layout after removal requires OpenAI generates refinement layout in the Background'
+      )
+    }
+    const reloadOutput = JSON.stringify({
+      items: refinementLayoutFromTable(data),
+    })
+    await mock_services
+      .openAi()
+      .replaceRefinementLayoutStubWithSequence(
+        refinementLayoutInitialOutput,
+        reloadOutput,
+        reloadOutput
       )
   })
 })

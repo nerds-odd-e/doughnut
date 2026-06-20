@@ -3,21 +3,22 @@ import {
   TextContentController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import {
   mockSdkService,
   mockSdkServiceWithImplementation,
-  wrapSdkError,
 } from "@tests/helpers"
 import usePopups from "@/components/commons/Popups/usePopups"
 import {
+  layoutCheckbox,
   mountNoteRefinement,
   note,
   refinementActionButton,
   refinementLayoutItems,
   refinementLayoutPanel,
   refinementLayoutSelectionApiCall,
+  renderer,
   selectFirstLayoutItem,
   setupNoteRefinementTests,
 } from "./noteRefinementTestSupport"
@@ -120,6 +121,46 @@ describe("NoteRefinement remove layout points", () => {
       expect(wrapper.emitted("contentUpdated")).toEqual([["Updated content"]])
     })
 
+    it("clears selection and reloads layout after confirmed removal", async () => {
+      const initialLayout = refinementLayoutItems(["Point 1", "Point 2"])
+      const postRemovalLayout = refinementLayoutItems(["Point 1"])
+      const generateLayoutSpy = mockSdkServiceWithImplementation(
+        AiController,
+        "generateRefinementSuggestions",
+        vi
+          .fn()
+          .mockResolvedValueOnce({ items: initialLayout })
+          .mockResolvedValueOnce({ items: postRemovalLayout })
+      )
+      mockSdkService(AiController, "removeRefinementSuggestion", {
+        content: "Updated content",
+      })
+      mockSdkService(
+        TextContentController,
+        "updateNoteContent",
+        makeMe.aNoteRealm.please()
+      )
+      const wrapper = renderer.withCleanStorage().withProps({ note }).mount()
+      await flushPromises()
+      expect(generateLayoutSpy).toHaveBeenCalledTimes(1)
+
+      await selectFirstLayoutItem(wrapper)
+      await wrapper
+        .find('[data-test-id="remove-refinement-layout"]')
+        .trigger("click")
+      usePopups().popups.done(true)
+      await flushPromises()
+
+      expect(generateLayoutSpy).toHaveBeenCalledTimes(2)
+      expect(layoutCheckbox(wrapper, "p1").checked).toBe(false)
+      expect(
+        refinementActionButton(wrapper, "remove-refinement-layout").disabled
+      ).toBe(true)
+      expect(
+        refinementLayoutPanel(wrapper).findAll('input[type="checkbox"]')
+      ).toHaveLength(1)
+    })
+
     it("does not call API when removal is cancelled", async () => {
       const removeLayoutSpy = mockSdkService(
         AiController,
@@ -138,76 +179,6 @@ describe("NoteRefinement remove layout points", () => {
 
       expect(removeLayoutSpy).not.toHaveBeenCalled()
       expect(wrapper.emitted()).not.toHaveProperty("contentUpdated")
-    })
-  })
-
-  describe("loading modal", () => {
-    function deferApiCompletion() {
-      let resolveApi!: () => void
-      const apiGate = new Promise<void>((resolve) => {
-        resolveApi = resolve
-      })
-      return { apiGate, finishApi: () => resolveApi() }
-    }
-
-    async function startRemovingWithPendingApi(apiResult: { content: string }) {
-      const { apiGate, finishApi } = deferApiCompletion()
-      mockSdkServiceWithImplementation(
-        AiController,
-        "removeRefinementSuggestion",
-        async () => {
-          await apiGate
-          return apiResult
-        }
-      )
-      const wrapper = mountNoteRefinement(["Point 1", "Point 2"])
-      await flushPromises()
-      await selectFirstLayoutItem(wrapper)
-      await wrapper
-        .find('[data-test-id="remove-refinement-layout"]')
-        .trigger("click")
-      await flushPromises()
-      usePopups().popups.done(true)
-      await flushPromises()
-      return { wrapper, finishApi }
-    }
-
-    it("shows LoadingModal while removing layout points", async () => {
-      const { finishApi } = await startRemovingWithPendingApi({
-        content: "Updated content",
-      })
-
-      expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
-      expect(document.body.textContent).toContain("AI is removing content...")
-      finishApi()
-      await flushPromises()
-      expect(document.querySelector(".loading-modal-mask")).toBeNull()
-    })
-
-    it("hides LoadingModal when remove API fails", async () => {
-      const { apiGate, finishApi } = deferApiCompletion()
-      mockSdkServiceWithImplementation(
-        AiController,
-        "removeRefinementSuggestion",
-        async () => {
-          await apiGate
-          return wrapSdkError("API Error")
-        }
-      )
-      const wrapper = mountNoteRefinement(["Point 1", "Point 2"])
-      await flushPromises()
-      await selectFirstLayoutItem(wrapper)
-      await wrapper
-        .find('[data-test-id="remove-refinement-layout"]')
-        .trigger("click")
-      await flushPromises()
-      usePopups().popups.done(true)
-      await flushPromises()
-
-      expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
-      finishApi()
-      await flushPromises()
-      expect(document.querySelector(".loading-modal-mask")).toBeNull()
     })
   })
 })

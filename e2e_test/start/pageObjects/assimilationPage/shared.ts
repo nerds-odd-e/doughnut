@@ -38,6 +38,9 @@ export const refinementLayoutPanel = () =>
     .contains('Note layout:')
     .closest('.bg-accent')
 
+export const removeRefinementLayoutButton = () =>
+  refinementLayoutPanel().find('[data-test-id="remove-refinement-layout"]')
+
 export const waitForExtractNote = () => {
   cy.contains('p.loading-message', 'AI is creating note...', {
     timeout: 15000,

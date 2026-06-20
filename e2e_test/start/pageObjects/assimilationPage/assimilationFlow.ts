@@ -28,9 +28,15 @@ export const assumeAssimilationPage = () => ({
     return this
   },
   openRefineNoteModal() {
-    cy.get('[data-test="open-refine-note-modal"]').scrollIntoView().click()
-    cy.get('[data-test="refine-note-modal"].daisy-modal-open').should('exist')
-    pageIsNotLoading()
+    cy.get('[data-test="refine-note-modal"]').then(($modal) => {
+      if ($modal.hasClass('daisy-modal-open')) {
+        pageIsNotLoading()
+        return
+      }
+      cy.get('[data-test="open-refine-note-modal"]').scrollIntoView().click()
+      cy.get('[data-test="refine-note-modal"].daisy-modal-open').should('exist')
+      pageIsNotLoading()
+    })
     return this
   },
   waitForAssimilationReady() {

@@ -90,13 +90,11 @@ class ServiceMocker {
     )
   }
 
-  public mockPostMatchsAndNotMatches(
+  private postMatchPredicates(
     path: string,
     bodyToMatch: unknown,
-    bodyNotToMatch: unknown,
-    responses: unknown[],
-    headers?: Record<string, string>
-  ): Promise<void> {
+    bodyNotToMatch: unknown
+  ): Predicate[] {
     const nots = bodyNotToMatch
       ? [
           new NotPredicate(
@@ -107,12 +105,44 @@ class ServiceMocker {
         ]
       : []
 
-    const predicate = new FlexiPredicate()
-      .withOperator(Operator.matches)
-      .withPath(path)
-      .withMethod(HttpMethod.POST)
-      .withBody(bodyToMatch)
-    return this.mockWithPredicates([predicate, ...nots], responses, headers)
+    return [
+      new FlexiPredicate()
+        .withOperator(Operator.matches)
+        .withPath(path)
+        .withMethod(HttpMethod.POST)
+        .withBody(bodyToMatch),
+      ...nots,
+    ]
+  }
+
+  public mockPostMatchsAndNotMatches(
+    path: string,
+    bodyToMatch: unknown,
+    bodyNotToMatch: unknown,
+    responses: unknown[],
+    headers?: Record<string, string>
+  ): Promise<void> {
+    return this.mockWithPredicates(
+      this.postMatchPredicates(path, bodyToMatch, bodyNotToMatch),
+      responses,
+      headers
+    )
+  }
+
+  public replacePostMatchStubAt(
+    index: number,
+    path: string,
+    bodyToMatch: unknown,
+    bodyNotToMatch: unknown,
+    responses: unknown[],
+    headers?: Record<string, string>
+  ): Promise<void> {
+    const stub = this.mountebankStubBuilder.stubWithPredicates(
+      this.postMatchPredicates(path, bodyToMatch, bodyNotToMatch),
+      responses,
+      headers
+    )
+    return this.replaceStubAt(index, stub)
   }
 
   public stubPosterUnauthorized(pathMatcher: string, response: unknown) {
@@ -176,6 +206,18 @@ class ServiceMocker {
       })
       .then(async (newStubs) => {
         await this.mountebank.addStubsToImposter(newStubs as Stub[])
+      })
+      .then(() => undefined) as unknown as Promise<void>
+  }
+
+  replaceStubAt(index: number, stub: Stub): Promise<void> {
+    return cy
+      .get(`@${this.stubsName}`)
+      .then(async (stubs) => {
+        const newStubs = [...(stubs as Stub[])]
+        newStubs[index] = stub
+        await cy.wrap(newStubs).as(this.stubsName)
+        await this.mountebank.addStubsToImposter(newStubs)
       })
       .then(() => undefined) as unknown as Promise<void>
   }

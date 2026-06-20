@@ -36,6 +36,12 @@ const openAiService = () => {
       return createOpenAiResponsesMock(serviceMocker)
     },
 
+    replaceRefinementLayoutStubWithSequence(...outputTexts: string[]) {
+      return this.responses().replaceRefinementLayoutStubWithSequence(
+        ...outputTexts
+      )
+    },
+
     // Smarter stub for POST /embeddings used by semantic search tests.
     // - If the request body contains "something else" in its input, return a very different vector.
     // - Otherwise, return 10 identical embeddings (more than requested) with a base vector.

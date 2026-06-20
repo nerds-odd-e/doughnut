@@ -160,6 +160,7 @@ const removeSelectedLayoutItems = async () => {
         )
       }
       emit("contentUpdated", data.content)
+      await loadRefinementLayout()
     }
   }, "AI is removing content...")
 }
