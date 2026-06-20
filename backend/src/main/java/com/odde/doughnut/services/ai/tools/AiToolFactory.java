@@ -183,25 +183,32 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
     return BookLayoutReorganizationSuggestion.class;
   }
 
-  public static InstructionAndSchema removeSuggestionsFromContentAiTool(
-      List<String> suggestionsToRemove) {
-    String suggestionsBlock = String.join("\n", suggestionsToRemove);
-    String message =
+  public static InstructionAndSchema removeSelectedLayoutPointsFromContentAiTool(
+      NoteRefinementLayout layout, List<String> selectedItemIds) {
+    String layoutJson = formatLayoutForPrompt(layout);
+    String selectedItemsBlock = formatSelectedItemsForPrompt(layout, selectedItemIds);
+    String instruction =
         """
-            You need to remove specific refinement suggestions from the note content. Carefully identify and completely remove all content related to each of the following suggestions. After removal, rewrite the remaining content into coherent, well-structured markdown while preserving all other information that is not related to the suggestions to be removed.
+        You need to remove selected layout points from the note content. Carefully identify and completely remove all content related to each selected point. After removal, rewrite the remaining content into coherent, well-structured markdown while preserving all other information.
 
-            Important guidelines:
-            1. Identify content that matches or relates to each suggestion listed below
-            2. Completely remove all sentences, paragraphs, or sections that contain or relate to these suggestions
-            3. Ensure the remaining content flows naturally and maintains coherence
-            4. Preserve all other information that is unrelated to the suggestions to be removed
-            5. Output only the new content in markdown format
+        Full note layout:
+        %s
 
-            Suggestions to remove:
-            %s
-            """
-            .formatted(suggestionsBlock);
-    return new InstructionAndSchema(message, RegeneratedNoteContent.class);
+        Selected layout item ids to remove: %s
+
+        Selected item texts:
+        %s
+
+        Important guidelines:
+        1. Identify content that matches or relates to each selected layout point listed above
+        2. Completely remove all sentences, paragraphs, or sections that contain or relate to these selected points
+        3. Selected points may be non-contiguous; keep unrelated content unchanged
+        4. Ensure the remaining content flows naturally and maintains coherence
+        5. Items marked alreadyExtracted in the layout are still valid user selections; remove their represented content as requested
+        6. Output only the new content in markdown format
+        """
+            .formatted(layoutJson, selectedItemIds, selectedItemsBlock);
+    return new InstructionAndSchema(instruction, RegeneratedNoteContent.class);
   }
 
   public static List<Class<?>> getAllAssistantTools() {

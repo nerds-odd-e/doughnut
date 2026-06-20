@@ -53,12 +53,6 @@ export function useRefinementLayoutSelection(
     }
   }
 
-  const selectedTexts = computed(() =>
-    allLayoutItems.value
-      .filter((item) => selectedItemIdSet.value.has(item.id))
-      .map(({ text }) => text)
-  )
-
   const clearSelection = () => {
     selectedItemIds.value = []
   }
@@ -69,7 +63,6 @@ export function useRefinementLayoutSelection(
     isFullySelected,
     isPartiallySelected,
     setItemSelection,
-    selectedTexts,
     clearSelection,
   }
 }

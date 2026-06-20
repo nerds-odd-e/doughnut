@@ -169,7 +169,7 @@ Completion notes:
 
 ### Phase 4 - Remove selected layout points using the same selection model
 
-Status: planned
+Status: done
 
 Behavior: When the user selects layout points and clicks **Remove selected**, AI removes those selected points from the note content while preserving unrelated content.
 
@@ -187,6 +187,12 @@ Targeted checks:
 - `CURSOR_DEV=true nix develop -c pnpm backend:test_only -- --tests com.odde.doughnut.controllers.AiControllerNoteRefinementTest`
 - `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/NoteRefinement.removeSuggestions.spec.ts`
 - `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/assimilation/note_refinement.feature`
+
+Completion notes:
+- Removal endpoint now accepts `NoteRefinementRemoveRequestDTO` with full `layout` and `selectedItemIds`; validation mirrors extraction.
+- `AiToolFactory.removeSelectedLayoutPointsFromContentAiTool` builds a prompt with the full nested layout JSON, selected ids, and selected item texts.
+- `NoteRefinement.vue` sends layout plus selected ids for removal; response-only save flow unchanged.
+- Dead `RefinementSuggestionsRequestDTO` removed; frontend tests share `refinementLayoutSelectionApiCall` helper.
 
 ### Phase 5 - Naming cleanup and generated API consistency
 

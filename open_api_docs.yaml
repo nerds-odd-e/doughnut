@@ -1549,7 +1549,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RefinementSuggestionsRequestDTO"
+              $ref: "#/components/schemas/NoteRefinementRemoveRequestDTO"
         required: true
       responses:
         "200":
@@ -4150,25 +4150,15 @@ components:
       properties:
         title:
           type: string
-    RefinementSuggestionsRequestDTO:
-      type: object
-      properties:
-        suggestions:
-          type: array
-          items:
-            type: string
-    RefinedContentResponseDTO:
-      type: object
-      properties:
-        content:
-          type: string
-    NoteRefinementLayoutDTO:
+    NoteRefinementLayout:
       type: object
       properties:
         items:
           type: array
           items:
             $ref: "#/components/schemas/NoteRefinementLayoutItem"
+      required:
+      - items
     NoteRefinementLayoutItem:
       type: object
       properties:
@@ -4189,6 +4179,27 @@ components:
       - children
       - id
       - text
+    NoteRefinementRemoveRequestDTO:
+      type: object
+      properties:
+        layout:
+          $ref: "#/components/schemas/NoteRefinementLayout"
+        selectedItemIds:
+          type: array
+          items:
+            type: string
+    RefinedContentResponseDTO:
+      type: object
+      properties:
+        content:
+          type: string
+    NoteRefinementLayoutDTO:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/NoteRefinementLayoutItem"
     NoteRefinementExtractRequestDTO:
       type: object
       properties:
@@ -4198,15 +4209,6 @@ components:
           type: array
           items:
             type: string
-    NoteRefinementLayout:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/NoteRefinementLayoutItem"
-      required:
-      - items
     QuestionGenerationBatchSubmissionSummaryDTO:
       type: object
       properties:

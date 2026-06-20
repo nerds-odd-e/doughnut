@@ -15,7 +15,8 @@ import {
   mountNoteRefinement,
   note,
   refinementActionButton,
-  refinementSuggestionsApiCall,
+  refinementLayoutItems,
+  refinementLayoutSelectionApiCall,
   refinementSuggestionsPanel,
   selectFirstSuggestion,
   setupNoteRefinementTests,
@@ -109,7 +110,11 @@ describe("NoteRefinement remove refinement suggestions", () => {
       await flushPromises()
 
       expect(removeSuggestionsSpy).toHaveBeenCalledWith(
-        refinementSuggestionsApiCall(note.id, ["Point 1"])
+        refinementLayoutSelectionApiCall(
+          note.id,
+          refinementLayoutItems(["Point 1", "Point 2"]),
+          ["p1"]
+        )
       )
       expect(updateDetailsSpy).toHaveBeenCalledWith({
         path: { note: note.id },

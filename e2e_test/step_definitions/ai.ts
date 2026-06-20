@@ -30,6 +30,9 @@ function stubOpenAiMcqFromSingleRowTable(questionTable: DataTable) {
 const EXTRACT_NOTE_INSTRUCTION_PATTERN =
   '.*extract selected layout points from a note to create one new note.*'
 
+const REMOVE_LAYOUT_POINTS_INSTRUCTION_PATTERN =
+  '.*remove selected layout points from the note content.*'
+
 const REFINEMENT_SUGGESTIONS_INSTRUCTION_PATTERN =
   '.*Return one current-content layout for the note content.*'
 
@@ -305,7 +308,7 @@ Given(
         .responses()
         .requestMessageMatches({
           role: 'developer',
-          content: '.*remove.*refinement suggestions.*',
+          content: REMOVE_LAYOUT_POINTS_INSTRUCTION_PATTERN,
         })
         .stubOutputText(reply)
     })

@@ -99,7 +99,6 @@ const {
   isFullySelected,
   isPartiallySelected,
   setItemSelection,
-  selectedTexts,
   clearSelection,
 } = useRefinementLayoutSelection(refinementLayoutItems)
 
@@ -144,7 +143,10 @@ const removeSelectedSuggestions = async () => {
     const { data, error } = await apiCallWithLoading(() =>
       AiController.removeRefinementSuggestion({
         path: { note: props.note.id },
-        body: { suggestions: selectedTexts.value },
+        body: {
+          layout: { items: refinementLayoutItems.value },
+          selectedItemIds: selectedItemIds.value,
+        },
       })
     )
 

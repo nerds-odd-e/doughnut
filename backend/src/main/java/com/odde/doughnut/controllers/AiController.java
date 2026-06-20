@@ -96,7 +96,7 @@ public class AiController {
   @Transactional
   public RefinedContentResponseDTO removeRefinementSuggestion(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
-      @RequestBody RefinementSuggestionsRequestDTO request)
+      @RequestBody NoteRefinementRemoveRequestDTO request)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
 
     authorizationService.assertAuthorization(note);
@@ -105,15 +105,13 @@ public class AiController {
     if (content == null || content.trim().isEmpty()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Note content cannot be empty");
     }
-    if (request.getSuggestions() == null || request.getSuggestions().isEmpty()) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "Suggestions to remove cannot be empty");
-    }
+    NoteRefinementLayout layout =
+        validateLayoutSelectionRequest(request.getLayout(), request.getSelectedItemIds());
 
     String newContent =
         notebookAssistantForNoteServiceFactory
             .createNoteAutomationService(note)
-            .removeSuggestionsAndRegenerateContent(request.getSuggestions());
+            .removeSelectedLayoutPointsAndRegenerateContent(layout, request.getSelectedItemIds());
 
     return new RefinedContentResponseDTO(newContent);
   }
@@ -125,7 +123,8 @@ public class AiController {
       @RequestBody NoteRefinementExtractRequestDTO request)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
     authorizationService.assertAuthorization(note);
-    NoteRefinementLayout layout = validateExtractRequest(request);
+    NoteRefinementLayout layout =
+        validateLayoutSelectionRequest(request.getLayout(), request.getSelectedItemIds());
     var automation = notebookAssistantForNoteServiceFactory.createNoteAutomationService(note);
     NoteExtractionResult aiResult = automation.extractNote(layout, request.getSelectedItemIds());
     if (aiResult == null) {
@@ -135,10 +134,8 @@ public class AiController {
     return noteConstructionService.createNoteFromExtractedSuggestion(note, aiResult);
   }
 
-  private static NoteRefinementLayout validateExtractRequest(
-      NoteRefinementExtractRequestDTO request) {
-    NoteRefinementLayout layout = request.getLayout();
-    List<String> selectedItemIds = request.getSelectedItemIds();
+  private static NoteRefinementLayout validateLayoutSelectionRequest(
+      NoteRefinementLayout layout, List<String> selectedItemIds) {
     if (!NoteRefinementLayoutValidator.isValid(layout)) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "layout is invalid");
     }

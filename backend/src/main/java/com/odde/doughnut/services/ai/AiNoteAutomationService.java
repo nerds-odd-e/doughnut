@@ -127,13 +127,13 @@ public class AiNoteAutomationService {
     return builder.build();
   }
 
-  public String removeSuggestionsAndRegenerateContent(List<String> suggestionsToRemove)
-      throws JsonProcessingException {
-    if (suggestionsToRemove == null || suggestionsToRemove.isEmpty()) {
+  public String removeSelectedLayoutPointsAndRegenerateContent(
+      NoteRefinementLayout layout, List<String> selectedItemIds) throws JsonProcessingException {
+    if (selectedItemIds == null || selectedItemIds.isEmpty()) {
       return note.getContent();
     }
     return executeWithTool(
-        AiToolFactory.removeSuggestionsFromContentAiTool(suggestionsToRemove),
+        AiToolFactory.removeSelectedLayoutPointsFromContentAiTool(layout, selectedItemIds),
         RegeneratedNoteContent.class,
         r -> r.content,
         note.getContent(),

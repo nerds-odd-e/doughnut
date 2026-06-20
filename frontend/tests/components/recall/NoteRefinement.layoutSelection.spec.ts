@@ -7,7 +7,7 @@ import {
   layoutCheckbox,
   mountNoteRefinementWithLayout,
   note,
-  refinementSuggestionsApiCall,
+  refinementLayoutSelectionApiCall,
   sampleNestedLayout,
   selectRefinementLayoutItem,
   setupNoteRefinementTests,
@@ -71,7 +71,10 @@ describe("NoteRefinement layout selection", () => {
     await flushPromises()
 
     expect(removeSuggestionsSpy).toHaveBeenCalledWith(
-      refinementSuggestionsApiCall(note.id, ["Child point A", "Separate point"])
+      refinementLayoutSelectionApiCall(note.id, sampleNestedLayout(), [
+        "p1-1",
+        "p2",
+      ])
     )
   })
 })

@@ -14,7 +14,7 @@ import {
   mountNoteRefinement,
   mountNoteRefinementWithLayout,
   note,
-  refinementExtractApiCall,
+  refinementLayoutSelectionApiCall,
   refinementLayoutItems,
   selectRefinementLayoutItem,
   setupNoteRefinementTests,
@@ -72,7 +72,7 @@ describe("NoteRefinement extract note", () => {
       await flushPromises()
 
       expect(extractNoteSpy).toHaveBeenCalledWith(
-        refinementExtractApiCall(
+        refinementLayoutSelectionApiCall(
           note.id,
           refinementLayoutItems(["Point 1", "Point 2", "Point 3"]),
           ["p2"]
@@ -103,7 +103,7 @@ describe("NoteRefinement extract note", () => {
       await flushPromises()
 
       expect(extractNoteSpy).toHaveBeenCalledWith(
-        refinementExtractApiCall(note.id, layout, ["p1", "p3"])
+        refinementLayoutSelectionApiCall(note.id, layout, ["p1", "p3"])
       )
       expect(routerReplace).toHaveBeenCalledWith(
         noteShowLocation(createdRealm.id)

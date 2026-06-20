@@ -26,8 +26,9 @@ public final class NoteAutomationService {
     return aiNoteAutomationService.extractNote(layout, selectedItemIds);
   }
 
-  public String removeSuggestionsAndRegenerateContent(List<String> suggestionsToRemove)
-      throws JsonProcessingException {
-    return aiNoteAutomationService.removeSuggestionsAndRegenerateContent(suggestionsToRemove);
+  public String removeSelectedLayoutPointsAndRegenerateContent(
+      NoteRefinementLayout layout, List<String> selectedItemIds) throws JsonProcessingException {
+    return aiNoteAutomationService.removeSelectedLayoutPointsAndRegenerateContent(
+        layout, selectedItemIds);
   }
 }

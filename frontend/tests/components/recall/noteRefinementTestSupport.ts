@@ -174,17 +174,7 @@ export function refinementLayoutItems(
   }))
 }
 
-export function refinementSuggestionsApiCall(
-  noteId: number,
-  suggestions: string[]
-) {
-  return {
-    path: { note: noteId },
-    body: { suggestions },
-  }
-}
-
-export function refinementExtractApiCall(
+export function refinementLayoutSelectionApiCall(
   noteId: number,
   items: NoteRefinementLayoutItem[],
   selectedItemIds: string[]

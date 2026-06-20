@@ -6,8 +6,8 @@ import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.NoteRefinementLayoutDTO;
+import com.odde.doughnut.controllers.dto.NoteRefinementRemoveRequestDTO;
 import com.odde.doughnut.controllers.dto.RefinedContentResponseDTO;
-import com.odde.doughnut.controllers.dto.RefinementSuggestionsRequestDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.ai.NoteRefinementLayout;
@@ -156,17 +156,38 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
       openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
     }
 
+    private NoteRefinementLayout sampleLayout() {
+      return new NoteRefinementLayout(
+          List.of(
+              new NoteRefinementLayoutItem(
+                  "p1",
+                  "Main concept",
+                  false,
+                  List.of(
+                      new NoteRefinementLayoutItem(
+                          "p1-1", "suggestion to remove", false, List.of()))),
+              new NoteRefinementLayoutItem("p2", "Other point", false, List.of())));
+    }
+
+    private NoteRefinementRemoveRequestDTO removeRequest(
+        NoteRefinementLayout layout, List<String> selectedItemIds) {
+      NoteRefinementRemoveRequestDTO requestDTO = new NoteRefinementRemoveRequestDTO();
+      requestDTO.setLayout(layout);
+      requestDTO.setSelectedItemIds(selectedItemIds);
+      return requestDTO;
+    }
+
     @Test
-    void shouldReturnRegeneratedContentAfterRemovingSuggestions()
+    void shouldReturnRegeneratedContentAfterRemovingSelectedLayoutPoints()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       openAiStructuredResponseMock.stubStructuredResponse(
           new RegeneratedNoteContent("Remaining content."));
       String originalContent = "Original with a suggestion to remove.";
       testNote.setContent(originalContent);
-      RefinementSuggestionsRequestDTO requestDTO = new RefinementSuggestionsRequestDTO();
-      requestDTO.suggestions = List.of("suggestion to remove");
+      NoteRefinementLayout layout = sampleLayout();
       RefinedContentResponseDTO response =
-          controller.removeRefinementSuggestion(testNote, requestDTO);
+          controller.removeRefinementSuggestion(
+              testNote, removeRequest(layout, List.of("p1-1", "p2")));
       assertThat(response.getContent()).isEqualTo("Remaining content.");
       makeMe.entityPersister.refresh(testNote);
       assertThat(testNote.getContent()).isEqualTo(originalContent);
@@ -175,27 +196,34 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
       ArgumentCaptor<StructuredResponseCreateParams<RegeneratedNoteContent>> paramsCaptor =
           ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
       verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
-      assertThat(paramsCaptor.getValue().rawParams().maxOutputTokens())
-          .isEqualTo(Optional.of(2000L));
+      StructuredResponseCreateParams<RegeneratedNoteContent> params = paramsCaptor.getValue();
+      String instructions = params.rawParams().instructions().orElse("");
+      assertThat(params.rawParams().maxOutputTokens()).isEqualTo(Optional.of(2000L));
+      assertThat(instructions).contains("Full note layout:");
+      assertThat(instructions).contains("\"id\" : \"p1-1\"");
+      assertThat(instructions).contains("Selected layout item ids to remove");
+      assertThat(instructions).contains("[p1-1, p2]");
+      assertThat(instructions).contains("- p1-1: \"suggestion to remove\"");
+      assertThat(instructions).contains("- p2: \"Other point\"");
     }
 
     @Test
-    void shouldThrowWhenSuggestionsToRemoveIsEmpty() {
+    void shouldThrowWhenSelectedItemIdsIsEmpty() {
       testNote.setContent("Some note content.");
-      RefinementSuggestionsRequestDTO requestDTO = new RefinementSuggestionsRequestDTO();
-      requestDTO.suggestions = List.of();
       assertBadRequestContaining(
-          () -> controller.removeRefinementSuggestion(testNote, requestDTO),
-          "Suggestions to remove cannot be empty");
+          () ->
+              controller.removeRefinementSuggestion(
+                  testNote, removeRequest(sampleLayout(), List.of())),
+          "selectedItemIds cannot be empty");
     }
 
     @Test
     void shouldThrowWhenNoteContentIsEmpty() {
       testNote.setContent("");
-      RefinementSuggestionsRequestDTO requestDTO = new RefinementSuggestionsRequestDTO();
-      requestDTO.suggestions = List.of("some suggestion");
       assertBadRequestContaining(
-          () -> controller.removeRefinementSuggestion(testNote, requestDTO),
+          () ->
+              controller.removeRefinementSuggestion(
+                  testNote, removeRequest(sampleLayout(), List.of("p1-1"))),
           "Note content cannot be empty");
     }
   }
