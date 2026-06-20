@@ -137,7 +137,7 @@ Notes:
 
 ### Phase 2 — Structure: derive last submission functionally; remove the saved-state table
 
-Status: planned
+Status: done
 
 Behavior: Externally unchanged (the derived "last submission" equals the previously saved value).
 Existing Phase 1 tests still pass.

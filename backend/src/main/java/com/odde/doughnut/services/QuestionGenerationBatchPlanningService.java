@@ -12,7 +12,6 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRequestRepository;
-import com.odde.doughnut.entities.repositories.QuestionGenerationBatchUserStateRepository;
 import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import java.sql.Timestamp;
@@ -36,7 +35,6 @@ public class QuestionGenerationBatchPlanningService {
   public static final String REASON_NO_CANDIDATE_TRACKERS = "NO_CANDIDATE_TRACKERS";
   public static final String REASON_NO_SCHEDULED_TIME = "NO_SCHEDULED_TIME";
 
-  private final QuestionGenerationBatchUserStateRepository userStateRepository;
   private final QuestionGenerationBatchRepository batchRepository;
   private final QuestionGenerationBatchRequestRepository batchRequestRepository;
   private final RecallPromptRepository recallPromptRepository;
@@ -44,13 +42,11 @@ public class QuestionGenerationBatchPlanningService {
   private final UserRepository userRepository;
 
   public QuestionGenerationBatchPlanningService(
-      QuestionGenerationBatchUserStateRepository userStateRepository,
       QuestionGenerationBatchRepository batchRepository,
       QuestionGenerationBatchRequestRepository batchRequestRepository,
       RecallPromptRepository recallPromptRepository,
       MemoryTrackerRepository memoryTrackerRepository,
       UserRepository userRepository) {
-    this.userStateRepository = userStateRepository;
     this.batchRepository = batchRepository;
     this.batchRequestRepository = batchRequestRepository;
     this.recallPromptRepository = recallPromptRepository;
@@ -158,7 +154,7 @@ public class QuestionGenerationBatchPlanningService {
     return dueInstantForUser(user, currentTime, windowStart)
         .flatMap(
             dueInstant ->
-                lastSuccessfulSubmissionAt(user)
+                latestSubmittedAtForUser(user)
                     .map(lastSubmission -> isSubmissionBeforeDueInstant(lastSubmission, dueInstant))
                     .or(() -> Optional.of(true)))
         .orElse(false);
@@ -183,10 +179,8 @@ public class QuestionGenerationBatchPlanningService {
             targetTimeOfDay, currentTime.toLocalDateTime()));
   }
 
-  private Optional<Timestamp> lastSuccessfulSubmissionAt(User user) {
-    return userStateRepository
-        .findByUser_Id(user.getId())
-        .map(state -> state.getLastSuccessfulSubmittedAt());
+  private Optional<Timestamp> latestSubmittedAtForUser(User user) {
+    return batchRepository.findLatestSubmittedAtByUser_Id(user.getId());
   }
 
   private boolean hasRecentRecallActivity(User user, Timestamp currentTime) {
@@ -226,7 +220,7 @@ public class QuestionGenerationBatchPlanningService {
     if (dueInstant.isEmpty()) {
       return false;
     }
-    Optional<Timestamp> lastSubmission = lastSuccessfulSubmissionAt(user);
+    Optional<Timestamp> lastSubmission = latestSubmittedAtForUser(user);
     if (lastSubmission.isEmpty()
         || isSubmissionBeforeDueInstant(lastSubmission.get(), dueInstant.get())) {
       return false;

@@ -8,10 +8,8 @@ import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuestionGenerationBatch;
 import com.odde.doughnut.entities.QuestionGenerationBatchStatus;
-import com.odde.doughnut.entities.QuestionGenerationBatchUserState;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository;
-import com.odde.doughnut.entities.repositories.QuestionGenerationBatchUserStateRepository;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -31,7 +29,6 @@ class QuestionGenerationBatchRetryEligibilityTest {
 
   @Autowired MakeMe makeMe;
   @Autowired QuestionGenerationBatchPlanningService planningService;
-  @Autowired QuestionGenerationBatchUserStateRepository userStateRepository;
   @Autowired QuestionGenerationBatchRepository batchRepository;
 
   User user;
@@ -70,7 +67,7 @@ class QuestionGenerationBatchRetryEligibilityTest {
 
   private void assertUserEligibleForOpenAiFailureRetryWhenSubmittedSinceDueInstant(
       QuestionGenerationBatchStatus terminalStatus) {
-    saveRecentSuccessfulSubmission();
+    saveSubmittedBatchAt(new Timestamp(cronTime.getTime() - TimeUnit.HOURS.toMillis(1)));
     QuestionGenerationBatch failedBatch = new QuestionGenerationBatch();
     failedBatch.setUser(user);
     failedBatch.setStatus(terminalStatus);
@@ -86,7 +83,7 @@ class QuestionGenerationBatchRetryEligibilityTest {
 
   @Test
   void excludesUserWhoSubmittedSinceLastDueInstantBeforeTodaysTarget() {
-    saveRecentSuccessfulSubmissionAt(Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 0)));
+    saveSubmittedBatchAt(Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 0)));
     makeMe.entityPersister.flush();
 
     List<User> candidates =
@@ -98,7 +95,7 @@ class QuestionGenerationBatchRetryEligibilityTest {
 
   @Test
   void excludesRetryEligibleUserWhileSubmittedBatchIsInFlight() {
-    saveRecentSuccessfulSubmission();
+    saveSubmittedBatchAt(new Timestamp(cronTime.getTime() - TimeUnit.HOURS.toMillis(1)));
     QuestionGenerationBatch failedBatch = new QuestionGenerationBatch();
     failedBatch.setUser(user);
     failedBatch.setStatus(QuestionGenerationBatchStatus.FAILED);
@@ -120,7 +117,7 @@ class QuestionGenerationBatchRetryEligibilityTest {
 
   @Test
   void excludesRecentlySuccessfulUserWithoutOpenAiFailureRetryBatch() {
-    saveRecentSuccessfulSubmissionAt(Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 10, 45)));
+    saveSubmittedBatchAt(Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 10, 45)));
     QuestionGenerationBatch failedBatch = new QuestionGenerationBatch();
     failedBatch.setUser(user);
     failedBatch.setStatus(QuestionGenerationBatchStatus.FAILED);
@@ -133,15 +130,12 @@ class QuestionGenerationBatchRetryEligibilityTest {
     assertThat(candidates, empty());
   }
 
-  private void saveRecentSuccessfulSubmission() {
-    saveRecentSuccessfulSubmissionAt(
-        new Timestamp(cronTime.getTime() - TimeUnit.HOURS.toMillis(1)));
-  }
-
-  private void saveRecentSuccessfulSubmissionAt(Timestamp submittedAt) {
-    QuestionGenerationBatchUserState state = new QuestionGenerationBatchUserState();
-    state.setUser(user);
-    state.setLastSuccessfulSubmittedAt(submittedAt);
-    userStateRepository.save(state);
+  private void saveSubmittedBatchAt(Timestamp submittedAt) {
+    QuestionGenerationBatch batch = new QuestionGenerationBatch();
+    batch.setUser(user);
+    batch.setStatus(QuestionGenerationBatchStatus.COMPLETED);
+    batch.setPlannedAt(submittedAt);
+    batch.setSubmittedAt(submittedAt);
+    batchRepository.save(batch);
   }
 }

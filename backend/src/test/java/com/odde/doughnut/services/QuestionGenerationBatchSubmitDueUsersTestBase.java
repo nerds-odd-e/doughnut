@@ -4,7 +4,6 @@ import static org.mockito.Mockito.reset;
 
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository;
-import com.odde.doughnut.entities.repositories.QuestionGenerationBatchUserStateRepository;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import jakarta.persistence.EntityManager;
@@ -36,7 +35,6 @@ abstract class QuestionGenerationBatchSubmitDueUsersTestBase {
   @MockitoSpyBean QuestionGenerationBatchPlanningService planningService;
   @Autowired QuestionGenerationBatchSubmitDueUsersService submitDueUsersService;
   @Autowired QuestionGenerationBatchRepository batchRepository;
-  @Autowired QuestionGenerationBatchUserStateRepository userStateRepository;
   @Autowired EntityManager entityManager;
   @Autowired PlatformTransactionManager transactionManager;
 
@@ -69,12 +67,6 @@ abstract class QuestionGenerationBatchSubmitDueUsersTestBase {
         .createNativeQuery(
             "DELETE qgb FROM question_generation_batch qgb "
                 + "INNER JOIN user u ON qgb.user_id = u.id "
-                + "WHERE u.external_identifier LIKE 'batch-due-%'")
-        .executeUpdate();
-    entityManager
-        .createNativeQuery(
-            "DELETE qgs FROM question_generation_batch_user_state qgs "
-                + "INNER JOIN user u ON qgs.user_id = u.id "
                 + "WHERE u.external_identifier LIKE 'batch-due-%'")
         .executeUpdate();
     entityManager

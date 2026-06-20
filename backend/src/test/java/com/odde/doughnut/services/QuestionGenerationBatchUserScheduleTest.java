@@ -8,10 +8,8 @@ import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuestionGenerationBatch;
 import com.odde.doughnut.entities.QuestionGenerationBatchStatus;
-import com.odde.doughnut.entities.QuestionGenerationBatchUserState;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository;
-import com.odde.doughnut.entities.repositories.QuestionGenerationBatchUserStateRepository;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -30,7 +28,6 @@ class QuestionGenerationBatchUserScheduleTest {
 
   @Autowired MakeMe makeMe;
   @Autowired QuestionGenerationBatchPlanningService planningService;
-  @Autowired QuestionGenerationBatchUserStateRepository userStateRepository;
   @Autowired QuestionGenerationBatchRepository batchRepository;
 
   User user;
@@ -67,7 +64,7 @@ class QuestionGenerationBatchUserScheduleTest {
   void catchesUpSameDayWhenOverdueAfterMissedTargetHour() {
     Timestamp now = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 11, 0));
     givenAnsweredRecallAt(Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 8, 30)));
-    givenLastSuccessfulSubmissionAt(Timestamp.valueOf(LocalDateTime.of(2024, 6, 14, 11, 30)));
+    givenPriorSubmittedBatchAt(Timestamp.valueOf(LocalDateTime.of(2024, 6, 14, 11, 30)));
 
     QuestionGenerationBatchUserScheduleDTO schedule =
         planningService.getNextBatchQuestionSchedule(user, now);
@@ -130,11 +127,13 @@ class QuestionGenerationBatchUserScheduleTest {
         .please();
   }
 
-  private void givenLastSuccessfulSubmissionAt(Timestamp submittedAt) {
-    QuestionGenerationBatchUserState state = new QuestionGenerationBatchUserState();
-    state.setUser(user);
-    state.setLastSuccessfulSubmittedAt(submittedAt);
-    userStateRepository.save(state);
+  private void givenPriorSubmittedBatchAt(Timestamp submittedAt) {
+    QuestionGenerationBatch batch = new QuestionGenerationBatch();
+    batch.setUser(user);
+    batch.setStatus(QuestionGenerationBatchStatus.COMPLETED);
+    batch.setPlannedAt(submittedAt);
+    batch.setSubmittedAt(submittedAt);
+    batchRepository.save(batch);
     makeMe.entityPersister.flush();
   }
 }

@@ -11,7 +11,6 @@ import com.odde.doughnut.controllers.dto.QuestionGenerationBatchSubmissionSummar
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuestionGenerationBatch;
 import com.odde.doughnut.entities.QuestionGenerationBatchStatus;
-import com.odde.doughnut.entities.QuestionGenerationBatchUserState;
 import com.odde.doughnut.entities.User;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -25,7 +24,7 @@ class QuestionGenerationBatchSubmitDueUsersTest
     extends QuestionGenerationBatchSubmitDueUsersTestBase {
 
   @Test
-  void continuesAfterPerUserFailureAndUpdatesSuccessfulUserMarker() {
+  void continuesAfterPerUserFailureAndRecordsLatestSubmittedAt() {
     User[] users = new User[2];
     inCommittedTransaction(
         () -> {
@@ -105,9 +104,7 @@ class QuestionGenerationBatchSubmitDueUsersTest
                   .filter(batch -> batch.getStatus() == QuestionGenerationBatchStatus.SUBMITTED)
                   .findFirst()
                   .orElseThrow();
-          QuestionGenerationBatchUserState successfulState =
-              userStateRepository.findByUser_Id(submittedBatch.getUser().getId()).orElseThrow();
-          assertThat(successfulState.getLastSuccessfulSubmittedAt(), equalTo(cronTime));
+          assertThat(submittedBatch.getSubmittedAt(), equalTo(cronTime));
           assertThat(submittedBatch.getOpenaiBatchId(), equalTo("batch-ok"));
 
           QuestionGenerationBatch failedBatch =
@@ -115,14 +112,17 @@ class QuestionGenerationBatchSubmitDueUsersTest
                   .filter(batch -> batch.getStatus() == QuestionGenerationBatchStatus.FAILED)
                   .findFirst()
                   .orElseThrow();
+          assertThat(failedBatch.getSubmittedAt(), is((Timestamp) null));
           assertThat(
-              userStateRepository.findByUser_Id(failedBatch.getUser().getId()).isPresent(),
+              batchRepository
+                  .findLatestSubmittedAtByUser_Id(failedBatch.getUser().getId())
+                  .isPresent(),
               is(false));
         });
   }
 
   @Test
-  void skipsDueUserWithNoCandidateTrackersWithoutUpdatingMarker() {
+  void skipsDueUserWithNoCandidateTrackersWithoutSubmittedBatch() {
     User[] dueUser = new User[1];
     inCommittedTransaction(
         () -> {
@@ -173,7 +173,9 @@ class QuestionGenerationBatchSubmitDueUsersTest
               batchRepository.findAll().stream()
                   .anyMatch(batch -> batch.getUser().getId().equals(dueUser[0].getId())),
               is(false));
-          assertThat(userStateRepository.findByUser_Id(dueUser[0].getId()).isPresent(), is(false));
+          assertThat(
+              batchRepository.findLatestSubmittedAtByUser_Id(dueUser[0].getId()).isPresent(),
+              is(false));
         });
   }
 }

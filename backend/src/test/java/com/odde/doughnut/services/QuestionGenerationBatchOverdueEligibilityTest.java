@@ -6,9 +6,10 @@ import static org.hamcrest.Matchers.empty;
 
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuestionGenerationBatchUserState;
+import com.odde.doughnut.entities.QuestionGenerationBatch;
+import com.odde.doughnut.entities.QuestionGenerationBatchStatus;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.QuestionGenerationBatchUserStateRepository;
+import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -27,7 +28,7 @@ class QuestionGenerationBatchOverdueEligibilityTest {
 
   @Autowired MakeMe makeMe;
   @Autowired QuestionGenerationBatchPlanningService planningService;
-  @Autowired QuestionGenerationBatchUserStateRepository userStateRepository;
+  @Autowired QuestionGenerationBatchRepository batchRepository;
 
   User user;
   Note note;
@@ -78,15 +79,21 @@ class QuestionGenerationBatchOverdueEligibilityTest {
     Timestamp cronTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 10, 30));
     Timestamp recallTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 0));
     createAnsweredRecall(recallTime);
-    QuestionGenerationBatchUserState state = new QuestionGenerationBatchUserState();
-    state.setUser(user);
-    state.setLastSuccessfulSubmittedAt(Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 10, 0)));
-    userStateRepository.save(state);
-    makeMe.entityPersister.flush();
+    saveSubmittedBatchAt(Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 10, 0)));
 
     List<User> candidates = planningService.findUsersEligibleForBatchSubmission(cronTime);
 
     assertThat(candidates, empty());
+  }
+
+  private void saveSubmittedBatchAt(Timestamp submittedAt) {
+    QuestionGenerationBatch batch = new QuestionGenerationBatch();
+    batch.setUser(user);
+    batch.setStatus(QuestionGenerationBatchStatus.COMPLETED);
+    batch.setPlannedAt(submittedAt);
+    batch.setSubmittedAt(submittedAt);
+    batchRepository.save(batch);
+    makeMe.entityPersister.flush();
   }
 
   private void createAnsweredRecall(Timestamp answerTime) {

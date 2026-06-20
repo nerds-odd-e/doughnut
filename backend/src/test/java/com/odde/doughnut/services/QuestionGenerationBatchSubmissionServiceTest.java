@@ -10,14 +10,11 @@ import static org.mockito.Mockito.when;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuestionGenerationBatch;
 import com.odde.doughnut.entities.QuestionGenerationBatchStatus;
-import com.odde.doughnut.entities.QuestionGenerationBatchUserState;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository;
-import com.odde.doughnut.entities.repositories.QuestionGenerationBatchUserStateRepository;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -39,7 +36,6 @@ class QuestionGenerationBatchSubmissionServiceTest {
   @Autowired QuestionGenerationBatchPlanningService planningService;
   @Autowired QuestionGenerationBatchSubmissionService submissionService;
   @Autowired QuestionGenerationBatchRepository batchRepository;
-  @Autowired QuestionGenerationBatchUserStateRepository userStateRepository;
   @Autowired GlobalSettingsService globalSettingsService;
 
   User user;
@@ -67,7 +63,7 @@ class QuestionGenerationBatchSubmissionServiceTest {
   @Nested
   class AcceptedSubmission {
     @Test
-    void updatesLocalBatchAndSubmissionMarker() {
+    void updatesLocalBatchWithSubmittedAt() {
       when(openAiApiHandler.uploadBatchInputFile(any())).thenReturn("file-abc");
       when(openAiApiHandler.createResponsesBatch("file-abc")).thenReturn("batch-xyz");
 
@@ -80,30 +76,9 @@ class QuestionGenerationBatchSubmissionServiceTest {
       assertThat(batch.getOpenaiInputFileId(), equalTo("file-abc"));
       assertThat(batch.getOpenaiBatchId(), equalTo("batch-xyz"));
       assertThat(batch.getSubmittedAt(), equalTo(currentTime));
-
-      QuestionGenerationBatchUserState state =
-          userStateRepository.findByUser_Id(user.getId()).orElseThrow();
-      assertThat(state.getLastSuccessfulSubmittedAt(), equalTo(currentTime));
-    }
-
-    @Test
-    void updatesExistingSubmissionMarker() {
-      Timestamp previousSubmission =
-          new Timestamp(currentTime.getTime() - TimeUnit.DAYS.toMillis(2));
-      QuestionGenerationBatchUserState state = new QuestionGenerationBatchUserState();
-      state.setUser(user);
-      state.setLastSuccessfulSubmittedAt(previousSubmission);
-      userStateRepository.save(state);
-      makeMe.entityPersister.flush();
-
-      when(openAiApiHandler.uploadBatchInputFile(any())).thenReturn("file-abc");
-      when(openAiApiHandler.createResponsesBatch("file-abc")).thenReturn("batch-xyz");
-
-      submissionService.submitPlannedBatch(plannedBatch, currentTime);
-
-      QuestionGenerationBatchUserState updated =
-          userStateRepository.findByUser_Id(user.getId()).orElseThrow();
-      assertThat(updated.getLastSuccessfulSubmittedAt(), equalTo(currentTime));
+      assertThat(
+          batchRepository.findLatestSubmittedAtByUser_Id(user.getId()).orElseThrow(),
+          equalTo(currentTime));
     }
   }
 
@@ -112,17 +87,19 @@ class QuestionGenerationBatchSubmissionServiceTest {
     Timestamp previousSubmission;
 
     @BeforeEach
-    void setupPreviousMarker() {
+    void setupPreviousSubmission() {
       previousSubmission = new Timestamp(currentTime.getTime() - TimeUnit.DAYS.toMillis(2));
-      QuestionGenerationBatchUserState state = new QuestionGenerationBatchUserState();
-      state.setUser(user);
-      state.setLastSuccessfulSubmittedAt(previousSubmission);
-      userStateRepository.save(state);
+      QuestionGenerationBatch priorBatch = new QuestionGenerationBatch();
+      priorBatch.setUser(user);
+      priorBatch.setStatus(QuestionGenerationBatchStatus.COMPLETED);
+      priorBatch.setPlannedAt(previousSubmission);
+      priorBatch.setSubmittedAt(previousSubmission);
+      batchRepository.save(priorBatch);
       makeMe.entityPersister.flush();
     }
 
     @Test
-    void uploadFailureMarksBatchFailedWithoutUpdatingMarker() {
+    void uploadFailureMarksBatchFailedWithoutUpdatingLatestSubmittedAt() {
       when(openAiApiHandler.uploadBatchInputFile(any()))
           .thenThrow(new RuntimeException("upload failed"));
 
@@ -136,13 +113,13 @@ class QuestionGenerationBatchSubmissionServiceTest {
       assertThat(batch.getOpenaiBatchId(), is(nullValue()));
       assertThat(batch.getSubmittedAt(), is(nullValue()));
 
-      QuestionGenerationBatchUserState state =
-          userStateRepository.findByUser_Id(user.getId()).orElseThrow();
-      assertThat(state.getLastSuccessfulSubmittedAt(), equalTo(previousSubmission));
+      assertThat(
+          batchRepository.findLatestSubmittedAtByUser_Id(user.getId()).orElseThrow(),
+          equalTo(previousSubmission));
     }
 
     @Test
-    void batchCreationFailureMarksBatchFailedWithoutUpdatingMarker() {
+    void batchCreationFailureMarksBatchFailedWithoutUpdatingLatestSubmittedAt() {
       when(openAiApiHandler.uploadBatchInputFile(any())).thenReturn("file-abc");
       when(openAiApiHandler.createResponsesBatch("file-abc"))
           .thenThrow(new RuntimeException("batch create failed"));
@@ -157,24 +134,9 @@ class QuestionGenerationBatchSubmissionServiceTest {
       assertThat(batch.getOpenaiBatchId(), is(nullValue()));
       assertThat(batch.getSubmittedAt(), is(nullValue()));
 
-      QuestionGenerationBatchUserState state =
-          userStateRepository.findByUser_Id(user.getId()).orElseThrow();
-      assertThat(state.getLastSuccessfulSubmittedAt(), equalTo(previousSubmission));
-    }
-
-    @Test
-    void leavesMarkerUnsetWhenNoPriorSuccessfulSubmissionExists() {
-      userStateRepository.deleteAll();
-      makeMe.entityPersister.flush();
-
-      when(openAiApiHandler.uploadBatchInputFile(any()))
-          .thenThrow(new RuntimeException("upload failed"));
-
-      submissionService.submitPlannedBatch(plannedBatch, currentTime);
-
-      Optional<QuestionGenerationBatchUserState> state =
-          userStateRepository.findByUser_Id(user.getId());
-      assertThat(state.isPresent(), is(false));
+      assertThat(
+          batchRepository.findLatestSubmittedAtByUser_Id(user.getId()).orElseThrow(),
+          equalTo(previousSubmission));
     }
   }
 }

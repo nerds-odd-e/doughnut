@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.QuestionGenerationBatchStatus;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -41,4 +42,11 @@ public interface QuestionGenerationBatchRepository
 
   @Query("SELECT b.status, COUNT(b) FROM QuestionGenerationBatch b GROUP BY b.status")
   List<Object[]> countByStatus();
+
+  @Query(
+      """
+      SELECT MAX(b.submittedAt) FROM QuestionGenerationBatch b
+      WHERE b.user.id = :userId AND b.submittedAt IS NOT NULL
+      """)
+  Optional<Timestamp> findLatestSubmittedAtByUser_Id(@Param("userId") Integer userId);
 }
