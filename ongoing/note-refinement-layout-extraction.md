@@ -262,27 +262,30 @@ Targeted checks:
 
 ### Phase 7 - Define indeterminate-parent selection semantics
 
-Status: planned (DECISION REQUIRED before implementation)
+Status: done
 
 Type: Behavior
 
-Decision required (stop the line): When a parent is **indeterminate** (only some descendants selected, or only the parent's own point selected after unchecking every child), should the parent's **own** point be part of the extract/remove selection?
-- Option A — Parent's own id is included only when the parent is **fully** selected. An indeterminate parent contributes only its checked descendants. (Cleaner for grouping-heading parents; matches typical tri-state intent.)
-- Option B — Keep current behavior: once the parent checkbox is toggled on, the parent's own id stays selected until the parent is toggled off, even while indeterminate. (Document and test it explicitly.)
+Decision: **Option A** — Parent's own id is included in extract/remove selection only when the parent is **fully** selected. An indeterminate parent contributes only its checked descendants (not the parent's own id).
 
-Why: `useRefinementLayoutSelection.setItemSelection` adds the parent's own id when the parent is checked and only removes a child's id when that child is unchecked, so an indeterminate parent still submits its own id. Per design decision 4 a top-level item may be a grouping heading, so extracting/removing its heading text when the user only wanted some children may be wrong. This behavior is currently untested.
+Why: `useRefinementLayoutSelection.setItemSelection` previously added the parent's own id when the parent was checked and only removed a child's id when that child was unchecked, so an indeterminate parent still submitted its own id. Per design decision 4 a top-level item may be a grouping heading, so extracting/removing its heading text when the user only wanted some children may be wrong.
 
-Behavior (after decision):
+Behavior:
 - Pre-condition: the user checks a parent, then unchecks one of its children (parent becomes indeterminate).
 - Trigger: the user clicks **Extract** or **Remove selected**.
-- Post-condition: the submitted `selectedItemIds` match the decided semantics (Option A or B), consistently for both extract and remove.
+- Post-condition: the submitted `selectedItemIds` match Option A semantics, consistently for both extract and remove.
 
 Implementation notes:
-- Adjust `setItemSelection` / selection derivation in `useRefinementLayoutSelection` to match the chosen option.
+- `reconcileParentSelection` in `useRefinementLayoutSelection` adds the parent's id only when all child descendants are selected; otherwise removes it.
 - Keep parent-checks-children and child-uncheck-makes-parent-indeterminate behavior intact.
 
+Completion notes:
+- `setItemSelection` calls `reconcileParentSelection` after each toggle so indeterminate parents exclude their own id from `selectedItemIds`.
+- When all descendants are selected again, the parent id is re-included.
+- Tests assert exact `selectedItemIds` for indeterminate-parent extract and remove, plus re-selection of all children.
+
 Tests:
-- Extend `frontend/tests/components/recall/NoteRefinement.layoutSelection.spec.ts` to assert the exact `selectedItemIds` for the indeterminate-parent case under the chosen option, for both extract and remove request bodies.
+- Extend `frontend/tests/components/recall/NoteRefinement.layoutSelection.spec.ts` to assert the exact `selectedItemIds` for the indeterminate-parent case under Option A, for both extract and remove request bodies.
 
 Targeted checks:
 - `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/NoteRefinement.layoutSelection.spec.ts tests/components/recall/NoteRefinement.extractNote.spec.ts`

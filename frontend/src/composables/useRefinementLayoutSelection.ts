@@ -36,6 +36,24 @@ export function useRefinementLayoutSelection(
     )
   }
 
+  const reconcileParentSelection = () => {
+    const ids = new Set(selectedItemIds.value)
+    for (const item of allLayoutItems.value) {
+      if ((item.children ?? []).length === 0) {
+        continue
+      }
+      const childIds = descendantIds(item).slice(1)
+      if (childIds.every((id) => ids.has(id))) {
+        ids.add(item.id)
+      } else {
+        ids.delete(item.id)
+      }
+    }
+    selectedItemIds.value = allLayoutItems.value
+      .map(({ id }) => id)
+      .filter((id) => ids.has(id))
+  }
+
   const setItemSelection = (
     item: NoteRefinementLayoutItem,
     selected: boolean
@@ -51,6 +69,7 @@ export function useRefinementLayoutSelection(
         (id) => !idsToRemove.has(id)
       )
     }
+    reconcileParentSelection()
   }
 
   const clearSelection = () => {
