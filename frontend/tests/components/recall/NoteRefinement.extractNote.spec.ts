@@ -55,7 +55,7 @@ describe("NoteRefinement extract note", () => {
       expect(extractButtons).toHaveLength(1)
     })
 
-    it("extracts the selected suggestion and navigates to the new note", async () => {
+    it("extracts the selected layout point and navigates to the new note", async () => {
       const createdRealm = makeMe.aNoteRealm.please()
       const extractNoteSpy = mockSdkService(
         AiController,
@@ -110,7 +110,7 @@ describe("NoteRefinement extract note", () => {
       )
     })
 
-    it("keeps suggestion in list when API fails", async () => {
+    it("keeps layout point in list when API fails", async () => {
       mockSdkService(AiController, "extractNote", undefined).mockResolvedValue(
         wrapSdkError("API Error")
       )
@@ -142,7 +142,7 @@ describe("NoteRefinement extract note", () => {
           return makeMe.aNoteRealm.please()
         }
       )
-      const wrapper = mountNoteRefinement(["Test refinement suggestion"])
+      const wrapper = mountNoteRefinement(["Test layout point"])
       await flushPromises()
 
       await selectRefinementLayoutItem(wrapper, "p1")
@@ -171,7 +171,7 @@ describe("NoteRefinement extract note", () => {
           return wrapSdkError({})
         }
       )
-      const wrapper = mountNoteRefinement(["Test refinement suggestion"])
+      const wrapper = mountNoteRefinement(["Test layout point"])
       await flushPromises()
 
       await selectRefinementLayoutItem(wrapper, "p1")

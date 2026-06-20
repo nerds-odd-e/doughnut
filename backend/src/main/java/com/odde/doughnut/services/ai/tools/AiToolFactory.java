@@ -160,7 +160,7 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
         Give every item a stable id that is unique within the layout.
         Set alreadyExtracted to true only for simple standalone wiki-link-only lines that point to content already extracted into another note, for example [[Target note]] or [[Target note|Label]]. These items should be marked Already extracted in the UI but remain selectable.
         """,
-        refinementSuggestions());
+        noteRefinementLayout());
   }
 
   public static InstructionAndSchema bookLayoutReorganizationAiTool() {
@@ -223,7 +223,7 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
     return TitleReplacement.class;
   }
 
-  public static Class<?> refinementSuggestions() {
+  public static Class<?> noteRefinementLayout() {
     return NoteRefinementLayout.class;
   }
 

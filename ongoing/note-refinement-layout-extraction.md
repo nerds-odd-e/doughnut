@@ -196,7 +196,7 @@ Completion notes:
 
 ### Phase 5 - Naming cleanup and generated API consistency
 
-Status: planned
+Status: done
 
 Behavior: User-facing refinement behavior is stable, and code/API names no longer misleadingly imply a flat suggestions list where practical.
 
@@ -212,6 +212,16 @@ Tests:
 Targeted checks:
 - `scripts/check_diff_whitespace.sh`
 - Relevant focused frontend/backend tests from prior phases.
+
+Completion notes:
+- Frontend UI label is now "Note layout:"; `data-test-id` values use `refinement-layout`, `extract-refinement-layout`, and `remove-refinement-layout`.
+- Test helpers and E2E page objects use layout-oriented names (`refinementLayoutPanel`, `removeRefinementLayoutItemsAt`, etc.). `NoteRefinement.removeSuggestions.spec.ts` renamed to `NoteRefinement.removeLayout.spec.ts`.
+- Removed dead E2E steps (`OpenAI generates refinement suggestions:`, flat item-count assertion) and unused `stubRefinementLayout`.
+- Backend `AiToolFactory.refinementSuggestions()` renamed to `noteRefinementLayout()`; transitional REST/SDK names kept: `generate-refinement-suggestions`, `remove-refinement-suggestion`, `generateRefinementSuggestions`, `removeRefinementSuggestion`.
+
+## Plan complete
+
+All five phases delivered nested note refinement layout generation, tri-state selection, multi-point extraction, layout-based removal, and naming cleanup.
 
 ## Out of scope
 

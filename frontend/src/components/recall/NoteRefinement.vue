@@ -2,11 +2,11 @@
   <div
     v-if="refinementLayoutItems.length > 0"
     class="mb-4 rounded-lg bg-accent p-4"
-    data-test-id="refinement-suggestions"
+    data-test-id="refinement-layout"
   >
     <div class="text-base">
       <div class="font-semibold mb-3 text-accent-content">
-        Refinement suggestions:
+        Note layout:
       </div>
       <ul class="space-y-2">
         <li
@@ -43,7 +43,7 @@
 
       <div class="flex gap-2 mt-4">
         <button
-          data-test-id="extract-refinement-suggestions"
+          data-test-id="extract-refinement-layout"
           :disabled="selectedItemIds.length === 0"
           @click="extractNote"
           class="daisy-btn daisy-btn-primary daisy-btn-sm"
@@ -53,9 +53,9 @@
           Extract
         </button>
         <button
-          data-test-id="remove-refinement-suggestions"
+          data-test-id="remove-refinement-layout"
           :disabled="selectedItemIds.length === 0"
-          @click="removeSelectedSuggestions"
+          @click="removeSelectedLayoutItems"
           class="daisy-btn daisy-btn-error daisy-btn-sm !text-white"
         >
           Remove selected
@@ -102,7 +102,7 @@ const {
   clearSelection,
 } = useRefinementLayoutSelection(refinementLayoutItems)
 
-const loadRefinementSuggestions = async () => {
+const loadRefinementLayout = async () => {
   try {
     const result = await apiCallWithLoading(() =>
       AiController.generateRefinementSuggestions({
@@ -114,25 +114,25 @@ const loadRefinementSuggestions = async () => {
       !result.error && result.data?.items ? result.data.items : []
     clearSelection()
   } catch (err) {
-    console.error("Failed to generate refinement suggestions:", err)
+    console.error("Failed to generate note layout:", err)
     refinementLayoutItems.value = []
     clearSelection()
   }
 }
 
-onMounted(() => loadRefinementSuggestions())
+onMounted(() => loadRefinementLayout())
 
 const { popups } = usePopups()
 const router = useRouter()
 const storageAccessor = useStorageAccessor()
 
-const removeSelectedSuggestions = async () => {
+const removeSelectedLayoutItems = async () => {
   if (selectedItemIds.value.length === 0) {
     return
   }
 
   const confirmed = await popups.confirm(
-    `Are you sure you want to remove ${selectedItemIds.value.length} selected suggestion(s)? The AI will remove related content from the note.`
+    `Are you sure you want to remove ${selectedItemIds.value.length} selected layout point(s)? The AI will remove related content from the note.`
   )
 
   if (!confirmed) {

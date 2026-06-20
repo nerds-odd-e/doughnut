@@ -1,18 +1,12 @@
-import { refinementSuggestionsPanel, waitForExtractNote } from './shared'
+import { refinementLayoutPanel, waitForExtractNote } from './shared'
 
 export function assimilationRefinementLayoutExpectations() {
   return {
-    expectRefinementSuggestionsCount(count: number) {
-      this.openRefineNoteModal()
-      refinementSuggestionsPanel().scrollIntoView().should('be.visible')
-      refinementSuggestionsPanel().find('ul li').should('have.length', count)
-      return this
-    },
     expectRefinementLayout(rows: Record<string, string>[]) {
       this.openRefineNoteModal()
-      refinementSuggestionsPanel().scrollIntoView().should('be.visible')
+      refinementLayoutPanel().scrollIntoView().should('be.visible')
       rows.forEach((row) => {
-        refinementSuggestionsPanel()
+        refinementLayoutPanel()
           .contains(`[data-layout-level="${row.level}"] > label`, row.text)
           .should('be.visible')
           .and(($item) => {
@@ -26,24 +20,21 @@ export function assimilationRefinementLayoutExpectations() {
       })
       return this
     },
-    checkRefinementSuggestion(index: number) {
-      refinementSuggestionsPanel()
-        .find('input[type="checkbox"]')
-        .eq(index)
-        .check()
+    checkRefinementLayoutItem(index: number) {
+      refinementLayoutPanel().find('input[type="checkbox"]').eq(index).check()
       return this
     },
-    removeRefinementSuggestionsAt(indices: number[]) {
+    removeRefinementLayoutItemsAt(indices: number[]) {
       this.openRefineNoteModal()
-      indices.forEach((index) => this.checkRefinementSuggestion(index))
+      indices.forEach((index) => this.checkRefinementLayoutItem(index))
       cy.findByRole('button', { name: 'Remove selected' }).click()
       cy.findByRole('button', { name: 'OK' }).click()
       return this
     },
-    extractLayoutPointsToNewNote(...suggestionTexts: string[]) {
-      refinementSuggestionsPanel().within(() => {
-        suggestionTexts.forEach((suggestionText) => {
-          cy.contains('[data-layout-level] > label', suggestionText)
+    extractLayoutPointsToNewNote(...layoutPointTexts: string[]) {
+      refinementLayoutPanel().within(() => {
+        layoutPointTexts.forEach((layoutPointText) => {
+          cy.contains('[data-layout-level] > label', layoutPointText)
             .find('input[type="checkbox"]')
             .first()
             .check()

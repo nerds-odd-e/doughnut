@@ -33,25 +33,8 @@ const EXTRACT_NOTE_INSTRUCTION_PATTERN =
 const REMOVE_LAYOUT_POINTS_INSTRUCTION_PATTERN =
   '.*remove selected layout points from the note content.*'
 
-const REFINEMENT_SUGGESTIONS_INSTRUCTION_PATTERN =
+const REFINEMENT_LAYOUT_INSTRUCTION_PATTERN =
   '.*Return one current-content layout for the note content.*'
-
-async function stubRefinementSuggestions(suggestions: string[]) {
-  const items = suggestions.map((text, index) => ({
-    id: `p${index + 1}`,
-    text,
-    alreadyExtracted: false,
-    children: [],
-  }))
-  await mock_services
-    .openAi()
-    .responses()
-    .requestMessageMatches({
-      role: 'developer',
-      content: REFINEMENT_SUGGESTIONS_INSTRUCTION_PATTERN,
-    })
-    .stubOutputText(JSON.stringify({ items }))
-}
 
 type RefinementLayoutItem = {
   id: string
@@ -270,17 +253,6 @@ When('I reject the suggested completion', () => {
   start.assumeConversationAboutNotePage().cancelCompletion()
 })
 
-Given('OpenAI generates refinement suggestions:', (data: DataTable) => {
-  const suggestions = data
-    .raw()
-    .flat()
-    .filter((suggestion) => suggestion.trim().length > 0)
-  cy.then(async () => {
-    await mock_services.openAi().restartImposter()
-    await stubRefinementSuggestions(suggestions)
-  })
-})
-
 Given('OpenAI generates refinement layout:', (data: DataTable) => {
   cy.then(async () => {
     await mock_services.openAi().restartImposter()
@@ -289,7 +261,7 @@ Given('OpenAI generates refinement layout:', (data: DataTable) => {
       .responses()
       .requestMessageMatches({
         role: 'developer',
-        content: REFINEMENT_SUGGESTIONS_INSTRUCTION_PATTERN,
+        content: REFINEMENT_LAYOUT_INSTRUCTION_PATTERN,
       })
       .stubOutputText(
         JSON.stringify({ items: refinementLayoutFromTable(data) })
@@ -298,7 +270,7 @@ Given('OpenAI generates refinement layout:', (data: DataTable) => {
 })
 
 Given(
-  'OpenAI returns the following content when requested to remove suggestions:',
+  'OpenAI returns the following content when requested to remove layout points:',
   (data: DataTable) => {
     const content = data.raw().flat()[0]
     const reply = JSON.stringify({ content })
@@ -316,9 +288,9 @@ Given(
 )
 
 Given(
-  'OpenAI will extract suggestion {string} to a new note with title {string} and content {string} and updated parent content {string}',
+  'OpenAI will extract layout points {string} to a new note with title {string} and content {string} and updated parent content {string}',
   (
-    _suggestion: string,
+    _layoutPoints: string,
     newNoteTitle: string,
     newNoteContent: string,
     updatedParentContent: string

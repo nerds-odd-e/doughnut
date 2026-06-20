@@ -66,10 +66,10 @@ export function setupNoteRefinementTests() {
 }
 
 export function mountNoteRefinement(
-  suggestions: string[],
+  layoutItemTexts: string[],
   overrides?: { note?: typeof note }
 ) {
-  return mountNoteRefinementWithLayout(refinementLayoutItems(suggestions), {
+  return mountNoteRefinementWithLayout(refinementLayoutItems(layoutItemTexts), {
     note: overrides?.note,
   })
 }
@@ -89,22 +89,16 @@ export function mountNoteRefinementWithLayout(
     .mount()
 }
 
-export function refinementSuggestionsPanel(wrapper: {
+export function refinementLayoutPanel(wrapper: {
   find: (s: string) => { findAll: (s: string) => unknown[] }
 }) {
-  return wrapper.find('[data-test-id="refinement-suggestions"]')
+  return wrapper.find('[data-test-id="refinement-layout"]')
 }
 
-export async function selectFirstSuggestion(
+export async function selectFirstLayoutItem(
   wrapper: ReturnType<typeof mountNoteRefinement>
 ) {
-  const checkboxes = refinementSuggestionsPanel(wrapper).findAll(
-    'input[type="checkbox"]'
-  ) as {
-    setValue: (v: boolean) => Promise<void>
-  }[]
-  await checkboxes[0]?.setValue(true)
-  await flushPromises()
+  await selectRefinementLayoutItem(wrapper, "p1")
 }
 
 export const extractNoteButtonTitle = "Extract selected to a new note"
@@ -147,7 +141,7 @@ export function layoutCheckbox(
 
 export function refinementActionButton(
   wrapper: ReturnType<typeof mountNoteRefinement>,
-  testId: "extract-refinement-suggestions" | "remove-refinement-suggestions"
+  testId: "extract-refinement-layout" | "remove-refinement-layout"
 ): HTMLButtonElement {
   return wrapper.find(`[data-test-id="${testId}"]`).element as HTMLButtonElement
 }
@@ -164,9 +158,9 @@ export async function selectRefinementLayoutItem(
 }
 
 export function refinementLayoutItems(
-  suggestions: string[]
+  texts: string[]
 ): NoteRefinementLayoutItem[] {
-  return suggestions.map((text, index) => ({
+  return texts.map((text, index) => ({
     id: `p${index + 1}`,
     text,
     alreadyExtracted: false,

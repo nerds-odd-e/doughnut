@@ -127,23 +127,16 @@ Then(
   }
 )
 
-Then(
-  'I should see refinement suggestions with {int} items',
-  (count: number) => {
-    start.assumeAssimilationPage().expectRefinementSuggestionsCount(count)
-  }
-)
-
 Then('I should see the refinement layout:', (data: DataTable) => {
   start.assumeAssimilationPage().expectRefinementLayout(data.hashes())
 })
 
 When(
-  'I remove refinement suggestions {int} and {int}',
+  'I remove refinement layout items {int} and {int}',
   (index1: number, index2: number) => {
     start
       .assumeAssimilationPage()
-      .removeRefinementSuggestionsAt([index1, index2])
+      .removeRefinementLayoutItemsAt([index1, index2])
   }
 )
 

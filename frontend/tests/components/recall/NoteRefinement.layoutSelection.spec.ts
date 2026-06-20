@@ -53,7 +53,7 @@ describe("NoteRefinement layout selection", () => {
   })
 
   it("removes non-contiguous selected layout points", async () => {
-    const removeSuggestionsSpy = mockSdkService(
+    const removeLayoutSpy = mockSdkService(
       AiController,
       "removeRefinementSuggestion",
       {
@@ -65,12 +65,12 @@ describe("NoteRefinement layout selection", () => {
     await selectRefinementLayoutItem(wrapper, "p1-1")
     await selectRefinementLayoutItem(wrapper, "p2")
     await wrapper
-      .find('[data-test-id="remove-refinement-suggestions"]')
+      .find('[data-test-id="remove-refinement-layout"]')
       .trigger("click")
     usePopups().popups.done(true)
     await flushPromises()
 
-    expect(removeSuggestionsSpy).toHaveBeenCalledWith(
+    expect(removeLayoutSpy).toHaveBeenCalledWith(
       refinementLayoutSelectionApiCall(note.id, sampleNestedLayout(), [
         "p1-1",
         "p2",

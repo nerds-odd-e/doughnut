@@ -2,8 +2,8 @@
 Feature: Note refinement
   As a learner, when I start assimilating a note, I want to open Refine note
   to see an AI-generated layout for decomposing and improving the note,
-  remove selected suggestions to have AI remove related content from note content,
-  and extract a suggestion to a new note.
+  remove selected layout points to have AI remove related content from note content,
+  and extract layout points to a new note.
   So that I can refine long notes while assimilating them.
 
   Background:
@@ -30,15 +30,15 @@ Feature: Note refinement
       | D    | 1     |                  |
       | E    | 1     |                  |
 
-  Scenario: Remove selected refinement suggestions
-    Given OpenAI returns the following content when requested to remove suggestions:
+  Scenario: Remove selected refinement layout points
+    Given OpenAI returns the following content when requested to remove layout points:
       | A. C. E. |
     When I am assimilating the note "Sample"
-    And I remove refinement suggestions 1 and 3
+    And I remove refinement layout items 1 and 3
     Then the note content on the current page should be "A. C. E."
 
   Scenario: Extract selected layout points to one new note
-    Given OpenAI will extract suggestion "B and D" to a new note with title "Point B and D" and content "Combined B and D" and updated parent content "A. C. E."
+    Given OpenAI will extract layout points "B and D" to a new note with title "Point B and D" and content "Combined B and D" and updated parent content "A. C. E."
     When I am assimilating the note "Sample"
     And I should see the refinement layout:
       | text | level | alreadyExtracted |

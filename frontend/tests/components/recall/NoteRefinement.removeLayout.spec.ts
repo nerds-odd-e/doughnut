@@ -16,68 +16,64 @@ import {
   note,
   refinementActionButton,
   refinementLayoutItems,
+  refinementLayoutPanel,
   refinementLayoutSelectionApiCall,
-  refinementSuggestionsPanel,
-  selectFirstSuggestion,
+  selectFirstLayoutItem,
   setupNoteRefinementTests,
 } from "./noteRefinementTestSupport"
 
 setupNoteRefinementTests()
 
-describe("NoteRefinement remove refinement suggestions", () => {
+describe("NoteRefinement remove layout points", () => {
   describe("selection and confirmation", () => {
-    it("shows checkboxes for each refinement suggestion", async () => {
+    it("shows checkboxes for each layout point", async () => {
       const wrapper = mountNoteRefinement(["Point 1", "Point 2", "Point 3"])
       await flushPromises()
       expect(
-        refinementSuggestionsPanel(wrapper).findAll('input[type="checkbox"]')
+        refinementLayoutPanel(wrapper).findAll('input[type="checkbox"]')
       ).toHaveLength(3)
     })
 
-    it("disables remove button when no suggestions are selected", async () => {
+    it("disables remove button when no layout points are selected", async () => {
       const wrapper = mountNoteRefinement(["Point 1", "Point 2"])
       await flushPromises()
       expect(
-        refinementActionButton(wrapper, "remove-refinement-suggestions")
-          .disabled
+        refinementActionButton(wrapper, "remove-refinement-layout").disabled
       ).toBe(true)
     })
 
-    it("disables extract button when no suggestions are selected", async () => {
+    it("disables extract button when no layout points are selected", async () => {
       const wrapper = mountNoteRefinement(["Point 1", "Point 2"])
       await flushPromises()
       expect(
-        refinementActionButton(wrapper, "extract-refinement-suggestions")
-          .disabled
+        refinementActionButton(wrapper, "extract-refinement-layout").disabled
       ).toBe(true)
     })
 
-    it("enables remove button when a suggestion is selected", async () => {
+    it("enables remove button when a layout point is selected", async () => {
       const wrapper = mountNoteRefinement(["Point 1", "Point 2"])
       await flushPromises()
-      await selectFirstSuggestion(wrapper)
+      await selectFirstLayoutItem(wrapper)
       expect(
-        refinementActionButton(wrapper, "remove-refinement-suggestions")
-          .disabled
+        refinementActionButton(wrapper, "remove-refinement-layout").disabled
       ).toBe(false)
     })
 
-    it("enables extract button when a suggestion is selected", async () => {
+    it("enables extract button when a layout point is selected", async () => {
       const wrapper = mountNoteRefinement(["Point 1", "Point 2"])
       await flushPromises()
-      await selectFirstSuggestion(wrapper)
+      await selectFirstLayoutItem(wrapper)
       expect(
-        refinementActionButton(wrapper, "extract-refinement-suggestions")
-          .disabled
+        refinementActionButton(wrapper, "extract-refinement-layout").disabled
       ).toBe(false)
     })
 
     it("shows confirmation dialog when remove button is clicked", async () => {
       const wrapper = mountNoteRefinement(["Point 1", "Point 2"])
       await flushPromises()
-      await selectFirstSuggestion(wrapper)
+      await selectFirstLayoutItem(wrapper)
       await wrapper
-        .find('[data-test-id="remove-refinement-suggestions"]')
+        .find('[data-test-id="remove-refinement-layout"]')
         .trigger("click")
       await flushPromises()
 
@@ -88,7 +84,7 @@ describe("NoteRefinement remove refinement suggestions", () => {
     })
 
     it("calls API and emits contentUpdated when removal is confirmed", async () => {
-      const removeSuggestionsSpy = mockSdkService(
+      const removeLayoutSpy = mockSdkService(
         AiController,
         "removeRefinementSuggestion",
         {
@@ -102,14 +98,14 @@ describe("NoteRefinement remove refinement suggestions", () => {
       )
       const wrapper = mountNoteRefinement(["Point 1", "Point 2"])
       await flushPromises()
-      await selectFirstSuggestion(wrapper)
+      await selectFirstLayoutItem(wrapper)
       await wrapper
-        .find('[data-test-id="remove-refinement-suggestions"]')
+        .find('[data-test-id="remove-refinement-layout"]')
         .trigger("click")
       usePopups().popups.done(true)
       await flushPromises()
 
-      expect(removeSuggestionsSpy).toHaveBeenCalledWith(
+      expect(removeLayoutSpy).toHaveBeenCalledWith(
         refinementLayoutSelectionApiCall(
           note.id,
           refinementLayoutItems(["Point 1", "Point 2"]),
@@ -125,7 +121,7 @@ describe("NoteRefinement remove refinement suggestions", () => {
     })
 
     it("does not call API when removal is cancelled", async () => {
-      const removeSuggestionsSpy = mockSdkService(
+      const removeLayoutSpy = mockSdkService(
         AiController,
         "removeRefinementSuggestion",
         {
@@ -134,13 +130,13 @@ describe("NoteRefinement remove refinement suggestions", () => {
       )
       const wrapper = mountNoteRefinement(["Point 1", "Point 2"])
       await flushPromises()
-      await selectFirstSuggestion(wrapper)
+      await selectFirstLayoutItem(wrapper)
       await wrapper
-        .find('[data-test-id="remove-refinement-suggestions"]')
+        .find('[data-test-id="remove-refinement-layout"]')
         .trigger("click")
       usePopups().popups.done(false)
 
-      expect(removeSuggestionsSpy).not.toHaveBeenCalled()
+      expect(removeLayoutSpy).not.toHaveBeenCalled()
       expect(wrapper.emitted()).not.toHaveProperty("contentUpdated")
     })
   })
@@ -166,9 +162,9 @@ describe("NoteRefinement remove refinement suggestions", () => {
       )
       const wrapper = mountNoteRefinement(["Point 1", "Point 2"])
       await flushPromises()
-      await selectFirstSuggestion(wrapper)
+      await selectFirstLayoutItem(wrapper)
       await wrapper
-        .find('[data-test-id="remove-refinement-suggestions"]')
+        .find('[data-test-id="remove-refinement-layout"]')
         .trigger("click")
       await flushPromises()
       usePopups().popups.done(true)
@@ -176,7 +172,7 @@ describe("NoteRefinement remove refinement suggestions", () => {
       return { wrapper, finishApi }
     }
 
-    it("shows LoadingModal while removing suggestions", async () => {
+    it("shows LoadingModal while removing layout points", async () => {
       const { finishApi } = await startRemovingWithPendingApi({
         content: "Updated content",
       })
@@ -200,9 +196,9 @@ describe("NoteRefinement remove refinement suggestions", () => {
       )
       const wrapper = mountNoteRefinement(["Point 1", "Point 2"])
       await flushPromises()
-      await selectFirstSuggestion(wrapper)
+      await selectFirstLayoutItem(wrapper)
       await wrapper
-        .find('[data-test-id="remove-refinement-suggestions"]')
+        .find('[data-test-id="remove-refinement-layout"]')
         .trigger("click")
       await flushPromises()
       usePopups().popups.done(true)

@@ -32,10 +32,10 @@ export function noteLevelReviveElements(doc: Document | ParentNode): Element[] {
   )
 }
 
-export const refinementSuggestionsPanel = () =>
+export const refinementLayoutPanel = () =>
   cy
     .get('[data-test="refine-note-modal"]')
-    .contains('Refinement suggestions:')
+    .contains('Note layout:')
     .closest('.bg-accent')
 
 export const waitForExtractNote = () => {
