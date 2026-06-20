@@ -183,3 +183,17 @@ export function refinementSuggestionsApiCall(
     body: { suggestions },
   }
 }
+
+export function refinementExtractApiCall(
+  noteId: number,
+  items: NoteRefinementLayoutItem[],
+  selectedItemIds: string[]
+) {
+  return {
+    path: { note: noteId },
+    body: {
+      layout: { items },
+      selectedItemIds,
+    },
+  }
+}

@@ -1591,7 +1591,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RefinementSuggestionsRequestDTO"
+              $ref: "#/components/schemas/NoteRefinementExtractRequestDTO"
         required: true
       responses:
         "200":
@@ -4189,6 +4189,24 @@ components:
       - children
       - id
       - text
+    NoteRefinementExtractRequestDTO:
+      type: object
+      properties:
+        layout:
+          $ref: "#/components/schemas/NoteRefinementLayout"
+        selectedItemIds:
+          type: array
+          items:
+            type: string
+    NoteRefinementLayout:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/NoteRefinementLayoutItem"
+      required:
+      - items
     QuestionGenerationBatchSubmissionSummaryDTO:
       type: object
       properties:

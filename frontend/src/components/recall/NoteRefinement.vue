@@ -45,7 +45,7 @@
         <button
           data-test-id="extract-refinement-suggestions"
           :disabled="selectedItemIds.length === 0"
-          @click="extractSelectedNote"
+          @click="extractNote"
           class="daisy-btn daisy-btn-primary daisy-btn-sm"
           title="Extract selected to a new note"
         >
@@ -96,7 +96,6 @@ const refinementLayoutItems = ref<NoteRefinementLayoutItem[]>([])
 
 const {
   selectedItemIds,
-  layoutItemsById,
   isFullySelected,
   isPartiallySelected,
   setItemSelection,
@@ -163,37 +162,16 @@ const removeSelectedSuggestions = async () => {
   }, "AI is removing content...")
 }
 
-const extractSelectedNote = async () => {
-  if (selectedItemIds.value.length === 0) {
-    return
-  }
-
-  const selectedItems = selectedItemIds.value
-    .map((id) => layoutItemsById.value.get(id))
-    .filter((item): item is NoteRefinementLayoutItem => item !== undefined)
-
-  if (selectedItems.length !== 1) {
-    await popups.alert(
-      "Please select one item to extract. Extracting multiple selected items is coming next."
-    )
-    return
-  }
-
-  const selectedItem = selectedItems[0]
-  if (!selectedItem) {
-    return
-  }
-
-  await extractNote(selectedItem.text)
-}
-
-const extractNote = async (suggestion: string) => {
+const extractNote = async () => {
   try {
     await runWithBlockingApiLoading(async () => {
       const response = await apiCallWithLoading(() =>
         AiController.extractNote({
           path: { note: props.note.id },
-          body: { suggestions: [suggestion] },
+          body: {
+            layout: { items: refinementLayoutItems.value },
+            selectedItemIds: selectedItemIds.value,
+          },
         })
       )
 

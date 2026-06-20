@@ -140,7 +140,7 @@ Completion notes:
 
 ### Phase 3 - Extract selected layout points into one note
 
-Status: planned
+Status: done
 
 Behavior: When the user selects one or more layout points and clicks **Extract**, AI creates one new note from those selected points and updates the original note so the remaining content is meaningful, even for non-contiguous selections.
 
@@ -160,6 +160,12 @@ Targeted checks:
 - `CURSOR_DEV=true nix develop -c pnpm backend:test_only -- --tests com.odde.doughnut.controllers.AiControllerExtractNoteTest`
 - `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/NoteRefinement.extractNote.spec.ts`
 - `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/assimilation/note_refinement.feature`
+
+Completion notes:
+- Extraction endpoint now accepts `NoteRefinementExtractRequestDTO` with full `layout` and `selectedItemIds`; validation ensures layout integrity and that every selected id exists.
+- `AiToolFactory.extractNoteAiTool` builds a prompt with the full nested layout JSON, selected ids, and selected item texts; already-extracted items remain valid selections.
+- `NoteRefinement.vue` sends layout plus selected ids for any selection count and navigates to the new note on success.
+- E2E scenario extracts non-contiguous layout points B and D into one new note.
 
 ### Phase 4 - Remove selected layout points using the same selection model
 

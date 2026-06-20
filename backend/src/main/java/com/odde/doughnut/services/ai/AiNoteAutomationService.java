@@ -61,8 +61,9 @@ public class AiNoteAutomationService {
         REFINEMENT_SUGGESTIONS_MAX_OUTPUT_TOKENS);
   }
 
-  public NoteExtractionResult extractNote(String suggestion) throws JsonProcessingException {
-    InstructionAndSchema tool = AiToolFactory.extractNoteAiTool(suggestion);
+  public NoteExtractionResult extractNote(NoteRefinementLayout layout, List<String> selectedItemIds)
+      throws JsonProcessingException {
+    InstructionAndSchema tool = AiToolFactory.extractNoteAiTool(layout, selectedItemIds);
     NoteExtractionResult result =
         executeWithTool(
             tool, NoteExtractionResult.class, r -> r, null, EXTRACT_NOTE_MAX_OUTPUT_TOKENS);

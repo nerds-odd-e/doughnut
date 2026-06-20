@@ -10,6 +10,7 @@ import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.NoteExtractionResult;
 import com.odde.doughnut.services.ai.NoteRefinementLayout;
+import com.odde.doughnut.services.ai.NoteRefinementLayoutValidator;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -121,12 +122,12 @@ public class AiController {
   @Transactional
   public NoteRealm extractNote(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
-      @RequestBody RefinementSuggestionsRequestDTO request)
+      @RequestBody NoteRefinementExtractRequestDTO request)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
     authorizationService.assertAuthorization(note);
-    String suggestion = getSingleSuggestion(request);
+    NoteRefinementLayout layout = validateExtractRequest(request);
     var automation = notebookAssistantForNoteServiceFactory.createNoteAutomationService(note);
-    NoteExtractionResult aiResult = automation.extractNote(suggestion);
+    NoteExtractionResult aiResult = automation.extractNote(layout, request.getSelectedItemIds());
     if (aiResult == null) {
       throw new ResponseStatusException(
           HttpStatus.SERVICE_UNAVAILABLE, "AI failed to generate extraction result");
@@ -134,12 +135,21 @@ public class AiController {
     return noteConstructionService.createNoteFromExtractedSuggestion(note, aiResult);
   }
 
-  private static String getSingleSuggestion(RefinementSuggestionsRequestDTO request) {
-    List<String> suggestions = request.getSuggestions();
-    if (suggestions == null || suggestions.size() != 1) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "suggestions must contain exactly one suggestion");
+  private static NoteRefinementLayout validateExtractRequest(
+      NoteRefinementExtractRequestDTO request) {
+    NoteRefinementLayout layout = request.getLayout();
+    List<String> selectedItemIds = request.getSelectedItemIds();
+    if (!NoteRefinementLayoutValidator.isValid(layout)) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "layout is invalid");
     }
-    return suggestions.getFirst();
+    if (selectedItemIds == null || selectedItemIds.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "selectedItemIds cannot be empty");
+    }
+    if (NoteRefinementLayoutValidator.selectedItems(layout, selectedItemIds).size()
+        != selectedItemIds.size()) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "selectedItemIds must reference layout items");
+    }
+    return layout;
   }
 }

@@ -6,6 +6,7 @@ import com.odde.doughnut.controllers.dto.BookLayoutReorganizationSuggestion;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.services.ai.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AiToolFactory {
 
@@ -227,16 +228,25 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
     return QuestionEvaluation.class;
   }
 
-  public static InstructionAndSchema extractNoteAiTool(String suggestion) {
+  public static InstructionAndSchema extractNoteAiTool(
+      NoteRefinementLayout layout, List<String> selectedItemIds) {
+    String layoutJson = formatLayoutForPrompt(layout);
+    String selectedItemsBlock = formatSelectedItemsForPrompt(layout, selectedItemIds);
     String instruction =
         """
-        You are helping extract a refinement suggestion from a note to create a new note.
+        You are helping extract selected layout points from a note to create one new note.
 
-        Suggestion to extract: "%s"
+        Full note layout:
+        %s
+
+        Selected layout item ids to extract together into one new note: %s
+
+        Selected item texts:
+        %s
 
         Tasks:
-        1. Generate a concise, meaningful title for the new note based on this suggestion
-        2. Identify the related content in the current note for this suggestion
+        1. Generate a concise, meaningful title for the new note based on the selected points
+        2. Identify the related content in the current note for these selected points (they may be non-contiguous)
         3. Move that content to the new note's content
         4. Remove the extracted content from the current note
 
@@ -244,15 +254,34 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
         - The new note's content should be based on the extracted content from current note, refined for clarity
         - Do not add new information that was not in the original content
         - Keep all unrelated parts of the current note unchanged
-        - Ensure the remaining content in current note still reads naturally
+        - Ensure the remaining content in current note still reads naturally after removing non-contiguous selections
+        - Items marked alreadyExtracted in the layout are still valid user selections; extract their represented content as requested
         - You receive focus-note context plus related notes. When helpful, add a wiki link from the original note to the new note.
         - When helpful, add wiki links from the new note back to the original note or to relevant related notes from the provided context.
         - Wiki links are case-insensitive. Use display text when useful, for example [[Canonical Note Title|visible text]].
         - Do not invent unrelated wiki links.
         """
-            .formatted(suggestion);
+            .formatted(layoutJson, selectedItemIds, selectedItemsBlock);
 
     return new InstructionAndSchema(instruction, noteExtractionResult());
+  }
+
+  private static String formatLayoutForPrompt(NoteRefinementLayout layout) {
+    try {
+      return new ObjectMapperConfig()
+          .objectMapper()
+          .writerWithDefaultPrettyPrinter()
+          .writeValueAsString(layout);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static String formatSelectedItemsForPrompt(
+      NoteRefinementLayout layout, List<String> selectedItemIds) {
+    return NoteRefinementLayoutValidator.selectedItems(layout, selectedItemIds).stream()
+        .map(item -> "- %s: \"%s\"".formatted(item.id, item.text))
+        .collect(Collectors.joining("\n"));
   }
 
   public static Class<?> noteExtractionResult() {

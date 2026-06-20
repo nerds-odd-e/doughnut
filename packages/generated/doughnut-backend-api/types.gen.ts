@@ -624,6 +624,15 @@ export type NoteRefinementLayoutItem = {
     children: Array<NoteRefinementLayoutItem>;
 };
 
+export type NoteRefinementExtractRequestDto = {
+    layout?: NoteRefinementLayout;
+    selectedItemIds?: Array<string>;
+};
+
+export type NoteRefinementLayout = {
+    items: Array<NoteRefinementLayoutItem>;
+};
+
 export type QuestionGenerationBatchSubmissionSummaryDto = {
     consideredUserCount?: number;
     submittedCount?: number;
@@ -2380,7 +2389,7 @@ export type GenerateRefinementSuggestionsResponses = {
 export type GenerateRefinementSuggestionsResponse = GenerateRefinementSuggestionsResponses[keyof GenerateRefinementSuggestionsResponses];
 
 export type ExtractNoteData = {
-    body: RefinementSuggestionsRequestDto;
+    body: NoteRefinementExtractRequestDto;
     path: {
         note: number;
     };

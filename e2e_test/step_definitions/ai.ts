@@ -28,7 +28,7 @@ function stubOpenAiMcqFromSingleRowTable(questionTable: DataTable) {
 }
 
 const EXTRACT_NOTE_INSTRUCTION_PATTERN =
-  '.*extract a refinement suggestion from a note to create a new note.*'
+  '.*extract selected layout points from a note to create one new note.*'
 
 const REFINEMENT_SUGGESTIONS_INSTRUCTION_PATTERN =
   '.*Return one current-content layout for the note content.*'

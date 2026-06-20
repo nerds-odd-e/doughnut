@@ -12,8 +12,10 @@ import {
 import {
   extractNoteButtonTitle,
   mountNoteRefinement,
+  mountNoteRefinementWithLayout,
   note,
-  refinementSuggestionsApiCall,
+  refinementExtractApiCall,
+  refinementLayoutItems,
   selectRefinementLayoutItem,
   setupNoteRefinementTests,
 } from "./noteRefinementTestSupport"
@@ -70,9 +72,39 @@ describe("NoteRefinement extract note", () => {
       await flushPromises()
 
       expect(extractNoteSpy).toHaveBeenCalledWith(
-        refinementSuggestionsApiCall(note.id, ["Point 2"])
+        refinementExtractApiCall(
+          note.id,
+          refinementLayoutItems(["Point 1", "Point 2", "Point 3"]),
+          ["p2"]
+        )
       )
       expect(wrapper.findAll("li")).toHaveLength(3)
+      expect(routerReplace).toHaveBeenCalledWith(
+        noteShowLocation(createdRealm.id)
+      )
+    })
+
+    it("extracts multiple selected layout points into one note", async () => {
+      const createdRealm = makeMe.aNoteRealm.please()
+      const extractNoteSpy = mockSdkService(
+        AiController,
+        "extractNote",
+        createdRealm
+      )
+      const layout = refinementLayoutItems(["Point 1", "Point 2", "Point 3"])
+      const wrapper = mountNoteRefinementWithLayout(layout)
+      await flushPromises()
+
+      await selectRefinementLayoutItem(wrapper, "p1")
+      await selectRefinementLayoutItem(wrapper, "p3")
+      await wrapper
+        .find(`button[title="${extractNoteButtonTitle}"]`)
+        .trigger("click")
+      await flushPromises()
+
+      expect(extractNoteSpy).toHaveBeenCalledWith(
+        refinementExtractApiCall(note.id, layout, ["p1", "p3"])
+      )
       expect(routerReplace).toHaveBeenCalledWith(
         noteShowLocation(createdRealm.id)
       )

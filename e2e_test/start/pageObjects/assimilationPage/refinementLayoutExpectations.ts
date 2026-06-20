@@ -40,13 +40,14 @@ export function assimilationRefinementLayoutExpectations() {
       cy.findByRole('button', { name: 'OK' }).click()
       return this
     },
-    /** Requires the refine-note modal to already be open (e.g. after openRefineNoteModal or expectRefinementSuggestionsCount). */
-    extractSuggestionToNewNote(suggestionText: string) {
+    extractLayoutPointsToNewNote(...suggestionTexts: string[]) {
       refinementSuggestionsPanel().within(() => {
-        cy.contains('[data-layout-level] > label', suggestionText)
-          .find('input[type="checkbox"]')
-          .first()
-          .check()
+        suggestionTexts.forEach((suggestionText) => {
+          cy.contains('[data-layout-level] > label', suggestionText)
+            .find('input[type="checkbox"]')
+            .first()
+            .check()
+        })
         cy.findByRole('button', { name: 'Extract' }).click()
       })
       waitForExtractNote()

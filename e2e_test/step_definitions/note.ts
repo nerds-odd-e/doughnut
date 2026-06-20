@@ -818,7 +818,16 @@ Then('the note content should contain a line break', () => {
 When(
   'I extract the suggestion {string} to a new note',
   (suggestionText: string) => {
-    start.assumeAssimilationPage().extractSuggestionToNewNote(suggestionText)
+    start.assumeAssimilationPage().extractLayoutPointsToNewNote(suggestionText)
+  }
+)
+
+When(
+  'I extract refinement layout points {string} and {string} to a new note',
+  (firstPoint: string, secondPoint: string) => {
+    start
+      .assumeAssimilationPage()
+      .extractLayoutPointsToNewNote(firstPoint, secondPoint)
   }
 )
 

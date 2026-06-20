@@ -37,8 +37,8 @@ Feature: Note refinement
     And I remove refinement suggestions 1 and 3
     Then the note content on the current page should be "A. C. E."
 
-  Scenario: Extract a suggestion to a new note
-    Given OpenAI will extract suggestion "B" to a new note with title "Point B" and content "Extracted" and updated parent content "A. C. D. E."
+  Scenario: Extract selected layout points to one new note
+    Given OpenAI will extract suggestion "B and D" to a new note with title "Point B and D" and content "Combined B and D" and updated parent content "A. C. E."
     When I am assimilating the note "Sample"
     And I should see the refinement layout:
       | text | level | alreadyExtracted |
@@ -47,9 +47,9 @@ Feature: Note refinement
       | C    | 2     | true             |
       | D    | 1     |                  |
       | E    | 1     |                  |
-    And I extract the suggestion "B" to a new note
-    Then the note title should be "Point B"
+    And I extract refinement layout points "B" and "D" to a new note
+    Then the note title should be "Point B and D"
     And I should see folder "Sample tree/Context" containing these notes:
-      | note-title |
-      | Sample     |
-      | Point B    |
+      | note-title    |
+      | Sample        |
+      | Point B and D |
