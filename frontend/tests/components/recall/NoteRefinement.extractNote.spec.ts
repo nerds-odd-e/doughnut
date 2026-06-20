@@ -14,6 +14,7 @@ import {
   mountNoteRefinement,
   note,
   refinementSuggestionsApiCall,
+  selectRefinementLayoutItem,
   setupNoteRefinementTests,
 } from "./noteRefinementTestSupport"
 
@@ -36,22 +37,23 @@ describe("NoteRefinement extract note", () => {
     routerReplace.mockResolvedValue(undefined)
   })
 
-  describe("per-suggestion action", () => {
-    it("displays extract note button for each suggestion", async () => {
+  describe("dialog-level action", () => {
+    it("displays one extract button and no per-item extract buttons", async () => {
       const wrapper = mountNoteRefinement(["Point 1", "Point 2", "Point 3"])
       await flushPromises()
 
       const listItems = wrapper.findAll("li")
       expect(listItems).toHaveLength(3)
-      listItems.forEach((li, index) => {
-        expect(li.text()).toContain(["Point 1", "Point 2", "Point 3"][index])
-        const buttons = li.findAll("button")
-        expect(buttons).toHaveLength(1)
-        expect(buttons[0]!.attributes("title")).toBe(extractNoteButtonTitle)
+      listItems.forEach((li) => {
+        expect(li.findAll("button")).toHaveLength(0)
       })
+      const extractButtons = wrapper.findAll(
+        `button[title="${extractNoteButtonTitle}"]`
+      )
+      expect(extractButtons).toHaveLength(1)
     })
 
-    it("extracts suggestion and navigates to the new note", async () => {
+    it("extracts the selected suggestion and navigates to the new note", async () => {
       const createdRealm = makeMe.aNoteRealm.please()
       const extractNoteSpy = mockSdkService(
         AiController,
@@ -61,7 +63,10 @@ describe("NoteRefinement extract note", () => {
       const wrapper = mountNoteRefinement(["Point 1", "Point 2", "Point 3"])
       await flushPromises()
 
-      await wrapper.findAll("li")[1]!.find("button").trigger("click")
+      await selectRefinementLayoutItem(wrapper, "p2")
+      await wrapper
+        .find(`button[title="${extractNoteButtonTitle}"]`)
+        .trigger("click")
       await flushPromises()
 
       expect(extractNoteSpy).toHaveBeenCalledWith(
@@ -80,7 +85,10 @@ describe("NoteRefinement extract note", () => {
       const wrapper = mountNoteRefinement(["Test Point"])
       await flushPromises()
 
-      await wrapper.find("li button").trigger("click")
+      await selectRefinementLayoutItem(wrapper, "p1")
+      await wrapper
+        .find(`button[title="${extractNoteButtonTitle}"]`)
+        .trigger("click")
       await flushPromises()
 
       expect(wrapper.findAll("li")).toHaveLength(1)
@@ -105,6 +113,7 @@ describe("NoteRefinement extract note", () => {
       const wrapper = mountNoteRefinement(["Test refinement suggestion"])
       await flushPromises()
 
+      await selectRefinementLayoutItem(wrapper, "p1")
       await wrapper
         .find(`button[title="${extractNoteButtonTitle}"]`)
         .trigger("click")
@@ -133,6 +142,7 @@ describe("NoteRefinement extract note", () => {
       const wrapper = mountNoteRefinement(["Test refinement suggestion"])
       await flushPromises()
 
+      await selectRefinementLayoutItem(wrapper, "p1")
       await wrapper
         .find(`button[title="${extractNoteButtonTitle}"]`)
         .trigger("click")

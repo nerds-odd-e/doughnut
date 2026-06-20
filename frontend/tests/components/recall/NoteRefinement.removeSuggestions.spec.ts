@@ -14,6 +14,7 @@ import usePopups from "@/components/commons/Popups/usePopups"
 import {
   mountNoteRefinement,
   note,
+  refinementActionButton,
   refinementSuggestionsApiCall,
   refinementSuggestionsPanel,
   selectFirstSuggestion,
@@ -36,10 +37,17 @@ describe("NoteRefinement remove refinement suggestions", () => {
       const wrapper = mountNoteRefinement(["Point 1", "Point 2"])
       await flushPromises()
       expect(
-        (
-          wrapper.find('[data-test-id="remove-refinement-suggestions"]')
-            .element as HTMLButtonElement
-        ).disabled
+        refinementActionButton(wrapper, "remove-refinement-suggestions")
+          .disabled
+      ).toBe(true)
+    })
+
+    it("disables extract button when no suggestions are selected", async () => {
+      const wrapper = mountNoteRefinement(["Point 1", "Point 2"])
+      await flushPromises()
+      expect(
+        refinementActionButton(wrapper, "extract-refinement-suggestions")
+          .disabled
       ).toBe(true)
     })
 
@@ -48,10 +56,18 @@ describe("NoteRefinement remove refinement suggestions", () => {
       await flushPromises()
       await selectFirstSuggestion(wrapper)
       expect(
-        (
-          wrapper.find('[data-test-id="remove-refinement-suggestions"]')
-            .element as HTMLButtonElement
-        ).disabled
+        refinementActionButton(wrapper, "remove-refinement-suggestions")
+          .disabled
+      ).toBe(false)
+    })
+
+    it("enables extract button when a suggestion is selected", async () => {
+      const wrapper = mountNoteRefinement(["Point 1", "Point 2"])
+      await flushPromises()
+      await selectFirstSuggestion(wrapper)
+      expect(
+        refinementActionButton(wrapper, "extract-refinement-suggestions")
+          .disabled
       ).toBe(false)
     })
 

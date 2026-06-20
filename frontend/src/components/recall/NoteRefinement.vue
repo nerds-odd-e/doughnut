@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="refinementSuggestions.length > 0"
+    v-if="refinementLayoutItems.length > 0"
     class="mb-4 rounded-lg bg-accent p-4"
     data-test-id="refinement-suggestions"
   >
@@ -10,38 +10,51 @@
       </div>
       <ul class="space-y-2">
         <li
-          v-for="(suggestion, index) in refinementSuggestions"
-          :key="index"
-          class="text-accent-content flex items-start gap-2"
+          v-for="item in refinementLayoutItems"
+          :key="item.id"
+          :data-test-id="`refinement-layout-item-${item.id}`"
+          data-layout-level="1"
+          class="text-accent-content"
         >
-          <label
-            class="flex items-start cursor-pointer gap-2 flex-1 min-w-0"
-          >
-            <input
-              type="checkbox"
-              :value="index"
-              v-model="selectedSuggestionIndices"
-              class="daisy-checkbox daisy-checkbox-accent daisy-checkbox-sm mt-1 border-black dark:border-white hover:border-black hover:dark:border-white checked:border-black checked:dark:border-white border-2 shrink-0"
-            />
-            <span class="break-words">{{ suggestion }}</span>
-          </label>
-          <div class="flex gap-1 shrink-0">
-            <button
-              class="daisy-btn daisy-btn-xs daisy-btn-ghost"
-              @click="extractNote(suggestion)"
-              title="Extract to a new note"
+          <RefinementLayoutItemRow
+            :item="item"
+            :fully-selected="isFullySelected(item)"
+            :partially-selected="isPartiallySelected(item)"
+            @selection-change="setItemSelection(item, $event)"
+          />
+
+          <ul v-if="item.children.length > 0" class="ml-6 mt-2 space-y-2">
+            <li
+              v-for="child in item.children"
+              :key="child.id"
+              :data-test-id="`refinement-layout-item-${child.id}`"
+              data-layout-level="2"
             >
-              <Folders class="w-4 h-4" />
-              Extract note
-            </button>
-          </div>
+              <RefinementLayoutItemRow
+                :item="child"
+                :fully-selected="isFullySelected(child)"
+                :partially-selected="isPartiallySelected(child)"
+                @selection-change="setItemSelection(child, $event)"
+              />
+            </li>
+          </ul>
         </li>
       </ul>
 
       <div class="flex gap-2 mt-4">
         <button
+          data-test-id="extract-refinement-suggestions"
+          :disabled="selectedItemIds.length === 0"
+          @click="extractSelectedNote"
+          class="daisy-btn daisy-btn-primary daisy-btn-sm"
+          title="Extract selected to a new note"
+        >
+          <Folders class="w-4 h-4" />
+          Extract
+        </button>
+        <button
           data-test-id="remove-refinement-suggestions"
-          :disabled="selectedSuggestionIndices.length === 0"
+          :disabled="selectedItemIds.length === 0"
           @click="removeSelectedSuggestions"
           class="daisy-btn daisy-btn-error daisy-btn-sm !text-white"
         >
@@ -63,7 +76,9 @@ import {
   apiCallWithLoading,
   runWithBlockingApiLoading,
 } from "@/managedApi/clientSetup"
+import { useRefinementLayoutSelection } from "@/composables/useRefinementLayoutSelection"
 import usePopups from "../commons/Popups/usePopups"
+import RefinementLayoutItemRow from "./RefinementLayoutItemRow.vue"
 import { Folders } from "@lucide/vue"
 import { onMounted, ref } from "vue"
 import { useRouter } from "vue-router"
@@ -77,13 +92,17 @@ const emit = defineEmits<{
   (e: "contentUpdated", newContent: string): void
 }>()
 
-const refinementSuggestions = ref<string[]>([])
+const refinementLayoutItems = ref<NoteRefinementLayoutItem[]>([])
 
-const flattenLayoutItems = (items: NoteRefinementLayoutItem[]): string[] =>
-  items.flatMap((item) => [
-    item.text,
-    ...flattenLayoutItems(item.children ?? []),
-  ])
+const {
+  selectedItemIds,
+  layoutItemsById,
+  isFullySelected,
+  isPartiallySelected,
+  setItemSelection,
+  selectedTexts,
+  clearSelection,
+} = useRefinementLayoutSelection(refinementLayoutItems)
 
 const loadRefinementSuggestions = async () => {
   try {
@@ -93,13 +112,13 @@ const loadRefinementSuggestions = async () => {
       })
     )
 
-    refinementSuggestions.value =
-      !result.error && result.data?.items
-        ? flattenLayoutItems(result.data.items)
-        : []
+    refinementLayoutItems.value =
+      !result.error && result.data?.items ? result.data.items : []
+    clearSelection()
   } catch (err) {
     console.error("Failed to generate refinement suggestions:", err)
-    refinementSuggestions.value = []
+    refinementLayoutItems.value = []
+    clearSelection()
   }
 }
 
@@ -109,30 +128,24 @@ const { popups } = usePopups()
 const router = useRouter()
 const storageAccessor = useStorageAccessor()
 
-const selectedSuggestionIndices = ref<number[]>([])
-
 const removeSelectedSuggestions = async () => {
-  if (selectedSuggestionIndices.value.length === 0) {
+  if (selectedItemIds.value.length === 0) {
     return
   }
 
   const confirmed = await popups.confirm(
-    `Are you sure you want to remove ${selectedSuggestionIndices.value.length} selected suggestion(s)? The AI will remove related content from the note.`
+    `Are you sure you want to remove ${selectedItemIds.value.length} selected suggestion(s)? The AI will remove related content from the note.`
   )
 
   if (!confirmed) {
     return
   }
 
-  const selectedSuggestions = selectedSuggestionIndices.value.map(
-    (index) => refinementSuggestions.value[index]!
-  )
-
   await runWithBlockingApiLoading(async () => {
     const { data, error } = await apiCallWithLoading(() =>
       AiController.removeRefinementSuggestion({
         path: { note: props.note.id },
-        body: { suggestions: selectedSuggestions },
+        body: { suggestions: selectedTexts.value },
       })
     )
 
@@ -148,6 +161,30 @@ const removeSelectedSuggestions = async () => {
       emit("contentUpdated", data.content)
     }
   }, "AI is removing content...")
+}
+
+const extractSelectedNote = async () => {
+  if (selectedItemIds.value.length === 0) {
+    return
+  }
+
+  const selectedItems = selectedItemIds.value
+    .map((id) => layoutItemsById.value.get(id))
+    .filter((item): item is NoteRefinementLayoutItem => item !== undefined)
+
+  if (selectedItems.length !== 1) {
+    await popups.alert(
+      "Please select one item to extract. Extracting multiple selected items is coming next."
+    )
+    return
+  }
+
+  const selectedItem = selectedItems[0]
+  if (!selectedItem) {
+    return
+  }
+
+  await extractNote(selectedItem.text)
 }
 
 const extractNote = async (suggestion: string) => {

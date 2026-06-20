@@ -1,7 +1,7 @@
 @usingMockedOpenAiService
 Feature: Note refinement
   As a learner, when I start assimilating a note, I want to open Refine note
-  to see AI refinement suggestions for decomposing and improving the note,
+  to see an AI-generated layout for decomposing and improving the note,
   remove selected suggestions to have AI remove related content from note content,
   and extract a suggestion to a new note.
   So that I can refine long notes while assimilating them.
@@ -12,28 +12,41 @@ Feature: Note refinement
       | Title  | Folder  | Content |
       | Parent |         | |
       | Sample | Context | A. B. C. D. E. |
-    And OpenAI generates refinement suggestions:
-      | A |
-      | B |
-      | C |
-      | D |
-      | E |
+    And OpenAI generates refinement layout:
+      | id   | text | parent | alreadyExtracted |
+      | p1   | A    |        |                  |
+      | p1-1 | B    | p1     |                  |
+      | p1-2 | C    | p1     | true             |
+      | p2   | D    |        |                  |
+      | p3   | E    |        |                  |
 
-  Scenario: Generate refinement suggestions for a note
+  Scenario: Generate a refinement layout for a note
     When I am assimilating the note "Sample"
-    Then I should see refinement suggestions with 5 items
+    Then I should see the refinement layout:
+      | text | level | alreadyExtracted |
+      | A    | 1     |                  |
+      | B    | 2     |                  |
+      | C    | 2     | true             |
+      | D    | 1     |                  |
+      | E    | 1     |                  |
 
   Scenario: Remove selected refinement suggestions
     Given OpenAI returns the following content when requested to remove suggestions:
-      | B. D. E. |
+      | A. C. E. |
     When I am assimilating the note "Sample"
-    And I remove refinement suggestions 0 and 2
-    Then the note content on the current page should be "B. D. E."
+    And I remove refinement suggestions 1 and 3
+    Then the note content on the current page should be "A. C. E."
 
   Scenario: Extract a suggestion to a new note
     Given OpenAI will extract suggestion "B" to a new note with title "Point B" and content "Extracted" and updated parent content "A. C. D. E."
     When I am assimilating the note "Sample"
-    And I should see refinement suggestions with 5 items
+    And I should see the refinement layout:
+      | text | level | alreadyExtracted |
+      | A    | 1     |                  |
+      | B    | 2     |                  |
+      | C    | 2     | true             |
+      | D    | 1     |                  |
+      | E    | 1     |                  |
     And I extract the suggestion "B" to a new note
     Then the note title should be "Point B"
     And I should see folder "Sample tree/Context" containing these notes:

@@ -50,6 +50,52 @@ async function stubRefinementSuggestions(suggestions: string[]) {
     .stubOutputText(JSON.stringify({ items }))
 }
 
+type RefinementLayoutItem = {
+  id: string
+  text: string
+  alreadyExtracted: boolean
+  children: RefinementLayoutItem[]
+}
+
+function parseAlreadyExtracted(value?: string) {
+  return ['true', 'yes', 'already extracted'].includes(
+    value?.trim().toLowerCase() ?? ''
+  )
+}
+
+function refinementLayoutFromTable(data: DataTable) {
+  const rows = data.hashes()
+  const itemsById = new Map<string, RefinementLayoutItem>()
+  rows.forEach((row) => {
+    itemsById.set(row.id, {
+      id: row.id,
+      text: row.text,
+      alreadyExtracted: parseAlreadyExtracted(row.alreadyExtracted),
+      children: [],
+    })
+  })
+
+  const rootItems: RefinementLayoutItem[] = []
+  rows.forEach((row) => {
+    const item = itemsById.get(row.id)
+    if (!item) {
+      throw new Error(`Missing refinement layout item ${row.id}`)
+    }
+
+    const parentId = row.parent?.trim()
+    if (parentId) {
+      const parent = itemsById.get(parentId)
+      if (!parent) {
+        throw new Error(`Missing refinement layout parent ${parentId}`)
+      }
+      parent.children.push(item)
+    } else {
+      rootItems.push(item)
+    }
+  })
+  return rootItems
+}
+
 async function stubExtractNoteResponse(
   newNoteTitle: string,
   newNoteContent: string,
@@ -229,6 +275,22 @@ Given('OpenAI generates refinement suggestions:', (data: DataTable) => {
   cy.then(async () => {
     await mock_services.openAi().restartImposter()
     await stubRefinementSuggestions(suggestions)
+  })
+})
+
+Given('OpenAI generates refinement layout:', (data: DataTable) => {
+  cy.then(async () => {
+    await mock_services.openAi().restartImposter()
+    await mock_services
+      .openAi()
+      .responses()
+      .requestMessageMatches({
+        role: 'developer',
+        content: REFINEMENT_SUGGESTIONS_INSTRUCTION_PATTERN,
+      })
+      .stubOutputText(
+        JSON.stringify({ items: refinementLayoutFromTable(data) })
+      )
   })
 })
 

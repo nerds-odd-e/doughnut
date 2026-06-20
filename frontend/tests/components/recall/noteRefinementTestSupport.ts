@@ -69,8 +69,17 @@ export function mountNoteRefinement(
   suggestions: string[],
   overrides?: { note?: typeof note }
 ) {
+  return mountNoteRefinementWithLayout(refinementLayoutItems(suggestions), {
+    note: overrides?.note,
+  })
+}
+
+export function mountNoteRefinementWithLayout(
+  items: NoteRefinementLayoutItem[],
+  overrides?: { note?: typeof note }
+) {
   mockSdkService(AiController, "generateRefinementSuggestions", {
-    items: refinementLayoutItems(suggestions),
+    items,
   })
   return renderer
     .withCleanStorage()
@@ -98,7 +107,61 @@ export async function selectFirstSuggestion(
   await flushPromises()
 }
 
-export const extractNoteButtonTitle = "Extract to a new note"
+export const extractNoteButtonTitle = "Extract selected to a new note"
+
+export const sampleNestedLayout = (): NoteRefinementLayoutItem[] => [
+  {
+    id: "p1",
+    text: "Parent point",
+    alreadyExtracted: false,
+    children: [
+      {
+        id: "p1-1",
+        text: "Child point A",
+        alreadyExtracted: false,
+        children: [],
+      },
+      {
+        id: "p1-2",
+        text: "Child point B",
+        alreadyExtracted: true,
+        children: [],
+      },
+    ],
+  },
+  {
+    id: "p2",
+    text: "Separate point",
+    alreadyExtracted: false,
+    children: [],
+  },
+]
+
+export function layoutCheckbox(
+  wrapper: ReturnType<typeof mountNoteRefinementWithLayout>,
+  itemId: string
+): HTMLInputElement {
+  return wrapper.find(`[data-test-id="refinement-layout-checkbox-${itemId}"]`)
+    .element as HTMLInputElement
+}
+
+export function refinementActionButton(
+  wrapper: ReturnType<typeof mountNoteRefinement>,
+  testId: "extract-refinement-suggestions" | "remove-refinement-suggestions"
+): HTMLButtonElement {
+  return wrapper.find(`[data-test-id="${testId}"]`).element as HTMLButtonElement
+}
+
+export async function selectRefinementLayoutItem(
+  wrapper: ReturnType<typeof mountNoteRefinement>,
+  itemId: string,
+  checked = true
+) {
+  await wrapper
+    .find(`[data-test-id="refinement-layout-checkbox-${itemId}"]`)
+    .setValue(checked)
+  await flushPromises()
+}
 
 export function refinementLayoutItems(
   suggestions: string[]

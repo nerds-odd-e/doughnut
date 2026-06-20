@@ -134,6 +134,10 @@ Then(
   }
 )
 
+Then('I should see the refinement layout:', (data: DataTable) => {
+  start.assumeAssimilationPage().expectRefinementLayout(data.hashes())
+})
+
 When(
   'I remove refinement suggestions {int} and {int}',
   (index1: number, index2: number) => {

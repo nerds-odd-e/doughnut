@@ -3,20 +3,20 @@ import { pageIsNotLoading } from '../../pageBase'
 import { form } from '../../forms'
 import { assimilationPropertyMemoryTrackerExpectations } from './propertyMemoryTrackerExpectations'
 import { assimilationPropertyFlow } from './assimilationPropertyFlow'
+import { assimilationRefinementLayoutExpectations } from './refinementLayoutExpectations'
 import {
   assimilateButton,
   mainNoteHeadingTitleSelector,
   noteLevelReviveElements,
-  refinementSuggestionsPanel,
   reviveButton,
   skipRecallOnPanel,
   waitForAssimilationNoteTitle,
-  waitForExtractNote,
 } from './shared'
 
 export const assumeAssimilationPage = () => ({
   ...assimilationPropertyMemoryTrackerExpectations(),
   ...assimilationPropertyFlow(),
+  ...assimilationRefinementLayoutExpectations(),
   expectAssimilationProgressSummary(triple: string) {
     cy.get('[data-test="assimilation-progress-summary"]')
       .should('be.visible')
@@ -153,39 +153,9 @@ export const assumeAssimilationPage = () => ({
       this.assimilateOneNote(assimilation)
     })
   },
-  expectRefinementSuggestionsCount(count: number) {
-    this.openRefineNoteModal()
-    refinementSuggestionsPanel().scrollIntoView().should('be.visible')
-    refinementSuggestionsPanel().find('ul li').should('have.length', count)
-    return this
-  },
   assimilateCurrentNote() {
     pageIsNotLoading()
     this.clickAssimilate()
-    return this
-  },
-  checkRefinementSuggestion(index: number) {
-    refinementSuggestionsPanel()
-      .find('input[type="checkbox"]')
-      .eq(index)
-      .check()
-    return this
-  },
-  removeRefinementSuggestionsAt(indices: number[]) {
-    this.openRefineNoteModal()
-    indices.forEach((index) => this.checkRefinementSuggestion(index))
-    cy.findByRole('button', { name: 'Remove selected' }).click()
-    cy.findByRole('button', { name: 'OK' }).click()
-    return this
-  },
-  /** Requires the refine-note modal to already be open (e.g. after openRefineNoteModal or expectRefinementSuggestionsCount). */
-  extractSuggestionToNewNote(suggestionText: string) {
-    refinementSuggestionsPanel().within(() => {
-      cy.contains('li', suggestionText)
-        .findByRole('button', { name: 'Extract note' })
-        .click()
-    })
-    waitForExtractNote()
     return this
   },
   checkRememberSpellingOption() {

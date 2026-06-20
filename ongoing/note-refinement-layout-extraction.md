@@ -112,7 +112,7 @@ Completion notes:
 
 ### Phase 2 - Show the layout with tri-state selection
 
-Status: planned
+Status: done
 
 Behavior: The refinement dialog renders the nested layout, marks already extracted points clearly, and allows selecting parents, children, or non-contiguous points. Checking a parent checks its children; unchecking a child makes the parent indeterminate.
 
@@ -131,6 +131,12 @@ Tests:
 Targeted checks:
 - `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/NoteRefinement.extractNote.spec.ts tests/components/recall/NoteRefinement.removeSuggestions.spec.ts`
 - `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/assimilation/note_refinement.feature`
+
+Completion notes:
+- `NoteRefinement.vue` renders nested layout items with tri-state checkboxes, **Already extracted** badges, and one dialog-level **Extract** button beside **Remove selected**; both actions disable when nothing is selected.
+- Selection logic lives in `useRefinementLayoutSelection`; shared row UI in `RefinementLayoutItemRow.vue`.
+- Multi-item extract still shows a placeholder alert (Phase 3); single-item extract and removal continue using flat suggestion text in API requests.
+- E2E scenarios assert nested layout levels and already-extracted markers instead of flat suggestion count.
 
 ### Phase 3 - Extract selected layout points into one note
 
