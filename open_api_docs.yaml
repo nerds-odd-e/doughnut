@@ -1549,7 +1549,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NoteRefinementRemoveRequestDTO"
+              $ref: "#/components/schemas/NoteRefinementLayoutSelectionRequestDTO"
         required: true
       responses:
         "200":
@@ -1591,7 +1591,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NoteRefinementExtractRequestDTO"
+              $ref: "#/components/schemas/NoteRefinementLayoutSelectionRequestDTO"
         required: true
       responses:
         "200":
@@ -4179,7 +4179,7 @@ components:
       - children
       - id
       - text
-    NoteRefinementRemoveRequestDTO:
+    NoteRefinementLayoutSelectionRequestDTO:
       type: object
       properties:
         layout:
@@ -4200,15 +4200,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/NoteRefinementLayoutItem"
-    NoteRefinementExtractRequestDTO:
-      type: object
-      properties:
-        layout:
-          $ref: "#/components/schemas/NoteRefinementLayout"
-        selectedItemIds:
-          type: array
-          items:
-            type: string
     QuestionGenerationBatchSubmissionSummaryDTO:
       type: object
       properties:

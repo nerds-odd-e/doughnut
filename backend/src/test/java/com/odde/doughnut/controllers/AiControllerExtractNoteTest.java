@@ -6,7 +6,7 @@ import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.NoteRealm;
-import com.odde.doughnut.controllers.dto.NoteRefinementExtractRequestDTO;
+import com.odde.doughnut.controllers.dto.NoteRefinementLayoutSelectionRequestDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -77,9 +77,10 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
           List.of(new NoteRefinementLayoutItem(id, text, false, List.of())));
     }
 
-    private NoteRefinementExtractRequestDTO extractRequest(
+    private NoteRefinementLayoutSelectionRequestDTO layoutSelectionRequest(
         NoteRefinementLayout layout, List<String> selectedItemIds) {
-      NoteRefinementExtractRequestDTO requestDTO = new NoteRefinementExtractRequestDTO();
+      NoteRefinementLayoutSelectionRequestDTO requestDTO =
+          new NoteRefinementLayoutSelectionRequestDTO();
       requestDTO.setLayout(layout);
       requestDTO.setSelectedItemIds(selectedItemIds);
       return requestDTO;
@@ -101,7 +102,7 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
           "Extracted Note", "Expanded content for the new note.", "Updated parent with summary.");
       NoteRefinementLayout layout = sampleLayout();
 
-      controller.extractNote(testNote, extractRequest(layout, List.of("p1-1", "p2")));
+      controller.extractNote(testNote, layoutSelectionRequest(layout, List.of("p1-1", "p2")));
 
       @SuppressWarnings({"unchecked", "rawtypes"})
       ArgumentCaptor<StructuredResponseCreateParams<NoteExtractionResult>> paramsCaptor =
@@ -149,7 +150,7 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
 
       NoteRefinementLayout layout = layoutWithItem("p1", "key suggestion to extract");
       NoteRealm response =
-          controller.extractNote(sourceNote, extractRequest(layout, List.of("p1")));
+          controller.extractNote(sourceNote, layoutSelectionRequest(layout, List.of("p1")));
       Note persistedNote = noteRepository.findById(response.getNote().getId()).orElseThrow();
       if (sourceInFolder) {
         assertThat(persistedNote.getFolder().getId()).isEqualTo(expectedFolder.getId());
@@ -170,7 +171,8 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
           "Back to [[foo/bar: baz]].");
       NoteRefinementLayout layout = layoutWithItem("p1", "key suggestion to extract");
 
-      NoteRealm response = controller.extractNote(testNote, extractRequest(layout, List.of("p1")));
+      NoteRealm response =
+          controller.extractNote(testNote, layoutSelectionRequest(layout, List.of("p1")));
 
       Note persistedNote = noteRepository.findById(response.getNote().getId()).orElseThrow();
       assertThat(persistedNote.getTitle()).isEqualTo("foo／bar： baz");
@@ -196,7 +198,8 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
           "A. See [[point b|the extracted note]]. C.");
       NoteRefinementLayout layout = layoutWithItem("p1", "B");
 
-      NoteRealm response = controller.extractNote(testNote, extractRequest(layout, List.of("p1")));
+      NoteRealm response =
+          controller.extractNote(testNote, layoutSelectionRequest(layout, List.of("p1")));
 
       assertThat(response.getWikiTitles())
           .anyMatch(
@@ -213,7 +216,7 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
       NoteRefinementLayout layout = layoutWithItem("p1", "a suggestion");
       assertThrows(
           ResponseStatusException.class,
-          () -> controller.extractNote(testNote, extractRequest(layout, List.of("p1"))));
+          () -> controller.extractNote(testNote, layoutSelectionRequest(layout, List.of("p1"))));
     }
 
     static Stream<List<String>> invalidSelectedItemIds() {
@@ -226,7 +229,7 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
       Note testNote = newRootNoteWithExtractableContent();
       NoteRefinementLayout layout = layoutWithItem("p1", "a suggestion");
       assertResponseStatus(
-          () -> controller.extractNote(testNote, extractRequest(layout, selectedItemIds)),
+          () -> controller.extractNote(testNote, layoutSelectionRequest(layout, selectedItemIds)),
           HttpStatus.BAD_REQUEST);
     }
 
@@ -237,7 +240,7 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
           new NoteRefinementLayout(
               List.of(new NoteRefinementLayoutItem("", "a suggestion", false, List.of())));
       assertResponseStatus(
-          () -> controller.extractNote(testNote, extractRequest(layout, List.of("p1"))),
+          () -> controller.extractNote(testNote, layoutSelectionRequest(layout, List.of("p1"))),
           HttpStatus.BAD_REQUEST);
     }
 
@@ -247,7 +250,7 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
       openAiStructuredResponseMock.stubStructuredResponse(null);
       NoteRefinementLayout layout = layoutWithItem("p1", "a suggestion");
       assertResponseStatus(
-          () -> controller.extractNote(testNote, extractRequest(layout, List.of("p1"))),
+          () -> controller.extractNote(testNote, layoutSelectionRequest(layout, List.of("p1"))),
           HttpStatus.SERVICE_UNAVAILABLE);
     }
 
@@ -257,7 +260,7 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
       testNote.setContent("");
       NoteRefinementLayout layout = layoutWithItem("p1", "a suggestion");
       assertResponseStatus(
-          () -> controller.extractNote(testNote, extractRequest(layout, List.of("p1"))),
+          () -> controller.extractNote(testNote, layoutSelectionRequest(layout, List.of("p1"))),
           HttpStatus.BAD_REQUEST);
     }
   }

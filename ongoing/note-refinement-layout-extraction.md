@@ -341,7 +341,7 @@ Targeted checks:
 
 ### Phase 10 - Unify the duplicate layout-selection request DTO
 
-Status: planned
+Status: done
 
 Type: Structure
 

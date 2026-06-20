@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class NoteRefinementRemoveRequestDTO {
+public class NoteRefinementLayoutSelectionRequestDTO {
   public NoteRefinementLayout layout;
   public List<String> selectedItemIds;
 }

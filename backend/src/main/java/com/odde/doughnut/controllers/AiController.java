@@ -96,7 +96,7 @@ public class AiController {
   @Transactional
   public RefinedContentResponseDTO removeRefinementSuggestion(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
-      @RequestBody NoteRefinementRemoveRequestDTO request)
+      @RequestBody NoteRefinementLayoutSelectionRequestDTO request)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
 
     authorizationService.assertAuthorization(note);
@@ -117,7 +117,7 @@ public class AiController {
   @Transactional
   public NoteRealm extractNote(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
-      @RequestBody NoteRefinementExtractRequestDTO request)
+      @RequestBody NoteRefinementLayoutSelectionRequestDTO request)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
     authorizationService.assertAuthorization(note);
 

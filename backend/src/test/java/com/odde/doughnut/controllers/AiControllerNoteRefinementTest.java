@@ -6,7 +6,7 @@ import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.NoteRefinementLayoutDTO;
-import com.odde.doughnut.controllers.dto.NoteRefinementRemoveRequestDTO;
+import com.odde.doughnut.controllers.dto.NoteRefinementLayoutSelectionRequestDTO;
 import com.odde.doughnut.controllers.dto.RefinedContentResponseDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -169,9 +169,10 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
               new NoteRefinementLayoutItem("p2", "Other point", false, List.of())));
     }
 
-    private NoteRefinementRemoveRequestDTO removeRequest(
+    private NoteRefinementLayoutSelectionRequestDTO layoutSelectionRequest(
         NoteRefinementLayout layout, List<String> selectedItemIds) {
-      NoteRefinementRemoveRequestDTO requestDTO = new NoteRefinementRemoveRequestDTO();
+      NoteRefinementLayoutSelectionRequestDTO requestDTO =
+          new NoteRefinementLayoutSelectionRequestDTO();
       requestDTO.setLayout(layout);
       requestDTO.setSelectedItemIds(selectedItemIds);
       return requestDTO;
@@ -187,7 +188,7 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
       NoteRefinementLayout layout = sampleLayout();
       RefinedContentResponseDTO response =
           controller.removeRefinementSuggestion(
-              testNote, removeRequest(layout, List.of("p1-1", "p2")));
+              testNote, layoutSelectionRequest(layout, List.of("p1-1", "p2")));
       assertThat(response.getContent()).isEqualTo("Remaining content.");
       makeMe.entityPersister.refresh(testNote);
       assertThat(testNote.getContent()).isEqualTo(originalContent);
@@ -213,7 +214,7 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
       assertBadRequestContaining(
           () ->
               controller.removeRefinementSuggestion(
-                  testNote, removeRequest(sampleLayout(), List.of())),
+                  testNote, layoutSelectionRequest(sampleLayout(), List.of())),
           "selectedItemIds cannot be empty");
     }
 
@@ -223,7 +224,7 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
       assertBadRequestContaining(
           () ->
               controller.removeRefinementSuggestion(
-                  testNote, removeRequest(sampleLayout(), List.of("p1-1"))),
+                  testNote, layoutSelectionRequest(sampleLayout(), List.of("p1-1"))),
           "Note content cannot be empty");
     }
   }

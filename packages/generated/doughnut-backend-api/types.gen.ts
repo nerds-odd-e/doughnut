@@ -616,7 +616,7 @@ export type NoteRefinementLayoutItem = {
     children: Array<NoteRefinementLayoutItem>;
 };
 
-export type NoteRefinementRemoveRequestDto = {
+export type NoteRefinementLayoutSelectionRequestDto = {
     layout?: NoteRefinementLayout;
     selectedItemIds?: Array<string>;
 };
@@ -627,11 +627,6 @@ export type RefinedContentResponseDto = {
 
 export type NoteRefinementLayoutDto = {
     items?: Array<NoteRefinementLayoutItem>;
-};
-
-export type NoteRefinementExtractRequestDto = {
-    layout?: NoteRefinementLayout;
-    selectedItemIds?: Array<string>;
 };
 
 export type QuestionGenerationBatchSubmissionSummaryDto = {
@@ -2354,7 +2349,7 @@ export type SuggestTitleResponses = {
 export type SuggestTitleResponse = SuggestTitleResponses[keyof SuggestTitleResponses];
 
 export type RemoveRefinementSuggestionData = {
-    body: NoteRefinementRemoveRequestDto;
+    body: NoteRefinementLayoutSelectionRequestDto;
     path: {
         note: number;
     };
@@ -2390,7 +2385,7 @@ export type GenerateRefinementSuggestionsResponses = {
 export type GenerateRefinementSuggestionsResponse = GenerateRefinementSuggestionsResponses[keyof GenerateRefinementSuggestionsResponses];
 
 export type ExtractNoteData = {
-    body: NoteRefinementExtractRequestDto;
+    body: NoteRefinementLayoutSelectionRequestDto;
     path: {
         note: number;
     };
