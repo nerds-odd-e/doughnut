@@ -132,6 +132,10 @@ spring:
   config:
     activate:
       on-profile: prod
+  task:
+    scheduling:
+      pool:
+        size: 3
   logging:
     level:
       root: INFO

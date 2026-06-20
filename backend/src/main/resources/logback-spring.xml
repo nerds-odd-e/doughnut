@@ -64,13 +64,33 @@
   </springProfile>
 
   <springProfile name="prod">
+    <appender name="PROD_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+      <file>${LOGS_ABSOLUTE_PATH}/doughnut-prod.log</file>
+      <encoder>
+        <pattern>${PATTERN}</pattern>
+      </encoder>
+      <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+        <fileNamePattern>${LOGS_ABSOLUTE_PATH}/archived/doughnut-prod.%i.log</fileNamePattern>
+        <minIndex>1</minIndex>
+        <maxIndex>3</maxIndex>
+      </rollingPolicy>
+      <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+        <maxFileSize>5MB</maxFileSize>
+      </triggeringPolicy>
+    </appender>
+    <appender name="ASYNC_CONSOLE" class="ch.qos.logback.classic.AsyncAppender">
+      <appender-ref ref="CONSOLE" />
+      <neverBlock>true</neverBlock>
+      <queueSize>256</queueSize>
+    </appender>
     <logger name="com.odde.doughnut" level="INFO" />
     <logger name="org.springframework" level="INFO" />
     <logger name="org.hibernate" level="WARN" />
     <logger name="com.zaxxer.hikari" level="WARN" />
 
     <root level="INFO">
-      <appender-ref ref="CONSOLE" />
+      <appender-ref ref="ASYNC_CONSOLE" />
+      <appender-ref ref="PROD_FILE" />
     </root>
   </springProfile>
 </configuration>
