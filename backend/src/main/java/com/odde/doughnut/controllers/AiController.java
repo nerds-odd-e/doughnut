@@ -89,7 +89,7 @@ public class AiController {
   }
 
   @Operation(
-      summary = "Remove refinement suggestions from note content (response only)",
+      summary = "Remove selected layout points from note content (response only)",
       description =
           "Returns AI-regenerated note content in the response. Does not persist the note; the client must save the returned text (for example via the note update API).")
   @PostMapping("/remove-refinement-suggestion/{note}")

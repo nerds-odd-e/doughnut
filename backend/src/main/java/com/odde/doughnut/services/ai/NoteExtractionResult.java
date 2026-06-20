@@ -8,9 +8,9 @@ import lombok.Data;
 
 @JsonClassDescription(
     """
-    Extract a refinement suggestion from the note and generate content for a new note.
-    The suggestion will be expanded into a complete note with title and content.
-    The original note's content will be updated with extracted content removed.
+    Extract one or more selected layout points from the note into one new note.
+    The selected points will be expanded into a complete note with title and content.
+    The original note's content will be updated with the extracted content removed.
     """)
 @Data
 public class NoteExtractionResult {

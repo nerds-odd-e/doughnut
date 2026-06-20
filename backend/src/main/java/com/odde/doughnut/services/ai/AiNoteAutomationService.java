@@ -20,8 +20,8 @@ import java.util.function.Function;
 public class AiNoteAutomationService {
   private static final String STRUCTURED_RESPONSE_INPUT =
       "Follow the instructions and return the requested structured response.";
-  private static final long REFINEMENT_SUGGESTIONS_MAX_OUTPUT_TOKENS = 1000L;
-  private static final long REMOVE_SUGGESTIONS_MAX_OUTPUT_TOKENS = 2000L;
+  private static final long NOTE_REFINEMENT_LAYOUT_MAX_OUTPUT_TOKENS = 1000L;
+  private static final long REMOVE_LAYOUT_POINTS_MAX_OUTPUT_TOKENS = 2000L;
   private static final long EXTRACT_NOTE_MAX_OUTPUT_TOKENS = 3000L;
 
   private final OpenAiApiHandler openAiApiHandler;
@@ -54,11 +54,11 @@ public class AiNoteAutomationService {
 
   public NoteRefinementLayout generateRefinementSuggestions() throws JsonProcessingException {
     return executeWithTool(
-        AiToolFactory.generateRefinementSuggestionsAiTool(),
+        AiToolFactory.generateNoteRefinementLayoutAiTool(),
         NoteRefinementLayout.class,
         NoteRefinementLayoutValidator::validOrEmpty,
         NoteRefinementLayout.empty(),
-        REFINEMENT_SUGGESTIONS_MAX_OUTPUT_TOKENS);
+        NOTE_REFINEMENT_LAYOUT_MAX_OUTPUT_TOKENS);
   }
 
   public NoteExtractionResult extractNote(NoteRefinementLayout layout, List<String> selectedItemIds)
@@ -137,6 +137,6 @@ public class AiNoteAutomationService {
         RegeneratedNoteContent.class,
         r -> r.content,
         note.getContent(),
-        REMOVE_SUGGESTIONS_MAX_OUTPUT_TOKENS);
+        REMOVE_LAYOUT_POINTS_MAX_OUTPUT_TOKENS);
   }
 }

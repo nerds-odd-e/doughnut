@@ -1041,7 +1041,7 @@ export class AiController {
     }
     
     /**
-     * Remove refinement suggestions from note content (response only)
+     * Remove selected layout points from note content (response only)
      *
      * Returns AI-regenerated note content in the response. Does not persist the note; the client must save the returned text (for example via the note update API).
      */

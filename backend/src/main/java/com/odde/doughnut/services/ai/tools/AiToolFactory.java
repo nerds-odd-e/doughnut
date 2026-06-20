@@ -150,7 +150,7 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
         suggestNoteTitle());
   }
 
-  public static InstructionAndSchema generateRefinementSuggestionsAiTool() {
+  public static InstructionAndSchema generateNoteRefinementLayoutAiTool() {
     return new InstructionAndSchema(
         """
         Return one current-content layout for the note content, not alternative breakdown suggestions.

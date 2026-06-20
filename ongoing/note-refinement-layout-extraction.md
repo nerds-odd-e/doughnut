@@ -364,7 +364,7 @@ Targeted checks:
 
 ### Phase 11 - Tidy remaining layout naming and prompt text
 
-Status: planned
+Status: done
 
 Type: Structure
 
@@ -377,6 +377,12 @@ Implementation notes:
 - Re-evaluate whether the transitional REST/SDK names (`generate-refinement-suggestions`, `remove-refinement-suggestion`, `generateRefinementSuggestions`, `removeRefinementSuggestion`) and token constants (`REFINEMENT_SUGGESTIONS_MAX_OUTPUT_TOKENS`, `REMOVE_SUGGESTIONS_MAX_OUTPUT_TOKENS`) can be renamed with contained generated-API churn; if not, keep this phase to prompt/description text only and re-document the transitional names.
 - Out of scope unless cheap: collapsing the asymmetric `NoteRefinementLayoutDTO` (response) vs `NoteRefinementLayout` (request) shapes.
 
+Completion notes:
+- `NoteExtractionResult` schema description now refers to one or more selected layout points.
+- Internal token constants renamed to `NOTE_REFINEMENT_LAYOUT_MAX_OUTPUT_TOKENS` and `REMOVE_LAYOUT_POINTS_MAX_OUTPUT_TOKENS`; `AiToolFactory.generateNoteRefinementLayoutAiTool()` replaces the transitional factory method name.
+- Remove endpoint OpenAPI summary updated to layout-oriented wording.
+- **Transitional REST/SDK names retained** (Jidoka): renaming paths/operationIds would churn generated `sdk.gen.ts`, `types.gen.ts`, frontend mocks, and external API consumers; defer to a dedicated API-versioning pass. Transitional names: `generate-refinement-suggestions`, `remove-refinement-suggestion`, `generateRefinementSuggestions`, `removeRefinementSuggestion`.
+
 Tests:
 - Run the focused backend and frontend tests touched by any rename.
 - `scripts/check_diff_whitespace.sh` before handing off.
@@ -384,6 +390,10 @@ Tests:
 Targeted checks:
 - `scripts/check_diff_whitespace.sh`
 - Relevant focused frontend/backend tests from prior phases.
+
+## Plan complete
+
+All review follow-up phases (6–11) are done. Note refinement now uses a nested layout with tri-state selection, multi-point extract/remove, post-removal layout refresh, indeterminate-parent semantics, aligned edge-case handling, diagnosable invalid layouts, unified layout-selection request DTO, and updated prompt/schema wording. Transitional REST/SDK endpoint names remain for a future contained API rename.
 
 ## Out of scope
 
