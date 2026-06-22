@@ -7,6 +7,7 @@ import { pageIsNotLoading } from '../pageBase'
 const submitTimeoutMs = 20000
 
 export type SidebarFolderOrganizeForm = {
+  selectDestinationNotebook: (notebookName: string) => SidebarFolderOrganizeForm
   selectNotebookRootAsDestination: () => SidebarFolderOrganizeForm
   openFolderSearch: () => SidebarFolderOrganizeForm
   searchFolderDestination: (text: string) => SidebarFolderOrganizeForm
@@ -26,6 +27,11 @@ export type SidebarFolderOrganizeForm = {
  */
 export function assumeSidebarFolderOrganizeForm(): SidebarFolderOrganizeForm {
   return {
+    selectDestinationNotebook(notebookName: string) {
+      cy.get('[data-testid="folder-move-notebook-select"]').select(notebookName)
+      return assumeSidebarFolderOrganizeForm()
+    },
+
     selectNotebookRootAsDestination() {
       cy.get('[data-testid="folder-move-parent-select"]').select('__root__')
       return assumeSidebarFolderOrganizeForm()

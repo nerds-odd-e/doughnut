@@ -52,6 +52,28 @@ When(
 )
 
 When(
+  'I move folder {string} to notebook {string} root using the folder page',
+  (folderLabel: string, notebookName: string) => {
+    start
+      .noteSidebar()
+      .openFolderPageForOrganize(folderLabel)
+      .selectDestinationNotebook(notebookName)
+      .confirmMove()
+  }
+)
+
+When(
+  'I move folder {string} under {string} to notebook {string} root using the folder page',
+  (childLabel: string, parentLabel: string, notebookName: string) => {
+    start
+      .noteSidebar()
+      .openFolderPageForOrganizeUnderParent(parentLabel, childLabel)
+      .selectDestinationNotebook(notebookName)
+      .confirmMove()
+  }
+)
+
+When(
   'I attempt to move folder {string} under {string} to notebook root using the folder page',
   (childLabel: string, parentLabel: string) => {
     start

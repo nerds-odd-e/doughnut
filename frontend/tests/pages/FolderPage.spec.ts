@@ -14,7 +14,7 @@ import {
   dissolveWithInitialConfirm,
   mountFolderPage,
   resolveTopConfirm,
-  stubFolderPageListingMocks,
+  selectDestinationNotebook,
   submitMoveForm,
 } from "@tests/pages/folderPageTestSupport"
 import type { Router } from "vue-router"
@@ -29,7 +29,6 @@ describe("FolderPage", () => {
 
   beforeEach(() => {
     router = createFolderPageRouter()
-    stubFolderPageListingMocks()
   })
 
   describe("move", () => {
@@ -117,7 +116,7 @@ describe("FolderPage", () => {
         await wrapper.setProps({ folderRealm: realmUnderAlpha })
       })
 
-      const mounted = mountFolderPage(router, 2, "Beta", fetchFolderPage)
+      const mounted = mountFolderPage(router, 2, "Beta", { fetchFolderPage })
       wrapper = mounted.wrapper
       await flushPromises()
 
@@ -173,6 +172,65 @@ describe("FolderPage", () => {
         params: {
           notebookId: String(folderRealm.notebookRealm.notebook.id),
           folderId: String(targetFolder.id),
+        },
+      })
+
+      wrapper.unmount()
+    })
+
+    it("sends destinationNotebookId when moving to another notebook root", async () => {
+      const destinationNotebook = makeMe.aNotebook.please()
+      const { wrapper, folderRealm } = mountFolderPage(router, 10, "Moved", {
+        extraNotebooks: [destinationNotebook],
+      })
+      await flushPromises()
+
+      const moveSpy = vi
+        .spyOn(NotebookController, "moveFolder")
+        .mockResolvedValue(wrapSdkResponse(folderRealm.folder) as never)
+
+      await selectDestinationNotebook(wrapper, destinationNotebook.id)
+      await submitMoveForm(wrapper)
+
+      expect(moveSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: {
+            notebook: folderRealm.notebookRealm.notebook.id,
+            folder: folderRealm.folder.id,
+          },
+          body: {
+            destinationNotebookId: destinationNotebook.id,
+            merge: false,
+          },
+        })
+      )
+
+      wrapper.unmount()
+    })
+
+    it("navigates to the moved folder in the destination notebook after a cross-notebook root move", async () => {
+      const destinationNotebook = makeMe.aNotebook.please()
+      const { wrapper, folderRealm } = mountFolderPage(router, 10, "Moved", {
+        extraNotebooks: [destinationNotebook],
+      })
+      await flushPromises()
+
+      vi.spyOn(NotebookController, "moveFolder").mockResolvedValue(
+        wrapSdkResponse(folderRealm.folder) as never
+      )
+
+      const pushSpy = vi
+        .spyOn(router, "push")
+        .mockResolvedValue(undefined as never)
+
+      await selectDestinationNotebook(wrapper, destinationNotebook.id)
+      await submitMoveForm(wrapper)
+
+      expect(pushSpy).toHaveBeenCalledWith({
+        name: "folderPage",
+        params: {
+          notebookId: String(destinationNotebook.id),
+          folderId: String(folderRealm.folder.id),
         },
       })
 

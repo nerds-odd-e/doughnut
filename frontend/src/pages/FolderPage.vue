@@ -31,18 +31,51 @@
               <p class="text-sm mb-3">
                 Move folder "{{ folderForView.folder.name }}".
               </p>
-              <label class="daisy-label" for="folder-move-destination">
-                <span class="daisy-label-text">Destination</span>
+              <label class="daisy-label" for="folder-move-notebook">
+                <span class="daisy-label-text">Destination notebook</span>
               </label>
-              <div id="folder-move-destination">
-                <FolderSelector
-                  v-model="selectedParentFolder"
-                  :notebook-id="folderForView.notebookRealm.notebook.id"
-                  :context-folder="folderForView.folder"
-                  :ancestor-folders="folderForView.ancestorFolders ?? []"
-                  :disabled="processing"
-                />
-              </div>
+              <select
+                id="folder-move-notebook"
+                v-model="selectedDestinationNotebookId"
+                class="daisy-select w-full mb-3"
+                data-testid="folder-move-notebook-select"
+                :disabled="processing || notebooksLoading"
+              >
+                <option
+                  v-for="notebook in destinationNotebooks"
+                  :key="notebook.id"
+                  :value="notebook.id"
+                >
+                  {{ notebook.name }}
+                </option>
+              </select>
+              <p
+                v-if="notebooksLoadError"
+                class="text-error text-sm mb-2"
+              >
+                {{ notebooksLoadError }}
+              </p>
+              <template v-if="!isCrossNotebookMove">
+                <label class="daisy-label" for="folder-move-destination">
+                  <span class="daisy-label-text">Destination folder</span>
+                </label>
+                <div id="folder-move-destination">
+                  <FolderSelector
+                    v-model="selectedParentFolder"
+                    :notebook-id="folderForView.notebookRealm.notebook.id"
+                    :context-folder="folderForView.folder"
+                    :ancestor-folders="folderForView.ancestorFolders ?? []"
+                    :disabled="processing"
+                  />
+                </div>
+              </template>
+              <p
+                v-else
+                class="text-sm text-base-content/70 mb-3"
+                data-testid="folder-move-cross-notebook-root-hint"
+              >
+                The folder will be placed at the destination notebook root.
+              </p>
               <p v-if="moveError" class="text-error text-sm mt-2">
                 {{ moveError }}
               </p>
@@ -109,10 +142,13 @@
 <script setup lang="ts">
 import type { Folder, FolderRealm } from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
-import { computed, ref, watch } from "vue"
+import { computed, onMounted, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import PathNameEditor from "@/components/notes/core/PathNameEditor.vue"
 import FolderSelector from "@/components/notes/FolderSelector.vue"
+import { notebooksFromCatalogItems } from "@/components/notebook/notebooksFromCatalogItems"
+import { sortNotebookCatalogAlphabetically } from "@/components/notebook/sortNotebookCatalogAlphabetically"
+import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import usePopups from "@/components/commons/Popups/usePopups"
 import NotebookPageReadonlySummary from "@/components/notebook/NotebookPageReadonlySummary.vue"
@@ -146,6 +182,69 @@ const dissolveError = ref<string | undefined>(undefined)
 const renameError = ref<string | undefined>(undefined)
 const selectedParentFolder = ref<Folder | null>(null)
 const renameName = ref("")
+const destinationCatalogItems = ref<NotebookCatalogEntry[] | undefined>(
+  undefined
+)
+const notebooksLoading = ref(true)
+const notebooksLoadError = ref<string | undefined>(undefined)
+const selectedDestinationNotebookId = ref<number | undefined>(undefined)
+
+const sourceNotebookId = computed(
+  () => folderForView.value?.notebookRealm.notebook.id
+)
+
+const destinationNotebooks = computed(() => {
+  if (destinationCatalogItems.value == null) return []
+  return notebooksFromCatalogItems(
+    sortNotebookCatalogAlphabetically(destinationCatalogItems.value)
+  )
+})
+
+const isCrossNotebookMove = computed(() => {
+  const sourceId = sourceNotebookId.value
+  const destinationId = selectedDestinationNotebookId.value
+  return sourceId != null && destinationId != null && destinationId !== sourceId
+})
+
+watch(
+  sourceNotebookId,
+  (notebookId) => {
+    if (notebookId == null) return
+    if (selectedDestinationNotebookId.value == null) {
+      selectedDestinationNotebookId.value = notebookId
+    }
+  },
+  { immediate: true }
+)
+
+watch(selectedDestinationNotebookId, (destinationId) => {
+  const sourceId = sourceNotebookId.value
+  if (destinationId != null && sourceId != null && destinationId !== sourceId) {
+    selectedParentFolder.value = null
+  }
+})
+
+onMounted(async () => {
+  notebooksLoadError.value = undefined
+  try {
+    const { data, error } = await apiCallWithLoading(() =>
+      NotebookController.myNotebooks({})
+    )
+    if (error || !data) throw new Error("Failed to load notebooks")
+    destinationCatalogItems.value = data.catalogItems
+    if (
+      selectedDestinationNotebookId.value == null &&
+      sourceNotebookId.value != null
+    ) {
+      selectedDestinationNotebookId.value = sourceNotebookId.value
+    }
+  } catch (e: unknown) {
+    notebooksLoadError.value =
+      toOpenApiError(e).message ?? "Failed to load notebooks"
+  } finally {
+    notebooksLoading.value = false
+  }
+})
 
 watch(
   () => folderForView.value?.folder.id,
@@ -246,34 +345,54 @@ const submitRename = async () => {
   }
 }
 
+function buildMoveBody(merge: boolean) {
+  if (isCrossNotebookMove.value) {
+    return {
+      destinationNotebookId: selectedDestinationNotebookId.value,
+      merge,
+    }
+  }
+  if (selectedParentFolder.value == null) {
+    return { merge }
+  }
+  return { newParentFolderId: selectedParentFolder.value.id, merge }
+}
+
 const submitMove = async (merge = false) => {
   const r = folderForView.value
   if (processing.value || r == null) return
   processing.value = true
   moveError.value = undefined
+  const destinationNotebookId =
+    selectedDestinationNotebookId.value ?? r.notebookRealm.notebook.id
   try {
-    const body =
-      selectedParentFolder.value == null
-        ? { merge }
-        : { newParentFolderId: selectedParentFolder.value.id, merge }
     const moveResult = await apiCallWithLoading(() =>
       NotebookController.moveFolder({
         path: {
           notebook: r.notebookRealm.notebook.id,
           folder: r.folder.id,
         },
-        body,
+        body: buildMoveBody(merge),
       })
     )
     throwIfSdkError(moveResult)
     refreshSidebarStructuralListings()
-    const notebookId = r.notebookRealm.notebook.id
     if (merge && moveResult.data) {
       await router.push({
         name: "folderPage",
         params: {
-          notebookId: String(notebookId),
+          notebookId: String(destinationNotebookId),
           folderId: String(moveResult.data.id),
+        },
+      })
+      return
+    }
+    if (isCrossNotebookMove.value) {
+      await router.push({
+        name: "folderPage",
+        params: {
+          notebookId: String(destinationNotebookId),
+          folderId: String(r.folder.id),
         },
       })
       return

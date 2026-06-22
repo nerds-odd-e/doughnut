@@ -1,3 +1,5 @@
+import type { Notebook } from "@generated/doughnut-backend-api"
+import type { NotebookCatalogEntry } from "@/components/notebook/patchNotebookInCatalogItems"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import FolderPage from "@/pages/FolderPage.vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
@@ -12,20 +14,40 @@ export function createFolderPageRouter() {
   return createRouter({ history: createWebHistory(), routes })
 }
 
-export function stubFolderPageListingMocks() {
+export function stubFolderPageListingMocks(
+  catalogItems: NotebookCatalogEntry[]
+) {
   mockSdkService(NotebookController, "listNotebookFolderIndex", [])
   mockSdkService(NotebookController, "listNotebookFolderListing", {
     folders: [],
   })
+  mockSdkService(NotebookController, "myNotebooks", {
+    notebooks: [],
+    catalogItems,
+    subscriptions: [],
+  })
+}
+
+export type MountFolderPageOptions = {
+  fetchFolderPage?: ReturnType<typeof vi.fn>
+  extraNotebooks?: Notebook[]
 }
 
 export function mountFolderPage(
   router: Router,
   folderId: number,
   folderName: string,
-  fetchFolderPage = vi.fn().mockResolvedValue(undefined)
+  options: MountFolderPageOptions = {}
 ) {
+  const fetchFolderPage =
+    options.fetchFolderPage ?? vi.fn().mockResolvedValue(undefined)
+  const extraNotebooks = options.extraNotebooks ?? []
   const folderRealm = makeMe.aFolderRealm.folder(folderId, folderName).please()
+  stubFolderPageListingMocks(
+    makeMe.notebookCatalog
+      .notebooks(folderRealm.notebookRealm.notebook, ...extraNotebooks)
+      .please()
+  )
   const wrapper = helper
     .component(FolderPage)
     .withCleanStorage()
@@ -39,6 +61,16 @@ export async function submitMoveForm(wrapper: VueWrapper) {
   await wrapper
     .find('[data-testid="folder-move-dialog"] form')
     .trigger("submit")
+  await flushPromises()
+}
+
+export async function selectDestinationNotebook(
+  wrapper: VueWrapper,
+  notebookId: number
+) {
+  await wrapper
+    .get('[data-testid="folder-move-notebook-select"]')
+    .setValue(String(notebookId))
   await flushPromises()
 }
 

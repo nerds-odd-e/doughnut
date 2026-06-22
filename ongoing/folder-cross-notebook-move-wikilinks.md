@@ -302,7 +302,7 @@ Complete moved-set-aware link correctness for links leaving the moved subtree.
   `NotebookFolderManagementControllerTest`. Phase 10 can expose cross-notebook
   folder move in the UI.
 
-### Phase 10 — UI can move a folder to another notebook root (Behavior)
+### Phase 10 — UI can move a folder to another notebook root (Behavior) — done
 
 Expose the safe root-destination workflow after backend link correctness exists.
 
@@ -321,6 +321,13 @@ Expose the safe root-destination workflow after backend link correctness exists.
 - Tests: frontend unit tests in `FolderPage.spec.ts`; Cypress scenario in
   `folder_organization/folder_organization.feature`.
 - Verification: targeted frontend test and touched Cypress feature.
+- Done: `FolderPage.vue` loads destination notebooks from `myNotebooks`, defaults
+  to the source notebook, hides the folder picker for cross-notebook root moves,
+  sends `destinationNotebookId` on submit, and navigates to the moved folder in
+  the destination notebook. Unit coverage in `FolderPage.spec.ts`; E2E in
+  `folder_organization.feature` verifies inbound/outgoing boundary wiki links after
+  a cross-notebook root move. Phase 11 can add non-root destination folders and
+  merge confirmation for cross-notebook moves.
 
 ### Phase 11 — UI can move a folder into another notebook's folder and merge conflicts (Behavior)
 

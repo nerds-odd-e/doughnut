@@ -68,3 +68,26 @@ Feature: Folder organization
     And I activate folder "Beta" under the open folder "Alpha" in the sidebar
     And I move folder "Beta" under "Alpha" to folder "Gamma" using folder search on the folder page
     Then I should see sidebar folder "Beta" under collapsed folder "Gamma"
+
+  @mockBrowserTime
+  Scenario: Moving a folder to another notebook root keeps boundary wiki links correct
+    Given I have a notebook "FolderXMove Old NB" with notes:
+      | Title   | Content                 | Folder                   |
+      | Target  | old notebook target     | FolderXMove Root         |
+      | Carrier | Read [[Target]].        | FolderXMove Root/Moved   |
+      | Ref     | See [[Carrier]].        | FolderXMove Root         |
+    And I have a notebook "FolderXMove New NB" with a note "Placeholder" and content "dest"
+    When I view note "Carrier"
+    And I activate folder "Moved" under the open folder "FolderXMove Root" in the sidebar
+    And I move folder "Moved" under "FolderXMove Root" to notebook "FolderXMove New NB" root using the folder page
+    Then I should see sidebar folder "Moved"
+    When I route to the note "Carrier"
+    And I view the note content as markdown
+    Then the note content markdown source should contain "[[FolderXMove Old NB:Target|Target]]"
+    When I route to the note "Ref"
+    And I view the note content as markdown
+    Then the note content markdown source should contain "[[FolderXMove New NB:Carrier|Carrier]]"
+    When I route to the note "Carrier"
+    And I view the note content as rich content
+    Then the link "Target" should open the note titled "Target"
+    And the note content on the current page should be "old notebook target"
