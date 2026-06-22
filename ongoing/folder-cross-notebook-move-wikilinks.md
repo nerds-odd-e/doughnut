@@ -202,7 +202,7 @@ Generalize the backend destination from notebook root to a target parent folder.
   coverage in `NotebookFolderManagementControllerTest`. Phase 6 can add destination
   conflict reporting for cross-notebook moves.
 
-### Phase 6 — Cross-notebook folder move reports destination conflicts (Behavior)
+### Phase 6 — Cross-notebook folder move reports destination conflicts (Behavior) — done
 
 Make the no-merge conflict behavior match existing same-notebook folder moves.
 
@@ -219,6 +219,11 @@ Make the no-merge conflict behavior match existing same-notebook folder moves.
 - Tests: `NotebookFolderManagementControllerTest` conflict cases for root,
   target-folder, and soft-deleted-title placement.
 - Verification: targeted backend test.
+- Done: `moveFolderToAnotherNotebook` validates destination sibling folder names via
+  `folderSiblingNameValidation` and soft-deleted note title placement via
+  `requireNoSoftDeletedTitlesInSubtree` before any mutations. Controller coverage in
+  `NotebookFolderManagementControllerTest`. Phase 7 can add merge-on-confirm for
+  cross-notebook moves.
 
 ### Phase 7 — Cross-notebook folder move can merge on confirmation (Behavior)
 

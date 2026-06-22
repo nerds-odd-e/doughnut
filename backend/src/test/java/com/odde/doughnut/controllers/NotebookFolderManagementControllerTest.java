@@ -6,14 +6,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.FolderCreationRequest;
 import com.odde.doughnut.controllers.dto.FolderListing;
 import com.odde.doughnut.controllers.dto.FolderMoveRequest;
 import com.odde.doughnut.controllers.dto.FolderRenameRequest;
+import com.odde.doughnut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -372,6 +375,79 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       req.setNewParentFolderId(parentP.getId());
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.moveFolder(nbA, folderF, req));
+    }
+
+    @Test
+    void rejectsDuplicateNameAtDestinationNotebookRoot() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nbA = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Notebook nbB = makeMe.aNotebook().creatorAndOwner(owner).please();
+      makeMe.aFolder().notebook(nbB).name("Dup").please();
+      Folder holder = makeMe.aFolder().notebook(nbA).name("Holder").please();
+      Folder nestedDup = makeMe.aFolder().parentFolder(holder).name("Dup").please();
+
+      FolderMoveRequest req = new FolderMoveRequest();
+      req.setDestinationNotebookId(nbB.getId());
+      req.setNewParentFolderId(null);
+      ResponseStatusException ex =
+          assertThrows(
+              ResponseStatusException.class, () -> controller.moveFolder(nbA, nestedDup, req));
+      assertEquals(HttpStatus.CONFLICT, ex.getStatusCode());
+      assertThat(ex.getReason(), equalTo("A folder with this name already exists here."));
+      makeMe.refresh(nestedDup);
+      assertThat(nestedDup.getNotebook().getId(), equalTo(nbA.getId()));
+    }
+
+    @Test
+    void rejectsDuplicateNameAtDestinationParentFolder() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nbA = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Notebook nbB = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder parentP = makeMe.aFolder().notebook(nbB).name("P").please();
+      makeMe.aFolder().parentFolder(parentP).name("F").please();
+      Folder folderF = makeMe.aFolder().notebook(nbA).name("F").please();
+
+      FolderMoveRequest req = new FolderMoveRequest();
+      req.setDestinationNotebookId(nbB.getId());
+      req.setNewParentFolderId(parentP.getId());
+      ResponseStatusException ex =
+          assertThrows(
+              ResponseStatusException.class, () -> controller.moveFolder(nbA, folderF, req));
+      assertEquals(HttpStatus.CONFLICT, ex.getStatusCode());
+      assertThat(ex.getReason(), equalTo("A folder with this name already exists here."));
+      makeMe.refresh(folderF);
+      assertThat(folderF.getNotebook().getId(), equalTo(nbA.getId()));
+      assertThat(folderF.getParentFolder(), nullValue());
+    }
+
+    @Test
+    void rejectsCrossNotebookMoveWhenSoftDeletedNoteHasSameTitleAtDestination()
+        throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nbA = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Notebook nbB = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folderF = makeMe.aFolder().notebook(nbB).name("F").please();
+      Note deleted = makeMe.aNote().folder(folderF).title("DupTitle").please();
+      noteService.destroy(deleted, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, owner);
+
+      FolderMoveRequest moveToA = new FolderMoveRequest();
+      moveToA.setDestinationNotebookId(nbA.getId());
+      controller.moveFolder(nbB, folderF, moveToA);
+
+      makeMe.aNote().folder(folderF).title("DupTitle").please();
+
+      FolderMoveRequest moveBackToB = new FolderMoveRequest();
+      moveBackToB.setDestinationNotebookId(nbB.getId());
+      ApiException ex =
+          assertThrows(ApiException.class, () -> controller.moveFolder(nbA, folderF, moveBackToB));
+      assertThat(
+          ex.getErrorBody().getErrorType(),
+          equalTo(ApiError.ErrorType.SOFT_DELETED_TITLE_CONFLICT));
+      assertThat(
+          ex.getErrorBody().getErrors().get("deletedNoteId"),
+          equalTo(String.valueOf(deleted.getId())));
+      makeMe.refresh(folderF);
+      assertThat(folderF.getNotebook().getId(), equalTo(nbA.getId()));
     }
 
     @Test

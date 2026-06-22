@@ -100,8 +100,10 @@ public class FolderRelocationService {
     folderSiblingNameValidation.requireNoConflictingSibling(
         destinationNotebook.getId(), destParentId, folder.getName(), folder.getId());
 
-    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     List<Folder> subtreeFolders = collectSubtreeFolders(folder);
+    requireNoSoftDeletedTitlesInSubtree(destinationNotebook, subtreeFolders);
+
+    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     for (Folder subtreeFolder : subtreeFolders) {
       subtreeFolder.setNotebook(destinationNotebook);
       subtreeFolder.setUpdatedAt(now);
@@ -133,6 +135,16 @@ public class FolderRelocationService {
   private void requireNewParentInNotebook(Folder newParent, Notebook notebook) {
     if (!newParent.getNotebook().getId().equals(notebook.getId())) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Parent folder not in notebook.");
+    }
+  }
+
+  private void requireNoSoftDeletedTitlesInSubtree(
+      Notebook destinationNotebook, List<Folder> subtreeFolders) {
+    for (Folder subtreeFolder : subtreeFolders) {
+      for (Note note : noteRepository.findNotesInFolderOrderByIdAsc(subtreeFolder.getId())) {
+        noteTitlePlacementRules.requireNoSoftDeletedTitleAt(
+            destinationNotebook, subtreeFolder, note.getTitle());
+      }
     }
   }
 
