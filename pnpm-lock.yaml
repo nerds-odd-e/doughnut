@@ -307,8 +307,8 @@ importers:
         specifier: workspace:*
         version: link:../packages/doughnut-test-fixtures
       es-toolkit:
-        specifier: ^1.47.1
-        version: 1.47.1
+        specifier: ^1.48.1
+        version: 1.48.1
       esbuild:
         specifier: '>=0.28.1'
         version: 0.28.1
@@ -3370,6 +3370,9 @@ packages:
 
   es-toolkit@1.47.1:
     resolution: {integrity: sha512-5RAqEwf4P4E17p+W75KLOWw/nOvKZzSQpxM32IpI2KZLaVonjTrZ0Ai5ghMaVI9eKC2p8eoQgcBdkEDgzFk6+Q==}
+
+  es-toolkit@1.48.1:
+    resolution: {integrity: sha512-wfnXlwd5I75eXRtdD2vuEs50xHHESECDsGD7yiQnfFVNoa5522NwXEbmgo98LfiukSQHs+mBM7/YG3qKJB9/mQ==}
 
   es5-ext@0.10.64:
     resolution: {integrity: sha512-p2snDhiLaXe6dahss1LddxqEm+SkuDvV8dnIQG0MWjyHpcMNfXKPE+/Cc0y+PhxJX3A4xGNeFCj5oc0BUh6deg==}
@@ -9578,6 +9581,8 @@ snapshots:
       hasown: 2.0.4
 
   es-toolkit@1.47.1: {}
+
+  es-toolkit@1.48.1: {}
 
   es5-ext@0.10.64:
     dependencies:
