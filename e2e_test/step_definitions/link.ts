@@ -12,3 +12,14 @@ When(
     start.assumeNotePage().insertWikiLinkToNote(targetNoteTitle)
   }
 )
+
+When(
+  'I move the current note to notebook {string} root via the link toolbar',
+  (notebookName: string) => {
+    start
+      .assumeNotePage()
+      .startSearchingAndAddRelationship()
+      .findTarget(notebookName)
+      .moveToNotebookRoot(notebookName)
+  }
+)

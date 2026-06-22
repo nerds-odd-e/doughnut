@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.algorithms.WikiLinkMarkdown;
 import com.odde.doughnut.controllers.dto.TitleRenameReferenceHandling;
 import com.odde.doughnut.controllers.dto.WikiTitle;
@@ -252,6 +253,27 @@ public class WikiTitleCacheService {
     UnaryOperator<String> fn =
         lt -> WikiLinkMarkdown.newInnerForKeepNotebookMove(lt, newNotebookName);
     rewriteInboundWikiLinks(targetNote, updatedAt, viewer, fn);
+  }
+
+  /**
+   * Rewrites a moved note's own unqualified outgoing wiki links so they keep pointing at its source
+   * notebook after the note moves to another notebook.
+   */
+  @Transactional
+  public void rewriteOutgoingWikiLinksForNotebookMove(
+      Note movedNote, String sourceNotebookName, Timestamp updatedAt, User viewer) {
+    String content = movedNote.getContent() != null ? movedNote.getContent() : "";
+    LinkedHashSet<String> linkTexts =
+        new LinkedHashSet<>(NoteContentMarkdown.wikiLinkInnersInOccurrenceOrder(content));
+    for (String linkText : linkTexts) {
+      String newInner =
+          WikiLinkMarkdown.newInnerForQualifyUnqualifiedOutgoingLink(linkText, sourceNotebookName);
+      content = WikiLinkMarkdown.replaceWikiLinksMatchingTrimmedInner(content, linkText, newInner);
+    }
+    movedNote.setContent(content);
+    movedNote.setUpdatedAt(updatedAt);
+    entityPersister.save(movedNote);
+    refreshForNote(movedNote, viewer);
   }
 
   private void rewriteInboundWikiLinks(

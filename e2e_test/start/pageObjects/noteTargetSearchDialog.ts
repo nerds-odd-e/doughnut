@@ -134,6 +134,18 @@ export const assumeNoteTargetSearchDialog = () => {
       cy.findByRole('button', { name: 'OK' }).click()
       pageIsNotLoading()
     },
+    moveToNotebookRoot(notebookName: string) {
+      cy.get('[role=listitem]')
+        .filter((_, el) => {
+          const t = el.querySelector('.notebook-hit-title')
+          return t?.textContent?.trim() === notebookName
+        })
+        .should('have.length', 1)
+        .findByRole('button', { name: 'Move to notebook root' })
+        .click()
+      cy.findByRole('button', { name: 'OK' }).click()
+      pageIsNotLoading()
+    },
     createRelationshipToTargetAs(toNoteTopic: string, relationType: string) {
       clickAddLinkOnRelationshipTargetNote(toNoteTopic)
       cy.findByRole('button', { name: 'Add a new relationship note' }).click()

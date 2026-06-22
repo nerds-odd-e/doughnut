@@ -34,6 +34,23 @@ Feature: Wiki links in notes
       | a   | WikiCross Tgt NB:WikiCross Deep    |
     And the link "WikiCross Tgt NB:WikiCross Deep" should open the note titled "WikiCross Deep"
 
+  @mockBrowserTime
+  Scenario: Moving a note across notebooks keeps outgoing links pointed at the old notebook
+    Given I have a notebook "WikiMove Old NB" with notes:
+      | Title            | Content                                                                | Folder            |
+      | WikiMove Target  | old notebook target                                                    | WikiMove Old Root |
+      | WikiMove Carrier | Read [[WikiMove Target]] and [[WikiMove Other NB:WikiMove Qualified]]. | WikiMove Old Root |
+    And I have a notebook "WikiMove Other NB" with a note "WikiMove Qualified" and content "qualified notebook target"
+    And I have a notebook "WikiMove New NB" with a note "WikiMove Target" and content "new notebook target"
+    When I route to the note "WikiMove Carrier"
+    And I move the current note to notebook "WikiMove New NB" root via the link toolbar
+    And I view the note content as markdown
+    Then the note content markdown source should contain "[[WikiMove Old NB:WikiMove Target|WikiMove Target]]"
+    And the note content markdown source should contain "[[WikiMove Other NB:WikiMove Qualified]]"
+    When I view the note content as rich content
+    Then the link "WikiMove Target" should open the note titled "WikiMove Target"
+    And the note content on the current page should be "old notebook target"
+
   Scenario: A dead wiki link is shown and can create the missing note
     When I update note "WikiLinks E2E CI" content using markdown to become:
       """

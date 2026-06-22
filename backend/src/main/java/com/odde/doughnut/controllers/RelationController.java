@@ -76,14 +76,17 @@ class RelationController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(sourceNote);
     authorizationService.assertAuthorization(targetNotebook);
-    Integer oldNotebookId =
-        sourceNote.getNotebook() != null ? sourceNote.getNotebook().getId() : null;
+    Notebook oldNotebook = sourceNote.getNotebook();
+    Integer oldNotebookId = oldNotebook != null ? oldNotebook.getId() : null;
+    String oldNotebookName = oldNotebook != null ? oldNotebook.getName() : null;
     noteMotionService.executeMoveToNotebookRoot(sourceNote, targetNotebook);
     User user = authorizationService.getCurrentUser();
     if (!Objects.equals(oldNotebookId, targetNotebook.getId())) {
       Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
       wikiTitleCacheService.rewriteInboundWikiLinksForNotebookMove(
           sourceNote, targetNotebook.getName(), currentUTCTimestamp, user);
+      wikiTitleCacheService.rewriteOutgoingWikiLinksForNotebookMove(
+          sourceNote, oldNotebookName, currentUTCTimestamp, user);
     }
     return List.of(noteRealmService.build(sourceNote, user));
   }

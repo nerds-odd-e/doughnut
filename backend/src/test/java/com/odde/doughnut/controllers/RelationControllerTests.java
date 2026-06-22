@@ -190,6 +190,33 @@ class RelationControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void crossNotebookMove_rewritesMovedNotesOutgoingUnqualifiedLinks()
+        throws UnexpectedNoAccessRightException {
+      User u = currentUser.getUser();
+      Notebook nb1 = makeMe.aNotebook().name("OldNb").creatorAndOwner(u).please();
+      Notebook nb2 = makeMe.aNotebook().name("NewNb").creatorAndOwner(u).please();
+      Notebook nb3 = makeMe.aNotebook().name("OtherNb").creatorAndOwner(u).please();
+      Note oldTarget = makeMe.aNote("X").notebook(nb1).please();
+      makeMe.aNote("X").notebook(nb2).please();
+      Note qualifiedTarget = makeMe.aNote("Y").notebook(nb3).please();
+      Note mover = makeMe.aNote("Mover").notebook(nb1).please();
+      mover.setContent("See [[X]] and [[OtherNb:Y]].");
+      makeMe.entityPersister.flush();
+      wikiTitleCacheServiceBean.refreshForNote(mover, u);
+      makeMe.entityPersister.flush();
+
+      controller.moveNoteToNotebookRootInNotebook(mover, nb2);
+
+      makeMe.refresh(mover);
+      assertThat(mover.getContent(), equalTo("See [[OldNb:X|X]] and [[OtherNb:Y]]."));
+      assertThat(
+          wikiTitleCacheServiceBean.wikiTitlesForViewer(mover, u).stream()
+              .map(wt -> wt.getNoteId())
+              .toList(),
+          containsInAnyOrder(oldTarget.getId(), qualifiedTarget.getId()));
+    }
+
+    @Test
     void crossNotebookMove_doesNotRewriteWhenNotebookUnchanged()
         throws UnexpectedNoAccessRightException {
       User u = currentUser.getUser();

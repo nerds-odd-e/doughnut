@@ -91,7 +91,7 @@ Prepare the immediate next behavior without changing any move behavior.
   inners unchanged. Phase 2 can use this helper when rewriting a moved note's
   outgoing links.
 
-### Phase 2 — Note root move preserves outgoing links (Behavior)
+### Phase 2 — Note root move preserves outgoing links (Behavior) — done
 
 The root-move path already fixes inbound links; add the missing outgoing half.
 
@@ -108,6 +108,12 @@ The root-move path already fixes inbound links; add the missing outgoing half.
   `note_topology/link.feature` for "move note across notebooks, then outgoing link
   still opens old-notebook target".
 - Verification: targeted backend test and the touched Cypress feature.
+- Done: `WikiTitleCacheService.rewriteOutgoingWikiLinksForNotebookMove` now
+  qualifies a moved note's unqualified outgoing links back to the source
+  notebook and refreshes its cache/property index. The root notebook move calls it
+  only for cross-notebook moves after the existing inbound rewrite, so existing
+  inbound rewriting remains covered. Phase 3 can reuse the same method for
+  note-to-folder cross-notebook moves.
 
 ### Phase 3 — Note-to-folder cross-notebook move preserves links (Behavior)
 
