@@ -121,6 +121,17 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
           instructions.contains("simple standalone wiki-link-only lines"),
           Matchers.is(true));
       MatcherAssert.assertThat(
+          "Instructions should scope layout to Focus Note content only",
+          instructions.contains("Focus Note content only")
+              && instructions.contains("only source for layout items"),
+          Matchers.is(true));
+      MatcherAssert.assertThat(
+          "Instructions should treat Retrieved Notes as secondary context",
+          instructions.contains("Retrieved Notes are secondary context only")
+              && instructions.contains(
+                  "do not add layout items for content that appears only in Retrieved Notes"),
+          Matchers.is(true));
+      MatcherAssert.assertThat(
           "Should use Responses structured text format",
           params.rawParams().text().flatMap(ResponseTextConfig::format).isPresent(),
           Matchers.is(true));

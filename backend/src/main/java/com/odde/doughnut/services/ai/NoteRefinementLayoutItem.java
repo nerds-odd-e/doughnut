@@ -22,7 +22,8 @@ public class NoteRefinementLayoutItem {
 
   @NotBlank
   @JsonProperty(required = true)
-  @JsonPropertyDescription("The current note content represented by this layout item.")
+  @JsonPropertyDescription(
+      "The Focus Note content represented by this layout item. Do not represent content that appears only in Retrieved Notes.")
   public String text;
 
   @JsonProperty(required = true)

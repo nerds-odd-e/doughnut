@@ -11,7 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @JsonClassDescription(
-    "A single current-content layout of the note, with at most top-level items and one level of child items. Do not return alternative layouts or suggestions.")
+    "A single current-content layout of the Focus Note, with at most top-level items and one level of child items. Items must cover Focus Note content only, not Retrieved Notes. Do not return alternative layouts or suggestions.")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,7 +20,7 @@ public class NoteRefinementLayout {
   @NotNull
   @JsonProperty(required = true)
   @JsonPropertyDescription(
-      "The one layout for the current note content. Items may have children, but children must not have children. Return an empty array for blank or unavailable content.")
+      "The one layout for the Focus Note content only. Items may have children, but children must not have children. Return an empty array for blank or unavailable content.")
   public List<NoteRefinementLayoutItem> items = List.of();
 
   public static NoteRefinementLayout empty() {
