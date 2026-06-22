@@ -50,28 +50,17 @@ public class FolderRelocationService {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
     }
     if (destinationNotebook != null && !destinationNotebook.getId().equals(notebook.getId())) {
-      return moveFolderToAnotherNotebookRoot(folder, request, destinationNotebook);
+      return moveFolderToAnotherNotebook(folder, request, destinationNotebook);
     }
     return moveFolderWithinNotebook(notebook, folder, request);
   }
 
   private Folder moveFolderWithinNotebook(
       Notebook notebook, Folder folder, FolderMoveRequest request) {
-    Integer newParentFolderId = request != null ? request.getNewParentFolderId() : null;
-    Folder newParent = null;
-    if (newParentFolderId != null) {
-      newParent =
-          folderRepository
-              .findById(newParentFolderId)
-              .orElseThrow(
-                  () ->
-                      new ResponseStatusException(
-                          HttpStatus.NOT_FOUND, "Parent folder not found."));
-      if (!newParent.getNotebook().getId().equals(notebook.getId())) {
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Parent folder not in notebook.");
-      }
+    Folder newParent = resolveNewParentFolder(request);
+    if (newParent != null) {
+      requireNewParentInNotebook(newParent, notebook);
     }
-
     FolderMoveDestinationRules.requireNotMovingIntoSelfOrDescendant(folder, newParent);
 
     Integer destParentId = newParent == null ? null : newParent.getId();
@@ -99,15 +88,17 @@ public class FolderRelocationService {
     return folder;
   }
 
-  private Folder moveFolderToAnotherNotebookRoot(
+  private Folder moveFolderToAnotherNotebook(
       Folder folder, FolderMoveRequest request, Notebook destinationNotebook) {
-    Integer newParentFolderId = request != null ? request.getNewParentFolderId() : null;
-    if (newParentFolderId != null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Parent folder not in notebook.");
+    Folder newParent = resolveNewParentFolder(request);
+    if (newParent != null) {
+      FolderMoveDestinationRules.requireNotMovingIntoSelfOrDescendant(folder, newParent);
+      requireNewParentInNotebook(newParent, destinationNotebook);
     }
 
+    Integer destParentId = newParent == null ? null : newParent.getId();
     folderSiblingNameValidation.requireNoConflictingSibling(
-        destinationNotebook.getId(), null, folder.getName(), folder.getId());
+        destinationNotebook.getId(), destParentId, folder.getName(), folder.getId());
 
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     List<Folder> subtreeFolders = collectSubtreeFolders(folder);
@@ -120,12 +111,29 @@ public class FolderRelocationService {
         entityPersister.merge(note);
       }
     }
-    folder.setParentFolder(null);
+    folder.setParentFolder(newParent);
     folder.setUpdatedAt(now);
     entityPersister.flush();
     entityPersister.merge(folder);
     entityPersister.flush();
     return folder;
+  }
+
+  private Folder resolveNewParentFolder(FolderMoveRequest request) {
+    Integer newParentFolderId = request != null ? request.getNewParentFolderId() : null;
+    if (newParentFolderId == null) {
+      return null;
+    }
+    return folderRepository
+        .findById(newParentFolderId)
+        .orElseThrow(
+            () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Parent folder not found."));
+  }
+
+  private void requireNewParentInNotebook(Folder newParent, Notebook notebook) {
+    if (!newParent.getNotebook().getId().equals(notebook.getId())) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Parent folder not in notebook.");
+    }
   }
 
   private List<Folder> collectSubtreeFolders(Folder root) {

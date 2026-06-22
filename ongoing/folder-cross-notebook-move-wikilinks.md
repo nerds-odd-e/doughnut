@@ -177,7 +177,7 @@ expose it in the UI yet.
   `NotebookFolderManagementControllerTest`. Phase 5 can generalize the destination
   to a target parent folder in another notebook.
 
-### Phase 5 — Folder subtree can move into a folder in another notebook (Behavior)
+### Phase 5 — Folder subtree can move into a folder in another notebook (Behavior) — done
 
 Generalize the backend destination from notebook root to a target parent folder.
 
@@ -195,6 +195,12 @@ Generalize the backend destination from notebook root to a target parent folder.
 - Tests: `NotebookFolderManagementControllerTest` for cross-notebook target
   parent, unauthorized target parent, and self/descendant rejection.
 - Verification: targeted backend test.
+- Done: `moveFolderToAnotherNotebook` accepts `newParentFolderId` in the destination
+  notebook when `destinationNotebookId` is set; self/descendant validation runs
+  before parent-in-notebook checks. Legacy same-notebook moves without
+  `destinationNotebookId` still reject a parent in another notebook. Controller
+  coverage in `NotebookFolderManagementControllerTest`. Phase 6 can add destination
+  conflict reporting for cross-notebook moves.
 
 ### Phase 6 — Cross-notebook folder move reports destination conflicts (Behavior)
 

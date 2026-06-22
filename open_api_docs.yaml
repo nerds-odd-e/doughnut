@@ -1028,9 +1028,9 @@ paths:
       - notebook-controller
       summary: Move a folder
       description: "Reparents the folder within the same notebook, or moves the folder\
-        \ subtree to another notebook's root when destinationNotebookId is set. Notes\
-        \ keep their folderId pointing at the same folder rows; descendant folders\
-        \ stay under the moved subtree."
+        \ subtree to another notebook when destinationNotebookId is set. Notes keep\
+        \ their folderId pointing at the same folder rows; descendant folders stay\
+        \ under the moved subtree."
       operationId: moveFolder
       parameters:
       - name: notebook
@@ -3740,8 +3740,8 @@ components:
     FolderMoveRequest:
       type: object
       description: "Move a folder to a new parent in the same notebook, or to another\
-        \ notebook's root when destinationNotebookId is set. Omit newParentFolderId\
-        \ or set it to null to place the folder at notebook root."
+        \ notebook when destinationNotebookId is set. Omit newParentFolderId or set\
+        \ it to null to place the folder at notebook root."
       properties:
         newParentFolderId:
           type: integer
@@ -3751,9 +3751,8 @@ components:
         destinationNotebookId:
           type: integer
           format: int32
-          description: "Destination notebook id for a cross-notebook move to that\
-            \ notebook's root. When null or omitted, the folder stays in the path\
-            \ notebook."
+          description: "Destination notebook id for a cross-notebook move. When null\
+            \ or omitted, the folder stays in the path notebook."
         merge:
           type: boolean
           description: "When true, merges the folder into an existing same-name sibling\

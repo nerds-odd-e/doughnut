@@ -407,7 +407,7 @@ export type FolderCreationRequest = {
 };
 
 /**
- * Move a folder to a new parent in the same notebook, or to another notebook's root when destinationNotebookId is set. Omit newParentFolderId or set it to null to place the folder at notebook root.
+ * Move a folder to a new parent in the same notebook, or to another notebook when destinationNotebookId is set. Omit newParentFolderId or set it to null to place the folder at notebook root.
  */
 export type FolderMoveRequest = {
     /**
@@ -415,7 +415,7 @@ export type FolderMoveRequest = {
      */
     newParentFolderId?: number;
     /**
-     * Destination notebook id for a cross-notebook move to that notebook's root. When null or omitted, the folder stays in the path notebook.
+     * Destination notebook id for a cross-notebook move. When null or omitted, the folder stays in the path notebook.
      */
     destinationNotebookId?: number;
     /**

@@ -167,7 +167,7 @@ class NotebookController {
       summary = "Move a folder",
       description =
           "Reparents the folder within the same notebook, or moves the folder subtree to another"
-              + " notebook's root when destinationNotebookId is set. Notes keep their folderId"
+              + " notebook when destinationNotebookId is set. Notes keep their folderId"
               + " pointing at the same folder rows; descendant folders stay under the moved"
               + " subtree.")
   @PostMapping("/{notebook}/folders/{folder}/move")
@@ -178,15 +178,7 @@ class NotebookController {
       @Valid @RequestBody(required = false) FolderMoveRequest request)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
-    Notebook destinationNotebook = null;
-    if (request != null && request.getDestinationNotebookId() != null) {
-      destinationNotebook =
-          notebookRepository
-              .findById(request.getDestinationNotebookId())
-              .orElseThrow(
-                  () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notebook not found."));
-      authorizationService.assertAuthorization(destinationNotebook);
-    }
+    Notebook destinationNotebook = resolveDestinationNotebookForFolderMove(request);
     return folderRelocationService.moveFolder(notebook, folder, request, destinationNotebook);
   }
 
@@ -424,6 +416,20 @@ class NotebookController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
     notebookIndexingService.resetNotebookIndex(notebook);
+  }
+
+  private Notebook resolveDestinationNotebookForFolderMove(FolderMoveRequest request)
+      throws UnexpectedNoAccessRightException {
+    if (request == null || request.getDestinationNotebookId() == null) {
+      return null;
+    }
+    Notebook destinationNotebook =
+        notebookRepository
+            .findById(request.getDestinationNotebookId())
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notebook not found."));
+    authorizationService.assertAuthorization(destinationNotebook);
+    return destinationNotebook;
   }
 
   private void assertFolderInNotebook(Notebook notebook, Folder folder) {

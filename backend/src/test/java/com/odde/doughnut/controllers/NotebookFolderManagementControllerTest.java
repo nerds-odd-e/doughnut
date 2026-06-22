@@ -324,6 +324,74 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
     }
 
     @Test
+    void movesFolderSubtreeIntoFolderInAnotherNotebook() throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nbA = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Notebook nbB = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folderF = makeMe.aFolder().notebook(nbA).name("F").please();
+      Folder subfolder = makeMe.aFolder().parentFolder(folderF).name("Child").please();
+      Note noteInF = makeMe.aNote("InF").folder(folderF).please();
+      Note noteInSub = makeMe.aNote("InSub").folder(subfolder).please();
+      Folder parentP = makeMe.aFolder().notebook(nbB).name("P").please();
+
+      FolderMoveRequest req = new FolderMoveRequest();
+      req.setDestinationNotebookId(nbB.getId());
+      req.setNewParentFolderId(parentP.getId());
+      Folder result = controller.moveFolder(nbA, folderF, req);
+
+      assertThat(result.getId(), equalTo(folderF.getId()));
+      makeMe.refresh(folderF);
+      makeMe.refresh(subfolder);
+      makeMe.refresh(noteInF);
+      makeMe.refresh(noteInSub);
+
+      assertThat(folderF.getNotebook().getId(), equalTo(nbB.getId()));
+      assertThat(subfolder.getNotebook().getId(), equalTo(nbB.getId()));
+      assertThat(noteInF.getNotebook().getId(), equalTo(nbB.getId()));
+      assertThat(noteInSub.getNotebook().getId(), equalTo(nbB.getId()));
+      assertThat(folderF.getParentFolder().getId(), equalTo(parentP.getId()));
+
+      FolderListing underP = controller.listNotebookFolderListing(nbB, parentP.getId());
+      assertTrue(underP.folders().stream().anyMatch(f -> f.getId().equals(folderF.getId())));
+      FolderListing rootA = controller.listNotebookFolderListing(nbA, null);
+      assertTrue(rootA.folders().stream().noneMatch(f -> f.getId().equals(folderF.getId())));
+    }
+
+    @Test
+    void rejectsCrossNotebookMoveToTargetParentWithoutDestinationNotebookAccess() {
+      User owner = makeMe.aUser().please();
+      User other = makeMe.aUser().please();
+      Notebook nbA = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Notebook nbB = makeMe.aNotebook().creatorAndOwner(other).please();
+      Folder folderF = makeMe.aFolder().notebook(nbA).name("F").please();
+      Folder parentP = makeMe.aFolder().notebook(nbB).name("P").please();
+
+      currentUser.setUser(owner);
+      FolderMoveRequest req = new FolderMoveRequest();
+      req.setDestinationNotebookId(nbB.getId());
+      req.setNewParentFolderId(parentP.getId());
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> controller.moveFolder(nbA, folderF, req));
+    }
+
+    @Test
+    void rejectsCrossNotebookMoveIntoItself() {
+      User owner = currentUser.getUser();
+      Notebook nbA = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Notebook nbB = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folderF = makeMe.aFolder().notebook(nbA).name("F").please();
+
+      FolderMoveRequest req = new FolderMoveRequest();
+      req.setDestinationNotebookId(nbB.getId());
+      req.setNewParentFolderId(folderF.getId());
+      ResponseStatusException ex =
+          assertThrows(
+              ResponseStatusException.class, () -> controller.moveFolder(nbA, folderF, req));
+      assertEquals(HttpStatus.BAD_REQUEST, ex.getStatusCode());
+      assertThat(ex.getReason(), equalTo("Cannot move folder into itself."));
+    }
+
+    @Test
     void mergesRecursivelyOnNestedNameClash() throws UnexpectedNoAccessRightException {
       User owner = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();

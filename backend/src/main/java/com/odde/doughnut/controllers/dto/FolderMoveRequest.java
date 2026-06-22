@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Schema(
     description =
-        "Move a folder to a new parent in the same notebook, or to another notebook's root when"
+        "Move a folder to a new parent in the same notebook, or to another notebook when"
             + " destinationNotebookId is set. Omit newParentFolderId or set it to null to place"
             + " the folder at notebook root.")
 @Getter
@@ -20,8 +20,8 @@ public class FolderMoveRequest {
 
   @Schema(
       description =
-          "Destination notebook id for a cross-notebook move to that notebook's root. When null"
-              + " or omitted, the folder stays in the path notebook.")
+          "Destination notebook id for a cross-notebook move. When null or omitted, the folder"
+              + " stays in the path notebook.")
   private Integer destinationNotebookId;
 
   @Schema(
