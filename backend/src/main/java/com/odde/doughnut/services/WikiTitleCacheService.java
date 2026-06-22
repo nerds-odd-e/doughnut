@@ -1,31 +1,23 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.algorithms.WikiLinkMarkdown;
-import com.odde.doughnut.controllers.dto.TitleRenameReferenceHandling;
 import com.odde.doughnut.controllers.dto.WikiTitle;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
-import com.odde.doughnut.factoryServices.EntityPersister;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceContext;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiPredicate;
-import java.util.function.UnaryOperator;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,22 +29,16 @@ public class WikiTitleCacheService {
   private final WikiLinkResolver wikiLinkResolver;
   private final NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
   private final AuthorizationService authorizationService;
-  private final JdbcTemplate jdbcTemplate;
-  private final EntityPersister entityPersister;
   private final NotePropertyIndexService notePropertyIndexService;
 
   public WikiTitleCacheService(
       WikiLinkResolver wikiLinkResolver,
       NoteWikiTitleCacheRepository noteWikiTitleCacheRepository,
       AuthorizationService authorizationService,
-      JdbcTemplate jdbcTemplate,
-      EntityPersister entityPersister,
       NotePropertyIndexService notePropertyIndexService) {
     this.wikiLinkResolver = wikiLinkResolver;
     this.noteWikiTitleCacheRepository = noteWikiTitleCacheRepository;
     this.authorizationService = authorizationService;
-    this.jdbcTemplate = jdbcTemplate;
-    this.entityPersister = entityPersister;
     this.notePropertyIndexService = notePropertyIndexService;
   }
 
@@ -219,96 +205,6 @@ public class WikiTitleCacheService {
       return false;
     }
     return viewer.canReferTo(referrerNotebook);
-  }
-
-  /**
-   * Rewrites inbound wiki links and rebuilds each changed referrer's wiki-title cache. Persists the
-   * renamed note's new title first so updated referrer tokens resolve.
-   */
-  @Transactional
-  public void rewriteInboundWikiLinksForTitleRename(
-      Note targetNote,
-      String newTitle,
-      Timestamp updatedAt,
-      User viewer,
-      TitleRenameReferenceHandling handling) {
-    UnaryOperator<String> fn =
-        handling == TitleRenameReferenceHandling.KEEP_VISIBLE_TEXT
-            ? lt -> WikiLinkMarkdown.newInnerForKeepVisibleText(lt, newTitle)
-            : lt -> WikiLinkMarkdown.newInnerForUpdateVisibleText(lt, newTitle);
-    targetNote.setTitle(newTitle);
-    targetNote.setUpdatedAt(updatedAt);
-    entityPersister.save(targetNote);
-    entityManager.flush();
-    rewriteInboundWikiLinks(targetNote, updatedAt, viewer, fn);
-  }
-
-  /**
-   * Rewrites inbound wiki links for a note that has moved to a different notebook. Preserves
-   * visible display text while qualifying all tokens with the new notebook name.
-   */
-  @Transactional
-  public void rewriteInboundWikiLinksForNotebookMove(
-      Note targetNote, String newNotebookName, Timestamp updatedAt, User viewer) {
-    UnaryOperator<String> fn =
-        lt -> WikiLinkMarkdown.newInnerForKeepNotebookMove(lt, newNotebookName);
-    rewriteInboundWikiLinks(targetNote, updatedAt, viewer, fn);
-  }
-
-  /**
-   * Rewrites a moved note's own unqualified outgoing wiki links so they keep pointing at its source
-   * notebook after the note moves to another notebook.
-   */
-  @Transactional
-  public void rewriteOutgoingWikiLinksForNotebookMove(
-      Note movedNote, String sourceNotebookName, Timestamp updatedAt, User viewer) {
-    String content = movedNote.getContent() != null ? movedNote.getContent() : "";
-    LinkedHashSet<String> linkTexts =
-        new LinkedHashSet<>(NoteContentMarkdown.wikiLinkInnersInOccurrenceOrder(content));
-    for (String linkText : linkTexts) {
-      String newInner =
-          WikiLinkMarkdown.newInnerForQualifyUnqualifiedOutgoingLink(linkText, sourceNotebookName);
-      content = WikiLinkMarkdown.replaceWikiLinksMatchingTrimmedInner(content, linkText, newInner);
-    }
-    movedNote.setContent(content);
-    movedNote.setUpdatedAt(updatedAt);
-    entityPersister.save(movedNote);
-    refreshForNote(movedNote, viewer);
-  }
-
-  private void rewriteInboundWikiLinks(
-      Note targetNote,
-      Timestamp updatedAt,
-      User viewer,
-      UnaryOperator<String> newInnerFromLinkText) {
-    Integer targetId = targetNote.getId();
-    List<NoteWikiTitleCache> rows =
-        noteWikiTitleCacheRepository.findRowsReferringToNonDeletedNotesForTarget(targetId);
-
-    Map<Integer, LinkedHashSet<String>> linkTextsByReferrer = new LinkedHashMap<>();
-    for (NoteWikiTitleCache row : rows) {
-      linkTextsByReferrer
-          .computeIfAbsent(row.getNote().getId(), _ -> new LinkedHashSet<>())
-          .add(row.getLinkText());
-    }
-    List<Integer> referrerIds = new ArrayList<>(linkTextsByReferrer.keySet());
-    Collections.sort(referrerIds);
-    for (Integer referrerId : referrerIds) {
-      Note referrer = entityManager.find(Note.class, referrerId);
-      if (referrer == null || referrer.getDeletedAt() != null) {
-        continue;
-      }
-      String content = referrer.getContent() != null ? referrer.getContent() : "";
-      for (String linkText : linkTextsByReferrer.get(referrerId)) {
-        String newInner = newInnerFromLinkText.apply(linkText);
-        content =
-            WikiLinkMarkdown.replaceWikiLinksMatchingTrimmedInner(content, linkText, newInner);
-      }
-      referrer.setContent(content);
-      referrer.setUpdatedAt(updatedAt);
-      entityPersister.save(referrer);
-      refreshForNote(referrer, viewer);
-    }
   }
 
   @Transactional

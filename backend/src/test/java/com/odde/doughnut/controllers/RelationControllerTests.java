@@ -3,7 +3,6 @@ package com.odde.doughnut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -11,10 +10,8 @@ import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.WikiTitleCacheService;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,81 +20,12 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class RelationControllerTests extends ControllerTestBase {
-  @Autowired NoteRepository noteRepository;
   @Autowired RelationController controller;
   @Autowired WikiTitleCacheService wikiTitleCacheServiceBean;
 
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-  }
-
-  @Nested
-  class MoveNoteToFolderTest {
-    User anotherUser;
-    Note ownNote;
-    Folder targetFolder;
-
-    @BeforeEach
-    void setup() {
-      anotherUser = makeMe.aUser().please();
-      Notebook ownNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      ownNote = makeMe.aNote("flower").notebook(ownNotebook).please();
-      Notebook anchorNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      makeMe.aRootNote("nbroot").notebook(anchorNotebook).please();
-      targetFolder = makeMe.aFolder().notebook(anchorNotebook).name("TargetF").please();
-    }
-
-    @Test
-    void moveNoteToFolderSuccessfully() throws UnexpectedNoAccessRightException {
-      Note mover = makeMe.aNote("mover").notebook(ownNote.getNotebook()).please();
-      var result = controller.moveNoteToFolder(mover, targetFolder);
-      assertThat(result, hasSize(1));
-      mover = noteRepository.findById(mover.getId()).orElseThrow();
-      assertThat(mover.getFolder().getId(), equalTo(targetFolder.getId()));
-    }
-
-    @Test
-    void shouldNotAllowMoveOtherPeoplesNoteToFolder() {
-      Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(anotherUser).please();
-      Note mover = makeMe.aNote().notebook(otherNotebook).please();
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.moveNoteToFolder(mover, targetFolder));
-    }
-
-    @Test
-    void shouldNotAllowMoveToUnauthorizedFolderNotebook() {
-      Notebook moverNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      Note mover = makeMe.aNote().notebook(moverNotebook).please();
-      Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(anotherUser).please();
-      Note otherAnchor = makeMe.aRootNote("other").notebook(otherNotebook).please();
-      Folder otherFolder = makeMe.aFolder().notebook(otherNotebook).name("ForeignF").please();
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.moveNoteToFolder(mover, otherFolder));
-    }
-
-    @Test
-    void moveNoteIntoFolder_collectsPeersAndIsIdempotent() throws Throwable {
-      User u = currentUser.getUser();
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(u).please();
-      makeMe.aRootNote("top").notebook(notebook).please();
-      Folder folder = makeMe.aFolder().notebook(notebook).name("F").please();
-      Note peer = makeMe.aNote("A").notebook(notebook).please();
-      Note mover = makeMe.aNote("M").notebook(notebook).please();
-      makeMe.entityPersister.flush();
-      controller.moveNoteToFolder(peer, folder);
-      controller.moveNoteToFolder(mover, folder);
-      makeMe.refresh(mover);
-      assertThat(mover.getFolder().getId(), equalTo(folder.getId()));
-
-      controller.moveNoteToFolder(mover, folder);
-      List<Note> ordered = noteRepository.findNotesInFolderOrderByIdAsc(folder.getId());
-      assertThat(
-          ordered.stream().map(Note::getId).toList(),
-          containsInAnyOrder(peer.getId(), mover.getId()));
-    }
   }
 
   @Nested

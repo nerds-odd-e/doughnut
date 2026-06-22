@@ -9,12 +9,10 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.NoteRealmService;
-import com.odde.doughnut.services.WikiTitleCacheService;
+import com.odde.doughnut.services.WikiLinkRewriteService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.sql.Timestamp;
 import java.util.List;
-import java.util.Objects;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,19 +25,19 @@ class RelationController {
   private final NoteMotionService noteMotionService;
   private final AuthorizationService authorizationService;
   private final NoteRealmService noteRealmService;
-  private final WikiTitleCacheService wikiTitleCacheService;
+  private final WikiLinkRewriteService wikiLinkRewriteService;
   private final TestabilitySettings testabilitySettings;
 
   public RelationController(
       NoteMotionService noteMotionService,
       AuthorizationService authorizationService,
       NoteRealmService noteRealmService,
-      WikiTitleCacheService wikiTitleCacheService,
+      WikiLinkRewriteService wikiLinkRewriteService,
       TestabilitySettings testabilitySettings) {
     this.noteMotionService = noteMotionService;
     this.authorizationService = authorizationService;
     this.noteRealmService = noteRealmService;
-    this.wikiTitleCacheService = wikiTitleCacheService;
+    this.wikiLinkRewriteService = wikiLinkRewriteService;
     this.testabilitySettings = testabilitySettings;
   }
 
@@ -51,8 +49,16 @@ class RelationController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(sourceNote);
     authorizationService.assertAuthorization(targetFolder.getNotebook());
+    Notebook oldNotebook = sourceNote.getNotebook();
+    Notebook targetNotebook = targetFolder.getNotebook();
     noteMotionService.executeMoveIntoFolder(sourceNote, targetFolder);
     User user = authorizationService.getCurrentUser();
+    wikiLinkRewriteService.rewriteWikiLinksForCrossNotebookMove(
+        sourceNote,
+        oldNotebook,
+        targetNotebook,
+        testabilitySettings.getCurrentUTCTimestamp(),
+        user);
     return List.of(noteRealmService.build(sourceNote, user));
   }
 
@@ -77,17 +83,14 @@ class RelationController {
     authorizationService.assertAuthorization(sourceNote);
     authorizationService.assertAuthorization(targetNotebook);
     Notebook oldNotebook = sourceNote.getNotebook();
-    Integer oldNotebookId = oldNotebook != null ? oldNotebook.getId() : null;
-    String oldNotebookName = oldNotebook != null ? oldNotebook.getName() : null;
     noteMotionService.executeMoveToNotebookRoot(sourceNote, targetNotebook);
     User user = authorizationService.getCurrentUser();
-    if (!Objects.equals(oldNotebookId, targetNotebook.getId())) {
-      Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-      wikiTitleCacheService.rewriteInboundWikiLinksForNotebookMove(
-          sourceNote, targetNotebook.getName(), currentUTCTimestamp, user);
-      wikiTitleCacheService.rewriteOutgoingWikiLinksForNotebookMove(
-          sourceNote, oldNotebookName, currentUTCTimestamp, user);
-    }
+    wikiLinkRewriteService.rewriteWikiLinksForCrossNotebookMove(
+        sourceNote,
+        oldNotebook,
+        targetNotebook,
+        testabilitySettings.getCurrentUTCTimestamp(),
+        user);
     return List.of(noteRealmService.build(sourceNote, user));
   }
 }

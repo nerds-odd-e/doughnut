@@ -51,6 +51,29 @@ Feature: Wiki links in notes
     Then the link "WikiMove Target" should open the note titled "WikiMove Target"
     And the note content on the current page should be "old notebook target"
 
+  @mockBrowserTime
+  Scenario: Moving a note into a folder across notebooks keeps inbound and outgoing links correct
+    Given I have a notebook "WikiFolderMove Old NB" with notes:
+      | Title                  | Content                                  | Folder                  |
+      | WikiFolderMove Target  | old notebook target                      | WikiFolderMove Old Root |
+      | WikiFolderMove Carrier | Read [[WikiFolderMove Target]].          | WikiFolderMove Old Root |
+      | WikiFolderMove Ref     | See [[WikiFolderMove Carrier]].          | WikiFolderMove Old Root |
+    And I have a notebook "WikiFolderMove New NB" with notes:
+      | Title                 | Content             | Folder                |
+      | WikiFolderMove Target | new notebook target | WikiFolderMove Folder |
+    When I route to the note "WikiFolderMove Carrier"
+    And I move the current note under folder "WikiFolderMove Folder" in notebook "WikiFolderMove New NB" via the link toolbar
+    And I view the note content as markdown
+    Then the note content markdown source should contain "[[WikiFolderMove Old NB:WikiFolderMove Target|WikiFolderMove Target]]"
+    When I view the note content as rich content
+    Then the link "WikiFolderMove Target" should open the note titled "WikiFolderMove Target"
+    And the note content on the current page should be "old notebook target"
+    When I route to the note "WikiFolderMove Ref"
+    And I view the note content as markdown
+    Then the note content markdown source should contain "[[WikiFolderMove New NB:WikiFolderMove Carrier|WikiFolderMove Carrier]]"
+    When I view the note content as rich content
+    Then the link "WikiFolderMove Carrier" should open the note titled "WikiFolderMove Carrier"
+
   Scenario: A dead wiki link is shown and can create the missing note
     When I update note "WikiLinks E2E CI" content using markdown to become:
       """

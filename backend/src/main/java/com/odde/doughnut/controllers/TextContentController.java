@@ -12,6 +12,7 @@ import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteRealmService;
 import com.odde.doughnut.services.NoteService;
+import com.odde.doughnut.services.WikiLinkRewriteService;
 import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,6 +33,7 @@ class TextContentController {
   private final AuthorizationService authorizationService;
   private final NoteRealmService noteRealmService;
   private final WikiTitleCacheService wikiTitleCacheService;
+  private final WikiLinkRewriteService wikiLinkRewriteService;
   private final NoteService noteService;
 
   public TextContentController(
@@ -40,12 +42,14 @@ class TextContentController {
       AuthorizationService authorizationService,
       NoteRealmService noteRealmService,
       WikiTitleCacheService wikiTitleCacheService,
+      WikiLinkRewriteService wikiLinkRewriteService,
       NoteService noteService) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
     this.noteRealmService = noteRealmService;
     this.wikiTitleCacheService = wikiTitleCacheService;
+    this.wikiLinkRewriteService = wikiLinkRewriteService;
     this.noteService = noteService;
   }
 
@@ -61,7 +65,7 @@ class TextContentController {
     User viewer = authorizationService.getCurrentUser();
     boolean titleChanged = !Objects.equals(note.getTitle(), titleDTO.getNewTitle());
     if (titleChanged && titleDTO.getReferenceHandling() != null) {
-      wikiTitleCacheService.rewriteInboundWikiLinksForTitleRename(
+      wikiLinkRewriteService.rewriteInboundWikiLinksForTitleRename(
           note,
           titleDTO.getNewTitle(),
           currentUTCTimestamp,

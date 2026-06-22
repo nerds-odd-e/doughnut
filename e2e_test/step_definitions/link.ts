@@ -23,3 +23,14 @@ When(
       .moveToNotebookRoot(notebookName)
   }
 )
+
+When(
+  'I move the current note under folder {string} in notebook {string} via the link toolbar',
+  (folderName: string, notebookName: string) => {
+    start
+      .assumeNotePage()
+      .startSearchingAndAddRelationship()
+      .findTarget(folderName)
+      .moveUnder(folderName, notebookName)
+  }
+)

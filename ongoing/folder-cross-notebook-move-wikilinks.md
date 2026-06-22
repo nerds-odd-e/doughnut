@@ -115,7 +115,7 @@ The root-move path already fixes inbound links; add the missing outgoing half.
   inbound rewriting remains covered. Phase 3 can reuse the same method for
   note-to-folder cross-notebook moves.
 
-### Phase 3 — Note-to-folder cross-notebook move preserves links (Behavior)
+### Phase 3 — Note-to-folder cross-notebook move preserves links (Behavior) — done
 
 Close the other single-note move gap before building folder moves on top of it.
 
@@ -128,9 +128,23 @@ Close the other single-note move gap before building folder moves on top of it.
   - In `RelationController.moveNoteToFolder`, capture source notebook before the
     move and detect a cross-notebook target folder.
   - Reuse the root-move inbound rewrite plus the Phase 2 outgoing rewrite.
+  - Tighten the outgoing rewrite so no-op moves do not create content/timestamp
+    churn for notes with no outgoing rewrites.
+  - Prefer one shared cross-notebook rewrite helper for the root and folder move
+    controller paths if that can be done without widening the phase.
 - Tests: controller coverage in `RelationControllerTests`; add/extend the
-  capability scenario in `note_topology/link.feature`.
+  capability scenario in `note_topology/link.feature`. Add focused coverage for
+  no-op outgoing rewrites preserving empty/null content if production behavior is
+  changed for that review finding.
 - Milestone: **all single-note cross-notebook moves are link-correct.**
+- Done: extracted `WikiLinkRewriteService` with
+  `rewriteWikiLinksForCrossNotebookMove` shared by root and folder cross-notebook
+  moves; outgoing rewrite skips persist when content is unchanged and preserves
+  `null` content. `RelationController.moveNoteToFolder` rewrites inbound and
+  outgoing links when the target folder is in another notebook. Controller coverage
+  in `RelationControllerMoveNoteToFolderTests`; E2E in `note_topology/link.feature`.
+  Phase 4 can build folder cross-notebook moves on top of this link-correct
+  single-note foundation.
 
 ### Phase 4 — Folder subtree can move to another notebook root through the API (Behavior)
 
