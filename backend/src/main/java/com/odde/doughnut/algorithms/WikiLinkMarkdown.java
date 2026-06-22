@@ -19,6 +19,8 @@ public final class WikiLinkMarkdown {
    */
   public record WikiInnerSplit(String target, String display) {}
 
+  private record QualifiedTargetToken(String notebookName, String noteTitle) {}
+
   private WikiLinkMarkdown() {}
 
   /**
@@ -86,6 +88,28 @@ public final class WikiLinkMarkdown {
         rawTargetToken -> requalifyTargetTokenWithNotebook(rawTargetToken, newNotebookName));
   }
 
+  /**
+   * Qualifies an unqualified outgoing wiki-link inner with the source notebook while preserving the
+   * text currently visible to readers. Already-qualified inners are left untouched.
+   */
+  public static String newInnerForQualifyUnqualifiedOutgoingLink(
+      String storedLinkInner, String sourceNotebookName) {
+    if (sourceNotebookName == null) {
+      throw new IllegalArgumentException("sourceNotebookName");
+    }
+    if (storedLinkInner == null || storedLinkInner.isEmpty()) {
+      return storedLinkInner;
+    }
+    int pipeIdx = storedLinkInner.indexOf('|');
+    String rawTargetPart = pipeIdx == -1 ? storedLinkInner : storedLinkInner.substring(0, pipeIdx);
+    String targetToken = rawTargetPart.trim();
+    if (targetToken.isEmpty() || isQualifiedTargetToken(targetToken)) {
+      return storedLinkInner;
+    }
+    return keepVisibleInner(
+        storedLinkInner, rawTargetToken -> sourceNotebookName + ":" + rawTargetToken);
+  }
+
   private static String newInnerWithHandling(
       String storedLinkInner, String newNoteTitle, boolean keepVisibleText) {
     if (newNoteTitle == null) {
@@ -130,11 +154,8 @@ public final class WikiLinkMarkdown {
   /** Replaces or adds the notebook prefix on a target token, keeping the note title intact. */
   private static String requalifyTargetTokenWithNotebook(
       String targetToken, String newNotebookName) {
-    int colon = targetToken.indexOf(':');
-    String noteTitle =
-        (colon > 0 && colon < targetToken.length() - 1)
-            ? targetToken.substring(colon + 1).trim()
-            : targetToken;
+    QualifiedTargetToken qualified = parseQualifiedTargetToken(targetToken);
+    String noteTitle = qualified == null ? targetToken : qualified.noteTitle();
     return newNotebookName + ":" + noteTitle;
   }
 
@@ -191,13 +212,27 @@ public final class WikiLinkMarkdown {
 
   private static String replaceUnqualifiedOrQualifiedNoteTitle(
       String targetToken, String newTitle) {
-    int colon = targetToken.indexOf(':');
-    if (colon > 0 && colon < targetToken.length() - 1) {
-      String nb = targetToken.substring(0, colon).trim();
-      if (!nb.isEmpty()) {
-        return nb + ":" + newTitle;
-      }
+    QualifiedTargetToken qualified = parseQualifiedTargetToken(targetToken);
+    if (qualified != null) {
+      return qualified.notebookName() + ":" + newTitle;
     }
     return newTitle;
+  }
+
+  private static boolean isQualifiedTargetToken(String targetToken) {
+    return parseQualifiedTargetToken(targetToken) != null;
+  }
+
+  private static QualifiedTargetToken parseQualifiedTargetToken(String targetToken) {
+    int colon = targetToken.indexOf(':');
+    if (colon <= 0 || colon >= targetToken.length() - 1) {
+      return null;
+    }
+    String notebookName = targetToken.substring(0, colon).trim();
+    String noteTitle = targetToken.substring(colon + 1).trim();
+    if (notebookName.isEmpty() || noteTitle.isEmpty()) {
+      return null;
+    }
+    return new QualifiedTargetToken(notebookName, noteTitle);
   }
 }

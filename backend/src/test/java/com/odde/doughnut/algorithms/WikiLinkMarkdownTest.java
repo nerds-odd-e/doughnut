@@ -69,6 +69,51 @@ class WikiLinkMarkdownTest {
   }
 
   @Test
+  void newInnerForQualifyUnqualifiedOutgoingLink_plainLinkAddsSourceNotebookAndDisplay() {
+    assertThat(
+        WikiLinkMarkdown.newInnerForQualifyUnqualifiedOutgoingLink("Target", "Source Notebook"),
+        equalTo("Source Notebook:Target|Target"));
+  }
+
+  @Test
+  void newInnerForQualifyUnqualifiedOutgoingLink_preservesCustomDisplay() {
+    assertThat(
+        WikiLinkMarkdown.newInnerForQualifyUnqualifiedOutgoingLink(
+            "Target|friendly label", "Source Notebook"),
+        equalTo("Source Notebook:Target|friendly label"));
+  }
+
+  @Test
+  void newInnerForQualifyUnqualifiedOutgoingLink_emptyPipeUsesTargetAsDisplay() {
+    assertThat(
+        WikiLinkMarkdown.newInnerForQualifyUnqualifiedOutgoingLink("Target|", "Source Notebook"),
+        equalTo("Source Notebook:Target|Target"));
+  }
+
+  @Test
+  void newInnerForQualifyUnqualifiedOutgoingLink_keepsAlreadyQualifiedPlainLink() {
+    assertThat(
+        WikiLinkMarkdown.newInnerForQualifyUnqualifiedOutgoingLink(
+            "Other Notebook:Target", "Source Notebook"),
+        equalTo("Other Notebook:Target"));
+  }
+
+  @Test
+  void newInnerForQualifyUnqualifiedOutgoingLink_keepsAlreadyQualifiedDisplayLink() {
+    assertThat(
+        WikiLinkMarkdown.newInnerForQualifyUnqualifiedOutgoingLink(
+            "Other Notebook:Target|friendly label", "Source Notebook"),
+        equalTo("Other Notebook:Target|friendly label"));
+  }
+
+  @Test
+  void newInnerForQualifyUnqualifiedOutgoingLink_keepsBlankInner() {
+    assertThat(
+        WikiLinkMarkdown.newInnerForQualifyUnqualifiedOutgoingLink("   ", "Source Notebook"),
+        equalTo("   "));
+  }
+
+  @Test
   void replaceWikiLinksMatchingTrimmedInner_matchesWhitespaceInsideBrackets() {
     assertThat(
         WikiLinkMarkdown.replaceWikiLinksMatchingTrimmedInner(

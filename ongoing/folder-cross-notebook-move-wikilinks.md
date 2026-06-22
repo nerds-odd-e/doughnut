@@ -68,7 +68,7 @@ commit, targeted tests, push, and deploy gate before the next phase. If a phase
 starts to require both a new E2E story and several unrelated backend/UI changes,
 split it again using the E2E-led sub-phase pattern from the planning skill.
 
-### Phase 1 — Outgoing wiki link qualifier exists (Structure)
+### Phase 1 — Outgoing wiki link qualifier exists (Structure) — done
 
 Prepare the immediate next behavior without changing any move behavior.
 
@@ -85,6 +85,11 @@ Prepare the immediate next behavior without changing any move behavior.
 - Tests: focused `WikiLinkMarkdown`/algorithm unit tests for plain links,
   display text, already-qualified links, whitespace/blank handling.
 - Verification: targeted unit test plus existing wiki-link unit tests.
+- Done: added `WikiLinkMarkdown.newInnerForQualifyUnqualifiedOutgoingLink`,
+  which qualifies unqualified inners to the source notebook while preserving
+  visible text, leaves already-qualified inners unchanged, and leaves blank
+  inners unchanged. Phase 2 can use this helper when rewriting a moved note's
+  outgoing links.
 
 ### Phase 2 — Note root move preserves outgoing links (Behavior)
 
