@@ -5,6 +5,7 @@ import com.odde.doughnut.controllers.dto.FolderRenameRequest;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
@@ -13,8 +14,10 @@ import java.sql.Timestamp;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -28,6 +31,7 @@ public class FolderRelocationService {
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
   private final NoteTitlePlacementRules noteTitlePlacementRules;
+  private final WikiLinkRewriteService wikiLinkRewriteService;
 
   public FolderRelocationService(
       FolderRepository folderRepository,
@@ -35,22 +39,28 @@ public class FolderRelocationService {
       FolderSiblingNameValidation folderSiblingNameValidation,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
-      NoteTitlePlacementRules noteTitlePlacementRules) {
+      NoteTitlePlacementRules noteTitlePlacementRules,
+      WikiLinkRewriteService wikiLinkRewriteService) {
     this.folderRepository = folderRepository;
     this.noteRepository = noteRepository;
     this.folderSiblingNameValidation = folderSiblingNameValidation;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.noteTitlePlacementRules = noteTitlePlacementRules;
+    this.wikiLinkRewriteService = wikiLinkRewriteService;
   }
 
   public Folder moveFolder(
-      Notebook notebook, Folder folder, FolderMoveRequest request, Notebook destinationNotebook) {
+      Notebook notebook,
+      Folder folder,
+      FolderMoveRequest request,
+      Notebook destinationNotebook,
+      User viewer) {
     if (!folder.getNotebook().getId().equals(notebook.getId())) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
     }
     if (destinationNotebook != null && !destinationNotebook.getId().equals(notebook.getId())) {
-      return moveFolderToAnotherNotebook(folder, request, destinationNotebook);
+      return moveFolderToAnotherNotebook(folder, request, destinationNotebook, viewer);
     }
     return moveFolderWithinNotebook(notebook, folder, request);
   }
@@ -89,7 +99,9 @@ public class FolderRelocationService {
   }
 
   private Folder moveFolderToAnotherNotebook(
-      Folder folder, FolderMoveRequest request, Notebook destinationNotebook) {
+      Folder folder, FolderMoveRequest request, Notebook destinationNotebook, User viewer) {
+    Set<Integer> movedNoteIds = collectSubtreeNoteIds(folder);
+    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     Folder newParent = resolveNewParentFolder(request);
     if (newParent != null) {
       FolderMoveDestinationRules.requireNotMovingIntoSelfOrDescendant(folder, newParent);
@@ -110,6 +122,7 @@ public class FolderRelocationService {
         List<Folder> subtreeFolders = collectSubtreeFolders(folder);
         requireNoSoftDeletedTitlesInSubtree(destinationNotebook, subtreeFolders);
         mergeFolderInto(folder, existingSibling.get());
+        rewriteInboundWikiLinksForFolderMove(movedNoteIds, destinationNotebook, now, viewer);
         return existingSibling.get();
       }
       throw new ResponseStatusException(
@@ -122,14 +135,30 @@ public class FolderRelocationService {
     List<Folder> subtreeFolders = collectSubtreeFolders(folder);
     requireNoSoftDeletedTitlesInSubtree(destinationNotebook, subtreeFolders);
 
-    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     reassignFolderSubtreeToNotebook(folder, destinationNotebook, now);
     folder.setParentFolder(newParent);
     folder.setUpdatedAt(now);
     entityPersister.flush();
     entityPersister.merge(folder);
     entityPersister.flush();
+    rewriteInboundWikiLinksForFolderMove(movedNoteIds, destinationNotebook, now, viewer);
     return folder;
+  }
+
+  private void rewriteInboundWikiLinksForFolderMove(
+      Set<Integer> movedNoteIds, Notebook destinationNotebook, Timestamp now, User viewer) {
+    wikiLinkRewriteService.rewriteInboundWikiLinksForFolderNotebookMove(
+        movedNoteIds, destinationNotebook.getName(), now, viewer);
+  }
+
+  private Set<Integer> collectSubtreeNoteIds(Folder root) {
+    Set<Integer> noteIds = new LinkedHashSet<>();
+    for (Folder subtreeFolder : collectSubtreeFolders(root)) {
+      for (Note note : noteRepository.findNotesInFolderOrderByIdAsc(subtreeFolder.getId())) {
+        noteIds.add(note.getId());
+      }
+    }
+    return noteIds;
   }
 
   private Folder resolveNewParentFolder(FolderMoveRequest request) {

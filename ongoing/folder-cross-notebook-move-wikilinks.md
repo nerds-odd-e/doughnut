@@ -249,7 +249,7 @@ Complete parity with same-notebook merge semantics for the backend API.
   `NotebookFolderManagementControllerTest`. Phase 8 can add inbound boundary link
   rewrites for folder moves.
 
-### Phase 8 — Folder move rewrites inbound boundary links (Behavior)
+### Phase 8 — Folder move rewrites inbound boundary links (Behavior) — done
 
 Start moved-set-aware link correctness with inbound links into the moved subtree.
 
@@ -267,6 +267,14 @@ Start moved-set-aware link correctness with inbound links into the moved subtree
   skipped. Do not add Cypress here unless the UI has already been exposed; the
   backend controller is the external API surface for this phase.
 - Verification: targeted backend test.
+- Done: `WikiLinkRewriteService.rewriteInboundWikiLinksForFolderNotebookMove`
+  rewrites inbound links for every note in moved set S with co-moved referrers
+  excluded via `excludedReferrerIds`. `FolderRelocationService` collects subtree
+  note IDs before cross-notebook moves (including merge) and calls the rewrite
+  after reassignment. Single-note moves still use the unchanged
+  `rewriteInboundWikiLinksForNotebookMove` entry point. Controller coverage in
+  `NotebookFolderManagementControllerTest`. Phase 9 can add outgoing boundary
+  link rewrites for folder moves.
 
 ### Phase 9 — Folder move rewrites outgoing boundary links (Behavior)
 

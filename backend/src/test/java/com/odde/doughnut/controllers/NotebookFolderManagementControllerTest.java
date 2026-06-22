@@ -18,12 +18,16 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.services.WikiTitleCacheService;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 class NotebookFolderManagementControllerTest extends NotebookControllerTestBase {
+
+  @Autowired WikiTitleCacheService wikiTitleCacheServiceBean;
 
   @Nested
   class CreateFolder {
@@ -276,6 +280,33 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       FolderListing root = controller.listNotebookFolderListing(nb, null);
       assertTrue(root.folders().stream().anyMatch(f -> f.getId().equals(target.getId())));
       assertTrue(root.folders().stream().noneMatch(f -> f.getId().equals(source.getId())));
+    }
+
+    @Test
+    void crossNotebookFolderMove_rewritesInboundLinksFromOutsideReferrerOnly()
+        throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nbA = makeMe.aNotebook().name("NbA").creatorAndOwner(owner).please();
+      Notebook nbB = makeMe.aNotebook().name("NbB").creatorAndOwner(owner).please();
+      Folder folderF = makeMe.aFolder().notebook(nbA).name("F").please();
+      Note target = makeMe.aNote("Target").folder(folderF).please();
+      Note insideReferrer = makeMe.aNote("Inside").folder(folderF).please();
+      insideReferrer.setContent("[[Target]]");
+      Note outsideReferrer = makeMe.aNote("Outside").notebook(nbA).please();
+      outsideReferrer.setContent("[[Target]]");
+      makeMe.entityPersister.flush();
+      wikiTitleCacheServiceBean.refreshForNote(insideReferrer, owner);
+      wikiTitleCacheServiceBean.refreshForNote(outsideReferrer, owner);
+      makeMe.entityPersister.flush();
+
+      FolderMoveRequest req = new FolderMoveRequest();
+      req.setDestinationNotebookId(nbB.getId());
+      controller.moveFolder(nbA, folderF, req);
+
+      makeMe.refresh(outsideReferrer);
+      makeMe.refresh(insideReferrer);
+      assertThat(outsideReferrer.getContent(), equalTo("[[NbB:Target|Target]]"));
+      assertThat(insideReferrer.getContent(), equalTo("[[Target]]"));
     }
 
     @Test

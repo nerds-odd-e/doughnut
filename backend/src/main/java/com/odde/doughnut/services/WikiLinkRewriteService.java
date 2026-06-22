@@ -19,6 +19,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.UnaryOperator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,7 +60,7 @@ public class WikiLinkRewriteService {
     targetNote.setUpdatedAt(updatedAt);
     entityPersister.save(targetNote);
     entityManager.flush();
-    rewriteInboundWikiLinks(targetNote, updatedAt, viewer, fn);
+    rewriteInboundWikiLinks(targetNote, updatedAt, viewer, fn, Set.of());
   }
 
   /**
@@ -89,9 +90,42 @@ public class WikiLinkRewriteService {
   @Transactional
   public void rewriteInboundWikiLinksForNotebookMove(
       Note targetNote, String newNotebookName, Timestamp updatedAt, User viewer) {
+    rewriteInboundWikiLinksForNotebookMove(
+        targetNote, newNotebookName, updatedAt, viewer, Set.of());
+  }
+
+  @Transactional
+  public void rewriteInboundWikiLinksForNotebookMove(
+      Note targetNote,
+      String newNotebookName,
+      Timestamp updatedAt,
+      User viewer,
+      Set<Integer> excludedReferrerIds) {
     UnaryOperator<String> fn =
         lt -> WikiLinkMarkdown.newInnerForKeepNotebookMove(lt, newNotebookName);
-    rewriteInboundWikiLinks(targetNote, updatedAt, viewer, fn);
+    rewriteInboundWikiLinks(targetNote, updatedAt, viewer, fn, excludedReferrerIds);
+  }
+
+  /**
+   * Rewrites inbound wiki links for every note in a folder subtree that moved to another notebook.
+   * Referrers inside the moved set are skipped because their relative links still resolve.
+   */
+  @Transactional
+  public void rewriteInboundWikiLinksForFolderNotebookMove(
+      Set<Integer> movedNoteIds, String newNotebookName, Timestamp updatedAt, User viewer) {
+    if (movedNoteIds.isEmpty()) {
+      return;
+    }
+    List<Integer> targetIds = new ArrayList<>(movedNoteIds);
+    Collections.sort(targetIds);
+    for (Integer targetId : targetIds) {
+      Note targetNote = entityManager.find(Note.class, targetId);
+      if (targetNote == null || targetNote.getDeletedAt() != null) {
+        continue;
+      }
+      rewriteInboundWikiLinksForNotebookMove(
+          targetNote, newNotebookName, updatedAt, viewer, movedNoteIds);
+    }
   }
 
   /**
@@ -126,7 +160,8 @@ public class WikiLinkRewriteService {
       Note targetNote,
       Timestamp updatedAt,
       User viewer,
-      UnaryOperator<String> newInnerFromLinkText) {
+      UnaryOperator<String> newInnerFromLinkText,
+      Set<Integer> excludedReferrerIds) {
     Integer targetId = targetNote.getId();
     List<NoteWikiTitleCache> rows =
         noteWikiTitleCacheRepository.findRowsReferringToNonDeletedNotesForTarget(targetId);
@@ -140,6 +175,9 @@ public class WikiLinkRewriteService {
     List<Integer> referrerIds = new ArrayList<>(linkTextsByReferrer.keySet());
     Collections.sort(referrerIds);
     for (Integer referrerId : referrerIds) {
+      if (excludedReferrerIds.contains(referrerId)) {
+        continue;
+      }
       Note referrer = entityManager.find(Note.class, referrerId);
       if (referrer == null || referrer.getDeletedAt() != null) {
         continue;

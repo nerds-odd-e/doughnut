@@ -179,7 +179,8 @@ class NotebookController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
     Notebook destinationNotebook = resolveDestinationNotebookForFolderMove(request);
-    return folderRelocationService.moveFolder(notebook, folder, request, destinationNotebook);
+    User user = authorizationService.getCurrentUser();
+    return folderRelocationService.moveFolder(notebook, folder, request, destinationNotebook, user);
   }
 
   @Operation(
