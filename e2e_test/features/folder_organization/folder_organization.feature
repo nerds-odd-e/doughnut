@@ -91,3 +91,29 @@ Feature: Folder organization
     And I view the note content as rich content
     Then the link "Target" should open the note titled "Target"
     And the note content on the current page should be "old notebook target"
+
+  Scenario: Move a folder into a folder in another notebook
+    Given I have a notebook "FolderXParent Old NB" with notes:
+      | Title | Folder                    |
+      | n1    | FolderXParent Root/Moved  |
+    And I have a notebook "FolderXParent New NB" with notes:
+      | Title | Folder                       |
+      | n2    | FolderXParent Dest           |
+    When I view note "n1"
+    And I activate folder "Moved" under the open folder "FolderXParent Root" in the sidebar
+    And I move folder "Moved" under "FolderXParent Root" to notebook "FolderXParent New NB" folder "FolderXParent Dest" using the folder page
+    Then I should see sidebar folder "Moved" under open folder "FolderXParent Dest"
+
+  Scenario: Moving a folder into another notebook merges same-name folder when confirmed
+    Given I have a notebook "FolderXMerge Old NB" with notes:
+      | Title      | Folder                     |
+      | Inner note | FolderXMerge Root/Shared   |
+    And I have a notebook "FolderXMerge New NB" with notes:
+      | Title      | Folder                              |
+      | Root note  | FolderXMerge Dest/Shared            |
+      | Place note | FolderXMerge Dest                   |
+    When I view note "Inner note"
+    And I activate folder "Shared" under the open folder "FolderXMerge Root" in the sidebar
+    And I move folder "Shared" under "FolderXMerge Root" to notebook "FolderXMerge New NB" folder "FolderXMerge Dest" and confirm merge using the folder page
+    Then I should see note "Root note" under open folder "Shared"
+    And I should see note "Inner note" under open folder "Shared"

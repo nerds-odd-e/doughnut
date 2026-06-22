@@ -74,6 +74,16 @@ export async function selectDestinationNotebook(
   await flushPromises()
 }
 
+export async function selectDestinationParentFolder(
+  wrapper: VueWrapper,
+  folderId: number
+) {
+  await wrapper
+    .get('[data-testid="folder-move-parent-select"]')
+    .setValue(String(folderId))
+  await flushPromises()
+}
+
 export async function dissolveWithInitialConfirm(wrapper: VueWrapper) {
   await wrapper.find('[data-testid="folder-dissolve-button"]').trigger("click")
   await flushPromises()

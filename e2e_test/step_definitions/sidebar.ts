@@ -74,6 +74,44 @@ When(
 )
 
 When(
+  'I move folder {string} under {string} to notebook {string} folder {string} using the folder page',
+  (
+    childLabel: string,
+    parentLabel: string,
+    notebookName: string,
+    destFolder: string
+  ) => {
+    start
+      .noteSidebar()
+      .openFolderPageForOrganizeUnderParent(parentLabel, childLabel)
+      .selectDestinationNotebook(notebookName)
+      .openFolderSearch()
+      .searchFolderDestination(destFolder)
+      .selectFolderSearchResultByName(destFolder)
+      .confirmMove()
+  }
+)
+
+When(
+  'I move folder {string} under {string} to notebook {string} folder {string} and confirm merge using the folder page',
+  (
+    childLabel: string,
+    parentLabel: string,
+    notebookName: string,
+    destFolder: string
+  ) => {
+    start
+      .noteSidebar()
+      .openFolderPageForOrganizeUnderParent(parentLabel, childLabel)
+      .selectDestinationNotebook(notebookName)
+      .openFolderSearch()
+      .searchFolderDestination(destFolder)
+      .selectFolderSearchResultByName(destFolder)
+      .confirmMerge()
+  }
+)
+
+When(
   'I attempt to move folder {string} under {string} to notebook root using the folder page',
   (childLabel: string, parentLabel: string) => {
     start

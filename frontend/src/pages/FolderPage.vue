@@ -55,27 +55,19 @@
               >
                 {{ notebooksLoadError }}
               </p>
-              <template v-if="!isCrossNotebookMove">
-                <label class="daisy-label" for="folder-move-destination">
-                  <span class="daisy-label-text">Destination folder</span>
-                </label>
-                <div id="folder-move-destination">
-                  <FolderSelector
-                    v-model="selectedParentFolder"
-                    :notebook-id="folderForView.notebookRealm.notebook.id"
-                    :context-folder="folderForView.folder"
-                    :ancestor-folders="folderForView.ancestorFolders ?? []"
-                    :disabled="processing"
-                  />
-                </div>
-              </template>
-              <p
-                v-else
-                class="text-sm text-base-content/70 mb-3"
-                data-testid="folder-move-cross-notebook-root-hint"
-              >
-                The folder will be placed at the destination notebook root.
-              </p>
+              <label class="daisy-label" for="folder-move-destination">
+                <span class="daisy-label-text">Destination folder</span>
+              </label>
+              <div id="folder-move-destination">
+                <FolderSelector
+                  :key="folderPickerNotebookId"
+                  v-model="selectedParentFolder"
+                  :notebook-id="folderPickerNotebookId"
+                  :context-folder="folderPickerContextFolder"
+                  :ancestor-folders="folderPickerAncestorFolders"
+                  :disabled="processing"
+                />
+              </div>
               <p v-if="moveError" class="text-error text-sm mt-2">
                 {{ moveError }}
               </p>
@@ -204,6 +196,26 @@ const isCrossNotebookMove = computed(() => {
   const sourceId = sourceNotebookId.value
   const destinationId = selectedDestinationNotebookId.value
   return sourceId != null && destinationId != null && destinationId !== sourceId
+})
+
+const folderPickerNotebookId = computed(() => {
+  if (
+    isCrossNotebookMove.value &&
+    selectedDestinationNotebookId.value != null
+  ) {
+    return selectedDestinationNotebookId.value
+  }
+  return folderForView.value?.notebookRealm.notebook.id ?? 0
+})
+
+const folderPickerContextFolder = computed((): Folder | null => {
+  if (isCrossNotebookMove.value) return null
+  return folderForView.value?.folder ?? null
+})
+
+const folderPickerAncestorFolders = computed((): Folder[] => {
+  if (isCrossNotebookMove.value) return []
+  return folderForView.value?.ancestorFolders ?? []
 })
 
 watch(
@@ -347,10 +359,18 @@ const submitRename = async () => {
 
 function buildMoveBody(merge: boolean) {
   if (isCrossNotebookMove.value) {
-    return {
+    const body: {
+      destinationNotebookId: number | undefined
+      newParentFolderId?: number
+      merge: boolean
+    } = {
       destinationNotebookId: selectedDestinationNotebookId.value,
       merge,
     }
+    if (selectedParentFolder.value != null) {
+      body.newParentFolderId = selectedParentFolder.value.id
+    }
+    return body
   }
   if (selectedParentFolder.value == null) {
     return { merge }

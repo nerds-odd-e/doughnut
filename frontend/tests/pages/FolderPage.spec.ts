@@ -15,6 +15,7 @@ import {
   mountFolderPage,
   resolveTopConfirm,
   selectDestinationNotebook,
+  selectDestinationParentFolder,
   submitMoveForm,
 } from "@tests/pages/folderPageTestSupport"
 import type { Router } from "vue-router"
@@ -231,6 +232,101 @@ describe("FolderPage", () => {
         params: {
           notebookId: String(destinationNotebook.id),
           folderId: String(folderRealm.folder.id),
+        },
+      })
+
+      wrapper.unmount()
+    })
+
+    it("sends destinationNotebookId and newParentFolderId for cross-notebook folder move", async () => {
+      const destinationNotebook = makeMe.aNotebook.please()
+      const destParent = testFolderStub(50, "DestParent")
+
+      const { wrapper, folderRealm } = mountFolderPage(router, 10, "Moved", {
+        extraNotebooks: [destinationNotebook],
+      })
+      await flushPromises()
+
+      mockSdkService(NotebookController, "listNotebookFolderListing", {
+        folders: [destParent],
+      })
+
+      const moveSpy = vi
+        .spyOn(NotebookController, "moveFolder")
+        .mockResolvedValue(wrapSdkResponse(folderRealm.folder) as never)
+
+      await selectDestinationNotebook(wrapper, destinationNotebook.id)
+      await flushPromises()
+      await selectDestinationParentFolder(wrapper, destParent.id)
+      await submitMoveForm(wrapper)
+
+      expect(moveSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: {
+            notebook: folderRealm.notebookRealm.notebook.id,
+            folder: folderRealm.folder.id,
+          },
+          body: {
+            destinationNotebookId: destinationNotebook.id,
+            newParentFolderId: destParent.id,
+            merge: false,
+          },
+        })
+      )
+
+      wrapper.unmount()
+    })
+
+    it("retries cross-notebook folder move with merge after 409 conflict", async () => {
+      const destinationNotebook = makeMe.aNotebook.please()
+      const destParent = testFolderStub(50, "DestParent")
+      const targetFolder = makeMe.aFolder.folder(99, "Dup").please()
+
+      const { wrapper } = mountFolderPage(router, 10, "Dup", {
+        extraNotebooks: [destinationNotebook],
+      })
+      await flushPromises()
+
+      mockSdkService(NotebookController, "listNotebookFolderListing", {
+        folders: [destParent],
+      })
+
+      const moveSpy = vi
+        .spyOn(NotebookController, "moveFolder")
+        .mockResolvedValueOnce(
+          wrapSdkError({
+            status: 409,
+            message: "A folder with this name already exists here.",
+          })
+        )
+        .mockResolvedValueOnce(wrapSdkResponse(targetFolder) as never)
+
+      const pushSpy = vi
+        .spyOn(router, "push")
+        .mockResolvedValue(undefined as never)
+
+      await selectDestinationNotebook(wrapper, destinationNotebook.id)
+      await flushPromises()
+      await selectDestinationParentFolder(wrapper, destParent.id)
+      await submitMoveForm(wrapper)
+      resolveTopConfirm(true)
+      await flushPromises()
+
+      expect(moveSpy).toHaveBeenCalledTimes(2)
+      expect(moveSpy).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          body: {
+            destinationNotebookId: destinationNotebook.id,
+            newParentFolderId: destParent.id,
+            merge: true,
+          },
+        })
+      )
+      expect(pushSpy).toHaveBeenCalledWith({
+        name: "folderPage",
+        params: {
+          notebookId: String(destinationNotebook.id),
+          folderId: String(targetFolder.id),
         },
       })
 

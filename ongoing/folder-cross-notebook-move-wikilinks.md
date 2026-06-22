@@ -329,7 +329,7 @@ Expose the safe root-destination workflow after backend link correctness exists.
   a cross-notebook root move. Phase 11 can add non-root destination folders and
   merge confirmation for cross-notebook moves.
 
-### Phase 11 — UI can move a folder into another notebook's folder and merge conflicts (Behavior)
+### Phase 11 — UI can move a folder into another notebook's folder and merge conflicts (Behavior) — done
 
 Finish the cross-notebook folder UI by supporting non-root destinations and
 existing conflict confirmation.
@@ -348,6 +348,13 @@ existing conflict confirmation.
   scenario in `folder_organization/folder_organization.feature`.
 - Verification: targeted frontend test and touched Cypress feature.
 - Milestone: **folder cross-notebook move is user-facing and fully link-correct.**
+- Done: `FolderPage.vue` scopes `FolderSelector` to the destination notebook for
+  cross-notebook moves (with `:key` remount on notebook change), sends
+  `newParentFolderId` with `destinationNotebookId`, and reuses the existing 409
+  merge confirmation. Unit coverage in `FolderPage.spec.ts`; E2E in
+  `folder_organization.feature` for non-root destination and cross-notebook merge.
+
+**Plan complete.** Folder cross-notebook move is fully link-correct end-to-end.
 
 ## Test ownership (named by capability, not phase)
 
