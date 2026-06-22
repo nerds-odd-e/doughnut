@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref, watch } from "vue"
 import type { NoteRealm } from "@generated/doughnut-backend-api"
 import Modal from "@/components/commons/Modal.vue"
 import { realmLeafFolder } from "./useNoteSidebarTree"
@@ -50,7 +50,7 @@ import SearchForm from "@/components/links/SearchForm.vue"
 import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
 
-defineProps<{
+const props = defineProps<{
   notebookId: number
   noteRealm: NoteRealm
   modelValue: DeadLinkPayload | null
@@ -64,6 +64,16 @@ const emit = defineEmits<{
 const linkingToExisting = ref(false)
 const showCreateForm = ref(false)
 
+watch(
+  () => props.modelValue,
+  (value) => {
+    if (value === null) {
+      linkingToExisting.value = false
+      showCreateForm.value = false
+    }
+  }
+)
+
 const onCreateNewNoteClick = () => {
   primeSoftKeyboard()
   showCreateForm.value = true
@@ -75,8 +85,6 @@ const onLinkToExistingClick = () => {
 }
 
 const close = () => {
-  linkingToExisting.value = false
-  showCreateForm.value = false
   emit("update:modelValue", null)
 }
 </script>

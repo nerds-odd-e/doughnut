@@ -112,6 +112,22 @@ describe("NoteDeadLinkCreateModal", () => {
     await wrapper?.vm.$nextTick()
   }
 
+  it("shows create-or-link choice when reopened after modelValue cleared without close", async () => {
+    mountModal()
+    await waitForChooser()
+    await tapChooserAndSettle(createNoteLabel)
+    await waitUntilFocused('[data-test="note-title"]')
+    expect(screen.queryByTestId("note-new-form")).not.toBeNull()
+
+    await wrapper!.setProps({ modelValue: null })
+    await flushPromises()
+    await wrapper!.setProps({ modelValue: deadLinkPayload })
+    await flushPromises()
+
+    await waitForChooser()
+    expect(screen.queryByTestId("note-new-form")).toBeNull()
+  })
+
   describe("soft keyboard primer", () => {
     it.each([
       { branch: "create", label: createNoteLabel },
