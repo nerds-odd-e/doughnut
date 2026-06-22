@@ -276,7 +276,7 @@ Start moved-set-aware link correctness with inbound links into the moved subtree
   `NotebookFolderManagementControllerTest`. Phase 9 can add outgoing boundary
   link rewrites for folder moves.
 
-### Phase 9 — Folder move rewrites outgoing boundary links (Behavior)
+### Phase 9 — Folder move rewrites outgoing boundary links (Behavior) — done
 
 Complete moved-set-aware link correctness for links leaving the moved subtree.
 
@@ -294,6 +294,13 @@ Complete moved-set-aware link correctness for links leaving the moved subtree.
   exposed; cover the user path in the later UI phases.
 - Verification: targeted backend test.
 - Milestone: **backend folder cross-notebook move is fully link-correct.**
+- Done: `WikiLinkRewriteService.rewriteOutgoingWikiLinksForFolderNotebookMove`
+  qualifies unqualified outgoing links to the source notebook while skipping
+  co-moved targets via `coMovedTargetResolvesFrom`. `FolderRelocationService`
+  calls `rewriteWikiLinksForFolderMove` for both inbound and outgoing rewrites
+  after cross-notebook moves (including merge). Controller coverage in
+  `NotebookFolderManagementControllerTest`. Phase 10 can expose cross-notebook
+  folder move in the UI.
 
 ### Phase 10 — UI can move a folder to another notebook root (Behavior)
 

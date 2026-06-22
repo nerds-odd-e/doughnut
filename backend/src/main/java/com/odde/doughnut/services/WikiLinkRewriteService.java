@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,14 +32,17 @@ public class WikiLinkRewriteService {
   private final NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
   private final EntityPersister entityPersister;
   private final WikiTitleCacheService wikiTitleCacheService;
+  private final WikiLinkResolver wikiLinkResolver;
 
   public WikiLinkRewriteService(
       NoteWikiTitleCacheRepository noteWikiTitleCacheRepository,
       EntityPersister entityPersister,
-      WikiTitleCacheService wikiTitleCacheService) {
+      WikiTitleCacheService wikiTitleCacheService,
+      WikiLinkResolver wikiLinkResolver) {
     this.noteWikiTitleCacheRepository = noteWikiTitleCacheRepository;
     this.entityPersister = entityPersister;
     this.wikiTitleCacheService = wikiTitleCacheService;
+    this.wikiLinkResolver = wikiLinkResolver;
   }
 
   /**
@@ -113,19 +117,26 @@ public class WikiLinkRewriteService {
   @Transactional
   public void rewriteInboundWikiLinksForFolderNotebookMove(
       Set<Integer> movedNoteIds, String newNotebookName, Timestamp updatedAt, User viewer) {
-    if (movedNoteIds.isEmpty()) {
-      return;
-    }
-    List<Integer> targetIds = new ArrayList<>(movedNoteIds);
-    Collections.sort(targetIds);
-    for (Integer targetId : targetIds) {
-      Note targetNote = entityManager.find(Note.class, targetId);
-      if (targetNote == null || targetNote.getDeletedAt() != null) {
-        continue;
-      }
-      rewriteInboundWikiLinksForNotebookMove(
-          targetNote, newNotebookName, updatedAt, viewer, movedNoteIds);
-    }
+    forEachNonDeletedNoteInMoveSet(
+        movedNoteIds,
+        note ->
+            rewriteInboundWikiLinksForNotebookMove(
+                note, newNotebookName, updatedAt, viewer, movedNoteIds));
+  }
+
+  /**
+   * Rewrites outgoing wiki links for every note in a folder subtree that moved to another notebook.
+   * Unqualified links to co-moved targets stay relative; links to notes that stayed behind qualify
+   * to the source notebook.
+   */
+  @Transactional
+  public void rewriteOutgoingWikiLinksForFolderNotebookMove(
+      Set<Integer> movedNoteIds, String sourceNotebookName, Timestamp updatedAt, User viewer) {
+    forEachNonDeletedNoteInMoveSet(
+        movedNoteIds,
+        note ->
+            rewriteOutgoingWikiLinksForNotebookMove(
+                note, sourceNotebookName, updatedAt, viewer, movedNoteIds));
   }
 
   /**
@@ -135,6 +146,17 @@ public class WikiLinkRewriteService {
   @Transactional
   public void rewriteOutgoingWikiLinksForNotebookMove(
       Note movedNote, String sourceNotebookName, Timestamp updatedAt, User viewer) {
+    rewriteOutgoingWikiLinksForNotebookMove(
+        movedNote, sourceNotebookName, updatedAt, viewer, Set.of());
+  }
+
+  @Transactional
+  public void rewriteOutgoingWikiLinksForNotebookMove(
+      Note movedNote,
+      String sourceNotebookName,
+      Timestamp updatedAt,
+      User viewer,
+      Set<Integer> coMovedTargetNoteIds) {
     String originalContent = movedNote.getContent();
     if (originalContent == null || originalContent.isEmpty()) {
       return;
@@ -145,6 +167,12 @@ public class WikiLinkRewriteService {
     for (String linkText : linkTexts) {
       String newInner =
           WikiLinkMarkdown.newInnerForQualifyUnqualifiedOutgoingLink(linkText, sourceNotebookName);
+      if (newInner.equals(linkText)) {
+        continue;
+      }
+      if (coMovedTargetResolvesFrom(movedNote, linkText, coMovedTargetNoteIds)) {
+        continue;
+      }
       content = WikiLinkMarkdown.replaceWikiLinksMatchingTrimmedInner(content, linkText, newInner);
     }
     if (content.equals(originalContent)) {
@@ -154,6 +182,31 @@ public class WikiLinkRewriteService {
     movedNote.setUpdatedAt(updatedAt);
     entityPersister.save(movedNote);
     wikiTitleCacheService.refreshForNote(movedNote, viewer);
+  }
+
+  private void forEachNonDeletedNoteInMoveSet(Set<Integer> movedNoteIds, Consumer<Note> action) {
+    if (movedNoteIds.isEmpty()) {
+      return;
+    }
+    List<Integer> noteIds = new ArrayList<>(movedNoteIds);
+    Collections.sort(noteIds);
+    for (Integer noteId : noteIds) {
+      Note note = entityManager.find(Note.class, noteId);
+      if (note != null && note.getDeletedAt() == null) {
+        action.accept(note);
+      }
+    }
+  }
+
+  private boolean coMovedTargetResolvesFrom(
+      Note movedNote, String linkText, Set<Integer> coMovedTargetNoteIds) {
+    if (coMovedTargetNoteIds.isEmpty()) {
+      return false;
+    }
+    return wikiLinkResolver
+        .resolveAnyTargetWikiLinkToken(linkText, movedNote)
+        .map(target -> coMovedTargetNoteIds.contains(target.getId()))
+        .orElse(false);
   }
 
   private void rewriteInboundWikiLinks(

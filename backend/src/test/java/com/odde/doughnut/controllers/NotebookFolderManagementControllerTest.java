@@ -310,6 +310,33 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
     }
 
     @Test
+    void crossNotebookFolderMove_rewritesOutgoingLinksToOutsideTargetOnly()
+        throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nbA = makeMe.aNotebook().name("NbA").creatorAndOwner(owner).please();
+      Notebook nbB = makeMe.aNotebook().name("NbB").creatorAndOwner(owner).please();
+      Notebook otherNb = makeMe.aNotebook().name("OtherNb").creatorAndOwner(owner).please();
+      Folder folderF = makeMe.aFolder().notebook(nbA).name("F").please();
+      Note insideNote = makeMe.aNote("Inside").folder(folderF).please();
+      makeMe.aNote("Peer").folder(folderF).please();
+      makeMe.aNote("Outside").notebook(nbA).please();
+      makeMe.aNote("Qualified").notebook(otherNb).please();
+      insideNote.setContent("[[Outside]] and [[Peer]] and [[OtherNb:Qualified]].");
+      makeMe.entityPersister.flush();
+      wikiTitleCacheServiceBean.refreshForNote(insideNote, owner);
+      makeMe.entityPersister.flush();
+
+      FolderMoveRequest req = new FolderMoveRequest();
+      req.setDestinationNotebookId(nbB.getId());
+      controller.moveFolder(nbA, folderF, req);
+
+      makeMe.refresh(insideNote);
+      assertThat(
+          insideNote.getContent(),
+          equalTo("[[NbA:Outside|Outside]] and [[Peer]] and [[OtherNb:Qualified]]."));
+    }
+
+    @Test
     void movesFolderSubtreeToAnotherNotebookRoot() throws UnexpectedNoAccessRightException {
       User owner = currentUser.getUser();
       Notebook nbA = makeMe.aNotebook().creatorAndOwner(owner).please();

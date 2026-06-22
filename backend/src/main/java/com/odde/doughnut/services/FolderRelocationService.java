@@ -100,6 +100,7 @@ public class FolderRelocationService {
 
   private Folder moveFolderToAnotherNotebook(
       Folder folder, FolderMoveRequest request, Notebook destinationNotebook, User viewer) {
+    Notebook sourceNotebook = folder.getNotebook();
     Set<Integer> movedNoteIds = collectSubtreeNoteIds(folder);
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     Folder newParent = resolveNewParentFolder(request);
@@ -122,7 +123,8 @@ public class FolderRelocationService {
         List<Folder> subtreeFolders = collectSubtreeFolders(folder);
         requireNoSoftDeletedTitlesInSubtree(destinationNotebook, subtreeFolders);
         mergeFolderInto(folder, existingSibling.get());
-        rewriteInboundWikiLinksForFolderMove(movedNoteIds, destinationNotebook, now, viewer);
+        rewriteWikiLinksForFolderMove(
+            movedNoteIds, sourceNotebook, destinationNotebook, now, viewer);
         return existingSibling.get();
       }
       throw new ResponseStatusException(
@@ -141,14 +143,20 @@ public class FolderRelocationService {
     entityPersister.flush();
     entityPersister.merge(folder);
     entityPersister.flush();
-    rewriteInboundWikiLinksForFolderMove(movedNoteIds, destinationNotebook, now, viewer);
+    rewriteWikiLinksForFolderMove(movedNoteIds, sourceNotebook, destinationNotebook, now, viewer);
     return folder;
   }
 
-  private void rewriteInboundWikiLinksForFolderMove(
-      Set<Integer> movedNoteIds, Notebook destinationNotebook, Timestamp now, User viewer) {
+  private void rewriteWikiLinksForFolderMove(
+      Set<Integer> movedNoteIds,
+      Notebook sourceNotebook,
+      Notebook destinationNotebook,
+      Timestamp now,
+      User viewer) {
     wikiLinkRewriteService.rewriteInboundWikiLinksForFolderNotebookMove(
         movedNoteIds, destinationNotebook.getName(), now, viewer);
+    wikiLinkRewriteService.rewriteOutgoingWikiLinksForFolderNotebookMove(
+        movedNoteIds, sourceNotebook.getName(), now, viewer);
   }
 
   private Set<Integer> collectSubtreeNoteIds(Folder root) {
