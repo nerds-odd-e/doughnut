@@ -407,13 +407,17 @@ export type FolderCreationRequest = {
 };
 
 /**
- * Move a folder to a new parent in the same notebook. Omit newParentFolderId or set it to null to place the folder at notebook root.
+ * Move a folder to a new parent in the same notebook, or to another notebook's root when destinationNotebookId is set. Omit newParentFolderId or set it to null to place the folder at notebook root.
  */
 export type FolderMoveRequest = {
     /**
      * Target parent folder id. When null or omitted, the folder is moved to notebook root.
      */
     newParentFolderId?: number;
+    /**
+     * Destination notebook id for a cross-notebook move to that notebook's root. When null or omitted, the folder stays in the path notebook.
+     */
+    destinationNotebookId?: number;
     /**
      * When true, merges the folder into an existing same-name sibling at the destination instead of returning 409. Subfolder name clashes are resolved recursively.
      */

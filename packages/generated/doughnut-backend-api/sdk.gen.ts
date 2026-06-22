@@ -663,7 +663,7 @@ export class NotebookController {
     /**
      * Move a folder
      *
-     * Reparents the folder within the same notebook. Notes keep their folderId pointing at the same folder rows; descendant folders stay under the moved subtree.
+     * Reparents the folder within the same notebook, or moves the folder subtree to another notebook's root when destinationNotebookId is set. Notes keep their folderId pointing at the same folder rows; descendant folders stay under the moved subtree.
      */
     public static moveFolder<ThrowOnError extends boolean = false>(options: Options<MoveFolderData, ThrowOnError>): RequestResult<MoveFolderResponses, unknown, ThrowOnError> {
         return (options.client ?? client).post<MoveFolderResponses, unknown, ThrowOnError>({

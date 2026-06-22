@@ -10,6 +10,9 @@ import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
@@ -41,10 +44,19 @@ public class FolderRelocationService {
     this.noteTitlePlacementRules = noteTitlePlacementRules;
   }
 
-  public Folder moveFolder(Notebook notebook, Folder folder, FolderMoveRequest request) {
+  public Folder moveFolder(
+      Notebook notebook, Folder folder, FolderMoveRequest request, Notebook destinationNotebook) {
     if (!folder.getNotebook().getId().equals(notebook.getId())) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
     }
+    if (destinationNotebook != null && !destinationNotebook.getId().equals(notebook.getId())) {
+      return moveFolderToAnotherNotebookRoot(folder, request, destinationNotebook);
+    }
+    return moveFolderWithinNotebook(notebook, folder, request);
+  }
+
+  private Folder moveFolderWithinNotebook(
+      Notebook notebook, Folder folder, FolderMoveRequest request) {
     Integer newParentFolderId = request != null ? request.getNewParentFolderId() : null;
     Folder newParent = null;
     if (newParentFolderId != null) {
@@ -85,6 +97,50 @@ public class FolderRelocationService {
     entityPersister.merge(folder);
     entityPersister.flush();
     return folder;
+  }
+
+  private Folder moveFolderToAnotherNotebookRoot(
+      Folder folder, FolderMoveRequest request, Notebook destinationNotebook) {
+    Integer newParentFolderId = request != null ? request.getNewParentFolderId() : null;
+    if (newParentFolderId != null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Parent folder not in notebook.");
+    }
+
+    folderSiblingNameValidation.requireNoConflictingSibling(
+        destinationNotebook.getId(), null, folder.getName(), folder.getId());
+
+    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+    List<Folder> subtreeFolders = collectSubtreeFolders(folder);
+    for (Folder subtreeFolder : subtreeFolders) {
+      subtreeFolder.setNotebook(destinationNotebook);
+      subtreeFolder.setUpdatedAt(now);
+      entityPersister.merge(subtreeFolder);
+      for (Note note : noteRepository.findNotesInFolderOrderByIdAsc(subtreeFolder.getId())) {
+        note.assignNotebook(destinationNotebook);
+        entityPersister.merge(note);
+      }
+    }
+    folder.setParentFolder(null);
+    folder.setUpdatedAt(now);
+    entityPersister.flush();
+    entityPersister.merge(folder);
+    entityPersister.flush();
+    return folder;
+  }
+
+  private List<Folder> collectSubtreeFolders(Folder root) {
+    List<Folder> result = new ArrayList<>();
+    Deque<Folder> stack = new ArrayDeque<>();
+    stack.push(root);
+    while (!stack.isEmpty()) {
+      Folder current = stack.pop();
+      result.add(current);
+      for (Folder child :
+          folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(current.getId())) {
+        stack.push(child);
+      }
+    }
+    return result;
   }
 
   private void mergeFolderInto(Folder source, Folder target) {

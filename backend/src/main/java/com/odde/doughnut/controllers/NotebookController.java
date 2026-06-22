@@ -166,8 +166,10 @@ class NotebookController {
   @Operation(
       summary = "Move a folder",
       description =
-          "Reparents the folder within the same notebook. Notes keep their folderId pointing at"
-              + " the same folder rows; descendant folders stay under the moved subtree.")
+          "Reparents the folder within the same notebook, or moves the folder subtree to another"
+              + " notebook's root when destinationNotebookId is set. Notes keep their folderId"
+              + " pointing at the same folder rows; descendant folders stay under the moved"
+              + " subtree.")
   @PostMapping("/{notebook}/folders/{folder}/move")
   @Transactional
   public Folder moveFolder(
@@ -176,7 +178,16 @@ class NotebookController {
       @Valid @RequestBody(required = false) FolderMoveRequest request)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
-    return folderRelocationService.moveFolder(notebook, folder, request);
+    Notebook destinationNotebook = null;
+    if (request != null && request.getDestinationNotebookId() != null) {
+      destinationNotebook =
+          notebookRepository
+              .findById(request.getDestinationNotebookId())
+              .orElseThrow(
+                  () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notebook not found."));
+      authorizationService.assertAuthorization(destinationNotebook);
+    }
+    return folderRelocationService.moveFolder(notebook, folder, request, destinationNotebook);
   }
 
   @Operation(

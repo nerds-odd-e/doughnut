@@ -146,7 +146,7 @@ Close the other single-note move gap before building folder moves on top of it.
   Phase 4 can build folder cross-notebook moves on top of this link-correct
   single-note foundation.
 
-### Phase 4 — Folder subtree can move to another notebook root through the API (Behavior)
+### Phase 4 — Folder subtree can move to another notebook root through the API (Behavior) — done
 
 Deliver the smallest backend/integrator slice of the folder capability. Do not
 expose it in the UI yet.
@@ -170,6 +170,12 @@ expose it in the UI yet.
   assertion that descendants and notes changed notebook.
 - Verification: targeted backend test plus API generation check.
 - Interim: boundary-crossing links are not promised by this backend-only slice.
+- Done: `FolderMoveRequest.destinationNotebookId` enables cross-notebook root moves;
+  `NotebookController.moveFolder` authorizes source and destination notebooks;
+  `FolderRelocationService.moveFolderToAnotherNotebookRoot` reassigns the folder
+  subtree and contained notes to the destination notebook. Controller coverage in
+  `NotebookFolderManagementControllerTest`. Phase 5 can generalize the destination
+  to a target parent folder in another notebook.
 
 ### Phase 5 — Folder subtree can move into a folder in another notebook (Behavior)
 
