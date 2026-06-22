@@ -3,9 +3,11 @@ package com.odde.doughnut.testability.builders;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
+import java.util.UUID;
 
 public class UserBuilder extends EntityBuilder<User> {
-  static final TestObjectCounter nameCounter = new TestObjectCounter(n -> "user" + n);
+  static final TestObjectCounter nameCounter =
+      new TestObjectCounter(n -> "user-" + UUID.randomUUID() + "-" + n);
 
   public UserBuilder(MakeMe makeMe) {
     super(makeMe, new User());

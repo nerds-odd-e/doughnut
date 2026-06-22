@@ -46,6 +46,12 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return notebook(notebook);
   }
 
+  private NoteBuilder attachToNewNotebookOwnedBy(User user) {
+    attachToNewNotebook(user.getOwnership());
+    entity.getNotebook().setCreator(user);
+    return this;
+  }
+
   public NoteBuilder notebook(Notebook notebook) {
     if (entity.getNotebook() == null) {
       entity.assignNotebook(notebook);
@@ -63,8 +69,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
       throw new AssertionError(
           "Notebook already set for `" + entity + "`, cannot set creator and owner for notebook.");
     }
-    attachToNewNotebook(user.getOwnership());
-    return this;
+    return attachToNewNotebookOwnedBy(user);
   }
 
   public NoteBuilder underSameNotebookAs(Note note) {
