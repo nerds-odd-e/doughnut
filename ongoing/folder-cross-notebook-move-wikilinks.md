@@ -225,7 +225,7 @@ Make the no-merge conflict behavior match existing same-notebook folder moves.
   `NotebookFolderManagementControllerTest`. Phase 7 can add merge-on-confirm for
   cross-notebook moves.
 
-### Phase 7 — Cross-notebook folder move can merge on confirmation (Behavior)
+### Phase 7 — Cross-notebook folder move can merge on confirmation (Behavior) — done
 
 Complete parity with same-notebook merge semantics for the backend API.
 
@@ -242,6 +242,12 @@ Complete parity with same-notebook merge semantics for the backend API.
 - Tests: `NotebookFolderManagementControllerTest` recursive merge case with a
   cross-notebook source and destination.
 - Verification: targeted backend test.
+- Done: `moveFolderToAnotherNotebook` handles `merge=true` with soft-deleted-title
+  validation before merge; `mergeFolderInto` reassigns notebooks via
+  `reassignFolderSubtreeToNotebook` when source and target differ; same-notebook
+  merge unchanged. Controller coverage in
+  `NotebookFolderManagementControllerTest`. Phase 8 can add inbound boundary link
+  rewrites for folder moves.
 
 ### Phase 8 — Folder move rewrites inbound boundary links (Behavior)
 

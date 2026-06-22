@@ -489,6 +489,40 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       assertThat(deepNoteInTarget.getFolder().getId(), equalTo(innerTarget.getId()));
       assertThat(deepNoteInSource.getFolder().getId(), equalTo(innerTarget.getId()));
     }
+
+    @Test
+    void mergesRecursivelyAcrossNotebooksWhenMergeRequested()
+        throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nbA = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Notebook nbB = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder target = makeMe.aFolder().notebook(nbB).name("Dup").please();
+      Folder innerTarget = makeMe.aFolder().parentFolder(target).name("Inner").please();
+      Note deepNoteInTarget = makeMe.aNote("DeepTarget").folder(innerTarget).please();
+      Folder holder = makeMe.aFolder().notebook(nbA).name("Holder").please();
+      Folder source = makeMe.aFolder().parentFolder(holder).name("Dup").please();
+      Folder innerSource = makeMe.aFolder().parentFolder(source).name("Inner").please();
+      Note deepNoteInSource = makeMe.aNote("DeepSource").folder(innerSource).please();
+
+      FolderMoveRequest req = new FolderMoveRequest();
+      req.setDestinationNotebookId(nbB.getId());
+      req.setNewParentFolderId(null);
+      req.setMerge(true);
+      Folder result = controller.moveFolder(nbA, source, req);
+
+      assertThat(result.getId(), equalTo(target.getId()));
+      makeMe.refresh(deepNoteInTarget);
+      makeMe.refresh(deepNoteInSource);
+      assertThat(deepNoteInTarget.getFolder().getId(), equalTo(innerTarget.getId()));
+      assertThat(deepNoteInSource.getFolder().getId(), equalTo(innerTarget.getId()));
+      assertThat(deepNoteInTarget.getNotebook().getId(), equalTo(nbB.getId()));
+      assertThat(deepNoteInSource.getNotebook().getId(), equalTo(nbB.getId()));
+      FolderListing rootB = controller.listNotebookFolderListing(nbB, null);
+      assertTrue(rootB.folders().stream().anyMatch(f -> f.getId().equals(target.getId())));
+      assertTrue(rootB.folders().stream().noneMatch(f -> f.getId().equals(source.getId())));
+      FolderListing rootA = controller.listNotebookFolderListing(nbA, null);
+      assertTrue(rootA.folders().stream().noneMatch(f -> f.getId().equals(source.getId())));
+    }
   }
 
   @Nested
