@@ -2,7 +2,7 @@
 
 ## Status
 
-Phase 7 done. Phase 8 done. Phase 9 done. Phases 10–12 planned.
+Phase 7 done. Phase 8 done. Phase 9 done. Phase 10 done. Phase 11 done. Phase 12 planned.
 
 ## Goal
 
@@ -377,6 +377,8 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMark
 ```
 
 ## Phase 11 - List Popup Supports Reordering
+
+**Done.**
 
 Type: Behavior.
 

@@ -57,6 +57,26 @@
           <button
             type="button"
             class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
+            :aria-label="`Move list item ${index + 1} up`"
+            :data-testid="`rich-note-property-value-popup-list-move-up-${index}`"
+            :disabled="index === 0"
+            @click="moveListItemUp(index)"
+          >
+            <ChevronUp class="h-4 w-4" aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
+            :aria-label="`Move list item ${index + 1} down`"
+            :data-testid="`rich-note-property-value-popup-list-move-down-${index}`"
+            :disabled="index === draftListItems.length - 1"
+            @click="moveListItemDown(index)"
+          >
+            <ChevronDown class="h-4 w-4" aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
             :aria-label="`Remove list item ${index + 1}`"
             :data-testid="`rich-note-property-value-popup-list-remove-${index}`"
             @click="removeListItem(index)"
@@ -104,7 +124,7 @@
 </template>
 
 <script setup lang="ts">
-import { Minus } from "@lucide/vue"
+import { ChevronDown, ChevronUp, Minus } from "@lucide/vue"
 import { ref, watch } from "vue"
 import Modal from "@/components/commons/Modal.vue"
 import {
@@ -162,6 +182,22 @@ function addListItem() {
 
 function removeListItem(index: number) {
   draftListItems.value = draftListItems.value.filter((_, i) => i !== index)
+}
+
+function moveListItem(fromIndex: number, toIndex: number) {
+  const items = [...draftListItems.value]
+  const [item] = items.splice(fromIndex, 1)
+  if (item === undefined) return
+  items.splice(toIndex, 0, item)
+  draftListItems.value = items
+}
+
+function moveListItemUp(index: number) {
+  if (index > 0) moveListItem(index, index - 1)
+}
+
+function moveListItemDown(index: number) {
+  if (index < draftListItems.value.length - 1) moveListItem(index, index + 1)
 }
 
 function onSave() {

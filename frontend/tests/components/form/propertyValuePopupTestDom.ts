@@ -40,6 +40,22 @@ export function clickListRemove(index: number) {
   ).click()
 }
 
+function clickListMoveButton(direction: "up" | "down", index: number) {
+  const button = document.querySelector(
+    `[data-testid="rich-note-property-value-popup-list-move-${direction}-${index}"]`
+  ) as HTMLButtonElement
+  expect(button).not.toBeNull()
+  button.click()
+}
+
+export function clickListMoveUp(index: number) {
+  clickListMoveButton("up", index)
+}
+
+export function clickListMoveDown(index: number) {
+  clickListMoveButton("down", index)
+}
+
 export function setTextareaValue(value: string) {
   const textarea = document.querySelector(
     '[data-testid="rich-note-property-value-popup-textarea"]'
