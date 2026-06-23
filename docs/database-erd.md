@@ -191,6 +191,9 @@ erDiagram
         int predefined_question_id FK
         int quiz_answer_id FK
     }
+    shedlock {
+        string name PK
+    }
     subscription {
         int id PK
         int user_id FK

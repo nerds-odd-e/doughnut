@@ -47,6 +47,7 @@ public class NotePropertyIndexService {
                             NotePropertyIndex row = new NotePropertyIndex();
                             row.setNote(indexOwner);
                             row.setPropertyKey(key);
+                            row.setItemIndex(0);
                             resolveTargetNoteFromPropertyValue(propertyValue, indexOwner)
                                 .ifPresent(row::setTargetNote);
                             notePropertyIndexRepository.save(row);

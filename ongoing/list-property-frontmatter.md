@@ -2,7 +2,7 @@
 
 ## Status
 
-Phase 5 done. Phases 6–12 planned.
+Phase 6 done. Phases 7–12 planned.
 
 ## Goal
 
@@ -199,6 +199,8 @@ CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests com.odde.doughnut.
 ```
 
 ## Phase 6 - Property Index Schema Can Represent List Items Without Behavior Change
+
+**Done.**
 
 Type: Structure.
 
