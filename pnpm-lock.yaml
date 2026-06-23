@@ -113,8 +113,8 @@ importers:
         specifier: ^1.0.8
         version: 1.0.8(canvas@3.2.3)
       got:
-        specifier: ^15.0.5
-        version: 15.0.5
+        specifier: ^15.0.6
+        version: 15.0.6
       hono:
         specifier: 4.12.26
         version: 4.12.26
@@ -3772,8 +3772,8 @@ packages:
     resolution: {integrity: sha512-6tfZ91bOr7bOXnK7PRDCGBLa1H4U080YHNaAQ2KsMGlLEzRbk44nsZF2E1IeRc3vtJHPVbKCYgdFbaGO2ljd8g==}
     engines: {node: '>=10.19.0'}
 
-  got@15.0.5:
-    resolution: {integrity: sha512-PMIMaZuYUCK43+Z9JWEXea4kkX2b3301m81D5TS6QpfG4PmNyirzEdO/Oa2OHAN4GsjnPfvWCWsshKN2rq4/gQ==}
+  got@15.0.6:
+    resolution: {integrity: sha512-6DEiZOte0BMR/QUFlk7CTBtcLpnJx/gAGnmApWtnHvM2i+LssgCaC3Kl3x+SZ/laTbYlmcaabylkwS0t97Y4BA==}
     engines: {node: '>=22'}
 
   graceful-fs@4.2.11:
@@ -10077,7 +10077,7 @@ snapshots:
       p-cancelable: 2.1.1
       responselike: 2.0.1
 
-  got@15.0.5:
+  got@15.0.6:
     dependencies:
       '@sindresorhus/is': 8.1.0
       byte-counter: 0.1.0
