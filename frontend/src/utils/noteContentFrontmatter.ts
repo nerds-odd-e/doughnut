@@ -10,8 +10,11 @@ import {
 export {
   INDEX_ONLY_PRESET_PROPERTY_KEYS,
   RICH_MODE_PRESET_PROPERTY_KEYS,
+  findPropertyRowIndexByExactKey,
   isExampleOfPropertyKey,
   isImagePropertyKey,
+  isListCapablePresetKey,
+  isListCapablePropertyKey,
   isQuestionGenerationInstructionPropertyKey,
   isReservedIndexOnlyPropertyKey,
   isScalarOnlyStructuralPropertyKey,
@@ -29,11 +32,13 @@ export {
 
 export {
   type PropertyRow,
+  appendValueToPropertyRow,
   composeNoteContentFromPropertyRows,
   insertPropertyRowAt,
   normalizePropertyRowForCommit,
   notePropertiesFromPropertyRows,
   propertyRowWithScalar,
+  propertyRowsAfterAppendingValueToExactKey,
   removePropertyRowAt,
   renamePropertyRowKeyAt,
   scalarStringFromPropertyRow,

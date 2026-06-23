@@ -181,11 +181,62 @@ export function nextAvailablePropertyKeyForPreset(
   return nextAvailablePropertyKeyFromFamilyKeys(presetKey, familyKeys)
 }
 
+/** True when a property key uses the text/list popup editor (not specialized controls). */
+export function isTextCapablePropertyKey(key: string): boolean {
+  if (isImagePropertyKey(key)) return false
+  if (isWikidataIdPropertyKey(key)) return false
+  return key.trim().toLowerCase() !== "relation"
+}
+
 /** True when a property row uses the text/list popup editor (not specialized controls). */
 export function isTextCapablePropertyRow(row: PropertyRow): boolean {
-  if (isImagePropertyKey(row.key)) return false
-  if (isWikidataIdPropertyKey(row.key)) return false
-  return row.key.trim().toLowerCase() !== "relation"
+  return isTextCapablePropertyKey(row.key)
+}
+
+/** True when a property key may hold list values (text-capable, not scalar-only structural). */
+export function isListCapablePropertyKey(key: string): boolean {
+  return (
+    isTextCapablePropertyKey(key) && !isScalarOnlyStructuralPropertyKey(key)
+  )
+}
+
+const LIST_CAPABLE_PRESET_KEYS: ReadonlySet<string> = new Set(
+  RICH_MODE_PRESET_PROPERTY_KEYS.filter((preset) =>
+    isListCapablePropertyKey(preset)
+  )
+)
+
+/** True when a rich-mode preset key supports list values on its exact key. */
+export function isListCapablePresetKey(presetKey: string): boolean {
+  return LIST_CAPABLE_PRESET_KEYS.has(presetKey)
+}
+
+/** Index of the row whose key exactly matches `key` (trimmed), or -1. */
+export function findPropertyRowIndexByExactKey(
+  rows: readonly PropertyRow[],
+  key: string,
+  options?: { excludeRowIndex?: number }
+): number {
+  const trimmed = key.trim()
+  for (let i = 0; i < rows.length; i++) {
+    if (options?.excludeRowIndex === i) continue
+    if (rows[i]!.key.trim() === trimmed) return i
+  }
+  return -1
+}
+
+function resolvedPresetKeyForPropertyRows(
+  presetKey: string,
+  rows: readonly PropertyRow[],
+  options?: { excludeRowIndex?: number }
+): string {
+  if (
+    isListCapablePresetKey(presetKey) &&
+    findPropertyRowIndexByExactKey(rows, presetKey, options) >= 0
+  ) {
+    return presetKey
+  }
+  return nextAvailablePropertyKeyForPreset(presetKey, rows, options)
 }
 
 /** Keys offered in the rich-mode property key dropdown (insert and row key fields). */
@@ -207,6 +258,6 @@ export function richModeKeyDropdownPresetKeysForPropertyRows(
   options?: { excludeRowIndex?: number }
 ): string[] {
   return richModeKeyDropdownPresetKeys(isIndexContext).map((preset) =>
-    nextAvailablePropertyKeyForPreset(preset, rows, options)
+    resolvedPresetKeyForPropertyRows(preset, rows, options)
   )
 }

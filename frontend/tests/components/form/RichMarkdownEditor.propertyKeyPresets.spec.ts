@@ -135,9 +135,9 @@ image: /x.png
     )
   })
 
-  it("selecting a resolved preset inserts the suffixed key when base is taken", async () => {
+  it("selecting a resolved preset inserts the suffixed key when base is taken for scalar-only presets", async () => {
     const markdown = `---
-url: https://example.com
+image: /cover.png
 ---
 
 # Body`
@@ -149,12 +149,12 @@ url: https://example.com
     ).focus()
     await nextTick()
     await flushPromises()
-    await h.selectPresetKey("url 2")
+    await h.selectPresetKey("image 2")
     expect(
       (
         h.getWrapper().find('[data-testid="rich-note-property-key"]')
           .element as HTMLInputElement
       ).value
-    ).toBe("url 2")
+    ).toBe("image 2")
   })
 })

@@ -123,12 +123,15 @@ import { useWikidataPropertyDialog } from "@/composables/useWikidataPropertyDial
 import { relationKebabFromLabel } from "@/models/relationTypeOptions"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
 import {
+  findPropertyRowIndexByExactKey,
+  isListCapablePropertyKey,
   isRelationPropertyKey,
   isReservedIndexOnlyPropertyKey,
   normalizePropertyRowForCommit,
   notePropertiesFromPropertyRows,
   parseNoteContentMarkdown,
   propertyRowWithScalar,
+  propertyRowsAfterAppendingValueToExactKey,
   removePropertyRowAt,
   scalarStringFromPropertyRow,
   sortedPropertyRowsFromNoteProperties,
@@ -298,12 +301,21 @@ function tryCommitInsert() {
   const value = draftValue.value.trim()
   if (!key || !value) return
 
-  if (propertyRows.value.some((r) => r.key.trim() === key)) {
-    validationMessage.value = "Duplicate property keys are not allowed."
-    return
+  let nextRows: PropertyRow[]
+  if (findPropertyRowIndexByExactKey(propertyRows.value, key) >= 0) {
+    if (!isListCapablePropertyKey(key)) {
+      validationMessage.value = "Duplicate property keys are not allowed."
+      return
+    }
+    nextRows = propertyRowsAfterAppendingValueToExactKey(
+      propertyRows.value,
+      key,
+      value
+    )!
+  } else {
+    nextRows = rowsAfterAdding(propertyRowWithScalar(key, value))
   }
 
-  const nextRows = rowsAfterAdding(propertyRowWithScalar(key, value))
   const result = validatePropertyRowsForRichEdit(nextRows)
   if (!result.ok) {
     validationMessage.value = result.message

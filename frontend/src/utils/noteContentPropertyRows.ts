@@ -1,7 +1,9 @@
 import { composeNoteContentMarkdown } from "@/utils/noteContentFrontmatter"
+import { findPropertyRowIndexByExactKey } from "@/utils/noteContentPropertyKeys"
 import {
   type NoteProperties,
   type PropertyValue,
+  listPropertyValue,
   notePropertiesFromScalarRecord,
   propertyValueHasContent,
   scalarPropertyValue,
@@ -56,7 +58,8 @@ export function composeNoteContentFromPropertyRows(
   })
 }
 
-function normalizeRowForValidation(row: PropertyRow): PropertyRow {
+/** Trims scalar row values; list values are preserved as-is. */
+export function normalizePropertyRowForCommit(row: PropertyRow): PropertyRow {
   return {
     key: row.key.trim(),
     value:
@@ -70,7 +73,7 @@ function normalizeRowForValidation(row: PropertyRow): PropertyRow {
 export function validatePropertyRowsForRichEdit(
   rows: readonly PropertyRow[]
 ): { ok: true } | { ok: false; message: string } {
-  const trimmed = rows.map(normalizeRowForValidation)
+  const trimmed = rows.map(normalizePropertyRowForCommit)
   let emptyKeyCount = 0
   for (const r of trimmed) {
     if (!r.key) {
@@ -126,20 +129,41 @@ export function removePropertyRowAt(
   return rows.filter((_, i) => i !== index)
 }
 
-/** Trims scalar row values; list values are preserved as-is. */
-export function normalizePropertyRowForCommit(row: PropertyRow): PropertyRow {
-  return {
-    key: row.key.trim(),
-    value:
-      row.value.kind === "scalar"
-        ? scalarPropertyValue(row.value.value.trim())
-        : row.value,
-  }
-}
-
 /** Scalar string for a row when the value is scalar; undefined for lists. */
 export function scalarStringFromPropertyRow(
   row: PropertyRow
 ): string | undefined {
   return scalarStringFromPropertyValue(row.value)
+}
+
+/** Appends a value to a row, promoting scalars to a two-item list when needed. */
+export function appendValueToPropertyRow(
+  row: PropertyRow,
+  value: string
+): PropertyRow {
+  const trimmed = value.trim()
+  if (row.value.kind === "list") {
+    return {
+      key: row.key,
+      value: listPropertyValue([...row.value.items, trimmed]),
+    }
+  }
+  const existing = scalarStringFromPropertyValue(row.value) ?? ""
+  return {
+    key: row.key,
+    value: listPropertyValue([existing, trimmed]),
+  }
+}
+
+/** Returns rows with `value` appended to the exact `key` row, or null when absent. */
+export function propertyRowsAfterAppendingValueToExactKey(
+  rows: readonly PropertyRow[],
+  key: string,
+  value: string
+): PropertyRow[] | null {
+  const idx = findPropertyRowIndexByExactKey(rows, key)
+  if (idx < 0) return null
+  return rows.map((r, i) =>
+    i === idx ? appendValueToPropertyRow(r, value) : r
+  )
 }

@@ -2,7 +2,7 @@
 
 ## Status
 
-Phase 7 done. Phase 8 done. Phase 9 done. Phase 10 done. Phase 11 done. Phase 12 planned.
+Plan complete. Phase 12 done.
 
 ## Goal
 
@@ -406,6 +406,8 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMark
 ```
 
 ## Phase 12 - Preset Families Can Add Values To Existing List-Capable Keys
+
+**Done.**
 
 Type: Behavior.
 
