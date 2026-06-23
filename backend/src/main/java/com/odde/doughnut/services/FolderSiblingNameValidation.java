@@ -1,16 +1,24 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.entities.repositories.FolderRepository;
+import com.odde.doughnut.exceptions.ApiException;
 import java.util.Set;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class FolderSiblingNameValidation {
 
-  private static final String DUPLICATE_SIBLING_NAME_HERE =
+  public static final String DUPLICATE_SIBLING_NAME_HERE =
       "A folder with this name already exists here.";
+
+  public static String dissolveSiblingClashAtDestination(String childName) {
+    return "A folder with this name already exists at the destination: " + childName;
+  }
+
+  public static void throwFolderNameConflict(String message) {
+    throw new ApiException(new ApiError(message, ApiError.ErrorType.FOLDER_NAME_CONFLICT));
+  }
 
   private final FolderRepository folderRepository;
 
@@ -47,7 +55,7 @@ public class FolderSiblingNameValidation {
         folderRepository.findCandidateChildContainers(notebookId, parentFolderId, name).stream()
             .anyMatch(f -> !excludedFolderIds.contains(f.getId()));
     if (clash) {
-      throw new ResponseStatusException(HttpStatus.CONFLICT, conflictMessage);
+      throwFolderNameConflict(conflictMessage);
     }
   }
 }

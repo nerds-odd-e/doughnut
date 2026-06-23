@@ -428,7 +428,7 @@ the co-moved peer, and then get wrongly qualified back to the source notebook.
   dependency from `WikiLinkRewriteService`. Controller coverage in
   `NotebookFolderManagementControllerTest`.
 
-### Phase 14 — Folder-move merge prompt keys on a stable conflict signal, not message text (Behavior)
+### Phase 14 — Folder-move merge prompt keys on a stable conflict signal, not message text (Behavior) — done
 
 Replace the brittle exact-English-message match that gates the merge-confirm
 prompt with a stable, typed conflict signal, so wording changes cannot silently
@@ -451,6 +451,12 @@ break the merge UX. Apply the same treatment to the dissolve merge prompt.
   non-mergeable 409s; `NotebookFolderManagementControllerTest`/existing conflict
   tests assert the typed signal; touched Cypress scenario stays green.
 - Verification: targeted frontend + backend tests, API generation check.
+- Done: added `ApiError.ErrorType.FOLDER_NAME_CONFLICT` for same-name folder clashes
+  (move, dissolve, rename, create); `FolderPage.vue` merge-retry branches key on
+  `errorType === "FOLDER_NAME_CONFLICT"` instead of English message matching;
+  global toast suppressed for the typed conflict. Controller and unit coverage in
+  `NotebookFolderManagementControllerTest` and `FolderPage.spec.ts`; E2E in
+  `folder_organization.feature` stays green.
 
 ### Phase 15 — Folder rename surfaces conflict status consistently (Behavior)
 

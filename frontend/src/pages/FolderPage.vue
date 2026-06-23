@@ -154,9 +154,10 @@ const props = defineProps<{
   fetchFolderPage: () => Promise<void>
 }>()
 
-/** SDK throws the response body; HTTP status is on `result.response`, not on `throw error`. */
-function isHttpConflict(apiError: ReturnType<typeof toOpenApiError>): boolean {
-  return apiError.status === 409 || apiError.errorType === "RESOURCE_CONFLICT"
+function isFolderNameConflict(
+  apiError: ReturnType<typeof toOpenApiError>
+): boolean {
+  return apiError.errorType === "FOLDER_NAME_CONFLICT"
 }
 
 const router = useRouter()
@@ -420,11 +421,7 @@ const submitMove = async (merge = false) => {
     await refreshFolderPage()
   } catch (e: unknown) {
     const apiError = toOpenApiError(e)
-    if (
-      !merge &&
-      isHttpConflict(apiError) &&
-      apiError.message === "A folder with this name already exists here."
-    ) {
+    if (!merge && isFolderNameConflict(apiError)) {
       processing.value = false
       const confirmed = await popups.confirm(
         `A folder named "${r.folder.name}" already exists at the destination. Merge into it?`
@@ -466,13 +463,7 @@ const dissolve = async (merge = false) => {
     await routeAfterDissolve(r)
   } catch (e: unknown) {
     const apiError = toOpenApiError(e)
-    if (
-      !merge &&
-      isHttpConflict(apiError) &&
-      apiError.message?.startsWith(
-        "A folder with this name already exists at the destination:"
-      )
-    ) {
+    if (!merge && isFolderNameConflict(apiError)) {
       processing.value = false
       const confirmed = await popups.confirm(
         "Some subfolders share names with siblings at the destination. Merge them?"

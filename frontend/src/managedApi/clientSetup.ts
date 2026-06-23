@@ -166,8 +166,10 @@ function handleSdkError(result: SdkResult) {
     errorBody &&
     typeof errorBody === "object" &&
     "errorType" in errorBody &&
-    (errorBody as { errorType?: string }).errorType ===
-      "SOFT_DELETED_TITLE_CONFLICT"
+    ((errorBody as { errorType?: string }).errorType ===
+      "SOFT_DELETED_TITLE_CONFLICT" ||
+      (errorBody as { errorType?: string }).errorType ===
+        "FOLDER_NAME_CONFLICT")
   ) {
     return
   }

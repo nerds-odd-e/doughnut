@@ -35,17 +35,18 @@ describe("FolderPage", () => {
   describe("move", () => {
     it.each([
       {
-        case: "RESOURCE_CONFLICT",
-        error: {
-          message: "A folder with this name already exists here.",
-          errorType: "RESOURCE_CONFLICT",
-        },
-      },
-      {
-        case: "409 status",
+        case: "409 with FOLDER_NAME_CONFLICT",
         error: {
           status: 409,
           message: "A folder with this name already exists here.",
+          errorType: "FOLDER_NAME_CONFLICT",
+        },
+      },
+      {
+        case: "typed signal without status",
+        error: {
+          message: "A folder with this name already exists here.",
+          errorType: "FOLDER_NAME_CONFLICT",
         },
       },
     ] as const)("shows merge confirm when move returns $case and retries with merge flag", async ({
@@ -86,6 +87,7 @@ describe("FolderPage", () => {
         wrapSdkError({
           status: 409,
           message: "A folder with this name already exists here.",
+          errorType: "FOLDER_NAME_CONFLICT",
         })
       )
 
@@ -155,7 +157,7 @@ describe("FolderPage", () => {
         .mockResolvedValueOnce(
           wrapSdkError({
             message: "A folder with this name already exists here.",
-            errorType: "RESOURCE_CONFLICT",
+            errorType: "FOLDER_NAME_CONFLICT",
           })
         )
         .mockResolvedValueOnce(wrapSdkResponse(targetFolder) as never)
@@ -297,6 +299,7 @@ describe("FolderPage", () => {
           wrapSdkError({
             status: 409,
             message: "A folder with this name already exists here.",
+            errorType: "FOLDER_NAME_CONFLICT",
           })
         )
         .mockResolvedValueOnce(wrapSdkResponse(targetFolder) as never)
@@ -332,6 +335,27 @@ describe("FolderPage", () => {
 
       wrapper.unmount()
     })
+
+    it("shows inline error without merge prompt when move returns soft-deleted title conflict", async () => {
+      const { wrapper } = mountFolderPage(router, 10, "Dup")
+
+      const conflictMessage =
+        "A note with this title already exists here but was deleted. Restore the deleted note (Undo delete), or choose another title."
+      vi.spyOn(NotebookController, "moveFolder").mockResolvedValue(
+        wrapSdkError({
+          status: 409,
+          errorType: "SOFT_DELETED_TITLE_CONFLICT",
+          message: conflictMessage,
+        })
+      )
+
+      await submitMoveForm(wrapper)
+
+      expect(usePopups().popups.peek()).toHaveLength(0)
+      expect(wrapper.text()).toContain(conflictMessage)
+
+      wrapper.unmount()
+    })
   })
 
   describe("dissolve", () => {
@@ -345,6 +369,7 @@ describe("FolderPage", () => {
             status: 409,
             message:
               "A folder with this name already exists at the destination: Inner",
+            errorType: "FOLDER_NAME_CONFLICT",
           })
         )
 

@@ -108,9 +108,9 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
 
       FolderCreationRequest dup = new FolderCreationRequest();
       dup.setName("Same");
-      ResponseStatusException ex =
-          assertThrows(ResponseStatusException.class, () -> controller.createFolder(nb, dup));
-      assertEquals(HttpStatus.CONFLICT, ex.getStatusCode());
+      ApiException ex = assertThrows(ApiException.class, () -> controller.createFolder(nb, dup));
+      assertThat(
+          ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.FOLDER_NAME_CONFLICT));
     }
 
     @Test
@@ -203,11 +203,12 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
 
       FolderMoveRequest req = new FolderMoveRequest();
       req.setNewParentFolderId(null);
-      ResponseStatusException ex =
-          assertThrows(
-              ResponseStatusException.class, () -> controller.moveFolder(nb, nestedDup, req));
-      assertEquals(HttpStatus.CONFLICT, ex.getStatusCode());
-      assertThat(ex.getReason(), equalTo("A folder with this name already exists here."));
+      ApiException ex =
+          assertThrows(ApiException.class, () -> controller.moveFolder(nb, nestedDup, req));
+      assertThat(
+          ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.FOLDER_NAME_CONFLICT));
+      assertThat(
+          ex.getErrorBody().getMessage(), equalTo("A folder with this name already exists here."));
     }
 
     @Test
@@ -471,11 +472,12 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       FolderMoveRequest req = new FolderMoveRequest();
       req.setDestinationNotebookId(nbB.getId());
       req.setNewParentFolderId(null);
-      ResponseStatusException ex =
-          assertThrows(
-              ResponseStatusException.class, () -> controller.moveFolder(nbA, nestedDup, req));
-      assertEquals(HttpStatus.CONFLICT, ex.getStatusCode());
-      assertThat(ex.getReason(), equalTo("A folder with this name already exists here."));
+      ApiException ex =
+          assertThrows(ApiException.class, () -> controller.moveFolder(nbA, nestedDup, req));
+      assertThat(
+          ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.FOLDER_NAME_CONFLICT));
+      assertThat(
+          ex.getErrorBody().getMessage(), equalTo("A folder with this name already exists here."));
       makeMe.refresh(nestedDup);
       assertThat(nestedDup.getNotebook().getId(), equalTo(nbA.getId()));
     }
@@ -492,11 +494,12 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       FolderMoveRequest req = new FolderMoveRequest();
       req.setDestinationNotebookId(nbB.getId());
       req.setNewParentFolderId(parentP.getId());
-      ResponseStatusException ex =
-          assertThrows(
-              ResponseStatusException.class, () -> controller.moveFolder(nbA, folderF, req));
-      assertEquals(HttpStatus.CONFLICT, ex.getStatusCode());
-      assertThat(ex.getReason(), equalTo("A folder with this name already exists here."));
+      ApiException ex =
+          assertThrows(ApiException.class, () -> controller.moveFolder(nbA, folderF, req));
+      assertThat(
+          ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.FOLDER_NAME_CONFLICT));
+      assertThat(
+          ex.getErrorBody().getMessage(), equalTo("A folder with this name already exists here."));
       makeMe.refresh(folderF);
       assertThat(folderF.getNotebook().getId(), equalTo(nbA.getId()));
       assertThat(folderF.getParentFolder(), nullValue());
@@ -703,10 +706,10 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
 
       FolderRenameRequest req = new FolderRenameRequest();
       req.setName("Taken");
-      ResponseStatusException ex =
-          assertThrows(
-              ResponseStatusException.class, () -> controller.renameFolder(nb, folder, req));
-      assertEquals(HttpStatus.CONFLICT, ex.getStatusCode());
+      ApiException ex =
+          assertThrows(ApiException.class, () -> controller.renameFolder(nb, folder, req));
+      assertThat(
+          ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.FOLDER_NAME_CONFLICT));
     }
 
     @Test
@@ -791,12 +794,12 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       makeMe.aFolder().parentFolder(outer).name("Inner").please();
       makeMe.aFolder().parentFolder(mid).name("Inner").please();
 
-      ResponseStatusException ex =
-          assertThrows(
-              ResponseStatusException.class, () -> controller.dissolveFolder(nb, mid, false));
-      assertEquals(HttpStatus.CONFLICT, ex.getStatusCode());
+      ApiException ex =
+          assertThrows(ApiException.class, () -> controller.dissolveFolder(nb, mid, false));
       assertThat(
-          ex.getReason(),
+          ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.FOLDER_NAME_CONFLICT));
+      assertThat(
+          ex.getErrorBody().getMessage(),
           equalTo("A folder with this name already exists at the destination: Inner"));
     }
 

@@ -86,8 +86,8 @@ public class FolderRelocationService {
         mergeFolderInto(folder, existingSibling.get());
         return existingSibling.get();
       }
-      throw new ResponseStatusException(
-          HttpStatus.CONFLICT, "A folder with this name already exists here.");
+      FolderSiblingNameValidation.throwFolderNameConflict(
+          FolderSiblingNameValidation.DUPLICATE_SIBLING_NAME_HERE);
     }
 
     folder.setParentFolder(newParent);
@@ -125,8 +125,8 @@ public class FolderRelocationService {
             movedNoteIds, sourceNotebook, destinationNotebook, now, viewer);
         return existingSibling.get();
       }
-      throw new ResponseStatusException(
-          HttpStatus.CONFLICT, "A folder with this name already exists here.");
+      FolderSiblingNameValidation.throwFolderNameConflict(
+          FolderSiblingNameValidation.DUPLICATE_SIBLING_NAME_HERE);
     }
 
     folderSiblingNameValidation.requireNoConflictingSibling(
@@ -312,9 +312,8 @@ public class FolderRelocationService {
       if (merge) {
         mergeFolderInto(child, existingSibling.get());
       } else {
-        throw new ResponseStatusException(
-            HttpStatus.CONFLICT,
-            "A folder with this name already exists at the destination: " + child.getName());
+        FolderSiblingNameValidation.throwFolderNameConflict(
+            FolderSiblingNameValidation.dissolveSiblingClashAtDestination(child.getName()));
       }
     }
 
