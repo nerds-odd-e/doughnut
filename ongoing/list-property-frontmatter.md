@@ -2,7 +2,7 @@
 
 ## Status
 
-Phase 3 done. Phases 4–12 planned.
+Phase 4 done. Phases 5–12 planned.
 
 ## Goal
 
@@ -140,6 +140,8 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMark
 ```
 
 ## Phase 4 - Backend Frontmatter Accessors Distinguish Scalars And Lists
+
+**Done.**
 
 Type: Structure.
 

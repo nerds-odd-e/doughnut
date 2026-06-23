@@ -42,17 +42,19 @@ public final class Frontmatter {
   }
 
   /**
-   * Case-insensitive lookup; returns the string representation of the first matching entry, or
-   * empty if absent.
+   * Case-insensitive lookup; returns a supported scalar string, or empty when absent or the value
+   * is a list, map, null, or other unsupported shape.
    */
   public Optional<String> getString(String key) {
-    for (Map.Entry<String, Object> entry : data.entrySet()) {
-      if (entry.getKey().equalsIgnoreCase(key)) {
-        Object v = entry.getValue();
-        return v == null ? Optional.empty() : Optional.of(v.toString());
-      }
-    }
-    return Optional.empty();
+    return rawValueIgnoreCase(key).flatMap(FrontmatterPropertyValues::scalarStringFromYamlObject);
+  }
+
+  /**
+   * Case-insensitive lookup; returns a supported scalar or one-level list value, or empty when
+   * absent or unsupported.
+   */
+  public Optional<FrontmatterPropertyValue> getPropertyValue(String key) {
+    return rawValueIgnoreCase(key).flatMap(FrontmatterPropertyValues::fromYamlObject);
   }
 
   /** Key names in insertion order. */
@@ -60,15 +62,22 @@ public final class Frontmatter {
     return Set.copyOf(data.keySet());
   }
 
-  /** String values in key insertion order (YAML document order when parsed via SnakeYAML). */
+  /** Supported scalar string values in key insertion order (YAML document order). */
   public List<String> stringValuesInInsertionOrder() {
     List<String> out = new ArrayList<>();
     for (Object v : data.values()) {
-      if (v != null) {
-        out.add(v.toString());
-      }
+      FrontmatterPropertyValues.scalarStringFromYamlObject(v).ifPresent(out::add);
     }
     return List.copyOf(out);
+  }
+
+  private Optional<Object> rawValueIgnoreCase(String key) {
+    for (Map.Entry<String, Object> entry : data.entrySet()) {
+      if (entry.getKey().equalsIgnoreCase(key)) {
+        return Optional.ofNullable(entry.getValue());
+      }
+    }
+    return Optional.empty();
   }
 
   /** Case-insensitive key presence (including entries whose value is null). */
