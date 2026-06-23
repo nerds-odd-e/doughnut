@@ -8,6 +8,8 @@
         <RichFrontmatterListPropertyValue
           v-if="isListPropertyValue(row.value)"
           :value="row.value"
+          :property-key="row.key"
+          compact
         />
         <template v-else-if="isRelationPropertyKey(row.key)">{{
           relationLabelFromKebab(row.value.value)

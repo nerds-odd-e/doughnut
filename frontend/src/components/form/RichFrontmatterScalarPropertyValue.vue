@@ -8,6 +8,7 @@
       <RichFrontmatterListPropertyValue
         v-if="listValue"
         :value="listValue"
+        :property-key="propertyKey"
       />
     </div>
     <div
@@ -104,9 +105,7 @@ const listModeAllowed = computed(
   () => !isScalarOnlyStructuralPropertyKey(propertyKey.value)
 )
 const isUrlProperty = computed(() => isUrlPropertyKey(propertyKey.value))
-const usesFlexRow = computed(
-  () => textCapable.value || (isUrlProperty.value && !isListValue.value)
-)
+const usesFlexRow = computed(() => textCapable.value || isUrlProperty.value)
 const rowLayoutClass = computed(() =>
   usesFlexRow.value ? "flex items-center gap-2" : ""
 )

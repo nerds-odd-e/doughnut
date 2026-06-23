@@ -304,6 +304,51 @@ example of:
     ).toBe(true)
   })
 
+  it("shows per-item external links for list url in readonly mode", async () => {
+    const markdown = `---
+url:
+  - https://example.com/a
+  - https://example.com/b
+---
+
+# Body`
+    const wrapper = await h.mountEditor(markdown, { readonly: true })
+    const readOnlyList = wrapper.find("dl")
+    expect(readOnlyList.text()).toContain("https://example.com/a")
+    expect(readOnlyList.text()).toContain("https://example.com/b")
+    const links = readOnlyList.findAll(
+      '[data-testid="rich-note-property-external-link"]'
+    )
+    expect(links.length).toBe(2)
+  })
+
+  it("shows per-item external links for list url in editable mode", async () => {
+    const markdown = `---
+url:
+  - https://example.com/a
+  - https://example.com/b
+---
+
+# Body`
+    const wrapper = await h.mountEditor(markdown)
+    await flushPromises()
+
+    const urlRow = wrapper
+      .findAll('[data-testid="rich-note-property-row"]')
+      .find((r) => (r.element as HTMLElement).dataset.propertyKey === "url")
+    expect(urlRow).toBeDefined()
+    expect(
+      urlRow!.find('[data-testid="rich-note-property-row-list-value"]').text()
+    ).toContain("https://example.com/a")
+    expect(
+      urlRow!.find('[data-testid="rich-note-property-row-list-value"]').text()
+    ).toContain("https://example.com/b")
+    const links = urlRow!.findAll(
+      '[data-testid="rich-note-property-external-link"]'
+    )
+    expect(links.length).toBe(2)
+  })
+
   it("shows list properties compactly in readonly mode", async () => {
     const markdown = `---
 tags:
