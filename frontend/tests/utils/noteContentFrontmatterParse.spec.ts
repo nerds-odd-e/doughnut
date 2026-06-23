@@ -95,15 +95,6 @@ describe("parseNoteContentMarkdown", () => {
     }
   })
 
-  it("rejects array values", () => {
-    const md = "---\ntags:\n  - a\n---\n"
-    const r = parseNoteContentMarkdown(md)
-    expect(r.ok).toBe(false)
-    if (!r.ok) {
-      expect(r.reason).toBe("unsupported_value")
-    }
-  })
-
   it("rejects malformed YAML", () => {
     const md = "---\nfoo: [\n---\n"
     const r = parseNoteContentMarkdown(md)

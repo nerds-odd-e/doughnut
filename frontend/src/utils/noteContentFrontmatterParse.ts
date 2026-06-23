@@ -1,7 +1,9 @@
 import YAML from "yaml"
+import { isScalarOnlyStructuralPropertyKey } from "@/utils/noteContentPropertyKeys"
 import {
   type NoteProperties,
-  yamlScalarToPropertyValue,
+  isListPropertyValue,
+  yamlValueToPropertyValue,
 } from "@/utils/noteProperties"
 
 export type { NoteProperties, PropertyValue } from "@/utils/noteProperties"
@@ -106,6 +108,9 @@ export function noteImageScalarsFromMarkdown(markdown: string): {
   return out
 }
 
+const unsupportedFrontmatterValueMessage =
+  "Note frontmatter must contain only string, number, boolean, or one-level list values."
+
 function mappingToProperties(
   map: Record<string, unknown>
 ):
@@ -113,13 +118,15 @@ function mappingToProperties(
   | Extract<ParseNoteContentMarkdownResult, { ok: false }> {
   const properties: NoteProperties = {}
   for (const key of Object.keys(map)) {
-    const value = yamlScalarToPropertyValue(map[key])
-    if (value === null) {
+    const value = yamlValueToPropertyValue(map[key])
+    if (
+      value === null ||
+      (isListPropertyValue(value) && isScalarOnlyStructuralPropertyKey(key))
+    ) {
       return {
         ok: false,
         reason: "unsupported_value",
-        message:
-          "Note frontmatter must contain only string, number, or boolean values.",
+        message: unsupportedFrontmatterValueMessage,
       }
     }
     properties[key] = value

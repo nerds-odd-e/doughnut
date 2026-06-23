@@ -1,4 +1,4 @@
-/** One frontmatter property value: scalar today; list items arrive in a later phase. */
+/** One frontmatter property value: scalar or one-level list of strings. */
 export type PropertyValue =
   | { kind: "scalar"; value: string }
   | { kind: "list"; items: readonly string[] }
@@ -80,4 +80,40 @@ export function yamlScalarToPropertyValue(
   }
   if (typeof value === "bigint") return scalarPropertyValue(String(value))
   return null
+}
+
+function yamlListItemToString(value: unknown): string | null {
+  const parsed = yamlScalarToPropertyValue(value)
+  if (parsed === null) return null
+  return scalarStringFromPropertyValue(parsed) ?? null
+}
+
+/** Converts a YAML mapping value to a supported scalar or one-level list property value. */
+export function yamlValueToPropertyValue(value: unknown): PropertyValue | null {
+  if (Array.isArray(value)) {
+    const items: string[] = []
+    for (const item of value) {
+      const normalized = yamlListItemToString(item)
+      if (normalized === null) return null
+      items.push(normalized)
+    }
+    return listPropertyValue(items)
+  }
+  return yamlScalarToPropertyValue(value)
+}
+
+/** Builds a YAML-serializable record from note properties for frontmatter compose. */
+export function yamlRecordFromNoteProperties(
+  properties: NoteProperties
+): Record<string, string | string[]> {
+  const record: Record<string, string | string[]> = {}
+  for (const key of Object.keys(properties)) {
+    const value = properties[key]!
+    if (isScalarPropertyValue(value)) {
+      record[key] = value.value
+    } else {
+      record[key] = [...value.items]
+    }
+  }
+  return record
 }

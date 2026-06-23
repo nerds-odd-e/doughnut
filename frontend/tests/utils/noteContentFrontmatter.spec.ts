@@ -25,6 +25,9 @@ describe("contentHasRelationProperty", () => {
     expect(contentHasRelationProperty("---\nbad:\n  nested: x\n---\n")).toBe(
       false
     )
+    expect(
+      contentHasRelationProperty("---\nrelation:\n  - parent-of\n---\n")
+    ).toBe(false)
   })
 })
 

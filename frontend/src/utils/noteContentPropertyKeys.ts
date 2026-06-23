@@ -15,6 +15,16 @@ export const RICH_MODE_PRESET_PROPERTY_KEYS = [
  */
 export const INDEX_ONLY_PRESET_PROPERTY_KEYS = ["title_pattern"] as const
 
+/** True when `key` must remain a scalar value (not a list). */
+export function isScalarOnlyStructuralPropertyKey(key: string): boolean {
+  if (isImagePropertyKey(key)) return true
+  if (propertyKeyBaseMatches(key, "image_mask")) return true
+  if (isWikidataIdPropertyKey(key)) return true
+  if (isTitlePatternPropertyKey(key)) return true
+  if (isQuestionGenerationInstructionPropertyKey(key)) return true
+  return propertyKeyBaseMatches(key, ["type", "relation", "source", "target"])
+}
+
 /** Splits a property key into its base name and optional numeric suffix (`url 2` → suffix 2). */
 export function propertyKeyBaseAndSuffix(key: string): {
   base: string

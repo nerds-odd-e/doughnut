@@ -3,8 +3,8 @@ import { isTitlePatternPropertyKey } from "@/utils/noteContentPropertyKeys"
 import { parseNoteContentMarkdown } from "@/utils/noteContentFrontmatterParse"
 import {
   type NoteProperties,
-  scalarRecordFromNoteProperties,
   scalarStringFromPropertyValue,
+  yamlRecordFromNoteProperties,
 } from "@/utils/noteProperties"
 
 export {
@@ -56,6 +56,8 @@ export {
   scalarPropertyValue,
   scalarRecordFromNoteProperties,
   scalarStringFromPropertyValue,
+  yamlRecordFromNoteProperties,
+  yamlValueToPropertyValue,
 } from "@/utils/noteProperties"
 
 /** Reads scoped title pattern from leading YAML (`title_pattern` or legacy `titlePattern`; key match ignores case and underscores). */
@@ -101,7 +103,7 @@ export function composeNoteContentMarkdown(input: {
   }
 
   const yamlBlock = YAML.stringify(
-    scalarRecordFromNoteProperties(input.properties),
+    yamlRecordFromNoteProperties(input.properties),
     {
       lineWidth: 0,
     }
