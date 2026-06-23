@@ -581,6 +581,67 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
       FolderListing rootA = controller.listNotebookFolderListing(nbA, null);
       assertTrue(rootA.folders().stream().noneMatch(f -> f.getId().equals(source.getId())));
     }
+
+    @Test
+    void rejectsCrossNotebookMergeWhenSoftDeletedNoteHasSameTitleAtDestinationFolder()
+        throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nbA = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Notebook nbB = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder target = makeMe.aFolder().notebook(nbB).name("Dup").please();
+      Note deleted = makeMe.aNote().folder(target).title("ConflictTitle").please();
+      noteService.destroy(deleted, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, owner);
+
+      Folder holder = makeMe.aFolder().notebook(nbA).name("Holder").please();
+      Folder source = makeMe.aFolder().parentFolder(holder).name("Dup").please();
+      makeMe.aNote().folder(source).title("ConflictTitle").please();
+
+      FolderMoveRequest req = new FolderMoveRequest();
+      req.setDestinationNotebookId(nbB.getId());
+      req.setNewParentFolderId(null);
+      req.setMerge(true);
+      ApiException ex =
+          assertThrows(ApiException.class, () -> controller.moveFolder(nbA, source, req));
+      assertThat(
+          ex.getErrorBody().getErrorType(),
+          equalTo(ApiError.ErrorType.SOFT_DELETED_TITLE_CONFLICT));
+      assertThat(
+          ex.getErrorBody().getErrors().get("deletedNoteId"),
+          equalTo(String.valueOf(deleted.getId())));
+      makeMe.refresh(source);
+      assertThat(source.getNotebook().getId(), equalTo(nbA.getId()));
+    }
+
+    @Test
+    void mergesAcrossNotebooksWhenNoSoftDeletedTitleConflictAtDestination()
+        throws UnexpectedNoAccessRightException {
+      User owner = currentUser.getUser();
+      Notebook nbA = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Notebook nbB = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder parentP = makeMe.aFolder().notebook(nbB).name("P").please();
+      Folder target = makeMe.aFolder().parentFolder(parentP).name("Dup").please();
+      Note noteInTarget = makeMe.aNote("KeptInTarget").folder(target).please();
+      Folder holder = makeMe.aFolder().notebook(nbA).name("Holder").please();
+      Folder source = makeMe.aFolder().parentFolder(holder).name("Dup").please();
+      Note noteInSource = makeMe.aNote("FromSource").folder(source).please();
+
+      FolderMoveRequest req = new FolderMoveRequest();
+      req.setDestinationNotebookId(nbB.getId());
+      req.setNewParentFolderId(parentP.getId());
+      req.setMerge(true);
+      Folder result = controller.moveFolder(nbA, source, req);
+
+      assertThat(result.getId(), equalTo(target.getId()));
+      makeMe.refresh(noteInTarget);
+      makeMe.refresh(noteInSource);
+      assertThat(noteInTarget.getFolder().getId(), equalTo(target.getId()));
+      assertThat(noteInSource.getFolder().getId(), equalTo(target.getId()));
+      assertThat(noteInTarget.getNotebook().getId(), equalTo(nbB.getId()));
+      assertThat(noteInSource.getNotebook().getId(), equalTo(nbB.getId()));
+      FolderListing underP = controller.listNotebookFolderListing(nbB, parentP.getId());
+      assertTrue(underP.folders().stream().anyMatch(f -> f.getId().equals(target.getId())));
+      assertTrue(underP.folders().stream().noneMatch(f -> f.getId().equals(source.getId())));
+    }
   }
 
   @Nested

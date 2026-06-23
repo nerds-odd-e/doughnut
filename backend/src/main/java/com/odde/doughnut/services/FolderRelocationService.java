@@ -120,8 +120,6 @@ public class FolderRelocationService {
 
     if (existingSibling.isPresent()) {
       if (request != null && request.isMerge()) {
-        List<Folder> subtreeFolders = collectSubtreeFolders(folder);
-        requireNoSoftDeletedTitlesInSubtree(destinationNotebook, subtreeFolders);
         mergeFolderInto(folder, existingSibling.get());
         rewriteWikiLinksForFolderMove(
             movedNoteIds, sourceNotebook, destinationNotebook, now, viewer);

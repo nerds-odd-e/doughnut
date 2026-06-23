@@ -354,7 +354,144 @@ existing conflict confirmation.
   merge confirmation. Unit coverage in `FolderPage.spec.ts`; E2E in
   `folder_organization.feature` for non-root destination and cross-notebook merge.
 
-**Plan complete.** Folder cross-notebook move is fully link-correct end-to-end.
+**Core capability complete (Phases 1-11).** Folder cross-notebook move is fully
+link-correct end-to-end.
+
+---
+
+## Hardening phases (from post-delivery code review)
+
+A review of the delivered change surfaced one real bug, two robustness
+weaknesses, and some internal duplication. The phases below address the items
+worth doing. They are ordered by user value (correctness → robustness →
+internal code health) and are **stop-safe**: the capability already works, so
+skipping any remaining hardening phase wastes nothing. Each phase is one focused
+commit with targeted tests and the deploy gate before the next.
+
+### Phase 12 — Cross-notebook merge enforces soft-deleted-title rules at the real destination (Behavior) — done
+
+Fix the misplaced/ineffective soft-deleted-title pre-check on the cross-notebook
+**merge** path, which currently validates against the source-side subtree folder
+(still in notebook A) instead of the destination folder the notes actually land
+in. The check is effectively a no-op on the merge path today; only the per-note
+check inside `mergeFolderInto` provides real protection.
+
+- Precondition: folder F in notebook A merges into an existing same-name folder
+  in notebook B; a note inside F has the same title as a **soft-deleted** note
+  already sitting at the destination folder in B.
+- Trigger: call the cross-notebook folder move API with `merge=true`.
+- Postcondition: the move returns the soft-deleted-title conflict
+  (`SOFT_DELETED_TITLE_CONFLICT`) and leaves the source subtree unchanged; a
+  non-conflicting merge still succeeds.
+- Work:
+  - Add a controller regression test that fails today only if the real
+    destination-folder check were removed — i.e. it must exercise the
+    `mergeFolderInto` per-note path, proving protection does not depend on the
+    pre-check.
+  - Remove the dead `requireNoSoftDeletedTitlesInSubtree` call from the merge
+    branch of `moveFolderToAnotherNotebook` (keep it on the non-merge branch,
+    where notes retain their folder and the check is correct).
+- Tests: `NotebookFolderManagementControllerTest` — cross-notebook merge with a
+  soft-deleted same-title note at the destination (rejected) and without one
+  (succeeds).
+- Verification: targeted backend test.
+- Done: removed the ineffective merge-branch `requireNoSoftDeletedTitlesInSubtree`
+  pre-check (it validated source-side folders, not the destination merge target);
+  soft-deleted-title protection on cross-notebook merge now relies solely on the
+  per-note check inside `mergeFolderInto`. Controller coverage in
+  `NotebookFolderManagementControllerTest` for merge rejection and success.
+
+### Phase 13 — Co-moved peer links stay relative even when the destination has a same-title note (Behavior)
+
+Pin and harden the outgoing-link rewrite for the duplicate-title edge case. Today
+`coMovedTargetResolvesFrom` resolves via the lowest-id global title match, so an
+unqualified `[[Peer]]` can resolve to a pre-existing destination note instead of
+the co-moved peer, and then get wrongly qualified back to the source notebook.
+
+- Precondition: inside note N links via `[[Peer]]` to a co-moved peer; notebook B
+  already contains a different, lower-id note also titled `Peer`.
+- Trigger: move folder F from A to B through the backend API.
+- Postcondition: N's `[[Peer]]` stays unqualified (it resolves to the co-moved
+  peer inside B); links to notes that stayed in A still qualify to A.
+- Work:
+  - Decide co-moved membership by checking the moved set directly (e.g. resolve
+    among the moved notes by title before falling back to global resolution),
+    rather than relying solely on lowest-id global match.
+  - Add a short code comment recording the chosen tie-break for duplicate titles.
+- Tests: `NotebookFolderManagementControllerTest` — co-moved peer with a
+  same-title pre-existing destination note (stays relative); keep existing
+  outside/co-moved/already-qualified assertions green.
+- Verification: targeted backend test.
+
+### Phase 14 — Folder-move merge prompt keys on a stable conflict signal, not message text (Behavior)
+
+Replace the brittle exact-English-message match that gates the merge-confirm
+prompt with a stable, typed conflict signal, so wording changes cannot silently
+break the merge UX. Apply the same treatment to the dissolve merge prompt.
+
+- Precondition: a same-name folder already exists at the destination (root,
+  parent folder, or a dissolve sibling clash).
+- Trigger: confirm a move/dissolve without merge.
+- Postcondition: the UI recognizes the name-clash conflict by a typed
+  signal/error code and offers the merge prompt; other 409s (e.g.
+  soft-deleted-title) do **not** trigger the merge prompt.
+- Work:
+  - Backend: emit a distinguishable conflict signal for the same-name folder
+    clash (a dedicated `ApiError` type/code) instead of a bare 409 + prose,
+    while keeping the human-readable message.
+  - Frontend `FolderPage.vue`: key the merge-retry branch (move and dissolve) on
+    that signal rather than `message ===`/`startsWith(...)`.
+  - Regenerate the TypeScript API client if the error contract changes.
+- Tests: `FolderPage.spec.ts` for merge-prompt-on-signal and no-prompt for
+  non-mergeable 409s; `NotebookFolderManagementControllerTest`/existing conflict
+  tests assert the typed signal; touched Cypress scenario stays green.
+- Verification: targeted frontend + backend tests, API generation check.
+
+### Phase 15 — Folder rename surfaces conflict status consistently (Behavior)
+
+Make the rename path on `FolderPage.vue` propagate HTTP status the same way move
+and dissolve do, so a rename name-clash surfaces a consistent, status-aware
+error instead of the raw thrown body.
+
+- Precondition: renaming a folder to a name that already exists under the same
+  parent.
+- Trigger: submit the rename.
+- Postcondition: the inline rename error reflects the conflict consistently with
+  the move/dissolve error handling.
+- Work:
+  - Route rename through the shared `throwIfSdkError` helper rather than
+    `if (error) throw error`.
+- Tests: `FolderPage.spec.ts` rename conflict case.
+- Verification: targeted frontend test.
+
+### Phase 16 — Consolidate folder-relocation traversal and conflict checks (Structure)
+
+Reduce duplication and repeated DB work in `FolderRelocationService` without
+changing observable behavior, verified by the existing controller and E2E suites.
+
+- Precondition: cross-notebook moves currently walk the subtree multiple times
+  per request (`collectSubtreeNoteIds` → `collectSubtreeFolders`, plus a second
+  `collectSubtreeFolders`, plus one inside `reassignFolderSubtreeToNotebook`),
+  duplicate the sibling-conflict lookup (inline `existingSibling` **and**
+  `requireNoConflictingSibling`), and re-fetch the timestamp inside
+  `mergeFolderInto`.
+- Trigger: same move/merge requests as today.
+- Postcondition: identical results and error semantics; the subtree is collected
+  once and threaded through, sibling-conflict detection uses one shared path, and
+  a single timestamp is used per move.
+- Work:
+  - Collect the subtree folder list once and pass it to note-id collection,
+    soft-deleted checks, and reassignment.
+  - Extract one shared sibling-conflict helper used by both same- and
+    cross-notebook branches.
+  - Thread the captured `now` into `mergeFolderInto` instead of re-fetching.
+  - Trim redundant public overloads in `WikiLinkRewriteService` if they become
+    unused.
+  - Update the `moveFolder` `@Operation` description to mention the cross-notebook
+    merge/409 semantics.
+- Tests: no new behavior tests; existing `NotebookFolderManagementControllerTest`,
+  `RelationController*Tests`, and touched Cypress features must stay green.
+- Verification: targeted backend tests plus the touched folder/wiki-link E2E specs.
 
 ## Test ownership (named by capability, not phase)
 
@@ -374,5 +511,8 @@ existing conflict confirmation.
 
 ## Open follow-ups (not in scope unless raised)
 
-- Bulk performance for very large folder subtrees (per-note rewrite loop).
+- Bulk performance for very large folder subtrees: the inbound rewrite runs one
+  `findRowsReferringToNonDeletedNotesForTarget` query per moved note, and inbound
+  plus outgoing rewrites both iterate the whole moved set. Consider batching the
+  referrer lookup and cache refreshes if large-subtree moves become slow.
 - Undo support for cross-notebook folder moves.
