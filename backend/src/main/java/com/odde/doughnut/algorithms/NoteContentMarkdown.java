@@ -140,9 +140,9 @@ public final class NoteContentMarkdown {
   }
 
   /**
-   * Wiki link inner titles in document order: parsed frontmatter scalar values first, then the
-   * body. Raw YAML escapes (e.g. {@code \"} inside double-quoted scalars) must not leak into link
-   * tokens.
+   * Wiki link inner titles in document order: parsed frontmatter scalar and list-item strings
+   * first, then the body. Raw YAML escapes (e.g. {@code \"} inside double-quoted scalars) must not
+   * leak into link tokens.
    */
   public static List<String> wikiLinkInnersInOccurrenceOrder(String content) {
     if (content == null || content.isEmpty()) {
@@ -152,7 +152,7 @@ public final class NoteContentMarkdown {
         .map(
             lf -> {
               List<String> titles = new ArrayList<>();
-              for (String value : lf.frontmatter().stringValuesInInsertionOrder()) {
+              for (String value : lf.frontmatter().supportedValueStringsInInsertionOrder()) {
                 titles.addAll(WikiLinkMarkdown.innerTitlesInOccurrenceOrder(value));
               }
               titles.addAll(WikiLinkMarkdown.innerTitlesInOccurrenceOrder(lf.body()));

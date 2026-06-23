@@ -64,9 +64,32 @@ public final class Frontmatter {
 
   /** Supported scalar string values in key insertion order (YAML document order). */
   public List<String> stringValuesInInsertionOrder() {
+    return valueStringsInInsertionOrder(false);
+  }
+
+  /**
+   * Supported scalar and list-item strings in property insertion order. List items appear in YAML
+   * sequence order immediately after their property's scalar would have appeared.
+   */
+  public List<String> supportedValueStringsInInsertionOrder() {
+    return valueStringsInInsertionOrder(true);
+  }
+
+  private List<String> valueStringsInInsertionOrder(boolean includeListItems) {
     List<String> out = new ArrayList<>();
     for (Object v : data.values()) {
-      FrontmatterPropertyValues.scalarStringFromYamlObject(v).ifPresent(out::add);
+      FrontmatterPropertyValues.fromYamlObject(v)
+          .ifPresent(
+              pv -> {
+                switch (pv) {
+                  case FrontmatterPropertyValue.Scalar s -> out.add(s.value());
+                  case FrontmatterPropertyValue.ListItems l -> {
+                    if (includeListItems) {
+                      out.addAll(l.items());
+                    }
+                  }
+                }
+              });
     }
     return List.copyOf(out);
   }
@@ -127,23 +150,54 @@ public final class Frontmatter {
   }
 
   /**
-   * Applies {@code transform} to every string value. Entries whose transformed value is blank are
-   * dropped. Returns empty if nothing changed.
+   * Applies {@code transform} to every supported scalar or list-item string. Entries whose
+   * transformed scalar is blank, or list properties with no remaining items, are dropped.
+   * Unsupported values are left unchanged. Returns empty if nothing changed.
    */
   public Optional<Frontmatter> mapStringValues(UnaryOperator<String> transform) {
     LinkedHashMap<String, Object> copy = new LinkedHashMap<>();
     boolean changed = false;
     for (Map.Entry<String, Object> entry : data.entrySet()) {
       Object original = entry.getValue();
-      String originalStr = original == null ? "" : original.toString();
-      String transformed = transform.apply(originalStr);
-      if (!transformed.equals(originalStr)) {
-        changed = true;
-        if (!transformed.isBlank()) {
-          copy.put(entry.getKey(), transformed);
-        }
-      } else {
+      Optional<FrontmatterPropertyValue> parsed =
+          FrontmatterPropertyValues.fromYamlObject(original);
+      if (parsed.isEmpty()) {
         copy.put(entry.getKey(), original);
+        continue;
+      }
+      FrontmatterPropertyValue propertyValue = parsed.get();
+      if (propertyValue instanceof FrontmatterPropertyValue.Scalar scalar) {
+        String transformed = transform.apply(scalar.value());
+        if (!transformed.equals(scalar.value())) {
+          changed = true;
+          if (!transformed.isBlank()) {
+            copy.put(entry.getKey(), transformed);
+          }
+        } else {
+          copy.put(entry.getKey(), original);
+        }
+      } else if (propertyValue instanceof FrontmatterPropertyValue.ListItems listItems) {
+        List<String> newItems = new ArrayList<>();
+        boolean listChanged = false;
+        for (String item : listItems.items()) {
+          String transformed = transform.apply(item);
+          if (!transformed.equals(item)) {
+            listChanged = true;
+          }
+          if (!transformed.isBlank()) {
+            newItems.add(transformed);
+          } else if (!item.isBlank()) {
+            listChanged = true;
+          }
+        }
+        if (listChanged) {
+          changed = true;
+          if (!newItems.isEmpty()) {
+            copy.put(entry.getKey(), new ArrayList<>(newItems));
+          }
+        } else {
+          copy.put(entry.getKey(), original);
+        }
       }
     }
     if (!changed) {

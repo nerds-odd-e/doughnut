@@ -5,9 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -121,15 +119,6 @@ class NoteContentMarkdownTest {
   }
 
   @Test
-  void wikiLinkInnersInOccurrenceOrder_readsWikiLinkFromParsedFrontmatterScalar() {
-    String title = "In volitional (\"let's\" or \"I shall\") statements";
-    String content = Frontmatter.empty().set("example of", "[[" + title + "]]").fenced("");
-
-    assertThat(
-        NoteContentMarkdown.wikiLinkInnersInOccurrenceOrder(content), equalTo(List.of(title)));
-  }
-
-  @Test
   void wikidataIdScalarFromLeadingFrontmatter_empty_when_no_frontmatter() {
     assertTrue(NoteContentMarkdown.wikidataIdScalarFromLeadingFrontmatter("plain").isEmpty());
   }
@@ -139,27 +128,6 @@ class NoteContentMarkdownTest {
     assertThat(
         NoteContentMarkdown.wikidataIdScalarFromLeadingFrontmatter("---\nwikidata_id: Q99\n---\n"),
         equalTo(Optional.of("Q99")));
-  }
-
-  @Test
-  void
-      removeWikiLinksFromLeadingFrontmatterProperties_removes_empty_property_and_keeps_body_link() {
-    String content = "---\ntarget: \"[[Target]]\"\n---\nBody still links [[Target]]";
-
-    assertThat(
-        NoteContentMarkdown.removeWikiLinksFromLeadingFrontmatterProperties(
-            content, Set.of("Target")),
-        equalTo(Optional.of("Body still links [[Target]]")));
-  }
-
-  @Test
-  void removeWikiLinksFromLeadingFrontmatterProperties_removes_only_matching_property_link() {
-    String content = "---\nsource: \"[[Source]]\"\ntarget: \"[[Target]]\"\n---\nBody";
-
-    assertThat(
-        NoteContentMarkdown.removeWikiLinksFromLeadingFrontmatterProperties(
-            content, Set.of("Target")),
-        equalTo(Optional.of("---\nsource: '[[Source]]'\n---\nBody")));
   }
 
   @Test

@@ -2,7 +2,7 @@
 
 ## Status
 
-Phase 4 done. Phases 5–12 planned.
+Phase 5 done. Phases 6–12 planned.
 
 ## Goal
 
@@ -169,6 +169,8 @@ CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests com.odde.doughnut.
 ```
 
 ## Phase 5 - Backend Wiki-Link Helpers See Links Inside List Items
+
+**Done.**
 
 Type: Behavior.
 

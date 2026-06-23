@@ -119,7 +119,7 @@ class FrontmatterTest {
   }
 
   @Test
-  void stringValuesInInsertionOrder_includes_only_supported_scalars() {
+  void valueStringsInInsertionOrder_respects_scalar_vs_list_item_inclusion() {
     Frontmatter fm =
         Frontmatter.parse(
             """
@@ -133,5 +133,6 @@ class FrontmatterTest {
             """);
 
     assertThat(fm.stringValuesInInsertionOrder(), equalTo(List.of("one", "2")));
+    assertThat(fm.supportedValueStringsInInsertionOrder(), equalTo(List.of("one", "a", "b", "2")));
   }
 }
