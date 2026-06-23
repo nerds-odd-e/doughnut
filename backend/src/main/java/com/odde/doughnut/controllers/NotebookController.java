@@ -169,7 +169,9 @@ class NotebookController {
           "Reparents the folder within the same notebook, or moves the folder subtree to another"
               + " notebook when destinationNotebookId is set. Notes keep their folderId"
               + " pointing at the same folder rows; descendant folders stay under the moved"
-              + " subtree.")
+              + " subtree. A same-name folder at the destination returns 409 with"
+              + " FOLDER_NAME_CONFLICT unless merge=true, in which case the source subtree is"
+              + " merged into the existing folder (including cross-notebook moves).")
   @PostMapping("/{notebook}/folders/{folder}/move")
   @Transactional
   public Folder moveFolder(

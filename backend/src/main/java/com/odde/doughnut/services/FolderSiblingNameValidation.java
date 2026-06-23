@@ -1,8 +1,10 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.ApiError;
+import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.exceptions.ApiException;
+import java.util.Optional;
 import java.util.Set;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +35,26 @@ public class FolderSiblingNameValidation {
   }
 
   /**
+   * Returns a same-name sibling under {@code parentFolderId} in {@code notebookId}, excluding
+   * folders whose ids are in {@code excludedFolderIds}.
+   */
+  public Optional<Folder> findConflictingSibling(
+      Integer notebookId, Integer parentFolderId, String name, Set<Integer> excludedFolderIds) {
+    return folderRepository.findCandidateChildContainers(notebookId, parentFolderId, name).stream()
+        .filter(f -> !excludedFolderIds.contains(f.getId()))
+        .findFirst();
+  }
+
+  /**
+   * Returns a same-name sibling under {@code parentFolderId} in {@code notebookId}, excluding
+   * {@code excludedFolderId}.
+   */
+  public Optional<Folder> findConflictingSibling(
+      Integer notebookId, Integer parentFolderId, String name, int excludedFolderId) {
+    return findConflictingSibling(notebookId, parentFolderId, name, Set.of(excludedFolderId));
+  }
+
+  /**
    * Move folder: destination siblings may not use the moved folder's name except the folder itself.
    */
   public void requireNoConflictingSibling(
@@ -51,10 +73,7 @@ public class FolderSiblingNameValidation {
       String name,
       Set<Integer> excludedFolderIds,
       String conflictMessage) {
-    boolean clash =
-        folderRepository.findCandidateChildContainers(notebookId, parentFolderId, name).stream()
-            .anyMatch(f -> !excludedFolderIds.contains(f.getId()));
-    if (clash) {
+    if (findConflictingSibling(notebookId, parentFolderId, name, excludedFolderIds).isPresent()) {
       throwFolderNameConflict(conflictMessage);
     }
   }

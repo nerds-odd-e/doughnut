@@ -478,7 +478,7 @@ error instead of the raw thrown body.
   is merged onto the thrown error before `toOpenApiError`. Unit coverage in
   `FolderPage.spec.ts` for rename 409 `FOLDER_NAME_CONFLICT` inline error.
 
-### Phase 16 — Consolidate folder-relocation traversal and conflict checks (Structure)
+### Phase 16 — Consolidate folder-relocation traversal and conflict checks (Structure) — done
 
 Reduce duplication and repeated DB work in `FolderRelocationService` without
 changing observable behavior, verified by the existing controller and E2E suites.
@@ -506,6 +506,16 @@ changing observable behavior, verified by the existing controller and E2E suites
 - Tests: no new behavior tests; existing `NotebookFolderManagementControllerTest`,
   `RelationController*Tests`, and touched Cypress features must stay green.
 - Verification: targeted backend tests plus the touched folder/wiki-link E2E specs.
+- Done: cross-notebook moves collect the subtree once and thread it through note-id
+  collection, soft-deleted checks, and reassignment; `siblingConflictMergeTarget`
+  and `FolderSiblingNameValidation.findConflictingSibling` unify sibling-conflict
+  detection for same- and cross-notebook moves (and dissolve); `mergeFolderInto`
+  accepts the caller's timestamp; `moveFolder` OpenAPI description documents
+  cross-notebook merge/409 semantics. `WikiLinkRewriteService` overloads unchanged
+  (still used by single-note moves). Controller, RelationController, and E2E
+  folder/wiki-link suites green.
+
+**Hardening complete (Phases 12-16).**
 
 ## Test ownership (named by capability, not phase)
 
