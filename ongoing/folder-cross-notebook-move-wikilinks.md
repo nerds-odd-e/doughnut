@@ -401,7 +401,7 @@ check inside `mergeFolderInto` provides real protection.
   per-note check inside `mergeFolderInto`. Controller coverage in
   `NotebookFolderManagementControllerTest` for merge rejection and success.
 
-### Phase 13 — Co-moved peer links stay relative even when the destination has a same-title note (Behavior)
+### Phase 13 — Co-moved peer links stay relative even when the destination has a same-title note (Behavior) — done
 
 Pin and harden the outgoing-link rewrite for the duplicate-title edge case. Today
 `coMovedTargetResolvesFrom` resolves via the lowest-id global title match, so an
@@ -422,6 +422,11 @@ the co-moved peer, and then get wrongly qualified back to the source notebook.
   same-title pre-existing destination note (stays relative); keep existing
   outside/co-moved/already-qualified assertions green.
 - Verification: targeted backend test.
+- Done: `coMovedTargetResolvesFrom` matches co-moved targets by parsed
+  notebook/title within the moved set (lowest note id when titles collide)
+  instead of global lowest-id resolution. Removed unused `WikiLinkResolver`
+  dependency from `WikiLinkRewriteService`. Controller coverage in
+  `NotebookFolderManagementControllerTest`.
 
 ### Phase 14 — Folder-move merge prompt keys on a stable conflict signal, not message text (Behavior)
 

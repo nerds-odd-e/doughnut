@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.algorithms.WikiLinkMarkdown;
+import com.odde.doughnut.algorithms.WikiLinkTargetReference;
 import com.odde.doughnut.controllers.dto.TitleRenameReferenceHandling;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
@@ -19,6 +20,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
@@ -32,17 +34,14 @@ public class WikiLinkRewriteService {
   private final NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
   private final EntityPersister entityPersister;
   private final WikiTitleCacheService wikiTitleCacheService;
-  private final WikiLinkResolver wikiLinkResolver;
 
   public WikiLinkRewriteService(
       NoteWikiTitleCacheRepository noteWikiTitleCacheRepository,
       EntityPersister entityPersister,
-      WikiTitleCacheService wikiTitleCacheService,
-      WikiLinkResolver wikiLinkResolver) {
+      WikiTitleCacheService wikiTitleCacheService) {
     this.noteWikiTitleCacheRepository = noteWikiTitleCacheRepository;
     this.entityPersister = entityPersister;
     this.wikiTitleCacheService = wikiTitleCacheService;
-    this.wikiLinkResolver = wikiLinkResolver;
   }
 
   /**
@@ -203,10 +202,34 @@ public class WikiLinkRewriteService {
     if (coMovedTargetNoteIds.isEmpty()) {
       return false;
     }
-    return wikiLinkResolver
-        .resolveAnyTargetWikiLinkToken(linkText, movedNote)
-        .map(target -> coMovedTargetNoteIds.contains(target.getId()))
-        .orElse(false);
+    String focusNotebookName =
+        movedNote.getNotebook() == null ? null : movedNote.getNotebook().getName();
+    Optional<WikiLinkTargetReference> reference =
+        WikiLinkTargetReference.forToken(linkText, focusNotebookName);
+    if (reference.isEmpty()) {
+      return false;
+    }
+    WikiLinkTargetReference ref = reference.get();
+    List<Integer> noteIds = new ArrayList<>(coMovedTargetNoteIds);
+    Collections.sort(noteIds);
+    // When several co-moved notes share a title, lowest note id wins (same as global resolution).
+    for (Integer noteId : noteIds) {
+      Note candidate = entityManager.find(Note.class, noteId);
+      if (candidate != null
+          && candidate.getDeletedAt() == null
+          && noteMatchesWikiLinkTarget(candidate, ref)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private static boolean noteMatchesWikiLinkTarget(Note note, WikiLinkTargetReference ref) {
+    if (note.getNotebook() == null) {
+      return false;
+    }
+    return note.getNotebook().getName().equalsIgnoreCase(ref.notebookName())
+        && note.getTitle().equalsIgnoreCase(ref.noteTitle());
   }
 
   private void rewriteInboundWikiLinks(
