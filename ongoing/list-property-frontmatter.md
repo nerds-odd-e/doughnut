@@ -2,7 +2,7 @@
 
 ## Status
 
-Phase 13 done. Phases 14–15 planned (follow-ups from post-implementation review).
+Phase 14 done. Phase 15 planned (follow-up from post-implementation review).
 
 ## Goal
 
@@ -441,7 +441,7 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/utils/noteContentPropert
 A critical review of Phases 1–12 surfaced the items below. Worth-doing items are scheduled as Phases 13–15; lower-value items are listed under Deferred.
 
 - Bug (fixed in Phase 13): switching a populated list to Text mode in the value popup and saving silently replaces the list with an empty scalar (`draftText` is seeded from the scalar projection, which is empty for lists). `RichFrontmatterPropertyValueDialog.vue`.
-- Bug: appending a value to a named key whose current value is empty produces a list with a blank first item (`["", value]`), which composes to `- ""` — the very shape the popup rejects. `appendValueToPropertyRow` in `noteContentPropertyRows.ts`.
+- Bug (fixed in Phase 14): appending a value to a named key whose current value is empty produces a list with a blank first item (`["", value]`), which composes to `- ""` — the very shape the popup rejects. `appendValueToPropertyRow` in `noteContentPropertyRows.ts`.
 - Improvement: a list-valued `url` renders as plain comma-joined text in read-only and editable views, losing the per-URL external-link affordance that scalar `url` has. The plan explicitly enabled multiple URLs, so the links should remain clickable.
 
 ## Phase 13 - Popup List-To-Text Conversion Preserves Visible Content
@@ -475,6 +475,8 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMark
 ```
 
 ## Phase 14 - Appending To An Empty-Valued Key Does Not Create A Blank List Item
+
+**Done.**
 
 Type: Behavior.
 

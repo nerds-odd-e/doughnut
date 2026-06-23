@@ -10,11 +10,27 @@ import {
 } from "@/utils/noteContentFrontmatter"
 
 describe("append value to exact property row", () => {
-  it("promotes a scalar row to a two-item list", () => {
+  it("promotes a non-empty scalar row to a two-item list", () => {
     const row = propertyRowWithScalar("example of", "[[A]]")
     expect(appendValueToPropertyRow(row, "[[B]]")).toEqual({
       key: "example of",
       value: listPropertyValue(["[[A]]", "[[B]]"]),
+    })
+  })
+
+  it("appends to an empty-valued scalar as a single-item list", () => {
+    const row = propertyRowWithScalar("example of", "")
+    expect(appendValueToPropertyRow(row, "[[B]]")).toEqual({
+      key: "example of",
+      value: listPropertyValue(["[[B]]"]),
+    })
+  })
+
+  it("appends to a whitespace-only scalar as a single-item list", () => {
+    const row = propertyRowWithScalar("example of", "   ")
+    expect(appendValueToPropertyRow(row, "[[B]]")).toEqual({
+      key: "example of",
+      value: listPropertyValue(["[[B]]"]),
     })
   })
 

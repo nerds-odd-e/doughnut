@@ -149,9 +149,12 @@ export function appendValueToPropertyRow(
     }
   }
   const existing = scalarStringFromPropertyValue(row.value) ?? ""
+  const items = propertyValueHasContent(row.value)
+    ? [existing, trimmed]
+    : [trimmed]
   return {
     key: row.key,
-    value: listPropertyValue([existing, trimmed]),
+    value: listPropertyValue(items),
   }
 }
 
