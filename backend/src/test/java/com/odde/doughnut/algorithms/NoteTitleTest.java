@@ -3,35 +3,43 @@ package com.odde.doughnut.algorithms;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 class NoteTitleTest {
 
   @Test
-  void with_multiple_options() {
+  void with_aliases() {
     NoteTitle noteTitle = new NoteTitle("cat／kitten");
-    assertThat(noteTitle.getTitles(), hasSize(2));
-    assertThat(noteTitle.getSubtitles(), hasSize(0));
+    assertThat(noteTitle.getTitleAliases(), hasSize(2));
+    assertThat(noteTitle.getQualifier(), is(Optional.empty()));
   }
 
   @Test
-  void ascii_slash_does_not_separate_alternatives() {
+  void ascii_slash_does_not_separate_aliases() {
     NoteTitle noteTitle = new NoteTitle("cat / kitten");
-    assertThat(noteTitle.getTitles(), hasSize(1));
-    assertThat(noteTitle.getTitles().get(0).stem(), equalTo("cat / kitten"));
+    assertThat(noteTitle.getTitleAliases(), hasSize(1));
+    assertThat(noteTitle.getTitleAliases().get(0).stem(), equalTo("cat / kitten"));
   }
 
   @Test
-  void with_subtitle() {
+  void with_qualifier() {
     NoteTitle noteTitle = new NoteTitle("cat (animal)");
-    assertThat(noteTitle.getTitles(), hasSize(1));
-    assertThat(noteTitle.getSubtitles(), hasSize(1));
+    assertThat(noteTitle.getTitleAliases(), hasSize(1));
+    assertThat(noteTitle.getQualifier().map(TitleFragment::stem), is(Optional.of("animal")));
+  }
+
+  @Test
+  void qualifier_does_not_split_on_fullwidth_slash() {
+    NoteTitle noteTitle = new NoteTitle("cat (a／b)");
+    assertThat(noteTitle.getTitleAliases(), hasSize(1));
+    assertThat(noteTitle.getQualifier().map(TitleFragment::stem), is(Optional.of("a／b")));
   }
 
   @Test
   void replacing() {
     NoteTitle noteTitle = new NoteTitle("~logy／~logical");
-    TitleFragment titleFragment = noteTitle.getTitles().get(0);
+    TitleFragment titleFragment = noteTitle.getTitleAliases().get(0);
     assertThat(titleFragment.replaceLiteralWords("technological", ".."), equalTo("techno.."));
   }
 
@@ -41,19 +49,19 @@ class NoteTitleTest {
     // U+00A0: non-breaking space, U+3000: CJK ideographic space,
     // U+2000-U+2003: en/em spaces
     NoteTitle noteTitle = new NoteTitle("nebulas ／\u00A0nebula");
-    assertThat(noteTitle.getTitles(), hasSize(2));
-    assertThat(noteTitle.getTitles().get(0).stem(), equalTo("nebulas"));
-    assertThat(noteTitle.getTitles().get(1).stem(), equalTo("nebula"));
+    assertThat(noteTitle.getTitleAliases(), hasSize(2));
+    assertThat(noteTitle.getTitleAliases().get(0).stem(), equalTo("nebulas"));
+    assertThat(noteTitle.getTitleAliases().get(1).stem(), equalTo("nebula"));
 
     noteTitle = new NoteTitle("cat\u3000／\u3000kitten");
-    assertThat(noteTitle.getTitles(), hasSize(2));
-    assertThat(noteTitle.getTitles().get(0).stem(), equalTo("kitten"));
-    assertThat(noteTitle.getTitles().get(1).stem(), equalTo("cat"));
+    assertThat(noteTitle.getTitleAliases(), hasSize(2));
+    assertThat(noteTitle.getTitleAliases().get(0).stem(), equalTo("kitten"));
+    assertThat(noteTitle.getTitleAliases().get(1).stem(), equalTo("cat"));
 
     noteTitle = new NoteTitle("word1\u2000／\u2001word2\u2002／\u2003word3");
-    assertThat(noteTitle.getTitles(), hasSize(3));
-    assertThat(noteTitle.getTitles().get(0).stem(), equalTo("word3"));
-    assertThat(noteTitle.getTitles().get(1).stem(), equalTo("word2"));
-    assertThat(noteTitle.getTitles().get(2).stem(), equalTo("word1"));
+    assertThat(noteTitle.getTitleAliases(), hasSize(3));
+    assertThat(noteTitle.getTitleAliases().get(0).stem(), equalTo("word3"));
+    assertThat(noteTitle.getTitleAliases().get(1).stem(), equalTo("word2"));
+    assertThat(noteTitle.getTitleAliases().get(2).stem(), equalTo("word1"));
   }
 }

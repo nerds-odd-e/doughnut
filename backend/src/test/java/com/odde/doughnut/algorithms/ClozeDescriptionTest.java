@@ -55,7 +55,7 @@ class ClozeDescriptionTest {
     "олет,             Это самолет,                        Это самолет",
     "不客气,            😃不客气,                           😃[...]",
     "ignore (complex (brackets)), ignore complex brackets,  ignore complex brackets",
-    "cat／dog(animal／weather), dog day is a hot weather,   [...] day is a hot <...>",
+    "cat／dog(animal／weather), dog day is a hot weather,   [...] day is a hot weather",
     "6,               6year,                              [...]year",
     "cat,             <p class='cat'>a cat</p>,           <p class='cat'>a [...]</p>",
     "～かたわら,        彼女は猫を可愛がる*かたわら*、犬に対してはなぜか冷たい。,  [...]",

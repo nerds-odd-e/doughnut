@@ -5,53 +5,70 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
+/**
+ * Parses note titles with grammar {@code title[／alias]*[(qualifier)]?}.
+ *
+ * <ul>
+ *   <li>{@code ／} (U+FF0F) separates aliases; {@code ／／} is a literal {@code ／}; ASCII {@code /}
+ *       never separates.
+ *   <li>Any leading {@code ~}/{@code 〜}/{@code ～} on a title alias or the qualifier marks a cloze
+ *       suffix fragment.
+ *   <li>Only the last trailing bracket pair (any Unicode {@code \p{Ps}…\p{Pe}}) is the qualifier;
+ *       the qualifier is a single value (no aliases).
+ * </ul>
+ */
 public class NoteTitle {
 
-  private final String title;
+  private static final Pattern TITLE_WITH_QUALIFIER =
+      Pattern.compile("(?U)(.+?)(\\p{Ps}([^\\p{Ps}\\p{Pe}]+)\\p{Pe})?$");
 
-  public NoteTitle(String title) {
-    this.title = title;
+  /** Only U+FF0F separates aliases; double {@code ／／} is one literal {@code ／}. */
+  private static final String ALIAS_SEPARATOR = "(?<![／])[／](?![／])";
+
+  private final String rawTitle;
+  private final ParsedSections parsedSections;
+
+  public NoteTitle(String rawTitle) {
+    this.rawTitle = rawTitle;
+    this.parsedSections = parseSections(rawTitle);
   }
 
   public boolean matches(String answer) {
-    if (title.trim().equalsIgnoreCase(answer)) {
+    if (rawTitle.trim().equalsIgnoreCase(answer)) {
       return true;
     }
-    return getTitles().stream().anyMatch(t -> t.matches(answer));
+    return getTitleAliases().stream().anyMatch(t -> t.matches(answer));
   }
 
-  public List<TitleFragment> getTitles() {
-    return getTitleFragments(false);
-  }
-
-  private List<TitleFragment> getTitleFragments(boolean subtitle) {
+  public List<TitleFragment> getTitleAliases() {
     List<TitleFragment> result = new ArrayList<>();
-    Pattern pattern = Pattern.compile("(?U)(.+?)(\\p{Ps}([^\\p{Ps}\\p{Pe}]+)\\p{Pe})?$");
-    Matcher matcher = pattern.matcher(title);
-    if (matcher.find()) {
-      getFragments(matcher.group(subtitle ? 3 : 1)).forEach(result::add);
+    if (parsedSections.aliasSection() != null) {
+      splitAliases(parsedSections.aliasSection()).forEach(result::add);
     }
     result.sort(Comparator.comparing(TitleFragment::length));
     Collections.reverse(result);
     return result;
   }
 
-  private Stream<TitleFragment> getFragments(String subString) {
-    // Only U+FF0F (fullwidth solidus) separates alternatives; double ／／ is one literal ／.
-    return Arrays.stream(
-            subString != null ? subString.split("(?<![／])[／](?![／])") : new String[] {})
-        .map(TitleFragment::from);
+  public Optional<TitleFragment> getQualifier() {
+    return Optional.ofNullable(parsedSections.qualifierSection()).map(TitleFragment::from);
   }
 
-  public List<TitleFragment> getSubtitles() {
-    return getTitleFragments(true);
+  private static ParsedSections parseSections(String rawTitle) {
+    Matcher matcher = TITLE_WITH_QUALIFIER.matcher(rawTitle);
+    if (!matcher.find()) {
+      return new ParsedSections(null, null);
+    }
+    return new ParsedSections(matcher.group(1), matcher.group(3));
   }
 
-  public String getTitle() {
-    return this.title;
+  private static List<TitleFragment> splitAliases(String text) {
+    return Arrays.stream(text.split(ALIAS_SEPARATOR)).map(TitleFragment::from).toList();
   }
+
+  private record ParsedSections(String aliasSection, String qualifierSection) {}
 }

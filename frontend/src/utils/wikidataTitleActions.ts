@@ -1,5 +1,5 @@
 import type { WikidataSearchEntity } from "@generated/doughnut-backend-api"
-import { NOTE_TITLE_ALTERNATIVE_FORM_JOINER } from "./noteTitleAlternativeFormJoiner"
+import { appendTitleAlias } from "./noteTitleAliasJoiner"
 
 /**
  * Calculates the new title based on the title action (replace or append).
@@ -18,11 +18,5 @@ export function calculateNewTitle(
   if (titleAction === "replace") {
     return entity.label
   }
-
-  // append
-  const trimmedTitle = currentTitle.trim()
-  if (trimmedTitle === "") {
-    return entity.label
-  }
-  return `${trimmedTitle}${NOTE_TITLE_ALTERNATIVE_FORM_JOINER}${entity.label}`
+  return appendTitleAlias(currentTitle, entity.label)
 }

@@ -2,11 +2,9 @@ package com.odde.doughnut.algorithms;
 
 import java.util.regex.Pattern;
 
-record TitleFragment(boolean suffix, String stem) {
+/** A parsed title alias or qualifier: {@code stem} plus an optional cloze suffix marker. */
+record TitleFragment(boolean suffixMarker, String stem) {
   public static TitleFragment from(String content) {
-    // Normalize all Unicode whitespace characters to regular spaces (U+0020)
-    // This includes: non-breaking space (U+00A0), CJK ideographic space (U+3000),
-    // en/em spaces (U+2000-U+200B), and other Unicode whitespace characters
     String normalizedContent = normalizeWhitespace(content);
     String trimmedContent = normalizedContent.trim();
     if (trimmedContent.startsWith("~")
@@ -27,7 +25,7 @@ record TitleFragment(boolean suffix, String stem) {
   }
 
   private ClozePatternCreator getClozePatternCreator() {
-    return new ClozePatternCreator(suffix);
+    return new ClozePatternCreator(suffixMarker);
   }
 
   boolean matches(String answer) {

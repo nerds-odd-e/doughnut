@@ -8,39 +8,40 @@ record ClozeReplacement(
     String partialMatchReplacement,
     String fullMatchReplacement,
     String pronunciationReplacement,
-    String fullMatchSubtitleReplacement) {
+    String fullMatchQualifierReplacement) {
 
-  private String replaceTitleFragments(String pronunciationMasked, NoteTitle noteTitle) {
+  private String maskAliasesAndQualifier(String pronunciationMasked, NoteTitle noteTitle) {
     final String internalPartialMatchReplacement = "__p_a_r_t_i_a_l__";
     final String internalFullMatchReplacement = "__f_u_l_l__";
-    final String internalFullMatchReplacementForSubtitle = "__f_u_l_l_s_u_b__";
+    final String internalFullMatchReplacementForQualifier = "__f_u_l_l_q_u_a_l__";
 
+    var aliases = noteTitle.getTitleAliases();
     String step1 =
-        replaceTitlesWithInternalPlaceholder(
-            noteTitle.getTitles(),
+        replaceAliasesWithInternalPlaceholder(
+            aliases,
             pronunciationMasked,
             (p, t) -> t.replaceLiteralWords(p, internalFullMatchReplacement));
     String step2 =
-        replaceTitlesWithInternalPlaceholder(
-            noteTitle.getTitles(),
-            step1,
-            (p, t) -> t.replaceSimilar(p, internalPartialMatchReplacement));
+        replaceAliasesWithInternalPlaceholder(
+            aliases, step1, (p, t) -> t.replaceSimilar(p, internalPartialMatchReplacement));
     String step3 =
-        replaceTitlesWithInternalPlaceholder(
-            noteTitle.getSubtitles(),
-            step2,
-            (p, t) -> t.replaceLiteralWords(p, internalFullMatchReplacementForSubtitle));
+        noteTitle
+            .getQualifier()
+            .map(
+                qualifier ->
+                    qualifier.replaceLiteralWords(step2, internalFullMatchReplacementForQualifier))
+            .orElse(step2);
     return step3
         .replace(internalFullMatchReplacement, fullMatchReplacement)
         .replace(internalPartialMatchReplacement, partialMatchReplacement)
-        .replace(internalFullMatchReplacementForSubtitle, fullMatchSubtitleReplacement);
+        .replace(internalFullMatchReplacementForQualifier, fullMatchQualifierReplacement);
   }
 
-  private static String replaceTitlesWithInternalPlaceholder(
-      List<TitleFragment> noteTitle,
+  private static String replaceAliasesWithInternalPlaceholder(
+      List<TitleFragment> aliases,
       String processed,
       BiFunction<String, TitleFragment, String> replacer) {
-    return noteTitle.stream().reduce(processed, replacer, (x, y) -> y);
+    return aliases.stream().reduce(processed, replacer, (x, y) -> y);
   }
 
   String maskPronunciationsAndTitles(
@@ -59,7 +60,7 @@ record ClozeReplacement(
     String pronunciationsReplaced =
         pattern.matcher(contentToProcess).replaceAll(internalPronunciationReplacement);
     return noteTitles1.stream()
-        .reduce(pronunciationsReplaced, this::replaceTitleFragments, (s, s2) -> s)
+        .reduce(pronunciationsReplaced, this::maskAliasesAndQualifier, (s, s2) -> s)
         .replace(internalPronunciationReplacement, pronunciationReplacement)
         .replace(HtmlOrMarkdown.NON_WHITESPACE_CONTEXT_MARKER, "");
   }
