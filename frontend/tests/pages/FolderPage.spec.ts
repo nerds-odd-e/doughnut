@@ -16,7 +16,9 @@ import {
   resolveTopConfirm,
   selectDestinationNotebook,
   selectDestinationParentFolder,
+  setRenameName,
   submitMoveForm,
+  submitRenameForm,
 } from "@tests/pages/folderPageTestSupport"
 import type { Router } from "vue-router"
 
@@ -353,6 +355,33 @@ describe("FolderPage", () => {
 
       expect(usePopups().popups.peek()).toHaveLength(0)
       expect(wrapper.text()).toContain(conflictMessage)
+
+      wrapper.unmount()
+    })
+  })
+
+  describe("rename", () => {
+    it("shows inline conflict error when rename returns 409 FOLDER_NAME_CONFLICT", async () => {
+      const { wrapper } = mountFolderPage(router, 10, "Original")
+      await flushPromises()
+
+      const conflictMessage = "A folder with this name already exists here."
+      const renameSpy = vi
+        .spyOn(NotebookController, "renameFolder")
+        .mockResolvedValue(
+          wrapSdkError({
+            status: 409,
+            message: conflictMessage,
+            errorType: "FOLDER_NAME_CONFLICT",
+          })
+        )
+
+      await setRenameName(wrapper, "Existing")
+      await submitRenameForm(wrapper)
+
+      expect(renameSpy).toHaveBeenCalled()
+      expect(wrapper.text()).toContain(conflictMessage)
+      expect(usePopups().popups.peek()).toHaveLength(0)
 
       wrapper.unmount()
     })

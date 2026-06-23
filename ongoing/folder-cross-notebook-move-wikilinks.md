@@ -458,7 +458,7 @@ break the merge UX. Apply the same treatment to the dissolve merge prompt.
   `NotebookFolderManagementControllerTest` and `FolderPage.spec.ts`; E2E in
   `folder_organization.feature` stays green.
 
-### Phase 15 — Folder rename surfaces conflict status consistently (Behavior)
+### Phase 15 — Folder rename surfaces conflict status consistently (Behavior) — done
 
 Make the rename path on `FolderPage.vue` propagate HTTP status the same way move
 and dissolve do, so a rename name-clash surfaces a consistent, status-aware
@@ -474,6 +474,9 @@ error instead of the raw thrown body.
     `if (error) throw error`.
 - Tests: `FolderPage.spec.ts` rename conflict case.
 - Verification: targeted frontend test.
+- Done: `submitRename` uses `throwIfSdkError` like move/dissolve so HTTP status
+  is merged onto the thrown error before `toOpenApiError`. Unit coverage in
+  `FolderPage.spec.ts` for rename 409 `FOLDER_NAME_CONFLICT` inline error.
 
 ### Phase 16 — Consolidate folder-relocation traversal and conflict checks (Structure)
 

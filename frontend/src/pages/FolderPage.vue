@@ -339,7 +339,7 @@ const submitRename = async () => {
   renameError.value = undefined
   try {
     const trimmed = renameName.value.trim()
-    const { error } = await apiCallWithLoading(() =>
+    const renameResult = await apiCallWithLoading(() =>
       NotebookController.renameFolder({
         path: {
           notebook: r.notebookRealm.notebook.id,
@@ -348,7 +348,7 @@ const submitRename = async () => {
         body: { name: trimmed },
       })
     )
-    if (error) throw error
+    throwIfSdkError(renameResult)
     refreshSidebarStructuralListings()
     await refreshFolderPage()
   } catch (e: unknown) {

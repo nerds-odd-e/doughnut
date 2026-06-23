@@ -64,6 +64,27 @@ export async function submitMoveForm(wrapper: VueWrapper) {
   await flushPromises()
 }
 
+export async function setRenameName(wrapper: VueWrapper, name: string) {
+  const nameInput = wrapper.find('[data-test="folder-name"]')
+    .element as HTMLElement
+  nameInput.innerText = name
+  nameInput.dispatchEvent(new Event("input", { bubbles: true }))
+  await flushPromises()
+}
+
+export async function submitRenameForm(wrapper: VueWrapper) {
+  const renameForm = wrapper
+    .find('[data-testid="folder-rename-submit"]')
+    .element.closest("form")
+  if (renameForm == null) {
+    throw new Error("Rename form not found")
+  }
+  renameForm.dispatchEvent(
+    new Event("submit", { bubbles: true, cancelable: true })
+  )
+  await flushPromises()
+}
+
 export async function selectDestinationNotebook(
   wrapper: VueWrapper,
   notebookId: number
