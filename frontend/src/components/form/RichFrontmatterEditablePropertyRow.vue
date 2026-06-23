@@ -31,9 +31,17 @@
         @select="onPresetSelected"
       />
     </div>
-    <RichFrontmatterListPropertyValue
-      v-if="isListPropertyValue(modelValue.value)"
-      :value="modelValue.value"
+    <RichFrontmatterScalarPropertyValue
+      v-if="isTextCapablePropertyRow(modelValue)"
+      :model-value="scalarValue"
+      :property-row="modelValue"
+      :wiki-titles="wikiTitles"
+      :row-index="idx"
+      @update:model-value="onValueUpdate"
+      @update:property-value="onPropertyValueUpdate"
+      @focus="emit('row-focus')"
+      @commit="emit('commit')"
+      @dead-link-click="emit('dead-link-click', $event)"
     />
     <RelationTypeSelectCompact
       v-else-if="isRelationPropertyKey(modelValue.key)"
@@ -96,17 +104,6 @@
         </button>
       </template>
     </div>
-    <RichFrontmatterScalarPropertyValue
-      v-else
-      :model-value="scalarValue"
-      :property-row="modelValue"
-      :wiki-titles="wikiTitles"
-      :row-index="idx"
-      @update:model-value="onValueUpdate"
-      @focus="emit('row-focus')"
-      @commit="emit('commit')"
-      @dead-link-click="emit('dead-link-click', $event)"
-    />
     <button
       type="button"
       class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
@@ -122,7 +119,6 @@
 <script setup lang="ts">
 import { Minus } from "@lucide/vue"
 import { computed, ref } from "vue"
-import RichFrontmatterListPropertyValue from "@/components/form/RichFrontmatterListPropertyValue.vue"
 import RichFrontmatterImagePropertyValue from "@/components/form/RichFrontmatterImagePropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import RichFrontmatterPropertyKeyPresets from "@/components/form/RichFrontmatterPropertyKeyPresets.vue"
@@ -132,13 +128,14 @@ import type { WikiTitle } from "@generated/doughnut-backend-api"
 import {
   isImagePropertyKey,
   isRelationPropertyKey,
+  isTextCapablePropertyRow,
   isWikidataIdPropertyKey,
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
 import {
-  isListPropertyValue,
   scalarPropertyValue,
   scalarStringFromPropertyValue,
+  type PropertyValue,
 } from "@/utils/noteProperties"
 import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
 import {
@@ -189,6 +186,13 @@ function onValueUpdate(value: string) {
   emit("update:modelValue", {
     ...props.modelValue,
     value: scalarPropertyValue(value),
+  })
+}
+
+function onPropertyValueUpdate(value: PropertyValue) {
+  emit("update:modelValue", {
+    ...props.modelValue,
+    value,
   })
 }
 

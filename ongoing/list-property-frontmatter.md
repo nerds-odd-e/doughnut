@@ -345,6 +345,8 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMark
 
 ## Phase 10 - Popup Can Switch Between Text And List Values
 
+**Done.**
+
 Type: Behavior.
 
 Precondition: A user edits a text-capable property row in the rich editor.

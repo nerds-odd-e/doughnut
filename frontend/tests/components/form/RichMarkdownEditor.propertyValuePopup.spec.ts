@@ -1,23 +1,17 @@
 import { flushPromises } from "@vue/test-utils"
+import {
+  clickSave,
+  openValuePopup,
+  setTextareaValue,
+} from "./propertyValuePopupTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
-describe("RichMarkdownEditor scalar property value popup", () => {
+describe("RichMarkdownEditor property value popup", () => {
   const h = createRichMarkdownEditorTestHarness()
 
   afterEach(() => {
     h.cleanup()
   })
-
-  async function openValuePopup(
-    wrapper: Awaited<ReturnType<typeof h.mountEditor>>
-  ) {
-    const openBtn = wrapper.find(
-      '[data-testid="rich-note-property-value-popup-open"]'
-    )
-    expect(openBtn.exists()).toBe(true)
-    await openBtn.trigger("click")
-    await flushPromises()
-  }
 
   it("opens dialog with text mode and textarea when edit icon is clicked", async () => {
     const markdown = `---
@@ -53,17 +47,9 @@ Body`
     const wrapper = await h.mountEditor(markdown, { attachToBody: true })
     await openValuePopup(wrapper)
 
-    const textarea = document.querySelector(
-      '[data-testid="rich-note-property-value-popup-textarea"]'
-    ) as HTMLTextAreaElement
-    textarea.value = "advanced workshop"
-    textarea.dispatchEvent(new Event("input", { bubbles: true }))
+    setTextareaValue("advanced workshop")
     await flushPromises()
-
-    const saveBtn = document.querySelector(
-      '[data-testid="rich-note-property-value-popup-save"]'
-    ) as HTMLButtonElement
-    saveBtn.click()
+    clickSave()
     await flushPromises()
 
     const last = h.lastEmittedMarkdown()
@@ -82,11 +68,7 @@ Body`
     const wrapper = await h.mountEditor(markdown, { attachToBody: true })
     await openValuePopup(wrapper)
 
-    const textarea = document.querySelector(
-      '[data-testid="rich-note-property-value-popup-textarea"]'
-    ) as HTMLTextAreaElement
-    textarea.value = "changed but not saved"
-    textarea.dispatchEvent(new Event("input", { bubbles: true }))
+    setTextareaValue("changed but not saved")
     await flushPromises()
 
     const emitCountBefore = wrapper.emitted("update:modelValue")?.length ?? 0
@@ -108,7 +90,28 @@ Body`
     expect(valField.text()).toContain("training")
   })
 
-  it("does not show value edit icon on list property rows", async () => {
+  it("hides list mode for scalar-only structural keys", async () => {
+    const markdown = `---
+image_mask: region-a
+---
+
+Body`
+    const wrapper = await h.mountEditor(markdown, { attachToBody: true })
+    await openValuePopup(wrapper)
+
+    expect(
+      document.querySelector(
+        '[data-testid="rich-note-property-value-popup-mode-list"]'
+      )
+    ).toBeNull()
+    expect(
+      document.querySelector(
+        '[data-testid="rich-note-property-value-popup-mode-text"]'
+      )
+    ).not.toBeNull()
+  })
+
+  it("shows value edit icon on list property rows", async () => {
     const markdown = `---
 tags:
   - alpha
@@ -122,7 +125,7 @@ Body`
       wrapper
         .find('[data-testid="rich-note-property-value-popup-open"]')
         .exists()
-    ).toBe(false)
+    ).toBe(true)
   })
 
   it("does not show value edit icon on specialized scalar property rows", async () => {

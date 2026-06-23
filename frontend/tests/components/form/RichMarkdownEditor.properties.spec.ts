@@ -293,10 +293,15 @@ example of:
         .text()
     ).toContain("two")
     expect(
-      wrapper
-        .find('[data-testid="rich-note-property-row-value-input"]')
+      tagsRow!
+        .find('[data-testid="rich-note-property-row-list-value"]')
         .exists()
-    ).toBe(false)
+    ).toBe(true)
+    expect(
+      tagsRow!
+        .find('[data-testid="rich-note-property-value-popup-open"]')
+        .exists()
+    ).toBe(true)
   })
 
   it("shows list properties compactly in readonly mode", async () => {
