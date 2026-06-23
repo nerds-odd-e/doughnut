@@ -54,6 +54,15 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
     }
 
     @Test
+    void persistsTitleWithoutSurroundingUnicodeWhitespaceFromJson() throws Exception {
+      Notebook nb = createNotebookWithTitle("NB Unicode Trim");
+      NoteCreationDTO noteCreation =
+          objectMapper.readValue("{\"newTitle\": \"\\u3000引っ張る\\u3000\"}", NoteCreationDTO.class);
+      NoteRealm result = controller.createNoteAtNotebookRoot(nb, noteCreation);
+      assertThat(result.getNote().getTitle(), equalTo("引っ張る"));
+    }
+
+    @Test
     void persistsInitialMarkdownContentWhenProvided() throws Exception {
       Notebook nb = createNotebookWithTitle("NB With Initial Body");
 

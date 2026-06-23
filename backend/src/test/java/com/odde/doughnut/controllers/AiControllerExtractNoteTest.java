@@ -183,6 +183,20 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
     }
 
     @Test
+    void shouldTrimSurroundingWhitespaceFromExtractedNoteTitle()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      Note testNote = newRootNoteWithExtractableContent();
+      stubExtractionResult("\u3000Extracted Note\u3000", "Expanded content.", "Updated parent.");
+      NoteRefinementLayout layout = layoutWithItem("p1", "key suggestion to extract");
+
+      NoteRealm response =
+          controller.extractNote(testNote, layoutSelectionRequest(layout, List.of("p1")));
+
+      Note persistedNote = noteRepository.findById(response.getNote().getId()).orElseThrow();
+      assertThat(persistedNote.getTitle()).isEqualTo("Extracted Note");
+    }
+
+    @Test
     void shouldRefreshWikiLinkCacheForOriginalAndNewNoteAfterExtraction()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       Note testNote =

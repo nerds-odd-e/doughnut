@@ -251,26 +251,36 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
     }
 
     @Test
-    void shouldPersistNameOnUpdate() throws UnexpectedNoAccessRightException {
+    void shouldPersistNameOnUpdate() throws Exception {
       Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       note.getNotebook().setName("Old Title");
       var request = new NotebookUpdateRequest();
       request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
-      request.setName("  New Title  ");
+      NotebookUpdateRequest trimmedName =
+          objectMapper.readValue("{\"name\": \"  New Title  \"}", NotebookUpdateRequest.class);
+      request.setName(trimmedName.getName());
       controller.updateNotebook(note.getNotebook(), request);
       assertThat(note.getNotebook().getName(), equalTo("New Title"));
     }
 
     @Test
-    void shouldRejectEmptyOrWhitespaceNameOnUpdate() {
+    void shouldRejectEmptyOrWhitespaceNameOnUpdate() throws Exception {
       Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       var request = new NotebookUpdateRequest();
       request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
-      request.setName("   ");
+      NotebookUpdateRequest trimmedName =
+          objectMapper.readValue("{\"name\": \"   \"}", NotebookUpdateRequest.class);
+      request.setName(trimmedName.getName());
       assertThrows(
           ResponseStatusException.class,
           () -> controller.updateNotebook(note.getNotebook(), request));
-      request.setName("");
+      trimmedName = objectMapper.readValue("{\"name\": \"\"}", NotebookUpdateRequest.class);
+      request.setName(trimmedName.getName());
+      assertThrows(
+          ResponseStatusException.class,
+          () -> controller.updateNotebook(note.getNotebook(), request));
+      trimmedName = objectMapper.readValue("{\"name\": \"\\u3000\"}", NotebookUpdateRequest.class);
+      request.setName(trimmedName.getName());
       assertThrows(
           ResponseStatusException.class,
           () -> controller.updateNotebook(note.getNotebook(), request));

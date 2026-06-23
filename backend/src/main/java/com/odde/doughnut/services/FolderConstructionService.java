@@ -36,8 +36,8 @@ public class FolderConstructionService {
   }
 
   public Folder createFolder(Notebook notebook, FolderCreationRequest request) {
-    String trimmedName = request.getName().trim();
-    if (trimmedName.isEmpty()) {
+    String name = request.getName();
+    if (name.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Folder name must not be blank.");
     }
 
@@ -76,14 +76,13 @@ public class FolderConstructionService {
     }
 
     Integer parentFolderId = parentFolder == null ? null : parentFolder.getId();
-    folderSiblingNameValidation.requireNoConflictingSibling(
-        notebook.getId(), parentFolderId, trimmedName);
+    folderSiblingNameValidation.requireNoConflictingSibling(notebook.getId(), parentFolderId, name);
 
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     Folder folder = new Folder();
     folder.setNotebook(notebook);
     folder.setParentFolder(parentFolder);
-    folder.setName(trimmedName);
+    folder.setName(name);
     folder.setCreatedAt(now);
     folder.setUpdatedAt(now);
     entityPersister.save(folder);

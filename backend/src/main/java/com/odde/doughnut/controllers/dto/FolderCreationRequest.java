@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.odde.doughnut.validators.DisplayNamePathSeparators;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -19,6 +20,7 @@ public class FolderCreationRequest {
   @NotBlank
   @Size(max = 512)
   @Pattern(regexp = DisplayNamePathSeparators.REGEXP, message = DisplayNamePathSeparators.MESSAGE)
+  @JsonDeserialize(using = DisplayNameTrimmingDeserializer.class)
   @Schema(
       requiredMode = Schema.RequiredMode.REQUIRED,
       description = "Display name for the new folder")

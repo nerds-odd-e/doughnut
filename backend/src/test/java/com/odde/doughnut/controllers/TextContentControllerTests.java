@@ -7,6 +7,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteUpdateContentDTO;
@@ -53,6 +55,15 @@ class TextContentControllerTests extends ControllerTestBase {
       NoteRealm response = controller.updateNoteTitle(note, noteUpdateTitleDTO);
       assertThat(response.getId(), equalTo(note.getId()));
       assertThat(response.getNote().getTitle(), equalTo("new title"));
+    }
+
+    @Test
+    void shouldPersistTitleWithoutSurroundingCrLfFromJson() throws Exception {
+      ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
+      NoteUpdateTitleDTO titleDto =
+          objectMapper.readValue("{\"newTitle\": \"\\r\\nAfter\\r\\n\"}", NoteUpdateTitleDTO.class);
+      NoteRealm response = controller.updateNoteTitle(note, titleDto);
+      assertThat(response.getNote().getTitle(), equalTo("After"));
     }
 
     @Test

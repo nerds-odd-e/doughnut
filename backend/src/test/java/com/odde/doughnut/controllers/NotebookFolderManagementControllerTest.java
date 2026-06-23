@@ -32,7 +32,7 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
   @Nested
   class CreateFolder {
     @Test
-    void createsRootFolder() throws UnexpectedNoAccessRightException {
+    void createsRootFolder() throws Exception {
       com.odde.doughnut.controllers.dto.NotebookCreationRequest createNb =
           new com.odde.doughnut.controllers.dto.NotebookCreationRequest();
       createNb.setNewTitle("NB Create Folder Root");
@@ -40,8 +40,8 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
           controller.createNotebook(createNb);
       Notebook nb = notebookRepository.findById(redirect.notebook().getId()).orElseThrow();
 
-      FolderCreationRequest req = new FolderCreationRequest();
-      req.setName("  Inbox  ");
+      FolderCreationRequest req =
+          objectMapper.readValue("{\"name\": \"  Inbox  \"}", FolderCreationRequest.class);
       Folder created = controller.createFolder(nb, req);
       assertThat(created.getName(), equalTo("Inbox"));
 
@@ -674,25 +674,25 @@ class NotebookFolderManagementControllerTest extends NotebookControllerTestBase 
   @Nested
   class RenameFolder {
     @Test
-    void renamesFolderInPlace() throws UnexpectedNoAccessRightException {
+    void renamesFolderInPlace() throws Exception {
       User owner = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       Folder folder = makeMe.aFolder().notebook(nb).name("Old").please();
 
-      FolderRenameRequest req = new FolderRenameRequest();
-      req.setName("  New  ");
+      FolderRenameRequest req =
+          objectMapper.readValue("{\"name\": \"  New  \"}", FolderRenameRequest.class);
       Folder result = controller.renameFolder(nb, folder, req);
       assertThat(result.getName(), equalTo("New"));
     }
 
     @Test
-    void noOpWhenNameUnchangedAfterTrim() throws UnexpectedNoAccessRightException {
+    void noOpWhenNameUnchangedAfterTrim() throws Exception {
       User owner = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       Folder folder = makeMe.aFolder().notebook(nb).name("Same").please();
 
-      FolderRenameRequest req = new FolderRenameRequest();
-      req.setName("  Same  ");
+      FolderRenameRequest req =
+          objectMapper.readValue("{\"name\": \"  Same  \"}", FolderRenameRequest.class);
       Folder result = controller.renameFolder(nb, folder, req);
       assertThat(result.getName(), equalTo("Same"));
     }

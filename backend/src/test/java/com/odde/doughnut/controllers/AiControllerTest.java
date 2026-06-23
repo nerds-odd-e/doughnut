@@ -99,6 +99,18 @@ class AiControllerTest extends ControllerTestBase {
     }
 
     @Test
+    void shouldTrimSurroundingWhitespaceFromSuggestedTitle()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      TitleReplacement suggestedTopic = new TitleReplacement();
+      suggestedTopic.setNewTitle("\u3000Suggested Title\u3000");
+      openAiStructuredResponseMock.stubStructuredResponse(suggestedTopic);
+
+      SuggestedTitleDTO result = controller.suggestTitle(testNote);
+
+      assertThat(result.getTitle()).isEqualTo("Suggested Title");
+    }
+
+    @Test
     void shouldCallResponsesApiWithStructuredInstructions()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       SuggestedTitleDTO result = controller.suggestTitle(testNote);

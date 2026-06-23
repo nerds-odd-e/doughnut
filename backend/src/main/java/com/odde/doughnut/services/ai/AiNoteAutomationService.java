@@ -44,7 +44,7 @@ public class AiNoteAutomationService {
   }
 
   public String suggestTitle() throws JsonProcessingException {
-    return DisplayNamePathSeparators.toFullwidthPathSeparators(
+    return DisplayNamePathSeparators.normalizeDisplayName(
         executeWithTool(
             AiToolFactory.suggestNoteTitleAiTool(),
             TitleReplacement.class,
@@ -74,7 +74,7 @@ public class AiNoteAutomationService {
     if (result == null) {
       return null;
     }
-    result.newNoteTitle = DisplayNamePathSeparators.toFullwidthPathSeparators(result.newNoteTitle);
+    result.newNoteTitle = DisplayNamePathSeparators.normalizeDisplayName(result.newNoteTitle);
     result.newNoteContent =
         WikiLinkMarkdown.sanitizePathSeparatorsInWikiLinks(result.newNoteContent);
     result.updatedParentContent =

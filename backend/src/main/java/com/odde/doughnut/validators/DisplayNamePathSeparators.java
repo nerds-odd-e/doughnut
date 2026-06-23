@@ -1,12 +1,29 @@
 package com.odde.doughnut.validators;
 
+import java.util.regex.Pattern;
+
 public final class DisplayNamePathSeparators {
 
   private DisplayNamePathSeparators() {}
 
+  private static final Pattern SURROUNDING_WHITESPACE =
+      Pattern.compile(
+          "(?U)\\A[\\s\\u200B\\u200C\\u200D\\u2060\\uFEFF]+|[\\s\\u200B\\u200C\\u200D\\u2060\\uFEFF]+\\z");
+
   public static final String REGEXP = "^[^\\\\/:]*$";
 
   public static final String MESSAGE = "Name must not contain backslash, slash, or colon.";
+
+  public static String trimSurroundingWhitespace(String value) {
+    if (value == null) {
+      return null;
+    }
+    return SURROUNDING_WHITESPACE.matcher(value).replaceAll("");
+  }
+
+  public static String normalizeDisplayName(String value) {
+    return trimSurroundingWhitespace(toFullwidthPathSeparators(value));
+  }
 
   /** Halfwidth path separators in note titles → fullwidth (mirrors V300000174 migration). */
   public static String toFullwidthPathSeparators(String value) {

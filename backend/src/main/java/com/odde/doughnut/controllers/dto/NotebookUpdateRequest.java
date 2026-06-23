@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers.dto;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NotebookSettings;
 import com.odde.doughnut.validators.DisplayNamePathSeparators;
@@ -21,5 +22,6 @@ public class NotebookUpdateRequest {
 
   @Size(max = Note.MAX_TITLE_LENGTH)
   @Pattern(regexp = DisplayNamePathSeparators.REGEXP, message = DisplayNamePathSeparators.MESSAGE)
+  @JsonDeserialize(using = DisplayNameTrimmingDeserializer.class)
   private String name;
 }

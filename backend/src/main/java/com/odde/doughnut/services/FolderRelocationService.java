@@ -268,18 +268,18 @@ public class FolderRelocationService {
     if (!folder.getNotebook().getId().equals(notebook.getId())) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
     }
-    String trimmedName = request.getName().trim();
-    if (trimmedName.isEmpty()) {
+    String name = request.getName();
+    if (name.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Folder name must not be blank.");
     }
-    if (trimmedName.equals(folder.getName())) {
+    if (name.equals(folder.getName())) {
       return folder;
     }
     Integer parentFolderId =
         folder.getParentFolder() == null ? null : folder.getParentFolder().getId();
     folderSiblingNameValidation.requireNoConflictingSibling(
-        notebook.getId(), parentFolderId, trimmedName, folder.getId());
-    folder.setName(trimmedName);
+        notebook.getId(), parentFolderId, name, folder.getId());
+    folder.setName(name);
     folder.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     entityPersister.flush();
     entityPersister.merge(folder);
