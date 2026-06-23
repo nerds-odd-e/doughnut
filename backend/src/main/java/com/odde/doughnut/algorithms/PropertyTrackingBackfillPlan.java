@@ -1,6 +1,7 @@
 package com.odde.doughnut.algorithms;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 /** Pure planner for note property index rows and skipped property-tracker seeding. */
@@ -15,18 +16,21 @@ public final class PropertyTrackingBackfillPlan {
    * tracker when none exists yet (case-insensitive on property keys).
    */
   public static Result forNote(
-      Set<String> frontmatterKeys, Set<String> existingNonDeletedPropertyKeys) {
+      Frontmatter frontmatter, Set<String> existingNonDeletedPropertyKeys) {
+    return forPlannedRows(
+        NotePropertyIndexPlanner.plannedRows(frontmatter), existingNonDeletedPropertyKeys);
+  }
+
+  public static Result forPlannedRows(
+      List<NotePropertyIndexPlanner.PlannedRow> plannedRows,
+      Set<String> existingNonDeletedPropertyKeys) {
     Set<String> keysToIndex = new LinkedHashSet<>();
+    for (NotePropertyIndexPlanner.PlannedRow row : plannedRows) {
+      keysToIndex.add(row.propertyKey());
+    }
     Set<String> keysToSeedSkipped = new LinkedHashSet<>();
-    for (String key : frontmatterKeys) {
-      if (key == null || key.isBlank()) {
-        continue;
-      }
-      if (PropertyKeyNaming.isReservedStructuralKey(key)) {
-        continue;
-      }
-      keysToIndex.add(key);
-      if (!PropertyKeyNaming.isExampleOfFamily(key)
+    for (String key : keysToIndex) {
+      if (!PropertyKeyNaming.isExampleOfPropertyKey(key)
           && !isAlreadyTracked(key, existingNonDeletedPropertyKeys)) {
         keysToSeedSkipped.add(key);
       }

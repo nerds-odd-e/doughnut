@@ -37,6 +37,41 @@ class AssimilationServicePropertyWikiLinkGateTest {
   }
 
   @Test
+  void gates_list_property_until_all_resolved_targets_are_assimilated() {
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+    Note targetA = makeMe.aNote().title("A").notebook(notebook).please();
+    Note targetB = makeMe.aNote().title("B").notebook(notebook).please();
+    Note carrier =
+        makeMe
+            .aNote()
+            .notebook(notebook)
+            .content(
+                "---\n" + "example of:\n" + "  - \"[[A]]\"\n" + "  - \"[[B]]\"\n" + "---\n\nbody")
+            .please();
+    notePropertyIndexService.refreshForNote(carrier);
+    makeMe.aMemoryTrackerFor(carrier).by(user).assimilatedAt(day1).please();
+
+    assertThat(assimilationService.getCounts().getTotalUnassimilatedCount(), equalTo(2));
+    AssimilationUnit next = assimilationService.getNextAssimilationUnit().orElseThrow();
+    assertThat(next.note(), equalTo(targetA));
+    assertThat(next.propertyKey(), nullValue());
+
+    makeMe.aMemoryTrackerFor(targetA).by(user).assimilatedAt(day1).please();
+
+    assertThat(assimilationService.getCounts().getTotalUnassimilatedCount(), equalTo(1));
+    AssimilationUnit stillGated = assimilationService.getNextAssimilationUnit().orElseThrow();
+    assertThat(stillGated.note(), equalTo(targetB));
+    assertThat(stillGated.propertyKey(), nullValue());
+
+    makeMe.aMemoryTrackerFor(targetB).by(user).assimilatedAt(day1).please();
+
+    assertThat(assimilationService.getCounts().getTotalUnassimilatedCount(), equalTo(1));
+    AssimilationUnit property = assimilationService.getNextAssimilationUnit().orElseThrow();
+    assertThat(property.note(), equalTo(carrier));
+    assertThat(property.propertyKey(), equalTo("example of"));
+  }
+
+  @Test
   void gates_property_while_target_note_is_still_pending() {
     Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
     Note target = makeMe.aNote().title("Word").notebook(notebook).please();

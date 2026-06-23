@@ -28,6 +28,51 @@ class UnassimilatedPropertyServiceTest {
   @Autowired UnassimilatedPropertyService unassimilatedPropertyService;
 
   @Test
+  void mixed_exact_keys_remain_separate_property_units() {
+    User user = makeMe.aUser().please();
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+    Note note =
+        makeMe
+            .aNote()
+            .notebook(notebook)
+            .content(
+                "---\n"
+                    + "example of:\n"
+                    + "  - alpha\n"
+                    + "  - beta\n"
+                    + "example of 2: gamma\n"
+                    + "---\n\nbody")
+            .please();
+    notePropertyIndexService.refreshForNote(note);
+
+    List<String> propertyKeys =
+        unassimilatedPropertyService.streamUnassimilatedPropertiesForUser(user).toList().stream()
+            .map(AssimilationUnit::propertyKey)
+            .toList();
+    assertThat(propertyKeys, containsInAnyOrder("example of", "example of 2"));
+    assertThat(unassimilatedPropertyService.countUnassimilatedPropertiesForUser(user), equalTo(2));
+  }
+
+  @Test
+  void list_property_emits_one_unit_after_refresh() {
+    User user = makeMe.aUser().please();
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+    Note note =
+        makeMe
+            .aNote()
+            .notebook(notebook)
+            .content("---\n" + "example of:\n" + "  - alpha\n" + "  - beta\n" + "---\n\nbody")
+            .please();
+    notePropertyIndexService.refreshForNote(note);
+
+    assertThat(unassimilatedPropertyService.countUnassimilatedPropertiesForUser(user), equalTo(1));
+    List<AssimilationUnit> pending =
+        unassimilatedPropertyService.streamUnassimilatedPropertiesForUser(user).toList();
+    assertThat(pending, hasSize(1));
+    assertThat(pending.get(0).propertyKey(), equalTo("example of"));
+  }
+
+  @Test
   void counts_indexed_example_of_when_no_property_tracker() {
     User user = makeMe.aUser().please();
     Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();

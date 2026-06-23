@@ -38,6 +38,109 @@ class NotePropertyIndexServiceTest {
   class refreshForNote {
 
     @Test
+    void indexes_list_property_with_one_row_per_resolved_target_preserving_yaml_order() {
+      User user = makeMe.aUser().please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      Note targetA = makeMe.aNote().title("A").notebook(notebook).please();
+      Note targetB = makeMe.aNote().title("B").notebook(notebook).please();
+      String markdown =
+          "---\n" + "example of:\n" + "  - \"[[A]]\"\n" + "  - \"[[B]]\"\n" + "---\n\nbody";
+      Note note = makeMe.aNote().notebook(notebook).content(markdown).please();
+
+      notePropertyIndexService.refreshForNote(note);
+
+      List<NotePropertyIndex> rows =
+          notePropertyIndexRepository.findByNote_IdOrderByIdAsc(note.getId());
+      assertThat(rows, hasSize(2));
+      assertThat(rows.get(0).getPropertyKey(), equalTo("example of"));
+      assertThat(rows.get(0).getItemIndex(), equalTo(0));
+      assertThat(rows.get(0).getTargetNote().getId(), equalTo(targetA.getId()));
+      assertThat(rows.get(1).getPropertyKey(), equalTo("example of"));
+      assertThat(rows.get(1).getItemIndex(), equalTo(1));
+      assertThat(rows.get(1).getTargetNote().getId(), equalTo(targetB.getId()));
+    }
+
+    @Test
+    void leaves_no_rows_for_empty_list_property() {
+      User user = makeMe.aUser().please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      Note note = makeMe.aNote().notebook(notebook).content("---\ntopic: []\n---\n\nbody").please();
+
+      notePropertyIndexService.refreshForNote(note);
+
+      assertThat(notePropertyIndexRepository.findByNote_IdOrderByIdAsc(note.getId()), empty());
+    }
+
+    @Test
+    void excludes_passthrough_keys_from_indexing() {
+      User user = makeMe.aUser().please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      String markdown =
+          "---\n"
+              + "tags:\n"
+              + "  - t1\n"
+              + "aliases: [a1]\n"
+              + "cssclasses:\n"
+              + "  - c1\n"
+              + "topic: physics\n"
+              + "---\n\nbody";
+      Note note = makeMe.aNote().notebook(notebook).content(markdown).please();
+
+      notePropertyIndexService.refreshForNote(note);
+
+      List<String> keys =
+          notePropertyIndexRepository.findByNote_IdOrderByIdAsc(note.getId()).stream()
+              .map(NotePropertyIndex::getPropertyKey)
+              .toList();
+      assertThat(keys, containsInAnyOrder("topic"));
+    }
+
+    @Test
+    void keeps_exact_suffix_keys_independent() {
+      User user = makeMe.aUser().please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      Note targetA = makeMe.aNote().title("A").notebook(notebook).please();
+      Note targetB = makeMe.aNote().title("B").notebook(notebook).please();
+      Note targetC = makeMe.aNote().title("C").notebook(notebook).please();
+      String markdown =
+          "---\n"
+              + "example of:\n"
+              + "  - \"[[A]]\"\n"
+              + "  - \"[[B]]\"\n"
+              + "example of 2: \"[[C]]\"\n"
+              + "---\n\nbody";
+      Note note = makeMe.aNote().notebook(notebook).content(markdown).please();
+
+      notePropertyIndexService.refreshForNote(note);
+
+      List<NotePropertyIndex> rows =
+          notePropertyIndexRepository.findByNote_IdOrderByIdAsc(note.getId());
+      assertThat(rows, hasSize(3));
+      assertThat(
+          rows.stream().filter(r -> "example of".equals(r.getPropertyKey())).count(), equalTo(2L));
+      assertThat(
+          rows.stream().filter(r -> "example of 2".equals(r.getPropertyKey())).count(),
+          equalTo(1L));
+      NotePropertyIndex suffixRow =
+          rows.stream().filter(r -> "example of 2".equals(r.getPropertyKey())).findFirst().get();
+      assertThat(suffixRow.getItemIndex(), equalTo(0));
+      assertThat(suffixRow.getTargetNote().getId(), equalTo(targetC.getId()));
+    }
+
+    @Test
+    void stores_scalar_with_item_index_zero() {
+      User user = makeMe.aUser().please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      Note note = makeMe.aNote().notebook(notebook).content("---\ntopic: physics\n---\n").please();
+
+      notePropertyIndexService.refreshForNote(note);
+
+      NotePropertyIndex row =
+          notePropertyIndexRepository.findByNote_IdOrderByIdAsc(note.getId()).getFirst();
+      assertThat(row.getItemIndex(), equalTo(0));
+    }
+
+    @Test
     void indexes_content_keys_and_excludes_reserved_structural_keys() {
       User user = makeMe.aUser().please();
       Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
@@ -145,6 +248,50 @@ class NotePropertyIndexServiceTest {
     }
 
     @Test
+    void indexes_non_empty_list_without_resolved_targets_as_one_null_target_row() {
+      User user = makeMe.aUser().please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      String markdown =
+          "---\n" + "topic:\n" + "  - alpha\n" + "  - beta\n" + "  - gamma\n" + "---\n\nbody";
+      Note note = makeMe.aNote().notebook(notebook).content(markdown).please();
+
+      notePropertyIndexService.refreshForNote(note);
+
+      List<NotePropertyIndex> rows =
+          notePropertyIndexRepository.findByNote_IdOrderByIdAsc(note.getId());
+      assertThat(rows, hasSize(1));
+      assertThat(rows.getFirst().getPropertyKey(), equalTo("topic"));
+      assertThat(rows.getFirst().getItemIndex(), equalTo(0));
+      assertThat(rows.getFirst().getTargetNote(), nullValue());
+    }
+
+    @Test
+    void indexes_list_with_mixed_link_and_non_link_items_only_for_resolved_targets() {
+      User user = makeMe.aUser().please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      Note targetA = makeMe.aNote().title("A").notebook(notebook).please();
+      Note targetC = makeMe.aNote().title("C").notebook(notebook).please();
+      String markdown =
+          "---\n"
+              + "example of:\n"
+              + "  - \"[[A]]\"\n"
+              + "  - plain text\n"
+              + "  - \"[[C]]\"\n"
+              + "---\n\nbody";
+      Note note = makeMe.aNote().notebook(notebook).content(markdown).please();
+
+      notePropertyIndexService.refreshForNote(note);
+
+      List<NotePropertyIndex> rows =
+          notePropertyIndexRepository.findByNote_IdOrderByIdAsc(note.getId());
+      assertThat(rows, hasSize(2));
+      assertThat(rows.get(0).getItemIndex(), equalTo(0));
+      assertThat(rows.get(0).getTargetNote().getId(), equalTo(targetA.getId()));
+      assertThat(rows.get(1).getItemIndex(), equalTo(2));
+      assertThat(rows.get(1).getTargetNote().getId(), equalTo(targetC.getId()));
+    }
+
+    @Test
     void stores_null_target_when_wiki_link_does_not_resolve() {
       User user = makeMe.aUser().please();
       Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
@@ -160,6 +307,27 @@ class NotePropertyIndexServiceTest {
       NotePropertyIndex row =
           notePropertyIndexRepository.findByNote_IdOrderByIdAsc(note.getId()).getFirst();
       assertThat(row.getTargetNote(), nullValue());
+    }
+
+    @Test
+    void collapses_unresolved_list_wiki_links_to_one_null_target_row() {
+      User user = makeMe.aUser().please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      String markdown =
+          "---\n"
+              + "example of:\n"
+              + "  - \"[[Missing]]\"\n"
+              + "  - \"[[AlsoMissing]]\"\n"
+              + "---\n\nbody";
+      Note note = makeMe.aNote().notebook(notebook).content(markdown).please();
+
+      notePropertyIndexService.refreshForNote(note);
+
+      List<NotePropertyIndex> rows =
+          notePropertyIndexRepository.findByNote_IdOrderByIdAsc(note.getId());
+      assertThat(rows, hasSize(1));
+      assertThat(rows.getFirst().getItemIndex(), equalTo(0));
+      assertThat(rows.getFirst().getTargetNote(), nullValue());
     }
 
     @Test

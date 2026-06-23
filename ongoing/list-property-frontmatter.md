@@ -2,7 +2,7 @@
 
 ## Status
 
-Phase 7 done. Phases 8–12 planned.
+Phase 7 done. Phase 8 done. Phases 9–12 planned.
 
 ## Goal
 
@@ -16,6 +16,7 @@ Users may keep using legacy suffix keys such as `example of 2`. Users may also u
 - Empty lists are content-level values only. Compose them as `key: []`, but do not seed a property-index row or memory tracker for an empty list unless a later product decision explicitly wants empty properties to be assimilable.
 - Current URL semantics should not change here. In this repo, `url` is currently reserved from automatic property tracking. List support may let users store multiple URLs, but this plan should not make URLs assimilable.
 - List wiki-link gating applies to resolved target notes only. Missing or unresolved wiki links behave like today's scalar unresolved wiki link: no target note is stored, so it does not block the property unit.
+- Only assimilable keys enter `note_property_index`. For list values, index rows should be minimal: one null-target row when an assimilable non-empty list has no resolved targets, or one row per resolved target when gating needs those targets. Do not create index rows for every non-link item.
 - Scalar-only structural keys remain scalar-only: `image`, `image_mask`, `wikidata_id`, `title_pattern`, `question_generation_instruction`, `type`, `relation`, `source`, and `target`.
 - Frontend and backend must converge on the same supported value shape: scalar string/number/boolean or one-level list of string/number/boolean. Nulls, nested lists, and nested mappings are unsupported.
 
@@ -37,8 +38,8 @@ Users may keep using legacy suffix keys such as `example of 2`. Users may also u
 - Frontend rich property rows currently model every row as `{ key: string; value: PropertyValue }` in `frontend/src/utils/noteContentPropertyRows.ts`.
 - Rich editor body updates recompose frontmatter from property rows, so imported lists must be represented in rows before parse support can safely ship. Otherwise body-only edits could drop or corrupt list values.
 - Backend frontmatter parsing is separate from the frontend parser. `backend/src/main/java/com/odde/doughnut/algorithms/Frontmatter.java` stores YAML values as `Object` but exposes most callers to `getString(...)` and `stringValuesInInsertionOrder()`.
-- `note_property_index` currently has one row per `(note_id, property_key)` plus optional `target_note_id`.
-- Backend indexing currently resolves only one scalar value per key in `NotePropertyIndexService.refreshForNote`.
+- `note_property_index` has one row per `(note_id, property_key, item_index)` plus optional `target_note_id`. List properties use minimal rows: one per resolved wiki-link target (with `item_index` preserving YAML order), or one null-target row when a non-empty list has no resolved targets.
+- Backend indexing resolves each list item's first wiki link independently in `NotePropertyIndexService.refreshForNote`, planned by `NotePropertyIndexPlanner`.
 - `url` is currently considered reserved structural in `PropertyKeyNaming.isReservedStructuralKey`, so URL properties are excluded from automatic property tracking today.
 
 ## Phase 1 - Frontend Property Model Can Carry Scalars Without Behavior Change
@@ -198,7 +199,7 @@ Targeted command:
 CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests com.odde.doughnut.algorithms.*
 ```
 
-## Phase 6 - Property Index Schema Can Represent List Items Without Behavior Change
+## Phase 6 - Property Index Schema Can Represent Multiple Rows Per Key Without Behavior Change
 
 **Done.**
 
@@ -208,7 +209,7 @@ Precondition: Existing indexed notes have at most one row per property key.
 
 Trigger: Migrations run and existing scalar property-index behavior is exercised.
 
-Postcondition: Existing scalar index behavior is unchanged, but the schema can store multiple item rows for one exact property key.
+Postcondition: Existing scalar index behavior is unchanged, but the schema can store multiple rows for one exact property key when later target gating needs them.
 
 Scope:
 
@@ -241,7 +242,7 @@ Precondition: The index schema allows multiple rows per property key, but produc
 
 Trigger: The assimilation queue counts and streams property units for scalar notes.
 
-Postcondition: Existing scalar queue behavior is unchanged, and the query shape is ready to emit one property unit per exact key when list item rows arrive in the next phase.
+Postcondition: Existing scalar queue behavior is unchanged, and the query shape is ready to emit one property unit per exact key when multiple target rows arrive in the next phase.
 
 Scope:
 
@@ -249,7 +250,7 @@ Scope:
 - Preserve tracker join semantics: one tracker for the exact key suppresses all rows for that exact key.
 - Preserve reserved-key filtering.
 - Keep ordering stable by note priority and property key.
-- Do not index list items yet.
+- Do not index list-derived rows yet.
 
 Tests:
 
@@ -262,7 +263,9 @@ Targeted command:
 CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests com.odde.doughnut.services.UnassimilatedPropertyServiceTest
 ```
 
-## Phase 8 - Backend Indexes List Items And Gates On All Resolved Targets
+## Phase 8 - Backend Indexes List Property Targets And Gates On All Resolved Targets
+
+**Done.**
 
 Type: Behavior.
 
@@ -270,18 +273,20 @@ Precondition: A note contains a list property with zero, one, or multiple scalar
 
 Trigger: The backend refreshes `note_property_index`, then the assimilation queue asks for unassimilated property units.
 
-Postcondition: Non-empty list properties create one index row per item and the queue offers at most one unit per exact key. A property unit is hidden until every resolved target note across that exact key is assimilated, deleted, or skip memory tracking.
+Postcondition: Non-empty assimilable list properties create only the index rows needed for property existence and resolved-target gating. The queue offers at most one unit per exact key. A property unit is hidden until every resolved target note across that exact key is assimilated, deleted, or skip memory tracking.
 
 Scope:
 
 - Update `NotePropertyIndexService.refreshForNote`:
   - scalar: one row with `item_index = 0`
-  - non-empty list: one row per item, item indexes in YAML order
+  - non-empty list with resolved wiki-link targets: one row per resolved target, with `item_index` preserving the original YAML item order
+  - non-empty list with no resolved targets: one null-target row with `item_index = 0`, so the exact property key can still become one property unit
   - empty list: no index rows and no memory tracker seeding
   - exact suffix keys are independent keys
 - Exclude passthrough keys `tags`, `aliases`, and `cssclasses` from automatic property indexing and tracker seeding.
 - Preserve current URL exclusion.
 - Resolve each list item's first wiki link independently.
+- Do not index every non-link item; non-link items only matter to the content value, not to target gating.
 - Make target-note gate require all rows for the exact key to pass.
 - Update tracker seeding/backfill logic to operate on distinct exact property keys.
 
@@ -295,6 +300,8 @@ Tests:
   - `example of: ["[[A]]", "[[B]]"]`
   - `example of 2: "[[C]]"`
   - `example of` and `example of 2` remain separate property units.
+- Include a regression that a custom non-empty list with no resolved targets creates one property unit, not one unit per item.
+- Include a regression that `tags`, `aliases`, `cssclasses`, `url`, and empty lists create no property-index rows.
 
 Targeted commands:
 

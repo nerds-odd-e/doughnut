@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.algorithms.NoteContentMarkdown;
+import com.odde.doughnut.algorithms.NotePropertyIndexPlanner;
 import com.odde.doughnut.algorithms.PropertyTrackingBackfillPlan;
 import com.odde.doughnut.entities.ForgettingCurve;
 import java.sql.Connection;
@@ -9,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /** One-time JDBC backfill for note property index rows and skipped property trackers. */
@@ -35,7 +37,7 @@ public final class NotePropertyTrackingBackfill {
       """;
 
   private static final String INSERT_INDEX =
-      "INSERT IGNORE INTO note_property_index (note_id, property_key) VALUES (?, ?)";
+      "INSERT IGNORE INTO note_property_index (note_id, property_key, item_index) VALUES (?, ?, ?)";
 
   private static final String TRACKER_EXISTS_QUERY =
       """
@@ -83,8 +85,12 @@ public final class NotePropertyTrackingBackfill {
           String content = notes.getString("content");
           Integer ownerUserId = readNullableInt(notes, "user_id");
 
-          Set<String> frontmatterKeys = frontmatterKeysFromContent(content);
-          if (frontmatterKeys.isEmpty()) {
+          var frontmatter =
+              NoteContentMarkdown.splitLeadingFrontmatter(content == null ? "" : content)
+                  .map(NoteContentMarkdown.LeadingFrontmatter::frontmatter)
+                  .filter(fm -> !fm.isEmpty())
+                  .orElse(null);
+          if (frontmatter == null) {
             continue;
           }
 
@@ -93,12 +99,15 @@ public final class NotePropertyTrackingBackfill {
                   ? Set.of()
                   : loadExistingPropertyKeys(existingKeysStmt, ownerUserId, noteId);
 
+          List<NotePropertyIndexPlanner.PlannedRow> plannedRows =
+              NotePropertyIndexPlanner.plannedRows(frontmatter);
           PropertyTrackingBackfillPlan.Result plan =
-              PropertyTrackingBackfillPlan.forNote(frontmatterKeys, existingPropertyKeys);
+              PropertyTrackingBackfillPlan.forPlannedRows(plannedRows, existingPropertyKeys);
 
-          for (String key : plan.keysToIndex()) {
+          for (NotePropertyIndexPlanner.PlannedRow row : plannedRows) {
             insertIndexStmt.setInt(1, noteId);
-            insertIndexStmt.setString(2, key);
+            insertIndexStmt.setString(2, row.propertyKey());
+            insertIndexStmt.setInt(3, row.itemIndex());
             insertIndexStmt.addBatch();
           }
 
@@ -129,12 +138,6 @@ public final class NotePropertyTrackingBackfill {
       return null;
     }
     return ((Number) value).intValue();
-  }
-
-  private static Set<String> frontmatterKeysFromContent(String content) {
-    return NoteContentMarkdown.splitLeadingFrontmatter(content == null ? "" : content)
-        .map(lf -> lf.frontmatter().keys())
-        .orElse(Set.of());
   }
 
   private static Set<String> loadExistingPropertyKeys(

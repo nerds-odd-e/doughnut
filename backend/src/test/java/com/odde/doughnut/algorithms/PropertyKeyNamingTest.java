@@ -78,6 +78,20 @@ class PropertyKeyNamingTest {
     assertThat(PropertyKeyNaming.isReservedStructuralKey(key), is(reserved));
   }
 
+  @ParameterizedTest
+  @CsvSource({
+    "tags, true",
+    "aliases, true",
+    "cssclasses, true",
+    "cssClasses, true",
+    "topic, false",
+    "example of, false",
+  })
+  void isPassthroughPropertyKey_matches_obsidian_passthrough_keys_only(
+      String key, boolean passthrough) {
+    assertThat(PropertyKeyNaming.isPassthroughPropertyKey(key), is(passthrough));
+  }
+
   @Test
   void isImagePropertyKey_does_not_match_image_mask() {
     assertThat(PropertyKeyNaming.isImagePropertyKey("image_mask"), is(false));
@@ -91,7 +105,7 @@ class PropertyKeyNamingTest {
     "example, false",
     "topic, false",
   })
-  void isExampleOfFamily_matches_example_of_family_only(String key, boolean exampleOf) {
-    assertThat(PropertyKeyNaming.isExampleOfFamily(key), is(exampleOf));
+  void isExampleOfPropertyKey_matches_example_of_family_only(String key, boolean exampleOf) {
+    assertThat(PropertyKeyNaming.isExampleOfPropertyKey(key), is(exampleOf));
   }
 }

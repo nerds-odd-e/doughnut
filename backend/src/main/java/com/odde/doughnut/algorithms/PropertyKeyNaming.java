@@ -69,14 +69,6 @@ public final class PropertyKeyNaming {
     return propertyKeyBaseMatches(key, "example of");
   }
 
-  /**
-   * {@code example of} family keys (suffix- and case-aware); alias of {@link
-   * #isExampleOfPropertyKey}.
-   */
-  public static boolean isExampleOfFamily(String key) {
-    return isExampleOfPropertyKey(key);
-  }
-
   /** Normalizes example-of property keys when reducing relationship notes to source properties. */
   public static String canonicalExampleOfFamilyKey(String key) {
     if (!propertyKeyBaseMatches(key, "an example of")) {
@@ -117,6 +109,19 @@ public final class PropertyKeyNaming {
         || isTitlePatternPropertyKey(key)
         || isQuestionGenerationInstructionPropertyKey(key)
         || isRelationshipNoteStructuralPropertyKey(key);
+  }
+
+  /** Obsidian passthrough keys excluded from property indexing and tracker seeding. */
+  public static boolean isPassthroughPropertyKey(String key) {
+    String normalized = normalizedBaseWithoutUnderscores(key);
+    return "tags".equals(normalized)
+        || "aliases".equals(normalized)
+        || "cssclasses".equals(normalized);
+  }
+
+  /** Frontmatter keys excluded from {@code note_property_index} and automatic tracker seeding. */
+  public static boolean isExcludedFromPropertyIndexing(String key) {
+    return isReservedStructuralKey(key) || isPassthroughPropertyKey(key);
   }
 
   /**
