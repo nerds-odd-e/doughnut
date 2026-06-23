@@ -2,7 +2,7 @@
 
 ## Status
 
-Phase 7 done. Phase 8 done. Phases 9–12 planned.
+Phase 7 done. Phase 8 done. Phase 9 done. Phases 10–12 planned.
 
 ## Goal
 
@@ -313,6 +313,8 @@ CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests com.odde.doughnut.
 ```
 
 ## Phase 9 - Scalar Property Values Can Be Edited In A Textarea Popup
+
+**Done.**
 
 Type: Behavior.
 

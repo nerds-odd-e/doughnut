@@ -14,6 +14,7 @@ export {
   isImagePropertyKey,
   isQuestionGenerationInstructionPropertyKey,
   isReservedIndexOnlyPropertyKey,
+  isTextCapableScalarPropertyRow,
   isTitlePatternPropertyKey,
   isUrlPropertyKey,
   isWikidataIdPropertyKey,

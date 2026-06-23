@@ -96,38 +96,17 @@
         </button>
       </template>
     </div>
-    <div
+    <RichFrontmatterScalarPropertyValue
       v-else
-      class="min-w-0"
-      :class="
-        isUrlPropertyKey(modelValue.key)
-          ? 'flex items-center gap-2'
-          : ''
-      "
-    >
-      <div
-        :class="
-          isUrlPropertyKey(modelValue.key) ? 'min-w-0 flex-1' : ''
-        "
-        @pointerdown="onValuePointerDown"
-      >
-        <WikiPropertyValueField
-          :model-value="scalarValue"
-          :wiki-titles="wikiTitles"
-          :aria-label="`Existing note property value (row ${idx + 1})`"
-          data-testid="rich-note-property-row-value-input"
-          @update:model-value="onValueUpdate"
-          @focus="emit('row-focus')"
-          @blur="emit('commit')"
-          @dead-link-click="emit('dead-link-click', $event)"
-        />
-      </div>
-      <RichFrontmatterPropertyExternalLink
-        v-if="isUrlPropertyKey(modelValue.key) && scalarValue.trim()"
-        kind="url"
-        :value="scalarValue"
-      />
-    </div>
+      :model-value="scalarValue"
+      :property-row="modelValue"
+      :wiki-titles="wikiTitles"
+      :row-index="idx"
+      @update:model-value="onValueUpdate"
+      @focus="emit('row-focus')"
+      @commit="emit('commit')"
+      @dead-link-click="emit('dead-link-click', $event)"
+    />
     <button
       type="button"
       class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
@@ -147,13 +126,12 @@ import RichFrontmatterListPropertyValue from "@/components/form/RichFrontmatterL
 import RichFrontmatterImagePropertyValue from "@/components/form/RichFrontmatterImagePropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import RichFrontmatterPropertyKeyPresets from "@/components/form/RichFrontmatterPropertyKeyPresets.vue"
-import WikiPropertyValueField from "@/components/form/WikiPropertyValueField.vue"
+import RichFrontmatterScalarPropertyValue from "@/components/form/RichFrontmatterScalarPropertyValue.vue"
 import RelationTypeSelectCompact from "@/components/links/RelationTypeSelectCompact.vue"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
 import {
   isImagePropertyKey,
   isRelationPropertyKey,
-  isUrlPropertyKey,
   isWikidataIdPropertyKey,
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
@@ -167,8 +145,6 @@ import {
   isKnownRelationKebab,
   relationTypeFromKebab,
 } from "@/models/relationTypeOptions"
-import { primeSoftKeyboard } from "@/utils/focusTarget"
-
 const props = defineProps<{
   modelValue: PropertyRow
   idx: number
@@ -214,12 +190,6 @@ function onValueUpdate(value: string) {
     ...props.modelValue,
     value: scalarPropertyValue(value),
   })
-}
-
-function onValuePointerDown(event: PointerEvent) {
-  const target = event.target as HTMLElement
-  if (target.closest("a")) return
-  primeSoftKeyboard()
 }
 
 function onKeyFocus() {

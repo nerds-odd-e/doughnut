@@ -181,6 +181,14 @@ export function nextAvailablePropertyKeyForPreset(
   return nextAvailablePropertyKeyFromFamilyKeys(presetKey, familyKeys)
 }
 
+/** True when a property row uses the text popup editor (scalar, not specialized controls). */
+export function isTextCapableScalarPropertyRow(row: PropertyRow): boolean {
+  if (row.value.kind === "list") return false
+  if (isImagePropertyKey(row.key)) return false
+  if (isWikidataIdPropertyKey(row.key)) return false
+  return row.key.trim().toLowerCase() !== "relation"
+}
+
 /** Keys offered in the rich-mode property key dropdown (insert and row key fields). */
 export function richModeKeyDropdownPresetKeys(
   isIndexContext: boolean
