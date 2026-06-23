@@ -125,13 +125,17 @@ import { primeSoftKeyboard } from "@/utils/focusTarget"
 import {
   isRelationPropertyKey,
   isReservedIndexOnlyPropertyKey,
+  normalizePropertyRowForCommit,
+  notePropertiesFromPropertyRows,
   parseNoteContentMarkdown,
+  propertyRowWithScalar,
   removePropertyRowAt,
+  scalarStringFromPropertyRow,
   sortedPropertyRowsFromNoteProperties,
-  sortedPropertyRowsFromRecord,
   validatePropertyRowsForRichEdit,
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
+import { scalarPropertyValue } from "@/utils/noteProperties"
 import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
 
 const props = defineProps<{
@@ -189,11 +193,9 @@ const wikidataAssociationDialogRef = ref<InstanceType<
 > | null>(null)
 
 function rowsAfterAdding(row: PropertyRow): PropertyRow[] {
-  const record = Object.fromEntries(
-    propertyRows.value.map((r) => [r.key, r.value])
-  )
-  record[row.key] = row.value
-  return sortedPropertyRowsFromRecord(record)
+  const properties = notePropertiesFromPropertyRows(propertyRows.value)
+  properties[row.key] = row.value
+  return sortedPropertyRowsFromNoteProperties(properties)
 }
 
 const {
@@ -243,7 +245,11 @@ function buildPropertyRows(): PropertyRow[] {
 function filterForEmit(rows: PropertyRow[]): PropertyRow[] {
   if (!props.isIndexContext) return rows
   return rows.filter(
-    (r) => !(isReservedIndexOnlyPropertyKey(r.key) && !r.value.trim())
+    (r) =>
+      !(
+        isReservedIndexOnlyPropertyKey(r.key) &&
+        !scalarStringFromPropertyRow(r)?.trim()
+      )
   )
 }
 
@@ -297,7 +303,7 @@ function tryCommitInsert() {
     return
   }
 
-  const nextRows = rowsAfterAdding({ key, value })
+  const nextRows = rowsAfterAdding(propertyRowWithScalar(key, value))
   const result = validatePropertyRowsForRichEdit(nextRows)
   if (!result.ok) {
     validationMessage.value = result.message
@@ -330,7 +336,7 @@ async function removeRow(idx: number) {
 async function commitRow(idx: number) {
   const snapshot = rowSnapshots.value[idx]
   const rows = propertyRows.value.map((r, i) =>
-    i === idx ? { key: r.key.trim(), value: r.value.trim() } : r
+    i === idx ? normalizePropertyRowForCommit(r) : r
   )
   propertyRows.value = rows
 
@@ -367,12 +373,16 @@ function onRelationTypeSelected(idx: number, newType: string | undefined) {
   if (newType === undefined) return
   const row = propertyRows.value[idx]
   if (!row || !isRelationPropertyKey(row.key)) return
+  const current = scalarStringFromPropertyRow(row) ?? ""
   const nextKebab = relationKebabFromLabel(newType)
-  if (row.value.trim().toLowerCase() === nextKebab.toLowerCase()) return
+  if (current.trim().toLowerCase() === nextKebab.toLowerCase()) return
   const rows = propertyRows.value.map((r, i) =>
     i === idx
-      ? { key: r.key.trim(), value: nextKebab }
-      : { key: r.key.trim(), value: r.value.trim() }
+      ? normalizePropertyRowForCommit({
+          ...r,
+          value: scalarPropertyValue(nextKebab),
+        })
+      : normalizePropertyRowForCommit(r)
   )
   propertyRows.value = rows
   const result = validatePropertyRowsForRichEdit(propertyRows.value)
@@ -386,7 +396,10 @@ function onRelationTypeSelected(idx: number, newType: string | undefined) {
 
 async function addWikiLinkProperty(wikiLinkText: string) {
   const trimmedLink = wikiLinkText.trim()
-  const newRows = [...propertyRows.value, { key: "", value: wikiLinkText }]
+  const newRows = [
+    ...propertyRows.value,
+    propertyRowWithScalar("", wikiLinkText),
+  ]
   const result = validatePropertyRowsForRichEdit(newRows)
   if (!result.ok) {
     validationMessage.value = result.message
@@ -397,7 +410,8 @@ async function addWikiLinkProperty(wikiLinkText: string) {
   emits("properties-changed", filterForEmit([...newRows]))
   await nextTick()
   const idx = propertyRows.value.findIndex(
-    (r) => !r.key.trim() && r.value.trim() === trimmedLink
+    (r) =>
+      !r.key.trim() && scalarStringFromPropertyRow(r)?.trim() === trimmedLink
   )
   const rowIndex = idx >= 0 ? idx : propertyRows.value.length - 1
   requestAnimationFrame(() => {

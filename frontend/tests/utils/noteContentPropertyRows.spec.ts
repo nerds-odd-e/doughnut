@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest"
 import {
   composeNoteContentFromPropertyRows,
   insertPropertyRowAt,
+  listPropertyValue,
   parseNoteContentMarkdown,
+  propertyRowWithScalar,
   removePropertyRowAt,
   renamePropertyRowKeyAt,
   scalarRecordFromNoteProperties,
@@ -12,7 +14,11 @@ import {
 
 describe("property rows compose / mutate", () => {
   it("insert: composing first row yields parseable frontmatter with matching scalar props", () => {
-    const rows = insertPropertyRowAt([], 0, { key: "topic", value: "training" })
+    const rows = insertPropertyRowAt(
+      [],
+      0,
+      propertyRowWithScalar("topic", "training")
+    )
     const md = composeNoteContentFromPropertyRows(rows, "# Hello\n")
     const parsed = parseNoteContentMarkdown(md)
     expect(
@@ -107,36 +113,81 @@ describe("property rows compose / mutate", () => {
     ).toEqual({})
     if (again.ok) expect(again.body).toBe("Paragraph.\n")
   })
+
+  it("compose preserves list property values from rows", () => {
+    const rows = [
+      { key: "tags", value: listPropertyValue(["alpha", "beta"]) },
+      propertyRowWithScalar("topic", "training"),
+    ]
+    const md = composeNoteContentFromPropertyRows(rows, "# Body\n")
+    const parsed = parseNoteContentMarkdown(md)
+    expect(parsed.ok).toBe(true)
+    if (!parsed.ok) return
+    expect(parsed.properties.tags).toEqual(listPropertyValue(["alpha", "beta"]))
+    expect(scalarRecordFromNoteProperties(parsed.properties)).toEqual({
+      topic: "training",
+    })
+    expect(md).toContain("- alpha")
+    expect(md).toContain("- beta")
+  })
+
+  it("sortedPropertyRowsFromNoteProperties includes list values", () => {
+    const parsed = parseNoteContentMarkdown(`---
+tags:
+  - a
+  - b
+topic: x
+---
+Body`)
+    expect(parsed.ok).toBe(true)
+    if (!parsed.ok) return
+    const rows = sortedPropertyRowsFromNoteProperties(parsed.properties)
+    expect(rows).toHaveLength(2)
+    expect(rows.find((r) => r.key === "tags")?.value).toEqual(
+      listPropertyValue(["a", "b"])
+    )
+    expect(rows.find((r) => r.key === "topic")?.value.kind).toBe("scalar")
+  })
 })
 
 describe("validatePropertyRowsForRichEdit", () => {
   it("accepts distinct keys after trim", () => {
     expect(
       validatePropertyRowsForRichEdit([
-        { key: " a ", value: "x" },
-        { key: "b", value: " y " },
+        propertyRowWithScalar(" a ", "x"),
+        propertyRowWithScalar("b", " y "),
       ])
     ).toEqual({ ok: true })
   })
 
   it("allows one draft row with empty key when value is non-empty", () => {
     expect(
-      validatePropertyRowsForRichEdit([{ key: "   ", value: "[[Note]]" }])
+      validatePropertyRowsForRichEdit([
+        propertyRowWithScalar("   ", "[[Note]]"),
+      ])
     ).toEqual({ ok: true })
   })
 
-  it("rejects empty key when value is empty", () => {
-    const r = validatePropertyRowsForRichEdit([{ key: "", value: "  " }])
+  it("rejects empty key when scalar value is empty", () => {
+    const r = validatePropertyRowsForRichEdit([propertyRowWithScalar("", "  ")])
     expect(r.ok).toBe(false)
     if (!r.ok) {
       expect(r.message).toContain("empty key")
     }
   })
 
+  it("allows empty key when list value is non-empty", () => {
+    expect(
+      validatePropertyRowsForRichEdit([
+        { key: "", value: listPropertyValue(["draft"]) },
+      ])
+    ).toEqual({ ok: true })
+  })
+
   it("rejects more than one row with empty key", () => {
     const r = validatePropertyRowsForRichEdit([
-      { key: "", value: "a" },
-      { key: "  ", value: "b" },
+      propertyRowWithScalar("", "a"),
+      propertyRowWithScalar("  ", "b"),
     ])
     expect(r.ok).toBe(false)
     if (!r.ok) {
@@ -146,12 +197,20 @@ describe("validatePropertyRowsForRichEdit", () => {
 
   it("rejects duplicate keys after trim", () => {
     const r = validatePropertyRowsForRichEdit([
-      { key: "same", value: "a" },
-      { key: "same", value: "b" },
+      propertyRowWithScalar("same", "a"),
+      propertyRowWithScalar("same", "b"),
     ])
     expect(r.ok).toBe(false)
     if (!r.ok) {
       expect(r.message).toContain("Duplicate")
     }
+  })
+
+  it("accepts list property rows", () => {
+    expect(
+      validatePropertyRowsForRichEdit([
+        { key: "tags", value: listPropertyValue(["a", "b"]) },
+      ])
+    ).toEqual({ ok: true })
   })
 })

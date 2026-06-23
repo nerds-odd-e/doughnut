@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest"
+import { propertyRowWithScalar } from "@/utils/noteContentPropertyRows"
 import {
   isExampleOfPropertyKey,
   isImagePropertyKey,
@@ -57,13 +58,13 @@ describe("nextAvailablePropertyKeyForPreset", () => {
   it("returns the next suffixed key when the base is taken", () => {
     expect(
       nextAvailablePropertyKeyForPreset("url", [
-        { key: "url", value: "https://a" },
+        propertyRowWithScalar("url", "https://a"),
       ])
     ).toBe("url 2")
     expect(
       nextAvailablePropertyKeyForPreset("url", [
-        { key: "url", value: "https://a" },
-        { key: "url 2", value: "https://b" },
+        propertyRowWithScalar("url", "https://a"),
+        propertyRowWithScalar("url 2", "https://b"),
       ])
     ).toBe("url 3")
   })
@@ -71,13 +72,13 @@ describe("nextAvailablePropertyKeyForPreset", () => {
   it("treats wikidataId as occupying the wikidata_id family", () => {
     expect(
       nextAvailablePropertyKeyForPreset("wikidata_id", [
-        { key: "wikidataId", value: "Q1" },
+        propertyRowWithScalar("wikidataId", "Q1"),
       ])
     ).toBe("wikidata_id 2")
   })
 
   it("excludes the current row when computing the next key", () => {
-    const rows = [{ key: "url", value: "https://a" }]
+    const rows = [propertyRowWithScalar("url", "https://a")]
     expect(
       nextAvailablePropertyKeyForPreset("url", rows, { excludeRowIndex: 0 })
     ).toBe("url")
@@ -91,7 +92,7 @@ describe("richModeKeyDropdownPresetKeysForPropertyRows", () => {
     )
     expect(
       richModeKeyDropdownPresetKeysForPropertyRows(false, [
-        { key: "status", value: "ok" },
+        propertyRowWithScalar("status", "ok"),
       ])
     ).toEqual(richModeKeyDropdownPresetKeys(false))
   })
@@ -99,7 +100,7 @@ describe("richModeKeyDropdownPresetKeysForPropertyRows", () => {
   it("resolves occupied presets to the next suffixed key", () => {
     expect(
       richModeKeyDropdownPresetKeysForPropertyRows(false, [
-        { key: "image", value: "/a.png" },
+        propertyRowWithScalar("image", "/a.png"),
       ])
     ).toEqual([
       "image 2",
@@ -110,7 +111,7 @@ describe("richModeKeyDropdownPresetKeysForPropertyRows", () => {
     ])
     expect(
       richModeKeyDropdownPresetKeysForPropertyRows(false, [
-        { key: "wikidataId", value: "Q1" },
+        propertyRowWithScalar("wikidataId", "Q1"),
       ])
     ).toEqual([
       "image",
@@ -121,7 +122,7 @@ describe("richModeKeyDropdownPresetKeysForPropertyRows", () => {
     ])
     expect(
       richModeKeyDropdownPresetKeysForPropertyRows(false, [
-        { key: "url", value: "https://x" },
+        propertyRowWithScalar("url", "https://x"),
       ])
     ).toEqual([
       "image",
@@ -135,8 +136,8 @@ describe("richModeKeyDropdownPresetKeysForPropertyRows", () => {
   it("ignores rows with empty keys", () => {
     expect(
       richModeKeyDropdownPresetKeysForPropertyRows(false, [
-        { key: "", value: "x" },
-        { key: "  ", value: "y" },
+        propertyRowWithScalar("", "x"),
+        propertyRowWithScalar("  ", "y"),
       ])
     ).toEqual(richModeKeyDropdownPresetKeys(false))
   })

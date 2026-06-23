@@ -2,7 +2,7 @@
 
 ## Status
 
-Phase 2 done. Phases 3–12 planned.
+Phase 3 done. Phases 4–12 planned.
 
 ## Goal
 
@@ -34,7 +34,7 @@ Users may keep using legacy suffix keys such as `example of 2`. Users may also u
 - Frontend parsing currently returns `NoteProperties` (`Record<string, PropertyValue>`) from `frontend/src/utils/noteContentFrontmatterParse.ts`; scalar compatibility via `scalarRecordFromNoteProperties` and `frontmatterScalar` in `frontend/src/utils/noteProperties.ts`.
 - `yamlValueToPropertyValue` and `yamlRecordFromNoteProperties` in `noteProperties.ts` handle one-level list parse and Obsidian-style block compose (`key: []` for empty lists).
 - `isScalarOnlyStructuralPropertyKey` in `noteContentPropertyKeys.ts` blocks list values on structural keys during parse.
-- Frontend rich property rows currently model every row as `{ key: string; value: string }` in `frontend/src/utils/noteContentPropertyRows.ts`.
+- Frontend rich property rows currently model every row as `{ key: string; value: PropertyValue }` in `frontend/src/utils/noteContentPropertyRows.ts`.
 - Rich editor body updates recompose frontmatter from property rows, so imported lists must be represented in rows before parse support can safely ship. Otherwise body-only edits could drop or corrupt list values.
 - Backend frontmatter parsing is separate from the frontend parser. `backend/src/main/java/com/odde/doughnut/algorithms/Frontmatter.java` stores YAML values as `Object` but exposes most callers to `getString(...)` and `stringValuesInInsertionOrder()`.
 - `note_property_index` currently has one row per `(note_id, property_key)` plus optional `target_note_id`.
@@ -108,6 +108,8 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/utils/noteContentFrontma
 ```
 
 ## Phase 3 - Rich Editor Preserves Imported Lists Without Full List Editing
+
+**Done.**
 
 Type: Behavior.
 

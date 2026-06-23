@@ -247,4 +247,111 @@ Body line`
     expect(last).toContain("beta:")
     expect(last).toContain("Body line")
   })
+
+  it("shows imported list properties without parse error banner", async () => {
+    const markdown = `---
+tags:
+  - alpha
+  - beta
+example of:
+  - one
+  - two
+---
+
+# Body`
+    const wrapper = await h.mountEditor(markdown)
+    await flushPromises()
+
+    expect(
+      wrapper.find('[data-testid="rich-note-frontmatter-parse-error"]').exists()
+    ).toBe(false)
+    expect(wrapper.find("h4").text()).toBe("Properties")
+    const rows = wrapper.findAll('[data-testid="rich-note-property-row"]')
+    expect(rows.length).toBe(2)
+    const tagsRow = rows.find(
+      (r) => (r.element as HTMLElement).dataset.propertyKey === "tags"
+    )
+    const exampleRow = rows.find(
+      (r) => (r.element as HTMLElement).dataset.propertyKey === "example of"
+    )
+    expect(tagsRow).toBeDefined()
+    expect(exampleRow).toBeDefined()
+    expect(
+      tagsRow!.find('[data-testid="rich-note-property-row-list-value"]').text()
+    ).toContain("alpha")
+    expect(
+      tagsRow!.find('[data-testid="rich-note-property-row-list-value"]').text()
+    ).toContain("beta")
+    expect(
+      exampleRow!
+        .find('[data-testid="rich-note-property-row-list-value"]')
+        .text()
+    ).toContain("one")
+    expect(
+      exampleRow!
+        .find('[data-testid="rich-note-property-row-list-value"]')
+        .text()
+    ).toContain("two")
+    expect(
+      wrapper
+        .find('[data-testid="rich-note-property-row-value-input"]')
+        .exists()
+    ).toBe(false)
+  })
+
+  it("shows list properties compactly in readonly mode", async () => {
+    const markdown = `---
+tags:
+  - alpha
+  - beta
+---
+
+# Body`
+    const wrapper = await h.mountEditor(markdown, { readonly: true })
+    const readOnlyList = wrapper.find("dl")
+    expect(readOnlyList.text()).toContain("tags")
+    expect(readOnlyList.text()).toContain("alpha")
+    expect(readOnlyList.text()).toContain("beta")
+  })
+
+  it("preserves list frontmatter when body is edited", async () => {
+    const markdown = `---
+tags:
+  - alpha
+  - beta
+---
+
+# Original`
+    await h.mountEditor(markdown)
+
+    const quill = h.getWrapper().findComponent({ name: "QuillEditor" })
+    quill.vm.$emit("update:modelValue", "<h1>Edited Heading</h1>")
+
+    const last = h.lastEmittedMarkdown()
+    expect(last).toContain("tags:")
+    expect(last).toContain("- alpha")
+    expect(last).toContain("- beta")
+    expect(last).toContain("Edited Heading")
+  })
+
+  it("preserves list frontmatter on pasteComplete", async () => {
+    const markdown = `---
+tags:
+  - a1
+  - a2
+---
+
+Hello`
+    const wrapper = await h.mountEditor(markdown)
+
+    const quill = wrapper.findComponent({ name: "QuillEditor" })
+    quill.vm.$emit("pasteComplete", "<p>Pasted</p>")
+
+    const emitted = wrapper.emitted("pasteComplete")
+    expect(emitted?.length).toBeGreaterThan(0)
+    const payload = emitted![emitted!.length - 1]![0] as string
+    expect(payload).toContain("tags:")
+    expect(payload).toContain("- a1")
+    expect(payload).toMatch(/^---\n/)
+  })
 })

@@ -54,6 +54,7 @@ import {
   composeNoteContentFromPropertyRows,
   diffFrontmatterPropertyKeyChanges,
   parseNoteContentMarkdown,
+  propertyRowWithScalar,
   sortedPropertyRowsFromNoteProperties,
   validatePropertyRowsForRichEdit,
 } from "@/utils/noteContentFrontmatter"
@@ -161,7 +162,7 @@ onMounted(() => {
       if (!parsed.ok) return
       const rows = [
         ...sortedPropertyRowsFromNoteProperties(parsed.properties),
-        { key: "", value: text },
+        propertyRowWithScalar("", text),
       ]
       if (!validatePropertyRowsForRichEdit(rows).ok) return
       const composed = composeNoteContentFromPropertyRows(rows, parsed.body)

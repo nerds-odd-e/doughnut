@@ -8,8 +8,12 @@ import { calculateNewTitle } from "@/utils/wikidataTitleActions"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
 import {
   validatePropertyRowsForRichEdit,
+  normalizePropertyRowForCommit,
+  propertyRowWithScalar,
+  scalarStringFromPropertyRow,
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
+import { scalarPropertyValue } from "@/utils/noteProperties"
 import type { Ref, ComputedRef } from "vue"
 
 export type WikidataEditContext =
@@ -57,14 +61,18 @@ export function useWikidataPropertyDialog({
   const wikidataDialogModelValue = computed(() => {
     const c = wikidataEditContext.value
     if (!c) return ""
-    if (c.type === "row") return propertyRows.value[c.idx]?.value ?? ""
+    if (c.type === "row")
+      return scalarStringFromPropertyRow(propertyRows.value[c.idx]!) ?? ""
     return draftValue.value
   })
 
   const wikidataDialogCanSaveEmptyToClear = computed(() => {
     const c = wikidataEditContext.value
     if (!c) return false
-    if (c.type === "row") return !!propertyRows.value[c.idx]?.value.trim()
+    if (c.type === "row") {
+      const scalar = scalarStringFromPropertyRow(propertyRows.value[c.idx]!)
+      return !!scalar?.trim()
+    }
     return !!draftValue.value.trim()
   })
 
@@ -81,7 +89,8 @@ export function useWikidataPropertyDialog({
     wikidataEditContext.value = ctx
     wikidataSavedSnapshot.value =
       ctx.type === "row"
-        ? (propertyRows.value[ctx.idx]?.value.trim() ?? "")
+        ? (scalarStringFromPropertyRow(propertyRows.value[ctx.idx]!)?.trim() ??
+          "")
         : draftValue.value.trim()
     wikidataIdError.value = undefined
     wikidataDialogOpen.value = true
@@ -104,8 +113,11 @@ export function useWikidataPropertyDialog({
   function applyWikidataIdToRow(idx: number, wikidataId: string) {
     const rows = propertyRows.value.map((r, i) =>
       i === idx
-        ? { key: r.key.trim(), value: wikidataId }
-        : { key: r.key.trim(), value: r.value.trim() }
+        ? normalizePropertyRowForCommit({
+            ...r,
+            value: scalarPropertyValue(wikidataId),
+          })
+        : normalizePropertyRowForCommit(r)
     )
     propertyRows.value = rows
     const result = validatePropertyRowsForRichEdit(propertyRows.value)
@@ -127,7 +139,7 @@ export function useWikidataPropertyDialog({
       wikidataIdError.value = "Duplicate property keys are not allowed."
       return
     }
-    const nextRows = rowsAfterAdding({ key, value: trimmed })
+    const nextRows = rowsAfterAdding(propertyRowWithScalar(key, trimmed))
     const result = validatePropertyRowsForRichEdit(nextRows)
     if (!result.ok) {
       onValidationError(result.message)

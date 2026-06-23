@@ -32,6 +32,19 @@ export function scalarStringFromPropertyValue(
   return value.kind === "scalar" ? value.value : undefined
 }
 
+/** Compact single-line label for property rows (comma-separated list items). */
+export function compactDisplayForPropertyValue(value: PropertyValue): string {
+  if (value.kind === "scalar") return value.value
+  if (value.items.length === 0) return "[]"
+  return value.items.join(", ")
+}
+
+/** True when a property row carries a non-empty scalar or list value. */
+export function propertyValueHasContent(value: PropertyValue): boolean {
+  if (value.kind === "list") return value.items.length > 0
+  return value.value.trim().length > 0
+}
+
 /** Builds note properties from legacy scalar-only records. */
 export function notePropertiesFromScalarRecord(
   record: Record<string, string>

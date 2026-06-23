@@ -31,8 +31,12 @@
         @select="onPresetSelected"
       />
     </div>
+    <RichFrontmatterListPropertyValue
+      v-if="isListPropertyValue(modelValue.value)"
+      :value="modelValue.value"
+    />
     <RelationTypeSelectCompact
-      v-if="isRelationPropertyKey(modelValue.key)"
+      v-else-if="isRelationPropertyKey(modelValue.key)"
       field="relationType"
       scope-name="rich-note-relation-property"
       hide-label
@@ -42,7 +46,7 @@
     />
     <RichFrontmatterImagePropertyValue
       v-else-if="isImagePropertyKey(modelValue.key)"
-      :model-value="modelValue.value"
+      :model-value="scalarValue"
       :note-id="noteId"
       :ariaLabel="`Existing note image property value (row ${idx + 1})`"
       value-test-id="rich-note-property-row-value-input"
@@ -57,22 +61,22 @@
     <div
       v-else-if="isWikidataIdPropertyKey(modelValue.key)"
       class="flex min-w-0 items-center gap-2"
-      :class="modelValue.value.trim() ? '' : 'justify-between'"
+      :class="scalarValue.trim() ? '' : 'justify-between'"
     >
-      <template v-if="modelValue.value.trim()">
+      <template v-if="scalarValue.trim()">
         <button
           type="button"
           class="daisy-btn daisy-btn-ghost daisy-btn-sm h-auto min-h-0 min-w-0 max-w-full shrink truncate justify-start py-0.5 px-1 font-mono text-sm font-normal text-base-content/90 normal-case"
-          :title="modelValue.value.trim()"
+          :title="scalarValue.trim()"
           data-testid="rich-note-wikidata-property-edit"
-          :aria-label="`Edit Wikidata ID ${modelValue.value.trim()}`"
+          :aria-label="`Edit Wikidata ID ${scalarValue.trim()}`"
           @click="emit('wikidata-dialog-open')"
         >
-          {{ modelValue.value.trim() }}
+          {{ scalarValue.trim() }}
         </button>
         <RichFrontmatterPropertyExternalLink
           kind="wikidata"
-          :value="modelValue.value"
+          :value="scalarValue"
         />
       </template>
       <template v-else>
@@ -108,7 +112,7 @@
         @pointerdown="onValuePointerDown"
       >
         <WikiPropertyValueField
-          :model-value="modelValue.value"
+          :model-value="scalarValue"
           :wiki-titles="wikiTitles"
           :aria-label="`Existing note property value (row ${idx + 1})`"
           data-testid="rich-note-property-row-value-input"
@@ -119,9 +123,9 @@
         />
       </div>
       <RichFrontmatterPropertyExternalLink
-        v-if="isUrlPropertyKey(modelValue.key) && modelValue.value.trim()"
+        v-if="isUrlPropertyKey(modelValue.key) && scalarValue.trim()"
         kind="url"
-        :value="modelValue.value"
+        :value="scalarValue"
       />
     </div>
     <button
@@ -139,6 +143,7 @@
 <script setup lang="ts">
 import { Minus } from "@lucide/vue"
 import { computed, ref } from "vue"
+import RichFrontmatterListPropertyValue from "@/components/form/RichFrontmatterListPropertyValue.vue"
 import RichFrontmatterImagePropertyValue from "@/components/form/RichFrontmatterImagePropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import RichFrontmatterPropertyKeyPresets from "@/components/form/RichFrontmatterPropertyKeyPresets.vue"
@@ -152,6 +157,11 @@ import {
   isWikidataIdPropertyKey,
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
+import {
+  isListPropertyValue,
+  scalarPropertyValue,
+  scalarStringFromPropertyValue,
+} from "@/utils/noteProperties"
 import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
 import {
   isKnownRelationKebab,
@@ -182,8 +192,12 @@ const emit = defineEmits<{
 
 const presetPanelOpen = ref(false)
 
+const scalarValue = computed(
+  () => scalarStringFromPropertyValue(props.modelValue.value) ?? ""
+)
+
 const relationModelValue = computed(() => {
-  const v = props.modelValue.value
+  const v = scalarValue.value
   if (isKnownRelationKebab(v)) return relationTypeFromKebab(v)
   return v.trim()
 })
@@ -196,7 +210,10 @@ function onKeyInput(event: Event) {
 }
 
 function onValueUpdate(value: string) {
-  emit("update:modelValue", { ...props.modelValue, value })
+  emit("update:modelValue", {
+    ...props.modelValue,
+    value: scalarPropertyValue(value),
+  })
 }
 
 function onValuePointerDown(event: PointerEvent) {

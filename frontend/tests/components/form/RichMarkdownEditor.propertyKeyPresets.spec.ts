@@ -1,4 +1,8 @@
 import { richModeKeyDropdownPresetKeysForPropertyRows } from "@/utils/noteContentFrontmatter"
+import {
+  propertyRowWithScalar,
+  type PropertyRow,
+} from "@/utils/noteContentPropertyRows"
 import { flushPromises } from "@vue/test-utils"
 import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
 import { nextTick } from "vue"
@@ -38,7 +42,7 @@ describe("RichMarkdownEditor property key presets", () => {
       case: "insert row",
       markdown: "# Hello Body",
       keyInputTestId: "rich-note-property-key",
-      existingRows: [] as { key: string; value: string }[],
+      existingRows: [] as PropertyRow[],
     },
     {
       case: "existing row",
@@ -48,7 +52,7 @@ status: ok
 
 # Body`,
       keyInputTestId: "rich-note-property-row-key-input",
-      existingRows: [{ key: "status", value: "ok" }],
+      existingRows: [propertyRowWithScalar("status", "ok")],
     },
   ] as const)("shows preset keys when $case key input is focused", async ({
     markdown,
@@ -126,7 +130,7 @@ image: /x.png
     await flushPromises()
     await h.assertPresetOptionsVisible(
       richModeKeyDropdownPresetKeysForPropertyRows(false, [
-        { key: "image", value: "/x.png" },
+        propertyRowWithScalar("image", "/x.png"),
       ])
     )
   })

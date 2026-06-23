@@ -1,12 +1,31 @@
 import { composeNoteContentMarkdown } from "@/utils/noteContentFrontmatter"
 import {
   type NoteProperties,
+  type PropertyValue,
   notePropertiesFromScalarRecord,
+  propertyValueHasContent,
+  scalarPropertyValue,
   scalarStringFromPropertyValue,
 } from "@/utils/noteProperties"
-export type PropertyRow = { key: string; value: string }
 
-/** Maps parsed properties into sorted rows for stable UI state (scalar values only). */
+export type PropertyRow = { key: string; value: PropertyValue }
+
+export function propertyRowWithScalar(key: string, value: string): PropertyRow {
+  return { key, value: scalarPropertyValue(value) }
+}
+
+/** Builds note properties from rich-editor property rows (last row wins on duplicate keys). */
+export function notePropertiesFromPropertyRows(
+  rows: readonly PropertyRow[]
+): NoteProperties {
+  const properties: NoteProperties = {}
+  for (const row of rows) {
+    properties[row.key] = row.value
+  }
+  return properties
+}
+
+/** Maps parsed properties into sorted rows for stable UI state. */
 export function sortedPropertyRowsFromNoteProperties(
   properties: NoteProperties
 ): PropertyRow[] {
@@ -14,10 +33,7 @@ export function sortedPropertyRowsFromNoteProperties(
   if (keys.length === 0) return []
   return keys
     .sort((a, b) => a.localeCompare(b))
-    .flatMap((key) => {
-      const scalar = scalarStringFromPropertyValue(properties[key]!)
-      return scalar === undefined ? [] : [{ key, value: scalar }]
-    })
+    .map((key) => ({ key, value: properties[key]! }))
 }
 
 /** Maps legacy scalar property records into sorted rows for stable UI state. */
@@ -34,25 +50,32 @@ export function composeNoteContentFromPropertyRows(
   rows: readonly PropertyRow[],
   body: string
 ): string {
-  const properties = notePropertiesFromScalarRecord(
-    Object.fromEntries(rows.map((row) => [row.key, row.value]))
-  )
-  return composeNoteContentMarkdown({ properties, body })
+  return composeNoteContentMarkdown({
+    properties: notePropertiesFromPropertyRows(rows),
+    body,
+  })
+}
+
+function normalizeRowForValidation(row: PropertyRow): PropertyRow {
+  return {
+    key: row.key.trim(),
+    value:
+      row.value.kind === "scalar"
+        ? scalarPropertyValue(row.value.value.trim())
+        : row.value,
+  }
 }
 
 /** Validates rich property rows before persisting or emitting updates (trimmed keys). */
 export function validatePropertyRowsForRichEdit(
   rows: readonly PropertyRow[]
 ): { ok: true } | { ok: false; message: string } {
-  const trimmed = rows.map((r) => ({
-    key: r.key.trim(),
-    value: r.value.trim(),
-  }))
+  const trimmed = rows.map(normalizeRowForValidation)
   let emptyKeyCount = 0
   for (const r of trimmed) {
     if (!r.key) {
       emptyKeyCount++
-      if (!r.value) {
+      if (!propertyValueHasContent(r.value)) {
         return {
           ok: false,
           message:
@@ -101,4 +124,22 @@ export function removePropertyRowAt(
   index: number
 ): PropertyRow[] {
   return rows.filter((_, i) => i !== index)
+}
+
+/** Trims scalar row values; list values are preserved as-is. */
+export function normalizePropertyRowForCommit(row: PropertyRow): PropertyRow {
+  return {
+    key: row.key.trim(),
+    value:
+      row.value.kind === "scalar"
+        ? scalarPropertyValue(row.value.value.trim())
+        : row.value,
+  }
+}
+
+/** Scalar string for a row when the value is scalar; undefined for lists. */
+export function scalarStringFromPropertyRow(
+  row: PropertyRow
+): string | undefined {
+  return scalarStringFromPropertyValue(row.value)
 }

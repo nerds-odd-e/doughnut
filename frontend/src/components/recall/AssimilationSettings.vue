@@ -61,8 +61,8 @@
                       <span class="font-medium shrink-0">{{ row.key }}</span>
                       <span
                         class="min-w-0 flex-1 truncate text-sm text-base-content/70"
-                        :title="row.value"
-                      >{{ row.value }}</span>
+                        :title="compactDisplayForPropertyValue(row.value)"
+                      >{{ compactDisplayForPropertyValue(row.value) }}</span>
                       <span class="shrink-0">
                         <AssimilationButtons
                           size="sm"
@@ -175,6 +175,7 @@ import {
   parseNoteContentMarkdown,
   sortedPropertyRowsFromNoteProperties,
 } from "@/utils/noteContentFrontmatter"
+import { compactDisplayForPropertyValue } from "@/utils/noteProperties"
 import { usePendingAssimilationProperty } from "@/composables/usePendingAssimilationProperty"
 import { computed, ref, toRef, watch } from "vue"
 
