@@ -34,6 +34,10 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
           + " OR COALESCE(t.recallSetting.skipMemoryTracking, FALSE) = TRUE"
           + " OR tmt IS NOT NULL) ";
 
+  String unassimilatedDedupeByExactKey =
+      " AND i.itemIndex = (SELECT MIN(i2.itemIndex) FROM NotePropertyIndex i2"
+          + " WHERE i2.note = n AND i2.propertyKey = i.propertyKey)";
+
   String unassimilatedOrderBy = " ORDER BY n.recallSetting.level, n.createdAt, n.id, i.propertyKey";
 
   @Modifying
@@ -51,6 +55,7 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
               + targetNoteGateJoin
               + unassimilatedWhereClause
               + targetNoteGateWhere
+              + unassimilatedDedupeByExactKey
               + unassimilatedOrderBy)
   Stream<NotePropertyIndex> streamUnassimilatedPropertiesForOwnership(
       @Param("userId") Integer userId, @Param("ownershipId") Integer ownershipId);
@@ -65,6 +70,7 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
               + unassimilatedWhereClause
               + targetNoteGateWhere
               + " AND nb.id = :notebookId"
+              + unassimilatedDedupeByExactKey
               + unassimilatedOrderBy)
   Stream<NotePropertyIndex> streamUnassimilatedPropertiesForNotebook(
       @Param("userId") Integer userId, @Param("notebookId") Integer notebookId);

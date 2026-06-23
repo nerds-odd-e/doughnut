@@ -125,6 +125,43 @@ class UnassimilatedPropertyServiceTest {
   }
 
   @Test
+  void emits_one_property_unit_when_multiple_index_rows_share_exact_key() {
+    User user = makeMe.aUser().please();
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+    Note note =
+        makeMe
+            .aNote()
+            .notebook(notebook)
+            .content("---\nexample of: \"[[Word]]\"\n---\n\nbody")
+            .please();
+    notePropertyIndexService.refreshForNote(note);
+    insertAdditionalIndexRow(note, "example of", 1);
+
+    assertThat(unassimilatedPropertyService.countUnassimilatedPropertiesForUser(user), equalTo(1));
+    List<AssimilationUnit> pending =
+        unassimilatedPropertyService.streamUnassimilatedPropertiesForUser(user).toList();
+    assertThat(pending, hasSize(1));
+    assertThat(pending.get(0).propertyKey(), equalTo("example of"));
+    assertThat(pending.get(0).note(), equalTo(note));
+  }
+
+  @Test
+  void property_tracker_suppresses_all_index_rows_for_exact_key() {
+    User user = makeMe.aUser().please();
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+    Note note =
+        makeMe.aNote().notebook(notebook).content("---\ntopic: physics\n---\n\nbody").please();
+    notePropertyIndexService.refreshForNote(note);
+    insertAdditionalIndexRow(note, "topic", 1);
+    makeMe.aMemoryTrackerFor(note).by(user).propertyKey("topic").please();
+
+    assertThat(unassimilatedPropertyService.countUnassimilatedPropertiesForUser(user), equalTo(0));
+    assertThat(
+        unassimilatedPropertyService.streamUnassimilatedPropertiesForUser(user).toList(),
+        hasSize(0));
+  }
+
+  @Test
   void counts_unassimilated_properties_in_subscribed_notebook() {
     User owner = makeMe.aUser().please();
     User subscriber = makeMe.aUser().please();
@@ -163,9 +200,14 @@ class UnassimilatedPropertyServiceTest {
   }
 
   private void insertStaleReservedIndexRow(Note note, String propertyKey) {
-    NotePropertyIndex staleReservedKey = new NotePropertyIndex();
-    staleReservedKey.setNote(note);
-    staleReservedKey.setPropertyKey(propertyKey);
-    notePropertyIndexRepository.save(staleReservedKey);
+    insertAdditionalIndexRow(note, propertyKey, 0);
+  }
+
+  private void insertAdditionalIndexRow(Note note, String propertyKey, int itemIndex) {
+    NotePropertyIndex row = new NotePropertyIndex();
+    row.setNote(note);
+    row.setPropertyKey(propertyKey);
+    row.setItemIndex(itemIndex);
+    notePropertyIndexRepository.save(row);
   }
 }

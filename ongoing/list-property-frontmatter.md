@@ -2,7 +2,7 @@
 
 ## Status
 
-Phase 6 done. Phases 7–12 planned.
+Phase 7 done. Phases 8–12 planned.
 
 ## Goal
 
@@ -232,6 +232,8 @@ CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests com.odde.doughnut.
 ```
 
 ## Phase 7 - Assimilation Queries Group Rows By Exact Property Key
+
+**Done.**
 
 Type: Structure.
 
