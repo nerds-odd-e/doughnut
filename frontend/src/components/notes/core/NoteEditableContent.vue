@@ -54,7 +54,7 @@ import {
   composeNoteContentFromPropertyRows,
   diffFrontmatterPropertyKeyChanges,
   parseNoteContentMarkdown,
-  sortedPropertyRowsFromRecord,
+  sortedPropertyRowsFromNoteProperties,
   validatePropertyRowsForRichEdit,
 } from "@/utils/noteContentFrontmatter"
 import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
@@ -160,7 +160,7 @@ onMounted(() => {
       const parsed = parseNoteContentMarkdown(props.noteContent ?? "")
       if (!parsed.ok) return
       const rows = [
-        ...sortedPropertyRowsFromRecord(parsed.properties),
+        ...sortedPropertyRowsFromNoteProperties(parsed.properties),
         { key: "", value: text },
       ]
       if (!validatePropertyRowsForRichEdit(rows).ok) return

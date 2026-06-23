@@ -1,4 +1,5 @@
 import { parseNoteContentMarkdown } from "@/utils/noteContentFrontmatter"
+import { frontmatterScalar, type NoteProperties } from "@/utils/noteProperties"
 
 export type RelationTypeLabel =
   | "related to"
@@ -120,16 +121,9 @@ export function relationTypeFromKebab(kebab: string): RelationTypeLabel {
 }
 
 function relationKebabFromProperties(
-  properties: Record<string, string>
+  properties: NoteProperties
 ): string | undefined {
-  for (const key of Object.keys(properties)) {
-    if (key.trim().toLowerCase() === "relation") {
-      const v = properties[key]?.trim()
-      if (!v) return
-      return v
-    }
-  }
-  return
+  return frontmatterScalar(properties, "relation")
 }
 
 /** Relation type label for display from note Markdown `relation` frontmatter (same mapping as rich property editor). */

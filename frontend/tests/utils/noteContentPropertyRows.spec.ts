@@ -5,7 +5,8 @@ import {
   parseNoteContentMarkdown,
   removePropertyRowAt,
   renamePropertyRowKeyAt,
-  sortedPropertyRowsFromRecord,
+  scalarRecordFromNoteProperties,
+  sortedPropertyRowsFromNoteProperties,
   validatePropertyRowsForRichEdit,
 } from "@/utils/noteContentFrontmatter"
 
@@ -14,7 +15,9 @@ describe("property rows compose / mutate", () => {
     const rows = insertPropertyRowAt([], 0, { key: "topic", value: "training" })
     const md = composeNoteContentFromPropertyRows(rows, "# Hello\n")
     const parsed = parseNoteContentMarkdown(md)
-    expect(parsed.ok && parsed.properties).toEqual({
+    expect(
+      parsed.ok && scalarRecordFromNoteProperties(parsed.properties)
+    ).toEqual({
       topic: "training",
     })
     if (parsed.ok) {
@@ -28,52 +31,64 @@ describe("property rows compose / mutate", () => {
     )
     expect(parsed.ok).toBe(true)
     if (!parsed.ok) return
-    let rows = sortedPropertyRowsFromRecord(parsed.properties)
+    let rows = sortedPropertyRowsFromNoteProperties(parsed.properties)
     rows = renamePropertyRowKeyAt(rows, 0, "alphaRenamed")
     const md = composeNoteContentFromPropertyRows(rows, parsed.body)
     const again = parseNoteContentMarkdown(md)
-    expect(again.ok && again.properties).toEqual({
+    expect(
+      again.ok && scalarRecordFromNoteProperties(again.properties)
+    ).toEqual({
       alphaRenamed: "one",
       beta: "two",
     })
-    expect(again.ok && again.properties.alpha).toBeUndefined()
+    expect(
+      again.ok && scalarRecordFromNoteProperties(again.properties).alpha
+    ).toBeUndefined()
   })
 
   it("remove: dropping one row leaves remaining props only", () => {
     const parsed = parseNoteContentMarkdown("---\na: 1\nb: 2\n---\nRest\n")
     expect(parsed.ok).toBe(true)
     if (!parsed.ok) return
-    let rows = sortedPropertyRowsFromRecord(parsed.properties)
+    let rows = sortedPropertyRowsFromNoteProperties(parsed.properties)
     rows = removePropertyRowAt(rows, 0)
     const md = composeNoteContentFromPropertyRows(rows, parsed.body)
     const again = parseNoteContentMarkdown(md)
-    expect(again.ok && again.properties).toEqual({ b: "2" })
+    expect(
+      again.ok && scalarRecordFromNoteProperties(again.properties)
+    ).toEqual({ b: "2" })
   })
 
   it("remove: dropping second sorted row keeps first key only", () => {
     const parsed = parseNoteContentMarkdown("---\na: 1\nb: 2\n---\nRest\n")
     expect(parsed.ok).toBe(true)
     if (!parsed.ok) return
-    let rows = sortedPropertyRowsFromRecord(parsed.properties)
+    let rows = sortedPropertyRowsFromNoteProperties(parsed.properties)
     rows = removePropertyRowAt(rows, 1)
     const md = composeNoteContentFromPropertyRows(rows, parsed.body)
     const again = parseNoteContentMarkdown(md)
-    expect(again.ok && again.properties).toEqual({ a: "1" })
-    expect(again.ok && again.properties.b).toBeUndefined()
+    expect(
+      again.ok && scalarRecordFromNoteProperties(again.properties)
+    ).toEqual({ a: "1" })
+    expect(
+      again.ok && scalarRecordFromNoteProperties(again.properties).b
+    ).toBeUndefined()
   })
 
   it("remove: clearing every row yields body-only content without frontmatter fence", () => {
     const parsed = parseNoteContentMarkdown("---\na: 1\nb: 2\n---\nRest\n")
     expect(parsed.ok).toBe(true)
     if (!parsed.ok) return
-    let rows = sortedPropertyRowsFromRecord(parsed.properties)
+    let rows = sortedPropertyRowsFromNoteProperties(parsed.properties)
     rows = removePropertyRowAt(rows, 0)
     rows = removePropertyRowAt(rows, 0)
     const md = composeNoteContentFromPropertyRows(rows, parsed.body)
     expect(md).toBe("Rest\n")
     expect(md.startsWith("---")).toBe(false)
     const again = parseNoteContentMarkdown(md)
-    expect(again.ok && again.properties).toEqual({})
+    expect(
+      again.ok && scalarRecordFromNoteProperties(again.properties)
+    ).toEqual({})
     if (again.ok) expect(again.body).toBe("Rest\n")
   })
 
@@ -81,13 +96,15 @@ describe("property rows compose / mutate", () => {
     const parsed = parseNoteContentMarkdown("---\nonly: x\n---\nParagraph.\n")
     expect(parsed.ok).toBe(true)
     if (!parsed.ok) return
-    let rows = sortedPropertyRowsFromRecord(parsed.properties)
+    let rows = sortedPropertyRowsFromNoteProperties(parsed.properties)
     rows = removePropertyRowAt(rows, 0)
     const md = composeNoteContentFromPropertyRows(rows, parsed.body)
     expect(md).toBe("Paragraph.\n")
     expect(md.startsWith("---")).toBe(false)
     const again = parseNoteContentMarkdown(md)
-    expect(again.ok && again.properties).toEqual({})
+    expect(
+      again.ok && scalarRecordFromNoteProperties(again.properties)
+    ).toEqual({})
     if (again.ok) expect(again.body).toBe("Paragraph.\n")
   })
 })

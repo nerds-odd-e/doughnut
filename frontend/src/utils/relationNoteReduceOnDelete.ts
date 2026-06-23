@@ -1,6 +1,9 @@
 import type { NoteRealm, WikiTitle } from "@generated/doughnut-backend-api"
 import { relationTypeLabelFromNoteContent } from "@/models/relationTypeOptions"
-import { parseNoteContentMarkdown } from "@/utils/noteContentFrontmatter"
+import {
+  frontmatterScalar,
+  parseNoteContentMarkdown,
+} from "@/utils/noteContentFrontmatter"
 import {
   splitWikiLinkInner,
   wikiTitleParts,
@@ -11,19 +14,6 @@ const RELATIONSHIP_NOTE_TYPE = "relationship"
 export type RelationNoteReduceOnDeleteQualification = {
   sourcePropertyKey: string
   sourceNoteId: number
-}
-
-function frontmatterScalar(
-  properties: Record<string, string>,
-  fieldKey: string
-): string | undefined {
-  const needle = fieldKey.toLowerCase()
-  for (const key of Object.keys(properties)) {
-    if (key.trim().toLowerCase() !== needle) continue
-    const v = properties[key]?.trim()
-    if (v) return v
-  }
-  return
 }
 
 function firstWikiLinkInnerInScalar(scalar: string): string | undefined {

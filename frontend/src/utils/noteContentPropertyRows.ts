@@ -1,17 +1,32 @@
 import { composeNoteContentMarkdown } from "@/utils/noteContentFrontmatter"
-
-/** One key/value row for rich property editing (order matches sorted keys). */
+import {
+  type NoteProperties,
+  notePropertiesFromScalarRecord,
+  scalarStringFromPropertyValue,
+} from "@/utils/noteProperties"
 export type PropertyRow = { key: string; value: string }
 
-/** Maps parsed scalar properties into sorted rows for stable UI state. */
-export function sortedPropertyRowsFromRecord(
-  properties: Record<string, string>
+/** Maps parsed properties into sorted rows for stable UI state (scalar values only). */
+export function sortedPropertyRowsFromNoteProperties(
+  properties: NoteProperties
 ): PropertyRow[] {
   const keys = Object.keys(properties)
   if (keys.length === 0) return []
   return keys
     .sort((a, b) => a.localeCompare(b))
-    .map((key) => ({ key, value: properties[key]! }))
+    .flatMap((key) => {
+      const scalar = scalarStringFromPropertyValue(properties[key]!)
+      return scalar === undefined ? [] : [{ key, value: scalar }]
+    })
+}
+
+/** Maps legacy scalar property records into sorted rows for stable UI state. */
+export function sortedPropertyRowsFromRecord(
+  properties: Record<string, string>
+): PropertyRow[] {
+  return sortedPropertyRowsFromNoteProperties(
+    notePropertiesFromScalarRecord(properties)
+  )
 }
 
 /** Composes content from ordered rows; duplicate keys keep the last occurrence. */
@@ -19,10 +34,9 @@ export function composeNoteContentFromPropertyRows(
   rows: readonly PropertyRow[],
   body: string
 ): string {
-  const properties: Record<string, string> = {}
-  for (const row of rows) {
-    properties[row.key] = row.value
-  }
+  const properties = notePropertiesFromScalarRecord(
+    Object.fromEntries(rows.map((row) => [row.key, row.value]))
+  )
   return composeNoteContentMarkdown({ properties, body })
 }
 

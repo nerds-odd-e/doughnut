@@ -4,6 +4,7 @@ import {
   firstScalarValueFromYamlBlock,
   noteImageScalarsFromMarkdown,
   parseNoteContentMarkdown,
+  scalarRecordFromNoteProperties,
 } from "@/utils/noteContentFrontmatter"
 
 describe("firstScalarValueFromYamlBlock", () => {
@@ -54,11 +55,13 @@ describe("parseNoteContentMarkdown", () => {
   it("parses two scalar properties and body after closing fence", () => {
     const md = "---\nalpha: one\nbeta: 2\n---\nParagraph.\n"
     const r = parseNoteContentMarkdown(md)
-    expect(r).toEqual({
-      ok: true,
-      properties: { alpha: "one", beta: "2" },
-      body: "Paragraph.\n",
+    expect(r.ok).toBe(true)
+    if (!r.ok) return
+    expect(scalarRecordFromNoteProperties(r.properties)).toEqual({
+      alpha: "one",
+      beta: "2",
     })
+    expect(r.body).toBe("Paragraph.\n")
   })
 
   it("places body immediately after closing fence without extra newline when absent", () => {
@@ -122,11 +125,13 @@ describe("parseNoteContentMarkdown", () => {
   it("coerces boolean and number scalars to strings", () => {
     const md = "---\nflag: true\nnum: 42\n---\n"
     const r = parseNoteContentMarkdown(md)
-    expect(r).toEqual({
-      ok: true,
-      properties: { flag: "true", num: "42" },
-      body: "",
+    expect(r.ok).toBe(true)
+    if (!r.ok) return
+    expect(scalarRecordFromNoteProperties(r.properties)).toEqual({
+      flag: "true",
+      num: "42",
     })
+    expect(r.body).toBe("")
   })
 
   it("rejects explicit yaml null property value", () => {
@@ -171,7 +176,7 @@ describe("composeNoteContentMarkdown", () => {
   it("round-trips empty frontmatter parse with compose adding no fence when props empty", () => {
     const md = "---\n---\nOnly body\n"
     const parsed = parseNoteContentMarkdown(md)
-    expect(parsed.ok && parsed.properties).toEqual({})
+    expect(parsed.ok && Object.keys(parsed.properties)).toEqual([])
     if (!parsed.ok) return
     expect(
       composeNoteContentMarkdown({

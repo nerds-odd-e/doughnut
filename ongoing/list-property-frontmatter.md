@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned.
+Phase 1 done. Phases 2–12 planned.
 
 ## Goal
 
@@ -31,7 +31,7 @@ Users may keep using legacy suffix keys such as `example of 2`. Users may also u
 
 ## Discoveries
 
-- Frontend parsing currently returns `Record<string, string>` from `frontend/src/utils/noteContentFrontmatterParse.ts`.
+- Frontend parsing currently returns `NoteProperties` (`Record<string, PropertyValue>`) from `frontend/src/utils/noteContentFrontmatterParse.ts`; scalar compatibility via `scalarRecordFromNoteProperties` and `frontmatterScalar` in `frontend/src/utils/noteProperties.ts`.
 - Frontend rich property rows currently model every row as `{ key: string; value: string }` in `frontend/src/utils/noteContentPropertyRows.ts`.
 - Rich editor body updates recompose frontmatter from property rows, so imported lists must be represented in rows before parse support can safely ship. Otherwise body-only edits could drop or corrupt list values.
 - Backend frontmatter parsing is separate from the frontend parser. `backend/src/main/java/com/odde/doughnut/algorithms/Frontmatter.java` stores YAML values as `Object` but exposes most callers to `getString(...)` and `stringValuesInInsertionOrder()`.
@@ -40,6 +40,8 @@ Users may keep using legacy suffix keys such as `example of 2`. Users may also u
 - `url` is currently considered reserved structural in `PropertyKeyNaming.isReservedStructuralKey`, so URL properties are excluded from automatic property tracking today.
 
 ## Phase 1 - Frontend Property Model Can Carry Scalars Without Behavior Change
+
+**Done.**
 
 Type: Structure.
 

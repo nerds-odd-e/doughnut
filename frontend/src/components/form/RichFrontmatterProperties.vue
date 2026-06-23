@@ -127,6 +127,7 @@ import {
   isReservedIndexOnlyPropertyKey,
   parseNoteContentMarkdown,
   removePropertyRowAt,
+  sortedPropertyRowsFromNoteProperties,
   sortedPropertyRowsFromRecord,
   validatePropertyRowsForRichEdit,
   type PropertyRow,
@@ -236,7 +237,7 @@ function rowKeyPresetListId(idx: number) {
 function buildPropertyRows(): PropertyRow[] {
   const p = parsed.value
   if (!p.ok) return []
-  return sortedPropertyRowsFromRecord(p.properties)
+  return sortedPropertyRowsFromNoteProperties(p.properties)
 }
 
 function filterForEmit(rows: PropertyRow[]): PropertyRow[] {

@@ -1,4 +1,10 @@
 import YAML from "yaml"
+import {
+  type NoteProperties,
+  yamlScalarToPropertyValue,
+} from "@/utils/noteProperties"
+
+export type { NoteProperties, PropertyValue } from "@/utils/noteProperties"
 
 export type ParseNoteContentFailureReason =
   | "malformed_frontmatter_fence"
@@ -7,7 +13,7 @@ export type ParseNoteContentFailureReason =
   | "unsupported_value"
 
 export type ParseNoteContentMarkdownResult =
-  | { ok: true; properties: Record<string, string>; body: string }
+  | { ok: true; properties: NoteProperties; body: string }
   | {
       ok: false
       reason: ParseNoteContentFailureReason
@@ -100,24 +106,14 @@ export function noteImageScalarsFromMarkdown(markdown: string): {
   return out
 }
 
-function yamlScalarToPropertyString(value: unknown): string | null {
-  if (value === null || value === undefined) return null
-  if (typeof value === "string") return value
-  if (typeof value === "number" || typeof value === "boolean") {
-    return String(value)
-  }
-  if (typeof value === "bigint") return String(value)
-  return null
-}
-
 function mappingToProperties(
   map: Record<string, unknown>
 ):
-  | { ok: true; properties: Record<string, string> }
+  | { ok: true; properties: NoteProperties }
   | Extract<ParseNoteContentMarkdownResult, { ok: false }> {
-  const properties: Record<string, string> = {}
+  const properties: NoteProperties = {}
   for (const key of Object.keys(map)) {
-    const value = yamlScalarToPropertyString(map[key])
+    const value = yamlScalarToPropertyValue(map[key])
     if (value === null) {
       return {
         ok: false,

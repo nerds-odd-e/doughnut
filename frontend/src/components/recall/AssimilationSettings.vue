@@ -173,7 +173,7 @@ import type { AssimilateEvent } from "@/composables/useAssimilateUnit"
 import { isSkippedForRecall } from "@/composables/useReviveMemoryTracker"
 import {
   parseNoteContentMarkdown,
-  sortedPropertyRowsFromRecord,
+  sortedPropertyRowsFromNoteProperties,
 } from "@/utils/noteContentFrontmatter"
 import { usePendingAssimilationProperty } from "@/composables/usePendingAssimilationProperty"
 import { computed, ref, toRef, watch } from "vue"
@@ -206,7 +206,7 @@ useDaisyDialog(showRefineNoteModal, refineNoteDialogRef)
 const propertyRows = computed(() => {
   const parsed = parseNoteContentMarkdown(note.content ?? "")
   if (!parsed.ok) return []
-  return sortedPropertyRowsFromRecord(parsed.properties)
+  return sortedPropertyRowsFromNoteProperties(parsed.properties)
 })
 
 const onNoteRecallInfoLoaded = (info: NoteRecallInfo) => {

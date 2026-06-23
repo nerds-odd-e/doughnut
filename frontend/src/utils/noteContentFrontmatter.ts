@@ -1,6 +1,11 @@
 import YAML from "yaml"
 import { isTitlePatternPropertyKey } from "@/utils/noteContentPropertyKeys"
 import { parseNoteContentMarkdown } from "@/utils/noteContentFrontmatterParse"
+import {
+  type NoteProperties,
+  scalarRecordFromNoteProperties,
+  scalarStringFromPropertyValue,
+} from "@/utils/noteProperties"
 
 export {
   INDEX_ONLY_PRESET_PROPERTY_KEYS,
@@ -26,18 +31,32 @@ export {
   insertPropertyRowAt,
   removePropertyRowAt,
   renamePropertyRowKeyAt,
+  sortedPropertyRowsFromNoteProperties,
   sortedPropertyRowsFromRecord,
   validatePropertyRowsForRichEdit,
 } from "@/utils/noteContentPropertyRows"
 
 export {
+  type NoteProperties,
   type ParseNoteContentFailureReason,
   type ParseNoteContentMarkdownResult,
+  type PropertyValue,
   firstScalarValueFromYamlBlock,
   noteImageScalarsFromMarkdown,
   parseNoteContentMarkdown,
   verbatimFrontmatterPrefixAndBody,
 } from "@/utils/noteContentFrontmatterParse"
+
+export {
+  frontmatterScalar,
+  isListPropertyValue,
+  isScalarPropertyValue,
+  listPropertyValue,
+  notePropertiesFromScalarRecord,
+  scalarPropertyValue,
+  scalarRecordFromNoteProperties,
+  scalarStringFromPropertyValue,
+} from "@/utils/noteProperties"
 
 /** Reads scoped title pattern from leading YAML (`title_pattern` or legacy `titlePattern`; key match ignores case and underscores). */
 export function titlePatternFromNoteMarkdown(
@@ -48,7 +67,7 @@ export function titlePatternFromNoteMarkdown(
   if (!p.ok) return
   for (const [k, v] of Object.entries(p.properties)) {
     if (isTitlePatternPropertyKey(k)) {
-      const t = (v ?? "").trim()
+      const t = (scalarStringFromPropertyValue(v) ?? "").trim()
       return t.length > 0 ? t : undefined
     }
   }
@@ -57,7 +76,7 @@ export function titlePatternFromNoteMarkdown(
 
 /** True when any key is the `relation` property (trimmed, case-insensitive), matching rich editor rows. */
 export function propertyRecordHasRelationKey(
-  properties: Record<string, string>
+  properties: Record<string, string> | NoteProperties
 ): boolean {
   for (const key of Object.keys(properties)) {
     if (key.trim().toLowerCase() === "relation") return true
@@ -74,16 +93,19 @@ export function contentHasRelationProperty(markdown: string): boolean {
 
 /** Composes note Markdown content with optional leading YAML frontmatter. */
 export function composeNoteContentMarkdown(input: {
-  properties: Record<string, string>
+  properties: NoteProperties
   body: string
 }): string {
   if (Object.keys(input.properties).length === 0) {
     return input.body
   }
 
-  const yamlBlock = YAML.stringify(input.properties, {
-    lineWidth: 0,
-  }).trimEnd()
+  const yamlBlock = YAML.stringify(
+    scalarRecordFromNoteProperties(input.properties),
+    {
+      lineWidth: 0,
+    }
+  ).trimEnd()
 
   return `---\n${yamlBlock}\n---\n${input.body}`
 }
@@ -120,7 +142,7 @@ export function diffFrontmatterPropertyKeyChanges(
 
   const removedByValue = new Map<string, string[]>()
   for (const key of removedKeys) {
-    const value = (oldProps[key] ?? "").trim()
+    const value = (scalarStringFromPropertyValue(oldProps[key]!) ?? "").trim()
     const list = removedByValue.get(value) ?? []
     list.push(key)
     removedByValue.set(value, list)
@@ -128,7 +150,7 @@ export function diffFrontmatterPropertyKeyChanges(
 
   const addedByValue = new Map<string, string[]>()
   for (const key of addedKeys) {
-    const value = (newProps[key] ?? "").trim()
+    const value = (scalarStringFromPropertyValue(newProps[key]!) ?? "").trim()
     const list = addedByValue.get(value) ?? []
     list.push(key)
     addedByValue.set(value, list)
