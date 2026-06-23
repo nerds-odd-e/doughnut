@@ -2,7 +2,7 @@
 
 ## Status
 
-Plan complete. Phase 12 done.
+Phase 13 done. Phases 14–15 planned (follow-ups from post-implementation review).
 
 ## Goal
 
@@ -436,8 +436,107 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMark
 CURSOR_DEV=true nix develop -c pnpm frontend:test tests/utils/noteContentPropertyRows.spec.ts
 ```
 
+## Review Findings (post-implementation)
+
+A critical review of Phases 1–12 surfaced the items below. Worth-doing items are scheduled as Phases 13–15; lower-value items are listed under Deferred.
+
+- Bug (fixed in Phase 13): switching a populated list to Text mode in the value popup and saving silently replaces the list with an empty scalar (`draftText` is seeded from the scalar projection, which is empty for lists). `RichFrontmatterPropertyValueDialog.vue`.
+- Bug: appending a value to a named key whose current value is empty produces a list with a blank first item (`["", value]`), which composes to `- ""` — the very shape the popup rejects. `appendValueToPropertyRow` in `noteContentPropertyRows.ts`.
+- Improvement: a list-valued `url` renders as plain comma-joined text in read-only and editable views, losing the per-URL external-link affordance that scalar `url` has. The plan explicitly enabled multiple URLs, so the links should remain clickable.
+
+## Phase 13 - Popup List-To-Text Conversion Preserves Visible Content
+
+**Done.**
+
+Type: Behavior.
+
+Precondition: A property row holds a non-empty list value and the user opens the value popup (which starts in list mode).
+
+Trigger: The user switches to Text mode and saves.
+
+Postcondition: Switching to Text mode shows the list content as editable text (not an empty textarea), so saving as text does not silently discard the list. Saving an unchanged text view preserves the prior items' content in scalar form.
+
+Scope:
+
+- Seed the popup `draftText` from the list value when the value is a list (for example newline- or comma-joined items), so the Text tab is never blank for a populated list.
+- Keep scalar-open behavior unchanged (text mode seeded from the scalar).
+- Keep list mode unchanged; only the text seeding for list values changes.
+- Do not change scalar-only structural key handling.
+
+Tests:
+
+- Extend `frontend/tests/components/form/RichMarkdownEditor.propertyValuePopupModeSwitch.spec.ts`.
+- Cover: open a populated list, switch to Text, the textarea is non-empty; save produces a non-empty scalar rather than `""`.
+
+Targeted command:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyValuePopupModeSwitch.spec.ts
+```
+
+## Phase 14 - Appending To An Empty-Valued Key Does Not Create A Blank List Item
+
+Type: Behavior.
+
+Precondition: A named property row exists with an empty (or whitespace-only) scalar value.
+
+Trigger: The user adds another value to that exact key through the rich insert UI.
+
+Postcondition: The resulting list contains only the newly added value (no leading blank `- ""` item). Appending to a key with a non-empty scalar still promotes to a two-item list as today.
+
+Scope:
+
+- In `appendValueToPropertyRow`, drop the existing scalar when it is blank before building the promoted list.
+- Preserve the existing-with-content promotion (`[existing, value]`).
+- Keep list-valued append behavior unchanged (append to existing items).
+
+Tests:
+
+- Extend `frontend/tests/utils/noteContentPropertyRows.append.spec.ts`.
+- Cover: append to an empty-valued key yields a single-item list; append to a non-empty scalar yields a two-item list; append to a list adds one item.
+
+Targeted command:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm frontend:test tests/utils/noteContentPropertyRows.append.spec.ts
+```
+
+## Phase 15 - List URL Values Render Clickable External Links
+
+Type: Behavior.
+
+Precondition: A note has a `url` property with a one-level list of URL values.
+
+Trigger: The user views the note properties in read-only mode or the editable rich property list.
+
+Postcondition: Each list URL item shows the same external-link affordance that scalar `url` values already have, instead of a single plain comma-joined string.
+
+Scope:
+
+- Render list `url` items with per-item external links in `RichFrontmatterReadOnlyList.vue` and the editable list value display (`RichFrontmatterListPropertyValue.vue` or its caller).
+- Reuse the existing `RichFrontmatterPropertyExternalLink` component.
+- Keep non-URL list display compact and unchanged.
+- Do not change URL tracking/indexing semantics (URLs remain non-assimilable).
+
+Tests:
+
+- Extend `frontend/tests/components/form/RichMarkdownEditor.properties.spec.ts`.
+- Cover: a list `url` shows a link per item in read-only and editable views.
+
+Targeted command:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMarkdownEditor.properties.spec.ts
+```
+
 ## Deferred
 
+- `diffFrontmatterPropertyKeyChanges` flattens every list value to `""`, so a single list-key removal plus a single list-key addition is misdetected as a rename. Currently only referenced by tests, not a production call path; revisit if it is wired into the memory-tracker guard.
+- `NotePropertyIndexPlanner` over-produces one row per link-syntax list item, then `NotePropertyIndexService.persistRowsForPropertyKey` re-resolves and collapses them, calling `WikiLinkMarkdown.innerTitlesInOccurrenceOrder` twice per item across two layers. Consolidate resolution into one place if this area is touched again.
+- The value popup reorder list uses `:key="index"` for add/remove/reorderable rows; works because the whole array is replaced per mutation, but a stable per-item id would be less fragile.
+- `Frontmatter.keys()` is documented "in insertion order" but returns an unordered `Set.copyOf(...)`; new planner code iterates it (cross-key row order is nondeterministic but does not affect correctness). Fix the contract or return an ordered view.
+- Backend `PropertyKeyNaming.java` and frontend `noteContentPropertyKeys.ts` independently encode the scalar-only / passthrough / list-capable taxonomy and must stay in lockstep; add a cross-reference note guarding the invariant.
+- One-time backfill never sets `target_note_id`, so backfilled list/scalar properties are not wiki-link gated until a live `refreshForNote` runs (pre-existing; now extends to lists).
 - First-class tag search/filtering.
 - Alias-based wiki-link resolution.
 - CSS behavior for `cssclasses`.

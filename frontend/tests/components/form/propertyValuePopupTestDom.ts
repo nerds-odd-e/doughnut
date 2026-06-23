@@ -56,6 +56,14 @@ export function clickListMoveDown(index: number) {
   clickListMoveButton("down", index)
 }
 
+export function getTextareaValue(): string {
+  const textarea = document.querySelector(
+    '[data-testid="rich-note-property-value-popup-textarea"]'
+  ) as HTMLTextAreaElement
+  expect(textarea).not.toBeNull()
+  return textarea.value
+}
+
 export function setTextareaValue(value: string) {
   const textarea = document.querySelector(
     '[data-testid="rich-note-property-value-popup-textarea"]'

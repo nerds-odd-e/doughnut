@@ -4,6 +4,7 @@ import {
   clickListRemove,
   clickModeTab,
   clickSave,
+  getTextareaValue,
   openValuePopup,
   setListItemValue,
   setTextareaValue,
@@ -39,6 +40,34 @@ Body`
     expect(last).toMatch(/topic:\s*\n\s*- workshop/)
     expect(last).toMatch(/- retreat/)
     expect(last).toContain("Body")
+    expect(document.querySelector("dialog")).toBeNull()
+  })
+
+  it("seeds text mode from populated list when switching from list mode", async () => {
+    const markdown = `---
+topic:
+  - alpha
+  - beta
+---
+
+Body`
+    const wrapper = await h.mountEditor(markdown, { attachToBody: true })
+    await openValuePopup(wrapper)
+
+    clickModeTab("rich-note-property-value-popup-mode-text")
+    await flushPromises()
+
+    const textareaValue = getTextareaValue()
+    expect(textareaValue).not.toBe("")
+    expect(textareaValue).toContain("alpha")
+    expect(textareaValue).toContain("beta")
+
+    clickSave()
+    await flushPromises()
+
+    const last = h.lastEmittedMarkdown()
+    expect(last).toContain("topic: alpha, beta")
+    expect(last).not.toMatch(/topic:\s*\n\s*-/)
     expect(document.querySelector("dialog")).toBeNull()
   })
 

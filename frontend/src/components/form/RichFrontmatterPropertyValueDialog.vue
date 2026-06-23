@@ -128,6 +128,7 @@ import { ChevronDown, ChevronUp, Minus } from "@lucide/vue"
 import { ref, watch } from "vue"
 import Modal from "@/components/commons/Modal.vue"
 import {
+  compactDisplayForPropertyValue,
   listPropertyValue,
   scalarPropertyValue,
   scalarStringFromPropertyValue,
@@ -152,7 +153,7 @@ function draftStateFromPropertyValue(value: PropertyValue) {
   if (value.kind === "list") {
     return {
       mode: "list" as const,
-      draftText: scalar,
+      draftText: compactDisplayForPropertyValue(value),
       draftListItems: [...value.items],
     }
   }
