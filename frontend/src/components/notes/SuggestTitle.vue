@@ -16,7 +16,6 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import RadioButtons from "../form/RadioButtons.vue"
-import { appendTitleAlias } from "@/utils/noteTitleAliasJoiner"
 
 const props = defineProps<{
   originalTitle: string
@@ -25,6 +24,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   suggestedTitleSelected: [title: string]
+  aliasAppended: [alias: string]
 }>()
 
 const replaceOrAppendTitle = ref("")
@@ -35,8 +35,8 @@ const updateModelValue = () => {
   }
 
   if (replaceOrAppendTitle.value === "Append") {
-    const newTitle = appendTitleAlias(props.originalTitle, props.suggestedTitle)
-    emit("suggestedTitleSelected", newTitle)
+    emit("suggestedTitleSelected", props.originalTitle)
+    emit("aliasAppended", props.suggestedTitle)
   }
 }
 </script>

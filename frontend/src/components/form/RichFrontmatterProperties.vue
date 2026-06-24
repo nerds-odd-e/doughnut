@@ -219,6 +219,7 @@ const {
   draftValue,
   searchKey: wikidataSearchKeyForDialog,
   noteId: () => props.noteId,
+  contentMarkdown: () => props.contentMarkdown,
   rowsAfterAdding,
   onValidationError: (msg) => {
     validationMessage.value = msg

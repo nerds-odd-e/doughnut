@@ -4,7 +4,10 @@ import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import type { WikidataSearchEntity } from "@generated/doughnut-backend-api"
 import { WikidataController } from "@generated/doughnut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
-import { calculateNewTitle } from "@/utils/wikidataTitleActions"
+import {
+  appendAliasToNoteContentWhenAbsent,
+  calculateNewTitle,
+} from "@/utils/wikidataTitleActions"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
 import {
   validatePropertyRowsForRichEdit,
@@ -31,6 +34,7 @@ export function useWikidataPropertyDialog({
   draftValue,
   searchKey,
   noteId,
+  contentMarkdown,
   rowsAfterAdding,
   onValidationError,
   clearValidation,
@@ -42,6 +46,7 @@ export function useWikidataPropertyDialog({
   draftValue: Ref<string>
   searchKey: Ref<string> | ComputedRef<string>
   noteId: () => number | undefined
+  contentMarkdown: () => string
   rowsAfterAdding: (row: PropertyRow) => PropertyRow[]
   onValidationError: (msg: string) => void
   clearValidation: () => void
@@ -239,10 +244,35 @@ export function useWikidataPropertyDialog({
       if (titleAction && noteId() != null) {
         const currentTitle = searchKey.value.trim()
         if (currentTitle) {
-          const newTitle = calculateNewTitle(currentTitle, entity, titleAction)
-          await storageAccessor.value
-            .storedApi()
-            .updateTextField(noteId()!, "edit title", newTitle)
+          if (titleAction === "replace") {
+            const newTitle = calculateNewTitle(
+              currentTitle,
+              entity,
+              titleAction
+            )
+            await storageAccessor.value
+              .storedApi()
+              .updateTextField(noteId()!, "edit title", newTitle)
+          } else {
+            const newContent = appendAliasToNoteContentWhenAbsent(
+              contentMarkdown(),
+              entity.label
+            )
+            if (newContent !== null) {
+              await storageAccessor.value
+                .storedApi()
+                .updateTextField(noteId()!, "edit content", newContent)
+            } else {
+              const newTitle = calculateNewTitle(
+                currentTitle,
+                entity,
+                titleAction
+              )
+              await storageAccessor.value
+                .storedApi()
+                .updateTextField(noteId()!, "edit title", newTitle)
+            }
+          }
         }
       }
       await applyWikidataIdAndClose(entity.id)

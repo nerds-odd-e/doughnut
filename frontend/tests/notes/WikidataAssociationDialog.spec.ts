@@ -1,6 +1,7 @@
 import { WikidataController } from "@generated/doughnut-backend-api/sdk.gen"
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
+import { appendAliasToNoteContentWhenAbsent } from "@/utils/wikidataTitleActions"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
@@ -578,6 +579,38 @@ describe("WikidataAssociationDialog", () => {
       await flushPromises()
 
       await waitUntilFocused("#wikidataID-wikidataID")
+    })
+  })
+
+  describe("append alias to frontmatter when no existing aliases", () => {
+    it("writes a YAML aliases list instead of appending to the title", () => {
+      const result = appendAliasToNoteContentWhenAbsent(
+        "## Workshop\n",
+        "Canine"
+      )
+      expect(result).toBe(`---\naliases:\n  - Canine\n---\n## Workshop\n`)
+    })
+
+    it("preserves existing frontmatter when adding the first aliases list", () => {
+      const markdown = `---
+wikidata_id: Q11399
+---
+
+# Body`
+      const result = appendAliasToNoteContentWhenAbsent(markdown, "Canine")
+      expect(result).toContain("wikidata_id: Q11399")
+      expect(result).toContain("aliases:\n  - Canine")
+      expect(result).toContain("# Body")
+    })
+
+    it("returns null when an aliases property already exists", () => {
+      const markdown = `---
+aliases:
+  - puppy
+---
+
+# Body`
+      expect(appendAliasToNoteContentWhenAbsent(markdown, "Canine")).toBeNull()
     })
   })
 })

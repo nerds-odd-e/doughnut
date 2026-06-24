@@ -2,7 +2,7 @@
 
 ## Status
 
-Phases 1–4.2 done. Remaining phases not yet implemented.
+Phases 1–5.1 done. Remaining phases not yet implemented.
 
 ## Goal
 
@@ -240,6 +240,8 @@ Tests:
   candidate skipped in favor of the first readable target.
 
 ## Phase 5.1 — Wikidata Append writes one alias list
+
+Status: done
 
 Type: Behavior.
 
