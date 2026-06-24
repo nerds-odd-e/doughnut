@@ -1,10 +1,13 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.FrontmatterAliases;
 import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.algorithms.WikiLinkTargetReference;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteAliasIndex;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.NoteAliasIndexRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -20,11 +23,15 @@ import org.springframework.stereotype.Service;
 public class WikiLinkResolver {
 
   private final NoteRepository noteRepository;
+  private final NoteAliasIndexRepository noteAliasIndexRepository;
   private final AuthorizationService authorizationService;
 
   public WikiLinkResolver(
-      NoteRepository noteRepository, AuthorizationService authorizationService) {
+      NoteRepository noteRepository,
+      NoteAliasIndexRepository noteAliasIndexRepository,
+      AuthorizationService authorizationService) {
     this.noteRepository = noteRepository;
+    this.noteAliasIndexRepository = noteAliasIndexRepository;
     this.authorizationService = authorizationService;
   }
 
@@ -94,7 +101,31 @@ public class WikiLinkResolver {
   }
 
   private List<Note> noteCandidates(String notebookName, String noteTitle) {
-    return noteRepository.findByNotebookNameAndNoteTitleOrderByIdAsc(notebookName, noteTitle);
+    List<Note> byTitle =
+        noteRepository.findByNotebookNameAndNoteTitleOrderByIdAsc(notebookName, noteTitle);
+    if (!byTitle.isEmpty()) {
+      return byTitle;
+    }
+    return singleAliasTargetCandidates(notebookName, noteTitle);
+  }
+
+  private List<Note> singleAliasTargetCandidates(String notebookName, String linkToken) {
+    String lookupKey = FrontmatterAliases.normalizedLookupKey(linkToken);
+    List<NoteAliasIndex> rows =
+        noteAliasIndexRepository.findByNotebookNameAndAliasLookupKeyOrderByNoteIdAsc(
+            notebookName, lookupKey);
+    if (rows.isEmpty()) {
+      return List.of();
+    }
+    List<Note> distinctNotes = new ArrayList<>();
+    Set<Integer> seenNoteIds = new HashSet<>();
+    for (NoteAliasIndex row : rows) {
+      Note note = row.getNote();
+      if (seenNoteIds.add(note.getId())) {
+        distinctNotes.add(note);
+      }
+    }
+    return distinctNotes.size() == 1 ? distinctNotes : List.of();
   }
 
   private static List<String> dedupePreserveOrder(List<String> titles) {

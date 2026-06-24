@@ -14,4 +14,17 @@ public interface NoteAliasIndexRepository extends JpaRepository<NoteAliasIndex, 
   void deleteByNoteIdInBulk(@Param("noteId") Integer noteId);
 
   List<NoteAliasIndex> findByNote_IdOrderByIdAsc(Integer noteId);
+
+  @Query(
+      value =
+          "SELECT i FROM NoteAliasIndex i "
+              + " JOIN FETCH i.note n "
+              + " JOIN FETCH n.notebook nb "
+              + " WHERE i.aliasLookupKey = :aliasLookupKey "
+              + " AND n.deletedAt IS NULL "
+              + " AND nb.deletedAt IS NULL "
+              + " AND LOWER(nb.name) = LOWER(:notebookName) "
+              + " ORDER BY n.id ASC")
+  List<NoteAliasIndex> findByNotebookNameAndAliasLookupKeyOrderByNoteIdAsc(
+      @Param("notebookName") String notebookName, @Param("aliasLookupKey") String aliasLookupKey);
 }

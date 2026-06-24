@@ -139,6 +139,36 @@ class NoteControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void shouldResolveWikiLinkToSingleFrontmatterAliasTarget()
+        throws UnexpectedNoAccessRightException {
+      User user = currentUser.getUser();
+      Note root = makeMe.aNote().notebookOwnedBy(user).title("root-head").please();
+      String aliasTargetMarkdown = "---\naliases:\n  - color\n---\n\nbody";
+      Note aliasTarget =
+          makeMe
+              .aNote()
+              .title("colour")
+              .notebook(root.getNotebook())
+              .content(aliasTargetMarkdown)
+              .please();
+      wikiTitleCacheService.refreshForNote(aliasTarget, user);
+      Note viewer =
+          makeMe
+              .aNote()
+              .notebook(root.getNotebook())
+              .content("Text [[color]] and [[NoSuch]].")
+              .please();
+      wikiTitleCacheService.refreshForNote(viewer, user);
+      NoteRealm realm = controller.showNote(viewer);
+      assertThat(realm.getWikiTitles(), hasSize(1));
+      WikiTitle wt = realm.getWikiTitles().get(0);
+      assertThat(wt.getLinkText(), equalTo("color"));
+      assertThat(wt.getTargetToken(), equalTo("color"));
+      assertThat(wt.getDisplayText(), equalTo("color"));
+      assertThat(wt.getNoteId(), equalTo(aliasTarget.getId()));
+    }
+
+    @Test
     void shouldResolveWikiLinkUsingTargetBeforePipeAndExposeDisplayFields()
         throws UnexpectedNoAccessRightException {
       User user = currentUser.getUser();

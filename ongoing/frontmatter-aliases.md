@@ -2,7 +2,7 @@
 
 ## Status
 
-Phases 1–3 done. Remaining phases not yet implemented.
+Phases 1–4.1 done. Remaining phases not yet implemented.
 
 ## Goal
 
@@ -108,6 +108,9 @@ with Obsidian-faithful ambiguity behavior, and migrate existing notes and their 
 - Phase 3: `note_alias_index` table stores `alias_display` + `alias_lookup_key` (NFKC + lower case)
   per note and notebook; `NoteAliasIndexService.refreshForNote` rebuilds on
   `WikiTitleCacheService.refreshForNote`; `FrontmatterAliases.normalizedLookupKey` shared with dedupe.
+- Phase 4.1: `WikiLinkResolver` falls back to `NoteAliasIndexRepository` after exact title match;
+  resolves only when exactly one note owns the alias in the notebook; qualified `Notebook:` links
+  preserved.
 
 ## Dependency / ordering rationale
 
@@ -196,6 +199,8 @@ Tests:
   populated from frontmatter aliases without changing resolution.
 
 ## Phase 4.1 — Unambiguous `[[alias]]` resolves within the notebook
+
+Status: done
 
 Type: Behavior.
 

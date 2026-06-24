@@ -20,6 +20,7 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
 
   @Autowired MakeMe makeMe;
   @Autowired WikiLinkResolver wikiLinkResolver;
+  @Autowired NoteAliasIndexService noteAliasIndexService;
 
   @Test
   void wikiLinkResolver_findsParentLinkInsideYamlFrontmatter() {
@@ -65,5 +66,51 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
     assertThat(resolved.size(), equalTo(1));
     assertThat(resolved.getFirst().linkText(), equalTo("Alpha|friendly alias"));
     assertThat(resolved.getFirst().targetNote().getId(), equalTo(parent.getId()));
+  }
+
+  @Test
+  void wikiLinkResolver_resolvesUnambiguousFrontmatterAliasInFocusNotebook() {
+    User owner = makeMe.aUser().please();
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
+    String aliasTargetMarkdown = "---\naliases:\n  - color\n---\n\nbody";
+    Note aliasTarget =
+        makeMe.aNote().title("colour").notebook(notebook).content(aliasTargetMarkdown).please();
+    noteAliasIndexService.refreshForNote(aliasTarget);
+    Note linker = makeMe.aNote().notebook(notebook).content("See [[color]]").please();
+    makeMe.entityPersister.flush();
+
+    var resolved = wikiLinkResolver.resolveWikiLinksForCache(linker, owner);
+    assertThat(resolved.size(), equalTo(1));
+    assertThat(resolved.getFirst().linkText(), equalTo("color"));
+    assertThat(resolved.getFirst().targetNote().getId(), equalTo(aliasTarget.getId()));
+  }
+
+  @Test
+  void wikiLinkResolver_resolvesQualifiedNotebookAliasLink() {
+    User owner = makeMe.aUser().please();
+    Notebook otherNotebook =
+        makeMe.aNotebook().creatorAndOwner(owner).name("Other Notebook").please();
+    String aliasTargetMarkdown = "---\naliases:\n  - LinkedAlias\n---\n\nbody";
+    Note aliasTarget =
+        makeMe
+            .aNote()
+            .title("Canonical Title")
+            .notebook(otherNotebook)
+            .content(aliasTargetMarkdown)
+            .please();
+    noteAliasIndexService.refreshForNote(aliasTarget);
+    Notebook mainNotebook = makeMe.aNotebook().creatorAndOwner(owner).name("Main").please();
+    Note linker =
+        makeMe
+            .aNote()
+            .notebook(mainNotebook)
+            .content("See [[Other Notebook:LinkedAlias]]")
+            .please();
+    makeMe.entityPersister.flush();
+
+    var resolved = wikiLinkResolver.resolveWikiLinksForCache(linker, owner);
+    assertThat(resolved.size(), equalTo(1));
+    assertThat(resolved.getFirst().linkText(), equalTo("Other Notebook:LinkedAlias"));
+    assertThat(resolved.getFirst().targetNote().getId(), equalTo(aliasTarget.getId()));
   }
 }
