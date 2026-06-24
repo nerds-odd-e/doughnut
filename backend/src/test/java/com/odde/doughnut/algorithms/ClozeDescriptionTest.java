@@ -16,9 +16,8 @@ class ClozeDescriptionTest {
   @CsvSource({
     "moon,            partner of earth,                    partner of earth",
     "Sedition,        word sedition means this,            word [...] means this",
-    "north／up,      it's on the north or up side,        it's on the [...] or [...] side",
-    "hort／horticulture,   horticulture is about,         [...] is about",
-    "cats／cat,        here is a cat,                       here is a [...]",
+    "hort,            horticulture is about,               horticulture is about",
+    "cats,            here is a cat,                       here is a [..~]",
     "http://xxx,      xxx,                                 xxx",
     "cats,            a cat,                               a [..~]",
     "istio,           existing,                            existing",
@@ -48,7 +47,7 @@ class ClozeDescriptionTest {
     "〜よう,            どのよう,                            どの[...]",
     "にとっては,       「にとっては」と,                      「[...]」と",
     "〜にとっては,       「〜にとっては」と,                    「〜[...]」と",
-    "～によると／によれば,  名詞＋によると　名詞＋によれば,        名詞＋[...]　名詞＋[...]",
+    "～によると,        名詞＋によると　名詞＋によれば,        名詞＋[...]　名詞＋によれば",
     "cat(animal),      cat is an animal,                  [...] is an <...>",
     "cat（animal),      cat is an animal,                  [...] is an <...>",
     "cat(animal) dog,  cat is an animal,                  cat is an animal",
@@ -56,7 +55,7 @@ class ClozeDescriptionTest {
     "олет,             Это самолет,                        Это самолет",
     "不客气,            😃不客气,                           😃[...]",
     "ignore (complex (brackets)), ignore complex brackets,  ignore complex brackets",
-    "cat／dog(animal／weather), dog day is a hot weather,   [...] day is a hot weather",
+    "dog(animal／weather), dog day is a hot weather,   [...] day is a hot weather",
     "6,               6year,                              [...]year",
     "cat,             <p class='cat'>a cat</p>,           <p class='cat'>a [...]</p>",
     "～かたわら,        彼女は猫を可愛がる*かたわら*、犬に対してはなぜか冷たい。,  [...]",
@@ -117,18 +116,17 @@ class ClozeDescriptionTest {
 
   @Test
   void clozeShouldWorkWithSlashInTitleAndUrlsInContent() {
-    String title = "archenemy／arch-enemy";
+    String title = "archenemy";
     String markdown =
         "In literature, an **archenemy** (sometimes spelled as **arch-enemy**) or **nemesis** is the main [enemy](https://en.wikipedia.org/wiki/Enemy) of the [protagonist](https://en.wikipedia.org/wiki/Protagonist)—or sometimes, one of the other main characters—appearing as the most prominent and most-known enemy of the [hero](https://en.wikipedia.org/wiki/Hero)";
     String result =
         new ClozedString(clozeReplacement, markdown)
             .hide(new NoteTitle(title))
+            .hideAliases(List.of("arch-enemy"))
             .maskedContentAsMarkdown();
 
-    // The word "archenemy" and "arch-enemy" should be clozed
     assertThat(result, containsString("[...]"));
 
-    // URLs should not be affected
     assertThat(result, containsString("https://en.wikipedia.org/wiki/Enemy"));
     assertThat(result, containsString("https://en.wikipedia.org/wiki/Protagonist"));
     assertThat(result, containsString("https://en.wikipedia.org/wiki/Hero"));
@@ -197,14 +195,16 @@ class ClozeDescriptionTest {
 
   @ParameterizedTest
   @CsvSource({
-    "archenemy／arch-enemy, an archenemy here, an [...] here",
-    "archenemy／arch-enemy, an arch-enemy here, an [...] here",
-    "archenemy／arch-enemy, the archenemy and arch-enemy are, the [...] and [...] are",
+    "archenemy, arch-enemy, an archenemy here, an [...] here",
+    "archenemy, arch-enemy, an arch-enemy here, an [...] here",
+    "archenemy, arch-enemy, the archenemy and arch-enemy are, the [...] and [...] are",
   })
-  void clozeShouldHandleTitleWithAliasSeparator(String title, String markdown, String expected) {
+  void clozeShouldHandleFrontmatterAliasSeparator(
+      String title, String frontmatterAlias, String markdown, String expected) {
     String result =
         new ClozedString(clozeReplacement, markdown)
             .hide(new NoteTitle(title))
+            .hideAliases(List.of(frontmatterAlias))
             .maskedContentAsMarkdown();
     assertThat(result, containsString(expected));
   }

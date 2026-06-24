@@ -79,4 +79,29 @@ class NoteTitleTest {
     assertThat(noteTitle.getTitleAliases().get(1).stem(), equalTo("word2"));
     assertThat(noteTitle.getTitleAliases().get(2).stem(), equalTo("word1"));
   }
+
+  @Test
+  void recallTitleFragments_includePrimaryAndSuffixFragmentsOnly() {
+    NoteTitle noteTitle = new NoteTitle("colour／color");
+    assertThat(noteTitle.getRecallTitleFragments(), hasSize(1));
+    assertThat(noteTitle.getRecallTitleFragments().get(0).stem(), equalTo("colour"));
+
+    noteTitle = new NoteTitle("~logy／~logical");
+    assertThat(noteTitle.getRecallTitleFragments(), hasSize(2));
+    assertThat(
+        noteTitle.getRecallTitleFragments().stream().map(TitleFragment::stem).toList(),
+        containsInAnyOrder("logy", "logical"));
+
+    noteTitle = new NoteTitle("～によると／によれば");
+    assertThat(noteTitle.getRecallTitleFragments(), hasSize(1));
+    assertThat(noteTitle.getRecallTitleFragments().get(0).stem(), equalTo("によると"));
+  }
+
+  @Test
+  void matchesForRecall_acceptsPrimaryAndSuffixFragments_notPlainAliases() {
+    NoteTitle noteTitle = new NoteTitle("colour／color");
+    assertThat(noteTitle.matchesForRecall("colour"), is(true));
+    assertThat(noteTitle.matchesForRecall("color"), is(false));
+    assertThat(noteTitle.matches("color"), is(true));
+  }
 }

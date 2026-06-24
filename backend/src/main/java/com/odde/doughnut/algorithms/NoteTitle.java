@@ -38,6 +38,30 @@ public class NoteTitle {
     return getTitleAliases().stream().anyMatch(t -> t.matches(answer));
   }
 
+  /**
+   * Spelling recall: primary stem plus {@code ~} suffix fragments only (not plain title aliases).
+   */
+  public boolean matchesForRecall(String answer) {
+    if (rawTitle.trim().equalsIgnoreCase(answer)) {
+      return true;
+    }
+    return getRecallTitleFragments().stream().anyMatch(t -> t.matches(answer));
+  }
+
+  /**
+   * Title fragments for recall answer matching and cloze masking: primary plus {@code ~} suffix
+   * fragments. Plain title aliases after the first {@code ／} segment are excluded.
+   */
+  public List<TitleFragment> getRecallTitleFragments() {
+    TitleAliasMigrationPlan.Result plan = TitleAliasMigrationPlan.from(rawTitle);
+    List<TitleFragment> recallFragments = new ArrayList<>();
+    recallFragments.add(plan.primary());
+    for (String suffixStem : plan.retainedSuffixFragments()) {
+      recallFragments.add(TitleFragment.from("~" + suffixStem));
+    }
+    return TitleFragment.sortedLongestFirst(recallFragments);
+  }
+
   public List<TitleFragment> getTitleAliases() {
     return TitleFragment.sortedLongestFirst(getAliasSegmentsInOrder());
   }

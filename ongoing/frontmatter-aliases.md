@@ -539,6 +539,8 @@ Tests:
 
 ## Phase 12.1 — Cleanup: recall and cloze stop reading plain title aliases
 
+Status: done
+
 Type: Behavior.
 
 - Precondition: the migration has completed in all environments.

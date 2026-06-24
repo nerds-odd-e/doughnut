@@ -16,7 +16,8 @@ record ClozeReplacement(
     final String internalFullMatchReplacement = "__f_u_l_l__";
     final String internalFullMatchReplacementForQualifier = "__f_u_l_l_q_u_a_l__";
 
-    var aliases = TitleFragment.mergeSortedLongestFirst(noteTitle.getTitleAliases(), extraAliases);
+    var aliases =
+        TitleFragment.mergeSortedLongestFirst(noteTitle.getRecallTitleFragments(), extraAliases);
     String step1 =
         replaceAliasesWithInternalPlaceholder(
             aliases,

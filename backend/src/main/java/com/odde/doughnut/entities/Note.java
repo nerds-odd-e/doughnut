@@ -133,7 +133,7 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public boolean matchAnswer(String spellingAnswer) {
-    if (getNoteTitle().matches(spellingAnswer)) {
+    if (getNoteTitle().matchesForRecall(spellingAnswer)) {
       return true;
     }
     return FrontmatterAliases.matchesFromNoteContent(getContent(), spellingAnswer);

@@ -502,11 +502,21 @@ class RecallPromptControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void answerOneOfTheTitleAliases() throws UnexpectedNoAccessRightException {
-      makeMe.theNote(answerNote).title("this／that").please();
+    void answerOneOfTheFrontmatterAliases() throws UnexpectedNoAccessRightException {
+      makeMe
+          .theNote(answerNote)
+          .title("this")
+          .content(
+              """
+              ---
+              aliases:
+                - that
+              ---
+              Body text
+              """)
+          .please();
       answerDTO.setSpellingAnswer("this");
       assertTrue(controller.answerSpelling(recallPrompt, answerDTO).getAnswer().getCorrect());
-      // Create a new recall prompt for the second answer
       RecallPrompt secondRecallPrompt =
           makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
       AnswerSpellingDTO secondAnswerDTO = new AnswerSpellingDTO();
