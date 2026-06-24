@@ -15,8 +15,10 @@ import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -157,14 +159,80 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
     for (Note note : notes) {
       TitleAliasMigrationTransform.Preview preview =
           TitleAliasMigrationTransform.preview(note.getTitle(), note.getContent());
-      placements.add(
-          new TitleAliasMigrationCollisionPolicy.NotePlacement(
-              note.getId(),
-              note.getNotebook().getId(),
-              note.getFolder() != null ? note.getFolder().getId() : null,
-              preview.plannedTitle()));
+      placements.add(notePlacement(note, preview));
     }
     return List.copyOf(placements);
+  }
+
+  /**
+   * Rebuilds collision-group placements with stable base titles so partial collision batches keep
+   * dry-run disambiguation indices.
+   */
+  static List<TitleAliasMigrationCollisionPolicy.NotePlacement> collisionResolutionPlacementsFor(
+      List<Note> notes) {
+    Map<String, String> baseByScopeKey = new LinkedHashMap<>();
+    for (Note note : notes) {
+      TitleAliasMigrationTransform.Preview preview =
+          TitleAliasMigrationTransform.preview(note.getTitle(), note.getContent());
+      if (preview.status() != TitleAliasMigrationPreviewStatus.MIGRATE) {
+        continue;
+      }
+      TitleAliasMigrationCollisionPolicy.NotePlacement placement = notePlacement(note, preview);
+      baseByScopeKey.putIfAbsent(collisionScopeKey(placement), placement.basePlannedTitle());
+    }
+    if (baseByScopeKey.isEmpty()) {
+      return List.of();
+    }
+    Map<Integer, TitleAliasMigrationCollisionPolicy.NotePlacement> byNoteId = new LinkedHashMap<>();
+    int maxCollisionIndex = notes.size();
+    for (Note note : notes) {
+      int notebookId = note.getNotebook().getId();
+      Integer folderId = note.getFolder() != null ? note.getFolder().getId() : null;
+      TitleAliasMigrationTransform.Preview preview =
+          TitleAliasMigrationTransform.preview(note.getTitle(), note.getContent());
+      for (Map.Entry<String, String> scope : baseByScopeKey.entrySet()) {
+        CollisionScope collisionScope = CollisionScope.parse(scope.getKey());
+        if (collisionScope.notebookId() != notebookId
+            || !Objects.equals(collisionScope.folderId(), folderId)) {
+          continue;
+        }
+        String basePlannedTitle = scope.getValue();
+        boolean member =
+            preview.status() == TitleAliasMigrationPreviewStatus.MIGRATE
+                ? preview.plannedTitle().equals(basePlannedTitle)
+                : TitleAliasMigrationCollisionPolicy.memberTitleMatchesCollisionBase(
+                    note.getTitle(), basePlannedTitle, maxCollisionIndex);
+        if (member) {
+          byNoteId.putIfAbsent(
+              note.getId(),
+              new TitleAliasMigrationCollisionPolicy.NotePlacement(
+                  note.getId(), notebookId, folderId, basePlannedTitle));
+        }
+      }
+    }
+    return List.copyOf(byNoteId.values());
+  }
+
+  private static TitleAliasMigrationCollisionPolicy.NotePlacement notePlacement(
+      Note note, TitleAliasMigrationTransform.Preview preview) {
+    return new TitleAliasMigrationCollisionPolicy.NotePlacement(
+        note.getId(),
+        note.getNotebook().getId(),
+        note.getFolder() != null ? note.getFolder().getId() : null,
+        preview.plannedTitle());
+  }
+
+  private record CollisionScope(int notebookId, Integer folderId) {
+    static CollisionScope parse(String key) {
+      String[] parts = key.split(":", 3);
+      return new CollisionScope(
+          Integer.parseInt(parts[0]), "null".equals(parts[1]) ? null : Integer.valueOf(parts[1]));
+    }
+  }
+
+  private static String collisionScopeKey(
+      TitleAliasMigrationCollisionPolicy.NotePlacement placement) {
+    return placement.notebookId() + ":" + placement.folderId() + ":" + placement.basePlannedTitle();
   }
 
   private static String errorMessageSafe(RuntimeException e) {

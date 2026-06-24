@@ -68,7 +68,12 @@ public class AdminDataMigrationBatchWorker {
     List<Integer> pendingIds =
         adminDataMigrationProgressService.pendingNoteIdsOrdered(step, orderedIds);
     if (pendingIds.isEmpty()) {
-      return finishWhenNoPendingNotes(step, allNotes, collisionNoteIds);
+      List<Integer> pendingCollisionIds = pendingCollisionMigratableIds(allNotes, collisionNoteIds);
+      if (!pendingCollisionIds.isEmpty()) {
+        return runCollisionDisambiguationBatch(adminUser, step, allNotes, pendingCollisionIds);
+      }
+      adminDataMigrationProgressService.markCompleted(step);
+      return batchResult("title_alias_to_frontmatter migration is complete.");
     }
 
     List<Integer> batchIds =
@@ -88,11 +93,7 @@ public class AdminDataMigrationBatchWorker {
         continue;
       }
       if (preview.status() == TitleAliasMigrationPreviewStatus.MIGRATE) {
-        note.setTitle(preview.plannedTitle());
-        note.setContent(preview.plannedContent());
-        entityPersister.merge(note);
-        entityPersister.flush();
-        wikiTitleCacheService.refreshForNote(note, adminUser);
+        applyTitleAliasMigration(note, adminUser, preview.plannedTitle(), preview.plannedContent());
         migratedCount++;
       }
     }
@@ -112,6 +113,59 @@ public class AdminDataMigrationBatchWorker {
                 .formatted(migratedCount, skippedCollisionCount, batchIds.size()));
   }
 
+  private AdminDataMigrationStatusDTO runCollisionDisambiguationBatch(
+      User adminUser, String step, List<Note> allNotes, List<Integer> pendingCollisionIds) {
+    List<Integer> batchIds =
+        pendingCollisionIds.stream()
+            .limit(AdminDataMigrationService.DATA_MIGRATION_BATCH_SIZE)
+            .toList();
+    List<TitleAliasMigrationCollisionPolicy.NotePlacement> resolutionPlacements =
+        AdminDataMigrationService.collisionResolutionPlacementsFor(allNotes);
+    Map<Integer, String> resolvedTitles =
+        TitleAliasMigrationCollisionPolicy.resolve(resolutionPlacements);
+    Map<Integer, Note> notesById =
+        allNotes.stream().collect(Collectors.toMap(Note::getId, Function.identity()));
+
+    int migratedCount = 0;
+    for (Integer noteId : batchIds) {
+      Note note = notesById.get(noteId);
+      TitleAliasMigrationTransform.Preview preview =
+          TitleAliasMigrationTransform.preview(note.getTitle(), note.getContent());
+      if (preview.status() != TitleAliasMigrationPreviewStatus.MIGRATE) {
+        continue;
+      }
+      String resolvedTitle = resolvedTitles.get(noteId);
+      if (resolvedTitle == null) {
+        continue;
+      }
+      applyTitleAliasMigration(note, adminUser, resolvedTitle, preview.plannedContent());
+      migratedCount++;
+    }
+
+    List<Integer> stillPending =
+        pendingCollisionMigratableIds(
+            allNotes,
+            TitleAliasMigrationCollisionPolicy.collisionNoteIds(
+                AdminDataMigrationService.collisionResolutionPlacementsFor(allNotes)));
+    if (stillPending.isEmpty()) {
+      adminDataMigrationProgressService.markCompleted(step);
+      return batchResult("title_alias_to_frontmatter migration is complete.");
+    }
+
+    return batchResult(
+        ("title_alias_to_frontmatter: migrated %d collision note(s); %d collision note(s)"
+                + " remaining.")
+            .formatted(migratedCount, stillPending.size()));
+  }
+
+  private void applyTitleAliasMigration(Note note, User adminUser, String title, String content) {
+    note.setTitle(title);
+    note.setContent(content);
+    entityPersister.merge(note);
+    entityPersister.flush();
+    wikiTitleCacheService.refreshForNote(note, adminUser);
+  }
+
   private AdminDataMigrationStatusDTO finishWhenNoPendingNotes(
       String step, List<Note> allNotes, Set<Integer> collisionNoteIds) {
     int pendingCollisionMigratables = countPendingCollisionMigratables(allNotes, collisionNoteIds);
@@ -123,6 +177,20 @@ public class AdminDataMigrationBatchWorker {
     }
     adminDataMigrationProgressService.markCompleted(step);
     return batchResult("title_alias_to_frontmatter migration is complete.");
+  }
+
+  private static List<Integer> pendingCollisionMigratableIds(
+      List<Note> notes, Set<Integer> collisionNoteIds) {
+    return notes.stream()
+        .filter(note -> collisionNoteIds.contains(note.getId()))
+        .filter(
+            note -> {
+              TitleAliasMigrationTransform.Preview preview =
+                  TitleAliasMigrationTransform.preview(note.getTitle(), note.getContent());
+              return preview.status() == TitleAliasMigrationPreviewStatus.MIGRATE;
+            })
+        .map(Note::getId)
+        .toList();
   }
 
   private static int countPendingCollisionMigratables(

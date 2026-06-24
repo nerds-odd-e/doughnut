@@ -386,6 +386,8 @@ Tests:
 
 ## Phase 8.2 — Execute collision disambiguation batches
 
+Status: done
+
 Type: Behavior.
 
 - Precondition: a confirmed dry run includes title collisions after alias stripping.

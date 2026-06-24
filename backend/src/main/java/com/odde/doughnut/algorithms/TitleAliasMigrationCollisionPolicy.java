@@ -100,6 +100,19 @@ public final class TitleAliasMigrationCollisionPolicy {
     return stem + " (" + qualifier + ")";
   }
 
+  public static boolean memberTitleMatchesCollisionBase(
+      String memberTitle, String basePlannedTitle, int maxCollisionIndex) {
+    if (memberTitle.equals(basePlannedTitle)) {
+      return true;
+    }
+    for (int i = 1; i <= maxCollisionIndex; i++) {
+      if (memberTitle.equals(disambiguatedTitle(basePlannedTitle, i))) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private static String titleStemWithoutQualifier(NoteTitle noteTitle) {
     List<TitleFragment> segments = noteTitle.getAliasSegmentsInOrder();
     if (segments.isEmpty()) {

@@ -105,6 +105,84 @@ class AdminDataMigrationServiceTest {
   }
 
   @Test
+  void runBatch_migratesCollidingNotes_withDisambiguationSuffixes() {
+    var admin = makeMe.anAdmin().please();
+    Note keeper = makeMe.aNote().title("colour").please();
+    Note firstMigratable =
+        makeMe.aNote().underSameNotebookAs(keeper).title("colour／color").please();
+    Note secondMigratable = makeMe.aNote().underSameNotebookAs(keeper).title("colour／hue").please();
+
+    AdminDataMigrationStatusDTO simplePhase = adminDataMigrationService.runBatch(admin);
+    assertThat(simplePhase.getMessage(), containsString("pending disambiguation"));
+
+    AdminDataMigrationStatusDTO collisionPhase = adminDataMigrationService.runBatch(admin);
+
+    assertThat(collisionPhase.isDataMigrationComplete(), equalTo(true));
+    assertThat(collisionPhase.getMessage(), containsString("complete"));
+    assertThat(keeper.getTitle(), equalTo("colour"));
+    assertThat(firstMigratable.getTitle(), equalTo("colour (1)"));
+    assertThat(secondMigratable.getTitle(), equalTo("colour (2)"));
+    assertThat(firstMigratable.getContent(), containsString("- color"));
+    assertThat(secondMigratable.getContent(), containsString("- hue"));
+    assertThat(
+        noteAliasIndexRepository.findByNote_IdOrderByIdAsc(firstMigratable.getId()), hasSize(1));
+    assertThat(
+        noteAliasIndexRepository.findByNote_IdOrderByIdAsc(secondMigratable.getId()), hasSize(1));
+  }
+
+  @Test
+  void runBatch_migratesExistingQualifierCollisions() {
+    var admin = makeMe.anAdmin().please();
+    Note keeper = makeMe.aNote().title("cat (animal)").please();
+    Note migratable =
+        makeMe.aNote().underSameNotebookAs(keeper).title("cat／kitten (animal)").please();
+
+    adminDataMigrationService.runBatch(admin);
+    AdminDataMigrationStatusDTO dto = adminDataMigrationService.runBatch(admin);
+
+    assertThat(dto.isDataMigrationComplete(), equalTo(true));
+    assertThat(keeper.getTitle(), equalTo("cat (animal)"));
+    assertThat(migratable.getTitle(), equalTo("cat (animal 1)"));
+    assertThat(migratable.getContent(), containsString("- kitten"));
+  }
+
+  @Test
+  void runBatch_collisionDisambiguation_assignsBareTitleToLowestNoteId() {
+    var admin = makeMe.anAdmin().please();
+    Note lowerIdMigratable = makeMe.aNote().title("topic／first-alias").please();
+    Note higherIdMigratable =
+        makeMe.aNote().underSameNotebookAs(lowerIdMigratable).title("topic／second-alias").please();
+
+    adminDataMigrationService.runBatch(admin);
+    adminDataMigrationService.runBatch(admin);
+
+    assertThat(lowerIdMigratable.getTitle(), equalTo("topic"));
+    assertThat(higherIdMigratable.getTitle(), equalTo("topic (1)"));
+  }
+
+  @Test
+  void runBatch_collisionDisambiguation_isIdempotentAfterPartialCompletion() {
+    var admin = makeMe.anAdmin().please();
+    Note keeper = makeMe.aNote().title("shared").please();
+    for (int i = 1; i <= AdminDataMigrationService.DATA_MIGRATION_BATCH_SIZE + 1; i++) {
+      makeMe.aNote().underSameNotebookAs(keeper).title("shared／alias" + i).please();
+    }
+
+    AdminDataMigrationStatusDTO phase;
+    do {
+      phase = adminDataMigrationService.runBatch(admin);
+    } while (!phase.getMessage().contains("simple migrations complete"));
+
+    AdminDataMigrationStatusDTO partial = adminDataMigrationService.runBatch(admin);
+    assertThat(partial.isDataMigrationComplete(), equalTo(false));
+    assertThat(partial.getMessage(), containsString("remaining"));
+
+    AdminDataMigrationStatusDTO finished = adminDataMigrationService.runBatch(admin);
+    assertThat(finished.isDataMigrationComplete(), equalTo(true));
+    assertThat(keeper.getTitle(), equalTo("shared"));
+  }
+
+  @Test
   void runBatch_withOnlyUnmigratableNotes_completesWithoutMutatingNotes() {
     Note note = makeMe.aNote().title("plain").content("body").please();
     String titleBefore = note.getTitle();
