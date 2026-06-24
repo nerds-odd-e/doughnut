@@ -37,7 +37,7 @@ jobs:
     name: Linting & Types Gen for Frontend
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Check for @focus tags in e2e test feature files
         run: ./scripts/check_focus_tags.sh
       - name: Check @wip scenario count limit
@@ -56,7 +56,7 @@ jobs:
     name: Backend Unit tests
     runs-on: ${{ vars.RUNNER }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Setup MySQL DB Server
         uses: ./.github/mysql_db
         with:
@@ -95,7 +95,7 @@ jobs:
     env:
       FRONTEND_UT_CONSOLE_OUTPUT_AS_FAILURE: true
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ./.github/setup_nodejs_with_cache
         with:
           node_version: ${{ vars.NODE_VERSION }}
@@ -110,7 +110,7 @@ jobs:
     name: Package backend & frontend artifacts for deployment
     runs-on: ${{ vars.RUNNER }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ./.github/setup_jdk_with_cache
         with:
           java_version: ${{ vars.JAVA_VERSION }}
@@ -161,7 +161,7 @@ jobs:
           - |
             e2e_test/features/c*/**
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: docker/login-action@v3
         with:
           username: ${{ env.DOCKERHUB_USERNAME }}
@@ -221,7 +221,7 @@ jobs:
         E2E-tests,
       ]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
       - uses: actions/setup-node@v6
@@ -261,7 +261,7 @@ jobs:
       ]
     if: always() && contains(needs.*.result, 'failure')
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 1
       - name: Compute short SHA, URLs, and sanitized commit subject

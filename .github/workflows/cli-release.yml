@@ -15,7 +15,7 @@ jobs:
     name: Build and publish CLI to GCS
     runs-on: ${{ vars.RUNNER }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ./.github/setup_nodejs_with_cache
         with:
           node_version: ${{ vars.NODE_VERSION }}
