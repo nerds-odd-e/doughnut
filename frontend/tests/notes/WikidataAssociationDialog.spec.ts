@@ -109,6 +109,14 @@ describe("WikidataAssociationDialog", () => {
     await flushPromises()
   }
 
+  const expectReplaceAndAppendTitleAliasControls = (suggestedLabel: string) => {
+    expect(getModal()?.textContent).toContain(
+      `Suggested Title: ${suggestedLabel}`
+    )
+    expect(getModal()?.querySelector('input[value="Replace"]')).toBeTruthy()
+    expect(getModal()?.querySelector('input[value="Append"]')).toBeTruthy()
+  }
+
   describe("basic functionality", () => {
     it("shows the current wikidata ID in the input field", async () => {
       mountDialog("Test Title", { modelValue: "Q123" })
@@ -251,7 +259,7 @@ describe("WikidataAssociationDialog", () => {
       expect(emitted?.[1]).toBeUndefined()
     })
 
-    it("shows title options when titles differ", async () => {
+    it("shows replace and append controls when suggested title differs", async () => {
       const searchResult = makeMe.aWikidataSearchEntity
         .label("Canine")
         .id("Q11399")
@@ -265,9 +273,7 @@ describe("WikidataAssociationDialog", () => {
       selectItem.click()
       await flushPromises()
 
-      expect(getModal()?.textContent).toContain("Suggested Title: Canine")
-      expect(getModal()?.querySelector('input[value="Replace"]')).toBeTruthy()
-      expect(getModal()?.querySelector('input[value="Append"]')).toBeTruthy()
+      expectReplaceAndAppendTitleAliasControls("Canine")
     })
 
     it("emits selected with replace action", async () => {
@@ -450,7 +456,7 @@ describe("WikidataAssociationDialog", () => {
       expect(wrapper.emitted("save")?.[0]).toEqual(["Q11399"])
     })
 
-    it("shows title options when selecting result with different title and showSaveButton is true", async () => {
+    it("shows replace and append controls when selecting result with different title and showSaveButton is true", async () => {
       const searchResult = makeMe.aWikidataSearchEntity
         .label("Canine")
         .id("Q11399")
@@ -464,10 +470,7 @@ describe("WikidataAssociationDialog", () => {
       selectItem.click()
       await flushPromises()
 
-      // Should show title options
-      expect(getModal()?.textContent).toContain("Suggested Title: Canine")
-      expect(getModal()?.querySelector('input[value="Replace"]')).toBeTruthy()
-      expect(getModal()?.querySelector('input[value="Append"]')).toBeTruthy()
+      expectReplaceAndAppendTitleAliasControls("Canine")
     })
 
     it("saves with replace action immediately when user selects Replace", async () => {

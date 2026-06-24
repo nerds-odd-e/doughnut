@@ -200,8 +200,7 @@ class ClozeDescriptionTest {
     "archenemy／arch-enemy, an arch-enemy here, an [...] here",
     "archenemy／arch-enemy, the archenemy and arch-enemy are, the [...] and [...] are",
   })
-  void clozeShouldHandleTitleWithAlternativeSeparator(
-      String title, String markdown, String expected) {
+  void clozeShouldHandleTitleWithAliasSeparator(String title, String markdown, String expected) {
     String result =
         new ClozedString(clozeReplacement, markdown)
             .hide(new NoteTitle(title))

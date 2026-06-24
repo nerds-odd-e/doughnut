@@ -272,7 +272,7 @@ class NoteControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void returnsCorrectWhenAlternativeSpellingMatches() throws UnexpectedNoAccessRightException {
+    void returnsCorrectWhenTitleAliasMatches() throws UnexpectedNoAccessRightException {
       Note note =
           makeMe.aNote().title("colour／color").notebookOwnedBy(currentUser.getUser()).please();
       AnswerSpellingDTO dto = new AnswerSpellingDTO();

@@ -31,9 +31,11 @@ Feature: Assimilate With Remembering Spelling
     Then the spelling verification result for note "<note_title>" should be <expected_result>
 
     Examples:
-      | note_title | spelling_input | expected_result         |
-      | sedition   | sedition       | "success"               |
-      | sedition   | wrong answer   | "error: wrong spelling" |
+      | note_title    | spelling_input | expected_result         |
+      | sedition      | sedition       | "success"               |
+      | sedition      | wrong answer   | "error: wrong spelling" |
+      | colour／color | colour         | "success"               |
+      | colour／color | color          | "success"               |
 
   Scenario: Already assimilated note reappears in to-be-assimilated list when remember spelling is added later
     Given I have a notebook "English practice" with notes:

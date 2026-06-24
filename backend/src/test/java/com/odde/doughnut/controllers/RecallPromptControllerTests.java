@@ -477,7 +477,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void answerOneOfTheTitles() throws UnexpectedNoAccessRightException {
+    void answerOneOfTheTitleAliases() throws UnexpectedNoAccessRightException {
       makeMe.theNote(answerNote).title("this／that").please();
       answerDTO.setSpellingAnswer("this");
       assertTrue(controller.answerSpelling(recallPrompt, answerDTO).getAnswer().getCorrect());
