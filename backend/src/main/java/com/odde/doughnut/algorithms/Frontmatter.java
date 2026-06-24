@@ -144,6 +144,29 @@ public final class Frontmatter {
     return new Frontmatter(copy);
   }
 
+  /**
+   * Returns a new {@code Frontmatter} with {@code aliases} as a YAML list. Replaces or removes an
+   * existing {@code aliases} key (case-insensitive). An empty list drops the property.
+   */
+  public Frontmatter setAliasesList(List<String> aliases) {
+    LinkedHashMap<String, Object> copy = new LinkedHashMap<>();
+    boolean replaced = false;
+    for (Map.Entry<String, Object> entry : data.entrySet()) {
+      if (entry.getKey().equalsIgnoreCase("aliases")) {
+        replaced = true;
+        if (!aliases.isEmpty()) {
+          copy.put(entry.getKey(), new ArrayList<>(aliases));
+        }
+      } else {
+        copy.put(entry.getKey(), entry.getValue());
+      }
+    }
+    if (!replaced && !aliases.isEmpty()) {
+      copy.put("aliases", new ArrayList<>(aliases));
+    }
+    return new Frontmatter(copy);
+  }
+
   /** Returns a new {@code Frontmatter} with all keys in {@code keys} removed (case-insensitive). */
   public Frontmatter remove(Set<String> keys) {
     LinkedHashMap<String, Object> copy = new LinkedHashMap<>();

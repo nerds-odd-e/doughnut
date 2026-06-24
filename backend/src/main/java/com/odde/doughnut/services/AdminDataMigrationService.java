@@ -1,9 +1,15 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.TitleAliasMigrationPreviewStatus;
+import com.odde.doughnut.algorithms.TitleAliasMigrationTransform;
+import com.odde.doughnut.controllers.dto.AdminDataMigrationDryRunDTO;
 import com.odde.doughnut.controllers.dto.AdminDataMigrationStatusDTO;
+import com.odde.doughnut.controllers.dto.TitleAliasMigrationNotePreviewDTO;
 import com.odde.doughnut.entities.AdminDataMigrationProgress;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.context.annotation.Lazy;
@@ -32,18 +38,46 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
 
   private final AdminDataMigrationProgressService adminDataMigrationProgressService;
   private final AdminDataMigrationBatchWorker batchWorker;
+  private final NoteRepository noteRepository;
 
   public AdminDataMigrationService(
       AdminDataMigrationProgressService adminDataMigrationProgressService,
-      @Lazy AdminDataMigrationBatchWorker batchWorker) {
+      @Lazy AdminDataMigrationBatchWorker batchWorker,
+      NoteRepository noteRepository) {
     this.adminDataMigrationProgressService = adminDataMigrationProgressService;
     this.batchWorker = batchWorker;
+    this.noteRepository = noteRepository;
   }
 
   public AdminDataMigrationStatusDTO getStatus() {
     AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
     dto.setMessage(READY_MESSAGE);
     populateMigrationProgress(dto);
+    return dto;
+  }
+
+  public AdminDataMigrationDryRunDTO dryRun() {
+    List<Note> notes = noteRepository.findAllNonDeletedOrderByIdAsc();
+    AdminDataMigrationDryRunDTO dto = new AdminDataMigrationDryRunDTO();
+    int migrateCount = 0;
+    for (Note note : notes) {
+      TitleAliasMigrationTransform.Preview preview =
+          TitleAliasMigrationTransform.preview(note.getTitle(), note.getContent());
+      TitleAliasMigrationNotePreviewDTO item = new TitleAliasMigrationNotePreviewDTO();
+      item.setNoteId(note.getId());
+      item.setCurrentTitle(note.getTitle());
+      item.setPlannedTitle(preview.plannedTitle());
+      item.setPlannedAliases(preview.plannedAliases());
+      item.setPlannedContent(preview.plannedContent());
+      item.setStatus(preview.status().name());
+      dto.getNotePreviews().add(item);
+      if (preview.status() == TitleAliasMigrationPreviewStatus.MIGRATE) {
+        migrateCount++;
+      }
+    }
+    dto.setTotalNoteCount(notes.size());
+    dto.setMigrateCount(migrateCount);
+    dto.setNoChangesCount(notes.size() - migrateCount);
     return dto;
   }
 

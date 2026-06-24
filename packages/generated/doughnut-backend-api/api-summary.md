@@ -206,6 +206,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 
 - `runDataMigrationBatch`: POST `/api/admin/data-migration/run-batch` -> `RunDataMigrationBatchResponse` (request: none; response body: AdminDataMigrationStatusDto)
 - `getAdminDataMigrationStatus`: GET `/api/admin/data-migration/status` -> `GetAdminDataMigrationStatusResponse` (request: none; response body: AdminDataMigrationStatusDto)
+- `getAdminDataMigrationDryRun`: GET `/api/admin/data-migration/dry-run` -> `GetAdminDataMigrationDryRunResponse` (request: none; response body: AdminDataMigrationDryRunDto)
 
 ## Text Content Controller
 

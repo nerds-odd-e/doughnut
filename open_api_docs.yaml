@@ -2882,6 +2882,19 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AdminDataMigrationStatusDTO"
+  /api/admin/data-migration/dry-run:
+    get:
+      tags:
+      - admin-data-migration-controller
+      summary: Preview title-alias to frontmatter migration without mutating notes
+      operationId: getAdminDataMigrationDryRun
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AdminDataMigrationDryRunDTO"
   /api/user/token/{tokenId}:
     delete:
       tags:
@@ -4890,3 +4903,37 @@ components:
         totalPages:
           type: integer
           format: int32
+    AdminDataMigrationDryRunDTO:
+      type: object
+      properties:
+        notePreviews:
+          type: array
+          items:
+            $ref: "#/components/schemas/TitleAliasMigrationNotePreviewDTO"
+        totalNoteCount:
+          type: integer
+          format: int32
+        migrateCount:
+          type: integer
+          format: int32
+        noChangesCount:
+          type: integer
+          format: int32
+    TitleAliasMigrationNotePreviewDTO:
+      type: object
+      properties:
+        noteId:
+          type: integer
+          format: int32
+        currentTitle:
+          type: string
+        plannedTitle:
+          type: string
+        plannedAliases:
+          type: array
+          items:
+            type: string
+        plannedContent:
+          type: string
+        status:
+          type: string

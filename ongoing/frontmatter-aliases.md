@@ -2,7 +2,7 @@
 
 ## Status
 
-Phases 1–7.1 done. Remaining phases not yet implemented.
+Phases 1–7.2 done. Remaining phases not yet implemented.
 
 ## Goal
 
@@ -325,6 +325,8 @@ Tests:
 - Focused pure tests for the migration parser/result.
 
 ## Phase 7.2 — Dry-run previews note title/content changes
+
+Status: done
 
 Type: Behavior.
 

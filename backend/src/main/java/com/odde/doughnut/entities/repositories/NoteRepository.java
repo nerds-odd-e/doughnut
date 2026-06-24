@@ -113,6 +113,9 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
               + "WHERE n.id IN :ids")
   List<Note> hydrateNonDeletedNotesWithNotebookAndFolderByIds(@Param("ids") List<Integer> ids);
 
+  @Query(value = selectFromNote + " WHERE n.deletedAt IS NULL ORDER BY n.id ASC")
+  List<Note> findAllNonDeletedOrderByIdAsc();
+
   String recallWhereClause =
       " WHERE "
           + "   rp IS NULL "

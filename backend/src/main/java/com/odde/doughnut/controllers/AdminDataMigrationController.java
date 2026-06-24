@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.dto.AdminDataMigrationDryRunDTO;
 import com.odde.doughnut.controllers.dto.AdminDataMigrationStatusDTO;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -44,5 +45,16 @@ class AdminDataMigrationController {
     authorizationService.assertAdminAuthorization();
     User admin = authorizationService.getCurrentUser();
     return adminDataMigrationService.runBatch(admin);
+  }
+
+  @Operation(
+      operationId = "getAdminDataMigrationDryRun",
+      summary = "Preview title-alias to frontmatter migration without mutating notes")
+  @GetMapping("/dry-run")
+  public AdminDataMigrationDryRunDTO getAdminDataMigrationDryRun()
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertLoggedIn();
+    authorizationService.assertAdminAuthorization();
+    return adminDataMigrationService.dryRun();
   }
 }

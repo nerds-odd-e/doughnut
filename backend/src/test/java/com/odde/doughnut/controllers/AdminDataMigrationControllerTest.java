@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.controllers.dto.AdminDataMigrationDryRunDTO;
 import com.odde.doughnut.controllers.dto.AdminDataMigrationStatusDTO;
 import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -58,5 +59,33 @@ class AdminDataMigrationControllerTest extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
 
     assertThrows(UnexpectedNoAccessRightException.class, () -> controller.runDataMigrationBatch());
+  }
+
+  @Test
+  void adminGetsDryRunPreviewWithoutMutatingNotes() throws UnexpectedNoAccessRightException {
+    currentUser.setUser(makeMe.anAdmin().please());
+    var note = makeMe.aNote().title("colour／color").content("body").please();
+    String titleBefore = note.getTitle();
+    String contentBefore = note.getContent();
+
+    AdminDataMigrationDryRunDTO dryRun = controller.getAdminDataMigrationDryRun();
+
+    assertThat(
+        dryRun.getNotePreviews().stream()
+            .filter(p -> p.getNoteId() == note.getId())
+            .findFirst()
+            .orElseThrow()
+            .getStatus(),
+        equalTo("MIGRATE"));
+    assertThat(note.getTitle(), equalTo(titleBefore));
+    assertThat(note.getContent(), equalTo(contentBefore));
+  }
+
+  @Test
+  void nonAdminCannotGetDryRun() {
+    currentUser.setUser(makeMe.aUser().please());
+
+    assertThrows(
+        UnexpectedNoAccessRightException.class, () -> controller.getAdminDataMigrationDryRun());
   }
 }

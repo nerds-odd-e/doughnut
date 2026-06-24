@@ -976,6 +976,22 @@ export type UserListingPage = {
     totalPages?: number;
 };
 
+export type AdminDataMigrationDryRunDto = {
+    notePreviews?: Array<TitleAliasMigrationNotePreviewDto>;
+    totalNoteCount?: number;
+    migrateCount?: number;
+    noChangesCount?: number;
+};
+
+export type TitleAliasMigrationNotePreviewDto = {
+    noteId?: number;
+    currentTitle?: string;
+    plannedTitle?: string;
+    plannedAliases?: Array<string>;
+    plannedContent?: string;
+    status?: string;
+};
+
 export type NotesTestDataWritable = {
     noteTestData?: Array<NoteTestData>;
     externalIdentifier?: string;
@@ -3619,6 +3635,22 @@ export type GetAdminDataMigrationStatusResponses = {
 };
 
 export type GetAdminDataMigrationStatusResponse = GetAdminDataMigrationStatusResponses[keyof GetAdminDataMigrationStatusResponses];
+
+export type GetAdminDataMigrationDryRunData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/admin/data-migration/dry-run';
+};
+
+export type GetAdminDataMigrationDryRunResponses = {
+    /**
+     * OK
+     */
+    200: AdminDataMigrationDryRunDto;
+};
+
+export type GetAdminDataMigrationDryRunResponse = GetAdminDataMigrationDryRunResponses[keyof GetAdminDataMigrationDryRunResponses];
 
 export type DeleteTokenData = {
     body?: never;
