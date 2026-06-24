@@ -169,6 +169,99 @@ class NoteControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void shouldResolveWikiLinkToExactTitleWhenTitleAndAliasCollide()
+        throws UnexpectedNoAccessRightException {
+      User user = currentUser.getUser();
+      Note root = makeMe.aNote().notebookOwnedBy(user).title("root-head").please();
+      Note byTitle = makeMe.aNote().title("color").notebook(root.getNotebook()).please();
+      String aliasTargetMarkdown = "---\naliases:\n  - color\n---\n\nbody";
+      Note byAlias =
+          makeMe
+              .aNote()
+              .title("colour")
+              .notebook(root.getNotebook())
+              .content(aliasTargetMarkdown)
+              .please();
+      wikiTitleCacheService.refreshForNote(byAlias, user);
+      Note viewer = makeMe.aNote().notebook(root.getNotebook()).content("Text [[color]].").please();
+      wikiTitleCacheService.refreshForNote(viewer, user);
+      NoteRealm realm = controller.showNote(viewer);
+      assertThat(realm.getWikiTitles(), hasSize(1));
+      assertThat(realm.getWikiTitles().get(0).getNoteId(), equalTo(byTitle.getId()));
+    }
+
+    @Test
+    void shouldResolveAmbiguousAliasToLowestNoteId() throws UnexpectedNoAccessRightException {
+      User user = currentUser.getUser();
+      Note root = makeMe.aNote().notebookOwnedBy(user).title("root-head").please();
+      String aliasTargetMarkdown = "---\naliases:\n  - color\n---\n\nbody";
+      Note firstTarget =
+          makeMe
+              .aNote()
+              .title("first")
+              .notebook(root.getNotebook())
+              .content(aliasTargetMarkdown)
+              .please();
+      Note secondTarget =
+          makeMe
+              .aNote()
+              .title("second")
+              .notebook(root.getNotebook())
+              .content(aliasTargetMarkdown)
+              .please();
+      wikiTitleCacheService.refreshForNote(firstTarget, user);
+      wikiTitleCacheService.refreshForNote(secondTarget, user);
+      Note viewer = makeMe.aNote().notebook(root.getNotebook()).content("Text [[color]].").please();
+      wikiTitleCacheService.refreshForNote(viewer, user);
+      NoteRealm realm = controller.showNote(viewer);
+      assertThat(realm.getWikiTitles(), hasSize(1));
+      assertThat(realm.getWikiTitles().get(0).getNoteId(), equalTo(firstTarget.getId()));
+    }
+
+    @Test
+    void shouldSkipUnreadableLowestIdAliasCandidateForReadableTarget()
+        throws UnexpectedNoAccessRightException {
+      User secretOwner = makeMe.aUser().please();
+      User viewer = currentUser.getUser();
+      String sharedNotebookName = "Shared Notebook";
+      Notebook secretNotebook =
+          makeMe.aNotebook().creatorAndOwner(secretOwner).name(sharedNotebookName).please();
+      String aliasTargetMarkdown = "---\naliases:\n  - term\n---\n\nbody";
+      Note unreadableTarget =
+          makeMe
+              .aNote()
+              .title("hidden")
+              .notebook(secretNotebook)
+              .content(aliasTargetMarkdown)
+              .please();
+      wikiTitleCacheService.refreshForNote(unreadableTarget, secretOwner);
+
+      Notebook readableNotebook =
+          makeMe.aNotebook().creatorAndOwner(viewer).name(sharedNotebookName).please();
+      makeMe.aBazaarNotebook(readableNotebook).please();
+      Note readableTarget =
+          makeMe
+              .aNote()
+              .title("visible")
+              .notebook(readableNotebook)
+              .content(aliasTargetMarkdown)
+              .please();
+      wikiTitleCacheService.refreshForNote(readableTarget, viewer);
+
+      Note root = makeMe.aNote().notebookOwnedBy(viewer).title("root-head").please();
+      Note viewerNote =
+          makeMe
+              .aNote()
+              .notebook(root.getNotebook())
+              .content("Text [[" + sharedNotebookName + ":term]].")
+              .please();
+      wikiTitleCacheService.refreshForNote(viewerNote, viewer);
+      NoteRealm realm = controller.showNote(viewerNote);
+      assertThat(realm.getWikiTitles(), hasSize(1));
+      assertThat(realm.getWikiTitles().get(0).getNoteId(), equalTo(readableTarget.getId()));
+    }
+
+    @Test
     void shouldResolveWikiLinkUsingTargetBeforePipeAndExposeDisplayFields()
         throws UnexpectedNoAccessRightException {
       User user = currentUser.getUser();

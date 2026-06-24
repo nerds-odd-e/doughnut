@@ -292,7 +292,7 @@ class WikiTitleCacheServiceTest {
     }
 
     @Test
-    void refresh_populates_alias_index_without_resolving_alias_links() {
+    void refresh_populates_alias_index_and_resolves_unambiguous_alias_links() {
       User user = makeMe.aUser().please();
       Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
       String targetMarkdown = "---\naliases:\n  - color\n---\n\n";
@@ -308,7 +308,10 @@ class WikiTitleCacheServiceTest {
       assertThat(aliasRows, hasSize(1));
       assertThat(aliasRows.get(0).getAliasDisplay(), equalTo("color"));
 
-      assertThat(noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId()), empty());
+      List<NoteWikiTitleCache> cacheRows =
+          noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
+      assertThat(cacheRows, hasSize(1));
+      assertThat(cacheRows.get(0).getTargetNote().getId(), equalTo(target.getId()));
     }
 
     @Test

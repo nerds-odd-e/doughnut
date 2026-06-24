@@ -2,7 +2,7 @@
 
 ## Status
 
-Phases 1–4.1 done. Remaining phases not yet implemented.
+Phases 1–4.2 done. Remaining phases not yet implemented.
 
 ## Goal
 
@@ -111,6 +111,9 @@ with Obsidian-faithful ambiguity behavior, and migrate existing notes and their 
 - Phase 4.1: `WikiLinkResolver` falls back to `NoteAliasIndexRepository` after exact title match;
   resolves only when exactly one note owns the alias in the notebook; qualified `Notebook:` links
   preserved.
+- Phase 4.2: exact title matches win over alias matches; ambiguous alias matches resolve to the
+  lowest readable note id via existing `firstReadableNotebookMatch` over alias candidates ordered by
+  note id.
 
 ## Dependency / ordering rationale
 
@@ -218,6 +221,8 @@ Tests:
   single alias match.
 
 ## Phase 4.2 — Title precedence and ambiguous alias resolution
+
+Status: done
 
 Type: Behavior.
 

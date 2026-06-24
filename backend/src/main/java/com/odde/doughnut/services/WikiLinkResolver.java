@@ -106,10 +106,10 @@ public class WikiLinkResolver {
     if (!byTitle.isEmpty()) {
       return byTitle;
     }
-    return singleAliasTargetCandidates(notebookName, noteTitle);
+    return aliasTargetCandidates(notebookName, noteTitle);
   }
 
-  private List<Note> singleAliasTargetCandidates(String notebookName, String linkToken) {
+  private List<Note> aliasTargetCandidates(String notebookName, String linkToken) {
     String lookupKey = FrontmatterAliases.normalizedLookupKey(linkToken);
     List<NoteAliasIndex> rows =
         noteAliasIndexRepository.findByNotebookNameAndAliasLookupKeyOrderByNoteIdAsc(
@@ -125,7 +125,7 @@ public class WikiLinkResolver {
         distinctNotes.add(note);
       }
     }
-    return distinctNotes.size() == 1 ? distinctNotes : List.of();
+    return distinctNotes;
   }
 
   private static List<String> dedupePreserveOrder(List<String> titles) {

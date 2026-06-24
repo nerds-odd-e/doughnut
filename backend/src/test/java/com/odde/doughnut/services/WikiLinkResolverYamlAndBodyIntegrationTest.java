@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.lessThan;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
@@ -112,5 +113,86 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
     assertThat(resolved.size(), equalTo(1));
     assertThat(resolved.getFirst().linkText(), equalTo("Other Notebook:LinkedAlias"));
     assertThat(resolved.getFirst().targetNote().getId(), equalTo(aliasTarget.getId()));
+  }
+
+  @Test
+  void wikiLinkResolver_exactTitleWinsOverFrontmatterAlias() {
+    User owner = makeMe.aUser().please();
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
+    Note byTitle = makeMe.aNote().title("color").notebook(notebook).please();
+    String aliasTargetMarkdown = "---\naliases:\n  - color\n---\n\nbody";
+    Note byAlias =
+        makeMe.aNote().title("colour").notebook(notebook).content(aliasTargetMarkdown).please();
+    noteAliasIndexService.refreshForNote(byAlias);
+    Note linker = makeMe.aNote().notebook(notebook).content("See [[color]]").please();
+    makeMe.entityPersister.flush();
+
+    var resolved = wikiLinkResolver.resolveWikiLinksForCache(linker, owner);
+    assertThat(resolved.size(), equalTo(1));
+    assertThat(resolved.getFirst().targetNote().getId(), equalTo(byTitle.getId()));
+  }
+
+  @Test
+  void wikiLinkResolver_resolvesAmbiguousAliasToLowestNoteId() {
+    User owner = makeMe.aUser().please();
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
+    String aliasTargetMarkdown = "---\naliases:\n  - color\n---\n\nbody";
+    Note firstTarget =
+        makeMe.aNote().title("first").notebook(notebook).content(aliasTargetMarkdown).please();
+    Note secondTarget =
+        makeMe.aNote().title("second").notebook(notebook).content(aliasTargetMarkdown).please();
+    noteAliasIndexService.refreshForNote(firstTarget);
+    noteAliasIndexService.refreshForNote(secondTarget);
+    Note linker = makeMe.aNote().notebook(notebook).content("See [[color]]").please();
+    makeMe.entityPersister.flush();
+
+    var resolved = wikiLinkResolver.resolveWikiLinksForCache(linker, owner);
+    assertThat(resolved.size(), equalTo(1));
+    assertThat(resolved.getFirst().targetNote().getId(), equalTo(firstTarget.getId()));
+    assertThat(firstTarget.getId(), lessThan(secondTarget.getId()));
+  }
+
+  @Test
+  void wikiLinkResolver_skipsUnreadableLowestIdAliasCandidateForReadableTarget() {
+    User secretOwner = makeMe.aUser().please();
+    User viewer = makeMe.aUser().please();
+    String sharedNotebookName = "Shared Notebook";
+    Notebook secretNotebook =
+        makeMe.aNotebook().creatorAndOwner(secretOwner).name(sharedNotebookName).please();
+    String aliasTargetMarkdown = "---\naliases:\n  - term\n---\n\nbody";
+    Note unreadableTarget =
+        makeMe
+            .aNote()
+            .title("hidden")
+            .notebook(secretNotebook)
+            .content(aliasTargetMarkdown)
+            .please();
+    noteAliasIndexService.refreshForNote(unreadableTarget);
+
+    Notebook readableNotebook =
+        makeMe.aNotebook().creatorAndOwner(viewer).name(sharedNotebookName).please();
+    makeMe.aBazaarNotebook(readableNotebook).please();
+    Note readableTarget =
+        makeMe
+            .aNote()
+            .title("visible")
+            .notebook(readableNotebook)
+            .content(aliasTargetMarkdown)
+            .please();
+    noteAliasIndexService.refreshForNote(readableTarget);
+    assertThat(unreadableTarget.getId(), lessThan(readableTarget.getId()));
+
+    Notebook viewerNotebook = makeMe.aNotebook().creatorAndOwner(viewer).name("Main").please();
+    Note linker =
+        makeMe
+            .aNote()
+            .notebook(viewerNotebook)
+            .content("See [[" + sharedNotebookName + ":term]]")
+            .please();
+    makeMe.entityPersister.flush();
+
+    var resolved = wikiLinkResolver.resolveWikiLinksForCache(linker, viewer);
+    assertThat(resolved.size(), equalTo(1));
+    assertThat(resolved.getFirst().targetNote().getId(), equalTo(readableTarget.getId()));
   }
 }
