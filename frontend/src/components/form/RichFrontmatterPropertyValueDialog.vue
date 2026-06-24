@@ -128,6 +128,10 @@ import { ChevronDown, ChevronUp, Minus } from "@lucide/vue"
 import { ref, watch } from "vue"
 import Modal from "@/components/commons/Modal.vue"
 import {
+  authoredAliasesValidationErrorForPropertyValue,
+  isAliasesPropertyKey,
+} from "@/utils/authoredAliasesValidation"
+import {
   compactDisplayForPropertyValue,
   listPropertyValue,
   scalarPropertyValue,
@@ -204,7 +208,15 @@ function moveListItemDown(index: number) {
 function onSave() {
   validationMessage.value = ""
   if (mode.value === "text") {
-    emit("save", scalarPropertyValue(draftText.value))
+    const value = scalarPropertyValue(draftText.value)
+    if (isAliasesPropertyKey(props.propertyKey)) {
+      const aliasError = authoredAliasesValidationErrorForPropertyValue(value)
+      if (aliasError) {
+        validationMessage.value = aliasError
+        return
+      }
+    }
+    emit("save", value)
     return
   }
 
@@ -213,10 +225,18 @@ function onSave() {
     return
   }
 
-  emit(
-    "save",
-    listPropertyValue(draftListItems.value.map((item) => item.trim()))
+  const value = listPropertyValue(
+    draftListItems.value.map((item) => item.trim())
   )
+  if (isAliasesPropertyKey(props.propertyKey)) {
+    const aliasError = authoredAliasesValidationErrorForPropertyValue(value)
+    if (aliasError) {
+      validationMessage.value = aliasError
+      return
+    }
+  }
+
+  emit("save", value)
 }
 
 function onCancel() {

@@ -1,5 +1,6 @@
 import { composeNoteContentMarkdown } from "@/utils/noteContentFrontmatter"
 import { findPropertyRowIndexByExactKey } from "@/utils/noteContentPropertyKeys"
+import { authoredAliasesValidationErrorForPropertyRow } from "@/utils/authoredAliasesValidation"
 import {
   type NoteProperties,
   type PropertyValue,
@@ -100,6 +101,12 @@ export function validatePropertyRowsForRichEdit(
       return { ok: false, message: "Duplicate property keys are not allowed." }
     }
     seen.add(k)
+  }
+  for (const row of trimmed) {
+    const aliasError = authoredAliasesValidationErrorForPropertyRow(row)
+    if (aliasError) {
+      return { ok: false, message: aliasError }
+    }
   }
   return { ok: true }
 }

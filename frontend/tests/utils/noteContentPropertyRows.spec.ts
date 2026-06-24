@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest"
+import { AUTHORED_ALIASES_MESSAGE } from "@/utils/authoredAliasesValidation"
 import {
   composeNoteContentFromPropertyRows,
   insertPropertyRowAt,
@@ -212,5 +213,29 @@ describe("validatePropertyRowsForRichEdit", () => {
         { key: "tags", value: listPropertyValue(["a", "b"]) },
       ])
     ).toEqual({ ok: true })
+  })
+
+  it("rejects scalar aliases values", () => {
+    const r = validatePropertyRowsForRichEdit([
+      propertyRowWithScalar("aliases", "color"),
+    ])
+    expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.message).toBe(AUTHORED_ALIASES_MESSAGE)
+  })
+
+  it("accepts valid aliases list rows", () => {
+    expect(
+      validatePropertyRowsForRichEdit([
+        { key: "aliases", value: listPropertyValue(["color", "hue"]) },
+      ])
+    ).toEqual({ ok: true })
+  })
+
+  it("rejects invalid alias list items", () => {
+    const r = validatePropertyRowsForRichEdit([
+      { key: "aliases", value: listPropertyValue(["good", "bad|alias"]) },
+    ])
+    expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.message).toBe(AUTHORED_ALIASES_MESSAGE)
   })
 })

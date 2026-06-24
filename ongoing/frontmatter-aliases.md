@@ -487,6 +487,8 @@ Tests:
 
 ## Phase 10.2 — Frontend editor explains alias constraints
 
+Status: done
+
 Type: Behavior.
 
 - Precondition: a user edits `aliases` in the existing frontmatter property editor.
