@@ -981,6 +981,21 @@ export type AdminDataMigrationDryRunDto = {
     totalNoteCount?: number;
     migrateCount?: number;
     noChangesCount?: number;
+    collisionGroups?: Array<TitleAliasMigrationCollisionGroupDto>;
+    collisionGroupCount?: number;
+    collisionNoteCount?: number;
+};
+
+export type TitleAliasMigrationCollisionGroupDto = {
+    notebookId?: number;
+    folderId?: number;
+    basePlannedTitle?: string;
+    members?: Array<TitleAliasMigrationCollisionMemberDto>;
+};
+
+export type TitleAliasMigrationCollisionMemberDto = {
+    noteId?: number;
+    resolvedTitle?: string;
 };
 
 export type TitleAliasMigrationNotePreviewDto = {

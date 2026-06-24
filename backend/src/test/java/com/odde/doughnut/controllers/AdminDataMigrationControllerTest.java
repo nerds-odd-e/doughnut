@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -79,6 +80,30 @@ class AdminDataMigrationControllerTest extends ControllerTestBase {
         equalTo("MIGRATE"));
     assertThat(note.getTitle(), equalTo(titleBefore));
     assertThat(note.getContent(), equalTo(contentBefore));
+  }
+
+  @Test
+  void adminGetsDryRunCollisionReportWithoutMutatingNotes()
+      throws UnexpectedNoAccessRightException {
+    currentUser.setUser(makeMe.anAdmin().please());
+    var keeper = makeMe.aNote().title("colour").please();
+    var migratable = makeMe.aNote().underSameNotebookAs(keeper).title("colour／color").please();
+    String keeperTitleBefore = keeper.getTitle();
+    String migratableTitleBefore = migratable.getTitle();
+
+    AdminDataMigrationDryRunDTO dryRun = controller.getAdminDataMigrationDryRun();
+
+    assertThat(dryRun.getCollisionGroupCount(), equalTo(1));
+    assertThat(dryRun.getCollisionGroups(), hasSize(1));
+    assertThat(
+        dryRun.getNotePreviews().stream()
+            .filter(p -> p.getNoteId() == migratable.getId())
+            .findFirst()
+            .orElseThrow()
+            .getPlannedTitle(),
+        equalTo("colour (1)"));
+    assertThat(keeper.getTitle(), equalTo(keeperTitleBefore));
+    assertThat(migratable.getTitle(), equalTo(migratableTitleBefore));
   }
 
   @Test

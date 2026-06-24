@@ -2,7 +2,7 @@
 
 ## Status
 
-Phases 1–7.2 done. Remaining phases not yet implemented.
+Phases 1–7.3 done. Remaining phases not yet implemented.
 
 ## Goal
 
@@ -345,6 +345,8 @@ Tests:
 - Service/controller tests asserting preview output and that no note rows are mutated.
 
 ## Phase 7.3 — Dry-run reports migration-only title collisions
+
+Status: done
 
 Type: Behavior.
 

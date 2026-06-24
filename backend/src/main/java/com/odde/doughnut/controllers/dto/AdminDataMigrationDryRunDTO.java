@@ -13,4 +13,7 @@ public class AdminDataMigrationDryRunDTO {
   private int totalNoteCount;
   private int migrateCount;
   private int noChangesCount;
+  private List<TitleAliasMigrationCollisionGroupDTO> collisionGroups = new ArrayList<>();
+  private int collisionGroupCount;
+  private int collisionNoteCount;
 }

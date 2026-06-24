@@ -1,16 +1,22 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.TitleAliasMigrationCollisionPolicy;
 import com.odde.doughnut.algorithms.TitleAliasMigrationPreviewStatus;
 import com.odde.doughnut.algorithms.TitleAliasMigrationTransform;
 import com.odde.doughnut.controllers.dto.AdminDataMigrationDryRunDTO;
 import com.odde.doughnut.controllers.dto.AdminDataMigrationStatusDTO;
+import com.odde.doughnut.controllers.dto.TitleAliasMigrationCollisionGroupDTO;
+import com.odde.doughnut.controllers.dto.TitleAliasMigrationCollisionMemberDTO;
 import com.odde.doughnut.controllers.dto.TitleAliasMigrationNotePreviewDTO;
 import com.odde.doughnut.entities.AdminDataMigrationProgress;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -60,6 +66,8 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
     List<Note> notes = noteRepository.findAllNonDeletedOrderByIdAsc();
     AdminDataMigrationDryRunDTO dto = new AdminDataMigrationDryRunDTO();
     int migrateCount = 0;
+    List<TitleAliasMigrationCollisionPolicy.NotePlacement> placements = new ArrayList<>();
+    Map<Integer, TitleAliasMigrationNotePreviewDTO> previewsByNoteId = new HashMap<>();
     for (Note note : notes) {
       TitleAliasMigrationTransform.Preview preview =
           TitleAliasMigrationTransform.preview(note.getTitle(), note.getContent());
@@ -71,14 +79,56 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
       item.setPlannedContent(preview.plannedContent());
       item.setStatus(preview.status().name());
       dto.getNotePreviews().add(item);
+      previewsByNoteId.put(note.getId(), item);
+      placements.add(
+          new TitleAliasMigrationCollisionPolicy.NotePlacement(
+              note.getId(),
+              note.getNotebook().getId(),
+              note.getFolder() != null ? note.getFolder().getId() : null,
+              preview.plannedTitle()));
       if (preview.status() == TitleAliasMigrationPreviewStatus.MIGRATE) {
         migrateCount++;
       }
     }
+    applyCollisionResolution(dto, placements, previewsByNoteId);
     dto.setTotalNoteCount(notes.size());
     dto.setMigrateCount(migrateCount);
     dto.setNoChangesCount(notes.size() - migrateCount);
     return dto;
+  }
+
+  private static void applyCollisionResolution(
+      AdminDataMigrationDryRunDTO dto,
+      List<TitleAliasMigrationCollisionPolicy.NotePlacement> placements,
+      Map<Integer, TitleAliasMigrationNotePreviewDTO> previewsByNoteId) {
+    Map<Integer, String> resolvedTitles = TitleAliasMigrationCollisionPolicy.resolve(placements);
+    resolvedTitles.forEach(
+        (noteId, resolvedTitle) -> {
+          TitleAliasMigrationNotePreviewDTO preview = previewsByNoteId.get(noteId);
+          if (preview != null) {
+            preview.setPlannedTitle(resolvedTitle);
+          }
+        });
+    List<TitleAliasMigrationCollisionPolicy.CollisionGroup> groups =
+        TitleAliasMigrationCollisionPolicy.collisionGroups(placements);
+    int collisionNoteCount = 0;
+    for (TitleAliasMigrationCollisionPolicy.CollisionGroup group : groups) {
+      TitleAliasMigrationCollisionGroupDTO groupDto = new TitleAliasMigrationCollisionGroupDTO();
+      groupDto.setNotebookId(group.notebookId());
+      groupDto.setFolderId(group.folderId());
+      groupDto.setBasePlannedTitle(group.basePlannedTitle());
+      for (TitleAliasMigrationCollisionPolicy.Member member : group.members()) {
+        TitleAliasMigrationCollisionMemberDTO memberDto =
+            new TitleAliasMigrationCollisionMemberDTO();
+        memberDto.setNoteId(member.noteId());
+        memberDto.setResolvedTitle(member.resolvedTitle());
+        groupDto.getMembers().add(memberDto);
+      }
+      dto.getCollisionGroups().add(groupDto);
+      collisionNoteCount += group.members().size();
+    }
+    dto.setCollisionGroupCount(groups.size());
+    dto.setCollisionNoteCount(collisionNoteCount);
   }
 
   public AdminDataMigrationStatusDTO runBatch(User adminUser) {

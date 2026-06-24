@@ -8,7 +8,9 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 
 import com.odde.doughnut.controllers.dto.AdminDataMigrationDryRunDTO;
 import com.odde.doughnut.controllers.dto.AdminDataMigrationStatusDTO;
+import com.odde.doughnut.controllers.dto.TitleAliasMigrationCollisionGroupDTO;
 import com.odde.doughnut.controllers.dto.TitleAliasMigrationNotePreviewDTO;
+import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
 import com.odde.doughnut.testability.MakeMe;
@@ -110,5 +112,75 @@ class AdminDataMigrationServiceTest {
     assertThat(migratable.getContent(), equalTo(migratableContentBefore));
     assertThat(unchanged.getTitle(), equalTo(unchangedTitleBefore));
     assertThat(unchanged.getContent(), equalTo(unchangedContentBefore));
+  }
+
+  @Test
+  void dryRun_reportsTitleCollisionsWithPlannedDisambiguation_withoutMutatingNotes() {
+    Note keeper = makeMe.aNote().title("colour").please();
+    Note firstMigratable =
+        makeMe.aNote().underSameNotebookAs(keeper).title("colour／color").please();
+    Note secondMigratable = makeMe.aNote().underSameNotebookAs(keeper).title("colour／hue").please();
+    String keeperTitleBefore = keeper.getTitle();
+    String firstTitleBefore = firstMigratable.getTitle();
+    String secondTitleBefore = secondMigratable.getTitle();
+
+    AdminDataMigrationDryRunDTO dryRun = adminDataMigrationService.dryRun();
+
+    assertThat(dryRun.getCollisionGroupCount(), equalTo(1));
+    assertThat(dryRun.getCollisionNoteCount(), equalTo(3));
+    TitleAliasMigrationCollisionGroupDTO group = dryRun.getCollisionGroups().getFirst();
+    assertThat(group.getBasePlannedTitle(), equalTo("colour"));
+    assertThat(
+        group.getMembers().stream().map(m -> m.getNoteId()).toList(),
+        contains(keeper.getId(), firstMigratable.getId(), secondMigratable.getId()));
+
+    TitleAliasMigrationNotePreviewDTO keeperPreview = previewFor(dryRun, keeper.getId());
+    TitleAliasMigrationNotePreviewDTO firstPreview = previewFor(dryRun, firstMigratable.getId());
+    TitleAliasMigrationNotePreviewDTO secondPreview = previewFor(dryRun, secondMigratable.getId());
+    assertThat(keeperPreview.getPlannedTitle(), equalTo("colour"));
+    assertThat(firstPreview.getPlannedTitle(), equalTo("colour (1)"));
+    assertThat(secondPreview.getPlannedTitle(), equalTo("colour (2)"));
+
+    assertThat(keeper.getTitle(), equalTo(keeperTitleBefore));
+    assertThat(firstMigratable.getTitle(), equalTo(firstTitleBefore));
+    assertThat(secondMigratable.getTitle(), equalTo(secondTitleBefore));
+  }
+
+  @Test
+  void dryRun_doesNotReportCollisionsAcrossDifferentFolders() {
+    Note anchor = makeMe.aNote().title("anchor").please();
+    Folder folderA = makeMe.aFolder().notebook(anchor.getNotebook()).name("A").please();
+    Folder folderB = makeMe.aFolder().notebook(anchor.getNotebook()).name("B").please();
+    Note inA = makeMe.aNote().title("colour／color").folder(folderA).please();
+    Note inB = makeMe.aNote().title("colour／hue").folder(folderB).please();
+
+    AdminDataMigrationDryRunDTO dryRun = adminDataMigrationService.dryRun();
+
+    assertThat(dryRun.getCollisionGroupCount(), equalTo(0));
+    assertThat(previewFor(dryRun, inA.getId()).getPlannedTitle(), equalTo("colour"));
+    assertThat(previewFor(dryRun, inB.getId()).getPlannedTitle(), equalTo("colour"));
+  }
+
+  @Test
+  void dryRun_reportsExistingQualifierCollisionDisambiguation() {
+    Note keeper = makeMe.aNote().title("cat (animal)").please();
+    Note migratable =
+        makeMe.aNote().underSameNotebookAs(keeper).title("cat／kitten (animal)").please();
+
+    AdminDataMigrationDryRunDTO dryRun = adminDataMigrationService.dryRun();
+
+    assertThat(dryRun.getCollisionGroupCount(), equalTo(1));
+    assertThat(previewFor(dryRun, keeper.getId()).getPlannedTitle(), equalTo("cat (animal)"));
+    assertThat(previewFor(dryRun, migratable.getId()).getPlannedTitle(), equalTo("cat (animal 1)"));
+    assertThat(keeper.getTitle(), equalTo("cat (animal)"));
+    assertThat(migratable.getTitle(), equalTo("cat／kitten (animal)"));
+  }
+
+  private static TitleAliasMigrationNotePreviewDTO previewFor(
+      AdminDataMigrationDryRunDTO dryRun, int noteId) {
+    return dryRun.getNotePreviews().stream()
+        .filter(p -> p.getNoteId() == noteId)
+        .findFirst()
+        .orElseThrow();
   }
 }

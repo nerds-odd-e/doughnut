@@ -4919,6 +4919,39 @@ components:
         noChangesCount:
           type: integer
           format: int32
+        collisionGroups:
+          type: array
+          items:
+            $ref: "#/components/schemas/TitleAliasMigrationCollisionGroupDTO"
+        collisionGroupCount:
+          type: integer
+          format: int32
+        collisionNoteCount:
+          type: integer
+          format: int32
+    TitleAliasMigrationCollisionGroupDTO:
+      type: object
+      properties:
+        notebookId:
+          type: integer
+          format: int32
+        folderId:
+          type: integer
+          format: int32
+        basePlannedTitle:
+          type: string
+        members:
+          type: array
+          items:
+            $ref: "#/components/schemas/TitleAliasMigrationCollisionMemberDTO"
+    TitleAliasMigrationCollisionMemberDTO:
+      type: object
+      properties:
+        noteId:
+          type: integer
+          format: int32
+        resolvedTitle:
+          type: string
     TitleAliasMigrationNotePreviewDTO:
       type: object
       properties:
