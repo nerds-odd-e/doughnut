@@ -36,15 +36,14 @@ class AdminDataMigrationControllerTest extends ControllerTestBase {
   @Test
   void adminRunBatchReturnsBatchSummary() throws UnexpectedNoAccessRightException {
     currentUser.setUser(makeMe.anAdmin().please());
+    makeMe.aNote().title("colour／color").please();
 
     AdminDataMigrationStatusDTO run = controller.runDataMigrationBatch();
 
     assertThat(run.getMessage(), notNullValue());
     assertThat(run.getMessage(), containsString("title_alias_to_frontmatter"));
-    assertThat(run.isDataMigrationComplete(), equalTo(false));
-    assertThat(
-        controller.getAdminDataMigrationStatus().getCurrentStepName(),
-        equalTo(AdminDataMigrationService.STEP_TITLE_ALIAS_TO_FRONTMATTER));
+    assertThat(run.isDataMigrationComplete(), equalTo(true));
+    assertThat(controller.getAdminDataMigrationStatus().isDataMigrationComplete(), equalTo(true));
   }
 
   @Test

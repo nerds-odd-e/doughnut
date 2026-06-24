@@ -2,7 +2,7 @@
 
 ## Status
 
-Phases 1–7.3 done. Remaining phases not yet implemented.
+Phases 1–7.3 and 8.1 done. Remaining phases not yet implemented.
 
 ## Goal
 
@@ -364,6 +364,8 @@ Tests:
 - Service/controller tests asserting collision report and planned title resolution; no rows mutated.
 
 ## Phase 8.1 — Execute simple alias-to-frontmatter batches
+
+Status: done
 
 Type: Behavior.
 

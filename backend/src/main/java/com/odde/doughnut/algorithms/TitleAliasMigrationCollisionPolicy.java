@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /** Migration-only title collision detection and qualifier disambiguation within notebook+folder. */
@@ -44,6 +45,13 @@ public final class TitleAliasMigrationCollisionPolicy {
               }
             });
     return Map.copyOf(resolved);
+  }
+
+  public static Set<Integer> collisionNoteIds(List<NotePlacement> placements) {
+    return collisionGroups(placements).stream()
+        .flatMap(group -> group.members().stream())
+        .map(Member::noteId)
+        .collect(Collectors.toUnmodifiableSet());
   }
 
   public static List<CollisionGroup> collisionGroups(List<NotePlacement> placements) {

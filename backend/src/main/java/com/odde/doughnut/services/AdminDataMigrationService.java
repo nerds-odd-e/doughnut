@@ -66,7 +66,8 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
     List<Note> notes = noteRepository.findAllNonDeletedOrderByIdAsc();
     AdminDataMigrationDryRunDTO dto = new AdminDataMigrationDryRunDTO();
     int migrateCount = 0;
-    List<TitleAliasMigrationCollisionPolicy.NotePlacement> placements = new ArrayList<>();
+    List<TitleAliasMigrationCollisionPolicy.NotePlacement> placements =
+        titleAliasPlacementsFor(notes);
     Map<Integer, TitleAliasMigrationNotePreviewDTO> previewsByNoteId = new HashMap<>();
     for (Note note : notes) {
       TitleAliasMigrationTransform.Preview preview =
@@ -80,12 +81,6 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
       item.setStatus(preview.status().name());
       dto.getNotePreviews().add(item);
       previewsByNoteId.put(note.getId(), item);
-      placements.add(
-          new TitleAliasMigrationCollisionPolicy.NotePlacement(
-              note.getId(),
-              note.getNotebook().getId(),
-              note.getFolder() != null ? note.getFolder().getId() : null,
-              preview.plannedTitle()));
       if (preview.status() == TitleAliasMigrationPreviewStatus.MIGRATE) {
         migrateCount++;
       }
@@ -154,6 +149,22 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
       }
       throw e;
     }
+  }
+
+  static List<TitleAliasMigrationCollisionPolicy.NotePlacement> titleAliasPlacementsFor(
+      List<Note> notes) {
+    List<TitleAliasMigrationCollisionPolicy.NotePlacement> placements = new ArrayList<>();
+    for (Note note : notes) {
+      TitleAliasMigrationTransform.Preview preview =
+          TitleAliasMigrationTransform.preview(note.getTitle(), note.getContent());
+      placements.add(
+          new TitleAliasMigrationCollisionPolicy.NotePlacement(
+              note.getId(),
+              note.getNotebook().getId(),
+              note.getFolder() != null ? note.getFolder().getId() : null,
+              preview.plannedTitle()));
+    }
+    return List.copyOf(placements);
   }
 
   private static String errorMessageSafe(RuntimeException e) {

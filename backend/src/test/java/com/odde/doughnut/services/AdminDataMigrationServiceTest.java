@@ -4,7 +4,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.lessThan;
 
 import com.odde.doughnut.controllers.dto.AdminDataMigrationDryRunDTO;
 import com.odde.doughnut.controllers.dto.AdminDataMigrationStatusDTO;
@@ -12,8 +16,11 @@ import com.odde.doughnut.controllers.dto.TitleAliasMigrationCollisionGroupDTO;
 import com.odde.doughnut.controllers.dto.TitleAliasMigrationNotePreviewDTO;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteAliasIndex;
 import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
+import com.odde.doughnut.entities.repositories.NoteAliasIndexRepository;
 import com.odde.doughnut.testability.MakeMe;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,6 +34,7 @@ class AdminDataMigrationServiceTest {
 
   @Autowired MakeMe makeMe;
   @Autowired AdminDataMigrationService adminDataMigrationService;
+  @Autowired NoteAliasIndexRepository noteAliasIndexRepository;
 
   @Test
   void getStatus_reportsRegisteredTitleAliasStepAsPending() {
@@ -43,26 +51,95 @@ class AdminDataMigrationServiceTest {
   }
 
   @Test
-  void runBatch_titleAliasStep_isNoOp_andDoesNotMutateNotes() {
-    Note note = makeMe.aNote().title("colour／color").please();
-    String titleBefore = note.getTitle();
+  void runBatch_migratesNonCollidingNotes_andRefreshesAliasIndex() {
+    Note note = makeMe.aNote().title("colour／color").content("## body\n").please();
 
     AdminDataMigrationStatusDTO dto = adminDataMigrationService.runBatch(makeMe.anAdmin().please());
 
-    assertThat(dto.getMessage(), containsString("title_alias_to_frontmatter"));
-    assertThat(dto.getMessage(), containsString("transform not yet implemented"));
-    assertThat(dto.isDataMigrationComplete(), equalTo(false));
-    assertThat(
-        dto.getCurrentStepName(),
-        equalTo(AdminDataMigrationService.STEP_TITLE_ALIAS_TO_FRONTMATTER));
-    assertThat(dto.getStepStatus(), equalTo(WikiReferenceMigrationStepStatus.RUNNING.name()));
-    assertThat(dto.getProcessedCount(), equalTo(0));
-    assertThat(dto.getTotalCount(), equalTo(0));
-    assertThat(note.getTitle(), equalTo(titleBefore));
+    assertThat(dto.isDataMigrationComplete(), equalTo(true));
+    assertThat(dto.getStepStatus(), equalTo(WikiReferenceMigrationStepStatus.COMPLETED.name()));
+    assertThat(dto.getMessage(), containsString("complete"));
+    assertThat(note.getTitle(), equalTo("colour"));
+    assertThat(note.getContent(), containsString("- color"));
+    List<NoteAliasIndex> aliasRows =
+        noteAliasIndexRepository.findByNote_IdOrderByIdAsc(note.getId());
+    assertThat(aliasRows, hasSize(1));
+    assertThat(aliasRows.getFirst().getAliasDisplay(), equalTo("color"));
   }
 
   @Test
-  void runBatch_matchesStatusProgressAfterNoOpBatch() {
+  void runBatch_mergesTitleAliasesWithExistingFrontmatterAliases() {
+    String content = "---\naliases:\n  - hue\n---\n\nbody";
+    Note note = makeMe.aNote().title("colour／color").content(content).please();
+
+    adminDataMigrationService.runBatch(makeMe.anAdmin().please());
+
+    assertThat(note.getTitle(), equalTo("colour"));
+    assertThat(note.getContent(), containsString("- hue"));
+    assertThat(note.getContent(), containsString("- color"));
+    assertThat(
+        note.getContent().indexOf("- hue"), is(lessThan(note.getContent().indexOf("- color"))));
+    List<NoteAliasIndex> aliasRows =
+        noteAliasIndexRepository.findByNote_IdOrderByIdAsc(note.getId());
+    assertThat(aliasRows, hasSize(2));
+    assertThat(aliasRows.get(0).getAliasDisplay(), equalTo("hue"));
+    assertThat(aliasRows.get(1).getAliasDisplay(), equalTo("color"));
+  }
+
+  @Test
+  void runBatch_skipsCollidingNotes_andReportsPendingCollisionHandling() {
+    Note keeper = makeMe.aNote().title("colour").please();
+    Note migratable = makeMe.aNote().underSameNotebookAs(keeper).title("colour／color").please();
+    String keeperTitleBefore = keeper.getTitle();
+    String migratableTitleBefore = migratable.getTitle();
+
+    AdminDataMigrationStatusDTO dto = adminDataMigrationService.runBatch(makeMe.anAdmin().please());
+
+    assertThat(dto.getMessage(), containsString("pending disambiguation"));
+    assertThat(dto.isDataMigrationComplete(), equalTo(false));
+    assertThat(dto.getStepStatus(), equalTo(WikiReferenceMigrationStepStatus.RUNNING.name()));
+    assertThat(keeper.getTitle(), equalTo(keeperTitleBefore));
+    assertThat(migratable.getTitle(), equalTo(migratableTitleBefore));
+    assertThat(noteAliasIndexRepository.findByNote_IdOrderByIdAsc(keeper.getId()), hasSize(0));
+    assertThat(noteAliasIndexRepository.findByNote_IdOrderByIdAsc(migratable.getId()), hasSize(0));
+  }
+
+  @Test
+  void runBatch_withOnlyUnmigratableNotes_completesWithoutMutatingNotes() {
+    Note note = makeMe.aNote().title("plain").content("body").please();
+    String titleBefore = note.getTitle();
+    String contentBefore = note.getContent();
+
+    AdminDataMigrationStatusDTO dto = adminDataMigrationService.runBatch(makeMe.anAdmin().please());
+
+    assertThat(dto.isDataMigrationComplete(), equalTo(true));
+    assertThat(dto.getStepStatus(), equalTo(WikiReferenceMigrationStepStatus.COMPLETED.name()));
+    assertThat(note.getTitle(), equalTo(titleBefore));
+    assertThat(note.getContent(), equalTo(contentBefore));
+  }
+
+  @Test
+  void runBatch_respectsBatchSizeAndResumesOnNextCall() {
+    var admin = makeMe.anAdmin().please();
+    Note anchor = makeMe.aNote().title("note0／alias0").please();
+    for (int i = 1; i <= AdminDataMigrationService.DATA_MIGRATION_BATCH_SIZE; i++) {
+      makeMe.aNote().underSameNotebookAs(anchor).title("note" + i + "／alias" + i).please();
+    }
+
+    AdminDataMigrationStatusDTO first = adminDataMigrationService.runBatch(admin);
+    AdminDataMigrationStatusDTO second = adminDataMigrationService.runBatch(admin);
+
+    assertThat(
+        first.getProcessedCount(), equalTo(AdminDataMigrationService.DATA_MIGRATION_BATCH_SIZE));
+    assertThat(first.isDataMigrationComplete(), equalTo(false));
+    assertThat(
+        second.getProcessedCount(),
+        greaterThan(AdminDataMigrationService.DATA_MIGRATION_BATCH_SIZE));
+    assertThat(second.isDataMigrationComplete(), equalTo(true));
+  }
+
+  @Test
+  void runBatch_matchesStatusProgressAfterBatch() {
     AdminDataMigrationStatusDTO batch =
         adminDataMigrationService.runBatch(makeMe.anAdmin().please());
     AdminDataMigrationStatusDTO status = adminDataMigrationService.getStatus();
