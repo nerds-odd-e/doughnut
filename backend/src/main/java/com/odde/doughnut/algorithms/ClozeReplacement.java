@@ -10,12 +10,13 @@ record ClozeReplacement(
     String pronunciationReplacement,
     String fullMatchQualifierReplacement) {
 
-  private String maskAliasesAndQualifier(String pronunciationMasked, NoteTitle noteTitle) {
+  private String maskAliasesAndQualifier(
+      String pronunciationMasked, NoteTitle noteTitle, List<TitleFragment> extraAliases) {
     final String internalPartialMatchReplacement = "__p_a_r_t_i_a_l__";
     final String internalFullMatchReplacement = "__f_u_l_l__";
     final String internalFullMatchReplacementForQualifier = "__f_u_l_l_q_u_a_l__";
 
-    var aliases = noteTitle.getTitleAliases();
+    var aliases = TitleFragment.mergeSortedLongestFirst(noteTitle.getTitleAliases(), extraAliases);
     String step1 =
         replaceAliasesWithInternalPlaceholder(
             aliases,
@@ -45,7 +46,10 @@ record ClozeReplacement(
   }
 
   String maskPronunciationsAndTitles(
-      String originalContent1, List<NoteTitle> noteTitles1, boolean followsNonWhitespace) {
+      String originalContent1,
+      List<NoteTitle> noteTitles1,
+      List<TitleFragment> extraAliases,
+      boolean followsNonWhitespace) {
     final String internalPronunciationReplacement = "__p_r_o_n_u_n_c__";
     final Pattern pattern =
         Pattern.compile(
@@ -60,7 +64,10 @@ record ClozeReplacement(
     String pronunciationsReplaced =
         pattern.matcher(contentToProcess).replaceAll(internalPronunciationReplacement);
     return noteTitles1.stream()
-        .reduce(pronunciationsReplaced, this::maskAliasesAndQualifier, (s, s2) -> s)
+        .reduce(
+            pronunciationsReplaced,
+            (content, noteTitle) -> maskAliasesAndQualifier(content, noteTitle, extraAliases),
+            (s, s2) -> s)
         .replace(internalPronunciationReplacement, pronunciationReplacement)
         .replace(HtmlOrMarkdown.NON_WHITESPACE_CONTEXT_MARKER, "");
   }

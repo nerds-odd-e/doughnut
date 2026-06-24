@@ -102,7 +102,8 @@ public class Note extends EntityIdentifiedByIdOnly {
 
     return ClozedString.forMarkdownWithMarkMasks(
             NoteContentMarkdown.bodyWithoutLeadingFrontmatter(getContent()))
-        .hide(getNoteTitle());
+        .hide(getNoteTitle())
+        .hideAliases(FrontmatterAliases.fromNoteContent(getContent()));
   }
 
   @JsonIgnore

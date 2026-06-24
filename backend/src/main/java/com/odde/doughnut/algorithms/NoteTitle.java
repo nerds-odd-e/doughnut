@@ -2,8 +2,6 @@ package com.odde.doughnut.algorithms;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -49,9 +47,7 @@ public class NoteTitle {
     if (parsedSections.aliasSection() != null) {
       splitAliases(parsedSections.aliasSection()).forEach(result::add);
     }
-    result.sort(Comparator.comparing(TitleFragment::length));
-    Collections.reverse(result);
-    return result;
+    return TitleFragment.sortedLongestFirst(result);
   }
 
   public Optional<TitleFragment> getQualifier() {

@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -206,5 +207,31 @@ class ClozeDescriptionTest {
             .hide(new NoteTitle(title))
             .maskedContentAsMarkdown();
     assertThat(result, containsString(expected));
+  }
+
+  @ParameterizedTest
+  @CsvSource({
+    "colour, color, the color of the sky, the [...] of the sky",
+    "north, up, it's on the north or up side, it's on the [...] or [...] side",
+    "archenemy, arch-enemy, an arch-enemy here, an [...] here",
+  })
+  void clozeShouldMaskFrontmatterAliases(
+      String title, String frontmatterAlias, String markdown, String expectedClozeDescription) {
+    assertThat(
+        new ClozedString(clozeReplacement, markdown)
+            .hide(new NoteTitle(title))
+            .hideAliases(List.of(frontmatterAlias))
+            .maskedContentAsMarkdown(),
+        containsString(expectedClozeDescription));
+  }
+
+  @Test
+  void clozeQualifierAndSuffixFragmentsStillComeFromTitleOnly() {
+    String result =
+        new ClozedString(clozeReplacement, "kitten is an animal")
+            .hide(new NoteTitle("cat(animal)"))
+            .hideAliases(List.of("kitten"))
+            .maskedContentAsMarkdown();
+    assertThat(result, containsString("[...] is an <...>"));
   }
 }

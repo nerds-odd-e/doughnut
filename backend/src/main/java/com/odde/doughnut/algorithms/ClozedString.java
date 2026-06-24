@@ -15,6 +15,7 @@ public class ClozedString {
   private ClozeReplacement clozeReplacement;
   private String originalContent;
   private List<NoteTitle> noteTitles = new ArrayList<>();
+  private List<TitleFragment> extraAliases = new ArrayList<>();
 
   public ClozedString(ClozeReplacement clozeReplacement, String originalContent) {
     this.clozeReplacement = clozeReplacement;
@@ -76,11 +77,16 @@ public class ClozedString {
     return this;
   }
 
+  public ClozedString hideAliases(List<String> aliasTexts) {
+    aliasTexts.stream().map(TitleFragment::from).forEach(extraAliases::add);
+    return this;
+  }
+
   private String cloze(String content) {
     return new HtmlOrMarkdown(content)
         .replaceTextWithContext(
             (text, followsNonWhitespace) ->
                 clozeReplacement.maskPronunciationsAndTitles(
-                    text, noteTitles, followsNonWhitespace));
+                    text, noteTitles, extraAliases, followsNonWhitespace));
   }
 }

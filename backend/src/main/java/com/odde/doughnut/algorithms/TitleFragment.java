@@ -1,5 +1,9 @@
 package com.odde.doughnut.algorithms;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /** A parsed title alias or qualifier: {@code stem} plus an optional cloze suffix marker. */
@@ -52,5 +56,25 @@ record TitleFragment(boolean suffixMarker, String stem) {
 
   public int length() {
     return stem.length();
+  }
+
+  static List<TitleFragment> sortedLongestFirst(List<TitleFragment> fragments) {
+    if (fragments.size() <= 1) {
+      return fragments;
+    }
+    List<TitleFragment> sorted = new ArrayList<>(fragments);
+    sorted.sort(Comparator.comparing(TitleFragment::length));
+    Collections.reverse(sorted);
+    return sorted;
+  }
+
+  static List<TitleFragment> mergeSortedLongestFirst(
+      List<TitleFragment> titleAliases, List<TitleFragment> additionalAliases) {
+    if (additionalAliases.isEmpty()) {
+      return titleAliases;
+    }
+    List<TitleFragment> merged = new ArrayList<>(titleAliases);
+    merged.addAll(additionalAliases);
+    return sortedLongestFirst(merged);
   }
 }

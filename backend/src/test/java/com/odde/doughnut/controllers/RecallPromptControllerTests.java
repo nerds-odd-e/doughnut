@@ -477,6 +477,31 @@ class RecallPromptControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void spellingQuestionMasksFrontmatterAliasesInStem() {
+      makeMe
+          .theNote(answerNote)
+          .title("colour")
+          .content(
+              """
+              ---
+              aliases:
+                - color
+              ---
+              The color of the sky is blue
+              """)
+          .please();
+      RecallPrompt spellingPrompt =
+          makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
+
+      SpellingQuestion question = spellingPrompt.getSpellingQuestion();
+
+      assertThat(question, notNullValue());
+      assertThat(question.getStem(), containsString("The "));
+      assertThat(question.getStem(), containsString("<mark"));
+      assertThat(question.getStem(), not(containsString("color")));
+    }
+
+    @Test
     void answerOneOfTheTitleAliases() throws UnexpectedNoAccessRightException {
       makeMe.theNote(answerNote).title("this／that").please();
       answerDTO.setSpellingAnswer("this");

@@ -2,7 +2,7 @@
 
 ## Status
 
-Phase 1 done. Remaining phases not yet implemented.
+Phases 1–2 done. Remaining phases not yet implemented.
 
 ## Goal
 
@@ -101,6 +101,10 @@ with Obsidian-faithful ambiguity behavior, and migrate existing notes and their 
   `backend/src/main/java/db/migration/V300000219__*.java`, `V300000220__*.java`.
 - Phase 1: `FrontmatterAliases` reads YAML-list `aliases` via `Frontmatter.getSequenceItemsIgnoreCase`;
   `Note.matchAnswer` combines title matching with `FrontmatterAliases.matchesFromNoteContent`.
+- Phase 2: `Note.createMaskedContentForRecall` passes `FrontmatterAliases.fromNoteContent` into
+  `ClozedString.hideAliases`; `ClozeReplacement` masks extra aliases alongside title aliases;
+  qualifier and `~` fragments still come from `NoteTitle` only. `TitleFragment.mergeSortedLongestFirst`
+  centralizes longest-first alias ordering for cloze.
 
 ## Dependency / ordering rationale
 
@@ -142,6 +146,8 @@ CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests com.odde.doughnut.
 ```
 
 ## Phase 2 — Cloze masks frontmatter aliases
+
+Status: done
 
 Type: Behavior.
 
