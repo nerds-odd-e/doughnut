@@ -30,16 +30,19 @@ public class WikiTitleCacheService {
   private final NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
   private final AuthorizationService authorizationService;
   private final NotePropertyIndexService notePropertyIndexService;
+  private final NoteAliasIndexService noteAliasIndexService;
 
   public WikiTitleCacheService(
       WikiLinkResolver wikiLinkResolver,
       NoteWikiTitleCacheRepository noteWikiTitleCacheRepository,
       AuthorizationService authorizationService,
-      NotePropertyIndexService notePropertyIndexService) {
+      NotePropertyIndexService notePropertyIndexService,
+      NoteAliasIndexService noteAliasIndexService) {
     this.wikiLinkResolver = wikiLinkResolver;
     this.noteWikiTitleCacheRepository = noteWikiTitleCacheRepository;
     this.authorizationService = authorizationService;
     this.notePropertyIndexService = notePropertyIndexService;
+    this.noteAliasIndexService = noteAliasIndexService;
   }
 
   public List<WikiTitle> wikiTitlesForViewer(Note focusNote, User viewer) {
@@ -211,6 +214,7 @@ public class WikiTitleCacheService {
   public void refreshForNote(Note note, User viewer) {
     rebuildWikiTitleCache(note, viewer);
     notePropertyIndexService.refreshForNote(note);
+    noteAliasIndexService.refreshForNote(note);
   }
 
   private void rebuildWikiTitleCache(Note note, User viewer) {

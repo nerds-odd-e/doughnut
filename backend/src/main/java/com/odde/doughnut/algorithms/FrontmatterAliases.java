@@ -66,12 +66,15 @@ public final class FrontmatterAliases {
     return !INVALID_ALIAS_CHARACTERS.matcher(trimmed).find();
   }
 
+  public static String normalizedLookupKey(String alias) {
+    return Normalizer.normalize(alias, Normalizer.Form.NFKC).toLowerCase(Locale.ROOT);
+  }
+
   private static List<String> dedupePreserveOrder(List<String> items) {
     List<String> out = new ArrayList<>();
     Set<String> seenNormalized = new HashSet<>();
     for (String item : items) {
-      String key = Normalizer.normalize(item, Normalizer.Form.NFKC).toLowerCase(Locale.ROOT);
-      if (seenNormalized.add(key)) {
+      if (seenNormalized.add(normalizedLookupKey(item))) {
         out.add(item);
       }
     }

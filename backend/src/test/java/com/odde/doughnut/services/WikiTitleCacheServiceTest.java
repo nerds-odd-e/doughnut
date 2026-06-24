@@ -10,9 +10,11 @@ import static org.hamcrest.Matchers.hasSize;
 import com.odde.doughnut.controllers.dto.WikiTitle;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteAliasIndex;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.NoteAliasIndexRepository;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -31,6 +33,7 @@ class WikiTitleCacheServiceTest {
   @Autowired MakeMe makeMe;
   @Autowired WikiTitleCacheService wikiTitleCacheService;
   @Autowired NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
+  @Autowired NoteAliasIndexRepository noteAliasIndexRepository;
 
   @Nested
   class refreshForNote {
@@ -284,6 +287,26 @@ class WikiTitleCacheServiceTest {
               .please();
 
       wikiTitleCacheService.refreshForNote(carrier, viewer);
+
+      assertThat(noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId()), empty());
+    }
+
+    @Test
+    void refresh_populates_alias_index_without_resolving_alias_links() {
+      User user = makeMe.aUser().please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      String targetMarkdown = "---\naliases:\n  - color\n---\n\n";
+      Note target =
+          makeMe.aNote().title("colour").notebook(notebook).content(targetMarkdown).please();
+      Note carrier = makeMe.aNote().notebook(notebook).content("see [[color]]").please();
+
+      wikiTitleCacheService.refreshForNote(target, user);
+      wikiTitleCacheService.refreshForNote(carrier, user);
+
+      List<NoteAliasIndex> aliasRows =
+          noteAliasIndexRepository.findByNote_IdOrderByIdAsc(target.getId());
+      assertThat(aliasRows, hasSize(1));
+      assertThat(aliasRows.get(0).getAliasDisplay(), equalTo("color"));
 
       assertThat(noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId()), empty());
     }

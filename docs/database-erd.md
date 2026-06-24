@@ -21,6 +21,7 @@ erDiagram
     "note" ||--o{ conversation : "note_id"
     "note" ||--o{ image : "note_id"
     "note" ||--o{ memory_tracker : "note_id"
+    "note" ||--o{ note_alias_index : "note_id"
     "note" ||--o{ note_creator : "note_id"
     "note" ||--o{ note_property_index : "note_id"
     "note" ||--o{ note_property_index : "target_note_id"
@@ -31,6 +32,7 @@ erDiagram
     notebook ||--o{ book : "notebook_id"
     notebook ||--o{ folder : "notebook_id"
     notebook ||--o{ "note" : "notebook_id"
+    notebook ||--o{ note_alias_index : "notebook_id"
     notebook ||--o{ subscription : "notebook_id"
     notebook_group ||--o{ notebook : "notebook_group_id"
     notebook_group ||--o{ subscription : "notebook_group_id"
@@ -132,6 +134,11 @@ erDiagram
         int image_id FK
         int notebook_id FK
         int folder_id FK
+    }
+    note_alias_index {
+        int id PK
+        int note_id FK
+        int notebook_id FK
     }
     note_creator {
         int note_id PK FK

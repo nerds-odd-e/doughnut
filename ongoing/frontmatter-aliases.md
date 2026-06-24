@@ -2,7 +2,7 @@
 
 ## Status
 
-Phases 1–2 done. Remaining phases not yet implemented.
+Phases 1–3 done. Remaining phases not yet implemented.
 
 ## Goal
 
@@ -105,6 +105,9 @@ with Obsidian-faithful ambiguity behavior, and migrate existing notes and their 
   `ClozedString.hideAliases`; `ClozeReplacement` masks extra aliases alongside title aliases;
   qualifier and `~` fragments still come from `NoteTitle` only. `TitleFragment.mergeSortedLongestFirst`
   centralizes longest-first alias ordering for cloze.
+- Phase 3: `note_alias_index` table stores `alias_display` + `alias_lookup_key` (NFKC + lower case)
+  per note and notebook; `NoteAliasIndexService.refreshForNote` rebuilds on
+  `WikiTitleCacheService.refreshForNote`; `FrontmatterAliases.normalizedLookupKey` shared with dedupe.
 
 ## Dependency / ordering rationale
 
@@ -171,6 +174,8 @@ CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests com.odde.doughnut.
 ```
 
 ## Phase 3 — Alias index (structure, populated but unused)
+
+Status: done
 
 Type: Structure.
 
