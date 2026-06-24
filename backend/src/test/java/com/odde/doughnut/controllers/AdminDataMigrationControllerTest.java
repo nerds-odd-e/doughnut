@@ -9,16 +9,19 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.AdminDataMigrationDryRunDTO;
 import com.odde.doughnut.controllers.dto.AdminDataMigrationStatusDTO;
+import com.odde.doughnut.controllers.dto.TitleAliasInboundReferenceRewritePreviewDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AdminDataMigrationService;
+import com.odde.doughnut.services.WikiTitleCacheService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class AdminDataMigrationControllerTest extends ControllerTestBase {
 
   @Autowired AdminDataMigrationController controller;
+  @Autowired WikiTitleCacheService wikiTitleCacheService;
 
   @Test
   void adminGetsMigrationStatus() throws UnexpectedNoAccessRightException {
@@ -104,6 +107,28 @@ class AdminDataMigrationControllerTest extends ControllerTestBase {
         equalTo("colour (1)"));
     assertThat(keeper.getTitle(), equalTo(keeperTitleBefore));
     assertThat(migratable.getTitle(), equalTo(migratableTitleBefore));
+  }
+
+  @Test
+  void adminGetsInboundReferenceRewriteDryRunWithoutMutatingNotes()
+      throws UnexpectedNoAccessRightException {
+    currentUser.setUser(makeMe.anAdmin().please());
+    var owner = makeMe.aUser().please();
+    Note target = makeMe.aNote().notebookOwnedBy(owner).title("colour／color").please();
+    Note referrer = makeMe.aNote().underSameNotebookAs(target).content("[[colour／color]]").please();
+    wikiTitleCacheService.refreshForNote(referrer, owner);
+    String referrerContentBefore = referrer.getContent();
+
+    AdminDataMigrationStatusDTO run = controller.runDataMigrationBatch();
+    assertThat(run.isDataMigrationComplete(), equalTo(true));
+
+    AdminDataMigrationDryRunDTO dryRun = controller.getAdminDataMigrationDryRun();
+
+    TitleAliasInboundReferenceRewritePreviewDTO preview =
+        dryRun.getInboundReferenceRewritePreviews().getFirst();
+    assertThat(preview.getPlannedLinkInner(), equalTo("colour"));
+    assertThat(preview.isVisibleTextWillChange(), equalTo(true));
+    assertThat(referrer.getContent(), equalTo(referrerContentBefore));
   }
 
   @Test

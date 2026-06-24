@@ -1,18 +1,22 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.TitleAliasInboundReferenceRewritePreview;
 import com.odde.doughnut.algorithms.TitleAliasMigrationCollisionPolicy;
 import com.odde.doughnut.algorithms.TitleAliasMigrationPreviewStatus;
 import com.odde.doughnut.algorithms.TitleAliasMigrationTransform;
 import com.odde.doughnut.controllers.dto.AdminDataMigrationDryRunDTO;
 import com.odde.doughnut.controllers.dto.AdminDataMigrationStatusDTO;
+import com.odde.doughnut.controllers.dto.TitleAliasInboundReferenceRewritePreviewDTO;
 import com.odde.doughnut.controllers.dto.TitleAliasMigrationCollisionGroupDTO;
 import com.odde.doughnut.controllers.dto.TitleAliasMigrationCollisionMemberDTO;
 import com.odde.doughnut.controllers.dto.TitleAliasMigrationNotePreviewDTO;
 import com.odde.doughnut.entities.AdminDataMigrationProgress;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteWikiTitleCache;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -47,14 +51,17 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
   private final AdminDataMigrationProgressService adminDataMigrationProgressService;
   private final AdminDataMigrationBatchWorker batchWorker;
   private final NoteRepository noteRepository;
+  private final NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
 
   public AdminDataMigrationService(
       AdminDataMigrationProgressService adminDataMigrationProgressService,
       @Lazy AdminDataMigrationBatchWorker batchWorker,
-      NoteRepository noteRepository) {
+      NoteRepository noteRepository,
+      NoteWikiTitleCacheRepository noteWikiTitleCacheRepository) {
     this.adminDataMigrationProgressService = adminDataMigrationProgressService;
     this.batchWorker = batchWorker;
     this.noteRepository = noteRepository;
+    this.noteWikiTitleCacheRepository = noteWikiTitleCacheRepository;
   }
 
   public AdminDataMigrationStatusDTO getStatus() {
@@ -91,6 +98,7 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
     dto.setTotalNoteCount(notes.size());
     dto.setMigrateCount(migrateCount);
     dto.setNoChangesCount(notes.size() - migrateCount);
+    populateInboundReferenceRewritePreview(dto);
     return dto;
   }
 
@@ -126,6 +134,46 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
     }
     dto.setCollisionGroupCount(groups.size());
     dto.setCollisionNoteCount(collisionNoteCount);
+  }
+
+  private void populateInboundReferenceRewritePreview(AdminDataMigrationDryRunDTO dto) {
+    if (!stepCompleted(STEP_TITLE_ALIAS_TO_FRONTMATTER)) {
+      dto.setInboundReferenceRewriteCount(0);
+      return;
+    }
+    List<TitleAliasInboundReferenceRewritePreviewDTO> previews = inboundReferenceRewritePreviews();
+    dto.setInboundReferenceRewritePreviews(previews);
+    dto.setInboundReferenceRewriteCount(previews.size());
+  }
+
+  private List<TitleAliasInboundReferenceRewritePreviewDTO> inboundReferenceRewritePreviews() {
+    List<TitleAliasInboundReferenceRewritePreviewDTO> previews = new ArrayList<>();
+    for (NoteWikiTitleCache row :
+        noteWikiTitleCacheRepository.findAllRowsBetweenNonDeletedNotes()) {
+      TitleAliasInboundReferenceRewritePreview.previewRow(row)
+          .map(AdminDataMigrationService::toInboundReferenceRewritePreviewDto)
+          .ifPresent(previews::add);
+    }
+    return previews;
+  }
+
+  private int countPendingInboundReferenceRewrites() {
+    if (!stepCompleted(STEP_TITLE_ALIAS_TO_FRONTMATTER)) {
+      return 0;
+    }
+    return inboundReferenceRewritePreviews().size();
+  }
+
+  private static TitleAliasInboundReferenceRewritePreviewDTO toInboundReferenceRewritePreviewDto(
+      TitleAliasInboundReferenceRewritePreview.Item item) {
+    TitleAliasInboundReferenceRewritePreviewDTO dto =
+        new TitleAliasInboundReferenceRewritePreviewDTO();
+    dto.setReferrerNoteId(item.referrerNoteId());
+    dto.setTargetNoteId(item.targetNoteId());
+    dto.setCurrentLinkInner(item.currentLinkInner());
+    dto.setPlannedLinkInner(item.plannedLinkInner());
+    dto.setVisibleTextWillChange(item.visibleTextWillChange());
+    return dto;
   }
 
   public AdminDataMigrationStatusDTO runBatch(User adminUser) {
@@ -271,6 +319,7 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
       dto.setProcessedCount(0);
       dto.setTotalCount(0);
       dto.setLastError(null);
+      dto.setPendingInboundReferenceRewriteCount(0);
       return;
     }
     Optional<AdminDataMigrationProgress> failed =
@@ -281,6 +330,7 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
     if (failed.isPresent()) {
       copyProgressFields(dto, failed.get());
       dto.setDataMigrationComplete(false);
+      dto.setPendingInboundReferenceRewriteCount(0);
       return;
     }
     if (migrationFullyComplete()) {
@@ -289,6 +339,7 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
       dto.setStepStatus(WikiReferenceMigrationStepStatus.COMPLETED.name());
       dto.setLastError(null);
       applyTitleAliasMigrationProgressCounts(dto);
+      dto.setPendingInboundReferenceRewriteCount(countPendingInboundReferenceRewrites());
       return;
     }
     dto.setDataMigrationComplete(false);
@@ -312,6 +363,7 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
                 applyTitleAliasMigrationProgressCounts(dto);
               }
             });
+    dto.setPendingInboundReferenceRewriteCount(0);
   }
 
   private void applyTitleAliasMigrationProgressCounts(AdminDataMigrationStatusDTO dto) {

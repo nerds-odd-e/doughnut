@@ -19,6 +19,11 @@ public interface NoteWikiTitleCacheRepository extends JpaRepository<NoteWikiTitl
   List<NoteWikiTitleCache> findByNote_IdOrderByIdAsc(Integer noteId);
 
   @Query(
+      "SELECT c FROM NoteWikiTitleCache c JOIN c.note n JOIN c.targetNote t WHERE n.deletedAt IS"
+          + " NULL AND t.deletedAt IS NULL ORDER BY n.id ASC, c.id ASC")
+  List<NoteWikiTitleCache> findAllRowsBetweenNonDeletedNotes();
+
+  @Query(
       "SELECT c FROM NoteWikiTitleCache c JOIN c.note n WHERE c.targetNote.id = :targetNoteId AND"
           + " n.deletedAt IS NULL ORDER BY n.id ASC, c.id ASC")
   List<NoteWikiTitleCache> findRowsReferringToNonDeletedNotesForTarget(

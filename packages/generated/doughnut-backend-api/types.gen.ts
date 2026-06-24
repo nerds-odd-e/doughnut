@@ -666,6 +666,7 @@ export type AdminDataMigrationStatusDto = {
     processedCount?: number;
     totalCount?: number;
     lastError?: string;
+    pendingInboundReferenceRewriteCount?: number;
 };
 
 export type UserDto = {
@@ -984,6 +985,16 @@ export type AdminDataMigrationDryRunDto = {
     collisionGroups?: Array<TitleAliasMigrationCollisionGroupDto>;
     collisionGroupCount?: number;
     collisionNoteCount?: number;
+    inboundReferenceRewritePreviews?: Array<TitleAliasInboundReferenceRewritePreviewDto>;
+    inboundReferenceRewriteCount?: number;
+};
+
+export type TitleAliasInboundReferenceRewritePreviewDto = {
+    referrerNoteId?: number;
+    targetNoteId?: number;
+    currentLinkInner?: string;
+    plannedLinkInner?: string;
+    visibleTextWillChange?: boolean;
 };
 
 export type TitleAliasMigrationCollisionGroupDto = {

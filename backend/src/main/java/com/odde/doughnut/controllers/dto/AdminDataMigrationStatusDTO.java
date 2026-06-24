@@ -21,4 +21,5 @@ public class AdminDataMigrationStatusDTO {
   private int processedCount;
   private int totalCount;
   private String lastError;
+  private int pendingInboundReferenceRewriteCount;
 }

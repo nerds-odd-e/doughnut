@@ -16,11 +16,13 @@ import com.odde.doughnut.algorithms.TitleAliasMigrationPreviewStatus;
 import com.odde.doughnut.algorithms.TitleAliasMigrationTransform;
 import com.odde.doughnut.controllers.dto.AdminDataMigrationDryRunDTO;
 import com.odde.doughnut.controllers.dto.AdminDataMigrationStatusDTO;
+import com.odde.doughnut.controllers.dto.TitleAliasInboundReferenceRewritePreviewDTO;
 import com.odde.doughnut.controllers.dto.TitleAliasMigrationCollisionGroupDTO;
 import com.odde.doughnut.controllers.dto.TitleAliasMigrationNotePreviewDTO;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAliasIndex;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
 import com.odde.doughnut.entities.repositories.NoteAliasIndexRepository;
 import com.odde.doughnut.testability.MakeMe;
@@ -42,6 +44,7 @@ class AdminDataMigrationServiceTest {
   @Autowired MakeMe makeMe;
   @Autowired AdminDataMigrationService adminDataMigrationService;
   @Autowired NoteAliasIndexRepository noteAliasIndexRepository;
+  @Autowired WikiTitleCacheService wikiTitleCacheService;
 
   @Test
   void getStatus_reportsRegisteredTitleAliasStepAsPending() {
@@ -435,6 +438,102 @@ class AdminDataMigrationServiceTest {
     assertThat(previewFor(dryRun, migratable.getId()).getPlannedTitle(), equalTo("cat (animal 1)"));
     assertThat(keeper.getTitle(), equalTo("cat (animal)"));
     assertThat(migratable.getTitle(), equalTo("cat／kitten (animal)"));
+  }
+
+  @Test
+  void dryRun_afterTitleAliasMigration_previewsBareLegacyInboundLinkRewriteWithoutMutation() {
+    var owner = makeMe.aUser().please();
+    Note target = makeMe.aNote().notebookOwnedBy(owner).title("colour／color").please();
+    Note referrer =
+        makeMe.aNote().underSameNotebookAs(target).content("See [[colour／color]]").please();
+    wikiTitleCacheService.refreshForNote(referrer, owner);
+    completeTitleAliasMigration(makeMe.anAdmin().please());
+
+    String referrerContentBefore = referrer.getContent();
+    String targetTitleBefore = target.getTitle();
+
+    AdminDataMigrationDryRunDTO dryRun = adminDataMigrationService.dryRun();
+
+    TitleAliasInboundReferenceRewritePreviewDTO preview =
+        dryRun.getInboundReferenceRewritePreviews().getFirst();
+    assertThat(preview.getReferrerNoteId(), equalTo(referrer.getId()));
+    assertThat(preview.getTargetNoteId(), equalTo(target.getId()));
+    assertThat(preview.getCurrentLinkInner(), equalTo("colour／color"));
+    assertThat(preview.getPlannedLinkInner(), equalTo("colour"));
+    assertThat(preview.isVisibleTextWillChange(), equalTo(true));
+    assertThat(dryRun.getInboundReferenceRewriteCount(), equalTo(1));
+    assertThat(referrer.getContent(), equalTo(referrerContentBefore));
+    assertThat(target.getTitle(), equalTo(targetTitleBefore));
+  }
+
+  @Test
+  void dryRun_afterTitleAliasMigration_previewsQualifiedAndPipedLegacyLinksWithoutMutation() {
+    var admin = makeMe.anAdmin().please();
+    var notebook = makeMe.aNotebook().name("Palette").creatorAndOwner(admin).please();
+    Note target = makeMe.aNote().notebook(notebook).title("colour／color").please();
+    Note qualifiedReferrer =
+        makeMe.aNote().notebook(notebook).content("[[Palette:colour／color]]").please();
+    Note pipedReferrer =
+        makeMe.aNote().notebook(notebook).content("[[colour／color|legacy label]]").please();
+    wikiTitleCacheService.refreshForNote(qualifiedReferrer, admin);
+    wikiTitleCacheService.refreshForNote(pipedReferrer, admin);
+    completeTitleAliasMigration(admin);
+
+    AdminDataMigrationDryRunDTO dryRun = adminDataMigrationService.dryRun();
+
+    assertThat(dryRun.getInboundReferenceRewriteCount(), equalTo(2));
+    TitleAliasInboundReferenceRewritePreviewDTO qualified =
+        dryRun.getInboundReferenceRewritePreviews().stream()
+            .filter(p -> p.getReferrerNoteId() == qualifiedReferrer.getId())
+            .findFirst()
+            .orElseThrow();
+    assertThat(qualified.getPlannedLinkInner(), equalTo("Palette:colour"));
+    assertThat(qualified.isVisibleTextWillChange(), equalTo(true));
+
+    TitleAliasInboundReferenceRewritePreviewDTO piped =
+        dryRun.getInboundReferenceRewritePreviews().stream()
+            .filter(p -> p.getReferrerNoteId() == pipedReferrer.getId())
+            .findFirst()
+            .orElseThrow();
+    assertThat(piped.getPlannedLinkInner(), equalTo("colour|legacy label"));
+    assertThat(piped.isVisibleTextWillChange(), equalTo(false));
+
+    assertThat(qualifiedReferrer.getContent(), equalTo("[[Palette:colour／color]]"));
+    assertThat(pipedReferrer.getContent(), equalTo("[[colour／color|legacy label]]"));
+  }
+
+  @Test
+  void getStatus_afterTitleAliasMigration_reportsPendingInboundReferenceRewriteCount() {
+    var owner = makeMe.aUser().please();
+    Note target = makeMe.aNote().notebookOwnedBy(owner).title("colour／color").please();
+    Note referrer = makeMe.aNote().underSameNotebookAs(target).content("[[colour／color]]").please();
+    wikiTitleCacheService.refreshForNote(referrer, owner);
+    completeTitleAliasMigration(makeMe.anAdmin().please());
+
+    AdminDataMigrationStatusDTO status = adminDataMigrationService.getStatus();
+
+    assertThat(status.getPendingInboundReferenceRewriteCount(), equalTo(1));
+    assertThat(referrer.getContent(), equalTo("[[colour／color]]"));
+  }
+
+  @Test
+  void dryRun_beforeTitleAliasMigration_omitsInboundReferenceRewritePreview() {
+    var owner = makeMe.aUser().please();
+    Note target = makeMe.aNote().notebookOwnedBy(owner).title("colour／color").please();
+    Note referrer = makeMe.aNote().underSameNotebookAs(target).content("[[colour／color]]").please();
+    wikiTitleCacheService.refreshForNote(referrer, owner);
+
+    AdminDataMigrationDryRunDTO dryRun = adminDataMigrationService.dryRun();
+
+    assertThat(dryRun.getInboundReferenceRewriteCount(), equalTo(0));
+    assertThat(dryRun.getInboundReferenceRewritePreviews(), hasSize(0));
+  }
+
+  private void completeTitleAliasMigration(User admin) {
+    AdminDataMigrationStatusDTO status;
+    do {
+      status = adminDataMigrationService.runBatch(admin);
+    } while (!status.isDataMigrationComplete());
   }
 
   private static TitleAliasMigrationNotePreviewDTO previewFor(

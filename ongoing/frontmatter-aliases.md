@@ -2,7 +2,7 @@
 
 ## Status
 
-Phases 1–7.3 and 8.1 done. Remaining phases not yet implemented.
+Phases 1–7.3, 8.1–8.3, and 9.1 done. Remaining phases not yet implemented.
 
 ## Goal
 
@@ -424,6 +424,8 @@ Tests:
   calls.
 
 ## Phase 9.1 — Preview inbound reference rewrites
+
+Status: done
 
 Type: Behavior.
 

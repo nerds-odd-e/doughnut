@@ -16,4 +16,7 @@ public class AdminDataMigrationDryRunDTO {
   private List<TitleAliasMigrationCollisionGroupDTO> collisionGroups = new ArrayList<>();
   private int collisionGroupCount;
   private int collisionNoteCount;
+  private List<TitleAliasInboundReferenceRewritePreviewDTO> inboundReferenceRewritePreviews =
+      new ArrayList<>();
+  private int inboundReferenceRewriteCount;
 }

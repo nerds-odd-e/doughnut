@@ -4291,6 +4291,9 @@ components:
           format: int32
         lastError:
           type: string
+        pendingInboundReferenceRewriteCount:
+          type: integer
+          format: int32
     UserDTO:
       type: object
       properties:
@@ -4929,6 +4932,28 @@ components:
         collisionNoteCount:
           type: integer
           format: int32
+        inboundReferenceRewritePreviews:
+          type: array
+          items:
+            $ref: "#/components/schemas/TitleAliasInboundReferenceRewritePreviewDTO"
+        inboundReferenceRewriteCount:
+          type: integer
+          format: int32
+    TitleAliasInboundReferenceRewritePreviewDTO:
+      type: object
+      properties:
+        referrerNoteId:
+          type: integer
+          format: int32
+        targetNoteId:
+          type: integer
+          format: int32
+        currentLinkInner:
+          type: string
+        plannedLinkInner:
+          type: string
+        visibleTextWillChange:
+          type: boolean
     TitleAliasMigrationCollisionGroupDTO:
       type: object
       properties:
