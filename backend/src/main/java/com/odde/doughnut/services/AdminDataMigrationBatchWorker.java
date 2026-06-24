@@ -72,7 +72,9 @@ public class AdminDataMigrationBatchWorker {
       if (!pendingCollisionIds.isEmpty()) {
         return runCollisionDisambiguationBatch(adminUser, step, allNotes, pendingCollisionIds);
       }
-      adminDataMigrationProgressService.markCompleted(step);
+      if (AdminDataMigrationService.countNotesPendingTitleAliasMigration(allNotes) == 0) {
+        adminDataMigrationProgressService.markCompleted(step);
+      }
       return batchResult("title_alias_to_frontmatter migration is complete.");
     }
 
@@ -147,7 +149,8 @@ public class AdminDataMigrationBatchWorker {
             allNotes,
             TitleAliasMigrationCollisionPolicy.collisionNoteIds(
                 AdminDataMigrationService.collisionResolutionPlacementsFor(allNotes)));
-    if (stillPending.isEmpty()) {
+    if (stillPending.isEmpty()
+        && AdminDataMigrationService.countNotesPendingTitleAliasMigration(allNotes) == 0) {
       adminDataMigrationProgressService.markCompleted(step);
       return batchResult("title_alias_to_frontmatter migration is complete.");
     }
@@ -159,6 +162,14 @@ public class AdminDataMigrationBatchWorker {
   }
 
   private void applyTitleAliasMigration(Note note, User adminUser, String title, String content) {
+    TitleAliasMigrationTransform.Preview preview =
+        TitleAliasMigrationTransform.preview(note.getTitle(), note.getContent());
+    if (preview.status() != TitleAliasMigrationPreviewStatus.MIGRATE) {
+      return;
+    }
+    if (title.equals(note.getTitle()) && content.equals(note.getContent())) {
+      return;
+    }
     note.setTitle(title);
     note.setContent(content);
     entityPersister.merge(note);
@@ -175,7 +186,9 @@ public class AdminDataMigrationBatchWorker {
                   + " disambiguation.")
               .formatted(pendingCollisionMigratables));
     }
-    adminDataMigrationProgressService.markCompleted(step);
+    if (AdminDataMigrationService.countNotesPendingTitleAliasMigration(allNotes) == 0) {
+      adminDataMigrationProgressService.markCompleted(step);
+    }
     return batchResult("title_alias_to_frontmatter migration is complete.");
   }
 
@@ -183,30 +196,18 @@ public class AdminDataMigrationBatchWorker {
       List<Note> notes, Set<Integer> collisionNoteIds) {
     return notes.stream()
         .filter(note -> collisionNoteIds.contains(note.getId()))
-        .filter(
-            note -> {
-              TitleAliasMigrationTransform.Preview preview =
-                  TitleAliasMigrationTransform.preview(note.getTitle(), note.getContent());
-              return preview.status() == TitleAliasMigrationPreviewStatus.MIGRATE;
-            })
+        .filter(AdminDataMigrationService::noteNeedsTitleAliasMigration)
         .map(Note::getId)
         .toList();
   }
 
   private static int countPendingCollisionMigratables(
       List<Note> notes, Set<Integer> collisionNoteIds) {
-    int count = 0;
-    for (Note note : notes) {
-      if (!collisionNoteIds.contains(note.getId())) {
-        continue;
-      }
-      TitleAliasMigrationTransform.Preview preview =
-          TitleAliasMigrationTransform.preview(note.getTitle(), note.getContent());
-      if (preview.status() == TitleAliasMigrationPreviewStatus.MIGRATE) {
-        count++;
-      }
-    }
-    return count;
+    return (int)
+        notes.stream()
+            .filter(note -> collisionNoteIds.contains(note.getId()))
+            .filter(AdminDataMigrationService::noteNeedsTitleAliasMigration)
+            .count();
   }
 
   private AdminDataMigrationStatusDTO noStepsConfiguredBatch() {

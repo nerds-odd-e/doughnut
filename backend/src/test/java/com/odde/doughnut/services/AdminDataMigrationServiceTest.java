@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -9,7 +10,10 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.not;
 
+import com.odde.doughnut.algorithms.TitleAliasMigrationPreviewStatus;
+import com.odde.doughnut.algorithms.TitleAliasMigrationTransform;
 import com.odde.doughnut.controllers.dto.AdminDataMigrationDryRunDTO;
 import com.odde.doughnut.controllers.dto.AdminDataMigrationStatusDTO;
 import com.odde.doughnut.controllers.dto.TitleAliasMigrationCollisionGroupDTO;
@@ -20,7 +24,10 @@ import com.odde.doughnut.entities.NoteAliasIndex;
 import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
 import com.odde.doughnut.entities.repositories.NoteAliasIndexRepository;
 import com.odde.doughnut.testability.MakeMe;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -226,6 +233,105 @@ class AdminDataMigrationServiceTest {
     assertThat(batch.getCurrentStepName(), equalTo(status.getCurrentStepName()));
     assertThat(batch.getProcessedCount(), equalTo(status.getProcessedCount()));
     assertThat(batch.getTotalCount(), equalTo(status.getTotalCount()));
+  }
+
+  @Test
+  void runBatch_repeatedCallAfterCompletion_doesNotChangeMigratedNotesOrDuplicateAliases() {
+    var admin = makeMe.anAdmin().please();
+    Note note = makeMe.aNote().title("colour／color").content("## body\n").please();
+
+    adminDataMigrationService.runBatch(admin);
+    String titleAfterMigration = note.getTitle();
+    String contentAfterMigration = note.getContent();
+    List<NoteAliasIndex> aliasesAfterFirstRun =
+        noteAliasIndexRepository.findByNote_IdOrderByIdAsc(note.getId());
+
+    AdminDataMigrationStatusDTO secondRun = adminDataMigrationService.runBatch(admin);
+
+    assertThat(secondRun.getMessage(), containsString("already complete"));
+    assertThat(note.getTitle(), equalTo(titleAfterMigration));
+    assertThat(note.getContent(), equalTo(contentAfterMigration));
+    List<NoteAliasIndex> aliasesAfterSecondRun =
+        noteAliasIndexRepository.findByNote_IdOrderByIdAsc(note.getId());
+    assertThat(aliasesAfterSecondRun, equalTo(aliasesAfterFirstRun));
+  }
+
+  @Test
+  void getStatus_afterPartialSimpleBatch_reportsMigratedNotesAsProcessed() {
+    var admin = makeMe.anAdmin().please();
+    Note anchor = makeMe.aNote().title("note0／alias0").please();
+    for (int i = 1; i <= AdminDataMigrationService.DATA_MIGRATION_BATCH_SIZE; i++) {
+      makeMe.aNote().underSameNotebookAs(anchor).title("note" + i + "／alias" + i).please();
+    }
+
+    AdminDataMigrationStatusDTO firstBatch = adminDataMigrationService.runBatch(admin);
+    AdminDataMigrationStatusDTO status = adminDataMigrationService.getStatus();
+
+    assertThat(firstBatch.isDataMigrationComplete(), equalTo(false));
+    assertThat(status.getProcessedCount(), equalTo(firstBatch.getProcessedCount()));
+    assertThat(status.getTotalCount(), equalTo(firstBatch.getTotalCount()));
+    assertThat(
+        status.getProcessedCount(), equalTo(AdminDataMigrationService.DATA_MIGRATION_BATCH_SIZE));
+    assertThat(
+        status.getTotalCount(), equalTo(AdminDataMigrationService.DATA_MIGRATION_BATCH_SIZE + 1));
+    assertThat(status.getProcessedCount(), is(lessThan(status.getTotalCount())));
+  }
+
+  @Test
+  void getStatus_withPendingCollisionNotes_reportsIncompleteProgress() {
+    Note keeper = makeMe.aNote().title("colour").please();
+    makeMe.aNote().underSameNotebookAs(keeper).title("colour／color").please();
+
+    adminDataMigrationService.runBatch(makeMe.anAdmin().please());
+    AdminDataMigrationStatusDTO status = adminDataMigrationService.getStatus();
+
+    assertThat(status.isDataMigrationComplete(), equalTo(false));
+    assertThat(status.getTotalCount(), equalTo(2));
+    assertThat(status.getProcessedCount(), equalTo(1));
+    assertThat(status.getProcessedCount(), is(lessThan(status.getTotalCount())));
+  }
+
+  @Test
+  void runBatch_afterPartialCollisionBatch_doesNotChangeAlreadyMigratedCollisionTitles() {
+    var admin = makeMe.anAdmin().please();
+    Note keeper = makeMe.aNote().title("shared").please();
+    List<Note> migratableNotes = new ArrayList<>();
+    for (int i = 1; i <= AdminDataMigrationService.DATA_MIGRATION_BATCH_SIZE + 1; i++) {
+      migratableNotes.add(
+          makeMe.aNote().underSameNotebookAs(keeper).title("shared／alias" + i).please());
+    }
+
+    AdminDataMigrationStatusDTO simplePhase;
+    do {
+      simplePhase = adminDataMigrationService.runBatch(admin);
+    } while (!simplePhase.getMessage().contains("simple migrations complete"));
+
+    AdminDataMigrationStatusDTO partialCollision = adminDataMigrationService.runBatch(admin);
+    assertThat(partialCollision.getMessage(), containsString("remaining"));
+
+    Map<Integer, String> titlesAfterPartial = new HashMap<>();
+    Map<Integer, List<NoteAliasIndex>> aliasesAfterPartial = new HashMap<>();
+    for (Note note : migratableNotes) {
+      if (TitleAliasMigrationTransform.preview(note.getTitle(), note.getContent()).status()
+          != TitleAliasMigrationPreviewStatus.MIGRATE) {
+        titlesAfterPartial.put(note.getId(), note.getTitle());
+        aliasesAfterPartial.put(
+            note.getId(), noteAliasIndexRepository.findByNote_IdOrderByIdAsc(note.getId()));
+      }
+    }
+    assertThat(titlesAfterPartial, is(not(anEmptyMap())));
+
+    adminDataMigrationService.runBatch(admin);
+
+    for (Note note : migratableNotes) {
+      if (!titlesAfterPartial.containsKey(note.getId())) {
+        continue;
+      }
+      assertThat(note.getTitle(), equalTo(titlesAfterPartial.get(note.getId())));
+      assertThat(
+          noteAliasIndexRepository.findByNote_IdOrderByIdAsc(note.getId()),
+          equalTo(aliasesAfterPartial.get(note.getId())));
+    }
   }
 
   @Test

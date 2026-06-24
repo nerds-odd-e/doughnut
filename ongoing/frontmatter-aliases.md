@@ -406,6 +406,8 @@ Tests:
 
 ## Phase 8.3 — Migration progress and resumability hardening
 
+Status: done
+
 Type: Behavior.
 
 - Precondition: the transform may be interrupted between batches.

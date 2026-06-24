@@ -164,6 +164,22 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
     return List.copyOf(placements);
   }
 
+  static int countNotesPendingTitleAliasMigration(List<Note> notes) {
+    int pending = 0;
+    for (Note note : notes) {
+      if (noteNeedsTitleAliasMigration(note)) {
+        pending++;
+      }
+    }
+    return pending;
+  }
+
+  static boolean noteNeedsTitleAliasMigration(Note note) {
+    TitleAliasMigrationTransform.Preview preview =
+        TitleAliasMigrationTransform.preview(note.getTitle(), note.getContent());
+    return preview.status() == TitleAliasMigrationPreviewStatus.MIGRATE;
+  }
+
   /**
    * Rebuilds collision-group placements with stable base titles so partial collision batches keep
    * dry-run disambiguation indices.
@@ -272,8 +288,7 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
       dto.setCurrentStepName(null);
       dto.setStepStatus(WikiReferenceMigrationStepStatus.COMPLETED.name());
       dto.setLastError(null);
-      dto.setProcessedCount(aggregateProcessedWhenComplete());
-      dto.setTotalCount(aggregateTotalWhenComplete());
+      applyTitleAliasMigrationProgressCounts(dto);
       return;
     }
     dto.setDataMigrationComplete(false);
@@ -282,13 +297,28 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
     adminDataMigrationProgressService
         .find(activeStep)
         .ifPresentOrElse(
-            p -> copyProgressFields(dto, p),
+            p -> {
+              copyProgressFields(dto, p);
+              if (STEP_TITLE_ALIAS_TO_FRONTMATTER.equals(activeStep)) {
+                applyTitleAliasMigrationProgressCounts(dto);
+              }
+            },
             () -> {
               dto.setStepStatus(WikiReferenceMigrationStepStatus.PENDING.name());
               dto.setProcessedCount(0);
               dto.setTotalCount(0);
               dto.setLastError(null);
+              if (STEP_TITLE_ALIAS_TO_FRONTMATTER.equals(activeStep)) {
+                applyTitleAliasMigrationProgressCounts(dto);
+              }
             });
+  }
+
+  private void applyTitleAliasMigrationProgressCounts(AdminDataMigrationStatusDTO dto) {
+    List<Note> notes = noteRepository.findAllNonDeletedOrderByIdAsc();
+    int pending = countNotesPendingTitleAliasMigration(notes);
+    dto.setTotalCount(notes.size());
+    dto.setProcessedCount(notes.size() - pending);
   }
 
   private static void copyProgressFields(
@@ -298,28 +328,6 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
     dto.setProcessedCount(p.getProcessedCount());
     dto.setTotalCount(p.getTotalCount());
     dto.setLastError(p.getLastError());
-  }
-
-  private int aggregateProcessedWhenComplete() {
-    return orderedAdminDataMigrationSteps.stream()
-        .mapToInt(
-            s ->
-                adminDataMigrationProgressService
-                    .find(s)
-                    .map(AdminDataMigrationProgress::getProcessedCount)
-                    .orElse(0))
-        .sum();
-  }
-
-  private int aggregateTotalWhenComplete() {
-    return orderedAdminDataMigrationSteps.stream()
-        .mapToInt(
-            s ->
-                adminDataMigrationProgressService
-                    .find(s)
-                    .map(AdminDataMigrationProgress::getTotalCount)
-                    .orElse(0))
-        .sum();
   }
 
   private String activeIncompleteStepName() {

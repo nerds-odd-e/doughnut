@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.AdminDataMigrationDryRunDTO;
 import com.odde.doughnut.controllers.dto.AdminDataMigrationStatusDTO;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AdminDataMigrationService;
@@ -111,5 +112,39 @@ class AdminDataMigrationControllerTest extends ControllerTestBase {
 
     assertThrows(
         UnexpectedNoAccessRightException.class, () -> controller.getAdminDataMigrationDryRun());
+  }
+
+  @Test
+  void adminGetsAccurateStatusAfterPartialBatch() throws UnexpectedNoAccessRightException {
+    currentUser.setUser(makeMe.anAdmin().please());
+    Note anchor = makeMe.aNote().title("note0／alias0").please();
+    for (int i = 1; i <= AdminDataMigrationService.DATA_MIGRATION_BATCH_SIZE; i++) {
+      makeMe.aNote().underSameNotebookAs(anchor).title("note" + i + "／alias" + i).please();
+    }
+
+    controller.runDataMigrationBatch();
+    AdminDataMigrationStatusDTO status = controller.getAdminDataMigrationStatus();
+
+    assertThat(status.isDataMigrationComplete(), equalTo(false));
+    assertThat(
+        status.getProcessedCount(), equalTo(AdminDataMigrationService.DATA_MIGRATION_BATCH_SIZE));
+    assertThat(
+        status.getTotalCount(), equalTo(AdminDataMigrationService.DATA_MIGRATION_BATCH_SIZE + 1));
+  }
+
+  @Test
+  void adminRepeatedRunBatchAfterCompletion_isIdempotent() throws UnexpectedNoAccessRightException {
+    currentUser.setUser(makeMe.anAdmin().please());
+    var note = makeMe.aNote().title("colour／color").please();
+    String titleAfter = "colour";
+
+    controller.runDataMigrationBatch();
+    assertThat(note.getTitle(), equalTo(titleAfter));
+
+    AdminDataMigrationStatusDTO secondRun = controller.runDataMigrationBatch();
+
+    assertThat(secondRun.getMessage(), containsString("already complete"));
+    assertThat(note.getTitle(), equalTo(titleAfter));
+    assertThat(controller.getAdminDataMigrationStatus().isDataMigrationComplete(), equalTo(true));
   }
 }
