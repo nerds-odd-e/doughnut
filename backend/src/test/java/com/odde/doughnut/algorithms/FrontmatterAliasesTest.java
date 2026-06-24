@@ -57,4 +57,82 @@ class FrontmatterAliasesTest {
 
     assertThat(FrontmatterAliases.fromFrontmatter(fm), equalTo(List.of("Color")));
   }
+
+  @Test
+  void authoredValidationError_isEmpty_when_aliases_property_absent() {
+    String content =
+        """
+        ---
+        color: red
+        ---
+
+        body
+        """;
+
+    assertThat(
+        FrontmatterAliases.authoredValidationErrorForNoteContent(content).isPresent(),
+        equalTo(false));
+  }
+
+  @Test
+  void authoredValidationError_isEmpty_for_valid_alias_list() {
+    String content =
+        """
+        ---
+        aliases:
+          - color
+          - hue
+        ---
+
+        body
+        """;
+
+    assertThat(
+        FrontmatterAliases.authoredValidationErrorForNoteContent(content).isPresent(),
+        equalTo(false));
+  }
+
+  @Test
+  void authoredValidationError_rejects_scalar_aliases_value() {
+    String content = "---\naliases: color\n---\n";
+
+    assertThat(
+        FrontmatterAliases.authoredValidationErrorForNoteContent(content).orElseThrow(),
+        equalTo(FrontmatterAliases.AUTHORED_ALIASES_MESSAGE));
+  }
+
+  @Test
+  void authoredValidationError_rejects_blank_and_invalid_list_items() {
+    String blankItem =
+        """
+        ---
+        aliases:
+          - "   "
+        ---
+        """;
+    String nestedItem =
+        """
+        ---
+        aliases:
+          - [oops]
+        ---
+        """;
+    String pipeItem =
+        """
+        ---
+        aliases:
+          - bad|alias
+        ---
+        """;
+
+    assertThat(
+        FrontmatterAliases.authoredValidationErrorForNoteContent(blankItem).orElseThrow(),
+        equalTo(FrontmatterAliases.AUTHORED_ALIASES_MESSAGE));
+    assertThat(
+        FrontmatterAliases.authoredValidationErrorForNoteContent(nestedItem).orElseThrow(),
+        equalTo(FrontmatterAliases.AUTHORED_ALIASES_MESSAGE));
+    assertThat(
+        FrontmatterAliases.authoredValidationErrorForNoteContent(pipeItem).orElseThrow(),
+        equalTo(FrontmatterAliases.AUTHORED_ALIASES_MESSAGE));
+  }
 }

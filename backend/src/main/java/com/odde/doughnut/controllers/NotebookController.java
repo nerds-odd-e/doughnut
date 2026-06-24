@@ -33,6 +33,7 @@ import com.odde.doughnut.services.NotebookIndexingService;
 import com.odde.doughnut.services.NotebookService;
 import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.testability.TestabilitySettings;
+import com.odde.doughnut.validators.AuthoredNoteContent;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -362,6 +363,9 @@ class NotebookController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
     String content = dto.getContent();
+    if (content != null && !content.isBlank()) {
+      AuthoredNoteContent.assertAliasesValidForSave(content);
+    }
     notebook.setIndexContent(content == null || content.isBlank() ? null : content);
     entityPersister.save(notebook);
     entityPersister.flush();
@@ -384,6 +388,9 @@ class NotebookController {
     authorizationService.assertAuthorization(notebook);
     assertFolderInNotebook(notebook, folder);
     String content = dto.getContent();
+    if (content != null && !content.isBlank()) {
+      AuthoredNoteContent.assertAliasesValidForSave(content);
+    }
     folder.setIndexContent(content == null || content.isBlank() ? null : content);
     entityPersister.save(folder);
     entityPersister.flush();

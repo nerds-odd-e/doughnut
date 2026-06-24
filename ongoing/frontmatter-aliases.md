@@ -465,6 +465,8 @@ Tests:
 
 ## Phase 10.1 — Backend rejects invalid authored aliases
 
+Status: done
+
 Type: Behavior.
 
 - Precondition: a user saves note content containing an `aliases` property.

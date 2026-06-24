@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -13,6 +14,10 @@ import java.util.regex.Pattern;
 public final class FrontmatterAliases {
 
   private static final String ALIASES_KEY = "aliases";
+
+  public static final String AUTHORED_ALIASES_MESSAGE =
+      "aliases must be a one-level YAML list of nonblank strings that can safely be used as"
+          + " wiki-link text.";
 
   private static final Pattern INVALID_ALIAS_CHARACTERS =
       Pattern.compile("[|#^:]|\\\\|/|＼|／|[\\r\\n]");
@@ -37,6 +42,40 @@ public final class FrontmatterAliases {
 
   public static boolean matchesFromNoteContent(String content, String answer) {
     return anyMatches(fromNoteContent(content), answer);
+  }
+
+  /**
+   * Returns a validation error when {@code content} has an authored {@code aliases} property that
+   * is not a one-level YAML list of nonblank wiki-link-safe strings. Empty when absent or valid.
+   */
+  public static Optional<String> authoredValidationErrorForNoteContent(String content) {
+    return NoteContentMarkdown.splitLeadingFrontmatter(content == null ? "" : content)
+        .flatMap(lf -> authoredValidationErrorForFrontmatter(lf.frontmatter()));
+  }
+
+  private static Optional<String> authoredValidationErrorForFrontmatter(Frontmatter frontmatter) {
+    if (!frontmatter.containsKeyIgnoreCase(ALIASES_KEY)) {
+      return Optional.empty();
+    }
+    Optional<List<?>> items = frontmatter.getSequenceItemsIgnoreCase(ALIASES_KEY);
+    if (items.isEmpty()) {
+      return Optional.of(AUTHORED_ALIASES_MESSAGE);
+    }
+    return authoredValidationErrorForRawItems(items.get());
+  }
+
+  private static Optional<String> authoredValidationErrorForRawItems(List<?> items) {
+    for (Object item : items) {
+      Optional<String> scalar = FrontmatterPropertyValues.scalarStringFromYamlObject(item);
+      if (scalar.isEmpty()) {
+        return Optional.of(AUTHORED_ALIASES_MESSAGE);
+      }
+      String trimmed = DisplayNamePathSeparators.trimSurroundingWhitespace(scalar.get());
+      if (trimmed.isBlank() || !isValidAliasText(trimmed)) {
+        return Optional.of(AUTHORED_ALIASES_MESSAGE);
+      }
+    }
+    return Optional.empty();
   }
 
   private static boolean anyMatches(List<String> aliases, String answer) {

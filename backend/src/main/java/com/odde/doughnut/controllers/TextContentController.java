@@ -15,6 +15,7 @@ import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.WikiLinkRewriteService;
 import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.testability.TestabilitySettings;
+import com.odde.doughnut.validators.AuthoredNoteContent;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.sql.Timestamp;
@@ -103,6 +104,7 @@ class TextContentController {
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @Valid @RequestBody NoteUpdateContentDTO contentDTO)
       throws UnexpectedNoAccessRightException {
+    AuthoredNoteContent.assertAliasesValidForSave(contentDTO.getContent());
     return updateNote(note, n -> n.setContent(contentDTO.getContent()), true, true);
   }
 

@@ -8,6 +8,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.algorithms.FrontmatterAliases;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.NoteRealm;
@@ -436,6 +437,76 @@ class TextContentControllerTests extends ControllerTestBase {
 
       assertThat(imageRepository.findById(first.getId()).isPresent(), equalTo(true));
       assertThat(imageRepository.findById(second.getId()).isPresent(), equalTo(true));
+    }
+  }
+
+  @Nested
+  class rejectInvalidAuthoredAliasesTest {
+    String initialContent = "unchanged body";
+    NoteUpdateContentDTO noteUpdateContentDTO = new NoteUpdateContentDTO();
+
+    @BeforeEach
+    void setupNoteContent() {
+      note.setContent(initialContent);
+      makeMe.entityPersister.save(note);
+    }
+
+    @Test
+    void rejects_scalar_aliases_value() {
+      noteUpdateContentDTO.setContent("---\naliases: color\n---\n\nbody");
+
+      ApiException thrown =
+          assertThrows(
+              ApiException.class, () -> controller.updateNoteContent(note, noteUpdateContentDTO));
+
+      assertThat(thrown.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.BINDING_ERROR));
+      assertThat(
+          thrown.getErrorBody().getErrors().get("aliases"),
+          equalTo(FrontmatterAliases.AUTHORED_ALIASES_MESSAGE));
+      makeMe.refresh(note);
+      assertThat(note.getContent(), equalTo(initialContent));
+    }
+
+    @Test
+    void rejects_invalid_alias_list_item() {
+      noteUpdateContentDTO.setContent(
+          """
+          ---
+          aliases:
+            - color
+            - bad|alias
+          ---
+
+          body
+          """);
+
+      ApiException thrown =
+          assertThrows(
+              ApiException.class, () -> controller.updateNoteContent(note, noteUpdateContentDTO));
+
+      assertThat(thrown.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.BINDING_ERROR));
+      assertThat(
+          thrown.getErrorBody().getErrors().get("aliases"),
+          equalTo(FrontmatterAliases.AUTHORED_ALIASES_MESSAGE));
+    }
+
+    @Test
+    void accepts_valid_alias_list() throws UnexpectedNoAccessRightException {
+      String content =
+          """
+          ---
+          aliases:
+            - color
+            - hue
+          ---
+
+          body
+          """;
+      noteUpdateContentDTO.setContent(content);
+
+      NoteRealm response = controller.updateNoteContent(note, noteUpdateContentDTO);
+
+      assertThat(response.getNote().getContent(), equalTo(content));
     }
   }
 }

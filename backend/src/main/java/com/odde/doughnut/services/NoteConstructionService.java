@@ -14,6 +14,7 @@ import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.ai.NoteExtractionResult;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.doughnut.testability.TestabilitySettings;
+import com.odde.doughnut.validators.AuthoredNoteContent;
 import java.io.IOException;
 import java.sql.Timestamp;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,6 +98,7 @@ public class NoteConstructionService {
     }
     Note note = createNote(notebook, folder, noteCreation.getNewTitle());
     if (noteCreation.getContent() != null) {
+      AuthoredNoteContent.assertAliasesValidForSave(noteCreation.getContent());
       Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
       note.setContent(noteCreation.getContent());
       note.setUpdatedAt(ts);
@@ -126,6 +128,8 @@ public class NoteConstructionService {
 
     Note newNote =
         createNote(originalNote.getNotebook(), originalNote.getFolder(), aiResult.newNoteTitle);
+    AuthoredNoteContent.assertAliasesValidForSave(aiResult.newNoteContent);
+    AuthoredNoteContent.assertAliasesValidForSave(aiResult.updatedParentContent);
     newNote.setContent(aiResult.newNoteContent);
     newNote.setUpdatedAt(currentUTCTimestamp);
     entityPersister.save(newNote);
