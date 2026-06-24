@@ -2,7 +2,7 @@
 
 ## Status
 
-Phases 1–5.1 done. Remaining phases not yet implemented.
+Phases 1–5.2 done. Remaining phases not yet implemented.
 
 ## Goal
 
@@ -263,6 +263,8 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/WikidataAssociatio
 ```
 
 ## Phase 5.2 — Wikidata Append merges with existing aliases
+
+Status: done
 
 Type: Behavior.
 

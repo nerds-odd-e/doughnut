@@ -1,23 +1,30 @@
 import type { WikidataSearchEntity } from "@generated/doughnut-backend-api"
+import { mergeAliasIntoList } from "./frontmatterAliases"
 import {
   composeNoteContentMarkdown,
   parseNoteContentMarkdown,
 } from "./noteContentFrontmatter"
 import { appendTitleAlias } from "./noteTitleAliasJoiner"
-import { listPropertyValue, type NoteProperties } from "./noteProperties"
+import {
+  isListPropertyValue,
+  listPropertyValue,
+  type NoteProperties,
+} from "./noteProperties"
 
-function noteHasAliasesProperty(properties: NoteProperties): boolean {
+function findAliasesPropertyKey(
+  properties: NoteProperties
+): string | undefined {
   for (const key of Object.keys(properties)) {
-    if (key.trim().toLowerCase() === "aliases") return true
+    if (key.trim().toLowerCase() === "aliases") return key
   }
-  return false
+  return
 }
 
 /**
- * When the note has no existing `aliases` frontmatter property, returns markdown
- * with a new YAML `aliases` list containing `alias`. Otherwise returns null.
+ * Returns updated note markdown with `alias` in frontmatter `aliases`, or null when
+ * content is unchanged, unparseable, or aliases is present but not a YAML list.
  */
-export function appendAliasToNoteContentWhenAbsent(
+export function appendAliasToNoteContent(
   contentMarkdown: string,
   alias: string
 ): string | null {
@@ -25,12 +32,31 @@ export function appendAliasToNoteContentWhenAbsent(
   if (!trimmedAlias) return null
 
   const parsed = parseNoteContentMarkdown(contentMarkdown)
-  if (!parsed.ok || noteHasAliasesProperty(parsed.properties)) return null
+  if (!parsed.ok) return null
+
+  const aliasesKey = findAliasesPropertyKey(parsed.properties)
+  if (!aliasesKey) {
+    return composeNoteContentMarkdown({
+      properties: {
+        ...parsed.properties,
+        aliases: listPropertyValue([trimmedAlias]),
+      },
+      body: parsed.body,
+    })
+  }
+
+  const existingValue = parsed.properties[aliasesKey]
+  if (existingValue === undefined || !isListPropertyValue(existingValue)) {
+    return null
+  }
+
+  const merged = mergeAliasIntoList(existingValue.items, trimmedAlias)
+  if (merged === null) return null
 
   return composeNoteContentMarkdown({
     properties: {
       ...parsed.properties,
-      aliases: listPropertyValue([trimmedAlias]),
+      [aliasesKey]: listPropertyValue(merged),
     },
     body: parsed.body,
   })

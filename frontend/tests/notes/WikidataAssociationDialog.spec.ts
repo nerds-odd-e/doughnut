@@ -1,7 +1,7 @@
 import { WikidataController } from "@generated/doughnut-backend-api/sdk.gen"
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
-import { appendAliasToNoteContentWhenAbsent } from "@/utils/wikidataTitleActions"
+import { appendAliasToNoteContent } from "@/utils/wikidataTitleActions"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
@@ -582,12 +582,9 @@ describe("WikidataAssociationDialog", () => {
     })
   })
 
-  describe("append alias to frontmatter when no existing aliases", () => {
+  describe("append alias to frontmatter", () => {
     it("writes a YAML aliases list instead of appending to the title", () => {
-      const result = appendAliasToNoteContentWhenAbsent(
-        "## Workshop\n",
-        "Canine"
-      )
+      const result = appendAliasToNoteContent("## Workshop\n", "Canine")
       expect(result).toBe(`---\naliases:\n  - Canine\n---\n## Workshop\n`)
     })
 
@@ -597,20 +594,56 @@ wikidata_id: Q11399
 ---
 
 # Body`
-      const result = appendAliasToNoteContentWhenAbsent(markdown, "Canine")
+      const result = appendAliasToNoteContent(markdown, "Canine")
       expect(result).toContain("wikidata_id: Q11399")
       expect(result).toContain("aliases:\n  - Canine")
       expect(result).toContain("# Body")
     })
 
-    it("returns null when an aliases property already exists", () => {
+    it("merges a new alias into an existing aliases list", () => {
       const markdown = `---
 aliases:
   - puppy
 ---
 
 # Body`
-      expect(appendAliasToNoteContentWhenAbsent(markdown, "Canine")).toBeNull()
+      const result = appendAliasToNoteContent(markdown, "Canine")
+      expect(result).toBe(`---
+aliases:
+  - puppy
+  - Canine
+---
+
+# Body`)
+    })
+
+    it("dedupes by normalized lookup key when merging", () => {
+      const markdown = `---
+aliases:
+  - Puppy
+---
+
+# Body`
+      expect(appendAliasToNoteContent(markdown, "puppy")).toBeNull()
+    })
+
+    it("dedupes NFKC-normalized aliases when merging", () => {
+      const markdown = `---
+aliases:
+  - Ｃａｎｉｎｅ
+---
+
+# Body`
+      expect(appendAliasToNoteContent(markdown, "Canine")).toBeNull()
+    })
+
+    it("returns null when aliases is not a YAML list", () => {
+      const markdown = `---
+aliases: puppy
+---
+
+# Body`
+      expect(appendAliasToNoteContent(markdown, "Canine")).toBeNull()
     })
   })
 })

@@ -5,7 +5,7 @@ import type { WikidataSearchEntity } from "@generated/doughnut-backend-api"
 import { WikidataController } from "@generated/doughnut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import {
-  appendAliasToNoteContentWhenAbsent,
+  appendAliasToNoteContent,
   calculateNewTitle,
 } from "@/utils/wikidataTitleActions"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
@@ -254,7 +254,7 @@ export function useWikidataPropertyDialog({
               .storedApi()
               .updateTextField(noteId()!, "edit title", newTitle)
           } else {
-            const newContent = appendAliasToNoteContentWhenAbsent(
+            const newContent = appendAliasToNoteContent(
               contentMarkdown(),
               entity.label
             )
