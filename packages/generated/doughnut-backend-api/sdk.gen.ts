@@ -1100,7 +1100,7 @@ export class AdminDataMigrationController {
     }
     
     /**
-     * Get admin data migration status (stub until a migration is wired)
+     * Get admin data migration status
      */
     public static getAdminDataMigrationStatus<ThrowOnError extends boolean = false>(options?: Options<GetAdminDataMigrationStatusData, ThrowOnError>): RequestResult<GetAdminDataMigrationStatusResponses, unknown, ThrowOnError> {
         return (options?.client ?? client).get<GetAdminDataMigrationStatusResponses, unknown, ThrowOnError>({ url: '/api/admin/data-migration/status', ...options });

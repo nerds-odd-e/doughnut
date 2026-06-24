@@ -95,6 +95,27 @@ describe("DataMigrationPanel", () => {
     expect(wrapper.text()).toContain("Migration is already complete")
   })
 
+  it("shows registered migration step from status", async () => {
+    const registered: AdminDataMigrationStatusDto = {
+      message:
+        "[admin-data-migration-diagnostics:v1]: Title alias to frontmatter migration runs in bounded batches.",
+      dataMigrationComplete: false,
+      currentStepName: "title_alias_to_frontmatter",
+      stepStatus: "PENDING",
+      processedCount: 0,
+      totalCount: 0,
+    }
+    getSpy.mockResolvedValue(wrapSdkResponse(registered))
+
+    const wrapper = helper.component(DataMigrationPanel).mount()
+    await flushPromises()
+
+    expect(wrapper.get('[data-testid="data-migration-step"]').text()).toBe(
+      "title_alias_to_frontmatter"
+    )
+    expect(wrapper.text()).toContain("PENDING")
+  })
+
   it("shows error when runDataMigrationBatch fails", async () => {
     vi.spyOn(
       AdminDataMigrationController,

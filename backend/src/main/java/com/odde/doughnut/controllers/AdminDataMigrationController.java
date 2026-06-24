@@ -27,7 +27,7 @@ class AdminDataMigrationController {
 
   @Operation(
       operationId = "getAdminDataMigrationStatus",
-      summary = "Get admin data migration status (stub until a migration is wired)")
+      summary = "Get admin data migration status")
   @GetMapping("/status")
   public AdminDataMigrationStatusDTO getAdminDataMigrationStatus()
       throws UnexpectedNoAccessRightException {

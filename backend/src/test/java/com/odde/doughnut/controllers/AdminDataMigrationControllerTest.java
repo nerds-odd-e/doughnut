@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.AdminDataMigrationStatusDTO;
+import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AdminDataMigrationService;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,11 @@ class AdminDataMigrationControllerTest extends ControllerTestBase {
     AdminDataMigrationStatusDTO status = controller.getAdminDataMigrationStatus();
 
     assertThat(status.getMessage(), equalTo(AdminDataMigrationService.READY_MESSAGE));
-    assertThat(status.isDataMigrationComplete(), equalTo(true));
+    assertThat(status.isDataMigrationComplete(), equalTo(false));
+    assertThat(
+        status.getCurrentStepName(),
+        equalTo(AdminDataMigrationService.STEP_TITLE_ALIAS_TO_FRONTMATTER));
+    assertThat(status.getStepStatus(), equalTo(WikiReferenceMigrationStepStatus.PENDING.name()));
   }
 
   @Test
@@ -33,10 +38,11 @@ class AdminDataMigrationControllerTest extends ControllerTestBase {
     AdminDataMigrationStatusDTO run = controller.runDataMigrationBatch();
 
     assertThat(run.getMessage(), notNullValue());
-    assertThat(run.getMessage(), containsString("Batch acknowledged"));
+    assertThat(run.getMessage(), containsString("title_alias_to_frontmatter"));
+    assertThat(run.isDataMigrationComplete(), equalTo(false));
     assertThat(
-        controller.getAdminDataMigrationStatus().getMessage(),
-        equalTo(AdminDataMigrationService.READY_MESSAGE));
+        controller.getAdminDataMigrationStatus().getCurrentStepName(),
+        equalTo(AdminDataMigrationService.STEP_TITLE_ALIAS_TO_FRONTMATTER));
   }
 
   @Test

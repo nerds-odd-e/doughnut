@@ -2,7 +2,7 @@
 
 ## Status
 
-Phases 1–5.2 done. Remaining phases not yet implemented.
+Phases 1–6 done. Remaining phases not yet implemented.
 
 ## Goal
 
@@ -285,6 +285,8 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/WikidataAssociatio
 ```
 
 ## Phase 6 — Register the admin migration step
+
+Status: done
 
 Type: Behavior.
 

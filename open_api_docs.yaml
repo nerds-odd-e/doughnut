@@ -2873,7 +2873,7 @@ paths:
     get:
       tags:
       - admin-data-migration-controller
-      summary: Get admin data migration status (stub until a migration is wired)
+      summary: Get admin data migration status
       operationId: getAdminDataMigrationStatus
       responses:
         "200":
