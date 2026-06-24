@@ -2,7 +2,7 @@
 
 ## Status
 
-Phases 1–7.3, 8.1–8.3, 9.1, and 9.2 done. Remaining phases not yet implemented.
+Phases 1–7.3, 8.1–8.3, 9.1, 9.2, 10.1, 10.2, and 11 (skipped) done. Remaining phases not yet implemented.
 
 ## Goal
 
@@ -505,7 +505,17 @@ Tests:
 
 ## Phase 11 — Cohesive frontmatter property constraints
 
+Status: skipped
+
 Type: Structure.
+
+Rationale: Phase 10 already localizes alias constraints in small cohesive modules on both
+sides — backend `FrontmatterAliases` (with shared `isValidAliasText` and existing
+`FrontmatterPropertyValue` shapes) and frontend `authoredAliasesValidation.ts` (dedicated
+helpers wired from `noteContentPropertyRows` and the property value dialog). A generic
+per-key constraint registry would add structure without removing meaningful duplication
+ahead of Phase 12 cleanup; revisit only if more constrained keys land before legacy
+title-alias code is deleted.
 
 - Precondition: `aliases` has explicit local validation and other frontmatter keys still rely on
   scattered ad hoc rules.
