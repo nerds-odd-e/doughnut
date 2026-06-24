@@ -4,7 +4,6 @@ import {
   composeNoteContentMarkdown,
   parseNoteContentMarkdown,
 } from "./noteContentFrontmatter"
-import { appendTitleAlias } from "./noteTitleAliasJoiner"
 import {
   isListPropertyValue,
   listPropertyValue,
@@ -63,16 +62,15 @@ export function appendAliasToNoteContent(
 }
 
 /**
- * Calculates the new title for replace, or legacy title-alias append when
- * frontmatter `aliases` is not used (e.g. new-note form).
+ * Calculates the new title for Wikidata replace; append no longer mutates the title.
  */
 export function calculateNewTitle(
   currentTitle: string,
   entity: WikidataSearchEntity,
   titleAction: "replace" | "append"
 ): string {
-  if (titleAction === "replace") {
-    return entity.label
+  if (titleAction === "append") {
+    return currentTitle
   }
-  return appendTitleAlias(currentTitle, entity.label)
+  return entity.label
 }

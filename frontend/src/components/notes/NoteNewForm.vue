@@ -69,7 +69,11 @@ import FolderSelector from "./FolderSelector.vue"
 import PathNameEditor from "./core/PathNameEditor.vue"
 import WikidataSearchByLabel from "./WikidataSearchByLabel.vue"
 import { useRouter } from "vue-router"
-import { calculateNewTitle } from "@/utils/wikidataTitleActions"
+import {
+  calculateNewTitle,
+  appendAliasToNoteContent,
+} from "@/utils/wikidataTitleActions"
+import { authoredNoteTitleValidationError } from "@/utils/authoredNoteTitleValidation"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { parseSoftDeletedTitleConflict } from "@/managedApi/softDeletedTitleConflict"
 import usePopups from "@/components/commons/Popups/usePopups"
@@ -139,6 +143,7 @@ function contentWithWikidataFrontmatter(
 // Reactive state
 const newTitle = ref(props.initialTitle ?? "Untitled")
 const wikidataIdSelection = ref("")
+const noteContentMarkdown = ref<string | undefined>(undefined)
 
 const noteFormErrors = ref({
   newTitle: undefined as undefined | string,
@@ -176,11 +181,28 @@ function parseCreateNoteFailure(e: unknown): {
   }
 }
 
+function contentForSubmit(): string | undefined {
+  const wikidataContent = contentWithWikidataFrontmatter(
+    wikidataIdSelection.value
+  )
+  if (noteContentMarkdown.value !== undefined) {
+    return noteContentMarkdown.value
+  }
+  return wikidataContent
+}
+
 const processForm = async () => {
   if (processing.value) return
   processing.value = true
   noteFormErrors.value.wikidataId = undefined
   noteFormErrors.value.newTitle = undefined
+
+  const titleValidationError = authoredNoteTitleValidationError(newTitle.value)
+  if (titleValidationError) {
+    noteFormErrors.value.newTitle = titleValidationError
+    processing.value = false
+    return
+  }
 
   const trimmedWikidata = wikidataIdSelection.value.trim()
   if (trimmedWikidata !== "" && !/^Q\d+$/i.test(trimmedWikidata)) {
@@ -190,12 +212,10 @@ const processForm = async () => {
   }
 
   const api = storageAccessor.value.storedApi()
-  const wikidataContent = contentWithWikidataFrontmatter(
-    wikidataIdSelection.value
-  )
+  const content = contentForSubmit()
   const body: NoteCreationDto = {
     newTitle: newTitle.value,
-    ...(wikidataContent !== undefined ? { content: wikidataContent } : {}),
+    ...(content !== undefined ? { content } : {}),
   }
   try {
     await api.createRootNoteAtNotebook(router, props.notebookId, body, {
@@ -242,6 +262,22 @@ const onSelectWikidataEntry = (
   titleAction?: "replace" | "append"
 ) => {
   wikidataIdSelection.value = selectedSuggestion.id ?? ""
+
+  if (titleAction === "append") {
+    const baseContent =
+      noteContentMarkdown.value ??
+      contentWithWikidataFrontmatter(wikidataIdSelection.value) ??
+      ""
+    const appended = appendAliasToNoteContent(
+      baseContent,
+      selectedSuggestion.label
+    )
+    if (appended !== null) {
+      noteContentMarkdown.value = appended
+    }
+    hasTitleBeenEdited.value = true
+    return
+  }
 
   if (titleAction) {
     newTitle.value = calculateNewTitle(

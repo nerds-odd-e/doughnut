@@ -35,7 +35,7 @@ Feature: Assimilate With Remembering Spelling
       | sedition      | sedition       | "success"               |
       | sedition      | wrong answer   | "error: wrong spelling" |
       | colour／color | colour         | "success"               |
-      | colour／color | color          | "success"               |
+      | colour／color | color          | "error: wrong spelling" |
 
   Scenario: Verify spelling accepts frontmatter alias
     Given I have a notebook "English practice" with notes:

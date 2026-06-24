@@ -33,7 +33,8 @@ public final class DisplayNamePathSeparators {
     if (!value.contains("\\") && !value.contains("/") && !value.contains(":")) {
       return value;
     }
-    return value.replace('\\', '＼').replace('/', '／').replace(':', '：');
+    // Halfwidth slash becomes escaped fullwidth ／／ so it stays literal, not a title alias.
+    return value.replace('\\', '＼').replace("/", "／／").replace(':', '：');
   }
 
   /**

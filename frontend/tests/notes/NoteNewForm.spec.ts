@@ -518,7 +518,7 @@ describe("adding new note", () => {
       ${"dog"}    | ${"dog"}      | ${"Q1"}    | ${undefined} | ${"dog"}
       ${"dog"}    | ${"Dog"}      | ${"Q1"}    | ${undefined} | ${"Dog"}
       ${"dog"}    | ${"Canine"}   | ${"Q1"}    | ${"replace"} | ${"Canine"}
-      ${"dog"}    | ${"Canine"}   | ${"Q1"}    | ${"append"}  | ${"dog ／ Canine"}
+      ${"dog"}    | ${"Canine"}   | ${"Q1"}    | ${"append"}  | ${"dog"}
     `(
       "search $searchTitle get $wikidataTitle with action $titleAction appends or replaces title alias as $expectedTitle",
       async ({

@@ -1278,6 +1278,22 @@ export type ShareToBazaarResponses = {
 
 export type ShareToBazaarResponse = ShareToBazaarResponses[keyof ShareToBazaarResponses];
 
+export type ResetAdminDataMigrationProgressData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/testability/reset_admin_data_migration_progress';
+};
+
+export type ResetAdminDataMigrationProgressResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type ResetAdminDataMigrationProgressResponse = ResetAdminDataMigrationProgressResponses[keyof ResetAdminDataMigrationProgressResponses];
+
 export type ReplaceServiceUrlData = {
     body: {
         [key: string]: string;

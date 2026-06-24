@@ -557,6 +557,8 @@ Tests:
 
 ## Phase 12.2 — Cleanup: title authoring no longer creates plain aliases
 
+Status: done
+
 Type: Behavior.
 
 - Precondition: the user edits or creates a note title.

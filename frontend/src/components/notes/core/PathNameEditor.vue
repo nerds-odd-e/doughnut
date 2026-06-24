@@ -38,8 +38,8 @@
       :editor="SeamlessTextEditor"
     />
 
-    <div v-if="errorMessage" class="text-error text-sm">
-      {{ errorMessage }}
+    <div v-if="displayError" class="text-error text-sm">
+      {{ displayError }}
     </div>
     <div v-else-if="displayWarning" class="text-warning text-sm">
       {{ displayWarning }}
@@ -50,11 +50,12 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue"
 import SeamlessTextEditor from "../../form/SeamlessTextEditor.vue"
+import { authoredNoteTitleValidationError } from "@/utils/authoredNoteTitleValidation"
 import { scheduleFocusTargetWithin } from "@/utils/focusTarget"
 
 const FULLWIDTH_REPLACE: Record<string, string> = {
   "\\": "＼",
-  "/": "／",
+  "/": "／／",
   ":": "：",
 }
 
@@ -76,7 +77,7 @@ function processIllegalPathChars(raw: string): {
       if (!replacementNote) {
         replacementNote =
           c === "/"
-            ? "'/' was replaced with fullwidth '／' (the only separator between alternative title spellings)"
+            ? "'/' was replaced with fullwidth '／／' (a literal slash in the title)"
             : `'${c}' is not a legal name, and it has been replaced with the fullwidth '${full}'`
       }
     } else {
@@ -130,6 +131,11 @@ const emit = defineEmits<{
 const root = ref<HTMLElement | null>(null)
 const replacementWarning = ref("")
 const linkWarning = ref("")
+const plainAliasError = ref("")
+
+const displayError = computed(
+  () => props.errorMessage || plainAliasError.value || ""
+)
 
 const displayWarning = computed(() => {
   const parts = [replacementWarning.value, linkWarning.value].filter(Boolean)
@@ -140,12 +146,14 @@ function onModelUpdate(raw: string) {
   if (props.readonly) {
     replacementWarning.value = ""
     linkWarning.value = ""
+    plainAliasError.value = ""
     emit("update:modelValue", raw)
     return
   }
   const { value, replacementNote } = processIllegalPathChars(raw)
   replacementWarning.value = replacementNote
   linkWarning.value = hasLinkBreakChars(value) ? LINK_NAME_WARNING : ""
+  plainAliasError.value = authoredNoteTitleValidationError(value) ?? ""
   emit("update:modelValue", value)
 }
 

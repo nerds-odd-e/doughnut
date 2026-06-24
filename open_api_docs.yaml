@@ -219,6 +219,18 @@ paths:
             '*/*':
               schema:
                 type: string
+  /api/testability/reset_admin_data_migration_progress:
+    post:
+      tags:
+      - testability-rest-controller
+      operationId: resetAdminDataMigrationProgress
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
   /api/testability/replace_service_url:
     post:
       tags:

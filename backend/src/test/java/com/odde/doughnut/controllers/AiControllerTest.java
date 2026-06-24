@@ -95,7 +95,7 @@ class AiControllerTest extends ControllerTestBase {
 
       SuggestedTitleDTO result = controller.suggestTitle(testNote);
 
-      assertThat(result.getTitle()).isEqualTo("TCP／IP： Overview");
+      assertThat(result.getTitle()).isEqualTo("TCP／／IP： Overview");
     }
 
     @Test

@@ -45,6 +45,29 @@ class DisplayNamePathSeparatorsValidationTest {
   }
 
   @Test
+  void noteTitle_rejectsPlainTitleAliasSegments() {
+    NoteUpdateTitleDTO dto = new NoteUpdateTitleDTO();
+    dto.setNewTitle("colour／color");
+    Set<ConstraintViolation<NoteUpdateTitleDTO>> violations = validator.validate(dto);
+    assertEquals(1, violations.size());
+    assertTrue(
+        violations.stream()
+            .anyMatch(
+                v ->
+                    v.getPropertyPath().toString().equals("newTitle")
+                        && v.getMessage().equals(NoteTitleAuthoring.PLAIN_TITLE_ALIAS_MESSAGE)));
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"word／~suffix", "cat／／kitten", "colour"})
+  void noteTitle_allowsSuffixFragmentsAndLiteralSlashes(String title) {
+    NoteUpdateTitleDTO dto = new NoteUpdateTitleDTO();
+    dto.setNewTitle(title);
+    Set<ConstraintViolation<NoteUpdateTitleDTO>> violations = validator.validate(dto);
+    assertTrue(violations.isEmpty());
+  }
+
+  @Test
   void folderCreationName_rejectsSeparators() {
     FolderCreationRequest req = new FolderCreationRequest();
     req.setName("a:b");
