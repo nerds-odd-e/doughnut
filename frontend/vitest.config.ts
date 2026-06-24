@@ -17,6 +17,7 @@ import checker from "vite-plugin-checker"
 // Check if we're running tests - Vitest sets process.env.VITEST
 // This is the official and most reliable way to detect test mode
 const isTest = process.env.VITEST !== undefined
+const isCI = process.env.CI === "true"
 
 const repoRoot = fileURLToPath(new URL("..", import.meta.url))
 
@@ -70,6 +71,9 @@ const config = defineConfig({
   test: {
     globals: true,
     environment: "node", // Browser mode uses 'node' environment
+    // Parallel file imports overwhelm the browser orchestrator on CI runners.
+    fileParallelism: !isCI,
+    retry: isCI ? 1 : 0,
     setupFiles: ["./tests/setupVitest.ts"],
     include: ["./**/*.spec.{ts,tsx}"],
     exclude: [
