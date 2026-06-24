@@ -46,7 +46,10 @@ class AdminDataMigrationControllerTest extends ControllerTestBase {
 
     assertThat(run.getMessage(), notNullValue());
     assertThat(run.getMessage(), containsString("title_alias_to_frontmatter"));
-    assertThat(run.isDataMigrationComplete(), equalTo(true));
+
+    AdminDataMigrationStatusDTO inboundRewrite = controller.runDataMigrationBatch();
+    assertThat(
+        inboundRewrite.getMessage(), containsString("title_alias_inbound_reference_rewrite"));
     assertThat(controller.getAdminDataMigrationStatus().isDataMigrationComplete(), equalTo(true));
   }
 
@@ -120,7 +123,11 @@ class AdminDataMigrationControllerTest extends ControllerTestBase {
     String referrerContentBefore = referrer.getContent();
 
     AdminDataMigrationStatusDTO run = controller.runDataMigrationBatch();
-    assertThat(run.isDataMigrationComplete(), equalTo(true));
+    while (AdminDataMigrationService.STEP_TITLE_ALIAS_TO_FRONTMATTER.equals(
+        controller.getAdminDataMigrationStatus().getCurrentStepName())) {
+      run = controller.runDataMigrationBatch();
+    }
+    assertThat(run.isDataMigrationComplete(), equalTo(false));
 
     AdminDataMigrationDryRunDTO dryRun = controller.getAdminDataMigrationDryRun();
 
@@ -164,6 +171,9 @@ class AdminDataMigrationControllerTest extends ControllerTestBase {
     String titleAfter = "colour";
 
     controller.runDataMigrationBatch();
+    while (!controller.getAdminDataMigrationStatus().isDataMigrationComplete()) {
+      controller.runDataMigrationBatch();
+    }
     assertThat(note.getTitle(), equalTo(titleAfter));
 
     AdminDataMigrationStatusDTO secondRun = controller.runDataMigrationBatch();

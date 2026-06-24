@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.AdminDataMigrationProgressRepository;
 import com.odde.doughnut.entities.repositories.CircleRepository;
 import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
@@ -56,6 +57,7 @@ class TestabilityRestController {
   @Autowired NotebookService notebookService;
   @Autowired FolderRepository folderRepository;
   @Autowired WikiTitleCacheService wikiTitleCacheService;
+  @Autowired AdminDataMigrationProgressRepository adminDataMigrationProgressRepository;
 
   @PostMapping("/clean_db_and_reset_testability_settings")
   @Transactional
@@ -69,6 +71,13 @@ class TestabilityRestController {
       createUser("a_trainer", "A Trainer");
       testabilitySettings.init();
     }
+    return "OK";
+  }
+
+  @PostMapping("/reset_admin_data_migration_progress")
+  @Transactional
+  public String resetAdminDataMigrationProgress() {
+    adminDataMigrationProgressRepository.deleteAll();
     return "OK";
   }
 

@@ -12,7 +12,6 @@ import com.odde.doughnut.controllers.dto.TitleAliasMigrationCollisionMemberDTO;
 import com.odde.doughnut.controllers.dto.TitleAliasMigrationNotePreviewDTO;
 import com.odde.doughnut.entities.AdminDataMigrationProgress;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteWikiTitleCache;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
 import com.odde.doughnut.entities.repositories.NoteRepository;
@@ -34,6 +33,9 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
 
   public static final String STEP_TITLE_ALIAS_TO_FRONTMATTER = "title_alias_to_frontmatter";
 
+  public static final String STEP_TITLE_ALIAS_INBOUND_REFERENCE_REWRITE =
+      "title_alias_inbound_reference_rewrite";
+
   public static final String READY_MESSAGE =
       ("[%s]: Title alias to frontmatter migration runs in bounded batches.")
           .formatted(DIAGNOSTIC_MARKER);
@@ -43,7 +45,7 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
    * implement {@link AdminDataMigrationBatchWorker} when adding migrations.
    */
   public static final List<String> orderedAdminDataMigrationSteps =
-      List.of(STEP_TITLE_ALIAS_TO_FRONTMATTER);
+      List.of(STEP_TITLE_ALIAS_TO_FRONTMATTER, STEP_TITLE_ALIAS_INBOUND_REFERENCE_REWRITE);
 
   /** Default notes per HTTP request once batch processing is wired for steps. */
   public static final int DATA_MIGRATION_BATCH_SIZE = 50;
@@ -148,13 +150,17 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
 
   private List<TitleAliasInboundReferenceRewritePreviewDTO> inboundReferenceRewritePreviews() {
     List<TitleAliasInboundReferenceRewritePreviewDTO> previews = new ArrayList<>();
-    for (NoteWikiTitleCache row :
-        noteWikiTitleCacheRepository.findAllRowsBetweenNonDeletedNotes()) {
-      TitleAliasInboundReferenceRewritePreview.previewRow(row)
-          .map(AdminDataMigrationService::toInboundReferenceRewritePreviewDto)
-          .ifPresent(previews::add);
+    for (TitleAliasInboundReferenceRewritePreview.Item item :
+        TitleAliasInboundReferenceRewritePreview.previewRows(
+            noteWikiTitleCacheRepository.findAllRowsBetweenNonDeletedNotes())) {
+      previews.add(toInboundReferenceRewritePreviewDto(item));
     }
     return previews;
+  }
+
+  List<Integer> targetNoteIdsNeedingInboundReferenceRewrite() {
+    return TitleAliasInboundReferenceRewritePreview.targetNoteIdsWithPendingRewrites(
+        noteWikiTitleCacheRepository.findAllRowsBetweenNonDeletedNotes());
   }
 
   private int countPendingInboundReferenceRewrites() {
@@ -184,7 +190,7 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
     }
     if (migrationFullyComplete()) {
       AdminDataMigrationStatusDTO dto = new AdminDataMigrationStatusDTO();
-      dto.setMessage("Title alias to frontmatter migration is already complete.");
+      dto.setMessage("Frontmatter alias migration is already complete.");
       populateMigrationProgress(dto);
       return dto;
     }
@@ -339,7 +345,7 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
       dto.setStepStatus(WikiReferenceMigrationStepStatus.COMPLETED.name());
       dto.setLastError(null);
       applyTitleAliasMigrationProgressCounts(dto);
-      dto.setPendingInboundReferenceRewriteCount(countPendingInboundReferenceRewrites());
+      dto.setPendingInboundReferenceRewriteCount(0);
       return;
     }
     dto.setDataMigrationComplete(false);
@@ -350,20 +356,48 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
         .ifPresentOrElse(
             p -> {
               copyProgressFields(dto, p);
-              if (STEP_TITLE_ALIAS_TO_FRONTMATTER.equals(activeStep)) {
-                applyTitleAliasMigrationProgressCounts(dto);
-              }
+              applyProgressCountsForStep(dto, activeStep);
             },
             () -> {
               dto.setStepStatus(WikiReferenceMigrationStepStatus.PENDING.name());
               dto.setProcessedCount(0);
               dto.setTotalCount(0);
               dto.setLastError(null);
-              if (STEP_TITLE_ALIAS_TO_FRONTMATTER.equals(activeStep)) {
-                applyTitleAliasMigrationProgressCounts(dto);
-              }
+              applyProgressCountsForStep(dto, activeStep);
             });
-    dto.setPendingInboundReferenceRewriteCount(0);
+    if (!STEP_TITLE_ALIAS_INBOUND_REFERENCE_REWRITE.equals(activeStep)) {
+      dto.setPendingInboundReferenceRewriteCount(0);
+    } else {
+      dto.setPendingInboundReferenceRewriteCount(countPendingInboundReferenceRewrites());
+    }
+  }
+
+  private void applyProgressCountsForStep(AdminDataMigrationStatusDTO dto, String activeStep) {
+    if (STEP_TITLE_ALIAS_TO_FRONTMATTER.equals(activeStep)) {
+      applyTitleAliasMigrationProgressCounts(dto);
+      return;
+    }
+    if (STEP_TITLE_ALIAS_INBOUND_REFERENCE_REWRITE.equals(activeStep)) {
+      applyInboundReferenceRewriteProgressCounts(dto);
+    }
+  }
+
+  private void applyInboundReferenceRewriteProgressCounts(AdminDataMigrationStatusDTO dto) {
+    List<Integer> pendingTargets = targetNoteIdsNeedingInboundReferenceRewrite();
+    int pending = pendingTargets.size();
+    adminDataMigrationProgressService
+        .find(STEP_TITLE_ALIAS_INBOUND_REFERENCE_REWRITE)
+        .ifPresentOrElse(
+            p -> {
+              int total =
+                  p.getTotalCount() > 0 ? p.getTotalCount() : pending + p.getProcessedCount();
+              dto.setTotalCount(total);
+              dto.setProcessedCount(Math.max(0, total - pending));
+            },
+            () -> {
+              dto.setTotalCount(pending);
+              dto.setProcessedCount(0);
+            });
   }
 
   private void applyTitleAliasMigrationProgressCounts(AdminDataMigrationStatusDTO dto) {

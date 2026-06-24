@@ -156,6 +156,13 @@ const testability = () => {
       )
     },
 
+    resetAdminDataMigrationProgress() {
+      return cy.request({
+        method: 'POST',
+        url: '/api/testability/reset_admin_data_migration_progress',
+      })
+    },
+
     attachBookToNotebook(
       notebookName: string,
       bookName: string,
@@ -424,6 +431,20 @@ const testability = () => {
             .wrap({ ...rest, [newTitle]: noteId })
             .as(injectedNoteIdMapAliasName)
         })
+      })
+    },
+
+    renameInjectedNoteTitle(oldTitle: string, newTitle: string) {
+      return cy.get(`@${injectedNoteIdMapAliasName}`).then((existingMap) => {
+        const map = existingMap as Record<string, number>
+        const noteId = map[oldTitle]
+        expect(noteId, `"${oldTitle}" is not in the injected note map`).to.be.a(
+          'number'
+        )
+        const { [oldTitle]: _removed, ...rest } = map
+        return cy
+          .wrap({ ...rest, [newTitle]: noteId })
+          .as(injectedNoteIdMapAliasName)
       })
     },
 

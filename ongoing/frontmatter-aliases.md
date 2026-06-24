@@ -2,7 +2,7 @@
 
 ## Status
 
-Phases 1–7.3, 8.1–8.3, and 9.1 done. Remaining phases not yet implemented.
+Phases 1–7.3, 8.1–8.3, 9.1, and 9.2 done. Remaining phases not yet implemented.
 
 ## Goal
 
@@ -442,6 +442,8 @@ Tests:
 - Service/controller tests for bare, qualified, and piped old full-title links; no rows mutated.
 
 ## Phase 9.2 — Execute inbound reference rewrites and rebuild caches
+
+Status: done
 
 Type: Behavior.
 

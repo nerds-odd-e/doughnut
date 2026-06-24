@@ -2,7 +2,11 @@ package com.odde.doughnut.algorithms;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /** Pure preview for inbound wiki links that still target legacy title-alias full titles. */
 public final class TitleAliasInboundReferenceRewritePreview {
@@ -15,6 +19,22 @@ public final class TitleAliasInboundReferenceRewritePreview {
       String currentLinkInner,
       String plannedLinkInner,
       boolean visibleTextWillChange) {}
+
+  public static List<Integer> targetNoteIdsWithPendingRewrites(Iterable<NoteWikiTitleCache> rows) {
+    Set<Integer> ids = new LinkedHashSet<>();
+    for (NoteWikiTitleCache row : rows) {
+      previewRow(row).ifPresent(item -> ids.add(item.targetNoteId()));
+    }
+    return List.copyOf(ids);
+  }
+
+  public static List<Item> previewRows(Iterable<NoteWikiTitleCache> rows) {
+    List<Item> previews = new ArrayList<>();
+    for (NoteWikiTitleCache row : rows) {
+      previewRow(row).ifPresent(previews::add);
+    }
+    return List.copyOf(previews);
+  }
 
   public static Optional<Item> previewRow(NoteWikiTitleCache row) {
     if (row == null || row.getNote() == null || row.getTargetNote() == null) {

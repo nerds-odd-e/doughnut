@@ -67,6 +67,22 @@ public class WikiLinkRewriteService {
   }
 
   /**
+   * Rewrites inbound wiki links that still use legacy title-alias full titles after title
+   * migration. Bare links update visible text to the note's current title; piped links keep
+   * explicit display text.
+   */
+  @Transactional
+  public void rewriteInboundWikiLinksForTitleAliasMigration(
+      Note targetNote, Timestamp updatedAt, User viewer) {
+    rewriteInboundWikiLinks(
+        targetNote,
+        updatedAt,
+        viewer,
+        lt -> WikiLinkMarkdown.newInnerForUpdateVisibleText(lt, targetNote.getTitle()),
+        Set.of());
+  }
+
+  /**
    * Rewrites inbound and outgoing wiki links when a note moves to a different notebook. No-op when
    * the source and target notebooks are the same.
    */

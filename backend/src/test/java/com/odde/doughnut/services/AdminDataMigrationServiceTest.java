@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.anEmptyMap;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -64,11 +63,11 @@ class AdminDataMigrationServiceTest {
   void runBatch_migratesNonCollidingNotes_andRefreshesAliasIndex() {
     Note note = makeMe.aNote().title("colour／color").content("## body\n").please();
 
-    AdminDataMigrationStatusDTO dto = adminDataMigrationService.runBatch(makeMe.anAdmin().please());
+    completeFullMigration(makeMe.anAdmin().please());
+    AdminDataMigrationStatusDTO dto = adminDataMigrationService.getStatus();
 
     assertThat(dto.isDataMigrationComplete(), equalTo(true));
     assertThat(dto.getStepStatus(), equalTo(WikiReferenceMigrationStepStatus.COMPLETED.name()));
-    assertThat(dto.getMessage(), containsString("complete"));
     assertThat(note.getTitle(), equalTo("colour"));
     assertThat(note.getContent(), containsString("- color"));
     List<NoteAliasIndex> aliasRows =
@@ -82,7 +81,7 @@ class AdminDataMigrationServiceTest {
     String content = "---\naliases:\n  - hue\n---\n\nbody";
     Note note = makeMe.aNote().title("colour／color").content(content).please();
 
-    adminDataMigrationService.runBatch(makeMe.anAdmin().please());
+    completeFullMigration(makeMe.anAdmin().please());
 
     assertThat(note.getTitle(), equalTo("colour"));
     assertThat(note.getContent(), containsString("- hue"));
@@ -126,8 +125,8 @@ class AdminDataMigrationServiceTest {
     assertThat(simplePhase.getMessage(), containsString("pending disambiguation"));
 
     AdminDataMigrationStatusDTO collisionPhase = adminDataMigrationService.runBatch(admin);
+    completeInboundReferenceRewrite(admin);
 
-    assertThat(collisionPhase.isDataMigrationComplete(), equalTo(true));
     assertThat(collisionPhase.getMessage(), containsString("complete"));
     assertThat(keeper.getTitle(), equalTo("colour"));
     assertThat(firstMigratable.getTitle(), equalTo("colour (1)"));
@@ -148,9 +147,9 @@ class AdminDataMigrationServiceTest {
         makeMe.aNote().underSameNotebookAs(keeper).title("cat／kitten (animal)").please();
 
     adminDataMigrationService.runBatch(admin);
-    AdminDataMigrationStatusDTO dto = adminDataMigrationService.runBatch(admin);
+    adminDataMigrationService.runBatch(admin);
+    completeInboundReferenceRewrite(admin);
 
-    assertThat(dto.isDataMigrationComplete(), equalTo(true));
     assertThat(keeper.getTitle(), equalTo("cat (animal)"));
     assertThat(migratable.getTitle(), equalTo("cat (animal 1)"));
     assertThat(migratable.getContent(), containsString("- kitten"));
@@ -188,7 +187,8 @@ class AdminDataMigrationServiceTest {
     assertThat(partial.getMessage(), containsString("remaining"));
 
     AdminDataMigrationStatusDTO finished = adminDataMigrationService.runBatch(admin);
-    assertThat(finished.isDataMigrationComplete(), equalTo(true));
+    completeInboundReferenceRewrite(admin);
+    assertThat(finished.getMessage(), containsString("complete"));
     assertThat(keeper.getTitle(), equalTo("shared"));
   }
 
@@ -198,10 +198,12 @@ class AdminDataMigrationServiceTest {
     String titleBefore = note.getTitle();
     String contentBefore = note.getContent();
 
-    AdminDataMigrationStatusDTO dto = adminDataMigrationService.runBatch(makeMe.anAdmin().please());
+    var admin = makeMe.anAdmin().please();
+    AdminDataMigrationStatusDTO dto = adminDataMigrationService.runBatch(admin);
+    completeInboundReferenceRewrite(admin);
 
-    assertThat(dto.isDataMigrationComplete(), equalTo(true));
-    assertThat(dto.getStepStatus(), equalTo(WikiReferenceMigrationStepStatus.COMPLETED.name()));
+    assertThat(dto.getMessage(), containsString("title_alias_to_frontmatter"));
+    assertThat(adminDataMigrationService.getStatus().isDataMigrationComplete(), equalTo(true));
     assertThat(note.getTitle(), equalTo(titleBefore));
     assertThat(note.getContent(), equalTo(contentBefore));
   }
@@ -221,9 +223,9 @@ class AdminDataMigrationServiceTest {
         first.getProcessedCount(), equalTo(AdminDataMigrationService.DATA_MIGRATION_BATCH_SIZE));
     assertThat(first.isDataMigrationComplete(), equalTo(false));
     assertThat(
-        second.getProcessedCount(),
-        greaterThan(AdminDataMigrationService.DATA_MIGRATION_BATCH_SIZE));
-    assertThat(second.isDataMigrationComplete(), equalTo(true));
+        second.getMessage(), containsString("title_alias_to_frontmatter migration is complete."));
+    completeInboundReferenceRewrite(admin);
+    assertThat(adminDataMigrationService.getStatus().isDataMigrationComplete(), equalTo(true));
   }
 
   @Test
@@ -243,7 +245,7 @@ class AdminDataMigrationServiceTest {
     var admin = makeMe.anAdmin().please();
     Note note = makeMe.aNote().title("colour／color").content("## body\n").please();
 
-    adminDataMigrationService.runBatch(admin);
+    completeFullMigration(admin);
     String titleAfterMigration = note.getTitle();
     String contentAfterMigration = note.getContent();
     List<NoteAliasIndex> aliasesAfterFirstRun =
@@ -292,6 +294,76 @@ class AdminDataMigrationServiceTest {
     assertThat(status.getTotalCount(), equalTo(2));
     assertThat(status.getProcessedCount(), equalTo(1));
     assertThat(status.getProcessedCount(), is(lessThan(status.getTotalCount())));
+  }
+
+  @Test
+  void runBatch_afterTitleAliasMigration_rewritesBareLegacyInboundLinks() {
+    var admin = makeMe.anAdmin().please();
+    var owner = makeMe.aUser().please();
+    Note target =
+        makeMe.aNote().notebookOwnedBy(owner).title("colour／color").content("body").please();
+    Note referrer =
+        makeMe.aNote().underSameNotebookAs(target).content("See [[colour／color]]").please();
+    wikiTitleCacheService.refreshForNote(referrer, owner);
+    completeTitleAliasMigration(admin);
+
+    AdminDataMigrationStatusDTO rewrite = adminDataMigrationService.runBatch(admin);
+
+    assertThat(rewrite.getMessage(), containsString("title_alias_inbound_reference_rewrite"));
+    assertThat(referrer.getContent(), equalTo("See [[colour]]"));
+    assertThat(target.getTitle(), equalTo("colour"));
+    assertThat(noteAliasIndexRepository.findByNote_IdOrderByIdAsc(target.getId()), hasSize(1));
+  }
+
+  @Test
+  void runBatch_afterTitleAliasMigration_rewritesQualifiedAndPipedLegacyInboundLinks() {
+    var admin = makeMe.anAdmin().please();
+    var notebook = makeMe.aNotebook().name("Palette").creatorAndOwner(admin).please();
+    Note target = makeMe.aNote().notebook(notebook).title("colour／color").content("body").please();
+    Note qualifiedReferrer =
+        makeMe.aNote().notebook(notebook).content("[[Palette:colour／color]]").please();
+    Note pipedReferrer =
+        makeMe.aNote().notebook(notebook).content("[[colour／color|legacy label]]").please();
+    wikiTitleCacheService.refreshForNote(qualifiedReferrer, admin);
+    wikiTitleCacheService.refreshForNote(pipedReferrer, admin);
+    completeTitleAliasMigration(admin);
+
+    completeInboundReferenceRewrite(admin);
+
+    assertThat(qualifiedReferrer.getContent(), equalTo("[[Palette:colour]]"));
+    assertThat(pipedReferrer.getContent(), equalTo("[[colour|legacy label]]"));
+  }
+
+  @Test
+  void runBatch_inboundReferenceRewrite_isIdempotentAfterCompletion() {
+    var admin = makeMe.anAdmin().please();
+    var owner = makeMe.aUser().please();
+    Note target = makeMe.aNote().notebookOwnedBy(owner).title("colour／color").please();
+    Note referrer = makeMe.aNote().underSameNotebookAs(target).content("[[colour／color]]").please();
+    wikiTitleCacheService.refreshForNote(referrer, owner);
+    completeFullMigration(admin);
+    String contentAfterRewrite = referrer.getContent();
+
+    AdminDataMigrationStatusDTO secondRun = adminDataMigrationService.runBatch(admin);
+
+    assertThat(secondRun.getMessage(), containsString("already complete"));
+    assertThat(referrer.getContent(), equalTo(contentAfterRewrite));
+  }
+
+  @Test
+  void getStatus_afterFullMigration_reportsZeroPendingInboundReferenceRewrites() {
+    var admin = makeMe.anAdmin().please();
+    var owner = makeMe.aUser().please();
+    Note target = makeMe.aNote().notebookOwnedBy(owner).title("colour／color").please();
+    Note referrer = makeMe.aNote().underSameNotebookAs(target).content("[[colour／color]]").please();
+    wikiTitleCacheService.refreshForNote(referrer, owner);
+    completeFullMigration(admin);
+
+    AdminDataMigrationStatusDTO status = adminDataMigrationService.getStatus();
+
+    assertThat(status.isDataMigrationComplete(), equalTo(true));
+    assertThat(status.getPendingInboundReferenceRewriteCount(), equalTo(0));
+    assertThat(referrer.getContent(), equalTo("[[colour]]"));
   }
 
   @Test
@@ -530,6 +602,22 @@ class AdminDataMigrationServiceTest {
   }
 
   private void completeTitleAliasMigration(User admin) {
+    AdminDataMigrationStatusDTO status;
+    do {
+      status = adminDataMigrationService.runBatch(admin);
+    } while (AdminDataMigrationService.STEP_TITLE_ALIAS_TO_FRONTMATTER.equals(
+        status.getCurrentStepName()));
+  }
+
+  private void completeInboundReferenceRewrite(User admin) {
+    AdminDataMigrationStatusDTO status;
+    do {
+      status = adminDataMigrationService.runBatch(admin);
+    } while (AdminDataMigrationService.STEP_TITLE_ALIAS_INBOUND_REFERENCE_REWRITE.equals(
+        status.getCurrentStepName()));
+  }
+
+  private void completeFullMigration(User admin) {
     AdminDataMigrationStatusDTO status;
     do {
       status = adminDataMigrationService.runBatch(admin);
