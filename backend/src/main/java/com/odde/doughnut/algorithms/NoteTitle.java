@@ -1,7 +1,6 @@
 package com.odde.doughnut.algorithms;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -24,9 +23,6 @@ public class NoteTitle {
   private static final Pattern TITLE_WITH_QUALIFIER =
       Pattern.compile("(?U)(.+?)(\\p{Ps}([^\\p{Ps}\\p{Pe}]+)\\p{Pe})?$");
 
-  /** Only U+FF0F separates aliases; double {@code ／／} is one literal {@code ／}. */
-  private static final String ALIAS_SEPARATOR = "(?<![／])[／](?![／])";
-
   private final String rawTitle;
   private final ParsedSections parsedSections;
 
@@ -43,11 +39,15 @@ public class NoteTitle {
   }
 
   public List<TitleFragment> getTitleAliases() {
-    List<TitleFragment> result = new ArrayList<>();
-    if (parsedSections.aliasSection() != null) {
-      splitAliases(parsedSections.aliasSection()).forEach(result::add);
+    return TitleFragment.sortedLongestFirst(getAliasSegmentsInOrder());
+  }
+
+  /** Alias segments in title order (primary first); not sorted by length. */
+  public List<TitleFragment> getAliasSegmentsInOrder() {
+    if (parsedSections.aliasSection() == null) {
+      return List.of();
     }
-    return TitleFragment.sortedLongestFirst(result);
+    return splitAliases(parsedSections.aliasSection());
   }
 
   public Optional<TitleFragment> getQualifier() {
@@ -63,7 +63,24 @@ public class NoteTitle {
   }
 
   private static List<TitleFragment> splitAliases(String text) {
-    return Arrays.stream(text.split(ALIAS_SEPARATOR)).map(TitleFragment::from).toList();
+    List<String> rawSegments = new ArrayList<>();
+    StringBuilder current = new StringBuilder();
+    for (int i = 0; i < text.length(); i++) {
+      char character = text.charAt(i);
+      if (character == '／') {
+        if (i + 1 < text.length() && text.charAt(i + 1) == '／') {
+          current.append('／');
+          i++;
+        } else {
+          rawSegments.add(current.toString());
+          current = new StringBuilder();
+        }
+      } else {
+        current.append(character);
+      }
+    }
+    rawSegments.add(current.toString());
+    return rawSegments.stream().map(TitleFragment::from).toList();
   }
 
   private record ParsedSections(String aliasSection, String qualifierSection) {}

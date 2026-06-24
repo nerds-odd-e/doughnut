@@ -2,7 +2,7 @@
 
 ## Status
 
-Phases 1–6 done. Remaining phases not yet implemented.
+Phases 1–7.1 done. Remaining phases not yet implemented.
 
 ## Goal
 
@@ -304,6 +304,8 @@ Tests:
   `frontend/tests/components/admin/DataMigrationPanel.spec.ts`.
 
 ## Phase 7.1 — Parse legacy title-alias migration candidates
+
+Status: done
 
 Type: Structure.
 

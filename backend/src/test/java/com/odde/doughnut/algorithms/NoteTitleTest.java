@@ -9,6 +9,21 @@ import org.junit.jupiter.api.Test;
 class NoteTitleTest {
 
   @Test
+  void escaped_fullwidth_slash_is_literal_inside_segment() {
+    NoteTitle noteTitle = new NoteTitle("colour／hue／／tone");
+    assertThat(noteTitle.getAliasSegmentsInOrder(), hasSize(2));
+    assertThat(noteTitle.getAliasSegmentsInOrder().get(0).stem(), equalTo("colour"));
+    assertThat(noteTitle.getAliasSegmentsInOrder().get(1).stem(), equalTo("hue／tone"));
+  }
+
+  @Test
+  void escaped_fullwidth_slash_keeps_single_segment_title_intact() {
+    NoteTitle noteTitle = new NoteTitle("cat／／kitten");
+    assertThat(noteTitle.getAliasSegmentsInOrder(), hasSize(1));
+    assertThat(noteTitle.getAliasSegmentsInOrder().get(0).stem(), equalTo("cat／kitten"));
+  }
+
+  @Test
   void with_aliases() {
     NoteTitle noteTitle = new NoteTitle("cat／kitten");
     assertThat(noteTitle.getTitleAliases(), hasSize(2));
