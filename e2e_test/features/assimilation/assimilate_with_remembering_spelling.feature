@@ -37,6 +37,23 @@ Feature: Assimilate With Remembering Spelling
       | colour／color | colour         | "success"               |
       | colour／color | color          | "success"               |
 
+  Scenario: Verify spelling accepts frontmatter alias
+    Given I have a notebook "English practice" with notes:
+      | Title  |
+      | colour |
+    And note "colour" has content:
+      """
+      ---
+      aliases:
+        - color
+      ---
+      Non-empty body text
+      """
+    And I am assimilating the note "colour"
+    And I assimilate with remembering spelling
+    When I verify spelling with "color"
+    Then the spelling verification result for note "colour" should be "success"
+
   Scenario: Already assimilated note reappears in to-be-assimilated list when remember spelling is added later
     Given I have a notebook "English practice" with notes:
       | Title   | Content |

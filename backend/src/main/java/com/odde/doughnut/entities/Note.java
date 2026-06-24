@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.algorithms.ClozedString;
+import com.odde.doughnut.algorithms.FrontmatterAliases;
 import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.configs.ObjectMapperConfig;
@@ -131,7 +132,10 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public boolean matchAnswer(String spellingAnswer) {
-    return getNoteTitle().matches(spellingAnswer);
+    if (getNoteTitle().matches(spellingAnswer)) {
+      return true;
+    }
+    return FrontmatterAliases.matchesFromNoteContent(getContent(), spellingAnswer);
   }
 
   @NonNull

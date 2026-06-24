@@ -103,6 +103,13 @@ public final class Frontmatter {
     return Optional.empty();
   }
 
+  /** Case-insensitive lookup; returns items when the value is a YAML sequence, otherwise empty. */
+  public Optional<List<?>> getSequenceItemsIgnoreCase(String key) {
+    return rawValueIgnoreCase(key)
+        .filter(List.class::isInstance)
+        .map(v -> List.copyOf((List<?>) v));
+  }
+
   /** Case-insensitive key presence (including entries whose value is null). */
   public boolean containsKeyIgnoreCase(String key) {
     for (String k : data.keySet()) {

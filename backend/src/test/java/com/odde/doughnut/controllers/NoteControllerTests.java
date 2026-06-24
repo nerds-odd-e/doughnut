@@ -284,6 +284,30 @@ class NoteControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void returnsCorrectWhenFrontmatterAliasMatches() throws UnexpectedNoAccessRightException {
+      Note note =
+          makeMe
+              .aNote()
+              .title("colour")
+              .content(
+                  """
+                  ---
+                  aliases:
+                    - color
+                  ---
+                  Non-empty body text
+                  """)
+              .notebookOwnedBy(currentUser.getUser())
+              .please();
+      AnswerSpellingDTO dto = new AnswerSpellingDTO();
+      dto.setSpellingAnswer("color");
+
+      SpellingVerificationResult result = controller.verifySpelling(note, dto);
+
+      assertThat(result.correct(), is(true));
+    }
+
+    @Test
     void returnsIncorrectWhenSpellingDoesNotMatch() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().title("sedition").notebookOwnedBy(currentUser.getUser()).please();
       AnswerSpellingDTO dto = new AnswerSpellingDTO();

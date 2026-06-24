@@ -2,7 +2,7 @@
 
 ## Status
 
-Planning. No phases implemented yet.
+Phase 1 done. Remaining phases not yet implemented.
 
 ## Goal
 
@@ -99,6 +99,8 @@ with Obsidian-faithful ambiguity behavior, and migrate existing notes and their 
   `DataMigrationPanel.vue`, `AdminDashboardPage.vue`; e2e `adminDashboardPage.ts`.
 - Java Flyway migration precedent (additive backfills calling domain code):
   `backend/src/main/java/db/migration/V300000219__*.java`, `V300000220__*.java`.
+- Phase 1: `FrontmatterAliases` reads YAML-list `aliases` via `Frontmatter.getSequenceItemsIgnoreCase`;
+  `Note.matchAnswer` combines title matching with `FrontmatterAliases.matchesFromNoteContent`.
 
 ## Dependency / ordering rationale
 
@@ -114,6 +116,8 @@ note titled `colour／color` still resolves via `[[colour／color]]` (full title
 ---
 
 ## Phase 1 — Recall accepts frontmatter aliases
+
+Status: done
 
 Type: Behavior.
 
