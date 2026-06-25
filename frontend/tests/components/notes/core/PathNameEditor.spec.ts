@@ -26,9 +26,7 @@ describe("PathNameEditor.vue", () => {
       props: { modelValue: "" },
     })
     await emitEditorValue(wrapper, "a\\b/c:d")
-    expect(wrapper.emitted("update:modelValue")?.at(-1)?.[0]).toBe(
-      "a＼b／／c：d"
-    )
+    expect(wrapper.emitted("update:modelValue")?.at(-1)?.[0]).toBe("a＼b／c：d")
   })
 
   it("shows a replacement warning naming the first illegal character and its fullwidth substitute", async () => {
@@ -39,7 +37,7 @@ describe("PathNameEditor.vue", () => {
     const warn = wrapper.find(".text-warning")
     expect(warn.exists()).toBe(true)
     expect(warn.text()).toContain(
-      "'/' was replaced with fullwidth '／／' (a literal slash in the title)"
+      "'/' is not a legal name, and it has been replaced with the fullwidth '／'"
     )
   })
 

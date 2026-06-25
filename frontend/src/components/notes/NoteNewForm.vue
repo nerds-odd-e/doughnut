@@ -73,7 +73,6 @@ import {
   calculateNewTitle,
   appendAliasToNoteContent,
 } from "@/utils/wikidataTitleActions"
-import { authoredNoteTitleValidationError } from "@/utils/authoredNoteTitleValidation"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { parseSoftDeletedTitleConflict } from "@/managedApi/softDeletedTitleConflict"
 import usePopups from "@/components/commons/Popups/usePopups"
@@ -196,13 +195,6 @@ const processForm = async () => {
   processing.value = true
   noteFormErrors.value.wikidataId = undefined
   noteFormErrors.value.newTitle = undefined
-
-  const titleValidationError = authoredNoteTitleValidationError(newTitle.value)
-  if (titleValidationError) {
-    noteFormErrors.value.newTitle = titleValidationError
-    processing.value = false
-    return
-  }
 
   const trimmedWikidata = wikidataIdSelection.value.trim()
   if (trimmedWikidata !== "" && !/^Q\d+$/i.test(trimmedWikidata)) {

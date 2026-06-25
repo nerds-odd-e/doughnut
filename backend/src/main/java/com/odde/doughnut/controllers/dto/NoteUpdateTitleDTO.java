@@ -3,7 +3,6 @@ package com.odde.doughnut.controllers.dto;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.validators.DisplayNamePathSeparators;
-import com.odde.doughnut.validators.NoPlainTitleAlias;
 import com.odde.doughnut.validators.NotReservedNoteTitle;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -15,7 +14,6 @@ public class NoteUpdateTitleDTO {
   @NotBlank
   @Size(max = Note.MAX_TITLE_LENGTH)
   @Pattern(regexp = DisplayNamePathSeparators.REGEXP, message = DisplayNamePathSeparators.MESSAGE)
-  @NoPlainTitleAlias
   @NotReservedNoteTitle
   @JsonDeserialize(using = DisplayNameTrimmingDeserializer.class)
   @Getter

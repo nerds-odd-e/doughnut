@@ -5,7 +5,7 @@ docs/teams/
 
 # Logs, dumps, and process files
 *.log
-core
+/core
 *.pid
 
 # Runtime state and local build output

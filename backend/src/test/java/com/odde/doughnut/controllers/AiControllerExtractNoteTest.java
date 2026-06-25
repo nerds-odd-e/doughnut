@@ -175,11 +175,11 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
           controller.extractNote(testNote, layoutSelectionRequest(layout, List.of("p1")));
 
       Note persistedNote = noteRepository.findById(response.getNote().getId()).orElseThrow();
-      assertThat(persistedNote.getTitle()).isEqualTo("foo／／bar： baz");
+      assertThat(persistedNote.getTitle()).isEqualTo("foo／bar： baz");
       assertThat(persistedNote.getContent())
-          .isEqualTo("See [[foo／／bar： baz|link]] and [[MyNb:foo／／bar|nb]].");
+          .isEqualTo("See [[foo／bar： baz|link]] and [[MyNb:foo／bar|nb]].");
       assertThat(noteRepository.findById(testNote.getId()).orElseThrow().getContent())
-          .isEqualTo("Back to [[foo／／bar： baz]].");
+          .isEqualTo("Back to [[foo／bar： baz]].");
     }
 
     @Test

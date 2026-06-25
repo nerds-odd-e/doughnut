@@ -61,8 +61,9 @@ with Obsidian-faithful ambiguity behavior, and migrate existing notes and their 
   Wikidata "Append" action to write `aliases` instead of mutating the title. No dedicated field.
 - **Mixed `word／~suffix` titles:** extract only non-`~` segments to frontmatter; `~` fragments stay
   joined to the primary in the title.
-- **New-title `／` input:** the title editor no longer creates plain `／` aliases; `／` before a `~`
-  fragment stays allowed. Enforced in the cleanup phase.
+- **Title `／` input:** `／` is a legal literal title character with no alias meaning. The editor still
+  replaces raw `/`, `\`, and `:` with fullwidth equivalents (generic note, same as before). No
+  authoring rejection for titles containing `／`.
 - **Type-constraint delivery:** first ship alias behavior with semantic readers/writers, then add
   alias-specific constraints, then generalize that constraint mechanism into a cohesive frontmatter
   property schema instead of prematurely building a generic type system.
@@ -84,8 +85,8 @@ with Obsidian-faithful ambiguity behavior, and migrate existing notes and their 
   semantic). Frontend: `noteContentFrontmatterParse.ts`, `noteContentFrontmatter.ts`.
 - Current frontmatter parsing already supports one-level YAML lists on both backend and frontend,
   but there is no domain-specific property schema or per-key type constraint yet.
-- Wikidata append-to-title: `frontend/src/utils/noteTitleAliasJoiner.ts`, `wikidataTitleActions.ts`,
-  `SuggestTitle.vue`.
+- Wikidata append alias: `frontend/src/utils/wikidataTitleActions.ts`, `SuggestTitle.vue`
+  (writes frontmatter `aliases`, not title segments).
 - Title validation/normalization: `DisplayNamePathSeparators.java` (forbids `\ / :`, fullwidth
   conversion).
 - Current wiki-link targets support `Notebook:Title`, not `Notebook:folder/title`; slash and colon
@@ -573,6 +574,12 @@ Scope:
 
 Tests:
 - Frontend title/Wikidata tests and backend title validation tests.
+
+Follow-up (post Phase 12.2): plain-alias authoring rejection and `／／` slash escaping were removed
+as a bug fix — typing `/` had duplicated `／` and reset the caret; `／` is now a legal literal title
+character with no alias semantics. Wikidata append-to-frontmatter routing (Phase 5) and recall/cloze
+cleanup (Phase 12.1) are unchanged. Phase 12.3 is slightly simplified (authoring validators already
+gone); Phases 13–14 unaffected.
 
 ## Phase 12.3 — Cleanup: remove temporary migration machinery
 

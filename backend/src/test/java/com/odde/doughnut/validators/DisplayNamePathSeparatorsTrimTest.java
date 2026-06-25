@@ -39,6 +39,6 @@ class DisplayNamePathSeparatorsTrimTest {
   void normalizeDisplayNameTrimsAndConvertsPathSeparators() {
     assertThat(
         DisplayNamePathSeparators.normalizeDisplayName(" \u3000foo/bar: baz\u3000 "),
-        equalTo("foo／／bar： baz"));
+        equalTo("foo／bar： baz"));
   }
 }
