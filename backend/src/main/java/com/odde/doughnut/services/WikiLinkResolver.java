@@ -9,11 +9,9 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteAliasIndexRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
-import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -132,8 +130,7 @@ public class WikiLinkResolver {
     List<String> out = new ArrayList<>();
     Set<String> seenNormalized = new HashSet<>();
     for (String t : titles) {
-      String key = Normalizer.normalize(t, Normalizer.Form.NFKC).toLowerCase(Locale.ROOT);
-      if (seenNormalized.add(key)) {
+      if (seenNormalized.add(FrontmatterAliases.normalizedLookupKey(t))) {
         out.add(t);
       }
     }

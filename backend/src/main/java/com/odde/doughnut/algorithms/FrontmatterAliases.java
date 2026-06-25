@@ -82,8 +82,8 @@ public final class FrontmatterAliases {
     if (answer == null) {
       return false;
     }
-    String stripped = answer.strip();
-    return aliases.stream().anyMatch(alias -> alias.equalsIgnoreCase(stripped));
+    String trimmed = DisplayNamePathSeparators.trimSurroundingWhitespace(answer);
+    return aliases.stream().anyMatch(alias -> alias.equalsIgnoreCase(trimmed));
   }
 
   private static List<String> validAliasesFromRawItems(List<?> items) {

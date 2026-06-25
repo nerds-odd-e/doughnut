@@ -75,9 +75,11 @@ Tests: renamed parser test + `NoteTitleTest` + `ClozeDescriptionTest` stay green
 
 ## Phase 3 — Drop the orphaned admin migration table
 
-Status: planned
+Status: skipped
 
 Type: Structure (schema cleanup).
+
+Deferred by developer.
 
 - Precondition: Phase 12.3 deleted the `AdminDataMigrationProgress` entity/repository, but
   `V300000226__create_admin_data_migration_progress.sql` still creates the table on every
@@ -93,7 +95,7 @@ Tests: `backend:verify` (Flyway migrate clean) passes.
 
 ## Phase 4 — Consolidate alias normalization helpers
 
-Status: planned
+Status: done
 
 Type: Structure (de‑duplication).
 
