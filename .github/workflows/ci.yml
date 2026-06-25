@@ -89,9 +89,18 @@ jobs:
           backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel
           BOOT_JAR_REPRO_SKIP_BUNDLE=1 bash backend/scripts/boot-jar-reproducible.sh
 
-  Other-unit-tests:
-    name: Other Unit Tests
+  Frontend-unit-tests:
+    # Sharded to keep each browser session short: the Vitest browser-mode
+    # orchestrator leaks frame state and Chromium eventually crashes mid-run
+    # ("Browser connection was closed"). 2 shards keeps each session under
+    # ~100 spec files. Increase the shard count when the frontend spec count
+    # grows past ~250 (i.e. when a single shard nears ~125 files again).
+    name: Frontend Unit Tests (${{ matrix.shard }}/2)
     runs-on: ${{ vars.RUNNER }}
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
     env:
       FRONTEND_UT_CONSOLE_OUTPUT_AS_FAILURE: true
     steps:
@@ -100,7 +109,17 @@ jobs:
         with:
           node_version: ${{ vars.NODE_VERSION }}
           pnpm_version: ${{ vars.PNPM_VERSION }}
-      - run: pnpm frontend:test
+      - run: pnpm frontend:test --shard=${{ matrix.shard }}/2
+
+  Other-unit-tests:
+    name: Other Unit Tests
+    runs-on: ${{ vars.RUNNER }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/setup_nodejs_with_cache
+        with:
+          node_version: ${{ vars.NODE_VERSION }}
+          pnpm_version: ${{ vars.PNPM_VERSION }}
       - run: pnpm mcp-server:test
       - run: pnpm cli:test
       - name: Run script unit tests
@@ -216,6 +235,7 @@ jobs:
       [
         Lint-N-Backend-Generated-Types-For-Frontend,
         Backend-unit-tests,
+        Frontend-unit-tests,
         Other-unit-tests,
         Package-artifacts,
         E2E-tests,
@@ -254,6 +274,7 @@ jobs:
       [
         Lint-N-Backend-Generated-Types-For-Frontend,
         Backend-unit-tests,
+        Frontend-unit-tests,
         Other-unit-tests,
         Package-artifacts,
         E2E-tests,
