@@ -116,6 +116,19 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   @Query(value = selectFromNote + " WHERE n.deletedAt IS NULL ORDER BY n.id ASC")
   List<Note> findAllNonDeletedOrderByIdAsc();
 
+  /**
+   * Counts notes still carrying a legacy plain title-alias segment (U+FF0F separator with a
+   * non-suffix alias). Used by the admin migration status endpoint to avoid loading all notes with
+   * content for a progress count.
+   */
+  @Query(
+      value = "SELECT COUNT(*) FROM note WHERE deleted_at IS NULL" + " AND title REGEXP '／[^～]'",
+      nativeQuery = true)
+  long countNonDeletedNotesWithPlainTitleAlias();
+
+  @Query(value = "SELECT COUNT(*) FROM note WHERE deleted_at IS NULL", nativeQuery = true)
+  long countNonDeleted();
+
   String recallWhereClause =
       " WHERE "
           + "   rp IS NULL "

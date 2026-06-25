@@ -401,10 +401,10 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
   }
 
   private void applyTitleAliasMigrationProgressCounts(AdminDataMigrationStatusDTO dto) {
-    List<Note> notes = noteRepository.findAllNonDeletedOrderByIdAsc();
-    int pending = countNotesPendingTitleAliasMigration(notes);
-    dto.setTotalCount(notes.size());
-    dto.setProcessedCount(notes.size() - pending);
+    long pending = noteRepository.countNonDeletedNotesWithPlainTitleAlias();
+    long total = noteRepository.countNonDeleted();
+    dto.setTotalCount((int) total);
+    dto.setProcessedCount((int) (total - pending));
   }
 
   private static void copyProgressFields(
