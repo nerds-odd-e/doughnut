@@ -31,13 +31,6 @@ public class NoteTitle {
     this.parsedSections = parseSections(rawTitle);
   }
 
-  public boolean matches(String answer) {
-    if (rawTitle.trim().equalsIgnoreCase(answer)) {
-      return true;
-    }
-    return getTitleAliases().stream().anyMatch(t -> t.matches(answer));
-  }
-
   /**
    * Spelling recall: primary stem plus {@code ~} suffix fragments only (not plain title aliases).
    */
@@ -60,10 +53,6 @@ public class NoteTitle {
       recallFragments.add(TitleFragment.from("~" + suffixStem));
     }
     return TitleFragment.sortedLongestFirst(recallFragments);
-  }
-
-  public List<TitleFragment> getTitleAliases() {
-    return TitleFragment.sortedLongestFirst(getAliasSegmentsInOrder());
   }
 
   /** Alias segments in title order (primary first); not sorted by length. */
