@@ -46,10 +46,10 @@ public class NoteTitle {
    * fragments. Plain title aliases after the first {@code ／} segment are excluded.
    */
   public List<TitleFragment> getRecallTitleFragments() {
-    TitleAliasMigrationPlan.Result plan = TitleAliasMigrationPlan.from(rawTitle);
+    RecallTitleSegments.Result segments = RecallTitleSegments.from(rawTitle);
     List<TitleFragment> recallFragments = new ArrayList<>();
-    recallFragments.add(plan.primary());
-    for (String suffixStem : plan.retainedSuffixFragments()) {
+    recallFragments.add(segments.primary());
+    for (String suffixStem : segments.retainedSuffixFragments()) {
       recallFragments.add(TitleFragment.from("~" + suffixStem));
     }
     return TitleFragment.sortedLongestFirst(recallFragments);

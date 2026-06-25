@@ -53,7 +53,7 @@ Tests: `NoteTitleTest`, `ClozeDescriptionTest`, `NoteControllerTests` stay green
 
 ## Phase 2 — Rename and slim the title‑segment parser
 
-Status: planned
+Status: done
 
 Type: Structure (naming + dead‑field removal).
 
