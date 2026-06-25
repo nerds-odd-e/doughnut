@@ -41,11 +41,9 @@ public class NoteAliasIndexService {
     }
 
     Note indexOwner = entityManager.getReference(Note.class, noteId);
-    Notebook notebookRef = entityManager.getReference(Notebook.class, notebook.getId());
     for (String aliasDisplay : aliases) {
       NoteAliasIndex row = new NoteAliasIndex();
       row.setNote(indexOwner);
-      row.setNotebook(notebookRef);
       row.setAliasDisplay(aliasDisplay);
       row.setAliasLookupKey(FrontmatterAliases.normalizedLookupKey(aliasDisplay));
       noteAliasIndexRepository.save(row);

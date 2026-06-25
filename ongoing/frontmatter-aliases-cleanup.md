@@ -118,7 +118,7 @@ Tests: `WikiLinkResolverYamlAndBodyIntegrationTest`, `NoteControllerTests` (alia
 
 ## Phase 5 — Align alias index schema with its query (drop write‑only `notebook_id`)
 
-Status: planned
+Status: done
 
 Type: Structure (schema/query alignment).
 

@@ -44,7 +44,6 @@ class NoteAliasIndexServiceTest {
       assertThat(rows, hasSize(2));
       assertThat(rows.get(0).getAliasDisplay(), equalTo("color"));
       assertThat(rows.get(0).getAliasLookupKey(), equalTo("color"));
-      assertThat(rows.get(0).getNotebook().getId(), equalTo(notebook.getId()));
       assertThat(rows.get(1).getAliasDisplay(), equalTo("hue"));
       assertThat(rows.get(1).getAliasLookupKey(), equalTo("hue"));
     }

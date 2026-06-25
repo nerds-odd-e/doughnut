@@ -18,6 +18,7 @@ erDiagram
     image ||--o{ "note" : "image_id"
     memory_tracker ||--o{ question_generation_batch_request : "memory_tracker_id"
     memory_tracker ||--o{ recall_prompt : "memory_tracker_id"
+    "note" ||--o{ admin_data_migration_progress : "last_processed_note_id"
     "note" ||--o{ conversation : "note_id"
     "note" ||--o{ image : "note_id"
     "note" ||--o{ memory_tracker : "note_id"
@@ -32,7 +33,6 @@ erDiagram
     notebook ||--o{ book : "notebook_id"
     notebook ||--o{ folder : "notebook_id"
     notebook ||--o{ "note" : "notebook_id"
-    notebook ||--o{ note_alias_index : "notebook_id"
     notebook ||--o{ subscription : "notebook_id"
     notebook_group ||--o{ notebook : "notebook_group_id"
     notebook_group ||--o{ subscription : "notebook_group_id"
@@ -56,6 +56,11 @@ erDiagram
     "user" ||--o{ question_generation_batch : "user_id"
     "user" ||--o{ subscription : "user_id"
     "user" ||--o{ user_token : "user_id"
+    admin_data_migration_progress {
+        int id PK
+        string step_name UK
+        int last_processed_note_id FK
+    }
     attachment_blob {
         int id PK
     }
@@ -138,7 +143,6 @@ erDiagram
     note_alias_index {
         int id PK
         int note_id FK
-        int notebook_id FK
     }
     note_creator {
         int note_id PK FK
