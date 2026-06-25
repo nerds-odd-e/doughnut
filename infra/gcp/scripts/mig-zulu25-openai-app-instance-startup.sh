@@ -67,8 +67,8 @@ export OPENAI_API_TOKEN=$(curl "https://secretmanager.googleapis.com/v1/projects
 export TZ=UTC
 export TERM=xterm
 export DEBIAN_FRONTEND=noninteractive
-export JAVA_OPTS="-XX:InitialRAMPercentage=75.0 \
-        -XX:MaxRAMPercentage=85.0 \
+export JAVA_OPTS="-XX:InitialRAMPercentage=40.0 \
+        -XX:MaxRAMPercentage=50.0 \
         -XX:+UseG1GC \
         -XX:MaxGCPauseMillis=100 \
         -XX:G1HeapRegionSize=32M \
@@ -80,9 +80,6 @@ export JAVA_OPTS="-XX:InitialRAMPercentage=75.0 \
         -XX:+DisableExplicitGC \
         -XX:+ParallelRefProcEnabled \
         -XX:+PerfDisableSharedMem \
-        -XX:+UseLargePages \
-        -XX:LargePageSizeInBytes=2m \
-        -XX:+UseTransparentHugePages \
         -XX:+ExitOnOutOfMemoryError \
         -XX:+HeapDumpOnOutOfMemoryError \
         -XX:HeapDumpPath=/var/log \
