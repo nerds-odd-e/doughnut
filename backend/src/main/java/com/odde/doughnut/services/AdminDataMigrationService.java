@@ -15,6 +15,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.entities.repositories.NoteTitlePlacement;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -78,7 +79,8 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
     AdminDataMigrationDryRunDTO dto = new AdminDataMigrationDryRunDTO();
     int migrateCount = 0;
     List<TitleAliasMigrationCollisionPolicy.NotePlacement> placements =
-        titleAliasPlacementsFor(notes);
+        titleAliasPlacementsFor(
+            notes.stream().map(AdminDataMigrationService::toPlacement).toList());
     Map<Integer, TitleAliasMigrationNotePreviewDTO> previewsByNoteId = new HashMap<>();
     for (Note note : notes) {
       TitleAliasMigrationTransform.Preview preview =
@@ -208,30 +210,27 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
   }
 
   static List<TitleAliasMigrationCollisionPolicy.NotePlacement> titleAliasPlacementsFor(
-      List<Note> notes) {
+      List<NoteTitlePlacement> notes) {
     List<TitleAliasMigrationCollisionPolicy.NotePlacement> placements = new ArrayList<>();
-    for (Note note : notes) {
-      TitleAliasMigrationTransform.Preview preview =
-          TitleAliasMigrationTransform.preview(note.getTitle(), note.getContent());
-      placements.add(notePlacement(note, preview));
+    for (NoteTitlePlacement note : notes) {
+      placements.add(notePlacement(note));
     }
     return List.copyOf(placements);
   }
 
-  static int countNotesPendingTitleAliasMigration(List<Note> notes) {
+  static int countNotesPendingTitleAliasMigration(List<NoteTitlePlacement> notes) {
     int pending = 0;
-    for (Note note : notes) {
-      if (noteNeedsTitleAliasMigration(note)) {
+    for (NoteTitlePlacement note : notes) {
+      if (needsTitleAliasMigration(note)) {
         pending++;
       }
     }
     return pending;
   }
 
-  static boolean noteNeedsTitleAliasMigration(Note note) {
-    TitleAliasMigrationTransform.Preview preview =
-        TitleAliasMigrationTransform.preview(note.getTitle(), note.getContent());
-    return preview.status() == TitleAliasMigrationPreviewStatus.MIGRATE;
+  static boolean needsTitleAliasMigration(NoteTitlePlacement note) {
+    return TitleAliasMigrationTransform.statusFor(note.title())
+        == TitleAliasMigrationPreviewStatus.MIGRATE;
   }
 
   /**
@@ -239,15 +238,14 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
    * dry-run disambiguation indices.
    */
   static List<TitleAliasMigrationCollisionPolicy.NotePlacement> collisionResolutionPlacementsFor(
-      List<Note> notes) {
+      List<NoteTitlePlacement> notes) {
     Map<String, String> baseByScopeKey = new LinkedHashMap<>();
-    for (Note note : notes) {
-      TitleAliasMigrationTransform.Preview preview =
-          TitleAliasMigrationTransform.preview(note.getTitle(), note.getContent());
-      if (preview.status() != TitleAliasMigrationPreviewStatus.MIGRATE) {
+    for (NoteTitlePlacement note : notes) {
+      if (TitleAliasMigrationTransform.statusFor(note.title())
+          != TitleAliasMigrationPreviewStatus.MIGRATE) {
         continue;
       }
-      TitleAliasMigrationCollisionPolicy.NotePlacement placement = notePlacement(note, preview);
+      TitleAliasMigrationCollisionPolicy.NotePlacement placement = notePlacement(note);
       baseByScopeKey.putIfAbsent(collisionScopeKey(placement), placement.basePlannedTitle());
     }
     if (baseByScopeKey.isEmpty()) {
@@ -255,11 +253,12 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
     }
     Map<Integer, TitleAliasMigrationCollisionPolicy.NotePlacement> byNoteId = new LinkedHashMap<>();
     int maxCollisionIndex = notes.size();
-    for (Note note : notes) {
-      int notebookId = note.getNotebook().getId();
-      Integer folderId = note.getFolder() != null ? note.getFolder().getId() : null;
-      TitleAliasMigrationTransform.Preview preview =
-          TitleAliasMigrationTransform.preview(note.getTitle(), note.getContent());
+    for (NoteTitlePlacement note : notes) {
+      int notebookId = note.notebookId();
+      Integer folderId = note.folderId();
+      TitleAliasMigrationPreviewStatus status =
+          TitleAliasMigrationTransform.statusFor(note.title());
+      String plannedTitle = TitleAliasMigrationTransform.plannedTitleFor(note.title());
       for (Map.Entry<String, String> scope : baseByScopeKey.entrySet()) {
         CollisionScope collisionScope = CollisionScope.parse(scope.getKey());
         if (collisionScope.notebookId() != notebookId
@@ -268,28 +267,36 @@ public class AdminDataMigrationService implements AdminDataMigrationProgressPopu
         }
         String basePlannedTitle = scope.getValue();
         boolean member =
-            preview.status() == TitleAliasMigrationPreviewStatus.MIGRATE
-                ? preview.plannedTitle().equals(basePlannedTitle)
+            status == TitleAliasMigrationPreviewStatus.MIGRATE
+                ? plannedTitle.equals(basePlannedTitle)
                 : TitleAliasMigrationCollisionPolicy.memberTitleMatchesCollisionBase(
-                    note.getTitle(), basePlannedTitle, maxCollisionIndex);
+                    note.title(), basePlannedTitle, maxCollisionIndex);
         if (member) {
           byNoteId.putIfAbsent(
-              note.getId(),
+              note.id(),
               new TitleAliasMigrationCollisionPolicy.NotePlacement(
-                  note.getId(), notebookId, folderId, basePlannedTitle));
+                  note.id(), notebookId, folderId, basePlannedTitle));
         }
       }
     }
     return List.copyOf(byNoteId.values());
   }
 
-  private static TitleAliasMigrationCollisionPolicy.NotePlacement notePlacement(
-      Note note, TitleAliasMigrationTransform.Preview preview) {
-    return new TitleAliasMigrationCollisionPolicy.NotePlacement(
+  static NoteTitlePlacement toPlacement(Note note) {
+    return new NoteTitlePlacement(
         note.getId(),
+        note.getTitle(),
         note.getNotebook().getId(),
-        note.getFolder() != null ? note.getFolder().getId() : null,
-        preview.plannedTitle());
+        note.getFolder() != null ? note.getFolder().getId() : null);
+  }
+
+  private static TitleAliasMigrationCollisionPolicy.NotePlacement notePlacement(
+      NoteTitlePlacement note) {
+    return new TitleAliasMigrationCollisionPolicy.NotePlacement(
+        note.id(),
+        note.notebookId(),
+        note.folderId(),
+        TitleAliasMigrationTransform.plannedTitleFor(note.title()));
   }
 
   private record CollisionScope(int notebookId, Integer folderId) {

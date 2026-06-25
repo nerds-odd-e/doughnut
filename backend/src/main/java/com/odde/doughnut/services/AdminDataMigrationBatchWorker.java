@@ -9,6 +9,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.WikiReferenceMigrationStepStatus;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.entities.repositories.NoteTitlePlacement;
 import com.odde.doughnut.entities.repositories.NoteWikiTitleCacheRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import java.sql.Timestamp;
@@ -129,8 +130,8 @@ public class AdminDataMigrationBatchWorker {
 
   private AdminDataMigrationStatusDTO runTitleAliasToFrontmatterBatch(User adminUser) {
     String step = AdminDataMigrationService.STEP_TITLE_ALIAS_TO_FRONTMATTER;
-    List<Note> allNotes = noteRepository.findAllNonDeletedOrderByIdAsc();
-    List<Integer> orderedIds = allNotes.stream().map(Note::getId).toList();
+    List<NoteTitlePlacement> allNotes = noteRepository.findNonDeletedTitlePlacementsOrderByIdAsc();
+    List<Integer> orderedIds = allNotes.stream().map(NoteTitlePlacement::id).toList();
     List<TitleAliasMigrationCollisionPolicy.NotePlacement> placements =
         AdminDataMigrationService.titleAliasPlacementsFor(allNotes);
     Set<Integer> collisionNoteIds = TitleAliasMigrationCollisionPolicy.collisionNoteIds(placements);
@@ -152,8 +153,7 @@ public class AdminDataMigrationBatchWorker {
 
     List<Integer> batchIds =
         pendingIds.stream().limit(AdminDataMigrationService.DATA_MIGRATION_BATCH_SIZE).toList();
-    Map<Integer, Note> notesById =
-        allNotes.stream().collect(Collectors.toMap(Note::getId, Function.identity()));
+    Map<Integer, Note> notesById = hydrateNotesById(batchIds);
 
     int migratedCount = 0;
     int skippedCollisionCount = 0;
@@ -178,7 +178,7 @@ public class AdminDataMigrationBatchWorker {
     List<Integer> stillPending =
         adminDataMigrationProgressService.pendingNoteIdsOrdered(step, orderedIds);
     if (stillPending.isEmpty()) {
-      return finishWhenNoPendingNotes(step, allNotes, collisionNoteIds);
+      return finishWhenNoPendingNotes(step);
     }
 
     return batchResult(
@@ -187,8 +187,16 @@ public class AdminDataMigrationBatchWorker {
                 .formatted(migratedCount, skippedCollisionCount, batchIds.size()));
   }
 
+  private Map<Integer, Note> hydrateNotesById(List<Integer> ids) {
+    return noteRepository.hydrateNonDeletedNotesWithNotebookAndFolderByIds(ids).stream()
+        .collect(Collectors.toMap(Note::getId, Function.identity()));
+  }
+
   private AdminDataMigrationStatusDTO runCollisionDisambiguationBatch(
-      User adminUser, String step, List<Note> allNotes, List<Integer> pendingCollisionIds) {
+      User adminUser,
+      String step,
+      List<NoteTitlePlacement> allNotes,
+      List<Integer> pendingCollisionIds) {
     List<Integer> batchIds =
         pendingCollisionIds.stream()
             .limit(AdminDataMigrationService.DATA_MIGRATION_BATCH_SIZE)
@@ -197,8 +205,7 @@ public class AdminDataMigrationBatchWorker {
         AdminDataMigrationService.collisionResolutionPlacementsFor(allNotes);
     Map<Integer, String> resolvedTitles =
         TitleAliasMigrationCollisionPolicy.resolve(resolutionPlacements);
-    Map<Integer, Note> notesById =
-        allNotes.stream().collect(Collectors.toMap(Note::getId, Function.identity()));
+    Map<Integer, Note> notesById = hydrateNotesById(batchIds);
 
     int migratedCount = 0;
     for (Integer noteId : batchIds) {
@@ -216,13 +223,15 @@ public class AdminDataMigrationBatchWorker {
       migratedCount++;
     }
 
+    List<NoteTitlePlacement> freshNotes =
+        noteRepository.findNonDeletedTitlePlacementsOrderByIdAsc();
     List<Integer> stillPending =
         pendingCollisionMigratableIds(
-            allNotes,
+            freshNotes,
             TitleAliasMigrationCollisionPolicy.collisionNoteIds(
-                AdminDataMigrationService.collisionResolutionPlacementsFor(allNotes)));
+                AdminDataMigrationService.collisionResolutionPlacementsFor(freshNotes)));
     if (stillPending.isEmpty()
-        && AdminDataMigrationService.countNotesPendingTitleAliasMigration(allNotes) == 0) {
+        && AdminDataMigrationService.countNotesPendingTitleAliasMigration(freshNotes) == 0) {
       adminDataMigrationProgressService.markCompleted(step);
       return batchResult("title_alias_to_frontmatter migration is complete.");
     }
@@ -249,36 +258,41 @@ public class AdminDataMigrationBatchWorker {
     wikiTitleCacheService.refreshForNote(note, adminUser);
   }
 
-  private AdminDataMigrationStatusDTO finishWhenNoPendingNotes(
-      String step, List<Note> allNotes, Set<Integer> collisionNoteIds) {
-    int pendingCollisionMigratables = countPendingCollisionMigratables(allNotes, collisionNoteIds);
+  private AdminDataMigrationStatusDTO finishWhenNoPendingNotes(String step) {
+    List<NoteTitlePlacement> freshNotes =
+        noteRepository.findNonDeletedTitlePlacementsOrderByIdAsc();
+    Set<Integer> collisionNoteIds =
+        TitleAliasMigrationCollisionPolicy.collisionNoteIds(
+            AdminDataMigrationService.titleAliasPlacementsFor(freshNotes));
+    int pendingCollisionMigratables =
+        countPendingCollisionMigratables(freshNotes, collisionNoteIds);
     if (pendingCollisionMigratables > 0) {
       return batchResult(
           ("title_alias_to_frontmatter: simple migrations complete; %d collision note(s) pending"
                   + " disambiguation.")
               .formatted(pendingCollisionMigratables));
     }
-    if (AdminDataMigrationService.countNotesPendingTitleAliasMigration(allNotes) == 0) {
+    if (AdminDataMigrationService.countNotesPendingTitleAliasMigration(freshNotes) == 0) {
       adminDataMigrationProgressService.markCompleted(step);
     }
     return batchResult("title_alias_to_frontmatter migration is complete.");
   }
 
   private static List<Integer> pendingCollisionMigratableIds(
-      List<Note> notes, Set<Integer> collisionNoteIds) {
+      List<NoteTitlePlacement> notes, Set<Integer> collisionNoteIds) {
     return notes.stream()
-        .filter(note -> collisionNoteIds.contains(note.getId()))
-        .filter(AdminDataMigrationService::noteNeedsTitleAliasMigration)
-        .map(Note::getId)
+        .filter(note -> collisionNoteIds.contains(note.id()))
+        .filter(AdminDataMigrationService::needsTitleAliasMigration)
+        .map(NoteTitlePlacement::id)
         .toList();
   }
 
   private static int countPendingCollisionMigratables(
-      List<Note> notes, Set<Integer> collisionNoteIds) {
+      List<NoteTitlePlacement> notes, Set<Integer> collisionNoteIds) {
     return (int)
         notes.stream()
-            .filter(note -> collisionNoteIds.contains(note.getId()))
-            .filter(AdminDataMigrationService::noteNeedsTitleAliasMigration)
+            .filter(note -> collisionNoteIds.contains(note.id()))
+            .filter(AdminDataMigrationService::needsTitleAliasMigration)
             .count();
   }
 

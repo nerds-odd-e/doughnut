@@ -15,6 +15,24 @@ public final class TitleAliasMigrationTransform {
       String plannedContent,
       TitleAliasMigrationPreviewStatus status) {}
 
+  /**
+   * Planned title for a note, derived from the title alone. Collision detection only needs this, so
+   * the migration can scan the whole corpus without loading note content.
+   */
+  public static String plannedTitleFor(String title) {
+    String safeTitle = title == null ? "" : title;
+    TitleAliasMigrationPlan.Result plan = TitleAliasMigrationPlan.from(safeTitle);
+    return plan.hasMigratablePlainAliases() ? buildMigratedTitle(plan) : safeTitle;
+  }
+
+  /** Migration status for a note, derived from the title alone (content is irrelevant here). */
+  public static TitleAliasMigrationPreviewStatus statusFor(String title) {
+    String safeTitle = title == null ? "" : title;
+    return TitleAliasMigrationPlan.from(safeTitle).hasMigratablePlainAliases()
+        ? TitleAliasMigrationPreviewStatus.MIGRATE
+        : TitleAliasMigrationPreviewStatus.NO_CHANGES;
+  }
+
   public static Preview preview(String title, String content) {
     String safeTitle = title == null ? "" : title;
     String safeContent = content == null ? "" : content;

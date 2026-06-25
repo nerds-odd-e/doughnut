@@ -2,6 +2,7 @@ package com.odde.doughnut.algorithms;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -109,7 +110,9 @@ class TitleAliasMigrationCollisionPolicyTest {
 
     assertThat(resolved.get(11990), equalTo("xAI"));
     assertThat(resolved.get(11991), equalTo("XAI (1)"));
-    assertThat(TitleAliasMigrationCollisionPolicy.collisionNoteIds(inputs), contains(11990, 11991));
+    assertThat(
+        TitleAliasMigrationCollisionPolicy.collisionNoteIds(inputs),
+        containsInAnyOrder(11990, 11991));
   }
 
   private static TitleAliasMigrationCollisionPolicy.NotePlacement placement(

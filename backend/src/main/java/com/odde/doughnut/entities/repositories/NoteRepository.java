@@ -117,6 +117,17 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   List<Note> findAllNonDeletedOrderByIdAsc();
 
   /**
+   * Content-free placements for the title-alias migration's collision scan. Loading only id, title,
+   * notebook id and folder id avoids hydrating full note entities (with content) on every batch.
+   */
+  @Query(
+      "SELECT new com.odde.doughnut.entities.repositories.NoteTitlePlacement("
+          + "n.id, n.title, nb.id, f.id) FROM Note n"
+          + " JOIN n.notebook nb LEFT JOIN n.folder f"
+          + " WHERE n.deletedAt IS NULL ORDER BY n.id ASC")
+  List<NoteTitlePlacement> findNonDeletedTitlePlacementsOrderByIdAsc();
+
+  /**
    * Counts notes still carrying a legacy plain title-alias segment (U+FF0F separator with a
    * non-suffix alias). Used by the admin migration status endpoint to avoid loading all notes with
    * content for a progress count.
