@@ -34,11 +34,3 @@ When(
       .removeNotebookFromBazaarAdminList(notebook)
   }
 )
-
-When('I run the admin data migration to completion', () => {
-  start.testability().resetAdminDataMigrationProgress()
-  return start
-    .goToAdminDashboard()
-    .openAdminDashboardTab('Data migration')
-    .runDataMigrationToCompletion()
-})

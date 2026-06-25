@@ -26,12 +26,6 @@
       @click.prevent="setActivePage('users')"
     >Users</a>
     <a
-      :class="`daisy-tab daisy-tab-lg ${activePage === 'dataMigration' ? 'daisy-tab-active' : ''}`"
-      role="button"
-      href="#"
-      @click.prevent="setActivePage('dataMigration')"
-    >Data migration</a>
-    <a
       :class="`daisy-tab daisy-tab-lg ${activePage === 'batchQuestions' ? 'daisy-tab-active' : ''}`"
       role="button"
       href="#"
@@ -43,7 +37,6 @@
     <ManageModel v-if="activePage === 'manageModel'" />
     <ManageBazaar v-if="activePage === 'manageBazaar'" />
     <UserListing v-if="activePage === 'users'" />
-    <DataMigrationPanel v-if="activePage === 'dataMigration'" />
     <QuestionGenerationBatchStatus v-if="activePage === 'batchQuestions'" />
   </div>
 </template>
@@ -56,7 +49,6 @@ import ManageModel from "../components/admin/ManageModel.vue"
 import ManageBazaar from "../components/admin/ManageBazaar.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
 import UserListing from "../components/admin/UserListing.vue"
-import DataMigrationPanel from "../components/admin/DataMigrationPanel.vue"
 import QuestionGenerationBatchStatus from "../components/admin/QuestionGenerationBatchStatus.vue"
 
 type TabType =
@@ -64,7 +56,6 @@ type TabType =
   | "manageModel"
   | "manageBazaar"
   | "users"
-  | "dataMigration"
   | "batchQuestions"
 
 const route = useRoute()
@@ -78,7 +69,6 @@ const activePage = computed({
       tab === "manageModel" ||
       tab === "manageBazaar" ||
       tab === "users" ||
-      tab === "dataMigration" ||
       tab === "batchQuestions"
     ) {
       return tab

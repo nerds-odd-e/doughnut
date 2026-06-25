@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/** Pure parser for legacy title-alias segments targeted by the frontmatter migration. */
+/**
+ * Parses title segments for recall: primary, plain aliases, {@code ~} suffix fragments, qualifier.
+ */
 public final class TitleAliasMigrationPlan {
 
   private TitleAliasMigrationPlan() {}
@@ -13,12 +15,7 @@ public final class TitleAliasMigrationPlan {
       TitleFragment primary,
       List<String> plainAliases,
       List<String> retainedSuffixFragments,
-      Optional<String> qualifier) {
-
-    public boolean hasMigratablePlainAliases() {
-      return !plainAliases.isEmpty();
-    }
-  }
+      Optional<String> qualifier) {}
 
   public static Result from(String rawTitle) {
     NoteTitle noteTitle = new NoteTitle(rawTitle);

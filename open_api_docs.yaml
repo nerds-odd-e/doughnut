@@ -219,18 +219,6 @@ paths:
             '*/*':
               schema:
                 type: string
-  /api/testability/reset_admin_data_migration_progress:
-    post:
-      tags:
-      - testability-rest-controller
-      operationId: resetAdminDataMigrationProgress
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: string
   /api/testability/replace_service_url:
     post:
       tags:
@@ -1639,18 +1627,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/QuestionGenerationBatchAdminStatusDTO"
-  /api/admin/data-migration/run-batch:
-    post:
-      tags:
-      - admin-data-migration-controller
-      operationId: runDataMigrationBatch
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/AdminDataMigrationStatusDTO"
   /api/user/{user}:
     patch:
       tags:
@@ -2881,32 +2857,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/QuestionGenerationBatchAdminStatusDTO"
-  /api/admin/data-migration/status:
-    get:
-      tags:
-      - admin-data-migration-controller
-      summary: Get admin data migration status
-      operationId: getAdminDataMigrationStatus
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/AdminDataMigrationStatusDTO"
-  /api/admin/data-migration/dry-run:
-    get:
-      tags:
-      - admin-data-migration-controller
-      summary: Preview title-alias to frontmatter migration without mutating notes
-      operationId: getAdminDataMigrationDryRun
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/AdminDataMigrationDryRunDTO"
   /api/user/token/{tokenId}:
     delete:
       tags:
@@ -4284,28 +4234,6 @@ components:
           format: date-time
         lastManualMaintenanceError:
           type: string
-    AdminDataMigrationStatusDTO:
-      type: object
-      properties:
-        message:
-          type: string
-        dataMigrationComplete:
-          type: boolean
-        currentStepName:
-          type: string
-        stepStatus:
-          type: string
-        processedCount:
-          type: integer
-          format: int32
-        totalCount:
-          type: integer
-          format: int32
-        lastError:
-          type: string
-        pendingInboundReferenceRewriteCount:
-          type: integer
-          format: int32
     UserDTO:
       type: object
       properties:
@@ -4918,92 +4846,3 @@ components:
         totalPages:
           type: integer
           format: int32
-    AdminDataMigrationDryRunDTO:
-      type: object
-      properties:
-        notePreviews:
-          type: array
-          items:
-            $ref: "#/components/schemas/TitleAliasMigrationNotePreviewDTO"
-        totalNoteCount:
-          type: integer
-          format: int32
-        migrateCount:
-          type: integer
-          format: int32
-        noChangesCount:
-          type: integer
-          format: int32
-        collisionGroups:
-          type: array
-          items:
-            $ref: "#/components/schemas/TitleAliasMigrationCollisionGroupDTO"
-        collisionGroupCount:
-          type: integer
-          format: int32
-        collisionNoteCount:
-          type: integer
-          format: int32
-        inboundReferenceRewritePreviews:
-          type: array
-          items:
-            $ref: "#/components/schemas/TitleAliasInboundReferenceRewritePreviewDTO"
-        inboundReferenceRewriteCount:
-          type: integer
-          format: int32
-    TitleAliasInboundReferenceRewritePreviewDTO:
-      type: object
-      properties:
-        referrerNoteId:
-          type: integer
-          format: int32
-        targetNoteId:
-          type: integer
-          format: int32
-        currentLinkInner:
-          type: string
-        plannedLinkInner:
-          type: string
-        visibleTextWillChange:
-          type: boolean
-    TitleAliasMigrationCollisionGroupDTO:
-      type: object
-      properties:
-        notebookId:
-          type: integer
-          format: int32
-        folderId:
-          type: integer
-          format: int32
-        basePlannedTitle:
-          type: string
-        members:
-          type: array
-          items:
-            $ref: "#/components/schemas/TitleAliasMigrationCollisionMemberDTO"
-    TitleAliasMigrationCollisionMemberDTO:
-      type: object
-      properties:
-        noteId:
-          type: integer
-          format: int32
-        resolvedTitle:
-          type: string
-    TitleAliasMigrationNotePreviewDTO:
-      type: object
-      properties:
-        noteId:
-          type: integer
-          format: int32
-        currentTitle:
-          type: string
-        plannedTitle:
-          type: string
-        plannedAliases:
-          type: array
-          items:
-            type: string
-        plannedContent:
-          type: string
-        status:
-          type: string

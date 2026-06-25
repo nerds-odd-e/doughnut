@@ -658,17 +658,6 @@ export type QuestionGenerationBatchAdminStatusDto = {
     lastManualMaintenanceError?: string;
 };
 
-export type AdminDataMigrationStatusDto = {
-    message?: string;
-    dataMigrationComplete?: boolean;
-    currentStepName?: string;
-    stepStatus?: string;
-    processedCount?: number;
-    totalCount?: number;
-    lastError?: string;
-    pendingInboundReferenceRewriteCount?: number;
-};
-
 export type UserDto = {
     name: string;
     dailyAssimilationCount?: number;
@@ -977,47 +966,6 @@ export type UserListingPage = {
     totalPages?: number;
 };
 
-export type AdminDataMigrationDryRunDto = {
-    notePreviews?: Array<TitleAliasMigrationNotePreviewDto>;
-    totalNoteCount?: number;
-    migrateCount?: number;
-    noChangesCount?: number;
-    collisionGroups?: Array<TitleAliasMigrationCollisionGroupDto>;
-    collisionGroupCount?: number;
-    collisionNoteCount?: number;
-    inboundReferenceRewritePreviews?: Array<TitleAliasInboundReferenceRewritePreviewDto>;
-    inboundReferenceRewriteCount?: number;
-};
-
-export type TitleAliasInboundReferenceRewritePreviewDto = {
-    referrerNoteId?: number;
-    targetNoteId?: number;
-    currentLinkInner?: string;
-    plannedLinkInner?: string;
-    visibleTextWillChange?: boolean;
-};
-
-export type TitleAliasMigrationCollisionGroupDto = {
-    notebookId?: number;
-    folderId?: number;
-    basePlannedTitle?: string;
-    members?: Array<TitleAliasMigrationCollisionMemberDto>;
-};
-
-export type TitleAliasMigrationCollisionMemberDto = {
-    noteId?: number;
-    resolvedTitle?: string;
-};
-
-export type TitleAliasMigrationNotePreviewDto = {
-    noteId?: number;
-    currentTitle?: string;
-    plannedTitle?: string;
-    plannedAliases?: Array<string>;
-    plannedContent?: string;
-    status?: string;
-};
-
 export type NotesTestDataWritable = {
     noteTestData?: Array<NoteTestData>;
     externalIdentifier?: string;
@@ -1277,22 +1225,6 @@ export type ShareToBazaarResponses = {
 };
 
 export type ShareToBazaarResponse = ShareToBazaarResponses[keyof ShareToBazaarResponses];
-
-export type ResetAdminDataMigrationProgressData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/testability/reset_admin_data_migration_progress';
-};
-
-export type ResetAdminDataMigrationProgressResponses = {
-    /**
-     * OK
-     */
-    200: string;
-};
-
-export type ResetAdminDataMigrationProgressResponse = ResetAdminDataMigrationProgressResponses[keyof ResetAdminDataMigrationProgressResponses];
 
 export type ReplaceServiceUrlData = {
     body: {
@@ -2499,22 +2431,6 @@ export type ResumeExistingQuestionGenerationBatchesResponses = {
 
 export type ResumeExistingQuestionGenerationBatchesResponse = ResumeExistingQuestionGenerationBatchesResponses[keyof ResumeExistingQuestionGenerationBatchesResponses];
 
-export type RunDataMigrationBatchData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/admin/data-migration/run-batch';
-};
-
-export type RunDataMigrationBatchResponses = {
-    /**
-     * OK
-     */
-    200: AdminDataMigrationStatusDto;
-};
-
-export type RunDataMigrationBatchResponse = RunDataMigrationBatchResponses[keyof RunDataMigrationBatchResponses];
-
 export type UpdateUserData = {
     body: UserDto;
     path: {
@@ -3661,38 +3577,6 @@ export type GetQuestionGenerationBatchStatusResponses = {
 };
 
 export type GetQuestionGenerationBatchStatusResponse = GetQuestionGenerationBatchStatusResponses[keyof GetQuestionGenerationBatchStatusResponses];
-
-export type GetAdminDataMigrationStatusData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/admin/data-migration/status';
-};
-
-export type GetAdminDataMigrationStatusResponses = {
-    /**
-     * OK
-     */
-    200: AdminDataMigrationStatusDto;
-};
-
-export type GetAdminDataMigrationStatusResponse = GetAdminDataMigrationStatusResponses[keyof GetAdminDataMigrationStatusResponses];
-
-export type GetAdminDataMigrationDryRunData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/admin/data-migration/dry-run';
-};
-
-export type GetAdminDataMigrationDryRunResponses = {
-    /**
-     * OK
-     */
-    200: AdminDataMigrationDryRunDto;
-};
-
-export type GetAdminDataMigrationDryRunResponse = GetAdminDataMigrationDryRunResponses[keyof GetAdminDataMigrationDryRunResponses];
 
 export type DeleteTokenData = {
     body?: never;

@@ -119,12 +119,4 @@ class TitleAliasMigrationPlanTest {
     assertThat(plan.primary().stem(), equalTo("cat"));
     assertThat(plan.plainAliases(), contains("kitten"));
   }
-
-  @Test
-  void hasMigratablePlainAliases_when_plain_aliases_exist() {
-    assertThat(TitleAliasMigrationPlan.from("colour／color").hasMigratablePlainAliases(), is(true));
-    assertThat(
-        TitleAliasMigrationPlan.from("~logy／~logical").hasMigratablePlainAliases(), is(false));
-    assertThat(TitleAliasMigrationPlan.from("colour").hasMigratablePlainAliases(), is(false));
-  }
 }

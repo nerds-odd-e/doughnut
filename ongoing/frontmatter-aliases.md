@@ -2,7 +2,16 @@
 
 ## Status
 
-Phases 1–7.3, 8.1–8.3, 9.1, 9.2, 10.1, 10.2, and 11 (skipped) done. Remaining phases not yet implemented.
+Phases 1–12.3 done. Phases 13–14 remain fuzzy placeholders.
+
+## Phase 12.3 — Cleanup: remove temporary migration machinery
+
+Status: done
+
+Removed admin data migration framework (`AdminDataMigration*`), title-alias migration transforms/collision
+policy/inbound rewrite preview, migration DTOs, `DataMigrationPanel`, E2E migration feature, and
+testability reset endpoint. Kept `TitleAliasMigrationPlan` for recall title-segment parsing in
+`NoteTitle.getRecallTitleFragments()`.
 
 ## Goal
 
@@ -582,6 +591,8 @@ cleanup (Phase 12.1) are unchanged. Phase 12.3 is slightly simplified (authoring
 gone); Phases 13–14 unaffected.
 
 ## Phase 12.3 — Cleanup: remove temporary migration machinery
+
+Status: done
 
 Type: Behavior.
 

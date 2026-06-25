@@ -8,7 +8,6 @@ const ADMIN_DASHBOARD_TAB_QUERY: Record<string, string> = {
   'Manage Models': 'manageModel',
   'Manage Bazaar': 'manageBazaar',
   Users: 'users',
-  'Data migration': 'dataMigration',
 }
 
 function removeNotebookFromBazaarTableRow(notebook: string) {
@@ -99,25 +98,6 @@ export function assumeAdminDashboardPage() {
 
     removeNotebookFromBazaarAdminList(notebook: string) {
       removeNotebookFromBazaarTableRow(notebook)
-      return this
-    },
-
-    runDataMigrationToCompletion() {
-      cy.findByTestId('run-data-migration-button').click()
-      cy.findByTestId('run-data-migration-button', { timeout: 120000 }).should(
-        'not.be.disabled'
-      )
-      cy.get('[data-testid="data-migration-status"]').should(($status) => {
-        const text = $status.text()
-        expect(text, 'data migration finished').to.satisfy(
-          (value: string) =>
-            value.includes('Frontmatter alias migration is already complete') ||
-            value.includes(
-              'title_alias_inbound_reference_rewrite migration is complete'
-            )
-        )
-      })
-      pageIsNotLoading()
       return this
     },
   }

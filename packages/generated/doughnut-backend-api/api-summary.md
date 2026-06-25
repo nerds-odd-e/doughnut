@@ -40,7 +40,6 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `timeTravel`: POST `/api/testability/time_travel` -> `TimeTravelResponse` (request: `TimeTravelData`; body: TimeTravel; response body: Array<unknown>)
 - `testabilityUpdateUser`: POST `/api/testability/testability_update_user` -> `TestabilityUpdateUserResponse` (request: `TestabilityUpdateUserData`; query: username; body: Record<string, string>; response body: string)
 - `shareToBazaar`: POST `/api/testability/share_to_bazaar` -> `ShareToBazaarResponse` (request: `ShareToBazaarData`; body: ShareToBazaarRequest; response body: string)
-- `resetAdminDataMigrationProgress`: POST `/api/testability/reset_admin_data_migration_progress` -> `ResetAdminDataMigrationProgressResponse` (request: none; response body: string)
 - `replaceServiceUrl`: POST `/api/testability/replace_service_url` -> `ReplaceServiceUrlResponse` (request: `ReplaceServiceUrlData`; body: Record<string, string>; response body: void)
 - `randomizer`: POST `/api/testability/randomizer` -> `RandomizerResponse` (request: `RandomizerData`; body: Randomization; response body: Array<unknown>)
 - `setOpenAiToken`: POST `/api/testability/open_ai_token` -> `SetOpenAiTokenResponse` (request: `SetOpenAiTokenData`; body: Record<string, string>; response body: void)
@@ -202,12 +201,6 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `submitRecentRecallUsersForQuestionGenerationBatch`: POST `/api/admin/question-generation-batch/submit-recent-recall-users` -> `SubmitRecentRecallUsersForQuestionGenerationBatchResponse` (request: none; response body: QuestionGenerationBatchSubmissionSummaryDto)
 - `resumeExistingQuestionGenerationBatches`: POST `/api/admin/question-generation-batch/resume-existing-batches` -> `ResumeExistingQuestionGenerationBatchesResponse` (request: none; response body: QuestionGenerationBatchAdminStatusDto)
 - `getQuestionGenerationBatchStatus`: GET `/api/admin/question-generation-batch/status` -> `GetQuestionGenerationBatchStatusResponse` (request: none; response body: QuestionGenerationBatchAdminStatusDto)
-
-## Admin Data Migration Controller
-
-- `runDataMigrationBatch`: POST `/api/admin/data-migration/run-batch` -> `RunDataMigrationBatchResponse` (request: none; response body: AdminDataMigrationStatusDto)
-- `getAdminDataMigrationStatus`: GET `/api/admin/data-migration/status` -> `GetAdminDataMigrationStatusResponse` (request: none; response body: AdminDataMigrationStatusDto)
-- `getAdminDataMigrationDryRun`: GET `/api/admin/data-migration/dry-run` -> `GetAdminDataMigrationDryRunResponse` (request: none; response body: AdminDataMigrationDryRunDto)
 
 ## Text Content Controller
 

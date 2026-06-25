@@ -766,13 +766,6 @@ When('I track the current note title as {string}', (newTitle: string) => {
   start.testability().renameInjectedNoteTitleForNoteOnPage(newTitle)
 })
 
-When(
-  'injected note {string} is indexed as {string}',
-  (oldTitle: string, newTitle: string) => {
-    start.testability().renameInjectedNoteTitle(oldTitle, newTitle)
-  }
-)
-
 Then(
   'I should see an error toast containing {string}',
   (messageSubstring: string) => {
