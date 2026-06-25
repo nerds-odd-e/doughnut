@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -21,10 +22,12 @@ public final class TitleAliasMigrationCollisionPolicy {
   public record CollisionGroup(
       int notebookId, Integer folderId, String basePlannedTitle, List<Member> members) {}
 
-  private record GroupKey(int notebookId, Integer folderId, String basePlannedTitle) {
+  private record GroupKey(int notebookId, Integer folderId, String basePlannedTitleLower) {
     static GroupKey from(NotePlacement placement) {
       return new GroupKey(
-          placement.notebookId(), placement.folderId(), placement.basePlannedTitle());
+          placement.notebookId(),
+          placement.folderId(),
+          placement.basePlannedTitle().toLowerCase(Locale.ROOT));
     }
   }
 
@@ -63,9 +66,10 @@ public final class TitleAliasMigrationCollisionPolicy {
               if (group.size() < 2) {
                 return;
               }
+              List<NotePlacement> ordered =
+                  group.stream().sorted(Comparator.comparingInt(NotePlacement::noteId)).toList();
               List<Member> members =
-                  group.stream()
-                      .sorted(Comparator.comparingInt(NotePlacement::noteId))
+                  ordered.stream()
                       .map(
                           p ->
                               new Member(
@@ -76,7 +80,7 @@ public final class TitleAliasMigrationCollisionPolicy {
                   new CollisionGroup(
                       key.notebookId(),
                       key.folderId(),
-                      key.basePlannedTitle(),
+                      ordered.getFirst().basePlannedTitle(),
                       List.copyOf(members)));
             });
     return List.copyOf(groups);

@@ -101,6 +101,17 @@ class TitleAliasMigrationCollisionPolicyTest {
         contains("colour", "colour (1)"));
   }
 
+  @Test
+  void resolve_caseInsensitivePlannedTitles_collideWithinNotebookAndFolder() {
+    var inputs = List.of(placement(11990, 4, 2697, "xAI"), placement(11991, 4, 2697, "XAI"));
+
+    Map<Integer, String> resolved = TitleAliasMigrationCollisionPolicy.resolve(inputs);
+
+    assertThat(resolved.get(11990), equalTo("xAI"));
+    assertThat(resolved.get(11991), equalTo("XAI (1)"));
+    assertThat(TitleAliasMigrationCollisionPolicy.collisionNoteIds(inputs), contains(11990, 11991));
+  }
+
   private static TitleAliasMigrationCollisionPolicy.NotePlacement placement(
       int noteId, int notebookId, Integer folderId, String basePlannedTitle) {
     return new TitleAliasMigrationCollisionPolicy.NotePlacement(
