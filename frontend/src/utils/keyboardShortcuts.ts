@@ -3,18 +3,49 @@ export type ShortcutAction =
   | "note-toggle-edit-mode"
   | "note-export"
   | "note-delete"
+  | "note-search"
+  | "note-link"
 
 type KeyMatcher = (e: KeyboardEvent) => boolean
+
+type ShortcutBinding = {
+  matches: KeyMatcher
+  guardEditable: boolean
+}
 
 function plainLetterKey(e: KeyboardEvent, code: string): boolean {
   return !e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey && e.code === code
 }
 
-const bindings: Record<ShortcutAction, KeyMatcher> = {
-  "note-new": (e) => plainLetterKey(e, "KeyN"),
-  "note-toggle-edit-mode": (e) => plainLetterKey(e, "KeyM"),
-  "note-export": (e) => plainLetterKey(e, "KeyE"),
-  "note-delete": (e) => plainLetterKey(e, "KeyD"),
+function ctrlCmdKeyF(e: KeyboardEvent, shift: boolean): boolean {
+  if (!e.ctrlKey && !e.metaKey) return false
+  if (e.shiftKey !== shift) return false
+  if (e.altKey) return false
+  return e.code === "KeyF"
+}
+
+const bindings: Record<ShortcutAction, ShortcutBinding> = {
+  "note-new": {
+    matches: (e) => plainLetterKey(e, "KeyN"),
+    guardEditable: true,
+  },
+  "note-toggle-edit-mode": {
+    matches: (e) => plainLetterKey(e, "KeyM"),
+    guardEditable: true,
+  },
+  "note-export": {
+    matches: (e) => plainLetterKey(e, "KeyE"),
+    guardEditable: true,
+  },
+  "note-delete": {
+    matches: (e) => plainLetterKey(e, "KeyD"),
+    guardEditable: true,
+  },
+  "note-search": {
+    matches: (e) => ctrlCmdKeyF(e, false),
+    guardEditable: false,
+  },
+  "note-link": { matches: (e) => ctrlCmdKeyF(e, true), guardEditable: false },
 }
 
 const handlerStacks = new Map<ShortcutAction, Array<() => void>>()
@@ -29,12 +60,17 @@ function isEditableTarget(target: EventTarget | null): boolean {
 }
 
 function onDocumentKeydownCapture(e: KeyboardEvent): void {
-  if (isEditableTarget(e.target) || isEditableTarget(document.activeElement)) {
-    return
-  }
-
   for (const action of Object.keys(bindings) as ShortcutAction[]) {
-    if (!bindings[action](e)) continue
+    const binding = bindings[action]
+    if (binding.guardEditable) {
+      if (
+        isEditableTarget(e.target) ||
+        isEditableTarget(document.activeElement)
+      ) {
+        continue
+      }
+    }
+    if (!binding.matches(e)) continue
     const stack = handlerStacks.get(action)
     const handler = stack?.[stack.length - 1]
     if (!handler) continue

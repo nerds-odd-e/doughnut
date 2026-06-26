@@ -47,6 +47,19 @@ describe("NoteToolbar", () => {
     })
   })
 
+  function dispatchLinkSearchShortcut() {
+    document.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "f",
+        code: "KeyF",
+        ctrlKey: true,
+        shiftKey: true,
+        bubbles: true,
+        cancelable: true,
+      })
+    )
+  }
+
   it("opens Link search on Ctrl+Shift+F when not readonly", async () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
     mockSdkService(SearchController, "searchForRelationshipTarget", [])
@@ -57,16 +70,7 @@ describe("NoteToolbar", () => {
     wrapper = await mountNoteToolbar(noteRealm)
     expect(screen.queryByPlaceholderText("Search")).toBeNull()
 
-    window.dispatchEvent(
-      new KeyboardEvent("keydown", {
-        key: "f",
-        code: "KeyF",
-        ctrlKey: true,
-        shiftKey: true,
-        bubbles: true,
-        cancelable: true,
-      })
-    )
+    dispatchLinkSearchShortcut()
     await flushPromises()
 
     expect(await screen.findByPlaceholderText("Search")).toBeInTheDocument()
@@ -78,16 +82,7 @@ describe("NoteToolbar", () => {
     wrapper = await mountNoteToolbar(noteRealm, {
       propsOverrides: { readonly: true },
     })
-    window.dispatchEvent(
-      new KeyboardEvent("keydown", {
-        key: "f",
-        code: "KeyF",
-        ctrlKey: true,
-        shiftKey: true,
-        bubbles: true,
-        cancelable: true,
-      })
-    )
+    dispatchLinkSearchShortcut()
     await flushPromises()
 
     expect(screen.queryByPlaceholderText("Search")).toBeNull()

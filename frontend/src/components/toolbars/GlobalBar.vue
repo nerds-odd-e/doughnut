@@ -28,13 +28,10 @@
 <script setup lang="ts">
 import type { Ref } from "vue"
 import type { User } from "@generated/doughnut-backend-api"
-import { inject, ref, watch } from "vue"
+import { inject, ref } from "vue"
 import { Search } from "@lucide/vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
-import {
-  registerGlobalNoteSearchOpener,
-  unregisterGlobalNoteSearchOpener,
-} from "@/utils/globalNoteSearchShortcut"
+import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
 
 const user = inject<Ref<User | undefined>>("currentUser")
 
@@ -44,15 +41,7 @@ const openNoteSearch = () => {
   searchNotePopButtonRef.value?.openDialog()
 }
 
-watch(
-  () => user?.value,
-  (loggedIn, _, onCleanup) => {
-    if (!loggedIn) return
-    registerGlobalNoteSearchOpener(openNoteSearch)
-    onCleanup(() => unregisterGlobalNoteSearchOpener(openNoteSearch))
-  },
-  { immediate: true }
-)
+useKeyboardShortcut("note-search", openNoteSearch, () => !!user?.value)
 </script>
 
 <style scoped lang="scss">

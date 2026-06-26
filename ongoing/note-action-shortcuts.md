@@ -89,7 +89,7 @@ only grows by one enum + one binding per later phase.
   duplicated).
 - **Tests:** `d` invokes the delete flow.
 
-### Phase 5 — Consolidate existing search/link shortcuts (Structure) — PLANNED
+### Phase 5 — Consolidate existing search/link shortcuts (Structure) — DONE
 
 - **Goal:** remove the two pre-existing ad-hoc implementations so all shortcuts use
   one mechanism (the explicit "no duplicate / no inconsistency" requirement).

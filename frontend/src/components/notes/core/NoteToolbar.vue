@@ -72,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, onMounted, onUnmounted } from "vue"
+import { computed, ref, watch } from "vue"
 import type { Folder, Note, NoteRealm } from "@generated/doughnut-backend-api"
 import SvgSearchForLink from "../../svgs/SvgSearchForLink.vue"
 import SearchForm from "../../links/SearchForm.vue"
@@ -127,26 +127,11 @@ useKeyboardShortcut(
   () => !props.readonly
 )
 
-function isLinkToolbarShortcut(e: KeyboardEvent): boolean {
-  if (!e.ctrlKey && !e.metaKey) return false
-  if (!e.shiftKey) return false
-  if (e.altKey) return false
-  return e.code === "KeyF" || e.key === "f" || e.key === "F"
-}
-
-function onWindowKeydownCapture(e: KeyboardEvent) {
-  if (props.readonly || !isLinkToolbarShortcut(e)) return
-  e.preventDefault()
-  linkPopButtonRef.value?.openDialog()
-}
-
-onMounted(() => {
-  window.addEventListener("keydown", onWindowKeydownCapture, true)
-})
-
-onUnmounted(() => {
-  window.removeEventListener("keydown", onWindowKeydownCapture, true)
-})
+useKeyboardShortcut(
+  "note-link",
+  () => linkPopButtonRef.value?.openDialog(),
+  () => !props.readonly
+)
 
 watch(
   () => props.note.id,
