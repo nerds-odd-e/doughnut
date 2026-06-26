@@ -1,5 +1,6 @@
 <template>
   <PopButton
+    ref="popButtonRef"
     title="New note"
     aria-label="New note"
     align-modal-top
@@ -24,6 +25,8 @@
 import PopButton from "../../commons/Popups/PopButton.vue"
 import type { Folder, Note } from "@generated/doughnut-backend-api"
 import NoteNewForm from "../NoteNewForm.vue"
+import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
+import { ref } from "vue"
 
 defineProps<{
   notebookId: number
@@ -33,4 +36,10 @@ defineProps<{
   ancestorFolders?: Folder[]
   initialTitle?: string
 }>()
+
+const popButtonRef = ref<InstanceType<typeof PopButton> | null>(null)
+
+useKeyboardShortcut("note-new", () => {
+  popButtonRef.value?.openDialog()
+})
 </script>
