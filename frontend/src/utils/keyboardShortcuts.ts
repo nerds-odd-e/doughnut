@@ -2,6 +2,7 @@ export type ShortcutAction =
   | "note-new"
   | "note-toggle-edit-mode"
   | "note-export"
+  | "note-delete"
 
 type KeyMatcher = (e: KeyboardEvent) => boolean
 
@@ -13,6 +14,7 @@ const bindings: Record<ShortcutAction, KeyMatcher> = {
   "note-new": (e) => plainLetterKey(e, "KeyN"),
   "note-toggle-edit-mode": (e) => plainLetterKey(e, "KeyM"),
   "note-export": (e) => plainLetterKey(e, "KeyE"),
+  "note-delete": (e) => plainLetterKey(e, "KeyD"),
 }
 
 const handlerStacks = new Map<ShortcutAction, Array<() => void>>()

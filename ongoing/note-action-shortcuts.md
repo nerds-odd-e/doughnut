@@ -80,7 +80,7 @@ only grows by one enum + one binding per later phase.
   available in both.
 - **Tests:** `e` opens the export dialog.
 
-### Phase 4 — Press `d` to Delete (Behavior) — PLANNED
+### Phase 4 — Press `d` to Delete (Behavior) — DONE
 
 - **Scenario:** With note actions available, pressing `d` starts the delete flow
   (confirmation/options), same as the delete button.

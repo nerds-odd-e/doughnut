@@ -1,5 +1,6 @@
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import NoteMoreOptionsActions from "@/components/notes/widgets/NoteMoreOptionsActions.vue"
+import usePopups from "@/components/commons/Popups/usePopups"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
@@ -19,11 +20,24 @@ function dispatchNoteExportShortcut() {
   )
 }
 
+function dispatchNoteDeleteShortcut() {
+  document.dispatchEvent(
+    new KeyboardEvent("keydown", {
+      key: "d",
+      code: "KeyD",
+      bubbles: true,
+      cancelable: true,
+    })
+  )
+}
+
 describe("NoteMoreOptionsActions keyboard shortcut", () => {
   const note = makeMe.aNote.please()
 
   beforeEach(() => {
+    usePopups().popups.register({ popupInfo: [] })
     mockSdkService(NoteController, "getAiContextMarkdown", aiMarkdownStub)
+    mockSdkService(NoteController, "deleteNote", undefined)
   })
 
   afterEach(() => {
@@ -50,5 +64,28 @@ describe("NoteMoreOptionsActions keyboard shortcut", () => {
     expect((document.querySelector("dialog") as HTMLDialogElement)?.open).toBe(
       true
     )
+  })
+
+  it.each([
+    "toolbar",
+    "menu",
+  ] as const)("starts the delete flow when d is pressed (layout=%s)", async (layout) => {
+    helper
+      .component(NoteMoreOptionsActions)
+      .withRouter()
+      .withCleanStorage()
+      .withProps({ note, layout })
+      .mount({ attachTo: document.body })
+
+    await flushPromises()
+    expect(usePopups().popups.peek()).toHaveLength(0)
+
+    dispatchNoteDeleteShortcut()
+    await flushPromises()
+
+    const popups = usePopups().popups.peek()
+    expect(popups?.length).toBe(1)
+    expect(popups?.[0]?.type).toBe("confirm")
+    expect(popups?.[0]?.message).toBe('Confirm to delete "Note1.1.1"?')
   })
 })

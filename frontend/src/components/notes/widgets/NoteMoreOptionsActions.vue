@@ -132,6 +132,8 @@ useKeyboardShortcut("note-export", () => {
   exportPopButtonRef.value?.openDialog()
 })
 
+useKeyboardShortcut("note-delete", deleteNote)
+
 const assimilationChecked = computed(() => isOpenForNote(props.note.id))
 
 const onAssimilationToggle = () => {
