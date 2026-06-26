@@ -1,11 +1,8 @@
 import {
   listPropertyValue,
   parseNoteContentMarkdown,
-  richModeKeyDropdownPresetKeysForPropertyRows,
 } from "@/utils/noteContentFrontmatter"
 import { propertyRowWithScalar } from "@/utils/noteContentPropertyRows"
-import { flushPromises } from "@vue/test-utils"
-import { nextTick } from "vue"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 describe("RichMarkdownEditor list-capable preset append", () => {
@@ -13,27 +10,6 @@ describe("RichMarkdownEditor list-capable preset append", () => {
 
   afterEach(() => {
     h.cleanup()
-  })
-
-  it("keeps list-capable preset on exact key when base row exists", async () => {
-    const markdown = `---
-example of: "[[A]]"
----
-
-# Body`
-    await h.mountEditor(markdown, { attachToBody: true })
-    await h.openAddProperty()
-    ;(
-      h.getWrapper().find('[data-testid="rich-note-property-key"]')
-        .element as HTMLInputElement
-    ).focus()
-    await nextTick()
-    await flushPromises()
-    await h.assertPresetOptionsVisible(
-      richModeKeyDropdownPresetKeysForPropertyRows(false, [
-        propertyRowWithScalar("example of", "[[A]]"),
-      ])
-    )
   })
 
   it("appends another value to exact list-capable key as a list item", async () => {

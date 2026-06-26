@@ -436,6 +436,12 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMark
 CURSOR_DEV=true nix develop -c pnpm frontend:test tests/utils/noteContentPropertyRows.spec.ts
 ```
 
+**Correction (2026-06-26):** Phase 12 originally made the preset dropdown keep the exact key for
+list-capable presets (e.g. `url` when `url` exists) instead of offering `url 2`. That replaced
+auto-suffix with list-append in the dropdown. Both mechanisms should coexist: the preset dropdown
+again auto-suffixes all presets when the base is taken; list-append remains available when the user
+explicitly enters an existing exact list-capable key in the insert form.
+
 ## Review Findings (post-implementation)
 
 A critical review of Phases 1–12 surfaced the items below. Worth-doing items are scheduled as Phases 13–15; lower-value items are listed under Deferred.

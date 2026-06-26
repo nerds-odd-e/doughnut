@@ -97,7 +97,7 @@ describe("richModeKeyDropdownPresetKeysForPropertyRows", () => {
     ).toEqual(richModeKeyDropdownPresetKeys(false))
   })
 
-  it("resolves occupied scalar-only presets to the next suffixed key", () => {
+  it("resolves occupied presets to the next suffixed key", () => {
     expect(
       richModeKeyDropdownPresetKeysForPropertyRows(false, [
         propertyRowWithScalar("image", "/a.png"),
@@ -120,9 +120,6 @@ describe("richModeKeyDropdownPresetKeysForPropertyRows", () => {
       "example of",
       "question_generation_instruction",
     ])
-  })
-
-  it("keeps list-capable presets on the exact key when the base row exists", () => {
     expect(
       richModeKeyDropdownPresetKeysForPropertyRows(false, [
         propertyRowWithScalar("url", "https://x"),
@@ -130,7 +127,7 @@ describe("richModeKeyDropdownPresetKeysForPropertyRows", () => {
     ).toEqual([
       "image",
       "wikidata_id",
-      "url",
+      "url 2",
       "example of",
       "question_generation_instruction",
     ])
@@ -143,7 +140,7 @@ describe("richModeKeyDropdownPresetKeysForPropertyRows", () => {
       "image",
       "wikidata_id",
       "url",
-      "example of",
+      "example of 3",
       "question_generation_instruction",
     ])
   })

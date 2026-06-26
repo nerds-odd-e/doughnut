@@ -135,12 +135,29 @@ image: /x.png
     )
   })
 
-  it("selecting a resolved preset inserts the suffixed key when base is taken for scalar-only presets", async () => {
-    const markdown = `---
+  it.each([
+    {
+      case: "list-capable preset",
+      markdown: `---
+url: https://example.com
+---
+
+# Body`,
+      suffixedKey: "url 2",
+    },
+    {
+      case: "scalar-only preset",
+      markdown: `---
 image: /cover.png
 ---
 
-# Body`
+# Body`,
+      suffixedKey: "image 2",
+    },
+  ] as const)("selecting a resolved preset inserts the suffixed key when base is taken ($case)", async ({
+    markdown,
+    suffixedKey,
+  }) => {
     await h.mountEditor(markdown, { attachToBody: true })
     await h.openAddProperty()
     ;(
@@ -149,12 +166,12 @@ image: /cover.png
     ).focus()
     await nextTick()
     await flushPromises()
-    await h.selectPresetKey("image 2")
+    await h.selectPresetKey(suffixedKey)
     expect(
       (
         h.getWrapper().find('[data-testid="rich-note-property-key"]')
           .element as HTMLInputElement
       ).value
-    ).toBe("image 2")
+    ).toBe(suffixedKey)
   })
 })

@@ -13,7 +13,6 @@ export {
   findPropertyRowIndexByExactKey,
   isExampleOfPropertyKey,
   isImagePropertyKey,
-  isListCapablePresetKey,
   isListCapablePropertyKey,
   isQuestionGenerationInstructionPropertyKey,
   isReservedIndexOnlyPropertyKey,
