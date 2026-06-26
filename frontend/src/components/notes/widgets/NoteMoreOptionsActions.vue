@@ -1,7 +1,11 @@
 <template>
   <template v-if="layout === 'menu'">
     <DropdownMenuItem>
-      <PopButton :btn-class="dropdownMenuButtonClass" :title="titles.export">
+      <PopButton
+        ref="exportPopButtonRef"
+        :btn-class="dropdownMenuButtonClass"
+        :title="titles.export"
+      >
         <template #button_face>
           <Upload class="shrink-0" :size="20" aria-hidden="true" />
           <span>{{ titles.export }}</span>
@@ -43,7 +47,11 @@
   </template>
 
   <template v-else>
-    <PopButton :title="titles.export" :aria-label="titles.export">
+    <PopButton
+      ref="exportPopButtonRef"
+      :title="titles.export"
+      :aria-label="titles.export"
+    >
       <template #button_face>
         <Upload class="w-6 h-6" aria-hidden="true" />
       </template>
@@ -98,7 +106,8 @@ import DropdownMenuActionButton from "@/components/commons/DropdownMenuActionBut
 import DropdownMenuItem from "@/components/commons/DropdownMenuItem.vue"
 import { dropdownMenuButtonClass } from "@/components/commons/dropdownMenuClasses"
 import { noteMoreOptionsTitles } from "./noteMoreOptionsTitles"
-import { computed } from "vue"
+import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
+import { computed, ref } from "vue"
 
 const toolbarGhostBtnClass = "daisy-btn daisy-btn-ghost daisy-btn-sm"
 const titles = noteMoreOptionsTitles
@@ -116,6 +125,12 @@ const { toggle, isOpenForNote } = useAssimilationView()
 const noteId = computed(() => props.note.id)
 const noteTitle = computed(() => props.note.noteTopology.title)
 const { deleteNote } = useNoteDeleteFlow(noteId, noteTitle)
+
+const exportPopButtonRef = ref<InstanceType<typeof PopButton> | null>(null)
+
+useKeyboardShortcut("note-export", () => {
+  exportPopButtonRef.value?.openDialog()
+})
 
 const assimilationChecked = computed(() => isOpenForNote(props.note.id))
 

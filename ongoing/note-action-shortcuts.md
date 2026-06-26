@@ -71,7 +71,7 @@ only grows by one enum + one binding per later phase.
   (handler emits `edit-as-markdown` with `!props.asMarkdown`, active when `!readonly`).
 - **Tests:** `m` toggles edit mode when not readonly; no toggle when readonly.
 
-### Phase 3 — Press `e` to open Export (Behavior) — PLANNED
+### Phase 3 — Press `e` to open Export (Behavior) — DONE
 
 - **Scenario:** With note actions available, pressing `e` opens the export dialog.
 - **Work:** add `note-export` -> plain `e`; in `NoteMoreOptionsActions.vue` add a
