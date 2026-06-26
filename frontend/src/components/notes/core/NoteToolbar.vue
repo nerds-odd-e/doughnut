@@ -86,6 +86,7 @@ import { noteChromeToolbarNavClass } from "../noteChromeToolbarNavClass"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import NoteCreationNewButton from "../NoteCreationNewButton.vue"
 import { useNotebookSidebarOpened } from "@/composables/notebookSidebarOpened"
+import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
 
 const props = withDefaults(
   defineProps<{
@@ -116,9 +117,15 @@ const moreOptionsRef = ref<InstanceType<typeof NoteToolbarMoreOptions> | null>(
 
 const router = useRouter()
 
-defineEmits<{
+const emit = defineEmits<{
   (e: "edit-as-markdown", value: boolean): void
 }>()
+
+useKeyboardShortcut(
+  "note-toggle-edit-mode",
+  () => emit("edit-as-markdown", !props.asMarkdown),
+  () => !props.readonly
+)
 
 function isLinkToolbarShortcut(e: KeyboardEvent): boolean {
   if (!e.ctrlKey && !e.metaKey) return false

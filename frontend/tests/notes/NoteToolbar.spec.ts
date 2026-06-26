@@ -101,4 +101,47 @@ describe("NoteToolbar", () => {
     })
     expect(wrapper.find('button[title="New note"]').exists()).toBe(true)
   })
+
+  function dispatchToggleEditModeShortcut() {
+    document.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "m",
+        code: "KeyM",
+        bubbles: true,
+        cancelable: true,
+      })
+    )
+  }
+
+  it.each([
+    { asMarkdown: false, expected: true },
+    { asMarkdown: true, expected: false },
+  ])("emits edit-as-markdown=$expected when m is pressed (asMarkdown=$asMarkdown)", async ({
+    asMarkdown,
+    expected,
+  }) => {
+    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
+
+    wrapper = await mountNoteToolbar(noteRealm, {
+      propsOverrides: { asMarkdown },
+    })
+
+    dispatchToggleEditModeShortcut()
+    await flushPromises()
+
+    expect(wrapper.emitted("edit-as-markdown")).toEqual([[expected]])
+  })
+
+  it("does not emit edit-as-markdown when m is pressed and readonly", async () => {
+    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
+
+    wrapper = await mountNoteToolbar(noteRealm, {
+      propsOverrides: { readonly: true },
+    })
+
+    dispatchToggleEditModeShortcut()
+    await flushPromises()
+
+    expect(wrapper.emitted("edit-as-markdown")).toBeUndefined()
+  })
 })

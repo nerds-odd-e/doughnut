@@ -63,7 +63,7 @@ only grows by one enum + one binding per later phase.
   - `n` is ignored while focus is in an input/textarea.
 - **Verify:** `CURSOR_DEV=true nix develop -c pnpm frontend:test <touched spec(s)>`.
 
-### Phase 2 — Press `m` to toggle markdown/rich edit mode (Behavior) — PLANNED
+### Phase 2 — Press `m` to toggle markdown/rich edit mode (Behavior) — DONE
 
 - **Scenario:** On an editable note, pressing `m` toggles between markdown and rich
   editing, same as the toolbar button.

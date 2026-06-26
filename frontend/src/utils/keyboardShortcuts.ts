@@ -1,10 +1,14 @@
-export type ShortcutAction = "note-new"
+export type ShortcutAction = "note-new" | "note-toggle-edit-mode"
 
 type KeyMatcher = (e: KeyboardEvent) => boolean
 
+function plainLetterKey(e: KeyboardEvent, code: string): boolean {
+  return !e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey && e.code === code
+}
+
 const bindings: Record<ShortcutAction, KeyMatcher> = {
-  "note-new": (e) =>
-    !e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey && e.code === "KeyN",
+  "note-new": (e) => plainLetterKey(e, "KeyN"),
+  "note-toggle-edit-mode": (e) => plainLetterKey(e, "KeyM"),
 }
 
 const handlerStacks = new Map<ShortcutAction, Array<() => void>>()
