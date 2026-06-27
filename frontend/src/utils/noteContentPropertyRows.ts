@@ -1,6 +1,9 @@
 import { composeNoteContentMarkdown } from "@/utils/noteContentFrontmatter"
 import { findPropertyRowIndexByExactKey } from "@/utils/noteContentPropertyKeys"
-import { authoredAliasesValidationErrorForPropertyRow } from "@/utils/authoredAliasesValidation"
+import {
+  authoredAliasesValidationErrorForPropertyRow,
+  isAliasesPropertyKey,
+} from "@/utils/authoredAliasesValidation"
 import {
   type NoteProperties,
   type PropertyValue,
@@ -15,6 +18,16 @@ export type PropertyRow = { key: string; value: PropertyValue }
 
 export function propertyRowWithScalar(key: string, value: string): PropertyRow {
   return { key, value: scalarPropertyValue(value) }
+}
+
+export function propertyRowForInsertedKey(
+  key: string,
+  value: string
+): PropertyRow {
+  if (isAliasesPropertyKey(key)) {
+    return { key, value: listPropertyValue([value.trim()]) }
+  }
+  return propertyRowWithScalar(key, value)
 }
 
 /** Builds note properties from rich-editor property rows (last row wins on duplicate keys). */

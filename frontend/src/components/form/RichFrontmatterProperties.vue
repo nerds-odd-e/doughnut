@@ -130,6 +130,7 @@ import {
   normalizePropertyRowForCommit,
   notePropertiesFromPropertyRows,
   parseNoteContentMarkdown,
+  propertyRowForInsertedKey,
   propertyRowWithScalar,
   propertyRowsAfterAppendingValueToExactKey,
   removePropertyRowAt,
@@ -314,7 +315,7 @@ function tryCommitInsert() {
       value
     )!
   } else {
-    nextRows = rowsAfterAdding(propertyRowWithScalar(key, value))
+    nextRows = rowsAfterAdding(propertyRowForInsertedKey(key, value))
   }
 
   const result = validatePropertyRowsForRichEdit(nextRows)

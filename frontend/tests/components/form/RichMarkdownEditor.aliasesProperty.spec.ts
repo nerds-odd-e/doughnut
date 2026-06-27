@@ -1,6 +1,10 @@
 import { flushPromises } from "@vue/test-utils"
 import { AUTHORED_ALIASES_MESSAGE } from "@/utils/authoredAliasesValidation"
 import {
+  listPropertyValue,
+  parseNoteContentMarkdown,
+} from "@/utils/noteContentFrontmatter"
+import {
   clickListAdd,
   clickModeTab,
   clickSave,
@@ -84,6 +88,33 @@ Body`
     expect(last).toMatch(/aliases:\s*\n\s*- color/)
     expect(last).toMatch(/- hue/)
     expect(document.querySelector("dialog")).toBeNull()
+  })
+
+  it("inserts the first alias as a list when adding a new aliases property", async () => {
+    await h.mountEditor("# Body", { attachToBody: true })
+    await h.openAddProperty()
+
+    const keyInput = h
+      .getWrapper()
+      .find('[data-testid="rich-note-property-key"]')
+    const valInput = h
+      .getWrapper()
+      .find('[data-testid="rich-note-property-value"]')
+    await keyInput.setValue("aliases")
+    await h.setWikiPropertyValueField(valInput, "color")
+    await valInput.trigger("blur")
+    await flushPromises()
+
+    expect(
+      h
+        .getWrapper()
+        .find('[data-testid="rich-note-property-validation"]')
+        .exists()
+    ).toBe(false)
+    const parsed = parseNoteContentMarkdown(h.lastEmittedMarkdown())
+    expect(parsed.ok).toBe(true)
+    if (!parsed.ok) return
+    expect(parsed.properties.aliases).toEqual(listPropertyValue(["color"]))
   })
 
   it("blocks commit when parsed aliases row is scalar", async () => {

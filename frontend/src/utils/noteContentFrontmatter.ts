@@ -36,6 +36,7 @@ export {
   insertPropertyRowAt,
   normalizePropertyRowForCommit,
   notePropertiesFromPropertyRows,
+  propertyRowForInsertedKey,
   propertyRowWithScalar,
   propertyRowsAfterAppendingValueToExactKey,
   removePropertyRowAt,
