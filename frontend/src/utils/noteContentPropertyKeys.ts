@@ -2,6 +2,7 @@ import type { PropertyRow } from "@/utils/noteContentPropertyRows"
 
 /** Preset property keys offered in rich-mode property name UI. */
 export const RICH_MODE_PRESET_PROPERTY_KEYS = [
+  "aliases",
   "image",
   "wikidata_id",
   "url",
@@ -114,6 +115,8 @@ export function propertyKeyMatchesPresetFamily(
   presetKey: string
 ): boolean {
   switch (presetKey) {
+    case "aliases":
+      return propertyKeyBaseMatches(key, "aliases")
     case "image":
       return isImagePropertyKey(key)
     case "wikidata_id":

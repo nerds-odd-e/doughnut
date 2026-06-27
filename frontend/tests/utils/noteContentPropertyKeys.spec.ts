@@ -57,6 +57,11 @@ describe("nextAvailablePropertyKeyForPreset", () => {
 
   it("returns the next suffixed key when the base is taken", () => {
     expect(
+      nextAvailablePropertyKeyForPreset("aliases", [
+        propertyRowWithScalar("aliases", "color"),
+      ])
+    ).toBe("aliases 2")
+    expect(
       nextAvailablePropertyKeyForPreset("url", [
         propertyRowWithScalar("url", "https://a"),
       ])
@@ -103,6 +108,7 @@ describe("richModeKeyDropdownPresetKeysForPropertyRows", () => {
         propertyRowWithScalar("image", "/a.png"),
       ])
     ).toEqual([
+      "aliases",
       "image 2",
       "wikidata_id",
       "url",
@@ -114,6 +120,7 @@ describe("richModeKeyDropdownPresetKeysForPropertyRows", () => {
         propertyRowWithScalar("wikidataId", "Q1"),
       ])
     ).toEqual([
+      "aliases",
       "image",
       "wikidata_id 2",
       "url",
@@ -125,6 +132,7 @@ describe("richModeKeyDropdownPresetKeysForPropertyRows", () => {
         propertyRowWithScalar("url", "https://x"),
       ])
     ).toEqual([
+      "aliases",
       "image",
       "wikidata_id",
       "url 2",
@@ -137,6 +145,7 @@ describe("richModeKeyDropdownPresetKeysForPropertyRows", () => {
         propertyRowWithScalar("example of 2", "[[B]]"),
       ])
     ).toEqual([
+      "aliases",
       "image",
       "wikidata_id",
       "url",
@@ -158,6 +167,7 @@ describe("richModeKeyDropdownPresetKeysForPropertyRows", () => {
 describe("richModeKeyDropdownPresetKeys", () => {
   it("includes question_generation_instruction in default presets", () => {
     expect(richModeKeyDropdownPresetKeys(false)).toEqual([
+      "aliases",
       "image",
       "wikidata_id",
       "url",
@@ -168,6 +178,7 @@ describe("richModeKeyDropdownPresetKeys", () => {
 
   it("appends index-only keys when isIndexContext is true", () => {
     expect(richModeKeyDropdownPresetKeys(true)).toEqual([
+      "aliases",
       "image",
       "wikidata_id",
       "url",
