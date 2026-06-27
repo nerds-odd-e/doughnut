@@ -3,7 +3,7 @@ import NoteMoreOptionsActions from "@/components/notes/widgets/NoteMoreOptionsAc
 import usePopups from "@/components/commons/Popups/usePopups"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
-import { flushPromises } from "@vue/test-utils"
+import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it } from "vitest"
 import { screen } from "@testing-library/vue"
 
@@ -33,6 +33,8 @@ function dispatchNoteDeleteShortcut() {
 
 describe("NoteMoreOptionsActions keyboard shortcut", () => {
   const note = makeMe.aNote.please()
+  // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
+  let wrapper: VueWrapper<any> | undefined
 
   beforeEach(() => {
     usePopups().popups.register({ popupInfo: [] })
@@ -41,18 +43,35 @@ describe("NoteMoreOptionsActions keyboard shortcut", () => {
   })
 
   afterEach(() => {
+    wrapper?.unmount()
+    wrapper = undefined
     document.body.innerHTML = ""
   })
+
+  function mountActions(layout: "toolbar" | "menu") {
+    wrapper = helper
+      .component(NoteMoreOptionsActions)
+      .withRouter()
+      .withProps({ note, layout })
+      .mount({ attachTo: document.body })
+    return wrapper
+  }
+
+  function mountActionsWithStorage(layout: "toolbar" | "menu") {
+    wrapper = helper
+      .component(NoteMoreOptionsActions)
+      .withRouter()
+      .withCleanStorage()
+      .withProps({ note, layout })
+      .mount({ attachTo: document.body })
+    return wrapper
+  }
 
   it.each([
     "toolbar",
     "menu",
   ] as const)("opens the export dialog when e is pressed (layout=%s)", async (layout) => {
-    helper
-      .component(NoteMoreOptionsActions)
-      .withRouter()
-      .withProps({ note, layout })
-      .mount({ attachTo: document.body })
+    mountActions(layout)
 
     await flushPromises()
     expect(document.querySelector("dialog")).toBeNull()
@@ -70,12 +89,7 @@ describe("NoteMoreOptionsActions keyboard shortcut", () => {
     "toolbar",
     "menu",
   ] as const)("starts the delete flow when d is pressed (layout=%s)", async (layout) => {
-    helper
-      .component(NoteMoreOptionsActions)
-      .withRouter()
-      .withCleanStorage()
-      .withProps({ note, layout })
-      .mount({ attachTo: document.body })
+    mountActionsWithStorage(layout)
 
     await flushPromises()
     expect(usePopups().popups.peek()).toHaveLength(0)
@@ -87,5 +101,25 @@ describe("NoteMoreOptionsActions keyboard shortcut", () => {
     expect(popups?.length).toBe(1)
     expect(popups?.[0]?.type).toBe("confirm")
     expect(popups?.[0]?.message).toBe('Confirm to delete "Note1.1.1"?')
+  })
+
+  it.each([
+    "toolbar",
+    "menu",
+  ] as const)("ignores d while the export dialog is open (layout=%s)", async (layout) => {
+    mountActionsWithStorage(layout)
+
+    await flushPromises()
+    dispatchNoteExportShortcut()
+    await flushPromises()
+    expect(await screen.findByText("Export Note Data")).toBeInTheDocument()
+
+    dispatchNoteDeleteShortcut()
+    await flushPromises()
+
+    expect(usePopups().popups.peek()).toHaveLength(0)
+    expect((document.querySelector("dialog") as HTMLDialogElement)?.open).toBe(
+      true
+    )
   })
 })

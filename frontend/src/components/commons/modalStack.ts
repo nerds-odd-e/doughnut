@@ -24,6 +24,10 @@ function detachListener() {
   }
 }
 
+export function hasOpenModal(): boolean {
+  return modalStack.length > 0
+}
+
 export function registerModal(close: () => void): () => void {
   modalStack.push(close)
   attachListener()

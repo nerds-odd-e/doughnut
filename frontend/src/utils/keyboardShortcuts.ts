@@ -1,3 +1,5 @@
+import { hasOpenModal } from "@/components/commons/modalStack"
+
 export type ShortcutAction =
   | "note-new"
   | "note-toggle-edit-mode"
@@ -63,6 +65,7 @@ function onDocumentKeydownCapture(e: KeyboardEvent): void {
   for (const action of Object.keys(bindings) as ShortcutAction[]) {
     const binding = bindings[action]
     if (binding.guardEditable) {
+      if (hasOpenModal()) continue
       if (
         isEditableTarget(e.target) ||
         isEditableTarget(document.activeElement)
