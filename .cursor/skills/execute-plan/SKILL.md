@@ -48,6 +48,16 @@ developer's brain — a learning moment, not a mechanical task.
 When stopping: explain **what** you learned, **why** you stopped, and **what
 decision** the developer needs to make. Then wait.
 
+**Check Jidoka both before and after each phase, with separate focuses:**
+
+- **Before** (coordinator, on the phase *description*) — is this phase safe to
+  start autonomously? Look for value/design forks, ambiguity, or missing
+  credentials in what the plan *asks for*.
+- **After** (sub-agent, on what was *learned* implementing the phase) — did
+  doing the work reveal something the plan did not anticipate? A discovered
+  value/design fork, an assumption proven wrong, or a learning that changes
+  downstream phases. Stop even if the phase itself succeeded.
+
 **Do NOT stop for:**
 
 - Routine implementation choices (naming, file placement, test structure) where
@@ -130,11 +140,23 @@ current phase and enough context for the sub-agent to work.
    `CURSOR_DEV=true nix develop -c pnpm format:all`. Fix any issues.
 3. **Regenerate API client** — if backend controller or DTO signatures changed,
    run the **generate-api-client** skill before committing.
-4. **Update the plan** — mark phase "done", update discoveries or remaining
-   work.
-5. **Commit** — stage all changes and commit with a message that references
+4. **Reflect & re-plan the plan file** — based on what this phase taught you:
+   - **Summarize learnings** — capture anything that changes future work
+     (surprises, constraints, assumptions proven wrong). Keep it brief; drop it
+     if there is nothing worth carrying forward.
+   - **Prune done phases** — mark the phase "done" and remove now-obsolete
+     implementation detail from completed phases. The plan reflects the current
+     state and what remains, not a development diary.
+   - **Adjust future phases** — revise, reorder, add, or remove downstream
+     phases when the learnings warrant it.
+5. **Post-phase Jidoka check** — if the learnings surface a value/design fork,
+   a wrong assumption, or anything needing developer judgment (see the
+   **after** focus in the Jidoka section), **do not commit blindly**: commit and
+   push the work so far, then return a Jidoka stop to the coordinator instead of
+   silently continuing.
+6. **Commit** — stage all changes and commit with a message that references
    the phase. Use the conventional format from the repo's recent history.
-6. **Push** — `git push`.
+7. **Push** — `git push`.
 
 ### Sub-agent: revert & split
 
@@ -171,8 +193,9 @@ Details about what to implement...
 Sub-phase documents (`ongoing/<plan-name>-<phase-number>-sub-phases.md`) use
 the same format with sub-phase headings. The executor treats both identically.
 
-The executor recognizes phases by headings and status markers. When updating
-status, change only the status line — preserve the rest of the plan.
+The executor recognizes phases by headings and status markers. When closing a
+phase, update its status and prune/adjust as described in the wrap-up checklist;
+otherwise leave unrelated parts of the plan intact.
 
 ---
 
