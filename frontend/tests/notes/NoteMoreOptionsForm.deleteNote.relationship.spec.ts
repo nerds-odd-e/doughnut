@@ -37,7 +37,7 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
 
     await flushPromises()
 
-    const deleteButton = wrapper.find('button[title="Delete note"]')
+    const deleteButton = wrapper.find('button[title="Delete note (d)"]')
     await deleteButton.trigger("click")
     await flushPromises()
 
@@ -64,7 +64,7 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
 
     await flushPromises()
 
-    const deleteButton = wrapper.find('button[title="Delete note"]')
+    const deleteButton = wrapper.find('button[title="Delete note (d)"]')
     await deleteButton.trigger("click")
     await flushPromises()
 
@@ -101,7 +101,7 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
 
     await flushPromises()
 
-    const deleteButton = wrapper.find('button[title="Delete note"]')
+    const deleteButton = wrapper.find('button[title="Delete note (d)"]')
     await deleteButton.trigger("click")
     await flushPromises()
 
@@ -153,7 +153,7 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
     await wrapper.setProps({ note: relationNote })
     await flushPromises()
 
-    await wrapper.find('button[title="Delete note"]').trigger("click")
+    await wrapper.find('button[title="Delete note (d)"]').trigger("click")
     await flushPromises()
 
     const popups = usePopups().popups.peek()

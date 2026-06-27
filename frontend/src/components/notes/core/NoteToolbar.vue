@@ -45,10 +45,10 @@
         <MessageCircle class="w-6 h-6" />
       </a>
 
-      <button v-if="!readonly && !asMarkdown" type="button" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as markdown" aria-label="Edit as markdown" @click="$emit('edit-as-markdown', true)">
+      <button v-if="!readonly && !asMarkdown" type="button" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as markdown (m)" aria-label="Edit as markdown (m)" @click="$emit('edit-as-markdown', true)">
         <FileCode class="w-6 h-6" />
       </button>
-      <button v-else-if="!readonly" type="button" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as rich content" aria-label="Edit as rich content" @click="$emit('edit-as-markdown', false)">
+      <button v-else-if="!readonly" type="button" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as rich content (m)" aria-label="Edit as rich content (m)" @click="$emit('edit-as-markdown', false)">
         <LayoutTemplate class="w-6 h-6" />
       </button>
 
@@ -87,6 +87,7 @@ import { noteShowLocation } from "@/routes/noteShowLocation"
 import NoteCreationNewButton from "../NoteCreationNewButton.vue"
 import { useNotebookSidebarOpened } from "@/composables/notebookSidebarOpened"
 import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
+import { useNoteShortcutScope } from "@/composables/noteShortcutScope"
 
 const props = withDefaults(
   defineProps<{
@@ -116,6 +117,7 @@ const moreOptionsRef = ref<InstanceType<typeof NoteToolbarMoreOptions> | null>(
 )
 
 const router = useRouter()
+const shortcutScope = useNoteShortcutScope()
 
 const emit = defineEmits<{
   (e: "edit-as-markdown", value: boolean): void
@@ -124,13 +126,13 @@ const emit = defineEmits<{
 useKeyboardShortcut(
   "note-toggle-edit-mode",
   () => emit("edit-as-markdown", !props.asMarkdown),
-  () => !props.readonly
+  () => !props.readonly && shortcutScope.value
 )
 
 useKeyboardShortcut(
   "note-link",
   () => linkPopButtonRef.value?.openDialog(),
-  () => !props.readonly
+  () => !props.readonly && shortcutScope.value
 )
 
 watch(

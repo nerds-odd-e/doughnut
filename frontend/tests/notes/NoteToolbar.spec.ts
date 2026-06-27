@@ -1,9 +1,11 @@
 import { SearchController } from "@generated/doughnut-backend-api/sdk.gen"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import { mockSdkService } from "@tests/helpers"
+import helper, { mockSdkService } from "@tests/helpers"
 import { notebookSidebarClosedPlugin } from "@tests/helpers/notebookSidebarTestProvide"
 import { installMockResizeObserver } from "@tests/helpers/mockNoteToolbarNavWidth"
 import { mountNoteToolbar } from "@tests/notes/noteToolbarTestHelpers"
+import { wrapWithNoteShortcutScope } from "@tests/helpers/noteShortcutScopeTestHelpers"
+import NoteToolbar from "@/components/notes/core/NoteToolbar.vue"
 import { screen } from "@testing-library/vue"
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
@@ -94,7 +96,7 @@ describe("NoteToolbar", () => {
     wrapper = await mountNoteToolbar(noteRealm, {
       plugin: notebookSidebarClosedPlugin(),
     })
-    expect(wrapper.find('button[title="New note"]').exists()).toBe(true)
+    expect(wrapper.find('button[title="New note (n)"]').exists()).toBe(true)
   })
 
   function dispatchToggleEditModeShortcut() {
@@ -127,12 +129,53 @@ describe("NoteToolbar", () => {
     expect(wrapper.emitted("edit-as-markdown")).toEqual([[expected]])
   })
 
+  it("advertises keyboard shortcut hints on edit mode buttons", async () => {
+    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
+
+    wrapper = await mountNoteToolbar(noteRealm, {
+      propsOverrides: { asMarkdown: false },
+    })
+    expect(wrapper.find('button[title="Edit as markdown (m)"]').exists()).toBe(
+      true
+    )
+
+    await wrapper.setProps({ asMarkdown: true })
+    expect(
+      wrapper.find('button[title="Edit as rich content (m)"]').exists()
+    ).toBe(true)
+  })
+
   it("does not emit edit-as-markdown when m is pressed and readonly", async () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
 
     wrapper = await mountNoteToolbar(noteRealm, {
       propsOverrides: { readonly: true },
     })
+
+    dispatchToggleEditModeShortcut()
+    await flushPromises()
+
+    expect(wrapper.emitted("edit-as-markdown")).toBeUndefined()
+  })
+
+  it("does not emit edit-as-markdown when m is pressed and shortcut scope is inactive", async () => {
+    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
+
+    const Harness = wrapWithNoteShortcutScope(
+      NoteToolbar,
+      {
+        note: noteRealm.note,
+        notebookId: noteRealm.notebookRealm.notebook.id,
+        activeNoteRealm: noteRealm,
+      },
+      false
+    )
+    wrapper = helper
+      .component(Harness)
+      .withCleanStorage()
+      .withRouter()
+      .mount({ attachTo: document.body })
+    await flushPromises()
 
     dispatchToggleEditModeShortcut()
     await flushPromises()

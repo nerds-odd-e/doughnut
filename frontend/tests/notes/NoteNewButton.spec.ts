@@ -6,6 +6,7 @@ import {
 import NoteNewButton from "@/components/notes/core/NoteNewButton.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
+import { wrapWithNoteShortcutScope } from "@tests/helpers/noteShortcutScopeTestHelpers"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { screen } from "@testing-library/vue"
@@ -101,6 +102,44 @@ describe("NoteNewButton keyboard shortcut", () => {
     await flushPromises()
     field.focus()
 
+    dispatchNoteNewShortcut()
+    await flushPromises()
+
+    expect(screen.queryByTestId("note-new-form")).toBeNull()
+  })
+
+  it("advertises the n shortcut in the new note button title", async () => {
+    helper
+      .component(NoteNewButton)
+      .withCleanStorage()
+      .withRouter()
+      .withProps({
+        notebookId: realm.notebookRealm.notebook.id,
+      })
+      .mount({ attachTo: document.body })
+
+    await flushPromises()
+    expect(
+      document.querySelector('button[title="New note (n)"]')
+    ).not.toBeNull()
+  })
+
+  it("ignores n when shortcut scope is inactive", async () => {
+    const Harness = wrapWithNoteShortcutScope(
+      NoteNewButton,
+      {
+        notebookId: realm.notebookRealm.notebook.id,
+      },
+      false
+    )
+
+    helper
+      .component(Harness)
+      .withCleanStorage()
+      .withRouter()
+      .mount({ attachTo: document.body })
+
+    await flushPromises()
     dispatchNoteNewShortcut()
     await flushPromises()
 

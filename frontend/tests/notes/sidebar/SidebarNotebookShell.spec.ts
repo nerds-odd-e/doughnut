@@ -72,7 +72,7 @@ describe("Sidebar notebook shell", () => {
         fixtures.topNoteRealm.note.noteTopology.title
       )?.exists()
     ).toBe(true)
-    expect(wrapper.find('button[title="New note"]').exists()).toBe(true)
+    expect(wrapper.find('button[title="New note (n)"]').exists()).toBe(true)
   })
 
   it("hides New note when notebook page is readonly and anchor realm is not loaded yet", async () => {
@@ -83,6 +83,6 @@ describe("Sidebar notebook shell", () => {
       true
     )
     await flushPromises()
-    expect(wrapper.find('button[title="New note"]').exists()).toBe(false)
+    expect(wrapper.find('button[title="New note (n)"]').exists()).toBe(false)
   })
 })

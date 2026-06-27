@@ -107,6 +107,7 @@ import DropdownMenuItem from "@/components/commons/DropdownMenuItem.vue"
 import { dropdownMenuButtonClass } from "@/components/commons/dropdownMenuClasses"
 import { noteMoreOptionsTitles } from "./noteMoreOptionsTitles"
 import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
+import { useNoteShortcutScope } from "@/composables/noteShortcutScope"
 import { computed, ref } from "vue"
 
 const toolbarGhostBtnClass = "daisy-btn daisy-btn-ghost daisy-btn-sm"
@@ -127,12 +128,17 @@ const noteTitle = computed(() => props.note.noteTopology.title)
 const { deleteNote } = useNoteDeleteFlow(noteId, noteTitle)
 
 const exportPopButtonRef = ref<InstanceType<typeof PopButton> | null>(null)
+const shortcutScope = useNoteShortcutScope()
 
-useKeyboardShortcut("note-export", () => {
-  exportPopButtonRef.value?.openDialog()
-})
+useKeyboardShortcut(
+  "note-export",
+  () => {
+    exportPopButtonRef.value?.openDialog()
+  },
+  () => shortcutScope.value
+)
 
-useKeyboardShortcut("note-delete", deleteNote)
+useKeyboardShortcut("note-delete", deleteNote, () => shortcutScope.value)
 
 const assimilationChecked = computed(() => isOpenForNote(props.note.id))
 

@@ -11,6 +11,7 @@
           noteId: resolvedNoteId,
           expandChildren: true,
           isMinimized: isContentMinimized,
+          ownsShortcuts: true,
         }"
       >
         <template #note-conversation="{ noteRealm: conversationRealm }">

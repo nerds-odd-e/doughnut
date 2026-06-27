@@ -20,7 +20,7 @@ describe("NoteMoreOptionsForm delete note", () => {
 
     await flushPromises()
 
-    const deleteButton = wrapper.find('button[title="Delete note"]')
+    const deleteButton = wrapper.find('button[title="Delete note (d)"]')
     await deleteButton.trigger("click")
     await flushPromises()
 
@@ -49,7 +49,7 @@ describe("NoteMoreOptionsForm delete note", () => {
 
     await flushPromises()
 
-    const deleteButton = wrapper.find('button[title="Delete note"]')
+    const deleteButton = wrapper.find('button[title="Delete note (d)"]')
     await deleteButton.trigger("click")
     await flushPromises()
 
@@ -81,7 +81,7 @@ describe("NoteMoreOptionsForm delete note", () => {
     const storedApi = storageAccessor.value.storedApi()
     storedApi.deleteNote = deleteNoteMock
 
-    const deleteButton = wrapper.find('button[title="Delete note"]')
+    const deleteButton = wrapper.find('button[title="Delete note (d)"]')
     await deleteButton.trigger("click")
     await flushPromises()
 

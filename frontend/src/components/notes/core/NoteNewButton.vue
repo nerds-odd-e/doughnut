@@ -1,8 +1,8 @@
 <template>
   <PopButton
     ref="popButtonRef"
-    title="New note"
-    aria-label="New note"
+    title="New note (n)"
+    aria-label="New note (n)"
     align-modal-top
   >
     <template #button_face>
@@ -26,6 +26,7 @@ import PopButton from "../../commons/Popups/PopButton.vue"
 import type { Folder, Note } from "@generated/doughnut-backend-api"
 import NoteNewForm from "../NoteNewForm.vue"
 import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
+import { useNoteShortcutScope } from "@/composables/noteShortcutScope"
 import { ref } from "vue"
 
 defineProps<{
@@ -38,8 +39,13 @@ defineProps<{
 }>()
 
 const popButtonRef = ref<InstanceType<typeof PopButton> | null>(null)
+const shortcutScope = useNoteShortcutScope()
 
-useKeyboardShortcut("note-new", () => {
-  popButtonRef.value?.openDialog()
-})
+useKeyboardShortcut(
+  "note-new",
+  () => {
+    popButtonRef.value?.openDialog()
+  },
+  () => shortcutScope.value
+)
 </script>

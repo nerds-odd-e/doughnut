@@ -109,17 +109,22 @@ import NoteToolbar from "./core/NoteToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import NoteDeadLinkCreateModal from "./NoteDeadLinkCreateModal.vue"
 import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
+import { provideNoteShortcutScope } from "@/composables/noteShortcutScope"
+
 const props = defineProps({
   noteId: { type: Number, required: true },
   expandChildren: { type: Boolean, required: true },
   noConversationButton: { type: Boolean, default: false },
   isMinimized: { type: Boolean, default: false },
   showBreadcrumb: { type: Boolean, default: false },
+  ownsShortcuts: { type: Boolean, default: false },
   ancestorFolders: {
     type: Array as PropType<Folder[]>,
     default: () => [],
   },
 })
+
+provideNoteShortcutScope(() => props.ownsShortcuts)
 
 const currentUser = inject<Ref<User | undefined>>("currentUser")
 const readonly = (noteRealm: NoteRealm) =>

@@ -3,6 +3,7 @@ import NoteMoreOptionsActions from "@/components/notes/widgets/NoteMoreOptionsAc
 import usePopups from "@/components/commons/Popups/usePopups"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
+import { wrapWithNoteShortcutScope } from "@tests/helpers/noteShortcutScopeTestHelpers"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it } from "vitest"
 import { screen } from "@testing-library/vue"
@@ -121,5 +122,44 @@ describe("NoteMoreOptionsActions keyboard shortcut", () => {
     expect((document.querySelector("dialog") as HTMLDialogElement)?.open).toBe(
       true
     )
+  })
+
+  it.each([
+    "toolbar",
+    "menu",
+  ] as const)("ignores e and d when shortcut scope is inactive (layout=%s)", async (layout) => {
+    const Harness = wrapWithNoteShortcutScope(
+      NoteMoreOptionsActions,
+      { note, layout },
+      false
+    )
+    wrapper = helper
+      .component(Harness)
+      .withRouter()
+      .withCleanStorage()
+      .mount({ attachTo: document.body })
+
+    await flushPromises()
+    dispatchNoteExportShortcut()
+    dispatchNoteDeleteShortcut()
+    await flushPromises()
+
+    expect(document.querySelector("dialog")).toBeNull()
+    expect(usePopups().popups.peek()).toHaveLength(0)
+  })
+
+  it.each([
+    "toolbar",
+    "menu",
+  ] as const)("advertises e and d shortcut hints in button titles (layout=%s)", async (layout) => {
+    mountActions(layout)
+    await flushPromises()
+
+    expect(
+      document.querySelector('button[title="Export... (e)"]')
+    ).not.toBeNull()
+    expect(
+      document.querySelector('button[title="Delete note (d)"]')
+    ).not.toBeNull()
   })
 })
