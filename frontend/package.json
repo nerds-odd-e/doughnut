@@ -49,7 +49,7 @@
     "@vitejs/plugin-vue-jsx": "^5.1.6",
     "@vitest/browser-playwright": "4.1.9",
     "@vitest/ui": "4.1.9",
-    "@vue/compiler-core": "3.5.38",
+    "@vue/compiler-core": "3.5.39",
     "@vue/server-renderer": "3.5.38",
     "@vue/test-utils": "2.4.11",
     "daisyui": "5.5.23",
