@@ -54,7 +54,7 @@
     "@vue/test-utils": "2.4.11",
     "daisyui": "5.5.23",
     "doughnut-test-fixtures": "workspace:*",
-    "es-toolkit": "^1.48.1",
+    "es-toolkit": "^1.49.0",
     "esbuild": ">=0.28.1",
     "gsap": "^3.15.0",
     "marked": "^18.0.5",
