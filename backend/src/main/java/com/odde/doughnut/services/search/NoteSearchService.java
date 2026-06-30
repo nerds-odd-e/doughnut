@@ -1,5 +1,6 @@
 package com.odde.doughnut.services.search;
 
+import com.odde.doughnut.algorithms.FrontmatterAliases;
 import com.odde.doughnut.controllers.dto.NoteSearchResult;
 import com.odde.doughnut.controllers.dto.RelationshipLiteralSearchHit;
 import com.odde.doughnut.controllers.dto.SearchTerm;
@@ -8,13 +9,16 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.FolderRepository;
+import com.odde.doughnut.entities.repositories.NoteAliasIndexRepository;
 import com.odde.doughnut.entities.repositories.NoteEmbeddingJdbcRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.NotebookRepository;
 import com.odde.doughnut.services.EmbeddingService;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.logging.log4j.util.Strings;
@@ -28,8 +32,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class NoteSearchService {
   private static final int FOLDER_LITERAL_MATCH_CAP = 12;
   private static final int NOTEBOOK_LITERAL_MATCH_CAP = 12;
+  private static final float TITLE_EXACT_DISTANCE = 0.0f;
+  private static final float ALIAS_EXACT_DISTANCE = 0.05f;
+  private static final float PARTIAL_DISTANCE = 0.9f;
 
   private final NoteRepository noteRepository;
+  private final NoteAliasIndexRepository noteAliasIndexRepository;
   private final FolderRepository folderRepository;
   private final NotebookRepository notebookRepository;
   private final NoteEmbeddingJdbcRepository noteEmbeddingJdbcRepository;
@@ -37,11 +45,13 @@ public class NoteSearchService {
 
   public NoteSearchService(
       NoteRepository noteRepository,
+      NoteAliasIndexRepository noteAliasIndexRepository,
       FolderRepository folderRepository,
       NotebookRepository notebookRepository,
       NoteEmbeddingJdbcRepository noteEmbeddingJdbcRepository,
       EmbeddingService embeddingService) {
     this.noteRepository = noteRepository;
+    this.noteAliasIndexRepository = noteAliasIndexRepository;
     this.folderRepository = folderRepository;
     this.notebookRepository = notebookRepository;
     this.noteEmbeddingJdbcRepository = noteEmbeddingJdbcRepository;
@@ -53,10 +63,12 @@ public class NoteSearchService {
       return List.of();
     }
 
-    List<Note> exactMatches = searchExactMatches(user, searchTerm, null);
+    List<Note> exactTitleMatches = searchExactTitleMatches(user, searchTerm, null);
+    List<Note> exactAliasMatches = searchExactAliasMatches(user, searchTerm, null);
     List<Note> partialMatches = searchPartialMatches(user, searchTerm, null);
     List<NoteSearchResult> noteResults =
-        combineExactAndPartialMatches(exactMatches, partialMatches, null, null);
+        combineExactAndPartialMatches(
+            exactTitleMatches, exactAliasMatches, partialMatches, null, null);
     return mergeNoteAndFolderLiteralHits(user, searchTerm, null, noteResults);
   }
 
@@ -68,10 +80,12 @@ public class NoteSearchService {
     Integer avoidNoteId = note != null ? note.getId() : null;
     Integer notebookId = note != null ? note.getNotebook().getId() : null;
 
-    List<Note> exactMatches = searchExactMatches(user, searchTerm, notebookId);
+    List<Note> exactTitleMatches = searchExactTitleMatches(user, searchTerm, notebookId);
+    List<Note> exactAliasMatches = searchExactAliasMatches(user, searchTerm, notebookId);
     List<Note> partialMatches = searchPartialMatches(user, searchTerm, notebookId);
     List<NoteSearchResult> noteResults =
-        combineExactAndPartialMatches(exactMatches, partialMatches, avoidNoteId, notebookId);
+        combineExactAndPartialMatches(
+            exactTitleMatches, exactAliasMatches, partialMatches, avoidNoteId, notebookId);
     return mergeNoteAndFolderLiteralHits(user, searchTerm, notebookId, noteResults);
   }
 
@@ -381,7 +395,7 @@ public class NoteSearchService {
     return sortByDistanceThenNotebook(results, notebookId);
   }
 
-  private List<Note> searchExactMatches(User user, SearchTerm searchTerm, Integer notebookId) {
+  private List<Note> searchExactTitleMatches(User user, SearchTerm searchTerm, Integer notebookId) {
     String exactSearchKey = searchTerm.getTrimmedSearchKey();
     if (Strings.isBlank(exactSearchKey)) {
       return List.of();
@@ -389,17 +403,17 @@ public class NoteSearchService {
 
     if (Boolean.TRUE.equals(searchTerm.getAllMyCircles())) {
       return Stream.concat(
-              searchExactMatchesInMyNotebooksAndSubscriptions(user, searchTerm).stream(),
+              searchExactTitleMatchesInMyNotebooksAndSubscriptions(user, searchTerm).stream(),
               noteRepository.searchExactForUserInAllMyCircle(user.getId(), exactSearchKey).stream())
           .toList();
     }
     if (Boolean.TRUE.equals(searchTerm.getAllMyNotebooksAndSubscriptions())) {
-      return searchExactMatchesInMyNotebooksAndSubscriptions(user, searchTerm);
+      return searchExactTitleMatchesInMyNotebooksAndSubscriptions(user, searchTerm);
     }
     return noteRepository.searchExactInNotebook(notebookId, exactSearchKey);
   }
 
-  private List<Note> searchExactMatchesInMyNotebooksAndSubscriptions(
+  private List<Note> searchExactTitleMatchesInMyNotebooksAndSubscriptions(
       User user, SearchTerm searchTerm) {
     return Stream.concat(
             noteRepository
@@ -412,15 +426,54 @@ public class NoteSearchService {
         .toList();
   }
 
+  private List<Note> searchExactAliasMatches(User user, SearchTerm searchTerm, Integer notebookId) {
+    String lookupKey = normalizedAliasLookupKey(searchTerm);
+    if (Strings.isBlank(lookupKey)) {
+      return List.of();
+    }
+
+    if (Boolean.TRUE.equals(searchTerm.getAllMyCircles())) {
+      return Stream.concat(
+              searchExactAliasMatchesInMyNotebooksAndSubscriptions(user, lookupKey).stream(),
+              noteAliasIndexRepository
+                  .searchExactForUserInAllMyCircle(user.getId(), lookupKey)
+                  .stream())
+          .toList();
+    }
+    if (Boolean.TRUE.equals(searchTerm.getAllMyNotebooksAndSubscriptions())) {
+      return searchExactAliasMatchesInMyNotebooksAndSubscriptions(user, lookupKey);
+    }
+    return noteAliasIndexRepository.searchExactInNotebook(notebookId, lookupKey);
+  }
+
+  private List<Note> searchExactAliasMatchesInMyNotebooksAndSubscriptions(
+      User user, String lookupKey) {
+    return Stream.concat(
+            noteAliasIndexRepository
+                .searchExactForUserInAllMyNotebooks(user.getId(), lookupKey)
+                .stream(),
+            noteAliasIndexRepository
+                .searchExactForUserInAllMySubscriptions(user.getId(), lookupKey)
+                .stream())
+        .toList();
+  }
+
   private List<Note> searchPartialMatches(User user, SearchTerm searchTerm, Integer notebookId) {
     String searchKey = searchTerm.getTrimmedSearchKey();
     if (Strings.isBlank(searchKey)) {
       return List.of();
     }
 
+    List<Note> titlePartial = searchPartialTitleMatches(user, searchTerm, notebookId);
+    List<Note> aliasPartial = searchPartialAliasMatches(user, searchTerm, notebookId);
+    return mergeUniqueNotes(titlePartial, aliasPartial);
+  }
+
+  private List<Note> searchPartialTitleMatches(
+      User user, SearchTerm searchTerm, Integer notebookId) {
     if (Boolean.TRUE.equals(searchTerm.getAllMyCircles())) {
       return Stream.concat(
-              searchPartialMatchesInMyNotebooksAndSubscriptions(user, searchTerm).stream(),
+              searchPartialTitleMatchesInMyNotebooksAndSubscriptions(user, searchTerm).stream(),
               noteRepository
                   .searchForUserInAllMyCircle(
                       user.getId(), getPattern(searchTerm), getLimitPageable())
@@ -428,12 +481,12 @@ public class NoteSearchService {
           .toList();
     }
     if (Boolean.TRUE.equals(searchTerm.getAllMyNotebooksAndSubscriptions())) {
-      return searchPartialMatchesInMyNotebooksAndSubscriptions(user, searchTerm);
+      return searchPartialTitleMatchesInMyNotebooksAndSubscriptions(user, searchTerm);
     }
     return noteRepository.searchInNotebook(notebookId, getPattern(searchTerm), getLimitPageable());
   }
 
-  private List<Note> searchPartialMatchesInMyNotebooksAndSubscriptions(
+  private List<Note> searchPartialTitleMatchesInMyNotebooksAndSubscriptions(
       User user, SearchTerm searchTerm) {
     return Stream.concat(
             noteRepository
@@ -447,33 +500,94 @@ public class NoteSearchService {
         .toList();
   }
 
+  private List<Note> searchPartialAliasMatches(
+      User user, SearchTerm searchTerm, Integer notebookId) {
+    String pattern = normalizedAliasLookupPattern(searchTerm);
+    if (Strings.isBlank(pattern.replace("%", ""))) {
+      return List.of();
+    }
+
+    if (Boolean.TRUE.equals(searchTerm.getAllMyCircles())) {
+      return Stream.concat(
+              searchPartialAliasMatchesInMyNotebooksAndSubscriptions(user, pattern).stream(),
+              noteAliasIndexRepository
+                  .searchForUserInAllMyCircle(user.getId(), pattern, getLimitPageable())
+                  .stream())
+          .toList();
+    }
+    if (Boolean.TRUE.equals(searchTerm.getAllMyNotebooksAndSubscriptions())) {
+      return searchPartialAliasMatchesInMyNotebooksAndSubscriptions(user, pattern);
+    }
+    return noteAliasIndexRepository.searchInNotebook(
+        notebookId, pattern, getLimitPageable());
+  }
+
+  private List<Note> searchPartialAliasMatchesInMyNotebooksAndSubscriptions(
+      User user, String pattern) {
+    return Stream.concat(
+            noteAliasIndexRepository
+                .searchForUserInAllMyNotebooks(user.getId(), pattern, getLimitPageable())
+                .stream(),
+            noteAliasIndexRepository
+                .searchForUserInAllMySubscriptions(user.getId(), pattern, getLimitPageable())
+                .stream())
+        .toList();
+  }
+
+  private static List<Note> mergeUniqueNotes(List<Note> first, List<Note> second) {
+    Set<Integer> seen = new HashSet<>();
+    List<Note> merged = new ArrayList<>();
+    for (Note note : first) {
+      if (seen.add(note.getId())) {
+        merged.add(note);
+      }
+    }
+    for (Note note : second) {
+      if (seen.add(note.getId())) {
+        merged.add(note);
+      }
+    }
+    return merged;
+  }
+
   private List<NoteSearchResult> combineExactAndPartialMatches(
-      List<Note> exactMatches, List<Note> partialMatches, Integer avoidNoteId, Integer notebookId) {
-    List<Note> filteredExactMatches = exactMatches;
-    List<Note> filteredPartialMatchesInput = partialMatches;
+      List<Note> titleExactMatches,
+      List<Note> aliasExactMatches,
+      List<Note> partialMatches,
+      Integer avoidNoteId,
+      Integer notebookId) {
+    Set<Integer> titleExactIds =
+        titleExactMatches.stream().map(Note::getId).collect(Collectors.toSet());
+    List<Note> aliasOnlyExactMatches =
+        aliasExactMatches.stream().filter(note -> !titleExactIds.contains(note.getId())).toList();
+    Set<Integer> allExactIds = new HashSet<>(titleExactIds);
+    aliasOnlyExactMatches.forEach(note -> allExactIds.add(note.getId()));
 
     List<Note> filteredPartialMatches =
-        filteredPartialMatchesInput.stream()
-            .filter(
-                note ->
-                    filteredExactMatches.stream()
-                        .noneMatch(exact -> exact.getId().equals(note.getId())))
-            .toList();
+        partialMatches.stream().filter(note -> !allExactIds.contains(note.getId())).toList();
 
     List<NoteSearchResult> results =
-        filteredExactMatches.stream()
+        titleExactMatches.stream()
             .filter(note -> !note.getId().equals(avoidNoteId))
-            .map(note -> noteToSearchResult(note, 0.0f))
-            .collect(Collectors.toList());
+            .map(note -> noteToSearchResult(note, TITLE_EXACT_DISTANCE))
+            .collect(Collectors.toCollection(ArrayList::new));
 
-    int remainingSlots = filteredExactMatches.isEmpty() ? 20 : 20 + filteredExactMatches.size();
+    aliasOnlyExactMatches.stream()
+        .filter(note -> !note.getId().equals(avoidNoteId))
+        .map(note -> noteToSearchResult(note, ALIAS_EXACT_DISTANCE))
+        .forEach(results::add);
+
+    int remainingSlots =
+        titleExactMatches.isEmpty() && aliasOnlyExactMatches.isEmpty()
+            ? 20
+            : 20 + titleExactMatches.size() + aliasOnlyExactMatches.size();
 
     if (remainingSlots > 0) {
       results.addAll(
           filteredPartialMatches.stream()
               .limit(remainingSlots)
               .filter(note -> !note.getId().equals(avoidNoteId))
-              .map(note -> noteToSearchResult(note, 0.9f))
+              .map(note -> noteToSearchResult(note, PARTIAL_DISTANCE))
               .collect(Collectors.toList()));
     }
 
@@ -508,5 +622,13 @@ public class NoteSearchService {
 
   private String getPattern(SearchTerm searchTerm) {
     return "%" + searchTerm.getTrimmedSearchKey() + "%";
+  }
+
+  private static String normalizedAliasLookupKey(SearchTerm searchTerm) {
+    return FrontmatterAliases.normalizedLookupKey(searchTerm.getTrimmedSearchKey());
+  }
+
+  private static String normalizedAliasLookupPattern(SearchTerm searchTerm) {
+    return "%" + normalizedAliasLookupKey(searchTerm) + "%";
   }
 }
