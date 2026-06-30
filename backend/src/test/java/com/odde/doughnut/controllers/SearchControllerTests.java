@@ -10,6 +10,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.services.NoteAliasIndexService;
 import com.odde.doughnut.testability.RelationshipLiteralSearchHits;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 class SearchControllerTests extends ControllerTestBase {
   @Autowired SearchController controller;
   @Autowired EntityManager entityManager;
+  @Autowired NoteAliasIndexService noteAliasIndexService;
 
   @BeforeEach
   void setup() {
@@ -158,6 +160,109 @@ class SearchControllerTests extends ControllerTestBase {
                           && "Recipe Ideas".equals(h.getNotebookName())
                           && h.getNotebookId() != null),
           is(true));
+    }
+
+    @Test
+    void shouldReturnMatchingNotesByFrontmatterAlias() throws UnexpectedNoAccessRightException {
+      User user = currentUser.getUser();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      Note aliasTarget =
+          makeMe
+              .aNote()
+              .title("Canonical Title")
+              .notebook(notebook)
+              .content("---\naliases:\n  - SearchAlias\n---\n\nbody")
+              .please();
+      noteAliasIndexService.refreshForNote(aliasTarget);
+
+      SearchTerm searchTerm = new SearchTerm();
+      searchTerm.setSearchKey("SearchAlias");
+      searchTerm.setAllMyNotebooksAndSubscriptions(true);
+
+      var result = controller.searchForRelationshipTarget(searchTerm);
+
+      var notes = RelationshipLiteralSearchHits.noteMatches(result);
+      assertThat(notes, hasSize(1));
+      assertThat(notes.get(0).getNoteTopology().getTitle(), equalTo("Canonical Title"));
+      assertThat(notes.get(0).getNoteTopology().getId(), equalTo(aliasTarget.getId()));
+      assertThat(notes.get(0).getDistance(), equalTo(0.05f));
+    }
+
+    @Test
+    void shouldReturnPartialMatchesForFrontmatterAlias() throws UnexpectedNoAccessRightException {
+      User user = currentUser.getUser();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      Note aliasTarget =
+          makeMe
+              .aNote()
+              .title("Canonical Title")
+              .notebook(notebook)
+              .content("---\naliases:\n  - Programming Language\n---\n\nbody")
+              .please();
+      noteAliasIndexService.refreshForNote(aliasTarget);
+
+      SearchTerm searchTerm = new SearchTerm();
+      searchTerm.setSearchKey("gram");
+      searchTerm.setAllMyNotebooksAndSubscriptions(true);
+
+      var result = controller.searchForRelationshipTarget(searchTerm);
+
+      var notes = RelationshipLiteralSearchHits.noteMatches(result);
+      assertThat(notes, hasSize(1));
+      assertThat(notes.get(0).getNoteTopology().getId(), equalTo(aliasTarget.getId()));
+      assertThat(notes.get(0).getDistance(), equalTo(0.9f));
+    }
+
+    @Test
+    void shouldPreferTitleExactMatchOverAliasExactMatch() throws UnexpectedNoAccessRightException {
+      User user = currentUser.getUser();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      Note byTitle = makeMe.aNote("color").notebook(notebook).please();
+      Note byAlias =
+          makeMe
+              .aNote()
+              .title("colour")
+              .notebook(notebook)
+              .content("---\naliases:\n  - color\n---\n\nbody")
+              .please();
+      noteAliasIndexService.refreshForNote(byAlias);
+
+      SearchTerm searchTerm = new SearchTerm();
+      searchTerm.setSearchKey("color");
+      searchTerm.setAllMyNotebooksAndSubscriptions(true);
+
+      var result = controller.searchForRelationshipTarget(searchTerm);
+
+      var notes = RelationshipLiteralSearchHits.noteMatches(result);
+      assertThat(notes, hasSize(2));
+      assertThat(notes.get(0).getNoteTopology().getId(), equalTo(byTitle.getId()));
+      assertThat(notes.get(0).getDistance(), equalTo(0.0f));
+      assertThat(notes.get(1).getNoteTopology().getId(), equalTo(byAlias.getId()));
+      assertThat(notes.get(1).getDistance(), equalTo(0.05f));
+    }
+
+    @Test
+    void shouldMatchAliasCaseInsensitively() throws UnexpectedNoAccessRightException {
+      User user = currentUser.getUser();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      Note aliasTarget =
+          makeMe
+              .aNote()
+              .title("Canonical Title")
+              .notebook(notebook)
+              .content("---\naliases:\n  - SearchAlias\n---\n\nbody")
+              .please();
+      noteAliasIndexService.refreshForNote(aliasTarget);
+
+      SearchTerm searchTerm = new SearchTerm();
+      searchTerm.setSearchKey("searchalias");
+      searchTerm.setAllMyNotebooksAndSubscriptions(true);
+
+      var result = controller.searchForRelationshipTarget(searchTerm);
+
+      var notes = RelationshipLiteralSearchHits.noteMatches(result);
+      assertThat(notes, hasSize(1));
+      assertThat(notes.get(0).getNoteTopology().getId(), equalTo(aliasTarget.getId()));
     }
 
     @Test
