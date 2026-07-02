@@ -16,7 +16,7 @@
                   'viewLastAnsweredQuestion',
                   !previousAnsweredQuestionCursor
                     ? finished - 1
-                    : previousAnsweredQuestionCursor - 1
+                    : previousAnsweredQuestionCursor! - 1
                 )
               "
             >
