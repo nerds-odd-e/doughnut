@@ -13,9 +13,12 @@ import com.odde.doughnut.services.ai.TextFromAudioWithCallInfo;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
+import com.openai.models.audio.transcriptions.Transcription;
 import com.openai.models.audio.transcriptions.TranscriptionCreateParams;
+import com.openai.models.audio.transcriptions.TranscriptionCreateResponse;
 import com.openai.models.responses.ResponseTextConfig;
 import com.openai.models.responses.StructuredResponseCreateParams;
+import com.openai.services.blocking.AudioService;
 import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -57,14 +60,11 @@ class AiAudioControllerTests {
   }
 
   protected void mockTranscriptionSrtResponse(String responseBody) {
-    var audioService =
-        Mockito.mock(com.openai.services.blocking.AudioService.class, Mockito.RETURNS_DEEP_STUBS);
+    var audioService = Mockito.mock(AudioService.class, Mockito.RETURNS_DEEP_STUBS);
     when(officialClient.audio()).thenReturn(audioService);
     var transcriptionResponse =
-        com.openai.models.audio.transcriptions.TranscriptionCreateResponse.ofTranscription(
-            com.openai.models.audio.transcriptions.Transcription.builder()
-                .text(responseBody)
-                .build());
+        TranscriptionCreateResponse.ofTranscription(
+            Transcription.builder().text(responseBody).build());
     when(audioService.transcriptions().create(any(TranscriptionCreateParams.class)))
         .thenReturn(transcriptionResponse);
   }

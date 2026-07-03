@@ -9,6 +9,9 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import com.openai.client.OpenAIClient;
 import com.openai.core.MultipartField;
 import com.openai.core.http.HttpResponse;
+import com.openai.models.audio.AudioResponseFormat;
+import com.openai.models.audio.transcriptions.Transcription;
+import com.openai.models.audio.transcriptions.TranscriptionCreateParams;
 import com.openai.models.batches.Batch;
 import com.openai.models.batches.BatchCreateParams;
 import com.openai.models.files.FileCreateParams;
@@ -112,20 +115,20 @@ public class OpenAiApiHandler {
   public String getTranscription(String filename, byte[] audioBytes) throws IOException {
     assertOpenAiAvailable();
     String effectiveFilename = filename != null && !filename.isBlank() ? filename : "audio.wav";
-    var params =
-        com.openai.models.audio.transcriptions.TranscriptionCreateParams.builder()
+    TranscriptionCreateParams params =
+        TranscriptionCreateParams.builder()
             .file(
                 MultipartField.<InputStream>builder()
                     .value(new ByteArrayInputStream(audioBytes))
                     .filename(effectiveFilename)
                     .build())
             .model("whisper-1")
-            .responseFormat(com.openai.models.audio.AudioResponseFormat.SRT)
+            .responseFormat(AudioResponseFormat.SRT)
             .build();
     var transcription = officialClient.audio().transcriptions().create(params);
     return transcription
         .transcription()
-        .map(com.openai.models.audio.transcriptions.Transcription::text)
+        .map(Transcription::text)
         .filter(text -> !text.isBlank())
         .orElseThrow(() -> new IOException("Empty transcription response from OpenAI"));
   }

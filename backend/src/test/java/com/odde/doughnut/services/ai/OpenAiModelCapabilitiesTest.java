@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import com.openai.models.ReasoningEffort;
+import com.openai.models.responses.ResponseTextConfig;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -57,14 +58,14 @@ class OpenAiModelCapabilitiesTest {
     void usesMediumForGpt41Mini() {
       assertThat(
           OpenAiModelCapabilities.responseTextVerbosity("gpt-4.1-mini"),
-          is(com.openai.models.responses.ResponseTextConfig.Verbosity.MEDIUM));
+          is(ResponseTextConfig.Verbosity.MEDIUM));
     }
 
     @Test
     void usesLowForOtherModels() {
       assertThat(
           OpenAiModelCapabilities.responseTextVerbosity("gpt-4o"),
-          is(com.openai.models.responses.ResponseTextConfig.Verbosity.LOW));
+          is(ResponseTextConfig.Verbosity.LOW));
     }
   }
 
