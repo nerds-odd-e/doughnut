@@ -57,15 +57,14 @@ class AiAudioControllerTests {
   }
 
   protected void mockTranscriptionSrtResponse(String responseBody) {
-    // Mock the official SDK audio transcription API
     var audioService =
         Mockito.mock(com.openai.services.blocking.AudioService.class, Mockito.RETURNS_DEEP_STUBS);
     when(officialClient.audio()).thenReturn(audioService);
     var transcriptionResponse =
-        Mockito.mock(
-            com.openai.models.audio.transcriptions.TranscriptionCreateResponse.class,
-            Mockito.RETURNS_DEEP_STUBS);
-    when(transcriptionResponse.toString()).thenReturn(responseBody);
+        com.openai.models.audio.transcriptions.TranscriptionCreateResponse.ofTranscription(
+            com.openai.models.audio.transcriptions.Transcription.builder()
+                .text(responseBody)
+                .build());
     when(audioService.transcriptions().create(any(TranscriptionCreateParams.class)))
         .thenReturn(transcriptionResponse);
   }

@@ -1,5 +1,6 @@
 package com.odde.doughnut.services.ai.builder;
 
+import com.odde.doughnut.services.ai.OpenAiModelCapabilities;
 import com.openai.models.Reasoning;
 import com.openai.models.ReasoningEffort;
 import com.openai.models.responses.ResponseTextConfig;
@@ -51,7 +52,7 @@ public class OpenAIResponseRequestBuilder<T> {
   }
 
   public StructuredResponseCreateParams<T> build() {
-    return createParams(ResponseTextConfig.Verbosity.LOW);
+    return createParams(OpenAiModelCapabilities.responseTextVerbosity(modelName));
   }
 
   /** Batch API uses medium verbosity; reasoning is included only when effort is set. */

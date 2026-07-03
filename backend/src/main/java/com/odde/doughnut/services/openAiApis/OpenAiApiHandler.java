@@ -111,16 +111,23 @@ public class OpenAiApiHandler {
 
   public String getTranscription(String filename, byte[] audioBytes) throws IOException {
     assertOpenAiAvailable();
+    String effectiveFilename = filename != null && !filename.isBlank() ? filename : "audio.wav";
     var params =
         com.openai.models.audio.transcriptions.TranscriptionCreateParams.builder()
-            .file(audioBytes)
+            .file(
+                MultipartField.<InputStream>builder()
+                    .value(new ByteArrayInputStream(audioBytes))
+                    .filename(effectiveFilename)
+                    .build())
             .model("whisper-1")
             .responseFormat(com.openai.models.audio.AudioResponseFormat.SRT)
             .build();
     var transcription = officialClient.audio().transcriptions().create(params);
-    // For SRT format, TranscriptionCreateResponse contains the transcription text
-    // The response object's toString() should return the transcription text for SRT format
-    return transcription.toString();
+    return transcription
+        .transcription()
+        .map(com.openai.models.audio.transcriptions.Transcription::text)
+        .filter(text -> !text.isBlank())
+        .orElseThrow(() -> new IOException("Empty transcription response from OpenAI"));
   }
 
   public <T> Optional<T> requestAndGetStructuredResponseResult(

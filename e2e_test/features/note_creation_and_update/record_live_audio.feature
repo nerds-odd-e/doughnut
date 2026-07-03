@@ -1,4 +1,3 @@
-@ignore
 @usingMockedOpenAiService
 Feature: Recording a live audio and append to note content
   As a learner, I want to create a note to capture the audio of a live event and append it to the note content
@@ -17,8 +16,8 @@ Feature: Recording a live audio and append to note content
     #   | user message | assistant reply | response type |
     #   | ...          | ...              | requires action |
     And the OpenAI completion service will return the following response for the transcription to text request:
-      | request contains                | response                               |
-      | its talk about dada struct day. | Let's talk about data structure today. |
+      | request contains                | response                                                          |
+      | its talk about dada struct day. | This is class 1.Let's talk about data structure today.            |
     And the browser is mocked to give permission to record audio
 
   Scenario: Record audio of a live event

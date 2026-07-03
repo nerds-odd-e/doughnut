@@ -52,6 +52,23 @@ class OpenAiModelCapabilitiesTest {
   }
 
   @Nested
+  class ResponseTextVerbosity {
+    @Test
+    void usesMediumForGpt41Mini() {
+      assertThat(
+          OpenAiModelCapabilities.responseTextVerbosity("gpt-4.1-mini"),
+          is(com.openai.models.responses.ResponseTextConfig.Verbosity.MEDIUM));
+    }
+
+    @Test
+    void usesLowForOtherModels() {
+      assertThat(
+          OpenAiModelCapabilities.responseTextVerbosity("gpt-4o"),
+          is(com.openai.models.responses.ResponseTextConfig.Verbosity.LOW));
+    }
+  }
+
+  @Nested
   class QuestionGenerationMaxOutputTokens {
     @Test
     void usesDefaultBudgetWithoutReasoning() {
