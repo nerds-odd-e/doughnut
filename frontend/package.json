@@ -22,7 +22,7 @@
     "test": "CI=true vitest run --browser=chromium"
   },
   "dependencies": {
-    "@lucide/vue": "^1.22.0",
+    "@lucide/vue": "^1.23.0",
     "epubjs": "^0.3.93",
     "file-saver": "^2.0.5",
     "mini-debounce": "^1.0.8",
@@ -52,7 +52,7 @@
     "@vue/compiler-core": "3.5.39",
     "@vue/server-renderer": "3.5.39",
     "@vue/test-utils": "2.4.11",
-    "daisyui": "5.6.6",
+    "daisyui": "5.6.7",
     "doughnut-test-fixtures": "workspace:*",
     "es-toolkit": "^1.49.0",
     "esbuild": ">=0.28.1",
