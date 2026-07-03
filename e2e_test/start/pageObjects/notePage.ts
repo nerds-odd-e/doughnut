@@ -276,7 +276,7 @@ export const assumeNotePage = (
     },
     switchToRichContent() {
       cy.get('body').then(($body) => {
-        const toRich = $body.find('button[aria-label="Edit as rich content"]')
+        const toRich = $body.find('button[aria-label^="Edit as rich content"]')
         if (toRich.length > 0) {
           cy.wrap(toRich.first()).click()
         }
@@ -302,7 +302,7 @@ export const assumeNotePage = (
     },
     openMarkdownContentEditor() {
       cy.get('body').then(($body) => {
-        const toMarkdown = $body.find('button[aria-label="Edit as markdown"]')
+        const toMarkdown = $body.find('button[aria-label^="Edit as markdown"]')
         if (toMarkdown.length > 0) {
           cy.wrap(toMarkdown.first()).click()
         }
@@ -676,7 +676,7 @@ export const assumeNotePage = (
     associateWikidataDialog() {
       // Notes open in rich (frontmatter) mode by default; only switch when already in markdown mode.
       cy.get('body').then(($body) => {
-        const toRich = $body.find('button[aria-label="Edit as rich content"]')
+        const toRich = $body.find('button[aria-label^="Edit as rich content"]')
         if (toRich.length > 0) {
           cy.wrap(toRich.first()).click()
         }
