@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
-/** A parsed title alias or qualifier: {@code stem} plus an optional cloze suffix marker. */
+/** A parsed recall or qualifier fragment: {@code stem} plus an optional cloze suffix marker. */
 record TitleFragment(boolean suffixMarker, String stem) {
   public static TitleFragment from(String content) {
     String normalizedContent = normalizeWhitespace(content);
@@ -69,12 +69,12 @@ record TitleFragment(boolean suffixMarker, String stem) {
   }
 
   static List<TitleFragment> mergeSortedLongestFirst(
-      List<TitleFragment> titleAliases, List<TitleFragment> additionalAliases) {
-    if (additionalAliases.isEmpty()) {
-      return titleAliases;
+      List<TitleFragment> titleFragments, List<TitleFragment> additionalFragments) {
+    if (additionalFragments.isEmpty()) {
+      return titleFragments;
     }
-    List<TitleFragment> merged = new ArrayList<>(titleAliases);
-    merged.addAll(additionalAliases);
+    List<TitleFragment> merged = new ArrayList<>(titleFragments);
+    merged.addAll(additionalFragments);
     return sortedLongestFirst(merged);
   }
 }

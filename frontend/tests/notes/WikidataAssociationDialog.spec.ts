@@ -110,10 +110,12 @@ describe("WikidataAssociationDialog", () => {
     await flushPromises()
   }
 
-  const expectReplaceAndAppendTitleAliasControls = (suggestedLabel: string) => {
+  const expectReplaceTitleAndAddAliasControls = (suggestedLabel: string) => {
     expect(getModal()?.textContent).toContain(
       `Suggested Title: ${suggestedLabel}`
     )
+    expect(getModal()?.textContent).toContain("Replace title")
+    expect(getModal()?.textContent).toContain("Add as alias")
     expect(getModal()?.querySelector('input[value="Replace"]')).toBeTruthy()
     expect(getModal()?.querySelector('input[value="Append"]')).toBeTruthy()
   }
@@ -260,7 +262,7 @@ describe("WikidataAssociationDialog", () => {
       expect(emitted?.[1]).toBeUndefined()
     })
 
-    it("shows replace and append controls when suggested title differs", async () => {
+    it("shows replace title and add alias controls when suggested title differs", async () => {
       const searchResult = makeMe.aWikidataSearchEntity
         .label("Canine")
         .id("Q11399")
@@ -274,7 +276,7 @@ describe("WikidataAssociationDialog", () => {
       selectItem.click()
       await flushPromises()
 
-      expectReplaceAndAppendTitleAliasControls("Canine")
+      expectReplaceTitleAndAddAliasControls("Canine")
     })
 
     it("emits selected with replace action", async () => {
@@ -302,7 +304,7 @@ describe("WikidataAssociationDialog", () => {
       expect(emitted?.[1]).toBe("replace")
     })
 
-    it("emits selected with append action", async () => {
+    it("emits selected with add alias action", async () => {
       const searchResult = mockSearchResult("Canine", "Q11399")
       const wrapper = mountDialog("dog")
       await flushPromises()
@@ -457,7 +459,7 @@ describe("WikidataAssociationDialog", () => {
       expect(wrapper.emitted("save")?.[0]).toEqual(["Q11399"])
     })
 
-    it("shows replace and append controls when selecting result with different title and showSaveButton is true", async () => {
+    it("shows replace title and add alias controls when selecting result with different title and showSaveButton is true", async () => {
       const searchResult = makeMe.aWikidataSearchEntity
         .label("Canine")
         .id("Q11399")
@@ -471,7 +473,7 @@ describe("WikidataAssociationDialog", () => {
       selectItem.click()
       await flushPromises()
 
-      expectReplaceAndAppendTitleAliasControls("Canine")
+      expectReplaceTitleAndAddAliasControls("Canine")
     })
 
     it("saves with replace action immediately when user selects Replace", async () => {
@@ -503,7 +505,7 @@ describe("WikidataAssociationDialog", () => {
       expect(emitted?.[1]).toBe("replace")
     })
 
-    it("saves with append action immediately when user selects Append", async () => {
+    it("saves with add alias action immediately when user selects Add as alias", async () => {
       const searchResult = mockSearchResult("Canine", "Q11399")
       const wrapper = mountDialog("dog", { showSaveButton: true })
       await flushPromises()

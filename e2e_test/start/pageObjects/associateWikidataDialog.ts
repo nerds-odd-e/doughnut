@@ -33,7 +33,7 @@ export const assumeAssociateWikidataDialog = () => {
     },
     confirmAssociationWithDifferentLabel(wikidataTitle: string) {
       withinModalContainer(() => {
-        // Wait for replace/append title alias controls and check the suggested label is visible
+        // Wait for title-choice controls and check the suggested label is visible
         cy.findByText(/Suggested Title:/)
           .should('be.visible')
           .should('contain.text', wikidataTitle)

@@ -17,23 +17,23 @@ class RecallTitleSegmentsTest {
   }
 
   @Test
-  void plain_aliases_after_primary_do_not_become_suffix_fragments() {
+  void fullwidth_slash_text_stays_in_primary_title() {
     var segments = RecallTitleSegments.from("colour／color");
 
-    assertThat(segments.primary().stem(), equalTo("colour"));
+    assertThat(segments.primary().stem(), equalTo("colour／color"));
     assertThat(segments.retainedSuffixFragments(), is(empty()));
   }
 
   @Test
-  void escaped_fullwidth_slash_keeps_primary_only_title_intact() {
+  void repeated_fullwidth_slash_stays_in_primary_title() {
     var segments = RecallTitleSegments.from("cat／／kitten");
 
-    assertThat(segments.primary().stem(), equalTo("cat／kitten"));
+    assertThat(segments.primary().stem(), equalTo("cat／／kitten"));
     assertThat(segments.retainedSuffixFragments(), is(empty()));
   }
 
   @Test
-  void ascii_slash_does_not_create_aliases() {
+  void ascii_slash_stays_in_primary_title() {
     var segments = RecallTitleSegments.from("cat / kitten");
 
     assertThat(segments.primary().stem(), equalTo("cat / kitten"));
@@ -60,12 +60,12 @@ class RecallTitleSegmentsTest {
   void mixed_plain_and_tilde_segments() {
     var segments = RecallTitleSegments.from("word／~logical／alias");
 
-    assertThat(segments.primary().stem(), equalTo("word"));
+    assertThat(segments.primary().stem(), equalTo("word／alias"));
     assertThat(segments.retainedSuffixFragments(), contains("logical"));
   }
 
   @Test
-  void primary_with_tilde_marker_is_not_a_plain_alias() {
+  void primary_keeps_its_tilde_marker() {
     var segments = RecallTitleSegments.from("~logy／~logical");
 
     assertThat(segments.primary().suffixMarker(), is(true));
@@ -77,11 +77,11 @@ class RecallTitleSegmentsTest {
   void normalizes_unicode_whitespace_in_segments() {
     var segments = RecallTitleSegments.from("nebulas ／\u00A0nebula");
 
-    assertThat(segments.primary().stem(), equalTo("nebulas"));
+    assertThat(segments.primary().stem(), equalTo("nebulas ／ nebula"));
     assertThat(segments.retainedSuffixFragments(), is(empty()));
 
     segments = RecallTitleSegments.from("cat\u3000／\u3000kitten");
-    assertThat(segments.primary().stem(), equalTo("cat"));
+    assertThat(segments.primary().stem(), equalTo("cat ／ kitten"));
     assertThat(segments.retainedSuffixFragments(), is(empty()));
   }
 }

@@ -395,11 +395,11 @@ class NoteControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void returnsCorrectWhenPrimaryTitleMatches() throws UnexpectedNoAccessRightException {
+    void returnsCorrectWhenLiteralTitleMatches() throws UnexpectedNoAccessRightException {
       Note note =
           makeMe.aNote().title("colour／color").notebookOwnedBy(currentUser.getUser()).please();
       AnswerSpellingDTO dto = new AnswerSpellingDTO();
-      dto.setSpellingAnswer("colour");
+      dto.setSpellingAnswer("colour／color");
 
       SpellingVerificationResult result = controller.verifySpelling(note, dto);
 
@@ -407,7 +407,7 @@ class NoteControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void returnsIncorrectWhenOnlyLegacyTitleAliasMatches() throws UnexpectedNoAccessRightException {
+    void returnsIncorrectWhenOnlyPartOfSlashTitleMatches() throws UnexpectedNoAccessRightException {
       Note note =
           makeMe.aNote().title("colour／color").notebookOwnedBy(currentUser.getUser()).please();
       AnswerSpellingDTO dto = new AnswerSpellingDTO();

@@ -34,7 +34,7 @@ Feature: Assimilate With Remembering Spelling
       | note_title    | spelling_input | expected_result         |
       | sedition      | sedition       | "success"               |
       | sedition      | wrong answer   | "error: wrong spelling" |
-      | colour／color | colour         | "success"               |
+      | colour／color | colour／color | "success"               |
       | colour／color | color          | "error: wrong spelling" |
 
   Scenario: Verify spelling accepts frontmatter alias

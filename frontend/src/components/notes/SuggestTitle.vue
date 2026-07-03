@@ -6,7 +6,7 @@
       scope-name="titleRadio"
       :options="[
         { value: 'Replace', label: 'Replace title' },
-        { value: 'Append', label: 'Append title' },
+        { value: 'Append', label: 'Add as alias' },
       ]"
       @update:model-value="updateModelValue"
     />

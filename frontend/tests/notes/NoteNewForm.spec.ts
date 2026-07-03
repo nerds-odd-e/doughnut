@@ -520,7 +520,7 @@ describe("adding new note", () => {
       ${"dog"}    | ${"Canine"}   | ${"Q1"}    | ${"replace"} | ${"Canine"}
       ${"dog"}    | ${"Canine"}   | ${"Q1"}    | ${"append"}  | ${"dog"}
     `(
-      "search $searchTitle get $wikidataTitle with action $titleAction appends or replaces title alias as $expectedTitle",
+      "search $searchTitle get $wikidataTitle with action $titleAction updates title as $expectedTitle",
       async ({
         searchTitle,
         wikidataTitle,

@@ -7,15 +7,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Parses note titles with grammar {@code title[／alias]*[(qualifier)]?}.
+ * Parses note titles into the literal title text, explicit cloze suffix fragments, and an optional
+ * qualifier.
  *
  * <ul>
- *   <li>{@code ／} (U+FF0F) separates aliases; {@code ／／} is a literal {@code ／}; ASCII {@code /}
- *       never separates.
- *   <li>Any leading {@code ~}/{@code 〜}/{@code ～} on a title alias or the qualifier marks a cloze
- *       suffix fragment.
+ *   <li>{@code ／} (U+FF0F) is a literal title character unless the following segment starts with
+ *       {@code ~}/{@code 〜}/{@code ～}.
+ *   <li>Marked suffix fragments participate in recall matching and cloze masking.
  *   <li>Only the last trailing bracket pair (any Unicode {@code \p{Ps}…\p{Pe}}) is the qualifier;
- *       the qualifier is a single value (no aliases).
+ *       the qualifier is a single value.
  * </ul>
  */
 public class NoteTitle {
@@ -31,9 +31,6 @@ public class NoteTitle {
     this.parsedSections = parseSections(rawTitle);
   }
 
-  /**
-   * Spelling recall: primary stem plus {@code ~} suffix fragments only (not plain title aliases).
-   */
   public boolean matchesForRecall(String answer) {
     if (rawTitle.trim().equalsIgnoreCase(answer)) {
       return true;
@@ -41,12 +38,9 @@ public class NoteTitle {
     return getRecallTitleFragments().stream().anyMatch(t -> t.matches(answer));
   }
 
-  /**
-   * Title fragments for recall answer matching and cloze masking: primary plus {@code ~} suffix
-   * fragments. Plain title aliases after the first {@code ／} segment are excluded.
-   */
+  /** Title fragments for recall answer matching and cloze masking. */
   public List<TitleFragment> getRecallTitleFragments() {
-    RecallTitleSegments.Result segments = RecallTitleSegments.from(rawTitle);
+    RecallTitleSegments.Result segments = recallTitleSegments();
     List<TitleFragment> recallFragments = new ArrayList<>();
     recallFragments.add(segments.primary());
     for (String suffixStem : segments.retainedSuffixFragments()) {
@@ -55,16 +49,16 @@ public class NoteTitle {
     return TitleFragment.sortedLongestFirst(recallFragments);
   }
 
-  /** Alias segments in title order (primary first); not sorted by length. */
-  public List<TitleFragment> getAliasSegmentsInOrder() {
-    if (parsedSections.aliasSection() == null) {
-      return List.of();
-    }
-    return splitAliases(parsedSections.aliasSection());
-  }
-
   public Optional<TitleFragment> getQualifier() {
     return Optional.ofNullable(parsedSections.qualifierSection()).map(TitleFragment::from);
+  }
+
+  private String titleText() {
+    return parsedSections.titleSection() == null ? rawTitle : parsedSections.titleSection();
+  }
+
+  RecallTitleSegments.Result recallTitleSegments() {
+    return RecallTitleSegments.fromTitleText(titleText());
   }
 
   private static ParsedSections parseSections(String rawTitle) {
@@ -75,26 +69,5 @@ public class NoteTitle {
     return new ParsedSections(matcher.group(1), matcher.group(3));
   }
 
-  private static List<TitleFragment> splitAliases(String text) {
-    List<String> rawSegments = new ArrayList<>();
-    StringBuilder current = new StringBuilder();
-    for (int i = 0; i < text.length(); i++) {
-      char character = text.charAt(i);
-      if (character == '／') {
-        if (i + 1 < text.length() && text.charAt(i + 1) == '／') {
-          current.append('／');
-          i++;
-        } else {
-          rawSegments.add(current.toString());
-          current = new StringBuilder();
-        }
-      } else {
-        current.append(character);
-      }
-    }
-    rawSegments.add(current.toString());
-    return rawSegments.stream().map(TitleFragment::from).toList();
-  }
-
-  private record ParsedSections(String aliasSection, String qualifierSection) {}
+  private record ParsedSections(String titleSection, String qualifierSection) {}
 }
