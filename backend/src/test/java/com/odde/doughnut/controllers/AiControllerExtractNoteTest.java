@@ -1,12 +1,11 @@
 package com.odde.doughnut.controllers;
 
+import static com.odde.doughnut.controllers.AiControllerExtractNoteTestSupport.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.NoteRealm;
-import com.odde.doughnut.controllers.dto.NoteRefinementLayoutSelectionRequestDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -18,19 +17,14 @@ import com.openai.client.OpenAIClient;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.web.server.ResponseStatusException;
 
 class AiControllerExtractNoteTest extends ControllerTestBase {
   @Autowired AiController controller;
@@ -53,12 +47,6 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
       openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
     }
 
-    private Note newRootNoteWithExtractableContent() {
-      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      note.setContent("Original content with a key suggestion to extract.");
-      return note;
-    }
-
     private NoteRefinementLayout sampleLayout() {
       return new NoteRefinementLayout(
           List.of(
@@ -72,32 +60,19 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
               new NoteRefinementLayoutItem("p2", "Other point", false, List.of())));
     }
 
-    private NoteRefinementLayout layoutWithItem(String id, String text) {
-      return new NoteRefinementLayout(
-          List.of(new NoteRefinementLayoutItem(id, text, false, List.of())));
-    }
-
-    private NoteRefinementLayoutSelectionRequestDTO layoutSelectionRequest(
-        NoteRefinementLayout layout, List<String> selectedItemIds) {
-      NoteRefinementLayoutSelectionRequestDTO requestDTO =
-          new NoteRefinementLayoutSelectionRequestDTO();
-      requestDTO.setLayout(layout);
-      requestDTO.setSelectedItemIds(selectedItemIds);
-      return requestDTO;
-    }
-
-    private void stubExtractionResult(String newTitle, String newContent, String updatedParent) {
+    private void stubExtractionResult(
+        String newTitle, String newContent, String updatedOriginalNote) {
       NoteExtractionResult aiResult = new NoteExtractionResult();
       aiResult.setNewNoteTitle(newTitle);
       aiResult.setNewNoteContent(newContent);
-      aiResult.setUpdatedParentContent(updatedParent);
+      aiResult.setUpdatedOriginalNoteContent(updatedOriginalNote);
       openAiStructuredResponseMock.stubStructuredResponse(aiResult);
     }
 
     @Test
     void shouldCallExtractNoteWithStructuredInstructions()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
-      Note testNote = newRootNoteWithExtractableContent();
+      Note testNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
       stubExtractionResult(
           "Extracted Note", "Expanded content for the new note.", "Updated parent with summary.");
       NoteRefinementLayout layout = sampleLayout();
@@ -117,7 +92,14 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
       assertThat(instructions).contains("[p1-1, p2]");
       assertThat(instructions).contains("- p1-1: \"key suggestion to extract\"");
       assertThat(instructions).contains("- p2: \"Other point\"");
-      assertThat(instructions).contains("wiki link from the original note");
+      assertThat(instructions)
+          .contains(
+              "Prefer replacing the removed content in the original note with a natural contextual wiki link to the new note");
+      assertThat(instructions)
+          .contains(
+              "Do not add YAML frontmatter or metadata properties, such as parent:, merely to backlink the new note to the original note");
+      assertThat(instructions)
+          .contains("Never use a generic parent property as the default extraction relationship");
       assertThat(instructions).contains("Wiki links are case-insensitive");
       assertThat(instructions).contains("[[Canonical Note Title|visible text]]");
       assertThat(instructions).contains("alreadyExtracted");
@@ -140,7 +122,7 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
                 .content("Original content with a key suggestion to extract.")
                 .please();
       } else {
-        sourceNote = newRootNoteWithExtractableContent();
+        sourceNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
       }
 
       stubExtractionResult(
@@ -164,7 +146,7 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
     @Test
     void shouldSanitizePathSeparatorsInExtractedNoteTitleAndWikiLinks()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
-      Note testNote = newRootNoteWithExtractableContent();
+      Note testNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
       stubExtractionResult(
           "foo/bar: baz",
           "See [[foo/bar: baz|link]] and [[MyNb:foo/bar|nb]].",
@@ -185,7 +167,7 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
     @Test
     void shouldTrimSurroundingWhitespaceFromExtractedNoteTitle()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
-      Note testNote = newRootNoteWithExtractableContent();
+      Note testNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
       stubExtractionResult("\u3000Extracted Note\u3000", "Expanded content.", "Updated parent.");
       NoteRefinementLayout layout = layoutWithItem("p1", "key suggestion to extract");
 
@@ -222,65 +204,5 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
                       && wikiTitle.getDisplayText().equals("the original note")
                       && wikiTitle.getNoteId().equals(testNote.getId()));
     }
-
-    @Test
-    void shouldRequireUserToBeLoggedIn() {
-      Note testNote = newRootNoteWithExtractableContent();
-      currentUser.setUser(null);
-      NoteRefinementLayout layout = layoutWithItem("p1", "a suggestion");
-      assertThrows(
-          ResponseStatusException.class,
-          () -> controller.extractNote(testNote, layoutSelectionRequest(layout, List.of("p1"))));
-    }
-
-    static Stream<List<String>> invalidSelectedItemIds() {
-      return Stream.of(null, List.of(), List.of("missing-id"));
-    }
-
-    @ParameterizedTest
-    @MethodSource("invalidSelectedItemIds")
-    void shouldRejectInvalidSelectedItemIds(List<String> selectedItemIds) {
-      Note testNote = newRootNoteWithExtractableContent();
-      NoteRefinementLayout layout = layoutWithItem("p1", "a suggestion");
-      assertResponseStatus(
-          () -> controller.extractNote(testNote, layoutSelectionRequest(layout, selectedItemIds)),
-          HttpStatus.BAD_REQUEST);
-    }
-
-    @Test
-    void shouldRejectInvalidLayout() {
-      Note testNote = newRootNoteWithExtractableContent();
-      NoteRefinementLayout layout =
-          new NoteRefinementLayout(
-              List.of(new NoteRefinementLayoutItem("", "a suggestion", false, List.of())));
-      assertResponseStatus(
-          () -> controller.extractNote(testNote, layoutSelectionRequest(layout, List.of("p1"))),
-          HttpStatus.BAD_REQUEST);
-    }
-
-    @Test
-    void shouldThrowWhenAiReturnsNull() {
-      Note testNote = newRootNoteWithExtractableContent();
-      openAiStructuredResponseMock.stubStructuredResponse(null);
-      NoteRefinementLayout layout = layoutWithItem("p1", "a suggestion");
-      assertResponseStatus(
-          () -> controller.extractNote(testNote, layoutSelectionRequest(layout, List.of("p1"))),
-          HttpStatus.SERVICE_UNAVAILABLE);
-    }
-
-    @Test
-    void shouldRejectBlankNoteContent() {
-      Note testNote = newRootNoteWithExtractableContent();
-      testNote.setContent("");
-      NoteRefinementLayout layout = layoutWithItem("p1", "a suggestion");
-      assertResponseStatus(
-          () -> controller.extractNote(testNote, layoutSelectionRequest(layout, List.of("p1"))),
-          HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  private static void assertResponseStatus(Executable action, HttpStatus expected) {
-    assertThat(assertThrows(ResponseStatusException.class, action).getStatusCode())
-        .isEqualTo(expected);
   }
 }

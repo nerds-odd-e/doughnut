@@ -77,8 +77,8 @@ public class AiNoteAutomationService {
     result.newNoteTitle = DisplayNamePathSeparators.normalizeDisplayName(result.newNoteTitle);
     result.newNoteContent =
         WikiLinkMarkdown.sanitizePathSeparatorsInWikiLinks(result.newNoteContent);
-    result.updatedParentContent =
-        WikiLinkMarkdown.sanitizePathSeparatorsInWikiLinks(result.updatedParentContent);
+    result.updatedOriginalNoteContent =
+        WikiLinkMarkdown.sanitizePathSeparatorsInWikiLinks(result.updatedOriginalNoteContent);
     return result;
   }
 

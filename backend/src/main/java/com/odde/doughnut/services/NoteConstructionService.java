@@ -129,13 +129,13 @@ public class NoteConstructionService {
     Note newNote =
         createNote(originalNote.getNotebook(), originalNote.getFolder(), aiResult.newNoteTitle);
     AuthoredNoteContent.assertAliasesValidForSave(aiResult.newNoteContent);
-    AuthoredNoteContent.assertAliasesValidForSave(aiResult.updatedParentContent);
+    AuthoredNoteContent.assertAliasesValidForSave(aiResult.updatedOriginalNoteContent);
     newNote.setContent(aiResult.newNoteContent);
     newNote.setUpdatedAt(currentUTCTimestamp);
     entityPersister.save(newNote);
 
     originalNote.setUpdatedAt(currentUTCTimestamp);
-    originalNote.setContent(aiResult.updatedParentContent);
+    originalNote.setContent(aiResult.updatedOriginalNoteContent);
     entityPersister.save(originalNote);
 
     noteService.deleteOrphanImagesForPersistedContent(newNote);

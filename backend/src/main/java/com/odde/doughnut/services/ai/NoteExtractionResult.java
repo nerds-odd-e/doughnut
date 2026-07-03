@@ -28,5 +28,5 @@ public class NoteExtractionResult {
   @JsonPropertyDescription(
       "The updated content for the original note with the extracted content removed or summarized")
   @JsonProperty(required = true)
-  public String updatedParentContent;
+  public String updatedOriginalNoteContent;
 }
