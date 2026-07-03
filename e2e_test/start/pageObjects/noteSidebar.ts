@@ -49,23 +49,31 @@ function openSidebarIfCollapsed() {
   cy.get('aside').should('be.visible')
 }
 
-const sidebarAddNoteButton = (buttonName?: string) => {
-  const getButton = () =>
-    cy.get('aside').findByRole('button', {
-      name: buttonName ?? 'New note',
-    })
+const sidebarToolbarButton = (
+  selector: () => Cypress.Chainable<JQuery<HTMLElement>>
+) => {
   return {
     click: () => {
-      getButton().click({ force: true })
+      selector().click({ force: true })
       return noteCreationForm
     },
-    shouldNotExist: () => getButton().should('not.exist'),
+    shouldNotExist: () => selector().should('not.exist'),
   }
 }
 
+const sidebarAddNoteButton = () =>
+  sidebarToolbarButton(() =>
+    cy.get('aside [data-testid="note-creation-new-button"] button')
+  )
+
+const sidebarAddFolderButton = () =>
+  sidebarToolbarButton(() =>
+    cy.get('aside').findByRole('button', { name: 'New folder' })
+  )
+
 function newNoteSidebarButton() {
   pageIsNotLoading()
-  return sidebarAddNoteButton('New note')
+  return sidebarAddNoteButton()
 }
 
 export const noteSidebar = () => {
@@ -105,7 +113,7 @@ export const noteSidebar = () => {
     addingChildNoteButton: newNoteSidebarButton,
 
     addingChildNote() {
-      sidebarAddNoteButton('New note').click()
+      sidebarAddNoteButton().click()
       return noteCreationForm
     },
 
@@ -172,7 +180,7 @@ export const noteSidebar = () => {
 
     addingNewFolderFromToolbar() {
       pageIsNotLoading()
-      sidebarAddNoteButton('New folder').click()
+      sidebarAddFolderButton().click()
       return noteCreationForm
     },
 
