@@ -8,7 +8,7 @@ import { questionListPage } from './questionListPage'
 
 const titles = {
   assimilation: 'Assimilation settings',
-  delete: 'Delete note',
+  delete: 'Delete note (d)',
   questions: 'Questions for the note',
   overflowMenu: 'more options',
 } as const
