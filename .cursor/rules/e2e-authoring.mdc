@@ -28,7 +28,7 @@ CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/ai_gene
 Important notes:
 
 - Do not use `cypress run -- --spec`; the empty `--` causes the `--spec` parameter to be ignored.
-- The default tag filter is `TAGS` in `e2e_test/config/ci.ts`, for example `not @ignore`. Override per run with `--env TAGS='...'` when needed.
+- The default tag filter is `tags` in `e2e_test/config/ci.ts`, for example `not @ignore`. Override per run with `--env tags='...'` when needed.
 - `@focus` and `@only` are local debugging aids only. Do not commit them; CI runs `./scripts/check_focus_tags.sh` on `.feature` files to block `@focus`, and `@only` should be treated the same.
 - If any node in a feature file is tagged `@focus` or `@only`, `@badeball/cypress-cucumber-preprocessor` filters scenarios in that file to `@focus or @only` only.
 
