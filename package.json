@@ -83,7 +83,7 @@
   },
   "devDependencies": {
     "@anev/ts-mountebank": "1.8.0",
-    "@badeball/cypress-cucumber-preprocessor": "^25.0.0",
+    "@badeball/cypress-cucumber-preprocessor": "^26.0.0",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.8",
     "@biomejs/biome": "2.5.2",
     "@cucumber/cucumber": "^13.0.0",
