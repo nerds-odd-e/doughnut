@@ -47,7 +47,7 @@ doughnut_needs_pnpm_install() {
 # Setup PNPM and Biome
 setup_pnpm_and_biome() {
   log "Setting up PNPM..."
-  # pnpm is provided by the nix dev shell (flake.nix pins 11.9.0 under nodejs_26).
+  # pnpm is provided by the nix dev shell (flake.nix pins 11.10.0 under nodejs_26).
   # Node 26 dropped bundled corepack, so we no longer activate pnpm via corepack.
   if doughnut_needs_pnpm_install; then
     pnpm --frozen-lockfile recursive install && doughnut_workspace_deps_fingerprint >"${PWD}/${DOUGHNUT_PNPM_FINGERPRINT_FILE}"
