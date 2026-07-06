@@ -83,7 +83,7 @@
   },
   "devDependencies": {
     "@anev/ts-mountebank": "1.8.0",
-    "@badeball/cypress-cucumber-preprocessor": "^25.0.0",
+    "@badeball/cypress-cucumber-preprocessor": "^26.0.0",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.8",
     "@biomejs/biome": "2.5.2",
     "@cucumber/cucumber": "^13.0.0",
@@ -99,7 +99,7 @@
     "cypress": "15.18.0",
     "cypress-file-upload": "^5.0.8",
     "github_action_sound": "^1.0.8",
-    "got": "^15.0.7",
+    "got": "^15.1.0",
     "hono": "4.12.27",
     "npm-run-all2": "^9.0.2",
     "process": "^0.11.10",

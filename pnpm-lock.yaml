@@ -65,8 +65,8 @@ importers:
         specifier: 1.8.0
         version: 1.8.0
       '@badeball/cypress-cucumber-preprocessor':
-        specifier: ^25.0.0
-        version: 25.0.0(@babel/core@7.29.7)(cypress@15.18.0)(typescript@6.0.3)
+        specifier: ^26.0.0
+        version: 26.0.0(@babel/core@7.29.7)(cypress@15.18.0)(typescript@6.0.3)
       '@bahmutov/cypress-esbuild-preprocessor':
         specifier: ^2.2.8
         version: 2.2.8(esbuild@0.28.1)
@@ -113,8 +113,8 @@ importers:
         specifier: ^1.0.8
         version: 1.0.8(canvas@3.2.3)
       got:
-        specifier: ^15.0.7
-        version: 15.0.7
+        specifier: ^15.1.0
+        version: 15.1.0
       hono:
         specifier: 4.12.27
         version: 4.12.27
@@ -641,12 +641,12 @@ packages:
     resolution: {integrity: sha512-K8ponJDxBwDHigkeFqaqT5wLGl4bTlwMafR8k7b5CPxr6Ww+UG9ls8Yx6Tcpboxu97eeGVEEyKcHmEyOwN1vSw==}
     engines: {node: ^22.18.0 || >=24.11.0}
 
-  '@badeball/cypress-cucumber-preprocessor@25.0.0':
-    resolution: {integrity: sha512-cZ8aeamjatUub3lj3qiTD6d0ITnrwoquxYP6vfj426kQ8Obc79uBaJHVGCQA6wt680uolDlZo104XVDw/W9r6w==}
+  '@badeball/cypress-cucumber-preprocessor@26.0.0':
+    resolution: {integrity: sha512-pAY1MrN/H0DztwQkLoiRA8GSduDiJOjCD17Tn525v3GxL5pzXSXsQoalzo77jCVXg8CAl75QoZ/5PsJF34WPsA==}
     engines: {node: ^20.12.0 || ^21.7.0 || >=22}
     hasBin: true
     peerDependencies:
-      cypress: ^12.0.0 || ^13.0.0 || ^14.0.0 || >=15.0.0 <=15.17.0
+      cypress: ^12.0.0 || ^13.0.0 || ^14.0.0 || >=15.0.0 <=15.17.0 || ^15.18.0
 
   '@bahmutov/cypress-esbuild-preprocessor@2.2.8':
     resolution: {integrity: sha512-pN90es4T1DYcQbBuDEpa7yotC/VhE+BgfHIEGpS0uxibTIqt7g4ZITQZbTFcaQATZh3QmPIMMkeZyBE7PWf1LA==}
@@ -3765,8 +3765,8 @@ packages:
     resolution: {integrity: sha512-6tfZ91bOr7bOXnK7PRDCGBLa1H4U080YHNaAQ2KsMGlLEzRbk44nsZF2E1IeRc3vtJHPVbKCYgdFbaGO2ljd8g==}
     engines: {node: '>=10.19.0'}
 
-  got@15.0.7:
-    resolution: {integrity: sha512-HA4XUhL2xk0/sA4l3zRyOzfqPtDEiVYpzDae56WLX2aHZYF6v6hjTnuDvURIdznSTPFYW1JUdlREhZjGAF9LCQ==}
+  got@15.1.0:
+    resolution: {integrity: sha512-DG+DAAkRtno+oDr/GBsliAkhN9+zczOPM5qXk3efDZY3qvyRnZU+NwQlb/IOY6cSnxxTR9z3aHCcShJyjb0hJA==}
     engines: {node: '>=22'}
 
   graceful-fs@4.2.11:
@@ -6808,7 +6808,7 @@ snapshots:
       '@babel/helper-string-parser': 8.0.0
       '@babel/helper-validator-identifier': 8.0.2
 
-  '@badeball/cypress-cucumber-preprocessor@25.0.0(@babel/core@7.29.7)(cypress@15.18.0)(typescript@6.0.3)':
+  '@badeball/cypress-cucumber-preprocessor@26.0.0(@babel/core@7.29.7)(cypress@15.18.0)(typescript@6.0.3)':
     dependencies:
       '@cucumber/ci-environment': 14.0.0
       '@cucumber/cucumber': 13.0.0
@@ -6984,7 +6984,7 @@ snapshots:
 
   '@cucumber/gherkin@41.0.0':
     dependencies:
-      '@cucumber/messages': 32.3.1
+      '@cucumber/messages': 33.0.4
 
   '@cucumber/html-formatter@23.1.0(@cucumber/messages@32.3.1)':
     dependencies:
@@ -10016,7 +10016,7 @@ snapshots:
       p-cancelable: 2.1.1
       responselike: 2.0.1
 
-  got@15.0.7:
+  got@15.1.0:
     dependencies:
       '@sindresorhus/is': 8.1.0
       byte-counter: 0.1.0
