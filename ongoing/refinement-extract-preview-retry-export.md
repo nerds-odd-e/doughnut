@@ -216,7 +216,7 @@ Phase **5b** still adds `@Transactional(readOnly = true)` for consistency with o
 focus-context endpoints, but the E2E net is now a **green regression guard**, not a red bug repro.
 Remove `@wip` in 5b once transactional fix lands.
 
-**5b — Behavior (green): make the export endpoints transactional.**
+**5b — Behavior (green): make the export endpoints transactional.** ✅
 Add `@Transactional(readOnly = true)` to both export endpoints in `AiController`. Rerun the two
 scenarios; remove `@wip` once they pass. No unit-test change (existing ones already pass under
 their ambient transaction).
@@ -285,7 +285,7 @@ _Green: no behavior change; specs unchanged (update selectors/names only if refe
 - Phase 4 (export breakdown request): ✅ complete (4a–4b)
 
 Extended phases (review fixes):
-- Phase 5 (export transaction bug): 5a ✅, 5b — planned (5a Jidoka: scenarios passed green, bug not reproduced with simple test data)
+- Phase 5 (export transaction bug): ✅ complete (5a–5b; 5a Jidoka: scenarios passed green, bug not reproduced with simple test data)
 - Phase 6 (blank-title guard): 6a — planned
 - Phase 7 (export dialog loading state): 7a — planned
 - Phase 8 (unify preview error UX): 8a — planned

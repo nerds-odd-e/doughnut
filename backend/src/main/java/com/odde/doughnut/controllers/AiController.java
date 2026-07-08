@@ -151,6 +151,7 @@ public class AiController {
       description =
           "Returns the OpenAI structured-response request body for note refinement layout generation (breakdown) without calling OpenAI.")
   @GetMapping("/export-refinement-layout-request/{note}")
+  @Transactional(readOnly = true)
   public Map<String, Object> exportRefinementLayoutRequest(
       @PathVariable(value = "note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
@@ -168,6 +169,7 @@ public class AiController {
       description =
           "Returns the OpenAI structured-response request body for note extraction without calling OpenAI.")
   @PostMapping("/export-extract-request/{note}")
+  @Transactional(readOnly = true)
   public Map<String, Object> exportExtractRequest(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
       @RequestBody NoteRefinementLayoutSelectionRequestDTO request)
