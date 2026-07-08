@@ -156,7 +156,7 @@ _Green: additive; no UI yet._
 
 **Learning:** `buildExtractNoteRequest` is exposed on `AiNoteAutomationService` and delegated through `NoteAutomationService`. Export reuses layout+selection validation from preview; schema lives at `text.format.schema` in the body map.
 
-**3b — Structure (frontend): a reusable AI-request export dialog.**
+**3b — Structure (frontend): a reusable AI-request export dialog.** ✅
 Generalize the question-export dialog into a shared component that renders arbitrary AI-request
 JSON (read-only textarea + copy), keeping `QuestionExportDialog` behavior and its existing test
 green.
@@ -192,5 +192,5 @@ shared dialog with the layout-generation JSON. Frontend spec for the button + di
 
 - Phase 1 (extract preview + create): ✅ complete (1a–1d)
 - Phase 2 (retry): ✅ complete (2a–2b)
-- Phase 3 (export extract request): 3a ✅, 3b, 3c — planned
+- Phase 3 (export extract request): 3a ✅, 3b ✅, 3c — planned
 - Phase 4 (export breakdown request): 4a, 4b — planned

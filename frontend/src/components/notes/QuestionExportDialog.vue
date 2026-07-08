@@ -1,35 +1,13 @@
 <template>
-  <Modal @close_request="$emit('close')">
-    <template #body>
-      <div class="daisy-card">
-        <div class="daisy-card-body">
-          <h3 class="daisy-card-title">Export Question Generation Request for ChatGPT</h3>
-          <div class="mt-4">
-            <textarea
-              class="daisy-textarea w-full h-96 bg-base-100 font-mono text-xs"
-              readonly
-              :value="exportContent"
-              data-testid="export-textarea"
-            />
-            <div class="flex gap-2 justify-end mt-2">
-              <CopyButton
-                :text="exportContent"
-                :disabled="!exportContent"
-                test-id="copy-export-btn"
-                aria-label="Copy to clipboard"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </template>
-  </Modal>
+  <AiRequestExportDialog
+    title="Export Question Generation Request for ChatGPT"
+    :fetch-export="fetchQuestionExport"
+    @close="$emit('close')"
+  />
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
-import Modal from "@/components/commons/Modal.vue"
-import CopyButton from "@/components/commons/CopyButton.vue"
+import AiRequestExportDialog from "@/components/commons/AiRequestExportDialog.vue"
 import { PredefinedQuestionController } from "@generated/doughnut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 
@@ -37,22 +15,18 @@ const props = defineProps<{
   noteId: number
 }>()
 
-const emit = defineEmits<{
+defineEmits<{
   (e: "close"): void
 }>()
 
-const exportContent = ref("")
-
-onMounted(async () => {
+async function fetchQuestionExport() {
   const { data: response, error } =
     await PredefinedQuestionController.exportQuestionGeneration({
       path: { note: props.noteId },
     })
   if (!error && response) {
-    exportContent.value = JSON.stringify(response, null, 2)
-  } else {
-    exportContent.value = "Failed to load export content"
+    return response
   }
-})
+  return null
+}
 </script>
-
