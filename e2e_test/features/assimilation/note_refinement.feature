@@ -58,9 +58,19 @@ Feature: Note refinement
       | C    | 2     | true             |
       | D    | 1     |                  |
       | E    | 1     |                  |
-    And I extract refinement layout points "B" and "D" to a new note
+    And I open extraction preview for refinement layout points "B" and "D"
+    And I create the note from the extraction preview
     Then the note title should be "Point B and D"
     And I should see folder "Sample tree/Context" containing these notes:
       | note-title    |
       | Sample        |
       | Point B and D |
+
+  Scenario: Save edited extraction preview content
+    Given OpenAI will extract layout points "B and D" to a new note with title "Point B and D" and content "Combined B and D" and updated parent content "A. C. E."
+    When I am assimilating the note "Sample"
+    And I open extraction preview for refinement layout points "B" and "D"
+    And I edit the extraction preview to title "Edited B and D" and content "Edited combined content" and updated parent content "A. C. E. edited"
+    And I create the note from the extraction preview
+    Then the note title should be "Edited B and D"
+    And I should see note "Sample tree/Context/Sample" has content "A. C. E. edited"

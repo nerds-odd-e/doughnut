@@ -41,6 +41,12 @@ export const refinementLayoutPanel = () =>
 export const removeRefinementLayoutButton = () =>
   refinementLayoutPanel().find('[data-test-id="remove-refinement-layout"]')
 
+export const waitForExtractNotePreview = () => {
+  cy.contains('p.loading-message', 'AI is generating preview...', {
+    timeout: 15000,
+  }).should('not.exist')
+}
+
 export const waitForExtractNote = () => {
   cy.contains('p.loading-message', 'AI is creating note...', {
     timeout: 15000,

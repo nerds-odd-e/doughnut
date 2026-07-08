@@ -10,12 +10,16 @@ import {
   wrapSdkError,
 } from "@tests/helpers"
 import {
+  createNoteFromExtractionPreview,
   extractNoteButtonTitle,
+  extractionPreviewApiCall,
   mountNoteRefinement,
   mountNoteRefinementWithLayout,
   note,
+  openExtractionPreview,
   refinementLayoutSelectionApiCall,
   refinementLayoutItems,
+  sampleExtractionPreview,
   selectRefinementLayoutItem,
   setupNoteRefinementTests,
 } from "./noteRefinementTestSupport"
@@ -55,41 +59,114 @@ describe("NoteRefinement extract note", () => {
       expect(extractButtons).toHaveLength(1)
     })
 
-    it("extracts the selected layout point and navigates to the new note", async () => {
-      const createdRealm = makeMe.aNoteRealm.please()
-      const extractNoteSpy = mockSdkService(
+    it("shows an editable preview after extracting selected layout points", async () => {
+      const preview = sampleExtractionPreview({
+        newNoteTitle: "Point 2 title",
+        newNoteContent: "Point 2 content",
+        updatedOriginalNoteContent: "Remaining content",
+      })
+      const extractNotePreviewSpy = mockSdkService(
         AiController,
-        "extractNote",
-        createdRealm
+        "extractNotePreview",
+        preview
       )
       const wrapper = mountNoteRefinement(["Point 1", "Point 2", "Point 3"])
       await flushPromises()
 
-      await selectRefinementLayoutItem(wrapper, "p2")
-      await wrapper
-        .find(`button[title="${extractNoteButtonTitle}"]`)
-        .trigger("click")
-      await flushPromises()
+      await openExtractionPreview(wrapper, "p2")
 
-      expect(extractNoteSpy).toHaveBeenCalledWith(
+      expect(extractNotePreviewSpy).toHaveBeenCalledWith(
         refinementLayoutSelectionApiCall(
           note.id,
           refinementLayoutItems(["Point 1", "Point 2", "Point 3"]),
           ["p2"]
         )
       )
-      expect(wrapper.findAll("li")).toHaveLength(3)
+      expect(wrapper.find('[data-test-id="extraction-preview"]').exists()).toBe(
+        true
+      )
+      expect(
+        (
+          wrapper.find('[data-test-id="extraction-preview-new-title"]')
+            .element as HTMLTextAreaElement
+        ).value
+      ).toBe("Point 2 title")
+      expect(
+        (
+          wrapper.find('[data-test-id="extraction-preview-new-content"]')
+            .element as HTMLTextAreaElement
+        ).value
+      ).toBe("Point 2 content")
+      expect(
+        (
+          wrapper.find('[data-test-id="extraction-preview-original-content"]')
+            .element as HTMLTextAreaElement
+        ).value
+      ).toBe("Remaining content")
+      expect(wrapper.findAll("li")).toHaveLength(0)
+    })
+
+    it("creates a note from the preview and navigates to the new note", async () => {
+      const preview = sampleExtractionPreview()
+      const createdRealm = makeMe.aNoteRealm.please()
+      mockSdkService(AiController, "extractNotePreview", preview)
+      const createExtractedNoteSpy = mockSdkService(
+        AiController,
+        "createExtractedNote",
+        createdRealm
+      )
+      const wrapper = mountNoteRefinement(["Point 1", "Point 2", "Point 3"])
+      await flushPromises()
+
+      await openExtractionPreview(wrapper, "p2")
+      await createNoteFromExtractionPreview(wrapper)
+
+      expect(createExtractedNoteSpy).toHaveBeenCalledWith(
+        extractionPreviewApiCall(note.id, preview)
+      )
       expect(routerReplace).toHaveBeenCalledWith(
         noteShowLocation(createdRealm.id)
       )
     })
 
-    it("extracts multiple selected layout points into one note", async () => {
+    it("creates a note from edited preview fields", async () => {
+      const preview = sampleExtractionPreview()
       const createdRealm = makeMe.aNoteRealm.please()
-      const extractNoteSpy = mockSdkService(
+      mockSdkService(AiController, "extractNotePreview", preview)
+      const createExtractedNoteSpy = mockSdkService(
         AiController,
-        "extractNote",
+        "createExtractedNote",
         createdRealm
+      )
+      const wrapper = mountNoteRefinement(["Point 1", "Point 2", "Point 3"])
+      await flushPromises()
+
+      await openExtractionPreview(wrapper, "p2")
+      await wrapper
+        .find('[data-test-id="extraction-preview-new-title"]')
+        .setValue("Edited title")
+      await wrapper
+        .find('[data-test-id="extraction-preview-new-content"]')
+        .setValue("Edited content")
+      await wrapper
+        .find('[data-test-id="extraction-preview-original-content"]')
+        .setValue("Edited original content")
+      await createNoteFromExtractionPreview(wrapper)
+
+      expect(createExtractedNoteSpy).toHaveBeenCalledWith(
+        extractionPreviewApiCall(note.id, {
+          newNoteTitle: "Edited title",
+          newNoteContent: "Edited content",
+          updatedOriginalNoteContent: "Edited original content",
+        })
+      )
+    })
+
+    it("extracts multiple selected layout points into one preview", async () => {
+      const extractNotePreviewSpy = mockSdkService(
+        AiController,
+        "extractNotePreview",
+        sampleExtractionPreview()
       )
       const layout = refinementLayoutItems(["Point 1", "Point 2", "Point 3"])
       const wrapper = mountNoteRefinementWithLayout(layout)
@@ -102,18 +179,42 @@ describe("NoteRefinement extract note", () => {
         .trigger("click")
       await flushPromises()
 
-      expect(extractNoteSpy).toHaveBeenCalledWith(
+      expect(extractNotePreviewSpy).toHaveBeenCalledWith(
         refinementLayoutSelectionApiCall(note.id, layout, ["p1", "p3"])
       )
-      expect(routerReplace).toHaveBeenCalledWith(
-        noteShowLocation(createdRealm.id)
+      expect(wrapper.find('[data-test-id="extraction-preview"]').exists()).toBe(
+        true
       )
     })
 
-    it("keeps layout point in list when API fails", async () => {
-      mockSdkService(AiController, "extractNote", undefined).mockResolvedValue(
-        wrapSdkError("API Error")
+    it("returns to the layout when Back is clicked", async () => {
+      mockSdkService(
+        AiController,
+        "extractNotePreview",
+        sampleExtractionPreview()
       )
+      const wrapper = mountNoteRefinement(["Test Point"])
+      await flushPromises()
+
+      await openExtractionPreview(wrapper, "p1")
+      await wrapper
+        .find('[data-test-id="extraction-preview-back"]')
+        .trigger("click")
+      await flushPromises()
+
+      expect(wrapper.find('[data-test-id="extraction-preview"]').exists()).toBe(
+        false
+      )
+      expect(wrapper.findAll("li")).toHaveLength(1)
+      expect(wrapper.text()).toContain("Test Point")
+    })
+
+    it("keeps layout visible when preview API fails", async () => {
+      mockSdkService(
+        AiController,
+        "extractNotePreview",
+        undefined
+      ).mockResolvedValue(wrapSdkError("API Error"))
       const wrapper = mountNoteRefinement(["Test Point"])
       await flushPromises()
 
@@ -123,23 +224,52 @@ describe("NoteRefinement extract note", () => {
         .trigger("click")
       await flushPromises()
 
+      expect(wrapper.find('[data-test-id="extraction-preview"]').exists()).toBe(
+        false
+      )
       expect(wrapper.findAll("li")).toHaveLength(1)
       expect(wrapper.text()).toContain("Test Point")
+    })
+
+    it("shows create errors in the preview", async () => {
+      mockSdkService(
+        AiController,
+        "extractNotePreview",
+        sampleExtractionPreview()
+      )
+      mockSdkService(
+        AiController,
+        "createExtractedNote",
+        undefined
+      ).mockResolvedValue(wrapSdkError({ message: "Title is reserved" }))
+      const wrapper = mountNoteRefinement(["Test Point"])
+      await flushPromises()
+
+      await openExtractionPreview(wrapper, "p1")
+      await createNoteFromExtractionPreview(wrapper)
+
+      expect(wrapper.find('[data-test-id="extraction-preview"]').exists()).toBe(
+        true
+      )
+      expect(
+        wrapper.find('[data-test-id="extraction-preview-error"]').text()
+      ).toBe("Title is reserved")
+      expect(routerReplace).not.toHaveBeenCalled()
     })
   })
 
   describe("loading modal", () => {
-    it("shows LoadingModal while extracting note", async () => {
+    it("shows LoadingModal while generating extract preview", async () => {
       let resolveApi: () => void
       const apiPromise = new Promise<void>((r) => {
         resolveApi = r
       })
       mockSdkServiceWithImplementation(
         AiController,
-        "extractNote",
+        "extractNotePreview",
         async () => {
           await apiPromise
-          return makeMe.aNoteRealm.please()
+          return sampleExtractionPreview()
         }
       )
       const wrapper = mountNoteRefinement(["Test layout point"])
@@ -152,20 +282,54 @@ describe("NoteRefinement extract note", () => {
       await nextTick()
 
       expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
+      expect(document.body.textContent).toContain("AI is generating preview...")
+      resolveApi!()
+      await flushPromises()
+      expect(document.querySelector(".loading-modal-mask")).toBeNull()
+    })
+
+    it("shows LoadingModal while creating note from preview", async () => {
+      let resolveApi: () => void
+      const apiPromise = new Promise<void>((r) => {
+        resolveApi = r
+      })
+      mockSdkService(
+        AiController,
+        "extractNotePreview",
+        sampleExtractionPreview()
+      )
+      mockSdkServiceWithImplementation(
+        AiController,
+        "createExtractedNote",
+        async () => {
+          await apiPromise
+          return makeMe.aNoteRealm.please()
+        }
+      )
+      const wrapper = mountNoteRefinement(["Test layout point"])
+      await flushPromises()
+
+      await openExtractionPreview(wrapper, "p1")
+      await wrapper
+        .find('[data-test-id="extraction-preview-create"]')
+        .trigger("click")
+      await nextTick()
+
+      expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
       expect(document.body.textContent).toContain("AI is creating note...")
       resolveApi!()
       await flushPromises()
       expect(document.querySelector(".loading-modal-mask")).toBeNull()
     })
 
-    it("hides LoadingModal when API fails", async () => {
+    it("hides LoadingModal when preview API fails", async () => {
       let resolveApi: () => void
       const apiGate = new Promise<void>((r) => {
         resolveApi = r
       })
       mockSdkServiceWithImplementation(
         AiController,
-        "extractNote",
+        "extractNotePreview",
         async () => {
           await apiGate
           return wrapSdkError({})

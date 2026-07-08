@@ -828,6 +828,34 @@ When(
   }
 )
 
+When(
+  'I open extraction preview for refinement layout points {string} and {string}',
+  (firstPoint: string, secondPoint: string) => {
+    start
+      .assumeAssimilationPage()
+      .openExtractionPreviewForLayoutPoints(firstPoint, secondPoint)
+  }
+)
+
+When('I create the note from the extraction preview', () => {
+  start.assumeAssimilationPage().createNoteFromExtractionPreview()
+})
+
+When(
+  'I edit the extraction preview to title {string} and content {string} and updated parent content {string}',
+  (
+    newNoteTitle: string,
+    newNoteContent: string,
+    updatedOriginalNoteContent: string
+  ) => {
+    start.assumeAssimilationPage().editExtractionPreviewFields({
+      newNoteTitle,
+      newNoteContent,
+      updatedOriginalNoteContent,
+    })
+  }
+)
+
 Then(
   'the link {string} should link to the note with the same title',
   (linkText: string) => {

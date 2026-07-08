@@ -1,6 +1,5 @@
 import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
-import makeMe from "doughnut-test-fixtures/makeMe"
 import { describe, expect, it } from "vitest"
 import { mockSdkService } from "@tests/helpers"
 import usePopups from "@/components/commons/Popups/usePopups"
@@ -13,6 +12,7 @@ import {
   sampleNestedLayout,
   selectRefinementLayoutItem,
   setupNoteRefinementTests,
+  sampleExtractionPreview,
 } from "./noteRefinementTestSupport"
 
 setupNoteRefinementTests()
@@ -64,10 +64,10 @@ describe("NoteRefinement layout selection", () => {
   })
 
   it("submits only checked descendants when parent is indeterminate (extract)", async () => {
-    const extractNoteSpy = mockSdkService(
+    const extractNotePreviewSpy = mockSdkService(
       AiController,
-      "extractNote",
-      makeMe.aNoteRealm.please()
+      "extractNotePreview",
+      sampleExtractionPreview()
     )
     const { layout, wrapper } = await mountWithIndeterminateParentSelection()
     await wrapper
@@ -75,7 +75,7 @@ describe("NoteRefinement layout selection", () => {
       .trigger("click")
     await flushPromises()
 
-    expect(extractNoteSpy).toHaveBeenCalledWith(
+    expect(extractNotePreviewSpy).toHaveBeenCalledWith(
       refinementLayoutSelectionApiCall(note.id, layout, ["p1-1"])
     )
   })
@@ -101,10 +101,10 @@ describe("NoteRefinement layout selection", () => {
   })
 
   it("includes parent id when all descendants are selected again", async () => {
-    const extractNoteSpy = mockSdkService(
+    const extractNotePreviewSpy = mockSdkService(
       AiController,
-      "extractNote",
-      makeMe.aNoteRealm.please()
+      "extractNotePreview",
+      sampleExtractionPreview()
     )
     const { layout, wrapper } = await mountWithIndeterminateParentSelection()
     await selectRefinementLayoutItem(wrapper, "p1-2", true)
@@ -113,7 +113,7 @@ describe("NoteRefinement layout selection", () => {
       .trigger("click")
     await flushPromises()
 
-    expect(extractNoteSpy).toHaveBeenCalledWith(
+    expect(extractNotePreviewSpy).toHaveBeenCalledWith(
       refinementLayoutSelectionApiCall(note.id, layout, ["p1", "p1-1", "p1-2"])
     )
   })

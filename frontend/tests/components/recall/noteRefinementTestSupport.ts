@@ -13,6 +13,7 @@ import usePopups from "@/components/commons/Popups/usePopups"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
 import type {
   Note,
+  NoteExtractionResult,
   NoteRefinementLayoutItem,
 } from "@generated/doughnut-backend-api"
 import { afterEach, beforeEach, vi } from "vitest"
@@ -50,7 +51,16 @@ export function setupNoteRefinementTests() {
       makeMe.aNoteRealm.please()
     )
     mockSdkService(NoteController, "showNote", makeMe.aNoteRealm.please())
-    mockSdkService(AiController, "extractNote", makeMe.aNoteRealm.please())
+    mockSdkService(
+      AiController,
+      "extractNotePreview",
+      sampleExtractionPreview()
+    )
+    mockSdkService(
+      AiController,
+      "createExtractedNote",
+      makeMe.aNoteRealm.please()
+    )
     renderer = helper.component(NoteRefinementWithGlobalLoading).withRouter()
   })
 
@@ -102,6 +112,25 @@ export async function selectFirstLayoutItem(
 }
 
 export const extractNoteButtonTitle = "Extract selected to a new note"
+
+export const sampleExtractionPreview = (
+  overrides?: Partial<NoteExtractionResult>
+): NoteExtractionResult => ({
+  newNoteTitle: "Extracted title",
+  newNoteContent: "Extracted content",
+  updatedOriginalNoteContent: "Updated original content",
+  ...overrides,
+})
+
+export function extractionPreviewApiCall(
+  noteId: number,
+  preview: NoteExtractionResult
+) {
+  return {
+    path: { note: noteId },
+    body: preview,
+  }
+}
 
 export const sampleNestedLayout = (): NoteRefinementLayoutItem[] => [
   {
@@ -180,4 +209,24 @@ export function refinementLayoutSelectionApiCall(
       selectedItemIds,
     },
   }
+}
+
+export async function openExtractionPreview(
+  wrapper: ReturnType<typeof mountNoteRefinement>,
+  itemId: string
+) {
+  await selectRefinementLayoutItem(wrapper, itemId)
+  await wrapper
+    .find(`button[title="${extractNoteButtonTitle}"]`)
+    .trigger("click")
+  await flushPromises()
+}
+
+export async function createNoteFromExtractionPreview(
+  wrapper: ReturnType<typeof mountNoteRefinement>
+) {
+  await wrapper
+    .find('[data-test-id="extraction-preview-create"]')
+    .trigger("click")
+  await flushPromises()
 }

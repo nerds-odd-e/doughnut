@@ -114,7 +114,7 @@ _Green: additive; old `extract-note` still works._
 Validation errors (`ApiException` for reserved `index` title and invalid aliases) bubble from
 `NoteConstructionService` unchanged — no controller mapping needed.
 
-**1c — Behavior (frontend + E2E): two-step preview → edit → create.**
+**1c — Behavior (frontend + E2E): two-step preview → edit → create.** ✅
 `Extract` (with selection) calls `extract-note-preview`; the modal replaces the layout list with
 3 editable `<textarea>`s (original note's new content, new note title, new note content), a
 **Back** button (return to layout), and a **Create note** button that calls
@@ -186,7 +186,7 @@ shared dialog with the layout-generation JSON. Frontend spec for the button + di
 
 ## Status
 
-- Phase 1 (extract preview + create): 1a ✅, 1b ✅, 1c, 1d — planned
+- Phase 1 (extract preview + create): 1a ✅, 1b ✅, 1c ✅, 1d — planned
 - Phase 2 (retry): 2a, 2b — planned
 - Phase 3 (export extract request): 3a, 3b, 3c — planned
 - Phase 4 (export breakdown request): 4a, 4b — planned

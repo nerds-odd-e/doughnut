@@ -4,7 +4,7 @@
     class="mb-4 rounded-lg bg-accent p-4"
     data-test-id="refinement-layout"
   >
-    <div class="text-base">
+    <div v-if="!showExtractionPreview" class="text-base">
       <div class="font-semibold mb-3 text-accent-content">
         Note layout:
       </div>
@@ -62,12 +62,76 @@
         </button>
       </div>
     </div>
+
+    <div
+      v-else
+      class="text-base"
+      data-test-id="extraction-preview"
+    >
+      <div class="font-semibold mb-3 text-accent-content">
+        Extract preview:
+      </div>
+
+      <div
+        v-if="createError"
+        class="daisy-alert daisy-alert-error mb-3 text-sm"
+        data-test-id="extraction-preview-error"
+      >
+        {{ createError }}
+      </div>
+
+      <label class="block mb-3 text-accent-content">
+        <span class="font-medium">Updated original note content</span>
+        <textarea
+          v-model="extractionPreview.updatedOriginalNoteContent"
+          data-test-id="extraction-preview-original-content"
+          class="daisy-textarea daisy-textarea-bordered mt-1 w-full min-h-24"
+        />
+      </label>
+
+      <label class="block mb-3 text-accent-content">
+        <span class="font-medium">New note title</span>
+        <textarea
+          v-model="extractionPreview.newNoteTitle"
+          data-test-id="extraction-preview-new-title"
+          class="daisy-textarea daisy-textarea-bordered mt-1 w-full"
+          rows="1"
+        />
+      </label>
+
+      <label class="block mb-3 text-accent-content">
+        <span class="font-medium">New note content</span>
+        <textarea
+          v-model="extractionPreview.newNoteContent"
+          data-test-id="extraction-preview-new-content"
+          class="daisy-textarea daisy-textarea-bordered mt-1 w-full min-h-24"
+        />
+      </label>
+
+      <div class="flex gap-2 mt-4">
+        <button
+          data-test-id="extraction-preview-back"
+          class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+          @click="backToLayout"
+        >
+          Back
+        </button>
+        <button
+          data-test-id="extraction-preview-create"
+          class="daisy-btn daisy-btn-primary daisy-btn-sm"
+          @click="createExtractedNote"
+        >
+          Create note
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import type {
   Note,
+  NoteExtractionResult,
   NoteRefinementLayoutItem,
 } from "@generated/doughnut-backend-api"
 import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
@@ -76,6 +140,7 @@ import {
   apiCallWithLoading,
   runWithBlockingApiLoading,
 } from "@/managedApi/clientSetup"
+import { toOpenApiError } from "@/managedApi/openApiError"
 import { useRefinementLayoutSelection } from "@/composables/useRefinementLayoutSelection"
 import usePopups from "../commons/Popups/usePopups"
 import RefinementLayoutItemRow from "./RefinementLayoutItemRow.vue"
@@ -93,6 +158,13 @@ const emit = defineEmits<{
 }>()
 
 const refinementLayoutItems = ref<NoteRefinementLayoutItem[]>([])
+const showExtractionPreview = ref(false)
+const extractionPreview = ref<NoteExtractionResult>({
+  newNoteTitle: "",
+  newNoteContent: "",
+  updatedOriginalNoteContent: "",
+})
+const createError = ref("")
 
 const {
   selectedItemIds,
@@ -101,6 +173,16 @@ const {
   setItemSelection,
   clearSelection,
 } = useRefinementLayoutSelection(refinementLayoutItems)
+
+const resetExtractionPreview = () => {
+  showExtractionPreview.value = false
+  createError.value = ""
+  extractionPreview.value = {
+    newNoteTitle: "",
+    newNoteContent: "",
+    updatedOriginalNoteContent: "",
+  }
+}
 
 const loadRefinementLayout = async () => {
   try {
@@ -113,10 +195,12 @@ const loadRefinementLayout = async () => {
     refinementLayoutItems.value =
       !result.error && result.data?.items ? result.data.items : []
     clearSelection()
+    resetExtractionPreview()
   } catch (err) {
     console.error("Failed to generate note layout:", err)
     refinementLayoutItems.value = []
     clearSelection()
+    resetExtractionPreview()
   }
 }
 
@@ -173,7 +257,7 @@ const extractNote = async () => {
   try {
     await runWithBlockingApiLoading(async () => {
       const response = await apiCallWithLoading(() =>
-        AiController.extractNote({
+        AiController.extractNotePreview({
           path: { note: props.note.id },
           body: {
             layout: { items: refinementLayoutItems.value },
@@ -183,7 +267,46 @@ const extractNote = async () => {
       )
 
       if (response.error || !response.data) {
-        await popups.alert("Failed to create note with AI")
+        await popups.alert("Failed to generate extract preview")
+        return
+      }
+
+      extractionPreview.value = { ...response.data }
+      createError.value = ""
+      showExtractionPreview.value = true
+    }, "AI is generating preview...")
+  } catch (err) {
+    console.error("Failed to generate extract preview:", err)
+    await popups.alert(`Error: ${err}`)
+  }
+}
+
+const backToLayout = () => {
+  showExtractionPreview.value = false
+  createError.value = ""
+}
+
+const createExtractedNote = async () => {
+  createError.value = ""
+
+  try {
+    await runWithBlockingApiLoading(async () => {
+      const response = await apiCallWithLoading(() =>
+        AiController.createExtractedNote({
+          path: { note: props.note.id },
+          body: {
+            newNoteTitle: extractionPreview.value.newNoteTitle,
+            newNoteContent: extractionPreview.value.newNoteContent,
+            updatedOriginalNoteContent:
+              extractionPreview.value.updatedOriginalNoteContent,
+          },
+        })
+      )
+
+      if (response.error || !response.data) {
+        const openApiError = toOpenApiError(response.error)
+        createError.value =
+          openApiError.message ?? "Failed to create note from preview"
         return
       }
 
@@ -192,8 +315,8 @@ const extractNote = async () => {
         .focusNoteRealm(router, response.data)
     }, "AI is creating note...")
   } catch (err) {
-    console.error("Failed to extract note:", err)
-    await popups.alert(`Error: ${err}`)
+    console.error("Failed to create extracted note:", err)
+    createError.value = `Error: ${err}`
   }
 }
 </script>
