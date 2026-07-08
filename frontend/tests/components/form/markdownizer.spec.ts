@@ -499,6 +499,18 @@ describe("replaceWikiLinksInHtml", () => {
     )
   })
 
+  it("preserves Quill hr markup without rewriting through DOMParser", () => {
+    const quillHr = "<p><hr></p>"
+    expect(replaceWikiLinksInHtml(quillHr, [])).toBe(quillHr)
+  })
+
+  it("is idempotent for Quill hr markup", () => {
+    const quillHr = "<p><hr></p>"
+    const once = replaceWikiLinksInHtml(quillHr, [])
+    const twice = replaceWikiLinksInHtml(once, [])
+    expect(twice).toBe(once)
+  })
+
   it("upgrades rich-editor dead-link anchors when wikiTitles resolve", () => {
     expect(
       replaceWikiLinksInHtml(

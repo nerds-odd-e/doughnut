@@ -21,6 +21,9 @@ function deadLinkBracketDisplayMatches(
 
 /** Rich editor HTML uses dead-link anchors, not [[ ]] literals; upgrade when titles resolve. */
 function upgradeDeadWikiAnchors(html: string, wikiTitles: WikiTitle[]): string {
+  if (wikiTitles.length === 0 || !html.includes("dead-link")) {
+    return html
+  }
   const parser = new DOMParser()
   const doc = parser.parseFromString(
     `<div id="doughnut-wiki-upgrade-wrap">${html}</div>`,
