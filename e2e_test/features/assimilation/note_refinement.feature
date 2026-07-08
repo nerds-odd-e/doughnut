@@ -74,3 +74,15 @@ Feature: Note refinement
     And I create the note from the extraction preview
     Then the note title should be "Edited B and D"
     And I should see note "Sample tree/Context/Sample" has content "A. C. E. edited"
+
+  Scenario: Retry extraction preview before creating note
+    Given OpenAI will extract layout points "B and D" with retry producing title "Retry B and D" and content "Retry combined content" and updated parent content "A. C. E. retry"
+    When I am assimilating the note "Sample"
+    And I open extraction preview for refinement layout points "B" and "D"
+    And I retry the extraction preview
+    And I create the note from the extraction preview
+    Then the note title should be "Retry B and D"
+    And I should see folder "Sample tree/Context" containing these notes:
+      | note-title    |
+      | Sample        |
+      | Retry B and D |

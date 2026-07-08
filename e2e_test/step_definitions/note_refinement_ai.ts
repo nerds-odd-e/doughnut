@@ -65,6 +65,18 @@ async function stubExtractNoteResponse(
   newNoteContent: string,
   updatedOriginalNoteContent: string
 ) {
+  await stubExtractNoteResponseSequence([
+    { newNoteTitle, newNoteContent, updatedOriginalNoteContent },
+  ])
+}
+
+async function stubExtractNoteResponseSequence(
+  results: {
+    newNoteTitle: string
+    newNoteContent: string
+    updatedOriginalNoteContent: string
+  }[]
+) {
   await mock_services
     .openAi()
     .responses()
@@ -72,12 +84,14 @@ async function stubExtractNoteResponse(
       role: 'developer',
       content: EXTRACT_NOTE_INSTRUCTION_PATTERN,
     })
-    .stubOutputText(
-      JSON.stringify({
-        newNoteTitle,
-        newNoteContent,
-        updatedOriginalNoteContent,
-      })
+    .stubOutputTextSequence(
+      ...results.map((result) =>
+        JSON.stringify({
+          newNoteTitle: result.newNoteTitle,
+          newNoteContent: result.newNoteContent,
+          updatedOriginalNoteContent: result.updatedOriginalNoteContent,
+        })
+      )
     )
 }
 
@@ -149,6 +163,31 @@ Given(
         newNoteContent,
         updatedOriginalNoteContent
       )
+    })
+  }
+)
+
+Given(
+  'OpenAI will extract layout points {string} with retry producing title {string} and content {string} and updated parent content {string}',
+  (
+    _layoutPoints: string,
+    retryNoteTitle: string,
+    retryNoteContent: string,
+    retryUpdatedParentContent: string
+  ) => {
+    cy.then(async () => {
+      await stubExtractNoteResponseSequence([
+        {
+          newNoteTitle: 'First attempt title',
+          newNoteContent: 'First attempt content',
+          updatedOriginalNoteContent: 'A. C. E. first',
+        },
+        {
+          newNoteTitle: retryNoteTitle,
+          newNoteContent: retryNoteContent,
+          updatedOriginalNoteContent: retryUpdatedParentContent,
+        },
+      ])
     })
   }
 )

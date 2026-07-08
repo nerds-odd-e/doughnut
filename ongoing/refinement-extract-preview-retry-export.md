@@ -135,7 +135,7 @@ _Green: no external behavior change (endpoint was already unused)._
 
 ### Phase 2 — Ask AI to retry extraction with the same selection
 
-**2a — Behavior: retry regenerates the preview.**
+**2a — Behavior: retry regenerates the preview.** ✅
 Add an **Ask AI to retry** button on the preview that re-calls `extract-note-preview` with the
 same `layout` + `selectedItemIds` and replaces the 3 fields. Frontend spec for the re-call +
 field replacement. Add a retry stub sequence in `note_refinement_ai.ts` and a
@@ -189,6 +189,6 @@ shared dialog with the layout-generation JSON. Frontend spec for the button + di
 ## Status
 
 - Phase 1 (extract preview + create): ✅ complete (1a–1d)
-- Phase 2 (retry): 2a, 2b — planned
+- Phase 2 (retry): 2a ✅, 2b — planned
 - Phase 3 (export extract request): 3a, 3b, 3c — planned
 - Phase 4 (export breakdown request): 4a, 4b — planned

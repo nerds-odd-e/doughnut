@@ -69,6 +69,14 @@ const openAiResponsesStubber = (
 
   return {
     stubOutputText: stubOutput,
+    stubOutputTextSequence(...outputTexts: string[]) {
+      return serviceMocker.mockPostMatchsAndNotMatches(
+        `/responses`,
+        bodyToMatch,
+        bodyNotToMatch,
+        outputTexts.map(responseBody)
+      )
+    },
     requestDoesNotMessageMatch(message: MessageToMatch) {
       return openAiResponsesStubber(
         serviceMocker,

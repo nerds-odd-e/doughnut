@@ -841,6 +841,10 @@ When('I create the note from the extraction preview', () => {
   start.assumeAssimilationPage().createNoteFromExtractionPreview()
 })
 
+When('I retry the extraction preview', () => {
+  start.assumeAssimilationPage().retryExtractionPreview()
+})
+
 When(
   'I edit the extraction preview to title {string} and content {string} and updated parent content {string}',
   (

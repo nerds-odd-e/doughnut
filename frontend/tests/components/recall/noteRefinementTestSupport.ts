@@ -230,3 +230,12 @@ export async function createNoteFromExtractionPreview(
     .trigger("click")
   await flushPromises()
 }
+
+export async function retryExtractionPreview(
+  wrapper: ReturnType<typeof mountNoteRefinement>
+) {
+  await wrapper
+    .find('[data-test-id="retry-extraction-preview"]')
+    .trigger("click")
+  await flushPromises()
+}

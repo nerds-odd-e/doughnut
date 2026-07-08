@@ -102,5 +102,12 @@ export function assimilationRefinementLayoutExpectations() {
       waitForExtractNote()
       return this
     },
+    retryExtractionPreview() {
+      extractionPreviewPanel()
+        .find('[data-test-id="retry-extraction-preview"]')
+        .click()
+      waitForExtractNotePreview()
+      return this
+    },
   }
 }

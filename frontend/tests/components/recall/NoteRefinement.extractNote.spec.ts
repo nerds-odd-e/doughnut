@@ -8,6 +8,7 @@ import {
   mockSdkService,
   mockSdkServiceWithImplementation,
   wrapSdkError,
+  wrapSdkResponse,
 } from "@tests/helpers"
 import {
   createNoteFromExtractionPreview,
@@ -19,6 +20,7 @@ import {
   openExtractionPreview,
   refinementLayoutSelectionApiCall,
   refinementLayoutItems,
+  retryExtractionPreview,
   sampleExtractionPreview,
   selectRefinementLayoutItem,
   setupNoteRefinementTests,
@@ -187,6 +189,59 @@ describe("NoteRefinement extract note", () => {
       )
     })
 
+    it("replaces preview fields when Ask AI to retry is clicked", async () => {
+      const layout = refinementLayoutItems(["Point 1", "Point 2", "Point 3"])
+      const firstPreview = sampleExtractionPreview({
+        newNoteTitle: "First title",
+        newNoteContent: "First content",
+        updatedOriginalNoteContent: "First original",
+      })
+      const retryPreview = sampleExtractionPreview({
+        newNoteTitle: "Retry title",
+        newNoteContent: "Retry content",
+        updatedOriginalNoteContent: "Retry original",
+      })
+      const extractNotePreviewSpy = mockSdkService(
+        AiController,
+        "extractNotePreview",
+        firstPreview
+      )
+      extractNotePreviewSpy.mockResolvedValueOnce(wrapSdkResponse(firstPreview))
+      extractNotePreviewSpy.mockResolvedValueOnce(wrapSdkResponse(retryPreview))
+      const wrapper = mountNoteRefinementWithLayout(layout)
+      await flushPromises()
+
+      await openExtractionPreview(wrapper, "p2")
+      await retryExtractionPreview(wrapper)
+
+      expect(extractNotePreviewSpy).toHaveBeenCalledTimes(2)
+      expect(extractNotePreviewSpy).toHaveBeenNthCalledWith(
+        2,
+        refinementLayoutSelectionApiCall(note.id, layout, ["p2"])
+      )
+      expect(
+        (
+          wrapper.find('[data-test-id="extraction-preview-new-title"]')
+            .element as HTMLTextAreaElement
+        ).value
+      ).toBe("Retry title")
+      expect(
+        (
+          wrapper.find('[data-test-id="extraction-preview-new-content"]')
+            .element as HTMLTextAreaElement
+        ).value
+      ).toBe("Retry content")
+      expect(
+        (
+          wrapper.find('[data-test-id="extraction-preview-original-content"]')
+            .element as HTMLTextAreaElement
+        ).value
+      ).toBe("Retry original")
+      expect(wrapper.find('[data-test-id="extraction-preview"]').exists()).toBe(
+        true
+      )
+    })
+
     it("returns to the layout when Back is clicked", async () => {
       mockSdkService(
         AiController,
@@ -345,6 +400,44 @@ describe("NoteRefinement extract note", () => {
       await nextTick()
 
       expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
+      resolveApi!()
+      await flushPromises()
+      expect(document.querySelector(".loading-modal-mask")).toBeNull()
+    })
+
+    it("shows LoadingModal while retrying extract preview", async () => {
+      let resolveApi: () => void
+      const apiPromise = new Promise<void>((r) => {
+        resolveApi = r
+      })
+      let callCount = 0
+      mockSdkServiceWithImplementation(
+        AiController,
+        "extractNotePreview",
+        async () => {
+          callCount++
+          if (callCount === 1) {
+            return sampleExtractionPreview()
+          }
+          await apiPromise
+          return sampleExtractionPreview({
+            newNoteTitle: "Retry title",
+            newNoteContent: "Retry content",
+            updatedOriginalNoteContent: "Retry original",
+          })
+        }
+      )
+      const wrapper = mountNoteRefinement(["Test layout point"])
+      await flushPromises()
+
+      await openExtractionPreview(wrapper, "p1")
+      await wrapper
+        .find('[data-test-id="retry-extraction-preview"]')
+        .trigger("click")
+      await nextTick()
+
+      expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
+      expect(document.body.textContent).toContain("AI is generating preview...")
       resolveApi!()
       await flushPromises()
       expect(document.querySelector(".loading-modal-mask")).toBeNull()

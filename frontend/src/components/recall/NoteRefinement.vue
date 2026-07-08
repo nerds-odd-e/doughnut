@@ -117,6 +117,13 @@
           Back
         </button>
         <button
+          data-test-id="retry-extraction-preview"
+          class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+          @click="retryExtractionPreview"
+        >
+          Ask AI to retry
+        </button>
+        <button
           data-test-id="extraction-preview-create"
           class="daisy-btn daisy-btn-primary daisy-btn-sm"
           @click="createExtractedNote"
@@ -253,33 +260,44 @@ const removeSelectedLayoutItems = async () => {
   }, "AI is removing content...")
 }
 
-const extractNote = async () => {
+const fetchExtractionPreview = async () => {
+  const response = await apiCallWithLoading(() =>
+    AiController.extractNotePreview({
+      path: { note: props.note.id },
+      body: {
+        layout: { items: refinementLayoutItems.value },
+        selectedItemIds: selectedItemIds.value,
+      },
+    })
+  )
+
+  if (response.error || !response.data) {
+    await popups.alert("Failed to generate extract preview")
+    return false
+  }
+
+  extractionPreview.value = { ...response.data }
+  createError.value = ""
+  return true
+}
+
+const runExtractionPreview = async (showPreviewOnSuccess: boolean) => {
   try {
     await runWithBlockingApiLoading(async () => {
-      const response = await apiCallWithLoading(() =>
-        AiController.extractNotePreview({
-          path: { note: props.note.id },
-          body: {
-            layout: { items: refinementLayoutItems.value },
-            selectedItemIds: selectedItemIds.value,
-          },
-        })
-      )
-
-      if (response.error || !response.data) {
-        await popups.alert("Failed to generate extract preview")
-        return
+      const success = await fetchExtractionPreview()
+      if (success && showPreviewOnSuccess) {
+        showExtractionPreview.value = true
       }
-
-      extractionPreview.value = { ...response.data }
-      createError.value = ""
-      showExtractionPreview.value = true
     }, "AI is generating preview...")
   } catch (err) {
     console.error("Failed to generate extract preview:", err)
     await popups.alert(`Error: ${err}`)
   }
 }
+
+const extractNote = () => runExtractionPreview(true)
+
+const retryExtractionPreview = () => runExtractionPreview(false)
 
 const backToLayout = () => {
   showExtractionPreview.value = false
