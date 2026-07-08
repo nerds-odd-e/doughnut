@@ -7,7 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.algorithms.FrontmatterAliases;
 import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.NoteRealm;
+import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -15,6 +17,8 @@ import com.odde.doughnut.services.ai.NoteExtractionResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class AiControllerCreateExtractedNoteTest extends ControllerTestBase {
@@ -82,6 +86,68 @@ class AiControllerCreateExtractedNoteTest extends ControllerTestBase {
           .isEqualTo(FrontmatterAliases.AUTHORED_ALIASES_MESSAGE);
       makeMe.entityPersister.refresh(testNote);
       assertThat(testNote.getContent()).isEqualTo(originalContent);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void shouldPlaceExtractedNoteAtExpectedLocation(boolean sourceInFolder)
+        throws UnexpectedNoAccessRightException {
+      Note sourceNote;
+      Folder expectedFolder = null;
+      if (sourceInFolder) {
+        Notebook notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+        expectedFolder = makeMe.aFolder().notebook(notebook).name("Context").please();
+        sourceNote =
+            makeMe
+                .aNote()
+                .title("Sample")
+                .folder(expectedFolder)
+                .content("Original content with a key suggestion to extract.")
+                .please();
+      } else {
+        sourceNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
+      }
+
+      NoteExtractionResult request =
+          extractionResult(
+              sourceInFolder ? "Point B" : "Extracted Note",
+              sourceInFolder ? "Extracted" : "Expanded content for the new note.",
+              sourceInFolder ? "A. C. D. E." : "Updated parent with summary.");
+      NoteRealm response = controller.createExtractedNote(sourceNote, request);
+      Note persistedNote = noteRepository.findById(response.getNote().getId()).orElseThrow();
+      if (sourceInFolder) {
+        assertThat(persistedNote.getFolder().getId()).isEqualTo(expectedFolder.getId());
+      } else {
+        assertThat(persistedNote.getFolder()).isNull();
+        assertThat(noteRepository.findById(sourceNote.getId()).orElseThrow().getContent())
+            .isEqualTo("Updated parent with summary.");
+      }
+    }
+
+    @Test
+    void shouldRefreshWikiLinkCacheForOriginalAndNewNoteAfterExtraction()
+        throws UnexpectedNoAccessRightException {
+      Note testNote =
+          makeMe
+              .aNote()
+              .title("Sample")
+              .notebookOwnedBy(currentUser.getUser())
+              .content("A. B. C.")
+              .please();
+      NoteExtractionResult request =
+          extractionResult(
+              "Point B",
+              "Extracted from [[sample|the original note]].",
+              "A. See [[point b|the extracted note]]. C.");
+
+      NoteRealm response = controller.createExtractedNote(testNote, request);
+
+      assertThat(response.getWikiTitles())
+          .anyMatch(
+              wikiTitle ->
+                  wikiTitle.getTargetToken().equals("sample")
+                      && wikiTitle.getDisplayText().equals("the original note")
+                      && wikiTitle.getNoteId().equals(testNote.getId()));
     }
   }
 }

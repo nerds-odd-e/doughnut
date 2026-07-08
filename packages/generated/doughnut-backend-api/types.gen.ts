@@ -2387,24 +2387,6 @@ export type GenerateRefinementSuggestionsResponses = {
 
 export type GenerateRefinementSuggestionsResponse = GenerateRefinementSuggestionsResponses[keyof GenerateRefinementSuggestionsResponses];
 
-export type ExtractNoteData = {
-    body: NoteRefinementLayoutSelectionRequestDto;
-    path: {
-        note: number;
-    };
-    query?: never;
-    url: '/api/ai/extract-note/{note}';
-};
-
-export type ExtractNoteResponses = {
-    /**
-     * OK
-     */
-    200: NoteRealm;
-};
-
-export type ExtractNoteResponse = ExtractNoteResponses[keyof ExtractNoteResponses];
-
 export type ExtractNotePreviewData = {
     body: NoteRefinementLayoutSelectionRequestDto;
     path: {

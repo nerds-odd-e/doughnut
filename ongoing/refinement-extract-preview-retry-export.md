@@ -126,10 +126,12 @@ scenario asserting **edited** preview content is what gets saved. The old `extra
 is now unused by the frontend.
 _Green: two-step extract works end-to-end; new endpoints now E2E-covered._
 
-**1d — Structure (cleanup): remove the old one-shot extract endpoint.**
+**1d — Structure (cleanup): remove the old one-shot extract endpoint.** ✅
 Delete `POST /api/ai/extract-note/{note}` and its now-obsolete test; remove dead code/helpers.
 Run `generateTypeScript`.
 _Green: no external behavior change (endpoint was already unused)._
+
+**Learning:** Sanitization (path separators, title trim) runs in `AiNoteAutomationService` on preview only; persistence tests belong on `createExtractedNote`. Consolidated coverage from deleted `AiControllerExtractNoteTest` into preview and create test classes.
 
 ### Phase 2 — Ask AI to retry extraction with the same selection
 
@@ -186,7 +188,7 @@ shared dialog with the layout-generation JSON. Frontend spec for the button + di
 
 ## Status
 
-- Phase 1 (extract preview + create): 1a ✅, 1b ✅, 1c ✅, 1d — planned
+- Phase 1 (extract preview + create): ✅ complete (1a–1d)
 - Phase 2 (retry): 2a, 2b — planned
 - Phase 3 (export extract request): 3a, 3b, 3c — planned
 - Phase 4 (export breakdown request): 4a, 4b — planned

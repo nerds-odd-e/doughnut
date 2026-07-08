@@ -1579,30 +1579,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NoteRefinementLayoutDTO"
-  /api/ai/extract-note/{note}:
-    post:
-      tags:
-      - ai-controller
-      operationId: extractNote
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/NoteRefinementLayoutSelectionRequestDTO"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/NoteRealm"
   /api/ai/extract-note-preview/{note}:
     post:
       tags:

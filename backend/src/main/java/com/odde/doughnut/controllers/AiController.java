@@ -140,16 +140,6 @@ public class AiController {
     return noteConstructionService.createNoteFromExtractedSuggestion(note, request);
   }
 
-  @PostMapping("/extract-note/{note}")
-  @Transactional
-  public NoteRealm extractNote(
-      @PathVariable(value = "note") @Schema(type = "integer") Note note,
-      @RequestBody NoteRefinementLayoutSelectionRequestDTO request)
-      throws UnexpectedNoAccessRightException, JsonProcessingException {
-    return noteConstructionService.createNoteFromExtractedSuggestion(
-        note, extractNoteFromLayoutSelection(note, request));
-  }
-
   private NoteExtractionResult extractNoteFromLayoutSelection(
       Note note, NoteRefinementLayoutSelectionRequestDTO request)
       throws UnexpectedNoAccessRightException, JsonProcessingException {

@@ -32,7 +32,7 @@ class AiControllerExtractNoteValidationTest extends ControllerTestBase {
   }
 
   @Nested
-  class ExtractNoteValidation {
+  class ExtractNotePreviewValidation {
     @Test
     void shouldRequireUserToBeLoggedIn() {
       Note testNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
@@ -40,7 +40,9 @@ class AiControllerExtractNoteValidationTest extends ControllerTestBase {
       NoteRefinementLayout layout = layoutWithItem("p1", "a suggestion");
       assertThrows(
           ResponseStatusException.class,
-          () -> controller.extractNote(testNote, layoutSelectionRequest(layout, List.of("p1"))));
+          () ->
+              controller.extractNotePreview(
+                  testNote, layoutSelectionRequest(layout, List.of("p1"))));
     }
 
     static Stream<List<String>> invalidSelectedItemIds() {
@@ -53,7 +55,9 @@ class AiControllerExtractNoteValidationTest extends ControllerTestBase {
       Note testNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
       NoteRefinementLayout layout = layoutWithItem("p1", "a suggestion");
       assertResponseStatus(
-          () -> controller.extractNote(testNote, layoutSelectionRequest(layout, selectedItemIds)),
+          () ->
+              controller.extractNotePreview(
+                  testNote, layoutSelectionRequest(layout, selectedItemIds)),
           HttpStatus.BAD_REQUEST);
     }
 
@@ -64,7 +68,9 @@ class AiControllerExtractNoteValidationTest extends ControllerTestBase {
           new NoteRefinementLayout(
               List.of(new NoteRefinementLayoutItem("", "a suggestion", false, List.of())));
       assertResponseStatus(
-          () -> controller.extractNote(testNote, layoutSelectionRequest(layout, List.of("p1"))),
+          () ->
+              controller.extractNotePreview(
+                  testNote, layoutSelectionRequest(layout, List.of("p1"))),
           HttpStatus.BAD_REQUEST);
     }
 
@@ -74,7 +80,9 @@ class AiControllerExtractNoteValidationTest extends ControllerTestBase {
       new OpenAiStructuredResponseMock(officialClient).stubStructuredResponse(null);
       NoteRefinementLayout layout = layoutWithItem("p1", "a suggestion");
       assertResponseStatus(
-          () -> controller.extractNote(testNote, layoutSelectionRequest(layout, List.of("p1"))),
+          () ->
+              controller.extractNotePreview(
+                  testNote, layoutSelectionRequest(layout, List.of("p1"))),
           HttpStatus.SERVICE_UNAVAILABLE);
     }
 
@@ -84,7 +92,9 @@ class AiControllerExtractNoteValidationTest extends ControllerTestBase {
       testNote.setContent("");
       NoteRefinementLayout layout = layoutWithItem("p1", "a suggestion");
       assertResponseStatus(
-          () -> controller.extractNote(testNote, layoutSelectionRequest(layout, List.of("p1"))),
+          () ->
+              controller.extractNotePreview(
+                  testNote, layoutSelectionRequest(layout, List.of("p1"))),
           HttpStatus.BAD_REQUEST);
     }
   }
