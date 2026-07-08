@@ -1603,6 +1603,34 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NoteRealm"
+  /api/ai/extract-note-preview/{note}:
+    post:
+      tags:
+      - ai-controller
+      summary: Preview note extraction (no persistence)
+      description: "Runs AI extraction for the selected layout points and returns\
+        \ the suggested new note title, new note content, and updated original note\
+        \ content without persisting any changes."
+      operationId: extractNotePreview
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteRefinementLayoutSelectionRequestDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NoteExtractionPreviewDTO"
   /api/admin/question-generation-batch/submit-recent-recall-users:
     post:
       tags:
@@ -4184,6 +4212,15 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/NoteRefinementLayoutItem"
+    NoteExtractionPreviewDTO:
+      type: object
+      properties:
+        newNoteTitle:
+          type: string
+        newNoteContent:
+          type: string
+        updatedOriginalNoteContent:
+          type: string
     QuestionGenerationBatchSubmissionSummaryDTO:
       type: object
       properties:

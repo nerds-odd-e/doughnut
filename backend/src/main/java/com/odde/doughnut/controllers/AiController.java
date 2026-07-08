@@ -113,25 +113,45 @@ public class AiController {
     return new RefinedContentResponseDTO(newContent);
   }
 
+  @Operation(
+      summary = "Preview note extraction (no persistence)",
+      description =
+          "Runs AI extraction for the selected layout points and returns the suggested new note title, new note content, and updated original note content without persisting any changes.")
+  @PostMapping("/extract-note-preview/{note}")
+  @Transactional
+  public NoteExtractionResult extractNotePreview(
+      @PathVariable(value = "note") @Schema(type = "integer") Note note,
+      @RequestBody NoteRefinementLayoutSelectionRequestDTO request)
+      throws UnexpectedNoAccessRightException, JsonProcessingException {
+    return extractNoteFromLayoutSelection(note, request);
+  }
+
   @PostMapping("/extract-note/{note}")
   @Transactional
   public NoteRealm extractNote(
       @PathVariable(value = "note") @Schema(type = "integer") Note note,
       @RequestBody NoteRefinementLayoutSelectionRequestDTO request)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
+    return noteConstructionService.createNoteFromExtractedSuggestion(
+        note, extractNoteFromLayoutSelection(note, request));
+  }
+
+  private NoteExtractionResult extractNoteFromLayoutSelection(
+      Note note, NoteRefinementLayoutSelectionRequestDTO request)
+      throws UnexpectedNoAccessRightException, JsonProcessingException {
     authorizationService.assertAuthorization(note);
-
     assertNoteContentNotEmpty(note);
-
     NoteRefinementLayout layout =
         validateLayoutSelectionRequest(request.getLayout(), request.getSelectedItemIds());
-    var automation = notebookAssistantForNoteServiceFactory.createNoteAutomationService(note);
-    NoteExtractionResult aiResult = automation.extractNote(layout, request.getSelectedItemIds());
+    NoteExtractionResult aiResult =
+        notebookAssistantForNoteServiceFactory
+            .createNoteAutomationService(note)
+            .extractNote(layout, request.getSelectedItemIds());
     if (aiResult == null) {
       throw new ResponseStatusException(
           HttpStatus.SERVICE_UNAVAILABLE, "AI failed to generate extraction result");
     }
-    return noteConstructionService.createNoteFromExtractedSuggestion(note, aiResult);
+    return aiResult;
   }
 
   private static void assertNoteContentNotEmpty(Note note) {
