@@ -46,11 +46,11 @@ class AiControllerExtractNotePreviewTest extends ControllerTestBase {
       String originalContent = testNote.getContent();
       long noteCountBefore = noteRepository.count();
 
-      NoteExtractionResult aiResult = new NoteExtractionResult();
-      aiResult.setNewNoteTitle("Extracted Note");
-      aiResult.setNewNoteContent("Expanded content for the new note.");
-      aiResult.setUpdatedOriginalNoteContent("Updated parent with summary.");
-      openAiStructuredResponseMock.stubStructuredResponse(aiResult);
+      openAiStructuredResponseMock.stubStructuredResponse(
+          extractionResult(
+              "Extracted Note",
+              "Expanded content for the new note.",
+              "Updated parent with summary."));
 
       NoteRefinementLayout layout = layoutWithItem("p1", "key suggestion to extract");
       NoteExtractionResult response =

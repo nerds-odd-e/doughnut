@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.controllers.dto.NoteRefinementLayoutSelectionRequestDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.services.ai.NoteExtractionResult;
 import com.odde.doughnut.services.ai.NoteRefinementLayout;
 import com.odde.doughnut.services.ai.NoteRefinementLayoutItem;
 import com.odde.doughnut.testability.MakeMe;
@@ -37,6 +38,15 @@ final class AiControllerExtractNoteTestSupport {
     requestDTO.setLayout(layout);
     requestDTO.setSelectedItemIds(selectedItemIds);
     return requestDTO;
+  }
+
+  static NoteExtractionResult extractionResult(
+      String newTitle, String newContent, String updatedOriginalNoteContent) {
+    NoteExtractionResult result = new NoteExtractionResult();
+    result.setNewNoteTitle(newTitle);
+    result.setNewNoteContent(newContent);
+    result.setUpdatedOriginalNoteContent(updatedOriginalNoteContent);
+    return result;
   }
 
   static Stream<List<String>> invalidSelectedItemIds() {

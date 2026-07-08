@@ -126,6 +126,20 @@ public class AiController {
     return extractNoteFromLayoutSelection(note, request);
   }
 
+  @Operation(
+      summary = "Create note from edited extraction fields",
+      description =
+          "Persists a new note and updates the original note using the provided extraction fields (typically from extract-note-preview, possibly edited by the user).")
+  @PostMapping("/create-extracted-note/{note}")
+  @Transactional
+  public NoteRealm createExtractedNote(
+      @PathVariable(value = "note") @Schema(type = "integer") Note note,
+      @RequestBody NoteExtractionResult request)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(note);
+    return noteConstructionService.createNoteFromExtractedSuggestion(note, request);
+  }
+
   @PostMapping("/extract-note/{note}")
   @Transactional
   public NoteRealm extractNote(

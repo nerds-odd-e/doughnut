@@ -1630,7 +1630,35 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NoteExtractionPreviewDTO"
+                $ref: "#/components/schemas/NoteExtractionResult"
+  /api/ai/create-extracted-note/{note}:
+    post:
+      tags:
+      - ai-controller
+      summary: Create note from edited extraction fields
+      description: "Persists a new note and updates the original note using the provided\
+        \ extraction fields (typically from extract-note-preview, possibly edited\
+        \ by the user)."
+      operationId: createExtractedNote
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteExtractionResult"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NoteRealm"
   /api/admin/question-generation-batch/submit-recent-recall-users:
     post:
       tags:
@@ -4212,7 +4240,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/NoteRefinementLayoutItem"
-    NoteExtractionPreviewDTO:
+    NoteExtractionResult:
       type: object
       properties:
         newNoteTitle:
@@ -4221,6 +4249,10 @@ components:
           type: string
         updatedOriginalNoteContent:
           type: string
+      required:
+      - newNoteContent
+      - newNoteTitle
+      - updatedOriginalNoteContent
     QuestionGenerationBatchSubmissionSummaryDTO:
       type: object
       properties:

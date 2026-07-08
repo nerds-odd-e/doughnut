@@ -633,10 +633,10 @@ export type NoteRefinementLayoutDto = {
     items?: Array<NoteRefinementLayoutItem>;
 };
 
-export type NoteExtractionPreviewDto = {
-    newNoteTitle?: string;
-    newNoteContent?: string;
-    updatedOriginalNoteContent?: string;
+export type NoteExtractionResult = {
+    newNoteTitle: string;
+    newNoteContent: string;
+    updatedOriginalNoteContent: string;
 };
 
 export type QuestionGenerationBatchSubmissionSummaryDto = {
@@ -2418,10 +2418,28 @@ export type ExtractNotePreviewResponses = {
     /**
      * OK
      */
-    200: NoteExtractionPreviewDto;
+    200: NoteExtractionResult;
 };
 
 export type ExtractNotePreviewResponse = ExtractNotePreviewResponses[keyof ExtractNotePreviewResponses];
+
+export type CreateExtractedNoteData = {
+    body: NoteExtractionResult;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/ai/create-extracted-note/{note}';
+};
+
+export type CreateExtractedNoteResponses = {
+    /**
+     * OK
+     */
+    200: NoteRealm;
+};
+
+export type CreateExtractedNoteResponse = CreateExtractedNoteResponses[keyof CreateExtractedNoteResponses];
 
 export type SubmitRecentRecallUsersForQuestionGenerationBatchData = {
     body?: never;

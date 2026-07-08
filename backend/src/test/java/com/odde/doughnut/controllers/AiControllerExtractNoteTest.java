@@ -62,11 +62,8 @@ class AiControllerExtractNoteTest extends ControllerTestBase {
 
     private void stubExtractionResult(
         String newTitle, String newContent, String updatedOriginalNote) {
-      NoteExtractionResult aiResult = new NoteExtractionResult();
-      aiResult.setNewNoteTitle(newTitle);
-      aiResult.setNewNoteContent(newContent);
-      aiResult.setUpdatedOriginalNoteContent(updatedOriginalNote);
-      openAiStructuredResponseMock.stubStructuredResponse(aiResult);
+      openAiStructuredResponseMock.stubStructuredResponse(
+          extractionResult(newTitle, newContent, updatedOriginalNote));
     }
 
     @Test

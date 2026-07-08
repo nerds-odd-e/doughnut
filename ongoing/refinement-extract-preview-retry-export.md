@@ -102,13 +102,17 @@ _Green: existing extract behavior + all tests unchanged._
 **Learning:** `NoteExtractionResult` is fine as the API response type (same 3 fields); no separate
 DTO needed. Preview and persist endpoints share `extractNoteFromLayoutSelection`.
 
-**1b — Structure (backend): add create-from-edited-fields endpoint.**
+**1b — Structure (backend): add create-from-edited-fields endpoint.** ✅
 Add `POST /api/ai/create-extracted-note/{note}` accepting `{ newNoteTitle, newNoteContent,
 updatedOriginalNoteContent }`, persisting both notes via
 `createNoteFromExtractedSuggestion(...)`, returning `NoteRealm`. Reuse existing validation;
 map validation failures to a clear error response. Add a controller test covering happy path +
 reserved `index` title + alias validation. Run `generateTypeScript`.
 _Green: additive; old `extract-note` still works._
+
+**Learning:** `NoteExtractionResult` works as both preview response and create request body.
+Validation errors (`ApiException` for reserved `index` title and invalid aliases) bubble from
+`NoteConstructionService` unchanged — no controller mapping needed.
 
 **1c — Behavior (frontend + E2E): two-step preview → edit → create.**
 `Extract` (with selection) calls `extract-note-preview`; the modal replaces the layout list with
@@ -182,7 +186,7 @@ shared dialog with the layout-generation JSON. Frontend spec for the button + di
 
 ## Status
 
-- Phase 1 (extract preview + create): 1a ✅, 1b, 1c, 1d — planned
+- Phase 1 (extract preview + create): 1a ✅, 1b ✅, 1c, 1d — planned
 - Phase 2 (retry): 2a, 2b — planned
 - Phase 3 (export extract request): 3a, 3b, 3c — planned
 - Phase 4 (export breakdown request): 4a, 4b — planned
