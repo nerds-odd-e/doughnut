@@ -52,13 +52,17 @@ public class AiNoteAutomationService {
             null));
   }
 
+  public StructuredResponseCreateParams<NoteRefinementLayout> buildRefinementLayoutRequest() {
+    InstructionAndSchema tool = AiToolFactory.generateNoteRefinementLayoutAiTool();
+    return buildStructuredResponseParams(
+        NoteRefinementLayout.class, tool, NOTE_REFINEMENT_LAYOUT_MAX_OUTPUT_TOKENS);
+  }
+
   public NoteRefinementLayout generateRefinementSuggestions() throws JsonProcessingException {
-    return executeWithTool(
-        AiToolFactory.generateNoteRefinementLayoutAiTool(),
-        NoteRefinementLayout.class,
+    return executeWithParams(
+        buildRefinementLayoutRequest(),
         NoteRefinementLayoutValidator::validOrEmpty,
-        NoteRefinementLayout.empty(),
-        NOTE_REFINEMENT_LAYOUT_MAX_OUTPUT_TOKENS);
+        NoteRefinementLayout.empty());
   }
 
   public StructuredResponseCreateParams<NoteExtractionResult> buildExtractNoteRequest(

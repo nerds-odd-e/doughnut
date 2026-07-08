@@ -2852,6 +2852,28 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AssimilationNextDTO"
+  /api/ai/export-refinement-layout-request/{note}:
+    get:
+      tags:
+      - ai-controller
+      summary: Export refinement-layout AI request JSON
+      description: Returns the OpenAI structured-response request body for note refinement
+        layout generation (breakdown) without calling OpenAI.
+      operationId: exportRefinementLayoutRequest
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: {}
   /api/ai/dummy:
     get:
       tags:

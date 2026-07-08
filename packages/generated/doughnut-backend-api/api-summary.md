@@ -195,6 +195,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `extractNotePreview`: POST `/api/ai/extract-note-preview/{note}` -> `ExtractNotePreviewResponse` (request: `ExtractNotePreviewData`; path: note; body: NoteRefinementLayoutSelectionRequestDto; response body: NoteExtractionResult)
 - `exportExtractRequest`: POST `/api/ai/export-extract-request/{note}` -> `ExportExtractRequestResponse` (request: `ExportExtractRequestData`; path: note; body: NoteRefinementLayoutSelectionRequestDto; response body: Record<string, unknown>)
 - `createExtractedNote`: POST `/api/ai/create-extracted-note/{note}` -> `CreateExtractedNoteResponse` (request: `CreateExtractedNoteData`; path: note; body: NoteExtractionResult; response body: NoteRealm)
+- `exportRefinementLayoutRequest`: GET `/api/ai/export-refinement-layout-request/{note}` -> `ExportRefinementLayoutRequestResponse` (request: `ExportRefinementLayoutRequestData`; path: note; response body: Record<string, unknown>)
 - `dummyEntryToGenerateDataTypesThatAreRequiredInEventStream`: GET `/api/ai/dummy` -> `DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamResponse` (request: none; response body: DummyForGeneratingTypes)
 - `getAvailableGptModels`: GET `/api/ai/available-gpt-models` -> `GetAvailableGptModelsResponse` (request: none; response body: Array<string>)
 

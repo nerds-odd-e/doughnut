@@ -3555,6 +3555,26 @@ export type NextResponses = {
 
 export type NextResponse = NextResponses[keyof NextResponses];
 
+export type ExportRefinementLayoutRequestData = {
+    body?: never;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/ai/export-refinement-layout-request/{note}';
+};
+
+export type ExportRefinementLayoutRequestResponses = {
+    /**
+     * OK
+     */
+    200: {
+        [key: string]: unknown;
+    };
+};
+
+export type ExportRefinementLayoutRequestResponse = ExportRefinementLayoutRequestResponses[keyof ExportRefinementLayoutRequestResponses];
+
 export type DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamData = {
     body?: never;
     path?: never;

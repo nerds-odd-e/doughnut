@@ -147,6 +147,23 @@ public class AiController {
   }
 
   @Operation(
+      summary = "Export refinement-layout AI request JSON",
+      description =
+          "Returns the OpenAI structured-response request body for note refinement layout generation (breakdown) without calling OpenAI.")
+  @GetMapping("/export-refinement-layout-request/{note}")
+  public Map<String, Object> exportRefinementLayoutRequest(
+      @PathVariable(value = "note") @Schema(type = "integer") Note note)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(note);
+    assertNoteContentNotEmpty(note);
+    StructuredResponseCreateParams<NoteRefinementLayout> params =
+        notebookAssistantForNoteServiceFactory
+            .createNoteAutomationService(note)
+            .buildRefinementLayoutRequest();
+    return paramsSerializer.toBodyMap(params);
+  }
+
+  @Operation(
       summary = "Export extract-note AI request JSON",
       description =
           "Returns the OpenAI structured-response request body for note extraction without calling OpenAI.")

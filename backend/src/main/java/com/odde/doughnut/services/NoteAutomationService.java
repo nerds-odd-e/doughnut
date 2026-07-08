@@ -22,6 +22,10 @@ public final class NoteAutomationService {
     return aiNoteAutomationService.generateRefinementSuggestions();
   }
 
+  public StructuredResponseCreateParams<NoteRefinementLayout> buildRefinementLayoutRequest() {
+    return aiNoteAutomationService.buildRefinementLayoutRequest();
+  }
+
   public NoteExtractionResult extractNote(NoteRefinementLayout layout, List<String> selectedItemIds)
       throws JsonProcessingException {
     return aiNoteAutomationService.extractNote(layout, selectedItemIds);
