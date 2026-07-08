@@ -10,7 +10,6 @@
         ref="searchNotePopButtonRef"
         aria-label="search note"
         title="Search note (Ctrl+F / Cmd+F)"
-        align-modal-top
         :show-close-button="false"
       >
         <template #button_face>

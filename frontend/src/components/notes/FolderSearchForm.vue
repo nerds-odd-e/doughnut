@@ -94,6 +94,7 @@ import { Search } from "@lucide/vue"
 import { computed, nextTick, onMounted, ref, watch } from "vue"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"
+import { useStableModalTop } from "@/composables/modalTopAnchor"
 import {
   collectSubtreeFolderIds,
   folderPathLabel,
@@ -104,6 +105,8 @@ import {
   folderSearchResultRowSelector,
   folderSearchResultTestId,
 } from "@/utils/searchDialogKeyboard"
+
+useStableModalTop()
 
 const props = defineProps<{
   notebookId: number

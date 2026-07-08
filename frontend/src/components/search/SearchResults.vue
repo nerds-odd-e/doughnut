@@ -165,6 +165,9 @@ import { computed, toRef } from "vue"
 import SearchDropdownHitList from "./SearchDropdownHitList.vue"
 import SearchResultList from "./SearchResultList.vue"
 import { useSearchExecution } from "@/composables/useSearchExecution"
+import { useStableModalTop } from "@/composables/modalTopAnchor"
+
+useStableModalTop()
 
 const props = defineProps({
   noteId: Number,

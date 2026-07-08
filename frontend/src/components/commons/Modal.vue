@@ -3,7 +3,7 @@
     <dialog
       ref="dialogRef"
       class="modal-mask text-base-content"
-      :class="{ 'modal-align-top': alignTop }"
+      :class="{ 'modal-align-top': stableTopAnchored }"
       @cancel.prevent
     >
     <div class="modal-panel-wrapper" @mousedown.self="$emit('close_request')">
@@ -41,12 +41,12 @@ import { X } from "@lucide/vue"
 import { useRoute } from "vue-router"
 import { registerModal } from "./modalStack"
 import { focusAutofocusTargetWithin } from "@/utils/focusTarget"
+import { provideModalTopAnchor } from "@/composables/modalTopAnchor"
 
 // Props
 interface Props {
   sidebar?: "left" | "right"
   isPopup?: boolean
-  alignTop?: boolean
   /** When false, the overlay X is omitted (e.g. in-dialog close control). */
   showCloseButton?: boolean
 }
@@ -60,6 +60,7 @@ const emit = defineEmits<{
 }>()
 
 const dialogRef = ref<HTMLDialogElement | null>(null)
+const stableTopAnchored = provideModalTopAnchor()
 
 // Computed
 const sidebarStyle = computed(() => {

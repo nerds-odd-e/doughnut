@@ -111,6 +111,9 @@ import RadioButtons from "../form/RadioButtons.vue"
 import TextInput from "../form/TextInput.vue"
 import { openWikidataEntityBrowseUrlInNonBlockingPopup } from "@/utils/wikidataEntityBrowseUrl"
 import { ExternalLink } from "@lucide/vue"
+import { useStableModalTop } from "@/composables/modalTopAnchor"
+
+useStableModalTop()
 
 const props = defineProps<{
   searchKey: string

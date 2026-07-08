@@ -15,7 +15,6 @@
   <Modal
     v-if="show"
     :sidebar="sidebar"
-    :align-top="alignModalTop"
     :show-close-button="showCloseButton"
     @close_request="closeDialog"
   >
@@ -39,7 +38,6 @@ defineProps({
   sidebar: String as PropType<"left" | "right">,
   btnClass: String,
   ariaLabel: String,
-  alignModalTop: Boolean,
   showCloseButton: {
     type: Boolean,
     default: true,

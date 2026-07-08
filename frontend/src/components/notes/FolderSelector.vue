@@ -49,7 +49,7 @@
         <MoreHorizontal class="w-5 h-5" />
       </button>
     </div>
-    <Modal v-if="searchOpen" align-top @close_request="searchOpen = false">
+    <Modal v-if="searchOpen" @close_request="searchOpen = false">
       <template #body>
         <FolderSearchForm
           :notebook-id="notebookId"

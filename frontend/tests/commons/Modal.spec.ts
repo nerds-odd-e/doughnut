@@ -4,6 +4,7 @@ import { flushPromises, mount, type VueWrapper } from "@vue/test-utils"
 import { vi, afterEach, describe, it, expect } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import { reactive } from "vue"
+import { useStableModalTop } from "@/composables/modalTopAnchor"
 
 // Browser Mode: Mock AiReplyEventSource to prevent import errors
 // (Modal doesn't use it, but Browser Mode hoists mocks globally)
@@ -57,14 +58,20 @@ describe("Modal", () => {
     return wrapper
   }
 
-  it("adds top alignment class when alignTop is true", async () => {
+  it("adds top alignment class when content requests stable modal top", async () => {
+    const AnchorChild = {
+      template: `<div>anchor</div>`,
+      setup() {
+        useStableModalTop()
+      },
+    }
     const TopAligned = {
       template: `
-        <Modal align-top @close_request="$emit('close_request')">
-          <template #body>x</template>
+        <Modal @close_request="$emit('close_request')">
+          <template #body><AnchorChild /></template>
         </Modal>
       `,
-      components: { Modal: Comp },
+      components: { Modal: Comp, AnchorChild },
       emits: ["close_request"],
     }
     wrapper = mount(TopAligned, {

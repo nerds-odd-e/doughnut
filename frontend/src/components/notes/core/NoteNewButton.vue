@@ -3,7 +3,6 @@
     ref="popButtonRef"
     title="New note (n)"
     aria-label="New note (n)"
-    align-modal-top
   >
     <template #button_face>
       <slot />
