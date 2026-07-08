@@ -143,6 +143,7 @@
         <button
           data-test-id="extraction-preview-create"
           class="daisy-btn daisy-btn-primary daisy-btn-sm"
+          :disabled="!canCreateExtractedNote"
           @click="createExtractedNote"
         >
           Create note
@@ -184,7 +185,7 @@ import AiRequestExportDialog from "@/components/commons/AiRequestExportDialog.vu
 import usePopups from "../commons/Popups/usePopups"
 import RefinementLayoutItemRow from "./RefinementLayoutItemRow.vue"
 import { Folders } from "@lucide/vue"
-import { onMounted, ref } from "vue"
+import { computed, onMounted, ref } from "vue"
 import { useRouter } from "vue-router"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
@@ -207,6 +208,10 @@ const lastAiExtractionResult = ref<NoteExtractionResult | null>(null)
 const createError = ref("")
 const showExportExtractDialog = ref(false)
 const showExportBreakdownDialog = ref(false)
+
+const canCreateExtractedNote = computed(
+  () => extractionPreview.value.newNoteTitle.trim().length > 0
+)
 
 const {
   selectedItemIds,

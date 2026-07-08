@@ -87,6 +87,16 @@ Feature: Note refinement
       | Sample        |
       | Retry B and D |
 
+  Scenario: Cannot create note with blank title from extraction preview
+    Given OpenAI will extract layout points "B and D" to a new note with title "Point B and D" and content "Combined B and D" and updated parent content "A. C. E."
+    When I am assimilating the note "Sample"
+    And I open extraction preview for refinement layout points "B" and "D"
+    And I clear the extraction preview new note title
+    Then the extraction preview create note button should be disabled
+    And I should see folder "Sample tree/Context" containing these notes:
+      | note-title |
+      | Sample     |
+
   Scenario: Export extract request shows AI request JSON
     When I am assimilating the note "Sample"
     And I export the extract request for refinement layout points "B" and "D"

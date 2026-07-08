@@ -1,7 +1,11 @@
 import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
+import { nextTick } from "vue"
 import { describe, expect, it } from "vitest"
-import { mockSdkService } from "@tests/helpers"
+import {
+  mockSdkService,
+  mockSdkServiceWithImplementation,
+} from "@tests/helpers"
 import {
   exportExtractRequestButtonTitle,
   mountNoteRefinement,
@@ -48,6 +52,45 @@ describe("NoteRefinement export extract request", () => {
     expect(
       refinementActionButton(wrapper, "export-extract-request").disabled
     ).toBe(false)
+  })
+
+  it("shows loading indicator before extract export JSON loads", async () => {
+    const layout = refinementLayoutItems(["Point 1", "Point 2"])
+    const exportData = sampleExportData
+    let resolveExport!: (value: typeof exportData) => void
+    const exportPromise = new Promise<typeof exportData>((resolve) => {
+      resolveExport = resolve
+    })
+    mockSdkServiceWithImplementation(
+      AiController,
+      "exportExtractRequest",
+      () => exportPromise
+    )
+    const wrapper = mountNoteRefinementWithLayout(layout)
+    await flushPromises()
+
+    await selectRefinementLayoutItem(wrapper, "p2")
+    await wrapper
+      .find(`button[title="${exportExtractRequestButtonTitle}"]`)
+      .trigger("click")
+    await nextTick()
+
+    expect(
+      document.body.querySelector('[data-testid="export-loading"]')
+    ).toBeTruthy()
+    expect(
+      document.body.querySelector('[data-testid="export-textarea"]')
+    ).toBeNull()
+
+    resolveExport(exportData)
+    await flushPromises()
+    expect(
+      document.body.querySelector('[data-testid="export-loading"]')
+    ).toBeNull()
+    const textarea = document.body.querySelector(
+      '[data-testid="export-textarea"]'
+    ) as HTMLTextAreaElement
+    expect(textarea.value).toContain('"model"')
   })
 
   it("opens export dialog with extract request JSON for the selection", async () => {

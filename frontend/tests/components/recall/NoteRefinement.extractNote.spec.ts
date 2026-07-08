@@ -165,6 +165,60 @@ describe("NoteRefinement extract note", () => {
       )
     })
 
+    it("disables Create note when new note title is blank", async () => {
+      mockSdkService(
+        AiController,
+        "extractNotePreview",
+        sampleExtractionPreview()
+      )
+      const createExtractedNoteSpy = mockSdkService(
+        AiController,
+        "createExtractedNote",
+        makeMe.aNoteRealm.please()
+      )
+      const wrapper = mountNoteRefinement(["Point 1", "Point 2", "Point 3"])
+      await flushPromises()
+
+      await openExtractionPreview(wrapper, "p2")
+      const createButton = wrapper.find(
+        '[data-test-id="extraction-preview-create"]'
+      )
+      expect((createButton.element as HTMLButtonElement).disabled).toBe(false)
+
+      await wrapper
+        .find('[data-test-id="extraction-preview-new-title"]')
+        .setValue("")
+      await nextTick()
+
+      expect((createButton.element as HTMLButtonElement).disabled).toBe(true)
+      await createButton.trigger("click")
+      await flushPromises()
+      expect(createExtractedNoteSpy).not.toHaveBeenCalled()
+    })
+
+    it("enables Create note once new note title is non-blank", async () => {
+      mockSdkService(
+        AiController,
+        "extractNotePreview",
+        sampleExtractionPreview({ newNoteTitle: "" })
+      )
+      const wrapper = mountNoteRefinement(["Point 1", "Point 2", "Point 3"])
+      await flushPromises()
+
+      await openExtractionPreview(wrapper, "p2")
+      const createButton = wrapper.find(
+        '[data-test-id="extraction-preview-create"]'
+      )
+      expect((createButton.element as HTMLButtonElement).disabled).toBe(true)
+
+      await wrapper
+        .find('[data-test-id="extraction-preview-new-title"]')
+        .setValue("New title")
+      await nextTick()
+
+      expect((createButton.element as HTMLButtonElement).disabled).toBe(false)
+    })
+
     it("extracts multiple selected layout points into one preview", async () => {
       const extractNotePreviewSpy = mockSdkService(
         AiController,

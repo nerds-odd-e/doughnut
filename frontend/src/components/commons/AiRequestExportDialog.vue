@@ -5,20 +5,31 @@
         <div class="daisy-card-body">
           <h3 class="daisy-card-title">{{ title }}</h3>
           <div class="mt-4">
-            <textarea
-              class="daisy-textarea w-full h-96 bg-base-100 font-mono text-xs"
-              readonly
-              :value="displayContent"
-              data-testid="export-textarea"
-            />
-            <div class="flex gap-2 justify-end mt-2">
-              <CopyButton
-                :text="displayContent"
-                :disabled="!displayContent"
-                test-id="copy-export-btn"
-                aria-label="Copy to clipboard"
+            <div
+              v-if="isLoading"
+              class="flex justify-center items-center h-96"
+              data-testid="export-loading"
+            >
+              <span
+                class="daisy-loading daisy-loading-spinner daisy-loading-lg"
               />
             </div>
+            <template v-else>
+              <textarea
+                class="daisy-textarea w-full h-96 bg-base-100 font-mono text-xs"
+                readonly
+                :value="displayContent"
+                data-testid="export-textarea"
+              />
+              <div class="flex gap-2 justify-end mt-2">
+                <CopyButton
+                  :text="displayContent"
+                  :disabled="!displayContent"
+                  test-id="copy-export-btn"
+                  aria-label="Copy to clipboard"
+                />
+              </div>
+            </template>
           </div>
         </div>
       </div>
@@ -42,6 +53,7 @@ defineEmits<{
 }>()
 
 const loadedContent = ref("")
+const isLoading = ref(false)
 
 const displayContent = computed(() => {
   if (props.exportContent !== undefined) {
@@ -64,10 +76,13 @@ onMounted(async () => {
   if (props.exportContent !== undefined || !props.fetchExport) {
     return
   }
+  isLoading.value = true
   try {
     loadedContent.value = formatExportContent(await props.fetchExport())
   } catch {
     loadedContent.value = "Failed to load export content"
+  } finally {
+    isLoading.value = false
   }
 })
 </script>

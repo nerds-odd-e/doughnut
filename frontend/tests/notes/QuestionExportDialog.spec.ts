@@ -1,6 +1,11 @@
 import { PredefinedQuestionController } from "@generated/doughnut-backend-api/sdk.gen"
 import { describe, it, vi, expect, beforeEach, afterEach } from "vitest"
-import helper, { mockSdkService, wrapSdkError } from "../helpers"
+import { nextTick } from "vue"
+import helper, {
+  mockSdkService,
+  mockSdkServiceWithImplementation,
+  wrapSdkError,
+} from "../helpers"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import QuestionExportDialog from "@/components/notes/QuestionExportDialog.vue"
 import { type VueWrapper } from "@vue/test-utils"
@@ -30,6 +35,49 @@ describe("QuestionExportDialog", () => {
   afterEach(() => {
     wrapper?.unmount()
     document.body.innerHTML = ""
+  })
+
+  it("shows loading indicator while fetching export content", async () => {
+    const note = makeMe.aNote.please()
+    const exportData = {
+      request: {
+        model: "gpt-4",
+        messages: [{ role: "system", content: "test" }],
+      },
+      title: "Test Note",
+    } as never
+    let resolveExport!: (value: typeof exportData) => void
+    const exportPromise = new Promise<typeof exportData>((resolve) => {
+      resolveExport = resolve
+    })
+    mockSdkServiceWithImplementation(
+      PredefinedQuestionController,
+      "exportQuestionGeneration",
+      () => exportPromise
+    )
+
+    wrapper = helper
+      .component(QuestionExportDialog)
+      .withProps({ noteId: note.id })
+      .mount({ attachTo: document.body })
+
+    await nextTick()
+    expect(
+      document.body.querySelector('[data-testid="export-loading"]')
+    ).toBeTruthy()
+    expect(
+      document.body.querySelector('[data-testid="export-textarea"]')
+    ).toBeNull()
+
+    resolveExport(exportData)
+    await flushPromises()
+    expect(
+      document.body.querySelector('[data-testid="export-loading"]')
+    ).toBeNull()
+    const textarea = document.body.querySelector(
+      '[data-testid="export-textarea"]'
+    ) as HTMLTextAreaElement
+    expect(textarea.value).toContain('"model"')
   })
 
   it("fetches and displays export content", async () => {

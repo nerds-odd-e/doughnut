@@ -860,6 +860,14 @@ When(
   }
 )
 
+When('I clear the extraction preview new note title', () => {
+  start.assumeAssimilationPage().clearExtractionPreviewNewNoteTitle()
+})
+
+Then('the extraction preview create note button should be disabled', () => {
+  start.assumeAssimilationPage().expectExtractionPreviewCreateButtonDisabled()
+})
+
 Then(
   'the link {string} should link to the note with the same title',
   (linkText: string) => {

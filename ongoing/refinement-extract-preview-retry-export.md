@@ -227,7 +227,7 @@ _Green: export dialogs load JSON end-to-end; bug covered by SUT-level E2E._
 **Severity: bug (bad data).** The preview lets a user clear **New note title** and click
 **Create note**; nothing guards a blank title, so a blank-titled note is created.
 
-**6a — Behavior (frontend + E2E): block create on blank title.**
+**6a — Behavior (frontend + E2E): block create on blank title.** ✅
 Disable **Create note** (and/or show the inline error) when
 `extractionPreview.newNoteTitle.trim()` is empty. Frontend spec: button disabled with blank
 title, enabled once non-blank. Add/extend a `note_refinement.feature` scenario: clear the title
@@ -286,7 +286,7 @@ _Green: no behavior change; specs unchanged (update selectors/names only if refe
 
 Extended phases (review fixes):
 - Phase 5 (export transaction bug): ✅ complete (5a–5b; 5a Jidoka: scenarios passed green, bug not reproduced with simple test data)
-- Phase 6 (blank-title guard): 6a — planned
-- Phase 7 (export dialog loading state): 7a — planned
+- Phase 6 (blank-title guard): ✅ complete (6a)
+- Phase 7 (export dialog loading state): ✅ complete (7a)
 - Phase 8 (unify preview error UX): 8a — planned
 - Phase 9 (code-smell refactor): 9a, 9b — planned

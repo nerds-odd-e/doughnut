@@ -134,6 +134,18 @@ export function assimilationRefinementLayoutExpectations() {
       })
       return this
     },
+    clearExtractionPreviewNewNoteTitle() {
+      extractionPreviewPanel().within(() => {
+        cy.get('[data-test-id="extraction-preview-new-title"]').clear()
+      })
+      return this
+    },
+    expectExtractionPreviewCreateButtonDisabled() {
+      extractionPreviewPanel()
+        .find('[data-test-id="extraction-preview-create"]')
+        .should('be.disabled')
+      return this
+    },
     createNoteFromExtractionPreview() {
       extractionPreviewPanel()
         .find('[data-test-id="extraction-preview-create"]')
