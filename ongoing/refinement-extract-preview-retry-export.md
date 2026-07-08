@@ -141,7 +141,7 @@ same `layout` + `selectedItemIds` and replaces the 3 fields. Frontend spec for t
 field replacement. Add a retry stub sequence in `note_refinement_ai.ts` and a
 `note_refinement.feature` scenario that retries then creates from the second result.
 
-**2b — Behavior: confirm before discarding edits on retry.**
+**2b — Behavior: confirm before discarding edits on retry.** ✅
 If any preview field was edited, `popups.confirm` before retrying; discard on accept, keep on
 cancel. Frontend spec for both branches.
 
@@ -189,6 +189,6 @@ shared dialog with the layout-generation JSON. Frontend spec for the button + di
 ## Status
 
 - Phase 1 (extract preview + create): ✅ complete (1a–1d)
-- Phase 2 (retry): 2a ✅, 2b — planned
+- Phase 2 (retry): ✅ complete (2a–2b)
 - Phase 3 (export extract request): 3a, 3b, 3c — planned
 - Phase 4 (export breakdown request): 4a, 4b — planned

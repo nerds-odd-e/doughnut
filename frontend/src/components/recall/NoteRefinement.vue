@@ -171,6 +171,7 @@ const extractionPreview = ref<NoteExtractionResult>({
   newNoteContent: "",
   updatedOriginalNoteContent: "",
 })
+const lastAiExtractionResult = ref<NoteExtractionResult | null>(null)
 const createError = ref("")
 
 const {
@@ -184,6 +185,7 @@ const {
 const resetExtractionPreview = () => {
   showExtractionPreview.value = false
   createError.value = ""
+  lastAiExtractionResult.value = null
   extractionPreview.value = {
     newNoteTitle: "",
     newNoteContent: "",
@@ -277,8 +279,23 @@ const fetchExtractionPreview = async () => {
   }
 
   extractionPreview.value = { ...response.data }
+  lastAiExtractionResult.value = { ...response.data }
   createError.value = ""
   return true
+}
+
+const isExtractionPreviewEdited = () => {
+  const lastResult = lastAiExtractionResult.value
+  if (!lastResult) {
+    return false
+  }
+
+  const current = extractionPreview.value
+  return (
+    current.newNoteTitle !== lastResult.newNoteTitle ||
+    current.newNoteContent !== lastResult.newNoteContent ||
+    current.updatedOriginalNoteContent !== lastResult.updatedOriginalNoteContent
+  )
 }
 
 const runExtractionPreview = async (showPreviewOnSuccess: boolean) => {
@@ -297,7 +314,18 @@ const runExtractionPreview = async (showPreviewOnSuccess: boolean) => {
 
 const extractNote = () => runExtractionPreview(true)
 
-const retryExtractionPreview = () => runExtractionPreview(false)
+const retryExtractionPreview = async () => {
+  if (isExtractionPreviewEdited()) {
+    const confirmed = await popups.confirm(
+      "You have unsaved edits to the extract preview. Ask AI to retry will discard your edits and regenerate the preview."
+    )
+    if (!confirmed) {
+      return
+    }
+  }
+
+  await runExtractionPreview(false)
+}
 
 const backToLayout = () => {
   showExtractionPreview.value = false

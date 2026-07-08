@@ -1,5 +1,6 @@
 import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
 import { noteShowLocation } from "@/routes/noteShowLocation"
+import usePopups from "@/components/commons/Popups/usePopups"
 import { flushPromises } from "@vue/test-utils"
 import { nextTick } from "vue"
 import { beforeEach, describe, expect, it, vi } from "vitest"
@@ -240,6 +241,139 @@ describe("NoteRefinement extract note", () => {
       expect(wrapper.find('[data-test-id="extraction-preview"]').exists()).toBe(
         true
       )
+    })
+
+    it("shows confirmation before retry when preview fields were edited", async () => {
+      const layout = refinementLayoutItems(["Point 1", "Point 2", "Point 3"])
+      const firstPreview = sampleExtractionPreview({
+        newNoteTitle: "First title",
+        newNoteContent: "First content",
+        updatedOriginalNoteContent: "First original",
+      })
+      const extractNotePreviewSpy = mockSdkService(
+        AiController,
+        "extractNotePreview",
+        firstPreview
+      )
+      const wrapper = mountNoteRefinementWithLayout(layout)
+      await flushPromises()
+
+      await openExtractionPreview(wrapper, "p2")
+      await wrapper
+        .find('[data-test-id="extraction-preview-new-title"]')
+        .setValue("Edited title")
+      await retryExtractionPreview(wrapper)
+
+      const popups = usePopups().popups.peek()
+      expect(popups).toHaveLength(1)
+      expect(popups[0]!.type).toBe("confirm")
+      expect(popups[0]!.message).toContain("discard")
+      expect(extractNotePreviewSpy).toHaveBeenCalledTimes(1)
+    })
+
+    it("discards edited preview fields when retry is confirmed", async () => {
+      const layout = refinementLayoutItems(["Point 1", "Point 2", "Point 3"])
+      const firstPreview = sampleExtractionPreview({
+        newNoteTitle: "First title",
+        newNoteContent: "First content",
+        updatedOriginalNoteContent: "First original",
+      })
+      const retryPreview = sampleExtractionPreview({
+        newNoteTitle: "Retry title",
+        newNoteContent: "Retry content",
+        updatedOriginalNoteContent: "Retry original",
+      })
+      const extractNotePreviewSpy = mockSdkService(
+        AiController,
+        "extractNotePreview",
+        firstPreview
+      )
+      extractNotePreviewSpy.mockResolvedValueOnce(wrapSdkResponse(firstPreview))
+      extractNotePreviewSpy.mockResolvedValueOnce(wrapSdkResponse(retryPreview))
+      const wrapper = mountNoteRefinementWithLayout(layout)
+      await flushPromises()
+
+      await openExtractionPreview(wrapper, "p2")
+      await wrapper
+        .find('[data-test-id="extraction-preview-new-title"]')
+        .setValue("Edited title")
+      await wrapper
+        .find('[data-test-id="retry-extraction-preview"]')
+        .trigger("click")
+      usePopups().popups.done(true)
+      await flushPromises()
+
+      expect(extractNotePreviewSpy).toHaveBeenCalledTimes(2)
+      expect(
+        (
+          wrapper.find('[data-test-id="extraction-preview-new-title"]')
+            .element as HTMLTextAreaElement
+        ).value
+      ).toBe("Retry title")
+      expect(
+        (
+          wrapper.find('[data-test-id="extraction-preview-new-content"]')
+            .element as HTMLTextAreaElement
+        ).value
+      ).toBe("Retry content")
+      expect(
+        (
+          wrapper.find('[data-test-id="extraction-preview-original-content"]')
+            .element as HTMLTextAreaElement
+        ).value
+      ).toBe("Retry original")
+    })
+
+    it("keeps edited preview fields when retry is cancelled", async () => {
+      const layout = refinementLayoutItems(["Point 1", "Point 2", "Point 3"])
+      const firstPreview = sampleExtractionPreview({
+        newNoteTitle: "First title",
+        newNoteContent: "First content",
+        updatedOriginalNoteContent: "First original",
+      })
+      const extractNotePreviewSpy = mockSdkService(
+        AiController,
+        "extractNotePreview",
+        firstPreview
+      )
+      const wrapper = mountNoteRefinementWithLayout(layout)
+      await flushPromises()
+
+      await openExtractionPreview(wrapper, "p2")
+      await wrapper
+        .find('[data-test-id="extraction-preview-new-title"]')
+        .setValue("Edited title")
+      await wrapper
+        .find('[data-test-id="extraction-preview-new-content"]')
+        .setValue("Edited content")
+      await wrapper
+        .find('[data-test-id="extraction-preview-original-content"]')
+        .setValue("Edited original")
+      await wrapper
+        .find('[data-test-id="retry-extraction-preview"]')
+        .trigger("click")
+      usePopups().popups.done(false)
+      await flushPromises()
+
+      expect(extractNotePreviewSpy).toHaveBeenCalledTimes(1)
+      expect(
+        (
+          wrapper.find('[data-test-id="extraction-preview-new-title"]')
+            .element as HTMLTextAreaElement
+        ).value
+      ).toBe("Edited title")
+      expect(
+        (
+          wrapper.find('[data-test-id="extraction-preview-new-content"]')
+            .element as HTMLTextAreaElement
+        ).value
+      ).toBe("Edited content")
+      expect(
+        (
+          wrapper.find('[data-test-id="extraction-preview-original-content"]')
+            .element as HTMLTextAreaElement
+        ).value
+      ).toBe("Edited original")
     })
 
     it("returns to the layout when Back is clicked", async () => {
