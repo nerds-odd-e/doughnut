@@ -66,7 +66,7 @@ export function assimilationRefinementLayoutExpectations() {
       this.createNoteFromExtractionPreview()
       return this
     },
-    openExtractionPreviewForLayoutPoints(...layoutPointTexts: string[]) {
+    selectRefinementLayoutPoints(...layoutPointTexts: string[]) {
       showRefinementLayout.call(this)
       refinementLayoutPanel().within(() => {
         layoutPointTexts.forEach((layoutPointText) => {
@@ -75,10 +75,49 @@ export function assimilationRefinementLayoutExpectations() {
             .first()
             .check()
         })
+      })
+      return this
+    },
+    openExtractionPreviewForLayoutPoints(...layoutPointTexts: string[]) {
+      this.selectRefinementLayoutPoints(...layoutPointTexts)
+      refinementLayoutPanel().within(() => {
         cy.findByRole('button', { name: 'Extract' }).click()
       })
       waitForExtractNotePreview()
       extractionPreviewPanel().should('be.visible')
+      return this
+    },
+    exportExtractRequestForLayoutPoints(...layoutPointTexts: string[]) {
+      this.selectRefinementLayoutPoints(...layoutPointTexts)
+      refinementLayoutPanel()
+        .find('[data-test-id="export-extract-request"]')
+        .click()
+      return this
+    },
+    exportBreakdownRequest() {
+      showRefinementLayout.call(this)
+      refinementLayoutPanel()
+        .find('[data-test-id="export-breakdown-request"]')
+        .click()
+      return this
+    },
+    expectExportRequestDialogShowsAiRequestJson() {
+      cy.get('[data-testid="export-textarea"]').should(($textarea) => {
+        const content = ($textarea.val() as string).trim()
+        expect(
+          content,
+          `Expected export dialog to show AI request JSON, but found: ${content}`
+        ).to.not.equal('')
+        expect(
+          content,
+          `Expected export dialog JSON to start with "{", but found: ${content}`
+        ).to.match(/^\{/)
+        const json = JSON.parse(content) as Record<string, unknown>
+        expect(
+          json,
+          `Expected export JSON to include "model" and "instructions" keys, but found: ${content}`
+        ).to.include.all.keys('model', 'instructions')
+      })
       return this
     },
     editExtractionPreviewFields(fields: ExtractionPreviewFields) {

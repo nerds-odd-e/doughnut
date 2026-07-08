@@ -182,6 +182,91 @@ shared dialog with the layout-generation JSON. Frontend spec for the button + di
 
 **Learning:** Mirrors export-extract pattern; `exportRefinementLayoutRequest` is a GET with only `path.note`. Button stays enabled whenever layout is shown; hidden on extraction preview like export-extract.
 
+## Extended phases — review fixes (ordered by severity)
+
+From the post-plan review. Ordered highest-severity first so stopping after any phase leaves
+the most important issue fixed. Same small-commit / green-boundary discipline as above.
+
+### Phase 5 — Fix: export endpoints run without a transaction
+
+**Severity: bug (runtime failure hidden by tests).** `exportRefinementLayoutRequest` and
+`exportExtractRequest` are **not** `@Transactional`, but both call `buildRefinementLayoutRequest`
+/ `buildExtractNoteRequest`, which run `focusContextRetrievalService.retrieve(note, …)` — the
+same lazy graph traversal that the `@Transactional` `generateRefinementSuggestions` needs. The
+app runs with `open-in-view: false`, so at runtime the detached path-variable `Note` can trigger
+`LazyInitializationException`. Controller tests pass because `ControllerTestBase` is
+`@Transactional` (ambient session), masking the defect — so the regression net must go through
+the **real running SUT** (E2E), not a `@Transactional` unit test.
+
+**5a — Behavior (E2E red): export buttons reach the backend end-to-end.** ✅
+Add two `@wip` scenarios to `note_refinement.feature`: open **Export extract request** (with a
+selection) and **Export breakdown request**, then assert the dialog shows JSON containing the
+request (e.g. an `instructions`/`model` key). Run
+`cypress run --spec e2e_test/features/assimilation/note_refinement.feature` against the running
+SUT and confirm they fail for the right reason (backend error / empty dialog), not a typo.
+Add any needed export steps to `note_refinement_ai.ts` / page objects.
+_Red: scenarios fail through the real backend, reproducing the bug._
+
+**Learning (Jidoka):** Both `@wip` scenarios **passed green** against the running SUT — the
+planned red failure was **not reproduced**. `FocusContextRetrievalService.retrieve` re-hydrates
+the note via `noteRepository.hydrateNonDeletedNotesWithNotebookAndFolderByIds` before graph
+traversal, so the simple Background note (`Sample` with flat content, no wiki links) does not
+trigger `LazyInitializationException` even without `@Transactional` on the export endpoints.
+Phase **5b** still adds `@Transactional(readOnly = true)` for consistency with other
+focus-context endpoints, but the E2E net is now a **green regression guard**, not a red bug repro.
+Remove `@wip` in 5b once transactional fix lands.
+
+**5b — Behavior (green): make the export endpoints transactional.**
+Add `@Transactional(readOnly = true)` to both export endpoints in `AiController`. Rerun the two
+scenarios; remove `@wip` once they pass. No unit-test change (existing ones already pass under
+their ambient transaction).
+_Green: export dialogs load JSON end-to-end; bug covered by SUT-level E2E._
+
+### Phase 6 — Fix: prevent creating a note with a blank title
+
+**Severity: bug (bad data).** The preview lets a user clear **New note title** and click
+**Create note**; nothing guards a blank title, so a blank-titled note is created.
+
+**6a — Behavior (frontend + E2E): block create on blank title.**
+Disable **Create note** (and/or show the inline error) when
+`extractionPreview.newNoteTitle.trim()` is empty. Frontend spec: button disabled with blank
+title, enabled once non-blank. Add/extend a `note_refinement.feature` scenario: clear the title
+in the preview, confirm the note is not created. Keep it a UI-level guard; do not add a backend
+defensive layer unless E2E shows the server still accepts a blank title.
+_Green: cannot create a blank-titled note from the preview._
+
+### Phase 7 — Improvement: export dialog shows a loading state
+
+**7a — Behavior (frontend): loading indicator while export JSON loads.**
+`AiRequestExportDialog` fetches on mount (focus-context-heavy) with a blank textarea until it
+returns. Add a loading indicator/disabled state until content resolves. Update
+`QuestionExportDialog.spec.ts` if needed and add a case to an export spec asserting the loading
+state. Applies to all three consumers (question, extract, breakdown) via the shared component.
+_Green: dialog shows loading, then JSON._
+
+### Phase 8 — Improvement: unify extraction-preview error UX
+
+**8a — Structure/Behavior (frontend): route preview-generation errors inline.**
+`fetchExtractionPreview` failures currently use `popups.alert`, while create failures use the
+inline `createError` banner. Route preview/retry failures into the same inline banner for one
+consistent surface. Update the extract spec's error cases to assert the inline banner.
+_Green: one error surface on the preview screen; behavior otherwise unchanged._
+
+### Phase 9 — Structure: remove code smells in `NoteRefinement.vue`
+
+Pure refactor, no external behavior change; existing specs stay green throughout.
+
+**9a — Structure: extract a `layoutSelectionBody()` helper.**
+Collapse the duplicated `{ layout: { items: refinementLayoutItems.value }, selectedItemIds:
+selectedItemIds.value }` body built in `removeSelectedLayoutItems`, `fetchExtractionPreview`, and
+`fetchExtractRequestExport` into one helper.
+
+**9b — Structure: rename `extractNote` → `openExtractionPreview` and align handler style.**
+The **Extract** button handler no longer extracts; rename to reflect "open preview." Convert the
+two `async function` export handlers to the `const … = async () =>` style used elsewhere in the
+file.
+_Green: no behavior change; specs unchanged (update selectors/names only if referenced)._
+
 ## Testing strategy notes
 
 - Frontend: Vitest browser mode via existing `noteRefinementTestSupport` helpers; test through
@@ -199,4 +284,9 @@ shared dialog with the layout-generation JSON. Frontend spec for the button + di
 - Phase 3 (export extract request): ✅ complete (3a–3c)
 - Phase 4 (export breakdown request): ✅ complete (4a–4b)
 
-**Plan complete.** All phases delivered.
+Extended phases (review fixes):
+- Phase 5 (export transaction bug): 5a ✅, 5b — planned (5a Jidoka: scenarios passed green, bug not reproduced with simple test data)
+- Phase 6 (blank-title guard): 6a — planned
+- Phase 7 (export dialog loading state): 7a — planned
+- Phase 8 (unify preview error UX): 8a — planned
+- Phase 9 (code-smell refactor): 9a, 9b — planned

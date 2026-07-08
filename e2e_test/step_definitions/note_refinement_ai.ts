@@ -2,7 +2,13 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { type DataTable, Given } from '@badeball/cypress-cucumber-preprocessor'
+import {
+  type DataTable,
+  Given,
+  Then,
+  When,
+} from '@badeball/cypress-cucumber-preprocessor'
+import start from '../start'
 import { mock_services } from '../start'
 import { REFINEMENT_LAYOUT_INSTRUCTION_PATTERN } from '../start/mock_services/createOpenAiResponsesMock'
 
@@ -191,3 +197,20 @@ Given(
     })
   }
 )
+
+When(
+  'I export the extract request for refinement layout points {string} and {string}',
+  (firstPoint: string, secondPoint: string) => {
+    start
+      .assumeAssimilationPage()
+      .exportExtractRequestForLayoutPoints(firstPoint, secondPoint)
+  }
+)
+
+When('I export the breakdown request from refinement layout', () => {
+  start.assumeAssimilationPage().exportBreakdownRequest()
+})
+
+Then('the export request dialog should show AI request JSON', () => {
+  start.assumeAssimilationPage().expectExportRequestDialogShowsAiRequestJson()
+})

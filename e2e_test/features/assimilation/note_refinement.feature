@@ -86,3 +86,15 @@ Feature: Note refinement
       | note-title    |
       | Sample        |
       | Retry B and D |
+
+  @wip
+  Scenario: Export extract request shows AI request JSON
+    When I am assimilating the note "Sample"
+    And I export the extract request for refinement layout points "B" and "D"
+    Then the export request dialog should show AI request JSON
+
+  @wip
+  Scenario: Export breakdown request shows AI request JSON
+    When I am assimilating the note "Sample"
+    And I export the breakdown request from refinement layout
+    Then the export request dialog should show AI request JSON
