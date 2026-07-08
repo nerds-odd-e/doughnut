@@ -246,7 +246,7 @@ _Green: dialog shows loading, then JSON._
 
 ### Phase 8 — Improvement: unify extraction-preview error UX
 
-**8a — Structure/Behavior (frontend): route preview-generation errors inline.**
+**8a — Structure/Behavior (frontend): route preview-generation errors inline.** ✅
 `fetchExtractionPreview` failures currently use `popups.alert`, while create failures use the
 inline `createError` banner. Route preview/retry failures into the same inline banner for one
 consistent surface. Update the extract spec's error cases to assert the inline banner.
@@ -256,12 +256,12 @@ _Green: one error surface on the preview screen; behavior otherwise unchanged._
 
 Pure refactor, no external behavior change; existing specs stay green throughout.
 
-**9a — Structure: extract a `layoutSelectionBody()` helper.**
+**9a — Structure: extract a `layoutSelectionBody()` helper.** ✅
 Collapse the duplicated `{ layout: { items: refinementLayoutItems.value }, selectedItemIds:
 selectedItemIds.value }` body built in `removeSelectedLayoutItems`, `fetchExtractionPreview`, and
 `fetchExtractRequestExport` into one helper.
 
-**9b — Structure: rename `extractNote` → `openExtractionPreview` and align handler style.**
+**9b — Structure: rename `extractNote` → `openExtractionPreview` and align handler style.** ✅
 The **Extract** button handler no longer extracts; rename to reflect "open preview." Convert the
 two `async function` export handlers to the `const … = async () =>` style used elsewhere in the
 file.
@@ -288,5 +288,5 @@ Extended phases (review fixes):
 - Phase 5 (export transaction bug): ✅ complete (5a–5b; 5a Jidoka: scenarios passed green, bug not reproduced with simple test data)
 - Phase 6 (blank-title guard): ✅ complete (6a)
 - Phase 7 (export dialog loading state): ✅ complete (7a)
-- Phase 8 (unify preview error UX): 8a — planned
-- Phase 9 (code-smell refactor): 9a, 9b — planned
+- Phase 8 (unify preview error UX): ✅ complete (8a)
+- Phase 9 (code-smell refactor): ✅ complete (9a–9b)

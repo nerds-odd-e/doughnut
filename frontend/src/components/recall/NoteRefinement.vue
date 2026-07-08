@@ -45,7 +45,7 @@
         <button
           data-test-id="extract-refinement-layout"
           :disabled="selectedItemIds.length === 0"
-          @click="extractNote"
+          @click="openExtractionPreview"
           class="daisy-btn daisy-btn-primary daisy-btn-sm"
           title="Extract selected to a new note"
         >
@@ -258,6 +258,11 @@ const { popups } = usePopups()
 const router = useRouter()
 const storageAccessor = useStorageAccessor()
 
+const layoutSelectionBody = () => ({
+  layout: { items: refinementLayoutItems.value },
+  selectedItemIds: selectedItemIds.value,
+})
+
 const removeSelectedLayoutItems = async () => {
   if (selectedItemIds.value.length === 0) {
     return
@@ -275,10 +280,7 @@ const removeSelectedLayoutItems = async () => {
     const { data, error } = await apiCallWithLoading(() =>
       AiController.removeRefinementSuggestion({
         path: { note: props.note.id },
-        body: {
-          layout: { items: refinementLayoutItems.value },
-          selectedItemIds: selectedItemIds.value,
-        },
+        body: layoutSelectionBody(),
       })
     )
 
@@ -305,15 +307,14 @@ const fetchExtractionPreview = async () => {
   const response = await apiCallWithLoading(() =>
     AiController.extractNotePreview({
       path: { note: props.note.id },
-      body: {
-        layout: { items: refinementLayoutItems.value },
-        selectedItemIds: selectedItemIds.value,
-      },
+      body: layoutSelectionBody(),
     })
   )
 
   if (response.error || !response.data) {
-    await popups.alert("Failed to generate extract preview")
+    const openApiError = toOpenApiError(response.error)
+    createError.value =
+      openApiError.message ?? "Failed to generate extract preview"
     return false
   }
 
@@ -338,20 +339,27 @@ const isExtractionPreviewEdited = () => {
 }
 
 const runExtractionPreview = async (showPreviewOnSuccess: boolean) => {
+  createError.value = ""
+
   try {
     await runWithBlockingApiLoading(async () => {
       const success = await fetchExtractionPreview()
-      if (success && showPreviewOnSuccess) {
+      if (success) {
+        if (showPreviewOnSuccess) {
+          showExtractionPreview.value = true
+        }
+      } else {
         showExtractionPreview.value = true
       }
     }, "AI is generating preview...")
   } catch (err) {
     console.error("Failed to generate extract preview:", err)
-    await popups.alert(`Error: ${err}`)
+    createError.value = `Error: ${err}`
+    showExtractionPreview.value = true
   }
 }
 
-const extractNote = () => runExtractionPreview(true)
+const openExtractionPreview = () => runExtractionPreview(true)
 
 const retryExtractionPreview = async () => {
   if (isExtractionPreviewEdited()) {
@@ -371,13 +379,10 @@ const backToLayout = () => {
   createError.value = ""
 }
 
-async function fetchExtractRequestExport() {
+const fetchExtractRequestExport = async () => {
   const { data: response, error } = await AiController.exportExtractRequest({
     path: { note: props.note.id },
-    body: {
-      layout: { items: refinementLayoutItems.value },
-      selectedItemIds: selectedItemIds.value,
-    },
+    body: layoutSelectionBody(),
   })
   if (!error && response) {
     return response
@@ -385,7 +390,7 @@ async function fetchExtractRequestExport() {
   return null
 }
 
-async function fetchBreakdownRequestExport() {
+const fetchBreakdownRequestExport = async () => {
   const { data: response, error } =
     await AiController.exportRefinementLayoutRequest({
       path: { note: props.note.id },
