@@ -176,9 +176,11 @@ _Green: additive; no UI yet._
 
 **Learning:** `buildRefinementLayoutRequest` on `AiNoteAutomationService` mirrors `buildExtractNoteRequest`; `generateRefinementSuggestions` now uses it. Schema at `text.format.schema`; `max_output_tokens` is 1000.
 
-**4b — Behavior (frontend): export breakdown request button.**
+**4b — Behavior (frontend): export breakdown request button.** ✅
 **Export breakdown request** button in the Refine note modal (no selection needed) opens the
 shared dialog with the layout-generation JSON. Frontend spec for the button + dialog.
+
+**Learning:** Mirrors export-extract pattern; `exportRefinementLayoutRequest` is a GET with only `path.note`. Button stays enabled whenever layout is shown; hidden on extraction preview like export-extract.
 
 ## Testing strategy notes
 
@@ -195,4 +197,6 @@ shared dialog with the layout-generation JSON. Frontend spec for the button + di
 - Phase 1 (extract preview + create): ✅ complete (1a–1d)
 - Phase 2 (retry): ✅ complete (2a–2b)
 - Phase 3 (export extract request): ✅ complete (3a–3c)
-- Phase 4 (export breakdown request): 4a ✅, 4b — planned
+- Phase 4 (export breakdown request): ✅ complete (4a–4b)
+
+**Plan complete.** All phases delivered.

@@ -62,6 +62,14 @@
           Export extract request
         </button>
         <button
+          data-test-id="export-breakdown-request"
+          @click="showExportBreakdownDialog = true"
+          class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+          title="Export breakdown request for ChatGPT"
+        >
+          Export breakdown request
+        </button>
+        <button
           data-test-id="remove-refinement-layout"
           :disabled="selectedItemIds.length === 0"
           @click="removeSelectedLayoutItems"
@@ -149,6 +157,13 @@
     :fetch-export="fetchExtractRequestExport"
     @close="showExportExtractDialog = false"
   />
+
+  <AiRequestExportDialog
+    v-if="showExportBreakdownDialog"
+    title="Export Breakdown Request for ChatGPT"
+    :fetch-export="fetchBreakdownRequestExport"
+    @close="showExportBreakdownDialog = false"
+  />
 </template>
 
 <script setup lang="ts">
@@ -191,6 +206,7 @@ const extractionPreview = ref<NoteExtractionResult>({
 const lastAiExtractionResult = ref<NoteExtractionResult | null>(null)
 const createError = ref("")
 const showExportExtractDialog = ref(false)
+const showExportBreakdownDialog = ref(false)
 
 const {
   selectedItemIds,
@@ -358,6 +374,17 @@ async function fetchExtractRequestExport() {
       selectedItemIds: selectedItemIds.value,
     },
   })
+  if (!error && response) {
+    return response
+  }
+  return null
+}
+
+async function fetchBreakdownRequestExport() {
+  const { data: response, error } =
+    await AiController.exportRefinementLayoutRequest({
+      path: { note: props.note.id },
+    })
   if (!error && response) {
     return response
   }

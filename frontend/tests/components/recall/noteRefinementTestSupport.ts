@@ -173,6 +173,7 @@ export function refinementActionButton(
   testId:
     | "extract-refinement-layout"
     | "export-extract-request"
+    | "export-breakdown-request"
     | "remove-refinement-layout"
 ): HTMLButtonElement {
   return wrapper.find(`[data-test-id="${testId}"]`).element as HTMLButtonElement
@@ -180,6 +181,9 @@ export function refinementActionButton(
 
 export const exportExtractRequestButtonTitle =
   "Export extract request for ChatGPT"
+
+export const exportBreakdownRequestButtonTitle =
+  "Export breakdown request for ChatGPT"
 
 export async function selectRefinementLayoutItem(
   wrapper: ReturnType<typeof mountNoteRefinement>,
