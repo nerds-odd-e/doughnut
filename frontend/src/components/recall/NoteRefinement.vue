@@ -53,6 +53,15 @@
           Extract
         </button>
         <button
+          data-test-id="export-extract-request"
+          :disabled="selectedItemIds.length === 0"
+          @click="showExportExtractDialog = true"
+          class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+          title="Export extract request for ChatGPT"
+        >
+          Export extract request
+        </button>
+        <button
           data-test-id="remove-refinement-layout"
           :disabled="selectedItemIds.length === 0"
           @click="removeSelectedLayoutItems"
@@ -133,6 +142,13 @@
       </div>
     </div>
   </div>
+
+  <AiRequestExportDialog
+    v-if="showExportExtractDialog"
+    title="Export Extract Request for ChatGPT"
+    :fetch-export="fetchExtractRequestExport"
+    @close="showExportExtractDialog = false"
+  />
 </template>
 
 <script setup lang="ts">
@@ -149,6 +165,7 @@ import {
 } from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { useRefinementLayoutSelection } from "@/composables/useRefinementLayoutSelection"
+import AiRequestExportDialog from "@/components/commons/AiRequestExportDialog.vue"
 import usePopups from "../commons/Popups/usePopups"
 import RefinementLayoutItemRow from "./RefinementLayoutItemRow.vue"
 import { Folders } from "@lucide/vue"
@@ -173,6 +190,7 @@ const extractionPreview = ref<NoteExtractionResult>({
 })
 const lastAiExtractionResult = ref<NoteExtractionResult | null>(null)
 const createError = ref("")
+const showExportExtractDialog = ref(false)
 
 const {
   selectedItemIds,
@@ -330,6 +348,20 @@ const retryExtractionPreview = async () => {
 const backToLayout = () => {
   showExtractionPreview.value = false
   createError.value = ""
+}
+
+async function fetchExtractRequestExport() {
+  const { data: response, error } = await AiController.exportExtractRequest({
+    path: { note: props.note.id },
+    body: {
+      layout: { items: refinementLayoutItems.value },
+      selectedItemIds: selectedItemIds.value,
+    },
+  })
+  if (!error && response) {
+    return response
+  }
+  return null
 }
 
 const createExtractedNote = async () => {

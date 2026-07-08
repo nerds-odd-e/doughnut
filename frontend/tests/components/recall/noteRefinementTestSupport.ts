@@ -170,10 +170,16 @@ export function layoutCheckbox(
 
 export function refinementActionButton(
   wrapper: ReturnType<typeof mountNoteRefinement>,
-  testId: "extract-refinement-layout" | "remove-refinement-layout"
+  testId:
+    | "extract-refinement-layout"
+    | "export-extract-request"
+    | "remove-refinement-layout"
 ): HTMLButtonElement {
   return wrapper.find(`[data-test-id="${testId}"]`).element as HTMLButtonElement
 }
+
+export const exportExtractRequestButtonTitle =
+  "Export extract request for ChatGPT"
 
 export async function selectRefinementLayoutItem(
   wrapper: ReturnType<typeof mountNoteRefinement>,

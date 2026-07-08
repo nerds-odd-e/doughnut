@@ -162,7 +162,7 @@ JSON (read-only textarea + copy), keeping `QuestionExportDialog` behavior and it
 green.
 _Green: existing question-export unchanged._
 
-**3c — Behavior (frontend): export extract request button.**
+**3c — Behavior (frontend): export extract request button.** ✅
 **Export extract request** button on the layout screen, enabled only with a selection, opens the
 shared dialog with the extract JSON. Frontend spec for gating + dialog content.
 
@@ -192,5 +192,5 @@ shared dialog with the layout-generation JSON. Frontend spec for the button + di
 
 - Phase 1 (extract preview + create): ✅ complete (1a–1d)
 - Phase 2 (retry): ✅ complete (2a–2b)
-- Phase 3 (export extract request): 3a ✅, 3b ✅, 3c — planned
+- Phase 3 (export extract request): ✅ complete (3a–3c)
 - Phase 4 (export breakdown request): 4a, 4b — planned
