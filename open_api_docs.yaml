@@ -1607,6 +1607,34 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NoteExtractionResult"
+  /api/ai/export-extract-request/{note}:
+    post:
+      tags:
+      - ai-controller
+      summary: Export extract-note AI request JSON
+      description: Returns the OpenAI structured-response request body for note extraction
+        without calling OpenAI.
+      operationId: exportExtractRequest
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteRefinementLayoutSelectionRequestDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: {}
   /api/ai/create-extracted-note/{note}:
     post:
       tags:

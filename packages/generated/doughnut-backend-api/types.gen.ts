@@ -2405,6 +2405,26 @@ export type ExtractNotePreviewResponses = {
 
 export type ExtractNotePreviewResponse = ExtractNotePreviewResponses[keyof ExtractNotePreviewResponses];
 
+export type ExportExtractRequestData = {
+    body: NoteRefinementLayoutSelectionRequestDto;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/ai/export-extract-request/{note}';
+};
+
+export type ExportExtractRequestResponses = {
+    /**
+     * OK
+     */
+    200: {
+        [key: string]: unknown;
+    };
+};
+
+export type ExportExtractRequestResponse = ExportExtractRequestResponses[keyof ExportExtractRequestResponses];
+
 export type CreateExtractedNoteData = {
     body: NoteExtractionResult;
     path: {

@@ -61,12 +61,17 @@ public class AiNoteAutomationService {
         NOTE_REFINEMENT_LAYOUT_MAX_OUTPUT_TOKENS);
   }
 
+  public StructuredResponseCreateParams<NoteExtractionResult> buildExtractNoteRequest(
+      NoteRefinementLayout layout, List<String> selectedItemIds) {
+    InstructionAndSchema tool = AiToolFactory.extractNoteAiTool(layout, selectedItemIds);
+    return buildStructuredResponseParams(
+        NoteExtractionResult.class, tool, EXTRACT_NOTE_MAX_OUTPUT_TOKENS);
+  }
+
   public NoteExtractionResult extractNote(NoteRefinementLayout layout, List<String> selectedItemIds)
       throws JsonProcessingException {
-    InstructionAndSchema tool = AiToolFactory.extractNoteAiTool(layout, selectedItemIds);
     NoteExtractionResult result =
-        executeWithTool(
-            tool, NoteExtractionResult.class, r -> r, null, EXTRACT_NOTE_MAX_OUTPUT_TOKENS);
+        executeWithParams(buildExtractNoteRequest(layout, selectedItemIds), r -> r, null);
     return sanitizeExtractionResult(result);
   }
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.services.ai.AiNoteAutomationService;
 import com.odde.doughnut.services.ai.NoteExtractionResult;
 import com.odde.doughnut.services.ai.NoteRefinementLayout;
+import com.openai.models.responses.StructuredResponseCreateParams;
 import java.util.List;
 
 public final class NoteAutomationService {
@@ -24,6 +25,11 @@ public final class NoteAutomationService {
   public NoteExtractionResult extractNote(NoteRefinementLayout layout, List<String> selectedItemIds)
       throws JsonProcessingException {
     return aiNoteAutomationService.extractNote(layout, selectedItemIds);
+  }
+
+  public StructuredResponseCreateParams<NoteExtractionResult> buildExtractNoteRequest(
+      NoteRefinementLayout layout, List<String> selectedItemIds) {
+    return aiNoteAutomationService.buildExtractNoteRequest(layout, selectedItemIds);
   }
 
   public String removeSelectedLayoutPointsAndRegenerateContent(

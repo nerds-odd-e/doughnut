@@ -12,9 +12,12 @@ import com.odde.doughnut.services.ai.NoteExtractionResult;
 import com.odde.doughnut.services.ai.NoteRefinementLayout;
 import com.odde.doughnut.services.ai.NoteRefinementLayoutValidator;
 import com.odde.doughnut.services.ai.OtherAiServices;
+import com.odde.doughnut.services.openAiApis.StructuredResponseCreateParamsSerializer;
+import com.openai.models.responses.StructuredResponseCreateParams;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,17 +35,20 @@ public class AiController {
   private final NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
   private final AuthorizationService authorizationService;
   private final NoteConstructionService noteConstructionService;
+  private final StructuredResponseCreateParamsSerializer paramsSerializer;
 
   @Autowired
   public AiController(
       NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory,
       OtherAiServices otherAiServices,
       AuthorizationService authorizationService,
-      NoteConstructionService noteConstructionService) {
+      NoteConstructionService noteConstructionService,
+      StructuredResponseCreateParamsSerializer paramsSerializer) {
     this.notebookAssistantForNoteServiceFactory = notebookAssistantForNoteServiceFactory;
     this.otherAiServices = otherAiServices;
     this.authorizationService = authorizationService;
     this.noteConstructionService = noteConstructionService;
+    this.paramsSerializer = paramsSerializer;
   }
 
   @GetMapping("/dummy")
@@ -138,6 +144,26 @@ public class AiController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
     return noteConstructionService.createNoteFromExtractedSuggestion(note, request);
+  }
+
+  @Operation(
+      summary = "Export extract-note AI request JSON",
+      description =
+          "Returns the OpenAI structured-response request body for note extraction without calling OpenAI.")
+  @PostMapping("/export-extract-request/{note}")
+  public Map<String, Object> exportExtractRequest(
+      @PathVariable(value = "note") @Schema(type = "integer") Note note,
+      @RequestBody NoteRefinementLayoutSelectionRequestDTO request)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(note);
+    assertNoteContentNotEmpty(note);
+    NoteRefinementLayout layout =
+        validateLayoutSelectionRequest(request.getLayout(), request.getSelectedItemIds());
+    StructuredResponseCreateParams<NoteExtractionResult> params =
+        notebookAssistantForNoteServiceFactory
+            .createNoteAutomationService(note)
+            .buildExtractNoteRequest(layout, request.getSelectedItemIds());
+    return paramsSerializer.toBodyMap(params);
   }
 
   private NoteExtractionResult extractNoteFromLayoutSelection(

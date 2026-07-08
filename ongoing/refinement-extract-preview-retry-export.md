@@ -147,12 +147,14 @@ cancel. Frontend spec for both branches.
 
 ### Phase 3 — Export the extract AI request JSON
 
-**3a — Structure (backend): expose params build + export endpoint.**
+**3a — Structure (backend): expose params build + export endpoint.** ✅
 Expose a "build extract params without executing" path in `AiNoteAutomationService` (mirror
 `buildQuestionGenerationRequest`). Add `POST /api/ai/export-extract-request/{note}` returning
 `toBodyMap(params)` (no OpenAI call). Controller test asserts the body map contains
 model/instructions/input/schema and reflects the selection. Run `generateTypeScript`.
 _Green: additive; no UI yet._
+
+**Learning:** `buildExtractNoteRequest` is exposed on `AiNoteAutomationService` and delegated through `NoteAutomationService`. Export reuses layout+selection validation from preview; schema lives at `text.format.schema` in the body map.
 
 **3b — Structure (frontend): a reusable AI-request export dialog.**
 Generalize the question-export dialog into a shared component that renders arbitrary AI-request
@@ -190,5 +192,5 @@ shared dialog with the layout-generation JSON. Frontend spec for the button + di
 
 - Phase 1 (extract preview + create): ✅ complete (1a–1d)
 - Phase 2 (retry): ✅ complete (2a–2b)
-- Phase 3 (export extract request): 3a, 3b, 3c — planned
+- Phase 3 (export extract request): 3a ✅, 3b, 3c — planned
 - Phase 4 (export breakdown request): 4a, 4b — planned
