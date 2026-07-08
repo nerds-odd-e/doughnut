@@ -290,3 +290,5 @@ Extended phases (review fixes):
 - Phase 7 (export dialog loading state): ✅ complete (7a)
 - Phase 8 (unify preview error UX): ✅ complete (8a)
 - Phase 9 (code-smell refactor): ✅ complete (9a–9b)
+
+**Plan status: ✅ complete**

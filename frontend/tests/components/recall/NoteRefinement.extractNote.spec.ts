@@ -452,12 +452,12 @@ describe("NoteRefinement extract note", () => {
       expect(wrapper.text()).toContain("Test Point")
     })
 
-    it("keeps layout visible when preview API fails", async () => {
+    it("shows inline error when extract preview API fails", async () => {
       mockSdkService(
         AiController,
         "extractNotePreview",
         undefined
-      ).mockResolvedValue(wrapSdkError("API Error"))
+      ).mockResolvedValue(wrapSdkError({ message: "API Error" }))
       const wrapper = mountNoteRefinement(["Test Point"])
       await flushPromises()
 
@@ -468,10 +468,40 @@ describe("NoteRefinement extract note", () => {
       await flushPromises()
 
       expect(wrapper.find('[data-test-id="extraction-preview"]').exists()).toBe(
-        false
+        true
       )
-      expect(wrapper.findAll("li")).toHaveLength(1)
-      expect(wrapper.text()).toContain("Test Point")
+      expect(
+        wrapper.find('[data-test-id="extraction-preview-error"]').text()
+      ).toBe("API Error")
+      expect(usePopups().popups.peek()).toHaveLength(0)
+    })
+
+    it("shows inline error when retry preview API fails", async () => {
+      const layout = refinementLayoutItems(["Point 1", "Point 2", "Point 3"])
+      const extractNotePreviewSpy = mockSdkService(
+        AiController,
+        "extractNotePreview",
+        sampleExtractionPreview()
+      )
+      extractNotePreviewSpy.mockResolvedValueOnce(
+        wrapSdkResponse(sampleExtractionPreview())
+      )
+      extractNotePreviewSpy.mockResolvedValueOnce(
+        wrapSdkError({ message: "Retry failed" })
+      )
+      const wrapper = mountNoteRefinementWithLayout(layout)
+      await flushPromises()
+
+      await openExtractionPreview(wrapper, "p2")
+      await retryExtractionPreview(wrapper)
+
+      expect(wrapper.find('[data-test-id="extraction-preview"]').exists()).toBe(
+        true
+      )
+      expect(
+        wrapper.find('[data-test-id="extraction-preview-error"]').text()
+      ).toBe("Retry failed")
+      expect(usePopups().popups.peek()).toHaveLength(0)
     })
 
     it("shows create errors in the preview", async () => {
@@ -570,14 +600,15 @@ describe("NoteRefinement extract note", () => {
       const apiGate = new Promise<void>((r) => {
         resolveApi = r
       })
-      mockSdkServiceWithImplementation(
+      const extractNotePreviewSpy = mockSdkService(
         AiController,
         "extractNotePreview",
-        async () => {
-          await apiGate
-          return wrapSdkError({})
-        }
+        sampleExtractionPreview()
       )
+      extractNotePreviewSpy.mockImplementation(async () => {
+        await apiGate
+        return wrapSdkError({ message: "Preview failed" })
+      })
       const wrapper = mountNoteRefinement(["Test layout point"])
       await flushPromises()
 
@@ -591,6 +622,9 @@ describe("NoteRefinement extract note", () => {
       resolveApi!()
       await flushPromises()
       expect(document.querySelector(".loading-modal-mask")).toBeNull()
+      expect(
+        wrapper.find('[data-test-id="extraction-preview-error"]').text()
+      ).toBe("Preview failed")
     })
 
     it("shows LoadingModal while retrying extract preview", async () => {
