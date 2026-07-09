@@ -15,6 +15,7 @@
       "!**/.gradle",
       "!**/.idea",
       "!**/.vscode",
+      "!**/.repowise",
       "!**/dist",
       "!**/storybook-static",
       "!**/gradle",
