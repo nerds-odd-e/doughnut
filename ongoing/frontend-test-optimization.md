@@ -683,7 +683,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/commons/Modal.spec.ts
 ---
 
 ### Phase 18: components/form/RichMarkdownEditor.propertyRelationImageIndex
-Status: planned
+Status: done
+
+**Learnings:** Hoisted mount/relation/index helpers into `propertyRelationImageIndexTestSupport.ts` and fast scoped `querySelector` DOM helpers into `propertyRelationImageIndexTestDom.ts` (editor root for in-tree controls, `document` for teleported modal). Merged unknown-relation Custom option check into prefilled-custom-text case; dropped standalone dialog smoke test. Suite wall ~129ms (9 → 8 tests).
 
 **Tests:** (3 in top 10%, ~51ms combined)
 - `tests/components/form/RichMarkdownEditor.propertyRelationImageIndex.spec.ts` — "commits custom relationship text from the dialog and emits updated frontmatter" (~19ms)
