@@ -302,9 +302,11 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/NoteRe
 ---
 
 ### Phase 3: toolbars/HorizontalMenu
-Status: planned
+Status: done
 
-**Tests:** (7 in top 10%, ~231ms combined)
+**Learnings:** Hoisted mount/mock/selectors into `horizontalMenuTestSupport.ts`, replaced all `page.getByLabelText` with `querySelector` via `ariaLabelEl`, merged initial-state and toggle+show-all-items cases, removed redundant route-already-collapsed test. Suite CPU ~294ms → ~42ms (21 → 15 tests).
+
+**Tests:** (7 in top 10%, ~231ms combined — pre-optimization baseline)
 - `tests/toolbars/HorizontalMenu.spec.ts` — "expands menu when clicking menu icon" (~49ms)
 - `tests/toolbars/HorizontalMenu.spec.ts` — "collapses menu when expand button is clicked again" (~49ms)
 - `tests/toolbars/HorizontalMenu.spec.ts` — "expands menu when expand button is clicked" (~34ms)
