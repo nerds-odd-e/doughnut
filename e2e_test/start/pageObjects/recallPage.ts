@@ -12,6 +12,19 @@ function recallProgressFromTriple(triple: string) {
   }
 }
 
+function loadRecallPage(options?: { waitForQuestion?: boolean }) {
+  if (options?.waitForQuestion) {
+    cy.intercept('GET', '**/api/memory-trackers/**/question**').as(
+      'recallQuestion'
+    )
+  }
+  cy.visit('/recall')
+  if (options?.waitForQuestion) {
+    cy.wait('@recallQuestion', { timeout: 15000 })
+  }
+  pageIsNotLoading()
+}
+
 const recallPage = () => {
   return {
     yesIRemember() {
@@ -134,8 +147,11 @@ export const recall = () => {
       return this
     },
     visitRecallPage() {
-      cy.visit('/recall')
-      pageIsNotLoading()
+      loadRecallPage()
+      return recallPage()
+    },
+    visitRecallPageAndWaitForQuestion() {
+      loadRecallPage({ waitForQuestion: true })
       return recallPage()
     },
     navigateToRecallPage() {

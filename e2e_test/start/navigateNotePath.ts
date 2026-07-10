@@ -4,17 +4,7 @@ import { noteSidebar } from './pageObjects/noteSidebar'
 
 export const BAZAAR_NOTE_PATH_ROOT = 'Bazaar'
 
-/** Requires the notebook catalog UI (My notebooks or Bazaar) to already be visible. */
-export function navigateAlongNotebookCatalogPath(segments: string[]) {
-  if (segments.length === 0) {
-    return
-  }
-  const [notebookName, ...titles] = segments
-  const notebook = notebookList().navigateToNotebook(notebookName!)
-  if (titles.length === 0) {
-    return notebook
-  }
-
+function navigateAlongSidebarToNote(titles: string[]) {
   const sidebar = noteSidebar()
 
   if (titles.length === 1) {
@@ -32,11 +22,33 @@ export function navigateAlongNotebookCatalogPath(segments: string[]) {
   return assumeNotePage(leafNoteTitle)
 }
 
+/** Requires the notebook catalog UI (My notebooks or Bazaar) to already be visible. */
+export function navigateAlongNotebookCatalogPath(segments: string[]) {
+  if (segments.length === 0) {
+    return
+  }
+  const [notebookName, ...titles] = segments
+  const notebook = notebookList().navigateToNotebook(notebookName!)
+  if (titles.length === 0) {
+    return notebook
+  }
+
+  return navigateAlongSidebarToNote(titles)
+}
+
 /**
  * Opens the notebook and walks the sidebar by structural segments only; the last path
  * segment is treated as a folder (expanded / structural), not opened as a note view.
  * Use {@link navigateAlongNotebookCatalogPath} when the last segment is a note to open.
  */
+export function navigateWithinOpenNotebook(titles: string[]) {
+  if (titles.length === 0) {
+    return
+  }
+
+  return navigateAlongSidebarToNote(titles)
+}
+
 export function openFolderAlongNotebookCatalogPath(segments: string[]) {
   if (segments.length < 2) {
     throw new Error(

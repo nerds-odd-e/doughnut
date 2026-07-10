@@ -5,17 +5,17 @@ Feature: Recall Quiz
   Background:
     Given I am logged in as an existing user
     And I have a notebook "English practice" with notes:
-      | Title       | Content                                                          | Skip Memory Tracking |
-      | English     |                                                                  | true                 |
-      | sedition    | Sedition means incite violence                                   |                      |
-      | sedation    | Put to sleep is sedation                                         |                      |
-      | LinkTarget  | A note linked from spelling content                              |                      |
-      | Wikistudy   | Wikistudy uses [[LinkTarget]] for practice                       |                      |
+      | Title       | Content                                                          | Skip Memory Tracking | Remember Spelling |
+      | English     |                                                                  | true                 |                     |
+      | sedition    | Sedition means incite violence                                   |                      | true                |
+      | sedation    | Put to sleep is sedation                                         |                      |                     |
+      | LinkTarget  | A note linked from spelling content                              |                      |                     |
+      | Wikistudy   | Wikistudy uses [[LinkTarget]] for practice                       |                      | true                |
 
   Scenario: Spelling quiz - correct answer
     Given It's day 1
-    And I assimilate the note "sedition" with the option of remembering spelling
-    When I am recalling my note on day 2
+    And the note "sedition" was assimilated on day 1
+    When I visit recall for a due quiz question on day 2
     Then I should be asked spelling question "means incite violence" from notebook "English practice"
     When I type my answer "Sedition"
     Then I should see that my answer is correct

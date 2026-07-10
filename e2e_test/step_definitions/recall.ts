@@ -86,6 +86,11 @@ Then('I am recalling my note on day {int}', (day: number) => {
   start.recall().visitRecallPage()
 })
 
+When('I visit recall for a due quiz question on day {int}', (day: number) => {
+  start.testability().backendTimeTravelTo(day, 8)
+  start.recall().visitRecallPageAndWaitForQuestion()
+})
+
 When(
   'I make {int} wrong answers over {int} days since day {int}, answering {string} to {string}',
   (

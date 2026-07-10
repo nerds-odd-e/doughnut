@@ -89,23 +89,14 @@ Status: **done** (2026-07-10)
 ---
 
 ### Phase 3: Access token, bazaar browse, spelling quiz
-Status: planned
+Status: **done** (2026-07-10)
 
-**Tests:**
-- `e2e_test/features/users/user_access_token.feature` — "Generate Doughnut Access Token" (~4166ms)
-- `e2e_test/features/bazaar/browsing.feature` — "Browsing as non-user" (~4116ms)
-- `e2e_test/features/recall/recall_quiz_spelling_question.feature` — "Spelling quiz - correct answer" (~4079ms)
+**Results:**
+- Access token: direct `/generate-token` route; dropped unused notebook setup and main-menu navigation (~4166ms → ~3076ms generate scenario).
+- Bazaar non-user: single bazaar visit; open notebook from catalog without re-navigation; sidebar path instead of full Bazaar path re-visit (~4116ms → ~1675ms).
+- Spelling quiz correct answer: inject `Remember Spelling` + API assimilate on day 1; `visitRecallPageAndWaitForQuestion` intercept (~4079ms → ~2392ms). Wikistudy scenario unchanged (UI assimilate).
 
-**Goals:**
-- Token: direct route / inject; drop extra catalog navigation.
-- Bazaar non-user: API share notebook; visit bazaar URL directly.
-- Spelling quiz: API assimilation + due tracker; one UI answer path; intercept quiz APIs.
-
-**Verify:**
-
-```bash
-CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/users/user_access_token.feature,e2e_test/features/bazaar/browsing.feature,e2e_test/features/recall/recall_quiz_spelling_question.feature
-```
+**Learnings:** Bazaar list assertion should assume already on `/bazaar`; `**/api/memory-trackers/**/question**` intercept is reliable for spelling recall load; API assimilate with inject `Remember Spelling` is safe when pause/Resume is not under test.
 
 ---
 
@@ -222,6 +213,6 @@ Re-run: `CURSOR_DEV=true nix develop -c pnpm cy:run-on-sut --reporter json` (tee
 
 **Candidates proposed this run:** real OpenAI audio (`record_live_audio_with_real_open_ai_service.feature`) — see blacklist
 
-**Commits:** phase 1 `6063698e4a`; phase 2 pending push
+**Commits:** phase 1 `6063698e4a`; phase 2 pending push; phase 3 pending push
 
 Archive summary to `ongoing/archive/e2e-test-optimization-history.md`, delete this working plan, keep blacklist. Do not commit profile JSON.

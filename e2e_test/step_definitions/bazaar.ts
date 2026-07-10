@@ -4,10 +4,16 @@
 // @ts-check
 
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
+import { commonSenseSplit } from 'support/string_util'
 import start from '../start'
+import { navigateWithinOpenNotebook } from '../start/navigateNotePath'
+
+When('I visit the Bazaar', () => {
+  start.navigateToBazaar()
+})
 
 Then('I should see {string} shared in the Bazaar', (notebooks: string) => {
-  start.navigateToBazaar().expectNotebooks(notebooks)
+  start.assumeBazaarPage().expectNotebooks(notebooks)
 })
 
 Then('notebook {string} is shared to the Bazaar', (notebookName: string) => {
@@ -19,8 +25,18 @@ Then("there shouldn't be any note edit button", () => {
 })
 
 When('I open the notebook {string} in the Bazaar', (noteTopology: string) => {
-  start.navigateToBazaar().navigateToNotebook(noteTopology)
+  start.assumeBazaarPage().navigateToNotebook(noteTopology)
 })
+
+When(
+  'I open note {string} in folder {string} from the sidebar',
+  (noteTitle: string, folderPath: string) => {
+    navigateWithinOpenNotebook([
+      ...commonSenseSplit(folderPath, '/'),
+      noteTitle,
+    ])
+  }
+)
 
 When(
   'I subscribe to notebook {string} in the bazaar, with target of learning {int} notes per day',

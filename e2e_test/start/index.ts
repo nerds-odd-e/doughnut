@@ -24,7 +24,7 @@ import {
   assumeAssimilationPage,
 } from './pageObjects/assimilationPage'
 import { assumeAudioTools } from './pageObjects/audioToolsPage'
-import { navigateToBazaar } from './pageObjects/bazaarPage'
+import { assumeBazaarPage, navigateToBazaar } from './pageObjects/bazaarPage'
 import { assumeCirclePage, navigateToCircle } from './pageObjects/circlePage'
 import { assumeHomePage } from './pageObjects/homePage'
 import { assumeConversationAboutNotePage } from './pageObjects/conversationAboutNotePage'
@@ -79,6 +79,7 @@ const start = {
   mainMenu,
   mcpAgentActions,
   messageCenterIndicator,
+  assumeBazaarPage,
   navigateToBazaar,
   navigateToCircle,
   navigateToMessageCenter,

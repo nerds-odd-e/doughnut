@@ -6,6 +6,7 @@
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
 import start from '../start'
+import { visitManageAccessTokensPage } from '../start/pageObjects/manageAccessTokensPage'
 
 Given('I am logged in as {string}', (externalIdentifier: string) => {
   return start.loginAs(externalIdentifier)
@@ -142,10 +143,7 @@ Then('I edit user profile to change my name to {string}', (name: string) => {
 When(
   'I generate a new Doughnut Access Token with label {string}',
   (label: string) => {
-    start
-      .mainMenu()
-      .userOptions()
-      .manageAccessTokens()
+    visitManageAccessTokensPage()
       .generateToken(label)
       .as('generatedAccessToken')
   }
@@ -177,10 +175,7 @@ Given(
 When(
   'I delete the Doughnut Access Token with label {string}',
   (label: string) => {
-    start
-      .mainMenu()
-      .userOptions()
-      .manageAccessTokens()
+    visitManageAccessTokensPage()
       .deleteToken(label)
       .checkTokenWithLabelNotExists(label)
   }
@@ -197,10 +192,6 @@ Given('calling token-info with the Doughnut Access Token succeeds', () => {
 Then(
   'I can see the token with label {string} in the list of tokens',
   (label: string) => {
-    start
-      .mainMenu()
-      .userOptions()
-      .manageAccessTokens()
-      .checkTokenWithLabelExists(label)
+    visitManageAccessTokensPage().checkTokenWithLabelExists(label)
   }
 )

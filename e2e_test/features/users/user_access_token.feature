@@ -3,7 +3,6 @@ Feature: User Doughnut Access Token
 
   Scenario: Generate Doughnut Access Token
     Given I am logged in as "old_learner"
-    And I have a notebook "Parent demo"
     When I generate a new Doughnut Access Token with label "Initial Token"
     Then the new Doughnut Access Token should be a valid UUID
     And I can see the token with label "Initial Token" in the list of tokens

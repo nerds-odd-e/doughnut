@@ -1,4 +1,11 @@
+import { pageIsNotLoading } from '../pageBase'
 import { submittableForm } from 'start/forms'
+
+export const visitManageAccessTokensPage = () => {
+  cy.visit('/generate-token')
+  pageIsNotLoading()
+  return manageAccessTokensPage()
+}
 
 export const manageAccessTokensPage = () => {
   return {

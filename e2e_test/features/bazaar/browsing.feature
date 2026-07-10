@@ -17,10 +17,11 @@ Feature: Bazaar browsing
 
   Scenario: Browsing as non-user
     When I haven't login
+    And I visit the Bazaar
     Then I should see "Geometry set" shared in the Bazaar
     When I open the notebook "Geometry set" in the Bazaar
     Then there shouldn't be any note edit button
     And I should see "Bazaar" in breadcrumb
-    When I navigate to "Bazaar/Geometry set/Topics/Rectangle" note
+    When I open note "Rectangle" in folder "Topics" from the sidebar
     Then there shouldn't be any note edit button
     And I should see it has relationship to "Square a specialization of Rectangle"
