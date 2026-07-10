@@ -446,7 +446,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void shouldExportConversationWithMessages() throws UnexpectedNoAccessRightException {
+    void shouldExportConversationWithContextAndHistory() throws UnexpectedNoAccessRightException {
       makeMe
           .aConversationMessage(conversation)
           .sender(currentUser.getUser())
@@ -455,7 +455,6 @@ class ConversationMessageControllerTest extends ControllerTestBase {
       makeMe.aConversationMessage(conversation).sender(null).message("No. It is not.").please();
 
       java.util.Map<String, Object> request = controller.exportConversation(conversation);
-      assertThat(request).isNotNull();
       List<java.util.Map<String, Object>> messages = extractMessagesForExport(request);
 
       assertThat(messages.stream().filter(m -> "user".equals(m.get("role"))).findFirst())
@@ -466,17 +465,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
           .get()
           .extracting(m -> m.get("content"))
           .isEqualTo("No. It is not.");
-    }
 
-    @Test
-    void shouldExportConversationWithContextAndHistory() throws UnexpectedNoAccessRightException {
-      makeMe
-          .aConversationMessage(conversation)
-          .sender(currentUser.getUser())
-          .message("Is Naba one of them?")
-          .please();
-
-      java.util.Map<String, Object> request = controller.exportConversation(conversation);
       String export = formatExportResponse(request);
       assertThat(export).contains("## Context");
       assertThat(export).contains("# Focus Context");

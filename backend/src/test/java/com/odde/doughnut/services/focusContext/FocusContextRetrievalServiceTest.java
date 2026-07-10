@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -186,7 +185,6 @@ class FocusContextRetrievalServiceTest {
 
       @ParameterizedTest
       @NullSource
-      @ValueSource(longs = {1L})
       void depth1InboundCappedAtSixWithStableSeed(Long seed) {
         RetrievalConfig cfg = RetrievalConfig.forQuestionGeneration(seed);
         List<String> first = inboundReferrerTitles(focusNote, viewer, cfg);
@@ -216,11 +214,15 @@ class FocusContextRetrievalServiceTest {
       }
 
       @Test
-      void focusInboundUriListCappedAtTwenty() {
-        FocusContextResult result =
-            service.retrieve(focusNote, viewer, RetrievalConfig.forQuestionGeneration(1L));
-
-        assertThat(result.getFocusNote().getInboundReferences(), hasSize(20));
+      void fixedSeedInboundSamplingCapAndUriList() {
+        RetrievalConfig cfg = RetrievalConfig.forQuestionGeneration(1L);
+        List<String> first = inboundReferrerTitles(focusNote, viewer, cfg);
+        List<String> second = inboundReferrerTitles(focusNote, viewer, cfg);
+        assertThat(first.size(), equalTo(6));
+        assertThat(first, equalTo(second));
+        assertThat(
+            service.retrieve(focusNote, viewer, cfg).getFocusNote().getInboundReferences(),
+            hasSize(20));
       }
     }
 

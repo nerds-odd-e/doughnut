@@ -375,14 +375,14 @@ CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles
 ---
 
 ### Phase 11: Optimize batch ranks 31–33
-Status: planned
+Status: done
 
-**Tests:**
-- `backend/src/test/java/com/odde/doughnut/services/QuestionGenerationBatchSubmitDueUsersTest.java` — "continuesAfterPerUserFailureAndRecordsLatestSubmittedAt()" (~38ms)
-- `backend/src/test/java/com/odde/doughnut/controllers/ConversationMessageControllerTest.java` — "shouldExportConversationWithMessages()" (~36ms)
-- `backend/src/test/java/com/odde/doughnut/services/focusContext/FocusContextRetrievalServiceTest.java` — "[2] seed = 1" (~34ms)
+**Tests (baseline → after):**
+- `QuestionGenerationBatchSubmitDueUsersTest.continuesAfterPerUserFailureAndRecordsLatestSubmittedAt()` (~38ms) → **deleted**; loop continuation + summary counts in mock-only `QuestionGenerationBatchSubmitDueUsersServiceLoopTest` (~&lt;5ms); first-time failure `submittedAt` path in `QuestionGenerationBatchSubmissionServiceTest.FirstTimeFailedSubmission`
+- `ConversationMessageControllerTest.shouldExportConversationWithMessages()` (~36ms) → **deleted**; user/assistant role assertions merged into `shouldExportConversationWithContextAndHistory()`
+- `FocusContextRetrievalServiceTest` `[2] seed = 1` (~34ms) → removed from parameterized cap test; seed=1 cap/stability/URI assertions consolidated in `fixedSeedInboundSamplingCapAndUriList` (2 retrieves vs 5)
 
-**Goals:** Speed up only these tests (merge/delete redundant cases, slim `makeMe`/fixtures, parameterize duplicates, avoid full-stack when a narrower entry suffices). If no meaningful win after a serious attempt, append **Candidates** in the blacklist and mark done.
+**Learnings:** Per-user submit loop is pure orchestration over `UserSubmissionTx`; export message roles are already covered at builder level — one export test suffices; seed=1 duplicated retrieves across parameterized and URI-cap tests.
 
 **Verify:**
 

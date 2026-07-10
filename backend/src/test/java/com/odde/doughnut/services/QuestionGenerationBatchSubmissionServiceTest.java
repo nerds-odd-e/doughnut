@@ -83,6 +83,26 @@ class QuestionGenerationBatchSubmissionServiceTest {
   }
 
   @Nested
+  class FirstTimeFailedSubmission {
+    @Test
+    void batchCreationFailureLeavesNoLatestSubmittedAt() {
+      when(openAiApiHandler.uploadBatchInputFile(any())).thenReturn("file-abc");
+      when(openAiApiHandler.createResponsesBatch("file-abc"))
+          .thenThrow(new RuntimeException("batch create failed"));
+
+      boolean submitted = submissionService.submitPlannedBatch(plannedBatch, currentTime);
+
+      assertThat(submitted, is(false));
+
+      QuestionGenerationBatch batch = batchRepository.findById(plannedBatch.getId()).orElseThrow();
+      assertThat(batch.getStatus(), is(QuestionGenerationBatchStatus.FAILED));
+      assertThat(batch.getSubmittedAt(), is(nullValue()));
+      assertThat(
+          batchRepository.findLatestSubmittedAtByUser_Id(user.getId()).isPresent(), is(false));
+    }
+  }
+
+  @Nested
   class FailedSubmission {
     Timestamp previousSubmission;
 
