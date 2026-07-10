@@ -157,28 +157,39 @@ jobs:
           path: backend/build/libs/${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
 
   E2E-tests:
+    # Explicit feature dirs (not letter globs) keep Cypress load ~even across
+    # the 6 shards. When adding a feature directory, put it in the lightest shard.
     name: End-to-End tests with Database
     runs-on: ${{ vars.RUNNER }}
     strategy:
       matrix:
         spec:
           - |
-            e2e_test/features/a*/**
+            e2e_test/features/assimilation/**
+            e2e_test/features/ai_generated_content/**
+            e2e_test/features/ai_generated_recall_questions/**
+            e2e_test/features/note_view/**
           - |
-            e2e_test/features/b*/**
-            e2e_test/features/f*/**
-            e2e_test/features/l*/**
+            e2e_test/features/bazaar/**
+            e2e_test/features/book_reading/**
+            e2e_test/features/folder_organization/**
+            e2e_test/features/notebooks/**
           - |
-            e2e_test/features/n*/**
+            e2e_test/features/note_creation_and_update/**
           - |
-            e2e_test/features/r*/**
-            e2e_test/features/w*/**
+            e2e_test/features/note_topology/**
+            e2e_test/features/relationships/**
+            e2e_test/features/circles/**
           - |
-            e2e_test/features/m*/**
-            e2e_test/features/t*/**
-            e2e_test/features/u*/**
+            e2e_test/features/recall/**
+            e2e_test/features/wikidata/**
+            e2e_test/features/mcp/**
           - |
-            e2e_test/features/c*/**
+            e2e_test/features/cli/**
+            e2e_test/features/messages/**
+            e2e_test/features/testability/**
+            e2e_test/features/user_admin/**
+            e2e_test/features/users/**
     steps:
       - uses: actions/checkout@v7
       - uses: docker/login-action@v3
