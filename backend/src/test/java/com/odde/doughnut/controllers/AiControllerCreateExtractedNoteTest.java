@@ -91,13 +91,23 @@ class AiControllerCreateExtractedNoteTest extends ControllerTestBase {
       NoteExtractionResult request =
           extractionResult(
               sourceInFolder ? "Point B" : "Extracted Note",
-              sourceInFolder ? "Extracted" : "Expanded content for the new note.",
-              sourceInFolder ? "A. C. D. E." : "Updated parent with summary.");
+              sourceInFolder
+                  ? "Extracted from [[sample|the original note]]."
+                  : "Expanded content for the new note.",
+              sourceInFolder
+                  ? "A. See [[point b|the extracted note]]. C."
+                  : "Updated parent with summary.");
       long noteCountBefore = noteRepository.count();
       NoteRealm response = controller.createExtractedNote(sourceNote, request);
       Note persistedNote = noteRepository.findById(response.getNote().getId()).orElseThrow();
       if (sourceInFolder) {
         assertThat(persistedNote.getFolder().getId()).isEqualTo(expectedFolder.getId());
+        assertThat(response.getWikiTitles())
+            .anyMatch(
+                wikiTitle ->
+                    wikiTitle.getTargetToken().equals("sample")
+                        && wikiTitle.getDisplayText().equals("the original note")
+                        && wikiTitle.getNoteId().equals(sourceNote.getId()));
       } else {
         assertThat(noteRepository.count()).isEqualTo(noteCountBefore + 1);
         assertThat(persistedNote.getTitle()).isEqualTo("Extracted Note");
@@ -106,32 +116,6 @@ class AiControllerCreateExtractedNoteTest extends ControllerTestBase {
         makeMe.entityPersister.refresh(sourceNote);
         assertThat(sourceNote.getContent()).isEqualTo("Updated parent with summary.");
       }
-    }
-
-    @Test
-    void shouldRefreshWikiLinkCacheForOriginalAndNewNoteAfterExtraction()
-        throws UnexpectedNoAccessRightException {
-      Note testNote =
-          makeMe
-              .aNote()
-              .title("Sample")
-              .notebookOwnedBy(currentUser.getUser())
-              .content("A. B. C.")
-              .please();
-      NoteExtractionResult request =
-          extractionResult(
-              "Point B",
-              "Extracted from [[sample|the original note]].",
-              "A. See [[point b|the extracted note]]. C.");
-
-      NoteRealm response = controller.createExtractedNote(testNote, request);
-
-      assertThat(response.getWikiTitles())
-          .anyMatch(
-              wikiTitle ->
-                  wikiTitle.getTargetToken().equals("sample")
-                      && wikiTitle.getDisplayText().equals("the original note")
-                      && wikiTitle.getNoteId().equals(testNote.getId()));
     }
   }
 }

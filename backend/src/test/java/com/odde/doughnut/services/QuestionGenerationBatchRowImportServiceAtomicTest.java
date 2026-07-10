@@ -27,7 +27,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -62,12 +61,6 @@ class QuestionGenerationBatchRowImportServiceAtomicTest {
   @Autowired RecallPromptRepository recallPromptRepository;
   @Autowired PlatformTransactionManager transactionManager;
   @Autowired EntityManager entityManager;
-
-  @BeforeEach
-  void cleanupStaleCommittedFixtures() {
-    FAIL_ON_RECALL_PROMPT_SAVE.set(false);
-    inCommittedTransaction(this::deleteCommittedAtomicImportFixtures);
-  }
 
   @AfterEach
   void cleanupCommittedState() {

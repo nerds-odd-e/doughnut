@@ -14,8 +14,6 @@ import java.util.stream.LongStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -183,16 +181,6 @@ class FocusContextRetrievalServiceTest {
         addInboundReferrers(focusNote, viewer, 21, "Ref");
       }
 
-      @ParameterizedTest
-      @NullSource
-      void depth1InboundCappedAtSixWithStableSeed(Long seed) {
-        RetrievalConfig cfg = RetrievalConfig.forQuestionGeneration(seed);
-        List<String> first = inboundReferrerTitles(focusNote, viewer, cfg);
-        List<String> second = inboundReferrerTitles(focusNote, viewer, cfg);
-        assertThat(first.size(), equalTo(6));
-        assertThat(first, equalTo(second));
-      }
-
       @Test
       void differentSeedsProduceDifferentInboundSelection() {
         List<String> baseline = sortedInboundReferrerTitles(1L);
@@ -213,15 +201,23 @@ class FocusContextRetrievalServiceTest {
             .toList();
       }
 
-      @Test
-      void fixedSeedInboundSamplingCapAndUriList() {
-        RetrievalConfig cfg = RetrievalConfig.forQuestionGeneration(1L);
+      private void assertInboundSampleStableAndCapped(Long seed) {
+        RetrievalConfig cfg = RetrievalConfig.forQuestionGeneration(seed);
         List<String> first = inboundReferrerTitles(focusNote, viewer, cfg);
         List<String> second = inboundReferrerTitles(focusNote, viewer, cfg);
         assertThat(first.size(), equalTo(6));
         assertThat(first, equalTo(second));
+      }
+
+      @Test
+      void inboundSamplingCapStabilityAndUriList() {
+        assertInboundSampleStableAndCapped(null);
+        assertInboundSampleStableAndCapped(1L);
         assertThat(
-            service.retrieve(focusNote, viewer, cfg).getFocusNote().getInboundReferences(),
+            service
+                .retrieve(focusNote, viewer, RetrievalConfig.forQuestionGeneration(1L))
+                .getFocusNote()
+                .getInboundReferences(),
             hasSize(20));
       }
     }

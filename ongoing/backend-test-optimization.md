@@ -393,14 +393,14 @@ CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles
 ---
 
 ### Phase 12: Optimize batch ranks 34–36
-Status: planned
+Status: done
 
-**Tests:**
-- `backend/src/test/java/com/odde/doughnut/services/QuestionGenerationBatchRowImportServiceAtomicTest.java` — "failureAfterQuestionCreationRollsBackAndLeavesRowReimportable()" (~33ms)
-- `backend/src/test/java/com/odde/doughnut/services/focusContext/FocusContextRetrievalServiceTest.java` — "[1] seed = null" (~32ms)
-- `backend/src/test/java/com/odde/doughnut/controllers/AiControllerCreateExtractedNoteTest.java` — "shouldRefreshWikiLinkCacheForOriginalAndNewNoteAfterExtraction()" (~32ms)
+**Tests (baseline → after):**
+- `QuestionGenerationBatchRowImportServiceAtomicTest.failureAfterQuestionCreationRollsBackAndLeavesRowReimportable()` (~33ms) → dropped redundant `@BeforeEach` cleanup (~9 native deletes); kept committed-transaction rollback test as-is
+- `FocusContextRetrievalServiceTest` `[1] seed = null` (~32ms) → merged into `inboundSamplingCapStabilityAndUriList` with seed `1L` (~&lt;5ms per seed); deleted parameterized `depth1InboundCappedAtSixWithStableSeed`
+- `AiControllerCreateExtractedNoteTest.shouldRefreshWikiLinkCacheForOriginalAndNewNoteAfterExtraction()` (~32ms) → **deleted**; wiki-link cache assertion merged into `shouldCreateExtractedNoteFromSourceNote(true)`
 
-**Goals:** Speed up only these tests (merge/delete redundant cases, slim `makeMe`/fixtures, parameterize duplicates, avoid full-stack when a narrower entry suffices). If no meaningful win after a serious attempt, append **Candidates** in the blacklist and mark done.
+**Learnings:** Atomic import test pays per-test committed cleanup; null-seed inbound cap duplicated fixed-seed stability checks; wiki cache refresh is exercised by folder extraction path without a separate controller test.
 
 **Verify:**
 
