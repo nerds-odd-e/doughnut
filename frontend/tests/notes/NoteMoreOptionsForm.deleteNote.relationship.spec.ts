@@ -1,5 +1,4 @@
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
-import { waitFor } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -11,9 +10,14 @@ import usePopups from "@/components/commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { relationshipNoteContent } from "./relationshipNoteTestContent"
 import {
+  clickDeleteNote,
   deleteNoteSpy,
+  loadingModalMask,
+  mountDeleteFormReady,
+  mountDeleteFormWithNotePropChange,
+  noteMoreOptionsDeleteFormRouter,
   qualifyingRelationRealmForDelete,
-  renderer,
+  relationNotesForPropChangeTest,
   seedRelationRealmWithInboundReferences,
   setupNoteMoreOptionsDeleteFormTests,
 } from "./noteMoreOptionsDeleteTestSupport"
@@ -33,40 +37,32 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
 
     const { relationRealm } = qualifyingRelationRealmForDelete()
     seedRelationRealmWithInboundReferences(relationRealm)
-    const wrapper = renderer.withProps({ note: relationRealm.note }).mount()
+    const wrapper = await mountDeleteFormReady(relationRealm.note)
 
-    await flushPromises()
-
-    const deleteButton = wrapper.find('button[title="Delete note (d)"]')
-    await deleteButton.trigger("click")
-    await flushPromises()
+    await clickDeleteNote(wrapper)
 
     usePopups().popups.done("REDUCE_TO_SOURCE_PROPERTY")
+    await flushPromises()
 
-    await waitFor(() => {
-      expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
-      expect(document.body.textContent).toContain(
-        "Reducing to source property..."
-      )
-    })
+    expect(loadingModalMask()).toBeTruthy()
+    expect(document.body.textContent).toContain(
+      "Reducing to source property..."
+    )
 
     resolveDelete!()
     await flushPromises()
+    await noteMoreOptionsDeleteFormRouter.isReady()
 
-    expect(document.querySelector(".loading-modal-mask")).toBeNull()
+    expect(loadingModalMask()).toBeNull()
   })
 
   it("offers reduce-to-property when deleting a qualifying relationship note", async () => {
     deleteNoteSpy.mockResolvedValue(wrapSdkResponse([]))
     const { relationRealm } = qualifyingRelationRealmForDelete()
     seedRelationRealmWithInboundReferences(relationRealm)
-    const wrapper = renderer.withProps({ note: relationRealm.note }).mount()
+    const wrapper = await mountDeleteFormReady(relationRealm.note)
 
-    await flushPromises()
-
-    const deleteButton = wrapper.find('button[title="Delete note (d)"]')
-    await deleteButton.trigger("click")
-    await flushPromises()
+    await clickDeleteNote(wrapper)
 
     const popups = usePopups().popups.peek()
     expect(popups?.length).toBe(1)
@@ -97,13 +93,9 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
       .content(relationshipNoteContent("a-part-of", "[[Moon]]", "[[Earth]]"))
       .please()
     useStorageAccessor().value.refreshNoteRealm(relationRealm)
-    const wrapper = renderer.withProps({ note: relationRealm.note }).mount()
+    const wrapper = await mountDeleteFormReady(relationRealm.note)
 
-    await flushPromises()
-
-    const deleteButton = wrapper.find('button[title="Delete note (d)"]')
-    await deleteButton.trigger("click")
-    await flushPromises()
+    await clickDeleteNote(wrapper)
 
     const popups = usePopups().popups.peek()
     expect(popups?.[0]?.type).toBe("confirm")
@@ -119,42 +111,14 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
 
   it("uses the current note id when note prop changes without remount", async () => {
     deleteNoteSpy.mockResolvedValue(wrapSdkResponse([]))
-    const moonId = 501
-    const relationId = 503
-    const moonNote = {
-      ...makeMe.aNote.please(),
-      id: moonId,
-      noteTopology: {
-        ...makeMe.aNote.please().noteTopology,
-        id: moonId,
-        title: "Moon",
-      },
-    }
-    const { relationRealm } = qualifyingRelationRealmForDelete({
-      moonId,
-      relationId,
-    })
-    const relationNote = {
-      ...relationRealm.note,
-      id: relationId,
-      noteTopology: {
-        ...relationRealm.note.noteTopology,
-        id: relationId,
-      },
-    }
-    useStorageAccessor().value.refreshNoteRealm({
-      ...makeMe.aNoteRealm.title("Moon").please(),
-      id: moonId,
-    })
-    useStorageAccessor().value.refreshNoteRealm(relationRealm)
+    const { relationId, moonNote, relationNote } =
+      relationNotesForPropChangeTest()
+    const wrapper = await mountDeleteFormWithNotePropChange(
+      moonNote,
+      relationNote
+    )
 
-    const wrapper = renderer.withProps({ note: moonNote }).mount()
-    await flushPromises()
-    await wrapper.setProps({ note: relationNote })
-    await flushPromises()
-
-    await wrapper.find('button[title="Delete note (d)"]').trigger("click")
-    await flushPromises()
+    await clickDeleteNote(wrapper)
 
     const popups = usePopups().popups.peek()
     expect(popups?.length).toBe(1)

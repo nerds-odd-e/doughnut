@@ -1,7 +1,14 @@
-import SeamlessTextEditor from "@/components/form/SeamlessTextEditor.vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { nextTick } from "vue"
-import helper from "@tests/helpers"
+import {
+  editorEl,
+  focusEditor,
+  mountSeamlessTextEditor,
+  PASTE_NO_UPDATE_CASES,
+  PASTE_SUCCESS_CASES,
+  pasteClipboard,
+  setCaretInEditor,
+} from "./seamlessTextEditorTestSupport"
 
 describe("SeamlessTextEditor", () => {
   let wrapper: VueWrapper
@@ -11,53 +18,18 @@ describe("SeamlessTextEditor", () => {
     document.body.innerHTML = ""
   })
 
-  const mountEditor = async (
-    initialValue: string,
-    options = {},
-    mountOpts?: { attachTo?: HTMLElement }
-  ) => {
-    wrapper = helper
-      .component(SeamlessTextEditor)
-      .withProps({
-        modelValue: initialValue,
-        ...options,
-      })
-      .mount(mountOpts?.attachTo ? { attachTo: mountOpts.attachTo } : undefined)
-    await flushPromises()
-    return wrapper
-  }
-
-  function setCaretInEditor(editor: HTMLElement, offset: number) {
-    const textNode = editor.firstChild as Text
-    const selection = window.getSelection()
-    const range = document.createRange()
-    range.setStart(textNode, offset)
-    range.setEnd(textNode, offset)
-    selection?.removeAllRanges()
-    selection?.addRange(range)
-  }
-
-  async function pastePlainText(editor: HTMLElement, text: string) {
-    const clipboardData = new DataTransfer()
-    clipboardData.setData("text/plain", text)
-    editor.dispatchEvent(
-      new ClipboardEvent("paste", {
-        bubbles: true,
-        cancelable: true,
-        clipboardData,
-      })
-    )
-    await nextTick()
-  }
-
   it("does not emit update when the change is from initial value", async () => {
-    await mountEditor("initial value")
+    wrapper = await mountSeamlessTextEditor("initial value")
     expect(wrapper.emitted()["update:modelValue"]).toBeUndefined()
   })
 
   it("keeps caret offset when modelValue is synced with same-length text", async () => {
-    await mountEditor("x:y", {}, { attachTo: document.body })
-    const editor = wrapper.find(".seamless-editor").element as HTMLElement
+    wrapper = await mountSeamlessTextEditor(
+      "x:y",
+      {},
+      { attachTo: document.body }
+    )
+    const editor = editorEl(wrapper)
     editor.focus()
     await nextTick()
     const textNode = editor.firstChild as Text
@@ -79,91 +51,34 @@ describe("SeamlessTextEditor", () => {
     expect(r?.startContainer).toBe(editor.firstChild)
   })
 
-  it("extracts plain text when pasting HTML content", async () => {
-    await mountEditor("")
-    await flushPromises()
-    await nextTick()
-
-    const editor = wrapper.find(".seamless-editor").element as HTMLElement
-    expect(editor).toBeTruthy()
-
-    // Browser Mode: Real focus() method!
-    editor.focus()
-    await nextTick()
-    await flushPromises()
-
-    // Browser Mode: Use real ClipboardEvent with DataTransfer!
-    const clipboardData = new DataTransfer()
-    clipboardData.setData("text/plain", "Bold text")
-    clipboardData.setData("text/html", "<p><strong>Bold text</strong></p>")
-
-    const pasteEvent = new ClipboardEvent("paste", {
-      bubbles: true,
-      cancelable: true,
-      clipboardData,
-    })
-
-    editor.dispatchEvent(pasteEvent)
-    await nextTick()
-    await flushPromises()
-
-    const emitted = wrapper.emitted()["update:modelValue"]
-    expect(emitted).toBeDefined()
-    expect(emitted?.length).toBeGreaterThan(0)
-    expect(emitted?.[emitted.length - 1]?.[0]).toBe("Bold text")
-    expect(editor.innerText).toBe("Bold text")
-  })
-
-  it("pastes plain text at cursor position", async () => {
-    await mountEditor("existing text")
-
-    const editor = wrapper.find(".seamless-editor").element as HTMLElement
-    setCaretInEditor(editor, 8)
-    await pastePlainText(editor, " inserted")
+  it.each(PASTE_SUCCESS_CASES)("pastes plain text ($case)", async ({
+    initialValue,
+    caretOffset,
+    paste,
+    expected,
+    expectedContains,
+  }) => {
+    wrapper = await mountSeamlessTextEditor(initialValue)
+    const editor = editorEl(wrapper)
+    await focusEditor(editor)
+    if (caretOffset !== undefined) {
+      setCaretInEditor(editor, caretOffset)
+    }
+    await pasteClipboard(editor, paste)
 
     const emitted = wrapper.emitted()["update:modelValue"]
     expect(emitted).toBeDefined()
     expect(emitted?.length).toBeGreaterThan(0)
     const finalText = emitted?.[emitted.length - 1]?.[0] as string
-    expect(finalText).toContain("existing")
-    expect(finalText).toContain("inserted")
-    expect(finalText).toContain("text")
-    expect(editor.innerText).toContain("existing")
-    expect(editor.innerText).toContain("inserted")
-  })
-
-  it("appends plain text when no selection", async () => {
-    await mountEditor("existing")
-    await flushPromises()
-    await nextTick()
-
-    const editor = wrapper.find(".seamless-editor").element as HTMLElement
-    // Browser Mode: Real focus() method!
-    editor.focus()
-    await nextTick()
-
-    // Browser Mode: Real Selection API!
-    // Clear selection
-    window.getSelection()?.removeAllRanges()
-
-    // Browser Mode: Real ClipboardEvent!
-    const clipboardData = new DataTransfer()
-    clipboardData.setData("text/plain", " appended")
-    const pasteEvent = new ClipboardEvent("paste", {
-      bubbles: true,
-      cancelable: true,
-      clipboardData,
-    })
-
-    editor.dispatchEvent(pasteEvent)
-    await nextTick()
-    await flushPromises()
-
-    const emitted = wrapper.emitted()["update:modelValue"]
-    expect(emitted).toBeDefined()
-    expect(emitted?.length).toBeGreaterThan(0)
-    expect(emitted?.[emitted.length - 1]?.[0]).toBe("existing appended")
-    expect(editor.innerText).toBe("existing appended")
+    if (expected !== undefined) {
+      expect(finalText).toBe(expected)
+      expect(editor.innerText).toBe(expected)
+    } else {
+      for (const part of expectedContains ?? []) {
+        expect(finalText).toContain(part)
+        expect(editor.innerText).toContain(part)
+      }
+    }
   })
 
   it("submits the nearest form on Enter", async () => {
@@ -174,19 +89,11 @@ describe("SeamlessTextEditor", () => {
     submit.type = "submit"
     form.appendChild(submit)
 
-    wrapper = helper
-      .component(SeamlessTextEditor)
-      .withProps({ modelValue: "x" })
-      .mount({ attachTo: form })
-    await flushPromises()
-    await nextTick()
-
+    wrapper = await mountSeamlessTextEditor("x", {}, { attachTo: form })
     document.body.appendChild(form)
 
-    const editor = wrapper.find(".seamless-editor").element as HTMLElement
-    editor.focus()
-    await nextTick()
-
+    const editor = editorEl(wrapper)
+    await focusEditor(editor)
     editor.dispatchEvent(
       new KeyboardEvent("keydown", {
         key: "Enter",
@@ -201,56 +108,20 @@ describe("SeamlessTextEditor", () => {
     form.remove()
   })
 
-  it("does not handle paste when readonly", async () => {
-    await mountEditor("", { readonly: true })
-    await flushPromises()
-    await nextTick()
-
-    const editor = wrapper.find(".seamless-editor").element as HTMLElement
-    // Browser Mode: Real focus() method!
-    editor.focus()
-    await nextTick()
-
-    // Browser Mode: Real ClipboardEvent!
-    const clipboardData = new DataTransfer()
-    clipboardData.setData("text/plain", "Test")
-    const pasteEvent = new ClipboardEvent("paste", {
-      bubbles: true,
-      cancelable: true,
-      clipboardData,
-    })
-
-    editor.dispatchEvent(pasteEvent)
-    await flushPromises()
+  it.each(PASTE_NO_UPDATE_CASES)("does not handle paste when $case", async ({
+    initialValue,
+    props,
+    paste,
+    expectedInnerText,
+  }) => {
+    wrapper = await mountSeamlessTextEditor(initialValue, props)
+    const editor = editorEl(wrapper)
+    await focusEditor(editor)
+    await pasteClipboard(editor, paste)
 
     expect(wrapper.emitted()["update:modelValue"]).toBeUndefined()
-  })
-
-  it("handles paste with empty clipboard", async () => {
-    await mountEditor("existing")
-    await flushPromises()
-    await nextTick()
-
-    const editor = wrapper.find(".seamless-editor").element as HTMLElement
-    // Browser Mode: Real focus() method!
-    editor.focus()
-    await nextTick()
-
-    // Browser Mode: Real ClipboardEvent with empty data!
-    const clipboardData = new DataTransfer()
-    const pasteEvent = new ClipboardEvent("paste", {
-      bubbles: true,
-      cancelable: true,
-      clipboardData,
-    })
-
-    editor.dispatchEvent(pasteEvent)
-    await nextTick()
-    await flushPromises()
-
-    // Should not emit update when clipboard is empty
-    const emitted = wrapper.emitted()["update:modelValue"]
-    expect(emitted).toBeUndefined()
-    expect(editor.innerText).toBe("existing")
+    if (expectedInnerText !== undefined) {
+      expect(editor.innerText).toBe(expectedInnerText)
+    }
   })
 })
