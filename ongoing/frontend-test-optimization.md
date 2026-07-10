@@ -894,7 +894,7 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/NotebookPage.spec.
 ### Phase 27: notes/NoteMoreOptionsForm.deleteNote.relationship
 Status: done
 
-**Learnings:** Extended `noteMoreOptionsDeleteTestSupport.ts` with `mountDeleteFormReady`, `clickDeleteNote`, `loadingModalMask`, and prop-change mount helper; replaced `waitFor` with `flushPromises` and `querySelector` for loading modal. Suite wall ~84ms (4 tests). *(Landed in same commit as Phase 30 via pre-commit staging.)*
+**Learnings:** Extended `noteMoreOptionsDeleteTestSupport.ts` with minimal memory router (`noteShow`/`notebookPage`/`folderPage`), `clickDeleteNote`, `mountDeleteFormReady`, `loadingModalMask`, `relationNotesForPropChangeTest`, and `mountDeleteFormWithNotePropChange`; replaced `waitFor` with `flushPromises` + `loadingModalMask`; `awaitDeleteSideEffects` only for held-delete loading case. Suite wall ~60ms → ~85ms browser (4 tests). *(Code landed in `perf(frontend): optimize SeamlessTextEditor tests` via pre-commit staging.)*
 
 **Tests:** (1 in top 10%, ~21ms combined)
 - `tests/notes/NoteMoreOptionsForm.deleteNote.relationship.spec.ts` — "uses the current note id when note prop changes without remount" (~21ms)

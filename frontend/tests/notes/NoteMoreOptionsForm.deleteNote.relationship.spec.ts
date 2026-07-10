@@ -15,7 +15,6 @@ import {
   loadingModalMask,
   mountDeleteFormReady,
   mountDeleteFormWithNotePropChange,
-  noteMoreOptionsDeleteFormRouter,
   qualifyingRelationRealmForDelete,
   relationNotesForPropChangeTest,
   seedRelationRealmWithInboundReferences,
@@ -76,7 +75,7 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
     expect(popup.options[1]?.label).toBe('Delete "Note1.1.1"')
 
     usePopups().popups.done("REDUCE_TO_SOURCE_PROPERTY")
-    await awaitDeleteSideEffects()
+    await flushPromises()
 
     expect(deleteNoteSpy).toHaveBeenCalledWith({
       path: { note: relationRealm.id },
@@ -101,7 +100,7 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
     expect(popups?.[0]?.type).toBe("confirm")
 
     usePopups().popups.done(true)
-    await awaitDeleteSideEffects()
+    await flushPromises()
 
     expect(deleteNoteSpy).toHaveBeenCalledWith({
       path: { note: relationRealm.id },
@@ -131,7 +130,7 @@ describe("NoteMoreOptionsForm delete relationship note", () => {
     )
 
     usePopups().popups.done("LEAVE_DEAD_LINKS")
-    await awaitDeleteSideEffects()
+    await flushPromises()
 
     expect(deleteNoteSpy).toHaveBeenCalledWith({
       path: { note: relationId },
