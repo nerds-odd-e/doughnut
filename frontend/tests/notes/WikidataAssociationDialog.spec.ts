@@ -1,16 +1,28 @@
-import { WikidataController } from "@generated/doughnut-backend-api/sdk.gen"
-import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
 import { appendAliasToNoteContent } from "@/utils/wikidataTitleActions"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
-import makeMe from "doughnut-test-fixtures/makeMe"
-import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+import { wrapSdkResponse } from "@tests/helpers"
 import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
 import {
   mountSoftKeyboardPrimer,
   softKeyboardPrimerElement,
   waitUntilFocused,
 } from "@tests/helpers/softKeyboardPrimerTestSupport"
+import {
+  clickWikidataSearchResult,
+  expectReplaceTitleAndAddAliasControls,
+  mockWikidataSearchResult,
+  mountWikidataAssociationDialog,
+  mountWikidataDialogReady,
+  selectWikidataSearchResultWithTitleAction,
+  setupWikidataDialogSdkMocks,
+  wikidataInput,
+  wikidataModal,
+  wikidataSaveButton,
+  wikidataSearchResultItem,
+  wikidataSearchResults,
+  type WikidataDialogSdkSpies,
+} from "@tests/notes/wikidataAssociationDialogTestSupport"
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 
 vi.mock("vue-router", async (importOriginal) => {
@@ -26,18 +38,13 @@ vi.mock("vue-router", async (importOriginal) => {
 describe("WikidataAssociationDialog", () => {
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
   let wrapper: VueWrapper<any>
-  let searchWikidataSpy: ReturnType<typeof mockSdkService>
-  let fetchWikidataEntitySpy: ReturnType<typeof mockSdkService>
+  let sdkSpies: WikidataDialogSdkSpies
   let matchMediaSpy: ReturnType<typeof mockCoarsePointer> | undefined
+
   beforeEach(() => {
     vi.resetAllMocks()
     document.body.innerHTML = ""
-    searchWikidataSpy = mockSdkService(WikidataController, "searchWikidata", [])
-    fetchWikidataEntitySpy = mockSdkService(
-      WikidataController,
-      "fetchWikidataEntityDataById",
-      makeMe.aWikidataEntity.please()
-    )
+    sdkSpies = setupWikidataDialogSdkMocks()
   })
 
   afterEach(() => {
@@ -49,102 +56,37 @@ describe("WikidataAssociationDialog", () => {
 
   const mountDialog = (
     searchKey: string,
-    options?: {
-      modelValue?: string
-      errorMessage?: string
-      showSaveButton?: boolean
-      canSaveEmptyToClear?: boolean
-      savedValue?: string
-    }
+    options?: Parameters<typeof mountWikidataAssociationDialog>[1]
   ) => {
-    wrapper = helper
-      .component(WikidataAssociationDialog)
-      .withProps({
-        searchKey,
-        ...options,
-      })
-      .mount({ attachTo: document.body })
+    wrapper = mountWikidataAssociationDialog(searchKey, options)
     return wrapper
-  }
-
-  const getModal = () => document.querySelector(".modal-container")
-  const getInput = () =>
-    getModal()?.querySelector(
-      'input[id="wikidataID-wikidataID"]'
-    ) as HTMLInputElement
-  const getSelect = () =>
-    getModal()?.querySelector(
-      '[data-testid="wikidata-search-results"]'
-    ) as HTMLElement
-  const getSelectItem = (wikidataId: string) =>
-    Array.from(
-      getModal()?.querySelectorAll(
-        '[data-testid="wikidata-search-result-item"]'
-      ) || []
-    ).find(
-      (item) => item.getAttribute("data-wikidata-id") === wikidataId
-    ) as HTMLElement
-
-  const mockSearchResult = (label: string, id: string) => {
-    const searchResult = makeMe.aWikidataSearchEntity
-      .label(label)
-      .id(id)
-      .please()
-    searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
-    return searchResult
-  }
-
-  const clickSearchResult = async (wikidataId: string) => {
-    const selectItem = getSelectItem(wikidataId)
-    expect(selectItem).toBeTruthy()
-    selectItem.click()
-    await flushPromises()
-  }
-
-  const clickTitleAction = async (action: "Replace" | "Append") => {
-    const label = getModal()?.querySelector(
-      `label[for="wikidataTitleAction-${action}"]`
-    ) as HTMLLabelElement
-    expect(label).toBeTruthy()
-    label.click()
-    await flushPromises()
-  }
-
-  const expectReplaceTitleAndAddAliasControls = (suggestedLabel: string) => {
-    expect(getModal()?.textContent).toContain(
-      `Suggested Title: ${suggestedLabel}`
-    )
-    expect(getModal()?.textContent).toContain("Replace title")
-    expect(getModal()?.textContent).toContain("Add as alias")
-    expect(getModal()?.querySelector('input[value="Replace"]')).toBeTruthy()
-    expect(getModal()?.querySelector('input[value="Append"]')).toBeTruthy()
   }
 
   describe("basic functionality", () => {
     it("shows the current wikidata ID in the input field", async () => {
       mountDialog("Test Title", { modelValue: "Q123" })
       await flushPromises()
-      expect(getInput()?.value).toBe("Q123")
+      expect(wikidataInput().value).toBe("Q123")
     })
 
     it("displays error message in the input field", async () => {
       mountDialog("Test Title", { errorMessage: "Invalid Wikidata ID" })
       await flushPromises()
-      const errorMessage = getModal()?.querySelector(".text-error")
+      const errorMessage = wikidataModal()?.querySelector(".text-error")
       expect(errorMessage?.textContent).toContain("Invalid Wikidata ID")
     })
 
     it("shows header title", async () => {
       mountDialog("Test Title")
       await flushPromises()
-      expect(getModal()?.textContent).toContain("Associate Wikidata")
+      expect(wikidataModal()?.textContent).toContain("Associate Wikidata")
     })
 
     it("emits close when close button is clicked", async () => {
-      searchWikidataSpy.mockResolvedValue(wrapSdkResponse([]))
+      sdkSpies.searchWikidataSpy.mockResolvedValue(wrapSdkResponse([]))
       const wrapper = mountDialog("test")
       await flushPromises()
-      const closeButton = getModal()?.querySelector(
+      const closeButton = wikidataModal()?.querySelector(
         "button.daisy-btn-secondary"
       ) as HTMLButtonElement
       closeButton?.click()
@@ -155,45 +97,41 @@ describe("WikidataAssociationDialog", () => {
 
   describe("search functionality", () => {
     it("shows loading state when searching", async () => {
-      searchWikidataSpy.mockImplementation(
+      sdkSpies.searchWikidataSpy.mockImplementation(
         () =>
           new Promise(() => {
-            // Never resolves - intentionally empty to test loading state
             // biome-ignore lint/suspicious/noExplicitAny: Promise intentionally never resolves for loading state test
           }) as any
       )
       mountDialog("dog")
       await flushPromises()
-      expect(getModal()?.textContent).toContain("Searching...")
+      expect(wikidataModal()?.textContent).toContain("Searching...")
     })
 
     it("shows not found message when results are empty and searchKey provided", async () => {
-      searchWikidataSpy.mockResolvedValue(wrapSdkResponse([]))
+      sdkSpies.searchWikidataSpy.mockResolvedValue(wrapSdkResponse([]))
       mountDialog("nonexistent")
       await flushPromises()
-      expect(getModal()?.textContent).toContain(
+      expect(wikidataModal()?.textContent).toContain(
         "No Wikidata entries found for 'nonexistent'"
       )
     })
 
     it("shows not found message when searchKey is provided but no results", async () => {
-      searchWikidataSpy.mockResolvedValue(wrapSdkResponse([]))
+      sdkSpies.searchWikidataSpy.mockResolvedValue(wrapSdkResponse([]))
       mountDialog("test")
       await flushPromises()
-      expect(getModal()?.textContent).toContain("No Wikidata entries found")
+      expect(wikidataModal()?.textContent).toContain(
+        "No Wikidata entries found"
+      )
     })
 
     it("displays search results in select when searchKey is provided", async () => {
-      const searchResult = makeMe.aWikidataSearchEntity
-        .label("Dog")
-        .id("Q11399")
-        .please()
-      searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
+      mockWikidataSearchResult(sdkSpies.searchWikidataSpy, "Dog", "Q11399")
       mountDialog("dog")
       await flushPromises()
-      expect(getSelect()).toBeTruthy()
-      expect(getSelect()?.textContent).toContain("Dog")
-      expect(getSelectItem("Q11399")).toBeTruthy()
+      expect(wikidataSearchResults().textContent).toContain("Dog")
+      expect(wikidataSearchResultItem("Q11399")).toBeTruthy()
     })
   })
 
@@ -201,8 +139,7 @@ describe("WikidataAssociationDialog", () => {
     it("emits update:modelValue when user types in the input", async () => {
       const wrapper = mountDialog("Test Title")
       await flushPromises()
-      const input = getInput()
-      expect(input).toBeTruthy()
+      const input = wikidataInput()
       input.value = "Q456"
       input.dispatchEvent(new Event("input", { bubbles: true }))
       await flushPromises()
@@ -212,9 +149,8 @@ describe("WikidataAssociationDialog", () => {
     it("allows manual input of Wikidata ID", async () => {
       const wrapper = mountDialog("test")
       await flushPromises()
-      const input = getInput()
-      expect(input).toBeTruthy()
-      expect(searchWikidataSpy).toHaveBeenCalled()
+      const input = wikidataInput()
+      expect(sdkSpies.searchWikidataSpy).toHaveBeenCalled()
       input.value = "Q999"
       input.dispatchEvent(new Event("input", { bubbles: true }))
       await flushPromises()
@@ -224,94 +160,71 @@ describe("WikidataAssociationDialog", () => {
 
   describe("title matching and actions", () => {
     it("emits selected with no titleAction when titles match", async () => {
-      const searchResult = makeMe.aWikidataSearchEntity
-        .label("dog")
-        .id("Q11399")
-        .please()
-      searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
+      const searchResult = mockWikidataSearchResult(
+        sdkSpies.searchWikidataSpy,
+        "dog",
+        "Q11399"
+      )
       const wrapper = mountDialog("dog")
       await flushPromises()
-
-      const selectItem = getSelectItem("Q11399")
-      expect(selectItem).toBeTruthy()
-      selectItem.click()
-      await flushPromises()
-
+      await clickWikidataSearchResult("Q11399")
       const emitted = wrapper.emitted("selected")?.[0]
       expect(emitted?.[0]).toEqual(searchResult)
       expect(emitted?.[1]).toBeUndefined()
-      expect(getInput()?.value).toBe("Q11399")
+      expect(wikidataInput().value).toBe("Q11399")
     })
 
     it("emits selected with no titleAction when titles match case-insensitively", async () => {
-      const searchResult = makeMe.aWikidataSearchEntity
-        .label("Dog")
-        .id("Q11399")
-        .please()
-      searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
+      const searchResult = mockWikidataSearchResult(
+        sdkSpies.searchWikidataSpy,
+        "Dog",
+        "Q11399"
+      )
       const wrapper = mountDialog("DOG")
       await flushPromises()
-
-      const selectItem = getSelectItem("Q11399")
-      expect(selectItem).toBeTruthy()
-      selectItem.click()
-      await flushPromises()
-
+      await clickWikidataSearchResult("Q11399")
       const emitted = wrapper.emitted("selected")?.[0]
       expect(emitted?.[0]).toEqual(searchResult)
       expect(emitted?.[1]).toBeUndefined()
     })
 
     it("shows replace title and add alias controls when suggested title differs", async () => {
-      const searchResult = makeMe.aWikidataSearchEntity
-        .label("Canine")
-        .id("Q11399")
-        .please()
-      searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
+      mockWikidataSearchResult(sdkSpies.searchWikidataSpy, "Canine", "Q11399")
       mountDialog("dog")
       await flushPromises()
-
-      const selectItem = getSelectItem("Q11399")
-      expect(selectItem).toBeTruthy()
-      selectItem.click()
-      await flushPromises()
-
+      await clickWikidataSearchResult("Q11399")
       expectReplaceTitleAndAddAliasControls("Canine")
     })
 
-    it("emits selected with replace action", async () => {
-      const searchResult = makeMe.aWikidataSearchEntity
-        .label("Canine")
-        .id("Q11399")
-        .please()
-      searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
-      const wrapper = mountDialog("dog")
-      await flushPromises()
-
-      const selectItem = getSelectItem("Q11399")
-      expect(selectItem).toBeTruthy()
-      selectItem.click()
-      await flushPromises()
-
-      const replaceLabel = getModal()?.querySelector(
-        'label[for="wikidataTitleAction-Replace"]'
-      ) as HTMLLabelElement
-      replaceLabel.click()
-      await flushPromises()
-
+    it.each([
+      false,
+      true,
+    ])("emits selected with replace action when showSaveButton is %s", async (showSaveButton) => {
+      const { wrapper, searchResult } = await mountWikidataDialogReady({
+        searchWikidataSpy: sdkSpies.searchWikidataSpy,
+        searchKey: "dog",
+        searchLabel: "Canine",
+        wikidataId: "Q11399",
+        mountOptions: showSaveButton ? { showSaveButton: true } : undefined,
+      })
+      await selectWikidataSearchResultWithTitleAction("Q11399", "Replace")
       const emitted = wrapper.emitted("selected")?.[0]
       expect(emitted?.[0]).toEqual(searchResult)
       expect(emitted?.[1]).toBe("replace")
     })
 
-    it("emits selected with add alias action", async () => {
-      const searchResult = mockSearchResult("Canine", "Q11399")
-      const wrapper = mountDialog("dog")
-      await flushPromises()
-
-      await clickSearchResult("Q11399")
-      await clickTitleAction("Append")
-
+    it.each([
+      false,
+      true,
+    ])("emits selected with add alias action when showSaveButton is %s", async (showSaveButton) => {
+      const { wrapper, searchResult } = await mountWikidataDialogReady({
+        searchWikidataSpy: sdkSpies.searchWikidataSpy,
+        searchKey: "dog",
+        searchLabel: "Canine",
+        wikidataId: "Q11399",
+        mountOptions: showSaveButton ? { showSaveButton: true } : undefined,
+      })
+      await selectWikidataSearchResultWithTitleAction("Q11399", "Append")
       const emitted = wrapper.emitted("selected")?.[0]
       expect(emitted?.[0]).toEqual(searchResult)
       expect(emitted?.[1]).toBe("append")
@@ -322,7 +235,7 @@ describe("WikidataAssociationDialog", () => {
     it("shows open link button when Wikidata ID is present and showSaveButton is true", async () => {
       mountDialog("Test Title", { modelValue: "Q123", showSaveButton: true })
       await flushPromises()
-      const openLinkButton = getModal()?.querySelector(
+      const openLinkButton = wikidataModal()?.querySelector(
         'button[title="open link"]'
       ) as HTMLButtonElement
       expect(openLinkButton).toBeTruthy()
@@ -332,7 +245,7 @@ describe("WikidataAssociationDialog", () => {
     it("shows open link button when showSaveButton is false but Wikidata ID is present", async () => {
       mountDialog("Test Title", { modelValue: "Q123", showSaveButton: false })
       await flushPromises()
-      const openLinkButton = getModal()?.querySelector(
+      const openLinkButton = wikidataModal()?.querySelector(
         'button[title="open link"]'
       ) as HTMLButtonElement
       expect(openLinkButton).toBeTruthy()
@@ -342,22 +255,21 @@ describe("WikidataAssociationDialog", () => {
     it("hides open link button when Wikidata ID is empty", async () => {
       mountDialog("Test Title", { modelValue: "", showSaveButton: true })
       await flushPromises()
-      const openLinkButton = getModal()?.querySelector(
+      const openLinkButton = wikidataModal()?.querySelector(
         'button[title="open link"]'
       ) as HTMLButtonElement
       expect(openLinkButton).toBeTruthy()
-      expect(openLinkButton?.style.display).toBe("none")
+      expect(openLinkButton.style.display).toBe("none")
     })
 
     it("opens Wikipedia URL when available", async () => {
       const wikipediaUrl = "https://en.wikipedia.org/wiki/Test"
-      fetchWikidataEntitySpy.mockResolvedValue(
+      sdkSpies.fetchWikidataEntitySpy.mockResolvedValue(
         wrapSdkResponse({
           WikipediaEnglishUrl: wikipediaUrl,
           // biome-ignore lint/suspicious/noExplicitAny: SDK response types are complex unions that require any for proper mocking
         } as any)
       )
-
       const windowOpenSpy = vi.spyOn(window, "open").mockImplementation(
         () =>
           ({
@@ -365,32 +277,27 @@ describe("WikidataAssociationDialog", () => {
             focus: vi.fn(),
           }) as unknown as Window
       )
-
       mountDialog("Test Title", { modelValue: "Q123", showSaveButton: true })
       await flushPromises()
-
-      const openLinkButton = getModal()?.querySelector(
+      const openLinkButton = wikidataModal()?.querySelector(
         'button[title="open link"]'
       ) as HTMLButtonElement
       openLinkButton.click()
       await flushPromises()
-
       expect(windowOpenSpy).toHaveBeenCalledWith("")
-      expect(fetchWikidataEntitySpy).toHaveBeenCalledWith({
+      expect(sdkSpies.fetchWikidataEntitySpy).toHaveBeenCalledWith({
         path: { wikidataId: "Q123" },
       })
-
       windowOpenSpy.mockRestore()
     })
 
     it("opens Wikidata URL when Wikipedia URL is not available", async () => {
-      fetchWikidataEntitySpy.mockResolvedValue(
+      sdkSpies.fetchWikidataEntitySpy.mockResolvedValue(
         wrapSdkResponse({
           WikipediaEnglishUrl: "",
           // biome-ignore lint/suspicious/noExplicitAny: SDK response types are complex unions that require any for proper mocking
         } as any)
       )
-
       const windowOpenSpy = vi.spyOn(window, "open").mockImplementation(
         () =>
           ({
@@ -398,124 +305,48 @@ describe("WikidataAssociationDialog", () => {
             focus: vi.fn(),
           }) as unknown as Window
       )
-
       mountDialog("Test Title", { modelValue: "Q123", showSaveButton: true })
       await flushPromises()
-
-      const openLinkButton = getModal()?.querySelector(
+      const openLinkButton = wikidataModal()?.querySelector(
         'button[title="open link"]'
       ) as HTMLButtonElement
       openLinkButton.click()
       await flushPromises()
-
       expect(windowOpenSpy).toHaveBeenCalledWith("")
-      expect(fetchWikidataEntitySpy).toHaveBeenCalledWith({
+      expect(sdkSpies.fetchWikidataEntitySpy).toHaveBeenCalledWith({
         path: { wikidataId: "Q123" },
       })
-
       windowOpenSpy.mockRestore()
     })
   })
 
   describe("edit mode with showSaveButton", () => {
-    const getSaveButton = () =>
-      Array.from(getModal()?.querySelectorAll("button") || []).find(
-        (btn) => btn.textContent?.trim() === "Save"
-      ) as HTMLButtonElement
-
     it("does not auto-save when selecting from result list if showSaveButton is true", async () => {
-      const searchResult = makeMe.aWikidataSearchEntity
-        .label("dog")
-        .id("Q11399")
-        .please()
-      searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
+      mockWikidataSearchResult(sdkSpies.searchWikidataSpy, "dog", "Q11399")
       const wrapper = mountDialog("dog", { showSaveButton: true })
       await flushPromises()
-
-      const select = getSelect()
-      expect(select).toBeTruthy()
-      const selectItem = getSelectItem("Q11399")
-      expect(selectItem).toBeTruthy()
-      selectItem.click()
-      await flushPromises()
-
-      // Should NOT emit selected immediately when showSaveButton is true
+      await clickWikidataSearchResult("Q11399")
       expect(wrapper.emitted("selected")).toBeFalsy()
-      // Should update modelValue
       expect(wrapper.emitted("update:modelValue")?.[0]).toEqual(["Q11399"])
-      // Should show Save button
-      expect(getSaveButton()).toBeTruthy()
+      expect(wikidataSaveButton()).toBeTruthy()
     })
 
     it("saves when clicking Save button after selecting from result list", async () => {
-      mockSearchResult("dog", "Q11399")
+      mockWikidataSearchResult(sdkSpies.searchWikidataSpy, "dog", "Q11399")
       const wrapper = mountDialog("dog", { showSaveButton: true })
       await flushPromises()
-
-      await clickSearchResult("Q11399")
-      getSaveButton().click()
+      await clickWikidataSearchResult("Q11399")
+      wikidataSaveButton().click()
       await flushPromises()
-
       expect(wrapper.emitted("save")?.[0]).toEqual(["Q11399"])
     })
 
     it("shows replace title and add alias controls when selecting result with different title and showSaveButton is true", async () => {
-      const searchResult = makeMe.aWikidataSearchEntity
-        .label("Canine")
-        .id("Q11399")
-        .please()
-      searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
+      mockWikidataSearchResult(sdkSpies.searchWikidataSpy, "Canine", "Q11399")
       mountDialog("dog", { showSaveButton: true })
       await flushPromises()
-
-      const selectItem = getSelectItem("Q11399")
-      expect(selectItem).toBeTruthy()
-      selectItem.click()
-      await flushPromises()
-
+      await clickWikidataSearchResult("Q11399")
       expectReplaceTitleAndAddAliasControls("Canine")
-    })
-
-    it("saves with replace action immediately when user selects Replace", async () => {
-      const searchResult = makeMe.aWikidataSearchEntity
-        .label("Canine")
-        .id("Q11399")
-        .please()
-      searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
-      const wrapper = mountDialog("dog", { showSaveButton: true })
-      await flushPromises()
-
-      const selectItem = getSelectItem("Q11399")
-      expect(selectItem).toBeTruthy()
-      selectItem.click()
-      await flushPromises()
-
-      // Select Replace option - this should immediately emit selected
-      const replaceLabel = getModal()?.querySelector(
-        'label[for*="Replace"]'
-      ) as HTMLLabelElement
-      expect(replaceLabel).toBeTruthy()
-      replaceLabel.click()
-      await flushPromises()
-
-      // Should emit selected with replace action immediately
-      expect(wrapper.emitted("selected")).toBeTruthy()
-      const emitted = wrapper.emitted("selected")?.[0]
-      expect(emitted?.[0]).toEqual(searchResult)
-      expect(emitted?.[1]).toBe("replace")
-    })
-
-    it("saves with add alias action immediately when user selects Add as alias", async () => {
-      const searchResult = mockSearchResult("Canine", "Q11399")
-      const wrapper = mountDialog("dog", { showSaveButton: true })
-      await flushPromises()
-
-      await clickSearchResult("Q11399")
-      await clickTitleAction("Append")
-
-      const emitted = wrapper.emitted("selected")?.[0]
-      expect(emitted?.[0]).toEqual(searchResult)
-      expect(emitted?.[1]).toBe("append")
     })
 
     it("enables Save and emits save with empty string when clearing and canSaveEmptyToClear", async () => {
@@ -526,13 +357,12 @@ describe("WikidataAssociationDialog", () => {
         modelValue: "Q123",
       })
       await flushPromises()
-      const input = getInput()
-      expect(input?.value).toBe("Q123")
+      const input = wikidataInput()
+      expect(input.value).toBe("Q123")
       input.value = ""
       input.dispatchEvent(new Event("input", { bubbles: true }))
       await flushPromises()
-
-      const saveButton = getSaveButton()
+      const saveButton = wikidataSaveButton()
       expect(saveButton.disabled).toBe(false)
       saveButton.click()
       await flushPromises()
@@ -546,9 +376,7 @@ describe("WikidataAssociationDialog", () => {
         savedValue: "Q123",
       })
       await flushPromises()
-      const saveButton = getSaveButton()
-      expect(saveButton).toBeTruthy()
-      expect(saveButton.disabled).toBe(true)
+      expect(wikidataSaveButton().disabled).toBe(true)
     })
 
     it("disables Save when both current and saved are empty", async () => {
@@ -559,9 +387,7 @@ describe("WikidataAssociationDialog", () => {
         savedValue: "",
       })
       await flushPromises()
-      const saveButton = getSaveButton()
-      expect(saveButton).toBeTruthy()
-      expect(saveButton.disabled).toBe(true)
+      expect(wikidataSaveButton().disabled).toBe(true)
     })
   })
 
@@ -576,10 +402,8 @@ describe("WikidataAssociationDialog", () => {
       expect(primer).toBeTruthy()
       primeSoftKeyboard()
       expect(document.activeElement).toBe(primer)
-
       mountDialog("test", { showSaveButton: true })
       await flushPromises()
-
       await waitUntilFocused("#wikidataID-wikidataID")
     })
   })

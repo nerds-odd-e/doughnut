@@ -8,6 +8,12 @@ import type { ComponentPublicInstance } from "vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+import {
+  clickWikidataSearchResult,
+  clickWikidataTitleAction,
+  wikidataModal,
+  wikidataSearchResultItem,
+} from "@tests/notes/wikidataAssociationDialogTestSupport"
 import { expect } from "vitest"
 
 export const noteNewFormRealm = makeMe.aNoteRealm.title("mythical").please()
@@ -85,20 +91,10 @@ export function noteTitleText(
     .innerText
 }
 
-export function wikidataModal(): HTMLElement | null {
-  return document.querySelector(".modal-container")
-}
+export { wikidataModal, wikidataSearchResultItem }
 
 export function wikidataDialogIsOpen(): boolean {
   return wikidataModal() !== null
-}
-
-export function wikidataSearchResultItem(wikidataId: string): HTMLElement {
-  const item = wikidataModal()?.querySelector(
-    `[data-testid="wikidata-search-result-item"][data-wikidata-id="${wikidataId}"]`
-  ) as HTMLElement | null
-  expect(item).toBeTruthy()
-  return item!
 }
 
 export function wikidataCancelButton(): HTMLButtonElement {
@@ -122,15 +118,9 @@ export async function selectWikidataSearchResult(
   wikidataId: string,
   titleAction?: "Replace" | "Append"
 ) {
-  wikidataSearchResultItem(wikidataId).click()
-  await flushPromises()
+  await clickWikidataSearchResult(wikidataId)
   if (titleAction) {
-    const label = wikidataModal()?.querySelector(
-      `label[for="wikidataTitleAction-${titleAction}"]`
-    ) as HTMLLabelElement | null
-    expect(label).toBeTruthy()
-    label!.click()
-    await flushPromises()
+    await clickWikidataTitleAction(titleAction)
   }
 }
 
