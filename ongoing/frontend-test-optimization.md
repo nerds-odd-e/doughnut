@@ -330,9 +330,11 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/toolbars/HorizontalMenu.
 ---
 
 ### Phase 4: links/SearchDialog
-Status: planned
+Status: done
 
-**Tests:** (8 in top 10%, ~168ms combined)
+**Learnings:** Hoisted mount/mocks/selectors into `searchDialogTestSupport.ts` (`titleEl`, `renderSearchWithKeyHistory`, `openSearchKeyHistoryDropdown`). Replaced `findByPlaceholderText` with `getByPlaceholderText` after `flushPromises`. Merged add-link choice + relationship form, dead-link button + rewrite, and paired history-collapse cases (`it.each`). Suite CPU ~274ms → ~260ms (17 → 15 tests).
+
+**Tests:** (8 in top 10%, ~168ms combined — pre-optimization baseline)
 - `tests/links/SearchDialog.spec.ts` — "shows relationship form when Add a new relationship note is clicked" (~26ms)
 - `tests/links/SearchDialog.spec.ts` — "shows confirm when move is blocked by soft-deleted title at destination" (~24ms)
 - `tests/links/SearchDialog.spec.ts` — "calls moveNoteToFolder with folder id after confirm" (~24ms)

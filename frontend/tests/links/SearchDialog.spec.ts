@@ -4,9 +4,7 @@ import {
   SearchController,
   TextContentController,
 } from "@generated/doughnut-backend-api/sdk.gen"
-import type { Note } from "@generated/doughnut-backend-api"
 import SearchForm from "@/components/links/SearchForm.vue"
-import Modal from "@/components/commons/Modal.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
@@ -19,97 +17,31 @@ import {
   clearSearchKeyHistoryCookie,
   readSearchKeyHistory,
 } from "@/utils/searchKeyHistoryCookie"
-import { searchResultItemTestId } from "@/utils/searchDialogKeyboard"
-import {
-  dispatchArrowKey,
-  testIdSelector,
-} from "@tests/helpers/searchDialogKeyboardTestSupport"
+import { dispatchArrowKey } from "@tests/helpers/searchDialogKeyboardTestSupport"
+import { afterEach, describe, expect, it, vi } from "vitest"
 import { advanceSearchDebounce } from "@tests/helpers/searchDebounceTestSupport"
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { defineComponent } from "vue"
-const searchResultItemSelector = testIdSelector(searchResultItemTestId)
+import {
+  allSearchResultItems,
+  confirmMovePopup,
+  deadLinkPayload,
+  historyDropdown,
+  makeNoteHit,
+  makeNotebookHit,
+  openAddLinkChoice,
+  openSearchKeyHistoryDropdown,
+  renderSearchForm,
+  renderSearchFormInModal,
+  renderSearchWithKeyHistory,
+  searchAndClickMoveUnder,
+  setupSearchDialogTests,
+  titleEl,
+  typeInSearch,
+} from "./searchDialogTestSupport"
+
 const searchInputId = "searchTerm-searchKey"
 
-function allSearchResultItems(): Element[] {
-  return Array.from(document.querySelectorAll(searchResultItemSelector))
-}
-
-function makeNoteHit(title: string, notebookId: number) {
-  return {
-    hitKind: "NOTE" as const,
-    noteSearchResult: MakeMe.aNoteSearchResult
-      .title(title)
-      .notebookId(notebookId)
-      .please(),
-  }
-}
-
-function makeFolderHit(folderId: number, folderName: string) {
-  return {
-    hitKind: "FOLDER" as const,
-    folderId,
-    folderName,
-    notebookId: 1,
-    notebookName: "Nb",
-    distance: 0.9,
-  }
-}
-
-function makeNotebookHit(notebookId: number, notebookName: string) {
-  return {
-    hitKind: "NOTEBOOK" as const,
-    notebookId,
-    notebookName,
-    distance: 0,
-  }
-}
-
-function setupSearchFormSdkMocks() {
-  mockSdkService(NoteController, "getRecentNotes", [])
-  mockSdkService(SearchController, "searchForRelationshipTarget", [])
-  mockSdkService(SearchController, "searchForRelationshipTargetWithin", [])
-  mockSdkService(SearchController, "semanticSearch", [])
-  mockSdkService(SearchController, "semanticSearchWithin", [])
-}
-
-async function typeInSearch(input: HTMLElement, value: string) {
-  fireEvent.update(input, value)
-  await advanceSearchDebounce()
-}
-
-async function renderSearchForm(
-  props: {
-    note?: Note | null
-    deadLinkPayload?: {
-      targetToken: string
-      displayText: string
-    }
-  },
-  options?: { router?: boolean; cleanStorage?: boolean }
-) {
-  let chain = helper.component(SearchForm)
-  if (options?.cleanStorage !== false) {
-    chain = chain.withCleanStorage()
-  }
-  if (options?.router) {
-    chain = chain.withRouter()
-  }
-  chain.withProps(props).render()
-  await flushPromises()
-  return screen.getByPlaceholderText("Search")
-}
-
-async function confirmMovePopup() {
-  usePopups().popups.done(true)
-  await flushPromises()
-}
-
 describe("SearchForm", () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-    clearSearchKeyHistoryCookie()
-    setupSearchFormSdkMocks()
-  })
+  setupSearchDialogTests()
 
   it("Search at the top level with no note", async () => {
     helper
@@ -119,10 +51,8 @@ describe("SearchForm", () => {
       .render()
     await flushPromises()
     screen.getByPlaceholderText("Search")
-    expect(screen.getByTitle("Semantic search")).toBeInTheDocument()
-    expect(
-      screen.getByTitle("All My Notebooks And Subscriptions")
-    ).toBeDisabled()
+    expect(titleEl("Semantic search")).toBeInTheDocument()
+    expect(titleEl("All My Notebooks And Subscriptions")).toBeDisabled()
   })
 
   describe("keyboard navigation", () => {
@@ -171,51 +101,33 @@ describe("SearchForm", () => {
     const note = MakeMe.aNote.please()
     helper.component(SearchForm).withCleanStorage().withProps({ note }).render()
     await flushPromises()
-    screen.getByTitle("All My Circles").click()
-    expect(screen.getByTitle("All My Notebooks And Subscriptions")).toHaveClass(
+    titleEl("All My Circles").click()
+    expect(titleEl("All My Notebooks And Subscriptions")).toHaveClass(
       "text-primary"
     )
-    screen.getByTitle("All My Notebooks And Subscriptions").click()
-    expect(screen.getByTitle("All My Circles")).not.toHaveClass("text-primary")
+    titleEl("All My Notebooks And Subscriptions").click()
+    expect(titleEl("All My Circles")).not.toHaveClass("text-primary")
   })
 
   describe("debounced search flows", () => {
-    beforeEach(() => {
-      vi.useFakeTimers()
-    })
-
     afterEach(() => {
       vi.runOnlyPendingTimers()
       vi.useRealTimers()
     })
 
     describe("Add link choice step", () => {
-      async function openAddLinkChoice(
-        note: Note,
-        options?: { router?: boolean }
-      ) {
-        mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
-          makeNoteHit("Target Note", note.noteTopology.id + 100),
-        ])
-        const searchInput = await renderSearchForm({ note }, options)
-        await typeInSearch(searchInput, "Target")
-        fireEvent.click(screen.getByText("Add link"))
-        await flushPromises()
-      }
+      beforeEach(() => {
+        vi.useFakeTimers()
+      })
 
-      it("shows choice buttons when Add link is clicked on a note hit", async () => {
+      it("shows link choice buttons and relationship form when Add a new relationship note is clicked", async () => {
         const note = MakeMe.aNote.please()
-        await openAddLinkChoice(note)
+        await openAddLinkChoice(note, { router: true })
 
         expect(screen.getByText("Insert as a wiki link")).toBeInTheDocument()
         expect(
           screen.getByText("Add a new relationship note")
         ).toBeInTheDocument()
-      })
-
-      it("shows relationship form when Add a new relationship note is clicked", async () => {
-        const note = MakeMe.aNote.please()
-        await openAddLinkChoice(note, { router: true })
 
         fireEvent.click(screen.getByText("Add a new relationship note"))
         await flushPromises()
@@ -227,15 +139,9 @@ describe("SearchForm", () => {
     describe("Move Under folder hit", () => {
       const targetFolderId = 42
 
-      async function searchAndClickMoveUnder(note: Note) {
-        mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
-          makeFolderHit(targetFolderId, "Archive"),
-        ])
-        const searchInput = await renderSearchForm({ note })
-        await typeInSearch(searchInput, "Arc")
-        fireEvent.click(screen.getByText("Move Under"))
-        await flushPromises()
-      }
+      beforeEach(() => {
+        vi.useFakeTimers()
+      })
 
       it("calls moveNoteToFolder with folder id after confirm", async () => {
         const note = MakeMe.aNote.please()
@@ -245,7 +151,7 @@ describe("SearchForm", () => {
           []
         )
 
-        await searchAndClickMoveUnder(note)
+        await searchAndClickMoveUnder(note, targetFolderId)
         expect(moveNoteToFolderSpy).not.toHaveBeenCalled()
 
         await confirmMovePopup()
@@ -275,7 +181,7 @@ describe("SearchForm", () => {
           })
         )
 
-        await searchAndClickMoveUnder(note)
+        await searchAndClickMoveUnder(note, targetFolderId)
         await confirmMovePopup()
 
         const conflictPopup = usePopups().popups.peek()?.[0]
@@ -288,6 +194,10 @@ describe("SearchForm", () => {
     })
 
     describe("Move to notebook root on NOTEBOOK hit", () => {
+      beforeEach(() => {
+        vi.useFakeTimers()
+      })
+
       it("calls moveNoteToNotebookRootInNotebook with notebook id after confirm", async () => {
         const note = MakeMe.aNote.please()
         const targetNotebookId = 99
@@ -320,10 +230,9 @@ describe("SearchForm", () => {
     })
 
     describe("Dead link - link to existing note", () => {
-      const deadLinkPayload = {
-        targetToken: "original text",
-        displayText: "original text",
-      }
+      beforeEach(() => {
+        vi.useFakeTimers()
+      })
 
       it("prefills search with dead link display text and searches automatically", async () => {
         const note = MakeMe.aNote.please()
@@ -350,23 +259,6 @@ describe("SearchForm", () => {
             body: expect.objectContaining({ searchKey: "original text" }),
           })
         )
-      })
-
-      it("shows 'Link ... to this note' button when dead link payload is provided", async () => {
-        const note = MakeMe.aNote.please()
-        mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
-          makeNoteHit("Selected Note", note.noteTopology.id + 100),
-        ])
-
-        const searchInput = await renderSearchForm({ note, deadLinkPayload })
-        await typeInSearch(searchInput, "Selected")
-
-        fireEvent.click(screen.getByText("Add link"))
-        await flushPromises()
-
-        expect(
-          screen.getByText('Link "original text" to this note')
-        ).toBeInTheDocument()
       })
 
       it("rewrites note content when linking dead link to existing note", async () => {
@@ -396,7 +288,11 @@ describe("SearchForm", () => {
 
         fireEvent.click(screen.getByText("Add link"))
         await flushPromises()
-        fireEvent.click(screen.getByText('Link "original text" to this note'))
+
+        const linkButton = screen.getByText('Link "original text" to this note')
+        expect(linkButton).toBeInTheDocument()
+
+        fireEvent.click(linkButton)
         await flushPromises()
 
         expect(updateSpy).toHaveBeenCalledTimes(1)
@@ -410,15 +306,21 @@ describe("SearchForm", () => {
       })
     })
 
-    it("records trimmed search key after debounced search completes", async () => {
-      clearSearchKeyHistoryCookie()
-      const note = MakeMe.aNote.please()
-      mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
-        makeNoteHit("Hit", note.noteTopology.id + 1),
-      ])
-      const searchInput = await renderSearchForm({ note })
-      await typeInSearch(searchInput, "  debounced-term  ")
-      expect(readSearchKeyHistory()).toEqual(["debounced-term"])
+    describe("search key recording", () => {
+      beforeEach(() => {
+        vi.useFakeTimers()
+      })
+
+      it("records trimmed search key after debounced search completes", async () => {
+        clearSearchKeyHistoryCookie()
+        const note = MakeMe.aNote.please()
+        mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
+          makeNoteHit("Hit", note.noteTopology.id + 1),
+        ])
+        const searchInput = await renderSearchForm({ note })
+        await typeInSearch(searchInput, "  debounced-term  ")
+        expect(readSearchKeyHistory()).toEqual(["debounced-term"])
+      })
     })
   })
 
@@ -429,7 +331,8 @@ describe("SearchForm", () => {
         .withCleanStorage()
         .withProps({ note: null })
         .render()
-      await screen.findByPlaceholderText("Search")
+      await flushPromises()
+      screen.getByPlaceholderText("Search")
       fireEvent.click(screen.getByTestId("search-key-history-trigger"))
       await flushPromises()
       expect(screen.getByText("No search history yet")).toBeInTheDocument()
@@ -439,100 +342,40 @@ describe("SearchForm", () => {
       appendSearchKeyToHistory("older")
       appendSearchKeyToHistory("newer")
       const note = MakeMe.aNote.please()
-      helper
-        .component(SearchForm)
-        .withCleanStorage()
-        .withProps({ note })
-        .render()
-      await screen.findByPlaceholderText("Search")
-      fireEvent.click(screen.getByTestId("search-key-history-trigger"))
-      await flushPromises()
+      await renderSearchWithKeyHistory(note, ["older", "newer"])
+      await openSearchKeyHistoryDropdown()
       fireEvent.click(screen.getByTestId("search-key-history-item-0"))
       await flushPromises()
       const input = screen.getByPlaceholderText("Search") as HTMLInputElement
       expect(input.value).toBe("newer")
     })
 
-    it("collapses search key history when clicking outside", async () => {
-      appendSearchKeyToHistory("older")
+    it.each([
+      {
+        scenario: "clicking the search input",
+        click: (input: HTMLElement) => fireEvent.click(input),
+      },
+      {
+        scenario: "clicking a search scope toggle",
+        click: () => titleEl("All My Circles").click(),
+      },
+    ])("collapses search key history when $scenario", async ({ click }) => {
       const note = MakeMe.aNote.please()
-      helper
-        .component(SearchForm)
-        .withCleanStorage()
-        .withProps({ note })
-        .render()
-      const input = await screen.findByPlaceholderText("Search")
-      fireEvent.click(screen.getByTestId("search-key-history-trigger"))
+      const input = await renderSearchWithKeyHistory(note)
+      await openSearchKeyHistoryDropdown()
+      click(input)
       await flushPromises()
-
-      const dropdown = screen.getByTestId(
-        "search-key-history-dropdown"
-      ) as HTMLDetailsElement
-      expect(dropdown.open).toBe(true)
-
-      fireEvent.click(input)
-      await flushPromises()
-
-      expect(dropdown.open).toBe(false)
-    })
-
-    it("collapses search key history when clicking a search scope toggle", async () => {
-      appendSearchKeyToHistory("older")
-      const note = MakeMe.aNote.please()
-      helper
-        .component(SearchForm)
-        .withCleanStorage()
-        .withProps({ note })
-        .render()
-      await screen.findByPlaceholderText("Search")
-      fireEvent.click(screen.getByTestId("search-key-history-trigger"))
-      await flushPromises()
-
-      const dropdown = screen.getByTestId(
-        "search-key-history-dropdown"
-      ) as HTMLDetailsElement
-      expect(dropdown.open).toBe(true)
-
-      fireEvent.click(screen.getByTitle("All My Circles"))
-      await flushPromises()
-
-      expect(dropdown.open).toBe(false)
+      expect(historyDropdown().open).toBe(false)
     })
 
     it("collapses search key history inside a modal when clicking elsewhere in that modal", async () => {
-      appendSearchKeyToHistory("older")
       const note = MakeMe.aNote.please()
-      const SearchFormInModal = defineComponent({
-        components: { Modal, SearchForm },
-        props: ["note"],
-        template: `
-          <Modal :show-close-button="false">
-            <template #body>
-              <SearchForm :note="note" />
-            </template>
-          </Modal>
-        `,
-      })
-
-      helper
-        .component(SearchFormInModal)
-        .withCleanStorage()
-        .withRouter()
-        .withProps({ note })
-        .render()
-      await screen.findByPlaceholderText("Search")
-      fireEvent.click(screen.getByTestId("search-key-history-trigger"))
+      appendSearchKeyToHistory("older")
+      await renderSearchFormInModal(note)
+      await openSearchKeyHistoryDropdown()
+      titleEl("All My Circles").click()
       await flushPromises()
-
-      const dropdown = screen.getByTestId(
-        "search-key-history-dropdown"
-      ) as HTMLDetailsElement
-      expect(dropdown.open).toBe(true)
-
-      fireEvent.click(screen.getByTitle("All My Circles"))
-      await flushPromises()
-
-      expect(dropdown.open).toBe(false)
+      expect(historyDropdown().open).toBe(false)
     })
   })
 })
