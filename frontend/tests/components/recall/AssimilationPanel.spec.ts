@@ -1,6 +1,5 @@
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
-import { flushPromises } from "@vue/test-utils"
-import { describe, expect, it, vi } from "vitest"
+import { describe, expect, it, vi, beforeEach } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import {
   mockSdkService,
@@ -9,15 +8,20 @@ import {
 } from "@tests/helpers"
 import { mockedGoToNextAssimilation } from "./assimilationPanelMocks"
 import {
+  assimilateButtonEl,
   assimilateSpy,
-  assimilateButtonSelector,
   clickAssimilate,
-  mountAssimilationPanel,
+  clickVerifySpelling,
+  closeSpellingVerificationPopup,
+  mountAssimilationPanelReady,
   mockedIncrementAssimilatedCount,
   mockedRequestDueRecallsRefresh,
   mockedTotalAssimilatedCount,
   note,
+  opaqueContentBlockerEl,
   setupAssimilationPanelTests,
+  setupRememberSpellingRecall,
+  spellingVerificationPopupEl,
 } from "./assimilationPanelTestSupport"
 
 vi.mock("@/composables/useRecallData")
@@ -40,9 +44,8 @@ describe("AssimilationPanel", () => {
           { id: 3, removedFromTracking: false },
         ])
       )
-      const wrapper = mountAssimilationPanel()
+      const wrapper = await mountAssimilationPanelReady()
 
-      await flushPromises()
       await clickAssimilate(wrapper)
 
       expect(assimilateSpy).toHaveBeenCalledWith({
@@ -57,8 +60,7 @@ describe("AssimilationPanel", () => {
 
   describe("NoteInfoBar", () => {
     it("loads note recall info for settings", async () => {
-      const wrapper = mountAssimilationPanel()
-      await flushPromises()
+      const wrapper = await mountAssimilationPanelReady()
       expect(
         wrapper.findComponent({ name: "NoteRecallSettingForm" }).exists()
       ).toBe(true)
@@ -67,66 +69,36 @@ describe("AssimilationPanel", () => {
 
   describe("SpellingVerificationPopup", () => {
     beforeEach(() => {
-      mockSdkService(NoteController, "getNoteInfo", {
-        recallSetting: { rememberSpelling: true },
-      })
+      setupRememberSpellingRecall()
     })
 
-    const getOpaqueContentBlocker = () =>
-      document.body.querySelector(
-        '[data-test="opaque-content-blocker"]'
-      ) as HTMLElement | null
-
-    const closeSpellingVerificationPopup = () => {
-      const closeButton = document
-        .querySelector('[data-test="spelling-verification-popup"]')
-        ?.closest(".modal-mask")
-        ?.querySelector(".close-button") as HTMLElement
-      closeButton.click()
-    }
-
     it("shows opaque layer to hide note content behind spelling verification", async () => {
-      const wrapper = mountAssimilationPanel()
-      await flushPromises()
+      const wrapper = await mountAssimilationPanelReady()
 
-      expect(getOpaqueContentBlocker()).toBeNull()
+      expect(opaqueContentBlockerEl()).toBeNull()
 
       await clickAssimilate(wrapper)
 
-      const opaqueLayer = getOpaqueContentBlocker()
+      const opaqueLayer = opaqueContentBlockerEl()
       expect(opaqueLayer).not.toBeNull()
       expect(opaqueLayer?.style.zIndex).toBe("9989")
       expect(opaqueLayer?.className).toContain("bg-black")
     })
 
-    it("hides opaque layer when spelling popup closes", async () => {
-      const wrapper = mountAssimilationPanel()
-      await flushPromises()
+    it("closes spelling verification and restores assimilate panel without assimilating", async () => {
+      const wrapper = await mountAssimilationPanelReady()
 
       await clickAssimilate(wrapper)
-      expect(getOpaqueContentBlocker()).not.toBeNull()
-
-      closeSpellingVerificationPopup()
-      await flushPromises()
-
-      expect(getOpaqueContentBlocker()).toBeNull()
-      wrapper.unmount()
-    })
-
-    it("closes popup and returns to original state when user closes it", async () => {
-      const wrapper = mountAssimilationPanel()
-      await flushPromises()
-
-      await clickAssimilate(wrapper)
-      expect(document.body.textContent).toContain("Verify Spelling")
+      expect(opaqueContentBlockerEl()).not.toBeNull()
+      expect(spellingVerificationPopupEl()).not.toBeNull()
       expect(assimilateSpy).not.toHaveBeenCalled()
 
-      closeSpellingVerificationPopup()
-      await flushPromises()
+      await closeSpellingVerificationPopup()
 
-      expect(document.body.textContent).not.toContain("Verify Spelling")
+      expect(opaqueContentBlockerEl()).toBeNull()
+      expect(spellingVerificationPopupEl()).toBeNull()
       expect(assimilateSpy).not.toHaveBeenCalled()
-      expect(wrapper.find(assimilateButtonSelector).exists()).toBe(true)
+      expect(assimilateButtonEl(wrapper)).not.toBeNull()
     })
   })
 
@@ -142,11 +114,9 @@ describe("AssimilationPanel", () => {
           },
         ],
       })
-      const wrapper = mountAssimilationPanel()
-      await flushPromises()
+      const wrapper = await mountAssimilationPanelReady()
 
-      const assimilateButton = wrapper.find(assimilateButtonSelector)
-      expect(assimilateButton.attributes("disabled")).toBeUndefined()
+      expect(assimilateButtonEl(wrapper)?.hasAttribute("disabled")).toBe(false)
     })
 
     it("disables assimilate after note-level assimilate when next unit stays on the same note", async () => {
@@ -166,19 +136,14 @@ describe("AssimilationPanel", () => {
         wrapSdkResponse([{ id: 1, removedFromTracking: false }])
       )
 
-      const wrapper = mountAssimilationPanel()
-      await flushPromises()
+      const wrapper = await mountAssimilationPanelReady()
 
-      expect(
-        wrapper.find(assimilateButtonSelector).attributes("disabled")
-      ).toBeUndefined()
+      expect(assimilateButtonEl(wrapper)?.hasAttribute("disabled")).toBe(false)
 
       await clickAssimilate(wrapper)
 
       expect(mockedGoToNextAssimilation).toHaveBeenCalled()
-      expect(
-        wrapper.find(assimilateButtonSelector).attributes("disabled")
-      ).toBeDefined()
+      expect(assimilateButtonEl(wrapper)?.hasAttribute("disabled")).toBe(true)
     })
 
     it("disables assimilate when note has memory trackers and no add-spelling-only mode", async () => {
@@ -187,11 +152,9 @@ describe("AssimilationPanel", () => {
           { ...makeMe.aMemoryTracker.please(), id: 1, spelling: false },
         ],
       })
-      const wrapper = mountAssimilationPanel()
-      await flushPromises()
+      const wrapper = await mountAssimilationPanelReady()
 
-      const assimilateButton = wrapper.find(assimilateButtonSelector)
-      expect(assimilateButton.attributes("disabled")).toBeDefined()
+      expect(assimilateButtonEl(wrapper)?.hasAttribute("disabled")).toBe(true)
     })
 
     it("enables assimilate when remember spelling on and no spelling tracker", async () => {
@@ -201,11 +164,9 @@ describe("AssimilationPanel", () => {
           { ...makeMe.aMemoryTracker.please(), id: 1, spelling: false },
         ],
       })
-      const wrapper = mountAssimilationPanel()
-      await flushPromises()
+      const wrapper = await mountAssimilationPanelReady()
 
-      const assimilateButton = wrapper.find(assimilateButtonSelector)
-      expect(assimilateButton.attributes("disabled")).toBeUndefined()
+      expect(assimilateButtonEl(wrapper)?.hasAttribute("disabled")).toBe(false)
     })
 
     it("adds only spelling memory tracker when in add-spelling-only mode", async () => {
@@ -226,16 +187,11 @@ describe("AssimilationPanel", () => {
           },
         ])
       )
-      const wrapper = mountAssimilationPanel()
-      await flushPromises()
+      const wrapper = await mountAssimilationPanelReady()
 
       await clickAssimilate(wrapper)
 
-      const verifyButton = document.querySelector(
-        '[data-test="verify-spelling"]'
-      ) as HTMLElement
-      verifyButton.click()
-      await flushPromises()
+      await clickVerifySpelling()
 
       expect(assimilateSpy).toHaveBeenCalledWith({
         body: { noteId: note.id },

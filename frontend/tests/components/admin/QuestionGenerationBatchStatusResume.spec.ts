@@ -12,7 +12,7 @@ import {
   mockQuestionGenerationBatchStatusApis,
   resumedQuestionGenerationBatchStatus,
   sampleQuestionGenerationBatchStatus,
-} from "./questionGenerationBatchStatusTestHelper"
+} from "./questionGenerationBatchStatusTestSupport"
 
 describe("QuestionGenerationBatchStatus resume existing batches", () => {
   beforeEach(() => {

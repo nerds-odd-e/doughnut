@@ -1,6 +1,5 @@
 import QuestionGenerationBatchStatus from "@/components/admin/QuestionGenerationBatchStatus.vue"
 import { AdminQuestionGenerationBatchController } from "@generated/doughnut-backend-api/sdk.gen"
-import type { QuestionGenerationBatchSubmissionSummaryDto } from "@generated/doughnut-backend-api/types.gen"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, expect, it } from "vitest"
 import helper, {
@@ -8,75 +7,56 @@ import helper, {
   mockSdkServiceWithImplementation,
 } from "@tests/helpers"
 import {
+  batchStatusRowText,
+  createDeferredGate,
+  manualMaintenanceRunState,
   mockQuestionGenerationBatchStatusApis,
+  mountQuestionGenerationBatchStatusReady,
+  openaiTokenBadge,
+  prodProfileBadge,
+  requestStatusRowText,
+  resumeExistingBatchesButton,
   sampleQuestionGenerationBatchStatus,
-} from "./questionGenerationBatchStatusTestHelper"
+  scheduledMaintenanceRunState,
+  schedulerBadge,
+  submissionSummaryEl,
+  submitRecentRecallUsersButton,
+} from "./questionGenerationBatchStatusTestSupport"
 
 describe("QuestionGenerationBatchStatus", () => {
   beforeEach(() => {
     mockQuestionGenerationBatchStatusApis()
   })
 
-  it("displays loading message initially", async () => {
+  it("displays loading message initially", () => {
     const wrapper = helper.component(QuestionGenerationBatchStatus).mount()
     expect(wrapper.text()).toContain(
       "Loading batch question generation status..."
     )
   })
 
-  it("displays batch and request status counts after loading", async () => {
-    const wrapper = helper.component(QuestionGenerationBatchStatus).mount()
-    await flushPromises()
+  it("loads status and renders counts, badges, and action buttons", async () => {
+    const wrapper = await mountQuestionGenerationBatchStatusReady()
 
     expect(wrapper.text()).toContain("PLANNED")
     expect(wrapper.text()).toContain("SUBMITTED")
     expect(wrapper.text()).toContain("PENDING")
     expect(wrapper.text()).toContain("IMPORTED")
-    expect(wrapper.get('[data-testid="batch-status-row"]').text()).toContain(
-      "2"
+    expect(batchStatusRowText(wrapper)).toContain("2")
+    expect(requestStatusRowText(wrapper)).toContain("3")
+    expect(openaiTokenBadge(wrapper).text()).toContain("configured")
+    expect(schedulerBadge(wrapper).text()).toContain("not registered")
+    expect(prodProfileBadge(wrapper).text()).toContain("inactive")
+    expect(scheduledMaintenanceRunState(wrapper).text()).toContain(
+      "Scheduled: never"
     )
-    expect(wrapper.get('[data-testid="request-status-row"]').text()).toContain(
-      "3"
+    expect(manualMaintenanceRunState(wrapper).text()).toContain("Manual: never")
+    expect(submitRecentRecallUsersButton(wrapper).text()).toContain(
+      "Generate for recent recall users"
     )
-  })
-
-  it("displays availability badges", async () => {
-    const wrapper = helper.component(QuestionGenerationBatchStatus).mount()
-    await flushPromises()
-
-    expect(wrapper.get('[data-testid="openai-token-badge"]').text()).toContain(
-      "configured"
+    expect(resumeExistingBatchesButton(wrapper).text()).toContain(
+      "Resume existing batches"
     )
-    expect(wrapper.get('[data-testid="scheduler-badge"]').text()).toContain(
-      "not registered"
-    )
-    expect(wrapper.get('[data-testid="prod-profile-badge"]').text()).toContain(
-      "inactive"
-    )
-    expect(
-      wrapper.get('[data-testid="scheduled-maintenance-run-state"]').text()
-    ).toContain("Scheduled: never")
-    expect(
-      wrapper.get('[data-testid="manual-maintenance-run-state"]').text()
-    ).toContain("Manual: never")
-  })
-
-  it("renders the manual generation button", async () => {
-    const wrapper = helper.component(QuestionGenerationBatchStatus).mount()
-    await flushPromises()
-
-    expect(
-      wrapper.get('[data-testid="submit-recent-recall-users-button"]').text()
-    ).toContain("Generate for recent recall users")
-  })
-
-  it("renders the resume existing batches button", async () => {
-    const wrapper = helper.component(QuestionGenerationBatchStatus).mount()
-    await flushPromises()
-
-    expect(
-      wrapper.get('[data-testid="resume-existing-batches-button"]').text()
-    ).toContain("Resume existing batches")
   })
 
   it("triggers manual generation and refreshes status with summary", async () => {
@@ -95,62 +75,50 @@ describe("QuestionGenerationBatchStatus", () => {
         skippedCount: 1,
       }
     )
-    const wrapper = helper.component(QuestionGenerationBatchStatus).mount()
-    await flushPromises()
+    const wrapper = await mountQuestionGenerationBatchStatusReady()
     const statusCallCountBeforeSubmit = statusSpy.mock.calls.length
 
-    await wrapper
-      .get('[data-testid="submit-recent-recall-users-button"]')
-      .trigger("click")
+    await submitRecentRecallUsersButton(wrapper).trigger("click")
     await flushPromises()
 
     expect(submitSpy).toHaveBeenCalled()
     expect(statusSpy.mock.calls.length).toBeGreaterThan(
       statusCallCountBeforeSubmit
     )
-    expect(wrapper.get('[data-testid="submission-summary"]').text()).toContain(
+    expect(submissionSummaryEl(wrapper).text()).toContain(
       "Considered 3, submitted 2, failed 0, skipped 1"
     )
   })
 
   it("disables the manual generation button while submitting", async () => {
-    let resolveSubmission:
-      | ((summary: QuestionGenerationBatchSubmissionSummaryDto) => void)
-      | undefined
+    const { gate, resolve } = createDeferredGate()
     mockSdkServiceWithImplementation(
       AdminQuestionGenerationBatchController,
       "submitRecentRecallUsersForQuestionGenerationBatch",
-      () =>
-        new Promise<QuestionGenerationBatchSubmissionSummaryDto>((resolve) => {
-          resolveSubmission = resolve
-        })
+      async () => {
+        await gate
+        return {
+          consideredUserCount: 1,
+          submittedCount: 1,
+          failedCount: 0,
+          skippedCount: 0,
+        }
+      }
     )
-    const wrapper = helper.component(QuestionGenerationBatchStatus).mount()
-    await flushPromises()
+    const wrapper = await mountQuestionGenerationBatchStatusReady()
 
-    await wrapper
-      .get('[data-testid="submit-recent-recall-users-button"]')
-      .trigger("click")
+    await submitRecentRecallUsersButton(wrapper).trigger("click")
     await flushPromises()
 
     expect(
-      wrapper
-        .get('[data-testid="submit-recent-recall-users-button"]')
-        .attributes("disabled")
+      submitRecentRecallUsersButton(wrapper).attributes("disabled")
     ).toBeDefined()
 
-    resolveSubmission?.({
-      consideredUserCount: 1,
-      submittedCount: 1,
-      failedCount: 0,
-      skippedCount: 0,
-    })
+    resolve()
     await flushPromises()
 
     expect(
-      wrapper
-        .get('[data-testid="submit-recent-recall-users-button"]')
-        .attributes("disabled")
+      submitRecentRecallUsersButton(wrapper).attributes("disabled")
     ).toBeUndefined()
   })
 
@@ -165,17 +133,10 @@ describe("QuestionGenerationBatchStatus", () => {
         schedulerActive: true,
       }
     )
-    const wrapper = helper.component(QuestionGenerationBatchStatus).mount()
-    await flushPromises()
+    const wrapper = await mountQuestionGenerationBatchStatusReady()
 
-    expect(wrapper.get('[data-testid="openai-token-badge"]').text()).toContain(
-      "not configured"
-    )
-    expect(wrapper.get('[data-testid="scheduler-badge"]').text()).toContain(
-      "registered"
-    )
-    expect(wrapper.get('[data-testid="prod-profile-badge"]').text()).toContain(
-      "active"
-    )
+    expect(openaiTokenBadge(wrapper).text()).toContain("not configured")
+    expect(schedulerBadge(wrapper).text()).toContain("registered")
+    expect(prodProfileBadge(wrapper).text()).toContain("active")
   })
 })

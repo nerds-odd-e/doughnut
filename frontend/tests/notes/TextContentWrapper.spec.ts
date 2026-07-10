@@ -1,135 +1,71 @@
 import { TextContentController } from "@generated/doughnut-backend-api/sdk.gen"
-import TextContentWrapper from "@/components/notes/core/TextContentWrapper.vue"
-import helper, { mockSdkService } from "@tests/helpers"
 import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDebounceTestSupport"
+import { mockSdkService } from "@tests/helpers"
+import {
+  contentSlotTextarea,
+  editReferencedTitle,
+  flushReferencedTitleBlurDiscardCheck,
+  mockUpdateNoteTitleSuccess,
+  mountContentWrapper,
+  mountReferencedTitleReady,
+  referencedTitleEdited,
+  referencedTitleOriginal,
+  referencedTitleSaveKeepVisibleTextButton,
+  referencedTitleSavePanel,
+  setupTextContentWrapperTests,
+  titleSlotInput,
+  wrapper,
+} from "@tests/notes/textContentWrapperTestSupport"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
 import { describe, it, expect, vi, afterEach } from "vitest"
-import { h, nextTick } from "vue"
-
-const waitForAnimationFrames = () =>
-  new Promise<void>((resolve) => {
-    requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
-  })
 
 describe("TextContentWrapper referenced title rename", () => {
+  setupTextContentWrapperTests()
+
   afterEach(() => {
-    document.body.innerHTML = ""
     vi.restoreAllMocks()
   })
 
-  const titleSlot = (slotProps: {
-    value: string
-    update: (noteId: number, v: string) => void
-    blur: () => void
-  }) =>
-    h("input", {
-      "data-testid": "title-slot-input",
-      value: slotProps.value,
-      onInput: (e: Event) =>
-        slotProps.update(1, (e.target as HTMLInputElement).value),
-      onBlur: slotProps.blur,
-    })
-
-  const mountReferencedTitle = () =>
-    helper
-      .component(TextContentWrapper)
-      .withCleanStorage()
-      .withProps({
-        field: "edit title",
-        value: "Original",
-        titleRenameNeedsExplicitReferenceChoice: true,
-        titleEditNoteId: 42,
-      })
-      .mount({
-        slots: { default: titleSlot },
-        attachTo: document.body,
-      })
-
   it("discards dirty title and hides save actions when focus leaves the wrapper", async () => {
-    const wrapper = mountReferencedTitle()
-    await flushPromises()
+    await mountReferencedTitleReady()
 
-    const input = document.querySelector(
-      "[data-testid=title-slot-input]"
-    ) as HTMLInputElement
-    input.focus()
-    input.value = "Edited"
-    input.dispatchEvent(new Event("input", { bubbles: true }))
-    await nextTick()
-
-    expect(
-      document.querySelector("[data-testid=referenced-title-save-panel]")
-    ).toBeTruthy()
+    const input = await editReferencedTitle()
+    expect(referencedTitleSavePanel()).toBeTruthy()
 
     input.blur()
     await flushPromises()
-    await waitForAnimationFrames()
-    await nextTick()
+    await flushReferencedTitleBlurDiscardCheck()
 
-    expect(input.value).toBe("Original")
-    expect(
-      document.querySelector("[data-testid=referenced-title-save-panel]")
-    ).toBeNull()
-
-    wrapper.unmount()
+    expect(input.value).toBe(referencedTitleOriginal)
+    expect(referencedTitleSavePanel()).toBeNull()
   })
 
   it("keeps the draft when choosing a save option (click does not discard before save)", async () => {
-    const updateSpy = mockSdkService(
-      TextContentController,
-      "updateNoteTitle",
-      makeMe.aNoteRealm.title("Edited").please()
-    )
+    const updateSpy = mockUpdateNoteTitleSuccess()
 
-    const wrapper = mountReferencedTitle()
+    await mountReferencedTitleReady()
+    const input = await editReferencedTitle()
+
+    referencedTitleSaveKeepVisibleTextButton().click()
     await flushPromises()
 
-    const input = document.querySelector(
-      "[data-testid=title-slot-input]"
-    ) as HTMLInputElement
-    input.focus()
-    input.value = "Edited"
-    input.dispatchEvent(new Event("input", { bubbles: true }))
-    await nextTick()
-
-    const keepBtn = document.querySelector(
-      "[data-testid=referenced-title-save-keep-visible-text]"
-    ) as HTMLButtonElement
-
-    keepBtn.click()
-    await flushPromises()
-    await waitForAnimationFrames()
-    await nextTick()
-
-    expect(input.value).toBe("Edited")
+    expect(input.value).toBe(referencedTitleEdited)
     expect(updateSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         body: expect.objectContaining({
-          newTitle: "Edited",
+          newTitle: referencedTitleEdited,
           referenceHandling: "KEEP_VISIBLE_TEXT",
         }),
       })
     )
-
-    wrapper.unmount()
   })
 
   it("does not discard when focusout has a misleading relatedTarget but focus remains inside the wrapper", async () => {
-    const wrapper = mountReferencedTitle()
-    await flushPromises()
+    await mountReferencedTitleReady()
+    await editReferencedTitle()
 
-    const input = document.querySelector(
-      "[data-testid=title-slot-input]"
-    ) as HTMLInputElement
-    input.focus()
-    input.value = "Edited"
-    input.dispatchEvent(new Event("input", { bubbles: true }))
-    await nextTick()
-
-    const keepBtn = document.querySelector(
-      "[data-testid=referenced-title-save-keep-visible-text]"
-    ) as HTMLButtonElement
+    const keepBtn = referencedTitleSaveKeepVisibleTextButton()
     keepBtn.focus()
 
     wrapper.element.dispatchEvent(
@@ -139,36 +75,20 @@ describe("TextContentWrapper referenced title rename", () => {
       })
     )
     await flushPromises()
-    await nextTick()
+    await flushReferencedTitleBlurDiscardCheck()
 
-    expect(input.value).toBe("Edited")
-    expect(
-      document.querySelector("[data-testid=referenced-title-save-panel]")
-    ).toBeTruthy()
-
-    wrapper.unmount()
+    expect(titleSlotInput().value).toBe(referencedTitleEdited)
+    expect(referencedTitleSavePanel()).toBeTruthy()
   })
 })
 
 describe("TextContentWrapper beforeSaveContent", () => {
+  setupTextContentWrapperTests()
+
   afterEach(() => {
-    document.body.innerHTML = ""
     vi.restoreAllMocks()
     vi.useRealTimers()
   })
-
-  const contentSlot = (slotProps: {
-    value: string
-    update: (noteId: number, v: string) => void
-    blur: () => void
-  }) =>
-    h("textarea", {
-      "data-testid": "content-slot-textarea",
-      value: slotProps.value,
-      onInput: (e: Event) =>
-        slotProps.update(1, (e.target as HTMLTextAreaElement).value),
-      onBlur: slotProps.blur,
-    })
 
   it("blocks save when beforeSaveContent returns false", async () => {
     vi.useFakeTimers()
@@ -179,23 +99,16 @@ describe("TextContentWrapper beforeSaveContent", () => {
       makeMe.aNoteRealm.please()
     )
 
-    const wrapper = helper
-      .component(TextContentWrapper)
-      .withCleanStorage()
-      .withProps({
-        field: "edit content",
+    mountContentWrapper(
+      {
         value: "Original content",
         beforeSaveContent,
-      })
-      .mount({
-        slots: { default: contentSlot },
-        attachTo: document.body,
-      })
+      },
+      { attachTo: document.body }
+    )
     await flushPromises()
 
-    const textarea = document.querySelector(
-      "[data-testid=content-slot-textarea]"
-    ) as HTMLTextAreaElement
+    const textarea = contentSlotTextarea()
     textarea.value = "Edited content"
     textarea.dispatchEvent(new Event("input", { bubbles: true }))
     await flushPromises()
@@ -206,7 +119,5 @@ describe("TextContentWrapper beforeSaveContent", () => {
       "Edited content"
     )
     expect(updateSpy).not.toHaveBeenCalled()
-
-    wrapper.unmount()
   })
 })

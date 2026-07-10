@@ -980,7 +980,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/Seamless
 ---
 
 ### Phase 31: components/recall/AssimilationPanel
-Status: planned
+Status: done
+
+**Learnings:** Hoisted spelling-popup DOM helpers, `mountAssimilationPanelReady`, `assimilateButtonEl`, and `clickVerifySpelling` into `assimilationPanelTestSupport.ts`; reused `closeButtonEl` from `modalTestSupport`; merged opaque-layer hide + popup-close restore cases; replaced `document.body.textContent` and `wrapper.find` with `querySelector` helpers. Suite wall ~51ms (10 → 9 tests).
 
 **Tests:** (1 in top 10%, ~17ms combined)
 - `tests/components/recall/AssimilationPanel.spec.ts` — "closes popup and returns to original state when user closes it" (~17ms)
@@ -1000,7 +1002,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/Assimi
 ---
 
 ### Phase 32: components/book-reading/PdfBookViewer.gestureZoom
-Status: planned
+Status: done
+
+**Learnings:** Hoisted pdf.js mocks and mount/gesture helpers into `pdfBookViewerGestureZoomTestSupport.ts`; merged ctrl+wheel and meta+wheel cases with `it.each`; `pdfViewerContainerEl` uses `querySelector` on host instead of `wrapper.find`. Suite wall ~52ms (4 tests).
 
 **Tests:** (1 in top 10%, ~17ms combined)
 - `tests/components/book-reading/PdfBookViewer.gestureZoom.spec.ts` — "meta+wheel on the viewer prevents default and updates pdf scale" (~17ms)
@@ -1020,7 +1024,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/book-reading/
 ---
 
 ### Phase 33: components/admin/QuestionGenerationBatchStatus
-Status: planned
+Status: done
+
+**Learnings:** Renamed `questionGenerationBatchStatusTestHelper.ts` → `questionGenerationBatchStatusTestSupport.ts`; hoisted `mountQuestionGenerationBatchStatusReady`, button/badge selectors, and `createDeferredGate`; merged four post-load render cases into one load test; replaced inline deferred-Promise mock with `createDeferredGate` for submit-in-flight case. Suite wall ~15ms (8 → 5 tests).
 
 **Tests:** (1 in top 10%, ~17ms combined)
 - `tests/components/admin/QuestionGenerationBatchStatus.spec.ts` — "disables the manual generation button while submitting" (~17ms)

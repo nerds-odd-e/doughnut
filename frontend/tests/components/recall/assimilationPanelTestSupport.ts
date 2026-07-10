@@ -13,6 +13,7 @@ import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import type { MemoryTrackerLite } from "@generated/doughnut-backend-api"
 import { computed, ref } from "vue"
 import usePopups from "@/components/commons/Popups/usePopups"
+import { closeButtonEl } from "@tests/commons/modalTestSupport"
 import { afterEach, beforeEach, vi } from "vitest"
 import { mockedGoToNextAssimilation } from "./assimilationPanelMocks"
 import { refinementLayoutItems } from "./noteRefinementTestSupport"
@@ -88,6 +89,38 @@ export function setupAssimilationPanelTests() {
 
 export const assimilateButtonSelector = '[data-test="assimilate"]' as const
 
+export function opaqueContentBlockerEl() {
+  return document.body.querySelector(
+    '[data-test="opaque-content-blocker"]'
+  ) as HTMLElement | null
+}
+
+export function spellingVerificationPopupEl() {
+  return document.body.querySelector(
+    '[data-test="spelling-verification-popup"]'
+  ) as HTMLElement | null
+}
+
+export function verifySpellingButtonEl() {
+  return document.body.querySelector(
+    '[data-test="verify-spelling"]'
+  ) as HTMLElement | null
+}
+
+export function setupRememberSpellingRecall() {
+  mockSdkService(NoteController, "getNoteInfo", {
+    recallSetting: { rememberSpelling: true },
+  })
+}
+
+export function assimilateButtonEl(
+  wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
+) {
+  return wrapper.element.querySelector(
+    assimilateButtonSelector
+  ) as HTMLButtonElement | null
+}
+
 export function mountAssimilationPanel(overrides?: { note?: typeof note }) {
   return renderer
     .withCleanStorage()
@@ -98,9 +131,27 @@ export function mountAssimilationPanel(overrides?: { note?: typeof note }) {
     .mount()
 }
 
+export async function mountAssimilationPanelReady(overrides?: {
+  note?: typeof note
+}) {
+  const wrapper = mountAssimilationPanel(overrides)
+  await flushPromises()
+  return wrapper
+}
+
+export async function closeSpellingVerificationPopup() {
+  closeButtonEl()!.click()
+  await flushPromises()
+}
+
+export async function clickVerifySpelling() {
+  verifySpellingButtonEl()!.click()
+  await flushPromises()
+}
+
 export async function clickAssimilate(
   wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
 ) {
-  await wrapper.find(assimilateButtonSelector).trigger("click")
+  assimilateButtonEl(wrapper)!.click()
   await flushPromises()
 }
