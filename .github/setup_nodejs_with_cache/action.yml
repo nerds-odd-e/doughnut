@@ -8,7 +8,7 @@ inputs:
     description: "PNPM Version"
     required: true
   force_install:
-    description: "Force install dependencies and Cypress"
+    description: "Force install Cypress binary (emergency only)"
     required: false
     default: "false"
 runs:
@@ -20,16 +20,11 @@ runs:
         node-version: ${{ inputs.node_version }}
     - name: Install pnpm
       uses: pnpm/action-setup@v6
-      with:
-        cache: true
-        run_install: |
-          - recursive: true
-            args: [--frozen-lockfile, --strict-peer-dependencies]
     - name: Get pnpm store directory
       shell: bash
       run: |
         echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-    - name: Setup pnpm cache
+    - name: Restore pnpm store and Cypress cache
       uses: actions/cache@v6
       with:
         path: |

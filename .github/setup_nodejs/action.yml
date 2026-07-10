@@ -8,7 +8,7 @@ inputs:
     description: "PNPM Version"
     required: true
   force_install:
-    description: "Force install dependencies and Cypress"
+    description: "Force install Cypress binary (emergency only)"
     required: false
     default: "false"
 runs:
@@ -18,12 +18,11 @@ runs:
       uses: actions/setup-node@v6
       with:
         node-version: ${{ inputs.node_version }}
-    - name: Setup pnpm & install deps
+    - name: Install pnpm
       uses: pnpm/action-setup@v6
-      with:
-        run_install: |
-          - recursive: true
-            args: [--frozen-lockfile, --strict-peer-dependencies]
+    - name: Install dependencies
+      shell: bash
+      run: pnpm --frozen-lockfile recursive install
     - name: Force install Cypress
       if: inputs.force_install == 'true'
       shell: bash

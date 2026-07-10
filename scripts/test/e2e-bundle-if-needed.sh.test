@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+#
+# Unit tests for scripts/ci/e2e-bundle-if-needed.sh
+
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+SCRIPT="$REPO_ROOT/scripts/ci/e2e-bundle-if-needed.sh"
+
+fail() {
+	echo "FAIL: $*" >&2
+	exit 1
+}
+
+write_fake_pnpm() {
+	local fake_bin=$1
+	mkdir -p "$fake_bin"
+	printf '#!/usr/bin/env bash\necho "pnpm $*" >>"${PNPM_LOG:?}"\n' >"$fake_bin/pnpm"
+	chmod +x "$fake_bin/pnpm"
+}
+
+test-skips-bundle-on-cache-hit() {
+	local tmp fake_bin log
+	tmp=$(mktemp -d)
+	fake_bin="$tmp/bin"
+	log="$tmp/pnpm.log"
+	: >"$log"
+	write_fake_pnpm "$fake_bin"
+
+	local out
+	out=$(
+		PATH="$fake_bin:$PATH"
+		export E2E_DIST_CACHE_HIT=true PNPM_LOG="$log"
+		bash "$SCRIPT"
+	) || fail "script should exit 0 on cache hit"
+
+	[[ "$out" == *"skipping pnpm bundle:all"* ]] || fail "expected skip message, got: $out"
+	[[ ! -s "$log" ]] || fail "pnpm should not run on cache hit"
+	rm -rf "$tmp"
+}
+
+test-runs-bundle-on-cache-miss() {
+	local tmp fake_bin log
+	tmp=$(mktemp -d)
+	fake_bin="$tmp/bin"
+	log="$tmp/pnpm.log"
+	: >"$log"
+	write_fake_pnpm "$fake_bin"
+
+	local out
+	out=$(
+		PATH="$fake_bin:$PATH"
+		export E2E_DIST_CACHE_HIT=false PNPM_LOG="$log"
+		bash "$SCRIPT"
+	) || fail "script should exit 0 on cache miss"
+
+	[[ "$out" == *"running pnpm bundle:all"* ]] || fail "expected miss message, got: $out"
+	[[ "$(cat "$log")" == "pnpm bundle:all" ]] || fail "expected pnpm bundle:all, got: $(cat "$log")"
+	rm -rf "$tmp"
+}
+
+test-runs-bundle-when-cache-hit-unset() {
+	local tmp fake_bin log
+	tmp=$(mktemp -d)
+	fake_bin="$tmp/bin"
+	log="$tmp/pnpm.log"
+	: >"$log"
+	write_fake_pnpm "$fake_bin"
+
+	(
+		PATH="$fake_bin:$PATH"
+		unset E2E_DIST_CACHE_HIT || true
+		export PNPM_LOG="$log"
+		bash "$SCRIPT"
+	) || fail "script should exit 0 when cache hit unset"
+
+	[[ "$(cat "$log")" == "pnpm bundle:all" ]] || fail "expected pnpm bundle:all when unset"
+	rm -rf "$tmp"
+}
+
+test-skips-bundle-on-cache-hit
+test-runs-bundle-on-cache-miss
+test-runs-bundle-when-cache-hit-unset
+echo "OK: e2e-bundle-if-needed.sh"

@@ -207,18 +207,27 @@ jobs:
         with:
           node_version: ${{ vars.NODE_VERSION }}
           pnpm_version: ${{ vars.PNPM_VERSION }}
-          force_install: "true"
+      - name: Restore E2E bundled dist cache
+        id: e2e-dist-cache
+        uses: actions/cache@v6
+        with:
+          path: |
+            frontend/dist
+            cli/dist
+            mcp-server/dist
+          key: ${{ runner.os }}-e2e-dist-${{ hashFiles('pnpm-lock.yaml', 'package.json', 'frontend/package.json', 'frontend/vite.config.ts', 'frontend/tsconfig.json', 'frontend/index.html', 'frontend/src/**', 'frontend/public/**', 'cli/package.json', 'cli/src/**', 'cli/tsconfig.json', 'mcp-server/package.json', 'mcp-server/src/**', 'packages/generated/doughnut-backend-api/**', 'packages/doughnut-api/**') }}
       - uses: cypress-io/github-action@v7.4.1
         with:
           browser: chrome
           config-file: e2e_test/config/ci.ts
-          build: pnpm bundle:all
+          build: bash scripts/ci/e2e-bundle-if-needed.sh
           start: pnpm run-p -clnr backend:sut:ci start:mb local:lb
           wait-on: "http://127.0.0.1:5173/__lb__/ready"
           wait-on-timeout: 150
           spec: ${{ matrix.spec }}
-          install: true
+          install: false
         env:
+          E2E_DIST_CACHE_HIT: ${{ steps.e2e-dist-cache.outputs.cache-hit }}
           GITHUB_FOR_ISSUES_API_TOKEN: ${{ env.GITHUB_FOR_ISSUES_API_TOKEN }}
           # Node/wait-on: bypass HTTP(S)_PROXY for loopback so healthcheck is not answered 400 by a corporate proxy
           NO_PROXY: 127.0.0.1,localhost
