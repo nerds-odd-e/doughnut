@@ -9,7 +9,7 @@ Status: in-progress
 Command:
 
 - **N tests**, suite wall ~**Xs**
-- Eligible after blacklist: **E** (Ignored excluded; see `ongoing/test-optimization-blacklist.md`)
+- Eligible after blacklist: **E** (Skip test optimization excluded; see `ongoing/test-optimization-blacklist.md`)
 - Raw profile: `<local path>` — **do not commit**
 
 ### Top 10% slowest (n = ceil(E × 0.10))
@@ -31,8 +31,8 @@ Command:
 3. Flaky = failure.
 
 Hard-to-improve tests: propose under **Candidates** in
-`ongoing/test-optimization-blacklist.md` (do not promote to Ignored without
-developer review).
+`ongoing/test-optimization-blacklist.md` (do not move to Skip test optimization
+without developer review).
 
 ---
 

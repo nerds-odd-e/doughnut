@@ -35,7 +35,7 @@ Apply on every optimization pass:
 ## Workflow overview
 
 ```
-Profile full suite → drop Ignored (blacklist) → take top 10%
+Profile full suite → drop Skip test optimization (blacklist) → take top 10%
 → group (by file vs batches of 3; fewer groups wins)
 → write plan in ongoing/ → execute-plan (one sub-agent per group)
 → each group: optimize → verify → post-change-refactor → commit → push
@@ -77,10 +77,10 @@ between spec runs.
 `ongoing/` is excluded from default indexing — **read the blacklist explicitly**.
 
 1. Read `ongoing/test-optimization-blacklist.md`.
-2. Skip every test listed under **Ignored** (not **Candidates**).
+2. Skip every test listed under **Skip test optimization** (not **Candidates**).
 3. Match by **file path + test/scenario name** (exact match preferred).
 
-Eligible tests = all profiled tests minus Ignored.
+Eligible tests = all profiled tests minus Skip test optimization entries.
 
 ## Step 3 — Select top 10%
 
@@ -140,8 +140,8 @@ need a product/design trade-off):
 3. Mark the phase done (or Jidoka-stop if a value decision is required) and
    continue.
 
-**Promoting** a candidate to **Ignored** is a developer decision (Jidoka) —
-propose only; do not move entries yourself.
+**Moving** a candidate to **Skip test optimization** is a developer decision
+(Jidoka) — propose only; do not move entries yourself.
 
 ## Step 7 — Optimize (tactics by layer)
 
@@ -226,7 +226,8 @@ test plans; do not delete the blacklist or unrelated roadmaps.
 
 ## Jidoka — stop and report
 
-- Product/design fork (which scenario to drop; whether to promote a Candidate to Ignored).
+- Product/design fork (which scenario to drop; whether to move a Candidate to
+  Skip test optimization).
 - Credentials or external services you cannot control.
 - Failures unrelated to your changes (SUT down, DB dirty).
 - Ambiguous grouping when slow tests are tightly coupled across files.
@@ -256,7 +257,7 @@ block per spec to stdout (interleaved with the run table). After
 - For each line that is a lone `{`, accumulate until braces balance and the
   buffer contains `"stats"`, then `JSON.parse` it.
 - Collect `tests[].title` + `tests[].duration`, tag with the current spec,
-  drop Ignored entries, then sort descending and slice the top 10%.
+  drop Skip test optimization entries, then sort descending and slice the top 10%.
 
 Write a reusable `scripts/` helper only if the team will run this repeatedly;
 otherwise a one-off inline Node script is enough.

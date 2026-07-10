@@ -1,10 +1,10 @@
 # Test optimization blacklist
 
-Tests listed under **Ignored** are skipped when selecting the top 10% for
-optimization. **Candidates** are proposals from optimization runs; promote to
-Ignored only after developer review.
+Tests listed under **Skip test optimization** are excluded when selecting the top
+10% for optimization. **Candidates** are proposals from optimization runs; move
+to Skip test optimization only after developer review.
 
-## Ignored
+## Skip test optimization
 
 <!-- file path — test/scenario name — reason — added YYYY-MM-DD -->
 
