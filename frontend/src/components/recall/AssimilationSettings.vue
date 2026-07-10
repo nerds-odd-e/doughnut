@@ -15,7 +15,7 @@
             <AssimilationProgressSummary />
           </h2>
           <div
-            class="assimilation-settings-scroll max-h-[min(40vh,22rem)] overflow-y-auto pr-1"
+            class="assimilation-settings-scroll max-h-[min(40vh,22rem)] overflow-y-auto pr-1 pb-20"
           >
             <NoteInfoBar
               ref="noteInfoBarRef"

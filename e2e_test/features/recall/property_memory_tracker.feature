@@ -53,8 +53,7 @@ Feature: Property memory tracker
     And I assimilated one note "Minerals" at the current time
     When I start assimilation from the menu
     Then I should see pending assimilation property "topic"
-    When I expand assimilation properties on the assimilation settings panel
-    And I skip recall on property "topic" on the assimilation settings panel
+    When I skip recall on property "topic" on the assimilation settings panel
     Then I should not see pending assimilation property "topic"
     And assimilate for property "topic" should be disabled
     When I visit note "Minerals"

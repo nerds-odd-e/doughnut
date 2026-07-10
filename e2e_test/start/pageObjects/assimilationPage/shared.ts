@@ -2,6 +2,7 @@ import { pageIsNotLoading } from '../../pageBase'
 
 export const assimilateButtonSelector = '[data-test="assimilate"]'
 export const reviveButtonSelector = '[data-test="revive"]'
+export const skipRecallButtonSelector = '[value="Skip recall"]'
 
 export const assimilationPropertyRow = (propertyKey: string) =>
   cy.get(
@@ -23,7 +24,7 @@ export const reviveButton = (options?: { timeout?: number }) =>
 
 export const skipRecallOnPanel = (options?: { timeout?: number }) =>
   cy
-    .get('[value="Skip recall"]', options ?? {})
+    .get(skipRecallButtonSelector, options ?? {})
     .filter((_, el) => isNoteLevelAssimilationControl(el))
 
 export function noteLevelReviveElements(doc: Document | ParentNode): Element[] {

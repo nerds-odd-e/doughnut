@@ -11,3 +11,5 @@ Ignored only after developer review.
 ## Candidates
 
 <!-- file path — test/scenario name — duration — why hard — proposed YYYY-MM-DD -->
+
+`e2e_test/features/note_creation_and_update/record_live_audio_with_real_open_ai_service.feature` — Record audio of a live event with real OpenAI service — ~7592ms — external OpenAI transcription + 20s content poll; mocked coverage in `record_live_audio.feature` — proposed 2026-07-10

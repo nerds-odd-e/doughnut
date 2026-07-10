@@ -10,8 +10,7 @@ Feature: User having a conversation regarding a note
       | Hi      |
 
   Scenario: User send message about a note in a circle
-    Given There is a circle "Odd-e SG Team" with "a_trainer, old_learner" members
-    And There is a notebook "Team agreement" in circle "Odd-e SG Team" by "a_trainer"
+    Given There is a circle "Odd-e SG Team" with "a_trainer, old_learner" members and notebook "Team agreement" by "a_trainer"
     When "old_learner" start a conversation about the note "Team agreement" with a message "Hi"
     And I can see the conversation with "Odd-e SG Team" for the subject "Team agreement" in the message center:
       | message |

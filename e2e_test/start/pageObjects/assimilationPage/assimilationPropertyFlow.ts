@@ -3,7 +3,19 @@ import {
   assimilationPropertyRow,
   assimilateButtonSelector,
   reviveButtonSelector,
+  skipRecallButtonSelector,
 } from './shared'
+
+const clickPropertyRowButton = (
+  propertyKey: string,
+  buttonSelector: string
+) => {
+  assimilationPropertyRow(propertyKey)
+    .scrollIntoView()
+    .within(() => {
+      cy.get(buttonSelector).scrollIntoView().click()
+    })
+}
 
 export function assimilationPropertyFlow() {
   return {
@@ -40,17 +52,13 @@ export function assimilationPropertyFlow() {
       return this
     },
     skipRecallProperty(propertyKey: string) {
-      assimilationPropertyRow(propertyKey).within(() => {
-        cy.findByText('Skip recall').click()
-      })
+      clickPropertyRowButton(propertyKey, skipRecallButtonSelector)
       cy.findByRole('button', { name: 'OK' }).click()
       pageIsNotLoading()
       return this
     },
     reviveRecallProperty(propertyKey: string) {
-      assimilationPropertyRow(propertyKey).within(() => {
-        cy.get(reviveButtonSelector).click()
-      })
+      clickPropertyRowButton(propertyKey, reviveButtonSelector)
       pageIsNotLoading()
       return this
     },
@@ -58,14 +66,14 @@ export function assimilationPropertyFlow() {
       assimilationPropertyRow(propertyKey).within(() => {
         cy.get(reviveButtonSelector).should('exist')
         cy.root().then(($root) => {
-          expect($root.find('[value="Skip recall"]').length).to.equal(0)
+          expect($root.find(skipRecallButtonSelector).length).to.equal(0)
         })
       })
       return this
     },
     expectSkipRecallForProperty(propertyKey: string) {
       assimilationPropertyRow(propertyKey).within(() => {
-        cy.get('[value="Skip recall"]').should('exist')
+        cy.get(skipRecallButtonSelector).should('exist')
         cy.root().then(($root) => {
           expect($root.find(reviveButtonSelector).length).to.equal(0)
         })

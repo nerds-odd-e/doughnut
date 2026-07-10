@@ -6,6 +6,27 @@
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 
+function injectCircleWithNotebook(
+  circleName: string,
+  members: string,
+  notebookTitle: string,
+  externalIdentifier: string
+) {
+  return start
+    .testability()
+    .injectCircle({ circleName, members })
+    .then(() =>
+      start
+        .testability()
+        .injectNotes(
+          [{ Title: notebookTitle }],
+          externalIdentifier,
+          notebookTitle,
+          circleName
+        )
+    )
+}
+
 When(
   'I create a new circle {string} and copy the invitation code',
   (circleName: string) => {
@@ -168,6 +189,23 @@ When(
 )
 
 Given(
+  'There is a circle {string} with {string} members and notebook {string} by {string}',
+  (
+    circleName: string,
+    members: string,
+    notebookTitle: string,
+    externalIdentifier: string
+  ) => {
+    injectCircleWithNotebook(
+      circleName,
+      members,
+      notebookTitle,
+      externalIdentifier
+    )
+  }
+)
+
+Given(
   'There is a circle {string} with {string} members and notebook {string} shared to the Bazaar by {string}',
   (
     circleName: string,
@@ -175,20 +213,12 @@ Given(
     notebookTitle: string,
     externalIdentifier: string
   ) => {
-    start
-      .testability()
-      .injectCircle({ circleName, members })
-      .then(() =>
-        start
-          .testability()
-          .injectNotes(
-            [{ Title: notebookTitle }],
-            externalIdentifier,
-            notebookTitle,
-            circleName
-          )
-      )
-      .then(() => start.testability().shareToBazaar(notebookTitle))
+    injectCircleWithNotebook(
+      circleName,
+      members,
+      notebookTitle,
+      externalIdentifier
+    ).then(() => start.testability().shareToBazaar(notebookTitle))
   }
 )
 

@@ -36,7 +36,7 @@ export function usePendingAssimilationProperty(noteId: Ref<number>) {
     await nextTick()
     propertyRowElements.get(key)?.scrollIntoView({
       behavior: "smooth",
-      block: "nearest",
+      block: "center",
     })
   }
 
