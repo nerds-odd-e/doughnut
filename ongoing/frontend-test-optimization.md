@@ -1090,7 +1090,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/NoteRe
 ---
 
 ### Phase 36: toolbars/NoteUndoButton
-Status: planned
+Status: done
+
+**Learnings:** Hoisted mount/selectors/actions into `noteUndoButtonTestSupport.ts`; kept `vi.mock("vue-router")` in spec (hoisting) with `fullPath` for Modal; replaced all `getByRole` dialog clicks with `querySelector` on `.undo-confirmation` button classes; merged visibility, cached confirm, not-cached confirm, accept-undo, and discard-multi-item cases with `it.each`. Suite wall ~59ms (25 → 23 tests).
 
 **Tests:** (1 in top 10%, ~16ms combined)
 - `tests/toolbars/NoteUndoButton.spec.ts` — "discards edit content item and shows next item" (~16ms)
