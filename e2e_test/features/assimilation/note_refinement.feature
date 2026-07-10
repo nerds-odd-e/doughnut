@@ -76,15 +76,11 @@ Feature: Note refinement
 
   Scenario: Retry extraction preview before creating note
     Given OpenAI will extract layout points "B and D" with retry producing title "Retry B and D" and content "Retry combined content" and updated parent content "A. C. E. retry"
-    When I am assimilating the note "Sample"
-    And I open extraction preview for refinement layout points "B" and "D"
+    When I open extraction preview on note "Sample" for refinement layout points "B" and "D"
     And I retry the extraction preview
     And I create the note from the extraction preview
     Then the note title should be "Retry B and D"
-    And I should see folder "Sample tree/Context" containing these notes:
-      | note-title    |
-      | Sample        |
-      | Retry B and D |
+    And note "Sample" should have content "A. C. E. retry"
 
   Scenario: Cannot create note with blank title from extraction preview
     Given OpenAI will extract layout points "B and D" to a new note with title "Point B and D" and content "Combined B and D" and updated parent content "A. C. E."

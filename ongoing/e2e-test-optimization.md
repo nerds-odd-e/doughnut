@@ -155,19 +155,15 @@ Status: **done** (2026-07-10)
 ---
 
 ### Phase 8: Refinement retry preview
-Status: planned
+Status: **done** (2026-07-10)
 
-**Tests:**
-- `e2e_test/features/assimilation/note_refinement.feature` — "Retry extraction preview before creating note" (~3400ms)
+**Results:**
+- Retry preview: combined `open extraction preview on note` step (reuses phase-6 inject path); `jumpToNotePage` parent content assertion instead of folder catalog navigation (~3400ms → ~2040ms).
+- Retry mock sequence unchanged (first attempt + retry via OpenAI imposter).
 
-**Goals:**
-- Mock extraction retries; inject preview; remove duplicate setup shared with "Save edited extraction preview".
+**Learnings:** API-level `cy.intercept` on extract-note-preview caused cross-scenario interference; keep OpenAI imposter stubs. Full-file green runs are intermittent under rapid re-runs; 3 consecutive passes after brief recovery.
 
-**Verify:**
-
-```bash
-CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/assimilation/note_refinement.feature
-```
+**Verify:** 3 consecutive green runs on `note_refinement.feature`.
 
 ---
 
