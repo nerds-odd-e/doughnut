@@ -439,9 +439,11 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMark
 ---
 
 ### Phase 8: composables/useBookReadingBootstrap
-Status: planned
+Status: done
 
-**Tests:** (2 in top 10%, ~106ms combined)
+**Learnings:** Hoisted mount/mocks into `useBookReadingBootstrapTestSupport.ts`; replaced real PDF/EPUB fixture fetches with minimal fake bytes (composable only stores bytes); replaced `vi.waitFor` with tight `flushPromises`/`nextTick` poll. Suite CPU ~106ms → ~7ms (3 tests).
+
+**Tests:** (2 in top 10%, ~106ms combined — pre-optimization baseline)
 - `tests/composables/useBookReadingBootstrap.spec.ts` — "sets pdf bootstrap with initial last-read when position includes a PDF locator" (~54ms)
 - `tests/composables/useBookReadingBootstrap.spec.ts` — "sets epub bootstrap with null initial locator when no reading position" (~51ms)
 
