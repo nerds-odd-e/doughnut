@@ -24,7 +24,9 @@ vi.mock("vue-toastification", () => ({
   useToast: () => mockToast,
 }))
 
-export const noteMoreOptionsDeleteFormNote = makeMe.aNote.please()
+export const noteMoreOptionsDeleteFormNoteRealm = makeMe.aNoteRealm.please()
+export const noteMoreOptionsDeleteFormNote =
+  noteMoreOptionsDeleteFormNoteRealm.note
 export let deleteNoteSpy: ReturnType<typeof mockSdkService>
 
 export const noteMoreOptionsDeleteFormRouter = createRouter({
@@ -106,6 +108,9 @@ export function setupNoteMoreOptionsDeleteFormTests() {
       .component(NoteMoreOptionsFormWithGlobalLoading)
       .withRouter(noteMoreOptionsDeleteFormRouter)
       .withCleanStorage()
+    useStorageAccessor().value.refreshNoteRealm(
+      noteMoreOptionsDeleteFormNoteRealm
+    )
   })
 }
 
