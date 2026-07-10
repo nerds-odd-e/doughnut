@@ -33,26 +33,6 @@ class AiControllerCreateExtractedNoteTest extends ControllerTestBase {
   @Nested
   class CreateExtractedNote {
     @Test
-    void shouldPersistNewAndUpdatedNotesFromEditedFields() throws UnexpectedNoAccessRightException {
-      Note testNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
-      long noteCountBefore = noteRepository.count();
-
-      NoteExtractionResult request =
-          extractionResult(
-              "Extracted Note",
-              "Expanded content for the new note.",
-              "Updated parent with summary.");
-      NoteRealm response = controller.createExtractedNote(testNote, request);
-
-      assertThat(noteRepository.count()).isEqualTo(noteCountBefore + 1);
-      Note persistedNewNote = noteRepository.findById(response.getNote().getId()).orElseThrow();
-      assertThat(persistedNewNote.getTitle()).isEqualTo("Extracted Note");
-      assertThat(persistedNewNote.getContent()).isEqualTo("Expanded content for the new note.");
-      makeMe.entityPersister.refresh(testNote);
-      assertThat(testNote.getContent()).isEqualTo("Updated parent with summary.");
-    }
-
-    @Test
     void shouldRejectReservedIndexTitle() {
       Note testNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
       long noteCountBefore = noteRepository.count();
@@ -90,7 +70,7 @@ class AiControllerCreateExtractedNoteTest extends ControllerTestBase {
 
     @ParameterizedTest
     @ValueSource(booleans = {false, true})
-    void shouldPlaceExtractedNoteAtExpectedLocation(boolean sourceInFolder)
+    void shouldCreateExtractedNoteFromSourceNote(boolean sourceInFolder)
         throws UnexpectedNoAccessRightException {
       Note sourceNote;
       Folder expectedFolder = null;
@@ -113,14 +93,18 @@ class AiControllerCreateExtractedNoteTest extends ControllerTestBase {
               sourceInFolder ? "Point B" : "Extracted Note",
               sourceInFolder ? "Extracted" : "Expanded content for the new note.",
               sourceInFolder ? "A. C. D. E." : "Updated parent with summary.");
+      long noteCountBefore = noteRepository.count();
       NoteRealm response = controller.createExtractedNote(sourceNote, request);
       Note persistedNote = noteRepository.findById(response.getNote().getId()).orElseThrow();
       if (sourceInFolder) {
         assertThat(persistedNote.getFolder().getId()).isEqualTo(expectedFolder.getId());
       } else {
+        assertThat(noteRepository.count()).isEqualTo(noteCountBefore + 1);
+        assertThat(persistedNote.getTitle()).isEqualTo("Extracted Note");
+        assertThat(persistedNote.getContent()).isEqualTo("Expanded content for the new note.");
         assertThat(persistedNote.getFolder()).isNull();
-        assertThat(noteRepository.findById(sourceNote.getId()).orElseThrow().getContent())
-            .isEqualTo("Updated parent with summary.");
+        makeMe.entityPersister.refresh(sourceNote);
+        assertThat(sourceNote.getContent()).isEqualTo("Updated parent with summary.");
       }
     }
 

@@ -240,18 +240,6 @@ class ConversationMessageControllerTest extends ControllerTestBase {
           List.of(conv3.getId(), conv2.getId(), conv1.getId()),
           orderedConversations.stream().map(ConversationListItem::id).toList());
     }
-
-    @Test
-    void returnsAtMost50Conversations() {
-      for (int i = 1; i <= 51; i++) {
-        makeMe
-            .aConversation()
-            .from(currentUser.getUser())
-            .createdAt(makeMe.aTimestamp().of(i, 0).please())
-            .please();
-      }
-      assertEquals(50, controller.getConversationsOfCurrentUser().size());
-    }
   }
 
   @Nested

@@ -321,14 +321,14 @@ CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles
 ---
 
 ### Phase 8: Optimize batch ranks 22–24
-Status: planned
+Status: done
 
-**Tests:**
-- `backend/src/test/java/com/odde/doughnut/controllers/ConversationMessageControllerTest.java` — "returnsAtMost50Conversations()" (~65ms)
-- `backend/src/test/java/com/odde/doughnut/services/EmbeddingMaintenanceJobTests.java` — "shouldInvokeUpdateForEveryNotebook()" (~58ms)
-- `backend/src/test/java/com/odde/doughnut/controllers/AiControllerCreateExtractedNoteTest.java` — "shouldPersistNewAndUpdatedNotesFromEditedFields()" (~53ms)
+**Tests (baseline → after):**
+- `ConversationMessageControllerTest.returnsAtMost50Conversations()` (~65ms) → **deleted**; 50-item cap covered by mock-only `ConversationServiceConversationListLimitTest.shouldRequestAtMostFiftyConversations()` (~&lt;5ms)
+- `EmbeddingMaintenanceJobTests.shouldInvokeUpdateForEveryNotebook()` (~58ms) → mock-only (~&lt;5ms); dropped `@SpringBootTest` + `makeMe` notebook seeding
+- `AiControllerCreateExtractedNoteTest.shouldPersistNewAndUpdatedNotesFromEditedFields()` (~53ms) → **deleted**; persistence assertions merged into parameterized `shouldCreateExtractedNoteFromSourceNote(false)`
 
-**Goals:** Speed up only these tests (merge/delete redundant cases, slim `makeMe`/fixtures, parameterize duplicates, avoid full-stack when a narrower entry suffices). If no meaningful win after a serious attempt, append **Candidates** in the blacklist and mark done.
+**Learnings:** Conversation list cap is `PageRequest.of(0, 50)` in `ConversationService`; embedding maintenance is a pure repository→indexing loop; root-note extraction persistence duplicated the parameterized placement test.
 
 **Verify:**
 
