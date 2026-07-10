@@ -1,6 +1,19 @@
-import { CUSTOM_RELATION_RADIO_SENTINEL } from "@/models/relationTypeOptions"
 import { INDEX_ONLY_PRESET_PROPERTY_KEYS } from "@/utils/noteContentFrontmatter"
 import { flushPromises } from "@vue/test-utils"
+import {
+  commitCustomRelationText,
+  customRelationRadioLabelEl,
+  customRelationTextInputEl,
+  openRelationDialog,
+  relationTypeButtonText,
+  selectCustomRelationRadio,
+} from "./propertyRelationImageIndexTestDom"
+import {
+  editorRoot,
+  emitQuillBodyHtml,
+  mountRelationNote,
+  propertyRowKeyValues,
+} from "./propertyRelationImageIndexTestSupport"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 describe("RichMarkdownEditor property relation and index", () => {
@@ -11,13 +24,6 @@ describe("RichMarkdownEditor property relation and index", () => {
   })
 
   describe("relation property in rich mode", () => {
-    async function mountRelation(relation: string) {
-      await h.mountEditor(
-        `---\nrelation: ${relation}\ntype: relationship\n---\n\nBody`
-      )
-      await flushPromises()
-    }
-
     it.each([
       {
         relation: "similar-to",
@@ -34,34 +40,17 @@ describe("RichMarkdownEditor property relation and index", () => {
       expectedLabel,
       notExpected,
     }) => {
-      await mountRelation(relation)
-      const btn = h.getWrapper().find('[aria-label="Relation Type"]')
-      expect(btn.text()).toContain(expectedLabel)
-      expect(btn.text()).not.toContain(notExpected)
-    })
-
-    it("opens relation dialog for unknown relation with Custom option", async () => {
-      await mountRelation("my-custom-relation")
-      await h.getWrapper().find('[aria-label="Relation Type"]').trigger("click")
-
-      const rt = h.getWrapper().findComponent({ name: "RelationTypeSelect" })
-      expect(rt.exists()).toBe(true)
-      expect(rt.text()).toContain("Custom…")
+      await mountRelationNote(h, relation)
+      const text = relationTypeButtonText(editorRoot(h))
+      expect(text).toContain(expectedLabel)
+      expect(text).not.toContain(notExpected)
     })
 
     it("commits custom relationship text from the dialog and emits updated frontmatter", async () => {
-      await mountRelation("similar-to")
-      await h.getWrapper().find('[aria-label="Relation Type"]').trigger("click")
-
-      const rt = h.getWrapper().findComponent({ name: "RelationTypeSelect" })
-      await rt
-        .find(`input[value="${CUSTOM_RELATION_RADIO_SENTINEL}"]`)
-        .trigger("change")
-
-      const field = rt.find('input[type="text"].daisy-input')
-      expect(field.exists()).toBe(true)
-      await field.setValue("novel connector phrase")
-      await field.trigger("keydown", { key: "Enter" })
+      await mountRelationNote(h, "similar-to")
+      await openRelationDialog(editorRoot(h))
+      await selectCustomRelationRadio()
+      await commitCustomRelationText("novel connector phrase")
 
       expect(h.lastEmittedMarkdown()).toContain(
         "relation: novel-connector-phrase"
@@ -69,20 +58,14 @@ describe("RichMarkdownEditor property relation and index", () => {
     })
 
     it("opens dialog with custom text prefilled for an unknown relation", async () => {
-      await mountRelation("xyz-unknown-kebab")
-      await h.getWrapper().find('[aria-label="Relation Type"]').trigger("click")
+      await mountRelationNote(h, "xyz-unknown-kebab")
+      await openRelationDialog(editorRoot(h))
 
-      const rt = h.getWrapper().findComponent({ name: "RelationTypeSelect" })
-      const field = rt.find('input[type="text"].daisy-input')
-      expect(field.exists()).toBe(true)
-      expect((field.element as HTMLInputElement).value).toBe(
-        "xyz-unknown-kebab"
-      )
-      const primaryLabelForCustom = rt.find(
-        `label[for="rich-note-relation-property-${CUSTOM_RELATION_RADIO_SENTINEL}"]`
-      )
-      expect(primaryLabelForCustom.exists()).toBe(true)
-      expect(primaryLabelForCustom.classes()).toContain("bg-primary")
+      expect(document.querySelector("dialog")?.textContent).toContain("Custom…")
+      expect(customRelationTextInputEl().value).toBe("xyz-unknown-kebab")
+      expect(
+        customRelationRadioLabelEl().classList.contains("bg-primary")
+      ).toBe(true)
     })
   })
 
@@ -113,15 +96,10 @@ Paragraph.\n`
 
   describe("index-only predefined properties", () => {
     it("does not show index-only predefined rows when isIndexContext is false", async () => {
-      const wrapper = await h.mountEditor("# Body")
+      await h.mountEditor("# Body")
       await flushPromises()
 
-      const keyInputs = wrapper.findAll(
-        '[data-testid="rich-note-property-row-key-input"]'
-      )
-      const keyValues = keyInputs.map(
-        (el) => (el.element as HTMLInputElement).value
-      )
+      const keyValues = propertyRowKeyValues(editorRoot(h))
       for (const key of INDEX_ONLY_PRESET_PROPERTY_KEYS) {
         expect(keyValues).not.toContain(key)
       }
@@ -129,11 +107,7 @@ Paragraph.\n`
 
     it("empty index-only fields are not included in emitted YAML", async () => {
       const wrapper = await h.mountEditor("# Body", { isIndexContext: true })
-      await flushPromises()
-
-      const quill = wrapper.findComponent({ name: "QuillEditor" })
-      quill.vm.$emit("update:modelValue", "<h1>Updated Body</h1>")
-      await flushPromises()
+      await emitQuillBodyHtml(wrapper, "<h1>Updated Body</h1>")
 
       const last = h.lastEmittedMarkdown()
       expect(last).not.toContain("title_pattern")
@@ -150,12 +124,7 @@ question_generation_instruction: Focus on facts.
       const wrapper = await h.mountEditor(markdown, { isIndexContext: true })
       await flushPromises()
 
-      const keyInputs = wrapper.findAll(
-        '[data-testid="rich-note-property-row-key-input"]'
-      )
-      const keyValues = keyInputs.map(
-        (el) => (el.element as HTMLInputElement).value
-      )
+      const keyValues = propertyRowKeyValues(editorRoot(h))
       expect(keyValues).toContain("title_pattern")
       expect(keyValues).toContain("question_generation_instruction")
       expect(wrapper.text()).toContain("{{date}}")
