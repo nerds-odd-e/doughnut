@@ -1046,7 +1046,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/admin/Questio
 ---
 
 ### Phase 34: notes/TextContentWrapper
-Status: planned
+Status: done
+
+**Learnings:** Hoisted mount/slots/selectors into `textContentWrapperTestSupport.ts`; dropped unnecessary double-rAF + `nextTick` from save-option case (only `flushPromises` after click); scoped `flushReferencedTitleBlurDiscardCheck` to blur/focusout cases; shared `editReferencedTitle` and `querySelector` helpers. Suite wall ~57ms → ~40ms (4 tests).
 
 **Tests:** (1 in top 10%, ~16ms combined)
 - `tests/notes/TextContentWrapper.spec.ts` — "keeps the draft when choosing a save option (click does not discard before save)" (~16ms)
