@@ -76,16 +76,16 @@ class ConversationAiRequestBuilderTest {
       List<ResponseInputItem> items = inputItems(conversation);
 
       assertEquals(5, items.size());
-      assertEquals(
-          EasyInputMessage.Role.DEVELOPER, items.get(0).easyInputMessage().orElseThrow().role());
-      assertEquals(
-          EasyInputMessage.Role.DEVELOPER, items.get(1).easyInputMessage().orElseThrow().role());
-      assertEquals(
-          EasyInputMessage.Role.USER, items.get(2).easyInputMessage().orElseThrow().role());
-      assertEquals(
-          EasyInputMessage.Role.ASSISTANT, items.get(3).easyInputMessage().orElseThrow().role());
-      assertEquals(
-          EasyInputMessage.Role.USER, items.get(4).easyInputMessage().orElseThrow().role());
+      assertEquals(EasyInputMessage.Role.DEVELOPER, easyInput(items, 0).role());
+      assertEquals(EasyInputMessage.Role.DEVELOPER, easyInput(items, 1).role());
+      assertTrue(
+          easyInputText(items, 1).contains("Make tool calls when user asks to update the note."));
+      assertEquals(EasyInputMessage.Role.USER, easyInput(items, 2).role());
+      assertEquals("First question", easyInputText(items, 2));
+      assertEquals(EasyInputMessage.Role.ASSISTANT, easyInput(items, 3).role());
+      assertEquals("AI response", easyInputText(items, 3));
+      assertEquals(EasyInputMessage.Role.USER, easyInput(items, 4).role());
+      assertEquals("Follow up question", easyInputText(items, 4));
     }
 
     @Test
@@ -110,10 +110,8 @@ class ConversationAiRequestBuilderTest {
       List<ResponseInputItem> items = inputItems(conversation);
 
       assertEquals(2, items.size());
-      assertEquals(
-          EasyInputMessage.Role.DEVELOPER, items.get(0).easyInputMessage().orElseThrow().role());
-      assertEquals(
-          EasyInputMessage.Role.DEVELOPER, items.get(1).easyInputMessage().orElseThrow().role());
+      assertEquals(EasyInputMessage.Role.DEVELOPER, easyInput(items, 0).role());
+      assertEquals(EasyInputMessage.Role.DEVELOPER, easyInput(items, 1).role());
     }
 
     private ConversationAiRequestBuilder builder() {
@@ -130,12 +128,15 @@ class ConversationAiRequestBuilderTest {
     }
 
     private String firstDeveloperMessageBody(Conversation conversation) {
-      return inputItems(conversation)
-          .getFirst()
-          .easyInputMessage()
-          .orElseThrow()
-          .content()
-          .asTextInput();
+      return easyInputText(inputItems(conversation), 0);
+    }
+
+    private EasyInputMessage easyInput(List<ResponseInputItem> items, int index) {
+      return items.get(index).easyInputMessage().orElseThrow();
+    }
+
+    private String easyInputText(List<ResponseInputItem> items, int index) {
+      return easyInput(items, index).content().asTextInput();
     }
   }
 }

@@ -14,6 +14,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.sql.Timestamp;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +34,7 @@ class QuestionGenerationBatchSubmissionServiceTest {
   @MockitoBean OpenAiApiHandler openAiApiHandler;
 
   @Autowired MakeMe makeMe;
+  @Autowired MeterRegistry meterRegistry;
   @Autowired QuestionGenerationBatchPlanningService planningService;
   @Autowired QuestionGenerationBatchSubmissionService submissionService;
   @Autowired QuestionGenerationBatchRepository batchRepository;
@@ -41,9 +43,13 @@ class QuestionGenerationBatchSubmissionServiceTest {
   User user;
   Timestamp currentTime;
   QuestionGenerationBatch plannedBatch;
+  private double submittedBaseline;
+  private double failedBaseline;
 
   @BeforeEach
   void setup() {
+    submittedBaseline = counter("question_generation_batch.submitted");
+    failedBaseline = counter("question_generation_batch.failed");
     user = makeMe.aUser().please();
     currentTime = makeMe.aTimestamp().please();
     globalSettingsService
@@ -126,6 +132,8 @@ class QuestionGenerationBatchSubmissionServiceTest {
       boolean submitted = submissionService.submitPlannedBatch(plannedBatch, currentTime);
 
       assertThat(submitted, is(false));
+      assertThat(counter("question_generation_batch.failed") - failedBaseline, is(1.0));
+      assertThat(counter("question_generation_batch.submitted") - submittedBaseline, is(0.0));
 
       QuestionGenerationBatch batch = batchRepository.findById(plannedBatch.getId()).orElseThrow();
       assertThat(batch.getStatus(), is(QuestionGenerationBatchStatus.FAILED));
@@ -158,5 +166,9 @@ class QuestionGenerationBatchSubmissionServiceTest {
           batchRepository.findLatestSubmittedAtByUser_Id(user.getId()).orElseThrow(),
           equalTo(previousSubmission));
     }
+  }
+
+  private double counter(String name) {
+    return meterRegistry.get(name).counter().count();
   }
 }

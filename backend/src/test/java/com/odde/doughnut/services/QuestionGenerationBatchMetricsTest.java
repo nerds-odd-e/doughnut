@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuestionGenerationBatch;
 import com.odde.doughnut.entities.QuestionGenerationBatchRequest;
-import com.odde.doughnut.entities.QuestionGenerationBatchStatus;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRequestRepository;
@@ -184,29 +183,6 @@ class QuestionGenerationBatchMetricsTest {
 
     assertThat(counter("question_generation_batch.failed") - failedBaseline, is(1.0));
     assertThat(counter("question_generation_batch.expired") - expiredBaseline, is(1.0));
-  }
-
-  @Test
-  void incrementsFailedBatchCounterWhenSubmissionFails() {
-    Note note = makeMe.aNote().notebookOwnedBy(user).please();
-    makeMe
-        .aMemoryTrackerFor(note)
-        .by(user)
-        .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(24)))
-        .please();
-
-    QuestionGenerationBatch plannedBatch =
-        planningService.planLocalBatchForUser(user, currentTime).orElseThrow();
-    when(openAiApiHandler.uploadBatchInputFile(any()))
-        .thenThrow(new RuntimeException("upload failed"));
-
-    submissionService.submitPlannedBatch(plannedBatch, currentTime);
-
-    assertThat(counter("question_generation_batch.failed") - failedBaseline, is(1.0));
-    assertThat(counter("question_generation_batch.submitted") - submittedBaseline, is(0.0));
-    assertThat(
-        batchRepository.findById(plannedBatch.getId()).orElseThrow().getStatus(),
-        is(QuestionGenerationBatchStatus.FAILED));
   }
 
   private double counter(String name) {

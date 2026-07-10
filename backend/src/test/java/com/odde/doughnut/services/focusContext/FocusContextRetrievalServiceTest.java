@@ -182,16 +182,24 @@ class FocusContextRetrievalServiceTest {
       }
 
       @Test
-      void differentSeedsProduceDifferentInboundSelection() {
-        List<String> baseline = sortedInboundReferrerTitles(1L);
+      void inboundSamplingCapStabilityAndUriList() {
+        assertInboundSampleStableAndCapped(null);
+        assertInboundSampleStableAndCapped(1L);
+        List<String> seed1Inbound = sortedInboundReferrerTitles(1L);
         boolean foundDistinct =
-            LongStream.rangeClosed(2, 10)
-                .anyMatch(seed -> !baseline.equals(sortedInboundReferrerTitles(seed)));
+            LongStream.rangeClosed(2, 5)
+                .anyMatch(seed -> !seed1Inbound.equals(sortedInboundReferrerTitles(seed)));
         assertThat(
             "CRC32(concat(noteId, seed)) can rank the same six referrers for two arbitrary seeds; "
                 + "expect some seed in range to change the capped set",
             foundDistinct,
             is(true));
+        assertThat(
+            service
+                .retrieve(focusNote, viewer, RetrievalConfig.forQuestionGeneration(1L))
+                .getFocusNote()
+                .getInboundReferences(),
+            hasSize(20));
       }
 
       private List<String> sortedInboundReferrerTitles(long seed) {
@@ -207,18 +215,6 @@ class FocusContextRetrievalServiceTest {
         List<String> second = inboundReferrerTitles(focusNote, viewer, cfg);
         assertThat(first.size(), equalTo(6));
         assertThat(first, equalTo(second));
-      }
-
-      @Test
-      void inboundSamplingCapStabilityAndUriList() {
-        assertInboundSampleStableAndCapped(null);
-        assertInboundSampleStableAndCapped(1L);
-        assertThat(
-            service
-                .retrieve(focusNote, viewer, RetrievalConfig.forQuestionGeneration(1L))
-                .getFocusNote()
-                .getInboundReferences(),
-            hasSize(20));
       }
     }
 

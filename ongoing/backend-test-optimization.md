@@ -429,14 +429,14 @@ CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles
 ---
 
 ### Phase 14: Optimize batch ranks 40–42
-Status: planned
+Status: done
 
-**Tests:**
-- `backend/src/test/java/com/odde/doughnut/services/QuestionGenerationBatchMetricsTest.java` — "incrementsFailedBatchCounterWhenSubmissionFails()" (~28ms)
-- `backend/src/test/java/com/odde/doughnut/services/focusContext/FocusContextRetrievalServiceTest.java` — "differentSeedsProduceDifferentInboundSelection()" (~27ms)
-- `backend/src/test/java/com/odde/doughnut/controllers/ConversationMessageControllerTest.java` — "shouldExportConversationWithContextAndHistory()" (~26ms)
+**Tests (baseline → after):**
+- `QuestionGenerationBatchMetricsTest.incrementsFailedBatchCounterWhenSubmissionFails()` (~28ms) → **deleted**; failed-batch counter assertions merged into `QuestionGenerationBatchSubmissionServiceTest.uploadFailureMarksBatchFailedWithoutUpdatingLatestSubmittedAt()`
+- `FocusContextRetrievalServiceTest.differentSeedsProduceDifferentInboundSelection()` (~27ms) → merged into `inboundSamplingCapStabilityAndUriList()`; seed scan narrowed 2–10 → 2–5
+- `ConversationMessageControllerTest.shouldExportConversationWithContextAndHistory()` (~26ms) → **deleted**; export payload assertions merged into `ConversationAiRequestBuilderTest.shouldIncludeUserAndAssistantMessages()`; dropped export-format helpers and unused export fixture setup
 
-**Goals:** Speed up only these tests (merge/delete redundant cases, slim `makeMe`/fixtures, parameterize duplicates, avoid full-stack when a narrower entry suffices). If no meaningful win after a serious attempt, append **Candidates** in the blacklist and mark done.
+**Learnings:** Submission-failure metrics duplicate submission-service failure tests; inbound seed diversity shares the same 21-referrer fixture as cap/stability; export JSON shape is builder behavior — controller serialization adds cost without extra coverage beyond access control.
 
 **Verify:**
 
