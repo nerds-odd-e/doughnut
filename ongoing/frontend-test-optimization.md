@@ -198,9 +198,11 @@ Verify changes with `pnpm frontend:test` (browser mode), not only plain
 ---
 
 ### Phase 1: pages/BookReadingPage
-Status: planned
+Status: done
 
-**Tests:** (49 in top 10%, ~2627ms combined)
+**Learnings:** Replacing `vi.waitFor` (8s timeout) with a tight `flushPromises`/`nextTick` poll cut per-test PDF wait cost sharply. Merging snap-budget and snap-animating cases plus shared geometry/nav helpers removed 3 tests without losing coverage. Suite CPU ~2709ms → ~131ms (47 tests).
+
+**Tests:** (49 in top 10%, ~2627ms combined — pre-optimization baseline)
 - `tests/pages/BookReadingPage.spec.ts` — "marking READ clears snap reminder: block no longer snaps when re-visited" (~57ms)
 - `tests/pages/BookReadingPage.spec.ts` — "different unread blocks get independent snap budgets" (~57ms)
 - `tests/pages/BookReadingPage.spec.ts` — "snaps back on second crossing, then allows normal scrolling on third" (~57ms)
