@@ -13,7 +13,7 @@ When('I visit the Bazaar', () => {
 })
 
 Then('I should see {string} shared in the Bazaar', (notebooks: string) => {
-  start.assumeBazaarPage().expectNotebooks(notebooks)
+  start.navigateToBazaar().expectNotebooks(notebooks)
 })
 
 Then('notebook {string} is shared to the Bazaar', (notebookName: string) => {
