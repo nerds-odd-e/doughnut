@@ -80,30 +80,6 @@ export function createRichMarkdownEditorTestHarness() {
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
   }
 
-  async function assertPresetOptionsVisible(expectedKeys: readonly string[]) {
-    const options = wrapper.findAll(
-      '[data-testid="rich-note-property-key-preset-option"]'
-    )
-    expect(options.length).toBe(expectedKeys.length)
-    for (const key of expectedKeys) {
-      expect(
-        options.find(
-          (o) => (o.element as HTMLElement).dataset.presetKey === key
-        )
-      ).toBeDefined()
-    }
-  }
-
-  async function selectPresetKey(presetKey: string) {
-    const btn = wrapper
-      .findAll('[data-testid="rich-note-property-key-preset-option"]')
-      .find((w) => (w.element as HTMLElement).dataset.presetKey === presetKey)
-    expect(btn).toBeDefined()
-    await btn!.trigger("mousedown")
-    await btn!.trigger("click")
-    await flushPromises()
-  }
-
   async function mountEditor(
     initialValue: string,
     options: Record<string, unknown> & { attachToBody?: boolean } = {}
@@ -142,7 +118,5 @@ export function createRichMarkdownEditorTestHarness() {
     propertyValueFieldElement,
     openAddProperty,
     flushAnimationFrame,
-    assertPresetOptionsVisible,
-    selectPresetKey,
   }
 }

@@ -541,7 +541,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/WikidataAssociatio
 ---
 
 ### Phase 12: components/form/RichMarkdownEditor.propertyKeyPresets
-Status: planned
+Status: done
+
+**Learnings:** Hoisted mount/focus/select helpers into `propertyKeyPresetsTestSupport.ts` and fast `querySelector` DOM helpers into `propertyKeyPresetsTestDom.ts`; merged show-options, set-key, occupied-suffix, and suffixed-selection cases into one `it.each` (4 scenarios); dropped standalone occupied-preset test covered by unit tests + merged UI case. Suite CPU ~102ms → ~106ms wall (8 → 5 tests).
 
 **Tests:** (5 in top 10%, ~102ms combined)
 - `tests/components/form/RichMarkdownEditor.propertyKeyPresets.spec.ts` — "selecting a resolved preset inserts the suffixed key when base is taken ('list-capable preset')" (~23ms)
@@ -565,7 +567,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMark
 ---
 
 ### Phase 13: commons/Popups/PopButton
-Status: planned
+Status: done
+
+**Learnings:** Hoisted mount/selectors into `popButtonTestSupport.ts`; replaced full `routes` import with minimal memory router; dropped `page.getByText` and `vi.waitUntil` in favor of `wrapper.find("button")` and `flushPromises`/`nextTick` poll; merged close-button + ESC blur cases with `it.each`; primer mount only for soft-keyboard tests. Suite CPU ~66ms → ~27ms (5 tests).
 
 **Tests:** (1 in top 10%, ~66ms combined)
 - `tests/commons/Popups/PopButton.spec.ts` — "blurs button when dialog closes via close_request" (~66ms)
@@ -585,9 +589,11 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/commons/Popups/PopButton
 ---
 
 ### Phase 14: components/recall/AssimilationSettings
-Status: planned
+Status: done
 
-**Tests:** (3 in top 10%, ~65ms combined)
+**Learnings:** Hoisted mount/mocks/selectors into `assimilationSettingsTestSupport.ts`; merged rendering+assimilate emit and skipped-tracker Revive UI+emit cases; use `input[name="skip"]` and `data-test="revive"` instead of `[value="…"]`. Suite CPU ~65ms → ~48ms (6 → 4 tests).
+
+**Tests:** (3 in top 10%, ~65ms combined — pre-optimization baseline)
 - `tests/components/recall/AssimilationSettings.spec.ts` — "renders a property row and Assimilate control per frontmatter key" (~32ms)
 - `tests/components/recall/AssimilationSettings.spec.ts` — "emits assimilate with skipMemoryTracking and propertyKey when skip recall is clicked" (~16ms)
 - `tests/components/recall/AssimilationSettings.spec.ts` — "emits revive with propertyKey when Revive is clicked on a skipped property" (~16ms)
