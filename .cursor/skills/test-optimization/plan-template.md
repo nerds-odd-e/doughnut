@@ -2,14 +2,17 @@
 
 Status: in-progress
 
+**Execution:** run via **execute-plan** (commit + push per phase).
+
 ## Profiling baseline (YYYY-MM-DD)
 
 Command:
 
 - **N tests**, suite wall ~**Xs**
+- Eligible after blacklist: **E** (Ignored excluded; see `ongoing/test-optimization-blacklist.md`)
 - Raw profile: `<local path>` — **do not commit**
 
-### Top 10% slowest (n = ceil(N × 0.10))
+### Top 10% slowest (n = ceil(E × 0.10))
 
 | # | ms | file / spec | test / scenario |
 |---|-----|-------------|-----------------|
@@ -17,16 +20,19 @@ Command:
 
 ### Grouping
 
-- By file: **G1** groups
-- Pairs of 2: **G2** groups
-- Batches of 10: **G3** groups
-- **Chosen:** … (smallest count)
+- By file: **G_file** groups
+- Batches of 3: **G_3** groups
+- **Chosen:** … (fewer groups; tie → by file)
 
 ## Optimization rules
 
 1. Remove or simplify redundant tests first.
 2. Strictly no fixed-time waits.
 3. Flaky = failure.
+
+Hard-to-improve tests: propose under **Candidates** in
+`ongoing/test-optimization-blacklist.md` (do not promote to Ignored without
+developer review).
 
 ---
 
@@ -54,5 +60,7 @@ Status: planned
 | Test count | | |
 | Suite wall | | |
 | Top 10% total time | | |
+
+**Candidates proposed this run:** (none / list)
 
 **Commits:**
