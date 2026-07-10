@@ -465,14 +465,14 @@ CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles
 ---
 
 ### Phase 16: Optimize batch ranks 46–48
-Status: planned
+Status: done
 
-**Tests:**
-- `backend/src/test/java/com/odde/doughnut/controllers/MemoryTrackerControllerTest.java` — "shouldReturnMCQRecallPromptForNonSpellingMemoryTracker()" (~25ms)
-- `backend/src/test/java/com/odde/doughnut/services/QuestionGenerationBatchMetricsTest.java` — "incrementsFailedAndExpiredBatchCountersFromPolling()" (~25ms)
-- `backend/src/test/java/com/odde/doughnut/configs/NullToNotFoundResponseBodyAdviceTest.java` — "[1] methodName = "returnsRecallPrompt", expected = "true"" (~23ms)
+**Tests (baseline → after):**
+- `MemoryTrackerControllerTest.shouldReturnMCQRecallPromptForNonSpellingMemoryTracker()` (~25ms) → **deleted**; MCQ generation moved to `RecallQuestionServiceTest.shouldGenerateMcqRecallPromptWhenNoUnansweredPromptExists()` (~same cost, service-level entry)
+- `QuestionGenerationBatchMetricsTest.incrementsFailedAndExpiredBatchCountersFromPolling()` (~25ms) → **deleted**; failed/expired counter assertions merged into `QuestionGenerationBatchPollingServiceTest.failedUpdatesLocalBatch()` / `expiredUpdatesLocalBatch()` (avoids duplicate user/planning fixture)
+- `NullToNotFoundResponseBodyAdviceTest` `[1] returnsRecallPrompt` (~23ms) → single `supportsAppliesOnlyToNonResponseEntityReturnTypes()` `@Test` (drops parameterized invocation overhead)
 
-**Goals:** Speed up only these tests (merge/delete redundant cases, slim `makeMe`/fixtures, parameterize duplicates, avoid full-stack when a narrower entry suffices). If no meaningful win after a serious attempt, append **Candidates** in the blacklist and mark done.
+**Learnings:** MCQ recall generation is `RecallQuestionService` behavior; polling metrics duplicate polling-service status tests; advice `supports` cases need no `@ParameterizedTest`.
 
 **Verify:**
 

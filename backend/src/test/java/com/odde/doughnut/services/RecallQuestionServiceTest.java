@@ -8,11 +8,14 @@ import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
+import com.openai.client.OpenAIClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -20,15 +23,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class RecallQuestionServiceTest {
 
+  @MockitoBean(name = "officialOpenAiClient")
+  OpenAIClient officialClient;
+
   @Autowired MakeMe makeMe;
   @Autowired RecallQuestionService recallQuestionService;
   private Note note;
   private MemoryTracker memoryTracker;
+  private OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
   @BeforeEach
   void setup() {
     note = makeMe.aNote().content("description long enough.").please();
     memoryTracker = makeMe.aMemoryTrackerFor(note).by(makeMe.aUser().please()).please();
+    openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
   }
 
   @Test
@@ -41,5 +49,15 @@ class RecallQuestionServiceTest {
 
     assertThat(result, notNullValue());
     assertThat(result.getId(), equalTo(mostRecent.getId()));
+  }
+
+  @Test
+  void shouldGenerateMcqRecallPromptWhenNoUnansweredPromptExists() {
+    openAiStructuredResponseMock.stubStructuredResponse(makeMe.aMCQWithAnswer().please());
+
+    RecallPrompt result = recallQuestionService.generateAQuestion(memoryTracker);
+
+    assertThat(result, notNullValue());
+    assertThat(result.getMultipleChoicesQuestion(), notNullValue());
   }
 }

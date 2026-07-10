@@ -6,8 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.entities.RecallPrompt;
 import java.lang.reflect.Method;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,17 +24,20 @@ class NullToNotFoundResponseBodyAdviceTest {
 
   private final NullToNotFoundResponseBodyAdvice advice = new NullToNotFoundResponseBodyAdvice();
 
-  @ParameterizedTest
-  @CsvSource({
-    "returnsRecallPrompt, true",
-    "returnsResponseEntity, false",
-  })
-  void supportsAppliesOnlyToNonResponseEntityReturnTypes(String methodName, boolean expected)
-      throws NoSuchMethodException {
-    Method method = SampleController.class.getDeclaredMethod(methodName);
-    MethodParameter returnType = new MethodParameter(method, -1);
-    assertThat(advice.supports(returnType, MappingJackson2HttpMessageConverter.class))
-        .isEqualTo(expected);
+  @Test
+  void supportsAppliesOnlyToNonResponseEntityReturnTypes() throws NoSuchMethodException {
+    Method recallPromptMethod = SampleController.class.getDeclaredMethod("returnsRecallPrompt");
+    Method responseEntityMethod = SampleController.class.getDeclaredMethod("returnsResponseEntity");
+    assertThat(
+            advice.supports(
+                new MethodParameter(recallPromptMethod, -1),
+                MappingJackson2HttpMessageConverter.class))
+        .isTrue();
+    assertThat(
+            advice.supports(
+                new MethodParameter(responseEntityMethod, -1),
+                MappingJackson2HttpMessageConverter.class))
+        .isFalse();
   }
 
   @Test

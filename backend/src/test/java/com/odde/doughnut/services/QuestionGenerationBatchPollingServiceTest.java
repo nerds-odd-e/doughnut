@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -16,6 +17,7 @@ import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.openai.models.batches.Batch;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.sql.Timestamp;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,10 +42,13 @@ class QuestionGenerationBatchPollingServiceTest {
   @Autowired QuestionGenerationBatchPollingService pollingService;
   @Autowired QuestionGenerationBatchRepository batchRepository;
   @Autowired GlobalSettingsService globalSettingsService;
+  @Autowired MeterRegistry meterRegistry;
 
   User user;
   Timestamp currentTime;
   QuestionGenerationBatch submittedBatch;
+  private double failedBaseline;
+  private double expiredBaseline;
 
   @BeforeEach
   void setup() {
@@ -62,11 +67,16 @@ class QuestionGenerationBatchPollingServiceTest {
 
     QuestionGenerationBatch plannedBatch =
         planningService.planLocalBatchForUser(user, currentTime).orElseThrow();
-    when(openAiApiHandler.uploadBatchInputFile(org.mockito.ArgumentMatchers.any()))
-        .thenReturn("file-abc");
+    when(openAiApiHandler.uploadBatchInputFile(any())).thenReturn("file-abc");
     when(openAiApiHandler.createResponsesBatch("file-abc")).thenReturn("batch-openai-1");
     submissionService.submitPlannedBatch(plannedBatch, currentTime);
     submittedBatch = batchRepository.findById(plannedBatch.getId()).orElseThrow();
+    failedBaseline = counter("question_generation_batch.failed");
+    expiredBaseline = counter("question_generation_batch.expired");
+  }
+
+  private double counter(String name) {
+    return meterRegistry.get(name).counter().count();
   }
 
   private Batch openAiBatchWithStatus(Batch.Status status) {
@@ -123,6 +133,7 @@ class QuestionGenerationBatchPollingServiceTest {
       QuestionGenerationBatch batch =
           batchRepository.findById(submittedBatch.getId()).orElseThrow();
       assertThat(batch.getStatus(), is(QuestionGenerationBatchStatus.FAILED));
+      assertThat(counter("question_generation_batch.failed") - failedBaseline, is(1.0));
     }
 
     @Test
@@ -135,6 +146,7 @@ class QuestionGenerationBatchPollingServiceTest {
       QuestionGenerationBatch batch =
           batchRepository.findById(submittedBatch.getId()).orElseThrow();
       assertThat(batch.getStatus(), is(QuestionGenerationBatchStatus.EXPIRED));
+      assertThat(counter("question_generation_batch.expired") - expiredBaseline, is(1.0));
     }
   }
 

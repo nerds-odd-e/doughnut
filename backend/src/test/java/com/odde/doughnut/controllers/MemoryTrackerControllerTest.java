@@ -18,8 +18,6 @@ import com.odde.doughnut.entities.repositories.ConversationRepository;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.NoteService;
-import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
-import com.openai.client.OpenAIClient;
 import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,22 +25,16 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.server.ResponseStatusException;
 
 class MemoryTrackerControllerTest extends ControllerTestBase {
-  @MockitoBean(name = "officialOpenAiClient")
-  OpenAIClient officialClient;
-
   @Autowired MemoryTrackerController controller;
   @Autowired NoteService noteService;
   @Autowired ConversationRepository conversationRepository;
-  OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-    openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
   }
 
   @Nested
@@ -198,26 +190,6 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       RecallQuestion recallQuestion = controller.askAQuestion(memoryTracker);
       assertThat(recallQuestion.getId(), equalTo(existingPrompt.getId()));
       assertThat(recallQuestion.getSpellingQuestion(), notNullValue());
-    }
-
-    @Test
-    void shouldReturnMCQRecallPromptForNonSpellingMemoryTracker()
-        throws UnexpectedNoAccessRightException {
-      Note note =
-          makeMe
-              .aNote("moon")
-              .content("partner of earth")
-              .notebookOwnedBy(currentUser.getUser())
-              .rememberSpelling()
-              .please();
-      MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
-
-      // Mock OpenAI API call
-      openAiStructuredResponseMock.stubStructuredResponse(makeMe.aMCQWithAnswer().please());
-
-      RecallQuestion recallQuestion = controller.askAQuestion(memoryTracker);
-      assertThat(recallQuestion, notNullValue());
-      assertThat(recallQuestion.getMultipleChoicesQuestion(), notNullValue());
     }
 
     @Test

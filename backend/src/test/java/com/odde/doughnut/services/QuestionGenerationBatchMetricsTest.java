@@ -49,8 +49,6 @@ class QuestionGenerationBatchMetricsTest {
   User user;
   Timestamp currentTime;
   private double submittedBaseline;
-  private double failedBaseline;
-  private double expiredBaseline;
   private double completedBaseline;
   private double importedBaseline;
   private double failedRowsBaseline;
@@ -63,8 +61,6 @@ class QuestionGenerationBatchMetricsTest {
         .globalSettingQuestionGeneration()
         .setKeyValue(currentTime, "gpt-batch-question-generation");
     submittedBaseline = counter("question_generation_batch.submitted");
-    failedBaseline = counter("question_generation_batch.failed");
-    expiredBaseline = counter("question_generation_batch.expired");
     completedBaseline = counter("question_generation_batch.completed");
     importedBaseline = counter("question_generation_batch.imported");
     failedRowsBaseline = counter("question_generation_batch_request.failed");
@@ -127,62 +123,6 @@ class QuestionGenerationBatchMetricsTest {
     assertThat(counter("question_generation_batch.completed") - completedBaseline, is(1.0));
     assertThat(counter("question_generation_batch.imported") - importedBaseline, is(1.0));
     assertThat(counter("question_generation_batch_request.failed") - failedRowsBaseline, is(1.0));
-    assertThat(counter("question_generation_batch.failed") - failedBaseline, is(0.0));
-    assertThat(counter("question_generation_batch.expired") - expiredBaseline, is(0.0));
-  }
-
-  @Test
-  void incrementsFailedAndExpiredBatchCountersFromPolling() {
-    Note note = makeMe.aNote().notebookOwnedBy(user).please();
-    makeMe
-        .aMemoryTrackerFor(note)
-        .by(user)
-        .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(24)))
-        .please();
-
-    QuestionGenerationBatch failedBatch =
-        planningService.planLocalBatchForUser(user, currentTime).orElseThrow();
-    when(openAiApiHandler.uploadBatchInputFile(any())).thenReturn("file-failed");
-    when(openAiApiHandler.createResponsesBatch("file-failed")).thenReturn("batch-failed");
-    submissionService.submitPlannedBatch(failedBatch, currentTime);
-
-    user = makeMe.aUser().please();
-    Note secondNote = makeMe.aNote().notebookOwnedBy(user).please();
-    makeMe
-        .aMemoryTrackerFor(secondNote)
-        .by(user)
-        .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(24)))
-        .please();
-    QuestionGenerationBatch expiredBatch =
-        planningService.planLocalBatchForUser(user, currentTime).orElseThrow();
-    when(openAiApiHandler.uploadBatchInputFile(any())).thenReturn("file-expired");
-    when(openAiApiHandler.createResponsesBatch("file-expired")).thenReturn("batch-expired");
-    submissionService.submitPlannedBatch(expiredBatch, currentTime);
-
-    when(openAiApiHandler.retrieveBatch("batch-failed"))
-        .thenReturn(
-            Batch.builder()
-                .id("batch-failed")
-                .completionWindow("24h")
-                .createdAt(1L)
-                .endpoint("/v1/responses")
-                .inputFileId("file-failed")
-                .status(Batch.Status.FAILED)
-                .build());
-    when(openAiApiHandler.retrieveBatch("batch-expired"))
-        .thenReturn(
-            Batch.builder()
-                .id("batch-expired")
-                .completionWindow("24h")
-                .createdAt(1L)
-                .endpoint("/v1/responses")
-                .inputFileId("file-expired")
-                .status(Batch.Status.EXPIRED)
-                .build());
-    pollingService.pollSubmittedBatches();
-
-    assertThat(counter("question_generation_batch.failed") - failedBaseline, is(1.0));
-    assertThat(counter("question_generation_batch.expired") - expiredBaseline, is(1.0));
   }
 
   private double counter(String name) {
