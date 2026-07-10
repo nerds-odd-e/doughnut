@@ -80,3 +80,32 @@ export function setListItemValue(index: number, value: string) {
   input.value = value
   input.dispatchEvent(new Event("input", { bubbles: true }))
 }
+
+export function dialogEl(): HTMLDialogElement | null {
+  return document.querySelector("dialog")
+}
+
+export function isModeTabActive(testId: string): boolean {
+  return (
+    document
+      .querySelector(`[data-testid="${testId}"]`)
+      ?.classList.contains("daisy-tab-active") ?? false
+  )
+}
+
+export function isListModeTabActive(): boolean {
+  return isModeTabActive("rich-note-property-value-popup-mode-list")
+}
+
+export function popupValidationText(): string | undefined {
+  return (
+    document.querySelector(
+      '[data-testid="rich-note-property-value-popup-validation"]'
+    )?.textContent ?? undefined
+  )
+}
+
+export async function savePopup() {
+  clickSave()
+  await flushPromises()
+}

@@ -415,7 +415,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteNewForm.spec.t
 ---
 
 ### Phase 7: components/form/RichMarkdownEditor.propertyValuePopupModeSwitch
-Status: planned
+Status: done
+
+**Learnings:** Hoisted mount/markdown/mode-switch helpers into `propertyValuePopupModeSwitchTestSupport.ts`; added shared `dialogEl`, `isListModeTabActive`, `popupValidationText`, `savePopup` to `propertyValuePopupTestDom.ts`; replaced inline `querySelector` with helpers. Suite CPU ~194ms → ~184ms (6 tests; no redundant cases to merge).
 
 **Tests:** (5 in top 10%, ~133ms combined)
 - `tests/components/form/RichMarkdownEditor.propertyValuePopupModeSwitch.spec.ts` — "saves an empty list from popup" (~30ms)
