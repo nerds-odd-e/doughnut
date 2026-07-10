@@ -1,6 +1,10 @@
 package com.odde.doughnut.controllers;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -8,11 +12,8 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
+import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,9 +24,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -33,7 +31,7 @@ class ApplicationControllerProdDeepLinkTests {
 
   private static final String SPA_PUBLIC_BASE = "http://127.0.0.1:18888";
 
-  private MockMvc mockMvc;
+  private ApplicationController controller;
   private Environment env;
   private RestTemplate restTemplate;
   private MockRestServiceServer mockUpstream;
@@ -44,12 +42,7 @@ class ApplicationControllerProdDeepLinkTests {
     when(env.acceptsProfiles(any(Profiles.class))).thenReturn(true);
     restTemplate = new RestTemplate();
     mockUpstream = MockRestServiceServer.bindTo(restTemplate).build();
-    ApplicationController controller =
-        new ApplicationController(env, restTemplate, SPA_PUBLIC_BASE);
-    mockMvc =
-        standaloneSetup(controller)
-            .setControllerAdvice(new RestClientExceptionAsInternalServerError())
-            .build();
+    controller = new ApplicationController(env, restTemplate, SPA_PUBLIC_BASE);
   }
 
   @AfterEach
@@ -58,39 +51,30 @@ class ApplicationControllerProdDeepLinkTests {
   }
 
   @Test
-  void prodDeepLinkRoutesReturnHtmlFromConfiguredSpaOrigin() throws Exception {
+  void prodDeepLinkRoutesReturnHtmlFromConfiguredSpaOrigin() {
     String shell = "<!DOCTYPE html><html><body>spa-shell</body></html>";
-    for (int i = 0; i < 2; i++) {
-      mockUpstream
-          .expect(requestTo("http://127.0.0.1:18888/"))
-          .andExpect(method(HttpMethod.GET))
-          .andRespond(withSuccess(shell, MediaType.TEXT_HTML));
-    }
+    mockUpstream
+        .expect(requestTo("http://127.0.0.1:18888/"))
+        .andExpect(method(HttpMethod.GET))
+        .andRespond(withSuccess(shell, MediaType.TEXT_HTML));
 
-    for (String path : new String[] {"/notebooks/1", "/n42"}) {
-      mockMvc
-          .perform(get(path))
-          .andExpect(status().isOk())
-          .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
-          .andExpect(content().string(containsString("spa-shell")));
-    }
+    Object result = controller.spaDeepLink();
+
+    assertThat(result, instanceOf(ResponseEntity.class));
+    @SuppressWarnings("unchecked")
+    ResponseEntity<byte[]> response = (ResponseEntity<byte[]>) result;
+    assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
+    assertThat(new String(response.getBody(), StandardCharsets.UTF_8), containsString("spa-shell"));
+    assertThat(response.getHeaders().getContentType(), equalTo(MediaType.TEXT_HTML));
   }
 
   @Test
-  void prodDeepLinkPropagatesUpstreamFailure() throws Exception {
+  void prodDeepLinkPropagatesUpstreamFailure() {
     mockUpstream
         .expect(requestTo("http://127.0.0.1:18888/"))
         .andExpect(method(HttpMethod.GET))
         .andRespond(withServerError());
 
-    mockMvc.perform(get("/d/x")).andExpect(status().isInternalServerError());
-  }
-
-  @ControllerAdvice
-  static final class RestClientExceptionAsInternalServerError {
-    @ExceptionHandler(RestClientException.class)
-    ResponseEntity<Void> map(RestClientException ignored) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    }
+    assertThrows(RestClientException.class, () -> controller.spaDeepLink());
   }
 }

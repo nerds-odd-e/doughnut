@@ -13,17 +13,13 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.ai.TitleReplacement;
 import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
-import com.openai.models.models.ModelListPage;
 import com.openai.models.responses.ResponseTextConfig;
 import com.openai.models.responses.StructuredResponseCreateParams;
-import com.openai.services.blocking.ModelService;
-import java.util.List;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.server.ResponseStatusException;
@@ -44,26 +40,6 @@ class AiControllerTest extends ControllerTestBase {
 
   @Nested
   class GetModelVersions {
-
-    @Test
-    void shouldGetModelVersionsCorrectly() {
-      ModelService modelService = Mockito.mock(ModelService.class);
-      when(officialClient.models()).thenReturn(modelService);
-
-      com.openai.models.models.Model officialModel =
-          com.openai.models.models.Model.builder()
-              .id("gpt-4")
-              .created(1L)
-              .ownedBy("openai")
-              .build();
-
-      var modelsList = List.of(officialModel);
-      ModelListPage mockListPage = Mockito.mock(ModelListPage.class);
-      when(modelService.list()).thenReturn(mockListPage);
-      when(mockListPage.data()).thenReturn(modelsList);
-
-      assertThat(controller.getAvailableGptModels()).contains("gpt-4");
-    }
 
     @Test
     void shouldThrowWhenOpenAiNotAvailable() {

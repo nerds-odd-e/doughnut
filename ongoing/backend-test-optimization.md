@@ -285,14 +285,14 @@ CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles
 ---
 
 ### Phase 6: Optimize batch ranks 16–18
-Status: planned
+Status: done
 
-**Tests:**
-- `backend/src/test/java/com/odde/doughnut/configs/ControllerSetupTest.java` — "[1] exception = org.springframework.web.server.ResponseStatusException: 401 UNAUTHORIZED "xx", expectedType = class org.springframework.web.server.ResponseStatusException" (~83ms)
-- `backend/src/test/java/com/odde/doughnut/controllers/AiControllerTest.java` — "shouldGetModelVersionsCorrectly()" (~83ms)
-- `backend/src/test/java/com/odde/doughnut/controllers/ApplicationControllerProdDeepLinkTests.java` — "prodDeepLinkRoutesReturnHtmlFromConfiguredSpaOrigin()" (~82ms)
+**Tests (baseline → after):**
+- `ControllerSetupTest.shouldNotRecordExcludedExceptions()` `[1] ResponseStatusException` (~83ms) → `ControllerSetupExcludedExceptionsTest` mock-only (~&lt;5ms); dropped `@SpringBootTest` + DB `count()` for excluded-exception path
+- `AiControllerTest.shouldGetModelVersionsCorrectly()` (~83ms) → `OtherAiServicesGetModelsTest` mock-only (~&lt;1ms); controller test keeps only `shouldThrowWhenOpenAiNotAvailable()`
+- `ApplicationControllerProdDeepLinkTests.prodDeepLinkRoutesReturnHtmlFromConfiguredSpaOrigin()` (~82ms) → direct `spaDeepLink()` call (~&lt;5ms); dropped MockMvc + duplicate path/upstream expectations
 
-**Goals:** Speed up only these tests (merge/delete redundant cases, slim `makeMe`/fixtures, parameterize duplicates, avoid full-stack when a narrower entry suffices). If no meaningful win after a serious attempt, append **Candidates** in the blacklist and mark done.
+**Learnings:** Excluded-exception and model-list filtering are pure handler/service behavior; MockMvc added cost without extra coverage for prod deep-link shell fetch.
 
 **Verify:**
 

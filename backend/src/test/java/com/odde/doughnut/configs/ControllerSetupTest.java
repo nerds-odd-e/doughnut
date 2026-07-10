@@ -14,13 +14,10 @@ import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.entities.FailureReport;
 import com.odde.doughnut.entities.repositories.FailureReportRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
-import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
-import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.RealGithubService;
 import com.odde.doughnut.services.UserService;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.util.Optional;
@@ -42,7 +39,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -50,7 +46,6 @@ import org.springframework.web.server.ResponseStatusException;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class ControllerSetupTest {
-  @Autowired MakeMe makeMe;
   @Autowired FailureReportRepository failureReportRepository;
   @Autowired UserRepository userRepository;
   @Autowired UserService userService;
@@ -69,27 +64,6 @@ public class ControllerSetupTest {
         new CurrentUserFetcherFromRequest(request, userRepository, userService, Optional.empty());
     controllerSetup =
         new ControllerSetup(failureReportRepository, currentUserFetcher, testabilitySettings);
-  }
-
-  @ParameterizedTest
-  @MethodSource("exceptionsNotRecorded")
-  void shouldNotRecordExcludedExceptions(
-      Exception exception, Class<? extends Throwable> expectedType) {
-    long count = failureReportRepository.count();
-    assertThrows(expectedType, () -> controllerSetup.handleSystemException(request, exception));
-    assertThat(failureReportRepository.count(), equalTo(count));
-  }
-
-  static Stream<Arguments> exceptionsNotRecorded() {
-    return Stream.of(
-        Arguments.of(
-            new ResponseStatusException(HttpStatus.UNAUTHORIZED, "xx"),
-            ResponseStatusException.class),
-        Arguments.of(
-            new ApiException("x", ApiError.ErrorType.BINDING_ERROR, "client error"),
-            ApiException.class),
-        Arguments.of(
-            new UnexpectedNoAccessRightException(), UnexpectedNoAccessRightException.class));
   }
 
   @ParameterizedTest
