@@ -241,6 +241,27 @@ export async function clickExtractRefinementLayout(
     .trigger("click")
 }
 
+export async function mountNestedLayoutWithIndeterminateParentSelection() {
+  const layout = sampleNestedLayout()
+  const wrapper = await mountNoteRefinementWithLayoutReady(layout)
+  await selectRefinementLayoutItem(wrapper, "p1")
+  await selectRefinementLayoutItem(wrapper, "p1-2", false)
+  return { layout, wrapper }
+}
+
+export async function clickRemoveRefinementLayout(
+  wrapper: ReturnType<typeof mountNoteRefinement>,
+  confirmed = true
+) {
+  await wrapper
+    .find('[data-test-id="remove-refinement-layout"]')
+    .trigger("click")
+  if (confirmed) {
+    usePopups().popups.done(true)
+    await flushPromises()
+  }
+}
+
 export const sampleExtractionPreview = (
   overrides?: Partial<NoteExtractionResult>
 ): NoteExtractionResult => ({

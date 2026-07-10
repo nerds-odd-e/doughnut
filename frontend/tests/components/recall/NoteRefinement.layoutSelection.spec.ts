@@ -1,48 +1,35 @@
 import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
-import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it } from "vitest"
+import { flushPromises } from "@vue/test-utils"
 import { mockSdkService } from "@tests/helpers"
-import usePopups from "@/components/commons/Popups/usePopups"
 import {
-  extractNoteButtonTitle,
+  clickExtractRefinementLayout,
+  clickRemoveRefinementLayout,
   layoutCheckbox,
-  mountNoteRefinementWithLayout,
+  mountNestedLayoutWithIndeterminateParentSelection,
+  mountNoteRefinementWithLayoutReady,
   note,
   refinementLayoutSelectionApiCall,
+  sampleExtractionPreview,
   sampleNestedLayout,
   selectRefinementLayoutItem,
   setupNoteRefinementTests,
-  sampleExtractionPreview,
 } from "./noteRefinementTestSupport"
 
 setupNoteRefinementTests()
 
-async function mountWithIndeterminateParentSelection() {
-  const layout = sampleNestedLayout()
-  const wrapper = mountNoteRefinementWithLayout(layout)
-  await flushPromises()
-  await selectRefinementLayoutItem(wrapper, "p1")
-  await selectRefinementLayoutItem(wrapper, "p1-2", false)
-  return { layout, wrapper }
-}
-
 describe("NoteRefinement layout selection", () => {
-  it("checks children when a parent is checked", async () => {
-    const wrapper = mountNoteRefinementWithLayout(sampleNestedLayout())
-    await flushPromises()
+  it("cascades parent selection and indeterminate state to children", async () => {
+    const wrapper = await mountNoteRefinementWithLayoutReady(
+      sampleNestedLayout()
+    )
 
     await selectRefinementLayoutItem(wrapper, "p1")
 
     expect(layoutCheckbox(wrapper, "p1").checked).toBe(true)
     expect(layoutCheckbox(wrapper, "p1-1").checked).toBe(true)
     expect(layoutCheckbox(wrapper, "p1-2").checked).toBe(true)
-  })
 
-  it("makes parent indeterminate when a selected child is unchecked", async () => {
-    const wrapper = mountNoteRefinementWithLayout(sampleNestedLayout())
-    await flushPromises()
-
-    await selectRefinementLayoutItem(wrapper, "p1")
     await selectRefinementLayoutItem(wrapper, "p1-2", false)
 
     expect(layoutCheckbox(wrapper, "p1").checked).toBe(false)
@@ -52,8 +39,9 @@ describe("NoteRefinement layout selection", () => {
   })
 
   it("marks already extracted layout points clearly without disabling selection", async () => {
-    const wrapper = mountNoteRefinementWithLayout(sampleNestedLayout())
-    await flushPromises()
+    const wrapper = await mountNoteRefinementWithLayoutReady(
+      sampleNestedLayout()
+    )
 
     const alreadyExtractedItem = wrapper.find(
       '[data-test-id="refinement-layout-item-p1-2"]'
@@ -63,39 +51,31 @@ describe("NoteRefinement layout selection", () => {
     expect(layoutCheckbox(wrapper, "p1-2").disabled).toBe(false)
   })
 
-  it("submits only checked descendants when parent is indeterminate (extract)", async () => {
-    const extractNotePreviewSpy = mockSdkService(
-      AiController,
-      "extractNotePreview",
-      sampleExtractionPreview()
-    )
-    const { layout, wrapper } = await mountWithIndeterminateParentSelection()
-    await wrapper
-      .find(`button[title="${extractNoteButtonTitle}"]`)
-      .trigger("click")
+  it.each([
+    {
+      action: "extract",
+      method: "extractNotePreview" as const,
+      response: sampleExtractionPreview(),
+      trigger: clickExtractRefinementLayout,
+    },
+    {
+      action: "remove",
+      method: "removeRefinementSuggestion" as const,
+      response: { content: "Updated content" },
+      trigger: clickRemoveRefinementLayout,
+    },
+  ])("submits only checked descendants when parent is indeterminate ($action)", async ({
+    method,
+    response,
+    trigger,
+  }) => {
+    const spy = mockSdkService(AiController, method, response)
+    const { layout, wrapper } =
+      await mountNestedLayoutWithIndeterminateParentSelection()
+    await trigger(wrapper)
     await flushPromises()
 
-    expect(extractNotePreviewSpy).toHaveBeenCalledWith(
-      refinementLayoutSelectionApiCall(note.id, layout, ["p1-1"])
-    )
-  })
-
-  it("submits only checked descendants when parent is indeterminate (remove)", async () => {
-    const removeLayoutSpy = mockSdkService(
-      AiController,
-      "removeRefinementSuggestion",
-      {
-        content: "Updated content",
-      }
-    )
-    const { layout, wrapper } = await mountWithIndeterminateParentSelection()
-    await wrapper
-      .find('[data-test-id="remove-refinement-layout"]')
-      .trigger("click")
-    usePopups().popups.done(true)
-    await flushPromises()
-
-    expect(removeLayoutSpy).toHaveBeenCalledWith(
+    expect(spy).toHaveBeenCalledWith(
       refinementLayoutSelectionApiCall(note.id, layout, ["p1-1"])
     )
   })
@@ -106,11 +86,10 @@ describe("NoteRefinement layout selection", () => {
       "extractNotePreview",
       sampleExtractionPreview()
     )
-    const { layout, wrapper } = await mountWithIndeterminateParentSelection()
+    const { layout, wrapper } =
+      await mountNestedLayoutWithIndeterminateParentSelection()
     await selectRefinementLayoutItem(wrapper, "p1-2", true)
-    await wrapper
-      .find(`button[title="${extractNoteButtonTitle}"]`)
-      .trigger("click")
+    await clickExtractRefinementLayout(wrapper)
     await flushPromises()
 
     expect(extractNotePreviewSpy).toHaveBeenCalledWith(
@@ -119,6 +98,7 @@ describe("NoteRefinement layout selection", () => {
   })
 
   it("removes non-contiguous selected layout points", async () => {
+    const layout = sampleNestedLayout()
     const removeLayoutSpy = mockSdkService(
       AiController,
       "removeRefinementSuggestion",
@@ -126,21 +106,13 @@ describe("NoteRefinement layout selection", () => {
         content: "Updated content",
       }
     )
-    const wrapper = mountNoteRefinementWithLayout(sampleNestedLayout())
-    await flushPromises()
+    const wrapper = await mountNoteRefinementWithLayoutReady(layout)
     await selectRefinementLayoutItem(wrapper, "p1-1")
     await selectRefinementLayoutItem(wrapper, "p2")
-    await wrapper
-      .find('[data-test-id="remove-refinement-layout"]')
-      .trigger("click")
-    usePopups().popups.done(true)
-    await flushPromises()
+    await clickRemoveRefinementLayout(wrapper)
 
     expect(removeLayoutSpy).toHaveBeenCalledWith(
-      refinementLayoutSelectionApiCall(note.id, sampleNestedLayout(), [
-        "p1-1",
-        "p2",
-      ])
+      refinementLayoutSelectionApiCall(note.id, layout, ["p1-1", "p2"])
     )
   })
 })

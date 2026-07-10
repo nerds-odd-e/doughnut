@@ -460,9 +460,11 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/composables/useBookReadi
 ---
 
 ### Phase 9: notes/NoteEditableContent
-Status: planned
+Status: done
 
-**Tests:** (6 in top 10%, ~106ms combined)
+**Learnings:** Hoisted mount/mocks/selectors into `noteEditableContentTestSupport.ts`; split 858-line spec into 6 cohesive files (all under 250 lines); merged paste popup yes/no, relation property show/omit, and HTML normalization no-save cases with `it.each`. Suite CPU ~373ms → ~260ms (25 tests).
+
+**Tests:** (6 in top 10%, ~106ms combined — pre-optimization baseline)
 - `tests/notes/NoteEditableContent.spec.ts` — "should preserve second edit when first save response arrives after second edit" (~26ms)
 - `tests/notes/NoteEditableContent.spec.ts` — "should preserve unsaved edits if the noteContent prop doesn't actually change" (~17ms)
 - `tests/notes/NoteEditableContent.spec.ts` — "updates the tracker property key and saves when the user confirms renaming" (~16ms)
@@ -485,9 +487,11 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteEditableConten
 ---
 
 ### Phase 10: components/recall/NoteRefinement.layoutSelection
-Status: planned
+Status: done
 
-**Tests:** (4 in top 10%, ~104ms combined)
+**Learnings:** Merged parent cascade + indeterminate checkbox cases; folded extract/remove indeterminate API submission into `it.each`; hoisted `mountNestedLayoutWithIndeterminateParentSelection` and `clickRemoveRefinementLayout` into `noteRefinementTestSupport.ts`; use `mountNoteRefinementWithLayoutReady` and `data-test-id` action helpers. Suite CPU ~104ms → ~107ms wall (7 → 6 tests).
+
+**Tests:** (4 in top 10%, ~104ms combined — pre-optimization baseline)
 - `tests/components/recall/NoteRefinement.layoutSelection.spec.ts` — "submits only checked descendants when parent is indeterminate (remove)" (~35ms)
 - `tests/components/recall/NoteRefinement.layoutSelection.spec.ts` — "includes parent id when all descendants are selected again" (~26ms)
 - `tests/components/recall/NoteRefinement.layoutSelection.spec.ts` — "submits only checked descendants when parent is indeterminate (extract)" (~22ms)
