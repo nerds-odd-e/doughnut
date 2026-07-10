@@ -52,10 +52,12 @@ class AdminUserControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void canListUsersWithCorrectMemoryTrackerCount() throws UnexpectedNoAccessRightException {
+    void canListUsersWithCorrectMemoryTrackerCountAndLastAssimilationTime()
+        throws UnexpectedNoAccessRightException {
       User userWithTrackers = makeMe.aUser().please();
       Note note = makeMe.aNote().please();
-      makeMe.aMemoryTrackerFor(note).by(userWithTrackers).please();
+      Timestamp assimilationTime = makeMe.aTimestamp().of(2025, 5).please();
+      makeMe.aMemoryTrackerFor(note).by(userWithTrackers).assimilatedAt(assimilationTime).please();
 
       UserListingPage result = controller.listUsers(0, 10);
 
@@ -65,6 +67,7 @@ class AdminUserControllerTest extends ControllerTestBase {
               .findFirst()
               .orElseThrow();
       assertThat(userListing.getMemoryTrackerCount(), equalTo(1L));
+      assertThat(userListing.getLastAssimilationTime(), equalTo(assimilationTime));
     }
 
     @Test
@@ -82,23 +85,6 @@ class AdminUserControllerTest extends ControllerTestBase {
               .findFirst()
               .orElseThrow();
       assertThat(userListing.getLastNoteTime(), equalTo(noteTime));
-    }
-
-    @Test
-    void canListUsersWithLastAssimilationTime() throws UnexpectedNoAccessRightException {
-      User userWithTrackers = makeMe.aUser().please();
-      Note note = makeMe.aNote().please();
-      Timestamp assimilationTime = makeMe.aTimestamp().of(2025, 5).please();
-      makeMe.aMemoryTrackerFor(note).by(userWithTrackers).assimilatedAt(assimilationTime).please();
-
-      UserListingPage result = controller.listUsers(0, 10);
-
-      UserForListing userListing =
-          result.getUsers().stream()
-              .filter(u -> u.getId().equals(userWithTrackers.getId()))
-              .findFirst()
-              .orElseThrow();
-      assertThat(userListing.getLastAssimilationTime(), equalTo(assimilationTime));
     }
 
     @Test

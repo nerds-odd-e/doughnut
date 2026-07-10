@@ -48,20 +48,6 @@ class AssimilationControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void subscriptionNoteBeforeOwnedNote() {
-      User user = currentUser.getUser();
-      User notebookOwner = makeMe.aUser().please();
-      Notebook subscribedNotebook = makeMe.aNotebook().creatorAndOwner(notebookOwner).please();
-      Note subscriptionNote = makeMe.aNote().notebook(subscribedNotebook).please();
-      makeMe.aNote().notebookOwnedBy(user).please();
-      makeMe.aSubscription().forNotebook(subscribedNotebook).forUser(user).daily(1).please();
-      makeMe.refresh(user);
-
-      AssimilationNextDTO result = controller.next("Asia/Shanghai");
-      assertThat(result.getNextUnit().getNoteId(), equalTo(subscriptionNote.getId()));
-    }
-
-    @Test
     void returnsOwnedNoteWhenSubscriptionDailyCapReached() {
       User user = currentUser.getUser();
       User notebookOwner = makeMe.aUser().please();

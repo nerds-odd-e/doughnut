@@ -411,14 +411,14 @@ CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles
 ---
 
 ### Phase 13: Optimize batch ranks 37–39
-Status: planned
+Status: done
 
-**Tests:**
-- `backend/src/test/java/com/odde/doughnut/services/focusContext/FocusContextRetrievalServiceTest.java` — "relatedNotesBudgetCapsNumberOfIncludedNotes()" (~30ms)
-- `backend/src/test/java/com/odde/doughnut/controllers/AdminUserControllerTest.java` — "canListUsersWithLastAssimilationTime()" (~29ms)
-- `backend/src/test/java/com/odde/doughnut/controllers/AssimilationControllerTests.java` — "subscriptionNoteBeforeOwnedNote()" (~28ms)
+**Tests (baseline → after):**
+- `FocusContextRetrievalServiceTest.relatedNotesBudgetCapsNumberOfIncludedNotes()` (~30ms) → **deleted**; budget cap on included notes covered by `budgetExhaustedMidRingLeavesLaterDepthOneNotesAndDepthTwoUnreachable()`
+- `AdminUserControllerTest.canListUsersWithLastAssimilationTime()` (~29ms) → merged into `canListUsersWithCorrectMemoryTrackerCountAndLastAssimilationTime()` (~same cost, one fewer test method)
+- `AssimilationControllerTests.subscriptionNoteBeforeOwnedNote()` (~28ms) → **deleted**; subscription-before-owned ordering covered by `AssimilationServiceQueueOrderingTest.owned_and_subscribed_notes_interleave_by_created_at_when_levels_equal()`
 
-**Goals:** Speed up only these tests (merge/delete redundant cases, slim `makeMe`/fixtures, parameterize duplicates, avoid full-stack when a narrower entry suffices). If no meaningful win after a serious attempt, append **Candidates** in the blacklist and mark done.
+**Learnings:** Related-notes budget cap duplicated the mid-ring budget exhaustion test; admin last-assimilation time shares the same memory-tracker fixture as tracker count; subscription queue ordering belongs at service level.
 
 **Verify:**
 

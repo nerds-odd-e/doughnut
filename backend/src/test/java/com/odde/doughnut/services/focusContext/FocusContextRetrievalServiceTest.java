@@ -333,36 +333,6 @@ class FocusContextRetrievalServiceTest {
   }
 
   @Nested
-  class TokenBudget {
-    @Test
-    void relatedNotesBudgetCapsNumberOfIncludedNotes() {
-      List<String> titles = List.of("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L");
-      StringBuilder linkLine = new StringBuilder("See ");
-      for (String t : titles) {
-        linkLine.append("[[").append(t).append("]] ");
-      }
-      User viewer = makeMe.aUser().please();
-      Notebook nb = notebookReadableBy(viewer);
-      Note focusNote =
-          makeMe
-              .aNote()
-              .notebook(nb)
-              .title("Focus")
-              .content(linkLine.toString().trim() + ".")
-              .please();
-      String largeDetails = "x".repeat(3000);
-      for (String title : titles) {
-        makeMe.aNote().underSameNotebookAs(focusNote).title(title).content(largeDetails).please();
-      }
-      refreshWikiCache(focusNote, viewer);
-
-      FocusContextResult result = service.retrieve(focusNote, viewer, RetrievalConfig.depth1());
-
-      assertThat(result.getRelatedNotes().size(), lessThan(titles.size()));
-    }
-  }
-
-  @Nested
   class BreadthFirstDepth2 {
     @Test
     void outgoingChainReachesDepthTwoLeaf() {
