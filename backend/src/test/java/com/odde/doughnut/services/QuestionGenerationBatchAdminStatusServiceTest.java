@@ -8,6 +8,8 @@ import static org.mockito.Mockito.when;
 import com.odde.doughnut.controllers.dto.QuestionGenerationBatchAdminStatusDTO;
 import com.odde.doughnut.entities.QuestionGenerationBatchMaintenanceRun;
 import com.odde.doughnut.entities.QuestionGenerationBatchMaintenanceTriggerSource;
+import com.odde.doughnut.entities.QuestionGenerationBatchRequestStatus;
+import com.odde.doughnut.entities.QuestionGenerationBatchStatus;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import java.sql.Timestamp;
@@ -35,6 +37,25 @@ class QuestionGenerationBatchAdminStatusServiceTest {
     maintenanceRunService = mock(QuestionGenerationBatchMaintenanceRunService.class);
     when(batchRepository.countByStatus()).thenReturn(List.of());
     when(requestRepository.countByStatus()).thenReturn(List.of());
+  }
+
+  @Test
+  void reportsBatchAndRequestCountsFromRepositories() {
+    when(batchRepository.countByStatus())
+        .thenReturn(
+            List.<Object[]>of(
+                new Object[] {QuestionGenerationBatchStatus.PLANNED, 1L},
+                new Object[] {QuestionGenerationBatchStatus.FAILED, 1L}));
+    when(requestRepository.countByStatus())
+        .thenReturn(
+            List.<Object[]>of(new Object[] {QuestionGenerationBatchRequestStatus.PENDING, 1L}));
+
+    QuestionGenerationBatchAdminStatusDTO status =
+        statusServiceWithTaskHolders(List.of()).getStatus();
+
+    assertThat(status.getBatchCountsByStatus().get("PLANNED"), equalTo(1L));
+    assertThat(status.getBatchCountsByStatus().get("FAILED"), equalTo(1L));
+    assertThat(status.getRequestCountsByStatus().get("PENDING"), equalTo(1L));
   }
 
   @Test

@@ -16,14 +16,19 @@ import com.google.cloud.storage.Storage;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+@ExtendWith(MockitoExtension.class)
 class GcsBookStorageTest {
+
+  @Mock Storage storage;
 
   @ParameterizedTest
   @CsvSource({
@@ -32,7 +37,6 @@ class GcsBookStorageTest {
   })
   void put_uploadsWithExpectedExtensionAndContentType(
       String format, String extension, String contentType) {
-    Storage storage = mock(Storage.class);
     GcsBookStorage cut = new GcsBookStorage(storage, "my-bucket", "pre");
 
     byte[] data = format.getBytes(StandardCharsets.UTF_8);
@@ -53,7 +57,6 @@ class GcsBookStorageTest {
   @MethodSource("getBlobPresenceCases")
   void get_returnsBytesOrEmptyWhenBlobPresentOrMissing(
       String prefix, String ref, boolean blobExists) {
-    Storage storage = mock(Storage.class);
     GcsBookStorage cut = new GcsBookStorage(storage, "b", prefix);
     if (blobExists) {
       Blob blob = mock(Blob.class);
@@ -73,22 +76,14 @@ class GcsBookStorageTest {
 
   @ParameterizedTest
   @CsvSource({
-    "safe/../evil",
-    "/safe/x",
-    "safe\\x",
+    "safe/../evil, safe/",
+    "/safe/x, safe/",
+    "safe\\x, safe/",
+    "other/key.pdf, expected/",
   })
-  void get_emptyWhenInvalidRef(String ref) {
-    Storage storage = mock(Storage.class);
-    GcsBookStorage cut = new GcsBookStorage(storage, "b", "safe/");
+  void get_emptyWhenInvalidRefOrWrongPrefix(String ref, String prefix) {
+    GcsBookStorage cut = new GcsBookStorage(storage, "b", prefix);
     assertTrue(cut.get(ref).isEmpty());
-    verifyNoInteractions(storage);
-  }
-
-  @Test
-  void get_emptyWhenWrongPrefix() {
-    Storage storage = mock(Storage.class);
-    GcsBookStorage cut = new GcsBookStorage(storage, "b", "expected/");
-    assertTrue(cut.get("other/key.pdf").isEmpty());
     verifyNoInteractions(storage);
   }
 
@@ -98,7 +93,6 @@ class GcsBookStorageTest {
     "safe/, safe/../evil, false",
   })
   void delete_respectsRefPrefix(String prefix, String ref, boolean callsStorage) {
-    Storage storage = mock(Storage.class);
     GcsBookStorage cut = new GcsBookStorage(storage, "b", prefix);
     cut.delete(ref);
     if (callsStorage) {

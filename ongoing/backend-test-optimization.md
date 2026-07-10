@@ -303,19 +303,19 @@ CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles
 ---
 
 ### Phase 7: Optimize batch ranks 19–21
-Status: planned
+Status: done
 
-**Tests:**
-- `backend/src/test/java/com/odde/doughnut/controllers/AdminQuestionGenerationBatchControllerTest.java` — "adminGetsCountsReflectingSeededBatchesAndRequests()" (~77ms)
-- `backend/src/test/java/com/odde/doughnut/services/book/GcsBookStorageTest.java` — "get_returnsBytesWhenBlobExists()" (~76ms)
-- `backend/src/test/java/com/odde/doughnut/controllers/AiControllerExportExtractRequestTest.java` — "shouldExportExtractRequestWithBodyMapReflectingSelection()" (~71ms)
+**Tests (baseline → after):**
+- `AdminQuestionGenerationBatchControllerTest.adminGetsCountsReflectingSeededBatchesAndRequests()` (~77ms) → **deleted**; count mapping moved to mock-only `QuestionGenerationBatchAdminStatusServiceTest.reportsBatchAndRequestCountsFromRepositories()` (~&lt;5ms)
+- `GcsBookStorageTest.get_returnsBytesWhenBlobExists()` (~76ms) → already parameterized in Phase 5; merged `get_emptyWhenWrongPrefix` into `get_emptyWhenInvalidRefOrWrongPrefix`; `@ExtendWith(MockitoExtension.class)` with shared `@Mock Storage`
+- `AiControllerExportExtractRequestTest.shouldExportExtractRequestWithBodyMapReflectingSelection()` (~71ms) → **deleted** separate `@SpringBootTest` class; body-map assertions in mock-only `AiNoteAutomationServiceExtractRequestTest.buildExtractNoteRequestBodyReflectsSelectedLayoutItems()` (~&lt;5ms)
 
-**Goals:** Speed up only these tests (merge/delete redundant cases, slim `makeMe`/fixtures, parameterize duplicates, avoid full-stack when a narrower entry suffices). If no meaningful win after a serious attempt, append **Candidates** in the blacklist and mark done.
+**Learnings:** Admin batch counts and extract-request export are service/serializer behavior; planning-service seeding and full controller context added cost without extra coverage beyond mock-only tests.
 
 **Verify:**
 
 ```bash
-CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles.active=test --tests "com.odde.doughnut.controllers.AdminQuestionGenerationBatchControllerTest" --tests "com.odde.doughnut.services.book.GcsBookStorageTest" --tests "com.odde.doughnut.controllers.AiControllerExportExtractRequestTest"
+CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles.active=test --tests "com.odde.doughnut.controllers.AdminQuestionGenerationBatchControllerTest" --tests "com.odde.doughnut.services.book.GcsBookStorageTest" --tests "com.odde.doughnut.services.ai.AiNoteAutomationServiceExtractRequestTest" --tests "com.odde.doughnut.services.QuestionGenerationBatchAdminStatusServiceTest"
 ```
 
 ---
