@@ -12,11 +12,17 @@ import usePopups from "@/components/commons/Popups/usePopups"
 import {
   createFolderPageRouter,
   dissolveWithInitialConfirm,
+  folderNameConflictMessage,
+  mountCrossNotebookFolderMovePage,
+  mountCrossNotebookRootMovePage,
   mountFolderPage,
+  mountFolderPageReady,
   resolveTopConfirm,
+  selectCrossNotebookDestination,
   selectDestinationNotebook,
-  selectDestinationParentFolder,
   setRenameName,
+  softDeletedTitleConflictMessage,
+  stubRouterPush,
   submitMoveForm,
   submitRenameForm,
 } from "@tests/pages/folderPageTestSupport"
@@ -40,25 +46,30 @@ describe("FolderPage", () => {
         case: "409 with FOLDER_NAME_CONFLICT",
         error: {
           status: 409,
-          message: "A folder with this name already exists here.",
+          message: folderNameConflictMessage,
           errorType: "FOLDER_NAME_CONFLICT",
         },
       },
       {
         case: "typed signal without status",
         error: {
-          message: "A folder with this name already exists here.",
+          message: folderNameConflictMessage,
           errorType: "FOLDER_NAME_CONFLICT",
         },
       },
-    ] as const)("shows merge confirm when move returns $case and retries with merge flag", async ({
+    ] as const)("shows merge confirm when move returns $case, retries with merge, and navigates", async ({
       error,
     }) => {
       const { wrapper, folderRealm } = mountFolderPage(router, 10, "Dup")
+      const targetFolder = makeMe.aFolder
+        .folder(99, folderRealm.folder.name)
+        .please()
 
       const moveSpy = vi
         .spyOn(NotebookController, "moveFolder")
         .mockResolvedValue(wrapSdkError(error))
+
+      const pushSpy = stubRouterPush(router)
 
       await submitMoveForm(wrapper)
 
@@ -66,9 +77,7 @@ describe("FolderPage", () => {
       expect(popup?.type).toBe("confirm")
       expect(popup?.message).toContain("Merge into it?")
 
-      moveSpy.mockResolvedValueOnce(
-        wrapSdkResponse(folderRealm.folder) as never
-      )
+      moveSpy.mockResolvedValueOnce(wrapSdkResponse(targetFolder) as never)
       resolveTopConfirm(true)
       await flushPromises()
 
@@ -78,6 +87,13 @@ describe("FolderPage", () => {
           body: expect.objectContaining({ merge: true }),
         })
       )
+      expect(pushSpy).toHaveBeenCalledWith({
+        name: "folderPage",
+        params: {
+          notebookId: String(folderRealm.notebookRealm.notebook.id),
+          folderId: String(targetFolder.id),
+        },
+      })
 
       wrapper.unmount()
     })
@@ -88,7 +104,7 @@ describe("FolderPage", () => {
       vi.spyOn(NotebookController, "moveFolder").mockResolvedValue(
         wrapSdkError({
           status: 409,
-          message: "A folder with this name already exists here.",
+          message: folderNameConflictMessage,
           errorType: "FOLDER_NAME_CONFLICT",
         })
       )
@@ -97,9 +113,7 @@ describe("FolderPage", () => {
       resolveTopConfirm(false)
       await flushPromises()
 
-      expect(wrapper.text()).toContain(
-        "A folder with this name already exists here."
-      )
+      expect(wrapper.text()).toContain(folderNameConflictMessage)
       wrapper.unmount()
     })
 
@@ -151,48 +165,14 @@ describe("FolderPage", () => {
       wrapper.unmount()
     })
 
-    it("navigates to the destination folder after a confirmed merge move", async () => {
-      const { wrapper, folderRealm } = mountFolderPage(router, 10, "Shared")
-      const targetFolder = makeMe.aFolder.folder(99, "Shared").please()
-
-      vi.spyOn(NotebookController, "moveFolder")
-        .mockResolvedValueOnce(
-          wrapSdkError({
-            message: "A folder with this name already exists here.",
-            errorType: "FOLDER_NAME_CONFLICT",
-          })
-        )
-        .mockResolvedValueOnce(wrapSdkResponse(targetFolder) as never)
-
-      const pushSpy = vi
-        .spyOn(router, "push")
-        .mockResolvedValue(undefined as never)
-
-      await submitMoveForm(wrapper)
-      resolveTopConfirm(true)
-      await flushPromises()
-
-      expect(pushSpy).toHaveBeenCalledWith({
-        name: "folderPage",
-        params: {
-          notebookId: String(folderRealm.notebookRealm.notebook.id),
-          folderId: String(targetFolder.id),
-        },
-      })
-
-      wrapper.unmount()
-    })
-
-    it("sends destinationNotebookId when moving to another notebook root", async () => {
-      const destinationNotebook = makeMe.aNotebook.please()
-      const { wrapper, folderRealm } = mountFolderPage(router, 10, "Moved", {
-        extraNotebooks: [destinationNotebook],
-      })
-      await flushPromises()
+    it("sends destinationNotebookId and navigates after cross-notebook root move", async () => {
+      const { wrapper, folderRealm, destinationNotebook } =
+        await mountCrossNotebookRootMovePage(router, 10, "Moved")
 
       const moveSpy = vi
         .spyOn(NotebookController, "moveFolder")
         .mockResolvedValue(wrapSdkResponse(folderRealm.folder) as never)
+      const pushSpy = stubRouterPush(router)
 
       await selectDestinationNotebook(wrapper, destinationNotebook.id)
       await submitMoveForm(wrapper)
@@ -209,28 +189,6 @@ describe("FolderPage", () => {
           },
         })
       )
-
-      wrapper.unmount()
-    })
-
-    it("navigates to the moved folder in the destination notebook after a cross-notebook root move", async () => {
-      const destinationNotebook = makeMe.aNotebook.please()
-      const { wrapper, folderRealm } = mountFolderPage(router, 10, "Moved", {
-        extraNotebooks: [destinationNotebook],
-      })
-      await flushPromises()
-
-      vi.spyOn(NotebookController, "moveFolder").mockResolvedValue(
-        wrapSdkResponse(folderRealm.folder) as never
-      )
-
-      const pushSpy = vi
-        .spyOn(router, "push")
-        .mockResolvedValue(undefined as never)
-
-      await selectDestinationNotebook(wrapper, destinationNotebook.id)
-      await submitMoveForm(wrapper)
-
       expect(pushSpy).toHaveBeenCalledWith({
         name: "folderPage",
         params: {
@@ -243,25 +201,18 @@ describe("FolderPage", () => {
     })
 
     it("sends destinationNotebookId and newParentFolderId for cross-notebook folder move", async () => {
-      const destinationNotebook = makeMe.aNotebook.please()
-      const destParent = testFolderStub(50, "DestParent")
-
-      const { wrapper, folderRealm } = mountFolderPage(router, 10, "Moved", {
-        extraNotebooks: [destinationNotebook],
-      })
-      await flushPromises()
-
-      mockSdkService(NotebookController, "listNotebookFolderListing", {
-        folders: [destParent],
-      })
+      const { wrapper, folderRealm, destinationNotebook, destParent } =
+        await mountCrossNotebookFolderMovePage(router, 10, "Moved")
 
       const moveSpy = vi
         .spyOn(NotebookController, "moveFolder")
         .mockResolvedValue(wrapSdkResponse(folderRealm.folder) as never)
 
-      await selectDestinationNotebook(wrapper, destinationNotebook.id)
-      await flushPromises()
-      await selectDestinationParentFolder(wrapper, destParent.id)
+      await selectCrossNotebookDestination(
+        wrapper,
+        destinationNotebook.id,
+        destParent.id
+      )
       await submitMoveForm(wrapper)
 
       expect(moveSpy).toHaveBeenCalledWith(
@@ -282,37 +233,27 @@ describe("FolderPage", () => {
     })
 
     it("retries cross-notebook folder move with merge after 409 conflict", async () => {
-      const destinationNotebook = makeMe.aNotebook.please()
-      const destParent = testFolderStub(50, "DestParent")
+      const { wrapper, destinationNotebook, destParent } =
+        await mountCrossNotebookFolderMovePage(router, 10, "Dup")
       const targetFolder = makeMe.aFolder.folder(99, "Dup").please()
-
-      const { wrapper } = mountFolderPage(router, 10, "Dup", {
-        extraNotebooks: [destinationNotebook],
-      })
-      await flushPromises()
-
-      mockSdkService(NotebookController, "listNotebookFolderListing", {
-        folders: [destParent],
-      })
 
       const moveSpy = vi
         .spyOn(NotebookController, "moveFolder")
         .mockResolvedValueOnce(
           wrapSdkError({
             status: 409,
-            message: "A folder with this name already exists here.",
+            message: folderNameConflictMessage,
             errorType: "FOLDER_NAME_CONFLICT",
           })
         )
         .mockResolvedValueOnce(wrapSdkResponse(targetFolder) as never)
+      const pushSpy = stubRouterPush(router)
 
-      const pushSpy = vi
-        .spyOn(router, "push")
-        .mockResolvedValue(undefined as never)
-
-      await selectDestinationNotebook(wrapper, destinationNotebook.id)
-      await flushPromises()
-      await selectDestinationParentFolder(wrapper, destParent.id)
+      await selectCrossNotebookDestination(
+        wrapper,
+        destinationNotebook.id,
+        destParent.id
+      )
       await submitMoveForm(wrapper)
       resolveTopConfirm(true)
       await flushPromises()
@@ -341,20 +282,18 @@ describe("FolderPage", () => {
     it("shows inline error without merge prompt when move returns soft-deleted title conflict", async () => {
       const { wrapper } = mountFolderPage(router, 10, "Dup")
 
-      const conflictMessage =
-        "A note with this title already exists here but was deleted. Restore the deleted note (Undo delete), or choose another title."
       vi.spyOn(NotebookController, "moveFolder").mockResolvedValue(
         wrapSdkError({
           status: 409,
           errorType: "SOFT_DELETED_TITLE_CONFLICT",
-          message: conflictMessage,
+          message: softDeletedTitleConflictMessage,
         })
       )
 
       await submitMoveForm(wrapper)
 
       expect(usePopups().popups.peek()).toHaveLength(0)
-      expect(wrapper.text()).toContain(conflictMessage)
+      expect(wrapper.text()).toContain(softDeletedTitleConflictMessage)
 
       wrapper.unmount()
     })
@@ -362,16 +301,14 @@ describe("FolderPage", () => {
 
   describe("rename", () => {
     it("shows inline conflict error when rename returns 409 FOLDER_NAME_CONFLICT", async () => {
-      const { wrapper } = mountFolderPage(router, 10, "Original")
-      await flushPromises()
+      const { wrapper } = await mountFolderPageReady(router, 10, "Original")
 
-      const conflictMessage = "A folder with this name already exists here."
       const renameSpy = vi
         .spyOn(NotebookController, "renameFolder")
         .mockResolvedValue(
           wrapSdkError({
             status: 409,
-            message: conflictMessage,
+            message: folderNameConflictMessage,
             errorType: "FOLDER_NAME_CONFLICT",
           })
         )
@@ -380,7 +317,7 @@ describe("FolderPage", () => {
       await submitRenameForm(wrapper)
 
       expect(renameSpy).toHaveBeenCalled()
-      expect(wrapper.text()).toContain(conflictMessage)
+      expect(wrapper.text()).toContain(folderNameConflictMessage)
       expect(usePopups().popups.peek()).toHaveLength(0)
 
       wrapper.unmount()
@@ -423,19 +360,17 @@ describe("FolderPage", () => {
     it("shows inline error when dissolve returns soft-deleted title conflict", async () => {
       const { wrapper } = mountFolderPage(router, 20, "Mid")
 
-      const conflictMessage =
-        "A note with this title already exists here but was deleted. Restore the deleted note (Undo delete), or choose another title."
       vi.spyOn(NotebookController, "dissolveFolder").mockResolvedValue(
         wrapSdkError({
           status: 409,
           errorType: "SOFT_DELETED_TITLE_CONFLICT",
-          message: conflictMessage,
+          message: softDeletedTitleConflictMessage,
         })
       )
 
       await dissolveWithInitialConfirm(wrapper)
 
-      expect(wrapper.text()).toContain(conflictMessage)
+      expect(wrapper.text()).toContain(softDeletedTitleConflictMessage)
 
       wrapper.unmount()
     })

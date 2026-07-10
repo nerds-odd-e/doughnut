@@ -359,9 +359,11 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/links/SearchDialog.spec.
 ---
 
 ### Phase 5: pages/FolderPage
-Status: planned
+Status: done
 
-**Tests:** (7 in top 10%, ~148ms combined)
+**Learnings:** Hoisted cross-notebook mount/select helpers into `folderPageTestSupport.ts`, merged cross-notebook root move API + navigation cases, folded same-notebook merge navigation into the `it.each` conflict-retry cases. Suite CPU ~234ms → ~192ms (13 → 11 tests).
+
+**Tests:** (7 in top 10%, ~148ms combined — pre-optimization baseline)
 - `tests/pages/FolderPage.spec.ts` — "retries cross-notebook folder move with merge after 409 conflict" (~33ms)
 - `tests/pages/FolderPage.spec.ts` — "sends destinationNotebookId and newParentFolderId for cross-notebook folder move" (~28ms)
 - `tests/pages/FolderPage.spec.ts` — "navigates to the moved folder in the destination notebook after a cross-notebook root move" (~18ms)
