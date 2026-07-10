@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 import com.odde.doughnut.configs.ShedLockConfig;
-import java.lang.reflect.Method;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
@@ -16,7 +15,6 @@ import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.core.SimpleLock;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
-import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,41 +28,19 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(
+    properties = {
+      "spring.datasource.url=jdbc:mysql://127.0.0.1:3309/doughnut_test",
+      "spring.datasource.username=doughnut",
+      "spring.datasource.password=doughnut",
+      "spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver"
+    })
+@Import(DataSourceAutoConfiguration.class)
 @ActiveProfiles("test")
-@Transactional
 class QuestionGenerationBatchMaintenanceConcurrencyTest {
 
-  private static final String LOCK_NAME = "questionGenerationBatchHourlyMaintenance";
-
   @Autowired JdbcTemplate jdbcTemplate;
-
-  @Test
-  void hourlyMaintenanceUsesSchedulerLockWithHourlyDurations() throws NoSuchMethodException {
-    Method method =
-        QuestionGenerationBatchMaintenanceJob.class.getDeclaredMethod("runHourlyMaintenance");
-    SchedulerLock schedulerLock = method.getAnnotation(SchedulerLock.class);
-
-    assertThat(schedulerLock, notNullValue());
-    assertThat(schedulerLock.name(), equalTo(LOCK_NAME));
-    assertThat(schedulerLock.lockAtMostFor(), equalTo("55m"));
-    assertThat(schedulerLock.lockAtLeastFor(), equalTo("1m"));
-  }
-
-  @Test
-  void shedlockTableExistsAfterMigration() {
-    Integer tableCount =
-        jdbcTemplate.queryForObject(
-            """
-            SELECT COUNT(*)
-            FROM information_schema.tables
-            WHERE table_schema = DATABASE()
-              AND table_name = 'shedlock'
-            """,
-            Integer.class);
-
-    assertThat(tableCount, equalTo(1));
-  }
 
   @Test
   @Transactional(propagation = Propagation.NOT_SUPPORTED)

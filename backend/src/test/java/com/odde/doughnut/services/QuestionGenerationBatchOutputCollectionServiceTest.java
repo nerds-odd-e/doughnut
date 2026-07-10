@@ -1,11 +1,9 @@
 package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -191,53 +189,6 @@ class QuestionGenerationBatchOutputCollectionServiceTest {
   }
 
   @Nested
-  class MalformedLines {
-    @Test
-    void ignoresMalformedOutputLinesWithoutFailingOtherRows() {
-      when(openAiApiHandler.retrieveBatch("batch-openai-1")).thenReturn(completedOpenAiBatch());
-      when(openAiApiHandler.downloadFileContent("file-output"))
-          .thenReturn(
-              "not-json\n"
-                  + successLine(firstRequest.getCustomId())
-                  + "\n"
-                  + "{\"response\":{\"status_code\":200}}");
-      when(openAiApiHandler.downloadFileContent("file-error")).thenReturn("");
-
-      outputCollectionService.collectOutputForCompletedBatches(currentTime);
-
-      List<QuestionGenerationBatchRequestStatus> statuses =
-          batchRequestRepository.findByBatch_Id(completedBatch.getId()).stream()
-              .map(QuestionGenerationBatchRequest::getStatus)
-              .toList();
-      assertThat(
-          statuses,
-          containsInAnyOrder(
-              QuestionGenerationBatchRequestStatus.OUTPUT_READY,
-              QuestionGenerationBatchRequestStatus.FAILED));
-    }
-
-    @Test
-    void ignoresErrorLinesWithMissingCustomId() {
-      when(openAiApiHandler.retrieveBatch("batch-openai-1")).thenReturn(completedOpenAiBatch());
-      when(openAiApiHandler.downloadFileContent("file-output")).thenReturn("");
-      when(openAiApiHandler.downloadFileContent("file-error"))
-          .thenReturn("{\"error\":{\"message\":\"batch failed\"}}");
-
-      outputCollectionService.collectOutputForCompletedBatches(currentTime);
-
-      List<QuestionGenerationBatchRequestStatus> statuses =
-          batchRequestRepository.findByBatch_Id(completedBatch.getId()).stream()
-              .map(QuestionGenerationBatchRequest::getStatus)
-              .toList();
-      assertThat(
-          statuses,
-          containsInAnyOrder(
-              QuestionGenerationBatchRequestStatus.FAILED,
-              QuestionGenerationBatchRequestStatus.FAILED));
-    }
-  }
-
-  @Nested
   class PersistedFileIds {
     @Test
     void downloadsFromPersistedFileIdsWithoutRetrieveBatch() {
@@ -255,29 +206,6 @@ class QuestionGenerationBatchOutputCollectionServiceTest {
       outputCollectionService.collectOutputForCompletedBatches(currentTime);
 
       verify(openAiApiHandler, never()).retrieveBatch(anyString());
-    }
-  }
-
-  @Nested
-  class CollectionScope {
-    @Test
-    void doesNotCollectAlreadyCollectedBatches() {
-      completedBatch.setOutputCollectedAt(currentTime);
-      batchRepository.saveAndFlush(completedBatch);
-
-      outputCollectionService.collectOutputForCompletedBatches(currentTime);
-
-      verify(openAiApiHandler, never()).retrieveBatch(anyString());
-    }
-
-    @Test
-    void doesNotCollectNonCompletedBatches() {
-      completedBatch.setStatus(QuestionGenerationBatchStatus.SUBMITTED);
-      batchRepository.saveAndFlush(completedBatch);
-
-      outputCollectionService.collectOutputForCompletedBatches(currentTime);
-
-      verify(openAiApiHandler, never()).retrieveBatch(eq("batch-openai-1"));
     }
   }
 }

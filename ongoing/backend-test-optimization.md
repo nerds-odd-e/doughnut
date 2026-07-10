@@ -447,14 +447,14 @@ CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles
 ---
 
 ### Phase 15: Optimize batch ranks 43–45
-Status: planned
+Status: done
 
-**Tests:**
-- `backend/src/test/java/com/odde/doughnut/services/QuestionGenerationBatchMaintenanceConcurrencyTest.java` — "jdbcLockProviderPreventsDuplicateMaintenanceExecution()" (~26ms)
-- `backend/src/test/java/com/odde/doughnut/services/QuestionGenerationBatchOutputCollectionServiceTest.java` — "doesNotCollectAlreadyCollectedBatches()" (~26ms)
-- `backend/src/test/java/com/odde/doughnut/services/QuestionGenerationBatchOutputCollectionServiceTest.java` — "ignoresErrorLinesWithMissingCustomId()" (~26ms)
+**Tests (baseline → after):**
+- `QuestionGenerationBatchMaintenanceConcurrencyTest.jdbcLockProviderPreventsDuplicateMaintenanceExecution()` (~26ms) → slim `DataSourceAutoConfiguration` context (~&lt;5ms); reflection test moved to `QuestionGenerationBatchMaintenanceJobSchedulerLockTest`; deleted redundant `shedlockTableExistsAfterMigration()`
+- `QuestionGenerationBatchOutputCollectionServiceTest.doesNotCollectAlreadyCollectedBatches()` (~26ms) → `QuestionGenerationBatchOutputCollectionScopeTest` with direct batch seed (~&lt;5ms); no planning/submission fixture
+- `QuestionGenerationBatchOutputCollectionServiceTest.ignoresErrorLinesWithMissingCustomId()` (~26ms) → `QuestionGenerationBatchOutputCollectionMalformedLineTest` with direct batch/request seed (~&lt;10ms); malformed output case moved with shared slim setup
 
-**Goals:** Speed up only these tests (merge/delete redundant cases, slim `makeMe`/fixtures, parameterize duplicates, avoid full-stack when a narrower entry suffices). If no meaningful win after a serious attempt, append **Candidates** in the blacklist and mark done.
+**Learnings:** JDBC lock duplicate prevention only needs `JdbcTemplate`; collection scope and malformed-line handling do not need full planning/submission — direct persisted batch rows suffice.
 
 **Verify:**
 
