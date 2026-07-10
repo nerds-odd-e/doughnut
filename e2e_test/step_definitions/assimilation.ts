@@ -51,6 +51,20 @@ Given(
   }
 )
 
+Given(
+  'the note {string} has assimilated property {string}',
+  (noteTitle: string, propertyKey: string) => {
+    start.testability().assimilateNoteProperty(noteTitle, propertyKey)
+  }
+)
+
+Given(
+  'I am viewing assimilation settings for note {string}',
+  (noteTitle: string) => {
+    start.jumpToNotePage(noteTitle).moreOptions().openAssimilationSettings()
+  }
+)
+
 When('I am assimilating the note {string}', (noteTitle: string) => {
   start.jumpToNotePage(noteTitle).moreOptions().openAssimilationSettings()
 })
@@ -178,6 +192,13 @@ When('I jump to the note page of {string}', (noteTitle: string) => {
 
 When('I open assimilation settings from more options', () => {
   start.assumeNotePage().moreOptions().openAssimilationSettings()
+})
+
+When('I reopen assimilation settings from more options', () => {
+  start
+    .assumeNotePage()
+    .moreOptions()
+    .reopenAssimilationSettingsWaitingForRecallInfo()
 })
 
 When('I assimilate on the assimilation panel', () => {

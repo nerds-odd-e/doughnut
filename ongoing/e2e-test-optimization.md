@@ -113,23 +113,16 @@ Status: **done** (2026-07-10)
 ---
 
 ### Phase 5: Property remove, browse notes, circle notebook note
-Status: planned
+Status: **done** (2026-07-10)
 
-**Tests:**
-- `e2e_test/features/recall/property_memory_tracker.feature` — "Removing tracked property deletes property memory tracker" (~3802ms)
-- `e2e_test/features/recall/browse_answer_and_notes_while_recalling.feature` — "Browse notes while recalling and come back" (~3750ms)
-- `e2e_test/features/circles/notebooks_in_circles.feature` — "Creating note that belongs to the circle" (~3703ms)
+**Results:**
+- Property remove: Background property assimilate via API (`assimilateNoteProperty`); per-scenario `I am viewing assimilation settings for note`; reopen settings with `note-info` intercept instead of full reload (~3802ms → ~1824ms).
+- Browse while recalling: `visitRecallPageAndWaitForQuestion` (no reload); direct `visit note "medical"` instead of notebooks list (~3750ms → ~2936ms).
+- Circle note: `jumpToNotePage` for add-note step instead of circle catalog navigation (~3703ms → ~2947ms).
 
-**Goals:**
-- Property remove: API/testability for tracked property; fewer assimilation UI steps (Background already heavy — slim if scenarios allow).
-- Browse while recalling: direct note route; intercept; drop extra reloads.
-- Circle note: API circle+notebook; create via shortest UI or inject.
+**Learnings:** Assimilation settings keep stale tracker rows after property removal until `note-info` refetch — toggle close/reopen with intercept beats `cy.reload()`; API property assimilate is safe when UI assimilate flow is not under test.
 
-**Verify:**
-
-```bash
-CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/recall/property_memory_tracker.feature,e2e_test/features/recall/browse_answer_and_notes_while_recalling.feature,e2e_test/features/circles/notebooks_in_circles.feature
-```
+**Verify:** 3 consecutive green runs on the three specs.
 
 ---
 
@@ -205,6 +198,6 @@ Re-run: `CURSOR_DEV=true nix develop -c pnpm cy:run-on-sut --reporter json` (tee
 
 **Candidates proposed this run:** real OpenAI audio (`record_live_audio_with_real_open_ai_service.feature`) — see blacklist
 
-**Commits:** phase 1 `6063698e4a`; phase 2 `f18e67daa4`; phase 3 `39b9fc9e9e`; phase 4 `9e25332256`
+**Commits:** phase 1 `6063698e4a`; phase 2 `f18e67daa4`; phase 3 `39b9fc9e9e`; phase 4 `9e25332256`; phase 5 (pending push)
 
 Archive summary to `ongoing/archive/e2e-test-optimization-history.md`, delete this working plan, keep blacklist. Do not commit profile JSON.

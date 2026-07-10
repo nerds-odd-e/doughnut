@@ -442,6 +442,17 @@ const testability = () => {
       })
     },
 
+    assimilateNoteProperty(noteTitle: string, propertyKey: string) {
+      return this.getInjectedNoteIdByTitle(noteTitle).then((noteId) => {
+        return cy.wrap(
+          AssimilationController.assimilate({
+            body: { noteId, propertyKey },
+          }),
+          { log: false }
+        )
+      })
+    },
+
     dueRecallPrompt() {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
       return cy

@@ -88,6 +88,17 @@ const noteMoreOptionsPage = () => {
       pageIsNotLoading()
       return assumeAssimilationPage().waitForAssimilationReady()
     },
+    reopenAssimilationSettingsWaitingForRecallInfo() {
+      cy.intercept('GET', '**/api/notes/**/note-info**').as('noteRecallInfo')
+      makeSureNoteMoreOptionsFormIsOpen()
+      assimilationSettingsButton().scrollIntoView().click()
+      cy.get(assimilateButtonSelector).should('not.exist')
+      assimilationSettingsButton().scrollIntoView().click()
+      cy.wait('@noteRecallInfo', { timeout: 15000 })
+      assimilateButton({ timeout: 15000 }).should('be.visible')
+      pageIsNotLoading()
+      return assumeAssimilationPage().waitForAssimilationReady()
+    },
     assimilateNote() {
       this.openAssimilationSettings().clickAssimilate()
       pageIsNotLoading()

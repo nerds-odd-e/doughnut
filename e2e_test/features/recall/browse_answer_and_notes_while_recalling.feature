@@ -23,10 +23,10 @@ Feature: Browse answers and notes while recalling
 
   Scenario: Browse notes while recalling and come back
     Given I assimilate the note "sedition" with the option of remembering spelling
-    And I am recalling my note on day 2
+    When I visit recall for a due quiz question on day 2
     And I type my answer "riot"
     And I should see that my spelling answer "riot" is incorrect
-    When I visit all my notebooks
+    When I visit note "medical"
     Then I should see the resume recall menu item
     And I click resume recall from the menu
     Then I should be back to the current question
