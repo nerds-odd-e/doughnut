@@ -822,7 +822,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/recall/Quiz.spec.ts
 ---
 
 ### Phase 24: components/admin/FailureReportList
-Status: planned
+Status: done
+
+**Learnings:** Hoisted mount/mocks/selectors into `failureReportListTestSupport.ts`; replaced full `routes` router with minimal memory router; merged list+badge+id display, delete-button visibility (1 vs 2 selected via `it.each`), and open-modal into cancel case; folded trigger-button smoke into API call test. Suite wall ~74ms (12 → 9 tests).
 
 **Tests:** (2 in top 10%, ~33ms combined)
 - `tests/components/admin/FailureReportList.spec.ts` — "closes modal when cancel is clicked" (~17ms)
@@ -866,7 +868,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/NoteRe
 ---
 
 ### Phase 26: pages/NotebookPage
-Status: planned
+Status: done
+
+**Learnings:** Hoisted mount/mocks/selectors into `notebookPageTestSupport.ts`; replaced full `routes` import with minimal memory router; merged empty/existing index editor visibility cases with `it.each`; replaced `userEvent` paste/click with `RichMarkdownEditor` `$emit` and wrapper `trigger`. Suite wall ~47ms (4 tests).
 
 **Tests:** (1 in top 10%, ~24ms combined)
 - `tests/pages/NotebookPage.spec.ts` — "saves notebook index content directly to container on save" (~24ms)

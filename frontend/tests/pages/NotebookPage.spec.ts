@@ -23,19 +23,19 @@ describe("NotebookPage.spec", () => {
 
     const hideSidebar = hideSidebarButtonEl()
     if (hideSidebar != null) {
-      expect(wrapper.find('[data-testid="note-main-creation-toolbar"]').exists()).toBe(
-        false
-      )
+      expect(
+        wrapper.find('[data-testid="note-main-creation-toolbar"]').exists()
+      ).toBe(false)
       await hideSidebar.click()
       await wrapper.vm.$nextTick()
     }
 
-    expect(wrapper.find('[data-testid="note-main-creation-toolbar"]').exists()).toBe(
-      true
-    )
-    expect(wrapper.find('[data-testid="note-creation-new-button"]').exists()).toBe(
-      true
-    )
+    expect(
+      wrapper.find('[data-testid="note-main-creation-toolbar"]').exists()
+    ).toBe(true)
+    expect(
+      wrapper.find('[data-testid="note-creation-new-button"]').exists()
+    ).toBe(true)
     wrapper.unmount()
   })
 
@@ -45,17 +45,16 @@ describe("NotebookPage.spec", () => {
       label: "existing",
       indexContent: "# Existing notebook index",
     },
-  ])(
-    "shows index editor when notebook has $label indexContent",
-    async ({ indexContent }) => {
-      const notebook = makeMe.aNotebook.please()
-      const { wrapper } = await mountNotebookPageReady(notebook, { indexContent })
+  ])("shows index editor when notebook has $label indexContent", async ({
+    indexContent,
+  }) => {
+    const notebook = makeMe.aNotebook.please()
+    const { wrapper } = await mountNotebookPageReady(notebook, { indexContent })
 
-      expect(notebookIndexEditorEl(wrapper).exists()).toBe(true)
-      expect(notebookIndexSaveEl(wrapper).exists()).toBe(true)
-      wrapper.unmount()
-    }
-  )
+    expect(notebookIndexEditorEl(wrapper).exists()).toBe(true)
+    expect(notebookIndexSaveEl(wrapper).exists()).toBe(true)
+    wrapper.unmount()
+  })
 
   it("saves notebook index content directly to container on save", async () => {
     const notebook = makeMe.aNotebook.please()

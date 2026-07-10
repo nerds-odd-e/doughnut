@@ -1,115 +1,59 @@
-import {
-  MemoryTrackerController,
-  NoteController,
-  RecallPromptController,
-} from "@generated/doughnut-backend-api/sdk.gen"
-import Quiz from "@/components/recall/Quiz.vue"
-import { flushPromises, type VueWrapper } from "@vue/test-utils"
-import { beforeEach, describe, it, vi, afterEach, expect } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import helper, {
-  mockSdkService,
-  wrapSdkResponse,
+import { flushPromises } from "@vue/test-utils"
+import { describe, it, expect } from "vitest"
+import {
+  askAQuestionSpy,
+  contentLoaderVisible,
+  contestableDummyInput,
+  contestableQuestionVisible,
+  createDeferredGate,
+  getRecallPrompt,
+  justReviewVisible,
+  mockAnswerSpelling,
+  mockSpellingRecallServices,
+  mountQuizReady,
+  setupQuizTests,
+  spellingQuestionVisible,
+  submitSpellingAnswerFromQuiz,
   wrapSdkError,
-} from "@tests/helpers"
-import type {
-  AnsweredQuestion,
-  MemoryTrackerLite,
-} from "@generated/doughnut-backend-api"
+  wrapSdkResponse,
+} from "./quizTestSupport"
 
 describe("repeat page", () => {
-  const recallPrompt = makeMe.aRecallQuestion.please()
-  let askAQuestionSpy: ReturnType<typeof mockSdkService>
-  let wrapper: VueWrapper
-
-  beforeEach(() => {
-    vi.resetAllMocks()
-    vi.useFakeTimers()
-    mockSdkService(NoteController, "showNote", makeMe.aNoteRealm.please())
-    mockSdkService(
-      MemoryTrackerController,
-      "showMemoryTracker",
-      makeMe.aMemoryTracker.please()
-    )
-    askAQuestionSpy = mockSdkService(
-      MemoryTrackerController,
-      "askAQuestion",
-      recallPrompt
-    )
-  })
-
-  afterEach(() => {
-    wrapper?.unmount()
-    document.body.innerHTML = ""
-    vi.useRealTimers()
-  })
-
-  const createMemoryTrackerLite = (
-    id: number,
-    spelling = false
-  ): MemoryTrackerLite => ({
-    memoryTrackerId: id,
-    spelling,
-  })
-
-  const mountPage = async (
-    memoryTrackerIds: number[],
-    eagerFetchCount: number,
-    spelling = false
-  ) => {
-    const memoryTrackers = memoryTrackerIds.map((id) =>
-      createMemoryTrackerLite(id, spelling)
-    )
-    wrapper = helper
-      .component(Quiz)
-      .withRouter()
-      .withCleanStorage()
-      .withProps({
-        memoryTrackers,
-        currentIndex: 0,
-        eagerFetchCount,
-      })
-      .mount({ attachTo: document.body })
-    await flushPromises()
-    return wrapper
-  }
+  setupQuizTests()
 
   describe('repeat page with "just review" quiz', () => {
-    it("fetch the first 1 question when mount", async () => {
-      await mountPage([1, 2, 3], 1)
-      expect(askAQuestionSpy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          path: { memoryTracker: 1 },
-        })
-      )
-    })
-
-    it("fetch the first 3 question when mount", async () => {
-      await mountPage([111, 222, 333, 444], 3)
-      expect(askAQuestionSpy).nthCalledWith(
-        1,
-        expect.objectContaining({
-          path: { memoryTracker: 111 },
-        })
-      )
-      expect(askAQuestionSpy).nthCalledWith(
-        2,
-        expect.objectContaining({
-          path: { memoryTracker: 222 },
-        })
-      )
-      expect(askAQuestionSpy).nthCalledWith(
-        3,
-        expect.objectContaining({
-          path: { memoryTracker: 333 },
-        })
-      )
+    it.each([
+      {
+        memoryTrackerIds: [1, 2, 3],
+        eagerFetchCount: 1,
+        expectedTrackerIds: [1],
+      },
+      {
+        memoryTrackerIds: [111, 222, 333, 444],
+        eagerFetchCount: 3,
+        expectedTrackerIds: [111, 222, 333],
+      },
+    ])("prefetches $eagerFetchCount question(s) on mount", async ({
+      memoryTrackerIds,
+      eagerFetchCount,
+      expectedTrackerIds,
+    }) => {
+      await mountQuizReady(memoryTrackerIds, eagerFetchCount)
+      for (const [index, memoryTrackerId] of expectedTrackerIds.entries()) {
+        expect(askAQuestionSpy).toHaveBeenNthCalledWith(
+          index + 1,
+          expect.objectContaining({
+            path: { memoryTracker: memoryTrackerId },
+          })
+        )
+      }
     })
 
     it("does not fetch question 2 again after prefetched", async () => {
-      const wrapper = await mountPage([1, 2, 3, 4], 2)
+      const quizWrapper = await mountQuizReady([1, 2, 3, 4], 2)
       expect(askAQuestionSpy).toBeCalledTimes(2)
-      await wrapper.setProps({ currentIndex: 1 })
+      await quizWrapper.setProps({ currentIndex: 1 })
       expect(askAQuestionSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           path: { memoryTracker: 3 },
@@ -120,68 +64,24 @@ describe("repeat page", () => {
 
   describe("spelling questions", () => {
     it("shows spelling question input when question has no choices", async () => {
-      const recallPromptWithoutChoices = makeMe.aRecallQuestion
-        .withSpellingStem("Spell the word 'cat'")
-        .please()
-      askAQuestionSpy.mockResolvedValue(
-        wrapSdkResponse(recallPromptWithoutChoices)
-      )
+      mockSpellingRecallServices()
 
-      const wrapper = await mountPage([1], 1, true)
+      const quizWrapper = await mountQuizReady([1], 1, true)
 
-      expect(
-        wrapper.findComponent({ name: "SpellingQuestionDisplay" }).exists()
-      ).toBe(true)
-      expect(
-        wrapper.findComponent({ name: "ContestableQuestion" }).exists()
-      ).toBe(false)
+      expect(spellingQuestionVisible(quizWrapper)).toBe(true)
+      expect(contestableQuestionVisible(quizWrapper)).toBe(false)
     })
 
     it("submits spelling answer correctly", async () => {
-      const recallPromptWithoutChoices = makeMe.aRecallQuestion
-        .withSpellingStem("Spell the word 'cat'")
-        .please()
-      askAQuestionSpy.mockResolvedValue(
-        wrapSdkResponse(recallPromptWithoutChoices)
-      )
-
-      const spellingRecallPrompt = makeMe.aRecallQuestion
-        .withSpellingStem("Spell the word 'cat'")
-        .please()
-      askAQuestionSpy.mockResolvedValue(wrapSdkResponse(spellingRecallPrompt))
-      const memoryTracker = makeMe.aMemoryTracker.please()
-      // Add clozeDescription method to note for stem computation
-      if (memoryTracker.note) {
-        // @ts-expect-error - clozeDescription is a method on Note, not a property
-        memoryTracker.note.clozeDescription = {
-          clozeDetails: () => "<p>Spell the word 'cat'</p>\n",
-        }
-      }
-      mockSdkService(
-        MemoryTrackerController,
-        "showMemoryTracker",
-        memoryTracker
-      )
-
-      const answerResult: AnsweredQuestion = makeMe.anAnsweredQuestion
+      const spellingRecallPrompt = mockSpellingRecallServices()
+      const answerResult = makeMe.anAnsweredQuestion
         .spelling()
         .withAnswer({ id: 1, correct: true, spellingAnswer: "cat" })
         .please()
-      const mockedAnswerSpelling = mockSdkService(
-        RecallPromptController,
-        "answerSpelling",
-        answerResult
-      )
+      const mockedAnswerSpelling = mockAnswerSpelling(answerResult)
 
-      const wrapper = await mountPage([1], 1, true)
-      await flushPromises()
-      await wrapper
-        .findComponent({ name: "SpellingQuestionDisplay" })
-        .vm.$emit("answer", {
-          spellingAnswer: "cat",
-          recallPromptId: spellingRecallPrompt.id,
-        })
-      await flushPromises()
+      const quizWrapper = await mountQuizReady([1], 1, true)
+      await submitSpellingAnswerFromQuiz(quizWrapper)
 
       expect(mockedAnswerSpelling).toHaveBeenCalledWith({
         path: { recallPrompt: spellingRecallPrompt.id },
@@ -190,7 +90,7 @@ describe("repeat page", () => {
         },
       })
 
-      const emitted = wrapper.emitted()
+      const emitted = quizWrapper.emitted()
       expect(emitted.answered).toBeTruthy()
       expect(emitted.answered![0]).toEqual([answerResult])
     })
@@ -198,6 +98,7 @@ describe("repeat page", () => {
 
   describe("contestable dummy input", () => {
     it("clears when advancing to the next question", async () => {
+      const recallPrompt = getRecallPrompt()
       const secondRecallPrompt = makeMe.aRecallQuestion
         .withQuestionStem("Second question")
         .please()
@@ -205,13 +106,11 @@ describe("repeat page", () => {
         .mockResolvedValueOnce(wrapSdkResponse(recallPrompt))
         .mockResolvedValueOnce(wrapSdkResponse(secondRecallPrompt))
 
-      const wrapper = await mountPage([1, 2], 2)
-      const dummyInput = wrapper.find<HTMLTextAreaElement>(
-        "[data-testid='contestable-dummy-input']"
-      )
+      const quizWrapper = await mountQuizReady([1, 2], 2)
+      const dummyInput = contestableDummyInput(quizWrapper)
       await dummyInput.setValue("notes from previous question")
 
-      await wrapper.setProps({ currentIndex: 1 })
+      await quizWrapper.setProps({ currentIndex: 1 })
       await flushPromises()
 
       expect(dummyInput.element.value).toBe("")
@@ -220,9 +119,9 @@ describe("repeat page", () => {
 
   describe("loading state when fetching recall prompt", () => {
     it("should show ContentLoader, not JustReview, when navigating to a memory tracker that previously failed", async () => {
-      vi.useRealTimers()
-      let finishRetry!: () => void
+      const recallPrompt = getRecallPrompt()
       let tracker1Calls = 0
+      const { gate, resolve } = createDeferredGate()
       askAQuestionSpy.mockImplementation(async (options) => {
         const memoryTracker = (options as { path: { memoryTracker: number } })
           .path.memoryTracker
@@ -231,29 +130,24 @@ describe("repeat page", () => {
           if (tracker1Calls === 1) {
             return wrapSdkError("Failed to fetch")
           }
-          await new Promise<void>((resolve) => {
-            finishRetry = resolve
-          })
+          await gate
           return wrapSdkResponse(recallPrompt)
         }
         return wrapSdkResponse(recallPrompt)
       })
 
-      const wrapper = await mountPage([1, 2], 1)
+      const quizWrapper = await mountQuizReady([1, 2], 1)
+
+      expect(justReviewVisible(quizWrapper)).toBe(true)
+
+      await quizWrapper.setProps({ currentIndex: 1 })
       await flushPromises()
+      await quizWrapper.setProps({ currentIndex: 0 })
 
-      expect(wrapper.findComponent({ name: "JustReview" }).exists()).toBe(true)
+      expect(justReviewVisible(quizWrapper)).toBe(false)
+      expect(contentLoaderVisible(quizWrapper)).toBe(true)
 
-      await wrapper.setProps({ currentIndex: 1 })
-      await flushPromises()
-      await wrapper.setProps({ currentIndex: 0 })
-
-      expect(wrapper.findComponent({ name: "JustReview" }).exists()).toBe(false)
-      expect(wrapper.findComponent({ name: "ContentLoader" }).exists()).toBe(
-        true
-      )
-
-      finishRetry()
+      resolve()
       await flushPromises()
     })
   })
