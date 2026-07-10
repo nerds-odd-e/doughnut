@@ -501,14 +501,14 @@ CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles
 ---
 
 ### Phase 18: Optimize batch ranks 52–54
-Status: planned
+Status: done
 
-**Tests:**
-- `backend/src/test/java/com/odde/doughnut/controllers/NotebookBooksAttachControllerTest.java` — "persistsEpubAttachWithFormatAndStorageRef()" (~23ms)
-- `backend/src/test/java/com/odde/doughnut/services/QuestionGenerationBatchOutputCollectionServiceTest.java` — "marksMissingOutputLinesAsFailed()" (~23ms)
-- `backend/src/test/java/com/odde/doughnut/services/QuestionGenerationBatchOutputCollectionServiceTest.java` — "downloadsFromPersistedFileIdsWithoutRetrieveBatch()" (~23ms)
+**Tests (baseline → after):**
+- `NotebookBooksAttachControllerTest.persistsEpubAttachWithFormatAndStorageRef()` (~23ms) → **deleted**; format/storageRef/outline assertions merged into `NotebookBooksRetrievalControllerTest.epubFixtureAttachPersistsFormatStorageRefOutlineAndContentLocators()` (one fewer EPUB fixture attach)
+- `QuestionGenerationBatchOutputCollectionServiceTest.marksMissingOutputLinesAsFailed()` (~23ms) → `QuestionGenerationBatchOutputCollectionDirectBatchTest` with direct batch/request seed (~&lt;10ms); no planning/submission fixture
+- `QuestionGenerationBatchOutputCollectionServiceTest.downloadsFromPersistedFileIdsWithoutRetrieveBatch()` (~23ms) → same slim class; shared wire helpers in `QuestionGenerationBatchOutputCollectionTestSupport`
 
-**Goals:** Speed up only these tests (merge/delete redundant cases, slim `makeMe`/fixtures, parameterize duplicates, avoid full-stack when a narrower entry suffices). If no meaningful win after a serious attempt, append **Candidates** in the blacklist and mark done.
+**Learnings:** EPUB attach format/outline duplicated the retrieval fixture attach; missing-line and persisted-file-id collection paths only need persisted batch rows, not full planning/submission.
 
 **Verify:**
 

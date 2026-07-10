@@ -143,44 +143,6 @@ class NotebookBooksAttachControllerTest extends NotebookBooksControllerTestBase 
     }
 
     @Test
-    void persistsEpubAttachWithFormatAndStorageRef() throws Exception {
-      Notebook nb = myNotebook();
-      byte[] epubBytes = readFixtureEpubValidMinimal();
-      AttachBookRequest req = epubAttachRequest("Minimal EPUB");
-
-      ResponseEntity<Book> res = controller.attachBook(nb, req, epubFile(epubBytes));
-
-      assertThat(res.getStatusCode(), equalTo(HttpStatus.CREATED));
-      assertThat(res.getBody(), notNullValue());
-      Book created = res.getBody();
-      assertThat(created.getFormat(), equalTo(BookReadingWireConstants.BOOK_FORMAT_EPUB));
-      assertThat(created.getBookName(), equalTo("Minimal EPUB"));
-      assertThat(created.getSourceFileRef(), notNullValue());
-      assertThat(created.getSourceFileRef().isBlank(), equalTo(false));
-      List<BookBlock> createdPreorder = blocksByLayoutOrder(created);
-      assertThat(createdPreorder, hasSize(5));
-      assertThat(
-          createdPreorder.stream().map(BookBlock::getStructuralTitle).toList(),
-          equalTo(
-              List.of(
-                  "Part One",
-                  "Chapter Alpha",
-                  "Chapter Beta",
-                  "Section Beta-One",
-                  "Section Beta-Two")));
-      assertThat(
-          createdPreorder.stream().map(BookBlock::getDepth).toList(),
-          equalTo(List.of(0, 1, 0, 1, 1)));
-
-      Book detail = controller.getBook(nb);
-      assertThat(detail.getFormat(), equalTo(BookReadingWireConstants.BOOK_FORMAT_EPUB));
-      assertThat(detail.getSourceFileRef(), equalTo(created.getSourceFileRef()));
-      assertThat(
-          blocksByLayoutOrder(detail).stream().map(BookBlock::getStructuralTitle).toList(),
-          equalTo(createdPreorder.stream().map(BookBlock::getStructuralTitle).toList()));
-    }
-
-    @Test
     void rejectsEpubWhenLayoutIncluded() {
       Notebook nb = myNotebook();
       AttachBookRequest req = attachRequest(node("A"));

@@ -178,13 +178,33 @@ class NotebookBooksRetrievalControllerTest extends NotebookBooksControllerTestBa
     }
 
     @Test
-    void epubContentLocatorsMatchAnchorAndDirectContentOnFixture() throws Exception {
+    void epubFixtureAttachPersistsFormatStorageRefOutlineAndContentLocators() throws Exception {
       Notebook nb = myNotebook();
       byte[] epubBytes = readFixtureEpubValidMinimal();
       ResponseEntity<Book> attached =
           controller.attachBook(nb, epubAttachRequest("Minimal EPUB"), epubFile(epubBytes));
-      assertThat(attached.getBody(), notNullValue());
-      BookBlock chapterBeta = blocksByLayoutOrder(attached.getBody()).get(2);
+      assertThat(attached.getStatusCode(), equalTo(HttpStatus.CREATED));
+      Book created = attached.getBody();
+      assertThat(created, notNullValue());
+      assertThat(created.getFormat(), equalTo(BookReadingWireConstants.BOOK_FORMAT_EPUB));
+      assertThat(created.getBookName(), equalTo("Minimal EPUB"));
+      assertThat(created.getSourceFileRef(), notNullValue());
+      assertThat(created.getSourceFileRef().isBlank(), equalTo(false));
+      List<BookBlock> createdPreorder = blocksByLayoutOrder(created);
+      assertThat(createdPreorder, hasSize(5));
+      assertThat(
+          createdPreorder.stream().map(BookBlock::getStructuralTitle).toList(),
+          equalTo(
+              List.of(
+                  "Part One",
+                  "Chapter Alpha",
+                  "Chapter Beta",
+                  "Section Beta-One",
+                  "Section Beta-Two")));
+      assertThat(
+          createdPreorder.stream().map(BookBlock::getDepth).toList(),
+          equalTo(List.of(0, 1, 0, 1, 1)));
+      BookBlock chapterBeta = createdPreorder.get(2);
       assertThat(chapterBeta.getStructuralTitle(), equalTo("Chapter Beta"));
       assertThat(chapterBeta.getContentLocators(), hasSize(2));
       assertThat(chapterBeta.getContentLocators().getFirst(), instanceOf(EpubLocator.class));

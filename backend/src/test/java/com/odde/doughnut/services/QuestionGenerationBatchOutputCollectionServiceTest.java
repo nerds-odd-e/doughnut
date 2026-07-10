@@ -1,11 +1,11 @@
 package com.odde.doughnut.services;
 
+import static com.odde.doughnut.services.QuestionGenerationBatchOutputCollectionTestSupport.completedOpenAiBatch;
+import static com.odde.doughnut.services.QuestionGenerationBatchOutputCollectionTestSupport.errorLine;
+import static com.odde.doughnut.services.QuestionGenerationBatchOutputCollectionTestSupport.successLine;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.entities.Note;
@@ -18,7 +18,6 @@ import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
-import com.openai.models.batches.Batch;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -90,31 +89,6 @@ class QuestionGenerationBatchOutputCollectionServiceTest {
     secondRequest = requests.get(1);
   }
 
-  private Batch completedOpenAiBatch() {
-    return Batch.builder()
-        .id("batch-openai-1")
-        .completionWindow("24h")
-        .createdAt(1L)
-        .endpoint("/v1/responses")
-        .inputFileId("file-abc")
-        .outputFileId("file-output")
-        .errorFileId("file-error")
-        .status(Batch.Status.COMPLETED)
-        .build();
-  }
-
-  private String successLine(String customId) {
-    return """
-        {"id":"batch_req_1","custom_id":"%s","response":{"status_code":200,"body":{"id":"resp-1"}},"error":null}"""
-        .formatted(customId);
-  }
-
-  private String errorLine(String customId, String message) {
-    return """
-        {"id":"batch_req_2","custom_id":"%s","response":null,"error":{"code":"invalid_request_error","message":"%s"}}"""
-        .formatted(customId, message);
-  }
-
   @Nested
   class OutputMapping {
     @Test
@@ -170,42 +144,6 @@ class QuestionGenerationBatchOutputCollectionServiceTest {
           reloadedSecond.getRawErrorPayload(),
           is(errorLine(secondRequest.getCustomId(), "model unavailable")));
       assertThat(reloadedSecond.getErrorDetail(), is("model unavailable"));
-    }
-
-    @Test
-    void marksMissingOutputLinesAsFailed() {
-      when(openAiApiHandler.retrieveBatch("batch-openai-1")).thenReturn(completedOpenAiBatch());
-      when(openAiApiHandler.downloadFileContent("file-output"))
-          .thenReturn(successLine(firstRequest.getCustomId()));
-      when(openAiApiHandler.downloadFileContent("file-error")).thenReturn("");
-
-      outputCollectionService.collectOutputForCompletedBatches(currentTime);
-
-      QuestionGenerationBatchRequest reloadedSecond =
-          batchRequestRepository.findById(secondRequest.getId()).orElseThrow();
-      assertThat(reloadedSecond.getStatus(), is(QuestionGenerationBatchRequestStatus.FAILED));
-      assertThat(reloadedSecond.getErrorDetail(), is("missing batch output line"));
-    }
-  }
-
-  @Nested
-  class PersistedFileIds {
-    @Test
-    void downloadsFromPersistedFileIdsWithoutRetrieveBatch() {
-      completedBatch.setOpenaiOutputFileId("file-output");
-      completedBatch.setOpenaiErrorFileId("file-error");
-      batchRepository.saveAndFlush(completedBatch);
-
-      when(openAiApiHandler.downloadFileContent("file-output"))
-          .thenReturn(
-              successLine(secondRequest.getCustomId())
-                  + "\n"
-                  + successLine(firstRequest.getCustomId()));
-      when(openAiApiHandler.downloadFileContent("file-error")).thenReturn("");
-
-      outputCollectionService.collectOutputForCompletedBatches(currentTime);
-
-      verify(openAiApiHandler, never()).retrieveBatch(anyString());
     }
   }
 }
