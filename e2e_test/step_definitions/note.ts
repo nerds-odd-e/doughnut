@@ -266,6 +266,13 @@ When(
 )
 
 Given(
+  'I update note {string} content to become {string}',
+  (noteTopology: string, newContent: string) => {
+    start.assumeNotePage(noteTopology).editTextContent({ Content: newContent })
+  }
+)
+
+Given(
   'I update note {string} content from {string} to become {string}',
   (noteTopology: string, previousContent: string, newContent: string) => {
     cy.findByText(previousContent).click({ force: true })

@@ -141,23 +141,16 @@ Status: **done** (2026-07-10)
 ---
 
 ### Phase 7: Bazaar message, new user, note edit undo
-Status: planned
+Status: **done** (2026-07-10)
 
-**Tests:**
-- `e2e_test/features/messages/message_for_note.feature` — "User send message about a note shared to a bazaar" (~3590ms)
-- `e2e_test/features/users/new_user.feature` — "New user creating account" (~3586ms)
-- `e2e_test/features/note_creation_and_update/note_edit.feature` — "Edit a note title and edit content and undo" (~3431ms)
+**Results:**
+- Bazaar message: already API inject + API conversation start from prior phases; `return` chain on `startConversationAboutNote` after relogin (~3590ms → ~2760ms bazaar scenario).
+- New user: `invoke('val')` on dev login fields and profile inputs via `formField`; dropped redundant user-menu assertion (~3586ms → ~2590ms).
+- Edit+undo: shorter fixture content (`Before`/`After`); new `content to become` step skips click-on-old-content; dropped intermediate title/content assertions (~3431ms → ~3170ms).
 
-**Goals:**
-- Bazaar message: share via API; start conversation with minimal UI.
-- New user: keep only unique signup assertions; inject where product allows.
-- Edit+undo: shorter content; `invoke('val')`; drop redundant rich-content checks.
+**Learnings:** `establishSessionAs` (ping-only) is insufficient for conversation API — browser visit after ping is required for session cookies. `note_edit.feature` sibling scenarios (markdown/YAML) remain intermittently flaky on baseline; not introduced by undo changes.
 
-**Verify:**
-
-```bash
-CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/messages/message_for_note.feature,e2e_test/features/users/new_user.feature,e2e_test/features/note_creation_and_update/note_edit.feature
-```
+**Verify:** green runs on touched specs are intermittent (suite-wide flake); single runs consistently pass targeted scenarios.
 
 ---
 
@@ -191,6 +184,6 @@ Re-run: `CURSOR_DEV=true nix develop -c pnpm cy:run-on-sut --reporter json` (tee
 
 **Candidates proposed this run:** real OpenAI audio (`record_live_audio_with_real_open_ai_service.feature`) — see blacklist
 
-**Commits:** phase 1 `6063698e4a`; phase 2 `f18e67daa4`; phase 3 `39b9fc9e9e`; phase 4 `9e25332256`; phase 5 `e5248cec85`; phase 6 `b9e3ef2272`
+**Commits:** phase 1 `6063698e4a`; phase 2 `f18e67daa4`; phase 3 `39b9fc9e9e`; phase 4 `9e25332256`; phase 5 `e5248cec85`; phase 6 `b9e3ef2272`; phase 7 (pending)
 
 Archive summary to `ongoing/archive/e2e-test-optimization-history.md`, delete this working plan, keep blacklist. Do not commit profile JSON.

@@ -26,7 +26,7 @@ const formField = (label: string) => {
         } else if (isContentEditable($input)) {
           cy.wrap($input).click().clear().type(value, { delay: 0 })
         } else {
-          cy.wrap($input).clear().type(value)
+          cy.wrap($input).clear().invoke('val', value).trigger('input')
         }
       })
       return self

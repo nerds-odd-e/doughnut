@@ -48,8 +48,8 @@ Given("I'm on the login page", () => {
 When('I identify myself as a new user', () => {
   cy.wrap('user').as('currentLoginUser')
   cy.intercept('GET', '**/api/healthcheck').as('devLogin')
-  cy.get('#username').type('user')
-  cy.get('#password').type('password')
+  cy.get('#username').clear().invoke('val', 'user').trigger('input')
+  cy.get('#password').clear().invoke('val', 'password').trigger('input')
   cy.get('#login-button').click()
   cy.wait('@devLogin').then(({ response }) => {
     expect(response?.statusCode, 'dev login healthcheck').to.equal(200)

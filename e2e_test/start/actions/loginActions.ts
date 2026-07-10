@@ -16,25 +16,26 @@ export const loginActions = {
       .clearAllCookies()
   },
 
+  establishSessionAs(username: string) {
+    cy.wrap(username).as('currentLoginUser')
+    cy.wrap(username).as('injectNotesExternalIdentifier')
+    return cy.wrap(
+      HealthCheckController.ping({
+        headers: {
+          Authorization: `Basic ${btoa(`${username}:password`)}`,
+        },
+      })
+    )
+  },
+
   loginAs(username: string) {
     if (username === 'none') {
       return this.logout()
     }
 
-    // Call the service directly - it will use cy.request via our custom request function
-    cy.wrap(username).as('currentLoginUser')
-    cy.wrap(username).as('injectNotesExternalIdentifier')
-    return cy
-      .wrap(
-        HealthCheckController.ping({
-          headers: {
-            Authorization: `Basic ${btoa(`${username}:password`)}`,
-          },
-        })
-      )
-      .then(() => {
-        cy.visit('/notebooks')
-      })
+    return this.establishSessionAs(username).then(() => {
+      cy.visit('/notebooks')
+    })
   },
 
   reloginAs(username: string) {

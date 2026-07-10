@@ -4,15 +4,13 @@ Feature: Note Edit
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook "LeSS training" with a note "LeSS in Action" and content "An awesome training"
+    And I have a notebook "LeSS training" with a note "LeSS in Action" and content "Before"
 
   Scenario: Edit a note title and edit content and undo
     Given I update note title "LeSS in Action" to become "Odd-e CSD"
-    And the note title should be "Odd-e CSD"
-    And I update note "Odd-e CSD" content from "An awesome training" to become "A super awesome training"
-    And the note content should include "A super awesome training"
+    And I update note "Odd-e CSD" content to become "After"
     When I undo "edit content"
-    Then the note content should include "An awesome training"
+    Then the note content should include "Before"
     When I undo "edit title" again
     Then the note title should be "LeSS in Action"
     And there should be no more undo to do

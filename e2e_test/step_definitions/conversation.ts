@@ -117,7 +117,7 @@ When(
   '{string} start a conversation about the note {string} with a message {string}',
   (externalIdentifier: string, note: string, conversation: string) => {
     start.reloginAs(externalIdentifier)
-    start.testability().startConversationAboutNote(note, conversation)
+    return start.testability().startConversationAboutNote(note, conversation)
   }
 )
 

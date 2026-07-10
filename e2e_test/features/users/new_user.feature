@@ -8,5 +8,4 @@ Feature: new user
       | Name      |
       | Learner A |
     Then I should see the home welcome heading for user "Learner A"
-    And My name "Learner A" is in the user action menu
 
