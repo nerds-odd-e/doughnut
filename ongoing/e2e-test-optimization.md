@@ -101,22 +101,14 @@ Status: **done** (2026-07-10)
 ---
 
 ### Phase 4: Predefined question + browse remove/revive
-Status: planned
+Status: **done** (2026-07-10)
 
-**Tests:**
-- `e2e_test/features/note_creation_and_update/predefined_questions_management.feature` — "Manually add a question to the note successfully" (~4018ms)
-- `e2e_test/features/recall/browse_answer_and_notes_while_recalling.feature` — "I can remove a note from further recalls" (~3867ms)
-- `e2e_test/features/recall/browse_answer_and_notes_while_recalling.feature` — "I can revive a memory tracker removed from recalls" (~3836ms)
+**Results:**
+- Predefined question manual add: router push instead of full visit; `invoke('val')` for question form fields (~4018ms → ~3179ms).
+- Browse remove/revive: per-scenario setup — UI assimilate only where pause/Resume needs it; API assimilate + `visitRecallPageAndWaitForQuestion` for remove/revive (~3867ms → ~2043ms, ~3836ms → ~2092ms).
+- Background slimmed: `Remember Spelling` inject on sedition; assimilate moved out of shared Background.
 
-**Goals:**
-- Predefined question: API note setup; shorter editor path; avoid redundant rich-content checks.
-- Remove/revive: merge overlapping setup if safe; API seed memory trackers; direct recall route.
-
-**Verify:**
-
-```bash
-CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/predefined_questions_management.feature,e2e_test/features/recall/browse_answer_and_notes_while_recalling.feature
-```
+**Learnings:** Per-scenario assimilate in browse feature avoids file split while keeping UI spelling path for Resume scenarios; remove/revive do not need UI assimilate when `Remember Spelling` is injected.
 
 ---
 
@@ -213,6 +205,6 @@ Re-run: `CURSOR_DEV=true nix develop -c pnpm cy:run-on-sut --reporter json` (tee
 
 **Candidates proposed this run:** real OpenAI audio (`record_live_audio_with_real_open_ai_service.feature`) — see blacklist
 
-**Commits:** phase 1 `6063698e4a`; phase 2 pending push; phase 3 pending push
+**Commits:** phase 1 `6063698e4a`; phase 2 pending push; phase 3 pending push; phase 4 pending push
 
 Archive summary to `ongoing/archive/e2e-test-optimization-history.md`, delete this working plan, keep blacklist. Do not commit profile JSON.

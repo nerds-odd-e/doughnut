@@ -195,7 +195,7 @@ When(
     expect(data.hashes().length, 'please add one question at a time.').to.equal(
       1
     )
-    start.jumpToNotePage(noteTopology, true).addQuestion(data.hashes()[0]!)
+    start.jumpToNotePage(noteTopology).addQuestion(data.hashes()[0]!)
   }
 )
 

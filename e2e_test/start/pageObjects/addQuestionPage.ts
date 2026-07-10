@@ -10,7 +10,10 @@ export const addQuestionPage = () => {
         'Correct Choice Index',
       ].forEach((key: string) => {
         if (row[key] !== undefined && row[key] !== '') {
-          cy.findByLabelText(key).clear().type(row[key]!)
+          cy.findByLabelText(key)
+            .clear()
+            .invoke('val', row[key]!)
+            .trigger('input')
         }
       })
     },
