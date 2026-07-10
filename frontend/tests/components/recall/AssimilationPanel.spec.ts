@@ -2,7 +2,11 @@ import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it, vi } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+import {
+  mockSdkService,
+  mockSdkServiceWithImplementation,
+  wrapSdkResponse,
+} from "@tests/helpers"
 import { mockedGoToNextAssimilation } from "./assimilationPanelMocks"
 import {
   assimilateSpy,
@@ -143,6 +147,38 @@ describe("AssimilationPanel", () => {
 
       const assimilateButton = wrapper.find(assimilateButtonSelector)
       expect(assimilateButton.attributes("disabled")).toBeUndefined()
+    })
+
+    it("disables assimilate after note-level assimilate when next unit stays on the same note", async () => {
+      let getNoteInfoCallCount = 0
+      mockSdkServiceWithImplementation(NoteController, "getNoteInfo", () => {
+        getNoteInfoCallCount += 1
+        if (getNoteInfoCallCount === 1) {
+          return { memoryTrackers: [] }
+        }
+        return {
+          memoryTrackers: [
+            { ...makeMe.aMemoryTracker.please(), id: 1, spelling: false },
+          ],
+        }
+      })
+      assimilateSpy.mockResolvedValue(
+        wrapSdkResponse([{ id: 1, removedFromTracking: false }])
+      )
+
+      const wrapper = mountAssimilationPanel()
+      await flushPromises()
+
+      expect(
+        wrapper.find(assimilateButtonSelector).attributes("disabled")
+      ).toBeUndefined()
+
+      await clickAssimilate(wrapper)
+
+      expect(mockedGoToNextAssimilation).toHaveBeenCalled()
+      expect(
+        wrapper.find(assimilateButtonSelector).attributes("disabled")
+      ).toBeDefined()
     })
 
     it("disables assimilate when note has memory trackers and no add-spelling-only mode", async () => {

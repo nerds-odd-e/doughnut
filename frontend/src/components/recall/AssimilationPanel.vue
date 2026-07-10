@@ -141,9 +141,7 @@ const doAssimilate = async ({
       return
     }
 
-    if (propertyKey) {
-      await settingsRef.value?.reloadNoteInfo()
-    }
+    await settingsRef.value?.reloadNoteInfo()
 
     if (!result.navigated) {
       if (propertyKey && skipMemoryTracking) {
