@@ -87,6 +87,7 @@ describe("repeat page", () => {
         path: { recallPrompt: spellingRecallPrompt.id },
         body: {
           spellingAnswer: "cat",
+          thinkingTimeMs: 0,
         },
       })
 

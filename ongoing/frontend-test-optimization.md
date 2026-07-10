@@ -801,7 +801,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/links/InsertWikiLink.spe
 ---
 
 ### Phase 23: recall/Quiz
-Status: planned
+Status: done
+
+**Learnings:** Hoisted mount/mocks/selectors into `quizTestSupport.ts`; replaced `findComponent({ name })` with `querySelector` helpers (`contentLoaderSelector`, `spellingAnswerInputSelector`, `.recall-prompt`, JustReview button text); merged eager-fetch mount cases with `it.each`; loading-state test uses `createDeferredGate` without `vi.useRealTimers()`; spelling submit via form instead of `$emit`. Suite wall ~164ms → ~77ms (8 → 7 tests).
 
 **Tests:** (2 in top 10%, ~38ms combined)
 - `tests/recall/Quiz.spec.ts` — "should show ContentLoader, not JustReview, when navigating to a memory tracker that previously failed" (~20ms)
