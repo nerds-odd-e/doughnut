@@ -13,5 +13,3 @@ to Skip test optimization only after developer review.
 ## Candidates
 
 <!-- file path — test/scenario name — duration — why hard — proposed YYYY-MM-DD -->
-
-`e2e_test/features/recall/browse_answer_and_notes_while_recalling.feature` — View last answered question when the quiz answer was correct — ~4351ms — shares Background with Resume scenario; API spelling assimilate/answer breaks pause/Resume; split file or Phase 4 merge with remove/revive — proposed 2026-07-10
