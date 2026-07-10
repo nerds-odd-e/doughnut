@@ -9,6 +9,7 @@ import {
   deleteNoteSpy,
   renderer,
   setupNoteMoreOptionsDeleteFormTests,
+  awaitDeleteSideEffects,
 } from "./noteMoreOptionsDeleteTestSupport"
 
 setupNoteMoreOptionsDeleteFormTests()
@@ -30,7 +31,7 @@ describe("NoteMoreOptionsForm delete note", () => {
     expect(popups?.[0]?.message).toBe('Confirm to delete "Note1.1.1"?')
 
     usePopups().popups.done(true)
-    await flushPromises()
+    await awaitDeleteSideEffects()
 
     expect(deleteNoteSpy).toHaveBeenCalledWith({
       path: { note: note.id },
@@ -63,7 +64,7 @@ describe("NoteMoreOptionsForm delete note", () => {
     )
 
     usePopups().popups.done("REMOVE_FROM_PROPERTIES")
-    await flushPromises()
+    await awaitDeleteSideEffects()
 
     expect(deleteNoteSpy).toHaveBeenCalledWith({
       path: { note: noteRealm.id },

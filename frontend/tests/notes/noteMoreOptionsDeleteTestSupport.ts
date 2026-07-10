@@ -194,3 +194,8 @@ export async function mountDeleteFormWithNotePropChange(
   await flushPromises()
   return wrapper
 }
+
+export async function awaitDeleteSideEffects() {
+  await flushPromises()
+  await noteMoreOptionsDeleteFormRouter.isReady()
+}
