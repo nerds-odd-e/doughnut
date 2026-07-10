@@ -77,23 +77,14 @@ Status: **done** (2026-07-10)
 ---
 
 ### Phase 2: Unread counts, AI quiz context, browse last answer
-Status: planned
+Status: **done** (2026-07-10)
 
-**Tests:**
-- `e2e_test/features/messages/message_center_with_unread_message_count.feature` — "Unread counts update when a conversation starts and the receiver replies" (~5435ms)
-- `e2e_test/features/recall/recall_quiz_ai_question.feature` — "AI question generation includes wiki-linked, depth-two wiki path, and folder-sibling focus context" (~4937ms)
-- `e2e_test/features/recall/browse_answer_and_notes_while_recalling.feature` — "View last answered question when the quiz answer was correct" (~4351ms)
+**Results:**
+- Message unread: conversation start/reply via `ConversationMessageController` API; unread-count checks wait on `menu-data` intercept after relogin (~5435ms suite → ~7s for 3 scenarios, main scenario much faster).
+- AI quiz context: dropped redundant Background notebook inject (login-only Background); per-scenario inject unchanged (~4937ms → ~7s for 3 scenarios).
+- Browse last answer: shared Background must keep UI spelling assimilate (API `Remember Spelling` inject breaks Resume in sibling scenario); no safe change to target scenario without splitting the feature file.
 
-**Goals:**
-- Message unread: API seed conversation/replies; intercept unread-count endpoints instead of full UI loops.
-- AI quiz context: slim notebook graph via API/testability; mock OpenAI; drop redundant navigation.
-- Browse last answer: API wrong/correct answer setup; one UI pass; intercept over reload.
-
-**Verify:**
-
-```bash
-CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/messages/message_center_with_unread_message_count.feature,e2e_test/features/recall/recall_quiz_ai_question.feature,e2e_test/features/recall/browse_answer_and_notes_while_recalling.feature
-```
+**Learnings:** Cypress `cy.then` must not return sync values after `cy.wrap().as()`; recall `/recalling` intercept is unreliable when menu-data pre-populates the store; spelling assimilate via inject + API does not match UI spelling-verification path for pause/Resume behavior.
 
 ---
 
@@ -231,6 +222,6 @@ Re-run: `CURSOR_DEV=true nix develop -c pnpm cy:run-on-sut --reporter json` (tee
 
 **Candidates proposed this run:** real OpenAI audio (`record_live_audio_with_real_open_ai_service.feature`) — see blacklist
 
-**Commits:** (phase 1 pending push)
+**Commits:** phase 1 `6063698e4a`; phase 2 pending push
 
 Archive summary to `ongoing/archive/e2e-test-optimization-history.md`, delete this working plan, keep blacklist. Do not commit profile JSON.

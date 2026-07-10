@@ -1,6 +1,10 @@
 import { assumeMessageCenterPage } from './messageCenterPage'
 import { pageIsNotLoading } from '../pageBase'
 
+export function waitForMenuDataUnreadCount() {
+  cy.intercept('GET', '**/api/user/menu-data**').as('menuDataForUnreadCount')
+}
+
 export function messageCenterIndicator() {
   const getMessageInSidebar = (
     fn: ($el: Cypress.Chainable<JQuery<HTMLElement>>) => void

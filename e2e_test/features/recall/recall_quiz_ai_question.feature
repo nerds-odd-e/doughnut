@@ -3,11 +3,6 @@ Feature: Recall Quiz
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook "English practice" with notes:
-      | Title   | Content | Skip Memory Tracking |
-      | English |                          | true                 |
-      | sedation | Put to sleep is sedation |                      |
-      | medical |                          |                      |
 
   @usingMockedOpenAiService
   Scenario: AI generated question - incorrect answer

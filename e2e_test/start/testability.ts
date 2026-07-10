@@ -13,6 +13,7 @@ import type {
 import type { NotesTestDataWritable } from '@generated/doughnut-backend-api'
 import {
   AssimilationController,
+  ConversationMessageController,
   MemoryTrackerController,
   NoteController,
   NotebookBooksController,
@@ -47,6 +48,9 @@ const cleanAndReset = (cy: Cypress.cy & CyEventEmitter, countdown: number) => {
 }
 
 const injectedNoteIdMapAliasName = 'injectedNoteIdMap'
+
+const conversationIdAlias = (noteTitle: string) =>
+  `conversationId_${noteTitle.replace(/\s+/g, '_')}`
 
 function noteIdFromUrl(url: string): number {
   const match =
@@ -438,7 +442,7 @@ const testability = () => {
       })
     },
 
-    submitWrongMcqRecallAnswer(wrongChoiceText: string) {
+    dueRecallPrompt() {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
       return cy
         .wrap(
@@ -458,24 +462,62 @@ const testability = () => {
             { log: false }
           )
         })
-        .then((recallPrompt) => {
-          const choices =
-            recallPrompt?.multipleChoicesQuestion?.responseChoices ??
-            recallPrompt?.predefinedQuestion?.multipleChoicesQuestion
-              ?.responseChoices
-          expect(choices, 'expected MCQ response choices').to.exist
-          const choiceIndex = choices!.indexOf(wrongChoiceText)
-          expect(
-            choiceIndex,
-            `expected choice "${wrongChoiceText}" in ${JSON.stringify(choices)}`
-          ).to.be.at.least(0)
-          return cy.wrap(
-            RecallPromptController.answerQuiz({
-              path: { recallPrompt: recallPrompt!.id },
-              body: { choiceIndex, thinkingTimeMs: 1000 },
+    },
+
+    submitWrongMcqRecallAnswer(wrongChoiceText: string) {
+      return this.dueRecallPrompt().then((recallPrompt) => {
+        const choices =
+          recallPrompt?.multipleChoicesQuestion?.responseChoices ??
+          recallPrompt?.predefinedQuestion?.multipleChoicesQuestion
+            ?.responseChoices
+        expect(choices, 'expected MCQ response choices').to.exist
+        const choiceIndex = choices!.indexOf(wrongChoiceText)
+        expect(
+          choiceIndex,
+          `expected choice "${wrongChoiceText}" in ${JSON.stringify(choices)}`
+        ).to.be.at.least(0)
+        return cy.wrap(
+          RecallPromptController.answerQuiz({
+            path: { recallPrompt: recallPrompt!.id },
+            body: { choiceIndex, thinkingTimeMs: 1000 },
+          }),
+          { log: false }
+        )
+      })
+    },
+
+    startConversationAboutNote(noteTitle: string, message: string) {
+      return this.getInjectedNoteIdByTitle(noteTitle).then((noteId) =>
+        cy
+          .wrap(
+            ConversationMessageController.startConversationAboutNote({
+              path: { note: noteId },
+              body: message,
             }),
             { log: false }
           )
+          .then((conversation) => {
+            cy.wrap(conversation.id).as(conversationIdAlias(noteTitle))
+          })
+      )
+    },
+
+    replyToConversationAboutNote(
+      noteTitle: string,
+      messages: readonly string[]
+    ) {
+      return cy
+        .get<number>(`@${conversationIdAlias(noteTitle)}`)
+        .then((conversationId) => {
+          cy.wrap(messages).each((message: string) => {
+            cy.wrap(
+              ConversationMessageController.replyToConversation({
+                path: { conversationId },
+                body: message,
+              }),
+              { log: false }
+            )
+          })
         })
     },
 

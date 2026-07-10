@@ -5,6 +5,7 @@ import {
   interceptConversationList,
   waitForConversationList,
 } from '../start/pageObjects/messageCenterPage'
+import { waitForMenuDataUnreadCount } from '../start/pageObjects/messageCenterIndicator'
 import type { DataTable } from '@cucumber/cucumber'
 
 function openMessageCenter(expectedSubject: string) {
@@ -40,7 +41,7 @@ When(
   'I reply to the conversation {string}:',
   (conversation: string, data: DataTable) => {
     const messages = data.raw().map((row) => row[0]!.trim())
-    start.navigateToMessageCenter().replyToConversation(conversation, messages)
+    start.testability().replyToConversationAboutNote(conversation, messages)
   }
 )
 
@@ -105,7 +106,7 @@ Then('I should have no unread messages', () => {
 Then(
   '{string} should have {int} unread messages',
   (user: string, unreadMessageCount: number) => {
-    cy.intercept('GET', '**/api/user/menu-data**').as('menuDataForUnreadCount')
+    waitForMenuDataUnreadCount()
     start.reloginAs(user)
     cy.wait('@menuDataForUnreadCount')
     start.messageCenterIndicator().expectCount(unreadMessageCount)
@@ -116,7 +117,7 @@ When(
   '{string} start a conversation about the note {string} with a message {string}',
   (externalIdentifier: string, note: string, conversation: string) => {
     start.reloginAs(externalIdentifier)
-    start.jumpToNotePage(note, true).sendMessageToNoteOwner(conversation)
+    start.testability().startConversationAboutNote(note, conversation)
   }
 )
 
