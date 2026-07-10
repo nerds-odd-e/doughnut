@@ -3,7 +3,6 @@ package com.odde.doughnut.services;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-import com.odde.doughnut.controllers.dto.AssimilationCountDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
@@ -49,6 +48,7 @@ class AssimilationServiceDailyCapTest extends AssimilationServiceTestBase {
       Timestamp day1_23 = makeMe.aTimestamp().of(1, 23).fromShanghai().please();
       AssimilationService recallService = assimilationServiceFor(user, day1_23);
       assertThat(getNextNoteToAssimilate(recallService), equalTo(note2));
+      assertThat(recallService.getCounts().getDueCount(), equalTo(0));
     }
 
     @Test
@@ -97,14 +97,9 @@ class AssimilationServiceDailyCapTest extends AssimilationServiceTestBase {
     }
 
     @Test
-    void returnsNextNotePastUserDailyCap() {
+    void returnsNextNoteWithZeroDueCountWhenUserDailyPlanComplete() {
       assertThat(earlyMorningService.getNextNoteToAssimilate().isPresent(), is(true));
-    }
-
-    @Test
-    void dueCountIsZeroWhenUserDailyPlanComplete() {
-      AssimilationCountDTO counts = earlyMorningService.getCounts();
-      assertThat(counts.getDueCount(), equalTo(0));
+      assertThat(earlyMorningService.getCounts().getDueCount(), equalTo(0));
     }
   }
 }

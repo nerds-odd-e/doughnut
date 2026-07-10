@@ -483,14 +483,14 @@ CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles
 ---
 
 ### Phase 17: Optimize batch ranks 49–51
-Status: planned
+Status: done
 
-**Tests:**
-- `backend/src/test/java/com/odde/doughnut/controllers/AdminQuestionGenerationBatchControllerTest.java` — "adminCanResumeExistingBatchesAndReceivesRefreshedStatus()" (~23ms)
-- `backend/src/test/java/com/odde/doughnut/controllers/AdminUserControllerTest.java` — "canListUsersWithCorrectNoteCount()" (~23ms)
-- `backend/src/test/java/com/odde/doughnut/controllers/AssimilationControllerTests.java` — "returnsNextNoteIdPastDailyCap()" (~23ms)
+**Tests (baseline → after):**
+- `AdminQuestionGenerationBatchControllerTest.adminCanResumeExistingBatchesAndReceivesRefreshedStatus()` (~23ms) → **deleted**; resume orchestration in mock-only `AdminQuestionGenerationBatchControllerResumeTest` (~&lt;5ms); MANUAL_RESUME persistence in `QuestionGenerationBatchMaintenanceRunRepositoryTest`
+- `AdminUserControllerTest.canListUsersWithCorrectNoteCount()` (~23ms) → merged into `canListUsersWithCorrectNoteCountAndLastNoteTime()` (one fewer test method, shared user+note fixture)
+- `AssimilationControllerTests.returnsNextNoteIdPastDailyCap()` (~23ms) → **deleted**; daily-cap next-note + dueCount=0 in `AssimilationServiceDailyCapTest.theDailyCountShouldNotBeResetOnSameDayDifferentHour()` and merged `returnsNextNoteWithZeroDueCountWhenUserDailyPlanComplete()`
 
-**Goals:** Speed up only these tests (merge/delete redundant cases, slim `makeMe`/fixtures, parameterize duplicates, avoid full-stack when a narrower entry suffices). If no meaningful win after a serious attempt, append **Candidates** in the blacklist and mark done.
+**Learnings:** Admin resume is controller glue over maintenance run recording + service resume; user note-count listing shares fixture with last-note-time; daily-cap past-limit behavior belongs at `AssimilationService` level.
 
 **Verify:**
 

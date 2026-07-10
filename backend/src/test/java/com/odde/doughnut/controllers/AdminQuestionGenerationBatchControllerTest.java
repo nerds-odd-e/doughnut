@@ -2,7 +2,6 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.QuestionGenerationBatchAdminStatusDTO;
@@ -86,20 +85,6 @@ class AdminQuestionGenerationBatchControllerTest extends ControllerTestBase {
 
     assertThat(status.getLastScheduledMaintenanceStartedAt(), equalTo(null));
     assertThat(status.getLastManualMaintenanceStartedAt(), equalTo(null));
-  }
-
-  @Test
-  void adminCanResumeExistingBatchesAndReceivesRefreshedStatus()
-      throws UnexpectedNoAccessRightException {
-    currentUser.setUser(makeMe.anAdmin().please());
-    testabilitySettings.timeTravelTo(currentTime);
-
-    QuestionGenerationBatchAdminStatusDTO status = controller.resumeExistingBatches();
-
-    assertThat(status.getBatchCountsByStatus().get("SUBMITTED"), equalTo(0L));
-    assertThat(status.getRequestCountsByStatus().get("PENDING"), equalTo(0L));
-    assertThat(status.getLastManualMaintenanceStartedAt(), equalTo(currentTime));
-    assertThat(status.getLastManualMaintenanceFinishedAt(), notNullValue());
   }
 
   @Test

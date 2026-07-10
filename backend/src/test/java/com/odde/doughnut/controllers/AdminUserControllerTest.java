@@ -36,22 +36,6 @@ class AdminUserControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void canListUsersWithCorrectNoteCount() throws UnexpectedNoAccessRightException {
-      User userWithNotes = makeMe.aUser().please();
-      Note note = makeMe.aNote().please();
-      makeMe.entityPersister.save(NoteCreator.forNoteAndUser(note, userWithNotes));
-
-      UserListingPage result = controller.listUsers(0, 10);
-
-      UserForListing userListing =
-          result.getUsers().stream()
-              .filter(u -> u.getId().equals(userWithNotes.getId()))
-              .findFirst()
-              .orElseThrow();
-      assertThat(userListing.getNoteCount(), equalTo(1L));
-    }
-
-    @Test
     void canListUsersWithCorrectMemoryTrackerCountAndLastAssimilationTime()
         throws UnexpectedNoAccessRightException {
       User userWithTrackers = makeMe.aUser().please();
@@ -71,7 +55,7 @@ class AdminUserControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void canListUsersWithLastNoteTime() throws UnexpectedNoAccessRightException {
+    void canListUsersWithCorrectNoteCountAndLastNoteTime() throws UnexpectedNoAccessRightException {
       User userWithNotes = makeMe.aUser().please();
       Timestamp noteTime = makeMe.aTimestamp().of(2025, 6).please();
       Note note = makeMe.aNote().createdAt(noteTime).please();
@@ -84,6 +68,7 @@ class AdminUserControllerTest extends ControllerTestBase {
               .filter(u -> u.getId().equals(userWithNotes.getId()))
               .findFirst()
               .orElseThrow();
+      assertThat(userListing.getNoteCount(), equalTo(1L));
       assertThat(userListing.getLastNoteTime(), equalTo(noteTime));
     }
 

@@ -32,22 +32,6 @@ class AssimilationControllerTests extends ControllerTestBase {
   @Nested
   class Next {
     @Test
-    void returnsNextNoteIdPastDailyCap() {
-      User user = currentUser.getUser();
-      makeMe.theUser(user).dailyAssimilationCount(1).please();
-      Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
-      testabilitySettings.timeTravelTo(day1);
-
-      Note note1 = makeMe.aNote("note1").notebookOwnedBy(user).please();
-      Note note2 = makeMe.aNote("note2").notebookOwnedBy(user).please();
-      makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(day1).please();
-
-      AssimilationNextDTO result = controller.next("Asia/Shanghai");
-      assertThat(result.getNextUnit().getNoteId(), equalTo(note2.getId()));
-      assertThat(result.getCounts().getDueCount(), equalTo(0));
-    }
-
-    @Test
     void returnsOwnedNoteWhenSubscriptionDailyCapReached() {
       User user = currentUser.getUser();
       User notebookOwner = makeMe.aUser().please();
