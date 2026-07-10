@@ -1,4 +1,16 @@
 import { flushPromises } from "@vue/test-utils"
+import {
+  propertyRowKeyInputEl,
+  propertyRows,
+  propertyValidationText,
+} from "./propertiesTestDom"
+import {
+  attemptRenamePropertyKey,
+  clickDeadWikiLinkInPropertyValue,
+  DEAD_LINK_CLICK_CASES,
+  mountDuplicateKeysEditor,
+  propertyWikiLinkMarkdown,
+} from "./propertiesTestSupport"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 describe("RichMarkdownEditor properties", () => {
@@ -123,46 +135,15 @@ Hello`
     expect(payload).toMatch(/^---\n/)
   })
 
-  it("emits deadLinkClick when a dead wiki link in a property value is clicked", async () => {
-    const markdown = `---
-topic: "[[Missing Note]]"
----
-
-Body`
-    const wrapper = await h.mountEditor(markdown)
-    await flushPromises()
-
-    const valField = wrapper.find(
-      '[data-testid="rich-note-property-row-value-input"]'
-    )
-    const dead = valField.find("a.dead-link")
-    expect(dead.exists()).toBe(true)
-    await dead.trigger("click")
-    await flushPromises()
-    expect(wrapper.emitted("deadLinkClick")?.[0]).toEqual([
-      { targetToken: "Missing Note", displayText: "Missing Note" },
-    ])
-  })
-
-  it("emits deadLinkClick with target token when a property wiki link uses display text", async () => {
-    const markdown = `---
-topic: "[[Ghost Page|shown text]]"
----
-
-Body`
-    const wrapper = await h.mountEditor(markdown)
-    await flushPromises()
-
-    const valField = wrapper.find(
-      '[data-testid="rich-note-property-row-value-input"]'
-    )
-    const dead = valField.find("a.dead-link")
-    expect(dead.exists()).toBe(true)
-    await dead.trigger("click")
-    await flushPromises()
-    expect(wrapper.emitted("deadLinkClick")?.[0]).toEqual([
-      { targetToken: "Ghost Page", displayText: "shown text" },
-    ])
+  it.each(
+    DEAD_LINK_CLICK_CASES
+  )("emits deadLinkClick for property wiki link ($case)", async ({
+    wikiToken,
+    expected,
+  }) => {
+    const wrapper = await h.mountEditor(propertyWikiLinkMarkdown(wikiToken))
+    await clickDeadWikiLinkInPropertyValue(wrapper)
+    expect(wrapper.emitted("deadLinkClick")?.[0]).toEqual([expected])
   })
 
   it("editing an existing property row emits renamed keys and updated values", async () => {
@@ -192,39 +173,19 @@ Workshop body.`
   })
 
   it("shows validation and does not emit corrupt duplicate keys when renaming a row", async () => {
-    const markdown = `---
-alpha: one
-beta: two
----
-
-Body`
-    const wrapper = await h.mountEditor(markdown)
-    await flushPromises()
-
-    const rows = wrapper.findAll('[data-testid="rich-note-property-row"]')
-    expect(rows.length).toBe(2)
-    const betaKeyInput = rows[1]!.find(
-      '[data-testid="rich-note-property-row-key-input"]'
-    )
+    const wrapper = await mountDuplicateKeysEditor(h)
+    expect(propertyRows(wrapper.element).length).toBe(2)
     const emitCountBefore = wrapper.emitted("update:modelValue")?.length ?? 0
 
-    await betaKeyInput.trigger("focus")
-    await betaKeyInput.setValue("alpha")
-    await betaKeyInput.trigger("blur")
-    await flushPromises()
+    await attemptRenamePropertyKey(wrapper, 1, "alpha")
 
-    expect(
-      wrapper.find('[data-testid="rich-note-property-validation"]').text()
-    ).toContain("Duplicate")
-
+    expect(propertyValidationText(wrapper.element)).toContain("Duplicate")
     expect(wrapper.emitted("update:modelValue")?.length ?? 0).toBe(
       emitCountBefore
     )
-
-    const betaKeyAfter = wrapper
-      .findAll('[data-testid="rich-note-property-row"]')[1]!
-      .find('[data-testid="rich-note-property-row-key-input"]')
-    expect((betaKeyAfter.element as HTMLInputElement).value).toBe("beta")
+    expect(propertyRowKeyInputEl(propertyRows(wrapper.element)[1]!).value).toBe(
+      "beta"
+    )
   })
 
   it("removing one property row emits markdown without that key and retains the rest", async () => {

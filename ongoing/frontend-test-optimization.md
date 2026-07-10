@@ -707,7 +707,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMark
 ---
 
 ### Phase 19: components/form/RichMarkdownEditor.properties
-Status: planned
+Status: done
+
+**Learnings:** Hoisted mount/dead-link/duplicate-key helpers into `propertiesTestSupport.ts` and fast `querySelector` DOM helpers into `propertiesTestDom.ts`; merged paired dead-link emit cases with `it.each`; use direct `click()` on dead-link anchor and `querySelector` for validation text. Suite wall ~176ms (17 → 16 tests).
 
 **Tests:** (3 in top 10%, ~51ms combined)
 - `tests/components/form/RichMarkdownEditor.properties.spec.ts` — "shows validation and does not emit corrupt duplicate keys when renaming a row" (~18ms)
@@ -729,7 +731,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMark
 ---
 
 ### Phase 20: pages/MemoryTrackerPageView
-Status: planned
+Status: done
+
+**Learnings:** Hoisted mount/mocks/selectors into `memoryTrackerPageViewTestSupport.ts`; merged focused-property, thinking-time format, delete-button visibility, confirmation-count (incl. contested exclusion + confirm type), and spelling-answer cases with `it.each`; merged skipped banner/revive/hide-remove into one case. Suite wall ~183ms (25 → 23 tests).
 
 **Tests:** (3 in top 10%, ~48ms combined)
 - `tests/pages/MemoryTrackerPageView.spec.ts` — "excludes contested prompts from unanswered count in confirmation message" (~16ms)
@@ -751,7 +755,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/MemoryTrackerPageV
 ---
 
 ### Phase 21: components/form/RichMarkdownEditor.propertyValuePopup
-Status: planned
+Status: done
+
+**Learnings:** Hoisted mount/markdown helpers into `propertyValuePopupTestSupport.ts`; added `clickCancel`, `modeTabEl` to `propertyValuePopupTestDom.ts`; reused `mountTopicValuePopup` from mode-switch support; folded open-dialog assertions into save case; merged edit-icon visibility cases with `it.each`. Suite wall ~104ms (6 → 5 tests).
 
 **Tests:** (2 in top 10%, ~41ms combined)
 - `tests/components/form/RichMarkdownEditor.propertyValuePopup.spec.ts` — "cancel closes popup without emitting property changes" (~23ms)
@@ -772,7 +778,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMark
 ---
 
 ### Phase 22: links/InsertWikiLink
-Status: planned
+Status: done
+
+**Learnings:** Hoisted mount/mocks/inserter setup into `insertWikiLinkTestSupport.ts`; reused `setupSearchFormSdkMocks`, `renderSearchForm`, and `typeInSearch` from `searchDialogTestSupport.ts`; shared `openLinkInsertionChoice` for search→Add link flow. Suite wall ~80ms → ~68ms (3 tests).
 
 **Tests:** (2 in top 10%, ~38ms combined)
 - `tests/links/InsertWikiLink.spec.ts` — "calls the wiki-property inserter when Add wiki link as a new property is clicked" (~21ms)

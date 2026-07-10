@@ -24,6 +24,18 @@ export function clickSave() {
   saveBtn.click()
 }
 
+export function clickCancel() {
+  const cancelBtn = document.querySelector(
+    '[data-testid="rich-note-property-value-popup-cancel"]'
+  ) as HTMLButtonElement
+  expect(cancelBtn).not.toBeNull()
+  cancelBtn.click()
+}
+
+export function modeTabEl(testId: string): HTMLElement | null {
+  return document.querySelector(`[data-testid="${testId}"]`)
+}
+
 export function clickListAdd() {
   ;(
     document.querySelector(

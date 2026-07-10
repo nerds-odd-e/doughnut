@@ -1,10 +1,26 @@
 import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
-import helper, { mockSdkService } from "@tests/helpers"
-import MemoryTrackerPageView from "@/pages/MemoryTrackerPageView.vue"
+import { mockSdkService } from "@tests/helpers"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import usePopups from "@/components/commons/Popups/usePopups"
 import { vi, describe, it, expect, beforeEach } from "vitest"
+import {
+  answeredRecallPrompt,
+  clickDeleteUnanswered,
+  contestedRecallPrompt,
+  defaultMemoryTracker,
+  defaultMemoryTrackerId,
+  deleteUnansweredButton,
+  focusedPropertyIndicator,
+  mockDeleteUnansweredRecallPrompts,
+  mountMemoryTrackerPageViewReady,
+  peekConfirmPopup,
+  recallPromptWithThinkingTime,
+  removeFromRecallButton,
+  resolveConfirmPopup,
+  reviveButton,
+  skippedBannerText,
+  unansweredRecallPrompt,
+} from "./memoryTrackerPageViewTestSupport"
 
 const mockedPush = vi.fn()
 vi.mock("vue-router", async (importOriginal) => {
@@ -26,127 +42,52 @@ describe("MemoryTrackerPageView", () => {
     )
   })
 
-  it("shows focused property indicator for property memory trackers", async () => {
-    const memoryTracker = makeMe.aMemoryTracker
-      .withPropertyKey("a part of")
-      .please()
+  it.each([
+    {
+      label: "property memory trackers",
+      memoryTracker: makeMe.aMemoryTracker
+        .withPropertyKey("a part of")
+        .please(),
+      shouldShow: true,
+      expectedText: "Focused property: a part of",
+    },
+    {
+      label: "note-level memory trackers",
+      memoryTracker: defaultMemoryTracker(),
+      shouldShow: false,
+      expectedText: null,
+    },
+  ])("$label focused property indicator visibility", async ({
+    memoryTracker,
+    shouldShow,
+    expectedText,
+  }) => {
+    const wrapper = await mountMemoryTrackerPageViewReady({
+      recallPrompts: [],
+      memoryTracker,
+    })
 
-    const wrapper = helper
-      .component(MemoryTrackerPageView)
-      .withProps({
-        recallPrompts: [],
-        memoryTracker,
-        memoryTrackerId: 1,
-      })
-      .mount()
-
-    await flushPromises()
-
-    expect(
-      wrapper.find('[data-testid="focused-property-indicator"]').exists()
-    ).toBe(true)
-    expect(wrapper.text()).toContain("Focused property: a part of")
+    expect(focusedPropertyIndicator(wrapper).exists()).toBe(shouldShow)
+    if (expectedText) {
+      expect(wrapper.text()).toContain(expectedText)
+    } else {
+      expect(wrapper.text()).not.toContain("Focused property:")
+    }
   })
 
-  it("omits focused property indicator for note-level memory trackers", async () => {
-    const memoryTracker = makeMe.aMemoryTracker.please()
+  it.each([
+    { thinkingTimeMs: 5234, expected: "Thinking time: 5.2s" },
+    { thinkingTimeMs: 500, expected: "Thinking time: 500ms" },
+    { thinkingTimeMs: 125000, expected: "Thinking time: 2m 5s" },
+  ])("formats thinking time as $expected", async ({
+    thinkingTimeMs,
+    expected,
+  }) => {
+    const wrapper = await mountMemoryTrackerPageViewReady({
+      recallPrompts: [recallPromptWithThinkingTime(thinkingTimeMs)],
+    })
 
-    const wrapper = helper
-      .component(MemoryTrackerPageView)
-      .withProps({
-        recallPrompts: [],
-        memoryTracker,
-        memoryTrackerId: 1,
-      })
-      .mount()
-
-    await flushPromises()
-
-    expect(
-      wrapper.find('[data-testid="focused-property-indicator"]').exists()
-    ).toBe(false)
-    expect(wrapper.text()).not.toContain("Focused property:")
-  })
-
-  it("displays thinking time for answered questions", async () => {
-    const recallPrompt = makeMe.aRecallPrompt
-      .withQuestionStem("Test question")
-      .withChoices(["A", "B", "C"])
-      .withAnswer({
-        id: 1,
-        choiceIndex: 0,
-        correct: true,
-        thinkingTimeMs: 5234,
-      })
-      .please()
-    const memoryTracker = makeMe.aMemoryTracker.please()
-
-    const wrapper = helper
-      .component(MemoryTrackerPageView)
-      .withProps({
-        recallPrompts: [recallPrompt],
-        memoryTracker,
-        memoryTrackerId: 1,
-      })
-      .mount()
-
-    await flushPromises()
-
-    expect(wrapper.text()).toContain("Thinking time: 5.2s")
-  })
-
-  it("formats thinking time in milliseconds when less than 1 second", async () => {
-    const recallPrompt = makeMe.aRecallPrompt
-      .withQuestionStem("Test question")
-      .withChoices(["A", "B", "C"])
-      .withAnswer({
-        id: 1,
-        choiceIndex: 0,
-        correct: true,
-        thinkingTimeMs: 500,
-      })
-      .please()
-    const memoryTracker = makeMe.aMemoryTracker.please()
-
-    const wrapper = helper
-      .component(MemoryTrackerPageView)
-      .withProps({
-        recallPrompts: [recallPrompt],
-        memoryTracker,
-        memoryTrackerId: 1,
-      })
-      .mount()
-
-    await flushPromises()
-
-    expect(wrapper.text()).toContain("Thinking time: 500ms")
-  })
-
-  it("formats thinking time in minutes and seconds when over 1 minute", async () => {
-    const recallPrompt = makeMe.aRecallPrompt
-      .withQuestionStem("Test question")
-      .withChoices(["A", "B", "C"])
-      .withAnswer({
-        id: 1,
-        choiceIndex: 0,
-        correct: true,
-        thinkingTimeMs: 125000,
-      })
-      .please()
-    const memoryTracker = makeMe.aMemoryTracker.please()
-
-    const wrapper = helper
-      .component(MemoryTrackerPageView)
-      .withProps({
-        recallPrompts: [recallPrompt],
-        memoryTracker,
-        memoryTrackerId: 1,
-      })
-      .mount()
-
-    await flushPromises()
-
-    expect(wrapper.text()).toContain("Thinking time: 2m 5s")
+    expect(wrapper.text()).toContain(expected)
   })
 
   it("does not display thinking time for unanswered questions", async () => {
@@ -154,381 +95,144 @@ describe("MemoryTrackerPageView", () => {
       .withQuestionStem("Test question")
       .withChoices(["A", "B", "C"])
       .please()
-    const memoryTracker = makeMe.aMemoryTracker.please()
 
-    const wrapper = helper
-      .component(MemoryTrackerPageView)
-      .withProps({
-        recallPrompts: [recallPrompt],
-        memoryTracker,
-        memoryTrackerId: 1,
-      })
-      .mount()
-
-    await flushPromises()
+    const wrapper = await mountMemoryTrackerPageViewReady({
+      recallPrompts: [recallPrompt],
+    })
 
     expect(wrapper.text()).not.toContain("Thinking time")
   })
 
   it("works correctly when there are no recall prompts (spelling tracker)", async () => {
-    const memoryTracker = makeMe.aMemoryTracker.please()
-    const wrapper = helper
-      .component(MemoryTrackerPageView)
-      .withProps({
-        recallPrompts: [],
-        memoryTracker,
-        memoryTrackerId: 456,
-      })
-      .mount()
-
-    await flushPromises()
+    const wrapper = await mountMemoryTrackerPageViewReady({
+      recallPrompts: [],
+      memoryTrackerId: 456,
+    })
 
     expect(wrapper.text()).toContain("No recall prompts found")
   })
 
   describe("delete unanswered prompts", () => {
-    it("shows delete button when there are unanswered prompts", async () => {
-      const unansweredPrompt = makeMe.aRecallPrompt
-        .withQuestionStem("Unanswered question")
-        .please()
-      const memoryTracker = makeMe.aMemoryTracker.please()
+    it.each([
+      {
+        label: "unanswered prompts",
+        recallPrompts: [unansweredRecallPrompt()],
+        visible: true,
+      },
+      {
+        label: "all answered prompts",
+        recallPrompts: [answeredRecallPrompt()],
+        visible: false,
+      },
+      {
+        label: "no prompts",
+        recallPrompts: [],
+        visible: false,
+      },
+      {
+        label: "only contested unanswered prompts",
+        recallPrompts: [contestedRecallPrompt()],
+        visible: false,
+      },
+    ])("delete button visibility when $label", async ({
+      recallPrompts,
+      visible,
+    }) => {
+      const wrapper = await mountMemoryTrackerPageViewReady({ recallPrompts })
 
-      mockSdkService(
-        MemoryTrackerController,
-        "deleteUnansweredRecallPrompts",
-        undefined
-      )
-
-      const wrapper = helper
-        .component(MemoryTrackerPageView)
-        .withProps({
-          recallPrompts: [unansweredPrompt],
-          memoryTracker,
-          memoryTrackerId: 1,
-        })
-        .mount()
-
-      await flushPromises()
-
-      expect(wrapper.text()).toContain("Delete Unanswered Prompts")
-    })
-
-    it("does not show delete button when all prompts are answered", async () => {
-      const answeredPrompt = makeMe.aRecallPrompt
-        .withQuestionStem("Answered question")
-        .withAnswer({
-          id: 1,
-          choiceIndex: 0,
-          correct: true,
-        })
-        .withAnswerTime(new Date().toISOString())
-        .please()
-      const memoryTracker = makeMe.aMemoryTracker.please()
-
-      const wrapper = helper
-        .component(MemoryTrackerPageView)
-        .withProps({
-          recallPrompts: [answeredPrompt],
-          memoryTracker,
-          memoryTrackerId: 1,
-        })
-        .mount()
-
-      await flushPromises()
-
-      const deleteButton = wrapper.find(
-        'button[title="delete all unanswered recall prompts"]'
-      )
-      expect(deleteButton.exists()).toBe(false)
-    })
-
-    it("does not show delete button when there are no prompts", async () => {
-      const memoryTracker = makeMe.aMemoryTracker.please()
-
-      const wrapper = helper
-        .component(MemoryTrackerPageView)
-        .withProps({
-          recallPrompts: [],
-          memoryTracker,
-          memoryTrackerId: 1,
-        })
-        .mount()
-
-      await flushPromises()
-
-      expect(wrapper.text()).not.toContain("Delete Unanswered Prompts")
+      expect(deleteUnansweredButton(wrapper).exists()).toBe(visible)
     })
 
     it("calls delete endpoint and emits refresh when confirmed", async () => {
-      const unansweredPrompt = makeMe.aRecallPrompt
-        .withQuestionStem("Unanswered question")
-        .please()
-      const memoryTracker = makeMe.aMemoryTracker.please()
+      const deleteSpy = mockDeleteUnansweredRecallPrompts()
 
-      const deleteSpy = mockSdkService(
-        MemoryTrackerController,
-        "deleteUnansweredRecallPrompts",
-        undefined
-      )
+      const wrapper = await mountMemoryTrackerPageViewReady({
+        recallPrompts: [unansweredRecallPrompt()],
+      })
 
-      const wrapper = helper
-        .component(MemoryTrackerPageView)
-        .withProps({
-          recallPrompts: [unansweredPrompt],
-          memoryTracker,
-          memoryTrackerId: 1,
-        })
-        .mount()
-
-      await flushPromises()
-
-      const deleteButton = wrapper.find(
-        'button[title="delete all unanswered recall prompts"]'
-      )
-      expect(deleteButton.exists()).toBe(true)
-      await deleteButton.trigger("click")
-      await flushPromises()
-      usePopups().popups.done(true)
-      await flushPromises()
+      await clickDeleteUnanswered(wrapper)
+      await resolveConfirmPopup(true)
 
       expect(deleteSpy).toHaveBeenCalledWith({
-        path: { memoryTracker: 1 },
+        path: { memoryTracker: defaultMemoryTrackerId },
       })
-      expect(wrapper.emitted("refresh")).toBeTruthy()
-      expect(wrapper.emitted("refresh")?.length).toBe(1)
+      expect(wrapper.emitted("refresh")).toHaveLength(1)
     })
 
-    it("shows confirmation dialog when delete button is clicked", async () => {
-      const unansweredPrompt = makeMe.aRecallPrompt
-        .withQuestionStem("Unanswered question")
-        .please()
-      const memoryTracker = makeMe.aMemoryTracker.please()
+    it.each([
+      {
+        label: "single prompt",
+        recallPrompts: [unansweredRecallPrompt()],
+        expectedMessage:
+          "Are you sure you want to delete 1 unanswered recall prompt?",
+      },
+      {
+        label: "multiple prompts",
+        recallPrompts: [
+          makeMe.aRecallPrompt
+            .withQuestionStem("Unanswered question 1")
+            .please(),
+          makeMe.aRecallPrompt
+            .withQuestionStem("Unanswered question 2")
+            .please(),
+        ],
+        expectedMessage:
+          "Are you sure you want to delete 2 unanswered recall prompts?",
+      },
+      {
+        label: "contested prompts excluded from count",
+        recallPrompts: [unansweredRecallPrompt(), contestedRecallPrompt()],
+        expectedMessage:
+          "Are you sure you want to delete 1 unanswered recall prompt?",
+      },
+    ])("confirmation message for $label", async ({
+      recallPrompts,
+      expectedMessage,
+    }) => {
+      mockDeleteUnansweredRecallPrompts()
 
-      const wrapper = helper
-        .component(MemoryTrackerPageView)
-        .withProps({
-          recallPrompts: [unansweredPrompt],
-          memoryTracker,
-          memoryTrackerId: 1,
-        })
-        .mount()
+      const wrapper = await mountMemoryTrackerPageViewReady({ recallPrompts })
+      await clickDeleteUnanswered(wrapper)
 
-      await flushPromises()
-
-      const deleteButton = wrapper.find(
-        'button[title="delete all unanswered recall prompts"]'
-      )
-      expect(deleteButton.exists()).toBe(true)
-      await deleteButton.trigger("click")
-      await flushPromises()
-
-      // Verify confirmation dialog is shown
-      const popups = usePopups().popups.peek()
-      expect(popups?.length).toBe(1)
+      const popups = peekConfirmPopup()
+      expect(popups).toHaveLength(1)
       expect(popups?.[0]?.type).toBe("confirm")
-      // Clean up
-      usePopups().popups.done(false)
-      await flushPromises()
-    })
+      expect(popups?.[0]?.message).toBe(expectedMessage)
 
-    it("shows correct count in confirmation message for single prompt", async () => {
-      const unansweredPrompt = makeMe.aRecallPrompt
-        .withQuestionStem("Unanswered question")
-        .please()
-      const memoryTracker = makeMe.aMemoryTracker.please()
-
-      mockSdkService(
-        MemoryTrackerController,
-        "deleteUnansweredRecallPrompts",
-        undefined
-      )
-
-      const wrapper = helper
-        .component(MemoryTrackerPageView)
-        .withProps({
-          recallPrompts: [unansweredPrompt],
-          memoryTracker,
-          memoryTrackerId: 1,
-        })
-        .mount()
-
-      await flushPromises()
-
-      const deleteButton = wrapper.find(
-        'button[title="delete all unanswered recall prompts"]'
-      )
-      expect(deleteButton.exists()).toBe(true)
-      await deleteButton.trigger("click")
-      await flushPromises()
-
-      const popups = usePopups().popups.peek()
-      expect(popups?.length).toBe(1)
-      expect(popups?.[0]?.message).toBe(
-        "Are you sure you want to delete 1 unanswered recall prompt?"
-      )
-      usePopups().popups.done(false)
-      await flushPromises()
-    })
-
-    it("shows correct count in confirmation message for multiple prompts", async () => {
-      const unansweredPrompt1 = makeMe.aRecallPrompt
-        .withQuestionStem("Unanswered question 1")
-        .please()
-      const unansweredPrompt2 = makeMe.aRecallPrompt
-        .withQuestionStem("Unanswered question 2")
-        .please()
-      const memoryTracker = makeMe.aMemoryTracker.please()
-
-      mockSdkService(
-        MemoryTrackerController,
-        "deleteUnansweredRecallPrompts",
-        undefined
-      )
-
-      const wrapper = helper
-        .component(MemoryTrackerPageView)
-        .withProps({
-          recallPrompts: [unansweredPrompt1, unansweredPrompt2],
-          memoryTracker,
-          memoryTrackerId: 1,
-        })
-        .mount()
-
-      await flushPromises()
-
-      const deleteButton = wrapper.find(
-        'button[title="delete all unanswered recall prompts"]'
-      )
-      expect(deleteButton.exists()).toBe(true)
-      await deleteButton.trigger("click")
-      await flushPromises()
-
-      const popups = usePopups().popups.peek()
-      expect(popups?.length).toBe(1)
-      expect(popups?.[0]?.message).toBe(
-        "Are you sure you want to delete 2 unanswered recall prompts?"
-      )
-      usePopups().popups.done(false)
-      await flushPromises()
-    })
-
-    it("does not show delete button when only contested unanswered prompts exist", async () => {
-      const contestedPrompt = makeMe.aRecallPrompt
-        .withQuestionStem("Contested question")
-        .withIsContested(true)
-        .please()
-      const memoryTracker = makeMe.aMemoryTracker.please()
-
-      const wrapper = helper
-        .component(MemoryTrackerPageView)
-        .withProps({
-          recallPrompts: [contestedPrompt],
-          memoryTracker,
-          memoryTrackerId: 1,
-        })
-        .mount()
-
-      await flushPromises()
-
-      const deleteButton = wrapper.find(
-        'button[title="delete all unanswered recall prompts"]'
-      )
-      expect(deleteButton.exists()).toBe(false)
-    })
-
-    it("excludes contested prompts from unanswered count in confirmation message", async () => {
-      const unansweredPrompt = makeMe.aRecallPrompt
-        .withQuestionStem("Unanswered question")
-        .please()
-      const contestedPrompt = makeMe.aRecallPrompt
-        .withQuestionStem("Contested question")
-        .withIsContested(true)
-        .please()
-      const memoryTracker = makeMe.aMemoryTracker.please()
-
-      mockSdkService(
-        MemoryTrackerController,
-        "deleteUnansweredRecallPrompts",
-        undefined
-      )
-
-      const wrapper = helper
-        .component(MemoryTrackerPageView)
-        .withProps({
-          recallPrompts: [unansweredPrompt, contestedPrompt],
-          memoryTracker,
-          memoryTrackerId: 1,
-        })
-        .mount()
-
-      await flushPromises()
-
-      const deleteButton = wrapper.find(
-        'button[title="delete all unanswered recall prompts"]'
-      )
-      expect(deleteButton.exists()).toBe(true)
-      await deleteButton.trigger("click")
-      await flushPromises()
-
-      const popups = usePopups().popups.peek()
-      expect(popups?.length).toBe(1)
-      expect(popups?.[0]?.message).toBe(
-        "Are you sure you want to delete 1 unanswered recall prompt?"
-      )
-      usePopups().popups.done(false)
-      await flushPromises()
+      await resolveConfirmPopup(false)
     })
   })
 
   describe("skipped memory tracker", () => {
-    const reviveButtonSelector = 'button[title="Revive this memory tracker"]'
-    const skippedBannerText =
-      "This memory tracker is currently skipped and will not appear in recall sessions."
+    const skippedMemoryTracker = () =>
+      makeMe.aMemoryTracker.removedFromTracking(true).please()
 
-    it("shows skipped banner and revive button when memory tracker is skipped", async () => {
-      const memoryTracker = makeMe.aMemoryTracker
-        .removedFromTracking(true)
-        .please()
+    it("shows skipped banner, revive button, and hides remove-from-recall", async () => {
       const recallPrompt = makeMe.aRecallPrompt
         .withQuestionStem("Test question")
         .please()
 
-      const wrapper = helper
-        .component(MemoryTrackerPageView)
-        .withProps({
-          recallPrompts: [recallPrompt],
-          memoryTracker,
-          memoryTrackerId: 1,
-        })
-        .mount()
-
-      await flushPromises()
+      const wrapper = await mountMemoryTrackerPageViewReady({
+        recallPrompts: [recallPrompt],
+        memoryTracker: skippedMemoryTracker(),
+      })
 
       expect(wrapper.text()).toContain(skippedBannerText)
-      const reviveButton = wrapper.find(reviveButtonSelector)
-      expect(reviveButton.exists()).toBe(true)
-      expect(reviveButton.text()).toContain("Revive")
+      expect(reviveButton(wrapper).exists()).toBe(true)
+      expect(reviveButton(wrapper).text()).toContain("Revive")
+      expect(removeFromRecallButton(wrapper).exists()).toBe(false)
     })
 
     it("shows recall prompts even when memory tracker is skipped", async () => {
-      const memoryTracker = makeMe.aMemoryTracker
-        .removedFromTracking(true)
-        .please()
       const recallPrompt = makeMe.aRecallPrompt
         .withQuestionStem("Test question")
         .withChoices(["A", "B", "C"])
         .please()
 
-      const wrapper = helper
-        .component(MemoryTrackerPageView)
-        .withProps({
-          recallPrompts: [recallPrompt],
-          memoryTracker,
-          memoryTrackerId: 1,
-        })
-        .mount()
-
-      await flushPromises()
+      const wrapper = await mountMemoryTrackerPageViewReady({
+        recallPrompts: [recallPrompt],
+        memoryTracker: skippedMemoryTracker(),
+      })
 
       expect(wrapper.text()).toContain("Test question")
       expect(wrapper.text()).toContain("A")
@@ -536,35 +240,8 @@ describe("MemoryTrackerPageView", () => {
       expect(wrapper.text()).toContain("C")
     })
 
-    it("hides remove from recall button when memory tracker is skipped", async () => {
-      const memoryTracker = makeMe.aMemoryTracker
-        .removedFromTracking(true)
-        .please()
-      const recallPrompt = makeMe.aRecallPrompt
-        .withQuestionStem("Test question")
-        .please()
-
-      const wrapper = helper
-        .component(MemoryTrackerPageView)
-        .withProps({
-          recallPrompts: [recallPrompt],
-          memoryTracker,
-          memoryTrackerId: 1,
-        })
-        .mount()
-
-      await flushPromises()
-
-      const removeButton = wrapper.find(
-        'button[title="remove this note from recall"]'
-      )
-      expect(removeButton.exists()).toBe(false)
-    })
-
     it("calls re-enable endpoint and emits refresh when revive button is clicked", async () => {
-      const memoryTracker = makeMe.aMemoryTracker
-        .removedFromTracking(true)
-        .please()
+      const memoryTracker = skippedMemoryTracker()
       const recallPrompt = makeMe.aRecallPrompt
         .withQuestionStem("Test question")
         .please()
@@ -574,162 +251,116 @@ describe("MemoryTrackerPageView", () => {
         removedFromTracking: false,
       })
 
-      const wrapper = helper
-        .component(MemoryTrackerPageView)
-        .withProps({
-          recallPrompts: [recallPrompt],
-          memoryTracker,
-          memoryTrackerId: 1,
-        })
-        .mount()
+      const wrapper = await mountMemoryTrackerPageViewReady({
+        recallPrompts: [recallPrompt],
+        memoryTracker,
+      })
 
-      await flushPromises()
-
-      const reviveButton = wrapper.find(reviveButtonSelector)
-      expect(reviveButton.exists()).toBe(true)
-      await reviveButton.trigger("click")
+      await reviveButton(wrapper).trigger("click")
       await flushPromises()
 
       expect(reEnableSpy).toHaveBeenCalledWith({
-        path: { memoryTracker: 1 },
+        path: { memoryTracker: defaultMemoryTrackerId },
       })
-      expect(wrapper.emitted("refresh")).toBeTruthy()
-      expect(wrapper.emitted("refresh")?.length).toBe(1)
+      expect(wrapper.emitted("refresh")).toHaveLength(1)
     })
 
     it("does not show skipped indicator when memory tracker is not skipped", async () => {
-      const memoryTracker = makeMe.aMemoryTracker
-        .removedFromTracking(false)
-        .please()
       const recallPrompt = makeMe.aRecallPrompt
         .withQuestionStem("Test question")
         .please()
 
-      const wrapper = helper
-        .component(MemoryTrackerPageView)
-        .withProps({
-          recallPrompts: [recallPrompt],
-          memoryTracker,
-          memoryTrackerId: 1,
-        })
-        .mount()
-
-      await flushPromises()
+      const wrapper = await mountMemoryTrackerPageViewReady({
+        recallPrompts: [recallPrompt],
+        memoryTracker: makeMe.aMemoryTracker
+          .removedFromTracking(false)
+          .please(),
+      })
 
       expect(wrapper.text()).not.toContain(
         "This memory tracker is currently skipped"
       )
-      const reviveButton = wrapper.find(reviveButtonSelector)
-      expect(reviveButton.exists()).toBe(false)
+      expect(reviveButton(wrapper).exists()).toBe(false)
     })
   })
 
   describe("spelling question type", () => {
     it("displays spelling question message when question type is SPELLING and unanswered", async () => {
-      const memoryTracker = makeMe.aMemoryTracker.please()
       const spellingPrompt = makeMe.aRecallPrompt
         .withQuestionType("SPELLING")
         .please()
 
-      const wrapper = helper
-        .component(MemoryTrackerPageView)
-        .withProps({
-          recallPrompts: [spellingPrompt],
-          memoryTracker,
-          memoryTrackerId: 1,
-        })
-        .mount()
-
-      await flushPromises()
+      const wrapper = await mountMemoryTrackerPageViewReady({
+        recallPrompts: [spellingPrompt],
+      })
 
       expect(wrapper.text()).toContain(
         "This is a spelling question. Details are not needed."
       )
     })
 
-    it("displays spelling answer information when answered correctly", async () => {
-      const memoryTracker = makeMe.aMemoryTracker.please()
-      const spellingPrompt = makeMe.aRecallPrompt
-        .withQuestionType("SPELLING")
-        .withAnswer({
+    it.each([
+      {
+        label: "correct",
+        answer: {
           id: 1,
           spellingAnswer: "Sedition",
           correct: true,
           thinkingTimeMs: 3000,
-        })
-        .withAnswerTime(new Date().toISOString())
-        .please()
-
-      const wrapper = helper
-        .component(MemoryTrackerPageView)
-        .withProps({
-          recallPrompts: [spellingPrompt],
-          memoryTracker,
-          memoryTrackerId: 1,
-        })
-        .mount()
-
-      await flushPromises()
-
-      expect(wrapper.text()).toContain("Your answer:")
-      expect(wrapper.text()).toContain("Sedition")
-      expect(wrapper.text()).toContain("Result:")
-      expect(wrapper.text()).toContain("Correct")
-      expect(wrapper.text()).toContain("Thinking time: 3.0s")
-      expect(wrapper.text()).not.toContain(
-        "This is a spelling question. Details are not needed."
-      )
-    })
-
-    it("displays spelling answer information when answered incorrectly", async () => {
-      const memoryTracker = makeMe.aMemoryTracker.please()
-      const spellingPrompt = makeMe.aRecallPrompt
-        .withQuestionType("SPELLING")
-        .withAnswer({
+        },
+        resultText: "Correct",
+        thinkingTime: "Thinking time: 3.0s",
+        hidesUnansweredMessage: true,
+      },
+      {
+        label: "incorrect",
+        answer: {
           id: 1,
           spellingAnswer: "asdf",
           correct: false,
           thinkingTimeMs: 1500,
-        })
+        },
+        resultText: "Incorrect",
+        thinkingTime: "Thinking time: 1.5s",
+        hidesUnansweredMessage: false,
+      },
+    ])("displays spelling answer information when answered $label", async ({
+      answer,
+      resultText,
+      thinkingTime,
+      hidesUnansweredMessage,
+    }) => {
+      const spellingPrompt = makeMe.aRecallPrompt
+        .withQuestionType("SPELLING")
+        .withAnswer(answer)
         .withAnswerTime(new Date().toISOString())
         .please()
 
-      const wrapper = helper
-        .component(MemoryTrackerPageView)
-        .withProps({
-          recallPrompts: [spellingPrompt],
-          memoryTracker,
-          memoryTrackerId: 1,
-        })
-        .mount()
-
-      await flushPromises()
+      const wrapper = await mountMemoryTrackerPageViewReady({
+        recallPrompts: [spellingPrompt],
+      })
 
       expect(wrapper.text()).toContain("Your answer:")
-      expect(wrapper.text()).toContain("asdf")
+      expect(wrapper.text()).toContain(answer.spellingAnswer)
       expect(wrapper.text()).toContain("Result:")
-      expect(wrapper.text()).toContain("Incorrect")
-      expect(wrapper.text()).toContain("Thinking time: 1.5s")
+      expect(wrapper.text()).toContain(resultText)
+      expect(wrapper.text()).toContain(thinkingTime)
+      if (hidesUnansweredMessage) {
+        expect(wrapper.text()).not.toContain(
+          "This is a spelling question. Details are not needed."
+        )
+      }
     })
 
     it("does not display supplemental question text for spelling questions", async () => {
-      const memoryTracker = makeMe.aMemoryTracker.please()
       const spellingPrompt = makeMe.aRecallPrompt
         .withQuestionType("SPELLING")
         .please()
 
-      const wrapper = helper
-        .component(MemoryTrackerPageView)
-        .withProps({
-          recallPrompts: [spellingPrompt],
-          memoryTracker,
-          memoryTrackerId: 1,
-        })
-        .mount()
+      const wrapper = await mountMemoryTrackerPageViewReady({
+        recallPrompts: [spellingPrompt],
+      })
 
-      await flushPromises()
-
-      // Should not display multiple choice question
       expect(wrapper.findComponent({ name: "QuestionDisplay" }).exists()).toBe(
         false
       )
