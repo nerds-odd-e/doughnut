@@ -205,6 +205,6 @@ Re-run: `CURSOR_DEV=true nix develop -c pnpm cy:run-on-sut --reporter json` (tee
 
 **Candidates proposed this run:** real OpenAI audio (`record_live_audio_with_real_open_ai_service.feature`) — see blacklist
 
-**Commits:** phase 1 `6063698e4a`; phase 2 pending push; phase 3 pending push; phase 4 pending push
+**Commits:** phase 1 `6063698e4a`; phase 2 `f18e67daa4`; phase 3 `39b9fc9e9e`; phase 4 `9e25332256`
 
 Archive summary to `ongoing/archive/e2e-test-optimization-history.md`, delete this working plan, keep blacklist. Do not commit profile JSON.
