@@ -6,7 +6,7 @@ import {
 import NoteRefinement from "@/components/recall/NoteRefinement.vue"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import helper, { mockSdkService } from "@tests/helpers"
+import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import usePopups from "@/components/commons/Popups/usePopups"
@@ -113,6 +113,134 @@ export async function selectFirstLayoutItem(
 
 export const extractNoteButtonTitle = "Extract selected to a new note"
 
+export const threePointLayoutTexts = ["Point 1", "Point 2", "Point 3"] as const
+
+export function threePointLayout() {
+  return refinementLayoutItems([...threePointLayoutTexts])
+}
+
+export type ExtractionPreviewFieldValues = {
+  newTitle?: string
+  newContent?: string
+  originalContent?: string
+}
+
+export function extractionPreviewFieldsFor(
+  label: string
+): ExtractionPreviewFieldValues {
+  return {
+    newTitle: `${label} title`,
+    newContent: `${label} content`,
+    originalContent: `${label} original`,
+  }
+}
+
+export function previewFieldValue(
+  wrapper: ReturnType<typeof mountNoteRefinement>,
+  testId:
+    | "extraction-preview-new-title"
+    | "extraction-preview-new-content"
+    | "extraction-preview-original-content"
+): string {
+  return (
+    wrapper.find(`[data-test-id="${testId}"]`).element as HTMLTextAreaElement
+  ).value
+}
+
+export function expectPreviewFields(
+  wrapper: ReturnType<typeof mountNoteRefinement>,
+  expected: ExtractionPreviewFieldValues
+) {
+  if (expected.newTitle !== undefined) {
+    expect(previewFieldValue(wrapper, "extraction-preview-new-title")).toBe(
+      expected.newTitle
+    )
+  }
+  if (expected.newContent !== undefined) {
+    expect(previewFieldValue(wrapper, "extraction-preview-new-content")).toBe(
+      expected.newContent
+    )
+  }
+  if (expected.originalContent !== undefined) {
+    expect(
+      previewFieldValue(wrapper, "extraction-preview-original-content")
+    ).toBe(expected.originalContent)
+  }
+}
+
+export function expectExtractionPreviewVisible(
+  wrapper: ReturnType<typeof mountNoteRefinement>,
+  visible = true
+) {
+  expect(wrapper.find('[data-test-id="extraction-preview"]').exists()).toBe(
+    visible
+  )
+}
+
+export function expectExtractionPreviewError(
+  wrapper: ReturnType<typeof mountNoteRefinement>,
+  message: string
+) {
+  expect(wrapper.find('[data-test-id="extraction-preview-error"]').text()).toBe(
+    message
+  )
+}
+
+export async function setPreviewFields(
+  wrapper: ReturnType<typeof mountNoteRefinement>,
+  fields: ExtractionPreviewFieldValues
+) {
+  if (fields.newTitle !== undefined) {
+    await wrapper
+      .find('[data-test-id="extraction-preview-new-title"]')
+      .setValue(fields.newTitle)
+  }
+  if (fields.newContent !== undefined) {
+    await wrapper
+      .find('[data-test-id="extraction-preview-new-content"]')
+      .setValue(fields.newContent)
+  }
+  if (fields.originalContent !== undefined) {
+    await wrapper
+      .find('[data-test-id="extraction-preview-original-content"]')
+      .setValue(fields.originalContent)
+  }
+}
+
+export function createDeferredGate() {
+  let resolveGate!: () => void
+  const gate = new Promise<void>((resolve) => {
+    resolveGate = resolve
+  })
+  return { gate, resolve: () => resolveGate() }
+}
+
+export const loadingModalMask = () =>
+  document.querySelector(".loading-modal-mask")
+
+export async function mountNoteRefinementReady(layoutItemTexts: string[]) {
+  const wrapper = mountNoteRefinement(layoutItemTexts)
+  await flushPromises()
+  return wrapper
+}
+
+export async function mountNoteRefinementWithLayoutReady(
+  items: NoteRefinementLayoutItem[],
+  overrides?: { note?: typeof note }
+) {
+  const wrapper = mountNoteRefinementWithLayout(items, overrides)
+  await flushPromises()
+  return wrapper
+}
+
+export async function clickExtractRefinementLayout(
+  wrapper: ReturnType<typeof mountNoteRefinement>
+) {
+  await wrapper
+    .find('[data-test-id="extract-refinement-layout"]')
+    .trigger("click")
+}
+
 export const sampleExtractionPreview = (
   overrides?: Partial<NoteExtractionResult>
 ): NoteExtractionResult => ({
@@ -121,6 +249,29 @@ export const sampleExtractionPreview = (
   updatedOriginalNoteContent: "Updated original content",
   ...overrides,
 })
+
+export function labeledExtractionPreview(
+  label: string,
+  overrides?: Partial<NoteExtractionResult>
+): NoteExtractionResult {
+  const fields = extractionPreviewFieldsFor(label)
+  return sampleExtractionPreview({
+    newNoteTitle: fields.newTitle,
+    newNoteContent: fields.newContent,
+    updatedOriginalNoteContent: fields.originalContent,
+    ...overrides,
+  })
+}
+
+export function mockExtractNotePreviewResponses(
+  ...previews: NoteExtractionResult[]
+) {
+  const spy = mockSdkService(AiController, "extractNotePreview", previews[0]!)
+  for (const preview of previews) {
+    spy.mockResolvedValueOnce(wrapSdkResponse(preview))
+  }
+  return spy
+}
 
 export function extractionPreviewApiCall(
   noteId: number,
@@ -226,26 +377,44 @@ export async function openExtractionPreview(
   itemId: string
 ) {
   await selectRefinementLayoutItem(wrapper, itemId)
-  await wrapper
-    .find(`button[title="${extractNoteButtonTitle}"]`)
-    .trigger("click")
+  await clickExtractRefinementLayout(wrapper)
   await flushPromises()
 }
 
-export async function createNoteFromExtractionPreview(
+export async function clickCreateNoteFromExtractionPreview(
   wrapper: ReturnType<typeof mountNoteRefinement>
 ) {
   await wrapper
     .find('[data-test-id="extraction-preview-create"]')
     .trigger("click")
+}
+
+export async function createNoteFromExtractionPreview(
+  wrapper: ReturnType<typeof mountNoteRefinement>
+) {
+  await clickCreateNoteFromExtractionPreview(wrapper)
   await flushPromises()
 }
 
-export async function retryExtractionPreview(
+export async function clickExtractionPreviewBack(
+  wrapper: ReturnType<typeof mountNoteRefinement>
+) {
+  await wrapper
+    .find('[data-test-id="extraction-preview-back"]')
+    .trigger("click")
+}
+
+export async function clickRetryExtractionPreview(
   wrapper: ReturnType<typeof mountNoteRefinement>
 ) {
   await wrapper
     .find('[data-test-id="retry-extraction-preview"]')
     .trigger("click")
+}
+
+export async function retryExtractionPreview(
+  wrapper: ReturnType<typeof mountNoteRefinement>
+) {
+  await clickRetryExtractionPreview(wrapper)
   await flushPromises()
 }

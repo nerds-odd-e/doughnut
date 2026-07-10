@@ -268,9 +268,11 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/BookReadingPage.sp
 ---
 
 ### Phase 2: components/recall/NoteRefinement.extractNote
-Status: planned
+Status: done
 
-**Tests:** (13 in top 10%, ~278ms combined)
+**Learnings:** Merged 4 redundant cases (create-button toggle, retry confirm/cancel, paired loading-modal success+failure) and hoisted shared mount/preview helpers into `noteRefinementTestSupport.ts` (`data-test-id` extract button, `mountNoteRefinementReady`, `expectPreviewFields`, `createDeferredGate`). Suite CPU ~370ms → ~326ms (19 → 15 tests).
+
+**Tests:** (13 in top 10%, ~278ms combined — pre-optimization baseline)
 - `tests/components/recall/NoteRefinement.extractNote.spec.ts` — "extracts multiple selected layout points into one preview" (~31ms)
 - `tests/components/recall/NoteRefinement.extractNote.spec.ts` — "shows LoadingModal while creating note from preview" (~22ms)
 - `tests/components/recall/NoteRefinement.extractNote.spec.ts` — "keeps edited preview fields when retry is cancelled" (~22ms)
