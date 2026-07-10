@@ -1068,7 +1068,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/TextContentWrapper
 ---
 
 ### Phase 35: components/recall/NoteRefinement.removeLayout
-Status: planned
+Status: done
+
+**Learnings:** Hoisted `openRemoveRefinementConfirmDialog`, `expectRemoveConfirmPopup`, and `mountNoteRefinementWithFirstItemSelected` into `noteRefinementTestSupport.ts`; refactored `clickRemoveRefinementLayout` to compose open+confirm; merged confirmation+cancel and paired disabled/enabled button cases with `it.each`; use `mountNoteRefinementReady` and shared action helpers. Suite wall ~94ms (10 → 9 tests).
 
 **Tests:** (1 in top 10%, ~16ms combined)
 - `tests/components/recall/NoteRefinement.removeLayout.spec.ts` — "shows confirmation dialog when remove button is clicked" (~16ms)

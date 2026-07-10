@@ -16,7 +16,7 @@ import type {
   NoteExtractionResult,
   NoteRefinementLayoutItem,
 } from "@generated/doughnut-backend-api"
-import { afterEach, beforeEach, vi } from "vitest"
+import { afterEach, beforeEach, expect, vi } from "vitest"
 import { defineComponent, type PropType } from "vue"
 
 export const noteRealm = makeMe.aNoteRealm.please()
@@ -249,17 +249,38 @@ export async function mountNestedLayoutWithIndeterminateParentSelection() {
   return { layout, wrapper }
 }
 
-export async function clickRemoveRefinementLayout(
-  wrapper: ReturnType<typeof mountNoteRefinement>,
-  confirmed = true
+export async function openRemoveRefinementConfirmDialog(
+  wrapper: ReturnType<typeof mountNoteRefinement>
 ) {
   await wrapper
     .find('[data-test-id="remove-refinement-layout"]')
     .trigger("click")
-  if (confirmed) {
-    usePopups().popups.done(true)
-    await flushPromises()
-  }
+  await flushPromises()
+}
+
+export function expectRemoveConfirmPopup() {
+  const popups = usePopups().popups.peek()
+  expect(popups).toHaveLength(1)
+  expect(popups[0]!.type).toBe("confirm")
+  expect(popups[0]!.message).toContain("remove")
+}
+
+export async function clickRemoveRefinementLayout(
+  wrapper: ReturnType<typeof mountNoteRefinement>
+) {
+  await openRemoveRefinementConfirmDialog(wrapper)
+  usePopups().popups.done(true)
+  await flushPromises()
+}
+
+export async function mountNoteRefinementWithFirstItemSelected(
+  layoutItemTexts: string[] = ["Point 1", "Point 2"],
+  overrides?: { note?: typeof note }
+) {
+  const wrapper = mountNoteRefinement(layoutItemTexts, overrides)
+  await flushPromises()
+  await selectFirstLayoutItem(wrapper)
+  return wrapper
 }
 
 export const sampleExtractionPreview = (
