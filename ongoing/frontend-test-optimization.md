@@ -934,7 +934,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/NoteRe
 ---
 
 ### Phase 29: components/form/RichMarkdownEditor.propertyTouchFocus
-Status: planned
+Status: done
+
+**Learnings:** Hoisted mount/coarse-pointer/primer setup and markdown fixtures into `propertyTouchFocusTestSupport.ts`; replaced `waitUntilFocused` (extra rAF) with `expectElementFocused` after `flushAnimationFrame`; removed redundant post-mount `flushPromises`. Suite wall ~200ms → ~102ms (9 tests).
 
 **Tests:** (1 in top 10%, ~20ms combined)
 - `tests/components/form/RichMarkdownEditor.propertyTouchFocus.spec.ts` — "does not focus primer when pointer is not coarse" (~20ms)

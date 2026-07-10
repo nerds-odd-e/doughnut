@@ -1,32 +1,14 @@
-import { flushPromises } from "@vue/test-utils"
 import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
-import {
-  mountSoftKeyboardPrimer,
-  softKeyboardPrimerElement,
-  waitUntilFocused,
-} from "@tests/helpers/softKeyboardPrimerTestSupport"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
-
-const addPropertyTapCases = [
-  {
-    case: "no existing rows",
-    markdown: "# Hello Body",
-  },
-  {
-    case: "existing rows",
-    markdown: `---
-status: ok
----
-
-# Body`,
-  },
-] as const
-
-const existingPropertyValueMarkdown = `---
-topic: training
----
-
-Workshop body.`
+import {
+  addPropertyTapCases,
+  deadLinkPropertyMarkdown,
+  existingPropertyValueMarkdown,
+  expectElementFocused,
+  mountTouchFocusEditor,
+  PROPERTY_KEY_INPUT,
+  PROPERTY_VALUE_INPUT,
+} from "./propertyTouchFocusTestSupport"
 
 describe("RichMarkdownEditor property touch focus", () => {
   const h = createRichMarkdownEditorTestHarness()
@@ -42,11 +24,12 @@ describe("RichMarkdownEditor property touch focus", () => {
   )("focuses primer synchronously when Add property is tapped with $case on touch device", async ({
     markdown,
   }) => {
-    matchMediaSpy = mockCoarsePointer(true)
-    mountSoftKeyboardPrimer()
-    await h.mountEditor(markdown, { attachToBody: true })
-    await flushPromises()
-    const primer = softKeyboardPrimerElement()
+    const { matchMediaSpy: spy, primer } = await mountTouchFocusEditor(
+      h,
+      markdown,
+      true
+    )
+    matchMediaSpy = spy
     expect(primer).toBeTruthy()
 
     h.tapAddProperty()
@@ -59,46 +42,40 @@ describe("RichMarkdownEditor property touch focus", () => {
   )("transfers focus to property key after insert form mounts with $case", async ({
     markdown,
   }) => {
-    matchMediaSpy = mockCoarsePointer(true)
-    mountSoftKeyboardPrimer()
-    await h.mountEditor(markdown, { attachToBody: true })
-    await flushPromises()
+    const { matchMediaSpy: spy } = await mountTouchFocusEditor(
+      h,
+      markdown,
+      true
+    )
+    matchMediaSpy = spy
 
     await h.openAddProperty()
     await h.flushAnimationFrame()
-    const keyInput = document.querySelector(
-      '[data-testid="rich-note-property-key"]'
-    )
-    expect(document.activeElement).toBe(keyInput)
+    expectElementFocused(PROPERTY_KEY_INPUT)
   })
 
   it("does not focus primer when pointer is not coarse", async () => {
-    matchMediaSpy = mockCoarsePointer(false)
-    mountSoftKeyboardPrimer()
-    await h.mountEditor("# Hello Body", { attachToBody: true })
-    await flushPromises()
-    const primer = softKeyboardPrimerElement()
+    const { matchMediaSpy: spy, primer } = await mountTouchFocusEditor(
+      h,
+      "# Hello Body",
+      false
+    )
+    matchMediaSpy = spy
 
     await h.openAddProperty()
     await h.flushAnimationFrame()
-
     expect(document.activeElement).not.toBe(primer)
-    await waitUntilFocused('[data-testid="rich-note-property-key"]')
+    expectElementFocused(PROPERTY_KEY_INPUT)
   })
 
   describe("existing property value", () => {
-    async function mountForPropertyValuePrimer(coarse: boolean) {
-      matchMediaSpy = mockCoarsePointer(coarse)
-      mountSoftKeyboardPrimer()
-      await h.mountEditor(existingPropertyValueMarkdown, {
-        attachToBody: true,
-      })
-      await flushPromises()
-      return softKeyboardPrimerElement()
-    }
-
     it("focuses primer synchronously when value is pointerdown-tapped on touch device", async () => {
-      const primer = await mountForPropertyValuePrimer(true)
+      const { matchMediaSpy: spy, primer } = await mountTouchFocusEditor(
+        h,
+        existingPropertyValueMarkdown,
+        true
+      )
+      matchMediaSpy = spy
       expect(primer).toBeTruthy()
 
       h.pointerdownPropertyValueField()
@@ -107,41 +84,40 @@ describe("RichMarkdownEditor property touch focus", () => {
     })
 
     it("transfers focus to value field after pointerdown on touch device", async () => {
-      await mountForPropertyValuePrimer(true)
+      const { matchMediaSpy: spy } = await mountTouchFocusEditor(
+        h,
+        existingPropertyValueMarkdown,
+        true
+      )
+      matchMediaSpy = spy
 
       h.pointerdownPropertyValueField()
       h.completePropertyValueFieldTap()
-
-      await waitUntilFocused(
-        '[data-testid="rich-note-property-row-value-input"]'
-      )
+      expectElementFocused(PROPERTY_VALUE_INPUT)
     })
 
     it("does not focus primer when pointer is not coarse", async () => {
-      const primer = await mountForPropertyValuePrimer(false)
+      const { matchMediaSpy: spy, primer } = await mountTouchFocusEditor(
+        h,
+        existingPropertyValueMarkdown,
+        false
+      )
+      matchMediaSpy = spy
 
       h.pointerdownPropertyValueField()
       h.completePropertyValueFieldTap()
 
       expect(document.activeElement).not.toBe(primer)
-      await waitUntilFocused(
-        '[data-testid="rich-note-property-row-value-input"]'
-      )
+      expectElementFocused(PROPERTY_VALUE_INPUT)
     })
 
     it("does not focus primer when pointerdown hits a dead wiki link", async () => {
-      matchMediaSpy = mockCoarsePointer(true)
-      mountSoftKeyboardPrimer()
-      await h.mountEditor(
-        `---
-topic: "[[Missing Note]]"
----
-
-Body`,
-        { attachToBody: true }
+      const { matchMediaSpy: spy, primer } = await mountTouchFocusEditor(
+        h,
+        deadLinkPropertyMarkdown,
+        true
       )
-      await flushPromises()
-      const primer = softKeyboardPrimerElement()
+      matchMediaSpy = spy
       const deadLink = h
         .propertyValueFieldElement()
         .querySelector("a.dead-link")
