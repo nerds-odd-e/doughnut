@@ -215,14 +215,14 @@ CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles
 ---
 
 ### Phase 2: Optimize batch ranks 4–6
-Status: planned
+Status: done
 
-**Tests:**
-- `backend/src/test/java/com/odde/doughnut/controllers/NoteControllerTests.java` — "shouldNotAllowUploadForNoteBelongingToAnotherUser()" (~318ms)
-- `backend/src/test/java/com/odde/doughnut/controllers/AiAudioControllerTests.java` — "shouldNotTruncateSRTWhenComplete()" (~238ms)
-- `backend/src/test/java/com/odde/doughnut/services/QuestionGenerationBatchMaintenanceServiceOrderTest.java` — "shouldPruneTerminalBatchesAfterImport()" (~214ms)
+**Tests (baseline → after):**
+- `NoteControllerTests.shouldNotAllowUploadForNoteBelongingToAnotherUser()` (~318ms) → ~4ms; dropped `anUploadedImage()` fixture — `assertAuthorization` throws before image processing
+- `AiAudioControllerTests.shouldNotTruncateSRTWhenComplete()` (~238ms) → **deleted** (redundant with `SRTProcessorTests`); also removed `shouldTruncateSRTWhenIncomplete()` (~same cost)
+- `QuestionGenerationBatchMaintenanceServiceOrderTest.shouldPruneTerminalBatchesAfterImport()` (~214ms) → merged into `QuestionGenerationBatchMaintenanceJobTests.ResumeExistingBatchesInvocationOrder` (~118ms); deleted standalone test class
 
-**Goals:** Speed up only these tests (merge/delete redundant cases, slim `makeMe`/fixtures, parameterize duplicates, avoid full-stack when a narrower entry suffices). If no meaningful win after a serious attempt, append **Candidates** in the blacklist and mark done.
+**Learnings:** PNG generation in `UploadedImageBuilder` dominated the upload access-denial test; SRT truncation is already covered at `SRTProcessor` unit level.
 
 **Verify:**
 

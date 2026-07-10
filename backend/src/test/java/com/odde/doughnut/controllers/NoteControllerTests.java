@@ -480,10 +480,9 @@ class NoteControllerTests extends ControllerTestBase {
     void shouldNotAllowUploadForNoteBelongingToAnotherUser() {
       User other = makeMe.aUser().please();
       Note note = makeMe.aNote().notebookOwnedBy(other).please();
-      NoteImageUploadDTO dto = new NoteImageUploadDTO();
-      dto.setUploadImage(makeMe.anUploadedImage().toMultiplePartFilePlease());
       assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.uploadNoteImage(note, dto));
+          UnexpectedNoAccessRightException.class,
+          () -> controller.uploadNoteImage(note, new NoteImageUploadDTO()));
     }
 
     @Test

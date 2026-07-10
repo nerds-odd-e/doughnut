@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verify;
 import com.odde.doughnut.entities.QuestionGenerationBatchMaintenanceTriggerSource;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InOrder;
@@ -33,6 +34,37 @@ class QuestionGenerationBatchMaintenanceJobTests {
     job =
         new QuestionGenerationBatchMaintenanceJob(
             maintenanceService, submitDueUsersService, maintenanceRunService);
+  }
+
+  @Nested
+  class ResumeExistingBatchesInvocationOrder {
+    @Mock QuestionGenerationBatchPollingService pollingService;
+    @Mock QuestionGenerationBatchOutputCollectionService outputCollectionService;
+    @Mock QuestionGenerationBatchImportService batchImportService;
+    @Mock QuestionGenerationBatchRetentionService retentionService;
+
+    QuestionGenerationBatchMaintenanceService batchMaintenanceService;
+
+    @BeforeEach
+    void setup() {
+      batchMaintenanceService =
+          new QuestionGenerationBatchMaintenanceService(
+              pollingService, outputCollectionService, batchImportService, retentionService);
+    }
+
+    @Test
+    void shouldPruneTerminalBatchesAfterImport() {
+      Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+
+      batchMaintenanceService.resumeExistingBatches(currentTime);
+
+      InOrder inOrder =
+          inOrder(pollingService, outputCollectionService, batchImportService, retentionService);
+      inOrder.verify(pollingService).pollSubmittedBatches();
+      inOrder.verify(outputCollectionService).collectOutputForCompletedBatches(currentTime);
+      inOrder.verify(batchImportService).importCompletedBatches(currentTime);
+      inOrder.verify(retentionService).pruneTerminalBatches(currentTime);
+    }
   }
 
   @Test
