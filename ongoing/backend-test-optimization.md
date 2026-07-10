@@ -233,19 +233,19 @@ CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles
 ---
 
 ### Phase 3: Optimize batch ranks 7–9
-Status: planned
+Status: done
 
-**Tests:**
-- `backend/src/test/java/com/odde/doughnut/controllers/ConversationMessageControllerAiReplyTests.java` — "chatWithAIAndGetResponse()" (~191ms)
-- `backend/src/test/java/com/odde/doughnut/services/QuestionGenerationBatchAdminStatusServiceTest.java` — "doesNotReportSchedulerActiveWhenNoMaintenanceTaskIsRegistered()" (~174ms)
-- `backend/src/test/java/com/odde/doughnut/algorithms/ImageUtilsTest.java` — "[2] width = "2001", height = "2", expectedWidth = "2000", expectedHeight = "1"" (~164ms)
+**Tests (baseline → after):**
+- `ConversationMessageControllerAiReplyTests.chatWithAIAndGetResponse()` (~191ms) → merged into `ConversationMessageControllerTest.GetAiReplyTests` (~170ms); dropped separate `@SpringBootTest` context
+- `QuestionGenerationBatchAdminStatusServiceTest.doesNotReportSchedulerActiveWhenNoMaintenanceTaskIsRegistered()` (~174ms) + `reportsRegisteredMaintenanceSchedulerFromScheduledTaskRegistry()` (~106ms) → merged `reportsSchedulerActiveBasedOnRegisteredMaintenanceTasks()` (~159ms); `StandardEnvironment` + mocked `ScheduledTask.toString()` instead of reflection
+- `ImageUtilsTest` resize `[2] 2001×2` (~164ms) → `scaledDimensions` parameterized cases (&lt;1ms each); one small integration resize test (~149ms, no longer top-10%)
 
-**Goals:** Speed up only these tests (merge/delete redundant cases, slim `makeMe`/fixtures, parameterize duplicates, avoid full-stack when a narrower entry suffices). If no meaningful win after a serious attempt, append **Candidates** in the blacklist and mark done.
+**Learnings:** Image resize slowness was JVM warmup on first `Graphics2D` path, not pixel count; dimension math belongs in a pure unit test.
 
 **Verify:**
 
 ```bash
-CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles.active=test --tests "com.odde.doughnut.controllers.ConversationMessageControllerAiReplyTests" --tests "com.odde.doughnut.services.QuestionGenerationBatchAdminStatusServiceTest" --tests "com.odde.doughnut.algorithms.ImageUtilsTest"
+CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles.active=test --tests "com.odde.doughnut.controllers.ConversationMessageControllerTest\$GetAiReplyTests" --tests "com.odde.doughnut.services.QuestionGenerationBatchAdminStatusServiceTest" --tests "com.odde.doughnut.algorithms.ImageUtilsTest"
 ```
 
 ---

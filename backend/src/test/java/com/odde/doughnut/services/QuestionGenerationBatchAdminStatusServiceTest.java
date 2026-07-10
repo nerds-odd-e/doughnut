@@ -10,60 +10,47 @@ import com.odde.doughnut.entities.QuestionGenerationBatchMaintenanceRun;
 import com.odde.doughnut.entities.QuestionGenerationBatchMaintenanceTriggerSource;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRequestRepository;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.core.env.Environment;
+import org.springframework.core.env.StandardEnvironment;
 import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.ScheduledTaskHolder;
-import org.springframework.scheduling.config.Task;
-import org.springframework.scheduling.support.ScheduledMethodRunnable;
 
 class QuestionGenerationBatchAdminStatusServiceTest {
 
   QuestionGenerationBatchRepository batchRepository;
   QuestionGenerationBatchRequestRepository requestRepository;
-  Environment environment;
+  StandardEnvironment environment;
   QuestionGenerationBatchMaintenanceRunService maintenanceRunService;
 
   @BeforeEach
   void setup() {
     batchRepository = mock(QuestionGenerationBatchRepository.class);
     requestRepository = mock(QuestionGenerationBatchRequestRepository.class);
-    environment = mock(Environment.class);
+    environment = new StandardEnvironment();
     maintenanceRunService = mock(QuestionGenerationBatchMaintenanceRunService.class);
     when(batchRepository.countByStatus()).thenReturn(List.of());
     when(requestRepository.countByStatus()).thenReturn(List.of());
-    when(environment.getActiveProfiles()).thenReturn(new String[] {});
   }
 
   @Test
-  void reportsRegisteredMaintenanceSchedulerFromScheduledTaskRegistry() throws Exception {
-    QuestionGenerationBatchMaintenanceJob job =
-        new QuestionGenerationBatchMaintenanceJob(
-            mock(QuestionGenerationBatchMaintenanceService.class),
-            mock(QuestionGenerationBatchSubmitDueUsersService.class),
-            maintenanceRunService);
-    ScheduledTask scheduledTask = scheduledTaskFor(job);
+  void reportsSchedulerActiveBasedOnRegisteredMaintenanceTasks() {
+    assertThat(
+        statusServiceWithTaskHolders(List.of()).getStatus().isSchedulerActive(), equalTo(false));
+
+    ScheduledTask scheduledTask = mock(ScheduledTask.class);
+    when(scheduledTask.toString())
+        .thenReturn(
+            QuestionGenerationBatchMaintenanceJob.class.getName() + " runHourlyMaintenance");
     ScheduledTaskHolder taskHolder = () -> Set.of(scheduledTask);
 
-    QuestionGenerationBatchAdminStatusDTO status =
-        statusServiceWithTaskHolders(List.of(taskHolder)).getStatus();
-
-    assertThat(status.isSchedulerActive(), equalTo(true));
-  }
-
-  @Test
-  void doesNotReportSchedulerActiveWhenNoMaintenanceTaskIsRegistered() {
-    QuestionGenerationBatchAdminStatusDTO status =
-        statusServiceWithTaskHolders(List.of()).getStatus();
-
-    assertThat(status.isSchedulerActive(), equalTo(false));
+    assertThat(
+        statusServiceWithTaskHolders(List.of(taskHolder)).getStatus().isSchedulerActive(),
+        equalTo(true));
   }
 
   @Test
@@ -72,7 +59,7 @@ class QuestionGenerationBatchAdminStatusServiceTest {
     Timestamp scheduledFinishedAt = Timestamp.valueOf("2026-06-18 05:01:00");
     Timestamp manualStartedAt = Timestamp.valueOf("2026-06-18 06:00:00");
     Timestamp manualFinishedAt = Timestamp.valueOf("2026-06-18 06:02:00");
-    when(environment.getActiveProfiles()).thenReturn(new String[] {"prod"});
+    environment.setActiveProfiles("prod");
     when(maintenanceRunService.findLatestRun(
             QuestionGenerationBatchMaintenanceTriggerSource.SCHEDULED))
         .thenReturn(
@@ -113,15 +100,6 @@ class QuestionGenerationBatchAdminStatusServiceTest {
         environment,
         taskHolders,
         maintenanceRunService);
-  }
-
-  private ScheduledTask scheduledTaskFor(QuestionGenerationBatchMaintenanceJob job)
-      throws Exception {
-    Method method = QuestionGenerationBatchMaintenanceJob.class.getMethod("runHourlyMaintenance");
-    Task task = new Task(new ScheduledMethodRunnable(job, method));
-    Constructor<ScheduledTask> constructor = ScheduledTask.class.getDeclaredConstructor(Task.class);
-    constructor.setAccessible(true);
-    return constructor.newInstance(task);
   }
 
   private static QuestionGenerationBatchMaintenanceRun maintenanceRun(

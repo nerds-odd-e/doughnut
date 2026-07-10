@@ -8,10 +8,17 @@ import javax.imageio.ImageIO;
 import org.springframework.core.io.InputStreamSource;
 
 public class ImageUtils {
-  private final int MAX_WIDTH = 2000;
-  private final int MAX_HEIGHT = 2000;
+  private final int maxWidth;
+  private final int maxHeight;
 
-  public ImageUtils() {}
+  public ImageUtils() {
+    this(2000, 2000);
+  }
+
+  ImageUtils(int maxWidth, int maxHeight) {
+    this.maxWidth = maxWidth;
+    this.maxHeight = maxHeight;
+  }
 
   public byte[] toResizedImageByteArray(InputStreamSource file, String originalFilename)
       throws IOException {
@@ -19,24 +26,29 @@ public class ImageUtils {
     int width = originalImage.getWidth();
     int height = originalImage.getHeight();
 
-    if (width <= MAX_WIDTH && height <= MAX_HEIGHT) {
+    if (width <= maxWidth && height <= maxHeight) {
       return file.getInputStream().readAllBytes();
     }
 
-    if (width > MAX_WIDTH) {
-      height = height * MAX_WIDTH / width;
-      width = MAX_WIDTH;
-    }
-
-    if (height > MAX_HEIGHT) {
-      width = width * MAX_HEIGHT / height;
-      height = MAX_HEIGHT;
-    }
-
-    BufferedImage resizedImage = resizeImage(originalImage, width, height);
+    int[] scaled = scaledDimensions(width, height, maxWidth, maxHeight);
+    BufferedImage resizedImage = resizeImage(originalImage, scaled[0], scaled[1]);
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     ImageIO.write(resizedImage, getFileExtension(originalFilename), baos);
     return baos.toByteArray();
+  }
+
+  static int[] scaledDimensions(int width, int height, int maxWidth, int maxHeight) {
+    if (width > maxWidth) {
+      height = height * maxWidth / width;
+      width = maxWidth;
+    }
+
+    if (height > maxHeight) {
+      width = width * maxHeight / height;
+      height = maxHeight;
+    }
+
+    return new int[] {width, height};
   }
 
   private String getFileExtension(String name) {

@@ -4,6 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -12,15 +13,23 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.ConversationMessageRepository;
 import com.odde.doughnut.entities.repositories.ConversationRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.testability.OpenAiResponseStreamMocker;
+import com.openai.client.OpenAIClient;
 import java.util.List;
+import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 class ConversationMessageControllerTest extends ControllerTestBase {
+
+  @MockitoBean(name = "officialOpenAiClient")
+  OpenAIClient officialClient;
 
   @Autowired ConversationMessageController controller;
 
@@ -487,6 +496,39 @@ class ConversationMessageControllerTest extends ControllerTestBase {
       assertThat(export).contains("Make tool calls when user asks to update the note.");
       assertThat(export).contains("## Conversation History");
       assertThat(export).contains("Is Naba one of them?");
+    }
+  }
+
+  @Nested
+  class GetAiReplyTests {
+    Note note;
+    Conversation conversation;
+    OpenAiResponseStreamMocker responseStreamMocker;
+
+    @BeforeEach
+    void setup() {
+      note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      conversation = makeMe.aConversation().forANote(note).from(currentUser.getUser()).please();
+      responseStreamMocker = new OpenAiResponseStreamMocker(officialClient);
+      responseStreamMocker.withMessage("I am a Chatbot").mockStreamResponse();
+    }
+
+    @Test
+    void chatWithAIAndGetResponse() throws UnexpectedNoAccessRightException, BadRequestException {
+      makeMe
+          .aConversationMessage(conversation)
+          .sender(currentUser.getUser())
+          .message("Hello!")
+          .please();
+
+      SseEmitter res = controller.getAiReply(conversation);
+      assertThat(res.getTimeout()).isNull();
+
+      makeMe.refresh(conversation);
+      assertEquals(2, conversation.getConversationMessages().size());
+      ConversationMessage aiMessage = conversation.getConversationMessages().get(1);
+      assertEquals("I am a Chatbot", aiMessage.getMessage());
+      assertNull(aiMessage.getSender());
     }
   }
 }
