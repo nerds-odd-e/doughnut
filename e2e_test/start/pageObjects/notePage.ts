@@ -324,7 +324,8 @@ export const assumeNotePage = (
     updateContentAsMarkdown(markdown: string) {
       this.toolbarButton('Edit as markdown').click()
       cy.get('textarea').clear().invoke('val', markdown).trigger('input')
-      return this.flushPendingContentSave()
+      this.flushPendingContentSave()
+      return this.switchToRichContent()
     },
     expectRichContent(elements: Record<string, string>[]) {
       for (const element of elements) {

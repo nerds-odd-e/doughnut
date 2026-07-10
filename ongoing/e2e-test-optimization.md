@@ -127,23 +127,16 @@ Status: **done** (2026-07-10)
 ---
 
 ### Phase 6: Note YAML edit, refinement save, Wikidata create
-Status: planned
+Status: **done** (2026-07-10)
 
-**Tests:**
-- `e2e_test/features/note_creation_and_update/note_edit.feature` — "Note YAML properties round-trip through markdown and rich editing" (~3655ms)
-- `e2e_test/features/assimilation/note_refinement.feature` — "Save edited extraction preview content" (~3623ms)
-- `e2e_test/features/wikidata/note_create_with_wikidata_id.feature` — "Create a new note with a wikidata id" (~3604ms)
+**Results:**
+- YAML round-trip: `updateContentAsMarkdown` returns to rich mode after save (drops redundant `view as rich` step); `invoke('val')` already used (~3655ms → ~3591ms).
+- Refinement save: combined assimilation + extract preview step; `invoke('val')` for preview fields; `jumpToNotePage` content assertion (~3623ms → ~2346ms).
+- Wikidata create: `jumpToNotebookPage` via API notebook id + router push instead of catalog navigation (~3604ms → ~3430ms).
 
-**Goals:**
-- YAML round-trip: `invoke('val')` for markdown; drop duplicate mode switches if covered elsewhere.
-- Refinement save: mock extraction; inject preview state; fewer UI prep steps.
-- Wikidata: stub Wikidata/OpenAI; API notebook; direct create path.
+**Learnings:** Markdown save must switch back to rich before YAML frontmatter properties are visible; auto-switch in `updateContentAsMarkdown` replaces per-scenario mode toggles.
 
-**Verify:**
-
-```bash
-CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_creation_and_update/note_edit.feature,e2e_test/features/assimilation/note_refinement.feature,e2e_test/features/wikidata/note_create_with_wikidata_id.feature
-```
+**Verify:** 3 consecutive green runs on the three specs.
 
 ---
 
@@ -198,6 +191,6 @@ Re-run: `CURSOR_DEV=true nix develop -c pnpm cy:run-on-sut --reporter json` (tee
 
 **Candidates proposed this run:** real OpenAI audio (`record_live_audio_with_real_open_ai_service.feature`) — see blacklist
 
-**Commits:** phase 1 `6063698e4a`; phase 2 `f18e67daa4`; phase 3 `39b9fc9e9e`; phase 4 `9e25332256`; phase 5 `e5248cec85`
+**Commits:** phase 1 `6063698e4a`; phase 2 `f18e67daa4`; phase 3 `39b9fc9e9e`; phase 4 `9e25332256`; phase 5 `e5248cec85`; phase 6 (pending)
 
 Archive summary to `ongoing/archive/e2e-test-optimization-history.md`, delete this working plan, keep blacklist. Do not commit profile JSON.

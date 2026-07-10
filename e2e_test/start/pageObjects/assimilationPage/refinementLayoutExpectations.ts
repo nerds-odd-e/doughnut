@@ -124,13 +124,16 @@ export function assimilationRefinementLayoutExpectations() {
       extractionPreviewPanel().within(() => {
         cy.get('[data-test-id="extraction-preview-new-title"]')
           .clear()
-          .type(fields.newNoteTitle)
+          .invoke('val', fields.newNoteTitle)
+          .trigger('input')
         cy.get('[data-test-id="extraction-preview-new-content"]')
           .clear()
-          .type(fields.newNoteContent)
+          .invoke('val', fields.newNoteContent)
+          .trigger('input')
         cy.get('[data-test-id="extraction-preview-original-content"]')
           .clear()
-          .type(fields.updatedOriginalNoteContent)
+          .invoke('val', fields.updatedOriginalNoteContent)
+          .trigger('input')
       })
       return this
     },

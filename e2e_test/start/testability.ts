@@ -9,6 +9,7 @@ import type { TimeTravelRelativeToNow } from '@generated/doughnut-backend-api'
 import type {
   AttachBookRequestFull,
   NoteRealm,
+  NotebooksViewedByUser,
 } from '@generated/doughnut-backend-api'
 import type { NotesTestDataWritable } from '@generated/doughnut-backend-api'
 import {
@@ -17,6 +18,7 @@ import {
   MemoryTrackerController,
   NoteController,
   NotebookBooksController,
+  NotebookController,
   RecallPromptController,
   RecallsController,
   TestabilityRestController,
@@ -399,6 +401,22 @@ const testability = () => {
             `"${noteTopology}" is not in the injected note. Did you created during the test?`
           ).to.have.property(noteTopology)
           return injectedNoteIdMap[noteTopology]
+        })
+    },
+
+    getNotebookIdByName(notebookName: string) {
+      return cy
+        .wrap(NotebookController.myNotebooks(), { log: false })
+        .then((response) => {
+          const data = unwrapData<NotebooksViewedByUser>(response)
+          const notebookRealm = data.notebooks.find(
+            (realm) => realm.notebook.name === notebookName
+          )
+          expect(
+            notebookRealm,
+            `notebook "${notebookName}" was not found for the current user`
+          ).to.not.be.undefined
+          return notebookRealm!.notebook.id
         })
     },
 

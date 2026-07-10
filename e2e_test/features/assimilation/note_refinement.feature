@@ -68,12 +68,11 @@ Feature: Note refinement
 
   Scenario: Save edited extraction preview content
     Given OpenAI will extract layout points "B and D" to a new note with title "Point B and D" and content "Combined B and D" and updated parent content "A. C. E."
-    When I am assimilating the note "Sample"
-    And I open extraction preview for refinement layout points "B" and "D"
+    When I open extraction preview on note "Sample" for refinement layout points "B" and "D"
     And I edit the extraction preview to title "Edited B and D" and content "Edited combined content" and updated parent content "A. C. E. edited"
     And I create the note from the extraction preview
     Then the note title should be "Edited B and D"
-    And I should see note "Sample tree/Context/Sample" has content "A. C. E. edited"
+    And note "Sample" should have content "A. C. E. edited"
 
   Scenario: Retry extraction preview before creating note
     Given OpenAI will extract layout points "B and D" with retry producing title "Retry B and D" and content "Retry combined content" and updated parent content "A. C. E. retry"

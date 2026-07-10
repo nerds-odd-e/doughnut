@@ -93,7 +93,6 @@ Feature: Note Edit
       # Workshop Body
       Main content here.
       """
-    When I view the note content as rich content
     Then I should see rich note property "diligence" with value "high"
     And I should see rich note property "topic" with value "training"
     When I add a rich note property with key "status" and value "draft"

@@ -302,8 +302,7 @@ When(
   (title: string, wikidataId: string, notebook: string) => {
     mock_services.wikidata().stubWikidataSearchResult(title, wikidataId)
     start
-      .navigateToNotebooksPage()
-      .navigateToNotebook(notebook)
+      .jumpToNotebookPage(notebook)
       .addingNewNoteFromToolbar()
       .createNoteWithTitleAndWikidataId(title, wikidataId)
     start.assumeNotePage(title, { timeout: 30000 })
@@ -316,18 +315,14 @@ When(
   (title: string, wikidataId: string, notebook: string) => {
     mock_services.wikidata().stubWikidataSearchResult(title, wikidataId)
     start
-      .navigateToNotebooksPage()
-      .navigateToNotebook(notebook)
+      .jumpToNotebookPage(notebook)
       .addingNewNoteFromToolbar()
       .createNoteWithTitleAndWikidataId(title, wikidataId)
   }
 )
 
 When('I am creating a note in the notebook {string}', (notebook: string) => {
-  start
-    .navigateToNotebooksPage()
-    .navigateToNotebook(notebook)
-    .addingNewNoteFromToolbar()
+  start.jumpToNotebookPage(notebook).addingNewNoteFromToolbar()
 })
 
 Then('I should see {string} in breadcrumb', (noteTitles: string) => {
@@ -815,6 +810,13 @@ Then(
   }
 )
 
+Then(
+  'note {string} should have content {string}',
+  (noteTitle: string, expectedContent: string) => {
+    start.jumpToNotePage(noteTitle).findNoteContent(expectedContent)
+  }
+)
+
 Then('the note content should contain a line break', () => {
   start.assumeNotePage().expectNoteContentContainLineBreak()
 })
@@ -833,6 +835,17 @@ When(
   (firstPoint: string, secondPoint: string) => {
     start
       .assumeAssimilationPage()
+      .openExtractionPreviewForLayoutPoints(firstPoint, secondPoint)
+  }
+)
+
+When(
+  'I open extraction preview on note {string} for refinement layout points {string} and {string}',
+  (noteTitle: string, firstPoint: string, secondPoint: string) => {
+    start
+      .jumpToNotePage(noteTitle)
+      .moreOptions()
+      .openAssimilationSettings()
       .openExtractionPreviewForLayoutPoints(firstPoint, secondPoint)
   }
 )
