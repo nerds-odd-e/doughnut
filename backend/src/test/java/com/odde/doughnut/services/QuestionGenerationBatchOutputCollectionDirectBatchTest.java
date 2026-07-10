@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import static com.odde.doughnut.services.QuestionGenerationBatchOutputCollectionTestSupport.completedOpenAiBatch;
 import static com.odde.doughnut.services.QuestionGenerationBatchOutputCollectionTestSupport.successLine;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
@@ -21,6 +22,7 @@ import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRequestRep
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -92,6 +94,50 @@ class QuestionGenerationBatchOutputCollectionDirectBatchTest {
         batchRequestRepository.findById(secondRequest.getId()).orElseThrow();
     assertThat(reloadedSecond.getStatus(), is(QuestionGenerationBatchRequestStatus.FAILED));
     assertThat(reloadedSecond.getErrorDetail(), is("missing batch output line"));
+  }
+
+  @Test
+  void ignoresMalformedOutputLinesWithoutFailingOtherRows() {
+    when(openAiApiHandler.retrieveBatch("batch-openai-1")).thenReturn(completedOpenAiBatch());
+    when(openAiApiHandler.downloadFileContent("file-output"))
+        .thenReturn(
+            "not-json\n"
+                + successLine(firstRequest.getCustomId())
+                + "\n"
+                + "{\"response\":{\"status_code\":200}}");
+    when(openAiApiHandler.downloadFileContent("file-error")).thenReturn("");
+
+    outputCollectionService.collectOutputForCompletedBatches(currentTime);
+
+    List<QuestionGenerationBatchRequestStatus> statuses =
+        batchRequestRepository.findByBatch_Id(completedBatch.getId()).stream()
+            .map(QuestionGenerationBatchRequest::getStatus)
+            .toList();
+    assertThat(
+        statuses,
+        containsInAnyOrder(
+            QuestionGenerationBatchRequestStatus.OUTPUT_READY,
+            QuestionGenerationBatchRequestStatus.FAILED));
+  }
+
+  @Test
+  void ignoresErrorLinesWithMissingCustomId() {
+    when(openAiApiHandler.retrieveBatch("batch-openai-1")).thenReturn(completedOpenAiBatch());
+    when(openAiApiHandler.downloadFileContent("file-output")).thenReturn("");
+    when(openAiApiHandler.downloadFileContent("file-error"))
+        .thenReturn("{\"error\":{\"message\":\"batch failed\"}}");
+
+    outputCollectionService.collectOutputForCompletedBatches(currentTime);
+
+    List<QuestionGenerationBatchRequestStatus> statuses =
+        batchRequestRepository.findByBatch_Id(completedBatch.getId()).stream()
+            .map(QuestionGenerationBatchRequest::getStatus)
+            .toList();
+    assertThat(
+        statuses,
+        containsInAnyOrder(
+            QuestionGenerationBatchRequestStatus.FAILED,
+            QuestionGenerationBatchRequestStatus.FAILED));
   }
 
   @Test

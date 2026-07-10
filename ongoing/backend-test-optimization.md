@@ -519,19 +519,19 @@ CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles
 ---
 
 ### Phase 19: Optimize batch ranks 55–57
-Status: planned
+Status: done
 
-**Tests:**
-- `backend/src/test/java/com/odde/doughnut/controllers/NotebookFolderManagementControllerTest.java` — "crossNotebookFolderMove_rewritesOutgoingLinksToOutsideTargetOnly()" (~22ms)
-- `backend/src/test/java/com/odde/doughnut/controllers/RelationControllerMoveNoteToFolderTests.java` — "crossNotebookMoveToFolder_rewritesInboundAndOutgoingLinks()" (~22ms)
-- `backend/src/test/java/com/odde/doughnut/services/QuestionGenerationBatchOutputCollectionServiceTest.java` — "ignoresMalformedOutputLinesWithoutFailingOtherRows()" (~22ms)
+**Tests (baseline → after):**
+- `NotebookFolderManagementControllerTest.crossNotebookFolderMove_rewritesOutgoingLinksToOutsideTargetOnly()` (~22ms) → **deleted**; outgoing folder rewrite in `WikiLinkRewriteServiceFolderNotebookMoveTest.rewriteOutgoingWikiLinksForFolderNotebookMove_qualifiesOutsideTargetsOnly()` (~&lt;10ms); slimmer fixture (no folder move, no third notebook)
+- `RelationControllerMoveNoteToFolderTests.crossNotebookMoveToFolder_rewritesInboundAndOutgoingLinks()` (~22ms) → **deleted** (redundant with `RelationControllerTests` cross-notebook move inbound/outgoing tests — same `rewriteWikiLinksForCrossNotebookMove` path)
+- `QuestionGenerationBatchOutputCollectionServiceTest.ignoresMalformedOutputLinesWithoutFailingOtherRows()` (~22ms) → merged into `QuestionGenerationBatchOutputCollectionDirectBatchTest`; deleted `QuestionGenerationBatchOutputCollectionMalformedLineTest` (shared direct-batch `@BeforeEach`)
 
-**Goals:** Speed up only these tests (merge/delete redundant cases, slim `makeMe`/fixtures, parameterize duplicates, avoid full-stack when a narrower entry suffices). If no meaningful win after a serious attempt, append **Candidates** in the blacklist and mark done.
+**Learnings:** Folder outgoing link rewrite is `WikiLinkRewriteService` behavior — service entry avoids folder relocation fixture; cross-notebook note-to-folder link rewrite duplicates notebook-root move coverage.
 
 **Verify:**
 
 ```bash
-CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles.active=test --tests "com.odde.doughnut.controllers.NotebookFolderManagementControllerTest" --tests "com.odde.doughnut.controllers.RelationControllerMoveNoteToFolderTests" --tests "com.odde.doughnut.services.QuestionGenerationBatchOutputCollectionServiceTest"
+CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles.active=test --tests "com.odde.doughnut.controllers.NotebookFolderManagementControllerTest" --tests "com.odde.doughnut.controllers.RelationControllerMoveNoteToFolderTests" --tests "com.odde.doughnut.services.QuestionGenerationBatchOutputCollectionDirectBatchTest" --tests "com.odde.doughnut.services.WikiLinkRewriteServiceFolderNotebookMoveTest"
 ```
 
 ---

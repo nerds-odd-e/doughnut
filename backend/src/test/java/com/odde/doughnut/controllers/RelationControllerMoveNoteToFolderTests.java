@@ -92,39 +92,6 @@ class RelationControllerMoveNoteToFolderTests extends ControllerTestBase {
   }
 
   @Test
-  void crossNotebookMoveToFolder_rewritesInboundAndOutgoingLinks()
-      throws UnexpectedNoAccessRightException {
-    User u = currentUser.getUser();
-    Notebook oldNotebook = makeMe.aNotebook().name("OldNb").creatorAndOwner(u).please();
-    Notebook newNotebook = makeMe.aNotebook().name("NewNb").creatorAndOwner(u).please();
-    Notebook otherNotebook = makeMe.aNotebook().name("OtherNb").creatorAndOwner(u).please();
-    Folder destination = makeMe.aFolder().notebook(newNotebook).name("Dest").please();
-    Note oldTarget = makeMe.aNote("X").notebook(oldNotebook).please();
-    makeMe.aNote("X").notebook(newNotebook).please();
-    Note qualifiedTarget = makeMe.aNote("Y").notebook(otherNotebook).please();
-    Note mover = makeMe.aNote("Mover").notebook(oldNotebook).please();
-    mover.setContent("See [[X]] and [[OtherNb:Y]].");
-    Note referrer = makeMe.aNote("Carrier").notebook(oldNotebook).please();
-    referrer.setContent("[[Mover]]");
-    makeMe.entityPersister.flush();
-    wikiTitleCacheServiceBean.refreshForNote(referrer, u);
-    wikiTitleCacheServiceBean.refreshForNote(mover, u);
-    makeMe.entityPersister.flush();
-
-    controller.moveNoteToFolder(mover, destination);
-
-    makeMe.refresh(referrer);
-    makeMe.refresh(mover);
-    assertThat(referrer.getContent(), equalTo("[[NewNb:Mover|Mover]]"));
-    assertThat(mover.getContent(), equalTo("See [[OldNb:X|X]] and [[OtherNb:Y]]."));
-    assertThat(
-        wikiTitleCacheServiceBean.wikiTitlesForViewer(mover, u).stream()
-            .map(wt -> wt.getNoteId())
-            .toList(),
-        containsInAnyOrder(oldTarget.getId(), qualifiedTarget.getId()));
-  }
-
-  @Test
   void sameNotebookMoveToFolder_doesNotRewriteLinks() throws UnexpectedNoAccessRightException {
     User u = currentUser.getUser();
     Notebook notebook = makeMe.aNotebook().name("SameNb").creatorAndOwner(u).please();
