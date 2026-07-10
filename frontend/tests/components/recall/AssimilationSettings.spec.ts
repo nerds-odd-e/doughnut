@@ -1,45 +1,26 @@
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
-import AssimilationSettings from "@/components/recall/AssimilationSettings.vue"
-import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+import { wrapSdkResponse } from "@tests/helpers"
+import { assimilateButtonSelector } from "./assimilationPanelTestSupport"
 import {
   assimilationPropertyRow,
-  expandAssimilationPropertiesSection,
-  noteWithAssimilationProperties,
-} from "./assimilationPropertyTestSupport"
-import { assimilateButtonSelector } from "./assimilationPanelTestSupport"
-import { afterEach, beforeEach, describe, expect, it } from "vitest"
+  clickPropertyAssimilate,
+  clickPropertyRevive,
+  clickPropertySkipRecall,
+  getNoteInfoSpy,
+  mountAssimilationSettingsReady,
+  propertyAssimilateButton,
+  propertyReviveButton,
+  propertySkipRecallButton,
+  setupAssimilationSettingsTests,
+  wrapper,
+} from "./assimilationSettingsTestSupport"
+import { beforeEach, describe, expect, it } from "vitest"
+
+setupAssimilationSettingsTests()
 
 describe("AssimilationSettings", () => {
-  let wrapper: VueWrapper
-  let getNoteInfoSpy: ReturnType<typeof mockSdkService>
-
-  beforeEach(() => {
-    getNoteInfoSpy = mockSdkService(NoteController, "getNoteInfo", {})
-  })
-
-  afterEach(() => {
-    wrapper?.unmount()
-    document.body.innerHTML = ""
-  })
-
-  const mountSettings = () => {
-    wrapper = helper
-      .component(AssimilationSettings)
-      .withProps({
-        note: noteWithAssimilationProperties,
-        noteInfoLoaded: true,
-        assimilateDisabled: false,
-      })
-      .withRouter()
-      .mount({ attachTo: document.body })
-  }
-
-  it("renders a property row and Assimilate control per frontmatter key", async () => {
-    mountSettings()
-    await flushPromises()
-    await expandAssimilationPropertiesSection()
+  it("renders property rows with Assimilate controls and emits assimilate with propertyKey", async () => {
+    await mountAssimilationSettingsReady()
 
     const rows = document.querySelectorAll(
       '[data-test="assimilation-property-row"]'
@@ -47,6 +28,7 @@ describe("AssimilationSettings", () => {
     expect(rows).toHaveLength(2)
     expect(assimilationPropertyRow("topic")).not.toBeNull()
     expect(assimilationPropertyRow("url")).not.toBeNull()
+
     const assimilateControls = document.querySelectorAll(
       `[data-test="assimilation-property-row"] ${assimilateButtonSelector}`
     )
@@ -54,19 +36,8 @@ describe("AssimilationSettings", () => {
     for (const control of assimilateControls) {
       expect((control as HTMLInputElement).value).toBe("Assimilate")
     }
-  })
 
-  it("emits assimilate with propertyKey when assimilating a property", async () => {
-    mountSettings()
-    await flushPromises()
-    await expandAssimilationPropertiesSection()
-
-    const assimilate = assimilationPropertyRow("topic").querySelector(
-      assimilateButtonSelector
-    ) as HTMLInputElement
-    assimilate.click()
-    await flushPromises()
-
+    await clickPropertyAssimilate("topic")
     expect(wrapper.emitted("assimilate")).toEqual([
       [{ skipMemoryTracking: false, propertyKey: "topic" }],
     ])
@@ -86,32 +57,16 @@ describe("AssimilationSettings", () => {
           .please()
       )
     )
-    mountSettings()
-    await flushPromises()
-    await expandAssimilationPropertiesSection()
+    await mountAssimilationSettingsReady()
 
-    const topicAssimilate = assimilationPropertyRow("topic").querySelector(
-      assimilateButtonSelector
-    ) as HTMLInputElement
-    const urlAssimilate = assimilationPropertyRow("url").querySelector(
-      assimilateButtonSelector
-    ) as HTMLInputElement
-
-    expect(topicAssimilate.disabled).toBe(true)
-    expect(urlAssimilate.disabled).toBe(false)
+    expect(propertyAssimilateButton("topic").disabled).toBe(true)
+    expect(propertyAssimilateButton("url").disabled).toBe(false)
   })
 
   it("emits assimilate with skipMemoryTracking and propertyKey when skip recall is clicked", async () => {
-    mountSettings()
-    await flushPromises()
-    await expandAssimilationPropertiesSection()
+    await mountAssimilationSettingsReady()
 
-    const skipRecall = assimilationPropertyRow("topic").querySelector(
-      '[value="Skip recall"]'
-    ) as HTMLInputElement
-    skipRecall.click()
-    await flushPromises()
-
+    await clickPropertySkipRecall("topic")
     expect(wrapper.emitted("assimilate")).toEqual([
       [{ skipMemoryTracking: true, propertyKey: "topic" }],
     ])
@@ -135,31 +90,15 @@ describe("AssimilationSettings", () => {
       )
     })
 
-    it("shows Revive instead of Skip recall when property tracker is skipped", async () => {
-      mountSettings()
-      await flushPromises()
-      await expandAssimilationPropertiesSection()
+    it("shows Revive on skipped property and emits revive when clicked", async () => {
+      await mountAssimilationSettingsReady()
 
-      const topicRow = assimilationPropertyRow("topic")
-      expect(topicRow.querySelector('[value="Revive"]')).not.toBeNull()
-      expect(topicRow.querySelector('[value="Skip recall"]')).toBeNull()
+      expect(propertyReviveButton("topic")).not.toBeNull()
+      expect(propertySkipRecallButton("topic")).toBeNull()
+      expect(propertySkipRecallButton("url")).not.toBeNull()
+      expect(propertyReviveButton("url")).toBeNull()
 
-      const urlRow = assimilationPropertyRow("url")
-      expect(urlRow.querySelector('[value="Skip recall"]')).not.toBeNull()
-      expect(urlRow.querySelector('[value="Revive"]')).toBeNull()
-    })
-
-    it("emits revive with propertyKey when Revive is clicked on a skipped property", async () => {
-      mountSettings()
-      await flushPromises()
-      await expandAssimilationPropertiesSection()
-
-      const revive = assimilationPropertyRow("topic").querySelector(
-        '[data-test="revive"]'
-      ) as HTMLInputElement
-      revive.click()
-      await flushPromises()
-
+      await clickPropertyRevive("topic")
       expect(wrapper.emitted("revive")).toEqual([[{ propertyKey: "topic" }]])
     })
   })

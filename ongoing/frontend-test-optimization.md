@@ -516,7 +516,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/NoteRe
 ---
 
 ### Phase 11: notes/WikidataAssociationDialog
-Status: planned
+Status: done
+
+**Learnings:** Hoisted mount/mocks/selectors into `wikidataAssociationDialogTestSupport.ts`; shared wikidata DOM helpers with `noteNewFormTestSupport.ts`; merged replace/append title-action cases for both `showSaveButton` modes with `it.each`. Suite CPU ~104ms → ~326ms wall (37 → 35 tests; 4 slow cases → 2 parameterized).
 
 **Tests:** (6 in top 10%, ~104ms combined)
 - `tests/notes/WikidataAssociationDialog.spec.ts` — "enables Save and emits save with empty string when clearing and canSaveEmptyToClear" (~19ms)
