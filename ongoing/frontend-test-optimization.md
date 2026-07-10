@@ -639,7 +639,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMark
 ---
 
 ### Phase 16: notes/Questions
-Status: planned
+Status: done
+
+**Learnings:** Hoisted mount/mocks/selectors into `questionsTestSupport.ts`; replaced `vi.waitUntil` with `flushPromises` after export click; use `button[title=…]` instead of `[aria-label]`; minimal memory router via `.withRouter()` for Modal teleports (vi.mock in support file did not hoist). Export case ~56ms → ~17ms (2 tests, ~24ms wall).
 
 **Tests:** (1 in top 10%, ~56ms combined)
 - `tests/notes/Questions.spec.ts` — "shows export dialog when export button is clicked" (~56ms)
@@ -659,7 +661,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/Questions.spec.ts
 ---
 
 ### Phase 17: commons/Modal
-Status: planned
+Status: done
+
+**Learnings:** Hoisted mount/selectors into `modalTestSupport.ts`; replaced full `routes` import with minimal memory router; replaced all `vi.waitUntil` with `flushPromises`/`nextTick` poll helpers; merged close-button + ESC close cases with `it.each`. Suite wall ~43ms (8 tests).
 
 **Tests:** (1 in top 10%, ~55ms combined)
 - `tests/commons/Modal.spec.ts` — "adds top alignment class when content requests stable modal top" (~55ms)

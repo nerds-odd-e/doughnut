@@ -1,62 +1,33 @@
-import Modal from "@/components/commons/Modal.vue"
-import routes from "@/routes/routes"
+import { useStableModalTop } from "@/composables/modalTopAnchor"
 import { flushPromises, mount, type VueWrapper } from "@vue/test-utils"
 import { vi, afterEach, describe, it, expect } from "vitest"
-import { createRouter, createWebHistory } from "vue-router"
 import { reactive } from "vue"
-import { useStableModalTop } from "@/composables/modalTopAnchor"
+import {
+  ModalComp,
+  closeButtonEl,
+  modalPanelWrapperEl,
+  modalRouter,
+  mountDefaultModal,
+  mountModal,
+  settleModalAutofocus,
+  topAlignedDialogEl,
+  waitForActiveElementId,
+  waitForDialog,
+  waitForDialogCount,
+  waitForTopAlignedDialog,
+} from "./modalTestSupport"
 
-// Browser Mode: Mock AiReplyEventSource to prevent import errors
-// (Modal doesn't use it, but Browser Mode hoists mocks globally)
 vi.mock("@/managedApi/AiReplyEventSource", () => ({
   default: class {},
 }))
 
-// Browser Mode: Use real Vue Router instead of mocking
-const router = createRouter({
-  history: createWebHistory(),
-  routes,
-})
-
-async function settleModalAutofocus() {
-  await flushPromises()
-  await vi.waitUntil(() => document.querySelector("dialog"), { timeout: 500 })
-  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
-}
-
 describe("Modal", () => {
-  const Comp = Modal
-  const TestComponent = {
-    template: `
-      <Modal @close_request="$emit('close_request')">
-        <template v-slot:header>
-        </template>
-        <template v-slot:body>
-        </template>
-        <template v-slot:footer>
-        </template>
-      </Modal>
-    `,
-    components: { Modal: Comp },
-    emits: ["close_request"],
-  }
-
   let wrapper: VueWrapper
 
   afterEach(() => {
     wrapper?.unmount()
     document.body.innerHTML = ""
   })
-
-  const mountModal = () => {
-    wrapper = mount(TestComponent, {
-      global: {
-        plugins: [router],
-      },
-      attachTo: document.body,
-    })
-    return wrapper
-  }
 
   it("adds top alignment class when content requests stable modal top", async () => {
     const AnchorChild = {
@@ -71,117 +42,89 @@ describe("Modal", () => {
           <template #body><AnchorChild /></template>
         </Modal>
       `,
-      components: { Modal: Comp, AnchorChild },
+      components: { Modal: ModalComp, AnchorChild },
       emits: ["close_request"],
     }
     wrapper = mount(TopAligned, {
-      global: { plugins: [router] },
+      global: { plugins: [modalRouter] },
       attachTo: document.body,
     })
-    await vi.waitUntil(() => document.querySelector("dialog.modal-align-top"), {
-      timeout: 1000,
-    })
-    expect(document.querySelector("dialog.modal-align-top")).toBeTruthy()
+
+    await waitForTopAlignedDialog()
+    expect(topAlignedDialogEl()).toBeTruthy()
   })
 
-  it("closes when close button is clicked", async () => {
-    wrapper = mountModal()
-    await vi.waitUntil(() => document.querySelector(".close-button"), {
-      timeout: 1000,
-    })
-    const closeButton = document.querySelector(".close-button") as HTMLElement
-    expect(closeButton).toBeTruthy()
-    closeButton.click()
+  it.each([
+    {
+      name: "close button",
+      close: async () => {
+        const button = closeButtonEl()
+        expect(button).toBeTruthy()
+        button!.click()
+      },
+    },
+    {
+      name: "ESC key",
+      close: async () => {
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
+      },
+    },
+  ])("closes when $name is used", async ({ close }) => {
+    wrapper = mountDefaultModal()
+    await waitForDialog()
+    await close()
     expect(wrapper.emitted().close_request).toHaveLength(1)
   })
 
   it("omits close button when showCloseButton is false", async () => {
-    const NoClose = {
-      template: `
-        <Modal :show-close-button="false" @close_request="$emit('close_request')">
-          <template #body>x</template>
-        </Modal>
-      `,
-      components: { Modal: Comp },
-      emits: ["close_request"],
-    }
-    wrapper = mount(NoClose, {
-      global: { plugins: [router] },
-      attachTo: document.body,
-    })
-    await vi.waitUntil(() => document.querySelector("dialog"), {
-      timeout: 1000,
-    })
-    expect(document.querySelector(".close-button")).toBeNull()
+    wrapper = mountModal(`
+      <Modal :show-close-button="false" @close_request="$emit('close_request')">
+        <template #body>x</template>
+      </Modal>
+    `)
+    await waitForDialog()
+    expect(closeButtonEl()).toBeNull()
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
     expect(wrapper.emitted("close_request")).toHaveLength(1)
   })
 
   it("focuses the explicit autofocus target after opening the dialog", async () => {
-    const AutofocusModal = {
-      template: `
-        <Modal @close_request="$emit('close_request')">
-          <template #body>
-            <button id="before-input">Before</button>
-            <input id="target-input" autofocus />
-          </template>
-        </Modal>
-      `,
-      components: { Modal: Comp },
-      emits: ["close_request"],
-    }
-    wrapper = mount(AutofocusModal, {
-      global: { plugins: [router] },
-      attachTo: document.body,
-    })
+    wrapper = mountModal(`
+      <Modal @close_request="$emit('close_request')">
+        <template #body>
+          <button id="before-input">Before</button>
+          <input id="target-input" autofocus />
+        </template>
+      </Modal>
+    `)
 
     await settleModalAutofocus()
     expect(document.activeElement?.id).toBe("target-input")
   })
 
   it("prefers text controls inside a marked autofocus container", async () => {
-    const MarkedContainerModal = {
-      template: `
-        <Modal @close_request="$emit('close_request')">
-          <template #body>
-            <div data-autofocus>
-              <button id="history-button">History</button>
-              <input id="search-input" />
-            </div>
-          </template>
-        </Modal>
-      `,
-      components: { Modal: Comp },
-      emits: ["close_request"],
-    }
-    wrapper = mount(MarkedContainerModal, {
-      global: { plugins: [router] },
-      attachTo: document.body,
-    })
+    wrapper = mountModal(`
+      <Modal @close_request="$emit('close_request')">
+        <template #body>
+          <div data-autofocus>
+            <button id="history-button">History</button>
+            <input id="search-input" />
+          </div>
+        </template>
+      </Modal>
+    `)
 
     await settleModalAutofocus()
+    await waitForActiveElementId("search-input")
     expect(document.activeElement?.id).toBe("search-input")
   })
 
-  it("closes when ESC is pressed", async () => {
-    wrapper = mountModal()
-    await vi.waitUntil(() => document.querySelector("dialog"), {
-      timeout: 1000,
-    })
-    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
-    expect(wrapper.emitted().close_request).toHaveLength(1)
-  })
-
   it("closes when modal backdrop is clicked", async () => {
-    wrapper = mountModal()
-    await vi.waitUntil(() => document.querySelector(".modal-panel-wrapper"), {
-      timeout: 1000,
-    })
-    const panelWrapper = document.querySelector(
-      ".modal-panel-wrapper"
-    ) as HTMLElement
+    wrapper = mountDefaultModal()
+    await waitForDialog()
+    const panelWrapper = modalPanelWrapperEl()
     expect(panelWrapper).toBeTruthy()
-    panelWrapper.dispatchEvent(
+    panelWrapper!.dispatchEvent(
       new MouseEvent("mousedown", { bubbles: true, cancelable: true })
     )
     expect(wrapper.emitted().close_request).toHaveLength(1)
@@ -202,7 +145,7 @@ describe("Modal", () => {
           </Modal>
         </div>
       `,
-      components: { Modal: Comp },
+      components: { Modal: ModalComp },
       setup() {
         return {
           state,
@@ -219,22 +162,20 @@ describe("Modal", () => {
     }
 
     wrapper = mount(StackedModalsComponent, {
-      global: { plugins: [router] },
+      global: { plugins: [modalRouter] },
       attachTo: document.body,
     })
 
-    await vi.waitUntil(() => document.querySelectorAll("dialog").length === 2, {
-      timeout: 1000,
-    })
+    await waitForDialogCount(2)
 
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
-    await wrapper.vm.$nextTick()
+    await flushPromises()
 
     expect(innerClosed).toHaveBeenCalledTimes(1)
     expect(outerClosed).not.toHaveBeenCalled()
 
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
-    await wrapper.vm.$nextTick()
+    await flushPromises()
 
     expect(outerClosed).toHaveBeenCalledTimes(1)
   })
