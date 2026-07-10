@@ -387,7 +387,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/FolderPage.spec.ts
 ---
 
 ### Phase 6: notes/NoteNewForm
-Status: planned
+Status: done
+
+**Learnings:** Hoisted mount/mocks/selectors into `noteNewFormTestSupport.ts`; merged open+close wikidata dialog cases; replaced `findComponent(WikidataAssociationDialog)` with `wikidataDialogIsOpen()` querySelector; dropped redundant `searchWikidataSpy` assertion from `it.each` title cases; use `data-testid` wikidata result items. Suite CPU ~296ms → ~271ms (18 → 17 tests); top-7 target ~163ms → ~160ms.
 
 **Tests:** (7 in top 10%, ~140ms combined)
 - `tests/notes/NoteNewForm.spec.ts` — "search 'dog' get 'Canine' with action 'append' updates title as 'dog'" (~26ms)
