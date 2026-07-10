@@ -357,14 +357,14 @@ CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles
 ---
 
 ### Phase 10: Optimize batch ranks 28–30
-Status: planned
+Status: done
 
-**Tests:**
-- `backend/src/test/java/com/odde/doughnut/configs/ControllerSetupTest.java` — "shouldNotRecordUserInfoWhenNoAuthentication()" (~46ms)
-- `backend/src/test/java/com/odde/doughnut/services/focusContext/FocusContextRetrievalServiceTest.java` — "focusInboundUriListCappedAtTwenty()" (~45ms)
-- `backend/src/test/java/com/odde/doughnut/services/QuestionGenerationBatchJsonlRendererTest.java` — "rendersOneJsonlLinePerRequestWithResponsesApiShape()" (~38ms)
+**Tests (baseline → after):**
+- `ControllerSetupTest.shouldNotRecordUserInfoWhenNoAuthentication()` (~46ms) → **deleted**; null external-id assertion merged into mock-only `FailureReportFactoryTest.recordsExceptionClassNameAndStackTrace()` (~&lt;5ms)
+- `FocusContextRetrievalServiceTest.focusInboundUriListCappedAtTwenty()` (~45ms) → merged into `Depth1CapAndSeed` shared setup (~&lt;5ms per test); eliminated duplicate 21-referrer fixture
+- `QuestionGenerationBatchJsonlRendererTest.rendersOneJsonlLinePerRequestWithResponsesApiShape()` (~38ms) → direct batch/request seed via `savePlannedBatch`/`saveBatchRequest` (~&lt;15ms); dropped `planningService` candidate scan and second note/tracker
 
-**Goals:** Speed up only these tests (merge/delete redundant cases, slim `makeMe`/fixtures, parameterize duplicates, avoid full-stack when a narrower entry suffices). If no meaningful win after a serious attempt, append **Candidates** in the blacklist and mark done.
+**Learnings:** Unauthenticated user info is `FailureReportFactory` behavior; inbound URI cap shares the same referrer graph as depth-1 sampling; JSONL shape tests only need persisted batch rows, not full planning.
 
 **Verify:**
 

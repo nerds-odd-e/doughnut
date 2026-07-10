@@ -38,7 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
 class QuestionGenerationBatchJsonlRendererTest {
 
   @Autowired MakeMe makeMe;
-  @Autowired QuestionGenerationBatchPlanningService planningService;
   @Autowired QuestionGenerationBatchJsonlRenderer jsonlRenderer;
   @Autowired QuestionGenerationBatchRequestRepository batchRequestRepository;
   @Autowired QuestionGenerationBatchRepository batchRepository;
@@ -92,21 +91,16 @@ class QuestionGenerationBatchJsonlRendererTest {
     @Test
     void rendersOneJsonlLinePerRequestWithResponsesApiShape() throws Exception {
       Note note = makeMe.aNote().notebookOwnedBy(user).please();
-      Note propertyNote = makeMe.aNote().notebookOwnedBy(user).please();
-      makeMe
-          .aMemoryTrackerFor(note)
-          .by(user)
-          .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(24)))
-          .please();
-      makeMe
-          .aMemoryTrackerFor(propertyNote)
-          .by(user)
-          .propertyKey("topic")
-          .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(12)))
-          .please();
+      MemoryTracker tracker =
+          makeMe
+              .aMemoryTrackerFor(note)
+              .by(user)
+              .propertyKey("topic")
+              .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(12)))
+              .please();
 
-      QuestionGenerationBatch batch =
-          planningService.planLocalBatchForUser(user, currentTime).orElseThrow();
+      QuestionGenerationBatch batch = savePlannedBatch();
+      saveBatchRequest(batch, tracker);
       List<QuestionGenerationBatchRequest> requests =
           batchRequestRepository.findByBatch_Id(batch.getId());
 
@@ -146,11 +140,7 @@ class QuestionGenerationBatchJsonlRendererTest {
 
     @Test
     void returnsEmptyStringWhenBatchHasNoRequests() throws Exception {
-      QuestionGenerationBatch batch = new QuestionGenerationBatch();
-      batch.setUser(user);
-      batch.setStatus(QuestionGenerationBatchStatus.PLANNED);
-      batch.setPlannedAt(currentTime);
-      batch = batchRepository.saveAndFlush(batch);
+      QuestionGenerationBatch batch = savePlannedBatch();
 
       String jsonl = jsonlRenderer.renderInputJsonl(batch);
 
@@ -162,14 +152,15 @@ class QuestionGenerationBatchJsonlRendererTest {
     void includesHighReasoningEffortForReasoningModel() throws Exception {
       globalSettingsService.globalSettingQuestionGeneration().setKeyValue(currentTime, "o3-mini");
       Note note = makeMe.aNote().notebookOwnedBy(user).please();
-      makeMe
-          .aMemoryTrackerFor(note)
-          .by(user)
-          .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(24)))
-          .please();
+      MemoryTracker tracker =
+          makeMe
+              .aMemoryTrackerFor(note)
+              .by(user)
+              .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(24)))
+              .please();
 
-      QuestionGenerationBatch batch =
-          planningService.planLocalBatchForUser(user, currentTime).orElseThrow();
+      QuestionGenerationBatch batch = savePlannedBatch();
+      saveBatchRequest(batch, tracker);
       List<QuestionGenerationBatchRequest> requests =
           batchRequestRepository.findByBatch_Id(batch.getId());
       String jsonl = jsonlRenderer.renderInputJsonl(batch);
@@ -184,5 +175,22 @@ class QuestionGenerationBatchJsonlRendererTest {
       Map<String, Object> reasoning = (Map<String, Object>) body.get("reasoning");
       assertThat(reasoning.get("effort"), is("high"));
     }
+  }
+
+  private QuestionGenerationBatch savePlannedBatch() {
+    QuestionGenerationBatch batch = new QuestionGenerationBatch();
+    batch.setUser(user);
+    batch.setStatus(QuestionGenerationBatchStatus.PLANNED);
+    batch.setPlannedAt(currentTime);
+    return batchRepository.saveAndFlush(batch);
+  }
+
+  private void saveBatchRequest(QuestionGenerationBatch batch, MemoryTracker tracker) {
+    QuestionGenerationBatchRequest request = new QuestionGenerationBatchRequest();
+    request.setBatch(batch);
+    request.setMemoryTracker(tracker);
+    request.setContextSeed(42L);
+    request.setCustomId(QuestionGenerationBatchRequest.customIdFor(batch.getId(), tracker.getId()));
+    batchRequestRepository.saveAndFlush(request);
   }
 }

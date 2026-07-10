@@ -28,6 +28,7 @@ class FailureReportFactoryTest {
     FailureReport report = createReport(new RuntimeException(), fetcherWithExternalId(null), null);
 
     assertEquals("java.lang.RuntimeException", report.getErrorName());
+    assertThat(report.getErrorDetail(), containsString("user external Id: null"));
     assertThat(report.getErrorDetail(), containsString("FailureReportFactoryTest.java"));
   }
 

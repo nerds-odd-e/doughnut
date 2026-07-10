@@ -181,7 +181,7 @@ class FocusContextRetrievalServiceTest {
         viewer = makeMe.aUser().please();
         Notebook nb = notebookReadableBy(viewer);
         focusNote = makeMe.aNote().notebook(nb).title("HubFocus").please();
-        addInboundReferrers(focusNote, viewer, 7, "Ref");
+        addInboundReferrers(focusNote, viewer, 21, "Ref");
       }
 
       @ParameterizedTest
@@ -214,17 +214,9 @@ class FocusContextRetrievalServiceTest {
             .sorted()
             .toList();
       }
-    }
 
-    @Nested
-    class FocusInboundUriListCap {
       @Test
       void focusInboundUriListCappedAtTwenty() {
-        User viewer = makeMe.aUser().please();
-        Notebook nb = notebookReadableBy(viewer);
-        Note focusNote = makeMe.aNote().notebook(nb).title("UriCapHub").please();
-        addInboundReferrers(focusNote, viewer, 21, "UriRef");
-
         FocusContextResult result =
             service.retrieve(focusNote, viewer, RetrievalConfig.forQuestionGeneration(1L));
 

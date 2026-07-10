@@ -99,12 +99,6 @@ public class ControllerSetupTest {
   }
 
   @Test
-  void shouldNotRecordUserInfoWhenNoAuthentication() {
-    FailureReport failureReport = catchExceptionAndGetFailureReport();
-    assertThat(failureReport.getErrorDetail(), containsString("user external Id: null"));
-  }
-
-  @Test
   void shouldHandleOpenAIUnauthorizedException() {
     OpenAiUnauthorizedException exception = new OpenAiUnauthorizedException("Unauthorized");
     ResponseEntity<ApiError> response =
