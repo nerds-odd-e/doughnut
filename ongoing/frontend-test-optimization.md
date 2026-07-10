@@ -912,7 +912,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteMoreOptionsFor
 ---
 
 ### Phase 28: components/recall/NoteRefinement.removeLayout.loading
-Status: planned
+Status: done
+
+**Learnings:** Merged success+failure loading-modal cases into one test; replaced local `deferApiCompletion` with shared `createDeferredGate`, `loadingModalMask`, `mountNoteRefinementReady`, and `clickRemoveRefinementLayout`. Suite wall ~29ms (2 → 1 test).
 
 **Tests:** (1 in top 10%, ~21ms combined)
 - `tests/components/recall/NoteRefinement.removeLayout.loading.spec.ts` — "hides LoadingModal when remove API fails" (~21ms)
@@ -952,7 +954,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMark
 ---
 
 ### Phase 30: components/form/SeamlessTextEditor
-Status: planned
+Status: done
+
+**Learnings:** Hoisted mount/paste/caret helpers into `seamlessTextEditorTestSupport.ts`; `editorEl` uses component root `classList` in browser mode (faster than `wrapper.find`); merged paste success and paste-no-update cases with `it.each`; dropped redundant `flushPromises`/`nextTick` after mount. Suite wall ~549ms (failing refactor) → ~72ms (8 tests).
 
 **Tests:** (1 in top 10%, ~19ms combined)
 - `tests/components/form/SeamlessTextEditor.spec.ts` — "does not handle paste when readonly" (~19ms)
