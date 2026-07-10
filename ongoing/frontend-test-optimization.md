@@ -843,7 +843,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/admin/Failure
 ---
 
 ### Phase 25: components/recall/NoteRefinement.exportExtractRequest
-Status: planned
+Status: done
+
+**Learnings:** Hoisted `sampleExtractExportData`, `exportLoadingEl`, `exportTextarea`, and `clickExportExtractRequest` into `noteRefinementTestSupport.ts`; merged enable/disable button cases with `it.each`; folded loading-indicator assertions into the open-dialog case via deferred API gate; use `data-test-id` click helper and `mountNoteRefinementReady` / `mountNoteRefinementWithLayoutReady`. Suite wall ~45ms (5 → 4 tests).
 
 **Tests:** (2 in top 10%, ~33ms combined)
 - `tests/components/recall/NoteRefinement.exportExtractRequest.spec.ts` — "opens export dialog with extract request JSON for the selection" (~17ms)

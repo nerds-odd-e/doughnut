@@ -2,129 +2,80 @@ import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import { nextTick } from "vue"
 import { describe, expect, it } from "vitest"
+import { mockSdkServiceWithImplementation } from "@tests/helpers"
 import {
-  mockSdkService,
-  mockSdkServiceWithImplementation,
-} from "@tests/helpers"
-import {
-  exportExtractRequestButtonTitle,
-  mountNoteRefinement,
-  mountNoteRefinementWithLayout,
+  clickExportExtractRequest,
+  exportLoadingEl,
+  exportTextarea,
+  mountNoteRefinementReady,
+  mountNoteRefinementWithLayoutReady,
   note,
   openExtractionPreview,
   refinementActionButton,
   refinementLayoutItems,
   refinementLayoutSelectionApiCall,
+  sampleExtractExportData,
   selectRefinementLayoutItem,
   setupNoteRefinementTests,
 } from "./noteRefinementTestSupport"
 
 setupNoteRefinementTests()
 
-const sampleExportData = {
-  model: "gpt-4",
-  instructions: "Extract selected layout points",
-  input: "Note content",
-  text: {
-    format: {
-      type: "json_schema",
-      schema: { type: "object" },
-    },
-  },
-}
-
 describe("NoteRefinement export extract request", () => {
-  it("disables export button when no layout points are selected", async () => {
-    const wrapper = mountNoteRefinement(["Point 1", "Point 2"])
-    await flushPromises()
+  it.each([
+    { itemId: null as string | null, expectedDisabled: true },
+    { itemId: "p1", expectedDisabled: false },
+  ])("export button disabled=$expectedDisabled when selection is $itemId", async ({
+    itemId,
+    expectedDisabled,
+  }) => {
+    const wrapper = await mountNoteRefinementReady(["Point 1", "Point 2"])
+    if (itemId) {
+      await selectRefinementLayoutItem(wrapper, itemId)
+    }
 
     expect(
       refinementActionButton(wrapper, "export-extract-request").disabled
-    ).toBe(true)
-  })
-
-  it("enables export button when layout points are selected", async () => {
-    const wrapper = mountNoteRefinement(["Point 1", "Point 2"])
-    await flushPromises()
-
-    await selectRefinementLayoutItem(wrapper, "p1")
-
-    expect(
-      refinementActionButton(wrapper, "export-extract-request").disabled
-    ).toBe(false)
-  })
-
-  it("shows loading indicator before extract export JSON loads", async () => {
-    const layout = refinementLayoutItems(["Point 1", "Point 2"])
-    const exportData = sampleExportData
-    let resolveExport!: (value: typeof exportData) => void
-    const exportPromise = new Promise<typeof exportData>((resolve) => {
-      resolveExport = resolve
-    })
-    mockSdkServiceWithImplementation(
-      AiController,
-      "exportExtractRequest",
-      () => exportPromise
-    )
-    const wrapper = mountNoteRefinementWithLayout(layout)
-    await flushPromises()
-
-    await selectRefinementLayoutItem(wrapper, "p2")
-    await wrapper
-      .find(`button[title="${exportExtractRequestButtonTitle}"]`)
-      .trigger("click")
-    await nextTick()
-
-    expect(
-      document.body.querySelector('[data-testid="export-loading"]')
-    ).toBeTruthy()
-    expect(
-      document.body.querySelector('[data-testid="export-textarea"]')
-    ).toBeNull()
-
-    resolveExport(exportData)
-    await flushPromises()
-    expect(
-      document.body.querySelector('[data-testid="export-loading"]')
-    ).toBeNull()
-    const textarea = document.body.querySelector(
-      '[data-testid="export-textarea"]'
-    ) as HTMLTextAreaElement
-    expect(textarea.value).toContain('"model"')
+    ).toBe(expectedDisabled)
   })
 
   it("opens export dialog with extract request JSON for the selection", async () => {
     const layout = refinementLayoutItems(["Point 1", "Point 2"])
-    const exportExtractRequestSpy = mockSdkService(
+    const exportData = sampleExtractExportData
+    let resolveExport!: (value: typeof exportData) => void
+    const exportPromise = new Promise<typeof exportData>((resolve) => {
+      resolveExport = resolve
+    })
+    const exportExtractRequestSpy = mockSdkServiceWithImplementation(
       AiController,
       "exportExtractRequest",
-      sampleExportData
+      () => exportPromise
     )
-    const wrapper = mountNoteRefinementWithLayout(layout)
-    await flushPromises()
+    const wrapper = await mountNoteRefinementWithLayoutReady(layout)
 
     await selectRefinementLayoutItem(wrapper, "p2")
-    await wrapper
-      .find(`button[title="${exportExtractRequestButtonTitle}"]`)
-      .trigger("click")
+    await clickExportExtractRequest(wrapper)
+    await nextTick()
+
+    expect(exportLoadingEl()).toBeTruthy()
+    expect(exportTextarea()).toBeNull()
+
+    resolveExport(exportData)
     await flushPromises()
 
+    expect(exportLoadingEl()).toBeNull()
     expect(exportExtractRequestSpy).toHaveBeenCalledWith(
       refinementLayoutSelectionApiCall(note.id, layout, ["p2"])
     )
-
-    const textarea = document.body.querySelector(
-      '[data-testid="export-textarea"]'
-    ) as HTMLTextAreaElement
+    const textarea = exportTextarea()
     expect(textarea).toBeTruthy()
-    expect(textarea.value).toContain('"model"')
-    expect(textarea.value).toContain('"instructions"')
-    expect(textarea.value).toContain("Extract selected layout points")
+    expect(textarea!.value).toContain('"model"')
+    expect(textarea!.value).toContain('"instructions"')
+    expect(textarea!.value).toContain("Extract selected layout points")
   })
 
   it("does not show export button on the extraction preview screen", async () => {
-    const wrapper = mountNoteRefinement(["Point 1"])
-    await flushPromises()
+    const wrapper = await mountNoteRefinementReady(["Point 1"])
 
     await openExtractionPreview(wrapper, "p1")
 
