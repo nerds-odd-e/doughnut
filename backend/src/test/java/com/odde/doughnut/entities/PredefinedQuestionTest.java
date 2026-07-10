@@ -1,12 +1,17 @@
 package com.odde.doughnut.entities;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
 
+import com.odde.doughnut.entities.repositories.PredefinedQuestionRepository;
 import com.odde.doughnut.services.PredefinedQuestionService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -30,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 class PredefinedQuestionTest {
   @Autowired MakeMe makeMe;
   @Autowired PredefinedQuestionService predefinedQuestionService;
+  @Autowired PredefinedQuestionRepository predefinedQuestionRepository;
   @MockitoBean AiQuestionGenerator aiQuestionGenerator;
 
   User user;
@@ -77,7 +83,7 @@ class PredefinedQuestionTest {
     }
 
     @Test
-    void shouldReturnOriginalQuestionWhenEvaluationPassesOrFails() {
+    void returnsOriginalQuestionWhenEvaluationDoesNotReject() {
       when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any(), any(), any()))
           .thenReturn(mcqWithAnswer);
       contestResult.feasibleQuestion = false;
@@ -130,6 +136,18 @@ class PredefinedQuestionTest {
       PredefinedQuestion result = predefinedQuestionService.generateAFeasibleQuestion(note);
 
       assertThat(result.getMcqWithAnswer(), equalTo(regeneratedQuestion));
+      assertThat(result.isContested(), is(false));
+
+      PredefinedQuestion contestedOriginal = null;
+      for (PredefinedQuestion question : predefinedQuestionRepository.findAll()) {
+        if (question.getNote().getId().equals(note.getId()) && question.isContested()) {
+          contestedOriginal = question;
+          break;
+        }
+      }
+      assertThat(contestedOriginal, notNullValue());
+      assertThat(
+          contestedOriginal.getMcqWithAnswer().getQuestion(), equalTo(mcqWithAnswer.getQuestion()));
     }
   }
 

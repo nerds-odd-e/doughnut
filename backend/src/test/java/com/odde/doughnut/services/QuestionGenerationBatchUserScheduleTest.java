@@ -99,24 +99,6 @@ class QuestionGenerationBatchUserScheduleTest {
         schedule.getReason(), is(QuestionGenerationBatchPlanningService.REASON_NO_RECENT_RECALLS));
   }
 
-  @Test
-  void returnsNoCandidateTrackersReasonWhenNoTrackersCanBeBatched() {
-    givenAnsweredRecallAt(new Timestamp(currentTime.getTime() - TimeUnit.HOURS.toMillis(1)));
-    makeMe
-        .aRecallPrompt()
-        .withPredefinedQuestionForNote(note)
-        .forMemoryTracker(dueTracker)
-        .please();
-
-    QuestionGenerationBatchUserScheduleDTO schedule =
-        planningService.getNextBatchQuestionSchedule(user, currentTime);
-
-    assertThat(schedule.getNextScheduledAt(), is((Timestamp) null));
-    assertThat(
-        schedule.getReason(),
-        is(QuestionGenerationBatchPlanningService.REASON_NO_CANDIDATE_TRACKERS));
-  }
-
   private void givenAnsweredRecallAt(Timestamp answeredAt) {
     makeMe
         .aRecallPrompt()

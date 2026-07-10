@@ -251,19 +251,19 @@ CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles
 ---
 
 ### Phase 4: Optimize batch ranks 10–12
-Status: planned
+Status: done
 
-**Tests:**
-- `backend/src/test/java/com/odde/doughnut/services/QuestionGenerationBatchUserScheduleTest.java` — "returnsNoCandidateTrackersReasonWhenNoTrackersCanBeBatched()" (~155ms)
-- `backend/src/test/java/com/odde/doughnut/services/PredefinedQuestionServiceRegenerationTest.java` — "savesOriginalAsContestedThenRegeneratedQuestion()" (~110ms)
-- `backend/src/test/java/com/odde/doughnut/services/ai/AiQuestionGeneratorShuffleTest.java` — "shouldReturnPostProcessedGeneratedQuestion()" (~108ms)
+**Tests (baseline → after):**
+- `QuestionGenerationBatchUserScheduleTest.returnsNoCandidateTrackersReasonWhenNoTrackersCanBeBatched()` (~155ms) → `QuestionGenerationBatchUserScheduleNoCandidateTrackersTest` mock-only (~&lt;5ms when Mockito warm; avoids 168× DB scan)
+- `PredefinedQuestionServiceRegenerationTest.savesOriginalAsContestedThenRegeneratedQuestion()` (~110ms) → **deleted**; contested-flag assertions merged into `PredefinedQuestionTest.shouldRegenerateQuestionWhenEvaluationShowsNotFeasible()`
+- `AiQuestionGeneratorShuffleTest.shouldReturnPostProcessedGeneratedQuestion()` (~108ms) → **deleted** (redundant with `GeneratedQuestionPostProcessorTest` + `AiQuestionGeneratorTests`)
 
-**Goals:** Speed up only these tests (merge/delete redundant cases, slim `makeMe`/fixtures, parameterize duplicates, avoid full-stack when a narrower entry suffices). If no meaningful win after a serious attempt, append **Candidates** in the blacklist and mark done.
+**Learnings:** `getNextBatchQuestionSchedule` scans up to 168 hours with DB queries per hour when no candidates exist; mock-only test covers the reason path without integration cost.
 
 **Verify:**
 
 ```bash
-CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles.active=test --tests "com.odde.doughnut.services.QuestionGenerationBatchUserScheduleTest" --tests "com.odde.doughnut.services.PredefinedQuestionServiceRegenerationTest" --tests "com.odde.doughnut.services.ai.AiQuestionGeneratorShuffleTest"
+CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles.active=test --tests "com.odde.doughnut.services.QuestionGenerationBatchUserScheduleTest" --tests "com.odde.doughnut.services.QuestionGenerationBatchUserScheduleNoCandidateTrackersTest" --tests "com.odde.doughnut.entities.PredefinedQuestionTest\$AutoEvaluateAndRegenerate" --tests "com.odde.doughnut.services.ai.AiQuestionGeneratorTests" --tests "com.odde.doughnut.services.ai.GeneratedQuestionPostProcessorTest"
 ```
 
 ---
