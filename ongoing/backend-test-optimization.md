@@ -269,19 +269,17 @@ CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles
 ---
 
 ### Phase 5: Optimize batch ranks 13–15
-Status: planned
+Status: done
 
-**Tests:**
-- `backend/src/test/java/com/odde/doughnut/controllers/DuplicateNoteTitleMvcTest.java` — "createNoteAtNotebookRootReturns409WhenTitleDuplicatesAtRoot()" (~107ms)
-- `backend/src/test/java/com/odde/doughnut/services/QuestionGenerationBatchAdminStatusServiceTest.java` — "reportsRegisteredMaintenanceSchedulerFromScheduledTaskRegistry()" (~106ms)
-- `backend/src/test/java/com/odde/doughnut/services/book/GcsBookStorageTest.java` — "get_emptyWhenNoBlob()" (~85ms)
-
-**Goals:** Speed up only these tests (merge/delete redundant cases, slim `makeMe`/fixtures, parameterize duplicates, avoid full-stack when a narrower entry suffices). If no meaningful win after a serious attempt, append **Candidates** in the blacklist and mark done.
+**Tests (baseline → after):**
+- `DuplicateNoteTitleMvcTest.createNoteAtNotebookRootReturns409WhenTitleDuplicatesAtRoot()` (~107ms) → **deleted** separate `@SpringBootTest` class; duplicate-title constraint + reserved-index create moved into `NotebookNotesFolderControllerTest` (direct controller, shared context); HTTP 409 mapping covered by new `CustomRestExceptionHandlerDuplicateTitleTest` (~&lt;1ms); rename-to-index MVC test dropped (covered by `NoteUpdateTitleDTOTest`)
+- `QuestionGenerationBatchAdminStatusServiceTest.reportsRegisteredMaintenanceSchedulerFromScheduledTaskRegistry()` (~106ms) → **already merged in Phase 3** as `reportsSchedulerActiveBasedOnRegisteredMaintenanceTasks()`
+- `GcsBookStorageTest.get_emptyWhenNoBlob()` (~85ms) → merged with `get_returnsBytesWhenBlobExists()` into parameterized `get_returnsBytesOrEmptyWhenBlobPresentOrMissing()`
 
 **Verify:**
 
 ```bash
-CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles.active=test --tests "com.odde.doughnut.controllers.DuplicateNoteTitleMvcTest" --tests "com.odde.doughnut.services.QuestionGenerationBatchAdminStatusServiceTest" --tests "com.odde.doughnut.services.book.GcsBookStorageTest"
+CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles.active=test --tests "com.odde.doughnut.controllers.NotebookNotesFolderControllerTest" --tests "com.odde.doughnut.configs.CustomRestExceptionHandlerDuplicateTitleTest" --tests "com.odde.doughnut.services.QuestionGenerationBatchAdminStatusServiceTest" --tests "com.odde.doughnut.services.book.GcsBookStorageTest"
 ```
 
 ---

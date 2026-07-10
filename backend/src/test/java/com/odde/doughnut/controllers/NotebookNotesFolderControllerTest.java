@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.FolderListing;
 import com.odde.doughnut.controllers.dto.FolderRealm;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
@@ -19,11 +20,16 @@ import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import java.util.List;
 import java.util.Objects;
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -124,6 +130,53 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
           assertThrows(
               ResponseStatusException.class, () -> controller.createNoteAtNotebookRoot(nb1, dto));
       assertThat(ex.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+      "SameTitle, SameTitle",
+      "SameTitle, sametitle",
+    })
+    void rejectsDuplicateTitleAtNotebookRoot(String existingTitle, String newTitle)
+        throws Exception {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      makeMe.aNote().notebook(nb).title(existingTitle).please();
+
+      NoteCreationDTO dto = new NoteCreationDTO();
+      dto.setNewTitle(newTitle);
+
+      assertThrows(
+          ConstraintViolationException.class, () -> controller.createNoteAtNotebookRoot(nb, dto));
+    }
+
+    @Test
+    void rejectsDuplicateTitleInSameFolder() throws Exception {
+      User owner = currentUser.getUser();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Folder folder = makeMe.aFolder().notebook(nb).name("F").please();
+      makeMe.aNote().folder(folder).title("InFolder").please();
+
+      NoteCreationDTO dto = new NoteCreationDTO();
+      dto.setNewTitle("InFolder");
+      dto.setFolderId(folder.getId());
+
+      assertThrows(
+          ConstraintViolationException.class, () -> controller.createNoteAtNotebookRoot(nb, dto));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"index", "INDEX"})
+    void rejectsReservedIndexTitleOnCreate(String reservedTitle) throws Exception {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      NoteCreationDTO dto = new NoteCreationDTO();
+      dto.setNewTitle(reservedTitle);
+
+      ApiException ex =
+          assertThrows(ApiException.class, () -> controller.createNoteAtNotebookRoot(nb, dto));
+
+      assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.BINDING_ERROR));
+      assertThat(ex.getErrorBody().getErrors().get("newTitle"), containsString("reserved"));
     }
   }
 

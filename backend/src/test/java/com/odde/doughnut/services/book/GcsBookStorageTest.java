@@ -15,9 +15,12 @@ import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 
 class GcsBookStorageTest {
@@ -46,16 +49,26 @@ class GcsBookStorageTest {
     assertEquals(contentType, info.getContentType());
   }
 
-  @Test
-  void get_returnsBytesWhenBlobExists() {
+  @ParameterizedTest
+  @MethodSource("getBlobPresenceCases")
+  void get_returnsBytesOrEmptyWhenBlobPresentOrMissing(
+      String prefix, String ref, boolean blobExists) {
     Storage storage = mock(Storage.class);
-    Blob blob = mock(Blob.class);
-    byte[] content = {1, 2, 3};
-    when(blob.getContent()).thenReturn(content);
-    when(storage.get(BlobId.of("b", "pre/x.pdf"))).thenReturn(blob);
+    GcsBookStorage cut = new GcsBookStorage(storage, "b", prefix);
+    if (blobExists) {
+      Blob blob = mock(Blob.class);
+      byte[] content = {1, 2, 3};
+      when(blob.getContent()).thenReturn(content);
+      when(storage.get(BlobId.of("b", ref))).thenReturn(blob);
+      assertEquals(Optional.of(content), cut.get(ref));
+    } else {
+      when(storage.get(BlobId.of("b", ref))).thenReturn(null);
+      assertTrue(cut.get(ref).isEmpty());
+    }
+  }
 
-    GcsBookStorage cut = new GcsBookStorage(storage, "b", "pre/");
-    assertEquals(Optional.of(content), cut.get("pre/x.pdf"));
+  static Stream<Arguments> getBlobPresenceCases() {
+    return Stream.of(Arguments.of("pre/", "pre/x.pdf", true), Arguments.of("", "a.pdf", false));
   }
 
   @ParameterizedTest
@@ -77,14 +90,6 @@ class GcsBookStorageTest {
     GcsBookStorage cut = new GcsBookStorage(storage, "b", "expected/");
     assertTrue(cut.get("other/key.pdf").isEmpty());
     verifyNoInteractions(storage);
-  }
-
-  @Test
-  void get_emptyWhenNoBlob() {
-    Storage storage = mock(Storage.class);
-    when(storage.get(BlobId.of("b", "a.pdf"))).thenReturn(null);
-    GcsBookStorage cut = new GcsBookStorage(storage, "b", "");
-    assertTrue(cut.get("a.pdf").isEmpty());
   }
 
   @ParameterizedTest
