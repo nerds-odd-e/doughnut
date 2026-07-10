@@ -615,7 +615,9 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/Assimi
 ---
 
 ### Phase 15: components/form/RichMarkdownEditor.aliasesProperty
-Status: planned
+Status: done
+
+**Learnings:** Hoisted mount/popup/add-property helpers into `aliasesPropertyTestSupport.ts`; merged popup scalar-text and invalid-list-item constraint cases with `it.each`; use shared `popupValidationText`, `dialogEl`, `savePopup` from `propertyValuePopupTestDom.ts`. Suite CPU ~65ms → ~114ms wall (5 tests; 2 popup cases → 1 parameterized).
 
 **Tests:** (3 in top 10%, ~65ms combined)
 - `tests/components/form/RichMarkdownEditor.aliasesProperty.spec.ts` — "emits valid aliases list edits from popup" (~25ms)
