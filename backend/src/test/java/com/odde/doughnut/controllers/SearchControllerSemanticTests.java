@@ -44,16 +44,6 @@ class SearchControllerSemanticTests extends ControllerTestBase {
   }
 
   @Nested
-  class SemanticSearch {
-    @Test
-    void shouldReturnEmptyListWhenNoMatchingNotes() throws UnexpectedNoAccessRightException {
-      var result = controller.semanticSearch(searchTerm("nonexistent"));
-
-      assertThat(result, empty());
-    }
-  }
-
-  @Nested
   class SemanticSearchWithinRelation {
     Note referenceNote;
 

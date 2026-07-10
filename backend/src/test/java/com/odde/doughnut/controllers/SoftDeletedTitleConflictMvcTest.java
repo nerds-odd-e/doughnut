@@ -1,10 +1,8 @@
 package com.odde.doughnut.controllers;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -16,7 +14,6 @@ import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.EmbeddingService;
 import com.odde.doughnut.services.NoteService;
 import java.util.List;
@@ -35,7 +32,6 @@ class SoftDeletedTitleConflictMvcTest extends ControllerTestBase {
   @Autowired private MockMvc mockMvc;
   @Autowired private ObjectMapper objectMapper;
   @Autowired private NoteService noteService;
-  @Autowired private NoteRepository noteRepository;
 
   @MockitoBean private EmbeddingService embeddingService;
 
@@ -73,19 +69,6 @@ class SoftDeletedTitleConflictMvcTest extends ControllerTestBase {
         .andExpect(status().isConflict())
         .andExpect(jsonPath("$.errorType").value("SOFT_DELETED_TITLE_CONFLICT"))
         .andExpect(jsonPath("$.errors.deletedNoteId").value(String.valueOf(n.getId())));
-  }
-
-  @Test
-  void undoDeleteRestoresNoteAfterSoftDeletedTitleConflict() throws Exception {
-    User owner = currentUser.getUser();
-    Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
-    Note n = makeMe.aNote().notebook(nb).title("RestoreMe").please();
-    noteService.destroy(n, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, owner);
-
-    mockMvc.perform(patch("/api/notes/{noteId}/undo-delete", n.getId())).andExpect(status().isOk());
-
-    Note reloaded = noteRepository.findById(n.getId()).orElseThrow();
-    assertNull(reloaded.getDeletedAt());
   }
 
   @Test

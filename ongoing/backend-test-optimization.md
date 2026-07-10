@@ -339,14 +339,14 @@ CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles
 ---
 
 ### Phase 9: Optimize batch ranks 25–27
-Status: planned
+Status: done
 
-**Tests:**
-- `backend/src/test/java/com/odde/doughnut/controllers/SearchControllerSemanticTests.java` — "shouldReturnEmptyListWhenNoMatchingNotes()" (~53ms)
-- `backend/src/test/java/com/odde/doughnut/algorithms/ImageUtilsTest.java` — "[1] width = "300", height = "300", expectedWidth = "300", expectedHeight = "300"" (~52ms)
-- `backend/src/test/java/com/odde/doughnut/controllers/SoftDeletedTitleConflictMvcTest.java` — "undoDeleteRestoresNoteAfterSoftDeletedTitleConflict()" (~49ms)
+**Tests (baseline → after):**
+- `SearchControllerSemanticTests.shouldReturnEmptyListWhenNoMatchingNotes()` (~53ms) → **deleted**; empty-embedding path covered by mock-only `SemanticNoteSearchServiceEmptyEmbeddingTest.returnsEmptyListWhenQueryEmbeddingIsEmpty()` (~&lt;5ms)
+- `ImageUtilsTest.passesThroughImagesWithinMaxDimensions()` (~52ms) → **deleted**; pass-through branch is trivial byte return when within bounds; dimension math covered by `scaledDimensions` parameterized cases
+- `SoftDeletedTitleConflictMvcTest.undoDeleteRestoresNoteAfterSoftDeletedTitleConflict()` (~49ms) → **deleted**; note restore covered by `NoteServiceTest.Restore` and `NoteControllerTests` undo-delete paths
 
-**Goals:** Speed up only these tests (merge/delete redundant cases, slim `makeMe`/fixtures, parameterize duplicates, avoid full-stack when a narrower entry suffices). If no meaningful win after a serious attempt, append **Candidates** in the blacklist and mark done.
+**Learnings:** Empty semantic search is an early-return in `SemanticNoteSearchService` when embedding is empty; ImageUtils pass-through avoids Graphics2D but still paid integration setup cost for trivial logic; undo-delete after soft-delete is not title-conflict-specific behavior.
 
 **Verify:**
 

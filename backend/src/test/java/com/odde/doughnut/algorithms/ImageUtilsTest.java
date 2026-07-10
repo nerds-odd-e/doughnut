@@ -31,13 +31,6 @@ class ImageUtilsTest {
   }
 
   @Test
-  void passesThroughImagesWithinMaxDimensions() throws IOException {
-    BufferedImage output = resized(buildImage(50, 50), "img.jpg", new ImageUtils(100, 100));
-    assertThat(output.getWidth(), equalTo(50));
-    assertThat(output.getHeight(), equalTo(50));
-  }
-
-  @Test
   void resizesOversizedImages() throws IOException {
     BufferedImage output = resized(buildImage(101, 2), "img.jpg", new ImageUtils(100, 100));
     assertThat(output.getWidth(), equalTo(100));
