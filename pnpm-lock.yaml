@@ -301,8 +301,8 @@ importers:
         specifier: 2.4.11
         version: 2.4.11(@vue/compiler-dom@3.5.39)(@vue/server-renderer@3.5.39(vue@3.5.39(typescript@6.0.3)))(vue@3.5.39(typescript@6.0.3))
       daisyui:
-        specifier: 5.6.16
-        version: 5.6.16
+        specifier: 5.6.17
+        version: 5.6.17
       doughnut-test-fixtures:
         specifier: workspace:*
         version: link:../packages/doughnut-test-fixtures
@@ -3023,8 +3023,8 @@ packages:
     resolution: {integrity: sha512-MOqHvMWF9/9MX6nza0KgvFH4HpMU0EF5uUDXqX/BtxtU8NfB0QzRtJ8Oe/6SuS4kbhyzVJwjd97EA4PKrzJ8bw==}
     engines: {node: '>=0.12'}
 
-  daisyui@5.6.16:
-    resolution: {integrity: sha512-A5/IrcFCXyfzQ7M2fnKVPfMbKCVu0xeM7/G22gK1XRcp2dgA39kvFOeEAK8f2KpJJQJ+s9Jc5pZoJoYsPEJ8JQ==}
+  daisyui@5.6.17:
+    resolution: {integrity: sha512-e/+8lJc2/GiMrnm6bVL+0K3pYE2mUP4DY/IFUcOCQdcocvRkDsmXGIIaC87JMedJJSKXVCuFpOVSZqMwaRcIGg==}
 
   dashdash@1.14.1:
     resolution: {integrity: sha512-jRFi8UDGo6j+odZiEpjazZaWqEal3w/basFjQHQEwVtZJGDpxbH1MeYluwCS8Xq5wmLJooDlMgvVarmWfGM44g==}
@@ -9139,7 +9139,7 @@ snapshots:
       es5-ext: 0.10.64
       type: 2.7.3
 
-  daisyui@5.6.16: {}
+  daisyui@5.6.17: {}
 
   dashdash@1.14.1:
     dependencies:
