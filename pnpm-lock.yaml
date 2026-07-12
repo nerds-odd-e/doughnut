@@ -81,7 +81,7 @@ importers:
         version: 0.99.0(typescript@6.0.3)
       '@hono/node-server':
         specifier: 2.0.8
-        version: 2.0.8(hono@4.12.28)
+        version: 2.0.8(hono@4.12.29)
       '@mbtest/mountebank':
         specifier: 2.9.4
         version: 2.9.4
@@ -116,8 +116,8 @@ importers:
         specifier: ^15.1.0
         version: 15.1.0
       hono:
-        specifier: 4.12.28
-        version: 4.12.28
+        specifier: 4.12.29
+        version: 4.12.29
       npm-run-all2:
         specifier: ^9.0.2
         version: 9.0.2
@@ -3798,8 +3798,8 @@ packages:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
     hasBin: true
 
-  hono@4.12.28:
-    resolution: {integrity: sha512-YwUvVpSF7m1yOblFPrU3Hbo8XhPheBoiyfGuII6z19LnOr6JpDnyyp7LFNrfV56wS8tpvtBFGRISHN02pDdLOA==}
+  hono@4.12.29:
+    resolution: {integrity: sha512-1hNiRjawYrLq/4m3DQQjPGFg0VZkk4RjQJDff/excI6Dm9BiL75qxGrd7/c6YOxPdq6AscP3LiXhQ6fKFC1Waw==}
     engines: {node: '>=16.9.0'}
 
   hookable@5.5.3:
@@ -7264,13 +7264,13 @@ snapshots:
 
   '@hey-api/types@0.1.4': {}
 
-  '@hono/node-server@1.19.14(hono@4.12.28)':
+  '@hono/node-server@1.19.14(hono@4.12.29)':
     dependencies:
-      hono: 4.12.28
+      hono: 4.12.29
 
-  '@hono/node-server@2.0.8(hono@4.12.28)':
+  '@hono/node-server@2.0.8(hono@4.12.29)':
     dependencies:
-      hono: 4.12.28
+      hono: 4.12.29
 
   '@inkjs/ui@2.0.0(ink@7.1.0(@types/react@19.2.17)(react@19.2.7))':
     dependencies:
@@ -7512,7 +7512,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.29.0(zod@4.4.3)':
     dependencies:
-      '@hono/node-server': 1.19.14(hono@4.12.28)
+      '@hono/node-server': 1.19.14(hono@4.12.29)
       ajv: 8.20.0
       ajv-formats: 3.0.1(ajv@8.20.0)
       content-type: 1.0.5
@@ -7522,7 +7522,7 @@ snapshots:
       eventsource-parser: 3.1.0
       express: 5.2.1
       express-rate-limit: 8.5.2(express@5.2.1)
-      hono: 4.12.28
+      hono: 4.12.29
       jose: 6.2.3
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
@@ -10030,7 +10030,7 @@ snapshots:
 
   he@1.2.0: {}
 
-  hono@4.12.28: {}
+  hono@4.12.29: {}
 
   hookable@5.5.3: {}
 
