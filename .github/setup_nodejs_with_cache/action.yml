@@ -22,7 +22,6 @@ runs:
       uses: pnpm/action-setup@v6
       with:
         version: ${{ inputs.pnpm_version }}
-        standalone: true
     - name: Get pnpm store directory
       shell: bash
       run: |
