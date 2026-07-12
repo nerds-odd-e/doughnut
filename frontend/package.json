@@ -37,7 +37,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.5.3",
     "@storybook/addon-docs": "10.4.6",
-    "@storybook/vue3": "10.4.6",
+    "@storybook/vue3": "10.5.0",
     "@storybook/vue3-vite": "10.4.6",
     "@tailwindcss/typography": "^0.5.20",
     "@tailwindcss/vite": "^4.3.2",
