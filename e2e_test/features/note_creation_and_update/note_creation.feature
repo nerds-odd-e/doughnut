@@ -58,3 +58,7 @@ Feature: Nested Note creation
   Scenario: Create a nested folder under an existing folder
     When I create a folder named "Deep" while viewing note "team"
     Then I should see sidebar folder "Deep" under open folder "LeSS in Action"
+
+  Scenario: Create note under current note as parent
+    When I create a note titled "Child topic" from note "Course intro" with relationship "Under current"
+    Then I should see rich note property "parent" with value "[[Course intro]]"

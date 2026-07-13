@@ -17,6 +17,21 @@ const noteCreationForm = {
     })
   },
 
+  selectParentRelationship(label: string) {
+    cy.findByTestId('note-creation-parent-relationship')
+      .contains('label', label)
+      .click()
+    return this
+  },
+
+  createNoteWithTitleAndParentRelationship(
+    title: string,
+    relationship: string
+  ) {
+    this.selectParentRelationship(relationship)
+    return this.createNoteWithTitle(title)
+  },
+
   createNoteWithTitleAndWikidataId(title: string, wikidataId: string) {
     const form = submittableForm.fill({
       Title: title,

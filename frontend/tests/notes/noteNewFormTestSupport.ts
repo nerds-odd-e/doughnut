@@ -12,7 +12,6 @@ import {
   clickWikidataSearchResult,
   clickWikidataTitleAction,
   wikidataModal,
-  wikidataSearchResultItem,
 } from "@tests/notes/wikidataAssociationDialogTestSupport"
 import { expect } from "vitest"
 
@@ -90,8 +89,6 @@ export function noteTitleText(
   return (wrapper.find('[data-test="note-title"]').element as HTMLElement)
     .innerText
 }
-
-export { wikidataModal, wikidataSearchResultItem }
 
 export function wikidataDialogIsOpen(): boolean {
   return wikidataModal() !== null
