@@ -59,10 +59,10 @@ repositories {
 def jdkUnsafeMemoryAccessJvmArgs = ['--sun-misc-unsafe-memory-access=allow']
 
 dependencies {
-  implementation platform('com.google.cloud:libraries-bom:26.84.0')
+  implementation platform('com.google.cloud:libraries-bom:26.85.0')
   implementation 'com.google.cloud:google-cloud-storage'
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-  implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate7:2.22.0'
+  implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate7:2.22.1'
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation 'org.springframework.boot:spring-boot-starter-websocket'
   implementation 'org.springframework.boot:spring-boot-starter-data-redis'
@@ -74,7 +74,7 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-security'
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
   implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:3.0.3'
-  implementation 'com.openai:openai-java:4.41.0'
+  implementation 'com.openai:openai-java:4.42.0'
   implementation 'org.yaml:snakeyaml:2.6'
   // RxJava2 for Flowable streaming support
   implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
