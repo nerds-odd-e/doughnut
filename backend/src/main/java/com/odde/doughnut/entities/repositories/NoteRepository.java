@@ -2,6 +2,7 @@ package com.odde.doughnut.entities.repositories;
 
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.utils.SearchTitleNormalizer;
 import java.util.List;
 import java.util.stream.Stream;
 import org.springframework.data.domain.Pageable;
@@ -12,8 +13,14 @@ import org.springframework.data.repository.query.Param;
 public interface NoteRepository extends CrudRepository<Note, Integer> {
 
   String selectFromNote = "SELECT n FROM Note n";
-  String searchForTitleLike = " WHERE LOWER(n.title) LIKE LOWER(:pattern) AND n.deletedAt IS NULL ";
-  String searchForTitleExact = " WHERE LOWER(n.title) = LOWER(:key) AND n.deletedAt IS NULL ";
+  String searchForTitleLike =
+      " WHERE LOWER("
+          + SearchTitleNormalizer.NORMALIZED_NOTE_TITLE_JPQL
+          + ") LIKE LOWER(:pattern) AND n.deletedAt IS NULL ";
+  String searchForTitleExact =
+      " WHERE LOWER("
+          + SearchTitleNormalizer.NORMALIZED_NOTE_TITLE_JPQL
+          + ") = LOWER(:key) AND n.deletedAt IS NULL ";
 
   @Query(
       value =

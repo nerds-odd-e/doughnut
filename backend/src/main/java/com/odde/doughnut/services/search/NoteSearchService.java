@@ -6,6 +6,7 @@ import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.utils.SearchTitleNormalizer;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -93,32 +94,32 @@ public class NoteSearchService {
   }
 
   private List<Note> searchExactMatches(User user, SearchTerm searchTerm, Integer notebookId) {
-    String exactSearchKey = searchTerm.getTrimmedSearchKey();
+    String exactSearchKey =
+        SearchTitleNormalizer.normalizeTildeVariants(searchTerm.getTrimmedSearchKey());
     if (Strings.isBlank(exactSearchKey)) {
       return List.of();
     }
 
     if (Boolean.TRUE.equals(searchTerm.getAllMyCircles())) {
       return Stream.concat(
-              searchExactMatchesInMyNotebooksAndSubscriptions(user, searchTerm).stream(),
+              searchExactMatchesInMyNotebooksAndSubscriptions(user, exactSearchKey).stream(),
               noteRepository.searchExactForUserInAllMyCircle(user.getId(), exactSearchKey).stream())
           .toList();
     }
     if (Boolean.TRUE.equals(searchTerm.getAllMyNotebooksAndSubscriptions())) {
-      return searchExactMatchesInMyNotebooksAndSubscriptions(user, searchTerm);
+      return searchExactMatchesInMyNotebooksAndSubscriptions(user, exactSearchKey);
     }
     return noteRepository.searchExactInNotebook(notebookId, exactSearchKey);
   }
 
   private List<Note> searchExactMatchesInMyNotebooksAndSubscriptions(
-      User user, SearchTerm searchTerm) {
+      User user, String exactSearchKey) {
     return Stream.concat(
             noteRepository
-                .searchExactForUserInAllMyNotebooks(user.getId(), searchTerm.getTrimmedSearchKey())
+                .searchExactForUserInAllMyNotebooks(user.getId(), exactSearchKey)
                 .stream(),
             noteRepository
-                .searchExactForUserInAllMySubscriptions(
-                    user.getId(), searchTerm.getTrimmedSearchKey())
+                .searchExactForUserInAllMySubscriptions(user.getId(), exactSearchKey)
                 .stream())
         .toList();
   }
@@ -242,6 +243,8 @@ public class NoteSearchService {
   }
 
   private String getPattern(SearchTerm searchTerm) {
-    return "%" + searchTerm.getTrimmedSearchKey() + "%";
+    return "%"
+        + SearchTitleNormalizer.normalizeTildeVariants(searchTerm.getTrimmedSearchKey())
+        + "%";
   }
 }

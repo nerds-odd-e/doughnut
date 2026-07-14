@@ -7,7 +7,7 @@
   >
     <slot />
   </ul>
-  <Teleport v-else-if="portalOpen" to="body">
+  <Teleport v-else-if="portalOpen" :to="teleportTarget">
     <ul
       ref="panelRef"
       tabindex="0"
@@ -23,7 +23,10 @@
 
 <script setup lang="ts">
 import { computed, inject, ref, type StyleValue } from "vue"
-import { dropdownPortalContextKey } from "@/composables/dropdownPortalContext"
+import {
+  dropdownPortalContextKey,
+  dropdownPortalTeleportTarget,
+} from "@/composables/dropdownPortalContext"
 import { useDropdownPortalPosition } from "@/composables/useDropdownPortalPosition"
 import {
   dropdownMenuPanelClass,
@@ -41,6 +44,9 @@ const props = withDefaults(
 const portalContext = inject(dropdownPortalContextKey, null)
 const usePortal = computed(() => portalContext != null)
 const portalOpen = computed(() => portalContext?.open.value ?? false)
+const teleportTarget = computed(() =>
+  dropdownPortalTeleportTarget(portalContext?.detailsRef.value)
+)
 
 const panelRef = ref<HTMLElement | null>(null)
 
