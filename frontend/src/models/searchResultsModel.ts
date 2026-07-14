@@ -3,61 +3,19 @@ import type {
   NoteSearchResult,
   RelationshipLiteralSearchHit,
 } from "@generated/doughnut-backend-api"
-import { relationshipLiteralSearchHitKey } from "./relationshipLiteralSearchHitKey"
+import {
+  computeSearchDisplayState,
+  type DisplayState,
+} from "./searchDisplayState"
+import { mergeRelationshipLiteralSearchHits } from "./mergeRelationshipLiteralSearchHits"
+import type { SearchListPreference } from "./searchListPreference"
 
-export interface DisplayState {
-  showRecentNotes: boolean
-  showEmptyState: boolean
-  showSearchResults: boolean
-  title: string | null
-  emptyMessage?: string
-  containerClass: string
-}
+export type { DisplayState }
 
 function noteHitFromSemantic(
   n: NoteSearchResult
 ): RelationshipLiteralSearchHit {
   return { hitKind: "NOTE", noteSearchResult: n }
-}
-
-function hitDistance(h: RelationshipLiteralSearchHit): number {
-  if (h.hitKind === "NOTE" && h.noteSearchResult) {
-    return h.noteSearchResult.distance ?? Number.POSITIVE_INFINITY
-  }
-  if (h.hitKind === "FOLDER" || h.hitKind === "NOTEBOOK") {
-    return h.distance ?? Number.POSITIVE_INFINITY
-  }
-  return Number.POSITIVE_INFINITY
-}
-
-function titleForSort(h: RelationshipLiteralSearchHit): string {
-  if (h.hitKind === "NOTE" && h.noteSearchResult?.noteTopology?.title) {
-    return h.noteSearchResult.noteTopology.title.trim().toLowerCase()
-  }
-  if (h.hitKind === "FOLDER" && h.folderName) {
-    return h.folderName.trim().toLowerCase()
-  }
-  if (h.hitKind === "NOTEBOOK" && h.notebookName) {
-    return h.notebookName.trim().toLowerCase()
-  }
-  return ""
-}
-
-function notebookIdOf(h: RelationshipLiteralSearchHit): number | undefined {
-  if (h.hitKind === "NOTE" && h.noteSearchResult) {
-    return h.noteSearchResult.notebookId
-  }
-  if (h.hitKind === "FOLDER" || h.hitKind === "NOTEBOOK") {
-    return h.notebookId
-  }
-  return
-}
-
-function hitKindRank(kind: RelationshipLiteralSearchHit["hitKind"]): number {
-  if (kind === "NOTE") return 0
-  if (kind === "NOTEBOOK") return 1
-  if (kind === "FOLDER") return 2
-  return 3
 }
 
 export class SearchResultsModel {
@@ -161,7 +119,6 @@ export class SearchResultsModel {
   prepareForNewSearch(trimmedSearchKey: string, isGlobal: boolean): void {
     const cachedSearches = this.getCachedSearches(isGlobal)
     if (!cachedSearches[trimmedSearchKey]) {
-      // Save current result as previous before starting new search
       if (this.state.recentResult !== undefined) {
         this.state.previousSearchResult = this.state.recentResult
       } else {
@@ -195,84 +152,15 @@ export class SearchResultsModel {
     noteId: number | undefined
     isDropdown: boolean
     filteredRecentNotesCount: number
+    listPreference?: SearchListPreference
   }): DisplayState {
-    const searchResult = this.getSearchResult(
-      opts.trimmedSearchKey,
-      opts.isGlobal
-    )
-    const hasSearchKey = opts.trimmedSearchKey !== ""
-    const hasSearchResults = searchResult !== undefined
-    const hasRecentNotes = opts.filteredRecentNotesCount > 0
-    const isWaitingForFirstSearch =
-      !hasSearchResults &&
-      this.state.previousSearchResult === undefined &&
-      hasSearchKey
-    const shouldShowRecent =
-      (opts.isGlobal || opts.noteId) &&
-      (!hasSearchKey || isWaitingForFirstSearch) &&
-      !hasSearchResults
-
-    const containerClass = opts.isDropdown
-      ? "dropdown-section"
-      : "result-section"
-
-    if (shouldShowRecent && hasRecentNotes) {
-      return {
-        showRecentNotes: true,
-        showEmptyState: false,
-        showSearchResults: false,
-        title: "Recently updated notes",
-        containerClass,
-      }
-    }
-
-    if (hasSearchResults && searchResult.length > 0) {
-      return {
-        showRecentNotes: false,
-        showEmptyState: false,
-        showSearchResults: true,
-        title: "Search result",
-        containerClass,
-      }
-    }
-
-    if (!this.state.isSearchInProgress) {
-      if (hasSearchResults && searchResult.length === 0) {
-        let emptyMessage = "No matching notes found."
-        if (opts.isDropdown && !hasSearchKey) {
-          emptyMessage = opts.noteId
-            ? "No recent notes found."
-            : "Similar notes within the same notebook"
-        }
-        return {
-          showRecentNotes: false,
-          showEmptyState: true,
-          showSearchResults: false,
-          title: "Search result",
-          emptyMessage,
-          containerClass,
-        }
-      }
-
-      if (!hasSearchKey && opts.noteId && opts.isDropdown && !hasRecentNotes) {
-        return {
-          showRecentNotes: false,
-          showEmptyState: true,
-          showSearchResults: false,
-          title: "Recently updated notes",
-          emptyMessage: "No recent notes found.",
-          containerClass,
-        }
-      }
-    }
-
-    return {
-      showRecentNotes: false,
-      showEmptyState: false,
-      showSearchResults: false,
-      title: null,
-      containerClass,
-    }
+    return computeSearchDisplayState({
+      ...opts,
+      listPreference: opts.listPreference ?? "auto",
+      searchResult: this.getSearchResult(opts.trimmedSearchKey, opts.isGlobal),
+      isSearchInProgress: this.state.isSearchInProgress,
+      hasPreviousResult: this.state.previousSearchResult !== undefined,
+    })
   }
 
   /**
@@ -296,7 +184,7 @@ export class SearchResultsModel {
     if (opts.semanticResults !== undefined) {
       incoming.push(...opts.semanticResults.map((n) => noteHitFromSemantic(n)))
     }
-    const merged = this.mergeUniqueAndSortByDistance(
+    const merged = mergeRelationshipLiteralSearchHits(
       existing,
       incoming,
       opts.currentNotebookId,
@@ -304,114 +192,5 @@ export class SearchResultsModel {
     )
     this.setCachedResult(opts.trimmedSearchKey, opts.isGlobal, merged)
     this.clearPreviousResult()
-  }
-
-  private mergeUniqueAndSortByDistance(
-    existing: RelationshipLiteralSearchHit[],
-    incoming: RelationshipLiteralSearchHit[],
-    currentNotebookId?: number,
-    searchKeyLower = ""
-  ): RelationshipLiteralSearchHit[] {
-    const byKey = new Map<string, RelationshipLiteralSearchHit>()
-
-    const isExactLiteralDistance = (d: number) => d === 0
-
-    const chooseBetterNote = (a: NoteSearchResult, b: NoteSearchResult) => {
-      const da = a.distance ?? Number.POSITIVE_INFINITY
-      const db = b.distance ?? Number.POSITIVE_INFINITY
-      if (isExactLiteralDistance(da) && !isExactLiteralDistance(db)) return a
-      if (!isExactLiteralDistance(da) && isExactLiteralDistance(db)) return b
-      return db < da ? b : a
-    }
-
-    const mergeHit = (
-      prev: RelationshipLiteralSearchHit | undefined,
-      next: RelationshipLiteralSearchHit
-    ): RelationshipLiteralSearchHit => {
-      if (!prev) return next
-      if (
-        prev.hitKind === "NOTE" &&
-        next.hitKind === "NOTE" &&
-        prev.noteSearchResult &&
-        next.noteSearchResult
-      ) {
-        const better = chooseBetterNote(
-          prev.noteSearchResult,
-          next.noteSearchResult
-        )
-        return better === prev.noteSearchResult ? prev : next
-      }
-      if (prev.hitKind === "FOLDER" && next.hitKind === "FOLDER") {
-        const da = prev.distance ?? Number.POSITIVE_INFINITY
-        const db = next.distance ?? Number.POSITIVE_INFINITY
-        if (isExactLiteralDistance(da) && !isExactLiteralDistance(db))
-          return prev
-        if (!isExactLiteralDistance(da) && isExactLiteralDistance(db))
-          return next
-        return db < da ? next : prev
-      }
-      if (prev.hitKind === "NOTEBOOK" && next.hitKind === "NOTEBOOK") {
-        const da = prev.distance ?? Number.POSITIVE_INFINITY
-        const db = next.distance ?? Number.POSITIVE_INFINITY
-        if (isExactLiteralDistance(da) && !isExactLiteralDistance(db))
-          return prev
-        if (!isExactLiteralDistance(da) && isExactLiteralDistance(db))
-          return next
-        return db < da ? next : prev
-      }
-      return next
-    }
-
-    existing.forEach((h) => byKey.set(relationshipLiteralSearchHitKey(h), h))
-    incoming.forEach((h) => {
-      const key = relationshipLiteralSearchHitKey(h)
-      const prev = byKey.get(key)
-      byKey.set(key, mergeHit(prev, h))
-    })
-
-    return Array.from(byKey.values()).sort((a, b) => {
-      const ta = titleForSort(a)
-      const tb = titleForSort(b)
-      const exactA = searchKeyLower !== "" && ta === searchKeyLower
-      const exactB = searchKeyLower !== "" && tb === searchKeyLower
-      if (exactA !== exactB) return exactA ? -1 : 1
-
-      const da = hitDistance(a)
-      const db = hitDistance(b)
-      const distDiff = da - db
-      if (!Number.isNaN(distDiff) && Math.abs(distDiff) > 1e-6) {
-        return distDiff
-      }
-
-      if (currentNotebookId !== undefined) {
-        const aNb = notebookIdOf(a)
-        const bNb = notebookIdOf(b)
-        const aSame = aNb === currentNotebookId
-        const bSame = bNb === currentNotebookId
-        const nb = Number(bSame) - Number(aSame)
-        if (nb !== 0) return nb
-      }
-
-      const lenDiff = ta.length - tb.length
-      if (lenDiff !== 0) return lenDiff
-      const cmp = ta.localeCompare(tb, undefined, {
-        sensitivity: "base",
-      })
-      if (cmp !== 0) return cmp
-
-      if (a.hitKind === "NOTE" && b.hitKind === "NOTE") {
-        return (
-          (a.noteSearchResult!.noteTopology!.id as number) -
-          (b.noteSearchResult!.noteTopology!.id as number)
-        )
-      }
-      if (a.hitKind === "FOLDER" && b.hitKind === "FOLDER") {
-        return (a.folderId ?? 0) - (b.folderId ?? 0)
-      }
-      if (a.hitKind === "NOTEBOOK" && b.hitKind === "NOTEBOOK") {
-        return (a.notebookId ?? 0) - (b.notebookId ?? 0)
-      }
-      return hitKindRank(a.hitKind) - hitKindRank(b.hitKind)
-    })
   }
 }

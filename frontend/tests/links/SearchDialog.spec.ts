@@ -1,21 +1,101 @@
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
+import {
+  NoteController,
+  SearchController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import SearchForm from "@/components/links/SearchForm.vue"
-import { screen } from "@testing-library/vue"
+import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import MakeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { dispatchArrowKey } from "@tests/helpers/searchDialogKeyboardTestSupport"
-import { describe, expect, it } from "vitest"
+import { advanceSearchDebounce } from "@tests/helpers/searchDebounceTestSupport"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import {
   allSearchResultItems,
+  makeNoteHit,
+  renderSearchForm,
   setupSearchDialogTests,
   titleEl,
+  typeInSearch,
 } from "./searchDialogTestSupport"
 
 const searchInputId = "searchTerm-searchKey"
 
 describe("SearchForm", () => {
   setupSearchDialogTests()
+
+  describe("Matches / Recent list mode", () => {
+    beforeEach(() => {
+      vi.useFakeTimers()
+    })
+
+    afterEach(() => {
+      vi.runOnlyPendingTimers()
+      vi.useRealTimers()
+    })
+
+    it("keeps search key and switches between Matches and Recent", async () => {
+      const note = MakeMe.aNote.please()
+      mockSdkService(NoteController, "getRecentNotes", [
+        MakeMe.aNoteSearchResult.title("Recent Note").please(),
+      ])
+      mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
+        makeNoteHit("Sedation", note.noteTopology.id + 100),
+      ])
+
+      const searchInput = await renderSearchForm({ note })
+      expect(screen.getByText("Recently updated notes")).toBeInTheDocument()
+      expect(screen.getByTestId("search-list-mode-matches")).toBeInTheDocument()
+      expect(screen.getByTestId("search-list-mode-recent")).toBeInTheDocument()
+
+      await typeInSearch(searchInput, "Sed")
+      expect(screen.getByText("Search result")).toBeInTheDocument()
+      expect(screen.getByText("Sedation")).toBeInTheDocument()
+      expect(
+        screen.queryByText("Recently updated notes")
+      ).not.toBeInTheDocument()
+      expect(searchInput).toHaveValue("Sed")
+
+      fireEvent.click(screen.getByTestId("search-list-mode-recent"))
+      await flushPromises()
+      expect(screen.getByText("Recently updated notes")).toBeInTheDocument()
+      expect(screen.getByText("Recent Note")).toBeInTheDocument()
+      expect(searchInput).toHaveValue("Sed")
+
+      fireEvent.click(screen.getByTestId("search-list-mode-matches"))
+      await flushPromises()
+      expect(screen.getByText("Search result")).toBeInTheDocument()
+      expect(screen.getByText("Sedation")).toBeInTheDocument()
+      expect(searchInput).toHaveValue("Sed")
+    })
+
+    it("allows switching to Recent when search is prefilled from a dead link", async () => {
+      const note = MakeMe.aNote.please()
+      mockSdkService(NoteController, "getRecentNotes", [
+        MakeMe.aNoteSearchResult.title("Recent Note").please(),
+      ])
+      mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
+        makeNoteHit("Selected Note", note.noteTopology.id + 100),
+      ])
+
+      const searchInput = await renderSearchForm({
+        note,
+        deadLinkPayload: {
+          targetToken: "original text",
+          displayText: "original text",
+        },
+      })
+      expect(searchInput).toHaveValue("original text")
+      await advanceSearchDebounce()
+      expect(screen.getByText("Selected Note")).toBeInTheDocument()
+
+      fireEvent.click(screen.getByTestId("search-list-mode-recent"))
+      await flushPromises()
+      expect(screen.getByText("Recently updated notes")).toBeInTheDocument()
+      expect(screen.getByText("Recent Note")).toBeInTheDocument()
+      expect(searchInput).toHaveValue("original text")
+    })
+  })
 
   it("Search at the top level with no note", async () => {
     helper

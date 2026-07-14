@@ -1,66 +1,31 @@
 <template>
   <div :class="{ 'dropdown-style': isDropdown }">
-    <div
-      v-if="panelVisible"
-      :class="displayState.containerClass"
-    >
-      <div
+    <div v-if="panelVisible" :class="displayState.containerClass">
+      <SearchResultsPanelHeader
         v-if="showTitleBar"
-        class="result-section-info-row flex flex-nowrap items-center gap-2 w-full min-w-0"
-      >
-        <button
-          v-if="embedSemanticToggle"
-          type="button"
-          title="Semantic search"
-          aria-label="Semantic search"
-          data-testid="note-new-form-semantic-search-toggle"
-          :class="[
-            'daisy-btn daisy-btn-ghost daisy-btn-sm daisy-btn-square shrink-0',
-            semanticSearchEnabled
-              ? 'text-primary'
-              : 'opacity-30',
-          ]"
-          @click="semanticSearchEnabled = !semanticSearchEnabled"
-        >
-          <Sparkles class="w-6 h-6" />
-        </button>
-        <span
-          v-if="displayState.title"
-          class="result-section-info shrink-0 text-sm font-normal text-base-content/70"
-        >
-          {{ displayState.title }}
-        </span>
-        <span
-          v-if="isSearchInProgress"
-          class="searching-indicator searching-indicator--title-inline inline-flex shrink-0 items-center"
-          role="status"
-          aria-busy="true"
-        >
-          <span
-            class="daisy-loading daisy-loading-spinner daisy-loading-xs"
-          />
-        </span>
-      </div>
+        v-model:semantic-search-enabled="semanticSearchEnabled"
+        v-model:list-preference="listPreference"
+        :embed-semantic-toggle="embedSemanticToggle"
+        :show-list-mode-toggle="showListModeToggle"
+        :active-list-mode="activeListMode"
+        :title="displayState.title"
+        :is-search-in-progress="isSearchInProgress"
+      />
       <div
         v-else-if="isSearchInProgress"
         class="searching-indicator searching-indicator--fallback"
         role="status"
         aria-busy="true"
       >
-        <span
-          class="daisy-loading daisy-loading-spinner daisy-loading-xs"
-        />
+        <span class="daisy-loading daisy-loading-spinner daisy-loading-xs" />
       </div>
 
-      <template v-if="displayState.showRecentNotes">
-        <SearchDropdownHitList
-          v-if="isDropdown"
-          :hits="recentNotesAsHits"
-        />
+      <template v-if="visibleHits">
+        <SearchDropdownHitList v-if="isDropdown" :hits="visibleHits" />
         <SearchResultList
           v-else
           class="search-result"
-          :search-hits="recentNotesAsHits"
+          :search-hits="visibleHits"
           :notebook-id="notebookId"
           @keydown="onListKeydown"
         >
@@ -99,50 +64,6 @@
       <template v-else-if="displayState.showEmptyState">
         <em>{{ displayState.emptyMessage }}</em>
       </template>
-
-      <template v-else-if="displayState.showSearchResults && searchResult">
-        <SearchDropdownHitList
-          v-if="isDropdown"
-          :hits="searchResult"
-        />
-        <SearchResultList
-          v-else
-          class="search-result"
-          :search-hits="searchResult"
-          :notebook-id="notebookId"
-          @keydown="onListKeydown"
-        >
-          <template #button="{ searchResult: result }">
-            <slot name="button" :note-search-result="result" />
-          </template>
-          <template
-            #folderButton="{
-              folderId,
-              folderName,
-              notebookId: folderNotebookId,
-            }"
-          >
-            <slot
-              name="folderButton"
-              :folder-id="folderId"
-              :folder-name="folderName"
-              :notebook-id="folderNotebookId"
-            />
-          </template>
-          <template
-            #notebookButton="{
-              notebookId: hitNotebookId,
-              notebookName,
-            }"
-          >
-            <slot
-              name="notebookButton"
-              :notebook-id="hitNotebookId"
-              :notebook-name="notebookName"
-            />
-          </template>
-        </SearchResultList>
-      </template>
     </div>
 
     <div
@@ -151,20 +72,22 @@
       role="status"
       aria-busy="true"
     >
-      <span
-        class="daisy-loading daisy-loading-spinner daisy-loading-xs"
-      />
+      <span class="daisy-loading daisy-loading-spinner daisy-loading-xs" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { NoteSearchResult } from "@generated/doughnut-backend-api"
-import { Sparkles } from "@lucide/vue"
+import type {
+  NoteSearchResult,
+  RelationshipLiteralSearchHit,
+} from "@generated/doughnut-backend-api"
 import { computed, toRef } from "vue"
 import SearchDropdownHitList from "./SearchDropdownHitList.vue"
+import SearchResultsPanelHeader from "./SearchResultsPanelHeader.vue"
 import SearchResultList from "./SearchResultList.vue"
 import { useSearchExecution } from "@/composables/useSearchExecution"
+import { useSearchListPreference } from "@/composables/useSearchListPreference"
 import { useStableModalTop } from "@/composables/modalTopAnchor"
 
 useStableModalTop()
@@ -234,6 +157,12 @@ const isGlobalSearch = computed(
   () => allMyNotebooksAndSubscriptions.value === true
 )
 
+const showListModeToggle = computed(() => !props.embedSemanticToggle)
+const { listPreference, effectiveListPreference } = useSearchListPreference({
+  enabled: showListModeToggle,
+  trimmedSearchKey,
+})
+
 const displayState = computed(() =>
   model.getDisplayState({
     trimmedSearchKey: trimmedSearchKey.value,
@@ -241,8 +170,21 @@ const displayState = computed(() =>
     noteId: props.noteId,
     isDropdown: props.isDropdown,
     filteredRecentNotesCount: filteredRecentNotes.value.length,
+    listPreference: effectiveListPreference.value,
   })
 )
+
+const activeListMode = computed<"matches" | "recent">(() =>
+  displayState.value.showRecentNotes ? "recent" : "matches"
+)
+
+const visibleHits = computed((): RelationshipLiteralSearchHit[] | null => {
+  if (displayState.value.showRecentNotes) return recentNotesAsHits.value
+  if (displayState.value.showSearchResults && searchResult.value) {
+    return searchResult.value
+  }
+  return null
+})
 
 const hasVisibleResultsSection = computed(
   () =>
@@ -265,11 +207,9 @@ const hasTitleText = computed(
   () => !!displayState.value.title && hasVisibleResultsSection.value
 )
 
-const showTitleBar = computed(() => {
-  if (hasTitleText.value) return true
-  if (props.embedSemanticToggle && blindLoading.value) return true
-  return false
-})
+const showTitleBar = computed(
+  () => hasTitleText.value || (props.embedSemanticToggle && blindLoading.value)
+)
 </script>
 
 <style scoped>
@@ -290,26 +230,6 @@ const showTitleBar = computed(() => {
 
 .result-section {
   margin-top: 1rem;
-}
-
-.result-section-info-row {
-  padding: 0.5rem 0.5rem 0;
-  margin-bottom: 0.5rem;
-}
-
-.result-section-info {
-  padding: 0;
-  line-height: 1.25;
-}
-
-.searching-indicator--title-inline {
-  margin-left: 0.125rem;
-  line-height: 1;
-}
-
-.searching-indicator--title-inline .daisy-loading {
-  width: 0.75rem;
-  height: 0.75rem;
 }
 
 .searching-indicator--fallback {

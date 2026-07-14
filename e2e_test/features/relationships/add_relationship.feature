@@ -41,6 +41,19 @@ Feature: add relationship
     And I should not see the recently updated notes section
 
   @mockBrowserTime
+  Scenario: Switch to recently updated notes while search key is non-empty
+    Given I have a notebook "Recent scratch" with a note "Recent Note" and content "Recently added"
+    When I am creating a relationship under note "Sedition"
+    And I search for "Sed" in all my notebooks
+    Then I should see relationship targets "Sedation, Sedative"
+    And I should not see the recently updated notes section
+    When I select Recent in the search list mode
+    Then I should see "Recent Note" in the recently updated notes section
+    And the note search field should contain "Sed"
+    When I select Matches in the search list mode
+    Then I should see relationship targets "Sedation, Sedative"
+
+  @mockBrowserTime
   Scenario: Undo creating relationship
     When I add relationship from note "Sedition" as "similar to" to note "Sedation"
     Then I should see "Sedition" has relationship "similar to" "Sedation"

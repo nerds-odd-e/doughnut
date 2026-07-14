@@ -179,6 +179,21 @@ export const assumeNoteTargetSearchDialog = () => {
       return this
     },
 
+    selectSearchListModeMatches() {
+      cy.findByTestId('search-list-mode-matches').click()
+      return this
+    },
+
+    selectSearchListModeRecent() {
+      cy.findByTestId('search-list-mode-recent').click()
+      return this
+    },
+
+    expectSearchFieldContains(value: string) {
+      cy.findByPlaceholderText('Search').should('have.value', value)
+      return this
+    },
+
     expectNotebookNameInSearchResults(notebookName: string) {
       cy.findByText('Search result', {
         selector: '.result-section-info',
