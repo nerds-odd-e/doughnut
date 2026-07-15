@@ -45,7 +45,7 @@
     "@testing-library/vue": "^8.1.0",
     "@types/node": "26.1.1",
     "@types/turndown": "^5.0.6",
-    "@vitejs/plugin-vue": "^6.0.7",
+    "@vitejs/plugin-vue": "^6.0.8",
     "@vitejs/plugin-vue-jsx": "^5.1.6",
     "@vitest/browser-playwright": "4.1.10",
     "@vitest/ui": "4.1.10",
