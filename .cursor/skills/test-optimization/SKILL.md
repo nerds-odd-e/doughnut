@@ -37,7 +37,7 @@ Apply on every optimization pass:
 ```
 Profile full suite → drop Skip test optimization (blacklist) → take top 10%
 → group (by file vs batches of 3; fewer groups wins)
-→ write plan in .planning/ → execute-plan (one sub-agent per group)
+→ write plan under .planning/phases/ or .planning/quick/ → execute-plan (parallel groups OK when safe)
 → each group: optimize → verify → post-change-refactor → commit → push
 → final re-profile → mark plan done
 ```
@@ -69,7 +69,7 @@ file; **tee stdout** and parse `{ "tests": [ { "title", "duration" } ] }` blocks
 between spec runs.
 
 **Do not commit** raw profile JSON (large, machine-specific). Store locally
-(e.g. `.planning/<scope>-profile-results.json` with a “do not commit” note, or
+(e.g. `.planning/quick/<scope>-profile-results.json` with a “do not commit” note, or
 `e2e_test/reports/`). Record baseline wall time and test count in the plan.
 
 ## Step 2 — Blacklist filter
@@ -107,7 +107,7 @@ Compute group counts for these two strategies only:
 
 ## Step 5 — Plan file
 
-Copy [plan-template.md](plan-template.md) to `.planning/<scope>-test-optimization.md`
+Copy [plan-template.md](plan-template.md) to `.planning/quick/NNN-<scope>-test-optimization/PLAN.md` (or a `phases/NN-slug/` PLAN)
 and fill in the baseline, blacklist note, top-10% table, grouping choice, one
 phase per group, and a final re-profile phase.
 
@@ -208,7 +208,7 @@ After all group phases (via execute-plan):
 - If full E2E re-profile is red (e.g. `Bad Gateway` on `cleanDB`), document that;
   use per-spec timings + CI for authoritative “after” — do not fake a green wall time.
 
-Set plan **Status: done**, then **clean up `.planning/`** (see below). Keep the
+Set plan **Status: done**, then **clean up spent plan history** (see below). Keep the
 blacklist file; do not delete it when archiving the plan.
 
 ## Planning folder cleanup
@@ -216,14 +216,11 @@ blacklist file; do not delete it when archiving the plan.
 When an optimization pass is **done**:
 
 1. **Do not keep two plans for the same scope** — merge outcomes into one archive entry or delete.
-2. **Move** a short summary to `.planning/archive/<scope>-test-optimization-history.md` (see existing
-   `ongoing/archive/test-optimization-history.md` for format).
-3. **Delete** the working plan at `.planning/<scope>-test-optimization.md` (or `e2e-slow-*.md` style names).
-4. **Never commit** profile JSON; paths are gitignored (`e2e_test/reports/`, `.planning/*-profile-results.json`, `ongoing/*-profile-results.json`).
-5. Leave **`ongoing/test-optimization-blacklist.md`** and other active product plans untouched.
+2. Optionally keep a one-line note in STATE/ROADMAP if useful; otherwise delete the `quick/` or phase working PLAN and spent SUMMARY noise. See existing `ongoing/archive/test-optimization-history.md` for a short archive format if a summary is still useful.
+3. **Never commit** profile JSON; paths are gitignored (`e2e_test/reports/`, `.planning/*-profile-results.json`, `.planning/quick/*-profile-results.json`, `ongoing/*-profile-results.json`).
+4. Leave **`ongoing/test-optimization-blacklist.md`** (legacy) and active GSD milestone artifacts untouched.
 
-If the user asks only to “clean up planning” after optimization: archive summary + delete completed
-test plans; do not delete the blacklist or unrelated roadmaps.
+If the user asks only to clean up after optimization: remove completed test-opt plans; do not delete the blacklist or unrelated GSD roadmap/phase dirs still in progress.
 
 ## Jidoka — stop and report
 

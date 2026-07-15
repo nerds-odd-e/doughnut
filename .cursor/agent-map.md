@@ -53,4 +53,15 @@ Assume `pnpm sut` is already running. If unsure, check `CURSOR_DEV=true nix deve
 
 ## Ignored Reference Material
 
-`docs/` and legacy `ongoing/` are excluded from default indexing to reduce retrieval noise. Active planning lives in `.planning/` (GSD). Read `docs/` or `ongoing/` explicitly only when the user asks for docs/legacy plans, a rule points to a specific document, or the task is about planning/history rather than current source behavior.
+`docs/` and legacy `ongoing/` are excluded from default indexing to reduce retrieval noise. Active planning lives in `.planning/` (GSD `phases/`, `quick/`, `STATE`, … — see `gsd-coexistence.mdc`). Read `docs/` or `ongoing/` explicitly only when the user asks for docs/legacy plans, a rule points to a specific document, or the task is about planning/history rather than current source behavior.
+
+## Planning modes (GSD vs local)
+
+| Mode | Artifacts | Orchestrator |
+|------|-----------|--------------|
+| Formal milestone | `.planning/phases/NN-slug/*-PLAN.md`, STATE, ROADMAP | `/gsd-plan-phase` → `/gsd-execute-phase` → `/gsd-ship` (+ local wrap-up) |
+| Ad-hoc / timer | `.planning/quick/NNN-slug/PLAN.md` | **phased-planning** + **execute-plan** |
+| Legacy | `ongoing/*.md` | **execute-plan** only; do not migrate |
+
+**Hard phase quality (both modes):** Behavior vs Structure, stop-safe, one observable behavior — `planning.mdc`.
+Do not write new flat `.planning/<name>.md` when `phases/` or `quick/` fits.

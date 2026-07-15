@@ -44,7 +44,7 @@ unrelated parts of the repo.
 ## Decision boundary
 
 Only keep code that is justified by **the current change** or by the
-**immediate next phase** in the plan (`.planning/*.md` or legacy `ongoing/*.md`, if one exists).
+**immediate next phase** in the plan (`.planning/phases/*/`, `.planning/quick/*/`, or legacy `ongoing/*.md`, if one exists).
 Anything justified only by a phase further out, or by "we might need it
 later", is speculative — remove it.
 

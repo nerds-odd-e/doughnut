@@ -1,0 +1,53 @@
+---
+alwaysApply: true
+---
+# GSD and local planning — coexistence
+
+This repo uses **GSD** (global Cursor install: `/gsd-*`) for milestone scaffolding and **local rules/skills** for delivery quality. Prefer one owner per workstream; when both apply, **local hard rules win** on conflicts listed below.
+
+## Compatible (use together)
+
+| Area | How they fit |
+|------|----------------|
+| **Folder layout** | Use GSD paths: `.planning/{PROJECT,REQUIREMENTS,ROADMAP,STATE}.md`, `config.json`, `.planning/phases/NN-slug/`, `.planning/codebase/`, `.planning/quick/`. |
+| **Discuss / plan / verify artifacts** | GSD CONTEXT, PLAN, SUMMARY, VERIFICATION are fine **while the plan is active** (resume across sessions). |
+| **Execution engine** | Prefer `/gsd-execute-phase` **or** local `execute-plan` on the same PLAN — both must run the **local phase wrap-up** (Jidoka, refactor, plan update, commit+push). |
+| **Parallel waves** | OK when file sets / mutable state do not overlap; otherwise sequential. |
+| **Observable verification** | GSD goal-backward verify + local TDD/E2E/`@wip` — same intent; run relevant local tests as the evidence. |
+| **Codebase maps** | `.planning/codebase/*` shared. |
+| **Capability naming in product** | Local rule: phase numbers only under `.planning/`. |
+
+## Must keep local (non-compatible with plain GSD defaults)
+
+These are **hard** in this repo even when GSD workflows omit them:
+
+| Local requirement | When it is needed | Why not drop it |
+|-------------------|-------------------|-----------------|
+| **Behavior vs Structure; stop-safe; one observable behavior per phase** | Every plan decomposition and every GSD PLAN task split | Prevents speculative structure and half-finished value if work stops mid-roadmap |
+| **Before- and after-phase Jidoka** | Every phase start/end | Stops autonomous runs on value/design/credential forks |
+| **After-phase plan update** | Every completed phase | Keeps remaining work accurate for resume |
+| **After-phase post-change-refactor** | Every phase before commit | Cohesion / dead code / 250-line discipline |
+| **After-phase commit + push (+ CD when applicable)** | Every closed phase before the next | Deploy gate; remote/CI catch issues early |
+| **Active history cleanup when the plan is done** | When the last phase is done and outcomes are in code/permanent docs | GSD tends to keep SUMMARYs; we prune spent planning diary |
+| **5-minute codebase retrospective hook** | Long uninterrupted agent sessions | Surfaces discoverability friction early |
+| **10-minute forced re-plan hook** | Same | Stops unbounded implementation; writes/updates a GSD-aligned plan under `.planning/quick/` or `phases/` |
+| **Nix prefix (`CURSOR_DEV=true nix develop -c`); assume `pnpm sut` running; no restart nag** | All tooling | Env contract GSD does not know |
+| **Stack/domain rules** (backend, frontend, e2e, cli, mcp, db-migration, …) | Matching globs / skills | Product architecture |
+
+## When to prefer which entrypoint
+
+| Scenario | Prefer |
+|----------|--------|
+| New or ongoing **milestone / roadmap** | GSD: `/gsd-onboard` or `/gsd-new-milestone`, then discuss → plan → execute |
+| **Timer interrupt** (10 min) or small ad-hoc slice | Local `phased-planning` → `.planning/quick/NNN-slug/` (or a new `phases/` entry), then `execute-plan` |
+| **Test optimization / domain tools** (API client, ERD, …) | Local skills; plans still under `.planning/phases/` or `quick/` |
+| Resuming after a break | Read `.planning/STATE.md` and the active phase dir; continue with GSD progress/resume **or** `execute-plan` on remaining PLAN tasks |
+
+## Anti-patterns
+
+- Flat new plans at `.planning/random.md` when a `phases/` or `quick/` dir would do (legacy flat files still executable).
+- Leaving completed phase diaries forever under `.planning/`.
+- Running GSD execute **without** local Jidoka / refactor / commit+push wrap-up.
+- Encoding phase numbers in product file/test/feature names.
+- Parallel agents on the same files or the same PLAN without coordination.
+- Enabling GSD `generate-claude-md` **workflow-enforcement** that forbids work outside GSD — conflicts with timer hooks and domain skills.

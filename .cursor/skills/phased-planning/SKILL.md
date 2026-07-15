@@ -1,9 +1,10 @@
 ---
 name: phased-planning
 description: >-
-  Decompose tasks into phased plans with one behavior per phase. Use when
-  planning new features, breaking down large tasks, when a task has been
-  in progress for over 10 minutes, or when the planning timer hook fires.
+  Decompose tasks into GSD-aligned phased plans with Behavior/Structure
+  grammar (one observable behavior per phase, stop-safe). Use when planning
+  new features, breaking down large tasks, when a task has been in progress
+  for over 10 minutes, or when the planning timer hook fires.
   Triggers on: plan, decompose, phases, break down, task too large, stuck.
 ---
 
@@ -14,42 +15,37 @@ description: >-
 - Developer asks to plan or decompose a task.
 - A phase or sub-phase is too large to implement in one pass.
 - The planning-timer hook fires (you have been working 10+ minutes).
+- GSD `/gsd-plan-phase` / discuss produced a plan that violates Behavior/Structure — **rewrite or split** until it complies.
+
+## Hard grammar (non-negotiable)
+
+Every phase is **Behavior** or **Structure**, **stop-safe**, and carries **one** observable behavior (or one structure change for the **immediate next** behavior only). Full rules: `.cursor/rules/planning.mdc`.
 
 ## If triggered by the 10-minute timeout
 
 1. **Stop** implementing immediately.
-2. **Review your conversation history**: what files did you search, what confused you, what approaches did you try, what failed? Identify the concrete reasons progress was slow.
-3. **Summarize** what you have learned (discoveries, blockers, partial progress) — include the friction points from step 2.
-4. **Stash** your changes: `git stash -m "WIP: <brief description>"`.
+2. **Review your conversation history**: what files did you search, what confused you, what approaches did you try, what failed?
+3. **Summarize** what you have learned (discoveries, blockers, partial progress).
+4. **Stash** your changes: `git stash -m "WIP: <brief description>"` — **unless** mid **GSD** execute with task commits that must reach SUMMARY; then stop and report without stash.
 5. **Decompose** the remaining work into phases (see below).
-6. **Write** the plan to `.planning/<short-name>.md`.
+6. **Write** the plan under `.planning/quick/NNN-slug/` (next free `NNN`) as `PLAN.md` (and update `.planning/STATE.md` if it exists). Prefer promoting into `.planning/phases/NN-slug/` when this work belongs on the roadmap.
 7. **Report** to the developer and wait for their decision.
 
-## Where to put plans
+## Where to put plans (GSD-aligned)
 
-`.planning/<short-name>.md` — informal, temporary local plans (same tree as GSD). Update as work proceeds; remove when done. Prefer GSD phase artifacts under `.planning/phases/` when a GSD roadmap exists.
+| Location | Use |
+|----------|-----|
+| `.planning/phases/NN-slug/` | Roadmap / milestone phases — GSD `*-CONTEXT.md`, `*-PLAN.md`, `*-SUMMARY.md`, … |
+| `.planning/quick/NNN-slug/` | Timer interrupts and ad-hoc slices not yet on the roadmap |
+| `ongoing/` | Legacy only — do not add new plans |
 
-For sub-decomposition of a single phase: `.planning/<plan-name>-<phase-number>-sub-phases.md`.
+Inside a phase or quick dir, primary executable file is `*-PLAN.md` or `PLAN.md`. Sub-decomposition: additional `*-PLAN.md` files in the same directory (GSD multi-plan) or clearly marked sub-phase sections — each still Behavior/Structure.
 
-Legacy plans may still live under `ongoing/` — do not migrate them unless asked.
+**History:** keep resume-useful status and brief learnings while in progress; when the whole plan is done and shipped as code/permanent docs, **clean up** spent planning history (`.cursor/rules/planning.mdc`).
 
 ---
 
 ## How to decompose into phases (scenario-first)
-
-Every phase is one of two types:
-
-| Type | What it does | Constraint |
-|------|-------------|------------|
-| **Behavior** | Delivers user value directly observable from the external perspective. | Must be externally observable and testable. |
-| **Structure** | Restructures internals to prepare for the **immediate next** behavior phase, without changing any external behavior. | All changes must be **verifiable from the external perspective** (existing tests still pass, no observable difference). No speculative prep for phases beyond the next behavior phase. |
-
-### Sequencing rules
-
-1. **Stop-safe ordering** — The user may decide to stop after **any** phase. The value delivered must be proportional to (or greater than) the number of completed phases, with close to **zero waste** if remaining phases are never implemented.
-2. **Order by value** — Earlier phases = higher user value and usability first.
-3. **Many phases are good** — Split as finely as you can while each phase still meets the type constraints above.
-4. **Structure phases only justify themselves through the next behavior phase** — A structure phase that is not immediately followed by the behavior phase it enables is speculative waste.
 
 **Default:** Split by **user scenarios and outcomes**, not by layers (DB → API → UI) or by "build the abstraction first."
 
@@ -76,7 +72,7 @@ Every phase is one of two types:
 
 ### Tests are owned by capability, phases only schedule work
 
-Phases decide **when** you add or extend tests, but tests are grouped and named by **what behavior they cover** — the domain capability, not the phase that introduced them. A phase may add scenarios to an existing capability-named feature file or create a new file named after the capability it introduces (e.g. `video_playback.feature`, `segment_export.feature` — never `phase_1.feature`).
+Phases decide **when** you add or extend tests, but tests are grouped and named by **what behavior they cover** — the domain capability, not the phase that introduced them.
 
 ### Observable behavior first (avoid structure-mapped tests)
 
@@ -117,13 +113,7 @@ When adding or changing behavior:
 
 ### Phase discipline checklist
 
-Before closing a phase and starting the next:
-
-1. **Clean up** — Remove dead or unreachable code.
-2. **No failing tests** — All unit tests and existing E2E tests must pass at the **merge / CI** gate. No test may be left in a failing state at the end of any phase or sub-phase. **Locally and for AI agents:** satisfy this by running **targeted** E2E (`cypress run --spec` for the feature(s) you touched and any clearly related features); do **not** run the **full** E2E suite unless CI, the workflow, or the user **explicitly** requires it.
-3. **`@wip` for not-yet-passing E2E scenarios** — When writing E2E scenarios test-first for behavior that is not yet implemented, tag them `@wip`. This tag runs normally in local development but is skipped in GitHub Actions CI. Remove the `@wip` tag once the scenario passes. CI enforces a maximum of 5 `@wip` scenarios across the entire E2E project to prevent accumulation.
-4. **Deploy gate** — Commit, push, and let **CD deploy** before the next phase (unless the team explicitly agrees otherwise). Usually **manual** on the developer side.
-5. **Update the plan** — Reflect what is done and what remains; drop obsolete notes.
+Before closing a phase and starting the next: follow `.cursor/rules/planning.mdc` (clean up, tests, `@wip`, Jidoka, plan update, deploy gate, parallelism).
 
 ### Interim behavior
 
@@ -137,8 +127,8 @@ Before closing a phase and starting the next:
 Document **important structure and intent** in the plan. **Update** when you learn something that changes how remaining phases should run. Remove text that no longer helps the **current** snapshot.
 
 Include:
-- Phases with status (done / in-progress / planned)
+- Phases with status (done / in-progress / planned) and type (Behavior | Structure)
 - Key design decisions and their rationale
 - Discoveries that affect remaining work
 
-**Naming rule for delegated work:** When a plan references feature files, test files, classes, or directories to create or modify, names must reflect the **domain capability** (e.g. `video_playback.feature`, `SegmentExportController`), not the phase or delivery order. Phase numbers belong only in the plan document itself, never in permanent artifact names.
+**Naming rule for delegated work:** When a plan references feature files, test files, classes, or directories to create or modify, names must reflect the **domain capability** (e.g. `video_playback.feature`, `SegmentExportController`), not the phase or delivery order. Phase numbers belong only under `.planning/`, never in permanent artifact names.

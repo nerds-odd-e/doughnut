@@ -19,7 +19,7 @@ doughnut/
 ├── infra/                   # GCP, Salt, Nix, path-routing
 ├── mysql/ · redis/          # Local data dirs for Nix process-compose
 ├── docs/                    # Human docs (not default-indexed)
-├── .planning/               # GSD planning + informal local plans
+├── .planning/               # GSD: phases/, quick/, STATE, codebase/
 ├── ongoing/                 # Legacy plans (not migrated; not default-indexed)
 ├── .cursor/                 # Agent map, rules, skills
 ├── open_api_docs.yaml       # Generated OpenAPI (do not hand-edit)
@@ -186,12 +186,22 @@ doughnut/
 - Committed: Yes — keep out of production behavior paths
 
 **.planning/:**
-- Purpose: GSD project state (`STATE.md`, `ROADMAP.md`, `phases/`, `codebase/`) and new informal local plans
+- Purpose: GSD project state (`STATE.md`, `ROADMAP.md`, `phases/`, `quick/`, `codebase/`)
 - Generated: Partial (GSD workflows + agents)
 - Committed: Yes (default GSD `commit_docs: true`); profile JSON gitignored
 
+**.planning/phases/:**
+- Purpose: Roadmap / milestone phase dirs (`*-PLAN.md`, SUMMARY, CONTEXT, …)
+- Generated: GSD plan/execute workflows
+- Committed: Yes while active; clean up spent history when the plan is done
+
+**.planning/quick/:**
+- Purpose: Timer / ad-hoc slices not yet on the roadmap
+- Generated: No (local phased-planning / `/gsd-quick`)
+- Committed: Yes while active; delete when done
+
 **ongoing/:**
-- Purpose: Legacy informal phased plans (left in place; new work goes to `.planning/`)
+- Purpose: Legacy informal phased plans (left in place; new work goes to `.planning/phases/` or `quick/`)
 - Generated: No
 - Committed: Yes — excluded from default agent indexing; read when working a legacy plan
 

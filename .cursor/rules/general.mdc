@@ -12,4 +12,6 @@ alwaysApply: true
 - Keep high cohesion: minimize duplication, keep one representation for each concept, and place related code together.
 - Keep changes simple. Do not add defensive layers unless observed behavior requires them.
 - Name permanent artifacts by product capability, not development history.
-- Do not add comments or docs about past implementations; code readers care about the current state.
+- Do not add comments or docs about past implementations in product code, tests, or permanent docs; code readers care about the current state.
+- **`.planning/` exception:** while a plan is **in progress**, keep enough history (STATE, CONTEXT, PLAN status, brief learnings) to **stop and resume** across sessions. When the plan is **fully executed** into code and permanent docs, **actively clean up** spent planning history (see `planning.mdc`).
+- Planning layout and GSD coexistence: `.cursor/rules/planning.mdc`, `.cursor/rules/gsd-coexistence.mdc`.

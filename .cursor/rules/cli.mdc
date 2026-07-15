@@ -38,7 +38,7 @@ Keep each module’s **public surface small**: `export` only what other modules 
 
 ## Architecture Roadmap
 
-The architecture roadmap is at `ongoing/cli-architecture-roadmap.md` (legacy location; leave in place). New planning artifacts go under `.planning/`.
+The architecture roadmap is at `ongoing/cli-architecture-roadmap.md` (legacy location; leave in place). New planning artifacts go under `.planning/phases/` or `.planning/quick/` — see `gsd-coexistence.mdc`.
 
 It is a guideline for growing the architecture, not a direct implementation checklist. Apply it when a feature needs it; challenge the fit first. Update it as decisions land and refine the forward-looking parts as understanding changes.
 
