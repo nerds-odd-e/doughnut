@@ -1,5 +1,6 @@
 # test optimization profiles (local only)
 ongoing/*-profile-results.json
+.planning/*-profile-results.json
 
 # Miscellaneous
 .doughnut-pnpm-lock.sha256

@@ -1,12 +1,13 @@
 ---
 name: execute-plan
 description: >-
-  Autonomously execute a phased plan from ongoing/*.md. Delegates each phase to
-  a fresh sub-agent so context does not accumulate. Each sub-agent commits and
-  pushes before the coordinator starts the next. Stops only when developer
-  judgment is needed (Jidoka).
-  Triggers on: execute plan, run plan, execute phases, start plan, do ongoing,
-  execute ongoing, run ongoing.
+  Autonomously execute a phased plan from .planning/*.md (or legacy
+  ongoing/*.md). Delegates each phase to a fresh sub-agent so context does not
+  accumulate. Each sub-agent commits and pushes before the coordinator starts
+  the next. Stops only when developer judgment is needed (Jidoka). Prefer GSD
+  execute workflows when a GSD phase plan exists.
+  Triggers on: execute plan, run plan, execute phases, start plan,
+  do .planning, execute .planning, run .planning.
 ---
 
 # Execute Plan — Autonomous Phase Runner
@@ -17,14 +18,16 @@ Start with `.cursor/agent-map.md` for navigation and focused test commands.
 
 Developer points at a plan file and asks to execute it. Common phrasings:
 
-- "execute plan ongoing/something.md"
-- "do @ongoing/something.md"
-- "run @ongoing/something-sub-phases.md"
+- "execute plan .planning/something.md"
+- "do @.planning/something.md"
+- "run @.planning/something-sub-phases.md"
 - "execute phases", "start plan"
 
-Plans and sub-phase plans live in `ongoing/*.md`. Sub-phase documents
-(`ongoing/<plan-name>-<phase-number>-sub-phases.md`) follow the **same** loop
-as top-level plans.
+Plans and sub-phase plans live in `.planning/*.md` (legacy plans may still be
+under `ongoing/*.md`). Sub-phase documents
+(`.planning/<plan-name>-<phase-number>-sub-phases.md`) follow the **same** loop
+as top-level plans. When the target is a GSD `*-PLAN.md` under
+`.planning/phases/`, prefer `/gsd-execute-phase` instead of this skill.
 
 ## Jidoka principle (autonomation)
 
@@ -74,7 +77,7 @@ Each phase is delegated to a **fresh sub-agent** so that context does not
 accumulate across phases.
 
 ```
-1. Read the plan file (ongoing/*.md)
+1. Read the plan file (`.planning/*.md`, or legacy `ongoing/*.md`)
 2. Find the next phase/sub-phase whose status is NOT "done"
 3. Check stop conditions on the phase description
    → If stop condition → report & STOP
@@ -181,7 +184,7 @@ again.
 
 ## Reading the plan file
 
-Plans live in `ongoing/*.md`. Each phase typically looks like:
+Plans live in `.planning/*.md` (legacy: `ongoing/*.md`). Each phase typically looks like:
 
 ```markdown
 ### Phase N: Short description
@@ -190,7 +193,7 @@ Status: planned / in-progress / done
 Details about what to implement...
 ```
 
-Sub-phase documents (`ongoing/<plan-name>-<phase-number>-sub-phases.md`) use
+Sub-phase documents (`.planning/<plan-name>-<phase-number>-sub-phases.md`) use
 the same format with sub-phase headings. The executor treats both identically.
 
 The executor recognizes phases by headings and status markers. When closing a

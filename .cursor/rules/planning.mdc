@@ -3,7 +3,7 @@ alwaysApply: true
 ---
 # Principles for Phased Development
 
-Use the `phased-planning` skill for decomposition details, examples, and test-driven workflow.
+Use the `phased-planning` skill for decomposition details, examples, and test-driven workflow. Write new plans under `.planning/` (GSD-compatible); leave legacy `ongoing/` content in place. Prefer GSD workflows when a GSD roadmap/phase exists.
 ## Phase Types
 
 - **Behavior:** delivers externally observable, testable user value. Describe it by pre-condition, trigger, and post-condition.

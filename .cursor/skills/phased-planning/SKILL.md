@@ -22,14 +22,16 @@ description: >-
 3. **Summarize** what you have learned (discoveries, blockers, partial progress) — include the friction points from step 2.
 4. **Stash** your changes: `git stash -m "WIP: <brief description>"`.
 5. **Decompose** the remaining work into phases (see below).
-6. **Write** the plan to `ongoing/<short-name>.md`.
+6. **Write** the plan to `.planning/<short-name>.md`.
 7. **Report** to the developer and wait for their decision.
 
 ## Where to put plans
 
-`ongoing/<short-name>.md` — informal, temporary. Update as work proceeds; remove when done.
+`.planning/<short-name>.md` — informal, temporary local plans (same tree as GSD). Update as work proceeds; remove when done. Prefer GSD phase artifacts under `.planning/phases/` when a GSD roadmap exists.
 
-For sub-decomposition of a single phase: `ongoing/<plan-name>-<phase-number>-sub-phases.md`.
+For sub-decomposition of a single phase: `.planning/<plan-name>-<phase-number>-sub-phases.md`.
+
+Legacy plans may still live under `ongoing/` — do not migrate them unless asked.
 
 ---
 

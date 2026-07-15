@@ -19,7 +19,8 @@ doughnut/
 ├── infra/                   # GCP, Salt, Nix, path-routing
 ├── mysql/ · redis/          # Local data dirs for Nix process-compose
 ├── docs/                    # Human docs (not default-indexed)
-├── ongoing/                 # Active plans (not default-indexed)
+├── .planning/               # GSD planning + informal local plans
+├── ongoing/                 # Legacy plans (not migrated; not default-indexed)
 ├── .cursor/                 # Agent map, rules, skills
 ├── open_api_docs.yaml       # Generated OpenAPI (do not hand-edit)
 ├── package.json             # pnpm workspace root scripts
@@ -184,10 +185,15 @@ doughnut/
 - Generated: No
 - Committed: Yes — keep out of production behavior paths
 
+**.planning/:**
+- Purpose: GSD project state (`STATE.md`, `ROADMAP.md`, `phases/`, `codebase/`) and new informal local plans
+- Generated: Partial (GSD workflows + agents)
+- Committed: Yes (default GSD `commit_docs: true`); profile JSON gitignored
+
 **ongoing/:**
-- Purpose: Informal phased plans for active work
+- Purpose: Legacy informal phased plans (left in place; new work goes to `.planning/`)
 - Generated: No
-- Committed: Yes — excluded from default agent indexing; read when executing/planning
+- Committed: Yes — excluded from default agent indexing; read when working a legacy plan
 
 **docs/:**
 - Purpose: Human architecture/tech/practice documentation

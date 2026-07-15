@@ -53,4 +53,4 @@ Assume `pnpm sut` is already running. If unsure, check `CURSOR_DEV=true nix deve
 
 ## Ignored Reference Material
 
-`docs/` and `ongoing/` are excluded from default indexing to reduce retrieval noise. Read them explicitly only when the user asks for docs/plans, a rule points to a specific document, or the task is about planning/history rather than current source behavior.
+`docs/` and legacy `ongoing/` are excluded from default indexing to reduce retrieval noise. Active planning lives in `.planning/` (GSD). Read `docs/` or `ongoing/` explicitly only when the user asks for docs/legacy plans, a rule points to a specific document, or the task is about planning/history rather than current source behavior.

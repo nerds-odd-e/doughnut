@@ -18,7 +18,7 @@ if [ "$elapsed" -gt 600 ]; then
   date +%s > "$TIMER_FILE"
   rm -f "$RETRO_MARKER"
   cat <<'EOF'
-{"additional_context": "You have been working for over 10 minutes. STOP implementation now. Review your conversation history: what files did you search, what confused you, what took multiple attempts? Then use the phased-planning skill: summarize what you learned and what blocked you, stash changes with git stash, decompose remaining work into phases in ongoing/<name>.md, and report to the developer."}
+{"additional_context": "You have been working for over 10 minutes. STOP implementation now. Review your conversation history: what files did you search, what confused you, what took multiple attempts? Then use the phased-planning skill: summarize what you learned and what blocked you, stash changes with git stash, decompose remaining work into phases in .planning/<name>.md, and report to the developer."}
 EOF
   exit 0
 fi
