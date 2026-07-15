@@ -30,10 +30,17 @@ const hourOfDay = (days: number, hours: number) => {
   return new Date(1976, 5, 1 + days, hours)
 }
 
+/** Per-attempt budget for DB truncate + seed; CI under load often exceeds 6s. */
+const CLEAN_DB_REQUEST_TIMEOUT_MS = 30_000
+
 const cleanAndReset = (cy: Cypress.cy & CyEventEmitter, countdown: number) => {
+  // Abort so a hung fetch rejects (retries run). cy.wrap alone only times out
+  // the command and never reaches the rejection handler below.
+  const signal = AbortSignal.timeout(CLEAN_DB_REQUEST_TIMEOUT_MS)
   return cy
-    .wrap(TestabilityRestController.resetDbAndTestabilitySettings(), {
+    .wrap(TestabilityRestController.resetDbAndTestabilitySettings({ signal }), {
       log: false,
+      timeout: CLEAN_DB_REQUEST_TIMEOUT_MS + 1_000,
     })
     .then(
       () => {
@@ -157,7 +164,7 @@ function pageCountFromContentList(contentList: Array<unknown>): number {
 const testability = () => {
   return {
     cleanDBAndResetTestabilitySettings() {
-      return cleanAndReset(cy, 5).then(() =>
+      return cleanAndReset(cy, 2).then(() =>
         cy.wrap({}).as(injectedNoteIdMapAliasName)
       )
     },

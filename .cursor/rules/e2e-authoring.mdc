@@ -164,6 +164,10 @@ A scenario describes one fixed path. Prefer dumb automation: the path is visible
 - State the condition in step wording when behavior differs, for example slash command vs plain line vs Enter alone vs ESC.
 - For CLI TTY sequences, add or extend Vitest under `cli/tests/interactive/` instead of adding a second Cypress PTY stack.
 
+## Before hook order
+
+`@badeball/cypress-cucumber-preprocessor` defaults Before hooks to order `10000`. The shared DB reset Before uses **`order: 0`** so it runs before tagged setup. Hooks that start long-lived side effects (e.g. `@interactiveCLI` PTY at order `2`) must stay **after** that reset; otherwise truncate can block on MySQL locks held by the PTY’s HTTP traffic.
+
 ## Pitfalls
 
 - Do not put complex logic in step definitions.

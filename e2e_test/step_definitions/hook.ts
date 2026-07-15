@@ -12,7 +12,10 @@ import {
 import start, { mock_services } from '../start'
 import { cli } from '../start/pageObjects/cli'
 
-Before(() => {
+// order 0: before tagged setup (e.g. @interactiveCLI order 2). Default hook
+// order is 10000 — without this, CLI PTY would start before DB reset and can
+// hold MySQL locks that make truncate hang past Cypress's wrap timeout.
+Before({ order: 0 }, () => {
   cy.task('clearTestState')
   start.testability().cleanDBAndResetTestabilitySettings()
   cy.wrap('no').as('firstVisited')
