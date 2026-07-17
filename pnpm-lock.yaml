@@ -74,14 +74,14 @@ importers:
         specifier: 2.5.4
         version: 2.5.4
       '@cucumber/cucumber':
-        specifier: ^13.1.0
-        version: 13.1.0
+        specifier: ^13.1.1
+        version: 13.1.1
       '@hey-api/openapi-ts':
         specifier: 0.99.0
         version: 0.99.0(typescript@6.0.3)
       '@hono/node-server':
-        specifier: 2.0.9
-        version: 2.0.9(hono@4.12.30)
+        specifier: 2.0.10
+        version: 2.0.10(hono@4.12.30)
       '@mbtest/mountebank':
         specifier: 2.9.4
         version: 2.9.4
@@ -758,8 +758,8 @@ packages:
   '@cucumber/cucumber-expressions@20.0.0':
     resolution: {integrity: sha512-t2FBLKuU0U1nP5FM8pHiVonYcXVm07fvXr/H9osdvrjcLXSWc5OCbOOqV/k5S56w/YndPv1Sv2/m/x1KBYvIlA==}
 
-  '@cucumber/cucumber@13.1.0':
-    resolution: {integrity: sha512-PfvQ9Jr2erYcXoOPXXwaSosomSH9EX/+z2ZurdRAM/lZ4OwtL1i+W5ZI0ISQiYmGlio6IsexQs9UOGBpC4r/lQ==}
+  '@cucumber/cucumber@13.1.1':
+    resolution: {integrity: sha512-HdFYYoC6yVvvOg98MnVQ1KDc2YbmN3n2Jtr7haERcVNuTRpILc7s7Hc8vNTIMT1eI+Hp7V/UmGt6kLkeYXNDSQ==}
     engines: {node: 22 || 24 || >=26}
     hasBin: true
 
@@ -1059,8 +1059,8 @@ packages:
     peerDependencies:
       hono: ^4
 
-  '@hono/node-server@2.0.9':
-    resolution: {integrity: sha512-cNMw3ziCdDcx0+ldta60zvUL5XO0OLt521n2hjPp0PB0ugczDCEczXsf33qQbkKIXWGFQ03f0LC85u6YK8pCLA==}
+  '@hono/node-server@2.0.10':
+    resolution: {integrity: sha512-ZcnNVhKTmyDJeg0UlnZjvM73JBsTAuhrH/J4fjwGOw59PwOW51r4J+p6CsKZWXdKSme4MFqU62CZMOsdDrU4CA==}
     engines: {node: '>=20'}
     peerDependencies:
       hono: ^4
@@ -6753,7 +6753,7 @@ snapshots:
   '@badeball/cypress-cucumber-preprocessor@26.0.0(@babel/core@7.29.7)(cypress@15.18.1)(typescript@6.0.3)':
     dependencies:
       '@cucumber/ci-environment': 14.0.0
-      '@cucumber/cucumber': 13.1.0
+      '@cucumber/cucumber': 13.1.1
       '@cucumber/cucumber-expressions': 20.0.0
       '@cucumber/gherkin': 41.0.0
       '@cucumber/html-formatter': 24.0.0(@cucumber/messages@33.0.4)
@@ -6857,7 +6857,7 @@ snapshots:
     dependencies:
       regexp-match-indices: 1.0.2
 
-  '@cucumber/cucumber@13.1.0':
+  '@cucumber/cucumber@13.1.1':
     dependencies:
       '@cucumber/ci-environment': 14.0.0
       '@cucumber/cucumber-expressions': 20.0.0
@@ -7195,7 +7195,7 @@ snapshots:
     dependencies:
       hono: 4.12.30
 
-  '@hono/node-server@2.0.9(hono@4.12.30)':
+  '@hono/node-server@2.0.10(hono@4.12.30)':
     dependencies:
       hono: 4.12.30
 
