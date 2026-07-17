@@ -43,21 +43,20 @@ describe("NoteAddQuestion", () => {
       expectedRefineButton: true,
       expectedGenerateButton: false,
     },
-  ])("only allow generation when no changes ($case)", async ({
-    question,
-    expectedRefineButton,
-    expectedGenerateButton,
-  }) => {
-    await mountNoteAddQuestion()
-    for (const key of Object.keys(question)) {
-      fillLabelText(key, question[key]!)
+  ])(
+    "only allow generation when no changes ($case)",
+    async ({ question, expectedRefineButton, expectedGenerateButton }) => {
+      await mountNoteAddQuestion()
+      for (const key of Object.keys(question)) {
+        fillLabelText(key, question[key]!)
+      }
+      await flushPromises()
+      const refineButton = screen.getByText(/refine/i) as HTMLButtonElement
+      const generateButton = screen.getByText(
+        /generate by ai/i
+      ) as HTMLButtonElement
+      expect(refineButton.disabled).toBe(!expectedRefineButton)
+      expect(generateButton.disabled).toBe(!expectedGenerateButton)
     }
-    await flushPromises()
-    const refineButton = screen.getByText(/refine/i) as HTMLButtonElement
-    const generateButton = screen.getByText(
-      /generate by ai/i
-    ) as HTMLButtonElement
-    expect(refineButton.disabled).toBe(!expectedRefineButton)
-    expect(generateButton.disabled).toBe(!expectedGenerateButton)
-  })
+  )
 })

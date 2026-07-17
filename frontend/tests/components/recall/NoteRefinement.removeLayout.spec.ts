@@ -45,23 +45,25 @@ describe("NoteRefinement remove layout points", () => {
     it.each([
       { testId: "remove-refinement-layout" as const, action: "remove" },
       { testId: "extract-refinement-layout" as const, action: "extract" },
-    ])("disables $action button when no layout points are selected", async ({
-      testId,
-    }) => {
-      const wrapper = await mountNoteRefinementReady(["Point 1", "Point 2"])
-      expect(refinementActionButton(wrapper, testId).disabled).toBe(true)
-    })
+    ])(
+      "disables $action button when no layout points are selected",
+      async ({ testId }) => {
+        const wrapper = await mountNoteRefinementReady(["Point 1", "Point 2"])
+        expect(refinementActionButton(wrapper, testId).disabled).toBe(true)
+      }
+    )
 
     it.each([
       { testId: "remove-refinement-layout" as const, action: "remove" },
       { testId: "extract-refinement-layout" as const, action: "extract" },
-    ])("enables $action button when a layout point is selected", async ({
-      testId,
-    }) => {
-      const wrapper = await mountNoteRefinementReady(["Point 1", "Point 2"])
-      await selectFirstLayoutItem(wrapper)
-      expect(refinementActionButton(wrapper, testId).disabled).toBe(false)
-    })
+    ])(
+      "enables $action button when a layout point is selected",
+      async ({ testId }) => {
+        const wrapper = await mountNoteRefinementReady(["Point 1", "Point 2"])
+        await selectFirstLayoutItem(wrapper)
+        expect(refinementActionButton(wrapper, testId).disabled).toBe(false)
+      }
+    )
 
     it("shows confirmation dialog and does not call API when removal is cancelled", async () => {
       const removeLayoutSpy = mockSdkService(

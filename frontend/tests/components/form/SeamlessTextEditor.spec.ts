@@ -51,35 +51,38 @@ describe("SeamlessTextEditor", () => {
     expect(r?.startContainer).toBe(editor.firstChild)
   })
 
-  it.each(PASTE_SUCCESS_CASES)("pastes plain text ($case)", async ({
-    initialValue,
-    caretOffset,
-    paste,
-    expected,
-    expectedContains,
-  }) => {
-    wrapper = await mountSeamlessTextEditor(initialValue)
-    const editor = editorEl(wrapper)
-    await focusEditor(editor)
-    if (caretOffset !== undefined) {
-      setCaretInEditor(editor, caretOffset)
-    }
-    await pasteClipboard(editor, paste)
+  it.each(PASTE_SUCCESS_CASES)(
+    "pastes plain text ($case)",
+    async ({
+      initialValue,
+      caretOffset,
+      paste,
+      expected,
+      expectedContains,
+    }) => {
+      wrapper = await mountSeamlessTextEditor(initialValue)
+      const editor = editorEl(wrapper)
+      await focusEditor(editor)
+      if (caretOffset !== undefined) {
+        setCaretInEditor(editor, caretOffset)
+      }
+      await pasteClipboard(editor, paste)
 
-    const emitted = wrapper.emitted()["update:modelValue"]
-    expect(emitted).toBeDefined()
-    expect(emitted?.length).toBeGreaterThan(0)
-    const finalText = emitted?.[emitted.length - 1]?.[0] as string
-    if (expected !== undefined) {
-      expect(finalText).toBe(expected)
-      expect(editor.innerText).toBe(expected)
-    } else {
-      for (const part of expectedContains ?? []) {
-        expect(finalText).toContain(part)
-        expect(editor.innerText).toContain(part)
+      const emitted = wrapper.emitted()["update:modelValue"]
+      expect(emitted).toBeDefined()
+      expect(emitted?.length).toBeGreaterThan(0)
+      const finalText = emitted?.[emitted.length - 1]?.[0] as string
+      if (expected !== undefined) {
+        expect(finalText).toBe(expected)
+        expect(editor.innerText).toBe(expected)
+      } else {
+        for (const part of expectedContains ?? []) {
+          expect(finalText).toContain(part)
+          expect(editor.innerText).toContain(part)
+        }
       }
     }
-  })
+  )
 
   it("submits the nearest form on Enter", async () => {
     const onSubmit = vi.fn((e: Event) => e.preventDefault())
@@ -108,20 +111,18 @@ describe("SeamlessTextEditor", () => {
     form.remove()
   })
 
-  it.each(PASTE_NO_UPDATE_CASES)("does not handle paste when $case", async ({
-    initialValue,
-    props,
-    paste,
-    expectedInnerText,
-  }) => {
-    wrapper = await mountSeamlessTextEditor(initialValue, props)
-    const editor = editorEl(wrapper)
-    await focusEditor(editor)
-    await pasteClipboard(editor, paste)
+  it.each(PASTE_NO_UPDATE_CASES)(
+    "does not handle paste when $case",
+    async ({ initialValue, props, paste, expectedInnerText }) => {
+      wrapper = await mountSeamlessTextEditor(initialValue, props)
+      const editor = editorEl(wrapper)
+      await focusEditor(editor)
+      await pasteClipboard(editor, paste)
 
-    expect(wrapper.emitted()["update:modelValue"]).toBeUndefined()
-    if (expectedInnerText !== undefined) {
-      expect(editor.innerText).toBe(expectedInnerText)
+      expect(wrapper.emitted()["update:modelValue"]).toBeUndefined()
+      if (expectedInnerText !== undefined) {
+        expect(editor.innerText).toBe(expectedInnerText)
+      }
     }
-  })
+  )
 })

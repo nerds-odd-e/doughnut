@@ -15,29 +15,32 @@ describe("new/updated pink banner", () => {
     [new Date(Date.UTC(2017, 1, 13)), "rgb(189,209,64)"],
     [new Date(Date.UTC(2017, 1, 12)), "rgb(181,197,82)"],
     [new Date(Date.UTC(2016, 1, 12)), "rgb(150,150,150)"],
-  ])("should show fresher color if recently updated", async (updatedAt, expectedColor) => {
-    const note = makeMe.aNoteRealm.updatedAtDate(updatedAt).please()
-    mockSdkService(NoteController, "showNote", note)
+  ])(
+    "should show fresher color if recently updated",
+    async (updatedAt, expectedColor) => {
+      const note = makeMe.aNoteRealm.updatedAtDate(updatedAt).please()
+      mockSdkService(NoteController, "showNote", note)
 
-    const wrapper = helper
-      .component(NoteShow)
-      .withRouter()
-      .withCleanStorage()
-      .withProps({
-        noteId: note.id,
-        expandChildren: true,
-      })
-      .mount({ attachTo: document.body })
-    await flushPromises()
-    const element = wrapper.find(".note-recent-update-indicator")
-      .element as HTMLElement
-    // Browser might return spaces in rgb values, e.g. "rgb(208, 237, 23)" vs "rgb(208,237,23)"
-    // Normalize both expected and actual by removing spaces
-    const actualColor = element.style.color.replace(/\s/g, "")
-    const expectedColorNormalized = expectedColor.replace(/\s/g, "")
-    expect(actualColor).toBe(expectedColorNormalized)
-    wrapper.unmount()
-  })
+      const wrapper = helper
+        .component(NoteShow)
+        .withRouter()
+        .withCleanStorage()
+        .withProps({
+          noteId: note.id,
+          expandChildren: true,
+        })
+        .mount({ attachTo: document.body })
+      await flushPromises()
+      const element = wrapper.find(".note-recent-update-indicator")
+        .element as HTMLElement
+      // Browser might return spaces in rgb values, e.g. "rgb(208, 237, 23)" vs "rgb(208,237,23)"
+      // Normalize both expected and actual by removing spaces
+      const actualColor = element.style.color.replace(/\s/g, "")
+      const expectedColorNormalized = expectedColor.replace(/\s/g, "")
+      expect(actualColor).toBe(expectedColorNormalized)
+      wrapper.unmount()
+    }
+  )
 })
 
 describe("note wth children", () => {

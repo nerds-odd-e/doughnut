@@ -58,16 +58,16 @@ describe("NoteUndoButton", () => {
         noteEditingHistory.moveNote(noteId, { folderId: null, notebookId: 1 }),
       expectedTitle: "undo move note",
     },
-  ])("shows with title $expectedTitle when undo is available", ({
-    setup,
-    expectedTitle,
-  }) => {
-    const note = makeMe.aNote.please()
-    setup(note.id)
-    const wrapper = mountNoteUndoButton()
-    expect(wrapper.find("button").exists()).toBe(true)
-    expect(wrapper.find("button").attributes("title")).toBe(expectedTitle)
-  })
+  ])(
+    "shows with title $expectedTitle when undo is available",
+    ({ setup, expectedTitle }) => {
+      const note = makeMe.aNote.please()
+      setup(note.id)
+      const wrapper = mountNoteUndoButton()
+      expect(wrapper.find("button").exists()).toBe(true)
+      expect(wrapper.find("button").attributes("title")).toBe(expectedTitle)
+    }
+  )
 
   describe("confirmation dialog", () => {
     describe("when note is in cache", () => {
@@ -97,23 +97,22 @@ describe("NoteUndoButton", () => {
           undoTitle: "undo move note",
           message: /Are you sure you want to undo moving /,
         },
-      ])("shows confirmation dialog with note title for $action", async ({
-        setup,
-        undoTitle,
-        message,
-      }) => {
-        const noteRealm = makeMe.aNoteRealm.title("My Note").please()
-        refreshNoteRealms(noteRealm)
-        setup(noteRealm)
-        renderNoteUndoButton()
+      ])(
+        "shows confirmation dialog with note title for $action",
+        async ({ setup, undoTitle, message }) => {
+          const noteRealm = makeMe.aNoteRealm.title("My Note").please()
+          refreshNoteRealms(noteRealm)
+          setup(noteRealm)
+          renderNoteUndoButton()
 
-        await clickUndoButton(undoTitle)
+          await clickUndoButton(undoTitle)
 
-        expectConfirmUndoVisible()
-        expect(screen.getByText(message)).toBeInTheDocument()
-        expectNoteTitleVisible("My Note")
-        expectNoteTitleLink("My Note")
-      })
+          expectConfirmUndoVisible()
+          expect(screen.getByText(message)).toBeInTheDocument()
+          expectNoteTitleVisible("My Note")
+          expectNoteTitleLink("My Note")
+        }
+      )
 
       it("shows confirmation dialog with note title and diff for edit title", async () => {
         const noteRealm = makeMe.aNoteRealm.title("Test Note").please()
@@ -235,24 +234,23 @@ describe("NoteUndoButton", () => {
           undoTitle: "undo edit content",
           assertMessage: () => undefined,
         },
-      ])("shows confirmation dialog for $action when note is not cached", async ({
-        setup,
-        undoTitle,
-        assertMessage,
-      }) => {
-        const note = makeMe.aNote.please()
-        setup(note.id)
-        renderNoteUndoButton()
+      ])(
+        "shows confirmation dialog for $action when note is not cached",
+        async ({ setup, undoTitle, assertMessage }) => {
+          const note = makeMe.aNote.please()
+          setup(note.id)
+          renderNoteUndoButton()
 
-        await clickUndoButton(undoTitle)
+          await clickUndoButton(undoTitle)
 
-        expectConfirmUndoVisible()
-        assertMessage(note.id)
-        if (undoTitle !== "undo delete note") {
-          expect(screen.getByText("Current")).toBeInTheDocument()
-          expect(screen.getByText("Will restore to")).toBeInTheDocument()
+          expectConfirmUndoVisible()
+          assertMessage(note.id)
+          if (undoTitle !== "undo delete note") {
+            expect(screen.getByText("Current")).toBeInTheDocument()
+            expect(screen.getByText("Will restore to")).toBeInTheDocument()
+          }
         }
-      })
+      )
     })
 
     it.each([
@@ -319,23 +317,23 @@ describe("NoteUndoButton", () => {
           noteRealm: ReturnType<typeof makeMe.aNoteRealm.please>
         }) => result.noteRealm.id,
       },
-    ])("calls undo when confirmation is accepted for $label", async ({
-      setup,
-      expectedNoteId,
-    }) => {
-      const { noteRealm, undoTitle } = setup()
-      renderNoteUndoButton()
+    ])(
+      "calls undo when confirmation is accepted for $label",
+      async ({ setup, expectedNoteId }) => {
+        const { noteRealm, undoTitle } = setup()
+        renderNoteUndoButton()
 
-      await clickUndoButton(undoTitle)
-      await clickDialogOk()
+        await clickUndoButton(undoTitle)
+        await clickDialogOk()
 
-      expect(mockedPush).toHaveBeenCalledWith({
-        name: "noteShow",
-        params: {
-          noteId: String(expectedNoteId({ noteRealm })),
-        },
-      })
-    })
+        expect(mockedPush).toHaveBeenCalledWith({
+          name: "noteShow",
+          params: {
+            noteId: String(expectedNoteId({ noteRealm })),
+          },
+        })
+      }
+    )
 
     it("does not call undo when confirmation is cancelled", async () => {
       const note = makeMe.aNote.please()
@@ -399,25 +397,25 @@ describe("NoteUndoButton", () => {
           },
           undoTitle: "undo edit content",
         },
-      ])("discards $action item and shows next item", async ({
-        setup,
-        undoTitle,
-      }) => {
-        const { noteRealm1, noteRealm2 } = setupTwoCachedNotes()
-        setup(noteRealm1, noteRealm2)
-        renderNoteUndoButton()
+      ])(
+        "discards $action item and shows next item",
+        async ({ setup, undoTitle }) => {
+          const { noteRealm1, noteRealm2 } = setupTwoCachedNotes()
+          setup(noteRealm1, noteRealm2)
+          renderNoteUndoButton()
 
-        await clickUndoButton(undoTitle)
+          await clickUndoButton(undoTitle)
 
-        expectConfirmUndoVisible()
-        expectNoteTitleVisible("First Note")
+          expectConfirmUndoVisible()
+          expectNoteTitleVisible("First Note")
 
-        await clickDialogDiscard()
+          await clickDialogDiscard()
 
-        expectConfirmUndoVisible()
-        expectNoteTitleVisible("Second Note")
-        expectNoteTitleHidden("First Note")
-      })
+          expectConfirmUndoVisible()
+          expectNoteTitleVisible("Second Note")
+          expectNoteTitleHidden("First Note")
+        }
+      )
 
       it("closes dialog when discarding the last undo item", async () => {
         const note = makeMe.aNote.please()

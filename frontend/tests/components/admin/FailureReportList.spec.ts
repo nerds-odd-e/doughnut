@@ -54,26 +54,27 @@ describe("FailureReportList", () => {
   })
 
   describe("selecting and deleting reports", () => {
-    it.each([
-      1, 2,
-    ])("shows delete button when %i report(s) are selected", async (selectedCount) => {
-      const wrapper = await mountFailureReportList([
-        aFailureReport(1),
-        aFailureReport(2),
-      ])
+    it.each([1, 2])(
+      "shows delete button when %i report(s) are selected",
+      async (selectedCount) => {
+        const wrapper = await mountFailureReportList([
+          aFailureReport(1),
+          aFailureReport(2),
+        ])
 
-      expect(deleteSelectedButton(wrapper).exists()).toBe(false)
+        expect(deleteSelectedButton(wrapper).exists()).toBe(false)
 
-      const rowChecks = rowSelectEls(wrapper)
-      for (let i = 0; i < selectedCount; i++) {
-        await rowChecks[i]!.setValue(true)
+        const rowChecks = rowSelectEls(wrapper)
+        for (let i = 0; i < selectedCount; i++) {
+          await rowChecks[i]!.setValue(true)
+        }
+        await flushPromises()
+
+        expect(deleteSelectedButton(wrapper).text()).toContain(
+          `Delete Selected (${selectedCount})`
+        )
       }
-      await flushPromises()
-
-      expect(deleteSelectedButton(wrapper).text()).toContain(
-        `Delete Selected (${selectedCount})`
-      )
-    })
+    )
 
     it("closes delete confirmation modal when cancel is clicked", async () => {
       const wrapper = await mountFailureReportList([aFailureReport(1)])

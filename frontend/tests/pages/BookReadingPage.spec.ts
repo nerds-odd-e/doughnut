@@ -836,32 +836,31 @@ describe("BookReadingPage", () => {
         expectRead: undefined,
         expectSkimmed: "true",
       },
-    ])("shows $status border for blocks returned as $status from reading-records on load", async ({
-      status,
-      expectRead,
-      expectSkimmed,
-    }) => {
-      vi.spyOn(
-        NotebookBooksController,
-        "getNotebookBookReadingRecords"
-      ).mockResolvedValue(
-        wrapSdkResponse([
-          {
-            bookBlockId: "101",
-            status,
-            completedAt: "2020-01-01T00:00:00Z",
-          },
-        ])
-      )
-      const wrapper = await mountLoadedBookWithBlocks(notebookId)
-      const section1Row = bookBlockRowStartingWith(wrapper, "Section 1")
-      expect(section1Row.attributes("data-direct-content-read")).toBe(
-        expectRead
-      )
-      expect(section1Row.attributes("data-direct-content-skimmed")).toBe(
-        expectSkimmed
-      )
-    })
+    ])(
+      "shows $status border for blocks returned as $status from reading-records on load",
+      async ({ status, expectRead, expectSkimmed }) => {
+        vi.spyOn(
+          NotebookBooksController,
+          "getNotebookBookReadingRecords"
+        ).mockResolvedValue(
+          wrapSdkResponse([
+            {
+              bookBlockId: "101",
+              status,
+              completedAt: "2020-01-01T00:00:00Z",
+            },
+          ])
+        )
+        const wrapper = await mountLoadedBookWithBlocks(notebookId)
+        const section1Row = bookBlockRowStartingWith(wrapper, "Section 1")
+        expect(section1Row.attributes("data-direct-content-read")).toBe(
+          expectRead
+        )
+        expect(section1Row.attributes("data-direct-content-skimmed")).toBe(
+          expectSkimmed
+        )
+      }
+    )
 
     it("shows the panel when the selected block’s successor is the viewport current block", async () => {
       const wrapper = await mountLoadedBookWithBlocks(notebookId)

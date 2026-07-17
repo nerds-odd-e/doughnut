@@ -168,11 +168,14 @@ describe("Markdown and HTML Conversion Tests", () => {
           "てっきり今日は水曜日だ_とばかり思っていました_。",
           "<p>てっきり今日は水曜日だ_とばかり思っていました_。</p>",
         ],
-      ])("does not treat underscores as emphasis %s", (_, markdown, expected) => {
-        const html = toHtml(markdown)
-        expect(html).toBe(expected)
-        expect(html).not.toContain("<em>")
-      })
+      ])(
+        "does not treat underscores as emphasis %s",
+        (_, markdown, expected) => {
+          const html = toHtml(markdown)
+          expect(html).toBe(expected)
+          expect(html).not.toContain("<em>")
+        }
+      )
 
       it.each([
         [
@@ -206,9 +209,12 @@ describe("Markdown and HTML Conversion Tests", () => {
           "hello **world** there",
           "<p>hello <strong>world</strong> there</p>",
         ],
-      ])("emphasis/bold still works for %s", (_, markdown, expectedSubstring) => {
-        expect(toHtml(markdown)).toContain(expectedSubstring)
-      })
+      ])(
+        "emphasis/bold still works for %s",
+        (_, markdown, expectedSubstring) => {
+          expect(toHtml(markdown)).toContain(expectedSubstring)
+        }
+      )
     })
 
     it.each([
@@ -305,14 +311,17 @@ describe("Markdown and HTML Conversion Tests", () => {
       it.each([
         [true, "<pre>", "ql-code-block"],
         [false, "ql-code-block-container", "<pre>"],
-      ])("with preserve_pre=%s, contains %s and not %s", (preservePre, expected, notExpected) => {
-        const html = markdownizer.markdownToHtml("```\ncode content\n```", {
-          preserve_pre: preservePre as boolean,
-        })
-        expect(html).toContain(expected)
-        expect(html).toContain("code content")
-        expect(html).not.toContain(notExpected)
-      })
+      ])(
+        "with preserve_pre=%s, contains %s and not %s",
+        (preservePre, expected, notExpected) => {
+          const html = markdownizer.markdownToHtml("```\ncode content\n```", {
+            preserve_pre: preservePre as boolean,
+          })
+          expect(html).toContain(expected)
+          expect(html).toContain("code content")
+          expect(html).not.toContain(notExpected)
+        }
+      )
 
       it("escapes HTML tags in <pre> when preserve_pre is true", () => {
         const html = markdownizer.markdownToHtml("```\n<p>X</p>\n```", {
@@ -390,11 +399,14 @@ describe("Markdown and HTML Conversion Tests", () => {
           '<div class="ql-code-block-container" spellcheck="false"><div class="ql-code-block" data-language="plain">  indented line</div></div>',
           "  indented line",
         ],
-      ])("converts %s to markdown fenced code block", (_, html, expectedContent) => {
-        const markdown = markdownizer.htmlToMarkdown(html)
-        expect(markdown).toContain(expectedContent)
-        expect(markdown).toMatch(/```[\s\S]*```/)
-      })
+      ])(
+        "converts %s to markdown fenced code block",
+        (_, html, expectedContent) => {
+          const markdown = markdownizer.htmlToMarkdown(html)
+          expect(markdown).toContain(expectedContent)
+          expect(markdown).toMatch(/```[\s\S]*```/)
+        }
+      )
 
       it("does not escape underscore in <pre> tag", () => {
         const markdown = markdownizer.htmlToMarkdown(

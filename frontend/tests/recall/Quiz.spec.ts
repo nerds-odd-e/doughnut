@@ -34,21 +34,20 @@ describe("repeat page", () => {
         eagerFetchCount: 3,
         expectedTrackerIds: [111, 222, 333],
       },
-    ])("prefetches $eagerFetchCount question(s) on mount", async ({
-      memoryTrackerIds,
-      eagerFetchCount,
-      expectedTrackerIds,
-    }) => {
-      await mountQuizReady(memoryTrackerIds, eagerFetchCount)
-      for (const [index, memoryTrackerId] of expectedTrackerIds.entries()) {
-        expect(askAQuestionSpy).toHaveBeenNthCalledWith(
-          index + 1,
-          expect.objectContaining({
-            path: { memoryTracker: memoryTrackerId },
-          })
-        )
+    ])(
+      "prefetches $eagerFetchCount question(s) on mount",
+      async ({ memoryTrackerIds, eagerFetchCount, expectedTrackerIds }) => {
+        await mountQuizReady(memoryTrackerIds, eagerFetchCount)
+        for (const [index, memoryTrackerId] of expectedTrackerIds.entries()) {
+          expect(askAQuestionSpy).toHaveBeenNthCalledWith(
+            index + 1,
+            expect.objectContaining({
+              path: { memoryTracker: memoryTrackerId },
+            })
+          )
+        }
       }
-    })
+    )
 
     it("does not fetch question 2 again after prefetched", async () => {
       const quizWrapper = await mountQuizReady([1, 2, 3, 4], 2)

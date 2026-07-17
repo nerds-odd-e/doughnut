@@ -19,40 +19,38 @@ describe("RichMarkdownEditor property touch focus", () => {
     h.cleanup()
   })
 
-  it.each(
-    addPropertyTapCases
-  )("focuses primer synchronously when Add property is tapped with $case on touch device", async ({
-    markdown,
-  }) => {
-    const { matchMediaSpy: spy, primer } = await mountTouchFocusEditor(
-      h,
-      markdown,
-      true
-    )
-    matchMediaSpy = spy
-    expect(primer).toBeTruthy()
+  it.each(addPropertyTapCases)(
+    "focuses primer synchronously when Add property is tapped with $case on touch device",
+    async ({ markdown }) => {
+      const { matchMediaSpy: spy, primer } = await mountTouchFocusEditor(
+        h,
+        markdown,
+        true
+      )
+      matchMediaSpy = spy
+      expect(primer).toBeTruthy()
 
-    h.tapAddProperty()
+      h.tapAddProperty()
 
-    expect(document.activeElement).toBe(primer)
-  })
+      expect(document.activeElement).toBe(primer)
+    }
+  )
 
-  it.each(
-    addPropertyTapCases
-  )("transfers focus to property key after insert form mounts with $case", async ({
-    markdown,
-  }) => {
-    const { matchMediaSpy: spy } = await mountTouchFocusEditor(
-      h,
-      markdown,
-      true
-    )
-    matchMediaSpy = spy
+  it.each(addPropertyTapCases)(
+    "transfers focus to property key after insert form mounts with $case",
+    async ({ markdown }) => {
+      const { matchMediaSpy: spy } = await mountTouchFocusEditor(
+        h,
+        markdown,
+        true
+      )
+      matchMediaSpy = spy
 
-    await h.openAddProperty()
-    await h.flushAnimationFrame()
-    expectElementFocused(PROPERTY_KEY_INPUT)
-  })
+      await h.openAddProperty()
+      await h.flushAnimationFrame()
+      expectElementFocused(PROPERTY_KEY_INPUT)
+    }
+  )
 
   it("does not focus primer when pointer is not coarse", async () => {
     const { matchMediaSpy: spy, primer } = await mountTouchFocusEditor(

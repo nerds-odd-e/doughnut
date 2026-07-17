@@ -196,39 +196,39 @@ describe("WikidataAssociationDialog", () => {
       expectReplaceTitleAndAddAliasControls("Canine")
     })
 
-    it.each([
-      false,
-      true,
-    ])("emits selected with replace action when showSaveButton is %s", async (showSaveButton) => {
-      const { wrapper, searchResult } = await mountWikidataDialogReady({
-        searchWikidataSpy: sdkSpies.searchWikidataSpy,
-        searchKey: "dog",
-        searchLabel: "Canine",
-        wikidataId: "Q11399",
-        mountOptions: showSaveButton ? { showSaveButton: true } : undefined,
-      })
-      await selectWikidataSearchResultWithTitleAction("Q11399", "Replace")
-      const emitted = wrapper.emitted("selected")?.[0]
-      expect(emitted?.[0]).toEqual(searchResult)
-      expect(emitted?.[1]).toBe("replace")
-    })
+    it.each([false, true])(
+      "emits selected with replace action when showSaveButton is %s",
+      async (showSaveButton) => {
+        const { wrapper, searchResult } = await mountWikidataDialogReady({
+          searchWikidataSpy: sdkSpies.searchWikidataSpy,
+          searchKey: "dog",
+          searchLabel: "Canine",
+          wikidataId: "Q11399",
+          mountOptions: showSaveButton ? { showSaveButton: true } : undefined,
+        })
+        await selectWikidataSearchResultWithTitleAction("Q11399", "Replace")
+        const emitted = wrapper.emitted("selected")?.[0]
+        expect(emitted?.[0]).toEqual(searchResult)
+        expect(emitted?.[1]).toBe("replace")
+      }
+    )
 
-    it.each([
-      false,
-      true,
-    ])("emits selected with add alias action when showSaveButton is %s", async (showSaveButton) => {
-      const { wrapper, searchResult } = await mountWikidataDialogReady({
-        searchWikidataSpy: sdkSpies.searchWikidataSpy,
-        searchKey: "dog",
-        searchLabel: "Canine",
-        wikidataId: "Q11399",
-        mountOptions: showSaveButton ? { showSaveButton: true } : undefined,
-      })
-      await selectWikidataSearchResultWithTitleAction("Q11399", "Append")
-      const emitted = wrapper.emitted("selected")?.[0]
-      expect(emitted?.[0]).toEqual(searchResult)
-      expect(emitted?.[1]).toBe("append")
-    })
+    it.each([false, true])(
+      "emits selected with add alias action when showSaveButton is %s",
+      async (showSaveButton) => {
+        const { wrapper, searchResult } = await mountWikidataDialogReady({
+          searchWikidataSpy: sdkSpies.searchWikidataSpy,
+          searchKey: "dog",
+          searchLabel: "Canine",
+          wikidataId: "Q11399",
+          mountOptions: showSaveButton ? { showSaveButton: true } : undefined,
+        })
+        await selectWikidataSearchResultWithTitleAction("Q11399", "Append")
+        const emitted = wrapper.emitted("selected")?.[0]
+        expect(emitted?.[0]).toEqual(searchResult)
+        expect(emitted?.[1]).toBe("append")
+      }
+    )
   })
 
   describe("open link button", () => {

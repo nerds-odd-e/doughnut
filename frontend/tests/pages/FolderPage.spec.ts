@@ -57,46 +57,47 @@ describe("FolderPage", () => {
           errorType: "FOLDER_NAME_CONFLICT",
         },
       },
-    ] as const)("shows merge confirm when move returns $case, retries with merge, and navigates", async ({
-      error,
-    }) => {
-      const { wrapper, folderRealm } = mountFolderPage(router, 10, "Dup")
-      const targetFolder = makeMe.aFolder
-        .folder(99, folderRealm.folder.name)
-        .please()
+    ] as const)(
+      "shows merge confirm when move returns $case, retries with merge, and navigates",
+      async ({ error }) => {
+        const { wrapper, folderRealm } = mountFolderPage(router, 10, "Dup")
+        const targetFolder = makeMe.aFolder
+          .folder(99, folderRealm.folder.name)
+          .please()
 
-      const moveSpy = vi
-        .spyOn(NotebookController, "moveFolder")
-        .mockResolvedValue(wrapSdkError(error))
+        const moveSpy = vi
+          .spyOn(NotebookController, "moveFolder")
+          .mockResolvedValue(wrapSdkError(error))
 
-      const pushSpy = stubRouterPush(router)
+        const pushSpy = stubRouterPush(router)
 
-      await submitMoveForm(wrapper)
+        await submitMoveForm(wrapper)
 
-      const popup = usePopups().popups.peek()?.[0]
-      expect(popup?.type).toBe("confirm")
-      expect(popup?.message).toContain("Merge into it?")
+        const popup = usePopups().popups.peek()?.[0]
+        expect(popup?.type).toBe("confirm")
+        expect(popup?.message).toContain("Merge into it?")
 
-      moveSpy.mockResolvedValueOnce(wrapSdkResponse(targetFolder) as never)
-      resolveTopConfirm(true)
-      await flushPromises()
+        moveSpy.mockResolvedValueOnce(wrapSdkResponse(targetFolder) as never)
+        resolveTopConfirm(true)
+        await flushPromises()
 
-      expect(moveSpy).toHaveBeenCalledTimes(2)
-      expect(moveSpy).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          body: expect.objectContaining({ merge: true }),
+        expect(moveSpy).toHaveBeenCalledTimes(2)
+        expect(moveSpy).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            body: expect.objectContaining({ merge: true }),
+          })
+        )
+        expect(pushSpy).toHaveBeenCalledWith({
+          name: "folderPage",
+          params: {
+            notebookId: String(folderRealm.notebookRealm.notebook.id),
+            folderId: String(targetFolder.id),
+          },
         })
-      )
-      expect(pushSpy).toHaveBeenCalledWith({
-        name: "folderPage",
-        params: {
-          notebookId: String(folderRealm.notebookRealm.notebook.id),
-          folderId: String(targetFolder.id),
-        },
-      })
 
-      wrapper.unmount()
-    })
+        wrapper.unmount()
+      }
+    )
 
     it("shows error message when move 409 and user cancels merge", async () => {
       const { wrapper } = mountFolderPage(router, 10, "Dup")

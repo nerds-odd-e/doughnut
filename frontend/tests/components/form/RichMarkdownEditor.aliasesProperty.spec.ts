@@ -28,22 +28,20 @@ describe("RichMarkdownEditor aliases property", () => {
     h.cleanup()
   })
 
-  it.each(
-    POPUP_ALIAS_CONSTRAINT_CASES
-  )("shows alias constraint for $case", async ({
-    prepareInvalidValue,
-    expectDialogOpen,
-  }) => {
-    const wrapper = await mountAliasesValuePopup(h)
-    await prepareInvalidValue()
-    await savePopup()
+  it.each(POPUP_ALIAS_CONSTRAINT_CASES)(
+    "shows alias constraint for $case",
+    async ({ prepareInvalidValue, expectDialogOpen }) => {
+      const wrapper = await mountAliasesValuePopup(h)
+      await prepareInvalidValue()
+      await savePopup()
 
-    expect(popupValidationText()).toBe(AUTHORED_ALIASES_MESSAGE)
-    if (expectDialogOpen) {
-      expect(dialogEl()).not.toBeNull()
+      expect(popupValidationText()).toBe(AUTHORED_ALIASES_MESSAGE)
+      if (expectDialogOpen) {
+        expect(dialogEl()).not.toBeNull()
+      }
+      expect(wrapper.emitted("update:modelValue")).toBeUndefined()
     }
-    expect(wrapper.emitted("update:modelValue")).toBeUndefined()
-  })
+  )
 
   it("emits valid aliases list edits from popup", async () => {
     await mountAliasesValuePopup(h)

@@ -83,30 +83,30 @@ describe("NoteNewButton keyboard shortcut", () => {
     expect(await screen.findByTestId("note-new-form")).toBeInTheDocument()
   })
 
-  it.each([
-    "input",
-    "textarea",
-  ])("ignores n while focus is in an %s", async (tagName) => {
-    const field = document.createElement(tagName)
-    document.body.append(field)
+  it.each(["input", "textarea"])(
+    "ignores n while focus is in an %s",
+    async (tagName) => {
+      const field = document.createElement(tagName)
+      document.body.append(field)
 
-    helper
-      .component(NoteNewButton)
-      .withCleanStorage()
-      .withRouter()
-      .withProps({
-        notebookId: realm.notebookRealm.notebook.id,
-      })
-      .mount({ attachTo: document.body })
+      helper
+        .component(NoteNewButton)
+        .withCleanStorage()
+        .withRouter()
+        .withProps({
+          notebookId: realm.notebookRealm.notebook.id,
+        })
+        .mount({ attachTo: document.body })
 
-    await flushPromises()
-    field.focus()
+      await flushPromises()
+      field.focus()
 
-    dispatchNoteNewShortcut()
-    await flushPromises()
+      dispatchNoteNewShortcut()
+      await flushPromises()
 
-    expect(screen.queryByTestId("note-new-form")).toBeNull()
-  })
+      expect(screen.queryByTestId("note-new-form")).toBeNull()
+    }
+  )
 
   it("advertises the n shortcut in the new note button title", async () => {
     helper

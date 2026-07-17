@@ -23,14 +23,17 @@ describe('get_note_graph tool', () => {
     test.each([
       [0, 'ERROR: tokenLimit must be a positive number'],
       [5, 'ERROR: tokenLimit too low to fetch any note'],
-    ])('returns error when tokenLimit is %i', async (tokenLimit, expectedError) => {
-      const tool = findTool('get_note_graph')
-      const result = await tool.handle(createMockContext(), {
-        noteId: 1,
-        tokenLimit,
-      })
-      expect(result.content[0].text).toBe(expectedError)
-    })
+    ])(
+      'returns error when tokenLimit is %i',
+      async (tokenLimit, expectedError) => {
+        const tool = findTool('get_note_graph')
+        const result = await tool.handle(createMockContext(), {
+          noteId: 1,
+          tokenLimit,
+        })
+        expect(result.content[0].text).toBe(expectedError)
+      }
+    )
 
     test('should successfully fetch graph with valid tokenLimit', async () => {
       const tool = findTool('get_note_graph')

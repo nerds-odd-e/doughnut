@@ -32,20 +32,21 @@ describe("RichMarkdownEditor property key presets", () => {
     expect(last).toContain("Hello Body")
   })
 
-  it.each(
-    PRESET_DROPDOWN_CASES
-  )("preset dropdown for $case shows options and sets key on selection", async ({
-    markdown,
-    keyInputTestId,
-    existingRows,
-    selectPreset,
-    expectedKeyValue,
-  }) => {
-    await preparePropertyKeyPresetDropdown(h, markdown, {
+  it.each(PRESET_DROPDOWN_CASES)(
+    "preset dropdown for $case shows options and sets key on selection",
+    async ({
+      markdown,
       keyInputTestId,
       existingRows,
-    })
-    await selectPresetKey(selectPreset)
-    expect(keyInputValue(keyInputTestId)).toBe(expectedKeyValue)
-  })
+      selectPreset,
+      expectedKeyValue,
+    }) => {
+      await preparePropertyKeyPresetDropdown(h, markdown, {
+        keyInputTestId,
+        existingRows,
+      })
+      await selectPresetKey(selectPreset)
+      expect(keyInputValue(keyInputTestId)).toBe(expectedKeyValue)
+    }
+  )
 })

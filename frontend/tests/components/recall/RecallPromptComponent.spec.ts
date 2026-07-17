@@ -62,43 +62,43 @@ describe("RecallPromptComponent", () => {
         nextIsSpelling: false,
         expectPrimerFocused: false,
       },
-    ])("primer focus on choice when nextIsSpelling=$nextIsSpelling", async ({
-      nextIsSpelling,
-      expectPrimerFocused,
-    }) => {
-      matchMediaSpy = mockCoarsePointer(true)
-      expect(softKeyboardPrimerElement()).toBeTruthy()
+    ])(
+      "primer focus on choice when nextIsSpelling=$nextIsSpelling",
+      async ({ nextIsSpelling, expectPrimerFocused }) => {
+        matchMediaSpy = mockCoarsePointer(true)
+        expect(softKeyboardPrimerElement()).toBeTruthy()
 
-      let resolveAnswer: (value: ReturnType<typeof wrapSdkResponse>) => void
-      const answerQuizSpy = mockSdkService(
-        RecallPromptController,
-        "answerQuiz",
-        makeMe.anAnsweredQuestion.please()
-      )
-      if (expectPrimerFocused) {
-        answerQuizSpy.mockImplementation(
-          () =>
-            new Promise((resolve) => {
-              resolveAnswer = resolve
-              // biome-ignore lint/suspicious/noExplicitAny: Promise type requires any for mock implementation
-            }) as any
+        let resolveAnswer: (value: ReturnType<typeof wrapSdkResponse>) => void
+        const answerQuizSpy = mockSdkService(
+          RecallPromptController,
+          "answerQuiz",
+          makeMe.anAnsweredQuestion.please()
         )
-      }
+        if (expectPrimerFocused) {
+          answerQuizSpy.mockImplementation(
+            () =>
+              new Promise((resolve) => {
+                resolveAnswer = resolve
+                // biome-ignore lint/suspicious/noExplicitAny: Promise type requires any for mock implementation
+              }) as any
+          )
+        }
 
-      const wrapper = mountComponent(nextIsSpelling)
-      wrapper
-        .findComponent({ name: "QuestionDisplay" })
-        .vm.$emit("answer", { choiceIndex: 0 })
+        const wrapper = mountComponent(nextIsSpelling)
+        wrapper
+          .findComponent({ name: "QuestionDisplay" })
+          .vm.$emit("answer", { choiceIndex: 0 })
 
-      if (expectPrimerFocused) {
-        expectSoftKeyboardPrimerIsFocused()
-        resolveAnswer!(wrapSdkResponse(makeMe.anAnsweredQuestion.please()))
-        await flushPromises()
-      } else {
-        expectSoftKeyboardPrimerIsNotFocused()
+        if (expectPrimerFocused) {
+          expectSoftKeyboardPrimerIsFocused()
+          resolveAnswer!(wrapSdkResponse(makeMe.anAnsweredQuestion.please()))
+          await flushPromises()
+        } else {
+          expectSoftKeyboardPrimerIsNotFocused()
+        }
+        wrapper.unmount()
       }
-      wrapper.unmount()
-    })
+    )
   })
 
   describe("answer submission", () => {

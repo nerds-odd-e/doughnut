@@ -135,16 +135,14 @@ Hello`
     expect(payload).toMatch(/^---\n/)
   })
 
-  it.each(
-    DEAD_LINK_CLICK_CASES
-  )("emits deadLinkClick for property wiki link ($case)", async ({
-    wikiToken,
-    expected,
-  }) => {
-    const wrapper = await h.mountEditor(propertyWikiLinkMarkdown(wikiToken))
-    await clickDeadWikiLinkInPropertyValue(wrapper)
-    expect(wrapper.emitted("deadLinkClick")?.[0]).toEqual([expected])
-  })
+  it.each(DEAD_LINK_CLICK_CASES)(
+    "emits deadLinkClick for property wiki link ($case)",
+    async ({ wikiToken, expected }) => {
+      const wrapper = await h.mountEditor(propertyWikiLinkMarkdown(wikiToken))
+      await clickDeadWikiLinkInPropertyValue(wrapper)
+      expect(wrapper.emitted("deadLinkClick")?.[0]).toEqual([expected])
+    }
+  )
 
   it("editing an existing property row emits renamed keys and updated values", async () => {
     const markdown = `---

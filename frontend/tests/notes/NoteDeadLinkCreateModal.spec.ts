@@ -132,19 +132,20 @@ describe("NoteDeadLinkCreateModal", () => {
     it.each([
       { branch: "create", label: createNoteLabel },
       { branch: "link", label: linkNoteLabel },
-    ])("focuses primer synchronously when $branch is tapped on touch device", async ({
-      label,
-    }) => {
-      matchMediaSpy = mockCoarsePointer(true)
-      mountModal()
-      await waitForChooser()
-      const primer = softKeyboardPrimerElement()
-      expect(primer).toBeTruthy()
+    ])(
+      "focuses primer synchronously when $branch is tapped on touch device",
+      async ({ label }) => {
+        matchMediaSpy = mockCoarsePointer(true)
+        mountModal()
+        await waitForChooser()
+        const primer = softKeyboardPrimerElement()
+        expect(primer).toBeTruthy()
 
-      tapChooser(label)
+        tapChooser(label)
 
-      expect(document.activeElement).toBe(primer)
-    })
+        expect(document.activeElement).toBe(primer)
+      }
+    )
 
     it("transfers focus to note title after create form mounts", async () => {
       matchMediaSpy = mockCoarsePointer(true)

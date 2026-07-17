@@ -42,26 +42,26 @@ describe("SpellingQuestionDisplay", () => {
     it.each([
       { nextIsSpelling: true, expectPrimerFocused: true },
       { nextIsSpelling: false, expectPrimerFocused: false },
-    ])("primer focus on submit when nextIsSpelling=$nextIsSpelling", async ({
-      nextIsSpelling,
-      expectPrimerFocused,
-    }) => {
-      matchMediaSpy = mockCoarsePointer(true)
-      expect(softKeyboardPrimerElement()).toBeTruthy()
+    ])(
+      "primer focus on submit when nextIsSpelling=$nextIsSpelling",
+      async ({ nextIsSpelling, expectPrimerFocused }) => {
+        matchMediaSpy = mockCoarsePointer(true)
+        expect(softKeyboardPrimerElement()).toBeTruthy()
 
-      const wrapper = await mountSpellingQuestionDisplay(
-        { memoryTrackerId: 1, nextIsSpelling },
-        { attachTo: document.body, rafCallbacks }
-      )
-      await submitSpellingAnswer(wrapper)
+        const wrapper = await mountSpellingQuestionDisplay(
+          { memoryTrackerId: 1, nextIsSpelling },
+          { attachTo: document.body, rafCallbacks }
+        )
+        await submitSpellingAnswer(wrapper)
 
-      if (expectPrimerFocused) {
-        expectSoftKeyboardPrimerIsFocused()
-      } else {
-        expectSoftKeyboardPrimerIsNotFocused()
+        if (expectPrimerFocused) {
+          expectSoftKeyboardPrimerIsFocused()
+        } else {
+          expectSoftKeyboardPrimerIsNotFocused()
+        }
+        wrapper.unmount()
       }
-      wrapper.unmount()
-    })
+    )
   })
 
   it("emits answer with thinking time on submit", async () => {

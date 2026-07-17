@@ -35,16 +35,15 @@ describe("RichMarkdownEditor property relation and index", () => {
         expectedLabel: "my-custom-relation",
         notExpected: "related to",
       },
-    ])("relation button shows $expectedLabel for $relation", async ({
-      relation,
-      expectedLabel,
-      notExpected,
-    }) => {
-      await mountRelationNote(h, relation)
-      const text = relationTypeButtonText(editorRoot(h))
-      expect(text).toContain(expectedLabel)
-      expect(text).not.toContain(notExpected)
-    })
+    ])(
+      "relation button shows $expectedLabel for $relation",
+      async ({ relation, expectedLabel, notExpected }) => {
+        await mountRelationNote(h, relation)
+        const text = relationTypeButtonText(editorRoot(h))
+        expect(text).toContain(expectedLabel)
+        expect(text).not.toContain(notExpected)
+      }
+    )
 
     it("commits custom relationship text from the dialog and emits updated frontmatter", async () => {
       await mountRelationNote(h, "similar-to")

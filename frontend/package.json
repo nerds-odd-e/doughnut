@@ -35,7 +35,7 @@
     "yaml": ">=2.9.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.3",
+    "@biomejs/biome": "2.5.4",
     "@storybook/addon-docs": "10.5.0",
     "@storybook/vue3": "10.5.0",
     "@storybook/vue3-vite": "10.5.0",

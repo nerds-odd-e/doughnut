@@ -113,21 +113,21 @@ describe("NoteToolbar", () => {
   it.each([
     { asMarkdown: false, expected: true },
     { asMarkdown: true, expected: false },
-  ])("emits edit-as-markdown=$expected when m is pressed (asMarkdown=$asMarkdown)", async ({
-    asMarkdown,
-    expected,
-  }) => {
-    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
+  ])(
+    "emits edit-as-markdown=$expected when m is pressed (asMarkdown=$asMarkdown)",
+    async ({ asMarkdown, expected }) => {
+      const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
 
-    wrapper = await mountNoteToolbar(noteRealm, {
-      propsOverrides: { asMarkdown },
-    })
+      wrapper = await mountNoteToolbar(noteRealm, {
+        propsOverrides: { asMarkdown },
+      })
 
-    dispatchToggleEditModeShortcut()
-    await flushPromises()
+      dispatchToggleEditModeShortcut()
+      await flushPromises()
 
-    expect(wrapper.emitted("edit-as-markdown")).toEqual([[expected]])
-  })
+      expect(wrapper.emitted("edit-as-markdown")).toEqual([[expected]])
+    }
+  )
 
   it("advertises keyboard shortcut hints on edit mode buttons", async () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()

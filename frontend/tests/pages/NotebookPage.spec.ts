@@ -45,16 +45,19 @@ describe("NotebookPage.spec", () => {
       label: "existing",
       indexContent: "# Existing notebook index",
     },
-  ])("shows index editor when notebook has $label indexContent", async ({
-    indexContent,
-  }) => {
-    const notebook = makeMe.aNotebook.please()
-    const { wrapper } = await mountNotebookPageReady(notebook, { indexContent })
+  ])(
+    "shows index editor when notebook has $label indexContent",
+    async ({ indexContent }) => {
+      const notebook = makeMe.aNotebook.please()
+      const { wrapper } = await mountNotebookPageReady(notebook, {
+        indexContent,
+      })
 
-    expect(notebookIndexEditorEl(wrapper).exists()).toBe(true)
-    expect(notebookIndexSaveEl(wrapper).exists()).toBe(true)
-    wrapper.unmount()
-  })
+      expect(notebookIndexEditorEl(wrapper).exists()).toBe(true)
+      expect(notebookIndexSaveEl(wrapper).exists()).toBe(true)
+      wrapper.unmount()
+    }
+  )
 
   it("saves notebook index content directly to container on save", async () => {
     const notebook = makeMe.aNotebook.please()

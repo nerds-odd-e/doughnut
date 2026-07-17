@@ -208,15 +208,15 @@ describe("main menu", () => {
       } as RouteLocationRaw,
       context: "circle show page",
     },
-  ])("applies primary nav styling to $linkLabel on $context", async ({
-    linkLabel,
-    route,
-  }) => {
-    await router.push(route)
-    await flushPromises()
-    await renderComponent()
-    expectNavLinkPrimary(linkLabel)
-  })
+  ])(
+    "applies primary nav styling to $linkLabel on $context",
+    async ({ linkLabel, route }) => {
+      await router.push(route)
+      await flushPromises()
+      await renderComponent()
+      expectNavLinkPrimary(linkLabel)
+    }
+  )
 
   describe("assimilate due count", () => {
     it("shows due count when there are due items", async () => {
@@ -333,40 +333,40 @@ describe("main menu", () => {
     it.each([
       { linkLabel: "Recall", isRecallPaused: false },
       { linkLabel: "Resume", isRecallPaused: true },
-    ])("shows recall count on $linkLabel when there are items to repeat", async ({
-      linkLabel,
-      isRecallPaused,
-    }) => {
-      mockSdkService(
-        UserController,
-        "getMenuData",
-        createMenuData({
-          recallStatus: {
+    ])(
+      "shows recall count on $linkLabel when there are items to repeat",
+      async ({ linkLabel, isRecallPaused }) => {
+        mockSdkService(
+          UserController,
+          "getMenuData",
+          createMenuData({
+            recallStatus: {
+              toRepeat: memoryTrackerLitesStub(789),
+              currentRecallWindowEndAt: "",
+              totalAssimilatedCount: 0,
+            },
+          })
+        )
+
+        vi.mocked(useRecallData).mockReturnValue(
+          createUseRecallDataMock({
+            isRecallPaused,
             toRepeat: memoryTrackerLitesStub(789),
-            currentRecallWindowEndAt: "",
-            totalAssimilatedCount: 0,
-          },
-        })
-      )
+          })
+        )
 
-      vi.mocked(useRecallData).mockReturnValue(
-        createUseRecallDataMock({
-          isRecallPaused,
-          toRepeat: memoryTrackerLitesStub(789),
-        })
-      )
+        mountMainMenu()
+        await flushPromises()
 
-      mountMainMenu()
-      await flushPromises()
-
-      const link = screen.getByLabelText(linkLabel)
-      const recallCount = link
-        .closest(".nav-item")
-        ?.querySelector(".recall-count")
-      expect(recallCount).toBeInTheDocument()
-      expect(recallCount).toHaveTextContent("789")
-      expect(recallCount).toHaveClass("recall-count")
-    })
+        const link = screen.getByLabelText(linkLabel)
+        const recallCount = link
+          .closest(".nav-item")
+          ?.querySelector(".recall-count")
+        expect(recallCount).toBeInTheDocument()
+        expect(recallCount).toHaveTextContent("789")
+        expect(recallCount).toHaveClass("recall-count")
+      }
+    )
 
     it("does not show recall count when there are no items to repeat", async () => {
       const { queryByText } = mountMainMenu()
@@ -575,33 +575,36 @@ describe("main menu", () => {
         toRepeat: memoryTrackerLitesStub(5),
         shouldShow: false,
       },
-    ])("$description", async ({
-      routeName,
-      isRecallPaused,
-      currentIndex,
-      toRepeat,
-      shouldShow,
-    }) => {
-      await router.push({ name: routeName as "notebooks" | "recall" })
-      await flushPromises()
+    ])(
+      "$description",
+      async ({
+        routeName,
+        isRecallPaused,
+        currentIndex,
+        toRepeat,
+        shouldShow,
+      }) => {
+        await router.push({ name: routeName as "notebooks" | "recall" })
+        await flushPromises()
 
-      vi.mocked(useRecallData).mockReturnValue(
-        createUseRecallDataMock({
-          isRecallPaused,
-          currentIndex,
-          toRepeat,
-        })
-      )
+        vi.mocked(useRecallData).mockReturnValue(
+          createUseRecallDataMock({
+            isRecallPaused,
+            currentIndex,
+            toRepeat,
+          })
+        )
 
-      await renderComponent()
+        await renderComponent()
 
-      const resumeRecallLink = screen.queryByLabelText("Resume")
-      if (shouldShow) {
-        expect(resumeRecallLink).toBeInTheDocument()
-      } else {
-        expect(resumeRecallLink).not.toBeInTheDocument()
+        const resumeRecallLink = screen.queryByLabelText("Resume")
+        if (shouldShow) {
+          expect(resumeRecallLink).toBeInTheDocument()
+        } else {
+          expect(resumeRecallLink).not.toBeInTheDocument()
+        }
       }
-    })
+    )
   })
 
   describe("diligent mode", () => {
@@ -630,32 +633,35 @@ describe("main menu", () => {
         diligentMode: true,
         shouldHaveDiligentMode: true,
       },
-    ])("$description", async ({
-      linkLabel,
-      isRecallPaused,
-      diligentMode,
-      shouldHaveDiligentMode,
-    }) => {
-      vi.mocked(useRecallData).mockReturnValue(
-        createUseRecallDataMock({
-          isRecallPaused,
-          toRepeat: memoryTrackerLitesStub(5),
-          diligentMode,
-        })
-      )
+    ])(
+      "$description",
+      async ({
+        linkLabel,
+        isRecallPaused,
+        diligentMode,
+        shouldHaveDiligentMode,
+      }) => {
+        vi.mocked(useRecallData).mockReturnValue(
+          createUseRecallDataMock({
+            isRecallPaused,
+            toRepeat: memoryTrackerLitesStub(5),
+            diligentMode,
+          })
+        )
 
-      await renderComponent()
+        await renderComponent()
 
-      const link = screen.getByLabelText(linkLabel)
-      const navItem = link.closest(".nav-item")
-      const count = navItem?.querySelector(".recall-count")
-      expect(count).toBeInTheDocument()
-      expect(count).toHaveClass("recall-count")
-      if (shouldHaveDiligentMode) {
-        expect(count).toHaveClass("diligent-mode")
-      } else {
-        expect(count).not.toHaveClass("diligent-mode")
+        const link = screen.getByLabelText(linkLabel)
+        const navItem = link.closest(".nav-item")
+        const count = navItem?.querySelector(".recall-count")
+        expect(count).toBeInTheDocument()
+        expect(count).toHaveClass("recall-count")
+        if (shouldHaveDiligentMode) {
+          expect(count).toHaveClass("diligent-mode")
+        } else {
+          expect(count).not.toHaveClass("diligent-mode")
+        }
       }
-    })
+    )
   })
 })

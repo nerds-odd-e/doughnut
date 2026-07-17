@@ -64,21 +64,20 @@ describe("NoteRefinement layout selection", () => {
       response: { content: "Updated content" },
       trigger: clickRemoveRefinementLayout,
     },
-  ])("submits only checked descendants when parent is indeterminate ($action)", async ({
-    method,
-    response,
-    trigger,
-  }) => {
-    const spy = mockSdkService(AiController, method, response)
-    const { layout, wrapper } =
-      await mountNestedLayoutWithIndeterminateParentSelection()
-    await trigger(wrapper)
-    await flushPromises()
+  ])(
+    "submits only checked descendants when parent is indeterminate ($action)",
+    async ({ method, response, trigger }) => {
+      const spy = mockSdkService(AiController, method, response)
+      const { layout, wrapper } =
+        await mountNestedLayoutWithIndeterminateParentSelection()
+      await trigger(wrapper)
+      await flushPromises()
 
-    expect(spy).toHaveBeenCalledWith(
-      refinementLayoutSelectionApiCall(note.id, layout, ["p1-1"])
-    )
-  })
+      expect(spy).toHaveBeenCalledWith(
+        refinementLayoutSelectionApiCall(note.id, layout, ["p1-1"])
+      )
+    }
+  )
 
   it("includes parent id when all descendants are selected again", async () => {
     const extractNotePreviewSpy = mockSdkService(

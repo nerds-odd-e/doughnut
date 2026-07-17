@@ -73,10 +73,12 @@ describe("RichMarkdownEditor property value popup", () => {
     expect(modeTabEl("rich-note-property-value-popup-mode-text")).not.toBeNull()
   })
 
-  it.each(EDIT_ICON_VISIBILITY_CASES)("$case", async ({
-    markdown,
-    expectedCount,
-  }) => {
-    expect(await mountEditorAndCountEditIcons(h, markdown)).toBe(expectedCount)
-  })
+  it.each(EDIT_ICON_VISIBILITY_CASES)(
+    "$case",
+    async ({ markdown, expectedCount }) => {
+      expect(await mountEditorAndCountEditIcons(h, markdown)).toBe(
+        expectedCount
+      )
+    }
+  )
 })

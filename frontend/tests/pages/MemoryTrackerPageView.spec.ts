@@ -57,38 +57,37 @@ describe("MemoryTrackerPageView", () => {
       shouldShow: false,
       expectedText: null,
     },
-  ])("$label focused property indicator visibility", async ({
-    memoryTracker,
-    shouldShow,
-    expectedText,
-  }) => {
-    const wrapper = await mountMemoryTrackerPageViewReady({
-      recallPrompts: [],
-      memoryTracker,
-    })
+  ])(
+    "$label focused property indicator visibility",
+    async ({ memoryTracker, shouldShow, expectedText }) => {
+      const wrapper = await mountMemoryTrackerPageViewReady({
+        recallPrompts: [],
+        memoryTracker,
+      })
 
-    expect(focusedPropertyIndicator(wrapper).exists()).toBe(shouldShow)
-    if (expectedText) {
-      expect(wrapper.text()).toContain(expectedText)
-    } else {
-      expect(wrapper.text()).not.toContain("Focused property:")
+      expect(focusedPropertyIndicator(wrapper).exists()).toBe(shouldShow)
+      if (expectedText) {
+        expect(wrapper.text()).toContain(expectedText)
+      } else {
+        expect(wrapper.text()).not.toContain("Focused property:")
+      }
     }
-  })
+  )
 
   it.each([
     { thinkingTimeMs: 5234, expected: "Thinking time: 5.2s" },
     { thinkingTimeMs: 500, expected: "Thinking time: 500ms" },
     { thinkingTimeMs: 125000, expected: "Thinking time: 2m 5s" },
-  ])("formats thinking time as $expected", async ({
-    thinkingTimeMs,
-    expected,
-  }) => {
-    const wrapper = await mountMemoryTrackerPageViewReady({
-      recallPrompts: [recallPromptWithThinkingTime(thinkingTimeMs)],
-    })
+  ])(
+    "formats thinking time as $expected",
+    async ({ thinkingTimeMs, expected }) => {
+      const wrapper = await mountMemoryTrackerPageViewReady({
+        recallPrompts: [recallPromptWithThinkingTime(thinkingTimeMs)],
+      })
 
-    expect(wrapper.text()).toContain(expected)
-  })
+      expect(wrapper.text()).toContain(expected)
+    }
+  )
 
   it("does not display thinking time for unanswered questions", async () => {
     const recallPrompt = makeMe.aRecallPrompt
@@ -134,14 +133,14 @@ describe("MemoryTrackerPageView", () => {
         recallPrompts: [contestedRecallPrompt()],
         visible: false,
       },
-    ])("delete button visibility when $label", async ({
-      recallPrompts,
-      visible,
-    }) => {
-      const wrapper = await mountMemoryTrackerPageViewReady({ recallPrompts })
+    ])(
+      "delete button visibility when $label",
+      async ({ recallPrompts, visible }) => {
+        const wrapper = await mountMemoryTrackerPageViewReady({ recallPrompts })
 
-      expect(deleteUnansweredButton(wrapper).exists()).toBe(visible)
-    })
+        expect(deleteUnansweredButton(wrapper).exists()).toBe(visible)
+      }
+    )
 
     it("calls delete endpoint and emits refresh when confirmed", async () => {
       const deleteSpy = mockDeleteUnansweredRecallPrompts()
@@ -185,22 +184,22 @@ describe("MemoryTrackerPageView", () => {
         expectedMessage:
           "Are you sure you want to delete 1 unanswered recall prompt?",
       },
-    ])("confirmation message for $label", async ({
-      recallPrompts,
-      expectedMessage,
-    }) => {
-      mockDeleteUnansweredRecallPrompts()
+    ])(
+      "confirmation message for $label",
+      async ({ recallPrompts, expectedMessage }) => {
+        mockDeleteUnansweredRecallPrompts()
 
-      const wrapper = await mountMemoryTrackerPageViewReady({ recallPrompts })
-      await clickDeleteUnanswered(wrapper)
+        const wrapper = await mountMemoryTrackerPageViewReady({ recallPrompts })
+        await clickDeleteUnanswered(wrapper)
 
-      const popups = peekConfirmPopup()
-      expect(popups).toHaveLength(1)
-      expect(popups?.[0]?.type).toBe("confirm")
-      expect(popups?.[0]?.message).toBe(expectedMessage)
+        const popups = peekConfirmPopup()
+        expect(popups).toHaveLength(1)
+        expect(popups?.[0]?.type).toBe("confirm")
+        expect(popups?.[0]?.message).toBe(expectedMessage)
 
-      await resolveConfirmPopup(false)
-    })
+        await resolveConfirmPopup(false)
+      }
+    )
   })
 
   describe("skipped memory tracker", () => {
@@ -324,33 +323,31 @@ describe("MemoryTrackerPageView", () => {
         thinkingTime: "Thinking time: 1.5s",
         hidesUnansweredMessage: false,
       },
-    ])("displays spelling answer information when answered $label", async ({
-      answer,
-      resultText,
-      thinkingTime,
-      hidesUnansweredMessage,
-    }) => {
-      const spellingPrompt = makeMe.aRecallPrompt
-        .withQuestionType("SPELLING")
-        .withAnswer(answer)
-        .withAnswerTime(new Date().toISOString())
-        .please()
+    ])(
+      "displays spelling answer information when answered $label",
+      async ({ answer, resultText, thinkingTime, hidesUnansweredMessage }) => {
+        const spellingPrompt = makeMe.aRecallPrompt
+          .withQuestionType("SPELLING")
+          .withAnswer(answer)
+          .withAnswerTime(new Date().toISOString())
+          .please()
 
-      const wrapper = await mountMemoryTrackerPageViewReady({
-        recallPrompts: [spellingPrompt],
-      })
+        const wrapper = await mountMemoryTrackerPageViewReady({
+          recallPrompts: [spellingPrompt],
+        })
 
-      expect(wrapper.text()).toContain("Your answer:")
-      expect(wrapper.text()).toContain(answer.spellingAnswer)
-      expect(wrapper.text()).toContain("Result:")
-      expect(wrapper.text()).toContain(resultText)
-      expect(wrapper.text()).toContain(thinkingTime)
-      if (hidesUnansweredMessage) {
-        expect(wrapper.text()).not.toContain(
-          "This is a spelling question. Details are not needed."
-        )
+        expect(wrapper.text()).toContain("Your answer:")
+        expect(wrapper.text()).toContain(answer.spellingAnswer)
+        expect(wrapper.text()).toContain("Result:")
+        expect(wrapper.text()).toContain(resultText)
+        expect(wrapper.text()).toContain(thinkingTime)
+        if (hidesUnansweredMessage) {
+          expect(wrapper.text()).not.toContain(
+            "This is a spelling question. Details are not needed."
+          )
+        }
       }
-    })
+    )
 
     it("does not display supplemental question text for spelling questions", async () => {
       const spellingPrompt = makeMe.aRecallPrompt

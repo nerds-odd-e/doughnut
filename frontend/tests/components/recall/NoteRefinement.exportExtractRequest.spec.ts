@@ -25,19 +25,19 @@ describe("NoteRefinement export extract request", () => {
   it.each([
     { itemId: null as string | null, expectedDisabled: true },
     { itemId: "p1", expectedDisabled: false },
-  ])("export button disabled=$expectedDisabled when selection is $itemId", async ({
-    itemId,
-    expectedDisabled,
-  }) => {
-    const wrapper = await mountNoteRefinementReady(["Point 1", "Point 2"])
-    if (itemId) {
-      await selectRefinementLayoutItem(wrapper, itemId)
-    }
+  ])(
+    "export button disabled=$expectedDisabled when selection is $itemId",
+    async ({ itemId, expectedDisabled }) => {
+      const wrapper = await mountNoteRefinementReady(["Point 1", "Point 2"])
+      if (itemId) {
+        await selectRefinementLayoutItem(wrapper, itemId)
+      }
 
-    expect(
-      refinementActionButton(wrapper, "export-extract-request").disabled
-    ).toBe(expectedDisabled)
-  })
+      expect(
+        refinementActionButton(wrapper, "export-extract-request").disabled
+      ).toBe(expectedDisabled)
+    }
+  )
 
   it("opens export dialog with extract request JSON for the selection", async () => {
     const layout = refinementLayoutItems(["Point 1", "Point 2"])
