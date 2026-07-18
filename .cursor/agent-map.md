@@ -1,6 +1,6 @@
 # Agent Map
 
-Use this as the first stop for code navigation. It is intentionally short so agents do not need to read generated API files or long docs for ordinary tasks.
+Short navigation index — start here before generated API files or long docs. Skill contracts: `.cursor/skills/`.
 
 ## Work Areas
 
@@ -65,3 +65,4 @@ Assume `pnpm sut` is already running. If unsure, check `CURSOR_DEV=true nix deve
 
 **Hard phase quality (both modes):** Behavior vs Structure, stop-safe, one observable behavior — `planning.mdc`.
 Do not write new flat `.planning/<name>.md` when `phases/` or `quick/` fits.
+**Per-phase wrap-up:** Jidoka → post-change-refactor → update plan → commit → push (**execute-plan**). Skills emit completion markers (e.g. `## REFACTOR COMPLETE`) for handoff.
