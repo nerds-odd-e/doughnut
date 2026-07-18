@@ -8,15 +8,24 @@ description: >-
   performance.
 ---
 
-# Test Optimization
+<objective>
+Profile a test suite, optimize the slowest top 10% in phased groups, and close
+with a re-profile — faster, deterministic tests, not more tests.
 
-Systematic workflow for faster, deterministic tests — not more tests.
+Purpose: Systematic test-performance workflow for any sub-project (backend,
+frontend, cli, mcp-server, E2E).
 
-Start with `.cursor/agent-map.md` for sub-project test commands.
+Output: Optimized tests with per-phase commits + summary ending with
+`## TEST OPTIMIZATION COMPLETE`.
+</objective>
 
-## Non-negotiable rules
+<context>
+**Mandatory first read:** `.cursor/agent-map.md` (sub-project test commands).
 
-Apply on every optimization pass:
+**Git does not use the Nix prefix.** All other repo tooling does:
+`CURSOR_DEV=true nix develop -c …`
+
+**Non-negotiable rules (every optimization pass):**
 
 1. **Remove or simplify redundant tests first** — merge overlapping scenarios,
    drop duplicate setup, delete tests that only repeat coverage elsewhere.
@@ -26,29 +35,23 @@ Apply on every optimization pass:
 3. **Flaky is failure** — re-run touched tests until stable; fix root cause, do
    not mask with retries.
 
-## When to use
+**Execution model:** After writing the plan, **always** use **execute-plan**
+(`.cursor/skills/execute-plan/SKILL.md`). Coordinator delegates each group to a
+fresh sub-agent; each phase runs post-change-refactor, then commits and pushes.
+Do not accumulate context across phases in one agent.
 
-- Full-suite or sub-project suite is slow; developer wants targeted wins.
-- After a large feature landed and tests grew heavy.
-- Before CI budget work — optimize the slow tail, not random files.
+**Blacklist:** `ongoing/test-optimization-blacklist.md` (legacy path; read explicitly).
+Skip entries under **Skip test optimization** (not **Candidates**). Match by
+file path + test/scenario name (exact preferred).
 
-## Workflow overview
+**Do not commit** raw profile JSON (large, machine-specific). Gitignored paths:
+`e2e_test/reports/`, `.planning/*-profile-results.json`,
+`.planning/quick/*-profile-results.json`, `ongoing/*-profile-results.json`.
+</context>
 
-```
-Profile full suite → drop Skip test optimization (blacklist) → take top 10%
-→ group (by file vs batches of 3; fewer groups wins)
-→ write plan under .planning/phases/ or .planning/quick/ → execute-plan (parallel groups OK when safe)
-→ each group: optimize → verify → post-change-refactor → commit → push
-→ final re-profile → mark plan done
-```
+<process>
 
-**Always** use the **execute-plan** skill after the plan is written. The
-coordinator delegates each group to a **fresh sub-agent**; each phase runs
-**post-change-refactor**, then **commits and pushes**. Do not accumulate
-context across phases in one agent.
-
-## Step 1 — Profile
-
+<step name="profile">
 Run the **full** suite for the target scope once. Capture per-test durations.
 
 | Scope | Profile command | Parse durations from |
@@ -59,94 +62,80 @@ Run the **full** suite for the target scope once. Capture per-test durations.
 | **Backend** | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` then parse | `backend/build/test-results/test/TEST-*.xml` → `testcase@time` |
 | **MCP server** | `CURSOR_DEV=true nix develop -c pnpm -C mcp-server exec vitest run --reporter=json` | Vitest JSON |
 
-**Frontend note:** the `frontend:test` script runs Vitest **browser mode**
-(`--browser=chromium`). The profile command above uses plain `vitest run` for
-per-test `duration` data; verify changes with `frontend:test` so browser-mode
-behavior is exercised.
+**Frontend note:** `frontend:test` runs Vitest **browser mode** (`--browser=chromium`).
+Profile uses plain `vitest run` for `duration` data; verify changes with
+`frontend:test`.
 
-**E2E JSON file output:** Cypress `--reporter-options output=…` may not write a
-file; **tee stdout** and parse `{ "tests": [ { "title", "duration" } ] }` blocks
-between spec runs.
+**E2E JSON:** Cypress `--reporter-options output=…` may not write a file; **tee
+stdout** and parse `{ "tests": [ { "title", "duration" } ] }` blocks between
+spec runs.
 
-**Do not commit** raw profile JSON (large, machine-specific). Store locally
-(e.g. `.planning/quick/<scope>-profile-results.json` with a “do not commit” note, or
-`e2e_test/reports/`). Record baseline wall time and test count in the plan.
+Store baseline locally (e.g. `.planning/quick/<scope>-profile-results.json` with
+"do not commit" note). Record baseline wall time and test count in the plan.
+</step>
 
-## Step 2 — Blacklist filter
-
-Legacy `ongoing/` is excluded from default indexing — **read the blacklist explicitly**.
-The active blacklist still lives at `ongoing/test-optimization-blacklist.md` (not migrated).
-
+<step name="blacklist_filter">
 1. Read `ongoing/test-optimization-blacklist.md`.
-2. Skip every test listed under **Skip test optimization** (not **Candidates**).
-3. Match by **file path + test/scenario name** (exact match preferred).
+2. Skip every test under **Skip test optimization**.
+3. Eligible tests = profiled minus Skip entries.
+</step>
 
-Eligible tests = all profiled tests minus Skip test optimization entries.
-
-## Step 3 — Select top 10%
-
+<step name="select_top_10_percent">
 ```text
 n_slow = max(1, ceil(eligible_tests * 0.10))
 ```
 
-Sort eligible tests by `duration` descending; take the first `n_slow`.
+Sort eligible by `duration` descending; take first `n_slow`. Record in plan:
+rank, seconds/ms, file/spec, test/scenario name.
+</step>
 
-Record in the plan: rank, seconds/ms, file/spec, test/scenario name.
-
-## Step 4 — Grouping (fewer groups wins)
-
-Compute group counts for these two strategies only:
+<step name="grouping">
+Compute group counts for two strategies only:
 
 | Strategy | How |
 |----------|-----|
-| **By file** | One group per file that contains ≥1 slow test |
-| **Batches of 3** | Consecutive slow tests in rank order, 3 per group (last group may be smaller) |
+| **By file** | One group per file containing ≥1 slow test |
+| **Batches of 3** | Consecutive slow tests in rank order, 3 per group (last may be smaller) |
 
-**Choose the strategy with the fewer groups.** Tie-break: prefer **by file**
-(less context switching).
+**Choose the strategy with fewer groups.** Tie-break: prefer **by file**.
+</step>
 
-## Step 5 — Plan file
-
-Copy [plan-template.md](plan-template.md) to `.planning/quick/NNN-<scope>-test-optimization/PLAN.md` (or a `phases/NN-slug/` PLAN)
-and fill in the baseline, blacklist note, top-10% table, grouping choice, one
-phase per group, and a final re-profile phase.
+<step name="write_plan">
+Copy [plan-template.md](plan-template.md) to
+`.planning/quick/NNN-<scope>-test-optimization/PLAN.md` (or `phases/NN-slug/` PLAN).
+Fill baseline, blacklist note, top-10% table, grouping choice, one phase per
+group, and a final re-profile phase.
 
 Read sub-project rules when editing tests: `e2e-authoring.mdc`, `frontend-testing.mdc`,
 `backend-testing.mdc`, `cli.mdc`, etc.
+</step>
 
-## Step 6 — Execute via execute-plan
-
-Hand the plan to the **execute-plan** skill
-(`.cursor/skills/execute-plan/SKILL.md`). Do not optimize groups in the
-coordinator agent.
+<step name="execute_via_execute_plan">
+Hand plan to **execute-plan**. Do not optimize groups in the coordinator agent.
 
 Each group phase (sub-agent):
 
-1. Optimize only the tests in that group (tactics below).
-2. Verify with focused commands.
-3. Run **post-change-refactor** (no commit from the refactor sub-agent).
-4. Lint/format as required by execute-plan wrap-up.
-5. Mark the phase **done** in the plan.
+1. Optimize only tests in that group (see `optimize_tactics`).
+2. Verify with focused commands (see `verify`).
+3. Run **post-change-refactor** (no commit from refactor sub-agent).
+4. Lint/format per execute-plan wrap-up.
+5. Mark phase **done** in plan.
 6. **Commit** (`perf(<scope>): …`) and **push**.
 
-### Hard-to-improve → blacklist candidates
-
-If a group cannot be meaningfully sped up (serious attempt, no win, or would
-need a product/design trade-off):
+**Hard-to-improve → blacklist candidates:** If no meaningful speedup after serious
+attempt, or would need product/design trade-off:
 
 1. Do **not** force a weak change.
-2. Append an entry under **Candidates** in
-   `ongoing/test-optimization-blacklist.md`: file path, test/scenario name,
-   measured duration, why hard, date (`YYYY-MM-DD`).
-3. Mark the phase done (or Jidoka-stop if a value decision is required) and
-   continue.
+2. Append under **Candidates** in `ongoing/test-optimization-blacklist.md`: file,
+   test/scenario, duration, why hard, date (`YYYY-MM-DD`).
+3. Mark phase done (or Jidoka-stop if value decision required).
 
 **Moving** a candidate to **Skip test optimization** is a developer decision
 (Jidoka) — propose only; do not move entries yourself.
+</step>
 
-## Step 7 — Optimize (tactics by layer)
-
-Work **only** the tests in the current group. Prefer the first applicable tactic.
+<step name="optimize_tactics">
+Work **only** tests in the current group. Prefer first applicable tactic.
 
 ### All layers
 
@@ -156,29 +145,29 @@ Work **only** the tests in the current group. Prefer the first applicable tactic
 
 ### Unit / component (Vitest, JUnit)
 
-- **Frontend:** avoid `getByRole` / `findByRole` (slow visibility); use
-  `data-testid`, `getByText`, `querySelector`. Replace `vi.waitUntil` / long
-  `vi.waitFor` with `flushPromises`, `nextTick`, fake timers for debounce.
+- **Frontend:** avoid `getByRole` / `findByRole`; use `data-testid`, `getByText`,
+  `querySelector`. Replace `vi.waitUntil` / long `vi.waitFor` with `flushPromises`,
+  `nextTick`, fake timers.
 - **CLI:** share Ink helpers (`inkTestHelpers`, `recallInteractiveShared`-style);
-  observable frame waits, not `frames.join` polls; `test.each` for escape/confirm variants.
+  observable frame waits, not `frames.join` polls; `test.each` for variants.
 - **Backend:** slimmer `makeMe` / fixtures; lighter multipart/OpenAPI setup;
   merge redundant `@Test` methods; avoid full-stack when controller slice suffices.
 
 ### E2E (Cypress + Cucumber)
 
-- **Testability inject** instead of UI flows already covered elsewhere.
-- **API setup** for recall/assimilation loops (wrong answers via API, one UI pass).
-- **Direct routes** (`cy.visit` / `I route to the note`) vs catalog navigation.
+- **Testability inject** instead of UI flows covered elsewhere.
+- **API setup** for recall/assimilation loops.
+- **Direct routes** vs catalog navigation.
 - **Intercept waits** (`GET **/api/...`) vs `cy.reload()` or extra relogin.
 - **Drop redundant steps** (extra reloads, duplicate rich-content checks, OCR when unnecessary).
 - **Cache expensive prep** (e.g. skip MCP rebundle if artifact exists).
 - **`invoke('val')` + `input`** instead of `cy.type()` on long markdown.
 
 Never add `@focus` / `@only` in committed code.
+</step>
 
-## Step 8 — Verify
-
-Run **focused** tests for the current group first, then widen if shared helpers changed.
+<step name="verify">
+Run **focused** tests for the current group first; widen if shared helpers changed.
 
 ```bash
 # E2E (example)
@@ -194,74 +183,81 @@ CURSOR_DEV=true nix develop -c pnpm cli:test
 CURSOR_DEV=true nix develop -c backend/gradlew -p backend test -Dspring.profiles.active=test --tests "com.odde.doughnut....ClassName"
 ```
 
-For E2E groups, **3+ consecutive green runs** on touched specs before closing a phase.
+E2E groups: **3+ consecutive green runs** on touched specs before closing a phase.
 
 **Pre-commit scope:** ensure unrelated WIP is not staged (hooks may `git add -u`).
+</step>
 
-## Step 9 — Re-profile and close plan
-
+<step name="reprofile_and_close">
 After all group phases (via execute-plan):
 
-- Re-run the same profile command as baseline.
-- Record: test count, suite wall, top-10 table, top-10% **total CPU** (Vitest) or sum of slow scenarios (E2E).
-- Note any new **Candidates** proposed during the run.
+- Re-run same profile command as baseline.
+- Record: test count, suite wall, top-10 table, top-10% **total CPU** (Vitest) or
+  sum of slow scenarios (E2E).
+- Note any new **Candidates** proposed.
 - If full E2E re-profile is red (e.g. `Bad Gateway` on `cleanDB`), document that;
-  use per-spec timings + CI for authoritative “after” — do not fake a green wall time.
+  use per-spec timings + CI for authoritative "after" — do not fake a green wall time.
 
-Set plan **Status: done**, then **clean up spent plan history** (see below). Keep the
-blacklist file; do not delete it when archiving the plan.
+Set plan **Status: done**; **clean up spent plan history** (see `planning_cleanup`).
+Keep the blacklist file.
+</step>
 
-## Planning folder cleanup
+<step name="planning_cleanup">
+When optimization pass is **done**:
 
-When an optimization pass is **done**:
+1. **Do not keep two plans for the same scope** — merge or delete duplicates.
+2. Optionally keep one-line note in STATE/ROADMAP; otherwise delete spent `quick/`
+   PLAN and SUMMARY noise. See `ongoing/archive/test-optimization-history.md` for
+   archive format.
+3. **Never commit** profile JSON.
+4. Leave **`ongoing/test-optimization-blacklist.md`** and active GSD milestone
+   artifacts untouched.
 
-1. **Do not keep two plans for the same scope** — merge outcomes into one archive entry or delete.
-2. Optionally keep a one-line note in STATE/ROADMAP if useful; otherwise delete the `quick/` or phase working PLAN and spent SUMMARY noise. See existing `ongoing/archive/test-optimization-history.md` for a short archive format if a summary is still useful.
-3. **Never commit** profile JSON; paths are gitignored (`e2e_test/reports/`, `.planning/*-profile-results.json`, `.planning/quick/*-profile-results.json`, `ongoing/*-profile-results.json`).
-4. Leave **`ongoing/test-optimization-blacklist.md`** (legacy) and active GSD milestone artifacts untouched.
+If user asks only to clean up: remove completed test-opt plans; do not delete
+blacklist or unrelated GSD dirs in progress.
+</step>
 
-If the user asks only to clean up after optimization: remove completed test-opt plans; do not delete the blacklist or unrelated GSD roadmap/phase dirs still in progress.
+<step name="parse_e2e_profile">
+JSON reporter prints one `{ "stats": …, "tests": [ { "title", "duration" } ] }`
+block per spec to stdout. After `tee /tmp/e2e-profile.log`, parse in Node:
 
-## Jidoka — stop and report
+- Track current spec from `Running:  <name>.feature` lines.
+- For each lone `{`, accumulate until braces balance and buffer contains `"stats"`,
+  then `JSON.parse`.
+- Collect `tests[].title` + `tests[].duration`, tag with current spec, drop Skip
+  entries, sort descending, slice top 10%.
 
-- Product/design fork (which scenario to drop; whether to move a Candidate to
-  Skip test optimization).
-- Credentials or external services you cannot control.
-- Failures unrelated to your changes (SUT down, DB dirty).
-- Ambiguous grouping when slow tests are tightly coupled across files.
+Write reusable `scripts/` helper only if team will run repeatedly; otherwise
+one-off inline Node script is enough.
+</step>
 
-Report what you measured, what blocked you, and what decision is needed.
+</process>
 
-## Experience summary (what worked)
+<success_criteria>
+- Full-suite profile captured; top 10% selected after blacklist filter
+- Plan written and executed via execute-plan (commit + push per group)
+- Non-negotiable rules applied (no redundant tests left, no fixed waits, no flaky)
+- Re-profile recorded; plan marked done; spent history cleaned
+- Final output includes `## TEST OPTIMIZATION COMPLETE`
+</success_criteria>
 
-| Area | Typical win |
-|------|-------------|
-| Frontend unit | −25% top-10% CPU; −5s wall on ~1370 tests — kill `getByRole`/polls, shared mount helpers |
-| CLI unit | Shared recall mocks/waits; merge redundant interactive cases; ~280→278 tests |
-| Backend unit | Slim fixtures; parameterized tests; merge duplicate advice/controller cases |
-| E2E | Often **40–60%** per scenario — inject/API paths, drop reloads, remove duplicate scenarios |
+<output>
+Report:
 
-**Common mistakes:** trusting a polluted full-suite re-profile; committing profile JSON;
-one giant commit spanning unrelated files; optimizing UI when testability/API is enough;
-keeping fixed waits “because it’s stable”.
+1. Scope and baseline vs after metrics.
+2. Groups optimized and commits made.
+3. Candidates proposed (if any).
+4. Planning cleanup performed.
 
-## Parsing the E2E profile log
+```
+## TEST OPTIMIZATION COMPLETE
+```
+</output>
 
-The JSON reporter prints one `{ "stats": …, "tests": [ { "title", "duration" } ] }`
-block per spec to stdout (interleaved with the run table). After
-`tee /tmp/e2e-profile.log`, parse it in Node:
-
-- Track the current spec from `Running:  <name>.feature` lines.
-- For each line that is a lone `{`, accumulate until braces balance and the
-  buffer contains `"stats"`, then `JSON.parse` it.
-- Collect `tests[].title` + `tests[].duration`, tag with the current spec,
-  drop Skip test optimization entries, then sort descending and slice the top 10%.
-
-Write a reusable `scripts/` helper only if the team will run this repeatedly;
-otherwise a one-off inline Node script is enough.
-
-## Related skills
-
-- **execute-plan** — required coordinator; sub-agents + commit/push per phase.
-- **post-change-refactor** — cleanup before each commit.
-- **phased-planning** — split an oversized phase.
+<out_of_scope>
+- Do not optimize in the coordinator agent after plan is written.
+- Do not commit profile JSON.
+- Do not move blacklist entries to Skip without developer (Jidoka).
+- Do not add `@focus` / `@only` in committed code.
+- Do not run full E2E suite for per-phase verify unless shared helpers require it.
+</out_of_scope>

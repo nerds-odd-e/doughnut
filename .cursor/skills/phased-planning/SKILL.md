@@ -8,127 +8,187 @@ description: >-
   Triggers on: plan, decompose, phases, break down, task too large, stuck.
 ---
 
-# Phased Planning — Task Decomposition
+<objective>
+Decompose a task into GSD-aligned phased plans obeying **Behavior/Structure**
+grammar: stop-safe, one observable behavior per phase.
 
-## When to use
+Purpose: Planning entry point for new features, oversized phases, and the
+10-minute timer hook.
 
-- Developer asks to plan or decompose a task.
-- A phase or sub-phase is too large to implement in one pass.
-- The planning-timer hook fires (you have been working 10+ minutes).
-- GSD `/gsd-plan-phase` / discuss produced a plan that violates Behavior/Structure — **rewrite or split** until it complies.
+Output: Written plan under `.planning/` + summary ending with
+`## PHASED PLAN WRITTEN`.
+</objective>
 
-## Hard grammar (non-negotiable)
+<context>
+**Hard grammar (non-negotiable):** Every phase is **Behavior** or **Structure**,
+**stop-safe**, and carries **one** observable behavior (or one structure change
+for the **immediate next** behavior only). Full rules: `.cursor/rules/planning.mdc`.
 
-Every phase is **Behavior** or **Structure**, **stop-safe**, and carries **one** observable behavior (or one structure change for the **immediate next** behavior only). Full rules: `.cursor/rules/planning.mdc`.
-
-## If triggered by the 10-minute timeout
-
-1. **Stop** implementing immediately.
-2. **Review your conversation history**: what files did you search, what confused you, what approaches did you try, what failed?
-3. **Summarize** what you have learned (discoveries, blockers, partial progress).
-4. **Stash** your changes: `git stash -m "WIP: <brief description>"` — **unless** mid **GSD** execute with task commits that must reach SUMMARY; then stop and report without stash.
-5. **Decompose** the remaining work into phases (see below).
-6. **Write** the plan under `.planning/quick/NNN-slug/` (next free `NNN`) as `PLAN.md` (and update `.planning/STATE.md` if it exists). Prefer promoting into `.planning/phases/NN-slug/` when this work belongs on the roadmap.
-7. **Report** to the developer and wait for their decision.
-
-## Where to put plans (GSD-aligned)
+**Where to put plans (GSD-aligned):**
 
 | Location | Use |
 |----------|-----|
-| `.planning/phases/NN-slug/` | Roadmap / milestone phases — GSD `*-CONTEXT.md`, `*-PLAN.md`, `*-SUMMARY.md`, … |
+| `.planning/phases/NN-slug/` | Roadmap / milestone — GSD `*-CONTEXT.md`, `*-PLAN.md`, `*-SUMMARY.md`, … |
 | `.planning/quick/NNN-slug/` | Timer interrupts and ad-hoc slices not yet on the roadmap |
 | `ongoing/` | Legacy only — do not add new plans |
 
-Inside a phase or quick dir, primary executable file is `*-PLAN.md` or `PLAN.md`. Sub-decomposition: additional `*-PLAN.md` files in the same directory (GSD multi-plan) or clearly marked sub-phase sections — each still Behavior/Structure.
+Primary executable file: `*-PLAN.md` or `PLAN.md`. Sub-decomposition: additional
+`*-PLAN.md` in the same directory or clearly marked sub-phase sections — each
+still Behavior/Structure.
 
-**History:** keep resume-useful status and brief learnings while in progress; when the whole plan is done and shipped as code/permanent docs, **clean up** spent planning history (`.cursor/rules/planning.mdc`).
+**History:** keep resume-useful status and brief learnings while in progress; when
+the whole plan is done and shipped as code/permanent docs, **clean up** spent
+planning history (`.cursor/rules/planning.mdc`).
 
----
+**Git does not use the Nix prefix.** Stash uses plain `git stash`.
+</context>
 
-## How to decompose into phases (scenario-first)
+<process>
 
-**Default:** Split by **user scenarios and outcomes**, not by layers (DB → API → UI) or by "build the abstraction first."
+<step name="ten_minute_timer">
+If triggered by the 10-minute timeout:
+
+1. **Stop** implementing immediately.
+2. **Review conversation history**: files searched, confusion, approaches tried, failures.
+3. **Summarize** what you learned (discoveries, blockers, partial progress).
+4. **Stash** changes: `git stash -m "WIP: <brief description>"` — **unless** mid
+   **GSD** execute with task commits that must reach SUMMARY; then stop and report
+   without stash.
+5. **Decompose** remaining work (see `decompose` step).
+6. **Write** plan under `.planning/quick/NNN-slug/` as `PLAN.md` (next free `NNN`;
+   update `.planning/STATE.md` if it exists). Promote to `.planning/phases/NN-slug/`
+   when work belongs on the roadmap.
+7. **Report** to the developer and wait for their decision.
+</step>
+
+<step name="decompose">
+**Default:** Split by **user scenarios and outcomes**, not by layers (DB → API → UI)
+or "build the abstraction first."
 
 **Order scenarios** from **common / general** toward **more specific** preconditions.
 
-**Solutions:** First phases implement a **narrow, concrete** slice. Later phases **generalize or reuse** only after you see real repetition — not a big generic framework up front.
+**Solutions:** First phases implement a **narrow, concrete** slice. Later phases
+**generalize or reuse** only after real repetition — not a big generic framework up front.
 
-**Regression:** If behavior **already exists** but has **no automated test**, prefer a **dedicated phase**: add a regression test and make it pass.
+**Regression:** If behavior **already exists** but has **no automated test**, prefer
+a **dedicated phase**: add a regression test and make it pass.
 
-**Extending tests:** If similar behavior **already has** tests, extend them for the new behavior; avoid duplicate test code. Either fold "test fails → pass" into the same phase as the feature, **or** use a short phase where the **new** test fails first. **While driving that change, keep at most one intentionally failing test** (the one you are implementing toward).
+**Extending tests:** If similar behavior **already has** tests, extend them; avoid
+duplicate test code. Fold "test fails → pass" into the feature phase, **or** use a
+short phase where the **new** test fails first. **Keep at most one intentionally
+failing test** while driving a change.
 
-**Big refactor:** If making the test pass needs a **large structural** change, plan **that structure as its own phase** before (or as the first slice of) the feature.
+**Big refactor:** If making the test pass needs a **large structural** change, plan
+**that structure as its own phase** before (or as the first slice of) the feature.
 
-**E2E-shaped phases:** Prefer phases that each map to an **end-to-end** scenario; different phases may use **different preconditions** (setup, role, data). Each phase adds or extends tests in **capability-named** feature files (e.g. `note_creation.feature`, `spaced_repetition.feature`). A phase may add scenarios to an existing file or create a new file named after the capability it introduces — **never** name files or scenarios after the phase itself.
+**E2E-shaped phases:** Each phase maps to an **end-to-end** scenario; different
+phases may use **different preconditions**. Add or extend tests in **capability-named**
+feature files (e.g. `note_creation.feature`) — **never** name files or scenarios after
+the phase.
 
-**Still too big:** If one precondition + one E2E story is still large, split by **one small part of the outcome** per phase (one aspect of the postcondition).
+**Still too big:** Split by **one small part of the outcome** per phase.
 
 ### Testing strategy
 
 | Layer | Role |
 |--------|------|
-| **E2E** | Each phase: tests that cover the **main user behavior** for that phase. |
-| **Unit tests** | Formatting, errors, invalid input, edge paths. Prefer **black-box** tests (inputs/outputs), minimal tests, full coverage of those concerns. |
+| **E2E** | Each phase: tests covering the **main user behavior** for that phase. |
+| **Unit tests** | Formatting, errors, invalid input, edge paths. Black-box, minimal, full coverage of those concerns. |
 
-### Tests are owned by capability, phases only schedule work
+**Tests are owned by capability; phases only schedule work.**
 
-Phases decide **when** you add or extend tests, but tests are grouped and named by **what behavior they cover** — the domain capability, not the phase that introduced them.
+**Observable behavior first:**
 
-### Observable behavior first (avoid structure-mapped tests)
+- Prefer tests driving **high-level entry points** (controllers, mounted components,
+  CLI `run` / `runInteractive`) — not internal helpers unless that API **is** the
+  deliberate isolated contract.
+- Avoid tests mirroring code structure (internal-only parameters, bespoke mocks).
+- **Minimum tests for same coverage** — fewer integration-style tests over many
+  scattered unit tests pinning private functions.
+- **Cohesion** — assertions for one user-visible behavior live together when practical.
+- **Small unit tests** — pure functions, validation, error messages: inputs → outputs.
 
-**Preference:** Tests should stand on **what a user or integrator can observe** (HTTP response, DOM, terminal output, exit code, public error text), not on how the code is factored inside.
+- **Test-driven:** tests first or alongside implementation.
+- **Phase-complete:** everything in a phase justified and tested inside that phase.
+- **No dead code:** production code used by current E2E **or** unit tests for
+  non–happy-path behavior. Normal user paths need E2E, not unit tests alone.
 
-- **Prefer tests that drive a high-level entry point** — e.g. Spring **controllers**, **mounted** pages/components, CLI **`run` / `runInteractive`** (or subprocess). The test may **never import or call the code under change directly** and still exercise it **through the real call chain**. Use **direct** tests on internal helpers only when that API **is** the deliberate isolated contract (pure formatting, algorithm I/O).
-- **Avoid tests that mirror code structure** — e.g. calling a low-level function with **internal-only parameters** (feature flags passed only from tests, bespoke `OutputAdapter` mocks) to assert behavior that really belongs to a full path. Those tests **break on harmless refactors** and **miss wiring bugs** (wrong argument at the real call site).
-- **Minimum tests for the same coverage; no 1:1 test ↔ implementation map** — When behavior spans layers, prefer **fewer integration-style tests** (one per **observable surface** if surfaces differ — e.g. CLI TTY vs piped stdin) over **many** tests scattered across files that each pin a private function. **Do not** add a test file (or case) just because a new module exists if an existing entry-point test already proves the behavior.
-- **Cohesion for one behavior** — Assertions for a single user-visible behavior should live **together** (one file or one focused `describe`) when practical, instead of duplicating partial checks in three places.
-- **Where small unit tests still shine** — Pure functions, validation, error messages, edge inputs: **inputs → outputs** with no need to know caller shape.
-
-- **Test-driven:** Prefer tests **first** or **alongside** implementation.
-- **Phase-complete:** Everything in a phase is **justified and tested inside that phase**. No separate "final integration phase" or deferred test pass for that slice.
-- **No dead code:** Production code must be **used** by current E2E tests **or** by unit tests that cover **non–happy-path** behavior. For **normal user paths**, unit tests alone are **not** enough to justify keeping the code — pair with E2E for that phase.
-
-**Scope of E2E:** "E2E for this phase" means Cypress (or equivalent) coverage for the **behavior and feature files touched in that phase** — run the relevant `--spec`(s), not the **entire** suite. See `e2e-authoring.mdc` for running a single feature.
+**E2E scope:** "E2E for this phase" = relevant `--spec`(s), not the entire suite.
+See `e2e-authoring.mdc`.
 
 ### E2E-led decomposition (sub-phases)
 
-**When to use:** A planned **phase** still spans several user-visible beats (e.g. multi-step Gherkin). Prefer **sub-phases** that alternate **E2E red** and **minimal implementation green**, instead of front-loading backend or UI layers.
+When a phase spans several user-visible beats:
 
-**Pattern (repeat until the scenario passes and `@wip` is removed):**
-
-1. **Red sub-phase** — Write the **full** E2E scenario in the feature file and tag it `@wip`. Run E2E locally with **`cypress run --spec`** pointing at **that** feature file (not the whole suite); confirm the failure is for the **right reason** (behavior not implemented, not typos).
-2. **Green sub-phase** — Implement the **smallest** production change that makes progress toward passing the scenario. **No dead code**; keep the change clean.
-3. **Next** — Run the same **`--spec`** again. If the scenario still fails, go back to **2**. When all steps pass, remove the `@wip` tag.
+1. **Red sub-phase** — Write full E2E scenario; tag `@wip`. Run `cypress run --spec`
+   for that feature; confirm failure is for the **right reason**.
+2. **Green sub-phase** — Smallest production change toward passing. No dead code.
+3. Repeat until scenario passes; remove `@wip`.
 
 ### Test-driven workflow
 
-When adding or changing behavior:
+1. Add or change E2E or unit test; run and confirm it **fails**.
+2. Confirm failure for the **right reason** (not typo or env issue).
+3. Improve assertion/message if unclear.
+4. Smallest change that makes the test pass.
+5. Refactor with tests green.
+6. Remove `@wip` from passing E2E scenarios.
 
-1. Add or change the **E2E or unit** test; **run it** and confirm it **fails**.
-2. Confirm it fails for the **right reason** (not a typo or env issue).
-3. If the failure is unclear, **improve the assertion or message** so the next reader learns what was wrong.
-4. Implement the **smallest** change that makes the test pass.
-5. **Refactor** with tests green, then continue.
-6. Remove the `@wip` tag from any E2E scenario that now passes.
+### Phase discipline
 
-### Phase discipline checklist
-
-Before closing a phase and starting the next: follow `.cursor/rules/planning.mdc` (clean up, tests, `@wip`, Jidoka, plan update, deploy gate, parallelism).
+Before closing a phase: `.cursor/rules/planning.mdc` (clean up, tests, `@wip`,
+Jidoka, plan update, deploy gate, parallelism).
 
 ### Interim behavior
 
-- **Allowed** when it gets the feature to users faster **or** gives the team **earlier end-to-end feedback**.
-- **Remove** interim behavior when a **later phase** replaces it with the intended design.
+- **Allowed** when it gets the feature to users faster or gives earlier E2E feedback.
+- **Remove** when a later phase replaces it with the intended design.
+</step>
 
----
-
-## Plan document
-
-Document **important structure and intent** in the plan. **Update** when you learn something that changes how remaining phases should run. Remove text that no longer helps the **current** snapshot.
+<step name="write_plan_document">
+Document **important structure and intent**. **Update** when learnings change
+remaining work. Remove text that no longer helps the current snapshot.
 
 Include:
+
 - Phases with status (done / in-progress / planned) and type (Behavior | Structure)
-- Key design decisions and their rationale
+- Key design decisions and rationale
 - Discoveries that affect remaining work
 
-**Naming rule for delegated work:** When a plan references feature files, test files, classes, or directories to create or modify, names must reflect the **domain capability** (e.g. `video_playback.feature`, `SegmentExportController`), not the phase or delivery order. Phase numbers belong only under `.planning/`, never in permanent artifact names.
+**Naming rule:** Feature files, test files, classes, directories reflect **domain
+capability** (e.g. `video_playback.feature`, `SegmentExportController`), not phase
+number. Phase numbers belong only under `.planning/`.
+
+If GSD `/gsd-plan-phase` / discuss produced a plan violating Behavior/Structure —
+**rewrite or split** until it complies.
+</step>
+
+</process>
+
+<success_criteria>
+- Every phase is Behavior or Structure, stop-safe, one observable behavior
+- Plan written to `.planning/quick/` or `.planning/phases/` (not `ongoing/`)
+- Scenario-first ordering; capability-named permanent artifacts
+- STATE.md updated when it exists
+- Final output includes `## PHASED PLAN WRITTEN`
+</success_criteria>
+
+<output>
+Report to the developer:
+
+1. Plan location and phase summary.
+2. Key design decisions.
+3. Discoveries affecting remaining work.
+
+```
+## PHASED PLAN WRITTEN
+```
+
+Then wait for their decision (especially after 10-minute timer trigger).
+</output>
+
+<out_of_scope>
+- Do not implement feature code during planning (except tiny fixes from retrospective).
+- Do not add new plans under `ongoing/`.
+- Do not encode phase numbers in product file/test names.
+</out_of_scope>

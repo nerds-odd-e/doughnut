@@ -63,8 +63,10 @@ Keep under ~500 lines; prefer tightening prose over progressive-disclosure files
 
 ## Phase 2: Convert orchestration / timer skills
 **Type:** Structure  
-**Status:** planned  
+**Status:** done  
 **Unlocks:** Phase 3 (entry docs can point at consistent skill contracts)
+
+**Learning:** Orchestration skills map cleanly to `<process>` steps (coordinator loop, timer hooks, profile→plan→execute); Jidoka and wrap-up checklists belong in `<preflight_gate>` / named steps, not loose headings.
 
 **Files:**
 - `.cursor/skills/execute-plan/SKILL.md`
