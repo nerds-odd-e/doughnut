@@ -22,7 +22,6 @@
     "test": "CI=true vitest run --browser=chromium"
   },
   "dependencies": {
-    "@lucide/vue": "^1.24.0",
     "epubjs": "^0.3.93",
     "file-saver": "^2.0.5",
     "mini-debounce": "^1.0.8",
@@ -36,6 +35,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.4",
+    "@lucide/vue": "^1.25.0",
     "@storybook/addon-docs": "10.5.2",
     "@storybook/vue3": "10.5.2",
     "@storybook/vue3-vite": "10.5.2",
