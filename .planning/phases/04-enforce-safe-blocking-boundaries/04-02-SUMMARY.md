@@ -100,7 +100,7 @@ status: complete
 1. **Task 1: Persist COHE-02 classification inventory in frontend-api.mdc** - `6a1129613b` (docs)
 2. **Task 2: Re-verify layout and preview cancelable adopters stay green** - no commit (verification-only; inventory already aligned, suites green)
 
-**Plan metadata:** (see final docs commit)
+**Plan metadata:** `5c4ecdc1a1` (docs: complete plan)
 
 ## Files Created/Modified
 
