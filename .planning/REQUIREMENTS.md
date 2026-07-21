@@ -9,15 +9,15 @@ Requirements for the initial progressive-cancellation release. Each maps to exac
 
 ### Cancellation Contract
 
-- [ ] **CANC-01**: User sees a Cancel control in the global blocking spinner only when the active operation explicitly opts into cancellation
-- [ ] **CANC-02**: User can activate Cancel to abort that operation's browser request and promptly remove its blocking state
-- [ ] **CANC-03**: User cancellation completes as a normal outcome without an error toast, success handling, or navigation from the cancelled operation
+- [x] **CANC-01**: User sees a Cancel control in the global blocking spinner only when the active operation explicitly opts into cancellation
+- [x] **CANC-02**: User can activate Cancel to abort that operation's browser request and promptly remove its blocking state
+- [x] **CANC-03**: User cancellation completes as a normal outcome without an error toast, success handling, or navigation from the cancelled operation
 - [ ] **CANC-04**: Cancelling one blocking operation does not clear or abort other concurrent loading operations
 
 ### Note Refinement
 
-- [ ] **REFN-01**: User sees the global blocking spinner with Cancel while AI generates the initial note-refinement layout
-- [ ] **REFN-02**: User who cancels initial layout generation remains in the refinement dialog with unchanged note content and an available retry action
+- [x] **REFN-01**: User sees the global blocking spinner with Cancel while AI generates the initial note-refinement layout
+- [x] **REFN-02**: User who cancels initial layout generation remains in the refinement dialog with unchanged note content and an available retry action
 - [ ] **REFN-03**: User sees the same global blocking spinner with Cancel while AI generates an extraction preview
 - [ ] **REFN-04**: User who cancels extraction-preview generation keeps the current layout selections, remains before the preview, and can retry
 - [ ] **REFN-05**: User sees the shared blocking spinner without Cancel while final extracted-note creation is pending
@@ -57,12 +57,12 @@ Which phases cover which requirements. Populated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CANC-01 | Phase 2 | Pending |
-| CANC-02 | Phase 2 | Pending |
-| CANC-03 | Phase 2 | Pending |
+| CANC-01 | Phase 2 | Complete |
+| CANC-02 | Phase 2 | Complete |
+| CANC-03 | Phase 2 | Complete |
 | CANC-04 | Phase 2 | Pending |
-| REFN-01 | Phase 2 | Pending |
-| REFN-02 | Phase 2 | Pending |
+| REFN-01 | Phase 2 | Complete |
+| REFN-02 | Phase 2 | Complete |
 | REFN-03 | Phase 3 | Pending |
 | REFN-04 | Phase 3 | Pending |
 | REFN-05 | Phase 4 | Pending |

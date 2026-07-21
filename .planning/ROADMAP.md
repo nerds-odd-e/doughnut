@@ -55,7 +55,7 @@ The project selected fine granularity. Four phases are sufficient because the re
   3. Cancellation produces no error toast, success handling, navigation, or note-content change
   4. The refinement dialog remains open with a retry action that can start a fresh request
 
-**Plans**: 1/3 plans executed
+**Plans**: 2/3 plans executed
 
 Plans:
 **Wave 1**
@@ -64,7 +64,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 02-02-PLAN.md — Cancelable layout load + empty/retry panel (vertical GREEN slice)
+- [x] 02-02-PLAN.md — Cancelable layout load + empty/retry panel (vertical GREEN slice)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -116,6 +116,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Shared Cancellation Contract | 3/3 | Complete    | 2026-07-21 |
-| 2. Cancel Refinement Layout Generation | 1/3 | In Progress|  |
+| 2. Cancel Refinement Layout Generation | 2/3 | In Progress|  |
 | 3. Cancel Extraction Preview Generation | 0/TBD | Not started | - |
 | 4. Enforce Safe Blocking Boundaries | 0/TBD | Not started | - |
