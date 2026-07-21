@@ -104,7 +104,7 @@ Keep local loading state (inline spinner, disabled control, row-level pending) w
 
 Every whole-UI blocker and long-running note-refinement AI request must be classified as **cancelable**, **intentionally noncancelable**, or **nonblocking**. Persist new sites here when adding `blockUi: true` or `runWithBlockingApiLoading` — do not leave them unclassified.
 
-**Cancelable allowlist** (only these product opt-ins may use `{ blockUi: true, cancelable: true }`):
+**Cancelable allowlist** (only these product opt-ins may use `{ blockUi: true, cancelable: true }`; exclusivity is gated by `frontend/tests/managedApi/cancelableAllowlist.spec.ts`):
 
 | Operation | Message | Call site | Notes |
 | --- | --- | --- | --- |
