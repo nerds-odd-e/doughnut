@@ -12,28 +12,32 @@ import {
 } from "@tests/helpers"
 import {
   clickCreateNoteFromExtractionPreview,
-  clickExtractRefinementLayout,
   clickExtractionPreviewBack,
   clickRetryExtractionPreview,
   createNoteFromExtractionPreview,
-  createDeferredGate,
   expectExtractionPreviewError,
   expectExtractionPreviewVisible,
   expectPreviewFields,
   extractionPreviewApiCall,
   extractionPreviewFieldsFor,
   labeledExtractionPreview,
-  loadingModalMask,
   mockExtractNotePreviewResponses,
+  openExtractionPreview,
+  retryExtractionPreview,
+  setPreviewFields,
+} from "./noteRefinementExtractionTestSupport"
+import {
+  createDeferredGate,
+  loadingModalMask,
+} from "./noteRefinementLayoutLoadingTestSupport"
+import {
+  clickExtractRefinementLayout,
   mountNoteRefinementReady,
   mountNoteRefinementWithLayoutReady,
   note,
-  openExtractionPreview,
   refinementLayoutSelectionApiCall,
-  retryExtractionPreview,
   sampleExtractionPreview,
   selectRefinementLayoutItem,
-  setPreviewFields,
   setupNoteRefinementTests,
   threePointLayout,
   threePointLayoutTexts,

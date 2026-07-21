@@ -2,12 +2,12 @@ import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it } from "vitest"
 import { mockSdkService } from "@tests/helpers"
+import { openExtractionPreview } from "./noteRefinementExtractionTestSupport"
+import { exportBreakdownRequestButtonTitle } from "./noteRefinementExportTestSupport"
 import {
-  exportBreakdownRequestButtonTitle,
   mountNoteRefinement,
   mountNoteRefinementWithLayout,
   note,
-  openExtractionPreview,
   refinementActionButton,
   setupNoteRefinementTests,
 } from "./noteRefinementTestSupport"

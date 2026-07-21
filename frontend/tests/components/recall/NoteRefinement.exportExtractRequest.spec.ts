@@ -3,18 +3,20 @@ import { flushPromises } from "@vue/test-utils"
 import { nextTick } from "vue"
 import { describe, expect, it } from "vitest"
 import { mockSdkServiceWithImplementation } from "@tests/helpers"
+import { openExtractionPreview } from "./noteRefinementExtractionTestSupport"
 import {
   clickExportExtractRequest,
   exportLoadingEl,
   exportTextarea,
+  sampleExtractExportData,
+} from "./noteRefinementExportTestSupport"
+import {
   mountNoteRefinementReady,
   mountNoteRefinementWithLayoutReady,
   note,
-  openExtractionPreview,
   refinementActionButton,
   refinementLayoutItems,
   refinementLayoutSelectionApiCall,
-  sampleExtractExportData,
   selectRefinementLayoutItem,
   setupNoteRefinementTests,
 } from "./noteRefinementTestSupport"

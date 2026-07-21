@@ -3,15 +3,17 @@ import { describe, expect, it } from "vitest"
 import { flushPromises } from "@vue/test-utils"
 import { mockSdkService } from "@tests/helpers"
 import {
-  clickExtractRefinementLayout,
   clickRemoveRefinementLayout,
-  layoutCheckbox,
   mountNestedLayoutWithIndeterminateParentSelection,
+  sampleNestedLayout,
+} from "./noteRefinementRemoveTestSupport"
+import {
+  clickExtractRefinementLayout,
+  layoutCheckbox,
   mountNoteRefinementWithLayoutReady,
   note,
   refinementLayoutSelectionApiCall,
   sampleExtractionPreview,
-  sampleNestedLayout,
   selectRefinementLayoutItem,
   setupNoteRefinementTests,
 } from "./noteRefinementTestSupport"

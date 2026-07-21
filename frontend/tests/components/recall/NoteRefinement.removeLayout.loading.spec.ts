@@ -3,9 +3,11 @@ import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it } from "vitest"
 import { mockSdkServiceWithImplementation, wrapSdkError } from "@tests/helpers"
 import {
-  clickRemoveRefinementLayout,
   createDeferredGate,
   loadingModalMask,
+} from "./noteRefinementLayoutLoadingTestSupport"
+import { clickRemoveRefinementLayout } from "./noteRefinementRemoveTestSupport"
+import {
   mountNoteRefinementReady,
   selectFirstLayoutItem,
   setupNoteRefinementTests,

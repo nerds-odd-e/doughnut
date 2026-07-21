@@ -13,11 +13,13 @@ import usePopups from "@/components/commons/Popups/usePopups"
 import {
   clickRemoveRefinementLayout,
   expectRemoveConfirmPopup,
+  openRemoveRefinementConfirmDialog,
+} from "./noteRefinementRemoveTestSupport"
+import {
   layoutCheckbox,
   mountNoteRefinementReady,
   mountNoteRefinementWithFirstItemSelected,
   note,
-  openRemoveRefinementConfirmDialog,
   refinementActionButton,
   refinementLayoutItems,
   refinementLayoutPanel,
