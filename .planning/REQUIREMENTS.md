@@ -12,7 +12,7 @@ Requirements for the initial progressive-cancellation release. Each maps to exac
 - [x] **CANC-01**: User sees a Cancel control in the global blocking spinner only when the active operation explicitly opts into cancellation
 - [x] **CANC-02**: User can activate Cancel to abort that operation's browser request and promptly remove its blocking state
 - [x] **CANC-03**: User cancellation completes as a normal outcome without an error toast, success handling, or navigation from the cancelled operation
-- [ ] **CANC-04**: Cancelling one blocking operation does not clear or abort other concurrent loading operations
+- [x] **CANC-04**: Cancelling one blocking operation does not clear or abort other concurrent loading operations
 
 ### Note Refinement
 
@@ -60,7 +60,7 @@ Which phases cover which requirements. Populated during roadmap creation.
 | CANC-01 | Phase 2 | Complete |
 | CANC-02 | Phase 2 | Complete |
 | CANC-03 | Phase 2 | Complete |
-| CANC-04 | Phase 2 | Pending |
+| CANC-04 | Phase 2 | Complete |
 | REFN-01 | Phase 2 | Complete |
 | REFN-02 | Phase 2 | Complete |
 | REFN-03 | Phase 3 | Pending |
