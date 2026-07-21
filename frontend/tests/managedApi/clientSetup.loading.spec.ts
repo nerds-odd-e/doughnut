@@ -1,5 +1,10 @@
 import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
-import { apiCallWithLoading, setupGlobalClient } from "@/managedApi/clientSetup"
+import {
+  apiCallWithLoading,
+  type CancelableApiLoadingOptions,
+  type CancelableApiResult,
+  setupGlobalClient,
+} from "@/managedApi/clientSetup"
 import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
 import { beforeEach, describe, expect, expectTypeOf, it, vi } from "vitest"
 import createFetchMock from "vitest-fetch-mock"
@@ -13,15 +18,6 @@ const okApiResult = {
   request: {} as Request,
   response: {} as Response,
 }
-
-type ExpectedCancelableApiResult<T> =
-  | { status: "completed"; result: T }
-  | { status: "cancelled" }
-
-const callCancelableApi = apiCallWithLoading as unknown as <T>(
-  apiCall: (signal: AbortSignal) => Promise<T>,
-  options: { blockUi: true; message?: string; cancelable: true }
-) => Promise<ExpectedCancelableApiResult<T>>
 
 function controlledApiCall() {
   let resolve: (value: typeof okApiResult) => void = () => undefined
@@ -136,7 +132,7 @@ describe("apiCallWithLoading loading state management", () => {
       message: "Older",
     })
     let receivedSignal: AbortSignal | undefined
-    const cancelableResult = callCancelableApi(
+    const cancelableResult = apiCallWithLoading(
       (signal) => {
         receivedSignal = signal
         return cancelableCall.promise
@@ -145,12 +141,10 @@ describe("apiCallWithLoading loading state management", () => {
     )
 
     expectTypeOf(cancelableResult).toEqualTypeOf<
-      Promise<ExpectedCancelableApiResult<typeof okApiResult>>
+      Promise<CancelableApiResult<typeof okApiResult>>
     >()
     expect(receivedSignal).toBeInstanceOf(AbortSignal)
-    const cancel = (
-      apiStatus.states.at(-1) as { cancel?: () => void } | undefined
-    )?.cancel
+    const cancel = apiStatus.states.at(-1)?.cancel
     expect(cancel).toEqual(expect.any(Function))
 
     cancel?.()
@@ -166,7 +160,13 @@ describe("apiCallWithLoading loading state management", () => {
   })
 
   it("requires narrowing before a completed result is available", async () => {
-    const outcome = await callCancelableApi(async () => okApiResult, {
+    const options: CancelableApiLoadingOptions = {
+      blockUi: true,
+      cancelable: true,
+    }
+    expectTypeOf(options.blockUi).toEqualTypeOf<true>()
+    expectTypeOf(options.cancelable).toEqualTypeOf<true>()
+    const outcome = await apiCallWithLoading(async () => okApiResult, {
       blockUi: true,
       cancelable: true,
     })

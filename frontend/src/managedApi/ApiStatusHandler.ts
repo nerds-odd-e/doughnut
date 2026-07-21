@@ -2,6 +2,7 @@ export type ApiLoadingState = {
   id: number
   blockUi?: boolean
   message?: string
+  cancel?: () => void
 }
 
 export type ApiStatus = {
@@ -22,20 +23,26 @@ export default class ApiStatusHandler {
     this.apiStatus = apiStatus
   }
 
-  startLoading(options: ApiLoadingOptions = {}) {
-    const loadingState = {
+  startLoading(options: ApiLoadingOptions = {}, cancel?: () => void) {
+    const loadingState: ApiLoadingState = {
       id: this.nextLoadingStateId++,
       blockUi: options.blockUi,
       message: options.message,
+      ...(cancel ? { cancel } : {}),
     }
     this.apiStatus.states.push(loadingState)
     return loadingState
   }
 
   finishLoading(loadingState: ApiLoadingState) {
+    const active = this.apiStatus.states.some(
+      (state) => state.id === loadingState.id
+    )
+    if (!active) return false
     this.apiStatus.states = this.apiStatus.states.filter(
       (state) => state.id !== loadingState.id
     )
+    return true
   }
 }
 

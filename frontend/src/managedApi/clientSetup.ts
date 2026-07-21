@@ -3,7 +3,11 @@ import {
   createClient,
   type Config,
 } from "@generated/doughnut-backend-api/client"
-import type { ApiLoadingOptions, ApiStatus } from "./ApiStatusHandler"
+import type {
+  ApiLoadingOptions,
+  ApiLoadingState,
+  ApiStatus,
+} from "./ApiStatusHandler"
 import ApiStatusHandler from "./ApiStatusHandler"
 import assignBadRequestProperties from "./window/assignBadRequestProperties"
 import loginOrRegisterAndHaltThisThread from "./window/loginOrRegisterAndHaltThisThread"
@@ -19,10 +23,8 @@ function apiRequestLabel(request: Request): string {
   }
 }
 
-// Global apiStatusHandler instance (set by setupGlobalClient)
 let apiStatusHandler: ApiStatusHandler | undefined
 
-// Client that does not trigger page reload on 401 errors
 export const nonReloadingClient = createClient()
 
 type SdkResult = {
@@ -36,35 +38,92 @@ type CompositeSdkResult<T> = SdkResult & {
   data: T
 }
 
-/**
- * Wrapper for API calls that manages loading state and error handling.
- *
- * This function:
- * - Sets loading state synchronously before the API call
- * - Shows error toasts for failed requests
- *
- * @param apiCall - Function that returns a Promise with the API result (SDK format with error, response, request)
- * @returns Promise with the API result
- *
- * @example
- * const result = await apiCallWithLoading(() =>
- *   someApiCall({ path: { id: 123 } })
- * )
- */
-export async function apiCallWithLoading<T extends SdkResult>(
+export type CancelableApiLoadingOptions = ApiLoadingOptions & {
+  blockUi: true
+  cancelable: true
+}
+
+export type CancelableApiResult<T> =
+  | { status: "completed"; result: T }
+  | { status: "cancelled" }
+
+export function apiCallWithLoading<T extends SdkResult>(
   apiCall: () => Promise<T>,
-  options: ApiLoadingOptions = {}
-): Promise<T> {
+  options?: ApiLoadingOptions
+): Promise<T>
+export function apiCallWithLoading<T extends SdkResult>(
+  apiCall: (signal: AbortSignal) => Promise<T>,
+  options: CancelableApiLoadingOptions
+): Promise<CancelableApiResult<T>>
+export async function apiCallWithLoading<T extends SdkResult>(
+  apiCall: (() => Promise<T>) | ((signal: AbortSignal) => Promise<T>),
+  options: ApiLoadingOptions | CancelableApiLoadingOptions = {}
+): Promise<T | CancelableApiResult<T>> {
   const statusHandler = apiStatusHandler
+  if ("cancelable" in options && options.cancelable) {
+    const controller = new AbortController()
+    const cancelableCall = apiCall as (signal: AbortSignal) => Promise<T>
+    if (!statusHandler) {
+      return {
+        status: "completed",
+        result: await cancelableCall(controller.signal),
+      }
+    }
+
+    const cancelled = { status: "cancelled" } as const
+    let cancellationAccepted = false
+    let loadingState: ApiLoadingState | undefined
+    let resolveCancellation: (result: typeof cancelled) => void = () =>
+      undefined
+    const cancellation = new Promise<typeof cancelled>((resolve) => {
+      resolveCancellation = resolve
+    })
+    const acceptCancellation = () => {
+      if (
+        cancellationAccepted ||
+        !loadingState ||
+        !statusHandler.finishLoading(loadingState)
+      ) {
+        return
+      }
+      cancellationAccepted = true
+      controller.abort()
+      resolveCancellation(cancelled)
+    }
+
+    loadingState = statusHandler.startLoading(options, acceptCancellation)
+    let operation: Promise<T>
+    try {
+      operation = cancelableCall(controller.signal)
+    } catch (error) {
+      statusHandler.finishLoading(loadingState)
+      throw error
+    }
+    const observedOperation = operation
+      .then(
+        (result): CancelableApiResult<T> => {
+          if (cancellationAccepted) return cancelled
+          if (result.error) handleSdkError(result)
+          return { status: "completed", result }
+        },
+        (error): CancelableApiResult<T> => {
+          if (cancellationAccepted) return cancelled
+          throw error
+        }
+      )
+      .finally(() => statusHandler.finishLoading(loadingState))
+
+    return await Promise.race([observedOperation, cancellation])
+  }
+
   if (!statusHandler) {
-    return await apiCall()
+    return await (apiCall as () => Promise<T>)()
   }
 
   const loadingState = statusHandler.startLoading(options)
   try {
-    const result = await apiCall()
+    const result = await (apiCall as () => Promise<T>)()
 
-    // Handle error if present in the SDK result
     if (result.error) {
       handleSdkError(result)
     }
@@ -86,15 +145,10 @@ export async function runWithBlockingApiLoading<T>(
   return data
 }
 
-/** Resets the global API status handler. Use only in tests. */
 export function teardownGlobalClientForTesting() {
   apiStatusHandler = undefined
 }
 
-/**
- * Sets up the global client.
- * This should be called once during app initialization (e.g., in DoughnutApp.vue).
- */
 export function setupGlobalClient(apiStatus: ApiStatus) {
   apiStatusHandler = new ApiStatusHandler(apiStatus)
 
@@ -108,10 +162,8 @@ export function setupGlobalClient(apiStatus: ApiStatus) {
     throwOnError: false,
   }
 
-  // Configure global client with SDK response format
   globalClient.setConfig(clientConfig)
 
-  // Add response interceptor to globalClient to handle 401 errors
   globalClient.interceptors.response.use((response, request) => {
     if (response.status === 401) {
       const method = request.method
@@ -137,15 +189,9 @@ export function setupGlobalClient(apiStatus: ApiStatus) {
     return response
   })
 
-  // Configure non-reloading client with same settings (no 401 interceptor)
   nonReloadingClient.setConfig(clientConfig)
 }
 
-/**
- * Handles API errors from SDK result format.
- * Shows error toasts and handles special cases (401, 404, 400).
- * 401 and 404 errors are handled silently (no toast).
- */
 function handleSdkError(result: SdkResult) {
   if (!apiStatusHandler) return
   if (!result.error) return
@@ -174,7 +220,6 @@ function handleSdkError(result: SdkResult) {
     return
   }
 
-  // Extract error message
   let msg = "API Error"
   if (
     errorBody &&
@@ -187,7 +232,6 @@ function handleSdkError(result: SdkResult) {
     msg = errorBody
   }
 
-  // Show error toast
   const toast = useToast()
   toast.error(msg, {
     timeout: 3000,
@@ -195,7 +239,6 @@ function handleSdkError(result: SdkResult) {
     pauseOnHover: true,
   })
 
-  // Handle 400 bad request - assign properties to error object
   if (status === 400 && errorBody) {
     const jsonResponse =
       typeof errorBody === "string" ? JSON.parse(errorBody) : errorBody
