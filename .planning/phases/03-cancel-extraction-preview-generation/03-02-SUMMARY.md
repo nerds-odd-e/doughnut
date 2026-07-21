@@ -98,7 +98,7 @@ status: complete
 
 1. **Task 1–2: Opt runExtractionPreview into cancelable blocking + green landings** - `e15de7d149` (feat)
 
-**Plan metadata:** (docs commit after SUMMARY/STATE)
+**Plan metadata:** `0ab6ed4361` (docs: complete plan)
 
 ## Files Created/Modified
 
