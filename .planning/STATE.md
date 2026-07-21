@@ -5,10 +5,10 @@ milestone_name: milestone
 current_phase: 2
 current_phase_name: Cancel Refinement Layout Generation
 status: planning
-stopped_at: Phase 02 research complete; ready for plan-phase
-last_updated: "2026-07-21T08:05:00.000Z"
+stopped_at: Phase 02 UI-SPEC draft written; ready for ui-checker / plan-phase
+last_updated: "2026-07-21T08:10:00.000Z"
 last_activity: 2026-07-21
-last_activity_desc: Phase 02 RESEARCH.md written for cancel refinement layout generation
+last_activity_desc: Phase 02 UI-SPEC.md written (Cancel adopt + empty layout retry)
 progress:
   total_phases: 1
   completed_phases: 1
@@ -29,10 +29,10 @@ See: .planning/PROJECT.md (updated 2026-07-21)
 
 Phase: 2 — Cancel Refinement Layout Generation
 Plan: Not started
-Status: Research complete — ready to plan
-Last activity: 2026-07-21 — Phase 02 research complete (cancel layout generation adoption)
+Status: UI-SPEC draft complete — ready for checker / plan
+Last activity: 2026-07-21 — Phase 02 UI-SPEC written (Cancel adopt + empty/retry panel)
 
-Progress: Phase 1 done; Phase 2 researching/planning
+Progress: Phase 1 done; Phase 2 UI contract drafted
 
 ## Performance Metrics
 
