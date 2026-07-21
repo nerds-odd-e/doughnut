@@ -6,7 +6,11 @@ import {
 import NoteRefinement from "@/components/recall/NoteRefinement.vue"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+import helper, {
+  mockSdkService,
+  mockSdkServiceWithImplementation,
+  wrapSdkResponse,
+} from "@tests/helpers"
 import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import usePopups from "@/components/commons/Popups/usePopups"
@@ -16,8 +20,9 @@ import type {
   NoteExtractionResult,
   NoteRefinementLayoutItem,
 } from "@generated/doughnut-backend-api"
+import { screen } from "@testing-library/vue"
 import { afterEach, beforeEach, expect, vi } from "vitest"
-import { defineComponent, type PropType } from "vue"
+import { defineComponent, nextTick, type PropType } from "vue"
 
 export const noteRealm = makeMe.aNoteRealm.please()
 export const memoryTracker = makeMe.aMemoryTracker.ofNote(noteRealm).please()
@@ -231,6 +236,47 @@ export async function mountNoteRefinementWithLayoutReady(
   const wrapper = mountNoteRefinementWithLayout(items, overrides)
   await flushPromises()
   return wrapper
+}
+
+/**
+ * Mounts NoteRefinement with generateRefinementSuggestions held pending.
+ * Does not flushPromises — caller asserts Cancel while the layout request is open.
+ */
+export async function mountNoteRefinementPendingLayout(
+  itemsWhenResolved: NoteRefinementLayoutItem[] = refinementLayoutItems([
+    "Should not appear",
+  ]),
+  overrides?: { note?: typeof note }
+) {
+  const { gate, resolve } = createDeferredGate()
+  const generateSpy = mockSdkServiceWithImplementation(
+    AiController,
+    "generateRefinementSuggestions",
+    async () => {
+      await gate
+      return { items: itemsWhenResolved }
+    }
+  )
+  const wrapper = renderer
+    .withCleanStorage()
+    .withProps({
+      note: overrides?.note ?? note,
+    })
+    .mount()
+  await nextTick()
+  return { wrapper, resolve, gate, generateSpy }
+}
+
+export function clickLoadingModalCancel() {
+  screen.getByText("Cancel").click()
+}
+
+export async function clickRetryRefinementLayout(
+  wrapper: ReturnType<typeof mountNoteRefinement>
+) {
+  await wrapper
+    .find('[data-test-id="retry-refinement-layout"]')
+    .trigger("click")
 }
 
 export async function clickExtractRefinementLayout(
