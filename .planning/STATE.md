@@ -3,11 +3,11 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: 3
-status: research_complete
-stopped_at: Phase 3 research complete — ready for planning
-last_updated: "2026-07-21T09:05:00.000Z"
+status: ui_spec_complete
+stopped_at: Phase 3 UI-SPEC drafted — ready for checker / plan-phase
+last_updated: "2026-07-21T09:10:00.000Z"
 last_activity: 2026-07-21
-last_activity_desc: Phase 3 RESEARCH.md written
+last_activity_desc: Phase 3 03-UI-SPEC.md written (adopt-only Cancel)
 progress:
   total_phases: 4
   completed_phases: 2
@@ -23,17 +23,17 @@ current_phase_name: Cancel Extraction Preview Generation
 See: .planning/PROJECT.md (updated 2026-07-21)
 
 **Core value:** When a long-running frontend action blocks the UI, the user can cancel it and remain in a coherent, usable state without unintended follow-up behavior.
-**Current focus:** Phase 3 — Cancel Extraction Preview Generation (research complete; ready to plan)
+**Current focus:** Phase 3 — Cancel Extraction Preview Generation (UI-SPEC drafted; awaiting checker / plan)
 
 ## Current Position
 
-Phase: 3 — RESEARCH COMPLETE
+Phase: 3 — UI-SPEC COMPLETE (draft)
 Plan: 0 of TBD
-Status: Research done; awaiting `/gsd-plan-phase` planning
-Last activity: 2026-07-21 — Phase 3 RESEARCH.md written
+Status: UI design contract written; awaiting gsd-ui-checker then `/gsd-plan-phase`
+Last activity: 2026-07-21 — Phase 3 03-UI-SPEC.md written
 
 Progress: [█████░░░░░] ~50% (2/4 phases complete)
-Resume file: .planning/phases/03-cancel-extraction-preview-generation/03-RESEARCH.md
+Resume file: .planning/phases/03-cancel-extraction-preview-generation/03-UI-SPEC.md
 
 ## Performance Metrics
 
