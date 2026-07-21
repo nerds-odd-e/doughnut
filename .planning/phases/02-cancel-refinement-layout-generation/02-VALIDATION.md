@@ -44,7 +44,7 @@ Wave 0 work is Plan 01 (not a separate plan id). Plans: `02-01`, `02-02`, `02-03
 | 02-01-02 | 01 | 1 | REFN-01–02, CANC-01–04 | T-02-02 / T-02-03 | Failing cancel suite locks pending message+Cancel, silent cancel, concurrent survivor, empty retry | browser component | quick run above (expect RED until Plan 02) | ❌ W0 | ⬜ pending |
 | 02-02-01 | 02 | 2 | REFN-01, CANC-01–03 | T-02-01 / T-02-02 | `loadRefinementLayout` opts into cancelable blocker + status narrowing | browser component | quick run above | ❌ until product | ⬜ pending |
 | 02-02-02 | 02 | 2 | REFN-02 | T-02-04 | Empty/cancelled panel + `retry-refinement-layout`; dialog stays open | browser component | quick run above | ❌ until product | ⬜ pending |
-| 02-03-01 | 03 | 3 | CANC-04, REFN-02 | T-02-03 / T-02-04 | Concurrent older-blocker survival + retry-interrupt edges green; extract/remove not cancelable | browser component | quick run above + remove-layout / extract loading regressions | ❌ until product | ⬜ pending |
+| 02-03-01 | 03 | 3 | CANC-04, REFN-02 | T-02-03 / T-02-04 | Concurrent older-blocker survival + retry-interrupt edges green; extract/remove not cancelable | browser component + rg exclusivity | `pnpm frontend:test` cancel + removeLayout.loading + extractNote specs; `rg "cancelable:\\s*true" frontend/src` only NoteRefinement.vue + clientSetup.ts | ❌ until product | ⬜ pending |
 | 02-03-02 | 03 | 3 | — (docs) | T-02-01 | `frontend-api.mdc` documents cancelable overload, status narrowing, silent cancel, identity-bound Cancel, client-only abort | docs grep | `rg` phrases in Plan 03 Task 2 `<verify>` | ✅ rule exists | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
