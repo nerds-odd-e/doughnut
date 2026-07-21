@@ -1,13 +1,21 @@
 import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
 import type { NoteExtractionResult } from "@generated/doughnut-backend-api"
-import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+import {
+  mockSdkService,
+  mockSdkServiceWithImplementation,
+  wrapSdkResponse,
+} from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { expect } from "vitest"
+import { nextTick } from "vue"
+import { createDeferredGate } from "./noteRefinementLayoutLoadingTestSupport"
 import {
   clickExtractRefinementLayout,
   mountNoteRefinement,
+  mountNoteRefinementReady,
   sampleExtractionPreview,
   selectRefinementLayoutItem,
+  threePointLayoutTexts,
 } from "./noteRefinementTestSupport"
 
 export type ExtractionPreviewFieldValues = {
@@ -176,4 +184,32 @@ export async function retryExtractionPreview(
 ) {
   await clickRetryExtractionPreview(wrapper)
   await flushPromises()
+}
+
+/**
+ * Mounts with layout flushed, selects an item, starts Extract with
+ * extractNotePreview held pending. Does not flushPromises — caller asserts
+ * Cancel while the preview request is open.
+ */
+export async function mountNoteRefinementPendingExtractionPreview(
+  layoutItemTexts: string[] = [...threePointLayoutTexts],
+  itemId = "p1",
+  previewWhenResolved: NoteExtractionResult = sampleExtractionPreview({
+    newNoteTitle: "Should not appear",
+  })
+) {
+  const { gate, resolve } = createDeferredGate()
+  const extractSpy = mockSdkServiceWithImplementation(
+    AiController,
+    "extractNotePreview",
+    async () => {
+      await gate
+      return previewWhenResolved
+    }
+  )
+  const wrapper = await mountNoteRefinementReady(layoutItemTexts)
+  await selectRefinementLayoutItem(wrapper, itemId)
+  await clickExtractRefinementLayout(wrapper)
+  await nextTick()
+  return { wrapper, resolve, gate, extractSpy }
 }
