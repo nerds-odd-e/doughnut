@@ -4,16 +4,16 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 01
 current_phase_name: shared-cancellation-contract
-status: executing
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-07-21T04:59:23.695Z"
+status: verifying
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-07-21T05:13:47.334Z"
 last_activity: 2026-07-21
 last_activity_desc: Phase 01 execution started
 progress:
   total_phases: 1
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -29,10 +29,10 @@ See: .planning/PROJECT.md (updated 2026-07-21)
 
 Phase: 01 (shared-cancellation-contract) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-07-21 — Phase 01 execution started
 
-Progress: [█████░░░░░] 50%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -59,6 +59,7 @@ Progress: [█████░░░░░] 50%
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
 | Phase 01 P01 | 17 min | 2 tasks | 4 files |
+| Phase 01 P02 | 8 min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,8 @@ Recent decisions affecting current work:
 - Initialization: Shared code owns generic mechanics; each caller owns only its specialized post-cancel state
 - [Phase 01]: Cancelable calls require literal blockUi and cancelable opt-in while default calls retain Promise<T>. — Keeps Phase 1 dormant and preserves all existing caller types.
 - [Phase 01]: Accepted exact-state removal is the cancellation linearization point. — Makes cancellation identity-bound, idempotent, prompt, and unable to retarget concurrent work.
+- [Phase 01]: Project message, identity, and cancel action directly from the same selected blocker. — Prevents hidden cancellation capability from leaking into the visible modal.
+- [Phase 01]: A keyed child captures its original cancellation action. — Prevents stale detached controls from adopting a revealed replacement blocker's callback.
 
 ### Pending Todos
 
@@ -91,6 +94,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-21T04:59:23.690Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-07-21T05:13:47.330Z
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None
