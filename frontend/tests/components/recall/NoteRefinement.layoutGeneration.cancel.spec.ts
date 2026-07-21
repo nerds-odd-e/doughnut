@@ -145,4 +145,45 @@ describe("NoteRefinement layout generation cancel", () => {
     expect(loadingModalMask()).toBeTruthy()
     expect(document.body.textContent).toContain("AI is generating layout...")
   })
+
+  it("cancels a pending retry without applying late layout items (REFN-02)", async () => {
+    const { wrapper, resolve } = await mountNoteRefinementPendingLayout(
+      refinementLayoutItems(["Late retry should not appear"])
+    )
+
+    clickLoadingModalCancel()
+    await flushPromises()
+
+    await clickRetryRefinementLayout(wrapper)
+    await nextTick()
+    expect(loadingModalMask()).toBeTruthy()
+    expect(document.body.textContent).toContain("AI is generating layout...")
+
+    clickLoadingModalCancel()
+    await flushPromises()
+
+    expect(loadingModalMask()).toBeNull()
+    expect(mockToast.error).not.toHaveBeenCalled()
+    expect(
+      wrapper.find('[data-test-id="refinement-layout-empty"]').exists()
+    ).toBe(true)
+    expect(
+      wrapper.find('[data-test-id="retry-refinement-layout"]').exists()
+    ).toBe(true)
+    expect(wrapper.find('[data-test-id="refinement-layout"]').exists()).toBe(
+      false
+    )
+    expect(
+      wrapper.find('[data-test-id="extract-refinement-layout"]').exists()
+    ).toBe(false)
+
+    resolve()
+    await flushPromises()
+    expect(wrapper.find('[data-test-id="refinement-layout"]').exists()).toBe(
+      false
+    )
+    expect(document.body.textContent).not.toContain(
+      "Late retry should not appear"
+    )
+  })
 })
