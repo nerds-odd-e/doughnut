@@ -97,7 +97,7 @@ Each task was committed atomically:
 
 1. **Task 1 + Task 2: Allowlist guard + managedApi abort ownership + rule pointer** - `45f8ca2691` (test)
 
-**Plan metadata:** (pending docs commit)
+**Plan metadata:** `078381ebcb` (docs: complete plan)
 
 _Note: TDD characterization guard — codebase already matched allowlist; RED phase intentionally skipped per plan action ("confirm it passes against current codebase")._
 
