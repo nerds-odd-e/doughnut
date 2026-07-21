@@ -89,7 +89,7 @@ Plans:
   2. Activating Cancel keeps all selected refinement-layout items and leaves the user before the preview
   3. Cancellation shows no API error and the user can retry preview generation from the preserved selection
 
-**Plans**: 1/3 plans executed
+**Plans**: 2/3 plans executed
 
 Plans:
 **Wave 1**
@@ -98,7 +98,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 03-02-PLAN.md — Cancelable preview load + preserve-selection / keep-prior-preview (vertical GREEN slice)
+- [x] 03-02-PLAN.md — Cancelable preview load + preserve-selection / keep-prior-preview (vertical GREEN slice)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -136,5 +136,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Shared Cancellation Contract | 3/3 | Complete    | 2026-07-21 |
 | 2. Cancel Refinement Layout Generation | 3/3 | Plans complete | 2026-07-21 |
-| 3. Cancel Extraction Preview Generation | 1/3 | In Progress|  |
+| 3. Cancel Extraction Preview Generation | 2/3 | In Progress|  |
 | 4. Enforce Safe Blocking Boundaries | 0/TBD | Not started | - |

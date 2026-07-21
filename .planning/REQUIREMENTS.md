@@ -18,8 +18,8 @@ Requirements for the initial progressive-cancellation release. Each maps to exac
 
 - [x] **REFN-01**: User sees the global blocking spinner with Cancel while AI generates the initial note-refinement layout
 - [x] **REFN-02**: User who cancels initial layout generation remains in the refinement dialog with unchanged note content and an available retry action
-- [ ] **REFN-03**: User sees the same global blocking spinner with Cancel while AI generates an extraction preview
-- [ ] **REFN-04**: User who cancels extraction-preview generation keeps the current layout selections, remains before the preview, and can retry
+- [x] **REFN-03**: User sees the same global blocking spinner with Cancel while AI generates an extraction preview
+- [x] **REFN-04**: User who cancels extraction-preview generation keeps the current layout selections, remains before the preview, and can retry
 - [ ] **REFN-05**: User sees the shared blocking spinner without Cancel while final extracted-note creation is pending
 
 ### Cohesion and Adoption
@@ -63,8 +63,8 @@ Which phases cover which requirements. Populated during roadmap creation.
 | CANC-04 | Phase 2 | Complete |
 | REFN-01 | Phase 2 | Complete |
 | REFN-02 | Phase 2 | Complete |
-| REFN-03 | Phase 3 | Pending |
-| REFN-04 | Phase 3 | Pending |
+| REFN-03 | Phase 3 | Complete |
+| REFN-04 | Phase 3 | Complete |
 | REFN-05 | Phase 4 | Pending |
 | COHE-01 | Phase 1 | Complete |
 | COHE-02 | Phase 4 | Pending |
