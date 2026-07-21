@@ -343,21 +343,13 @@ rg -n 'AbortController|AbortError' frontend/src --glob '*.{ts,vue}'
 
 **If this table is empty:** All claims in this research were verified or cited — no user confirmation needed for stack facts. Discretion items remain planner/executor choices, not assumptions.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Promote vs split create-note Cancel-absent test**
-   - What we know: Edge lives in `NoteRefinement.extractionPreview.cancel.edges.spec.ts` labeled Phase 3 D-10; success nav covered in `NoteRefinement.extractNote.spec.ts`.
-   - What's unclear: Whether planner prefers rename-in-place, move to a dedicated create-boundary spec, or duplicate a thin REFN-05-named case.
-   - Recommendation: Rename/strengthen in edges file (or dedicated recall cohesion spec) without deleting coverage; keep extractNote success-nav as regression. Claude's Discretion covers placement.
+1. **Promote vs split create-note Cancel-absent test** — **RESOLVED (04-01):** Rename/strengthen in-place in the capability-named edges file; keep extractNote success-nav as regression.
 
-2. **Allowlist automation medium**
-   - What we know: Phases 2–3 used manual `rg` in plan verification; D-11 makes Vitest allowlist optional.
-   - What's unclear: Whether CI should encode the allowlist as a Vitest test that reads source files.
-   - Recommendation: Prefer a small Vitest (or script invoked by frontend verify) so the gate cannot be skipped; `rg` alone is fine if plan verification step is explicit.
+2. **Allowlist automation medium** — **RESOLVED (04-03):** Vitest allowlist (`cancelableAllowlist.spec.ts`) plus plan verify `rg` exclusivity checks.
 
-3. **Flatten createExtractedNote?**
-   - What we know: Composite helper correctly covers mutation + `focusNoteRealm` under one message.
-   - Recommendation: **Leave as-is** — zero product risk; Discretion flatten only if post-change-refactor finds a clear cohesion win without changing observables.
+3. **Flatten createExtractedNote?** — **RESOLVED (04-01):** Leave `runWithBlockingApiLoading` composite as-is unless Discretion finds a zero-risk flatten.
 
 ## Environment Availability
 
@@ -495,10 +487,10 @@ Step 2.6: Mostly SKIPPED for external services — Phase 4 is frontend code/docs
 | Architecture | HIGH | Full call-site map + create path verified |
 | Pitfalls | HIGH | Locked decisions + known copy-paste Cancel risk |
 
-### Open Questions
-- Test placement (promote edges vs dedicated REFN-05 spec)
-- Allowlist medium (`rg` vs Vitest)
-- Optional flatten of create blocker (recommend leave as-is)
+### Open Questions (RESOLVED)
+- Test placement → in-place REFN-05 rename in edges file (04-01)
+- Allowlist medium → Vitest allowlist (04-03)
+- Flatten create → leave composite as-is (04-01)
 
 ### Ready for Planning
 Research complete. Planner can now create PLAN.md files.
