@@ -1,8 +1,9 @@
 ---
-status: diagnosed
+status: resolved
 trigger: "G-01-3 — LoadingModal long-message content is clipped at a narrow viewport"
 created: 2026-07-21T06:52:37Z
-updated: 2026-07-21T07:06:18Z
+updated: 2026-07-21T07:45:00Z
+resolved_by: 01-03
 ---
 
 ## Current Focus

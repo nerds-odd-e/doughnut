@@ -19,6 +19,10 @@ When a long-running frontend action blocks the UI, the user can cancel it and re
 - ✓ Blocking calls carry per-call state and messages, including correct cleanup for nested and concurrent calls — existing
 - ✓ Generated API calls accept standard request options needed to pass an abort signal — existing
 
+### Validated (Phase 1)
+
+- ✓ Shared API-loading cancellation contract exists (abort ownership, cancelled outcome, conditional modal Cancel) without product call-site adoption — Validated in Phase 1: Shared Cancellation Contract
+
 ### Active
 
 - [ ] A blocking API operation can opt into a shared cancel control that aborts the browser request and clears its loading state
@@ -85,5 +89,9 @@ This document evolves at phase transitions and milestone boundaries.
 3. Audit Out of Scope — reasons still valid?
 4. Update Context with current state
 
+## Current State
+
+Phase 1 complete — dormant shared cancellation contract and overflow-safe centered Overlay are in place; product callers remain noncancelable until Phase 2.
+
 ---
-*Last updated: 2026-07-21 after initialization*
+*Last updated: 2026-07-21 after Phase 1 completion*
