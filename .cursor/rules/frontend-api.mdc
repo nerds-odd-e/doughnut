@@ -48,6 +48,8 @@ const { data, error } = await apiCallWithLoading(
 
 For safe **read-only** blockers where the user may abandon the wait, pass the literal opt-in `{ blockUi: true, cancelable: true, message?: string }`. That overload returns `CancelableApiResult<T>` (`{ status: "completed"; result }` | `{ status: "cancelled" }`). Narrow on `status` before using `result`; do not treat cancel as an API error.
 
+Allowed product opt-ins today (note refinement only): **layout generation** (`AI is generating layout...`) and **extraction-preview generation** (`extractNotePreview` / `AI is generating preview...`). Both use this same overload and status narrowing.
+
 ```typescript
 const outcome = await apiCallWithLoading(
   (signal) =>
@@ -70,7 +72,29 @@ if (outcome.status === "cancelled") {
 const { data, error } = outcome.result
 ```
 
-Cancel on the global modal is projected only from the **selected blocker's identity-bound** action; cancelling one state does not clear older concurrent blockers. Accepted cancel is silent (no toast / Cancelling interstitial). Browser abort is **client-only** — it does not promise server work stopped. Do **not** opt mutations or irreversible writes into `cancelable: true`. Do not invent AbortError-name matching, a cancelable `runWithBlockingApiLoading`, or a parallel helper — use this overload only.
+```typescript
+const previewOutcome = await apiCallWithLoading(
+  (signal) =>
+    AiController.extractNotePreview({
+      path: { note: noteId },
+      body: layoutSelection,
+      signal,
+    }),
+  {
+    blockUi: true,
+    cancelable: true,
+    message: "AI is generating preview...",
+  }
+)
+
+if (previewOutcome.status === "cancelled") {
+  return
+}
+
+const { data, error } = previewOutcome.result
+```
+
+Cancel on the global modal is projected only from the **selected blocker's identity-bound** action; cancelling one state does not clear older concurrent blockers. Accepted cancel is silent (no toast / Cancelling interstitial). Browser abort is **client-only** — it does not promise server work stopped. Do **not** opt mutations or irreversible writes into `cancelable: true` (e.g. create-note / `AI is creating note...` stays noncancelable). Do not invent AbortError-name matching, a cancelable `runWithBlockingApiLoading`, or a parallel helper — use this overload only.
 
 For one continuous blocker across multiple calls, wrap them in `runWithBlockingApiLoading(operation, message)`; inner `apiCallWithLoading` calls keep thin bar + toasts only. That helper remains noncancelable.
 
