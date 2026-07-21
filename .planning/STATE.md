@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 3
-status: phase_complete
-stopped_at: Phase 4 context gathered
-last_updated: "2026-07-21T09:56:45.797Z"
+current_phase: 4
+status: ui_spec_drafted
+stopped_at: Phase 4 UI-SPEC drafted
+last_updated: "2026-07-21T10:05:00.000Z"
 last_activity: 2026-07-21
-last_activity_desc: Completed 03-03-PLAN.md
+last_activity_desc: Drafted 04-UI-SPEC.md (create-note Cancel-absent contract)
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 9
   completed_plans: 9
-current_phase_name: Cancel Extraction Preview Generation
+current_phase_name: Enforce Safe Blocking Boundaries
 ---
 
 # Project State
@@ -23,17 +23,17 @@ current_phase_name: Cancel Extraction Preview Generation
 See: .planning/PROJECT.md (updated 2026-07-21)
 
 **Core value:** When a long-running frontend action blocks the UI, the user can cancel it and remain in a coherent, usable state without unintended follow-up behavior.
-**Current focus:** Phase 3 complete — next is Phase 4 (Enforce Safe Blocking Boundaries) when started explicitly
+**Current focus:** Phase 4 UI design contract drafted — next is UI-SPEC check / plan-phase
 
 ## Current Position
 
-Phase: 3 — COMPLETE
-Plan: 3 of 3
-Status: All Phase 3 plans executed (03-01 RED → 03-02 GREEN → 03-03 edges/docs); ready for verify/ship before Phase 4
-Last activity: 2026-07-21 — Completed 03-03-PLAN.md
+Phase: 4 — UI-SPEC draft
+Plan: not started
+Status: Phase 3 complete; Phase 4 CONTEXT + RESEARCH + UI-SPEC present; ready for gsd-ui-checker then plan
+Last activity: 2026-07-21 — Drafted 04-UI-SPEC.md
 
-Progress: [██████████] 100% of Phase 1–3 plans; 3/4 roadmap phases complete
-Resume file: .planning/phases/04-enforce-safe-blocking-boundaries/04-CONTEXT.md
+Progress: [██████████] 100% of Phase 1–3 plans; Phase 4 pre-plan artifacts in progress
+Resume file: .planning/phases/04-enforce-safe-blocking-boundaries/04-UI-SPEC.md
 
 ## Performance Metrics
 
