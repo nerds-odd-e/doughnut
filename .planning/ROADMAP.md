@@ -14,8 +14,8 @@ The project selected fine granularity. Four phases are sufficient because the re
 - Decimal phases (2.1, 2.2): Urgent insertions marked `INSERTED`
 
 - [x] **Phase 1: Shared Cancellation Contract** - Add cohesive opt-in cancellation structure without changing existing blocker behavior (completed 2026-07-21)
-- [ ] **Phase 2: Cancel Refinement Layout Generation** - Let the user cancel the initial AI layout wait and retry safely
-- [ ] **Phase 3: Cancel Extraction Preview Generation** - Reuse the contract while preserving layout selections and preview state
+- [x] **Phase 2: Cancel Refinement Layout Generation** - Let the user cancel the initial AI layout wait and retry safely (completed 2026-07-21)
+- [x] **Phase 3: Cancel Extraction Preview Generation** - Reuse the contract while preserving layout selections and preview state (completed 2026-07-21)
 - [ ] **Phase 4: Enforce Safe Blocking Boundaries** - Keep transactional creation noncancelable and verify consistent adoption across the refinement flow
 
 ## Phase Details
@@ -89,7 +89,7 @@ Plans:
   2. Activating Cancel keeps all selected refinement-layout items and leaves the user before the preview
   3. Cancellation shows no API error and the user can retry preview generation from the preserved selection
 
-**Plans**: 2/3 plans executed
+**Plans**: 3/3 plans executed
 
 Plans:
 **Wave 1**
@@ -102,7 +102,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 03-03-PLAN.md — Retry/idempotent edges, create-note noncancelable regression, frontend-api.mdc docs
+- [x] 03-03-PLAN.md — Retry/idempotent edges, create-note noncancelable regression, frontend-api.mdc docs
 
 **Cross-cutting constraints:**
 
@@ -136,5 +136,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Shared Cancellation Contract | 3/3 | Complete    | 2026-07-21 |
 | 2. Cancel Refinement Layout Generation | 3/3 | Plans complete | 2026-07-21 |
-| 3. Cancel Extraction Preview Generation | 2/3 | In Progress|  |
+| 3. Cancel Extraction Preview Generation | 3/3 | In Progress|  |
 | 4. Enforce Safe Blocking Boundaries | 0/TBD | Not started | - |
