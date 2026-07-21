@@ -137,7 +137,8 @@ describe("NoteRefinement extraction preview cancel edges", () => {
     resolve()
   })
 
-  it("create-note pending shows creating message without Cancel (D-10)", async () => {
+  // REFN-05 / D-01: transactional create stays intentionally noncancelable (D-04).
+  it("create-note pending shows creating message without Cancel (REFN-05)", async () => {
     const { gate, resolve } = createDeferredGate()
     mockSdkService(
       AiController,
@@ -157,7 +158,8 @@ describe("NoteRefinement extraction preview cancel edges", () => {
     await clickCreateNoteFromExtractionPreview(wrapper)
     await nextTick()
 
-    expect(loadingModalMask()).toBeTruthy()
+    const mask = loadingModalMask()
+    expect(mask).toBeTruthy()
     expect(document.body.textContent).toContain("AI is creating note...")
     expect(document.body.textContent).not.toContain("Cancel")
     resolve()
