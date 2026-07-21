@@ -16,7 +16,7 @@ The project selected fine granularity. Four phases are sufficient because the re
 - [x] **Phase 1: Shared Cancellation Contract** - Add cohesive opt-in cancellation structure without changing existing blocker behavior (completed 2026-07-21)
 - [x] **Phase 2: Cancel Refinement Layout Generation** - Let the user cancel the initial AI layout wait and retry safely (completed 2026-07-21)
 - [x] **Phase 3: Cancel Extraction Preview Generation** - Reuse the contract while preserving layout selections and preview state (completed 2026-07-21)
-- [ ] **Phase 4: Enforce Safe Blocking Boundaries** - Keep transactional creation noncancelable and verify consistent adoption across the refinement flow
+- [x] **Phase 4: Enforce Safe Blocking Boundaries** - Keep transactional creation noncancelable and verify consistent adoption across the refinement flow (completed 2026-07-21)
 
 ## Phase Details
 
@@ -125,7 +125,7 @@ Plans:
   3. Every existing whole-UI blocker and long-running note-refinement AI request has an explicit cancellation classification, and every safe in-scope request uses the shared contract
   4. No in-scope caller duplicates generic abort, loading cleanup, or cancellation-error suppression logic
 
-**Plans**: 2/3 plans executed
+**Plans**: 3/3 plans executed
 
 Plans:
 **Wave 1**
@@ -138,7 +138,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 04-03-PLAN.md — Automated cancelable allowlist + managedApi-only AbortController guard
+- [x] 04-03-PLAN.md — Automated cancelable allowlist + managedApi-only AbortController guard
 
 **Cross-cutting constraints:**
 
@@ -156,4 +156,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. Shared Cancellation Contract | 3/3 | Complete    | 2026-07-21 |
 | 2. Cancel Refinement Layout Generation | 3/3 | Plans complete | 2026-07-21 |
 | 3. Cancel Extraction Preview Generation | 3/3 | Complete | 2026-07-21 |
-| 4. Enforce Safe Blocking Boundaries | 2/3 | In Progress|  |
+| 4. Enforce Safe Blocking Boundaries | 3/3 | Complete | 2026-07-21 |
