@@ -5,6 +5,11 @@ export type ApiLoadingState = {
   cancel?: () => void
 }
 
+export type ApiLoadingCancelControl = {
+  id: number
+  action: () => void
+}
+
 export type ApiStatus = {
   states: ApiLoadingState[]
 }

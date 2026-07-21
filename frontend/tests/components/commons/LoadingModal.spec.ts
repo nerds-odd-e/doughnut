@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest"
 import { render } from "@testing-library/vue"
 import LoadingModal from "@/components/commons/LoadingModal.vue"
+import type { ApiLoadingCancelControl } from "@/managedApi/ApiStatusHandler"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
 import { nextTick } from "vue"
@@ -48,14 +49,19 @@ describe("LoadingModal", () => {
     expect(document.querySelector(".close-button")).toBeNull()
   })
 
-  it("renders one neutral native Cancel button only when an action is supplied", () => {
+  it("requires cancel identity and action as one component control", () => {
+    // @ts-expect-error a cancel action cannot be supplied without its identity
+    const invalidControl: ApiLoadingCancelControl = { action: () => undefined }
+    expect(invalidControl.action).toBeTypeOf("function")
+  })
+
+  it("renders one neutral native Cancel button only when a control is supplied", () => {
     const cancelAction = vi.fn()
     const { getByText } = render(LoadingModal, {
       props: {
         show: true,
         message: "AI is creating note...",
-        loadingStateId: 11,
-        cancelAction,
+        cancelControl: { id: 11, action: cancelAction },
       },
     })
 
@@ -80,8 +86,7 @@ describe("LoadingModal", () => {
       props: {
         show: true,
         message: "Newest blocker",
-        loadingStateId: 21,
-        cancelAction: firstCancel,
+        cancelControl: { id: 21, action: firstCancel },
       },
     })
     const overlay = document.querySelector(".loading-modal-mask")
@@ -90,8 +95,7 @@ describe("LoadingModal", () => {
     await rerender({
       show: true,
       message: "Older blocker",
-      loadingStateId: 20,
-      cancelAction: secondCancel,
+      cancelControl: { id: 20, action: secondCancel },
     })
 
     const secondButton = getByText("Cancel")
@@ -113,8 +117,7 @@ describe("LoadingModal", () => {
       props: {
         show: true,
         message: longMessage,
-        loadingStateId: 31,
-        cancelAction: vi.fn(),
+        cancelControl: { id: 31, action: vi.fn() },
       },
     })
 
@@ -131,8 +134,7 @@ describe("LoadingModal", () => {
       props: {
         show: false,
         message: "Loading...",
-        loadingStateId: 41,
-        cancelAction: vi.fn(),
+        cancelControl: { id: 41, action: vi.fn() },
       },
     })
 

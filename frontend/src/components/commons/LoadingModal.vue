@@ -4,15 +4,16 @@
       <div class="daisy-loading daisy-loading-spinner daisy-loading-lg"></div>
       <p class="loading-message">{{ message }}</p>
       <IdentityBoundCancelButton
-        v-if="cancelAction"
-        :key="loadingStateId"
-        :cancel-action="cancelAction"
+        v-if="cancelControl"
+        :key="cancelControl.id"
+        :cancel-action="cancelControl.action"
       />
     </div>
   </Overlay>
 </template>
 
 <script setup lang="ts">
+import type { ApiLoadingCancelControl } from "@/managedApi/ApiStatusHandler"
 import { defineComponent, h, type PropType } from "vue"
 import Overlay from "./Overlay.vue"
 
@@ -42,8 +43,7 @@ const IdentityBoundCancelButton = defineComponent({
 interface Props {
   show: boolean
   message?: string
-  loadingStateId?: number
-  cancelAction?: () => void
+  cancelControl?: ApiLoadingCancelControl
 }
 
 withDefaults(defineProps<Props>(), {
