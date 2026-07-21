@@ -13,7 +13,7 @@ The project selected fine granularity. Four phases are sufficient because the re
 - Integer phases (1, 2, 3): Planned project work
 - Decimal phases (2.1, 2.2): Urgent insertions marked `INSERTED`
 
-- [ ] **Phase 1: Shared Cancellation Contract** - Add cohesive opt-in cancellation structure without changing existing blocker behavior
+- [x] **Phase 1: Shared Cancellation Contract** - Add cohesive opt-in cancellation structure without changing existing blocker behavior (completed 2026-07-21)
 - [ ] **Phase 2: Cancel Refinement Layout Generation** - Let the user cancel the initial AI layout wait and retry safely
 - [ ] **Phase 3: Cancel Extraction Preview Generation** - Reuse the contract while preserving layout selections and preview state
 - [ ] **Phase 4: Enforce Safe Blocking Boundaries** - Keep transactional creation noncancelable and verify consistent adoption across the refinement flow
@@ -97,7 +97,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Shared Cancellation Contract | 3/3 | Plans complete | 2026-07-21 |
+| 1. Shared Cancellation Contract | 3/3 | Complete    | 2026-07-21 |
 | 2. Cancel Refinement Layout Generation | 0/TBD | Not started | - |
 | 3. Cancel Extraction Preview Generation | 0/TBD | Not started | - |
 | 4. Enforce Safe Blocking Boundaries | 0/TBD | Not started | - |
