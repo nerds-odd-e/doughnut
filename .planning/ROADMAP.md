@@ -42,7 +42,7 @@ The project selected fine granularity. Four phases are sufficient because the re
 
 ### Phase 2: Cancel Refinement Layout Generation
 
-**Goal**: User can cancel the initial AI refinement-layout request and remain ready to retry in the same dialog
+**Goal**: As a note author using Refine note, I want to cancel the initial AI layout wait and retry in the same dialog, so that I recover without changing note content or losing my place.
 **Mode:** mvp
 **Type:** Behavior
 **UI hint:** yes
@@ -55,7 +55,12 @@ The project selected fine granularity. Four phases are sufficient because the re
   3. Cancellation produces no error toast, success handling, navigation, or note-content change
   4. The refinement dialog remains open with a retry action that can start a fresh request
 
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Failing Vitest cancel+retry suite and pending-mount helpers (TDD RED)
+- [ ] 02-02-PLAN.md — Cancelable layout load + empty/retry panel (vertical GREEN slice)
+- [ ] 02-03-PLAN.md — Concurrent/idempotent edges, scope-boundary regressions, frontend-api.mdc docs
 
 ### Phase 3: Cancel Extraction Preview Generation
 
@@ -98,6 +103,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Shared Cancellation Contract | 3/3 | Complete    | 2026-07-21 |
-| 2. Cancel Refinement Layout Generation | 0/TBD | Not started | - |
+| 2. Cancel Refinement Layout Generation | 0/3 | Planned | - |
 | 3. Cancel Extraction Preview Generation | 0/TBD | Not started | - |
 | 4. Enforce Safe Blocking Boundaries | 0/TBD | Not started | - |
