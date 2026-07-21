@@ -414,17 +414,13 @@ expect(document.body.textContent).not.toContain("Should not appear")
 
 **If this table is empty:** N/A — three discretion/process assumptions logged above.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Should existing `NoteRefinement.extractNote.spec.ts` loading-modal cases assert Cancel presence?**
-   - What we know: They currently assert message + mask without Cancel. After Phase 3, Cancel will appear for preview.
-   - What's unclear: Whether to update those assertions in-place or only cover Cancel in the new cancel spec.
-   - Recommendation: Keep happy-path loading assertions in extractNote.spec; put Cancel/silent/late-apply/selection in the new cancel spec. Optionally add one `toContain("Cancel")` to the existing pending-preview loading test for REFN-03 smoke.
+1. **Should existing `NoteRefinement.extractNote.spec.ts` loading-modal cases assert Cancel presence? — RESOLVED**
+   - **Decision:** Cancel / silent / late-apply / selection preservation live only in `NoteRefinement.extractionPreview.cancel.spec.ts`. Leave extractNote happy-path loading asserts as-is. Optional Cancel smoke in extractNote.spec is not required for the phase gate.
 
-2. **UI-SPEC for Phase 3?**
-   - What we know: Workflow has `ui_phase: true`; Phase 2 produced `02-UI-SPEC.md` as adopt-only + domain empty panel.
-   - What's unclear: Whether planner/orchestrator runs `/gsd-ui-phase` before PLAN.
-   - Recommendation: UI-SPEC should be **adopt Phase 1 Cancel + keep message `AI is generating preview...` + no new empty panel**; document Extract / Ask AI to retry as retry affordances only.
+2. **UI-SPEC for Phase 3? — RESOLVED**
+   - **Decision:** `03-UI-SPEC.md` exists (adopt Phase 1 Cancel; message `AI is generating preview...`; no new empty panel; Extract / Ask AI to retry as retry affordances).
 
 ## Environment Availability
 
