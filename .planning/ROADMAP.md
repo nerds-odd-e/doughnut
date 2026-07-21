@@ -136,5 +136,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Shared Cancellation Contract | 3/3 | Complete    | 2026-07-21 |
 | 2. Cancel Refinement Layout Generation | 3/3 | Plans complete | 2026-07-21 |
-| 3. Cancel Extraction Preview Generation | 3/3 | In Progress|  |
+| 3. Cancel Extraction Preview Generation | 3/3 | Complete | 2026-07-21 |
 | 4. Enforce Safe Blocking Boundaries | 0/TBD | Not started | - |

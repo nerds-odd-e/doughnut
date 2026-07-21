@@ -112,7 +112,7 @@ status: complete
 2. **Task 2: Document extraction-preview cancelable opt-in in frontend-api.mdc** - `463ba3eee6` (docs)
 3. **Post-change-refactor: split cancel edge suite** - `fe97bc69dc` (refactor)
 
-**Plan metadata:** (pending docs commit)
+**Plan metadata:** `2f327f8ee5` (docs: complete plan)
 
 ## Files Created/Modified
 
