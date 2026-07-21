@@ -23,7 +23,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-21)
 
 **Core value:** When a long-running frontend action blocks the UI, the user can cancel it and remain in a coherent, usable state without unintended follow-up behavior.
-**Current focus:** Phase 01 — shared-cancellation-contract
+**Current focus:** Phase 2 — Cancel Refinement Layout Generation
 
 ## Current Position
 
