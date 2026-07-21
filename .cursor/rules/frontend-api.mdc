@@ -44,7 +44,35 @@ const { data, error } = await apiCallWithLoading(
 )
 ```
 
-For one continuous blocker across multiple calls, wrap them in `runWithBlockingApiLoading(operation, message)`; inner `apiCallWithLoading` calls keep thin bar + toasts only.
+### Cancelable blocking calls
+
+For safe **read-only** blockers where the user may abandon the wait, pass the literal opt-in `{ blockUi: true, cancelable: true, message?: string }`. That overload returns `CancelableApiResult<T>` (`{ status: "completed"; result }` | `{ status: "cancelled" }`). Narrow on `status` before using `result`; do not treat cancel as an API error.
+
+```typescript
+const outcome = await apiCallWithLoading(
+  (signal) =>
+    AiController.generateRefinementSuggestions({
+      path: { note: noteId },
+      signal,
+    }),
+  {
+    blockUi: true,
+    cancelable: true,
+    message: "AI is generating layout...",
+  }
+)
+
+if (outcome.status === "cancelled") {
+  // Domain-local empty/retry UI only — accepted cancel is silent (no toast).
+  return
+}
+
+const { data, error } = outcome.result
+```
+
+Cancel on the global modal is projected only from the **selected blocker's identity-bound** action; cancelling one state does not clear older concurrent blockers. Accepted cancel is silent (no toast / Cancelling interstitial). Browser abort is **client-only** — it does not promise server work stopped. Do **not** opt mutations or irreversible writes into `cancelable: true`. Do not invent AbortError-name matching, a cancelable `runWithBlockingApiLoading`, or a parallel helper — use this overload only.
+
+For one continuous blocker across multiple calls, wrap them in `runWithBlockingApiLoading(operation, message)`; inner `apiCallWithLoading` calls keep thin bar + toasts only. That helper remains noncancelable.
 
 Keep local loading state (inline spinner, disabled control, row-level pending) when the user should stay able to interact with the rest of the page — e.g. search, pagination, single form-field upload, recall prompt internals. These can still call `apiCallWithLoading` without `blockUi`.
 
@@ -52,8 +80,9 @@ Keep local loading state (inline spinner, disabled control, row-level pending) w
 | --- | --- |
 | Thin top loading bar | Any `apiCallWithLoading` call |
 | Whole-UI modal | `apiCallWithLoading(..., { blockUi: true, message? })` or `runWithBlockingApiLoading` |
+| Cancelable whole-UI modal | `apiCallWithLoading(..., { blockUi: true, cancelable: true, message? })` → `CancelableApiResult` (status narrowing) |
 | Inline / partial progress | Local component state |
-| Error toasts | `apiCallWithLoading` (handled in `clientSetup.ts`) |
+| Error toasts | `apiCallWithLoading` (handled in `clientSetup.ts`); accepted cancel is silent |
 | Silent background fetch | Direct SDK call without `apiCallWithLoading` |
 
 ## API Return Value Usage
