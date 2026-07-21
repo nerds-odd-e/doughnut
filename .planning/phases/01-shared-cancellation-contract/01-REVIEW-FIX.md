@@ -1,50 +1,41 @@
 ---
 phase: 01-shared-cancellation-contract
-fixed_at: 2026-07-21T05:34:14Z
+fixed_at: 2026-07-21T07:50:00Z
 review_path: .planning/phases/01-shared-cancellation-contract/01-REVIEW.md
 iteration: 1
-findings_in_scope: 3
-fixed: 3
+findings_in_scope: 2
+fixed: 2
 skipped: 0
 status: all_fixed
 ---
 
 # Phase 1: Code Review Fix Report
 
-**Fixed at:** 2026-07-21T05:34:14Z
+**Fixed at:** 2026-07-21T07:50:00Z
 **Source review:** `.planning/phases/01-shared-cancellation-contract/01-REVIEW.md`
 **Iteration:** 1
 
 **Summary:**
-- Findings in scope: 3
-- Fixed: 3
+- Findings in scope: 2
+- Fixed: 2
 - Skipped: 0
 
 ## Fixed Issues
 
-### CR-01: Hoisted cancelable options select the noncancelable overload
+### WR-01: `safe center` has no `center` fallback
 
-**Status:** fixed
-**Files modified:** `frontend/src/managedApi/clientSetup.ts`, `frontend/tests/managedApi/clientSetup.loading.spec.ts`
-**Commit:** db0c7bfb6c
-**Applied fix:** Added an overload-safe noncancelable options type, prioritized the cancelable overload, and made the existing compile-time contract test pass hoisted cancelable options through the public function.
+**Files modified:** `frontend/src/components/commons/Overlay.vue`
+**Commit:** efc4dbb039
+**Applied fix:** Added `align-items: center` before `align-items: safe center` so unsupported browsers keep vertical centering while supporting browsers retain safe alignment.
 
-### CR-02: New message CSS changes existing noncancelable blockers
+### WR-02: `GlobalApiLoadingModal` never tears down the module `apiStatusHandler`
 
-**Status:** fixed
-**Files modified:** `frontend/src/components/commons/LoadingModal.vue`, `frontend/tests/components/commons/LoadingModal.spec.ts`
-**Commit:** 328b0d003f
-**Applied fix:** Removed the new default message width, wrapping, and alignment declarations and changed the component regression to verify the pre-existing message layout remains intact when cancellation control is present.
-
-### WR-01: The component API does not require an identity with a cancel action
-
-**Status:** fixed: requires human verification
-**Files modified:** `frontend/src/managedApi/ApiStatusHandler.ts`, `frontend/src/components/commons/LoadingModal.vue`, `frontend/src/DoughnutApp.vue`, `frontend/tests/helpers/GlobalApiLoadingModal.ts`, `frontend/tests/components/commons/LoadingModal.spec.ts`
-**Commit:** feff4ca8ae
-**Applied fix:** Replaced independently optional identity/action props with one typed cancel-control value, keyed and captured the action from that pair, updated both global callers, and added a compile-time regression that rejects an action without its identity.
+**Files modified:** `frontend/tests/helpers/GlobalApiLoadingModal.ts`, `frontend/tests/components/commons/LoadingModal.spec.ts`
+**Commit:** e3568aef48
+**Applied fix:** Call `teardownGlobalClientForTesting` from `onUnmounted` in the helper, and add suite-level `afterEach` teardown in `LoadingModal.spec.ts` (matching AssimilationPanel loading-modal pattern). Verified with `vitest run tests/components/commons/LoadingModal.spec.ts` (12 passed).
 
 ---
 
-_Fixed: 2026-07-21T05:34:14Z_
-_Fixer: generic-agent workaround (gsd-code-fixer role)_
+_Fixed: 2026-07-21T07:50:00Z_
+_Fixer: Claude (gsd-code-fixer)_
 _Iteration: 1_
