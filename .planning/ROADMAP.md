@@ -112,7 +112,7 @@ Plans:
 
 ### Phase 4: Enforce Safe Blocking Boundaries
 
-**Goal**: User receives a consistent blocker throughout note extraction without being offered unsafe client-only cancellation for transactional creation
+**Goal:** As a note author finishing Refine note extraction, I want to see the shared create-note blocker without Cancel while the mutation runs, so that I am never offered unsafe client-only cancellation of a transactional write.
 **Mode:** mvp
 **Type:** Behavior
 **UI hint:** yes
@@ -125,7 +125,26 @@ Plans:
   3. Every existing whole-UI blocker and long-running note-refinement AI request has an explicit cancellation classification, and every safe in-scope request uses the shared contract
   4. No in-scope caller duplicates generic abort, loading cleanup, or cancellation-error suppression logic
 
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 04-01-PLAN.md — Promote REFN-05 create-note Cancel-absent proof + keep success navigation green
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 04-02-PLAN.md — Persist COHE-02 classification inventory in frontend-api.mdc; re-verify layout/preview cancelable
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 04-03-PLAN.md — Automated cancelable allowlist + managedApi-only AbortController guard
+
+**Cross-cutting constraints:**
+
+- Create-note stays intentionally noncancelable (`AI is creating note...`, Cancel absent); do not invent cancelable create.
+- Cancelable allowlist remains layout + extraction-preview only; no ADPT-01 migrations.
+- Abort ownership stays inside `frontend/src/managedApi/` only.
 
 ## Progress
 
@@ -137,4 +156,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. Shared Cancellation Contract | 3/3 | Complete    | 2026-07-21 |
 | 2. Cancel Refinement Layout Generation | 3/3 | Plans complete | 2026-07-21 |
 | 3. Cancel Extraction Preview Generation | 3/3 | Complete | 2026-07-21 |
-| 4. Enforce Safe Blocking Boundaries | 0/TBD | Not started | - |
+| 4. Enforce Safe Blocking Boundaries | 0/3 | Planned | - |

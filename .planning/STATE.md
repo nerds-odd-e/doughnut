@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: 4
-status: ui_spec_drafted
-stopped_at: Phase 4 UI-SPEC drafted
-last_updated: "2026-07-21T10:05:00.000Z"
+status: plans_ready
+stopped_at: Phase 4 plans created (04-01..04-03)
+last_updated: "2026-07-21T10:15:00.000Z"
 last_activity: 2026-07-21
-last_activity_desc: Drafted 04-UI-SPEC.md (create-note Cancel-absent contract)
+last_activity_desc: Created Phase 4 PLAN.md files (REFN-05 proof, COHE-02 inventory, allowlist guard)
 progress:
   total_phases: 4
   completed_phases: 3
-  total_plans: 9
+  total_plans: 12
   completed_plans: 9
 current_phase_name: Enforce Safe Blocking Boundaries
 ---
@@ -23,17 +23,17 @@ current_phase_name: Enforce Safe Blocking Boundaries
 See: .planning/PROJECT.md (updated 2026-07-21)
 
 **Core value:** When a long-running frontend action blocks the UI, the user can cancel it and remain in a coherent, usable state without unintended follow-up behavior.
-**Current focus:** Phase 4 UI design contract drafted — next is UI-SPEC check / plan-phase
+**Current focus:** Phase 4 plans ready — execute 04-01 → 04-02 → 04-03
 
 ## Current Position
 
-Phase: 4 — UI-SPEC draft
-Plan: not started
-Status: Phase 3 complete; Phase 4 CONTEXT + RESEARCH + UI-SPEC present; ready for gsd-ui-checker then plan
-Last activity: 2026-07-21 — Drafted 04-UI-SPEC.md
+Phase: 4 — Plans ready
+Plan: 04-01 next
+Status: Phase 4 CONTEXT + RESEARCH + UI-SPEC + 3 PLANs present; ready for execute-phase
+Last activity: 2026-07-21 — Created 04-01/02/03-PLAN.md
 
-Progress: [██████████] 100% of Phase 1–3 plans; Phase 4 pre-plan artifacts in progress
-Resume file: .planning/phases/04-enforce-safe-blocking-boundaries/04-UI-SPEC.md
+Progress: [██████████] 100% of Phase 1–3 plans; Phase 4 0/3 plans executed
+Resume file: .planning/phases/04-enforce-safe-blocking-boundaries/04-01-PLAN.md
 
 ## Performance Metrics
 
@@ -117,6 +117,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-21T09:56:45.792Z
-Stopped at: Phase 4 context gathered
-Resume file: None
+Last session: 2026-07-21T10:15:00.000Z
+Stopped at: Phase 4 plans created
+Resume file: .planning/phases/04-enforce-safe-blocking-boundaries/04-01-PLAN.md
