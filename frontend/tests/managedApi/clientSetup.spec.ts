@@ -122,6 +122,29 @@ describe("clientSetup", () => {
       expect(result.error).toBeDefined()
       expect(mockToast.error).toHaveBeenCalled()
     })
+
+    it("does not toast a late error after cancellation", async () => {
+      let resolveCall: (value: {
+        error: string
+        response: { status: number }
+      }) => void = () => undefined
+      const result = apiCallWithLoading(
+        () =>
+          new Promise<{ error: string; response: { status: number } }>(
+            (resolve) => {
+              resolveCall = resolve
+            }
+          ),
+        { blockUi: true, cancelable: true }
+      )
+
+      apiStatus.states[0]?.cancel?.()
+      await expect(result).resolves.toEqual({ status: "cancelled" })
+      resolveCall({ error: "request aborted", response: { status: 500 } })
+      await Promise.resolve()
+
+      expect(mockToast.error).not.toHaveBeenCalled()
+    })
   })
 
   describe("401 unauthorized — redirect to sign-in", () => {

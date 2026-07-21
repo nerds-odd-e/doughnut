@@ -19,16 +19,18 @@ const okApiResult = {
   response: {} as Response,
 }
 
-function controlledApiCall() {
-  let resolve: (value: typeof okApiResult) => void = () => undefined
+function controlledPromise<T>() {
+  let resolve: (value: T) => void = () => undefined
   let reject: (reason: unknown) => void = () => undefined
-  const promise = new Promise<typeof okApiResult>(
-    (resolvePromise, rejectPromise) => {
-      resolve = resolvePromise
-      reject = rejectPromise
-    }
-  )
+  const promise = new Promise<T>((resolvePromise, rejectPromise) => {
+    resolve = resolvePromise
+    reject = rejectPromise
+  })
   return { promise, resolve, reject }
+}
+
+function controlledApiCall() {
+  return controlledPromise<typeof okApiResult>()
 }
 
 describe("apiCallWithLoading loading state management", () => {
@@ -178,5 +180,69 @@ describe("apiCallWithLoading loading state management", () => {
       // @ts-expect-error cancelled outcomes intentionally expose no result
       expect(outcome.result).toBeUndefined()
     }
+  })
+
+  it("lets accepted cancellation win a same-turn request resolution", async () => {
+    const call = controlledApiCall()
+    const result = apiCallWithLoading(() => call.promise, {
+      blockUi: true,
+      cancelable: true,
+    })
+    const cancel = apiStatus.states[0]?.cancel
+
+    call.resolve(okApiResult)
+    cancel?.()
+
+    await expect(result).resolves.toEqual({ status: "cancelled" })
+  })
+
+  it("settles promptly and consumes fulfillment after cancellation", async () => {
+    const lateFulfillment = controlledApiCall()
+    const fulfilledResult = apiCallWithLoading(() => lateFulfillment.promise, {
+      blockUi: true,
+      cancelable: true,
+    })
+    apiStatus.states[0]?.cancel?.()
+    await expect(fulfilledResult).resolves.toEqual({ status: "cancelled" })
+    lateFulfillment.resolve(okApiResult)
+    await lateFulfillment.promise
+  })
+
+  it("settles promptly and consumes rejection after cancellation", async () => {
+    const lateRejection = controlledApiCall()
+    const rejectedResult = apiCallWithLoading(() => lateRejection.promise, {
+      blockUi: true,
+      cancelable: true,
+    })
+    apiStatus.states[0]?.cancel?.()
+    await expect(rejectedResult).resolves.toEqual({ status: "cancelled" })
+    lateRejection.reject(new Error("late rejection"))
+    await new Promise<void>((resolve) => queueMicrotask(resolve))
+  })
+
+  it("forwards the operation signal through a generated request", async () => {
+    let receivedSignal: AbortSignal | undefined
+    const response = controlledPromise<Response>()
+    const requestStarted = controlledPromise<Request>()
+    fetchMock.mockImplementation((request) => {
+      requestStarted.resolve(request as Request)
+      return response.promise
+    })
+    const result = apiCallWithLoading(
+      (signal) => {
+        receivedSignal = signal
+        return UserController.getUserProfile({ signal })
+      },
+      { blockUi: true, cancelable: true }
+    )
+
+    const request = await requestStarted.promise
+    expect(receivedSignal?.aborted).toBe(false)
+    expect(request.signal.aborted).toBe(false)
+    apiStatus.states[0]?.cancel?.()
+    expect(receivedSignal?.aborted).toBe(true)
+    expect(request.signal.aborted).toBe(true)
+    await expect(result).resolves.toEqual({ status: "cancelled" })
+    response.resolve(new Response(JSON.stringify({})))
   })
 })
