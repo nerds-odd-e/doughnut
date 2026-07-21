@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest"
+import { describe, it, expect, vi } from "vitest"
 import { render } from "@testing-library/vue"
 import LoadingModal from "@/components/commons/LoadingModal.vue"
 
@@ -12,7 +12,7 @@ describe("LoadingModal", () => {
   })
 
   it("should render with spinner and message when show is true", () => {
-    const { getByText } = render(LoadingModal, {
+    const { getByText, queryByText } = render(LoadingModal, {
       props: { show: true, message: "AI is creating note..." },
     })
 
@@ -20,6 +20,7 @@ describe("LoadingModal", () => {
     expect(document.querySelector(".loading-modal-mask")).toBeTruthy()
     expect(document.querySelector(".daisy-loading-spinner")).toBeTruthy()
     expect(getByText("AI is creating note...")).toBeTruthy()
+    expect(queryByText("Cancel")).toBeNull()
   })
 
   it("should render with default message when message prop is not provided", () => {
@@ -36,5 +37,99 @@ describe("LoadingModal", () => {
     })
 
     expect(document.querySelector(".close-button")).toBeNull()
+  })
+
+  it("renders one neutral native Cancel button only when an action is supplied", () => {
+    const cancelAction = vi.fn()
+    const { getByText } = render(LoadingModal, {
+      props: {
+        show: true,
+        message: "AI is creating note...",
+        // @ts-expect-error RED: the modal does not expose cancellation props yet
+        loadingStateId: 11,
+        cancelAction,
+      },
+    })
+
+    const cancelButton = getByText("Cancel")
+    expect(cancelButton.tagName).toBe("BUTTON")
+    expect(cancelButton).toHaveAttribute("type", "button")
+    expect(cancelButton).toHaveClass(
+      "daisy-btn",
+      "daisy-btn-ghost",
+      "text-white"
+    )
+    expect(document.querySelectorAll("button")).toHaveLength(1)
+
+    cancelButton.click()
+    expect(cancelAction).toHaveBeenCalledOnce()
+  })
+
+  it("replaces only the identity-bound action when the selected state changes", async () => {
+    const firstCancel = vi.fn()
+    const secondCancel = vi.fn()
+    const { getByText, rerender } = render(LoadingModal, {
+      props: {
+        show: true,
+        message: "Newest blocker",
+        // @ts-expect-error RED: the modal does not expose cancellation props yet
+        loadingStateId: 21,
+        cancelAction: firstCancel,
+      },
+    })
+    const overlay = document.querySelector(".loading-modal-mask")
+    const firstButton = getByText("Cancel")
+
+    await rerender({
+      show: true,
+      message: "Older blocker",
+      loadingStateId: 20,
+      cancelAction: secondCancel,
+    })
+
+    const secondButton = getByText("Cancel")
+    expect(document.querySelector(".loading-modal-mask")).toBe(overlay)
+    expect(getByText("Older blocker")).toBeTruthy()
+    expect(secondButton).not.toBe(firstButton)
+
+    secondButton.click()
+    expect(secondCancel).toHaveBeenCalledOnce()
+    expect(firstCancel).not.toHaveBeenCalled()
+  })
+
+  it("keeps long messages centered with the optional action", () => {
+    const longMessage = Array.from(
+      { length: 20 },
+      () => "Generating a detailed refinement layout"
+    ).join(" ")
+    const { getByText } = render(LoadingModal, {
+      props: {
+        show: true,
+        message: longMessage,
+        // @ts-expect-error RED: the modal does not expose cancellation props yet
+        loadingStateId: 31,
+        cancelAction: vi.fn(),
+      },
+    })
+
+    const message = getByText(longMessage)
+    expect(message).toHaveClass("loading-message")
+    expect(getComputedStyle(message).textAlign).toBe("center")
+    expect(getByText("Cancel")).toBeTruthy()
+  })
+
+  it("does not render the action while hidden", () => {
+    const { queryByText } = render(LoadingModal, {
+      props: {
+        show: false,
+        message: "Loading...",
+        // @ts-expect-error RED: the modal does not expose cancellation props yet
+        loadingStateId: 41,
+        cancelAction: vi.fn(),
+      },
+    })
+
+    expect(document.querySelector(".loading-modal-mask")).toBeNull()
+    expect(queryByText("Cancel")).toBeNull()
   })
 })
