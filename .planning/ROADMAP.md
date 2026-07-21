@@ -77,7 +77,7 @@ Plans:
 
 ### Phase 3: Cancel Extraction Preview Generation
 
-**Goal**: User can cancel AI extraction-preview generation without losing the layout choices that led to it
+**Goal**: As a note author using Refine note, I want to cancel AI extraction-preview generation without losing my layout selections, so that I can retry Extract from the same choices or keep my prior preview if I cancelled a regenerate.
 **Mode:** mvp
 **Type:** Behavior
 **UI hint:** yes
@@ -89,7 +89,26 @@ Plans:
   2. Activating Cancel keeps all selected refinement-layout items and leaves the user before the preview
   3. Cancellation shows no API error and the user can retry preview generation from the preserved selection
 
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 03-01-PLAN.md — Failing Vitest cancel suite and pending-preview helpers (TDD RED)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 03-02-PLAN.md — Cancelable preview load + preserve-selection / keep-prior-preview (vertical GREEN slice)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 03-03-PLAN.md — Retry/idempotent edges, create-note noncancelable regression, frontend-api.mdc docs
+
+**Cross-cutting constraints:**
+
+- While extraction-preview generation is pending, the global blocker shows AI is generating preview... and an accessible Cancel control.
+- After Extract cancel, selections stay and Extract remains the retry CTA (no layout empty panel).
+- Create-note remains noncancelable in this phase.
 
 ### Phase 4: Enforce Safe Blocking Boundaries
 
@@ -117,5 +136,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Shared Cancellation Contract | 3/3 | Complete    | 2026-07-21 |
 | 2. Cancel Refinement Layout Generation | 3/3 | Plans complete | 2026-07-21 |
-| 3. Cancel Extraction Preview Generation | 0/TBD | Not started | - |
+| 3. Cancel Extraction Preview Generation | 0/3 | Planned | - |
 | 4. Enforce Safe Blocking Boundaries | 0/TBD | Not started | - |

@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: 3
-status: ui_spec_complete
-stopped_at: Phase 3 UI-SPEC drafted — ready for checker / plan-phase
-last_updated: "2026-07-21T09:10:00.000Z"
+status: ready_to_execute
+stopped_at: Phase 3 plans written — ready for execute-phase
+last_updated: "2026-07-21T09:20:00.000Z"
 last_activity: 2026-07-21
-last_activity_desc: Phase 3 03-UI-SPEC.md written (adopt-only Cancel)
+last_activity_desc: Phase 3 plans created (03-01/02/03 RED→GREEN→edges)
 progress:
   total_phases: 4
   completed_phases: 2
-  total_plans: 6
+  total_plans: 9
   completed_plans: 6
 current_phase_name: Cancel Extraction Preview Generation
 ---
@@ -23,17 +23,17 @@ current_phase_name: Cancel Extraction Preview Generation
 See: .planning/PROJECT.md (updated 2026-07-21)
 
 **Core value:** When a long-running frontend action blocks the UI, the user can cancel it and remain in a coherent, usable state without unintended follow-up behavior.
-**Current focus:** Phase 3 — Cancel Extraction Preview Generation (UI-SPEC drafted; awaiting checker / plan)
+**Current focus:** Phase 3 — Cancel Extraction Preview Generation (plans ready; execute next)
 
 ## Current Position
 
-Phase: 3 — UI-SPEC COMPLETE (draft)
-Plan: 0 of TBD
-Status: UI design contract written; awaiting gsd-ui-checker then `/gsd-plan-phase`
-Last activity: 2026-07-21 — Phase 3 03-UI-SPEC.md written
+Phase: 3 — PLANNED
+Plan: 0 of 3
+Status: Plans written (Wave 1 RED → Wave 2 GREEN → Wave 3 edges/docs); ready for `/gsd-execute-phase 3`
+Last activity: 2026-07-21 — Phase 3 03-01/02/03-PLAN.md written
 
 Progress: [█████░░░░░] ~50% (2/4 phases complete)
-Resume file: .planning/phases/03-cancel-extraction-preview-generation/03-UI-SPEC.md
+Resume file: .planning/phases/03-cancel-extraction-preview-generation/03-01-PLAN.md
 
 ## Performance Metrics
 

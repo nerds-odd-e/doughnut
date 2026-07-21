@@ -36,7 +36,7 @@ created: 2026-07-21
 
 ## Per-Task Verification Map
 
-Plans TBD by planner; Wave 0 gaps from RESEARCH map to early plan tasks.
+Mapped to plans 03-01 / 03-02 / 03-03.
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
