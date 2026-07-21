@@ -5,10 +5,10 @@ milestone_name: milestone
 current_phase: 2
 current_phase_name: Cancel Refinement Layout Generation
 status: planned
-stopped_at: Phase 02 plans revised for checker (research/nyquist/verify); ready for execute-phase
-last_updated: "2026-07-21T08:25:00.000Z"
+stopped_at: Phase 02 checker revision 2 (02-03 verify gates); ready for execute-phase
+last_updated: "2026-07-21T08:30:00.000Z"
 last_activity: 2026-07-21
-last_activity_desc: Phase 02 plans revised (Open Questions RESOLVED, VALIDATION map synced, 02-03 verify phrases)
+last_activity_desc: Phase 02 checker revision 2 — 02-03 Task 1 extractNote + cancelable exclusivity rg gate
 progress:
   total_phases: 4
   completed_phases: 1
@@ -30,9 +30,9 @@ See: .planning/PROJECT.md (updated 2026-07-21)
 Phase: 2 — Cancel Refinement Layout Generation
 Plan: 02-01 (next)
 Status: Planned — 3 plans ready for execute
-Last activity: 2026-07-21 — Phase 02 checker revision (research Qs resolved, Nyquist map synced, docs verify expanded)
+Last activity: 2026-07-21 — Phase 02 checker revision 2 (02-03 Task 1 extractNote + exclusivity rg)
 
-Progress: Phase 1 done; Phase 2 planned (3/3 plans, checker revision 1 applied)
+Progress: Phase 1 done; Phase 2 planned (3/3 plans, checker revision 2 applied)
 
 ## Performance Metrics
 
