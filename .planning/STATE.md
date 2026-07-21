@@ -4,16 +4,16 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 4
 current_phase_name: Enforce Safe Blocking Boundaries
-status: plans_ready
-stopped_at: Phase 4 plans verified — ready to execute
-last_updated: "2026-07-21T10:08:51.275Z"
+status: executing
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-07-21T10:10:57.733Z"
 last_activity: 2026-07-21
-last_activity_desc: Created 04-01/02/03-PLAN.md
+last_activity_desc: Completed 04-01 REFN-05 create-note Cancel-absent proof
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 12
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # Project State
@@ -23,17 +23,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-21)
 
 **Core value:** When a long-running frontend action blocks the UI, the user can cancel it and remain in a coherent, usable state without unintended follow-up behavior.
-**Current focus:** Phase 4 plans ready — execute 04-01 → 04-02 → 04-03
+**Current focus:** Phase 4 executing — 04-01 done; next 04-02 → 04-03
 
 ## Current Position
 
-Phase: 4 — Plans ready
-Plan: 04-01 next
-Status: Phase 4 CONTEXT + RESEARCH + UI-SPEC + 3 PLANs present; ready for execute-phase
-Last activity: 2026-07-21 — Created 04-01/02/03-PLAN.md
+Phase: 4 — Enforce Safe Blocking Boundaries
+Plan: 04-02 next
+Status: 04-01 complete (REFN-05 proof); execute 04-02 COHE-02 inventory next
+Last activity: 2026-07-21 — Completed 04-01-PLAN.md
 
-Progress: [██████████] 100% of Phase 1–3 plans; Phase 4 0/3 plans executed
-Resume file: .planning/phases/04-enforce-safe-blocking-boundaries/04-01-PLAN.md
+Progress: [████████░░] 83% (10/12 plans); Phase 4 1/3 plans executed
+Resume file: .planning/phases/04-enforce-safe-blocking-boundaries/04-02-PLAN.md
 
 ## Performance Metrics
 
@@ -68,6 +68,7 @@ Resume file: .planning/phases/04-enforce-safe-blocking-boundaries/04-01-PLAN.md
 | Phase 03 P01 | 8min | 2 tasks | 2 files |
 | Phase 03 P02 | 3min | 2 tasks | 4 files |
 | Phase 03 P03 | 5min | 2 tasks | 3 files |
+| Phase 04 P01 | 3min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -98,6 +99,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 03]: No NoteRefinement.vue fix needed for cancel edges — already correct from 03-02
 - [Phase ?]: [Phase 03]: frontend-api.mdc documents extraction-preview as second cancelable opt-in; create-note stays forbidden
 - [Phase ?]: [Phase 03]: Split extraction-preview cancel edges into dedicated spec for 250-line gate
+- [Phase ?]: [Phase 04]: Left createExtractedNote on runWithBlockingApiLoading (no Discretion flatten)
+- [Phase ?]: [Phase 04]: Promoted D-10 edge in-place to REFN-05 rather than a new phase-numbered spec file
 
 ### Pending Todos
 
@@ -117,6 +120,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-21T10:08:51.269Z
-Stopped at: Phase 4 plans verified — ready to execute
+Last session: 2026-07-21T10:10:57.728Z
+Stopped at: Completed 04-01-PLAN.md
 Resume file: .planning/phases/04-enforce-safe-blocking-boundaries/04-01-PLAN.md

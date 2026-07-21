@@ -125,12 +125,12 @@ Plans:
   3. Every existing whole-UI blocker and long-running note-refinement AI request has an explicit cancellation classification, and every safe in-scope request uses the shared contract
   4. No in-scope caller duplicates generic abort, loading cleanup, or cancellation-error suppression logic
 
-**Plans**: 0/3 plans executed
+**Plans**: 1/3 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 04-01-PLAN.md — Promote REFN-05 create-note Cancel-absent proof + keep success navigation green
+- [x] 04-01-PLAN.md — Promote REFN-05 create-note Cancel-absent proof + keep success navigation green
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -156,4 +156,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. Shared Cancellation Contract | 3/3 | Complete    | 2026-07-21 |
 | 2. Cancel Refinement Layout Generation | 3/3 | Plans complete | 2026-07-21 |
 | 3. Cancel Extraction Preview Generation | 3/3 | Complete | 2026-07-21 |
-| 4. Enforce Safe Blocking Boundaries | 0/3 | Planned    |  |
+| 4. Enforce Safe Blocking Boundaries | 1/3 | In Progress|  |
