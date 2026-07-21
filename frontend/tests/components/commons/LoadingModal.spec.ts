@@ -45,7 +45,6 @@ describe("LoadingModal", () => {
       props: {
         show: true,
         message: "AI is creating note...",
-        // @ts-expect-error RED: the modal does not expose cancellation props yet
         loadingStateId: 11,
         cancelAction,
       },
@@ -72,7 +71,6 @@ describe("LoadingModal", () => {
       props: {
         show: true,
         message: "Newest blocker",
-        // @ts-expect-error RED: the modal does not expose cancellation props yet
         loadingStateId: 21,
         cancelAction: firstCancel,
       },
@@ -106,7 +104,6 @@ describe("LoadingModal", () => {
       props: {
         show: true,
         message: longMessage,
-        // @ts-expect-error RED: the modal does not expose cancellation props yet
         loadingStateId: 31,
         cancelAction: vi.fn(),
       },
@@ -123,7 +120,6 @@ describe("LoadingModal", () => {
       props: {
         show: false,
         message: "Loading...",
-        // @ts-expect-error RED: the modal does not expose cancellation props yet
         loadingStateId: 41,
         cancelAction: vi.fn(),
       },

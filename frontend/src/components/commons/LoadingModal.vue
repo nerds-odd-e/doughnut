@@ -3,6 +3,15 @@
     <div class="loading-modal-content">
       <div class="daisy-loading daisy-loading-spinner daisy-loading-lg"></div>
       <p class="loading-message">{{ message }}</p>
+      <button
+        v-if="cancelAction"
+        :key="loadingStateId"
+        type="button"
+        class="daisy-btn daisy-btn-ghost text-white focus-visible:outline-2 focus-visible:outline-white"
+        @click="cancelAction"
+      >
+        Cancel
+      </button>
     </div>
   </Overlay>
 </template>
@@ -13,6 +22,8 @@ import Overlay from "./Overlay.vue"
 interface Props {
   show: boolean
   message?: string
+  loadingStateId?: number
+  cancelAction?: () => void
 }
 
 withDefaults(defineProps<Props>(), {
@@ -37,5 +48,8 @@ withDefaults(defineProps<Props>(), {
   font-size: 1.125rem;
   font-weight: 500;
   margin: 0;
+  max-width: calc(100vw - 2rem);
+  overflow-wrap: anywhere;
+  text-align: center;
 }
 </style>
