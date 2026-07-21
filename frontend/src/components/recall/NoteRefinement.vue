@@ -152,6 +152,23 @@
     </div>
   </div>
 
+  <div
+    v-else-if="layoutLoadSettled"
+    class="mb-4 rounded-lg bg-accent p-4"
+    data-test-id="refinement-layout-empty"
+  >
+    <div class="font-semibold mb-3 text-accent-content">
+      Note layout:
+    </div>
+    <button
+      data-test-id="retry-refinement-layout"
+      class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+      @click="loadRefinementLayout"
+    >
+      Ask AI to retry
+    </button>
+  </div>
+
   <AiRequestExportDialog
     v-if="showExportExtractDialog"
     title="Export Extract Request for ChatGPT"
@@ -198,6 +215,7 @@ const emit = defineEmits<{
 }>()
 
 const refinementLayoutItems = ref<NoteRefinementLayoutItem[]>([])
+const layoutLoadSettled = ref(false)
 const showExtractionPreview = ref(false)
 const extractionPreview = ref<NoteExtractionResult>({
   newNoteTitle: "",
@@ -233,23 +251,33 @@ const resetExtractionPreview = () => {
 }
 
 const loadRefinementLayout = async () => {
-  try {
-    const result = await apiCallWithLoading(() =>
+  const settleLayout = (items: NoteRefinementLayoutItem[]) => {
+    refinementLayoutItems.value = items
+    clearSelection()
+    resetExtractionPreview()
+    layoutLoadSettled.value = true
+  }
+
+  const outcome = await apiCallWithLoading(
+    (signal) =>
       AiController.generateRefinementSuggestions({
         path: { note: props.note.id },
-      })
-    )
+        signal,
+      }),
+    {
+      blockUi: true,
+      message: "AI is generating layout...",
+      cancelable: true,
+    }
+  )
 
-    refinementLayoutItems.value =
-      !result.error && result.data?.items ? result.data.items : []
-    clearSelection()
-    resetExtractionPreview()
-  } catch (err) {
-    console.error("Failed to generate note layout:", err)
-    refinementLayoutItems.value = []
-    clearSelection()
-    resetExtractionPreview()
+  if (outcome.status === "cancelled") {
+    settleLayout([])
+    return
   }
+
+  const { data, error } = outcome.result
+  settleLayout(!error && data?.items ? data.items : [])
 }
 
 onMounted(() => loadRefinementLayout())
