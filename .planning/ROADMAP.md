@@ -58,9 +58,22 @@ The project selected fine granularity. Four phases are sufficient because the re
 **Plans**: 3 plans
 
 Plans:
+**Wave 1**
+
 - [ ] 02-01-PLAN.md — Failing Vitest cancel+retry suite and pending-mount helpers (TDD RED)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 02-02-PLAN.md — Cancelable layout load + empty/retry panel (vertical GREEN slice)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 02-03-PLAN.md — Concurrent/idempotent edges, scope-boundary regressions, frontend-api.mdc docs
+
+**Cross-cutting constraints:**
+
+- While initial layout generation is pending, the global blocker shows AI is generating layout... and an accessible Cancel control.
+- After cancel, no selected checkboxes / no extract actions until a populated layout returns.
 
 ### Phase 3: Cancel Extraction Preview Generation
 
