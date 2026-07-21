@@ -26,7 +26,7 @@ When a long-running frontend action blocks the UI, the user can cancel it and re
 - [ ] Callers customize only their domain-specific post-cancel state while shared cancellation mechanics remain centralized
 - [ ] Cancelling note-refinement layout generation leaves the refinement dialog open and makes retry available
 - [ ] Cancelling extract-preview generation preserves the selected layout items and leaves the user before the preview
-- [ ] Cancelling extracted-note creation preserves the edited preview and does not navigate
+- [ ] Extracted-note creation uses the shared blocking experience without offering a misleading client-only Cancel action
 - [ ] Existing whole-UI blockers and long-running AI actions are audited, with safe candidates migrated to the shared opt-in solution
 
 ### Out of Scope
@@ -34,6 +34,7 @@ When a long-running frontend action blocks the UI, the user can cancel it and re
 - Guaranteed server-side cancellation — the first iteration aborts the browser request; cooperative backend cancellation can be added later where its value justifies the larger API design
 - Universal cancellation for every API request or thin loading-bar operation — cancellation is explicitly enabled only for blocking interactions where the caller can define a safe outcome
 - Offering cancellation for mutations that may already have committed server-side state — these require separate safety analysis or backend cooperation
+- Client-only cancellation for extracted-note creation — retrying after an ambiguous abort could create duplicate notes or apply the original-note update twice
 - A broad visual redesign of Doughnut's frontend — this effort is limited to cohesive blocking and cancellation behavior
 
 ## Context
@@ -65,6 +66,7 @@ When a long-running frontend action blocks the UI, the user can cancel it and re
 | Centralize generic cancellation mechanics | Keeps API abortion, loading cleanup, and cancellation classification consistent across the frontend | — Pending |
 | Keep post-cancel UI behavior at each usage site | Layout generation, preview generation, and note creation must preserve different user state | — Pending |
 | Prove the solution in the note-refinement flow | It exposes missing and existing spinners around related AI actions and demonstrates reuse across distinct outcomes | — Pending |
+| Keep extracted-note creation non-cancelable in the first version | It is a transactional mutation, and aborting the browser request cannot safely promise that the note was not created | — Pending |
 
 ## Evolution
 
