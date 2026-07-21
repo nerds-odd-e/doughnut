@@ -104,7 +104,7 @@ describe("LoadingModal", () => {
     expect(firstCancel).not.toHaveBeenCalled()
   })
 
-  it("keeps long messages centered with the optional action", () => {
+  it("preserves the existing message layout with the optional action", () => {
     const longMessage = Array.from(
       { length: 20 },
       () => "Generating a detailed refinement layout"
@@ -120,7 +120,9 @@ describe("LoadingModal", () => {
 
     const message = getByText(longMessage)
     expect(message).toHaveClass("loading-message")
-    expect(getComputedStyle(message).textAlign).toBe("center")
+    expect(getComputedStyle(message).textAlign).toBe("start")
+    expect(getComputedStyle(message).maxWidth).toBe("none")
+    expect(getComputedStyle(message).overflowWrap).toBe("normal")
     expect(getByText("Cancel")).toBeTruthy()
   })
 

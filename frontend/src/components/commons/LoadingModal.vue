@@ -68,8 +68,5 @@ withDefaults(defineProps<Props>(), {
   font-size: 1.125rem;
   font-weight: 500;
   margin: 0;
-  max-width: calc(100vw - 2rem);
-  overflow-wrap: anywhere;
-  text-align: center;
 }
 </style>
