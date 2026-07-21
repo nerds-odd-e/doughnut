@@ -89,7 +89,7 @@ status: complete
 1. **Task 1: Promote create-note Cancel-absent to REFN-05 proof** - `b83f4c9740` (test)
 2. **Task 2: Keep create success navigation green** - no commit (verification-only; product path left as-is)
 
-**Plan metadata:** (pending docs commit)
+**Plan metadata:** `66a93a8a21` (docs: complete plan)
 
 ## Files Created/Modified
 
