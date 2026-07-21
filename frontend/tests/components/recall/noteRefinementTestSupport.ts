@@ -16,7 +16,7 @@ import type {
   NoteExtractionResult,
   NoteRefinementLayoutItem,
 } from "@generated/doughnut-backend-api"
-import { afterEach, beforeEach, vi } from "vitest"
+import { afterEach, beforeEach, expect, vi } from "vitest"
 import { defineComponent, type PropType } from "vue"
 
 export const noteRealm = makeMe.aNoteRealm.please()
@@ -205,15 +205,27 @@ export function refinementLayoutItems(
 export function refinementLayoutSelectionApiCall(
   noteId: number,
   items: NoteRefinementLayoutItem[],
-  selectedItemIds: string[]
+  selectedItemIds: string[],
+  options?: { signal?: boolean }
 ) {
-  return {
+  const call: {
+    path: { note: number }
+    body: {
+      layout: { items: NoteRefinementLayoutItem[] }
+      selectedItemIds: string[]
+    }
+    signal?: AbortSignal
+  } = {
     path: { note: noteId },
     body: {
       layout: { items },
       selectedItemIds,
     },
   }
+  if (options?.signal) {
+    return { ...call, signal: expect.any(AbortSignal) }
+  }
+  return call
 }
 
 export {

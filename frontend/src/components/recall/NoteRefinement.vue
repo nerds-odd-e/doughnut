@@ -331,27 +331,6 @@ const removeSelectedLayoutItems = async () => {
   }, "AI is removing content...")
 }
 
-const fetchExtractionPreview = async () => {
-  const response = await apiCallWithLoading(() =>
-    AiController.extractNotePreview({
-      path: { note: props.note.id },
-      body: layoutSelectionBody(),
-    })
-  )
-
-  if (response.error || !response.data) {
-    const openApiError = toOpenApiError(response.error)
-    createError.value =
-      openApiError.message ?? "Failed to generate extract preview"
-    return false
-  }
-
-  extractionPreview.value = { ...response.data }
-  lastAiExtractionResult.value = { ...response.data }
-  createError.value = ""
-  return true
-}
-
 const isExtractionPreviewEdited = () => {
   const lastResult = lastAiExtractionResult.value
   if (!lastResult) {
@@ -369,20 +348,37 @@ const isExtractionPreviewEdited = () => {
 const runExtractionPreview = async (showPreviewOnSuccess: boolean) => {
   createError.value = ""
 
-  try {
-    await runWithBlockingApiLoading(async () => {
-      const success = await fetchExtractionPreview()
-      if (success) {
-        if (showPreviewOnSuccess) {
-          showExtractionPreview.value = true
-        }
-      } else {
-        showExtractionPreview.value = true
-      }
-    }, "AI is generating preview...")
-  } catch (err) {
-    console.error("Failed to generate extract preview:", err)
-    createError.value = `Error: ${err}`
+  const outcome = await apiCallWithLoading(
+    (signal) =>
+      AiController.extractNotePreview({
+        path: { note: props.note.id },
+        body: layoutSelectionBody(),
+        signal,
+      }),
+    {
+      blockUi: true,
+      cancelable: true,
+      message: "AI is generating preview...",
+    }
+  )
+
+  if (outcome.status === "cancelled") {
+    return
+  }
+
+  const { data, error } = outcome.result
+  if (error || !data) {
+    const openApiError = toOpenApiError(error)
+    createError.value =
+      openApiError.message ?? "Failed to generate extract preview"
+    showExtractionPreview.value = true
+    return
+  }
+
+  extractionPreview.value = { ...data }
+  lastAiExtractionResult.value = { ...data }
+  createError.value = ""
+  if (showPreviewOnSuccess) {
     showExtractionPreview.value = true
   }
 }

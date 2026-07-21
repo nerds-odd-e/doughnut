@@ -92,7 +92,9 @@ describe("NoteRefinement extract note", () => {
       await openExtractionPreview(wrapper, "p2")
 
       expect(extractNotePreviewSpy).toHaveBeenCalledWith(
-        refinementLayoutSelectionApiCall(note.id, threePointLayout(), ["p2"])
+        refinementLayoutSelectionApiCall(note.id, threePointLayout(), ["p2"], {
+          signal: true,
+        })
       )
       expectExtractionPreviewVisible(wrapper)
       expectPreviewFields(wrapper, {
@@ -199,7 +201,9 @@ describe("NoteRefinement extract note", () => {
       await flushPromises()
 
       expect(extractNotePreviewSpy).toHaveBeenCalledWith(
-        refinementLayoutSelectionApiCall(note.id, layout, ["p1", "p3"])
+        refinementLayoutSelectionApiCall(note.id, layout, ["p1", "p3"], {
+          signal: true,
+        })
       )
       expectExtractionPreviewVisible(wrapper)
     })
@@ -220,7 +224,9 @@ describe("NoteRefinement extract note", () => {
       expect(extractNotePreviewSpy).toHaveBeenCalledTimes(2)
       expect(extractNotePreviewSpy).toHaveBeenNthCalledWith(
         2,
-        refinementLayoutSelectionApiCall(note.id, layout, ["p2"])
+        refinementLayoutSelectionApiCall(note.id, layout, ["p2"], {
+          signal: true,
+        })
       )
       expectPreviewFields(wrapper, extractionPreviewFieldsFor("Retry"))
       expectExtractionPreviewVisible(wrapper)

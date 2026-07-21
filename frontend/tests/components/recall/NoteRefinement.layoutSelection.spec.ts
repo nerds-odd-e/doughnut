@@ -76,7 +76,9 @@ describe("NoteRefinement layout selection", () => {
       await flushPromises()
 
       expect(spy).toHaveBeenCalledWith(
-        refinementLayoutSelectionApiCall(note.id, layout, ["p1-1"])
+        refinementLayoutSelectionApiCall(note.id, layout, ["p1-1"], {
+          signal: method === "extractNotePreview",
+        })
       )
     }
   )
@@ -94,7 +96,14 @@ describe("NoteRefinement layout selection", () => {
     await flushPromises()
 
     expect(extractNotePreviewSpy).toHaveBeenCalledWith(
-      refinementLayoutSelectionApiCall(note.id, layout, ["p1", "p1-1", "p1-2"])
+      refinementLayoutSelectionApiCall(
+        note.id,
+        layout,
+        ["p1", "p1-1", "p1-2"],
+        {
+          signal: true,
+        }
+      )
     )
   })
 
