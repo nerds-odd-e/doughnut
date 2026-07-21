@@ -1,6 +1,15 @@
 import { describe, it, expect, vi } from "vitest"
 import { render } from "@testing-library/vue"
 import LoadingModal from "@/components/commons/LoadingModal.vue"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
+import { nextTick } from "vue"
+
+const pendingResult = { data: "pending" }
+const neverSettles = () =>
+  new Promise<typeof pendingResult>(() => {
+    // The shared cancellation result settles independently of this request.
+  })
 
 describe("LoadingModal", () => {
   it("should not render when show is false", () => {
@@ -127,5 +136,65 @@ describe("LoadingModal", () => {
 
     expect(document.querySelector(".loading-modal-mask")).toBeNull()
     expect(queryByText("Cancel")).toBeNull()
+  })
+
+  it("cancels the newest blocker and reveals the older action in the same overlay", async () => {
+    const { getByText } = render(GlobalApiLoadingModal)
+    const olderCall = apiCallWithLoading(() => neverSettles(), {
+      blockUi: true,
+      message: "Older cancelable blocker",
+      cancelable: true,
+    })
+    const newestCall = apiCallWithLoading(() => neverSettles(), {
+      blockUi: true,
+      message: "Newest cancelable blocker",
+      cancelable: true,
+    })
+    await nextTick()
+
+    const overlay = document.querySelector(".loading-modal-mask")
+    expect(getByText("Newest cancelable blocker")).toBeTruthy()
+    const newestCancelButton = getByText("Cancel")
+    newestCancelButton.click()
+
+    await expect(newestCall).resolves.toEqual({ status: "cancelled" })
+    await nextTick()
+    expect(document.querySelector(".loading-modal-mask")).toBe(overlay)
+    expect(getByText("Older cancelable blocker")).toBeTruthy()
+
+    newestCancelButton.click()
+    await nextTick()
+    expect(getByText("Older cancelable blocker")).toBeTruthy()
+
+    getByText("Cancel").click()
+    await expect(olderCall).resolves.toEqual({ status: "cancelled" })
+  })
+
+  it("hides an older cancelable action behind the newest noncancelable blocker", async () => {
+    const { getByText, queryByText } = render(GlobalApiLoadingModal)
+    const olderCall = apiCallWithLoading(() => neverSettles(), {
+      blockUi: true,
+      message: "Older cancelable blocker",
+      cancelable: true,
+    })
+    let resolveNewest: (value: typeof pendingResult) => void = () => undefined
+    const newestCall = apiCallWithLoading(
+      () =>
+        new Promise<typeof pendingResult>((resolve) => {
+          resolveNewest = resolve
+        }),
+      { blockUi: true, message: "Newest noncancelable blocker" }
+    )
+    await nextTick()
+
+    expect(getByText("Newest noncancelable blocker")).toBeTruthy()
+    expect(queryByText("Cancel")).toBeNull()
+
+    resolveNewest(pendingResult)
+    await newestCall
+    await nextTick()
+    expect(getByText("Older cancelable blocker")).toBeTruthy()
+    getByText("Cancel").click()
+    await expect(olderCall).resolves.toEqual({ status: "cancelled" })
   })
 })
