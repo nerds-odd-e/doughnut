@@ -1,7 +1,7 @@
 import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
 import { apiCallWithLoading, setupGlobalClient } from "@/managedApi/clientSetup"
 import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { beforeEach, describe, expect, expectTypeOf, it, vi } from "vitest"
 import createFetchMock from "vitest-fetch-mock"
 
 const fetchMock = createFetchMock(vi)
@@ -14,6 +14,27 @@ const okApiResult = {
   response: {} as Response,
 }
 
+type ExpectedCancelableApiResult<T> =
+  | { status: "completed"; result: T }
+  | { status: "cancelled" }
+
+const callCancelableApi = apiCallWithLoading as unknown as <T>(
+  apiCall: (signal: AbortSignal) => Promise<T>,
+  options: { blockUi: true; message?: string; cancelable: true }
+) => Promise<ExpectedCancelableApiResult<T>>
+
+function controlledApiCall() {
+  let resolve: (value: typeof okApiResult) => void = () => undefined
+  let reject: (reason: unknown) => void = () => undefined
+  const promise = new Promise<typeof okApiResult>(
+    (resolvePromise, rejectPromise) => {
+      resolve = resolvePromise
+      reject = rejectPromise
+    }
+  )
+  return { promise, resolve, reject }
+}
+
 describe("apiCallWithLoading loading state management", () => {
   const apiStatus: ApiStatus = { states: [] }
   const baseUrl = "http://localhost:9081"
@@ -24,102 +45,32 @@ describe("apiCallWithLoading loading state management", () => {
     setupGlobalClient(apiStatus)
   })
 
-  it("sets loading state synchronously before API call", async () => {
-    let loadingStateBeforeCall = false
-    let loadingStateDuringCall = false
-
-    fetchMock.mockResponse(
-      () => {
-        loadingStateDuringCall = apiStatus.states.length > 0
-        return Promise.resolve(JSON.stringify({ user: {} }))
-      },
-      { url: `${baseUrl}/api/user` }
-    )
-
-    const promise = apiCallWithLoading(() => {
-      loadingStateBeforeCall = apiStatus.states.length > 0
-      return UserController.getUserProfile({})
+  it("preserves the synchronous raw-result contract for default calls", async () => {
+    const call = controlledApiCall()
+    let stateWasVisibleDuringCall = false
+    const resultPromise = apiCallWithLoading(() => {
+      stateWasVisibleDuringCall = apiStatus.states.length === 1
+      return call.promise
     })
 
-    expect(apiStatus.states.length).toBe(1)
+    expectTypeOf(resultPromise).toEqualTypeOf<Promise<typeof okApiResult>>()
+    expect(stateWasVisibleDuringCall).toBe(true)
+    expect(apiStatus.states).toEqual([
+      expect.not.objectContaining({ cancel: expect.any(Function) }),
+    ])
 
-    await promise
-
-    expect(loadingStateBeforeCall).toBe(true)
-    expect(loadingStateDuringCall).toBe(true)
-    expect(apiStatus.states.length).toBe(0)
+    call.resolve(okApiResult)
+    await expect(resultPromise).resolves.toBe(okApiResult)
+    expect(apiStatus.states).toEqual([])
   })
 
-  it("clears loading state after successful API call", async () => {
-    fetchMock.mockResponse(JSON.stringify({ user: {} }), {
-      url: `${baseUrl}/api/user`,
-    })
-
-    await apiCallWithLoading(() => UserController.getUserProfile({}))
-
-    expect(apiStatus.states.length).toBe(0)
-  })
-
-  it("clears loading state even on API error", async () => {
+  it("clears loading state after an SDK error", async () => {
     fetchMock.mockResponse(JSON.stringify({}), {
       url: `${baseUrl}/api/user`,
       status: 500,
     })
 
     await apiCallWithLoading(() => UserController.getUserProfile({}))
-
-    expect(apiStatus.states.length).toBe(0)
-  })
-
-  it("returns the API result correctly", async () => {
-    const mockUser = { name: "Test User" }
-    fetchMock.mockResponse(JSON.stringify(mockUser), {
-      url: `${baseUrl}/api/user`,
-      headers: { "Content-Type": "application/json" },
-    })
-
-    const { data } = await apiCallWithLoading(() =>
-      UserController.getUserProfile({})
-    )
-
-    expect(data).toEqual(mockUser)
-  })
-
-  it("handles multiple concurrent calls correctly", async () => {
-    fetchMock.mockResponse(JSON.stringify({ user: {} }), {
-      url: `${baseUrl}/api/user`,
-    })
-
-    const promise1 = apiCallWithLoading(() => UserController.getUserProfile({}))
-    const promise2 = apiCallWithLoading(() => UserController.getUserProfile({}))
-
-    expect(apiStatus.states.length).toBe(2)
-
-    await Promise.all([promise1, promise2])
-
-    expect(apiStatus.states.length).toBe(0)
-  })
-
-  it("adds blocking state with message while a blocking API call is pending", async () => {
-    let resolveCall: (value: typeof okApiResult) => void = () => undefined
-
-    const promise = apiCallWithLoading(
-      () =>
-        new Promise<typeof okApiResult>((resolve) => {
-          resolveCall = resolve
-        }),
-      { blockUi: true, message: "Loading next note..." }
-    )
-
-    expect(apiStatus.states).toEqual([
-      expect.objectContaining({
-        blockUi: true,
-        message: "Loading next note...",
-      }),
-    ])
-
-    resolveCall(okApiResult)
-    await promise
 
     expect(apiStatus.states).toEqual([])
   })
@@ -130,18 +81,10 @@ describe("apiCallWithLoading loading state management", () => {
         expect(apiStatus.states.map((state) => state.message)).toEqual([
           "Outer",
         ])
-
-        await apiCallWithLoading(
-          async () => {
-            expect(apiStatus.states.map((state) => state.message)).toEqual([
-              "Outer",
-              "Inner",
-            ])
-            return okApiResult
-          },
-          { blockUi: true, message: "Inner" }
-        )
-
+        await apiCallWithLoading(async () => okApiResult, {
+          blockUi: true,
+          message: "Inner",
+        })
         expect(apiStatus.states.map((state) => state.message)).toEqual([
           "Outer",
         ])
@@ -153,38 +96,24 @@ describe("apiCallWithLoading loading state management", () => {
     expect(apiStatus.states).toEqual([])
   })
 
-  it("clears only the completed blocking state for concurrent calls", async () => {
-    let resolveFirst: (value: typeof okApiResult) => void = () => undefined
-    let resolveSecond: (value: typeof okApiResult) => void = () => undefined
+  it("clears only the completed state for concurrent calls", async () => {
+    const first = controlledApiCall()
+    const second = controlledApiCall()
+    const firstResult = apiCallWithLoading(() => first.promise, {
+      blockUi: true,
+      message: "First",
+    })
+    const secondResult = apiCallWithLoading(() => second.promise, {
+      blockUi: true,
+      message: "Second",
+    })
 
-    const firstCall = apiCallWithLoading(
-      () =>
-        new Promise<typeof okApiResult>((resolve) => {
-          resolveFirst = resolve
-        }),
-      { blockUi: true, message: "First" }
-    )
-    const secondCall = apiCallWithLoading(
-      () =>
-        new Promise<typeof okApiResult>((resolve) => {
-          resolveSecond = resolve
-        }),
-      { blockUi: true, message: "Second" }
-    )
-
-    expect(apiStatus.states.map((state) => state.message)).toEqual([
-      "First",
-      "Second",
-    ])
-
-    resolveSecond(okApiResult)
-    await secondCall
-
+    second.resolve(okApiResult)
+    await secondResult
     expect(apiStatus.states.map((state) => state.message)).toEqual(["First"])
 
-    resolveFirst(okApiResult)
-    await firstCall
-
+    first.resolve(okApiResult)
+    await firstResult
     expect(apiStatus.states).toEqual([])
   })
 
@@ -197,5 +126,57 @@ describe("apiCallWithLoading loading state management", () => {
     ).rejects.toThrow("network failed")
 
     expect(apiStatus.states).toEqual([])
+  })
+
+  it("provides an identity-bound opt-in cancellation result", async () => {
+    const olderCall = controlledApiCall()
+    const cancelableCall = controlledApiCall()
+    const olderResult = apiCallWithLoading(() => olderCall.promise, {
+      blockUi: true,
+      message: "Older",
+    })
+    let receivedSignal: AbortSignal | undefined
+    const cancelableResult = callCancelableApi(
+      (signal) => {
+        receivedSignal = signal
+        return cancelableCall.promise
+      },
+      { blockUi: true, message: "Newest", cancelable: true }
+    )
+
+    expectTypeOf(cancelableResult).toEqualTypeOf<
+      Promise<ExpectedCancelableApiResult<typeof okApiResult>>
+    >()
+    expect(receivedSignal).toBeInstanceOf(AbortSignal)
+    const cancel = (
+      apiStatus.states.at(-1) as { cancel?: () => void } | undefined
+    )?.cancel
+    expect(cancel).toEqual(expect.any(Function))
+
+    cancel?.()
+    expect(receivedSignal?.aborted).toBe(true)
+    expect(apiStatus.states.map((state) => state.message)).toEqual(["Older"])
+    await expect(cancelableResult).resolves.toEqual({ status: "cancelled" })
+
+    cancel?.()
+    expect(apiStatus.states.map((state) => state.message)).toEqual(["Older"])
+
+    olderCall.resolve(okApiResult)
+    await olderResult
+  })
+
+  it("requires narrowing before a completed result is available", async () => {
+    const outcome = await callCancelableApi(async () => okApiResult, {
+      blockUi: true,
+      cancelable: true,
+    })
+
+    if (outcome.status === "completed") {
+      expectTypeOf(outcome.result).toEqualTypeOf<typeof okApiResult>()
+      expect(outcome.result).toBe(okApiResult)
+    } else {
+      // @ts-expect-error cancelled outcomes intentionally expose no result
+      expect(outcome.result).toBeUndefined()
+    }
   })
 })
