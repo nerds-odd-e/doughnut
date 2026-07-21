@@ -24,7 +24,7 @@ Requirements for the initial progressive-cancellation release. Each maps to exac
 
 ### Cohesion and Adoption
 
-- [ ] **COHE-01**: Frontend cancellation call sites use one shared abort, loading-cleanup, and cancelled-outcome contract while defining only their domain-specific post-cancel behavior
+- [x] **COHE-01**: Frontend cancellation call sites use one shared abort, loading-cleanup, and cancelled-outcome contract while defining only their domain-specific post-cancel behavior
 - [ ] **COHE-02**: Every existing whole-UI blocker and long-running note-refinement AI request is classified as cancelable, intentionally noncancelable, or nonblocking, with safe in-scope operations using the shared solution
 
 ## v2 Requirements
@@ -66,10 +66,11 @@ Which phases cover which requirements. Populated during roadmap creation.
 | REFN-03 | Phase 3 | Pending |
 | REFN-04 | Phase 3 | Pending |
 | REFN-05 | Phase 4 | Pending |
-| COHE-01 | Phase 1 | Pending |
+| COHE-01 | Phase 1 | Complete |
 | COHE-02 | Phase 4 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 11 total
 - Mapped to phases: 11
 - Unmapped: 0 ✓
