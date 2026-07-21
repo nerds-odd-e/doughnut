@@ -40,7 +40,7 @@ function hitsFor(pattern: RegExp): { rel: string; count: number }[] {
     .filter((h) => h.count > 0)
 }
 
-describe("cancelable allowlist (COHE-02 / D-11)", () => {
+describe("cancelable allowlist", () => {
   it("restricts cancelable: true to NoteRefinement + clientSetup", () => {
     const hits = hitsFor(CANCELABLE_TRUE)
     const files = hits.map((h) => h.rel).sort()
@@ -57,7 +57,7 @@ describe("cancelable allowlist (COHE-02 / D-11)", () => {
   })
 })
 
-describe("managedApi-only abort ownership (D-09)", () => {
+describe("managedApi-only abort ownership", () => {
   it("keeps new AbortController only under managedApi/", () => {
     const outside = hitsFor(NEW_ABORT_CONTROLLER).filter(
       (h) => !h.rel.startsWith("managedApi/")

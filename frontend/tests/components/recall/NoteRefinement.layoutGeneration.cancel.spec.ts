@@ -33,7 +33,7 @@ vi.mock("vue-toastification", () => ({
 setupNoteRefinementTests()
 
 describe("NoteRefinement layout generation cancel", () => {
-  it("shows blocking Cancel while layout generates (REFN-01, CANC-01)", async () => {
+  it("shows blocking Cancel while layout generates", async () => {
     await mountNoteRefinementPendingLayout()
 
     expect(loadingModalMask()).toBeTruthy()
@@ -41,7 +41,7 @@ describe("NoteRefinement layout generation cancel", () => {
     expect(document.body.textContent).toContain("Cancel")
   })
 
-  it("cancels silently: clears mask, leaves dialog, no toast or contentUpdated (CANC-02, CANC-03)", async () => {
+  it("cancels silently: clears mask, leaves dialog, no toast or contentUpdated", async () => {
     const { wrapper, resolve } = await mountNoteRefinementPendingLayout(
       refinementLayoutItems(["Should not appear"])
     )
@@ -73,7 +73,7 @@ describe("NoteRefinement layout generation cancel", () => {
     )
   })
 
-  it("ignores a second Cancel click after accepted cancel (CANC-02 idempotency)", async () => {
+  it("ignores a second Cancel click after accepted cancel (idempotency)", async () => {
     await mountNoteRefinementPendingLayout()
 
     // Hold the same Cancel element: after mask clears, re-query would throw;
@@ -88,7 +88,7 @@ describe("NoteRefinement layout generation cancel", () => {
     expect(mockToast.error).not.toHaveBeenCalled()
   })
 
-  it("keeps an older concurrent blocker after layout Cancel (CANC-04)", async () => {
+  it("keeps an older concurrent blocker after layout Cancel", async () => {
     // One GlobalApiLoadingModal only — a second mount would reset setupGlobalClient.
     render(GlobalApiLoadingModal)
 
@@ -131,7 +131,7 @@ describe("NoteRefinement layout generation cancel", () => {
     resolve()
   })
 
-  it("retries layout generation with a fresh request after cancel (REFN-02)", async () => {
+  it("retries layout generation with a fresh request after cancel", async () => {
     const { wrapper, generateSpy } = await mountNoteRefinementPendingLayout()
     const callsAfterMount = generateSpy.mock.calls.length
 
@@ -146,7 +146,7 @@ describe("NoteRefinement layout generation cancel", () => {
     expect(document.body.textContent).toContain("AI is generating layout...")
   })
 
-  it("cancels a pending retry without applying late layout items (REFN-02)", async () => {
+  it("cancels a pending retry without applying late layout items", async () => {
     const { wrapper, resolve } = await mountNoteRefinementPendingLayout(
       refinementLayoutItems(["Late retry should not appear"])
     )

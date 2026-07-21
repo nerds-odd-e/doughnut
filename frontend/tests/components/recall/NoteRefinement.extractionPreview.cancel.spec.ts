@@ -35,7 +35,7 @@ vi.mock("vue-toastification", () => ({
 setupNoteRefinementTests()
 
 describe("NoteRefinement extraction preview cancel", () => {
-  it("shows blocking Cancel while preview generates (REFN-03)", async () => {
+  it("shows blocking Cancel while preview generates", async () => {
     await mountNoteRefinementPendingExtractionPreview()
 
     expect(loadingModalMask()).toBeTruthy()
@@ -43,7 +43,7 @@ describe("NoteRefinement extraction preview cancel", () => {
     expect(document.body.textContent).toContain("Cancel")
   })
 
-  it("cancels from Extract: stays on layout, keeps selection, silent, ignores late data (REFN-04)", async () => {
+  it("cancels from Extract: stays on layout, keeps selection, silent, ignores late data", async () => {
     const { wrapper, resolve } =
       await mountNoteRefinementPendingExtractionPreview(
         [...threePointLayoutTexts],
@@ -81,7 +81,7 @@ describe("NoteRefinement extraction preview cancel", () => {
     expect(document.body.textContent).not.toContain("Should not appear title")
   })
 
-  it("cancels Ask AI to retry without wiping prior preview (REFN-04 / D-06)", async () => {
+  it("cancels Ask AI to retry without wiping prior preview", async () => {
     const first = labeledExtractionPreview("First")
     const { gate, resolve } = createDeferredGate()
     let callCount = 0

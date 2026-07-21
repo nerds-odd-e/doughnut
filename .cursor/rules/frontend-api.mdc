@@ -100,7 +100,7 @@ For one continuous blocker across multiple calls, wrap them in `runWithBlockingA
 
 Keep local loading state (inline spinner, disabled control, row-level pending) when the user should stay able to interact with the rest of the page — e.g. search, pagination, single form-field upload, recall prompt internals. These can still call `apiCallWithLoading` without `blockUi`.
 
-### Blocking classification inventory (COHE-02)
+### Blocking classification inventory
 
 Every whole-UI blocker and long-running note-refinement AI request must be classified as **cancelable**, **intentionally noncancelable**, or **nonblocking**. Persist new sites here when adding `blockUi: true` or `runWithBlockingApiLoading` — do not leave them unclassified.
 
@@ -111,16 +111,16 @@ Every whole-UI blocker and long-running note-refinement AI request must be class
 | Layout generation | `AI is generating layout...` | `NoteRefinement.vue` | Shared cancelable overload |
 | Extraction-preview generation | `AI is generating preview...` | `NoteRefinement.vue` | Shared cancelable overload |
 
-**Intentionally noncancelable** (whole-UI blocker without Cancel — do **not** migrate to `cancelable: true` in v1; broader adoption is ADPT-01 after per-domain post-cancel outcomes):
+**Intentionally noncancelable** (whole-UI blocker without Cancel — do **not** opt into `cancelable: true` until a safe post-cancel outcome is defined for that site):
 
 | Operation | Message | Call site | Mechanism | Notes |
 | --- | --- | --- | --- | --- |
-| Create extracted note | `AI is creating note...` | `NoteRefinement.vue` | `runWithBlockingApiLoading` | Cancel absence is intentional safety (REFN-05): client-only abort is unsafe for this transactional write (duplicate note / double original-note update risk). Do not opt into `cancelable: true`. |
+| Create extracted note | `AI is creating note...` | `NoteRefinement.vue` | `runWithBlockingApiLoading` | Intentional: client-only abort is unsafe for this transactional write (duplicate note / double original-note update risk). |
 | Remove refinement content | `AI is removing content...` | `NoteRefinement.vue` | `runWithBlockingApiLoading` | Mutation |
 | Assimilate unit | `Assimilating...` | `useAssimilateUnit.ts` | `{ blockUi: true }` | Mutation |
 | Load next assimilation note | `Loading next note...` | `useGoToNextAssimilation.ts` | `{ blockUi: true }` | View transition |
 | Book layout mutations | `Updating book layout…` | `useBookLayoutMutations.ts` | `{ blockUi: true }` (2 sites) | Mutation |
-| Book layout AI suggest | `Analyzing book layout…` | `useBookLayoutAiReorganize.ts` | `{ blockUi: true }` | ADPT-01 candidate — long-running AI read; leave noncancelable until post-cancel UX is defined |
+| Book layout AI suggest | `Analyzing book layout…` | `useBookLayoutAiReorganize.ts` | `{ blockUi: true }` | Long-running AI read; leave noncancelable until post-cancel UX is defined |
 | Book layout apply suggestion | `Applying layout changes…` | `useBookLayoutAiReorganize.ts` | `{ blockUi: true }` | Mutation |
 | Note delete / reduce | `Deleting note...` / `Reducing to source property...` | `useNoteDeleteFlow.ts` | `runWithBlockingApiLoading` | Mutation |
 | Relationship finalize | `Creating relationship note...` | `AddRelationshipFinalize.vue` | `runWithBlockingApiLoading` | Mutation |

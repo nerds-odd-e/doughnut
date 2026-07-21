@@ -46,7 +46,7 @@ vi.mock("vue-toastification", () => ({
 setupNoteRefinementTests()
 
 describe("NoteRefinement extraction preview cancel edges", () => {
-  it("retries Extract with a fresh cancelable preview after cancel (REFN-04 / D-04)", async () => {
+  it("retries Extract with a fresh cancelable preview after cancel", async () => {
     const { wrapper, extractSpy } =
       await mountNoteRefinementPendingExtractionPreview()
     const callsAfterExtract = extractSpy.mock.calls.length
@@ -137,8 +137,8 @@ describe("NoteRefinement extraction preview cancel edges", () => {
     resolve()
   })
 
-  // REFN-05 / D-01: transactional create stays intentionally noncancelable (D-04).
-  it("create-note pending shows creating message without Cancel (REFN-05)", async () => {
+  // Transactional create stays intentionally noncancelable.
+  it("create-note pending shows creating message without Cancel", async () => {
     const { gate, resolve } = createDeferredGate()
     mockSdkService(
       AiController,
