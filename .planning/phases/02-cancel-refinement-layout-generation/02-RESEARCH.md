@@ -367,17 +367,13 @@ expect(wrapper.find('[data-test-id="refinement-layout"]').exists()).toBe(false)
 | A2 | Empty successful AI layouts (zero items) should share the same retry panel as cancel | Discretion | Slight UX expansion beyond strict cancel; still stop-safe and valuable |
 | A3 | No Cypress E2E is required for Phase 2 if Vitest browser coverage is thorough | Validation Architecture | If UAT demands browser E2E later, add a single targeted feature then |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should Phase 2 also update `.cursor/rules/frontend-api.mdc` to document `cancelable: true`?**
-   - What we know: Rule still documents only `{ blockUi, message }`.
-   - What's unclear: Whether docs update belongs in this Behavior phase or Phase 4 audit.
-   - Recommendation: Include a short rule update in the same phase once the first caller exists—keeps cohesion without expanding product scope.
+   - **RESOLVED** — Phase 2 Plan 03 Task 2 updates `.cursor/rules/frontend-api.mdc` with cancelable overload / status narrowing / silent cancel / identity-bound / client-only abort docs.
 
 2. **UI-SPEC for empty/retry?**
-   - What we know: Phase has `UI hint: yes`; Phase 1 UI-SPEC covers Cancel only.
-   - What's unclear: Whether ui-phase will run before plan under `--auto`.
-   - Recommendation: If UI-SPEC is produced, lock only empty/retry copy, `data-test-id`, and “no dialog close on cancel”; do not reopen Cancel visual decisions.
+   - **RESOLVED** — `02-UI-SPEC.md` already produced under `--auto`; empty/cancelled retry panel locked.
 
 ## Environment Availability
 
