@@ -21,6 +21,8 @@ export default defineComponent({
     <LoadingModal
       :show="!!blockingApiState"
       :message="blockingApiState?.message"
+      :loading-state-id="blockingApiState?.id"
+      :cancel-action="blockingApiState?.cancel"
     />
   `,
 })

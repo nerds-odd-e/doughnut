@@ -70,6 +70,8 @@ onMounted(async () => {
     v-if="user"
     :show="!!blockingApiState"
     :message="blockingApiState?.message"
+    :loading-state-id="blockingApiState?.id"
+    :cancel-action="blockingApiState?.cancel"
   />
   <div class="flex bg-base-100 text-base-content app-container">
     <div class="main-menu flex bg-neutral text-neutral-content z-[10000]">

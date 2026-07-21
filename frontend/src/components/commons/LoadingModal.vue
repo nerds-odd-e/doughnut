@@ -3,21 +3,41 @@
     <div class="loading-modal-content">
       <div class="daisy-loading daisy-loading-spinner daisy-loading-lg"></div>
       <p class="loading-message">{{ message }}</p>
-      <button
+      <IdentityBoundCancelButton
         v-if="cancelAction"
         :key="loadingStateId"
-        type="button"
-        class="daisy-btn daisy-btn-ghost text-white focus-visible:outline-2 focus-visible:outline-white"
-        @click="cancelAction"
-      >
-        Cancel
-      </button>
+        :cancel-action="cancelAction"
+      />
     </div>
   </Overlay>
 </template>
 
 <script setup lang="ts">
+import { defineComponent, h, type PropType } from "vue"
 import Overlay from "./Overlay.vue"
+
+const IdentityBoundCancelButton = defineComponent({
+  props: {
+    cancelAction: {
+      type: Function as PropType<() => void>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const stateBoundAction = props.cancelAction
+    return () =>
+      h(
+        "button",
+        {
+          type: "button",
+          class:
+            "daisy-btn daisy-btn-ghost text-white focus-visible:outline-2 focus-visible:outline-white",
+          onClick: stateBoundAction,
+        },
+        "Cancel"
+      )
+  },
+})
 
 interface Props {
   show: boolean
