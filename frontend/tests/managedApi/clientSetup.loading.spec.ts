@@ -168,10 +168,11 @@ describe("apiCallWithLoading loading state management", () => {
     }
     expectTypeOf(options.blockUi).toEqualTypeOf<true>()
     expectTypeOf(options.cancelable).toEqualTypeOf<true>()
-    const outcome = await apiCallWithLoading(async () => okApiResult, {
-      blockUi: true,
-      cancelable: true,
-    })
+    const resultPromise = apiCallWithLoading(async () => okApiResult, options)
+    expectTypeOf(resultPromise).toEqualTypeOf<
+      Promise<CancelableApiResult<typeof okApiResult>>
+    >()
+    const outcome = await resultPromise
 
     if (outcome.status === "completed") {
       expectTypeOf(outcome.result).toEqualTypeOf<typeof okApiResult>()

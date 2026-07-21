@@ -43,18 +43,20 @@ export type CancelableApiLoadingOptions = ApiLoadingOptions & {
   cancelable: true
 }
 
+type NonCancelableApiLoadingOptions = ApiLoadingOptions & { cancelable?: never }
+
 export type CancelableApiResult<T> =
   | { status: "completed"; result: T }
   | { status: "cancelled" }
 
 export function apiCallWithLoading<T extends SdkResult>(
-  apiCall: () => Promise<T>,
-  options?: ApiLoadingOptions
-): Promise<T>
-export function apiCallWithLoading<T extends SdkResult>(
   apiCall: (signal: AbortSignal) => Promise<T>,
   options: CancelableApiLoadingOptions
 ): Promise<CancelableApiResult<T>>
+export function apiCallWithLoading<T extends SdkResult>(
+  apiCall: () => Promise<T>,
+  options?: NonCancelableApiLoadingOptions
+): Promise<T>
 export async function apiCallWithLoading<T extends SdkResult>(
   apiCall: (() => Promise<T>) | ((signal: AbortSignal) => Promise<T>),
   options: ApiLoadingOptions | CancelableApiLoadingOptions = {}
