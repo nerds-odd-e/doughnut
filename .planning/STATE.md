@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-milestone_name: milestone
-current_phase: 1
-current_phase_name: Health lint contract
-status: phase_complete
-stopped_at: Completed 01-02-PLAN.md
-last_updated: "2026-07-22T09:45:28.483Z"
+milestone_name: Notebook Lint & Auto-Fix
+current_phase: 2
+current_phase_name: Empty-folder findings
+status: ready_to_discuss
+stopped_at: Phase 1 complete — Health lint contract delivered
+last_updated: "2026-07-22T09:50:00.000Z"
 last_activity: 2026-07-22
-last_activity_desc: Phase 1 plans executed (01-01, 01-02) — Health lint contract skeleton
+last_activity_desc: Phase 1 complete via discuss --auto → plan → execute
 progress:
-  total_phases: 1
+  total_phases: 7
   completed_phases: 1
   total_plans: 2
   completed_plans: 2
@@ -23,37 +23,31 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-22)
 
 **Core value:** From Notebook Settings → Health, a user can run lint and see actionable health findings — with optional bulk removal of empty folders when auto-fix is enabled.
-**Current focus:** Phase 1 complete — ready for Phase 2 (Empty-folder findings)
+**Current focus:** Phase 2 — Empty-folder findings (Behavior)
 
 ## Current Position
 
-Phase: 1 of 7 (Health lint contract) — plans complete
-Plan: 2 of 2 in current phase (done)
-Status: Phase 1 structure contract delivered; awaiting verify / Phase 2
-Last activity: 2026-07-22 — Completed 01-02-PLAN.md (HealthRule runner + NotebookHealthService)
+Phase: 2 of 7 (Empty-folder findings) — ready to discuss/plan
+Plan: —
+Status: Phase 1 structure contract delivered
+Last activity: 2026-07-22 — Phase 1 complete (HealthRule runner + findings DTOs)
 
-Progress: [██████████] 100%
+Progress: [█░░░░░░░░░] 14%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 0
-- Average duration: —
-- Total execution time: 0 hours
+- Total plans completed: 2
+- Average duration: ~3 min
+- Total execution time: ~6 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 1. Health lint contract | 2 | 2 | 3 min |
 
-**Recent Trend:**
-
-- Last 5 plans: —
-- Trend: —
-
-*Updated after each plan completion*
 **Per-Plan Metrics:**
 
 | Plan | Duration | Tasks | Files |
@@ -65,19 +59,17 @@ Progress: [██████████] 100%
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
+Decisions are logged in PROJECT.md Key Decisions table and Phase 1 CONTEXT.
+
 Recent decisions affecting current work:
 
 - Report before mutate; Structure only for immediate next Behavior
 - Empty folders vs readme-only (`readmeContent`) are separate finding types
 - Dead links report-only; only fix is bulk purge of fully empty folders (not dissolve)
 - Per-user defaults; Health tab only (no `/health` route or dialog)
-- [Phase ?]: DTO classes (not records) with Lombok getters/setters per existing controllers/dto patterns
-- [Phase ?]: HealthSeverity as public top-level enum with lowercase error|warning|info constants
-- [Phase ?]: Omit item-level autoFixable; keep group-level autoFixable only (D-06)
-- [Phase ?]: HealthRuleRunner uses List.copyOf; skip @Order until Phase 2+
-- [Phase ?]: NotebookHealthService.lint is public for Phase 2 controller call site
-- [Phase ?]: Zero HealthRule @Service beans in Phase 1 (D-11)
+- Phase 1: DTO classes with Lombok getters/setters; `HealthSeverity` lowercase constants
+- Phase 1: Group-level `autoFixable` only (no item-level)
+- Phase 1: `HealthRuleRunner` uses `List.copyOf`; zero rule beans; public `NotebookHealthService.lint`
 
 ### Pending Todos
 
@@ -95,6 +87,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-22T09:45:28.477Z
-Stopped at: Completed 01-02-PLAN.md
-Resume file: None
+Last session: 2026-07-22
+Stopped at: Phase 1 complete — ready for `/gsd-discuss-phase 2 --auto`
+Resume file: `.planning/phases/01-health-lint-contract/01-CONTEXT.md`
