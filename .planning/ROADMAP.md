@@ -101,12 +101,12 @@ Plans:
   2. Lint reports dead wiki links in note **frontmatter / properties** with the same resolve semantics
   3. Dead-link findings are grouped by note in the report and are **report-only** (no auto-fix or rewrite path)
 
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 04-01-PLAN.md — HealthRunContext viewer + unresolvedWikiLinkTokens + live-notes query (Structure for dead links)
+- [x] 04-01-PLAN.md — HealthRunContext viewer + unresolvedWikiLinkTokens + live-notes query (Structure for dead links)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -173,7 +173,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 1. Health lint contract | 2/2 | Complete | 2026-07-22 |
 | 2. Empty-folder findings | 2/2 | Complete | 2026-07-22 |
 | 3. Readme-only folder findings | 1/1 | Complete | 2026-07-22 |
-| 4. Dead-link findings | 0/2 | Planned | - |
+| 4. Dead-link findings | 1/2 | In Progress|  |
 | 5. Health tab and Run | 0/TBD | Not started | - |
 | 6. User-level defaults | 0/TBD | Not started | - |
 | 7. Gated empty-folder purge | 0/TBD | Not started | - |

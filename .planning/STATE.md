@@ -4,16 +4,16 @@ milestone: v1.0
 milestone_name: Notebook Lint & Auto-Fix
 current_phase: 4
 current_phase_name: Dead-link findings
-status: ready
-stopped_at: Phase 4 plans created
-last_updated: "2026-07-22T19:50:00.000Z"
+status: in_progress
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-07-22T11:51:14.333Z"
 last_activity: 2026-07-22
-last_activity_desc: Phase 4 plans written (04-01, 04-02)
+last_activity_desc: Completed 04-01 viewer context and resolve helpers
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 7
-  completed_plans: 5
+  completed_plans: 6
 ---
 
 # Project State
@@ -23,25 +23,25 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-22)
 
 **Core value:** From Notebook Settings → Health, a user can run lint and see actionable health findings — with optional bulk removal of empty folders when auto-fix is enabled.
-**Current focus:** Phase 4 — Dead-link findings (execute next)
+**Current focus:** Phase 4 — Dead-link findings (04-01 done; execute 04-02)
 
 ## Current Position
 
-Phase: 4 of 7 (Dead-link findings) — planned, ready to execute
-Plan: 04-01 (Wave 1 Structure) → 04-02 (Wave 2 Behavior)
-Status: Phase 4 plans complete — ready for `/gsd-execute-phase 4`
-Last activity: 2026-07-22 — Phase 4 plans (dead-link findings)
-Resume file: .planning/phases/04-dead-link-findings/04-01-PLAN.md
+Phase: 4 of 7 (Dead-link findings) — in progress
+Plan: 04-02 (Wave 2 Behavior) — next
+Status: 04-01 complete — ready for DeadWikiLinkHealthRule
+Last activity: 2026-07-22 — 04-01 HealthRunContext viewer + unresolvedWikiLinkTokens + live-notes query
+Resume file: .planning/phases/04-dead-link-findings/04-02-PLAN.md
 
-Progress: [████░░░░░░] 43% (3/7 phases)
+Progress: [█████████░] 86% (3/7 phases)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 5
+- Total plans completed: 6
 - Average duration: ~5 min
-- Total execution time: ~24 min
+- Total execution time: ~29 min
 
 **By Phase:**
 
@@ -50,7 +50,7 @@ Progress: [████░░░░░░] 43% (3/7 phases)
 | 1. Health lint contract | 2 | 2 | 3 min |
 | 2. Empty-folder findings | 2/2 | 2 | 6 min |
 | 3. Readme-only folder findings | 1/1 | 1 | 6 min |
-| 4. Dead-link findings | 0/2 | 2 | — |
+| 4. Dead-link findings | 1/2 | 2 | 5 min |
 
 **Per-Plan Metrics:**
 
@@ -61,6 +61,7 @@ Progress: [████░░░░░░] 43% (3/7 phases)
 | Phase 02 P01 | 8min | 2 tasks | 3 files |
 | Phase 02 P02 | 4min | 2 tasks | 7 files |
 | Phase 03 P01 | 6min | 2 tasks | 4 files |
+| Phase 04 P01 | 5min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -87,6 +88,7 @@ Recent decisions affecting current work:
 - Phase 3: readme_only_folders autoFixable=false (D-07)
 - Phase 3: Shared FolderSubtreeLiveNotes.noteEmptyFolderItems for complementary gates (D-10)
 - Phase 4: Dead = viewer-readable WikiLinkResolver unresolved; extract via wikiLinkInnersInOccurrenceOrder; live sources only; distinct tokens; nest by note; autoFixable=false; always emit (D-01..D-13)
+- [Phase ?]: HealthRunContext requires User viewer; unresolvedWikiLinkTokens uses viewer-readable resolveToken only
 
 ### Pending Todos
 
@@ -104,6 +106,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-22
-Stopped at: Phase 4 plans created
+Last session: 2026-07-22T11:51:14.326Z
+Stopped at: Completed 04-01-PLAN.md
 Resume file: .planning/phases/04-dead-link-findings/04-01-PLAN.md
