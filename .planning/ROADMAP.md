@@ -45,7 +45,7 @@ Plans:
 
 ### Phase 2: Empty-folder findings
 
-**Goal:** Authorized lint reports folders whose entire subtree has no notes, as a list under an empty-folder findings group, without mutating the notebook
+**Goal:** As a notebook owner, I want to run authorized Health lint and receive fully empty folders under an empty-folder findings group, so that I can audit structural decay without mutating my notebook.
 **Mode:** mvp
 **Type:** Behavior
 **Depends on:** Phase 1
@@ -57,7 +57,12 @@ Plans:
   3. Lint does not delete folders or otherwise mutate notebook data
   4. Only an authorized notebook actor can run lint (foreign/anon callers are rejected)
 
-**Plans:** TBD
+**Plans:** 2 plans
+
+Plans:
+
+- [ ] 02-01-PLAN.md — EmptyFolderHealthRule + live folder-id query + predicate tests (EFOL-01)
+- [ ] 02-02-PLAN.md — Authorized POST .../health/lint + controller tests + OpenAPI regen (EFOL-02)
 
 ### Phase 3: Readme-only folder findings
 
@@ -148,7 +153,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Health lint contract | 2/2 | Complete | 2026-07-22 |
-| 2. Empty-folder findings | 0/TBD | Not started | - |
+| 2. Empty-folder findings | 0/2 | Planned | - |
 | 3. Readme-only folder findings | 0/TBD | Not started | - |
 | 4. Dead-link findings | 0/TBD | Not started | - |
 | 5. Health tab and Run | 0/TBD | Not started | - |
