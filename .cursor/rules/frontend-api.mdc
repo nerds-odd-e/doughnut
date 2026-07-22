@@ -116,7 +116,7 @@ Every whole-UI blocker and long-running note-refinement AI request must be class
 | Operation | Message | Call site | Mechanism | Notes |
 | --- | --- | --- | --- | --- |
 | Create extracted note | `AI is creating note...` | `NoteRefinement.vue` | `runWithBlockingApiLoading` | Intentional: client-only abort is unsafe for this transactional write (duplicate note / double original-note update risk). |
-| Remove refinement content | `AI is removing content...` | `NoteRefinement.vue` | `runWithBlockingApiLoading` | Mutation |
+| Remove refinement content | `AI is removing content...` | `NoteRefinement.vue` | `runWithBlockingApiLoading` | Mutation; nested post-remove layout reload is nonblocking (see below) |
 | Assimilate unit | `Assimilating...` | `useAssimilateUnit.ts` | `{ blockUi: true }` | Mutation |
 | Load next assimilation note | `Loading next note...` | `useGoToNextAssimilation.ts` | `{ blockUi: true }` | View transition |
 | Book layout mutations | `Updating book layout…` | `useBookLayoutMutations.ts` | `{ blockUi: true }` (2 sites) | Mutation |
@@ -132,6 +132,7 @@ Every whole-UI blocker and long-running note-refinement AI request must be class
 | --- | --- | --- |
 | Export extract request | `NoteRefinement.vue` `fetchExtractRequestExport` | Direct SDK; no `apiCallWithLoading` |
 | Export refinement layout request | `NoteRefinement.vue` `fetchBreakdownRequestExport` | Direct SDK; no whole-UI block |
+| Post-remove layout reload | `NoteRefinement.vue` `loadRefinementLayout({ blockUi: false })` | Thin-bar nested under remove continuous blocker |
 | Load book after attach | `NotebookAttachedBookSection.vue` `loadBook` | Thin-bar `apiCallWithLoading` without `blockUi` |
 
 | Concern | Mechanism |

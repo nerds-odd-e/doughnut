@@ -163,7 +163,7 @@
     <button
       data-test-id="retry-refinement-layout"
       class="daisy-btn daisy-btn-ghost daisy-btn-sm"
-      @click="loadRefinementLayout"
+      @click="() => loadRefinementLayout()"
     >
       Ask AI to retry
     </button>
@@ -250,7 +250,11 @@ const resetExtractionPreview = () => {
   }
 }
 
-const loadRefinementLayout = async () => {
+const loadRefinementLayout = async ({
+  blockUi = true,
+}: {
+  blockUi?: boolean
+} = {}) => {
   const settleLayout = (items: NoteRefinementLayoutItem[]) => {
     refinementLayoutItems.value = items
     clearSelection()
@@ -258,26 +262,37 @@ const loadRefinementLayout = async () => {
     layoutLoadSettled.value = true
   }
 
-  const outcome = await apiCallWithLoading(
-    (signal) =>
-      AiController.generateRefinementSuggestions({
-        path: { note: props.note.id },
-        signal,
-      }),
-    {
-      blockUi: true,
-      message: "AI is generating layout...",
-      cancelable: true,
-    }
-  )
+  const settleFromResult = ({
+    data,
+    error,
+  }: {
+    data?: { items?: NoteRefinementLayoutItem[] } | null
+    error?: unknown
+  }) => settleLayout(!error && data?.items ? data.items : [])
+
+  const requestLayout = (signal?: AbortSignal) =>
+    AiController.generateRefinementSuggestions({
+      path: { note: props.note.id },
+      signal,
+    })
+
+  if (!blockUi) {
+    settleFromResult(await apiCallWithLoading(requestLayout))
+    return
+  }
+
+  const outcome = await apiCallWithLoading(requestLayout, {
+    blockUi: true,
+    message: "AI is generating layout...",
+    cancelable: true,
+  })
 
   if (outcome.status === "cancelled") {
     settleLayout([])
     return
   }
 
-  const { data, error } = outcome.result
-  settleLayout(!error && data?.items ? data.items : [])
+  settleFromResult(outcome.result)
 }
 
 onMounted(() => loadRefinementLayout())
@@ -326,7 +341,7 @@ const removeSelectedLayoutItems = async () => {
         )
       }
       emit("contentUpdated", data.content)
-      await loadRefinementLayout()
+      await loadRefinementLayout({ blockUi: false })
     }
   }, "AI is removing content...")
 }
