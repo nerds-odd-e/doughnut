@@ -46,6 +46,7 @@ withDefaults(
 
 .overlay--centered {
   display: flex;
+  align-items: center;
   align-items: safe center;
   justify-content: center;
   overflow-y: auto;

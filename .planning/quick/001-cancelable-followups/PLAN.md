@@ -65,7 +65,7 @@ passed as options. Inventory: remove row + nonblocking nested reload line in
 
 ---
 
-### Phase 2 — Behavior — planned
+### Phase 2 — Behavior — done
 
 **Observable behavior:** Centered Overlay keeps normal vertical centering
 when the engine does not understand `safe` keywords (fallback
@@ -81,6 +81,9 @@ test still passes.
 2. Re-run `LoadingModal.spec.ts` narrow/centering cases.
 
 **Done when:** Fallback present; related modal tests green.
+
+**Learnings:** Dual `align-items` cascade is intentional (not duplication);
+engines that ignore `safe center` keep `center`.
 
 ---
 
@@ -117,7 +120,7 @@ fewer redundant cases; observable cancel behavior unchanged.
 | Phase | Type | Status |
 | --- | --- | --- |
 | 1 Nested remove must not expose cancelable layout wipe | Behavior | done |
-| 2 Overlay `align-items` center fallback | Behavior | planned |
+| 2 Overlay `align-items` center fallback | Behavior | done |
 | 3 Prune dead/redundant cancel tests | Structure | planned |
 
-**Next action:** Execute Phase 2 (Overlay centering fallback).
+**Next action:** Execute Phase 3 (prune dead/redundant cancel tests).
