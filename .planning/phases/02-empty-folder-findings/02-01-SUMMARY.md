@@ -96,7 +96,7 @@ Each task was committed atomically:
 1. **Task 1: Add EmptyFolderHealthRule predicate tests (RED)** - `0170314a75` (test)
 2. **Task 2: Implement live folder-id query and EmptyFolderHealthRule (GREEN)** - `a86008f3a8` (feat)
 
-**Plan metadata:** (pending docs commit)
+**Plan metadata:** `846115d90f` (docs: complete plan)
 
 ## Files Created/Modified
 - `backend/src/main/java/com/odde/doughnut/services/health/EmptyFolderHealthRule.java` - HealthRule bean for fully empty folders
