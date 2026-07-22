@@ -79,6 +79,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 
 ## Predefined Question Controller
 
+- `deleteQuestion`: POST `/api/predefined-questions/{predefinedQuestion}/delete` -> `DeleteQuestionResponse` (request: `DeleteQuestionData`; path: predefinedQuestion; response body: PredefinedQuestion)
 - `refineQuestion`: POST `/api/predefined-questions/{note}/refine-question` -> `RefineQuestionResponse` (request: `RefineQuestionData`; path: note; body: PredefinedQuestion; response body: PredefinedQuestion)
 - `getAllQuestionByNote`: GET `/api/predefined-questions/{note}/note-questions` -> `GetAllQuestionByNoteResponse` (request: `GetAllQuestionByNoteData`; path: note; response body: Array<PredefinedQuestion>)
 - `addQuestionManually`: POST `/api/predefined-questions/{note}/note-questions` -> `AddQuestionManuallyResponse` (request: `AddQuestionManuallyData`; path: note; body: PredefinedQuestion; response body: PredefinedQuestion)
