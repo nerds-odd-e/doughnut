@@ -22,6 +22,15 @@
       </div>
       <button
         type="button"
+        class="daisy-btn daisy-btn-secondary daisy-btn-sm"
+        data-testid="notebook-health-fix"
+        :disabled="!fixEnabled"
+        @click="applyFix"
+      >
+        {{ fixLabel }}
+      </button>
+      <button
+        type="button"
         class="daisy-btn daisy-btn-ghost daisy-btn-sm"
         data-testid="notebook-health-save-defaults"
         @click="saveAsDefaults"
@@ -47,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject, onMounted, ref, type Ref } from "vue"
+import { computed, inject, onMounted, ref, type Ref } from "vue"
 import type {
   NotebookHealthLintReport,
   User,
@@ -68,6 +77,19 @@ const currentUser = inject<Ref<User | undefined>>("currentUser")
 const report = ref<NotebookHealthLintReport | null>(null)
 const removeEmptyFolders = ref(false)
 
+const emptyFolderCount = computed(() => {
+  const group = report.value?.groups?.find((g) => g.ruleId === "empty_folders")
+  return group?.items?.length ?? 0
+})
+const fixEnabled = computed(
+  () => removeEmptyFolders.value && emptyFolderCount.value > 0
+)
+const fixLabel = computed(() =>
+  emptyFolderCount.value > 0
+    ? `Remove ${emptyFolderCount.value} empty folders`
+    : "Remove empty folders"
+)
+
 onMounted(() => {
   removeEmptyFolders.value =
     currentUser?.value?.healthRemoveEmptyFoldersDefault ?? false
@@ -81,6 +103,18 @@ async function runLint() {
   )
   if (!error) {
     report.value = data!
+  }
+}
+
+async function applyFix() {
+  const { error } = await apiCallWithLoading(() =>
+    NotebookHealthController.fix({
+      path: { notebook: props.notebookId },
+      body: { removeEmptyFolders: true },
+    })
+  )
+  if (!error) {
+    await runLint()
   }
 }
 
