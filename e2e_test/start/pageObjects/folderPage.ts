@@ -9,11 +9,8 @@ const folderPage = () => ({
       .should('be.visible')
       .click()
       .type(text, { delay: 0 })
-    cy.get('[data-testid="folder-index-save"]').click()
+      .blur()
     pageIsNotLoading()
-    cy.contains('.Vue-Toastification__toast--success', 'Folder index saved', {
-      timeout: 10000,
-    }).should('be.visible')
     return this
   },
   expectFolderIndexBodyContains(fragment: string) {

@@ -1,6 +1,7 @@
 <template>
   <div
     class="scoped-index-note-editor mb-6"
+    :class="{ dirty: isDirty }"
     :data-testid="`${testIdPrefix}-body`"
   >
     <h2 class="text-lg font-semibold text-base-content mb-2">
@@ -8,32 +9,26 @@
     </h2>
     <div :data-testid="`${testIdPrefix}-editor`">
       <RichMarkdownEditor
-        v-model="draftContent"
+        :model-value="localValue"
         :multiple-line="true"
         :scope-name="richEditorScopeName"
         field="content"
         :readonly="false"
         :wiki-titles="[]"
         :is-index-context="true"
+        @update:model-value="propose"
+        @blur="flush"
       />
     </div>
-    <button
-      type="button"
-      class="daisy-btn daisy-btn-primary daisy-btn-sm mt-3"
-      :data-testid="`${testIdPrefix}-save`"
-      :disabled="saving"
-      @click="save"
-    >
-      {{ saving ? saveButtonSavingLabel : saveButtonIdleLabel }}
-    </button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import { useToast } from "@/composables/useToast"
+import { useDebouncedTextAutosave } from "@/composables/useDebouncedTextAutosave"
+import { normalizeNoteContent } from "@/utils/normalizeNoteContent"
+import { hasNewWikiLinkTexts } from "@/utils/noteContentWikiLinks"
 import RichMarkdownEditor from "@/components/form/RichMarkdownEditor.vue"
 
 const props = withDefaults(
@@ -44,17 +39,11 @@ const props = withDefaults(
     testIdPrefix?: string
     richEditorScopeName?: string
     headingLabel?: string
-    saveButtonIdleLabel?: string
-    saveButtonSavingLabel?: string
-    successToastSaved?: string
   }>(),
   {
     testIdPrefix: "notebook-index",
     richEditorScopeName: "notebook-index",
     headingLabel: "Index",
-    saveButtonIdleLabel: "Save index",
-    saveButtonSavingLabel: "Saving…",
-    successToastSaved: "Index saved",
   }
 )
 
@@ -62,43 +51,31 @@ const emit = defineEmits<{
   (e: "saved"): void
 }>()
 
-const { showSuccessToast } = useToast()
-
-const draftContent = ref(props.indexContent ?? "")
-
-watch(
-  () => [props.notebookId, props.folderId ?? null, props.indexContent] as const,
-  ([, , content]) => {
-    draftContent.value = content ?? ""
+const persistIndexContent = async (content: string) => {
+  if (props.folderId != null) {
+    await apiCallWithLoading(() =>
+      NotebookController.updateFolderIndexContent({
+        path: { notebook: props.notebookId, folder: props.folderId! },
+        body: { content },
+      })
+    )
+  } else {
+    await apiCallWithLoading(() =>
+      NotebookController.updateNotebookIndexContent({
+        path: { notebook: props.notebookId },
+        body: { content },
+      })
+    )
   }
-)
-
-const saving = ref(false)
-
-const save = async () => {
-  saving.value = true
-  try {
-    if (props.folderId != null) {
-      await apiCallWithLoading(() =>
-        NotebookController.updateFolderIndexContent({
-          path: { notebook: props.notebookId, folder: props.folderId! },
-          body: { content: draftContent.value },
-        })
-      )
-    } else {
-      await apiCallWithLoading(() =>
-        NotebookController.updateNotebookIndexContent({
-          path: { notebook: props.notebookId },
-          body: { content: draftContent.value },
-        })
-      )
-    }
-    showSuccessToast(props.successToastSaved)
-    emit("saved")
-  } finally {
-    saving.value = false
-  }
+  emit("saved")
 }
+
+const { localValue, isDirty, propose, flush } = useDebouncedTextAutosave({
+  externalValue: () => props.indexContent ?? undefined,
+  persist: persistIndexContent,
+  normalize: normalizeNoteContent,
+  shouldFlushImmediately: (prev, next) => hasNewWikiLinkTexts(prev, next),
+})
 </script>
 
 <style scoped>

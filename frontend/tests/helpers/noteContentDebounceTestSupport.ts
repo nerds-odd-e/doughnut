@@ -1,8 +1,9 @@
+import { TEXT_AUTOSAVE_DEBOUNCE_MS } from "@/composables/useDebouncedTextAutosave"
 import { flushPromises } from "@vue/test-utils"
 import { vi } from "vitest"
 
-/** Matches `NoteEditableContent` auto-save debounce interval. */
-export const NOTE_CONTENT_SAVE_DEBOUNCE_MS = 1000
+/** Matches note body / indexContent auto-save debounce (`useDebouncedTextAutosave`). */
+export const NOTE_CONTENT_SAVE_DEBOUNCE_MS = TEXT_AUTOSAVE_DEBOUNCE_MS
 
 export async function advanceNoteContentSaveDebounce() {
   vi.advanceTimersByTime(NOTE_CONTENT_SAVE_DEBOUNCE_MS)

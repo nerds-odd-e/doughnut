@@ -19,9 +19,6 @@
         test-id-prefix="folder-index"
         rich-editor-scope-name="folder-index"
         heading-label="Folder index"
-        save-button-idle-label="Save folder index"
-        save-button-saving-label="Saving…"
-        success-toast-saved="Folder index saved"
         @saved="refreshFolderPage"
       />
       <div class="daisy-card w-full mb-6" data-testid="folder-move-dialog">

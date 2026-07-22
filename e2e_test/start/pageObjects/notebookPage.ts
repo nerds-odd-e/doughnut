@@ -63,7 +63,7 @@ const notebookPage = () => {
         .should('be.visible')
         .click()
         .type(text, { delay: 0 })
-      cy.get('[data-testid="notebook-index-save"]').click()
+        .blur()
       pageIsNotLoading()
       return this
     },

@@ -77,10 +77,6 @@ export function notebookIndexEditorEl(wrapper: VueWrapper) {
   return wrapper.find('[data-testid="notebook-index-editor"]')
 }
 
-export function notebookIndexSaveEl(wrapper: VueWrapper) {
-  return wrapper.find('[data-testid="notebook-index-save"]')
-}
-
 export async function setNotebookIndexDraft(
   wrapper: VueWrapper,
   content: string
@@ -88,11 +84,6 @@ export async function setNotebookIndexDraft(
   wrapper
     .findComponent({ name: "RichMarkdownEditor" })
     .vm.$emit("update:modelValue", content)
-  await flushPromises()
-}
-
-export async function clickNotebookIndexSave(wrapper: VueWrapper) {
-  await notebookIndexSaveEl(wrapper).trigger("click")
   await flushPromises()
 }
 

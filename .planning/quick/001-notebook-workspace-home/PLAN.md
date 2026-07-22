@@ -8,9 +8,10 @@ Make the **notebook page** feel like an **overview / command center** (Notion wo
 
 | Phase | Type | Status | Observable outcome |
 |-------|------|--------|--------------------|
-| 1 | Structure (design) | planned | Winning HTML sketch direction chosen for notebook home layout |
-| 2 | Behavior | planned | Opening a notebook shows a workspace-home main column (hero + index primary), not a settings stack |
-| 3 | Behavior | planned | Index content + properties are the primary editable surface; settings/admin actions are secondary |
+| 1 | Structure (design) | done (winner C) | Winning HTML sketch direction chosen for notebook home layout |
+| 1b | Behavior | done | Index content auto-saves with same debounced behavior as note body (no Save button) |
+| 2 | Behavior | planned | Opening a notebook shows a workspace-home main column (Home tab: hero/title + index primary; Settings tab for admin) |
+| 3 | Behavior | planned | Index content + properties are the primary editable surface on Home; settings/admin actions only on Settings |
 | 4 | Behavior | planned | Folder and note pages remain recognizably different from notebook home (no regression of their roles) |
 
 ## Design direction (from intake)
@@ -51,6 +52,10 @@ Artifacts: `.planning/sketches/` (MANIFEST, theme, `NNN-*/index.html`). No produ
 
 **Resume:** `/gsd-sketch` (or continue this chat: create theme + `001-notebook-home-layout` variants). Optional `/gsd-ui-phase` after winner.
 
+## Phase 1b — Behavior: index debounced autosave (done)
+
+**Pre/Trigger/Post:** Editing notebook or folder `indexContent` auto-saves after the same debounce as note body; no Save button; flush on blur. Implemented via shared `useDebouncedTextAutosave` used by `TextContentWrapper` and `ScopedIndexNoteEditor`.
+
 ### Phase 2 — Behavior: notebook opens as workspace home
 
 **Pre:** User owns/opens a notebook with optional `indexContent`.
@@ -90,4 +95,4 @@ Artifacts: `.planning/sketches/` (MANIFEST, theme, `NNN-*/index.html`). No produ
 
 ## Next action
 
-Resume **Phase 1**: build `.planning/sketches/001-notebook-home-layout` with variants A/B/C and get a winner before product code.
+**Phase 1 done** — sketch 001 winner **C** (Home / Settings tabs). Optional: sketches 002–003 for property strip / demotion polish, or proceed to Phase 2 (product UI) / `/gsd-ui-phase` / `/gsd-sketch --wrap-up`.

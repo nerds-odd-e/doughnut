@@ -5,6 +5,7 @@ import "vue-toastification/dist/index.css"
 
 import routes from "./routes/routes"
 import "./assets/daisyui.css"
+import "./assets/dirty-indicator.css"
 import DoughnutAppVue from "./DoughnutApp.vue"
 import { scheduleFocusTargetWithin } from "./utils/focusTarget"
 

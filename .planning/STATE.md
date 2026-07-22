@@ -3,13 +3,18 @@
 ## Current
 
 - **Active plan:** `.planning/quick/001-notebook-workspace-home/PLAN.md`
-- **Phase:** 1 — Structure (design): choose notebook home direction via GSD sketches
-- **Next:** Build sketch `001-notebook-home-layout` (Notion-like hero+index / property rail / Home|Settings tabs); pick winner before product UI
+- **Phase:** 2 next — implement Home / Settings notebook home (sketch C); **index autosave shipped** ahead of layout
+- **Next:** Implement notebook page Home / Settings tabs per sketch-findings; optional `/gsd-ui-phase`
 
 ## Context
 
-Notebook page should feel like overview / command center (Notion workspace home). Primary job: see/edit notebook `indexContent` + properties. Today notebook and folder share a settings-stack + `ScopedIndexNoteEditor` look; notes are full document editors. Chrome (`NotebookSidebarLayout`) stays; differentiate main column.
+Notebook page should feel like overview / command center (Notion workspace home). Primary job: see/edit notebook `indexContent` + properties.
 
-## Blocked / paused
+## Sketch decisions
 
-10-minute timer interrupted mid `/gsd-sketch` after mood intake + codebase research; no product code or sketch HTML written yet (empty `.planning/sketches/themes/` only).
+- **001 winner C:** Default **Home** = index + light properties; **Settings** = management / settings / search-indexing.
+- **Wrap-up:** `.cursor/skills/sketch-findings-doughnut/` + `.planning/sketches/WRAP-UP-SUMMARY.md`
+
+## Shipped outside phase order
+
+- Index (notebook + folder) uses shared `useDebouncedTextAutosave` with note body; Save button removed.

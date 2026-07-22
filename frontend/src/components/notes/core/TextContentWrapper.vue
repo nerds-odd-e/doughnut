@@ -34,11 +34,11 @@
 </template>
 
 <script setup lang="ts">
-import { debounce } from "es-toolkit"
 import type { PropType } from "vue"
-import { computed, onUnmounted, ref, watch } from "vue"
+import { computed, ref, toRef } from "vue"
 import type { TitleRenameReferenceHandling } from "@/store/StoredApiCollection"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useDebouncedTextAutosave } from "@/composables/useDebouncedTextAutosave"
 import { normalizeNoteContent } from "@/utils/normalizeNoteContent"
 import { hasNewWikiLinkTexts } from "@/utils/noteContentWikiLinks"
 
@@ -80,137 +80,11 @@ const props = defineProps({
   },
 })
 
-const savedVersion = ref(0)
-const lastSavedValue = ref(props.value ?? "")
-const pendingSaveValues = new Set<string>()
-
 const needsExplicitReferencedTitleSave = (): boolean =>
   props.field === "edit title" && props.titleRenameNeedsExplicitReferenceChoice
 
 const savingReferencedTitle = ref(false)
-const changerInner = async (
-  noteId: number,
-  newValue: string,
-  version: number,
-  errorHander: (errs: unknown) => void
-) => {
-  if (props.field === "edit content" && props.beforeSaveContent) {
-    const proceed = await props.beforeSaveContent(
-      lastSavedValue.value ?? "",
-      newValue
-    )
-    if (!proceed) {
-      return
-    }
-  }
-  pendingSaveValues.add(newValue)
-  try {
-    await storageAccessor.value
-      .storedApi()
-      .updateTextField(noteId, props.field, newValue)
-      .catch(errorHander)
-    savedVersion.value = version
-    lastSavedValue.value = newValue
-  } finally {
-    pendingSaveValues.delete(newValue)
-  }
-}
-const changer = debounce(changerInner, 1000)
-
-const localValue = ref(props.value ?? "")
-const version = ref(0)
-const errors = ref({} as Record<string, string>)
-
-const hasUnsavedChanges = (): boolean => {
-  if (props.field === "edit content") {
-    const normalizedCurrent = normalizeNoteContent(localValue.value ?? "")
-    const normalizedSaved = normalizeNoteContent(lastSavedValue.value ?? "")
-    return normalizedCurrent !== normalizedSaved
-  }
-  return localValue.value !== lastSavedValue.value
-}
-
-const discardReferencedTitleDraft = () => {
-  errors.value = {}
-  localValue.value = lastSavedValue.value ?? ""
-  version.value = savedVersion.value
-}
-
-const scheduleReferencedTitleBlurDiscardCheck = (root: HTMLElement) => {
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      if (!needsExplicitReferencedTitleSave() || !hasUnsavedChanges()) return
-      const focused = document.activeElement
-      if (focused instanceof Node && root.contains(focused)) return
-      discardReferencedTitleDraft()
-    })
-  })
-}
-
-const onReferencedTitleFocusOut = (event: FocusEvent) => {
-  if (!needsExplicitReferencedTitleSave() || !hasUnsavedChanges()) return
-  changer.cancel()
-  const root = event.currentTarget as HTMLElement
-  const next = event.relatedTarget as Node | null
-  if (next && root.contains(next)) return
-  scheduleReferencedTitleBlurDiscardCheck(root)
-}
-
-const showReferencedTitleSavePanel = computed(
-  () => needsExplicitReferencedTitleSave() && hasUnsavedChanges()
-)
-
-const wrapperClass = computed(() => {
-  if (hasUnsavedChanges()) {
-    return "dirty"
-  }
-  return ""
-})
-
-const onUpdate = (noteId: number, newValue: string) => {
-  if (props.field === "edit title" && !newValue.trim()) {
-    return
-  }
-
-  if (props.field === "edit content") {
-    const normalizedNewValue = normalizeNoteContent(newValue)
-    const normalizedLastSaved = normalizeNoteContent(lastSavedValue.value ?? "")
-    const prevNormalized = normalizeNoteContent(localValue.value ?? "")
-
-    errors.value = {}
-    localValue.value = newValue
-
-    if (normalizedNewValue === normalizedLastSaved) {
-      return
-    }
-
-    changer(noteId, normalizedNewValue, version.value + 1, setError)
-    version.value += 1
-    if (hasNewWikiLinkTexts(prevNormalized, normalizedNewValue)) {
-      changer.flush()
-    }
-    return
-  }
-
-  errors.value = {}
-  localValue.value = newValue
-
-  if (needsExplicitReferencedTitleSave()) {
-    version.value += 1
-    return
-  }
-
-  changer(noteId, newValue, version.value + 1, setError)
-  version.value += 1
-}
-
-const onBlur = () => {
-  if (needsExplicitReferencedTitleSave()) {
-    changer.cancel()
-    return
-  }
-  changer.flush()
-}
+const activeNoteId = ref<number | null>(null)
 
 const is401Error = (errs: unknown): boolean =>
   typeof errs === "object" &&
@@ -234,6 +108,93 @@ const setError = (errs: unknown) => {
   }
 }
 
+const autosave = useDebouncedTextAutosave({
+  externalValue: toRef(props, "value"),
+  persist: async (value) => {
+    const noteId = activeNoteId.value
+    if (noteId == null) return
+    await storageAccessor.value
+      .storedApi()
+      .updateTextField(noteId, props.field, value)
+  },
+  normalize:
+    props.field === "edit content" ? normalizeNoteContent : (value) => value,
+  beforePersist: async (lastSaved, newValue) => {
+    if (props.field !== "edit content" || !props.beforeSaveContent) {
+      return true
+    }
+    return props.beforeSaveContent(lastSaved, newValue)
+  },
+  shouldFlushImmediately:
+    props.field === "edit content"
+      ? (prev, next) => hasNewWikiLinkTexts(prev, next)
+      : undefined,
+  onError: setError,
+  cancelOnUnmount: needsExplicitReferencedTitleSave(),
+})
+
+const {
+  localValue,
+  errors,
+  isDirty,
+  hasUnsavedChanges,
+  propose,
+  flush,
+  cancel,
+  discardDraft,
+  markSaved,
+} = autosave
+
+const showReferencedTitleSavePanel = computed(
+  () => needsExplicitReferencedTitleSave() && hasUnsavedChanges()
+)
+
+const wrapperClass = computed(() => (isDirty.value ? "dirty" : ""))
+
+const onUpdate = (noteId: number, newValue: string) => {
+  if (props.field === "edit title" && !newValue.trim()) {
+    return
+  }
+
+  activeNoteId.value = noteId
+
+  if (needsExplicitReferencedTitleSave()) {
+    errors.value = {}
+    localValue.value = newValue
+    return
+  }
+
+  propose(newValue)
+}
+
+const onBlur = () => {
+  if (needsExplicitReferencedTitleSave()) {
+    cancel()
+    return
+  }
+  flush()
+}
+
+const scheduleReferencedTitleBlurDiscardCheck = (root: HTMLElement) => {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      if (!needsExplicitReferencedTitleSave() || !hasUnsavedChanges()) return
+      const focused = document.activeElement
+      if (focused instanceof Node && root.contains(focused)) return
+      discardDraft()
+    })
+  })
+}
+
+const onReferencedTitleFocusOut = (event: FocusEvent) => {
+  if (!needsExplicitReferencedTitleSave() || !hasUnsavedChanges()) return
+  cancel()
+  const root = event.currentTarget as HTMLElement
+  const next = event.relatedTarget as Node | null
+  if (next && root.contains(next)) return
+  scheduleReferencedTitleBlurDiscardCheck(root)
+}
+
 const saveReferencedTitleWithChoice = async (
   referenceHandling: TitleRenameReferenceHandling
 ) => {
@@ -248,72 +209,11 @@ const saveReferencedTitleWithChoice = async (
       .updateTextField(noteId, "edit title", localValue.value, {
         titleReferenceHandling: referenceHandling,
       })
-    savedVersion.value = version.value
-    lastSavedValue.value = localValue.value
+    markSaved(localValue.value)
   } catch (errs: unknown) {
     setError(errs)
   } finally {
     savingReferencedTitle.value = false
   }
 }
-
-const handleNavigation = (newValue: string) => {
-  changer.cancel()
-  version.value = savedVersion.value
-  localValue.value = newValue
-  lastSavedValue.value = newValue
-}
-
-const updateToPropValue = (newValue: string | undefined) => {
-  const valueToSet = newValue ?? ""
-  localValue.value = valueToSet
-  lastSavedValue.value = valueToSet
-}
-
-const handlePropChange = (newValue: string | undefined) => {
-  if (version.value !== savedVersion.value) {
-    const normalizedNewValue = newValue ?? ""
-    if (
-      normalizedNewValue !== "" &&
-      pendingSaveValues.has(normalizedNewValue)
-    ) {
-      return
-    }
-    const normalizedCurrentValue = localValue.value ?? ""
-    const normalizedLastSaved = lastSavedValue.value ?? ""
-    if (
-      normalizedNewValue !== normalizedCurrentValue &&
-      normalizedNewValue !== normalizedLastSaved
-    ) {
-      handleNavigation(normalizedNewValue)
-      return
-    }
-    return
-  }
-  updateToPropValue(newValue)
-}
-
-watch(() => props.value, handlePropChange)
-
-onUnmounted(() => {
-  needsExplicitReferencedTitleSave() ? changer.cancel() : changer.flush()
-})
 </script>
-
-<style lang="sass">
-.dirty
-  position: relative
-  background-color: transparent
-  &::after
-    content: ""
-    position: absolute
-    top: 0
-    right: 0
-    border-top: 5px solid transparent
-    border-left: 5px solid transparent
-    border-right: 5px solid red
-    border-bottom: 5px solid red
-    transform: rotate(-90deg)
-    z-index: 1000
-
-  </style>

@@ -2,12 +2,11 @@ import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { wrapSdkResponse } from "@tests/helpers"
 import { beforeEach, describe, it, expect, vi } from "vitest"
+import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDebounceTestSupport"
 import {
-  clickNotebookIndexSave,
   hideSidebarButtonEl,
   mountNotebookPageReady,
   notebookIndexEditorEl,
-  notebookIndexSaveEl,
   notebookPageRouter,
   setNotebookIndexDraft,
 } from "./notebookPageTestSupport"
@@ -54,12 +53,15 @@ describe("NotebookPage.spec", () => {
       })
 
       expect(notebookIndexEditorEl(wrapper).exists()).toBe(true)
-      expect(notebookIndexSaveEl(wrapper).exists()).toBe(true)
+      expect(wrapper.find('[data-testid="notebook-index-save"]').exists()).toBe(
+        false
+      )
       wrapper.unmount()
     }
   )
 
-  it("saves notebook index content directly to container on save", async () => {
+  it("auto-saves notebook index content after debounce", async () => {
+    vi.useFakeTimers()
     const notebook = makeMe.aNotebook.please()
     const saveSpy = vi
       .spyOn(NotebookController, "updateNotebookIndexContent")
@@ -74,7 +76,7 @@ describe("NotebookPage.spec", () => {
 
     const { wrapper } = await mountNotebookPageReady(notebook)
     await setNotebookIndexDraft(wrapper, "New notebook index")
-    await clickNotebookIndexSave(wrapper)
+    await advanceNoteContentSaveDebounce()
 
     expect(saveSpy).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -86,5 +88,6 @@ describe("NotebookPage.spec", () => {
     )
     saveSpy.mockRestore()
     wrapper.unmount()
+    vi.useRealTimers()
   })
 })
