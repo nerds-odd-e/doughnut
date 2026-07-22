@@ -1,8 +1,14 @@
-import { NotebookHealthController } from "@generated/doughnut-backend-api/sdk.gen"
+import type { User } from "@generated/doughnut-backend-api"
+import {
+  NotebookHealthController,
+  UserController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import NotebookHealthPanel from "@/components/notebook/NotebookHealthPanel.vue"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
-import { flushPromises } from "@vue/test-utils"
+import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { beforeEach, describe, expect, it, vi } from "vitest"
+import type { Ref } from "vue"
 
 const reportFixture = {
   groups: [
@@ -42,17 +48,36 @@ const reportFixture = {
 describe("NotebookHealthPanel", () => {
   const notebookId = 42
   let lintSpy: ReturnType<typeof mockSdkService>
+  let updateUserSpy: ReturnType<typeof mockSdkService>
 
   beforeEach(() => {
     vi.restoreAllMocks()
     lintSpy = mockSdkService(NotebookHealthController, "lint", reportFixture)
+    updateUserSpy = mockSdkService(
+      UserController,
+      "updateUser",
+      makeMe.aUser.please()
+    )
   })
 
-  function mountPanel() {
-    return helper
+  function mountPanel(user?: User) {
+    const builder = helper
       .component(NotebookHealthPanel)
       .withProps({ notebookId })
-      .mount()
+    if (user) {
+      builder.withCurrentUser(user)
+    }
+    return builder.mount()
+  }
+
+  function providedCurrentUser(wrapper: VueWrapper) {
+    return wrapper.vm.$.appContext.provides.currentUser as Ref<User | undefined>
+  }
+
+  function removeEmptyFoldersCheckbox(wrapper: VueWrapper) {
+    return wrapper.get(
+      '[data-testid="notebook-health-remove-empty-folders"] input[type="checkbox"]'
+    )
   }
 
   it("shows idle prompt and action bar without calling lint on mount", async () => {
@@ -216,5 +241,103 @@ describe("NotebookHealthPanel", () => {
     expect(nestedCollapse!.text()).toContain("Missing")
     expect(nestedCollapse!.find("a").exists()).toBe(false)
     expect(wrapper.html()).not.toMatch(/v-html|innerHTML/)
+  })
+
+  it("prefills Remove empty folders from currentUser without calling lint", async () => {
+    const wrapper = mountPanel({
+      ...makeMe.aUser.please(),
+      healthRemoveEmptyFoldersDefault: true,
+    })
+    await flushPromises()
+
+    expect(
+      (removeEmptyFoldersCheckbox(wrapper).element as HTMLInputElement).checked
+    ).toBe(true)
+    expect(lintSpy).not.toHaveBeenCalled()
+    expect(updateUserSpy).not.toHaveBeenCalled()
+  })
+
+  it("prefills Remove empty folders unchecked when preference is missing or false", async () => {
+    const withoutPreference = makeMe.aUser.please()
+    delete withoutPreference.healthRemoveEmptyFoldersDefault
+
+    const missingWrapper = mountPanel(withoutPreference)
+    await flushPromises()
+    expect(
+      (removeEmptyFoldersCheckbox(missingWrapper).element as HTMLInputElement)
+        .checked
+    ).toBe(false)
+    expect(lintSpy).not.toHaveBeenCalled()
+
+    const falseWrapper = mountPanel({
+      ...makeMe.aUser.please(),
+      healthRemoveEmptyFoldersDefault: false,
+    })
+    await flushPromises()
+    expect(
+      (removeEmptyFoldersCheckbox(falseWrapper).element as HTMLInputElement)
+        .checked
+    ).toBe(false)
+    expect(lintSpy).not.toHaveBeenCalled()
+  })
+
+  it("shows Save as defaults and does not PATCH when only toggling the checkbox", async () => {
+    const user = {
+      ...makeMe.aUser.please(),
+      healthRemoveEmptyFoldersDefault: false,
+    }
+    const wrapper = mountPanel(user)
+    await flushPromises()
+
+    expect(
+      wrapper.find('[data-testid="notebook-health-save-defaults"]').exists()
+    ).toBe(true)
+    expect(wrapper.text()).toContain("Save as defaults")
+
+    await removeEmptyFoldersCheckbox(wrapper).setValue(true)
+    await flushPromises()
+
+    expect(updateUserSpy).not.toHaveBeenCalled()
+    expect(lintSpy).not.toHaveBeenCalled()
+  })
+
+  it("saves full UserDTO-shaped defaults without calling lint and updates currentUser", async () => {
+    const user = {
+      ...makeMe.aUser.please(),
+      name: "Health Owner",
+      dailyAssimilationCount: 12,
+      spaceIntervals: "0, 1, 2",
+      healthRemoveEmptyFoldersDefault: false,
+    }
+    const updatedUser = {
+      ...user,
+      healthRemoveEmptyFoldersDefault: true,
+    }
+    updateUserSpy = mockSdkService(UserController, "updateUser", updatedUser)
+
+    const wrapper = mountPanel(user)
+    await flushPromises()
+
+    await removeEmptyFoldersCheckbox(wrapper).setValue(true)
+    await flushPromises()
+    await wrapper
+      .get('[data-testid="notebook-health-save-defaults"]')
+      .trigger("click")
+    await flushPromises()
+
+    expect(updateUserSpy).toHaveBeenCalledOnce()
+    expect(updateUserSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: { user: user.id },
+        body: {
+          name: "Health Owner",
+          dailyAssimilationCount: 12,
+          spaceIntervals: "0, 1, 2",
+          healthRemoveEmptyFoldersDefault: true,
+        },
+      })
+    )
+    expect(lintSpy).not.toHaveBeenCalled()
+    expect(providedCurrentUser(wrapper).value).toEqual(updatedUser)
   })
 })
