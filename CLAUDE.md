@@ -20,6 +20,7 @@ Legacy notes may remain under `ongoing/` — do not migrate unless asked.
 
 - **Layout (GSD-aligned):** `.planning/phases/NN-slug/`, `.planning/quick/NNN-slug/`, plus GSD `PROJECT` / `ROADMAP` / `STATE` / `codebase/`. See `planning.mdc` and `gsd-coexistence.mdc`.
 - **Hard plan grammar:** Behavior vs Structure, stop-safe, one observable behavior per phase (`planning.mdc`) — applies to GSD PLANs too.
+- **Time budget (self-enforced):** ~5 min fuzzy goal per problem slice (incl. tests); >5 min → scrutinize finer decompose; >10 min → hard finer-decompose + revert/retry unless good reason (`planning.mdc`).
 - **History:** keep resume-useful planning artifacts while a plan is in progress; **clean up** spent history when the plan is fully executed into code/permanent docs.
 - **Execution wrap-up (required):** Jidoka → post-change-refactor → update plan → commit → push (**execute-plan**; also `/gsd-execute-phase`). Skills emit completion markers for handoff.
 - **GSD** for milestones (`/gsd-onboard`, `/gsd-plan-phase`, `/gsd-execute-phase`, …); **phased-planning** + **execute-plan** for ad-hoc slices under `.planning/quick/`.

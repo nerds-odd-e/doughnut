@@ -33,6 +33,18 @@ Every phase is one of two types:
 
 **To decompose a task into phases**, use the **phased-planning** skill (or GSD `/gsd-plan-phase` / discuss — still apply this grammar to every plan task).
 
+### Time budget (one problem slice)
+
+Applies to any agent or sub-agent working on **one** breakdown — e.g. making a specific test pass, or solving one Behavior/Structure unit. Wall-clock includes implementation **and** test execution.
+
+| Elapsed | Expectation |
+|---------|-------------|
+| **≤ ~5 min** | Fuzzy goal. Size each slice so it can finish in about five minutes. |
+| **> 5 min** | Scrutinize the breakdown. Prefer finer decompose → revert WIP → retry a smaller slice when the slice was oversized or thrashing. |
+| **> 10 min** | **Hard trigger:** stop, revert uncommitted WIP for that attempt, finer-decompose with **phased-planning**, and retry — **unless** there is a stated good reason to continue (e.g. a single targeted test that itself needs >10 min, blocked on developer input, or irreversible mid-migration already validated). |
+
+Do not use Cursor timer hooks for this; agents self-enforce while working.
+
 ---
 
 ## Planning layout (GSD-aligned)

@@ -24,6 +24,7 @@ These are **hard** in this repo even when GSD workflows omit them:
 | Local requirement | When it is needed | Why not drop it |
 |-------------------|-------------------|-----------------|
 | **Behavior vs Structure; stop-safe; one observable behavior per phase** | Every plan decomposition and every GSD PLAN task split | Prevents speculative structure and half-finished value if work stops mid-roadmap |
+| **Time budget per slice (~5 min fuzzy; >10 min hard finer-decompose)** | Agents/sub-agents making a test pass or solving one problem unit | Keeps breakdowns small; self-enforced (no Cursor timer hooks) — see `planning.mdc` |
 | **Before- and after-phase Jidoka** | Every phase start/end | Stops autonomous runs on value/design/credential forks |
 | **After-phase plan update** | Every completed phase | Keeps remaining work accurate for resume |
 | **After-phase post-change-refactor** | Every phase before commit | Cohesion / dead code / 250-line discipline |

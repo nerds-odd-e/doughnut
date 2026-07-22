@@ -72,6 +72,11 @@ the phase.
 
 **Still too big:** Split by **one small part of the outcome** per phase.
 
+**Time budget when sizing phases:** Each Behavior/Structure unit should be
+achievable by an agent/sub-agent in about **5 minutes** wall-clock including
+targeted test runs (`planning.mdc`). Prefer many small phases over slices that
+routinely blow past 5–10 minutes.
+
 ### Testing strategy
 
 | Layer | Role |

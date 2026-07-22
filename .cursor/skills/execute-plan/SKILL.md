@@ -130,7 +130,8 @@ The sub-agent prompt **must** include:
    phase text).
 2. **Jidoka stop conditions** (copy the list above).
 3. **Implementation rules**: `planning.mdc` (Behavior/Structure, TDD, phase
-   discipline), `gsd-coexistence.mdc`, and other applicable rules. **Naming:**
+   discipline, **time budget** ~5 min fuzzy / >10 min hard finer-decompose),
+   `gsd-coexistence.mdc`, and other applicable rules. **Naming:**
    permanent artifacts by **capability/domain**, never phase number.
 4. **Wrap-up checklist** (see `wrap_up` step).
 5. **Revert & split** instructions (see `revert_and_split` step).
@@ -164,19 +165,25 @@ Sub-agent wrap-up checklist (after tests pass):
 </step>
 
 <step name="revert_and_split">
-A phase is **too big** when:
+A phase / problem slice is **too big** when:
 
 - Changes span many unrelated files with no clear single behavior emerging.
 - Tests are not converging after reasonable effort.
+- Wall-clock for the slice (implementation + test runs) exceeds the
+  **time budget** in `planning.mdc`: scrutinize after **~5 min**; after
+  **>10 min**, finer decompose and retry is **required** unless a good reason
+  is stated (and reported to the coordinator / developer).
 
 When this happens:
 
 1. `git checkout .` — revert all uncommitted changes.
 2. `git clean -fd` — remove untracked files from the attempt.
-3. Invoke **phased-planning** to split into Behavior/Structure sub-phases.
+3. Invoke **phased-planning** to split into Behavior/Structure sub-phases
+   sized for the ~5 minute fuzzy goal (including test execution).
 4. Update the PLAN in the phase/quick dir.
 5. Commit and push the updated plan.
-6. Return "reverted and split" to the coordinator.
+6. Return "reverted and split" to the coordinator (include elapsed time and
+   whether the 10-minute hard trigger applied).
 </step>
 
 </process>
