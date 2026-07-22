@@ -4,16 +4,16 @@ milestone: v1.0
 milestone_name: Notebook Lint & Auto-Fix
 current_phase: 7
 current_phase_name: Gated empty-folder purge
-status: executing
-stopped_at: Completed 07-01-PLAN.md
-last_updated: "2026-07-22T15:02:59.277Z"
+status: milestone_complete
+stopped_at: Completed Phase 7 (07-02 Fix UI + E2E)
+last_updated: "2026-07-22T15:14:17.138Z"
 last_activity: 2026-07-22
-last_activity_desc: Completed 07-01 gated empty-folder purge API
+last_activity_desc: Completed 07-02 gated Health Fix UI + notebook_health E2E
 progress:
   total_phases: 7
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 13
-  completed_plans: 12
+  completed_plans: 13
 ---
 
 # Project State
@@ -23,25 +23,25 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-22)
 
 **Core value:** From Notebook Settings → Health, a user can run lint and see actionable health findings — with optional bulk removal of empty folders when auto-fix is enabled.
-**Current focus:** Phase 7 — Gated empty-folder purge (07-01 done; execute 07-02 Fix UI + E2E)
+**Current focus:** Milestone complete — Phase 7 gated empty-folder purge shipped (API + Fix UI + E2E)
 
 ## Current Position
 
-Phase: 7 of 7 (Gated empty-folder purge) — in progress
-Plan: 07-02 (Wave 2)
-Status: 07-01 backend purge API complete; next is Fix UI + E2E
-Last activity: 2026-07-22 — Completed 07-01 EmptyFolderBulkPurge + health/fix
-Resume file: .planning/phases/07-gated-empty-folder-purge/07-02-PLAN.md
+Phase: 7 of 7 (Gated empty-folder purge) — complete
+Plan: 07-02 done (all Phase 7 plans complete)
+Status: Milestone v1.0 Notebook Lint & Auto-Fix delivered
+Last activity: 2026-07-22 — Completed 07-02 Fix UI + auto re-lint + notebook_health E2E
+Resume file: None
 
-Progress: [█████████░] 92%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 12
-- Average duration: ~5 min
-- Total execution time: ~64 min
+- Total plans completed: 13
+- Average duration: ~5.5 min
+- Total execution time: ~73 min
 
 **By Phase:**
 
@@ -53,7 +53,7 @@ Progress: [█████████░] 92%
 | 4. Dead-link findings | 2/2 | 2 | 5.5 min |
 | 5. Health tab and Run | 2/2 | 2 | 6.5 min |
 | 6. User-level defaults | 2/2 | 2 | 5 min |
-| 7. Gated empty-folder purge | 1/2 | 2 | 6 min |
+| 7. Gated empty-folder purge | 2/2 | 2 | 7.5 min |
 
 **Per-Plan Metrics:**
 
@@ -71,6 +71,7 @@ Progress: [█████████░] 92%
 | Phase 06 P01 | 6min | 2 tasks | 8 files |
 | Phase 06 P02 | 4min | 2 tasks | 5 files |
 | Phase 07-gated-empty-folder-purge P01 | 6min | 2 tasks | 11 files |
+| Phase 07 P02 | 9min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -84,31 +85,10 @@ Recent decisions affecting current work:
 - Empty folders vs readme-only (`readmeContent`) are separate finding types
 - Dead links report-only; only fix is bulk purge of fully empty folders (not dissolve)
 - Per-user defaults; Health tab only (no `/health` route or dialog)
-- Phase 1: DTO classes with Lombok getters/setters; `HealthSeverity` lowercase constants
-- Phase 1: Group-level `autoFixable` only (no item-level)
-- Phase 1: `HealthRuleRunner` uses `List.copyOf`; zero rule beans; public `NotebookHealthService.lint`
-- Phase 2: Empty-folder label is bare folder name (D-04 v1)
-- Phase 2: Blank readme = null or String.isBlank()
-- Phase 2: Always emit empty_folders group even when items empty
-- Phase 2: Dedicated NotebookHealthController (not NotebookController) for cohesion and 250-line discipline
-- Phase 2: Owner write auth only via assertAuthorization (never assertReadAuthorization)
-- Phase 2: No request DTO / fix options for Phase 2 lint (D-09)
-- Phase 3: Own non-blank readme only — no ancestor inheritance (D-02)
-- Phase 3: readme_only_folders autoFixable=false (D-07)
-- Phase 3: Shared FolderSubtreeLiveNotes.noteEmptyFolderItems for complementary gates (D-10)
-- Phase 4: Dead = viewer-readable WikiLinkResolver unresolved; extract via wikiLinkInnersInOccurrenceOrder; live sources only; distinct tokens; nest by note; autoFixable=false; always emit (D-01..D-13)
-- HealthRunContext requires User viewer; unresolvedWikiLinkTokens uses viewer-readable resolveToken only
-- DeadWikiLinkHealthRule: children-by-note nesting; top items empty; report-only
-- Phase 5: includeHealth default false keeps Health off FolderPage
-- Phase 5: Extract findings into NotebookHealthFindings; panel keeps action bar + idle/Run
-- Phase 5: Primary E2E seeds all three finding types; separate AFIX-01 no-mutate scenario
-- Phase 6: Null-safe Objects.requireNonNullElse for healthRemoveEmptyFoldersDefault on updateUser
-- Phase 6: Health defaults persist on User column; ERD key-only exporter shows no non-key column change
-- Phase 6: onMounted prefill from currentUser.healthRemoveEmptyFoldersDefault ?? false
-- Phase 6: Save body always includes name, dailyAssimilationCount, spaceIntervals, healthRemoveEmptyFoldersDefault
 - Phase 7: EmptyFolderBulkPurge in services/health; void fix response
-- Phase 7: D ⊆ S CASCADE-safe filter: all real descendants must be in empty set before hard-delete
-- Phase 7: Detach soft-deleted notes before folder remove for Hibernate coherence
+- Phase 7: D ⊆ S CASCADE-safe filter; detach soft-deleted notes before folder remove
+- Phase 7: Fix secondary/sm after checkbox; refreshSidebarStructuralListings after successful purge
+- Phase 7: expectSidebarFolderAbsent uses find + not.exist without waiting for presence
 
 ### Pending Todos
 
@@ -126,6 +106,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-22T15:02:59.268Z
-Stopped at: Completed 07-01-PLAN.md
-Resume file: .planning/phases/07-gated-empty-folder-purge/07-02-PLAN.md
+Last session: 2026-07-22T15:14:17.138Z
+Stopped at: Completed Phase 7 (07-02 Fix UI + E2E)
+Resume file: None

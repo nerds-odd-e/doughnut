@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Dead-link findings** - Behavior: lint reports dead wiki links in body and frontmatter (report-only)
 - [x] **Phase 5: Health tab and Run** - Behavior: Health tab with Run lint and expandable nested findings (no mutation on Run)
 - [x] **Phase 6: User-level defaults** - Behavior: save and prefill Health run options at user level
-- [ ] **Phase 7: Gated empty-folder purge** - Behavior: optional bulk remove of fully empty folders via dedicated purge
+- [x] **Phase 7: Gated empty-folder purge** - Behavior: optional bulk remove of fully empty folders via dedicated purge
 
 ## Phase Details
 
@@ -184,18 +184,22 @@ Plans:
   4. Empty-folder removal uses a **dedicated purge** path (does not use folder dissolve / promote-children)
   5. After a successful fix, the user can re-run lint and no longer sees the purged fully empty folders
 
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans executed
 
 Plans:
 **Wave 1**
 
 - [x] 07-01-PLAN.md — Backend EmptyFolderBulkPurge + POST health/fix + tests + OpenAPI regen
 
-**Wave 2** *(blocked on Wave 1 completion)*
+**Wave 2**
 
-- [ ] 07-02-PLAN.md — Health Fix gate + auto re-lint + unit tests + notebook_health E2E
+- [x] 07-02-PLAN.md — Health Fix gate + auto re-lint + unit tests + notebook_health E2E
 
 **UI hint:** yes
+
+### Phase 7 complete
+
+Shipped: dedicated `POST .../health/fix` purge API (07-01) and gated Fix UI with auto re-lint + `notebook_health` E2E (07-02). Keep CONTEXT/RESEARCH/UI-SPEC for verification; SUMMARYs retained until milestone archive cleanup.
 
 ## Progress
 
@@ -210,7 +214,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 4. Dead-link findings | 2/2 | Complete | 2026-07-22 |
 | 5. Health tab and Run | 2/2 | Complete | 2026-07-22 |
 | 6. User-level defaults | 2/2 | Complete | 2026-07-22 |
-| 7. Gated empty-folder purge | 1/2 | In Progress|  |
+| 7. Gated empty-folder purge | 2/2 | Complete | 2026-07-22 |
 
 ## Coverage
 
