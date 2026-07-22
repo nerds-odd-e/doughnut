@@ -14,7 +14,7 @@ Ship a notebook **Health** capability: mechanical lint that reports structural d
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Health lint contract** - Structure: shared findings DTOs and rule-registry skeleton for the first lint rule
-- [ ] **Phase 2: Empty-folder findings** - Behavior: authorized lint reports recursive empty folders (report-only)
+- [x] **Phase 2: Empty-folder findings** - Behavior: authorized lint reports recursive empty folders (report-only)
 - [ ] **Phase 3: Readme-only folder findings** - Behavior: note-empty folders with non-blank readme as a separate finding type
 - [ ] **Phase 4: Dead-link findings** - Behavior: lint reports dead wiki links in body and frontmatter (report-only)
 - [ ] **Phase 5: Health tab and Run** - Behavior: Health tab with Run lint and expandable nested findings (no mutation on Run)
@@ -57,7 +57,7 @@ Plans:
   3. Lint does not delete folders or otherwise mutate notebook data
   4. Only an authorized notebook actor can run lint (foreign/anon callers are rejected)
 
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans executed
 
 Plans:
 **Wave 1**
@@ -66,7 +66,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 02-02-PLAN.md — Authorized POST .../health/lint + controller tests + OpenAPI regen (EFOL-02)
+- [x] 02-02-PLAN.md — Authorized POST .../health/lint + controller tests + OpenAPI regen (EFOL-02)
 
 ### Phase 3: Readme-only folder findings
 
@@ -157,7 +157,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Health lint contract | 2/2 | Complete | 2026-07-22 |
-| 2. Empty-folder findings | 1/2 | In Progress|  |
+| 2. Empty-folder findings | 2/2 | Complete | 2026-07-22 |
 | 3. Readme-only folder findings | 0/TBD | Not started | - |
 | 4. Dead-link findings | 0/TBD | Not started | - |
 | 5. Health tab and Run | 0/TBD | Not started | - |
