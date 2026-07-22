@@ -466,17 +466,13 @@ const lintSpy = mockSdkService(NotebookHealthController, "lint", {
 
 No other ASSUMED claims: stack and API verified in-repo.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Should landmark E2E wording change from “Readme and Settings tabs” to include Health?**
-   - What we know: `workspace_surface_landmarks` asserts two notebook tabs today.
-   - What's unclear: Whether to rename steps vs extend assertions only.
-   - Recommendation: Extend assertions to require Health on notebook; keep step text sensible (“notebook workspace tabs include Health”) or update existing Then steps in the same feature change.
+1. **Should landmark E2E wording change from “Readme and Settings tabs” to include Health?** — **RESOLVED**
+   - **Decision (05-02):** Extend `expectNotebookWorkspaceTabsPresent` to require `notebook-workspace-tab-health`; `expectFolderWorkspaceTabsPresent` asserts Health absent. Update `workspace_surface_landmarks.feature` step text/assertions in the same change (not assertion-only drift).
 
-2. **E2E fixture strategy for all three finding types in one scenario vs three**
-   - What we know: Empty folder = create folder with no notes; readme-only = folder with readme and no notes; dead link = note body `[[Missing]]`.
-   - What's unclear: Minimal scenario count for D-20.
-   - Recommendation: One primary scenario seeding all three (create empty folder, set folder readme on another empty folder, note with dead link) plus a dedicated AFIX-01 scenario (Run with checkbox checked → folder still in sidebar).
+2. **E2E fixture strategy for all three finding types in one scenario vs three** — **RESOLVED**
+   - **Decision (05-02):** One primary scenario seeding all three finding types (empty folder, readme-only folder, note with `[[Missing]]`) plus a dedicated AFIX-01 scenario (Run with checkbox checked → folder still present).
 
 ## Environment Availability
 
