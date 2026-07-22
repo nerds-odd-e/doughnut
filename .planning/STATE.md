@@ -5,10 +5,10 @@ milestone_name: Notebook Lint & Auto-Fix
 current_phase: 7
 current_phase_name: Gated empty-folder purge
 status: milestone_complete
-stopped_at: Quick 001 Phase 2 (Fix blockUi) done
+stopped_at: Quick 001 complete (all 3 phases)
 last_updated: "2026-07-23T00:00:00.000Z"
 last_activity: 2026-07-23
-last_activity_desc: Completed quick/001 Phase 2 — Health Fix blocking UI overlay
+last_activity_desc: Completed quick/001 Phase 3 — dead wiki links flat list + open note
 progress:
   total_phases: 7
   completed_phases: 7
@@ -23,17 +23,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-22)
 
 **Core value:** From Notebook Settings → Health, a user can run lint and see actionable health findings — with optional bulk removal of empty folders when auto-fix is enabled.
-**Current focus:** Post-v1 Health UI polish — `.planning/quick/001-health-ui-polish/`
+**Current focus:** Milestone complete; quick/001 Health UI polish done
 
 ## Current Position
 
-Phase: Milestone v1.0 complete; quick plan 001 Phases 1–2 done
-Plan: `.planning/quick/001-health-ui-polish/PLAN.md` — next: Phase 3 (dead wiki links flat list + open note)
-Status: Milestone v1.0 delivered; Health Fix uses global blocking overlay
-Last activity: 2026-07-23 — Phase 2 Fix blockUi via runWithBlockingApiLoading
-Resume file: `.planning/quick/001-health-ui-polish/PLAN.md` (Phase 3)
+Phase: Milestone v1.0 complete; quick plan 001 all phases done
+Plan: `.planning/quick/001-health-ui-polish/PLAN.md` — Status: done
+Status: Milestone v1.0 delivered; Health UI polish (lint spinner, fix blockUi, dead-link navigate) complete
+Last activity: 2026-07-23 — Phase 3 dead wiki links flat list + noteShow navigation
+Resume file: none (quick 001 complete)
 
-Progress: [██████████] 100% (milestone); quick 001 Phase 2/3 done
+Progress: [██████████] 100% (milestone); quick 001 3/3 done
 
 ## Performance Metrics
 
@@ -90,6 +90,7 @@ Recent decisions affecting current work:
 - Phase 7: Fix secondary/sm after checkbox; refreshSidebarStructuralListings after successful purge
 - Phase 7: expectSidebarFolderAbsent uses find + not.exist without waiting for presence
 - Quick 001: Lint = local spinner; Fix = global `runWithBlockingApiLoading` continuous overlay through re-lint
+- Quick 001: Dead-link children are flat linked rows (`noteShowLocation`), not nested collapse
 
 ### Pending Todos
 
@@ -108,5 +109,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-07-23
-Stopped at: Quick 001 Phase 2 done
-Resume file: `.planning/quick/001-health-ui-polish/PLAN.md` (Phase 3)
+Stopped at: Quick 001 complete
+Resume file: none

@@ -1,6 +1,6 @@
 # Health UI polish (post-v1 adjustments)
 
-**Status:** in progress (Phases 1–2 done)  
+**Status:** done  
 **Location:** `.planning/quick/001-health-ui-polish/`  
 **Type:** Ad-hoc quick plan (not on milestone roadmap)  
 **Created:** 2026-07-23
@@ -84,7 +84,7 @@ Improve Health tab UX after v1 ship: clear in-flight feedback for lint and fix, 
 ## Phase 3: Dead wiki links — flat list + open note
 
 **Type:** Behavior  
-**Status:** planned
+**Status:** done
 
 **Pre-condition:** Health report includes dead wiki links (nested by note).  
 **Trigger:** User expands **Dead wiki links** (section still toggles) and clicks a dead-link finding (note heading or token item).  
@@ -92,20 +92,17 @@ Improve Health tab UX after v1 ship: clear in-flight feedback for lint and fix, 
 
 ### Implementation notes
 
-- In `NotebookHealthFindings`, for `dead_wiki_links` children: render a non-collapse block (note title + token list), not nested `daisy-collapse`.
-- Top-level group for `dead_wiki_links` keeps existing section collapse behavior.
-- Links: `router-link` or `router.push` via `noteShowLocation(noteId)` using each item’s `noteId` (note title may use first item’s `noteId`).
-- “Note and folder”: note show is the notebook note route; folder context comes from existing note/workspace chrome — **do not** jump to `folderPage` as the primary action.
-- `data-testid`s for clickable findings (e.g. note row / token links) for tests.
-- Out of scope: scroll/highlight first `[[token]]` in the editor (HLTH-11 remainder).
+- `NotebookHealthFindings`: `dead_wiki_links` children render as note title + token list with `router-link` via `noteShowLocation(noteId)`; not nested `daisy-collapse`.
+- Top-level group keeps section collapse; other ruleIds keep nested collapse for children.
+- Tests: `NotebookHealthFindings.spec.ts` (flat list, note links, non-dead-link nested collapse preserved).
 
 ### Verification
 
-- Frontend: findings component — dead-link children have no nested collapse checkbox; links use note ids; other groups still collapse as before.
-- Optional E2E: one scenario in `notebook_health.feature` click dead-link finding → lands on note — only if Vitest cannot cover router navigation cleanly; tag `@wip` until green.
-- Commands:  
-  `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/notebook/`  
-  (targeted E2E only if added)
+- Frontend: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/notebook/`
+
+### Learning
+
+- Vitest stubbed `router-link` + `noteShowLocation` covers navigation without E2E.
 
 ---
 

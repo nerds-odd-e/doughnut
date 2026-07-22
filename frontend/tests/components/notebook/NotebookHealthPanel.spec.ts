@@ -130,7 +130,7 @@ describe("NotebookHealthPanel", () => {
     expect(readmeOnly.text()).toContain("No findings")
   })
 
-  it("nests dead wiki links by note title with token leaf labels", async () => {
+  it("lists dead wiki links by note title with token leaf labels", async () => {
     const wrapper = mountPanel()
     await flushPromises()
 
@@ -140,13 +140,11 @@ describe("NotebookHealthPanel", () => {
     const deadLinks = wrapper.get(
       '[data-testid="notebook-health-group-dead_wiki_links"]'
     )
-    const nestedCollapse = deadLinks
-      .findAll(".daisy-collapse")
-      .find((node) => node.text().includes("Source"))
-    expect(nestedCollapse).toBeDefined()
-    expect(nestedCollapse!.text()).toContain("Source")
-    expect(nestedCollapse!.text()).toContain("Missing")
-    expect(nestedCollapse!.find("a").exists()).toBe(false)
+    expect(deadLinks.text()).toContain("Source")
+    expect(deadLinks.text()).toContain("Missing")
+    expect(
+      deadLinks.find('[data-testid="notebook-health-dead-link-note"]').exists()
+    ).toBe(true)
     expect(wrapper.html()).not.toMatch(/v-html|innerHTML/)
   })
 
