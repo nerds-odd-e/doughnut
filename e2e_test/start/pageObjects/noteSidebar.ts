@@ -167,6 +167,15 @@ export const noteSidebar = () => {
       folderTreitemByLabel(folderLabel).should('exist')
     },
 
+    expectSidebarFolderAbsent(folderLabel: string) {
+      pageIsNotLoading()
+      cy.get('aside')
+        .find(
+          `[role="treeitem"].sidebar-folder-li[aria-label="${folderLabel}"]`
+        )
+        .should('not.exist')
+    },
+
     expectSidebarFolderUnderOpenParent(
       parentFolderLabel: string,
       childFolderLabel: string

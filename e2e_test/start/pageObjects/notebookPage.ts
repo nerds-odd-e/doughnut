@@ -46,6 +46,12 @@ const notebookPage = () => {
       return this
     },
 
+    applyFix() {
+      cy.get('[data-testid="notebook-health-fix"]').click()
+      pageIsNotLoading()
+      return this
+    },
+
     expectHealthIdle() {
       cy.get('[data-testid="notebook-health-idle"]').should('be.visible')
       return this
@@ -89,6 +95,14 @@ const notebookPage = () => {
     expectFindingGroupIncludes(ruleId: string, label: string) {
       cy.get(`[data-testid="notebook-health-group-${ruleId}"]`).should(
         'contain.text',
+        label
+      )
+      return this
+    },
+
+    expectFindingGroupDoesNotInclude(ruleId: string, label: string) {
+      cy.get(`[data-testid="notebook-health-group-${ruleId}"]`).should(
+        'not.contain.text',
         label
       )
       return this

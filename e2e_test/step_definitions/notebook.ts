@@ -125,6 +125,10 @@ When('I run notebook health lint', () => {
   notebookPage().runLint()
 })
 
+When('I apply notebook health empty folder fix', () => {
+  notebookPage().applyFix()
+})
+
 When('I check Remove empty folders on the notebook health panel', () => {
   notebookPage().checkRemoveEmptyFolders()
 })
@@ -152,6 +156,13 @@ Then(
   'the notebook health empty folders finding includes {string}',
   (label: string) => {
     notebookPage().expectFindingGroupIncludes('empty_folders', label)
+  }
+)
+
+Then(
+  'the notebook health empty folders finding does not include {string}',
+  (label: string) => {
+    notebookPage().expectFindingGroupDoesNotInclude('empty_folders', label)
   }
 )
 

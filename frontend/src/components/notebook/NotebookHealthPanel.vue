@@ -67,6 +67,7 @@ import {
 } from "@generated/doughnut-backend-api/sdk.gen"
 import CheckInput from "@/components/form/CheckInput.vue"
 import NotebookHealthFindings from "@/components/notebook/NotebookHealthFindings.vue"
+import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const props = defineProps<{
@@ -114,6 +115,7 @@ async function applyFix() {
     })
   )
   if (!error) {
+    refreshSidebarStructuralListings()
     await runLint()
   }
 }

@@ -379,6 +379,10 @@ Then('I should see sidebar folder {string}', (folderLabel: string) => {
   start.noteSidebar().expectSidebarFolderVisible(folderLabel)
 })
 
+Then('I should not see sidebar folder {string}', (folderLabel: string) => {
+  start.noteSidebar().expectSidebarFolderAbsent(folderLabel)
+})
+
 Then(
   'I should see sidebar folder {string} under open folder {string}',
   (childFolderLabel: string, parentFolderLabel: string) => {
