@@ -5,14 +5,14 @@ milestone_name: Notebook Lint & Auto-Fix
 current_phase: 4
 current_phase_name: Dead-link findings
 status: ready
-stopped_at: Phase 4 research complete
-last_updated: "2026-07-22T19:40:00.000Z"
+stopped_at: Phase 4 plans created
+last_updated: "2026-07-22T19:50:00.000Z"
 last_activity: 2026-07-22
-last_activity_desc: Phase 4 research written (04-RESEARCH.md)
+last_activity_desc: Phase 4 plans written (04-01, 04-02)
 progress:
   total_phases: 4
   completed_phases: 3
-  total_plans: 5
+  total_plans: 7
   completed_plans: 5
 ---
 
@@ -23,15 +23,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-22)
 
 **Core value:** From Notebook Settings → Health, a user can run lint and see actionable health findings — with optional bulk removal of empty folders when auto-fix is enabled.
-**Current focus:** Phase 4 — Dead-link findings (next)
+**Current focus:** Phase 4 — Dead-link findings (execute next)
 
 ## Current Position
 
-Phase: 4 of 7 (Dead-link findings) — research complete, ready to plan
-Plan: (none active — research done)
-Status: Phase 4 research complete — ready for `/gsd-plan-phase`
-Last activity: 2026-07-22 — Phase 4 research (dead-link findings)
-Resume file: .planning/phases/04-dead-link-findings/04-RESEARCH.md
+Phase: 4 of 7 (Dead-link findings) — planned, ready to execute
+Plan: 04-01 (Wave 1 Structure) → 04-02 (Wave 2 Behavior)
+Status: Phase 4 plans complete — ready for `/gsd-execute-phase 4`
+Last activity: 2026-07-22 — Phase 4 plans (dead-link findings)
+Resume file: .planning/phases/04-dead-link-findings/04-01-PLAN.md
 
 Progress: [████░░░░░░] 43% (3/7 phases)
 
@@ -50,6 +50,7 @@ Progress: [████░░░░░░] 43% (3/7 phases)
 | 1. Health lint contract | 2 | 2 | 3 min |
 | 2. Empty-folder findings | 2/2 | 2 | 6 min |
 | 3. Readme-only folder findings | 1/1 | 1 | 6 min |
+| 4. Dead-link findings | 0/2 | 2 | — |
 
 **Per-Plan Metrics:**
 
@@ -85,6 +86,7 @@ Recent decisions affecting current work:
 - Phase 3: Own non-blank readme only — no ancestor inheritance (D-02)
 - Phase 3: readme_only_folders autoFixable=false (D-07)
 - Phase 3: Shared FolderSubtreeLiveNotes.noteEmptyFolderItems for complementary gates (D-10)
+- Phase 4: Dead = viewer-readable WikiLinkResolver unresolved; extract via wikiLinkInnersInOccurrenceOrder; live sources only; distinct tokens; nest by note; autoFixable=false; always emit (D-01..D-13)
 
 ### Pending Todos
 
@@ -103,5 +105,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-07-22
-Stopped at: Phase 4 research complete
-Resume file: .planning/phases/04-dead-link-findings/04-RESEARCH.md
+Stopped at: Phase 4 plans created
+Resume file: .planning/phases/04-dead-link-findings/04-01-PLAN.md
