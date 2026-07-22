@@ -85,6 +85,15 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   List<Note> findNotesInFolderOrderByIdAsc(@Param("folderId") Integer folderId);
 
   @Query(
+      """
+      SELECT DISTINCT n.folder.id FROM Note n
+      WHERE n.notebook.id = :notebookId
+        AND n.deletedAt IS NULL
+        AND n.folder IS NOT NULL
+      """)
+  List<Integer> findLiveNoteFolderIdsByNotebookId(@Param("notebookId") Integer notebookId);
+
+  @Query(
       value =
           selectFromNote
               + " JOIN n.notebook.subscriptions s ON s.user.id = :userId "
