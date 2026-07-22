@@ -184,7 +184,7 @@ Plans:
   4. Empty-folder removal uses a **dedicated purge** path (does not use folder dissolve / promote-children)
   5. After a successful fix, the user can re-run lint and no longer sees the purged fully empty folders
 
-**Plans:** 2 plans
+**Plans:** 0/2 plans executed
 
 Plans:
 **Wave 1**
@@ -210,7 +210,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 4. Dead-link findings | 2/2 | Complete | 2026-07-22 |
 | 5. Health tab and Run | 2/2 | Complete | 2026-07-22 |
 | 6. User-level defaults | 2/2 | Complete | 2026-07-22 |
-| 7. Gated empty-folder purge | 0/2 | Planned | - |
+| 7. Gated empty-folder purge | 0/2 | Planned    |  |
 
 ## Coverage
 
