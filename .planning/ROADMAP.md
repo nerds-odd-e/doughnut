@@ -60,8 +60,12 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
+**Wave 1**
 
 - [ ] 02-01-PLAN.md — EmptyFolderHealthRule + live folder-id query + predicate tests (EFOL-01)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 02-02-PLAN.md — Authorized POST .../health/lint + controller tests + OpenAPI regen (EFOL-02)
 
 ### Phase 3: Readme-only folder findings
