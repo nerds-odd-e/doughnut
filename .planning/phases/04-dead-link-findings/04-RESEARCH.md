@@ -501,17 +501,19 @@ Notes:
 - Batching optimization beyond per-note resolver calls is discretionary and not required for correctness [ASSUMED: acceptable latency for typical notebook sizes on on-demand lint].
 - Spring `List<HealthRule>` order is undefined without `@Order` — tests must filter by `ruleId` [VERIFIED: Phase 2/3 practice].
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should `WikiLinkResolver` gain `unresolvedWikiLinkTokens` vs invert `resolveWikiLinksForCache` in the rule?**
    - What we know: Both can be correct if extract/dedupe match.
    - What's unclear: Naming preference only.
    - Recommendation: **Add `unresolvedWikiLinkTokens`** (or `unresolvedWikiLinkInners`) on `WikiLinkResolver` so Health cannot drift.
+   - **RESOLVED:** Add `WikiLinkResolver.unresolvedWikiLinkTokens(Note, User)` sharing the extract/dedupe/viewer-readable resolve loop with `resolveWikiLinksForCache` (locked in `04-01-PLAN.md`).
 
 2. **HealthRunContext constructor breakage for existing tests**
    - What we know: All current call sites use `new HealthRunContext()`.
    - What's unclear: None — mechanical update.
    - Recommendation: Require `User viewer`; update folder-rule tests to pass notebook owner.
+   - **RESOLVED:** Require `User viewer` on `HealthRunContext`; update controller + all `new HealthRunContext()` call sites (locked in `04-01-PLAN.md`).
 
 ## Environment Availability
 
