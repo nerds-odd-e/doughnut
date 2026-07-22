@@ -13,10 +13,18 @@ import com.odde.doughnut.controllers.dto.HealthFindingGroup;
 import com.odde.doughnut.controllers.dto.HealthFindingItem;
 import com.odde.doughnut.controllers.dto.HealthSeverity;
 import com.odde.doughnut.controllers.dto.NotebookHealthLintReport;
+import com.odde.doughnut.entities.Notebook;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class HealthRuleRunnerTest {
+
+  @Test
+  void returnsEmptyGroupsWhenNoRulesRegistered() {
+    HealthRuleRunner runner = new HealthRuleRunner(List.of());
+    NotebookHealthLintReport report = runner.run(new Notebook(), new HealthRunContext());
+    assertThat(report.getGroups(), empty());
+  }
 
   @Test
   void nestedFindingGroupRetainsItemsAndChildren() {
