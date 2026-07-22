@@ -96,7 +96,7 @@ status: complete
 1. **Task 1: Add zero-rules empty report test (RED)** - `9bca556801` (test)
 2. **Task 2: Implement HealthRule runner and NotebookHealthService (GREEN)** - `3db676b2c4` (feat)
 
-**Plan metadata:** see docs commit after this SUMMARY
+**Plan metadata:** `d2dce0378e` (docs: complete plan)
 
 ## Files Created/Modified
 
