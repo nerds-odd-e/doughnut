@@ -38,12 +38,13 @@ class ReadmeOnlyFolderHealthRuleTest {
   @Autowired FolderRepository folderRepository;
   @Autowired MakeMe makeMe;
 
+  private User owner;
   private Notebook notebook;
 
   @BeforeEach
   void setup() {
-    User user = makeMe.aUser().please();
-    notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+    owner = makeMe.aUser().please();
+    notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
   }
 
   @Test
@@ -153,7 +154,8 @@ class ReadmeOnlyFolderHealthRuleTest {
     makeMe.aFolder().notebook(notebook).name("HasReadme").readmeContent("keep me").please();
     makeMe.aFolder().notebook(notebook).name("Empty").please();
 
-    NotebookHealthLintReport report = notebookHealthService.lint(notebook, new HealthRunContext());
+    NotebookHealthLintReport report =
+        notebookHealthService.lint(notebook, new HealthRunContext(owner));
     List<String> ruleIds = report.getGroups().stream().map(HealthFindingGroup::getRuleId).toList();
 
     assertThat(ruleIds, hasItem(HealthRuleIds.EMPTY_FOLDERS));
@@ -166,7 +168,7 @@ class ReadmeOnlyFolderHealthRuleTest {
     makeMe.aFolder().notebook(notebook).name("Empty").please();
     int folderCountBefore = folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()).size();
 
-    notebookHealthService.lint(notebook, new HealthRunContext());
+    notebookHealthService.lint(notebook, new HealthRunContext(owner));
 
     assertThat(
         folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()),
@@ -182,7 +184,8 @@ class ReadmeOnlyFolderHealthRuleTest {
   }
 
   private HealthFindingGroup groupByRuleId(String ruleId) {
-    NotebookHealthLintReport report = notebookHealthService.lint(notebook, new HealthRunContext());
+    NotebookHealthLintReport report =
+        notebookHealthService.lint(notebook, new HealthRunContext(owner));
     List<HealthFindingGroup> groups = report.getGroups();
     assertThat(groups, is(not(nullValue())));
     return groups.stream()

@@ -34,12 +34,13 @@ class EmptyFolderHealthRuleTest {
   @Autowired NotebookHealthService notebookHealthService;
   @Autowired MakeMe makeMe;
 
+  private User owner;
   private Notebook notebook;
 
   @BeforeEach
   void setup() {
-    User user = makeMe.aUser().please();
-    notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+    owner = makeMe.aUser().please();
+    notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
   }
 
   @Test
@@ -112,7 +113,9 @@ class EmptyFolderHealthRuleTest {
   }
 
   private HealthFindingGroup emptyFoldersGroup() {
-    NotebookHealthLintReport report = notebookHealthService.lint(notebook, new HealthRunContext());
+    NotebookHealthLintReport report =
+        notebookHealthService.lint(notebook, new HealthRunContext(owner));
+
     List<HealthFindingGroup> groups = report.getGroups();
     assertThat(groups, is(not(nullValue())));
     return groups.stream()

@@ -96,6 +96,13 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   @Query(
       value =
           selectFromNote
+              + " WHERE n.notebook.id = :notebookId AND n.deletedAt IS NULL"
+              + " ORDER BY n.id ASC")
+  List<Note> findLiveNotesByNotebookIdOrderByIdAsc(@Param("notebookId") Integer notebookId);
+
+  @Query(
+      value =
+          selectFromNote
               + " JOIN n.notebook.subscriptions s ON s.user.id = :userId "
               + searchForTitleLike)
   List<Note> searchForUserInAllMySubscriptions(

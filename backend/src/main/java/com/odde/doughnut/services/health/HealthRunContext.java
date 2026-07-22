@@ -1,3 +1,15 @@
 package com.odde.doughnut.services.health;
 
-public class HealthRunContext {}
+import com.odde.doughnut.entities.User;
+
+public final class HealthRunContext {
+  private final User viewer;
+
+  public HealthRunContext(User viewer) {
+    this.viewer = viewer;
+  }
+
+  public User viewer() {
+    return viewer;
+  }
+}

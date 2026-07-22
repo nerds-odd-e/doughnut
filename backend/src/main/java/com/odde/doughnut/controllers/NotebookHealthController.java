@@ -34,6 +34,7 @@ class NotebookHealthController {
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
-    return notebookHealthService.lint(notebook, new HealthRunContext());
+    return notebookHealthService.lint(
+        notebook, new HealthRunContext(authorizationService.getCurrentUser()));
   }
 }

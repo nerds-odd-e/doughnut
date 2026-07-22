@@ -63,6 +63,28 @@ public class WikiLinkResolver {
     return List.copyOf(out);
   }
 
+  /**
+   * Unresolved wiki-link inners for the viewer, in first-occurrence order (same
+   * extract/dedupe/resolve as cache).
+   */
+  public List<String> unresolvedWikiLinkTokens(Note focusNote, User viewer) {
+    String content = focusNote.getContent();
+    if (content == null || content.isBlank()) {
+      return List.of();
+    }
+    List<String> linkTitlesOrdered = NoteContentMarkdown.wikiLinkInnersInOccurrenceOrder(content);
+    if (linkTitlesOrdered.isEmpty()) {
+      return List.of();
+    }
+    List<String> unresolved = new ArrayList<>();
+    for (String token : dedupePreserveOrder(linkTitlesOrdered)) {
+      if (resolveToken(token, viewer, focusNote) == null) {
+        unresolved.add(token);
+      }
+    }
+    return List.copyOf(unresolved);
+  }
+
   private Note resolveAnyTargetToken(String token, Note focusNote) {
     return resolveParsedLink(token, focusNote, this::firstNotebookMatch);
   }
