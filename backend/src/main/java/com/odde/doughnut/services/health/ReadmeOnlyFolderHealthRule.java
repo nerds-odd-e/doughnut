@@ -12,23 +12,24 @@ import java.util.Set;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EmptyFolderHealthRule implements HealthRule {
+public class ReadmeOnlyFolderHealthRule implements HealthRule {
   private final FolderRepository folderRepository;
   private final NoteRepository noteRepository;
 
-  public EmptyFolderHealthRule(FolderRepository folderRepository, NoteRepository noteRepository) {
+  public ReadmeOnlyFolderHealthRule(
+      FolderRepository folderRepository, NoteRepository noteRepository) {
     this.folderRepository = folderRepository;
     this.noteRepository = noteRepository;
   }
 
   @Override
   public String id() {
-    return HealthRuleIds.EMPTY_FOLDERS;
+    return HealthRuleIds.README_ONLY_FOLDERS;
   }
 
   @Override
   public String title() {
-    return "Empty folders";
+    return "Readme-only folders";
   }
 
   @Override
@@ -38,7 +39,7 @@ public class EmptyFolderHealthRule implements HealthRule {
 
   @Override
   public boolean autoFixable() {
-    return true;
+    return false;
   }
 
   @Override
@@ -54,7 +55,7 @@ public class EmptyFolderHealthRule implements HealthRule {
     group.setAutoFixable(autoFixable());
     group.setItems(
         FolderSubtreeLiveNotes.noteEmptyFolderItems(
-            folders, occupiedFolderIds, FolderSubtreeLiveNotes::isBlankReadme));
+            folders, occupiedFolderIds, readme -> !FolderSubtreeLiveNotes.isBlankReadme(readme)));
     return group;
   }
 }
