@@ -81,7 +81,12 @@ Plans:
   2. Fully empty folders (no notes in subtree and no meaningful readme) remain only under the empty-folder findings group
   3. Lint remains report-only (no deletes or mutations)
 
-**Plans:** TBD
+**Plans:** 1 plan
+
+Plans:
+**Wave 1**
+
+- [ ] 03-01-PLAN.md — Shared FolderSubtreeLiveNotes + ReadmeOnlyFolderHealthRule + mutual-exclusion tests (EFOL-03)
 
 ### Phase 4: Dead-link findings
 
@@ -158,7 +163,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 |-------|----------------|--------|-----------|
 | 1. Health lint contract | 2/2 | Complete | 2026-07-22 |
 | 2. Empty-folder findings | 2/2 | Complete | 2026-07-22 |
-| 3. Readme-only folder findings | 0/TBD | Not started | - |
+| 3. Readme-only folder findings | 0/1 | Planned | - |
 | 4. Dead-link findings | 0/TBD | Not started | - |
 | 5. Health tab and Run | 0/TBD | Not started | - |
 | 6. User-level defaults | 0/TBD | Not started | - |
