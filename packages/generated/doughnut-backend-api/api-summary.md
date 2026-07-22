@@ -129,6 +129,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 ## Notebook Health Controller
 
 - `lint`: POST `/api/notebooks/{notebook}/health/lint` -> `LintResponse` (request: `LintData`; path: notebook; response body: NotebookHealthLintReport)
+- `fix`: POST `/api/notebooks/{notebook}/health/fix` -> `FixResponse` (request: `FixData`; path: notebook; body: NotebookHealthFixRequest; response body: void)
 
 ## Notebook Group Controller
 

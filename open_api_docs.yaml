@@ -1011,6 +1011,26 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebookHealthLintReport"
+  /api/notebooks/{notebook}/health/fix:
+    post:
+      tags:
+      - notebook-health-controller
+      operationId: fix
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotebookHealthFixRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
   /api/notebooks/{notebook}/folders:
     post:
       tags:
@@ -3853,6 +3873,14 @@ components:
           description: "Finding groups, typically one per health rule"
           items:
             $ref: "#/components/schemas/HealthFindingGroup"
+    NotebookHealthFixRequest:
+      type: object
+      properties:
+        removeEmptyFolders:
+          type: boolean
+          description: Must be true to bulk-purge fully empty folder trees
+      required:
+      - removeEmptyFolders
     FolderCreationRequest:
       type: object
       description: "Create a folder under notebook root, nested under an explicit\

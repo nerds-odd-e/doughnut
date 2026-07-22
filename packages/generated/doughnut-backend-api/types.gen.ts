@@ -446,6 +446,13 @@ export type NotebookHealthLintReport = {
     groups?: Array<HealthFindingGroup>;
 };
 
+export type NotebookHealthFixRequest = {
+    /**
+     * Must be true to bulk-purge fully empty folder trees
+     */
+    removeEmptyFolders: boolean;
+};
+
 /**
  * Create a folder under notebook root, nested under an explicit parent folder, or nested under the folder of a context note.
  */
@@ -1970,6 +1977,22 @@ export type LintResponses = {
 };
 
 export type LintResponse = LintResponses[keyof LintResponses];
+
+export type FixData = {
+    body: NotebookHealthFixRequest;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/health/fix';
+};
+
+export type FixResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
 
 export type CreateFolderData = {
     body: FolderCreationRequest;
