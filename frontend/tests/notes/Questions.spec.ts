@@ -1,10 +1,12 @@
 import { PredefinedQuestionController } from "@generated/doughnut-backend-api/sdk.gen"
 import { describe, it, expect } from "vitest"
+import { flushPromises } from "@vue/test-utils"
 import { mockSdkService } from "@tests/helpers"
 import {
   clickExportQuestionGeneration,
   exportTextarea,
   mountQuestionsReady,
+  questionsFixture,
   questionsNote,
   sampleQuestionExportData,
   setupQuestionsTests,
@@ -17,6 +19,25 @@ describe("Questions", () => {
     const wrapper = await mountQuestionsReady()
 
     expect(wrapper.text()).toContain("What is 2+2?")
+  })
+
+  it("deletes a question when its delete button is clicked", async () => {
+    const deleteSpy = mockSdkService(
+      PredefinedQuestionController,
+      "deleteQuestion",
+      questionsFixture[0]!
+    )
+
+    const wrapper = await mountQuestionsReady()
+    expect(wrapper.text()).toContain("What is 2+2?")
+
+    await wrapper.find('button[aria-label="Delete question"]').trigger("click")
+    await flushPromises()
+
+    expect(deleteSpy).toHaveBeenCalledWith({
+      path: { predefinedQuestion: questionsFixture[0]!.id },
+    })
+    expect(wrapper.text()).not.toContain("What is 2+2?")
   })
 
   it("shows export dialog when export button is clicked", async () => {
