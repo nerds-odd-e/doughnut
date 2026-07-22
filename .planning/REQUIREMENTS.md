@@ -26,10 +26,10 @@
 ### Auto-fix
 
 - [x] **AFIX-01**: Auto-fix is an **optional** run option; lint never deletes or mutates on Run alone
-- [ ] **AFIX-02**: The only v1 fix action is bulk **remove empty folders** (no per-folder multi-select)
-- [ ] **AFIX-03**: **Fix** is enabled only when the user has selected the bulk “remove empty folders” option
-- [ ] **AFIX-04**: Bulk remove deletes only **fully empty** folder trees (no notes in subtree and no meaningful readme); folders in the separate “readme only” finding type are **not** deleted by this fix
-- [ ] **AFIX-05**: Empty-folder removal uses a **dedicated purge** path (must not use folder dissolve / promote-children)
+- [x] **AFIX-02**: The only v1 fix action is bulk **remove empty folders** (no per-folder multi-select)
+- [x] **AFIX-03**: **Fix** is enabled only when the user has selected the bulk “remove empty folders” option
+- [x] **AFIX-04**: Bulk remove deletes only **fully empty** folder trees (no notes in subtree and no meaningful readme); folders in the separate “readme only” finding type are **not** deleted by this fix
+- [x] **AFIX-05**: Empty-folder removal uses a **dedicated purge** path (must not use folder dissolve / promote-children)
 
 ### User defaults
 
@@ -90,10 +90,10 @@ Deferred; not in current roadmap.
 | AFIX-01 | Phase 5 | Complete |
 | DFLT-01 | Phase 6 | Complete |
 | DFLT-02 | Phase 6 | Complete |
-| AFIX-02 | Phase 7 | Pending |
-| AFIX-03 | Phase 7 | Pending |
-| AFIX-04 | Phase 7 | Pending |
-| AFIX-05 | Phase 7 | Pending |
+| AFIX-02 | Phase 7 | Complete |
+| AFIX-03 | Phase 7 | Complete |
+| AFIX-04 | Phase 7 | Complete |
+| AFIX-05 | Phase 7 | Complete |
 
 **Coverage:**
 

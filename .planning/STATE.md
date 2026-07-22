@@ -4,16 +4,16 @@ milestone: v1.0
 milestone_name: Notebook Lint & Auto-Fix
 current_phase: 7
 current_phase_name: Gated empty-folder purge
-status: ready_to_execute
-stopped_at: Phase 7 plans ready
-last_updated: "2026-07-22T14:55:12.241Z"
+status: executing
+stopped_at: Completed 07-01-PLAN.md
+last_updated: "2026-07-22T15:02:59.277Z"
 last_activity: 2026-07-22
-last_activity_desc: Created 07-01/07-02 PLAN.md + VALIDATION.md
+last_activity_desc: Completed 07-01 gated empty-folder purge API
 progress:
   total_phases: 7
   completed_phases: 6
   total_plans: 13
-  completed_plans: 11
+  completed_plans: 12
 ---
 
 # Project State
@@ -23,25 +23,25 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-22)
 
 **Core value:** From Notebook Settings → Health, a user can run lint and see actionable health findings — with optional bulk removal of empty folders when auto-fix is enabled.
-**Current focus:** Phase 7 — Gated empty-folder purge (execute next)
+**Current focus:** Phase 7 — Gated empty-folder purge (07-01 done; execute 07-02 Fix UI + E2E)
 
 ## Current Position
 
-Phase: 7 of 7 (Gated empty-folder purge) — ready to execute
-Plan: 07-01 (Wave 1)
-Status: Phase 7 planned — 07-01 backend purge API, 07-02 Fix UI + E2E
-Last activity: 2026-07-22 — Created 07-01/07-02 PLAN.md + VALIDATION.md
-Resume file: .planning/phases/07-gated-empty-folder-purge/07-01-PLAN.md
+Phase: 7 of 7 (Gated empty-folder purge) — in progress
+Plan: 07-02 (Wave 2)
+Status: 07-01 backend purge API complete; next is Fix UI + E2E
+Last activity: 2026-07-22 — Completed 07-01 EmptyFolderBulkPurge + health/fix
+Resume file: .planning/phases/07-gated-empty-folder-purge/07-02-PLAN.md
 
-Progress: [████████░░] 86%
+Progress: [█████████░] 92%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 11
+- Total plans completed: 12
 - Average duration: ~5 min
-- Total execution time: ~58 min
+- Total execution time: ~64 min
 
 **By Phase:**
 
@@ -53,6 +53,7 @@ Progress: [████████░░] 86%
 | 4. Dead-link findings | 2/2 | 2 | 5.5 min |
 | 5. Health tab and Run | 2/2 | 2 | 6.5 min |
 | 6. User-level defaults | 2/2 | 2 | 5 min |
+| 7. Gated empty-folder purge | 1/2 | 2 | 6 min |
 
 **Per-Plan Metrics:**
 
@@ -69,6 +70,7 @@ Progress: [████████░░] 86%
 | Phase 05 P02 | 5min | 2 tasks | 9 files |
 | Phase 06 P01 | 6min | 2 tasks | 8 files |
 | Phase 06 P02 | 4min | 2 tasks | 5 files |
+| Phase 07-gated-empty-folder-purge P01 | 6min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -104,6 +106,9 @@ Recent decisions affecting current work:
 - Phase 6: Health defaults persist on User column; ERD key-only exporter shows no non-key column change
 - Phase 6: onMounted prefill from currentUser.healthRemoveEmptyFoldersDefault ?? false
 - Phase 6: Save body always includes name, dailyAssimilationCount, spaceIntervals, healthRemoveEmptyFoldersDefault
+- Phase 7: EmptyFolderBulkPurge in services/health; void fix response
+- Phase 7: D ⊆ S CASCADE-safe filter: all real descendants must be in empty set before hard-delete
+- Phase 7: Detach soft-deleted notes before folder remove for Hibernate coherence
 
 ### Pending Todos
 
@@ -121,6 +126,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-22T14:55:12.231Z
-Stopped at: Phase 7 plans ready
-Resume file: None
+Last session: 2026-07-22T15:02:59.268Z
+Stopped at: Completed 07-01-PLAN.md
+Resume file: .planning/phases/07-gated-empty-folder-purge/07-02-PLAN.md
