@@ -18,27 +18,12 @@
       </p>
     </div>
 
-    <div
-      class="daisy-tabs daisy-tabs-box bg-base-200 p-2 mb-6"
-      data-testid="notebook-workspace-tabs"
-    >
-      <a
-        :class="tabClass('home')"
-        role="button"
-        href="#"
-        data-testid="notebook-workspace-tab-home"
-        @click.prevent="activeTab = 'home'"
-      >Home</a>
-      <a
-        :class="tabClass('settings')"
-        role="button"
-        href="#"
-        data-testid="notebook-workspace-tab-settings"
-        @click.prevent="activeTab = 'settings'"
-      >Settings</a>
-    </div>
+    <WorkspaceIndexSettingsTabs
+      v-model="activeTab"
+      test-id-prefix="notebook-workspace"
+    />
 
-    <div v-if="activeTab === 'home'" data-testid="notebook-workspace-home">
+    <div v-if="activeTab === 'index'" data-testid="notebook-workspace-index">
       <ScopedIndexNoteEditor
         :notebook-id="notebook.id"
         :index-content="indexContent"
@@ -64,8 +49,9 @@ import type { Notebook, User } from "@generated/doughnut-backend-api"
 import NotebookPageNameEditor from "@/components/notebook/NotebookPageNameEditor.vue"
 import NotebookWorkspaceSettings from "@/components/notebook/NotebookWorkspaceSettings.vue"
 import ScopedIndexNoteEditor from "@/components/notebook/ScopedIndexNoteEditor.vue"
-
-type WorkspaceTab = "home" | "settings"
+import WorkspaceIndexSettingsTabs, {
+  type WorkspaceIndexSettingsTab,
+} from "@/components/commons/WorkspaceIndexSettingsTabs.vue"
 
 const props = defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },
@@ -86,10 +72,7 @@ const emit = defineEmits<{
   (e: "index-content-updated"): void
 }>()
 
-const activeTab = ref<WorkspaceTab>("home")
-
-const tabClass = (tab: WorkspaceTab) =>
-  `daisy-tab daisy-tab-lg ${activeTab.value === tab ? "daisy-tab-active" : ""}`
+const activeTab = ref<WorkspaceIndexSettingsTab>("index")
 
 const { skipMemoryTrackingEntirely } = props.notebook.notebookSettings
 

@@ -116,7 +116,18 @@ export async function selectCrossNotebookDestination(
   await selectDestinationParentFolder(wrapper, destParentId)
 }
 
+export async function openFolderSettingsTab(wrapper: VueWrapper) {
+  const settingsTab = wrapper.find(
+    '[data-testid="folder-workspace-tab-settings"]'
+  )
+  if (settingsTab.exists()) {
+    await settingsTab.trigger("click")
+    await flushPromises()
+  }
+}
+
 export async function submitMoveForm(wrapper: VueWrapper) {
+  await openFolderSettingsTab(wrapper)
   await wrapper
     .find('[data-testid="folder-move-dialog"] form')
     .trigger("submit")
@@ -124,6 +135,7 @@ export async function submitMoveForm(wrapper: VueWrapper) {
 }
 
 export async function setRenameName(wrapper: VueWrapper, name: string) {
+  await openFolderSettingsTab(wrapper)
   const nameInput = wrapper.find('[data-test="folder-name"]')
     .element as HTMLElement
   nameInput.innerText = name
@@ -132,6 +144,7 @@ export async function setRenameName(wrapper: VueWrapper, name: string) {
 }
 
 export async function submitRenameForm(wrapper: VueWrapper) {
+  await openFolderSettingsTab(wrapper)
   const renameForm = wrapper
     .find('[data-testid="folder-rename-submit"]')
     .element.closest("form")
@@ -148,6 +161,7 @@ export async function selectDestinationNotebook(
   wrapper: VueWrapper,
   notebookId: number
 ) {
+  await openFolderSettingsTab(wrapper)
   await wrapper
     .get('[data-testid="folder-move-notebook-select"]')
     .setValue(String(notebookId))
@@ -158,6 +172,7 @@ export async function selectDestinationParentFolder(
   wrapper: VueWrapper,
   folderId: number
 ) {
+  await openFolderSettingsTab(wrapper)
   await wrapper
     .get('[data-testid="folder-move-parent-select"]')
     .setValue(String(folderId))
@@ -165,6 +180,7 @@ export async function selectDestinationParentFolder(
 }
 
 export async function dissolveWithInitialConfirm(wrapper: VueWrapper) {
+  await openFolderSettingsTab(wrapper)
   await wrapper.find('[data-testid="folder-dissolve-button"]').trigger("click")
   await flushPromises()
   usePopups().popups.done(true)

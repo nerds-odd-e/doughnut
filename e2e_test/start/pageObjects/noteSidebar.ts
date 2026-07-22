@@ -1,6 +1,9 @@
 import { pageIsNotLoading } from '../pageBase'
 import noteCreationForm from './forms/noteCreationForm'
-import { assumeSidebarFolderOrganizeForm } from './sidebarFolderOrganizeForm'
+import {
+  openFolderPageForOrganize,
+  openFolderPageForOrganizeUnderParent,
+} from './sidebarFolderOrganizeNav'
 
 const sidebarActionTimeoutMs = 20000
 
@@ -145,33 +148,8 @@ export const noteSidebar = () => {
       pageIsNotLoading()
     },
 
-    openFolderPageForOrganize(folderLabel: string) {
-      pageIsNotLoading()
-      folderRowControls(folderTreitemByLabel(folderLabel))
-        .find('[data-testid="sidebar-folder-open-page-link"]')
-        .click()
-      pageIsNotLoading()
-      return assumeSidebarFolderOrganizeForm()
-    },
-
-    openFolderPageForOrganizeUnderParent(
-      parentLabel: string,
-      childLabel: string
-    ) {
-      pageIsNotLoading()
-      const childFolder = folderTreitemByLabel(parentLabel)
-        .find(
-          `[role="treeitem"].sidebar-folder-li[aria-label="${childLabel}"]`,
-          { timeout: sidebarActionTimeoutMs }
-        )
-        .filter(':visible')
-        .last()
-      folderRowControls(childFolder)
-        .find('[data-testid="sidebar-folder-open-page-link"]')
-        .click()
-      pageIsNotLoading()
-      return assumeSidebarFolderOrganizeForm()
-    },
+    openFolderPageForOrganize,
+    openFolderPageForOrganizeUnderParent,
 
     addingNewNoteFromToolbar() {
       newNoteSidebarButton().click()
@@ -258,18 +236,3 @@ export const noteSidebar = () => {
     },
   }
 }
-
-export const sidebarChildNotePageMethods = () => ({
-  addingChildNoteButton() {
-    return noteSidebar().addingChildNoteButton()
-  },
-  addingChildNote() {
-    return noteSidebar().addingChildNote()
-  },
-  addingNewNoteFromToolbar() {
-    return noteSidebar().addingNewNoteFromToolbar()
-  },
-  addingNewFolderFromToolbar() {
-    return noteSidebar().addingNewFolderFromToolbar()
-  },
-})

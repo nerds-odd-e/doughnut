@@ -63,6 +63,7 @@ declare module 'vue' {
     FolderNewForm: typeof import('./src/components/notes/FolderNewForm.vue')['default']
     FolderSearchForm: typeof import('./src/components/notes/FolderSearchForm.vue')['default']
     FolderSelector: typeof import('./src/components/notes/FolderSelector.vue')['default']
+    FolderWorkspaceSettings: typeof import('./src/components/folder/FolderWorkspaceSettings.vue')['default']
     FullScreen: typeof import('./src/components/common/FullScreen.vue')['default']
     GlobalBar: typeof import('./src/components/toolbars/GlobalBar.vue')['default']
     HorizontalMenu: typeof import('./src/components/toolbars/HorizontalMenu.vue')['default']
@@ -250,6 +251,7 @@ declare module 'vue' {
     WikidataAssociationDialogBody: typeof import('./src/components/notes/WikidataAssociationDialogBody.vue')['default']
     WikidataSearchByLabel: typeof import('./src/components/notes/WikidataSearchByLabel.vue')['default']
     WikiPropertyValueField: typeof import('./src/components/form/WikiPropertyValueField.vue')['default']
+    WorkspaceIndexSettingsTabs: typeof import('./src/components/commons/WorkspaceIndexSettingsTabs.vue')['default']
   }
 }
 
@@ -306,6 +308,7 @@ declare global {
   const FolderNewForm: typeof import('./src/components/notes/FolderNewForm.vue')['default']
   const FolderSearchForm: typeof import('./src/components/notes/FolderSearchForm.vue')['default']
   const FolderSelector: typeof import('./src/components/notes/FolderSelector.vue')['default']
+  const FolderWorkspaceSettings: typeof import('./src/components/folder/FolderWorkspaceSettings.vue')['default']
   const FullScreen: typeof import('./src/components/common/FullScreen.vue')['default']
   const GlobalBar: typeof import('./src/components/toolbars/GlobalBar.vue')['default']
   const HorizontalMenu: typeof import('./src/components/toolbars/HorizontalMenu.vue')['default']
@@ -493,4 +496,5 @@ declare global {
   const WikidataAssociationDialogBody: typeof import('./src/components/notes/WikidataAssociationDialogBody.vue')['default']
   const WikidataSearchByLabel: typeof import('./src/components/notes/WikidataSearchByLabel.vue')['default']
   const WikiPropertyValueField: typeof import('./src/components/form/WikiPropertyValueField.vue')['default']
+  const WorkspaceIndexSettingsTabs: typeof import('./src/components/commons/WorkspaceIndexSettingsTabs.vue')['default']
 }

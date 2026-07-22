@@ -103,9 +103,9 @@ Then('the notebook page summary shows name {string}', (name: string) => {
 })
 
 Then(
-  'the notebook workspace home shows name {string} and index',
+  'the notebook workspace index shows name {string} and index',
   (name: string) => {
-    notebookPage().expectHomeLandmarks(name)
+    notebookPage().expectIndexLandmarks(name)
   }
 )
 
@@ -121,11 +121,11 @@ Then('notebook admin settings sections are visible', () => {
   notebookPage().expectSettingsSectionsVisible()
 })
 
-Then('notebook Home and Settings tabs are present', () => {
+Then('notebook Index and Settings tabs are present', () => {
   workspaceSurfaceLandmarks().expectNotebookWorkspaceTabsPresent()
 })
 
-Then('notebook Home and Settings tabs are not present', () => {
+Then('notebook Index and Settings tabs are not present', () => {
   workspaceSurfaceLandmarks().expectNotebookWorkspaceTabsAbsent()
 })
 

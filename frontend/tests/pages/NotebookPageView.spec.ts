@@ -96,7 +96,7 @@ describe("NotebookPageView.spec", () => {
       wrapper.find('[data-testid="notebook-page-summary"]').text()
     ).toContain("Home cue")
     expect(
-      wrapper.find('[data-testid="notebook-workspace-home"]').exists()
+      wrapper.find('[data-testid="notebook-workspace-index"]').exists()
     ).toBe(true)
     expect(wrapper.find('[data-testid="notebook-index-editor"]').exists()).toBe(
       true
@@ -148,7 +148,7 @@ describe("NotebookPageView.spec", () => {
     expect(settings.text()).toContain("Update index")
     expect(settings.text()).toContain("Reset notebook index")
     expect(
-      wrapper.find('[data-testid="notebook-workspace-home"]').exists()
+      wrapper.find('[data-testid="notebook-workspace-index"]').exists()
     ).toBe(false)
     expect(wrapper.find('[data-testid="notebook-index-editor"]').exists()).toBe(
       false

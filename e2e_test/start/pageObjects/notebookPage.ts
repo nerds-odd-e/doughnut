@@ -1,7 +1,7 @@
 import { pageIsNotLoading } from '../pageBase'
 import { form } from '../forms'
 import bookReadingPage from './bookReadingPage'
-import { sidebarChildNotePageMethods } from './noteSidebar'
+import { sidebarChildNotePageMethods } from './sidebarChildNotePageMethods'
 
 const notebookPage = () => {
   const clickButton = (name: string) =>
@@ -30,7 +30,7 @@ const notebookPage = () => {
       return this
     },
 
-    expectHomeLandmarks(name: string) {
+    expectIndexLandmarks(name: string) {
       cy.get('[data-testid="notebook-page-kind-label"]').should(
         'contain.text',
         'Notebook'
@@ -38,7 +38,7 @@ const notebookPage = () => {
       cy.get('[data-testid="notebook-page-summary"]')
         .find('h1')
         .should('contain.text', name)
-      cy.get('[data-testid="notebook-workspace-home"]').should('be.visible')
+      cy.get('[data-testid="notebook-workspace-index"]').should('be.visible')
       cy.get('[data-testid="notebook-index-editor"]').should('be.visible')
       expectAdminSettingsAbsent()
       return this

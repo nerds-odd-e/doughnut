@@ -1,6 +1,12 @@
 import { pageIsNotLoading } from '../pageBase'
 
 const folderPage = () => ({
+  openSettingsTab() {
+    cy.get('[data-testid="folder-workspace-tab-settings"]').click()
+    cy.get('[data-testid="folder-workspace-settings"]').should('be.visible')
+    return this
+  },
+
   typeFolderIndexDraftAndSave(text: string) {
     cy.get('[data-testid="folder-index-editor"]')
       .scrollIntoView()

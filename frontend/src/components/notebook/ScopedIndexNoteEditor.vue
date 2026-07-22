@@ -45,7 +45,7 @@ const props = withDefaults(
     testIdPrefix?: string
     richEditorScopeName?: string
     headingLabel?: string
-    /** No nested card chrome — full column width, no top margin (notebook Home). */
+    /** No nested card chrome — full column width, no top margin (workspace Index). */
     flush?: boolean
   }>(),
   {

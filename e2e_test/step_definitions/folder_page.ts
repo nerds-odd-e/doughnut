@@ -44,6 +44,14 @@ Then('the folder admin controls are not present', () => {
   workspaceSurfaceLandmarks().expectFolderAdminControlsAbsent()
 })
 
+Then('folder Index and Settings tabs are present', () => {
+  workspaceSurfaceLandmarks().expectFolderWorkspaceTabsPresent()
+})
+
+Then('folder Index and Settings tabs are not present', () => {
+  workspaceSurfaceLandmarks().expectFolderWorkspaceTabsAbsent()
+})
+
 When('I reload the folder page', () => {
   cy.reload()
   pageIsNotLoading()

@@ -1,6 +1,8 @@
 /**
  * Cross-route main-column landmarks that distinguish note, folder, and notebook.
  */
+import folderPage from './folderPage'
+
 const workspaceSurfaceLandmarks = () => ({
   expectNotebookWorkspaceTabsPresent() {
     cy.get('[data-testid="notebook-page-kind-label"]').should(
@@ -8,7 +10,7 @@ const workspaceSurfaceLandmarks = () => ({
       'Notebook'
     )
     cy.get('[data-testid="notebook-workspace-tabs"]').should('be.visible')
-    cy.get('[data-testid="notebook-workspace-tab-home"]').should('be.visible')
+    cy.get('[data-testid="notebook-workspace-tab-index"]').should('be.visible')
     cy.get('[data-testid="notebook-workspace-tab-settings"]').should(
       'be.visible'
     )
@@ -18,15 +20,38 @@ const workspaceSurfaceLandmarks = () => ({
   expectNotebookWorkspaceTabsAbsent() {
     cy.get('[data-testid="notebook-page-kind-label"]').should('not.exist')
     cy.get('[data-testid="notebook-workspace-tabs"]').should('not.exist')
-    cy.get('[data-testid="notebook-workspace-tab-home"]').should('not.exist')
+    cy.get('[data-testid="notebook-workspace-tab-index"]').should('not.exist')
     cy.get('[data-testid="notebook-workspace-tab-settings"]').should(
       'not.exist'
     )
     return this
   },
 
+  expectFolderWorkspaceTabsPresent() {
+    cy.get('[data-testid="folder-page-kind-label"]').should(
+      'contain.text',
+      'Folder'
+    )
+    cy.get('[data-testid="folder-workspace-tabs"]').should('be.visible')
+    cy.get('[data-testid="folder-workspace-tab-index"]').should('be.visible')
+    cy.get('[data-testid="folder-workspace-tab-settings"]').should('be.visible')
+    return this
+  },
+
+  expectFolderWorkspaceTabsAbsent() {
+    cy.get('[data-testid="folder-page-kind-label"]').should('not.exist')
+    cy.get('[data-testid="folder-workspace-tabs"]').should('not.exist')
+    return this
+  },
+
+  openFolderSettingsTab() {
+    folderPage().openSettingsTab()
+    return this
+  },
+
   expectFolderAdminControlsPresent() {
     cy.get('[data-testid="folder-index-editor"]').should('be.visible')
+    this.openFolderSettingsTab()
     cy.get('[data-testid="folder-move-dialog"]').should('be.visible')
     cy.get('[data-testid="folder-rename-submit"]').should('exist')
     cy.get('[data-testid="folder-dissolve-button"]').should('exist')
