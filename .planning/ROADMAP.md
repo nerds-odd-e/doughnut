@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Health lint contract** - Structure: shared findings DTOs and rule-registry skeleton for the first lint rule
 - [x] **Phase 2: Empty-folder findings** - Behavior: authorized lint reports recursive empty folders (report-only)
 - [x] **Phase 3: Readme-only folder findings** - Behavior: note-empty folders with non-blank readme as a separate finding type
-- [ ] **Phase 4: Dead-link findings** - Behavior: lint reports dead wiki links in body and frontmatter (report-only)
+- [x] **Phase 4: Dead-link findings** - Behavior: lint reports dead wiki links in body and frontmatter (report-only)
 - [ ] **Phase 5: Health tab and Run** - Behavior: Health tab with Run lint and expandable nested findings (no mutation on Run)
 - [ ] **Phase 6: User-level defaults** - Behavior: save and prefill Health run options at user level
 - [ ] **Phase 7: Gated empty-folder purge** - Behavior: optional bulk remove of fully empty folders via dedicated purge
@@ -101,7 +101,7 @@ Plans:
   2. Lint reports dead wiki links in note **frontmatter / properties** with the same resolve semantics
   3. Dead-link findings are grouped by note in the report and are **report-only** (no auto-fix or rewrite path)
 
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans executed
 
 Plans:
 **Wave 1**
@@ -110,7 +110,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 04-02-PLAN.md — DeadWikiLinkHealthRule + nested findings tests (DLNK-01/02/03)
+- [x] 04-02-PLAN.md — DeadWikiLinkHealthRule + nested findings tests (DLNK-01/02/03)
 
 ### Phase 5: Health tab and Run
 
@@ -173,7 +173,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 1. Health lint contract | 2/2 | Complete | 2026-07-22 |
 | 2. Empty-folder findings | 2/2 | Complete | 2026-07-22 |
 | 3. Readme-only folder findings | 1/1 | Complete | 2026-07-22 |
-| 4. Dead-link findings | 1/2 | In Progress|  |
+| 4. Dead-link findings | 2/2 | Complete | 2026-07-22 |
 | 5. Health tab and Run | 0/TBD | Not started | - |
 | 6. User-level defaults | 0/TBD | Not started | - |
 | 7. Gated empty-folder purge | 0/TBD | Not started | - |

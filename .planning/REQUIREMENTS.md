@@ -19,9 +19,9 @@
 
 ### Dead wiki links
 
-- [ ] **DLNK-01**: Lint reports dead `[[wiki links]]` in note **body** using the same resolve semantics as the editor (including aliases and qualified `Notebook:Title` links)
-- [ ] **DLNK-02**: Lint reports dead wiki links in note **frontmatter / properties** with the same resolve semantics
-- [ ] **DLNK-03**: Dead-link findings are **report-only** in v1 (no auto-fix / rewrite)
+- [x] **DLNK-01**: Lint reports dead `[[wiki links]]` in note **body** using the same resolve semantics as the editor (including aliases and qualified `Notebook:Title` links)
+- [x] **DLNK-02**: Lint reports dead wiki links in note **frontmatter / properties** with the same resolve semantics
+- [x] **DLNK-03**: Dead-link findings are **report-only** in v1 (no auto-fix / rewrite)
 
 ### Auto-fix
 
@@ -81,9 +81,9 @@ Deferred; not in current roadmap.
 | EFOL-01 | Phase 2 | Complete |
 | EFOL-02 | Phase 2 | Complete |
 | EFOL-03 | Phase 3 | Complete |
-| DLNK-01 | Phase 4 | Pending |
-| DLNK-02 | Phase 4 | Pending |
-| DLNK-03 | Phase 4 | Pending |
+| DLNK-01 | Phase 4 | Complete |
+| DLNK-02 | Phase 4 | Complete |
+| DLNK-03 | Phase 4 | Complete |
 | HLTH-01 | Phase 5 | Pending |
 | HLTH-02 | Phase 5 | Pending |
 | HLTH-03 | Phase 5 | Pending |
