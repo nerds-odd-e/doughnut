@@ -3,6 +3,10 @@
  */
 const workspaceSurfaceLandmarks = () => ({
   expectNotebookWorkspaceTabsPresent() {
+    cy.get('[data-testid="notebook-page-kind-label"]').should(
+      'contain.text',
+      'Notebook'
+    )
     cy.get('[data-testid="notebook-workspace-tabs"]').should('be.visible')
     cy.get('[data-testid="notebook-workspace-tab-home"]').should('be.visible')
     cy.get('[data-testid="notebook-workspace-tab-settings"]').should(
@@ -12,6 +16,7 @@ const workspaceSurfaceLandmarks = () => ({
   },
 
   expectNotebookWorkspaceTabsAbsent() {
+    cy.get('[data-testid="notebook-page-kind-label"]').should('not.exist')
     cy.get('[data-testid="notebook-workspace-tabs"]').should('not.exist')
     cy.get('[data-testid="notebook-workspace-tab-home"]').should('not.exist')
     cy.get('[data-testid="notebook-workspace-tab-settings"]').should(

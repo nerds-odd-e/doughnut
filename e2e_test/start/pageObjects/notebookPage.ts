@@ -31,6 +31,10 @@ const notebookPage = () => {
     },
 
     expectHomeLandmarks(name: string) {
+      cy.get('[data-testid="notebook-page-kind-label"]').should(
+        'contain.text',
+        'Notebook'
+      )
       cy.get('[data-testid="notebook-page-summary"]')
         .find('h1')
         .should('contain.text', name)

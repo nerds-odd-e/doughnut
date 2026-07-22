@@ -1,6 +1,12 @@
 <template>
   <div class="container mx-auto py-4 max-w-6xl">
     <div class="notebook-page-summary mb-6" data-testid="notebook-page-summary">
+      <p
+        class="text-sm text-base-content/70 mb-2"
+        data-testid="notebook-page-kind-label"
+      >
+        Notebook
+      </p>
       <NotebookPageNameEditor
         :notebook-id="notebook.id"
         :name="notebook.name ?? ''"

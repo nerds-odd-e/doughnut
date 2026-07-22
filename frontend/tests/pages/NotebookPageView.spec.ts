@@ -42,6 +42,9 @@ describe("NotebookPageView.spec", () => {
 
     const summary = wrapper.find('[data-testid="notebook-page-summary"]')
     expect(summary.exists()).toBe(true)
+    expect(
+      wrapper.find('[data-testid="notebook-page-kind-label"]').text()
+    ).toContain("Notebook")
     expect(summary.text()).toContain("My Notebook Title")
     expect(summary.text()).toContain("A short message for the notebook.")
     expect(summary.text()).not.toContain("Head note")
@@ -83,6 +86,9 @@ describe("NotebookPageView.spec", () => {
       })
       .mount()
 
+    expect(
+      wrapper.find('[data-testid="notebook-page-kind-label"]').text()
+    ).toContain("Notebook")
     expect(
       wrapper.find('[data-testid="notebook-page-summary"]').text()
     ).toContain("Workspace Home NB")
