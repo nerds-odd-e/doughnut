@@ -104,3 +104,18 @@ export function removeEmptyFoldersCheckbox(wrapper: VueWrapper) {
 export function fixButton(wrapper: VueWrapper) {
   return wrapper.get('[data-testid="notebook-health-fix"]')
 }
+
+/** Hold lint pending until the returned resolve is called with a report. */
+export function holdPendingLint(report: typeof reportFixture = reportFixture): {
+  resolve: (value?: typeof reportFixture) => void
+  promise: Promise<typeof reportFixture>
+} {
+  let resolve!: (value: typeof reportFixture) => void
+  const promise = new Promise<typeof reportFixture>((r) => {
+    resolve = r
+  })
+  return {
+    promise,
+    resolve: (value = report) => resolve(value),
+  }
+}

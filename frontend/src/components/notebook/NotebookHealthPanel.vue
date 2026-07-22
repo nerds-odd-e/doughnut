@@ -8,6 +8,7 @@
         type="button"
         class="daisy-btn daisy-btn-primary daisy-btn-sm"
         data-testid="notebook-health-run"
+        :disabled="lintRunning"
         @click="runLint"
       >
         Run lint
@@ -24,7 +25,7 @@
         type="button"
         class="daisy-btn daisy-btn-secondary daisy-btn-sm"
         data-testid="notebook-health-fix"
-        :disabled="!fixEnabled"
+        :disabled="!fixEnabled || lintRunning"
         @click="applyFix"
       >
         {{ fixLabel }}
@@ -39,8 +40,16 @@
       </button>
     </div>
 
+    <div
+      v-if="lintRunning"
+      class="flex justify-center py-8"
+      data-testid="notebook-health-lint-spinner"
+    >
+      <span class="daisy-loading daisy-loading-spinner daisy-loading-lg" />
+    </div>
+
     <p
-      v-if="report === null"
+      v-else-if="report === null"
       class="text-sm text-base-content/70"
       data-testid="notebook-health-idle"
     >
@@ -77,6 +86,7 @@ const props = defineProps<{
 const currentUser = inject<Ref<User | undefined>>("currentUser")
 const report = ref<NotebookHealthLintReport | null>(null)
 const removeEmptyFolders = ref(false)
+const lintRunning = ref(false)
 
 const emptyFolderCount = computed(() => {
   const group = report.value?.groups?.find((g) => g.ruleId === "empty_folders")
@@ -97,13 +107,19 @@ onMounted(() => {
 })
 
 async function runLint() {
-  const { data, error } = await apiCallWithLoading(() =>
-    NotebookHealthController.lint({
-      path: { notebook: props.notebookId },
-    })
-  )
-  if (!error) {
-    report.value = data!
+  if (lintRunning.value) return
+  lintRunning.value = true
+  try {
+    const { data, error } = await apiCallWithLoading(() =>
+      NotebookHealthController.lint({
+        path: { notebook: props.notebookId },
+      })
+    )
+    if (!error) {
+      report.value = data!
+    }
+  } finally {
+    lintRunning.value = false
   }
 }
 

@@ -5,10 +5,10 @@ milestone_name: Notebook Lint & Auto-Fix
 current_phase: 7
 current_phase_name: Gated empty-folder purge
 status: milestone_complete
-stopped_at: Completed Phase 7 (07-02 Fix UI + E2E)
-last_updated: "2026-07-22T15:14:17.138Z"
-last_activity: 2026-07-22
-last_activity_desc: Completed 07-02 gated Health Fix UI + notebook_health E2E
+stopped_at: Quick 001 Phase 1 (lint in-flight feedback) done
+last_updated: "2026-07-23T00:00:00.000Z"
+last_activity: 2026-07-23
+last_activity_desc: Completed quick/001 Phase 1 — Health Run lint spinner + disable
 progress:
   total_phases: 7
   completed_phases: 7
@@ -23,17 +23,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-22)
 
 **Core value:** From Notebook Settings → Health, a user can run lint and see actionable health findings — with optional bulk removal of empty folders when auto-fix is enabled.
-**Current focus:** Milestone complete — Phase 7 gated empty-folder purge shipped (API + Fix UI + E2E)
+**Current focus:** Post-v1 Health UI polish — `.planning/quick/001-health-ui-polish/`
 
 ## Current Position
 
-Phase: 7 of 7 (Gated empty-folder purge) — complete
-Plan: 07-02 done (all Phase 7 plans complete)
-Status: Milestone v1.0 Notebook Lint & Auto-Fix delivered
-Last activity: 2026-07-22 — Completed 07-02 Fix UI + auto re-lint + notebook_health E2E
-Resume file: None
+Phase: Milestone v1.0 complete; quick plan 001 Phase 1 done
+Plan: `.planning/quick/001-health-ui-polish/PLAN.md` — next: Phase 2 (Fix blockUi)
+Status: Milestone v1.0 delivered; Health lint in-flight UI shipped
+Last activity: 2026-07-23 — Phase 1 lint spinner + Run/Fix disabled while running
+Resume file: `.planning/quick/001-health-ui-polish/PLAN.md` (Phase 2)
 
-Progress: [██████████] 100%
+Progress: [██████████] 100% (milestone); quick 001 Phase 1/3 done
 
 ## Performance Metrics
 
