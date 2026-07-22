@@ -4,16 +4,16 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 1
 current_phase_name: Health lint contract
-status: planning
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-07-22T09:40:19.988Z"
+status: phase_complete
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-07-22T09:45:28.483Z"
 last_activity: 2026-07-22
-last_activity_desc: Phase 1 plans written (01-01-PLAN.md, 01-02-PLAN.md)
+last_activity_desc: Phase 1 plans executed (01-01, 01-02) — Health lint contract skeleton
 progress:
   total_phases: 1
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -23,16 +23,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-22)
 
 **Core value:** From Notebook Settings → Health, a user can run lint and see actionable health findings — with optional bulk removal of empty folders when auto-fix is enabled.
-**Current focus:** Phase 1 — Health lint contract (Structure)
+**Current focus:** Phase 1 complete — ready for Phase 2 (Empty-folder findings)
 
 ## Current Position
 
-Phase: 1 of 7 (Health lint contract)
-Plan: 1 of 2 in current phase
-Status: Plans created — ready to execute
-Last activity: 2026-07-22 — Phase 1 plans written (01-01-PLAN.md, 01-02-PLAN.md)
+Phase: 1 of 7 (Health lint contract) — plans complete
+Plan: 2 of 2 in current phase (done)
+Status: Phase 1 structure contract delivered; awaiting verify / Phase 2
+Last activity: 2026-07-22 — Completed 01-02-PLAN.md (HealthRule runner + NotebookHealthService)
 
-Progress: [█████░░░░░] 50%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -59,6 +59,7 @@ Progress: [█████░░░░░] 50%
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
 | Phase 01 P01 | 3min | 2 tasks | 5 files |
+| Phase 01 P02 | 3min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -74,6 +75,9 @@ Recent decisions affecting current work:
 - [Phase ?]: DTO classes (not records) with Lombok getters/setters per existing controllers/dto patterns
 - [Phase ?]: HealthSeverity as public top-level enum with lowercase error|warning|info constants
 - [Phase ?]: Omit item-level autoFixable; keep group-level autoFixable only (D-06)
+- [Phase ?]: HealthRuleRunner uses List.copyOf; skip @Order until Phase 2+
+- [Phase ?]: NotebookHealthService.lint is public for Phase 2 controller call site
+- [Phase ?]: Zero HealthRule @Service beans in Phase 1 (D-11)
 
 ### Pending Todos
 
@@ -91,6 +95,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-22T09:40:19.982Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-07-22T09:45:28.477Z
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None

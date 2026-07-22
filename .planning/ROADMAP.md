@@ -13,7 +13,7 @@ Ship a notebook **Health** capability: mechanical lint that reports structural d
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Health lint contract** - Structure: shared findings DTOs and rule-registry skeleton for the first lint rule
+- [x] **Phase 1: Health lint contract** - Structure: shared findings DTOs and rule-registry skeleton for the first lint rule
 - [ ] **Phase 2: Empty-folder findings** - Behavior: authorized lint reports recursive empty folders (report-only)
 - [ ] **Phase 3: Readme-only folder findings** - Behavior: note-empty folders with non-blank readme as a separate finding type
 - [ ] **Phase 4: Dead-link findings** - Behavior: lint reports dead wiki links in body and frontmatter (report-only)
@@ -36,12 +36,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. A `HealthRule`-style interface and runner skeleton exist under the Health service package, with OpenAPI-ready findings DTO shapes (report groups/items, rule id, severity, `autoFixable` reserved)
   3. The contract is sufficient for Phase 2 to add one rule and return a typed lint report without reworking the shared model
 
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans executed
 
 Plans:
 
 - [x] 01-01-PLAN.md — OpenAPI-ready findings DTOs (report/group/item/severity) + nested construction test
-- [ ] 01-02-PLAN.md — HealthRule registry skeleton + NotebookHealthService + zero-rules empty report
+- [x] 01-02-PLAN.md — HealthRule registry skeleton + NotebookHealthService + zero-rules empty report
 
 ### Phase 2: Empty-folder findings
 
@@ -147,7 +147,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Health lint contract | 1/2 | In Progress|  |
+| 1. Health lint contract | 2/2 | In Progress|  |
 | 2. Empty-folder findings | 0/TBD | Not started | - |
 | 3. Readme-only folder findings | 0/TBD | Not started | - |
 | 4. Dead-link findings | 0/TBD | Not started | - |
