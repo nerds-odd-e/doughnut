@@ -64,6 +64,24 @@ class UserControllerTest extends ControllerTestBase {
   }
 
   @Test
+  void newUserHealthRemoveEmptyFoldersDefaultIsFalse() {
+    assertThat(controller.getUserProfile().getHealthRemoveEmptyFoldersDefault(), equalTo(false));
+  }
+
+  @Test
+  void updateUserPersistsHealthRemoveEmptyFoldersDefault() throws UnexpectedNoAccessRightException {
+    UserDTO dto = new UserDTO();
+    dto.setName(currentUser.getUser().getName());
+    dto.setSpaceIntervals(currentUser.getUser().getSpaceIntervals());
+    dto.setDailyAssimilationCount(currentUser.getUser().getDailyAssimilationCount());
+    dto.setHealthRemoveEmptyFoldersDefault(true);
+
+    User response = controller.updateUser(currentUser.getUser(), dto);
+    assertThat(response.getHealthRemoveEmptyFoldersDefault(), equalTo(true));
+    assertThat(controller.getUserProfile().getHealthRemoveEmptyFoldersDefault(), equalTo(true));
+  }
+
+  @Test
   void generateTokenShouldReturnValidUserToken() {
     TokenConfigDTO tokenConfig = new TokenConfigDTO();
     tokenConfig.setLabel("TEST_LABEL");

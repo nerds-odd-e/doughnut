@@ -1,9 +1,9 @@
 ---
 phase: 6
 slug: user-level-defaults
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: approved
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-07-22
 ---
 
@@ -38,10 +38,10 @@ created: 2026-07-22
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|----------------|-----------------|-----------|-------------------|-------------|--------|
-| 06-01-01 | 01 | 1 | DFLT-01 | T-06-01 | RED: User default false + PATCH round-trip | unit | `CURSOR_DEV=true nix develop -c pnpm backend:test` | ❌ W0 | ⬜ pending |
-| 06-01-02 | 01 | 1 | DFLT-01 | T-06-01 | GREEN: column + UserDTO/updateUser mapping | unit | same | ❌ W0 | ⬜ pending |
-| 06-02-01 | 02 | 2 | DFLT-02, DFLT-01 | T-06-02 | Prefill + Save as defaults; no lint on open/save | unit | `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/notebook/NotebookHealthPanel.spec.ts` | ❌ W0 | ⬜ pending |
-| 06-02-02 | 02 | 2 | DFLT-01, DFLT-02 | T-06-02 | Cross-notebook prefill E2E | E2E | `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/notebooks/notebook_health.feature` | ❌ W0 | ⬜ pending |
+| 06-01-01 | 01 | 1 | DFLT-01 | T-06-01 | RED: User default false + PATCH round-trip | unit | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` | ✅ in 06-01 T1 | ⬜ pending |
+| 06-01-02 | 01 | 1 | DFLT-01 | T-06-01 | GREEN: column + UserDTO/updateUser mapping | unit | `CURSOR_DEV=true nix develop -c pnpm backend:test` | ✅ in 06-01 T2 | ⬜ pending |
+| 06-02-01 | 02 | 2 | DFLT-02, DFLT-01 | T-06-02 | Prefill + Save as defaults; no lint on open/save | unit | `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/notebook/NotebookHealthPanel.spec.ts` | ✅ in 06-02 T1 | ⬜ pending |
+| 06-02-02 | 02 | 2 | DFLT-01, DFLT-02 | T-06-02 | Cross-notebook prefill E2E | E2E | `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/notebooks/notebook_health.feature` | ✅ in 06-02 T2 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -49,11 +49,13 @@ created: 2026-07-22
 
 ## Wave 0 Requirements
 
-- [ ] Extend `UserControllerTest` for default `false` + PATCH round-trip of `healthRemoveEmptyFoldersDefault`
-- [ ] Extend `NotebookHealthPanel.spec.ts` for prefill, Save PATCH body, no lint on mount/save
-- [ ] E2E page object: `saveAsDefaults()`, checkbox expectation helpers
-- [ ] E2E steps for Save + checkbox assertion
-- [ ] New scenario in `notebook_health.feature` tagged `@wip` until green
+Wave 0 test gaps are covered **inside** plan TDD tasks (no separate Wave 0 plan; no `<automated>MISSING</automated>` refs):
+
+- [x] Extend `UserControllerTest` — 06-01 Task 1 (RED)
+- [x] Extend `NotebookHealthPanel.spec.ts` — 06-02 Task 1 (RED then GREEN)
+- [x] E2E page object `saveAsDefaults()` + checkbox expectation — 06-02 Task 2
+- [x] E2E steps for Save + checkbox assertion — 06-02 Task 2
+- [x] New scenario in `notebook_health.feature` tagged `@wip` until green — 06-02 Task 2
 
 *Existing JUnit + Vitest + Cypress infrastructure — extend Health/User tests only.*
 
@@ -67,11 +69,11 @@ All phase behaviors have automated verification.
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency documented; full E2E suite not required
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references (none; tests authored in TDD tasks)
+- [x] No watch-mode flags
+- [x] Feedback latency documented; full E2E suite not required
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** plan-checker 2026-07-22 — plans executable; Phase 6 goal covered
