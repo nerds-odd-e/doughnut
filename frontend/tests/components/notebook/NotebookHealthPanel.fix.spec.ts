@@ -1,4 +1,6 @@
 import { NotebookHealthController } from "@generated/doughnut-backend-api/sdk.gen"
+import NotebookHealthPanel from "@/components/notebook/NotebookHealthPanel.vue"
+import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
 import {
   createHealthPanelSpies,
   emptyReportFixture,
@@ -8,9 +10,16 @@ import {
   removeEmptyFoldersCheckbox,
   reportFixture,
 } from "./notebookHealthPanelTestSupport"
-import { mockSdkService, wrapSdkError, wrapSdkResponse } from "@tests/helpers"
+import helper, {
+  mockSdkService,
+  mockSdkServiceWithImplementation,
+  wrapSdkError,
+  wrapSdkResponse,
+} from "@tests/helpers"
+import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
-import { beforeEach, describe, expect, it } from "vitest"
+import { afterEach, beforeEach, describe, expect, it } from "vitest"
+import { defineComponent } from "vue"
 
 describe("NotebookHealthPanel Fix", () => {
   let lintSpy: ReturnType<typeof mockSdkService>
@@ -19,6 +28,24 @@ describe("NotebookHealthPanel Fix", () => {
   beforeEach(() => {
     ;({ lintSpy, fixSpy } = createHealthPanelSpies())
   })
+
+  afterEach(() => {
+    teardownGlobalClientForTesting()
+  })
+
+  const loadingModal = () => document.querySelector(".loading-modal-mask")
+
+  function mountPanelWithGlobalModal() {
+    const Host = defineComponent({
+      components: { NotebookHealthPanel, GlobalApiLoadingModal },
+      setup: () => ({ notebookId }),
+      template: `
+        <NotebookHealthPanel :notebook-id="notebookId" />
+        <GlobalApiLoadingModal />
+      `,
+    })
+    return helper.component(Host).mount({ attachTo: document.body })
+  }
 
   async function runLintWithCheckbox(wrapper: VueWrapper, checked: boolean) {
     await removeEmptyFoldersCheckbox(wrapper).setValue(checked)
@@ -95,6 +122,53 @@ describe("NotebookHealthPanel Fix", () => {
     expect(fix.text()).toBe("Remove 1 empty folders")
     expect(fix.classes()).toContain("daisy-btn-secondary")
     expect(fix.classes()).not.toContain("daisy-btn-primary")
+  })
+
+  it("shows blocking loading overlay for Fix through post-fix re-lint", async () => {
+    let resolveFix!: () => void
+    const fixPending = new Promise<void>((resolve) => {
+      resolveFix = resolve
+    })
+    let resolveRelint!: () => void
+    const relintPending = new Promise<typeof emptyReportFixture>((resolve) => {
+      resolveRelint = () => resolve(emptyReportFixture)
+    })
+
+    lintSpy = mockSdkService(NotebookHealthController, "lint", reportFixture)
+    lintSpy.mockResolvedValueOnce(wrapSdkResponse(reportFixture))
+    lintSpy.mockImplementationOnce(() =>
+      relintPending.then((data) => wrapSdkResponse(data))
+    )
+    fixSpy = mockSdkServiceWithImplementation(
+      NotebookHealthController,
+      "fix",
+      async () => {
+        await fixPending
+      }
+    )
+
+    const wrapper = mountPanelWithGlobalModal()
+    await flushPromises()
+    await runLintWithCheckbox(wrapper, true)
+    expect(loadingModal()).toBeNull()
+
+    await fixButton(wrapper).trigger("click")
+    await wrapper.vm.$nextTick()
+
+    expect(loadingModal()).toBeTruthy()
+    expect(document.body.textContent).toMatch(/empty folders/i)
+
+    resolveFix()
+    await flushPromises()
+    await wrapper.vm.$nextTick()
+
+    expect(loadingModal()).toBeTruthy()
+    expect(fixSpy).toHaveBeenCalledOnce()
+    expect(lintSpy).toHaveBeenCalledTimes(2)
+
+    resolveRelint()
+    await flushPromises()
+    expect(loadingModal()).toBeNull()
   })
 
   it("calls fix then re-lints and replaces report on success", async () => {

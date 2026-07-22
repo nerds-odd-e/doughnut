@@ -77,7 +77,10 @@ import {
 import CheckInput from "@/components/form/CheckInput.vue"
 import NotebookHealthFindings from "@/components/notebook/NotebookHealthFindings.vue"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import {
+  apiCallWithLoading,
+  runWithBlockingApiLoading,
+} from "@/managedApi/clientSetup"
 
 const props = defineProps<{
   notebookId: number
@@ -124,16 +127,19 @@ async function runLint() {
 }
 
 async function applyFix() {
-  const { error } = await apiCallWithLoading(() =>
-    NotebookHealthController.fix({
-      path: { notebook: props.notebookId },
-      body: { removeEmptyFolders: true },
-    })
-  )
-  if (!error) {
-    refreshSidebarStructuralListings()
-    await runLint()
-  }
+  if (lintRunning.value || !fixEnabled.value) return
+  await runWithBlockingApiLoading(async () => {
+    const { error } = await apiCallWithLoading(() =>
+      NotebookHealthController.fix({
+        path: { notebook: props.notebookId },
+        body: { removeEmptyFolders: true },
+      })
+    )
+    if (!error) {
+      refreshSidebarStructuralListings()
+      await runLint()
+    }
+  }, "Removing empty folders…")
 }
 
 async function saveAsDefaults() {

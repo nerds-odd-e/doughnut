@@ -1,6 +1,6 @@
 # Health UI polish (post-v1 adjustments)
 
-**Status:** in progress (Phase 1 done)  
+**Status:** in progress (Phases 1–2 done)  
 **Location:** `.planning/quick/001-health-ui-polish/`  
 **Type:** Ad-hoc quick plan (not on milestone roadmap)  
 **Created:** 2026-07-23
@@ -57,7 +57,7 @@ Improve Health tab UX after v1 ship: clear in-flight feedback for lint and fix, 
 ## Phase 2: Fix blocks the entire UI
 
 **Type:** Behavior  
-**Status:** planned  
+**Status:** done  
 **Depends on:** Phase 1 optional but preferred (same panel loading hygiene)
 
 **Pre-condition:** Fix is enabled (Remove empty folders checked + empty_folders ≥ 1).  
@@ -66,14 +66,18 @@ Improve Health tab UX after v1 ship: clear in-flight feedback for lint and fix, 
 
 ### Implementation notes
 
-- Pass `{ blockUi: true, message: "…" }` into `apiCallWithLoading` for the fix request (and for the chained re-lint if it should stay under the same overlay — prefer one continuous block until the panel’s post-fix work finishes).
-- Reuse existing global blocking loading chrome (`ApiStatusHandler` / `currentBlockingApiState`); do not invent a second overlay.
-- Keep Run/Fix local disabled states coherent with Phase 1 so the user cannot double-submit.
+- `runWithBlockingApiLoading` wraps fix + chained re-lint for one continuous overlay via existing `ApiStatusHandler` chrome.
+- Guard: early-return when `lintRunning` or Fix not enabled; Phase 1 `lintRunning` still disables Run/Fix during re-lint.
+- Tests: `NotebookHealthPanel.fix.spec.ts` — GlobalApiLoadingModal host asserts overlay through fix → re-lint.
 
 ### Verification
 
-- Frontend: Fix path invokes loading with `blockUi: true` (assert via spy on `apiCallWithLoading` options or documented status-handler test pattern already used elsewhere).
-- Command: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/notebook/NotebookHealthPanel.spec.ts`
+- Frontend: Fix path shows blocking loading modal through post-fix re-lint.
+- Command: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/notebook/NotebookHealthPanel.fix.spec.ts`
+
+### Learning
+
+- Browser Vitest cannot `vi.spyOn` ESM `apiCallWithLoading`; assert via `GlobalApiLoadingModal` + pending fix/relint instead.
 
 ---
 

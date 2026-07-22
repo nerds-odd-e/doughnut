@@ -5,10 +5,10 @@ milestone_name: Notebook Lint & Auto-Fix
 current_phase: 7
 current_phase_name: Gated empty-folder purge
 status: milestone_complete
-stopped_at: Quick 001 Phase 1 (lint in-flight feedback) done
+stopped_at: Quick 001 Phase 2 (Fix blockUi) done
 last_updated: "2026-07-23T00:00:00.000Z"
 last_activity: 2026-07-23
-last_activity_desc: Completed quick/001 Phase 1 — Health Run lint spinner + disable
+last_activity_desc: Completed quick/001 Phase 2 — Health Fix blocking UI overlay
 progress:
   total_phases: 7
   completed_phases: 7
@@ -27,13 +27,13 @@ See: .planning/PROJECT.md (updated 2026-07-22)
 
 ## Current Position
 
-Phase: Milestone v1.0 complete; quick plan 001 Phase 1 done
-Plan: `.planning/quick/001-health-ui-polish/PLAN.md` — next: Phase 2 (Fix blockUi)
-Status: Milestone v1.0 delivered; Health lint in-flight UI shipped
-Last activity: 2026-07-23 — Phase 1 lint spinner + Run/Fix disabled while running
-Resume file: `.planning/quick/001-health-ui-polish/PLAN.md` (Phase 2)
+Phase: Milestone v1.0 complete; quick plan 001 Phases 1–2 done
+Plan: `.planning/quick/001-health-ui-polish/PLAN.md` — next: Phase 3 (dead wiki links flat list + open note)
+Status: Milestone v1.0 delivered; Health Fix uses global blocking overlay
+Last activity: 2026-07-23 — Phase 2 Fix blockUi via runWithBlockingApiLoading
+Resume file: `.planning/quick/001-health-ui-polish/PLAN.md` (Phase 3)
 
-Progress: [██████████] 100% (milestone); quick 001 Phase 1/3 done
+Progress: [██████████] 100% (milestone); quick 001 Phase 2/3 done
 
 ## Performance Metrics
 
@@ -89,6 +89,7 @@ Recent decisions affecting current work:
 - Phase 7: D ⊆ S CASCADE-safe filter; detach soft-deleted notes before folder remove
 - Phase 7: Fix secondary/sm after checkbox; refreshSidebarStructuralListings after successful purge
 - Phase 7: expectSidebarFolderAbsent uses find + not.exist without waiting for presence
+- Quick 001: Lint = local spinner; Fix = global `runWithBlockingApiLoading` continuous overlay through re-lint
 
 ### Pending Todos
 
@@ -106,6 +107,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-22T15:14:17.138Z
-Stopped at: Completed Phase 7 (07-02 Fix UI + E2E)
-Resume file: None
+Last session: 2026-07-23
+Stopped at: Quick 001 Phase 2 done
+Resume file: `.planning/quick/001-health-ui-polish/PLAN.md` (Phase 3)
