@@ -32,7 +32,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   1. Existing product behavior is unchanged (existing unit and targeted E2E tests still pass)
   2. A `HealthRule`-style interface and runner skeleton exist under the Health service package, with OpenAPI-ready findings DTO shapes (report groups/items, rule id, severity, `autoFixable` reserved)
   3. The contract is sufficient for Phase 2 to add one rule and return a typed lint report without reworking the shared model
-**Plans:** TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — OpenAPI-ready findings DTOs (report/group/item/severity) + nested construction test
+- [ ] 01-02-PLAN.md — HealthRule registry skeleton + NotebookHealthService + zero-rules empty report
 
 ### Phase 2: Empty-folder findings
 **Goal:** Authorized lint reports folders whose entire subtree has no notes, as a list under an empty-folder findings group, without mutating the notebook
@@ -120,7 +124,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Health lint contract | 0/TBD | Not started | - |
+| 1. Health lint contract | 0/2 | Planned | - |
 | 2. Empty-folder findings | 0/TBD | Not started | - |
 | 3. Readme-only folder findings | 0/TBD | Not started | - |
 | 4. Dead-link findings | 0/TBD | Not started | - |
