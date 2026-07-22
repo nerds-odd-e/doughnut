@@ -2,17 +2,17 @@
 name: codebase-retrospective
 description: >-
   Retrospective on what made a task unexpectedly difficult.
-  Triggered by the 5-minute timer hook. Reviews your own session
-  to identify codebase friction and either fixes it or proposes improvements.
-  Triggers on: 5-minute hook, slow progress, friction, hard to find, confusing.
+  Reviews your own session to identify codebase friction and either fixes it
+  or proposes improvements.
+  Triggers on: slow progress, friction, hard to find, confusing, discoverability.
 ---
 
 <objective>
 Identify codebase friction from your current session and either fix it directly
 or propose structural improvements — then continue the original task.
 
-Purpose: 5-minute timer hook for discoverability and code quality, not task
-planning (that is phased-planning's 10-minute hook).
+Purpose: discoverability and code quality, not task planning (use
+**phased-planning** when the task itself is too large).
 
 Output: Short friction report ending with `## RETROSPECTIVE COMPLETE`, then
 resume the original work.
@@ -21,11 +21,11 @@ resume the original work.
 <context>
 **When to run:**
 
-- The 5-minute timer hook fires (5+ minutes without finishing).
 - You notice repeated confusion, wrong turns, or wasted searches in your session.
+- The developer asks for a retrospective on friction or discoverability.
 
 **This is about codebase quality**, not task planning. If the task itself is too
-big, use **phased-planning** (10-minute hook).
+big, use **phased-planning**.
 
 Take 1–2 minutes — do not derail the session.
 </context>

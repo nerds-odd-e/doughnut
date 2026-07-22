@@ -29,8 +29,6 @@ These are **hard** in this repo even when GSD workflows omit them:
 | **After-phase post-change-refactor** | Every phase before commit | Cohesion / dead code / 250-line discipline |
 | **After-phase commit + push (+ CD when applicable)** | Every closed phase before the next | Deploy gate; remote/CI catch issues early |
 | **Active history cleanup when the plan is done** | When the last phase is done and outcomes are in code/permanent docs | GSD tends to keep SUMMARYs; we prune spent planning diary |
-| **5-minute codebase retrospective hook** | Long uninterrupted agent sessions | Surfaces discoverability friction early |
-| **10-minute forced re-plan hook** | Same | Stops unbounded implementation; writes/updates a GSD-aligned plan under `.planning/quick/` or `phases/` |
 | **Nix prefix (`CURSOR_DEV=true nix develop -c`); assume `pnpm sut` running; no restart nag** | All tooling | Env contract GSD does not know |
 | **Stack/domain rules** (backend, frontend, e2e, cli, mcp, db-migration, …) | Matching globs / skills | Product architecture |
 
@@ -39,7 +37,7 @@ These are **hard** in this repo even when GSD workflows omit them:
 | Scenario | Prefer |
 |----------|--------|
 | New or ongoing **milestone / roadmap** | GSD: `/gsd-onboard` or `/gsd-new-milestone`, then discuss → plan → execute |
-| **Timer interrupt** (10 min) or small ad-hoc slice | Local `phased-planning` → `.planning/quick/NNN-slug/` (or a new `phases/` entry), then `execute-plan` |
+| Small ad-hoc slice | Local `phased-planning` → `.planning/quick/NNN-slug/` (or a new `phases/` entry), then `execute-plan` |
 | **Test optimization / domain tools** (API client, ERD, …) | Local skills; plans still under `.planning/phases/` or `quick/` |
 | Resuming after a break | Read `.planning/STATE.md` and the active phase dir; continue with GSD progress/resume **or** `execute-plan` on remaining PLAN tasks |
 
@@ -50,4 +48,4 @@ These are **hard** in this repo even when GSD workflows omit them:
 - Running GSD execute **without** local Jidoka / refactor / commit+push wrap-up.
 - Encoding phase numbers in product file/test/feature names.
 - Parallel agents on the same files or the same PLAN without coordination.
-- Enabling GSD `generate-claude-md` **workflow-enforcement** that forbids work outside GSD — conflicts with timer hooks and domain skills.
+- Enabling GSD `generate-claude-md` **workflow-enforcement** that forbids work outside GSD — conflicts with local domain skills and ad-hoc planning.

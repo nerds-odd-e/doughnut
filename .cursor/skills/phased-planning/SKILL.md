@@ -3,8 +3,8 @@ name: phased-planning
 description: >-
   Decompose tasks into GSD-aligned phased plans with Behavior/Structure
   grammar (one observable behavior per phase, stop-safe). Use when planning
-  new features, breaking down large tasks, when a task has been in progress
-  for over 10 minutes, or when the planning timer hook fires.
+  new features, breaking down large tasks, or when a task is too large to finish
+  safely in one pass.
   Triggers on: plan, decompose, phases, break down, task too large, stuck.
 ---
 
@@ -12,8 +12,8 @@ description: >-
 Decompose a task into GSD-aligned phased plans obeying **Behavior/Structure**
 grammar: stop-safe, one observable behavior per phase.
 
-Purpose: Planning entry point for new features, oversized phases, and the
-10-minute timer hook.
+Purpose: Planning entry point for new features, oversized phases, and ad-hoc
+work not yet on the roadmap.
 
 Output: Written plan under `.planning/` + summary ending with
 `## PHASED PLAN WRITTEN`.
@@ -29,7 +29,7 @@ for the **immediate next** behavior only). Full rules: `.cursor/rules/planning.m
 | Location | Use |
 |----------|-----|
 | `.planning/phases/NN-slug/` | Roadmap / milestone — GSD `*-CONTEXT.md`, `*-PLAN.md`, `*-SUMMARY.md`, … |
-| `.planning/quick/NNN-slug/` | Timer interrupts and ad-hoc slices not yet on the roadmap |
+| `.planning/quick/NNN-slug/` | Ad-hoc slices not yet on the roadmap |
 | `ongoing/` | Legacy only — do not add new plans |
 
 Primary executable file: `*-PLAN.md` or `PLAN.md`. Sub-decomposition: additional
@@ -40,26 +40,10 @@ still Behavior/Structure.
 the whole plan is done and shipped as code/permanent docs, **clean up** spent
 planning history (`.cursor/rules/planning.mdc`).
 
-**Git does not use the Nix prefix.** Stash uses plain `git stash`.
+**Git does not use the Nix prefix.**
 </context>
 
 <process>
-
-<step name="ten_minute_timer">
-If triggered by the 10-minute timeout:
-
-1. **Stop** implementing immediately.
-2. **Review conversation history**: files searched, confusion, approaches tried, failures.
-3. **Summarize** what you learned (discoveries, blockers, partial progress).
-4. **Stash** changes: `git stash -m "WIP: <brief description>"` — **unless** mid
-   **GSD** execute with task commits that must reach SUMMARY; then stop and report
-   without stash.
-5. **Decompose** remaining work (see `decompose` step).
-6. **Write** plan under `.planning/quick/NNN-slug/` as `PLAN.md` (next free `NNN`;
-   update `.planning/STATE.md` if it exists). Promote to `.planning/phases/NN-slug/`
-   when work belongs on the roadmap.
-7. **Report** to the developer and wait for their decision.
-</step>
 
 <step name="decompose">
 **Default:** Split by **user scenarios and outcomes**, not by layers (DB → API → UI)
@@ -184,7 +168,7 @@ Report to the developer:
 ## PHASED PLAN WRITTEN
 ```
 
-Then wait for their decision (especially after 10-minute timer trigger).
+Then wait for their decision.
 </output>
 
 <out_of_scope>

@@ -44,7 +44,7 @@ Active work lives under `.planning/`:
 | `.planning/PROJECT.md`, `REQUIREMENTS.md`, `ROADMAP.md`, `STATE.md`, `config.json` | GSD project memory (create via `/gsd-new-project` or `/gsd-onboard`) |
 | `.planning/phases/NN-slug/` | Phase directory: `*-CONTEXT.md`, `*-PLAN.md`, `*-SUMMARY.md`, `*-VERIFICATION.md`, … |
 | `.planning/codebase/` | Codebase maps |
-| `.planning/quick/` | Timer / interrupt plans that are not yet on the roadmap |
+| `.planning/quick/` | Ad-hoc plans that are not yet on the roadmap |
 | `ongoing/` | Legacy only — do not put new plans here |
 
 Prefer GSD phase dirs and filenames. Local flat `.planning/<name>.md` is legacy-compatible for execute-plan but **new** plans should use `.planning/phases/NN-slug/` or `.planning/quick/NNN-slug/`.

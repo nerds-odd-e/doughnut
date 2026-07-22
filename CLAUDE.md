@@ -22,7 +22,6 @@ Legacy notes may remain under `ongoing/` — do not migrate unless asked.
 - **Hard plan grammar:** Behavior vs Structure, stop-safe, one observable behavior per phase (`planning.mdc`) — applies to GSD PLANs too.
 - **History:** keep resume-useful planning artifacts while a plan is in progress; **clean up** spent history when the plan is fully executed into code/permanent docs.
 - **Execution wrap-up (required):** Jidoka → post-change-refactor → update plan → commit → push (**execute-plan**; also `/gsd-execute-phase`). Skills emit completion markers for handoff.
-- **GSD** for milestones (`/gsd-onboard`, `/gsd-plan-phase`, `/gsd-execute-phase`, …); **phased-planning** + **execute-plan** for timer/ad-hoc slices under `.planning/quick/`.
-- **Timers:** 5 min → `codebase-retrospective`; 10 min → stop, stash, write/update plan under `.planning/quick/` (or `phases/`).
+- **GSD** for milestones (`/gsd-onboard`, `/gsd-plan-phase`, `/gsd-execute-phase`, …); **phased-planning** + **execute-plan** for ad-hoc slices under `.planning/quick/`.
 - **Test optimization:** `test-optimization` skill — plans under `.planning/phases/` or `quick/`, run via execute-plan.
 - **Non-compatible local overlays** (must keep): documented in `.cursor/rules/gsd-coexistence.mdc`.
