@@ -117,15 +117,59 @@ When('I open the notebook workspace Settings tab', () => {
   notebookPage().openSettingsTab()
 })
 
+When('I open the notebook workspace Health tab', () => {
+  notebookPage().openHealthTab()
+})
+
+When('I run notebook health lint', () => {
+  notebookPage().runLint()
+})
+
+When('I check Remove empty folders on the notebook health panel', () => {
+  notebookPage().checkRemoveEmptyFolders()
+})
+
+Then('the notebook health idle prompt is visible', () => {
+  notebookPage().expectHealthIdle()
+})
+
+Then(
+  'the notebook health findings show expandable groups for empty folders, readme-only folders, and dead wiki links',
+  () => {
+    notebookPage().expectFindingGroupsExpandable()
+  }
+)
+
+Then(
+  'the notebook health empty folders finding includes {string}',
+  (label: string) => {
+    notebookPage().expectFindingGroupIncludes('empty_folders', label)
+  }
+)
+
+Then(
+  'the notebook health readme-only folders finding includes {string}',
+  (label: string) => {
+    notebookPage().expectFindingGroupIncludes('readme_only_folders', label)
+  }
+)
+
+Then(
+  'the notebook health dead wiki links finding includes note {string} and token {string}',
+  (noteTitle: string, token: string) => {
+    notebookPage().expectDeadWikiLinkFinding(noteTitle, token)
+  }
+)
+
 Then('notebook admin settings sections are visible', () => {
   notebookPage().expectSettingsSectionsVisible()
 })
 
-Then('notebook Readme and Settings tabs are present', () => {
+Then('notebook Readme, Settings, and Health tabs are present', () => {
   workspaceSurfaceLandmarks().expectNotebookWorkspaceTabsPresent()
 })
 
-Then('notebook Readme and Settings tabs are not present', () => {
+Then('notebook Readme, Settings, and Health tabs are not present', () => {
   workspaceSurfaceLandmarks().expectNotebookWorkspaceTabsAbsent()
 })
 

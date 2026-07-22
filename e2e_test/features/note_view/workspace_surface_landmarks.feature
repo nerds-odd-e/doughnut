@@ -11,7 +11,7 @@ Feature: Note, folder, and notebook surface landmarks
   Scenario: Notebook, folder, and note main columns use different landmarks
     When I open the notebook "Surface landmarks suite" from my notebooks catalog
     Then the notebook workspace readme shows name "Surface landmarks suite" and readme
-    And notebook Readme and Settings tabs are present
+    And notebook Readme, Settings, and Health tabs are present
     And the note document toolbar is not present
     And the folder admin controls are not present
 
@@ -19,10 +19,10 @@ Feature: Note, folder, and notebook surface landmarks
     And I open the folder page for "Alpha" from the sidebar
     Then folder Readme and Settings tabs are present
     And the folder admin controls are present
-    And notebook Readme and Settings tabs are not present
+    And notebook Readme, Settings, and Health tabs are not present
     And the note document toolbar is not present
 
     When I view note "Surface note"
     Then the note document toolbar is present
-    And notebook Readme and Settings tabs are not present
+    And notebook Readme, Settings, and Health tabs are not present
     And the folder admin controls are not present

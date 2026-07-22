@@ -14,6 +14,7 @@ const workspaceSurfaceLandmarks = () => ({
     cy.get('[data-testid="notebook-workspace-tab-settings"]').should(
       'be.visible'
     )
+    cy.get('[data-testid="notebook-workspace-tab-health"]').should('be.visible')
     return this
   },
 
@@ -24,6 +25,7 @@ const workspaceSurfaceLandmarks = () => ({
     cy.get('[data-testid="notebook-workspace-tab-settings"]').should(
       'not.exist'
     )
+    cy.get('[data-testid="notebook-workspace-tab-health"]').should('not.exist')
     return this
   },
 
@@ -35,6 +37,7 @@ const workspaceSurfaceLandmarks = () => ({
     cy.get('[data-testid="folder-workspace-tabs"]').should('be.visible')
     cy.get('[data-testid="folder-workspace-tab-readme"]').should('be.visible')
     cy.get('[data-testid="folder-workspace-tab-settings"]').should('be.visible')
+    cy.get('[data-testid="folder-workspace-tab-health"]').should('not.exist')
     return this
   },
 

@@ -12,6 +12,11 @@ const notebookPage = () => {
     cy.get('[data-testid="notebook-workspace-settings"]').should('be.visible')
   }
 
+  const openHealthTab = () => {
+    cy.get('[data-testid="notebook-workspace-tab-health"]').click()
+    cy.get('[data-testid="notebook-workspace-health"]').should('be.visible')
+  }
+
   const expectAdminSettingsAbsent = () => {
     cy.get('[data-testid="notebook-workspace-settings"]').should('not.exist')
     cy.contains('Notebook Management').should('not.exist')
@@ -27,6 +32,62 @@ const notebookPage = () => {
   return {
     openSettingsTab() {
       openSettingsTab()
+      return this
+    },
+
+    openHealthTab() {
+      openHealthTab()
+      return this
+    },
+
+    runLint() {
+      cy.get('[data-testid="notebook-health-run"]').click()
+      pageIsNotLoading()
+      return this
+    },
+
+    expectHealthIdle() {
+      cy.get('[data-testid="notebook-health-idle"]').should('be.visible')
+      return this
+    },
+
+    checkRemoveEmptyFolders() {
+      cy.get(
+        '[data-testid="notebook-health-remove-empty-folders"] input[type="checkbox"]'
+      ).check({ force: true })
+      return this
+    },
+
+    expectFindingGroupsExpandable() {
+      cy.get('[data-testid="notebook-health-findings"]').should('be.visible')
+      for (const ruleId of [
+        'empty_folders',
+        'readme_only_folders',
+        'dead_wiki_links',
+      ]) {
+        cy.get(`[data-testid="notebook-health-group-${ruleId}"]`).within(() => {
+          cy.get('input[type="checkbox"]').should('exist')
+          cy.get('.daisy-collapse-title').should('be.visible')
+        })
+      }
+      return this
+    },
+
+    expectFindingGroupIncludes(ruleId: string, label: string) {
+      cy.get(`[data-testid="notebook-health-group-${ruleId}"]`).should(
+        'contain.text',
+        label
+      )
+      return this
+    },
+
+    expectDeadWikiLinkFinding(noteTitle: string, token: string) {
+      cy.get('[data-testid="notebook-health-group-dead_wiki_links"]').within(
+        () => {
+          cy.contains('.daisy-collapse-title', noteTitle).should('be.visible')
+          cy.contains('li', token).should('be.visible')
+        }
+      )
       return this
     },
 
