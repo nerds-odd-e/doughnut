@@ -1,10 +1,16 @@
 <template>
   <div
-    class="scoped-index-note-editor mb-6"
-    :class="{ dirty: isDirty }"
+    class="scoped-index-note-editor"
+    :class="[
+      { dirty: isDirty, 'scoped-index-note-editor--flush': flush },
+      flush ? '' : 'mb-6',
+    ]"
     :data-testid="`${testIdPrefix}-body`"
   >
-    <h2 class="text-lg font-semibold text-base-content mb-2">
+    <h2
+      v-if="headingLabel"
+      class="text-lg font-semibold text-base-content mb-2"
+    >
       {{ headingLabel }}
     </h2>
     <div :data-testid="`${testIdPrefix}-editor`">
@@ -17,7 +23,7 @@
         :wiki-titles="[]"
         :is-index-context="true"
         @update:model-value="propose"
-        @blur="flush"
+        @blur="flushAutosave"
       />
     </div>
   </div>
@@ -39,11 +45,14 @@ const props = withDefaults(
     testIdPrefix?: string
     richEditorScopeName?: string
     headingLabel?: string
+    /** No nested card chrome — full column width, no top margin (notebook Home). */
+    flush?: boolean
   }>(),
   {
     testIdPrefix: "notebook-index",
     richEditorScopeName: "notebook-index",
     headingLabel: "Index",
+    flush: false,
   }
 )
 
@@ -70,7 +79,12 @@ const persistIndexContent = async (content: string) => {
   emit("saved")
 }
 
-const { localValue, isDirty, propose, flush } = useDebouncedTextAutosave({
+const {
+  localValue,
+  isDirty,
+  propose,
+  flush: flushAutosave,
+} = useDebouncedTextAutosave({
   externalValue: () => props.indexContent ?? undefined,
   persist: persistIndexContent,
   normalize: normalizeNoteContent,
@@ -79,9 +93,16 @@ const { localValue, isDirty, propose, flush } = useDebouncedTextAutosave({
 </script>
 
 <style scoped>
-.scoped-index-note-editor {
+.scoped-index-note-editor:not(.scoped-index-note-editor--flush) {
   background: color-mix(in oklch, var(--color-base-200) 80%, transparent);
   border-radius: 8px;
   padding: 1rem 1.25rem;
+}
+
+.scoped-index-note-editor--flush {
+  margin-top: 0;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
 }
 </style>

@@ -102,6 +102,12 @@ describe("NotebookPageView.spec", () => {
       true
     )
     expect(
+      wrapper
+        .find('[data-testid="notebook-index-body"]')
+        .classes()
+        .includes("scoped-index-note-editor--flush")
+    ).toBe(true)
+    expect(
       wrapper.find('[data-testid="notebook-workspace-settings"]').exists()
     ).toBe(false)
     expect(wrapper.text()).not.toContain("Notebook Management")

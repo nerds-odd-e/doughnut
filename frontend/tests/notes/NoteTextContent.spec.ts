@@ -10,6 +10,17 @@ import type { ComponentPublicInstance } from "vue"
 
 const mockedUpdateTitleCall = vi.fn()
 
+function mockUpdateNoteTitle() {
+  mockedUpdateTitleCall.mockImplementation(async (options) =>
+    makeMe.aNoteRealm.title(options.body.newTitle).please()
+  )
+  mockSdkServiceWithImplementation(
+    TextContentController,
+    "updateNoteTitle",
+    async (options) => await mockedUpdateTitleCall(options)
+  )
+}
+
 describe("in place edit on title", () => {
   const note = makeMe.aNote.title("Dummy Title").please()
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
@@ -35,11 +46,7 @@ describe("in place edit on title", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     vi.useFakeTimers()
-    mockSdkServiceWithImplementation(
-      TextContentController,
-      "updateNoteTitle",
-      async (options) => await mockedUpdateTitleCall(options)
-    )
+    mockUpdateNoteTitle()
   })
 
   afterEach(() => {
@@ -136,6 +143,7 @@ describe("in place edit on title", () => {
     titleEl.innerText = "updated"
     titleEl.dispatchEvent(new Event("input"))
     wrapper.unmount() // Trigger save
+    await flushPromises()
     expect(mockedUpdateTitleCall).toBeCalledWith({
       path: { note: note.id },
       body: { newTitle: "updated" },
@@ -166,6 +174,7 @@ describe("in place edit on title", () => {
     await editTitle(wrapper, "updated")
     const titleEl = wrapper.find('[role="title"]').element as HTMLElement
     titleEl.dispatchEvent(new Event("blur"))
+    await flushPromises()
     expect(mockedUpdateTitleCall).toBeCalledWith({
       path: { note: note.id },
       body: { newTitle: "updated" },
@@ -371,11 +380,7 @@ describe("rich mode wiki dead link display text", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     vi.useFakeTimers()
-    mockSdkServiceWithImplementation(
-      TextContentController,
-      "updateNoteTitle",
-      async (options) => await mockedUpdateTitleCall(options)
-    )
+    mockUpdateNoteTitle()
     wrapper = helper
       .component(NoteTextContent)
       .withCleanStorage()
@@ -417,11 +422,7 @@ describe("rich mode wiki resolved link display text", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     vi.useFakeTimers()
-    mockSdkServiceWithImplementation(
-      TextContentController,
-      "updateNoteTitle",
-      async (options) => await mockedUpdateTitleCall(options)
-    )
+    mockUpdateNoteTitle()
     wrapper = helper
       .component(NoteTextContent)
       .withCleanStorage()

@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto py-4 max-w-6xl">
+  <div class="container mx-auto pt-0 pb-4 max-w-6xl">
     <div class="notebook-page-summary mb-6" data-testid="notebook-page-summary">
       <p
         class="text-sm text-base-content/70 mb-2"
@@ -42,6 +42,7 @@
       <ScopedIndexNoteEditor
         :notebook-id="notebook.id"
         :index-content="indexContent"
+        flush
         @saved="emit('index-content-updated')"
       />
     </div>
