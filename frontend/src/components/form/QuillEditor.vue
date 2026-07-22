@@ -94,6 +94,7 @@ const options: QuillOptions = {
     "blockquote",
     "code-block",
     "list",
+    "indent",
     "link",
     "mark",
     "softbreak",

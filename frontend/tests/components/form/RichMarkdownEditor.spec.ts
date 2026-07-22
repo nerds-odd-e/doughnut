@@ -29,6 +29,26 @@ describe("RichMarkdownEditor", () => {
     expect(emitted![emitted!.length - 1]![0]).toContain("Bold text")
   })
 
+  it("preserves nested bullet indentation when pasting ChatGPT-style HTML", async () => {
+    await h.mountEditor("", { attachToBody: true })
+    await h.dispatchPasteHtmlToQuill(
+      `<p class="p1">Intro</p><ul><li><span class="s1"><b>Japan</b></span><ul><li>correct: circle</li><li>incorrect: cross</li></ul></li></ul>`
+    )
+    const markdown = h.lastEmittedMarkdown()
+    expect(markdown).toMatch(/\n {2,}\* +correct: circle/)
+    expect(markdown).toMatch(/\n {2,}\* +incorrect: cross/)
+    expect(
+      Array.from(h.quillEditorEl().querySelectorAll("li")).map((li) => ({
+        text: li.textContent?.trim(),
+        indent: li.className.match(/ql-indent-(\d+)/)?.[1] ?? "0",
+      }))
+    ).toEqual([
+      { text: "Japan", indent: "0" },
+      { text: "correct: circle", indent: "1" },
+      { text: "incorrect: cross", indent: "1" },
+    ])
+  })
+
   it("does not paste when readonly", async () => {
     await h.mountEditor("", { readonly: true })
     await h.dispatchPasteHtmlToQuill("<p>Test</p>")
