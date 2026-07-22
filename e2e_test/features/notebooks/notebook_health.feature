@@ -30,3 +30,14 @@ Feature: Notebook health
     And I check Remove empty folders on the notebook health panel
     And I run notebook health lint
     Then I should see sidebar folder "Keep Empty"
+
+  Scenario: Save Remove empty folders default applies on another notebook
+    Given I have a notebook "Defaults A" with a note "A1"
+    And I have a notebook "Defaults B" with a note "B1"
+    When I open the notebook "Defaults A" from my notebooks catalog
+    And I open the notebook workspace Health tab
+    And I check Remove empty folders on the notebook health panel
+    And I save notebook health options as defaults
+    And I open the notebook "Defaults B" from my notebooks catalog
+    And I open the notebook workspace Health tab
+    Then Remove empty folders on the notebook health panel is checked

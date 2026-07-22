@@ -58,6 +58,19 @@ const notebookPage = () => {
       return this
     },
 
+    saveAsDefaults() {
+      cy.get('[data-testid="notebook-health-save-defaults"]').click()
+      pageIsNotLoading()
+      return this
+    },
+
+    expectRemoveEmptyFoldersChecked() {
+      cy.get(
+        '[data-testid="notebook-health-remove-empty-folders"] input[type="checkbox"]'
+      ).should('be.checked')
+      return this
+    },
+
     expectFindingGroupsExpandable() {
       cy.get('[data-testid="notebook-health-findings"]').should('be.visible')
       for (const ruleId of [

@@ -129,8 +129,16 @@ When('I check Remove empty folders on the notebook health panel', () => {
   notebookPage().checkRemoveEmptyFolders()
 })
 
+When('I save notebook health options as defaults', () => {
+  notebookPage().saveAsDefaults()
+})
+
 Then('the notebook health idle prompt is visible', () => {
   notebookPage().expectHealthIdle()
+})
+
+Then('Remove empty folders on the notebook health panel is checked', () => {
+  notebookPage().expectRemoveEmptyFoldersChecked()
 })
 
 Then(
