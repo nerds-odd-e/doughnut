@@ -13,7 +13,7 @@
 
 ### Empty folders
 
-- [ ] **EFOL-01**: Lint reports folders whose **entire subtree has no notes** (recursive emptiness; soft-deleted notes do not count as content)
+- [x] **EFOL-01**: Lint reports folders whose **entire subtree has no notes** (recursive emptiness; soft-deleted notes do not count as content)
 - [ ] **EFOL-02**: When auto-fix is not selected, user can see the list of empty folders under the empty-folder findings group
 - [ ] **EFOL-03**: Lint reports note-empty folders that still have non-blank **readme** (`readmeContent`) as a **separate finding type** (not lumped with fully empty folders)
 
@@ -78,7 +78,7 @@ Deferred; not in current roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| EFOL-01 | Phase 2 | Pending |
+| EFOL-01 | Phase 2 | Complete |
 | EFOL-02 | Phase 2 | Pending |
 | EFOL-03 | Phase 3 | Pending |
 | DLNK-01 | Phase 4 | Pending |
@@ -96,6 +96,7 @@ Deferred; not in current roadmap.
 | AFIX-05 | Phase 7 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 16 total
 - Mapped to phases: 16
 - Unmapped: 0 ✓

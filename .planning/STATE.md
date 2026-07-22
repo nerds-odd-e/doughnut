@@ -4,16 +4,16 @@ milestone: v1.0
 milestone_name: Notebook Lint & Auto-Fix
 current_phase: 2
 current_phase_name: Empty-folder findings
-status: ready_to_execute
-stopped_at: Phase 2 plans created
-last_updated: "2026-07-22T10:05:00.000Z"
+status: in_progress
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-07-22T10:18:00.000Z"
 last_activity: 2026-07-22
-last_activity_desc: Phase 2 plans created (empty-folder findings)
+last_activity_desc: "Completed 02-01: EmptyFolderHealthRule + predicate tests"
 progress:
-  total_phases: 2
+  total_phases: 7
   completed_phases: 1
   total_plans: 4
-  completed_plans: 2
+  completed_plans: 3
 ---
 
 # Project State
@@ -27,26 +27,27 @@ See: .planning/PROJECT.md (updated 2026-07-22)
 
 ## Current Position
 
-Phase: 2 of 7 (Empty-folder findings) — ready to execute
-Plan: 02-01 (next)
-Status: Phase 2 plans created (02-01, 02-02)
-Last activity: 2026-07-22 — Phase 2 plan: EmptyFolderHealthRule + authorized lint API
+Phase: 2 of 7 (Empty-folder findings) — in progress
+Plan: 02-02 (next)
+Status: 02-01 complete (EmptyFolderHealthRule); 02-02 remaining (authorized lint API)
+Last activity: 2026-07-22 — Completed 02-01: EmptyFolderHealthRule + predicate tests
 
-Progress: [█░░░░░░░░░] 14%
+Progress: [████████░░] 75%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 2
-- Average duration: ~3 min
-- Total execution time: ~6 min
+- Total plans completed: 3
+- Average duration: ~5 min
+- Total execution time: ~14 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Health lint contract | 2 | 2 | 3 min |
+| 2. Empty-folder findings | 1/2 | — | 8 min |
 
 **Per-Plan Metrics:**
 
@@ -54,6 +55,7 @@ Progress: [█░░░░░░░░░] 14%
 |------|----------|-------|-------|
 | Phase 01 P01 | 3min | 2 tasks | 5 files |
 | Phase 01 P02 | 3min | 2 tasks | 6 files |
+| Phase 02 P01 | 8min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -70,6 +72,9 @@ Recent decisions affecting current work:
 - Phase 1: DTO classes with Lombok getters/setters; `HealthSeverity` lowercase constants
 - Phase 1: Group-level `autoFixable` only (no item-level)
 - Phase 1: `HealthRuleRunner` uses `List.copyOf`; zero rule beans; public `NotebookHealthService.lint`
+- Phase 2: Empty-folder label is bare folder name (D-04 v1)
+- Phase 2: Blank readme = null or String.isBlank()
+- Phase 2: Always emit empty_folders group even when items empty
 
 ### Pending Todos
 
@@ -87,6 +92,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-22T10:05:00.000Z
-Stopped at: Phase 2 plans created
-Resume file: .planning/phases/02-empty-folder-findings/02-01-PLAN.md
+Last session: 2026-07-22T10:15:09.488Z
+Stopped at: Completed 02-01-PLAN.md
+Resume file: None

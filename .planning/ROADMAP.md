@@ -57,12 +57,12 @@ Plans:
   3. Lint does not delete folders or otherwise mutate notebook data
   4. Only an authorized notebook actor can run lint (foreign/anon callers are rejected)
 
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 02-01-PLAN.md — EmptyFolderHealthRule + live folder-id query + predicate tests (EFOL-01)
+- [x] 02-01-PLAN.md — EmptyFolderHealthRule + live folder-id query + predicate tests (EFOL-01)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -157,7 +157,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Health lint contract | 2/2 | Complete | 2026-07-22 |
-| 2. Empty-folder findings | 0/2 | Planned | - |
+| 2. Empty-folder findings | 1/2 | In Progress|  |
 | 3. Readme-only folder findings | 0/TBD | Not started | - |
 | 4. Dead-link findings | 0/TBD | Not started | - |
 | 5. Health tab and Run | 0/TBD | Not started | - |
