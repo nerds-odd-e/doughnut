@@ -109,10 +109,7 @@ Then(
 )
 
 Then('notebook admin settings sections are not visible', () => {
-  cy.get('[data-testid="notebook-workspace-settings"]').should('not.exist')
-  cy.contains('Notebook Management').should('not.exist')
-  cy.contains('Notebook Settings').should('not.exist')
-  cy.contains('Notebook Indexing').should('not.exist')
+  notebookPage().expectAdminSettingsAbsent()
 })
 
 When('I open the notebook workspace Settings tab', () => {

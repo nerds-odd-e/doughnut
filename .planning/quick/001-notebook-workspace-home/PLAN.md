@@ -11,7 +11,7 @@ Make the **notebook page** feel like an **overview / command center** (Notion wo
 | 1 | Structure (design) | done (winner C) | Winning HTML sketch direction chosen for notebook home layout |
 | 1b | Behavior | done | Index content auto-saves with same debounced behavior as note body (no Save button) |
 | 2 | Behavior | done | Opening a notebook shows a workspace-home main column (Home tab: hero/title + index primary; Settings tab for admin) |
-| 3 | Behavior | planned | Thin verification: Home keeps index primary; Settings holds admin (largely delivered by Phase 2 tabs) |
+| 3 | Behavior | done | Home keeps index primary (autosave E2E); Settings holds admin controls (verified) |
 | 4 | Behavior | planned | Folder and note pages remain recognizably different from notebook home (no regression of their roles) |
 
 ## Design direction (from intake)
@@ -68,17 +68,11 @@ Artifacts: `.planning/sketches/` (MANIFEST, theme, `NNN-*/index.html`). No produ
 
 **Learnings:** Admin sections on Settings can sit below the fold / overflow-clip in the main column — assert DOM presence in Settings panel, not strict Cypress `be.visible` for every section title.
 
-### Phase 3 — Behavior: index + properties primary; admin secondary
+### Phase 3 — Behavior: index + properties primary; admin secondary (done)
 
-**Pre:** Notebook home from Phase 2.
+**Pre/Trigger/Post:** Index edit/autosave stays on Home; admin (move/share/skip-memory/search-index/attach-book) only via Settings — no competition on default Home view.
 
-**Trigger:** Edit index markdown / properties; open settings/management.
-
-**Post:** Index save/edit path remains obvious; move/share/skip-memory/search-index/attach-book reachable but **not** competing with index on the default view (drawer, tab, or below-fold secondary).
-
-**Note:** Phase 2 already demotes admin to Settings tab. Phase 3 is **thin verification** (index edit on Home + settings stay secondary) unless property-strip work (sketch 002) is added.
-
-**Tests:** E2E for index edit + that settings are secondary; extend existing notebook page specs if present.
+**Shipped (verification only):** Extended `notebook_workspace_home.feature` (Home index autosave + reload) and strengthened Home-absent / Settings-present admin control assertions in page object + `NotebookPageView.spec.ts`. No UI change; sketch 002 property-strip not needed (frontmatter properties already via `isIndexContext`).
 
 ### Phase 4 — Behavior: note and folder stay distinct
 
@@ -99,4 +93,4 @@ Artifacts: `.planning/sketches/` (MANIFEST, theme, `NNN-*/index.html`). No produ
 
 ## Next action
 
-**Phase 2 done** — notebook Home / Settings tabs shipped. **Phase 3** is thin verification (index edit stays on Home; admin only via Settings), optionally property-strip polish (sketch 002).
+**Phase 3 done** — Home index autosave + Settings-only admin verified. **Phase 4:** note and folder stay recognizably distinct from notebook home.

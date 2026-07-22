@@ -12,6 +12,18 @@ const notebookPage = () => {
     cy.get('[data-testid="notebook-workspace-settings"]').should('be.visible')
   }
 
+  const expectAdminSettingsAbsent = () => {
+    cy.get('[data-testid="notebook-workspace-settings"]').should('not.exist')
+    cy.contains('Notebook Management').should('not.exist')
+    cy.contains('Notebook Settings').should('not.exist')
+    cy.contains('Notebook Indexing').should('not.exist')
+    cy.contains('Move to ...').should('not.exist')
+    cy.contains('Share notebook to bazaar').should('not.exist')
+    cy.contains('Skip Memory Tracking').should('not.exist')
+    cy.contains('Update index').should('not.exist')
+    cy.contains('Reset notebook index').should('not.exist')
+  }
+
   return {
     openSettingsTab() {
       openSettingsTab()
@@ -24,10 +36,12 @@ const notebookPage = () => {
         .should('contain.text', name)
       cy.get('[data-testid="notebook-workspace-home"]').should('be.visible')
       cy.get('[data-testid="notebook-index-editor"]').should('be.visible')
-      cy.get('[data-testid="notebook-workspace-settings"]').should('not.exist')
-      cy.contains('Notebook Management').should('not.exist')
-      cy.contains('Notebook Settings').should('not.exist')
-      cy.contains('Notebook Indexing').should('not.exist')
+      expectAdminSettingsAbsent()
+      return this
+    },
+
+    expectAdminSettingsAbsent() {
+      expectAdminSettingsAbsent()
       return this
     },
 
@@ -37,6 +51,10 @@ const notebookPage = () => {
         cy.contains('Notebook Management').should('exist')
         cy.contains('Notebook Settings').should('exist')
         cy.contains('Notebook Indexing').should('exist')
+        cy.contains('Share notebook to bazaar').should('exist')
+        cy.contains('Skip Memory Tracking').should('exist')
+        cy.contains('Update index').should('exist')
+        cy.contains('Reset notebook index').should('exist')
       })
       return this
     },

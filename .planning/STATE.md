@@ -3,8 +3,8 @@
 ## Current
 
 - **Active plan:** `.planning/quick/001-notebook-workspace-home/PLAN.md`
-- **Phase:** 3 next — thin verification that index stays primary on Home and admin stays on Settings (Phase 2 already demoted admin)
-- **Next:** Phase 3 verification / optional property-strip (sketch 002); then Phase 4 note/folder distinctness
+- **Phase:** 4 next — note and folder stay recognizably different from notebook home
+- **Next:** Phase 4 smoke/regression across note vs folder vs notebook main landmarks
 
 ## Context
 
@@ -18,4 +18,5 @@ Notebook page should feel like overview / command center (Notion workspace home)
 ## Shipped
 
 - Index (notebook + folder) uses shared `useDebouncedTextAutosave` with note body; Save button removed.
-- Notebook page Home / Settings tabs: Home = title + description cue + index canvas; Settings = `NotebookWorkspaceSettings` (book, management, settings, indexing). E2E `notebook_workspace_home.feature`.
+- Notebook page Home / Settings tabs: Home = title + description cue + index canvas; Settings = `NotebookWorkspaceSettings` (book, management, settings, indexing).
+- Phase 3 verification: Home index autosave E2E; admin controls asserted absent on Home / present only in Settings.

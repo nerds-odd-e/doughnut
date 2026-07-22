@@ -101,6 +101,10 @@ describe("NotebookPageView.spec", () => {
     expect(wrapper.text()).not.toContain("Notebook Management")
     expect(wrapper.text()).not.toContain("Notebook Settings")
     expect(wrapper.text()).not.toContain("Notebook Indexing")
+    expect(wrapper.text()).not.toContain("Share notebook to bazaar")
+    expect(wrapper.text()).not.toContain("Skip Memory Tracking")
+    expect(wrapper.text()).not.toContain("Update index")
+    expect(wrapper.text()).not.toContain("Reset notebook index")
   })
 
   it("shows admin sections only after opening Settings tab", async () => {
@@ -113,6 +117,9 @@ describe("NotebookPageView.spec", () => {
     expect(
       wrapper.find('[data-testid="notebook-workspace-settings"]').exists()
     ).toBe(false)
+    expect(wrapper.find('[data-testid="notebook-index-editor"]').exists()).toBe(
+      true
+    )
 
     await wrapper
       .get('[data-testid="notebook-workspace-tab-settings"]')
@@ -124,9 +131,16 @@ describe("NotebookPageView.spec", () => {
     expect(settings.text()).toContain("Notebook Management")
     expect(settings.text()).toContain("Notebook Settings")
     expect(settings.text()).toContain("Notebook Indexing")
+    expect(settings.text()).toContain("Share notebook to bazaar")
+    expect(settings.text()).toContain("Skip Memory Tracking")
+    expect(settings.text()).toContain("Update index")
+    expect(settings.text()).toContain("Reset notebook index")
     expect(
       wrapper.find('[data-testid="notebook-workspace-home"]').exists()
     ).toBe(false)
+    expect(wrapper.find('[data-testid="notebook-index-editor"]').exists()).toBe(
+      false
+    )
   })
 
   it("sends description when saving notebook settings", async () => {
