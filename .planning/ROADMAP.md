@@ -7,6 +7,7 @@ Ship a notebook **Health** capability: mechanical lint that reports structural d
 ## Phases
 
 **Phase Numbering:**
+
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
@@ -23,97 +24,119 @@ Decimal phases appear between their surrounding integers in numeric order.
 ## Phase Details
 
 ### Phase 1: Health lint contract
+
 **Goal:** Shared Health lint contract (finding shape, rule interface, runner skeleton) ready so the empty-folder rule can plug in without inventing a second model
 **Mode:** mvp
 **Type:** Structure
 **Depends on:** Nothing (first phase)
 **Requirements:** *(none — enables Phase 2)*
 **Success Criteria** (what must be TRUE):
+
   1. Existing product behavior is unchanged (existing unit and targeted E2E tests still pass)
   2. A `HealthRule`-style interface and runner skeleton exist under the Health service package, with OpenAPI-ready findings DTO shapes (report groups/items, rule id, severity, `autoFixable` reserved)
   3. The contract is sufficient for Phase 2 to add one rule and return a typed lint report without reworking the shared model
-**Plans:** 2 plans
+
+**Plans:** 1/2 plans executed
 
 Plans:
-- [ ] 01-01-PLAN.md — OpenAPI-ready findings DTOs (report/group/item/severity) + nested construction test
+
+- [x] 01-01-PLAN.md — OpenAPI-ready findings DTOs (report/group/item/severity) + nested construction test
 - [ ] 01-02-PLAN.md — HealthRule registry skeleton + NotebookHealthService + zero-rules empty report
 
 ### Phase 2: Empty-folder findings
+
 **Goal:** Authorized lint reports folders whose entire subtree has no notes, as a list under an empty-folder findings group, without mutating the notebook
 **Mode:** mvp
 **Type:** Behavior
 **Depends on:** Phase 1
 **Requirements:** EFOL-01, EFOL-02
 **Success Criteria** (what must be TRUE):
+
   1. Calling notebook Health lint reports folders whose **entire subtree has no notes** (recursive; soft-deleted notes do not count as content)
   2. The empty-folder findings group lists those folders even when auto-fix is not selected (report path does not require fix options)
   3. Lint does not delete folders or otherwise mutate notebook data
   4. Only an authorized notebook actor can run lint (foreign/anon callers are rejected)
+
 **Plans:** TBD
 
 ### Phase 3: Readme-only folder findings
+
 **Goal:** Note-empty folders that still have non-blank **readme** (`readmeContent`) appear as their own finding type, not lumped with fully empty folders
 **Mode:** mvp
 **Type:** Behavior
 **Depends on:** Phase 2
 **Requirements:** EFOL-03
 **Success Criteria** (what must be TRUE):
+
   1. Lint reports note-empty folders with non-blank `readmeContent` under a **separate** finding type/group from fully empty folders
   2. Fully empty folders (no notes in subtree and no meaningful readme) remain only under the empty-folder findings group
   3. Lint remains report-only (no deletes or mutations)
+
 **Plans:** TBD
 
 ### Phase 4: Dead-link findings
+
 **Goal:** Lint reports dead `[[wiki links]]` in note body and frontmatter using editor resolve semantics, report-only
 **Mode:** mvp
 **Type:** Behavior
 **Depends on:** Phase 1
 **Requirements:** DLNK-01, DLNK-02, DLNK-03
 **Success Criteria** (what must be TRUE):
+
   1. Lint reports dead wiki links in note **body** with the same resolve semantics as the editor (aliases and qualified `Notebook:Title` links included)
   2. Lint reports dead wiki links in note **frontmatter / properties** with the same resolve semantics
   3. Dead-link findings are grouped by note in the report and are **report-only** (no auto-fix or rewrite path)
+
 **Plans:** TBD
 
 ### Phase 5: Health tab and Run
+
 **Goal:** From Notebook Settings → Health, the user can Run lint on demand and review expandable nested findings without a separate route or dialog, and without mutation on Run
 **Mode:** mvp
 **Type:** Behavior
 **Depends on:** Phase 2, Phase 3, Phase 4
 **Requirements:** HLTH-01, HLTH-02, HLTH-03, AFIX-01
 **Success Criteria** (what must be TRUE):
+
   1. User can open a **Health** tab on notebook settings alongside Index/Settings (no dedicated `/health` route or findings dialog)
   2. User can explicitly **Run lint** for the current notebook; merely opening Health does not mutate data
   3. User can review **expandable nested findings** on the Health tab (grouped by rule; dead links nested by note) with an action bar for fix options
   4. Auto-fix is an **optional** run option; Run alone never deletes or mutates notebook data
+
 **Plans:** TBD
 **UI hint:** yes
 
 ### Phase 6: User-level defaults
+
 **Goal:** User can save Health lint/auto-fix option defaults at user level and see them prefilled when opening Health on any notebook
 **Mode:** mvp
 **Type:** Behavior
 **Depends on:** Phase 5
 **Requirements:** DFLT-01, DFLT-02
 **Success Criteria** (what must be TRUE):
+
   1. User can save Health lint/auto-fix option defaults at **user** level (apply across notebooks)
   2. Opening Health prefills run options from the user’s saved defaults
   3. Prefilling defaults does not apply fixes or mutate notebook data on open
+
 **Plans:** TBD
 **UI hint:** yes
 
 ### Phase 7: Gated empty-folder purge
+
 **Goal:** User can optionally apply the only v1 fix — bulk remove fully empty folder trees — via a dedicated purge path, only when the bulk option is selected; readme-only folders are never deleted by this fix
 **Mode:** mvp
 **Type:** Behavior
 **Depends on:** Phase 5, Phase 6
 **Requirements:** AFIX-02, AFIX-03, AFIX-04, AFIX-05
 **Success Criteria** (what must be TRUE):
+
   1. The only v1 fix action is bulk **remove empty folders** (no per-folder multi-select)
   2. **Fix** is enabled only when the user has selected the bulk “remove empty folders” option
   3. Bulk remove deletes only **fully empty** folder trees (no notes in subtree and no meaningful readme); folders in the separate readme-only finding type are **not** deleted
   4. Empty-folder removal uses a **dedicated purge** path (does not use folder dissolve / promote-children)
   5. After a successful fix, the user can re-run lint and no longer sees the purged fully empty folders
+
 **Plans:** TBD
 **UI hint:** yes
 
@@ -124,7 +147,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Health lint contract | 0/2 | Planned | - |
+| 1. Health lint contract | 1/2 | In Progress|  |
 | 2. Empty-folder findings | 0/TBD | Not started | - |
 | 3. Readme-only folder findings | 0/TBD | Not started | - |
 | 4. Dead-link findings | 0/TBD | Not started | - |
