@@ -109,8 +109,10 @@ status: complete
 
 Single wrap-up commit (local execute-plan): product + tests + this SUMMARY.
 
-1. **Task 1: RED unit tests** — included in wrap-up commit
-2. **Task 2: GREEN Health tab shell, panel, and Run** — included in wrap-up commit
+1. **Task 1: RED unit tests** — `7147033873` (feat)
+2. **Task 2: GREEN Health tab shell, panel, and Run** — `7147033873` (feat)
+
+**Plan metadata:** included in `7147033873`
 
 ## Files Created/Modified
 
