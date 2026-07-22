@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Notebook Lint & Auto-Fix
-current_phase: 4
-current_phase_name: Dead-link findings
-status: complete
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-07-22T11:55:57.168Z"
+current_phase: 5
+current_phase_name: Health tab and Run
+status: ready
+stopped_at: Phase 4 complete — ready for Phase 5 discuss/plan
+last_updated: "2026-07-22T12:00:00.000Z"
 last_activity: 2026-07-22
-last_activity_desc: DeadWikiLinkHealthRule + DLNK-01/02/03 tests green
+last_activity_desc: Phase 4 complete; auto-chain cleared (--no-transition)
 progress:
-  total_phases: 4
+  total_phases: 7
   completed_phases: 4
   total_plans: 7
   completed_plans: 7
@@ -23,17 +23,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-22)
 
 **Core value:** From Notebook Settings → Health, a user can run lint and see actionable health findings — with optional bulk removal of empty folders when auto-fix is enabled.
-**Current focus:** Phase 4 — Dead-link findings complete; Phase 5 next (no auto-transition)
+**Current focus:** Phase 5 — Health tab and Run (next)
 
 ## Current Position
 
-Phase: 4 of 7 (Dead-link findings) — complete
-Plan: 04-02 done (both Phase 4 plans complete)
+Phase: 5 of 7 (Health tab and Run) — ready to discuss/plan
+Plan: (none active — Phase 4 complete)
 Status: Phase 4 complete — dead_wiki_links report-only via NotebookHealthService.lint
-Last activity: 2026-07-22 — DeadWikiLinkHealthRule + DLNK-01/02/03 tests green
+Last activity: 2026-07-22 — Phase 4 pushed; auto-chain ended (--no-transition)
 Resume file: None
 
-Progress: [██████████] 100% plans for phases 1–4 (4/7 milestone phases)
+Progress: [████░░░░░░] 57% (4/7 phases)
 
 ## Performance Metrics
 
