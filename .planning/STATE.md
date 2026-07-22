@@ -2,21 +2,12 @@
 
 ## Current
 
-- **Active plan:** Notebook Lint & Auto-Fix (Doughnut Health tab)
-- **Milestone status:** Project research complete
-- **Next:** Requirements definition → roadmap
+- **Active plan:** Notebook Lint & Auto-Fix (GSD new-project in progress)
+- **Status:** Requirements drafted — awaiting approval, then roadmap
+- **Next:** Approve REQUIREMENTS.md → project structure mode → roadmap
 
-## Progress
+## Project
 
-- [x] PROJECT.md initialized
-- [x] Research: STACK, FEATURES, ARCHITECTURE, PITFALLS
-- [x] Research SUMMARY.md synthesized
-- [ ] REQUIREMENTS.md
-- [ ] ROADMAP.md
+Notebook Health: mechanical lint (empty folders, readme-only folders, dead wiki links) + gated bulk empty-folder purge. Entry: Notebook Settings → Health. Defaults: per-user. Domain rename: index → readme (`readmeContent`).
 
-## Research digest
-
-Mechanical notebook Health (rule registry, report ≠ fix) on existing Vue + Spring Boot stack. v1: empty folders (recursive) + dead wiki links (report-only); gated bulk remove empty folders; user-level defaults. Six suggested phases in `.planning/research/SUMMARY.md`.
-
----
-*Updated: 2026-07-22 after research synthesis*
+Last updated: 2026-07-22

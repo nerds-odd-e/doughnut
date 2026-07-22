@@ -20,8 +20,9 @@ From Notebook Settings → Health, a user can run lint and see actionable health
 
 - [ ] Health tab on notebook settings: run lint, review nested findings, configure lint/auto-fix options
 - [ ] Lint rule: empty folders (entire subtree has no notes — recursive)
+- [ ] Lint rule: note-empty folders with non-blank **readme** (`readmeContent`) as a separate finding type
 - [ ] Lint rule: dead wiki links in note content and frontmatter
-- [ ] Optional auto-fix: bulk “remove empty folders” only (no per-folder multi-select)
+- [ ] Optional auto-fix: bulk “remove empty folders” only (no per-folder multi-select; excludes readme-only folders)
 - [ ] Fix action enabled only when that bulk option is selected
 - [ ] User-level defaults for lint/auto-fix options (apply across notebooks)
 - [ ] Research-informed rule/config model inspired by LM Wiki lint (report vs fix separation, severity, extensible rules) — configs beyond v1 explored during research
@@ -65,6 +66,8 @@ From Notebook Settings → Health, a user can run lint and see actionable health
 | Entry: Notebook Settings → Health tab | Natural place beside Index/Settings; run + review in one surface | — Pending |
 | v1 rules: empty folders + dead wiki links (body + frontmatter) | Highest-signal mechanical health; empty notes deferred | — Pending |
 | Empty folder = recursive (subtree has no notes) | Nested empty shells are the real rot; leaf-only misses the pattern | — Pending |
+| Note-empty + non-blank readme = separate finding | Avoid conflating “has readme” with fully empty; auto-fix must not delete readme-only | — Pending |
+| Domain rename: index → readme (`readmeContent`) | Product renamed index content to readme; lint/docs must use current names | — Pending |
 | Auto-fix optional; only bulk remove empty folders | Aligns with LM Wiki “safe fix” gate; no silent deletes | — Pending |
 | No per-folder multi-select | Simpler UX; one fix option; Fix active only when selected | — Pending |
 | Dead links: report only in v1 | Creating/retargeting links needs judgment; avoid wrong auto-writes | — Pending |
