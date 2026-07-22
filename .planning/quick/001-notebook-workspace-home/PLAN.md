@@ -10,8 +10,8 @@ Make the **notebook page** feel like an **overview / command center** (Notion wo
 |-------|------|--------|--------------------|
 | 1 | Structure (design) | done (winner C) | Winning HTML sketch direction chosen for notebook home layout |
 | 1b | Behavior | done | Index content auto-saves with same debounced behavior as note body (no Save button) |
-| 2 | Behavior | planned | Opening a notebook shows a workspace-home main column (Home tab: hero/title + index primary; Settings tab for admin) |
-| 3 | Behavior | planned | Index content + properties are the primary editable surface on Home; settings/admin actions only on Settings |
+| 2 | Behavior | done | Opening a notebook shows a workspace-home main column (Home tab: hero/title + index primary; Settings tab for admin) |
+| 3 | Behavior | planned | Thin verification: Home keeps index primary; Settings holds admin (largely delivered by Phase 2 tabs) |
 | 4 | Behavior | planned | Folder and note pages remain recognizably different from notebook home (no regression of their roles) |
 
 ## Design direction (from intake)
@@ -56,7 +56,7 @@ Artifacts: `.planning/sketches/` (MANIFEST, theme, `NNN-*/index.html`). No produ
 
 **Pre/Trigger/Post:** Editing notebook or folder `indexContent` auto-saves after the same debounce as note body; no Save button; flush on blur. Implemented via shared `useDebouncedTextAutosave` used by `TextContentWrapper` and `ScopedIndexNoteEditor`.
 
-### Phase 2 — Behavior: notebook opens as workspace home
+### Phase 2 — Behavior: notebook opens as workspace home (done)
 
 **Pre:** User owns/opens a notebook with optional `indexContent`.
 
@@ -64,7 +64,9 @@ Artifacts: `.planning/sketches/` (MANIFEST, theme, `NNN-*/index.html`). No produ
 
 **Post:** Main column reads as home: strong `notebook.name` (and description cue), **Index** as primary canvas; not a vertical stack of settings cards at first paint. Sidebar chrome unchanged.
 
-**Tests:** Targeted E2E asserting notebook home landmarks (capability-named feature, e.g. notebook workspace / notebook page — not phase-numbered).
+**Shipped:** Home / Settings tabs on `NotebookPageView` (sketch C). Home = title + description cue + `ScopedIndexNoteEditor`. Settings = attached book, management, settings form, indexing (`NotebookWorkspaceSettings`). E2E: `notebook_workspace_home.feature`.
+
+**Learnings:** Admin sections on Settings can sit below the fold / overflow-clip in the main column — assert DOM presence in Settings panel, not strict Cypress `be.visible` for every section title.
 
 ### Phase 3 — Behavior: index + properties primary; admin secondary
 
@@ -73,6 +75,8 @@ Artifacts: `.planning/sketches/` (MANIFEST, theme, `NNN-*/index.html`). No produ
 **Trigger:** Edit index markdown / properties; open settings/management.
 
 **Post:** Index save/edit path remains obvious; move/share/skip-memory/search-index/attach-book reachable but **not** competing with index on the default view (drawer, tab, or below-fold secondary).
+
+**Note:** Phase 2 already demotes admin to Settings tab. Phase 3 is **thin verification** (index edit on Home + settings stay secondary) unless property-strip work (sketch 002) is added.
 
 **Tests:** E2E for index edit + that settings are secondary; extend existing notebook page specs if present.
 
@@ -95,4 +99,4 @@ Artifacts: `.planning/sketches/` (MANIFEST, theme, `NNN-*/index.html`). No produ
 
 ## Next action
 
-**Phase 1 done** — sketch 001 winner **C** (Home / Settings tabs). Optional: sketches 002–003 for property strip / demotion polish, or proceed to Phase 2 (product UI) / `/gsd-ui-phase` / `/gsd-sketch --wrap-up`.
+**Phase 2 done** — notebook Home / Settings tabs shipped. **Phase 3** is thin verification (index edit stays on Home; admin only via Settings), optionally property-strip polish (sketch 002).

@@ -67,6 +67,68 @@ describe("NotebookPageView.spec", () => {
     )
   })
 
+  it("shows home landmarks and hides admin sections on first paint", async () => {
+    const nb: Notebook = {
+      ...makeMe.aNotebook.please(),
+      name: "Workspace Home NB",
+      description: "Home cue",
+    }
+    const wrapper = helper
+      .component(NotebookPageView)
+      .withRouter()
+      .withProps({
+        notebook: nb,
+        fetchNotebookPage: noopFetchNotebookPage,
+        indexContent: "Index canvas body",
+      })
+      .mount()
+
+    expect(
+      wrapper.find('[data-testid="notebook-page-summary"]').text()
+    ).toContain("Workspace Home NB")
+    expect(
+      wrapper.find('[data-testid="notebook-page-summary"]').text()
+    ).toContain("Home cue")
+    expect(
+      wrapper.find('[data-testid="notebook-workspace-home"]').exists()
+    ).toBe(true)
+    expect(wrapper.find('[data-testid="notebook-index-editor"]').exists()).toBe(
+      true
+    )
+    expect(
+      wrapper.find('[data-testid="notebook-workspace-settings"]').exists()
+    ).toBe(false)
+    expect(wrapper.text()).not.toContain("Notebook Management")
+    expect(wrapper.text()).not.toContain("Notebook Settings")
+    expect(wrapper.text()).not.toContain("Notebook Indexing")
+  })
+
+  it("shows admin sections only after opening Settings tab", async () => {
+    const wrapper = helper
+      .component(NotebookPageView)
+      .withRouter()
+      .withProps({ notebook, fetchNotebookPage: noopFetchNotebookPage })
+      .mount()
+
+    expect(
+      wrapper.find('[data-testid="notebook-workspace-settings"]').exists()
+    ).toBe(false)
+
+    await wrapper
+      .get('[data-testid="notebook-workspace-tab-settings"]')
+      .trigger("click")
+    await flushPromises()
+
+    const settings = wrapper.find('[data-testid="notebook-workspace-settings"]')
+    expect(settings.exists()).toBe(true)
+    expect(settings.text()).toContain("Notebook Management")
+    expect(settings.text()).toContain("Notebook Settings")
+    expect(settings.text()).toContain("Notebook Indexing")
+    expect(
+      wrapper.find('[data-testid="notebook-workspace-home"]').exists()
+    ).toBe(false)
+  })
+
   it("sends description when saving notebook settings", async () => {
     const nb: Notebook = {
       ...makeMe.aNotebook.please(),
@@ -80,6 +142,11 @@ describe("NotebookPageView.spec", () => {
       .withRouter()
       .withProps({ notebook: nb, fetchNotebookPage: noopFetchNotebookPage })
       .mount()
+
+    await wrapper
+      .get('[data-testid="notebook-workspace-tab-settings"]')
+      .trigger("click")
+    await flushPromises()
 
     await wrapper.find("[name='description']").setValue("Saved blurb")
     await wrapper.find("button.daisy-btn-primary.mt-4").trigger("click")
@@ -148,6 +215,9 @@ describe("NotebookPageView.spec", () => {
       .withRouter()
       .withProps({ notebook, fetchNotebookPage: noopFetchNotebookPage })
       .mount()
+    await wrapper
+      .get('[data-testid="notebook-workspace-tab-settings"]')
+      .trigger("click")
     await flushPromises()
 
     const empty = wrapper.find('[data-testid="notebook-no-book"]')

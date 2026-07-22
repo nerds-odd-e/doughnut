@@ -3,8 +3,8 @@
 ## Current
 
 - **Active plan:** `.planning/quick/001-notebook-workspace-home/PLAN.md`
-- **Phase:** 2 next — implement Home / Settings notebook home (sketch C); **index autosave shipped** ahead of layout
-- **Next:** Implement notebook page Home / Settings tabs per sketch-findings; optional `/gsd-ui-phase`
+- **Phase:** 3 next — thin verification that index stays primary on Home and admin stays on Settings (Phase 2 already demoted admin)
+- **Next:** Phase 3 verification / optional property-strip (sketch 002); then Phase 4 note/folder distinctness
 
 ## Context
 
@@ -15,6 +15,7 @@ Notebook page should feel like overview / command center (Notion workspace home)
 - **001 winner C:** Default **Home** = index + light properties; **Settings** = management / settings / search-indexing.
 - **Wrap-up:** `.cursor/skills/sketch-findings-doughnut/` + `.planning/sketches/WRAP-UP-SUMMARY.md`
 
-## Shipped outside phase order
+## Shipped
 
 - Index (notebook + folder) uses shared `useDebouncedTextAutosave` with note body; Save button removed.
+- Notebook page Home / Settings tabs: Home = title + description cue + index canvas; Settings = `NotebookWorkspaceSettings` (book, management, settings, indexing). E2E `notebook_workspace_home.feature`.

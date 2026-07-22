@@ -7,18 +7,54 @@ const notebookPage = () => {
   const clickButton = (name: string) =>
     cy.findByRole('button', { name }).click()
 
+  const openSettingsTab = () => {
+    cy.get('[data-testid="notebook-workspace-tab-settings"]').click()
+    cy.get('[data-testid="notebook-workspace-settings"]').should('be.visible')
+  }
+
   return {
+    openSettingsTab() {
+      openSettingsTab()
+      return this
+    },
+
+    expectHomeLandmarks(name: string) {
+      cy.get('[data-testid="notebook-page-summary"]')
+        .find('h1')
+        .should('contain.text', name)
+      cy.get('[data-testid="notebook-workspace-home"]').should('be.visible')
+      cy.get('[data-testid="notebook-index-editor"]').should('be.visible')
+      cy.get('[data-testid="notebook-workspace-settings"]').should('not.exist')
+      cy.contains('Notebook Management').should('not.exist')
+      cy.contains('Notebook Settings').should('not.exist')
+      cy.contains('Notebook Indexing').should('not.exist')
+      return this
+    },
+
+    expectSettingsSectionsVisible() {
+      cy.get('[data-testid="notebook-workspace-settings"]').should('be.visible')
+      cy.get('[data-testid="notebook-workspace-settings"]').within(() => {
+        cy.contains('Notebook Management').should('exist')
+        cy.contains('Notebook Settings').should('exist')
+        cy.contains('Notebook Indexing').should('exist')
+      })
+      return this
+    },
+
     assertNoteHasSettingWithValue(setting: string, value: string) {
+      openSettingsTab()
       form.getField(setting).shouldHaveValue(value)
     },
 
     skipMemoryTracking() {
+      openSettingsTab()
       form.getField('Skip Memory Tracking').check()
       clickButton('Update Settings')
       pageIsNotLoading()
     },
 
     attachEpubFixture(relativePath: string) {
+      openSettingsTab()
       cy.get('[data-testid="notebook-no-book"]')
         .find('input[type="file"]')
         .selectFile(`e2e_test/fixtures/${relativePath}`, { force: true })
@@ -27,6 +63,7 @@ const notebookPage = () => {
       return this
     },
     attemptAttachEpubFixture(relativePath: string) {
+      openSettingsTab()
       cy.get('[data-testid="notebook-no-book"]')
         .find('input[type="file"]')
         .selectFile(`e2e_test/fixtures/${relativePath}`, { force: true })
@@ -42,18 +79,21 @@ const notebookPage = () => {
       return this
     },
     reindexNotebook() {
+      openSettingsTab()
       cy.findByRole('button', { name: 'Update index' }).click()
       // Wait for the indexing to complete - toast notification will appear
       pageIsNotLoading()
       return this
     },
     shareNotebookToBazaar() {
+      openSettingsTab()
       cy.findByRole('button', { name: 'Share notebook to bazaar' }).click()
       cy.findByRole('button', { name: 'OK' }).click()
       pageIsNotLoading()
       return this
     },
     moveNotebookToCircle() {
+      openSettingsTab()
       cy.findByRole('button', { name: 'Move to ...' }).click()
       return this
     },
@@ -77,6 +117,7 @@ const notebookPage = () => {
     },
     readBook(bookTitle: string) {
       pageIsNotLoading()
+      openSettingsTab()
       cy.get('[data-testid="notebook-attached-book"]').within(() => {
         cy.contains(bookTitle)
         cy.findByRole('button', { name: /^Read$/i }).click()
