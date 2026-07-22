@@ -184,7 +184,17 @@ Plans:
   4. Empty-folder removal uses a **dedicated purge** path (does not use folder dissolve / promote-children)
   5. After a successful fix, the user can re-run lint and no longer sees the purged fully empty folders
 
-**Plans:** TBD
+**Plans:** 2 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 07-01-PLAN.md — Backend EmptyFolderBulkPurge + POST health/fix + tests + OpenAPI regen
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 07-02-PLAN.md — Health Fix gate + auto re-lint + unit tests + notebook_health E2E
+
 **UI hint:** yes
 
 ## Progress
@@ -199,8 +209,8 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 3. Readme-only folder findings | 1/1 | Complete | 2026-07-22 |
 | 4. Dead-link findings | 2/2 | Complete | 2026-07-22 |
 | 5. Health tab and Run | 2/2 | Complete | 2026-07-22 |
-| 6. User-level defaults | 2/2 | In Progress|  |
-| 7. Gated empty-folder purge | 0/TBD | Not started | - |
+| 6. User-level defaults | 2/2 | Complete | 2026-07-22 |
+| 7. Gated empty-folder purge | 0/2 | Planned | - |
 
 ## Coverage
 

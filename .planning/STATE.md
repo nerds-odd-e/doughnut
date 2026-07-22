@@ -4,15 +4,15 @@ milestone: v1.0
 milestone_name: Notebook Lint & Auto-Fix
 current_phase: 7
 current_phase_name: Gated empty-folder purge
-status: ready_to_plan
-stopped_at: Phase 7 research complete
-last_updated: "2026-07-22T14:42:00.000Z"
+status: ready_to_execute
+stopped_at: Phase 7 plans created (07-01, 07-02)
+last_updated: "2026-07-22T15:00:00.000Z"
 last_activity: 2026-07-22
-last_activity_desc: Completed 07-RESEARCH (gated empty-folder purge)
+last_activity_desc: Created Phase 7 plans for gated empty-folder purge
 progress:
   total_phases: 7
   completed_phases: 6
-  total_plans: 11
+  total_plans: 13
   completed_plans: 11
 ---
 
@@ -23,15 +23,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-22)
 
 **Core value:** From Notebook Settings → Health, a user can run lint and see actionable health findings — with optional bulk removal of empty folders when auto-fix is enabled.
-**Current focus:** Phase 7 — Gated empty-folder purge (next)
+**Current focus:** Phase 7 — Gated empty-folder purge (execute next)
 
 ## Current Position
 
-Phase: 7 of 7 (Gated empty-folder purge) — ready to plan
-Plan: —
-Status: Phase 6 complete; DFLT-01 and DFLT-02 delivered
-Last activity: 2026-07-22 — Completed 07-RESEARCH (gated empty-folder purge)
-Resume file: .planning/phases/07-gated-empty-folder-purge/07-RESEARCH.md
+Phase: 7 of 7 (Gated empty-folder purge) — ready to execute
+Plan: 07-01 (Wave 1)
+Status: Phase 7 planned — 07-01 backend purge API, 07-02 Fix UI + E2E
+Last activity: 2026-07-22 — Created 07-01/07-02 PLAN.md + VALIDATION.md
+Resume file: .planning/phases/07-gated-empty-folder-purge/07-01-PLAN.md
 
 Progress: [████████░░] 86%
 
