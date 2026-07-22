@@ -176,7 +176,7 @@ describe("richModeKeyDropdownPresetKeys", () => {
     ])
   })
 
-  it("appends index-only keys when isIndexContext is true", () => {
+  it("appends readme-only keys when isReadmeContext is true", () => {
     expect(richModeKeyDropdownPresetKeys(true)).toEqual([
       "aliases",
       "image",

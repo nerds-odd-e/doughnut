@@ -18,8 +18,8 @@ export function useNoteCreationToolbarContext(
   const initialTitle = computed((): string | undefined => {
     const { activeNoteRealm, activeFolderRealm } = toValue(props)
     const markdown =
-      activeNoteRealm?.indexNoteContent ??
-      activeFolderRealm?.indexNoteContent ??
+      activeNoteRealm?.scopedReadmeContent ??
+      activeFolderRealm?.scopedReadmeContent ??
       null
     const pattern = titlePatternFromNoteMarkdown(markdown)
     if (pattern == null || pattern === "") return

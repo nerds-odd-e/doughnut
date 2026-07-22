@@ -1,7 +1,7 @@
 import { debounce } from "es-toolkit"
 import { computed, onUnmounted, ref, watch, type Ref } from "vue"
 
-/** Debounce for note body and container indexContent autosave. */
+/** Debounce for note body and container readmeContent autosave. */
 export const TEXT_AUTOSAVE_DEBOUNCE_MS = 1000
 
 export type DebouncedTextAutosaveOptions = {
@@ -28,7 +28,7 @@ function readExternal(
 }
 
 /**
- * Debounced text autosave shared by note body editing and container indexContent.
+ * Debounced text autosave shared by note body editing and container readmeContent.
  */
 export function useDebouncedTextAutosave(
   options: DebouncedTextAutosaveOptions

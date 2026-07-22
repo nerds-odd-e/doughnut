@@ -8,7 +8,7 @@
       :note-title-for-wikidata-search="noteTitleForWikidataSearch"
       :note-id="noteId"
       :interaction-locked="imageUploadInProgress"
-      :is-index-context="isIndexContext"
+      :is-readme-context="isReadmeContext"
       @properties-changed="onPropertiesChanged"
       @dead-link-click="$emit('deadLinkClick', $event)"
       @image-upload-state="imageUploadInProgress = $event"
@@ -65,7 +65,7 @@ const props = defineProps({
   wikiTitles: { type: Array as PropType<WikiTitle[]>, required: true },
   noteTitleForWikidataSearch: { type: String, default: "" },
   noteId: { type: Number as PropType<number | undefined>, default: undefined },
-  isIndexContext: { type: Boolean, default: false },
+  isReadmeContext: { type: Boolean, default: false },
 })
 
 const emits = defineEmits<{

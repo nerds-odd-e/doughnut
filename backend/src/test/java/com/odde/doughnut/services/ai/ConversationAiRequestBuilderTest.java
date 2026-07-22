@@ -94,7 +94,7 @@ class ConversationAiRequestBuilderTest {
       Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
       makeMe
           .theNotebook(notebook)
-          .indexContent("---\nquestion_generation_instruction: NOT_FOR_CHAT\n---\n")
+          .readmeContent("---\nquestion_generation_instruction: NOT_FOR_CHAT\n---\n")
           .please();
       Note note = makeMe.aNote().notebook(notebook).please();
       Conversation conversation = makeMe.aConversation().forANote(note).from(user).please();

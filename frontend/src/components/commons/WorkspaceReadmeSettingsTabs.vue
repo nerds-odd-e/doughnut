@@ -4,12 +4,12 @@
     :data-testid="`${testIdPrefix}-tabs`"
   >
     <a
-      :class="tabClass('index')"
+      :class="tabClass('readme')"
       role="button"
       href="#"
-      :data-testid="`${testIdPrefix}-tab-index`"
-      @click.prevent="model = 'index'"
-    >Index</a>
+      :data-testid="`${testIdPrefix}-tab-readme`"
+      @click.prevent="model = 'readme'"
+    >Readme</a>
     <a
       :class="tabClass('settings')"
       role="button"
@@ -21,9 +21,9 @@
 </template>
 
 <script setup lang="ts">
-export type WorkspaceIndexSettingsTab = "index" | "settings"
+export type WorkspaceReadmeSettingsTab = "readme" | "settings"
 
-const model = defineModel<WorkspaceIndexSettingsTab>({ required: true })
+const model = defineModel<WorkspaceReadmeSettingsTab>({ required: true })
 
 withDefaults(
   defineProps<{
@@ -34,6 +34,6 @@ withDefaults(
   }
 )
 
-const tabClass = (tab: WorkspaceIndexSettingsTab) =>
+const tabClass = (tab: WorkspaceReadmeSettingsTab) =>
   `daisy-tab daisy-tab-lg ${model.value === tab ? "daisy-tab-active" : ""}`
 </script>

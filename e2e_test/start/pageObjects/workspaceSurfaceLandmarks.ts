@@ -10,7 +10,7 @@ const workspaceSurfaceLandmarks = () => ({
       'Notebook'
     )
     cy.get('[data-testid="notebook-workspace-tabs"]').should('be.visible')
-    cy.get('[data-testid="notebook-workspace-tab-index"]').should('be.visible')
+    cy.get('[data-testid="notebook-workspace-tab-readme"]').should('be.visible')
     cy.get('[data-testid="notebook-workspace-tab-settings"]').should(
       'be.visible'
     )
@@ -20,7 +20,7 @@ const workspaceSurfaceLandmarks = () => ({
   expectNotebookWorkspaceTabsAbsent() {
     cy.get('[data-testid="notebook-page-kind-label"]').should('not.exist')
     cy.get('[data-testid="notebook-workspace-tabs"]').should('not.exist')
-    cy.get('[data-testid="notebook-workspace-tab-index"]').should('not.exist')
+    cy.get('[data-testid="notebook-workspace-tab-readme"]').should('not.exist')
     cy.get('[data-testid="notebook-workspace-tab-settings"]').should(
       'not.exist'
     )
@@ -33,7 +33,7 @@ const workspaceSurfaceLandmarks = () => ({
       'Folder'
     )
     cy.get('[data-testid="folder-workspace-tabs"]').should('be.visible')
-    cy.get('[data-testid="folder-workspace-tab-index"]').should('be.visible')
+    cy.get('[data-testid="folder-workspace-tab-readme"]').should('be.visible')
     cy.get('[data-testid="folder-workspace-tab-settings"]').should('be.visible')
     return this
   },
@@ -50,7 +50,7 @@ const workspaceSurfaceLandmarks = () => ({
   },
 
   expectFolderAdminControlsPresent() {
-    cy.get('[data-testid="folder-index-editor"]').should('be.visible')
+    cy.get('[data-testid="folder-readme-editor"]').should('be.visible')
     this.openFolderSettingsTab()
     cy.get('[data-testid="folder-move-dialog"]').should('be.visible')
     cy.get('[data-testid="folder-rename-submit"]').should('exist')

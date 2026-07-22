@@ -74,9 +74,9 @@ When(
 )
 
 When(
-  'I type notebook index body {string} on the notebook page and save',
+  'I type notebook readme body {string} on the notebook page and save',
   (body: string) => {
-    notebookPage().typeNotebookIndexDraftAndSave(body)
+    notebookPage().typeNotebookReadmeDraftAndSave(body)
   }
 )
 
@@ -85,8 +85,8 @@ When('I reload the notebook page', () => {
   pageIsNotLoading()
 })
 
-Then('the notebook index body includes {string}', (fragment: string) => {
-  notebookPage().expectNotebookIndexBodyContains(fragment)
+Then('the notebook readme body includes {string}', (fragment: string) => {
+  notebookPage().expectNotebookReadmeBodyContains(fragment)
 })
 
 Then('I should see popup {string}', (message: string) => {
@@ -103,9 +103,9 @@ Then('the notebook page summary shows name {string}', (name: string) => {
 })
 
 Then(
-  'the notebook workspace index shows name {string} and index',
+  'the notebook workspace readme shows name {string} and readme',
   (name: string) => {
-    notebookPage().expectIndexLandmarks(name)
+    notebookPage().expectReadmeLandmarks(name)
   }
 )
 
@@ -121,11 +121,11 @@ Then('notebook admin settings sections are visible', () => {
   notebookPage().expectSettingsSectionsVisible()
 })
 
-Then('notebook Index and Settings tabs are present', () => {
+Then('notebook Readme and Settings tabs are present', () => {
   workspaceSurfaceLandmarks().expectNotebookWorkspaceTabsPresent()
 })
 
-Then('notebook Index and Settings tabs are not present', () => {
+Then('notebook Readme and Settings tabs are not present', () => {
   workspaceSurfaceLandmarks().expectNotebookWorkspaceTabsAbsent()
 })
 

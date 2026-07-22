@@ -11,10 +11,10 @@ export const RICH_MODE_PRESET_PROPERTY_KEYS = [
 ] as const
 
 /**
- * Predefined property keys shown only when editing a designated index note
- * (notebook index, folder index, or direct /n<noteId> for those notes).
+ * Predefined property keys shown only when editing a container readme
+ * (notebook/folder readme editors, or a note whose title is a reserved readme name).
  */
-export const INDEX_ONLY_PRESET_PROPERTY_KEYS = ["title_pattern"] as const
+export const README_ONLY_PRESET_PROPERTY_KEYS = ["title_pattern"] as const
 
 /** True when `key` must remain a scalar value (not a list). */
 export function isScalarOnlyStructuralPropertyKey(key: string): boolean {
@@ -89,18 +89,18 @@ export function isQuestionGenerationInstructionPropertyKey(
   return t === "questiongenerationinstruction"
 }
 
-/** True when `key` is any index-only predefined slot, including legacy camelCase aliases. */
-export function isReservedIndexOnlyPropertyKey(key: string): boolean {
+/** True when `key` is any readme-only predefined slot, including legacy camelCase aliases. */
+export function isReservedReadmeOnlyPropertyKey(key: string): boolean {
   return (
-    (INDEX_ONLY_PRESET_PROPERTY_KEYS as readonly string[]).includes(key) ||
+    (README_ONLY_PRESET_PROPERTY_KEYS as readonly string[]).includes(key) ||
     isTitlePatternPropertyKey(key)
   )
 }
 
 /** True when `rowKey` already fills the slot for `canonicalPresetKey` (same key or legacy alias). */
-export function rowFillsIndexOnlyPresetSlot(
+export function rowFillsReadmeOnlyPresetSlot(
   rowKey: string,
-  canonicalPresetKey: (typeof INDEX_ONLY_PRESET_PROPERTY_KEYS)[number]
+  canonicalPresetKey: (typeof README_ONLY_PRESET_PROPERTY_KEYS)[number]
 ): boolean {
   if (rowKey === canonicalPresetKey) return true
   if (canonicalPresetKey === "title_pattern") {
@@ -126,7 +126,7 @@ export function propertyKeyMatchesPresetFamily(
     case "example of":
       return isExampleOfPropertyKey(key)
     case "title_pattern":
-      return rowFillsIndexOnlyPresetSlot(key, "title_pattern")
+      return rowFillsReadmeOnlyPresetSlot(key, "title_pattern")
     case "question_generation_instruction":
       return isQuestionGenerationInstructionPropertyKey(key)
     default:
@@ -219,10 +219,10 @@ export function findPropertyRowIndexByExactKey(
 
 /** Keys offered in the rich-mode property key dropdown (insert and row key fields). */
 export function richModeKeyDropdownPresetKeys(
-  isIndexContext: boolean
+  isReadmeContext: boolean
 ): string[] {
   const keys: string[] = [...RICH_MODE_PRESET_PROPERTY_KEYS]
-  if (isIndexContext) keys.push(...INDEX_ONLY_PRESET_PROPERTY_KEYS)
+  if (isReadmeContext) keys.push(...README_ONLY_PRESET_PROPERTY_KEYS)
   return keys
 }
 
@@ -231,11 +231,11 @@ export function richModeKeyDropdownPresetKeys(
  * available name in its family (e.g. `url 2` when `url` already exists).
  */
 export function richModeKeyDropdownPresetKeysForPropertyRows(
-  isIndexContext: boolean,
+  isReadmeContext: boolean,
   rows: readonly PropertyRow[],
   options?: { excludeRowIndex?: number }
 ): string[] {
-  return richModeKeyDropdownPresetKeys(isIndexContext).map((preset) =>
+  return richModeKeyDropdownPresetKeys(isReadmeContext).map((preset) =>
     nextAvailablePropertyKeyForPreset(preset, rows, options)
   )
 }

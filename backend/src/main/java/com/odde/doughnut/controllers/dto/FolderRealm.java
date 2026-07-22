@@ -11,7 +11,7 @@ import java.util.List;
     description =
         "Notebook chrome plus folder row for loading the folder page: same shared realm sidebar as"
             + " NoteRealm (without note-level fields), plus folder identity, optional parent folder id,"
-            + " and optional container-owned folder index markdown.")
+            + " and optional container-owned folder readme markdown.")
 public record FolderRealm(
     @NotNull @JsonUnwrapped RealmNotebookSidebar sidebar,
     @NotNull Folder folder,
@@ -22,21 +22,21 @@ public record FolderRealm(
     @JsonInclude(JsonInclude.Include.NON_NULL)
         @Schema(
             description =
-                "Container-owned folder index markdown (populated by migration from legacy"
-                    + " index note). Omitted when absent.")
-        String indexContent) {
+                "Container-owned folder readme markdown (populated by migration from legacy"
+                    + " container note). Omitted when absent.")
+        String readmeContent) {
 
   public static FolderRealm of(
       NotebookRealm chrome,
       List<Folder> ancestorFolders,
-      String indexNoteContent,
+      String scopedReadmeContent,
       Folder folder,
       Integer parentFolderId,
-      String indexContent) {
+      String readmeContent) {
     RealmNotebookSidebar sidebar = new RealmNotebookSidebar();
     sidebar.setNotebookRealm(chrome);
     sidebar.setAncestorFolders(ancestorFolders);
-    sidebar.setIndexNoteContent(indexNoteContent);
-    return new FolderRealm(sidebar, folder, parentFolderId, indexContent);
+    sidebar.setScopedReadmeContent(scopedReadmeContent);
+    return new FolderRealm(sidebar, folder, parentFolderId, readmeContent);
   }
 }

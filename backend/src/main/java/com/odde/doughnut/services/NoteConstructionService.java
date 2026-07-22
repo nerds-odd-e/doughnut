@@ -15,6 +15,7 @@ import com.odde.doughnut.services.ai.NoteExtractionResult;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.validators.AuthoredNoteContent;
+import com.odde.doughnut.validators.ReservedReadmeTitles;
 import java.io.IOException;
 import java.sql.Timestamp;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,6 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class NoteConstructionService {
 
-  private static final String RESERVED_INDEX_TITLE_MESSAGE =
-      "'index' is reserved for notebook and folder index content.";
   private final AuthorizationService authorizationService;
   private final TestabilitySettings testabilitySettings;
   private final FolderRepository folderRepository;
@@ -113,10 +112,10 @@ public class NoteConstructionService {
   }
 
   private void throwIfReservedTitle(String title) {
-    if (title != null && title.trim().equalsIgnoreCase("index")) {
+    if (ReservedReadmeTitles.isReserved(title)) {
       ApiError apiError =
-          new ApiError(RESERVED_INDEX_TITLE_MESSAGE, ApiError.ErrorType.BINDING_ERROR);
-      apiError.add("newTitle", RESERVED_INDEX_TITLE_MESSAGE);
+          new ApiError(ReservedReadmeTitles.RESERVED_MESSAGE, ApiError.ErrorType.BINDING_ERROR);
+      apiError.add("newTitle", ReservedReadmeTitles.RESERVED_MESSAGE);
       throw new ApiException(apiError);
     }
   }

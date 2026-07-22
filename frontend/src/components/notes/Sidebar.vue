@@ -107,7 +107,7 @@ const sidebarReadonly = useSidebarCreationReadonly(currentUser, () => ({
   notebookReadonly: props.notebookReadonly,
 }))
 
-/** Notebook overview pages may load root notes without an anchor note (e.g. no index note). */
+/** Notebook overview pages may load root notes without an anchor note (e.g. no readme). */
 const sidebarTreeShown = computed(
   () => props.activeNoteRealm === undefined || activeNoteTopology.value != null
 )

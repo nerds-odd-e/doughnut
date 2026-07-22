@@ -16,7 +16,7 @@ import lombok.Setter;
   "ancestorFolders",
   "references",
   "wikiTitles",
-  "indexNoteContent"
+  "scopedReadmeContent"
 })
 public class NoteRealm {
   /**
@@ -58,11 +58,11 @@ public class NoteRealm {
     sidebar.setAncestorFolders(ancestorFolders);
   }
 
-  public String getIndexNoteContent() {
-    return sidebar.getIndexNoteContent();
+  public String getScopedReadmeContent() {
+    return sidebar.getScopedReadmeContent();
   }
 
-  public void setIndexNoteContent(String indexNoteContent) {
-    sidebar.setIndexNoteContent(indexNoteContent);
+  public void setScopedReadmeContent(String scopedReadmeContent) {
+    sidebar.setScopedReadmeContent(scopedReadmeContent);
   }
 }

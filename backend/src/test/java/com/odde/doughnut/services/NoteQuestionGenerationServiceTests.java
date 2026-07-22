@@ -151,7 +151,8 @@ class NoteQuestionGenerationServiceTests {
     if (containerInstruction != null) {
       makeMe
           .theNotebook(nb)
-          .indexContent("---\nquestion_generation_instruction: " + containerInstruction + "\n---\n")
+          .readmeContent(
+              "---\nquestion_generation_instruction: " + containerInstruction + "\n---\n")
           .please();
     }
     String content =
@@ -211,17 +212,17 @@ class NoteQuestionGenerationServiceTests {
       Notebook nb = makeMe.aNotebook().creatorAndOwner(user).name("Physics").please();
       makeMe
           .theNotebook(nb)
-          .indexContent("---\nquestion_generation_instruction: NOTEBOOK_INSTRUCTION\n---\n")
+          .readmeContent("---\nquestion_generation_instruction: NOTEBOOK_INSTRUCTION\n---\n")
           .please();
       Folder outer = makeMe.aFolder().notebook(nb).name("Mechanics").please();
       makeMe
           .theFolder(outer)
-          .indexContent("---\nquestion_generation_instruction: OUTER_INSTRUCTION\n---\n")
+          .readmeContent("---\nquestion_generation_instruction: OUTER_INSTRUCTION\n---\n")
           .please();
       Folder inner = makeMe.aFolder().parentFolder(outer).name("Kinematics").please();
       makeMe
           .theFolder(inner)
-          .indexContent("---\nquestion_generation_instruction: INNER_INSTRUCTION\n---\n")
+          .readmeContent("---\nquestion_generation_instruction: INNER_INSTRUCTION\n---\n")
           .please();
       Note note =
           makeMe
@@ -357,7 +358,7 @@ class NoteQuestionGenerationServiceTests {
         throws JsonProcessingException {
       makeMe
           .theNotebook(testNote.getNotebook())
-          .indexContent("---\nquestion_generation_instruction: NOT_FOR_EVALUATION\n---\n")
+          .readmeContent("---\nquestion_generation_instruction: NOT_FOR_EVALUATION\n---\n")
           .please();
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       QuestionEvaluation evaluation = new QuestionEvaluation();

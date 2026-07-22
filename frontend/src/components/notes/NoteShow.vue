@@ -40,7 +40,7 @@
                     asMarkdown,
                     readonly: readonly(noteRealm),
                     wikiTitles: noteRealm.wikiTitles ?? [],
-                    isIndexContext: isIndexTitle(noteRealm),
+                    isReadmeContext: isReadmeTitle(noteRealm),
                     hasInboundReferences: noteHasInboundWikiReferences(noteRealm),
                   }"
                   @dead-link-click="onDeadLinkClick"
@@ -110,6 +110,7 @@ import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import NoteDeadLinkCreateModal from "./NoteDeadLinkCreateModal.vue"
 import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
 import { provideNoteShortcutScope } from "@/composables/noteShortcutScope"
+import { isReservedReadmeNoteTitle } from "@/utils/reservedReadmeTitles"
 
 const props = defineProps({
   noteId: { type: Number, required: true },
@@ -130,8 +131,8 @@ const currentUser = inject<Ref<User | undefined>>("currentUser")
 const readonly = (noteRealm: NoteRealm) =>
   !currentUser?.value || noteRealm.notebookRealm.readonly === true
 
-const isIndexTitle = (noteRealm: NoteRealm) =>
-  (noteRealm.note.noteTopology.title ?? "").trim().toLowerCase() === "index"
+const isReadmeTitle = (noteRealm: NoteRealm) =>
+  isReservedReadmeNoteTitle(noteRealm.note.noteTopology.title)
 
 const noteHasInboundWikiReferences = (noteRealm: NoteRealm) =>
   (noteRealm.references?.length ?? 0) > 0

@@ -9,12 +9,12 @@ Feature: Notebook creation
       | Title          | Description                                |
       | Sedation Wiki  | Quick reference for sedation protocols     |
 
-  Scenario: Create notebook index from notebook page when notebook has no index
-    When I create a notebook with title "Empty NB E2E Index" and description "e2e"
-    And I open the notebook "Empty NB E2E Index" from my notebooks catalog
-    And I type notebook index body "E2E index body" on the notebook page and save
+  Scenario: Create notebook readme from notebook page when notebook has no readme
+    When I create a notebook with title "Empty NB E2E Readme" and description "e2e"
+    And I open the notebook "Empty NB E2E Readme" from my notebooks catalog
+    And I type notebook readme body "E2E readme body" on the notebook page and save
     And I reload the notebook page
-    Then the notebook index body includes "E2E index body"
+    Then the notebook readme body includes "E2E readme body"
 
   Scenario: Create a new notebook with invalid information
     When I create a notebook with empty title

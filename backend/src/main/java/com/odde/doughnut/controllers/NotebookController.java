@@ -337,8 +337,8 @@ class NotebookController {
   @Operation(
       summary = "Get folder page payload",
       description =
-          "Notebook chrome, folder metadata, parent folder id when nested, and designated folder"
-              + " index note id when resolved.")
+          "Notebook chrome, folder metadata, parent folder id when nested, and optional folder"
+              + " readme content when present.")
   @GetMapping("/{notebook}/folders/{folder}")
   public FolderRealm getFolderPage(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
@@ -351,13 +351,13 @@ class NotebookController {
   }
 
   @Operation(
-      summary = "Update notebook index content directly",
+      summary = "Update notebook readme content directly",
       description =
           "Saves the given markdown (with optional YAML frontmatter) as the notebook container's"
-              + " indexContent field. Blank content clears the field.")
-  @PatchMapping("/{notebook}/index-content")
+              + " readmeContent field. Blank content clears the field.")
+  @PatchMapping("/{notebook}/readme-content")
   @Transactional
-  public NotebookRealm updateNotebookIndexContent(
+  public NotebookRealm updateNotebookReadmeContent(
       @PathVariable @Schema(type = "integer") Notebook notebook,
       @RequestBody NoteUpdateContentDTO dto)
       throws UnexpectedNoAccessRightException {
@@ -366,7 +366,7 @@ class NotebookController {
     if (content != null && !content.isBlank()) {
       AuthoredNoteContent.assertAliasesValidForSave(content);
     }
-    notebook.setIndexContent(content == null || content.isBlank() ? null : content);
+    notebook.setReadmeContent(content == null || content.isBlank() ? null : content);
     entityPersister.save(notebook);
     entityPersister.flush();
     User user = authorizationService.getCurrentUser();
@@ -374,13 +374,13 @@ class NotebookController {
   }
 
   @Operation(
-      summary = "Update folder index content directly",
+      summary = "Update folder readme content directly",
       description =
           "Saves the given markdown (with optional YAML frontmatter) as the folder container's"
-              + " indexContent field. Blank content clears the field.")
-  @PatchMapping("/{notebook}/folders/{folder}/index-content")
+              + " readmeContent field. Blank content clears the field.")
+  @PatchMapping("/{notebook}/folders/{folder}/readme-content")
   @Transactional
-  public FolderRealm updateFolderIndexContent(
+  public FolderRealm updateFolderReadmeContent(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @PathVariable("folder") @Schema(type = "integer") Folder folder,
       @RequestBody NoteUpdateContentDTO dto)
@@ -391,7 +391,7 @@ class NotebookController {
     if (content != null && !content.isBlank()) {
       AuthoredNoteContent.assertAliasesValidForSave(content);
     }
-    folder.setIndexContent(content == null || content.isBlank() ? null : content);
+    folder.setReadmeContent(content == null || content.isBlank() ? null : content);
     entityPersister.save(folder);
     entityPersister.flush();
     User user = authorizationService.getCurrentUser();

@@ -18,19 +18,19 @@
         </h1>
       </div>
 
-      <WorkspaceIndexSettingsTabs
+      <WorkspaceReadmeSettingsTabs
         v-model="activeTab"
         test-id-prefix="folder-workspace"
       />
 
-      <div v-if="activeTab === 'index'" data-testid="folder-workspace-index">
-        <ScopedIndexNoteEditor
+      <div v-if="activeTab === 'readme'" data-testid="folder-workspace-readme">
+        <ScopedReadmeEditor
           :notebook-id="folderForView.notebookRealm.notebook.id"
           :folder-id="folderForView.folder.id"
-          :index-content="folderForView.indexContent ?? null"
-          test-id-prefix="folder-index"
-          rich-editor-scope-name="folder-index"
-          heading-label="Folder index"
+          :readme-content="folderForView.readmeContent ?? null"
+          test-id-prefix="folder-readme"
+          rich-editor-scope-name="folder-readme"
+          heading-label="Folder readme"
           flush
           @saved="refreshFolderPage"
         />
@@ -50,11 +50,11 @@ import type { FolderRealm } from "@generated/doughnut-backend-api"
 import { computed, ref } from "vue"
 import NotebookPageReadonlySummary from "@/components/notebook/NotebookPageReadonlySummary.vue"
 import FolderWorkspaceSettings from "@/components/folder/FolderWorkspaceSettings.vue"
-import ScopedIndexNoteEditor from "@/components/notebook/ScopedIndexNoteEditor.vue"
+import ScopedReadmeEditor from "@/components/notebook/ScopedReadmeEditor.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-import WorkspaceIndexSettingsTabs, {
-  type WorkspaceIndexSettingsTab,
-} from "@/components/commons/WorkspaceIndexSettingsTabs.vue"
+import WorkspaceReadmeSettingsTabs, {
+  type WorkspaceReadmeSettingsTab,
+} from "@/components/commons/WorkspaceReadmeSettingsTabs.vue"
 
 const props = defineProps<{
   folderRealm: FolderRealm | undefined
@@ -67,7 +67,7 @@ const folderForView = computed((): FolderRealm | undefined => {
   return r
 })
 
-const activeTab = ref<WorkspaceIndexSettingsTab>("index")
+const activeTab = ref<WorkspaceReadmeSettingsTab>("readme")
 
 const refreshFolderPage = () => props.fetchFolderPage()
 </script>

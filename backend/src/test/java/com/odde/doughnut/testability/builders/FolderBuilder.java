@@ -78,8 +78,8 @@ public class FolderBuilder extends EntityBuilder<Folder> {
     return this;
   }
 
-  public FolderBuilder indexContent(String content) {
-    entity.setIndexContent(content);
+  public FolderBuilder readmeContent(String content) {
+    entity.setReadmeContent(content);
     return this;
   }
 }

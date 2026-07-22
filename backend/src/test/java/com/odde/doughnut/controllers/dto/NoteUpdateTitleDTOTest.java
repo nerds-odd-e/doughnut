@@ -69,8 +69,19 @@ class NoteUpdateTitleDTOTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"index", "INDEX", "Index", " index ", "  INDEX  "})
-  void rejectsReservedIndexTitle(String reserved) {
+  @ValueSource(
+      strings = {
+        "readme",
+        "README",
+        "Readme",
+        " readme ",
+        "  README  ",
+        "readme.md",
+        "README.md",
+        "Readme.md",
+        " readme.md "
+      })
+  void rejectsReservedReadmeTitle(String reserved) {
     dto.setNewTitle(reserved);
     Set<ConstraintViolation<NoteUpdateTitleDTO>> violations = validator.validate(dto);
     assertEquals(1, violations.size());
@@ -79,8 +90,8 @@ class NoteUpdateTitleDTOTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"index_to_be_deleted", "index2", "reindex", "my index"})
-  void allowsTitlesThatContainIndexAsSubstring(String title) {
+  @ValueSource(strings = {"readme_to_be_deleted", "readme2", "my readme", "index", "INDEX"})
+  void allowsTitlesThatAreNotExactReservedReadme(String title) {
     dto.setNewTitle(title);
     Set<ConstraintViolation<NoteUpdateTitleDTO>> violations = validator.validate(dto);
     assertEquals(0, violations.size());

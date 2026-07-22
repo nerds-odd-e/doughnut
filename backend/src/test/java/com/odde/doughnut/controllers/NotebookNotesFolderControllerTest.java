@@ -166,8 +166,8 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"index", "INDEX"})
-    void rejectsReservedIndexTitleOnCreate(String reservedTitle) throws Exception {
+    @ValueSource(strings = {"readme", "README", "readme.md", "README.md"})
+    void rejectsReservedReadmeTitleOnCreate(String reservedTitle) throws Exception {
       Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       NoteCreationDTO dto = new NoteCreationDTO();
       dto.setNewTitle(reservedTitle);
@@ -371,7 +371,7 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
     }
 
     @Test
-    void exposesFolderContainerIndexContentWhenPresent() throws UnexpectedNoAccessRightException {
+    void exposesFolderContainerReadmeContentWhenPresent() throws UnexpectedNoAccessRightException {
       User owner = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       Folder folder =
@@ -379,24 +379,24 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
               .aFolder()
               .notebook(nb)
               .name("Configured")
-              .indexContent("---\ntitle_pattern: \"{{date}}\"\n---\n\nFolder notes")
+              .readmeContent("---\ntitle_pattern: \"{{date}}\"\n---\n\nFolder notes")
               .please();
 
       FolderRealm realm = controller.getFolderPage(nb, folder);
 
       assertThat(
-          realm.indexContent(), equalTo("---\ntitle_pattern: \"{{date}}\"\n---\n\nFolder notes"));
+          realm.readmeContent(), equalTo("---\ntitle_pattern: \"{{date}}\"\n---\n\nFolder notes"));
     }
 
     @Test
-    void omitsFolderIndexContentWhenNonePresent() throws UnexpectedNoAccessRightException {
+    void omitsFolderReadmeContentWhenNonePresent() throws UnexpectedNoAccessRightException {
       User owner = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       Folder folder = makeMe.aFolder().notebook(nb).name("Empty").please();
 
       FolderRealm realm = controller.getFolderPage(nb, folder);
 
-      assertThat(realm.indexContent(), nullValue());
+      assertThat(realm.readmeContent(), nullValue());
     }
   }
 
@@ -434,36 +434,36 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
   }
 
   @Nested
-  class UpdateFolderIndexContent {
+  class UpdateFolderReadmeContent {
     @Test
-    void updatesFolderIndexContentDirectly() throws UnexpectedNoAccessRightException {
+    void updatesFolderReadmeContentDirectly() throws UnexpectedNoAccessRightException {
       User owner = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       Folder folder = makeMe.aFolder().notebook(nb).name("Box").please();
       NoteUpdateContentDTO dto = new NoteUpdateContentDTO();
-      dto.setContent("direct folder index content");
+      dto.setContent("direct folder readme content");
 
-      FolderRealm result = controller.updateFolderIndexContent(nb, folder, dto);
+      FolderRealm result = controller.updateFolderReadmeContent(nb, folder, dto);
 
-      assertThat(result.indexContent(), equalTo("direct folder index content"));
+      assertThat(result.readmeContent(), equalTo("direct folder readme content"));
     }
 
     @Test
-    void clearsFolderIndexContentWhenBlankContentGiven() throws UnexpectedNoAccessRightException {
+    void clearsFolderReadmeContentWhenBlankContentGiven() throws UnexpectedNoAccessRightException {
       User owner = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       Folder folder =
-          makeMe.aFolder().notebook(nb).name("Box").indexContent("old folder content").please();
+          makeMe.aFolder().notebook(nb).name("Box").readmeContent("old folder content").please();
       NoteUpdateContentDTO dto = new NoteUpdateContentDTO();
       dto.setContent("   ");
 
-      FolderRealm result = controller.updateFolderIndexContent(nb, folder, dto);
+      FolderRealm result = controller.updateFolderReadmeContent(nb, folder, dto);
 
-      assertThat(result.indexContent(), nullValue());
+      assertThat(result.readmeContent(), nullValue());
     }
 
     @Test
-    void requiresAuthorizationToUpdateFolderIndexContent() {
+    void requiresAuthorizationToUpdateFolderReadmeContent() {
       User owner = makeMe.aUser().please();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       Folder folder = makeMe.aFolder().notebook(nb).name("Box").please();
@@ -471,7 +471,7 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       NoteUpdateContentDTO dto = new NoteUpdateContentDTO();
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.updateFolderIndexContent(nb, folder, dto));
+          () -> controller.updateFolderReadmeContent(nb, folder, dto));
     }
 
     @Test
@@ -484,7 +484,7 @@ class NotebookNotesFolderControllerTest extends NotebookControllerTestBase {
       ResponseStatusException ex =
           assertThrows(
               ResponseStatusException.class,
-              () -> controller.updateFolderIndexContent(nb, foreign, dto));
+              () -> controller.updateFolderReadmeContent(nb, foreign, dto));
       assertThat(ex.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
     }
   }

@@ -120,69 +120,69 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
     }
 
     @Test
-    void exposesContainerIndexContentWhenMigratedMarkdownExists()
+    void exposesContainerReadmeContentWhenMigratedMarkdownExists()
         throws UnexpectedNoAccessRightException {
       User owner = currentUser.getUser();
       Notebook nb =
           makeMe
               .aNotebook()
               .creatorAndOwner(owner)
-              .indexContent("---\ntitle_pattern: \"{{date}}\"\n---\n\nNotebook index body")
+              .readmeContent("---\ntitle_pattern: \"{{date}}\"\n---\n\nNotebook readme body")
               .please();
 
       NotebookRealm realm = controller.get(nb);
 
       assertThat(
-          realm.indexContent(),
-          equalTo("---\ntitle_pattern: \"{{date}}\"\n---\n\nNotebook index body"));
+          realm.readmeContent(),
+          equalTo("---\ntitle_pattern: \"{{date}}\"\n---\n\nNotebook readme body"));
     }
 
     @Test
-    void omitsIndexContentWhenNonePresent() throws UnexpectedNoAccessRightException {
+    void omitsReadmeContentWhenNonePresent() throws UnexpectedNoAccessRightException {
       User owner = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
 
       NotebookRealm realm = controller.get(nb);
 
-      assertThat(realm.indexContent(), nullValue());
+      assertThat(realm.readmeContent(), nullValue());
     }
   }
 
   @Nested
-  class UpdateNotebookIndexContent {
+  class UpdateNotebookReadmeContent {
     @Test
-    void updatesIndexContentDirectly() throws UnexpectedNoAccessRightException {
+    void updatesReadmeContentDirectly() throws UnexpectedNoAccessRightException {
       User owner = currentUser.getUser();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       var dto = new com.odde.doughnut.controllers.dto.NoteUpdateContentDTO();
-      dto.setContent("direct notebook index content");
+      dto.setContent("direct notebook readme content");
 
-      NotebookRealm result = controller.updateNotebookIndexContent(nb, dto);
+      NotebookRealm result = controller.updateNotebookReadmeContent(nb, dto);
 
-      assertThat(result.indexContent(), equalTo("direct notebook index content"));
+      assertThat(result.readmeContent(), equalTo("direct notebook readme content"));
     }
 
     @Test
-    void clearsIndexContentWhenBlankContentGiven() throws UnexpectedNoAccessRightException {
+    void clearsReadmeContentWhenBlankContentGiven() throws UnexpectedNoAccessRightException {
       User owner = currentUser.getUser();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).indexContent("old content").please();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).readmeContent("old content").please();
       var dto = new com.odde.doughnut.controllers.dto.NoteUpdateContentDTO();
       dto.setContent("   ");
 
-      NotebookRealm result = controller.updateNotebookIndexContent(nb, dto);
+      NotebookRealm result = controller.updateNotebookReadmeContent(nb, dto);
 
-      assertThat(result.indexContent(), nullValue());
+      assertThat(result.readmeContent(), nullValue());
     }
 
     @Test
-    void requiresAuthorizationToUpdateIndexContent() {
+    void requiresAuthorizationToUpdateReadmeContent() {
       User owner = makeMe.aUser().please();
       Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
       currentUser.setUser(makeMe.aUser().please());
       var dto = new com.odde.doughnut.controllers.dto.NoteUpdateContentDTO();
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.updateNotebookIndexContent(nb, dto));
+          () -> controller.updateNotebookReadmeContent(nb, dto));
     }
   }
 

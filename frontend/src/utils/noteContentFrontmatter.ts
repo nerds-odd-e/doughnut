@@ -8,14 +8,14 @@ import {
 } from "@/utils/noteProperties"
 
 export {
-  INDEX_ONLY_PRESET_PROPERTY_KEYS,
+  README_ONLY_PRESET_PROPERTY_KEYS,
   RICH_MODE_PRESET_PROPERTY_KEYS,
   findPropertyRowIndexByExactKey,
   isExampleOfPropertyKey,
   isImagePropertyKey,
   isListCapablePropertyKey,
   isQuestionGenerationInstructionPropertyKey,
-  isReservedIndexOnlyPropertyKey,
+  isReservedReadmeOnlyPropertyKey,
   isScalarOnlyStructuralPropertyKey,
   isTextCapablePropertyRow,
   isTitlePatternPropertyKey,
@@ -26,7 +26,7 @@ export {
   propertyKeyMatchesPresetFamily,
   richModeKeyDropdownPresetKeys,
   richModeKeyDropdownPresetKeysForPropertyRows,
-  rowFillsIndexOnlyPresetSlot,
+  rowFillsReadmeOnlyPresetSlot,
 } from "@/utils/noteContentPropertyKeys"
 
 export {

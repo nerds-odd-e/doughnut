@@ -7,6 +7,7 @@ import { wikiTitleFromInnerAndNoteId } from "@/utils/wikiPropertyValueField"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import type { ComponentPublicInstance } from "vue"
+import { RESERVED_README_TITLE_MESSAGE } from "@/utils/reservedReadmeTitles"
 
 const mockedUpdateTitleCall = vi.fn()
 
@@ -277,7 +278,7 @@ describe("in place edit on title", () => {
     beforeEach(async () => {
       const w = mountComponent(note)
       mockedUpdateTitleCall.mockRejectedValueOnce({
-        title: "'index' is reserved for notebook and folder index content.",
+        title: RESERVED_README_TITLE_MESSAGE,
         status: 400,
       })
       await editTitleThenBlur(w)

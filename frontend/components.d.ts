@@ -178,7 +178,7 @@ declare module 'vue' {
     RichMarkdownEditor: typeof import('./src/components/form/RichMarkdownEditor.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    ScopedIndexNoteEditor: typeof import('./src/components/notebook/ScopedIndexNoteEditor.vue')['default']
+    ScopedReadmeEditor: typeof import('./src/components/notebook/ScopedReadmeEditor.vue')['default']
     ScrollTo: typeof import('./src/components/commons/ScrollTo.vue')['default']
     SeamlessTextEditor: typeof import('./src/components/form/SeamlessTextEditor.vue')['default']
     SearchDropdownHitList: typeof import('./src/components/search/SearchDropdownHitList.vue')['default']
@@ -251,7 +251,7 @@ declare module 'vue' {
     WikidataAssociationDialogBody: typeof import('./src/components/notes/WikidataAssociationDialogBody.vue')['default']
     WikidataSearchByLabel: typeof import('./src/components/notes/WikidataSearchByLabel.vue')['default']
     WikiPropertyValueField: typeof import('./src/components/form/WikiPropertyValueField.vue')['default']
-    WorkspaceIndexSettingsTabs: typeof import('./src/components/commons/WorkspaceIndexSettingsTabs.vue')['default']
+    WorkspaceReadmeSettingsTabs: typeof import('./src/components/commons/WorkspaceReadmeSettingsTabs.vue')['default']
   }
 }
 
@@ -423,7 +423,7 @@ declare global {
   const RichMarkdownEditor: typeof import('./src/components/form/RichMarkdownEditor.vue')['default']
   const RouterLink: typeof import('vue-router')['RouterLink']
   const RouterView: typeof import('vue-router')['RouterView']
-  const ScopedIndexNoteEditor: typeof import('./src/components/notebook/ScopedIndexNoteEditor.vue')['default']
+  const ScopedReadmeEditor: typeof import('./src/components/notebook/ScopedReadmeEditor.vue')['default']
   const ScrollTo: typeof import('./src/components/commons/ScrollTo.vue')['default']
   const SeamlessTextEditor: typeof import('./src/components/form/SeamlessTextEditor.vue')['default']
   const SearchDropdownHitList: typeof import('./src/components/search/SearchDropdownHitList.vue')['default']
@@ -496,5 +496,5 @@ declare global {
   const WikidataAssociationDialogBody: typeof import('./src/components/notes/WikidataAssociationDialogBody.vue')['default']
   const WikidataSearchByLabel: typeof import('./src/components/notes/WikidataSearchByLabel.vue')['default']
   const WikiPropertyValueField: typeof import('./src/components/form/WikiPropertyValueField.vue')['default']
-  const WorkspaceIndexSettingsTabs: typeof import('./src/components/commons/WorkspaceIndexSettingsTabs.vue')['default']
+  const WorkspaceReadmeSettingsTabs: typeof import('./src/components/commons/WorkspaceReadmeSettingsTabs.vue')['default']
 }

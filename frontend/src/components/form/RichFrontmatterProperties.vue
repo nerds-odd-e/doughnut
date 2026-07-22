@@ -115,7 +115,7 @@ import { computed, nextTick, provide, ref, useId, watch } from "vue"
 import RichFrontmatterReadOnlyList from "@/components/form/RichFrontmatterReadOnlyList.vue"
 import RichFrontmatterEditablePropertyRow from "@/components/form/RichFrontmatterEditablePropertyRow.vue"
 import RichFrontmatterInsertForm from "@/components/form/RichFrontmatterInsertForm.vue"
-import { richFrontmatterIsIndexContextKey } from "@/components/form/richFrontmatterProvide"
+import { richFrontmatterIsReadmeContextKey } from "@/components/form/richFrontmatterProvide"
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
 import { usePropertyMemoryTrackerGuard } from "@/composables/usePropertyMemoryTrackerGuard"
@@ -126,7 +126,7 @@ import {
   findPropertyRowIndexByExactKey,
   isListCapablePropertyKey,
   isRelationPropertyKey,
-  isReservedIndexOnlyPropertyKey,
+  isReservedReadmeOnlyPropertyKey,
   normalizePropertyRowForCommit,
   notePropertiesFromPropertyRows,
   parseNoteContentMarkdown,
@@ -153,8 +153,8 @@ const props = defineProps<{
   noteId?: number
   /** When true, properties UI is non-interactive (e.g. during image upload). */
   interactionLocked?: boolean
-  /** When true, insert/key presets include index-only keys (`title_pattern`, `question_generation_instruction`). */
-  isIndexContext?: boolean
+  /** When true, insert/key presets include readme-only keys (`title_pattern`, `question_generation_instruction`). */
+  isReadmeContext?: boolean
 }>()
 
 const emits = defineEmits<{
@@ -174,8 +174,8 @@ const insertKeyPresetListId = `${headingId}-insert-key-presets`
 
 const isReadOnly = computed(() => props.readOnly ?? false)
 
-const indexContextForProvide = computed(() => props.isIndexContext ?? false)
-provide(richFrontmatterIsIndexContextKey, indexContextForProvide)
+const indexContextForProvide = computed(() => props.isReadmeContext ?? false)
+provide(richFrontmatterIsReadmeContextKey, indexContextForProvide)
 
 const parsed = computed(() => parseNoteContentMarkdown(props.contentMarkdown))
 
@@ -248,11 +248,11 @@ function buildPropertyRows(): PropertyRow[] {
 }
 
 function filterForEmit(rows: PropertyRow[]): PropertyRow[] {
-  if (!props.isIndexContext) return rows
+  if (!props.isReadmeContext) return rows
   return rows.filter(
     (r) =>
       !(
-        isReservedIndexOnlyPropertyKey(r.key) &&
+        isReservedReadmeOnlyPropertyKey(r.key) &&
         !scalarStringFromPropertyRow(r)?.trim()
       )
   )

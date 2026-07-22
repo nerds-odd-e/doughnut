@@ -50,21 +50,21 @@ public class NoteRealmService {
     realm.setReferences(refNotes.stream().map(Note::getNoteTopology).toList());
     realm.setNotebookRealm(notebookCatalogService.notebookRealmFor(focus.getNotebook(), viewer));
     realm.setAncestorFolders(FolderTrailSegments.fromRootToContainingFolder(focus));
-    realm.setIndexNoteContent(resolveIndexNoteContentForNote(focus));
+    realm.setScopedReadmeContent(resolveScopedReadmeContentForNote(focus));
     return realm;
   }
 
-  public String resolveIndexNoteContentForFolder(Folder folder) {
+  public String resolveScopedReadmeContentForFolder(Folder folder) {
     if (folder.getNotebook() == null) {
       return null;
     }
-    return resolveIndexNoteContent(
+    return resolveScopedReadmeContent(
         FolderTrailSegments.fromRootToFolder(folder), folder.getNotebook());
   }
 
   /**
    * Every distinct {@code question_generation_instruction} on the trail to {@code focus}, each
-   * rendered as a source-labeled block. Order: notebook index, folders outermost → innermost, then
+   * rendered as a source-labeled block. Order: notebook readme, folders outermost → innermost, then
    * the focus note. Levels without a non-blank instruction are omitted; no level overrides another;
    * identical instruction text appears only once (outermost occurrence wins).
    */
@@ -76,13 +76,13 @@ public class NoteRealmService {
       addLabeledInstructionBlockIfDistinct(
           blocks,
           seenInstructionText,
-          notebook.getIndexContent(),
+          notebook.getReadmeContent(),
           "Instruction from notebook \"" + notebook.getName() + "\":");
       for (Folder folder : FolderTrailSegments.fromRootToContainingFolder(focus)) {
         addLabeledInstructionBlockIfDistinct(
             blocks,
             seenInstructionText,
-            folder.getIndexContent(),
+            folder.getReadmeContent(),
             "Instruction from folder \"" + folder.getName() + "\":");
       }
     }
@@ -98,22 +98,22 @@ public class NoteRealmService {
         .ifPresent(instruction -> blocks.add(label + "\n" + instruction));
   }
 
-  private String resolveIndexNoteContentForNote(Note focus) {
+  private String resolveScopedReadmeContentForNote(Note focus) {
     if (focus.getNotebook() == null) {
       return null;
     }
-    return resolveIndexNoteContent(
+    return resolveScopedReadmeContent(
         FolderTrailSegments.fromRootToContainingFolder(focus), focus.getNotebook());
   }
 
-  private String resolveIndexNoteContent(List<Folder> outerToInner, Notebook notebook) {
+  private String resolveScopedReadmeContent(List<Folder> outerToInner, Notebook notebook) {
     for (int i = outerToInner.size() - 1; i >= 0; i--) {
-      String content = outerToInner.get(i).getIndexContent();
+      String content = outerToInner.get(i).getReadmeContent();
       if (hasNonBlankTitlePatternInContent(content)) {
         return content;
       }
     }
-    String nbContent = notebook.getIndexContent();
+    String nbContent = notebook.getReadmeContent();
     return hasNonBlankTitlePatternInContent(nbContent) ? nbContent : null;
   }
 

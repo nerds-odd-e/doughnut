@@ -18,17 +18,17 @@
       </p>
     </div>
 
-    <WorkspaceIndexSettingsTabs
+    <WorkspaceReadmeSettingsTabs
       v-model="activeTab"
       test-id-prefix="notebook-workspace"
     />
 
-    <div v-if="activeTab === 'index'" data-testid="notebook-workspace-index">
-      <ScopedIndexNoteEditor
+    <div v-if="activeTab === 'readme'" data-testid="notebook-workspace-readme">
+      <ScopedReadmeEditor
         :notebook-id="notebook.id"
-        :index-content="indexContent"
+        :readme-content="readmeContent"
         flush
-        @saved="emit('index-content-updated')"
+        @saved="emit('readme-content-updated')"
       />
     </div>
 
@@ -48,10 +48,10 @@ import { ref, watch } from "vue"
 import type { Notebook, User } from "@generated/doughnut-backend-api"
 import NotebookPageNameEditor from "@/components/notebook/NotebookPageNameEditor.vue"
 import NotebookWorkspaceSettings from "@/components/notebook/NotebookWorkspaceSettings.vue"
-import ScopedIndexNoteEditor from "@/components/notebook/ScopedIndexNoteEditor.vue"
-import WorkspaceIndexSettingsTabs, {
-  type WorkspaceIndexSettingsTab,
-} from "@/components/commons/WorkspaceIndexSettingsTabs.vue"
+import ScopedReadmeEditor from "@/components/notebook/ScopedReadmeEditor.vue"
+import WorkspaceReadmeSettingsTabs, {
+  type WorkspaceReadmeSettingsTab,
+} from "@/components/commons/WorkspaceReadmeSettingsTabs.vue"
 
 const props = defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },
@@ -60,7 +60,7 @@ const props = defineProps({
     type: Function as PropType<() => Promise<void>>,
     required: true,
   },
-  indexContent: {
+  readmeContent: {
     type: String as PropType<string | null>,
     required: false,
     default: null,
@@ -69,10 +69,10 @@ const props = defineProps({
 
 const emit = defineEmits<{
   (e: "notebook-updated", notebook: Notebook): void
-  (e: "index-content-updated"): void
+  (e: "readme-content-updated"): void
 }>()
 
-const activeTab = ref<WorkspaceIndexSettingsTab>("index")
+const activeTab = ref<WorkspaceReadmeSettingsTab>("readme")
 
 const { skipMemoryTrackingEntirely } = props.notebook.notebookSettings
 

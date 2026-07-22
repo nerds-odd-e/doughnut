@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, inject, unref } from "vue"
 import {
-  richFrontmatterIsIndexContextFallback,
-  richFrontmatterIsIndexContextKey,
+  richFrontmatterIsReadmeContextFallback,
+  richFrontmatterIsReadmeContextKey,
 } from "@/components/form/richFrontmatterProvide"
 import type { PropertyRow } from "@/utils/noteContentFrontmatter"
 import { richModeKeyDropdownPresetKeysForPropertyRows } from "@/utils/noteContentFrontmatter"
@@ -16,14 +16,14 @@ const props = withDefaults(
   { propertyRows: () => [] }
 )
 
-const isIndexContextRef = inject(
-  richFrontmatterIsIndexContextKey,
-  richFrontmatterIsIndexContextFallback
+const isReadmeContextRef = inject(
+  richFrontmatterIsReadmeContextKey,
+  richFrontmatterIsReadmeContextFallback
 )
 
 const presetKeys = computed(() =>
   richModeKeyDropdownPresetKeysForPropertyRows(
-    unref(isIndexContextRef),
+    unref(isReadmeContextRef),
     props.propertyRows,
     { excludeRowIndex: props.excludeRowIndex }
   )

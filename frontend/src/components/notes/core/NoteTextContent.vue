@@ -23,7 +23,7 @@
         asMarkdown,
         wikiTitles,
         noteTitleForWikidataSearch: note.noteTopology.title,
-        isIndexContext,
+        isReadmeContext,
       }"
       @dead-link-click="$emit('deadLinkClick', $event)"
     />
@@ -42,7 +42,7 @@ defineProps({
   readonly: { type: Boolean, default: true },
   asMarkdown: Boolean,
   wikiTitles: { type: Array as PropType<WikiTitle[]>, required: true },
-  isIndexContext: { type: Boolean, default: false },
+  isReadmeContext: { type: Boolean, default: false },
   hasInboundReferences: { type: Boolean, default: false },
 })
 

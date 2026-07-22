@@ -1,7 +1,7 @@
 import { computed, type ComputedRef, type InjectionKey } from "vue"
 
-export const richFrontmatterIsIndexContextKey: InjectionKey<
+export const richFrontmatterIsReadmeContextKey: InjectionKey<
   ComputedRef<boolean>
-> = Symbol("richFrontmatterIsIndexContext")
+> = Symbol("richFrontmatterIsReadmeContext")
 
-export const richFrontmatterIsIndexContextFallback = computed(() => false)
+export const richFrontmatterIsReadmeContextFallback = computed(() => false)

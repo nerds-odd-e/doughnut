@@ -10,7 +10,7 @@ import lombok.Setter;
 
 @Schema(
     description =
-        "Notebook chrome, ancestor folder trail, and optional index note markdown for scoped title"
+        "Notebook chrome, ancestor folder trail, and optional scoped readme markdown for scoped title"
             + " patterns (shared by note and folder page realms).")
 @Getter
 @Setter
@@ -19,8 +19,8 @@ public class RealmNotebookSidebar {
   @NotNull
   @Schema(
       description =
-          "Notebook chrome: entity plus optional catalog hints and optional notebook index landing"
-              + " note id.")
+          "Notebook chrome: entity plus optional catalog hints and optional notebook readme"
+              + " content.")
   private NotebookRealm notebookRealm;
 
   @Schema(description = "Folders from notebook root outward; see each realm for trail semantics.")
@@ -29,7 +29,7 @@ public class RealmNotebookSidebar {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   @Schema(
       description =
-          "Full markdown of the designated index note that supplies the nearest non-blank title_pattern"
+          "Full markdown of the container readme that supplies the nearest non-blank title_pattern"
               + " (inner scope toward notebook root). Omitted when none applies.")
-  private String indexNoteContent;
+  private String scopedReadmeContent;
 }

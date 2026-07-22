@@ -17,8 +17,8 @@ When(
   }
 )
 
-When('I type and save the folder index with text {string}', (text: string) => {
-  folderPage().typeFolderIndexDraftAndSave(text)
+When('I type and save the folder readme with text {string}', (text: string) => {
+  folderPage().typeFolderReadmeDraftAndSave(text)
 })
 
 When(
@@ -32,8 +32,8 @@ When(
   }
 )
 
-Then('the folder index should contain {string}', (fragment: string) => {
-  folderPage().expectFolderIndexBodyContains(fragment)
+Then('the folder readme should contain {string}', (fragment: string) => {
+  folderPage().expectFolderReadmeBodyContains(fragment)
 })
 
 Then('the folder admin controls are present', () => {
@@ -44,11 +44,11 @@ Then('the folder admin controls are not present', () => {
   workspaceSurfaceLandmarks().expectFolderAdminControlsAbsent()
 })
 
-Then('folder Index and Settings tabs are present', () => {
+Then('folder Readme and Settings tabs are present', () => {
   workspaceSurfaceLandmarks().expectFolderWorkspaceTabsPresent()
 })
 
-Then('folder Index and Settings tabs are not present', () => {
+Then('folder Readme and Settings tabs are not present', () => {
   workspaceSurfaceLandmarks().expectFolderWorkspaceTabsAbsent()
 })
 

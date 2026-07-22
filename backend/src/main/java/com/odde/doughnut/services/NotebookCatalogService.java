@@ -58,7 +58,7 @@ public class NotebookCatalogService {
         notebook,
         hasAttachedBook(notebook),
         readonlyFor(notebook, viewer),
-        notebook.getIndexContent());
+        notebook.getReadmeContent());
   }
 
   public FolderRealm folderRealmFor(Notebook notebook, Folder folder, User viewer) {
@@ -72,10 +72,10 @@ public class NotebookCatalogService {
     return FolderRealm.of(
         chrome,
         FolderTrailSegments.ancestorsFromRootToParent(loaded),
-        noteRealmService.resolveIndexNoteContentForFolder(loaded),
+        noteRealmService.resolveScopedReadmeContentForFolder(loaded),
         loaded,
         parentFolderId,
-        loaded.getIndexContent());
+        loaded.getReadmeContent());
   }
 
   /**

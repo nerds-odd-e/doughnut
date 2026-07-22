@@ -21,6 +21,7 @@ import {
   type NoteNewFormSdkSpies,
 } from "@tests/notes/noteNewFormTestSupport"
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
+import { RESERVED_README_TITLE_MESSAGE } from "@/utils/reservedReadmeTitles"
 
 const popupsMock = {
   confirm: vi.fn().mockResolvedValue(false),
@@ -75,7 +76,7 @@ describe("NoteNewForm wikidata and soft-delete", () => {
     })
 
     it("displays reserved title error when api returns binding error for newTitle", async () => {
-      await setNoteNewFormTitle(wrapper, "index")
+      await setNoteNewFormTitle(wrapper, "readme")
 
       sdkSpies.mockedCreateNoteAtRoot.mockResolvedValueOnce({
         data: undefined,
@@ -83,8 +84,7 @@ describe("NoteNewForm wikidata and soft-delete", () => {
           message: "binding error",
           errorType: "BINDING_ERROR",
           errors: {
-            newTitle:
-              "'index' is reserved for notebook and folder index content.",
+            newTitle: RESERVED_README_TITLE_MESSAGE,
           },
         },
         request: {} as Request,

@@ -10,9 +10,9 @@
       :notebook="notebook"
       :user="user"
       :fetch-notebook-page="fetchNotebookPage"
-      :index-content="props.notebookRealm?.indexContent ?? null"
+      :readme-content="props.notebookRealm?.readmeContent ?? null"
       @notebook-updated="() => fetchNotebookPage()"
-      @index-content-updated="fetchNotebookPage"
+      @readme-content-updated="fetchNotebookPage"
     />
   </div>
 </template>

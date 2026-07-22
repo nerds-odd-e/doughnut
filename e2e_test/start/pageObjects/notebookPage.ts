@@ -30,7 +30,7 @@ const notebookPage = () => {
       return this
     },
 
-    expectIndexLandmarks(name: string) {
+    expectReadmeLandmarks(name: string) {
       cy.get('[data-testid="notebook-page-kind-label"]').should(
         'contain.text',
         'Notebook'
@@ -38,8 +38,8 @@ const notebookPage = () => {
       cy.get('[data-testid="notebook-page-summary"]')
         .find('h1')
         .should('contain.text', name)
-      cy.get('[data-testid="notebook-workspace-index"]').should('be.visible')
-      cy.get('[data-testid="notebook-index-editor"]').should('be.visible')
+      cy.get('[data-testid="notebook-workspace-readme"]').should('be.visible')
+      cy.get('[data-testid="notebook-readme-editor"]').should('be.visible')
       expectAdminSettingsAbsent()
       return this
     },
@@ -120,8 +120,8 @@ const notebookPage = () => {
       return this
     },
     ...sidebarChildNotePageMethods(),
-    typeNotebookIndexDraftAndSave(text: string) {
-      cy.get('[data-testid="notebook-index-editor"] .ql-editor')
+    typeNotebookReadmeDraftAndSave(text: string) {
+      cy.get('[data-testid="notebook-readme-editor"] .ql-editor')
         .should('be.visible')
         .click()
         .type(text, { delay: 0 })
@@ -129,9 +129,9 @@ const notebookPage = () => {
       pageIsNotLoading()
       return this
     },
-    expectNotebookIndexBodyContains(fragment: string) {
+    expectNotebookReadmeBodyContains(fragment: string) {
       pageIsNotLoading()
-      cy.get('[data-testid="notebook-index-body"] .ql-editor').should(
+      cy.get('[data-testid="notebook-readme-body"] .ql-editor').should(
         'contain.text',
         fragment
       )

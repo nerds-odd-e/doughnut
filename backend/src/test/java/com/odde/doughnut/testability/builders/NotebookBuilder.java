@@ -68,8 +68,8 @@ public class NotebookBuilder extends EntityBuilder<Notebook> {
     return this;
   }
 
-  public NotebookBuilder indexContent(String content) {
-    entity.setIndexContent(content);
+  public NotebookBuilder readmeContent(String content) {
+    entity.setReadmeContent(content);
     return this;
   }
 }

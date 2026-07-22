@@ -1,4 +1,4 @@
-import { INDEX_ONLY_PRESET_PROPERTY_KEYS } from "@/utils/noteContentFrontmatter"
+import { README_ONLY_PRESET_PROPERTY_KEYS } from "@/utils/noteContentFrontmatter"
 import { flushPromises } from "@vue/test-utils"
 import {
   commitCustomRelationText,
@@ -93,19 +93,19 @@ Paragraph.\n`
     expect(wrapper.text()).toContain("Add property")
   })
 
-  describe("index-only predefined properties", () => {
-    it("does not show index-only predefined rows when isIndexContext is false", async () => {
+  describe("readme-only predefined properties", () => {
+    it("does not show readme-only predefined rows when isReadmeContext is false", async () => {
       await h.mountEditor("# Body")
       await flushPromises()
 
       const keyValues = propertyRowKeyValues(editorRoot(h))
-      for (const key of INDEX_ONLY_PRESET_PROPERTY_KEYS) {
+      for (const key of README_ONLY_PRESET_PROPERTY_KEYS) {
         expect(keyValues).not.toContain(key)
       }
     })
 
-    it("empty index-only fields are not included in emitted YAML", async () => {
-      const wrapper = await h.mountEditor("# Body", { isIndexContext: true })
+    it("empty readme-only fields are not included in emitted YAML", async () => {
+      const wrapper = await h.mountEditor("# Body", { isReadmeContext: true })
       await emitQuillBodyHtml(wrapper, "<h1>Updated Body</h1>")
 
       const last = h.lastEmittedMarkdown()
@@ -113,14 +113,14 @@ Paragraph.\n`
       expect(last).toContain("Updated Body")
     })
 
-    it("index-only fields are shown when note already has those keys in frontmatter", async () => {
+    it("readme-only fields are shown when note already has those keys in frontmatter", async () => {
       const markdown = `---
 title_pattern: "{{date}}"
 question_generation_instruction: Focus on facts.
 ---
 
 # Body`
-      const wrapper = await h.mountEditor(markdown, { isIndexContext: true })
+      const wrapper = await h.mountEditor(markdown, { isReadmeContext: true })
       await flushPromises()
 
       const keyValues = propertyRowKeyValues(editorRoot(h))

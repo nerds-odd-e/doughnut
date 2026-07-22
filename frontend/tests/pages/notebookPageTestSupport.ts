@@ -21,19 +21,19 @@ export const notebookPageRouter = createRouter({
 
 export type MountNotebookPageOptions = {
   router?: Router
-  indexContent?: string
+  readmeContent?: string
 }
 
 export function mockNotebookGet(
   notebook: Notebook,
-  options: { indexContent?: string } = {}
+  options: { readmeContent?: string } = {}
 ) {
   return mockSdkService(NotebookController, "get", {
     notebook,
     hasAttachedBook: false,
     readonly: false,
-    ...(options.indexContent !== undefined
-      ? { indexContent: options.indexContent }
+    ...(options.readmeContent !== undefined
+      ? { readmeContent: options.readmeContent }
       : {}),
   })
 }
@@ -43,7 +43,7 @@ export function mountNotebookPage(
   options: MountNotebookPageOptions = {}
 ) {
   const router = options.router ?? notebookPageRouter
-  mockNotebookGet(notebook, { indexContent: options.indexContent })
+  mockNotebookGet(notebook, { readmeContent: options.readmeContent })
   const wrapper = helper
     .component(NotebookPageWithNotebookSidebarLayout)
     .withCleanStorage()
@@ -73,11 +73,11 @@ export async function navigateToNotebookPage(
   await flushPromises()
 }
 
-export function notebookIndexEditorEl(wrapper: VueWrapper) {
-  return wrapper.find('[data-testid="notebook-index-editor"]')
+export function notebookReadmeEditorEl(wrapper: VueWrapper) {
+  return wrapper.find('[data-testid="notebook-readme-editor"]')
 }
 
-export async function setNotebookIndexDraft(
+export async function setNotebookReadmeDraft(
   wrapper: VueWrapper,
   content: string
 ) {

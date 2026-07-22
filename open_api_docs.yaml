@@ -1801,6 +1801,33 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NoteRealm"
+  /api/notebooks/{notebook}/readme-content:
+    patch:
+      tags:
+      - notebook-controller
+      summary: Update notebook readme content directly
+      description: Saves the given markdown (with optional YAML frontmatter) as the
+        notebook container's readmeContent field. Blank content clears the field.
+      operationId: updateNotebookReadmeContent
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteUpdateContentDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NotebookRealm"
   /api/notebooks/{notebook}/notebook-group:
     patch:
       tags:
@@ -1848,40 +1875,13 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Notebook"
-  /api/notebooks/{notebook}/index-content:
-    patch:
-      tags:
-      - notebook-controller
-      summary: Update notebook index content directly
-      description: Saves the given markdown (with optional YAML frontmatter) as the
-        notebook container's indexContent field. Blank content clears the field.
-      operationId: updateNotebookIndexContent
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/NoteUpdateContentDTO"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/NotebookRealm"
   /api/notebooks/{notebook}/folders/{folder}:
     get:
       tags:
       - notebook-controller
       summary: Get folder page payload
       description: "Notebook chrome, folder metadata, parent folder id when nested,\
-        \ and designated folder index note id when resolved."
+        \ and optional folder readme content when present."
       operationId: getFolderPage
       parameters:
       - name: notebook
@@ -1961,14 +1961,14 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Folder"
-  /api/notebooks/{notebook}/folders/{folder}/index-content:
+  /api/notebooks/{notebook}/folders/{folder}/readme-content:
     patch:
       tags:
       - notebook-controller
-      summary: Update folder index content directly
+      summary: Update folder readme content directly
       description: Saves the given markdown (with optional YAML frontmatter) as the
-        folder container's indexContent field. Blank content clears the field.
-      operationId: updateFolderIndexContent
+        folder container's readmeContent field. Blank content clears the field.
+      operationId: updateFolderReadmeContent
       parameters:
       - name: notebook
         in: path
@@ -3361,7 +3361,7 @@ components:
         updatedAt:
           type: string
           format: date-time
-        indexContent:
+        readmeContent:
           type: string
       required:
       - createdAt
@@ -3409,7 +3409,7 @@ components:
         id:
           type: integer
           format: int32
-        indexContent:
+        readmeContent:
           type: string
         name:
           type: string
@@ -3458,7 +3458,7 @@ components:
         notebookRealm:
           $ref: "#/components/schemas/NotebookRealm"
           description: "Notebook chrome: entity plus optional catalog hints and optional\
-            \ notebook index landing note id."
+            \ notebook readme content."
         ancestorFolders:
           type: array
           description: Folders from notebook root outward; see each realm for trail
@@ -3473,11 +3473,11 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/WikiTitle"
-        indexNoteContent:
+        scopedReadmeContent:
           type: string
-          description: Full markdown of the designated index note that supplies the
-            nearest non-blank title_pattern (inner scope toward notebook root). Omitted
-            when none applies.
+          description: Full markdown of the container readme that supplies the nearest
+            non-blank title_pattern (inner scope toward notebook root). Omitted when
+            none applies.
       required:
       - id
       - note
@@ -3503,7 +3503,7 @@ components:
     NotebookRealm:
       type: object
       description: "Notebook chrome: entity plus optional catalog hints (attached\
-        \ book, readonly), and optional container-owned index markdown."
+        \ book, readonly), and optional container-owned readme markdown."
       properties:
         notebook:
           $ref: "#/components/schemas/Notebook"
@@ -3511,10 +3511,10 @@ components:
           type: boolean
         readonly:
           type: boolean
-        indexContent:
+        readmeContent:
           type: string
-          description: Container-owned notebook index markdown (populated by migration
-            from legacy index note). Omitted when absent.
+          description: Container-owned notebook readme markdown (populated by migration
+            from legacy container note). Omitted when absent.
       required:
       - notebook
     WikiTitle:
@@ -4387,23 +4387,23 @@ components:
       description: "Notebook chrome plus folder row for loading the folder page: same\
         \ shared realm sidebar as NoteRealm (without note-level fields), plus folder\
         \ identity, optional parent folder id, and optional container-owned folder\
-        \ index markdown."
+        \ readme markdown."
       properties:
         notebookRealm:
           $ref: "#/components/schemas/NotebookRealm"
           description: "Notebook chrome: entity plus optional catalog hints and optional\
-            \ notebook index landing note id."
+            \ notebook readme content."
         ancestorFolders:
           type: array
           description: Folders from notebook root outward; see each realm for trail
             semantics.
           items:
             $ref: "#/components/schemas/Folder"
-        indexNoteContent:
+        scopedReadmeContent:
           type: string
-          description: Full markdown of the designated index note that supplies the
-            nearest non-blank title_pattern (inner scope toward notebook root). Omitted
-            when none applies.
+          description: Full markdown of the container readme that supplies the nearest
+            non-blank title_pattern (inner scope toward notebook root). Omitted when
+            none applies.
         folder:
           $ref: "#/components/schemas/Folder"
         parentFolderId:
@@ -4411,10 +4411,10 @@ components:
           format: int32
           description: Parent folder id when this folder is nested; omitted at notebook
             root.
-        indexContent:
+        readmeContent:
           type: string
-          description: Container-owned folder index markdown (populated by migration
-            from legacy index note). Omitted when absent.
+          description: Container-owned folder readme markdown (populated by migration
+            from legacy container note). Omitted when absent.
       required:
       - folder
       - notebookRealm

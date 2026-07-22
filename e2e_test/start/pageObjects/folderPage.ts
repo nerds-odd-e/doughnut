@@ -7,11 +7,11 @@ const folderPage = () => ({
     return this
   },
 
-  typeFolderIndexDraftAndSave(text: string) {
-    cy.get('[data-testid="folder-index-editor"]')
+  typeFolderReadmeDraftAndSave(text: string) {
+    cy.get('[data-testid="folder-readme-editor"]')
       .scrollIntoView()
       .should('be.visible')
-    cy.get('[data-testid="folder-index-editor"] .ql-editor')
+    cy.get('[data-testid="folder-readme-editor"] .ql-editor')
       .should('be.visible')
       .click()
       .type(text, { delay: 0 })
@@ -19,12 +19,12 @@ const folderPage = () => ({
     pageIsNotLoading()
     return this
   },
-  expectFolderIndexBodyContains(fragment: string) {
+  expectFolderReadmeBodyContains(fragment: string) {
     pageIsNotLoading()
-    cy.get('[data-testid="folder-index-body"]')
+    cy.get('[data-testid="folder-readme-body"]')
       .scrollIntoView()
       .should('be.visible')
-    cy.get('[data-testid="folder-index-body"] .ql-editor').should(
+    cy.get('[data-testid="folder-readme-body"] .ql-editor').should(
       'contain.text',
       fragment
     )

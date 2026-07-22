@@ -82,7 +82,7 @@ describe("NotebookPageView.spec", () => {
       .withProps({
         notebook: nb,
         fetchNotebookPage: noopFetchNotebookPage,
-        indexContent: "Index canvas body",
+        readmeContent: "Readme canvas body",
       })
       .mount()
 
@@ -96,16 +96,16 @@ describe("NotebookPageView.spec", () => {
       wrapper.find('[data-testid="notebook-page-summary"]').text()
     ).toContain("Home cue")
     expect(
-      wrapper.find('[data-testid="notebook-workspace-index"]').exists()
+      wrapper.find('[data-testid="notebook-workspace-readme"]').exists()
     ).toBe(true)
-    expect(wrapper.find('[data-testid="notebook-index-editor"]').exists()).toBe(
-      true
-    )
+    expect(
+      wrapper.find('[data-testid="notebook-readme-editor"]').exists()
+    ).toBe(true)
     expect(
       wrapper
-        .find('[data-testid="notebook-index-body"]')
+        .find('[data-testid="notebook-readme-body"]')
         .classes()
-        .includes("scoped-index-note-editor--flush")
+        .includes("scoped-readme-editor--flush")
     ).toBe(true)
     expect(
       wrapper.find('[data-testid="notebook-workspace-settings"]').exists()
@@ -129,9 +129,9 @@ describe("NotebookPageView.spec", () => {
     expect(
       wrapper.find('[data-testid="notebook-workspace-settings"]').exists()
     ).toBe(false)
-    expect(wrapper.find('[data-testid="notebook-index-editor"]').exists()).toBe(
-      true
-    )
+    expect(
+      wrapper.find('[data-testid="notebook-readme-editor"]').exists()
+    ).toBe(true)
 
     await wrapper
       .get('[data-testid="notebook-workspace-tab-settings"]')
@@ -148,11 +148,11 @@ describe("NotebookPageView.spec", () => {
     expect(settings.text()).toContain("Update index")
     expect(settings.text()).toContain("Reset notebook index")
     expect(
-      wrapper.find('[data-testid="notebook-workspace-index"]').exists()
+      wrapper.find('[data-testid="notebook-workspace-readme"]').exists()
     ).toBe(false)
-    expect(wrapper.find('[data-testid="notebook-index-editor"]').exists()).toBe(
-      false
-    )
+    expect(
+      wrapper.find('[data-testid="notebook-readme-editor"]').exists()
+    ).toBe(false)
   })
 
   it("sends description when saving notebook settings", async () => {

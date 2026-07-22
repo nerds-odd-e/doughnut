@@ -6,9 +6,9 @@ import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDeboun
 import {
   hideSidebarButtonEl,
   mountNotebookPageReady,
-  notebookIndexEditorEl,
+  notebookReadmeEditorEl,
   notebookPageRouter,
-  setNotebookIndexDraft,
+  setNotebookReadmeDraft,
 } from "./notebookPageTestSupport"
 
 describe("NotebookPage.spec", () => {
@@ -39,50 +39,50 @@ describe("NotebookPage.spec", () => {
   })
 
   it.each([
-    { label: "no", indexContent: undefined as string | undefined },
+    { label: "no", readmeContent: undefined as string | undefined },
     {
       label: "existing",
-      indexContent: "# Existing notebook index",
+      readmeContent: "# Existing notebook readme",
     },
   ])(
-    "shows index editor when notebook has $label indexContent",
-    async ({ indexContent }) => {
+    "shows readme editor when notebook has $label readmeContent",
+    async ({ readmeContent }) => {
       const notebook = makeMe.aNotebook.please()
       const { wrapper } = await mountNotebookPageReady(notebook, {
-        indexContent,
+        readmeContent,
       })
 
-      expect(notebookIndexEditorEl(wrapper).exists()).toBe(true)
-      expect(wrapper.find('[data-testid="notebook-index-save"]').exists()).toBe(
-        false
-      )
+      expect(notebookReadmeEditorEl(wrapper).exists()).toBe(true)
+      expect(
+        wrapper.find('[data-testid="notebook-readme-save"]').exists()
+      ).toBe(false)
       wrapper.unmount()
     }
   )
 
-  it("auto-saves notebook index content after debounce", async () => {
+  it("auto-saves notebook readme content after debounce", async () => {
     vi.useFakeTimers()
     const notebook = makeMe.aNotebook.please()
     const saveSpy = vi
-      .spyOn(NotebookController, "updateNotebookIndexContent")
+      .spyOn(NotebookController, "updateNotebookReadmeContent")
       .mockResolvedValue(
         wrapSdkResponse({
           notebook,
           hasAttachedBook: false,
           readonly: false,
-          indexContent: "New notebook index",
+          readmeContent: "New notebook readme",
         })
       )
 
     const { wrapper } = await mountNotebookPageReady(notebook)
-    await setNotebookIndexDraft(wrapper, "New notebook index")
+    await setNotebookReadmeDraft(wrapper, "New notebook readme")
     await advanceNoteContentSaveDebounce()
 
     expect(saveSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         path: { notebook: notebook.id },
         body: expect.objectContaining({
-          content: expect.stringContaining("New notebook index"),
+          content: expect.stringContaining("New notebook readme"),
         }),
       })
     )

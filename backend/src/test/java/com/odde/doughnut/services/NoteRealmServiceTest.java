@@ -209,14 +209,14 @@ class NoteRealmServiceTest {
 
   @Test
   void notebook_index_applies_title_pattern_and_question_instruction_to_sibling_notes() {
-    String indexContent =
+    String readmeContent =
         "---\ntitle_pattern: \"{{date}}\"\nquestion_generation_instruction: Focus on definitions\n---\n";
-    makeMe.theNotebook(notebook).indexContent(indexContent).please();
+    makeMe.theNotebook(notebook).readmeContent(readmeContent).please();
     Note normal = makeMe.aNote().notebook(notebook).please();
 
     NoteRealm realm = noteRealmService.build(normal, user);
 
-    assertThat(realm.getIndexNoteContent(), equalTo(indexContent));
+    assertThat(realm.getScopedReadmeContent(), equalTo(readmeContent));
     List<String> blocks = noteRealmService.questionGenerationInstructionBlocks(normal);
     assertThat(blocks, hasSize(1));
     assertThat(blocks.get(0), containsString("Instruction from notebook"));
@@ -228,12 +228,13 @@ class NoteRealmServiceTest {
     "title_pattern, {{date}}",
     "titlePattern, {{date}}",
   })
-  void index_note_content_recognizes_title_pattern_key_aliases(String key, String value) {
-    String indexContent = "---\n" + key + ": \"" + value + "\"\n---\n";
-    makeMe.theNotebook(notebook).indexContent(indexContent).please();
+  void scoped_readme_content_recognizes_title_pattern_key_aliases(String key, String value) {
+    String readmeContent = "---\n" + key + ": \"" + value + "\"\n---\n";
+    makeMe.theNotebook(notebook).readmeContent(readmeContent).please();
     Note normal = makeMe.aNote().notebook(notebook).please();
 
-    assertThat(noteRealmService.build(normal, user).getIndexNoteContent(), equalTo(indexContent));
+    assertThat(
+        noteRealmService.build(normal, user).getScopedReadmeContent(), equalTo(readmeContent));
   }
 
   @ParameterizedTest
@@ -242,7 +243,10 @@ class NoteRealmServiceTest {
     "questionGenerationInstruction, Legacy key text",
   })
   void question_instruction_recognizes_instruction_key_aliases(String key, String text) {
-    makeMe.theNotebook(notebook).indexContent("---\n" + key + ": \"" + text + "\"\n---\n").please();
+    makeMe
+        .theNotebook(notebook)
+        .readmeContent("---\n" + key + ": \"" + text + "\"\n---\n")
+        .please();
     Note normal = makeMe.aNote().notebook(notebook).please();
 
     List<String> blocks = noteRealmService.questionGenerationInstructionBlocks(normal);
@@ -255,26 +259,27 @@ class NoteRealmServiceTest {
   void question_instruction_includes_every_level_ordered_notebook_then_folders_no_override() {
     makeMe
         .theNotebook(notebook)
-        .indexContent("---\ntitle_pattern: \"nb\"\nquestion_generation_instruction: nb-text\n---\n")
+        .readmeContent(
+            "---\ntitle_pattern: \"nb\"\nquestion_generation_instruction: nb-text\n---\n")
         .please();
 
     Folder outer = makeMe.aFolder().notebook(notebook).name("Outer").please();
     makeMe
         .theFolder(outer)
-        .indexContent(
+        .readmeContent(
             "---\ntitle_pattern: \"outer\"\nquestion_generation_instruction: outer-text\n---\n")
         .please();
 
     Folder inner = makeMe.aFolder().parentFolder(outer).name("Inner").please();
-    String innerIndex =
+    String innerReadme =
         "---\ntitle_pattern: \"inner\"\nquestion_generation_instruction: inner-text\n---\n";
-    makeMe.theFolder(inner).indexContent(innerIndex).please();
+    makeMe.theFolder(inner).readmeContent(innerReadme).please();
 
     Note inInner = makeMe.aNote().folder(inner).please();
 
     NoteRealm realm = noteRealmService.build(inInner, user);
 
-    assertThat(realm.getIndexNoteContent(), equalTo(innerIndex));
+    assertThat(realm.getScopedReadmeContent(), equalTo(innerReadme));
     List<String> blocks = noteRealmService.questionGenerationInstructionBlocks(inInner);
     assertThat(blocks, hasSize(3));
     assertThat(blocks.get(0), containsString("Instruction from notebook"));
@@ -288,18 +293,18 @@ class NoteRealmServiceTest {
   @Test
   void question_instruction_omits_levels_without_instruction() {
     Folder outer = makeMe.aFolder().notebook(notebook).name("Outer").please();
-    String outerIndex =
+    String outerReadme =
         "---\ntitle_pattern: \"outer\"\nquestion_generation_instruction: outer-only\n---\n";
-    makeMe.theFolder(outer).indexContent(outerIndex).please();
+    makeMe.theFolder(outer).readmeContent(outerReadme).please();
 
     Folder inner = makeMe.aFolder().parentFolder(outer).name("Inner").please();
-    makeMe.theFolder(inner).indexContent("---\nother: x\n---\n").please();
+    makeMe.theFolder(inner).readmeContent("---\nother: x\n---\n").please();
 
     Note inInner = makeMe.aNote().folder(inner).please();
 
     NoteRealm realm = noteRealmService.build(inInner, user);
 
-    assertThat(realm.getIndexNoteContent(), equalTo(outerIndex));
+    assertThat(realm.getScopedReadmeContent(), equalTo(outerReadme));
     List<String> blocks = noteRealmService.questionGenerationInstructionBlocks(inInner);
     assertThat(blocks, hasSize(1));
     assertThat(blocks.get(0), containsString("Instruction from folder \"Outer\":"));
@@ -310,13 +315,13 @@ class NoteRealmServiceTest {
   void question_instruction_deduplicates_identical_text_at_multiple_levels() {
     makeMe
         .theNotebook(notebook)
-        .indexContent("---\nquestion_generation_instruction: shared-text\n---\n")
+        .readmeContent("---\nquestion_generation_instruction: shared-text\n---\n")
         .please();
 
     Folder outer = makeMe.aFolder().notebook(notebook).name("Outer").please();
     makeMe
         .theFolder(outer)
-        .indexContent("---\nquestion_generation_instruction: shared-text\n---\n")
+        .readmeContent("---\nquestion_generation_instruction: shared-text\n---\n")
         .please();
 
     Note inOuter = makeMe.aNote().folder(outer).please();
@@ -328,16 +333,16 @@ class NoteRealmServiceTest {
   }
 
   @Test
-  void index_note_content_from_notebook_when_folder_index_content_has_no_title_pattern() {
+  void scoped_readme_content_from_notebook_when_folder_readme_has_no_title_pattern() {
     String nbContent = "---\ntitle_pattern: \"nb\"\n---\n";
-    makeMe.theNotebook(notebook).indexContent(nbContent).please();
+    makeMe.theNotebook(notebook).readmeContent(nbContent).please();
 
     Folder folder = makeMe.aFolder().notebook(notebook).please();
-    makeMe.theFolder(folder).indexContent("---\n---\n").please();
+    makeMe.theFolder(folder).readmeContent("---\n---\n").please();
 
     Note inFolder = makeMe.aNote().folder(folder).please();
 
-    assertThat(noteRealmService.build(inFolder, user).getIndexNoteContent(), equalTo(nbContent));
+    assertThat(noteRealmService.build(inFolder, user).getScopedReadmeContent(), equalTo(nbContent));
   }
 
   @Test
@@ -346,12 +351,12 @@ class NoteRealmServiceTest {
 
     NoteRealm realm = noteRealmService.build(normal, user);
 
-    assertThat(realm.getIndexNoteContent(), nullValue());
+    assertThat(realm.getScopedReadmeContent(), nullValue());
     assertThat(noteRealmService.questionGenerationInstructionBlocks(normal), empty());
   }
 
   @Test
-  void index_note_titled_for_deletion_does_not_supply_scoped_metadata() {
+  void soft_deleted_note_does_not_supply_scoped_readme_metadata() {
     makeMe
         .aNote()
         .notebook(notebook)
@@ -363,7 +368,7 @@ class NoteRealmServiceTest {
 
     NoteRealm realm = noteRealmService.build(normal, user);
 
-    assertThat(realm.getIndexNoteContent(), nullValue());
+    assertThat(realm.getScopedReadmeContent(), nullValue());
     assertThat(noteRealmService.questionGenerationInstructionBlocks(normal), empty());
   }
 

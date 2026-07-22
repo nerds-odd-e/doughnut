@@ -342,10 +342,12 @@ export const assumeNotePage = (
     },
     addRichNoteProperty(key: string, value: string) {
       cy.get('body').then(($body) => {
-        const folderIndexBody = $body.find('[data-testid="folder-index-body"]')
+        const folderReadmeBody = $body.find(
+          '[data-testid="folder-readme-body"]'
+        )
         const scope =
-          folderIndexBody.length > 0
-            ? cy.wrap(folderIndexBody.first())
+          folderReadmeBody.length > 0
+            ? cy.wrap(folderReadmeBody.first())
             : cy.findByRole(noteContentRegion.role, {
                 name: noteContentRegion.name,
               })
@@ -360,8 +362,8 @@ export const assumeNotePage = (
             .blur()
         })
         const focusScope =
-          folderIndexBody.length > 0
-            ? cy.wrap(folderIndexBody.first())
+          folderReadmeBody.length > 0
+            ? cy.wrap(folderReadmeBody.first())
             : cy.findByRole(noteContentRegion.role, {
                 name: noteContentRegion.name,
               })

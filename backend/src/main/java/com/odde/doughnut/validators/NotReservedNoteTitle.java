@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = ReservedNoteTitleValidator.class)
 public @interface NotReservedNoteTitle {
-  String message() default "'index' is reserved for notebook and folder index content.";
+  String message() default ReservedReadmeTitles.RESERVED_MESSAGE;
 
   Class<?>[] groups() default {};
 

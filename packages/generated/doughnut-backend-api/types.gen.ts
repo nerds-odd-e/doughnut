@@ -170,7 +170,7 @@ export type Notebook = {
     description?: string;
     createdAt: string;
     updatedAt: string;
-    indexContent?: string;
+    readmeContent?: string;
 };
 
 export type NotebookSettings = {
@@ -193,7 +193,7 @@ export type GlobalAiModelSettings = {
 
 export type Folder = {
     id: number;
-    indexContent?: string;
+    readmeContent?: string;
     name: string;
     createdAt: string;
     updatedAt: string;
@@ -214,7 +214,7 @@ export type NoteRealm = {
     id: number;
     note: Note;
     /**
-     * Notebook chrome: entity plus optional catalog hints and optional notebook index landing note id.
+     * Notebook chrome: entity plus optional catalog hints and optional notebook readme content.
      */
     notebookRealm: NotebookRealm;
     /**
@@ -224,9 +224,9 @@ export type NoteRealm = {
     references?: Array<NoteTopology>;
     wikiTitles?: Array<WikiTitle>;
     /**
-     * Full markdown of the designated index note that supplies the nearest non-blank title_pattern (inner scope toward notebook root). Omitted when none applies.
+     * Full markdown of the container readme that supplies the nearest non-blank title_pattern (inner scope toward notebook root). Omitted when none applies.
      */
-    indexNoteContent?: string;
+    scopedReadmeContent?: string;
 };
 
 export type NoteTopology = {
@@ -237,16 +237,16 @@ export type NoteTopology = {
 };
 
 /**
- * Notebook chrome: entity plus optional catalog hints (attached book, readonly), and optional container-owned index markdown.
+ * Notebook chrome: entity plus optional catalog hints (attached book, readonly), and optional container-owned readme markdown.
  */
 export type NotebookRealm = {
     notebook: Notebook;
     hasAttachedBook?: boolean;
     readonly?: boolean;
     /**
-     * Container-owned notebook index markdown (populated by migration from legacy index note). Omitted when absent.
+     * Container-owned notebook readme markdown (populated by migration from legacy container note). Omitted when absent.
      */
-    indexContent?: string;
+    readmeContent?: string;
 };
 
 export type WikiTitle = {
@@ -694,11 +694,11 @@ export type FolderRenameRequest = {
 };
 
 /**
- * Notebook chrome plus folder row for loading the folder page: same shared realm sidebar as NoteRealm (without note-level fields), plus folder identity, optional parent folder id, and optional container-owned folder index markdown.
+ * Notebook chrome plus folder row for loading the folder page: same shared realm sidebar as NoteRealm (without note-level fields), plus folder identity, optional parent folder id, and optional container-owned folder readme markdown.
  */
 export type FolderRealm = {
     /**
-     * Notebook chrome: entity plus optional catalog hints and optional notebook index landing note id.
+     * Notebook chrome: entity plus optional catalog hints and optional notebook readme content.
      */
     notebookRealm: NotebookRealm;
     /**
@@ -706,18 +706,18 @@ export type FolderRealm = {
      */
     ancestorFolders?: Array<Folder>;
     /**
-     * Full markdown of the designated index note that supplies the nearest non-blank title_pattern (inner scope toward notebook root). Omitted when none applies.
+     * Full markdown of the container readme that supplies the nearest non-blank title_pattern (inner scope toward notebook root). Omitted when none applies.
      */
-    indexNoteContent?: string;
+    scopedReadmeContent?: string;
     folder: Folder;
     /**
      * Parent folder id when this folder is nested; omitted at notebook root.
      */
     parentFolderId?: number;
     /**
-     * Container-owned folder index markdown (populated by migration from legacy index note). Omitted when absent.
+     * Container-owned folder readme markdown (populated by migration from legacy container note). Omitted when absent.
      */
-    indexContent?: string;
+    readmeContent?: string;
 };
 
 export type BookLastReadPositionRequest = {
@@ -998,7 +998,7 @@ export type NoteRealmWritable = {
     id: number;
     note: NoteWritable;
     /**
-     * Notebook chrome: entity plus optional catalog hints and optional notebook index landing note id.
+     * Notebook chrome: entity plus optional catalog hints and optional notebook readme content.
      */
     notebookRealm: NotebookRealm;
     /**
@@ -1008,9 +1008,9 @@ export type NoteRealmWritable = {
     references?: Array<NoteTopology>;
     wikiTitles?: Array<WikiTitle>;
     /**
-     * Full markdown of the designated index note that supplies the nearest non-blank title_pattern (inner scope toward notebook root). Omitted when none applies.
+     * Full markdown of the container readme that supplies the nearest non-blank title_pattern (inner scope toward notebook root). Omitted when none applies.
      */
-    indexNoteContent?: string;
+    scopedReadmeContent?: string;
 };
 
 export type MemoryTrackerWritable = {
@@ -2565,6 +2565,24 @@ export type UndoDeleteNoteResponses = {
 
 export type UndoDeleteNoteResponse = UndoDeleteNoteResponses[keyof UndoDeleteNoteResponses];
 
+export type UpdateNotebookReadmeContentData = {
+    body: NoteUpdateContentDto;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/readme-content';
+};
+
+export type UpdateNotebookReadmeContentResponses = {
+    /**
+     * OK
+     */
+    200: NotebookRealm;
+};
+
+export type UpdateNotebookReadmeContentResponse = UpdateNotebookReadmeContentResponses[keyof UpdateNotebookReadmeContentResponses];
+
 export type UpdateNotebookGroupData = {
     body: UpdateNotebookGroupRequest;
     path: {
@@ -2601,24 +2619,6 @@ export type MoveToCircleResponses = {
 };
 
 export type MoveToCircleResponse = MoveToCircleResponses[keyof MoveToCircleResponses];
-
-export type UpdateNotebookIndexContentData = {
-    body: NoteUpdateContentDto;
-    path: {
-        notebook: number;
-    };
-    query?: never;
-    url: '/api/notebooks/{notebook}/index-content';
-};
-
-export type UpdateNotebookIndexContentResponses = {
-    /**
-     * OK
-     */
-    200: NotebookRealm;
-};
-
-export type UpdateNotebookIndexContentResponse = UpdateNotebookIndexContentResponses[keyof UpdateNotebookIndexContentResponses];
 
 export type DissolveFolderData = {
     body?: never;
@@ -2677,24 +2677,24 @@ export type RenameFolderResponses = {
 
 export type RenameFolderResponse = RenameFolderResponses[keyof RenameFolderResponses];
 
-export type UpdateFolderIndexContentData = {
+export type UpdateFolderReadmeContentData = {
     body: NoteUpdateContentDto;
     path: {
         notebook: number;
         folder: number;
     };
     query?: never;
-    url: '/api/notebooks/{notebook}/folders/{folder}/index-content';
+    url: '/api/notebooks/{notebook}/folders/{folder}/readme-content';
 };
 
-export type UpdateFolderIndexContentResponses = {
+export type UpdateFolderReadmeContentResponses = {
     /**
      * OK
      */
     200: FolderRealm;
 };
 
-export type UpdateFolderIndexContentResponse = UpdateFolderIndexContentResponses[keyof UpdateFolderIndexContentResponses];
+export type UpdateFolderReadmeContentResponse = UpdateFolderReadmeContentResponses[keyof UpdateFolderReadmeContentResponses];
 
 export type GetNotebookBookReadingPositionData = {
     body?: never;

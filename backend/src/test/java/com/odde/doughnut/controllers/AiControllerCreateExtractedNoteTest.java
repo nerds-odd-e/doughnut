@@ -37,7 +37,7 @@ class AiControllerCreateExtractedNoteTest extends ControllerTestBase {
       Note testNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
       long noteCountBefore = noteRepository.count();
       NoteExtractionResult request =
-          extractionResult("index", "New note content.", "Updated parent.");
+          extractionResult("readme", "New note content.", "Updated parent.");
 
       ApiException thrown =
           assertThrows(ApiException.class, () -> controller.createExtractedNote(testNote, request));

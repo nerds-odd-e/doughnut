@@ -72,11 +72,11 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @Setter
   private NotebookGroup notebookGroup;
 
-  /** Container-owned index markdown (populated by migration; canonical from 10.15 onward). */
-  @Column(name = "index_content", columnDefinition = "mediumtext")
+  /** Container-owned readme markdown (populated by migration; canonical from 10.15 onward). */
+  @Column(name = "readme_content", columnDefinition = "mediumtext")
   @Getter
   @Setter
-  private String indexContent;
+  private String readmeContent;
 
   @Column(name = "description")
   @Getter

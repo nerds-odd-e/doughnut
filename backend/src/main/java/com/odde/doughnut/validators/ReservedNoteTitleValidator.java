@@ -11,6 +11,13 @@ public class ReservedNoteTitleValidator
     if (value == null) {
       return true;
     }
-    return !value.trim().equalsIgnoreCase("index");
+    if (!ReservedReadmeTitles.isReserved(value)) {
+      return true;
+    }
+    context.disableDefaultConstraintViolation();
+    context
+        .buildConstraintViolationWithTemplate(ReservedReadmeTitles.RESERVED_MESSAGE)
+        .addConstraintViolation();
+    return false;
   }
 }
