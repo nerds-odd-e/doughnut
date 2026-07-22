@@ -4,11 +4,11 @@ milestone: v1.0
 milestone_name: Notebook Lint & Auto-Fix
 current_phase: 6
 current_phase_name: User-level defaults
-status: ready_for_discuss
-stopped_at: Phase 6 context gathered
-last_updated: "2026-07-22T13:04:12.323Z"
+status: ready_for_planning
+stopped_at: Phase 6 research complete
+last_updated: "2026-07-22T13:10:00.000Z"
 last_activity: 2026-07-22
-last_activity_desc: Completed 05-02 expandable findings and Health E2E
+last_activity_desc: Phase 6 RESEARCH.md written (User-level defaults)
 progress:
   total_phases: 6
   completed_phases: 5
@@ -23,15 +23,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-22)
 
 **Core value:** From Notebook Settings → Health, a user can run lint and see actionable health findings — with optional bulk removal of empty folders when auto-fix is enabled.
-**Current focus:** Phase 6 — User-level defaults (discuss next)
+**Current focus:** Phase 6 — User-level defaults (plan next)
 
 ## Current Position
 
-Phase: 6 of 7 (User-level defaults) — Phase 5 complete
-Plan: discuss / plan Phase 6 next
-Status: Ready for phase 6 discuss
-Last activity: 2026-07-22 — Completed 05-02 expandable findings and Health E2E
-Resume file: .planning/phases/06-user-level-defaults/06-CONTEXT.md
+Phase: 6 of 7 (User-level defaults) — context + research complete
+Plan: `/gsd-plan-phase` for Phase 6
+Status: Ready for planning
+Last activity: 2026-07-22 — Phase 6 RESEARCH.md complete
+Resume file: .planning/phases/06-user-level-defaults/06-RESEARCH.md
 
 Progress: [██████████] 100% of planned plans through Phase 5 (9/9); Phases 6–7 TBD
 
