@@ -7,7 +7,6 @@ Short navigation index — start here before generated API files or long docs. S
 - Backend HTTP/API behavior: start in `backend/src/main/java/com/odde/doughnut/controllers/`, then follow services in `backend/src/main/java/com/odde/doughnut/services/` and entities/repositories in `backend/src/main/java/com/odde/doughnut/entities/`.
 - Backend tests: prefer controller-level tests under `backend/src/test/java/com/odde/doughnut/controllers/`; use `makeMe` fixtures and real database transactions.
 - Frontend pages and components: start in `frontend/src/pages/`, `frontend/src/components/`, `frontend/src/composables/`, and `frontend/src/store/`.
-- **Sketch findings for doughnut** (design decisions, CSS patterns, visual direction) → skill `sketch-findings-doughnut` (`.cursor/skills/sketch-findings-doughnut/`)
 - Frontend tests: use `frontend/tests/`; mock generated API calls with `mockSdkService()` and build API-shaped data with `doughnut-test-fixtures/makeMe`.
 - E2E behavior: start with `e2e_test/features/`, then the matching step definitions in `e2e_test/step_definitions/`, then page objects in `e2e_test/start/`.
 - CLI behavior: start in `cli/src/`; run focused CLI tests from `cli/` rather than broad workspace verification.

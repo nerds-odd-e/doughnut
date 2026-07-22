@@ -2,12 +2,7 @@
 
 ## Current
 
-- **Last completed plan:** `.planning/quick/001-notebook-workspace-home/` — notebook workspace home shipped
 - **Active plan:** none
+- **Next:** —
 
-## Shipped (notebook workspace home)
-
-- Notebook opens as Home / Settings workspace home (index primary on Home; admin on Settings)
-- Index autosave (notebook + folder) via shared debounce helper
-- Note / folder / notebook main-column landmarks stay distinct (`workspace_surface_landmarks.feature`)
-- Design notes: `.cursor/skills/sketch-findings-doughnut/`; sketches under `.planning/sketches/`
+Last completed work lives in product code and E2E (notebook Home/Settings workspace home; index autosave; surface landmarks). No active planning diary.
