@@ -5,10 +5,10 @@ milestone_name: Notebook Lint & Auto-Fix
 current_phase: 6
 current_phase_name: User-level defaults
 status: ready_for_planning
-stopped_at: Phase 6 research complete
-last_updated: "2026-07-22T13:10:00.000Z"
+stopped_at: Phase 6 UI-SPEC complete
+last_updated: "2026-07-22T13:15:00.000Z"
 last_activity: 2026-07-22
-last_activity_desc: Phase 6 RESEARCH.md written (User-level defaults)
+last_activity_desc: Phase 6 UI-SPEC.md written (User-level defaults design contract)
 progress:
   total_phases: 6
   completed_phases: 5
@@ -27,11 +27,11 @@ See: .planning/PROJECT.md (updated 2026-07-22)
 
 ## Current Position
 
-Phase: 6 of 7 (User-level defaults) — context + research complete
+Phase: 6 of 7 (User-level defaults) — context + research + UI-SPEC complete
 Plan: `/gsd-plan-phase` for Phase 6
 Status: Ready for planning
-Last activity: 2026-07-22 — Phase 6 RESEARCH.md complete
-Resume file: .planning/phases/06-user-level-defaults/06-RESEARCH.md
+Last activity: 2026-07-22 — Phase 6 UI-SPEC.md complete
+Resume file: .planning/phases/06-user-level-defaults/06-UI-SPEC.md
 
 Progress: [██████████] 100% of planned plans through Phase 5 (9/9); Phases 6–7 TBD
 
