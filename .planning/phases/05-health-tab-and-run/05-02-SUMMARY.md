@@ -119,7 +119,7 @@ status: complete
 1. **Task 1: Expandable findings from wire shape** - `26e79568f0` (feat)
 2. **Task 2: Targeted notebook_health E2E and landmarks** - `eb5b8b1ff3` (feat)
 
-**Plan metadata:** (pending docs commit)
+**Plan metadata:** `218a291739` (docs: complete plan)
 
 ## Files Created/Modified
 
