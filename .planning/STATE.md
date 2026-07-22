@@ -4,11 +4,11 @@ milestone: v1.0
 milestone_name: Notebook Lint & Auto-Fix
 current_phase: 2
 current_phase_name: Empty-folder findings
-status: ready_to_discuss
-stopped_at: Phase 2 context gathered
-last_updated: "2026-07-22T09:51:11.532Z"
+status: ready_to_plan
+stopped_at: Phase 2 research complete
+last_updated: "2026-07-22T09:56:00.000Z"
 last_activity: 2026-07-22
-last_activity_desc: Phase 1 complete (HealthRule runner + findings DTOs)
+last_activity_desc: Phase 2 research complete (empty-folder findings)
 progress:
   total_phases: 2
   completed_phases: 1
@@ -27,10 +27,10 @@ See: .planning/PROJECT.md (updated 2026-07-22)
 
 ## Current Position
 
-Phase: 2 of 7 (Empty-folder findings) — ready to discuss/plan
+Phase: 2 of 7 (Empty-folder findings) — ready to plan
 Plan: —
-Status: Phase 1 structure contract delivered
-Last activity: 2026-07-22 — Phase 1 complete (HealthRule runner + findings DTOs)
+Status: Phase 2 research complete (02-RESEARCH.md)
+Last activity: 2026-07-22 — Phase 2 research: EmptyFolderHealthRule + authorized lint API
 
 Progress: [█░░░░░░░░░] 14%
 
@@ -89,4 +89,4 @@ None yet.
 
 Last session: 2026-07-22T09:51:11.526Z
 Stopped at: Phase 2 context gathered
-Resume file: .planning/phases/02-empty-folder-findings/02-CONTEXT.md
+Resume file: .planning/phases/02-empty-folder-findings/02-RESEARCH.md
