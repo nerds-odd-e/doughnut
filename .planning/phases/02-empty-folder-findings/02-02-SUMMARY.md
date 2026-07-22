@@ -109,7 +109,7 @@ Each task was committed atomically:
 1. **Task 1: Add NotebookHealthController auth and report tests (RED)** - `993fff4e40` (test)
 2. **Task 2: Implement NotebookHealthController and regenerate OpenAPI client (GREEN)** - `7618245402` (feat)
 
-**Plan metadata:** (recorded after this summary)
+**Plan metadata:** `678cbc12e5` (docs: complete plan)
 
 ## Files Created/Modified
 - `backend/src/main/java/com/odde/doughnut/controllers/NotebookHealthController.java` - POST `/{notebook}/health/lint`
