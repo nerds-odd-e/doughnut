@@ -13,6 +13,7 @@ import NotePath from '../support/NotePath'
 import '../support/string_util'
 import start from '../start'
 import mock_services from '../start/mock_services'
+import workspaceSurfaceLandmarks from '../start/pageObjects/workspaceSurfaceLandmarks'
 
 defineParameterType({
   name: 'notepath',
@@ -453,6 +454,14 @@ Then(
 Then('I should be on a notebook folder page in the browser', () => {
   start.pageIsNotLoading()
   cy.location('pathname').should('match', /^\/notebooks\/\d+\/folders\/\d+$/)
+})
+
+Then('the note document toolbar is present', () => {
+  workspaceSurfaceLandmarks().expectNoteDocumentToolbarPresent()
+})
+
+Then('the note document toolbar is not present', () => {
+  workspaceSurfaceLandmarks().expectNoteDocumentToolbarAbsent()
 })
 
 Then('I should be on the notebook root page in the browser', () => {

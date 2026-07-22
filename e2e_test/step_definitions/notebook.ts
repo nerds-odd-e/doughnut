@@ -11,6 +11,7 @@ import {
 } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 import notebookPage from '../start/pageObjects/notebookPage'
+import workspaceSurfaceLandmarks from '../start/pageObjects/workspaceSurfaceLandmarks'
 import { pageIsNotLoading } from '../start/pageBase'
 
 Given('I choose to share my notebook {string}', (noteTopology: string) => {
@@ -118,6 +119,14 @@ When('I open the notebook workspace Settings tab', () => {
 
 Then('notebook admin settings sections are visible', () => {
   notebookPage().expectSettingsSectionsVisible()
+})
+
+Then('notebook Home and Settings tabs are present', () => {
+  workspaceSurfaceLandmarks().expectNotebookWorkspaceTabsPresent()
+})
+
+Then('notebook Home and Settings tabs are not present', () => {
+  workspaceSurfaceLandmarks().expectNotebookWorkspaceTabsAbsent()
 })
 
 When(

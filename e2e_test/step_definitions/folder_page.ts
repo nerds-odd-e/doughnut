@@ -7,6 +7,7 @@ import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 import folderPage from '../start/pageObjects/folderPage'
 import noteCreationForm from '../start/pageObjects/forms/noteCreationForm'
+import workspaceSurfaceLandmarks from '../start/pageObjects/workspaceSurfaceLandmarks'
 import { pageIsNotLoading } from '../start/pageBase'
 
 When(
@@ -33,6 +34,14 @@ When(
 
 Then('the folder index should contain {string}', (fragment: string) => {
   folderPage().expectFolderIndexBodyContains(fragment)
+})
+
+Then('the folder admin controls are present', () => {
+  workspaceSurfaceLandmarks().expectFolderAdminControlsPresent()
+})
+
+Then('the folder admin controls are not present', () => {
+  workspaceSurfaceLandmarks().expectFolderAdminControlsAbsent()
 })
 
 When('I reload the folder page', () => {
