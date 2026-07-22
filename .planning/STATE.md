@@ -4,16 +4,16 @@ milestone: v1.0
 milestone_name: Notebook Lint & Auto-Fix
 current_phase: 6
 current_phase_name: User-level defaults
-status: ready_to_execute
-stopped_at: Phase 6 plan-check passed
-last_updated: "2026-07-22T13:25:00.000Z"
+status: in_progress
+stopped_at: Completed 06-01-PLAN.md
+last_updated: "2026-07-22T13:26:12.601Z"
 last_activity: 2026-07-22
-last_activity_desc: Phase 6 plan-check passed; VALIDATION nyquist_compliant; ready for /gsd-execute-phase 6
+last_activity_desc: Completed 06-01 User preference persistence; next 06-02 Health UI Save/prefill
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 11
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # Project State
@@ -23,25 +23,25 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-22)
 
 **Core value:** From Notebook Settings → Health, a user can run lint and see actionable health findings — with optional bulk removal of empty folders when auto-fix is enabled.
-**Current focus:** Phase 6 — User-level defaults (execute next)
+**Current focus:** Phase 6 — User-level defaults (06-01 done; execute 06-02)
 
 ## Current Position
 
-Phase: 6 of 7 (User-level defaults) — plans ready
-Plan: `/gsd-execute-phase 6` (06-01 → 06-02)
-Status: Ready to execute
-Last activity: 2026-07-22 — Phase 6 plan-check passed (Nyquist signed off)
-Resume file: .planning/phases/06-user-level-defaults/06-01-PLAN.md
+Phase: 6 of 7 (User-level defaults) — 1/2 plans complete
+Plan: 06-02 (Health UI Save/prefill)
+Status: 06-01 complete; ready for 06-02
+Last activity: 2026-07-22 — Completed 06-01 (healthRemoveEmptyFoldersDefault persistence)
+Resume file: .planning/phases/06-user-level-defaults/06-02-PLAN.md
 
-Progress: [██████████] Phase 5 complete (9/9); Phase 6 planned 0/2; Phase 7 TBD
+Progress: [█████████░] 91%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 9
+- Total plans completed: 10
 - Average duration: ~5 min
-- Total execution time: ~48 min
+- Total execution time: ~54 min
 
 **By Phase:**
 
@@ -52,6 +52,7 @@ Progress: [██████████] Phase 5 complete (9/9); Phase 6 plann
 | 3. Readme-only folder findings | 1/1 | 1 | 6 min |
 | 4. Dead-link findings | 2/2 | 2 | 5.5 min |
 | 5. Health tab and Run | 2/2 | 2 | 6.5 min |
+| 6. User-level defaults | 1/2 | 2 | 6 min |
 
 **Per-Plan Metrics:**
 
@@ -66,6 +67,7 @@ Progress: [██████████] Phase 5 complete (9/9); Phase 6 plann
 | Phase 04 P02 | 6min | 2 tasks | 2 files |
 | Phase 05 P01 | 8min | 2 tasks | 7 files |
 | Phase 05 P02 | 5min | 2 tasks | 9 files |
+| Phase 06 P01 | 6min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -97,6 +99,8 @@ Recent decisions affecting current work:
 - Phase 5: includeHealth default false keeps Health off FolderPage
 - Phase 5: Extract findings into NotebookHealthFindings; panel keeps action bar + idle/Run
 - Phase 5: Primary E2E seeds all three finding types; separate AFIX-01 no-mutate scenario
+- Phase 6: Null-safe Objects.requireNonNullElse for healthRemoveEmptyFoldersDefault on updateUser
+- Phase 6: Health defaults persist on User column; ERD key-only exporter shows no non-key column change
 
 ### Pending Todos
 
@@ -114,6 +118,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-22T13:04:12.316Z
-Stopped at: Phase 6 context gathered
-Resume file: None
+Last session: 2026-07-22T13:26:12.595Z
+Stopped at: Completed 06-01-PLAN.md
+Resume file: .planning/phases/06-user-level-defaults/06-02-PLAN.md

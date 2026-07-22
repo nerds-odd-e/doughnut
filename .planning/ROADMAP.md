@@ -152,15 +152,16 @@ Plans:
   2. Opening Health prefills run options from the user’s saved defaults
   3. Prefilling defaults does not apply fixes or mutate notebook data on open
 
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
-- [ ] 06-01-PLAN.md — Persist healthRemoveEmptyFoldersDefault on User (Flyway + DTO + updateUser + OpenAPI regen)
+
+- [x] 06-01-PLAN.md — Persist healthRemoveEmptyFoldersDefault on User (Flyway + DTO + updateUser + OpenAPI regen)
 - [ ] 06-02-PLAN.md — Health prefill + Save as defaults + cross-notebook notebook_health E2E
 
 **Wave 1**
 
-- [ ] 06-01-PLAN.md — Backend User column + DTO + updateUser + tests + OpenAPI regen
+- [x] 06-01-PLAN.md — Backend User column + DTO + updateUser + tests + OpenAPI regen
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -198,7 +199,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 3. Readme-only folder findings | 1/1 | Complete | 2026-07-22 |
 | 4. Dead-link findings | 2/2 | Complete | 2026-07-22 |
 | 5. Health tab and Run | 2/2 | Complete | 2026-07-22 |
-| 6. User-level defaults | 0/2 | Not started | - |
+| 6. User-level defaults | 1/2 | In Progress|  |
 | 7. Gated empty-folder purge | 0/TBD | Not started | - |
 
 ## Coverage

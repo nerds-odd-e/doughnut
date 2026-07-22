@@ -33,7 +33,7 @@
 
 ### User defaults
 
-- [ ] **DFLT-01**: User can save Health lint/auto-fix option defaults at **user** level (apply across notebooks)
+- [x] **DFLT-01**: User can save Health lint/auto-fix option defaults at **user** level (apply across notebooks)
 - [ ] **DFLT-02**: Opening Health prefills run options from the user’s saved defaults
 
 ## v2 Requirements
@@ -88,7 +88,7 @@ Deferred; not in current roadmap.
 | HLTH-02 | Phase 5 | Complete |
 | HLTH-03 | Phase 5 | Complete |
 | AFIX-01 | Phase 5 | Complete |
-| DFLT-01 | Phase 6 | Pending |
+| DFLT-01 | Phase 6 | Complete |
 | DFLT-02 | Phase 6 | Pending |
 | AFIX-02 | Phase 7 | Pending |
 | AFIX-03 | Phase 7 | Pending |
