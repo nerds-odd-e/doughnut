@@ -388,6 +388,63 @@ export type NotebookUpdateRequest = {
     name?: string;
 };
 
+export type HealthFindingGroup = {
+    /**
+     * Stable rule id
+     */
+    ruleId: string;
+    /**
+     * Human-readable rule title
+     */
+    title: string;
+    /**
+     * Rule severity
+     */
+    severity: 'error' | 'warning' | 'info';
+    /**
+     * Whether findings in this group can be auto-fixed
+     */
+    autoFixable: boolean;
+    /**
+     * Leaf findings for this group
+     */
+    items?: Array<HealthFindingItem>;
+    /**
+     * Nested finding groups (e.g. per-note dead links)
+     */
+    children?: Array<HealthFindingGroup>;
+};
+
+export type HealthFindingItem = {
+    /**
+     * Target folder id when the finding refers to a folder
+     */
+    folderId?: number;
+    /**
+     * Target note id when the finding refers to a note
+     */
+    noteId?: number;
+    /**
+     * Short display label for the finding target
+     */
+    label?: string;
+    /**
+     * Optional human-readable detail message
+     */
+    message?: string;
+    /**
+     * Optional wiki-link token for dead-link findings
+     */
+    wikiLinkToken?: string;
+};
+
+export type NotebookHealthLintReport = {
+    /**
+     * Finding groups, typically one per health rule
+     */
+    groups?: Array<HealthFindingGroup>;
+};
+
 /**
  * Create a folder under notebook root, nested under an explicit parent folder, or nested under the folder of a context note.
  */
@@ -1893,6 +1950,24 @@ export type ResetNotebookIndexResponses = {
      */
     200: unknown;
 };
+
+export type LintData = {
+    body?: never;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/health/lint';
+};
+
+export type LintResponses = {
+    /**
+     * OK
+     */
+    200: NotebookHealthLintReport;
+};
+
+export type LintResponse = LintResponses[keyof LintResponses];
 
 export type CreateFolderData = {
     body: FolderCreationRequest;

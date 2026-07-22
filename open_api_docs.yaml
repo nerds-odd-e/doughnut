@@ -993,6 +993,24 @@ paths:
       responses:
         "200":
           description: OK
+  /api/notebooks/{notebook}/health/lint:
+    post:
+      tags:
+      - notebook-health-controller
+      operationId: lint
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NotebookHealthLintReport"
   /api/notebooks/{notebook}/folders:
     post:
       tags:
@@ -3771,6 +3789,68 @@ components:
           maxLength: 150
           minLength: 0
           pattern: "^[^\\\\/:]*$"
+    HealthFindingGroup:
+      type: object
+      properties:
+        ruleId:
+          type: string
+          description: Stable rule id
+        title:
+          type: string
+          description: Human-readable rule title
+        severity:
+          type: string
+          description: Rule severity
+          enum:
+          - error
+          - warning
+          - info
+        autoFixable:
+          type: boolean
+          description: Whether findings in this group can be auto-fixed
+        items:
+          type: array
+          description: Leaf findings for this group
+          items:
+            $ref: "#/components/schemas/HealthFindingItem"
+        children:
+          type: array
+          description: Nested finding groups (e.g. per-note dead links)
+          items:
+            $ref: "#/components/schemas/HealthFindingGroup"
+      required:
+      - autoFixable
+      - ruleId
+      - severity
+      - title
+    HealthFindingItem:
+      type: object
+      properties:
+        folderId:
+          type: integer
+          format: int32
+          description: Target folder id when the finding refers to a folder
+        noteId:
+          type: integer
+          format: int32
+          description: Target note id when the finding refers to a note
+        label:
+          type: string
+          description: Short display label for the finding target
+        message:
+          type: string
+          description: Optional human-readable detail message
+        wikiLinkToken:
+          type: string
+          description: Optional wiki-link token for dead-link findings
+    NotebookHealthLintReport:
+      type: object
+      properties:
+        groups:
+          type: array
+          description: "Finding groups, typically one per health rule"
+          items:
+            $ref: "#/components/schemas/HealthFindingGroup"
     FolderCreationRequest:
       type: object
       description: "Create a folder under notebook root, nested under an explicit\
