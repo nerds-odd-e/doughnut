@@ -86,7 +86,7 @@ status: complete
 1. **Task 1: Add nested findings DTO construction test (RED)** - `c08488bb47` (test)
 2. **Task 2: Implement OpenAPI-ready findings DTOs (GREEN)** - `fd8890da90` (feat)
 
-**Plan metadata:** (pending docs commit)
+**Plan metadata:** `ae0dfbb3dd` (docs: complete plan)
 
 ## Files Created/Modified
 
