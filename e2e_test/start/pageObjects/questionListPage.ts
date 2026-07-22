@@ -14,5 +14,19 @@ export const questionListPage = () => {
         })
       })
     },
+    deleteQuestion(questionStem: string) {
+      cy.intercept('POST', '**/api/predefined-questions/**/delete').as(
+        'deleteQuestion'
+      )
+      cy.contains('.question-table tr', questionStem)
+        .findByRole('button', { name: 'Delete question' })
+        .click()
+      cy.wait('@deleteQuestion').then(({ response }) => {
+        expect(response?.statusCode, 'delete question').to.equal(200)
+      })
+    },
+    expectNoQuestions() {
+      cy.findByText('No questions')
+    },
   }
 }
