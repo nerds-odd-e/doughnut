@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Readme-only folder findings** - Behavior: note-empty folders with non-blank readme as a separate finding type
 - [x] **Phase 4: Dead-link findings** - Behavior: lint reports dead wiki links in body and frontmatter (report-only)
 - [x] **Phase 5: Health tab and Run** - Behavior: Health tab with Run lint and expandable nested findings (no mutation on Run)
-- [ ] **Phase 6: User-level defaults** - Behavior: save and prefill Health run options at user level
+- [x] **Phase 6: User-level defaults** - Behavior: save and prefill Health run options at user level
 - [ ] **Phase 7: Gated empty-folder purge** - Behavior: optional bulk remove of fully empty folders via dedicated purge
 
 ## Phase Details
@@ -152,20 +152,20 @@ Plans:
   2. Opening Health prefills run options from the user’s saved defaults
   3. Prefilling defaults does not apply fixes or mutate notebook data on open
 
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans executed
 
 Plans:
 
 - [x] 06-01-PLAN.md — Persist healthRemoveEmptyFoldersDefault on User (Flyway + DTO + updateUser + OpenAPI regen)
-- [ ] 06-02-PLAN.md — Health prefill + Save as defaults + cross-notebook notebook_health E2E
+- [x] 06-02-PLAN.md — Health prefill + Save as defaults + cross-notebook notebook_health E2E
 
 **Wave 1**
 
 - [x] 06-01-PLAN.md — Backend User column + DTO + updateUser + tests + OpenAPI regen
 
-**Wave 2** *(blocked on Wave 1 completion)*
+**Wave 2**
 
-- [ ] 06-02-PLAN.md — Frontend prefill + Save + frontend tests + E2E
+- [x] 06-02-PLAN.md — Frontend prefill + Save + frontend tests + E2E
 
 **UI hint:** yes
 
@@ -199,7 +199,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 3. Readme-only folder findings | 1/1 | Complete | 2026-07-22 |
 | 4. Dead-link findings | 2/2 | Complete | 2026-07-22 |
 | 5. Health tab and Run | 2/2 | Complete | 2026-07-22 |
-| 6. User-level defaults | 1/2 | In Progress|  |
+| 6. User-level defaults | 2/2 | In Progress|  |
 | 7. Gated empty-folder purge | 0/TBD | Not started | - |
 
 ## Coverage
