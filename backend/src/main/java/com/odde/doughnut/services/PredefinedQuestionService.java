@@ -38,6 +38,14 @@ public class PredefinedQuestionService {
     return predefinedQuestion;
   }
 
+  public PredefinedQuestion deleteQuestion(PredefinedQuestion predefinedQuestion) {
+    Notebook parentNotebook = predefinedQuestion.getNote().getNotebook();
+    parentNotebook.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+    entityPersister.save(parentNotebook);
+    entityPersister.remove(predefinedQuestion);
+    return predefinedQuestion;
+  }
+
   public PredefinedQuestion refineAIQuestion(Note note, PredefinedQuestion predefinedQuestion) {
     MCQWithAnswer aiGeneratedRefineQuestion =
         aiQuestionGenerator.getAiGeneratedRefineQuestion(
