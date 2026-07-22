@@ -17,20 +17,30 @@
       :data-testid="`${testIdPrefix}-tab-settings`"
       @click.prevent="model = 'settings'"
     >Settings</a>
+    <a
+      v-if="includeHealth"
+      :class="tabClass('health')"
+      role="button"
+      href="#"
+      :data-testid="`${testIdPrefix}-tab-health`"
+      @click.prevent="model = 'health'"
+    >Health</a>
   </div>
 </template>
 
 <script setup lang="ts">
-export type WorkspaceReadmeSettingsTab = "readme" | "settings"
+export type WorkspaceReadmeSettingsTab = "readme" | "settings" | "health"
 
 const model = defineModel<WorkspaceReadmeSettingsTab>({ required: true })
 
 withDefaults(
   defineProps<{
     testIdPrefix?: string
+    includeHealth?: boolean
   }>(),
   {
     testIdPrefix: "workspace",
+    includeHealth: false,
   }
 )
 

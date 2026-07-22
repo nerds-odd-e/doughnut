@@ -21,6 +21,7 @@
     <WorkspaceReadmeSettingsTabs
       v-model="activeTab"
       test-id-prefix="notebook-workspace"
+      include-health
     />
 
     <div v-if="activeTab === 'readme'" data-testid="notebook-workspace-readme">
@@ -33,11 +34,16 @@
     </div>
 
     <NotebookWorkspaceSettings
-      v-else
+      v-else-if="activeTab === 'settings'"
       :notebook="notebook"
       :user="user"
       :settings-body="formData"
       @notebook-updated="(n) => emit('notebook-updated', n)"
+    />
+
+    <NotebookHealthPanel
+      v-else-if="activeTab === 'health'"
+      :notebook-id="notebook.id"
     />
   </div>
 </template>
@@ -46,6 +52,7 @@
 import type { PropType } from "vue"
 import { ref, watch } from "vue"
 import type { Notebook, User } from "@generated/doughnut-backend-api"
+import NotebookHealthPanel from "@/components/notebook/NotebookHealthPanel.vue"
 import NotebookPageNameEditor from "@/components/notebook/NotebookPageNameEditor.vue"
 import NotebookWorkspaceSettings from "@/components/notebook/NotebookWorkspaceSettings.vue"
 import ScopedReadmeEditor from "@/components/notebook/ScopedReadmeEditor.vue"

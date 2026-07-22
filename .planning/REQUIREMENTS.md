@@ -7,8 +7,8 @@
 
 ### Health surface
 
-- [ ] **HLTH-01**: User can open a **Health** tab on notebook settings (alongside Index/Settings), without a separate `/health` route or findings dialog
-- [ ] **HLTH-02**: User can explicitly **Run lint** for the current notebook (on-demand; opening Health does not mutate data)
+- [x] **HLTH-01**: User can open a **Health** tab on notebook settings (alongside Index/Settings), without a separate `/health` route or findings dialog
+- [x] **HLTH-02**: User can explicitly **Run lint** for the current notebook (on-demand; opening Health does not mutate data)
 - [ ] **HLTH-03**: User can review **expandable nested findings** on the Health tab (grouped by rule; dead links nested by note) with an action bar for fix options
 
 ### Empty folders
@@ -25,7 +25,7 @@
 
 ### Auto-fix
 
-- [ ] **AFIX-01**: Auto-fix is an **optional** run option; lint never deletes or mutates on Run alone
+- [x] **AFIX-01**: Auto-fix is an **optional** run option; lint never deletes or mutates on Run alone
 - [ ] **AFIX-02**: The only v1 fix action is bulk **remove empty folders** (no per-folder multi-select)
 - [ ] **AFIX-03**: **Fix** is enabled only when the user has selected the bulk “remove empty folders” option
 - [ ] **AFIX-04**: Bulk remove deletes only **fully empty** folder trees (no notes in subtree and no meaningful readme); folders in the separate “readme only” finding type are **not** deleted by this fix
@@ -84,10 +84,10 @@ Deferred; not in current roadmap.
 | DLNK-01 | Phase 4 | Complete |
 | DLNK-02 | Phase 4 | Complete |
 | DLNK-03 | Phase 4 | Complete |
-| HLTH-01 | Phase 5 | Pending |
-| HLTH-02 | Phase 5 | Pending |
+| HLTH-01 | Phase 5 | Complete |
+| HLTH-02 | Phase 5 | Complete |
 | HLTH-03 | Phase 5 | Pending |
-| AFIX-01 | Phase 5 | Pending |
+| AFIX-01 | Phase 5 | Complete |
 | DFLT-01 | Phase 6 | Pending |
 | DFLT-02 | Phase 6 | Pending |
 | AFIX-02 | Phase 7 | Pending |

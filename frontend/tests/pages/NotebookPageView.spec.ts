@@ -110,6 +110,12 @@ describe("NotebookPageView.spec", () => {
     expect(
       wrapper.find('[data-testid="notebook-workspace-settings"]').exists()
     ).toBe(false)
+    expect(
+      wrapper.find('[data-testid="notebook-workspace-health"]').exists()
+    ).toBe(false)
+    expect(
+      wrapper.find('[data-testid="notebook-workspace-tab-health"]').exists()
+    ).toBe(true)
     expect(wrapper.text()).not.toContain("Notebook Management")
     expect(wrapper.text()).not.toContain("Notebook Settings")
     expect(wrapper.text()).not.toContain("Notebook Indexing")
@@ -117,6 +123,36 @@ describe("NotebookPageView.spec", () => {
     expect(wrapper.text()).not.toContain("Skip Memory Tracking")
     expect(wrapper.text()).not.toContain("Update index")
     expect(wrapper.text()).not.toContain("Reset notebook index")
+  })
+
+  it("shows Health panel and hides Settings after opening Health tab", async () => {
+    const wrapper = helper
+      .component(NotebookPageView)
+      .withRouter()
+      .withProps({ notebook, fetchNotebookPage: noopFetchNotebookPage })
+      .mount()
+
+    expect(
+      wrapper.find('[data-testid="notebook-workspace-health"]').exists()
+    ).toBe(false)
+    expect(
+      wrapper.find('[data-testid="notebook-workspace-settings"]').exists()
+    ).toBe(false)
+
+    await wrapper
+      .get('[data-testid="notebook-workspace-tab-health"]')
+      .trigger("click")
+    await flushPromises()
+
+    expect(
+      wrapper.find('[data-testid="notebook-workspace-health"]').exists()
+    ).toBe(true)
+    expect(
+      wrapper.find('[data-testid="notebook-workspace-settings"]').exists()
+    ).toBe(false)
+    expect(
+      wrapper.find('[data-testid="notebook-workspace-readme"]').exists()
+    ).toBe(false)
   })
 
   it("shows admin sections only after opening Settings tab", async () => {

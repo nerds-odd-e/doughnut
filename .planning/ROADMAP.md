@@ -126,12 +126,12 @@ Plans:
   3. User can review **expandable nested findings** on the Health tab (grouped by rule; dead links nested by note) with an action bar for fix options
   4. Auto-fix is an **optional** run option; Run alone never deletes or mutates notebook data
 
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 05-01-PLAN.md — Health tab shell + action bar + Run lint (idle→report groups; AFIX-01 unit)
+- [x] 05-01-PLAN.md — Health tab shell + action bar + Run lint (idle→report groups; AFIX-01 unit)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -184,7 +184,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 2. Empty-folder findings | 2/2 | Complete | 2026-07-22 |
 | 3. Readme-only folder findings | 1/1 | Complete | 2026-07-22 |
 | 4. Dead-link findings | 2/2 | Complete | 2026-07-22 |
-| 5. Health tab and Run | 0/2 | Planned | - |
+| 5. Health tab and Run | 1/2 | In Progress|  |
 | 6. User-level defaults | 0/TBD | Not started | - |
 | 7. Gated empty-folder purge | 0/TBD | Not started | - |
 
