@@ -5,10 +5,10 @@ milestone_name: Notebook Lint & Auto-Fix
 current_phase: 5
 current_phase_name: Health tab and Run
 status: ready
-stopped_at: Phase 5 research complete
-last_updated: "2026-07-22T12:15:00.000Z"
+stopped_at: Phase 5 UI-SPEC complete
+last_updated: "2026-07-22T12:20:00.000Z"
 last_activity: 2026-07-22
-last_activity_desc: Phase 5 RESEARCH.md written; ready for planning
+last_activity_desc: Phase 5 UI-SPEC.md written; ready for plan-phase
 progress:
   total_phases: 5
   completed_phases: 4
@@ -27,11 +27,11 @@ See: .planning/PROJECT.md (updated 2026-07-22)
 
 ## Current Position
 
-Phase: 5 of 7 (Health tab and Run) — research complete, ready to plan
+Phase: 5 of 7 (Health tab and Run) — UI-SPEC complete, ready to plan
 Plan: (none active — Phase 4 complete)
-Status: Phase 5 research complete — frontend Health tab + Run consumes existing lint API
-Last activity: 2026-07-22 — Phase 5 RESEARCH.md committed
-Resume file: .planning/phases/05-health-tab-and-run/05-RESEARCH.md
+Status: Phase 5 UI-SPEC complete — DaisyUI Health tab contract locked for planner
+Last activity: 2026-07-22 — Phase 5 UI-SPEC.md written
+Resume file: .planning/phases/05-health-tab-and-run/05-UI-SPEC.md
 
 Progress: [████░░░░░░] 57% (4/7 phases)
 
