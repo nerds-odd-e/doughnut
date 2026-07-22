@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Notebook Lint & Auto-Fix
-current_phase: 5
-current_phase_name: Health tab and Run
-status: in_progress
-stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-07-22T12:25:28.557Z"
+current_phase: 6
+current_phase_name: User-level defaults
+status: ready_for_discuss
+stopped_at: Completed 05-02-PLAN.md; Phase 5 complete — ready for phase 6 discuss
+last_updated: "2026-07-22T12:33:30Z"
 last_activity: 2026-07-22
-last_activity_desc: Completed 05-01 Health tab and Run
+last_activity_desc: Completed 05-02 expandable findings and Health E2E; Phase 5 complete
 progress:
-  total_phases: 5
-  completed_phases: 4
+  total_phases: 7
+  completed_phases: 5
   total_plans: 9
-  completed_plans: 8
+  completed_plans: 9
 ---
 
 # Project State
@@ -23,25 +23,25 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-22)
 
 **Core value:** From Notebook Settings → Health, a user can run lint and see actionable health findings — with optional bulk removal of empty folders when auto-fix is enabled.
-**Current focus:** Phase 5 — Health tab and Run (05-02 next)
+**Current focus:** Phase 6 — User-level defaults (discuss next)
 
 ## Current Position
 
-Phase: 5 of 7 (Health tab and Run) — 05-01 complete
-Plan: 05-02 (Wave 2) next
-Status: In progress — findings expand/collapse polish + E2E
-Last activity: 2026-07-22 — Completed 05-01 Health tab and Run
-Resume file: .planning/phases/05-health-tab-and-run/05-02-PLAN.md
+Phase: 6 of 7 (User-level defaults) — Phase 5 complete
+Plan: discuss / plan Phase 6 next
+Status: Ready for phase 6 discuss
+Last activity: 2026-07-22 — Completed 05-02 expandable findings and Health E2E
+Resume file: None
 
-Progress: [█████████░] 89% (8/9 plans)
+Progress: [██████████] 100% of planned plans through Phase 5 (9/9); Phases 6–7 TBD
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 8
+- Total plans completed: 9
 - Average duration: ~5 min
-- Total execution time: ~43 min
+- Total execution time: ~48 min
 
 **By Phase:**
 
@@ -51,6 +51,7 @@ Progress: [█████████░] 89% (8/9 plans)
 | 2. Empty-folder findings | 2/2 | 2 | 6 min |
 | 3. Readme-only folder findings | 1/1 | 1 | 6 min |
 | 4. Dead-link findings | 2/2 | 2 | 5.5 min |
+| 5. Health tab and Run | 2/2 | 2 | 6.5 min |
 
 **Per-Plan Metrics:**
 
@@ -64,6 +65,7 @@ Progress: [█████████░] 89% (8/9 plans)
 | Phase 04 P01 | 5min | 2 tasks | 7 files |
 | Phase 04 P02 | 6min | 2 tasks | 2 files |
 | Phase 05 P01 | 8min | 2 tasks | 7 files |
+| Phase 05 P02 | 5min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -92,8 +94,9 @@ Recent decisions affecting current work:
 - Phase 4: Dead = viewer-readable WikiLinkResolver unresolved; extract via wikiLinkInnersInOccurrenceOrder; live sources only; distinct tokens; nest by note; autoFixable=false; always emit (D-01..D-13)
 - HealthRunContext requires User viewer; unresolvedWikiLinkTokens uses viewer-readable resolveToken only
 - DeadWikiLinkHealthRule: children-by-note nesting; top items empty; report-only
-- Phase 5: Findings inline in NotebookHealthPanel; collapse polish deferred to 05-02
 - Phase 5: includeHealth default false keeps Health off FolderPage
+- Phase 5: Extract findings into NotebookHealthFindings; panel keeps action bar + idle/Run
+- Phase 5: Primary E2E seeds all three finding types; separate AFIX-01 no-mutate scenario
 
 ### Pending Todos
 
@@ -111,6 +114,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-22T12:25:28.551Z
-Stopped at: Completed 05-01-PLAN.md
-Resume file: .planning/phases/05-health-tab-and-run/05-02-PLAN.md
+Last session: 2026-07-22T12:33:02.579Z
+Stopped at: Completed 05-02-PLAN.md; Phase 5 complete — ready for phase 6 discuss
+Resume file: None

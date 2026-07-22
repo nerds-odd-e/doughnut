@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Empty-folder findings** - Behavior: authorized lint reports recursive empty folders (report-only)
 - [x] **Phase 3: Readme-only folder findings** - Behavior: note-empty folders with non-blank readme as a separate finding type
 - [x] **Phase 4: Dead-link findings** - Behavior: lint reports dead wiki links in body and frontmatter (report-only)
-- [ ] **Phase 5: Health tab and Run** - Behavior: Health tab with Run lint and expandable nested findings (no mutation on Run)
+- [x] **Phase 5: Health tab and Run** - Behavior: Health tab with Run lint and expandable nested findings (no mutation on Run)
 - [ ] **Phase 6: User-level defaults** - Behavior: save and prefill Health run options at user level
 - [ ] **Phase 7: Gated empty-folder purge** - Behavior: optional bulk remove of fully empty folders via dedicated purge
 
@@ -126,7 +126,7 @@ Plans:
   3. User can review **expandable nested findings** on the Health tab (grouped by rule; dead links nested by note) with an action bar for fix options
   4. Auto-fix is an **optional** run option; Run alone never deletes or mutates notebook data
 
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans executed
 
 Plans:
 **Wave 1**
@@ -135,7 +135,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 05-02-PLAN.md — Expandable findings polish + targeted notebook_health E2E + landmarks
+- [x] 05-02-PLAN.md — Expandable findings polish + targeted notebook_health E2E + landmarks
 
 **UI hint:** yes
 
@@ -184,7 +184,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 2. Empty-folder findings | 2/2 | Complete | 2026-07-22 |
 | 3. Readme-only folder findings | 1/1 | Complete | 2026-07-22 |
 | 4. Dead-link findings | 2/2 | Complete | 2026-07-22 |
-| 5. Health tab and Run | 1/2 | In Progress|  |
+| 5. Health tab and Run | 2/2 | Complete | 2026-07-22 |
 | 6. User-level defaults | 0/TBD | Not started | - |
 | 7. Gated empty-folder purge | 0/TBD | Not started | - |
 
