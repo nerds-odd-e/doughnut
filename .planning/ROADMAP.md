@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Health lint contract** - Structure: shared findings DTOs and rule-registry skeleton for the first lint rule
 - [x] **Phase 2: Empty-folder findings** - Behavior: authorized lint reports recursive empty folders (report-only)
-- [ ] **Phase 3: Readme-only folder findings** - Behavior: note-empty folders with non-blank readme as a separate finding type
+- [x] **Phase 3: Readme-only folder findings** - Behavior: note-empty folders with non-blank readme as a separate finding type
 - [ ] **Phase 4: Dead-link findings** - Behavior: lint reports dead wiki links in body and frontmatter (report-only)
 - [ ] **Phase 5: Health tab and Run** - Behavior: Health tab with Run lint and expandable nested findings (no mutation on Run)
 - [ ] **Phase 6: User-level defaults** - Behavior: save and prefill Health run options at user level
@@ -81,12 +81,12 @@ Plans:
   2. Fully empty folders (no notes in subtree and no meaningful readme) remain only under the empty-folder findings group
   3. Lint remains report-only (no deletes or mutations)
 
-**Plans:** 1 plan
+**Plans:** 1/1 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 03-01-PLAN.md — Shared FolderSubtreeLiveNotes + ReadmeOnlyFolderHealthRule + mutual-exclusion tests (EFOL-03)
+- [x] 03-01-PLAN.md — Shared FolderSubtreeLiveNotes + ReadmeOnlyFolderHealthRule + mutual-exclusion tests (EFOL-03)
 
 ### Phase 4: Dead-link findings
 
@@ -163,7 +163,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 |-------|----------------|--------|-----------|
 | 1. Health lint contract | 2/2 | Complete | 2026-07-22 |
 | 2. Empty-folder findings | 2/2 | Complete | 2026-07-22 |
-| 3. Readme-only folder findings | 0/1 | Planned | - |
+| 3. Readme-only folder findings | 1/1 | Complete | 2026-07-22 |
 | 4. Dead-link findings | 0/TBD | Not started | - |
 | 5. Health tab and Run | 0/TBD | Not started | - |
 | 6. User-level defaults | 0/TBD | Not started | - |

@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Notebook Lint & Auto-Fix
-current_phase: 3
-current_phase_name: Readme-only folder findings
+current_phase: 4
+current_phase_name: Dead-link findings
 status: ready
-stopped_at: Phase 3 planning complete
-last_updated: "2026-07-22T10:37:40.247Z"
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-07-22T10:44:56.241Z"
 last_activity: 2026-07-22
-last_activity_desc: Phase 3 03-01-PLAN.md written
+last_activity_desc: Phase 3 03-01 executed — readme_only_folders findings delivered
 progress:
-  total_phases: 3
-  completed_phases: 2
+  total_phases: 7
+  completed_phases: 3
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
 ---
 
 # Project State
@@ -23,24 +23,24 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-22)
 
 **Core value:** From Notebook Settings → Health, a user can run lint and see actionable health findings — with optional bulk removal of empty folders when auto-fix is enabled.
-**Current focus:** Phase 3 — Readme-only folder findings (planned → execute next)
+**Current focus:** Phase 4 — Dead-link findings (next)
 
 ## Current Position
 
-Phase: 3 of 7 (Readme-only folder findings) — planned
-Plan: 03-01 (next: `/gsd-execute-phase 3`)
-Status: Phase 3 plan complete — ready for execution
-Last activity: 2026-07-22 — Phase 3 03-01-PLAN.md written
+Phase: 4 of 7 (Dead-link findings) — ready to plan/execute
+Plan: (none active — Phase 3 complete)
+Status: Phase 3 complete — EFOL-03 delivered
+Last activity: 2026-07-22 — Phase 3 03-01 executed (readme_only_folders)
 
-Progress: [███░░░░░░░] 29% (2/7 phases)
+Progress: [████░░░░░░] 43% (3/7 phases)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 4
+- Total plans completed: 5
 - Average duration: ~5 min
-- Total execution time: ~18 min
+- Total execution time: ~24 min
 
 **By Phase:**
 
@@ -48,6 +48,7 @@ Progress: [███░░░░░░░] 29% (2/7 phases)
 |-------|-------|-------|----------|
 | 1. Health lint contract | 2 | 2 | 3 min |
 | 2. Empty-folder findings | 2/2 | 2 | 6 min |
+| 3. Readme-only folder findings | 1/1 | 1 | 6 min |
 
 **Per-Plan Metrics:**
 
@@ -57,6 +58,7 @@ Progress: [███░░░░░░░] 29% (2/7 phases)
 | Phase 01 P02 | 3min | 2 tasks | 6 files |
 | Phase 02 P01 | 8min | 2 tasks | 3 files |
 | Phase 02 P02 | 4min | 2 tasks | 7 files |
+| Phase 03 P01 | 6min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -79,6 +81,9 @@ Recent decisions affecting current work:
 - Phase 2: Dedicated NotebookHealthController (not NotebookController) for cohesion and 250-line discipline
 - Phase 2: Owner write auth only via assertAuthorization (never assertReadAuthorization)
 - Phase 2: No request DTO / fix options for Phase 2 lint (D-09)
+- Phase 3: Own non-blank readme only — no ancestor inheritance (D-02)
+- Phase 3: readme_only_folders autoFixable=false (D-07)
+- Phase 3: Shared FolderSubtreeLiveNotes.noteEmptyFolderItems for complementary gates (D-10)
 
 ### Pending Todos
 
@@ -96,6 +101,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-22T10:37:40.240Z
-Stopped at: Phase 3 planning complete
-Resume file: .planning/phases/03-readme-only-folder-findings/03-01-PLAN.md
+Last session: 2026-07-22T10:44:56.236Z
+Stopped at: Completed 03-01-PLAN.md
+Resume file: None

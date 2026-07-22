@@ -15,7 +15,7 @@
 
 - [x] **EFOL-01**: Lint reports folders whose **entire subtree has no notes** (recursive emptiness; soft-deleted notes do not count as content)
 - [x] **EFOL-02**: When auto-fix is not selected, user can see the list of empty folders under the empty-folder findings group
-- [ ] **EFOL-03**: Lint reports note-empty folders that still have non-blank **readme** (`readmeContent`) as a **separate finding type** (not lumped with fully empty folders)
+- [x] **EFOL-03**: Lint reports note-empty folders that still have non-blank **readme** (`readmeContent`) as a **separate finding type** (not lumped with fully empty folders)
 
 ### Dead wiki links
 
@@ -80,7 +80,7 @@ Deferred; not in current roadmap.
 |-------------|-------|--------|
 | EFOL-01 | Phase 2 | Complete |
 | EFOL-02 | Phase 2 | Complete |
-| EFOL-03 | Phase 3 | Pending |
+| EFOL-03 | Phase 3 | Complete |
 | DLNK-01 | Phase 4 | Pending |
 | DLNK-02 | Phase 4 | Pending |
 | DLNK-03 | Phase 4 | Pending |
