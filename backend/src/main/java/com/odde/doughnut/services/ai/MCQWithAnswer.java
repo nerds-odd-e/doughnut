@@ -29,11 +29,11 @@ public class MCQWithAnswer {
   private boolean choicesMayBeShuffled = true;
 
   @JsonPropertyDescription(
-      "Internal summary of the specific focus-note knowledge point tested. Not shown to the learner.")
+      "Internal summary of the specific focus-note knowledge point tested. Up to a few sentences, at most 50 words. Not shown to the learner.")
   private String testedFocus;
 
   @JsonPropertyDescription(
-      "Internal explanation of why the solution choice is uniquely correct. Keep concise: 1 short sentence, at most 25 words. Not shown to the learner.")
+      "Internal explanation of why the solution choice is uniquely correct and the other choices are incorrect. Note ambiguity if any. Up to a few sentences, at most 100 words. Not shown to the learner.")
   private String validationRationale;
 
   @JsonIgnore
