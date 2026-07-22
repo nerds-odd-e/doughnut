@@ -4,15 +4,15 @@ milestone: v1.0
 milestone_name: Notebook Lint & Auto-Fix
 current_phase: 6
 current_phase_name: User-level defaults
-status: ready_for_planning
-stopped_at: Phase 6 UI-SPEC complete
-last_updated: "2026-07-22T13:15:00.000Z"
+status: ready_to_execute
+stopped_at: Phase 6 plans created
+last_updated: "2026-07-22T13:20:00.000Z"
 last_activity: 2026-07-22
-last_activity_desc: Phase 6 UI-SPEC.md written (User-level defaults design contract)
+last_activity_desc: Phase 6 PLAN.md files written (06-01 backend, 06-02 frontend+E2E)
 progress:
-  total_phases: 6
+  total_phases: 7
   completed_phases: 5
-  total_plans: 9
+  total_plans: 11
   completed_plans: 9
 ---
 
@@ -23,17 +23,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-22)
 
 **Core value:** From Notebook Settings → Health, a user can run lint and see actionable health findings — with optional bulk removal of empty folders when auto-fix is enabled.
-**Current focus:** Phase 6 — User-level defaults (plan next)
+**Current focus:** Phase 6 — User-level defaults (execute next)
 
 ## Current Position
 
-Phase: 6 of 7 (User-level defaults) — context + research + UI-SPEC complete
-Plan: `/gsd-plan-phase` for Phase 6
-Status: Ready for planning
-Last activity: 2026-07-22 — Phase 6 UI-SPEC.md complete
-Resume file: .planning/phases/06-user-level-defaults/06-UI-SPEC.md
+Phase: 6 of 7 (User-level defaults) — plans ready
+Plan: `/gsd-execute-phase 6` (06-01 → 06-02)
+Status: Ready to execute
+Last activity: 2026-07-22 — Phase 6 PLAN.md files created
+Resume file: .planning/phases/06-user-level-defaults/06-01-PLAN.md
 
-Progress: [██████████] 100% of planned plans through Phase 5 (9/9); Phases 6–7 TBD
+Progress: [██████████] Phase 5 complete (9/9); Phase 6 planned 0/2; Phase 7 TBD
 
 ## Performance Metrics
 
