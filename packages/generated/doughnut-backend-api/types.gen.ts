@@ -83,6 +83,7 @@ export type User = {
     ownership?: Ownership;
     dailyAssimilationCount?: number;
     spaceIntervals?: string;
+    healthRemoveEmptyFoldersDefault?: boolean;
     admin?: boolean;
 };
 
@@ -725,6 +726,7 @@ export type UserDto = {
     name: string;
     dailyAssimilationCount?: number;
     spaceIntervals?: string;
+    healthRemoveEmptyFoldersDefault?: boolean;
 };
 
 export type NoteUpdateTitleDto = {

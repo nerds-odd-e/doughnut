@@ -14,6 +14,7 @@ class UserBuilder extends Builder<User> {
       ownership: { id: 0 },
       dailyAssimilationCount: 5,
       spaceIntervals: '',
+      healthRemoveEmptyFoldersDefault: false,
       admin: false,
     }
   }

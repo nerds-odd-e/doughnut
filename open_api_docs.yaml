@@ -3202,6 +3202,8 @@ components:
           format: int32
         spaceIntervals:
           type: string
+        healthRemoveEmptyFoldersDefault:
+          type: boolean
         admin:
           type: boolean
       required:
@@ -4422,6 +4424,8 @@ components:
         spaceIntervals:
           type: string
           pattern: "^\\d+((,\\s*\\d+){1,1000})*$"
+        healthRemoveEmptyFoldersDefault:
+          type: boolean
       required:
       - name
     NoteUpdateTitleDTO:

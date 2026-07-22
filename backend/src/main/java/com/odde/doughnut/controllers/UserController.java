@@ -25,6 +25,7 @@ import java.security.Principal;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,6 +91,8 @@ class UserController {
     user.setName(updates.getName());
     user.setSpaceIntervals(updates.getSpaceIntervals());
     user.setDailyAssimilationCount(updates.getDailyAssimilationCount());
+    user.setHealthRemoveEmptyFoldersDefault(
+        Objects.requireNonNullElse(updates.getHealthRemoveEmptyFoldersDefault(), false));
     entityPersister.save(user);
     return user;
   }
