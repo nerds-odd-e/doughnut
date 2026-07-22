@@ -2,9 +2,9 @@
 
 ## Current
 
-- **Active plan:** `.planning/quick/001-cancelable-followups/PLAN.md`
-- **Phase:** 3 — Structure (planned) — Prune dead/redundant cancel tests
-- **Next:** Execute Phase 3
+- **Active plan:** `.planning/quick/001-cancelable-followups/PLAN.md` — **complete**
+- **Phase:** all done (1–3)
+- **Next:** none for this plan (cleanup of spent planning history optional)
 
 ## Progress
 
@@ -12,7 +12,7 @@
 | --- | --- | --- |
 | 001-cancelable-followups | 1 Nested remove / cancelable layout | done |
 | 001-cancelable-followups | 2 Overlay align-items fallback | done |
-| 001-cancelable-followups | 3 Prune dead/redundant cancel tests | planned |
+| 001-cancelable-followups | 3 Prune dead/redundant cancel tests | done |
 
 ## Notes
 
@@ -26,3 +26,6 @@ template `@click` needs `() => loadRefinementLayout()` after parameterization.
 
 **Phase 2 learning:** Dual `align-items` (`center` then `safe center`) is the
 intentional CSS cascade fallback; not duplication to collapse.
+
+**Phase 3 learning:** Stack concurrent-blocker / Cancel idempotency lives in
+LoadingModal; NoteRefinement cancel specs keep domain post-cancel UI only.

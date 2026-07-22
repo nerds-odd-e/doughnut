@@ -12,9 +12,6 @@ const sources = import.meta.glob("../../src/**/*.{ts,vue}", {
 
 const CANCELABLE_TRUE = /cancelable\s*:\s*true/g
 const NEW_ABORT_CONTROLLER = /new\s+AbortController\b/g
-/** AbortError-name matching (e.g. error.name === "AbortError"), not bare identifiers. */
-const ABORT_ERROR_NAME_MATCH =
-  /(?:\.name\s*===?\s*['"]AbortError['"]|['"]AbortError['"]\s*===?\s*\w+\.name)/g
 
 const ALLOWED_CANCELABLE_FILES = new Set([
   "components/recall/NoteRefinement.vue",
@@ -60,13 +57,6 @@ describe("cancelable allowlist", () => {
 describe("managedApi-only abort ownership", () => {
   it("keeps new AbortController only under managedApi/", () => {
     const outside = hitsFor(NEW_ABORT_CONTROLLER).filter(
-      (h) => !h.rel.startsWith("managedApi/")
-    )
-    expect(outside).toEqual([])
-  })
-
-  it("keeps AbortError-name matching only under managedApi/", () => {
-    const outside = hitsFor(ABORT_ERROR_NAME_MATCH).filter(
       (h) => !h.rel.startsWith("managedApi/")
     )
     expect(outside).toEqual([])

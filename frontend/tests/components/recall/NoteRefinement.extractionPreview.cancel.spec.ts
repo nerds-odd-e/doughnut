@@ -35,14 +35,6 @@ vi.mock("vue-toastification", () => ({
 setupNoteRefinementTests()
 
 describe("NoteRefinement extraction preview cancel", () => {
-  it("shows blocking Cancel while preview generates", async () => {
-    await mountNoteRefinementPendingExtractionPreview()
-
-    expect(loadingModalMask()).toBeTruthy()
-    expect(document.body.textContent).toContain("AI is generating preview...")
-    expect(document.body.textContent).toContain("Cancel")
-  })
-
   it("cancels from Extract: stays on layout, keeps selection, silent, ignores late data", async () => {
     const { wrapper, resolve } =
       await mountNoteRefinementPendingExtractionPreview(

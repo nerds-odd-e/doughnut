@@ -87,31 +87,30 @@ engines that ignore `safe center` keep `center`.
 
 ---
 
-### Phase 3 — Structure — planned
+### Phase 3 — Structure — done
 
 **Structure change (no product behavior change):** Remove dead and
 overlapping cancellation tests so the next reader maintains one contract
 suite + domain cancel outcomes only.
 
-**Delete or collapse (capability-preserving):**
-- `LoadingModal.spec.ts`: “requires cancel identity and action as one
-  component control” (type-only / useless runtime).
-- `cancelableAllowlist.spec.ts`: AbortError-name matching describe/it (no
-  product hits; docs forbid inventing AbortError matching).
-- Layout + extraction: “shows blocking Cancel while … generates” when fully
-  subsumed by cancel happy-path tests in the same files.
-- Triplicated “older concurrent blocker” / second-Cancel idempotency: keep
-  **one** stack-level proof (prefer `LoadingModal.spec.ts` or
-  `clientSetup.loading.spec.ts`); drop duplicate copies from NoteRefinement
-  cancel specs **unless** they assert domain-unique UI (then keep only the
-  domain-unique assertions).
-- Vacuous `expect(olderCall).toBeTruthy()` wherever it remains.
+**Deleted / collapsed:**
+- `LoadingModal.spec.ts` type-only cancel-control test.
+- Allowlist AbortError-name matching gate (kept `cancelable: true` +
+  AbortController ownership).
+- Layout + extraction “shows blocking Cancel while … generates” smokes.
+- Duplicate NoteRefinement concurrent-blocker suites; layout second-Cancel
+  idempotency (stack proof remains in `LoadingModal.spec.ts`).
+- Extraction second-Cancel kept only for domain-unique selection retention
+  (`keeps layout selection after a second Cancel click`).
+- Vacuous `expect(olderCall).toBeTruthy()`.
 
-**Do not delete:** domain cancel outcomes (late layout/preview ignored,
-retry, create-note Cancel-absent, allowlist `cancelable: true` file gate).
+**Kept:** domain cancel outcomes (late data ignored, retry, create-note
+Cancel-absent, allowlist file gate); LoadingModal concurrent-blocker stack
+proof.
 
-**Done when:** Focused cancel/remove/LoadingModal/allowlist tests green;
-fewer redundant cases; observable cancel behavior unchanged.
+**Learnings:** Prefer stack-level concurrent-blocker / Cancel idempotency
+in LoadingModal (or clientSetup); NoteRefinement cancel specs should assert
+domain post-cancel UI only.
 
 ---
 
@@ -121,6 +120,6 @@ fewer redundant cases; observable cancel behavior unchanged.
 | --- | --- | --- |
 | 1 Nested remove must not expose cancelable layout wipe | Behavior | done |
 | 2 Overlay `align-items` center fallback | Behavior | done |
-| 3 Prune dead/redundant cancel tests | Structure | planned |
+| 3 Prune dead/redundant cancel tests | Structure | done |
 
-**Next action:** Execute Phase 3 (prune dead/redundant cancel tests).
+**Plan complete.** All three phases done.

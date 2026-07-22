@@ -2,7 +2,6 @@ import { describe, it, expect, vi } from "vitest"
 import { page } from "vitest/browser"
 import { render } from "@testing-library/vue"
 import LoadingModal from "@/components/commons/LoadingModal.vue"
-import type { ApiLoadingCancelControl } from "@/managedApi/ApiStatusHandler"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
 import { nextTick } from "vue"
@@ -45,12 +44,6 @@ describe("LoadingModal", () => {
   it("should not have close button", () => {
     render(LoadingModal, { props: { show: true, message: "Loading..." } })
     expect(document.querySelector(".close-button")).toBeNull()
-  })
-
-  it("requires cancel identity and action as one component control", () => {
-    // @ts-expect-error a cancel action cannot be supplied without its identity
-    const invalidControl: ApiLoadingCancelControl = { action: () => undefined }
-    expect(invalidControl.action).toBeTypeOf("function")
   })
 
   it("renders one neutral native Cancel button only when a control is supplied", () => {
