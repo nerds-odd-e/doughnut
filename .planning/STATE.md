@@ -1,13 +1,79 @@
-# State
+---
+gsd_state_version: '1.0'
+status: planning
+progress:
+  total_phases: 7
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
+---
 
-## Current
+# Project State
 
-- **Active plan:** Notebook Lint & Auto-Fix (GSD new-project in progress)
-- **Status:** Requirements drafted — awaiting approval, then roadmap
-- **Next:** Approve REQUIREMENTS.md → project structure mode → roadmap
+## Project Reference
 
-## Project
+See: .planning/PROJECT.md (updated 2026-07-22)
 
-Notebook Health: mechanical lint (empty folders, readme-only folders, dead wiki links) + gated bulk empty-folder purge. Entry: Notebook Settings → Health. Defaults: per-user. Domain rename: index → readme (`readmeContent`).
+**Core value:** From Notebook Settings → Health, a user can run lint and see actionable health findings — with optional bulk removal of empty folders when auto-fix is enabled.
+**Current focus:** Phase 1 — Health lint contract (Structure)
 
-Last updated: 2026-07-22
+## Current Position
+
+Phase: 1 of 7 (Health lint contract)
+Plan: 0 of TBD in current phase
+Status: Ready to plan
+Last activity: 2026-07-22 — Roadmap created (7 phases, 16/16 REQs mapped)
+
+Progress: [░░░░░░░░░░] 0%
+
+## Performance Metrics
+
+**Velocity:**
+- Total plans completed: 0
+- Average duration: —
+- Total execution time: 0 hours
+
+**By Phase:**
+
+| Phase | Plans | Total | Avg/Plan |
+|-------|-------|-------|----------|
+| - | - | - | - |
+
+**Recent Trend:**
+- Last 5 plans: —
+- Trend: —
+
+*Updated after each plan completion*
+
+## Accumulated Context
+
+### Decisions
+
+Decisions are logged in PROJECT.md Key Decisions table.
+Recent decisions affecting current work:
+
+- Report before mutate; Structure only for immediate next Behavior
+- Empty folders vs readme-only (`readmeContent`) are separate finding types
+- Dead links report-only; only fix is bulk purge of fully empty folders (not dissolve)
+- Per-user defaults; Health tab only (no `/health` route or dialog)
+
+### Pending Todos
+
+None yet.
+
+### Blockers/Concerns
+
+None yet.
+
+## Deferred Items
+
+| Category | Item | Status | Deferred At |
+|----------|------|--------|-------------|
+| *(none)* | | | |
+
+## Session Continuity
+
+Last session: 2026-07-22
+Stopped at: Roadmap written; Phase 1 ready for `/gsd-plan-phase`
+Resume file: None

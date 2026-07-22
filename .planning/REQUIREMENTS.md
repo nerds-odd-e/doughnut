@@ -76,32 +76,30 @@ Deferred; not in current roadmap.
 
 ## Traceability
 
-Filled during roadmap creation.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| HLTH-01 | — | Pending |
-| HLTH-02 | — | Pending |
-| HLTH-03 | — | Pending |
-| EFOL-01 | — | Pending |
-| EFOL-02 | — | Pending |
-| EFOL-03 | — | Pending |
-| DLNK-01 | — | Pending |
-| DLNK-02 | — | Pending |
-| DLNK-03 | — | Pending |
-| AFIX-01 | — | Pending |
-| AFIX-02 | — | Pending |
-| AFIX-03 | — | Pending |
-| AFIX-04 | — | Pending |
-| AFIX-05 | — | Pending |
-| DFLT-01 | — | Pending |
-| DFLT-02 | — | Pending |
+| EFOL-01 | Phase 2 | Pending |
+| EFOL-02 | Phase 2 | Pending |
+| EFOL-03 | Phase 3 | Pending |
+| DLNK-01 | Phase 4 | Pending |
+| DLNK-02 | Phase 4 | Pending |
+| DLNK-03 | Phase 4 | Pending |
+| HLTH-01 | Phase 5 | Pending |
+| HLTH-02 | Phase 5 | Pending |
+| HLTH-03 | Phase 5 | Pending |
+| AFIX-01 | Phase 5 | Pending |
+| DFLT-01 | Phase 6 | Pending |
+| DFLT-02 | Phase 6 | Pending |
+| AFIX-02 | Phase 7 | Pending |
+| AFIX-03 | Phase 7 | Pending |
+| AFIX-04 | Phase 7 | Pending |
+| AFIX-05 | Phase 7 | Pending |
 
 **Coverage:**
 - v1 requirements: 16 total
-- Mapped to phases: 0
-- Unmapped: 16 ⚠️
+- Mapped to phases: 16
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-07-22*
-*Last updated: 2026-07-22 after scoping (readme rename; separate readme-only finding)*
+*Last updated: 2026-07-22 after roadmap (traceability)*
