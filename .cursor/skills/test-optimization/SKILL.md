@@ -40,9 +40,14 @@ Output: Optimized tests with per-phase commits + summary ending with
 fresh sub-agent; each phase runs post-change-refactor, then commits and pushes.
 Do not accumulate context across phases in one agent.
 
-**Blacklist:** `ongoing/test-optimization-blacklist.md` (legacy path; read explicitly).
-Skip entries under **Skip test optimization** (not **Candidates**). Match by
-file path + test/scenario name (exact preferred).
+**E2E skip tag:** `@skipOptimizationDueToKnownNecessarySlowness` on a Scenario
+or Feature marks known-necessary slowness. Profile runs exclude it via
+`--env tags=…` (see `profile`). Adding the tag is a developer decision (Jidoka)
+— propose only; do not add it yourself.
+
+**Candidates:** `ongoing/test-optimization-blacklist.md` holds **Candidates**
+from optimization runs (proposals only). Keep that section; do not invent a
+Skip list there.
 
 **Do not commit** raw profile JSON (large, machine-specific). Gitignored paths:
 `e2e_test/reports/`, `.planning/*-profile-results.json`,
@@ -56,11 +61,13 @@ Run the **full** suite for the target scope once. Capture per-test durations.
 
 | Scope | Profile command | Parse durations from |
 |-------|-----------------|----------------------|
-| **E2E** | `CURSOR_DEV=true nix develop -c pnpm cy:run-on-sut --reporter json` (SUT up; `pnpm sut:healthcheck`) | JSON blocks in stdout — tee to `/tmp/e2e-profile.log` |
+| **E2E** | `CURSOR_DEV=true nix develop -c pnpm cy:run-on-sut --reporter json --env tags='not @ignore and not @skipOptimizationDueToKnownNecessarySlowness'` (SUT up; `pnpm sut:healthcheck`) | JSON blocks in stdout — tee to `/tmp/e2e-profile.log` |
 | **Frontend** | `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vitest run --reporter=json` | Vitest JSON `testResults[].assertionResults[].duration` |
 | **CLI** | `cd cli && CURSOR_DEV=true nix develop -c pnpm exec vitest run --reporter=json` | Same as Vitest |
 | **Backend** | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` then parse | `backend/build/test-results/test/TEST-*.xml` → `testcase@time` |
 | **MCP server** | `CURSOR_DEV=true nix develop -c pnpm -C mcp-server exec vitest run --reporter=json` | Vitest JSON |
+
+**E2E tags:** Always pass `--env tags='not @ignore and not @skipOptimizationDueToKnownNecessarySlowness'` for profile (and re-profile) so tagged scenarios/features are not run and do not enter the top 10%. CI default tags still apply for normal runs; this override is profile-only. In CI, also keep excluding `@wip` if you mirror CI: `not @ignore and not @wip and not @skipOptimizationDueToKnownNecessarySlowness`.
 
 **Frontend note:** `frontend:test` runs Vitest **browser mode** (`--browser=chromium`).
 Profile uses plain `vitest run` for `duration` data; verify changes with
@@ -74,10 +81,11 @@ Store baseline locally (e.g. `.planning/quick/<scope>-profile-results.json` with
 "do not commit" note). Record baseline wall time and test count in the plan.
 </step>
 
-<step name="blacklist_filter">
-1. Read `ongoing/test-optimization-blacklist.md`.
-2. Skip every test under **Skip test optimization**.
-3. Eligible tests = profiled minus Skip entries.
+<step name="eligible_set">
+Eligible tests = all profiled tests (E2E skip-tagged scenarios were already
+excluded by the profile tag filter). Optionally read
+`ongoing/test-optimization-blacklist.md` **Candidates** for context only — do
+not auto-exclude Candidates from the top 10%.
 </step>
 
 <step name="select_top_10_percent">
@@ -103,7 +111,7 @@ Compute group counts for two strategies only:
 <step name="write_plan">
 Copy [plan-template.md](plan-template.md) to
 `.planning/quick/NNN-<scope>-test-optimization/PLAN.md` (or `phases/NN-slug/` PLAN).
-Fill baseline, blacklist note, top-10% table, grouping choice, one phase per
+Fill baseline, skip-tag note, top-10% table, grouping choice, one phase per
 group, and a final re-profile phase.
 
 Read sub-project rules when editing tests: `e2e-authoring.mdc`, `frontend-testing.mdc`,
@@ -122,7 +130,7 @@ Each group phase (sub-agent):
 5. Mark phase **done** in plan.
 6. **Commit** (`perf(<scope>): …`) and **push**.
 
-**Hard-to-improve → blacklist candidates:** If no meaningful speedup after serious
+**Hard-to-improve → Candidates / skip tag:** If no meaningful speedup after serious
 attempt, or would need product/design trade-off:
 
 1. Do **not** force a weak change.
@@ -130,8 +138,9 @@ attempt, or would need product/design trade-off:
    test/scenario, duration, why hard, date (`YYYY-MM-DD`).
 3. Mark phase done (or Jidoka-stop if value decision required).
 
-**Moving** a candidate to **Skip test optimization** is a developer decision
-(Jidoka) — propose only; do not move entries yourself.
+**Promoting** a Candidate to permanent skip is a developer decision (Jidoka) —
+propose tagging the Scenario or Feature with
+`@skipOptimizationDueToKnownNecessarySlowness`; do not add the tag yourself.
 </step>
 
 <step name="optimize_tactics">
@@ -164,6 +173,7 @@ Work **only** tests in the current group. Prefer first applicable tactic.
 - **`invoke('val')` + `input`** instead of `cy.type()` on long markdown.
 
 Never add `@focus` / `@only` in committed code.
+Never add `@skipOptimizationDueToKnownNecessarySlowness` without developer Jidoka.
 </step>
 
 <step name="verify">
@@ -191,7 +201,7 @@ E2E groups: **3+ consecutive green runs** on touched specs before closing a phas
 <step name="reprofile_and_close">
 After all group phases (via execute-plan):
 
-- Re-run same profile command as baseline.
+- Re-run same profile command as baseline (same `--env tags=…` for E2E).
 - Record: test count, suite wall, top-10 table, top-10% **total CPU** (Vitest) or
   sum of slow scenarios (E2E).
 - Note any new **Candidates** proposed.
@@ -199,7 +209,7 @@ After all group phases (via execute-plan):
   use per-spec timings + CI for authoritative "after" — do not fake a green wall time.
 
 Set plan **Status: done**; **clean up spent plan history** (see `planning_cleanup`).
-Keep the blacklist file.
+Keep the Candidates blacklist file.
 </step>
 
 <step name="planning_cleanup">
@@ -224,8 +234,9 @@ block per spec to stdout. After `tee /tmp/e2e-profile.log`, parse in Node:
 - Track current spec from `Running:  <name>.feature` lines.
 - For each lone `{`, accumulate until braces balance and buffer contains `"stats"`,
   then `JSON.parse`.
-- Collect `tests[].title` + `tests[].duration`, tag with current spec, drop Skip
-  entries, sort descending, slice top 10%.
+- Collect `tests[].title` + `tests[].duration`, tag with current spec, sort
+  descending, slice top 10%. (Skip-tagged scenarios should already be absent
+  when profile used the tag filter.)
 
 Write reusable `scripts/` helper only if team will run repeatedly; otherwise
 one-off inline Node script is enough.
@@ -234,7 +245,8 @@ one-off inline Node script is enough.
 </process>
 
 <success_criteria>
-- Full-suite profile captured; top 10% selected after blacklist filter
+- Full-suite profile captured with E2E skip tag excluded via `--env tags`
+- Top 10% selected from eligible (profiled) tests
 - Plan written and executed via execute-plan (commit + push per group)
 - Non-negotiable rules applied (no redundant tests left, no fixed waits, no flaky)
 - Re-profile recorded; plan marked done; spent history cleaned
@@ -257,7 +269,7 @@ Report:
 <out_of_scope>
 - Do not optimize in the coordinator agent after plan is written.
 - Do not commit profile JSON.
-- Do not move blacklist entries to Skip without developer (Jidoka).
+- Do not add `@skipOptimizationDueToKnownNecessarySlowness` without developer Jidoka.
 - Do not add `@focus` / `@only` in committed code.
 - Do not run full E2E suite for per-phase verify unless shared helpers require it.
 </out_of_scope>
