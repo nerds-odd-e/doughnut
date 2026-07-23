@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Notebook Lint & Auto-Fix
-current_phase: 7
-current_phase_name: Gated empty-folder purge
-status: milestone_complete
-stopped_at: Quick 001 complete (all 3 phases)
-last_updated: "2026-07-23T00:00:00.000Z"
+current_phase: 1
+current_phase_name: E2E test optimization batch 1–3
+status: in_progress
+stopped_at: Quick 002 Phase 1 done (audio/recall/note-yaml)
+last_updated: "2026-07-23T01:00:00.000Z"
 last_activity: 2026-07-23
-last_activity_desc: Completed quick/001 Phase 3 — dead wiki links flat list + open note
+last_activity_desc: Completed quick/002 Phase 1 — sped up audio/recall/note-yaml E2E scenarios
 progress:
   total_phases: 7
   completed_phases: 7
@@ -23,17 +23,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-22)
 
 **Core value:** From Notebook Settings → Health, a user can run lint and see actionable health findings — with optional bulk removal of empty folders when auto-fix is enabled.
-**Current focus:** Milestone complete; quick/001 Health UI polish done
+**Current focus:** Quick 002 E2E test optimization (Phase 1 done; next Phase 2)
 
 ## Current Position
 
-Phase: Milestone v1.0 complete; quick plan 001 all phases done
-Plan: `.planning/quick/001-health-ui-polish/PLAN.md` — Status: done
-Status: Milestone v1.0 delivered; Health UI polish (lint spinner, fix blockUi, dead-link navigate) complete
-Last activity: 2026-07-23 — Phase 3 dead wiki links flat list + noteShow navigation
-Resume file: none (quick 001 complete)
+Phase: Quick 002 Phase 1 done; Phase 2 next
+Plan: `.planning/quick/002-e2e-test-optimization/PLAN.md` — Status: in-progress (Phase 1 done)
+Status: Milestone v1.0 delivered; E2E top-10% optimization in progress
+Last activity: 2026-07-23 — Phase 1 audio/recall/note-yaml scenarios sped up (3 consecutive greens)
+Resume file: `.planning/quick/002-e2e-test-optimization/PLAN.md` Phase 2
 
-Progress: [██████████] 100% (milestone); quick 001 3/3 done
+Progress: [█░░░░░░░░░] quick 002 1/9 phases done
 
 ## Performance Metrics
 
