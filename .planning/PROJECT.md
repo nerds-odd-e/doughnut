@@ -18,6 +18,7 @@ During spelling recall, an answer that names a *different* note becomes a learni
 - ✓ Note aliases in frontmatter, indexed (`FrontmatterAliases`/`NoteAliasIndex`/`NoteAliasIndexService`) — existing
 - ✓ Add-link UI: wiki link, property link, relationship note (`SearchForm`/`LinkInsertionChoice`/`AddRelationshipFinalize`) — existing
 - ✓ Notebook settings Health tab + recall-stats tab — existing (v1.0 lint milestone shipped)
+- ✓ API/DTO extension: `Answer.correct` (boolean) → third outcome with accidental-match metadata (`@Transient matchedNoteId` + `AnswerOutcome` enum: CORRECT/WRONG/ACCIDENTAL_MATCH/OVERLAP); `AnsweredQuestion` gains optional `overlap` + `matchedNotes: List<NoteTopology>`; OpenAPI client regenerated — Validated in Phase 1: Extend Answer outcome API (representable but not yet returned)
 
 ### Active
 
@@ -27,7 +28,6 @@ During spelling recall, an answer that names a *different* note becomes a learni
 - [ ] Offer to build a link between the notes via the existing add-link UI (property link or relationship note), with the matched note pre-selected
 - [ ] Overlap handling: when the answer is correct for the reviewed note but the reviewed note declares overlap with another note, respond "correct, but we're looking for another answer — try again," no credit
 - [ ] Overlap declaration model: extend the `aliases` frontmatter to accept wiki-link values pointing to another note
-- [ ] API/DTO extension: `Answer.correct` (boolean) → third outcome with accidental-match metadata (matched note id, overlap flag); `AnsweredQuestion` extension; OpenAPI regen
 
 ### Out of Scope
 
@@ -74,6 +74,11 @@ During spelling recall, an answer that names a *different* note becomes a learni
 | Reuse WikiLinkResolver + LinkInsertionChoice | Existing matching + add-link UI; minimize new concepts | — Pending |
 | Third SRS outcome via updateForgettingCurve | Existing partial-adjustment API; no new scheduling machinery | — Pending |
 
+## Current State
+
+- **Phase 1 complete (2026-07-23):** The answer contract now represents the third outcome (accidental match + overlap) — `AnswerOutcome` enum, `@Transient matchedNoteId`/`outcome` on `Answer`, optional `overlap`/`matchedNotes` on `AnsweredQuestion`, OpenAPI client regenerated. Pure Structure: states representable but **not yet returned** (0 writers). Foundation is in place for Phases 2–6.
+- **Next:** Phase 2 — accidental-match grading & penalty (writes `matchedNoteId` + `outcome = ACCIDENTAL_MATCH` behind the existing `assertReadAuthorization` gate; re-check OWASP ASVS V4 there, since that is when matched-note data first crosses the trust boundary).
+
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
@@ -92,4 +97,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-23 after initialization*
+*Last updated: 2026-07-23 after Phase 1 completion*

@@ -10,7 +10,7 @@
 
 ## Phases
 
-- [ ] **Phase 1: Extend Answer outcome API** - Add a third outcome (accidental-match + overlap) to the Answer/AnsweredQuestion contract and regen the OpenAPI client
+- [x] **Phase 1: Extend Answer outcome API** - Add a third outcome (accidental-match + overlap) to the Answer/AnsweredQuestion contract and regen the OpenAPI client (completed 2026-07-23)
 - [ ] **Phase 2: Accidental-match grading & penalty** - Detect a spelling answer that names a different note and apply a lighter-than-wrong SRS penalty
 - [ ] **Phase 3: Reveal both notes after accidental match** - Show the reviewed note and the matched note(s) together after an accidental match
 - [ ] **Phase 4: Offer link between notes** - Let the user build a link (property link or relationship note) between the reviewed and matched note via the existing add-link UI, with the matched note pre-selected
@@ -117,7 +117,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Extend Answer outcome API | 1/1 | In Progress|  |
+| 1. Extend Answer outcome API | 1/1 | Complete    | 2026-07-23 |
 | 2. Accidental-match grading & penalty | 0/0 | Not started | - |
 | 3. Reveal both notes after accidental match | 0/0 | Not started | - |
 | 4. Offer link between notes | 0/0 | Not started | - |
