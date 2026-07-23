@@ -235,14 +235,23 @@ Run focused specs **3+ consecutive greens** before closing.
 
 ### Phase 8: Batch ranks 22–24 (note tree, AI reorganize, wikidata person)
 Type: Behavior
-Status: planned
+Status: done
 
 **Tests:**
-- `e2e_test/features/note_topology/note_tree_view.feature` — "expand side bar to see the note tree" (~3417ms)
-- `e2e_test/features/book_reading/ai_reorganize_layout.feature` — "AI reorganize opens preview dialog and applies on confirm" (~3402ms)
-- `e2e_test/features/wikidata/associate_wikidata_person_entries.feature` — "Create a note for a person with wikidata should auto fill the content (example #1)" (~3391ms)
+- `e2e_test/features/note_topology/note_tree_view.feature` — "expand side bar to see the note tree" (~3417ms → ~2.6–2.8s)
+- `e2e_test/features/book_reading/ai_reorganize_layout.feature` — "AI reorganize opens preview dialog and applies on confirm" (~3402ms) — **Candidate** (see blacklist)
+- `e2e_test/features/wikidata/associate_wikidata_person_entries.feature` — "Create a note for a person with wikidata should auto fill the content (example #1)" (~3391ms) — **Candidate** (see blacklist)
 
-**Goals:** Speed up these scenarios.
+**Done (2026-07-23):**
+- Note tree: replaced `And I navigate to "LeSS training/LeSS in Action" note` (catalog nav: full-load `/notebooks` + notebook-card click + sidebar note click) with the existing `And I route to the note "LeSS in Action"` step (`jumpToNotePage` → direct note-page load). At the 500×500 viewport the catalog nav was forcing a sidebar collapse/expand dance; the direct jump lands on the note page with the sidebar collapsed, so `I expand the side bar` (the behavior under test) is unchanged. Skips the redundant `/notebooks` reload + notebook-card click + sidebar interactions. No new step/helper added (reuses the existing `I route to the note` step).
+- AI reorganize + wikidata person: proposed under **Candidates** in `ongoing/test-optimization-blacklist.md`. AI reorganize: dominant cost is the book-reading page full load + PDF canvas render (inherent); the AI path has no redundant steps / fixed waits; a cross-step book cache (attachBook already returns the full book) added alias-read/write overhead that offset the ~2 saved API calls (measured no win, lost in variance). Wikidata person: dominant cost is the notebook-page load + backend wikidata entity fetch + content auto-fill (inherent); the flow already uses `assignValue`; moving per-example wikidata stubs out of the shared Background reduced mountebank stub additions but the saving was lost in run-to-run variance.
+
+**Verify:** 3 consecutive focused greens (9/9 each; note_tree_view "expand side bar" 2654/2752/2728ms).
+
+**Learnings for later phases:**
+- For a scenario whose behavior is "expand the collapsed sidebar to see the tree", the navigation to the note page is setup, not the behavior under test — swapping catalog nav (`I navigate to ... note`) for the existing direct `I route to the note {string}` (`jumpToNotePage`) is a clean win when the catalog nav does extra work (here, a redundant `/notebooks` reload + sidebar collapse/expand at a small viewport). The sidebar tree still populates after a direct `jumpToNotePage` (same as scenario 4 in the file, which already uses it).
+- A cross-step Cypress-alias cache to skip 1–2 backend API calls is usually NOT worth it: the `cy.get('@alias')` read + `cy.wrap(...).as(...)` write per stub add Cypress command overhead (~50–100ms each) that offsets the ~50–150ms per saved API call, and the result is lost in run-to-run variance. Prefer caching only when it saves many calls or a genuinely slow call.
+- Reducing mountebank stub count (e.g. moving shared-Background stubs per-example so each example only stubs what it needs) cuts O(n²) stub re-additions, but with a small n (≤7) and fast local mountebank the saving is below run-to-run variance — not a reliable win. Only worth it when n is large or mountebank is remote/slow.
 
 **Verify:**
 
@@ -277,3 +286,4 @@ CURSOR_DEV=true nix develop -c pnpm cy:run-on-sut --reporter json 2>&1 | tee /tm
 - Phase 2: `perf(e2e): speed up circle-note and unread-message scenarios`
 - Phase 3: `perf(e2e): speed up wikidata-create, semantic-search, reading-record`
 - Phase 7: `perf(e2e): speed up folder-readme and assimilation-walkthrough scenarios`
+- Phase 8: `perf(e2e): speed up note-tree-view scenario`

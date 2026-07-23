@@ -15,7 +15,7 @@ Feature: Note tree view
 
   Scenario: expand side bar to see the note tree
     Given I am on a window 500 * 500
-    And I navigate to "LeSS training/LeSS in Action" note
+    And I route to the note "LeSS in Action"
     When I expand the side bar
     And I expand the children of note "LeSS in Action" in the sidebar
     Then I should see the note tree in the sidebar

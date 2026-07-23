@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Notebook Lint & Auto-Fix
-current_phase: 6
-current_phase_name: E2E test optimization batch 16–18
+current_phase: 8
+current_phase_name: E2E test optimization batch 22–24
 status: in_progress
-stopped_at: Quick 002 Phase 6 done (AI models sped up; bazaar + predefined questions proposed as Candidates)
-last_updated: "2026-07-23T03:00:00.000Z"
+stopped_at: Quick 002 Phase 8 done (note-tree-view sped up; ai_reorganize + wikidata-person proposed as Candidates)
+last_updated: "2026-07-23T03:30:00.000Z"
 last_activity: 2026-07-23
-last_activity_desc: Completed quick/002 Phase 6 — sped up admin default-model; bazaar-subscribe + predefined-questions proposed as Candidates
+last_activity_desc: Completed quick/002 Phase 8 — sped up note-tree-view (direct jumpToNotePage); ai_reorganize + wikidata-person proposed as Candidates
 progress:
   total_phases: 7
   completed_phases: 7
@@ -23,17 +23,17 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-07-22)
 
 **Core value:** From Notebook Settings → Health, a user can run lint and see actionable health findings — with optional bulk removal of empty folders when auto-fix is enabled.
-**Current focus:** Quick 002 E2E test optimization (Phase 6 done; next Phase 7)
+**Current focus:** Quick 002 E2E test optimization (Phase 8 done; next Phase 9)
 
 ## Current Position
 
-Phase: Quick 002 Phase 6 done; Phase 7 next
-Plan: `.planning/quick/002-e2e-test-optimization/PLAN.md` — Status: in-progress (Phases 1–6 done)
+Phase: Quick 002 Phase 8 done; Phase 9 next
+Plan: `.planning/quick/002-e2e-test-optimization/PLAN.md` — Status: in-progress (Phases 1–8 done)
 Status: Milestone v1.0 delivered; E2E top-10% optimization in progress
-Last activity: 2026-07-23 — Phase 6 admin default-model sped up (3 consecutive greens); bazaar-subscribe + predefined-questions proposed as Candidates
-Resume file: `.planning/quick/002-e2e-test-optimization/PLAN.md` Phase 7
+Last activity: 2026-07-23 — Phase 8 note-tree-view sped up (3 consecutive greens); ai_reorganize + wikidata-person proposed as Candidates
+Resume file: `.planning/quick/002-e2e-test-optimization/PLAN.md` Phase 9
 
-Progress: [██████░░░] quick 002 6/9 phases done
+Progress: [████████░] quick 002 8/9 phases done
 
 ## Performance Metrics
 
@@ -109,5 +109,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-07-23
-Stopped at: Quick 002 Phase 6 done
-Resume file: `.planning/quick/002-e2e-test-optimization/PLAN.md` Phase 7
+Stopped at: Quick 002 Phase 8 done
+Resume file: `.planning/quick/002-e2e-test-optimization/PLAN.md` Phase 9
