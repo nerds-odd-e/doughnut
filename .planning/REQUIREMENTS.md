@@ -17,8 +17,8 @@
 
 ### API
 
-- [ ] **API-01**: The `Answer` outcome is extended beyond a boolean `correct` to represent accidental-match (with matched note id) and overlap states.
-- [ ] **API-02**: The `AnsweredQuestion` response carries matched-note topology and an overlap flag; the OpenAPI client is regenerated.
+- [x] **API-01**: The `Answer` outcome is extended beyond a boolean `correct` to represent accidental-match (with matched note id) and overlap states.
+- [x] **API-02**: The `AnsweredQuestion` response carries matched-note topology and an overlap flag; the OpenAPI client is regenerated.
 
 ## v2 Requirements (deferred)
 
@@ -43,8 +43,8 @@
 | OVL-01 | Phase 6 | pending |
 | OVL-02 | Phase 5 | pending |
 | OVL-03 | Phase 5 | pending |
-| API-01 | Phase 1 | pending |
-| API-02 | Phase 1 | pending |
+| API-01 | Phase 1 | Complete |
+| API-02 | Phase 1 | Complete |
 
 ---
 *Last updated: 2026-07-23 after initialization*

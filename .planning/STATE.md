@@ -4,8 +4,9 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 01
 current_phase_name: Extend Answer outcome API
-status: executing
-last_updated: "2026-07-23T13:48:11.218Z"
+status: verifying
+stopped_at: Completed 01-01-PLAN.md (contract round-trip + no-behavior tests; A1 verified)
+last_updated: "2026-07-23T14:14:05.316Z"
 progress:
   total_phases: 1
   completed_phases: 0
@@ -26,8 +27,8 @@ progress:
 
 - **Phase:** 01 (Extend Answer outcome API) — EXECUTING
 - **Plan:** 1 of 1
-- **Status:** Executing Phase 01
-- **Progress:** 0/6 phases complete
+- **Status:** Phase complete — ready for verification
+- **Progress:** [░░░░░░░░░░] 0%
 
 ```
 [1][..........] 0/6 phases
@@ -49,6 +50,12 @@ progress:
 - **Phases completed:** 0
 - **Requirements delivered:** 0/9
 - **Coverage:** 9/9 mapped (100%)
+
+**Per-Plan Metrics:**
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase 01 P01 | 23min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -83,9 +90,19 @@ progress:
 
 ## Session Continuity
 
+**Last session:** 2026-07-23T14:14:05.310Z
+**Stopped at:** Completed 01-01-PLAN.md (contract round-trip + no-behavior tests; A1 verified)
+**Resume file:** None
+
 - **Last action:** Phase 1 planned — `01-01-PLAN.md` written (1 plan, wave 1, autonomous; tracer = full contract round-trip, expansion = no-behavior tests on both contract surfaces). ROADMAP + STATE finalized.
 - **Next action:** `/gsd-execute-phase 1` (Structure — API contract extension; no behavior, no service, no UI).
 - **Resume from:** Read this file + `.planning/phases/01-extend-answer-outcome-api/01-01-PLAN.md`; execute the plan.
 
 ---
 *Last updated: 2026-07-23 during roadmap creation*
+
+## Decisions
+
+- [Phase ?]: Locked Option A (D-05): @Transient matchedNoteId + AnswerOutcome enum on Answer; overlap + matchedNotes:List<NoteTopology> on AnsweredQuestion; A1 (@Transient surfaces in OpenAPI) verified via regen-then-grep
+- [Phase ?]: Pure Structure phase: no production writer sets the new fields (grep invariant = 0); AnsweredQuestion.from(RecallPrompt) unchanged; correct stays required/@NotNull and sole SRS-credit signal
+- [Phase ?]: Reused existing NoteTopology (id+title) for matchedNotes; no new note-ref DTO; no Flyway migration (fields are @Transient)
