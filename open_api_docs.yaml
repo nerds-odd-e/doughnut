@@ -3646,6 +3646,16 @@ components:
           format: int32
         spellingAnswer:
           type: string
+        matchedNoteId:
+          type: integer
+          format: int64
+        outcome:
+          type: string
+          enum:
+          - CORRECT
+          - WRONG
+          - ACCIDENTAL_MATCH
+          - OVERLAP
       required:
       - correct
       - id
@@ -3669,6 +3679,12 @@ components:
           $ref: "#/components/schemas/Answer"
         predefinedQuestion:
           $ref: "#/components/schemas/PredefinedQuestion"
+        overlap:
+          type: boolean
+        matchedNotes:
+          type: array
+          items:
+            $ref: "#/components/schemas/NoteTopology"
       required:
       - answer
       - id

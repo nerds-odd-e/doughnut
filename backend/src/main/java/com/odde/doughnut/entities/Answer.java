@@ -34,6 +34,10 @@ public class Answer extends EntityIdentifiedByIdOnly {
   @Setter
   private String spellingAnswer;
 
+  @Transient @Getter @Setter private Long matchedNoteId;
+
+  @Transient @Getter @Setter private AnswerOutcome outcome;
+
   public static Answer buildAnswer(
       AnswerDTO answerDTO, PredefinedQuestion predefinedQuestion, Answer existingAnswer) {
     if (existingAnswer != null) {

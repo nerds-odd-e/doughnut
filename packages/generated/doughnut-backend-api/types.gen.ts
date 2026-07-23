@@ -285,6 +285,8 @@ export type Answer = {
     correct: boolean;
     thinkingTimeMs?: number;
     spellingAnswer?: string;
+    matchedNoteId?: number;
+    outcome?: 'CORRECT' | 'WRONG' | 'ACCIDENTAL_MATCH' | 'OVERLAP';
 };
 
 export type AnsweredQuestion = {
@@ -294,6 +296,8 @@ export type AnsweredQuestion = {
     recalledNote: RecalledNote;
     answer: Answer;
     predefinedQuestion?: PredefinedQuestion;
+    overlap?: boolean;
+    matchedNotes?: Array<NoteTopology>;
 };
 
 export type RecalledNote = {

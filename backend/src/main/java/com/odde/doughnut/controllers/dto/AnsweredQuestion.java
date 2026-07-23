@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.entities.QuestionType;
 import com.odde.doughnut.entities.RecallPrompt;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import java.util.Objects;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,6 +29,10 @@ public class AnsweredQuestion {
   private Answer answer;
 
   private PredefinedQuestion predefinedQuestion;
+
+  private Boolean overlap;
+
+  private List<NoteTopology> matchedNotes;
 
   public static AnsweredQuestion from(RecallPrompt recallPrompt) {
     Objects.requireNonNull(recallPrompt.getAnswer(), "answered question requires an answer");
