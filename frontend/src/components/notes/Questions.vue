@@ -29,7 +29,7 @@
           <th>B</th>
           <th>C</th>
           <th>D</th>
-          <th></th>
+          <th><span class="sr-only">Actions</span></th>
         </tr>
       </thead>
       <tbody>

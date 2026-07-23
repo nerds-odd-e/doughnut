@@ -30,20 +30,21 @@ public class PredefinedQuestionService {
 
   public PredefinedQuestion addQuestion(Note note, PredefinedQuestion predefinedQuestion) {
     predefinedQuestion.setNote(note);
-
-    Notebook parentNotebook = note.getNotebook();
-    parentNotebook.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
-    entityPersister.save(parentNotebook);
+    touchNotebook(note);
     entityPersister.save(predefinedQuestion);
     return predefinedQuestion;
   }
 
   public PredefinedQuestion deleteQuestion(PredefinedQuestion predefinedQuestion) {
-    Notebook parentNotebook = predefinedQuestion.getNote().getNotebook();
-    parentNotebook.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
-    entityPersister.save(parentNotebook);
+    touchNotebook(predefinedQuestion.getNote());
     entityPersister.remove(predefinedQuestion);
     return predefinedQuestion;
+  }
+
+  private void touchNotebook(Note note) {
+    Notebook parentNotebook = note.getNotebook();
+    parentNotebook.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+    entityPersister.save(parentNotebook);
   }
 
   public PredefinedQuestion refineAIQuestion(Note note, PredefinedQuestion predefinedQuestion) {
