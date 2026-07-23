@@ -18,8 +18,25 @@ export function confirmPropertyMemoryTrackerChange() {
   pageIsNotLoading()
 }
 
+const SCOPED_README_BODY_TEST_IDS = [
+  'folder-readme-body',
+  'notebook-readme-body',
+] as const
+
+/**
+ * Note body (`role=region` "Note content") or notebook/folder scoped readme
+ * editor (`*-readme-body`), whichever is on the current page.
+ */
 export function findNoteContentRegion() {
-  return cy.findByRole(noteContentRegion.role, {
-    name: noteContentRegion.name,
+  return cy.get('body').then(($body) => {
+    for (const testId of SCOPED_README_BODY_TEST_IDS) {
+      const scoped = $body.find(`[data-testid="${testId}"]`)
+      if (scoped.length > 0) {
+        return cy.wrap(scoped.first())
+      }
+    }
+    return cy.findByRole(noteContentRegion.role, {
+      name: noteContentRegion.name,
+    })
   })
 }

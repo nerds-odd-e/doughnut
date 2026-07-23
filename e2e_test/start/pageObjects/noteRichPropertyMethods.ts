@@ -2,37 +2,24 @@ import { pageIsNotLoading } from '../pageBase'
 import {
   confirmPropertyMemoryTrackerChange,
   findNoteContentRegion,
-  noteContentRegion,
   richNotePropertyRow,
 } from './notePageContentRegion'
 import { assumeAssociateWikidataDialog } from './associateWikidataDialog'
 
-function noteOrFolderReadmeScope($body: JQuery<HTMLElement>) {
-  const folderReadmeBody = $body.find('[data-testid="folder-readme-body"]')
-  return folderReadmeBody.length > 0
-    ? cy.wrap(folderReadmeBody.first())
-    : cy.findByRole(noteContentRegion.role, {
-        name: noteContentRegion.name,
-      })
-}
-
 export const noteRichPropertyMethods = () => ({
   addRichNoteProperty(key: string, value: string) {
-    cy.get('body').then(($body) => {
-      const scope = noteOrFolderReadmeScope($body)
-      scope.within(() => {
-        cy.findByRole('button', { name: 'Add property' }).click()
-        cy.findByTestId('rich-note-property-key')
-          .clear()
-          .type(key, { parseSpecialCharSequences: false })
-        cy.findByTestId('rich-note-property-value')
-          .clear()
-          .type(value, { parseSpecialCharSequences: false })
-          .blur()
-      })
-      noteOrFolderReadmeScope($body).within(() => {
-        cy.get('.ql-editor[contenteditable="true"]').first().click()
-      })
+    findNoteContentRegion().within(() => {
+      cy.findByRole('button', { name: 'Add property' }).click()
+      cy.findByTestId('rich-note-property-key')
+        .clear()
+        .type(key, { parseSpecialCharSequences: false })
+      cy.findByTestId('rich-note-property-value')
+        .clear()
+        .type(value, { parseSpecialCharSequences: false })
+        .blur()
+    })
+    findNoteContentRegion().within(() => {
+      cy.get('.ql-editor[contenteditable="true"]').first().click()
     })
     return this.flushPendingContentSave()
   },
