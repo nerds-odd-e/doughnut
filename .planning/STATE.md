@@ -5,10 +5,10 @@ milestone_name: Notebook Lint & Auto-Fix
 current_phase: 9
 current_phase_name: E2E test optimization complete
 status: done
-stopped_at: Quick 002 complete — all 9 phases done and re-profiled (suite 9m39s→8m45s; targeted top-23 −23.2%)
-last_updated: "2026-07-23T04:30:00.000Z"
+stopped_at: Milestone v1.0 done; quick 260723-jlm recall-stats settings tab complete (backend dac57e127c, frontend 41c7945d42)
+last_updated: "2026-07-23T06:45:00.000Z"
 last_activity: 2026-07-23
-last_activity_desc: Completed quick/002 Phase 9 — re-profiled full E2E suite; plan marked done; 8 Candidates proposed to blacklist
+last_activity_desc: Completed quick 260723-jlm — Recall Statistics settings tab (retention-first: daily retention trend, activity calendar, response-time trend, weekday×hour heatmap)
 progress:
   total_phases: 7
   completed_phases: 7
@@ -99,6 +99,12 @@ None yet.
 ### Blockers/Concerns
 
 None yet.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260723-jlm | Add recall statistics for user (new Settings "Recall Stats" tab: retention-first — daily retention trend, activity calendar, daily response-time trend, morning/afternoon, weekday×hour heatmap, headline tiles, best/worst hour by retention) | 2026-07-23 | 41c7945d42 | [260723-jlm-add-recall-statistics-for-user-a-new-tab](./quick/260723-jlm-add-recall-statistics-for-user-a-new-tab/) |
 
 ## Deferred Items
 
