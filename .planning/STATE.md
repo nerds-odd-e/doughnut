@@ -5,10 +5,10 @@ milestone_name: milestone
 current_phase: 2
 current_phase_name: Accidental-match grading & penalty
 status: planning
-stopped_at: Completed 01-01-PLAN.md (contract round-trip + no-behavior tests; A1 verified)
-last_updated: "2026-07-23T14:18:44.804Z"
+stopped_at: Phase 2 context gathered
+last_updated: "2026-07-23T23:21:47.198Z"
 progress:
-  total_phases: 1
+  total_phases: 2
   completed_phases: 1
   total_plans: 1
   completed_plans: 1
@@ -90,9 +90,9 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-23T14:14:05.310Z
-**Stopped at:** Completed 01-01-PLAN.md (contract round-trip + no-behavior tests; A1 verified)
-**Resume file:** None
+**Last session:** 2026-07-23T23:21:47.193Z
+**Stopped at:** Phase 2 context gathered
+**Resume file:** .planning/phases/02-accidental-match-grading-penalty/02-CONTEXT.md
 
 - **Last action:** Phase 1 planned — `01-01-PLAN.md` written (1 plan, wave 1, autonomous; tracer = full contract round-trip, expansion = no-behavior tests on both contract surfaces). ROADMAP + STATE finalized.
 - **Next action:** `/gsd-execute-phase 1` (Structure — API contract extension; no behavior, no service, no UI).
