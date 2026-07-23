@@ -1,13 +1,13 @@
 import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import { reactive } from "vue"
-import RecentPage from "@/pages/RecentPage.vue"
+import RecentSettingsTab from "@/pages/settings/RecentSettingsTab.vue"
 import helper, { mockSdkService } from "@tests/helpers"
 
 const mockPush = vi.fn()
 const mockRoute = reactive({
-  name: "recent",
-  path: "/recent",
+  name: "settingsRecent",
+  path: "/settings/recent",
   params: {},
   query: {},
 })
@@ -23,7 +23,7 @@ vi.mock("vue-router", async (importOriginal) => {
   }
 })
 
-describe("RecentPage.vue", () => {
+describe("RecentSettingsTab.vue", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockRoute.query = {}
@@ -33,7 +33,7 @@ describe("RecentPage.vue", () => {
 
   describe("Tab Navigation", () => {
     it("shows Recently Learned tab by default when no query parameter", () => {
-      const wrapper = helper.component(RecentPage).mount()
+      const wrapper = helper.component(RecentSettingsTab).mount()
 
       const activeTab = wrapper.find(".daisy-tab-active")
       expect(activeTab.text()).toBe("Recently Learned")
@@ -44,7 +44,7 @@ describe("RecentPage.vue", () => {
 
     it("shows Recently Learned tab when query parameter is recentlyLearned", () => {
       mockRoute.query = { tab: "recentlyLearned" }
-      const wrapper = helper.component(RecentPage).mount()
+      const wrapper = helper.component(RecentSettingsTab).mount()
 
       const activeTab = wrapper.find(".daisy-tab-active")
       expect(activeTab.text()).toBe("Recently Learned")
@@ -55,7 +55,7 @@ describe("RecentPage.vue", () => {
 
     it("shows Recently Recalled tab when query parameter is recentlyRecalled", () => {
       mockRoute.query = { tab: "recentlyRecalled" }
-      const wrapper = helper.component(RecentPage).mount()
+      const wrapper = helper.component(RecentSettingsTab).mount()
 
       const activeTab = wrapper.find(".daisy-tab-active")
       expect(activeTab.text()).toBe("Recently Recalled")
@@ -66,7 +66,7 @@ describe("RecentPage.vue", () => {
 
     it("defaults to Recently Learned tab when query parameter is invalid", () => {
       mockRoute.query = { tab: "invalidTab" }
-      const wrapper = helper.component(RecentPage).mount()
+      const wrapper = helper.component(RecentSettingsTab).mount()
 
       const activeTab = wrapper.find(".daisy-tab-active")
       expect(activeTab.text()).toBe("Recently Learned")
@@ -76,7 +76,7 @@ describe("RecentPage.vue", () => {
     })
 
     it("updates route when Recently Learned tab is clicked", async () => {
-      const wrapper = helper.component(RecentPage).mount()
+      const wrapper = helper.component(RecentSettingsTab).mount()
 
       const tab = wrapper
         .findAll(".daisy-tab")
@@ -84,13 +84,13 @@ describe("RecentPage.vue", () => {
       await tab?.trigger("click")
 
       expect(mockPush).toHaveBeenCalledWith({
-        name: "recent",
+        name: "settingsRecent",
         query: { tab: "recentlyLearned" },
       })
     })
 
     it("updates route when Recently Recalled tab is clicked", async () => {
-      const wrapper = helper.component(RecentPage).mount()
+      const wrapper = helper.component(RecentSettingsTab).mount()
 
       const tab = wrapper
         .findAll(".daisy-tab")
@@ -98,19 +98,9 @@ describe("RecentPage.vue", () => {
       await tab?.trigger("click")
 
       expect(mockPush).toHaveBeenCalledWith({
-        name: "recent",
+        name: "settingsRecent",
         query: { tab: "recentlyRecalled" },
       })
-    })
-  })
-
-  describe("Component Loading", () => {
-    it("passes correct props to ContainerPage", () => {
-      const wrapper = helper.component(RecentPage).mount()
-
-      const containerPage = wrapper.findComponent({ name: "ContainerPage" })
-      expect(containerPage.props("contentLoaded")).toBe(true)
-      expect(containerPage.props("title")).toBe("Recent")
     })
   })
 })

@@ -22,7 +22,7 @@ export const mainMenu = () => {
         },
 
         userSettingsButton(userName: string) {
-          return cy.findByRole('button', { name: `Settings for ${userName}` })
+          return cy.findByRole('link', { name: `Settings for ${userName}` })
         },
 
         userSettings(userName: string) {

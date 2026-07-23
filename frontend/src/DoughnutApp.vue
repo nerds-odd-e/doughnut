@@ -80,7 +80,6 @@ onMounted(async () => {
     <div class="main-menu flex bg-neutral text-neutral-content z-[10000]">
       <MainMenu
         :user="user"
-        @update-user="user = $event"
       />
     </div>
     <div class="flex flex-col flex-grow overflow-y-auto overflow-x-hidden main-content">

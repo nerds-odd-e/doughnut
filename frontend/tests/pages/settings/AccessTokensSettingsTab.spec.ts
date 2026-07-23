@@ -1,10 +1,10 @@
 import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
-import ManageAccessTokensPage from "@/pages/ManageAccessTokensPage.vue"
+import AccessTokensSettingsTab from "@/pages/settings/AccessTokensSettingsTab.vue"
 import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 
-describe("ManageAccessTokensPage", () => {
+describe("AccessTokensSettingsTab", () => {
   let wrapper: VueWrapper
 
   beforeEach(() => {
@@ -25,7 +25,7 @@ describe("ManageAccessTokensPage", () => {
     mockSdkService(UserController, "getTokens", [])
 
     wrapper = helper
-      .component(ManageAccessTokensPage)
+      .component(AccessTokensSettingsTab)
       .withRouter()
       .mount({ attachTo: document.body })
     await flushPromises()

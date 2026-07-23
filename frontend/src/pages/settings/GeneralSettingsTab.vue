@@ -1,63 +1,57 @@
 <template>
-  <ContainerPage
-    v-bind="{
-      contentLoaded: formData !== undefined,
-      title: 'Edit User Setting',
-    }"
-  >
-    <div v-if="formData">
-      <form @submit.prevent.once="processForm">
-        <TextInput
-          scope-name="user"
-          field="name"
-          v-model="formData.name"
-          :autofocus="true"
-          :error-message="errors.name"
-        />
-        <TextInput
-          scope-name="user"
-          field="dailyAssimilationCount"
-          v-model="formData.dailyAssimilationCount"
-          :error-message="errors.dailyAssimilationCount"
-        />
-        <TextInput
-          scope-name="user"
-          field="spaceIntervals"
-          v-model="formData.spaceIntervals"
-          :error-message="errors.spaceIntervals"
-        />
-        <section class="my-4">
-          <h3 class="mb-2 text-base font-semibold">Batch questions</h3>
-          <div class="text-sm" data-testid="batch-question-schedule">
-            <span class="font-medium">Next batch question generation: </span>
-            <span v-if="formattedNextScheduledAt">
-              {{ formattedNextScheduledAt }}
-            </span>
-            <span v-else-if="batchSchedule">
-              No batch question generation is scheduled yet
-            </span>
-            <span v-else>Loading...</span>
-          </div>
-        </section>
-        <input type="submit" value="Submit" class="daisy-btn daisy-btn-primary" />
-      </form>
-    </div>
-  </ContainerPage>
+  <div v-if="formData">
+    <form @submit.prevent.once="processForm">
+      <TextInput
+        scope-name="user"
+        field="name"
+        v-model="formData.name"
+        :autofocus="true"
+        :error-message="errors.name"
+      />
+      <TextInput
+        scope-name="user"
+        field="dailyAssimilationCount"
+        v-model="formData.dailyAssimilationCount"
+        :error-message="errors.dailyAssimilationCount"
+      />
+      <TextInput
+        scope-name="user"
+        field="spaceIntervals"
+        v-model="formData.spaceIntervals"
+        :error-message="errors.spaceIntervals"
+      />
+      <section class="my-4">
+        <h3 class="mb-2 text-base font-semibold">Batch questions</h3>
+        <div class="text-sm" data-testid="batch-question-schedule">
+          <span class="font-medium">Next batch question generation: </span>
+          <span v-if="formattedNextScheduledAt">
+            {{ formattedNextScheduledAt }}
+          </span>
+          <span v-else-if="batchSchedule">
+            No batch question generation is scheduled yet
+          </span>
+          <span v-else>Loading...</span>
+        </div>
+      </section>
+      <input type="submit" value="Submit" class="daisy-btn daisy-btn-primary" />
+    </form>
+  </div>
+  <ContentLoader v-else />
 </template>
 
 <script setup lang="ts">
 import TextInput from "@/components/form/TextInput.vue"
+import ContentLoader from "@/components/commons/ContentLoader.vue"
 import type {
   QuestionGenerationBatchUserScheduleDto,
   User,
 } from "@generated/doughnut-backend-api"
 import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import ContainerPage from "@/pages/commons/ContainerPage.vue"
-import { computed, onMounted, ref } from "vue"
+import { computed, inject, onMounted, ref, type Ref } from "vue"
 import { toOpenApiError } from "@/managedApi/openApiError"
 
-const emits = defineEmits(["user-updated"])
+const currentUser = inject<Ref<User | undefined>>("currentUser")
 
 const formData = ref<User | undefined>()
 const batchSchedule = ref<QuestionGenerationBatchUserScheduleDto | undefined>()
@@ -99,7 +93,9 @@ const processForm = async () => {
     errors.value = errorObj.errors || {}
   } else {
     errors.value = {}
-    emits("user-updated", updatedUser)
+    if (currentUser) {
+      currentUser.value = updatedUser
+    }
   }
 }
 

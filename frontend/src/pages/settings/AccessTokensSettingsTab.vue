@@ -1,8 +1,9 @@
 <template>
-  <div class="container mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-4">Generate Token</h1>
-
-    <PopButton ref="popbutton" btn-class="daisy-btn daisy-btn-primary daisy-btn-md">
+  <div>
+    <PopButton
+      ref="popbutton"
+      btn-class="daisy-btn daisy-btn-primary daisy-btn-md"
+    >
       <template #button_face>
         Generate Token
       </template>
@@ -13,12 +14,19 @@
           v-focus
           v-model="tokenFormData.label"
         />
-        <input type="submit" value="Submit" class="daisy-btn daisy-btn-primary" />
+        <input
+          type="submit"
+          value="Submit"
+          class="daisy-btn daisy-btn-primary"
+        />
       </form>
     </PopButton>
 
     <div v-if="token" class="flex items-center mt-6">
-      <span class="mr-2 px-2 py-1 bg-base-200 rounded font-mono" data-testid="token-result">
+      <span
+        class="mr-2 px-2 py-1 bg-base-200 rounded font-mono"
+        data-testid="token-result"
+      >
         {{ token }}
       </span>
       <CopyButton
@@ -38,10 +46,15 @@
       </thead>
       <tbody>
         <tr v-for="(item, idx) in tokens" :key="idx">
-          <td class="px-4 py-2 font-mono">{{ item.label || 'No Label' }}</td>
+          <td class="px-4 py-2 font-mono">{{ item.label || "No Label" }}</td>
           <td class="px-4 py-2 font-mono">
             <div class="flex justify-end">
-              <button class="daisy-btn daisy-btn-error daisy-btn-xs" @click="deleteToken(item.id)">Delete</button>
+              <button
+                class="daisy-btn daisy-btn-error daisy-btn-xs"
+                @click="deleteToken(item.id)"
+              >
+                Delete
+              </button>
             </div>
           </td>
         </tr>

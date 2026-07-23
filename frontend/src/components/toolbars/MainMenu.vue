@@ -5,7 +5,6 @@
     :upper-nav-items="upperNavItems"
     :lower-nav-items="lowerNavItems"
     :is-home-page="isHomePage"
-    :show-user-settings-dialog="showUserSettingsDialog"
     :logout="logout"
   />
   <HorizontalMenu
@@ -14,36 +13,20 @@
     :upper-nav-items="upperNavItems"
     :lower-nav-items="lowerNavItems"
     :is-home-page="isHomePage"
-    :show-user-settings-dialog="showUserSettingsDialog"
     :logout="logout"
   />
-  <Modal v-if="showUserSettings" @close_request="showUserSettings = false">
-    <template #body>
-      <UserProfileForm
-        v-bind="{ user }"
-        @user-updated="
-          if ($event) {
-            $emit('updateUser', $event);
-          }
-          showUserSettings = false;
-        "
-      />
-    </template>
-  </Modal>
 </template>
 
 <script setup lang="ts">
 import type { User } from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
-import UserProfileForm from "./UserProfileForm.vue"
 import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
-import { watch, computed, ref } from "vue"
+import { watch, computed } from "vue"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { useRecallData } from "@/composables/useRecallData"
 import { useNavigationItems } from "@/composables/useNavigationItems"
 import { messageCenterConversations } from "@/store/messageStore"
-import Modal from "@/components/commons/Modal.vue"
 import { useBreakpoint } from "@/composables/useBreakpoint"
 import { useRoute } from "vue-router"
 import VerticalMenu from "@/components/toolbars/VerticalMenu.vue"
@@ -53,15 +36,10 @@ const props = defineProps({
   user: { type: Object as PropType<User>, required: false },
 })
 
-defineEmits<{
-  (e: "updateUser", user: User): void
-}>()
-
 const route = useRoute()
 const { isLgOrLarger } = useBreakpoint()
 const { upperNavItems, lowerNavItems } = useNavigationItems()
 const isHomePage = computed(() => route.name === "home")
-const showUserSettings = ref(false)
 
 const { applyAssimilationCountDto } = useAssimilationCount()
 const { setToRepeat, setCurrentRecallWindowEndAt, setTotalAssimilatedCount } =
@@ -102,9 +80,5 @@ const logout = async () => {
     method: "POST",
   })
   window.location.href = "/bazaar"
-}
-
-const showUserSettingsDialog = () => {
-  showUserSettings.value = true
 }
 </script>

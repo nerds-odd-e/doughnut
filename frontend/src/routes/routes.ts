@@ -14,14 +14,16 @@ import FailureReportPage from "@/pages/FailureReportPage.vue"
 import AdminDashboardPage from "@/pages/AdminDashboardPage.vue"
 import NonproductionOnlyLoginPage from "@/pages/NonproductionOnlyLoginPage.vue"
 import MessageCenterPage from "../pages/MessageCenterPage.vue"
-import RecentPage from "@/pages/RecentPage.vue"
 import CirclesPage from "@/pages/CirclesPage.vue"
-import ManageAccessTokensPage from "@/pages/ManageAccessTokensPage.vue"
 import MemoryTrackerPage from "@/pages/MemoryTrackerPage.vue"
 import NotebookPage from "@/pages/NotebookPage.vue"
 import FolderPage from "@/pages/FolderPage.vue"
 import NotebookGroupPage from "@/pages/NotebookGroupPage.vue"
 import BookReadingPage from "@/pages/BookReadingPage.vue"
+import SettingsPage from "@/pages/SettingsPage.vue"
+import GeneralSettingsTab from "@/pages/settings/GeneralSettingsTab.vue"
+import RecentSettingsTab from "@/pages/settings/RecentSettingsTab.vue"
+import AccessTokensSettingsTab from "@/pages/settings/AccessTokensSettingsTab.vue"
 import NotebookSidebarLayout from "@/layouts/NotebookSidebarLayout.vue"
 import { routeMetadata } from "./routeMetadata"
 
@@ -41,9 +43,7 @@ const componentMap: Record<string, RouteComponent> = {
   recall: RecallPage,
   failureReport: FailureReportPage,
   nonproductionOnlyLogin: NonproductionOnlyLoginPage,
-  recent: RecentPage,
   circles: CirclesPage,
-  manageAccessTokens: ManageAccessTokensPage,
   memoryTrackerShow: MemoryTrackerPage,
   notebookPage: NotebookPage,
   folderPage: FolderPage,
@@ -100,8 +100,31 @@ const legacyDeeplinkPrefixRedirect: RouteRecordRaw = {
   },
 }
 
+const settingsNestedRoute: RouteRecordRaw = {
+  path: "/settings",
+  component: SettingsPage,
+  children: [
+    {
+      path: "",
+      name: "settingsGeneral",
+      component: GeneralSettingsTab,
+    },
+    {
+      path: "recent",
+      name: "settingsRecent",
+      component: RecentSettingsTab,
+    },
+    {
+      path: "access-tokens",
+      name: "settingsAccessTokens",
+      component: AccessTokensSettingsTab,
+    },
+  ],
+}
+
 const routes: RouteRecordRaw[] = [
   ...routesFromMetadata,
+  settingsNestedRoute,
   legacyDeeplinkPrefixRedirect,
 ]
 

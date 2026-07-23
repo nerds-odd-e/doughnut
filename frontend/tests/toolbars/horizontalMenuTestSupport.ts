@@ -116,7 +116,6 @@ export function renderHorizontalMenu(
       user,
       ...navItems,
       isHomePage: options.isHomePage ?? false,
-      showUserSettingsDialog: noop,
       logout: noop,
     })
     .render()

@@ -101,13 +101,6 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '/ManageAccessTokensPage': RouteRecordInfo<
-      '/ManageAccessTokensPage',
-      '/ManageAccessTokensPage',
-      Record<never, never>,
-      Record<never, never>,
-      | never
-    >,
     '/MemoryTrackerPage': RouteRecordInfo<
       '/MemoryTrackerPage',
       '/MemoryTrackerPage',
@@ -192,9 +185,30 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '/RecentPage': RouteRecordInfo<
-      '/RecentPage',
-      '/RecentPage',
+    '/settings/AccessTokensSettingsTab': RouteRecordInfo<
+      '/settings/AccessTokensSettingsTab',
+      '/settings/AccessTokensSettingsTab',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/settings/GeneralSettingsTab': RouteRecordInfo<
+      '/settings/GeneralSettingsTab',
+      '/settings/GeneralSettingsTab',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/settings/RecentSettingsTab': RouteRecordInfo<
+      '/settings/RecentSettingsTab',
+      '/settings/RecentSettingsTab',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
+    '/SettingsPage': RouteRecordInfo<
+      '/SettingsPage',
+      '/SettingsPage',
       Record<never, never>,
       Record<never, never>,
       | never
@@ -299,14 +313,6 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/ManageAccessTokensPage.vue': {
-      routes:
-        | '/ManageAccessTokensPage'
-      views:
-        | never
-      pathParamNames:
-        | never
-    }
     'src/pages/MemoryTrackerPage.vue': {
       routes:
         | '/MemoryTrackerPage'
@@ -403,9 +409,33 @@ declare module 'vue-router/auto-routes' {
       pathParamNames:
         | never
     }
-    'src/pages/RecentPage.vue': {
+    'src/pages/settings/AccessTokensSettingsTab.vue': {
       routes:
-        | '/RecentPage'
+        | '/settings/AccessTokensSettingsTab'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/settings/GeneralSettingsTab.vue': {
+      routes:
+        | '/settings/GeneralSettingsTab'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/settings/RecentSettingsTab.vue': {
+      routes:
+        | '/settings/RecentSettingsTab'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/SettingsPage.vue': {
+      routes:
+        | '/SettingsPage'
       views:
         | never
       pathParamNames:

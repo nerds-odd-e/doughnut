@@ -1,15 +1,19 @@
 import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
-import UserProfileForm from "@/components/toolbars/UserProfileForm.vue"
+import GeneralSettingsTab from "@/pages/settings/GeneralSettingsTab.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { ref, type Ref } from "vue"
+import type { User } from "@generated/doughnut-backend-api"
 
-describe("UserProfileForm", () => {
+describe("GeneralSettingsTab", () => {
   let wrapper: VueWrapper
+  let currentUser: Ref<User | undefined>
 
   beforeEach(() => {
     vi.restoreAllMocks()
+    currentUser = ref<User | undefined>(undefined)
   })
 
   afterEach(() => {
@@ -25,7 +29,11 @@ describe("UserProfileForm", () => {
       nextScheduledAt,
     })
 
-    wrapper = helper.component(UserProfileForm).withRouter().mount()
+    wrapper = helper
+      .component(GeneralSettingsTab)
+      .withRouter()
+      .withCurrentUserRef(currentUser)
+      .mount()
     await flushPromises()
 
     expect(wrapper.text()).toContain("Next batch question generation:")
@@ -37,7 +45,11 @@ describe("UserProfileForm", () => {
     mockSdkService(UserController, "getUserProfile", user)
     mockSdkService(UserController, "getQuestionGenerationBatchSchedule", {})
 
-    wrapper = helper.component(UserProfileForm).withRouter().mount()
+    wrapper = helper
+      .component(GeneralSettingsTab)
+      .withRouter()
+      .withCurrentUserRef(currentUser)
+      .mount()
     await flushPromises()
 
     expect(wrapper.text()).toContain(
@@ -45,20 +57,24 @@ describe("UserProfileForm", () => {
     )
   })
 
-  it("emits user-updated after saving profile changes", async () => {
+  it("updates the injected currentUser ref after saving profile changes", async () => {
     const user = makeMe.aUser.please()
     const updatedUser = { ...user, name: "New name" }
     mockSdkService(UserController, "getUserProfile", user)
     mockSdkService(UserController, "getQuestionGenerationBatchSchedule", {})
     mockSdkService(UserController, "updateUser", updatedUser)
 
-    wrapper = helper.component(UserProfileForm).withRouter().mount()
+    wrapper = helper
+      .component(GeneralSettingsTab)
+      .withRouter()
+      .withCurrentUserRef(currentUser)
+      .mount()
     await flushPromises()
 
     await wrapper.get("#user-name").setValue("New name")
     await wrapper.get("form").trigger("submit")
     await flushPromises()
 
-    expect(wrapper.emitted("user-updated")).toEqual([[updatedUser]])
+    expect(currentUser.value).toEqual(updatedUser)
   })
 })
