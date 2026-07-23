@@ -277,7 +277,7 @@ jobs:
           credentials_json: ${{ env.GCP_CREDENTIALS }}
           skip_install: ${{ runner.os == 'Linux' && vars.GCP_FORCE_GCLOUD_INSTALL != 'true' }}
       - name: Download production application jar artifact
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: ${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
       - name: Conditional GCS upload, MIG rolling replace, record last success
