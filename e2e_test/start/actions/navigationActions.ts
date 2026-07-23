@@ -1,5 +1,6 @@
 import router from '../router'
 import { pageIsNotLoading } from '../pageBase'
+import bookReadingPage from '../pageObjects/bookReadingPage'
 import notebookPage from '../pageObjects/notebookPage'
 import { assumeNotePage } from '../pageObjects/notePage'
 import testability from '../testability'
@@ -27,5 +28,16 @@ export const navigationActions = {
       })
     pageIsNotLoading()
     return notebookPage()
+  },
+
+  jumpToBookReadingPage(notebookName: string) {
+    return testability()
+      .getNotebookIdByName(notebookName)
+      .then((notebookId: number) => {
+        router().push(`/notebooks/${notebookId}/book`, 'bookReading', {
+          notebookId,
+        })
+      })
+      .then(() => bookReadingPage())
   },
 }

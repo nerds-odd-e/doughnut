@@ -109,22 +109,21 @@ Status: done
 
 ### Phase 3: Batch ranks 7–9 (wikidata create, semantic search, reading record)
 Type: Behavior
-Status: planned
+Status: done
 
 **Tests:**
-- `e2e_test/features/wikidata/note_create_with_wikidata_id.feature` — "Create a new note with a wikidata id" (~3968ms)
-- `e2e_test/features/note_view/semantical_search.feature` — "Search with semantic search (example #1)" (~3752ms)
-- `e2e_test/features/book_reading/reading_record.feature` — "Auto-read a heading-only book block when entering its successor (reading record)" (~3720ms)
+- `e2e_test/features/wikidata/note_create_with_wikidata_id.feature` — "Create a new note with a wikidata id" (~3968ms → ~3.4–3.7s)
+- `e2e_test/features/note_view/semantical_search.feature` — "Search with semantic search (example #1)" (~3752ms → ~2.6–3.4s)
+- `e2e_test/features/book_reading/reading_record.feature` — "Auto-read a heading-only book block when entering its successor (reading record)" (~3720ms → ~2.7–3.0s)
 
-**Goals:** Speed up these scenarios.
+**Done (2026-07-23):**
+- Wikidata create: assert wiki link on the current note (drop force re-visit after create).
+- Semantic search: reindex via `NotebookController.updateNotebookIndex` API; search field via `invoke('val')` + `input`.
+- Reading record: open book via direct `bookReading` route (`jumpToBookReadingPage`); cache blank PDF bytes for attach; drop unused `@attachedBookPdfStem` / UI `reindexNotebook`.
 
-**Verify:**
+**Verify:** 3 consecutive focused greens.
 
-```bash
-CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/wikidata/note_create_with_wikidata_id.feature,e2e_test/features/note_view/semantical_search.feature,e2e_test/features/book_reading/reading_record.feature
-```
-
-Run focused specs **3+ consecutive greens** before closing.
+**Learnings for later phases:** Prefer API index update over settings-tab "Update index"; stay on the created note for wiki link asserts; book open can skip notebooks→settings→Read when the notebook already has an attached book.
 
 ---
 
@@ -254,3 +253,4 @@ CURSOR_DEV=true nix develop -c pnpm cy:run-on-sut --reporter json 2>&1 | tee /tm
 **Commits:**
 - Phase 1: `perf(e2e): speed up audio/recall/note-yaml scenarios`
 - Phase 2: `perf(e2e): speed up circle-note and unread-message scenarios`
+- Phase 3: `perf(e2e): speed up wikidata-create, semantic-search, reading-record`

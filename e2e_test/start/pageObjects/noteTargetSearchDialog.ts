@@ -52,7 +52,10 @@ function searchNote(searchKey: string, options: string[]) {
   if (options?.includes('All My Notebooks And Subscriptions')) {
     ensureAllMyNotebooksAndSubscriptionsScopeOn()
   }
-  cy.findByPlaceholderText('Search').clear().type(searchKey)
+  cy.findByPlaceholderText('Search')
+    .clear()
+    .invoke('val', searchKey)
+    .trigger('input')
   cy.tick(1000)
 }
 

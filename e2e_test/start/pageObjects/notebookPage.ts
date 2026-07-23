@@ -194,13 +194,6 @@ const notebookPage = () => {
       cy.get('[data-testid="notebook-attached-book"]').should('not.exist')
       return this
     },
-    reindexNotebook() {
-      openSettingsTab()
-      cy.findByRole('button', { name: 'Update index' }).click()
-      // Wait for the indexing to complete - toast notification will appear
-      pageIsNotLoading()
-      return this
-    },
     shareNotebookToBazaar() {
       openSettingsTab()
       cy.findByRole('button', { name: 'Share notebook to bazaar' }).click()
