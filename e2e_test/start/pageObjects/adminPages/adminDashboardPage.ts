@@ -72,7 +72,7 @@ export function assumeAdminDashboardPage() {
     },
 
     goToModelManagement() {
-      this.goToTabInAdminDashboard('Manage Models')
+      this.openAdminDashboardTab('Manage Models')
       return {
         chooseModel(model: string, task: string) {
           submittableForm.submitWith({ [task]: model })

@@ -174,14 +174,23 @@ Status: done
 
 ### Phase 6: Batch ranks 16–18 (AI models, bazaar subscribe, predefined questions)
 Type: Behavior
-Status: planned
+Status: done
 
 **Tests:**
-- `e2e_test/features/user_admin/manage_ai_models.feature` — "Admin choose a default model" (~3548ms)
-- `e2e_test/features/bazaar/add_to_learning.feature` — "subscribe to a note and browse" (~3518ms)
-- `e2e_test/features/note_creation_and_update/predefined_questions_management.feature` — "Manually add a question to the note successfully" (~3516ms)
+- `e2e_test/features/user_admin/manage_ai_models.feature` — "Admin choose a default model" (~3548ms → ~2.6–3.0s)
+- `e2e_test/features/bazaar/add_to_learning.feature` — "subscribe to a note and browse" (~3518ms) — **Candidate** (see blacklist)
+- `e2e_test/features/note_creation_and_update/predefined_questions_management.feature` — "Manually add a question to the note successfully" (~3516ms) — **Candidate** (see blacklist)
 
-**Goals:** Speed up these scenarios.
+**Done (2026-07-23):**
+- AI models: replaced `goToAdminDashboard()` (reload + `mainMenu()` → /notebooks → click Account → click Admin Dashboard) + `goToTabInAdminDashboard('Manage Models')` (button click) with `assumeAdminDashboardPage().goToModelManagement()` where `goToModelManagement` now uses `openAdminDashboardTab('Manage Models')` (direct `cy.visit('/admin-dashboard?tab=manageModel')`). One direct visit replaces reload + 4 UI clicks + their waits. `goToAdminDashboard()` kept (still used by the failure-report scenario via `loginAsAdminAndGoToAdminDashboard`).
+- Bazaar subscribe: attempted converting `navigateToBazaar` to SPA `router.push` (target dropped to ~3110ms) but it regressed the `@mockBrowserTime` "subscribe to a note and recall" sibling — `cy.clock`/`cy.tick` + SPA nav (vs full `cy.visit`) leaves the recall page without the "Square" question. Reverted; proposed under **Candidates** (shared helper can't flip without reworking the recall scenario).
+- Predefined questions: investigated; already lean (`fillQuestion` uses `invoke('val')`+`trigger('input')`, intercept-waited save, no redundant steps). Proposed under **Candidates**.
+
+**Verify:** 3 consecutive focused greens (7/7 each; Admin ~2670/2973/2752ms).
+
+**Learnings for later phases:**
+- `assumeAdminDashboardPage()` returns the page object with no DOM assertion, so a step can jump straight to `openAdminDashboardTab('<tab>')` (direct `cy.visit('/admin-dashboard?tab=<query>')`) instead of `goToAdminDashboard()` (reload + menu clicks) — same proven pattern as the `I navigate to the {string} section in the admin dashboard` step.
+- Shared navigation helpers used by `@mockBrowserTime` siblings are risky to convert from `cy.visit` (full load) to `router.push` (SPA nav): `cy.clock`/`cy.tick` + SPA nav can leave a downstream page (e.g. recall) without freshly fetched data, where a full `cy.visit` re-mounts and re-fetches. Verify sibling `@mockBrowserTime` scenarios before flipping a shared nav helper.
 
 **Verify:**
 
