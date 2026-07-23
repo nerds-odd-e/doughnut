@@ -17,6 +17,7 @@
         <input
           type="submit"
           value="Submit"
+          :disabled="loading"
           class="daisy-btn daisy-btn-primary"
         />
       </form>
@@ -42,6 +43,7 @@
       <thead>
         <tr>
           <th class="text-left px-4 py-2">Label</th>
+          <th class="text-right px-4 py-2">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -51,7 +53,8 @@
             <div class="flex justify-end">
               <button
                 class="daisy-btn daisy-btn-error daisy-btn-xs"
-                @click="deleteToken(item.id)"
+                :disabled="loading"
+                @click="deleteToken(item)"
               >
                 Delete
               </button>
@@ -59,7 +62,7 @@
           </td>
         </tr>
         <tr v-if="tokens.length === 0">
-          <td class="px-4 py-2 text-gray-400">No tokens yet</td>
+          <td colspan="2" class="px-4 py-2 text-gray-400">No tokens yet</td>
         </tr>
       </tbody>
     </table>
@@ -70,9 +73,12 @@
 import { ref } from "vue"
 import { UserController } from "@generated/doughnut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import usePopups from "@/components/commons/Popups/usePopups"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import TextInput from "@/components/form/TextInput.vue"
 import CopyButton from "@/components/commons/CopyButton.vue"
+
+const { popups } = usePopups()
 
 const popbutton = ref<InstanceType<typeof PopButton> | null>(null)
 
@@ -101,31 +107,47 @@ loadTokens()
 
 const generateToken = async () => {
   loading.value = true
-  const { data: newToken, error } = await apiCallWithLoading(() =>
-    UserController.generateToken({
-      body: {
-        label: tokenFormData.value.label,
-      },
-    })
-  )
-  if (!error) {
-    token.value = newToken!.token
-    tokens.value.push({
-      id: newToken!.id,
-      label: newToken!.label,
-    })
-    tokenFormData.value.label = ""
-    popbutton.value?.closeDialog()
+  try {
+    const { data: newToken, error } = await apiCallWithLoading(() =>
+      UserController.generateToken({
+        body: {
+          label: tokenFormData.value.label,
+        },
+      })
+    )
+    if (!error) {
+      token.value = newToken!.token
+      tokens.value.push({
+        id: newToken!.id,
+        label: newToken!.label,
+      })
+      tokenFormData.value.label = ""
+      popbutton.value?.closeDialog()
+    }
+  } finally {
+    loading.value = false
   }
-  loading.value = false
 }
 
-const deleteToken = async (id: number) => {
-  const { error } = await apiCallWithLoading(() =>
-    UserController.deleteToken({ path: { tokenId: id } })
-  )
-  if (!error) {
-    tokens.value = tokens.value.filter((token) => token.id !== id)
+const deleteToken = async (item: { id: number; label: string }) => {
+  const label = item.label || "this token"
+  if (
+    !(await popups.confirm(
+      `Delete access token "${label}"? Any API clients using it will stop working.`
+    ))
+  ) {
+    return
+  }
+  loading.value = true
+  try {
+    const { error } = await apiCallWithLoading(() =>
+      UserController.deleteToken({ path: { tokenId: item.id } })
+    )
+    if (!error) {
+      tokens.value = tokens.value.filter((t) => t.id !== item.id)
+    }
+  } finally {
+    loading.value = false
   }
 }
 </script>

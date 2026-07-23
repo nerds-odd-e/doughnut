@@ -20,6 +20,8 @@ export const manageAccessTokensPage = () => {
       cy.contains('tr', label).within(() => {
         cy.findByRole('button', { name: 'Delete' }).click()
       })
+      cy.findByRole('button', { name: 'OK' }).click()
+      pageIsNotLoading()
       return this
     },
     checkTokenWithLabelNotExists(label: string) {
