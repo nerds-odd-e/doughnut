@@ -129,22 +129,24 @@ Status: done
 
 ### Phase 4: Batch ranks 10–12 (folder move, notebook health, notebook group)
 Type: Behavior
-Status: planned
+Status: done
 
 **Tests:**
-- `e2e_test/features/folder_organization/folder_organization.feature` — "Move a nested folder to notebook root from the folder page" (~3717ms)
-- `e2e_test/features/notebooks/notebook_health.feature` — "Run lint shows expandable findings for seeded health issues" (~3702ms)
-- `e2e_test/features/notebooks/notebook_group.feature` — "Catalog group for owned notebook, group page, and ungroup" (~3679ms)
+- `e2e_test/features/folder_organization/folder_organization.feature` — "Move a nested folder to notebook root from the folder page" (~3717ms → ~3.0s)
+- `e2e_test/features/notebooks/notebook_health.feature` — "Run lint shows expandable findings for seeded health issues" (~3702ms → ~2.5s)
+- `e2e_test/features/notebooks/notebook_group.feature` — "Catalog group for owned notebook, group page, and ungroup" (~3679ms → ~3.2s)
 
-**Goals:** Speed up these scenarios.
+**Done (2026-07-23):**
+- Folder move: seed the "Beta" folder via `NotebookController.createFolder` API (`underNoteId` = the viewed note) instead of UI "New folder"; drop the UI creation step (still covered by `notebook_health` scenarios 2 & 3).
+- Notebook health: seed the empty folder + readme-only folder via API (`createEmptyFolder` / `createReadmeOnlyFolder` testability helpers using `createFolder` + `updateFolderReadmeContent`); jump straight to the notebook Health tab instead of view-note → UI folder creation → open folder page → type readme → catalog nav. Aligns with the "seeded health issues" scenario intent.
+- Notebook group: drop redundant `navigateToNotebooksPage()` re-navigations in 3 catalog steps (same-route router push was a near-no-op; exported `myNotebooksPage()` to assert on the current page); add `{ delay: 0 }` to the group-name typing.
 
-**Verify:**
+**Verify:** 3 consecutive focused greens (15/15 each).
 
-```bash
-CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/folder_organization/folder_organization.feature,e2e_test/features/notebooks/notebook_health.feature,e2e_test/features/notebooks/notebook_group.feature
-```
-
-Run focused specs **3+ consecutive greens** before closing.
+**Learnings for later phases:**
+- `NotebookController.createFolder({ body: { name, underNoteId } })` creates an empty (or under-a-note) folder via API — use it to seed folder structure without UI; `updateFolderReadmeContent` sets a folder readme directly (matches the UI blur-save path).
+- Removing `navigateToNotebooksPage()` re-navigation when already on `/notebooks` saves little (Vue Router no-ops same-route pushes); the real win on catalog scenarios is `{ delay: 0 }` on `cy.type` of names + dropping genuine extra navigations.
+- "Create folder while viewing note" UI coverage lives in `notebook_health.feature` scenarios 2 & 3 — safe to use API seeding elsewhere.
 
 ---
 

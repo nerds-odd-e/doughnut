@@ -8,6 +8,8 @@ import type { TimeTravel } from '@generated/doughnut-backend-api'
 import type { TimeTravelRelativeToNow } from '@generated/doughnut-backend-api'
 import type {
   AttachBookRequestFull,
+  Folder,
+  FolderCreationRequest,
   NoteRealm,
   NotebooksViewedByUser,
 } from '@generated/doughnut-backend-api'
@@ -444,6 +446,54 @@ const testability = () => {
           }),
           { log: false }
         )
+      )
+    },
+
+    createEmptyFolder(
+      notebookName: string,
+      folderName: string,
+      underNoteTitle?: string
+    ) {
+      return this.getNotebookIdByName(notebookName).then((notebookId) => {
+        const body: FolderCreationRequest = { name: folderName }
+        const createFolder = () =>
+          cy.wrap(
+            NotebookController.createFolder({
+              path: { notebook: notebookId },
+              body,
+            }),
+            { log: false }
+          )
+        if (underNoteTitle) {
+          return this.getInjectedNoteIdByTitle(underNoteTitle).then(
+            (noteId) => {
+              body.underNoteId = noteId
+              return createFolder()
+            }
+          )
+        }
+        return createFolder()
+      })
+    },
+
+    createReadmeOnlyFolder(
+      notebookName: string,
+      folderName: string,
+      readme: string
+    ) {
+      return this.createEmptyFolder(notebookName, folderName).then(
+        (response) => {
+          const folder = unwrapData<Folder>(response)
+          return this.getNotebookIdByName(notebookName).then((notebookId) =>
+            cy.wrap(
+              NotebookController.updateFolderReadmeContent({
+                path: { notebook: notebookId, folder: folder.id },
+                body: { content: readme },
+              }),
+              { log: false }
+            )
+          )
+        }
       )
     },
 

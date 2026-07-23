@@ -7,12 +7,9 @@ Feature: Notebook health
 
   Scenario: Run lint shows expandable findings for seeded health issues
     Given I have a notebook "Health findings suite" with a note "Carrier" and content "See [[Missing]]"
-    When I view note "Carrier"
-    And I create a folder named "Empty Shell" while viewing note "Carrier"
-    And I create a folder named "Readme Only Shell" while viewing note "Carrier"
-    And I open the folder page for "Readme Only Shell" from the sidebar
-    And I type and save the folder readme with text "Only a readme here"
-    And I open the notebook "Health findings suite" from my notebooks catalog
+    And the notebook "Health findings suite" has an empty folder "Empty Shell"
+    And the notebook "Health findings suite" has a readme-only folder "Readme Only Shell" with readme "Only a readme here"
+    When I jump to the notebook "Health findings suite"
     And I open the notebook workspace Health tab
     Then the notebook health idle prompt is visible
     When I run notebook health lint

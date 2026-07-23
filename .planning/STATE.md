@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Notebook Lint & Auto-Fix
-current_phase: 3
-current_phase_name: E2E test optimization batch 7–9
+current_phase: 4
+current_phase_name: E2E test optimization batch 10–12
 status: in_progress
-stopped_at: Quick 002 Phase 3 done (wikidata-create/semantic-search/reading-record)
-last_updated: "2026-07-23T01:45:00.000Z"
+stopped_at: Quick 002 Phase 4 done (folder-move/notebook-health/notebook-group)
+last_updated: "2026-07-23T02:00:00.000Z"
 last_activity: 2026-07-23
-last_activity_desc: Completed quick/002 Phase 3 — sped up wikidata-create, semantic-search, reading-record E2E
+last_activity_desc: Completed quick/002 Phase 4 — sped up folder-move, notebook-health, notebook-group E2E
 progress:
   total_phases: 7
   completed_phases: 7
@@ -20,20 +20,20 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-07-22)
+See: `.planning/PROJECT.md` (updated 2026-07-22)
 
 **Core value:** From Notebook Settings → Health, a user can run lint and see actionable health findings — with optional bulk removal of empty folders when auto-fix is enabled.
-**Current focus:** Quick 002 E2E test optimization (Phase 3 done; next Phase 4)
+**Current focus:** Quick 002 E2E test optimization (Phase 4 done; next Phase 5)
 
 ## Current Position
 
-Phase: Quick 002 Phase 3 done; Phase 4 next
-Plan: `.planning/quick/002-e2e-test-optimization/PLAN.md` — Status: in-progress (Phases 1–3 done)
+Phase: Quick 002 Phase 4 done; Phase 5 next
+Plan: `.planning/quick/002-e2e-test-optimization/PLAN.md` — Status: in-progress (Phases 1–4 done)
 Status: Milestone v1.0 delivered; E2E top-10% optimization in progress
-Last activity: 2026-07-23 — Phase 3 wikidata-create / semantic-search / reading-record sped up (3 consecutive greens)
-Resume file: `.planning/quick/002-e2e-test-optimization/PLAN.md` Phase 4
+Last activity: 2026-07-23 — Phase 4 folder-move / notebook-health / notebook-group sped up (3 consecutive greens)
+Resume file: `.planning/quick/002-e2e-test-optimization/PLAN.md` Phase 5
 
-Progress: [███░░░░░░░] quick 002 3/9 phases done
+Progress: [████░░░░░░] quick 002 4/9 phases done
 
 ## Performance Metrics
 
@@ -109,5 +109,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-07-23
-Stopped at: Quick 002 Phase 3 done
-Resume file: `.planning/quick/002-e2e-test-optimization/PLAN.md` Phase 4
+Stopped at: Quick 002 Phase 4 done
+Resume file: `.planning/quick/002-e2e-test-optimization/PLAN.md` Phase 5

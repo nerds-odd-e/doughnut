@@ -132,6 +132,33 @@ Given('note {string} has content:', (noteTitle: string, content: string) => {
 })
 
 Given(
+  'the notebook {string} has an empty folder {string}',
+  (notebookName: string, folderName: string) => {
+    start.testability().createEmptyFolder(notebookName, folderName)
+  }
+)
+
+Given(
+  'the notebook {string} has a folder {string} under note {string}',
+  (notebookName: string, folderName: string, underNoteTitle: string) => {
+    start
+      .testability()
+      .createEmptyFolder(notebookName, folderName, underNoteTitle)
+  }
+)
+
+Given(
+  'the notebook {string} has a readme-only folder {string} with readme {string}',
+  (notebookName: string, folderName: string, readme: string) => {
+    start.testability().createReadmeOnlyFolder(notebookName, folderName, readme)
+  }
+)
+
+When('I jump to the notebook {string}', (notebookName: string) => {
+  start.jumpToNotebookPage(notebookName)
+})
+
+Given(
   'there are some notes for existing user {string} in notebook {string}',
   (externalIdentifier: string, notebookName: string, data: DataTable) => {
     const hashes = data

@@ -10,7 +10,8 @@ Feature: Folder organization
       | In folder | Alpha  |
 
   Scenario: Move a nested folder to notebook root from the folder page
-    When I create a folder named "Beta" while viewing note "In folder"
+    Given the notebook "Organize NB" has a folder "Beta" under note "In folder"
+    When I view note "In folder"
     Then I should see sidebar folder "Beta" under open folder "Alpha"
     When I activate folder "Beta" in the sidebar
     And I move folder "Beta" to notebook root using the folder page

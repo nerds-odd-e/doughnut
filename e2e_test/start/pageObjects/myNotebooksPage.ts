@@ -18,7 +18,7 @@ const addNewNotebookButton = () =>
 const completeMoveNotebookToNewGroupDialog = (newGroupName: string) => {
   cy.findByRole('dialog', { name: 'Move to group' }).within(() => {
     cy.get('#notebook-catalog-move-to-group-target').select('new')
-    cy.findByLabelText('New group name').type(newGroupName)
+    cy.findByLabelText('New group name').type(newGroupName, { delay: 0 })
     cy.findByRole('button', { name: 'Move' }).click()
   })
   pageIsNotLoading()
@@ -32,7 +32,7 @@ const completeMoveNotebookToUngroupedDialog = () => {
   pageIsNotLoading()
 }
 
-const myNotebooksPage = () => {
+export const myNotebooksPage = () => {
   cy.contains('h1', 'My notebooks', { timeout: 15000 }).should('be.visible')
 
   return {
