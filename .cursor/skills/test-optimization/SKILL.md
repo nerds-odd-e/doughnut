@@ -5,7 +5,8 @@ description: >-
   close with a re-profile. Works for unit/integration tests in any sub-project
   (backend, frontend, cli, mcp-server) or Cypress E2E. Use when the developer
   asks to optimize, speed up, or profile slow tests, top 10% slowest, or test
-  performance.
+  performance. With `--resolve`, run resolve-only mode: triage the blacklist
+  Candidates (tag / plan / ask) with no profiling or optimization.
 ---
 
 <objective>
@@ -18,6 +19,16 @@ frontend, cli, mcp-server, E2E).
 Output: Optimized tests with per-phase commits + summary ending with
 `## TEST OPTIMIZATION COMPLETE`.
 </objective>
+
+<modes>
+| Invocation | Mode | What runs |
+|------------|------|-----------|
+| `/test-optimization` (default) | **Optimize** | Full `<process>`: profile → select top 10% → plan → execute-plan → re-profile. |
+| `/test-optimization --resolve` | **Resolve-only** | Run **only** the `resolve_candidates` step against `ongoing/test-optimization-blacklist.md`. **No profiling, no top-10% selection, no optimization.** |
+
+When `--resolve` is given, skip every other step and go straight to
+`resolve_candidates`.
+</modes>
 
 <context>
 **Mandatory first read:** `.cursor/agent-map.md` (sub-project test commands).
@@ -55,6 +66,55 @@ Skip list there.
 </context>
 
 <process>
+
+<step name="resolve_candidates">
+**Only runs in `--resolve` mode** (see `<modes>`). Triage every entry under
+**Candidates** in `ongoing/test-optimization-blacklist.md`. Do **not** profile,
+select a top 10%, or optimize any test here.
+
+**Goal:** for each Candidate, decide whether the slow test earns its cost, or
+whether a cheaper test gives the same protection.
+
+For **each** Candidate:
+
+1. **Read the actual test** (feature/scenario or unit test) plus the sibling
+   scenarios in the same file and any unit/backend tests the blacklist note
+   references. Confirm what unique behavior it actually protects.
+2. **Weigh the slow test against alternatives.** Ask whether one or more **unit
+   tests** (or a **mocked** E2E scenario) could give the **same coverage,
+   behavioral protection, and external user-value clarity**. Remember: unit tests
+   usually **cannot** reproduce the external user-value clarity of a genuine
+   multi-step UI/PTY journey — so inherent-cost journeys stay as E2E.
+3. **Distinguish inherent vs avoidable slowness.** Cost from genuine product
+   behavior (full page load, PDF/canvas render, PTY/Ink startup, frontend session
+   state not replicable via API) is *inherent*. Cost from a live network call,
+   redundant setup, or coverage duplicated elsewhere is *avoidable* — do not label
+   avoidable cost as "necessary".
+
+**Resolve each Candidate with exactly one of:**
+
+| Option | When | Action |
+|--------|------|--------|
+| **1. Tag** | Slowness is inherent to the behavior under test and no cheaper test matches its coverage + user-value clarity. | Add `@skipOptimizationDueToKnownNecessarySlowness` to that Scenario / Scenario Outline / Feature (tag the specific slow scenario, not the whole feature unless all of it is slow). |
+| **2. Plan** | A unit test (or mocked scenario) can give the same coverage + behavioral protection + user-value clarity, so the slow test should be replaced/removed. | Add it to a phased plan via the **phased-planning** skill (`.planning/quick/NNN-slug/`) to remove the test and replace with the cheaper test(s). |
+| **3. Ask** | No obviously logical decision (e.g. a genuine product / network / value trade-off). | Use `AskQuestion` to let the developer decide; then apply their choice. |
+
+**Constraints:**
+
+- **Zero or one plan total** across the whole resolve pass — batch replacements
+  into a single phased plan if more than one Candidate needs option 2.
+- Tagging is a **developer decision (Jidoka)** normally proposed, not auto-applied;
+  in `--resolve` mode the developer has invoked resolve explicitly, so you **may
+  apply option-1 tags directly** when the decision is obviously logical, and fall
+  back to option 3 (ask) whenever it is not.
+
+**After resolving:** for every Candidate you tag (option 1) or fold into a plan
+(option 2), **delete its entry** from the Candidates list — do **not** keep a
+"Resolved" archive in the blacklist file. Leave the Candidates header and the
+`_(none)_` placeholder when the list is empty.
+
+**Then stop** — report per the resolve output below; do not continue to `profile`.
+</step>
 
 <step name="profile">
 Run the **full** suite for the target scope once. Capture per-test durations.
@@ -245,16 +305,24 @@ one-off inline Node script is enough.
 </process>
 
 <success_criteria>
+**Optimize mode:**
 - Full-suite profile captured with E2E skip tag excluded via `--env tags`
 - Top 10% selected from eligible (profiled) tests
 - Plan written and executed via execute-plan (commit + push per group)
 - Non-negotiable rules applied (no redundant tests left, no fixed waits, no flaky)
 - Re-profile recorded; plan marked done; spent history cleaned
 - Final output includes `## TEST OPTIMIZATION COMPLETE`
+
+**Resolve mode (`--resolve`):**
+- Every Candidate resolved by exactly one of tag / plan / ask
+- At most one phased plan created for all replacements
+- Resolved Candidates deleted from the blacklist (no "Resolved" archive kept)
+- No profiling or optimization performed
+- Final output includes `## CANDIDATES RESOLVED`
 </success_criteria>
 
 <output>
-Report:
+**Optimize mode** — report:
 
 1. Scope and baseline vs after metrics.
 2. Groups optimized and commits made.
@@ -264,12 +332,20 @@ Report:
 ```
 ## TEST OPTIMIZATION COMPLETE
 ```
+
+**Resolve mode (`--resolve`)** — report per Candidate: the decision (tag / plan /
+ask) and its one-line rationale; the plan location if one was created; confirm the
+blacklist Candidates list was pruned.
+
+```
+## CANDIDATES RESOLVED
+```
 </output>
 
 <out_of_scope>
 - Do not optimize in the coordinator agent after plan is written.
 - Do not commit profile JSON.
-- Do not add `@skipOptimizationDueToKnownNecessarySlowness` without developer Jidoka.
+- In optimize mode, do not add `@skipOptimizationDueToKnownNecessarySlowness` without developer Jidoka (in `--resolve` mode you may tag directly per the `resolve_candidates` step).
 - Do not add `@focus` / `@only` in committed code.
 - Do not run full E2E suite for per-phase verify unless shared helpers require it.
 </out_of_scope>
