@@ -36,15 +36,15 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AM-01 | — | pending |
-| AM-02 | — | pending |
-| AM-03 | — | pending |
-| AM-04 | — | pending |
-| OVL-01 | — | pending |
-| OVL-02 | — | pending |
-| OVL-03 | — | pending |
-| API-01 | — | pending |
-| API-02 | — | pending |
+| AM-01 | Phase 2 | pending |
+| AM-02 | Phase 2 | pending |
+| AM-03 | Phase 3 | pending |
+| AM-04 | Phase 4 | pending |
+| OVL-01 | Phase 6 | pending |
+| OVL-02 | Phase 5 | pending |
+| OVL-03 | Phase 5 | pending |
+| API-01 | Phase 1 | pending |
+| API-02 | Phase 1 | pending |
 
 ---
 *Last updated: 2026-07-23 after initialization*

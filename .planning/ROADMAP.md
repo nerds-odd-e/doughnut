@@ -1,0 +1,124 @@
+# Roadmap: Spelling Answer Match & Link
+
+## Project
+
+**Core value:** During spelling recall, an answer that names a *different* note becomes a learning opportunity — penalized lightly, both notes revealed, and a link offered — turning recall confusion into connection-building; and overlapping-but-distinct notes are kept distinct by asking the user for a more specific answer.
+
+**Granularity:** fine (6–10 phases; natural boundaries stand)
+**Phase ID convention:** sequential (`Phase N`)
+**Project mode:** mvp
+
+## Phases
+
+- [ ] **Phase 1: Extend Answer outcome API** - Add a third outcome (accidental-match + overlap) to the Answer/AnsweredQuestion contract and regen the OpenAPI client
+- [ ] **Phase 2: Accidental-match grading & penalty** - Detect a spelling answer that names a different note and apply a lighter-than-wrong SRS penalty
+- [ ] **Phase 3: Reveal both notes after accidental match** - Show the reviewed note and the matched note(s) together after an accidental match
+- [ ] **Phase 4: Offer link between notes** - Let the user build a link (property link or relationship note) between the reviewed and matched note via the existing add-link UI, with the matched note pre-selected
+- [ ] **Phase 5: Alias-as-wiki-link overlap declaration** - Extend `aliases` frontmatter to accept wiki-link values pointing to another note, preserving wiki-resolve/search/cloze-masking behavior
+- [ ] **Phase 6: Overlap "try again, no credit"** - When the answer is correct but the reviewed note declares overlap, respond "correct, but we're looking for another answer — try again" with no credit
+
+## Phase Details
+
+### Phase 1: Extend Answer outcome API
+**Goal:** The backend→frontend answer contract can represent a third outcome (accidental-match with matched-note id, and an overlap flag) instead of only a boolean `correct`.
+**Mode:** mvp
+**Depends on**: Nothing (first phase; the contract change is the foundation for every later behavior)
+**Requirements**: API-01, API-02
+**Success Criteria** (what must be TRUE):
+  1. The `Answer` outcome type carries an accidental-match state with a matched-note id (not just a boolean `correct`).
+  2. The `AnsweredQuestion` response carries matched-note topology and an overlap flag.
+  3. The regenerated OpenAPI client compiles and the frontend type-checks against the new contract (no backend behavior wired yet — the new states are representable but not yet returned).
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 2: Accidental-match grading & penalty
+**Goal:** When a user types a spelling answer that is wrong for the reviewed note but matches another note's title or alias (searched across all notebooks the user can read), the system grades it as an accidental match with a lighter-than-wrong spaced-repetition penalty.
+**Mode:** mvp
+**Depends on**: Phase 1
+**Requirements**: AM-01, AM-02
+**Success Criteria** (what must be TRUE):
+  1. A spelling answer that matches another note's title or alias (across all readable notebooks) is graded as an accidental match, distinct from a plain wrong answer.
+  2. An accidental match applies a lighter SRS penalty than a plain wrong answer (a third outcome via `updateForgettingCurve`, no 12h override).
+  3. When the answer already matches the reviewed note, the accidental-match search is skipped (overlap is declared, not auto-detected).
+**Plans**: TBD
+
+### Phase 3: Reveal both notes after accidental match
+**Goal:** After an accidental match, the user sees the reviewed note and the matched note(s) revealed together, so the confusion becomes visible.
+**Mode:** mvp
+**Depends on**: Phase 2
+**Requirements**: AM-03
+**Success Criteria** (what must be TRUE):
+  1. After an accidental match, the reviewed note and the matched note are both shown to the user in the spelling answer result.
+  2. When multiple notes match, all matched notes are surfaced (not just one).
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 4: Offer link between notes
+**Goal:** After an accidental match, the user can build a link between the reviewed note and a matched note through the existing add-link UI, with the matched note pre-selected.
+**Mode:** mvp
+**Depends on**: Phase 3
+**Requirements**: AM-04
+**Success Criteria** (what must be TRUE):
+  1. After an accidental match, the user is offered the existing add-link UI (property link or relationship note) to connect the reviewed note to a matched note.
+  2. The matched note is pre-selected in the add-link UI, so the user can confirm a link with minimal effort.
+  3. The system never auto-writes a link — link creation is user-initiated.
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 5: Alias-as-wiki-link overlap declaration
+**Goal:** The `aliases` frontmatter accepts wiki-link values that point to another note, declaring overlap, without regressing existing wiki-resolve, search, or cloze-masking behavior.
+**Mode:** mvp
+**Depends on**: Phase 1 (overlap flag in the contract); independent of Phases 2–4
+**Requirements**: OVL-02, OVL-03
+**Success Criteria** (what must be TRUE):
+  1. A note's `aliases` frontmatter can contain a wiki-link value (e.g. `[[Other Note]]`) that declares overlap with another note.
+  2. Existing wiki-link resolution by title/alias still resolves correctly for plain (non-wiki-link) aliases.
+  3. Existing search behavior is unchanged for plain aliases (a wiki-link alias is not surfaced as a searchable title where it shouldn't be).
+  4. Existing cloze-masking behavior is unchanged (a wiki-link alias does not leak or break cloze deletion).
+**Plans**: TBD
+
+> **⚠️ Known risk — alias blast radius:** Extending `aliases` to accept wiki-link values touches the derived-index coherence path (wiki title / property / alias caches refreshed via `WikiTitleCacheService.refreshForNote` and backfills — see `.planning/codebase/CONCERNS.md` "Derived index coherence"). Missed refresh sites recreate assimilation/search/cloze bugs. Treat this phase as a design spike: enumerate every consumer of `aliases` (wiki resolve, search index, cloze masking, `NoteAliasIndex`/`NoteAliasIndexService`, `FrontmatterAliases`) before changing the parser, and gate on regression tests for each consumer. Expect this phase to take longer than its neighbors; do not rush it.
+
+### Phase 6: Overlap "try again, no credit"
+**Goal:** When a spelling answer is correct for the reviewed note but the reviewed note declares overlap with another note, the system responds "correct, but we're looking for another answer — try again," with no credit and no note-data mutation.
+**Mode:** mvp
+**Depends on**: Phase 5
+**Requirements**: OVL-01
+**Success Criteria** (what must be TRUE):
+  1. When the answer is correct for the reviewed note AND the reviewed note declares overlap (via an alias-as-wiki-link), the user is told "correct, but we're looking for another answer — try again."
+  2. An overlap response gives no SRS credit (the review is not marked correct).
+  3. An overlap response does not mutate note data — the user simply retries the same review.
+**Plans**: TBD
+**UI hint**: yes
+
+## Progress
+
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 1. Extend Answer outcome API | 0/0 | Not started | - |
+| 2. Accidental-match grading & penalty | 0/0 | Not started | - |
+| 3. Reveal both notes after accidental match | 0/0 | Not started | - |
+| 4. Offer link between notes | 0/0 | Not started | - |
+| 5. Alias-as-wiki-link overlap declaration | 0/0 | Not started | - |
+| 6. Overlap "try again, no credit" | 0/0 | Not started | - |
+
+## Coverage
+
+All 9 v1 requirements mapped:
+
+| Requirement | Phase |
+|-------------|-------|
+| AM-01 | Phase 2 |
+| AM-02 | Phase 2 |
+| AM-03 | Phase 3 |
+| AM-04 | Phase 4 |
+| OVL-01 | Phase 6 |
+| OVL-02 | Phase 5 |
+| OVL-03 | Phase 5 |
+| API-01 | Phase 1 |
+| API-02 | Phase 1 |
+
+✓ 9/9 v1 requirements mapped — no orphans, no duplicates.
+
+---
+*Last updated: 2026-07-23 during roadmap creation*

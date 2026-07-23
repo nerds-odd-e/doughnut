@@ -1,0 +1,70 @@
+# State: Spelling Answer Match & Link
+
+## Project Reference
+
+- **Project:** Spelling Answer Match & Link
+- **Core value:** During spelling recall, an answer that names a *different* note becomes a learning opportunity — penalized lightly, both notes revealed, and a link offered — turning recall confusion into connection-building; and overlapping-but-distinct notes are kept distinct by asking the user for a more specific answer.
+- **Repo:** `/Users/terryyin/git/doughnut` (brownfield Spring Boot + Vue)
+- **Current focus:** Phase 1 — Extend Answer outcome API
+
+## Current Position
+
+- **Phase:** 1 — Extend Answer outcome API
+- **Plan:** none yet (awaiting `/gsd-plan-phase 1`)
+- **Status:** Not started
+- **Progress:** 0/6 phases complete
+
+```
+[1][..........] 0/6 phases
+```
+
+## Roadmap Snapshot
+
+| # | Phase | Type | Requirements | Depends on |
+|---|-------|------|--------------|------------|
+| 1 | Extend Answer outcome API | Structure | API-01, API-02 | — |
+| 2 | Accidental-match grading & penalty | Behavior | AM-01, AM-02 | 1 |
+| 3 | Reveal both notes after accidental match | Behavior | AM-03 | 2 |
+| 4 | Offer link between notes | Behavior | AM-04 | 3 |
+| 5 | Alias-as-wiki-link overlap declaration | Structure | OVL-02, OVL-03 | 1 |
+| 6 | Overlap "try again, no credit" | Behavior | OVL-01 | 5 |
+
+## Performance Metrics
+
+- **Phases completed:** 0
+- **Requirements delivered:** 0/9
+- **Coverage:** 9/9 mapped (100%)
+
+## Accumulated Context
+
+### Key decisions (from PROJECT.md)
+- v1 covers all three problems (accidental match + link + overlap) — shipping a half-feature is not acceptable.
+- Match scope: all notebooks the user can read (broader than notebook-scoped `WikiLinkResolver`).
+- Accidental-match penalty is lighter than a plain wrong answer (third SRS outcome via `updateForgettingCurve`, no 12h override).
+- Overlap is **declared** (alias-as-wiki-link), not auto-detected.
+- Reuse `WikiLinkResolver`, `Note.matchAnswer`, `LinkInsertionChoice`, `updateForgettingCurve`.
+
+### Integration points (from codebase map)
+- Backend: `MemoryTrackerService.answerSpelling` (lines ~255–280), after `Note.matchAnswer`.
+- Frontend: `AnsweredSpellingQuestion.vue`.
+- Reuse: `WikiLinkResolver.resolveWikiLinkToken`, `Note.matchAnswer`, `LinkInsertionChoice` / `AddRelationshipFinalize`, `updateForgettingCurve`.
+
+### Known risks / blockers
+- **⚠️ Alias blast radius (Phase 5):** Extending `aliases` to accept wiki-link values affects wiki resolve, search, and cloze masking. The derived-index coherence path (`WikiTitleCacheService.refreshForNote` + backfills) is a known regression source (see `.planning/codebase/CONCERNS.md`). Phase 5 is treated as a design spike — enumerate every `aliases` consumer and gate on regression tests before changing the parser. Expect it to take longer than its neighbors.
+
+### Todos
+- [ ] Run `/gsd-plan-phase 1` to plan the API contract extension.
+- [ ] Confirm the accidental-match penalty value (e.g. `updateForgettingCurve(−10)`-style) during Phase 2 planning.
+
+### Open questions
+- Exact SRS penalty magnitude for the accidental-match outcome (Phase 2).
+- Whether the overlap "try again" re-asks the same review immediately or re-queues (Phase 6).
+
+## Session Continuity
+
+- **Last action:** Roadmap created (6 phases, 9/9 requirements mapped).
+- **Next action:** `/gsd-plan-phase 1` (Structure — API contract extension).
+- **Resume from:** Read this file + `.planning/ROADMAP.md`; continue at Phase 1 planning.
+
+---
+*Last updated: 2026-07-23 during roadmap creation*
