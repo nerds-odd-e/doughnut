@@ -29,7 +29,7 @@
   2. The `AnsweredQuestion` response carries matched-note topology and an overlap flag.
   3. The regenerated OpenAPI client compiles and the frontend type-checks against the new contract (no backend behavior wired yet — the new states are representable but not yet returned).
 **Plans**: TBD
-**UI hint**: yes
+**UI hint**: no
 
 ### Phase 2: Accidental-match grading & penalty
 **Goal:** When a user types a spelling answer that is wrong for the reviewed note but matches another note's title or alias (searched across all notebooks the user can read), the system grades it as an accidental match with a lighter-than-wrong spaced-repetition penalty.
