@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.dto.GeneratedTokenDTO;
 import com.odde.doughnut.controllers.dto.MenuDataDTO;
 import com.odde.doughnut.controllers.dto.QuestionGenerationBatchUserScheduleDTO;
+import com.odde.doughnut.controllers.dto.RecallStatsDTO;
 import com.odde.doughnut.controllers.dto.TokenConfigDTO;
 import com.odde.doughnut.controllers.dto.UserDTO;
 import com.odde.doughnut.entities.User;
@@ -14,6 +15,7 @@ import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.QuestionGenerationBatchPlanningService;
 import com.odde.doughnut.services.RecallService;
+import com.odde.doughnut.services.RecallStatsService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.TestAccessTokenResolver;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -41,6 +43,7 @@ class UserController {
   private final UserService userService;
   private final AssimilationServiceFactory assimilationServiceFactory;
   private final RecallService recallService;
+  private final RecallStatsService recallStatsService;
   private final ConversationService conversationService;
   private final QuestionGenerationBatchPlanningService questionGenerationBatchPlanningService;
   private final TestabilitySettings testabilitySettings;
@@ -53,6 +56,7 @@ class UserController {
       UserService userService,
       AssimilationServiceFactory assimilationServiceFactory,
       RecallService recallService,
+      RecallStatsService recallStatsService,
       ConversationService conversationService,
       QuestionGenerationBatchPlanningService questionGenerationBatchPlanningService,
       TestabilitySettings testabilitySettings,
@@ -62,6 +66,7 @@ class UserController {
     this.userService = userService;
     this.assimilationServiceFactory = assimilationServiceFactory;
     this.recallService = recallService;
+    this.recallStatsService = recallStatsService;
     this.conversationService = conversationService;
     this.questionGenerationBatchPlanningService = questionGenerationBatchPlanningService;
     this.testabilitySettings = testabilitySettings;
@@ -196,6 +201,16 @@ class UserController {
     var unreadConversations = conversationService.getUnreadConversations(user);
 
     return new MenuDataDTO(assimilationCount, recallStatus, unreadConversations);
+  }
+
+  @GetMapping("/recall-stats")
+  @Transactional(readOnly = true)
+  public RecallStatsDTO getRecallStats(@RequestParam(value = "timezone") String timezone) {
+    authorizationService.assertLoggedIn();
+    User user = authorizationService.getCurrentUser();
+    ZoneId timeZone = TimezoneUtils.parseTimezone(timezone);
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+    return recallStatsService.compute(user, timeZone, currentUTCTimestamp);
   }
 
   @GetMapping("/question-generation-batch-schedule")

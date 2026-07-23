@@ -821,6 +821,68 @@ export type UserToken = {
     label: string;
 };
 
+export type AmPmResponseTime = {
+    morningMs?: number;
+    morningSamples?: number;
+    afternoonMs?: number;
+    afternoonSamples?: number;
+    eveningMs?: number;
+    eveningSamples?: number;
+    nightMs?: number;
+    nightSamples?: number;
+};
+
+export type DayAvgResponseTime = {
+    date?: string;
+    avgMs?: number;
+    sampleSize?: number;
+};
+
+export type DayCount = {
+    date?: string;
+    count?: number;
+};
+
+export type DayRetention = {
+    date?: string;
+    retentionPct?: number;
+    correctCount?: number;
+    answeredCount?: number;
+    sampleSize?: number;
+};
+
+export type HeadlineStats = {
+    totalReviewsAllTime?: number;
+    totalReviews365?: number;
+    reviewsToday?: number;
+    retentionPct365?: number;
+    currentStreak?: number;
+    longestStreak?: number;
+    totalTimeSpentMs?: number;
+    bestHour?: number;
+    bestHourRetentionPct?: number;
+    worstHour?: number;
+    worstHourRetentionPct?: number;
+};
+
+export type HourRetention = {
+    hour?: number;
+    retentionPct?: number;
+    correctCount?: number;
+    answeredCount?: number;
+};
+
+export type RecallStatsDto = {
+    calendar?: Array<DayCount>;
+    trend?: Array<DayAvgResponseTime>;
+    retentionTrend?: Array<DayRetention>;
+    amPm?: AmPmResponseTime;
+    weekdayHourCounts?: Array<Array<number>>;
+    weekdayHourCorrect?: Array<Array<number>>;
+    hourlyRetention?: Array<HourRetention>;
+    totals?: HeadlineStats;
+};
+
 export type QuestionGenerationBatchUserScheduleDto = {
     nextScheduledAt?: string;
     reason?: string;
@@ -2975,6 +3037,24 @@ export type GetTokenInfoResponses = {
 };
 
 export type GetTokenInfoResponse = GetTokenInfoResponses[keyof GetTokenInfoResponses];
+
+export type GetRecallStatsData = {
+    body?: never;
+    path?: never;
+    query: {
+        timezone: string;
+    };
+    url: '/api/user/recall-stats';
+};
+
+export type GetRecallStatsResponses = {
+    /**
+     * OK
+     */
+    200: RecallStatsDto;
+};
+
+export type GetRecallStatsResponse = GetRecallStatsResponses[keyof GetRecallStatsResponses];
 
 export type GetQuestionGenerationBatchScheduleData = {
     body?: never;

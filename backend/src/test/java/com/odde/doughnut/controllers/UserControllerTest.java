@@ -2,15 +2,20 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.everyItem;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.GeneratedTokenDTO;
 import com.odde.doughnut.controllers.dto.MenuDataDTO;
 import com.odde.doughnut.controllers.dto.NoteDeleteReferenceHandling;
+import com.odde.doughnut.controllers.dto.RecallStatsDTO;
 import com.odde.doughnut.controllers.dto.TokenConfigDTO;
 import com.odde.doughnut.controllers.dto.UserDTO;
 import com.odde.doughnut.entities.Conversation;
+import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.UserToken;
@@ -307,6 +312,116 @@ class UserControllerTest extends ControllerTestBase {
       MenuDataDTO menuData = controller.getMenuData("Asia/Shanghai");
 
       assertEquals(0, menuData.getUnreadConversations().size());
+    }
+  }
+
+  @Nested
+  class GetRecallStats {
+    @Test
+    void forLoginUserOnly() {
+      currentUser.setUser(null);
+      ResponseStatusException exception =
+          assertThrows(
+              ResponseStatusException.class, () -> controller.getRecallStats("Asia/Shanghai"));
+      assertEquals(HttpStatusCode.valueOf(401), exception.getStatusCode());
+    }
+
+    @Test
+    void returns401WhenUserNotLoggedIn() {
+      currentUser.setUser(null);
+      assertThrows(ResponseStatusException.class, () -> controller.getRecallStats("Asia/Shanghai"));
+    }
+
+    @Test
+    void calendarHas365ZeroFilledEntries() {
+      RecallStatsDTO dto = controller.getRecallStats("Asia/Shanghai");
+      assertThat(dto.getCalendar().size(), equalTo(365));
+      assertThat(dto.getCalendar(), everyItem(hasProperty("count", equalTo(0))));
+    }
+
+    @Test
+    void retentionTrendPresentAndRespectsGuard() {
+      RecallStatsDTO dto = controller.getRecallStats("Asia/Shanghai");
+      assertThat(dto.getRetentionTrend().size(), equalTo(90));
+      // No data -> every day insufficient (null retentionPct)
+      assertThat(dto.getRetentionTrend(), everyItem(hasProperty("retentionPct", nullValue())));
+    }
+
+    @Test
+    void totalsRetentionPct365IsPresent() {
+      RecallStatsDTO dto = controller.getRecallStats("Asia/Shanghai");
+      assertThat(dto.getTotals(), notNullValue());
+      // No data -> retentionPct365 null (no answered reviews), but the field is present
+      assertThat(dto.getTotals().getRetentionPct365(), nullValue());
+    }
+
+    @Test
+    void reviewsTodayUsesTestabilityClockAndUserZoneTodayBoundary() {
+      // Freeze "now" at 1989-01-01 00:00 UTC = 1989-01-01 08:00 Shanghai -> today local =
+      // 1989-01-01
+      Timestamp now = makeMe.aTimestamp().of(0, 0).please();
+      testabilitySettings.timeTravelTo(now);
+
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      MemoryTracker mt = makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+      // An answer at Shanghai 1989-01-01 10:00 = UTC 1989-01-01 02:00, which is < now (00:00 UTC)?
+      // now is 00:00 UTC; an answer at 02:00 UTC is AFTER now -> excluded by the < endTime bound.
+      // Use an answer before now: Shanghai 1989-01-01 07:00 = UTC 1989-01-00 23:00 = 1988-12-31
+      // 23:00 UTC.
+      // That lands on local day 1988-12-31 (Shanghai) -> not "today". To land on today (1989-01-01
+      // Shanghai)
+      // AND before now (00:00 UTC), we need an answer between 1988-12-31 16:00 UTC (1989-01-01
+      // 00:00 Shanghai)
+      // and 1989-01-01 00:00 UTC. Use 1988-12-31 17:00 UTC = 1989-01-01 01:00 Shanghai.
+      Timestamp todayAnswer =
+          Timestamp.from(
+              java.time.ZonedDateTime.of(1988, 12, 31, 17, 0, 0, 0, java.time.ZoneId.of("UTC"))
+                  .toInstant());
+      makeMe
+          .aRecallPrompt()
+          .withPredefinedQuestionForNote(note)
+          .forMemoryTracker(mt)
+          .answerChoiceIndex(0)
+          .answerTimestamp(todayAnswer)
+          .please();
+
+      RecallStatsDTO dto = controller.getRecallStats("Asia/Shanghai");
+
+      assertThat(dto.getTotals().getReviewsToday(), equalTo(1));
+    }
+
+    @Test
+    void scopedToCurrentUserExcludesOtherUsersPrompts() {
+      Timestamp now = makeMe.aTimestamp().of(10, 12).please();
+      testabilitySettings.timeTravelTo(now);
+
+      Note myNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      MemoryTracker myMt = makeMe.aMemoryTrackerFor(myNote).by(currentUser.getUser()).please();
+      Timestamp myAnswer = makeMe.aTimestamp().of(9, 10).please();
+      makeMe
+          .aRecallPrompt()
+          .withPredefinedQuestionForNote(myNote)
+          .forMemoryTracker(myMt)
+          .answerChoiceIndex(0)
+          .answerTimestamp(myAnswer)
+          .please();
+
+      User other = makeMe.aUser().please();
+      Note otherNote = makeMe.aNote().notebookOwnedBy(other).please();
+      MemoryTracker otherMt = makeMe.aMemoryTrackerFor(otherNote).by(other).please();
+      Timestamp otherAnswer = makeMe.aTimestamp().of(9, 10).please();
+      makeMe
+          .aRecallPrompt()
+          .withPredefinedQuestionForNote(otherNote)
+          .forMemoryTracker(otherMt)
+          .answerChoiceIndex(0)
+          .answerTimestamp(otherAnswer)
+          .please();
+
+      RecallStatsDTO dto = controller.getRecallStats("UTC");
+
+      // Only my 1 review counted in the 365d window
+      assertThat(dto.getTotals().getTotalReviews365(), equalTo(1));
     }
   }
 }
