@@ -89,22 +89,21 @@ Status: done
 
 ### Phase 2: Batch ranks 4–6 (wikidata real, circle note, unread messages)
 Type: Behavior
-Status: planned
+Status: done
 
 **Tests:**
-- `e2e_test/features/wikidata/associate_wikidata.feature` — "Associate note to wikipedia via wikidata using real service" (~4201ms)
-- `e2e_test/features/circles/notebooks_in_circles.feature` — "Creating note that belongs to the circle" (~4106ms)
-- `e2e_test/features/messages/message_center_with_unread_message_count.feature` — "Unread counts update when a conversation starts and the receiver replies" (~4041ms)
+- `e2e_test/features/wikidata/associate_wikidata.feature` — "Associate note to wikipedia via wikidata using real service" (~4201ms) — **Candidate** (live Wikidata; see blacklist)
+- `e2e_test/features/circles/notebooks_in_circles.feature` — "Creating note that belongs to the circle" (~4106ms → ~2.1–2.3s)
+- `e2e_test/features/messages/message_center_with_unread_message_count.feature` — "Unread counts update when a conversation starts and the receiver replies" (~4041ms → ~3.1–3.5s)
 
-**Goals:** Speed up these scenarios; if real Wikidata cannot be meaningfully sped without product trade-off, propose Candidate.
+**Done (2026-07-23):**
+- Wikidata real: proposed under Candidates in `ongoing/test-optimization-blacklist.md` (network-bound; mocked E2E + backend unit coverage already exist).
+- Circle note: drop Background login; scenario logs in only when needed; other-member creates note via `establishSessionAs` + direct note visit (skip intermediate `/notebooks`).
+- Unread messages: remove redundant re-login as `a_trainer` after unread assertion already switched user.
 
-**Verify:**
+**Verify:** 3 consecutive focused greens.
 
-```bash
-CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/wikidata/associate_wikidata.feature,e2e_test/features/circles/notebooks_in_circles.feature,e2e_test/features/messages/message_center_with_unread_message_count.feature
-```
-
-Run focused specs **3+ consecutive greens** before closing.
+**Learnings for later phases:** Prefer `establishSessionAs` + `jumpToNotePage(..., true)` over full `reloginAs` when the next step navigates away from `/notebooks`; unread-count Then that switches user already leaves you logged in for API replies.
 
 ---
 
@@ -254,3 +253,4 @@ CURSOR_DEV=true nix develop -c pnpm cy:run-on-sut --reporter json 2>&1 | tee /tm
 
 **Commits:**
 - Phase 1: `perf(e2e): speed up audio/recall/note-yaml scenarios`
+- Phase 2: `perf(e2e): speed up circle-note and unread-message scenarios`

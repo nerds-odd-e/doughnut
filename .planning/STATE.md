@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Notebook Lint & Auto-Fix
-current_phase: 1
-current_phase_name: E2E test optimization batch 1–3
+current_phase: 2
+current_phase_name: E2E test optimization batch 4–6
 status: in_progress
-stopped_at: Quick 002 Phase 1 done (audio/recall/note-yaml)
-last_updated: "2026-07-23T01:00:00.000Z"
+stopped_at: Quick 002 Phase 2 done (circle-note/unread; wikidata Candidate)
+last_updated: "2026-07-23T01:20:00.000Z"
 last_activity: 2026-07-23
-last_activity_desc: Completed quick/002 Phase 1 — sped up audio/recall/note-yaml E2E scenarios
+last_activity_desc: Completed quick/002 Phase 2 — sped up circle-note and unread-message E2E; Wikidata real as Candidate
 progress:
   total_phases: 7
   completed_phases: 7
@@ -23,17 +23,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-22)
 
 **Core value:** From Notebook Settings → Health, a user can run lint and see actionable health findings — with optional bulk removal of empty folders when auto-fix is enabled.
-**Current focus:** Quick 002 E2E test optimization (Phase 1 done; next Phase 2)
+**Current focus:** Quick 002 E2E test optimization (Phase 2 done; next Phase 3)
 
 ## Current Position
 
-Phase: Quick 002 Phase 1 done; Phase 2 next
-Plan: `.planning/quick/002-e2e-test-optimization/PLAN.md` — Status: in-progress (Phase 1 done)
+Phase: Quick 002 Phase 2 done; Phase 3 next
+Plan: `.planning/quick/002-e2e-test-optimization/PLAN.md` — Status: in-progress (Phases 1–2 done)
 Status: Milestone v1.0 delivered; E2E top-10% optimization in progress
-Last activity: 2026-07-23 — Phase 1 audio/recall/note-yaml scenarios sped up (3 consecutive greens)
-Resume file: `.planning/quick/002-e2e-test-optimization/PLAN.md` Phase 2
+Last activity: 2026-07-23 — Phase 2 circle-note/unread sped up; Wikidata real proposed as Candidate (3 consecutive greens)
+Resume file: `.planning/quick/002-e2e-test-optimization/PLAN.md` Phase 3
 
-Progress: [█░░░░░░░░░] quick 002 1/9 phases done
+Progress: [██░░░░░░░░] quick 002 2/9 phases done
 
 ## Performance Metrics
 

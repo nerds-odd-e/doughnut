@@ -6,7 +6,6 @@ Feature: Message Center with Unread Message Count
     When "old_learner" start a conversation about the note "Rocket Science" with a message "Hi"
     Then I should have no unread messages
     And "a_trainer" should have 1 unread messages
-    And I am re-logged in as "a_trainer"
     When I reply to the conversation "Rocket Science":
       | Thanks, happy to help. |
     Then "old_learner" should have 1 unread messages

@@ -135,12 +135,21 @@ Then(
 )
 
 When(
-  'I add a note {string} under notebook {string} in circle {string}',
-  (noteTopology: string, parentNoteTitle: string, _circleName: string) => {
-    start
-      .jumpToNotePage(parentNoteTitle)
-      .addingNewNoteFromToolbar()
-      .createNoteWithTitle(noteTopology)
+  '{string} adds a note {string} under notebook {string}',
+  (
+    externalIdentifier: string,
+    noteTopology: string,
+    parentNoteTitle: string
+  ) => {
+    return start
+      .logout()
+      .then(() => start.establishSessionAs(externalIdentifier))
+      .then(() => {
+        start
+          .jumpToNotePage(parentNoteTitle, true)
+          .addingNewNoteFromToolbar()
+          .createNoteWithTitle(noteTopology)
+      })
   }
 )
 

@@ -3,26 +3,27 @@ Feature: Notes in circles
 
   Background:
     Given There is a circle "Odd-e SG Team" with "old_learner, another_old_learner" members
-    And I am logged in as "old_learner"
 
   Scenario: Creating note that belongs to the circle
     Given There is a notebook "Team agreement" in circle "Odd-e SG Team" by "old_learner"
-    And I am re-logged in as "another_old_learner"
-    When I add a note "Keep it complex" under notebook "Team agreement" in circle "Odd-e SG Team"
+    When "another_old_learner" adds a note "Keep it complex" under notebook "Team agreement"
     Then the note title should be "Keep it complex"
 
   Scenario: subscribe to a note and view
-    Given  There is a notebook "Team agreement" in circle "Odd-e SG Team" by "old_learner"
+    Given I am logged in as "old_learner"
+    And There is a notebook "Team agreement" in circle "Odd-e SG Team" by "old_learner"
     When I subscribe to notebook "Team agreement" in the circle "Odd-e SG Team", with target of learning 1 notes per day
-    Then  I should be able to edit the subscription to notebook "Team agreement"
+    Then I should be able to edit the subscription to notebook "Team agreement"
 
   Scenario: move notebook to another circle
-    Given There is a circle "Odd-e Thai Team" with "old_learner" members
-    And  There is a notebook "Family gathering guidelines" in circle "Odd-e SG Team" by "old_learner"
+    Given I am logged in as "old_learner"
+    And There is a circle "Odd-e Thai Team" with "old_learner" members
+    And There is a notebook "Family gathering guidelines" in circle "Odd-e SG Team" by "old_learner"
     When I move the notebook "Family gathering guidelines" from "Odd-e SG Team" to "Odd-e Thai Team"
     Then I should see the notebook "Family gathering guidelines" in circle "Odd-e Thai Team"
 
   Scenario: Circle catalog shows notebook groups and layout controls
+    Given I am logged in as "old_learner"
     When I create a notebook "Circle catalog nb" in circle "Odd-e SG Team"
     And I am on "Odd-e SG Team" circle page
     Then I should see circle notebook catalog layout controls

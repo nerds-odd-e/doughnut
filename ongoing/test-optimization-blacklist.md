@@ -13,3 +13,5 @@ to Skip test optimization only after developer review.
 ## Candidates
 
 <!-- file path — test/scenario name — duration — why hard — proposed YYYY-MM-DD -->
+
+`e2e_test/features/wikidata/associate_wikidata.feature` — Associate note to wikipedia via wikidata using real service — ~4201ms — hits live Wikidata network; mocked association scenarios already cover UI; backend unit tests cover Q12345 entity fetch; speeding without mocking is a product/network trade-off — proposed 2026-07-23
