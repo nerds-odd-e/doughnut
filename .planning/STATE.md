@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Notebook Lint & Auto-Fix
-current_phase: 9
-current_phase_name: E2E test optimization complete
-status: done
-stopped_at: Milestone v1.0 done; quick 260723-jlm recall-stats settings tab complete (backend dac57e127c, frontend 41c7945d42)
-last_updated: "2026-07-23T06:45:00.000Z"
+status: Awaiting next milestone
+stopped_at: Quick 002 complete (all 9 phases done; re-profiled)
+last_updated: "2026-07-23T07:39:50.104Z"
 last_activity: 2026-07-23
-last_activity_desc: Completed quick 260723-jlm — Recall Statistics settings tab (retention-first: daily retention trend, activity calendar, response-time trend, weekday×hour heatmap)
+last_activity_desc: Milestone v1.0 completed and archived
 progress:
   total_phases: 7
   completed_phases: 7
   total_plans: 13
   completed_plans: 13
+current_phase: 9
+current_phase_name: E2E test optimization complete
 ---
 
 # Project State
@@ -27,13 +27,10 @@ See: `.planning/PROJECT.md` (updated 2026-07-22)
 
 ## Current Position
 
-Phase: Quick 002 complete (9/9 phases done)
-Plan: `.planning/quick/002-e2e-test-optimization/PLAN.md` — Status: done
-Status: Milestone v1.0 delivered; E2E top-10% optimization complete
-Last activity: 2026-07-23 — Phase 9 re-profiled full suite (231→230 tests, 9m39s→8m45s wall, targeted top-23 86.6s→66.5s −23.2%); 8 hard cases proposed as Candidates
-Resume file: none (quick 002 complete)
-
-Progress: [█████████] quick 002 9/9 phases done
+Phase: Milestone v1.0 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-07-23 — Milestone v1.0 completed and archived
 
 ## Performance Metrics
 
@@ -108,12 +105,25 @@ None yet.
 
 ## Deferred Items
 
-| Category | Item | Status | Deferred At |
-|----------|------|--------|-------------|
-| *(none)* | | | |
+Items acknowledged and deferred at milestone close on 2026-07-23 (override closeout):
+
+| Category | Item | Status |
+|----------|------|--------|
+| verification | Phase 1 (Health lint contract) — no `/gsd-verify-work` report | shipped, unverified |
+| verification | Phase 3 (Readme-only folder findings) — no `/gsd-verify-work` report | shipped, unverified |
+| verification | Phase 4 (Dead-link findings) — no `/gsd-verify-work` report | shipped, unverified |
+| verification | Phase 5 (Health tab and Run) — no `/gsd-verify-work` report | shipped, unverified |
+| verification | Phase 6 (User-level defaults) — no `/gsd-verify-work` report | shipped, unverified |
+| verification | Phase 7 (Gated empty-folder purge) — no `/gsd-verify-work` report | shipped, unverified |
+
+All six phases have implementation complete + SUMMARY + `notebook_health` E2E coverage; only Phase 2 was formally verified. Accepted as override to retire v1.0 before starting a separate project.
 
 ## Session Continuity
 
 Last session: 2026-07-23
 Stopped at: Quick 002 complete (all 9 phases done; re-profiled)
 Resume file: none (quick 002 complete)
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone
