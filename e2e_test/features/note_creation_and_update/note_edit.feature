@@ -81,7 +81,7 @@ Feature: Note Edit
     And the note content should contain a line break
 
   Scenario: Note YAML properties round-trip through markdown and rich editing
-    When I update note "LeSS in Action" content using markdown to become:
+    Given note "LeSS in Action" has content:
       """
       ---
       diligence: high
@@ -91,6 +91,7 @@ Feature: Note Edit
       # Workshop Body
       Main content here.
       """
+    When I visit note "LeSS in Action"
     Then I should see rich note property "diligence" with value "high"
     And I should see rich note property "topic" with value "training"
     When I add a rich note property with key "status" and value "draft"

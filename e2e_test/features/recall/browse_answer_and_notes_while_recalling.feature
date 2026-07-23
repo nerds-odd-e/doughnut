@@ -16,8 +16,8 @@ Feature: Browse answers and notes while recalling
     And It's day 1
 
   Scenario: View last answered question when the quiz answer was correct
-    Given I assimilate the note "sedition" with the option of remembering spelling
-    When I am recalling my note on day 2
+    Given the note "sedition" was assimilated on day 1
+    When I visit recall for a due quiz question on day 2
     And I type my answer "sedition"
     Then I should see that my last spelling answer was correct with recall count 1
 

@@ -25,12 +25,7 @@ Feature: Recording a live audio and append to note content
     And the browser records audio input from the microphone as in "lecture.wav"
     When I stop recording audio
     Then the note content on the current page should be "This is class 1.Let's talk about data structure today."
-
-  Scenario: Download the audio file to local machine
-    Given I start recording audio for the note "Data Structure Lecture"
-    And the browser records audio input from the microphone as in "lecture.wav"
-    When I stop recording audio
-    Then I must be able to download the audio file to my local machine and it matches the size 123
+    And I must be able to download the audio file to my local machine and it matches the size 123
 
   @mockBrowserTime
   Scenario: Record long lecture and continuous converting

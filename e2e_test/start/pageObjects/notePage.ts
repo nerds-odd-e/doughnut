@@ -1,39 +1,24 @@
 import { commonSenseSplit } from '../../support/string_util'
 import { pageIsNotLoading } from '../pageBase'
-import { form } from '../forms'
+import testability from '../testability'
 import audioToolsPage from './audioToolsPage'
-import { assumeConversationAboutNotePage } from './conversationAboutNotePage'
 import noteCreationForm from './forms/noteCreationForm'
 import { assumeNoteTargetSearchDialog } from './noteTargetSearchDialog'
 import { sidebarChildNotePageMethods } from './sidebarChildNotePageMethods'
-import { assumeAssociateWikidataDialog } from './associateWikidataDialog'
-import { toolbarButton } from './toolbarButton'
 import { makeSureNoteMoreOptionsFormIsOpen } from './noteMoreOptionsForm'
-import { questionListPage } from './questionListPage'
+import { toolbarButton } from './toolbarButton'
+import { noteContentEditingMethods } from './noteContentEditingMethods'
+import { noteConversationAndQuestionMethods } from './noteConversationAndQuestionMethods'
 import {
-  assumeAssimilationPage,
-  assimilateButtonSelector,
-} from './assimilationPage'
-import testability from '../testability'
-import { clickPopupConfirmOk } from '../../support/daisyModalHelpers'
+  findNoteContentRegion,
+  noteContentRegion,
+} from './notePageContentRegion'
+import { noteRelationshipMethods } from './noteRelationshipMethods'
+import { noteRichPropertyMethods } from './noteRichPropertyMethods'
 
 /** Matches `noteShowHref()` (`/n{id}`), `/n/:id`, or legacy `/d/n/:id` note links. */
 const noteShowHref = /^\/d\/n\/\d+$|^\/n\/\d+$|^\/n\d+$/
 const noteShowPathInUrl = /\/d\/n\/\d+|\/n\/\d+|\/n\d+/
-
-const noteContentRegion = { role: 'region' as const, name: 'Note content' }
-
-const richNotePropertyRow = (key: string) =>
-  `[data-testid="rich-note-property-row"][data-property-key="${key}"]`
-
-function confirmPropertyMemoryTrackerChange() {
-  cy.get('dialog', { timeout: 15000 })
-    .filter(':visible')
-    .contains('memory tracker')
-    .should('be.visible')
-  clickPopupConfirmOk()
-  pageIsNotLoading()
-}
 
 const mainNoteHeadingTitleSelector =
   '#main-note-content h2.path-name-heading [role=title]'
@@ -50,10 +35,7 @@ const titleRenameReferenceSaveTestId: Record<
 
 function wikiLinkInNoteContentFluent(linkText: string) {
   const locator = () =>
-    cy
-      .findByRole(noteContentRegion.role, { name: noteContentRegion.name })
-      .find('a.doughnut-link')
-      .contains(linkText)
+    findNoteContentRegion().find('a.doughnut-link').contains(linkText)
   return {
     expectNoteShowHref() {
       locator().should('have.attr', 'href').and('match', noteShowHref)
@@ -94,11 +76,6 @@ export const assumeNotePage = (
     findNoteTitle(noteTopology)
   }
   return {
-    expectWithoutAssimilationPanel() {
-      cy.url({ timeout: 15000 }).should('match', noteShowPathInUrl)
-      cy.get(assimilateButtonSelector).should('not.exist')
-      return this
-    },
     expectNoteTitleDisplayed(title: string) {
       findNoteTitle(title)
       return this
@@ -113,66 +90,6 @@ export const assumeNotePage = (
     },
     expandChildren: () => {
       cy.findByRole('button', { name: 'expand children' }).click()
-    },
-    addRelationshipTo: (target: string) => {
-      return {
-        relationType: (relationType: string) => {
-          cy.get('#main-note-content').then(($scope) => {
-            const cardWithTarget = $scope
-              .find('[role=card]')
-              .toArray()
-              .find((el) => el.textContent?.includes(target))
-            if (cardWithTarget) {
-              cy.wrap(cardWithTarget).should('contain', relationType)
-            } else {
-              cy.contains('#main-note-content [role=card]', target).should(
-                'contain',
-                relationType
-              )
-            }
-          })
-        },
-      }
-    },
-
-    expectRelationshipTopic: function (relationType: string, target: string) {
-      this.addRelationshipTo(target).relationType(relationType)
-    },
-    expectRelationshipChildren: function (
-      relationType: string,
-      targetNoteTopics: string
-    ) {
-      cy.get('#main-note-content').then(($main) => {
-        const expandBtn = $main.find('button[title="expand children"]')
-        if (expandBtn.length) {
-          cy.wrap(expandBtn.first()).click()
-        }
-      })
-      commonSenseSplit(targetNoteTopics, ',').forEach((target) => {
-        this.expectRelationshipTopic(relationType, target)
-      })
-    },
-    changeRelationType: function (relationType: string) {
-      cy.get('[data-property-key="relation"]').within(() => {
-        cy.findByRole('button', { name: 'Relation Type' }).click()
-      })
-      form.getField('Relation Type').clickOption(relationType)
-      pageIsNotLoading()
-    },
-
-    navigateToReference: (referenceTopic: string) => {
-      cy.get('#main-note-content')
-        .find('[role=card]')
-        .contains(referenceTopic)
-        .closest('[role=card]')
-        .find('a')
-        .first()
-        .click({ force: true })
-      cy.findByRole(noteContentRegion.role, {
-        name: noteContentRegion.name,
-      }).should('be.visible')
-      pageIsNotLoading()
-      return assumeNotePage()
     },
     expectBreadcrumb: (items: string) => {
       cy.get('.daisy-breadcrumbs').within(() =>
@@ -198,17 +115,11 @@ export const assumeNotePage = (
       })
     },
     expectNoteContentContainLineBreak: () => {
-      cy.findByRole(noteContentRegion.role, {
-        name: noteContentRegion.name,
-      }).within(() => {
-        // Verify that "Hello" is immediately followed by a <br> tag
+      findNoteContentRegion().within(() => {
         cy.get('.ql-editor, [contenteditable]').should(($el) => {
           const html = $el.html()
-          // Check that "Hello" is immediately followed by a <br> tag (with optional whitespace/newlines)
-          // This ensures the <br> is right after "Hello", not somewhere else
           const match = html.match(/Hello\s*<br[^>]*>/i)
           expect(match).to.not.be.null
-          // Also verify "World" comes after the <br>
           expect(html).to.match(/Hello\s*<br[^>]*>\s*World/i)
         })
       })
@@ -237,324 +148,29 @@ export const assumeNotePage = (
       pageIsNotLoading()
       testability().renameInjectedNoteTitleForNoteOnPage(newTitle)
     },
-    editTextContent: (noteAttributes: Record<string, string>) => {
-      const parseSpecialKeys = (text: string): string => {
-        // Replace <Shift-Enter> with Cypress key sequence {shift}{enter}
-        return text.replace(/<Shift-Enter>/g, '{shift}{enter}')
-      }
-
-      for (const propName in noteAttributes) {
-        const value = noteAttributes[propName]
-        if (value) {
-          if (propName === 'Content') {
-            cy.findByRole(noteContentRegion.role, {
-              name: noteContentRegion.name,
-            }).within(() => {
-              cy.get('.ql-editor[contenteditable="true"], textarea')
-                .first()
-                .click()
-            })
-          } else {
-            cy.findByRole(propName.toLowerCase()).click()
-          }
-          const cypressState = cy as unknown as {
-            state?: (key: string) => unknown
-          }
-          if (cypressState.state?.('clock')) {
-            cy.tick(5000)
-          }
-          const parsedValue = parseSpecialKeys(value)
-          cy.clearFocusedText().type(parsedValue).blur()
-          cy.get('.dirty').should('not.exist')
-        }
-      }
-      pageIsNotLoading()
-    },
     audioTools() {
       this.toolbarButton('Audio tools').click()
       return audioToolsPage()
     },
-    switchToRichContent() {
-      cy.get('body').then(($body) => {
-        const toRich = $body.find('button[aria-label^="Edit as rich content"]')
-        if (toRich.length > 0) {
-          cy.wrap(toRich.first()).click()
-        }
-      })
-      return this
-    },
-    switchToRichContentMode() {
-      return this.switchToRichContent()
-    },
-    flushPendingContentSave() {
-      cy.findByRole(noteContentRegion.role, {
-        name: noteContentRegion.name,
-      }).then(($noteField) => {
-        const $textarea = $noteField.find('textarea').filter(':visible')
-        if ($textarea.length) {
-          cy.wrap($textarea.first()).blur()
-        }
-      })
-      cy.get('body').click(0, 0, { force: true })
-      cy.get('.dirty').should('not.exist')
-      pageIsNotLoading()
-      return this
-    },
-    openMarkdownContentEditor() {
-      cy.get('body').then(($body) => {
-        const toMarkdown = $body.find('button[aria-label^="Edit as markdown"]')
-        if (toMarkdown.length > 0) {
-          cy.wrap(toMarkdown.first()).click()
-        }
-      })
-      return this
-    },
-    expectMarkdownContentSourceContains(fragment: string) {
-      cy.get('textarea').should(($ta) => {
-        expect($ta.val()).to.include(fragment)
-      })
-      return this
-    },
-    expectMarkdownContentSourceDoesNotContain(fragment: string) {
-      cy.get('textarea').should(($ta) => {
-        expect($ta.val()).to.not.include(fragment)
-      })
-      return this
-    },
-    updateContentAsMarkdown(markdown: string) {
-      this.toolbarButton('Edit as markdown').click()
-      cy.get('textarea').clear().invoke('val', markdown).trigger('input')
-      this.flushPendingContentSave()
-      return this.switchToRichContent()
-    },
-    expectRichContent(elements: Record<string, string>[]) {
-      for (const element of elements) {
-        const tag = element.Tag as string
-        const content = element.Content ?? ''
-        cy.get('#main-note-content .note-content .ql-editor').within(() => {
-          if (content === '') {
-            cy.get(tag).should('exist')
-          } else {
-            cy.contains(tag, content).should('exist')
-          }
-        })
-      }
-    },
-    addRichNoteProperty(key: string, value: string) {
-      cy.get('body').then(($body) => {
-        const folderReadmeBody = $body.find(
-          '[data-testid="folder-readme-body"]'
-        )
-        const scope =
-          folderReadmeBody.length > 0
-            ? cy.wrap(folderReadmeBody.first())
-            : cy.findByRole(noteContentRegion.role, {
-                name: noteContentRegion.name,
-              })
-        scope.within(() => {
-          cy.findByRole('button', { name: 'Add property' }).click()
-          cy.findByTestId('rich-note-property-key')
-            .clear()
-            .type(key, { parseSpecialCharSequences: false })
-          cy.findByTestId('rich-note-property-value')
-            .clear()
-            .type(value, { parseSpecialCharSequences: false })
-            .blur()
-        })
-        const focusScope =
-          folderReadmeBody.length > 0
-            ? cy.wrap(folderReadmeBody.first())
-            : cy.findByRole(noteContentRegion.role, {
-                name: noteContentRegion.name,
-              })
-        focusScope.within(() => {
-          cy.get('.ql-editor[contenteditable="true"]').first().click()
-        })
-      })
-      return this
-    },
-    uploadRichNoteImagePropertyFromFixture(fixtureRelativePath: string) {
-      cy.findByRole(noteContentRegion.role, {
-        name: noteContentRegion.name,
-      }).within(() => {
-        cy.findByRole('button', { name: 'Add property' }).click()
-        cy.findByTestId('rich-note-property-key').clear().type('image')
-        cy.get('[data-testid="rich-note-image-insert-file-input"]').selectFile(
-          `e2e_test/fixtures/${fixtureRelativePath}`,
-          { force: true }
-        )
-      })
-      cy.get(
-        `[data-testid="rich-note-property-row"][data-property-key="image"]`,
-        { timeout: 20000 }
-      ).should('exist')
-      return this.flushPendingContentSave()
-    },
-    setRichNoteImagePropertyUrl(url: string) {
-      this.addRichNoteProperty('image', url)
-      cy.get(
-        `[data-testid="rich-note-property-row"][data-property-key="image"]`,
-        { timeout: 20000 }
-      ).should('exist')
-      return this.flushPendingContentSave()
-    },
-    expectRichNotePropertyDisplayed(key: string, value: string) {
-      cy.findByRole(noteContentRegion.role, {
-        name: noteContentRegion.name,
-      }).within(() => {
-        cy.contains('h4', 'Properties')
-        cy.get(
-          `[data-testid="rich-note-property-row"][data-property-key="${key}"]`
-        ).within(() => {
-          cy.get('[data-testid="rich-note-property-row-key-input"]').should(
-            'have.value',
-            key
-          )
-          const keyNorm = key.trim().toLowerCase()
-          const isWikidata =
-            keyNorm === 'wikidata_id' || keyNorm === 'wikidataid'
-          if (isWikidata) {
-            cy.contains('.font-mono', value).should('exist')
-          } else if (keyNorm === 'image') {
-            cy.get('[data-testid="rich-note-property-row-value-input"]').should(
-              'have.value',
-              value.trim()
-            )
-          } else {
-            cy.get('[data-testid="rich-note-property-row-value-input"]').should(
-              ($el) => {
-                expect($el.text().trim()).to.eq(value)
-              }
-            )
-          }
-        })
-      })
-      return this
-    },
-    expectRichNoteImagePropertyAttachmentPath(key: string) {
-      cy.findByRole(noteContentRegion.role, {
-        name: noteContentRegion.name,
-      }).within(() => {
-        cy.get(
-          `[data-testid="rich-note-property-row"][data-property-key="${key}"]`
-        ).within(() => {
-          cy.get('[data-testid="rich-note-property-row-value-input"]').should(
-            ($input) => {
-              expect(String($input.val() ?? '').trim()).to.match(
-                /^\/attachments\/images\/\d+\/.+/
-              )
-            }
-          )
-        })
-      })
-      return this
-    },
-    expectRichNotePropertyAbsent(key: string) {
-      cy.findByRole(noteContentRegion.role, {
-        name: noteContentRegion.name,
-      }).within(() => {
-        cy.get(richNotePropertyRow(key)).should('not.exist')
-      })
-      return this
-    },
-    removeRichNoteProperty(key: string) {
-      this.switchToRichContent()
-      cy.findByRole(noteContentRegion.role, {
-        name: noteContentRegion.name,
-      }).within(() => {
-        cy.get(richNotePropertyRow(key))
-          .find('[data-testid="rich-note-property-row-remove"]')
-          .click()
-      })
-      confirmPropertyMemoryTrackerChange()
-      return this.flushPendingContentSave()
-    },
-    removeMarkdownNotePropertyConfirmingMemoryTrackerChange(key: string) {
-      this.openMarkdownContentEditor()
-      cy.get('textarea').then(($ta) => {
-        const lines = String($ta.val() ?? '').split('\n')
-        const withoutProperty = lines
-          .filter((line) => !new RegExp(`^\\s*${key}\\s*:`).test(line))
-          .join('\n')
-        cy.wrap($ta).clear().invoke('val', withoutProperty).trigger('input')
-      })
-      cy.findByRole(noteContentRegion.role, {
-        name: noteContentRegion.name,
-      })
-        .find('textarea')
-        .filter(':visible')
+    navigateToReference: (referenceTopic: string) => {
+      cy.get('#main-note-content')
+        .find('[role=card]')
+        .contains(referenceTopic)
+        .closest('[role=card]')
+        .find('a')
         .first()
-        .blur()
-      cy.get('body').click(0, 0, { force: true })
-      confirmPropertyMemoryTrackerChange()
-      cy.get('.dirty').should('not.exist')
+        .click({ force: true })
+      findNoteContentRegion().should('be.visible')
       pageIsNotLoading()
-      return this
-    },
-    renameRichNotePropertyKey(oldKey: string, newKey: string) {
-      this.switchToRichContent()
-      cy.findByRole(noteContentRegion.role, {
-        name: noteContentRegion.name,
-      }).within(() => {
-        cy.get(richNotePropertyRow(oldKey), { timeout: 15000 }).within(() => {
-          cy.get('[data-testid="rich-note-property-row-key-input"]')
-            .clear()
-            .type(newKey)
-            .blur()
-        })
-      })
-      confirmPropertyMemoryTrackerChange()
-      return this.flushPendingContentSave()
+      return assumeNotePage()
     },
     expectDeadWikiLink(linkText: string) {
-      cy.findByRole(noteContentRegion.role, { name: noteContentRegion.name })
-        .find('a.dead-link')
-        .contains(linkText)
-      return this
-    },
-    editRichNoteProperty(oldKey: string, newKey: string, newValue: string) {
-      // Edit value before key: changing the key updates `data-property-key` on the row,
-      // which breaks a single `.within()` chain that queries by `oldKey` then touches both inputs.
-      cy.findByRole(noteContentRegion.role, {
-        name: noteContentRegion.name,
-      }).within(() => {
-        cy.contains('h4', 'Properties')
-        cy.get(
-          `[data-testid="rich-note-property-row"][data-property-key="${oldKey}"]`,
-          { timeout: 15000 }
-        ).within(() => {
-          cy.get('[data-testid="rich-note-property-row-value-input"]')
-            .clear()
-            .type(newValue)
-            .blur()
-        })
-      })
-      cy.findByRole(noteContentRegion.role, {
-        name: noteContentRegion.name,
-      }).within(() => {
-        cy.get(
-          `[data-testid="rich-note-property-row"][data-property-key="${oldKey}"]`,
-          { timeout: 15000 }
-        ).within(() => {
-          cy.get('[data-testid="rich-note-property-row-key-input"]')
-            .clear()
-            .type(newKey)
-            .blur()
-        })
-      })
-      cy.findByRole(noteContentRegion.role, {
-        name: noteContentRegion.name,
-      }).within(() => {
-        cy.get('.ql-editor[contenteditable="true"]').first().click()
-      })
+      findNoteContentRegion().find('a.dead-link').contains(linkText)
       return this
     },
     followDeadLink(linkTitle: string) {
       this.switchToRichContent()
-      cy.findByRole(noteContentRegion.role, { name: noteContentRegion.name })
-        .find('a.dead-link')
-        .contains(linkTitle)
-        .click()
+      findNoteContentRegion().find('a.dead-link').contains(linkTitle).click()
       return {
         createNote: () => {
           cy.findByRole('button', { name: /Create a new note/ }).click()
@@ -574,154 +190,10 @@ export const assumeNotePage = (
     wikiLinkInNoteContent(linkText: string) {
       return wikiLinkInNoteContentFluent(linkText)
     },
-    expectWikidataBrowseLinkOpensUrl(expectedUrl: string) {
-      this.switchToRichContent()
-      cy.findByRole(noteContentRegion.role, {
-        name: noteContentRegion.name,
-      }).within(() => {
-        cy.get('[data-testid="rich-note-property-row"]')
-          .filter((_, row) => {
-            const key = row.getAttribute('data-property-key')?.toLowerCase()
-            return key === 'wikidata_id' || key === 'wikidataid'
-          })
-          .find('[data-testid="rich-note-property-external-link"]')
-          .should('be.visible')
-          .then(($btn) => {
-            cy.window().then((win) => {
-              const popupWindowStub = {
-                location: { href: undefined as string | undefined },
-                focus: cy.stub(),
-              }
-              cy.stub(win, 'open').as('open').returns(popupWindowStub)
-              cy.wrap($btn).click()
-              cy.get('@open').should('have.been.called')
-              cy.wrap(() => popupWindowStub.location.href)
-                .should((cb) => expect(cb()).equal(expectedUrl))
-                .then(() => {
-                  expect(popupWindowStub.focus).to.have.been.called
-                })
-            })
-          })
-      })
-      return this
-    },
-
-    startSearchingAndAddRelationship() {
-      this.toolbarButton('Link').click()
-      return assumeNoteTargetSearchDialog()
-    },
-    insertWikiLinkToNote(toNoteTopic: string) {
-      this.toolbarButton('Link').click()
-      assumeNoteTargetSearchDialog()
-        .findTarget(toNoteTopic)
-        .insertWikiLinkToTarget(toNoteTopic)
-      return this
-    },
+    ...noteContentEditingMethods(),
+    ...noteRichPropertyMethods(),
+    ...noteRelationshipMethods(),
     ...sidebarChildNotePageMethods(),
-    deleteNote() {
-      this.moreOptions().deleteNote()
-    },
-    deleteRelationshipNote() {
-      this.moreOptions().deleteRelationshipNote()
-    },
-    deleteNoteAndLeaveReferencesAsDeadLinks() {
-      this.moreOptions().deleteNoteAndLeaveReferencesAsDeadLinks()
-    },
-    deleteNoteAndRemoveFromReferenceProperties() {
-      this.moreOptions().deleteNoteAndRemoveFromReferenceProperties()
-    },
-    deleteNoteAndReduceToSourceProperty() {
-      this.moreOptions().deleteNoteAndReduceToSourceProperty()
-    },
-    openQuestionList() {
-      return this.moreOptions().openQuestionList()
-    },
-    addQuestion(row: Record<string, string>) {
-      this.openQuestionList().addQuestionPage().addQuestion(row)
-    },
-    refineQuestion(row: Record<string, string>) {
-      this.openQuestionList().addQuestionPage().refineQuestion(row)
-    },
-    expectQuestionsInList(expectedQuestions: Record<string, string>[]) {
-      cy.get('body').then(($body) => {
-        if ($body.find('.question-table').length > 0) {
-          questionListPage().expectQuestion(expectedQuestions)
-        } else {
-          this.openQuestionList().expectQuestion(expectedQuestions)
-        }
-      })
-    },
-    sendMessageToNoteOwner(message: string) {
-      cy.intercept('POST', '**/api/conversation/note/**').as(
-        'startNoteConversation'
-      )
-      this.toolbarButton('Star a conversation about this note').click()
-      cy.findByRole('textbox').type(message)
-      cy.findByRole('button', { name: 'Send message' }).click()
-      cy.wait('@startNoteConversation').should(({ response }) => {
-        expect(response?.statusCode, 'start conversation about note').to.equal(
-          200
-        )
-      })
-    },
-
-    startAConversationAboutNote() {
-      this.toolbarButton('Star a conversation about this note').click()
-      return assumeConversationAboutNotePage()
-    },
-
-    sendMessageToAI(message: string) {
-      this.startAConversationAboutNote().replyToConversationAndInviteAiToReply(
-        message
-      )
-    },
-
-    associateWikidataDialog() {
-      // Notes open in rich (frontmatter) mode by default; only switch when already in markdown mode.
-      cy.get('body').then(($body) => {
-        const toRich = $body.find('button[aria-label^="Edit as rich content"]')
-        if (toRich.length > 0) {
-          cy.wrap(toRich.first()).click()
-        }
-      })
-      cy.findByRole(noteContentRegion.role, {
-        name: noteContentRegion.name,
-      }).within(() => {
-        cy.root().then(($region) => {
-          const editBtn = $region.find(
-            '[data-testid="rich-note-wikidata-property-edit"]'
-          )
-          if (editBtn.length > 0) {
-            cy.wrap(editBtn.first()).click()
-          } else {
-            cy.findByRole('button', { name: 'Add property' }).click()
-            cy.findByTestId('rich-note-property-key')
-              .clear()
-              .type('wikidata_id')
-            cy.findByTestId('rich-note-wikidata-property-insert-edit').click()
-          }
-        })
-      })
-      return assumeAssociateWikidataDialog()
-    },
-    openAssimilationSettings() {
-      makeSureNoteMoreOptionsFormIsOpen().openAssimilationSettings()
-      pageIsNotLoading()
-      return assumeAssimilationPage()
-    },
-    setLevel(level: number) {
-      this.openAssimilationSettings()
-      form.getField('Level').within(() => {
-        cy.findByRole('button', { name: `${level}` }).click()
-      })
-      pageIsNotLoading()
-      return this
-    },
-    setRememberSpelling() {
-      this.openAssimilationSettings()
-      form.getField('Remember Spelling').check()
-      pageIsNotLoading()
-      return this
-    },
+    ...noteConversationAndQuestionMethods(),
   }
 }
