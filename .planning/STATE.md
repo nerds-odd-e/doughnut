@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Notebook Lint & Auto-Fix
-current_phase: 4
-current_phase_name: E2E test optimization batch 10–12
+current_phase: 5
+current_phase_name: E2E test optimization batch 13–15
 status: in_progress
-stopped_at: Quick 002 Phase 4 done (folder-move/notebook-health/notebook-group)
-last_updated: "2026-07-23T02:00:00.000Z"
+stopped_at: Quick 002 Phase 5 done (note-move/cli-token/recall-browse)
+last_updated: "2026-07-23T02:30:00.000Z"
 last_activity: 2026-07-23
-last_activity_desc: Completed quick/002 Phase 4 — sped up folder-move, notebook-health, notebook-group E2E
+last_activity_desc: Completed quick/002 Phase 5 — sped up note-move; cli-token + recall-browse proposed as Candidates
 progress:
   total_phases: 7
   completed_phases: 7
@@ -23,17 +23,17 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-07-22)
 
 **Core value:** From Notebook Settings → Health, a user can run lint and see actionable health findings — with optional bulk removal of empty folders when auto-fix is enabled.
-**Current focus:** Quick 002 E2E test optimization (Phase 4 done; next Phase 5)
+**Current focus:** Quick 002 E2E test optimization (Phase 5 done; next Phase 6)
 
 ## Current Position
 
-Phase: Quick 002 Phase 4 done; Phase 5 next
-Plan: `.planning/quick/002-e2e-test-optimization/PLAN.md` — Status: in-progress (Phases 1–4 done)
+Phase: Quick 002 Phase 5 done; Phase 6 next
+Plan: `.planning/quick/002-e2e-test-optimization/PLAN.md` — Status: in-progress (Phases 1–5 done)
 Status: Milestone v1.0 delivered; E2E top-10% optimization in progress
-Last activity: 2026-07-23 — Phase 4 folder-move / notebook-health / notebook-group sped up (3 consecutive greens)
-Resume file: `.planning/quick/002-e2e-test-optimization/PLAN.md` Phase 5
+Last activity: 2026-07-23 — Phase 5 note-move sped up (3 consecutive greens); cli-token + recall-browse proposed as Candidates
+Resume file: `.planning/quick/002-e2e-test-optimization/PLAN.md` Phase 6
 
-Progress: [████░░░░░░] quick 002 4/9 phases done
+Progress: [█████░░░░░] quick 002 5/9 phases done
 
 ## Performance Metrics
 
@@ -109,5 +109,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-07-23
-Stopped at: Quick 002 Phase 4 done
-Resume file: `.planning/quick/002-e2e-test-optimization/PLAN.md` Phase 5
+Stopped at: Quick 002 Phase 5 done
+Resume file: `.planning/quick/002-e2e-test-optimization/PLAN.md` Phase 6

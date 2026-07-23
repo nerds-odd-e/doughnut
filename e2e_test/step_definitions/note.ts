@@ -391,6 +391,16 @@ Then(
   }
 )
 
+Then(
+  'I should see sidebar folder {string} containing these notes:',
+  (folderLabel: string, data: DataTable) => {
+    start
+      .noteSidebar()
+      .expand(folderLabel)
+      .expectChildrenUnderFolder(folderLabel, data.hashes())
+  }
+)
+
 When(
   'I create a folder named {string} while viewing note {string}',
   (folderName: string, noteTitle: string) => {

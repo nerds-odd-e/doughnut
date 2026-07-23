@@ -13,11 +13,12 @@ Feature: note move
   @mockBrowserTime
   Scenario: link and move
     Given I move note "Sedition" to be under note "Sedation"
-    Then I should see folder "Sedation care/Sedation" containing these notes:
+    Then I should see sidebar folder "Sedation" containing these notes:
       | note-title   |
       | Sedation     |
       | Sedition     |
     When I undo "move note"
-    Then I should see folder "Sedation care/Sedation" containing these notes:
+    When I jump to the notebook "Sedation care"
+    Then I should see sidebar folder "Sedation" containing these notes:
       | note-title   |
       | Sedation     |

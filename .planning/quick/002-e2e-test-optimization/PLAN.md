@@ -152,22 +152,23 @@ Status: done
 
 ### Phase 5: Batch ranks 13–15 (note move, CLI token, recall browse notes)
 Type: Behavior
-Status: planned
+Status: done
 
 **Tests:**
-- `e2e_test/features/note_topology/note_move.feature` — "link and move" (~3602ms)
-- `e2e_test/features/cli/cli_access_token.feature` — "Set access token" (~3587ms)
-- `e2e_test/features/recall/browse_answer_and_notes_while_recalling.feature` — "Browse notes while recalling and come back" (~3572ms)
+- `e2e_test/features/note_topology/note_move.feature` — "link and move" (~3602ms → ~2.9–3.1s)
+- `e2e_test/features/cli/cli_access_token.feature` — "Set access token" (~3587ms) — **Candidate** (PTY-bound; see blacklist)
+- `e2e_test/features/recall/browse_answer_and_notes_while_recalling.feature` — "Browse notes while recalling and come back" (~3572ms) — **Candidate** (UI assimilation required for pauseable "Resume" session; see blacklist)
 
-**Goals:** Speed up these scenarios. Note: recall file may already be touched in Phase 1 — optimize only this scenario here; avoid conflicting rewrites of shared helpers without reading current HEAD.
+**Done (2026-07-23):**
+- Note move: assert the post-move folder contents from the note-page sidebar (no navigation) — `moveUnder` only closes the dialog and reactively updates the sidebar, so the Sedition note page already shows the Sedation care/Sedation folder. Added a thin step `I should see sidebar folder {string} containing these notes:` (reuses proven `noteSidebar().expand(...).expectChildrenUnderFolder(...)` — same assertion as the catalog route, just skips the catalog navigation). The post-undo assertion still navigates via `I jump to the notebook "Sedation care"` (undo relocates Sedition back to Sedition law, so the Sedation care notebook must be opened). Dropped one full `/notebooks` catalog navigation + notebook-card click per scenario.
+- Recall browse + CLI token: proposed under **Candidates** in `ongoing/test-optimization-blacklist.md`. Recall: API `assimilateNote` creates only one due tracker, so the session completes after the single spelling question and the "Resume" menu item never appears (the UI `assimilateWithSpellingOption` flow is what produces the pauseable session; `verifySpelling` is read-only). CLI: PTY spawn + node/Ink startup is the floor; scenario steps are already minimal.
 
-**Verify:**
+**Verify:** 3 consecutive focused greens (7/7 each; note_move 3110/3074/2934ms).
 
-```bash
-CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/note_topology/note_move.feature,e2e_test/features/cli/cli_access_token.feature,e2e_test/features/recall/browse_answer_and_notes_while_recalling.feature
-```
-
-Run focused specs **3+ consecutive greens** before closing.
+**Learnings for later phases:**
+- `moveUnder` (Link dialog → Move Under → OK) does NOT navigate — it only closes the dialog and reactively refreshes the sidebar. So after a move, the note-page sidebar already shows the new placement; assert folder contents from there to skip a catalog navigation. The undo, however, DOES `router.push(noteShowLocation(...))` to the undone note (now back in its original notebook), so a post-undo folder assertion on a different notebook still needs a navigation.
+- `AssimilationController.assimilate` returns `List<MemoryTracker>` but for a `rememberSpelling` note via API it yields one due tracker; the UI `assimilateWithSpellingOption` flow produces a pauseable session (the "Resume" menu item depends on `toRepeatCount > 0` after answering). Do NOT assume API assimilate is a safe drop-in for scenarios that rely on a pauseable/multi-question recall session — verify the "Resume" condition (`useNavigationItems.ts`) first.
+- A new thin Gherkin step that delegates to an existing, proven page-object method (e.g. `noteSidebar().expand(...).expectChildrenUnderFolder(...)`) is low-risk and lets a scenario skip a heavier shared step's navigation without modifying the shared step's behavior.
 
 ---
 
