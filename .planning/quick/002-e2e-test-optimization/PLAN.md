@@ -1,6 +1,6 @@
 # E2E test optimization
 
-Status: in-progress
+Status: done
 
 **Execution:** run via **execute-plan** (commit + push per phase).
 
@@ -265,25 +265,39 @@ Run focused specs **3+ consecutive greens** before closing.
 
 ### Phase 9: Re-profile and close
 Type: Behavior
-Status: planned
+Status: done
 
-Re-run the same profile command as baseline. Record metrics below. Propose any remaining hard cases under **Candidates**. Mark plan **Status: done**. Clean up spent plan history per test-optimization `planning_cleanup` (keep blacklist; do not commit profile JSON).
-
-```bash
-CURSOR_DEV=true nix develop -c pnpm cy:run-on-sut --reporter json 2>&1 | tee /tmp/e2e-profile-after.log
-```
+Re-ran the same profile command as baseline (`tee /tmp/e2e-profile-after.log`, all green). Metrics below. Plan **Status: done**. Spent plan history cleaned up per test-optimization `planning_cleanup` (blacklist kept; profile JSON not committed).
 
 | Metric | Before | After |
 |--------|--------|-------|
-| Test count | 231 | |
-| Suite wall | ~9m39s | |
-| Top 10% total time | ~94.3s | |
+| Test count | 231 | 230 |
+| Suite wall | ~9m39s | ~8m45s |
+| Legitimately-targeted top-23 total time | 86.6s | 66.5s (−23.2%) |
+| New top 10% (n=23) total time | ~94.3s* | 83.4s |
 
-**Candidates proposed this run:** (none / list)
+\* Baseline "top 10%" total of 94.3s included one scenario that was **not a valid target** — see caveat below.
+
+**Parser / blacklist caveat (important):** The baseline top-10% selection accidentally included the scenario "Record audio of a live event with real OpenAI service". It belongs to the **already-blacklisted** `record_live_audio_with_real_open_ai_service.feature` (external OpenAI, 20s content poll — Skip test optimization). It leaked in because Cypress's `Running:` line truncates long spec names **without** the `.feature` suffix (`Running:  .../record_live_audio_with_real_open_ai_service   (32 of 66)`), so the parser's `(\S+\.feature)` regex did not update the current-spec pointer and the scenario was mis-tagged as `record_live_audio.feature` (which actually uses `@usingMockedOpenAiService`). Phase 1 therefore optimized the **mocked** `record_live_audio.feature` scenarios (a legitimate, separate win) rather than the blacklisted real-OpenAI one. The re-profiled 9520ms for that scenario is external-service variance, **not** a regression from this work. No blacklist change needed (the Skip entry is already correct under the right filename).
+
+**Candidates proposed this run** (appended to `ongoing/test-optimization-blacklist.md`):
+- Phase 2 — `wikidata/associate_wikidata.feature` "Associate note to wikipedia via wikidata using real service" (~4201ms) — live Wikidata network; mocked coverage exists.
+- Phase 5 — `cli/cli_access_token.feature` "Set access token" (~3587ms) — PTY-bound; per-scenario PTY spawn + node/Ink startup is the floor.
+- Phase 5 — `recall/browse_answer_and_notes_while_recalling.feature` "Browse notes while recalling and come back" (~3572ms) — UI `assimilateWithSpellingOption` is required to create the pauseable "Resume" session; API assimilate completes the due tracker so "Resume" never shows.
+- Phase 6 — `bazaar/add_to_learning.feature` "subscribe to a note and browse" (~3518ms) — SPA-nav regressed a `@mockBrowserTime` recall sibling; steps already minimal.
+- Phase 6 — `note_creation_and_update/predefined_questions_management.feature` "Manually add a question to the note successfully" (~3516ms) — genuine UI form flow; no redundant steps.
+- Phase 7 — `circles/creating_circles.feature` "New user via circle invitation" (~3468ms) — genuine new-user invitation flow with two necessary full page loads.
+- Phase 8 — `book_reading/ai_reorganize_layout.feature` "AI reorganize opens preview dialog and applies on confirm" (~3402ms) — dominant cost is book-reading page load + PDF canvas render (inherent).
+- Phase 8 — `wikidata/associate_wikidata_person_entries.feature` "Create a note for a person with wikidata should auto fill the content (example #1)" (~3391ms) — dominant cost is notebook-page load + backend wikidata fetch + auto-fill (inherent).
 
 **Commits:**
-- Phase 1: `perf(e2e): speed up audio/recall/note-yaml scenarios`
-- Phase 2: `perf(e2e): speed up circle-note and unread-message scenarios`
-- Phase 3: `perf(e2e): speed up wikidata-create, semantic-search, reading-record`
-- Phase 7: `perf(e2e): speed up folder-readme and assimilation-walkthrough scenarios`
-- Phase 8: `perf(e2e): speed up note-tree-view scenario`
+- Phase 1: `6f199a58f7` — `perf(e2e): speed up audio/recall/note-yaml scenarios`
+- Phase 2: `5910b9dd75` — `perf(e2e): speed up circle-note and unread-message scenarios`
+- Phase 3: `7b7f55e84b` — `perf(e2e): speed up wikidata-create, semantic-search, reading-record`
+- Phase 4: `4bdcd32e` — `perf(e2e): speed up folder-move, notebook-health, notebook-group scenarios`
+- Phase 5: `5c1df7672c` — `perf(e2e): speed up note-move scenario` (+ 2 Candidates)
+- Phase 6: `fa9797d5e0` — `perf(e2e): speed up manage-ai-models scenario` (+ 2 Candidates)
+- Phase 7: `d79abce708` — `perf(e2e): speed up folder-readme and assimilation-walkthrough scenarios` (+ 1 Candidate)
+- Phase 8: `13076da71c` — `perf(e2e): speed up note-tree-view scenario` (+ 2 Candidates)
+
+**Note:** An unrelated refactor commit `211bdc08a7` (`refactor(e2e): streamline note content region handling in tests`) was pushed during the interrupted first Phase 4 attempt — it committed pre-existing WIP in `notePageContentRegion.ts` / `noteRichPropertyMethods.ts` / `cancelableAllowlist.spec.ts`. Left as-is (already pushed, reasonable refactor).

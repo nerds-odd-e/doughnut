@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Notebook Lint & Auto-Fix
-current_phase: 8
-current_phase_name: E2E test optimization batch 22–24
-status: in_progress
-stopped_at: Quick 002 Phase 8 done (note-tree-view sped up; ai_reorganize + wikidata-person proposed as Candidates)
-last_updated: "2026-07-23T03:30:00.000Z"
+current_phase: 9
+current_phase_name: E2E test optimization complete
+status: done
+stopped_at: Quick 002 complete — all 9 phases done and re-profiled (suite 9m39s→8m45s; targeted top-23 −23.2%)
+last_updated: "2026-07-23T04:30:00.000Z"
 last_activity: 2026-07-23
-last_activity_desc: Completed quick/002 Phase 8 — sped up note-tree-view (direct jumpToNotePage); ai_reorganize + wikidata-person proposed as Candidates
+last_activity_desc: Completed quick/002 Phase 9 — re-profiled full E2E suite; plan marked done; 8 Candidates proposed to blacklist
 progress:
   total_phases: 7
   completed_phases: 7
@@ -23,17 +23,17 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-07-22)
 
 **Core value:** From Notebook Settings → Health, a user can run lint and see actionable health findings — with optional bulk removal of empty folders when auto-fix is enabled.
-**Current focus:** Quick 002 E2E test optimization (Phase 8 done; next Phase 9)
+**Current focus:** Quick 002 E2E test optimization complete (all 9 phases done)
 
 ## Current Position
 
-Phase: Quick 002 Phase 8 done; Phase 9 next
-Plan: `.planning/quick/002-e2e-test-optimization/PLAN.md` — Status: in-progress (Phases 1–8 done)
-Status: Milestone v1.0 delivered; E2E top-10% optimization in progress
-Last activity: 2026-07-23 — Phase 8 note-tree-view sped up (3 consecutive greens); ai_reorganize + wikidata-person proposed as Candidates
-Resume file: `.planning/quick/002-e2e-test-optimization/PLAN.md` Phase 9
+Phase: Quick 002 complete (9/9 phases done)
+Plan: `.planning/quick/002-e2e-test-optimization/PLAN.md` — Status: done
+Status: Milestone v1.0 delivered; E2E top-10% optimization complete
+Last activity: 2026-07-23 — Phase 9 re-profiled full suite (231→230 tests, 9m39s→8m45s wall, targeted top-23 86.6s→66.5s −23.2%); 8 hard cases proposed as Candidates
+Resume file: none (quick 002 complete)
 
-Progress: [████████░] quick 002 8/9 phases done
+Progress: [█████████] quick 002 9/9 phases done
 
 ## Performance Metrics
 
@@ -109,5 +109,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-07-23
-Stopped at: Quick 002 Phase 8 done
-Resume file: `.planning/quick/002-e2e-test-optimization/PLAN.md` Phase 9
+Stopped at: Quick 002 complete (all 9 phases done; re-profiled)
+Resume file: none (quick 002 complete)
