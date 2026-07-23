@@ -28,8 +28,11 @@
   1. The `Answer` outcome type carries an accidental-match state with a matched-note id (not just a boolean `correct`).
   2. The `AnsweredQuestion` response carries matched-note topology and an overlap flag.
   3. The regenerated OpenAPI client compiles and the frontend type-checks against the new contract (no backend behavior wired yet — the new states are representable but not yet returned).
-**Plans**: TBD
+**Plans**: 1 plan
 **UI hint**: no
+
+Plans:
+- [ ] 01-01-PLAN.md — Extend the Answer/AnsweredQuestion contract (Option A: @Transient matchedNoteId + AnswerOutcome enum on Answer; optional overlap + matchedNotes: List<NoteTopology> on AnsweredQuestion), regenerate the OpenAPI client, verify the @Transient fields surface in types.gen.ts (A1), confirm the frontend type-checks, and pin representable-but-not-returned with no-behavior backend tests on both contract surfaces (AnsweredQuestion + RecallPromptHistoryItem)
 
 ### Phase 2: Accidental-match grading & penalty
 **Goal:** When a user types a spelling answer that is wrong for the reviewed note but matches another note's title or alias (searched across all notebooks the user can read), the system grades it as an accidental match with a lighter-than-wrong spaced-repetition penalty.
@@ -95,7 +98,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Extend Answer outcome API | 0/0 | Not started | - |
+| 1. Extend Answer outcome API | 0/1 | Plan ready | - |
 | 2. Accidental-match grading & penalty | 0/0 | Not started | - |
 | 3. Reveal both notes after accidental match | 0/0 | Not started | - |
 | 4. Offer link between notes | 0/0 | Not started | - |

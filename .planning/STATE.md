@@ -10,8 +10,8 @@
 ## Current Position
 
 - **Phase:** 1 — Extend Answer outcome API
-- **Plan:** none yet (awaiting `/gsd-plan-phase 1`)
-- **Status:** Not started
+- **Plan:** 01-01-PLAN.md (1 plan, wave 1, autonomous) — ready for `/gsd-execute-phase 1`
+- **Status:** Plan ready (awaiting execution)
 - **Progress:** 0/6 phases complete
 
 ```
@@ -53,7 +53,8 @@
 - **⚠️ Alias blast radius (Phase 5):** Extending `aliases` to accept wiki-link values affects wiki resolve, search, and cloze masking. The derived-index coherence path (`WikiTitleCacheService.refreshForNote` + backfills) is a known regression source (see `.planning/codebase/CONCERNS.md`). Phase 5 is treated as a design spike — enumerate every `aliases` consumer and gate on regression tests before changing the parser. Expect it to take longer than its neighbors.
 
 ### Todos
-- [ ] Run `/gsd-plan-phase 1` to plan the API contract extension.
+- [x] Run `/gsd-plan-phase 1` to plan the API contract extension.
+- [ ] Run `/gsd-execute-phase 1` to execute 01-01-PLAN.md (contract round-trip + no-behavior tests).
 - [ ] Confirm the accidental-match penalty value (e.g. `updateForgettingCurve(−10)`-style) during Phase 2 planning.
 
 ### Open questions
@@ -62,9 +63,9 @@
 
 ## Session Continuity
 
-- **Last action:** Roadmap created (6 phases, 9/9 requirements mapped).
-- **Next action:** `/gsd-plan-phase 1` (Structure — API contract extension).
-- **Resume from:** Read this file + `.planning/ROADMAP.md`; continue at Phase 1 planning.
+- **Last action:** Phase 1 planned — `01-01-PLAN.md` written (1 plan, wave 1, autonomous; tracer = full contract round-trip, expansion = no-behavior tests on both contract surfaces). ROADMAP + STATE finalized.
+- **Next action:** `/gsd-execute-phase 1` (Structure — API contract extension; no behavior, no service, no UI).
+- **Resume from:** Read this file + `.planning/phases/01-extend-answer-outcome-api/01-01-PLAN.md`; execute the plan.
 
 ---
 *Last updated: 2026-07-23 during roadmap creation*
