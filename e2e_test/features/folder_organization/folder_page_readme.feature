@@ -9,8 +9,7 @@ Feature: Folder page readme
       | In Alpha | Alpha  |
 
   Scenario: Folder readme content persists after reload
-    When I view note "In Alpha"
-    And I open the folder page for "Alpha" from the sidebar
+    When I open the folder page for "Alpha" in notebook "Folder Readme NB"
     And I type and save the folder readme with text "Persistent folder landing"
     Then the folder readme should contain "Persistent folder landing"
     When I reload the folder page

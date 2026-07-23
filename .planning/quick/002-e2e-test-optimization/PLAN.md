@@ -204,14 +204,24 @@ Run focused specs **3+ consecutive greens** before closing.
 
 ### Phase 7: Batch ranks 19–21 (folder readme, circle invite, assimilation)
 Type: Behavior
-Status: planned
+Status: done
 
 **Tests:**
-- `e2e_test/features/folder_organization/folder_page_readme.feature` — "Folder readme content persists after reload" (~3488ms)
-- `e2e_test/features/circles/creating_circles.feature` — "New user via circle invitation" (~3468ms)
-- `e2e_test/features/assimilation/assimilation_walkthrough.feature` — "Walk through notes with menu, keep, skip, toasts, and panel on note page" (~3428ms)
+- `e2e_test/features/folder_organization/folder_page_readme.feature` — "Folder readme content persists after reload" (~3488ms → ~3.2s)
+- `e2e_test/features/circles/creating_circles.feature` — "New user via circle invitation" (~3468ms) — **Candidate** (see blacklist)
+- `e2e_test/features/assimilation/assimilation_walkthrough.feature` — "Walk through notes with menu, keep, skip, toasts, and panel on note page" (~3428ms → ~3.4s)
 
-**Goals:** Speed up these scenarios.
+**Done (2026-07-23):**
+- Folder readme: replaced `When I view note "In Alpha"` + `And I open the folder page for "Alpha" from the sidebar` with a new direct-nav step `When I open the folder page for "Alpha" in notebook "Folder Readme NB"` that resolves the folder id via `NotebookController.listNotebookFolderIndex` (new `getFolderIdInNotebook` testability helper) and `start.routerPush`-es straight to the folder page. Skips the note-page render + sidebar interaction; the first `routerPush` full-loads the folder page directly instead of full-loading the note page then SPA-nav'ing to the folder. The sibling `from the sidebar` step is unchanged (still used by the "title_pattern default" scenario and Phase 4's `folder_organization.feature`).
+- Assimilation walkthrough: removed the redundant trailing `waitForAssimilationReady()` from `openAssimilationSettings()` — the assimilate button visibility is already asserted two lines above (`assimilateButton({ timeout: 15000 }).should('be.visible')`), so the trailing re-check was pure overhead. `waitForAssimilationReady` stays in `expectAssimilatingNote` (different concern) and `reopenAssimilationSettingsWaitingForRecallInfo` (recall-info wait).
+- Circle invite: proposed under **Candidates** in `ongoing/test-optimization-blacklist.md` — genuine new-user invitation journey with two necessary full page loads, already uses `invoke('val')` for form fills and API for the join.
+
+**Verify:** 3 consecutive focused greens (6/6 each).
+
+**Learnings for later phases:**
+- `NotebookController.listNotebookFolderIndex({ path: { notebook } })` returns `Folder[]` (with `id`, `name`, `parentFolderId`); use it (via a `getFolderIdInNotebook(notebookId, folderName)` testability helper) to resolve a folder id for direct SPA `routerPush` to `/notebooks/:notebookId/folders/:folderId`, skipping note-page + sidebar navigation. The folder page defaults to the Readme tab, so the readme editor is present on direct nav.
+- The first `routerPush` in a scenario still full-loads (it only SPA-navs once `@firstVisited === 'yes'`, which a prior `cy.visit`-based login/background does not set). So a direct `routerPush` to the destination replaces one full load (the note page) with the destination's full load — a net win only when it also drops a sidebar interaction or an extra SPA nav. Don't assume `routerPush` is always SPA; measure.
+- Removing a trailing redundant re-assertion from a shared page-object method (e.g. `openAssimilationSettings` re-checking `assimilateButton().should('be.visible')` already asserted above) is low-risk when the prior line already guarantees the same condition; keep the helper where the re-check is the *only* guard (`expectAssimilatingNote`).
 
 **Verify:**
 
@@ -266,3 +276,4 @@ CURSOR_DEV=true nix develop -c pnpm cy:run-on-sut --reporter json 2>&1 | tee /tm
 - Phase 1: `perf(e2e): speed up audio/recall/note-yaml scenarios`
 - Phase 2: `perf(e2e): speed up circle-note and unread-message scenarios`
 - Phase 3: `perf(e2e): speed up wikidata-create, semantic-search, reading-record`
+- Phase 7: `perf(e2e): speed up folder-readme and assimilation-walkthrough scenarios`

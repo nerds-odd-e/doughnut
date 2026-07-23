@@ -438,6 +438,25 @@ const testability = () => {
         })
     },
 
+    getFolderIdInNotebook(notebookId: number, folderName: string) {
+      return cy
+        .wrap(
+          NotebookController.listNotebookFolderIndex({
+            path: { notebook: notebookId },
+          }),
+          { log: false }
+        )
+        .then((response) => {
+          const folders = unwrapData<Folder[]>(response)
+          const folder = folders.find((f) => f.name === folderName)
+          expect(
+            folder,
+            `folder "${folderName}" was not found in notebook id ${notebookId}`
+          ).to.exist
+          return folder!.id
+        })
+    },
+
     updateNotebookIndex(notebookName: string) {
       return this.getNotebookIdByName(notebookName).then((notebookId) =>
         cy.wrap(

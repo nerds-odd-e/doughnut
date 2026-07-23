@@ -17,6 +17,28 @@ When(
   }
 )
 
+When(
+  'I open the folder page for {string} in notebook {string}',
+  (folderLabel: string, notebookName: string) => {
+    start
+      .testability()
+      .getNotebookIdByName(notebookName)
+      .then((notebookId) =>
+        start
+          .testability()
+          .getFolderIdInNotebook(notebookId, folderLabel)
+          .then((folderId) => {
+            start.routerPush(
+              `/notebooks/${notebookId}/folders/${folderId}`,
+              'folderPage',
+              { notebookId, folderId }
+            )
+            start.pageIsNotLoading()
+          })
+      )
+  }
+)
+
 When('I type and save the folder readme with text {string}', (text: string) => {
   folderPage().typeFolderReadmeDraftAndSave(text)
 })
