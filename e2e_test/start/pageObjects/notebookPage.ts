@@ -111,8 +111,14 @@ const notebookPage = () => {
     expectDeadWikiLinkFinding(noteTitle: string, token: string) {
       cy.get('[data-testid="notebook-health-group-dead_wiki_links"]').within(
         () => {
-          cy.contains('.daisy-collapse-title', noteTitle).should('be.visible')
-          cy.contains('li', token).should('be.visible')
+          cy.contains(
+            '[data-testid="notebook-health-dead-link-note-title"]',
+            noteTitle
+          ).should('be.visible')
+          cy.contains(
+            '[data-testid="notebook-health-dead-link-token"]',
+            token
+          ).should('be.visible')
         }
       )
       return this
