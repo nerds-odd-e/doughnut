@@ -24,6 +24,7 @@ import SettingsPage from "@/pages/SettingsPage.vue"
 import GeneralSettingsTab from "@/pages/settings/GeneralSettingsTab.vue"
 import RecentSettingsTab from "@/pages/settings/RecentSettingsTab.vue"
 import AccessTokensSettingsTab from "@/pages/settings/AccessTokensSettingsTab.vue"
+import RecallStatsSettingsTab from "@/pages/settings/RecallStatsSettingsTab.vue"
 import NotebookSidebarLayout from "@/layouts/NotebookSidebarLayout.vue"
 import { routeMetadata } from "./routeMetadata"
 
@@ -118,6 +119,11 @@ const settingsNestedRoute: RouteRecordRaw = {
       path: "access-tokens",
       name: "settingsAccessTokens",
       component: AccessTokensSettingsTab,
+    },
+    {
+      path: "recall-stats",
+      name: "settingsRecallStats",
+      component: RecallStatsSettingsTab,
     },
   ],
 }

@@ -199,6 +199,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/settings/RecallStatsSettingsTab': RouteRecordInfo<
+      '/settings/RecallStatsSettingsTab',
+      '/settings/RecallStatsSettingsTab',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/settings/RecentSettingsTab': RouteRecordInfo<
       '/settings/RecentSettingsTab',
       '/settings/RecentSettingsTab',
@@ -420,6 +427,14 @@ declare module 'vue-router/auto-routes' {
     'src/pages/settings/GeneralSettingsTab.vue': {
       routes:
         | '/settings/GeneralSettingsTab'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/settings/RecallStatsSettingsTab.vue': {
+      routes:
+        | '/settings/RecallStatsSettingsTab'
       views:
         | never
       pathParamNames:

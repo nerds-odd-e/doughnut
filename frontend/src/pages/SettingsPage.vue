@@ -26,6 +26,7 @@ const tabs = [
   { name: "settingsGeneral", label: "General" },
   { name: "settingsRecent", label: "Recent" },
   { name: "settingsAccessTokens", label: "Access Tokens" },
+  { name: "settingsRecallStats", label: "Recall Stats" },
 ] as const
 
 const isActive = (name: string) => route.name === name
