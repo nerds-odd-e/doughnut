@@ -1,6 +1,7 @@
 @usingMockedOpenAiService
 Feature: AI-assisted book layout reorganization
 
+  @skipOptimizationDueToKnownNecessarySlowness
   Scenario: AI reorganize opens preview dialog and applies on confirm
     Given I am logged in as an existing user
     And I have a notebook "Refactoring read" with a note "Code Refactoring Book"

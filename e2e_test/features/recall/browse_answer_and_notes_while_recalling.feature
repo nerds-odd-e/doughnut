@@ -21,6 +21,7 @@ Feature: Browse answers and notes while recalling
     And I type my answer "sedition"
     Then I should see that my last spelling answer was correct with recall count 1
 
+  @skipOptimizationDueToKnownNecessarySlowness
   Scenario: Browse notes while recalling and come back
     Given I assimilate the note "sedition" with the option of remembering spelling
     When I visit recall for a due quiz question on day 2

@@ -13,6 +13,7 @@ Feature: Note creation should have content if wikidata is a person
     And I have a notebook "Notable people"
 
   @usingMockedWikidataService
+  @skipOptimizationDueToKnownNecessarySlowness
   Scenario Outline: Create a note for a person with wikidata should auto fill the content
     When I create a note with title "<person name>" and wikidata id "<Wikidata Id>" in the notebook "Notable people"
     Then the note content on the current page should be "<expected content>"
