@@ -29,13 +29,11 @@
           <th>B</th>
           <th>C</th>
           <th>D</th>
+          <th><span class="sr-only">Actions</span></th>
         </tr>
       </thead>
       <tbody>
-        <tr
-          v-for="question in questions"
-          :key="question.multipleChoicesQuestion.questionStem"
-        >
+        <tr v-for="question in questions" :key="question.id">
           <td>
             {{ question.multipleChoicesQuestion.questionStem }}
           </td>
@@ -53,6 +51,16 @@
               {{ choice }}
             </td>
           </template>
+          <td>
+            <button
+              class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+              aria-label="Delete question"
+              title="Delete question"
+              @click="deleteQuestion(question)"
+            >
+              <Trash2 class="w-5 h-5" />
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -75,7 +83,7 @@ import { PredefinedQuestionController } from "@generated/doughnut-backend-api/sd
 import NoteAddQuestion from "./NoteAddQuestion.vue"
 import QuestionExportDialog from "./QuestionExportDialog.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
-import { Upload } from "@lucide/vue"
+import { Trash2, Upload } from "@lucide/vue"
 
 const props = defineProps({
   note: {
@@ -100,6 +108,14 @@ const questionAdded = (newQuestion: PredefinedQuestion) => {
     return
   }
   questions.value.push(newQuestion)
+}
+const deleteQuestion = async (question: PredefinedQuestion) => {
+  const { error } = await PredefinedQuestionController.deleteQuestion({
+    path: { predefinedQuestion: question.id },
+  })
+  if (!error) {
+    questions.value = questions.value.filter((q) => q.id !== question.id)
+  }
 }
 onMounted(() => {
   fetchQuestions()

@@ -43,6 +43,17 @@ export const noteConversationAndQuestionMethods = () => ({
       }
     })
   },
+  deleteQuestion(questionStem: string) {
+    this.openQuestionList().deleteQuestion(questionStem)
+  },
+  expectNoQuestionsInList() {
+    cy.get('body').then(($body) => {
+      if (!$body.text().includes('No questions')) {
+        this.openQuestionList()
+      }
+      questionListPage().expectNoQuestions()
+    })
+  },
   sendMessageToNoteOwner(message: string) {
     cy.intercept('POST', '**/api/conversation/note/**').as(
       'startNoteConversation'

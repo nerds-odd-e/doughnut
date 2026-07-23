@@ -238,6 +238,13 @@ Given(
 )
 
 When(
+  'I delete the question {string} from the note {string}',
+  (questionStem: string, noteTopology: string) => {
+    start.jumpToNotePage(noteTopology).deleteQuestion(questionStem)
+  }
+)
+
+When(
   'I create a notebook with title {string} and description {string}',
   (notebookName: string, description: string) => {
     start.navigateToNotebooksPage().creatingNotebook(notebookName, description)
@@ -647,6 +654,13 @@ Then(
   'I should see the questions in the question list of the note {string}:',
   (_noteTopology: string, data: DataTable) => {
     start.assumeNotePage().expectQuestionsInList(data.hashes())
+  }
+)
+
+Then(
+  'I should see no questions in the question list of the note {string}',
+  (_noteTopology: string) => {
+    start.assumeNotePage().expectNoQuestionsInList()
   }
 )
 

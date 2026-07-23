@@ -1728,6 +1728,24 @@ export type AnswerSpellingResponses = {
 
 export type AnswerSpellingResponse = AnswerSpellingResponses[keyof AnswerSpellingResponses];
 
+export type DeleteQuestionData = {
+    body?: never;
+    path: {
+        predefinedQuestion: number;
+    };
+    query?: never;
+    url: '/api/predefined-questions/{predefinedQuestion}/delete';
+};
+
+export type DeleteQuestionResponses = {
+    /**
+     * OK
+     */
+    200: PredefinedQuestion;
+};
+
+export type DeleteQuestionResponse = DeleteQuestionResponses[keyof DeleteQuestionResponses];
+
 export type RefineQuestionData = {
     body: PredefinedQuestion;
     path: {
