@@ -102,9 +102,9 @@ None yet.
 
 ### Quick Tasks Completed
 
-| # | Description | Date | Commit | Directory |
-|---|-------------|------|--------|-----------|
-| 260723-jlm | Add recall statistics for user (new Settings "Recall Stats" tab: retention-first — daily retention trend, activity calendar, daily response-time trend, morning/afternoon, weekday×hour heatmap, headline tiles, best/worst hour by retention) | 2026-07-23 | 41c7945d42 | [260723-jlm-add-recall-statistics-for-user-a-new-tab](./quick/260723-jlm-add-recall-statistics-for-user-a-new-tab/) |
+| # | Description | Date | Commit |
+|---|-------------|------|--------|
+| 260723-jlm | Add recall statistics for user (new Settings "Recall Stats" tab: retention-first — daily retention trend, activity calendar, daily response-time trend, morning/afternoon, weekday×hour heatmap, headline tiles, best/worst hour by retention) | 2026-07-23 | 41c7945d42 |
 
 ## Deferred Items
 

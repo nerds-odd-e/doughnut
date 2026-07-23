@@ -1,58 +1,19 @@
 package com.odde.doughnut.services;
 
+import static com.odde.doughnut.services.RecallStatsTestFixtures.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.controllers.dto.RecallStatsDTO;
-import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.RecallPrompt;
 import java.sql.Timestamp;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 class RecallStatsServiceTest {
-  // day 0 = 1989-01-01; day 9 = 1989-01-10; day 10 = 1989-01-11 (UTC).
-
-  private static RecallPrompt answered(
-      Timestamp answerAt, Integer thinkingTimeMs, Boolean correct, Timestamp promptAt) {
-    RecallPrompt rp = new RecallPrompt();
-    rp.setCreatedAt(promptAt != null ? promptAt : answerAt);
-    Answer answer = new Answer();
-    answer.setCorrect(correct);
-    answer.setThinkingTimeMs(thinkingTimeMs);
-    answer.setCreatedAt(answerAt);
-    rp.setAnswer(answer);
-    return rp;
-  }
-
-  private static Timestamp utc(int day, int hour) {
-    return Timestamp.from(
-        ZonedDateTime.of(1989, 1, 1, hour, 0, 0, 0, ZoneId.of("UTC")).plusDays(day).toInstant());
-  }
-
-  private static RecallStatsDTO aggregate(List<RecallPrompt> recent, Timestamp now) {
-    return RecallStatsService.aggregate(recent, recent, ZoneId.of("UTC"), now);
-  }
-
-  private static RecallStatsDTO aggregateZone(
-      List<RecallPrompt> recent, ZoneId zoneId, Timestamp now) {
-    return RecallStatsService.aggregate(recent, recent, zoneId, now);
-  }
-
-  private static RecallStatsDTO.DayAvgResponseTime dayAvg(RecallStatsDTO dto, String date) {
-    return dto.getTrend().stream().filter(t -> t.getDate().equals(date)).findFirst().orElseThrow();
-  }
-
-  private static RecallStatsDTO.DayRetention dayRet(RecallStatsDTO dto, String date) {
-    return dto.getRetentionTrend().stream()
-        .filter(t -> t.getDate().equals(date))
-        .findFirst()
-        .orElseThrow();
-  }
 
   @Nested
   class ResponseTimeTrimmedMean {
@@ -216,25 +177,14 @@ class RecallStatsServiceTest {
       // Same UTC instant 1989-01-09 17:00 UTC:
       //   under UTC zone -> local day 1989-01-09
       //   under Shanghai zone -> 1989-01-10 01:00 -> local day 1989-01-10
-      Timestamp instant =
-          Timestamp.from(ZonedDateTime.of(1989, 1, 9, 17, 0, 0, 0, ZoneId.of("UTC")).toInstant());
+      Timestamp instant = utc(8, 17);
       Timestamp now = utc(20, 12);
       List<RecallPrompt> rows =
           List.of(answered(instant, 5000, true, null), answered(instant, 5000, true, null));
       RecallStatsDTO asShanghai = aggregateZone(rows, ZoneId.of("Asia/Shanghai"), now);
       RecallStatsDTO asUtc = aggregateZone(rows, ZoneId.of("UTC"), now);
-      long shanghaiCountDay10 =
-          asShanghai.getCalendar().stream()
-              .filter(c -> c.getDate().equals("1989-01-10"))
-              .mapToInt(RecallStatsDTO.DayCount::getCount)
-              .sum();
-      long utcCountDay9 =
-          asUtc.getCalendar().stream()
-              .filter(c -> c.getDate().equals("1989-01-09"))
-              .mapToInt(RecallStatsDTO.DayCount::getCount)
-              .sum();
-      assertThat(shanghaiCountDay10, equalTo(2L));
-      assertThat(utcCountDay9, equalTo(2L));
+      assertThat(calendarCount(asShanghai, "1989-01-10"), equalTo(2L));
+      assertThat(calendarCount(asUtc, "1989-01-09"), equalTo(2L));
     }
   }
 
