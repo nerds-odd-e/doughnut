@@ -5,9 +5,7 @@
     data-test-id="refinement-layout"
   >
     <div v-if="!showExtractionPreview" class="text-base">
-      <div class="font-semibold mb-3 text-accent-content">
-        Note layout:
-      </div>
+      <div class="font-semibold mb-3 text-accent-content">Note layout:</div>
       <ul class="space-y-2">
         <li
           v-for="item in refinementLayoutItems"
@@ -80,76 +78,16 @@
       </div>
     </div>
 
-    <div
+    <NoteExtractionPreview
       v-else
-      class="text-base"
-      data-test-id="extraction-preview"
-    >
-      <div class="font-semibold mb-3 text-accent-content">
-        Extract preview:
-      </div>
-
-      <div
-        v-if="createError"
-        class="daisy-alert daisy-alert-error mb-3 text-sm"
-        data-test-id="extraction-preview-error"
-      >
-        {{ createError }}
-      </div>
-
-      <label class="block mb-3 text-accent-content">
-        <span class="font-medium">Updated original note content</span>
-        <textarea
-          v-model="extractionPreview.updatedOriginalNoteContent"
-          data-test-id="extraction-preview-original-content"
-          class="daisy-textarea daisy-textarea-bordered mt-1 w-full min-h-24"
-        />
-      </label>
-
-      <label class="block mb-3 text-accent-content">
-        <span class="font-medium">New note title</span>
-        <textarea
-          v-model="extractionPreview.newNoteTitle"
-          data-test-id="extraction-preview-new-title"
-          class="daisy-textarea daisy-textarea-bordered mt-1 w-full"
-          rows="1"
-        />
-      </label>
-
-      <label class="block mb-3 text-accent-content">
-        <span class="font-medium">New note content</span>
-        <textarea
-          v-model="extractionPreview.newNoteContent"
-          data-test-id="extraction-preview-new-content"
-          class="daisy-textarea daisy-textarea-bordered mt-1 w-full min-h-24"
-        />
-      </label>
-
-      <div class="flex gap-2 mt-4">
-        <button
-          data-test-id="extraction-preview-back"
-          class="daisy-btn daisy-btn-ghost daisy-btn-sm"
-          @click="backToLayout"
-        >
-          Back
-        </button>
-        <button
-          data-test-id="retry-extraction-preview"
-          class="daisy-btn daisy-btn-ghost daisy-btn-sm"
-          @click="retryExtractionPreview"
-        >
-          Ask AI to retry
-        </button>
-        <button
-          data-test-id="extraction-preview-create"
-          class="daisy-btn daisy-btn-primary daisy-btn-sm"
-          :disabled="!canCreateExtractedNote"
-          @click="createExtractedNote"
-        >
-          Create note
-        </button>
-      </div>
-    </div>
+      v-model="extractionPreview"
+      :original-note-content="note.content ?? ''"
+      :create-error="createError"
+      :can-create="canCreateExtractedNote"
+      @back="backToLayout"
+      @retry="retryExtractionPreview"
+      @create="createExtractedNote"
+    />
   </div>
 
   <div
@@ -157,9 +95,7 @@
     class="mb-4 rounded-lg bg-accent p-4"
     data-test-id="refinement-layout-empty"
   >
-    <div class="font-semibold mb-3 text-accent-content">
-      Note layout:
-    </div>
+    <div class="font-semibold mb-3 text-accent-content">Note layout:</div>
     <button
       data-test-id="retry-refinement-layout"
       class="daisy-btn daisy-btn-ghost daisy-btn-sm"
@@ -185,26 +121,13 @@
 </template>
 
 <script setup lang="ts">
-import type {
-  Note,
-  NoteExtractionResult,
-  NoteRefinementLayoutItem,
-} from "@generated/doughnut-backend-api"
-import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
-
-import {
-  apiCallWithLoading,
-  runWithBlockingApiLoading,
-} from "@/managedApi/clientSetup"
-import { toOpenApiError } from "@/managedApi/openApiError"
-import { useRefinementLayoutSelection } from "@/composables/useRefinementLayoutSelection"
+import type { Note } from "@generated/doughnut-backend-api"
 import AiRequestExportDialog from "@/components/commons/AiRequestExportDialog.vue"
-import usePopups from "../commons/Popups/usePopups"
+import { useNoteRefinement } from "@/composables/useNoteRefinement"
+import NoteExtractionPreview from "./NoteExtractionPreview.vue"
 import RefinementLayoutItemRow from "./RefinementLayoutItemRow.vue"
 import { Folders } from "@lucide/vue"
-import { computed, onMounted, ref } from "vue"
-import { useRouter } from "vue-router"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { toRef } from "vue"
 
 const props = defineProps<{
   note: Note
@@ -214,263 +137,28 @@ const emit = defineEmits<{
   (e: "contentUpdated", newContent: string): void
 }>()
 
-const refinementLayoutItems = ref<NoteRefinementLayoutItem[]>([])
-const layoutLoadSettled = ref(false)
-const showExtractionPreview = ref(false)
-const extractionPreview = ref<NoteExtractionResult>({
-  newNoteTitle: "",
-  newNoteContent: "",
-  updatedOriginalNoteContent: "",
-})
-const lastAiExtractionResult = ref<NoteExtractionResult | null>(null)
-const createError = ref("")
-const showExportExtractDialog = ref(false)
-const showExportBreakdownDialog = ref(false)
-
-const canCreateExtractedNote = computed(
-  () => extractionPreview.value.newNoteTitle.trim().length > 0
-)
-
 const {
+  refinementLayoutItems,
+  layoutLoadSettled,
+  showExtractionPreview,
+  extractionPreview,
+  createError,
+  showExportExtractDialog,
+  showExportBreakdownDialog,
+  canCreateExtractedNote,
   selectedItemIds,
   isFullySelected,
   isPartiallySelected,
   setItemSelection,
-  clearSelection,
-} = useRefinementLayoutSelection(refinementLayoutItems)
-
-const resetExtractionPreview = () => {
-  showExtractionPreview.value = false
-  createError.value = ""
-  lastAiExtractionResult.value = null
-  extractionPreview.value = {
-    newNoteTitle: "",
-    newNoteContent: "",
-    updatedOriginalNoteContent: "",
-  }
-}
-
-const loadRefinementLayout = async ({
-  blockUi = true,
-}: {
-  blockUi?: boolean
-} = {}) => {
-  const settleLayout = (items: NoteRefinementLayoutItem[]) => {
-    refinementLayoutItems.value = items
-    clearSelection()
-    resetExtractionPreview()
-    layoutLoadSettled.value = true
-  }
-
-  const settleFromResult = ({
-    data,
-    error,
-  }: {
-    data?: { items?: NoteRefinementLayoutItem[] } | null
-    error?: unknown
-  }) => settleLayout(!error && data?.items ? data.items : [])
-
-  const requestLayout = (signal?: AbortSignal) =>
-    AiController.generateRefinementSuggestions({
-      path: { note: props.note.id },
-      signal,
-    })
-
-  if (!blockUi) {
-    settleFromResult(await apiCallWithLoading(requestLayout))
-    return
-  }
-
-  const outcome = await apiCallWithLoading(requestLayout, {
-    blockUi: true,
-    message: "AI is generating layout...",
-    cancelable: true,
-  })
-
-  if (outcome.status === "cancelled") {
-    settleLayout([])
-    return
-  }
-
-  settleFromResult(outcome.result)
-}
-
-onMounted(() => loadRefinementLayout())
-
-const { popups } = usePopups()
-const router = useRouter()
-const storageAccessor = useStorageAccessor()
-
-const layoutSelectionBody = () => ({
-  layout: { items: refinementLayoutItems.value },
-  selectedItemIds: selectedItemIds.value,
-})
-
-const removeSelectedLayoutItems = async () => {
-  if (selectedItemIds.value.length === 0) {
-    return
-  }
-
-  const confirmed = await popups.confirm(
-    `Are you sure you want to remove ${selectedItemIds.value.length} selected layout point(s)? The AI will remove related content from the note.`
-  )
-
-  if (!confirmed) {
-    return
-  }
-
-  await runWithBlockingApiLoading(async () => {
-    const { data, error } = await apiCallWithLoading(() =>
-      AiController.removeRefinementSuggestion({
-        path: { note: props.note.id },
-        body: layoutSelectionBody(),
-      })
-    )
-
-    if (!error && data?.content !== undefined) {
-      if (data.content === props.note.content) {
-        return
-      }
-
-      const storedApi = storageAccessor.value?.storedApi()
-      if (storedApi) {
-        await storedApi.updateTextField(
-          props.note.id,
-          "edit content",
-          data.content
-        )
-      }
-      emit("contentUpdated", data.content)
-      await loadRefinementLayout({ blockUi: false })
-    }
-  }, "AI is removing content...")
-}
-
-const isExtractionPreviewEdited = () => {
-  const lastResult = lastAiExtractionResult.value
-  if (!lastResult) {
-    return false
-  }
-
-  const current = extractionPreview.value
-  return (
-    current.newNoteTitle !== lastResult.newNoteTitle ||
-    current.newNoteContent !== lastResult.newNoteContent ||
-    current.updatedOriginalNoteContent !== lastResult.updatedOriginalNoteContent
-  )
-}
-
-const runExtractionPreview = async (showPreviewOnSuccess: boolean) => {
-  createError.value = ""
-
-  const outcome = await apiCallWithLoading(
-    (signal) =>
-      AiController.extractNotePreview({
-        path: { note: props.note.id },
-        body: layoutSelectionBody(),
-        signal,
-      }),
-    {
-      blockUi: true,
-      cancelable: true,
-      message: "AI is generating preview...",
-    }
-  )
-
-  if (outcome.status === "cancelled") {
-    return
-  }
-
-  const { data, error } = outcome.result
-  if (error || !data) {
-    const openApiError = toOpenApiError(error)
-    createError.value =
-      openApiError.message ?? "Failed to generate extract preview"
-    showExtractionPreview.value = true
-    return
-  }
-
-  extractionPreview.value = { ...data }
-  lastAiExtractionResult.value = { ...data }
-  createError.value = ""
-  if (showPreviewOnSuccess) {
-    showExtractionPreview.value = true
-  }
-}
-
-const openExtractionPreview = () => runExtractionPreview(true)
-
-const retryExtractionPreview = async () => {
-  if (isExtractionPreviewEdited()) {
-    const confirmed = await popups.confirm(
-      "You have unsaved edits to the extract preview. Ask AI to retry will discard your edits and regenerate the preview."
-    )
-    if (!confirmed) {
-      return
-    }
-  }
-
-  await runExtractionPreview(false)
-}
-
-const backToLayout = () => {
-  showExtractionPreview.value = false
-  createError.value = ""
-}
-
-const fetchExtractRequestExport = async () => {
-  const { data: response, error } = await AiController.exportExtractRequest({
-    path: { note: props.note.id },
-    body: layoutSelectionBody(),
-  })
-  if (!error && response) {
-    return response
-  }
-  return null
-}
-
-const fetchBreakdownRequestExport = async () => {
-  const { data: response, error } =
-    await AiController.exportRefinementLayoutRequest({
-      path: { note: props.note.id },
-    })
-  if (!error && response) {
-    return response
-  }
-  return null
-}
-
-const createExtractedNote = async () => {
-  createError.value = ""
-
-  try {
-    await runWithBlockingApiLoading(async () => {
-      const response = await apiCallWithLoading(() =>
-        AiController.createExtractedNote({
-          path: { note: props.note.id },
-          body: {
-            newNoteTitle: extractionPreview.value.newNoteTitle,
-            newNoteContent: extractionPreview.value.newNoteContent,
-            updatedOriginalNoteContent:
-              extractionPreview.value.updatedOriginalNoteContent,
-          },
-        })
-      )
-
-      if (response.error || !response.data) {
-        const openApiError = toOpenApiError(response.error)
-        createError.value =
-          openApiError.message ?? "Failed to create note from preview"
-        return
-      }
-
-      await storageAccessor.value
-        .storedApi()
-        .focusNoteRealm(router, response.data)
-    }, "AI is creating note...")
-  } catch (err) {
-    console.error("Failed to create extracted note:", err)
-    createError.value = `Error: ${err}`
-  }
-}
+  loadRefinementLayout,
+  removeSelectedLayoutItems,
+  openExtractionPreview,
+  retryExtractionPreview,
+  backToLayout,
+  fetchExtractRequestExport,
+  fetchBreakdownRequestExport,
+  createExtractedNote,
+} = useNoteRefinement(toRef(props, "note"), (newContent) =>
+  emit("contentUpdated", newContent)
+)
 </script>
