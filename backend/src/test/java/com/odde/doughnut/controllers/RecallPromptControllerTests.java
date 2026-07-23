@@ -656,6 +656,17 @@ class RecallPromptControllerTests extends ControllerTestBase {
           IllegalArgumentException.class, () -> controller.answerSpelling(mcqPrompt, answer));
     }
 
+    @Test
+    void shouldNotPopulateAccidentalMatchFieldsOnCorrectSpellingAnswer()
+        throws UnexpectedNoAccessRightException {
+      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+      assertTrue(answerResult.getAnswer().getCorrect());
+      assertNull(answerResult.getAnswer().getMatchedNoteId());
+      assertNull(answerResult.getAnswer().getOutcome());
+      assertNull(answerResult.getOverlap());
+      assertNull(answerResult.getMatchedNotes());
+    }
+
     @Nested
     class WrongAnswer {
       @BeforeEach
@@ -690,6 +701,17 @@ class RecallPromptControllerTests extends ControllerTestBase {
             lessThan(
                 TimestampOperations.addHoursToTimestamp(
                     testabilitySettings.getCurrentUTCTimestamp(), 25)));
+      }
+
+      @Test
+      void shouldNotPopulateAccidentalMatchFieldsOnWrongSpellingAnswer()
+          throws UnexpectedNoAccessRightException {
+        AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+        assertFalse(answerResult.getAnswer().getCorrect());
+        assertNull(answerResult.getAnswer().getMatchedNoteId());
+        assertNull(answerResult.getAnswer().getOutcome());
+        assertNull(answerResult.getOverlap());
+        assertNull(answerResult.getMatchedNotes());
       }
     }
   }
