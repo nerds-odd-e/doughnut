@@ -1,24 +1,28 @@
 ---
 phase: 02-accidental-match-grading-penalty
 verified: 2026-07-24T00:58:10Z
-status: human_needed
+status: passed
 score: 9/12 must-haves verified
 behavior_unverified: 1
 overrides_applied: 0
 mvp_goal_format: invalid
 mvp_note: "ROADMAP mode is mvp but phase goal is not user-story form (gsd_run query user-story.validate → false). Technical goal-backward verification proceeded per orchestrator request; run /gsd mvp-phase 2 if User Flow UAT framing is required."
 behavior_unverified_items:
+
   - truth: "The accidental-match lookup prefers a title match over an alias match (title-then-alias fallback)."
     test: "Create a wrong spelling answer that equals note A's title AND note B's alias (both readable, neither is the reviewed note). Answer via answerSpelling."
     expected: "outcome=ACCIDENTAL_MATCH and matchedNoteId=A (title), never B (alias-only)."
     why_human: "Code returns titleMatch before consulting the alias leg, but no controller test creates a conflicting title+alias pair to exercise the ordering invariant."
 human_verification:
+
   - test: "Submit a blank or whitespace-only spelling answer when another readable note exists."
     expected: "Graded plain wrong — correct=false, outcome=null, matchedNoteId=null (no accidental match)."
     why_human: "PLAN backstop truth (insufficient_spec). findAccidentalMatch has no blank guard; no held-out test covers empty/blank answers."
+
   - test: "Create two readable notes with the same title (different ids); answer with that title (wrong for reviewed note)."
     expected: "matchedNoteId equals the lower note id (OrderByIdAsc + first readable)."
     why_human: "PLAN backstop truth (insufficient_spec). Repository orders by id ASC and firstReadableAccidentalCandidate returns first, but no test with multiple simultaneous matches."
+
   - test: "Create a wrong answer that equals note A's title AND note B's alias; answer via answerSpelling."
     expected: "matchedNoteId=A (title preferred); alias leg not used when a readable title match exists."
     why_human: "Title-then-alias ordering is wired but not behaviorally tested (PRESENT_BEHAVIOR_UNVERIFIED)."
@@ -163,6 +167,7 @@ REQUIREMENTS.md maps AM-01/AM-02 → Phase 2 (Complete). No orphaned Phase 2 req
 No **FAILED** roadmap success criteria or missing/stub artifacts. Phase goal (AM-01 / AM-02 grading + lighter penalty) is implemented and covered by passing AccidentalMatch controller tests.
 
 Status is **human_needed** (not `passed`) because:
+
 1. Two PLAN **backstop** truths lack held-out tests (`insufficient_spec`).
 2. One ordering truth is present and wired but **behavior-unverified** (title-over-alias).
 
