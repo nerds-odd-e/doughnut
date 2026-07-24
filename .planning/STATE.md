@@ -5,13 +5,13 @@ milestone_name: milestone
 current_phase: 4
 current_phase_name: Offer link between notes
 status: executing
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-07-24T05:04:16.947Z"
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-07-24T05:11:49.224Z"
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 9
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # State: Spelling Answer Match & Link
@@ -26,9 +26,9 @@ progress:
 ## Current Position
 
 - **Phase:** 4 — Offer link between notes
-- **Plan:** 04-02 (next to execute)
-- **Status:** Executing (1/3 plans complete)
-- **Progress:** [████████░░] 78%
+- **Plan:** 04-03 (next to execute)
+- **Status:** Executing (2/3 plans complete)
+- **Progress:** [█████████░] 89%
 
 ```
 [x][x][x][ ][ ][ ] 3/6 phases
@@ -62,6 +62,7 @@ progress:
 | Phase 03 P02 | 3min | 2 tasks | 3 files |
 | Phase 03 P03 | 8min | 2 tasks | 3 files |
 | Phase 04 P01 | 12min | 2 tasks | 10 files |
+| Phase 04-offer-link-between-notes P02 | 6min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -95,13 +96,13 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T05:04:16.940Z
-**Stopped at:** Completed 04-01-PLAN.md
+**Last session:** 2026-07-24T05:11:49.217Z
+**Stopped at:** Completed 04-02-PLAN.md
 **Resume file:** None
 
-- **Last action:** Completed 04-01 — property-link tracer (MatchedNoteLinkOffer + CTAs + Vitest).
-- **Next action:** Execute 04-02 (relationship finalize + D-07).
-- **Resume from:** `.planning/phases/04-offer-link-between-notes/04-02-PLAN.md`
+- **Last action:** Completed 04-02 — relationship finalize + D-07 stay-on-page (skipNavigation / navigateOnSuccess).
+- **Next action:** Execute 04-03 (remaining AM-04 / E2E surface).
+- **Resume from:** `.planning/phases/04-offer-link-between-notes/04-03-PLAN.md`
 
 ## Decisions
 
@@ -112,3 +113,5 @@ progress:
 - [Phase 4]: D-01 per-row CTA; D-02 reviewed→matched; D-03 preselect past search; D-04 NoteStorage fetch; D-05 hide bare wiki; D-06 write gate; D-07 stay on page via skipNavigation/navigateOnSuccess=false on relationship path
 - [Phase 4]: Wave 1 hides relationship via relationshipOptionAvailable=false; property write via appendWikiLinkPropertyRow + updateTextField
 - [Phase 4]: wikiPropertyOptionAvailable from parseNoteContentMarkdown on source note, not useContentCursorInserter
+- [Phase 4]: D-07: skipNavigation + navigateOnSuccess=false keeps recall on accidental-match after relationship create
+- [Phase 4]: Toolbar/SearchForm omit navigateOnSuccess so default navigate-after-create is preserved

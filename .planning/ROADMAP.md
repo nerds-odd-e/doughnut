@@ -100,7 +100,7 @@ Plans:
   2. The matched note is pre-selected in the add-link UI, so the user can confirm a link with minimal effort.
   3. The system never auto-writes a link — link creation is user-initiated.
 
-**Plans**: 1/3 plans executed
+**Plans**: 2/3 plans executed
 **UI hint**: yes
 
 Plans:
@@ -110,7 +110,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1)*
 
-- [ ] 04-02-PLAN.md — Relationship finalize with skipNavigation / navigateOnSuccess=false so D-07 stays on recall result + Vitest
+- [x] 04-02-PLAN.md — Relationship finalize with skipNavigation / navigateOnSuccess=false so D-07 stays on recall result + Vitest
 
 **Wave 3** *(blocked on Waves 1–2)*
 
@@ -155,7 +155,7 @@ Plans:
 | 1. Extend Answer outcome API | 1/1 | Complete    | 2026-07-23 |
 | 2. Accidental-match grading & penalty | 2/2 | Complete    | 2026-07-24 |
 | 3. Reveal both notes after accidental match | 3/3 | Complete    | 2026-07-24 |
-| 4. Offer link between notes | 1/3 | In Progress|  |
+| 4. Offer link between notes | 2/3 | In Progress|  |
 | 5. Alias-as-wiki-link overlap declaration | 0/0 | Not started | - |
 | 6. Overlap "try again, no credit" | 0/0 | Not started | - |
 
