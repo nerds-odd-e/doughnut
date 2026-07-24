@@ -23,9 +23,9 @@
 
 ### Phase 1 — Behavior: pin DB session time zone to UTC — done
 
-Fixes hour-of-day display for all correctly-stored data (~11 months of history)
-and stops further skewed writes. Safe in every environment (no-op where tz
-already consistent).
+Pins the JDBC session tz explicitly going forward (defensive fix — see Status
+log 2026-07-24: turned out to be a no-op for current prod behavior, since JVM
+and DB were already both UTC, but still worth keeping as a safety net).
 
 - Test first (red): backend DB test (capability-named, e.g.
   `DatabaseTimeZoneTest`) asserting via the app datasource:
@@ -49,35 +49,63 @@ already consistent).
 
 ### Phase 2 — Behavior: repair skewed `quiz_answer.created_at` window — planned
 
-Stats become fully correct (recent month included). Vehicle: **placeholder-gated
-Flyway migration** deployed via CD (decision 2026-07-24, replaces manual runbook).
+Stats become fully correct for the confirmed ~11-month skewed core window.
+Vehicle: **placeholder-gated Flyway migration** deployed via CD (decision
+2026-07-24, replaces manual runbook).
 
-1. Prereq (read-only prod query, Jidoka): find the boundary ids — the cutover
-   shows as an ~8h **backward** jump in `created_at` between consecutive ids
-   (fuzzy over the few-minute rolling replace; ±8h on a handful of boundary rows
-   is acceptable). Window end = last row before the Phase 1 rollout, same
-   signature in reverse. Also confirm
-   `SELECT @@session.time_zone, @@system_time_zone, NOW(), UTC_TIMESTAMP();`.
-2. Migration `V3000002XX__repair_tz_skewed_quiz_answer_created_at.sql`:
-   `UPDATE quiz_answer SET created_at = created_at + INTERVAL 8 HOUR
-    WHERE ${tz_repair} AND id BETWEEN <literal bounds> AND created_at BETWEEN <band>;`
+**Revised window and direction** (superseding the original guess — see Status
+log 2026-07-24 root-cause revision): the skew is **not** a 1-month window
+around the 2026-06-20 JVM change. It's the opposite direction and a different,
+much larger window, confirmed via read-only prod queries (`user_id=1`,
+`quiz_answer` joined to `recall_prompt`/`memory_tracker`):
+
+- **Conservative core window** (safe, unambiguous — both boundary months
+  excluded): `created_at >= '2025-07-01 00:00:00' AND created_at < '2026-06-01 00:00:00'`.
+  Confirmed id range for this window: `quiz_answer.id BETWEEN 180685 AND 225258`
+  (39,257 rows for user_id=1; use the id band as the safety gate, same rationale
+  as before — a fresh local/e2e DB's `quiz_answer` ids start low (baseline
+  `AUTO_INCREMENT`), so this id band cannot match freshly-seeded local/e2e data).
+- **Direction:** `created_at = created_at - INTERVAL 8 HOUR` (not `+`). Currently
+  (post Phase 1, no JDBC conversion) the app displays `HOUR(created_at) + 8`
+  (Shanghai offset) directly. Rows in this window are stored 8h **ahead** of
+  their true instant (raw stored hour clusters at 6-9 UTC, displaying as a
+  spurious 14:00-17:00 peak); subtracting 8h moves them back to the same raw
+  22-23-0 UTC band that correctly displays ~06:00-08:00, matching the user's
+  confirmed real habit.
+- **Excluded (deliberately, for now):** 2025-06 and 2026-06 — transition months
+  where both the "true" and "spurious" patterns are mixed at low enough
+  resolution (month-level bins) that a per-row-safe cutoff isn't available from
+  the evidence gathered so far. Left as known residual imprecision (~1-2 months
+  out of ~3 years); can be revisited later if worth the extra forensics.
+- **Root cause of the 2025-06 flip itself is still unknown** (predates the
+  2026-06-20 JVM commit by a year; ruled out the Jan-2024 driver-family switch).
+  Decision 2026-07-24: proceed on the empirical boundary without chasing the
+  exact trigger — the data evidence (clean monthly flip, corroborated by the
+  user's own stated habit) is strong enough to act on.
+
+**Steps:**
+
+1. Migration `V3000002XX__repair_tz_skewed_quiz_answer_created_at.sql`:
+   `UPDATE quiz_answer SET created_at = created_at - INTERVAL 8 HOUR
+    WHERE ${tz_repair} AND id BETWEEN 180685 AND 225258
+    AND created_at >= '2025-07-01 00:00:00' AND created_at < '2026-06-01 00:00:00';`
    - `tz_repair` Flyway placeholder defaults to `1=0` (no-op everywhere);
      enabled (`1=1`) only via the prod startup script system property.
    - `updated_at` is `ON UPDATE CURRENT_TIMESTAMP` (server-side, already
      correct) — do not touch.
-3. Deploy **after** Phase 1 is live (window closed; rolling replace cannot
-   append skewed rows post-repair).
-4. Verify in the stats UI: activity peak at ~07:00 across the whole year;
-   "reviews today" consistent. Regenerate ERD not needed (no schema change).
+2. Verify in the stats UI: activity peak at ~07:00 dominant across the repaired
+   window; "reviews today"/recent stats unaffected (window ends well before
+   today). Regenerate ERD not needed (no schema change).
 
 ### Phase 3 — Behavior: repair `memory_tracker` scheduling columns — planned
 
 Recalls due at correct times for trackers touched in the window
-(`next_recall_at`, `last_recalled_at`, `assimilated_at` stored 8h early →
-recalls surface 8h early). Same vehicle: placeholder-gated migration in the
-same or a follow-up deploy.
+(`next_recall_at`, `last_recalled_at`, `assimilated_at` stored 8h **ahead** of
+true instant, same direction/window as Phase 2 → `- INTERVAL 8 HOUR`). Same
+vehicle: placeholder-gated migration in the same or a follow-up deploy.
 
-1. Id-bounding doesn't apply to UPDATEs; use **join-based bounds**:
+1. Id-bounding doesn't apply to UPDATEs; use **join-based bounds** (same
+   conservative date band as Phase 2: `>= '2025-07-01' AND < '2026-06-01'`):
    `last_recalled_at`/`next_recall_at` for trackers whose latest
    `recall_prompt`→`quiz_answer` id falls in the Phase 2 window;
    `assimilated_at` for trackers whose own id is in the window (creation-time).
@@ -170,10 +198,7 @@ to skip entirely.
     columns touched in the same window) are stored/interpreted 8h off from their true instant. This
     is a much bigger repair than the original "1 month around 6/20" scope, but also much better
     evidenced (clean monthly boundary, corroborated by the user's own habit description).
-  - **Decision needed from developer** before designing the real Phase 2: (a) worth spending more
-    effort to find the exact 2025-06 trigger (for confidence in the correction direction/scope), or
-    (b) proceed straight to a repair plan bounded by the empirically-observed monthly cluster
-    flip (2025-06-01 ↔ 2026-06-20ish), accepting some fuzziness at the two transition months.
-  - Phases 2–4 as originally written are **superseded** — do not execute them as-is. A new repair
-    plan must be designed against the real (~13-month) window once the developer decides how much
-    further to investigate the 2025-06 trigger.
+  - **Decision (developer, 2026-07-24):** proceed on the empirical boundary; do not chase the exact
+    2025-06 trigger further. Phase 2 rewritten below with the confirmed conservative window
+    (`2025-07-01` to `2026-06-01`, id band `180685`-`225258`, `- INTERVAL 8 HOUR`), excluding the two
+    fuzzy transition months (2025-06, 2026-06) as accepted residual imprecision.
