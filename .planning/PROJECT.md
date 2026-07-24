@@ -22,10 +22,10 @@ During spelling recall, an answer that names a *different* note becomes a learni
 - ✓ Accidental-match detection: wrong spelling answer matching another readable note's title or alias → `ACCIDENTAL_MATCH` + `matchedNoteId` — Phase 2 (AM-01)
 - ✓ Slight (lighter-than-wrong) SRS penalty for accidental match (`partialFail` −10, no 12h override) — Phase 2 (AM-02)
 - ✓ Reveal the reviewed note and the matched note(s) together after an accidental match — Phase 3 (AM-03)
+- ✓ Offer to build a link between the notes via the existing add-link UI (property link or relationship note), with the matched note pre-selected — Phase 4 (AM-04)
 
 ### Active
 
-- [ ] Offer to build a link between the notes via the existing add-link UI (property link or relationship note), with the matched note pre-selected
 - [ ] Overlap handling: when the answer is correct for the reviewed note but the reviewed note declares overlap with another note, respond "correct, but we're looking for another answer — try again," no credit
 - [ ] Overlap declaration model: extend the `aliases` frontmatter to accept wiki-link values pointing to another note
 
@@ -79,7 +79,8 @@ During spelling recall, an answer that names a *different* note becomes a learni
 - **Phase 1 complete (2026-07-23):** Answer contract represents the third outcome — `AnswerOutcome`, `@Transient matchedNoteId`/`outcome`, optional `overlap`/`matchedNotes`; OpenAPI client regenerated.
 - **Phase 2 complete (2026-07-24):** Accidental-match grading + lighter penalty shipped (title + alias legs, IDOR readability filter, UAT + security verified).
 - **Phase 3 complete (2026-07-24):** Accidental match reveals reviewed + all matched notes (`matchedNotes` + UI stack + E2E); human spot-check approved.
-- **Next:** Phase 4 — offer link between notes (add-link UI with matched note pre-selected).
+- **Phase 4 complete (2026-07-24):** Offer link from matched CTA (`MatchedNoteLinkOffer` property + relationship, D-07 stay-on-page); E2E + human verify approved.
+- **Next:** Phase 5 — alias-as-wiki-link overlap declaration (design spike / alias blast radius).
 
 ## Evolution
 

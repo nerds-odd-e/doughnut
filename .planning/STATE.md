@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 4
-current_phase_name: Offer link between notes
-status: executing
-stopped_at: Phase 4 awaiting human spot-check (04-03 Task 2)
-last_updated: "2026-07-24T05:16:35.617Z"
+current_phase: 5
+current_phase_name: Alias-as-wiki-link overlap declaration
+status: planning
+stopped_at: Phase 4 complete; next Phase 5 discuss
+last_updated: "2026-07-24T05:30:00.000Z"
 progress:
-  total_phases: 4
-  completed_phases: 3
+  total_phases: 6
+  completed_phases: 4
   total_plans: 9
-  completed_plans: 8
+  completed_plans: 9
 ---
 
 # State: Spelling Answer Match & Link
@@ -21,17 +21,17 @@ progress:
 - **Project:** Spelling Answer Match & Link
 - **Core value:** During spelling recall, an answer that names a *different* note becomes a learning opportunity — penalized lightly, both notes revealed, and a link offered — turning recall confusion into connection-building; and overlapping-but-distinct notes are kept distinct by asking the user for a more specific answer.
 - **Repo:** `/Users/terryyin/git/doughnut` (brownfield Spring Boot + Vue)
-- **Current focus:** Phase 04 — offer-link-between-notes
+- **Current focus:** Phase 05 — alias-as-wiki-link overlap declaration
 
 ## Current Position
 
-- **Phase:** 4 — Offer link between notes
-- **Plan:** 04-03 (next to execute)
-- **Status:** Executing (2/3 plans complete)
-- **Progress:** [█████████░] 89%
+- **Phase:** 5 — Alias-as-wiki-link overlap declaration
+- **Plan:** Not started
+- **Status:** Ready to discuss/plan
+- **Progress:** [█████████████░░░░░░░] 4/6 phases
 
 ```
-[x][x][x][ ][ ][ ] 3/6 phases
+[x][x][x][x][ ][ ] 4/6 phases
 ```
 
 ## Roadmap Snapshot
@@ -47,8 +47,8 @@ progress:
 
 ## Performance Metrics
 
-- **Phases completed:** 3
-- **Requirements delivered:** 6/9 (API-01, API-02, AM-01, AM-02, AM-03, AM-04 property path tracer)
+- **Phases completed:** 4
+- **Requirements delivered:** 6/9 (API-01, API-02, AM-01, AM-02, AM-03, AM-04)
 - **Coverage:** 9/9 mapped (100%)
 
 **Per-Plan Metrics:**
@@ -62,7 +62,8 @@ progress:
 | Phase 03 P02 | 3min | 2 tasks | 3 files |
 | Phase 03 P03 | 8min | 2 tasks | 3 files |
 | Phase 04 P01 | 12min | 2 tasks | 10 files |
-| Phase 04-offer-link-between-notes P02 | 6min | 2 tasks | 5 files |
+| Phase 04 P02 | 6min | 2 tasks | 5 files |
+| Phase 04 P03 | 15min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -76,9 +77,8 @@ progress:
 
 ### Integration points (from codebase map)
 
-- Backend: `findAllAccidentalMatches` + `AnsweredQuestion.matchedNotes` populated on accidental match.
-- Frontend: `AnsweredSpellingQuestion.vue` ACCIDENTAL_MATCH alert + `matched-notes-section` NoteShow stack.
-- Phase 4: `MatchedNoteLinkOffer` under matched rows; property via `updateTextField`; relationship via `AddRelationshipFinalize` with `navigateOnSuccess=false` (D-07).
+- Phase 4 shipped: `MatchedNoteLinkOffer` under matched rows; property via `updateTextField`; relationship via `AddRelationshipFinalize` with `navigateOnSuccess=false` (D-07).
+- Phase 5: extend `aliases` frontmatter for wiki-link values — alias blast radius (CONCERNS.md).
 
 ### Known risks / blockers
 
@@ -86,9 +86,8 @@ progress:
 
 ### Todos
 
-- [x] Execute Phase 3 (03-01..03-03) — AM-03 reveal complete; human verify approved.
-- [x] Discuss + plan Phase 4 (04-01..04-03).
-- [ ] Execute Phase 4 — `/gsd-execute-phase 4` (or local execute-plan).
+- [x] Execute Phase 4 (04-01..04-03) — AM-04 offer-link complete; E2E green; human verify approved (E2E-env browser subagent).
+- [ ] Run `/gsd-discuss-phase 5` (or `--auto`) then plan/execute OVL-02/OVL-03.
 
 ### Open questions
 
@@ -96,22 +95,17 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T05:16:35.608Z
-**Stopped at:** Phase 4 awaiting human spot-check (04-03 Task 2)
-**Resume file:** .planning/phases/04-offer-link-between-notes/04-03-PLAN.md
+**Last session:** 2026-07-24T05:30:00.000Z
+**Stopped at:** Phase 4 complete; next Phase 5 discuss
+**Resume file:** .planning/ROADMAP.md
 
-- **Last action:** Completed 04-02 — relationship finalize + D-07 stay-on-page (skipNavigation / navigateOnSuccess).
-- **Next action:** Execute 04-03 (remaining AM-04 / E2E surface).
-- **Resume from:** `.planning/phases/04-offer-link-between-notes/04-03-PLAN.md`
+- **Last action:** Phase 4 closed — VERIFICATION passed; AM-04 complete; human spot-check approved via E2E-env subagent.
+- **Next action:** `/gsd-discuss-phase 5 --auto` (or discuss without auto).
+- **Resume from:** Read this file + ROADMAP Phase 5.
 
 ## Decisions
 
 - [Phase 1]: Locked Option A (D-05): @Transient matchedNoteId + AnswerOutcome enum on Answer; overlap + matchedNotes:List<NoteTopology> on AnsweredQuestion
 - [Phase 2]: ACCIDENTAL_MATCH grading + lighter −10 penalty; findAccidentalMatch title then alias
 - [Phase 3]: D-01 findAllAccidentalMatches title∪alias; D-02 populate matchedNotes; D-03–D-05 UI NoteShow stack + distinct alert; D-06 no add-link this phase
-- [Phase 3]: assumption_delta promote — matchedNotes list is primary; matchedNoteId = first-of-list for Phase 4
-- [Phase 4]: D-01 per-row CTA; D-02 reviewed→matched; D-03 preselect past search; D-04 NoteStorage fetch; D-05 hide bare wiki; D-06 write gate; D-07 stay on page via skipNavigation/navigateOnSuccess=false on relationship path
-- [Phase 4]: Wave 1 hides relationship via relationshipOptionAvailable=false; property write via appendWikiLinkPropertyRow + updateTextField
-- [Phase 4]: wikiPropertyOptionAvailable from parseNoteContentMarkdown on source note, not useContentCursorInserter
-- [Phase 4]: D-07: skipNavigation + navigateOnSuccess=false keeps recall on accidental-match after relationship create
-- [Phase 4]: Toolbar/SearchForm omit navigateOnSuccess so default navigate-after-create is preserved
+- [Phase 4]: D-01–D-07 MatchedNoteLinkOffer; property updateTextField; relationship navigateOnSuccess=false; human verify via E2E browser subagent
