@@ -5,12 +5,12 @@ milestone_name: milestone
 current_phase: 2
 current_phase_name: Accidental-match grading & penalty
 status: planning
-stopped_at: Phase 2 context gathered
-last_updated: "2026-07-23T23:21:47.198Z"
+stopped_at: Phase 2 planned (2 plans)
+last_updated: "2026-07-24T08:30:00.000Z"
 progress:
   total_phases: 2
   completed_phases: 1
-  total_plans: 1
+  total_plans: 3
   completed_plans: 1
 ---
 
@@ -26,12 +26,12 @@ progress:
 ## Current Position
 
 - **Phase:** 2 — Accidental-match grading & penalty
-- **Plan:** Not started
-- **Status:** Ready to plan
-- **Progress:** [░░░░░░░░░░] 0%
+- **Plan:** 02-01-PLAN.md, 02-02-PLAN.md written (2 plans, 2 waves; Plan 01 = tracer title-leg + IDOR/skip tests, Plan 02 = alias leg + clamp/threshold tests)
+- **Status:** Planned
+- **Progress:** [██░░░░░░░░] Phase 2 planning complete
 
 ```
-[1][..........] 0/6 phases
+[1][.....] 1/2 phases (Phase 2 planned, not executed)
 ```
 
 ## Roadmap Snapshot
@@ -80,8 +80,9 @@ progress:
 ### Todos
 
 - [x] Run `/gsd-plan-phase 1` to plan the API contract extension.
-- [ ] Run `/gsd-execute-phase 1` to execute 01-01-PLAN.md (contract round-trip + no-behavior tests).
-- [ ] Confirm the accidental-match penalty value (e.g. `updateForgettingCurve(−10)`-style) during Phase 2 planning.
+- [x] Run `/gsd-execute-phase 1` to execute 01-01-PLAN.md (contract round-trip + no-behavior tests).
+- [x] Confirm the accidental-match penalty value (D-03 locked at -10 = DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT, half of failed()'s -20, no 12h override) during Phase 2 planning.
+- [ ] Run `/gsd-execute-phase 2` to execute 02-01-PLAN.md then 02-02-PLAN.md.
 
 ### Open questions
 
@@ -90,13 +91,13 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-23T23:21:47.193Z
-**Stopped at:** Phase 2 context gathered
-**Resume file:** .planning/phases/02-accidental-match-grading-penalty/02-CONTEXT.md
+**Last session:** 2026-07-24T08:30:00.000Z
+**Stopped at:** Phase 2 planned (2 plans, 2 waves)
+**Resume file:** .planning/phases/02-accidental-match-grading-penalty/02-01-PLAN.md
 
-- **Last action:** Phase 1 planned — `01-01-PLAN.md` written (1 plan, wave 1, autonomous; tracer = full contract round-trip, expansion = no-behavior tests on both contract surfaces). ROADMAP + STATE finalized.
-- **Next action:** `/gsd-execute-phase 1` (Structure — API contract extension; no behavior, no service, no UI).
-- **Resume from:** Read this file + `.planning/phases/01-extend-answer-outcome-api/01-01-PLAN.md`; execute the plan.
+- **Last action:** Phase 2 planned — `02-01-PLAN.md` (tracer: title-leg accidental match + lighter -10 clamped penalty + IDOR/skip-when-correct tests) and `02-02-PLAN.md` (alias leg + floor-clamp/threshold-counts tests) written. ROADMAP + STATE finalized. Both plans validate clean; all 6 locked decisions D-01..D-06 cited; threat_model + assumption_delta_decision + Artifacts sections present.
+- **Next action:** `/gsd-execute-phase 2` (Behavior — accidental-match grading + lighter SRS penalty; Plan 01 Wave 1, then Plan 02 Wave 2).
+- **Resume from:** Read this file + `.planning/phases/02-accidental-match-grading-penalty/02-01-PLAN.md`; execute the plans in wave order.
 
 ---
 *Last updated: 2026-07-23 during roadmap creation*

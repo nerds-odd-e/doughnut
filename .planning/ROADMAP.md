@@ -50,7 +50,16 @@ Plans:
   2. An accidental match applies a lighter SRS penalty than a plain wrong answer (a third outcome via `updateForgettingCurve`, no 12h override).
   3. When the answer already matches the reviewed note, the accidental-match search is skipped (overlap is declared, not auto-detected).
 
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 02-01-PLAN.md — Wire the end-to-end title-leg accidental-match path (WikiLinkResolver.findAccidentalMatch + NoteRepository.findByNoteTitleOrderByIdAsc + ForgettingCurve.partialFail + MemoryTracker.markAsAccidentalMatch + MemoryTrackerService wiring) as the first production writer of Answer.matchedNoteId/outcome=ACCIDENTAL_MATCH with the lighter -10 clamped penalty (no 12h), plus IDOR-unreadable and skip-when-correct-shared-title controller tests
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 02-02-PLAN.md — Add the alias leg of findAccidentalMatch (NoteAliasIndexRepository.findByAliasLookupKeyOrderByNoteIdAsc + title-then-alias fallback) and the floor-clamp + threshold-counts edge-case controller tests
 
 ### Phase 3: Reveal both notes after accidental match
 
@@ -118,7 +127,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Extend Answer outcome API | 1/1 | Complete    | 2026-07-23 |
-| 2. Accidental-match grading & penalty | 0/0 | Not started | - |
+| 2. Accidental-match grading & penalty | 0/2 | Planned | - |
 | 3. Reveal both notes after accidental match | 0/0 | Not started | - |
 | 4. Offer link between notes | 0/0 | Not started | - |
 | 5. Alias-as-wiki-link overlap declaration | 0/0 | Not started | - |
