@@ -1,18 +1,14 @@
 ---
-status: testing
+status: complete
 phase: 02-accidental-match-grading-penalty
 source: [02-VERIFICATION.md]
 started: 2026-07-24T01:00:00Z
-updated: 2026-07-24T03:05:04Z
+updated: 2026-07-24T03:46:08Z
 ---
 
 ## Current Test
 
-number: 2
-name: Multiple same-title matches → lowest note id
-expected: |
-  matchedNoteId equals the lower note id (OrderByIdAsc + first readable).
-awaiting: user response
+[testing complete]
 
 ## Tests
 
@@ -22,18 +18,18 @@ result: pass
 
 ### 2. Multiple same-title matches → lowest note id
 expected: matchedNoteId equals the lower note id (OrderByIdAsc + first readable).
-result: [pending]
+result: pass
 
 ### 3. Title preferred over alias when both match
 expected: matchedNoteId=A (title preferred); alias leg not used when a readable title match exists.
-result: [pending]
+result: pass
 
 ## Summary
 
 total: 3
-passed: 1
+passed: 3
 issues: 0
-pending: 2
+pending: 0
 skipped: 0
 blocked: 0
 

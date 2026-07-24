@@ -759,6 +759,47 @@ class RecallPromptControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void shouldPreferLowestNoteIdWhenMultipleReadableNotesShareTitle()
+        throws UnexpectedNoAccessRightException {
+      Notebook thirdNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      Note thirdNote = makeMe.aNote().notebook(thirdNotebook).title(secondNote.getTitle()).please();
+      assertThat(secondNote.getId(), lessThan(thirdNote.getId()));
+
+      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+
+      assertFalse(answerResult.getAnswer().getCorrect());
+      assertThat(answerResult.getAnswer().getOutcome(), is(AnswerOutcome.ACCIDENTAL_MATCH));
+      assertThat(
+          answerResult.getAnswer().getMatchedNoteId(), equalTo(secondNote.getId().longValue()));
+    }
+
+    @Test
+    void shouldPreferTitleMatchOverAliasMatchWhenBothExist()
+        throws UnexpectedNoAccessRightException {
+      String shared = "TitlePreferredMatch";
+      Notebook notebookA = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      Note noteA = makeMe.aNote().notebook(notebookA).title(shared).please();
+      Notebook notebookB = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      Note noteB =
+          makeMe
+              .aNote()
+              .notebook(notebookB)
+              .title("AliasOnlyNoteTitle")
+              .content("---\naliases:\n  - " + shared + "\n---\n\nbody")
+              .please();
+      noteAliasIndexService.refreshForNote(noteB);
+      answerDTO.setSpellingAnswer(shared);
+
+      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+
+      assertFalse(answerResult.getAnswer().getCorrect());
+      assertThat(answerResult.getAnswer().getOutcome(), is(AnswerOutcome.ACCIDENTAL_MATCH));
+      assertThat(answerResult.getAnswer().getMatchedNoteId(), equalTo(noteA.getId().longValue()));
+      assertThat(
+          answerResult.getAnswer().getMatchedNoteId(), not(equalTo(noteB.getId().longValue())));
+    }
+
+    @Test
     void shouldGradeBlankAnswerAsPlainWrongEvenWhenEmptyTitleReadableNoteExists()
         throws UnexpectedNoAccessRightException {
       Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
