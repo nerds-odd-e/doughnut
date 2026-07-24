@@ -55,18 +55,18 @@ const fillClass = (count?: number) => {
 
 <style scoped>
 .rs-cal-empty {
-  fill: #ebedf0;
+  fill: var(--color-base-300);
 }
 .rs-cal-l1 {
-  fill: #9be9a8;
+  fill: color-mix(in oklab, var(--color-base-300), var(--color-success) 40%);
 }
 .rs-cal-l2 {
-  fill: #40c463;
+  fill: color-mix(in oklab, var(--color-base-300), var(--color-success) 65%);
 }
 .rs-cal-l3 {
-  fill: #30a14e;
+  fill: color-mix(in oklab, var(--color-base-300), var(--color-success) 85%);
 }
 .rs-cal-l4 {
-  fill: #216e39;
+  fill: var(--color-success);
 }
 </style>

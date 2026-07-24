@@ -4,7 +4,7 @@
       :data-testid="polylineTestid"
       :points="polylinePoints"
       fill="none"
-      :stroke="stroke"
+      :style="{ stroke: stroke }"
       stroke-width="2"
     />
     <circle
@@ -82,6 +82,6 @@ const insufficientPoints = computed(() => {
 
 <style scoped>
 .rs-trend-insufficient {
-  fill: oklch(0.7 0 0 / 0.4);
+  fill: color-mix(in oklab, var(--color-base-content) 40%, transparent);
 }
 </style>

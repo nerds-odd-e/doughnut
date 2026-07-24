@@ -4,7 +4,7 @@
       :values="values"
       polyline-testid="response-time-polyline"
       insufficient-testid="response-time-insufficient"
-      stroke="oklch(0.55 0.2 250)"
+      stroke="var(--color-primary)"
       aria-label="Response time trend"
     />
   </div>

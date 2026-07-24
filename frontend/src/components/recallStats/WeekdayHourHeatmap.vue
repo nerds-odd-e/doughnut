@@ -90,33 +90,33 @@ const cellTitle = (wd: number, hr: number) => {
 
 <style scoped>
 .rs-hm-c-empty {
-  fill: #ebedf0;
+  fill: var(--color-base-300);
 }
 .rs-hm-c1 {
-  fill: #9be9a8;
+  fill: color-mix(in oklab, var(--color-base-300), var(--color-success) 40%);
 }
 .rs-hm-c2 {
-  fill: #40c463;
+  fill: color-mix(in oklab, var(--color-base-300), var(--color-success) 65%);
 }
 .rs-hm-c3 {
-  fill: #30a14e;
+  fill: color-mix(in oklab, var(--color-base-300), var(--color-success) 85%);
 }
 .rs-hm-c4 {
-  fill: #216e39;
+  fill: var(--color-success);
 }
 .rs-hm-insufficient {
-  fill: oklch(0.7 0 0 / 0.25);
+  fill: color-mix(in oklab, var(--color-base-content) 25%, transparent);
 }
 .rs-hm-r1 {
-  fill: oklch(0.6 0.2 25);
+  fill: color-mix(in oklab, var(--color-base-300), var(--color-primary) 40%);
 }
 .rs-hm-r2 {
-  fill: oklch(0.7 0.15 95);
+  fill: color-mix(in oklab, var(--color-base-300), var(--color-primary) 65%);
 }
 .rs-hm-r3 {
-  fill: oklch(0.75 0.15 145);
+  fill: color-mix(in oklab, var(--color-base-300), var(--color-primary) 85%);
 }
 .rs-hm-r4 {
-  fill: oklch(0.6 0.18 145);
+  fill: var(--color-primary);
 }
 </style>

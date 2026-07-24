@@ -5,7 +5,7 @@
       :y-max="100"
       polyline-testid="retention-trend-polyline"
       insufficient-testid="retention-trend-insufficient"
-      stroke="oklch(0.6 0.15 145)"
+      stroke="var(--color-primary)"
       aria-label="Retention trend"
     />
   </div>

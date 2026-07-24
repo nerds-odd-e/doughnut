@@ -61,13 +61,13 @@ const bars = computed(() => {
 
 <style scoped>
 .rs-ampm-bar {
-  fill: oklch(0.55 0.2 250);
+  fill: var(--color-primary);
 }
 .rs-ampm-empty {
-  fill: oklch(0.7 0 0 / 0.25);
+  fill: color-mix(in oklab, var(--color-base-content) 25%, transparent);
 }
 .rs-ampm-label {
-  fill: oklch(0.4 0 0 0.7);
-  font-size: 10px;
+  fill: var(--color-base-content);
+  font-size: 12px;
 }
 </style>
