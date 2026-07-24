@@ -96,7 +96,7 @@ export JAVA_OPTS="-XX:InitialRAMPercentage=40.0 \
 bash -c "java ${JAVA_OPTS} \
         -Dspring-boot.run.profiles=prod \
         -Dspring.profiles.active=prod \
-        -Dspring.datasource.url='jdbc:mysql://db-server:3306/doughnut' \
+        -Dspring.datasource.url='jdbc:mysql://db-server:3306/doughnut?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true' \
         -Dspring.datasource.password=${MYSQL_PASSWORD} \
         -Dspring.github_for_issues.token=${GITHUB_FOR_ISSUES_API_TOKEN} \
         -Dspring.openai.token=${OPENAI_API_TOKEN} \

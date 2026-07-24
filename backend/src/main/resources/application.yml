@@ -79,7 +79,7 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
   datasource:
-    url: ${INPUT_DB_URL:jdbc:mysql://127.0.0.1:3309/doughnut_e2e_test}
+    url: ${INPUT_DB_URL:jdbc:mysql://127.0.0.1:3309/doughnut_e2e_test?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true}
     username: ${db.user}
     password: ${db.password}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -156,7 +156,7 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
   datasource:
-    url: jdbc:mysql://db-server:3306/doughnut
+    url: jdbc:mysql://db-server:3306/doughnut?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true
     username: doughnut
     password: ${MYSQL_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver

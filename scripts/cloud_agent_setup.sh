@@ -113,12 +113,13 @@ else
 fi
 
 # Export environment variables for tests (port 3309 matches db-test.properties)
-export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:${MYSQL_PORT}/doughnut_test?allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true"
+DB_URL_PARAMS="allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true&connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true"
+export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:${MYSQL_PORT}/doughnut_test?${DB_URL_PARAMS}"
 export SPRING_DATASOURCE_USERNAME="doughnut"
 export SPRING_DATASOURCE_PASSWORD="doughnut"
 
 # Export environment variable for e2e tests (backend uses INPUT_DB_URL when running with e2e profile)
-export INPUT_DB_URL="jdbc:mysql://127.0.0.1:${MYSQL_PORT}/doughnut_e2e_test?allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true"
+export INPUT_DB_URL="jdbc:mysql://127.0.0.1:${MYSQL_PORT}/doughnut_e2e_test?${DB_URL_PARAMS}"
 
 # Use pipe fallback for CLI PTY tests (ESC, arrow keys) - PTY via script is unreliable without real terminal
 export CI=1

@@ -21,7 +21,7 @@
 
 ## Phases
 
-### Phase 1 — Behavior: pin DB session time zone to UTC — planned
+### Phase 1 — Behavior: pin DB session time zone to UTC — done
 
 Fixes hour-of-day display for all correctly-stored data (~11 months of history)
 and stops further skewed writes. Safe in every environment (no-op where tz
@@ -114,3 +114,20 @@ to skip entirely.
 ## Status log
 
 - 2026-07-24: plan written. Nothing executed yet.
+- 2026-07-24: Phase 1 done. Added `backend/src/test/java/com/odde/doughnut/configs/DatabaseTimeZoneTest.java`
+  (asserts `SELECT @@session.time_zone` is `+00:00` and a `FROM_UNIXTIME` round-trip through JDBC
+  `Timestamp` matches the known epoch millis exactly). Confirmed red first (`SYSTEM`), then green after
+  the config change. Appended `?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true` (or
+  `&...` where a `?` already existed) to every real runtime JDBC URL:
+  `backend/src/main/resources/application.yml` (e2e fallback + prod), `db-dev.properties`,
+  `db-test.properties`, `infra/gcp/scripts/mig-zulu25-openai-app-instance-startup.sh` (the actual
+  prod-controlling `-Dspring.datasource.url` override), and `scripts/cloud_agent_setup.sh`
+  (`SPRING_DATASOURCE_URL`/`INPUT_DB_URL` for the no-Nix Cloud VM path).
+  Surprises: `db-e2e.properties` defines no `db.url` (e2e always resolves via the `INPUT_DB_URL`
+  env var or the `application.yml` fallback, so nothing to change there); `.github/workflows/ci.yml`
+  never sets `INPUT_DB_URL`, so CI e2e always uses the `application.yml` fallback — updating that one
+  line covers CI; `.github/starting_backend_actions/action.yml` also references `INPUT_DB_URL` but is
+  not invoked from any workflow (dead/orphaned composite action) — left untouched.
+  Full backend suite (`pnpm backend:test_only`) green after the change; `pnpm lint:all` /
+  `pnpm format:all` clean.
+  No scope change to Phases 2–4.
