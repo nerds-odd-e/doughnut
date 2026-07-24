@@ -5,10 +5,10 @@ milestone_name: milestone
 current_phase: 3
 current_phase_name: Reveal both notes after accidental match
 status: planned
-stopped_at: Phase 3 plans created (03-01..03-03)
-last_updated: "2026-07-24T04:08:37.958Z"
+stopped_at: Phase 3 planning complete; Wave 1 execute in progress
+last_updated: "2026-07-24T04:13:24.542Z"
 progress:
-  total_phases: 6
+  total_phases: 3
   completed_phases: 2
   total_plans: 6
   completed_plans: 3
@@ -94,8 +94,8 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T04:08:37.958Z
-**Stopped at:** Phase 3 plans created (03-01..03-03)
+**Last session:** 2026-07-24T04:13:24.533Z
+**Stopped at:** Phase 3 planning complete; Wave 1 execute in progress
 **Resume file:** .planning/phases/03-reveal-both-notes-after-accidental-match/03-01-PLAN.md
 
 - **Last action:** Phase 3 executable plans written — `03-01-PLAN.md` (backend findAll + matchedNotes + IDOR), `03-02-PLAN.md` (UI alert + NoteShow stack), `03-03-PLAN.md` (E2E + human verify). Assumption-delta: promote matchedNotes list; matchedNoteId = first-of-list.
