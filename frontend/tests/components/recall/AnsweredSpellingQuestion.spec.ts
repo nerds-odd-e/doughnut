@@ -281,4 +281,46 @@ describe("AnsweredSpellingQuestion", () => {
       ).toBe(false)
     })
   })
+
+  describe("overlap try-again result", () => {
+    it("shows warning try-again alert without matched notes and emits retry", async () => {
+      const reviewed = makeMe.aNote.title("Reviewed Note").please()
+      const answeredQuestion: AnsweredQuestion = {
+        ...makeMe.anAnsweredQuestion
+          .withNote(reviewed)
+          .spelling()
+          .answerCorrect(false)
+          .withAnswer({
+            id: 1,
+            correct: false,
+            spellingAnswer: "Shared Title",
+            outcome: "OVERLAP",
+          })
+          .please(),
+        overlap: true,
+      }
+
+      const wrapper = mountAnsweredSpellingQuestion(answeredQuestion)
+      await flushPromises()
+
+      const alert = wrapper.find('[data-testid="overlap-try-again-alert"]')
+      expect(alert.exists()).toBe(true)
+      expect(alert.classes()).toContain("daisy-alert-warning")
+      expect(alert.text()).toContain(
+        "Correct, but we're looking for another answer — try again."
+      )
+      expect(
+        wrapper.find('[data-testid="matched-notes-section"]').exists()
+      ).toBe(false)
+      expect(
+        wrapper.find('[data-testid="accidental-match-alert"]').exists()
+      ).toBe(false)
+
+      const tryAgain = wrapper.find('[data-testid="overlap-try-again"]')
+      expect(tryAgain.exists()).toBe(true)
+      expect(tryAgain.text()).toContain("Try again")
+      await tryAgain.trigger("click")
+      expect(wrapper.emitted("retry")).toHaveLength(1)
+    })
+  })
 })

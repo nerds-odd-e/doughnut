@@ -1164,4 +1164,82 @@ class RecallPromptControllerTests extends ControllerTestBase {
       assertThat(memoryTrackerService.isThresholdExceeded(memoryTracker, now), is(true));
     }
   }
+
+  @Nested
+  class OverlapTryAgain {
+    Note reviewedNote;
+    Note partnerNote;
+    MemoryTracker memoryTracker;
+
+    @BeforeEach
+    void setup() {
+      Notebook partnerNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      partnerNote = makeMe.aNote().notebook(partnerNotebook).title("Shared Title").please();
+      String overlapToken = partnerNotebook.getName() + ":Shared Title";
+      reviewedNote =
+          makeMe
+              .aNote()
+              .rememberSpelling()
+              .title("Shared Title")
+              .content(
+                  """
+                  ---
+                  aliases:
+                    - color
+                    - "[[%s]]"
+                  ---
+                  Body text
+                  """
+                      .formatted(overlapToken))
+              .please();
+      memoryTracker =
+          makeMe
+              .aMemoryTrackerFor(reviewedNote)
+              .by(currentUser.getUser())
+              .forgettingCurveAndNextRecallAt(200.0f)
+              .spelling()
+              .please();
+    }
+
+    @Test
+    void shouldGradeAsOverlapWhenAnswerMatchesReviewedAndResolvedOverlapTarget()
+        throws UnexpectedNoAccessRightException {
+      Integer recallCountBefore = memoryTracker.getRecallCount();
+      Float forgettingCurveBefore = memoryTracker.getForgettingCurveIndex();
+      Timestamp nextRecallAtBefore = memoryTracker.getNextRecallAt();
+
+      AnswerSpellingDTO answerDTO = new AnswerSpellingDTO();
+      answerDTO.setSpellingAnswer("Shared Title");
+      RecallPrompt prompt =
+          makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
+
+      AnsweredQuestion result = controller.answerSpelling(prompt, answerDTO);
+
+      assertFalse(result.getAnswer().getCorrect());
+      assertThat(result.getAnswer().getOutcome(), is(AnswerOutcome.OVERLAP));
+      assertThat(result.getOverlap(), is(true));
+      assertThat(result.getMatchedNotes(), anyOf(nullValue(), empty()));
+      assertThat(memoryTracker.getRecallCount(), equalTo(recallCountBefore));
+      assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(forgettingCurveBefore));
+      assertThat(memoryTracker.getNextRecallAt(), equalTo(nextRecallAtBefore));
+    }
+
+    @Test
+    void shouldGradeCorrectWithCreditWhenDistinguishingPlainAlias()
+        throws UnexpectedNoAccessRightException {
+      Integer recallCountBefore = memoryTracker.getRecallCount();
+
+      AnswerSpellingDTO answerDTO = new AnswerSpellingDTO();
+      answerDTO.setSpellingAnswer("color");
+      RecallPrompt prompt =
+          makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
+
+      AnsweredQuestion result = controller.answerSpelling(prompt, answerDTO);
+
+      assertTrue(result.getAnswer().getCorrect());
+      assertThat(result.getAnswer().getOutcome(), not(is(AnswerOutcome.OVERLAP)));
+      assertThat(result.getOverlap(), anyOf(nullValue(), is(false)));
+      assertThat(memoryTracker.getRecallCount(), equalTo(recallCountBefore + 1));
+    }
+  }
 }
