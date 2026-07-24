@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 3
 current_phase_name: Reveal both notes after accidental match
-status: planned
-stopped_at: Phase 3 planning complete; Wave 1 execute in progress
-last_updated: "2026-07-24T04:13:24.542Z"
+status: in_progress
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-07-24T04:31:00Z"
 progress:
-  total_phases: 3
+  total_phases: 6
   completed_phases: 2
   total_plans: 6
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # State: Spelling Answer Match & Link
@@ -26,9 +26,9 @@ progress:
 ## Current Position
 
 - **Phase:** 3 — Reveal both notes after accidental match
-- **Plan:** 03-01 (next to execute)
-- **Status:** Planned — 3 plans ready (waves 1→2→3)
-- **Progress:** Phase 3 plans 0/3 executed; overall [████░░░░░░░░░░░░░░░░] ~33%
+- **Plan:** 03-02 (next to execute)
+- **Status:** In Progress — 03-01 complete; Wave 2 (UI) next
+- **Progress:** Phase 3 plans 1/3 executed; overall [███████░░░] 67%
 
 ```
 [x][x][ ][ ][ ][ ] 2/6 phases
@@ -58,6 +58,7 @@ progress:
 | Phase 01 P01 | 23min | 2 tasks | 8 files |
 | Phase 02 P01 | 6min | 2 tasks | 6 files |
 | Phase 02 P02 | 8min | 2 tasks | 3 files |
+| Phase 03 P01 | 18min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -71,9 +72,9 @@ progress:
 
 ### Integration points (from codebase map)
 
-- Backend: `MemoryTrackerService.answerSpelling` (lines ~255–280), after `Note.matchAnswer`.
-- Frontend: `AnsweredSpellingQuestion.vue`.
-- Reuse: `WikiLinkResolver.resolveWikiLinkToken`, `Note.matchAnswer`, `LinkInsertionChoice` / `AddRelationshipFinalize`, `updateForgettingCurve`.
+- Backend: `MemoryTrackerService.answerSpelling` + `SpellingAnswerResult` + `findAllAccidentalMatches`; `AnsweredQuestion.matchedNotes` populated.
+- Frontend: `AnsweredSpellingQuestion.vue` (03-02 next).
+- Reuse: `WikiLinkResolver`, `Note.matchAnswer`, `LinkInsertionChoice` / `AddRelationshipFinalize`, `updateForgettingCurve`.
 
 ### Known risks / blockers
 
@@ -86,7 +87,8 @@ progress:
 - [x] Confirm the accidental-match penalty value (D-03 locked at -10 = DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT, half of failed()'s -20, no 12h override) during Phase 2 planning.
 - [x] Run `/gsd-execute-phase 2` to execute 02-01-PLAN.md then 02-02-PLAN.md.
 - [x] Run `/gsd-plan-phase 3` to write 03-01..03-03 PLAN.md.
-- [ ] Run `/gsd-execute-phase 3` (or local execute-plan) starting with 03-01-PLAN.md.
+- [x] Execute 03-01-PLAN.md (findAll + matchedNotes + IDOR).
+- [ ] Execute 03-02-PLAN.md (UI reveal) then 03-03-PLAN.md (E2E).
 
 ### Open questions
 
@@ -94,26 +96,24 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T04:13:24.533Z
-**Stopped at:** Phase 3 planning complete; Wave 1 execute in progress
-**Resume file:** .planning/phases/03-reveal-both-notes-after-accidental-match/03-01-PLAN.md
+**Last session:** 2026-07-24T04:31:00Z
+**Stopped at:** Completed 03-01-PLAN.md
+**Resume file:** None
 
-- **Last action:** Phase 3 executable plans written — `03-01-PLAN.md` (backend findAll + matchedNotes + IDOR), `03-02-PLAN.md` (UI alert + NoteShow stack), `03-03-PLAN.md` (E2E + human verify). Assumption-delta: promote matchedNotes list; matchedNoteId = first-of-list.
-- **Next action:** `/gsd-execute-phase 3` (Wave 1 → 03-01).
-- **Resume from:** Read this file + `.planning/phases/03-reveal-both-notes-after-accidental-match/03-01-PLAN.md`.
-
----
-*Last updated: 2026-07-23 during roadmap creation*
+- **Last action:** Completed 03-01 — `findAllAccidentalMatches` + populated `matchedNotes` on answer-spelling; IDOR list coverage green.
+- **Next action:** Execute 03-02-PLAN.md (AnsweredSpellingQuestion ACCIDENTAL_MATCH UI).
+- **Resume from:** Read this file + `.planning/phases/03-reveal-both-notes-after-accidental-match/03-02-PLAN.md`.
 
 ## Decisions
 
-- [Phase ?]: Locked Option A (D-05): @Transient matchedNoteId + AnswerOutcome enum on Answer; overlap + matchedNotes:List<NoteTopology> on AnsweredQuestion; A1 (@Transient surfaces in OpenAPI) verified via regen-then-grep
-- [Phase ?]: Pure Structure phase: no production writer sets the new fields (grep invariant = 0); AnsweredQuestion.from(RecallPrompt) unchanged; correct stays required/@NotNull and sole SRS-credit signal
-- [Phase ?]: Reused existing NoteTopology (id+title) for matchedNotes; no new note-ref DTO; no Flyway migration (fields are @Transient)
-- [Phase ?]: Set ACCIDENTAL_MATCH @Transient fields on recallPrompt.getAnswer() after merge/save so managed Answer keeps outcome/matchedNoteId
-- [Phase ?]: Plan 02-01 title leg only; alias fallback deferred to Plan 02-02
-- [Phase ?]: Alias index fixture must call refreshForNote — makeMe does not auto-index aliases
+- [Phase 1]: Locked Option A (D-05): @Transient matchedNoteId + AnswerOutcome enum on Answer; overlap + matchedNotes:List<NoteTopology> on AnsweredQuestion; A1 (@Transient surfaces in OpenAPI) verified via regen-then-grep
+- [Phase 1]: Pure Structure phase: no production writer sets the new fields (grep invariant = 0); AnsweredQuestion.from(RecallPrompt) unchanged; correct stays required/@NotNull and sole SRS-credit signal
+- [Phase 1]: Reused existing NoteTopology (id+title) for matchedNotes; no new note-ref DTO; no Flyway migration (fields are @Transient)
+- [Phase 2]: Set ACCIDENTAL_MATCH @Transient fields on recallPrompt.getAnswer() after merge/save so managed Answer keeps outcome/matchedNoteId
+- [Phase 2]: Plan 02-01 title leg only; alias fallback deferred to Plan 02-02
+- [Phase 2]: Alias index fixture must call refreshForNote — makeMe does not auto-index aliases
 - [Phase 2]: At floor index, nextRecallAt equals now (0 repeat hours); assert greaterThanOrEqualTo
 - [Phase 3]: D-01 findAllAccidentalMatches title∪alias union; D-02 populate matchedNotes; matchedNoteId = first-of-list
 - [Phase 3]: D-03–D-05 UI: full NoteShow stack + distinct ACCIDENTAL_MATCH alert; D-06 no add-link this phase
 - [Phase 3]: Assumption-delta promote: matchedNotes list is primary plural surface
+- [Phase 3]: SpellingAnswerResult carries match list so controller avoids second findAll

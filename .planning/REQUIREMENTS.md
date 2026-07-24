@@ -38,7 +38,7 @@
 |-------------|-------|--------|
 | AM-01 | Phase 2 | Complete |
 | AM-02 | Phase 2 | Complete |
-| AM-03 | Phase 3 | pending |
+| AM-03 | Phase 3 | In Progress |
 | AM-04 | Phase 4 | pending |
 | OVL-01 | Phase 6 | pending |
 | OVL-02 | Phase 5 | pending |

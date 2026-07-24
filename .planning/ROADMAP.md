@@ -72,13 +72,13 @@ Plans:
   1. After an accidental match, the reviewed note and the matched note are both shown to the user in the spelling answer result.
   2. When multiple notes match, all matched notes are surfaced (not just one).
 
-**Plans**: 3 plans
+**Plans**: 1/3 plans executed
 **UI hint**: yes
 
 Plans:
 **Wave 1**
 
-- [ ] 03-01-PLAN.md — findAllAccidentalMatches + populate AnsweredQuestion.matchedNotes on answer-spelling (tracer) + IDOR list coverage
+- [x] 03-01-PLAN.md — findAllAccidentalMatches + populate AnsweredQuestion.matchedNotes on answer-spelling (tracer) + IDOR list coverage
 
 **Wave 2** *(blocked on Wave 1)*
 
@@ -141,7 +141,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Extend Answer outcome API | 1/1 | Complete    | 2026-07-23 |
 | 2. Accidental-match grading & penalty | 2/2 | Complete    | 2026-07-24 |
-| 3. Reveal both notes after accidental match | 0/3 | Planned | - |
+| 3. Reveal both notes after accidental match | 1/3 | In Progress|  |
 | 4. Offer link between notes | 0/0 | Not started | - |
 | 5. Alias-as-wiki-link overlap declaration | 0/0 | Not started | - |
 | 6. Overlap "try again, no credit" | 0/0 | Not started | - |
