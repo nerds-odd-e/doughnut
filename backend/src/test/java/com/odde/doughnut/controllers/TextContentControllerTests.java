@@ -508,5 +508,49 @@ class TextContentControllerTests extends ControllerTestBase {
 
       assertThat(response.getNote().getContent(), equalTo(content));
     }
+
+    @Test
+    void accepts_well_formed_wiki_link_overlap_alias_list()
+        throws UnexpectedNoAccessRightException {
+      String content =
+          """
+          ---
+          aliases:
+            - color
+            - "[[Other Note]]"
+            - "[[Shared Notebook:Hue|display]]"
+          ---
+
+          body
+          """;
+      noteUpdateContentDTO.setContent(content);
+
+      NoteRealm response = controller.updateNoteContent(note, noteUpdateContentDTO);
+
+      assertThat(response.getNote().getContent(), equalTo(content));
+    }
+
+    @Test
+    void rejects_malformed_wiki_link_alias_list_item() {
+      noteUpdateContentDTO.setContent(
+          """
+          ---
+          aliases:
+            - color
+            - "[["
+          ---
+
+          body
+          """);
+
+      ApiException thrown =
+          assertThrows(
+              ApiException.class, () -> controller.updateNoteContent(note, noteUpdateContentDTO));
+
+      assertThat(thrown.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.BINDING_ERROR));
+      assertThat(
+          thrown.getErrorBody().getErrors().get("aliases"),
+          equalTo(FrontmatterAliases.AUTHORED_ALIASES_MESSAGE));
+    }
   }
 }
