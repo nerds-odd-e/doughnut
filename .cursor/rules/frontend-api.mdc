@@ -1,5 +1,5 @@
 ---
-description: Frontend API integration for files importing @generated/doughnut-backend-api/sdk.gen, apiCallWithLoading, blockUi loading, wrapped responses, toOpenApiError
+description: Frontend API integration for files importing @generated/doughnut-backend-api/sdk.gen, apiCallWithLoading, blockUi loading, pageIsNotLoading E2E pairing, wrapped responses, toOpenApiError
 alwaysApply: false
 ---
 # Frontend API Rules
@@ -143,6 +143,19 @@ Every whole-UI blocker and long-running note-refinement AI request must be class
 | Inline / partial progress | Local component state |
 | Error toasts | `apiCallWithLoading` (handled in `clientSetup.ts`); accepted cancel is silent |
 | Silent background fetch | Direct SDK call without `apiCallWithLoading` |
+| E2E wait for those globals | `pageIsNotLoading()` in Cypress page objects (see below) |
+
+### E2E pairing (`pageIsNotLoading`)
+
+The global loading surfaces above are the product half of a fixed pair with E2E:
+
+| Product | E2E |
+| --- | --- |
+| `apiCallWithLoading` / `runWithBlockingApiLoading` | `pageIsNotLoading()` from `e2e_test/start/pageBase.ts` |
+
+`pageIsNotLoading` waits until `.loading-bar` and `.loading-modal-mask` are gone. After a Cypress action that triggers a wrapped user-initiated call, call it in the page object before the next assertion that depends on that call finishing.
+
+This wait means **in-flight work finished** (loading UI cleared). It is not a success assertion — prefer a user-visible outcome when the product shows one. Do not replace this pair with hardcoded sleeps. Network intercepts are optional extras, not the default stand-in for this pairing. Full E2E authoring notes: `.cursor/rules/e2e-authoring.mdc`.
 
 ## API Return Value Usage
 

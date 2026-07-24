@@ -70,6 +70,7 @@
 - **Backend HTTP:** `@ControllerAdvice` in `CustomRestExceptionHandler.java` and `ControllerSetup.java` map exceptions to `ApiError` / status codes (validation, integrity, OpenAI auth, multipart, etc.). Domain access failures throw `UnexpectedNoAccessRightException` (asserted in controller tests with `assertThrows`).
 - **Frontend API:** Client uses `responseStyle: "fields"` and `throwOnError: false`. Always check `error` before using `data`. User-initiated calls go through `apiCallWithLoading` in `frontend/src/managedApi/clientSetup.ts` (loading bar + error toasts). Field validation: `toOpenApiError(error)` from `frontend/src/managedApi/openApiError.ts`. Silent background fetches call the SDK directly without `apiCallWithLoading`.
 - **Whole-UI blocking:** `apiCallWithLoading(..., { blockUi: true, message? })` or `runWithBlockingApiLoading` — do not add component-local `LoadingModal` for global blocking; global modal is mounted from `DoughnutApp.vue`.
+- **Frontend API ↔ E2E loading:** `apiCallWithLoading` / blocking helpers own `.loading-bar` and `.loading-modal-mask`; Cypress waits with `pageIsNotLoading()` from `e2e_test/start/pageBase.ts` after actions that trigger those calls (`.cursor/rules/frontend-api.mdc`, `.cursor/rules/e2e-authoring.mdc`).
 - **CLI:** Map slash-command failures with `userVisibleSlashCommandError`; red transcript lines via `pastAssistantErrorBlock.tsx`.
 - **E2E:** Assertions must include expected vs actual and domain meaning; put assertions in page objects when that keeps steps thin (`.cursor/rules/e2e-authoring.mdc`).
 
