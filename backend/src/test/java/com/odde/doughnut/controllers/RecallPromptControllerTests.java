@@ -14,6 +14,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.MemoryTrackerService;
 import com.odde.doughnut.services.NoteAliasIndexService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
@@ -41,6 +42,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
   @Autowired RecallPromptController controller;
   @Autowired GlobalSettingsService globalSettingsService;
   @Autowired NoteAliasIndexService noteAliasIndexService;
+  @Autowired MemoryTrackerService memoryTrackerService;
   OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
   @BeforeEach
@@ -848,6 +850,31 @@ class RecallPromptControllerTests extends ControllerTestBase {
       assertThat(
           memoryTracker.getNextRecallAt(),
           greaterThanOrEqualTo(testabilitySettings.getCurrentUTCTimestamp()));
+    }
+
+    @Test
+    void shouldStillCountAccidentalMatchTowardWrongAnswerThreshold()
+        throws UnexpectedNoAccessRightException {
+      answerDTO.setSpellingAnswer(secondNote.getTitle());
+      Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+      assertThat(memoryTrackerService.isThresholdExceeded(memoryTracker, now), is(false));
+
+      for (int i = 0; i < 4; i++) {
+        RecallPrompt prompt =
+            makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
+        AnsweredQuestion result = controller.answerSpelling(prompt, answerDTO);
+        assertThat(result.getAnswer().getOutcome(), is(AnswerOutcome.ACCIDENTAL_MATCH));
+        assertFalse(result.getAnswer().getCorrect());
+      }
+      assertThat(memoryTrackerService.isThresholdExceeded(memoryTracker, now), is(false));
+
+      AnsweredQuestion fifth =
+          controller.answerSpelling(
+              makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please(),
+              answerDTO);
+      assertThat(fifth.getAnswer().getOutcome(), is(AnswerOutcome.ACCIDENTAL_MATCH));
+      assertFalse(fifth.getAnswer().getCorrect());
+      assertThat(memoryTrackerService.isThresholdExceeded(memoryTracker, now), is(true));
     }
   }
 }
