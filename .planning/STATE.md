@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 6
 current_phase_name: Overlap try again no credit
-status: ready_to_plan
-stopped_at: Phase 6 UI-SPEC approved — ready for plan-phase
-last_updated: "2026-07-24T19:54:00+08:00"
+status: ready_to_execute
+stopped_at: Phase 6 plans created — ready to execute
+last_updated: "2026-07-24T20:02:00+08:00"
 progress:
   total_phases: 6
   completed_phases: 5
-  total_plans: 12
+  total_plans: 16
   completed_plans: 12
 ---
 
@@ -26,10 +26,11 @@ progress:
 ## Current Position
 
 - **Phase:** 6 — Overlap "try again, no credit"
-- **Plan:** Not started
-- **Status:** Research + UI-SPEC approved — ready for plan-phase
-- **Progress:** [█████████████░░░░░░░] 5/6 phases
+- **Plan:** 06-01 (next)
+- **Status:** Plans created — ready to execute
+- **Progress:** [████████░░] 75% (12/16 plans; 5/6 phases)
 - **UI contract:** `.planning/phases/06-overlap-try-again-no-credit/06-UI-SPEC.md` (status: approved)
+- **Plans:** 06-01 tracer → 06-02 Flyway D-04 (checkpoint) → 06-03 edges → 06-04 E2E
 
 ```
 [x][x][x][x][x][ ] 5/6 phases
@@ -87,6 +88,7 @@ progress:
 ### Known risks / blockers
 
 - None blocking Phase 6. Alias blast radius mitigated by plain-only segregation (Phase 5).
+- Plan 06-02 has a blocking `checkpoint:decision` for Flyway D-04 (yolo recommended default: option-flyway).
 
 ### Todos
 
@@ -94,22 +96,23 @@ progress:
 - [x] Discuss Phase 6 (`--auto`) — CONTEXT gathered.
 - [x] Research Phase 6 — RESEARCH.md written.
 - [x] UI-SPEC Phase 6 — approved by gsd-ui-checker (6/6 PASS).
-- [ ] Plan/execute Phase 6 (OVL-01).
+- [x] Plan Phase 6 — 06-01..06-04 PLAN.md created.
+- [ ] Execute Phase 6 (OVL-01) — start `/gsd-execute-phase 6`.
 - [x] Quick plan (outside milestone): `.planning/quick/260724-db-timezone-fix/` — closed 2026-07-24. All 4 phases done and verified live in prod: JDBC session pinned to UTC, and the confirmed 2025-07–2026-06 8h-skew window repaired for `quiz_answer.created_at`, `memory_tracker` scheduling columns, and `note.created_at`. Plan file kept (trimmed) as the permanent forensics record referenced by the migration comments.
 
 ### Open questions
 
-- Overlap retry: stay on same memory tracker (D-05); open: durable D-04 vs Flyway (see RESEARCH).
+- Durable D-04: RESEARCH prefers Flyway persist `outcome`; plan 06-02 gates with checkpoint (yolo default option-flyway).
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T19:54:00+08:00
-**Stopped at:** Phase 6 UI-SPEC approved
-**Resume file:** .planning/phases/06-overlap-try-again-no-credit/06-UI-SPEC.md
+**Last session:** 2026-07-24T20:02:00+08:00
+**Stopped at:** Phase 6 plans created — ready to execute
+**Resume file:** `.planning/phases/06-overlap-try-again-no-credit/06-01-PLAN.md`
 
-- **Last action:** UI-SPEC verified — all 6 dimensions PASS; status approved.
-- **Next action:** `/gsd-plan-phase 6` (or plan-phase for OVL-01).
-- **Resume from:** Read this file + approved `06-UI-SPEC.md` + `06-CONTEXT.md` / `06-RESEARCH.md`.
+- **Last action:** Created 06-01..06-04 PLAN.md + 06-VALIDATION.md; updated ROADMAP plan listing.
+- **Next action:** `/gsd-execute-phase 6` (or execute-plan on 06-01).
+- **Resume from:** Read this file + `06-01-PLAN.md` + locked `06-CONTEXT.md` / `06-RESEARCH.md` / `06-UI-SPEC.md`.
 
 ## Decisions
 
@@ -123,3 +126,4 @@ progress:
 - [Phase 5]: 05-03: Regression gate only; MemoryTrackerService OVERLAP grading deferred to Phase 6
 - [Phase 5]: OVL-03 index/search: zero production edits; inherit FrontmatterAliases plain-only from*
 - [Phase 5]: Skipped optional WikiTitleCacheServiceTest awareness (file already >250 lines)
+- [Phase 6]: 4 plans 06-01..06-04 — tracer OVL-01 + Flyway D-04 (yolo) + edges + E2E

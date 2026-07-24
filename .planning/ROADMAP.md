@@ -15,7 +15,7 @@
 - [x] **Phase 3: Reveal both notes after accidental match** - Show the reviewed note and the matched note(s) together after an accidental match (completed 2026-07-24)
 - [x] **Phase 4: Offer link between notes** - Let the user build a link (property link or relationship note) between the reviewed and matched note via the existing add-link UI, with the matched note pre-selected (completed 2026-07-24)
 - [x] **Phase 5: Alias-as-wiki-link overlap declaration** - Extend `aliases` frontmatter to accept wiki-link values pointing to another note, preserving wiki-resolve/search/cloze-masking behavior (completed 2026-07-24)
-- [ ] **Phase 6: Overlap "try again, no credit"** - When the answer is correct but the reviewed note declares overlap, respond "correct, but we're looking for another answer — try again" with no credit
+- [ ] **Phase 6: Overlap "try again, no credit"** - As a learner in spelling recall, I want to be asked to try a more specific answer when my answer is correct but non-distinguishing because of declared overlap, so that I get no SRS credit and can retry the same review without mutating note data
 
 ## Phase Details
 
@@ -145,7 +145,7 @@ Plans:
 
 ### Phase 6: Overlap "try again, no credit"
 
-**Goal:** When a spelling answer is correct for the reviewed note but the reviewed note declares overlap with another note, the system responds "correct, but we're looking for another answer — try again," with no credit and no note-data mutation.
+**Goal:** As a learner in spelling recall, I want to be asked to try a more specific answer when my answer is correct but non-distinguishing because of declared overlap, so that I get no SRS credit and can retry the same review without mutating note data.
 **Mode:** mvp
 **Depends on**: Phase 5
 **Requirements**: OVL-01
@@ -155,7 +155,14 @@ Plans:
   2. An overlap response gives no SRS credit (the review is not marked correct).
   3. An overlap response does not mutate note data — the user simply retries the same review.
 
-**Plans**: TBD
+**Plans:** 4 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — Tracer: dual-match OVERLAP grade + warning try-again UI + stay/retry
+- [ ] 06-02-PLAN.md — Durable D-04: Flyway persist outcome + exclude OVERLAP from wrong-count
+- [ ] 06-03-PLAN.md — Edge cases: dead/unreadable/self → CORRECT; AM + matched-notes gates
+- [ ] 06-04-PLAN.md — E2E overlap_try_again.feature (try-again + distinguishing credit)
+
 **UI hint**: yes
 
 ## Progress
@@ -167,7 +174,7 @@ Plans:
 | 3. Reveal both notes after accidental match | 3/3 | Complete    | 2026-07-24 |
 | 4. Offer link between notes | 3/3 | Complete    | 2026-07-24 |
 | 5. Alias-as-wiki-link overlap declaration | 3/3 | Complete    | 2026-07-24 |
-| 6. Overlap "try again, no credit" | 0/0 | Not started | - |
+| 6. Overlap "try again, no credit" | 0/4 | Planned | - |
 
 ## Coverage
 
