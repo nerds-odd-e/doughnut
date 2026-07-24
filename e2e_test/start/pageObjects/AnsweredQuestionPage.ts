@@ -20,10 +20,10 @@ function expectOverlapTryAgainAlert() {
       'contain.text',
       "Correct, but we're looking for another answer — try again."
     )
-  cy.findByTestId('overlap-try-again').should('be.visible')
+  cy.findByTestId('overlap-try-again').scrollIntoView().should('be.visible')
 }
 
-function expectNoMatchedNotesOrAccidentalMatchOnOverlap() {
+function expectNoMatchedNotesOrAccidentalMatch() {
   cy.findByTestId('matched-notes-section').should('not.exist')
   cy.findByTestId('accidental-match-alert').should('not.exist')
 }
@@ -128,7 +128,7 @@ const assumeAnsweredQuestionPage = () => {
       return self
     },
     expectNoMatchedNotesOrAccidentalMatchOnOverlap() {
-      expectNoMatchedNotesOrAccidentalMatchOnOverlap()
+      expectNoMatchedNotesOrAccidentalMatch()
       return self
     },
     clickOverlapTryAgain() {

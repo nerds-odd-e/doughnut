@@ -214,10 +214,6 @@ When('I click overlap try again', () => {
   start.assumeAnsweredQuestionPage().clickOverlapTryAgain()
 })
 
-Then('I should see that my spelling answer is correct', () => {
-  start.assumeAnsweredQuestionPage().expectSpellingAnswerToBeCorrect()
-})
-
 Then('I should see that my answer is correct as the last question', () => {
   start
     .assumeAnsweredQuestionPage()
