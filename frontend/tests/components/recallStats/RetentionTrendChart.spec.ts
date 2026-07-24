@@ -55,4 +55,28 @@ describe("RetentionTrendChart", () => {
     expect(points.length).toBe(sufficient)
     expect(greyed.length).toBe(insufficient)
   })
+
+  it("renders a titled 0-100% axis with x-date labels", () => {
+    const retentionTrend: DayRetention[] = []
+    for (let i = 0; i < 30; i++) {
+      retentionTrend.push({
+        date: `1989-02-${String(i + 1).padStart(2, "0")}`,
+        retentionPct: 60 + (i % 30),
+        correctCount: 3,
+        answeredCount: 4,
+        sampleSize: 4,
+      })
+    }
+    const wrapper = helper
+      .component(RetentionTrendChart)
+      .withProps({ retentionTrend })
+      .mount()
+
+    const texts = wrapper.findAll("text").map((t) => t.text())
+    expect(texts).toContain("Retention (%/day)")
+    expect(texts).toContain("0%")
+    expect(texts).toContain("50%")
+    expect(texts).toContain("100%")
+    expect(texts).toContain("2/1")
+  })
 })

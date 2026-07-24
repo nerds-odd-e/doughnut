@@ -28,6 +28,9 @@
         <ResponseTimeTrendChart :trend="visibleTrend" />
         <RetentionTrendChart :retention-trend="visibleRetentionTrend" />
       </div>
+      <p class="mt-1 text-xs opacity-70">
+        <span class="rs-legend-dot">●</span> = insufficient data (fewer than 3 answers)
+      </p>
     </section>
 
     <section class="mt-6">

@@ -6,6 +6,9 @@
       polyline-testid="retention-trend-polyline"
       insufficient-testid="retention-trend-insufficient"
       stroke="var(--color-primary)"
+      title="Retention (%/day)"
+      :x-labels="dates"
+      :format-y="formatPercent"
       aria-label="Retention trend"
     />
   </div>
@@ -24,4 +27,6 @@ const values = computed(() =>
     d.retentionPct == null ? null : d.retentionPct
   )
 )
+const dates = computed(() => props.retentionTrend.map((d) => d.date ?? ""))
+const formatPercent = (v: number) => `${Math.round(v)}%`
 </script>

@@ -1,9 +1,59 @@
 <template>
-  <svg
-    :viewBox="`0 0 ${width} ${height}`"
-    class="h-auto w-full"
-    role="img"
-  >
+  <svg :viewBox="`0 0 ${width} ${height}`" class="h-auto w-full" role="img">
+    <g v-if="title">
+      <text class="rs-trend-axis" :x="padLeft" :y="14" font-weight="600">
+        {{ title }}
+      </text>
+    </g>
+    <!-- Y-axis: gridlines + tick labels -->
+    <g>
+      <line
+        v-for="(t, i) in yTicks"
+        :key="`ygrid-${i}`"
+        class="rs-trend-grid"
+        :x1="padLeft"
+        :x2="width - 10"
+        :y1="t.y"
+        :y2="t.y"
+      />
+      <text
+        v-for="(t, i) in yTicks"
+        :key="`ylabel-${i}`"
+        class="rs-trend-axis"
+        :x="padLeft - 4"
+        :y="t.y + 3"
+        text-anchor="end"
+      >
+        {{ t.label }}
+      </text>
+      <line
+        class="rs-trend-axis-line"
+        :x1="padLeft"
+        :x2="padLeft"
+        :y1="padTop"
+        :y2="height - padBottom"
+      />
+    </g>
+    <!-- X-axis: date tick labels -->
+    <g v-if="xLabels">
+      <line
+        class="rs-trend-axis-line"
+        :x1="padLeft"
+        :x2="width - 10"
+        :y1="height - padBottom"
+        :y2="height - padBottom"
+      />
+      <text
+        v-for="(t, i) in xTicks"
+        :key="`xlabel-${i}`"
+        class="rs-trend-axis"
+        :x="t.x"
+        :y="height - padBottom + 12"
+        text-anchor="middle"
+      >
+        {{ t.label }}
+      </text>
+    </g>
     <polyline
       :data-testid="polylineTestid"
       :points="polylinePoints"
@@ -32,6 +82,9 @@ const props = defineProps<{
   insufficientTestid: string
   stroke: string
   yMax?: number
+  title?: string
+  xLabels?: string[]
+  formatY?: (v: number) => string
 }>()
 
 const width = 600
@@ -46,7 +99,6 @@ const plotHeight = height - padBottom - padTop
 const xFor = (i: number, total: number) =>
   padLeft + (total <= 1 ? 0 : (i / (total - 1)) * plotWidth)
 
-// When `yMax` is unset, derive it from the data (min 1 so an all-zero/flat series still spans the plot).
 const effectiveYMax = computed(() => {
   if (props.yMax != null) {
     return props.yMax
@@ -82,10 +134,62 @@ const insufficientPoints = computed(() => {
   })
   return points
 })
+
+const yTicks = computed(() => {
+  const fmt = props.formatY ?? ((v: number) => String(Math.round(v)))
+  const max = effectiveYMax.value
+  const ticks = [0, max / 2, max]
+  const seen = new Set<number>()
+  return ticks
+    .filter((t) => {
+      const key = Math.round(t * 1000)
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+    .map((t) => ({ y: yFor(t), label: fmt(t) }))
+})
+
+const formatX = (iso?: string): string => {
+  if (!iso) return ""
+  const [m = 1, d = 1] = iso.slice(5).split("-").map(Number)
+  return `${m}/${d}`
+}
+
+const xTicks = computed(() => {
+  const labels = props.xLabels ?? []
+  const total = props.values.length
+  if (total === 0) return []
+  const indices = [0, Math.floor((total - 1) / 2), total - 1]
+  const seen = new Set<number>()
+  return indices
+    .filter((i) => {
+      if (i < 0 || i >= labels.length) return false
+      if (seen.has(i)) return false
+      seen.add(i)
+      return true
+    })
+    .map((i) => ({ x: xFor(i, total), label: formatX(labels[i]) }))
+})
 </script>
 
 <style scoped>
 .rs-trend-insufficient {
   fill: color-mix(in oklab, var(--color-base-content) 40%, transparent);
+}
+.rs-trend-grid {
+  stroke: var(--color-base-content);
+  stroke-opacity: 0.12;
+  stroke-width: 1;
+}
+.rs-trend-axis-line {
+  stroke: var(--color-base-content);
+  stroke-opacity: 0.4;
+  stroke-width: 1;
+}
+.rs-trend-axis {
+  fill: var(--color-base-content);
+  font-size: 11px;
+  opacity: 0.7;
 }
 </style>

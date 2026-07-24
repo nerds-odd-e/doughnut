@@ -43,4 +43,25 @@ describe("ResponseTimeTrendChart", () => {
     const greyed = wrapper.findAll('[data-testid="response-time-insufficient"]')
     expect(greyed).toHaveLength(insufficient)
   })
+
+  it("renders a titled axis with y-unit and x-date labels", () => {
+    const trend: DayAvgResponseTime[] = []
+    for (let i = 0; i < 30; i++) {
+      trend.push({
+        date: `1989-02-${String(i + 1).padStart(2, "0")}`,
+        avgMs: 3000 + i * 100,
+        sampleSize: 4,
+      })
+    }
+    const wrapper = helper
+      .component(ResponseTimeTrendChart)
+      .withProps({ trend })
+      .mount()
+
+    const texts = wrapper.findAll("text").map((t) => t.text())
+    expect(texts).toContain("Response time (s/day)")
+    expect(texts).toContain("0.0s")
+    expect(texts).toContain("5.9s")
+    expect(texts).toContain("2/1")
+  })
 })
