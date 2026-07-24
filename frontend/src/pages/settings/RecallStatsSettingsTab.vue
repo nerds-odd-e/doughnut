@@ -34,11 +34,16 @@
     </section>
 
     <section class="mt-6">
-      <h3 class="mt-0 mb-2 text-base font-semibold">Weekday × hour</h3>
+      <h3 class="mt-0 mb-2 text-base font-semibold">By weekday and hour</h3>
       <div class="grid md:grid-cols-2 gap-4">
-        <WeekdayHourHeatmap mode="count" :counts="stats.weekdayHourCounts ?? []" />
+        <WeekdayHourHeatmap
+          mode="count"
+          label="Reviews"
+          :counts="stats.weekdayHourCounts ?? []"
+        />
         <WeekdayHourHeatmap
           mode="retention"
+          label="Retention %"
           :counts="stats.weekdayHourCounts ?? []"
           :correct="stats.weekdayHourCorrect ?? []"
         />
@@ -46,7 +51,7 @@
     </section>
 
     <section class="mt-6">
-      <h3 class="mt-0 mb-2 text-base font-semibold">Morning vs afternoon</h3>
+      <h3 class="mt-0 mb-2 text-base font-semibold">Response time by time of day</h3>
       <AmPmResponseTimeChart :am-pm="stats.amPm ?? {}" />
     </section>
   </div>

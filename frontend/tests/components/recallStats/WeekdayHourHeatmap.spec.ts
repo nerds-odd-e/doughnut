@@ -59,4 +59,20 @@ describe("WeekdayHourHeatmap", () => {
     expect(insufficient).toBeDefined()
     expect(insufficient!.classes()).toContain("rs-hm-insufficient")
   })
+
+  it("renders weekday and hour axis captions and a caption label", () => {
+    const counts = emptyGrid()
+    const wrapper = helper
+      .component(WeekdayHourHeatmap)
+      .withProps({ mode: "count", counts, label: "Reviews" })
+      .mount()
+
+    const texts = wrapper.findAll("text").map((t) => t.text())
+    expect(texts).toContain("Reviews")
+    expect(texts).toContain("Mon")
+    expect(texts).toContain("Wed")
+    expect(texts).toContain("Fri")
+    expect(texts).toContain("0")
+    expect(texts).toContain("12")
+  })
 })
