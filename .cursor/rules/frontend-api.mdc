@@ -33,7 +33,7 @@ const { data: users, error: loadError } = await UserController.getUserProfile()
 `apiCallWithLoading` drives two global surfaces mounted from `DoughnutApp.vue`:
 
 - **Thin loading bar** — shown while any wrapped call is in flight.
-- **Whole-UI blocking modal** — shown when an in-flight call passed `{ blockUi: true }`; its message comes from the latest blocking state. Each call pushes/pops a state by id, so concurrent blockers clean up correctly.
+- **Whole-UI blocking modal** — shown when an in-flight call passed `{ blockUi: true }`; its message comes from the latest blocking state. Each call pushes/pops a state by id, so concurrent blockers clean up correctly. The modal is a native `<dialog>` opened with `showModal()`, so it lives in the browser top layer and paints above other top-layer modals (e.g. the Refine note dialog) — `z-index` cannot reach the top layer.
 
 Use `{ blockUi: true, message?: string }` when a user action must finish before the rest of the UI is usable — view transitions that depend on a result, or mutations where partial interaction would confuse state. Show the blocker only after any confirmation step. Do **not** add component-local `LoadingModal` refs; the global modal is the single whole-UI blocker.
 
