@@ -24,7 +24,7 @@
     "@types/node": "26.1.1",
     "doughnut-test-fixtures": "workspace:*",
     "esbuild": ">=0.28.1",
-    "typescript": "6.0.3",
+    "typescript": "7.0.2",
     "vitest": "4.1.10",
     "zod": "^4.4.3"
   }
