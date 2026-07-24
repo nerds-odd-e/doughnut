@@ -5,13 +5,13 @@ milestone_name: milestone
 current_phase: 5
 current_phase_name: Alias-as-wiki-link overlap declaration
 status: in_progress
-stopped_at: Completed 05-03-PLAN.md
-last_updated: "2026-07-24T06:06:47.109Z"
+stopped_at: Completed 05-02-PLAN.md
+last_updated: "2026-07-24T06:10:46.100Z"
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 12
-  completed_plans: 11
+  completed_plans: 12
 ---
 
 # State: Spelling Answer Match & Link
@@ -26,12 +26,12 @@ progress:
 ## Current Position
 
 - **Phase:** 5 — Alias-as-wiki-link overlap declaration
-- **Plan:** 05-02 remaining (Wave 2 OVL-03 index/search)
-- **Status:** In progress — 05-01 + 05-03 complete; 05-02 remaining for OVL-03 search/index
-- **Progress:** [█████████░] 92%
+- **Plan:** All phase plans complete (05-01..05-03)
+- **Status:** Phase 5 plans complete — ready for verify / Phase 6
+- **Progress:** [██████████] 100%
 
 ```
-[x][x][x][x][ ][ ] 4/6 phases
+[x][x][x][x][x][ ] 5/6 phases
 ```
 
 ## Roadmap Snapshot
@@ -47,8 +47,8 @@ progress:
 
 ## Performance Metrics
 
-- **Phases completed:** 4
-- **Requirements delivered:** 7/9 (API-01, API-02, AM-01, AM-02, AM-03, AM-04, OVL-02)
+- **Phases completed:** 5
+- **Requirements delivered:** 8/9 (API-01, API-02, AM-01, AM-02, AM-03, AM-04, OVL-02, OVL-03)
 - **Coverage:** 9/9 mapped (100%)
 
 **Per-Plan Metrics:**
@@ -66,6 +66,7 @@ progress:
 | Phase 04 P03 | 15min | 2 tasks | 3 files |
 | Phase 05 P01 | 6min | 2 tasks | 6 files |
 | Phase 05 P03 | 6min | 2 tasks | 2 files |
+| Phase 05 P02 | 9min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -94,7 +95,7 @@ progress:
 - [x] `/gsd-plan-phase 5` — 05-01..05-03 PLAN.md written.
 - [x] Execute 05-01 — FrontmatterAliases segregation + frontend authoredAliasesValidation parity.
 - [x] Execute 05-03 — OVL-03 wiki-resolve + cloze + matchAnswer + AM alias-leg regressions.
-- [ ] Execute 05-02 — OVL-03 index + alias search regressions.
+- [x] Execute 05-02 — OVL-03 index + alias search regressions.
 - [ ] Quick plan (outside milestone): `.planning/quick/260724-spa-routing-consistency/` — LB SPA fallback + remove backend frontend-serving; 3 phases planned, none executed.
 
 ### Open questions
@@ -103,13 +104,13 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T06:06:47.102Z
-**Stopped at:** Completed 05-03-PLAN.md
+**Last session:** 2026-07-24T06:10:46.071Z
+**Stopped at:** Completed 05-02-PLAN.md
 **Resume file:** None
 
-- **Last action:** Completed 05-03 (wiki-resolve / cloze / matchAnswer / AM alias-leg OVL-03 gates).
-- **Next action:** Execute 05-02 (index + alias search OVL-03).
-- **Resume from:** `.planning/phases/05-alias-as-wiki-link-overlap-declaration/05-02-PLAN.md`
+- **Last action:** Completed 05-02 (index + alias search OVL-03 gates).
+- **Next action:** Phase 5 verify / start Phase 6 overlap grading.
+- **Resume from:** None
 
 ## Decisions
 
@@ -121,3 +122,5 @@ progress:
 - [Phase 5]: Whole-item WikiLinkMarkdown.INNER_LINK_PATTERN.matches() for wiki-link alias detection
 - [Phase 5]: 05-03: No production edits — OVL-03 consumer safety from 05-01 plain-only parse/index
 - [Phase 5]: 05-03: Regression gate only; MemoryTrackerService OVERLAP grading deferred to Phase 6
+- [Phase 5]: OVL-03 index/search: zero production edits; inherit FrontmatterAliases plain-only from*
+- [Phase 5]: Skipped optional WikiTitleCacheServiceTest awareness (file already >250 lines)
