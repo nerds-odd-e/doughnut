@@ -107,8 +107,8 @@ progress:
 **Stopped at:** Completed 05-03-PLAN.md
 **Resume file:** None
 
-- **Last action:** Completed 05-01 tracer (FrontmatterAliases + frontend parity).
-- **Next action:** Execute 05-02 / 05-03 (OVL-03 consumer regressions).
+- **Last action:** Completed 05-03 (wiki-resolve / cloze / matchAnswer / AM alias-leg OVL-03 gates).
+- **Next action:** Execute 05-02 (index + alias search OVL-03).
 - **Resume from:** `.planning/phases/05-alias-as-wiki-link-overlap-declaration/05-02-PLAN.md`
 
 ## Decisions
@@ -119,5 +119,5 @@ progress:
 - [Phase 4]: D-01–D-07 MatchedNoteLinkOffer; property updateTextField; relationship navigateOnSuccess=false; human verify via E2E browser subagent
 - [Phase 5]: Keep fromNoteContent/fromFrontmatter plain-only; add overlapWikiLinkTokensFrom* for Phase 6
 - [Phase 5]: Whole-item WikiLinkMarkdown.INNER_LINK_PATTERN.matches() for wiki-link alias detection
-- [Phase ?]: 05-03: No production edits — OVL-03 consumer safety from 05-01 plain-only parse/index
-- [Phase ?]: 05-03: Regression gate only; MemoryTrackerService OVERLAP grading deferred to Phase 6
+- [Phase 5]: 05-03: No production edits — OVL-03 consumer safety from 05-01 plain-only parse/index
+- [Phase 5]: 05-03: Regression gate only; MemoryTrackerService OVERLAP grading deferred to Phase 6

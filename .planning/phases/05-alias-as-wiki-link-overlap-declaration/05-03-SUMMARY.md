@@ -33,7 +33,7 @@ patterns-established:
   - "Pattern: wiki-resolve empty resolve when only wiki-link overlap alias exists"
   - "Pattern: cloze/matchAnswer/AM controller fixtures with mixed and wiki-link-only aliases"
 
-requirements-completed: [OVL-03]
+requirements-completed: []  # OVL-03 also needs 05-02 (index/search); do not mark complete until both Wave 2 plans done
 
 coverage:
   - id: D1
@@ -106,7 +106,7 @@ status: complete
 1. **Task 1: Wiki-resolve alias targets ignore overlap wiki-link alias items** - `53ce5843f4` (test)
 2. **Task 2: Cloze, matchAnswer, and accidental-match alias leg ignore wiki-link overlap items** - `7e4f8e29f2` (test)
 
-**Plan metadata:** (pending docs commit)
+**Plan metadata:** `docs(05-03)` commit (this SUMMARY)
 
 ## Files Created/Modified
 
