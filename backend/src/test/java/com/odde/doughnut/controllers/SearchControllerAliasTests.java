@@ -87,21 +87,77 @@ class SearchControllerAliasTests extends ControllerTestBase {
     assertThat(noteIds, not(hasItem(otherNotebookAliasMatch.getId())));
   }
 
+  @Test
+  void does_not_return_note_for_wiki_link_only_overlap_alias_token_or_inner_title()
+      throws UnexpectedNoAccessRightException {
+    Note overlapCarrier =
+        createNoteWithAliases(
+            "Hue Carrier",
+            """
+            ---
+            aliases:
+              - "[[Other Note]]"
+            ---
+
+            body
+            """);
+
+    assertNoteNotInSearchResults(overlapCarrier, "[[Other Note]]");
+    assertNoteNotInSearchResults(overlapCarrier, "Other Note");
+  }
+
+  @Test
+  void mixed_aliases_remain_searchable_by_plain_alias_but_not_wiki_link_overlap()
+      throws UnexpectedNoAccessRightException {
+    Note mixed =
+        createNoteWithAliases(
+            "Colour Theory",
+            """
+            ---
+            aliases:
+              - color
+              - "[[Other Note]]"
+            ---
+
+            body
+            """);
+
+    var plainHits =
+        RelationshipLiteralSearchHits.noteMatches(
+            controller.searchForRelationshipTarget(searchTermFor("color")));
+    assertThat(
+        plainHits.stream().map(r -> r.getNoteTopology().getId()).toList(), hasItem(mixed.getId()));
+
+    assertNoteNotInSearchResults(mixed, "[[Other Note]]");
+    assertNoteNotInSearchResults(mixed, "Other Note");
+  }
+
   private Note createAliasNote(String title) {
-    Note note =
-        makeMe
-            .aNote(title)
-            .notebookOwnedBy(currentUser.getUser())
-            .content(aliasMarkdown())
-            .please();
-    noteAliasIndexService.refreshForNote(note);
-    return note;
+    return createNoteWithAliases(title, aliasMarkdown());
   }
 
   private Note createAliasNote(String title, Notebook notebook) {
     Note note = makeMe.aNote(title).notebook(notebook).content(aliasMarkdown()).please();
     noteAliasIndexService.refreshForNote(note);
     return note;
+  }
+
+  private Note createNoteWithAliases(String title, String markdown) {
+    Note note =
+        makeMe.aNote(title).notebookOwnedBy(currentUser.getUser()).content(markdown).please();
+    noteAliasIndexService.refreshForNote(note);
+    return note;
+  }
+
+  private void assertNoteNotInSearchResults(Note note, String searchKey)
+      throws UnexpectedNoAccessRightException {
+    var noteIds =
+        RelationshipLiteralSearchHits.noteMatches(
+                controller.searchForRelationshipTarget(searchTermFor(searchKey)))
+            .stream()
+            .map(r -> r.getNoteTopology().getId())
+            .toList();
+    assertThat(noteIds, not(hasItem(note.getId())));
   }
 
   private SearchTerm searchTermFor(String searchKey) {
