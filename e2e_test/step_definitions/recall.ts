@@ -170,6 +170,33 @@ Then(
   }
 )
 
+When(
+  'I link the matched note {string} as a wiki property from the accidental match result',
+  (matchedNoteTitle: string) => {
+    start
+      .assumeAnsweredQuestionPage()
+      .linkMatchedNoteAsProperty(matchedNoteTitle)
+  }
+)
+
+When(
+  'I link the matched note {string} as relationship {string} from the accidental match result',
+  (matchedNoteTitle: string, relationType: string) => {
+    start
+      .assumeAnsweredQuestionPage()
+      .linkMatchedNoteAsRelationship(matchedNoteTitle, relationType)
+  }
+)
+
+Then(
+  'I should still be on the accidental match result for spelling answer {string} with matched note {string}',
+  (answer: string, matchedNoteTitle: string) => {
+    start
+      .assumeAnsweredQuestionPage()
+      .expectStillOnAccidentalMatchResult(answer, matchedNoteTitle)
+  }
+)
+
 Then('I should see that my answer is correct as the last question', () => {
   start
     .assumeAnsweredQuestionPage()

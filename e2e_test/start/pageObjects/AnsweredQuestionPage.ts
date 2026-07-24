@@ -1,10 +1,33 @@
 import { pageIsNotLoading } from '../pageBase'
+import { form } from '../forms'
 import { assumeMemoryTrackerPage } from './memoryTrackerPage'
+
+function expectAccidentalMatchAlert(answer: string) {
+  cy.findByTestId('accidental-match-alert')
+    .scrollIntoView()
+    .should('be.visible')
+    .and(
+      'contain.text',
+      `Your answer \`${answer}\` names another note — not correct for this review.`
+    )
+}
+
+function expectMatchedNoteInSection(matchedNoteTitle: string) {
+  cy.findByTestId('matched-notes-section')
+    .scrollIntoView()
+    .should('be.visible')
+    .within(() => {
+      cy.findByText('Matched note(s)').should('be.visible')
+      cy.get('[data-test="note-title"]')
+        .filter(`:contains("${matchedNoteTitle}")`)
+        .should('have.length.at.least', 1)
+    })
+}
 
 const assumeAnsweredQuestionPage = () => {
   cy.get('body').should('be.visible')
 
-  return {
+  const self = {
     expectMCQAnswerToBeCorrect() {
       cy.get('[data-test="question-section"]').within(() => {
         cy.get('.is-correct.is-selected').should('exist')
@@ -12,7 +35,7 @@ const assumeAnsweredQuestionPage = () => {
     },
     expectSpellingAnswerToBeCorrect() {
       cy.findByText('Correct!').should('exist')
-      return this
+      return self
     },
     expectMCQAnswerToBeIncorrect(answer: string) {
       cy.contains('button', answer).should('have.class', 'is-selected')
@@ -27,12 +50,7 @@ const assumeAnsweredQuestionPage = () => {
       reviewedNoteTitle: string,
       matchedNoteTitle: string
     ) {
-      cy.findByTestId('accidental-match-alert')
-        .should('be.visible')
-        .and(
-          'contain.text',
-          `Your answer \`${answer}\` names another note — not correct for this review.`
-        )
+      expectAccidentalMatchAlert(answer)
       cy.findByText(`Your answer \`${answer}\` is incorrect.`).should(
         'not.exist'
       )
@@ -40,16 +58,54 @@ const assumeAnsweredQuestionPage = () => {
       cy.get('[data-test="note-title"]')
         .filter(`:contains("${reviewedNoteTitle}")`)
         .should('have.length.at.least', 1)
+      expectMatchedNoteInSection(matchedNoteTitle)
+      return self
+    },
+    openLinkToMatchedNote(matchedNoteTitle: string) {
+      expectMatchedNoteInSection(matchedNoteTitle)
       cy.findByTestId('matched-notes-section')
-        .scrollIntoView()
+        .find('[data-testid^="link-to-matched-note-"]')
         .should('be.visible')
-        .within(() => {
-          cy.findByText('Matched note(s)').should('be.visible')
-          cy.get('[data-test="note-title"]')
-            .filter(`:contains("${matchedNoteTitle}")`)
-            .should('have.length.at.least', 1)
-        })
-      return this
+        .and('contain.text', 'Link to this note')
+        .click()
+      cy.contains('Link to:')
+        .should('be.visible')
+        .parent()
+        .should('contain.text', matchedNoteTitle)
+      cy.findByPlaceholderText('Search').should('not.exist')
+      cy.findByRole('button', { name: 'Insert as a wiki link' }).should(
+        'not.exist'
+      )
+      return self
+    },
+    linkMatchedNoteAsProperty(matchedNoteTitle: string) {
+      self.openLinkToMatchedNote(matchedNoteTitle)
+      cy.findByRole('button', {
+        name: 'Add wiki link as a new property',
+      }).click()
+      pageIsNotLoading()
+      return self
+    },
+    linkMatchedNoteAsRelationship(
+      matchedNoteTitle: string,
+      relationType: string
+    ) {
+      self.openLinkToMatchedNote(matchedNoteTitle)
+      cy.findByRole('button', {
+        name: 'Add a new relationship note',
+      }).click()
+      form.getField('Relation Type').clickOption(relationType)
+      pageIsNotLoading()
+      return self
+    },
+    expectStillOnAccidentalMatchResult(
+      answer: string,
+      matchedNoteTitle: string
+    ) {
+      cy.url().should('include', '/recall')
+      expectAccidentalMatchAlert(answer)
+      expectMatchedNoteInSection(matchedNoteTitle)
+      return self
     },
     viewMemoryTracker() {
       pageIsNotLoading()
@@ -83,6 +139,7 @@ const assumeAnsweredQuestionPage = () => {
       cy.findByRole('button', { name: 'OK' }).click()
     },
   }
+  return self
 }
 
 export { assumeAnsweredQuestionPage }
