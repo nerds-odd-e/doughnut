@@ -887,6 +887,32 @@ class RecallPromptControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void shouldOmitUnreadableNotesFromMatchedNotesWhenReadableMatchAlsoExists()
+        throws UnexpectedNoAccessRightException {
+      String sharedTitle = "Shared Accidental Title";
+      User otherUser = makeMe.aUser().please();
+      Notebook unreadableNotebook = makeMe.aNotebook().creatorAndOwner(otherUser).please();
+      Note unreadableNote = makeMe.aNote().notebook(unreadableNotebook).title(sharedTitle).please();
+      Notebook readableNotebook =
+          makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      Note readableNote = makeMe.aNote().notebook(readableNotebook).title(sharedTitle).please();
+      answerDTO.setSpellingAnswer(sharedTitle);
+
+      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+
+      assertFalse(answerResult.getAnswer().getCorrect());
+      assertThat(answerResult.getAnswer().getOutcome(), is(AnswerOutcome.ACCIDENTAL_MATCH));
+      assertThat(answerResult.getMatchedNotes(), notNullValue());
+      assertThat(answerResult.getMatchedNotes(), hasSize(1));
+      assertThat(answerResult.getMatchedNotes().getFirst().getId(), equalTo(readableNote.getId()));
+      assertThat(
+          answerResult.getAnswer().getMatchedNoteId(), equalTo(readableNote.getId().longValue()));
+      assertThat(
+          answerResult.getMatchedNotes().stream().map(NoteTopology::getId).toList(),
+          not(hasItem(unreadableNote.getId())));
+    }
+
+    @Test
     void shouldSkipAccidentalMatchSearchWhenAnswerMatchesReviewedNoteEvenIfAnotherNoteSharesTitle()
         throws UnexpectedNoAccessRightException {
       Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
