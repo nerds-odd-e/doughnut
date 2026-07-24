@@ -36,18 +36,37 @@
         :data-testid="`matched-note-${matched.id}`"
       >
         <NoteShow :note-id="matched.id" :expand-children="false" />
+        <PopButton
+          v-if="canOfferLinkToMatched(matched.id)"
+          :title="'Link to this note'"
+          :aria-label="'Link to this note'"
+          btn-class="daisy-btn daisy-btn-secondary daisy-btn-sm mt-2"
+          :data-testid="`link-to-matched-note-${matched.id}`"
+          :show-close-button="false"
+        >
+          <template #default="{ closer }">
+            <MatchedNoteLinkOffer
+              :reviewed-note-id="reviewedNoteId"
+              :matched-note-id="matched.id"
+              @close-dialog="closer"
+            />
+          </template>
+        </PopButton>
       </div>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { computed, type PropType } from "vue"
-import type { AnsweredQuestion } from "@generated/doughnut-backend-api"
+import { computed, inject, type PropType, type Ref } from "vue"
+import type { AnsweredQuestion, User } from "@generated/doughnut-backend-api"
 import NoteShow from "@/components/notes/NoteShow.vue"
+import PopButton from "@/components/commons/Popups/PopButton.vue"
+import MatchedNoteLinkOffer from "@/components/recall/MatchedNoteLinkOffer.vue"
 import NoteUnderQuestion from "./NoteUnderQuestion.vue"
 import ViewMemoryTrackerLink from "./ViewMemoryTrackerLink.vue"
 import { recalledNoteUnderQuestionProps } from "./recalledNoteUnderQuestionProps"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const props = defineProps({
   answeredQuestion: {
@@ -56,11 +75,34 @@ const props = defineProps({
   },
 })
 
+const currentUser = inject<Ref<User | undefined>>("currentUser")
+const storageAccessor = useStorageAccessor()
+
+const reviewedNoteId = computed(
+  () => props.answeredQuestion.recalledNote.noteTopology.id
+)
+
+const reviewedRealm = computed(
+  () =>
+    storageAccessor.value
+      .storedApi()
+      .getNoteRealmRefAndLoadWhenNeeded(reviewedNoteId.value).value
+)
+
 const showMatchedNotesSection = computed(
   () =>
     props.answeredQuestion.answer.outcome === "ACCIDENTAL_MATCH" &&
     (props.answeredQuestion.matchedNotes?.length ?? 0) > 0
 )
+
+function canOfferLinkToMatched(matchedNoteId: number): boolean {
+  if (!currentUser?.value || !reviewedRealm.value) return false
+  if (reviewedRealm.value.notebookRealm.readonly === true) return false
+  const matchedRealm = storageAccessor.value
+    .storedApi()
+    .getNoteRealmRefAndLoadWhenNeeded(matchedNoteId).value
+  return !!matchedRealm
+}
 
 const alertMessage = computed(() => {
   const { answer } = props.answeredQuestion

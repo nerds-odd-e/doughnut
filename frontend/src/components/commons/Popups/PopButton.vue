@@ -1,6 +1,7 @@
 <template>
   <button
     ref="buttonRef"
+    v-bind="$attrs"
     :class="btnClass || 'daisy-btn daisy-btn-ghost daisy-btn-sm'"
     :aria-label="ariaLabel"
     role="button"
@@ -29,6 +30,8 @@ import type { PropType } from "vue"
 import { ref } from "vue"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
 import Modal from "../Modal.vue"
+
+defineOptions({ inheritAttrs: false })
 
 defineProps({
   title: {

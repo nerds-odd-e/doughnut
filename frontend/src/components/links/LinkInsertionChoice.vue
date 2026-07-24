@@ -7,7 +7,11 @@
       </strong>
     </div>
     <div class="flex flex-col gap-2">
-      <button class="daisy-btn daisy-btn-primary" @click="onPrimaryClick">
+      <button
+        v-if="showBareWikiPrimary"
+        class="daisy-btn daisy-btn-primary"
+        @click="onPrimaryClick"
+      >
         {{ primaryLabel }}
       </button>
       <button
@@ -18,7 +22,7 @@
         Add wiki link as a new property
       </button>
       <button
-        v-if="!deadLinkDisplayText"
+        v-if="relationshipOptionAvailable && !deadLinkDisplayText"
         class="daisy-btn daisy-btn-secondary"
         @click="$emit('chooseAddRelationship')"
       >
@@ -37,11 +41,19 @@ import type { NoteTopology } from "@generated/doughnut-backend-api"
 import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
 import { Reply } from "@lucide/vue"
 
-const props = defineProps<{
-  targetNoteTopology: NoteTopology
-  wikiPropertyOptionAvailable?: boolean
-  deadLinkDisplayText?: string
-}>()
+const props = withDefaults(
+  defineProps<{
+    targetNoteTopology: NoteTopology
+    wikiPropertyOptionAvailable?: boolean
+    deadLinkDisplayText?: string
+    bareWikiLinkAvailable?: boolean
+    relationshipOptionAvailable?: boolean
+  }>(),
+  {
+    bareWikiLinkAvailable: true,
+    relationshipOptionAvailable: true,
+  }
+)
 
 const emit = defineEmits<{
   chooseInsertWikiLink: []
@@ -55,6 +67,10 @@ const primaryLabel = computed(() =>
   props.deadLinkDisplayText
     ? `Link "${props.deadLinkDisplayText}" to this note`
     : "Insert as a wiki link"
+)
+
+const showBareWikiPrimary = computed(
+  () => props.bareWikiLinkAvailable || Boolean(props.deadLinkDisplayText)
 )
 
 function onPrimaryClick() {

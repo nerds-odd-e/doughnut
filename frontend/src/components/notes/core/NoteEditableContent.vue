@@ -51,12 +51,9 @@ import { usePasteWithLinkImageOptions } from "@/composables/usePasteWithLinkImag
 import { useContentCursorInserter } from "@/composables/useContentCursorInserter"
 import { usePropertyMemoryTrackerGuard } from "@/composables/usePropertyMemoryTrackerGuard"
 import {
-  composeNoteContentFromPropertyRows,
+  appendWikiLinkPropertyRow,
   diffFrontmatterPropertyKeyChanges,
   parseNoteContentMarkdown,
-  propertyRowWithScalar,
-  sortedPropertyRowsFromNoteProperties,
-  validatePropertyRowsForRichEdit,
 } from "@/utils/noteContentFrontmatter"
 import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
 
@@ -158,14 +155,8 @@ onMounted(() => {
   registerWikiPropertyInserter({
     canInsert: () => parseNoteContentMarkdown(props.noteContent ?? "").ok,
     insert: (text: string) => {
-      const parsed = parseNoteContentMarkdown(props.noteContent ?? "")
-      if (!parsed.ok) return
-      const rows = [
-        ...sortedPropertyRowsFromNoteProperties(parsed.properties),
-        propertyRowWithScalar("", text),
-      ]
-      if (!validatePropertyRowsForRichEdit(rows).ok) return
-      const composed = composeNoteContentFromPropertyRows(rows, parsed.body)
+      const composed = appendWikiLinkPropertyRow(props.noteContent ?? "", text)
+      if (composed === undefined) return
       if (props.asMarkdown) {
         const textarea = textareaRef.value?.$el?.querySelector(
           "textarea"
