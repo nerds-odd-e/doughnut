@@ -34,6 +34,7 @@
         :current-index="getCurrentMemoryTrackerIndex()"
         :next-is-spelling="nextIsSpelling"
         :eager-fetch-count="eagerFetchCount ?? 5"
+        :spelling-retry-nonce="spellingRetryNonce"
         @answered="onAnswered"
         @just-reviewed="onJustReviewed"
       />
@@ -44,6 +45,7 @@
       <AnsweredSpellingQuestion
         v-if="currentAnsweredSpelling"
         :answered-question="currentAnsweredSpelling"
+        @retry="onOverlapRetry"
       />
       <template v-else-if="toRepeatCount === 0 && previousAnsweredQuestionCursor === undefined">
         <div class="daisy-alert daisy-alert-success">
@@ -127,6 +129,7 @@ const previousAnsweredQuestions = ref<(AnsweredQuestion | undefined)[]>([])
 const previousAnsweredQuestionCursor = ref<number | undefined>(undefined)
 const isProgressBarVisible = ref(true)
 const isLoadingMore = ref(false)
+const spellingRetryNonce = ref(0)
 
 // Sync currentIndex with useRecallData
 watch(
@@ -243,6 +246,14 @@ const offerReAssimilation = async (answerResult: AnsweredQuestion) => {
 }
 
 const onAnswered = async (answerResult: AnsweredQuestion) => {
+  const isOverlap =
+    answerResult.answer?.outcome === "OVERLAP" || answerResult.overlap === true
+  if (isOverlap) {
+    previousAnsweredQuestions.value.push(answerResult)
+    viewLastAnsweredQuestion(previousAnsweredQuestions.value.length - 1)
+    return
+  }
+
   moveToNextMemoryTracker()
   previousAnsweredQuestions.value.push(answerResult)
   if (!answerResult.answer?.correct) {
@@ -259,6 +270,11 @@ const onAnswered = async (answerResult: AnsweredQuestion) => {
       }
     }
   }
+}
+
+const onOverlapRetry = () => {
+  previousAnsweredQuestionCursor.value = undefined
+  spellingRetryNonce.value += 1
 }
 
 const onJustReviewed = () => {

@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers.dto;
 
 import com.odde.doughnut.entities.Answer;
+import com.odde.doughnut.entities.AnswerOutcome;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.entities.QuestionType;
@@ -54,6 +55,9 @@ public class AnsweredQuestion {
     AnsweredQuestion answeredQuestion = from(recallPrompt);
     if (matches != null && !matches.isEmpty()) {
       answeredQuestion.setMatchedNotes(matches.stream().map(Note::getNoteTopology).toList());
+    }
+    if (recallPrompt.getAnswer().getOutcome() == AnswerOutcome.OVERLAP) {
+      answeredQuestion.setOverlap(true);
     }
     return answeredQuestion;
   }

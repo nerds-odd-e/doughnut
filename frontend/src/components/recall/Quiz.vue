@@ -13,7 +13,7 @@
           nextIsSpelling,
         }"
         @answer="onSpellingAnswer($event)"
-        :key="`spelling-${currentMemoryTrackerId}`"
+        :key="`spelling-${currentMemoryTrackerId}-${props.spellingRetryNonce ?? 0}`"
       />
       <template v-else>
         <div v-if="!currentRecallPrompt">
@@ -76,6 +76,7 @@ interface QuizProps {
   currentIndex: number
   eagerFetchCount: number
   nextIsSpelling?: boolean
+  spellingRetryNonce?: number
 }
 
 const props = defineProps<QuizProps>()

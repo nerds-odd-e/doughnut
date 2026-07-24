@@ -1,15 +1,8 @@
 <template>
   <div
     class="daisy-alert"
-    :class="{
-      'daisy-alert-success': answeredQuestion.answer.correct,
-      'daisy-alert-error': !answeredQuestion.answer.correct,
-    }"
-    :data-testid="
-      answeredQuestion.answer.outcome === 'ACCIDENTAL_MATCH'
-        ? 'accidental-match-alert'
-        : undefined
-    "
+    :class="alertClass"
+    :data-testid="alertTestId"
   >
     <strong>{{ alertMessage }}</strong>
   </div>
@@ -23,6 +16,17 @@
     :note-id="answeredQuestion.recalledNote.noteTopology.id"
     :expand-children="false"
   />
+  <button
+    v-if="isOverlap"
+    type="button"
+    class="daisy-btn daisy-btn-secondary daisy-btn-sm mt-6"
+    data-testid="overlap-try-again"
+    title="Try again"
+    aria-label="Try again"
+    @click="emit('retry')"
+  >
+    Try again
+  </button>
   <section
     v-if="showMatchedNotesSection"
     class="mt-6"
@@ -75,6 +79,10 @@ const props = defineProps({
   },
 })
 
+const emit = defineEmits<{
+  (e: "retry"): void
+}>()
+
 const currentUser = inject<Ref<User | undefined>>("currentUser")
 const storageAccessor = useStorageAccessor()
 
@@ -87,6 +95,12 @@ const reviewedRealm = computed(
     storageAccessor.value
       .storedApi()
       .getNoteRealmRefAndLoadWhenNeeded(reviewedNoteId.value).value
+)
+
+const isOverlap = computed(
+  () =>
+    props.answeredQuestion.answer.outcome === "OVERLAP" ||
+    props.answeredQuestion.overlap === true
 )
 
 const showMatchedNotesSection = computed(
@@ -104,8 +118,25 @@ function canOfferLinkToMatched(matchedNoteId: number): boolean {
   return !!matchedRealm
 }
 
+const alertClass = computed(() => {
+  if (isOverlap.value) return "daisy-alert-warning"
+  if (props.answeredQuestion.answer.correct) return "daisy-alert-success"
+  return "daisy-alert-error"
+})
+
+const alertTestId = computed(() => {
+  if (isOverlap.value) return "overlap-try-again-alert"
+  if (props.answeredQuestion.answer.outcome === "ACCIDENTAL_MATCH") {
+    return "accidental-match-alert"
+  }
+  return undefined
+})
+
 const alertMessage = computed(() => {
   const { answer } = props.answeredQuestion
+  if (isOverlap.value) {
+    return "Correct, but we're looking for another answer — try again."
+  }
   if (answer.outcome === "ACCIDENTAL_MATCH") {
     return `Your answer \`${answer.spellingAnswer}\` names another note — not correct for this review.`
   }

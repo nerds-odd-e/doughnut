@@ -1,5 +1,7 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.FrontmatterAliases;
+import com.odde.doughnut.algorithms.WikiLinkMarkdown;
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
 import com.odde.doughnut.entities.Answer;
@@ -16,6 +18,8 @@ import com.odde.doughnut.factoryServices.EntityPersister;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -281,6 +285,14 @@ public class MemoryTrackerService {
     recallPrompt.setAnswer(answer);
     recallPrompt = entityPersister.save(recallPrompt);
 
+    if (Boolean.TRUE.equals(correct) && isNonDistinguishingOverlap(note, spellingAnswer, user)) {
+      Answer gradedAnswer = recallPrompt.getAnswer();
+      gradedAnswer.setCorrect(false);
+      gradedAnswer.setOutcome(AnswerOutcome.OVERLAP);
+      entityPersister.save(recallPrompt);
+      return new SpellingAnswerResult(recallPrompt, List.of());
+    }
+
     if (!correct && spellingAnswer != null && !spellingAnswer.isBlank()) {
       List<Note> matches = wikiLinkResolver.findAllAccidentalMatches(spellingAnswer, note, user);
       if (!matches.isEmpty()) {
@@ -295,6 +307,29 @@ public class MemoryTrackerService {
     markAsRecalled(
         currentUTCTimestamp, correct, memoryTracker, answerSpellingDTO.getThinkingTimeMs());
     return new SpellingAnswerResult(recallPrompt, List.of());
+  }
+
+  private boolean isNonDistinguishingOverlap(Note reviewedNote, String spellingAnswer, User user) {
+    for (String token :
+        FrontmatterAliases.overlapWikiLinkTokensFromNoteContent(reviewedNote.getContent())) {
+      Matcher matcher = WikiLinkMarkdown.INNER_LINK_PATTERN.matcher(token);
+      if (!matcher.matches()) {
+        continue;
+      }
+      String inner = matcher.group(1).trim();
+      Optional<Note> target = wikiLinkResolver.resolveWikiLinkToken(inner, reviewedNote, user);
+      if (target.isEmpty()) {
+        continue;
+      }
+      Note other = target.get();
+      if (other.getId().equals(reviewedNote.getId())) {
+        continue;
+      }
+      if (other.matchAnswer(spellingAnswer)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private void markAsAccidentalMatch(Timestamp currentUTCTimestamp, MemoryTracker memoryTracker) {
