@@ -767,5 +767,39 @@ class RecallPromptControllerTests extends ControllerTestBase {
                   TimestampOperations.addHoursToTimestamp(
                       testabilitySettings.getCurrentUTCTimestamp(), 12))));
     }
+
+    @Test
+    void shouldNotLeakMatchedNoteIdFromUnreadableNotebook()
+        throws UnexpectedNoAccessRightException {
+      User otherUser = makeMe.aUser().please();
+      Notebook unreadableNotebook = makeMe.aNotebook().creatorAndOwner(otherUser).please();
+      Note unreadableNote =
+          makeMe.aNote().notebook(unreadableNotebook).title("Unreadable Accidental Title").please();
+      answerDTO.setSpellingAnswer(unreadableNote.getTitle());
+
+      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+
+      assertFalse(answerResult.getAnswer().getCorrect());
+      assertNull(answerResult.getAnswer().getOutcome());
+      assertNull(answerResult.getAnswer().getMatchedNoteId());
+      assertNull(answerResult.getMatchedNotes());
+      assertNull(answerResult.getOverlap());
+    }
+
+    @Test
+    void shouldSkipAccidentalMatchSearchWhenAnswerMatchesReviewedNoteEvenIfAnotherNoteSharesTitle()
+        throws UnexpectedNoAccessRightException {
+      Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      makeMe.aNote().notebook(otherNotebook).title(answerNote.getTitle()).please();
+      answerDTO.setSpellingAnswer(answerNote.getTitle());
+
+      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+
+      assertTrue(answerResult.getAnswer().getCorrect());
+      assertNull(answerResult.getAnswer().getOutcome());
+      assertNull(answerResult.getAnswer().getMatchedNoteId());
+      assertNull(answerResult.getMatchedNotes());
+      assertNull(answerResult.getOverlap());
+    }
   }
 }
