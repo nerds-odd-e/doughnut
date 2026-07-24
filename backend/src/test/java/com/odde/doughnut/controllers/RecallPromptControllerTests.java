@@ -532,6 +532,102 @@ class RecallPromptControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void spellingQuestionMasksPlainAliasButNotOverlapWikiLinkTargetTitle() {
+      makeMe
+          .theNote(answerNote)
+          .title("colour")
+          .content(
+              """
+              ---
+              aliases:
+                - color
+                - "[[Other Note]]"
+              ---
+              The color of Other Note is blue
+              """)
+          .please();
+      RecallPrompt spellingPrompt =
+          makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
+
+      SpellingQuestion question = spellingPrompt.getSpellingQuestion();
+
+      assertThat(question, notNullValue());
+      assertThat(question.getStem(), containsString("<mark"));
+      assertThat(question.getStem(), not(containsString("color")));
+      assertThat(question.getStem(), containsString("Other Note"));
+    }
+
+    @Test
+    void spellingQuestionDoesNotMaskOverlapTargetTitleFromWikiLinkOnlyAlias() {
+      makeMe
+          .theNote(answerNote)
+          .title("colour")
+          .content(
+              """
+              ---
+              aliases:
+                - "[[Other Note]]"
+              ---
+              Mentions Other Note in the body
+              """)
+          .please();
+      RecallPrompt spellingPrompt =
+          makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
+
+      SpellingQuestion question = spellingPrompt.getSpellingQuestion();
+
+      assertThat(question, notNullValue());
+      assertThat(question.getStem(), containsString("Other Note"));
+      assertThat(question.getStem(), not(containsString("<mark")));
+    }
+
+    @Test
+    void answerDoesNotMatchOverlapWikiLinkAliasTargetOrRawToken()
+        throws UnexpectedNoAccessRightException {
+      makeMe
+          .theNote(answerNote)
+          .title("this")
+          .content(
+              """
+              ---
+              aliases:
+                - that
+                - "[[Other Note]]"
+              ---
+              Body text
+              """)
+          .please();
+
+      AnswerSpellingDTO plainAliasAnswer = new AnswerSpellingDTO();
+      plainAliasAnswer.setSpellingAnswer("that");
+      assertTrue(
+          controller
+              .answerSpelling(
+                  makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please(),
+                  plainAliasAnswer)
+              .getAnswer()
+              .getCorrect());
+
+      AnswerSpellingDTO overlapTitleAnswer = new AnswerSpellingDTO();
+      overlapTitleAnswer.setSpellingAnswer("Other Note");
+      AnsweredQuestion overlapTitleResult =
+          controller.answerSpelling(
+              makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please(),
+              overlapTitleAnswer);
+      assertFalse(overlapTitleResult.getAnswer().getCorrect());
+      assertNull(overlapTitleResult.getOverlap());
+
+      AnswerSpellingDTO rawTokenAnswer = new AnswerSpellingDTO();
+      rawTokenAnswer.setSpellingAnswer("[[Other Note]]");
+      AnsweredQuestion rawTokenResult =
+          controller.answerSpelling(
+              makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please(),
+              rawTokenAnswer);
+      assertFalse(rawTokenResult.getAnswer().getCorrect());
+      assertNull(rawTokenResult.getOverlap());
+    }
+
+    @Test
     void shouldValidateTheAnswerAndUpdateMemoryTracker() throws UnexpectedNoAccessRightException {
       Integer oldRecallCount = memoryTracker.getRecallCount();
       AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
@@ -957,6 +1053,38 @@ class RecallPromptControllerTests extends ControllerTestBase {
       assertThat(
           answerResult.getAnswer().getMatchedNoteId(),
           equalTo((long) answerResult.getMatchedNotes().getFirst().getId()));
+      assertNull(answerResult.getOverlap());
+    }
+
+    @Test
+    void shouldNotAccidentalMatchViaWikiLinkOverlapAliasItem()
+        throws UnexpectedNoAccessRightException {
+      Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      String overlapTargetTitle = "OverlapTargetTitle";
+      Note overlapDeclarer =
+          makeMe
+              .aNote()
+              .notebook(otherNotebook)
+              .title("Unrelated Overlap Declarer")
+              .content(
+                  """
+                  ---
+                  aliases:
+                    - "[[OverlapTargetTitle]]"
+                  ---
+
+                  body
+                  """)
+              .please();
+      noteAliasIndexService.refreshForNote(overlapDeclarer);
+      answerDTO.setSpellingAnswer(overlapTargetTitle);
+
+      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+
+      assertFalse(answerResult.getAnswer().getCorrect());
+      assertNull(answerResult.getAnswer().getOutcome());
+      assertNull(answerResult.getAnswer().getMatchedNoteId());
+      assertNull(answerResult.getMatchedNotes());
       assertNull(answerResult.getOverlap());
     }
 
