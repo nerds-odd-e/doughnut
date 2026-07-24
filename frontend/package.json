@@ -60,7 +60,7 @@
     "marked": "^18.0.7",
     "optionator": "^0.9.4",
     "playwright": "^1.61.1",
-    "sass": "1.101.3",
+    "sass": "1.101.6",
     "storybook": "10.5.3",
     "tailwindcss": "4.3.3",
     "terser": "^5.49.0",
