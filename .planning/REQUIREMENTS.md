@@ -40,7 +40,7 @@
 | AM-02 | Phase 2 | Complete |
 | AM-03 | Phase 3 | Complete |
 | AM-04 | Phase 4 | Complete |
-| OVL-01 | Phase 6 | pending |
+| OVL-01 | Phase 6 | In Progress (06-01 tracer shipped) |
 | OVL-02 | Phase 5 | Complete |
 | OVL-03 | Phase 5 | Complete (05-01 seam + 05-02 index/search + 05-03 wiki-resolve/cloze/matchAnswer/AM) |
 | API-01 | Phase 1 | Complete |

@@ -5,13 +5,13 @@ milestone_name: milestone
 current_phase: 6
 current_phase_name: Overlap try again no credit
 status: ready_to_execute
-stopped_at: Phase 6 plan-check passed — ready to execute
-last_updated: "2026-07-24T20:10:00+08:00"
+stopped_at: Completed 06-01-PLAN.md
+last_updated: "2026-07-24T12:15:05.398Z"
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 16
-  completed_plans: 12
+  completed_plans: 13
 ---
 
 # State: Spelling Answer Match & Link
@@ -26,12 +26,12 @@ progress:
 ## Current Position
 
 - **Phase:** 6 — Overlap "try again, no credit"
-- **Plan:** 06-01 (next)
-- **Status:** Plan-check passed — ready to execute
-- **Progress:** [████████░░] 75% (12/16 plans; 5/6 phases)
+- **Plan:** 06-02 (next)
+- **Status:** 06-01 tracer complete — ready to execute 06-02
+- **Progress:** [████████░░] 81% (13/16 plans; 5/6 phases)
 - **UI contract:** `.planning/phases/06-overlap-try-again-no-credit/06-UI-SPEC.md` (status: approved)
-- **Plans:** 06-01 tracer → 06-02 Flyway D-04 (checkpoint) → 06-03 edges → 06-04 E2E
-- **Plan check:** Blockers fixed (D-03 soften path removed; RESEARCH open questions resolved)
+- **Plans:** 06-01 ✓ → 06-02 Flyway D-04 (checkpoint) → 06-03 edges → 06-04 E2E
+- **Last completed:** 06-01 dual-match OVERLAP + warning try-again stay/retry
 
 ```
 [x][x][x][x][x][ ] 5/6 phases
@@ -70,6 +70,7 @@ progress:
 | Phase 05 P01 | 6min | 2 tasks | 6 files |
 | Phase 05 P03 | 6min | 2 tasks | 2 files |
 | Phase 05 P02 | 9min | 2 tasks | 2 files |
+| Phase 06-overlap-try-again-no-credit P01 | 8min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -107,9 +108,9 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T20:02:00+08:00
-**Stopped at:** Phase 6 plans created — ready to execute
-**Resume file:** `.planning/phases/06-overlap-try-again-no-credit/06-01-PLAN.md`
+**Last session:** 2026-07-24T12:15:05.390Z
+**Stopped at:** Completed 06-01-PLAN.md
+**Resume file:** None
 
 - **Last action:** Created 06-01..06-04 PLAN.md + 06-VALIDATION.md; updated ROADMAP plan listing.
 - **Next action:** `/gsd-execute-phase 6` (or execute-plan on 06-01).
@@ -128,3 +129,5 @@ progress:
 - [Phase 5]: OVL-03 index/search: zero production edits; inherit FrontmatterAliases plain-only from*
 - [Phase 5]: Skipped optional WikiTitleCacheServiceTest awareness (file already >250 lines)
 - [Phase 6]: 4 plans 06-01..06-04 — tracer OVL-01 + Flyway D-04 (yolo) + edges + E2E
+- [Phase ?]: Dual-match OVERLAP only when reviewed matchAnswer and resolved overlap target also matchAnswer (D-01)
+- [Phase ?]: OVERLAP correct=false + zero mark path; frontend stay/retry via spellingRetryNonce (D-03/D-05)
