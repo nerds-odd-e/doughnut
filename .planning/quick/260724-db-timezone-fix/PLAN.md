@@ -97,7 +97,7 @@ much larger window, confirmed via read-only prod queries (`user_id=1`,
    window; "reviews today"/recent stats unaffected (window ends well before
    today). Regenerate ERD not needed (no schema change).
 
-### Phase 3 — Behavior: repair `memory_tracker` scheduling columns — planned
+### Phase 3 — Behavior: repair `memory_tracker` scheduling columns — in-progress (migration written, not yet deployed)
 
 Recalls due at correct times for trackers touched in the window
 (`next_recall_at`, `last_recalled_at`, `assimilated_at` stored 8h **ahead** of
@@ -228,3 +228,24 @@ to skip entirely.
     UTC hours 22-1 (≈06:00-09:00 local) with a secondary bump at UTC 11-14
     (≈19:00-22:00 local) — matches the user's confirmed real habit; the old spurious
     14:00-17:00-local cluster is gone. Phase 2 closed.
+
+- 2026-07-24: Phase 3 implemented. Confirmed via read-only prod SSH before writing the
+  migration: `memory_tracker.last_recalled_at` for trackers whose **true latest**
+  linked `quiz_answer` (max `quiz_answer_id` across all the tracker's
+  `recall_prompt` rows, not just ones in-band) falls in the Phase-2 id band
+  (`180685`-`225258`) shows the same raw-hour-6-9-UTC skew signature (7,966 trackers
+  after correctly excluding 2,338 self-healed ones re-answered post-Phase-1); the
+  `memory_tracker` id band for `assimilated_at >= '2025-07-01' AND < '2026-06-01'`
+  is `24179`-`26039` (1,841 rows), and its raw-hour histogram shows the same
+  skew signature. Added `backend/src/main/resources/db/migration/
+  V300000234__repair_tz_skewed_memory_tracker_scheduling.sql` with two
+  placeholder-gated `UPDATE`s (reusing the `tz_repair` placeholder from
+  V300000233, already defaulted to `1=0` everywhere): (1) `last_recalled_at`/
+  `next_recall_at - INTERVAL 8 HOUR` gated by a join on the true-latest-answer id
+  band (self-healing-aware), (2) `assimilated_at - INTERVAL 8 HOUR` gated by the
+  `24179`-`26039` id band + date band. Added
+  `MemoryTrackerTimeZoneRepairMigrationTest` (splits the two statements, exercises
+  both against a fresh tracker/recall_prompt/quiz_answer fixture, asserts 0 rows
+  updated and all three timestamps unchanged with the no-op default). Full backend
+  suite green; `pnpm lint:all` clean. Not yet deployed to prod — next step is
+  push + let CD roll out, then confirm via `flyway_schema_history`.
