@@ -91,6 +91,7 @@ progress:
 - [x] Phase 5 research — `05-RESEARCH.md` (consumer inventory + segregation approach).
 - [x] `/gsd-plan-phase 5` — 05-01..05-03 PLAN.md written.
 - [ ] `/gsd-execute-phase 5` — OVL-02/OVL-03 Structure (no Phase 6 grading).
+- [ ] Quick plan (outside milestone): `.planning/quick/260724-spa-routing-consistency/` — LB SPA fallback + remove backend frontend-serving; 3 phases planned, none executed.
 
 ### Open questions
 
