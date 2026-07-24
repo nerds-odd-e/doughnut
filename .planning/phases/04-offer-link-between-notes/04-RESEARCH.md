@@ -289,17 +289,13 @@ Not applicable — no framework/library version drift is relevant here; this is 
 
 **Risk assessment:** both assumptions are naming/structure preferences with reversible, low-blast-radius impact — neither affects correctness of the AM-04 behavior itself.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Where exactly should the per-row CTA render relative to each matched `NoteShow`?**
-   - What we know: D-01 says "under each matched `NoteShow`"; the current `matched-notes-section` in `AnsweredSpellingQuestion.vue` renders a `<div data-testid="matched-note-{id}">` wrapper per match containing just the `NoteShow`.
-   - What's unclear: whether the CTA sits directly below the `NoteShow` inside that same wrapper div, or in a small footer row with distinct `data-testid`.
-   - Recommendation: put it inside the existing `matched-note-{id}` wrapper, below `NoteShow`, with its own `data-testid="link-to-matched-note-{id}"` for E2E/unit targeting — least template churn, keeps the existing per-match wrapper as the natural CTA anchor.
+1. **Where exactly should the per-row CTA render relative to each matched `NoteShow`?** — **RESOLVED**
+   - Locked by UI-SPEC + 04-01-PLAN: inside the existing `matched-note-{id}` wrapper, below `NoteShow`, with `data-testid="link-to-matched-note-{id}"`.
 
-2. **Exact component boundary: one wrapper handling both property-write and relationship-finalize stages, or two separate components?**
-   - What we know: `SearchForm.vue` already does this exact two-stage dance (`selectedSearchResult` set → `LinkInsertionChoice` → optional `targetSearchResult` set → `AddRelationshipFinalize`) in one file.
-   - What's unclear: whether the planner prefers one `MatchedNoteLinkOffer.vue` (mirroring `SearchForm`'s internal two-stage `ref` pattern, minus the search step) or splitting choice/finalize into two components.
-   - Recommendation: one component mirroring `SearchForm`'s existing two-ref pattern (`targetSearchResult = ref<NoteSearchResult|undefined>()`, toggled by `LinkInsertionChoice`'s `chooseAddRelationship` emit) — smallest diff, matches an established pattern exactly, stays well under the 250-line file-size guidance.
+2. **Exact component boundary: one wrapper handling both property-write and relationship-finalize stages, or two separate components?** — **RESOLVED**
+   - Locked by 04-01/04-02 PLAN + PATTERNS: one `MatchedNoteLinkOffer.vue` mirroring `SearchForm`'s two-ref choice→finalize pattern (minus search). Wave 1 ships property path only (hide relationship choice until Wave 2 mounts `AddRelationshipFinalize`) so a mid-phase stop does not leave a dead-end button.
 
 ## Environment Availability
 
