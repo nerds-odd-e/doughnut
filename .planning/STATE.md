@@ -5,8 +5,10 @@ milestone_name: milestone
 current_phase: 6
 current_phase_name: Overlap try again no credit
 status: phase_complete
-stopped_at: Completed 06-04-PLAN.md
-last_updated: "2026-07-24T12:31:59.873Z"
+stopped_at: Phase 6 verified passed (06-VERIFICATION.md)
+last_updated: "2026-07-24T12:36:42Z"
+last_verified: "2026-07-24T12:36:42Z"
+verification_status: passed
 progress:
   total_phases: 6
   completed_phases: 6
@@ -21,13 +23,14 @@ progress:
 - **Project:** Spelling Answer Match & Link
 - **Core value:** During spelling recall, an answer that names a *different* note becomes a learning opportunity — penalized lightly, both notes revealed, and a link offered — turning recall confusion into connection-building; and overlapping-but-distinct notes are kept distinct by asking the user for a more specific answer.
 - **Repo:** `/Users/terryyin/git/doughnut` (brownfield Spring Boot + Vue)
-- **Current focus:** Phase 06 complete — OVL-01 E2E green; milestone ready for verify/ship
+- **Current focus:** Phase 06 verified passed — milestone ready for ship
 
 ## Current Position
 
 - **Phase:** 6 — Overlap "try again, no credit"
 - **Plan:** 06-04 complete (last plan in phase)
-- **Status:** Phase 6 plans 06-01..06-04 complete — OVL-01 live E2E green
+- **Status:** Phase 6 verified passed (12/12 must-haves) — see `06-VERIFICATION.md`
+- **Verification:** `.planning/phases/06-overlap-try-again-no-credit/06-VERIFICATION.md` (passed)
 - **Progress:** [██████████] 100% (16/16 plans; 6/6 phases)
 - **UI contract:** `.planning/phases/06-overlap-try-again-no-credit/06-UI-SPEC.md` (status: approved)
 - **Plans:** 06-01 ✓ → 06-02 ✓ → 06-03 ✓ → 06-04 ✓
