@@ -30,15 +30,26 @@ fallback via URL-map custom error response policy (404 from bucket →
 Runbook already names this as the alternative (`docs/gcp/prod-frontend-static-lb.md`,
 "SPA deep links" section).
 
-## Pre-flight gate (Jidoka — before Phase 2)
+## Pre-flight gate (Jidoka — before Phase 3) — RESOLVED 2026-07-24
 
-Needs gcloud access on project `carbon-syntax-298809`; stop for developer if unavailable:
+Ran against project `carbon-syntax-298809` (gcloud reauth required, then succeeded):
 
-1. `customErrorResponsePolicy` requires the **global external ALB (EXTERNAL_MANAGED)**,
-   not classic. Check: `gcloud compute forwarding-rules list --global --format='table(name,loadBalancingScheme,target)'`.
-   If classic → **stop**; LB migration is a developer decision and its own pre-phase.
-2. Confirm MIG backend-service health check hits `/api/healthcheck` (not `/`), so
-   deleting `home()` in Phase 3 is safe.
+1. **LB scheme is classic (`EXTERNAL`)**, confirmed on both the forwarding rule
+   (`doughnut-app-https-content-rule` → `doughnut-app-service-map-target-proxy-2`) and
+   the backend service (`doughnut-app-service`). `customErrorResponsePolicy` needs
+   `EXTERNAL_MANAGED` → **blocked**. Developer decision: migrate the LB first as its
+   own Structure phase (new Phase 2 below), then proceed with the original Phase 2
+   (renumbered Phase 3).
+2. MIG backend-service health check: legacy `doughnut-app-health-check`
+   (`httpHealthChecks`), `requestPath: /api/healthcheck`, port 8081 — **not** `/`.
+   Confirmed safe to delete `home()` in the final structure phase. Legacy HTTP health
+   checks remain supported after migrating to `EXTERNAL_MANAGED` (GCP docs: supported
+   when backends are instance groups serving HTTP/HTTPS — true here), so no health
+   check change is needed as part of the LB migration.
+3. `doughnut-app-http-content-rule` (port 80) uses url map `doughnut-app-web-map-http`,
+   which is a pure `defaultUrlRedirect` (HTTP→HTTPS, no backend reference) — it does
+   not touch `doughnut-app-service` or the frontend bucket and does **not** need
+   migrating.
 
 ## Phases
 
@@ -48,15 +59,53 @@ Needs gcloud access on project `carbon-syntax-298809`; stop for developer if una
   are handled by `spaDeepLink` (non-prod forward to `/index.html`); confirm red.
 - Add `"/settings"`, `"/settings/**"` to the `spaDeepLink` mapping; test green.
 - `CURSOR_DEV=true nix develop -c pnpm backend:test_only`; commit, push (CI deploys).
-- **Interim behavior:** the whole whitelist mechanism is deleted in Phase 3. Justified:
-  ships the user-facing fix now, while Phase 2 carries infra risk (LB scheme gate).
+- **Interim behavior:** the whole whitelist mechanism is deleted in Phase 4. Justified:
+  ships the user-facing fix now, while Phases 2–3 carry infra risk (LB migration +
+  URL-map rework).
 - Stop-safe: prod bug fixed even if nothing else proceeds.
 
 **Done:** added `SettingsDeepLinkTests` (MockMvc, `test` profile, asserts
 `forwardedUrl("/index.html")` for `GET /settings` and `GET /settings/recall-stats`;
 confirmed red/404 before the mapping change). `backend:test_only` green.
 
-### Phase 2 — Behavior: LB serves the SPA shell for any non-backend path (planned)
+### Phase 2 — Structure: migrate prod LB from classic to global external ALB (planned)
+
+No external behavior change (staged, near-zero-downtime, GCP-native migration path);
+enables `customErrorResponsePolicy` for Phase 3. Resources in play (project
+`carbon-syntax-298809`): backend service `doughnut-app-service`, backend bucket
+`doughnut-frontend-backend-bucket`, forwarding rule `doughnut-app-https-content-rule`
+(target proxy `doughnut-app-service-map-target-proxy-2`). `doughnut-app-http-content-rule`
+(HTTP→HTTPS redirect only) is untouched.
+
+**Time-budget exception (planning.mdc):** GCP mandates ≥6 min stabilization between
+each migration-state change; this phase's wall-clock will exceed the 10-minute hard
+trigger by design (waiting on infra, not thrashing) — proceed through the checkpoints
+below rather than reverting for time alone. Smoke-check after every state change;
+stop and roll back the *last* state change (see rollback column) on any failure —
+do not proceed to the next stage.
+
+Order: backend service → backend bucket (via forwarding rule flag) → forwarding rule
+(must fully migrate the backend service before starting the bucket/forwarding rule,
+per GCP requirement).
+
+| Step | Command | Wait | Smoke check | Rollback |
+|---|---|---|---|---|
+| 2a | `gcloud compute backend-services update doughnut-app-service --external-managed-migration-state=PREPARE --global` | ≥6 min | `curl -sf $BASE/api/healthcheck` | re-run with `--external-managed-migration-state=PREPARE` is idempotent; no traffic shifted yet |
+| 2b | `--external-managed-migration-state=TEST_BY_PERCENTAGE --external-managed-migration-testing-percentage=10` | ≥6 min | repeat curl + check error rate/logs for `doughnut-app-service` | drop back to `PREPARE` |
+| 2c | same with `--external-managed-migration-testing-percentage=50` | ≥6 min | same | drop back to `PREPARE` or lower percentage |
+| 2d | `--external-managed-migration-state=TEST_ALL_TRAFFIC` | ≥6 min | same | drop back to a lower `TEST_BY_PERCENTAGE` |
+| 2e | `--load-balancing-scheme=EXTERNAL_MANAGED --global` (finalize backend service) | ≥6 min | `curl -sf $BASE/api/healthcheck`; confirm `loadBalancingScheme: EXTERNAL_MANAGED` in describe | GCP-documented rollback window after finalize (time-boxed); otherwise reverse migration steps |
+| 2f | `gcloud compute forwarding-rules update doughnut-app-https-content-rule --external-managed-backend-bucket-migration-state=PREPARE --global` | ≥6 min | `curl -sI $BASE/` (200 from bucket) | re-run PREPARE; no shift yet |
+| 2g | same with `TEST_BY_PERCENTAGE --external-managed-backend-bucket-migration-testing-percentage=10`, then `50` | ≥6 min each | `curl -sI $BASE/` and a real `/assets/*` URL | drop back a stage |
+| 2h | `--external-managed-backend-bucket-migration-state=TEST_ALL_TRAFFIC` | ≥6 min | same | drop back |
+| 2i | `gcloud compute forwarding-rules update doughnut-app-https-content-rule --external-managed-migration-state=PREPARE --global` → `TEST_BY_PERCENTAGE` (10, 50) → `TEST_ALL_TRAFFIC` → `--load-balancing-scheme=EXTERNAL_MANAGED` (finalize forwarding rule) | ≥6 min each | full smoke: `/`, `/api/healthcheck`, a real `/assets/*` URL, `/settings` (still via Phase 1 whitelist at this point) | reverse staged steps; GCP rollback window after finalize |
+
+- Verify final state: `gcloud compute forwarding-rules describe doughnut-app-https-content-rule --global --format='value(loadBalancingScheme)'` → `EXTERNAL_MANAGED`; same for `doughnut compute backend-services describe doughnut-app-service --global`.
+- Stop-safe: identical external behavior throughout and after; unblocks Phase 3.
+  If migration is abandoned partway, everything still works (classic or in-test
+  states both serve traffic); nothing here is user-visible.
+
+### Phase 3 — Behavior: LB serves the SPA shell for any non-backend path (planned)
 
 One observable behavior: a deep link unknown to the backend (e.g.
 `/settings/recall-stats`, or any future route) returns the active SHA's `index.html`
@@ -64,7 +113,7 @@ with 200 from GCS, with zero backend involvement.
 
 Slices (~5 min each, test-first via `pnpm test:path-routing` / `pnpm validate:path-routing`):
 
-- **2a (red→green):** extend URL-map renderer unit tests, then
+- **3a (red→green):** extend URL-map renderer unit tests, then
   `renderDoughnutAppServiceUrlMapYamlFromRouting`:
   - MIG pathRules generated from `backendPathHints` (exact → `path`; prefix `p/` →
     `p` + `p/*`; allow-bare likewise).
@@ -74,10 +123,10 @@ Slices (~5 min each, test-first via `pnpm test:path-routing` / `pnpm validate:pa
   - `pathMatchers[].defaultCustomErrorResponsePolicy`: `matchResponseCodes: [404]`,
     `path: /frontend/<SHA>/index.html`, `overrideResponseCode: 200`,
     `errorService:` the backend bucket.
-- **2b:** update `validate-url-map-static-vs-backend-hints.mjs` for the inverted shape
+- **3b:** update `validate-url-map-static-vs-backend-hints.mjs` for the inverted shape
   (backend hints must hit MIG; probes + a deep-link sample like `/settings/recall-stats`
   must resolve to bucket/fallback). Local LB needs no change — same `backendPathHints`.
-- **2c:** merge → CI `apply-doughnut-app-service-url-map.sh` imports the map. Prod
+- **3c:** merge → CI `apply-doughnut-app-service-url-map.sh` imports the map. Prod
   smoke: `curl -sI $BASE/settings/recall-stats` → 200 `text/html`;
   `curl -sf $BASE/api/healthcheck` → MIG; a hashed `/assets/*` URL still 200.
 - Legacy `/d/**` bookmarks keep working (fallback shell + frontend `/d/:pathMatch`
@@ -85,7 +134,7 @@ Slices (~5 min each, test-first via `pnpm test:path-routing` / `pnpm validate:pa
 - Stop-safe: consistent solution live; Java whitelist becomes unreachable overlap,
   removed next phase.
 
-### Phase 3 — Structure: backend stops serving frontend (planned)
+### Phase 4 — Structure: backend stops serving frontend (planned)
 
 No external behavior change through the public origin; removes the overlapped/dead
 mechanisms.
@@ -100,7 +149,7 @@ mechanisms.
 - Docs: rewrite `docs/gcp/prod-frontend-static-lb.md` "SPA deep links" + MIG path
   table — LB fallback is *the* mechanism; drop whitelist maintenance instructions.
 - Verify: `backend:test_only` green; targeted e2e spec covering login/identify flow
-  green; prod smoke from Phase 2 still holds after deploy.
+  green; prod smoke from Phase 3 still holds after deploy.
 
 ## Key decisions
 
@@ -117,7 +166,10 @@ mechanisms.
 
 ## Risks
 
-- LB may be classic (pre-flight gate) → Phase 2 blocked pending migration decision;
-  Phase 1 has already shipped the user-facing fix.
-- URL-map import failure mid-deploy: rollback = re-import previous SHA's map (existing
-  runbook recovery commands unchanged).
+- LB confirmed classic → Phase 2 (LB migration) required before Phase 3; Phase 1
+  already shipped the user-facing fix so nothing is blocked from the user's view.
+- LB migration (Phase 2) touches live prod traffic in stages; each stage is
+  independently reversible per GCP's staged rollout (see rollback column). Increased
+  backend memory/connections possible post-migration (GCP docs) — monitor after 2e/2i.
+- URL-map import failure mid-deploy (Phase 3): rollback = re-import previous SHA's map
+  (existing runbook recovery commands unchanged).
