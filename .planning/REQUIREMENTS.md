@@ -12,7 +12,7 @@
 ### Overlap
 
 - [ ] **OVL-01**: When a spelling answer is correct for the reviewed note but the reviewed note declares overlap with another note, the system responds "correct, but we're looking for another answer — try again," with no credit.
-- [ ] **OVL-02**: Overlap is declared by extending the `aliases` frontmatter to accept wiki-link values that point to another note.
+- [x] **OVL-02**: Overlap is declared by extending the `aliases` frontmatter to accept wiki-link values that point to another note.
 - [ ] **OVL-03**: Extending aliases to accept wiki links preserves existing wiki-resolve, search, and cloze-masking behavior (no regressions).
 
 ### API
@@ -41,8 +41,8 @@
 | AM-03 | Phase 3 | Complete |
 | AM-04 | Phase 4 | Complete |
 | OVL-01 | Phase 6 | pending |
-| OVL-02 | Phase 5 | pending |
-| OVL-03 | Phase 5 | pending |
+| OVL-02 | Phase 5 | Complete |
+| OVL-03 | Phase 5 | In progress (plain-only seam in 05-01; consumer regressions 05-02/05-03) |
 | API-01 | Phase 1 | Complete |
 | API-02 | Phase 1 | Complete |
 

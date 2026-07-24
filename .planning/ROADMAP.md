@@ -129,14 +129,14 @@ Plans:
   3. Existing search behavior is unchanged for plain aliases (a wiki-link alias is not surfaced as a searchable title where it shouldn't be).
   4. Existing cloze-masking behavior is unchanged (a wiki-link alias does not leak or break cloze deletion).
 
-**Plans**: 3 plans
+**Plans**: 1/3 plans executed
 
 > **⚠️ Known risk — alias blast radius:** Extending `aliases` to accept wiki-link values touches the derived-index coherence path (wiki title / property / alias caches refreshed via `WikiTitleCacheService.refreshForNote` and backfills — see `.planning/codebase/CONCERNS.md` "Derived index coherence"). Missed refresh sites recreate assimilation/search/cloze bugs. Treat this phase as a design spike: enumerate every consumer of `aliases` (wiki resolve, search index, cloze masking, `NoteAliasIndex`/`NoteAliasIndexService`, `FrontmatterAliases`) before changing the parser, and gate on regression tests for each consumer. Expect this phase to take longer than its neighbors; do not rush it.
 
 Plans:
 **Wave 1**
 
-- [ ] 05-01-PLAN.md — Tracer: FrontmatterAliases plain/wiki segregation + overlapWikiLinkTokensFrom* + HTTP accept + frontend authoredAliasesValidation parity (D-01–D-04 / OVL-02)
+- [x] 05-01-PLAN.md — Tracer: FrontmatterAliases plain/wiki segregation + overlapWikiLinkTokensFrom* + HTTP accept + frontend authoredAliasesValidation parity (D-01–D-04 / OVL-02)
 
 **Wave 2** *(blocked on Wave 1; 05-02 ∥ 05-03)*
 
@@ -166,7 +166,7 @@ Plans:
 | 2. Accidental-match grading & penalty | 2/2 | Complete    | 2026-07-24 |
 | 3. Reveal both notes after accidental match | 3/3 | Complete    | 2026-07-24 |
 | 4. Offer link between notes | 3/3 | Complete    | 2026-07-24 |
-| 5. Alias-as-wiki-link overlap declaration | 0/3 | Planned | - |
+| 5. Alias-as-wiki-link overlap declaration | 1/3 | In Progress|  |
 | 6. Overlap "try again, no credit" | 0/0 | Not started | - |
 
 ## Coverage

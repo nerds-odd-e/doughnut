@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 5
 current_phase_name: Alias-as-wiki-link overlap declaration
-status: ready_to_execute
-stopped_at: Phase 5 planning complete; ready to execute
-last_updated: "2026-07-24T05:51:47.603Z"
+status: in_progress
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-07-24T05:59:06.208Z"
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 12
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # State: Spelling Answer Match & Link
@@ -26,9 +26,9 @@ progress:
 ## Current Position
 
 - **Phase:** 5 — Alias-as-wiki-link overlap declaration
-- **Plan:** 05-01 next (Wave 1 tracer)
-- **Status:** Planned — 3 plans ready to execute
-- **Progress:** [█████████████░░░░░░░] 4/6 phases
+- **Plan:** 05-02 next (Wave 2 OVL-03 consumer regressions)
+- **Status:** In progress — 05-01 tracer complete; 05-02/05-03 remaining
+- **Progress:** [████████░░] 83%
 
 ```
 [x][x][x][x][ ][ ] 4/6 phases
@@ -48,7 +48,7 @@ progress:
 ## Performance Metrics
 
 - **Phases completed:** 4
-- **Requirements delivered:** 6/9 (API-01, API-02, AM-01, AM-02, AM-03, AM-04)
+- **Requirements delivered:** 7/9 (API-01, API-02, AM-01, AM-02, AM-03, AM-04, OVL-02)
 - **Coverage:** 9/9 mapped (100%)
 
 **Per-Plan Metrics:**
@@ -64,6 +64,7 @@ progress:
 | Phase 04 P01 | 12min | 2 tasks | 10 files |
 | Phase 04 P02 | 6min | 2 tasks | 5 files |
 | Phase 04 P03 | 15min | 2 tasks | 3 files |
+| Phase 05 P01 | 6min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -90,7 +91,8 @@ progress:
 - [x] Run `/gsd-discuss-phase 5 --auto` — CONTEXT locked (D-01..D-04).
 - [x] Phase 5 research — `05-RESEARCH.md` (consumer inventory + segregation approach).
 - [x] `/gsd-plan-phase 5` — 05-01..05-03 PLAN.md written.
-- [ ] `/gsd-execute-phase 5` — OVL-02/OVL-03 Structure (no Phase 6 grading).
+- [x] Execute 05-01 — FrontmatterAliases segregation + frontend authoredAliasesValidation parity.
+- [ ] Execute 05-02 / 05-03 — OVL-03 consumer regressions (index/search/resolve/cloze/AM).
 - [ ] Quick plan (outside milestone): `.planning/quick/260724-spa-routing-consistency/` — LB SPA fallback + remove backend frontend-serving; 3 phases planned, none executed.
 
 ### Open questions
@@ -99,13 +101,13 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T05:51:47.593Z
-**Stopped at:** Phase 5 planning complete; ready to execute
-**Resume file:** .planning/phases/05-alias-as-wiki-link-overlap-declaration/05-01-PLAN.md
+**Last session:** 2026-07-24T05:59:06.200Z
+**Stopped at:** Completed 05-01-PLAN.md
+**Resume file:** None
 
-- **Last action:** Phase 5 PLAN.md files written (tracer + parallel OVL-03 consumer waves).
-- **Next action:** `/gsd-execute-phase 5` starting at 05-01.
-- **Resume from:** Read 05-01-PLAN.md + 05-CONTEXT.md + 05-RESEARCH.md.
+- **Last action:** Completed 05-01 tracer (FrontmatterAliases + frontend parity).
+- **Next action:** Execute 05-02 / 05-03 (OVL-03 consumer regressions).
+- **Resume from:** `.planning/phases/05-alias-as-wiki-link-overlap-declaration/05-02-PLAN.md`
 
 ## Decisions
 
@@ -113,3 +115,5 @@ progress:
 - [Phase 2]: ACCIDENTAL_MATCH grading + lighter −10 penalty; findAccidentalMatch title then alias
 - [Phase 3]: D-01 findAllAccidentalMatches title∪alias; D-02 populate matchedNotes; D-03–D-05 UI NoteShow stack + distinct alert; D-06 no add-link this phase
 - [Phase 4]: D-01–D-07 MatchedNoteLinkOffer; property updateTextField; relationship navigateOnSuccess=false; human verify via E2E browser subagent
+- [Phase 5]: Keep fromNoteContent/fromFrontmatter plain-only; add overlapWikiLinkTokensFrom* for Phase 6
+- [Phase 5]: Whole-item WikiLinkMarkdown.INNER_LINK_PATTERN.matches() for wiki-link alias detection
