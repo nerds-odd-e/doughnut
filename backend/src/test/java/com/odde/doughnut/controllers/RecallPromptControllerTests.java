@@ -715,4 +715,57 @@ class RecallPromptControllerTests extends ControllerTestBase {
       }
     }
   }
+
+  @Nested
+  class AccidentalMatch {
+    Note answerNote;
+    Note secondNote;
+    MemoryTracker memoryTracker;
+    RecallPrompt recallPrompt;
+    AnswerSpellingDTO answerDTO = new AnswerSpellingDTO();
+
+    @BeforeEach
+    void setup() {
+      answerNote = makeMe.aNote().rememberSpelling().please();
+      memoryTracker =
+          makeMe
+              .aMemoryTrackerFor(answerNote)
+              .by(currentUser.getUser())
+              .forgettingCurveAndNextRecallAt(200.0f)
+              .spelling()
+              .please();
+      recallPrompt = makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
+      Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      secondNote = makeMe.aNote().notebook(otherNotebook).title("Another Note Title").please();
+      answerDTO.setSpellingAnswer(secondNote.getTitle());
+    }
+
+    @Test
+    void shouldGradeAsAccidentalMatchWhenWrongAnswerMatchesAnotherReadableNoteTitle()
+        throws UnexpectedNoAccessRightException {
+      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+      assertFalse(answerResult.getAnswer().getCorrect());
+      assertThat(answerResult.getAnswer().getOutcome(), is(AnswerOutcome.ACCIDENTAL_MATCH));
+      assertThat(
+          answerResult.getAnswer().getMatchedNoteId(), equalTo(secondNote.getId().longValue()));
+      assertNull(answerResult.getMatchedNotes());
+      assertNull(answerResult.getOverlap());
+    }
+
+    @Test
+    void shouldApplyLighterPenaltyThanWrongAnswer() throws UnexpectedNoAccessRightException {
+      testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
+      controller.answerSpelling(recallPrompt, answerDTO);
+      assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(190.0f));
+      assertThat(
+          memoryTracker.getNextRecallAt(),
+          greaterThan(testabilitySettings.getCurrentUTCTimestamp()));
+      assertThat(
+          memoryTracker.getNextRecallAt(),
+          not(
+              equalTo(
+                  TimestampOperations.addHoursToTimestamp(
+                      testabilitySettings.getCurrentUTCTimestamp(), 12))));
+    }
+  }
 }

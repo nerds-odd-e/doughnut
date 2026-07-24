@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 2
-current_phase_name: Accidental-match grading & penalty
-status: planning
+current_phase: 02
+current_phase_name: accidental-match-grading-penalty
+status: executing
 stopped_at: Phase 2 planned (2 plans)
-last_updated: "2026-07-24T08:30:00.000Z"
+last_updated: "2026-07-24T00:39:03.767Z"
 progress:
   total_phases: 2
   completed_phases: 1
@@ -21,13 +21,13 @@ progress:
 - **Project:** Spelling Answer Match & Link
 - **Core value:** During spelling recall, an answer that names a *different* note becomes a learning opportunity — penalized lightly, both notes revealed, and a link offered — turning recall confusion into connection-building; and overlapping-but-distinct notes are kept distinct by asking the user for a more specific answer.
 - **Repo:** `/Users/terryyin/git/doughnut` (brownfield Spring Boot + Vue)
-- **Current focus:** Phase 01 — Extend Answer outcome API
+- **Current focus:** Phase 02 — accidental-match-grading-penalty
 
 ## Current Position
 
-- **Phase:** 2 — Accidental-match grading & penalty
-- **Plan:** 02-01-PLAN.md, 02-02-PLAN.md written (2 plans, 2 waves; Plan 01 = tracer title-leg + IDOR/skip tests, Plan 02 = alias leg + clamp/threshold tests)
-- **Status:** Planned
+- **Phase:** 02 (accidental-match-grading-penalty) — EXECUTING
+- **Plan:** 1 of 2
+- **Status:** Executing Phase 02
 - **Progress:** [██░░░░░░░░] Phase 2 planning complete
 
 ```
