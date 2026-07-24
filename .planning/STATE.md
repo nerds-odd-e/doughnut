@@ -91,7 +91,7 @@ progress:
 
 - [x] Execute Phase 5 (05-01..05-03) — OVL-02/OVL-03 complete; VERIFICATION passed 8/8.
 - [ ] Run `/gsd-discuss-phase 6` (or `--auto`) then plan/execute OVL-01.
-- [ ] Quick plan (outside milestone): `.planning/quick/260724-db-timezone-fix/` — Phases 1-3 done and verified live in prod (JDBC pin, `quiz_answer.created_at` repair, `memory_tracker` scheduling columns repair). Phase 4 (optional broader audit of other app-written timestamp columns) still pending — next Jidoka checkpoint: continue or stop/close the plan here.
+- [x] Quick plan (outside milestone): `.planning/quick/260724-db-timezone-fix/` — closed 2026-07-24. All 4 phases done and verified live in prod: JDBC session pinned to UTC, and the confirmed 2025-07–2026-06 8h-skew window repaired for `quiz_answer.created_at`, `memory_tracker` scheduling columns, and `note.created_at`. Plan file kept (trimmed) as the permanent forensics record referenced by the migration comments.
 
 ### Open questions
 
