@@ -30,7 +30,6 @@
           :readme-content="folderForView.readmeContent ?? null"
           test-id-prefix="folder-readme"
           rich-editor-scope-name="folder-readme"
-          heading-label="Folder readme"
           flush
           @saved="refreshFolderPage"
         />
