@@ -4,6 +4,7 @@
       v-if="show"
       ref="dialogRef"
       class="loading-modal-mask"
+      data-app-busy
       @cancel.prevent
     >
       <div class="loading-modal-content">

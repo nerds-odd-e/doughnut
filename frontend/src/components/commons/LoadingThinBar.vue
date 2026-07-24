@@ -1,5 +1,5 @@
 <template>
-  <div class="toolbar-overlap loading-bar"></div>
+  <div class="toolbar-overlap" data-app-busy></div>
 </template>
 
 <script setup lang="ts">
