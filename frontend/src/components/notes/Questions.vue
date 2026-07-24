@@ -29,12 +29,13 @@
           <th>B</th>
           <th>C</th>
           <th>D</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
         <tr
           v-for="question in questions"
-          :key="question.multipleChoicesQuestion.questionStem"
+          :key="question.id"
         >
           <td>
             {{ question.multipleChoicesQuestion.questionStem }}
@@ -53,6 +54,16 @@
               {{ choice }}
             </td>
           </template>
+          <td>
+            <button
+              class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+              title="Delete question"
+              aria-label="Delete question"
+              @click="deleteQuestion(question)"
+            >
+              <Trash2 class="w-5 h-5" />
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -75,7 +86,9 @@ import { PredefinedQuestionController } from "@generated/doughnut-backend-api/sd
 import NoteAddQuestion from "./NoteAddQuestion.vue"
 import QuestionExportDialog from "./QuestionExportDialog.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
-import { Upload } from "@lucide/vue"
+import usePopups from "../commons/Popups/usePopups"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import { Upload, Trash2 } from "@lucide/vue"
 
 const props = defineProps({
   note: {
@@ -85,6 +98,7 @@ const props = defineProps({
 })
 const questions = ref<PredefinedQuestion[]>([])
 const showExportDialog = ref(false)
+const { popups } = usePopups()
 
 const fetchQuestions = async () => {
   const { data: allQuestions, error } =
@@ -100,6 +114,19 @@ const questionAdded = (newQuestion: PredefinedQuestion) => {
     return
   }
   questions.value.push(newQuestion)
+}
+const deleteQuestion = async (question: PredefinedQuestion) => {
+  if (!(await popups.confirm("Confirm to delete this question?"))) {
+    return
+  }
+  const { error } = await apiCallWithLoading(() =>
+    PredefinedQuestionController.deleteQuestion({
+      path: { predefinedQuestionId: question.id },
+    })
+  )
+  if (!error) {
+    questions.value = questions.value.filter((q) => q.id !== question.id)
+  }
 }
 onMounted(() => {
   fetchQuestions()

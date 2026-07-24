@@ -3842,6 +3842,22 @@ export type DeleteTokenResponses = {
     200: unknown;
 };
 
+export type DeleteQuestionData = {
+    body?: never;
+    path: {
+        predefinedQuestionId: number;
+    };
+    query?: never;
+    url: '/api/predefined-questions/{predefinedQuestionId}';
+};
+
+export type DeleteQuestionResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type CancelBookBlockData = {
     body?: never;
     path: {

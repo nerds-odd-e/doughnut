@@ -70,6 +70,15 @@ class PredefinedQuestionController {
     return predefinedQuestionService.addQuestion(note, predefinedQuestion);
   }
 
+  @DeleteMapping("/{predefinedQuestionId}")
+  @Transactional
+  public void deleteQuestion(@PathVariable("predefinedQuestionId") Integer predefinedQuestionId)
+      throws UnexpectedNoAccessRightException {
+    PredefinedQuestion predefinedQuestion = predefinedQuestionService.getById(predefinedQuestionId);
+    authorizationService.assertAuthorization(predefinedQuestion.getNote());
+    predefinedQuestionService.deleteQuestion(predefinedQuestion);
+  }
+
   @PostMapping("/{note}/refine-question")
   @Transactional
   public PredefinedQuestion refineQuestion(

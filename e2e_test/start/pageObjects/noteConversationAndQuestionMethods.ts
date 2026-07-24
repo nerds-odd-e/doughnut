@@ -34,6 +34,12 @@ export const noteConversationAndQuestionMethods = () => ({
   refineQuestion(row: Record<string, string>) {
     this.openQuestionList().addQuestionPage().refineQuestion(row)
   },
+  deleteQuestion(stem: string) {
+    this.openQuestionList().deleteQuestion(stem)
+  },
+  expectQuestionNotInList(stem: string) {
+    this.openQuestionList().expectQuestionNotInList(stem)
+  },
   expectQuestionsInList(expectedQuestions: Record<string, string>[]) {
     cy.get('body').then(($body) => {
       if ($body.find('.question-table').length > 0) {
