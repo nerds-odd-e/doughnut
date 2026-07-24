@@ -5,10 +5,10 @@ milestone_name: milestone
 current_phase: 5
 current_phase_name: Alias-as-wiki-link overlap declaration
 status: ready_to_execute
-stopped_at: Phase 5 plans created (05-01..05-03)
-last_updated: "2026-07-24T05:50:00.000Z"
+stopped_at: Phase 5 planning complete; ready to execute
+last_updated: "2026-07-24T05:51:47.603Z"
 progress:
-  total_phases: 6
+  total_phases: 5
   completed_phases: 4
   total_plans: 12
   completed_plans: 9
@@ -98,8 +98,8 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T05:50:00.000Z
-**Stopped at:** Phase 5 plans created (05-01..05-03)
+**Last session:** 2026-07-24T05:51:47.593Z
+**Stopped at:** Phase 5 planning complete; ready to execute
 **Resume file:** .planning/phases/05-alias-as-wiki-link-overlap-declaration/05-01-PLAN.md
 
 - **Last action:** Phase 5 PLAN.md files written (tracer + parallel OVL-03 consumer waves).
