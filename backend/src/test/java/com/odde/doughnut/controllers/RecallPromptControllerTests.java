@@ -754,7 +754,14 @@ class RecallPromptControllerTests extends ControllerTestBase {
       assertThat(answerResult.getAnswer().getOutcome(), is(AnswerOutcome.ACCIDENTAL_MATCH));
       assertThat(
           answerResult.getAnswer().getMatchedNoteId(), equalTo(secondNote.getId().longValue()));
-      assertNull(answerResult.getMatchedNotes());
+      assertThat(answerResult.getMatchedNotes(), notNullValue());
+      assertThat(answerResult.getMatchedNotes(), hasSize(1));
+      assertThat(answerResult.getMatchedNotes().getFirst().getId(), equalTo(secondNote.getId()));
+      assertThat(
+          answerResult.getAnswer().getMatchedNoteId(),
+          equalTo((long) answerResult.getMatchedNotes().getFirst().getId()));
+      assertThat(
+          answerResult.getMatchedNotes().getFirst().getTitle(), equalTo(secondNote.getTitle()));
       assertNull(answerResult.getOverlap());
     }
 
@@ -771,10 +778,17 @@ class RecallPromptControllerTests extends ControllerTestBase {
       assertThat(answerResult.getAnswer().getOutcome(), is(AnswerOutcome.ACCIDENTAL_MATCH));
       assertThat(
           answerResult.getAnswer().getMatchedNoteId(), equalTo(secondNote.getId().longValue()));
+      assertThat(answerResult.getMatchedNotes(), notNullValue());
+      assertThat(
+          answerResult.getMatchedNotes().stream().map(NoteTopology::getId).toList(),
+          contains(secondNote.getId(), thirdNote.getId()));
+      assertThat(
+          answerResult.getAnswer().getMatchedNoteId(),
+          equalTo((long) answerResult.getMatchedNotes().getFirst().getId()));
     }
 
     @Test
-    void shouldPreferTitleMatchOverAliasMatchWhenBothExist()
+    void shouldIncludeTitleAndAliasMatchesInMatchedNotesOrderedById()
         throws UnexpectedNoAccessRightException {
       String shared = "TitlePreferredMatch";
       Notebook notebookA = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
@@ -792,11 +806,18 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
       AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
 
+      int minId = Math.min(noteA.getId(), noteB.getId());
+      int maxId = Math.max(noteA.getId(), noteB.getId());
       assertFalse(answerResult.getAnswer().getCorrect());
       assertThat(answerResult.getAnswer().getOutcome(), is(AnswerOutcome.ACCIDENTAL_MATCH));
-      assertThat(answerResult.getAnswer().getMatchedNoteId(), equalTo(noteA.getId().longValue()));
+      assertThat(answerResult.getMatchedNotes(), notNullValue());
       assertThat(
-          answerResult.getAnswer().getMatchedNoteId(), not(equalTo(noteB.getId().longValue())));
+          answerResult.getMatchedNotes().stream().map(NoteTopology::getId).toList(),
+          contains(minId, maxId));
+      assertThat(answerResult.getAnswer().getMatchedNoteId(), equalTo((long) minId));
+      assertThat(
+          answerResult.getAnswer().getMatchedNoteId(),
+          equalTo((long) answerResult.getMatchedNotes().getFirst().getId()));
     }
 
     @Test
@@ -903,7 +924,13 @@ class RecallPromptControllerTests extends ControllerTestBase {
       assertThat(
           answerResult.getAnswer().getMatchedNoteId(),
           equalTo(aliasBearingNote.getId().longValue()));
-      assertNull(answerResult.getMatchedNotes());
+      assertThat(answerResult.getMatchedNotes(), notNullValue());
+      assertThat(answerResult.getMatchedNotes(), hasSize(1));
+      assertThat(
+          answerResult.getMatchedNotes().getFirst().getId(), equalTo(aliasBearingNote.getId()));
+      assertThat(
+          answerResult.getAnswer().getMatchedNoteId(),
+          equalTo((long) answerResult.getMatchedNotes().getFirst().getId()));
       assertNull(answerResult.getOverlap());
     }
 
@@ -929,6 +956,13 @@ class RecallPromptControllerTests extends ControllerTestBase {
       assertThat(
           answerResult.getAnswer().getMatchedNoteId(),
           equalTo(aliasBearingNote.getId().longValue()));
+      assertThat(answerResult.getMatchedNotes(), notNullValue());
+      assertThat(answerResult.getMatchedNotes(), hasSize(1));
+      assertThat(
+          answerResult.getMatchedNotes().getFirst().getId(), equalTo(aliasBearingNote.getId()));
+      assertThat(
+          answerResult.getAnswer().getMatchedNoteId(),
+          equalTo((long) answerResult.getMatchedNotes().getFirst().getId()));
     }
 
     @Test
