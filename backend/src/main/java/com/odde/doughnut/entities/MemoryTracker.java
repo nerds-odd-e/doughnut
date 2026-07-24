@@ -146,6 +146,13 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     }
   }
 
+  public void markAsAccidentalMatch(Timestamp currentUTCTimestamp) {
+    setRecallCount(getRecallCount() + 1);
+    setForgettingCurveIndex(forgettingCurve().partialFail());
+    setLastRecalledAt(currentUTCTimestamp);
+    setNextRecallAt(calculateNextRecallAt());
+  }
+
   @JsonIgnore
   public boolean isActive() {
     return deletedAt == null && !Boolean.TRUE.equals(removedFromTracking);

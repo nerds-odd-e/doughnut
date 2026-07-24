@@ -39,6 +39,18 @@ public class WikiLinkResolver {
     return Optional.ofNullable(resolveToken(token, viewer, focusNote));
   }
 
+  public Optional<Note> findAccidentalMatch(String answer, Note reviewedNote, User viewer) {
+    for (Note candidate : noteRepository.findByNoteTitleOrderByIdAsc(answer)) {
+      Notebook notebook = candidate.getNotebook();
+      if (notebook != null
+          && authorizationService.userMayReadNotebook(viewer, notebook)
+          && !candidate.getId().equals(reviewedNote.getId())) {
+        return Optional.of(candidate);
+      }
+    }
+    return Optional.empty();
+  }
+
   /** Resolves a wiki-link token to any matching note, regardless of viewer readability. */
   public Optional<Note> resolveAnyTargetWikiLinkToken(String token, Note focusNote) {
     return Optional.ofNullable(resolveAnyTargetToken(token, focusNote));

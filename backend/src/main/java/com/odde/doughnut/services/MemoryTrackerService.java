@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
 import com.odde.doughnut.entities.Answer;
+import com.odde.doughnut.entities.AnswerOutcome;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuestionType;
@@ -15,6 +16,7 @@ import com.odde.doughnut.factoryServices.EntityPersister;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -29,18 +31,21 @@ public class MemoryTrackerService {
   private final MemoryTrackerRepository memoryTrackerRepository;
   private final RecallPromptRepository recallPromptRepository;
   private final ConversationRepository conversationRepository;
+  private final WikiLinkResolver wikiLinkResolver;
 
   public MemoryTrackerService(
       EntityPersister entityPersister,
       UserService userService,
       MemoryTrackerRepository memoryTrackerRepository,
       RecallPromptRepository recallPromptRepository,
-      ConversationRepository conversationRepository) {
+      ConversationRepository conversationRepository,
+      WikiLinkResolver wikiLinkResolver) {
     this.entityPersister = entityPersister;
     this.userService = userService;
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.recallPromptRepository = recallPromptRepository;
     this.conversationRepository = conversationRepository;
+    this.wikiLinkResolver = wikiLinkResolver;
   }
 
   public List<MemoryTracker> findLast100ByUser(Integer userId) {
@@ -273,11 +278,29 @@ public class MemoryTrackerService {
     answer.setCorrect(correct);
     answer.setThinkingTimeMs(answerSpellingDTO.getThinkingTimeMs());
     recallPrompt.setAnswer(answer);
-    entityPersister.save(recallPrompt);
+    recallPrompt = entityPersister.save(recallPrompt);
+
+    if (!correct) {
+      Optional<Note> match = wikiLinkResolver.findAccidentalMatch(spellingAnswer, note, user);
+      if (match.isPresent()) {
+        Answer gradedAnswer = recallPrompt.getAnswer();
+        gradedAnswer.setMatchedNoteId(match.get().getId().longValue());
+        gradedAnswer.setOutcome(AnswerOutcome.ACCIDENTAL_MATCH);
+        markAsAccidentalMatch(currentUTCTimestamp, memoryTracker);
+        return recallPrompt;
+      }
+    }
 
     markAsRecalled(
         currentUTCTimestamp, correct, memoryTracker, answerSpellingDTO.getThinkingTimeMs());
     return recallPrompt;
+  }
+
+  private void markAsAccidentalMatch(Timestamp currentUTCTimestamp, MemoryTracker memoryTracker) {
+    memoryTracker.markAsAccidentalMatch(currentUTCTimestamp);
+    entityPersister.save(memoryTracker);
+    hasExceededWrongAnswerThreshold(
+        memoryTracker, currentUTCTimestamp, WRONG_ANSWER_PERIOD_DAYS, WRONG_ANSWER_THRESHOLD);
   }
 
   public boolean hasExceededWrongAnswerThreshold(
