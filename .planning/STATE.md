@@ -5,13 +5,13 @@ milestone_name: milestone
 current_phase: 02
 current_phase_name: accidental-match-grading-penalty
 status: executing
-stopped_at: Phase 2 planned (2 plans)
-last_updated: "2026-07-24T00:39:03.767Z"
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-07-24T00:46:06.976Z"
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 3
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # State: Spelling Answer Match & Link
@@ -26,9 +26,9 @@ progress:
 ## Current Position
 
 - **Phase:** 02 (accidental-match-grading-penalty) — EXECUTING
-- **Plan:** 1 of 2
-- **Status:** Executing Phase 02
-- **Progress:** [██░░░░░░░░] Phase 2 planning complete
+- **Plan:** 2 of 2
+- **Status:** Ready to execute
+- **Progress:** [███████░░░] 67%
 
 ```
 [1][.....] 1/2 phases (Phase 2 planned, not executed)
@@ -56,6 +56,7 @@ progress:
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
 | Phase 01 P01 | 23min | 2 tasks | 8 files |
+| Phase 02 P01 | 6min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -91,9 +92,9 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T08:30:00.000Z
-**Stopped at:** Phase 2 planned (2 plans, 2 waves)
-**Resume file:** .planning/phases/02-accidental-match-grading-penalty/02-01-PLAN.md
+**Last session:** 2026-07-24T00:46:06.971Z
+**Stopped at:** Completed 02-01-PLAN.md
+**Resume file:** None
 
 - **Last action:** Phase 2 planned — `02-01-PLAN.md` (tracer: title-leg accidental match + lighter -10 clamped penalty + IDOR/skip-when-correct tests) and `02-02-PLAN.md` (alias leg + floor-clamp/threshold-counts tests) written. ROADMAP + STATE finalized. Both plans validate clean; all 6 locked decisions D-01..D-06 cited; threat_model + assumption_delta_decision + Artifacts sections present.
 - **Next action:** `/gsd-execute-phase 2` (Behavior — accidental-match grading + lighter SRS penalty; Plan 01 Wave 1, then Plan 02 Wave 2).
@@ -107,3 +108,5 @@ progress:
 - [Phase ?]: Locked Option A (D-05): @Transient matchedNoteId + AnswerOutcome enum on Answer; overlap + matchedNotes:List<NoteTopology> on AnsweredQuestion; A1 (@Transient surfaces in OpenAPI) verified via regen-then-grep
 - [Phase ?]: Pure Structure phase: no production writer sets the new fields (grep invariant = 0); AnsweredQuestion.from(RecallPrompt) unchanged; correct stays required/@NotNull and sole SRS-credit signal
 - [Phase ?]: Reused existing NoteTopology (id+title) for matchedNotes; no new note-ref DTO; no Flyway migration (fields are @Transient)
+- [Phase ?]: Set ACCIDENTAL_MATCH @Transient fields on recallPrompt.getAnswer() after merge/save so managed Answer keeps outcome/matchedNoteId
+- [Phase ?]: Plan 02-01 title leg only; alias fallback deferred to Plan 02-02
