@@ -1,5 +1,5 @@
 <template>
-  <div v-if="stats">
+  <div v-if="stats && hasData">
     <RecallStatsTiles :totals="stats.totals ?? {}" />
 
     <section class="mt-6">
@@ -55,6 +55,31 @@
       <AmPmResponseTimeChart :am-pm="stats.amPm ?? {}" />
     </section>
   </div>
+  <div
+    v-else-if="stats"
+    data-testid="recall-stats-empty"
+    class="mt-6 rounded-box bg-base-200 p-6 text-center"
+  >
+    <p class="text-base font-semibold">No reviews yet</p>
+    <p class="mt-1 text-sm opacity-70">
+      Once you start reviewing, your recall stats will appear here.
+    </p>
+  </div>
+  <div
+    v-else-if="error"
+    data-testid="recall-stats-error"
+    class="mt-6 rounded-box bg-base-200 p-6 text-center"
+  >
+    <p class="text-base font-semibold">Couldn't load your stats</p>
+    <button
+      type="button"
+      class="daisy-btn daisy-btn-sm daisy-btn-primary mt-3"
+      data-testid="recall-stats-retry"
+      @click="load"
+    >
+      Try Again
+    </button>
+  </div>
   <ContentLoader v-else />
 </template>
 
@@ -73,8 +98,13 @@ import type { RecallStatsDto } from "@generated/doughnut-backend-api"
 import { computed, onMounted, ref } from "vue"
 
 const stats = ref<RecallStatsDto | undefined>()
+const error = ref(false)
 const window = ref<number | "all">(90)
 const windowOptions: (number | "all")[] = [30, 90, "all"]
+
+const hasData = computed(
+  () => (stats.value?.totals?.totalReviewsAllTime ?? 0) > 0
+)
 
 const sliceSize = computed(() =>
   window.value === "all" ? 90 : (window.value as number)
@@ -90,12 +120,18 @@ const visibleRetentionTrend = computed(() => {
   return trend.slice(Math.max(0, trend.length - sliceSize.value))
 })
 
-onMounted(async () => {
-  const { data, error } = await apiCallWithLoading(() =>
+const load = async () => {
+  error.value = false
+  stats.value = undefined
+  const { data, error: apiError } = await apiCallWithLoading(() =>
     UserController.getRecallStats({ query: { timezone: timezoneParam() } })
   )
-  if (!error) {
+  if (apiError) {
+    error.value = true
+  } else {
     stats.value = data
   }
-})
+}
+
+onMounted(load)
 </script>

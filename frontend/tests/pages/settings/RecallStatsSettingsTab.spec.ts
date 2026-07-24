@@ -158,4 +158,46 @@ describe("RecallStatsSettingsTab", () => {
     expect(bestWorst.text()).toContain("10")
     expect(bestWorst.text()).toContain("20")
   })
+
+  it("shows an empty state when there are no reviews yet", async () => {
+    mockSdkService(UserController, "getRecallStats", {
+      totals: { totalReviewsAllTime: 0 },
+    })
+
+    const wrapper = helper
+      .component(RecallStatsSettingsTab)
+      .withRouter()
+      .mount()
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="recall-stats-empty"]').exists()).toBe(
+      true
+    )
+    expect(
+      wrapper.find('[data-testid="recall-activity-calendar"]').exists()
+    ).toBe(false)
+  })
+
+  it("shows an error state with a retry button when the stats request fails", async () => {
+    vi.spyOn(UserController, "getRecallStats").mockResolvedValue({
+      data: undefined,
+      error: { statusCode: 500 },
+      // biome-ignore lint/suspicious/noExplicitAny: error-path mock shape
+    } as any)
+
+    const wrapper = helper
+      .component(RecallStatsSettingsTab)
+      .withRouter()
+      .mount()
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="recall-stats-error"]').exists()).toBe(
+      true
+    )
+    const retry = wrapper.find('[data-testid="recall-stats-retry"]')
+    expect(retry.exists()).toBe(true)
+    await retry.trigger("click")
+    await flushPromises()
+    expect(UserController.getRecallStats).toHaveBeenCalledTimes(2)
+  })
 })
