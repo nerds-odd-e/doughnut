@@ -95,10 +95,10 @@ status: complete
 
 ## Task Commits
 
-1. **Task 1 RED:** `8dfc6a9154` — test(03-02): add failing test for accidental-match reveal UI
-2. **Task 2 GREEN:** `93acbeeab4` — feat(03-02): reveal matched notes after accidental spelling match
+1. **Task 1 RED:** `ae21bf8530` — test(03-02): add failing test for accidental-match reveal UI
+2. **Task 2 GREEN:** `b3a4ab6979` — feat(03-02): reveal matched notes after accidental spelling match
 
-**Plan metadata:** (docs commit follows)
+**Plan metadata:** `005c10e823` (docs: complete plan)
 
 ## Files Created/Modified
 
@@ -133,5 +133,5 @@ None.
 
 - `AnsweredSpellingQuestion.vue` FOUND with `matched-notes-section` and `ACCIDENTAL_MATCH`
 - Spec file FOUND; Vitest 3/3 pass
-- Commits `8dfc6a9154`, `93acbeeab4` FOUND
+- Commits `ae21bf8530`, `b3a4ab6979`, `005c10e823` FOUND
 - No Phase 4 link UI in component
