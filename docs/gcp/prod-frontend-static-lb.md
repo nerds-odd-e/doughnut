@@ -98,7 +98,7 @@ Send to the **backend service (MIG)** at least:
 
 **Optional:** `/robots.txt` can be served from GCS if you upload it in the static tree, or left on the MIG.
 
-**Default service:** In the rendered map, `defaultService` is the MIG (`doughnut-app-service`). Traffic that does not match a static path rule goes to Spring (API, OAuth, deep-link shell fetch, etc.).
+**Default service:** In the rendered map, `defaultService` is the **backend bucket** (`doughnut-frontend-backend-bucket`), not the MIG. Explicit MIG `pathRules` are generated from `backendPathHints` above; every other path falls through to the bucket, and the pathMatcher's `defaultCustomErrorResponsePolicy` turns the bucket's 404 into the active SHA's `index.html` (200) — see [SPA deep links](#spa-deep-links-d-n-and-any-other-client-route) below.
 
 ---
 
@@ -115,13 +115,11 @@ Minimum to send to the **backend bucket** (with prefix rewrite to `frontend/<ACT
 
 ---
 
-## SPA deep links (`/d/…`, `/n…`)
+## SPA deep links (`/d/…`, `/n…`, and any other client route)
 
-There is **no** object per client route under `frontend/<sha>/`. The URL map still sends these paths to the **MIG** (path matcher default). Spring must not serve **classpath** `index.html` for them when that build can differ from the **active GCS** tree (e.g. frontend-only deploy + conditional MIG skip): the HTML would reference new chunk names while `/assets/*` still maps to GCS for the older SHA → **404 on JS**.
+There is **no** object per client route under `frontend/<sha>/`. Any path that isn't an explicit backend path rule or a known static file falls through the URL map's catch-all `/*` pathRule to the **backend bucket**, which 404s (no matching object) — and the pathMatcher's `defaultCustomErrorResponsePolicy` intercepts that 404 and serves `frontend/<ACTIVE_SHA>/index.html` with `overrideResponseCode: 200`. The shell always matches the active GCS tree (no jar/GCS chunk desync, since the backend is never involved).
 
-**Current behavior:** In **prod**, [`ApplicationController`](../../backend/src/main/java/com/odde/doughnut/controllers/ApplicationController.java) handles `/d/**` and `/n**` by HTTP‑fetching the public site root (`doughnut.spa-public-base-url`, overridable with `DOUGHNUT_SPA_PUBLIC_BASE_URL`) so the shell matches what `/` gets from GCS. **Non‑prod** keeps forwarding to classpath `index.html`.
-
-**Alternative (infra-only):** Route deep links to the backend bucket and use **Cloud CDN custom error response** (404 → `index.html` in the active prefix), with strict path rules so `/api/*` never hits the bucket.
+The backend has **no** frontend-serving code — no whitelist to maintain. Adding a new client route only requires a `frontend/src/routes/` change; the LB fallback covers it automatically. `backendPathHints` in [`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json) is the single source of truth for which paths must instead hit the MIG (see [Path routing](#path-routing-what-must-hit-the-mig) above).
 
 ---
 

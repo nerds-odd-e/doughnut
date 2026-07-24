@@ -203,7 +203,6 @@ question:
   regeneration:
     times: 0
 doughnut:
-  spa-public-base-url: ${DOUGHNUT_SPA_PUBLIC_BASE_URL:https://doughnut.odd-e.com}
   # prod: book PDF bytes live in this bucket (GcsBookStorage). Non-prod uses DB storage instead.
   book-pdf:
     gcs:
