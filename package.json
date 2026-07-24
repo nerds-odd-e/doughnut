@@ -98,7 +98,7 @@
     "@types/node": "26.1.1",
     "cypress": "15.19.0",
     "cypress-file-upload": "^5.0.8",
-    "github_action_sound": "^1.0.8",
+    "github_action_sound": "^1.1.0",
     "got": "^15.1.0",
     "hono": "4.12.31",
     "npm-run-all2": "^9.0.2",
