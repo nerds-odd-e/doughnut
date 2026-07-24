@@ -26,11 +26,15 @@ afterEach(() => {
 })
 
 function buildCalendar(): DayCount[] {
+  const end = Math.round(Date.UTC(2026, 6, 24) / 86_400_000)
   const days: DayCount[] = []
-  for (let i = 0; i < 365; i++) {
+  for (let i = 364; i >= 0; i--) {
+    const ed = end - i
+    const dt = new Date(ed * 86_400_000)
+    const date = `${dt.getUTCFullYear()}-${String(dt.getUTCMonth() + 1).padStart(2, "0")}-${String(dt.getUTCDate()).padStart(2, "0")}`
     days.push({
-      date: `1989-01-${String((i % 28) + 1).padStart(2, "0")}`,
-      count: i === 100 ? 10 : 0,
+      date,
+      count: ed === Math.round(Date.UTC(2026, 6, 1) / 86_400_000) ? 10 : 0,
     })
   }
   return days
