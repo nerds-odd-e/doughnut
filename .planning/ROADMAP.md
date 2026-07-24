@@ -155,13 +155,13 @@ Plans:
   2. An overlap response gives no SRS credit (the review is not marked correct).
   3. An overlap response does not mutate note data — the user simply retries the same review.
 
-**Plans:** 2/4 plans executed
+**Plans:** 3/4 plans executed
 
 Plans:
 
 - [x] 06-01-PLAN.md — Tracer: dual-match OVERLAP grade + warning try-again UI + stay/retry
 - [x] 06-02-PLAN.md — Durable D-04: Flyway persist outcome + exclude OVERLAP from wrong-count
-- [ ] 06-03-PLAN.md — Edge cases: dead/unreadable/self → CORRECT; AM + matched-notes gates
+- [x] 06-03-PLAN.md — Edge cases: dead/unreadable/self → CORRECT; AM + matched-notes gates
 - [ ] 06-04-PLAN.md — E2E overlap_try_again.feature (try-again + distinguishing credit)
 
 **UI hint**: yes
@@ -175,7 +175,7 @@ Plans:
 | 3. Reveal both notes after accidental match | 3/3 | Complete    | 2026-07-24 |
 | 4. Offer link between notes | 3/3 | Complete    | 2026-07-24 |
 | 5. Alias-as-wiki-link overlap declaration | 3/3 | Complete    | 2026-07-24 |
-| 6. Overlap "try again, no credit" | 2/4 | In Progress|  |
+| 6. Overlap "try again, no credit" | 3/4 | In Progress|  |
 
 ## Coverage
 

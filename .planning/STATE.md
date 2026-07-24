@@ -5,13 +5,13 @@ milestone_name: milestone
 current_phase: 6
 current_phase_name: Overlap try again no credit
 status: ready_to_execute
-stopped_at: Completed 06-02-PLAN.md
-last_updated: "2026-07-24T12:28:00.000Z"
+stopped_at: Completed 06-03-PLAN.md
+last_updated: "2026-07-24T12:24:33.819Z"
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 16
-  completed_plans: 14
+  completed_plans: 15
 ---
 
 # State: Spelling Answer Match & Link
@@ -26,12 +26,12 @@ progress:
 ## Current Position
 
 - **Phase:** 6 — Overlap "try again, no credit"
-- **Plan:** 06-03 (next)
-- **Status:** 06-02 Flyway D-04 complete — ready to execute 06-03
-- **Progress:** [█████████░] 88% (14/16 plans; 5/6 phases)
+- **Plan:** 06-04 (next)
+- **Status:** 06-03 edges complete — ready to execute 06-04 E2E
+- **Progress:** [█████████░] 94% (15/16 plans; 5/6 phases)
 - **UI contract:** `.planning/phases/06-overlap-try-again-no-credit/06-UI-SPEC.md` (status: approved)
-- **Plans:** 06-01 ✓ → 06-02 ✓ → 06-03 edges → 06-04 E2E
-- **Last completed:** 06-02 persist outcome + exclude OVERLAP from wrong-count
+- **Plans:** 06-01 ✓ → 06-02 ✓ → 06-03 ✓ → 06-04 E2E
+- **Last completed:** 06-03 dead/unreadable/self CORRECT + matched-notes gate
 
 ```
 [x][x][x][x][x][ ] 5/6 phases
@@ -72,6 +72,7 @@ progress:
 | Phase 05 P02 | 9min | 2 tasks | 2 files |
 | Phase 06-overlap-try-again-no-credit P01 | 8min | 2 tasks | 8 files |
 | Phase 06-overlap-try-again-no-credit P02 | 12min | 2 tasks | 4 files |
+| Phase 06 P03 | 3min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -91,7 +92,7 @@ progress:
 ### Known risks / blockers
 
 - None blocking Phase 6. Alias blast radius mitigated by plain-only segregation (Phase 5).
-- Plan 06-02 Flyway D-04 complete (option-flyway). Next: 06-03 edges.
+- Plan 06-03 edges complete. Next: 06-04 E2E.
 
 ### Todos
 
@@ -109,13 +110,13 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T12:28:00.000Z
-**Stopped at:** Completed 06-02-PLAN.md
+**Last session:** 2026-07-24T12:24:33.812Z
+**Stopped at:** Completed 06-03-PLAN.md
 **Resume file:** None
 
-- **Last action:** Completed 06-02 — Flyway outcome + wrong-count exclusion (D-04).
-- **Next action:** Execute 06-03 (edges).
-- **Resume from:** Read this file + `06-03-PLAN.md` + locked `06-CONTEXT.md` / `06-RESEARCH.md`.
+- **Last action:** Completed 06-03 — dead/unreadable/self CORRECT + matched-notes gate proofs.
+- **Next action:** Execute 06-04 (E2E).
+- **Resume from:** Read this file + `06-04-PLAN.md` + locked `06-CONTEXT.md` / `06-RESEARCH.md`.
 
 ## Decisions
 
@@ -133,3 +134,4 @@ progress:
 - [Phase ?]: Dual-match OVERLAP only when reviewed matchAnswer and resolved overlap target also matchAnswer (D-01)
 - [Phase ?]: OVERLAP correct=false + zero mark path; frontend stay/retry via spellingRetryNonce (D-03/D-05)
 - [Phase 6]: 06-02: Auto-selected option-flyway — persist Answer.outcome + exclude OVERLAP from wrong-count; D-03 correct=false unchanged
+- [Phase ?]: 06-03: No production change — 06-01 dual-match + ACCIDENTAL_MATCH-only matched-notes gate already cover D-01/D-07 edges
