@@ -1,0 +1,4 @@
+interface:
+  display_name: "Prepare LIA Product Backlog"
+  short_description: "Shape class-ready LeSS in Action backlogs"
+  default_prompt: "Use $prepare-product-backlog-for-lia to prepare and assess product backlog items for my next LeSS in Action class."
