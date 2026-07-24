@@ -4,13 +4,26 @@ import {
   TextContentController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import MatchedNoteLinkOffer from "@/components/recall/MatchedNoteLinkOffer.vue"
+import RelationTypeSelect from "@/components/links/RelationTypeSelect.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import helper, { mockSdkService } from "@tests/helpers"
+import helper, { mockSdkService, testFolderStub } from "@tests/helpers"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import type { NoteRealm } from "@generated/doughnut-backend-api"
-import { flushPromises } from "@vue/test-utils"
+import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
+
+const routerReplace = vi.fn()
+
+vi.mock("vue-router", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("vue-router")>()
+  return {
+    ...actual,
+    useRouter: () => ({
+      replace: routerReplace,
+    }),
+  }
+})
 
 function buildReviewedAndMatched(): {
   reviewedRealm: NoteRealm
@@ -44,9 +57,38 @@ function mountOffer(reviewedRealm: NoteRealm, matchedRealm: NoteRealm) {
     .mount()
 }
 
+async function selectRelationType(wrapper: VueWrapper, relationType: string) {
+  await wrapper
+    .findComponent(RelationTypeSelect)
+    .vm.$emit("update:modelValue", relationType)
+  await flushPromises()
+}
+
+function mockRelationshipCreate(
+  sourceRealm: NoteRealm,
+  createdRealm: NoteRealm
+) {
+  mockSdkService(NoteController, "showNote", sourceRealm)
+  mockSdkService(TextContentController, "updateNoteContent", sourceRealm)
+  mockSdkService(NotebookController, "listNotebookFolderListing", {
+    folders: [],
+  })
+  mockSdkService(
+    NotebookController,
+    "createFolder",
+    testFolderStub(77, "relations")
+  )
+  return mockSdkService(
+    NotebookController,
+    "createNoteAtNotebookRoot",
+    createdRealm
+  )
+}
+
 describe("MatchedNoteLinkOffer", () => {
   beforeEach(() => {
     vi.resetAllMocks()
+    routerReplace.mockResolvedValue(undefined)
     mockSdkService(NoteController, "showNote", makeMe.aNoteRealm.please())
   })
 
@@ -54,7 +96,7 @@ describe("MatchedNoteLinkOffer", () => {
     teardownGlobalClientForTesting()
   })
 
-  it("shows Link to: with matched title, hides bare wiki and relationship options", async () => {
+  it("shows Link to: with matched title, property and relationship options, hides bare wiki", async () => {
     const { reviewedRealm, matchedRealm } = buildReviewedAndMatched()
     const updateSpy = mockSdkService(
       TextContentController,
@@ -74,7 +116,7 @@ describe("MatchedNoteLinkOffer", () => {
     expect(wrapper.text()).toContain("Matched Target")
     expect(wrapper.text()).not.toContain("Insert as a wiki link")
     expect(wrapper.text()).toContain("Add wiki link as a new property")
-    expect(wrapper.text()).not.toContain("Add a new relationship note")
+    expect(wrapper.text()).toContain("Add a new relationship note")
     expect(wrapper.find("input").exists()).toBe(false)
     expect(updateSpy).not.toHaveBeenCalled()
     expect(createSpy).not.toHaveBeenCalled()
@@ -131,5 +173,50 @@ describe("MatchedNoteLinkOffer", () => {
 
     expect(updateSpy).not.toHaveBeenCalled()
     expect(createSpy).not.toHaveBeenCalled()
+  })
+
+  it("does not create a relationship note until the user confirms relation type", async () => {
+    const { reviewedRealm, matchedRealm } = buildReviewedAndMatched()
+    const createdRealm = makeMe.aNoteRealm
+      .title("Created relationship")
+      .please()
+    const createSpy = mockRelationshipCreate(reviewedRealm, createdRealm)
+
+    const wrapper = mountOffer(reviewedRealm, matchedRealm)
+    await flushPromises()
+
+    expect(createSpy).not.toHaveBeenCalled()
+
+    await wrapper
+      .findAll("button")
+      .find((b) => b.text().includes("Add a new relationship note"))!
+      .trigger("click")
+    await flushPromises()
+
+    expect(createSpy).not.toHaveBeenCalled()
+    expect(wrapper.text()).toContain("Relation note location")
+  })
+
+  it("creates relationship note, closes dialog, and does not navigate", async () => {
+    const { reviewedRealm, matchedRealm } = buildReviewedAndMatched()
+    const createdRealm = makeMe.aNoteRealm
+      .title("Created relationship")
+      .please()
+    const createSpy = mockRelationshipCreate(reviewedRealm, createdRealm)
+
+    const wrapper = mountOffer(reviewedRealm, matchedRealm)
+    await flushPromises()
+
+    await wrapper
+      .findAll("button")
+      .find((b) => b.text().includes("Add a new relationship note"))!
+      .trigger("click")
+    await flushPromises()
+
+    await selectRelationType(wrapper, "related to")
+
+    expect(createSpy).toHaveBeenCalledTimes(1)
+    expect(routerReplace).not.toHaveBeenCalled()
+    expect(wrapper.emitted("closeDialog")).toHaveLength(1)
   })
 })
