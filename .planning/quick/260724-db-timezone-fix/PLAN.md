@@ -47,7 +47,7 @@ and DB were already both UTC, but still worth keeping as a safety net).
 - Wrap-up: targeted backend test + one recall-related E2E spec; commit + push;
   prod rollout is via MIG startup-script update + rolling replace (runbook note).
 
-### Phase 2 — Behavior: repair skewed `quiz_answer.created_at` window — in-progress (migration written, not yet deployed)
+### Phase 2 — Behavior: repair skewed `quiz_answer.created_at` window — done
 
 Stats become fully correct for the confirmed ~11-month skewed core window.
 Vehicle: **placeholder-gated Flyway migration** deployed via CD (decision
@@ -217,6 +217,14 @@ to skip entirely.
   `RecallStatsTimeZoneRepairMigrationTest` (loads the actual migration SQL from the
   classpath, substitutes the real default placeholder, asserts 0 rows updated and an
   inserted row's timestamp is unchanged — proves the no-op safety net). Full backend
-  suite green; `pnpm lint:all` / `pnpm format:all` clean. Not yet deployed to prod —
-  next step is push + let CD roll out, then confirm via the stats UI and
-  `flyway_schema_history`.
+  suite green; `pnpm lint:all` / `pnpm format:all` clean.
+
+- 2026-07-24: Phase 2 deployed and verified. Pushed to `main` (`089710c90f`), CI green,
+  CD rolling-replaced both MIG instances (confirmed healthy on the new template).
+  Confirmed via read-only prod SSH:
+  - `flyway_schema_history`: version `300000233` `success=1`, installed
+    `2026-07-24 09:36:24`.
+  - Post-repair hourly histogram for `id BETWEEN 180685 AND 225258` now peaks at raw
+    UTC hours 22-1 (≈06:00-09:00 local) with a secondary bump at UTC 11-14
+    (≈19:00-22:00 local) — matches the user's confirmed real habit; the old spurious
+    14:00-17:00-local cluster is gone. Phase 2 closed.
