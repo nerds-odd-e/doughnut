@@ -68,7 +68,7 @@ Ran against project `carbon-syntax-298809` (gcloud reauth required, then succeed
 `forwardedUrl("/index.html")` for `GET /settings` and `GET /settings/recall-stats`;
 confirmed red/404 before the mapping change). `backend:test_only` green.
 
-### Phase 2 — Structure: migrate prod LB from classic to global external ALB (planned)
+### Phase 2 — Structure: migrate prod LB from classic to global external ALB (done)
 
 No external behavior change (staged, near-zero-downtime, GCP-native migration path);
 enables `customErrorResponsePolicy` for Phase 3. Resources in play (project
@@ -88,6 +88,13 @@ Order: backend service → backend bucket (via forwarding rule flag) → forward
 (must fully migrate the backend service before starting the bucket/forwarding rule,
 per GCP requirement).
 
+**Simplified 2026-07-24 (developer decision, low prod traffic):** skip percentage-based
+traffic-shifting steps (10%/50%) for the remaining forwarding-rule stage — go straight
+`PREPARE` → `TEST_ALL_TRAFFIC` → finalize, keeping only the mandatory ~6 min
+stabilization wait between each state (that wait is about GCP infra settling, not
+about traffic percentage). Backend service and the first half of the bucket migration
+had already gone through 10%/50% before this decision.
+
 | Step | Command | Wait | Smoke check | Rollback |
 |---|---|---|---|---|
 | 2a | `gcloud compute backend-services update doughnut-app-service --external-managed-migration-state=PREPARE --global` | ≥6 min | `curl -sf $BASE/api/healthcheck` | re-run with `--external-managed-migration-state=PREPARE` is idempotent; no traffic shifted yet |
@@ -98,12 +105,29 @@ per GCP requirement).
 | 2f | `gcloud compute forwarding-rules update doughnut-app-https-content-rule --external-managed-backend-bucket-migration-state=PREPARE --global` | ≥6 min | `curl -sI $BASE/` (200 from bucket) | re-run PREPARE; no shift yet |
 | 2g | same with `TEST_BY_PERCENTAGE --external-managed-backend-bucket-migration-testing-percentage=10`, then `50` | ≥6 min each | `curl -sI $BASE/` and a real `/assets/*` URL | drop back a stage |
 | 2h | `--external-managed-backend-bucket-migration-state=TEST_ALL_TRAFFIC` | ≥6 min | same | drop back |
-| 2i | `gcloud compute forwarding-rules update doughnut-app-https-content-rule --external-managed-migration-state=PREPARE --global` → `TEST_BY_PERCENTAGE` (10, 50) → `TEST_ALL_TRAFFIC` → `--load-balancing-scheme=EXTERNAL_MANAGED` (finalize forwarding rule) | ≥6 min each | full smoke: `/`, `/api/healthcheck`, a real `/assets/*` URL, `/settings` (still via Phase 1 whitelist at this point) | reverse staged steps; GCP rollback window after finalize |
+| 2i | `gcloud compute forwarding-rules update doughnut-app-https-content-rule --load-balancing-scheme=EXTERNAL_MANAGED --global` (finalize forwarding rule — **correction**: `--external-managed-backend-bucket-migration-state` is the *only* state machine for this forwarding rule's own EXTERNAL→EXTERNAL_MANAGED readiness despite its name; steps 2f–2h already drove it to `TEST_ALL_TRAFFIC`, so no separate PREPARE/TEST cycle is needed here) | ≥6 min | full smoke: `/`, `/api/healthcheck`, a real `/assets/*` URL, `/settings` (still via Phase 1 whitelist at this point) | GCP rollback window after finalize |
 
 - Verify final state: `gcloud compute forwarding-rules describe doughnut-app-https-content-rule --global --format='value(loadBalancingScheme)'` → `EXTERNAL_MANAGED`; same for `doughnut compute backend-services describe doughnut-app-service --global`.
 - Stop-safe: identical external behavior throughout and after; unblocks Phase 3.
   If migration is abandoned partway, everything still works (classic or in-test
   states both serve traffic); nothing here is user-visible.
+
+**Done (2026-07-24):** Both `doughnut-app-service` and `doughnut-app-https-content-rule`
+confirmed `EXTERNAL_MANAGED`. Ran 2a–2e (backend service, with 10%/50% percentage
+testing) and 2f–2i (bucket + forwarding rule scheme, simplified per developer
+decision to skip percentage-testing given low prod traffic — went `PREPARE` →
+`TEST_ALL_TRAFFIC` → finalize, keeping only the mandatory ~6 min stabilization waits).
+Smoke-checked after every state change; zero failures throughout. Final comprehensive
+check: `/`, `/api/healthcheck`, a real `/assets/*.js`, `/settings`, `/settings/recall-stats`,
+`/d/1`, `/notebooks` all 200. `doughnut-app-http-content-rule` (HTTP→HTTPS redirect,
+no backend) left untouched as planned.
+**Learning:** `forwarding-rules update --external-managed-backend-bucket-migration-state`
+is the *only* state machine governing that forwarding rule's own EXTERNAL→EXTERNAL_MANAGED
+readiness (its name is misleading — it is not bucket-specific). There is no separate
+`--external-managed-migration-state` flag for forwarding rules (that flag only exists
+for `backend-services update`). Once this state reaches `TEST_ALL_TRAFFIC`, finalize
+directly with `--load-balancing-scheme=EXTERNAL_MANAGED` — no separate PREPARE/TEST
+cycle needed for "the forwarding rule itself" as Phase 2's original table implied.
 
 ### Phase 3 — Behavior: LB serves the SPA shell for any non-backend path (planned)
 
