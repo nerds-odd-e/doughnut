@@ -161,6 +161,15 @@ Then(
   }
 )
 
+Then(
+  'I should see an accidental match reveal for spelling answer {string} with reviewed note {string} and matched note {string}',
+  (answer: string, reviewedNoteTitle: string, matchedNoteTitle: string) => {
+    start
+      .assumeAnsweredQuestionPage()
+      .expectAccidentalMatchReveal(answer, reviewedNoteTitle, matchedNoteTitle)
+  }
+)
+
 Then('I should see that my answer is correct as the last question', () => {
   start
     .assumeAnsweredQuestionPage()

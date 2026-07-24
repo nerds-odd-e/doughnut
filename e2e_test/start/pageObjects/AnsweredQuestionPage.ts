@@ -22,6 +22,35 @@ const assumeAnsweredQuestionPage = () => {
     expectSpellingAnswerToBeIncorrect(answer: string) {
       cy.findByText(`Your answer \`${answer}\` is incorrect.`).should('exist')
     },
+    expectAccidentalMatchReveal(
+      answer: string,
+      reviewedNoteTitle: string,
+      matchedNoteTitle: string
+    ) {
+      cy.findByTestId('accidental-match-alert')
+        .should('be.visible')
+        .and(
+          'contain.text',
+          `Your answer \`${answer}\` names another note — not correct for this review.`
+        )
+      cy.findByText(`Your answer \`${answer}\` is incorrect.`).should(
+        'not.exist'
+      )
+      cy.findByText('Note under question').should('be.visible')
+      cy.get('[data-test="note-title"]')
+        .filter(`:contains("${reviewedNoteTitle}")`)
+        .should('have.length.at.least', 1)
+      cy.findByTestId('matched-notes-section')
+        .scrollIntoView()
+        .should('be.visible')
+        .within(() => {
+          cy.findByText('Matched note(s)').should('be.visible')
+          cy.get('[data-test="note-title"]')
+            .filter(`:contains("${matchedNoteTitle}")`)
+            .should('have.length.at.least', 1)
+        })
+      return this
+    },
     viewMemoryTracker() {
       pageIsNotLoading()
       cy.findByRole('button', { name: 'View Memory Tracker' })
