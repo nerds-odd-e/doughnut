@@ -280,7 +280,7 @@ public class MemoryTrackerService {
     recallPrompt.setAnswer(answer);
     recallPrompt = entityPersister.save(recallPrompt);
 
-    if (!correct) {
+    if (!correct && spellingAnswer != null && !spellingAnswer.isBlank()) {
       Optional<Note> match = wikiLinkResolver.findAccidentalMatch(spellingAnswer, note, user);
       if (match.isPresent()) {
         Answer gradedAnswer = recallPrompt.getAnswer();

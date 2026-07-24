@@ -40,6 +40,9 @@ public class WikiLinkResolver {
   }
 
   public Optional<Note> findAccidentalMatch(String answer, Note reviewedNote, User viewer) {
+    if (answer == null || answer.isBlank()) {
+      return Optional.empty();
+    }
     Optional<Note> titleMatch =
         firstReadableAccidentalCandidate(
             noteRepository.findByNoteTitleOrderByIdAsc(answer), reviewedNote, viewer);

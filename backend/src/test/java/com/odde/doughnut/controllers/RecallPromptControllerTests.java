@@ -23,6 +23,7 @@ import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.odde.doughnut.utils.TimestampOperations;
 import com.openai.client.OpenAIClient;
 import com.openai.models.responses.StructuredResponseCreateParams;
+import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,6 +44,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
   @Autowired GlobalSettingsService globalSettingsService;
   @Autowired NoteAliasIndexService noteAliasIndexService;
   @Autowired MemoryTrackerService memoryTrackerService;
+  @Autowired EntityManager entityManager;
   OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
   @BeforeEach
@@ -754,6 +756,38 @@ class RecallPromptControllerTests extends ControllerTestBase {
           answerResult.getAnswer().getMatchedNoteId(), equalTo(secondNote.getId().longValue()));
       assertNull(answerResult.getMatchedNotes());
       assertNull(answerResult.getOverlap());
+    }
+
+    @Test
+    void shouldGradeBlankAnswerAsPlainWrongEvenWhenEmptyTitleReadableNoteExists()
+        throws UnexpectedNoAccessRightException {
+      Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      Note emptyTitleNote = makeMe.aNote().notebook(otherNotebook).title("temp").please();
+      entityManager
+          .createQuery("UPDATE Note n SET n.title = '' WHERE n.id = :id")
+          .setParameter("id", emptyTitleNote.getId())
+          .executeUpdate();
+      entityManager.flush();
+      answerDTO.setSpellingAnswer("");
+
+      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+
+      assertFalse(answerResult.getAnswer().getCorrect());
+      assertNull(answerResult.getAnswer().getOutcome());
+      assertNull(answerResult.getAnswer().getMatchedNoteId());
+      assertNull(answerResult.getMatchedNotes());
+      assertNull(answerResult.getOverlap());
+    }
+
+    @Test
+    void shouldGradeWhitespaceOnlyAnswerAsPlainWrong() throws UnexpectedNoAccessRightException {
+      answerDTO.setSpellingAnswer("   \t  ");
+
+      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+
+      assertFalse(answerResult.getAnswer().getCorrect());
+      assertNull(answerResult.getAnswer().getOutcome());
+      assertNull(answerResult.getAnswer().getMatchedNoteId());
     }
 
     @Test
