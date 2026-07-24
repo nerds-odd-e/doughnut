@@ -1,4 +1,4 @@
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import { form } from '../forms'
 import { commonSenseSplit } from '../../support/string_util'
 import { assumeNoteTargetSearchDialog } from './noteTargetSearchDialog'
@@ -48,7 +48,7 @@ export const noteRelationshipMethods = () => ({
       cy.findByRole('button', { name: 'Relation Type' }).click()
     })
     form.getField('Relation Type').clickOption(relationType)
-    pageIsNotLoading()
+    waitUntilAppIsNotBusy()
   },
 
   startSearchingAndAddRelationship() {

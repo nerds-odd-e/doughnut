@@ -1,4 +1,4 @@
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import { form } from '../forms'
 import bookReadingPage from './bookReadingPage'
 import { sidebarChildNotePageMethods } from './sidebarChildNotePageMethods'
@@ -42,13 +42,13 @@ const notebookPage = () => {
 
     runLint() {
       cy.get('[data-testid="notebook-health-run"]').click()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return this
     },
 
     applyFix() {
       cy.get('[data-testid="notebook-health-fix"]').click()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return this
     },
 
@@ -66,7 +66,7 @@ const notebookPage = () => {
 
     saveAsDefaults() {
       cy.get('[data-testid="notebook-health-save-defaults"]').click()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return this
     },
 
@@ -166,7 +166,7 @@ const notebookPage = () => {
       openSettingsTab()
       form.getField('Skip Memory Tracking').check()
       clickButton('Update Settings')
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
     },
 
     attachEpubFixture(relativePath: string) {
@@ -174,7 +174,7 @@ const notebookPage = () => {
       cy.get('[data-testid="notebook-no-book"]')
         .find('input[type="file"]')
         .selectFile(`e2e_test/fixtures/${relativePath}`, { force: true })
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('[data-testid="notebook-attached-book"]').should('be.visible')
       return this
     },
@@ -183,7 +183,7 @@ const notebookPage = () => {
       cy.get('[data-testid="notebook-no-book"]')
         .find('input[type="file"]')
         .selectFile(`e2e_test/fixtures/${relativePath}`, { force: true })
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return this
     },
     expectEpubAttachErrorContaining(messageSubstring: string) {
@@ -198,7 +198,7 @@ const notebookPage = () => {
       openSettingsTab()
       cy.findByRole('button', { name: 'Share notebook to bazaar' }).click()
       cy.findByRole('button', { name: 'OK' }).click()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return this
     },
     moveNotebookToCircle() {
@@ -213,11 +213,11 @@ const notebookPage = () => {
         .click()
         .type(text, { delay: 0 })
         .blur()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return this
     },
     expectNotebookReadmeBodyContains(fragment: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('[data-testid="notebook-readme-body"] .ql-editor').should(
         'contain.text',
         fragment
@@ -225,7 +225,7 @@ const notebookPage = () => {
       return this
     },
     readBook(bookTitle: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       openSettingsTab()
       cy.get('[data-testid="notebook-attached-book"]').within(() => {
         cy.contains(bookTitle)

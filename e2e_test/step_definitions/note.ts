@@ -361,7 +361,7 @@ When('I am creating a note in the notebook {string}', (notebook: string) => {
 })
 
 Then('I should see {string} in breadcrumb', (noteTitles: string) => {
-  start.pageIsNotLoading().assumeNotePage().expectBreadcrumb(noteTitles)
+  start.waitUntilAppIsNotBusy().assumeNotePage().expectBreadcrumb(noteTitles)
 })
 
 Then('the note title should be {string}', (title: string) => {
@@ -384,7 +384,7 @@ Then(
   'I should see folder {notepath} containing these notes:',
   (notePath: NotePath, data: DataTable) => {
     start
-      .pageIsNotLoading()
+      .waitUntilAppIsNotBusy()
       .navigateToNotebooksPage()
       .expandFolderInSidebar(notePath)
       .expectChildrenUnderSidebarFolder(data.hashes())
@@ -493,7 +493,7 @@ Then(
 )
 
 Then('I should be on a notebook folder page in the browser', () => {
-  start.pageIsNotLoading()
+  start.waitUntilAppIsNotBusy()
   cy.location('pathname').should('match', /^\/notebooks\/\d+\/folders\/\d+$/)
 })
 
@@ -506,7 +506,7 @@ Then('the note document toolbar is not present', () => {
 })
 
 Then('I should be on the notebook root page in the browser', () => {
-  start.pageIsNotLoading()
+  start.waitUntilAppIsNotBusy()
   cy.location('pathname').should('match', /^\/notebooks\/\d+$/)
 })
 
@@ -518,7 +518,7 @@ Then(
   'note {string} should show the rich content elements in the note content:',
   (noteTitle: string, data: DataTable) => {
     start.jumpToNotePage(noteTitle, true)
-    start.pageIsNotLoading()
+    start.waitUntilAppIsNotBusy()
     start
       .assumeNotePage(noteTitle)
       .switchToRichContent()
@@ -540,7 +540,7 @@ Then(
   'I should see {string} is {string} than {string}',
   (left: string, aging: string, right: string) => {
     let leftColor = ''
-    start.pageIsNotLoading().jumpToNotePage(left)
+    start.waitUntilAppIsNotBusy().jumpToNotePage(left)
     cy.get('.note-recent-update-indicator')
       .invoke('css', 'color')
       .then((val) => {
@@ -565,7 +565,7 @@ Then(
 
 When('I undo {string}', (undoType: string) => {
   start.assumeNotePage().undo(undoType)
-  start.pageIsNotLoading()
+  start.waitUntilAppIsNotBusy()
 })
 
 When('I undo {string} again', (undoType: string) => {
@@ -616,7 +616,7 @@ When(
       .replyToConversationAndInviteAiToReply(
         'Please complete the note content.'
       )
-    start.pageIsNotLoading()
+    start.waitUntilAppIsNotBusy()
   }
 )
 
@@ -770,7 +770,7 @@ When(
 
 When('I reload the current page for note {string}', (noteTopology: string) => {
   cy.reload()
-  start.pageIsNotLoading()
+  start.waitUntilAppIsNotBusy()
   start.assumeNotePage(noteTopology)
 })
 

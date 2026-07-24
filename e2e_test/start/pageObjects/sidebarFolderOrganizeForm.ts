@@ -2,7 +2,7 @@ import {
   clickPopupConfirmOk,
   declineMergeConfirmIfShown,
 } from '../../support/daisyModalHelpers'
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 
 const submitTimeoutMs = 20000
 
@@ -62,7 +62,7 @@ export function assumeSidebarFolderOrganizeForm(): SidebarFolderOrganizeForm {
       cy.get('[data-testid="folder-move-submit"]', { timeout: submitTimeoutMs })
         .should('not.be.disabled')
         .click()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
     },
 
     tryConfirmMove() {
@@ -78,7 +78,7 @@ export function assumeSidebarFolderOrganizeForm(): SidebarFolderOrganizeForm {
         .should('not.be.disabled')
         .click()
       clickPopupConfirmOk()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
     },
 
     expectErrorText(text: string) {
@@ -95,7 +95,7 @@ export function assumeSidebarFolderOrganizeForm(): SidebarFolderOrganizeForm {
         .should('not.be.disabled')
         .click()
       clickPopupConfirmOk()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
     },
 
     dissolveFolderWithMerge() {
@@ -106,7 +106,7 @@ export function assumeSidebarFolderOrganizeForm(): SidebarFolderOrganizeForm {
         .click()
       clickPopupConfirmOk()
       clickPopupConfirmOk()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
     },
   }
 }

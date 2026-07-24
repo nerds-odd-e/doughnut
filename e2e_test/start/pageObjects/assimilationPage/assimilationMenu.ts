@@ -1,6 +1,6 @@
 import { UserController } from '@generated/doughnut-backend-api/sdk.gen'
 import type { MenuDataDto } from '@generated/doughnut-backend-api'
-import { pageIsNotLoading } from '../../pageBase'
+import { waitUntilAppIsNotBusy } from '../../pageBase'
 import {
   assimilationDueFromTriple,
   assimilationToastMessages,
@@ -37,7 +37,7 @@ export const assimilation = () => {
     },
     startAssimilationFromMenu() {
       clickAssimilateListItemInSidebar()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return this
     },
     startAssimilationFromMenuAndObserveBlockingLoading() {
@@ -56,7 +56,7 @@ export const assimilation = () => {
         'be.visible'
       )
       cy.wait('@nextAssimilation')
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return this
     },
     expectDailyAssimilationGoalToast() {

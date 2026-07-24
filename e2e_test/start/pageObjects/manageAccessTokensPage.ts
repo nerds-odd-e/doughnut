@@ -1,9 +1,9 @@
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import { submittableForm } from 'start/forms'
 
 export const visitManageAccessTokensPage = () => {
   cy.visit('/settings/access-tokens')
-  pageIsNotLoading()
+  waitUntilAppIsNotBusy()
   return manageAccessTokensPage()
 }
 
@@ -21,7 +21,7 @@ export const manageAccessTokensPage = () => {
         cy.findByRole('button', { name: 'Delete' }).click()
       })
       cy.findByRole('button', { name: 'OK' }).click()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return this
     },
     checkTokenWithLabelNotExists(label: string) {

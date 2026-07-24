@@ -1,5 +1,5 @@
 import { commonSenseSplit } from '../../support/string_util'
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import testability from '../testability'
 import audioToolsPage from './audioToolsPage'
 import noteCreationForm from './forms/noteCreationForm'
@@ -145,7 +145,7 @@ export const assumeNotePage = (
         .find('[role=title]')
         .first()
         .should('contain', newTitle)
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       testability().renameInjectedNoteTitleForNoteOnPage(newTitle)
     },
     audioTools() {
@@ -161,7 +161,7 @@ export const assumeNotePage = (
         .first()
         .click({ force: true })
       findNoteContentRegion().should('be.visible')
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return assumeNotePage()
     },
     expectDeadWikiLink(linkText: string) {

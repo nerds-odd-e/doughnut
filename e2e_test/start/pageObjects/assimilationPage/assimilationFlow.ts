@@ -1,5 +1,5 @@
 import { commonSenseSplit } from 'support/string_util'
-import { pageIsNotLoading } from '../../pageBase'
+import { waitUntilAppIsNotBusy } from '../../pageBase'
 import { form } from '../../forms'
 import { assimilationPropertyMemoryTrackerExpectations } from './propertyMemoryTrackerExpectations'
 import { assimilationPropertyFlow } from './assimilationPropertyFlow'
@@ -30,12 +30,12 @@ export const assumeAssimilationPage = () => ({
   openRefineNoteModal() {
     cy.get('[data-test="refine-note-modal"]').then(($modal) => {
       if ($modal.hasClass('daisy-modal-open')) {
-        pageIsNotLoading()
+        waitUntilAppIsNotBusy()
         return
       }
       cy.get('[data-test="open-refine-note-modal"]').scrollIntoView().click()
       cy.get('[data-test="refine-note-modal"].daisy-modal-open').should('exist')
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
     })
     return this
   },
@@ -50,18 +50,18 @@ export const assumeAssimilationPage = () => ({
   },
   assimilateOnPanel() {
     this.clickAssimilate()
-    pageIsNotLoading()
+    waitUntilAppIsNotBusy()
     return this
   },
   skipRecallOnPanel() {
     cy.findByText('Skip recall').click()
     cy.findByRole('button', { name: 'OK' }).click()
-    pageIsNotLoading()
+    waitUntilAppIsNotBusy()
     return this
   },
   reviveRecallOnPanel() {
     reviveButton().click()
-    pageIsNotLoading()
+    waitUntilAppIsNotBusy()
     return this
   },
   expectReviveOnPanel() {
@@ -90,7 +90,7 @@ export const assumeAssimilationPage = () => ({
         this.proceedWithRememberingSpelling()
         this.verifySpellingWith(noteTitle.trim())
         this.expectPopupClosed()
-        pageIsNotLoading()
+        waitUntilAppIsNotBusy()
       })
     return this
   },
@@ -150,7 +150,7 @@ export const assumeAssimilationPage = () => ({
       this.skipRecallOnPanel()
     } else {
       this.clickAssimilate()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
     }
     return this
   },
@@ -160,13 +160,13 @@ export const assumeAssimilationPage = () => ({
     })
   },
   assimilateCurrentNote() {
-    pageIsNotLoading()
+    waitUntilAppIsNotBusy()
     this.clickAssimilate()
     return this
   },
   checkRememberSpellingOption() {
     form.getField('Remember Spelling').check()
-    pageIsNotLoading()
+    waitUntilAppIsNotBusy()
     return this
   },
   verifySpellingWith(text: string) {

@@ -1,4 +1,4 @@
-import { pageIsNotLoading } from './pageBase'
+import { waitUntilAppIsNotBusy } from './pageBase'
 import { formField } from './formField'
 
 const inputElement = (label: string) => cy.findByLabelText(label)
@@ -46,7 +46,7 @@ const submittableForm = {
       } else {
         cy.findByRole('button', { name: 'Save' }).click()
       }
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
     })
   },
   submitWith(noteAttributes: Record<string, string | undefined>) {

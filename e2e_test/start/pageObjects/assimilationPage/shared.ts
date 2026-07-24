@@ -1,4 +1,4 @@
-import { pageIsNotLoading } from '../../pageBase'
+import { waitUntilAppIsNotBusy } from '../../pageBase'
 
 export const assimilateButtonSelector = '[data-test="assimilate"]'
 export const reviveButtonSelector = '[data-test="revive"]'
@@ -78,7 +78,7 @@ export function propertyMemoryTrackerRowLabel(propertyKey: string) {
 }
 
 export function waitForAssimilationNoteTitle(expectedTitle?: string) {
-  pageIsNotLoading()
+  waitUntilAppIsNotBusy()
   cy.get('#main-note-content', { timeout: 15000 }).should('be.visible')
   const title = cy.get(mainNoteHeadingTitleSelector, { timeout: 15000 })
   if (expectedTitle !== undefined && expectedTitle.trim() !== '') {

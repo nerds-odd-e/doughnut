@@ -1,4 +1,4 @@
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import { form } from '../forms'
 import { navigateToNotebooksPage } from './myNotebooksPage'
 import { assumeAdminDashboardPage } from './adminPages/adminDashboardPage'
@@ -7,7 +7,6 @@ import { manageAccessTokensPage } from './manageAccessTokensPage'
 
 export const mainMenu = () => {
   navigateToNotebooksPage()
-  pageIsNotLoading()
 
   return {
     adminDashboard() {
@@ -31,7 +30,7 @@ export const mainMenu = () => {
             changeName(name: string) {
               form.getField('Name').assignValue(name)
               cy.findByText('Submit').click()
-              pageIsNotLoading()
+              waitUntilAppIsNotBusy()
             },
           }
         },

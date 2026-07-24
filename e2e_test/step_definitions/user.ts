@@ -38,7 +38,7 @@ Given('I am re-logged in as an admin', (_tabName: string) => {
 })
 
 Given('my session is logged out', () => {
-  return start.pageIsNotLoading().logout()
+  return start.waitUntilAppIsNotBusy().logout()
 })
 
 Given("I'm on the login page", () => {
@@ -78,7 +78,7 @@ When('I save my profile with:', (data: DataTable) => {
     name: /Please create your profile/i,
     timeout: 15000,
   }).should('not.exist')
-  start.pageIsNotLoading()
+  start.waitUntilAppIsNotBusy()
 })
 
 Then(

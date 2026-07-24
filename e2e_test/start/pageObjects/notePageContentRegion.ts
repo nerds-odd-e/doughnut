@@ -1,4 +1,4 @@
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import { clickPopupConfirmOk } from '../../support/daisyModalHelpers'
 
 export const noteContentRegion = {
@@ -15,7 +15,7 @@ export function confirmPropertyMemoryTrackerChange() {
     .contains('memory tracker')
     .should('be.visible')
   clickPopupConfirmOk()
-  pageIsNotLoading()
+  waitUntilAppIsNotBusy()
 }
 
 const SCOPED_README_BODY_TEST_IDS = [

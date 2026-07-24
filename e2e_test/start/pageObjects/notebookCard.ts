@@ -1,4 +1,4 @@
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import {
   clickNotebookCardTitleToOpenNotebookPage,
   findNotebookCardButton,
@@ -17,7 +17,7 @@ export const notebookCard = (notebook: string) => ({
   unsubscribe() {
     findNotebookCardButton(notebook, 'Unsubscribe').click()
     cy.findByRole('button', { name: 'OK' }).click()
-    pageIsNotLoading()
+    waitUntilAppIsNotBusy()
   },
   openNotebookPage() {
     clickNotebookCardTitleToOpenNotebookPage(notebook)

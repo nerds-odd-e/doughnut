@@ -1,4 +1,4 @@
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import {
   assumeAssimilationPage,
   assimilateButtonSelector,
@@ -70,7 +70,7 @@ export const noteConversationAndQuestionMethods = () => ({
 
   openAssimilationSettings() {
     makeSureNoteMoreOptionsFormIsOpen().openAssimilationSettings()
-    pageIsNotLoading()
+    waitUntilAppIsNotBusy()
     return assumeAssimilationPage()
   },
   setLevel(level: number) {
@@ -78,13 +78,13 @@ export const noteConversationAndQuestionMethods = () => ({
     form.getField('Level').within(() => {
       cy.findByRole('button', { name: `${level}` }).click()
     })
-    pageIsNotLoading()
+    waitUntilAppIsNotBusy()
     return this
   },
   setRememberSpelling() {
     this.openAssimilationSettings()
     form.getField('Remember Spelling').check()
-    pageIsNotLoading()
+    waitUntilAppIsNotBusy()
     return this
   },
   expectWithoutAssimilationPanel() {

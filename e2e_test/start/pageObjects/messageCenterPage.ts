@@ -1,4 +1,4 @@
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import router from 'start/router'
 
 function conversationPane() {
@@ -15,7 +15,7 @@ function conversationPane() {
         .type(message)
       cy.findByRole('button', { name: 'Send message' }).click()
       cy.findByText(message).should('be.visible')
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return this
     },
   }
@@ -23,7 +23,7 @@ function conversationPane() {
 
 function withinConversationList(fn: () => void) {
   cy.findByText('Message Center').should('be.visible')
-  pageIsNotLoading()
+  waitUntilAppIsNotBusy()
   cy.get('[data-testid="message-center-conversation-item"]').should(
     'have.length.at.least',
     1
@@ -52,7 +52,7 @@ export const assumeMessageCenterPage = () => {
           .should('be.visible')
           .click()
       })
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return conversationPane()
     },
     expectMessageDisplayAtUserSide(message: string) {
@@ -74,7 +74,7 @@ export const assumeMessageCenterPage = () => {
           .should('be.visible')
           .click()
       })
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return conversationPane()
     },
     replyToConversation(
@@ -90,7 +90,7 @@ export const assumeMessageCenterPage = () => {
           .type(message)
         cy.findByRole('button', { name: 'Send message' }).click()
         cy.findByText(message).should('be.visible')
-        pageIsNotLoading()
+        waitUntilAppIsNotBusy()
       })
       return this
     },
@@ -118,7 +118,7 @@ export const waitForConversationList = (options?: {
       ).to.be.true
     }
   })
-  pageIsNotLoading()
+  waitUntilAppIsNotBusy()
 }
 
 export const navigateToMessageCenter = () => {

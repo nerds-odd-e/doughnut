@@ -1,5 +1,5 @@
 import { assumeMessageCenterPage } from './messageCenterPage'
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 
 export function waitForMenuDataUnreadCount() {
   cy.intercept('GET', '**/api/user/menu-data**').as('menuDataForUnreadCount')
@@ -26,7 +26,7 @@ export function messageCenterIndicator() {
       getMessageInSidebar(($el) => {
         $el.click()
       })
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return assumeMessageCenterPage()
     },
   }

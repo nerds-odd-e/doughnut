@@ -1,6 +1,6 @@
 import { clickDaisyDialogButton } from '../../../support/daisyModalHelpers'
 import { commonSenseSplit } from '../../../support/string_util'
-import { pageIsNotLoading } from '../../pageBase'
+import { waitUntilAppIsNotBusy } from '../../pageBase'
 import { submittableForm } from '../../forms'
 
 const ADMIN_DASHBOARD_TAB_QUERY: Record<string, string> = {
@@ -17,7 +17,7 @@ function removeNotebookFromBazaarTableRow(notebook: string) {
     .findByRole('button', { name: 'Remove' })
     .click()
   cy.findByRole('button', { name: 'OK' }).click()
-  pageIsNotLoading()
+  waitUntilAppIsNotBusy()
 }
 
 export function assumeAdminDashboardPage() {
@@ -52,7 +52,7 @@ export function assumeAdminDashboardPage() {
       }
       cy.visit(`/admin-dashboard?tab=${tab}`)
       cy.location('search').should('include', `tab=${tab}`)
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return this
     },
 
@@ -67,7 +67,7 @@ export function assumeAdminDashboardPage() {
         'have.class',
         'daisy-tab-active'
       )
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return this
     },
 
@@ -81,7 +81,7 @@ export function assumeAdminDashboardPage() {
     },
 
     expectBazaarAdminNotebooks(notebooks: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.location('pathname').should('include', 'admin-dashboard')
       cy.location('search').should('include', 'tab=manageBazaar')
       const expected = commonSenseSplit(notebooks, ',')

@@ -1,10 +1,10 @@
 import { commonSenseSplit } from '../../support/string_util'
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import { findDropdownPortalButton } from './dropdownPortal'
 import notebookPage from './notebookPage'
 
 export const notebookList = () => {
-  pageIsNotLoading()
+  waitUntilAppIsNotBusy()
   return {
     expectNotebookCards: (notebooks: Record<string, string>[]) => {
       cy.get('.notebook-card h5').should('have.length', notebooks.length)
@@ -21,7 +21,7 @@ export const notebookList = () => {
       })
     },
     expectNotebooks: (notebooks: string) => {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       const expected = commonSenseSplit(notebooks, ',')
       cy.get('.notebook-card h5', { timeout: 15000 }).should(($els) => {
         const cardTitles = Array.from($els, (el) => el.innerText)
@@ -29,14 +29,14 @@ export const notebookList = () => {
       })
     },
     navigateToNotebook(notebookName: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('.notebook-card').should('be.visible')
       cy.findByText(notebookName, {
         selector: '.notebook-card h5',
       })
         .should('be.visible')
         .click()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return notebookPage()
     },
   }
@@ -46,7 +46,7 @@ export const notebookList = () => {
 export const clickNotebookCardTitleToOpenNotebookPage = (
   notebookName: string
 ) => {
-  pageIsNotLoading()
+  waitUntilAppIsNotBusy()
   cy.get('.notebook-card').should('be.visible')
   cy.get('[data-cy="notebook-card"]')
     .filter((_index, card) => {
@@ -63,7 +63,7 @@ export const clickNotebookCardTitleToOpenNotebookPage = (
         .closest('a')
         .click()
     })
-  pageIsNotLoading()
+  waitUntilAppIsNotBusy()
 }
 
 const OVERFLOW_MENU_ACTION_NAMES = [
@@ -77,7 +77,7 @@ function usesCatalogOverflowMenu(name: string): boolean {
 
 export const findNotebookCardButton = (notebook: string, name: string) => {
   const finder = () => {
-    pageIsNotLoading()
+    waitUntilAppIsNotBusy()
     cy.get('.notebook-card').should('be.visible')
     return cy
       .get('[data-cy="notebook-card"]')

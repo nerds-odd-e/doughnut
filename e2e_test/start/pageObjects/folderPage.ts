@@ -1,4 +1,4 @@
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 
 const folderPage = () => ({
   openSettingsTab() {
@@ -16,11 +16,11 @@ const folderPage = () => ({
       .click()
       .type(text, { delay: 0 })
       .blur()
-    pageIsNotLoading()
+    waitUntilAppIsNotBusy()
     return this
   },
   expectFolderReadmeBodyContains(fragment: string) {
-    pageIsNotLoading()
+    waitUntilAppIsNotBusy()
     cy.get('[data-testid="folder-readme-body"]')
       .scrollIntoView()
       .should('be.visible')

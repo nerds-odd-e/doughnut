@@ -1,4 +1,4 @@
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import {
   confirmPropertyMemoryTrackerChange,
   findNoteContentRegion,
@@ -111,7 +111,7 @@ export const noteRichPropertyMethods = () => ({
     cy.get('body').click(0, 0, { force: true })
     confirmPropertyMemoryTrackerChange()
     cy.get('.dirty').should('not.exist')
-    pageIsNotLoading()
+    waitUntilAppIsNotBusy()
     return this
   },
   renameRichNotePropertyKey(oldKey: string, newKey: string) {

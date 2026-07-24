@@ -12,7 +12,7 @@ import {
 import start from '../start'
 import notebookPage from '../start/pageObjects/notebookPage'
 import workspaceSurfaceLandmarks from '../start/pageObjects/workspaceSurfaceLandmarks'
-import { pageIsNotLoading } from '../start/pageBase'
+import { waitUntilAppIsNotBusy } from '../start/pageBase'
 
 Given('I choose to share my notebook {string}', (noteTopology: string) => {
   start.navigateToNotebookPage(noteTopology).shareNotebookToBazaar()
@@ -26,7 +26,7 @@ Then(
       .subscribedNotebooks()
       .openNotebook(noteTopology)
     start
-      .pageIsNotLoading()
+      .waitUntilAppIsNotBusy()
       .assumeNotePage()
       .addingChildNoteButton()
       .shouldNotExist()
@@ -82,7 +82,7 @@ When(
 
 When('I reload the notebook page', () => {
   cy.reload()
-  pageIsNotLoading()
+  waitUntilAppIsNotBusy()
 })
 
 Then('the notebook readme body includes {string}', (fragment: string) => {
@@ -200,6 +200,6 @@ When(
     cy.clearFocusedText().type(newName)
     cy.get('[data-testid="notebook-page-name-update"]').click()
     cy.findByRole('button', { name: 'OK' }).click()
-    pageIsNotLoading()
+    waitUntilAppIsNotBusy()
   }
 )

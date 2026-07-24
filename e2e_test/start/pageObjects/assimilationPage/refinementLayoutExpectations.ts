@@ -1,4 +1,4 @@
-import { pageIsNotLoading } from '../../pageBase'
+import { waitUntilAppIsNotBusy } from '../../pageBase'
 import {
   refinementLayoutPanel,
   removeRefinementLayoutButton,
@@ -50,7 +50,7 @@ export function assimilationRefinementLayoutExpectations() {
       indices.forEach((index) => this.checkRefinementLayoutItem(index))
       removeRefinementLayoutButton().click()
       cy.findByRole('button', { name: 'OK' }).click()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return this
     },
     expectNoRefinementLayoutSelection() {

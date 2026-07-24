@@ -1,4 +1,4 @@
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import {
   findNoteContentRegion,
   noteContentRegion,
@@ -27,7 +27,7 @@ export const noteContentEditingMethods = () => ({
     })
     cy.get('body').click(0, 0, { force: true })
     cy.get('.dirty').should('not.exist')
-    pageIsNotLoading()
+    waitUntilAppIsNotBusy()
     return this
   },
   openMarkdownContentEditor() {
@@ -99,6 +99,6 @@ export const noteContentEditingMethods = () => ({
         cy.get('.dirty').should('not.exist')
       }
     }
-    pageIsNotLoading()
+    waitUntilAppIsNotBusy()
   },
 })

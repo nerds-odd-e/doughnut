@@ -1,11 +1,11 @@
 /// <reference types="cypress" />
 /// <reference path="../../support/index.d.ts" />
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import { findDropdownPortalButton } from './dropdownPortal'
 
 /** Bazaar subscriptions appear in the merged notebooks catalog (same list as owned notebooks). */
 export const subscribedNotebooks = () => {
-  pageIsNotLoading()
+  waitUntilAppIsNotBusy()
 
   const openOverflowOnSubscribedCard = (notebookName: string) => {
     cy.get('[data-cy="notebook-card"]')
@@ -29,7 +29,7 @@ export const subscribedNotebooks = () => {
     card(notebookName: string) {
       return {
         openMoveToGroupDialog() {
-          pageIsNotLoading()
+          waitUntilAppIsNotBusy()
           openOverflowOnSubscribedCard(notebookName)
           findDropdownPortalButton('Move to group…').click()
         },
@@ -55,7 +55,7 @@ export const subscribedNotebooks = () => {
       })
     },
     openNotebook(notebookName: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('main').within(() => {
         cy.findByText(notebookName, {
           selector: '.notebook-card h5',

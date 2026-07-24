@@ -1,5 +1,5 @@
 /// <reference types="cypress" />
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import type NotePath from '../../support/NotePath'
 import {
   navigateAlongNotebookCatalogPath,
@@ -21,7 +21,7 @@ const completeMoveNotebookToNewGroupDialog = (newGroupName: string) => {
     cy.findByLabelText('New group name').type(newGroupName, { delay: 0 })
     cy.findByRole('button', { name: 'Move' }).click()
   })
-  pageIsNotLoading()
+  waitUntilAppIsNotBusy()
 }
 
 const completeMoveNotebookToUngroupedDialog = () => {
@@ -29,7 +29,7 @@ const completeMoveNotebookToUngroupedDialog = () => {
     cy.get('#notebook-catalog-move-to-group-target').select('ungrouped')
     cy.findByRole('button', { name: 'Move' }).click()
   })
-  pageIsNotLoading()
+  waitUntilAppIsNotBusy()
 }
 
 export const myNotebooksPage = () => {
@@ -109,7 +109,7 @@ export const myNotebooksPage = () => {
       cy.contains('[data-cy="notebook-group-card"]', groupName)
         .find('[data-cy="notebook-group-header-link"]')
         .click()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return this as any
     },
     expectNotebookAtTopLevelOfCatalog(notebookName: string) {
@@ -123,7 +123,7 @@ export const myNotebooksPage = () => {
 
 export const navigateToNotebooksPage = () => {
   router().push('/notebooks', 'notebooks', {})
-  pageIsNotLoading()
+  waitUntilAppIsNotBusy()
   return myNotebooksPage()
 }
 

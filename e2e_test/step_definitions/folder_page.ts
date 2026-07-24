@@ -8,7 +8,7 @@ import start from '../start'
 import folderPage from '../start/pageObjects/folderPage'
 import noteCreationForm from '../start/pageObjects/forms/noteCreationForm'
 import workspaceSurfaceLandmarks from '../start/pageObjects/workspaceSurfaceLandmarks'
-import { pageIsNotLoading } from '../start/pageBase'
+import { waitUntilAppIsNotBusy } from '../start/pageBase'
 
 When(
   'I open the folder page for {string} from the sidebar',
@@ -33,7 +33,7 @@ When(
               'folderPage',
               { notebookId, folderId }
             )
-            start.pageIsNotLoading()
+            start.waitUntilAppIsNotBusy()
           })
       )
   }
@@ -49,7 +49,7 @@ When(
     const expectedTitle = new Date().toISOString().slice(0, 10)
     start.noteSidebar().addingNewNoteFromToolbar()
     noteCreationForm.submit()
-    pageIsNotLoading()
+    waitUntilAppIsNotBusy()
     start.assumeNotePage().expectNoteTitleDisplayed(expectedTitle)
   }
 )
@@ -76,5 +76,5 @@ Then('folder Readme and Settings tabs are not present', () => {
 
 When('I reload the folder page', () => {
   cy.reload()
-  pageIsNotLoading()
+  waitUntilAppIsNotBusy()
 })

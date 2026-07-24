@@ -1,5 +1,5 @@
 import router from '../router'
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import bookReadingPage from '../pageObjects/bookReadingPage'
 import notebookPage from '../pageObjects/notebookPage'
 import { assumeNotePage } from '../pageObjects/notePage'
@@ -26,7 +26,7 @@ export const navigationActions = {
           notebookId,
         })
       })
-    pageIsNotLoading()
+    waitUntilAppIsNotBusy()
     return notebookPage()
   },
 

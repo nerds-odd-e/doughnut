@@ -1,4 +1,4 @@
-import { pageIsNotLoading } from '../../pageBase'
+import { waitUntilAppIsNotBusy } from '../../pageBase'
 import {
   assimilationPropertyRow,
   assimilateButtonSelector,
@@ -48,18 +48,18 @@ export function assimilationPropertyFlow() {
       assimilationPropertyRow(propertyKey).within(() => {
         cy.get(assimilateButtonSelector).click()
       })
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return this
     },
     skipRecallProperty(propertyKey: string) {
       clickPropertyRowButton(propertyKey, skipRecallButtonSelector)
       cy.findByRole('button', { name: 'OK' }).click()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return this
     },
     reviveRecallProperty(propertyKey: string) {
       clickPropertyRowButton(propertyKey, reviveButtonSelector)
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return this
     },
     expectReviveForProperty(propertyKey: string) {

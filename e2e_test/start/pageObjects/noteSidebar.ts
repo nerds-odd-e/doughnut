@@ -1,4 +1,4 @@
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import noteCreationForm from './forms/noteCreationForm'
 import {
   openFolderPageForOrganize,
@@ -24,7 +24,7 @@ function folderRowControls(treeitem: Cypress.Chainable<JQuery<HTMLElement>>) {
 }
 
 function expandFolder(label: string) {
-  pageIsNotLoading()
+  waitUntilAppIsNotBusy()
   revealFolderInSidebar(label)
   folderTreitemByLabel(label)
     .find('[role="treeitem"]', { timeout: sidebarActionTimeoutMs })
@@ -75,7 +75,7 @@ const sidebarAddFolderButton = () =>
   )
 
 function newNoteSidebarButton() {
-  pageIsNotLoading()
+  waitUntilAppIsNotBusy()
   return sidebarAddNoteButton()
 }
 
@@ -89,7 +89,7 @@ export const noteSidebar = () => {
     },
 
     expectOrderedNotes(expectedNotes: Record<string, string>[]) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       const expectedTitles = expectedNotes.map((note) => note['note-title'])
       cy.get('aside [role="treeitem"].sidebar-note-li', {
         timeout: 15000,
@@ -121,14 +121,14 @@ export const noteSidebar = () => {
     },
 
     activateFolderByLabel(folderLabel: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       folderTreitemByLabel(folderLabel).click()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return this
     },
 
     activateFolderUnderOpenParent(parentLabel: string, childLabel: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       const childFolder = folderTreitemByLabel(parentLabel)
         .find(
           `[role="treeitem"].sidebar-folder-li[aria-label="${childLabel}"]`,
@@ -137,15 +137,15 @@ export const noteSidebar = () => {
         .filter(':visible')
         .last()
       folderRowControls(childFolder).find('.folder-label-area').click()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
     },
 
     openFolderPageByLabel(folderLabel: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       folderRowControls(folderTreitemByLabel(folderLabel))
         .find('[data-testid="sidebar-folder-open-page-link"]')
         .click()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
     },
 
     openFolderPageForOrganize,
@@ -157,18 +157,18 @@ export const noteSidebar = () => {
     },
 
     addingNewFolderFromToolbar() {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       sidebarAddFolderButton().click()
       return noteCreationForm
     },
 
     expectSidebarFolderVisible(folderLabel: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       folderTreitemByLabel(folderLabel).should('exist')
     },
 
     expectSidebarFolderAbsent(folderLabel: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('aside')
         .find(
           `[role="treeitem"].sidebar-folder-li[aria-label="${folderLabel}"]`
@@ -180,7 +180,7 @@ export const noteSidebar = () => {
       parentFolderLabel: string,
       childFolderLabel: string
     ) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       folderTreitemByLabel(parentFolderLabel)
         .find(
           `[role="treeitem"].sidebar-folder-li[aria-label="${childFolderLabel}"]`
@@ -189,7 +189,7 @@ export const noteSidebar = () => {
     },
 
     expectSidebarNoteUnderOpenFolder(folderLabel: string, noteTitle: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       revealFolderInSidebar(folderLabel)
       folderTreitemByLabel(folderLabel)
         .find(`[role="treeitem"].sidebar-note-li[aria-label="${noteTitle}"]`, {
@@ -199,7 +199,7 @@ export const noteSidebar = () => {
     },
 
     navigateToNote(title: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('aside')
         .find(`[role="treeitem"].sidebar-note-li[aria-label="${title}"]`, {
           timeout: sidebarActionTimeoutMs,
@@ -208,14 +208,14 @@ export const noteSidebar = () => {
         .last()
         .find('a')
         .click()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
     },
 
     expectChildrenUnderFolder(
       folderLabel: string,
       children: Record<string, string>[]
     ) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       const expected = children.map(
         (row) => row['note-title'] ?? row.Title ?? ''
       )

@@ -1,4 +1,4 @@
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import { form } from '../forms'
 import { assumeMemoryTrackerPage } from './memoryTrackerPage'
 
@@ -83,7 +83,7 @@ const assumeAnsweredQuestionPage = () => {
       cy.findByRole('button', {
         name: 'Add wiki link as a new property',
       }).click()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return self
     },
     linkMatchedNoteAsRelationship(
@@ -95,7 +95,7 @@ const assumeAnsweredQuestionPage = () => {
         name: 'Add a new relationship note',
       }).click()
       form.getField('Relation Type').clickOption(relationType)
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return self
     },
     expectStillOnAccidentalMatchResult(
@@ -108,16 +108,16 @@ const assumeAnsweredQuestionPage = () => {
       return self
     },
     viewMemoryTracker() {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.findByRole('button', { name: 'View Memory Tracker' })
         .should('be.visible')
         .click()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.findByRole('heading', { name: 'Memory Tracker' }).should('be.visible')
       return assumeMemoryTrackerPage()
     },
     goToLastAnsweredQuestion: () => {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('body').then(($body) => {
         if ($body.text().includes('Note under question')) {
           return
@@ -130,7 +130,7 @@ const assumeAnsweredQuestionPage = () => {
           .should('not.be.disabled')
           .click()
       })
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.findByText('Note under question').should('be.visible')
       return assumeAnsweredQuestionPage()
     },
