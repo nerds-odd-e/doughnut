@@ -1,18 +1,27 @@
 <template>
   <LinkInsertionChoice
-    v-if="selectedSearchResult && sourceNote"
+    v-if="selectedSearchResult && sourceNote && !targetSearchResult"
     :target-note-topology="selectedSearchResult.noteTopology"
     :bare-wiki-link-available="false"
-    :relationship-option-available="false"
     :wiki-property-option-available="wikiPropertyOptionAvailable"
     @choose-insert-wiki-link-as-property="onInsertWikiLinkAsProperty"
+    @choose-add-relationship="chooseAddRelationship"
     @go-back="$emit('closeDialog')"
+  />
+  <AddRelationshipFinalize
+    v-if="targetSearchResult && sourceNote"
+    :note="sourceNote"
+    :target-search-result="targetSearchResult"
+    :navigate-on-success="false"
+    @success="$emit('closeDialog')"
+    @go-back="targetSearchResult = undefined"
   />
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick } from "vue"
+import { computed, nextTick, ref } from "vue"
 import type { Note, NoteSearchResult } from "@generated/doughnut-backend-api"
+import AddRelationshipFinalize from "@/components/links/AddRelationshipFinalize.vue"
 import LinkInsertionChoice from "@/components/links/LinkInsertionChoice.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { buildWikiLinkText } from "@/utils/buildWikiLinkText"
@@ -51,6 +60,8 @@ const selectedSearchResult = computed<NoteSearchResult | undefined>(() => {
   }
 })
 
+const targetSearchResult = ref<NoteSearchResult | undefined>(undefined)
+
 const wikiPropertyOptionAvailable = computed(
   () => parseNoteContentMarkdown(sourceNote.value?.content ?? "").ok
 )
@@ -58,6 +69,10 @@ const wikiPropertyOptionAvailable = computed(
 const sourceNotebookId = computed(
   () => reviewedRealmRef.value?.notebookRealm.notebook.id
 )
+
+function chooseAddRelationship() {
+  targetSearchResult.value = selectedSearchResult.value
+}
 
 async function closeDialogThen(run: () => void | Promise<void>) {
   emit("closeDialog")
