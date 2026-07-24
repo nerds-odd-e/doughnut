@@ -65,6 +65,8 @@ public class ApplicationController {
         "/recent",
         "/generate-token",
         "/memory-trackers/**",
+        "/settings",
+        "/settings/**",
       },
       method = RequestMethod.GET)
   public Object spaDeepLink() {

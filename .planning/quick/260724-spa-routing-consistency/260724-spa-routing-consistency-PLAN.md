@@ -42,7 +42,7 @@ Needs gcloud access on project `carbon-syntax-298809`; stop for developer if una
 
 ## Phases
 
-### Phase 1 — Behavior (interim): `/settings` deep links load the app in prod (planned)
+### Phase 1 — Behavior (interim): `/settings` deep links load the app in prod (done)
 
 - Test-first: backend test asserting `GET /settings` and `GET /settings/recall-stats`
   are handled by `spaDeepLink` (non-prod forward to `/index.html`); confirm red.
@@ -51,6 +51,10 @@ Needs gcloud access on project `carbon-syntax-298809`; stop for developer if una
 - **Interim behavior:** the whole whitelist mechanism is deleted in Phase 3. Justified:
   ships the user-facing fix now, while Phase 2 carries infra risk (LB scheme gate).
 - Stop-safe: prod bug fixed even if nothing else proceeds.
+
+**Done:** added `SettingsDeepLinkTests` (MockMvc, `test` profile, asserts
+`forwardedUrl("/index.html")` for `GET /settings` and `GET /settings/recall-stats`;
+confirmed red/404 before the mapping change). `backend:test_only` green.
 
 ### Phase 2 — Behavior: LB serves the SPA shell for any non-backend path (planned)
 

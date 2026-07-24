@@ -91,7 +91,7 @@ progress:
 
 - [x] Execute Phase 5 (05-01..05-03) — OVL-02/OVL-03 complete; VERIFICATION passed 8/8.
 - [ ] Run `/gsd-discuss-phase 6` (or `--auto`) then plan/execute OVL-01.
-- [ ] Quick plan (outside milestone): `.planning/quick/260724-spa-routing-consistency/` — LB SPA fallback + remove backend frontend-serving; 3 phases planned, none executed.
+- [ ] Quick plan (outside milestone): `.planning/quick/260724-spa-routing-consistency/` — LB SPA fallback + remove backend frontend-serving; Phase 1 done (prod `/settings` deep-link fix shipped), Phases 2-3 pending.
 
 ### Open questions
 
