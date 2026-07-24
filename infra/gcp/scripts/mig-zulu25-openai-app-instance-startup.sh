@@ -98,6 +98,7 @@ bash -c "java ${JAVA_OPTS} \
         -Dspring.profiles.active=prod \
         -Dspring.datasource.url='jdbc:mysql://db-server:3306/doughnut?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true' \
         -Dspring.datasource.password=${MYSQL_PASSWORD} \
+        -Dspring.flyway.placeholders.tz_repair=1=1 \
         -Dspring.github_for_issues.token=${GITHUB_FOR_ISSUES_API_TOKEN} \
         -Dspring.openai.token=${OPENAI_API_TOKEN} \
         -Dlogging.level.com.zaxxer.hikari=WARN \

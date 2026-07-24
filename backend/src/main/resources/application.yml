@@ -29,6 +29,7 @@ spring:
   flyway:
     placeholders:
       embedding_column: "embedding_raw VARBINARY(6144) NOT NULL"
+      tz_repair: "1=0"
   jpa:
     generate-ddl: false
     show-sql: false
@@ -97,6 +98,7 @@ spring:
     clean-disabled: true
     placeholders:
       embedding_column: "embedding_raw VARBINARY(6144) NOT NULL"
+      tz_repair: "1=0"
   jpa:
     generate-ddl: false
     show-sql: false
@@ -174,6 +176,7 @@ spring:
     clean-disabled: true
     placeholders:
       embedding_column: "embedding VECTOR(1536) USING VARBINARY NOT NULL"
+      tz_repair: "1=0"
   jpa:
     generate-ddl: false
     show-sql: false
@@ -239,6 +242,7 @@ spring:
   flyway:
     placeholders:
       embedding_column: "embedding_raw VARBINARY(6144) NOT NULL"
+      tz_repair: "1=0"
   jpa:
     generate-ddl: false
     show-sql: true

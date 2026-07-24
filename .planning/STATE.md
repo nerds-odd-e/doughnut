@@ -91,7 +91,7 @@ progress:
 
 - [x] Execute Phase 5 (05-01..05-03) — OVL-02/OVL-03 complete; VERIFICATION passed 8/8.
 - [ ] Run `/gsd-discuss-phase 6` (or `--auto`) then plan/execute OVL-01.
-- [ ] Quick plan (outside milestone): `.planning/quick/260724-db-timezone-fix/` — Phase 1 done (JDBC URLs pinned to UTC, live in prod). Phase 2 rewritten with confirmed window (`2025-07-01`..`2026-06-01`, id `180685`-`225258`, `-8h`) after prod forensics revealed the real skew is ~11 months, not the originally-planned 1-month window; next: write the Flyway migration.
+- [ ] Quick plan (outside milestone): `.planning/quick/260724-db-timezone-fix/` — Phase 1 done (JDBC URLs pinned to UTC, live in prod). Phase 2 migration written (`V300000233`, placeholder-gated `-8h` repair, window `2025-07-01`..`2026-06-01`, id `180685`-`225258`) but not yet pushed/deployed. Phase 3 (memory_tracker) still pending.
 
 ### Open questions
 

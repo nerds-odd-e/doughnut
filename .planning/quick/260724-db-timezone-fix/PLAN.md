@@ -47,7 +47,7 @@ and DB were already both UTC, but still worth keeping as a safety net).
 - Wrap-up: targeted backend test + one recall-related E2E spec; commit + push;
   prod rollout is via MIG startup-script update + rolling replace (runbook note).
 
-### Phase 2 — Behavior: repair skewed `quiz_answer.created_at` window — planned
+### Phase 2 — Behavior: repair skewed `quiz_answer.created_at` window — in-progress (migration written, not yet deployed)
 
 Stats become fully correct for the confirmed ~11-month skewed core window.
 Vehicle: **placeholder-gated Flyway migration** deployed via CD (decision
@@ -202,3 +202,21 @@ to skip entirely.
     2025-06 trigger further. Phase 2 rewritten below with the confirmed conservative window
     (`2025-07-01` to `2026-06-01`, id band `180685`-`225258`, `- INTERVAL 8 HOUR`), excluding the two
     fuzzy transition months (2025-06, 2026-06) as accepted residual imprecision.
+
+- 2026-07-24: Phase 2 implemented. Added `backend/src/main/resources/db/migration/
+  V300000233__repair_tz_skewed_quiz_answer_created_at.sql` (placeholder-gated
+  `UPDATE ... WHERE ${tz_repair} AND id BETWEEN 180685 AND 225258 AND created_at
+  BETWEEN 2025-07-01 AND 2026-06-01`, `- INTERVAL 8 HOUR`). Learned Flyway does **not**
+  support inline `${name:default}` syntax — default value must come from
+  `spring.flyway.placeholders.tz_repair` config instead. Added `tz_repair: "1=0"` to
+  every profile's `flyway.placeholders` map in `application.yml` (default/test, e2e,
+  prod, dev); added `-Dspring.flyway.placeholders.tz_repair=1=1` to
+  `infra/gcp/scripts/mig-zulu25-openai-app-instance-startup.sh` (prod-only enable —
+  safe to leave permanently since Flyway never re-applies a versioned migration once
+  recorded in `flyway_schema_history`). Added
+  `RecallStatsTimeZoneRepairMigrationTest` (loads the actual migration SQL from the
+  classpath, substitutes the real default placeholder, asserts 0 rows updated and an
+  inserted row's timestamp is unchanged — proves the no-op safety net). Full backend
+  suite green; `pnpm lint:all` / `pnpm format:all` clean. Not yet deployed to prod —
+  next step is push + let CD roll out, then confirm via the stats UI and
+  `flyway_schema_history`.
