@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers.dto;
 
 import com.odde.doughnut.entities.Answer;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.entities.QuestionType;
 import com.odde.doughnut.entities.RecallPrompt;
@@ -45,6 +46,14 @@ public class AnsweredQuestion {
     answeredQuestion.setAnswer(recallPrompt.getAnswer());
     if (recallPrompt.getQuestionType() == QuestionType.MCQ) {
       answeredQuestion.setPredefinedQuestion(recallPrompt.getPredefinedQuestion());
+    }
+    return answeredQuestion;
+  }
+
+  public static AnsweredQuestion from(RecallPrompt recallPrompt, List<Note> matches) {
+    AnsweredQuestion answeredQuestion = from(recallPrompt);
+    if (matches != null && !matches.isEmpty()) {
+      answeredQuestion.setMatchedNotes(matches.stream().map(Note::getNoteTopology).toList());
     }
     return answeredQuestion;
   }

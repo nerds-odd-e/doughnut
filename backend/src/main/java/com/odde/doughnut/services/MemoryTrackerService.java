@@ -16,7 +16,6 @@ import com.odde.doughnut.factoryServices.EntityPersister;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -257,7 +256,9 @@ public class MemoryTrackerService {
     return entityPersister.save(recallPrompt);
   }
 
-  public RecallPrompt answerSpelling(
+  public record SpellingAnswerResult(RecallPrompt recallPrompt, List<Note> matchedNotes) {}
+
+  public SpellingAnswerResult answerSpelling(
       RecallPrompt recallPrompt,
       AnswerSpellingDTO answerSpellingDTO,
       User user,
@@ -281,19 +282,19 @@ public class MemoryTrackerService {
     recallPrompt = entityPersister.save(recallPrompt);
 
     if (!correct && spellingAnswer != null && !spellingAnswer.isBlank()) {
-      Optional<Note> match = wikiLinkResolver.findAccidentalMatch(spellingAnswer, note, user);
-      if (match.isPresent()) {
+      List<Note> matches = wikiLinkResolver.findAllAccidentalMatches(spellingAnswer, note, user);
+      if (!matches.isEmpty()) {
         Answer gradedAnswer = recallPrompt.getAnswer();
-        gradedAnswer.setMatchedNoteId(match.get().getId().longValue());
+        gradedAnswer.setMatchedNoteId(matches.getFirst().getId().longValue());
         gradedAnswer.setOutcome(AnswerOutcome.ACCIDENTAL_MATCH);
         markAsAccidentalMatch(currentUTCTimestamp, memoryTracker);
-        return recallPrompt;
+        return new SpellingAnswerResult(recallPrompt, matches);
       }
     }
 
     markAsRecalled(
         currentUTCTimestamp, correct, memoryTracker, answerSpellingDTO.getThinkingTimeMs());
-    return recallPrompt;
+    return new SpellingAnswerResult(recallPrompt, List.of());
   }
 
   private void markAsAccidentalMatch(Timestamp currentUTCTimestamp, MemoryTracker memoryTracker) {

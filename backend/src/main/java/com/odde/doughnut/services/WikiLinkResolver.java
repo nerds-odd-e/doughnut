@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.function.BiFunction;
 import org.springframework.stereotype.Service;
 
@@ -41,17 +42,19 @@ public class WikiLinkResolver {
   }
 
   public Optional<Note> findAccidentalMatch(String answer, Note reviewedNote, User viewer) {
+    return findAllAccidentalMatches(answer, reviewedNote, viewer).stream().findFirst();
+  }
+
+  public List<Note> findAllAccidentalMatches(String answer, Note reviewedNote, User viewer) {
     if (answer == null || answer.isBlank()) {
-      return Optional.empty();
+      return List.of();
     }
-    Optional<Note> titleMatch =
-        firstReadableAccidentalCandidate(
-            noteRepository.findByNoteTitleOrderByIdAsc(answer), reviewedNote, viewer);
-    if (titleMatch.isPresent()) {
-      return titleMatch;
-    }
-    return firstReadableAccidentalCandidate(
-        aliasAccidentalCandidates(answer), reviewedNote, viewer);
+    TreeMap<Integer, Note> matchesById = new TreeMap<>();
+    addReadableAccidentalCandidates(
+        noteRepository.findByNoteTitleOrderByIdAsc(answer), reviewedNote, viewer, matchesById);
+    addReadableAccidentalCandidates(
+        aliasAccidentalCandidates(answer), reviewedNote, viewer, matchesById);
+    return List.copyOf(matchesById.values());
   }
 
   private List<Note> aliasAccidentalCandidates(String answer) {
@@ -76,17 +79,16 @@ public class WikiLinkResolver {
     return distinctNotes;
   }
 
-  private Optional<Note> firstReadableAccidentalCandidate(
-      List<Note> candidates, Note reviewedNote, User viewer) {
+  private void addReadableAccidentalCandidates(
+      List<Note> candidates, Note reviewedNote, User viewer, TreeMap<Integer, Note> matchesById) {
     for (Note candidate : candidates) {
       Notebook notebook = candidate.getNotebook();
       if (notebook != null
           && authorizationService.userMayReadNotebook(viewer, notebook)
           && !candidate.getId().equals(reviewedNote.getId())) {
-        return Optional.of(candidate);
+        matchesById.putIfAbsent(candidate.getId(), candidate);
       }
     }
-    return Optional.empty();
   }
 
   /** Resolves a wiki-link token to any matching note, regardless of viewer readability. */
