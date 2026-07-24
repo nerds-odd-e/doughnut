@@ -19,11 +19,11 @@ During spelling recall, an answer that names a *different* note becomes a learni
 - ✓ Add-link UI: wiki link, property link, relationship note (`SearchForm`/`LinkInsertionChoice`/`AddRelationshipFinalize`) — existing
 - ✓ Notebook settings Health tab + recall-stats tab — existing (v1.0 lint milestone shipped)
 - ✓ API/DTO extension: `Answer.correct` (boolean) → third outcome with accidental-match metadata (`@Transient matchedNoteId` + `AnswerOutcome` enum: CORRECT/WRONG/ACCIDENTAL_MATCH/OVERLAP); `AnsweredQuestion` gains optional `overlap` + `matchedNotes: List<NoteTopology>`; OpenAPI client regenerated — Validated in Phase 1: Extend Answer outcome API (representable but not yet returned)
+- ✓ Accidental-match detection: wrong spelling answer matching another readable note's title or alias → `ACCIDENTAL_MATCH` + `matchedNoteId` — Phase 2 (AM-01)
+- ✓ Slight (lighter-than-wrong) SRS penalty for accidental match (`partialFail` −10, no 12h override) — Phase 2 (AM-02)
 
 ### Active
 
-- [ ] Accidental-match detection: when a spelling answer is wrong for the reviewed note but matches another note's title or alias, detect the match (search all notebooks the user can read)
-- [ ] Slight (lighter-than-wrong) penalty for accidental match — a third SRS outcome (not full `recallFailed` −20/12h)
 - [ ] Reveal the reviewed note and the matched note(s) together after an accidental match
 - [ ] Offer to build a link between the notes via the existing add-link UI (property link or relationship note), with the matched note pre-selected
 - [ ] Overlap handling: when the answer is correct for the reviewed note but the reviewed note declares overlap with another note, respond "correct, but we're looking for another answer — try again," no credit
@@ -68,7 +68,7 @@ During spelling recall, an answer that names a *different* note becomes a learni
 |----------|-----------|---------|
 | v1 covers all three problems (accidental match + link + overlap) | User value is the combined recall-improvement loop; splitting would ship a half-feature | — Pending |
 | Match scope: all notebooks the user can read | Confusion/links cross notebook boundaries; notebook-scoped would miss real matches | — Pending |
-| Accidental-match penalty lighter than a plain wrong answer | The user did know a real note, just not this one; full wrong-answer penalty is too harsh | — Pending |
+| Accidental-match penalty lighter than a plain wrong answer | The user did know a real note, just not this one; full wrong-answer penalty is too harsh | Validated Phase 2 — `ForgettingCurve.partialFail` / `markAsAccidentalMatch` (−10, no 12h) |
 | Overlap modeled by extending aliases to accept wiki links | Reuses the alias concept the user already knows; declares "A overlaps B" as a link | — Pending (broad blast radius — spike) |
 | Overlap is declared, not auto-detected | Auto-detecting any shared alias as overlap would be too aggressive; user opts in per pair | — Pending |
 | Reuse WikiLinkResolver + LinkInsertionChoice | Existing matching + add-link UI; minimize new concepts | — Pending |
@@ -76,8 +76,9 @@ During spelling recall, an answer that names a *different* note becomes a learni
 
 ## Current State
 
-- **Phase 1 complete (2026-07-23):** The answer contract now represents the third outcome (accidental match + overlap) — `AnswerOutcome` enum, `@Transient matchedNoteId`/`outcome` on `Answer`, optional `overlap`/`matchedNotes` on `AnsweredQuestion`, OpenAPI client regenerated. Pure Structure: states representable but **not yet returned** (0 writers). Foundation is in place for Phases 2–6.
-- **Next:** Phase 2 — accidental-match grading & penalty (writes `matchedNoteId` + `outcome = ACCIDENTAL_MATCH` behind the existing `assertReadAuthorization` gate; re-check OWASP ASVS V4 there, since that is when matched-note data first crosses the trust boundary).
+- **Phase 1 complete (2026-07-23):** Answer contract represents the third outcome — `AnswerOutcome`, `@Transient matchedNoteId`/`outcome`, optional `overlap`/`matchedNotes`; OpenAPI client regenerated.
+- **Phase 2 complete (2026-07-24):** Accidental-match grading + lighter penalty shipped (title + alias legs, IDOR readability filter, UAT + security verified). `matchedNoteId`/`outcome=ACCIDENTAL_MATCH` are written; UI reveal of both notes is still Phase 3.
+- **Next:** Phase 3 — reveal both notes after accidental match.
 
 ## Evolution
 
@@ -97,4 +98,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-23 after Phase 1 completion*
+*Last updated: 2026-07-24 after Phase 2*

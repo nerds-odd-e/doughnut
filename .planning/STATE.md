@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 02
-current_phase_name: accidental-match-grading-penalty
-status: verifying
+current_phase: 3
+current_phase_name: Reveal both notes after accidental match
+status: planning
 stopped_at: Completed 02-02-PLAN.md
-last_updated: "2026-07-24T00:55:28.002Z"
+last_updated: "2026-07-24T03:48:43.889Z"
 progress:
-  total_phases: 2
+  total_phases: 6
   completed_phases: 2
   total_plans: 3
   completed_plans: 3
@@ -21,17 +21,17 @@ progress:
 - **Project:** Spelling Answer Match & Link
 - **Core value:** During spelling recall, an answer that names a *different* note becomes a learning opportunity — penalized lightly, both notes revealed, and a link offered — turning recall confusion into connection-building; and overlapping-but-distinct notes are kept distinct by asking the user for a more specific answer.
 - **Repo:** `/Users/terryyin/git/doughnut` (brownfield Spring Boot + Vue)
-- **Current focus:** Phase 02 — accidental-match-grading-penalty
+- **Current focus:** Phase 03 — reveal-both-notes-after-accidental-match
 
 ## Current Position
 
-- **Phase:** 02 (accidental-match-grading-penalty) — EXECUTING
-- **Plan:** 2 of 2
-- **Status:** Phase complete — ready for verification
-- **Progress:** [██████████] 100%
+- **Phase:** 3 — Reveal both notes after accidental match
+- **Plan:** Not started
+- **Status:** Ready to plan
+- **Progress:** [████████████████████] 3/3 plans (100%)
 
 ```
-[1][.....] 1/2 phases (Phase 2 planned, not executed)
+[x][x][ ][ ][ ][ ] 2/6 phases
 ```
 
 ## Roadmap Snapshot
@@ -47,8 +47,8 @@ progress:
 
 ## Performance Metrics
 
-- **Phases completed:** 0
-- **Requirements delivered:** 0/9
+- **Phases completed:** 2
+- **Requirements delivered:** 4/9 (API-01, API-02, AM-01, AM-02)
 - **Coverage:** 9/9 mapped (100%)
 
 **Per-Plan Metrics:**
