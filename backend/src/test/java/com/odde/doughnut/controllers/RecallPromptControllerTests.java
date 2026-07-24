@@ -801,5 +801,30 @@ class RecallPromptControllerTests extends ControllerTestBase {
       assertNull(answerResult.getMatchedNotes());
       assertNull(answerResult.getOverlap());
     }
+
+    @Test
+    void shouldGradeAsAccidentalMatchWhenWrongAnswerMatchesAnotherReadableNoteAlias()
+        throws UnexpectedNoAccessRightException {
+      Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      String alias = "AccidentalAliasMatch";
+      Note aliasBearingNote =
+          makeMe
+              .aNote()
+              .notebook(otherNotebook)
+              .title("Unrelated Note Title")
+              .content("---\naliases:\n  - " + alias + "\n---\n\nbody")
+              .please();
+      answerDTO.setSpellingAnswer(alias);
+
+      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+
+      assertFalse(answerResult.getAnswer().getCorrect());
+      assertThat(answerResult.getAnswer().getOutcome(), is(AnswerOutcome.ACCIDENTAL_MATCH));
+      assertThat(
+          answerResult.getAnswer().getMatchedNoteId(),
+          equalTo(aliasBearingNote.getId().longValue()));
+      assertNull(answerResult.getMatchedNotes());
+      assertNull(answerResult.getOverlap());
+    }
   }
 }
