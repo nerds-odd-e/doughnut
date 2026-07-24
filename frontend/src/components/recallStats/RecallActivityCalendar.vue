@@ -1,8 +1,8 @@
 <template>
   <div data-testid="recall-activity-calendar">
     <svg
-      :width="cellSize * 53 + labelWidth"
-      :height="cellSize * 7 + labelHeight"
+      :viewBox="`0 0 ${cellSize * 53 + labelWidth} ${cellSize * 7 + labelHeight}`"
+      class="h-auto w-full"
       role="img"
       aria-label="Recall activity calendar"
     >

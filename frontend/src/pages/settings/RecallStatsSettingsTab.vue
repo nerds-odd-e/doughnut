@@ -3,13 +3,13 @@
     <RecallStatsTiles :totals="stats.totals ?? {}" />
 
     <section class="mt-6">
-      <h3 class="mb-2 text-base font-semibold">Activity</h3>
+      <h3 class="mt-0 mb-2 text-base font-semibold">Activity</h3>
       <RecallActivityCalendar :calendar="stats.calendar ?? []" />
     </section>
 
     <section class="mt-6">
       <div class="mb-2 flex items-center justify-between">
-        <h3 class="text-base font-semibold">Daily trends</h3>
+        <h3 class="mt-0 text-base font-semibold">Daily trends</h3>
         <div class="daisy-join">
           <button
             v-for="opt in windowOptions"
@@ -31,7 +31,7 @@
     </section>
 
     <section class="mt-6">
-      <h3 class="mb-2 text-base font-semibold">Weekday × hour</h3>
+      <h3 class="mt-0 mb-2 text-base font-semibold">Weekday × hour</h3>
       <div class="grid md:grid-cols-2 gap-4">
         <WeekdayHourHeatmap mode="count" :counts="stats.weekdayHourCounts ?? []" />
         <WeekdayHourHeatmap
@@ -43,7 +43,7 @@
     </section>
 
     <section class="mt-6">
-      <h3 class="mb-2 text-base font-semibold">Morning vs afternoon</h3>
+      <h3 class="mt-0 mb-2 text-base font-semibold">Morning vs afternoon</h3>
       <AmPmResponseTimeChart :am-pm="stats.amPm ?? {}" />
     </section>
   </div>

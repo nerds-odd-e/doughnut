@@ -1,5 +1,9 @@
 <template>
-  <svg :width="width" :height="height" role="img">
+  <svg
+    :viewBox="`0 0 ${width} ${height}`"
+    class="h-auto w-full"
+    role="img"
+  >
     <polyline
       :data-testid="polylineTestid"
       :points="polylinePoints"

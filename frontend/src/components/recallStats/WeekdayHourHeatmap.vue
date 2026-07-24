@@ -1,8 +1,8 @@
 <template>
   <div :data-testid="`weekday-hour-heatmap-${mode}`">
     <svg
-      :width="cellSize * 24"
-      :height="cellSize * 7"
+      :viewBox="`0 0 ${cellSize * 24} ${cellSize * 7}`"
+      class="h-auto w-full"
       role="img"
       :aria-label="`${mode} heatmap`"
     >

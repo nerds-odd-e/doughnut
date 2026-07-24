@@ -1,6 +1,11 @@
 <template>
   <div data-testid="am-pm-response-time-chart">
-    <svg :width="width" :height="height" role="img" aria-label="Morning vs afternoon response time">
+    <svg
+      :viewBox="`0 0 ${width} ${height}`"
+      class="h-auto w-full"
+      role="img"
+      aria-label="Morning vs afternoon response time"
+    >
       <g v-for="(bar, idx) in bars" :key="bar.label">
         <rect
           data-testid="am-pm-bar"
