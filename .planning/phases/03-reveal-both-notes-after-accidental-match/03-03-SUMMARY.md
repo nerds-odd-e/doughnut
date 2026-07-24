@@ -79,7 +79,7 @@ status: awaiting-human-verify
 
 ## Task Commits
 
-1. **Task 1: E2E feature + page object for accidental-match reveal** - `c969249cb5` (test)
+1. **Task 1: E2E feature + page object for accidental-match reveal** - `1b8652dcb5` (test)
 2. **Task 2: Human spot-check** - pending (checkpoint)
 
 ## Files Created/Modified
@@ -102,7 +102,7 @@ status: awaiting-human-verify
 - **Issue:** `findByText(reviewedTitle)` matched multiple DOM nodes; `matched-notes-section` existed but failed `be.visible` due to parent overflow clip
 - **Fix:** Assert reviewed/matched titles via `[data-test="note-title"]` filters; `scrollIntoView()` before visibility assert on matched section
 - **Files modified:** `AnsweredQuestionPage.ts`
-- **Committed in:** `c969249cb5`
+- **Committed in:** `1b8652dcb5`
 
 ## Known Stubs
 
@@ -112,7 +112,7 @@ None.
 
 - FOUND: `e2e_test/features/recall/accidental_match_reveal.feature`
 - FOUND: `expectAccidentalMatchReveal` in `AnsweredQuestionPage.ts`
-- FOUND: commit `c969249cb5`
+- FOUND: commit `1b8652dcb5`
 - E2E verify: exit 0 (no `@wip`)
 
 ## Threat Flags
