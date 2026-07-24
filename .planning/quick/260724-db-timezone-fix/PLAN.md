@@ -116,11 +116,18 @@ vehicle: placeholder-gated migration in the same or a follow-up deploy.
 4. Verify: due list shows sensible next-recall times; one targeted recall E2E
    locally stays green.
 
-### Phase 4 — Behavior (optional): audit remaining app-written timestamps — planned
+### Phase 4 — Behavior (optional, narrowed to `note.created_at`): done
 
-Enumerate other app-written `TIMESTAMP` columns (notes, conversations, tokens…)
-and repair the same window. Mostly cosmetic (created/updated display). Stop-safe
-to skip entirely.
+Enumerated app-written `TIMESTAMP` columns and confirmed the recall-stats bug
+itself needs no further repair: `recall_prompt.created_at` is only ever used
+for a duration subtraction (`answerCreatedAt - promptCreatedAt`) that cancels
+out an equal skew on both sides, and all calendar/hour-of-day bucketing uses
+`quiz_answer.created_at` (already repaired in Phase 2). Developer decision
+2026-07-24: narrow Phase 4 to `note.created_at` only (user-visible, clean
+single-write-immutable-at-creation signature); skip `note.updated_at` and all
+other candidates (conversations, predefined_question, question_generation_batch,
+note_embeddings, failure_report) as either too ambiguous (see below) or
+internal/non-user-facing.
 
 ## Key decisions
 
@@ -260,3 +267,25 @@ to skip entirely.
   - `last_recalled_at` for the self-healing-aware join set: dominant cluster moved
     from raw hours 6-9 UTC to 22-1 UTC, matching the same "true ~7am local"
     signature confirmed in Phase 2. Phase 3 closed.
+
+- 2026-07-24: Phase 4 investigated and scoped down (developer decision:
+  `notes_only`). Confirmed via code read that `recall_prompt.created_at` needs no
+  repair (self-canceling duration usage only) — the originally-reported recall
+  stats bug is fully closed by Phases 1-3 alone. Investigated `note` via
+  read-only prod SSH: `created_at` for the confirmed date window has id band
+  `26925`-`29354` (2,140 rows) with the same raw-hour-6-10-UTC skew signature as
+  quiz_answer/memory_tracker. `updated_at` in the same date window showed a very
+  different, much larger and less coherent hourly spread (spikes at hours 1, 3,
+  9, 10 far exceeding note-creation volume) — inconsistent with a single
+  personal-review-time signature, most likely because `updated_at` is also
+  written by background/batch processes (AI content generation, imports) with
+  their own timing, not just user edits. Decision: repair `created_at` only
+  (immutable after creation, no self-healing join needed, unambiguous signature);
+  leave `updated_at` alone as not safely correctable from the evidence available.
+  Note: unlike the Phase 2/3 id bands, this one sits *below* the baseline
+  schema's fresh-DB starting `AUTO_INCREMENT` (85359), so the `tz_repair`
+  placeholder default (`1=0`) is the only thing preventing a coincidental match
+  against baseline seed data in local/e2e/test — same primary safety mechanism as
+  Phase 2/3, just without the extra "band is out of reach" property.
+  Added `V300000235__repair_tz_skewed_note_created_at.sql` +
+  `NoteTimeZoneRepairMigrationTest`. Full backend suite green; lint clean.
