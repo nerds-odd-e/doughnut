@@ -34,17 +34,31 @@ public class RecallStatsService {
   }
 
   public RecallStatsDTO compute(User user, ZoneId zoneId, Timestamp now) {
-    List<RecallPrompt> recent =
-        recallPromptRepository.findAnsweredRecallPromptsInTimeRange(
-            user.getId(), minusDays(now, 365), now);
-    List<RecallPrompt> allTime =
-        recallPromptRepository.findAnsweredRecallPromptsInTimeRange(
+    // One projection query over the all-time window (5y); derive the 1y "recent" set in Java.
+    // The projection selects only the 4 fields the aggregator needs, so Hibernate never hydrates
+    // RecallPrompt entities or their eager associations — this is what avoids the production
+    // N+1/timeout.
+    Timestamp sinceYear = minusDays(now, 365);
+    List<RecallAnswerRow> allTime =
+        recallPromptRepository.findAnsweredRecallAnswerRows(
             user.getId(), minusDays(now, 5 * 365), now);
-    return aggregate(recent, allTime, zoneId, now);
+    List<RecallAnswerRow> recent = new ArrayList<>();
+    for (RecallAnswerRow r : allTime) {
+      if (!r.answerCreatedAt().before(sinceYear)) {
+        recent.add(r);
+      }
+    }
+    return aggregateRows(recent, allTime, zoneId, now);
   }
 
+  /** Adapter preserved for unit tests that build {@link RecallPrompt} rows directly. */
   static RecallStatsDTO aggregate(
       List<RecallPrompt> recent, List<RecallPrompt> allTime, ZoneId zoneId, Timestamp now) {
+    return aggregateRows(rowsFrom(recent), rowsFrom(allTime), zoneId, now);
+  }
+
+  static RecallStatsDTO aggregateRows(
+      List<RecallAnswerRow> recent, List<RecallAnswerRow> allTime, ZoneId zoneId, Timestamp now) {
     LocalDate today = now.toInstant().atZone(zoneId).toLocalDate();
 
     Map<LocalDate, List<Long>> perDayTimes = new HashMap<>();
@@ -59,17 +73,16 @@ public class RecallStatsService {
     }
     int totalCorrect365 = 0;
 
-    for (RecallPrompt rp : recent) {
-      Answer answer = rp.getAnswer();
-      if (answer == null || answer.getCreatedAt() == null) {
+    for (RecallAnswerRow r : recent) {
+      if (r.answerCreatedAt() == null) {
         continue;
       }
-      ZonedDateTime zdt = TimestampOperations.getZonedDateTime(answer.getCreatedAt(), zoneId);
+      ZonedDateTime zdt = TimestampOperations.getZonedDateTime(r.answerCreatedAt(), zoneId);
       LocalDate localDate = zdt.toLocalDate();
       int wd = zdt.getDayOfWeek().getValue() - 1;
       int hour = zdt.getHour();
 
-      boolean correct = Boolean.TRUE.equals(answer.getCorrect());
+      boolean correct = Boolean.TRUE.equals(r.correct());
       weekdayHourCounts[wd][hour]++;
       hourAnswered[hour]++;
       if (correct) {
@@ -80,7 +93,7 @@ public class RecallStatsService {
       perDayRetention.computeIfAbsent(localDate, k -> new int[2])[0] += correct ? 1 : 0;
       perDayRetention.computeIfAbsent(localDate, k -> new int[2])[1] += 1;
 
-      Optional<Long> rt = RecallStatsAggregator.responseTimeMs(rp);
+      Optional<Long> rt = RecallStatsAggregator.responseTimeMs(r);
       if (rt.isPresent()) {
         perDayTimes.computeIfAbsent(localDate, k -> new ArrayList<>()).add(rt.get());
         amPmValues[RecallStatsAggregator.amPmIndex(hour)].add(rt.get());
@@ -118,6 +131,20 @@ public class RecallStatsService {
         weekdayHourCorrect,
         hourlyRetention,
         totals);
+  }
+
+  private static List<RecallAnswerRow> rowsFrom(List<RecallPrompt> prompts) {
+    List<RecallAnswerRow> rows = new ArrayList<>(prompts.size());
+    for (RecallPrompt rp : prompts) {
+      Answer answer = rp.getAnswer();
+      rows.add(
+          new RecallAnswerRow(
+              answer == null ? null : answer.getCreatedAt(),
+              answer == null ? null : answer.getCorrect(),
+              answer == null ? null : answer.getThinkingTimeMs(),
+              rp.getCreatedAt()));
+    }
+    return rows;
   }
 
   private static Timestamp minusDays(Timestamp ts, int days) {

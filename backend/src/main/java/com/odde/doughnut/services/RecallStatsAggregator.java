@@ -7,8 +7,6 @@ import com.odde.doughnut.controllers.dto.RecallStatsDTO.DayCount;
 import com.odde.doughnut.controllers.dto.RecallStatsDTO.DayRetention;
 import com.odde.doughnut.controllers.dto.RecallStatsDTO.HeadlineStats;
 import com.odde.doughnut.controllers.dto.RecallStatsDTO.HourRetention;
-import com.odde.doughnut.entities.Answer;
-import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -21,8 +19,8 @@ import java.util.Optional;
 import java.util.TreeSet;
 
 /**
- * Pure aggregation primitives that turn recall rows into the stats series/totals of {@link
- * RecallStatsDTO}.
+ * Pure aggregation primitives that turn {@link RecallAnswerRow} projections into the stats
+ * series/totals of {@link RecallStatsDTO}.
  */
 final class RecallStatsAggregator {
   private static final DateTimeFormatter ISO_DATE = DateTimeFormatter.ISO_LOCAL_DATE;
@@ -35,7 +33,7 @@ final class RecallStatsAggregator {
   private RecallStatsAggregator() {}
 
   static HeadlineStats buildTotals(
-      List<RecallPrompt> allTime,
+      List<RecallAnswerRow> allTime,
       ZoneId zoneId,
       LocalDate today,
       int totalReviews365,
@@ -44,16 +42,15 @@ final class RecallStatsAggregator {
       List<HourRetention> hourlyRetention) {
     long totalTimeSpentMs = 0;
     TreeSet<LocalDate> dates = new TreeSet<>();
-    for (RecallPrompt rp : allTime) {
-      Answer answer = rp.getAnswer();
-      if (answer == null || answer.getCreatedAt() == null) {
+    for (RecallAnswerRow r : allTime) {
+      if (r.answerCreatedAt() == null) {
         continue;
       }
-      Optional<Long> rt = responseTimeMs(rp);
+      Optional<Long> rt = responseTimeMs(r);
       if (rt.isPresent()) {
         totalTimeSpentMs += rt.get();
       }
-      dates.add(TimestampOperations.getZonedDateTime(answer.getCreatedAt(), zoneId).toLocalDate());
+      dates.add(TimestampOperations.getZonedDateTime(r.answerCreatedAt(), zoneId).toLocalDate());
     }
     int currentStreak = currentStreak(dates, today);
     int longestStreak = longestStreak(dates);
@@ -181,22 +178,21 @@ final class RecallStatsAggregator {
     return longest;
   }
 
-  static Optional<Long> responseTimeMs(RecallPrompt rp) {
-    Answer answer = rp.getAnswer();
-    if (answer == null) {
+  static Optional<Long> responseTimeMs(RecallAnswerRow r) {
+    if (r.answerCreatedAt() == null) {
       return Optional.empty();
     }
     long value;
-    if (answer.getThinkingTimeMs() != null) {
-      value = answer.getThinkingTimeMs();
+    if (r.thinkingTimeMs() != null) {
+      value = r.thinkingTimeMs();
       if (value > THINKING_CAP_MS) {
         value = THINKING_CAP_MS;
       }
     } else {
-      if (answer.getCreatedAt() == null || rp.getCreatedAt() == null) {
+      if (r.promptCreatedAt() == null) {
         return Optional.empty();
       }
-      value = answer.getCreatedAt().getTime() - rp.getCreatedAt().getTime();
+      value = r.answerCreatedAt().getTime() - r.promptCreatedAt().getTime();
       if (value > DIFF_CAP_MS) {
         value = DIFF_CAP_MS;
       }
