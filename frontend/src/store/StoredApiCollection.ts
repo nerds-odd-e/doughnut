@@ -85,6 +85,7 @@ export interface StoredApi {
     options?: {
       folderId?: number | null
       refreshWikiTitleCacheForNoteIds?: number[]
+      skipNavigation?: boolean
     }
   ): Promise<NoteRealm>
 
@@ -254,6 +255,7 @@ export default class StoredApiCollection implements StoredApi {
     options?: {
       folderId?: number | null
       refreshWikiTitleCacheForNoteIds?: number[]
+      skipNavigation?: boolean
     }
   ) {
     const folderId = options?.folderId
@@ -279,6 +281,10 @@ export default class StoredApiCollection implements StoredApi {
       for (const id of refreshWikiTitleCacheForNoteIds) {
         await this.refreshWikiLinkCacheForNote(id)
       }
+    }
+    if (options?.skipNavigation) {
+      refreshSidebarStructuralListings()
+      return focus
     }
     return this.navigateToFocusedNote(router, focus)
   }

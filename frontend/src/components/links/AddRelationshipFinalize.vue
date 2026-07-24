@@ -59,6 +59,7 @@ const props = defineProps({
     type: Object as PropType<NoteSearchResult>,
     required: true,
   },
+  navigateOnSuccess: { type: Boolean, default: true },
 })
 
 const emit = defineEmits(["success", "goBack"])
@@ -151,6 +152,7 @@ const relationTypeSelected = async (relationType: string | undefined) => {
             props.note.id,
             props.targetSearchResult.noteTopology.id,
           ],
+          skipNavigation: props.navigateOnSuccess === false,
         }
       )
     }, "Creating relationship note...")
