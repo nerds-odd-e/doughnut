@@ -81,6 +81,7 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
               + "JOIN quiz_answer qa ON rp.quiz_answer_id = qa.id "
               + "WHERE rp.memory_tracker_id = :memoryTrackerId "
               + "AND qa.correct = false "
+              + "AND (qa.outcome IS NULL OR qa.outcome <> 'OVERLAP') "
               + "AND qa.created_at >= :since",
       nativeQuery = true)
   int countWrongAnswersSinceForMemoryTracker(

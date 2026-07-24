@@ -36,7 +36,10 @@ public class Answer extends EntityIdentifiedByIdOnly {
 
   @Transient @Getter @Setter private Long matchedNoteId;
 
-  @Transient @Getter @Setter private AnswerOutcome outcome;
+  @Column(name = "outcome")
+  @Enumerated(EnumType.STRING)
+  @Setter
+  private AnswerOutcome outcome;
 
   public static Answer buildAnswer(
       AnswerDTO answerDTO, PredefinedQuestion predefinedQuestion, Answer existingAnswer) {
