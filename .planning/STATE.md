@@ -5,8 +5,8 @@ milestone_name: milestone
 current_phase: 3
 current_phase_name: Reveal both notes after accidental match
 status: planning
-stopped_at: Phase 3 research complete
-last_updated: "2026-07-24T04:00:00.000Z"
+stopped_at: Phase 3 UI-SPEC approved
+last_updated: "2026-07-24T12:00:00.000Z"
 progress:
   total_phases: 3
   completed_phases: 2
@@ -27,7 +27,7 @@ progress:
 
 - **Phase:** 3 — Reveal both notes after accidental match
 - **Plan:** Not started
-- **Status:** Research complete — ready to plan
+- **Status:** UI-SPEC approved — ready to plan
 - **Progress:** [████████████████████] 3/3 plans (100%)
 
 ```
@@ -93,13 +93,13 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T04:00:00.000Z
-**Stopped at:** Phase 3 research complete
-**Resume file:** .planning/phases/03-reveal-both-notes-after-accidental-match/03-RESEARCH.md
+**Last session:** 2026-07-24T12:00:00.000Z
+**Stopped at:** Phase 3 UI-SPEC approved
+**Resume file:** .planning/phases/03-reveal-both-notes-after-accidental-match/03-UI-SPEC.md
 
-- **Last action:** Phase 3 research written — `03-RESEARCH.md` (findAllAccidentalMatches title∪alias; populate matchedNotes; AnsweredSpellingQuestion reveal UI; Wave 0 test gaps). Phase 2 already executed (AM-01/AM-02 complete).
-- **Next action:** `/gsd-plan-phase 3` planner consumes `03-CONTEXT.md` + `03-RESEARCH.md` to write PLAN.md.
-- **Resume from:** Read this file + `.planning/phases/03-reveal-both-notes-after-accidental-match/03-RESEARCH.md`.
+- **Last action:** Phase 3 UI design contract written — `03-UI-SPEC.md` (DaisyUI recall reveal: distinct ACCIDENTAL_MATCH alert, vertical Matched note(s) NoteShow stack; checker dimensions PASS; UI considerations probe resolved).
+- **Next action:** `/gsd-plan-phase 3` planner consumes `03-CONTEXT.md` + `03-RESEARCH.md` + `03-UI-SPEC.md` to write PLAN.md.
+- **Resume from:** Read this file + `.planning/phases/03-reveal-both-notes-after-accidental-match/03-UI-SPEC.md`.
 
 ---
 *Last updated: 2026-07-23 during roadmap creation*
