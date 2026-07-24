@@ -91,7 +91,7 @@ progress:
 
 - [x] Execute Phase 5 (05-01..05-03) — OVL-02/OVL-03 complete; VERIFICATION passed 8/8.
 - [ ] Run `/gsd-discuss-phase 6` (or `--auto`) then plan/execute OVL-01.
-- [ ] Quick plan (outside milestone): `.planning/quick/260724-spa-routing-consistency/` — LB SPA fallback + remove backend frontend-serving; Phase 1 (prod `/settings` deep-link fix) and Phase 2 (classic→EXTERNAL_MANAGED LB migration) done and live in prod, Phases 3-4 pending.
+- [ ] Quick plan (outside milestone): `.planning/quick/260724-spa-routing-consistency/` — LB SPA fallback + remove backend frontend-serving; Phases 1-3 (prod `/settings` deep-link fix, classic→EXTERNAL_MANAGED LB migration, inverted URL map with bucket catch-all + custom error response) done and live in prod, Phase 4 (delete backend frontend-serving code) pending.
 - [ ] Quick plan (outside milestone): `.planning/quick/260724-db-timezone-fix/` — pin JDBC session tz to UTC + repair +8h-skewed prod TIMESTAMPs (2026-06-20 → fix rollout); Phases 1-4 planned, nothing executed.
 
 ### Open questions

@@ -49,33 +49,43 @@ already consistent).
 
 ### Phase 2 — Behavior: repair skewed `quiz_answer.created_at` window — planned
 
-Stats become fully correct (recent month included). Manual prod runbook with
-Jidoka stops (credentials + approval before UPDATE):
+Stats become fully correct (recent month included). Vehicle: **placeholder-gated
+Flyway migration** deployed via CD (decision 2026-07-24, replaces manual runbook).
 
-1. Verify: `SELECT @@session.time_zone, @@system_time_zone, NOW(), UTC_TIMESTAMP();`
-   — confirm effective +8 pre-fix assumption held.
-2. Bound the window by **id**, not by the (skewed) `created_at`: find the first
-   `quiz_answer.id` after the 2026-06-20 rollout and the last id before the
-   Phase 1 rollout.
-3. Count + snapshot affected rows; then
-   `UPDATE quiz_answer SET created_at = created_at + INTERVAL 8 HOUR WHERE id BETWEEN ... ;`
-   (same for `updated_at` only if app-written; `ON UPDATE CURRENT_TIMESTAMP` is
-   server-side and already correct).
+1. Prereq (read-only prod query, Jidoka): find the boundary ids — the cutover
+   shows as an ~8h **backward** jump in `created_at` between consecutive ids
+   (fuzzy over the few-minute rolling replace; ±8h on a handful of boundary rows
+   is acceptable). Window end = last row before the Phase 1 rollout, same
+   signature in reverse. Also confirm
+   `SELECT @@session.time_zone, @@system_time_zone, NOW(), UTC_TIMESTAMP();`.
+2. Migration `V3000002XX__repair_tz_skewed_quiz_answer_created_at.sql`:
+   `UPDATE quiz_answer SET created_at = created_at + INTERVAL 8 HOUR
+    WHERE ${tz_repair} AND id BETWEEN <literal bounds> AND created_at BETWEEN <band>;`
+   - `tz_repair` Flyway placeholder defaults to `1=0` (no-op everywhere);
+     enabled (`1=1`) only via the prod startup script system property.
+   - `updated_at` is `ON UPDATE CURRENT_TIMESTAMP` (server-side, already
+     correct) — do not touch.
+3. Deploy **after** Phase 1 is live (window closed; rolling replace cannot
+   append skewed rows post-repair).
 4. Verify in the stats UI: activity peak at ~07:00 across the whole year;
-   "reviews today" consistent.
+   "reviews today" consistent. Regenerate ERD not needed (no schema change).
 
 ### Phase 3 — Behavior: repair `memory_tracker` scheduling columns — planned
 
 Recalls due at correct times for trackers touched in the window
 (`next_recall_at`, `last_recalled_at`, `assimilated_at` stored 8h early →
-recalls surface 8h early). Runbook:
+recalls surface 8h early). Same vehicle: placeholder-gated migration in the
+same or a follow-up deploy.
 
-1. Identify rows whose scheduling columns were written in the window (bound via
-   correlated `quiz_answer`/`recall_prompt` ids or an `updated_at` that is
-   server-maintained — inspect schema on prod first).
-2. Shift affected columns +8h; skip trackers already re-answered after the
-   Phase 1 rollout (self-healed).
-3. Verify: due list shows sensible next-recall times; one targeted recall E2E
+1. Id-bounding doesn't apply to UPDATEs; use **join-based bounds**:
+   `last_recalled_at`/`next_recall_at` for trackers whose latest
+   `recall_prompt`→`quiz_answer` id falls in the Phase 2 window;
+   `assimilated_at` for trackers whose own id is in the window (creation-time).
+2. Skip trackers already re-answered after the Phase 1 rollout (self-healed —
+   the join on latest answer id handles this naturally).
+3. Escalate to a Java migration (`backend/src/main/java/db/migration/`) only if
+   the SQL gets contorted.
+4. Verify: due list shows sensible next-recall times; one targeted recall E2E
    locally stays green.
 
 ### Phase 4 — Behavior (optional): audit remaining app-written timestamps — planned
@@ -89,11 +99,15 @@ to skip entirely.
 - **Pin via `forceConnectionTimeZoneToSession=true` + `connectionTimeZone=UTC`**
   (Connector/J "Solution 2b"): session is forced to UTC on connect, so no
   conversion can ever be wrong, independent of JVM/host/server settings.
-- **Repair is a manual prod runbook, not a Flyway migration** — a migration
-  bounded by dates would corrupt correct local/e2e rows created in the same
-  window.
-- **Window bounded by id, not created_at** — ids are monotonic; created_at in
-  the window is exactly the thing that's wrong.
+- **Repair via placeholder-gated Flyway migration** (revised 2026-07-24;
+  originally a manual runbook). Rationale: ships through CD/review instead of a
+  hand-typed session on the private-IP DB VM. Safety: `tz_repair` placeholder
+  defaults to no-op — a date- or id-only bound would corrupt local/e2e rows
+  (fresh DBs inherit `AUTO_INCREMENT=5038` from the baseline, so ids collide
+  with prod's range). Manual prod work shrinks to one read-only boundary query.
+- **Window bounded by literal ids + date band + placeholder gate** —
+  `created_at` alone is ambiguous in an 8h band around the cutover; ids alone
+  are not env-safe.
 - Phase 1 before repairs: it stops ongoing corruption and fixes the bulk of the
   display immediately; repairs then operate on a closed window.
 

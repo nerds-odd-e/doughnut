@@ -129,7 +129,7 @@ for `backend-services update`). Once this state reaches `TEST_ALL_TRAFFIC`, fina
 directly with `--load-balancing-scheme=EXTERNAL_MANAGED` — no separate PREPARE/TEST
 cycle needed for "the forwarding rule itself" as Phase 2's original table implied.
 
-### Phase 3 — Behavior: LB serves the SPA shell for any non-backend path (planned)
+### Phase 3 — Behavior: LB serves the SPA shell for any non-backend path (done)
 
 One observable behavior: a deep link unknown to the backend (e.g.
 `/settings/recall-stats`, or any future route) returns the active SHA's `index.html`
@@ -157,6 +157,33 @@ Slices (~5 min each, test-first via `pnpm test:path-routing` / `pnpm validate:pa
   strip-prefix route).
 - Stop-safe: consistent solution live; Java whitelist becomes unreachable overlap,
   removed next phase.
+
+**Done (2026-07-24, commit `a65e04c64b`):** Rendered `doughnut-routing.json` /
+`doughnutRouting.mjs` inverted as designed — `backendPathHints` now generate
+explicit MIG `pathRules` (via new `backendMigPathRulesFromHints` helper), a
+`/*` catch-all routes everything else to the backend bucket with the SHA
+rewrite, and `defaultCustomErrorResponsePolicy` (404 → active SHA
+`index.html`, override 200, `errorService` = bucket) sits on the pathMatcher.
+`defaultService` (both URL-map and pathMatcher level) is now the bucket, not
+the MIG. Renamed `gcpUrlMap.defaultService` → `gcpUrlMap.backendService` in
+the JSON schema (MIG URL only; bucket already had its own field). Generalized
+`gcpPathPatternMatches` to treat any trailing `*` as a prefix match (not just
+`/*`), needed for the `pathPrefixesAllowBare` rules (`/logout`, `/logout*`).
+`scripts/local-lb.mjs` needed no change — confirmed same `backendPathHints`
+source, independent SPA fallback already correct.
+`pnpm test:path-routing` and `pnpm validate:path-routing` green locally; CI
+(`doughnut CI` run 30078008675, incl. `GCP MIG Rolling Update Deploy` job)
+green. Prod smoke (post-deploy, after ~30s of URL-map propagation lag across
+GFE PoPs — first few checks on the never-before-seen path returned stale 404s
+before settling): `/`, `/api/healthcheck`, `/settings`, `/settings/recall-stats`,
+and an arbitrary unknown path (`/some-totally-made-up-route-xyz123`) all 200;
+a real hashed `/assets/*.js` asset 200 with `content-type: text/javascript`.
+**Learning for Phase 4:** the Java `spaDeepLink` whitelist is now provably
+unreachable in prod (unknown paths never reach the MIG — LB resolves them
+via the bucket + error-policy fallback), safe to delete outright. Prod
+smoke checks right after a URL-map deploy can show transient 404s on
+previously-uncached paths for up to ~30s while the change propagates across
+Google Front Ends — retry before treating a single 404 as a real failure.
 
 ### Phase 4 — Structure: backend stops serving frontend (planned)
 
