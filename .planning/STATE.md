@@ -5,8 +5,8 @@ milestone_name: milestone
 current_phase: 3
 current_phase_name: Reveal both notes after accidental match
 status: planning
-stopped_at: Phase 3 context gathered
-last_updated: "2026-07-24T03:52:57.566Z"
+stopped_at: Phase 3 research complete
+last_updated: "2026-07-24T04:00:00.000Z"
 progress:
   total_phases: 3
   completed_phases: 2
@@ -27,7 +27,7 @@ progress:
 
 - **Phase:** 3 — Reveal both notes after accidental match
 - **Plan:** Not started
-- **Status:** Ready to plan
+- **Status:** Research complete — ready to plan
 - **Progress:** [████████████████████] 3/3 plans (100%)
 
 ```
@@ -93,13 +93,13 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T03:52:57.560Z
-**Stopped at:** Phase 3 context gathered
-**Resume file:** .planning/phases/03-reveal-both-notes-after-accidental-match/03-CONTEXT.md
+**Last session:** 2026-07-24T04:00:00.000Z
+**Stopped at:** Phase 3 research complete
+**Resume file:** .planning/phases/03-reveal-both-notes-after-accidental-match/03-RESEARCH.md
 
-- **Last action:** Phase 2 planned — `02-01-PLAN.md` (tracer: title-leg accidental match + lighter -10 clamped penalty + IDOR/skip-when-correct tests) and `02-02-PLAN.md` (alias leg + floor-clamp/threshold-counts tests) written. ROADMAP + STATE finalized. Both plans validate clean; all 6 locked decisions D-01..D-06 cited; threat_model + assumption_delta_decision + Artifacts sections present.
-- **Next action:** `/gsd-execute-phase 2` (Behavior — accidental-match grading + lighter SRS penalty; Plan 01 Wave 1, then Plan 02 Wave 2).
-- **Resume from:** Read this file + `.planning/phases/02-accidental-match-grading-penalty/02-01-PLAN.md`; execute the plans in wave order.
+- **Last action:** Phase 3 research written — `03-RESEARCH.md` (findAllAccidentalMatches title∪alias; populate matchedNotes; AnsweredSpellingQuestion reveal UI; Wave 0 test gaps). Phase 2 already executed (AM-01/AM-02 complete).
+- **Next action:** `/gsd-plan-phase 3` planner consumes `03-CONTEXT.md` + `03-RESEARCH.md` to write PLAN.md.
+- **Resume from:** Read this file + `.planning/phases/03-reveal-both-notes-after-accidental-match/03-RESEARCH.md`.
 
 ---
 *Last updated: 2026-07-23 during roadmap creation*
