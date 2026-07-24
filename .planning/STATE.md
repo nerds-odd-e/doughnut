@@ -5,8 +5,8 @@ milestone_name: milestone
 current_phase: 6
 current_phase_name: Overlap try again no credit
 status: ready_to_discuss
-stopped_at: Phase 5 complete; next Phase 6 discuss
-last_updated: "2026-07-24T06:20:00.000Z"
+stopped_at: Phase 6 context gathered
+last_updated: "2026-07-24T11:45:10.878Z"
 progress:
   total_phases: 6
   completed_phases: 5
@@ -99,9 +99,9 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T06:20:00.000Z
-**Stopped at:** Phase 5 complete; next Phase 6 discuss
-**Resume file:** .planning/ROADMAP.md
+**Last session:** 2026-07-24T11:45:10.865Z
+**Stopped at:** Phase 6 context gathered
+**Resume file:** .planning/phases/06-overlap-try-again-no-credit/06-CONTEXT.md
 
 - **Last action:** Phase 5 closed — VERIFICATION passed; OVL-02/OVL-03 complete.
 - **Next action:** `/gsd-discuss-phase 6 --auto` (or discuss without auto).
