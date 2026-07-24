@@ -5,8 +5,8 @@ milestone_name: milestone
 current_phase: 4
 current_phase_name: Offer link between notes
 status: executing
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-07-24T05:11:49.224Z"
+stopped_at: Phase 4 awaiting human spot-check (04-03 Task 2)
+last_updated: "2026-07-24T05:16:35.617Z"
 progress:
   total_phases: 4
   completed_phases: 3
@@ -96,9 +96,9 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T05:11:49.217Z
-**Stopped at:** Completed 04-02-PLAN.md
-**Resume file:** None
+**Last session:** 2026-07-24T05:16:35.608Z
+**Stopped at:** Phase 4 awaiting human spot-check (04-03 Task 2)
+**Resume file:** .planning/phases/04-offer-link-between-notes/04-03-PLAN.md
 
 - **Last action:** Completed 04-02 — relationship finalize + D-07 stay-on-page (skipNavigation / navigateOnSuccess).
 - **Next action:** Execute 04-03 (remaining AM-04 / E2E surface).
