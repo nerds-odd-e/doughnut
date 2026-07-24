@@ -1241,5 +1241,22 @@ class RecallPromptControllerTests extends ControllerTestBase {
       assertThat(result.getOverlap(), anyOf(nullValue(), is(false)));
       assertThat(memoryTracker.getRecallCount(), equalTo(recallCountBefore + 1));
     }
+
+    @Test
+    void shouldNotCountOverlapTowardWrongAnswerThreshold() throws UnexpectedNoAccessRightException {
+      AnswerSpellingDTO answerDTO = new AnswerSpellingDTO();
+      answerDTO.setSpellingAnswer("Shared Title");
+      Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+      assertThat(memoryTrackerService.isThresholdExceeded(memoryTracker, now), is(false));
+
+      for (int i = 0; i < 5; i++) {
+        RecallPrompt prompt =
+            makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
+        AnsweredQuestion result = controller.answerSpelling(prompt, answerDTO);
+        assertThat(result.getAnswer().getOutcome(), is(AnswerOutcome.OVERLAP));
+        assertFalse(result.getAnswer().getCorrect());
+      }
+      assertThat(memoryTrackerService.isThresholdExceeded(memoryTracker, now), is(false));
+    }
   }
 }
