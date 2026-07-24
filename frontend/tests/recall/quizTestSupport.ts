@@ -22,7 +22,7 @@ import { createDeferredGate } from "@tests/components/recall/noteRefinementTestS
 
 export { createDeferredGate, wrapSdkError, wrapSdkResponse }
 
-export const contentLoaderSelector = ".loading-bar.daisy-loading-spinner"
+export const contentLoaderSelector = ".daisy-loading.daisy-loading-spinner"
 export const contestableDummyInputSelector =
   '[data-testid="contestable-dummy-input"]'
 export const recallPromptSelector = ".recall-prompt"
