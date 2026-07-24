@@ -26,8 +26,8 @@ progress:
 ## Current Position
 
 - **Phase:** 5 — Alias-as-wiki-link overlap declaration
-- **Plan:** 05-02 next (Wave 2 OVL-03 consumer regressions)
-- **Status:** In progress — 05-01 tracer complete; 05-02/05-03 remaining
+- **Plan:** 05-02 remaining (Wave 2 OVL-03 index/search)
+- **Status:** In progress — 05-01 + 05-03 complete; 05-02 remaining for OVL-03 search/index
 - **Progress:** [█████████░] 92%
 
 ```
@@ -93,7 +93,8 @@ progress:
 - [x] Phase 5 research — `05-RESEARCH.md` (consumer inventory + segregation approach).
 - [x] `/gsd-plan-phase 5` — 05-01..05-03 PLAN.md written.
 - [x] Execute 05-01 — FrontmatterAliases segregation + frontend authoredAliasesValidation parity.
-- [ ] Execute 05-02 / 05-03 — OVL-03 consumer regressions (index/search/resolve/cloze/AM).
+- [x] Execute 05-03 — OVL-03 wiki-resolve + cloze + matchAnswer + AM alias-leg regressions.
+- [ ] Execute 05-02 — OVL-03 index + alias search regressions.
 - [ ] Quick plan (outside milestone): `.planning/quick/260724-spa-routing-consistency/` — LB SPA fallback + remove backend frontend-serving; 3 phases planned, none executed.
 
 ### Open questions
