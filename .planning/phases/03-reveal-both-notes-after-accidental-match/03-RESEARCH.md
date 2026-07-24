@@ -331,15 +331,10 @@ assertThat(answerResult.getAnswer().getMatchedNoteId(),
 
 *(A1–A2 are labeled ASSUMED only for product-copy/perf preference; core code seams are VERIFIED.)*
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Assembler seam (discretion, recommend decide in plan):**
-   - What we know: list must appear on `AnsweredQuestion`; service returns `RecallPrompt` today; controller has no `WikiLinkResolver` yet.
-   - What's unclear: whether planner prefers injecting resolver into controller vs returning a small result record from the service.
-   - Recommendation: **Single lookup in service + thin assembler** (overload `AnsweredQuestion.from(prompt, List<Note> matches)` or setMatchedNotes in controller from a service-returned list). Avoid dual short-circuit + union paths.
-
-2. **E2E vs frontend-unit split (discretion):**
-   - Recommendation: Frontend Vitest covering alert branch + N× `NoteShow` props (fast); one Cypress scenario for end-to-end “type other note’s title → see both notes” (UI hint: yes). Tag E2E `@wip` until green.
+1. **Assembler seam** — RESOLVED: Plan 03-01 — single `findAllAccidentalMatches` lookup in `MemoryTrackerService` + thin assembler `AnsweredQuestion.from(prompt, List<Note> matches)` (controller does not re-query). Avoid dual short-circuit + union paths.
+2. **E2E vs frontend-unit** — RESOLVED: Plan 03-02 Vitest (alert + NoteShow stack) + Plan 03-03 capability-named E2E `@wip`→green.
 
 ## Environment Availability
 
