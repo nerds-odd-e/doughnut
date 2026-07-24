@@ -5,13 +5,13 @@ milestone_name: milestone
 current_phase: 5
 current_phase_name: Alias-as-wiki-link overlap declaration
 status: in_progress
-stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-07-24T05:59:06.208Z"
+stopped_at: Completed 05-03-PLAN.md
+last_updated: "2026-07-24T06:06:47.109Z"
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 12
-  completed_plans: 10
+  completed_plans: 11
 ---
 
 # State: Spelling Answer Match & Link
@@ -28,7 +28,7 @@ progress:
 - **Phase:** 5 — Alias-as-wiki-link overlap declaration
 - **Plan:** 05-02 next (Wave 2 OVL-03 consumer regressions)
 - **Status:** In progress — 05-01 tracer complete; 05-02/05-03 remaining
-- **Progress:** [████████░░] 83%
+- **Progress:** [█████████░] 92%
 
 ```
 [x][x][x][x][ ][ ] 4/6 phases
@@ -65,6 +65,7 @@ progress:
 | Phase 04 P02 | 6min | 2 tasks | 5 files |
 | Phase 04 P03 | 15min | 2 tasks | 3 files |
 | Phase 05 P01 | 6min | 2 tasks | 6 files |
+| Phase 05 P03 | 6min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -101,8 +102,8 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T05:59:06.200Z
-**Stopped at:** Completed 05-01-PLAN.md
+**Last session:** 2026-07-24T06:06:47.102Z
+**Stopped at:** Completed 05-03-PLAN.md
 **Resume file:** None
 
 - **Last action:** Completed 05-01 tracer (FrontmatterAliases + frontend parity).
@@ -117,3 +118,5 @@ progress:
 - [Phase 4]: D-01–D-07 MatchedNoteLinkOffer; property updateTextField; relationship navigateOnSuccess=false; human verify via E2E browser subagent
 - [Phase 5]: Keep fromNoteContent/fromFrontmatter plain-only; add overlapWikiLinkTokensFrom* for Phase 6
 - [Phase 5]: Whole-item WikiLinkMarkdown.INNER_LINK_PATTERN.matches() for wiki-link alias detection
+- [Phase ?]: 05-03: No production edits — OVL-03 consumer safety from 05-01 plain-only parse/index
+- [Phase ?]: 05-03: Regression gate only; MemoryTrackerService OVERLAP grading deferred to Phase 6

@@ -13,7 +13,7 @@
 
 - [ ] **OVL-01**: When a spelling answer is correct for the reviewed note but the reviewed note declares overlap with another note, the system responds "correct, but we're looking for another answer — try again," with no credit.
 - [x] **OVL-02**: Overlap is declared by extending the `aliases` frontmatter to accept wiki-link values that point to another note.
-- [ ] **OVL-03**: Extending aliases to accept wiki links preserves existing wiki-resolve, search, and cloze-masking behavior (no regressions).
+- [x] **OVL-03**: Extending aliases to accept wiki links preserves existing wiki-resolve, search, and cloze-masking behavior (no regressions).
 
 ### API
 

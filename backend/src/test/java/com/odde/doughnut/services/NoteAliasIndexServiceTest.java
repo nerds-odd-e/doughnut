@@ -1,9 +1,12 @@
 package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAliasIndex;
@@ -88,6 +91,105 @@ class NoteAliasIndexServiceTest {
       Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
       Note note = makeMe.aNote().notebook(notebook).content("plain body").please();
 
+      noteAliasIndexService.refreshForNote(note);
+
+      assertThat(noteAliasIndexRepository.findByNote_IdOrderByIdAsc(note.getId()), empty());
+    }
+
+    @Test
+    void indexes_only_plain_aliases_when_wiki_link_overlap_declared() {
+      User user = makeMe.aUser().please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      String markdown =
+          """
+          ---
+          aliases:
+            - color
+            - "[[Other Note]]"
+            - "[[Shared Notebook:Hue|display]]"
+          ---
+
+          body
+          """;
+      Note note = makeMe.aNote().title("colour").notebook(notebook).content(markdown).please();
+
+      noteAliasIndexService.refreshForNote(note);
+
+      List<NoteAliasIndex> rows = noteAliasIndexRepository.findByNote_IdOrderByIdAsc(note.getId());
+      assertThat(rows, hasSize(1));
+      assertThat(rows.get(0).getAliasDisplay(), equalTo("color"));
+      assertThat(rows.get(0).getAliasLookupKey(), equalTo("color"));
+      assertThat(
+          rows.stream().map(NoteAliasIndex::getAliasDisplay).toList(),
+          everyItem(not(containsString("[["))));
+    }
+
+    @Test
+    void leaves_no_rows_when_aliases_are_wiki_link_overlap_only() {
+      User user = makeMe.aUser().please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      String markdown =
+          """
+          ---
+          aliases:
+            - "[[Other Note]]"
+            - "[[Shared Notebook:Hue|display]]"
+          ---
+
+          body
+          """;
+      Note note = makeMe.aNote().notebook(notebook).content(markdown).please();
+
+      noteAliasIndexService.refreshForNote(note);
+
+      assertThat(noteAliasIndexRepository.findByNote_IdOrderByIdAsc(note.getId()), empty());
+    }
+
+    @Test
+    void leaves_no_rows_when_aliases_list_is_empty() {
+      User user = makeMe.aUser().please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      Note note =
+          makeMe.aNote().notebook(notebook).content("---\naliases: []\n---\n\nbody").please();
+
+      noteAliasIndexService.refreshForNote(note);
+
+      assertThat(noteAliasIndexRepository.findByNote_IdOrderByIdAsc(note.getId()), empty());
+    }
+
+    @Test
+    void removes_plain_alias_row_when_only_wiki_link_overlap_remains() {
+      User user = makeMe.aUser().please();
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+      Note note =
+          makeMe
+              .aNote()
+              .notebook(notebook)
+              .content(
+                  """
+                  ---
+                  aliases:
+                    - color
+                    - "[[Other Note]]"
+                  ---
+
+                  body
+                  """)
+              .please();
+
+      noteAliasIndexService.refreshForNote(note);
+      assertThat(noteAliasIndexRepository.findByNote_IdOrderByIdAsc(note.getId()), hasSize(1));
+
+      note.setContent(
+          """
+          ---
+          aliases:
+            - "[[Other Note]]"
+          ---
+
+          body
+          """);
+      makeMe.entityPersister.merge(note);
       noteAliasIndexService.refreshForNote(note);
 
       assertThat(noteAliasIndexRepository.findByNote_IdOrderByIdAsc(note.getId()), empty());
