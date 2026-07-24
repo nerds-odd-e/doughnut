@@ -94,7 +94,7 @@ The highest-risk seam is **D-04 vs persisted `correct=false`**: `countWrongAnswe
 ### Alternatives Considered
 | Instead of | Could Use | Tradeoff |
 |------------|-----------|----------|
-| Persist `outcome` column for D-04 | Soften D-03: persist `correct=true` + wire `outcome=OVERLAP` | Avoids Flyway but re-litigates D-03 literal `correct=false` |
+| Persist `outcome` column for D-04 | Soften D-03: persist `correct=true` + wire `outcome=OVERLAP` | Avoids Flyway but **contradicts locked D-03** — escalate / amend CONTEXT instead of implementing |
 | Explicit Try again button | Auto-clear result on resume only | Resume-only fails remount unless key nonce added; button is clearer for E2E |
 | New overlap search service | Reuse `WikiLinkResolver` | Custom search would duplicate resolve + readability |
 
@@ -230,7 +230,7 @@ return false;
 **What goes wrong:** OVERLAP persists `quiz_answer.correct = 0`. `countWrongAnswersSinceForMemoryTracker` counts those rows. Five try-agains trip re-assimilation; later real wrongs trip earlier. Frontend skipping `getThresholdExceeded` is necessary but not sufficient. [VERIFIED: codebase]
 **Why it happens:** Phase 1 left `outcome` `@Transient` (no Flyway); D-03 requires `correct=false` + persist.
 **How to avoid (preferred):** Promote `Answer.outcome` to a nullable persisted column (Flyway `V300000236+`), write `OVERLAP` on grade, and change the native count query to exclude `outcome = 'OVERLAP'` (treat NULL as today). Keep `matchedNoteId` `@Transient`.
-**Fallback (Jidoka if schema rejected):** Soften D-03 to persist/wire `correct=true` with `outcome=OVERLAP` and never call `markAsRecalled` — threshold stays clean, but re-litigates the locked `correct=false` literal; frontend must key UI off `outcome`, not `!correct`.
+**If schema is blocked (Jidoka):** Escalate — amend CONTEXT before changing D-03. Do **not** silently persist `correct=true` + `outcome=OVERLAP` while D-03 locks `correct=false`.
 **Warning signs:** Test “N OVERLAPs do not exceed threshold” fails; re-assimilation dialog after only try-agains.
 
 ### Pitfall 2: Bracketed overlap tokens fail resolve
@@ -324,16 +324,11 @@ const onAnswered = async (answerResult: AnsweredQuestion) => {
 
 **If Flyway is approved, A1 becomes a locked implementation choice rather than an assumption.**
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Durable D-04 vs Phase 1 `@Transient` outcome**
-   - What we know: count query uses `qa.correct = false` only; outcome is not persisted. [VERIFIED: codebase]
-   - What's unclear: whether team accepts a small Flyway in a Behavior phase.
-   - **Recommendation (preferred):** Flyway nullable `outcome` VARCHAR + exclude OVERLAP from count. Keep `matchedNoteId` transient. Jidoka before planning tasks if schema is blocked; fallback is amend D-03 to `correct=true`+`outcome=OVERLAP` with zero mark path.
+1. **Durable D-04 vs Phase 1 `@Transient` outcome** — RESOLVED: Use Flyway nullable `outcome` VARCHAR + exclude OVERLAP from `countWrongAnswersSinceForMemoryTracker` (plan 06-02). Keep `matchedNoteId` `@Transient`. Honor locked D-03 `correct=false` + zero mark path. If schema is blocked at Jidoka, escalate to amend CONTEXT — do not silently soften D-03 to `correct=true`.
 
-2. **Self-referential overlap wiki-link**
-   - What we know: D-01 says “another note.”
-   - **Recommendation:** Exclude resolved target when `id` equals reviewed note; treat as non-firing for that token.
+2. **Self-referential overlap wiki-link** — RESOLVED: Exclude resolved target when `id` equals reviewed note; treat as non-firing for that token (D-01 “another note”; plans 06-01 / 06-03).
 
 ## Environment Availability
 
@@ -428,7 +423,7 @@ const onAnswered = async (answerResult: AnsweredQuestion) => {
 | `overlap` flag assembly | Set in controller/DTO path when `outcome == OVERLAP` (mirror `matchedNotes` overload) |
 | Test split | Controller (grade/SRS/threshold) + Vitest (alert + queue) + E2E (happy path distinguishing alias) |
 | OpenAPI | No regen unless gap discovered |
-| D-04 durable | Flyway persist `outcome` + exclude from count (Jidoka if blocked) |
+| D-04 durable | Flyway persist `outcome` + exclude from count (escalate if schema blocked — do not soften D-03) |
 
 ## Sources
 

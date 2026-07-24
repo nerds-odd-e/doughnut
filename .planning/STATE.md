@@ -5,8 +5,8 @@ milestone_name: milestone
 current_phase: 6
 current_phase_name: Overlap try again no credit
 status: ready_to_execute
-stopped_at: Phase 6 plans created — ready to execute
-last_updated: "2026-07-24T20:02:00+08:00"
+stopped_at: Phase 6 plan-check passed — ready to execute
+last_updated: "2026-07-24T20:10:00+08:00"
 progress:
   total_phases: 6
   completed_phases: 5
@@ -27,10 +27,11 @@ progress:
 
 - **Phase:** 6 — Overlap "try again, no credit"
 - **Plan:** 06-01 (next)
-- **Status:** Plans created — ready to execute
+- **Status:** Plan-check passed — ready to execute
 - **Progress:** [████████░░] 75% (12/16 plans; 5/6 phases)
 - **UI contract:** `.planning/phases/06-overlap-try-again-no-credit/06-UI-SPEC.md` (status: approved)
 - **Plans:** 06-01 tracer → 06-02 Flyway D-04 (checkpoint) → 06-03 edges → 06-04 E2E
+- **Plan check:** Blockers fixed (D-03 soften path removed; RESEARCH open questions resolved)
 
 ```
 [x][x][x][x][x][ ] 5/6 phases

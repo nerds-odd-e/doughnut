@@ -45,7 +45,8 @@ created: 2026-07-24
 | 06-02-02 | 02 | 2 | OVL-01 | T-06-02 | Persist outcome; exclude OVERLAP from wrong-count | controller | `pnpm backend:test_only` | ❌ W0 | ⬜ pending |
 | 06-03-01 | 03 | 3 | OVL-01 | T-06-01 | Dead/unreadable → CORRECT; self-token skip | controller | `pnpm backend:test_only` | ❌ W0 | ⬜ pending |
 | 06-03-02 | 03 | 3 | OVL-01 | T-06-03 | AM path unchanged when matchAnswer false; matchedNotes empty on OVERLAP | controller + Vitest | backend:test_only + AnsweredSpellingQuestion.spec | ❌ W0 | ⬜ pending |
-| 06-04-01 | 04 | 4 | OVL-01 | T-06-01 | E2E try-again + distinguishing credit | E2E | `pnpm cypress run --spec …/overlap_try_again.feature` | ❌ W0 | ⬜ pending |
+| 06-04-01 | 04 | 4 | OVL-01 | T-06-01 | E2E scaffold feature + steps + page object (@wip) | file/rg | feature exists; testids wired | ❌ W0 | ⬜ pending |
+| 06-04-02 | 04 | 4 | OVL-01 | T-06-01 | E2E try-again + distinguishing credit green; drop @wip | E2E | `pnpm cypress run --spec …/overlap_try_again.feature` | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
