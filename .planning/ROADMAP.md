@@ -90,7 +90,7 @@ Plans:
 
 ### Phase 4: Offer link between notes
 
-**Goal:** After an accidental match, the user can build a link between the reviewed note and a matched note through the existing add-link UI, with the matched note pre-selected.
+**Goal:** As a learner doing spelling recall, I want to build a link between the reviewed note and a matched note after an accidental match with the matched note already selected, so that I can turn recall confusion into a lasting connection without the system auto-writing a link.
 **Mode:** mvp
 **Depends on**: Phase 3
 **Requirements**: AM-04
@@ -100,8 +100,21 @@ Plans:
   2. The matched note is pre-selected in the add-link UI, so the user can confirm a link with minimal effort.
   3. The system never auto-writes a link — link creation is user-initiated.
 
-**Plans**: TBD
+**Plans**: 3 plans
 **UI hint**: yes
+
+Plans:
+**Wave 1**
+
+- [ ] 04-01-PLAN.md — Tracer: per-matched CTA + MatchedNoteLinkOffer + bareWikiLinkAvailable + property wiki-link via updateTextField + Vitest (D-01–D-06 property path)
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 04-02-PLAN.md — Relationship finalize with skipNavigation / navigateOnSuccess=false so D-07 stays on recall result + Vitest
+
+**Wave 3** *(blocked on Waves 1–2)*
+
+- [ ] 04-03-PLAN.md — Extend accidental_match_reveal E2E for offer-link (property + relationship) + human spot-check
 
 ### Phase 5: Alias-as-wiki-link overlap declaration
 
@@ -142,7 +155,7 @@ Plans:
 | 1. Extend Answer outcome API | 1/1 | Complete    | 2026-07-23 |
 | 2. Accidental-match grading & penalty | 2/2 | Complete    | 2026-07-24 |
 | 3. Reveal both notes after accidental match | 3/3 | Complete    | 2026-07-24 |
-| 4. Offer link between notes | 0/0 | Not started | - |
+| 4. Offer link between notes | 0/3 | Planned | - |
 | 5. Alias-as-wiki-link overlap declaration | 0/0 | Not started | - |
 | 6. Overlap "try again, no credit" | 0/0 | Not started | - |
 

@@ -5,12 +5,12 @@ milestone_name: milestone
 current_phase: 4
 current_phase_name: Offer link between notes
 status: planning
-stopped_at: Phase 4 context gathered
-last_updated: "2026-07-24T04:35:41.729Z"
+stopped_at: Phase 4 plans created (04-01..04-03)
+last_updated: "2026-07-24T05:00:00.000Z"
 progress:
-  total_phases: 4
+  total_phases: 6
   completed_phases: 3
-  total_plans: 6
+  total_plans: 9
   completed_plans: 6
 ---
 
@@ -26,8 +26,8 @@ progress:
 ## Current Position
 
 - **Phase:** 4 — Offer link between notes
-- **Plan:** Not started
-- **Status:** Ready to plan
+- **Plan:** 04-01 (next to execute)
+- **Status:** Plans ready (3 plans / 3 waves)
 - **Progress:** [████████████░░░░░░░░] 3/6 phases
 
 ```
@@ -76,7 +76,7 @@ progress:
 
 - Backend: `findAllAccidentalMatches` + `AnsweredQuestion.matchedNotes` populated on accidental match.
 - Frontend: `AnsweredSpellingQuestion.vue` ACCIDENTAL_MATCH alert + `matched-notes-section` NoteShow stack.
-- Phase 4: attach add-link UI (`LinkInsertionChoice` / `AddRelationshipFinalize`) under matched section with preselection — never auto-write links.
+- Phase 4: `MatchedNoteLinkOffer` under matched rows; property via `updateTextField`; relationship via `AddRelationshipFinalize` with `navigateOnSuccess=false` (D-07).
 
 ### Known risks / blockers
 
@@ -85,7 +85,8 @@ progress:
 ### Todos
 
 - [x] Execute Phase 3 (03-01..03-03) — AM-03 reveal complete; human verify approved.
-- [ ] Run `/gsd-discuss-phase 4` (or `--auto`) then plan/execute AM-04 offer-link.
+- [x] Discuss + plan Phase 4 (04-01..04-03).
+- [ ] Execute Phase 4 — `/gsd-execute-phase 4` (or local execute-plan).
 
 ### Open questions
 
@@ -93,13 +94,13 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T04:35:41.722Z
-**Stopped at:** Phase 4 context gathered
-**Resume file:** .planning/phases/04-offer-link-between-notes/04-CONTEXT.md
+**Last session:** 2026-07-24T05:00:00.000Z
+**Stopped at:** Phase 4 plans created (04-01..04-03)
+**Resume file:** .planning/phases/04-offer-link-between-notes/04-01-PLAN.md
 
-- **Last action:** Phase 3 closed — VERIFICATION passed; AM-03 marked complete; human spot-check approved.
-- **Next action:** `/gsd-discuss-phase 4 --auto` (or discuss without auto).
-- **Resume from:** Read this file + ROADMAP Phase 4.
+- **Last action:** Phase 4 PLAN.md files written (tracer property → relationship+D-07 → E2E/human).
+- **Next action:** `/gsd-execute-phase 4` (or plan-check then execute).
+- **Resume from:** Read 04-01-PLAN.md + 04-CONTEXT.md.
 
 ## Decisions
 
@@ -107,3 +108,4 @@ progress:
 - [Phase 2]: ACCIDENTAL_MATCH grading + lighter −10 penalty; findAccidentalMatch title then alias
 - [Phase 3]: D-01 findAllAccidentalMatches title∪alias; D-02 populate matchedNotes; D-03–D-05 UI NoteShow stack + distinct alert; D-06 no add-link this phase
 - [Phase 3]: assumption_delta promote — matchedNotes list is primary; matchedNoteId = first-of-list for Phase 4
+- [Phase 4]: D-01 per-row CTA; D-02 reviewed→matched; D-03 preselect past search; D-04 NoteStorage fetch; D-05 hide bare wiki; D-06 write gate; D-07 stay on page via skipNavigation/navigateOnSuccess=false on relationship path
