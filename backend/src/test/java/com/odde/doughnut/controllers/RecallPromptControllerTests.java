@@ -1258,5 +1258,124 @@ class RecallPromptControllerTests extends ControllerTestBase {
       }
       assertThat(memoryTrackerService.isThresholdExceeded(memoryTracker, now), is(false));
     }
+
+    @Test
+    void shouldGradeCorrectWithCreditWhenOverlapTargetDoesNotExist()
+        throws UnexpectedNoAccessRightException {
+      Note noteWithDeadOverlap =
+          makeMe
+              .aNote()
+              .rememberSpelling()
+              .title("Reviewed Alone")
+              .content(
+                  """
+                  ---
+                  aliases:
+                    - "[[No Such Notebook:Missing Partner Title]]"
+                  ---
+                  Body text
+                  """)
+              .please();
+      MemoryTracker tracker =
+          makeMe
+              .aMemoryTrackerFor(noteWithDeadOverlap)
+              .by(currentUser.getUser())
+              .forgettingCurveAndNextRecallAt(200.0f)
+              .spelling()
+              .please();
+      Integer recallCountBefore = tracker.getRecallCount();
+
+      AnswerSpellingDTO answerDTO = new AnswerSpellingDTO();
+      answerDTO.setSpellingAnswer("Reviewed Alone");
+      RecallPrompt prompt = makeMe.aRecallPrompt().forMemoryTracker(tracker).spelling().please();
+
+      AnsweredQuestion result = controller.answerSpelling(prompt, answerDTO);
+
+      assertTrue(result.getAnswer().getCorrect());
+      assertThat(result.getAnswer().getOutcome(), not(is(AnswerOutcome.OVERLAP)));
+      assertThat(result.getOverlap(), anyOf(nullValue(), is(false)));
+      assertThat(tracker.getRecallCount(), equalTo(recallCountBefore + 1));
+    }
+
+    @Test
+    void shouldGradeCorrectWithCreditWhenOverlapPartnerIsUnreadable()
+        throws UnexpectedNoAccessRightException {
+      User otherUser = makeMe.aUser().please();
+      Notebook unreadableNotebook = makeMe.aNotebook().creatorAndOwner(otherUser).please();
+      makeMe.aNote().notebook(unreadableNotebook).title("Shared Unreadable").please();
+      String overlapToken = unreadableNotebook.getName() + ":Shared Unreadable";
+      Note reviewed =
+          makeMe
+              .aNote()
+              .rememberSpelling()
+              .title("Shared Unreadable")
+              .content(
+                  """
+                  ---
+                  aliases:
+                    - "[[%s]]"
+                  ---
+                  Body text
+                  """
+                      .formatted(overlapToken))
+              .please();
+      MemoryTracker tracker =
+          makeMe
+              .aMemoryTrackerFor(reviewed)
+              .by(currentUser.getUser())
+              .forgettingCurveAndNextRecallAt(200.0f)
+              .spelling()
+              .please();
+      Integer recallCountBefore = tracker.getRecallCount();
+
+      AnswerSpellingDTO answerDTO = new AnswerSpellingDTO();
+      answerDTO.setSpellingAnswer("Shared Unreadable");
+      RecallPrompt prompt = makeMe.aRecallPrompt().forMemoryTracker(tracker).spelling().please();
+
+      AnsweredQuestion result = controller.answerSpelling(prompt, answerDTO);
+
+      assertTrue(result.getAnswer().getCorrect());
+      assertThat(result.getAnswer().getOutcome(), not(is(AnswerOutcome.OVERLAP)));
+      assertThat(result.getOverlap(), anyOf(nullValue(), is(false)));
+      assertThat(tracker.getRecallCount(), equalTo(recallCountBefore + 1));
+    }
+
+    @Test
+    void shouldGradeCorrectWithCreditWhenOverlapTokenIsSelfReferential()
+        throws UnexpectedNoAccessRightException {
+      Note selfOverlapping =
+          makeMe
+              .aNote()
+              .rememberSpelling()
+              .title("Self Referential Title")
+              .content(
+                  """
+                  ---
+                  aliases:
+                    - "[[Self Referential Title]]"
+                  ---
+                  Body text
+                  """)
+              .please();
+      MemoryTracker tracker =
+          makeMe
+              .aMemoryTrackerFor(selfOverlapping)
+              .by(currentUser.getUser())
+              .forgettingCurveAndNextRecallAt(200.0f)
+              .spelling()
+              .please();
+      Integer recallCountBefore = tracker.getRecallCount();
+
+      AnswerSpellingDTO answerDTO = new AnswerSpellingDTO();
+      answerDTO.setSpellingAnswer("Self Referential Title");
+      RecallPrompt prompt = makeMe.aRecallPrompt().forMemoryTracker(tracker).spelling().please();
+
+      AnsweredQuestion result = controller.answerSpelling(prompt, answerDTO);
+
+      assertTrue(result.getAnswer().getCorrect());
+      assertThat(result.getAnswer().getOutcome(), not(is(AnswerOutcome.OVERLAP)));
+      assertThat(result.getOverlap(), anyOf(nullValue(), is(false)));
+      assertThat(tracker.getRecallCount(), equalTo(recallCountBefore + 1));
+    }
   }
 }
