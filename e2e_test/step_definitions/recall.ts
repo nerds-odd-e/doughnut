@@ -197,6 +197,27 @@ Then(
   }
 )
 
+Then('I should see an overlap try-again alert for spelling', () => {
+  start.assumeAnsweredQuestionPage().expectOverlapTryAgainForSpelling()
+})
+
+Then(
+  'I should not see matched notes or accidental match on the overlap result',
+  () => {
+    start
+      .assumeAnsweredQuestionPage()
+      .expectNoMatchedNotesOrAccidentalMatchOnOverlap()
+  }
+)
+
+When('I click overlap try again', () => {
+  start.assumeAnsweredQuestionPage().clickOverlapTryAgain()
+})
+
+Then('I should see that my spelling answer is correct', () => {
+  start.assumeAnsweredQuestionPage().expectSpellingAnswerToBeCorrect()
+})
+
 Then('I should see that my answer is correct as the last question', () => {
   start
     .assumeAnsweredQuestionPage()

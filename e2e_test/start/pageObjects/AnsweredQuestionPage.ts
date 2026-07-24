@@ -12,6 +12,22 @@ function expectAccidentalMatchAlert(answer: string) {
     )
 }
 
+function expectOverlapTryAgainAlert() {
+  cy.findByTestId('overlap-try-again-alert')
+    .scrollIntoView()
+    .should('be.visible')
+    .and(
+      'contain.text',
+      "Correct, but we're looking for another answer — try again."
+    )
+  cy.findByTestId('overlap-try-again').should('be.visible')
+}
+
+function expectNoMatchedNotesOrAccidentalMatchOnOverlap() {
+  cy.findByTestId('matched-notes-section').should('not.exist')
+  cy.findByTestId('accidental-match-alert').should('not.exist')
+}
+
 function expectMatchedNoteInSection(matchedNoteTitle: string) {
   cy.findByTestId('matched-notes-section')
     .scrollIntoView()
@@ -105,6 +121,19 @@ const assumeAnsweredQuestionPage = () => {
       cy.url().should('include', '/recall')
       expectAccidentalMatchAlert(answer)
       expectMatchedNoteInSection(matchedNoteTitle)
+      return self
+    },
+    expectOverlapTryAgainForSpelling() {
+      expectOverlapTryAgainAlert()
+      return self
+    },
+    expectNoMatchedNotesOrAccidentalMatchOnOverlap() {
+      expectNoMatchedNotesOrAccidentalMatchOnOverlap()
+      return self
+    },
+    clickOverlapTryAgain() {
+      cy.findByTestId('overlap-try-again').scrollIntoView().click()
+      waitUntilAppIsNotBusy()
       return self
     },
     viewMemoryTracker() {
