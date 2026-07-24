@@ -20,7 +20,7 @@
   },
   "gcpUrlMap": {
     "name": "doughnut-app-service-map",
-    "defaultService": "https://www.googleapis.com/compute/v1/projects/carbon-syntax-298809/global/backendServices/doughnut-app-service",
+    "backendService": "https://www.googleapis.com/compute/v1/projects/carbon-syntax-298809/global/backendServices/doughnut-app-service",
     "staticBackendBucketService": "https://www.googleapis.com/compute/v1/projects/carbon-syntax-298809/global/backendBuckets/doughnut-frontend-backend-bucket",
     "staticPathRules": [
       {

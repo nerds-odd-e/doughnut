@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import YAML from 'yaml'
+import { backendMigPathRulesFromHints } from './pathGoesToBackend.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -53,12 +54,14 @@ export function renderDoughnutAppServiceUrlMapTemplate(templateText, githubSha) 
  */
 export function renderDoughnutAppServiceUrlMapYamlFromRouting(routing, githubSha) {
   const sha = assertGithubSha40(githubSha)
-  const { gcpUrlMap } = routing
+  const { gcpUrlMap, backendPathHints } = routing
   const bucket = gcpUrlMap.staticBackendBucketService
-  const migDefault = gcpUrlMap.defaultService
-  const subst = (s) =>
-    s.split(FRONTEND_GITHUB_SHA_PLACEHOLDER).join(sha)
-  const pathRules = gcpUrlMap.staticPathRules.map((rule) => ({
+  const backendService = gcpUrlMap.backendService
+  const subst = (s) => s.split(FRONTEND_GITHUB_SHA_PLACEHOLDER).join(sha)
+
+  const backendRules = backendMigPathRulesFromHints(backendPathHints, backendService)
+
+  const staticRules = gcpUrlMap.staticPathRules.map((rule) => ({
     paths: rule.paths,
     service: bucket,
     routeAction: {
@@ -67,15 +70,36 @@ export function renderDoughnutAppServiceUrlMapYamlFromRouting(routing, githubSha
       },
     },
   }))
+
+  const catchAllRule = {
+    paths: ['/*'],
+    service: bucket,
+    routeAction: {
+      urlRewrite: {
+        pathPrefixRewrite: subst(`/frontend/${FRONTEND_GITHUB_SHA_PLACEHOLDER}/`),
+      },
+    },
+  }
+
   const doc = {
     name: gcpUrlMap.name,
-    defaultService: migDefault,
+    defaultService: bucket,
     hostRules: [{ hosts: ['*'], pathMatcher: 'doughnut-paths' }],
     pathMatchers: [
       {
         name: 'doughnut-paths',
-        defaultService: migDefault,
-        pathRules,
+        defaultService: bucket,
+        pathRules: [...backendRules, ...staticRules, catchAllRule],
+        defaultCustomErrorResponsePolicy: {
+          errorResponseRules: [
+            {
+              matchResponseCodes: ['404'],
+              path: subst(`/frontend/${FRONTEND_GITHUB_SHA_PLACEHOLDER}/index.html`),
+              overrideResponseCode: 200,
+            },
+          ],
+          errorService: bucket,
+        },
       },
     ],
   }

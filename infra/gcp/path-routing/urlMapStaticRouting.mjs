@@ -10,9 +10,9 @@ import { defaultDoughnutRoutingPath, loadDoughnutRouting } from './doughnutRouti
  * @param {string} urlPath pathname only, no query
  */
 export function gcpPathPatternMatches(pattern, urlPath) {
-  if (pattern.endsWith('/*')) {
-    const dir = pattern.slice(0, -1)
-    return urlPath.startsWith(dir)
+  if (pattern.endsWith('*')) {
+    const prefix = pattern.slice(0, -1)
+    return urlPath.startsWith(prefix)
   }
   return urlPath === pattern
 }
