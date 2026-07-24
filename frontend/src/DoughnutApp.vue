@@ -65,9 +65,8 @@ onMounted(async () => {
 <template>
   <SoftKeyboardPrimer />
   <Popups />
-  <LoadingThinBar v-if="user && apiStatus.states.length > 0" />
+  <LoadingThinBar v-if="apiStatus.states.length > 0" />
   <LoadingModal
-    v-if="user"
     :show="!!blockingApiState"
     :message="blockingApiState?.message"
     :cancel-control="
