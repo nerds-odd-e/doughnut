@@ -20,7 +20,9 @@ public class NoteExtractionResult {
   public String newNoteTitle;
 
   @NotNull
-  @JsonPropertyDescription("The content for the new note in markdown format")
+  @JsonPropertyDescription(
+      "Markdown body for the new note. Do not repeat newNoteTitle as a leading markdown heading;"
+          + " the title is stored separately and shown by the UI.")
   @JsonProperty(required = true)
   public String newNoteContent;
 
