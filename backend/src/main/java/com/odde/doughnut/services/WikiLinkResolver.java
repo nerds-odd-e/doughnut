@@ -40,7 +40,37 @@ public class WikiLinkResolver {
   }
 
   public Optional<Note> findAccidentalMatch(String answer, Note reviewedNote, User viewer) {
-    for (Note candidate : noteRepository.findByNoteTitleOrderByIdAsc(answer)) {
+    Optional<Note> titleMatch =
+        firstReadableAccidentalCandidate(
+            noteRepository.findByNoteTitleOrderByIdAsc(answer), reviewedNote, viewer);
+    if (titleMatch.isPresent()) {
+      return titleMatch;
+    }
+    return firstReadableAccidentalCandidate(
+        aliasAccidentalCandidates(answer), reviewedNote, viewer);
+  }
+
+  private List<Note> aliasAccidentalCandidates(String answer) {
+    String lookupKey = FrontmatterAliases.normalizedLookupKey(answer);
+    List<NoteAliasIndex> rows =
+        noteAliasIndexRepository.findByAliasLookupKeyOrderByNoteIdAsc(lookupKey);
+    if (rows.isEmpty()) {
+      return List.of();
+    }
+    List<Note> distinctNotes = new ArrayList<>();
+    Set<Integer> seenNoteIds = new HashSet<>();
+    for (NoteAliasIndex row : rows) {
+      Note note = row.getNote();
+      if (seenNoteIds.add(note.getId())) {
+        distinctNotes.add(note);
+      }
+    }
+    return distinctNotes;
+  }
+
+  private Optional<Note> firstReadableAccidentalCandidate(
+      List<Note> candidates, Note reviewedNote, User viewer) {
+    for (Note candidate : candidates) {
       Notebook notebook = candidate.getNotebook();
       if (notebook != null
           && authorizationService.userMayReadNotebook(viewer, notebook)

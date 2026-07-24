@@ -14,6 +14,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.NoteAliasIndexService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
@@ -39,6 +40,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
   @Autowired MakeMe makeMe;
   @Autowired RecallPromptController controller;
   @Autowired GlobalSettingsService globalSettingsService;
+  @Autowired NoteAliasIndexService noteAliasIndexService;
   OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
   @BeforeEach
@@ -814,6 +816,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
               .title("Unrelated Note Title")
               .content("---\naliases:\n  - " + alias + "\n---\n\nbody")
               .please();
+      noteAliasIndexService.refreshForNote(aliasBearingNote);
       answerDTO.setSpellingAnswer(alias);
 
       AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
