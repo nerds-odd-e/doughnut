@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 6
 current_phase_name: Overlap try again no credit
-status: ready_to_execute
-stopped_at: Completed 06-03-PLAN.md
-last_updated: "2026-07-24T12:24:33.819Z"
+status: phase_complete
+stopped_at: Completed 06-04-PLAN.md
+last_updated: "2026-07-24T12:31:59.873Z"
 progress:
   total_phases: 6
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 16
-  completed_plans: 15
+  completed_plans: 16
 ---
 
 # State: Spelling Answer Match & Link
@@ -21,20 +21,20 @@ progress:
 - **Project:** Spelling Answer Match & Link
 - **Core value:** During spelling recall, an answer that names a *different* note becomes a learning opportunity — penalized lightly, both notes revealed, and a link offered — turning recall confusion into connection-building; and overlapping-but-distinct notes are kept distinct by asking the user for a more specific answer.
 - **Repo:** `/Users/terryyin/git/doughnut` (brownfield Spring Boot + Vue)
-- **Current focus:** Phase 06 — overlap "try again, no credit"
+- **Current focus:** Phase 06 complete — OVL-01 E2E green; milestone ready for verify/ship
 
 ## Current Position
 
 - **Phase:** 6 — Overlap "try again, no credit"
-- **Plan:** 06-04 (next)
-- **Status:** 06-03 edges complete — ready to execute 06-04 E2E
-- **Progress:** [█████████░] 94% (15/16 plans; 5/6 phases)
+- **Plan:** 06-04 complete (last plan in phase)
+- **Status:** Phase 6 plans 06-01..06-04 complete — OVL-01 live E2E green
+- **Progress:** [██████████] 100% (16/16 plans; 6/6 phases)
 - **UI contract:** `.planning/phases/06-overlap-try-again-no-credit/06-UI-SPEC.md` (status: approved)
-- **Plans:** 06-01 ✓ → 06-02 ✓ → 06-03 ✓ → 06-04 E2E
-- **Last completed:** 06-03 dead/unreadable/self CORRECT + matched-notes gate
+- **Plans:** 06-01 ✓ → 06-02 ✓ → 06-03 ✓ → 06-04 ✓
+- **Last completed:** 06-04 overlap_try_again E2E (try-again + distinguishing credit)
 
 ```
-[x][x][x][x][x][ ] 5/6 phases
+[x][x][x][x][x][x] 6/6 phases
 ```
 
 ## Roadmap Snapshot
@@ -50,8 +50,8 @@ progress:
 
 ## Performance Metrics
 
-- **Phases completed:** 5
-- **Requirements delivered:** 8/9 (API-01, API-02, AM-01, AM-02, AM-03, AM-04, OVL-02, OVL-03)
+- **Phases completed:** 6
+- **Requirements delivered:** 9/9 (API-01, API-02, AM-01, AM-02, AM-03, AM-04, OVL-01, OVL-02, OVL-03)
 - **Coverage:** 9/9 mapped (100%)
 
 **Per-Plan Metrics:**
@@ -73,6 +73,7 @@ progress:
 | Phase 06-overlap-try-again-no-credit P01 | 8min | 2 tasks | 8 files |
 | Phase 06-overlap-try-again-no-credit P02 | 12min | 2 tasks | 4 files |
 | Phase 06 P03 | 3min | 2 tasks | 2 files |
+| Phase 06-overlap-try-again-no-credit P04 | 6min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -91,8 +92,7 @@ progress:
 
 ### Known risks / blockers
 
-- None blocking Phase 6. Alias blast radius mitigated by plain-only segregation (Phase 5).
-- Plan 06-03 edges complete. Next: 06-04 E2E.
+- None. Phase 6 OVL-01 complete including live E2E.
 
 ### Todos
 
@@ -101,7 +101,7 @@ progress:
 - [x] Research Phase 6 — RESEARCH.md written.
 - [x] UI-SPEC Phase 6 — approved by gsd-ui-checker (6/6 PASS).
 - [x] Plan Phase 6 — 06-01..06-04 PLAN.md created.
-- [ ] Execute Phase 6 (OVL-01) — start `/gsd-execute-phase 6`.
+- [x] Execute Phase 6 (OVL-01) — 06-01..06-04 complete; overlap_try_again E2E green.
 - [x] Quick plan (outside milestone): `.planning/quick/260724-db-timezone-fix/` — closed 2026-07-24. All 4 phases done and verified live in prod: JDBC session pinned to UTC, and the confirmed 2025-07–2026-06 8h-skew window repaired for `quiz_answer.created_at`, `memory_tracker` scheduling columns, and `note.created_at`. Plan file kept (trimmed) as the permanent forensics record referenced by the migration comments.
 
 ### Open questions
@@ -110,13 +110,13 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T12:24:33.812Z
-**Stopped at:** Completed 06-03-PLAN.md
+**Last session:** 2026-07-24T12:31:59.866Z
+**Stopped at:** Completed 06-04-PLAN.md
 **Resume file:** None
 
-- **Last action:** Completed 06-03 — dead/unreadable/self CORRECT + matched-notes gate proofs.
-- **Next action:** Execute 06-04 (E2E).
-- **Resume from:** Read this file + `06-04-PLAN.md` + locked `06-CONTEXT.md` / `06-RESEARCH.md`.
+- **Last action:** Completed 06-04 — overlap_try_again E2E green without `@wip` (OVL-01).
+- **Next action:** Phase/milestone verify or ship (`/gsd-verify-work` / `/gsd-ship`).
+- **Resume from:** Not needed — Phase 6 plans complete.
 
 ## Decisions
 
@@ -135,3 +135,4 @@ progress:
 - [Phase ?]: OVERLAP correct=false + zero mark path; frontend stay/retry via spellingRetryNonce (D-03/D-05)
 - [Phase 6]: 06-02: Auto-selected option-flyway — persist Answer.outcome + exclude OVERLAP from wrong-count; D-03 correct=false unchanged
 - [Phase ?]: 06-03: No production change — 06-01 dual-match + ACCIDENTAL_MATCH-only matched-notes gate already cover D-01/D-07 edges
+- [Phase ?]: E2E dual-match fixture: colour+[[Partner]] with Partner alias colour; credit via last-answered spelling

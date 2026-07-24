@@ -15,7 +15,7 @@
 - [x] **Phase 3: Reveal both notes after accidental match** - Show the reviewed note and the matched note(s) together after an accidental match (completed 2026-07-24)
 - [x] **Phase 4: Offer link between notes** - Let the user build a link (property link or relationship note) between the reviewed and matched note via the existing add-link UI, with the matched note pre-selected (completed 2026-07-24)
 - [x] **Phase 5: Alias-as-wiki-link overlap declaration** - Extend `aliases` frontmatter to accept wiki-link values pointing to another note, preserving wiki-resolve/search/cloze-masking behavior (completed 2026-07-24)
-- [ ] **Phase 6: Overlap "try again, no credit"** - As a learner in spelling recall, I want to be asked to try a more specific answer when my answer is correct but non-distinguishing because of declared overlap, so that I get no SRS credit and can retry the same review without mutating note data
+- [x] **Phase 6: Overlap "try again, no credit"** - As a learner in spelling recall, I want to be asked to try a more specific answer when my answer is correct but non-distinguishing because of declared overlap, so that I get no SRS credit and can retry the same review without mutating note data (completed 2026-07-24)
 
 ## Phase Details
 
@@ -155,14 +155,14 @@ Plans:
   2. An overlap response gives no SRS credit (the review is not marked correct).
   3. An overlap response does not mutate note data — the user simply retries the same review.
 
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans executed
 
 Plans:
 
 - [x] 06-01-PLAN.md — Tracer: dual-match OVERLAP grade + warning try-again UI + stay/retry
 - [x] 06-02-PLAN.md — Durable D-04: Flyway persist outcome + exclude OVERLAP from wrong-count
 - [x] 06-03-PLAN.md — Edge cases: dead/unreadable/self → CORRECT; AM + matched-notes gates
-- [ ] 06-04-PLAN.md — E2E overlap_try_again.feature (try-again + distinguishing credit)
+- [x] 06-04-PLAN.md — E2E overlap_try_again.feature (try-again + distinguishing credit)
 
 **UI hint**: yes
 
@@ -175,7 +175,7 @@ Plans:
 | 3. Reveal both notes after accidental match | 3/3 | Complete    | 2026-07-24 |
 | 4. Offer link between notes | 3/3 | Complete    | 2026-07-24 |
 | 5. Alias-as-wiki-link overlap declaration | 3/3 | Complete    | 2026-07-24 |
-| 6. Overlap "try again, no credit" | 3/4 | In Progress|  |
+| 6. Overlap "try again, no credit" | 4/4 | Complete    | 2026-07-24 |
 
 ## Coverage
 
