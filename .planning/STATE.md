@@ -5,10 +5,10 @@ milestone_name: milestone
 current_phase: 4
 current_phase_name: Offer link between notes
 status: planning
-stopped_at: Phase 3 complete; next Phase 4 discuss
-last_updated: "2026-07-24T04:30:52.170Z"
+stopped_at: Phase 4 context gathered
+last_updated: "2026-07-24T04:35:41.729Z"
 progress:
-  total_phases: 6
+  total_phases: 4
   completed_phases: 3
   total_plans: 6
   completed_plans: 6
@@ -93,9 +93,9 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T04:30:29.971Z
-**Stopped at:** Phase 3 complete; next Phase 4 discuss
-**Resume file:** .planning/ROADMAP.md
+**Last session:** 2026-07-24T04:35:41.722Z
+**Stopped at:** Phase 4 context gathered
+**Resume file:** .planning/phases/04-offer-link-between-notes/04-CONTEXT.md
 
 - **Last action:** Phase 3 closed — VERIFICATION passed; AM-03 marked complete; human spot-check approved.
 - **Next action:** `/gsd-discuss-phase 4 --auto` (or discuss without auto).
