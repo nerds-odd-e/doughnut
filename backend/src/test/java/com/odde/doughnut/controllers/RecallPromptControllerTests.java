@@ -829,5 +829,25 @@ class RecallPromptControllerTests extends ControllerTestBase {
       assertNull(answerResult.getMatchedNotes());
       assertNull(answerResult.getOverlap());
     }
+
+    @Test
+    void shouldNotDropForgettingCurveIndexBelowFloorOnAccidentalMatch()
+        throws UnexpectedNoAccessRightException {
+      memoryTracker.setForgettingCurveIndex(ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX);
+      memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
+      makeMe.entityPersister.save(memoryTracker);
+      answerDTO.setSpellingAnswer(secondNote.getTitle());
+      testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
+
+      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+
+      assertThat(answerResult.getAnswer().getOutcome(), is(AnswerOutcome.ACCIDENTAL_MATCH));
+      assertThat(
+          memoryTracker.getForgettingCurveIndex(),
+          equalTo(ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX));
+      assertThat(
+          memoryTracker.getNextRecallAt(),
+          greaterThanOrEqualTo(testabilitySettings.getCurrentUTCTimestamp()));
+    }
   }
 }
