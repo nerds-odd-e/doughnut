@@ -4,8 +4,8 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 6
 current_phase_name: Overlap try again no credit
-status: ready_to_discuss
-stopped_at: Phase 6 context gathered
+status: ready_to_plan
+stopped_at: Phase 6 research complete
 last_updated: "2026-07-24T11:45:10.878Z"
 progress:
   total_phases: 6
@@ -27,7 +27,7 @@ progress:
 
 - **Phase:** 6 — Overlap "try again, no credit"
 - **Plan:** Not started
-- **Status:** Ready to discuss/plan
+- **Status:** Research complete — ready to plan
 - **Progress:** [█████████████░░░░░░░] 5/6 phases
 
 ```
@@ -90,12 +90,14 @@ progress:
 ### Todos
 
 - [x] Execute Phase 5 (05-01..05-03) — OVL-02/OVL-03 complete; VERIFICATION passed 8/8.
-- [ ] Run `/gsd-discuss-phase 6` (or `--auto`) then plan/execute OVL-01.
+- [x] Discuss Phase 6 (`--auto`) — CONTEXT gathered.
+- [x] Research Phase 6 — RESEARCH.md written.
+- [ ] Plan/execute Phase 6 (OVL-01).
 - [x] Quick plan (outside milestone): `.planning/quick/260724-db-timezone-fix/` — closed 2026-07-24. All 4 phases done and verified live in prod: JDBC session pinned to UTC, and the confirmed 2025-07–2026-06 8h-skew window repaired for `quiz_answer.created_at`, `memory_tracker` scheduling columns, and `note.created_at`. Plan file kept (trimmed) as the permanent forensics record referenced by the migration comments.
 
 ### Open questions
 
-- Whether the overlap "try again" re-asks the same review immediately or re-queues (Phase 6).
+- Overlap retry: stay on same memory tracker (D-05); open: durable D-04 vs Flyway (see RESEARCH).
 
 ## Session Continuity
 
