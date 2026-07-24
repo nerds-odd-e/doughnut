@@ -1,7 +1,8 @@
 ---
 phase: 6
 slug: overlap-try-again-no-credit
-status: draft
+status: approved
+reviewed_at: 2026-07-24T19:54:00+08:00
 shadcn_initialized: false
 preset: none
 created: 2026-07-24
@@ -294,14 +295,14 @@ Do not design or implement in Phase 6:
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending — awaiting gsd-ui-checker
+**Approval:** approved by gsd-ui-checker — 2026-07-24T19:54:00+08:00
 
 ---
 

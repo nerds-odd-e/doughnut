@@ -5,8 +5,8 @@ milestone_name: milestone
 current_phase: 6
 current_phase_name: Overlap try again no credit
 status: ready_to_plan
-stopped_at: Phase 6 research complete
-last_updated: "2026-07-24T11:45:10.878Z"
+stopped_at: Phase 6 UI-SPEC approved — ready for plan-phase
+last_updated: "2026-07-24T19:54:00+08:00"
 progress:
   total_phases: 6
   completed_phases: 5
@@ -27,8 +27,9 @@ progress:
 
 - **Phase:** 6 — Overlap "try again, no credit"
 - **Plan:** Not started
-- **Status:** Research complete — ready to plan
+- **Status:** Research + UI-SPEC approved — ready for plan-phase
 - **Progress:** [█████████████░░░░░░░] 5/6 phases
+- **UI contract:** `.planning/phases/06-overlap-try-again-no-credit/06-UI-SPEC.md` (status: approved)
 
 ```
 [x][x][x][x][x][ ] 5/6 phases
@@ -92,6 +93,7 @@ progress:
 - [x] Execute Phase 5 (05-01..05-03) — OVL-02/OVL-03 complete; VERIFICATION passed 8/8.
 - [x] Discuss Phase 6 (`--auto`) — CONTEXT gathered.
 - [x] Research Phase 6 — RESEARCH.md written.
+- [x] UI-SPEC Phase 6 — approved by gsd-ui-checker (6/6 PASS).
 - [ ] Plan/execute Phase 6 (OVL-01).
 - [x] Quick plan (outside milestone): `.planning/quick/260724-db-timezone-fix/` — closed 2026-07-24. All 4 phases done and verified live in prod: JDBC session pinned to UTC, and the confirmed 2025-07–2026-06 8h-skew window repaired for `quiz_answer.created_at`, `memory_tracker` scheduling columns, and `note.created_at`. Plan file kept (trimmed) as the permanent forensics record referenced by the migration comments.
 
@@ -101,13 +103,13 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T11:45:10.865Z
-**Stopped at:** Phase 6 context gathered
-**Resume file:** .planning/phases/06-overlap-try-again-no-credit/06-CONTEXT.md
+**Last session:** 2026-07-24T19:54:00+08:00
+**Stopped at:** Phase 6 UI-SPEC approved
+**Resume file:** .planning/phases/06-overlap-try-again-no-credit/06-UI-SPEC.md
 
-- **Last action:** Phase 5 closed — VERIFICATION passed; OVL-02/OVL-03 complete.
-- **Next action:** `/gsd-discuss-phase 6 --auto` (or discuss without auto).
-- **Resume from:** Read this file + ROADMAP Phase 6.
+- **Last action:** UI-SPEC verified — all 6 dimensions PASS; status approved.
+- **Next action:** `/gsd-plan-phase 6` (or plan-phase for OVL-01).
+- **Resume from:** Read this file + approved `06-UI-SPEC.md` + `06-CONTEXT.md` / `06-RESEARCH.md`.
 
 ## Decisions
 
