@@ -5,8 +5,8 @@ milestone_name: milestone
 current_phase: 5
 current_phase_name: Alias-as-wiki-link overlap declaration
 status: planning
-stopped_at: Phase 5 context gathered
-last_updated: "2026-07-24T05:35:34.499Z"
+stopped_at: Phase 5 research complete
+last_updated: "2026-07-24T05:40:00.000Z"
 progress:
   total_phases: 5
   completed_phases: 4
@@ -27,7 +27,7 @@ progress:
 
 - **Phase:** 5 — Alias-as-wiki-link overlap declaration
 - **Plan:** Not started
-- **Status:** Ready to discuss/plan
+- **Status:** Research complete — ready to plan
 - **Progress:** [█████████████░░░░░░░] 4/6 phases
 
 ```
@@ -87,7 +87,9 @@ progress:
 ### Todos
 
 - [x] Execute Phase 4 (04-01..04-03) — AM-04 offer-link complete; E2E green; human verify approved (E2E-env browser subagent).
-- [ ] Run `/gsd-discuss-phase 5` (or `--auto`) then plan/execute OVL-02/OVL-03.
+- [x] Run `/gsd-discuss-phase 5 --auto` — CONTEXT locked (D-01..D-04).
+- [x] Phase 5 research — `05-RESEARCH.md` (consumer inventory + segregation approach).
+- [ ] `/gsd-plan-phase 5` then execute OVL-02/OVL-03.
 
 ### Open questions
 
@@ -95,13 +97,13 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T05:35:34.490Z
-**Stopped at:** Phase 5 context gathered
-**Resume file:** .planning/phases/05-alias-as-wiki-link-overlap-declaration/05-CONTEXT.md
+**Last session:** 2026-07-24T05:40:00.000Z
+**Stopped at:** Phase 5 research complete
+**Resume file:** .planning/phases/05-alias-as-wiki-link-overlap-declaration/05-RESEARCH.md
 
-- **Last action:** Phase 4 closed — VERIFICATION passed; AM-04 complete; human spot-check approved via E2E-env subagent.
-- **Next action:** `/gsd-discuss-phase 5 --auto` (or discuss without auto).
-- **Resume from:** Read this file + ROADMAP Phase 5.
+- **Last action:** Phase 5 RESEARCH.md written (consumer inventory, plain-vs-overlap segregation, frontend authored-validation parity).
+- **Next action:** `/gsd-plan-phase 5` (planner consumes 05-RESEARCH.md + 05-CONTEXT.md).
+- **Resume from:** Read 05-CONTEXT.md + 05-RESEARCH.md + ROADMAP Phase 5.
 
 ## Decisions
 
