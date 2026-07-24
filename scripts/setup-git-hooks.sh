@@ -8,7 +8,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 GIT_HOOKS_SOURCE="$SCRIPT_DIR/git-hooks"
-GIT_HOOKS_TARGET="$REPO_ROOT/.git/hooks"
+GIT_HOOKS_TARGET="$(git rev-parse --git-common-dir)/hooks"
 
 if [ ! -d "$GIT_HOOKS_TARGET" ]; then
   echo "Error: .git/hooks directory not found. Are you in a git repository?"
