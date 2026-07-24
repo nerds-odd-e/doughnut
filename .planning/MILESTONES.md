@@ -1,5 +1,22 @@
 # Milestones
 
+## v1.1 Spelling Answer Match & Link (Shipped: 2026-07-25)
+
+**Phases completed:** 6 phases, 16 plans, 32 tasks
+
+**Key accomplishments:**
+
+- Extended `Answer`/`AnsweredQuestion` with `AnswerOutcome` (CORRECT / WRONG / ACCIDENTAL_MATCH / OVERLAP), `@Transient matchedNoteId`, optional `overlap` + `matchedNotes`; OpenAPI client regenerated.
+- Accidental-match grading across readable notebooks (title then alias) with lighter −10 SRS penalty (no 12h override).
+- Spelling result reveals reviewed + matched notes and offers property/relationship link with matched note pre-selected (stay-on-page for relationship).
+- Alias-as-wiki-link overlap declaration via `FrontmatterAliases` plain-only `from*` + `overlapWikiLinkTokensFrom*`, preserving wiki-resolve / search / cloze.
+- OVERLAP try-again: dual-match withholds SRS credit, remount retry, Flyway-persisted `quiz_answer.outcome` excluded from wrong-count; live E2E green.
+
+**Closeout type:** override_closeout
+**Known verification overrides:** 1 (see STATE.md Deferred Items) — quick task `260724-db-timezone-fix` is closed forensics kept for migration comments; milestone audit skipped by acknowledgment at close.
+
+---
+
 ## v1.0 Notebook Lint & Auto-Fix (Shipped: 2026-07-23)
 
 **Phases completed:** 7 phases, 13 plans, 26 tasks
