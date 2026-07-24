@@ -5,10 +5,10 @@ milestone_name: milestone
 current_phase: 5
 current_phase_name: Alias-as-wiki-link overlap declaration
 status: planning
-stopped_at: Phase 4 complete; next Phase 5 discuss
-last_updated: "2026-07-24T05:30:00.000Z"
+stopped_at: Phase 5 context gathered
+last_updated: "2026-07-24T05:35:34.499Z"
 progress:
-  total_phases: 6
+  total_phases: 5
   completed_phases: 4
   total_plans: 9
   completed_plans: 9
@@ -95,9 +95,9 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T05:30:00.000Z
-**Stopped at:** Phase 4 complete; next Phase 5 discuss
-**Resume file:** .planning/ROADMAP.md
+**Last session:** 2026-07-24T05:35:34.490Z
+**Stopped at:** Phase 5 context gathered
+**Resume file:** .planning/phases/05-alias-as-wiki-link-overlap-declaration/05-CONTEXT.md
 
 - **Last action:** Phase 4 closed — VERIFICATION passed; AM-04 complete; human spot-check approved via E2E-env subagent.
 - **Next action:** `/gsd-discuss-phase 5 --auto` (or discuss without auto).
