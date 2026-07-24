@@ -503,7 +503,7 @@ export class PredefinedQuestionController {
     }
     
     public static deleteQuestion<ThrowOnError extends boolean = false>(options: Options<DeleteQuestionData, ThrowOnError>): RequestResult<DeleteQuestionResponses, unknown, ThrowOnError> {
-        return (options.client ?? client).delete<DeleteQuestionResponses, unknown, ThrowOnError>({ url: '/api/predefined-questions/{predefinedQuestion}', ...options });
+        return (options.client ?? client).delete<DeleteQuestionResponses, unknown, ThrowOnError>({ url: '/api/predefined-questions/{predefinedQuestionId}', ...options });
     }
 }
 

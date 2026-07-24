@@ -3845,10 +3845,10 @@ export type DeleteTokenResponses = {
 export type DeleteQuestionData = {
     body?: never;
     path: {
-        predefinedQuestion: number;
+        predefinedQuestionId: number;
     };
     query?: never;
-    url: '/api/predefined-questions/{predefinedQuestion}';
+    url: '/api/predefined-questions/{predefinedQuestionId}';
 };
 
 export type DeleteQuestionResponses = {

@@ -70,12 +70,11 @@ class PredefinedQuestionController {
     return predefinedQuestionService.addQuestion(note, predefinedQuestion);
   }
 
-  @DeleteMapping("/{predefinedQuestion}")
+  @DeleteMapping("/{predefinedQuestionId}")
   @Transactional
-  public void deleteQuestion(
-      @PathVariable("predefinedQuestion") @Schema(type = "integer")
-          PredefinedQuestion predefinedQuestion)
+  public void deleteQuestion(@PathVariable("predefinedQuestionId") Integer predefinedQuestionId)
       throws UnexpectedNoAccessRightException {
+    PredefinedQuestion predefinedQuestion = predefinedQuestionService.getById(predefinedQuestionId);
     authorizationService.assertAuthorization(predefinedQuestion.getNote());
     predefinedQuestionService.deleteQuestion(predefinedQuestion);
   }

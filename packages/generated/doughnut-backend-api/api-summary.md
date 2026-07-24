@@ -84,7 +84,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `addQuestionManually`: POST `/api/predefined-questions/{note}/note-questions` -> `AddQuestionManuallyResponse` (request: `AddQuestionManuallyData`; path: note; body: PredefinedQuestion; response body: PredefinedQuestion)
 - `generateQuestionWithoutSave`: POST `/api/predefined-questions/generate-question-without-save` -> `GenerateQuestionWithoutSaveResponse` (request: `GenerateQuestionWithoutSaveData`; query: note; response body: PredefinedQuestion)
 - `exportQuestionGeneration`: GET `/api/predefined-questions/{note}/export-question-generation` -> `ExportQuestionGenerationResponse` (request: `ExportQuestionGenerationData`; path: note; response body: Record<string, unknown>)
-- `deleteQuestion`: DELETE `/api/predefined-questions/{predefinedQuestion}` -> `DeleteQuestionResponse` (request: `DeleteQuestionData`; path: predefinedQuestion; response body: void)
+- `deleteQuestion`: DELETE `/api/predefined-questions/{predefinedQuestionId}` -> `DeleteQuestionResponse` (request: `DeleteQuestionData`; path: predefinedQuestionId; response body: void)
 
 ## Note Controller
 

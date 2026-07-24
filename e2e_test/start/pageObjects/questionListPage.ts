@@ -1,3 +1,4 @@
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import { addQuestionPage } from './addQuestionPage'
 
 export const questionListPage = () => {
@@ -25,13 +26,12 @@ export const questionListPage = () => {
       cy.wait('@deleteQuestion').then(({ response }) => {
         expect(response?.statusCode, 'delete question').to.equal(200)
       })
+      waitUntilAppIsNotBusy()
+      return this
     },
     expectQuestionNotInList(stem: string) {
-      cy.get('body').then(($body) => {
-        if ($body.find('.question-table').length > 0) {
-          cy.get('.question-table').should('not.contain.text', stem)
-        }
-      })
+      cy.findByText(stem).should('not.exist')
+      return this
     },
   }
 }

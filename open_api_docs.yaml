@@ -3009,17 +3009,18 @@ paths:
       responses:
         "200":
           description: OK
-  /api/predefined-questions/{predefinedQuestion}:
+  /api/predefined-questions/{predefinedQuestionId}:
     delete:
       tags:
       - predefined-question-controller
       operationId: deleteQuestion
       parameters:
-      - name: predefinedQuestion
+      - name: predefinedQuestionId
         in: path
         required: true
         schema:
           type: integer
+          format: int32
       responses:
         "200":
           description: OK

@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.server.ResponseStatusException;
 
 class PredefinedQuestionControllerTests extends ControllerTestBase {
 
@@ -116,13 +117,20 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
     void authorization() {
       PredefinedQuestion othersQuestion = makeMe.aPredefinedQuestion().please();
       assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.deleteQuestion(othersQuestion));
+          UnexpectedNoAccessRightException.class,
+          () -> controller.deleteQuestion(othersQuestion.getId()));
+    }
+
+    @Test
+    void notFoundWhenQuestionDoesNotExist() {
+      assertThrows(
+          ResponseStatusException.class, () -> controller.deleteQuestion(Integer.MAX_VALUE));
     }
 
     @Test
     void deleteSuccessfully() throws UnexpectedNoAccessRightException {
       assertThat(note.getPredefinedQuestions(), hasSize(1));
-      controller.deleteQuestion(predefinedQuestion);
+      controller.deleteQuestion(predefinedQuestion.getId());
       makeMe.refresh(note);
       assertThat(note.getPredefinedQuestions(), hasSize(0));
     }

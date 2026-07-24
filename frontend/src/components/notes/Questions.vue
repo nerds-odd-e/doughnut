@@ -57,8 +57,8 @@
           <td>
             <button
               class="daisy-btn daisy-btn-ghost daisy-btn-sm"
-              :title="`Delete question`"
-              :aria-label="`Delete question`"
+              title="Delete question"
+              aria-label="Delete question"
               @click="deleteQuestion(question)"
             >
               <Trash2 class="w-5 h-5" />
@@ -121,7 +121,7 @@ const deleteQuestion = async (question: PredefinedQuestion) => {
   }
   const { error } = await apiCallWithLoading(() =>
     PredefinedQuestionController.deleteQuestion({
-      path: { predefinedQuestion: question.id },
+      path: { predefinedQuestionId: question.id },
     })
   )
   if (!error) {

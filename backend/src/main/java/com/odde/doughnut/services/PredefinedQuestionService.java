@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.PredefinedQuestionRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -10,22 +11,33 @@ import java.sql.Timestamp;
 import java.util.concurrent.ThreadLocalRandom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class PredefinedQuestionService {
   private final EntityPersister entityPersister;
+  private final PredefinedQuestionRepository predefinedQuestionRepository;
   private final AiQuestionGenerator aiQuestionGenerator;
   private final int regenerationTimes;
 
   @Autowired
   public PredefinedQuestionService(
       EntityPersister entityPersister,
+      PredefinedQuestionRepository predefinedQuestionRepository,
       AiQuestionGenerator aiQuestionGenerator,
       @Value("${question.regeneration.times:0}") int regenerationTimes) {
     this.entityPersister = entityPersister;
+    this.predefinedQuestionRepository = predefinedQuestionRepository;
     this.aiQuestionGenerator = aiQuestionGenerator;
     this.regenerationTimes = regenerationTimes;
+  }
+
+  public PredefinedQuestion getById(Integer predefinedQuestionId) {
+    return predefinedQuestionRepository
+        .findById(predefinedQuestionId)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
   }
 
   public PredefinedQuestion addQuestion(Note note, PredefinedQuestion predefinedQuestion) {
