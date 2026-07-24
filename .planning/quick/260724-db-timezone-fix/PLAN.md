@@ -130,4 +130,50 @@ to skip entirely.
   not invoked from any workflow (dead/orphaned composite action) — left untouched.
   Full backend suite (`pnpm backend:test_only`) green after the change; `pnpm lint:all` /
   `pnpm format:all` clean.
-  No scope change to Phases 2–4.
+  Deployed to prod via normal CI rolling replace; confirmed live via SSH
+  (`-Duser.timezone=UTC`, datasource URL carries the new params).
+
+- 2026-07-24: **Root-cause model revised after production read-only forensics (Phase 2 prereq).**
+  Original theory (single skew window ≈ the 2026-06-20 JVM tz cutover) is **wrong**. Real picture,
+  found via read-only `SELECT`s against prod through `gcloud compute ssh` (no writes):
+  - Prod DB session/system time zone has **always been UTC** (`@@system_time_zone=UTC`,
+    `@@session.time_zone=SYSTEM`) — confirmed directly. The 2026-06-20 JVM change (Singapore→UTC)
+    made the **JVM** match the **DB**, which had already been UTC all along. So Phase 1's config
+    pin, while still a good defensive fix, was a **no-op for current prod behavior** — there was no
+    live JDBC mismatch today.
+  - The real bug is historical: binning `quiz_answer` (joined to `recall_prompt`/`memory_tracker`,
+    `user_id=1`) by month into "true ~7am cluster" (raw stored hour 22,23,0 UTC → displays 06:00–08:00
+    Shanghai) vs "spurious ~15:00 cluster" (raw stored hour 6,7,8,9 UTC → displays 14:00–17:00
+    Shanghai) shows a **clean flip**:
+    - 2023-07 → 2025-05: "true" cluster dominant (matches user's confirmed real habit: ~7am + a
+      smaller 19:00–22:00 evening scatter).
+    - **2025-06 → 2026-06 (~13 months)**: flips hard — "spurious" cluster dominant (e.g. 2025-11:
+      true=10, spurious=2442). This is the actual skewed window, ~13x bigger than originally planned.
+    - 2026-06: transitional month (the 2026-06-20 JVM fix rolled out mid-month).
+    - 2026-07 (post-fix): back to "true" dominant (true=1686, spurious=253) — matches user's
+      self-reported real habit almost exactly. Confirms **today's live behavior is correct**.
+  - User confirmed (2026-07-24) their real habit is "mostly ~7am, small scatter 19:00–22:00" — this
+    matches the pre-2025-06 and post-2026-07 eras, and contradicts the 2025-06→2026-06 era, which is
+    now confirmed to be **display-bug artifacts**, not real usage.
+  - **Unknown**: what caused the 2025-06 flip. It predates the known 2026-06-20 JVM change by a full
+    year, so that commit is not the trigger — it just happens to have corrected the symptom as a side
+    effect (the commit's stated purpose was `fix(batch-question-generation)`, unrelated to stats).
+    Candidate causes not yet checked: MySQL Connector/J version bumps around 2025-04/05
+    (9.2.0 @ 2025-04-04, 9.3.0 @ 2025-05-07 — default `connectionTimeZone` behavior may differ across
+    minor versions); a DB server VM change/recreation around mid-2025 (not visible in this repo's git
+    history — would need GCP audit logs or `db-server` instance metadata); some other prod config
+    change. Driver history in this data's lifetime: `mysql:mysql-connector-java` (legacy, unpinned
+    version) from before 2023-06-29 (earliest `quiz_answer` row) until 2024-01-27, then
+    `com.mysql:mysql-connector-j` 8.1.0 → 9.7.0 (today) — the Jan 2024 driver-family switch does NOT
+    line up with the 2025-06 flip, so it's a separate, ruled-out candidate.
+  - **Impact**: ~13 months of `quiz_answer.created_at` (and likely `memory_tracker` scheduling
+    columns touched in the same window) are stored/interpreted 8h off from their true instant. This
+    is a much bigger repair than the original "1 month around 6/20" scope, but also much better
+    evidenced (clean monthly boundary, corroborated by the user's own habit description).
+  - **Decision needed from developer** before designing the real Phase 2: (a) worth spending more
+    effort to find the exact 2025-06 trigger (for confidence in the correction direction/scope), or
+    (b) proceed straight to a repair plan bounded by the empirically-observed monthly cluster
+    flip (2025-06-01 ↔ 2026-06-20ish), accepting some fuzziness at the two transition months.
+  - Phases 2–4 as originally written are **superseded** — do not execute them as-is. A new repair
+    plan must be designed against the real (~13-month) window once the developer decides how much
+    further to investigate the 2025-06 trigger.

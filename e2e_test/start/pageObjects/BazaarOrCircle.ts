@@ -1,3 +1,4 @@
+import { pageIsNotLoading } from '../pageBase'
 import { findNotebookCardButton, notebookList } from './NotebookList'
 
 const addToMyLearning = 'Add to my learning'
@@ -14,6 +15,7 @@ export const bazaarOrCircle = () => {
         .clear()
         .type(dailyLearningCount)
       cy.findByRole('button', { name: 'Submit' }).click()
+      pageIsNotLoading()
     },
   }
 }
