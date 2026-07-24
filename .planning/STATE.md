@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 5
 current_phase_name: Alias-as-wiki-link overlap declaration
-status: planning
-stopped_at: Phase 5 research complete
-last_updated: "2026-07-24T05:40:00.000Z"
+status: ready_to_execute
+stopped_at: Phase 5 plans created (05-01..05-03)
+last_updated: "2026-07-24T05:50:00.000Z"
 progress:
-  total_phases: 5
+  total_phases: 6
   completed_phases: 4
-  total_plans: 9
+  total_plans: 12
   completed_plans: 9
 ---
 
@@ -26,8 +26,8 @@ progress:
 ## Current Position
 
 - **Phase:** 5 — Alias-as-wiki-link overlap declaration
-- **Plan:** Not started
-- **Status:** Research complete — ready to plan
+- **Plan:** 05-01 next (Wave 1 tracer)
+- **Status:** Planned — 3 plans ready to execute
 - **Progress:** [█████████████░░░░░░░] 4/6 phases
 
 ```
@@ -89,7 +89,8 @@ progress:
 - [x] Execute Phase 4 (04-01..04-03) — AM-04 offer-link complete; E2E green; human verify approved (E2E-env browser subagent).
 - [x] Run `/gsd-discuss-phase 5 --auto` — CONTEXT locked (D-01..D-04).
 - [x] Phase 5 research — `05-RESEARCH.md` (consumer inventory + segregation approach).
-- [ ] `/gsd-plan-phase 5` then execute OVL-02/OVL-03.
+- [x] `/gsd-plan-phase 5` — 05-01..05-03 PLAN.md written.
+- [ ] `/gsd-execute-phase 5` — OVL-02/OVL-03 Structure (no Phase 6 grading).
 
 ### Open questions
 
@@ -97,13 +98,13 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T05:40:00.000Z
-**Stopped at:** Phase 5 research complete
-**Resume file:** .planning/phases/05-alias-as-wiki-link-overlap-declaration/05-RESEARCH.md
+**Last session:** 2026-07-24T05:50:00.000Z
+**Stopped at:** Phase 5 plans created (05-01..05-03)
+**Resume file:** .planning/phases/05-alias-as-wiki-link-overlap-declaration/05-01-PLAN.md
 
-- **Last action:** Phase 5 RESEARCH.md written (consumer inventory, plain-vs-overlap segregation, frontend authored-validation parity).
-- **Next action:** `/gsd-plan-phase 5` (planner consumes 05-RESEARCH.md + 05-CONTEXT.md).
-- **Resume from:** Read 05-CONTEXT.md + 05-RESEARCH.md + ROADMAP Phase 5.
+- **Last action:** Phase 5 PLAN.md files written (tracer + parallel OVL-03 consumer waves).
+- **Next action:** `/gsd-execute-phase 5` starting at 05-01.
+- **Resume from:** Read 05-01-PLAN.md + 05-CONTEXT.md + 05-RESEARCH.md.
 
 ## Decisions
 

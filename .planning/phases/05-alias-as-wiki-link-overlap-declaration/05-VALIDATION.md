@@ -40,10 +40,12 @@ created: 2026-07-24
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 05-01-01 | 01 | 1 | OVL-02 | — | N/A (parser) | unit | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` | ❌ W0 | ⬜ pending |
-| 05-01-02 | 01 | 1 | OVL-02 | — | N/A (frontend validation parity) | unit | `CURSOR_DEV=true nix develop -c pnpm frontend:test` | ❌ W0 | ⬜ pending |
-| 05-02-01 | 02 | 2 | OVL-03 | — | Wiki-link aliases not searchable/indexed | service/controller | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` | ❌ W0 | ⬜ pending |
-| 05-02-02 | 02 | 2 | OVL-03 | — | Cloze / matchAnswer / resolve / AM alias leg ignore wiki-link items | controller/integration | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` | ❌ W0 | ⬜ pending |
+| 05-01-01 | 01 | 1 | OVL-02 | T-05-01 | Whole-item wiki accept; reject malformed [[ | unit + controller | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` | ❌ W0 | ⬜ pending |
+| 05-01-02 | 01 | 1 | OVL-02 | T-05-01 | Frontend authored validation parity | unit | `CURSOR_DEV=true nix develop -c pnpm -C frontend test tests/utils/authoredAliasesValidation.spec.ts` | ❌ W0 | ⬜ pending |
+| 05-02-01 | 02 | 2 | OVL-03 | T-05-04 | Wiki-link aliases not indexed | service | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` | ❌ W0 | ⬜ pending |
+| 05-02-02 | 02 | 2 | OVL-03 | T-05-05 | Wiki-link aliases not searchable | controller | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` | ❌ W0 | ⬜ pending |
+| 05-03-01 | 03 | 2 | OVL-03 | T-05-06 | Wiki-resolve ignores wiki-link alias items | integration | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` | ❌ W0 | ⬜ pending |
+| 05-03-02 | 03 | 2 | OVL-03 | T-05-07 | Cloze / matchAnswer / AM alias leg ignore wiki-link items | controller | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
