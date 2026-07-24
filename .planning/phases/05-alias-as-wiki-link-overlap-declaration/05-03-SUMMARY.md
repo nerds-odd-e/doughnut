@@ -106,7 +106,7 @@ status: complete
 1. **Task 1: Wiki-resolve alias targets ignore overlap wiki-link alias items** - `53ce5843f4` (test)
 2. **Task 2: Cloze, matchAnswer, and accidental-match alias leg ignore wiki-link overlap items** - `7e4f8e29f2` (test)
 
-**Plan metadata:** `docs(05-03)` commit (this SUMMARY)
+**Plan metadata:** `c9dae3ead4` (docs: complete plan)
 
 ## Files Created/Modified
 
