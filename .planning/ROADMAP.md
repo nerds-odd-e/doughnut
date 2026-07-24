@@ -100,13 +100,13 @@ Plans:
   2. The matched note is pre-selected in the add-link UI, so the user can confirm a link with minimal effort.
   3. The system never auto-writes a link — link creation is user-initiated.
 
-**Plans**: 3 plans
+**Plans**: 1/3 plans executed
 **UI hint**: yes
 
 Plans:
 **Wave 1**
 
-- [ ] 04-01-PLAN.md — Tracer: per-matched CTA + MatchedNoteLinkOffer + bareWikiLinkAvailable + property wiki-link via updateTextField + Vitest (D-01–D-06 property path)
+- [x] 04-01-PLAN.md — Tracer: per-matched CTA + MatchedNoteLinkOffer + bareWikiLinkAvailable + property wiki-link via updateTextField + Vitest (D-01–D-06 property path)
 
 **Wave 2** *(blocked on Wave 1)*
 
@@ -155,7 +155,7 @@ Plans:
 | 1. Extend Answer outcome API | 1/1 | Complete    | 2026-07-23 |
 | 2. Accidental-match grading & penalty | 2/2 | Complete    | 2026-07-24 |
 | 3. Reveal both notes after accidental match | 3/3 | Complete    | 2026-07-24 |
-| 4. Offer link between notes | 0/3 | Planned | - |
+| 4. Offer link between notes | 1/3 | In Progress|  |
 | 5. Alias-as-wiki-link overlap declaration | 0/0 | Not started | - |
 | 6. Overlap "try again, no credit" | 0/0 | Not started | - |
 

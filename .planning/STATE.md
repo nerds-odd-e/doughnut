@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 4
 current_phase_name: Offer link between notes
-status: planning
-stopped_at: Phase 4 planned; ready to execute
-last_updated: "2026-07-24T04:56:08.789Z"
+status: executing
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-07-24T05:04:16.947Z"
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 9
-  completed_plans: 6
+  completed_plans: 7
 ---
 
 # State: Spelling Answer Match & Link
@@ -26,9 +26,9 @@ progress:
 ## Current Position
 
 - **Phase:** 4 — Offer link between notes
-- **Plan:** 04-01 (next to execute)
-- **Status:** Plans ready (3 plans / 3 waves)
-- **Progress:** [████████████░░░░░░░░] 3/6 phases
+- **Plan:** 04-02 (next to execute)
+- **Status:** Executing (1/3 plans complete)
+- **Progress:** [████████░░] 78%
 
 ```
 [x][x][x][ ][ ][ ] 3/6 phases
@@ -48,7 +48,7 @@ progress:
 ## Performance Metrics
 
 - **Phases completed:** 3
-- **Requirements delivered:** 5/9 (API-01, API-02, AM-01, AM-02, AM-03)
+- **Requirements delivered:** 6/9 (API-01, API-02, AM-01, AM-02, AM-03, AM-04 property path tracer)
 - **Coverage:** 9/9 mapped (100%)
 
 **Per-Plan Metrics:**
@@ -61,6 +61,7 @@ progress:
 | Phase 03 P01 | 18min | 2 tasks | 5 files |
 | Phase 03 P02 | 3min | 2 tasks | 3 files |
 | Phase 03 P03 | 8min | 2 tasks | 3 files |
+| Phase 04 P01 | 12min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -94,13 +95,13 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T04:56:08.781Z
-**Stopped at:** Phase 4 planned; ready to execute
-**Resume file:** .planning/phases/04-offer-link-between-notes/04-01-PLAN.md
+**Last session:** 2026-07-24T05:04:16.940Z
+**Stopped at:** Completed 04-01-PLAN.md
+**Resume file:** None
 
-- **Last action:** Phase 4 PLAN.md files written (tracer property → relationship+D-07 → E2E/human).
-- **Next action:** `/gsd-execute-phase 4` (or plan-check then execute).
-- **Resume from:** Read 04-01-PLAN.md + 04-CONTEXT.md.
+- **Last action:** Completed 04-01 — property-link tracer (MatchedNoteLinkOffer + CTAs + Vitest).
+- **Next action:** Execute 04-02 (relationship finalize + D-07).
+- **Resume from:** `.planning/phases/04-offer-link-between-notes/04-02-PLAN.md`
 
 ## Decisions
 
@@ -109,3 +110,5 @@ progress:
 - [Phase 3]: D-01 findAllAccidentalMatches title∪alias; D-02 populate matchedNotes; D-03–D-05 UI NoteShow stack + distinct alert; D-06 no add-link this phase
 - [Phase 3]: assumption_delta promote — matchedNotes list is primary; matchedNoteId = first-of-list for Phase 4
 - [Phase 4]: D-01 per-row CTA; D-02 reviewed→matched; D-03 preselect past search; D-04 NoteStorage fetch; D-05 hide bare wiki; D-06 write gate; D-07 stay on page via skipNavigation/navigateOnSuccess=false on relationship path
+- [Phase 4]: Wave 1 hides relationship via relationshipOptionAvailable=false; property write via appendWikiLinkPropertyRow + updateTextField
+- [Phase 4]: wikiPropertyOptionAvailable from parseNoteContentMarkdown on source note, not useContentCursorInserter

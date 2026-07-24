@@ -7,7 +7,7 @@
 - [x] **AM-01**: When a spelling answer is wrong for the reviewed note but matches another note's title or alias (searched across all notebooks the user can read), the system detects an accidental match.
 - [x] **AM-02**: An accidental match applies a slight spaced-repetition penalty that is lighter than a plain wrong answer (a third SRS outcome, no 12h override).
 - [x] **AM-03**: After an accidental match, the reviewed note and the matched note(s) are revealed together.
-- [ ] **AM-04**: After an accidental match, the user can build a link between the reviewed note and a matched note via the existing add-link UI (property link or relationship note), with the matched note pre-selected.
+- [x] **AM-04**: After an accidental match, the user can build a link between the reviewed note and a matched note via the existing add-link UI (property link or relationship note), with the matched note pre-selected.
 
 ### Overlap
 
@@ -39,7 +39,7 @@
 | AM-01 | Phase 2 | Complete |
 | AM-02 | Phase 2 | Complete |
 | AM-03 | Phase 3 | Complete |
-| AM-04 | Phase 4 | pending |
+| AM-04 | Phase 4 | Complete |
 | OVL-01 | Phase 6 | pending |
 | OVL-02 | Phase 5 | pending |
 | OVL-03 | Phase 5 | pending |
