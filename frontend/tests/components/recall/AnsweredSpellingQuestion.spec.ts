@@ -322,5 +322,40 @@ describe("AnsweredSpellingQuestion", () => {
       await tryAgain.trigger("click")
       expect(wrapper.emitted("retry")).toHaveLength(1)
     })
+
+    it("keeps matched-notes section and offer-link CTAs absent when matchedNotes leak on OVERLAP", async () => {
+      const reviewed = makeMe.aNote.title("Reviewed Note").please()
+      const leakedPartner = makeMe.aNote.title("Leaked Partner").please()
+      leakedPartner.id = 99
+      leakedPartner.noteTopology.id = 99
+
+      const answeredQuestion: AnsweredQuestion = {
+        ...makeMe.anAnsweredQuestion
+          .withNote(reviewed)
+          .spelling()
+          .answerCorrect(false)
+          .withAnswer({
+            id: 1,
+            correct: false,
+            spellingAnswer: "Shared Title",
+            outcome: "OVERLAP",
+          })
+          .withMatchedNotes([leakedPartner.noteTopology])
+          .please(),
+        overlap: true,
+      }
+
+      const wrapper = mountAnsweredSpellingQuestion(answeredQuestion)
+      await flushPromises()
+
+      expect(
+        wrapper.find('[data-testid="overlap-try-again-alert"]').exists()
+      ).toBe(true)
+      expect(
+        wrapper.find('[data-testid="matched-notes-section"]').exists()
+      ).toBe(false)
+      expect(wrapper.text()).not.toContain("Link to this note")
+      expect(wrapper.text()).not.toContain("Matched note(s)")
+    })
   })
 })
