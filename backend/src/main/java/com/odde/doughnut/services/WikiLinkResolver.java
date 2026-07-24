@@ -9,6 +9,7 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteAliasIndexRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.validators.DisplayNamePathSeparators;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -54,7 +55,11 @@ public class WikiLinkResolver {
   }
 
   private List<Note> aliasAccidentalCandidates(String answer) {
-    String lookupKey = FrontmatterAliases.normalizedLookupKey(answer);
+    String trimmed = DisplayNamePathSeparators.trimSurroundingWhitespace(answer);
+    if (trimmed == null || trimmed.isBlank()) {
+      return List.of();
+    }
+    String lookupKey = FrontmatterAliases.normalizedLookupKey(trimmed);
     List<NoteAliasIndex> rows =
         noteAliasIndexRepository.findByAliasLookupKeyOrderByNoteIdAsc(lookupKey);
     if (rows.isEmpty()) {

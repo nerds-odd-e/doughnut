@@ -867,6 +867,30 @@ class RecallPromptControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void shouldGradeAsAccidentalMatchWhenWrongAnswerMatchesAliasAfterTrim()
+        throws UnexpectedNoAccessRightException {
+      Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      String alias = "AccidentalAliasMatch";
+      Note aliasBearingNote =
+          makeMe
+              .aNote()
+              .notebook(otherNotebook)
+              .title("Unrelated Note Title For Trim")
+              .content("---\naliases:\n  - " + alias + "\n---\n\nbody")
+              .please();
+      noteAliasIndexService.refreshForNote(aliasBearingNote);
+      answerDTO.setSpellingAnswer("  " + alias + "  ");
+
+      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+
+      assertFalse(answerResult.getAnswer().getCorrect());
+      assertThat(answerResult.getAnswer().getOutcome(), is(AnswerOutcome.ACCIDENTAL_MATCH));
+      assertThat(
+          answerResult.getAnswer().getMatchedNoteId(),
+          equalTo(aliasBearingNote.getId().longValue()));
+    }
+
+    @Test
     void shouldNotDropForgettingCurveIndexBelowFloorOnAccidentalMatch()
         throws UnexpectedNoAccessRightException {
       memoryTracker.setForgettingCurveIndex(ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX);
