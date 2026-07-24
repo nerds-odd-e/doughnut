@@ -21,10 +21,10 @@ During spelling recall, an answer that names a *different* note becomes a learni
 - ✓ API/DTO extension: `Answer.correct` (boolean) → third outcome with accidental-match metadata (`@Transient matchedNoteId` + `AnswerOutcome` enum: CORRECT/WRONG/ACCIDENTAL_MATCH/OVERLAP); `AnsweredQuestion` gains optional `overlap` + `matchedNotes: List<NoteTopology>`; OpenAPI client regenerated — Validated in Phase 1: Extend Answer outcome API (representable but not yet returned)
 - ✓ Accidental-match detection: wrong spelling answer matching another readable note's title or alias → `ACCIDENTAL_MATCH` + `matchedNoteId` — Phase 2 (AM-01)
 - ✓ Slight (lighter-than-wrong) SRS penalty for accidental match (`partialFail` −10, no 12h override) — Phase 2 (AM-02)
+- ✓ Reveal the reviewed note and the matched note(s) together after an accidental match — Phase 3 (AM-03)
 
 ### Active
 
-- [ ] Reveal the reviewed note and the matched note(s) together after an accidental match
 - [ ] Offer to build a link between the notes via the existing add-link UI (property link or relationship note), with the matched note pre-selected
 - [ ] Overlap handling: when the answer is correct for the reviewed note but the reviewed note declares overlap with another note, respond "correct, but we're looking for another answer — try again," no credit
 - [ ] Overlap declaration model: extend the `aliases` frontmatter to accept wiki-link values pointing to another note
@@ -77,8 +77,9 @@ During spelling recall, an answer that names a *different* note becomes a learni
 ## Current State
 
 - **Phase 1 complete (2026-07-23):** Answer contract represents the third outcome — `AnswerOutcome`, `@Transient matchedNoteId`/`outcome`, optional `overlap`/`matchedNotes`; OpenAPI client regenerated.
-- **Phase 2 complete (2026-07-24):** Accidental-match grading + lighter penalty shipped (title + alias legs, IDOR readability filter, UAT + security verified). `matchedNoteId`/`outcome=ACCIDENTAL_MATCH` are written; UI reveal of both notes is still Phase 3.
-- **Next:** Phase 3 — reveal both notes after accidental match.
+- **Phase 2 complete (2026-07-24):** Accidental-match grading + lighter penalty shipped (title + alias legs, IDOR readability filter, UAT + security verified).
+- **Phase 3 complete (2026-07-24):** Accidental match reveals reviewed + all matched notes (`matchedNotes` + UI stack + E2E); human spot-check approved.
+- **Next:** Phase 4 — offer link between notes (add-link UI with matched note pre-selected).
 
 ## Evolution
 

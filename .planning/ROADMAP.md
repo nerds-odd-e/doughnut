@@ -12,7 +12,7 @@
 
 - [x] **Phase 1: Extend Answer outcome API** - Add a third outcome (accidental-match + overlap) to the Answer/AnsweredQuestion contract and regen the OpenAPI client (completed 2026-07-23)
 - [x] **Phase 2: Accidental-match grading & penalty** - Detect a spelling answer that names a different note and apply a lighter-than-wrong SRS penalty (completed 2026-07-24)
-- [ ] **Phase 3: Reveal both notes after accidental match** - Show the reviewed note and the matched note(s) together after an accidental match
+- [x] **Phase 3: Reveal both notes after accidental match** - Show the reviewed note and the matched note(s) together after an accidental match (completed 2026-07-24)
 - [ ] **Phase 4: Offer link between notes** - Let the user build a link (property link or relationship note) between the reviewed and matched note via the existing add-link UI, with the matched note pre-selected
 - [ ] **Phase 5: Alias-as-wiki-link overlap declaration** - Extend `aliases` frontmatter to accept wiki-link values pointing to another note, preserving wiki-resolve/search/cloze-masking behavior
 - [ ] **Phase 6: Overlap "try again, no credit"** - When the answer is correct but the reviewed note declares overlap, respond "correct, but we're looking for another answer — try again" with no credit
@@ -72,7 +72,7 @@ Plans:
   1. After an accidental match, the reviewed note and the matched note are both shown to the user in the spelling answer result.
   2. When multiple notes match, all matched notes are surfaced (not just one).
 
-**Plans**: 2/3 plans executed
+**Plans**: 3/3 plans executed
 **UI hint**: yes
 
 Plans:
@@ -86,7 +86,7 @@ Plans:
 
 **Wave 3** *(blocked on Waves 1–2)*
 
-- [ ] 03-03-PLAN.md — capability-named E2E accidental_match_reveal + human spot-check
+- [x] 03-03-PLAN.md — capability-named E2E accidental_match_reveal + human spot-check (approved)
 
 ### Phase 4: Offer link between notes
 
@@ -141,7 +141,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Extend Answer outcome API | 1/1 | Complete    | 2026-07-23 |
 | 2. Accidental-match grading & penalty | 2/2 | Complete    | 2026-07-24 |
-| 3. Reveal both notes after accidental match | 2/3 | In Progress|  |
+| 3. Reveal both notes after accidental match | 3/3 | Complete    | 2026-07-24 |
 | 4. Offer link between notes | 0/0 | Not started | - |
 | 5. Alias-as-wiki-link overlap declaration | 0/0 | Not started | - |
 | 6. Overlap "try again, no credit" | 0/0 | Not started | - |

@@ -33,7 +33,7 @@ key-decisions:
 patterns-established:
   - "Pattern: expectAccidentalMatchReveal vs expectSpellingAnswerToBeIncorrect as separate methods"
 
-requirements-completed: []  # AM-03 awaits Task 2 human-verify approval before mark-complete
+requirements-completed: [AM-03]
 
 coverage:
   - id: D1
@@ -50,25 +50,29 @@ coverage:
   - id: D2
     description: "Human spot-check of accidental-match alert copy, vertical Matched note(s) stack, no Phase 4 add-link"
     requirement: AM-03
-    verification: []
+    verification:
+      - kind: human
+        ref: "Developer approved 2026-07-24 (reply: approve)"
+        status: pass
     human_judgment: true
-    rationale: "Plan Task 2 checkpoint:human-verify — visual/copy confirmation in running app; not auto-approved"
+    rationale: "Plan Task 2 checkpoint:human-verify — approved by developer"
 
 duration: 8min
 completed: 2026-07-24
-status: awaiting-human-verify
+status: complete
 ---
 
 # Phase 03 Plan 03: Accidental-match reveal E2E Summary
 
-**Capability-named Cypress scenario proves spelling accidental-match reveals reviewed + matched notes; plain-wrong E2E expectation left unchanged. Human spot-check still required.**
+**Capability-named Cypress scenario proves spelling accidental-match reveals reviewed + matched notes; plain-wrong E2E expectation left unchanged. Human spot-check approved.**
 
 ## Performance
 
-- **Duration:** ~8 min
+- **Duration:** ~8 min (+ human verify)
 - **Started:** 2026-07-24T04:23:53Z
 - **Completed (Task 1):** 2026-07-24T04:26:30Z
-- **Tasks:** 1/2 auto complete; Task 2 awaiting human verify
+- **Human verify approved:** 2026-07-24
+- **Tasks:** 2/2 complete
 - **Files modified:** 3
 
 ## Accomplishments
@@ -76,11 +80,12 @@ status: awaiting-human-verify
 - Added `accidental_match_reveal.feature` (no phase numbers; `@wip` removed after green)
 - Added `expectAccidentalMatchReveal` without changing `expectSpellingAnswerToBeIncorrect` copy
 - Targeted Cypress run exits 0
+- Human spot-check approved
 
 ## Task Commits
 
 1. **Task 1: E2E feature + page object for accidental-match reveal** - `1b8652dcb5` (test)
-2. **Task 2: Human spot-check** - pending (checkpoint)
+2. **Task 2: Human spot-check** - approved (no code commit)
 
 ## Files Created/Modified
 

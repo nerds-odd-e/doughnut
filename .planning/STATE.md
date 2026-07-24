@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 3
-current_phase_name: Reveal both notes after accidental match
-status: in_progress
-stopped_at: Phase 3 awaiting human-verify (03-03 Task 2)
-last_updated: "2026-07-24T04:27:47.735Z"
+current_phase: 4
+current_phase_name: Offer link between notes
+status: planning
+stopped_at: Phase 3 complete; next Phase 4 discuss
+last_updated: "2026-07-24T04:30:52.170Z"
 progress:
-  total_phases: 3
+  total_phases: 6
   completed_phases: 3
   total_plans: 6
   completed_plans: 6
@@ -21,17 +21,17 @@ progress:
 - **Project:** Spelling Answer Match & Link
 - **Core value:** During spelling recall, an answer that names a *different* note becomes a learning opportunity — penalized lightly, both notes revealed, and a link offered — turning recall confusion into connection-building; and overlapping-but-distinct notes are kept distinct by asking the user for a more specific answer.
 - **Repo:** `/Users/terryyin/git/doughnut` (brownfield Spring Boot + Vue)
-- **Current focus:** Phase 03 — reveal-both-notes-after-accidental-match
+- **Current focus:** Phase 04 — offer-link-between-notes
 
 ## Current Position
 
-- **Phase:** 3 — Reveal both notes after accidental match
-- **Plan:** 03-03 (next to execute)
-- **Status:** In Progress — 03-01, 03-02 complete; Wave 3 (E2E) next
-- **Progress:** Phase 3 plans 2/3 executed; overall [████████░░] 83%
+- **Phase:** 4 — Offer link between notes
+- **Plan:** Not started
+- **Status:** Ready to plan
+- **Progress:** [████████████░░░░░░░░] 3/6 phases
 
 ```
-[x][x][ ][ ][ ][ ] 2/6 phases
+[x][x][x][ ][ ][ ] 3/6 phases
 ```
 
 ## Roadmap Snapshot
@@ -47,8 +47,8 @@ progress:
 
 ## Performance Metrics
 
-- **Phases completed:** 2
-- **Requirements delivered:** 4/9 (API-01, API-02, AM-01, AM-02)
+- **Phases completed:** 3
+- **Requirements delivered:** 5/9 (API-01, API-02, AM-01, AM-02, AM-03)
 - **Coverage:** 9/9 mapped (100%)
 
 **Per-Plan Metrics:**
@@ -59,8 +59,8 @@ progress:
 | Phase 02 P01 | 6min | 2 tasks | 6 files |
 | Phase 02 P02 | 8min | 2 tasks | 3 files |
 | Phase 03 P01 | 18min | 2 tasks | 5 files |
-| Phase 03-reveal-both-notes-after-accidental-match P02 | 3min | 2 tasks | 3 files |
-| Phase 03-reveal-both-notes-after-accidental-match P03 | 8min | 1 tasks | 3 files |
+| Phase 03 P02 | 3min | 2 tasks | 3 files |
+| Phase 03 P03 | 8min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -74,24 +74,18 @@ progress:
 
 ### Integration points (from codebase map)
 
-- Backend: `MemoryTrackerService.answerSpelling` + `SpellingAnswerResult` + `findAllAccidentalMatches`; `AnsweredQuestion.matchedNotes` populated.
-- Frontend: `AnsweredSpellingQuestion.vue` ACCIDENTAL_MATCH alert + matched-notes-section NoteShow stack (03-02 done).
-- Reuse: `WikiLinkResolver`, `Note.matchAnswer`, `LinkInsertionChoice` / `AddRelationshipFinalize`, `updateForgettingCurve`.
+- Backend: `findAllAccidentalMatches` + `AnsweredQuestion.matchedNotes` populated on accidental match.
+- Frontend: `AnsweredSpellingQuestion.vue` ACCIDENTAL_MATCH alert + `matched-notes-section` NoteShow stack.
+- Phase 4: attach add-link UI (`LinkInsertionChoice` / `AddRelationshipFinalize`) under matched section with preselection — never auto-write links.
 
 ### Known risks / blockers
 
-- **⚠️ Alias blast radius (Phase 5):** Extending `aliases` to accept wiki-link values affects wiki resolve, search, and cloze masking. The derived-index coherence path (`WikiTitleCacheService.refreshForNote` + backfills) is a known regression source (see `.planning/codebase/CONCERNS.md`). Phase 5 is treated as a design spike — enumerate every `aliases` consumer and gate on regression tests before changing the parser. Expect it to take longer than its neighbors.
+- **⚠️ Alias blast radius (Phase 5):** Extending `aliases` to accept wiki-link values affects wiki resolve, search, and cloze masking. See `.planning/codebase/CONCERNS.md`.
 
 ### Todos
 
-- [x] Run `/gsd-plan-phase 1` to plan the API contract extension.
-- [x] Run `/gsd-execute-phase 1` to execute 01-01-PLAN.md (contract round-trip + no-behavior tests).
-- [x] Confirm the accidental-match penalty value (D-03 locked at -10 = DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT, half of failed()'s -20, no 12h override) during Phase 2 planning.
-- [x] Run `/gsd-execute-phase 2` to execute 02-01-PLAN.md then 02-02-PLAN.md.
-- [x] Run `/gsd-plan-phase 3` to write 03-01..03-03 PLAN.md.
-- [x] Execute 03-01-PLAN.md (findAll + matchedNotes + IDOR).
-- [x] Execute 03-02-PLAN.md (UI reveal).
-- [ ] Execute 03-03-PLAN.md (E2E).
+- [x] Execute Phase 3 (03-01..03-03) — AM-03 reveal complete; human verify approved.
+- [ ] Run `/gsd-discuss-phase 4` (or `--auto`) then plan/execute AM-04 offer-link.
 
 ### Open questions
 
@@ -99,27 +93,17 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T04:27:47.726Z
-**Stopped at:** Phase 3 awaiting human-verify (03-03 Task 2)
-**Resume file:** .planning/phases/03-reveal-both-notes-after-accidental-match/03-03-PLAN.md
+**Last session:** 2026-07-24T04:30:29.971Z
+**Stopped at:** Phase 3 complete; next Phase 4 discuss
+**Resume file:** .planning/ROADMAP.md
 
-- **Last action:** Completed 03-02 — Accidental-match alert + Matched note(s) NoteShow stack; Vitest green.
-- **Next action:** Execute 03-03-PLAN.md (E2E / messaging).
-- **Resume from:** Read this file + `.planning/phases/03-reveal-both-notes-after-accidental-match/03-03-PLAN.md`.
+- **Last action:** Phase 3 closed — VERIFICATION passed; AM-03 marked complete; human spot-check approved.
+- **Next action:** `/gsd-discuss-phase 4 --auto` (or discuss without auto).
+- **Resume from:** Read this file + ROADMAP Phase 4.
 
 ## Decisions
 
-- [Phase 1]: Locked Option A (D-05): @Transient matchedNoteId + AnswerOutcome enum on Answer; overlap + matchedNotes:List<NoteTopology> on AnsweredQuestion; A1 (@Transient surfaces in OpenAPI) verified via regen-then-grep
-- [Phase 1]: Pure Structure phase: no production writer sets the new fields (grep invariant = 0); AnsweredQuestion.from(RecallPrompt) unchanged; correct stays required/@NotNull and sole SRS-credit signal
-- [Phase 1]: Reused existing NoteTopology (id+title) for matchedNotes; no new note-ref DTO; no Flyway migration (fields are @Transient)
-- [Phase 2]: Set ACCIDENTAL_MATCH @Transient fields on recallPrompt.getAnswer() after merge/save so managed Answer keeps outcome/matchedNoteId
-- [Phase 2]: Plan 02-01 title leg only; alias fallback deferred to Plan 02-02
-- [Phase 2]: Alias index fixture must call refreshForNote — makeMe does not auto-index aliases
-- [Phase 2]: At floor index, nextRecallAt equals now (0 repeat hours); assert greaterThanOrEqualTo
-- [Phase 3]: D-01 findAllAccidentalMatches title∪alias union; D-02 populate matchedNotes; matchedNoteId = first-of-list
-- [Phase 3]: D-03–D-05 UI: full NoteShow stack + distinct ACCIDENTAL_MATCH alert; D-06 no add-link this phase
-- [Phase 3]: Assumption-delta promote: matchedNotes list is primary plural surface
-- [Phase 3]: SpellingAnswerResult carries match list so controller avoids second findAll
-- [Phase 3]: Followed UI-SPEC accidental-match copy and Matched note(s) heading verbatim
-- [Phase 3]: Stubbed NoteShow in Vitest to assert noteId/expandChildren without realm load
-- [Phase 3]: AM-03 left In Progress until 03-03 E2E closes reveal story
+- [Phase 1]: Locked Option A (D-05): @Transient matchedNoteId + AnswerOutcome enum on Answer; overlap + matchedNotes:List<NoteTopology> on AnsweredQuestion
+- [Phase 2]: ACCIDENTAL_MATCH grading + lighter −10 penalty; findAccidentalMatch title then alias
+- [Phase 3]: D-01 findAllAccidentalMatches title∪alias; D-02 populate matchedNotes; D-03–D-05 UI NoteShow stack + distinct alert; D-06 no add-link this phase
+- [Phase 3]: assumption_delta promote — matchedNotes list is primary; matchedNoteId = first-of-list for Phase 4
