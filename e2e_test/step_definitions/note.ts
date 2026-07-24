@@ -238,6 +238,20 @@ Given(
 )
 
 When(
+  'I delete the question {string} from the note {string}',
+  (stem: string, noteTopology: string) => {
+    start.jumpToNotePage(noteTopology, true).deleteQuestion(stem)
+  }
+)
+
+Then(
+  'I should not see the question {string} in the question list of the note {string}',
+  (stem: string, noteTopology: string) => {
+    start.jumpToNotePage(noteTopology, true).expectQuestionNotInList(stem)
+  }
+)
+
+When(
   'I create a notebook with title {string} and description {string}',
   (notebookName: string, description: string) => {
     start.navigateToNotebooksPage().creatingNotebook(notebookName, description)

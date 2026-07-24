@@ -13,6 +13,16 @@ Feature: Quiz Question Management
       | Question                             | Correct Choice |
       | What do you call a cow with not leg? | Ground beef    |
 
+  @skipOptimizationDueToKnownNecessarySlowness
+  Scenario: Delete a question from the note successfully
+    Given I am logged in as an existing user
+    And I have a notebook "Cow jokes" with a note "The cow joke"
+    And I add the following question for the note "The cow joke":
+      | Stem                                 | Choice 0    | Choice 1 | Choice 2 | Correct Choice Index |
+      | What do you call a cow with not leg? | Ground beef | Cowboy   | Oxford   | 0                    |
+    When I delete the question "What do you call a cow with not leg?" from the note "The cow joke"
+    Then I should not see the question "What do you call a cow with not leg?" in the question list of the note "The cow joke"
+
   @usingMockedOpenAiService
   Scenario: Can generate the question by AI
     Given I am logged in as an existing user
