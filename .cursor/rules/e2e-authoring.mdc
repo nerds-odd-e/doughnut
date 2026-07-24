@@ -1,5 +1,5 @@
 ---
-description: E2E testing with Cypress and Cucumber, feature files, step definitions, page objects, fluent interface, assertions, apiCallWithLoading/pageIsNotLoading pairing, test execution
+description: E2E testing with Cypress and Cucumber, feature files, step definitions, page objects, fluent interface, assertions, data-app-busy / waitUntilAppIsNotBusy pairing, test execution
 globs: e2e_test/**/*.{feature,ts}
 alwaysApply: false
 ---
@@ -103,26 +103,25 @@ Then("I should see {string} in the non-interactive output", (expected: string) =
 })
 ```
 
-## Waiting after user-initiated API calls
+## Waiting until the app is not busy
 
-Product code wraps user-initiated SDK calls in `apiCallWithLoading` (optional `{ blockUi: true }` / `runWithBlockingApiLoading`). That drives the global thin bar (`.loading-bar`) and, when blocking, the modal mask (`.loading-modal-mask`). See `.cursor/rules/frontend-api.mdc`.
+Product loading UI that means unfinished work marks itself with `data-app-busy` (`LoadingThinBar` from `apiCallWithLoading`, `ContentLoader` for pending page data, `LoadingModal` for `blockUi`). See `.cursor/rules/frontend-api.mdc`.
 
-E2E pairs that with `pageIsNotLoading()` from `e2e_test/start/pageBase.ts`:
+E2E waits with `waitUntilAppIsNotBusy()` from `e2e_test/start/pageBase.ts` (also `start.waitUntilAppIsNotBusy()`):
 
 ```typescript
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 
-// after a click/submit that triggers apiCallWithLoading in the app:
 cy.findByRole('button', { name: 'Submit' }).click()
-pageIsNotLoading()
+waitUntilAppIsNotBusy()
 ```
 
 Rules of thumb:
 
-- Call `pageIsNotLoading()` in the page object **on the action that starts the wrapped call**, before the next step that needs that call’s result.
-- Prefer asserting a **user-visible** success outcome when the product provides one; use `pageIsNotLoading` for “loading finished,” not as a substitute for success.
+- Call `waitUntilAppIsNotBusy()` in the page object **on the action that starts loading**, before the next step that needs that work’s result.
+- Prefer asserting a **user-visible** success outcome when the product provides one; use the waiter for “busy cleared,” not as a substitute for success.
 - Do not use hardcoded waits (`cy.wait(ms)`) for this.
-- Do not skip the wait and rely on a later navigation’s loading check alone — that races when the next step does not go through loading UI.
+- Do not skip the wait and rely on a later navigation’s loading check alone — that races when the next step does not go through busy UI.
 - Network `cy.intercept` / `cy.wait('@…')` is optional; it is not the documented default stand-in for this product/E2E pair.
 
 ## Test Data And Service Mocking
@@ -197,7 +196,7 @@ A scenario describes one fixed path. Prefer dumb automation: the path is visible
 - Do not create long scenarios with many steps.
 - Do not rely on test order.
 - Do not use hardcoded waits.
-- Do not fire a user action that triggers `apiCallWithLoading` and then assert domain state without `pageIsNotLoading()` (or a clearer user-visible success signal) first.
+- Do not fire a user action that starts app-busy loading and then assert domain state without `waitUntilAppIsNotBusy()` (or a clearer user-visible success signal) first.
 - Do not skip error handling.
 - Do not mix different levels of abstraction in scenarios.
 - Do not ignore linting errors that appear in the terminal.
