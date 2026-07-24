@@ -63,7 +63,7 @@ Plans:
 
 ### Phase 3: Reveal both notes after accidental match
 
-**Goal:** After an accidental match, the user sees the reviewed note and the matched note(s) revealed together, so the confusion becomes visible.
+**Goal:** As a learner doing spelling recall, I want to see the reviewed note and all matched notes revealed together after an accidental match, so that my confusion becomes visible.
 **Mode:** mvp
 **Depends on**: Phase 2
 **Requirements**: AM-03
@@ -72,8 +72,21 @@ Plans:
   1. After an accidental match, the reviewed note and the matched note are both shown to the user in the spelling answer result.
   2. When multiple notes match, all matched notes are surfaced (not just one).
 
-**Plans**: TBD
+**Plans**: 3 plans
 **UI hint**: yes
+
+Plans:
+**Wave 1**
+
+- [ ] 03-01-PLAN.md — findAllAccidentalMatches + populate AnsweredQuestion.matchedNotes on answer-spelling (tracer) + IDOR list coverage
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 03-02-PLAN.md — AnsweredSpellingQuestion ACCIDENTAL_MATCH alert + vertical Matched note(s) NoteShow stack + Vitest
+
+**Wave 3** *(blocked on Waves 1–2)*
+
+- [ ] 03-03-PLAN.md — capability-named E2E accidental_match_reveal + human spot-check
 
 ### Phase 4: Offer link between notes
 
@@ -128,7 +141,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Extend Answer outcome API | 1/1 | Complete    | 2026-07-23 |
 | 2. Accidental-match grading & penalty | 2/2 | Complete    | 2026-07-24 |
-| 3. Reveal both notes after accidental match | 0/0 | Not started | - |
+| 3. Reveal both notes after accidental match | 0/3 | Planned | - |
 | 4. Offer link between notes | 0/0 | Not started | - |
 | 5. Alias-as-wiki-link overlap declaration | 0/0 | Not started | - |
 | 6. Overlap "try again, no credit" | 0/0 | Not started | - |

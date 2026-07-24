@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 3
 current_phase_name: Reveal both notes after accidental match
-status: planning
-stopped_at: Phase 3 UI-SPEC approved
-last_updated: "2026-07-24T12:00:00.000Z"
+status: planned
+stopped_at: Phase 3 plans created (03-01..03-03)
+last_updated: "2026-07-24T04:08:37.958Z"
 progress:
-  total_phases: 3
+  total_phases: 6
   completed_phases: 2
-  total_plans: 3
+  total_plans: 6
   completed_plans: 3
 ---
 
@@ -26,9 +26,9 @@ progress:
 ## Current Position
 
 - **Phase:** 3 — Reveal both notes after accidental match
-- **Plan:** Not started
-- **Status:** UI-SPEC approved — ready to plan
-- **Progress:** [████████████████████] 3/3 plans (100%)
+- **Plan:** 03-01 (next to execute)
+- **Status:** Planned — 3 plans ready (waves 1→2→3)
+- **Progress:** Phase 3 plans 0/3 executed; overall [████░░░░░░░░░░░░░░░░] ~33%
 
 ```
 [x][x][ ][ ][ ][ ] 2/6 phases
@@ -84,22 +84,23 @@ progress:
 - [x] Run `/gsd-plan-phase 1` to plan the API contract extension.
 - [x] Run `/gsd-execute-phase 1` to execute 01-01-PLAN.md (contract round-trip + no-behavior tests).
 - [x] Confirm the accidental-match penalty value (D-03 locked at -10 = DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT, half of failed()'s -20, no 12h override) during Phase 2 planning.
-- [ ] Run `/gsd-execute-phase 2` to execute 02-01-PLAN.md then 02-02-PLAN.md.
+- [x] Run `/gsd-execute-phase 2` to execute 02-01-PLAN.md then 02-02-PLAN.md.
+- [x] Run `/gsd-plan-phase 3` to write 03-01..03-03 PLAN.md.
+- [ ] Run `/gsd-execute-phase 3` (or local execute-plan) starting with 03-01-PLAN.md.
 
 ### Open questions
 
-- Exact SRS penalty magnitude for the accidental-match outcome (Phase 2).
 - Whether the overlap "try again" re-asks the same review immediately or re-queues (Phase 6).
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T12:00:00.000Z
-**Stopped at:** Phase 3 UI-SPEC approved
-**Resume file:** .planning/phases/03-reveal-both-notes-after-accidental-match/03-UI-SPEC.md
+**Last session:** 2026-07-24T04:08:37.958Z
+**Stopped at:** Phase 3 plans created (03-01..03-03)
+**Resume file:** .planning/phases/03-reveal-both-notes-after-accidental-match/03-01-PLAN.md
 
-- **Last action:** Phase 3 UI design contract written — `03-UI-SPEC.md` (DaisyUI recall reveal: distinct ACCIDENTAL_MATCH alert, vertical Matched note(s) NoteShow stack; checker dimensions PASS; UI considerations probe resolved).
-- **Next action:** `/gsd-plan-phase 3` planner consumes `03-CONTEXT.md` + `03-RESEARCH.md` + `03-UI-SPEC.md` to write PLAN.md.
-- **Resume from:** Read this file + `.planning/phases/03-reveal-both-notes-after-accidental-match/03-UI-SPEC.md`.
+- **Last action:** Phase 3 executable plans written — `03-01-PLAN.md` (backend findAll + matchedNotes + IDOR), `03-02-PLAN.md` (UI alert + NoteShow stack), `03-03-PLAN.md` (E2E + human verify). Assumption-delta: promote matchedNotes list; matchedNoteId = first-of-list.
+- **Next action:** `/gsd-execute-phase 3` (Wave 1 → 03-01).
+- **Resume from:** Read this file + `.planning/phases/03-reveal-both-notes-after-accidental-match/03-01-PLAN.md`.
 
 ---
 *Last updated: 2026-07-23 during roadmap creation*
@@ -112,4 +113,7 @@ progress:
 - [Phase ?]: Set ACCIDENTAL_MATCH @Transient fields on recallPrompt.getAnswer() after merge/save so managed Answer keeps outcome/matchedNoteId
 - [Phase ?]: Plan 02-01 title leg only; alias fallback deferred to Plan 02-02
 - [Phase ?]: Alias index fixture must call refreshForNote — makeMe does not auto-index aliases
-- [Phase ?]: At floor index, nextRecallAt equals now (0 repeat hours); assert greaterThanOrEqualTo
+- [Phase 2]: At floor index, nextRecallAt equals now (0 repeat hours); assert greaterThanOrEqualTo
+- [Phase 3]: D-01 findAllAccidentalMatches title∪alias union; D-02 populate matchedNotes; matchedNoteId = first-of-list
+- [Phase 3]: D-03–D-05 UI: full NoteShow stack + distinct ACCIDENTAL_MATCH alert; D-06 no add-link this phase
+- [Phase 3]: Assumption-delta promote: matchedNotes list is primary plural surface
