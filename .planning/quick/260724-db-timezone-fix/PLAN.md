@@ -97,7 +97,7 @@ much larger window, confirmed via read-only prod queries (`user_id=1`,
    window; "reviews today"/recent stats unaffected (window ends well before
    today). Regenerate ERD not needed (no schema change).
 
-### Phase 3 — Behavior: repair `memory_tracker` scheduling columns — in-progress (migration written, not yet deployed)
+### Phase 3 — Behavior: repair `memory_tracker` scheduling columns — done
 
 Recalls due at correct times for trackers touched in the window
 (`next_recall_at`, `last_recalled_at`, `assimilated_at` stored 8h **ahead** of
@@ -247,5 +247,16 @@ to skip entirely.
   `MemoryTrackerTimeZoneRepairMigrationTest` (splits the two statements, exercises
   both against a fresh tracker/recall_prompt/quiz_answer fixture, asserts 0 rows
   updated and all three timestamps unchanged with the no-op default). Full backend
-  suite green; `pnpm lint:all` clean. Not yet deployed to prod — next step is
-  push + let CD roll out, then confirm via `flyway_schema_history`.
+  suite green; `pnpm lint:all` clean.
+
+- 2026-07-24: Phase 3 deployed and verified. Pushed to `main` (`3fefb89d9d`), CI green,
+  CD rolling-replaced both MIG instances (confirmed healthy on the new template).
+  Confirmed via read-only prod SSH:
+  - `flyway_schema_history`: version `300000234` `success=1`, installed
+    `2026-07-24 10:13:07`.
+  - `assimilated_at` for the `24179`-`26039` id band: raw hours 7/8/9/10 (counts
+    87/530/593/270) moved to raw hours 23/0/1/2 with the exact same counts —
+    confirms the -8h shift is precise.
+  - `last_recalled_at` for the self-healing-aware join set: dominant cluster moved
+    from raw hours 6-9 UTC to 22-1 UTC, matching the same "true ~7am local"
+    signature confirmed in Phase 2. Phase 3 closed.

@@ -91,7 +91,7 @@ progress:
 
 - [x] Execute Phase 5 (05-01..05-03) — OVL-02/OVL-03 complete; VERIFICATION passed 8/8.
 - [ ] Run `/gsd-discuss-phase 6` (or `--auto`) then plan/execute OVL-01.
-- [ ] Quick plan (outside milestone): `.planning/quick/260724-db-timezone-fix/` — Phase 1 and Phase 2 done and verified live in prod. Phase 3 migration written (`V300000234`, repairs `memory_tracker.last_recalled_at`/`next_recall_at`/`assimilated_at` for the same window, self-healing-aware join) but not yet pushed/deployed. Phase 4 (optional broader audit) still pending.
+- [ ] Quick plan (outside milestone): `.planning/quick/260724-db-timezone-fix/` — Phases 1-3 done and verified live in prod (JDBC pin, `quiz_answer.created_at` repair, `memory_tracker` scheduling columns repair). Phase 4 (optional broader audit of other app-written timestamp columns) still pending — next Jidoka checkpoint: continue or stop/close the plan here.
 
 ### Open questions
 
