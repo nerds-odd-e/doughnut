@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 5
-current_phase_name: Alias-as-wiki-link overlap declaration
-status: in_progress
-stopped_at: Completed 05-02-PLAN.md
-last_updated: "2026-07-24T06:10:46.100Z"
+current_phase: 6
+current_phase_name: Overlap try again no credit
+status: ready_to_discuss
+stopped_at: Phase 5 complete; next Phase 6 discuss
+last_updated: "2026-07-24T06:20:00.000Z"
 progress:
-  total_phases: 5
+  total_phases: 6
   completed_phases: 5
   total_plans: 12
   completed_plans: 12
@@ -21,14 +21,14 @@ progress:
 - **Project:** Spelling Answer Match & Link
 - **Core value:** During spelling recall, an answer that names a *different* note becomes a learning opportunity — penalized lightly, both notes revealed, and a link offered — turning recall confusion into connection-building; and overlapping-but-distinct notes are kept distinct by asking the user for a more specific answer.
 - **Repo:** `/Users/terryyin/git/doughnut` (brownfield Spring Boot + Vue)
-- **Current focus:** Phase 05 — alias-as-wiki-link overlap declaration
+- **Current focus:** Phase 06 — overlap "try again, no credit"
 
 ## Current Position
 
-- **Phase:** 5 — Alias-as-wiki-link overlap declaration
-- **Plan:** All phase plans complete (05-01..05-03)
-- **Status:** Phase 5 plans complete — ready for verify / Phase 6
-- **Progress:** [██████████] 100%
+- **Phase:** 6 — Overlap "try again, no credit"
+- **Plan:** Not started
+- **Status:** Ready to discuss/plan
+- **Progress:** [█████████████░░░░░░░] 5/6 phases
 
 ```
 [x][x][x][x][x][ ] 5/6 phases
@@ -81,21 +81,16 @@ progress:
 ### Integration points (from codebase map)
 
 - Phase 4 shipped: `MatchedNoteLinkOffer` under matched rows; property via `updateTextField`; relationship via `AddRelationshipFinalize` with `navigateOnSuccess=false` (D-07).
-- Phase 5: extend `aliases` frontmatter for wiki-link values — alias blast radius (CONCERNS.md).
+- Phase 5 shipped: `FrontmatterAliases` plain-only `from*` + `overlapWikiLinkTokensFrom*`; frontend authoredAliasesValidation parity; OVL-03 consumer regressions green.
 
 ### Known risks / blockers
 
-- **⚠️ Alias blast radius (Phase 5):** Extending `aliases` to accept wiki-link values affects wiki resolve, search, and cloze masking. See `.planning/codebase/CONCERNS.md`.
+- None blocking Phase 6. Alias blast radius mitigated by plain-only segregation (Phase 5).
 
 ### Todos
 
-- [x] Execute Phase 4 (04-01..04-03) — AM-04 offer-link complete; E2E green; human verify approved (E2E-env browser subagent).
-- [x] Run `/gsd-discuss-phase 5 --auto` — CONTEXT locked (D-01..D-04).
-- [x] Phase 5 research — `05-RESEARCH.md` (consumer inventory + segregation approach).
-- [x] `/gsd-plan-phase 5` — 05-01..05-03 PLAN.md written.
-- [x] Execute 05-01 — FrontmatterAliases segregation + frontend authoredAliasesValidation parity.
-- [x] Execute 05-03 — OVL-03 wiki-resolve + cloze + matchAnswer + AM alias-leg regressions.
-- [x] Execute 05-02 — OVL-03 index + alias search regressions.
+- [x] Execute Phase 5 (05-01..05-03) — OVL-02/OVL-03 complete; VERIFICATION passed 8/8.
+- [ ] Run `/gsd-discuss-phase 6` (or `--auto`) then plan/execute OVL-01.
 - [ ] Quick plan (outside milestone): `.planning/quick/260724-spa-routing-consistency/` — LB SPA fallback + remove backend frontend-serving; 3 phases planned, none executed.
 
 ### Open questions
@@ -104,13 +99,13 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T06:10:46.071Z
-**Stopped at:** Completed 05-02-PLAN.md
-**Resume file:** None
+**Last session:** 2026-07-24T06:20:00.000Z
+**Stopped at:** Phase 5 complete; next Phase 6 discuss
+**Resume file:** .planning/ROADMAP.md
 
-- **Last action:** Completed 05-02 (index + alias search OVL-03 gates).
-- **Next action:** Phase 5 verify / start Phase 6 overlap grading.
-- **Resume from:** None
+- **Last action:** Phase 5 closed — VERIFICATION passed; OVL-02/OVL-03 complete.
+- **Next action:** `/gsd-discuss-phase 6 --auto` (or discuss without auto).
+- **Resume from:** Read this file + ROADMAP Phase 6.
 
 ## Decisions
 

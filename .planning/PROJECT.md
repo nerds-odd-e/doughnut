@@ -80,7 +80,8 @@ During spelling recall, an answer that names a *different* note becomes a learni
 - **Phase 2 complete (2026-07-24):** Accidental-match grading + lighter penalty shipped (title + alias legs, IDOR readability filter, UAT + security verified).
 - **Phase 3 complete (2026-07-24):** Accidental match reveals reviewed + all matched notes (`matchedNotes` + UI stack + E2E); human spot-check approved.
 - **Phase 4 complete (2026-07-24):** Offer link from matched CTA (`MatchedNoteLinkOffer` property + relationship, D-07 stay-on-page); E2E + human verify approved.
-- **Next:** Phase 5 — alias-as-wiki-link overlap declaration (design spike / alias blast radius).
+- **Phase 5 complete (2026-07-24):** Alias-as-wiki-link overlap declaration — plain-only `from*` + `overlapWikiLinkTokensFrom*`; OVL-03 consumer regressions green.
+- **Next:** Phase 6 — overlap "try again, no credit" (OVL-01).
 
 ## Evolution
 

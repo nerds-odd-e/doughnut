@@ -14,7 +14,7 @@
 - [x] **Phase 2: Accidental-match grading & penalty** - Detect a spelling answer that names a different note and apply a lighter-than-wrong SRS penalty (completed 2026-07-24)
 - [x] **Phase 3: Reveal both notes after accidental match** - Show the reviewed note and the matched note(s) together after an accidental match (completed 2026-07-24)
 - [x] **Phase 4: Offer link between notes** - Let the user build a link (property link or relationship note) between the reviewed and matched note via the existing add-link UI, with the matched note pre-selected (completed 2026-07-24)
-- [ ] **Phase 5: Alias-as-wiki-link overlap declaration** - Extend `aliases` frontmatter to accept wiki-link values pointing to another note, preserving wiki-resolve/search/cloze-masking behavior
+- [x] **Phase 5: Alias-as-wiki-link overlap declaration** - Extend `aliases` frontmatter to accept wiki-link values pointing to another note, preserving wiki-resolve/search/cloze-masking behavior (completed 2026-07-24)
 - [ ] **Phase 6: Overlap "try again, no credit"** - When the answer is correct but the reviewed note declares overlap, respond "correct, but we're looking for another answer — try again" with no credit
 
 ## Phase Details
@@ -131,7 +131,7 @@ Plans:
 
 **Plans**: 3/3 plans executed
 
-> **⚠️ Known risk — alias blast radius:** Extending `aliases` to accept wiki-link values touches the derived-index coherence path (wiki title / property / alias caches refreshed via `WikiTitleCacheService.refreshForNote` and backfills — see `.planning/codebase/CONCERNS.md` "Derived index coherence"). Missed refresh sites recreate assimilation/search/cloze bugs. Treat this phase as a design spike: enumerate every consumer of `aliases` (wiki resolve, search index, cloze masking, `NoteAliasIndex`/`NoteAliasIndexService`, `FrontmatterAliases`) before changing the parser, and gate on regression tests for each consumer. Expect this phase to take longer than its neighbors; do not rush it.
+> Alias blast radius mitigated: plain-only `FrontmatterAliases.from*` + OVL-03 regressions (index/search/resolve/cloze/matchAnswer/AM). See `05-VERIFICATION.md`.
 
 Plans:
 **Wave 1**
@@ -166,7 +166,7 @@ Plans:
 | 2. Accidental-match grading & penalty | 2/2 | Complete    | 2026-07-24 |
 | 3. Reveal both notes after accidental match | 3/3 | Complete    | 2026-07-24 |
 | 4. Offer link between notes | 3/3 | Complete    | 2026-07-24 |
-| 5. Alias-as-wiki-link overlap declaration | 3/3 | In Progress|  |
+| 5. Alias-as-wiki-link overlap declaration | 3/3 | Complete    | 2026-07-24 |
 | 6. Overlap "try again, no credit" | 0/0 | Not started | - |
 
 ## Coverage
