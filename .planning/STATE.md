@@ -5,13 +5,13 @@ milestone_name: milestone
 current_phase: 3
 current_phase_name: Reveal both notes after accidental match
 status: in_progress
-stopped_at: Phase 3 Wave 1 complete; Wave 2 execute started
-last_updated: "2026-07-24T04:19:39.030Z"
+stopped_at: Completed 03-02-PLAN.md
+last_updated: "2026-07-24T04:22:23.308Z"
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 6
-  completed_plans: 4
+  completed_plans: 5
 ---
 
 # State: Spelling Answer Match & Link
@@ -26,9 +26,9 @@ progress:
 ## Current Position
 
 - **Phase:** 3 — Reveal both notes after accidental match
-- **Plan:** 03-02 (next to execute)
-- **Status:** In Progress — 03-01 complete; Wave 2 (UI) next
-- **Progress:** Phase 3 plans 1/3 executed; overall [███████░░░] 67%
+- **Plan:** 03-03 (next to execute)
+- **Status:** In Progress — 03-01, 03-02 complete; Wave 3 (E2E) next
+- **Progress:** Phase 3 plans 2/3 executed; overall [████████░░] 83%
 
 ```
 [x][x][ ][ ][ ][ ] 2/6 phases
@@ -59,6 +59,7 @@ progress:
 | Phase 02 P01 | 6min | 2 tasks | 6 files |
 | Phase 02 P02 | 8min | 2 tasks | 3 files |
 | Phase 03 P01 | 18min | 2 tasks | 5 files |
+| Phase 03-reveal-both-notes-after-accidental-match P02 | 3min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -73,7 +74,7 @@ progress:
 ### Integration points (from codebase map)
 
 - Backend: `MemoryTrackerService.answerSpelling` + `SpellingAnswerResult` + `findAllAccidentalMatches`; `AnsweredQuestion.matchedNotes` populated.
-- Frontend: `AnsweredSpellingQuestion.vue` (03-02 next).
+- Frontend: `AnsweredSpellingQuestion.vue` ACCIDENTAL_MATCH alert + matched-notes-section NoteShow stack (03-02 done).
 - Reuse: `WikiLinkResolver`, `Note.matchAnswer`, `LinkInsertionChoice` / `AddRelationshipFinalize`, `updateForgettingCurve`.
 
 ### Known risks / blockers
@@ -88,7 +89,8 @@ progress:
 - [x] Run `/gsd-execute-phase 2` to execute 02-01-PLAN.md then 02-02-PLAN.md.
 - [x] Run `/gsd-plan-phase 3` to write 03-01..03-03 PLAN.md.
 - [x] Execute 03-01-PLAN.md (findAll + matchedNotes + IDOR).
-- [ ] Execute 03-02-PLAN.md (UI reveal) then 03-03-PLAN.md (E2E).
+- [x] Execute 03-02-PLAN.md (UI reveal).
+- [ ] Execute 03-03-PLAN.md (E2E).
 
 ### Open questions
 
@@ -96,13 +98,13 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T04:19:39.011Z
-**Stopped at:** Phase 3 Wave 1 complete; Wave 2 execute started
-**Resume file:** .planning/phases/03-reveal-both-notes-after-accidental-match/03-02-PLAN.md
+**Last session:** 2026-07-24T04:22:23.299Z
+**Stopped at:** Completed 03-02-PLAN.md
+**Resume file:** None
 
-- **Last action:** Completed 03-01 — `findAllAccidentalMatches` + populated `matchedNotes` on answer-spelling; IDOR list coverage green.
-- **Next action:** Execute 03-02-PLAN.md (AnsweredSpellingQuestion ACCIDENTAL_MATCH UI).
-- **Resume from:** Read this file + `.planning/phases/03-reveal-both-notes-after-accidental-match/03-02-PLAN.md`.
+- **Last action:** Completed 03-02 — Accidental-match alert + Matched note(s) NoteShow stack; Vitest green.
+- **Next action:** Execute 03-03-PLAN.md (E2E / messaging).
+- **Resume from:** Read this file + `.planning/phases/03-reveal-both-notes-after-accidental-match/03-03-PLAN.md`.
 
 ## Decisions
 
@@ -117,3 +119,6 @@ progress:
 - [Phase 3]: D-03–D-05 UI: full NoteShow stack + distinct ACCIDENTAL_MATCH alert; D-06 no add-link this phase
 - [Phase 3]: Assumption-delta promote: matchedNotes list is primary plural surface
 - [Phase 3]: SpellingAnswerResult carries match list so controller avoids second findAll
+- [Phase 3]: Followed UI-SPEC accidental-match copy and Matched note(s) heading verbatim
+- [Phase 3]: Stubbed NoteShow in Vitest to assert noteId/expandChildren without realm load
+- [Phase 3]: AM-03 left In Progress until 03-03 E2E closes reveal story
