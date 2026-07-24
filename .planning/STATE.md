@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 02
 current_phase_name: accidental-match-grading-penalty
-status: executing
-stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-07-24T00:46:06.976Z"
+status: verifying
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-07-24T00:55:28.002Z"
 progress:
   total_phases: 2
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 3
-  completed_plans: 2
+  completed_plans: 3
 ---
 
 # State: Spelling Answer Match & Link
@@ -27,8 +27,8 @@ progress:
 
 - **Phase:** 02 (accidental-match-grading-penalty) — EXECUTING
 - **Plan:** 2 of 2
-- **Status:** Ready to execute
-- **Progress:** [███████░░░] 67%
+- **Status:** Phase complete — ready for verification
+- **Progress:** [██████████] 100%
 
 ```
 [1][.....] 1/2 phases (Phase 2 planned, not executed)
@@ -57,6 +57,7 @@ progress:
 |------|----------|-------|-------|
 | Phase 01 P01 | 23min | 2 tasks | 8 files |
 | Phase 02 P01 | 6min | 2 tasks | 6 files |
+| Phase 02 P02 | 8min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -92,8 +93,8 @@ progress:
 
 ## Session Continuity
 
-**Last session:** 2026-07-24T00:46:06.971Z
-**Stopped at:** Completed 02-01-PLAN.md
+**Last session:** 2026-07-24T00:55:27.996Z
+**Stopped at:** Completed 02-02-PLAN.md
 **Resume file:** None
 
 - **Last action:** Phase 2 planned — `02-01-PLAN.md` (tracer: title-leg accidental match + lighter -10 clamped penalty + IDOR/skip-when-correct tests) and `02-02-PLAN.md` (alias leg + floor-clamp/threshold-counts tests) written. ROADMAP + STATE finalized. Both plans validate clean; all 6 locked decisions D-01..D-06 cited; threat_model + assumption_delta_decision + Artifacts sections present.
@@ -110,3 +111,5 @@ progress:
 - [Phase ?]: Reused existing NoteTopology (id+title) for matchedNotes; no new note-ref DTO; no Flyway migration (fields are @Transient)
 - [Phase ?]: Set ACCIDENTAL_MATCH @Transient fields on recallPrompt.getAnswer() after merge/save so managed Answer keeps outcome/matchedNoteId
 - [Phase ?]: Plan 02-01 title leg only; alias fallback deferred to Plan 02-02
+- [Phase ?]: Alias index fixture must call refreshForNote — makeMe does not auto-index aliases
+- [Phase ?]: At floor index, nextRecallAt equals now (0 repeat hours); assert greaterThanOrEqualTo

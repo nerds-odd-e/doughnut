@@ -50,7 +50,7 @@ Plans:
   2. An accidental match applies a lighter SRS penalty than a plain wrong answer (a third outcome via `updateForgettingCurve`, no 12h override).
   3. When the answer already matches the reviewed note, the accidental-match search is skipped (overlap is declared, not auto-detected).
 
-**Plans**: 1/2 plans executed
+**Plans**: 2/2 plans executed
 
 Plans:
 **Wave 1**
@@ -59,7 +59,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 02-02-PLAN.md — Add the alias leg of findAccidentalMatch (NoteAliasIndexRepository.findByAliasLookupKeyOrderByNoteIdAsc + title-then-alias fallback) and the floor-clamp + threshold-counts edge-case controller tests
+- [x] 02-02-PLAN.md — Add the alias leg of findAccidentalMatch (NoteAliasIndexRepository.findByAliasLookupKeyOrderByNoteIdAsc + title-then-alias fallback) and the floor-clamp + threshold-counts edge-case controller tests
 
 ### Phase 3: Reveal both notes after accidental match
 
@@ -127,7 +127,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Extend Answer outcome API | 1/1 | Complete    | 2026-07-23 |
-| 2. Accidental-match grading & penalty | 1/2 | In Progress|  |
+| 2. Accidental-match grading & penalty | 2/2 | In Progress|  |
 | 3. Reveal both notes after accidental match | 0/0 | Not started | - |
 | 4. Offer link between notes | 0/0 | Not started | - |
 | 5. Alias-as-wiki-link overlap declaration | 0/0 | Not started | - |
