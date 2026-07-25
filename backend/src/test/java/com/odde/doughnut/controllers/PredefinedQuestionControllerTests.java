@@ -134,6 +134,50 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
   }
 
   @Nested
+  class UpdateQuestionOfNote {
+    @Test
+    void authorization() {
+      Note note = makeMe.aNote().please();
+      PredefinedQuestion question =
+          makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(note).please();
+      PredefinedQuestion updatedQuestion = makeMe.aPredefinedQuestion().please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.updateQuestion(note, question, updatedQuestion));
+    }
+
+    @Test
+    void shouldThrowWhenQuestionDoesNotBelongToNote() {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      Note otherNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      PredefinedQuestion questionOfOtherNote =
+          makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(otherNote).please();
+      PredefinedQuestion updatedQuestion = makeMe.aPredefinedQuestion().please();
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> controller.updateQuestion(note, questionOfOtherNote, updatedQuestion));
+    }
+
+    @Test
+    void updatesTheQuestionInPlace() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      PredefinedQuestion question =
+          makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(note).please();
+      PredefinedQuestion updatedQuestion = makeMe.aPredefinedQuestion().please();
+
+      PredefinedQuestion result = controller.updateQuestion(note, question, updatedQuestion);
+
+      assertThat(result.getId(), equalTo(question.getId()));
+      assertThat(
+          result.getMultipleChoicesQuestion(),
+          equalTo(updatedQuestion.getMultipleChoicesQuestion()));
+      assertThat(result.getCorrectAnswerIndex(), equalTo(updatedQuestion.getCorrectAnswerIndex()));
+      makeMe.refresh(note);
+      assertThat(note.getPredefinedQuestions(), hasSize(1));
+    }
+  }
+
+  @Nested
   class GenerateQuestionWithoutSave {
     @Test
     void shouldThrowWhenOpenAiNotAvailable() {

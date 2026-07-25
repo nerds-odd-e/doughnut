@@ -84,6 +84,21 @@ class PredefinedQuestionController {
     predefinedQuestionService.deleteQuestion(predefinedQuestion);
   }
 
+  @PatchMapping("/{note}/note-questions/{predefinedQuestion}")
+  @Transactional
+  public PredefinedQuestion updateQuestion(
+      @PathVariable("note") @Schema(type = "integer") Note note,
+      @PathVariable("predefinedQuestion") @Schema(type = "integer")
+          PredefinedQuestion predefinedQuestion,
+      @Valid @RequestBody PredefinedQuestion updatedQuestion)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(note);
+    if (!predefinedQuestion.getNote().getId().equals(note.getId())) {
+      throw new IllegalArgumentException("The question does not belong to this note.");
+    }
+    return predefinedQuestionService.updateQuestion(predefinedQuestion, updatedQuestion);
+  }
+
   @PostMapping("/{note}/refine-question")
   @Transactional
   public PredefinedQuestion refineQuestion(

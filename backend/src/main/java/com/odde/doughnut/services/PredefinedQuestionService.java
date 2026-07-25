@@ -45,6 +45,18 @@ public class PredefinedQuestionService {
     entityPersister.remove(predefinedQuestion);
   }
 
+  public PredefinedQuestion updateQuestion(
+      PredefinedQuestion existingQuestion, PredefinedQuestion updatedQuestion) {
+    existingQuestion.setMultipleChoicesQuestion(updatedQuestion.getMultipleChoicesQuestion());
+    existingQuestion.setCorrectAnswerIndex(updatedQuestion.getCorrectAnswerIndex());
+
+    Notebook parentNotebook = existingQuestion.getNote().getNotebook();
+    parentNotebook.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+    entityPersister.save(parentNotebook);
+    entityPersister.save(existingQuestion);
+    return existingQuestion;
+  }
+
   public PredefinedQuestion refineAIQuestion(Note note, PredefinedQuestion predefinedQuestion) {
     MCQWithAnswer aiGeneratedRefineQuestion =
         aiQuestionGenerator.getAiGeneratedRefineQuestion(
