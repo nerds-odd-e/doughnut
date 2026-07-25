@@ -134,6 +134,46 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
   }
 
   @Nested
+  class updateQuestion {
+    @Test
+    void authorization() {
+      Note note = makeMe.aNote().please();
+      PredefinedQuestion question =
+          makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(note).please();
+      PredefinedQuestion updated = new PredefinedQuestion();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.updateQuestion(question.getId(), updated));
+    }
+
+    @Test
+    void notFoundWhenQuestionDoesNotExist() {
+      PredefinedQuestion updated = new PredefinedQuestion();
+      ResponseStatusException exception =
+          assertThrows(ResponseStatusException.class, () -> controller.updateQuestion(-1, updated));
+      assertThat(exception.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
+    }
+
+    @Test
+    void updatesTheQuestion() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      PredefinedQuestion question =
+          makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(note).please();
+      PredefinedQuestion updated = new PredefinedQuestion();
+      updated.setMultipleChoicesQuestion(
+          new com.odde.doughnut.services.ai.MultipleChoicesQuestion(
+              "Updated stem?", java.util.List.of("Right", "Wrong")));
+      updated.setCorrectAnswerIndex(0);
+
+      controller.updateQuestion(question.getId(), updated);
+
+      makeMe.refresh(question);
+      assertThat(question.getMultipleChoicesQuestion().getQuestionStem(), equalTo("Updated stem?"));
+      assertThat(question.getCorrectAnswerIndex(), equalTo(0));
+    }
+  }
+
+  @Nested
   class GenerateQuestionWithoutSave {
     @Test
     void shouldThrowWhenOpenAiNotAvailable() {

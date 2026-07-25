@@ -92,6 +92,17 @@ class PredefinedQuestionController {
     predefinedQuestionService.deleteQuestion(predefinedQuestion);
   }
 
+  @PatchMapping("/{predefinedQuestion}")
+  @Transactional
+  public PredefinedQuestion updateQuestion(
+      @PathVariable("predefinedQuestion") @Schema(type = "integer") Integer predefinedQuestionId,
+      @Valid @RequestBody PredefinedQuestion updated)
+      throws UnexpectedNoAccessRightException {
+    PredefinedQuestion predefinedQuestion = findQuestionOrNotFound(predefinedQuestionId);
+    authorizationService.assertAuthorization(predefinedQuestion.getNote());
+    return predefinedQuestionService.updateQuestion(predefinedQuestion, updated);
+  }
+
   @PostMapping("/{note}/refine-question")
   @Transactional
   public PredefinedQuestion refineQuestion(
