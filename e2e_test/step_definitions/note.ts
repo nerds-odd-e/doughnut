@@ -614,6 +614,16 @@ Then(
   }
 )
 
+When(
+  'I edit the question {string} of the note {string} to:',
+  (stem: string, noteTopology: string, data: DataTable) => {
+    start
+      .jumpToNotePage(noteTopology)
+      .openQuestionList()
+      .editQuestion(stem, data.hashes()[0]!)
+  }
+)
+
 When('I generate question by AI for note {string}', (noteName: string) => {
   start
     .jumpToNotePage(noteName, true)

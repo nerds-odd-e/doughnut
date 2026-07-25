@@ -21,6 +21,19 @@ Feature: Quiz Question Management
     And I delete the question "What do you call a cow with not leg?" from the note "The cow joke"
     Then I should see no questions in the question list of the note "The cow joke"
 
+  Scenario: Edit a question in the question list of the note
+    Given I am logged in as an existing user
+    And I have a notebook "Cow jokes" with a note "The cow joke"
+    When I add the following question for the note "The cow joke":
+      | Stem                                 | Choice 0    | Choice 1 | Choice 2 | Correct Choice Index |
+      | What do you call a cow with not leg? | Ground beef | Cowboy   | Oxford   | 0                    |
+    And I edit the question "What do you call a cow with not leg?" of the note "The cow joke" to:
+      | Stem                                |
+      | What do you call a cow with no leg? |
+    Then I should see the questions in the question list of the note "The cow joke":
+      | Question                            | Correct Choice |
+      | What do you call a cow with no leg? | Ground beef    |
+
   @usingMockedOpenAiService
   Scenario: Can generate the question by AI
     Given I am logged in as an existing user
