@@ -40,6 +40,10 @@ Items acknowledged and deferred at milestone close on 2026-07-25:
 | quick_task | 260724-db-timezone-fix | closed — kept as forensics for migration comments |
 | milestone_audit | v1.1 formal `/gsd-audit-milestone` | skipped by acknowledgment |
 
+## Active quick plans
+
+- `.planning/quick/260725-spa-cdn-fallback-fix/` — rewrite-based SPA fallback + CDN hygiene; Phase 2–3 code in progress (Phase 1 CDN invalidate deferred to post-deploy `/*` invalidation — gcloud reauth blocked in agent).
+
 ## Session Continuity
 
 **Last session:** 2026-07-25

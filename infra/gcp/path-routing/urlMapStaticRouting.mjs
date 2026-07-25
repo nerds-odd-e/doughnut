@@ -1,6 +1,7 @@
 /**
- * Approximates GCP URL map pathRule matching: first matching rule wins.
- * Used to validate prod routing without calling gcloud.
+ * Approximates GCP URL map matching for validation without calling gcloud.
+ * Supports both legacy pathRules (first-match array order) and routeRules
+ * (priority-ordered matchRules).
  */
 
 import { defaultDoughnutRoutingPath, loadDoughnutRouting } from './doughnutRouting.mjs'
@@ -18,15 +19,66 @@ export function gcpPathPatternMatches(pattern, urlPath) {
 }
 
 /**
+ * @param {{
+ *   fullPathMatch?: string,
+ *   prefixMatch?: string,
+ *   pathTemplateMatch?: string,
+ * }} matchRule
  * @param {string} urlPath
- * @param {Array<{ paths?: string[], service?: string }>} pathRules
- * @returns {string | null} matched service URL, or null if no pathRule matched
  */
-export function gcpFirstMatchService(urlPath, pathRules) {
-  for (const rule of pathRules) {
-    for (const pat of rule.paths ?? []) {
-      if (gcpPathPatternMatches(pat, urlPath)) return rule.service ?? ''
-    }
+export function routeMatchRuleMatches(matchRule, urlPath) {
+  if (matchRule.fullPathMatch != null) {
+    return urlPath === matchRule.fullPathMatch
+  }
+  if (matchRule.prefixMatch != null) {
+    return urlPath.startsWith(matchRule.prefixMatch)
+  }
+  if (matchRule.pathTemplateMatch != null) {
+    // Only /** (match-all) is used in our rendered map today.
+    if (matchRule.pathTemplateMatch === '/**') return true
+    return false
+  }
+  return false
+}
+
+/**
+ * @typedef {{ service: string, matches: (urlPath: string) => boolean }} NormalizedRoutingRule
+ */
+
+/**
+ * @param {object[]} routeRules
+ * @returns {NormalizedRoutingRule[]}
+ */
+export function normalizeRouteRules(routeRules) {
+  return [...routeRules]
+    .sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0))
+    .map((rule) => ({
+      service: rule.service ?? '',
+      matches: (urlPath) =>
+        (rule.matchRules ?? []).some((m) => routeMatchRuleMatches(m, urlPath)),
+    }))
+}
+
+/**
+ * @param {Array<{ paths?: string[], service?: string }>} pathRules
+ * @returns {NormalizedRoutingRule[]}
+ */
+export function normalizePathRules(pathRules) {
+  return pathRules.map((rule) => ({
+    service: rule.service ?? '',
+    matches: (urlPath) =>
+      (rule.paths ?? []).some((pat) => gcpPathPatternMatches(pat, urlPath)),
+  }))
+}
+
+/**
+ * @param {string} urlPath
+ * @param {NormalizedRoutingRule[]} routingRules
+ * @returns {string | null} matched service URL, or null if no rule matched
+ */
+export function gcpFirstMatchService(urlPath, routingRules) {
+  for (const rule of routingRules) {
+    if (rule.matches(urlPath)) return rule.service
   }
   return null
 }
@@ -35,8 +87,12 @@ export function isBackendBucketRule(service) {
   return typeof service === 'string' && service.includes('backendBuckets')
 }
 
-export function gcpRoutesToStaticBucket(urlPath, pathRules) {
-  const svc = gcpFirstMatchService(urlPath, pathRules)
+/**
+ * @param {string} urlPath
+ * @param {NormalizedRoutingRule[]} routingRules
+ */
+export function gcpRoutesToStaticBucket(urlPath, routingRules) {
+  const svc = gcpFirstMatchService(urlPath, routingRules)
   if (svc === null) return false
   return isBackendBucketRule(svc)
 }

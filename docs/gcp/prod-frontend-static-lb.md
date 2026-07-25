@@ -98,7 +98,7 @@ Send to the **backend service (MIG)** at least:
 
 **Optional:** `/robots.txt` can be served from GCS if you upload it in the static tree, or left on the MIG.
 
-**Default service:** In the rendered map, `defaultService` is the **backend bucket** (`doughnut-frontend-backend-bucket`), not the MIG. Explicit MIG `pathRules` are generated from `backendPathHints` above; every other path falls through to the bucket, and the pathMatcher's `defaultCustomErrorResponsePolicy` turns the bucket's 404 into the active SHA's `index.html` (200) — see [SPA deep links](#spa-deep-links-d-n-and-any-other-client-route) below.
+**Default service:** In the rendered map, `defaultService` is the **backend bucket** (`doughnut-frontend-backend-bucket`), not the MIG. Explicit MIG `routeRules` are generated from `backendPathHints` above; every other path is handled by a low-priority catch-all that rewrites to the active SHA's `index.html` — see [SPA deep links](#spa-deep-links-d-n-and-any-other-client-route) below.
 
 ---
 
@@ -117,9 +117,11 @@ Minimum to send to the **backend bucket** (with prefix rewrite to `frontend/<ACT
 
 ## SPA deep links (`/d/…`, `/n…`, and any other client route)
 
-There is **no** object per client route under `frontend/<sha>/`. Any path that isn't an explicit backend path rule or a known static file falls through the URL map's catch-all `/*` pathRule to the **backend bucket**, which 404s (no matching object) — and the pathMatcher's `defaultCustomErrorResponsePolicy` intercepts that 404 and serves `frontend/<ACTIVE_SHA>/index.html` with `overrideResponseCode: 200`. The shell always matches the active GCS tree (no jar/GCS chunk desync, since the backend is never involved).
+There is **no** object per client route under `frontend/<sha>/`. Any path that isn't an explicit backend or known-static `routeRule` matches the catch-all `pathTemplateMatch: /**`, which **rewrites the request to `frontend/<ACTIVE_SHA>/index.html`** on the backend bucket. That is a normal GCS object fetch (not a custom-error substitution), so Cloud CDN caches a real shell response. The shell always matches the active GCS tree; the backend is never involved.
 
-The backend has **no** frontend-serving code — no whitelist to maintain. Adding a new client route only requires a `frontend/src/routes/` change; the LB fallback covers it automatically. `backendPathHints` in [`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json) is the single source of truth for which paths must instead hit the MIG (see [Path routing](#path-routing-what-must-hit-the-mig) above).
+The backend has **no** frontend-serving code — no whitelist to maintain. Adding a new client route only requires a `frontend/src/routes/` change; the LB rewrite covers it automatically. `backendPathHints` in [`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json) is the single source of truth for which paths must instead hit the MIG (see [Path routing](#path-routing-what-must-hit-the-mig) above).
+
+Missing hashed assets (e.g. a typo under `/assets/`) return a real **404** — they are not rewritten to HTML.
 
 ---
 
@@ -127,11 +129,20 @@ The backend has **no** frontend-serving code — no whitelist to maintain. Addin
 
 1. **Backend bucket** points at **`GCS_FRONTEND_BUCKET`** (the bucket CI uploads SPA + CLI into), not at the deploy bucket (`GCS_BUCKET`).
 2. **LB service account** needs `storage.objectViewer` on that bucket (see [Backend buckets](https://cloud.google.com/load-balancing/docs/backend-bucket) IAM).
-3. **Cloud CDN** (optional but typical): enable on the backend bucket service; tune **cache mode** and **TTLs**:
-   - Hashed assets under `/assets/` → long cache safe.
-   - `index.html` → short TTL or cache bypass so new deployments are visible quickly after you change `<ACTIVE_SHA>` or error-page behavior.
+3. **Cloud CDN** (enabled on the frontend backend bucket):
+   - Hashed assets under `/assets/` → long cache safe (immutable filenames).
+   - `index.html` → **`Cache-Control: public,max-age=60`** set by [`upload-frontend-static-to-gcs.sh`](../../infra/gcp/scripts/upload-frontend-static-to-gcs.sh) after rsync (hashed assets keep the rsync default).
+   - After each URL-map import, [`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh) runs `gcloud compute url-maps invalidate-cdn-cache … --path "/*" --async` so shells cached against a previous SHA (or any poisoned entry) do not linger.
 
-Set **Cache-Control** at upload time if you want CDN to respect origins; today [`upload-frontend-static-to-gcs.sh`](../../infra/gcp/scripts/upload-frontend-static-to-gcs.sh) uses `gsutil rsync` without custom metadata—add `-h "Cache-Control:…"` if you need stronger CDN alignment.
+Manual invalidation (e.g. after a bad CDN fill):
+
+```bash
+gcloud compute url-maps invalidate-cdn-cache doughnut-app-service-map --path "/notebooks" --global
+gcloud compute url-maps invalidate-cdn-cache doughnut-app-service-map --path "/recall" --global
+gcloud compute url-maps invalidate-cdn-cache doughnut-app-service-map --path "/circles" --global
+# or wipe everything:
+gcloud compute url-maps invalidate-cdn-cache doughnut-app-service-map --path "/*" --global
+```
 
 ---
 

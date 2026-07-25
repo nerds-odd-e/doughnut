@@ -35,22 +35,41 @@ export function pathGoesToBackend(urlPath, hints) {
 }
 
 /**
- * GCP URL map pathRules that send every path classified backend-owned by `hints`
+ * GCP URL map routeRules that send every path classified backend-owned by `hints`
  * to `backendService`, one rule per hint entry, with no rewrite.
+ * Priorities start at `startPriority` and increase by 1 per rule.
  * @param {ReturnType<typeof loadBackendPathHints>} hints
  * @param {string} backendService
- * @returns {Array<{ paths: string[], service: string }>}
+ * @param {number} [startPriority=1]
+ * @returns {{ rules: object[], nextPriority: number }}
  */
-export function backendMigPathRulesFromHints(hints, backendService) {
+export function backendMigRouteRulesFromHints(
+  hints,
+  backendService,
+  startPriority = 1
+) {
   const rules = []
+  let priority = startPriority
   for (const p of hints.exactPaths) {
-    rules.push({ paths: [p], service: backendService })
+    rules.push({
+      priority: priority++,
+      matchRules: [{ fullPathMatch: p }],
+      service: backendService,
+    })
   }
   for (const p of hints.pathPrefixes) {
-    rules.push({ paths: [`${p}*`], service: backendService })
+    rules.push({
+      priority: priority++,
+      matchRules: [{ prefixMatch: p }],
+      service: backendService,
+    })
   }
   for (const p of hints.pathPrefixesAllowBare ?? []) {
-    rules.push({ paths: [p, `${p}*`], service: backendService })
+    rules.push({
+      priority: priority++,
+      matchRules: [{ prefixMatch: p }],
+      service: backendService,
+    })
   }
-  return rules
+  return { rules, nextPriority: priority }
 }

@@ -11,6 +11,7 @@ import {
 import {
   gcpPathPatternMatches,
   gcpRoutesToStaticBucket,
+  normalizePathRules,
 } from './urlMapStaticRouting.mjs'
 import {
   pathRulesFromUrlMapDoc,
@@ -109,7 +110,7 @@ test('fixture: /assets/* sends probe path to bucket', () => {
   assert.ok(
     gcpRoutesToStaticBucket(
       '/assets/.doughnut-path-routing-probe',
-      pr.pathRules
+      normalizePathRules(pr.pathRules)
     )
   )
 })

@@ -10,7 +10,7 @@ import {
 } from './doughnutRouting.mjs'
 import {
   PATH_ROUTING_VALIDATION_DUMMY_SHA,
-  pathRulesFromUrlMapDoc,
+  routingRulesFromUrlMapDoc,
 } from './validateUrlMapPathRouting.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -27,63 +27,55 @@ function renderRepoUrlMap() {
   return { routing, doc: YAML.parse(yamlText) }
 }
 
-test('rendered URL map path rule order: MIG hint rules, then static rules, then catch-all', () => {
+test('rendered URL map routeRules: MIG, then static, then pathTemplateRewrite catch-all', () => {
   const { routing, doc } = renderRepoUrlMap()
-  const pr = pathRulesFromUrlMapDoc(doc)
-  assert.ok(!('error' in pr))
-  const hints = routing.backendPathHints
-  const expectedMigPaths = [
-    ...hints.exactPaths,
-    ...hints.pathPrefixes.map((p) => `${p}*`),
-    ...(hints.pathPrefixesAllowBare ?? []).flatMap((p) => [p, `${p}*`]),
-  ]
-  const expectedStaticPaths = routing.gcpUrlMap.staticPathRules.flatMap(
-    (r) => r.paths
+  const matcher = doc.pathMatchers.find((m) => m.name === 'doughnut-paths')
+  assert.ok(matcher.routeRules, 'expected routeRules (not pathRules)')
+  assert.ok(!matcher.pathRules, 'pathRules must not be mixed with routeRules')
+  assert.ok(
+    !matcher.defaultCustomErrorResponsePolicy,
+    'SPA fallback is rewrite-based; no custom error policy'
   )
-  const expected = [...expectedMigPaths, ...expectedStaticPaths, '/*']
-  const actual = pr.pathRules.flatMap((r) => r.paths ?? [])
-  assert.deepEqual(actual, expected)
-})
 
-test('rendered URL map: MIG hint rules target the backend service, not the bucket', () => {
-  const { routing, doc } = renderRepoUrlMap()
-  const pr = pathRulesFromUrlMapDoc(doc)
-  const migRule = pr.pathRules.find((r) => r.paths?.includes('/api/*'))
-  assert.ok(migRule, 'expected a rendered pathRule for /api/*')
-  assert.equal(migRule.service, routing.gcpUrlMap.backendService)
-  assert.ok(!('routeAction' in migRule), 'MIG pathRules should not rewrite the path')
+  const sorted = [...matcher.routeRules].sort(
+    (a, b) => a.priority - b.priority
+  )
+  const last = sorted[sorted.length - 1]
+  assert.deepEqual(last.matchRules, [{ pathTemplateMatch: '/**' }])
+  assert.equal(
+    last.routeAction.urlRewrite.pathTemplateRewrite,
+    `/frontend/${PATH_ROUTING_VALIDATION_DUMMY_SHA}/index.html`
+  )
+  assert.equal(last.service, routing.gcpUrlMap.staticBackendBucketService)
+
+  const apiPrefix = sorted.find((r) =>
+    r.matchRules?.some((m) => m.prefixMatch === '/api/')
+  )
+  assert.ok(apiPrefix, 'expected MIG prefixMatch for /api/')
+  assert.equal(apiPrefix.service, routing.gcpUrlMap.backendService)
+  assert.ok(!('routeAction' in apiPrefix))
 })
 
 test('rendered URL map: backend-classified paths are not routed to the bucket', () => {
   const { doc } = renderRepoUrlMap()
-  const pr = pathRulesFromUrlMapDoc(doc)
+  const rr = routingRulesFromUrlMapDoc(doc)
+  assert.ok(!('error' in rr))
   for (const urlPath of ['/api/foo', '/attachments/x', '/logout']) {
     assert.ok(
-      !gcpRoutesToStaticBucket(urlPath, pr.pathRules),
+      !gcpRoutesToStaticBucket(urlPath, rr.routingRules),
       `${urlPath} should not route to the static bucket`
     )
   }
 })
 
-test('rendered URL map: unknown frontend deep link falls through the catch-all to the bucket', () => {
+test('rendered URL map: unknown frontend deep link hits catch-all bucket rewrite', () => {
   const { doc } = renderRepoUrlMap()
-  const pr = pathRulesFromUrlMapDoc(doc)
-  assert.ok(gcpRoutesToStaticBucket('/settings/recall-stats', pr.pathRules))
-})
-
-test('rendered URL map: defaultCustomErrorResponsePolicy serves active SHA index.html with 200 on 404', () => {
-  const { routing, doc } = renderRepoUrlMap()
-  const matcher = doc.pathMatchers.find((m) => m.name === 'doughnut-paths')
-  const policy = matcher.defaultCustomErrorResponsePolicy
-  assert.ok(policy, 'expected defaultCustomErrorResponsePolicy on the pathMatcher')
-  assert.equal(policy.errorResponseRules.length, 1)
-  assert.deepEqual(policy.errorResponseRules[0].matchResponseCodes, ['404'])
-  assert.equal(
-    policy.errorResponseRules[0].path,
-    `/frontend/${PATH_ROUTING_VALIDATION_DUMMY_SHA}/index.html`
-  )
-  assert.equal(policy.errorResponseRules[0].overrideResponseCode, 200)
-  assert.equal(policy.errorService, routing.gcpUrlMap.staticBackendBucketService)
+  const rr = routingRulesFromUrlMapDoc(doc)
+  assert.ok(!('error' in rr))
+  assert.ok(gcpRoutesToStaticBucket('/settings/recall-stats', rr.routingRules))
+  assert.ok(gcpRoutesToStaticBucket('/notebooks', rr.routingRules))
+  assert.ok(gcpRoutesToStaticBucket('/recall', rr.routingRules))
+  assert.ok(gcpRoutesToStaticBucket('/circles', rr.routingRules))
 })
 
 test('rendered URL map: defaultService is the backend bucket (backend paths are explicit)', () => {
