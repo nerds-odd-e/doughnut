@@ -51,7 +51,7 @@ export const addQuestionPage = () => {
           cy.findByLabelText(key).clear().invoke('val', row[key]!).trigger('input')
         }
       })
-      cy.findByRole('button', { name: 'Submit' }).click()
+      cy.findByRole('button', { name: 'Save' }).click()
       cy.wait('@updateQuestion').then(({ response }) => {
         expect(response?.statusCode, 'update question').to.equal(200)
       })

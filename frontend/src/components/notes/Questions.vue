@@ -52,6 +52,24 @@
             </td>
           </template>
           <td>
+            <PopButton
+              btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+              aria-label="Edit question"
+              title="Edit question"
+            >
+              <template #button_face>
+                <Pencil class="w-4 h-4" />
+              </template>
+              <template #default="{ closer }">
+                <NoteAddQuestion
+                  v-bind="{ note, existingQuestion: question }"
+                  @close-dialog="
+                    closer();
+                    questionUpdated($event);
+                  "
+                />
+              </template>
+            </PopButton>
             <button
               class="daisy-btn daisy-btn-ghost daisy-btn-sm"
               aria-label="Delete question"
@@ -83,7 +101,7 @@ import { PredefinedQuestionController } from "@generated/doughnut-backend-api/sd
 import NoteAddQuestion from "./NoteAddQuestion.vue"
 import QuestionExportDialog from "./QuestionExportDialog.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
-import { Upload, Trash2 } from "@lucide/vue"
+import { Upload, Trash2, Pencil } from "@lucide/vue"
 
 const props = defineProps({
   note: {
@@ -108,6 +126,15 @@ const questionAdded = (newQuestion: PredefinedQuestion) => {
     return
   }
   questions.value.push(newQuestion)
+}
+const questionUpdated = (updatedQuestion: PredefinedQuestion) => {
+  if (updatedQuestion == null) {
+    return
+  }
+  const index = questions.value.findIndex((q) => q.id === updatedQuestion.id)
+  if (index !== -1) {
+    questions.value[index] = updatedQuestion
+  }
 }
 const deleteQuestion = async (question: PredefinedQuestion) => {
   if (!window.confirm("Delete this question?")) {
