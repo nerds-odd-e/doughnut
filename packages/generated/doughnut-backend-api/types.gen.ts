@@ -2713,6 +2713,42 @@ export type UpdateSubscriptionGroupResponses = {
 
 export type UpdateSubscriptionGroupResponse = UpdateSubscriptionGroupResponses[keyof UpdateSubscriptionGroupResponses];
 
+export type DeleteQuestionData = {
+    body?: never;
+    path: {
+        note: number;
+        predefinedQuestion: number;
+    };
+    query?: never;
+    url: '/api/predefined-questions/{note}/note-questions/{predefinedQuestion}';
+};
+
+export type DeleteQuestionResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type UpdateQuestionData = {
+    body: PredefinedQuestion;
+    path: {
+        note: number;
+        predefinedQuestion: number;
+    };
+    query?: never;
+    url: '/api/predefined-questions/{note}/note-questions/{predefinedQuestion}';
+};
+
+export type UpdateQuestionResponses = {
+    /**
+     * OK
+     */
+    200: PredefinedQuestion;
+};
+
+export type UpdateQuestionResponse = UpdateQuestionResponses[keyof UpdateQuestionResponses];
+
 export type UndoDeleteNoteData = {
     body?: never;
     path: {
@@ -3836,23 +3872,6 @@ export type DeleteTokenData = {
 };
 
 export type DeleteTokenResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
-
-export type DeleteQuestionData = {
-    body?: never;
-    path: {
-        note: number;
-        predefinedQuestion: number;
-    };
-    query?: never;
-    url: '/api/predefined-questions/{note}/note-questions/{predefinedQuestion}';
-};
-
-export type DeleteQuestionResponses = {
     /**
      * OK
      */
