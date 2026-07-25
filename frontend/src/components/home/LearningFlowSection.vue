@@ -45,8 +45,9 @@
 <script setup lang="ts">
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
+import { useLearningFlowPath } from "@/composables/useLearningFlowPath"
 import type { Component } from "vue"
-import { onMounted, onUnmounted, ref } from "vue"
+import { ref } from "vue"
 
 const { goToNextAssimilation } = useGoToNextAssimilation()
 
@@ -65,7 +66,7 @@ defineProps<{
 }>()
 
 const upperHalf = ref<HTMLElement>()
-const isScrolling = ref(false)
+const { isScrolling } = useLearningFlowPath(upperHalf)
 
 const cardTitles = [
   "Taking notes is only the beginning",
@@ -78,109 +79,6 @@ const cardDescriptions = [
   "Start to understand your notes, and tracking your memories about them. Decide what to keep and what to let go.",
   "Using AI generated questions to help you recall the notes to keep your memories alive. Improve the notes stucture continously as we learn.",
 ]
-
-const handleScroll = () => {
-  if (!upperHalf.value) return
-
-  const upperRect = upperHalf.value.getBoundingClientRect()
-  const scrollPosition = window.scrollY
-  const threshold = upperRect.height * 0.7
-
-  isScrolling.value = scrollPosition > threshold
-}
-
-const updateFlowPath = () => {
-  const svg = document.querySelector(".flow-background") as SVGElement
-  const iconWrappers = document.querySelectorAll(
-    ".nav-item-wrapper"
-  ) as NodeListOf<HTMLElement>
-  if (!svg || iconWrappers.length !== 3) return
-
-  const svgRect = svg.getBoundingClientRect()
-  const positions = Array.from(iconWrappers).map((wrapper) => {
-    const rect = wrapper.getBoundingClientRect()
-    return {
-      x: rect.left + rect.width / 2 - svgRect.left,
-      y: rect.top + rect.height / 2 - svgRect.top,
-    }
-  })
-
-  const path = document.querySelector(".flow-path") as SVGPathElement
-  if (!path) return
-
-  const spacing = 30
-  const curveRadius = 20
-  const arrowSize = 8
-  const wrapPadding = 80
-  const edgeMargin = 60
-  const sideMargin = 60
-  const leftOffset = 60
-  const connectionGap = 40
-  const iconWidth = 70
-
-  if (positions[0] && positions[1] && positions[2]) {
-    const pathData = `
-      M ${positions[0].x + connectionGap + leftOffset - iconWidth},${positions[0].y}
-      H ${positions[1].x - connectionGap + leftOffset - iconWidth}
-      M ${positions[1].x + connectionGap + leftOffset - iconWidth},${positions[1].y}
-      H ${positions[2].x - connectionGap + leftOffset - iconWidth}
-      M ${positions[2].x + leftOffset},${positions[2].y}
-      h ${wrapPadding}
-      q ${curveRadius} 0 ${curveRadius} ${curveRadius}
-      v ${svgRect.height - positions[2].y - edgeMargin}
-      q 0 ${curveRadius} -${curveRadius} ${curveRadius}
-      h -${svgRect.width - sideMargin * 2}
-      q -${curveRadius} 0 -${curveRadius} -${curveRadius}
-      v -${svgRect.height - positions[0].y - edgeMargin}
-      q 0 -${curveRadius} ${curveRadius} -${curveRadius}
-      H ${positions[0].x - spacing + leftOffset - iconWidth}
-    `
-    path.setAttribute("d", pathData)
-
-    const arrowPositions = [
-      {
-        x: positions[1].x - connectionGap + leftOffset - iconWidth,
-        y: positions[1].y,
-      },
-      {
-        x: positions[2].x - connectionGap + leftOffset - iconWidth,
-        y: positions[2].y,
-      },
-      {
-        x: positions[0].x - spacing + leftOffset - iconWidth,
-        y: positions[0].y,
-      },
-    ]
-
-    const arrowHeads = document.querySelectorAll(
-      ".arrow-marker"
-    ) as NodeListOf<SVGPathElement>
-    arrowHeads.forEach((arrow, index) => {
-      const pos = arrowPositions[index]
-      if (pos) {
-        arrow.setAttribute(
-          "d",
-          `
-          M ${pos.x - arrowSize},${pos.y - arrowSize / 2}
-          L ${pos.x},${pos.y}
-          L ${pos.x - arrowSize},${pos.y + arrowSize / 2}
-        `
-        )
-      }
-    })
-  }
-}
-
-onMounted(() => {
-  window.addEventListener("scroll", handleScroll)
-  window.addEventListener("resize", updateFlowPath)
-  setTimeout(updateFlowPath, 100)
-})
-
-onUnmounted(() => {
-  window.removeEventListener("scroll", handleScroll)
-  window.removeEventListener("resize", updateFlowPath)
-})
 </script>
 
 <style lang="scss" scoped>
@@ -188,7 +86,11 @@ onUnmounted(() => {
   min-height: 100vh;
   min-height: 100dvh;
   padding: 2rem;
-  background: linear-gradient(to bottom, #ffffff, #f5f5f5);
+  background: linear-gradient(
+    to bottom,
+    var(--color-base-100),
+    var(--color-base-200)
+  );
 }
 
 .welcome-text {
@@ -224,13 +126,6 @@ onUnmounted(() => {
   transform: translateX(-100px);
 }
 
-.note-card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
 .learning-steps {
   display: flex;
   justify-content: space-between;
@@ -262,10 +157,10 @@ onUnmounted(() => {
 
 .note-card {
   width: 100%;
-  background: white;
+  background: var(--color-base-100);
   padding: 1.5rem;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px color-mix(in oklch, var(--color-base-content) 10%, transparent);
   min-height: 200px;
   margin-top: 1rem;
   display: flex;

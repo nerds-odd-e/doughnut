@@ -11,8 +11,8 @@
     }
   },
   "engines": {
-    "node": ">=26.4",
-    "pnpm": ">=11.15.1"
+    "node": ">=26.5",
+    "pnpm": ">=11.16.0"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
@@ -30,7 +30,7 @@
     "chalk": "^5.6.2",
     "doughnut-api": "workspace:*",
     "markdansi": "0.3.2",
-    "react": "^19.2.7",
+    "react": "^19.2.8",
     "string-width": "^8.2.2",
     "turndown": "^7.2.4",
     "yoga-layout": "~3.2.1"

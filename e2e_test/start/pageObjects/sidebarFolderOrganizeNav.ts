@@ -1,4 +1,4 @@
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import folderPage from './folderPage'
 import { assumeSidebarFolderOrganizeForm } from './sidebarFolderOrganizeForm'
 
@@ -19,11 +19,11 @@ function folderRowControls(treeitem: Cypress.Chainable<JQuery<HTMLElement>>) {
 }
 
 function openFolderPageLink(treeitem: Cypress.Chainable<JQuery<HTMLElement>>) {
-  pageIsNotLoading()
+  waitUntilAppIsNotBusy()
   folderRowControls(treeitem)
     .find('[data-testid="sidebar-folder-open-page-link"]')
     .click()
-  pageIsNotLoading()
+  waitUntilAppIsNotBusy()
   folderPage().openSettingsTab()
   return assumeSidebarFolderOrganizeForm()
 }

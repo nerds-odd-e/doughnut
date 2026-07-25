@@ -1,4 +1,4 @@
-import { pageIsNotLoading } from '../../pageBase'
+import { waitUntilAppIsNotBusy } from '../../pageBase'
 import { assumeMemoryTrackerPage } from '../memoryTrackerPage'
 import { propertyMemoryTrackerRowLabel } from './shared'
 
@@ -22,7 +22,7 @@ export function assimilationPropertyMemoryTrackerExpectations() {
     openPropertyMemoryTracker(propertyKey: string) {
       cy.contains('tr', propertyMemoryTrackerRowLabel(propertyKey)).click()
       cy.url().should('include', '/memory-trackers/')
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return assumeMemoryTrackerPage()
     },
     expectMemoryTrackerInfo(expected: { [key: string]: string }[]) {
@@ -40,7 +40,7 @@ export function assimilationPropertyMemoryTrackerExpectations() {
     removeMemoryTrackerFromRecall(type: 'normal' | 'spelling') {
       cy.contains('tr', type).click()
       cy.url().should('include', '/memory-trackers/')
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return assumeMemoryTrackerPage().removeFromRecall()
     },
   }

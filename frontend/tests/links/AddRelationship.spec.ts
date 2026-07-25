@@ -45,10 +45,12 @@ function mountAddRelationshipFinalize({
   note,
   targetSearchResult,
   seedRealm,
+  navigateOnSuccess = true,
 }: {
   note: Note
   targetSearchResult: NoteSearchResult
   seedRealm?: NoteRealm
+  navigateOnSuccess?: boolean
 }) {
   const Host = defineComponent({
     components: { AddRelationshipFinalize, GlobalApiLoadingModal },
@@ -58,12 +60,14 @@ function mountAddRelationshipFinalize({
         type: Object as PropType<NoteSearchResult>,
         required: true,
       },
+      navigateOnSuccess: { type: Boolean, default: true },
     },
     emits: ["success", "goBack"],
     template: `
       <AddRelationshipFinalize
         :note="note"
         :target-search-result="targetSearchResult"
+        :navigate-on-success="navigateOnSuccess"
         @success="$emit('success')"
         @goBack="$emit('goBack')"
       />
@@ -75,7 +79,7 @@ function mountAddRelationshipFinalize({
     useStorageAccessor().value.refreshNoteRealm(seedRealm)
   }
   return renderer
-    .withProps({ note, targetSearchResult })
+    .withProps({ note, targetSearchResult, navigateOnSuccess })
     .mount({ attachTo: document.body })
 }
 
@@ -220,6 +224,29 @@ describe("AddRelationshipFinalize", () => {
     expect(routerReplace).toHaveBeenCalledWith(
       noteShowLocation(createdRealm.id)
     )
+    expect(wrapper.emitted().success).toHaveLength(1)
+  })
+
+  it("creates relationship note and emits success without navigating when navigateOnSuccess is false", async () => {
+    const { sourceRealm, note, createdRealm } =
+      sourceAndCreatedRelationshipRealms()
+    const target = targetSearchResult()
+    const createNoteSpy = mockRelationshipNoteCreation(
+      sourceRealm,
+      createdRealm
+    )
+
+    const wrapper = mountAddRelationshipFinalize({
+      note,
+      targetSearchResult: target,
+      seedRealm: sourceRealm,
+      navigateOnSuccess: false,
+    })
+
+    await selectRelationType(wrapper, "related to")
+
+    expect(createNoteSpy).toHaveBeenCalledTimes(1)
+    expect(routerReplace).not.toHaveBeenCalled()
     expect(wrapper.emitted().success).toHaveLength(1)
   })
 })

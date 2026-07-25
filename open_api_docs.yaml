@@ -1011,6 +1011,26 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebookHealthLintReport"
+  /api/notebooks/{notebook}/health/fix:
+    post:
+      tags:
+      - notebook-health-controller
+      operationId: fix
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotebookHealthFixRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
   /api/notebooks/{notebook}/folders:
     post:
       tags:
@@ -2195,6 +2215,24 @@ paths:
       responses:
         "200":
           description: OK
+  /api/user/recall-stats:
+    get:
+      tags:
+      - user-controller
+      operationId: getRecallStats
+      parameters:
+      - name: timezone
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RecallStatsDTO"
   /api/user/question-generation-batch-schedule:
     get:
       tags:
@@ -3221,6 +3259,8 @@ components:
           format: int32
         spaceIntervals:
           type: string
+        healthRemoveEmptyFoldersDefault:
+          type: boolean
         admin:
           type: boolean
       required:
@@ -3625,6 +3665,16 @@ components:
           format: int32
         spellingAnswer:
           type: string
+        matchedNoteId:
+          type: integer
+          format: int64
+        outcome:
+          type: string
+          enum:
+          - CORRECT
+          - WRONG
+          - ACCIDENTAL_MATCH
+          - OVERLAP
       required:
       - correct
       - id
@@ -3648,6 +3698,12 @@ components:
           $ref: "#/components/schemas/Answer"
         predefinedQuestion:
           $ref: "#/components/schemas/PredefinedQuestion"
+        overlap:
+          type: boolean
+        matchedNotes:
+          type: array
+          items:
+            $ref: "#/components/schemas/NoteTopology"
       required:
       - answer
       - id
@@ -3870,6 +3926,14 @@ components:
           description: "Finding groups, typically one per health rule"
           items:
             $ref: "#/components/schemas/HealthFindingGroup"
+    NotebookHealthFixRequest:
+      type: object
+      properties:
+        removeEmptyFolders:
+          type: boolean
+          description: Must be true to bulk-purge fully empty folder trees
+      required:
+      - removeEmptyFolders
     FolderCreationRequest:
       type: object
       description: "Create a folder under notebook root, nested under an explicit\
@@ -4441,6 +4505,8 @@ components:
         spaceIntervals:
           type: string
           pattern: "^\\d+((,\\s*\\d+){1,1000})*$"
+        healthRemoveEmptyFoldersDefault:
+          type: boolean
       required:
       - name
     NoteUpdateTitleDTO:
@@ -4574,6 +4640,157 @@ components:
       required:
       - id
       - label
+    AmPmResponseTime:
+      type: object
+      properties:
+        morningMs:
+          type: integer
+          format: int64
+        morningSamples:
+          type: integer
+          format: int32
+        afternoonMs:
+          type: integer
+          format: int64
+        afternoonSamples:
+          type: integer
+          format: int32
+        eveningMs:
+          type: integer
+          format: int64
+        eveningSamples:
+          type: integer
+          format: int32
+        nightMs:
+          type: integer
+          format: int64
+        nightSamples:
+          type: integer
+          format: int32
+    DayAvgResponseTime:
+      type: object
+      properties:
+        date:
+          type: string
+        avgMs:
+          type: integer
+          format: int64
+        sampleSize:
+          type: integer
+          format: int32
+    DayCount:
+      type: object
+      properties:
+        date:
+          type: string
+        count:
+          type: integer
+          format: int32
+    DayRetention:
+      type: object
+      properties:
+        date:
+          type: string
+        retentionPct:
+          type: number
+          format: double
+        correctCount:
+          type: integer
+          format: int32
+        answeredCount:
+          type: integer
+          format: int32
+        sampleSize:
+          type: integer
+          format: int32
+    HeadlineStats:
+      type: object
+      properties:
+        totalReviewsAllTime:
+          type: integer
+          format: int32
+        totalReviews365:
+          type: integer
+          format: int32
+        reviewsToday:
+          type: integer
+          format: int32
+        retentionPct365:
+          type: number
+          format: double
+        currentStreak:
+          type: integer
+          format: int32
+        longestStreak:
+          type: integer
+          format: int32
+        totalTimeSpentMs:
+          type: integer
+          format: int64
+        bestHour:
+          type: integer
+          format: int32
+        bestHourRetentionPct:
+          type: number
+          format: double
+        worstHour:
+          type: integer
+          format: int32
+        worstHourRetentionPct:
+          type: number
+          format: double
+    HourRetention:
+      type: object
+      properties:
+        hour:
+          type: integer
+          format: int32
+        retentionPct:
+          type: number
+          format: double
+        correctCount:
+          type: integer
+          format: int32
+        answeredCount:
+          type: integer
+          format: int32
+    RecallStatsDTO:
+      type: object
+      properties:
+        calendar:
+          type: array
+          items:
+            $ref: "#/components/schemas/DayCount"
+        trend:
+          type: array
+          items:
+            $ref: "#/components/schemas/DayAvgResponseTime"
+        retentionTrend:
+          type: array
+          items:
+            $ref: "#/components/schemas/DayRetention"
+        amPm:
+          $ref: "#/components/schemas/AmPmResponseTime"
+        weekdayHourCounts:
+          type: array
+          items:
+            type: array
+            items:
+              type: integer
+              format: int32
+        weekdayHourCorrect:
+          type: array
+          items:
+            type: array
+            items:
+              type: integer
+              format: int32
+        hourlyRetention:
+          type: array
+          items:
+            $ref: "#/components/schemas/HourRetention"
+        totals:
+          $ref: "#/components/schemas/HeadlineStats"
     QuestionGenerationBatchUserScheduleDTO:
       type: object
       properties:

@@ -7,12 +7,6 @@
     ]"
     :data-testid="`${testIdPrefix}-body`"
   >
-    <h2
-      v-if="headingLabel"
-      class="text-lg font-semibold text-base-content mb-2"
-    >
-      {{ headingLabel }}
-    </h2>
     <div :data-testid="`${testIdPrefix}-editor`">
       <RichMarkdownEditor
         :model-value="localValue"
@@ -44,14 +38,12 @@ const props = withDefaults(
     readmeContent?: string | null
     testIdPrefix?: string
     richEditorScopeName?: string
-    headingLabel?: string
     /** No nested card chrome — full column width, no top margin (workspace Readme). */
     flush?: boolean
   }>(),
   {
     testIdPrefix: "notebook-readme",
     richEditorScopeName: "notebook-readme",
-    headingLabel: "Readme",
     flush: false,
   }
 )

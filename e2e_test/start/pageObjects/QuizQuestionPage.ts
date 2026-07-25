@@ -1,4 +1,4 @@
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 
 const assumeQuestionPage = (stem?: string) => {
   if (stem) {
@@ -20,7 +20,7 @@ const assumeQuestionPage = (stem?: string) => {
       cy.findByText(notebook, { selector: '.notebook-source *' })
     },
     skipQuestion() {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       getQuestionSection().should('exist')
       cy.get('.progress-bar').first().click()
       cy.findByRole('button', { name: 'Move to end of list' }).click()
@@ -34,7 +34,7 @@ const assumeQuestionPage = (stem?: string) => {
         .within(() => {
           cy.findByText(answer).should('be.visible').click()
         })
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       // Wait for the answered overlay to disappear, indicating it moved to the next stage
       cy.get('[data-test="answered-overlay"]').should('not.exist')
       return this

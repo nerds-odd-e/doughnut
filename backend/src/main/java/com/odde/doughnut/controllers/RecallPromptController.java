@@ -85,13 +85,13 @@ class RecallPromptController {
       @Valid @RequestBody AnswerSpellingDTO answerDTO)
       throws UnexpectedNoAccessRightException {
     assertCanMutateRecallPrompt(recallPrompt);
-    RecallPrompt answered =
+    MemoryTrackerService.SpellingAnswerResult result =
         memoryTrackerService.answerSpelling(
             recallPrompt,
             answerDTO,
             authorizationService.getCurrentUser(),
             testabilitySettings.getCurrentUTCTimestamp());
-    return AnsweredQuestion.from(answered);
+    return AnsweredQuestion.from(result.recallPrompt(), result.matchedNotes());
   }
 
   private void assertCanMutateRecallPrompt(RecallPrompt recallPrompt)

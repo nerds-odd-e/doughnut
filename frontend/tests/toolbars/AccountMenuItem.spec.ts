@@ -6,15 +6,11 @@ import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it, vi } from "vitest"
 
 describe("AccountMenuItem", () => {
-  const renderAccountMenuItem = (overrides?: {
-    logout?: () => void
-    showUserSettingsDialog?: () => void
-  }) =>
+  const renderAccountMenuItem = (overrides?: { logout?: () => void }) =>
     helper
       .component(AccountMenuItem)
       .withProps({
         user: makeMe.aUser.please(),
-        showUserSettingsDialog: overrides?.showUserSettingsDialog ?? vi.fn(),
         logout: overrides?.logout ?? vi.fn(),
       })
       .withRouter()

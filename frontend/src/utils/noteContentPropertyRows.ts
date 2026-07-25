@@ -1,4 +1,5 @@
 import { composeNoteContentMarkdown } from "@/utils/noteContentFrontmatter"
+import { parseNoteContentMarkdown } from "@/utils/noteContentFrontmatterParse"
 import { findPropertyRowIndexByExactKey } from "@/utils/noteContentPropertyKeys"
 import {
   authoredAliasesValidationErrorForPropertyRow,
@@ -189,4 +190,19 @@ export function propertyRowsAfterAppendingValueToExactKey(
   return rows.map((r, i) =>
     i === idx ? appendValueToPropertyRow(r, value) : r
   )
+}
+
+/** Appends an empty-key wiki-link property row; undefined when content cannot be updated. */
+export function appendWikiLinkPropertyRow(
+  content: string,
+  linkText: string
+): string | undefined {
+  const parsed = parseNoteContentMarkdown(content ?? "")
+  if (!parsed.ok) return
+  const rows = [
+    ...sortedPropertyRowsFromNoteProperties(parsed.properties),
+    propertyRowWithScalar("", linkText),
+  ]
+  if (!validatePropertyRowsForRichEdit(rows).ok) return
+  return composeNoteContentFromPropertyRows(rows, parsed.body)
 }

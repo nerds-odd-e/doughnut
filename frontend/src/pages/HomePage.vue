@@ -62,7 +62,11 @@ const { upperNavItems, lowerNavItems } = useNavigationItems()
   min-height: 100vh;
   min-height: 100dvh;
   padding: 2rem;
-  background: linear-gradient(to bottom, #f5f5f5, #ffffff);
+  background: linear-gradient(
+    to bottom,
+    var(--color-base-200),
+    var(--color-base-100)
+  );
 }
 
 .sharing-section {
@@ -79,7 +83,7 @@ const { upperNavItems, lowerNavItems } = useNavigationItems()
 .cli-install-code {
   text-align: left;
   display: inline-block;
-  background: #f5f5f5;
+  background: var(--color-base-200);
   padding: 1rem 1.5rem;
   border-radius: 8px;
   overflow-x: auto;

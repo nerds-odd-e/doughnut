@@ -3,7 +3,7 @@ import {
   clickNotebookCardTitleToOpenNotebookPage,
   findNotebookCardButton,
 } from './NotebookList'
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import notebookPage from './notebookPage'
 import notebookCreationForm from './forms/notebookCreationForm'
 
@@ -19,7 +19,7 @@ const completeMoveNotebookToNewGroupDialog = (newGroupName: string) => {
     cy.findByLabelText('New group name').type(newGroupName)
     cy.findByRole('button', { name: 'Move' }).click()
   })
-  pageIsNotLoading()
+  waitUntilAppIsNotBusy()
 }
 
 export const assumeCirclePage = () => ({
@@ -84,7 +84,7 @@ export const navigateToCircle = (circleName: string) => {
       }
     })
   })
-  pageIsNotLoading()
+  waitUntilAppIsNotBusy()
   cy.findByText(`Circle: ${circleName}`)
   cy.findByText('Add New Notebook In This Circle', { timeout: 15000 }).should(
     'be.visible'

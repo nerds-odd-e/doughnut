@@ -1,4 +1,4 @@
-import { pageIsNotLoading } from '../../pageBase'
+import { waitUntilAppIsNotBusy } from '../../pageBase'
 import {
   refinementLayoutPanel,
   removeRefinementLayoutButton,
@@ -50,7 +50,7 @@ export function assimilationRefinementLayoutExpectations() {
       indices.forEach((index) => this.checkRefinementLayoutItem(index))
       removeRefinementLayoutButton().click()
       cy.findByRole('button', { name: 'OK' }).click()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return this
     },
     expectNoRefinementLayoutSelection() {
@@ -147,6 +147,52 @@ export function assimilationRefinementLayoutExpectations() {
       extractionPreviewPanel()
         .find('[data-test-id="extraction-preview-create"]')
         .should('be.disabled')
+      return this
+    },
+    expectExtractionPreviewOriginalContentTabActive() {
+      extractionPreviewPanel().within(() => {
+        cy.get('[data-test-id="extraction-preview-original-tab-content"]')
+          .should('have.attr', 'aria-selected', 'true')
+          .and('have.class', 'daisy-tab-active')
+        cy.get('[data-test-id="extraction-preview-original-content"]').should(
+          'be.visible'
+        )
+        cy.get('[data-testid="diff-left-pane"]').should('not.exist')
+      })
+      return this
+    },
+    expectExtractionPreviewOriginalContentFieldContains(content: string) {
+      extractionPreviewPanel()
+        .find('[data-test-id="extraction-preview-original-content"]')
+        .should('have.value', content)
+      return this
+    },
+    switchExtractionPreviewOriginalSectionToDiffTab() {
+      extractionPreviewPanel()
+        .find('[data-test-id="extraction-preview-original-tab-diff"]')
+        .click()
+      return this
+    },
+    expectExtractionPreviewOriginalDiffShows(
+      originalContent: string,
+      updatedContent: string
+    ) {
+      extractionPreviewPanel().within(() => {
+        cy.get('[data-test-id="extraction-preview-original-tab-diff"]')
+          .should('have.attr', 'aria-selected', 'true')
+          .and('have.class', 'daisy-tab-active')
+        cy.get('[data-test-id="extraction-preview-original-content"]').should(
+          'not.exist'
+        )
+        cy.get('[data-testid="diff-left-pane"]').should(
+          'contain.text',
+          originalContent
+        )
+        cy.get('[data-testid="diff-right-pane"]').should(
+          'contain.text',
+          updatedContent
+        )
+      })
       return this
     },
     createNoteFromExtractionPreview() {

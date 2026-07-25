@@ -65,7 +65,6 @@ When(
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (fixtureFilename: string, notebookName: string) => {
     const stem = pdfFixtureStem(fixtureFilename)
-    cy.wrap(stem).as('attachedBookPdfStem')
     return cli
       .useNotebook(notebookName)
       .then((ctx) => ctx.attachPdfBook(fixtureFilename))
@@ -79,14 +78,12 @@ When(
   'I attach a fake blank pdf book with layout of {string} to the notebook {string}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (fixtureStem: string, notebookName: string) => {
-    const bookName = fixtureStem
-    cy.wrap(bookName).as('attachedBookPdfStem')
     return cy
       .fixture(`book_reading/mineru_output_for_${fixtureStem}.json`)
       .then((contentList: unknown) => {
         return testability().attachBookToNotebook(
           notebookName,
-          bookName,
+          fixtureStem,
           contentList as Array<unknown>
         )
       })
@@ -97,9 +94,7 @@ When(
   'I open the book attached to notebook {string}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (notebookName: string) => {
-    return cy.get<string>('@attachedBookPdfStem').then((stem) => {
-      start.navigateToNotebookPage(notebookName).readBook(stem)
-    })
+    return start.jumpToBookReadingPage(notebookName)
   }
 )
 

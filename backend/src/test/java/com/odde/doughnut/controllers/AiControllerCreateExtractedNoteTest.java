@@ -68,6 +68,23 @@ class AiControllerCreateExtractedNoteTest extends ControllerTestBase {
       assertThat(testNote.getContent()).isEqualTo(originalContent);
     }
 
+    @Test
+    void shouldStripLeadingMarkdownHeadingThatRepeatsTitleOnCreate()
+        throws UnexpectedNoAccessRightException {
+      Note sourceNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
+      NoteExtractionResult request =
+          extractionResult(
+              "Key Suggestion",
+              "# Key Suggestion\n\nBody that should remain.",
+              "Updated parent with summary.");
+
+      NoteRealm response = controller.createExtractedNote(sourceNote, request);
+      Note persistedNote = noteRepository.findById(response.getNote().getId()).orElseThrow();
+
+      assertThat(persistedNote.getTitle()).isEqualTo("Key Suggestion");
+      assertThat(persistedNote.getContent()).isEqualTo("Body that should remain.");
+    }
+
     @ParameterizedTest
     @ValueSource(booleans = {false, true})
     void shouldCreateExtractedNoteFromSourceNote(boolean sourceInFolder)

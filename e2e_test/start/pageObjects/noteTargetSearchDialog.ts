@@ -1,4 +1,4 @@
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import { form } from '../forms'
 
 const relationshipTargetListMaxAttempts = 5
@@ -52,7 +52,10 @@ function searchNote(searchKey: string, options: string[]) {
   if (options?.includes('All My Notebooks And Subscriptions')) {
     ensureAllMyNotebooksAndSubscriptionsScopeOn()
   }
-  cy.findByPlaceholderText('Search').clear().type(searchKey)
+  cy.findByPlaceholderText('Search')
+    .clear()
+    .invoke('val', searchKey)
+    .trigger('input')
   cy.tick(1000)
 }
 
@@ -132,7 +135,7 @@ export const assumeNoteTargetSearchDialog = () => {
       }
       cards.findByRole('button', { name: 'Move Under' }).click()
       cy.findByRole('button', { name: 'OK' }).click()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
     },
     moveToNotebookRoot(notebookName: string) {
       cy.get('[role=listitem]')
@@ -144,25 +147,25 @@ export const assumeNoteTargetSearchDialog = () => {
         .findByRole('button', { name: 'Move to notebook root' })
         .click()
       cy.findByRole('button', { name: 'OK' }).click()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
     },
     createRelationshipToTargetAs(toNoteTopic: string, relationType: string) {
       clickAddLinkOnRelationshipTargetNote(toNoteTopic)
       cy.findByRole('button', { name: 'Add a new relationship note' }).click()
       form.getField('Relation Type').clickOption(relationType)
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
     },
     insertWikiLinkToTarget(toNoteTopic: string) {
       clickAddLinkOnRelationshipTargetNote(toNoteTopic)
       cy.findByRole('button', { name: 'Insert as a wiki link' }).click()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
     },
     insertDeadLinkToTarget(toNoteTopic: string, displayText: string) {
       clickAddLinkOnRelationshipTargetNote(toNoteTopic)
       cy.findByRole('button', {
         name: `Link "${displayText}" to this note`,
       }).click()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
     },
     expectNoteInRecentlyUpdatedSection(noteTitle: string) {
       cy.findByText('Recently updated notes', {

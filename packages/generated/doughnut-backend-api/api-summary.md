@@ -27,6 +27,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `updateUser`: PATCH `/api/user/{user}` -> `UpdateUserResponse` (request: `UpdateUserData`; path: user; body: UserDto; response body: User)
 - `getTokenInfo`: GET `/api/user/token-info` -> `GetTokenInfoResponse` (request: none; response body: UserToken)
 - `revokeToken`: DELETE `/api/user/token-info` -> `RevokeTokenResponse` (request: none; response body: void)
+- `getRecallStats`: GET `/api/user/recall-stats` -> `GetRecallStatsResponse` (request: `GetRecallStatsData`; query: timezone; response body: RecallStatsDto)
 - `getQuestionGenerationBatchSchedule`: GET `/api/user/question-generation-batch-schedule` -> `GetQuestionGenerationBatchScheduleResponse` (request: none; response body: QuestionGenerationBatchUserScheduleDto)
 - `getMenuData`: GET `/api/user/menu-data` -> `GetMenuDataResponse` (request: `GetMenuDataData`; query: timezone; response body: MenuDataDto)
 - `getTokens`: GET `/api/user/get-tokens` -> `GetTokensResponse` (request: none; response body: Array<UserToken>)
@@ -130,6 +131,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 ## Notebook Health Controller
 
 - `lint`: POST `/api/notebooks/{notebook}/health/lint` -> `LintResponse` (request: `LintData`; path: notebook; response body: NotebookHealthLintReport)
+- `fix`: POST `/api/notebooks/{notebook}/health/fix` -> `FixResponse` (request: `FixData`; path: notebook; body: NotebookHealthFixRequest; response body: void)
 
 ## Notebook Group Controller
 

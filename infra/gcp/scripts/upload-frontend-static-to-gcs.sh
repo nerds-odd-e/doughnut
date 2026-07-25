@@ -22,3 +22,15 @@ fi
 DEST="gs://${DEST_BUCKET}/frontend/${GITHUB_SHA}/"
 echo "Uploading frontend static from $STATIC_DIR to $DEST"
 gsutil -m rsync -r "$STATIC_DIR" "$DEST"
+
+# SPA shell must not linger in Cloud CDN for an hour: hashed assets are
+# immutable, but index.html is rewritten onto every client deep link and
+# must pick up the new SHA's chunk names quickly after a frontend deploy.
+INDEX_SRC="${STATIC_DIR}/index.html"
+INDEX_DEST="${DEST}index.html"
+if [[ ! -f "$INDEX_SRC" ]]; then
+	echo "error: missing SPA shell: $INDEX_SRC" >&2
+	exit 1
+fi
+echo "Setting short Cache-Control on $INDEX_DEST"
+gsutil -h "Cache-Control:public,max-age=60" cp "$INDEX_SRC" "$INDEX_DEST"

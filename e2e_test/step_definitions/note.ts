@@ -132,6 +132,33 @@ Given('note {string} has content:', (noteTitle: string, content: string) => {
 })
 
 Given(
+  'the notebook {string} has an empty folder {string}',
+  (notebookName: string, folderName: string) => {
+    start.testability().createEmptyFolder(notebookName, folderName)
+  }
+)
+
+Given(
+  'the notebook {string} has a folder {string} under note {string}',
+  (notebookName: string, folderName: string, underNoteTitle: string) => {
+    start
+      .testability()
+      .createEmptyFolder(notebookName, folderName, underNoteTitle)
+  }
+)
+
+Given(
+  'the notebook {string} has a readme-only folder {string} with readme {string}',
+  (notebookName: string, folderName: string, readme: string) => {
+    start.testability().createReadmeOnlyFolder(notebookName, folderName, readme)
+  }
+)
+
+When('I jump to the notebook {string}', (notebookName: string) => {
+  start.jumpToNotebookPage(notebookName)
+})
+
+Given(
   'there are some notes for existing user {string} in notebook {string}',
   (externalIdentifier: string, notebookName: string, data: DataTable) => {
     const hashes = data
@@ -334,7 +361,7 @@ When('I am creating a note in the notebook {string}', (notebook: string) => {
 })
 
 Then('I should see {string} in breadcrumb', (noteTitles: string) => {
-  start.pageIsNotLoading().assumeNotePage().expectBreadcrumb(noteTitles)
+  start.waitUntilAppIsNotBusy().assumeNotePage().expectBreadcrumb(noteTitles)
 })
 
 Then('the note title should be {string}', (title: string) => {
@@ -357,10 +384,20 @@ Then(
   'I should see folder {notepath} containing these notes:',
   (notePath: NotePath, data: DataTable) => {
     start
-      .pageIsNotLoading()
+      .waitUntilAppIsNotBusy()
       .navigateToNotebooksPage()
       .expandFolderInSidebar(notePath)
       .expectChildrenUnderSidebarFolder(data.hashes())
+  }
+)
+
+Then(
+  'I should see sidebar folder {string} containing these notes:',
+  (folderLabel: string, data: DataTable) => {
+    start
+      .noteSidebar()
+      .expand(folderLabel)
+      .expectChildrenUnderFolder(folderLabel, data.hashes())
   }
 )
 
@@ -377,6 +414,10 @@ When(
 
 Then('I should see sidebar folder {string}', (folderLabel: string) => {
   start.noteSidebar().expectSidebarFolderVisible(folderLabel)
+})
+
+Then('I should not see sidebar folder {string}', (folderLabel: string) => {
+  start.noteSidebar().expectSidebarFolderAbsent(folderLabel)
 })
 
 Then(
@@ -452,7 +493,7 @@ Then(
 )
 
 Then('I should be on a notebook folder page in the browser', () => {
-  start.pageIsNotLoading()
+  start.waitUntilAppIsNotBusy()
   cy.location('pathname').should('match', /^\/notebooks\/\d+\/folders\/\d+$/)
 })
 
@@ -465,7 +506,7 @@ Then('the note document toolbar is not present', () => {
 })
 
 Then('I should be on the notebook root page in the browser', () => {
-  start.pageIsNotLoading()
+  start.waitUntilAppIsNotBusy()
   cy.location('pathname').should('match', /^\/notebooks\/\d+$/)
 })
 
@@ -477,7 +518,7 @@ Then(
   'note {string} should show the rich content elements in the note content:',
   (noteTitle: string, data: DataTable) => {
     start.jumpToNotePage(noteTitle, true)
-    start.pageIsNotLoading()
+    start.waitUntilAppIsNotBusy()
     start
       .assumeNotePage(noteTitle)
       .switchToRichContent()
@@ -499,7 +540,7 @@ Then(
   'I should see {string} is {string} than {string}',
   (left: string, aging: string, right: string) => {
     let leftColor = ''
-    start.pageIsNotLoading().jumpToNotePage(left)
+    start.waitUntilAppIsNotBusy().jumpToNotePage(left)
     cy.get('.note-recent-update-indicator')
       .invoke('css', 'color')
       .then((val) => {
@@ -524,7 +565,7 @@ Then(
 
 When('I undo {string}', (undoType: string) => {
   start.assumeNotePage().undo(undoType)
-  start.pageIsNotLoading()
+  start.waitUntilAppIsNotBusy()
 })
 
 When('I undo {string} again', (undoType: string) => {
@@ -575,7 +616,7 @@ When(
       .replyToConversationAndInviteAiToReply(
         'Please complete the note content.'
       )
-    start.pageIsNotLoading()
+    start.waitUntilAppIsNotBusy()
   }
 )
 
@@ -743,7 +784,7 @@ When(
 
 When('I reload the current page for note {string}', (noteTopology: string) => {
   cy.reload()
-  start.pageIsNotLoading()
+  start.waitUntilAppIsNotBusy()
   start.assumeNotePage(noteTopology)
 })
 
@@ -849,66 +890,6 @@ Then(
 
 Then('the note content should contain a line break', () => {
   start.assumeNotePage().expectNoteContentContainLineBreak()
-})
-
-When(
-  'I extract refinement layout points {string} and {string} to a new note',
-  (firstPoint: string, secondPoint: string) => {
-    start
-      .assumeAssimilationPage()
-      .extractLayoutPointsToNewNote(firstPoint, secondPoint)
-  }
-)
-
-When(
-  'I open extraction preview for refinement layout points {string} and {string}',
-  (firstPoint: string, secondPoint: string) => {
-    start
-      .assumeAssimilationPage()
-      .openExtractionPreviewForLayoutPoints(firstPoint, secondPoint)
-  }
-)
-
-When(
-  'I open extraction preview on note {string} for refinement layout points {string} and {string}',
-  (noteTitle: string, firstPoint: string, secondPoint: string) => {
-    start
-      .jumpToNotePage(noteTitle)
-      .moreOptions()
-      .openAssimilationSettings()
-      .openExtractionPreviewForLayoutPoints(firstPoint, secondPoint)
-  }
-)
-
-When('I create the note from the extraction preview', () => {
-  start.assumeAssimilationPage().createNoteFromExtractionPreview()
-})
-
-When('I retry the extraction preview', () => {
-  start.assumeAssimilationPage().retryExtractionPreview()
-})
-
-When(
-  'I edit the extraction preview to title {string} and content {string} and updated parent content {string}',
-  (
-    newNoteTitle: string,
-    newNoteContent: string,
-    updatedOriginalNoteContent: string
-  ) => {
-    start.assumeAssimilationPage().editExtractionPreviewFields({
-      newNoteTitle,
-      newNoteContent,
-      updatedOriginalNoteContent,
-    })
-  }
-)
-
-When('I clear the extraction preview new note title', () => {
-  start.assumeAssimilationPage().clearExtractionPreviewNewNoteTitle()
-})
-
-Then('the extraction preview create note button should be disabled', () => {
-  start.assumeAssimilationPage().expectExtractionPreviewCreateButtonDisabled()
 })
 
 Then(

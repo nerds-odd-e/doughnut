@@ -34,6 +34,15 @@ public interface NoteAliasIndexRepository extends JpaRepository<NoteAliasIndex, 
           SELECT_ALIAS_WITH_NOTEBOOK
               + " WHERE i.aliasLookupKey = :aliasLookupKey "
               + ACTIVE_NOTE_AND_NOTEBOOK
+              + " ORDER BY n.id ASC")
+  List<NoteAliasIndex> findByAliasLookupKeyOrderByNoteIdAsc(
+      @Param("aliasLookupKey") String aliasLookupKey);
+
+  @Query(
+      value =
+          SELECT_ALIAS_WITH_NOTEBOOK
+              + " WHERE i.aliasLookupKey = :aliasLookupKey "
+              + ACTIVE_NOTE_AND_NOTEBOOK
               + " AND nb.ownership.user.id = :userId "
               + " ORDER BY n.id ASC")
   List<NoteAliasIndex> searchExactForUserInAllMyNotebooks(

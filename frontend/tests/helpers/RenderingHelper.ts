@@ -5,7 +5,7 @@ import type { User } from "@generated/doughnut-backend-api"
 import { render } from "@testing-library/vue"
 import { mount } from "@vue/test-utils"
 import { merge } from "es-toolkit"
-import { ref, type DefineComponent } from "vue"
+import { ref, type DefineComponent, type Ref } from "vue"
 import type { RouteLocationRaw } from "vue-router"
 import { createRouter, createWebHistory } from "vue-router"
 
@@ -69,6 +69,11 @@ class RenderingHelper<T = DefineComponent> {
 
   withCurrentUser(user: User) {
     this.global.provide.currentUser = ref(user)
+    return this
+  }
+
+  withCurrentUserRef(userRef: Ref<User | undefined>) {
+    this.global.provide.currentUser = userRef
     return this
   }
 

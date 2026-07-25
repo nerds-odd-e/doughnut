@@ -2,6 +2,7 @@ Feature: Quiz Question Management
   As a trainer, I want to manage the quiz questions for the notes of a notebook,
   so that learners can practice with consistent multiple-choice questions tied to each note.
 
+  @skipOptimizationDueToKnownNecessarySlowness
   Scenario: Manually add a question to the note successfully
     Given I am logged in as an existing user
     And I have a notebook "Cow jokes" with a note "The cow joke"

@@ -6,6 +6,9 @@ const audioToolsPage = () => {
     },
     stopRecording: () => {
       cy.findByRole('button', { name: 'Stop Recording' }).click()
+      cy.findByRole('button', { name: 'Save Audio Locally' }).should(
+        'not.be.disabled'
+      )
       return this
     },
     startToUploadAudioFile: (fileName: string) => {

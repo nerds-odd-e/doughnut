@@ -161,6 +161,59 @@ Then(
   }
 )
 
+Then(
+  'I should see an accidental match reveal for spelling answer {string} with reviewed note {string} and matched note {string}',
+  (answer: string, reviewedNoteTitle: string, matchedNoteTitle: string) => {
+    start
+      .assumeAnsweredQuestionPage()
+      .expectAccidentalMatchReveal(answer, reviewedNoteTitle, matchedNoteTitle)
+  }
+)
+
+When(
+  'I link the matched note {string} as a wiki property from the accidental match result',
+  (matchedNoteTitle: string) => {
+    start
+      .assumeAnsweredQuestionPage()
+      .linkMatchedNoteAsProperty(matchedNoteTitle)
+  }
+)
+
+When(
+  'I link the matched note {string} as relationship {string} from the accidental match result',
+  (matchedNoteTitle: string, relationType: string) => {
+    start
+      .assumeAnsweredQuestionPage()
+      .linkMatchedNoteAsRelationship(matchedNoteTitle, relationType)
+  }
+)
+
+Then(
+  'I should still be on the accidental match result for spelling answer {string} with matched note {string}',
+  (answer: string, matchedNoteTitle: string) => {
+    start
+      .assumeAnsweredQuestionPage()
+      .expectStillOnAccidentalMatchResult(answer, matchedNoteTitle)
+  }
+)
+
+Then('I should see an overlap try-again alert for spelling', () => {
+  start.assumeAnsweredQuestionPage().expectOverlapTryAgainForSpelling()
+})
+
+Then(
+  'I should not see matched notes or accidental match on the overlap result',
+  () => {
+    start
+      .assumeAnsweredQuestionPage()
+      .expectNoMatchedNotesOrAccidentalMatchOnOverlap()
+  }
+)
+
+When('I click overlap try again', () => {
+  start.assumeAnsweredQuestionPage().clickOverlapTryAgain()
+})
+
 Then('I should see that my answer is correct as the last question', () => {
   start
     .assumeAnsweredQuestionPage()

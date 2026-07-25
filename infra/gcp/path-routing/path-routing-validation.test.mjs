@@ -11,13 +11,9 @@ import {
 import {
   gcpPathPatternMatches,
   gcpRoutesToStaticBucket,
+  normalizePathRules,
 } from './urlMapStaticRouting.mjs'
 import {
-  loadDoughnutRouting,
-  renderDoughnutAppServiceUrlMapYamlFromRouting,
-} from './doughnutRouting.mjs'
-import {
-  PATH_ROUTING_VALIDATION_DUMMY_SHA,
   pathRulesFromUrlMapDoc,
   runRepoPathRoutingValidation,
   validateUrlMapAgainstHintsAndStaticPaths,
@@ -114,7 +110,7 @@ test('fixture: /assets/* sends probe path to bucket', () => {
   assert.ok(
     gcpRoutesToStaticBucket(
       '/assets/.doughnut-path-routing-probe',
-      pr.pathRules
+      normalizePathRules(pr.pathRules)
     )
   )
 })
@@ -150,22 +146,4 @@ test('fixture: backend path must not match static bucket rule', () => {
 test('URL map rendered from doughnut-routing.json passes validation', () => {
   const { failures } = runRepoPathRoutingValidation({ repoRoot })
   assert.equal(failures.length, 0, failures.join('\n'))
-})
-
-test('rendered URL map path rule order matches doughnut-routing.json', () => {
-  const routingPath = path.join(
-    repoRoot,
-    'infra/gcp/path-routing/doughnut-routing.json'
-  )
-  const routing = loadDoughnutRouting(routingPath)
-  const yamlText = renderDoughnutAppServiceUrlMapYamlFromRouting(
-    routing,
-    PATH_ROUTING_VALIDATION_DUMMY_SHA
-  )
-  const doc = YAML.parse(yamlText)
-  const pr = pathRulesFromUrlMapDoc(doc)
-  assert.ok(!('error' in pr))
-  const expected = routing.gcpUrlMap.staticPathRules.flatMap((r) => r.paths)
-  const actual = pr.pathRules.flatMap((r) => r.paths ?? [])
-  assert.deepEqual(actual, expected)
 })

@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.lessThan;
 
@@ -194,5 +195,65 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
     var resolved = wikiLinkResolver.resolveWikiLinksForCache(linker, viewer);
     assertThat(resolved.size(), equalTo(1));
     assertThat(resolved.getFirst().targetNote().getId(), equalTo(readableTarget.getId()));
+  }
+
+  @Test
+  void does_not_resolve_alias_target_from_wiki_link_only_overlap_alias() {
+    User owner = makeMe.aUser().please();
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
+    String overlapOnlyMarkdown =
+        """
+        ---
+        aliases:
+          - "[[Other Note]]"
+        ---
+
+        body
+        """;
+    Note overlapDeclarer =
+        makeMe
+            .aNote()
+            .title("Overlap Declarer")
+            .notebook(notebook)
+            .content(overlapOnlyMarkdown)
+            .please();
+    noteAliasIndexService.refreshForNote(overlapDeclarer);
+    Note linkerByInnerTitle =
+        makeMe.aNote().notebook(notebook).content("See [[Other Note]]").please();
+    makeMe.entityPersister.flush();
+
+    // Neither the overlap target title nor the raw wiki-link token is an alias index key,
+    // so resolve finds no alias target (and there is no title match for "Other Note").
+    assertThat(wikiLinkResolver.resolveWikiLinksForCache(linkerByInnerTitle, owner), empty());
+  }
+
+  @Test
+  void resolves_plain_alias_and_ignores_wiki_link_overlap_item_in_mixed_list() {
+    User owner = makeMe.aUser().please();
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
+    String mixedAliasMarkdown =
+        """
+        ---
+        aliases:
+          - color
+          - "[[Other Note]]"
+        ---
+
+        body
+        """;
+    Note mixedAliasNote =
+        makeMe.aNote().title("colour").notebook(notebook).content(mixedAliasMarkdown).please();
+    noteAliasIndexService.refreshForNote(mixedAliasNote);
+    Note plainAliasLinker = makeMe.aNote().notebook(notebook).content("See [[color]]").please();
+    Note overlapTitleLinker =
+        makeMe.aNote().notebook(notebook).content("See [[Other Note]]").please();
+    makeMe.entityPersister.flush();
+
+    var plainResolved = wikiLinkResolver.resolveWikiLinksForCache(plainAliasLinker, owner);
+    assertThat(plainResolved.size(), equalTo(1));
+    assertThat(plainResolved.getFirst().linkText(), equalTo("color"));
+    assertThat(plainResolved.getFirst().targetNote().getId(), equalTo(mixedAliasNote.getId()));
+
+    assertThat(wikiLinkResolver.resolveWikiLinksForCache(overlapTitleLinker, owner), empty());
   }
 }

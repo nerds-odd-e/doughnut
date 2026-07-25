@@ -1,7 +1,7 @@
 import './clientConfig'
 import { UserController } from '@generated/doughnut-backend-api/sdk.gen'
 import mock_services from './mock_services/index'
-import { pageIsNotLoading as waitForPageNotLoading } from './pageBase'
+import { waitUntilAppIsNotBusy as waitForAppNotBusy } from './pageBase'
 import { questionGenerationService } from './questionGenerationService'
 import type NotePath from '../support/NotePath'
 import {
@@ -50,8 +50,8 @@ import { form } from './forms'
 
 const start = {
   // === Page Base ===
-  pageIsNotLoading() {
-    waitForPageNotLoading()
+  waitUntilAppIsNotBusy() {
+    waitForAppNotBusy()
     return this
   },
 

@@ -94,6 +94,7 @@ final class NoteRefinementAiToolFactory {
         - When helpful, add wiki links from the new note body back to the original note or to relevant related notes from the provided context.
         - Wiki links are case-insensitive. Use display text when useful, for example [[Canonical Note Title|visible text]].
         - Do not invent unrelated wiki links.
+        - The note title is stored separately from the body. Do not repeat newNoteTitle as a markdown heading in newNoteContent (for example "# Title" or "## Title" at the start). Begin the body with the actual content.
         """
             .formatted(layoutJson, selectedItemIds, selectedItemsBlock);
 

@@ -109,16 +109,8 @@ export const routeMetadata: RouteMetadata[] = [
     name: "nonproductionOnlyLogin",
   },
   {
-    path: "/recent",
-    name: "recent",
-  },
-  {
     path: "/circles",
     name: "circles",
-  },
-  {
-    path: "/generate-token",
-    name: "manageAccessTokens",
   },
   {
     path: "/memory-trackers/:memoryTrackerId",

@@ -29,6 +29,7 @@ spring:
   flyway:
     placeholders:
       embedding_column: "embedding_raw VARBINARY(6144) NOT NULL"
+      tz_repair: "1=0"
   jpa:
     generate-ddl: false
     show-sql: false
@@ -79,7 +80,7 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
   datasource:
-    url: ${INPUT_DB_URL:jdbc:mysql://127.0.0.1:3309/doughnut_e2e_test}
+    url: ${INPUT_DB_URL:jdbc:mysql://127.0.0.1:3309/doughnut_e2e_test?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true}
     username: ${db.user}
     password: ${db.password}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -97,6 +98,7 @@ spring:
     clean-disabled: true
     placeholders:
       embedding_column: "embedding_raw VARBINARY(6144) NOT NULL"
+      tz_repair: "1=0"
   jpa:
     generate-ddl: false
     show-sql: false
@@ -156,7 +158,7 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
   datasource:
-    url: jdbc:mysql://db-server:3306/doughnut
+    url: jdbc:mysql://db-server:3306/doughnut?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true
     username: doughnut
     password: ${MYSQL_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -174,6 +176,7 @@ spring:
     clean-disabled: true
     placeholders:
       embedding_column: "embedding VECTOR(1536) USING VARBINARY NOT NULL"
+      tz_repair: "1=0"
   jpa:
     generate-ddl: false
     show-sql: false
@@ -203,7 +206,6 @@ question:
   regeneration:
     times: 0
 doughnut:
-  spa-public-base-url: ${DOUGHNUT_SPA_PUBLIC_BASE_URL:https://doughnut.odd-e.com}
   # prod: book PDF bytes live in this bucket (GcsBookStorage). Non-prod uses DB storage instead.
   book-pdf:
     gcs:
@@ -240,6 +242,7 @@ spring:
   flyway:
     placeholders:
       embedding_column: "embedding_raw VARBINARY(6144) NOT NULL"
+      tz_repair: "1=0"
   jpa:
     generate-ddl: false
     show-sql: true

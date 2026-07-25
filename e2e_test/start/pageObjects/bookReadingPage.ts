@@ -2,7 +2,7 @@ import {
   expectDaisyDialogBoxVisible,
   openDaisyDialog,
 } from '../../support/daisyModalHelpers'
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 
 export type BookLayoutRow = { depth: number; title: string }
 
@@ -64,7 +64,7 @@ const bookReadingPage = () => {
 
   return {
     expectEpubReadingViewShowsBookName(name: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.location('pathname').should('match', /^\/notebooks\/\d+\/book$/)
       cy.get('[data-testid="book-reading-page"]').should('exist')
       cy.get('[data-testid="book-reading-epub-global-bar-title"]').should(
@@ -80,7 +80,7 @@ const bookReadingPage = () => {
      * intersect that container's on-screen rect (so content below the scroll position fails).
      */
     expectEpubContentTextVisible(text: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.location('pathname').should('match', /^\/notebooks\/\d+\/book$/)
       cy.get('[data-testid="book-reading-page"]').should('exist')
       cy.get('[data-testid="epub-book-viewer"]', { timeout: 30000 })
@@ -130,7 +130,7 @@ const bookReadingPage = () => {
      * so `relocated` can advance past the initially displayed spine item without a layout click.
      */
     scrollEpubReaderUntilTextInViewport(markerText: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.location('pathname').should('match', /^\/notebooks\/\d+\/book$/)
       cy.get('[data-testid="book-reading-page"]').should('exist')
       cy.get('[data-testid="epub-book-viewer"]', { timeout: 30000 }).should(
@@ -181,7 +181,7 @@ const bookReadingPage = () => {
      * "scroll until text" can still cross fragment boundaries within the same spine file.
      */
     scrollEpubReaderHostToTop() {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.location('pathname').should('match', /^\/notebooks\/\d+\/book$/)
       cy.get('[data-testid="book-reading-page"]').should('exist')
       cy.get('[data-testid="epub-book-viewer"]', { timeout: 30000 }).should(
@@ -208,7 +208,7 @@ const bookReadingPage = () => {
      * reading-page URL to force a full remount of BookReadingEpubView.
      */
     leaveEpubReadingViewAndReturn() {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('[data-testid="epub-book-viewer"]').should('be.visible')
       cy.location('pathname')
         .should('match', /^\/notebooks\/\d+\/book$/)
@@ -221,7 +221,7 @@ const bookReadingPage = () => {
             /^\/notebooks\/\d+\/book$/
           )
           cy.visit(readingPath)
-          pageIsNotLoading()
+          waitUntilAppIsNotBusy()
           cy.get('[data-testid="epub-book-viewer"]', {
             timeout: 30000,
           }).should('be.visible')
@@ -230,7 +230,7 @@ const bookReadingPage = () => {
       return this
     },
     expectBookLayoutRows(expected: BookLayoutRow[]) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.location('pathname').should('match', /^\/notebooks\/\d+\/book$/)
       cy.get('[data-testid="book-reading-page"]').should('exist')
       for (const row of expected) {
@@ -246,13 +246,13 @@ const bookReadingPage = () => {
       return this
     },
     expectPdfBeginningVisible() {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.location('pathname').should('match', /^\/notebooks\/\d+\/book$/)
       this.expectCurrentPage(1)
       return this
     },
     clickBookBlockByTitle(title: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('[data-testid="book-reading-page-indicator"]')
         .should('be.visible')
         .and('contain', ' /')
@@ -269,7 +269,7 @@ const bookReadingPage = () => {
      * Does not assert layout state; use `expectBookBlockIsCurrentBlockByTitle` / selection steps as needed.
      */
     clickBookLayoutBlockByTitle(title: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.location('pathname').should('match', /^\/notebooks\/\d+\/book$/)
       cy.get('[data-testid="book-reading-page"]').should('exist')
       bookBlockRowByTitle(title).click()
@@ -279,7 +279,7 @@ const bookReadingPage = () => {
       title: string,
       substring: string
     ) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.location('pathname').should('match', /^\/notebooks\/\d+\/book$/)
       bookBlockRowByTitle(title)
         .invoke('attr', 'data-epub-start-href')
@@ -287,7 +287,7 @@ const bookReadingPage = () => {
       return this
     },
     expectBookBlockIsCurrentSelectionByTitle(title: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       bookBlockRowByTitle(title).should(
         'have.attr',
         'data-current-selection',
@@ -303,7 +303,7 @@ const bookReadingPage = () => {
      * position has moved away from the explicit selection).
      */
     expectBookLayoutCurrentBlockDiffersFromSelection() {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('[data-testid="book-reading-book-layout"]')
         .find('[data-current-selection="true"][data-current-block="true"]')
         .should('not.exist')
@@ -313,12 +313,12 @@ const bookReadingPage = () => {
       return this
     },
     expectBookBlockIsFocusedByTitle(title: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       bookBlockRowByTitle(title).should('be.focused')
       return this
     },
     expectBookBlockAtDepth(title: string, depth: number) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       bookBlockRowByTitle(title).should(
         'have.attr',
         'data-book-block-depth',
@@ -361,7 +361,7 @@ const bookReadingPage = () => {
       return this
     },
     expectBookBlockNotPresent(title: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('[data-testid="book-reading-book-layout"]').should(
         'not.contain',
         title
@@ -369,7 +369,7 @@ const bookReadingPage = () => {
       return this
     },
     expectCurrentPage(pageNumber: number) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('[data-testid="book-reading-page-indicator"]')
         .should('be.visible')
         .and('contain', `${pageNumber} /`)
@@ -385,7 +385,7 @@ const bookReadingPage = () => {
       return this
     },
     scrollPdfBookReaderToBringPage2IntoPrimaryView() {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       const page2Sel =
         '[data-testid="pdf-book-viewer"] .pdfViewer .page[data-page-number="2"]'
       cy.get(page2Sel)
@@ -416,7 +416,7 @@ const bookReadingPage = () => {
      * viewport, making §2.1 (y0=631) the first visible anchor and therefore the current block.
      */
     scrollPdfBookReaderDownWithinSamePageForNextBbox() {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get(
         '[data-testid="pdf-book-viewer"] .pdfViewer .page[data-page-number="1"]'
       )
@@ -433,7 +433,7 @@ const bookReadingPage = () => {
       return this
     },
     expectBookBlockIsCurrentBlockByTitle(title: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       bookBlockRowByTitle(title)
         .should('have.attr', 'data-current-block', 'true')
         .and('have.attr', 'aria-current', 'location')
@@ -468,7 +468,7 @@ const bookReadingPage = () => {
      * asserting it contains the selected block title.
      */
     scrollPdfUntilReadingControlPanelVisible(selectedBlockTitle: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       const step = 150
       const doScroll = (remaining: number): void => {
         if (remaining <= 0) return
@@ -499,7 +499,7 @@ const bookReadingPage = () => {
      * Contract for production: data-testid book-reading-reading-control-panel + book-reading-mark-as-read.
      */
     markBookBlockAsReadInReadingControlPanel(blockTitle: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('[data-testid="book-reading-reading-control-panel"]')
         .should('be.visible')
         .and('contain', blockTitle)
@@ -509,7 +509,7 @@ const bookReadingPage = () => {
       return this
     },
     markBookBlockAsSkimmedInReadingControlPanel(blockTitle: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('[data-testid="book-reading-reading-control-panel"]')
         .should('be.visible')
         .and('contain', blockTitle)
@@ -519,7 +519,7 @@ const bookReadingPage = () => {
       return this
     },
     expectEpubReadingControlPanelContentAnchored() {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('[data-testid="book-reading-reading-control-panel"]', {
         timeout: 10000,
       })
@@ -532,7 +532,7 @@ const bookReadingPage = () => {
      * and screen-reader “Marked as read” on the row.
      */
     expectBookBlockMarkedAsReadInBookLayout(title: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       bookBlockRowByTitle(title).should(
         'have.attr',
         'data-direct-content-read',
@@ -541,7 +541,7 @@ const bookReadingPage = () => {
       return this
     },
     expectBookBlockMarkedAsSkimmedInBookLayout(title: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       bookBlockRowByTitle(title).should(
         'have.attr',
         'data-direct-content-skimmed',
@@ -550,29 +550,29 @@ const bookReadingPage = () => {
       return this
     },
     expectCurrentBlockNavigationBar(title: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('[data-testid="current-block-navigation-bar"]', { timeout: 10000 })
         .should('be.visible')
         .and('contain', title)
       return this
     },
     expectCurrentBlockNavigationBarNotVisible() {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('[data-testid="current-block-navigation-bar"]').should('not.exist')
       return this
     },
     clickReadFromHere() {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('[data-testid="read-from-here"]').should('be.visible').click()
       return this
     },
     clickBackToSelected() {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('[data-testid="back-to-selected"]').should('be.visible').click()
       return this
     },
     clickAiReorganizeLayout() {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('[data-testid="book-reading-ai-reorganize-layout"]')
         .should('be.visible')
         .click()
@@ -582,7 +582,7 @@ const bookReadingPage = () => {
       return this
     },
     expectReorganizationPreviewDialog() {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       const dialog = '[data-testid="book-layout-reorganize-preview-dialog"]'
       expectDaisyDialogBoxVisible(dialog)
       cy.get('#book-layout-reorganize-preview-title').should(
@@ -595,7 +595,7 @@ const bookReadingPage = () => {
       blockTitle: string,
       suggestedDepth: number
     ) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       const dialog = '[data-testid="book-layout-reorganize-preview-dialog"]'
       expectDaisyDialogBoxVisible(dialog)
       cy.get(`${dialog}.daisy-modal-open .daisy-modal-box`).within(() => {
@@ -609,30 +609,30 @@ const bookReadingPage = () => {
       return this
     },
     confirmAiReorganizeSuggestion() {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       openDaisyDialog('[data-testid="book-layout-reorganize-preview-dialog"]')
       cy.get('[data-testid="book-layout-reorganize-preview-confirm"]').click({
         force: true,
       })
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return this
     },
     expectContentBlockBboxOverlaysVisible() {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('[data-testid="pdf-book-viewer"]')
         .find('[data-testid="book-block-selection-bbox-highlight"]')
         .should('exist')
       return this
     },
     clickContentBlockBboxOverlay() {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('[data-book-content-block-id]')
         .first()
         .trigger('click', { bubbles: true, force: true })
       return this
     },
     clickLongTextContentBlockBboxOverlay() {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get(
         '[data-derived-title-truncated="true"][data-book-content-block-id]'
       )
@@ -646,26 +646,26 @@ const bookReadingPage = () => {
       return this
     },
     expectNewBlockCallout() {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('[data-testid="new-book-block-callout"]').should('be.visible')
       return this
     },
     confirmNewBlockCallout() {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('[data-testid="new-book-block-callout-confirm"]')
         .should('be.visible')
         .click()
       return this
     },
     expectNewChildBlockInLayout() {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('[data-testid="book-reading-book-layout"]')
         .find('[data-book-block-depth="1"]')
         .should('have.length.greaterThan', 0)
       return this
     },
     expectTitlePromptWithDefaultTitle() {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       const dialog = '[data-testid="new-block-title-dialog"]'
       expectDaisyDialogBoxVisible(dialog)
       cy.get('[data-testid="new-block-title-input"]')
@@ -674,7 +674,7 @@ const bookReadingPage = () => {
       return this
     },
     confirmTitlePrompt() {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       openDaisyDialog('[data-testid="new-block-title-dialog"]')
       cy.get('[data-testid="new-block-title-confirm"]').click({ force: true })
       return this

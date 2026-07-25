@@ -14,7 +14,8 @@ const CANCELABLE_TRUE = /cancelable\s*:\s*true/g
 const NEW_ABORT_CONTROLLER = /new\s+AbortController\b/g
 
 const ALLOWED_CANCELABLE_FILES = new Set([
-  "components/recall/NoteRefinement.vue",
+  "composables/useNoteExtractionPreview.ts",
+  "composables/useNoteRefinementLayout.ts",
   "managedApi/clientSetup.ts",
 ])
 
@@ -38,16 +39,21 @@ function hitsFor(pattern: RegExp): { rel: string; count: number }[] {
 }
 
 describe("cancelable allowlist", () => {
-  it("restricts cancelable: true to NoteRefinement + clientSetup", () => {
+  it("restricts cancelable: true to NoteRefinement composables + clientSetup", () => {
     const hits = hitsFor(CANCELABLE_TRUE)
     const files = hits.map((h) => h.rel).sort()
 
     expect(files).toEqual([...ALLOWED_CANCELABLE_FILES].sort())
 
-    const noteRefinement = hits.find((h) =>
-      h.rel.endsWith("NoteRefinement.vue")
+    const extractionPreview = hits.find((h) =>
+      h.rel.endsWith("useNoteExtractionPreview.ts")
     )
-    expect(noteRefinement?.count).toBe(2)
+    expect(extractionPreview?.count).toBe(1)
+
+    const refinementLayout = hits.find((h) =>
+      h.rel.endsWith("useNoteRefinementLayout.ts")
+    )
+    expect(refinementLayout?.count).toBe(1)
 
     const clientSetup = hits.find((h) => h.rel.endsWith("clientSetup.ts"))
     expect(clientSetup?.count).toBeGreaterThanOrEqual(1)

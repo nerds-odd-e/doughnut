@@ -8,7 +8,7 @@ import start from '../start'
 import { commonSenseSplit } from '../support/string_util'
 
 Given('I reindex the notebook {string}', (notebookName: string) => {
-  start.navigateToNotebookPage(notebookName).reindexNotebook()
+  start.testability().updateNotebookIndex(notebookName)
 })
 
 When('I start searching from all my notebooks page', () => {

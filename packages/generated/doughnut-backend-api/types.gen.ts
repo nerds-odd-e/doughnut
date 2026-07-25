@@ -83,6 +83,7 @@ export type User = {
     ownership?: Ownership;
     dailyAssimilationCount?: number;
     spaceIntervals?: string;
+    healthRemoveEmptyFoldersDefault?: boolean;
     admin?: boolean;
 };
 
@@ -284,6 +285,8 @@ export type Answer = {
     correct: boolean;
     thinkingTimeMs?: number;
     spellingAnswer?: string;
+    matchedNoteId?: number;
+    outcome?: 'CORRECT' | 'WRONG' | 'ACCIDENTAL_MATCH' | 'OVERLAP';
 };
 
 export type AnsweredQuestion = {
@@ -293,6 +296,8 @@ export type AnsweredQuestion = {
     recalledNote: RecalledNote;
     answer: Answer;
     predefinedQuestion?: PredefinedQuestion;
+    overlap?: boolean;
+    matchedNotes?: Array<NoteTopology>;
 };
 
 export type RecalledNote = {
@@ -443,6 +448,13 @@ export type NotebookHealthLintReport = {
      * Finding groups, typically one per health rule
      */
     groups?: Array<HealthFindingGroup>;
+};
+
+export type NotebookHealthFixRequest = {
+    /**
+     * Must be true to bulk-purge fully empty folder trees
+     */
+    removeEmptyFolders: boolean;
 };
 
 /**
@@ -725,6 +737,7 @@ export type UserDto = {
     name: string;
     dailyAssimilationCount?: number;
     spaceIntervals?: string;
+    healthRemoveEmptyFoldersDefault?: boolean;
 };
 
 export type NoteUpdateTitleDto = {
@@ -810,6 +823,68 @@ export type UserToken = {
     id: number;
     userId?: number;
     label: string;
+};
+
+export type AmPmResponseTime = {
+    morningMs?: number;
+    morningSamples?: number;
+    afternoonMs?: number;
+    afternoonSamples?: number;
+    eveningMs?: number;
+    eveningSamples?: number;
+    nightMs?: number;
+    nightSamples?: number;
+};
+
+export type DayAvgResponseTime = {
+    date?: string;
+    avgMs?: number;
+    sampleSize?: number;
+};
+
+export type DayCount = {
+    date?: string;
+    count?: number;
+};
+
+export type DayRetention = {
+    date?: string;
+    retentionPct?: number;
+    correctCount?: number;
+    answeredCount?: number;
+    sampleSize?: number;
+};
+
+export type HeadlineStats = {
+    totalReviewsAllTime?: number;
+    totalReviews365?: number;
+    reviewsToday?: number;
+    retentionPct365?: number;
+    currentStreak?: number;
+    longestStreak?: number;
+    totalTimeSpentMs?: number;
+    bestHour?: number;
+    bestHourRetentionPct?: number;
+    worstHour?: number;
+    worstHourRetentionPct?: number;
+};
+
+export type HourRetention = {
+    hour?: number;
+    retentionPct?: number;
+    correctCount?: number;
+    answeredCount?: number;
+};
+
+export type RecallStatsDto = {
+    calendar?: Array<DayCount>;
+    trend?: Array<DayAvgResponseTime>;
+    retentionTrend?: Array<DayRetention>;
+    amPm?: AmPmResponseTime;
+    weekdayHourCounts?: Array<Array<number>>;
+    weekdayHourCorrect?: Array<Array<number>>;
+    hourlyRetention?: Array<HourRetention>;
+    totals?: HeadlineStats;
 };
 
 export type QuestionGenerationBatchUserScheduleDto = {
@@ -1969,6 +2044,22 @@ export type LintResponses = {
 
 export type LintResponse = LintResponses[keyof LintResponses];
 
+export type FixData = {
+    body: NotebookHealthFixRequest;
+    path: {
+        notebook: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/health/fix';
+};
+
+export type FixResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type CreateFolderData = {
     body: FolderCreationRequest;
     path: {
@@ -2950,6 +3041,24 @@ export type GetTokenInfoResponses = {
 };
 
 export type GetTokenInfoResponse = GetTokenInfoResponses[keyof GetTokenInfoResponses];
+
+export type GetRecallStatsData = {
+    body?: never;
+    path?: never;
+    query: {
+        timezone: string;
+    };
+    url: '/api/user/recall-stats';
+};
+
+export type GetRecallStatsResponses = {
+    /**
+     * OK
+     */
+    200: RecallStatsDto;
+};
+
+export type GetRecallStatsResponse = GetRecallStatsResponses[keyof GetRecallStatsResponses];
 
 export type GetQuestionGenerationBatchScheduleData = {
     body?: never;

@@ -8,6 +8,7 @@
         type="button"
         class="daisy-btn daisy-btn-primary daisy-btn-sm"
         data-testid="notebook-health-run"
+        :disabled="lintRunning"
         @click="runLint"
       >
         Run lint
@@ -20,10 +21,35 @@
           v-model="removeEmptyFolders"
         />
       </div>
+      <button
+        type="button"
+        class="daisy-btn daisy-btn-secondary daisy-btn-sm"
+        data-testid="notebook-health-fix"
+        :disabled="!fixEnabled || lintRunning"
+        @click="applyFix"
+      >
+        {{ fixLabel }}
+      </button>
+      <button
+        type="button"
+        class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+        data-testid="notebook-health-save-defaults"
+        @click="saveAsDefaults"
+      >
+        Save as defaults
+      </button>
+    </div>
+
+    <div
+      v-if="lintRunning"
+      class="flex justify-center py-8"
+      data-testid="notebook-health-lint-spinner"
+    >
+      <span class="daisy-loading daisy-loading-spinner daisy-loading-lg" />
     </div>
 
     <p
-      v-if="report === null"
+      v-else-if="report === null"
       class="text-sm text-base-content/70"
       data-testid="notebook-health-idle"
     >
@@ -39,28 +65,99 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
-import type { NotebookHealthLintReport } from "@generated/doughnut-backend-api"
-import { NotebookHealthController } from "@generated/doughnut-backend-api/sdk.gen"
+import { computed, inject, onMounted, ref, type Ref } from "vue"
+import type {
+  NotebookHealthLintReport,
+  User,
+} from "@generated/doughnut-backend-api"
+import {
+  NotebookHealthController,
+  UserController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import CheckInput from "@/components/form/CheckInput.vue"
 import NotebookHealthFindings from "@/components/notebook/NotebookHealthFindings.vue"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
+import {
+  apiCallWithLoading,
+  runWithBlockingApiLoading,
+} from "@/managedApi/clientSetup"
 
 const props = defineProps<{
   notebookId: number
 }>()
 
+const currentUser = inject<Ref<User | undefined>>("currentUser")
 const report = ref<NotebookHealthLintReport | null>(null)
 const removeEmptyFolders = ref(false)
+const lintRunning = ref(false)
+
+const emptyFolderCount = computed(() => {
+  const group = report.value?.groups?.find((g) => g.ruleId === "empty_folders")
+  return group?.items?.length ?? 0
+})
+const fixEnabled = computed(
+  () => removeEmptyFolders.value && emptyFolderCount.value > 0
+)
+const fixLabel = computed(() =>
+  emptyFolderCount.value > 0
+    ? `Remove ${emptyFolderCount.value} empty folders`
+    : "Remove empty folders"
+)
+
+onMounted(() => {
+  removeEmptyFolders.value =
+    currentUser?.value?.healthRemoveEmptyFoldersDefault ?? false
+})
 
 async function runLint() {
+  if (lintRunning.value) return
+  lintRunning.value = true
+  try {
+    const { data, error } = await apiCallWithLoading(() =>
+      NotebookHealthController.lint({
+        path: { notebook: props.notebookId },
+      })
+    )
+    if (!error) {
+      report.value = data!
+    }
+  } finally {
+    lintRunning.value = false
+  }
+}
+
+async function applyFix() {
+  if (lintRunning.value || !fixEnabled.value) return
+  await runWithBlockingApiLoading(async () => {
+    const { error } = await apiCallWithLoading(() =>
+      NotebookHealthController.fix({
+        path: { notebook: props.notebookId },
+        body: { removeEmptyFolders: true },
+      })
+    )
+    if (!error) {
+      refreshSidebarStructuralListings()
+      await runLint()
+    }
+  }, "Removing empty folders…")
+}
+
+async function saveAsDefaults() {
+  const user = currentUser?.value
+  if (!user) return
   const { data, error } = await apiCallWithLoading(() =>
-    NotebookHealthController.lint({
-      path: { notebook: props.notebookId },
+    UserController.updateUser({
+      path: { user: user.id },
+      body: {
+        name: user.name,
+        dailyAssimilationCount: user.dailyAssimilationCount,
+        spaceIntervals: user.spaceIntervals,
+        healthRemoveEmptyFoldersDefault: removeEmptyFolders.value,
+      },
     })
   )
-  if (!error) {
-    report.value = data!
+  if (!error && currentUser) {
+    currentUser.value = data!
   }
 }
 </script>

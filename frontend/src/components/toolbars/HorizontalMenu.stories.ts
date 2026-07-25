@@ -101,10 +101,6 @@ const meta = {
       control: "boolean",
       description: "Whether the current page is the home page.",
     },
-    showUserSettingsDialog: {
-      action: "showUserSettingsDialog",
-      description: "Function to show user settings dialog.",
-    },
     logout: {
       action: "logout",
       description: "Function to handle logout.",
@@ -133,7 +129,6 @@ export const WithUser: Story = {
     user: makeMe.aUser.please(),
     ...defaultNavItems,
     isHomePage: false,
-    showUserSettingsDialog: noop,
     logout: noop,
   },
 }
@@ -143,7 +138,6 @@ export const WithoutUser: Story = {
     user: undefined,
     ...defaultNavItems,
     isHomePage: false,
-    showUserSettingsDialog: noop,
     logout: noop,
   },
 }
@@ -153,7 +147,6 @@ export const WithBadges: Story = {
     user: makeMe.aUser.please(),
     ...createMockNavItems(true),
     isHomePage: false,
-    showUserSettingsDialog: noop,
     logout: noop,
   },
 }
@@ -163,7 +156,6 @@ export const OnHomePage: Story = {
     user: makeMe.aUser.please(),
     ...defaultNavItems,
     isHomePage: true,
-    showUserSettingsDialog: noop,
     logout: noop,
   },
 }
@@ -195,7 +187,6 @@ export const WithActiveItem: Story = {
     ],
     lowerNavItems: defaultNavItems.lowerNavItems,
     isHomePage: false,
-    showUserSettingsDialog: noop,
     logout: noop,
   },
 }
@@ -227,7 +218,6 @@ export const CollapsedWithActiveItem: Story = {
     ],
     lowerNavItems: defaultNavItems.lowerNavItems,
     isHomePage: false,
-    showUserSettingsDialog: noop,
     logout: noop,
   },
   parameters: {
@@ -245,7 +235,6 @@ export const CollapsedWithoutActiveItem: Story = {
     user: makeMe.aUser.please(),
     ...defaultNavItems,
     isHomePage: false,
-    showUserSettingsDialog: noop,
     logout: noop,
   },
   parameters: {
@@ -263,7 +252,6 @@ export const Expanded: Story = {
     user: makeMe.aUser.please(),
     ...defaultNavItems,
     isHomePage: false,
-    showUserSettingsDialog: noop,
     logout: noop,
   },
   parameters: {

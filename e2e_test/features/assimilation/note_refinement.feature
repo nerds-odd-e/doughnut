@@ -92,6 +92,15 @@ Feature: Note refinement
       | note-title |
       | Sample     |
 
+  Scenario: Switch between content and diff for updated original note
+    Given OpenAI will extract layout points "B and D" to a new note with title "Point B and D" and content "Combined B and D" and updated parent content "A. C. E."
+    When I am assimilating the note "Sample"
+    And I open extraction preview for refinement layout points "B" and "D"
+    Then the extraction preview original content tab should be active
+    And the extraction preview original content field should contain "A. C. E."
+    When I switch the extraction preview original section to the diff tab
+    Then the extraction preview original diff should show original "A. B. C. D. E." and updated "A. C. E."
+
   Scenario: Export extract request shows AI request JSON
     When I am assimilating the note "Sample"
     And I export the extract request for refinement layout points "B" and "D"

@@ -1,5 +1,8 @@
 <template>
-  <div class="loading-bar daisy-loading daisy-loading-spinner daisy-loading-md"></div>
+  <div
+    class="daisy-loading daisy-loading-spinner daisy-loading-md"
+    data-app-busy
+  ></div>
 </template>
 
 <script lang="ts" setup>

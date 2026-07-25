@@ -1,6 +1,7 @@
 package com.odde.doughnut.services.ai;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.doughnut.algorithms.NoteContentTitleHeading;
 import com.odde.doughnut.algorithms.WikiLinkMarkdown;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.GlobalSettingsService;
@@ -85,7 +86,9 @@ public class AiNoteAutomationService {
     }
     result.newNoteTitle = DisplayNamePathSeparators.normalizeDisplayName(result.newNoteTitle);
     result.newNoteContent =
-        WikiLinkMarkdown.sanitizePathSeparatorsInWikiLinks(result.newNoteContent);
+        NoteContentTitleHeading.withoutRepeatedTitleHeading(
+            result.newNoteTitle,
+            WikiLinkMarkdown.sanitizePathSeparatorsInWikiLinks(result.newNoteContent));
     result.updatedOriginalNoteContent =
         WikiLinkMarkdown.sanitizePathSeparatorsInWikiLinks(result.updatedOriginalNoteContent);
     return result;

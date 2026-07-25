@@ -1,10 +1,13 @@
 package com.odde.doughnut.controllers.dto;
 
 import com.odde.doughnut.entities.Answer;
+import com.odde.doughnut.entities.AnswerOutcome;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.entities.QuestionType;
 import com.odde.doughnut.entities.RecallPrompt;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import java.util.Objects;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,6 +32,10 @@ public class AnsweredQuestion {
 
   private PredefinedQuestion predefinedQuestion;
 
+  private Boolean overlap;
+
+  private List<NoteTopology> matchedNotes;
+
   public static AnsweredQuestion from(RecallPrompt recallPrompt) {
     Objects.requireNonNull(recallPrompt.getAnswer(), "answered question requires an answer");
     AnsweredQuestion answeredQuestion = new AnsweredQuestion();
@@ -40,6 +47,17 @@ public class AnsweredQuestion {
     answeredQuestion.setAnswer(recallPrompt.getAnswer());
     if (recallPrompt.getQuestionType() == QuestionType.MCQ) {
       answeredQuestion.setPredefinedQuestion(recallPrompt.getPredefinedQuestion());
+    }
+    return answeredQuestion;
+  }
+
+  public static AnsweredQuestion from(RecallPrompt recallPrompt, List<Note> matches) {
+    AnsweredQuestion answeredQuestion = from(recallPrompt);
+    if (matches != null && !matches.isEmpty()) {
+      answeredQuestion.setMatchedNotes(matches.stream().map(Note::getNoteTopology).toList());
+    }
+    if (recallPrompt.getAnswer().getOutcome() == AnswerOutcome.OVERLAP) {
+      answeredQuestion.setOverlap(true);
     }
     return answeredQuestion;
   }

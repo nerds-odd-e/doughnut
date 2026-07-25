@@ -9,11 +9,13 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteAliasIndexRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.validators.DisplayNamePathSeparators;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.function.BiFunction;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +39,56 @@ public class WikiLinkResolver {
 
   public Optional<Note> resolveWikiLinkToken(String token, Note focusNote, User viewer) {
     return Optional.ofNullable(resolveToken(token, viewer, focusNote));
+  }
+
+  public Optional<Note> findAccidentalMatch(String answer, Note reviewedNote, User viewer) {
+    return findAllAccidentalMatches(answer, reviewedNote, viewer).stream().findFirst();
+  }
+
+  public List<Note> findAllAccidentalMatches(String answer, Note reviewedNote, User viewer) {
+    if (answer == null || answer.isBlank()) {
+      return List.of();
+    }
+    TreeMap<Integer, Note> matchesById = new TreeMap<>();
+    addReadableAccidentalCandidates(
+        noteRepository.findByNoteTitleOrderByIdAsc(answer), reviewedNote, viewer, matchesById);
+    addReadableAccidentalCandidates(
+        aliasAccidentalCandidates(answer), reviewedNote, viewer, matchesById);
+    return List.copyOf(matchesById.values());
+  }
+
+  private List<Note> aliasAccidentalCandidates(String answer) {
+    String trimmed = DisplayNamePathSeparators.trimSurroundingWhitespace(answer);
+    if (trimmed == null || trimmed.isBlank()) {
+      return List.of();
+    }
+    String lookupKey = FrontmatterAliases.normalizedLookupKey(trimmed);
+    List<NoteAliasIndex> rows =
+        noteAliasIndexRepository.findByAliasLookupKeyOrderByNoteIdAsc(lookupKey);
+    if (rows.isEmpty()) {
+      return List.of();
+    }
+    List<Note> distinctNotes = new ArrayList<>();
+    Set<Integer> seenNoteIds = new HashSet<>();
+    for (NoteAliasIndex row : rows) {
+      Note note = row.getNote();
+      if (seenNoteIds.add(note.getId())) {
+        distinctNotes.add(note);
+      }
+    }
+    return distinctNotes;
+  }
+
+  private void addReadableAccidentalCandidates(
+      List<Note> candidates, Note reviewedNote, User viewer, TreeMap<Integer, Note> matchesById) {
+    for (Note candidate : candidates) {
+      Notebook notebook = candidate.getNotebook();
+      if (notebook != null
+          && authorizationService.userMayReadNotebook(viewer, notebook)
+          && !candidate.getId().equals(reviewedNote.getId())) {
+        matchesById.putIfAbsent(candidate.getId(), candidate);
+      }
+    }
   }
 
   /** Resolves a wiki-link token to any matching note, regardless of viewer readability. */

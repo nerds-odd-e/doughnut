@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.HealthFindingGroup;
 import com.odde.doughnut.controllers.dto.HealthFindingItem;
+import com.odde.doughnut.controllers.dto.NotebookHealthFixRequest;
 import com.odde.doughnut.controllers.dto.NotebookHealthLintReport;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Notebook;
@@ -13,10 +14,14 @@ import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.health.HealthRuleIds;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 class NotebookHealthControllerTest extends ControllerTestBase {
 
@@ -82,6 +87,71 @@ class NotebookHealthControllerTest extends ControllerTestBase {
       currentUser.setUser(null);
 
       assertThrows(UnexpectedNoAccessRightException.class, () -> controller.lint(notebook));
+    }
+  }
+
+  @Nested
+  class FixHealth {
+    @Test
+    void authorizedOwnerFixSucceeds() throws UnexpectedNoAccessRightException {
+      Notebook notebook = myNotebook();
+      Folder emptyFolder = makeMe.aFolder().notebook(notebook).name("Empty Shell").please();
+      Folder readmeOnly =
+          makeMe.aFolder().notebook(notebook).name("Readme Only").readmeContent("keep").please();
+
+      controller.fix(notebook, fixRequest(true));
+
+      Set<Integer> remainingIds =
+          folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+              .map(Folder::getId)
+              .collect(Collectors.toSet());
+      assertThat(remainingIds, not(hasItem(emptyFolder.getId())));
+      assertThat(remainingIds, hasItem(readmeOnly.getId()));
+    }
+
+    @Test
+    void fixRejectsWithoutOptIn() {
+      Notebook notebook = myNotebook();
+      Folder emptyFolder = makeMe.aFolder().notebook(notebook).name("Empty Shell").please();
+
+      ResponseStatusException nullBody =
+          assertThrows(
+              ResponseStatusException.class, () -> controller.fix(notebook, fixRequest(null)));
+      assertThat(nullBody.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
+
+      ResponseStatusException falseBody =
+          assertThrows(
+              ResponseStatusException.class, () -> controller.fix(notebook, fixRequest(false)));
+      assertThat(falseBody.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
+
+      assertThat(
+          folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+              .map(Folder::getId)
+              .toList(),
+          hasItem(emptyFolder.getId()));
+    }
+
+    @Test
+    void foreignAndAnonRejected() {
+      Notebook otherNotebook = otherUsersNotebook();
+      makeMe.aFolder().notebook(otherNotebook).name("Empty Shell").please();
+
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.fix(otherNotebook, fixRequest(true)));
+
+      Notebook notebook = myNotebook();
+      makeMe.aFolder().notebook(notebook).name("Empty Shell").please();
+      currentUser.setUser(null);
+
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> controller.fix(notebook, fixRequest(true)));
+    }
+
+    private NotebookHealthFixRequest fixRequest(Boolean removeEmptyFolders) {
+      NotebookHealthFixRequest request = new NotebookHealthFixRequest();
+      request.setRemoveEmptyFolders(removeEmptyFolders);
+      return request;
     }
   }
 }

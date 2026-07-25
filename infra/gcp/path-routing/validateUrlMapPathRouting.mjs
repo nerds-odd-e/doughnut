@@ -5,6 +5,8 @@ import { loadBackendPathHints, pathGoesToBackend } from './pathGoesToBackend.mjs
 import {
   gcpRoutesToStaticBucket,
   mandatoryStaticBucketProbes,
+  normalizePathRules,
+  normalizeRouteRules,
 } from './urlMapStaticRouting.mjs'
 import { collectRequiredStaticPathsFromFrontend } from './requiredStaticPathsFromFrontend.mjs'
 import {
@@ -29,8 +31,25 @@ function backendProbePaths(hints) {
 
 /**
  * @param {object} doc parsed URL map YAML
- * @returns {{ pathRules: object[] } | { error: string }}
+ * @returns {{ routingRules: import('./urlMapStaticRouting.mjs').NormalizedRoutingRule[] } | { error: string }}
  */
+export function routingRulesFromUrlMapDoc(doc) {
+  const matcher = doc.pathMatchers?.find((m) => m.name === 'doughnut-paths')
+  if (!matcher) {
+    return { error: 'missing pathMatchers.doughnut-paths' }
+  }
+  if (matcher.routeRules) {
+    return { routingRules: normalizeRouteRules(matcher.routeRules) }
+  }
+  if (matcher.pathRules) {
+    return { routingRules: normalizePathRules(matcher.pathRules) }
+  }
+  return {
+    error: 'missing pathMatchers.doughnut-paths.routeRules (or pathRules)',
+  }
+}
+
+/** @deprecated Prefer routingRulesFromUrlMapDoc — kept for fixture tests using pathRules. */
 export function pathRulesFromUrlMapDoc(doc) {
   const matcher = doc.pathMatchers?.find((m) => m.name === 'doughnut-paths')
   if (!matcher?.pathRules) {
@@ -53,7 +72,7 @@ export function validateUrlMapAgainstHintsAndStaticPaths({
   requiredStaticPaths,
 }) {
   const doc = YAML.parse(urlMapYamlText)
-  const rulesInfo = pathRulesFromUrlMapDoc(doc)
+  const rulesInfo = routingRulesFromUrlMapDoc(doc)
   if ('error' in rulesInfo) {
     return {
       failures: [rulesInfo.error],
@@ -61,16 +80,16 @@ export function validateUrlMapAgainstHintsAndStaticPaths({
       staticChecks: 0,
     }
   }
-  const { pathRules } = rulesInfo
+  const { routingRules } = rulesInfo
   const failures = []
 
   let backendChecks = 0
   for (const urlPath of backendProbePaths(hints)) {
     if (!pathGoesToBackend(urlPath, hints)) continue
     backendChecks++
-    if (gcpRoutesToStaticBucket(urlPath, pathRules)) {
+    if (gcpRoutesToStaticBucket(urlPath, routingRules)) {
       failures.push(
-        `backend-classified path <${urlPath}> would match a static (backend bucket) pathRule`
+        `backend-classified path <${urlPath}> would match a static (backend bucket) route`
       )
     }
   }
@@ -91,7 +110,7 @@ export function validateUrlMapAgainstHintsAndStaticPaths({
       )
       continue
     }
-    if (!gcpRoutesToStaticBucket(urlPath, pathRules)) {
+    if (!gcpRoutesToStaticBucket(urlPath, routingRules)) {
       failures.push(
         `required static path <${urlPath}> would not be served from the static backend bucket (default would hit the MIG)`
       )

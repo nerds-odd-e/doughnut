@@ -121,6 +121,23 @@ class AiControllerExtractNotePreviewTest extends ControllerTestBase {
       assertThat(instructions).contains("Wiki links are case-insensitive");
       assertThat(instructions).contains("[[Canonical Note Title|visible text]]");
       assertThat(instructions).contains("alreadyExtracted");
+      assertThat(instructions)
+          .contains("Do not repeat newNoteTitle as a markdown heading in newNoteContent");
+    }
+
+    @Test
+    void shouldStripLeadingMarkdownHeadingThatRepeatsExtractedTitle()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      Note testNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
+      openAiStructuredResponseMock.stubStructuredResponse(
+          extractionResult(
+              "Key Suggestion", "# Key Suggestion\n\nBody that should remain.", "Updated parent."));
+      NoteRefinementLayout layout = layoutWithItem("p1", "key suggestion to extract");
+
+      NoteExtractionResult response =
+          controller.extractNotePreview(testNote, layoutSelectionRequest(layout, List.of("p1")));
+
+      assertThat(response.getNewNoteContent()).isEqualTo("Body that should remain.");
     }
 
     @Test

@@ -27,6 +27,14 @@ const meta = {
       control: "text",
       description: "Maximum height of the diff panes",
     },
+    currentLabel: {
+      control: "text",
+      description: "Label above the current (left) pane",
+    },
+    oldLabel: {
+      control: "text",
+      description: "Label above the old (right) pane",
+    },
   },
 } satisfies Meta<typeof DiffView>
 

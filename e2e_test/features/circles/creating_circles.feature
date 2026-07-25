@@ -8,6 +8,7 @@ Feature: Creating circles
     And I join the circle
     Then I should see the circle "Odd-e Invite Circle" and it has two members in it
 
+  @skipOptimizationDueToKnownNecessarySlowness
   Scenario: New user via circle invitation
     Given circle "Odd-e New User Circle" exists for "old_learner" with invitation link saved
     And my session is logged out

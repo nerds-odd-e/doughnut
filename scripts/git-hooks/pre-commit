@@ -8,9 +8,10 @@
 
 set -e
 
-# Get the directory of this script (git hooks directory)
-HOOK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$HOOK_DIR/../.." && pwd)"
+# Resolve the root of the working tree the commit is running in. Use `git rev-parse` so this
+# works in worktrees too: the hook file lives in the shared common .git/hooks dir, whose parent
+# is the main repo (not the worktree), so $HOOK_DIR/../.. would resolve to the wrong tree.
+REPO_ROOT="$(git rev-parse --show-toplevel)"
 
 cd "$REPO_ROOT"
 

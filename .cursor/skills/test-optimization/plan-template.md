@@ -9,7 +9,7 @@ Status: in-progress
 Command:
 
 - **N tests**, suite wall ~**Xs**
-- Eligible after blacklist: **E** (Skip test optimization excluded; see `ongoing/test-optimization-blacklist.md`)
+- Eligible: **E** (E2E: profiled with `--env tags='not @ignore and not @skipOptimizationDueToKnownNecessarySlowness'`)
 - Raw profile: `<local path>` — **do not commit**
 
 ### Top 10% slowest (n = ceil(E × 0.10))
@@ -31,8 +31,8 @@ Command:
 3. Flaky = failure.
 
 Hard-to-improve tests: propose under **Candidates** in
-`ongoing/test-optimization-blacklist.md` (do not move to Skip test optimization
-without developer review).
+`ongoing/test-optimization-blacklist.md`. Permanent skip (developer Jidoka only):
+tag Scenario or Feature `@skipOptimizationDueToKnownNecessarySlowness`.
 
 ---
 

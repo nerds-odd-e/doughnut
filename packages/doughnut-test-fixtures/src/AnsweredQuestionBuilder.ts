@@ -2,6 +2,7 @@ import type {
   AnsweredQuestion,
   Answer,
   Note,
+  NoteTopology,
   PredefinedQuestion,
   RecallPromptHistoryItem,
 } from '@generated/doughnut-backend-api'
@@ -19,6 +20,7 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
   private predefinedQuestionToUse?: PredefinedQuestion
   private answerToUse?: Answer
   private notebookIdToUse = generateId()
+  private matchedNotesToUse?: NoteTopology[]
 
   withNote(note: Note): this {
     this.noteToUse = note
@@ -57,6 +59,11 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
 
   withAnswer(answer: Answer): this {
     this.answerToUse = answer
+    return this
+  }
+
+  withMatchedNotes(matchedNotes: NoteTopology[]): this {
+    this.matchedNotesToUse = matchedNotes
     return this
   }
 
@@ -104,6 +111,9 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
       },
       answer,
       predefinedQuestion,
+      ...(this.matchedNotesToUse !== undefined && {
+        matchedNotes: this.matchedNotesToUse,
+      }),
     }
   }
 }

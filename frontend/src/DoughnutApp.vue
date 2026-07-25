@@ -65,9 +65,8 @@ onMounted(async () => {
 <template>
   <SoftKeyboardPrimer />
   <Popups />
-  <LoadingThinBar v-if="user && apiStatus.states.length > 0" />
+  <LoadingThinBar v-if="apiStatus.states.length > 0" />
   <LoadingModal
-    v-if="user"
     :show="!!blockingApiState"
     :message="blockingApiState?.message"
     :cancel-control="
@@ -80,7 +79,6 @@ onMounted(async () => {
     <div class="main-menu flex bg-neutral text-neutral-content z-[10000]">
       <MainMenu
         :user="user"
-        @update-user="user = $event"
       />
     </div>
     <div class="flex flex-col flex-grow overflow-y-auto overflow-x-hidden main-content">

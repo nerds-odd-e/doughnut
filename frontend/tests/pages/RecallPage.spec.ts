@@ -395,6 +395,99 @@ describe("repeat page", () => {
     })
   })
 
+  describe("overlap try-again stay and retry", () => {
+    const memoryTrackerId = 123
+    let getThresholdExceededSpy: ReturnType<typeof mockSdkService>
+    let askAQuestionSpy: ReturnType<typeof mockSdkService>
+
+    beforeEach(() => {
+      vi.useFakeTimers()
+      mockSdkService(
+        MemoryTrackerController,
+        "showMemoryTracker",
+        makeMe.aMemoryTracker.please()
+      )
+      askAQuestionSpy = mockSdkService(
+        MemoryTrackerController,
+        "askAQuestion",
+        makeMe.aRecallQuestion.withSpellingStem("Spell").please()
+      )
+      getThresholdExceededSpy = mockSdkService(
+        MemoryTrackerController,
+        "getThresholdExceeded",
+        {
+          thresholdExceeded: false,
+        }
+      )
+      const trackers = [
+        createMemoryTrackerLite(memoryTrackerId, true),
+        createMemoryTrackerLite(456, true),
+      ]
+      vi.mocked(useRecallData).mockReturnValue(
+        createUseRecallDataMock({ toRepeat: trackers })
+      )
+    })
+
+    it("stays on the same tracker, skips threshold, and remounts spelling on Try again", async () => {
+      const note = makeMe.aNote.please()
+      const overlapResult: AnsweredQuestion = {
+        ...makeMe.anAnsweredQuestion
+          .withNote(note)
+          .spelling()
+          .withAnswer({
+            id: 1,
+            correct: false,
+            spellingAnswer: "Shared Title",
+            outcome: "OVERLAP",
+          })
+          .withMemoryTrackerId(memoryTrackerId)
+          .please(),
+        overlap: true,
+      }
+
+      const wrapper = await mountPage()
+      await flushPromises()
+      type ExposedVM = { currentIndex: number }
+      const vm = wrapper.vm as unknown as ExposedVM
+      expect(vm.currentIndex).toBe(0)
+
+      const quizBefore = wrapper.findComponent({ name: "Quiz" })
+      expect(quizBefore.exists()).toBe(true)
+      quizBefore.vm.$emit("answered", overlapResult)
+      await flushPromises()
+
+      expect(vm.currentIndex).toBe(0)
+      expect(getThresholdExceededSpy).not.toHaveBeenCalled()
+
+      const answeredSpelling = wrapper.findComponent({
+        name: "AnsweredSpellingQuestion",
+      })
+      expect(answeredSpelling.exists()).toBe(true)
+
+      const tryAgain = answeredSpelling.find(
+        '[data-testid="overlap-try-again"]'
+      )
+      expect(tryAgain.exists()).toBe(true)
+      const askCallsBeforeRetry = askAQuestionSpy.mock.calls.length
+      await tryAgain.trigger("click")
+      await flushPromises()
+
+      expect(
+        wrapper.findComponent({ name: "AnsweredSpellingQuestion" }).exists()
+      ).toBe(false)
+      expect(vm.currentIndex).toBe(0)
+      const quizAfter = wrapper.findComponent({ name: "Quiz" })
+      expect(quizAfter.exists()).toBe(true)
+      expect(quizAfter.props("spellingRetryNonce")).toBe(1)
+      expect(
+        quizAfter.findComponent({ name: "SpellingQuestionDisplay" }).exists()
+      ).toBe(true)
+      expect(askAQuestionSpy.mock.calls.length).toBeGreaterThan(
+        askCallsBeforeRetry
+      )
+    })
+  })
+
   describe("treadmill mode", () => {
     const normalMemoryTrackerId = 123
     const spellingMemoryTrackerId = 456

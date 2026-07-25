@@ -112,33 +112,44 @@ const browser = {
     })
   },
   receiveAudioFromMicrophone: function (audioFileName: string) {
+    const targetSampleRate = 16000
+    const cached = this.decodedAudioCache[audioFileName]
+    if (cached) {
+      this.deliverAudioToWorklet(cached)
+      return
+    }
+
     cy.fixture(audioFileName, 'base64').then((audioBase64) => {
       const blob = Cypress.Blob.base64StringToBlob(audioBase64, 'audio/wav')
       return blob.arrayBuffer().then((arrayBuffer) => {
         const audioContext = new AudioContext()
         return audioContext.decodeAudioData(arrayBuffer).then((audioBuffer) => {
-          const originalSampleRate = audioBuffer.sampleRate
-          const targetSampleRate = 16000 // Assuming the target sample rate is 44.1kHz
           const float32Array = audioBuffer.getChannelData(0)
-
-          // Resample the audio data
-          const resampledBuffer = this.resampleAudio(
-            float32Array,
-            originalSampleRate,
-            targetSampleRate
-          )
-
-          if (!this.audioWorletPort.onmessage)
-            throw new Error(`audioWorletPort.onmessage is not mocked`)
-          this.audioWorletPort.onmessage({
-            data: { audioBuffer: [resampledBuffer] },
-          } as MessageEvent)
+          const resampledBuffer =
+            audioBuffer.sampleRate === targetSampleRate
+              ? float32Array
+              : this.resampleAudio(
+                  float32Array,
+                  audioBuffer.sampleRate,
+                  targetSampleRate
+                )
+          this.decodedAudioCache[audioFileName] = resampledBuffer
+          this.deliverAudioToWorklet(resampledBuffer)
         })
       })
     })
   },
 
-  // Add this new method to the browser object
+  deliverAudioToWorklet: function (pcmSamples: Float32Array) {
+    if (!this.audioWorletPort.onmessage)
+      throw new Error(`audioWorletPort.onmessage is not mocked`)
+    this.audioWorletPort.onmessage({
+      data: { audioBuffer: [pcmSamples] },
+    } as MessageEvent)
+  },
+
+  decodedAudioCache: {} as Record<string, Float32Array>,
+
   resampleAudio: function (
     audioBuffer: Float32Array,
     fromSampleRate: number,

@@ -5,6 +5,7 @@ Feature: CLI access token management
   Background:
     Given I am logged in as "old_learner"
 
+  @skipOptimizationDueToKnownNecessarySlowness
   Scenario: Set access token
     Given I have a valid Doughnut Access Token with label "E2E CLI Token"
     And I set the saved access token in the interactive CLI using set-access-token

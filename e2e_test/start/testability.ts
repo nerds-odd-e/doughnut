@@ -8,6 +8,8 @@ import type { TimeTravel } from '@generated/doughnut-backend-api'
 import type { TimeTravelRelativeToNow } from '@generated/doughnut-backend-api'
 import type {
   AttachBookRequestFull,
+  Folder,
+  FolderCreationRequest,
   NoteRealm,
   NotebooksViewedByUser,
 } from '@generated/doughnut-backend-api'
@@ -145,6 +147,21 @@ ${suffix}`
 /** Must match page count in `e2e_test/fixtures/book_reading/blank_5_pages.pdf`. */
 const BLANK_BOOK_FIXTURE_PAGE_COUNT = 5
 
+/** Cached once per Cypress process — blank PDF bytes for attachBook. */
+let blankBookPdfBuffer: ArrayBuffer | undefined
+
+function readBlankBookPdf() {
+  if (blankBookPdfBuffer !== undefined) {
+    return cy.wrap(blankBookPdfBuffer, { log: false })
+  }
+  return cy
+    .readFile('e2e_test/fixtures/book_reading/blank_5_pages.pdf', null)
+    .then((pdfBuffer) => {
+      blankBookPdfBuffer = pdfBuffer as ArrayBuffer
+      return blankBookPdfBuffer
+    })
+}
+
 function pageCountFromContentList(contentList: Array<unknown>): number {
   let max = -1
   for (const o of contentList) {
@@ -189,40 +206,34 @@ const testability = () => {
             expect(notebookId, 'note must belong to a notebook').to.be.a(
               'number'
             )
-            return cy
-              .readFile(
-                'e2e_test/fixtures/book_reading/blank_5_pages.pdf',
-                null
-              )
-              .then((pdfBuffer) => {
-                const pdfBlob = new Blob([pdfBuffer as BlobPart], {
-                  type: 'application/pdf',
-                })
-                const file = new File([pdfBlob], 'blank.pdf', {
-                  type: 'application/pdf',
-                })
-                const metadataBlob = new Blob(
-                  [
-                    JSON.stringify({
-                      bookName,
-                      format: 'pdf',
-                      contentList,
-                    }),
-                  ],
-                  { type: 'application/json' }
-                )
-                return cy.wrap(
-                  NotebookBooksController.attachBook({
-                    path: { notebook: notebookId },
-                    body: {
-                      metadata:
-                        metadataBlob as unknown as AttachBookRequestFull,
-                      file,
-                    },
-                  }),
-                  { log: false }
-                )
+            return readBlankBookPdf().then((pdfBuffer) => {
+              const pdfBlob = new Blob([pdfBuffer as BlobPart], {
+                type: 'application/pdf',
               })
+              const file = new File([pdfBlob], 'blank.pdf', {
+                type: 'application/pdf',
+              })
+              const metadataBlob = new Blob(
+                [
+                  JSON.stringify({
+                    bookName,
+                    format: 'pdf',
+                    contentList,
+                  }),
+                ],
+                { type: 'application/json' }
+              )
+              return cy.wrap(
+                NotebookBooksController.attachBook({
+                  path: { notebook: notebookId },
+                  body: {
+                    metadata: metadataBlob as unknown as AttachBookRequestFull,
+                    file,
+                  },
+                }),
+                { log: false }
+              )
+            })
           })
       )
     },
@@ -425,6 +436,84 @@ const testability = () => {
           ).to.not.be.undefined
           return notebookRealm!.notebook.id
         })
+    },
+
+    getFolderIdInNotebook(notebookId: number, folderName: string) {
+      return cy
+        .wrap(
+          NotebookController.listNotebookFolderIndex({
+            path: { notebook: notebookId },
+          }),
+          { log: false }
+        )
+        .then((response) => {
+          const folders = unwrapData<Folder[]>(response)
+          const folder = folders.find((f) => f.name === folderName)
+          expect(
+            folder,
+            `folder "${folderName}" was not found in notebook id ${notebookId}`
+          ).to.exist
+          return folder!.id
+        })
+    },
+
+    updateNotebookIndex(notebookName: string) {
+      return this.getNotebookIdByName(notebookName).then((notebookId) =>
+        cy.wrap(
+          NotebookController.updateNotebookIndex({
+            path: { notebook: notebookId },
+          }),
+          { log: false }
+        )
+      )
+    },
+
+    createEmptyFolder(
+      notebookName: string,
+      folderName: string,
+      underNoteTitle?: string
+    ) {
+      return this.getNotebookIdByName(notebookName).then((notebookId) => {
+        const body: FolderCreationRequest = { name: folderName }
+        const createFolder = () =>
+          cy.wrap(
+            NotebookController.createFolder({
+              path: { notebook: notebookId },
+              body,
+            }),
+            { log: false }
+          )
+        if (underNoteTitle) {
+          return this.getInjectedNoteIdByTitle(underNoteTitle).then(
+            (noteId) => {
+              body.underNoteId = noteId
+              return createFolder()
+            }
+          )
+        }
+        return createFolder()
+      })
+    },
+
+    createReadmeOnlyFolder(
+      notebookName: string,
+      folderName: string,
+      readme: string
+    ) {
+      return this.createEmptyFolder(notebookName, folderName).then(
+        (response) => {
+          const folder = unwrapData<Folder>(response)
+          return this.getNotebookIdByName(notebookName).then((notebookId) =>
+            cy.wrap(
+              NotebookController.updateFolderReadmeContent({
+                path: { notebook: notebookId, folder: folder.id },
+                body: { content: readme },
+              }),
+              { log: false }
+            )
+          )
+        }
+      )
     },
 
     setInjectedNoteContent(noteTitle: string, content: string) {

@@ -72,7 +72,6 @@
 
         <AccountMenuItem
           :user="user"
-          :show-user-settings-dialog="showUserSettingsDialog"
           :logout="logout"
         />
       </ul>
@@ -128,10 +127,6 @@ const props = defineProps({
     required: true,
   },
   isHomePage: { type: Boolean, required: true },
-  showUserSettingsDialog: {
-    type: Function as PropType<() => void>,
-    required: true,
-  },
   logout: { type: Function as PropType<() => void>, required: true },
 })
 

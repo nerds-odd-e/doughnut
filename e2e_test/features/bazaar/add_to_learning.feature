@@ -12,6 +12,7 @@ Feature: Bazaar subscription
       | Big Square | Plane figures/Quads |                      |
     And notebook "Shape" is shared to the Bazaar
 
+  @skipOptimizationDueToKnownNecessarySlowness
   Scenario: subscribe to a note and browse
     Given I am logged in as an existing user
     When I subscribe to notebook "Shape" in the bazaar, with target of learning 1 notes per day

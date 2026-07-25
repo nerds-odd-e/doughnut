@@ -1,4 +1,4 @@
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import {
   assumeAssimilationPage,
   assimilateButton,
@@ -51,7 +51,7 @@ export const makeSureNoteMoreOptionsFormIsOpen = () => {
 const deleteNoteWithConfirmation = (confirmButtonName: string | RegExp) => {
   visibleMoreOptionsButton(titles.delete).click()
   cy.findByRole('button', { name: confirmButtonName }).click()
-  pageIsNotLoading()
+  waitUntilAppIsNotBusy()
 }
 
 const noteMoreOptionsPage = () => {
@@ -85,8 +85,8 @@ const noteMoreOptionsPage = () => {
         }
       })
       assimilateButton({ timeout: 15000 }).should('be.visible')
-      pageIsNotLoading()
-      return assumeAssimilationPage().waitForAssimilationReady()
+      waitUntilAppIsNotBusy()
+      return assumeAssimilationPage()
     },
     reopenAssimilationSettingsWaitingForRecallInfo() {
       cy.intercept('GET', '**/api/notes/**/note-info**').as('noteRecallInfo')
@@ -96,12 +96,12 @@ const noteMoreOptionsPage = () => {
       assimilationSettingsButton().scrollIntoView().click()
       cy.wait('@noteRecallInfo', { timeout: 15000 })
       assimilateButton({ timeout: 15000 }).should('be.visible')
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return assumeAssimilationPage().waitForAssimilationReady()
     },
     assimilateNote() {
       this.openAssimilationSettings().clickAssimilate()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
     },
   }
 }

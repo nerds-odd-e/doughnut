@@ -19,7 +19,7 @@
           </DropdownMenuItem>
           <DropdownMenuItem>
             <router-link
-              :to="{ name: 'recent' }"
+              :to="{ name: 'settingsRecent' }"
               :class="dropdownMenuButtonClass"
               @click="closeDropdown"
             >
@@ -28,14 +28,17 @@
             </router-link>
           </DropdownMenuItem>
           <DropdownMenuItem>
-            <DropdownMenuActionButton
-              :title="settingsTitle"
-              @click="openSettings(closeDropdown)"
-            />
+            <router-link
+              :to="{ name: 'settingsGeneral' }"
+              :class="dropdownMenuButtonClass"
+              @click="closeDropdown"
+            >
+              {{ settingsTitle }}
+            </router-link>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <router-link
-              :to="{ name: 'manageAccessTokens' }"
+              :to="{ name: 'settingsAccessTokens' }"
               :class="dropdownMenuButtonClass"
               @click="closeDropdown"
             >
@@ -66,19 +69,10 @@ import { CircleCheck, User as UserIcon } from "@lucide/vue"
 
 const props = defineProps({
   user: { type: Object as PropType<User>, required: true },
-  showUserSettingsDialog: {
-    type: Function as PropType<() => void>,
-    required: true,
-  },
   logout: { type: Function as PropType<() => void>, required: true },
 })
 
 const settingsTitle = computed(() => `Settings for ${props.user.name}`)
-
-const openSettings = (closeDropdown: () => void) => {
-  props.showUserSettingsDialog()
-  closeDropdown()
-}
 
 const onLogout = (closeDropdown: () => void) => {
   props.logout()

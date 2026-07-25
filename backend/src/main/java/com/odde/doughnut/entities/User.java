@@ -44,6 +44,11 @@ public class User extends EntityIdentifiedByIdOnly {
   @Setter
   private String spaceIntervals = "0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55";
 
+  @Column(name = "health_remove_empty_folders_default")
+  @Getter
+  @Setter
+  private Boolean healthRemoveEmptyFoldersDefault = false;
+
   @JoinTable(
       name = "circle_user",
       joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)},

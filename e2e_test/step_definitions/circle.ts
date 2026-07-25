@@ -40,7 +40,7 @@ When('I visit the invitation link', () => {
       .invoke('toString')
       .then((url) => {
         cy.visit(url)
-        start.pageIsNotLoading()
+        start.waitUntilAppIsNotBusy()
         cy.get('#username, #join-circle-invitationCode', {
           timeout: 15000,
         }).should('exist')
@@ -70,7 +70,7 @@ When('I join the saved circle invitation as the logged-in user', () => {
       }).then((response) => {
         expect(response.status, 'join circle via invitation code').to.equal(200)
         cy.visit(`/circles/${response.body.id}`)
-        start.pageIsNotLoading()
+        start.waitUntilAppIsNotBusy()
       })
     })
   })
@@ -88,7 +88,7 @@ When('I join the circle', () => {
       ).to.equal(200)
     })
     cy.url({ timeout: 15000 }).should('match', /\/circles\/\d+/)
-    start.pageIsNotLoading()
+    start.waitUntilAppIsNotBusy()
   })
 })
 
@@ -123,7 +123,7 @@ When(
   (noteTopology: string, circleName: string) => {
     start.navigateToCircle(circleName).creatingNotebook(noteTopology)
     cy.url().should('match', /\/notebooks\/\d+/)
-    start.pageIsNotLoading().assumeNotePage().expectBreadcrumb(circleName)
+    start.waitUntilAppIsNotBusy().assumeNotePage().expectBreadcrumb(circleName)
   }
 )
 
@@ -135,12 +135,21 @@ Then(
 )
 
 When(
-  'I add a note {string} under notebook {string} in circle {string}',
-  (noteTopology: string, parentNoteTitle: string, _circleName: string) => {
-    start
-      .jumpToNotePage(parentNoteTitle)
-      .addingNewNoteFromToolbar()
-      .createNoteWithTitle(noteTopology)
+  '{string} adds a note {string} under notebook {string}',
+  (
+    externalIdentifier: string,
+    noteTopology: string,
+    parentNoteTitle: string
+  ) => {
+    return start
+      .logout()
+      .then(() => start.establishSessionAs(externalIdentifier))
+      .then(() => {
+        start
+          .jumpToNotePage(parentNoteTitle, true)
+          .addingNewNoteFromToolbar()
+          .createNoteWithTitle(noteTopology)
+      })
   }
 )
 

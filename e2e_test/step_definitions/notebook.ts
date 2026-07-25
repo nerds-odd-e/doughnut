@@ -12,7 +12,7 @@ import {
 import start from '../start'
 import notebookPage from '../start/pageObjects/notebookPage'
 import workspaceSurfaceLandmarks from '../start/pageObjects/workspaceSurfaceLandmarks'
-import { pageIsNotLoading } from '../start/pageBase'
+import { waitUntilAppIsNotBusy } from '../start/pageBase'
 
 Given('I choose to share my notebook {string}', (noteTopology: string) => {
   start.navigateToNotebookPage(noteTopology).shareNotebookToBazaar()
@@ -26,7 +26,7 @@ Then(
       .subscribedNotebooks()
       .openNotebook(noteTopology)
     start
-      .pageIsNotLoading()
+      .waitUntilAppIsNotBusy()
       .assumeNotePage()
       .addingChildNoteButton()
       .shouldNotExist()
@@ -82,7 +82,7 @@ When(
 
 When('I reload the notebook page', () => {
   cy.reload()
-  pageIsNotLoading()
+  waitUntilAppIsNotBusy()
 })
 
 Then('the notebook readme body includes {string}', (fragment: string) => {
@@ -125,12 +125,24 @@ When('I run notebook health lint', () => {
   notebookPage().runLint()
 })
 
+When('I apply notebook health empty folder fix', () => {
+  notebookPage().applyFix()
+})
+
 When('I check Remove empty folders on the notebook health panel', () => {
   notebookPage().checkRemoveEmptyFolders()
 })
 
+When('I save notebook health options as defaults', () => {
+  notebookPage().saveAsDefaults()
+})
+
 Then('the notebook health idle prompt is visible', () => {
   notebookPage().expectHealthIdle()
+})
+
+Then('Remove empty folders on the notebook health panel is checked', () => {
+  notebookPage().expectRemoveEmptyFoldersChecked()
 })
 
 Then(
@@ -144,6 +156,13 @@ Then(
   'the notebook health empty folders finding includes {string}',
   (label: string) => {
     notebookPage().expectFindingGroupIncludes('empty_folders', label)
+  }
+)
+
+Then(
+  'the notebook health empty folders finding does not include {string}',
+  (label: string) => {
+    notebookPage().expectFindingGroupDoesNotInclude('empty_folders', label)
   }
 )
 
@@ -181,6 +200,6 @@ When(
     cy.clearFocusedText().type(newName)
     cy.get('[data-testid="notebook-page-name-update"]').click()
     cy.findByRole('button', { name: 'OK' }).click()
-    pageIsNotLoading()
+    waitUntilAppIsNotBusy()
   }
 )

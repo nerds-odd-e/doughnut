@@ -1,8 +1,11 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.FrontmatterAliases;
+import com.odde.doughnut.algorithms.WikiLinkMarkdown;
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
 import com.odde.doughnut.entities.Answer;
+import com.odde.doughnut.entities.AnswerOutcome;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuestionType;
@@ -15,6 +18,8 @@ import com.odde.doughnut.factoryServices.EntityPersister;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -29,18 +34,21 @@ public class MemoryTrackerService {
   private final MemoryTrackerRepository memoryTrackerRepository;
   private final RecallPromptRepository recallPromptRepository;
   private final ConversationRepository conversationRepository;
+  private final WikiLinkResolver wikiLinkResolver;
 
   public MemoryTrackerService(
       EntityPersister entityPersister,
       UserService userService,
       MemoryTrackerRepository memoryTrackerRepository,
       RecallPromptRepository recallPromptRepository,
-      ConversationRepository conversationRepository) {
+      ConversationRepository conversationRepository,
+      WikiLinkResolver wikiLinkResolver) {
     this.entityPersister = entityPersister;
     this.userService = userService;
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.recallPromptRepository = recallPromptRepository;
     this.conversationRepository = conversationRepository;
+    this.wikiLinkResolver = wikiLinkResolver;
   }
 
   public List<MemoryTracker> findLast100ByUser(Integer userId) {
@@ -252,7 +260,9 @@ public class MemoryTrackerService {
     return entityPersister.save(recallPrompt);
   }
 
-  public RecallPrompt answerSpelling(
+  public record SpellingAnswerResult(RecallPrompt recallPrompt, List<Note> matchedNotes) {}
+
+  public SpellingAnswerResult answerSpelling(
       RecallPrompt recallPrompt,
       AnswerSpellingDTO answerSpellingDTO,
       User user,
@@ -273,11 +283,60 @@ public class MemoryTrackerService {
     answer.setCorrect(correct);
     answer.setThinkingTimeMs(answerSpellingDTO.getThinkingTimeMs());
     recallPrompt.setAnswer(answer);
-    entityPersister.save(recallPrompt);
+    recallPrompt = entityPersister.save(recallPrompt);
+
+    if (Boolean.TRUE.equals(correct) && isNonDistinguishingOverlap(note, spellingAnswer, user)) {
+      Answer gradedAnswer = recallPrompt.getAnswer();
+      gradedAnswer.setCorrect(false);
+      gradedAnswer.setOutcome(AnswerOutcome.OVERLAP);
+      entityPersister.save(recallPrompt);
+      return new SpellingAnswerResult(recallPrompt, List.of());
+    }
+
+    if (!correct && spellingAnswer != null && !spellingAnswer.isBlank()) {
+      List<Note> matches = wikiLinkResolver.findAllAccidentalMatches(spellingAnswer, note, user);
+      if (!matches.isEmpty()) {
+        Answer gradedAnswer = recallPrompt.getAnswer();
+        gradedAnswer.setMatchedNoteId(matches.getFirst().getId().longValue());
+        gradedAnswer.setOutcome(AnswerOutcome.ACCIDENTAL_MATCH);
+        markAsAccidentalMatch(currentUTCTimestamp, memoryTracker);
+        return new SpellingAnswerResult(recallPrompt, matches);
+      }
+    }
 
     markAsRecalled(
         currentUTCTimestamp, correct, memoryTracker, answerSpellingDTO.getThinkingTimeMs());
-    return recallPrompt;
+    return new SpellingAnswerResult(recallPrompt, List.of());
+  }
+
+  private boolean isNonDistinguishingOverlap(Note reviewedNote, String spellingAnswer, User user) {
+    for (String token :
+        FrontmatterAliases.overlapWikiLinkTokensFromNoteContent(reviewedNote.getContent())) {
+      Matcher matcher = WikiLinkMarkdown.INNER_LINK_PATTERN.matcher(token);
+      if (!matcher.matches()) {
+        continue;
+      }
+      String inner = matcher.group(1).trim();
+      Optional<Note> target = wikiLinkResolver.resolveWikiLinkToken(inner, reviewedNote, user);
+      if (target.isEmpty()) {
+        continue;
+      }
+      Note other = target.get();
+      if (other.getId().equals(reviewedNote.getId())) {
+        continue;
+      }
+      if (other.matchAnswer(spellingAnswer)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private void markAsAccidentalMatch(Timestamp currentUTCTimestamp, MemoryTracker memoryTracker) {
+    memoryTracker.markAsAccidentalMatch(currentUTCTimestamp);
+    entityPersister.save(memoryTracker);
+    hasExceededWrongAnswerThreshold(
+        memoryTracker, currentUTCTimestamp, WRONG_ANSWER_PERIOD_DAYS, WRONG_ANSWER_THRESHOLD);
   }
 
   public boolean hasExceededWrongAnswerThreshold(

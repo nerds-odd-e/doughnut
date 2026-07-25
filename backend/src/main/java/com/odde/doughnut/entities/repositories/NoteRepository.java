@@ -44,6 +44,15 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
       @Param("notebookName") String notebookName, @Param("noteTitle") String noteTitle);
 
   @Query(
+      value =
+          selectFromNote
+              + " JOIN FETCH n.notebook nb "
+              + " WHERE LOWER(n.title) = LOWER(:noteTitle) AND n.deletedAt IS NULL "
+              + " AND nb.deletedAt IS NULL "
+              + " ORDER BY n.id ASC")
+  List<Note> findByNoteTitleOrderByIdAsc(@Param("noteTitle") String noteTitle);
+
+  @Query(
       value = selectFromNote + searchForTitleLike + "  AND n.notebook.ownership.user.id = :userId")
   List<Note> searchForUserInAllMyNotebooks(Integer userId, String pattern, Pageable pageable);
 

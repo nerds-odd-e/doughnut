@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.NoteContentTitleHeading;
 import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
@@ -125,11 +126,15 @@ public class NoteConstructionService {
     User user = authorizationService.getCurrentUser();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
+    String newNoteContent =
+        NoteContentTitleHeading.withoutRepeatedTitleHeading(
+            aiResult.newNoteTitle, aiResult.newNoteContent);
+
     Note newNote =
         createNote(originalNote.getNotebook(), originalNote.getFolder(), aiResult.newNoteTitle);
-    AuthoredNoteContent.assertAliasesValidForSave(aiResult.newNoteContent);
+    AuthoredNoteContent.assertAliasesValidForSave(newNoteContent);
     AuthoredNoteContent.assertAliasesValidForSave(aiResult.updatedOriginalNoteContent);
-    newNote.setContent(aiResult.newNoteContent);
+    newNote.setContent(newNoteContent);
     newNote.setUpdatedAt(currentUTCTimestamp);
     entityPersister.save(newNote);
 

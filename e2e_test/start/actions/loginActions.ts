@@ -1,10 +1,10 @@
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import { mainMenu } from '../pageObjects/mainMenu'
 import { HealthCheckController } from '@generated/doughnut-backend-api/sdk.gen'
 
 export const loginActions = {
   logout() {
-    pageIsNotLoading()
+    waitUntilAppIsNotBusy()
     cy.wrap(null).as('currentLoginUser')
     return cy
       .request({

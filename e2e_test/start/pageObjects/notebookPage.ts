@@ -1,4 +1,4 @@
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import { form } from '../forms'
 import bookReadingPage from './bookReadingPage'
 import { sidebarChildNotePageMethods } from './sidebarChildNotePageMethods'
@@ -42,7 +42,13 @@ const notebookPage = () => {
 
     runLint() {
       cy.get('[data-testid="notebook-health-run"]').click()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
+      return this
+    },
+
+    applyFix() {
+      cy.get('[data-testid="notebook-health-fix"]').click()
+      waitUntilAppIsNotBusy()
       return this
     },
 
@@ -55,6 +61,19 @@ const notebookPage = () => {
       cy.get(
         '[data-testid="notebook-health-remove-empty-folders"] input[type="checkbox"]'
       ).check({ force: true })
+      return this
+    },
+
+    saveAsDefaults() {
+      cy.get('[data-testid="notebook-health-save-defaults"]').click()
+      waitUntilAppIsNotBusy()
+      return this
+    },
+
+    expectRemoveEmptyFoldersChecked() {
+      cy.get(
+        '[data-testid="notebook-health-remove-empty-folders"] input[type="checkbox"]'
+      ).should('be.checked')
       return this
     },
 
@@ -81,11 +100,25 @@ const notebookPage = () => {
       return this
     },
 
+    expectFindingGroupDoesNotInclude(ruleId: string, label: string) {
+      cy.get(`[data-testid="notebook-health-group-${ruleId}"]`).should(
+        'not.contain.text',
+        label
+      )
+      return this
+    },
+
     expectDeadWikiLinkFinding(noteTitle: string, token: string) {
       cy.get('[data-testid="notebook-health-group-dead_wiki_links"]').within(
         () => {
-          cy.contains('.daisy-collapse-title', noteTitle).should('be.visible')
-          cy.contains('li', token).should('be.visible')
+          cy.contains(
+            '[data-testid="notebook-health-dead-link-note-title"]',
+            noteTitle
+          ).should('be.visible')
+          cy.contains(
+            '[data-testid="notebook-health-dead-link-token"]',
+            token
+          ).should('be.visible')
         }
       )
       return this
@@ -133,7 +166,7 @@ const notebookPage = () => {
       openSettingsTab()
       form.getField('Skip Memory Tracking').check()
       clickButton('Update Settings')
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
     },
 
     attachEpubFixture(relativePath: string) {
@@ -141,7 +174,7 @@ const notebookPage = () => {
       cy.get('[data-testid="notebook-no-book"]')
         .find('input[type="file"]')
         .selectFile(`e2e_test/fixtures/${relativePath}`, { force: true })
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('[data-testid="notebook-attached-book"]').should('be.visible')
       return this
     },
@@ -150,7 +183,7 @@ const notebookPage = () => {
       cy.get('[data-testid="notebook-no-book"]')
         .find('input[type="file"]')
         .selectFile(`e2e_test/fixtures/${relativePath}`, { force: true })
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return this
     },
     expectEpubAttachErrorContaining(messageSubstring: string) {
@@ -161,18 +194,11 @@ const notebookPage = () => {
       cy.get('[data-testid="notebook-attached-book"]').should('not.exist')
       return this
     },
-    reindexNotebook() {
-      openSettingsTab()
-      cy.findByRole('button', { name: 'Update index' }).click()
-      // Wait for the indexing to complete - toast notification will appear
-      pageIsNotLoading()
-      return this
-    },
     shareNotebookToBazaar() {
       openSettingsTab()
       cy.findByRole('button', { name: 'Share notebook to bazaar' }).click()
       cy.findByRole('button', { name: 'OK' }).click()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return this
     },
     moveNotebookToCircle() {
@@ -187,11 +213,11 @@ const notebookPage = () => {
         .click()
         .type(text, { delay: 0 })
         .blur()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return this
     },
     expectNotebookReadmeBodyContains(fragment: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('[data-testid="notebook-readme-body"] .ql-editor').should(
         'contain.text',
         fragment
@@ -199,7 +225,7 @@ const notebookPage = () => {
       return this
     },
     readBook(bookTitle: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       openSettingsTab()
       cy.get('[data-testid="notebook-attached-book"]').within(() => {
         cy.contains(bookTitle)

@@ -17,7 +17,7 @@ Then('I should see the message {string}', (message: string) => {
 
 When('I choose model {string} for {string}', (model: string, task: string) => {
   return start
-    .goToAdminDashboard()
+    .assumeAdminDashboardPage()
     .goToModelManagement()
     .chooseModel(model, task)
 })

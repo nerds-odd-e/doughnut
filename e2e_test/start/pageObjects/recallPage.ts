@@ -1,6 +1,6 @@
 import { RecallsController } from '@generated/doughnut-backend-api/sdk.gen'
 import { commonSenseSplit } from 'support/string_util'
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import router from '../router'
 
 function recallProgressFromTriple(triple: string) {
@@ -22,7 +22,7 @@ function loadRecallPage(options?: { waitForQuestion?: boolean }) {
   if (options?.waitForQuestion) {
     cy.wait('@recallQuestion', { timeout: 15000 })
   }
-  pageIsNotLoading()
+  waitUntilAppIsNotBusy()
 }
 
 const recallPage = () => {
@@ -43,7 +43,7 @@ const recallPage = () => {
       })
     },
     typeSpellingAnswer(answer: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('[data-test="question-section"]', { timeout: 15000 })
         .should('be.visible')
         .as('spellingQuestion')
@@ -51,11 +51,12 @@ const recallPage = () => {
         .find('input[placeholder="put your answer here"]')
         .should('be.visible')
         .clear()
-        .type(answer)
+        .invoke('val', answer)
+        .trigger('input')
       cy.get('@spellingQuestion')
         .find('input[type="submit"][value="Answer"]')
         .click()
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
     },
     expectRecallProgressFromTriple(numberOfRecalls: string) {
       const { finished, toRepeatCount, totalAssimilated } =
@@ -113,7 +114,7 @@ const recallPage = () => {
       cy.findByRole('button', { name: 'Load more from next 3 days' }).click()
     },
     recallNotes(noteTitles: string) {
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       commonSenseSplit(noteTitles, ',').forEach((title) => {
         if (title === 'end') {
           cy.findByText(
@@ -128,7 +129,7 @@ const recallPage = () => {
     expectCurrentQuestion() {
       // Verify we're back to the quiz view (current question) by checking that
       // the question section exists, which means we're viewing a question, not an answered question
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       cy.get('[data-test="question-section"]').should('exist')
       return this
     },
@@ -159,7 +160,7 @@ export const recall = () => {
       getRecallListItemInSidebar(($el) => {
         $el.click()
       })
-      pageIsNotLoading()
+      waitUntilAppIsNotBusy()
       return recallPage()
     },
     assumeRecallPage() {

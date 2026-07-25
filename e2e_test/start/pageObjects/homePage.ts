@@ -1,8 +1,8 @@
-import { pageIsNotLoading } from '../pageBase'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 
 /** Home route: welcome banner with the signed-in user's display name */
 export const assumeHomePage = () => {
-  pageIsNotLoading()
+  waitUntilAppIsNotBusy()
   return {
     expectWelcomeHeadingNamesUser(displayName: string) {
       cy.get('h1.welcome-text').should('contain', `Welcome ${displayName}`)

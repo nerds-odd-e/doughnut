@@ -69,6 +69,31 @@ describe("authoredAliasesValidationErrorForPropertyValue", () => {
     }
   })
 
+  it("accepts well-formed wiki-link overlap alias items", () => {
+    expect(
+      authoredAliasesValidationErrorForPropertyValue(
+        listPropertyValue([
+          "color",
+          "[[Other Note]]",
+          "[[Shared Notebook:Hue]]",
+          "[[Title|display]]",
+          "[[Shared Notebook:Hue|display]]",
+        ])
+      )
+    ).toBeUndefined()
+  })
+
+  it("rejects embedded or malformed wiki-link alias items", () => {
+    for (const item of ["[[", "see [[Other]]", "[[a]][[b]]", "[[]]"]) {
+      expect(
+        authoredAliasesValidationErrorForPropertyValue(
+          listPropertyValue([item])
+        ),
+        item
+      ).toBe(AUTHORED_ALIASES_MESSAGE)
+    }
+  })
+
   it("allows duplicate alias values", () => {
     expect(
       authoredAliasesValidationErrorForPropertyValue(

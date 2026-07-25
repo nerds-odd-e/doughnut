@@ -25,4 +25,12 @@ gcloud compute url-maps import doughnut-app-service-map \
   --global \
   --quiet
 
+# Drop CDN entries that still point at the previous SHA's shell / error-policy
+# substitutes so deep links do not keep serving a stale or empty body.
+echo "Invalidating Cloud CDN cache for doughnut-app-service-map (/*)"
+gcloud compute url-maps invalidate-cdn-cache doughnut-app-service-map \
+  --path "/*" \
+  --global \
+  --async
+
 echo "URL map doughnut-app-service-map updated for frontend prefix frontend/${GITHUB_SHA}/"
