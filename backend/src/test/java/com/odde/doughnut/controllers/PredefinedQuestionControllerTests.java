@@ -100,6 +100,40 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
   }
 
   @Nested
+  class DeleteQuestionFromNote {
+    @Test
+    void authorization() {
+      Note note = makeMe.aNote().please();
+      PredefinedQuestion question =
+          makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(note).please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> controller.deleteQuestion(note, question));
+    }
+
+    @Test
+    void shouldThrowWhenQuestionDoesNotBelongToNote() {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      Note otherNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      PredefinedQuestion questionOfOtherNote =
+          makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(otherNote).please();
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> controller.deleteQuestion(note, questionOfOtherNote));
+    }
+
+    @Test
+    void removesTheQuestionFromTheNote() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      PredefinedQuestion question =
+          makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(note).please();
+      makeMe.refresh(note);
+      controller.deleteQuestion(note, question);
+      makeMe.refresh(note);
+      assertThat(note.getPredefinedQuestions(), hasSize(0));
+    }
+  }
+
+  @Nested
   class GenerateQuestionWithoutSave {
     @Test
     void shouldThrowWhenOpenAiNotAvailable() {
