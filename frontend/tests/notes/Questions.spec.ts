@@ -1,10 +1,12 @@
 import { PredefinedQuestionController } from "@generated/doughnut-backend-api/sdk.gen"
-import { describe, it, expect } from "vitest"
+import { flushPromises } from "@vue/test-utils"
+import { describe, it, expect, vi } from "vitest"
 import { mockSdkService } from "@tests/helpers"
 import {
   clickExportQuestionGeneration,
   exportTextarea,
   mountQuestionsReady,
+  questionsFixture,
   questionsNote,
   sampleQuestionExportData,
   setupQuestionsTests,
@@ -33,5 +35,39 @@ describe("Questions", () => {
     expect(exportQuestionGenerationSpy).toHaveBeenCalledWith({
       path: { note: questionsNote.id },
     })
+  })
+
+  it("deletes a question when the delete button is confirmed", async () => {
+    vi.spyOn(window, "confirm").mockReturnValue(true)
+    const deleteQuestionSpy = mockSdkService(
+      PredefinedQuestionController,
+      "deleteQuestion",
+      undefined
+    )
+
+    const wrapper = await mountQuestionsReady()
+    await wrapper.find('button[aria-label="Delete question"]').trigger("click")
+    await flushPromises()
+
+    expect(deleteQuestionSpy).toHaveBeenCalledWith({
+      path: { note: questionsNote.id, predefinedQuestion: questionsFixture[0]!.id },
+    })
+    expect(wrapper.text()).not.toContain("What is 2+2?")
+  })
+
+  it("does not delete the question when the confirmation is cancelled", async () => {
+    vi.spyOn(window, "confirm").mockReturnValue(false)
+    const deleteQuestionSpy = mockSdkService(
+      PredefinedQuestionController,
+      "deleteQuestion",
+      undefined
+    )
+
+    const wrapper = await mountQuestionsReady()
+    await wrapper.find('button[aria-label="Delete question"]').trigger("click")
+    await flushPromises()
+
+    expect(deleteQuestionSpy).not.toHaveBeenCalled()
+    expect(wrapper.text()).toContain("What is 2+2?")
   })
 })
