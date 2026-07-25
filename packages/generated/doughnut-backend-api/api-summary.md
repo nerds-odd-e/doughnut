@@ -82,8 +82,9 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `getAllQuestionByNote`: GET `/api/predefined-questions/{note}/note-questions` -> `GetAllQuestionByNoteResponse` (request: `GetAllQuestionByNoteData`; path: note; response body: Array<PredefinedQuestion>)
 - `addQuestionManually`: POST `/api/predefined-questions/{note}/note-questions` -> `AddQuestionManuallyResponse` (request: `AddQuestionManuallyData`; path: note; body: PredefinedQuestion; response body: PredefinedQuestion)
 - `generateQuestionWithoutSave`: POST `/api/predefined-questions/generate-question-without-save` -> `GenerateQuestionWithoutSaveResponse` (request: `GenerateQuestionWithoutSaveData`; query: note; response body: PredefinedQuestion)
-- `exportQuestionGeneration`: GET `/api/predefined-questions/{note}/export-question-generation` -> `ExportQuestionGenerationResponse` (request: `ExportQuestionGenerationData`; path: note; response body: Record<string, unknown>)
 - `deleteQuestion`: DELETE `/api/predefined-questions/{predefinedQuestion}` -> `DeleteQuestionResponse` (request: `DeleteQuestionData`; path: predefinedQuestion; response body: void)
+- `updateQuestion`: PATCH `/api/predefined-questions/{predefinedQuestion}` -> `UpdateQuestionResponse` (request: `UpdateQuestionData`; path: predefinedQuestion; body: PredefinedQuestion; response body: PredefinedQuestion)
+- `exportQuestionGeneration`: GET `/api/predefined-questions/{note}/export-question-generation` -> `ExportQuestionGenerationResponse` (request: `ExportQuestionGenerationData`; path: note; response body: Record<string, unknown>)
 
 ## Note Controller
 
