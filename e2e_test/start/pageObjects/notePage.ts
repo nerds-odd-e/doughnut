@@ -651,6 +651,24 @@ export const assumeNotePage = (
         }
       })
     },
+    deleteQuestion(questionStem: string) {
+      cy.get('body').then(($body) => {
+        if ($body.find('.question-table').length > 0) {
+          questionListPage().deleteQuestion(questionStem)
+        } else {
+          this.openQuestionList().deleteQuestion(questionStem)
+        }
+      })
+    },
+    expectNoQuestions() {
+      cy.get('body').then(($body) => {
+        if ($body.find('.question-table').length > 0) {
+          questionListPage().expectNoQuestions()
+        } else {
+          this.openQuestionList().expectNoQuestions()
+        }
+      })
+    },
     sendMessageToNoteOwner(message: string) {
       cy.intercept('POST', '**/api/conversation/note/**').as(
         'startNoteConversation'

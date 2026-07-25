@@ -14,5 +14,15 @@ export const questionListPage = () => {
         })
       })
     },
+    deleteQuestion(questionStem: string) {
+      cy.findByText(questionStem)
+        .parents('tr')
+        .within(() => {
+          cy.findByRole('button', { name: 'Delete question' }).click()
+        })
+    },
+    expectNoQuestions() {
+      cy.findByText('No questions').should('be.visible')
+    },
   }
 }

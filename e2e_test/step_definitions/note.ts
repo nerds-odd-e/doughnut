@@ -609,6 +609,20 @@ Then(
   }
 )
 
+When(
+  'I delete the question {string} from the note {string}',
+  (questionStem: string, _noteTopology: string) => {
+    start.assumeNotePage().deleteQuestion(questionStem)
+  }
+)
+
+Then(
+  'I should see no questions in the question list of the note {string}',
+  (_noteTopology: string) => {
+    start.assumeNotePage().expectNoQuestions()
+  }
+)
+
 When('I generate question by AI for note {string}', (noteName: string) => {
   start
     .jumpToNotePage(noteName, true)
