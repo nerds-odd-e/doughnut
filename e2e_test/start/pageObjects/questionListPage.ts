@@ -21,6 +21,14 @@ export const questionListPage = () => {
           cy.findByRole('button', { name: 'Delete question' }).click()
         })
     },
+    editQuestion(questionStem: string, row: Record<string, string>) {
+      cy.findByText(questionStem)
+        .parents('tr')
+        .within(() => {
+          cy.findByRole('button', { name: 'Edit question' }).click()
+        })
+      addQuestionPage().editQuestion(row)
+    },
     expectNoQuestions() {
       cy.findByText('No questions').should('be.visible')
     },

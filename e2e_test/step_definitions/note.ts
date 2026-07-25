@@ -657,6 +657,16 @@ When(
   }
 )
 
+When(
+  'I edit the question {string} for the note {string} to become:',
+  (questionStem: string, _noteTopology: string, data: DataTable) => {
+    expect(data.hashes().length, 'please edit one question at a time.').to.equal(
+      1
+    )
+    start.assumeNotePage().editQuestion(questionStem, data.hashes()[0]!)
+  }
+)
+
 Then(
   'I should see no questions in the question list of the note {string}',
   (_noteTopology: string) => {

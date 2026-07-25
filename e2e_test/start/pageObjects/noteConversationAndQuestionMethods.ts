@@ -61,6 +61,15 @@ export const noteConversationAndQuestionMethods = () => ({
       }
     })
   },
+  editQuestion(questionStem: string, row: Record<string, string>) {
+    cy.get('body').then(($body) => {
+      if ($body.find('button[title="Add Question"]').length > 0) {
+        questionListPage().editQuestion(questionStem, row)
+      } else {
+        this.openQuestionList().editQuestion(questionStem, row)
+      }
+    })
+  },
   sendMessageToNoteOwner(message: string) {
     cy.intercept('POST', '**/api/conversation/note/**').as(
       'startNoteConversation'

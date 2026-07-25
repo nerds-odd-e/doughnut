@@ -35,5 +35,27 @@ export const addQuestionPage = () => {
       this.fillQuestion(row)
       cy.findByRole('button', { name: 'Refine' }).click()
     },
+    editQuestion(row: Record<string, string>) {
+      cy.intercept(
+        'PATCH',
+        '**/api/predefined-questions/**/note-questions/**'
+      ).as('updateQuestion')
+      ;[
+        'Stem',
+        'Choice 0',
+        'Choice 1',
+        'Choice 2',
+        'Correct Choice Index',
+      ].forEach((key: string) => {
+        if (row[key] !== undefined && row[key] !== '') {
+          cy.findByLabelText(key).clear().invoke('val', row[key]!).trigger('input')
+        }
+      })
+      cy.findByRole('button', { name: 'Submit' }).click()
+      cy.wait('@updateQuestion').then(({ response }) => {
+        expect(response?.statusCode, 'update question').to.equal(200)
+      })
+      cy.get('.question-table').should('contain.text', row.Stem!)
+    },
   }
 }
