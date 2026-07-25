@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.PredefinedQuestionRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteQuestionGenerationService;
@@ -14,8 +15,10 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/predefined-questions")
@@ -26,6 +29,7 @@ class PredefinedQuestionController {
   private final AuthorizationService authorizationService;
   private final NoteQuestionGenerationService noteQuestionGenerationService;
   private final StructuredResponseCreateParamsSerializer paramsSerializer;
+  private final PredefinedQuestionRepository predefinedQuestionRepository;
 
   @Autowired
   public PredefinedQuestionController(
@@ -33,12 +37,20 @@ class PredefinedQuestionController {
       AuthorizationService authorizationService,
       AiQuestionGenerator aiQuestionGenerator,
       NoteQuestionGenerationService noteQuestionGenerationService,
-      StructuredResponseCreateParamsSerializer paramsSerializer) {
+      StructuredResponseCreateParamsSerializer paramsSerializer,
+      PredefinedQuestionRepository predefinedQuestionRepository) {
     this.predefinedQuestionService = predefinedQuestionService;
     this.authorizationService = authorizationService;
     this.aiQuestionGenerator = aiQuestionGenerator;
     this.noteQuestionGenerationService = noteQuestionGenerationService;
     this.paramsSerializer = paramsSerializer;
+    this.predefinedQuestionRepository = predefinedQuestionRepository;
+  }
+
+  private PredefinedQuestion findQuestionOrNotFound(Integer predefinedQuestionId) {
+    return predefinedQuestionRepository
+        .findById(predefinedQuestionId)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
   }
 
   @PostMapping("/generate-question-without-save")
@@ -68,6 +80,16 @@ class PredefinedQuestionController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
     return predefinedQuestionService.addQuestion(note, predefinedQuestion);
+  }
+
+  @DeleteMapping("/{predefinedQuestion}")
+  @Transactional
+  public void deleteQuestion(
+      @PathVariable("predefinedQuestion") @Schema(type = "integer") Integer predefinedQuestionId)
+      throws UnexpectedNoAccessRightException {
+    PredefinedQuestion predefinedQuestion = findQuestionOrNotFound(predefinedQuestionId);
+    authorizationService.assertAuthorization(predefinedQuestion.getNote());
+    predefinedQuestionService.deleteQuestion(predefinedQuestion);
   }
 
   @PostMapping("/{note}/refine-question")

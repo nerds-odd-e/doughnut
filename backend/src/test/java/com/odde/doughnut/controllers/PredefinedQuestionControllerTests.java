@@ -14,6 +14,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 class PredefinedQuestionControllerTests extends ControllerTestBase {
 
@@ -96,6 +98,38 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
       controller.addQuestionManually(note, mcqWithAnswer);
       makeMe.refresh(note);
       assertThat(note.getPredefinedQuestions(), hasSize(1));
+    }
+  }
+
+  @Nested
+  class deleteQuestion {
+    @Test
+    void authorization() {
+      Note note = makeMe.aNote().please();
+      PredefinedQuestion question =
+          makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(note).please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.deleteQuestion(question.getId()));
+    }
+
+    @Test
+    void notFoundWhenQuestionDoesNotExist() {
+      ResponseStatusException exception =
+          assertThrows(ResponseStatusException.class, () -> controller.deleteQuestion(-1));
+      assertThat(exception.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
+    }
+
+    @Test
+    void deletesTheQuestion() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      PredefinedQuestion question =
+          makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(note).please();
+      makeMe.refresh(note);
+      assertThat(note.getPredefinedQuestions(), hasSize(1));
+      controller.deleteQuestion(question.getId());
+      makeMe.refresh(note);
+      assertThat(note.getPredefinedQuestions(), hasSize(0));
     }
   }
 
