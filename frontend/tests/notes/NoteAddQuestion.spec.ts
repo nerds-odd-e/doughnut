@@ -1,8 +1,9 @@
 import NoteAddQuestion from "@/components/notes/NoteAddQuestion.vue"
+import { PredefinedQuestionController } from "@generated/doughnut-backend-api/sdk.gen"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import helper from "@tests/helpers"
+import helper, { mockSdkService } from "@tests/helpers"
 import { describe, it, expect } from "vitest"
 
 const note = makeMe.aNoteRealm.please()
@@ -59,4 +60,36 @@ describe("NoteAddQuestion", () => {
       expect(generateButton.disabled).toBe(!expectedGenerateButton)
     }
   )
+
+  it("prefills the form and updates the question on submit when editing", async () => {
+    const existingQuestion = makeMe.aPredefinedQuestion
+      .withQuestionStem("Original stem?")
+      .withChoices(["Right", "Wrong"])
+      .correctAnswerIndex(0)
+      .please()
+    const updateQuestionSpy = mockSdkService(
+      PredefinedQuestionController,
+      "updateQuestion",
+      existingQuestion
+    )
+
+    const wrapper = helper
+      .component(NoteAddQuestion)
+      .withProps({ note: note.note, existingQuestion })
+      .mount({ attachTo: document.body })
+    await flushPromises()
+
+    expect((screen.getByLabelText("Stem") as HTMLInputElement).value).toBe(
+      "Original stem?"
+    )
+    ;(screen.getByText(/submit/i) as HTMLButtonElement).click()
+    await flushPromises()
+
+    expect(updateQuestionSpy).toHaveBeenCalledWith({
+      path: { predefinedQuestion: existingQuestion.id },
+      body: existingQuestion,
+    })
+    expect(wrapper.emitted("close-dialog")).toBeTruthy()
+    wrapper.unmount()
+  })
 })

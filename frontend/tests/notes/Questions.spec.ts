@@ -1,6 +1,7 @@
 import { PredefinedQuestionController } from "@generated/doughnut-backend-api/sdk.gen"
 import { describe, it, expect, vi } from "vitest"
 import { flushPromises } from "@vue/test-utils"
+import { screen } from "@testing-library/vue"
 import { mockSdkService } from "@tests/helpers"
 import {
   clickExportQuestionGeneration,
@@ -72,5 +73,16 @@ describe("Questions", () => {
 
     expect(deleteQuestionSpy).not.toHaveBeenCalled()
     expect(wrapper.text()).toContain("What is 2+2?")
+  })
+
+  it("opens a prefilled edit form for a question", async () => {
+    const wrapper = await mountQuestionsReady({ attachToBody: true })
+
+    await wrapper.find('button[aria-label="Edit question"]').trigger("click")
+    await flushPromises()
+
+    expect((screen.getByLabelText("Stem") as HTMLInputElement).value).toBe(
+      "What is 2+2?"
+    )
   })
 })
