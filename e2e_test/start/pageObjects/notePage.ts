@@ -653,7 +653,7 @@ export const assumeNotePage = (
     },
     deleteQuestion(questionStem: string) {
       cy.get('body').then(($body) => {
-        if ($body.find('.question-table').length > 0) {
+        if ($body.find('button[title="Add Question"]').length > 0) {
           questionListPage().deleteQuestion(questionStem)
         } else {
           this.openQuestionList().deleteQuestion(questionStem)
@@ -662,7 +662,7 @@ export const assumeNotePage = (
     },
     expectNoQuestions() {
       cy.get('body').then(($body) => {
-        if ($body.find('.question-table').length > 0) {
+        if ($body.find('button[title="Add Question"]').length > 0) {
           questionListPage().expectNoQuestions()
         } else {
           this.openQuestionList().expectNoQuestions()
