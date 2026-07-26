@@ -166,6 +166,13 @@ Grow from the walking skeleton by varying user scenarios and policies:
 Split by user-observable behavior, workflow step, business rule, data variation,
 or operational boundary. Do not split by technical layer or assign stories to
 component teams.
+
+Before retaining a story, ask: once earlier stories exist, can the user already
+achieve this outcome directly with a standard tool? If yes, treat it as a
+supported workflow, documentation need, or acceptance constraint—not as a
+product feature. Keep an integration story only when the product adds
+differentiated behavior such as domain-aware mapping, managed synchronization,
+conflict handling, or recovery.
 </step>
 
 <step name="order_for_value_learning_and_dependencies">
@@ -217,6 +224,7 @@ Look especially for:
 
 - attractive technology without a real user outcome;
 - a walking skeleton that is still horizontal;
+- a story that merely wraps an existing tool without adding product behavior;
 - independent items that create no cross-team learning;
 - an unsafe "simple first version";
 - stories too large to finish or too small to demonstrate;
@@ -285,9 +293,11 @@ Retain these lessons:
 3. Separate format compatibility, application interoperability, local
    synchronization, version control, and hosted sharing. They can be related
    without being one indivisible feature.
-4. Place an inexpensive, familiar mechanism such as local Git history or
-   publishing to an existing remote early once the underlying state is
-   trustworthy.
+4. Do not turn an inexpensive, familiar workflow such as local Git history or
+   publishing to an existing remote into a product story merely to put Git or
+   GitHub in the backlog. Once the workspace is stable, users already have that
+   capability. Fold Git-friendly behavior into the workspace contract unless
+   Doughnut adds domain-specific value.
 5. Delegate authentication to existing secure mechanisms and design CI around
    local substitutes when possible.
 6. Preserve conflicts, idempotency, partial failure, and recovery while slicing;
