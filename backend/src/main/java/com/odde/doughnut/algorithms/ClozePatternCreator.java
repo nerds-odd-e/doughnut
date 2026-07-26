@@ -33,13 +33,23 @@ public class ClozePatternCreator {
     for (int i = 0; i < words.length; i++) {
       if (i > 0) sb.append(between);
       String word = words[i];
-      sb.append(Pattern.quote(word));
       if (i == words.length - 1) {
-        sb.append("(?:s|ed|ing)?(?:[_*])?");
+        sb.append(withOptionalEnglishInflection(word)).append("(?:[_*])?");
         if (!isCjkOnly(word)) sb.append("(?!\\w)");
+      } else {
+        sb.append(Pattern.quote(word));
       }
     }
     return sb.toString();
+  }
+
+  private static String withOptionalEnglishInflection(String word) {
+    String quotedWord = Pattern.quote(word);
+    if (word.length() > 1 && (word.endsWith("e") || word.endsWith("E"))) {
+      String quotedStem = Pattern.quote(word.substring(0, word.length() - 1));
+      return "(?:" + quotedWord + "(?:s|d|ing)?|" + quotedStem + "ing)";
+    }
+    return quotedWord + "(?:s|ed|ing)?";
   }
 
   private static boolean isCjkOnly(String s) {

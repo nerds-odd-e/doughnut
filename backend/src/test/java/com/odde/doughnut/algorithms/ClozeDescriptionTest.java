@@ -77,6 +77,7 @@ class ClozeDescriptionTest {
     "試みる,   わたしが試みてみよう。,  わたしが[..~]てみよう。",
     "熟す,      この語はまだ熟していない。,  この語はまだ[..~]ていない。",
     "bona fide, _Bona fides_ is a Latin phrase meaning \"good faith\"., [...]",
+    "indoctrinate, indoctrinating, [...]",
   })
   void clozeDescription(String title, String markdown, String expectedClozeDescription) {
     assertThat(
