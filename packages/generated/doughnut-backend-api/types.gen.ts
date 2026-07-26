@@ -4,6 +4,20 @@ export type ClientOptions = {
     baseUrl: `${string}://${string}` | (string & {});
 };
 
+export type MultipleChoicesQuestion = {
+    questionStem: string;
+    responseChoices: Array<string>;
+};
+
+export type PredefinedQuestion = {
+    id: number;
+    multipleChoicesQuestion: MultipleChoicesQuestion;
+    correctAnswerIndex?: number;
+    contextSeed?: number;
+    testedFocus?: string;
+    validationRationale?: string;
+};
+
 export type BookBlockReadingRecordPutRequest = {
     /**
      * Reading disposition for the book block's direct content
@@ -142,20 +156,6 @@ export type PredefinedQuestionTestData = {
 export type PredefinedQuestionsTestData = {
     notebookName?: string;
     predefinedQuestionTestData?: Array<PredefinedQuestionTestData>;
-};
-
-export type MultipleChoicesQuestion = {
-    questionStem: string;
-    responseChoices: Array<string>;
-};
-
-export type PredefinedQuestion = {
-    id: number;
-    multipleChoicesQuestion: MultipleChoicesQuestion;
-    correctAnswerIndex?: number;
-    contextSeed?: number;
-    testedFocus?: string;
-    validationRationale?: string;
 };
 
 export type SubscriptionDto = {
@@ -1177,6 +1177,42 @@ export type NoteRecallInfoWritable = {
     memoryTrackers?: Array<MemoryTrackerWritable>;
     recallSetting?: NoteRecallSetting;
 };
+
+export type DeleteQuestionData = {
+    body?: never;
+    path: {
+        note: number;
+        question: number;
+    };
+    query?: never;
+    url: '/api/predefined-questions/{note}/note-questions/{question}';
+};
+
+export type DeleteQuestionResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type UpdateQuestionData = {
+    body: PredefinedQuestion;
+    path: {
+        note: number;
+        question: number;
+    };
+    query?: never;
+    url: '/api/predefined-questions/{note}/note-questions/{question}';
+};
+
+export type UpdateQuestionResponses = {
+    /**
+     * OK
+     */
+    200: PredefinedQuestion;
+};
+
+export type UpdateQuestionResponse = UpdateQuestionResponses[keyof UpdateQuestionResponses];
 
 export type PutNotebookBookBlockReadingRecordData = {
     body?: BookBlockReadingRecordPutRequest;
@@ -3836,23 +3872,6 @@ export type DeleteTokenData = {
 };
 
 export type DeleteTokenResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
-
-export type DeleteQuestionData = {
-    body?: never;
-    path: {
-        note: number;
-        question: number;
-    };
-    query?: never;
-    url: '/api/predefined-questions/{note}/note-questions/{question}';
-};
-
-export type DeleteQuestionResponses = {
     /**
      * OK
      */

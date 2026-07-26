@@ -37,6 +37,7 @@
       -
     </button>
     <button
+      v-if="!isEditMode"
       @click="refineQuestion"
       :disabled="!dirty"
       class="daisy-btn daisy-btn-sm daisy-btn-secondary mr-2"
@@ -44,6 +45,7 @@
       Refine
     </button>
     <button
+      v-if="!isEditMode"
       @click="generateQuestionByAI"
       :disabled="dirty"
       class="daisy-btn daisy-btn-sm daisy-btn-accent mr-2"
@@ -75,15 +77,25 @@ const props = defineProps({
     type: Object as PropType<Note>,
     required: true,
   },
+  existingQuestion: {
+    type: Object as PropType<PredefinedQuestion>,
+    default: undefined,
+  },
 })
 
-const predefinedQuestion = ref<PredefinedQuestion>({
-  correctAnswerIndex: 0,
-  multipleChoicesQuestion: {
-    questionStem: "",
-    responseChoices: ["", ""],
-  },
-} as PredefinedQuestion)
+const isEditMode = computed(() => !!props.existingQuestion)
+
+const predefinedQuestion = ref<PredefinedQuestion>(
+  props.existingQuestion
+    ? (JSON.parse(JSON.stringify(props.existingQuestion)) as PredefinedQuestion)
+    : ({
+        correctAnswerIndex: 0,
+        multipleChoicesQuestion: {
+          questionStem: "",
+          responseChoices: ["", ""],
+        },
+      } as PredefinedQuestion)
+)
 
 const minimumNumberOfChoices = 2
 const maximumNumberOfChoices = 10
@@ -135,10 +147,15 @@ const removeChoice = () => {
 const submitQuestion = async () => {
   const recallPrompt = predefinedQuestion.value
   const { data: response, error } = await apiCallWithLoading(() =>
-    PredefinedQuestionController.addQuestionManually({
-      path: { note: props.note.id },
-      body: recallPrompt,
-    })
+    isEditMode.value
+      ? PredefinedQuestionController.updateQuestion({
+          path: { note: props.note.id, question: props.existingQuestion!.id },
+          body: recallPrompt,
+        })
+      : PredefinedQuestionController.addQuestionManually({
+          path: { note: props.note.id },
+          body: recallPrompt,
+        })
   )
   if (!error && response) {
     emit("close-dialog", response)

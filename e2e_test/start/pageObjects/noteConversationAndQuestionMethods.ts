@@ -40,6 +40,15 @@ export const noteConversationAndQuestionMethods = () => ({
       }
     })
   },
+  editQuestion(questionStem: string, row: Record<string, string>) {
+    cy.get('body').then(($body) => {
+      const list =
+        $body.find('button[title="Add Question"]').length > 0
+          ? questionListPage()
+          : this.openQuestionList()
+      list.editQuestionPage(questionStem).editQuestion(row)
+    })
+  },
   expectQuestionNotInList(questionStem: string) {
     cy.get('body').then(($body) => {
       if ($body.find('button[title="Add Question"]').length > 0) {

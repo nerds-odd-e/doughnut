@@ -55,6 +55,24 @@
             </td>
           </template>
           <td>
+            <PopButton
+              btn-class="daisy-btn daisy-btn-outline daisy-btn-sm mr-2"
+              title="Edit question"
+              aria-label="Edit question"
+            >
+              <template #button_face>
+                <SquarePen class="w-4 h-4" />
+              </template>
+              <template #default="{ closer }">
+                <NoteAddQuestion
+                  v-bind="{ note, existingQuestion: question }"
+                  @close-dialog="
+                    closer();
+                    questionUpdated($event);
+                  "
+                />
+              </template>
+            </PopButton>
             <button
               class="daisy-btn daisy-btn-outline daisy-btn-sm"
               aria-label="Delete question"
@@ -87,7 +105,7 @@ import NoteAddQuestion from "./NoteAddQuestion.vue"
 import QuestionExportDialog from "./QuestionExportDialog.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
 import usePopups from "../commons/Popups/usePopups"
-import { Trash2, Upload } from "@lucide/vue"
+import { SquarePen, Trash2, Upload } from "@lucide/vue"
 
 const props = defineProps({
   note: {
@@ -113,6 +131,16 @@ const questionAdded = (newQuestion: PredefinedQuestion) => {
     return
   }
   questions.value.push(newQuestion)
+}
+const questionUpdated = (updatedQuestion: PredefinedQuestion) => {
+  if (updatedQuestion == null) {
+    return
+  }
+  const index = questions.value.findIndex((q) => q.id === updatedQuestion.id)
+  if (index === -1) {
+    return
+  }
+  questions.value.splice(index, 1, updatedQuestion)
 }
 const deleteQuestion = async (question: PredefinedQuestion) => {
   const confirmed = await popups.confirm("Confirm to delete this question?")

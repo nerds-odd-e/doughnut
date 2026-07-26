@@ -5,6 +5,53 @@ info:
 servers:
 - url: ""
 paths:
+  /api/predefined-questions/{note}/note-questions/{question}:
+    put:
+      tags:
+      - predefined-question-controller
+      operationId: updateQuestion
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: question
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PredefinedQuestion"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PredefinedQuestion"
+    delete:
+      tags:
+      - predefined-question-controller
+      operationId: deleteQuestion
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: question
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
   /api/notebooks/{notebook}/book/blocks/{bookBlock}/reading-record:
     put:
       tags:
@@ -3009,25 +3056,6 @@ paths:
       responses:
         "200":
           description: OK
-  /api/predefined-questions/{note}/note-questions/{question}:
-    delete:
-      tags:
-      - predefined-question-controller
-      operationId: deleteQuestion
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: question
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
   /api/notebooks/{notebook}/book/blocks/{bookBlock}:
     delete:
       tags:
@@ -3085,6 +3113,39 @@ paths:
           description: OK
 components:
   schemas:
+    MultipleChoicesQuestion:
+      type: object
+      properties:
+        questionStem:
+          type: string
+        responseChoices:
+          type: array
+          items:
+            type: string
+      required:
+      - questionStem
+      - responseChoices
+    PredefinedQuestion:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        multipleChoicesQuestion:
+          $ref: "#/components/schemas/MultipleChoicesQuestion"
+        correctAnswerIndex:
+          type: integer
+          format: int32
+        contextSeed:
+          type: integer
+          format: int64
+        testedFocus:
+          type: string
+        validationRationale:
+          type: string
+      required:
+      - id
+      - multipleChoicesQuestion
     BookBlockReadingRecordPutRequest:
       type: object
       properties:
@@ -3377,39 +3438,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/PredefinedQuestionTestData"
-    MultipleChoicesQuestion:
-      type: object
-      properties:
-        questionStem:
-          type: string
-        responseChoices:
-          type: array
-          items:
-            type: string
-      required:
-      - questionStem
-      - responseChoices
-    PredefinedQuestion:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        multipleChoicesQuestion:
-          $ref: "#/components/schemas/MultipleChoicesQuestion"
-        correctAnswerIndex:
-          type: integer
-          format: int32
-        contextSeed:
-          type: integer
-          format: int64
-        testedFocus:
-          type: string
-        validationRationale:
-          type: string
-      required:
-      - id
-      - multipleChoicesQuestion
     SubscriptionDTO:
       type: object
       properties:

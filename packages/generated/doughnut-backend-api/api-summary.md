@@ -3,6 +3,16 @@
 Generated from `open_api_docs.yaml` by `scripts/generate-api-summary.mjs`.
 Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact generated signatures.
 
+## Predefined Question Controller
+
+- `updateQuestion`: PUT `/api/predefined-questions/{note}/note-questions/{question}` -> `UpdateQuestionResponse` (request: `UpdateQuestionData`; path: note, question; body: PredefinedQuestion; response body: PredefinedQuestion)
+- `deleteQuestion`: DELETE `/api/predefined-questions/{note}/note-questions/{question}` -> `DeleteQuestionResponse` (request: `DeleteQuestionData`; path: note, question; response body: void)
+- `refineQuestion`: POST `/api/predefined-questions/{note}/refine-question` -> `RefineQuestionResponse` (request: `RefineQuestionData`; path: note; body: PredefinedQuestion; response body: PredefinedQuestion)
+- `getAllQuestionByNote`: GET `/api/predefined-questions/{note}/note-questions` -> `GetAllQuestionByNoteResponse` (request: `GetAllQuestionByNoteData`; path: note; response body: Array<PredefinedQuestion>)
+- `addQuestionManually`: POST `/api/predefined-questions/{note}/note-questions` -> `AddQuestionManuallyResponse` (request: `AddQuestionManuallyData`; path: note; body: PredefinedQuestion; response body: PredefinedQuestion)
+- `generateQuestionWithoutSave`: POST `/api/predefined-questions/generate-question-without-save` -> `GenerateQuestionWithoutSaveResponse` (request: `GenerateQuestionWithoutSaveData`; query: note; response body: PredefinedQuestion)
+- `exportQuestionGeneration`: GET `/api/predefined-questions/{note}/export-question-generation` -> `ExportQuestionGenerationResponse` (request: `ExportQuestionGenerationData`; path: note; response body: Record<string, unknown>)
+
 ## Notebook Books Controller
 
 - `putNotebookBookBlockReadingRecord`: PUT `/api/notebooks/{notebook}/book/blocks/{bookBlock}/reading-record` -> `PutNotebookBookBlockReadingRecordResponse` (request: `PutNotebookBookBlockReadingRecordData`; path: notebook, bookBlock; body: BookBlockReadingRecordPutRequest; response body: Array<BookBlockReadingRecordListItem>)
@@ -76,15 +86,6 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `contest`: POST `/api/recall-prompts/{recallPrompt}/contest` -> `ContestResponse` (request: `ContestData`; path: recallPrompt; response body: QuestionContestResult)
 - `answerQuiz`: POST `/api/recall-prompts/{recallPrompt}/answer` -> `AnswerQuizResponse` (request: `AnswerQuizData`; path: recallPrompt; body: AnswerDto; response body: AnsweredQuestion)
 - `answerSpelling`: POST `/api/recall-prompts/{recallPrompt}/answer-spelling` -> `AnswerSpellingResponse` (request: `AnswerSpellingData`; path: recallPrompt; body: AnswerSpellingDto; response body: AnsweredQuestion)
-
-## Predefined Question Controller
-
-- `refineQuestion`: POST `/api/predefined-questions/{note}/refine-question` -> `RefineQuestionResponse` (request: `RefineQuestionData`; path: note; body: PredefinedQuestion; response body: PredefinedQuestion)
-- `getAllQuestionByNote`: GET `/api/predefined-questions/{note}/note-questions` -> `GetAllQuestionByNoteResponse` (request: `GetAllQuestionByNoteData`; path: note; response body: Array<PredefinedQuestion>)
-- `addQuestionManually`: POST `/api/predefined-questions/{note}/note-questions` -> `AddQuestionManuallyResponse` (request: `AddQuestionManuallyData`; path: note; body: PredefinedQuestion; response body: PredefinedQuestion)
-- `generateQuestionWithoutSave`: POST `/api/predefined-questions/generate-question-without-save` -> `GenerateQuestionWithoutSaveResponse` (request: `GenerateQuestionWithoutSaveData`; query: note; response body: PredefinedQuestion)
-- `exportQuestionGeneration`: GET `/api/predefined-questions/{note}/export-question-generation` -> `ExportQuestionGenerationResponse` (request: `ExportQuestionGenerationData`; path: note; response body: Record<string, unknown>)
-- `deleteQuestion`: DELETE `/api/predefined-questions/{note}/note-questions/{question}` -> `DeleteQuestionResponse` (request: `DeleteQuestionData`; path: note, question; response body: void)
 
 ## Note Controller
 

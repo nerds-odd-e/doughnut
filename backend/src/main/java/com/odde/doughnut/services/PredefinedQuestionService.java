@@ -56,6 +56,14 @@ public class PredefinedQuestionService {
     predefinedQuestionRepository.delete(predefinedQuestion);
   }
 
+  public PredefinedQuestion updateQuestion(
+      PredefinedQuestion existing, PredefinedQuestion updated) {
+    existing.setMultipleChoicesQuestion(updated.getMultipleChoicesQuestion());
+    existing.setCorrectAnswerIndex(updated.getCorrectAnswerIndex());
+    entityPersister.merge(existing);
+    return existing;
+  }
+
   public QuestionContestResult contest(PredefinedQuestion predefinedQuestion) {
     MCQWithAnswer mcqWithAnswer = predefinedQuestion.getMcqWithAnswer();
     QuestionEvaluation questionContestResult =

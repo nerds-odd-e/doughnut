@@ -61,7 +61,7 @@ Touches:
 - E2E: new scenario "Delete a question from the note" in
   `predefined_questions_management.feature`, tag `@wip` until green.
 
-### Phase 2 — Edit a question (Behavior) — [planned]
+### Phase 2 — Edit a question (Behavior) — [done]
 
 - **Pre-condition:** A note has an existing predefined question.
 - **Trigger:** User clicks "Edit" on a question row; the reused
@@ -113,3 +113,28 @@ Touches:
   "Can refine the question by AI") fail identically on unmodified `main` in
   this sandbox — a pre-existing environment/mock flake unrelated to Phase 1.
   Not fixed as part of this phase (out of scope).
+
+### Phase 2 learnings / deviations
+
+- `PredefinedQuestionService.updateQuestion` only copies the three editable
+  fields (`multipleChoicesQuestion`, `correctAnswerIndex`) onto the existing
+  entity and `entityPersister.merge`s it — `note`/ownership is never touched,
+  matching decision #5's "no new auth/ownership logic" intent.
+- `NoteAddQuestion.vue` prefill: cloning the incoming `existingQuestion` prop
+  with `structuredClone()` throws `DataCloneError` because Vue wraps props in
+  reactive Proxies, which the structured-clone algorithm can't clone. Used
+  `JSON.parse(JSON.stringify(...))` instead — safe here since
+  `PredefinedQuestion` is plain JSON-serialisable data with no
+  functions/dates/cycles.
+- E2E `fillQuestion` (used by "add") unconditionally clicks the `+` button
+  once to grow from the form's default 2 choices to the 3 the test fixtures
+  use. Reusing it for "edit" over-adds a 4th (empty) choice, which fails the
+  `isMCQWithAnswerValid` check and leaves Submit disabled. Split it into
+  `fillQuestionFields` (just types into existing fields, no `+` click) and
+  `fillQuestion` (`+` click then `fillQuestionFields`, used by add/refine);
+  `editQuestion` uses `fillQuestionFields` directly since edit mode is
+  already prefilled with the right number of choices.
+- Reused Phase 1's "is the popup already open" detection
+  (`button[title="Add Question"]` presence) for the new `editQuestion`
+  page-object method, so it works whether or not a prior step in the same
+  scenario already opened the "Questions for the note" dialog.
