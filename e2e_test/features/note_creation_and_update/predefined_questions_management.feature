@@ -42,3 +42,11 @@ Feature: Quiz Question Management
     Then the question in the form becomes:
       | Stem                            | Choice 0                 | Choice 1           | Choice 2      | Correct Choice Index |
       | Why did the cow cross the road? | To get to the udder side | To see the chicken | To find grass | 0                    |
+
+  Scenario: Can delete a question from the note question list
+    Given I am logged in as an existing user
+    And I have a notebook "Cow jokes" with note "The cow joke" and predefined questions in the notebook:
+      | Note Title   | Question             | Answer | One Wrong Choice |
+      | The cow joke | What does a cow say? | moo    | woo              |
+    When I delete the question "What does a cow say?" from the note "The cow joke"
+    Then I should not see the question "What does a cow say?" in the question list of the note "The cow joke"

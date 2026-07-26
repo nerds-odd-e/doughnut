@@ -88,4 +88,6 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
       @Param("memoryTrackerId") Integer memoryTrackerId, @Param("since") Timestamp since);
 
   void deleteByMemoryTracker_Id(Integer memoryTrackerId);
+
+  List<RecallPrompt> findByPredefinedQuestion_IdIn(List<Integer> predefinedQuestionIds);
 }

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import java.util.List;
@@ -96,6 +97,73 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
       controller.addQuestionManually(note, mcqWithAnswer);
       makeMe.refresh(note);
       assertThat(note.getPredefinedQuestions(), hasSize(1));
+    }
+  }
+
+  @Nested
+  class DeleteQuestions {
+    @Test
+    void authorization() {
+      Note note = makeMe.aNote().please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.deleteQuestions(note, List.of(1)));
+    }
+
+    @Test
+    void deletesSingleQuestion() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      PredefinedQuestion question =
+          makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(note).please();
+      controller.deleteQuestions(note, List.of(question.getId()));
+      makeMe.refresh(note);
+      assertThat(note.getPredefinedQuestions(), hasSize(0));
+    }
+
+    @Test
+    void deletesMultipleQuestions() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      PredefinedQuestion first =
+          makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(note).please();
+      PredefinedQuestion second =
+          makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(note).please();
+      controller.deleteQuestions(note, List.of(first.getId(), second.getId()));
+      makeMe.refresh(note);
+      assertThat(note.getPredefinedQuestions(), hasSize(0));
+    }
+
+    @Test
+    void clearsRecallPromptForeignKeyBeforeDelete() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      MemoryTracker memoryTracker =
+          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+      RecallPrompt prompt =
+          makeMe
+              .aRecallPrompt()
+              .forMemoryTracker(memoryTracker)
+              .withPredefinedQuestionForNote(note)
+              .please();
+      Integer questionId = prompt.getPredefinedQuestion().getId();
+      controller.deleteQuestions(note, List.of(questionId));
+      makeMe.refresh(prompt);
+      makeMe.refresh(note);
+      assertThat(prompt.getPredefinedQuestion(), nullValue());
+      assertThat(note.getPredefinedQuestions(), hasSize(0));
+    }
+
+    @Test
+    void rejectsIdsThatDoNotBelongToNote() {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      Note otherNote = makeMe.aNote().please();
+      PredefinedQuestion foreignQuestion =
+          makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(otherNote).please();
+      ApiException thrown =
+          assertThrows(
+              ApiException.class,
+              () -> controller.deleteQuestions(note, List.of(foreignQuestion.getId())));
+      assertThat(
+          thrown.getErrorBody().getMessage(),
+          equalTo("Delete failed: One or more questions do not belong to this note."));
     }
   }
 

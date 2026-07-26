@@ -650,6 +650,24 @@ Then(
   }
 )
 
+When(
+  'I delete the question {string} from the note {string}',
+  (questionStem: string, noteName: string) => {
+    start
+      .jumpToNotePage(noteName, true)
+      .openQuestionList()
+      .selectQuestion(questionStem)
+      .deleteSelectedQuestions()
+  }
+)
+
+Then(
+  'I should not see the question {string} in the question list of the note {string}',
+  (questionStem: string, _noteName: string) => {
+    start.assumeNotePage().expectQuestionAbsentInList(questionStem)
+  }
+)
+
 When('I generate question by AI for note {string}', (noteName: string) => {
   start
     .jumpToNotePage(noteName, true)

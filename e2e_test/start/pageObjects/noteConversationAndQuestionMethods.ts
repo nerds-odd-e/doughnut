@@ -43,6 +43,15 @@ export const noteConversationAndQuestionMethods = () => ({
       }
     })
   },
+  expectQuestionAbsentInList(questionStem: string) {
+    cy.get('body').then(($body) => {
+      if ($body.find('.question-table').length > 0) {
+        questionListPage().expectQuestionAbsent(questionStem)
+      } else {
+        this.openQuestionList().expectQuestionAbsent(questionStem)
+      }
+    })
+  },
   sendMessageToNoteOwner(message: string) {
     cy.intercept('POST', '**/api/conversation/note/**').as(
       'startNoteConversation'

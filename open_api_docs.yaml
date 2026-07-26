@@ -3009,6 +3009,29 @@ paths:
       responses:
         "200":
           description: OK
+  /api/predefined-questions/{note}/note-questions/delete:
+    delete:
+      tags:
+      - predefined-question-controller
+      operationId: deleteQuestions
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: integer
+                format: int32
+        required: true
+      responses:
+        "200":
+          description: OK
   /api/notebooks/{notebook}/book/blocks/{bookBlock}:
     delete:
       tags:
