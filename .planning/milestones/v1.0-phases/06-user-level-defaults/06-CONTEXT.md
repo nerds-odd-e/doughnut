@@ -76,7 +76,7 @@ Delivers DFLT-01 and DFLT-02. Extends the Phase 5 Health action bar (`Remove emp
 - `.cursor/rules/frontend-api.mdc` — generated SDK + `apiCallWithLoading` + error handling
 - `.cursor/rules/db-migration.mdc` — Flyway migrations for new User column
 - `.cursor/rules/e2e-authoring.mdc` — capability-named features, `@wip`, page objects
-- `.cursor/skills/generate-api-client/SKILL.md` — regenerate TS client after OpenAPI/`User`/`UserDTO` change
+- `.agents/skills/generate-api-client/SKILL.md` — regenerate TS client after OpenAPI/`User`/`UserDTO` change
 
 ### Implemented surfaces to extend (must not replace)
 - `frontend/src/components/notebook/NotebookHealthPanel.vue` — action bar + local `removeEmptyFolders` ref; add prefill + Save as defaults

@@ -96,7 +96,7 @@
 ## Function Design
 
 **Size:**
-- Prefer small, focused units. Post-change refactor skill targets splitting files larger than ~250 lines into cohesive modules (`.cursor/skills/post-change-refactor/SKILL.md`).
+- Prefer small, focused units. Post-change refactor skill targets splitting files larger than ~250 lines into cohesive modules (`.agents/skills/post-change-refactor/SKILL.md`).
 - One observable behavior per test method / `it` block.
 
 **Parameters:**

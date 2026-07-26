@@ -80,4 +80,4 @@ Rare maintenance: collapse applied migrations into the baseline so the repo keep
 
 ## Entity-relationship diagram
 
-After adding or changing schema migrations, regenerate **`docs/database-erd.md`** so the Mermaid ERD stays aligned with Flyway. Follow the **`database-erd`** skill (`.cursor/skills/database-erd/SKILL.md`): run `CURSOR_DEV=true nix develop -c pnpm export:database-erd` (or `python3 scripts/export_database_erd.py`) against a migrated local MySQL schema.
+After adding or changing schema migrations, regenerate **`docs/database-erd.md`** so the Mermaid ERD stays aligned with Flyway. Follow the **`database-erd`** skill (`.agents/skills/database-erd/SKILL.md`): run `CURSOR_DEV=true nix develop -c pnpm export:database-erd` (or `python3 scripts/export_database_erd.py`) against a migrated local MySQL schema.

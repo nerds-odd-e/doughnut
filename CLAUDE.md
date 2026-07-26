@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Index for Claude Code and other AI coding agents. Skill contracts: `.cursor/skills/`; rules: `.cursor/rules/`.
+Index for Claude Code and other AI coding agents. Skill contracts: `.agents/skills/`; rules: `.cursor/rules/`.
 
 Doughnut is a Personal Knowledge Management tool combining zettelkasten-style note capture, spaced repetition, and knowledge sharing.
 

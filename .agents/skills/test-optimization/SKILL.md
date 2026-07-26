@@ -47,7 +47,7 @@ When `--resolve` is given, skip every other step and go straight to
    not mask with retries.
 
 **Execution model:** After writing the plan, **always** use **execute-plan**
-(`.cursor/skills/execute-plan/SKILL.md`). Coordinator delegates each group to a
+(`.agents/skills/execute-plan/SKILL.md`). Coordinator delegates each group to a
 fresh sub-agent; each phase runs post-change-refactor, then commits and pushes.
 Do not accumulate context across phases in one agent.
 

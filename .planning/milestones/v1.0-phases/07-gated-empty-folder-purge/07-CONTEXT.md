@@ -78,7 +78,7 @@ Delivers AFIX-02, AFIX-03, AFIX-04, and AFIX-05. Extends the Phase 5/6 Health ac
 - `.planning/codebase/ARCHITECTURE.md` — thin controllers + `AuthorizationService`
 - `.cursor/rules/frontend-api.mdc` — generated SDK + `apiCallWithLoading` + error handling
 - `.cursor/rules/e2e-authoring.mdc` — capability-named features, `@wip`, page objects
-- `.cursor/skills/generate-api-client/SKILL.md` — regenerate TS client after OpenAPI health/fix change
+- `.agents/skills/generate-api-client/SKILL.md` — regenerate TS client after OpenAPI health/fix change
 
 ### Implemented surfaces to extend (must not replace)
 - `frontend/src/components/notebook/NotebookHealthPanel.vue` — action bar + `removeEmptyFolders` + Run lint + Save as defaults; add gated Fix

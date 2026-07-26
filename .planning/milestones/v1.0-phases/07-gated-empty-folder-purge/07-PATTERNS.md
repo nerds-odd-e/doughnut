@@ -569,7 +569,7 @@ export class NotebookHealthController {
 }
 ```
 
-**Regen process** (`.cursor/skills/generate-api-client/SKILL.md`):
+**Regen process** (`.agents/skills/generate-api-client/SKILL.md`):
 1. Land Java controller + DTO first (source of truth).
 2. `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`
 3. Never hand-edit `packages/generated/doughnut-backend-api/**` or `open_api_docs.yaml`.
@@ -657,7 +657,7 @@ if (!Boolean.TRUE.equals(request.getRemoveEmptyFolders())) {
 | Save defaults | `notebook-health-save-defaults` |
 
 ### OpenAPI regen
-**Source:** `.cursor/skills/generate-api-client/SKILL.md`  
+**Source:** `.agents/skills/generate-api-client/SKILL.md`
 **Apply to:** after controller signature lands
 
 ```bash
@@ -684,7 +684,7 @@ None — every planned file has an in-repo analog (Health stack + dissolve’s r
 
 ## Metadata
 
-**Analog search scope:** `backend/.../controllers`, `controllers/dto`, `services`, `services/health`, `frontend/src/components/notebook`, `frontend/tests/components/notebook`, `e2e_test/features/notebooks`, `e2e_test/start/pageObjects`, `e2e_test/step_definitions`, `packages/generated/doughnut-backend-api`, `.cursor/skills/generate-api-client`
+**Analog search scope:** `backend/.../controllers`, `controllers/dto`, `services`, `services/health`, `frontend/src/components/notebook`, `frontend/tests/components/notebook`, `e2e_test/features/notebooks`, `e2e_test/start/pageObjects`, `e2e_test/step_definitions`, `packages/generated/doughnut-backend-api`, `.agents/skills/generate-api-client`
 
 **Files scanned:** ~25 primary analogs (health stack, dissolve, DTOs, E2E, SDK, skill)
 

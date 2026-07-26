@@ -147,7 +147,7 @@ lives in STATE / PLAN files on disk.
 Sub-agent wrap-up checklist (after tests pass):
 
 1. **Delegate refactoring** — Spawn a fresh sub-agent running **post-change-refactor**
-   (`.cursor/skills/post-change-refactor/SKILL.md`) on the uncommitted change.
+   (`.agents/skills/post-change-refactor/SKILL.md`) on the uncommitted change.
    Pass phase text, plan path, nix prefix; **do not commit** from the refactor agent.
 2. **Lint & format** — `CURSOR_DEV=true nix develop -c pnpm lint:all` and
    `CURSOR_DEV=true nix develop -c pnpm format:all`. Fix any issues.

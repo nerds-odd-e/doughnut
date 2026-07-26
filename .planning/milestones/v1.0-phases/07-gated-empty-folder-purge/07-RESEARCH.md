@@ -533,7 +533,7 @@ None blocking. Subtree-safe deletable filter resolves the CASCADE vs D-08 tensio
 - `.planning/phases/07-gated-empty-folder-purge/07-CONTEXT.md` — locked decisions
 - `.planning/phases/02-empty-folder-findings/02-RESEARCH.md` Pitfall 6 — parent vs readme-only child [VERIFIED: prior research]
 - `.planning/research/ARCHITECTURE.md`, `.planning/research/PITFALLS.md` — fix path + dissolve/TOCTOU
-- `.cursor/skills/generate-api-client/SKILL.md` — regen steps
+- `.agents/skills/generate-api-client/SKILL.md` — regen steps
 - Context7 Spring Framework reference — void controller + `@ResponseStatus` patterns [CITED: spring.io reference 6.2]
 
 ### Secondary (MEDIUM confidence)

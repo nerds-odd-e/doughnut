@@ -138,7 +138,7 @@ describe("LoadingModal", () => {
 ```
 
 **Patterns:**
-- **Observable behavior first:** Drive controllers, mounted pages/components, CLI `run` / `runInteractive`, or E2E — not a 1:1 map of production classes (`.cursor/skills/phased-planning/SKILL.md`, backend/frontend testing rules).
+- **Observable behavior first:** Drive controllers, mounted pages/components, CLI `run` / `runInteractive`, or E2E — not a 1:1 map of production classes (`.agents/skills/phased-planning/SKILL.md`, backend/frontend testing rules).
 - Group with `@Nested` (Java) or `describe` (TS); minimal `@BeforeEach` / `beforeEach` shared setup.
 - One behavior per test; descriptive names.
 - Frontend: use `data-testid` selectors; avoid `getByRole` / `findByRole` (slow visibility checks). Prefer `getByText`, `getByLabelText`, `getByTitle`, or `querySelector`.

@@ -525,7 +525,7 @@ Scenario: Save Remove empty folders default applies on another notebook
 - `frontend/src/DoughnutApp.vue`, `UserProfileForm.vue`, `NotebookHealthPanel.vue`, `NotebookPageView.vue` — inject + Health UI
 - `backend/.../db/migration/*` — tip version `V300000231`
 - `.cursor/rules/db-migration.mdc`, `frontend-api.mdc`, `e2e-authoring.mdc`
-- `.cursor/skills/generate-api-client/SKILL.md`
+- `.agents/skills/generate-api-client/SKILL.md`
 - `.planning/research/ARCHITECTURE.md` Pattern 3; `.planning/research/PITFALLS.md` silent mutation
 
 ### Secondary (MEDIUM confidence)

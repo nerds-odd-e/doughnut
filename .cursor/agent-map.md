@@ -1,6 +1,6 @@
 # Agent Map
 
-Short navigation index — start here before generated API files or long docs. Skill contracts: `.cursor/skills/`.
+Short navigation index — start here before generated API files or long docs. Skill contracts: `.agents/skills/`.
 
 ## Work Areas
 

@@ -28,7 +28,7 @@ Output: Passing focused tests + short summary ending with `## BUG FIX COMPLETE`.
   helper.
 
 **Before commit:** run **post-change-refactor**
-(`.cursor/skills/post-change-refactor/SKILL.md`) on the full uncommitted change.
+(`.agents/skills/post-change-refactor/SKILL.md`) on the full uncommitted change.
 </context>
 
 <process>

@@ -351,7 +351,7 @@ assertThrows(
 ```bash
 CURSOR_DEV=true nix develop -c pnpm generateTypeScript
 ```
-Follow `.cursor/skills/generate-api-client/SKILL.md`.
+Follow `.agents/skills/generate-api-client/SKILL.md`.
 
 ## Shared Patterns
 
