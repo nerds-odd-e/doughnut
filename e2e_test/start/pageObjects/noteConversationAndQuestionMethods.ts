@@ -31,6 +31,24 @@ export const noteConversationAndQuestionMethods = () => ({
   addQuestion(row: Record<string, string>) {
     this.openQuestionList().addQuestionPage().addQuestion(row)
   },
+  deleteQuestion(questionStem: string) {
+    cy.get('body').then(($body) => {
+      if ($body.find('button[title="Add Question"]').length > 0) {
+        questionListPage().deleteQuestion(questionStem)
+      } else {
+        this.openQuestionList().deleteQuestion(questionStem)
+      }
+    })
+  },
+  expectQuestionNotInList(questionStem: string) {
+    cy.get('body').then(($body) => {
+      if ($body.find('button[title="Add Question"]').length > 0) {
+        questionListPage().expectQuestionNotInList(questionStem)
+      } else {
+        this.openQuestionList().expectQuestionNotInList(questionStem)
+      }
+    })
+  },
   refineQuestion(row: Record<string, string>) {
     this.openQuestionList().addQuestionPage().refineQuestion(row)
   },

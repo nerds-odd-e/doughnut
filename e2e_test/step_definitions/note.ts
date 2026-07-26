@@ -227,6 +227,20 @@ When(
   }
 )
 
+When(
+  'I delete the question {string} for the note {string}',
+  (questionStem: string, noteTopology: string) => {
+    start.jumpToNotePage(noteTopology).deleteQuestion(questionStem)
+  }
+)
+
+Then(
+  'I should not see the question {string} in the question list of the note {string}',
+  (questionStem: string, _noteTopology: string) => {
+    start.assumeNotePage().expectQuestionNotInList(questionStem)
+  }
+)
+
 Given(
   'I refine the following question for the note {string}:',
   (noteTopology: string, data: DataTable) => {

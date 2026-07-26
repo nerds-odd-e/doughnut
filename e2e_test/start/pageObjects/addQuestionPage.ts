@@ -37,3 +37,16 @@ export const addQuestionPage = () => {
     },
   }
 }
+
+export const deleteQuestion = (questionStem: string) => {
+  cy.intercept('DELETE', '**/api/predefined-questions/**/note-questions/**').as(
+    'deleteQuestion'
+  )
+  cy.contains('.question-table tr', questionStem).within(() => {
+    cy.findByRole('button', { name: 'Delete question' }).click()
+  })
+  cy.findByRole('button', { name: 'OK' }).click()
+  cy.wait('@deleteQuestion').then(({ response }) => {
+    expect(response?.statusCode, 'delete question').to.equal(200)
+  })
+}

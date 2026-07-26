@@ -41,7 +41,7 @@ Treated as an outdated mockup — **out of scope**. This plan covers only
 
 ## Phases
 
-### Phase 1 — Delete a question (Behavior) — [planned]
+### Phase 1 — Delete a question (Behavior) — [done]
 
 - **Pre-condition:** A note has an existing predefined question.
 - **Trigger:** User clicks "Delete" on a question row in the "Questions for
@@ -93,3 +93,23 @@ Touches:
   never lands.
 - No database migration needed (no schema change).
 - No new authorization logic needed (see clarified decision #5).
+
+### Phase 1 learnings / deviations
+
+- `PredefinedQuestionService` needed a direct `PredefinedQuestionRepository`
+  dependency (didn't have one before) — `EntityPersister` only exposes
+  save/merge, not delete. Added the repository as a constructor param,
+  `deleteQuestion()` just calls `repository.delete(...)`.
+- E2E page objects: the "Questions for the note" popup stays mounted across
+  Cucumber steps within one scenario (PopButton's `show` ref isn't reset by
+  `router().push` to the same note URL). The existing `expectQuestionsInList`
+  pattern re-detects "is the dialog already open" by checking for
+  `.question-table` in the DOM — that check breaks once the list is empty
+  (0 questions renders "No questions" instead of the table), so the new
+  `deleteQuestion`/`expectQuestionNotInList` helpers detect open state via
+  the always-present `button[title="Add Question"]` instead.
+- Confirmed (via `git stash` + full SUT restart) that the two pre-existing
+  `@usingMockedOpenAiService` scenarios ("Can generate the question by AI",
+  "Can refine the question by AI") fail identically on unmodified `main` in
+  this sandbox — a pre-existing environment/mock flake unrelated to Phase 1.
+  Not fixed as part of this phase (out of scope).

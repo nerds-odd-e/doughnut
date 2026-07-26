@@ -29,6 +29,7 @@
           <th>B</th>
           <th>C</th>
           <th>D</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -53,6 +54,16 @@
               {{ choice }}
             </td>
           </template>
+          <td>
+            <button
+              class="daisy-btn daisy-btn-outline daisy-btn-sm"
+              aria-label="Delete question"
+              title="Delete question"
+              @click="deleteQuestion(question)"
+            >
+              <Trash2 class="w-4 h-4" />
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -75,7 +86,8 @@ import { PredefinedQuestionController } from "@generated/doughnut-backend-api/sd
 import NoteAddQuestion from "./NoteAddQuestion.vue"
 import QuestionExportDialog from "./QuestionExportDialog.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
-import { Upload } from "@lucide/vue"
+import usePopups from "../commons/Popups/usePopups"
+import { Trash2, Upload } from "@lucide/vue"
 
 const props = defineProps({
   note: {
@@ -85,6 +97,7 @@ const props = defineProps({
 })
 const questions = ref<PredefinedQuestion[]>([])
 const showExportDialog = ref(false)
+const { popups } = usePopups()
 
 const fetchQuestions = async () => {
   const { data: allQuestions, error } =
@@ -100,6 +113,19 @@ const questionAdded = (newQuestion: PredefinedQuestion) => {
     return
   }
   questions.value.push(newQuestion)
+}
+const deleteQuestion = async (question: PredefinedQuestion) => {
+  const confirmed = await popups.confirm("Confirm to delete this question?")
+  if (!confirmed) {
+    return
+  }
+  const { error } = await PredefinedQuestionController.deleteQuestion({
+    path: { note: props.note.id, question: question.id },
+  })
+  if (error) {
+    return
+  }
+  questions.value = questions.value.filter((q) => q.id !== question.id)
 }
 onMounted(() => {
   fetchQuestions()

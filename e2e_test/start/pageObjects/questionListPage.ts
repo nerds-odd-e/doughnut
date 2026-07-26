@@ -1,4 +1,4 @@
-import { addQuestionPage } from './addQuestionPage'
+import { addQuestionPage, deleteQuestion } from './addQuestionPage'
 
 export const questionListPage = () => {
   return {
@@ -12,6 +12,16 @@ export const questionListPage = () => {
         cy.findByText(row['Correct Choice']!).then(($el) => {
           cy.wrap($el).should('have.class', 'correct-choice')
         })
+      })
+    },
+    deleteQuestion(questionStem: string) {
+      deleteQuestion(questionStem)
+    },
+    expectQuestionNotInList(questionStem: string) {
+      cy.get('body').then(($body) => {
+        if ($body.find('.question-table').length > 0) {
+          cy.get('.question-table').should('not.contain.text', questionStem)
+        }
       })
     },
   }
