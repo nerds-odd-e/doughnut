@@ -24,6 +24,24 @@
             @reviewed="() => emit('just-reviewed', undefined)"
           />
         </div>
+        <div
+          v-else-if="!currentRecallPrompt.multipleChoicesQuestion"
+          data-test="question-section"
+        >
+          <div
+            class="daisy-alert daisy-alert-warning mb-4"
+            data-testid="deleted-question-warning"
+            role="alert"
+          >
+            This question was deleted and cannot be reviewed.
+          </div>
+          <JustReview
+            v-bind="{
+              memoryTrackerId: currentMemoryTrackerId,
+            }"
+            @reviewed="() => emit('just-reviewed', undefined)"
+          />
+        </div>
         <template v-else>
          <div class="notebook-source mb-4">
             <NotebookLink :notebook="currentRecallPrompt.notebook" />
@@ -178,7 +196,7 @@ const showContestableDummyInput = computed(
     currentQuestionFetched.value &&
     !isCurrentMemoryTrackerFetching.value &&
     !currentMemoryTracker.value?.spelling &&
-    currentRecallPrompt.value !== undefined
+    currentRecallPrompt.value?.multipleChoicesQuestion != null
 )
 const contestableDummyInput = ref("")
 

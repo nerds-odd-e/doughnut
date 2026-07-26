@@ -3,9 +3,11 @@ package com.odde.doughnut.services;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
@@ -59,5 +61,26 @@ class RecallQuestionServiceTest {
 
     assertThat(result, notNullValue());
     assertThat(result.getMultipleChoicesQuestion(), notNullValue());
+  }
+
+  @Test
+  void shouldReturnOrphanedMcqPromptWhenPredefinedQuestionWasDeleted() {
+    RecallPrompt prompt =
+        makeMe
+            .aRecallPrompt()
+            .forMemoryTracker(memoryTracker)
+            .withPredefinedQuestionForNote(note)
+            .please();
+    PredefinedQuestion deletedQuestion = prompt.getPredefinedQuestion();
+    prompt.setPredefinedQuestion(null);
+    makeMe.entityPersister.save(prompt);
+    makeMe.entityPersister.remove(deletedQuestion);
+    makeMe.entityPersister.flush();
+
+    RecallPrompt result = recallQuestionService.generateAQuestion(memoryTracker);
+
+    assertThat(result, notNullValue());
+    assertThat(result.getId(), equalTo(prompt.getId()));
+    assertThat(result.getMultipleChoicesQuestion(), nullValue());
   }
 }

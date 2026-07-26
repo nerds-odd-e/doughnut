@@ -42,6 +42,15 @@ const recallPage = () => {
         cy.findByRole('button', { name: 'Yes, I remember' }).click({})
       })
     },
+    expectDeletedQuestionWarning() {
+      waitUntilAppIsNotBusy()
+      cy.contains(
+        '[data-testid="deleted-question-warning"]',
+        'This question was deleted and cannot be reviewed.'
+      ).should('be.visible')
+      cy.get('.recall-prompt').should('not.exist')
+      return this
+    },
     typeSpellingAnswer(answer: string) {
       waitUntilAppIsNotBusy()
       cy.get('[data-test="question-section"]', { timeout: 15000 })

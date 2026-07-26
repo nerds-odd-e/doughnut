@@ -162,6 +162,7 @@ public class MemoryTrackerService {
       Boolean correct,
       MemoryTracker memoryTracker,
       Integer thinkingTimeMs) {
+    removeOrphanedUnansweredMcqPrompts(memoryTracker);
     memoryTracker.markAsRecalled(currentUTCTimestamp, correct, thinkingTimeMs);
     entityPersister.save(memoryTracker);
 
@@ -170,6 +171,25 @@ public class MemoryTrackerService {
           memoryTracker, currentUTCTimestamp, WRONG_ANSWER_PERIOD_DAYS, WRONG_ANSWER_THRESHOLD);
     }
     return false;
+  }
+
+  void removeOrphanedUnansweredMcqPrompts(MemoryTracker memoryTracker) {
+    List<RecallPrompt> orphanedMcqPrompts =
+        recallPromptRepository.findAllUnansweredByMemoryTrackerId(memoryTracker.getId()).stream()
+            .filter(prompt -> prompt.getQuestionType() == QuestionType.MCQ)
+            .filter(prompt -> prompt.getPredefinedQuestion() == null)
+            .toList();
+    if (orphanedMcqPrompts.isEmpty()) {
+      return;
+    }
+    conversationRepository
+        .findBySubjectRecallPromptIn(orphanedMcqPrompts)
+        .forEach(
+            conversation -> {
+              conversation.getSubject().setRecallPrompt(null);
+              conversationRepository.save(conversation);
+            });
+    orphanedMcqPrompts.forEach(entityPersister::remove);
   }
 
   public void softDelete(MemoryTracker memoryTracker) {

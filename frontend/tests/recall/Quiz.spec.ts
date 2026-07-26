@@ -151,4 +151,21 @@ describe("repeat page", () => {
       await flushPromises()
     })
   })
+
+  describe("deleted predefined question", () => {
+    it("shows warning and just review when recall prompt has no MCQ", async () => {
+      const hollowPrompt = makeMe.aRecallQuestion.please()
+      hollowPrompt.multipleChoicesQuestion = undefined
+      askAQuestionSpy.mockResolvedValue(wrapSdkResponse(hollowPrompt))
+
+      const quizWrapper = await mountQuizReady([1], 1)
+
+      expect(quizWrapper.text()).toContain(
+        "This question was deleted and cannot be reviewed."
+      )
+      expect(contestableQuestionVisible(quizWrapper)).toBe(false)
+      expect(justReviewVisible(quizWrapper)).toBe(true)
+      expect(contestableDummyInput(quizWrapper).exists()).toBe(false)
+    })
+  })
 })

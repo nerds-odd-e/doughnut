@@ -302,4 +302,42 @@ public class MemoryTrackerServiceTest {
       assertThat(trackers, hasSize(1));
     }
   }
+
+  @Nested
+  class OrphanedMcqCleanup {
+    @Test
+    void markAsRecalledRemovesUnansweredMcqPromptsWithoutPredefinedQuestion() {
+      Note note = makeMe.aNote().notebookOwnedBy(user).please();
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
+      RecallPrompt orphaned =
+          makeMe
+              .aRecallPrompt()
+              .withPredefinedQuestionForNote(note)
+              .forMemoryTracker(memoryTracker)
+              .please();
+      var deletedQuestion = orphaned.getPredefinedQuestion();
+      orphaned.setPredefinedQuestion(null);
+      makeMe.entityPersister.save(orphaned);
+      makeMe.entityPersister.remove(deletedQuestion);
+      makeMe.entityPersister.flush();
+
+      memoryTrackerService.markAsRecalled(day1, true, memoryTracker, null);
+
+      assertThat(memoryTrackerService.getAllRecallPrompts(memoryTracker), empty());
+    }
+
+    @Test
+    void markAsRecalledKeepsSpellingPromptsWithoutPredefinedQuestion() {
+      Note note = makeMe.aNote().notebookOwnedBy(user).please();
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
+      RecallPrompt spelling =
+          makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
+
+      memoryTrackerService.markAsRecalled(day1, true, memoryTracker, null);
+
+      List<RecallPrompt> prompts = memoryTrackerService.getAllRecallPrompts(memoryTracker);
+      assertThat(prompts, hasSize(1));
+      assertThat(prompts.get(0).getId(), equalTo(spelling.getId()));
+    }
+  }
 }

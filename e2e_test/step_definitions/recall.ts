@@ -5,6 +5,7 @@
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import { commonSenseSplit } from 'support/string_util'
 import start from '../start'
+import { waitUntilAppIsNotBusy } from '../start/pageBase'
 import { assumeMemoryTrackerPage } from '../start/pageObjects/memoryTrackerPage'
 
 function assertAssimilationDueOnDay(day: number, toAssimilateAndTotal: string) {
@@ -126,6 +127,17 @@ When(
 
 Then('I choose yes I remember', () => {
   start.recall().assumeRecallPage().yesIRemember()
+})
+
+Then('I should see that the question was deleted and cannot be reviewed', () => {
+  start.recall().assumeRecallPage().expectDeletedQuestionWarning()
+})
+
+Then('I should see that I have finished all recalls for this half a day', () => {
+  waitUntilAppIsNotBusy()
+  cy.findByText('You have finished all recalls for this half a day!').should(
+    'be.visible'
+  )
 })
 
 Then('I skip one question', () => {

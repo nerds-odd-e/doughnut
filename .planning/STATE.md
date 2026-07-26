@@ -2,47 +2,28 @@
 gsd_state_version: 1.0
 milestone: null
 milestone_name: null
-status: Awaiting next milestone
-stopped_at: Milestone v1.1 archived; spent phase history removed
-last_updated: "2026-07-25T00:00:00.000Z"
-last_activity: 2026-07-25
-last_activity_desc: Milestone v1.1 completed, archived, and spent docs cleaned
+status: Active quick plan (phase 1 done)
+stopped_at: Phase 1 recall deleted-question warning done
+last_updated: "2026-07-26T00:00:00.000Z"
+last_activity: 2026-07-26
+last_activity_desc: Phase 1 recall deleted-question warning shipped locally
 progress:
-  total_phases: 0
-  completed_phases: 0
-  total_plans: 0
+  total_phases: 1
+  completed_phases: 1
+  total_plans: 1
   completed_plans: 0
 ---
 
 # State
 
-## Project Reference
+## Current focus
 
-See: `.planning/PROJECT.md` (updated 2026-07-25)
+`.planning/quick/260726-recall-deleted-question/PLAN.md` — **Phase 1 done**. Phase 2 (generate new question from warning) still optional/deferred.
 
-**Core value:** During spelling recall, an answer that names a *different* note becomes a learning opportunity — penalized lightly, both notes revealed, and a link offered — turning recall confusion into connection-building; and overlapping-but-distinct notes are kept distinct by asking the user for a more specific answer.
+## Also open
 
-**Current focus:** Planning next milestone (`/gsd-new-milestone`)
+Note question delete + success toast (earlier work) — E2E for delete list may still need manual verify; SUT needs `OPENAI_API_TOKEN` set for AI mock E2E.
 
-## Current Position
+## Next action
 
-- **Milestone:** v1.1 Spelling Answer Match & Link — SHIPPED 2026-07-25
-- **Status:** Awaiting next milestone
-- **Archives:** `.planning/milestones/v1.1-ROADMAP.md`, `.planning/milestones/v1.1-REQUIREMENTS.md`
-- **Summary:** `.planning/MILESTONES.md`
-
-## Deferred Items
-
-Items acknowledged and deferred at milestone close on 2026-07-25:
-
-| Category | Item | Status |
-|----------|------|--------|
-| quick_task | 260724-db-timezone-fix | closed — kept as forensics for migration comments |
-| milestone_audit | v1.1 formal `/gsd-audit-milestone` | skipped by acknowledgment |
-
-
-## Session Continuity
-
-**Last session:** 2026-07-25
-**Stopped at:** Milestone v1.1 complete + spent phase history cleaned
-**Next action:** `/gsd-new-milestone`
+Confirm / commit if desired; optionally Phase 2 later.
