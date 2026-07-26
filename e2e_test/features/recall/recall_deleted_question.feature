@@ -5,7 +5,6 @@ Feature: Recall after predefined question deleted
   Background:
     Given I am logged in as an existing user
 
-  @mockBrowserTime
   @usingMockedOpenAiService
   Scenario: Deleted question shows warning during recall
     Given I have a notebook "English practice" with notes:
@@ -21,5 +20,5 @@ Feature: Recall after predefined question deleted
     When I delete the question "What is the meaning of sedition?" from the note "sedition"
     And I am recalling my note on day 2
     Then I should see that the question was deleted and cannot be reviewed
-    When I choose yes I remember
+    When I choose that I need more recall
     Then I should see that I have finished all recalls for this half a day

@@ -129,6 +129,10 @@ Then('I choose yes I remember', () => {
   start.recall().assumeRecallPage().yesIRemember()
 })
 
+Then('I choose that I need more recall', () => {
+  start.recall().assumeRecallPage().chooseNeedMoreRecall()
+})
+
 Then('I should see that the question was deleted and cannot be reviewed', () => {
   start.recall().assumeRecallPage().expectDeletedQuestionWarning()
 })

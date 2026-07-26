@@ -42,6 +42,11 @@ const recallPage = () => {
         cy.findByRole('button', { name: 'Yes, I remember' }).click({})
       })
     },
+    chooseNeedMoreRecall() {
+      cy.findByRole('button', { name: 'No, I need more recall' }).click()
+      waitUntilAppIsNotBusy()
+      return this
+    },
     expectDeletedQuestionWarning() {
       waitUntilAppIsNotBusy()
       cy.contains(
