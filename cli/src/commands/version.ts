@@ -1,5 +1,5 @@
 declare const CLI_VERSION: string | undefined
-const VERSION = typeof CLI_VERSION !== 'undefined' ? CLI_VERSION : '0.2.0'
+const VERSION = typeof CLI_VERSION !== 'undefined' ? CLI_VERSION : '0.3.0'
 
 export function getVersion(): string {
   return VERSION
