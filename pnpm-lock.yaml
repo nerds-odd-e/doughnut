@@ -55,6 +55,8 @@ overrides:
   yaml: '>=2.9.0'
   yauzl: '>=3.2.1'
 
+packageExtensionsChecksum: sha256-E7Cci1c7RII7uQbBWBCSDIn5m5iFwi+BxEDdK9b4Yj8=
+
 importers:
 
   .:
@@ -158,7 +160,7 @@ importers:
     dependencies:
       '@inkjs/ui':
         specifier: 2.0.0
-        version: 2.0.0(ink@7.1.1(@types/react@19.2.17)(react@19.2.8))
+        version: 2.0.0(ink@7.1.1(@types/react@19.2.17)(react@19.2.8))(react@19.2.8)
       chalk:
         specifier: ^5.6.2
         version: 5.6.2
@@ -1072,6 +1074,7 @@ packages:
     engines: {node: '>=18'}
     peerDependencies:
       ink: '>=5'
+      react: '*'
 
   '@inquirer/ansi@2.0.7':
     resolution: {integrity: sha512-3eTuUO1vH2cZm2ZKHeQxnOqlTi9EfZDGgIe3BL3I4u+rJHocr9Fz86M4fjYABPvFnQG/gGK551HqDiIcETwU6Q==}
@@ -7324,13 +7327,14 @@ snapshots:
     dependencies:
       hono: 4.12.32
 
-  '@inkjs/ui@2.0.0(ink@7.1.1(@types/react@19.2.17)(react@19.2.8))':
+  '@inkjs/ui@2.0.0(ink@7.1.1(@types/react@19.2.17)(react@19.2.8))(react@19.2.8)':
     dependencies:
       chalk: 5.6.2
       cli-spinners: 3.4.0
       deepmerge: 4.3.1
       figures: 6.1.0
       ink: 7.1.1(@types/react@19.2.17)(react@19.2.8)
+      react: 19.2.8
 
   '@inquirer/ansi@2.0.7': {}
 

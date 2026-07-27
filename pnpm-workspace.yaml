@@ -6,6 +6,13 @@ packages:
   - packages/doughnut-test-fixtures
   - packages/generated/doughnut-backend-api
 
+# @inkjs/ui imports react but only declares peer `ink`; without this, unbundled
+# `pnpm cli` (tsx) fails with ERR_MODULE_NOT_FOUND for react under pnpm isolation.
+packageExtensions:
+  '@inkjs/ui':
+    peerDependencies:
+      react: '*'
+
 overrides:
   '@anev/ts-mountebank>superagent': '>=10.3.0'
   '@hono/node-server': '>=2.0.11'
