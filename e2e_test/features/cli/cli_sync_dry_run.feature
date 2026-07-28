@@ -216,6 +216,7 @@ Feature: Preview what a pull would change
         Estimation
         Definition of done
         Working agreement
+        Team charter
         Retrospective
         Demo
         """
@@ -230,6 +231,7 @@ Feature: Preview what a pull would change
         Estimation
         Definition of done
         Working agreement
+        Team charter
         Retrospective and demo
         Demo
         """
@@ -247,6 +249,7 @@ Feature: Preview what a pull would change
           @@ line 7 @@
             Definition of done
             Working agreement
+            Team charter
           - Retrospective
           + Retrospective and demo
             Demo

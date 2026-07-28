@@ -91,8 +91,9 @@ A changed note is reported as a unified diff of its content.
 - Context lines are prefixed with spaces.
 - Each hunk carries up to 3 unchanged lines before and after the change, as
   `git diff` does. Fewer are shown where the note begins or ends.
-- Changes closer together than their context share one hunk; changes further
-  apart produce separate hunks.
+- Changes whose context would touch share one hunk; changes with more than six
+  unchanged lines between them produce separate hunks, each headed by the line
+  it starts at. A diff of one hunk carries no heading.
 - Note content is compared and printed as raw text. Markdown is not rendered,
   so a change to markup itself remains visible and the `-`/`+` columns stay
   aligned.
@@ -255,6 +256,9 @@ team.md
 Changes separated by more than their context are reported as separate hunks,
 each headed by the line it starts at.
 
+Two changes fall into separate hunks once more than six unchanged lines lie
+between them, so that neither change's three lines of context reach the other.
+
 Given the note "team" holds:
 
 ```
@@ -266,16 +270,17 @@ Story mapping
 Estimation
 Definition of done
 Working agreement
+Team charter
 Retrospective
 Demo
 ```
 
 and the workspace holds the same content,
-when line 2 becomes "Three week sprint" and line 9 becomes
+when line 2 becomes "Three week sprint" and line 10 becomes
 "Retrospective and demo" in Doughnut
 and I run the preview,
-then the diff carries two hunks, because "Estimation" on line 6 lies beyond the
-context of both changes:
+then the diff carries two hunks, each headed by the line it starts at, and the
+seven unchanged lines between them are not all printed:
 
 ```
 team.md
@@ -289,6 +294,7 @@ team.md
   @@ line 7 @@
     Definition of done
     Working agreement
+    Team charter
   - Retrospective
   + Retrospective and demo
     Demo
