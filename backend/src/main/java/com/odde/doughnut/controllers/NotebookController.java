@@ -28,6 +28,7 @@ import com.odde.doughnut.services.FolderRelocationService;
 import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.NotebookCatalogService;
+import com.odde.doughnut.services.NotebookExportService;
 import com.odde.doughnut.services.NotebookGroupService;
 import com.odde.doughnut.services.NotebookIndexingService;
 import com.odde.doughnut.services.NotebookService;
@@ -39,7 +40,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
@@ -67,6 +71,7 @@ class NotebookController {
   private final WikidataService wikidataService;
   private final FolderConstructionService folderConstructionService;
   private final FolderRelocationService folderRelocationService;
+  private final NotebookExportService notebookExportService;
 
   public NotebookController(
       EntityPersister entityPersister,
@@ -84,7 +89,8 @@ class NotebookController {
       NoteConstructionService noteConstructionService,
       WikidataService wikidataService,
       FolderConstructionService folderConstructionService,
-      FolderRelocationService folderRelocationService) {
+      FolderRelocationService folderRelocationService,
+      NotebookExportService notebookExportService) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.notebookIndexingService = notebookIndexingService;
@@ -101,6 +107,7 @@ class NotebookController {
     this.wikidataService = wikidataService;
     this.folderConstructionService = folderConstructionService;
     this.folderRelocationService = folderRelocationService;
+    this.notebookExportService = notebookExportService;
   }
 
   @GetMapping("")
@@ -426,6 +433,21 @@ class NotebookController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
     notebookIndexingService.resetNotebookIndex(notebook);
+  }
+
+  @Operation(operationId = "exportNotebook", summary = "Export notebook as a Markdown zip")
+  @GetMapping(value = "/{notebook}/export", produces = "application/zip")
+  @Transactional(readOnly = true)
+  public ResponseEntity<byte[]> exportNotebook(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertReadAuthorization(notebook);
+    byte[] zipBytes = notebookExportService.exportNotebookAsZip(notebook);
+    String filename = notebookExportService.exportFileName(notebook);
+    return ResponseEntity.ok()
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+        .contentType(MediaType.valueOf("application/zip"))
+        .body(zipBytes);
   }
 
   private Notebook resolveDestinationNotebookForFolderMove(FolderMoveRequest request)
