@@ -339,3 +339,41 @@ export async function attachNotebookBookFile(
     return (await res.json()) as BookFull
   })
 }
+
+/**
+ * Download a notebook as the zip the backend builds from its notes and folders.
+ *
+ * The endpoint is owned by the team building export and is not serving yet; a
+ * 404 is reported as such rather than as an empty notebook. See
+ * `docs/refinement/2026-07-27/QUESTIONS-for-export-team.md`.
+ */
+export async function downloadNotebookExportZip(
+  notebookId: number,
+  signal?: AbortSignal
+): Promise<Buffer> {
+  const stored = loadStoredAccessToken()
+  if (!stored) {
+    throw new Error(authenticatedBackendCallFailureAdvice.noAccessTokenInConfig)
+  }
+
+  const { apiBaseUrl } = getApiConfig()
+  return withBackendClient(stored.token, async () => {
+    const res = await fetch(
+      `${apiBaseUrl}/api/notebooks/${notebookId}/export`,
+      {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${stored.token}` },
+        signal,
+      }
+    )
+    if (res.status === 404) {
+      throw new Error(
+        'Exporting a notebook is not available yet, or the notebook no longer exists in Doughnut.'
+      )
+    }
+    if (!res.ok) {
+      throw { body: await res.text(), status: res.status }
+    }
+    return Buffer.from(await res.arrayBuffer())
+  })
+}

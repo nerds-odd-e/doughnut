@@ -1,6 +1,7 @@
 import type { Notebook } from 'doughnut-api'
 import type { InteractiveSlashCommand } from '../interactiveSlashCommand.js'
 import { attachNotebookSlashCommandFor } from './notebookAttachSlashCommand.js'
+import { syncSlashCommandFor } from './syncSlashCommand.js'
 
 const leaveNotebookDoc = {
   name: '/exit',
@@ -21,6 +22,7 @@ export function notebookStageSlashCommandsFor(
 ): readonly InteractiveSlashCommand[] {
   return [
     attachNotebookSlashCommandFor(notebook),
+    syncSlashCommandFor(notebook),
     leaveNotebookStageSlashCommand,
   ]
 }
