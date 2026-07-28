@@ -126,6 +126,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `myNotebooks`: GET `/api/notebooks` -> `MyNotebooksResponse` (request: none; response body: NotebooksViewedByUser)
 - `listNotebookFolderIndex`: GET `/api/notebooks/{notebook}/folders/index` -> `ListNotebookFolderIndexResponse` (request: `ListNotebookFolderIndexData`; path: notebook; response body: Array<Folder>)
 - `listNotebookFolderListing`: GET `/api/notebooks/{notebook}/folder-listing` -> `ListNotebookFolderListingResponse` (request: `ListNotebookFolderListingData`; path: notebook; query: parent; response body: FolderListing)
+- `exportNotebook`: GET `/api/notebooks/{notebook}/export` -> `ExportNotebookResponse` (request: `ExportNotebookData`; path: notebook; response body: string)
 
 ## Notebook Health Controller
 
