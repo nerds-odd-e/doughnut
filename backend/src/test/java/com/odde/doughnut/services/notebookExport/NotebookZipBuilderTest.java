@@ -39,4 +39,21 @@ class NotebookZipBuilderTest {
     assertThat(entries.get("README.md"), equalTo("# Notebook readme"));
     assertThat(entries.get("First note.md"), equalTo("# First note\n\nFirst body"));
   }
+
+  @Test
+  void writesNestedFoldersWithTheirOwnReadmeAndNotes() throws IOException {
+    ExportFolderRow parent = new ExportFolderRow(10, null, "Parent Folder", "Parent readme");
+    ExportFolderRow child = new ExportFolderRow(11, 10, "Child Folder", null);
+    ExportNoteRow noteInChild = new ExportNoteRow(2, 11, "Nested note", "Nested body");
+
+    byte[] zipBytes = NotebookZipBuilder.build(null, List.of(parent, child), List.of(noteInChild));
+
+    Map<String, String> entries = readZipEntries(zipBytes);
+
+    assertThat(entries.get("Parent Folder/README.md"), equalTo("Parent readme"));
+    assertThat(entries.containsKey("Child Folder/README.md"), equalTo(false));
+    assertThat(
+        entries.get("Parent Folder/Child Folder/Nested note.md"),
+        equalTo("# Nested note\n\nNested body"));
+  }
 }
