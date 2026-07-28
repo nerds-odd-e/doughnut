@@ -56,7 +56,7 @@ public final class NotebookZipBuilder {
       Map<Integer, List<ExportNoteRow>> notesByFolder)
       throws IOException {
     if (readmeContentOrNull != null && !readmeContentOrNull.isBlank()) {
-      writeEntry(zos, pathPrefix + "README.md", readmeContentOrNull);
+      writeEntry(zos, pathPrefix + "index.md", readmeContentOrNull);
     }
 
     Map<Integer, String> noteFileNames =
@@ -85,7 +85,7 @@ public final class NotebookZipBuilder {
   private static String noteFileContent(ExportNoteRow note) {
     String rawContent = note.content() == null ? "" : note.content();
     String body = NoteContentMarkdown.bodyWithoutLeadingFrontmatter(rawContent).stripLeading();
-    return "# " + note.title() + "\n\n" + body;
+    return "---\ndoughnut_id: " + note.id() + "\n---\n\n# " + note.title() + "\n\n" + body;
   }
 
   private static void writeEntry(ZipOutputStream zos, String path, String content)

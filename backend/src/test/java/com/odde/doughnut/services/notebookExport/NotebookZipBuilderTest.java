@@ -27,7 +27,8 @@ class NotebookZipBuilderTest {
   }
 
   @Test
-  void writesNotebookReadmeAndRootNotesAsMarkdownFilesWithTitleHeading() throws IOException {
+  void writesNotebookIndexAndRootNotesAsMarkdownFilesWithIdentityAndTitleHeading()
+      throws IOException {
     byte[] zipBytes =
         NotebookZipBuilder.build(
             "# Notebook readme",
@@ -36,12 +37,14 @@ class NotebookZipBuilderTest {
 
     Map<String, String> entries = readZipEntries(zipBytes);
 
-    assertThat(entries.get("README.md"), equalTo("# Notebook readme"));
-    assertThat(entries.get("First note.md"), equalTo("# First note\n\nFirst body"));
+    assertThat(entries.get("index.md"), equalTo("# Notebook readme"));
+    assertThat(
+        entries.get("First note.md"),
+        equalTo("---\ndoughnut_id: 1\n---\n\n# First note\n\nFirst body"));
   }
 
   @Test
-  void writesNestedFoldersWithTheirOwnReadmeAndNotes() throws IOException {
+  void writesNestedFoldersWithTheirOwnIndexAndNotes() throws IOException {
     ExportFolderRow parent = new ExportFolderRow(10, null, "Parent Folder", "Parent readme");
     ExportFolderRow child = new ExportFolderRow(11, 10, "Child Folder", null);
     ExportNoteRow noteInChild = new ExportNoteRow(2, 11, "Nested note", "Nested body");
@@ -50,21 +53,23 @@ class NotebookZipBuilderTest {
 
     Map<String, String> entries = readZipEntries(zipBytes);
 
-    assertThat(entries.get("Parent Folder/README.md"), equalTo("Parent readme"));
-    assertThat(entries.containsKey("Child Folder/README.md"), equalTo(false));
+    assertThat(entries.get("Parent Folder/index.md"), equalTo("Parent readme"));
+    assertThat(entries.containsKey("Child Folder/index.md"), equalTo(false));
     assertThat(
         entries.get("Parent Folder/Child Folder/Nested note.md"),
-        equalTo("# Nested note\n\nNested body"));
+        equalTo("---\ndoughnut_id: 2\n---\n\n# Nested note\n\nNested body"));
   }
 
   @Test
-  void stripsLeadingInternalFrontmatterFromNoteBody() throws IOException {
+  void stripsInternalFrontmatterButKeepsAStableDoughnutIdentity() throws IOException {
     String contentWithFrontmatter = "---\nwikidata_id: Q123\n---\n\nActual body text";
     ExportNoteRow note = new ExportNoteRow(3, null, "My Note", contentWithFrontmatter);
 
     byte[] zipBytes = NotebookZipBuilder.build(null, List.of(), List.of(note));
 
     Map<String, String> entries = readZipEntries(zipBytes);
-    assertThat(entries.get("My Note.md"), equalTo("# My Note\n\nActual body text"));
+    assertThat(
+        entries.get("My Note.md"),
+        equalTo("---\ndoughnut_id: 3\n---\n\n# My Note\n\nActual body text"));
   }
 }
