@@ -11,6 +11,13 @@ import { NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY } from "@/composables/useNoteSidebar
 import helper, { mockSdkService } from "@tests/helpers"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
+import { saveAs } from "file-saver"
+import createFetchMock from "vitest-fetch-mock"
+
+vi.mock("file-saver", () => ({ saveAs: vi.fn() }))
+
+const fetchMock = createFetchMock(vi)
+fetchMock.enableMocks()
 
 async function pickNotebookCatalogPeerSort(
   wrapper: VueWrapper,
@@ -401,6 +408,40 @@ describe("Notebooks Page", () => {
       await flushPromises()
       expect(screen.queryByTitle("Edit notebook settings")).toBeNull()
       expect(screen.getByTitle("Move to group")).toBeInTheDocument()
+    })
+
+    it("downloads a zip when Export is clicked", async () => {
+      const nb = { ...makeMe.aNotebook.please(), name: "Owned Catalog" }
+      mockSdkService(NotebookController, "myNotebooks", {
+        notebooks: [{ notebook: nb }],
+        catalogItems: makeMe.notebookCatalog.notebooks(nb).please(),
+        subscriptions: [],
+      })
+      fetchMock.resetMocks()
+      fetchMock.mockResponseOnce("zip-file-bytes")
+      const wrapper = helper
+        .component(NotebooksPage)
+        .withCurrentUser(makeMe.aUser.please())
+        .withRouter()
+        .mount()
+      await flushPromises()
+      await fireEvent.click(
+        wrapper.get('[data-cy="notebook-catalog-overflow"]').element
+      )
+      await flushPromises()
+      // Teleported dropdown portals from earlier tests in this file are never
+      // unmounted (no explicit wrapper.unmount()), so more than one portal can
+      // be present; the freshest one (this test's own) is always last in DOM order.
+      const exportButtons = screen.getAllByTitle("Export")
+      await fireEvent.click(exportButtons[exportButtons.length - 1]!)
+      await flushPromises()
+
+      expect(fetchMock).toHaveBeenCalledWith(
+        `/api/notebooks/${nb.id}/export`,
+        expect.objectContaining({ credentials: "same-origin" })
+      )
+      expect(saveAs).toHaveBeenCalled()
+      expect(vi.mocked(saveAs).mock.calls[0][1]).toBe("Owned Catalog.zip")
     })
   })
 

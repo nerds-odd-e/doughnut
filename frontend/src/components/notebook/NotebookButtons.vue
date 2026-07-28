@@ -34,6 +34,17 @@
             Move to group…
           </button>
         </DropdownMenuItem>
+        <DropdownMenuItem>
+          <button
+            type="button"
+            :class="dropdownMenuButtonClass"
+            title="Export"
+            data-testid="notebook-catalog-export"
+            @click="exportNotebook(closeDropdown)"
+          >
+            Export
+          </button>
+        </DropdownMenuItem>
       </DropdownMenu>
     </AutoCollapseDropdown>
     <Modal v-if="showMoveToGroup" @close_request="closeMoveToGroup">
@@ -55,6 +66,8 @@
 <script setup lang="ts">
 import { computed, inject, ref, type ComputedRef } from "vue"
 import { useRouter } from "vue-router"
+import { saveAs } from "file-saver"
+import { useToast } from "vue-toastification"
 import { BookOpen, MoreHorizontal } from "@lucide/vue"
 import type { Notebook, User } from "@generated/doughnut-backend-api"
 import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue"
@@ -108,6 +121,19 @@ const onReadBook = () => {
 const openMoveToGroup = (closeDropdown: () => void) => {
   closeDropdown()
   showMoveToGroup.value = true
+}
+
+const exportNotebook = async (closeDropdown: () => void) => {
+  closeDropdown()
+  const response = await fetch(`/api/notebooks/${props.notebook.id}/export`, {
+    credentials: "same-origin",
+  })
+  if (!response.ok) {
+    useToast().error("Failed to export notebook.")
+    return
+  }
+  const blob = await response.blob()
+  saveAs(blob, `${props.notebook.name}.zip`)
 }
 
 const closeMoveToGroup = () => {
