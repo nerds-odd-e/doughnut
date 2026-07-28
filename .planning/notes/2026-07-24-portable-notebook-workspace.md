@@ -21,9 +21,9 @@ Acceptance examples:
 - Portable content is separated from local synchronization state, and no credentials or secrets are written into the workspace.
 - A failed pull reports what happened and does not present a partial workspace as successfully synchronized.
 
-### 2. Preview a pull without changing files
+### 2. Preview changes before updating an existing workspace
 
-As a notebook owner, I want to preview what a pull would create, update, leave unchanged, or reject so that I can detect naming and mapping problems before writing to my workspace.
+As a notebook owner, I want to preview what the next pull would create, update, move, leave unchanged, or reject so that I can review its effects before changing my existing workspace.
 
 Acceptance examples:
 
