@@ -56,4 +56,15 @@ class NotebookZipBuilderTest {
         entries.get("Parent Folder/Child Folder/Nested note.md"),
         equalTo("# Nested note\n\nNested body"));
   }
+
+  @Test
+  void stripsLeadingInternalFrontmatterFromNoteBody() throws IOException {
+    String contentWithFrontmatter = "---\nwikidata_id: Q123\n---\n\nActual body text";
+    ExportNoteRow note = new ExportNoteRow(3, null, "My Note", contentWithFrontmatter);
+
+    byte[] zipBytes = NotebookZipBuilder.build(null, List.of(), List.of(note));
+
+    Map<String, String> entries = readZipEntries(zipBytes);
+    assertThat(entries.get("My Note.md"), equalTo("# My Note\n\nActual body text"));
+  }
 }

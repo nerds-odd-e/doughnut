@@ -1,5 +1,6 @@
 package com.odde.doughnut.services.notebookExport;
 
+import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -82,7 +83,9 @@ public final class NotebookZipBuilder {
   }
 
   private static String noteFileContent(ExportNoteRow note) {
-    return "# " + note.title() + "\n\n" + (note.content() == null ? "" : note.content());
+    String rawContent = note.content() == null ? "" : note.content();
+    String body = NoteContentMarkdown.bodyWithoutLeadingFrontmatter(rawContent).stripLeading();
+    return "# " + note.title() + "\n\n" + body;
   }
 
   private static void writeEntry(ZipOutputStream zos, String path, String content)
