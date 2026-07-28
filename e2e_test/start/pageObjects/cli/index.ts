@@ -6,7 +6,6 @@ import { useNotebook } from './notebookInteractiveCliSession'
 import {
   editWorkspaceFile,
   previewPull,
-  runSyncWithoutDryRun,
   workspaceFileShouldHold,
   workspaceMatchingNotebook,
   workspaceShouldHoldOnly,
@@ -31,7 +30,6 @@ export const cli = {
   syncWorkspace: {
     editWorkspaceFile,
     previewPull,
-    runSyncWithoutDryRun,
     workspaceFileShouldHold,
     workspaceMatchingNotebook,
     workspaceShouldHoldOnly,

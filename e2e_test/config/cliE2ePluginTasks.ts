@@ -252,16 +252,7 @@ export function createCliE2ePluginTasks(
     createCliConfigDir() {
       return mkdtempSync(join(tmpdir(), 'cypress-cli-config-'))
     },
-    /** A workspace directory holding the given notes, keyed by relative path. */
-    createCliWorkspace(notes: Record<string, string>) {
-      const workspace = mkdtempSync(join(tmpdir(), 'cypress-cli-workspace-'))
-      for (const [relativePath, content] of Object.entries(notes)) {
-        const full = join(workspace, relativePath)
-        mkdirSync(dirname(full), { recursive: true })
-        writeFileSync(full, content, 'utf8')
-      }
-      return workspace
-    },
+
     readCliWorkspaceFile({
       workspace,
       relativePath,

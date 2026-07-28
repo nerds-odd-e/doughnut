@@ -62,12 +62,6 @@ export function previewPull(workspaceName: string) {
   )
 }
 
-export function runSyncWithoutDryRun(workspaceName: string) {
-  return interactiveCli().enterSlashCommandInInteractiveCli(
-    `/sync ${resolveWorkspaceDir(workspaceName)}`
-  )
-}
-
 export function workspaceFileShouldHold(
   workspaceName: string,
   relativePath: string,

@@ -16,27 +16,8 @@ Given(
   }
 )
 
-Given(
-  'I have a notebook {string} with note {string} holding:',
-  (notebookName: string, noteTitle: string, content: string) => {
-    cy.get<string>('@currentLoginUser').then((username) =>
-      start
-        .testability()
-        .injectNotes([{ Title: noteTitle }], username, notebookName)
-    )
-    start.testability().setInjectedNoteContent(noteTitle, content)
-  }
-)
-
 When(
   'the note {string} is changed in Doughnut to {string}',
-  (noteTitle: string, content: string) => {
-    start.testability().setInjectedNoteContent(noteTitle, content)
-  }
-)
-
-When(
-  'the note {string} is changed in Doughnut to:',
   (noteTitle: string, content: string) => {
     start.testability().setInjectedNoteContent(noteTitle, content)
   }
@@ -53,13 +34,6 @@ When(
   'I preview the pull into the workspace {string}',
   (workspaceName: string) => {
     syncWorkspace.previewPull(workspaceName)
-  }
-)
-
-When(
-  'I run sync without --dry-run on the workspace {string}',
-  (workspaceName: string) => {
-    syncWorkspace.runSyncWithoutDryRun(workspaceName)
   }
 )
 
