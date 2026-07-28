@@ -11,6 +11,9 @@ export const notebookCard = (notebook: string) => ({
   openMoveToGroupDialog() {
     findNotebookCardButton(notebook, 'Move to group…').click()
   },
+  exportNotebook() {
+    findNotebookCardButton(notebook, 'Export').click()
+  },
   updateSubscription() {
     findNotebookCardButton(notebook, 'Edit subscription').click()
   },

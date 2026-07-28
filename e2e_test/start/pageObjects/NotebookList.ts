@@ -69,6 +69,7 @@ export const clickNotebookCardTitleToOpenNotebookPage = (
 const OVERFLOW_MENU_ACTION_NAMES = [
   'Edit subscription',
   'Move to group…',
+  'Export',
 ] as const
 
 function usesCatalogOverflowMenu(name: string): boolean {
