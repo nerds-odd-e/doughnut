@@ -1,5 +1,4 @@
 import {
-  existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
@@ -9,50 +8,34 @@ import {
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
-import type { ExportNotebook } from '../src/sync/exportNotebook.js'
 import { previewPull } from '../src/sync/previewPull.js'
+import { zipOfNotes } from './zipFixture.js'
 
 describe('previewPull', () => {
   let workspace: string
-  let exportedInto: string | undefined
 
   beforeEach(() => {
     workspace = mkdtempSync(join(tmpdir(), 'doughnut-previewPull-'))
-    exportedInto = undefined
   })
 
   afterEach(() => {
     rmSync(workspace, { recursive: true, force: true })
   })
 
-  const writeInto = (root: string, relativePath: string, content: string) => {
-    const full = join(root, relativePath)
+  const write = (relativePath: string, content: string) => {
+    const full = join(workspace, relativePath)
     mkdirSync(join(full, '..'), { recursive: true })
     writeFileSync(full, content, 'utf8')
   }
 
-  const write = (relativePath: string, content: string) =>
-    writeInto(workspace, relativePath, content)
-
   const readBack = (relativePath: string) =>
     readFileSync(join(workspace, relativePath), 'utf8')
-
-  /** An export that writes the given notes and records where it was asked to write. */
-  const exportOf =
-    (notes: Record<string, string>): ExportNotebook =>
-    (_notebookId, targetDirectory) => {
-      exportedInto = targetDirectory
-      for (const [path, content] of Object.entries(notes)) {
-        writeInto(targetDirectory, path, content)
-      }
-      return Promise.resolve()
-    }
 
   const preview = (notes: Record<string, string>, path = workspace) =>
     previewPull({
       notebookId: 1,
       workspacePath: path,
-      exportNotebook: exportOf(notes),
+      exportNotebookAsZip: () => Promise.resolve(zipOfNotes(notes)),
     })
 
   test('reports a changed note as a diff', async () => {
@@ -133,6 +116,32 @@ describe('previewPull', () => {
     )
   })
 
+  test('compares a note the export writes with its title as a heading', async () => {
+    write('less.md', '# less\n\nHello')
+
+    await expect(
+      preview({ 'less.md': '# less\n\nHello world!' })
+    ).resolves.toBe(
+      [
+        'less.md',
+        '    # less',
+        '    ',
+        '  - Hello',
+        '  + Hello world!',
+        '',
+        '1 note would change.',
+      ].join('\n')
+    )
+  })
+
+  test('ignores an exported file that is not Markdown', async () => {
+    write('less.md', 'Hello')
+
+    await expect(
+      preview({ 'less.md': 'Hello', 'notes.txt': 'whatever' })
+    ).resolves.toBe('No changes to pull.')
+  })
+
   test('reports a locally edited note as what a pull would overwrite', async () => {
     write('less.md', 'Hello from Obsidian')
 
@@ -163,23 +172,6 @@ describe('previewPull', () => {
     expect(readBack('less.md')).toBe('Hello')
   })
 
-  test('removes the scratch directory it exported into', async () => {
-    write('less.md', 'Hello')
-
-    await preview({ 'less.md': 'Hello world!' })
-
-    expect(exportedInto).toBeDefined()
-    expect(existsSync(exportedInto!)).toBe(false)
-  })
-
-  test('exports into a scratch directory outside the workspace', async () => {
-    write('less.md', 'Hello')
-
-    await preview({ 'less.md': 'Hello world!' })
-
-    expect(exportedInto!.startsWith(workspace)).toBe(false)
-  })
-
   test('reports the same difference when run twice', async () => {
     write('less.md', 'Hello')
 
@@ -195,22 +187,35 @@ describe('previewPull', () => {
     )
   })
 
-  test('removes the scratch directory when the export fails', async () => {
+  test('reads the workspace before asking for an export', async () => {
+    let asked = false
+
+    await expect(
+      previewPull({
+        notebookId: 1,
+        workspacePath: join(workspace, 'nowhere'),
+        exportNotebookAsZip: () => {
+          asked = true
+          return Promise.resolve(zipOfNotes({}))
+        },
+      })
+    ).rejects.toThrow('No directory at')
+
+    expect(asked).toBe(false)
+  })
+
+  test('surfaces a failed export', async () => {
     write('less.md', 'Hello')
-    let attempted: string | undefined
 
     await expect(
       previewPull({
         notebookId: 1,
         workspacePath: workspace,
-        exportNotebook: (_id, targetDirectory) => {
-          attempted = targetDirectory
-          return Promise.reject(new Error('export blew up'))
-        },
+        exportNotebookAsZip: () =>
+          Promise.reject(
+            new Error('Ben Notebook no longer exists in Doughnut.')
+          ),
       })
-    ).rejects.toThrow('export blew up')
-
-    expect(attempted).toBeDefined()
-    expect(existsSync(attempted!)).toBe(false)
+    ).rejects.toThrow('Ben Notebook no longer exists in Doughnut.')
   })
 })
