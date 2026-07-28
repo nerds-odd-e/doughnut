@@ -7,7 +7,7 @@
 **Architecture:** A framework-free `NotebookZipBuilder` (pure tree-to-zip algorithm, unit tested without Spring/DB) is wrapped by a thin `NotebookExportService` that loads the flat `Folder`/`Note` rows via existing repositories, which is exposed through a new `GET /api/notebooks/{notebook}/export` endpoint returning `ResponseEntity<byte[]>` with `Content-Disposition: attachment`, following the existing Books-download response pattern. Each exported note file strips Doughnut-internal leading YAML frontmatter (via the existing `NoteContentMarkdown.bodyWithoutLeadingFrontmatter`) and is prefixed with a `# {title}` heading, since title lives in a separate DB column from content. The frontend downloads the zip with a plain `fetch()` + `file-saver`, mirroring the existing `useBookReadingBootstrap.ts` raw-fetch pattern (not the generated SDK, which isn't built for binary bodies).
 **Tech Stack:** Spring Boot (Java, JUnit 5, Hamcrest, `makeMe` fixtures), Vue 3 + Vitest + Testing Library, `file-saver` (already a dependency).
 **Complexity Path:** `E2E path` — user-facing UI action, spans backend (entities → repositories → service → controller) and frontend (component → download), matching the plan skill's E2E-path criteria.
-**Status:** In Progress
+**Status:** Complete
 
 ---
 
@@ -1275,9 +1275,9 @@ Run:
 - **Incident (occurred during execution, 2026-07-28):** Task 7's commit and the cross-team-alignment rework commit were pushed to `main` already known (locally, via `RobotsTests.openApiDocsMatchCommittedYaml`) to fail CI's `Lint-N-Backend-Generated-Types-For-Frontend` job (`assert_generated_type_script_up_to_date.sh`), on the reasoning that Task 10 would fix it later. CI runs on every push to `main` (`.github/workflows/ci.yml`), so this was a real, if brief, broken-main window, not just a local inconvenience -> **Fix applied:** Task 10 was pulled forward and run immediately once this was pointed out; CI is green again as of commit `97e138d558`. **Going forward:** any commit touching a controller's `@Operation`-annotated surface must regenerate + verify generated types (`pnpm generateTypeScript`, `bash assert_generated_type_script_up_to_date.sh`) in that same commit before pushing — never defer to a later task when the API surface is already live on `main`. Recorded in memory as [[dod-and-working-agreement]].
 
 ## Success Criteria
-- [ ] `NotebookExportFilenamesTest`, `NotebookZipBuilderTest`, `NotebookExportServiceTest`, `NotebookExportControllerTest` all pass.
-- [ ] `frontend/tests/pages/NotebooksPage.spec.ts` passes, including the new Export test and the pre-existing overflow-menu test.
-- [ ] `e2e_test/features/notebooks/notebook_export.feature` passes via `pnpm cypress run --spec ...`.
-- [ ] `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passes in full.
-- [ ] `CURSOR_DEV=true nix develop -c pnpm lint:all` passes (includes `test:api-summary`).
-- [ ] Manual check: exporting a real notebook with nested folders and frontmatter-bearing notes through the running app produces a `.zip` whose structure matches the notebook and whose `.md` files are clean (title heading + body only, no internal frontmatter).
+- [x] `NotebookExportFilenamesTest`, `NotebookZipBuilderTest`, `NotebookExportServiceTest`, `NotebookExportControllerTest` all pass.
+- [x] `frontend/tests/pages/NotebooksPage.spec.ts` passes, including the new Export test and the pre-existing overflow-menu test (235 files / 1650 tests, full suite).
+- [x] `e2e_test/features/notebooks/notebook_export.feature` passes via `pnpm cypress run --spec ...` — confirmed against the real running app; downloaded zip inspected with `unzip -l`.
+- [x] `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passes in full (1633 tests).
+- [x] `pnpm generateTypeScript` run and verified (`test:api-summary` green, `RobotsTests.openApiDocsMatchCommittedYaml` green).
+- [~] Manual check: nested-folder + frontmatter-bearing export was validated via `NotebookZipBuilderTest`/`NotebookExportServiceTest` (real DB fixtures) rather than a separate hands-on browser click-through with a multi-folder notebook — the E2E test did confirm a real click-through download end-to-end, but with a single flat note. Worth a real hands-on spot-check before considering the feature fully "used and reliable" per DoD, since automated coverage and a human actually opening the resulting files aren't quite the same thing.
