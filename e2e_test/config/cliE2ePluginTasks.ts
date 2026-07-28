@@ -2,10 +2,19 @@
  * Cypress `task` handlers for CLI E2E. Depends only on `repoRoot` (repo checkout path).
  */
 
-import { existsSync, mkdtempSync, unlinkSync, writeFileSync } from 'node:fs'
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  unlinkSync,
+  writeFileSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import { delimiter, dirname, join } from 'node:path'
 import { attachGoogleOAuthSimulation } from './cliE2eGoogleOAuthSimulation'
+import { unzipExportedWorkspace } from './unzipExportedWorkspace'
 import {
   bundleCliE2eInstall,
   CLI_E2E_INSTALL_BUNDLE_RELATIVE_PATH,
@@ -242,6 +251,67 @@ export function createCliE2ePluginTasks(
     },
     createCliConfigDir() {
       return mkdtempSync(join(tmpdir(), 'cypress-cli-config-'))
+    },
+    /** A workspace directory holding the given notes, keyed by relative path. */
+    createCliWorkspace(notes: Record<string, string>) {
+      const workspace = mkdtempSync(join(tmpdir(), 'cypress-cli-workspace-'))
+      for (const [relativePath, content] of Object.entries(notes)) {
+        const full = join(workspace, relativePath)
+        mkdirSync(dirname(full), { recursive: true })
+        writeFileSync(full, content, 'utf8')
+      }
+      return workspace
+    },
+    readCliWorkspaceFile({
+      workspace,
+      relativePath,
+    }: {
+      workspace: string
+      relativePath: string
+    }) {
+      return readFileSync(join(workspace, relativePath), 'utf8')
+    },
+    writeCliWorkspaceFile({
+      workspace,
+      relativePath,
+      content,
+    }: {
+      workspace: string
+      relativePath: string
+      content: string
+    }) {
+      const full = join(workspace, relativePath)
+      mkdirSync(dirname(full), { recursive: true })
+      writeFileSync(full, content, 'utf8')
+      return null
+    },
+    /** A workspace holding exactly what a notebook export zip contains. */
+    createCliWorkspaceFromZip({ zipBase64 }: { zipBase64: string }) {
+      const workspace = mkdtempSync(join(tmpdir(), 'cypress-cli-workspace-'))
+      for (const [relativePath, content] of unzipExportedWorkspace(
+        Buffer.from(zipBase64, 'base64')
+      )) {
+        const full = join(workspace, relativePath)
+        mkdirSync(dirname(full), { recursive: true })
+        writeFileSync(full, content, 'utf8')
+      }
+      return workspace
+    },
+    /** Every file in the workspace, as forward-slashed relative paths, sorted. */
+    listCliWorkspaceFiles(workspace: string) {
+      const found: string[] = []
+      const walk = (directory: string, prefix: string) => {
+        for (const entry of readdirSync(directory, { withFileTypes: true })) {
+          const path = join(directory, entry.name)
+          if (entry.isDirectory()) {
+            walk(path, `${prefix}${entry.name}/`)
+          } else {
+            found.push(`${prefix}${entry.name}`)
+          }
+        }
+      }
+      walk(workspace, '')
+      return found.sort()
     },
     createCliConfigDirWithGmail(gmailConfig: Record<string, unknown>) {
       const configDir = mkdtempSync(join(tmpdir(), 'cypress-cli-gmail-'))
