@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import type { Notebook } from 'doughnut-api'
 import { downloadNotebookExportZip } from '../../backendApi/doughnutBackendClient.js'
 import { applyPull } from '../../sync/applyPull.js'
@@ -18,6 +18,70 @@ const syncDoc: CommandDoc = {
     'Pull remote note changes into a local Markdown workspace, or preview them with --dry-run. Only updates files that already exist locally and match an exported note path.',
 }
 
+type SettleProps = Pick<
+  InteractiveSlashCommandStageProps,
+  'onSettled' | 'onAbortWithError'
+>
+
+/**
+ * Report a usage error without a spinner, since nothing is being waited for.
+ */
+function UsageErrorStage({
+  message,
+  onAbortWithError,
+}: { readonly message: string } & Pick<SettleProps, 'onAbortWithError'>) {
+  const reported = useRef(false)
+
+  useEffect(() => {
+    if (reported.current) return
+    reported.current = true
+    onAbortWithError(message)
+  }, [message, onAbortWithError])
+
+  return null
+}
+
+type SyncRunStageProps = SettleProps & {
+  readonly notebookId: number
+  readonly workspacePath: string
+  readonly dryRun: boolean
+}
+
+/** Run the pull, or the preview of it, against an argument already read. */
+function SyncRunStage({
+  notebookId,
+  workspacePath,
+  dryRun,
+  onSettled,
+  onAbortWithError,
+}: SyncRunStageProps) {
+  const runSync = useCallback(
+    (signal: AbortSignal) => {
+      const request = {
+        notebookId,
+        workspacePath,
+        exportNotebookAsZip: downloadNotebookExportZip,
+        signal,
+      }
+      return dryRun ? previewPull(request) : applyPull(request)
+    },
+    [notebookId, workspacePath, dryRun]
+  )
+
+  return (
+    <AsyncAssistantFetchStage
+      spinnerLabel={
+        dryRun
+          ? 'Comparing the workspace with the notebook…'
+          : 'Pulling remote changes into the workspace…'
+      }
+      runAssistantMessage={runSync}
+      onSettled={onSettled}
+      onAbortWithError={onAbortWithError}
+    />
+  )
+}
+
 export function syncSlashCommandFor(
   notebook: Notebook
 ): InteractiveSlashCommand {
@@ -26,35 +90,19 @@ export function syncSlashCommandFor(
     onSettled,
     onAbortWithError,
   }: InteractiveSlashCommandStageProps) {
-    const runSync = useCallback(
-      (signal: AbortSignal) => {
-        const parsed = parseSyncArgument(argument)
-        if (parsed.error !== undefined) {
-          return Promise.reject(new Error(parsed.error))
-        }
-        const request = {
-          notebookId: notebook.id,
-          workspacePath: parsed.workspacePath,
-          exportNotebookAsZip: downloadNotebookExportZip,
-          signal,
-        }
-        return parsed.dryRun ? previewPull(request) : applyPull(request)
-      },
-      [argument]
-    )
-
     const parsed = parseSyncArgument(argument)
-    const dryRun = parsed.error === undefined && parsed.dryRun
 
-    return (
-      <AsyncAssistantFetchStage
-        spinnerLabel={
-          dryRun
-            ? 'Comparing the workspace with the notebook…'
-            : 'Pulling remote changes into the workspace…'
-        }
-        runAssistantMessage={runSync}
+    return parsed.error === undefined ? (
+      <SyncRunStage
+        notebookId={notebook.id}
+        workspacePath={parsed.workspacePath}
+        dryRun={parsed.dryRun}
         onSettled={onSettled}
+        onAbortWithError={onAbortWithError}
+      />
+    ) : (
+      <UsageErrorStage
+        message={parsed.error}
         onAbortWithError={onAbortWithError}
       />
     )

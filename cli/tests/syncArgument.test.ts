@@ -54,6 +54,12 @@ describe('parseSyncArgument', () => {
     })
   })
 
+  test('rejects the dry run flag typed after the workspace path', () => {
+    expect(parseSyncArgument('./BenNotebook --dry-run')).toEqual({
+      error: 'Usage: /sync [--dry-run] <workspace path>',
+    })
+  })
+
   test('strips surrounding double quotes from the workspace path', () => {
     expect(parseSyncArgument('"/mnt/d/LeSS/Perf Notebook"')).toEqual({
       workspacePath: '/mnt/d/LeSS/Perf Notebook',

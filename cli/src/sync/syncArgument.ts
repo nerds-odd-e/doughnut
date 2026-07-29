@@ -33,6 +33,12 @@ export function parseSyncArgument(argument: string | undefined): SyncArgument {
   }
 
   if (workspacePart === '') return { error: USAGE }
+  // The flag is only read where the usage puts it. Typed after the path it would
+  // otherwise become part of the path and be reported as a missing directory,
+  // which says nothing about the flag being in the wrong place.
+  if (workspacePart.split(/\s+/).includes(DRY_RUN_FLAG)) {
+    return { error: USAGE }
+  }
   return { workspacePath: stripSurroundingQuotes(workspacePart), dryRun }
 }
 
