@@ -229,6 +229,72 @@ describe('diffLines', () => {
     )
   })
 
+  test('heads a hunk with its line in the note, not in the compared region', () => {
+    // Ten unchanged lines lead in and out, so all but the context around each
+    // change is left out of the comparison; the headings still count from the
+    // first line of the note.
+    const pad = (tag: string, count: number) =>
+      Array.from({ length: count }, (_, i) => `${tag}${i}`)
+    const before = [
+      ...pad('pad', 10),
+      'CHANGED',
+      ...pad('gap', 7),
+      'CHANGED TOO',
+      ...pad('tail', 10),
+    ]
+    const after = [...before]
+    after[10] = 'changed'
+    after[18] = 'changed too'
+
+    expect(render(before.join('\n'), after.join('\n'))).toBe(
+      [
+        '@@ line 8 @@',
+        '  pad7',
+        '  pad8',
+        '  pad9',
+        '- CHANGED',
+        '+ changed',
+        '  gap0',
+        '  gap1',
+        '  gap2',
+        '@@ line 16 @@',
+        '  gap4',
+        '  gap5',
+        '  gap6',
+        '- CHANGED TOO',
+        '+ changed too',
+        '  tail0',
+        '  tail1',
+        '  tail2',
+      ].join('\n')
+    )
+  })
+
+  test('diffs one changed line in a note of twenty thousand within a second', () => {
+    // The comparison costs the product of the two lengths, so a note this long
+    // is only affordable because the unchanged head and tail are left out of it.
+    const before = Array.from({ length: 20_000 }, (_, i) => `line ${i}`)
+    const after = [...before]
+    after[10_000] = 'changed line'
+
+    const started = performance.now()
+    const rendered = render(before.join('\n'), after.join('\n'))
+
+    expect(performance.now() - started).toBeLessThan(1000)
+    expect(rendered).toBe(
+      [
+        '  line 9997',
+        '  line 9998',
+        '  line 9999',
+        '- line 10000',
+        '+ changed line',
+        '  line 10001',
+        '  line 10002',
+        '  line 10003',
+      ].join('\n')
+    )
+  })
+
   test('treats a blank line as content', () => {
     expect(
       render(

@@ -43,34 +43,85 @@ type WalkedLine = DiffLine & {
 
 function walk(
   before: readonly string[],
-  after: readonly string[]
+  after: readonly string[],
+  firstBeforeLine: number
 ): WalkedLine[] {
   const table = lcsLengths(before, after)
   const walked: WalkedLine[] = []
   let i = 0
   let j = 0
+  const beforeLine = () => firstBeforeLine + i
   while (i < before.length && j < after.length) {
     if (before[i] === after[j]) {
-      walked.push({ kind: 'context', text: before[i]!, beforeLine: i + 1 })
+      walked.push({
+        kind: 'context',
+        text: before[i]!,
+        beforeLine: beforeLine(),
+      })
       i++
       j++
     } else if (table[i + 1]![j]! >= table[i]![j + 1]!) {
-      walked.push({ kind: 'removed', text: before[i]!, beforeLine: i + 1 })
+      walked.push({
+        kind: 'removed',
+        text: before[i]!,
+        beforeLine: beforeLine(),
+      })
       i++
     } else {
-      walked.push({ kind: 'added', text: after[j]!, beforeLine: i + 1 })
+      walked.push({ kind: 'added', text: after[j]!, beforeLine: beforeLine() })
       j++
     }
   }
   while (i < before.length) {
-    walked.push({ kind: 'removed', text: before[i]!, beforeLine: i + 1 })
+    walked.push({ kind: 'removed', text: before[i]!, beforeLine: beforeLine() })
     i++
   }
   while (j < after.length) {
-    walked.push({ kind: 'added', text: after[j]!, beforeLine: i + 1 })
+    walked.push({ kind: 'added', text: after[j]!, beforeLine: beforeLine() })
     j++
   }
   return walked
+}
+
+type TrimmedSides = {
+  readonly before: readonly string[]
+  readonly after: readonly string[]
+  /** 1-based line the kept region starts at on the removed side. */
+  readonly firstBeforeLine: number
+}
+
+/**
+ * Narrow both sides to the region a diff can print, by dropping the unchanged
+ * head and tail they share beyond the context lines.
+ *
+ * The comparison below costs the product of the two lengths in time and memory,
+ * so a note of many lines with one line changed would otherwise pay for its
+ * whole length. Only lines past the context are dropped, so every hunk still
+ * prints the unchanged lines around its change, and the diff is the same one
+ * comparing the sides whole would produce.
+ */
+function trimUnchangedEdges(
+  before: readonly string[],
+  after: readonly string[]
+): TrimmedSides {
+  const shorter = Math.min(before.length, after.length)
+  let prefix = 0
+  while (prefix < shorter && before[prefix] === after[prefix]) prefix++
+  let suffix = 0
+  while (
+    suffix < shorter - prefix &&
+    before[before.length - 1 - suffix] === after[after.length - 1 - suffix]
+  ) {
+    suffix++
+  }
+
+  const head = Math.max(0, prefix - CONTEXT_LINES)
+  const tail = Math.max(0, suffix - CONTEXT_LINES)
+  return {
+    before: before.slice(head, before.length - tail),
+    after: after.slice(head, after.length - tail),
+    firstBeforeLine: head + 1,
+  }
 }
 
 /** Index ranges of `walked` to keep: each change plus its surrounding context. */
@@ -104,7 +155,8 @@ export function diffLines(before: string, after: string): DiffHunk[] {
 
   // Empty content is no lines at all, where splitting would yield one blank one.
   const lines = (content: string) => (content === '' ? [] : content.split('\n'))
-  const walked = walk(lines(before), lines(after))
+  const sides = trimUnchangedEdges(lines(before), lines(after))
+  const walked = walk(sides.before, sides.after, sides.firstBeforeLine)
   const ranges = keptRanges(walked)
 
   return ranges.map(({ from, to }) => ({
