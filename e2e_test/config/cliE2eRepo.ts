@@ -49,7 +49,7 @@ const CLI_E2E_INSTALL_BUNDLE_OUTFILE =
   './dist/e2e-install-doughnut-cli.bundle.mjs'
 
 function cliE2eInstallBundleVersion(env?: NodeJS.ProcessEnv): string {
-  return env?.CLI_VERSION ?? process.env.CLI_VERSION ?? '0.3.0'
+  return env?.CLI_VERSION ?? process.env.CLI_VERSION ?? '0.4.0'
 }
 
 function cliE2eInstallBundleCacheRelativePath(version: string): string {

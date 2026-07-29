@@ -6,8 +6,8 @@ import {
 } from '../src/commands/version.js'
 
 describe('version', () => {
-  test('default version matches cli_install_and_run.feature (0.3.0)', () => {
-    expect(getVersion()).toBe('0.3.0')
+  test('default version matches cli_install_and_run.feature (0.4.0)', () => {
+    expect(getVersion()).toBe('0.4.0')
   })
 
   test('getVersion returns version string', () => {

@@ -33,7 +33,7 @@ describe('runUpdate', () => {
     )
 
     vi.mocked(childProcess.spawnSync).mockReturnValue({
-      stdout: 'doughnut 0.3.0',
+      stdout: 'doughnut 0.4.0',
       stderr: '',
       status: 0,
       error: undefined,
@@ -45,7 +45,7 @@ describe('runUpdate', () => {
     await runUpdate()
 
     expect(consoleSpy).toHaveBeenCalledWith(
-      'doughnut 0.3.0 is already the latest version'
+      'doughnut 0.4.0 is already the latest version'
     )
   })
 
@@ -63,7 +63,7 @@ describe('runUpdate', () => {
     )
 
     vi.mocked(childProcess.spawnSync).mockReturnValue({
-      stdout: 'doughnut 0.4.0',
+      stdout: 'doughnut 0.5.0',
       stderr: '',
       status: 0,
       error: undefined,
@@ -75,7 +75,7 @@ describe('runUpdate', () => {
     await runUpdate()
 
     expect(consoleSpy).toHaveBeenCalledWith(
-      'Updated doughnut from 0.3.0 to 0.4.0'
+      'Updated doughnut from 0.4.0 to 0.5.0'
     )
   })
 
