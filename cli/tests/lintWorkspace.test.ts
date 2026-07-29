@@ -26,4 +26,17 @@ describe('lintWorkspace', () => {
 
     expect(lintWorkspace(root)).toContain('banana.md:1')
   })
+
+  test('reports frontmatter that does not say what type the concept is', () => {
+    write('apple.md', '---\ntitle: apple\n---\n\n# apple')
+
+    expect(lintWorkspace(root)).toContain('Frontmatter has no `type` key')
+  })
+
+  test('reports nothing when every concept has frontmatter', () => {
+    write('apple.md', '---\ntype: concept\n---\n\n# apple')
+    write('fruit/banana.md', '---\ntype: concept\n---\n\n# banana')
+
+    expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
+  })
 })
