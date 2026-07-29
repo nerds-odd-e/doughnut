@@ -4,6 +4,7 @@ import { backend } from './backend'
 import { interactiveCli } from './interactiveCli'
 import { useNotebook } from './notebookInteractiveCliSession'
 import {
+  addExtraDestinationFile,
   destinationFileShouldHold,
   destinationShouldHoldOnly,
   emptyDestination,
@@ -54,6 +55,7 @@ export const cli = {
     workspaceShouldHoldOnly,
   },
   exportDestination: {
+    addExtraDestinationFile,
     destinationFileShouldHold,
     destinationShouldHoldOnly,
     emptyDestination,

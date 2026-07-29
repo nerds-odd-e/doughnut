@@ -1,4 +1,10 @@
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import {
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
@@ -62,5 +68,25 @@ describe('writeNotebookExport', () => {
         '2 files written.',
       ].join('\n')
     )
+  })
+
+  test('overwrites a file of the same name on a repeated export', async () => {
+    await write({ 'less.md': 'Hello world!' })
+    await write({ 'less.md': 'Hi' })
+
+    expect(readBack('Ben Notebook/less.md')).toBe('Hi')
+  })
+
+  test('leaves files it did not write alone', async () => {
+    const notebookDir = join(destination, 'Ben Notebook')
+    mkdirSync(notebookDir, { recursive: true })
+    writeFileSync(join(notebookDir, 'scratch.md'), 'keep me', 'utf8')
+    writeFileSync(join(destination, 'unrelated.txt'), 'not mine', 'utf8')
+
+    await write({ 'less.md': 'Hello' })
+
+    expect(readBack('Ben Notebook/less.md')).toBe('Hello')
+    expect(readBack('Ben Notebook/scratch.md')).toBe('keep me')
+    expect(readBack('unrelated.txt')).toBe('not mine')
   })
 })

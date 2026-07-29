@@ -12,6 +12,13 @@ Given('an empty export destination {string}', (name: string) => {
   exportDestination.emptyDestination(name)
 })
 
+Given(
+  'the export destination {string} has an extra file {string} with content:',
+  (name: string, relativePath: string, content: string) => {
+    exportDestination.addExtraDestinationFile(name, relativePath, content)
+  }
+)
+
 When('I export the notebook into {string}', (name: string) => {
   exportDestination.exportNotebook(name)
 })

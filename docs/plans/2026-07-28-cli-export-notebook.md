@@ -247,13 +247,21 @@ Inward: Slice 1 already used `{ recursive: true }` and path-ordering in
 `writeNotebookExport.test.ts`. The only new glue was
 `testability.setNotebookReadmeContent` so e2e can seed notebook readme without UI.
 
-### Slice 3 — e2e: what a repeated export means
+### Slice 3 — e2e: what a repeated export means — DONE
 
-Add scenarios: export, change a note in Doughnut, export again, and the file is current; and,
-separately, an unrelated file placed in the target survives an export.
+Pinned at the outermost layer: `cli_export.feature` gained "Exporting again reflects a changed
+note" (export, change the note in Doughnut via the existing `the note ... is changed in
+Doughnut to ...` step, export again, assert the file and the tree shape) and "An unrelated file
+in the destination survives an export" (seed a file inside the notebook subdirectory before
+exporting, assert it and the exported note both survive). New `addExtraDestinationFile` page
+object helper (guards against writing into an unregistered destination — see
+`exportDestination.ts`), wired through `index.ts` and a new step in `cli_export.ts`.
 
-Inward: add "overwrites a file of the same name" and "leaves unrelated files alone" cases to
-`writeNotebookExport.test.ts`.
+Inward: `writeNotebookExport.test.ts` gained "overwrites a file of the same name on a repeated
+export" and "leaves files it did not write alone" (covers a file inside the notebook
+subdirectory and a sibling at the destination root). No production code changed —
+`writeNotebookExport.ts` already never clears its destination and only writes the paths in the
+zip, so this slice locks in existing behaviour with tests, the same pattern Slice 2 used.
 
 ### Slice 4 — e2e: failures are reported, not silently succeeded
 

@@ -51,3 +51,34 @@ Feature: Export a notebook to a local Markdown tree
       | Ben Notebook/intro.md               |
       | Ben Notebook/LeSS in Action/team.md |
     And the file "Ben Notebook/LeSS in Action/team.md" in the export destination "./ExportTarget" should hold "Sprint"
+
+  Scenario: Exporting again reflects a changed note
+    Given I have a notebook "Ben Notebook" with notes:
+      | Title | Content |
+      | less  | Hello   |
+    And an empty export destination "./ExportTarget"
+    And I enter the slash command "/use Ben Notebook" in the interactive CLI
+    And I export the notebook into "./ExportTarget"
+    When the note "less" is changed in Doughnut to "Hello world!"
+    And I export the notebook into "./ExportTarget"
+    Then the export destination "./ExportTarget" should hold only:
+      | Path                 |
+      | Ben Notebook/less.md |
+    And the file "Ben Notebook/less.md" in the export destination "./ExportTarget" should hold "Hello world!"
+
+  Scenario: An unrelated file in the destination survives an export
+    Given I have a notebook "Ben Notebook" with notes:
+      | Title | Content |
+      | less  | Hello   |
+    And an empty export destination "./ExportTarget"
+    And the export destination "./ExportTarget" has an extra file "Ben Notebook/scratch.md" with content:
+      """
+      keep me
+      """
+    And I enter the slash command "/use Ben Notebook" in the interactive CLI
+    When I export the notebook into "./ExportTarget"
+    Then the export destination "./ExportTarget" should hold only:
+      | Path                    |
+      | Ben Notebook/less.md    |
+      | Ben Notebook/scratch.md |
+    And the file "Ben Notebook/scratch.md" in the export destination "./ExportTarget" should hold "keep me"

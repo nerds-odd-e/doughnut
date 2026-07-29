@@ -15,6 +15,16 @@ export function resolveDestinationDir(name: string): string {
   return destinationDirsByName.get(name) ?? name
 }
 
+function requireDestinationDir(name: string): string {
+  const dir = destinationDirsByName.get(name)
+  if (!dir) {
+    throw new Error(
+      `No export destination named "${name}". Add: Given an empty export destination "${name}"`
+    )
+  }
+  return dir
+}
+
 export function emptyDestination(name: string) {
   return cy.task<string>('createCliEmptyDirectory').then((dir) => {
     destinationDirsByName.set(name, dir)
@@ -25,6 +35,19 @@ export function exportNotebook(name: string) {
   return interactiveCli().enterSlashCommandInInteractiveCli(
     `/export ${resolveDestinationDir(name)}`
   )
+}
+
+/** Put a file in the destination before an export, to prove export leaves it alone. */
+export function addExtraDestinationFile(
+  name: string,
+  relativePath: string,
+  content: string
+) {
+  return cy.task('writeCliWorkspaceFile', {
+    workspace: requireDestinationDir(name),
+    relativePath,
+    content,
+  })
 }
 
 export function destinationFileShouldHold(
