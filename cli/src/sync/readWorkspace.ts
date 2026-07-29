@@ -1,5 +1,6 @@
-import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { join, posix, sep } from 'node:path'
+import { isDirectory } from './isDirectory.js'
 
 const MARKDOWN_SUFFIX = '.md'
 
@@ -13,14 +14,6 @@ const MARKDOWN_SUFFIX = '.md'
  */
 function noteContent(path: string): string {
   return readFileSync(path, 'utf8').replace(/\r\n/g, '\n')
-}
-
-function isDirectory(path: string): boolean {
-  try {
-    return statSync(path).isDirectory()
-  } catch {
-    return false
-  }
 }
 
 function collect(

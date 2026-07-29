@@ -263,13 +263,17 @@ subdirectory and a sibling at the destination root). No production code changed 
 `writeNotebookExport.ts` already never clears its destination and only writes the paths in the
 zip, so this slice locks in existing behaviour with tests, the same pattern Slice 2 used.
 
-### Slice 4 — e2e: failures are reported, not silently succeeded
+### Slice 4 — e2e: failures are reported, not silently succeeded — DONE
 
-Add a scenario: `/export ./NoSuchDirectory` shows a readable error (the existing
-`I should see "..." in past CLI assistant messages` step).
+Pinned at the outermost layer: `cli_export.feature` gained "A destination that does not exist
+reports a readable error" (`/export ./NoSuchDirectory` where no page-object directory is
+registered for that name, so the literal string reaches the CLI unresolved). Confirmed red
+first: without a destination-existence check, `writeNotebookExport`'s `mkdirSync(...,
+{recursive: true})` silently created the missing tree and the notebook exported successfully.
 
-Inward: write the "missing argument -> usage" and "path does not exist" cases in
-`cli/tests/exportDestination.test.ts` (red), then add `cli/src/sync/exportDestination.ts`:
+Inward: `cli/tests/exportDestination.test.ts` covers "rejects a missing argument", "rejects a
+blank argument", "resolves an existing directory", "rejects a path that does not exist", and
+"rejects a path that is a file" — then `cli/src/sync/exportDestination.ts` was added:
 
 ```ts
 export type ExportDestination =
@@ -278,12 +282,29 @@ export type ExportDestination =
 export function parseExportDestination(argument: string | undefined): ExportDestination
 ```
 
-- Empty -> `error: 'Usage: /export <destination directory>'`
-- Otherwise `resolve(process.cwd(), ...)`
+- Empty (after trimming) -> `error: 'Usage: /export <destination directory>'`
+- Otherwise strip surrounding shell-style quotes (a new shared
+  `cli/src/sync/stripSurroundingQuotes.ts`, deduped out of `syncArgument.ts`, which carried its
+  own copy — a quoted destination is exactly what a user types for a path with spaces), then
+  `resolve(process.cwd(), ...)`, then `error: 'No directory at <resolved>.'` unless that path is
+  an existing directory (symlinks included) — same wording `readWorkspace.ts` already uses for
+  `/sync`, via a new shared `cli/src/sync/isDirectory.ts` (deduped out of `readWorkspace.ts`,
+  which carried its own copy).
 
-Wire it into `exportSlashCommand.tsx`: an error becomes `Promise.reject(new Error(...))`,
-otherwise call inward. The stage's error path is then complete — a failed download is already
-handled by `downloadNotebookExportZip`'s classified messages plus `AsyncAssistantFetchStage`.
+Wired into `exportSlashCommand.tsx` by splitting the stage in two (`ExportRunStage` for the
+happy path, the parse error otherwise), rather than the `Promise.reject` this section
+originally sketched: `c657c674ad` ("fix(cli): report a /sync usage error without a spinner",
+merged the day this slice was implemented) had already found that raising a usage error from
+inside the async work flashes the spinner label first. That fix's `UsageErrorStage` component
+was lifted out of `syncSlashCommand.tsx` into shared `cli/src/commands/UsageErrorStage.tsx`
+(not `commands/notebook/`, since it has no notebook dependency) and reused here instead of
+duplicating it; a component test in `cli/tests/exportSlashCommand.test.tsx` pins that the
+export spinner never renders before the error. Parsing moved into `useMemo` so a re-render
+(e.g. a terminal resize) does not re-run `statSync` or flip the stage mid-export. The
+`onSettled`/`onAbortWithError` pair each stage split needs is now the shared
+`InteractiveSlashCommandSettleProps` type (`interactiveSlashCommand.ts`) rather than a
+`SettleProps` alias redefined in both `syncSlashCommand.tsx` and `exportSlashCommand.tsx`.
+`exportDoc`'s description now says "into an existing directory".
 
 ### Slice 5 — Inner edge cases (unit tests only, no new scenario)
 

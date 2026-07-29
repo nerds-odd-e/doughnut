@@ -11,6 +11,12 @@ export type InteractiveSlashCommandStageProps = {
   readonly onAbortWithError: (message: string) => void
 }
 
+/** The completion callbacks alone, for a stage split into an argument-parsing part and a run part. */
+export type InteractiveSlashCommandSettleProps = Pick<
+  InteractiveSlashCommandStageProps,
+  'onSettled' | 'onAbortWithError'
+>
+
 type InteractiveSlashCommandResult = {
   assistantMessage: string
 }

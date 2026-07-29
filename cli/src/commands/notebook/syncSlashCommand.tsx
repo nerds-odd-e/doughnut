@@ -1,13 +1,15 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback } from 'react'
 import type { Notebook } from 'doughnut-api'
 import { downloadNotebookExportZip } from '../../backendApi/doughnutBackendClient.js'
 import { applyPull } from '../../sync/applyPull.js'
 import { previewPull } from '../../sync/previewPull.js'
 import { parseSyncArgument } from '../../sync/syncArgument.js'
 import { AsyncAssistantFetchStage } from '../gmail/AsyncAssistantFetchStage.js'
+import { UsageErrorStage } from '../UsageErrorStage.js'
 import type {
   CommandDoc,
   InteractiveSlashCommand,
+  InteractiveSlashCommandSettleProps,
   InteractiveSlashCommandStageProps,
 } from '../interactiveSlashCommand.js'
 
@@ -18,30 +20,7 @@ const syncDoc: CommandDoc = {
     'Pull remote note changes into a local Markdown workspace, or preview them with --dry-run. Only updates files that already exist locally and match an exported note path.',
 }
 
-type SettleProps = Pick<
-  InteractiveSlashCommandStageProps,
-  'onSettled' | 'onAbortWithError'
->
-
-/**
- * Report a usage error without a spinner, since nothing is being waited for.
- */
-function UsageErrorStage({
-  message,
-  onAbortWithError,
-}: { readonly message: string } & Pick<SettleProps, 'onAbortWithError'>) {
-  const reported = useRef(false)
-
-  useEffect(() => {
-    if (reported.current) return
-    reported.current = true
-    onAbortWithError(message)
-  }, [message, onAbortWithError])
-
-  return null
-}
-
-type SyncRunStageProps = SettleProps & {
+type SyncRunStageProps = InteractiveSlashCommandSettleProps & {
   readonly notebookId: number
   readonly workspacePath: string
   readonly dryRun: boolean

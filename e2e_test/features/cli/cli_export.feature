@@ -82,3 +82,11 @@ Feature: Export a notebook to a local Markdown tree
       | Ben Notebook/less.md    |
       | Ben Notebook/scratch.md |
     And the file "Ben Notebook/scratch.md" in the export destination "./ExportTarget" should hold "keep me"
+
+  Scenario: A destination that does not exist reports a readable error
+    Given I have a notebook "Ben Notebook" with notes:
+      | Title | Content |
+      | less  | Hello   |
+    And I enter the slash command "/use Ben Notebook" in the interactive CLI
+    When I export the notebook into "./NoSuchDirectory"
+    Then I should see "No directory at" in past CLI assistant messages
