@@ -289,6 +289,31 @@ export function createCliE2ePluginTasks(
       writeFileSync(full, content, 'utf8')
       return null
     },
+    /**
+     * Retype a note's body in the workspace, the way an editor like Obsidian
+     * would: the export's frontmatter and `# title` heading stay as they are,
+     * so the file still reads as the same note with different content.
+     */
+    writeCliWorkspaceNoteBody({
+      workspace,
+      relativePath,
+      content,
+    }: {
+      workspace: string
+      relativePath: string
+      content: string
+    }) {
+      const full = join(workspace, relativePath)
+      const lines = readFileSync(full, 'utf8').split('\n')
+      const heading = lines.findIndex((line) => line.startsWith('# '))
+      if (heading === -1) {
+        throw new Error(`No "# title" heading in ${relativePath} to keep.`)
+      }
+      // The export leaves one blank line between the heading and the body.
+      const keep = lines.slice(0, heading + 2)
+      writeFileSync(full, [...keep, content].join('\n'), 'utf8')
+      return null
+    },
     /** A workspace holding exactly what a notebook export zip contains. */
     createCliWorkspaceFromZip({ zipBase64 }: { zipBase64: string }) {
       const workspace = mkdtempSync(join(tmpdir(), 'cypress-cli-workspace-'))

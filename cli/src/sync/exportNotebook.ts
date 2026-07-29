@@ -18,15 +18,3 @@ export type ExportNotebookAsZip = (
   notebookId: number,
   signal?: AbortSignal
 ) => Promise<NotebookExport>
-
-/**
- * The export that is not reachable yet. Wiring this in place of a real one
- * keeps the preview honest: it reports that exporting is unavailable rather
- * than pretending a notebook has no notes.
- */
-export const exportNotebookAsZipUnavailable: ExportNotebookAsZip = () =>
-  Promise.reject(
-    new Error(
-      'Exporting a notebook is not available yet. The endpoint is still being built.'
-    )
-  )

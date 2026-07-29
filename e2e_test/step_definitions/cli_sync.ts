@@ -41,16 +41,9 @@ When(
 )
 
 When(
-  'I edit {string} in the workspace {string} to {string}',
+  'I edit the content of {string} in the workspace {string} to {string}',
   (relativePath: string, workspaceName: string, content: string) => {
-    syncWorkspace.editWorkspaceFile(workspaceName, relativePath, content)
-  }
-)
-
-When(
-  'I preview the pull into the workspace {string}',
-  (workspaceName: string) => {
-    syncWorkspace.previewPull(workspaceName)
+    syncWorkspace.editWorkspaceNoteBody(workspaceName, relativePath, content)
   }
 )
 
@@ -96,7 +89,10 @@ Given(
 Then(
   'I should see the preview in past CLI assistant messages:',
   (expected: string) => {
-    cli.interactiveCli().pastCliAssistantMessages().expectContains(expected)
+    cli
+      .interactiveCli()
+      .pastCliAssistantMessages()
+      .expectContainsBlock(expected)
   }
 )
 

@@ -81,6 +81,23 @@ export function whenCurrentGuidanceContainsThen(
   )
 }
 
+/**
+ * Match consecutive lines in the transcript.
+ *
+ * The cumulative transcript is raw PTY output, so rows are separated by CRLF
+ * and a plain multi-line needle never matches. Matching line by line with a
+ * tolerant separator keeps the assertion about adjacency, which is the point
+ * of asserting a block rather than each line on its own.
+ */
+function transcriptBlockPattern(expected: string): { source: string } {
+  return {
+    source: expected
+      .split('\n')
+      .map((line) => line.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+      .join('\\r?\\n'),
+  }
+}
+
 function pastCliAssistantMessages() {
   return {
     expectContains(expected: string): Cypress.Chainable<null> {
@@ -90,6 +107,17 @@ function pastCliAssistantMessages() {
           'Past CLI assistant messages (in past CLI assistant messages).'
         )
       )
+    },
+    /** As `expectContains`, for an expectation spanning several lines. */
+    expectContainsBlock(expected: string): Cypress.Chainable<null> {
+      return cliAssertTask({
+        ...transcriptPollBase,
+        needle: transcriptBlockPattern(expected),
+        surface: 'strippedTranscript',
+        messagePrefix:
+          'Past CLI assistant messages (consecutive lines in past CLI assistant messages).',
+        timeoutMs: 15000,
+      })
     },
   }
 }

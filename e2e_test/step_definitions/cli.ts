@@ -56,7 +56,11 @@ When(
 When(
   'I enter the slash command {string} in the interactive CLI',
   (command: string) => {
-    cli.interactiveCli().enterSlashCommandInInteractiveCli(command)
+    cli
+      .interactiveCli()
+      .enterSlashCommandInInteractiveCli(
+        cli.syncWorkspace.resolveWorkspaceNames(command)
+      )
   }
 )
 

@@ -19,6 +19,17 @@ export function resolveWorkspaceDir(name: string): string {
 }
 
 /**
+ * Swap workspace names in a slash command for the directories behind them, so
+ * a scenario can write the command the way a user types it and still run
+ * against the temporary directory the export was unzipped into.
+ *
+ * Only whole arguments are matched; an unregistered one is left as it is.
+ */
+export function resolveWorkspaceNames(command: string): string {
+  return command.split(' ').map(resolveWorkspaceDir).join(' ')
+}
+
+/**
  * Build `name` as a directory holding exactly what the notebook exports today.
  *
  * Taking it from the export itself is what makes "the same content" true: it
@@ -46,6 +57,7 @@ export function workspaceMatchingNotebook(notebookName: string, name: string) {
     })
 }
 
+/** Replace a workspace file outright, or create one that was not there. */
 export function editWorkspaceFile(
   workspaceName: string,
   relativePath: string,
@@ -58,10 +70,21 @@ export function editWorkspaceFile(
   })
 }
 
-export function previewPull(workspaceName: string) {
-  return interactiveCli().enterSlashCommandInInteractiveCli(
-    `/sync --dry-run ${resolveWorkspaceDir(workspaceName)}`
-  )
+/**
+ * Retype a note's body in the workspace, leaving the frontmatter and title
+ * heading the export writes in place, so the diff is about the content the
+ * user changed rather than about the whole file being replaced.
+ */
+export function editWorkspaceNoteBody(
+  workspaceName: string,
+  relativePath: string,
+  content: string
+) {
+  return cy.task('writeCliWorkspaceNoteBody', {
+    workspace: resolveWorkspaceDir(workspaceName),
+    relativePath,
+    content,
+  })
 }
 
 export function pullIntoWorkspace(workspaceName: string) {

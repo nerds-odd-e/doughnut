@@ -1,4 +1,3 @@
-@ignore
 # Specified at the refinement session on 2026-07-27; see
 # docs/refinement/2026-07-27/SPEC-sync-dry-run.md.
 #
@@ -12,6 +11,11 @@
 # The e2e scenarios below verify only integration-level concerns that
 # the unit tests cannot reach: the full CLI → API → diff → output path,
 # workspace safety, and error handling that needs server-side state.
+#
+# An exported note carries frontmatter and a `# title` heading above its
+# content, so a diff of the content is preceded by those as context lines.
+# These scenarios assert the changed content and the count, which is what
+# reaching the real export proves; the surrounding context is unit-tested.
 @withCliConfig
 @interactiveCLI
 @disableOpenAiService
@@ -39,10 +43,10 @@ Feature: Preview what a pull would change
       And the workspace "./BenNotebook" holds the same content as "Ben Notebook"
       And I enter the slash command "/use Ben Notebook" in the interactive CLI
       When the note "less" is changed in Doughnut to "Hello world!"
-      And I preview the pull into the workspace "./BenNotebook"
-      Then I should see the preview in past CLI assistant messages:
+      And I enter the slash command "/sync --dry-run ./BenNotebook" in the interactive CLI
+      Then I should see "less.md" in past CLI assistant messages
+      And I should see the preview in past CLI assistant messages:
         """
-        less.md
           - Hello
           + Hello world!
 
@@ -59,11 +63,11 @@ Feature: Preview what a pull would change
       And I enter the slash command "/use Ben Notebook" in the interactive CLI
 
     Scenario: A note edited locally is reported as what a pull would overwrite
-      When I edit "less.md" in the workspace "./BenNotebook" to "Hello from Obsidian"
-      And I preview the pull into the workspace "./BenNotebook"
-      Then I should see the preview in past CLI assistant messages:
+      When I edit the content of "less.md" in the workspace "./BenNotebook" to "Hello from Obsidian"
+      And I enter the slash command "/sync --dry-run ./BenNotebook" in the interactive CLI
+      Then I should see "less.md" in past CLI assistant messages
+      And I should see the preview in past CLI assistant messages:
         """
-        less.md
           - Hello from Obsidian
           + Hello
 
@@ -71,7 +75,7 @@ Feature: Preview what a pull would change
         """
 
     Scenario: No difference to report
-      When I preview the pull into the workspace "./BenNotebook"
+      When I enter the slash command "/sync --dry-run ./BenNotebook" in the interactive CLI
       Then I should see "No changes to pull." in past CLI assistant messages
 
   Rule: The preview leaves nothing behind
@@ -85,12 +89,12 @@ Feature: Preview what a pull would change
 
     Scenario: The workspace is not written to
       When the note "less" is changed in Doughnut to "Hello world!"
-      And I preview the pull into the workspace "./BenNotebook"
+      And I enter the slash command "/sync --dry-run ./BenNotebook" in the interactive CLI
       Then the file "less.md" in the workspace "./BenNotebook" should hold "Hello"
 
     Scenario: The preview adds no files of its own
       When the note "less" is changed in Doughnut to "Hello world!"
-      And I preview the pull into the workspace "./BenNotebook"
+      And I enter the slash command "/sync --dry-run ./BenNotebook" in the interactive CLI
       Then the workspace "./BenNotebook" should hold only:
         | Path    |
         | less.md |
