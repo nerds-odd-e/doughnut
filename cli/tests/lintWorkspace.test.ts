@@ -27,6 +27,14 @@ describe('lintWorkspace', () => {
     expect(lintWorkspace(root)).toContain('banana.md:1')
   })
 
+  test('reports frontmatter the closing `---` is missing from', () => {
+    write('apple.md', '---\ntype: concept\n\n# apple')
+
+    expect(lintWorkspace(root)).toContain(
+      'Frontmatter is not closed with `---`'
+    )
+  })
+
   test('reports frontmatter that does not say what type the concept is', () => {
     write('apple.md', '---\ntitle: apple\n---\n\n# apple')
 

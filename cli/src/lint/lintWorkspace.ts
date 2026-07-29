@@ -1,21 +1,17 @@
 import { readWorkspace } from '../sync/readWorkspace.js'
 
 const OPENING = '---\n'
-
-/** The keys between the opening `---` and the line closing the block. */
-function frontmatterKeys(content: string): string {
-  const closing = content.indexOf('\n---', OPENING.length)
-  return closing === -1
-    ? content.slice(OPENING.length)
-    : content.slice(OPENING.length, closing)
-}
+const CLOSING = '\n---'
 
 /** `type` is the one key OKF always requires of a concept. */
 function problemsIn(content: string): string[] {
   if (!content.startsWith(OPENING)) return ['Frontmatter is missing']
-  if (!/^type:/m.test(frontmatterKeys(content))) {
-    return ['Frontmatter has no `type` key']
-  }
+
+  const closing = content.indexOf(CLOSING, OPENING.length)
+  if (closing === -1) return ['Frontmatter is not closed with `---`']
+
+  const keys = content.slice(OPENING.length, closing)
+  if (!/^type:/m.test(keys)) return ['Frontmatter has no `type` key']
   return []
 }
 
