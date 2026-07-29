@@ -14,7 +14,8 @@ written into matching local files quickly, without creating new files or touchin
 In scope:
 
 - `/sync <workspace path>` inside the notebook context established by `/use`.
-- `/sync --dry-run <workspace path>` remains preview-only (see `SPEC-sync-dry-run.md`).
+- `/sync --dry-run <workspace path>` remains preview-only; it is specified by
+  `e2e_test/features/cli/cli_sync_dry_run.feature` and the CLI unit tests.
 - For each `.md` file already in the workspace, if the notebook export contains the same path and
   the content differs, replace the local file with the exported content (including frontmatter).
 - Unchanged intersecting files are not written (content and modification time preserved).

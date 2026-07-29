@@ -1,9 +1,14 @@
 # Questions for the team building `/export`
 
+**Historical record of the 2026-07-27 session.** `/sync --dry-run` shipped
+unzipping the export in memory rather than into a scratch directory, so the
+scratch-directory questions below were answered by dropping the idea. What the
+command does now is specified by
+`e2e_test/features/cli/cli_sync_dry_run.feature` and the CLI unit tests.
+
 `/sync --dry-run` compares a workspace against the notebook as it stands. It
 does that by exporting the notebook into a scratch directory on every run and
-diffing the two directories, so its correctness rests on your export. See
-`SPEC-sync-dry-run.md` in this folder for what we are building.
+diffing the two directories, so its correctness rests on your export.
 
 We have ordered these by how much they block us.
 

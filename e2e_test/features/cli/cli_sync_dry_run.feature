@@ -1,5 +1,7 @@
-# Specified at the refinement session on 2026-07-27; see
-# docs/refinement/2026-07-27/SPEC-sync-dry-run.md.
+# Specified at the refinement session on 2026-07-27. This feature and the CLI
+# unit tests below are now the specification; the refinement note they came from
+# is gone, along with the scratch-directory design the implementation dropped in
+# favour of unzipping the export in memory.
 #
 # Diff formatting (context lines, hunks, blank lines, Markdown markup),
 # report assembly (multiple notes, ordering, folder paths), and argument
@@ -88,7 +90,7 @@ Feature: Preview what a pull would change
       And I enter the slash command "/use Ben Notebook" in the interactive CLI
 
     Scenario: The workspace is not written to
-      When the note "less" is changed in Doughnut to "Hello world!"
+      When the note "less" is changed in Doughnut to "Hi world!"
       And I enter the slash command "/sync --dry-run ./BenNotebook" in the interactive CLI
       Then the file "less.md" in the workspace "./BenNotebook" should hold "Hello"
 

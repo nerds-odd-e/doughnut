@@ -374,9 +374,10 @@ exists to avoid repeating that.
   `ContentDisposition.attachment().filename(name, UTF_8)`, emitting RFC 5987
   `filename*=UTF-8''...` — small, and it fixes the web download too. **Raise as its own item.**
 - Mirroring or deleting extra files; `--force` or `--dry-run` flags; an option to land the zip.
-- `/sync` itself, including its own missing `~` expansion and its divergence from
-  `SPEC-sync-dry-run.md` examples 18 and 23 on the scratch directory.
-- Un-`@ignore`ing `cli_sync_dry_run.feature`.
+- `/sync` itself, including its own missing `~` expansion. (The scratch-directory
+  divergence noted here is settled: `/sync` unzips the export in memory, and the
+  refinement note that specified a scratch directory has been removed.)
+- Un-`@ignore`ing `cli_sync_dry_run.feature`. (Done in `c3a1bf842f`.)
 - The rest of the portable workspace epic
   (`.planning/notes/2026-07-24-portable-notebook-workspace.md`, `promoted: false`). Its story 1
   mentions internal references becoming Markdown links and usable attachment references, which
