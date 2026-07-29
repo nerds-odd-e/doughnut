@@ -39,6 +39,15 @@ Then(
     cli.interactiveCli().pastCliAssistantMessages().expectContains(expected)
 )
 
+Then(
+  'I should see {string} with any spacing in past CLI assistant messages',
+  (expected: string) =>
+    cli
+      .interactiveCli()
+      .pastCliAssistantMessages()
+      .expectContainsIgnoringSpacing(expected)
+)
+
 Then('I should see {string} in answered questions', (expected: string) =>
   cli.interactiveCli().answeredQuestions().expectContains(expected)
 )

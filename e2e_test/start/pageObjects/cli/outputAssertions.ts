@@ -98,6 +98,23 @@ function transcriptBlockPattern(expected: string): { source: string } {
   }
 }
 
+/**
+ * Match `expected` with each run of whitespace standing for a run of any width.
+ *
+ * Column-aligned output pads to the widest value in the run, so the padding is
+ * a property of the whole report rather than of the line being asserted. A
+ * scenario spelling it out would break the moment another file is added.
+ */
+function transcriptSpacingPattern(expected: string): { source: string } {
+  return {
+    source: expected
+      .trim()
+      .split(/\s+/)
+      .map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+      .join('[^\\S\\n]+'),
+  }
+}
+
 function pastCliAssistantMessages() {
   return {
     expectContains(expected: string): Cypress.Chainable<null> {
@@ -107,6 +124,17 @@ function pastCliAssistantMessages() {
           'Past CLI assistant messages (in past CLI assistant messages).'
         )
       )
+    },
+    /** As `expectContains`, ignoring how wide each run of spacing is. */
+    expectContainsIgnoringSpacing(expected: string): Cypress.Chainable<null> {
+      return cliAssertTask({
+        ...transcriptPollBase,
+        needle: transcriptSpacingPattern(expected),
+        surface: 'strippedTranscript',
+        messagePrefix:
+          'Past CLI assistant messages (in past CLI assistant messages, any spacing).',
+        timeoutMs: 15000,
+      })
     },
     /** As `expectContains`, for an expectation spanning several lines. */
     expectContainsBlock(expected: string): Cypress.Chainable<null> {
