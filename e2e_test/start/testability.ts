@@ -516,6 +516,18 @@ const testability = () => {
       )
     },
 
+    setNotebookReadmeContent(notebookName: string, content: string) {
+      return this.getNotebookIdByName(notebookName).then((notebookId) =>
+        cy.wrap(
+          NotebookController.updateNotebookReadmeContent({
+            path: { notebook: notebookId },
+            body: { content },
+          }),
+          { log: false }
+        )
+      )
+    },
+
     setInjectedNoteContent(noteTitle: string, content: string) {
       return this.getInjectedNoteIdByTitle(noteTitle).then((noteId) =>
         cy.wrap(

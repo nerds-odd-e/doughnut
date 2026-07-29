@@ -237,17 +237,15 @@ no shared package between them (`doughnut-api` is used by cli and mcp-server, no
 and what repeats is parsing a standard HTTP header, not a business rule. The business rule
 (sanitizing) still has one home, in the backend.
 
-### Slice 2 — e2e: folder structure lands
+### Slice 2 — e2e: folder structure lands — DONE
 
-Add a scenario: a notebook with a root note and a note inside a folder, asserting
-`Ben Notebook/index.md`, `Ben Notebook/intro.md`, and
-`Ben Notebook/LeSS in Action/team.md`; plus one using `readCliWorkspaceFile` to assert a file
-holds the note body.
+Pinned at the outermost layer: `cli_export.feature` now exports a notebook with
+readme (`index.md`), a root note (`intro.md`), and a note in a folder
+(`LeSS in Action/team.md`), and asserts the note body via `readCliWorkspaceFile`.
 
-Inward: `unzipToEntries` already yields flat posix paths, so the only inner need is recursive
-directory creation — satisfied already if Slice 1 used `{ recursive: true }`. This slice mostly
-pins the behaviour at the outermost layer. Add a path-ordering unit assertion to
-`writeNotebookExport.test.ts` while here.
+Inward: Slice 1 already used `{ recursive: true }` and path-ordering in
+`writeNotebookExport.test.ts`. The only new glue was
+`testability.setNotebookReadmeContent` so e2e can seed notebook readme without UI.
 
 ### Slice 3 — e2e: what a repeated export means
 

@@ -35,3 +35,19 @@ Feature: Export a notebook to a local Markdown tree
     Then the export destination "./ExportTarget" should hold only:
       | Path                 |
       | Ben Notebook/less.md |
+
+  Scenario: Export preserves folder structure and note bodies
+    Given I have a notebook "Ben Notebook" with notes:
+      | Title | Content         | Folder         |
+      | intro | Hello from root |                |
+      | team  | Sprint          | LeSS in Action |
+    And the notebook "Ben Notebook" has readme content "About this notebook"
+    And an empty export destination "./ExportTarget"
+    And I enter the slash command "/use Ben Notebook" in the interactive CLI
+    When I export the notebook into "./ExportTarget"
+    Then the export destination "./ExportTarget" should hold only:
+      | Path                                |
+      | Ben Notebook/index.md               |
+      | Ben Notebook/intro.md               |
+      | Ben Notebook/LeSS in Action/team.md |
+    And the file "Ben Notebook/LeSS in Action/team.md" in the export destination "./ExportTarget" should hold "Sprint"

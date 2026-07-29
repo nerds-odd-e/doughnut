@@ -154,6 +154,13 @@ Given(
   }
 )
 
+Given(
+  'the notebook {string} has readme content {string}',
+  (notebookName: string, content: string) => {
+    start.testability().setNotebookReadmeContent(notebookName, content)
+  }
+)
+
 When('I jump to the notebook {string}', (notebookName: string) => {
   start.jumpToNotebookPage(notebookName)
 })
