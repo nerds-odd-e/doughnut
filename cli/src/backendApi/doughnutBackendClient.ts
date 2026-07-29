@@ -359,29 +359,38 @@ export async function downloadNotebookExportZip(
   }
 
   const { apiBaseUrl } = getApiConfig()
-  return withBackendClient(stored.token, async () => {
-    const res = await fetch(
-      `${apiBaseUrl}/api/notebooks/${notebookId}/export`,
-      {
-        method: 'GET',
-        headers: { Authorization: `Bearer ${stored.token}` },
-        signal,
-      }
-    )
-    if (res.status === 404) {
-      throw new Error(
-        'Exporting a notebook is not available yet, or the notebook no longer exists in Doughnut.'
+  const { bytes, contentDisposition } = await withBackendClient(
+    stored.token,
+    async () => {
+      const res = await fetch(
+        `${apiBaseUrl}/api/notebooks/${notebookId}/export`,
+        {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${stored.token}` },
+          signal,
+        }
       )
+      if (res.status === 404) {
+        throw new Error(
+          'Exporting a notebook is not available yet, or the notebook no longer exists in Doughnut.'
+        )
+      }
+      if (!res.ok) {
+        throw { body: await res.text(), status: res.status }
+      }
+      return {
+        bytes: Buffer.from(await res.arrayBuffer()),
+        contentDisposition: res.headers.get('content-disposition'),
+      }
     }
-    if (!res.ok) {
-      throw { body: await res.text(), status: res.status }
-    }
-    const fileName = contentDispositionFileName(
-      res.headers.get('content-disposition')
-    )
-    if (fileName === undefined) {
-      throw new Error('The export response did not name a file.')
-    }
-    return { bytes: Buffer.from(await res.arrayBuffer()), fileName }
-  })
+  )
+
+  // Parsed outside withBackendClient: a plain `throw new Error(...)` here would
+  // otherwise be reclassified into a generic "service unreachable" message by
+  // withBackendClient's SDK-error classifier, since it has no `.status`.
+  const fileName = contentDispositionFileName(contentDisposition)
+  if (fileName === undefined) {
+    throw new Error('The export response did not name a file.')
+  }
+  return { bytes, fileName }
 }

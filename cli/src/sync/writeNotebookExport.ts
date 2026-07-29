@@ -13,6 +13,22 @@ export type WriteNotebookExportRequest = {
   readonly signal?: AbortSignal
 }
 
+/**
+ * A zip entry path is trusted only as far as "no separator that could escape
+ * `root`": absolute paths, `..` segments, and `\` (a Windows separator the
+ * backend never emits, but this only unzips bytes it did not create) are all
+ * rejected before anything is written.
+ */
+function assertSafeEntryPath(path: string): void {
+  if (
+    path.startsWith('/') ||
+    path.includes('\\') ||
+    path.split('/').includes('..')
+  ) {
+    throw new Error(`The export contained an unsafe path: ${path}.`)
+  }
+}
+
 function render(root: string, paths: readonly string[]): string {
   const count =
     paths.length === 1 ? '1 file written.' : `${paths.length} files written.`
@@ -44,11 +60,17 @@ export async function writeNotebookExport({
   signal,
 }: WriteNotebookExportRequest): Promise<string> {
   const { bytes, fileName } = await exportNotebookAsZip(notebookId, signal)
-  const root = join(destinationDirectory, basename(fileName, ZIP_SUFFIX))
-
   const entries = [...unzipToEntries(bytes)].sort(([a], [b]) =>
     a < b ? -1 : a > b ? 1 : 0
   )
+  if (entries.length === 0) {
+    return 'Nothing to export: the notebook has no notes.'
+  }
+
+  const root = join(destinationDirectory, basename(fileName, ZIP_SUFFIX))
+  for (const [path] of entries) {
+    assertSafeEntryPath(path)
+  }
   for (const [path, content] of entries) {
     const full = join(root, path)
     mkdirSync(dirname(full), { recursive: true })

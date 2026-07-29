@@ -1,14 +1,27 @@
-import { mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import {
+  mkdirSync,
+  mkdtempSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
-import { afterEach, beforeEach, describe, expect, test } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { parseExportDestination } from '../src/sync/exportDestination.js'
+
+const homedir = vi.hoisted(() => vi.fn())
+vi.mock('node:os', async (importOriginal) => {
+  const os = await importOriginal<typeof import('node:os')>()
+  return { ...os, homedir }
+})
 
 describe('parseExportDestination', () => {
   let root: string
 
   beforeEach(() => {
     root = mkdtempSync(join(tmpdir(), 'doughnut-exportDestination-'))
+    homedir.mockReturnValue(root)
   })
 
   afterEach(() => {
@@ -67,5 +80,23 @@ describe('parseExportDestination', () => {
     } finally {
       rmSync(link, { force: true })
     }
+  })
+
+  test('expands a bare ~ to the home directory', () => {
+    expect(parseExportDestination('~')).toEqual({ directory: root })
+  })
+
+  test('expands ~/... against the home directory', () => {
+    const sub = join(root, 'download')
+    mkdirSync(sub)
+
+    expect(parseExportDestination('~/download')).toEqual({ directory: sub })
+  })
+
+  test("rejects another user's home directory shorthand rather than creating a literal directory", () => {
+    expect(parseExportDestination('~otheruser')).toEqual({
+      error:
+        "Cannot expand ~otheruser: only the current user's home directory (~) is supported.",
+    })
   })
 })

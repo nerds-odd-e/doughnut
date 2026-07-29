@@ -1,9 +1,28 @@
+import makeMe from 'doughnut-test-fixtures/makeMe'
 import { describe, expect, test } from 'vitest'
+import type { InteractiveSlashCommand } from '../src/commands/interactiveSlashCommand.js'
+import { notebookStageSlashCommandsFor } from '../src/commands/notebook/notebookStageSlashCommands.js'
 import {
+  getSlashTabCompletion,
   slashGuidanceForInk,
   slashGuidanceUsageColumnWidth,
 } from '../src/mainInteractivePrompt/slashCommandCompletion.js'
-import type { InteractiveSlashCommand } from '../src/commands/interactiveSlashCommand.js'
+
+const aNotebook = () =>
+  makeMe.aNotebook
+    .withSeedNote(makeMe.aNote.title('Ben Notebook').please())
+    .do()
+
+describe('getSlashTabCompletion', () => {
+  test('/ex stops short of a full command: /export and /exit share the prefix', () => {
+    const commands = notebookStageSlashCommandsFor(aNotebook())
+
+    expect(getSlashTabCompletion('/ex', commands)).toEqual({
+      completed: '/ex',
+      count: 2,
+    })
+  })
+})
 
 describe('slash guidance usage column cap', () => {
   test('column width ignores usages wider than cap', () => {

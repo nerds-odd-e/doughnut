@@ -1,4 +1,5 @@
 import {
+  existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
@@ -88,5 +89,40 @@ describe('writeNotebookExport', () => {
     expect(readBack('Ben Notebook/less.md')).toBe('Hello')
     expect(readBack('Ben Notebook/scratch.md')).toBe('keep me')
     expect(readBack('unrelated.txt')).toBe('not mine')
+  })
+
+  test('rejects an absolute path in the zip and writes nothing outside the target', async () => {
+    await expect(write({ '/etc/passwd': 'nope' })).rejects.toThrow(
+      'The export contained an unsafe path: /etc/passwd.'
+    )
+    expect(existsSync(join(destination, 'Ben Notebook'))).toBe(false)
+  })
+
+  test('rejects a .. segment in the zip', async () => {
+    await expect(write({ '../escape.md': 'nope' })).rejects.toThrow(
+      'The export contained an unsafe path: ../escape.md.'
+    )
+    expect(existsSync(join(destination, 'Ben Notebook'))).toBe(false)
+  })
+
+  test('rejects a backslash in the zip path', async () => {
+    await expect(write({ 'folder\\note.md': 'nope' })).rejects.toThrow(
+      'The export contained an unsafe path: folder\\note.md.'
+    )
+    expect(existsSync(join(destination, 'Ben Notebook'))).toBe(false)
+  })
+
+  test('rejects the unsafe entry even when it sorts after a safe one, writing neither', async () => {
+    await expect(
+      write({ '0-first.md': 'Hello', '\\injected.md': 'nope' })
+    ).rejects.toThrow('The export contained an unsafe path: \\injected.md.')
+    expect(existsSync(join(destination, 'Ben Notebook'))).toBe(false)
+  })
+
+  test('reports an empty notebook without creating a directory', async () => {
+    const summary = await write({})
+
+    expect(summary).toBe('Nothing to export: the notebook has no notes.')
+    expect(existsSync(join(destination, 'Ben Notebook'))).toBe(false)
   })
 })

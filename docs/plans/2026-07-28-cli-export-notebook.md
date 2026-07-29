@@ -306,7 +306,7 @@ export spinner never renders before the error. Parsing moved into `useMemo` so a
 `SettleProps` alias redefined in both `syncSlashCommand.tsx` and `exportSlashCommand.tsx`.
 `exportDoc`'s description now says "into an existing directory".
 
-### Slice 5 — Inner edge cases (unit tests only, no new scenario)
+### Slice 5 — Inner edge cases (unit tests only, no new scenario) — DONE
 
 Not worth covering end to end, but the behaviour has to exist:
 
@@ -341,6 +341,20 @@ Exported to /Users/me/download/Ben Notebook
   at `/ex` and reports a count of 2 — a change from today's behaviour, so pin it in
   `slashCommandCompletion.test.ts`.
 - **`CommandDoc`**: already written in Slice 1; adjust wording here only as behaviour is added.
+
+Each bullet above was driven red-first. The `/ex` tab-completion case needed no production
+change: `getSlashTabCompletion()` already stopped at the longest shared prefix, so its test only
+pins existing behaviour, the same as Slice 3's pattern.
+
+Writing the "does not guess" test uncovered a real defect, not just missing coverage: the
+"no filename" throw inside `downloadNotebookExportZip()` was nested inside `withBackendClient()`,
+whose SDK-error classifier reclassifies any plain `Error` without a `.status` into the generic
+"Doughnut service is not available…" message — so the specific message never reached the user.
+Fixed by moving the `contentDispositionFileName()` parse and its throw to after the
+`withBackendClient()` call returns, so it escapes unclassified. The 404 short-circuit inside
+`withBackendClient()` likely has the same defect, but its message text is Slice 7's job to fix, not
+this slice's, and reclassifying it now would collide with that slice's diff — left as found, so
+Slice 7 should check it lands correctly once it edits that string.
 
 ### Slice 6 — The web reads `Content-Disposition` too
 

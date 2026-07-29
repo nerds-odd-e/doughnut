@@ -11,5 +11,7 @@ export function contentDispositionFileName(
   if (header === null || header === undefined) return
   const quoted = /;\s*filename\s*=\s*"([^"]*)"/i.exec(header)
   if (quoted !== null) return quoted[1]
+  const unquoted = /;\s*filename\s*=\s*([^;\s]+)/i.exec(header)
+  if (unquoted !== null) return unquoted[1]
   return
 }
