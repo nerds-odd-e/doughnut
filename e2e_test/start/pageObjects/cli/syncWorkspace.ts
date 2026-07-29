@@ -4,7 +4,8 @@ import { cliAssertTask } from './cliAssertTask'
 import { interactiveCli } from './interactiveCli'
 
 /**
- * Local Markdown workspaces for `/sync --dry-run` to compare against.
+ * Local Markdown workspaces for a command to read: `/sync --dry-run` compares
+ * against one, `/lint` checks one.
  *
  * Scenarios name a workspace the way a user would (`./BenNotebook`); each name
  * is backed by a real temporary directory, so the command runs against actual
@@ -16,6 +17,16 @@ const workspaceDirsByName = new Map<string, string>()
 
 export function resolveWorkspaceDir(name: string): string {
   return workspaceDirsByName.get(name) ?? name
+}
+
+/**
+ * Build `name` as an empty directory, for a scenario that spells out every file
+ * it needs rather than starting from what a notebook exports.
+ */
+export function emptyWorkspace(name: string) {
+  return cy.task<string>('createCliEmptyDirectory').then((dir) => {
+    workspaceDirsByName.set(name, dir)
+  })
 }
 
 /**
