@@ -168,6 +168,14 @@ describe('previewPull', () => {
     )
   })
 
+  test('reports nothing to pull when only the line endings differ', async () => {
+    write('less.md', 'Sprint planning\r\nDaily standup')
+
+    await expect(
+      preview({ 'less.md': 'Sprint planning\nDaily standup' })
+    ).resolves.toBe('No changes to pull.')
+  })
+
   test('does not write to the workspace', async () => {
     write('less.md', 'Hello')
 

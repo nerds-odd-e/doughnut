@@ -3,6 +3,18 @@ import { join, posix, sep } from 'node:path'
 
 const MARKDOWN_SUFFIX = '.md'
 
+/**
+ * Read note content the way the export writes it, with Unix line endings.
+ *
+ * An editor on Windows saves CRLF, which differs from every exported line and
+ * would otherwise report each line of such a note as changed on every run. A
+ * note whose content really did change is written back with the line endings the
+ * export uses, so a workspace saved as CRLF drifts to LF as notes change.
+ */
+function noteContent(path: string): string {
+  return readFileSync(path, 'utf8').replace(/\r\n/g, '\n')
+}
+
 function isDirectory(path: string): boolean {
   try {
     return statSync(path).isDirectory()
@@ -23,7 +35,7 @@ function collect(
     } else if (entry.name.endsWith(MARKDOWN_SUFFIX)) {
       into.set(
         `${prefix}${entry.name}`.split(sep).join(posix.sep),
-        readFileSync(path, 'utf8')
+        noteContent(path)
       )
     }
   }

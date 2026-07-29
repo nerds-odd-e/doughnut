@@ -65,6 +65,14 @@ describe('readWorkspace', () => {
     expect(readWorkspace(root).get('less.md')).toBe('')
   })
 
+  test('reads a note saved with Windows line endings as the export writes it', () => {
+    write('less.md', 'Sprint planning\r\nDaily standup\r\n')
+
+    expect(readWorkspace(root).get('less.md')).toBe(
+      'Sprint planning\nDaily standup\n'
+    )
+  })
+
   test('reads an empty directory as no notes', () => {
     expect(readWorkspace(root)).toEqual(new Map())
   })
