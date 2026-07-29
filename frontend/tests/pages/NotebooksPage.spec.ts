@@ -443,6 +443,68 @@ describe("Notebooks Page", () => {
       expect(saveAs).toHaveBeenCalled()
       expect(vi.mocked(saveAs).mock.calls[0][1]).toBe("Owned Catalog.zip")
     })
+
+    it("uses the sanitized filename the backend sends via Content-Disposition", async () => {
+      const nb = { ...makeMe.aNotebook.please(), name: "Q&A: Notes" }
+      mockSdkService(NotebookController, "myNotebooks", {
+        notebooks: [{ notebook: nb }],
+        catalogItems: makeMe.notebookCatalog.notebooks(nb).please(),
+        subscriptions: [],
+      })
+      fetchMock.resetMocks()
+      fetchMock.mockResponseOnce("zip-file-bytes", {
+        headers: {
+          "content-disposition": 'attachment; filename="Q&A Notes.zip"',
+        },
+      })
+      const wrapper = helper
+        .component(NotebooksPage)
+        .withCurrentUser(makeMe.aUser.please())
+        .withRouter()
+        .mount()
+      await flushPromises()
+      await fireEvent.click(
+        wrapper.get('[data-cy="notebook-catalog-overflow"]').element
+      )
+      await flushPromises()
+      const exportButtons = screen.getAllByTitle("Export")
+      await fireEvent.click(exportButtons[exportButtons.length - 1]!)
+      await flushPromises()
+
+      expect(vi.mocked(saveAs).mock.calls.at(-1)?.[1]).toBe("Q&A Notes.zip")
+    })
+
+    it("falls back to the notebook name when Content-Disposition is not printable ASCII", async () => {
+      const nb = { ...makeMe.aNotebook.please(), name: "筆記本" }
+      mockSdkService(NotebookController, "myNotebooks", {
+        notebooks: [{ notebook: nb }],
+        catalogItems: makeMe.notebookCatalog.notebooks(nb).please(),
+        subscriptions: [],
+      })
+      fetchMock.resetMocks()
+      // Representative of a Content-Disposition header Spring's ISO-8859-1
+      // header encoding mangled from a non-ASCII notebook name.
+      fetchMock.mockResponseOnce("zip-file-bytes", {
+        headers: {
+          "content-disposition": 'attachment; filename="ç­.zip"',
+        },
+      })
+      const wrapper = helper
+        .component(NotebooksPage)
+        .withCurrentUser(makeMe.aUser.please())
+        .withRouter()
+        .mount()
+      await flushPromises()
+      await fireEvent.click(
+        wrapper.get('[data-cy="notebook-catalog-overflow"]').element
+      )
+      await flushPromises()
+      const exportButtons = screen.getAllByTitle("Export")
+      await fireEvent.click(exportButtons[exportButtons.length - 1]!)
+      await flushPromises()
+
+      expect(vi.mocked(saveAs).mock.calls.at(-1)?.[1]).toBe("筆記本.zip")
+    })
   })
 
   describe("catalog list", () => {

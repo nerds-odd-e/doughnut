@@ -356,7 +356,7 @@ Fixed by moving the `contentDispositionFileName()` parse and its throw to after 
 this slice's, and reclassifying it now would collide with that slice's diff — left as found, so
 Slice 7 should check it lands correctly once it edits that string.
 
-### Slice 6 — The web reads `Content-Disposition` too
+### Slice 6 — The web reads `Content-Disposition` too — DONE
 
 `NotebookExportService.exportFileName()` computes `sanitize(name) + ".zip"` and puts it in the
 header, but `NotebookButtons.vue:136` uses `` saveAs(blob, `${props.notebook.name}.zip`) `` —
@@ -365,15 +365,44 @@ for a notebook with special characters is decided by browser rules (Chrome turns
 others differ).
 
 - Add a small frontend helper (for example `frontend/src/utils/contentDispositionFileName.ts`)
-  and its spec, equivalent to the CLI one.
-- `NotebookButtons.vue`: ``saveAs(blob, parsed ?? `${props.notebook.name}.zip`)`` — keeping the
-  fallback, so behaviour only improves when the header is readable.
+  and its spec, equivalent to the CLI one (including the unquoted-filename form the CLI's
+  version grew in Slice 5 — no reason for the frontend copy to start out narrower).
+- **Guard against the non-ASCII hole this inherits.** Spring encodes response headers as
+  ISO-8859-1, so a non-ASCII notebook name (a Chinese title, say) does not come back as
+  `undefined` from a missing header — it comes back as a *defined but mangled* string. A plain
+  `parsed ?? fallback` would happily hand that mangled string to `saveAs`, replacing today's
+  correct `notebook.name` with garbage for exactly the notebooks most likely to hit this. Add a
+  second small pure helper, `isPrintableAscii(value: string): boolean` (`/^[\x20-\x7E]+$/`), and
+  only trust `parsed` when it passes:
+  `` const fileName = parsed !== undefined && isPrintableAscii(parsed) ? parsed : `${props.notebook.name}.zip` ``.
+  This keeps the win (special characters sanitized the way the backend already computes) without
+  regressing the notebooks this plan cannot fix in this slice — the real fix is still the backend
+  RFC 5987 change noted below, raised as its own item.
+- `NotebookButtons.vue`: use `fileName` from the guard above in `saveAs(blob, fileName)`, so
+  behaviour only improves when the header is both present and printable-ASCII.
 - `frontend/tests/pages/NotebooksPage.spec.ts:444` currently asserts `"Owned Catalog.zip"`, a
   name with no special characters, which is why the bug is invisible. Have the fetch mock
-  return a `Content-Disposition` header, and add a special-character case proving the header's
-  value is what gets used.
+  return a `Content-Disposition` header, and add: a special-character case proving the header's
+  sanitized value is what gets used, and a non-ASCII case proving a mangled header is rejected in
+  favor of `notebook.name`.
 
 The backend is not touched; the frontend simply starts using what it already computes.
+
+Implemented as designed: `frontend/src/utils/contentDispositionFileName.ts` (parses quoted and
+unquoted forms, mirroring the CLI's) and `frontend/src/utils/isPrintableAscii.ts`
+(`/^[\x20-\x7E]+$/`) each got their own red-then-green spec, then `NotebookButtons.vue`'s
+`exportNotebook` was wired to use the header only when both parseable and printable-ASCII.
+
+Writing the two new `NotebooksPage.spec.ts` cases (sanitized-name and non-ASCII-fallback)
+surfaced a pre-existing test-isolation bug, not a bug in this slice's code: `vi.mock("file-saver",
+() => ({ saveAs: vi.fn() }))` creates one `saveAs` mock shared for the whole file, never cleared
+between tests, so `vi.mocked(saveAs).mock.calls[0]` — what the original "downloads a zip…" test
+and my first draft of the new tests asserted on — is the *first* call `saveAs` ever received
+across the file's run, not the most recent one. It only ever looked correct because that original
+test happened to be the first (and, before this slice, only) caller of `saveAs` in the file. Fixed
+by asserting on `mock.calls.at(-1)` in the two new tests instead of touching the shared mock's
+lifecycle (out of scope for this slice); the original assertion was left alone since it is still
+correct for its own case (it really is the first call).
 
 ### Slice 7 — Clear out leftovers from when the endpoint did not exist
 

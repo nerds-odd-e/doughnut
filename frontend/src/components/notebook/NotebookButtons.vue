@@ -81,6 +81,8 @@ import {
   type CatalogMoveToGroupInjected,
 } from "@/components/notebook/catalogMoveToGroupContext"
 import NotebookCatalogMoveToGroupForm from "@/components/notebook/NotebookCatalogMoveToGroupForm.vue"
+import { contentDispositionFileName } from "@/utils/contentDispositionFileName"
+import { isPrintableAscii } from "@/utils/isPrintableAscii"
 
 const router = useRouter()
 
@@ -133,7 +135,14 @@ const exportNotebook = async (closeDropdown: () => void) => {
     return
   }
   const blob = await response.blob()
-  saveAs(blob, `${props.notebook.name}.zip`)
+  const parsed = contentDispositionFileName(
+    response.headers.get("content-disposition")
+  )
+  const fileName =
+    parsed !== undefined && isPrintableAscii(parsed)
+      ? parsed
+      : `${props.notebook.name}.zip`
+  saveAs(blob, fileName)
 }
 
 const closeMoveToGroup = () => {
