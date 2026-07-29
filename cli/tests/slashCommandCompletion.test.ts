@@ -1,5 +1,9 @@
 import { describe, expect, test } from 'vitest'
-import { slashGuidanceUsageColumnWidth } from '../src/mainInteractivePrompt/slashCommandCompletion.js'
+import {
+  slashGuidanceForInk,
+  slashGuidanceUsageColumnWidth,
+} from '../src/mainInteractivePrompt/slashCommandCompletion.js'
+import type { InteractiveSlashCommand } from '../src/commands/interactiveSlashCommand.js'
 
 describe('slash guidance usage column cap', () => {
   test('column width ignores usages wider than cap', () => {
@@ -18,5 +22,41 @@ describe('slash guidance usage column cap', () => {
         26
       )
     ).toBe(14)
+  })
+})
+
+describe('slash guidance filtering', () => {
+  const command = (
+    literal: string,
+    usage: string
+  ): InteractiveSlashCommand => ({
+    literal,
+    doc: { name: literal, usage, description: 'does something' },
+    run: () => ({ assistantMessage: '' }),
+  })
+
+  const listed = (draft: string, commands: InteractiveSlashCommand[]) => {
+    const guidance = slashGuidanceForInk(draft, commands)
+    return guidance.show === 'list'
+      ? guidance.rows.map((row) => row.completionLine)
+      : guidance.show
+  }
+
+  test('offers a command the draft appears anywhere in the name of', () => {
+    expect(
+      listed('/call', [
+        command('/recall', '/recall'),
+        command('/exit', '/exit'),
+      ])
+    ).toEqual(['/recall'])
+  })
+
+  test('does not offer a command whose argument name contains the draft', () => {
+    expect(
+      listed('/re', [
+        command('/recall', '/recall'),
+        command('/lint', '/lint <workspace directory>'),
+      ])
+    ).toEqual(['/recall'])
   })
 })

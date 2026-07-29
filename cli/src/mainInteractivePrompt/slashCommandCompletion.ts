@@ -66,6 +66,7 @@ export function getSlashTabCompletion(
   return { completed: buffer, count: matches.length }
 }
 
+/** Match the name only: a `<workspace directory>` holding "re" is not a match for `/re`. */
 function filterSlashCommandsByPrefix(
   commands: readonly InteractiveSlashCommand[],
   prefix: string
@@ -75,7 +76,7 @@ function filterSlashCommandsByPrefix(
   if (!searchTerm) return [...commands]
 
   return [...commands]
-    .filter((c) => c.doc.usage.includes(searchTerm))
+    .filter((c) => c.literal.includes(searchTerm))
     .sort((a, b) => {
       const aBegins =
         a.doc.usage.startsWith(prefix) ||
