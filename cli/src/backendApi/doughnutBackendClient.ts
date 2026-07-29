@@ -7,6 +7,8 @@ import {
   type BookFull,
   type RequestOptions,
 } from 'doughnut-api'
+import { contentDispositionFileName } from '../sync/contentDispositionFileName.js'
+import type { NotebookExport } from '../sync/exportNotebook.js'
 import { loadStoredAccessToken } from './accessTokenStorage.js'
 
 /**
@@ -350,7 +352,7 @@ export async function attachNotebookBookFile(
 export async function downloadNotebookExportZip(
   notebookId: number,
   signal?: AbortSignal
-): Promise<Buffer> {
+): Promise<NotebookExport> {
   const stored = loadStoredAccessToken()
   if (!stored) {
     throw new Error(authenticatedBackendCallFailureAdvice.noAccessTokenInConfig)
@@ -374,6 +376,12 @@ export async function downloadNotebookExportZip(
     if (!res.ok) {
       throw { body: await res.text(), status: res.status }
     }
-    return Buffer.from(await res.arrayBuffer())
+    const fileName = contentDispositionFileName(
+      res.headers.get('content-disposition')
+    )
+    if (fileName === undefined) {
+      throw new Error('The export response did not name a file.')
+    }
+    return { bytes: Buffer.from(await res.arrayBuffer()), fileName }
   })
 }

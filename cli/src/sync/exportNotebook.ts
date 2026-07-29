@@ -8,10 +8,16 @@
  * and reconcile with theirs once the endpoint exists. See
  * `docs/refinement/2026-07-27/QUESTIONS-for-export-team.md`.
  */
+export type NotebookExport = {
+  readonly bytes: Buffer
+  /** As the backend named it, e.g. `Ben Notebook.zip`. */
+  readonly fileName: string
+}
+
 export type ExportNotebookAsZip = (
   notebookId: number,
   signal?: AbortSignal
-) => Promise<Buffer>
+) => Promise<NotebookExport>
 
 /**
  * The export that is not reachable yet. Wiring this in place of a real one

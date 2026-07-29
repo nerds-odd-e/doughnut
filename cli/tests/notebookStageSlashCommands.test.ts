@@ -33,4 +33,23 @@ describe('notebookStageSlashCommandsFor', () => {
 
     expect(sync?.argument?.optional).toBe(false)
   })
+
+  test('offers export inside the notebook context', () => {
+    const literals = notebookStageSlashCommandsFor(aNotebook()).map(
+      (command) => command.literal
+    )
+
+    expect(literals).toContain('/export')
+  })
+
+  test('documents where export writes and what it overwrites', () => {
+    const exportCommand = notebookStageSlashCommandsFor(aNotebook()).find(
+      (command) => command.literal === '/export'
+    )
+
+    expect(exportCommand?.doc.usage).toBe('/export <destination directory>')
+    expect(exportCommand?.doc.description).toContain('subdirectory')
+    expect(exportCommand?.doc.description).toContain('overwritten')
+    expect(exportCommand?.argument?.optional).toBe(false)
+  })
 })

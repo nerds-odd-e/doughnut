@@ -4,6 +4,12 @@ import { backend } from './backend'
 import { interactiveCli } from './interactiveCli'
 import { useNotebook } from './notebookInteractiveCliSession'
 import {
+  destinationFileShouldHold,
+  destinationShouldHoldOnly,
+  emptyDestination,
+  exportNotebook,
+} from './exportDestination'
+import {
   editWorkspaceFile,
   addExtraWorkspaceFile,
   pullIntoWorkspace,
@@ -24,6 +30,7 @@ import { ttyAssertTerminal } from './ttyAssertTerminal'
  * - `interactiveCli()`: typing / slash / recall helpers on the PTY session
  * - `useNotebook(title)`: `/use` then fluent `attachPdfBook` / `pastCliAssistantMessages` (notebook stage)
  * - `syncWorkspace`: a local Markdown workspace and `/sync --dry-run` against it
+ * - `exportDestination`: a local directory and `/export` writing the notebook into it
  * - Execution (installation)
  * - Backend (bundle, install script)
  */
@@ -43,6 +50,12 @@ export const cli = {
     workspaceShouldNotContain,
     workspaceMatchingNotebook,
     workspaceShouldHoldOnly,
+  },
+  exportDestination: {
+    destinationFileShouldHold,
+    destinationShouldHoldOnly,
+    emptyDestination,
+    exportNotebook,
   },
   installation,
   backend,

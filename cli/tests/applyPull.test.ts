@@ -35,7 +35,11 @@ describe('applyPull', () => {
     applyPull({
       notebookId: 1,
       workspacePath: path,
-      exportNotebookAsZip: () => Promise.resolve(zipOfNotes(notes)),
+      exportNotebookAsZip: () =>
+        Promise.resolve({
+          bytes: zipOfNotes(notes),
+          fileName: 'Ben Notebook.zip',
+        }),
     })
 
   test('updates a changed note on disk', async () => {

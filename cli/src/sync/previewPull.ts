@@ -54,7 +54,8 @@ export async function previewPull({
   signal,
 }: PreviewPullRequest): Promise<string> {
   const workspace = readWorkspace(workspacePath)
-  const exported = unzipToEntries(await exportNotebookAsZip(notebookId, signal))
+  const { bytes } = await exportNotebookAsZip(notebookId, signal)
+  const exported = unzipToEntries(bytes)
 
   const changed = [...exported]
     .filter(([path]) => path.endsWith(MARKDOWN_SUFFIX))

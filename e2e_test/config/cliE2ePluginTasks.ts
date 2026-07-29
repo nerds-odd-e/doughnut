@@ -252,7 +252,10 @@ export function createCliE2ePluginTasks(
     createCliConfigDir() {
       return mkdtempSync(join(tmpdir(), 'cypress-cli-config-'))
     },
-
+    /** An empty directory for a command to write into. */
+    createCliEmptyDirectory() {
+      return mkdtempSync(join(tmpdir(), 'cypress-cli-export-'))
+    },
     readCliWorkspaceFile({
       workspace,
       relativePath,

@@ -34,7 +34,8 @@ export async function applyPull({
   signal,
 }: ApplyPullRequest): Promise<string> {
   const workspace = readWorkspace(workspacePath)
-  const exported = unzipToEntries(await exportNotebookAsZip(notebookId, signal))
+  const { bytes } = await exportNotebookAsZip(notebookId, signal)
+  const exported = unzipToEntries(bytes)
 
   let updated = 0
   for (const [path, localContent] of workspace) {

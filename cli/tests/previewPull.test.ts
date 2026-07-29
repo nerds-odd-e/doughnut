@@ -35,7 +35,11 @@ describe('previewPull', () => {
     previewPull({
       notebookId: 1,
       workspacePath: path,
-      exportNotebookAsZip: () => Promise.resolve(zipOfNotes(notes)),
+      exportNotebookAsZip: () =>
+        Promise.resolve({
+          bytes: zipOfNotes(notes),
+          fileName: 'Ben Notebook.zip',
+        }),
     })
 
   test('reports a changed note as a diff', async () => {
@@ -196,7 +200,10 @@ describe('previewPull', () => {
         workspacePath: join(workspace, 'nowhere'),
         exportNotebookAsZip: () => {
           asked = true
-          return Promise.resolve(zipOfNotes({}))
+          return Promise.resolve({
+            bytes: zipOfNotes({}),
+            fileName: 'Ben Notebook.zip',
+          })
         },
       })
     ).rejects.toThrow('No directory at')
