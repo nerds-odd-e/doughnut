@@ -1,3 +1,4 @@
+import { lintWorkspace } from '../lint/lintWorkspace.js'
 import type {
   CommandDoc,
   InteractiveSlashCommand,
@@ -14,8 +15,5 @@ export const lintSlashCommand: InteractiveSlashCommand = {
   literal: '/lint',
   doc: lintDoc,
   argument: { name: 'workspace directory', optional: false },
-  run: () => ({
-    assistantMessage:
-      'a.md:1  error  Frontmatter is missing\n\n1 error in 1 file.',
-  }),
+  run: (argument) => ({ assistantMessage: lintWorkspace(argument ?? '') }),
 }
