@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import type { Notebook } from 'doughnut-api'
 import { downloadNotebookExportZip } from '../../backendApi/doughnutBackendClient.js'
+import { applyPull } from '../../sync/applyPull.js'
 import { previewPull } from '../../sync/previewPull.js'
 import { parseSyncArgument } from '../../sync/syncArgument.js'
 import { AsyncAssistantFetchStage } from '../gmail/AsyncAssistantFetchStage.js'
@@ -12,9 +13,9 @@ import type {
 
 const syncDoc: CommandDoc = {
   name: '/sync',
-  usage: '/sync --dry-run <workspace path>',
+  usage: '/sync [--dry-run] <workspace path>',
   description:
-    'Preview what pulling the active notebook would change in a local Markdown workspace. Reports a unified diff per changed note and writes nothing. Only --dry-run is available; pulling is not implemented yet.',
+    'Pull remote note changes into a local Markdown workspace, or preview them with --dry-run. Only updates files that already exist locally and match an exported note path.',
 }
 
 export function syncSlashCommandFor(
@@ -25,26 +26,34 @@ export function syncSlashCommandFor(
     onSettled,
     onAbortWithError,
   }: InteractiveSlashCommandStageProps) {
-    const runPreview = useCallback(
+    const runSync = useCallback(
       (signal: AbortSignal) => {
         const parsed = parseSyncArgument(argument)
         if (parsed.error !== undefined) {
           return Promise.reject(new Error(parsed.error))
         }
-        return previewPull({
+        const request = {
           notebookId: notebook.id,
           workspacePath: parsed.workspacePath,
           exportNotebookAsZip: downloadNotebookExportZip,
           signal,
-        })
+        }
+        return parsed.dryRun ? previewPull(request) : applyPull(request)
       },
       [argument]
     )
 
+    const parsed = parseSyncArgument(argument)
+    const dryRun = parsed.error === undefined && parsed.dryRun
+
     return (
       <AsyncAssistantFetchStage
-        spinnerLabel="Comparing the workspace with the notebook…"
-        runAssistantMessage={runPreview}
+        spinnerLabel={
+          dryRun
+            ? 'Comparing the workspace with the notebook…'
+            : 'Pulling remote changes into the workspace…'
+        }
+        runAssistantMessage={runSync}
         onSettled={onSettled}
         onAbortWithError={onAbortWithError}
       />
@@ -54,7 +63,7 @@ export function syncSlashCommandFor(
   return {
     literal: '/sync',
     doc: syncDoc,
-    argument: { name: '--dry-run <workspace path>', optional: false },
+    argument: { name: '[--dry-run] <workspace path>', optional: false },
     stageComponent: SyncStage,
   }
 }

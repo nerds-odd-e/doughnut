@@ -5,8 +5,13 @@ import { interactiveCli } from './interactiveCli'
 import { useNotebook } from './notebookInteractiveCliSession'
 import {
   editWorkspaceFile,
+  addExtraWorkspaceFile,
+  pullIntoWorkspace,
+  pullIntoWorkspaceWithinSeconds,
+  removeWorkspaceFile,
   previewPull,
   workspaceFileShouldHold,
+  workspaceShouldNotContain,
   workspaceMatchingNotebook,
   workspaceShouldHoldOnly,
 } from './syncWorkspace'
@@ -29,8 +34,13 @@ export const cli = {
   useNotebook,
   syncWorkspace: {
     editWorkspaceFile,
+    addExtraWorkspaceFile,
+    pullIntoWorkspace,
+    pullIntoWorkspaceWithinSeconds,
+    removeWorkspaceFile,
     previewPull,
     workspaceFileShouldHold,
+    workspaceShouldNotContain,
     workspaceMatchingNotebook,
     workspaceShouldHoldOnly,
   },

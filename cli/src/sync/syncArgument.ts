@@ -1,28 +1,49 @@
 const DRY_RUN_FLAG = '--dry-run'
 
-const USAGE = 'Usage: /sync --dry-run <workspace path>'
-
-const DRY_RUN_ONLY =
-  'Only /sync --dry-run is available. Pulling is not implemented yet.'
+const USAGE = 'Usage: /sync [--dry-run] <workspace path>'
 
 export type SyncArgument =
-  | { readonly workspacePath: string; readonly error?: undefined }
+  | {
+      readonly workspacePath: string
+      readonly dryRun: boolean
+      readonly error?: undefined
+    }
   | { readonly error: string; readonly workspacePath?: undefined }
 
 /**
- * Read `--dry-run <workspace path>`. Previewing is all this command does for
- * now, so anything else is turned away rather than assumed to mean a pull.
+ * Read `[--dry-run] <workspace path>`. Without the flag, the command pulls
+ * remote changes into existing workspace files.
  */
 export function parseSyncArgument(argument: string | undefined): SyncArgument {
   const trimmed = (argument ?? '').trim()
   if (trimmed === '') return { error: USAGE }
-  if (!trimmed.startsWith(DRY_RUN_FLAG)) return { error: DRY_RUN_ONLY }
 
-  const rest = trimmed.slice(DRY_RUN_FLAG.length)
-  // Without separating whitespace this is a longer flag, not the dry run one.
-  if (rest !== '' && !/^\s/.test(rest)) return { error: DRY_RUN_ONLY }
+  let dryRun = false
+  let workspacePart = trimmed
 
-  const workspacePath = rest.trim()
-  if (workspacePath === '') return { error: USAGE }
-  return { workspacePath }
+  if (trimmed.startsWith(DRY_RUN_FLAG)) {
+    const afterFlag = trimmed.slice(DRY_RUN_FLAG.length)
+    if (afterFlag !== '' && !/^\s/.test(afterFlag)) {
+      return { error: USAGE }
+    }
+    dryRun = true
+    workspacePart = afterFlag.trim()
+  } else if (trimmed.startsWith('--')) {
+    return { error: USAGE }
+  }
+
+  if (workspacePart === '') return { error: USAGE }
+  return { workspacePath: stripSurroundingQuotes(workspacePart), dryRun }
+}
+
+/** Shell-style quotes are not parsed by the CLI; strip them if the user typed them. */
+function stripSurroundingQuotes(path: string): string {
+  if (path.length >= 2) {
+    const first = path[0]
+    const last = path[path.length - 1]
+    if ((first === '"' && last === '"') || (first === "'" && last === "'")) {
+      return path.slice(1, -1)
+    }
+  }
+  return path
 }

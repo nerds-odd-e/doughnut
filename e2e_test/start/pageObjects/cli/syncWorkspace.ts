@@ -1,5 +1,6 @@
 import { e2eAppBaseUrl } from '../../../support/e2eAppUrl'
 import testability from '../../testability'
+import { cliAssertTask } from './cliAssertTask'
 import { interactiveCli } from './interactiveCli'
 
 /**
@@ -32,6 +33,7 @@ export function workspaceMatchingNotebook(notebookName: string, name: string) {
         method: 'GET',
         url: `${e2eAppBaseUrl()}/api/notebooks/${notebookId}/export`,
         encoding: 'base64',
+        timeout: 120_000,
       })
     )
     .then((response) =>
@@ -62,6 +64,56 @@ export function previewPull(workspaceName: string) {
   )
 }
 
+export function pullIntoWorkspace(workspaceName: string) {
+  return interactiveCli().enterSlashCommandInInteractiveCli(
+    `/sync ${resolveWorkspaceDir(workspaceName)}`
+  )
+}
+
+export function pullIntoWorkspaceWithinSeconds(
+  workspaceName: string,
+  seconds: number
+) {
+  const startedAt = Date.now()
+  const dir = resolveWorkspaceDir(workspaceName)
+  return interactiveCli()
+    .enterSlashCommandInInteractiveCli(`/sync ${dir}`)
+    .then(() =>
+      cliAssertTask({
+        strict: false,
+        needle: 'note updated.',
+        surface: 'strippedTranscript',
+        messagePrefix: 'Past CLI assistant messages (pull timing).',
+        timeoutMs: 120_000,
+      })
+    )
+    .then(() => {
+      const elapsedMs = Date.now() - startedAt
+      expect(
+        elapsedMs,
+        `sync should finish within ${seconds}s but took ${elapsedMs}ms`
+      ).to.be.lessThan(seconds * 1000)
+    })
+}
+
+export function addExtraWorkspaceFile(
+  workspaceName: string,
+  relativePath: string,
+  content: string
+) {
+  return editWorkspaceFile(workspaceName, relativePath, content)
+}
+
+export function removeWorkspaceFile(
+  workspaceName: string,
+  relativePath: string
+) {
+  return cy.task('deleteCliWorkspaceFile', {
+    workspace: resolveWorkspaceDir(workspaceName),
+    relativePath,
+  })
+}
+
 export function workspaceFileShouldHold(
   workspaceName: string,
   relativePath: string,
@@ -73,6 +125,15 @@ export function workspaceFileShouldHold(
       relativePath,
     })
     .should('contain', expectedBody)
+}
+
+export function workspaceShouldNotContain(
+  workspaceName: string,
+  relativePath: string
+) {
+  return cy
+    .task<string[]>('listCliWorkspaceFiles', resolveWorkspaceDir(workspaceName))
+    .should('not.include', relativePath)
 }
 
 export function workspaceShouldHoldOnly(

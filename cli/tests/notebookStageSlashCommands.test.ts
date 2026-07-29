@@ -16,13 +16,14 @@ describe('notebookStageSlashCommandsFor', () => {
     expect(literals).toContain('/sync')
   })
 
-  test('documents that only a dry run is available', () => {
+  test('documents pull and dry-run usage', () => {
     const sync = notebookStageSlashCommandsFor(aNotebook()).find(
       (command) => command.literal === '/sync'
     )
 
-    expect(sync?.doc.usage).toBe('/sync --dry-run <workspace path>')
+    expect(sync?.doc.usage).toBe('/sync [--dry-run] <workspace path>')
     expect(sync?.doc.description).toContain('--dry-run')
+    expect(sync?.doc.description).toContain('Pull')
   })
 
   test('requires an argument', () => {

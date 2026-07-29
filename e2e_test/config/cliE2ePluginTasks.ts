@@ -262,6 +262,16 @@ export function createCliE2ePluginTasks(
     }) {
       return readFileSync(join(workspace, relativePath), 'utf8')
     },
+    deleteCliWorkspaceFile({
+      workspace,
+      relativePath,
+    }: {
+      workspace: string
+      relativePath: string
+    }) {
+      unlinkSync(join(workspace, relativePath))
+      return null
+    },
     writeCliWorkspaceFile({
       workspace,
       relativePath,
