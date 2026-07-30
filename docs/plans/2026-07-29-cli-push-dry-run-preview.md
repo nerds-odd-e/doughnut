@@ -256,12 +256,13 @@ Learned during implementation:
 - **Phase 1's `reports the same difference when run twice` test was made obsolete by this phase**
   and became the `(push)` case: with a baseline on disk, a second run over an unchanged remote and
   a changed local *should* read differently from the first. Replaced, not kept.
-- **The diff direction is unchanged from Phase 1 and `previewPull`**: removed lines are the
-  workspace, added lines are Doughnut, whatever the label. So a `(push)` note reads
-  `- <local>` / `+ <remote>`, which is the opposite of the "what a push would do to Doughnut"
-  reading a user might expect. Left alone deliberately — flipping it per label would make the
-  report inconsistent with itself, and flipping it everywhere is a change to Phase 1's shipped
-  behavior, out of this phase's scope. Worth deciding explicitly before story #6 (the real push).
+- **The diff direction now flips for `(push)`.** Flagged after first landing as counter-intuitive
+  — a `(push)` note read `- <local>` / `+ <remote>`, backwards from "what a push would do to
+  Doughnut." Decided explicitly and fixed: `renderNoteDiff` (`diffReport.ts`) shows `push` notes
+  notebook-to-workspace (removed = Doughnut as it stands, added = workspace as it stands, i.e.
+  what pushing would write) and leaves every other case — unlabeled, `(pull)`, and the
+  not-yet-implemented `(CONFLICT)` — as workspace-to-notebook, matching `/sync --dry-run`.
+  `previewPull.ts` never passes a `status`, so it is unaffected.
 - `renderNoteDiff` grew one optional `status` parameter rendered as ` (status)` on the path
   header, so `previewPull`'s call site is untouched and Phase 3's `CONFLICT` needs no further
   rendering change.

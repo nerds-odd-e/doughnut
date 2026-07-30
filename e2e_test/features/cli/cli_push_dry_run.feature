@@ -6,8 +6,10 @@
 # later preview reads that baseline to say which side changed. Conflicts —
 # both sides changed since the baseline — are Phase 3, not covered here yet.
 #
-# Whatever the label, removed lines are the workspace as it stands and added
-# lines are the notebook as it stands, the same way `/sync --dry-run` reads.
+# An unlabeled or `(pull)` diff reads workspace-to-notebook, the same way
+# `/sync --dry-run` reads. A `(push)` diff reads notebook-to-workspace instead
+# — removed is Doughnut as it stands, added is the workspace as it stands —
+# so it shows what pushing would actually write into Doughnut.
 #
 # Diff formatting, classification, and argument parsing are covered by the CLI
 # unit tests: cli/tests/previewPush.test.ts, cli/tests/pushArgument.test.ts.
@@ -82,8 +84,8 @@ Feature: Preview what a push would change
       Then I should see "less.md (push)" in past CLI assistant messages
       And I should see the preview in past CLI assistant messages:
         """
-          - Hello from Obsidian
-          + Hello
+          - Hello
+          + Hello from Obsidian
 
         1 note would change.
         """

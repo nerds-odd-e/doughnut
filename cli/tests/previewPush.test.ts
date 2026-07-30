@@ -174,8 +174,8 @@ describe('previewPush', () => {
     await expect(preview({ 'less.md': 'Hello' })).resolves.toBe(
       [
         'less.md (push)',
-        '  - Hello from Obsidian',
-        '  + Hello',
+        '  - Hello',
+        '  + Hello from Obsidian',
         '',
         '1 note would change.',
       ].join('\n')

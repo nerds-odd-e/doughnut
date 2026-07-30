@@ -3,7 +3,10 @@ import { diffLines } from './unifiedDiff.js'
 /**
  * One note's diff, formatted the way `/sync --dry-run` and `/push --dry-run`
  * both report it. `status`, when given, is appended to the path header in
- * parentheses — `less.md (push)` — to say which way the difference would flow.
+ * parentheses — `less.md (push)` — to say which way the difference would
+ * flow. For `push`, the diff is shown remote-to-local (what pushing would
+ * write into Doughnut); every other case (including unlabeled) is shown
+ * workspace-to-notebook, as `/sync --dry-run` already reads.
  */
 export function renderNoteDiff(
   path: string,
@@ -11,7 +14,11 @@ export function renderNoteDiff(
   notebookContent: string,
   status?: string
 ): string {
-  const body = diffLines(workspaceContent, notebookContent).flatMap((hunk) => [
+  const [before, after] =
+    status === 'push'
+      ? [notebookContent, workspaceContent]
+      : [workspaceContent, notebookContent]
+  const body = diffLines(before, after).flatMap((hunk) => [
     ...(hunk.header === undefined ? [] : [`  @@ line ${hunk.header} @@`]),
     ...hunk.lines.map(({ kind, text }) =>
       kind === 'context'
