@@ -1,8 +1,8 @@
 # CLI `/push --dry-run` — preview local edits and conflicts before pushing
 
-**Status:** Phases 1-3 done and committed (Phase 3 together with its code-review fixes and the
+**Status:** Phases 1-4 done and committed (Phase 3 together with its code-review fixes and the
 `---`/`+++` diff side headers, as a single commit — the two were too intertwined by the time
-review was done to split safely). Phase 4 planned, not started.
+review was done to split safely). Plan complete.
 
 **Goal:** Inside the notebook context that `/use` establishes, `/push --dry-run <workspace path>`
 reports, per note, whether a push would update Doughnut, whether a pull would update the
@@ -437,7 +437,29 @@ confirming each fails before implementing.
 Then implement: extend `previewPush.ts`'s classification (both-changed branch) and the
 summary-line renderer.
 
-### Phase 4 — Stale baseline for a different notebook (closing the loop)
+### Phase 4 — Stale baseline for a different notebook (closing the loop) — DONE
+
+Checked first: Phase 1's `pushBaseline.test.ts` only pinned the mismatch at the
+`loadPushBaseline`/`savePushBaseline` layer (`treats a baseline saved for a different notebook as
+absent`) — `previewPush.test.ts` had no case exercising it through the full `previewPush()` flow,
+despite the Phase 1 write-up's plan to add it there. Added
+`falls back to the bootstrap diff when the baseline belongs to a different notebook`: establishes
+a baseline under `notebookId: 1`, then calls `previewPush` again for the same workspace under
+`notebookId: 2` with different remote content, and asserts the result is the plain unlabeled
+bootstrap diff (not `(pull)`) — the same shape Phase 1 already covers for a workspace with no
+baseline at all.
+
+The test passed immediately, confirming `previewPush.ts`'s existing
+`loadPushBaseline(workspacePath, notebookId)` call already falls back to an empty baseline on a
+notebookId mismatch — exactly as Phase 1 predicted ("Phase 4's behavior falls out for free here").
+No production code changed. No new e2e scenario needed: the added unit test fully expresses the
+workspace-reuse angle (same workspace path, two different notebook contexts) that an e2e scenario
+would otherwise exist to cover.
+
+Verified: `cli/tests/previewPush.test.ts` (26 tests) and the full CLI suite (465 tests) pass;
+`pnpm lint:all` clean.
+
+Original phase description follows, kept for reference:
 
 Mostly covered by Phase 1's `pushBaseline.ts` (mismatch treated as absent, tested there already).
 This phase is just an end-to-end check: reuse a workspace's `.doughnut-sync/baseline.json`

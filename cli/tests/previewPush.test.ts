@@ -395,6 +395,41 @@ describe('previewPush', () => {
     )
   })
 
+  test('falls back to the bootstrap diff when the baseline belongs to a different notebook', async () => {
+    write('less.md', 'Hello')
+    await previewPush({
+      notebookId: 1,
+      workspacePath: workspace,
+      exportNotebookAsZip: () =>
+        Promise.resolve({
+          bytes: zipOfNotes({ 'less.md': 'Hello' }),
+          fileName: 'Ben Notebook.zip',
+        }),
+    })
+
+    await expect(
+      previewPush({
+        notebookId: 2,
+        workspacePath: workspace,
+        exportNotebookAsZip: () =>
+          Promise.resolve({
+            bytes: zipOfNotes({ 'less.md': 'Hello world!' }),
+            fileName: 'Other Notebook.zip',
+          }),
+      })
+    ).resolves.toBe(
+      [
+        'less.md',
+        '  --- workspace',
+        '  +++ Doughnut',
+        '  - Hello',
+        '  + Hello world!',
+        '',
+        '1 note would change.',
+      ].join('\n')
+    )
+  })
+
   test('reports a missing workspace directory', async () => {
     await expect(preview({}, join(workspace, 'nowhere'))).rejects.toThrow(
       `No directory at ${join(workspace, 'nowhere')}.`
