@@ -1,12 +1,11 @@
 /**
  * Fetching a notebook as an exported Markdown workspace.
  *
- * The preview needs a copy of the notebook as it stands to compare a workspace
- * against. The backend builds that copy as a zip
- * (`NotebookExportService.exportNotebookAsZip`), which another team owns; they
- * are building the web side first, so this is the seam we define from our end
- * and reconcile with theirs once the endpoint exists. See
- * `docs/refinement/2026-07-27/QUESTIONS-for-export-team.md`.
+ * The backend builds this as a zip (`NotebookExportService.exportNotebookAsZip`,
+ * served by `GET /api/notebooks/{notebook}/export`), and `/export` and
+ * `/sync --dry-run` share this one shape for it: `/export` writes it to disk
+ * (`writeNotebookExport`), `/sync --dry-run` compares it against a workspace
+ * (`previewPull`) without writing anything.
  */
 export type NotebookExport = {
   readonly bytes: Buffer

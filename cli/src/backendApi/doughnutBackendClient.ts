@@ -345,9 +345,9 @@ export async function attachNotebookBookFile(
 /**
  * Download a notebook as the zip the backend builds from its notes and folders.
  *
- * The endpoint is owned by the team building export and is not serving yet; a
- * 404 is reported as such rather than as an empty notebook. See
- * `docs/refinement/2026-07-27/QUESTIONS-for-export-team.md`.
+ * Shared entry point for both `/export` (writes the zip to disk) and
+ * `/sync --dry-run` (previews a pull against a workspace without writing
+ * anything) — see `exportNotebook.ts`.
  */
 export async function downloadNotebookExportZip(
   notebookId: number,
@@ -371,9 +371,11 @@ export async function downloadNotebookExportZip(
         }
       )
       if (res.status === 404) {
-        throw new Error(
-          'Exporting a notebook is not available yet, or the notebook no longer exists in Doughnut.'
-        )
+        throw {
+          status: 404,
+          message:
+            'The notebook no longer exists in Doughnut, or you no longer have read access to it.',
+        }
       }
       if (!res.ok) {
         throw { body: await res.text(), status: res.status }

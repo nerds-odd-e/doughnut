@@ -51,4 +51,20 @@ describe('downloadNotebookExportZip', () => {
       'The export response did not name a file.'
     )
   })
+
+  test('reports a 404 as the notebook being gone or unreadable, not as the endpoint being unavailable', async () => {
+    process.env.DOUGHNUT_CONFIG_DIR = tempConfigWithToken()
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 404,
+        text: () => Promise.resolve(''),
+      })
+    )
+
+    await expect(downloadNotebookExportZip(1)).rejects.toThrow(
+      'The notebook no longer exists in Doughnut, or you no longer have read access to it.'
+    )
+  })
 })

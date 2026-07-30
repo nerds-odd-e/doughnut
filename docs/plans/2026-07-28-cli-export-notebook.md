@@ -404,7 +404,7 @@ by asserting on `mock.calls.at(-1)` in the two new tests instead of touching the
 lifecycle (out of scope for this slice); the original assertion was left alone since it is still
 correct for its own case (it really is the first call).
 
-### Slice 7 — Clear out leftovers from when the endpoint did not exist
+### Slice 7 — Clear out leftovers from when the endpoint did not exist — DONE
 
 The CLI never had an export feature — only the HTTP client `/sync` wrote to fetch a notebook's
 current state (`downloadNotebookExportZip()`, whose only caller is `syncSlashCommand.tsx:37`).
@@ -429,6 +429,28 @@ longer true, and that read as though CLI export had already been built:
 
 No new behaviour, but it is what keeps the next reader from misjudging this code. Do it last so
 it does not collide with earlier slices in the same files.
+
+Task 1's dead-code deletion was already done, incidentally, by `c3a1bf842f` ("test(cli): unignore
+and fix e2e tests for cli sync dry run") before this slice started — its commit message says
+"Remove the unused fallback `exportNotebookAsZipUnavailable`." The file header comment it left
+behind was still stale, so that part of Task 1 remained. Rewrote both `exportNotebook.ts`'s file
+header and `downloadNotebookExportZip()`'s doc comment (Task 2) to describe the shared
+`/export` + `/sync --dry-run` role instead of the old "another team owns this, not serving yet"
+framing.
+
+Task 3's fix followed Slice 5's exact same discovery: the 404 short-circuit threw a plain `Error`
+inside `withBackendClient()`, so its message was reclassified into the generic "service
+unreachable" text by the same classifier that swallowed Slice 5's "did not name a file" message
+(a plain `Error` has no `.status`). Rather than moving this one outside the wrapped call too, it
+throws `{ status: 404, message: '...' }` instead — an object shape the classifier already knows
+how to read correctly (the same pattern the adjacent `!res.ok` branch already used), so the fix is
+one line smaller than Slice 5's and doesn't need a second escape hatch. New message: "The notebook
+no longer exists in Doughnut, or you no longer have read access to it." — pinned red-first in
+`cli/tests/doughnutBackendClient.errors.test.ts`.
+
+Not done here, as it belongs to the plan's final wrap-up rather than any one slice: the reply
+under `docs/refinement/2026-07-27/` (decision 2) confirming `writeNotebookExport()` satisfies
+blocking ask #1 and explaining the notebook-subdirectory divergence.
 
 The e2e feature is never `@ignore`d. `cli_sync_dry_run.feature:1` is `@ignore`d to this day,
 its header saying "Enable them in the commit that does" — a commit that never came. Outside-in
