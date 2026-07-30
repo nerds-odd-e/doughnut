@@ -1,6 +1,8 @@
 # CLI `/push --dry-run` — preview local edits and conflicts before pushing
 
-**Status:** Phases 1-2 done and committed. Phases 3-4 planned, not started.
+**Status:** Phases 1-2 done and committed. Phase 3 done (with its code-review fixes) and the
+`---`/`+++` diff side headers done, both in the working tree, **neither committed yet** — intended
+as two commits, Phase 3 first. Phase 4 planned, not started.
 
 **Goal:** Inside the notebook context that `/use` establishes, `/push --dry-run <workspace path>`
 reports, per note, whether a push would update Doughnut, whether a pull would update the
@@ -29,15 +31,22 @@ story #5 only — not story #6 (the actual, mutating push).
    `--dry-run` returns a usage error (the real push is story #6, not built here).
 2. **A baseline is required** to tell local-changed apart from remote-changed apart from
    conflict; without one, two-way comparison can only ever say "they differ." The baseline is a
-   snapshot of the **remote** content last observed, refreshed on every run.
-3. **The baseline is established lazily, and never by touching local files.** The first run in a
-   workspace with no baseline yet does the same plain two-way diff `previewPull` already does
-   (no pull/push/conflict label), and in that same run seeds the baseline from the
-   freshly-exported remote content. No separate bootstrap step, no forced overwrite of local
-   `.md` files — a local edit that predates the first-ever preview is exactly the kind of
-   difference this tool exists to surface, not silently resolve.
+   **merge base**: per note, the content Doughnut and the workspace were last *observed to agree
+   on*. It is therefore recorded only for a note whose two sides agree in the run doing the
+   recording, and is otherwise carried forward untouched — never refreshed to whatever the
+   remote side happened to look like this run. (Corrected during Phase 3; originally "a snapshot
+   of the remote content last observed, refreshed on every run", which let the baseline absorb
+   the remote side of a difference it had just reported — see "Classification algorithm" below.)
+3. **The baseline is established lazily, and never by touching local files.** A run finding no
+   baseline entry for a note does the same plain two-way diff `previewPull` already does (no
+   pull/push/conflict label). No separate bootstrap step, no forced overwrite of local `.md`
+   files — a local edit that predates the first-ever preview is exactly the kind of difference
+   this tool exists to surface, not silently resolve. Following from decision 2, a first run
+   seeds an entry only for the notes whose two sides already agree; a note that differs on its
+   very first run stays unlabeled on every later run too, until the two sides do agree once,
+   because no merge base exists for it yet and no direction can be honestly claimed.
 4. **Baseline storage never touches `.md` files.** It lives in a hidden
-   `<workspacePath>/.doughnut-sync/baseline.json` (`{ notebookId, notes: { [path]: remoteContent
+   `<workspacePath>/.doughnut-sync/baseline.json` (`{ notebookId, notes: { [path]: agreedContent
    } }`). `readWorkspace()` only ever collects `.md` files, so this file is naturally invisible
    to the diff engine on both read and write. It is the *only* thing this command ever writes.
    A stored `notebookId` that doesn't match the current notebook is treated as no baseline at
@@ -55,12 +64,12 @@ story #5 only — not story #6 (the actual, mutating push).
 Per note present in both the workspace and the fresh export:
 
 ```
-baseline = load baseline.json → notes[path]   // undefined on first run for this note
+baseline = load baseline.json → notes[path]   // undefined until the two sides agree once
 remote    = fresh export content
 local     = current workspace content
 
 if baseline is undefined:
-  // bootstrap — no history yet for this note: show the plain two-way diff,
+  // no merge base yet for this note: show the plain two-way diff,
   // exactly like previewPull, with no local/remote/conflict label
   if local !== remote: report as DIFF (unlabeled)
 else:
@@ -71,9 +80,40 @@ else:
   if remoteChanged and localChanged and local !== remote: report as CONFLICT
   // both changed but converged to the same content → nothing to report
 
-always, regardless of branch: write notes[path] = remote into baseline.json for
-every path seen this run — the only mutation this command ever performs
+then, for every path in this run's export — the only mutation this command ever performs:
+  if local === remote:                    notes[path] = remote   // they agree: a real merge base
+  else if the path has a baseline:         leave notes[path] as it is
+  else:                                   no entry for this path at all
+  // paths the export no longer holds are dropped from notes
 ```
+
+**Corrected during Phase 3** (originally: "write notes[path] = remote for every path seen this
+run", regardless of branch; then, after the first review round, still exempting a path with no
+entry yet). An entry is written only when the two sides *actually agree* — bootstrap included.
+Writing one while a difference is being reported lets the baseline absorb the remote side of that
+difference, so the next run, with nothing edited in between, sees only the workspace as changed
+and reports the same untouched divergence as a `(push)`: exactly the stale-local-over-newer-remote
+push this feature exists to prevent, and a direction nothing had established. Exempting the
+bootstrap case reintroduced that one run earlier in a note's life, so it is gone too.
+
+Enumerated over one note — {entry exists?} × {local vs entry} × {remote vs entry} × {local vs
+remote} — every reachable combination now either names a direction the recorded agreement
+supports, or names none at all:
+
+| Entry | local vs entry | remote vs entry | local vs remote | Report | Next baseline |
+| --- | --- | --- | --- | --- | --- |
+| absent | — | — | same | nothing | `remote` (they agree) |
+| absent | — | — | differ | unlabeled | no entry |
+| present | same | same | same | nothing | unchanged |
+| present | same | differ | differ | `(pull)` | unchanged |
+| present | differ | same | differ | `(push)` | unchanged |
+| present | differ | differ | same | nothing | `remote` (converged) |
+| present | differ | differ | differ | `(CONFLICT)` | unchanged |
+
+A note the export holds but the workspace does not is out of scope (decision 6): it is left out
+of the report, and out of any new entry — `workspace.get(path)` is `undefined`, which equals no
+remote string, so it can never be mistaken for agreement. An entry already there is carried
+forward, so restoring the file resumes from the merge base rather than losing it.
 
 Line-ending normalization reuses `readWorkspace.ts`'s existing CRLF→LF handling, so a workspace
 saved with CRLF line endings doesn't spuriously report every line as changed.
@@ -86,15 +126,22 @@ line), adding a status label per note and a distinct summary phrase for conflict
 
 ```
 less.md (push)
+  --- Doughnut
+  +++ workspace
   - Hello
   + Hello world!
 
 scrum.md (CONFLICT)
+  --- workspace
+  +++ Doughnut
   - Sprint plan A
   + Sprint plan B
 
-1 note would push. 1 conflict.
+1 note would change. 1 conflict.
 ```
+
+The `---`/`+++` side headers were **added after Phase 3**, outside this plan's phase structure —
+see "Naming each diff's sides" at the end of the phase list below.
 
 Empty case: `"No changes to push."`, following `previewPull`'s `"No changes to pull."`
 convention. Exact wording for the pull-suggested and bootstrap-unlabeled cases is finalized
@@ -221,7 +268,8 @@ from step 1 is green:
   exportNotebookAsZip, signal })`. Mirrors `previewPull.ts`'s shape (read workspace, export,
   unzip, filter to `.md`, sort). This phase's branch: no baseline entry for a path → diff exactly
   like `previewPull`'s `renderNote` (unlabeled). Always ends by saving the fresh export as the
-  new baseline.
+  new baseline. (Superseded in Phase 3: an entry is recorded only for a note whose two sides
+  agree — see decision 2 and "Classification algorithm".)
 - New `cli/src/sync/pushArgument.ts` — `parsePushArgument`, same parsing shape as
   `syncArgument.ts`'s `parseSyncArgument`. Only `--dry-run` is implemented; a call without the
   flag returns a usage error — `Usage: /push --dry-run <workspace path>`.
@@ -287,7 +335,91 @@ confirming each fails before implementing.
 Then implement: extend `previewPush.ts`'s classification branch (baseline-defined case) and its
 rendering (status suffix per note, e.g. `less.md (push)`).
 
-### Phase 3 — Conflict detection
+### Phase 3 — Conflict detection — DONE
+
+Pinned at the outermost layer first: a third scenario under the "later preview" rule (both sides
+edited between the rule background's baseline-establishing run and a second one), watched red on
+the missing `(CONFLICT)` label and the old summary line while the diff body itself already read
+correctly — again with no new step definition needed, and again reusing the two existing edit
+steps. Then `previewPush.test.ts`'s conflict, converged, mixed-count and plural cases, each
+watched red before implementing `classify`'s both-changed branch and `renderDiffReport`'s
+conflict count.
+
+Learned during implementation:
+
+- **Conflicts are counted apart from, not inside, "would change."** A conflict is not something a
+  push could apply, so counting it as a note that "would change" would overstate what the command
+  could do. The summary is a sentence per kind, joined by a space and each only present when
+  non-zero: `1 note would change. 1 conflict.` for one of each, `1 conflict.` / `2 conflicts.`
+  when conflicts are all there is. This keeps Phase 2's established "would change" phrasing as the
+  base count rather than the plan's original illustrative "would push" — `/push --dry-run` reports
+  both directions, so naming only one of them in the count would mislead.
+- **`renderNoteDiff`'s diff direction needed no change, as Phase 2 predicted.** Widening
+  `NoteDiffStatus` was enough: the generic `${path} (${status})` heading renders the label, and the
+  `status === 'push'` check already leaves everything else — conflicts included —
+  workspace-to-notebook. The label is uppercase (`CONFLICT`) so a conflict stands out from the
+  lowercase directions in a report listing several notes, but the *status* stayed lowercase
+  (`'conflict'`) and `renderNoteDiff` applies the casing, keeping it a presentation decision.
+- **`renderDiffReport` now takes the reported notes as `{ diff, status }` entries** rather than
+  rendered strings, and counts the conflicts itself. A parallel `conflictCount` parameter was tried
+  first, but `changed.length - conflictCount` is an invariant nothing can enforce, and `previewPush`
+  already had the richer data — so it hands that over instead of re-deriving a count from it.
+  `previewPull` wraps each rendered diff in `{ diff }`, one line, no behavior change.
+- **Phase 2's `leaves a note unlabeled while both sides differ from the baseline` guard test was
+  made obsolete by this phase** — it pinned exactly the fall-through this phase replaces. Rewritten
+  in place as `labels a note CONFLICT when both sides changed and diverged since the last run`,
+  not kept alongside, since the two assertions contradict each other.
+- **The converged-both-changed case already behaved correctly** (`classify` falls through to
+  `'nothing'` when `local === remote`), but nothing pinned it: the nearest existing test covered
+  *neither* side changing. Added as its own case, and it was the one new test that passed on
+  arrival — kept as a regression guard rather than dropped.
+
+Found in code review (first round), fixed before this phase was committed:
+
+- **A conflict or a pull was reported once, then silently downgraded to a `(push)`.** Phase 1's
+  "refresh the baseline from this run's export, always" rule meant the baseline caught up with the
+  remote side of a difference it had just reported. The next run — with nothing edited by anyone —
+  saw `remoteChanged` false and `localChanged` still true, and called the same untouched divergence
+  a `(push)`: the stale-local-over-newer-remote push this feature exists to prevent, reachable by
+  simply previewing twice. Fixed by making the baseline a *merge base* that only advances once the
+  workspace has caught up (see the corrected rule in "Classification algorithm" above), pinned by
+  `keeps reporting a conflict when the preview runs again with nothing edited` and
+  `keeps reporting a pull when the preview runs again with nothing edited`, both watched red
+  (`(push)`) against the old rule first. Two further guards keep the parts of Phase 1's behavior
+  that were right: `advances the baseline once the workspace catches up to Doughnut` and
+  `keeps the baseline to the notes the export still holds`.
+- **A note missing locally was branded a difference — even a `(CONFLICT)` — with an empty diff
+  side.** `workspace.get(path) ?? ''` read "no local file" as "empty local file", so a remote-only
+  note (out of scope per Decision 6) counted as locally changed. Now such a path is skipped
+  outright, pinned by `leaves a note missing from the workspace out of the report`. `previewPull`
+  keeps its own `?? ''`: for a *pull*, a note missing locally is a file the pull would create, which
+  is exactly what it should report.
+
+Found in code review (second round), fixed before this phase was committed:
+
+- **The same bug class survived once more, in the bootstrap case.** The first round's fix still
+  exempted a path with no baseline entry (`agreed === undefined || workspace.get(path) === remote`),
+  so a first-ever preview reporting an honest unlabeled difference still seeded the entry from that
+  run's remote content — and the very next run, nothing edited in between, called it a `(push)`. The
+  direction was fabricated: nothing had been learned between the two runs. The exemption is gone, so
+  an entry is written only when the two sides actually agree. Pinned by
+  `seeds the baseline only with the notes the two sides agree on` (a bootstrap run over one agreeing
+  and one differing note leaves only the agreeing one in `baseline.json`) and
+  `keeps a note unlabeled when the first preview found no history for it`, both watched red first —
+  the second showing exactly the fabricated `less.md (push)`. It replaced Phase 1's
+  `writes the baseline file with the exported content`, which pinned the buggy rule. The first
+  round's two guards passed unchanged, as they should: both establish their baseline through
+  genuine first-run agreement rather than a bootstrap difference.
+- **Accepted consequence, deliberately pinned:** a note that differs on its very first run stays
+  unlabeled on every later run too, until the two sides agree once. Honest per decision 3 — no merge
+  base exists for it yet, so no direction can be claimed. The whole case table is in
+  "Classification algorithm" above, walked to confirm no cell invents a direction.
+- **Doc comments describing the pre-fix rule were corrected**, in `pushBaseline.ts` (its save
+  function and the stored file's type) and `previewPush.ts` (`classify`, `nextBaseline`,
+  `previewPush`), along with decision 2 above, which still stated the "refreshed on every run" rule
+  a reader would hit before the correction recorded further down.
+
+Original phase description follows, kept for reference:
 
 When both local and remote content differ from the baseline **and** differ from each other,
 label the note `(CONFLICT)` instead of `(pull)`/`(push)`, and use a distinct summary phrase
@@ -319,7 +451,55 @@ if one is needed, write and red-confirm it first, same as every other phase.
 
 Then implement: none expected beyond what Phase 1 already wrote.
 
-## Out of scope
+### Naming each diff's sides — DONE, outside this plan's phases
+
+Raised by the user after reviewing Phase 3's output: `-` and `+` alone cannot say which side a
+line came from, because the direction flips per status — `-` is the workspace for an unlabeled,
+`(pull)` or `(CONFLICT)` note, but Doughnut for a `(push)` one, and nothing in the report said so.
+Decided (option chosen by the user out of four offered): name the two sides `git diff` style, on
+every note, `--- <side the removed lines come from>` / `+++ <side the added lines come from>`.
+
+Deliberately **not** folded into Phase 3: it changes `diffReport.ts`, which `/sync --dry-run` has
+shipped on since Phase 1, so it is a change to already-released output rather than part of
+conflict detection. Kept as its own commit, after Phase 3's.
+
+- **The renderer became the only place that knows a side's name.** `renderNoteDiff` picks a
+  `{ name, content }` pair per side and derives both the headers and the diff body from the same
+  choice, so a future direction change cannot leave the labels behind.
+- **A new `cli/tests/diffReport.test.ts` pins the renderer directly** — one case per status for the
+  header direction and the uppercase conflict label, plus the summary-composition branches
+  (changes only, conflicts only, both; singular and plural). This replaced growing
+  `previewPush.test.ts` with more near-duplicate fixture runs: its `counts two conflicts in the
+  plural` case was dropped in favor of the direct one, keeping only the mixed
+  push-plus-conflict case there as an end-to-end check that classification feeds the count.
+- **The e2e docstrings did need updating, contrary to the first guess.** A block asserted through
+  `I should see the preview in past CLI assistant messages:` must be contiguous in the rendered
+  terminal output, and the side headers are not adjacent to the `-`/`+` lines there. So each
+  labeled scenario asserts two blocks: `path (status)` with its two side headers, then the body
+  with the summary line. The redundant `I should see "less.md (push)"` single-line steps were
+  dropped, since the block now covers the label. `cli_sync_dry_run.feature` needed no change at
+  all, verified by running it.
+- **Why they are not adjacent — measured, not guessed** (an earlier note here blamed a markdown
+  rendering boundary, which was wrong: the preview reaches the transcript as a bare Ink
+  `<Text>` node via `appendScrollbackAssistantTextMessage`
+  (`sessionScrollback/sessionScrollbackAppendContext.tsx`), with no markdown renderer anywhere on
+  that path — `AsyncAssistantFetchStage`'s `onSettled` string goes straight through). The three
+  lines actually sitting between `+++ Doughnut` and `- Hello` are the diff's own **context
+  lines**. `NotebookZipBuilder.java` builds every exported note as
+  `---\ndoughnut_id: N\n---\n\n# <title>\n\n<body>`, so a body-only change sits on line 7 and
+  `unifiedDiff.ts`'s `CONTEXT_LINES = 3` prints lines 4-6 above it: the blank line closing the
+  frontmatter, the `# <title>` heading, and the blank line after it. Nothing renders a blank line
+  into the report; `renderNoteDiff` emits the side headers immediately above the body.
+  `cli_sync_dry_run.feature`'s header comment already recorded this ("An exported note carries
+  frontmatter and a `# title` heading above its content, so a diff of the content is preceded by
+  those as context lines") — the same note now sits in `cli_push_dry_run.feature`.
+- **A single contiguous block was tried first and rejected on evidence.** Folding each scenario's
+  two docstrings into one failed all four labeled scenarios, the assertion reporting the pattern
+  `less\.md\r?\n  --- workspace\r?\n  \+\+\+ Doughnut\r?\n  - Hello…` unmatched. Spanning the gap
+  would mean spelling the export's frontmatter-and-heading preamble into every scenario, which
+  `cli_sync_dry_run.feature` deliberately declines to do — it would break the moment the export's
+  shape changes, over something these scenarios are not about. Two blocks bracketing the preamble
+  keep the assertion on what naming the sides is meant to prove.
 
 - The real, mutating `/push` (story #6) — only its preview, here.
 - Local-only notes (would become a new remote note) and remote-only notes (missing locally) —

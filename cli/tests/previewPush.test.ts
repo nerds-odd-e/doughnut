@@ -48,6 +48,8 @@ describe('previewPush', () => {
     await expect(preview({ 'less.md': 'Hello world!' })).resolves.toBe(
       [
         'less.md',
+        '  --- workspace',
+        '  +++ Doughnut',
         '  - Hello',
         '  + Hello world!',
         '',
@@ -65,10 +67,14 @@ describe('previewPush', () => {
     ).resolves.toBe(
       [
         'less.md',
+        '  --- workspace',
+        '  +++ Doughnut',
         '  - Hello',
         '  + Hello world!',
         '',
         'scrum.md',
+        '  --- workspace',
+        '  +++ Doughnut',
         '  - Sprint',
         '  + Sprint review',
         '',
@@ -98,6 +104,8 @@ describe('previewPush', () => {
     ).resolves.toBe(
       [
         'LeSS in Action/team.md',
+        '  --- workspace',
+        '  +++ Doughnut',
         '  - Sprint',
         '  + Sprint review',
         '',
@@ -138,16 +146,34 @@ describe('previewPush', () => {
     expect(readBack('less.md')).toBe('Hello')
   })
 
-  test('writes the baseline file with the exported content', async () => {
+  test('seeds the baseline only with the notes the two sides agree on', async () => {
     write('less.md', 'Hello')
+    write('scrum.md', 'Sprint')
 
-    await preview({ 'less.md': 'Hello world!' })
+    await preview({ 'less.md': 'Hello world!', 'scrum.md': 'Sprint' })
 
     const raw = readBack(join('.doughnut-sync', 'baseline.json'))
     expect(JSON.parse(raw)).toEqual({
       notebookId: 1,
-      notes: { 'less.md': 'Hello world!' },
+      notes: { 'scrum.md': 'Sprint' },
     })
+  })
+
+  test('keeps a note unlabeled when the first preview found no history for it', async () => {
+    write('less.md', 'Hello')
+    await preview({ 'less.md': 'Hello world!' })
+
+    await expect(preview({ 'less.md': 'Hello world!' })).resolves.toBe(
+      [
+        'less.md',
+        '  --- workspace',
+        '  +++ Doughnut',
+        '  - Hello',
+        '  + Hello world!',
+        '',
+        '1 note would change.',
+      ].join('\n')
+    )
   })
 
   test('labels a note only Doughnut changed since the last run as a pull', async () => {
@@ -157,6 +183,8 @@ describe('previewPush', () => {
     await expect(preview({ 'less.md': 'Hello world!' })).resolves.toBe(
       [
         'less.md (pull)',
+        '  --- workspace',
+        '  +++ Doughnut',
         '  - Hello',
         '  + Hello world!',
         '',
@@ -174,6 +202,8 @@ describe('previewPush', () => {
     await expect(preview({ 'less.md': 'Hello' })).resolves.toBe(
       [
         'less.md (push)',
+        '  --- Doughnut',
+        '  +++ workspace',
         '  - Hello',
         '  + Hello from Obsidian',
         '',
@@ -196,6 +226,8 @@ describe('previewPush', () => {
     await expect(preview({ 'many.md': baselineContent })).resolves.toBe(
       [
         'many.md (push)',
+        '  --- Doughnut',
+        '  +++ workspace',
         '  @@ line 2 @@',
         '    line 2',
         '    line 3',
@@ -229,7 +261,7 @@ describe('previewPush', () => {
     )
   })
 
-  test('leaves a note unlabeled while both sides differ from the baseline', async () => {
+  test('labels a note CONFLICT when both sides changed and diverged since the last run', async () => {
     write('less.md', 'Hello')
     await preview({ 'less.md': 'Hello' })
 
@@ -237,11 +269,128 @@ describe('previewPush', () => {
 
     await expect(preview({ 'less.md': 'Hello world!' })).resolves.toBe(
       [
-        'less.md',
+        'less.md (CONFLICT)',
+        '  --- workspace',
+        '  +++ Doughnut',
         '  - Hello from Obsidian',
         '  + Hello world!',
         '',
+        '1 conflict.',
+      ].join('\n')
+    )
+  })
+
+  test('keeps reporting a conflict when the preview runs again with nothing edited', async () => {
+    write('less.md', 'Hello')
+    await preview({ 'less.md': 'Hello' })
+
+    write('less.md', 'Hello from Obsidian')
+    await preview({ 'less.md': 'Hello world!' })
+
+    await expect(preview({ 'less.md': 'Hello world!' })).resolves.toBe(
+      [
+        'less.md (CONFLICT)',
+        '  --- workspace',
+        '  +++ Doughnut',
+        '  - Hello from Obsidian',
+        '  + Hello world!',
+        '',
+        '1 conflict.',
+      ].join('\n')
+    )
+  })
+
+  test('keeps reporting a pull when the preview runs again with nothing edited', async () => {
+    write('less.md', 'Hello')
+    await preview({ 'less.md': 'Hello' })
+
+    await preview({ 'less.md': 'Hello world!' })
+
+    await expect(preview({ 'less.md': 'Hello world!' })).resolves.toBe(
+      [
+        'less.md (pull)',
+        '  --- workspace',
+        '  +++ Doughnut',
+        '  - Hello',
+        '  + Hello world!',
+        '',
         '1 note would change.',
+      ].join('\n')
+    )
+  })
+
+  test('advances the baseline once the workspace catches up to Doughnut', async () => {
+    write('less.md', 'Hello')
+    await preview({ 'less.md': 'Hello' })
+
+    await preview({ 'less.md': 'Hello world!' })
+
+    write('less.md', 'Hello world!')
+
+    await expect(preview({ 'less.md': 'Hello world!' })).resolves.toBe(
+      'No changes to push.'
+    )
+    expect(
+      JSON.parse(readBack(join('.doughnut-sync', 'baseline.json')))
+    ).toEqual({ notebookId: 1, notes: { 'less.md': 'Hello world!' } })
+  })
+
+  test('keeps the baseline to the notes the export still holds', async () => {
+    write('less.md', 'Hello')
+    write('scrum.md', 'Sprint')
+    await preview({ 'less.md': 'Hello', 'scrum.md': 'Sprint' })
+
+    await preview({ 'less.md': 'Hello' })
+
+    expect(
+      JSON.parse(readBack(join('.doughnut-sync', 'baseline.json')))
+    ).toEqual({ notebookId: 1, notes: { 'less.md': 'Hello' } })
+  })
+
+  test('leaves a note missing from the workspace out of the report', async () => {
+    write('less.md', 'Hello')
+
+    await expect(
+      preview({ 'less.md': 'Hello', 'scrum.md': 'Sprint' })
+    ).resolves.toBe('No changes to push.')
+  })
+
+  test('leaves a note both sides changed to the same content out of the report', async () => {
+    write('less.md', 'Hello')
+    await preview({ 'less.md': 'Hello' })
+
+    write('less.md', 'Hello world!')
+
+    await expect(preview({ 'less.md': 'Hello world!' })).resolves.toBe(
+      'No changes to push.'
+    )
+  })
+
+  test('counts conflicts apart from the notes that would change', async () => {
+    write('less.md', 'Hello')
+    write('scrum.md', 'Sprint')
+    await preview({ 'less.md': 'Hello', 'scrum.md': 'Sprint' })
+
+    write('less.md', 'Hello from Obsidian')
+    write('scrum.md', 'Sprint plan A')
+
+    await expect(
+      preview({ 'less.md': 'Hello', 'scrum.md': 'Sprint plan B' })
+    ).resolves.toBe(
+      [
+        'less.md (push)',
+        '  --- Doughnut',
+        '  +++ workspace',
+        '  - Hello',
+        '  + Hello from Obsidian',
+        '',
+        'scrum.md (CONFLICT)',
+        '  --- workspace',
+        '  +++ Doughnut',
+        '  - Sprint plan A',
+        '  + Sprint plan B',
+        '',
+        '1 note would change. 1 conflict.',
       ].join('\n')
     )
   })

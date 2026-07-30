@@ -3,14 +3,19 @@ import { dirname, join } from 'node:path'
 
 const BASELINE_RELATIVE_PATH = join('.doughnut-sync', 'baseline.json')
 
+/**
+ * `notes` holds, per note path, the content Doughnut and the workspace were
+ * last seen to agree on — a merge base, not a snapshot of either side as it
+ * stands. A note the two sides have never yet been seen to agree on is absent.
+ */
 type PushBaselineFile = {
   readonly notebookId: number
   readonly notes: Readonly<Record<string, string>>
 }
 
 /**
- * The remote content last observed for each note, from the last time
- * `/push --dry-run` ran in this workspace.
+ * The content each note's two sides were last seen to agree on, as
+ * `/push --dry-run` recorded it in this workspace.
  *
  * Empty for a workspace that has never previewed a push, or whose stored
  * baseline belongs to a different notebook — a workspace reused for a
@@ -29,7 +34,7 @@ export function loadPushBaseline(
   return new Map(Object.entries(parsed.notes))
 }
 
-/** Persist this run's freshly-exported remote content as the new baseline. */
+/** Persist the content the two sides now agree on, note by note. */
 export function savePushBaseline(
   workspacePath: string,
   notebookId: number,

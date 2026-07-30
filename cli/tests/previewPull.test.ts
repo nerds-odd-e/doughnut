@@ -48,6 +48,8 @@ describe('previewPull', () => {
     await expect(preview({ 'less.md': 'Hello world!' })).resolves.toBe(
       [
         'less.md',
+        '  --- workspace',
+        '  +++ Doughnut',
         '  - Hello',
         '  + Hello world!',
         '',
@@ -65,10 +67,14 @@ describe('previewPull', () => {
     ).resolves.toBe(
       [
         'less.md',
+        '  --- workspace',
+        '  +++ Doughnut',
         '  - Hello',
         '  + Hello world!',
         '',
         'scrum.md',
+        '  --- workspace',
+        '  +++ Doughnut',
         '  - Sprint',
         '  + Sprint review',
         '',
@@ -98,6 +104,8 @@ describe('previewPull', () => {
     ).resolves.toBe(
       [
         'LeSS in Action/team.md',
+        '  --- workspace',
+        '  +++ Doughnut',
         '  - Sprint',
         '  + Sprint review',
         '',
@@ -128,6 +136,8 @@ describe('previewPull', () => {
     ).resolves.toBe(
       [
         'less.md',
+        '  --- workspace',
+        '  +++ Doughnut',
         '    # less',
         '    ',
         '  - Hello',
@@ -152,8 +162,30 @@ describe('previewPull', () => {
     await expect(preview({ 'less.md': 'Hello' })).resolves.toBe(
       [
         'less.md',
+        '  --- workspace',
+        '  +++ Doughnut',
         '  - Hello from Obsidian',
         '  + Hello',
+        '',
+        '1 note would change.',
+      ].join('\n')
+    )
+  })
+
+  // The side headers name the two sides of the comparison, not two files the
+  // way `git diff`'s `/dev/null` does, so the side a pull would write into is
+  // still `workspace` when it holds no file for the note yet.
+  test('reports a note the pull would create as all added lines', async () => {
+    write('less.md', 'Hello')
+
+    await expect(
+      preview({ 'less.md': 'Hello', 'scrum.md': 'Sprint plan' })
+    ).resolves.toBe(
+      [
+        'scrum.md',
+        '  --- workspace',
+        '  +++ Doughnut',
+        '  + Sprint plan',
         '',
         '1 note would change.',
       ].join('\n')

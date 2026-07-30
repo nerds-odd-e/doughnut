@@ -36,9 +36,9 @@ export async function previewPull({
     .filter(([path]) => path.endsWith(MARKDOWN_SUFFIX))
     .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
     .filter(([path, content]) => workspace.get(path) !== content)
-    .map(([path, content]) =>
-      renderNoteDiff(path, workspace.get(path) ?? '', content)
-    )
+    .map(([path, content]) => ({
+      diff: renderNoteDiff(path, workspace.get(path) ?? '', content),
+    }))
 
   return renderDiffReport(changed, NOTHING_TO_PULL)
 }

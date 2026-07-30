@@ -1,15 +1,27 @@
-# Phases 1-2 of docs/plans/2026-07-29-cli-push-dry-run-preview.md. Story #5 of
+# Phases 1-3 of docs/plans/2026-07-29-cli-push-dry-run-preview.md. Story #5 of
 # .planning/notes/2026-07-24-portable-notebook-workspace.md ("preview local
 # edits and conflicts before pushing"). Mirrors cli_sync_dry_run.feature's
 # background and step reuse. The first preview in a workspace shows a plain
 # diff and never touches anything but its own baseline bookkeeping file; a
-# later preview reads that baseline to say which side changed. Conflicts —
-# both sides changed since the baseline — are Phase 3, not covered here yet.
+# later preview reads that baseline to say which side changed, or to call out a
+# conflict when both sides changed and diverged since the baseline.
 #
-# An unlabeled or `(pull)` diff reads workspace-to-notebook, the same way
-# `/sync --dry-run` reads. A `(push)` diff reads notebook-to-workspace instead
-# — removed is Doughnut as it stands, added is the workspace as it stands —
-# so it shows what pushing would actually write into Doughnut.
+# An unlabeled, `(pull)` or `(CONFLICT)` diff reads workspace-to-notebook, the
+# same way `/sync --dry-run` reads. A `(push)` diff reads notebook-to-workspace
+# instead — removed is Doughnut as it stands, added is the workspace as it
+# stands — so it shows what pushing would actually write into Doughnut. Because
+# that direction flips, every diff names its own sides `git diff` style:
+# `--- <side the removed lines come from>` / `+++ <side the added lines come
+# from>`.
+#
+# Each scenario asserts the path header with its two side headers, then the
+# changed content with the count, as two blocks rather than one. As
+# cli_sync_dry_run.feature also notes, an exported note carries frontmatter and
+# a `# title` heading above its content, so a body-only change prints those as
+# context lines and the two blocks are not adjacent in the real output. Naming
+# the sides is the point here, so the blocks that bracket that preamble are
+# asserted and the preamble itself is left to the unit tests, which is where a
+# change to the export's shape belongs.
 #
 # Diff formatting, classification, and argument parsing are covered by the CLI
 # unit tests: cli/tests/previewPush.test.ts, cli/tests/pushArgument.test.ts.
@@ -46,6 +58,12 @@ Feature: Preview what a push would change
       And I enter the slash command "/push --dry-run ./BenNotebook" in the interactive CLI
       Then I should see the preview in past CLI assistant messages:
         """
+        less.md
+          --- workspace
+          +++ Doughnut
+        """
+      And I should see the preview in past CLI assistant messages:
+        """
           - Hello
           + Hello world!
 
@@ -69,7 +87,12 @@ Feature: Preview what a push would change
     Scenario: A note changed only in Doughnut would come in on a pull
       When the note "less" is changed in Doughnut to "Hello world!"
       And I enter the slash command "/push --dry-run ./BenNotebook" in the interactive CLI
-      Then I should see "less.md (pull)" in past CLI assistant messages
+      Then I should see the preview in past CLI assistant messages:
+        """
+        less.md (pull)
+          --- workspace
+          +++ Doughnut
+        """
       And I should see the preview in past CLI assistant messages:
         """
           - Hello
@@ -81,13 +104,36 @@ Feature: Preview what a push would change
     Scenario: A note changed only in the workspace would go out on a push
       When I edit the content of "less.md" in the workspace "./BenNotebook" to "Hello from Obsidian"
       And I enter the slash command "/push --dry-run ./BenNotebook" in the interactive CLI
-      Then I should see "less.md (push)" in past CLI assistant messages
+      Then I should see the preview in past CLI assistant messages:
+        """
+        less.md (push)
+          --- Doughnut
+          +++ workspace
+        """
       And I should see the preview in past CLI assistant messages:
         """
           - Hello
           + Hello from Obsidian
 
         1 note would change.
+        """
+
+    Scenario: A note changed on both sides since the last preview is a conflict
+      When I edit the content of "less.md" in the workspace "./BenNotebook" to "Hello from Obsidian"
+      And the note "less" is changed in Doughnut to "Hello world!"
+      And I enter the slash command "/push --dry-run ./BenNotebook" in the interactive CLI
+      Then I should see the preview in past CLI assistant messages:
+        """
+        less.md (CONFLICT)
+          --- workspace
+          +++ Doughnut
+        """
+      And I should see the preview in past CLI assistant messages:
+        """
+          - Hello from Obsidian
+          + Hello world!
+
+        1 conflict.
         """
 
   Rule: The preview leaves the workspace and Doughnut untouched
