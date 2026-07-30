@@ -57,6 +57,20 @@ describe('lintWorkspace', () => {
     expect(lintWorkspace(root)).toContain('`type` has no value')
   })
 
+  test('asks nothing of a reserved index.md', () => {
+    write('apple.md', concept('type: concept', 'apple'))
+    write('index.md', '# Fruit\n\n- [apple](/apple)\n')
+
+    expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
+  })
+
+  test('asks nothing of a reserved log.md', () => {
+    write('apple.md', concept('type: concept', 'apple'))
+    write('fruit/log.md', '# Log\n\n## 2026-07-30\n')
+
+    expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
+  })
+
   test('reports nothing when every concept has frontmatter', () => {
     write('apple.md', concept('type: concept', 'apple'))
     write('fruit/banana.md', concept('type: concept', 'banana'))
