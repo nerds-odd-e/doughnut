@@ -16,6 +16,10 @@ const folderPage = () => ({
       .click()
       .type(text, { delay: 0 })
       .blur()
+    cy.get('[data-testid="folder-readme-body"]').should(
+      'not.have.class',
+      'dirty'
+    )
     waitUntilAppIsNotBusy()
     return this
   },

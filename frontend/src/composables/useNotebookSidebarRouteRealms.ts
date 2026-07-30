@@ -3,6 +3,7 @@ import type {
   NotebookRealm,
 } from "@generated/doughnut-backend-api"
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { computed, ref, watch } from "vue"
 import type { RouteLocationNormalizedLoaded } from "vue-router"
 
@@ -23,9 +24,11 @@ export function useNotebookSidebarRouteRealms(
   async function fetchFolderPage() {
     const notebookId = Number(route.params.notebookId)
     const folderId = Number(route.params.folderId)
-    const { data: page, error } = await NotebookController.getFolderPage({
-      path: { notebook: notebookId, folder: folderId },
-    })
+    const { data: page, error } = await apiCallWithLoading(() =>
+      NotebookController.getFolderPage({
+        path: { notebook: notebookId, folder: folderId },
+      })
+    )
     if (!error && page?.notebookRealm?.notebook) {
       activeFolderRealm.value = page
       return
