@@ -83,4 +83,37 @@ describe('lintWorkspace', () => {
 
     expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
   })
+
+  /**
+   * OKF closes with what a consumer must not reject a bundle over. Each of these
+   * would be an easy rule to add and a wrong one, so each is nailed down.
+   */
+  describe('what OKF says a bundle must not be rejected over', () => {
+    test('a type nobody recognises', () => {
+      write('apple.md', concept('type: greengrocery-invoice', 'apple'))
+
+      expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
+    })
+
+    test('keys OKF says nothing about', () => {
+      write(
+        'apple.md',
+        concept('type: concept\nripeness: 7\nfarm: Ben', 'apple')
+      )
+
+      expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
+    })
+
+    test('a link to a concept that is not in the bundle', () => {
+      write('apple.md', `${concept('type: concept', 'apple')}\n\n[go](/pear)`)
+
+      expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
+    })
+
+    test('one concept carrying only a `type`, and no index.md', () => {
+      write('apple.md', concept('type: concept', 'apple'))
+
+      expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
+    })
+  })
 })
