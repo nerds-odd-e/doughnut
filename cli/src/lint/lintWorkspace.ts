@@ -8,9 +8,20 @@ function isReserved(path: string): boolean {
   return RESERVED.has(path.slice(path.lastIndexOf('/') + 1))
 }
 
-function report(problems: readonly string[]): string {
+type Problem = { readonly path: string; readonly message: string }
+
+function counted(count: number, noun: string): string {
+  return `${count} ${noun}${count === 1 ? '' : 's'}`
+}
+
+function report(problems: readonly Problem[]): string {
   if (problems.length === 0) return 'Workspace follows the OKF format.'
-  return [...problems, '', '1 error in 1 file.'].join('\n')
+  const files = new Set(problems.map(({ path }) => path)).size
+  return [
+    ...problems.map(({ path, message }) => `${path}:1  error  ${message}`),
+    '',
+    `${counted(problems.length, 'error')} in ${counted(files, 'file')}.`,
+  ].join('\n')
 }
 
 export function lintWorkspace(workspace: string): string {
@@ -18,9 +29,7 @@ export function lintWorkspace(workspace: string): string {
     [...readWorkspace(workspace)]
       .filter(([path]) => !isReserved(path))
       .flatMap(([path, content]) =>
-        conceptProblems(content).map(
-          (message) => `${path}:1  error  ${message}`
-        )
+        conceptProblems(content).map((message) => ({ path, message }))
       )
   )
 }

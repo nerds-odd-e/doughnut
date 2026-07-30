@@ -63,6 +63,13 @@ describe('lintWorkspace', () => {
     expect(lintWorkspace(root)).toContain('`type` is not a string')
   })
 
+  test('counts the problems and the files they were found in', () => {
+    write('apple.md', '# apple')
+    write('fruit/banana.md', '# banana')
+
+    expect(lintWorkspace(root)).toContain('2 errors in 2 files.')
+  })
+
   test('asks nothing of a reserved index.md', () => {
     write('apple.md', concept('type: concept', 'apple'))
     write('index.md', '# Fruit\n\n- [apple](/apple)\n')
