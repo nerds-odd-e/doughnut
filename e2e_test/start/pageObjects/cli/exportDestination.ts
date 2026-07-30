@@ -50,24 +50,53 @@ export function addExtraDestinationFile(
   })
 }
 
+/**
+ * Read the destination until it says what the scenario expects.
+ *
+ * Typing `/export` only starts the export, and the reads below go through
+ * `cy.task`, which Cypress does not retry: a single read can land while the
+ * export is still writing, which on a cold machine it does. Re-reading is what
+ * makes the assertion about where the destination ends up rather than about how
+ * quickly it got there. The assertion is left to run afterwards so a genuine
+ * mismatch still reports what was found.
+ */
+function readUntil<T>(
+  read: () => Cypress.Chainable<T>,
+  matches: (found: T) => boolean,
+  attemptsLeft = 50
+): Cypress.Chainable<T> {
+  return read().then((found) =>
+    matches(found) || attemptsLeft === 0
+      ? cy.wrap(found, { log: false })
+      : cy
+          .wait(100, { log: false })
+          .then(() => readUntil(read, matches, attemptsLeft - 1))
+  )
+}
+
 export function destinationFileShouldHold(
   name: string,
   relativePath: string,
   expectedBody: string
 ) {
-  return cy
-    .task<string>('readCliWorkspaceFile', {
-      workspace: resolveDestinationDir(name),
-      relativePath,
-    })
-    .should('contain', expectedBody)
+  return readUntil(
+    () =>
+      cy.task<string>('readCliWorkspaceFile', {
+        workspace: resolveDestinationDir(name),
+        relativePath,
+      }),
+    (found) => found.includes(expectedBody)
+  ).should('contain', expectedBody)
 }
 
 export function destinationShouldHoldOnly(
   name: string,
   relativePaths: readonly string[]
 ) {
-  return cy
-    .task<string[]>('listCliWorkspaceFiles', resolveDestinationDir(name))
-    .should('deep.equal', [...relativePaths].sort())
+  const expected = [...relativePaths].sort()
+  return readUntil(
+    () =>
+      cy.task<string[]>('listCliWorkspaceFiles', resolveDestinationDir(name)),
+    (found) => Cypress._.isEqual(found, expected)
+  ).should('deep.equal', expected)
 }
