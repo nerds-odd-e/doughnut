@@ -39,7 +39,6 @@ Feature: Check whether a workspace follows the OKF format
 
   # A clean report is what proves the dot folder was not walked and the link in
   # the body was not followed; either would raise an error otherwise.
-  @ignore
   Scenario: A conformant bundle reports nothing
     Given the workspace "./Workspace" has a file "a.md" with content:
       """

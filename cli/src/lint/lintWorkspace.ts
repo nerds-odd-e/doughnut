@@ -8,6 +8,13 @@ function basename(path: string): string {
   return path.slice(path.lastIndexOf('/') + 1)
 }
 
+function inDotFolder(path: string): boolean {
+  return path
+    .split('/')
+    .slice(0, -1)
+    .some((folder) => folder.startsWith('.'))
+}
+
 /**
  * Which rules a file answers to. OKF reserves `index.md` and `log.md`, each with
  * a structure of its own rather than a concept's.
@@ -57,8 +64,10 @@ function report(problems: readonly Problem[]): string {
 
 export function lintWorkspace(workspace: string): string {
   return report(
-    [...readWorkspace(workspace)].flatMap(([path, content]) =>
-      problemsIn(path, content).map((problem) => ({ ...problem, path }))
-    )
+    [...readWorkspace(workspace)]
+      .filter(([path]) => !inDotFolder(path))
+      .flatMap(([path, content]) =>
+        problemsIn(path, content).map((problem) => ({ ...problem, path }))
+      )
   )
 }

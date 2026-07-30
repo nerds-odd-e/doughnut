@@ -124,6 +124,14 @@ describe('lintWorkspace', () => {
     )
   })
 
+  test('walks past a dot folder that tooling keeps its own files in', () => {
+    write('apple.md', concept('type: concept', 'apple'))
+    write('.git/config.md', 'no frontmatter here')
+    write('.obsidian/plugins/notes.md', 'nor here')
+
+    expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
+  })
+
   test('reports a log date heading that is not ISO 8601', () => {
     write('fruit/log.md', '# Log\n\n## July 30, 2026\n\n* Added apple\n')
 

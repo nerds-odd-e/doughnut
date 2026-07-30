@@ -35,12 +35,9 @@ function tagsProblems(keys: Record<string, unknown>): OkfProblem[] {
 }
 
 /**
- * What a concept breaks in the Open Knowledge Format, read from its content
- * alone: where it sits in a bundle and how it is reported are not its concern.
- *
- * Frontmatter that cannot be read stands on its own — there is nothing further
- * to say about keys nobody can see. Once read, every key is asked about, so one
- * fix at a time is not what the author is left with.
+ * What a concept breaks in the Open Knowledge Format, from its content alone.
+ * Frontmatter nobody can read stands on its own; once read, every key is asked
+ * about rather than leaving the author one fix at a time.
  *
  * @see https://github.com/GoogleCloudPlatform/knowledge-catalog
  */
