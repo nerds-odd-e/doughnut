@@ -1,4 +1,5 @@
 import { readWorkspace } from '../sync/readWorkspace.js'
+import { nonMarkdownPaths } from './bundleFiles.js'
 import { conceptProblems } from './okfConcept.js'
 import { indexProblems } from './okfIndex.js'
 import { logProblems } from './okfLog.js'
@@ -55,19 +56,29 @@ function report(problems: readonly Problem[]): string {
   return [
     ...problems.map(
       ({ path, line, severity, message }) =>
-        `${path}:${line}  ${severity}  ${message}`
+        `${line === undefined ? path : `${path}:${line}`}  ${severity}  ${message}`
     ),
     '',
     summary(problems),
   ].join('\n')
 }
 
+/** OKF reads `.md` and says nothing about the rest, which is worth saying out loud. */
+function notAConcept(path: string): Problem {
+  return {
+    path,
+    severity: 'warning',
+    message: 'Not an OKF concept; only .md files are checked',
+  }
+}
+
 export function lintWorkspace(workspace: string): string {
-  return report(
-    [...readWorkspace(workspace)]
+  return report([
+    ...[...readWorkspace(workspace)]
       .filter(([path]) => !inDotFolder(path))
       .flatMap(([path, content]) =>
         problemsIn(path, content).map((problem) => ({ ...problem, path }))
-      )
-  )
+      ),
+    ...nonMarkdownPaths(workspace).map(notAConcept),
+  ])
 }

@@ -124,6 +124,18 @@ describe('lintWorkspace', () => {
     )
   })
 
+  test('warns about a file OKF has no rules for, naming no line', () => {
+    write('apple.md', concept('type: concept', 'apple'))
+    write('a.json', '{}')
+
+    const report = lintWorkspace(root)
+
+    expect(report).toContain('a.json  warning  Not an OKF concept')
+    expect(report).toContain(
+      'Workspace follows the OKF format. 1 warning in 1 file.'
+    )
+  })
+
   test('walks past a dot folder that tooling keeps its own files in', () => {
     write('apple.md', concept('type: concept', 'apple'))
     write('.git/config.md', 'no frontmatter here')

@@ -18,7 +18,6 @@ Feature: Check whether a workspace follows the OKF format
     Then I should see "a.md:1 error Frontmatter is missing" with any spacing in past CLI assistant messages
     And I should see "1 error in 1 file." in past CLI assistant messages
 
-  @ignore
   Scenario: A file that is not a concept is a warning, not an error
     Given the workspace "./Workspace" has a file "a.md" with content:
       """
