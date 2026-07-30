@@ -67,10 +67,12 @@ Run each check below **in order**. After all pass, return to the caller —
 **do not commit** from inside this skill.
 
 <step name="duplication">
-- Look for **new** duplication introduced by the change (copy-pasted blocks,
-  parallel structures with cosmetic differences).
-- Look for duplication the change made **visible** — new code repeats logic
-  that already existed elsewhere.
+- **"New" duplication** means at least one copy is newly introduced or
+  closely related to newly introduced code — not that every copy is new.
+  Collapse it even when the other side already existed.
+- Look for copy-pasted blocks and parallel structures with cosmetic
+  differences that the change introduced or made visible (new code
+  repeating logic that already lived elsewhere).
 - The same concept in two representations counts as duplication, not just
   literal copies.
 - **Action:** collapse onto a single representation. Prefer reusing an
@@ -89,12 +91,15 @@ Run each check below **in order**. After all pass, return to the caller —
 </step>
 
 <step name="shotgun_surgery">
-- Shotgun surgery: **one logical concept** forces edits in many places.
-- Estimate likelihood of another change of the same shape soon.
-- **Action:**
-  - **High likelihood** → consolidate behind a single seam (one function,
-    one config, one module) so the next change touches one place. Do it now.
-  - **Low likelihood** → leave it. Do not preemptively abstract.
+- Shotgun surgery: **one logical concept** (e.g. a version string) forces
+  edits in many places for one purpose.
+- Give the concept **one** representation. The next change of that shape
+  should touch that place — not be scattered again.
+- Acceptable extra touchpoints: tests that assert the concept, and
+  generated code derived from it. Do not hardcode the same value in
+  product paths, fixtures, E2E config, and feature files in parallel.
+- **Action:** consolidate now behind one seam (one constant, config, or
+  module). Leave only low-likelihood one-offs unabstracted.
 </step>
 
 <step name="dead_redundant_code">
