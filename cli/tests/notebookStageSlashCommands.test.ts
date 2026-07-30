@@ -52,4 +52,22 @@ describe('notebookStageSlashCommandsFor', () => {
     expect(exportCommand?.doc.description).toContain('overwritten')
     expect(exportCommand?.argument?.optional).toBe(false)
   })
+
+  test('offers push inside the notebook context', () => {
+    const literals = notebookStageSlashCommandsFor(aNotebook()).map(
+      (command) => command.literal
+    )
+
+    expect(literals).toContain('/push')
+  })
+
+  test('documents dry-run push usage', () => {
+    const push = notebookStageSlashCommandsFor(aNotebook()).find(
+      (command) => command.literal === '/push'
+    )
+
+    expect(push?.doc.usage).toBe('/push --dry-run <workspace path>')
+    expect(push?.doc.description).toContain('Preview')
+    expect(push?.argument?.optional).toBe(false)
+  })
 })

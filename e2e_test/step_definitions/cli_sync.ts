@@ -40,6 +40,16 @@ When(
   }
 )
 
+Then(
+  'the note {string} in Doughnut should still hold {string}',
+  (noteTitle: string, expected: string) => {
+    start
+      .testability()
+      .getInjectedNoteContent(noteTitle)
+      .should('equal', expected)
+  }
+)
+
 When(
   'I edit the content of {string} in the workspace {string} to {string}',
   (relativePath: string, workspaceName: string, content: string) => {

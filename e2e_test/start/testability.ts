@@ -540,6 +540,17 @@ const testability = () => {
       )
     },
 
+    /** The note's current content in Doughnut itself, not the workspace file. */
+    getInjectedNoteContent(noteTitle: string) {
+      return this.getInjectedNoteIdByTitle(noteTitle).then((noteId) =>
+        cy
+          .wrap(NoteController.showNote({ path: { note: noteId } }), {
+            log: false,
+          })
+          .then((response) => unwrapData<NoteRealm>(response).note.content)
+      )
+    },
+
     renameInjectedNoteTitleForNoteOnPage(newTitle: string) {
       return cy.url().then((url) => {
         const noteId = noteIdFromUrl(url)
