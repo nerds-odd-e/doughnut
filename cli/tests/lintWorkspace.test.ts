@@ -72,6 +72,15 @@ describe('lintWorkspace', () => {
     expect(report).toContain('Workspace follows the OKF format.')
   })
 
+  test('reports every problem a concept has, not only the first', () => {
+    write('apple.md', concept('tags: fruit', 'apple'))
+
+    const report = lintWorkspace(root)
+
+    expect(report).toContain('Frontmatter has no `type` key')
+    expect(report).toContain('`tags` is not a list')
+  })
+
   test('counts a warning apart from an error', () => {
     write('apple.md', concept('type: concept\ntags: fruit', 'apple'))
     write('fruit/banana.md', '# banana')

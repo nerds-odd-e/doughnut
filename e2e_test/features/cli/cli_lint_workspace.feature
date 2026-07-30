@@ -61,7 +61,6 @@ Feature: Check whether a workspace follows the OKF format
   # The run does not stop at the first problem: `a.md` has two (no `type` key, and
   # `tags` is not a list), `b.md` has one. The counts are what prove nothing was
   # dropped; the layout of each line is unit-tested.
-  @ignore
   Scenario: Every problem in the bundle is reported in one run
     Given the workspace "./Workspace" has a file "a.md" with content:
       """
