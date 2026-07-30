@@ -4,15 +4,12 @@ import { join, posix, sep } from 'node:path'
 const MARKDOWN_SUFFIX = '.md'
 
 /**
- * A dot folder holds what its tooling owns rather than what an author wrote, so
- * /lint reads nothing in one. The walk below skips them on the way down; this
- * says the same of a path already collected elsewhere.
+ * A dot file or folder holds what its tooling owns rather than what an author
+ * wrote, so /lint reads neither. The walk below skips them on the way down;
+ * this says the same of a path already collected elsewhere.
  */
-export function inDotFolder(path: string): boolean {
-  return path
-    .split(posix.sep)
-    .slice(0, -1)
-    .some((folder) => folder.startsWith('.'))
+export function isHidden(path: string): boolean {
+  return path.split(posix.sep).some((segment) => segment.startsWith('.'))
 }
 
 function collect(directory: string, prefix: string, into: string[]): void {

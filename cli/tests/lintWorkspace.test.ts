@@ -148,6 +148,13 @@ describe('lintWorkspace', () => {
     )
   })
 
+  test('walks past a dot file as readily as a dot folder', () => {
+    write('apple.md', concept('type: concept', 'apple'))
+    write('.hidden.md', 'no frontmatter here')
+
+    expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
+  })
+
   test('walks past a dot folder that tooling keeps its own files in', () => {
     write('apple.md', concept('type: concept', 'apple'))
     write('.git/config.md', 'no frontmatter here')

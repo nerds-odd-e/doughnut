@@ -1,5 +1,5 @@
 import { readWorkspace } from '../sync/readWorkspace.js'
-import { inDotFolder, nonMarkdownPaths } from './bundleFiles.js'
+import { isHidden, nonMarkdownPaths } from './bundleFiles.js'
 import { type Finding, lintReport } from './lintReport.js'
 import { conceptProblems } from './okfConcept.js'
 import { indexProblems } from './okfIndex.js'
@@ -32,7 +32,7 @@ function notAConcept(path: string): Finding {
 
 export function lintWorkspace(workspace: string): string {
   const inConcepts = [...readWorkspace(workspace)]
-    .filter(([path]) => !inDotFolder(path))
+    .filter(([path]) => !isHidden(path))
     .flatMap(([path, content]) =>
       problemsIn(path, content).map((problem) => ({ ...problem, path }))
     )
