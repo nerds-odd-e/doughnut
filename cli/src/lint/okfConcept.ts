@@ -1,5 +1,19 @@
+import { parse } from 'yaml'
+
 const OPENING = '---\n'
 const CLOSING = '\n---'
+
+/** The frontmatter as a mapping, or undefined when no parser could read it. */
+function parsedKeys(keys: string): Record<string, unknown> | undefined {
+  try {
+    const parsed: unknown = parse(keys)
+    return typeof parsed === 'object' && parsed !== null
+      ? (parsed as Record<string, unknown>)
+      : undefined
+  } catch {
+    return
+  }
+}
 
 /**
  * What a concept breaks in the Open Knowledge Format, read from its content
@@ -13,10 +27,12 @@ export function conceptProblems(content: string): string[] {
   const closing = content.indexOf(CLOSING, OPENING.length)
   if (closing === -1) return ['Frontmatter is not closed with `---`']
 
+  const keys = parsedKeys(content.slice(OPENING.length, closing))
+  if (keys === undefined) return ['Frontmatter is not valid YAML']
+
   // `type` is the one key OKF always requires of a concept.
-  const keys = content.slice(OPENING.length, closing)
-  if (!/^type:/m.test(keys)) return ['Frontmatter has no `type` key']
-  if (!/^type:[^\S\n]*\S/m.test(keys)) {
+  if (!('type' in keys)) return ['Frontmatter has no `type` key']
+  if (keys.type === null || keys.type === '') {
     return ['Frontmatter `type` has no value']
   }
   return []

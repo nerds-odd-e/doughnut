@@ -45,6 +45,12 @@ describe('lintWorkspace', () => {
     expect(lintWorkspace(root)).toContain('Frontmatter has no `type` key')
   })
 
+  test('reports frontmatter no YAML parser can read', () => {
+    write('apple.md', concept('type: concept\n\ttitle: apple', 'apple'))
+
+    expect(lintWorkspace(root)).toContain('Frontmatter is not valid YAML')
+  })
+
   test('reports a `type` key left without a value', () => {
     write('apple.md', concept('type:', 'apple'))
 
