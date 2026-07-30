@@ -1,6 +1,6 @@
 # CLI `/push --dry-run` — preview local edits and conflicts before pushing
 
-**Status:** Phase 1 done (not committed yet). Phases 2-4 planned, not started.
+**Status:** Phases 1-2 done and committed. Phases 3-4 planned, not started.
 
 **Goal:** Inside the notebook context that `/use` establishes, `/push --dry-run <workspace path>`
 reports, per note, whether a push would update Doughnut, whether a pull would update the
@@ -80,7 +80,7 @@ saved with CRLF line endings doesn't spuriously report every line as changed.
 
 ## Output format
 
-Reuses `unifiedDiff.ts`'s `diffLines` and the rendering shape `previewPull.ts`'s `renderNote`
+Reuses `unifiedDiff.ts`'s `diffLines` and the rendering shape `diffReport.ts`'s `renderNoteDiff`
 already established (path header, indented hunk lines, blank-line separator, trailing count
 line), adding a status label per note and a distinct summary phrase for conflicts:
 
@@ -106,7 +106,7 @@ while writing tests, following `previewPull`'s existing phrasing rather than inv
 | --- | --- |
 | Read every workspace note, keyed by path, CRLF-normalized | `readWorkspace()` — `cli/src/sync/readWorkspace.ts` |
 | zip → `Map<path, content>` | `unzipToEntries()` — `cli/src/sync/unzip.ts` |
-| Line-level diff rendering | `diffLines()` — `cli/src/sync/unifiedDiff.ts`; rendering shape — `previewPull.ts`'s `renderNote`/`render` |
+| Line-level diff rendering | `diffLines()` — `cli/src/sync/unifiedDiff.ts`; rendering shape — `cli/src/sync/diffReport.ts` (`renderNoteDiff`, `renderDiffReport`, shared with `previewPull.ts`) |
 | Download the export zip (401/403/404/5xx user-readable errors) | `downloadNotebookExportZip()` — `cli/src/backendApi/doughnutBackendClient.ts` |
 | Argument-parsing return shape (`{ value } \| { error }`), flag parsing | `parseSyncArgument()` — `cli/src/sync/syncArgument.ts` |
 | Notebook stage slash command registry | `notebookStageSlashCommandsFor()` — `cli/src/commands/notebook/notebookStageSlashCommands.ts` |
@@ -236,7 +236,37 @@ cd cli && CURSOR_DEV=true nix develop -c pnpm vitest run tests/pushArgument.test
 CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_push_dry_run.feature
 ```
 
-### Phase 2 — Distinguish which side changed, using the baseline
+### Phase 2 — Distinguish which side changed, using the baseline — DONE
+
+Pinned at the outermost layer first: two scenarios under a new
+`cli_push_dry_run.feature` rule, each running `/push --dry-run` twice (the first invocation moved
+into the rule's Background, since establishing the baseline is the precondition rather than the
+behavior under test), confirmed red only on the missing `(pull)`/`(push)` label — the surrounding
+steps all reused what Phase 1 already had, so no new step definition was needed. Then
+`previewPush.test.ts`'s two label cases, likewise watched red on the label alone.
+
+Learned during implementation:
+
+- **The both-sides-changed case had to keep reporting, unlabeled.** Phase 1 reported it as a plain
+  difference; classifying it as "nothing to report" until Phase 3 adds the conflict label would
+  have silently dropped the most dangerous case from the report. So `classify` falls through to
+  the unlabeled difference whenever it cannot name a direction — a regression guard test
+  (`leaves a note unlabeled while both sides differ from the baseline`) pins that, and Phase 3
+  only has to turn that fall-through into `(CONFLICT)`.
+- **Phase 1's `reports the same difference when run twice` test was made obsolete by this phase**
+  and became the `(push)` case: with a baseline on disk, a second run over an unchanged remote and
+  a changed local *should* read differently from the first. Replaced, not kept.
+- **The diff direction is unchanged from Phase 1 and `previewPull`**: removed lines are the
+  workspace, added lines are Doughnut, whatever the label. So a `(push)` note reads
+  `- <local>` / `+ <remote>`, which is the opposite of the "what a push would do to Doughnut"
+  reading a user might expect. Left alone deliberately — flipping it per label would make the
+  report inconsistent with itself, and flipping it everywhere is a change to Phase 1's shipped
+  behavior, out of this phase's scope. Worth deciding explicitly before story #6 (the real push).
+- `renderNoteDiff` grew one optional `status` parameter rendered as ` (status)` on the path
+  header, so `previewPull`'s call site is untouched and Phase 3's `CONFLICT` needs no further
+  rendering change.
+
+Original phase description follows, kept for reference:
 
 On a second (or later) run, with a baseline now on disk: a note whose remote content differs
 from the baseline but whose local content doesn't is labeled `(pull)`; a note whose local content

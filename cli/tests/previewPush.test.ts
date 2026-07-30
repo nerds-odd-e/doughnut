@@ -150,13 +150,62 @@ describe('previewPush', () => {
     })
   })
 
-  test('reports the same difference when run twice', async () => {
+  test('labels a note only Doughnut changed since the last run as a pull', async () => {
     write('less.md', 'Hello')
+    await preview({ 'less.md': 'Hello' })
 
-    const first = await preview({ 'less.md': 'Hello world!' })
-    const second = await preview({ 'less.md': 'Hello world!' })
+    await expect(preview({ 'less.md': 'Hello world!' })).resolves.toBe(
+      [
+        'less.md (pull)',
+        '  - Hello',
+        '  + Hello world!',
+        '',
+        '1 note would change.',
+      ].join('\n')
+    )
+  })
 
-    expect(second).toBe(first)
+  test('labels a note only the workspace changed since the last run as a push', async () => {
+    write('less.md', 'Hello')
+    await preview({ 'less.md': 'Hello' })
+
+    write('less.md', 'Hello from Obsidian')
+
+    await expect(preview({ 'less.md': 'Hello' })).resolves.toBe(
+      [
+        'less.md (push)',
+        '  - Hello from Obsidian',
+        '  + Hello',
+        '',
+        '1 note would change.',
+      ].join('\n')
+    )
+  })
+
+  test('leaves a note neither side changed since the last run out of the report', async () => {
+    write('less.md', 'Hello')
+    await preview({ 'less.md': 'Hello' })
+
+    await expect(preview({ 'less.md': 'Hello' })).resolves.toBe(
+      'No changes to push.'
+    )
+  })
+
+  test('leaves a note unlabeled while both sides differ from the baseline', async () => {
+    write('less.md', 'Hello')
+    await preview({ 'less.md': 'Hello' })
+
+    write('less.md', 'Hello from Obsidian')
+
+    await expect(preview({ 'less.md': 'Hello world!' })).resolves.toBe(
+      [
+        'less.md',
+        '  - Hello from Obsidian',
+        '  + Hello world!',
+        '',
+        '1 note would change.',
+      ].join('\n')
+    )
   })
 
   test('reports a missing workspace directory', async () => {

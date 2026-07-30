@@ -1,10 +1,15 @@
 import { diffLines } from './unifiedDiff.js'
 
-/** One note's diff, formatted the way `/sync --dry-run` and `/push --dry-run` both report it. */
+/**
+ * One note's diff, formatted the way `/sync --dry-run` and `/push --dry-run`
+ * both report it. `status`, when given, is appended to the path header in
+ * parentheses — `less.md (push)` — to say which way the difference would flow.
+ */
 export function renderNoteDiff(
   path: string,
   workspaceContent: string,
-  notebookContent: string
+  notebookContent: string,
+  status?: string
 ): string {
   const body = diffLines(workspaceContent, notebookContent).flatMap((hunk) => [
     ...(hunk.header === undefined ? [] : [`  @@ line ${hunk.header} @@`]),
@@ -14,7 +19,8 @@ export function renderNoteDiff(
         : `  ${kind === 'removed' ? '-' : '+'} ${text}`
     ),
   ])
-  return [path, ...body, ''].join('\n')
+  const heading = status === undefined ? path : `${path} (${status})`
+  return [heading, ...body, ''].join('\n')
 }
 
 /** The list of changed notes, or `nothingChanged` when there is nothing to report. */
