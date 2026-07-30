@@ -1,6 +1,6 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { join, resolve } from 'node:path'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { lintWorkspace } from '../src/lint/lintWorkspace.js'
 
@@ -24,6 +24,35 @@ describe('lintWorkspace', () => {
   /** A well-formed concept, so a test varies only what it is about. */
   const concept = (keys: string, body: string) =>
     `---\n${keys}\n---\n\n# ${body}`
+
+  describe('the path the user typed', () => {
+    test('says so when nothing is there, rather than throwing', () => {
+      const missing = join(root, 'nowhere')
+
+      expect(lintWorkspace(missing)).toBe(`No directory at ${missing}.`)
+    })
+
+    test('says so when the path is a file', () => {
+      write('apple.md', concept('type: concept', 'apple'))
+      const file = join(root, 'apple.md')
+
+      expect(lintWorkspace(file)).toBe(`No directory at ${file}.`)
+    })
+
+    test('strips surrounding quotes, as a shell would', () => {
+      write('apple.md', concept('type: concept', 'apple'))
+
+      expect(lintWorkspace(`"${root}"`)).toBe(
+        'Workspace follows the OKF format.'
+      )
+    })
+
+    test('resolves a relative path against the working directory', () => {
+      expect(lintWorkspace('nowhere-relative')).toBe(
+        `No directory at ${resolve(process.cwd(), 'nowhere-relative')}.`
+      )
+    })
+  })
 
   test('names the concept the problem was found in', () => {
     write('banana.md', '# banana')

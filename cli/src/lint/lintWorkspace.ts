@@ -1,4 +1,7 @@
+import { resolve } from 'node:path'
+import { isDirectory } from '../sync/isDirectory.js'
 import { readWorkspace } from '../sync/readWorkspace.js'
+import { stripSurroundingQuotes } from '../sync/stripSurroundingQuotes.js'
 import { isHidden, nonMarkdownPaths } from './bundleFiles.js'
 import { type Finding, lintReport } from './lintReport.js'
 import { conceptProblems } from './okfConcept.js'
@@ -30,14 +33,22 @@ function notAConcept(path: string): Finding {
   }
 }
 
-export function lintWorkspace(workspace: string): string {
-  const inConcepts = [...readWorkspace(workspace)]
+/** What the user typed, read the way a shell would read it. */
+function bundleDirectory(argument: string): string {
+  return resolve(process.cwd(), stripSurroundingQuotes(argument.trim()))
+}
+
+export function lintWorkspace(argument: string): string {
+  const bundle = bundleDirectory(argument)
+  if (!isDirectory(bundle)) return `No directory at ${bundle}.`
+
+  const inConcepts = [...readWorkspace(bundle)]
     .filter(([path]) => !isHidden(path))
     .flatMap(([path, content]) =>
       problemsIn(path, content).map((problem) => ({ ...problem, path }))
     )
   return lintReport([
     ...inConcepts,
-    ...nonMarkdownPaths(workspace).map(notAConcept),
+    ...nonMarkdownPaths(bundle).map(notAConcept),
   ])
 }
