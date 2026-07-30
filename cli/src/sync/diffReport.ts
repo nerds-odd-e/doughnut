@@ -1,18 +1,23 @@
 import { diffLines } from './unifiedDiff.js'
 
+/** How a note's difference is labeled, and which way its diff then reads. */
+export type NoteDiffStatus = 'pull' | 'push'
+
 /**
  * One note's diff, formatted the way `/sync --dry-run` and `/push --dry-run`
  * both report it. `status`, when given, is appended to the path header in
  * parentheses — `less.md (push)` — to say which way the difference would
- * flow. For `push`, the diff is shown remote-to-local (what pushing would
- * write into Doughnut); every other case (including unlabeled) is shown
- * workspace-to-notebook, as `/sync --dry-run` already reads.
+ * flow. For `push`, the diff is shown notebook-to-workspace (what pushing
+ * would write into Doughnut); every other case (including unlabeled) is
+ * shown workspace-to-notebook, as `/sync --dry-run` already reads. Hunk
+ * `@@ line N @@` markers number against whichever side is `before`, so a
+ * push diff's line numbers follow Doughnut's copy, not the workspace file.
  */
 export function renderNoteDiff(
   path: string,
   workspaceContent: string,
   notebookContent: string,
-  status?: string
+  status?: NoteDiffStatus
 ): string {
   const [before, after] =
     status === 'push'

@@ -182,6 +182,44 @@ describe('previewPush', () => {
     )
   })
 
+  test('numbers a push diff hunk against Doughnut, the side removed lines come from', async () => {
+    const lines = Array.from({ length: 20 }, (_, i) => `line ${i + 1}`)
+    const baselineContent = lines.join('\n')
+    write('many.md', baselineContent)
+    await preview({ 'many.md': baselineContent })
+
+    const editedLines = [...lines]
+    editedLines[4] = 'line 5 EDITED'
+    editedLines[14] = 'line 15 EDITED'
+    write('many.md', editedLines.join('\n'))
+
+    await expect(preview({ 'many.md': baselineContent })).resolves.toBe(
+      [
+        'many.md (push)',
+        '  @@ line 2 @@',
+        '    line 2',
+        '    line 3',
+        '    line 4',
+        '  - line 5',
+        '  + line 5 EDITED',
+        '    line 6',
+        '    line 7',
+        '    line 8',
+        '  @@ line 12 @@',
+        '    line 12',
+        '    line 13',
+        '    line 14',
+        '  - line 15',
+        '  + line 15 EDITED',
+        '    line 16',
+        '    line 17',
+        '    line 18',
+        '',
+        '1 note would change.',
+      ].join('\n')
+    )
+  })
+
   test('leaves a note neither side changed since the last run out of the report', async () => {
     write('less.md', 'Hello')
     await preview({ 'less.md': 'Hello' })
