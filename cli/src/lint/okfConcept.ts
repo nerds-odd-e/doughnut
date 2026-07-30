@@ -16,5 +16,8 @@ export function conceptProblems(content: string): string[] {
   // `type` is the one key OKF always requires of a concept.
   const keys = content.slice(OPENING.length, closing)
   if (!/^type:/m.test(keys)) return ['Frontmatter has no `type` key']
+  if (!/^type:[^\S\n]*\S/m.test(keys)) {
+    return ['Frontmatter `type` has no value']
+  }
   return []
 }

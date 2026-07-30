@@ -45,6 +45,12 @@ describe('lintWorkspace', () => {
     expect(lintWorkspace(root)).toContain('Frontmatter has no `type` key')
   })
 
+  test('reports a `type` key left without a value', () => {
+    write('apple.md', concept('type:', 'apple'))
+
+    expect(lintWorkspace(root)).toContain('`type` has no value')
+  })
+
   test('reports nothing when every concept has frontmatter', () => {
     write('apple.md', concept('type: concept', 'apple'))
     write('fruit/banana.md', concept('type: concept', 'banana'))
