@@ -1,8 +1,5 @@
-import { resolve } from 'node:path'
-import { expandTilde } from '../sync/expandTilde.js'
-import { isDirectory } from '../sync/isDirectory.js'
+import { parseDirectoryArgument } from '../sync/directoryArgument.js'
 import { readWorkspace } from '../sync/readWorkspace.js'
-import { stripSurroundingQuotes } from '../sync/stripSurroundingQuotes.js'
 import { isHidden, nonMarkdownPaths } from './bundleFiles.js'
 import { type Finding, lintReport } from './lintReport.js'
 import { conceptProblems } from './okfConcept.js'
@@ -34,20 +31,10 @@ function notAConcept(path: string): Finding {
   }
 }
 
-function bundleDirectory(
-  argument: string
-): { path: string } | { error: string } {
-  const expanded = expandTilde(stripSurroundingQuotes(argument.trim()))
-  if ('error' in expanded) return expanded
-
-  const path = resolve(process.cwd(), expanded.path)
-  return isDirectory(path) ? { path } : { error: `No directory at ${path}.` }
-}
-
 export function lintWorkspace(argument: string): string {
-  const directory = bundleDirectory(argument)
-  if ('error' in directory) return directory.error
-  const bundle = directory.path
+  const parsed = parseDirectoryArgument(argument)
+  if (parsed.error !== undefined) return parsed.error
+  const bundle = parsed.directory
 
   const inConcepts = [...readWorkspace(bundle)]
     .filter(([path]) => !isHidden(path))
