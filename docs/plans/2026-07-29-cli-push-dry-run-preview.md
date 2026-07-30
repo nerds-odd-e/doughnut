@@ -1,8 +1,8 @@
 # CLI `/push --dry-run` — preview local edits and conflicts before pushing
 
-**Status:** Phases 1-2 done and committed. Phase 3 done (with its code-review fixes) and the
-`---`/`+++` diff side headers done, both in the working tree, **neither committed yet** — intended
-as two commits, Phase 3 first. Phase 4 planned, not started.
+**Status:** Phases 1-3 done and committed (Phase 3 together with its code-review fixes and the
+`---`/`+++` diff side headers, as a single commit — the two were too intertwined by the time
+review was done to split safely). Phase 4 planned, not started.
 
 **Goal:** Inside the notebook context that `/use` establishes, `/push --dry-run <workspace path>`
 reports, per note, whether a push would update Doughnut, whether a pull would update the
