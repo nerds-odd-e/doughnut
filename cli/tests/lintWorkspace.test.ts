@@ -164,6 +164,12 @@ describe('lintWorkspace', () => {
     )
   })
 
+  test('reports a log date heading shaped right but naming no day', () => {
+    write('fruit/log.md', '# Log\n\n## 2026-02-30\n\n## 2026-13-01\n')
+
+    expect(lintWorkspace(root)).toContain('2 errors in 1 file.')
+  })
+
   test('names the line a log date heading is on', () => {
     write('fruit/log.md', '# Log\n\n## 2026-07-30\n\n## July 23, 2026\n')
 
