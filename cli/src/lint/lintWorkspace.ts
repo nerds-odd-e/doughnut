@@ -1,16 +1,26 @@
 import { readWorkspace } from '../sync/readWorkspace.js'
-import { type ConceptProblem, conceptProblems } from './okfConcept.js'
+import { conceptProblems } from './okfConcept.js'
+import { indexProblems } from './okfIndex.js'
+import type { OkfProblem } from './okfProblem.js'
 
-/** Names OKF reserves, each with a structure of its own rather than a concept's. */
-const RESERVED = new Set(['index.md', 'log.md'])
+function basename(path: string): string {
+  return path.slice(path.lastIndexOf('/') + 1)
+}
 
-function isReserved(path: string): boolean {
-  return RESERVED.has(path.slice(path.lastIndexOf('/') + 1))
+/**
+ * Which rules a file answers to. OKF reserves `index.md` and `log.md`, each with
+ * a structure of its own rather than a concept's; a `log.md` has no rule here yet.
+ */
+function problemsIn(path: string, content: string): OkfProblem[] {
+  const name = basename(path)
+  if (name === 'index.md') return indexProblems(content, path === name)
+  if (name === 'log.md') return []
+  return conceptProblems(content)
 }
 
 const CONFORMS = 'Workspace follows the OKF format.'
 
-type Problem = ConceptProblem & { readonly path: string }
+type Problem = OkfProblem & { readonly path: string }
 
 function counted(count: number, noun: string): string {
   return `${count} ${noun}${count === 1 ? '' : 's'}`
@@ -45,10 +55,8 @@ function report(problems: readonly Problem[]): string {
 
 export function lintWorkspace(workspace: string): string {
   return report(
-    [...readWorkspace(workspace)]
-      .filter(([path]) => !isReserved(path))
-      .flatMap(([path, content]) =>
-        conceptProblems(content).map((problem) => ({ ...problem, path }))
-      )
+    [...readWorkspace(workspace)].flatMap(([path, content]) =>
+      problemsIn(path, content).map((problem) => ({ ...problem, path }))
+    )
   )
 }

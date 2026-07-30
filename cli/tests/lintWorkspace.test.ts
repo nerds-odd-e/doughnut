@@ -93,6 +93,28 @@ describe('lintWorkspace', () => {
     expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
   })
 
+  test('reports an index.md carrying frontmatter', () => {
+    write('fruit/index.md', concept('type: concept', 'Fruit'))
+
+    expect(lintWorkspace(root)).toContain(
+      'fruit/index.md:1  error  An index carries no frontmatter'
+    )
+  })
+
+  test('accepts `okf_version` in the frontmatter of the root index.md', () => {
+    write('index.md', '---\nokf_version: 0.2\n---\n\n# Fruit\n')
+
+    expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
+  })
+
+  test('reports the root index.md carrying more than `okf_version`', () => {
+    write('index.md', '---\nokf_version: 0.2\ntitle: Fruit\n---\n\n# Fruit\n')
+
+    expect(lintWorkspace(root)).toContain(
+      'index.md:1  error  An index carries no frontmatter beyond `okf_version`'
+    )
+  })
+
   test('asks nothing of a reserved log.md', () => {
     write('apple.md', concept('type: concept', 'apple'))
     write('fruit/log.md', '# Log\n\n## 2026-07-30\n')

@@ -1,4 +1,5 @@
 import { parse } from 'yaml'
+import { type OkfProblem, error } from './okfProblem.js'
 
 const OPENING = '---\n'
 const CLOSING = '\n---'
@@ -15,23 +16,13 @@ function parsedKeys(keys: string): Record<string, unknown> | undefined {
   }
 }
 
-export type ConceptProblem = {
-  /** What OKF requires is an error; what it recommends is a warning. */
-  readonly severity: 'error' | 'warning'
-  readonly message: string
-}
-
-function error(message: string): ConceptProblem[] {
-  return [{ severity: 'error', message }]
-}
-
 /**
  * What a concept breaks in the Open Knowledge Format, read from its content
  * alone: where it sits in a bundle and how it is reported are not its concern.
  *
  * @see https://github.com/GoogleCloudPlatform/knowledge-catalog
  */
-export function conceptProblems(content: string): ConceptProblem[] {
+export function conceptProblems(content: string): OkfProblem[] {
   if (!content.startsWith(OPENING)) return error('Frontmatter is missing')
 
   const closing = content.indexOf(CLOSING, OPENING.length)
