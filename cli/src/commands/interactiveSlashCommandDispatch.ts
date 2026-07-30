@@ -61,7 +61,10 @@ export function applyResolvedInteractiveSlashCommand(
     )
     return
   }
-  Promise.resolve(command.run(argument))
+  // Called from inside the chain so a synchronous throw rejects rather than
+  // escaping past the shell into the terminal.
+  Promise.resolve()
+    .then(() => command.run(argument))
     .then((r) => {
       handlers.onRunSuccess(command, r.assistantMessage)
     })

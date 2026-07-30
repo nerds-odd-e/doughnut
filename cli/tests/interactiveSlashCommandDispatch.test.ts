@@ -156,6 +156,35 @@ describe('applyResolvedInteractiveSlashCommand', () => {
     })
   })
 
+  test('run: a synchronous throw reaches the user, not the terminal', async () => {
+    const boom: InteractiveSlashCommand = {
+      literal: '/boom',
+      doc: {
+        name: '/boom',
+        usage: '/boom',
+        description: 'boom',
+      },
+      run: () => {
+        throw new Error('explode')
+      },
+    }
+    const appendScrollbackError = vi.fn()
+
+    applyResolvedInteractiveSlashCommand(
+      { command: boom, argument: undefined, line: '/boom' },
+      {
+        appendScrollbackError,
+        setStageArgumentRef: vi.fn(),
+        openStage: vi.fn(),
+        onRunSuccess: vi.fn(),
+      }
+    )
+
+    await vi.waitFor(() => {
+      expect(appendScrollbackError).toHaveBeenCalledWith('explode')
+    })
+  })
+
   test('run: rejection maps through userVisibleSlashCommandError', async () => {
     const boom: InteractiveSlashCommand = {
       literal: '/boom',
