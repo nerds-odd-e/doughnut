@@ -63,12 +63,24 @@ describe('lintWorkspace', () => {
     expect(lintWorkspace(root)).toContain('`type` is not a string')
   })
 
+  test('names the line a `type` without a value is on', () => {
+    write('apple.md', concept('title: apple\ntype:', 'apple'))
+
+    expect(lintWorkspace(root)).toContain('apple.md:3  error')
+  })
+
+  test('names the line `tags` is on', () => {
+    write('apple.md', concept('type: concept\ntitle: apple\ntags: fruit', 'a'))
+
+    expect(lintWorkspace(root)).toContain('apple.md:4  warning')
+  })
+
   test('warns about `tags` that are not a list, without failing the check', () => {
     write('apple.md', concept('type: concept\ntags: fruit', 'apple'))
 
     const report = lintWorkspace(root)
 
-    expect(report).toContain('apple.md:1  warning  `tags` is not a list')
+    expect(report).toContain('warning  `tags` is not a list')
     expect(report).toContain('Workspace follows the OKF format.')
   })
 
