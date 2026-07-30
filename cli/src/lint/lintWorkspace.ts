@@ -1,4 +1,5 @@
 import { resolve } from 'node:path'
+import { expandTilde } from '../sync/expandTilde.js'
 import { isDirectory } from '../sync/isDirectory.js'
 import { readWorkspace } from '../sync/readWorkspace.js'
 import { stripSurroundingQuotes } from '../sync/stripSurroundingQuotes.js'
@@ -33,14 +34,20 @@ function notAConcept(path: string): Finding {
   }
 }
 
-/** What the user typed, read the way a shell would read it. */
-function bundleDirectory(argument: string): string {
-  return resolve(process.cwd(), stripSurroundingQuotes(argument.trim()))
+function bundleDirectory(
+  argument: string
+): { path: string } | { error: string } {
+  const expanded = expandTilde(stripSurroundingQuotes(argument.trim()))
+  if ('error' in expanded) return expanded
+
+  const path = resolve(process.cwd(), expanded.path)
+  return isDirectory(path) ? { path } : { error: `No directory at ${path}.` }
 }
 
 export function lintWorkspace(argument: string): string {
-  const bundle = bundleDirectory(argument)
-  if (!isDirectory(bundle)) return `No directory at ${bundle}.`
+  const directory = bundleDirectory(argument)
+  if ('error' in directory) return directory.error
+  const bundle = directory.path
 
   const inConcepts = [...readWorkspace(bundle)]
     .filter(([path]) => !isHidden(path))

@@ -1,5 +1,5 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
-import { tmpdir } from 'node:os'
+import { homedir, tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { lintWorkspace } from '../src/lint/lintWorkspace.js'
@@ -44,6 +44,18 @@ describe('lintWorkspace', () => {
 
       expect(lintWorkspace(`"${root}"`)).toBe(
         'Workspace follows the OKF format.'
+      )
+    })
+
+    test('expands `~` to the home directory', () => {
+      expect(lintWorkspace('~/nowhere-in-home')).toBe(
+        `No directory at ${join(homedir(), 'nowhere-in-home')}.`
+      )
+    })
+
+    test('will not guess at another user from `~`', () => {
+      expect(lintWorkspace('~someone/bundle')).toBe(
+        "Cannot expand ~someone/bundle: only the current user's home directory (~) is supported."
       )
     })
 
