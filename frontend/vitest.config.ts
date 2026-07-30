@@ -13,7 +13,7 @@ import Inspector from "unplugin-vue-inspector/vite"
 import { VueRouterAutoImports } from "vue-router/unplugin"
 import VueRouter from "vue-router/vite"
 import checker from "vite-plugin-checker"
-import { orchestratorGcReporter } from "./orchestratorGcReporter"
+import { orchestratorGcReporter } from "./orchestratorGcReporter.ts"
 
 // Check if we're running tests - Vitest sets process.env.VITEST
 // This is the official and most reliable way to detect test mode
