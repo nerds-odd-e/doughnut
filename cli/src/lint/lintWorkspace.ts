@@ -1,6 +1,7 @@
 import { readWorkspace } from '../sync/readWorkspace.js'
 import { conceptProblems } from './okfConcept.js'
 import { indexProblems } from './okfIndex.js'
+import { logProblems } from './okfLog.js'
 import type { OkfProblem } from './okfProblem.js'
 
 function basename(path: string): string {
@@ -9,12 +10,12 @@ function basename(path: string): string {
 
 /**
  * Which rules a file answers to. OKF reserves `index.md` and `log.md`, each with
- * a structure of its own rather than a concept's; a `log.md` has no rule here yet.
+ * a structure of its own rather than a concept's.
  */
 function problemsIn(path: string, content: string): OkfProblem[] {
   const name = basename(path)
   if (name === 'index.md') return indexProblems(content, path === name)
-  if (name === 'log.md') return []
+  if (name === 'log.md') return logProblems(content)
   return conceptProblems(content)
 }
 

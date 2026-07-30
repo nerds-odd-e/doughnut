@@ -115,6 +115,14 @@ describe('lintWorkspace', () => {
     )
   })
 
+  test('reports a log date heading that is not ISO 8601', () => {
+    write('fruit/log.md', '# Log\n\n## July 30, 2026\n\n* Added apple\n')
+
+    expect(lintWorkspace(root)).toContain(
+      'A log date heading is not `YYYY-MM-DD`'
+    )
+  })
+
   test('asks nothing of a reserved log.md', () => {
     write('apple.md', concept('type: concept', 'apple'))
     write('fruit/log.md', '# Log\n\n## 2026-07-30\n')
