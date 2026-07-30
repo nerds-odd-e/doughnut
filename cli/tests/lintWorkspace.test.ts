@@ -63,6 +63,22 @@ describe('lintWorkspace', () => {
     expect(lintWorkspace(root)).toContain('`type` is not a string')
   })
 
+  test('warns about `tags` that are not a list, without failing the check', () => {
+    write('apple.md', concept('type: concept\ntags: fruit', 'apple'))
+
+    const report = lintWorkspace(root)
+
+    expect(report).toContain('apple.md:1  warning  `tags` is not a list')
+    expect(report).toContain('Workspace follows the OKF format.')
+  })
+
+  test('counts a warning apart from an error', () => {
+    write('apple.md', concept('type: concept\ntags: fruit', 'apple'))
+    write('fruit/banana.md', '# banana')
+
+    expect(lintWorkspace(root)).toContain('1 error, 1 warning in 2 files.')
+  })
+
   test('counts the problems and the files they were found in', () => {
     write('apple.md', '# apple')
     write('fruit/banana.md', '# banana')

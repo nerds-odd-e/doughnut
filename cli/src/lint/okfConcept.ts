@@ -15,28 +15,43 @@ function parsedKeys(keys: string): Record<string, unknown> | undefined {
   }
 }
 
+export type ConceptProblem = {
+  /** What OKF requires is an error; what it recommends is a warning. */
+  readonly severity: 'error' | 'warning'
+  readonly message: string
+}
+
+function error(message: string): ConceptProblem[] {
+  return [{ severity: 'error', message }]
+}
+
 /**
  * What a concept breaks in the Open Knowledge Format, read from its content
  * alone: where it sits in a bundle and how it is reported are not its concern.
  *
  * @see https://github.com/GoogleCloudPlatform/knowledge-catalog
  */
-export function conceptProblems(content: string): string[] {
-  if (!content.startsWith(OPENING)) return ['Frontmatter is missing']
+export function conceptProblems(content: string): ConceptProblem[] {
+  if (!content.startsWith(OPENING)) return error('Frontmatter is missing')
 
   const closing = content.indexOf(CLOSING, OPENING.length)
-  if (closing === -1) return ['Frontmatter is not closed with `---`']
+  if (closing === -1) return error('Frontmatter is not closed with `---`')
 
   const keys = parsedKeys(content.slice(OPENING.length, closing))
-  if (keys === undefined) return ['Frontmatter is not valid YAML']
+  if (keys === undefined) return error('Frontmatter is not valid YAML')
 
   // `type` is the one key OKF always requires: a non-empty string.
-  if (!('type' in keys)) return ['Frontmatter has no `type` key']
+  if (!('type' in keys)) return error('Frontmatter has no `type` key')
   if (keys.type === null || keys.type === '') {
-    return ['Frontmatter `type` has no value']
+    return error('Frontmatter `type` has no value')
   }
   if (typeof keys.type !== 'string') {
-    return ['Frontmatter `type` is not a string']
+    return error('Frontmatter `type` is not a string')
+  }
+
+  // `tags` is a list of short strings, which OKF recommends rather than requires.
+  if ('tags' in keys && !Array.isArray(keys.tags)) {
+    return [{ severity: 'warning', message: '`tags` is not a list' }]
   }
   return []
 }
