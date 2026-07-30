@@ -1,32 +1,3 @@
-# Phases 1-3 of docs/plans/2026-07-29-cli-push-dry-run-preview.md. Story #5 of
-# .planning/notes/2026-07-24-portable-notebook-workspace.md ("preview local
-# edits and conflicts before pushing"). Mirrors cli_sync_dry_run.feature's
-# background and step reuse. The first preview in a workspace shows a plain
-# diff and never touches anything but its own baseline bookkeeping file; a
-# later preview reads that baseline to say which side changed, or to call out a
-# conflict when both sides changed and diverged since the baseline.
-#
-# An unlabeled, `(pull)` or `(CONFLICT)` diff reads workspace-to-notebook, the
-# same way `/sync --dry-run` reads. A `(push)` diff reads notebook-to-workspace
-# instead — removed is Doughnut as it stands, added is the workspace as it
-# stands — so it shows what pushing would actually write into Doughnut. Because
-# that direction flips, every diff names its own sides `git diff` style:
-# `--- <side the removed lines come from>` / `+++ <side the added lines come
-# from>`.
-#
-# Each scenario asserts the path header with its two side headers, then the
-# changed content with the count, as two blocks rather than one. As
-# cli_sync_dry_run.feature also notes, an exported note carries frontmatter and
-# a `# title` heading above its content, so a body-only change prints those as
-# context lines and the two blocks are not adjacent in the real output. Naming
-# the sides is the point here, so the blocks that bracket that preamble are
-# asserted and the preamble itself is left to the unit tests, which is where a
-# change to the export's shape belongs.
-#
-# Diff formatting, classification, and argument parsing are covered by the CLI
-# unit tests: cli/tests/previewPush.test.ts, cli/tests/pushArgument.test.ts.
-# These scenarios verify only the CLI -> API -> diff -> output integration
-# path those unit tests cannot reach.
 @withCliConfig
 @interactiveCLI
 @disableOpenAiService
