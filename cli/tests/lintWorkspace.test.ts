@@ -21,6 +21,10 @@ describe('lintWorkspace', () => {
     writeFileSync(full, content, 'utf8')
   }
 
+  /** A well-formed concept, so a test varies only what it is about. */
+  const concept = (keys: string, body: string) =>
+    `---\n${keys}\n---\n\n# ${body}`
+
   test('names the concept the problem was found in', () => {
     write('banana.md', '# banana')
 
@@ -36,14 +40,14 @@ describe('lintWorkspace', () => {
   })
 
   test('reports frontmatter that does not say what type the concept is', () => {
-    write('apple.md', '---\ntitle: apple\n---\n\n# apple')
+    write('apple.md', concept('title: apple', 'apple'))
 
     expect(lintWorkspace(root)).toContain('Frontmatter has no `type` key')
   })
 
   test('reports nothing when every concept has frontmatter', () => {
-    write('apple.md', '---\ntype: concept\n---\n\n# apple')
-    write('fruit/banana.md', '---\ntype: concept\n---\n\n# banana')
+    write('apple.md', concept('type: concept', 'apple'))
+    write('fruit/banana.md', concept('type: concept', 'banana'))
 
     expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
   })
