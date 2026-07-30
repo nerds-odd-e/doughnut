@@ -42,7 +42,7 @@ export function conceptProblems(content: string): OkfProblem[] {
 
   // `tags` is a list of short strings, which OKF recommends rather than requires.
   if ('tags' in keys && !Array.isArray(keys.tags)) {
-    return [{ severity: 'warning', message: '`tags` is not a list' }]
+    return [{ severity: 'warning', line: 1, message: '`tags` is not a list' }]
   }
   return []
 }

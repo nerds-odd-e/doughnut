@@ -9,10 +9,16 @@ const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/
  *
  * @see https://github.com/GoogleCloudPlatform/knowledge-catalog
  */
+function namesADay(line: string): boolean {
+  return ISO_DATE.test(line.slice(HEADING.length).trim())
+}
+
 export function logProblems(content: string): OkfProblem[] {
   return content
     .split('\n')
-    .filter((line) => line.startsWith(HEADING))
-    .filter((line) => !ISO_DATE.test(line.slice(HEADING.length).trim()))
-    .flatMap(() => error('A log date heading is not `YYYY-MM-DD`'))
+    .flatMap((line, index) =>
+      line.startsWith(HEADING) && !namesADay(line)
+        ? error('A log date heading is not `YYYY-MM-DD`', index + 1)
+        : []
+    )
 }

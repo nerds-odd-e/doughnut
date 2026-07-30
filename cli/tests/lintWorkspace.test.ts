@@ -123,6 +123,12 @@ describe('lintWorkspace', () => {
     )
   })
 
+  test('names the line a log date heading is on', () => {
+    write('fruit/log.md', '# Log\n\n## 2026-07-30\n\n## July 23, 2026\n')
+
+    expect(lintWorkspace(root)).toContain('fruit/log.md:5  error')
+  })
+
   test('asks nothing of a reserved log.md', () => {
     write('apple.md', concept('type: concept', 'apple'))
     write('fruit/log.md', '# Log\n\n## 2026-07-30\n')

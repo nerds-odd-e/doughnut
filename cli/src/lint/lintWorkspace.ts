@@ -47,7 +47,8 @@ function report(problems: readonly Problem[]): string {
   if (problems.length === 0) return CONFORMS
   return [
     ...problems.map(
-      ({ path, severity, message }) => `${path}:1  ${severity}  ${message}`
+      ({ path, line, severity, message }) =>
+        `${path}:${line}  ${severity}  ${message}`
     ),
     '',
     summary(problems),
