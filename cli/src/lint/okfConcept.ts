@@ -1,4 +1,5 @@
 import { parse } from 'yaml'
+import { type OkfProblem, error } from './okfProblem.js'
 
 const OPENING = '---\n'
 const CLOSING = '\n---'
@@ -15,25 +16,39 @@ function parsedKeys(keys: string): Record<string, unknown> | undefined {
   }
 }
 
+/** `type` is the one key OKF always requires: a non-empty string. */
+function typeProblems(keys: Record<string, unknown>): OkfProblem[] {
+  if (!('type' in keys)) return error('Frontmatter has no `type` key')
+  if (keys.type === null || keys.type === '') {
+    return error('Frontmatter `type` has no value')
+  }
+  if (typeof keys.type !== 'string') {
+    return error('Frontmatter `type` is not a string')
+  }
+  return []
+}
+
+/** `tags` is a list of short strings, which OKF recommends rather than requires. */
+function tagsProblems(keys: Record<string, unknown>): OkfProblem[] {
+  if (!('tags' in keys) || Array.isArray(keys.tags)) return []
+  return [{ severity: 'warning', line: 1, message: '`tags` is not a list' }]
+}
+
 /**
- * What a concept breaks in the Open Knowledge Format, read from its content
- * alone: where it sits in a bundle and how it is reported are not its concern.
+ * What a concept breaks in the Open Knowledge Format, from its content alone.
+ * Frontmatter nobody can read stands on its own; once read, every key is asked
+ * about rather than leaving the author one fix at a time.
  *
  * @see https://github.com/GoogleCloudPlatform/knowledge-catalog
  */
-export function conceptProblems(content: string): string[] {
-  if (!content.startsWith(OPENING)) return ['Frontmatter is missing']
+export function conceptProblems(content: string): OkfProblem[] {
+  if (!content.startsWith(OPENING)) return error('Frontmatter is missing')
 
   const closing = content.indexOf(CLOSING, OPENING.length)
-  if (closing === -1) return ['Frontmatter is not closed with `---`']
+  if (closing === -1) return error('Frontmatter is not closed with `---`')
 
   const keys = parsedKeys(content.slice(OPENING.length, closing))
-  if (keys === undefined) return ['Frontmatter is not valid YAML']
+  if (keys === undefined) return error('Frontmatter is not valid YAML')
 
-  // `type` is the one key OKF always requires of a concept.
-  if (!('type' in keys)) return ['Frontmatter has no `type` key']
-  if (keys.type === null || keys.type === '') {
-    return ['Frontmatter `type` has no value']
-  }
-  return []
+  return [...typeProblems(keys), ...tagsProblems(keys)]
 }

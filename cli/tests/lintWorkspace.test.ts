@@ -57,10 +57,139 @@ describe('lintWorkspace', () => {
     expect(lintWorkspace(root)).toContain('`type` has no value')
   })
 
+  test('reports a `type` that is not a string', () => {
+    write('apple.md', concept('type: 123', 'apple'))
+
+    expect(lintWorkspace(root)).toContain('`type` is not a string')
+  })
+
+  test('warns about `tags` that are not a list, without failing the check', () => {
+    write('apple.md', concept('type: concept\ntags: fruit', 'apple'))
+
+    const report = lintWorkspace(root)
+
+    expect(report).toContain('apple.md:1  warning  `tags` is not a list')
+    expect(report).toContain('Workspace follows the OKF format.')
+  })
+
+  test('reports every problem a concept has, not only the first', () => {
+    write('apple.md', concept('tags: fruit', 'apple'))
+
+    const report = lintWorkspace(root)
+
+    expect(report).toContain('Frontmatter has no `type` key')
+    expect(report).toContain('`tags` is not a list')
+  })
+
+  test('counts a warning apart from an error', () => {
+    write('apple.md', concept('type: concept\ntags: fruit', 'apple'))
+    write('fruit/banana.md', '# banana')
+
+    expect(lintWorkspace(root)).toContain('1 error, 1 warning in 2 files.')
+  })
+
+  test('counts the problems and the files they were found in', () => {
+    write('apple.md', '# apple')
+    write('fruit/banana.md', '# banana')
+
+    expect(lintWorkspace(root)).toContain('2 errors in 2 files.')
+  })
+
+  test('asks nothing of a reserved index.md', () => {
+    write('apple.md', concept('type: concept', 'apple'))
+    write('index.md', '# Fruit\n\n- [apple](/apple)\n')
+
+    expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
+  })
+
+  test('reports an index.md carrying frontmatter', () => {
+    write('fruit/index.md', concept('type: concept', 'Fruit'))
+
+    expect(lintWorkspace(root)).toContain(
+      'fruit/index.md:1  error  An index carries no frontmatter'
+    )
+  })
+
+  test('accepts `okf_version` in the frontmatter of the root index.md', () => {
+    write('index.md', '---\nokf_version: 0.2\n---\n\n# Fruit\n')
+
+    expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
+  })
+
+  test('reports the root index.md carrying more than `okf_version`', () => {
+    write('index.md', '---\nokf_version: 0.2\ntitle: Fruit\n---\n\n# Fruit\n')
+
+    expect(lintWorkspace(root)).toContain(
+      'index.md:1  error  An index carries no frontmatter beyond `okf_version`'
+    )
+  })
+
+  test('walks past a dot folder that tooling keeps its own files in', () => {
+    write('apple.md', concept('type: concept', 'apple'))
+    write('.git/config.md', 'no frontmatter here')
+    write('.obsidian/plugins/notes.md', 'nor here')
+
+    expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
+  })
+
+  test('reports a log date heading that is not ISO 8601', () => {
+    write('fruit/log.md', '# Log\n\n## July 30, 2026\n\n* Added apple\n')
+
+    expect(lintWorkspace(root)).toContain(
+      'A log date heading is not `YYYY-MM-DD`'
+    )
+  })
+
+  test('names the line a log date heading is on', () => {
+    write('fruit/log.md', '# Log\n\n## 2026-07-30\n\n## July 23, 2026\n')
+
+    expect(lintWorkspace(root)).toContain('fruit/log.md:5  error')
+  })
+
+  test('asks nothing of a reserved log.md', () => {
+    write('apple.md', concept('type: concept', 'apple'))
+    write('fruit/log.md', '# Log\n\n## 2026-07-30\n')
+
+    expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
+  })
+
   test('reports nothing when every concept has frontmatter', () => {
     write('apple.md', concept('type: concept', 'apple'))
     write('fruit/banana.md', concept('type: concept', 'banana'))
 
     expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
+  })
+
+  /**
+   * OKF closes with what a consumer must not reject a bundle over. Each of these
+   * would be an easy rule to add and a wrong one, so each is nailed down.
+   */
+  describe('what OKF says a bundle must not be rejected over', () => {
+    test('a type nobody recognises', () => {
+      write('apple.md', concept('type: greengrocery-invoice', 'apple'))
+
+      expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
+    })
+
+    test('keys OKF says nothing about', () => {
+      write(
+        'apple.md',
+        concept('type: concept\nripeness: 7\nfarm: Ben', 'apple')
+      )
+
+      expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
+    })
+
+    test('a link to a concept that is not in the bundle', () => {
+      write('apple.md', `${concept('type: concept', 'apple')}\n\n[go](/pear)`)
+
+      expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
+    })
+
+    test('one concept carrying only a `type`, and no index.md', () => {
+      write('apple.md', concept('type: concept', 'apple'))
+
+      expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
+    })
   })
 })
