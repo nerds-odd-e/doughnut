@@ -30,10 +30,13 @@ export function conceptProblems(content: string): string[] {
   const keys = parsedKeys(content.slice(OPENING.length, closing))
   if (keys === undefined) return ['Frontmatter is not valid YAML']
 
-  // `type` is the one key OKF always requires of a concept.
+  // `type` is the one key OKF always requires: a non-empty string.
   if (!('type' in keys)) return ['Frontmatter has no `type` key']
   if (keys.type === null || keys.type === '') {
     return ['Frontmatter `type` has no value']
+  }
+  if (typeof keys.type !== 'string') {
+    return ['Frontmatter `type` is not a string']
   }
   return []
 }

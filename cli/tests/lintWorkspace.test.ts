@@ -57,6 +57,12 @@ describe('lintWorkspace', () => {
     expect(lintWorkspace(root)).toContain('`type` has no value')
   })
 
+  test('reports a `type` that is not a string', () => {
+    write('apple.md', concept('type: 123', 'apple'))
+
+    expect(lintWorkspace(root)).toContain('`type` is not a string')
+  })
+
   test('asks nothing of a reserved index.md', () => {
     write('apple.md', concept('type: concept', 'apple'))
     write('index.md', '# Fruit\n\n- [apple](/apple)\n')
