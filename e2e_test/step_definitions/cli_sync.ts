@@ -57,6 +57,18 @@ When(
   }
 )
 
+/**
+ * The whole file as the user's editor shows it, frontmatter included, for a
+ * scenario about what a property looks like locally rather than about a body
+ * edit alone.
+ */
+When(
+  'the file {string} in the workspace {string} is:',
+  (relativePath: string, workspaceName: string, content: string) => {
+    syncWorkspace.editWorkspaceFile(workspaceName, relativePath, content)
+  }
+)
+
 When('I pull into the workspace {string}', (workspaceName: string) => {
   syncWorkspace.pullIntoWorkspace(workspaceName)
 })
