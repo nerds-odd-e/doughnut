@@ -43,8 +43,9 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 | **Question contest** | Challenging or replacing an AI-generated recall question |
 | **Accidental match** | Recall result that matches an unintended note |
 | **Wiki link** | In-content `[[…]]` reference to a note (optionally `Notebook:Title`) |
-| **Relationship** | Typed association between notes (e.g. “similar to”, “a part of”); may be stored as a relationship note |
-| **Property** | Attribute on a note; may result from reducing a relationship to the source |
+| **Relationship** | Typed association between notes (e.g. “similar to”, “a part of”) |
+| **Relationship note** | A note that represents a relationship (`type: relationship` in frontmatter), with source, target, and relation |
+| **Property** | Attribute on a note; may result from reducing a relationship note to the source |
 | **Wikidata association** | Binding a note to a Wikidata entity (also called Wiki association) |
 | **Book** | Attached reading artifact (EPUB, PDF, …), distinct from a notebook |
 | **Reading record** | Progress through a book |
@@ -53,8 +54,8 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 | **Conversation** | Thread of messages about a note (human or AI participant) |
 | **Message** | One utterance in a conversation |
 | **Message center** | UI for conversations and unread state |
-| **Local workspace** | On-disk Markdown / OKF tree used by CLI sync |
-| **OKF** | On-disk notebook folder format expected by CLI lint and sync |
+| **Local workspace** | On-disk Markdown / Open Knowledge Format (OKF) tree used by CLI sync |
+| **OKF** | [Open Knowledge Format](https://cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing): portable directory of markdown concept files with YAML frontmatter; CLI lint and sync expect a local workspace to follow it |
 | **Push / pull** | Sync local workspace to or from a remote notebook |
 | **Notebook health** | In-app lint, findings, and fixes for a notebook |
 | **Focus context** | Bounded neighborhood of notes around a focus note for AI use |
@@ -93,7 +94,7 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 |-----|----------------|
 | No umbrella for **recall question** kinds | Spelling / AI / predefined / contested lack a shared type name |
 | **Focus context** | Used in AI flows but not established as a first-class domain noun |
-| **OKF** | Named in CLI lint but not introduced beside local workspace |
+| **OKF** (Open Knowledge Format) | Named in CLI lint but not introduced beside local workspace |
 | **Sync baseline** | CLI sync state on disk has no stable domain name elsewhere |
 | **Owned vs subscribed notebook** | Distinction exists in behavior but not as glossary entries |
 | **Notebook health** vs **lint workspace** | Same lint/findings idea at two layers without a shared term family |
@@ -122,7 +123,8 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 | **Recall question** | A single recall prompt (kinds: spelling, AI-generated, predefined, …) |
 | **Memory tracking** | Whether a note or notebook participates in assimilation and recall |
 | **Wiki link** | In-content `[[…]]` reference to a note |
-| **Relationship** | Typed association between notes (may be a relationship note) |
+| **Relationship** | Typed association between notes |
+| **Relationship note** | A note that represents a relationship (`type: relationship` in frontmatter), with source, target, and relation |
 | **Wikidata association** | Binding a note to a Wikidata entity |
 | **Property memory tracker** | Recall tracking keyed by a property or relationship label |
 | **Refinement layout** | Layout for decomposing a note while refining |
@@ -130,9 +132,9 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 | **Conversation** | Thread of messages about a note (human or AI participant) |
 | **Message** | One utterance in a conversation |
 | **Message center** | UI for conversations and unread state |
-| **Local workspace** | On-disk Markdown/OKF tree used by CLI sync |
+| **Local workspace** | On-disk Markdown / Open Knowledge Format (OKF) tree used by CLI sync |
 | **Notebook workspace** | In-app notebook shell (Readme / Settings / Health) |
-| **OKF** | On-disk notebook folder format expected by CLI lint and sync |
+| **OKF** | [Open Knowledge Format](https://cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing): portable directory of markdown concept files with YAML frontmatter; CLI lint and sync expect a local workspace to follow it |
 | **Spaced-repetition schedule** | User interval list for recall |
 | **Daily assimilation target** | Max new notes to assimilate per day (profile or subscription) |
 | **Notebook health** | In-app lint, findings, and fixes for a notebook |
@@ -194,4 +196,4 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 - Supersedes: (none)
 - Superseded by: (none)
 - Links: playbook [README.md](./README.md); ADR-0000
-  [use-adrs-accepted.md](./0000-use-adrs-accepted.md)
+  [use-adrs-accepted.md](./0000-use-adrs-accepted.md); [Open Knowledge Format](https://cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing)
