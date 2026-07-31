@@ -11,19 +11,17 @@ import {
   exportNotebook,
 } from './exportDestination'
 import {
-  addExtraWorkspaceFile,
-  editWorkspaceFile,
   editWorkspaceNoteBody,
   emptyWorkspace,
-  pullIntoWorkspace,
-  pullIntoWorkspaceWithinSeconds,
   removeWorkspaceFile,
   resolveWorkspaceNames,
   workspaceFileShouldHold,
   workspaceShouldNotContain,
   workspaceMatchingNotebook,
   workspaceShouldHoldOnly,
-} from './syncWorkspace'
+  writeWorkspaceFile,
+} from './workspace'
+import { pullIntoWorkspace, pullIntoWorkspaceWithinSeconds } from './syncPull'
 import { ttyAssertTerminal } from './ttyAssertTerminal'
 
 /**
@@ -32,7 +30,8 @@ import { ttyAssertTerminal } from './ttyAssertTerminal'
  * - `ttyAssertTerminal()`: PTY `cy.task` I/O + same transcript fluents as `interactiveCli()`
  * - `interactiveCli()`: typing / slash / recall helpers on the PTY session
  * - `useNotebook(title)`: `/use` then fluent `attachPdfBook` / `pastCliAssistantMessages` (notebook stage)
- * - `syncWorkspace`: a local Markdown workspace and `/sync --dry-run` against it
+ * - `workspace`: a local Markdown workspace as files, for `/sync`, `/push` and `/lint`
+ * - `syncPull`: `/sync` pulling a notebook down into a workspace
  * - `exportDestination`: a local directory and `/export` writing the notebook into it
  * - Execution (installation)
  * - Backend (bundle, install script)
@@ -42,19 +41,20 @@ export const cli = {
   ttyAssertTerminal,
   interactiveCli,
   useNotebook,
-  syncWorkspace: {
-    addExtraWorkspaceFile,
-    editWorkspaceFile,
+  workspace: {
     editWorkspaceNoteBody,
     emptyWorkspace,
-    pullIntoWorkspace,
-    pullIntoWorkspaceWithinSeconds,
     removeWorkspaceFile,
     resolveWorkspaceNames,
     workspaceFileShouldHold,
     workspaceShouldNotContain,
     workspaceMatchingNotebook,
     workspaceShouldHoldOnly,
+    writeWorkspaceFile,
+  },
+  syncPull: {
+    pullIntoWorkspace,
+    pullIntoWorkspaceWithinSeconds,
   },
   exportDestination: {
     addExtraDestinationFile,

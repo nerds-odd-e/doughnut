@@ -1,11 +1,10 @@
 import { e2eAppBaseUrl } from '../../../support/e2eAppUrl'
 import testability from '../../testability'
-import { cliAssertTask } from './cliAssertTask'
-import { interactiveCli } from './interactiveCli'
 
 /**
- * Local Markdown workspaces for a command to read: `/sync --dry-run` compares
- * against one, `/lint` checks one.
+ * The local Markdown workspace as files on disk: what `/sync`, `/push` and
+ * `/lint` read, and what a user edits in their editor. The commands acting on
+ * one live elsewhere — `syncPull` for `/sync`.
  *
  * Scenarios name a workspace the way a user would (`./BenNotebook`); each name
  * is backed by a real temporary directory, so the command runs against actual
@@ -69,7 +68,7 @@ export function workspaceMatchingNotebook(notebookName: string, name: string) {
 }
 
 /** Replace a workspace file outright, or create one that was not there. */
-export function editWorkspaceFile(
+export function writeWorkspaceFile(
   workspaceName: string,
   relativePath: string,
   content: string
@@ -96,46 +95,6 @@ export function editWorkspaceNoteBody(
     relativePath,
     content,
   })
-}
-
-export function pullIntoWorkspace(workspaceName: string) {
-  return interactiveCli().enterSlashCommandInInteractiveCli(
-    `/sync ${resolveWorkspaceDir(workspaceName)}`
-  )
-}
-
-export function pullIntoWorkspaceWithinSeconds(
-  workspaceName: string,
-  seconds: number
-) {
-  const startedAt = Date.now()
-  const dir = resolveWorkspaceDir(workspaceName)
-  return interactiveCli()
-    .enterSlashCommandInInteractiveCli(`/sync ${dir}`)
-    .then(() =>
-      cliAssertTask({
-        strict: false,
-        needle: 'note updated.',
-        surface: 'strippedTranscript',
-        messagePrefix: 'Past CLI assistant messages (pull timing).',
-        timeoutMs: 120_000,
-      })
-    )
-    .then(() => {
-      const elapsedMs = Date.now() - startedAt
-      expect(
-        elapsedMs,
-        `sync should finish within ${seconds}s but took ${elapsedMs}ms`
-      ).to.be.lessThan(seconds * 1000)
-    })
-}
-
-export function addExtraWorkspaceFile(
-  workspaceName: string,
-  relativePath: string,
-  content: string
-) {
-  return editWorkspaceFile(workspaceName, relativePath, content)
 }
 
 export function removeWorkspaceFile(

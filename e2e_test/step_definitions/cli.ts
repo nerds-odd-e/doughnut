@@ -59,6 +59,15 @@ Then(
 )
 
 Then(
+  'I should see the preview in past CLI assistant messages:',
+  (expected: string) =>
+    cli
+      .interactiveCli()
+      .pastCliAssistantMessages()
+      .expectContainsBlock(expected)
+)
+
+Then(
   'I should see {string} with any spacing in past CLI assistant messages',
   (expected: string) =>
     cli
@@ -87,7 +96,7 @@ When(
     cli
       .interactiveCli()
       .enterSlashCommandInInteractiveCli(
-        cli.syncWorkspace.resolveWorkspaceNames(command)
+        cli.workspace.resolveWorkspaceNames(command)
       )
   }
 )

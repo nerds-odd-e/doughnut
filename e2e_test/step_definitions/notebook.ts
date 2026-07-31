@@ -14,6 +14,19 @@ import notebookPage from '../start/pageObjects/notebookPage'
 import workspaceSurfaceLandmarks from '../start/pageObjects/workspaceSurfaceLandmarks'
 import { waitUntilAppIsNotBusy } from '../start/pageBase'
 
+Given(
+  'I have a notebook {string} with {int} numbered notes',
+  (notebookName: string, count: number) => {
+    const notes = Array.from({ length: count }, (_, index) => ({
+      Title: `note-${String(index + 1).padStart(4, '0')}`,
+      Content: 'seed',
+    }))
+    cy.get<string>('@currentLoginUser').then((username) =>
+      start.testability().injectNotes(notes, username, notebookName)
+    )
+  }
+)
+
 Given('I choose to share my notebook {string}', (noteTopology: string) => {
   start.navigateToNotebookPage(noteTopology).shareNotebookToBazaar()
 })

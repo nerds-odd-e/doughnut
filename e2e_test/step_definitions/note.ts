@@ -131,6 +131,24 @@ Given('note {string} has content:', (noteTitle: string, content: string) => {
   start.testability().setInjectedNoteContent(noteTitle, content)
 })
 
+/** A change made in Doughnut itself, as opposed to one made in a workspace file. */
+When(
+  'the note {string} is changed in Doughnut to {string}',
+  (noteTitle: string, content: string) => {
+    start.testability().setInjectedNoteContent(noteTitle, content)
+  }
+)
+
+Then(
+  'the note {string} in Doughnut should still hold {string}',
+  (noteTitle: string, expected: string) => {
+    start
+      .testability()
+      .getInjectedNoteContent(noteTitle)
+      .should('equal', expected)
+  }
+)
+
 Given(
   'the notebook {string} has an empty folder {string}',
   (notebookName: string, folderName: string) => {
