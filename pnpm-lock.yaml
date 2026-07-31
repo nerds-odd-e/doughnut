@@ -257,8 +257,8 @@ importers:
         specifier: 2.5.6
         version: 2.5.6
       '@lucide/vue':
-        specifier: ^1.27.0
-        version: 1.27.0(vue@3.5.40(typescript@6.0.3))
+        specifier: ^1.28.0
+        version: 1.28.0(vue@3.5.40(typescript@6.0.3))
       '@storybook/addon-docs':
         specifier: 10.5.5
         version: 10.5.5(@types/react@19.2.17)(esbuild@0.28.1)(storybook@10.5.5(@types/react@19.2.17)(react@19.2.8))(vite@8.2.0(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.102.0)(terser@5.49.0)(tsx@4.23.1)(yaml@2.9.0))
@@ -308,8 +308,8 @@ importers:
         specifier: 2.4.11
         version: 2.4.11(@vue/compiler-dom@3.5.40)(@vue/server-renderer@3.5.40)(vue@3.5.40(typescript@6.0.3))
       daisyui:
-        specifier: 5.7.4
-        version: 5.7.4
+        specifier: 5.7.8
+        version: 5.7.8
       doughnut-test-fixtures:
         specifier: workspace:*
         version: link:../packages/doughnut-test-fixtures
@@ -1244,8 +1244,8 @@ packages:
   '@keyv/serialize@1.1.1':
     resolution: {integrity: sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA==}
 
-  '@lucide/vue@1.27.0':
-    resolution: {integrity: sha512-LKDEZJ0Uo9UaT4vxBMYVwXeK/0dGcWCTdav1AK/aGD/jYsDPtiVvOgfM7jPlx9BVeyGZ1Uf0aQhHA++rmbe7rw==}
+  '@lucide/vue@1.28.0':
+    resolution: {integrity: sha512-cO89UyNM/0i2Srdi04nFWeEOQkqzDZlM2ehtWyBhcMpRTJDKpMZPCGAVlmVBgBgr5HaeL5L6FsU8RHsOdwXtKw==}
     peerDependencies:
       vue: '>=3.0.1'
 
@@ -2982,8 +2982,8 @@ packages:
     resolution: {integrity: sha512-MOqHvMWF9/9MX6nza0KgvFH4HpMU0EF5uUDXqX/BtxtU8NfB0QzRtJ8Oe/6SuS4kbhyzVJwjd97EA4PKrzJ8bw==}
     engines: {node: '>=0.12'}
 
-  daisyui@5.7.4:
-    resolution: {integrity: sha512-zKzFIwvEvn2QvE1TbUUtDnYFOqWoxeZh+j4QXfhkZKYAT++pO2ijyT9rkFm0GIPDWR1/oo9hHZzd96AsTK0iZg==}
+  daisyui@5.7.8:
+    resolution: {integrity: sha512-/r3QoXteCOSlbvUM7bfOTIkc3rq6WskDRKgdTIF7M3ufdnY8gXsAo/CfRUNM2La21Kpnr34PGyU3uDFJ6sGJog==}
 
   dashdash@1.14.1:
     resolution: {integrity: sha512-jRFi8UDGo6j+odZiEpjazZaWqEal3w/basFjQHQEwVtZJGDpxbH1MeYluwCS8Xq5wmLJooDlMgvVarmWfGM44g==}
@@ -7546,7 +7546,7 @@ snapshots:
 
   '@keyv/serialize@1.1.1': {}
 
-  '@lucide/vue@1.27.0(vue@3.5.40(typescript@6.0.3))':
+  '@lucide/vue@1.28.0(vue@3.5.40(typescript@6.0.3))':
     dependencies:
       vue: 3.5.40(typescript@6.0.3)
 
@@ -8614,7 +8614,7 @@ snapshots:
       '@vue/shared': 3.5.40
       estree-walker: 2.0.2
       magic-string: 0.30.21
-      postcss: 8.5.20
+      postcss: 8.5.25
       source-map-js: 1.2.1
 
   '@vue/compiler-ssr@3.5.40':
@@ -9290,7 +9290,7 @@ snapshots:
       es5-ext: 0.10.64
       type: 2.7.3
 
-  daisyui@5.7.4: {}
+  daisyui@5.7.8: {}
 
   dashdash@1.14.1:
     dependencies:
