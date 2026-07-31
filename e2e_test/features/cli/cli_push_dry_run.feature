@@ -107,6 +107,32 @@ Feature: Preview what a push would change
         1 conflict.
         """
 
+  Rule: Exporting primes the baseline, so the very next preview can already tell a direction
+
+    Scenario: A note edited right after export is labeled a push without a priming run
+      Given I have a notebook "Ben Notebook" with notes:
+        | Title | Content |
+        | less  | Hello   |
+      And an empty export destination "./ExportTarget"
+      And I enter the slash command "/use Ben Notebook" in the interactive CLI
+      And I export the notebook into "./ExportTarget"
+      And the workspace "./BenNotebookExport" is the notebook "Ben Notebook" exported into "./ExportTarget"
+      When I edit the content of "less.md" in the workspace "./BenNotebookExport" to "Hello from Obsidian"
+      And I enter the slash command "/push --dry-run ./BenNotebookExport" in the interactive CLI
+      Then I should see the preview in past CLI assistant messages:
+        """
+        less.md (push)
+          --- Doughnut
+          +++ workspace
+        """
+      And I should see the preview in past CLI assistant messages:
+        """
+          - Hello
+          + Hello from Obsidian
+
+        1 note would change.
+        """
+
   Rule: The preview leaves the workspace and Doughnut untouched
 
     Background:

@@ -1,5 +1,6 @@
 import { e2eAppBaseUrl } from '../../../support/e2eAppUrl'
 import testability from '../../testability'
+import { resolveDestinationDir } from './exportDestination'
 
 /**
  * The local Markdown workspace as files on disk: what `/sync`, `/push` and
@@ -65,6 +66,23 @@ export function workspaceMatchingNotebook(notebookName: string, name: string) {
     .then((dir) => {
       workspaceDirsByName.set(name, dir)
     })
+}
+
+/**
+ * Register the directory `/export` wrote a notebook into as a named
+ * workspace, so `/push --dry-run` can be pointed at exactly what `/export`
+ * left on disk — baseline included — instead of a separately unzipped copy
+ * that never went through `/export` at all.
+ */
+export function exportedNotebookAsWorkspace(
+  notebookName: string,
+  destinationName: string,
+  workspaceName: string
+) {
+  workspaceDirsByName.set(
+    workspaceName,
+    `${resolveDestinationDir(destinationName)}/${notebookName}`
+  )
 }
 
 /** Replace a workspace file outright, or create one that was not there. */

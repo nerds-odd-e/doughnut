@@ -56,7 +56,14 @@ this is a legitimate baseline point. A `/push --dry-run` right after an edit mad
 correctly labels the note on its very first run, no priming run needed. See
 `cli/tests/writeNotebookExport.test.ts` ("seeds the push baseline …", "overwrites the push
 baseline …") and `cli/tests/previewPush.test.ts` ("labels a note (push) on the very first preview
-when /export primed the workspace") for the regression coverage.
+when /export primed the workspace") for the regression coverage, plus the e2e scenario
+`e2e_test/features/cli/cli_push_dry_run.feature` ("Rule: Exporting primes the baseline …"),
+which runs the real interactive `/export` command against a real backend. That scenario needed a
+small bridge in the e2e harness — `workspace.exportedNotebookAsWorkspace()` — to point `/push
+--dry-run` at the directory `/export` actually wrote, since the harness previously kept "export
+destinations" and "push/sync workspaces" as two separate registries. Fixing this also meant
+updating `cli_export.feature`'s exact-file-listing assertions to include the new
+`.doughnut-sync/baseline.json` file `/export` now writes alongside the notes.
 
 **Accepted remaining gap:** a workspace never created by this CLI's `/export` (hand-authored
 files, files copied some other way) still has no history to seed from, so its very first

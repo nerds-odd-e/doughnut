@@ -13,6 +13,7 @@ import {
 import {
   editWorkspaceNoteBody,
   emptyWorkspace,
+  exportedNotebookAsWorkspace,
   removeWorkspaceFile,
   resolveWorkspaceNames,
   workspaceFileShouldHold,
@@ -44,6 +45,7 @@ export const cli = {
   workspace: {
     editWorkspaceNoteBody,
     emptyWorkspace,
+    exportedNotebookAsWorkspace,
     removeWorkspaceFile,
     resolveWorkspaceNames,
     workspaceFileShouldHold,

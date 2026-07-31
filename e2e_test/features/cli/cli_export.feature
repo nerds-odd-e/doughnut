@@ -33,8 +33,9 @@ Feature: Export a notebook to a local Markdown tree
     And I enter the slash command "/use Ben Notebook" in the interactive CLI
     When I export the notebook into "./ExportTarget"
     Then the export destination "./ExportTarget" should hold only:
-      | Path                 |
-      | Ben Notebook/less.md |
+      | Path                                      |
+      | Ben Notebook/.doughnut-sync/baseline.json |
+      | Ben Notebook/less.md                      |
 
   Scenario: Export preserves folder structure and note bodies
     Given I have a notebook "Ben Notebook" with notes:
@@ -46,10 +47,11 @@ Feature: Export a notebook to a local Markdown tree
     And I enter the slash command "/use Ben Notebook" in the interactive CLI
     When I export the notebook into "./ExportTarget"
     Then the export destination "./ExportTarget" should hold only:
-      | Path                                |
-      | Ben Notebook/index.md               |
-      | Ben Notebook/intro.md               |
-      | Ben Notebook/LeSS in Action/team.md |
+      | Path                                      |
+      | Ben Notebook/.doughnut-sync/baseline.json |
+      | Ben Notebook/index.md                     |
+      | Ben Notebook/intro.md                     |
+      | Ben Notebook/LeSS in Action/team.md       |
     And the file "Ben Notebook/LeSS in Action/team.md" in the export destination "./ExportTarget" should hold "Sprint"
 
   Scenario: Exporting again reflects a changed note
@@ -62,8 +64,9 @@ Feature: Export a notebook to a local Markdown tree
     When the note "less" is changed in Doughnut to "Hello world!"
     And I export the notebook into "./ExportTarget"
     Then the export destination "./ExportTarget" should hold only:
-      | Path                 |
-      | Ben Notebook/less.md |
+      | Path                                      |
+      | Ben Notebook/.doughnut-sync/baseline.json |
+      | Ben Notebook/less.md                      |
     And the file "Ben Notebook/less.md" in the export destination "./ExportTarget" should hold "Hello world!"
 
   Scenario: An unrelated file in the destination survives an export
@@ -78,9 +81,10 @@ Feature: Export a notebook to a local Markdown tree
     And I enter the slash command "/use Ben Notebook" in the interactive CLI
     When I export the notebook into "./ExportTarget"
     Then the export destination "./ExportTarget" should hold only:
-      | Path                    |
-      | Ben Notebook/less.md    |
-      | Ben Notebook/scratch.md |
+      | Path                                      |
+      | Ben Notebook/.doughnut-sync/baseline.json |
+      | Ben Notebook/less.md                      |
+      | Ben Notebook/scratch.md                   |
     And the file "Ben Notebook/scratch.md" in the export destination "./ExportTarget" should hold "keep me"
 
   Scenario: A destination that does not exist reports a readable error

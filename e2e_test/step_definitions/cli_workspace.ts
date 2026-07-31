@@ -21,6 +21,17 @@ Given(
 )
 
 Given(
+  'the workspace {string} is the notebook {string} exported into {string}',
+  (workspaceName: string, notebookName: string, destinationName: string) => {
+    workspace.exportedNotebookAsWorkspace(
+      notebookName,
+      destinationName,
+      workspaceName
+    )
+  }
+)
+
+Given(
   'the workspace {string} has a file {string} with content:',
   (workspaceName: string, relativePath: string, content: string) => {
     workspace.writeWorkspaceFile(workspaceName, relativePath, content)
