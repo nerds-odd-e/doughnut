@@ -1,9 +1,11 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { basename, dirname, join } from 'node:path'
 import type { ExportNotebookAsZip } from './exportNotebook.js'
+import { savePushBaseline } from './pushBaseline.js'
 import { unzipToEntries } from './unzip.js'
 
 const ZIP_SUFFIX = '.zip'
+const MARKDOWN_SUFFIX = '.md'
 
 export type WriteNotebookExportRequest = {
   readonly notebookId: number
@@ -52,6 +54,12 @@ function render(root: string, paths: readonly string[]): string {
  *
  * Files of the same name are overwritten. Anything else already in the
  * destination is left alone: this writes a notebook, it does not mirror one.
+ *
+ * This also seeds `.doughnut-sync/baseline.json`, the same baseline
+ * `/push --dry-run` maintains: right after writing, every exported note's
+ * workspace and Doughnut content agree by construction, so a `/push --dry-run`
+ * run against an edit made right after this already has history to compare
+ * against, instead of needing a priming run first.
  */
 export async function writeNotebookExport({
   notebookId,
@@ -76,6 +84,12 @@ export async function writeNotebookExport({
     mkdirSync(dirname(full), { recursive: true })
     writeFileSync(full, content, 'utf8')
   }
+
+  savePushBaseline(
+    root,
+    notebookId,
+    new Map(entries.filter(([path]) => path.endsWith(MARKDOWN_SUFFIX)))
+  )
 
   return render(
     root,

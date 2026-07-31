@@ -9,6 +9,7 @@ import {
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
+import { loadPushBaseline } from '../src/sync/pushBaseline.js'
 import { writeNotebookExport } from '../src/sync/writeNotebookExport.js'
 import { zipOfNotes } from './zipFixture.js'
 
@@ -124,5 +125,29 @@ describe('writeNotebookExport', () => {
 
     expect(summary).toBe('Nothing to export: the notebook has no notes.')
     expect(existsSync(join(destination, 'Ben Notebook'))).toBe(false)
+  })
+
+  test('seeds the push baseline with the exported Markdown notes', async () => {
+    await write({
+      'less.md': 'Hello',
+      'LeSS in Action/team.md': 'Sprint',
+      'attachment.txt': 'not a note',
+    })
+
+    expect(loadPushBaseline(join(destination, 'Ben Notebook'), 1)).toEqual(
+      new Map([
+        ['LeSS in Action/team.md', 'Sprint'],
+        ['less.md', 'Hello'],
+      ])
+    )
+  })
+
+  test('overwrites the push baseline on a repeated export', async () => {
+    await write({ 'less.md': 'Hello world!' })
+    await write({ 'less.md': 'Hi' })
+
+    expect(loadPushBaseline(join(destination, 'Ben Notebook'), 1)).toEqual(
+      new Map([['less.md', 'Hi']])
+    )
   })
 })

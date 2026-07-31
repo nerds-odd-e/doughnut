@@ -14,12 +14,13 @@ type PushBaselineFile = {
 }
 
 /**
- * The content each note's two sides were last seen to agree on, as
- * `/push --dry-run` recorded it in this workspace.
+ * The content each note's two sides were last seen to agree on, as `/export`
+ * or `/push --dry-run` recorded it in this workspace.
  *
- * Empty for a workspace that has never previewed a push, or whose stored
- * baseline belongs to a different notebook — a workspace reused for a
- * different notebook has no useful history to compare against.
+ * Empty for a workspace that has never been exported into or previewed a
+ * push, or whose stored baseline belongs to a different notebook — a
+ * workspace reused for a different notebook has no useful history to compare
+ * against.
  */
 export function loadPushBaseline(
   workspacePath: string,

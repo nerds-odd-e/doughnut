@@ -9,6 +9,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { previewPush } from '../src/sync/previewPush.js'
+import { writeNotebookExport } from '../src/sync/writeNotebookExport.js'
 import { zipOfNotes } from './zipFixture.js'
 
 describe('previewPush', () => {
@@ -469,5 +470,45 @@ describe('previewPush', () => {
           ),
       })
     ).rejects.toThrow('Ben Notebook no longer exists in Doughnut.')
+  })
+
+  test('labels a note (push) on the very first preview when /export primed the workspace', async () => {
+    const notes = { 'less.md': 'Hello' }
+    const exportNotebookAsZip = () =>
+      Promise.resolve({
+        bytes: zipOfNotes(notes),
+        fileName: 'Ben Notebook.zip',
+      })
+
+    await writeNotebookExport({
+      notebookId: 1,
+      destinationDirectory: workspace,
+      exportNotebookAsZip,
+    })
+
+    const notebookWorkspace = join(workspace, 'Ben Notebook')
+    writeFileSync(
+      join(notebookWorkspace, 'less.md'),
+      'Hello from Obsidian',
+      'utf8'
+    )
+
+    await expect(
+      previewPush({
+        notebookId: 1,
+        workspacePath: notebookWorkspace,
+        exportNotebookAsZip,
+      })
+    ).resolves.toBe(
+      [
+        'less.md (push)',
+        '  --- Doughnut',
+        '  +++ workspace',
+        '  - Hello',
+        '  + Hello from Obsidian',
+        '',
+        '1 note would change.',
+      ].join('\n')
+    )
   })
 })
