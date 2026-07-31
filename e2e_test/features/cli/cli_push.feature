@@ -12,6 +12,9 @@ Feature: Push a local workspace into a notebook
   workspace. The frontmatter of a local file is the note's properties, so a push
   carries them up with the body.
 
+  A push remembers the workspace it was given, so the next one can leave the
+  path out.
+
   Background:
     Given I am logged in as an existing user
     And I set the access token for "old_learner" in the interactive CLI
@@ -48,3 +51,16 @@ Feature: Push a local workspace into a notebook
     And I enter the slash command "/push ./BenNotebook" in the interactive CLI
     Then I should see "1 note updated." in past CLI assistant messages
     And the note "less" in Doughnut should have property "url" as "http://new"
+
+  Scenario: A second push goes to the workspace the first one named
+    Given the workspace "./BenNotebook" holds the same content as "Ben Notebook"
+    And I enter the slash command "/push ./BenNotebook" in the interactive CLI
+    When the file "less.md" in the workspace "./BenNotebook" is:
+      """
+      # less
+
+      Hello from Obsidian
+      """
+    And I enter the slash command "/push" in the interactive CLI
+    Then I should see "1 note updated." in past CLI assistant messages
+    And the note "less" in Doughnut should hold "Hello from Obsidian"
