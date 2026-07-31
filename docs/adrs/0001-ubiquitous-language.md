@@ -1,0 +1,197 @@
+# 0001 — Ubiquitous language for Doughnut domain concepts
+
+**Status:** Proposed  
+**Date:** 2026-07-31  
+**Decision makers:** (who will approve)  
+**Consulted:** (people / teams asked for advice)
+
+## Context
+
+Doughnut’s product vocabulary is **inconsistent**: the same idea appears under
+several names, and some names mean more than one thing. Humans, UI copy, APIs,
+and coding agents then invent synonyms or collide terms.
+
+This ADR proposes a **canonical ubiquitous language**, plus renames where
+today’s wording is missing, ambiguous, or redundant. Accepting it does **not**
+require renaming the whole codebase at once; it constrains *new* naming and
+guides gradual alignment (tests, UI, OpenAPI, packages).
+
+### Current vocabulary
+
+| Term | Meaning |
+|------|---------|
+| **Note** | Atomic knowledge document (title, content, markdown / rich content, frontmatter; may be nested under another note) |
+| **Notebook** | Top-level collection of notes a user owns or subscribes to |
+| **Folder** | Hierarchical path segment inside a notebook |
+| **Readme** | Descriptive text on a notebook or folder |
+| **Notebook catalog** | List of a user’s notebooks (and notebook groups) |
+| **Notebook group** | Named catalog grouping of notebooks (not a Circle) |
+| **Notebook workspace** | In-app notebook shell with Readme, Settings, and Health |
+| **Circle** | Multi-user shared space with members and notebooks |
+| **Bazaar** | Marketplace where notebooks are shared for others to browse and subscribe |
+| **Subscription** | Following a shared notebook (from the Bazaar or a Circle) with a daily assimilation quota |
+| **Add to learning** | Synonym used for starting a subscription |
+| **Assimilation** | First-pass intake of a note into the learner’s memory schedule |
+| **Recall** | Spaced review of assimilated material |
+| **Re-assimilate** | Return a note to assimilation after failed recall |
+| **Skip recall** | Opt a note or notebook out of recall (panel action or notebook setting) |
+| **Revive recall** | Re-enable recall after it was skipped |
+| **Memory tracking** | Whether a note or notebook participates in assimilation and recall |
+| **Remembering spelling** | Assimilation option that requires verifying the note title by spelling |
+| **Property memory tracker** | Recall tracking keyed by a property or relationship label |
+| **Quiz / question** | A recall prompt (spelling, AI-generated, predefined, contested, …) |
+| **Question contest** | Challenging or replacing an AI-generated recall question |
+| **Accidental match** | Recall result that matches an unintended note |
+| **Wiki link** | In-content `[[…]]` reference to a note (optionally `Notebook:Title`) |
+| **Relationship** | Typed association between notes (e.g. “similar to”, “a part of”); may be stored as a relationship note |
+| **Property** | Attribute on a note; may result from reducing a relationship to the source |
+| **Wikidata association** | Binding a note to a Wikidata entity (also called Wiki association) |
+| **Book** | Attached reading artifact (EPUB, PDF, …), distinct from a notebook |
+| **Reading record** | Progress through a book |
+| **Book layout** | Structure of an attached book |
+| **Refinement layout** | Layout for decomposing and improving a note while refining |
+| **Conversation** | Thread of messages about a note (human or AI participant) |
+| **Message** | One utterance in a conversation |
+| **Message center** | UI for conversations and unread state |
+| **Local workspace** | On-disk Markdown / OKF tree used by CLI sync |
+| **OKF** | On-disk notebook folder format expected by CLI lint and sync |
+| **Push / pull** | Sync local workspace to or from a remote notebook |
+| **Notebook health** | In-app lint, findings, and fixes for a notebook |
+| **Focus context** | Bounded neighborhood of notes around a focus note for AI use |
+| **Daily assimilation target** | Max new notes to assimilate per day (profile or subscription) |
+| **Space setting** | User’s spaced-repetition interval list (e.g. `1, 2, 4, 8`) |
+| **Access token** | Credential for API / CLI access to Doughnut |
+
+### Problems
+
+#### Ambiguous (one word, several meanings)
+
+| Term | Colliding senses |
+|------|------------------|
+| **Workspace** | Local filesystem tree for CLI sync vs in-app notebook shell (Readme / Settings / Health) |
+| **Link** | Wiki link in note body; linking a matched note as relationship or property; circle invitation URL |
+| **Learning** | Overall learner metaphor; alias for subscription (“add to learning”); “target of learning N notes per day” as assimilation quota |
+| **Layout** | Refinement layout for a note vs book layout for an attached book |
+| **Quiz / question** | Spelling, AI-generated, predefined, and contested prompts without a shared parent name |
+| **Property** | Reduced relationship field; wiki property from accidental match; property memory tracker key |
+| **Chat / conversation / message** | Human note threads and AI chat share the same nouns without a clear split |
+| **My notes / my notebooks** | Notebook catalog; note search scope; subscribed notebook appearing among the user’s notebooks |
+
+#### Redundant (several names, one concept)
+
+| Concept | Overlapping names |
+|---------|-------------------|
+| Turning off recall for a note or notebook | skip recall, Skip Memory Tracking, no “add to learning” when memory tracking is off |
+| Following a shared notebook | subscribe, subscription, add to learning |
+| Binding to Wikidata | Wikidata association, Wiki association, associate Wikidata ID |
+| User recall interval list | space setting, spaced repetition |
+| Meaning-based find | semantical search, semantic search |
+
+#### Missing or weakly named
+
+| Gap | Why it matters |
+|-----|----------------|
+| No umbrella for **recall question** kinds | Spelling / AI / predefined / contested lack a shared type name |
+| **Focus context** | Used in AI flows but not established as a first-class domain noun |
+| **OKF** | Named in CLI lint but not introduced beside local workspace |
+| **Sync baseline** | CLI sync state on disk has no stable domain name elsewhere |
+| **Owned vs subscribed notebook** | Distinction exists in behavior but not as glossary entries |
+| **Notebook health** vs **lint workspace** | Same lint/findings idea at two layers without a shared term family |
+
+## Decision
+
+1. **Maintain a glossary** — Keep the dictionary in this ADR (Accepted form) as
+   the source of truth for product/domain naming. Phase plans and renames may
+   cite it; they must not invent competing canonical names silently.
+
+2. **Canonical terms** — Prefer these meanings in new UI copy, APIs, tests, and
+   code identifiers:
+
+| Term | Meaning |
+|------|---------|
+| **Note** | Atomic knowledge document |
+| **Notebook** | Top-level note collection a user owns or subscribes to |
+| **Folder** | Hierarchical path segment inside a notebook |
+| **Notebook catalog** | UI list of a user’s notebooks and notebook groups |
+| **Notebook group** | Named catalog grouping of notebooks |
+| **Circle** | Multi-user shared space with members and notebooks |
+| **Bazaar** | Marketplace for shared notebooks |
+| **Subscription** | Following a shared notebook (Bazaar or Circle) with an assimilation quota |
+| **Assimilation** | First-pass intake of a note into the learner’s memory schedule |
+| **Recall** | Spaced review of assimilated material |
+| **Recall question** | A single recall prompt (kinds: spelling, AI-generated, predefined, …) |
+| **Memory tracking** | Whether a note or notebook participates in assimilation and recall |
+| **Wiki link** | In-content `[[…]]` reference to a note |
+| **Relationship** | Typed association between notes (may be a relationship note) |
+| **Wikidata association** | Binding a note to a Wikidata entity |
+| **Property memory tracker** | Recall tracking keyed by a property or relationship label |
+| **Refinement layout** | Layout for decomposing a note while refining |
+| **Book layout** | Structure of an attached book |
+| **Conversation** | Thread of messages about a note (human or AI participant) |
+| **Message** | One utterance in a conversation |
+| **Message center** | UI for conversations and unread state |
+| **Local workspace** | On-disk Markdown/OKF tree used by CLI sync |
+| **Notebook workspace** | In-app notebook shell (Readme / Settings / Health) |
+| **OKF** | On-disk notebook folder format expected by CLI lint and sync |
+| **Spaced-repetition schedule** | User interval list for recall |
+| **Daily assimilation target** | Max new notes to assimilate per day (profile or subscription) |
+| **Notebook health** | In-app lint, findings, and fixes for a notebook |
+| **Focus context** | Bounded note neighborhood for AI use |
+| **Book** | Attached reading artifact (EPUB, PDF, …), distinct from a notebook |
+
+3. **Disambiguation rules**
+
+   - Always qualify **workspace** as **local** or **notebook**.
+   - Always qualify **layout** as **refinement** or **book**.
+   - Use **wiki link**, **relationship**, or **Wikidata association** — never
+     bare **link** or **wiki** when the kind matters.
+   - Use **subscription** / **subscribe** for following a shared notebook;
+     reserve **learning** for the overall learner metaphor, not as a synonym of
+     subscription.
+   - Prefer **memory tracking** for the setting; **skip recall** for the action.
+   - Prefer **recall question** over bare **quiz** when naming the prompt type.
+   - Prefer **spaced-repetition schedule** over **space setting** in new copy.
+   - Prefer **semantic search** over **semantical search**.
+
+4. **Alignment policy** — On Accept:
+
+   - **New** features, tests, OpenAPI names, and packages follow this glossary.
+   - **Existing** names may remain until a deliberate rename slice; do not
+     mass-rename in drive-by PRs.
+   - Agents treat this ADR as binding for naming choices; conflicts with older
+     strings are expected until cleaned up.
+
+5. **Out of scope** — Exact UI microcopy, i18n, and full mechanical rename
+   plans. Those become normal product work citing this ADR.
+
+## Consequences
+
+- Product language converges on fewer overloaded words (**workspace**,
+  **link**, **learning**, **layout**).
+- Humans and agents share an explicit dictionary instead of inferring synonyms.
+- Some existing strings (`add to learning`, `space setting`, bare `workspace`)
+  become known debt until renamed.
+- Circles, notebook groups, and folders stay clearly separated in speech.
+
+## Pros
+
+- Low process cost: one ADR, incremental alignment.
+- Reduces accidental synonymy in plans and API design.
+
+## Cons
+
+- Glossary will need edits as the product grows.
+- Temporary dual vocabulary until renames land.
+- Some metaphors (“add to learning”, “space setting”) may feel colder when
+  replaced with sharper terms.
+
+## Prerequisites / Assumptions
+
+- No Accepted ADR yet constrains domain naming (only ADR-0000 on using ADRs).
+
+## Related
+
+- Supersedes: (none)
+- Superseded by: (none)
+- Links: playbook [README.md](./README.md); ADR-0000
+  [use-adrs-accepted.md](./0000-use-adrs-accepted.md)

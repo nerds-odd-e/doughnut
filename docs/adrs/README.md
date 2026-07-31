@@ -78,5 +78,6 @@ Number sequentially from `0000`. Prefer capability-named titles, not phase numbe
 | ADR | Status | Title |
 |-----|--------|-------|
 | [0000](./0000-use-adrs-accepted.md) | Accepted | Use ADRs for architectural decisions |
+| [0001](./0001-ubiquitous-language.md) | Proposed | Ubiquitous language for Doughnut domain concepts |
 
 Keep this table current when you accept, reject, or supersede an ADR.
