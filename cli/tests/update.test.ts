@@ -1,5 +1,10 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
 import * as childProcess from 'node:child_process'
+import { formatVersionOutput, getVersion } from '../src/commands/version.js'
+
+function newerThan(version: string): string {
+  return `${Number(version.split('.')[0]) + 1}.0.0`
+}
 
 vi.mock('node:child_process', () => ({
   spawnSync: vi.fn(),
@@ -32,8 +37,9 @@ describe('runUpdate', () => {
       })
     )
 
+    const currentBanner = formatVersionOutput()
     vi.mocked(childProcess.spawnSync).mockReturnValue({
-      stdout: 'doughnut 0.5.0',
+      stdout: currentBanner,
       stderr: '',
       status: 0,
       error: undefined,
@@ -45,7 +51,7 @@ describe('runUpdate', () => {
     await runUpdate()
 
     expect(consoleSpy).toHaveBeenCalledWith(
-      'doughnut 0.5.0 is already the latest version'
+      `${currentBanner} is already the latest version`
     )
   })
 
@@ -62,8 +68,10 @@ describe('runUpdate', () => {
       })
     )
 
+    const current = getVersion()
+    const newer = newerThan(current)
     vi.mocked(childProcess.spawnSync).mockReturnValue({
-      stdout: 'doughnut 0.6.0',
+      stdout: `doughnut ${newer}`,
       stderr: '',
       status: 0,
       error: undefined,
@@ -75,7 +83,7 @@ describe('runUpdate', () => {
     await runUpdate()
 
     expect(consoleSpy).toHaveBeenCalledWith(
-      'Updated doughnut from 0.5.0 to 0.6.0'
+      `Updated doughnut from ${current} to ${newer}`
     )
   })
 

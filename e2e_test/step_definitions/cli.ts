@@ -20,13 +20,23 @@ When(
   () => cli.installation().runUpdate()
 )
 
-When('the backend serves the CLI with version {string}', (version: string) =>
-  cli.backend().serveVersion(version)
+When('the backend serves a newer CLI than the installed version', () =>
+  cli.backend().serveNewerThanInstalled()
 )
 
 Then(
   'I should see {string} in the non-interactive output',
   (expected: string) => cli.nonInteractiveOutput().expectContains(expected)
+)
+
+Then(
+  'I should see the installed CLI version in the non-interactive output',
+  () => cli.nonInteractiveOutput().expectInstalledCliVersionBanner()
+)
+
+Then(
+  'I should see that the CLI was updated to the newer version in the non-interactive output',
+  () => cli.nonInteractiveOutput().expectUpdatedFromInstalledToNewer()
 )
 
 When('I run the installed doughnut command in interactive mode', () =>
@@ -37,6 +47,15 @@ Then(
   'I should see {string} in past CLI assistant messages',
   (expected: string) =>
     cli.interactiveCli().pastCliAssistantMessages().expectContains(expected)
+)
+
+Then(
+  'I should see the installed CLI version in past CLI assistant messages',
+  () =>
+    cli
+      .interactiveCli()
+      .pastCliAssistantMessages()
+      .expectInstalledCliVersionBanner()
 )
 
 Then(

@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { describe, test, expect } from 'vitest'
 import {
   getVersion,
@@ -5,9 +8,18 @@ import {
   compareVersions,
 } from '../src/commands/version.js'
 
+const packageVersion = (
+  JSON.parse(
+    readFileSync(
+      join(dirname(fileURLToPath(import.meta.url)), '../package.json'),
+      'utf8'
+    )
+  ) as { version: string }
+).version
+
 describe('version', () => {
-  test('default version matches cli_install_and_run.feature (0.5.0)', () => {
-    expect(getVersion()).toBe('0.5.0')
+  test('default version matches cli/package.json', () => {
+    expect(getVersion()).toBe(packageVersion)
   })
 
   test('getVersion returns version string', () => {

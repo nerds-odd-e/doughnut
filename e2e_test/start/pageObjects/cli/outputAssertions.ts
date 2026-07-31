@@ -1,5 +1,9 @@
 import type { ManagedTtyAssertInput } from 'tty-assert'
 import { cliAssertTask } from './cliAssertTask'
+import {
+  installedCliVersionBanner,
+  installedToNewerUpdateMessage,
+} from './cliPackageVersion'
 
 const guidanceStartAfterAnchors = [
   { source: '^\\s*└' },
@@ -64,6 +68,16 @@ function nonInteractiveOutput() {
     expectContains(expected: string) {
       return cliAssertTask(nonInteractiveCliOutputAssertRequest(expected))
     },
+    expectInstalledCliVersionBanner() {
+      return installedCliVersionBanner().then((banner) =>
+        cliAssertTask(nonInteractiveCliOutputAssertRequest(banner))
+      )
+    },
+    expectUpdatedFromInstalledToNewer() {
+      return installedToNewerUpdateMessage().then((message) =>
+        cliAssertTask(nonInteractiveCliOutputAssertRequest(message))
+      )
+    },
   }
 }
 
@@ -122,6 +136,16 @@ function pastCliAssistantMessages() {
         strippedTranscriptTextAssertRequest(
           expected,
           'Past CLI assistant messages (in past CLI assistant messages).'
+        )
+      )
+    },
+    expectInstalledCliVersionBanner(): Cypress.Chainable<null> {
+      return installedCliVersionBanner().then((banner) =>
+        cliAssertTask(
+          strippedTranscriptTextAssertRequest(
+            banner,
+            'Past CLI assistant messages (in past CLI assistant messages).'
+          )
         )
       )
     },

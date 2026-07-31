@@ -48,8 +48,22 @@ export const CLI_E2E_INSTALL_BUNDLE_RELATIVE_PATH =
 const CLI_E2E_INSTALL_BUNDLE_OUTFILE =
   './dist/e2e-install-doughnut-cli.bundle.mjs'
 
-function cliE2eInstallBundleVersion(env?: NodeJS.ProcessEnv): string {
-  return env?.CLI_VERSION ?? process.env.CLI_VERSION ?? '0.5.0'
+export function readCliPackageVersion(repoRoot: string): string {
+  const pkg = JSON.parse(
+    readFileSync(join(repoRoot, 'cli/package.json'), 'utf8')
+  ) as { version: string }
+  return pkg.version
+}
+
+function cliE2eInstallBundleVersion(
+  repoRoot: string,
+  env?: NodeJS.ProcessEnv
+): string {
+  return (
+    env?.CLI_VERSION ??
+    process.env.CLI_VERSION ??
+    readCliPackageVersion(repoRoot)
+  )
 }
 
 function cliE2eInstallBundleCacheRelativePath(version: string): string {
@@ -150,7 +164,7 @@ export function runShellCommandSync(
 }
 
 export function bundleCliE2eInstall(repoRoot: string, env?: NodeJS.ProcessEnv) {
-  const version = cliE2eInstallBundleVersion(env)
+  const version = cliE2eInstallBundleVersion(repoRoot, env)
   const installBundle = join(repoRoot, CLI_E2E_INSTALL_BUNDLE_RELATIVE_PATH)
   const cacheBundle = join(
     repoRoot,

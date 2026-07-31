@@ -2,19 +2,17 @@
  * Cypress `task` handlers for CLI E2E. Depends only on `repoRoot` (repo checkout path).
  */
 
-import {
-  existsSync,
-  mkdirSync,
-  mkdtempSync,
-  readdirSync,
-  readFileSync,
-  unlinkSync,
-  writeFileSync,
-} from 'node:fs'
+import { existsSync, mkdtempSync, unlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { delimiter, dirname, join } from 'node:path'
 import { attachGoogleOAuthSimulation } from './cliE2eGoogleOAuthSimulation'
-import { unzipExportedWorkspace } from './unzipExportedWorkspace'
+import {
+  CLI_E2E_MANAGED_PTY_GEOMETRY,
+  NON_INTERACTIVE_CLI_EXIT_TIMEOUT_MS,
+  createCliE2eManagedPty,
+  waitForPtyExit,
+} from './cliE2eManagedPty'
+import { createCliE2ePluginWorkspaceTasks } from './cliE2ePluginWorkspaceTasks'
 import {
   bundleCliE2eInstall,
   CLI_E2E_INSTALL_BUNDLE_RELATIVE_PATH,
@@ -22,11 +20,8 @@ import {
   runShellCommandSync,
 } from './cliE2eRepo'
 import { cliEnv } from './cliEnv'
-import {
-  startManagedTtySession,
-  type ManagedTtyAssertInput,
-  type ManagedTtySession,
-} from 'tty-assert'
+import { startManagedTtySession } from 'tty-assert'
+import type { ManagedTtyAssertInput, ManagedTtySession } from 'tty-assert'
 
 type WithOptionalCliEnv = { env?: NodeJS.ProcessEnv }
 
@@ -58,85 +53,6 @@ export type CliE2ePluginTasksOptions = {
   ) => string
 }
 
-const INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING = 'doughnut 0.5.0'
-const INSTALLED_CLI_INTERACTIVE_STARTUP_TIMEOUT_MS = 20_000
-const CLI_INTERACTIVE_WRITE_IDLE_MS = 40
-const CLI_INTERACTIVE_WRITE_IDLE_TIMEOUT_MS = 15_000
-
-/** Interactive CLI PTY size for Cypress (failure PNG/GIF); smaller than tty-assert defaults (120×48). */
-const CLI_E2E_INTERACTIVE_PTY_COLS = 80
-const CLI_E2E_INTERACTIVE_PTY_ROWS = 24
-
-const CLI_E2E_MANAGED_PTY_GEOMETRY = {
-  cols: CLI_E2E_INTERACTIVE_PTY_COLS,
-  rows: CLI_E2E_INTERACTIVE_PTY_ROWS,
-} as const
-
-const NON_INTERACTIVE_CLI_EXIT_TIMEOUT_MS = 60_000
-
-type PtyWithOnExit = {
-  onExit: (listener: (e: { exitCode: number; signal?: number }) => void) => {
-    dispose: () => void
-  }
-}
-
-async function waitForInteractiveCliTranscriptIdle(
-  handle: ManagedTtySession,
-  timeoutMs = CLI_INTERACTIVE_WRITE_IDLE_TIMEOUT_MS
-): Promise<void> {
-  const deadline = Date.now() + timeoutMs
-  let last = handle.session.buf.text
-  let stableSince = Date.now()
-  while (Date.now() < deadline) {
-    await new Promise<void>((resolve) =>
-      setTimeout(resolve, CLI_INTERACTIVE_WRITE_IDLE_MS)
-    )
-    const current = handle.session.buf.text
-    if (current !== last) {
-      last = current
-      stableSince = Date.now()
-      continue
-    }
-    if (Date.now() - stableSince >= CLI_INTERACTIVE_WRITE_IDLE_MS) {
-      return
-    }
-  }
-  throw new Error(
-    `Timeout after ${timeoutMs}ms waiting for interactive CLI transcript to settle`
-  )
-}
-
-function waitForPtyExit(
-  pty: PtyWithOnExit,
-  expectCode: number,
-  timeoutMs: number
-): Promise<void> {
-  return new Promise((resolve, reject) => {
-    let timeoutId: ReturnType<typeof setTimeout> | undefined
-    const sub = pty.onExit(({ exitCode, signal }) => {
-      if (timeoutId !== undefined) clearTimeout(timeoutId)
-      sub.dispose()
-      if (exitCode === expectCode) {
-        resolve()
-        return
-      }
-      reject(
-        new Error(
-          `CLI exited with code ${exitCode}${signal != null ? ` (signal ${signal})` : ''}`
-        )
-      )
-    })
-    timeoutId = setTimeout(() => {
-      sub.dispose()
-      reject(
-        new Error(
-          `Timeout after ${timeoutMs}ms waiting for non-interactive CLI to exit`
-        )
-      )
-    }, timeoutMs)
-  })
-}
-
 async function bundleCliE2eInstallOrThrow(
   repoRoot: string,
   env?: NodeJS.ProcessEnv
@@ -154,84 +70,13 @@ export function createCliE2ePluginTasks(
   repoRoot: string,
   options: CliE2ePluginTasksOptions
 ) {
-  let interactiveCliPtyHandle: ManagedTtySession | null = null
-
-  function disposeManagedCliPtySession(): void {
-    interactiveCliPtyHandle?.dispose()
-    interactiveCliPtyHandle = null
-  }
-
-  async function managedAssertWithTerminalArtifacts(
-    handle: ManagedTtySession,
-    assertOpts: ManagedTtyAssertInput,
-    logPrefix: string
-  ): Promise<void> {
-    try {
-      await handle.assert(assertOpts)
-    } catch (err) {
-      try {
-        const png = await handle.captureViewportPng()
-        const pngPath = options.saveBufferToCurrentSpecFolder(
-          'terminal-pty-assert-failure',
-          '.png',
-          png
-        )
-        let suffix = `\n\nTerminal viewport PNG: ${pngPath}`
-        try {
-          const gif = await handle.buildViewportAnimationGif()
-          const gifPath = options.saveBufferToCurrentSpecFolder(
-            'terminal-pty-anim',
-            '.gif',
-            gif
-          )
-          suffix += `\nTerminal viewport animation (GIF): ${gifPath}`
-        } catch (gifErr) {
-          const msg = gifErr instanceof Error ? gifErr.message : String(gifErr)
-          if (!msg.includes('at least 2 distinct viewport frames')) {
-            console.error(
-              `${logPrefix}: failed to build/save terminal GIF`,
-              gifErr
-            )
-          }
-        }
-        if (err instanceof Error) {
-          err.message = `${err.message}${suffix}`
-        }
-      } catch (captureErr) {
-        console.error(
-          `${logPrefix}: failed to capture/save terminal failure artifacts`,
-          captureErr
-        )
-      }
-      throw err
-    }
-  }
-
-  async function startInteractiveCliPtySession(opts: {
-    command: string
-    args: string[]
-    cwd: string
-    env?: NodeJS.ProcessEnv
-  }): Promise<void> {
-    disposeManagedCliPtySession()
-    const managed = await startManagedTtySession(
-      {
-        command: opts.command,
-        args: opts.args,
-        cwd: opts.cwd,
-        env: { ...process.env, ...cliEnv(opts.env) },
-      },
-      CLI_E2E_MANAGED_PTY_GEOMETRY
-    )
-    interactiveCliPtyHandle = managed
-    await managed.assert({
-      needle: INSTALLED_CLI_INTERACTIVE_STARTUP_SUBSTRING,
-      surface: 'strippedTranscript',
-      timeoutMs: INSTALLED_CLI_INTERACTIVE_STARTUP_TIMEOUT_MS,
-    })
-  }
+  const pty = createCliE2eManagedPty({
+    repoRoot,
+    saveBufferToCurrentSpecFolder: options.saveBufferToCurrentSpecFolder,
+  })
 
   return {
+    ...createCliE2ePluginWorkspaceTasks(),
     getMineruE2eMockSitePath(): string {
       return join(repoRoot, 'e2e_test', 'python_stubs', 'mineru_site')
     },
@@ -249,107 +94,6 @@ export function createCliE2ePluginTasks(
       }
       return p
     },
-    createCliConfigDir() {
-      return mkdtempSync(join(tmpdir(), 'cypress-cli-config-'))
-    },
-    /** An empty directory for a command to write into. */
-    createCliEmptyDirectory() {
-      return mkdtempSync(join(tmpdir(), 'cypress-cli-export-'))
-    },
-    readCliWorkspaceFile({
-      workspace,
-      relativePath,
-    }: {
-      workspace: string
-      relativePath: string
-    }) {
-      return readFileSync(join(workspace, relativePath), 'utf8')
-    },
-    deleteCliWorkspaceFile({
-      workspace,
-      relativePath,
-    }: {
-      workspace: string
-      relativePath: string
-    }) {
-      unlinkSync(join(workspace, relativePath))
-      return null
-    },
-    writeCliWorkspaceFile({
-      workspace,
-      relativePath,
-      content,
-    }: {
-      workspace: string
-      relativePath: string
-      content: string
-    }) {
-      const full = join(workspace, relativePath)
-      mkdirSync(dirname(full), { recursive: true })
-      writeFileSync(full, content, 'utf8')
-      return null
-    },
-    /**
-     * Retype a note's body in the workspace, the way an editor like Obsidian
-     * would: the export's frontmatter and `# title` heading stay as they are,
-     * so the file still reads as the same note with different content.
-     */
-    writeCliWorkspaceNoteBody({
-      workspace,
-      relativePath,
-      content,
-    }: {
-      workspace: string
-      relativePath: string
-      content: string
-    }) {
-      const full = join(workspace, relativePath)
-      const lines = readFileSync(full, 'utf8').split('\n')
-      const heading = lines.findIndex((line) => line.startsWith('# '))
-      if (heading === -1) {
-        throw new Error(`No "# title" heading in ${relativePath} to keep.`)
-      }
-      // The export leaves one blank line between the heading and the body.
-      const keep = lines.slice(0, heading + 2)
-      writeFileSync(full, [...keep, content].join('\n'), 'utf8')
-      return null
-    },
-    /** A workspace holding exactly what a notebook export zip contains. */
-    createCliWorkspaceFromZip({ zipBase64 }: { zipBase64: string }) {
-      const workspace = mkdtempSync(join(tmpdir(), 'cypress-cli-workspace-'))
-      for (const [relativePath, content] of unzipExportedWorkspace(
-        Buffer.from(zipBase64, 'base64')
-      )) {
-        const full = join(workspace, relativePath)
-        mkdirSync(dirname(full), { recursive: true })
-        writeFileSync(full, content, 'utf8')
-      }
-      return workspace
-    },
-    /** Every file in the workspace, as forward-slashed relative paths, sorted. */
-    listCliWorkspaceFiles(workspace: string) {
-      const found: string[] = []
-      const walk = (directory: string, prefix: string) => {
-        for (const entry of readdirSync(directory, { withFileTypes: true })) {
-          const path = join(directory, entry.name)
-          if (entry.isDirectory()) {
-            walk(path, `${prefix}${entry.name}/`)
-          } else {
-            found.push(`${prefix}${entry.name}`)
-          }
-        }
-      }
-      walk(workspace, '')
-      return found.sort()
-    },
-    createCliConfigDirWithGmail(gmailConfig: Record<string, unknown>) {
-      const configDir = mkdtempSync(join(tmpdir(), 'cypress-cli-gmail-'))
-      writeFileSync(
-        join(configDir, 'gmail.json'),
-        JSON.stringify(gmailConfig, null, 2)
-      )
-      return configDir
-    },
     async bundleCliE2eInstall() {
       return bundleCliE2eInstallOrThrow(repoRoot)
     },
@@ -365,7 +109,7 @@ export function createCliE2ePluginTasks(
       return null
     },
     async installCli(baseUrl: string) {
-      disposeManagedCliPtySession()
+      pty.dispose()
       const installDir = mkdtempSync(join(tmpdir(), 'cypress-doughnut-cli-'))
       const installScriptPath = join(installDir, 'install.sh')
       const response = await fetch(`${baseUrl}/install`)
@@ -403,7 +147,7 @@ export function createCliE2ePluginTasks(
         )
       }
       const cwd = dirname(doughnutPath)
-      disposeManagedCliPtySession()
+      pty.dispose()
       let managed: ManagedTtySession | undefined
       try {
         managed = await startManagedTtySession(
@@ -420,7 +164,7 @@ export function createCliE2ePluginTasks(
           0,
           NON_INTERACTIVE_CLI_EXIT_TIMEOUT_MS
         )
-        interactiveCliPtyHandle = managed
+        pty.setHandle(managed)
       } catch (e) {
         managed?.dispose()
         throw e
@@ -441,7 +185,7 @@ export function createCliE2ePluginTasks(
           `runInstalledCliInteractive: doughnut binary not found at ${doughnutPath}. Ensure prior install step succeeded.`
         )
       }
-      await startInteractiveCliPtySession({
+      await pty.startInteractive({
         command: process.execPath,
         args: [doughnutPath],
         cwd: dirname(doughnutPath),
@@ -453,7 +197,7 @@ export function createCliE2ePluginTasks(
       env,
     }: RunRepoCliInteractiveTask = {}): Promise<null> {
       const { command, baseArgs } = cliRepoSpawnFromRoot(repoRoot)
-      await startInteractiveCliPtySession({
+      await pty.startInteractive({
         command,
         args: baseArgs,
         cwd: repoRoot,
@@ -462,7 +206,7 @@ export function createCliE2ePluginTasks(
       return null
     },
     cliInteractivePtyEnableGoogleOAuthSimulation() {
-      const handle = interactiveCliPtyHandle
+      const handle = pty.getHandle()
       if (!handle) {
         throw new Error(
           'cliInteractivePtyEnableGoogleOAuthSimulation: no active interactive CLI PTY. Start the session first (e.g. runRepoCliInteractive).'
@@ -472,41 +216,23 @@ export function createCliE2ePluginTasks(
       return null
     },
     cliInteractivePtyDispose() {
-      disposeManagedCliPtySession()
+      pty.dispose()
       return null
     },
     async cliAssert(body: ManagedTtyAssertInput): Promise<null> {
-      const handle = interactiveCliPtyHandle
-      if (!handle) {
-        throw new Error(
-          'cliAssert: no managed CLI PTY session. Start interactive (runInstalledCliInteractive / runRepoCliInteractive) or run a one-shot command (runInstalledCli) first.'
-        )
-      }
-      await managedAssertWithTerminalArtifacts(handle, body, 'cliAssert')
+      await pty.assert(body)
       return null
     },
     async cliInteractiveWriteLine({
       line,
     }: CliInteractiveWriteLineTask): Promise<null> {
-      if (!interactiveCliPtyHandle) {
-        throw new Error(
-          'cliInteractiveWriteLine: no active interactive CLI PTY session. Ensure @interactiveCLI started the session or run the installed CLI in interactive mode first.'
-        )
-      }
-      interactiveCliPtyHandle.submit(line)
-      await waitForInteractiveCliTranscriptIdle(interactiveCliPtyHandle)
+      await pty.writeLine(line)
       return null
     },
     async cliInteractiveWriteRaw({
       data,
     }: CliInteractiveWriteRawTask): Promise<null> {
-      if (!interactiveCliPtyHandle) {
-        throw new Error(
-          'cliInteractiveWriteRaw: no active interactive CLI PTY session. Ensure @interactiveCLI started the session or run the installed CLI in interactive mode first.'
-        )
-      }
-      interactiveCliPtyHandle.write(data)
-      await waitForInteractiveCliTranscriptIdle(interactiveCliPtyHandle)
+      await pty.writeRaw(data)
       return null
     },
   }

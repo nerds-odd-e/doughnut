@@ -1,5 +1,16 @@
+import { createRequire } from 'node:module'
+
 declare const CLI_VERSION: string | undefined
-const VERSION = typeof CLI_VERSION !== 'undefined' ? CLI_VERSION : '0.5.0'
+
+function defaultVersionFromPackageJson(): string {
+  const require = createRequire(import.meta.url)
+  return (require('../../package.json') as { version: string }).version
+}
+
+const VERSION =
+  typeof CLI_VERSION !== 'undefined'
+    ? CLI_VERSION
+    : defaultVersionFromPackageJson()
 
 export function getVersion(): string {
   return VERSION
