@@ -51,9 +51,16 @@ Useful focused checks:
 
 Assume `pnpm sut` is already running. If unsure, check `CURSOR_DEV=true nix develop -c pnpm sut:healthcheck`. Do not ask developers to restart services after normal code changes; backend and frontend auto-reload.
 
+## Architectural decisions (ADRs)
+
+- Human propose / discuss / approve: `docs/adrs/README.md`
+- Current recommendations: `docs/adrs/*-accepted.md` (read explicitly — under `docs/`)
+- Agent use / cite / conflict / maintain: `.agents/skills/adr-awareness/SKILL.md`
+- Rule pointer: `.cursor/rules/architecture-decisions.mdc`
+
 ## Ignored Reference Material
 
-`docs/` and legacy `ongoing/` are excluded from default indexing to reduce retrieval noise. Active planning lives in `.planning/` (GSD `phases/`, `quick/`, `STATE`, … — see `gsd-coexistence.mdc`). Read `docs/` or `ongoing/` explicitly only when the user asks for docs/legacy plans, a rule points to a specific document, or the task is about planning/history rather than current source behavior.
+`docs/` and legacy `ongoing/` are excluded from default indexing to reduce retrieval noise. Active planning lives in `.planning/` (GSD `phases/`, `quick/`, `STATE`, … — see `gsd-coexistence.mdc`). Read `docs/` or `ongoing/` explicitly only when the user asks for docs/legacy plans, a rule points to a specific document, an ADR check is required (`docs/adrs/`), or the task is about planning/history rather than current source behavior.
 
 ## Planning modes (GSD vs local)
 
