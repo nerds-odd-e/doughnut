@@ -1,6 +1,6 @@
 package com.odde.doughnut.services.notebookExport;
 
-import com.odde.doughnut.algorithms.NoteContentMarkdown;
+import com.odde.doughnut.algorithms.NoteLeadingFrontmatter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -82,10 +82,21 @@ public final class NotebookZipBuilder {
     }
   }
 
+  /**
+   * A note as a Markdown file: its properties as it holds them, then its title as a heading, then
+   * its body.
+   *
+   * <p>The properties are the note's leading frontmatter, written out untouched — this is the file
+   * the user edits, so the block they wrote is the block they get back. The heading is the one
+   * addition: a title lives in a column of its own, so without it the file would never say its own
+   * name. A note with no frontmatter gets no fenced block at all, rather than an empty one.
+   */
   private static String noteFileContent(ExportNoteRow note) {
     String rawContent = note.content() == null ? "" : note.content();
-    String body = NoteContentMarkdown.bodyWithoutLeadingFrontmatter(rawContent).stripLeading();
-    return "---\ndoughnut_id: " + note.id() + "\n---\n\n# " + note.title() + "\n\n" + body;
+    String heading = "# " + note.title() + "\n\n";
+    return NoteLeadingFrontmatter.splitVerbatim(rawContent)
+        .map(split -> split.frontmatterBlock() + "\n\n" + heading + split.body().stripLeading())
+        .orElseGet(() -> heading + rawContent.stripLeading());
   }
 
   private static void writeEntry(ZipOutputStream zos, String path, String content)

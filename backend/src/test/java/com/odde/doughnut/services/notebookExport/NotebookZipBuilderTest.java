@@ -27,8 +27,7 @@ class NotebookZipBuilderTest {
   }
 
   @Test
-  void writesNotebookIndexAndRootNotesAsMarkdownFilesWithIdentityAndTitleHeading()
-      throws IOException {
+  void writesNotebookIndexAndRootNotesAsMarkdownFilesWithATitleHeading() throws IOException {
     byte[] zipBytes =
         NotebookZipBuilder.build(
             "# Notebook readme",
@@ -38,9 +37,7 @@ class NotebookZipBuilderTest {
     Map<String, String> entries = readZipEntries(zipBytes);
 
     assertThat(entries.get("index.md"), equalTo("# Notebook readme"));
-    assertThat(
-        entries.get("First note.md"),
-        equalTo("---\ndoughnut_id: 1\n---\n\n# First note\n\nFirst body"));
+    assertThat(entries.get("First note.md"), equalTo("# First note\n\nFirst body"));
   }
 
   @Test
@@ -57,11 +54,11 @@ class NotebookZipBuilderTest {
     assertThat(entries.containsKey("Child Folder/index.md"), equalTo(false));
     assertThat(
         entries.get("Parent Folder/Child Folder/Nested note.md"),
-        equalTo("---\ndoughnut_id: 2\n---\n\n# Nested note\n\nNested body"));
+        equalTo("# Nested note\n\nNested body"));
   }
 
   @Test
-  void stripsInternalFrontmatterButKeepsAStableDoughnutIdentity() throws IOException {
+  void keepsThePropertiesVerbatimAndAddsNoIdentity() throws IOException {
     String contentWithFrontmatter = "---\nwikidata_id: Q123\n---\n\nActual body text";
     ExportNoteRow note = new ExportNoteRow(3, null, "My Note", contentWithFrontmatter);
 
@@ -70,6 +67,6 @@ class NotebookZipBuilderTest {
     Map<String, String> entries = readZipEntries(zipBytes);
     assertThat(
         entries.get("My Note.md"),
-        equalTo("---\ndoughnut_id: 3\n---\n\n# My Note\n\nActual body text"));
+        equalTo("---\nwikidata_id: Q123\n---\n\n# My Note\n\nActual body text"));
   }
 }

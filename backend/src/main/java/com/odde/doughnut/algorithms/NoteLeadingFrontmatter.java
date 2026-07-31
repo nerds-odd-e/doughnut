@@ -9,7 +9,25 @@ public final class NoteLeadingFrontmatter {
 
   public record Split(Frontmatter frontmatter, String body) {}
 
+  /**
+   * The leading block as the author wrote it — fences included, nothing reparsed or re-dumped —
+   * with the body after it. Reading a property means {@link #split}; handing the block back to the
+   * author means this, because a round trip through {@link Frontmatter} settles comments, key
+   * order, and quoting for them.
+   */
+  public record VerbatimSplit(String frontmatterBlock, String body) {}
+
   public static Optional<Split> split(String content) {
+    return scan(content).map(s -> new Split(Frontmatter.parse(s.yamlRaw()), s.body()));
+  }
+
+  public static Optional<VerbatimSplit> splitVerbatim(String content) {
+    return scan(content).map(s -> new VerbatimSplit(s.frontmatterBlock(), s.body()));
+  }
+
+  private record Scan(String yamlRaw, String body, String frontmatterBlock) {}
+
+  private static Optional<Scan> scan(String content) {
     if (content == null || content.isEmpty()) {
       return Optional.empty();
     }
@@ -23,7 +41,8 @@ public final class NoteLeadingFrontmatter {
       if ("---".equals(lines[i])) {
         String yamlRaw = joinLines(lines, 1, i);
         String body = joinLines(lines, i + 1, lines.length);
-        return Optional.of(new Split(Frontmatter.parse(yamlRaw), body));
+        String frontmatterBlock = joinLines(lines, 0, i + 1);
+        return Optional.of(new Scan(yamlRaw, body, frontmatterBlock));
       }
     }
     return Optional.empty();
