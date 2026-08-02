@@ -3,7 +3,6 @@
 **Status:** Accepted  
 **Date:** 2026-07-31  
 **Decision makers:** Team  
-**Consulted:** Discussion of advice-process / Whale-style ADR practice
 
 ## Context
 
