@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Clean up LIA training participant code
-current_phase: 12
-current_phase_name: Resolve push dry-run (story 5)
-status: phase_complete
-stopped_at: Phase 13 context gathered
-last_updated: "2026-08-03T08:29:55.077Z"
+current_phase: 13
+current_phase_name: Resolve safe push (story 6)
+status: research_complete
+stopped_at: Phase 13 research complete
+last_updated: "2026-08-03T08:45:00.000Z"
 last_activity: 2026-08-03
-last_activity_desc: Executed 12-01 (feat d29f3b841b); units 30/30 + E2E 11/11
+last_activity_desc: Wrote 13-RESEARCH.md (Story 6 remove: delete cli_push.feature; keep dry-run)
 progress:
   total_phases: 8
   completed_phases: 3
@@ -25,18 +25,18 @@ See: `.planning/PROJECT.md` (updated 2026-08-03)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** Milestone v1.2 — Phase 12 PUSH-01 closed; next Phase 13 Story 6 (PUSH-02)
+**Current focus:** Milestone v1.2 — Phase 13 Story 6 remove (PUSH-02); Phase 12 PUSH-01 closed
 
 ## Current Position
 
-Phase: 12 — Resolve push dry-run (story 5)
-Plan: 12-01 complete (1/1)
-Status: Phase 12 complete — PUSH-01 strengthen landed (load-only baseline + create/update)
-Last activity: 2026-08-03 — Executed 12-01 (feat d29f3b841b); units 30/30 + E2E 11/11
+Phase: 13 — Resolve safe push (story 6)
+Plan: (next — plan Phase 13 from RESEARCH)
+Status: Phase 13 research complete — PUSH-02 remove path documented (delete `@ignore` cli_push.feature; keep dry-run)
+Last activity: 2026-08-03 — Wrote 13-RESEARCH.md (delete surface + orphan scan + absence proofs)
 
 Progress: [████████░░] 77%
 
-**Next:** `/gsd-progress` or discuss/plan Phase 13 (PUSH-02)
+**Next:** `/gsd-plan-phase 13` (CONTEXT + RESEARCH ready)
 
 ## Performance Metrics
 
@@ -116,6 +116,7 @@ Decisions are logged in PROJECT.md Key Decisions table. Roadmap-shaping decision
 - [Phase 12]: D-04/A1: intersecting keep (push)/(pull)/(CONFLICT); creates use (create) heading
 - [Phase 12]: D-08: one implementation commit for code+units+E2E
 - [Phase 12]: PUSH-01 closed — units + targeted cli_push_dry_run E2E green; HYG-02 intact
+- [Phase 13]: Research complete — remove path only; delete `cli_push.feature`; keep Phase 12 dry-run; no mutate push
 
 ### Pending Todos
 
@@ -138,7 +139,7 @@ Items acknowledged and deferred at milestone close on 2026-07-25:
 
 ## Session Continuity
 
-**Last session:** 2026-08-03T08:29:55.068Z
-**Stopped at:** Phase 13 context gathered
-**Next action:** Discuss/plan Phase 13 (PUSH-02) or `/gsd-progress`
-**Resume file:** .planning/phases/13-resolve-safe-push-story-6/13-CONTEXT.md
+**Last session:** 2026-08-03T08:45:00.000Z
+**Stopped at:** Phase 13 research complete
+**Next action:** `/gsd-plan-phase 13`
+**Resume file:** .planning/phases/13-resolve-safe-push-story-6/13-RESEARCH.md
