@@ -4,10 +4,10 @@ milestone: v1.2
 milestone_name: Clean up LIA training participant code
 current_phase: 9
 status: ready
-stopped_at: Phase 9 plans created
-last_updated: "2026-08-03T07:10:00.000Z"
+stopped_at: Phase 9 plan-check passed
+last_updated: "2026-08-03T15:05:00.000Z"
 last_activity: 2026-08-03
-last_activity_desc: Created 09-01 and 09-02 PLAN.md
+last_activity_desc: Phase 9 plan-check re-verify passed (Open Questions RESOLVED; E2E stop-safe fixed)
 progress:
   total_phases: 8
   completed_phases: 2
@@ -25,16 +25,16 @@ See: `.planning/PROJECT.md` (updated 2026-08-03)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** Milestone v1.2 — Phase 9 planned (EXP-02); next execute Phase 9
+**Current focus:** Milestone v1.2 — Phase 9 plan-check passed (EXP-02); next execute Phase 9
 
 ## Current Position
 
-Phase: 9 — PLANNED
+Phase: 9 — READY TO EXECUTE
 Plan: 09-01 ready (wave 1), 09-02 depends on 09-01
-Status: 2 plans — strengthen previewPull+units then E2E dry-run wrap-up; applyPull frozen
-Last activity: 2026-08-03 — Created 09-01 and 09-02 PLAN.md
+Status: 2 plans verified — strengthen previewPull+units then E2E dry-run wrap-up; applyPull frozen
+Last activity: 2026-08-03 — Plan-check re-verify PASSED (0 blockers)
 
-Progress: Phase 8 complete; Phase 9 plans ready to execute
+Progress: Phase 8 complete; Phase 9 plans verified — execute next
 
 **Next:** `/gsd-execute-phase 9` — Wave 1: 09-01 preview taxonomy + units
 
@@ -87,6 +87,7 @@ Decisions are logged in PROJECT.md Key Decisions table. Roadmap-shaping decision
 - [Phase 8]: Attachment rewrite only matches /attachments/images/{digits}/… prefixed with publicOrigin
 - [Phase 8]: CLI /export E2E proves doughnut_id, wiki→MD links, absolute attachment URLs without CLI rewrite (D-06)
 - [Phase 9]: Plans created — previewPull+units (09-01) then cli_sync_dry_run E2E (09-02); D-01..D-09 locked; applyPull frozen
+- [Phase 9]: Plan-check passed (rev 2) — Open Questions RESOLVED; Plan 01 stop-safe E2E substrings constrained
 
 ### Pending Todos
 
@@ -109,7 +110,7 @@ Items acknowledged and deferred at milestone close on 2026-07-25:
 
 ## Session Continuity
 
-**Last session:** 2026-08-03T07:10:00.000Z
-**Stopped at:** Phase 9 plans created
+**Last session:** 2026-08-03T15:05:00.000Z
+**Stopped at:** Phase 9 plan-check passed
 **Next action:** `/gsd-execute-phase 9`
 **Resume file:** .planning/phases/09-resolve-preview-before-pull-story-2/09-01-PLAN.md
