@@ -3,18 +3,18 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Clean up LIA training participant code
 current_phase: 7
-current_phase_name: Publish triage decisions
-status: ready_for_next_phase
+status: completed
 stopped_at: Completed 07-03-PLAN.md — Phase 7 triage published
-last_updated: "2026-08-03T06:07:09.947Z"
+last_updated: "2026-08-03T06:11:28.798Z"
 last_activity: 2026-08-03
-last_activity_desc: "Completed 07-03: Stories 5–6 + author-filter completeness; CONTEXT/STATE/ROADMAP point at TRIAGE.md"
+last_activity_desc: Phase 7 marked complete
 progress:
   total_phases: 8
   completed_phases: 1
   total_plans: 3
   completed_plans: 3
-  percent: 100
+  percent: 13
+current_phase_name: Publish triage decisions
 ---
 
 # State
@@ -29,10 +29,10 @@ See: `.planning/PROJECT.md` (updated 2026-08-03)
 
 ## Current Position
 
-Phase: 7 of 14 (Publish triage decisions) — **triage published**
+Phase: 7 — COMPLETE
 Plan: 07-03 (complete — all Phase 7 plans done)
-Status: Phase 7 complete — ready for Phase 8 execute
-Last activity: 2026-08-03 — Completed 07-03: Stories 5–6 + author-filter completeness; CONTEXT/STATE/ROADMAP point at TRIAGE.md
+Status: Phase 7 complete
+Last activity: 2026-08-03 — Phase 7 marked complete
 
 Progress: [██████████] 100% (Phase 7 plans)
 
