@@ -46,7 +46,7 @@
 - [x] **Phase 7: Publish triage decisions** - Maintainer has cited keep/strengthen/remove for stories 1–6 (3 plans)
 - [x] **Phase 8: Resolve pull/export (story 1)** - Keep/strengthen or cleanly remove story 1 participant work
 - [x] **Phase 9: Resolve preview-before-pull (story 2)** - Keep/strengthen or cleanly remove story 2 participant work
-- [ ] **Phase 10: Resolve incremental pull (story 3)** - Keep/strengthen or cleanly remove story 3 participant work
+- [x] **Phase 10: Resolve incremental pull (story 3)** - Keep/strengthen or cleanly remove story 3 participant work
 - [ ] **Phase 11: Resolve workspace lint (story 4)** - Keep/strengthen or cleanly remove story 4 participant work
 - [ ] **Phase 12: Resolve push dry-run (story 5)** - Keep/strengthen or cleanly remove story 5 participant work
 - [ ] **Phase 13: Resolve safe push (story 6)** - Keep/strengthen or cleanly remove story 6 participant work
@@ -129,10 +129,11 @@ Plans:
   3. If remove: story 3 participant path and related debris are gone cleanly
   4. Terry Yin and Tan Yeong Sheng changes remain untouched (HYG-02 standing constraint)
 
-**Plans**: 1 plan
+**Plans**: 1/1 plans executed
 
 Plans:
-- [ ] 10-01-PLAN.md — Strengthen applyPull (create/update/move + gated baseline) + units + cli_sync_pull E2E
+
+- [x] 10-01-PLAN.md — Strengthen applyPull (create/update/move + gated baseline) + units + cli_sync_pull E2E
 
 ### Phase 11: Resolve workspace lint (story 4)
 
@@ -203,7 +204,7 @@ Plans:
 | 7. Publish triage decisions | v1.2 | 3/3 | Complete | 2026-08-03 |
 | 8. Resolve pull/export (story 1) | v1.2 | 2/2 | Complete | 2026-08-03 |
 | 9. Resolve preview-before-pull (story 2) | v1.2 | 2/2 | Complete | 2026-08-03 |
-| 10. Resolve incremental pull (story 3) | v1.2 | 0/? | Not started | - |
+| 10. Resolve incremental pull (story 3) | v1.2 | 1/1 | In Progress|  |
 | 11. Resolve workspace lint (story 4) | v1.2 | 0/? | Not started | - |
 | 12. Resolve push dry-run (story 5) | v1.2 | 0/? | Not started | - |
 | 13. Resolve safe push (story 6) | v1.2 | 0/? | Not started | - |

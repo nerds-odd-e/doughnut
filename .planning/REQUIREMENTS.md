@@ -16,7 +16,7 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 - [x] **EXP-01**: Kept or strengthened pull/export behavior matches story 1 acceptance (hierarchy, identity frontmatter, indexes, links, no secrets, failed pull not presented as success) — or the incomplete/incorrect path is removed cleanly
 - [x] **EXP-02**: Kept or strengthened preview-before-pull matches story 2 (paths/actions reported; preview mutates nothing) — or removed cleanly
-- [ ] **EXP-03**: Kept or strengthened incremental pull matches story 3 (unchanged files undisturbed; idempotent re-pull) — or removed cleanly
+- [x] **EXP-03**: Kept or strengthened incremental pull matches story 3 (unchanged files undisturbed; idempotent re-pull) — or removed cleanly
 
 ### Workspace lint (story 4)
 
@@ -66,7 +66,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TRIAGE-02 | Phase 7 | Complete |
 | EXP-01 | Phase 8 | Complete |
 | EXP-02 | Phase 9 | Complete |
-| EXP-03 | Phase 10 | Pending |
+| EXP-03 | Phase 10 | Complete |
 | LINT-01 | Phase 11 | Pending |
 | PUSH-01 | Phase 12 | Pending |
 | PUSH-02 | Phase 13 | Pending |

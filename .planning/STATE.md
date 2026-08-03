@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Clean up LIA training participant code
-current_phase: 10
-current_phase_name: Resolve incremental pull (story 3)
-status: ready_to_execute
-stopped_at: Phase 10 plan-check passed (revision 2)
-last_updated: "2026-08-03T07:40:00.000Z"
+current_phase: 11
+current_phase_name: Resolve workspace lint (story 4)
+status: phase_complete
+stopped_at: Completed 10-01-PLAN.md
+last_updated: "2026-08-03T07:35:01.557Z"
 last_activity: 2026-08-03
-last_activity_desc: Re-verified 10-PLAN-CHECK.md — VERIFICATION PASSED
+last_activity_desc: Completed Phase 10 plan 10-01 — applyPull create/update/move + gated baseline
 progress:
   total_phases: 8
-  completed_phases: 2
-  total_plans: 9
-  completed_plans: 7
-  percent: 25
+  completed_phases: 4
+  total_plans: 10
+  completed_plans: 8
+  percent: 80
 ---
 
 # State
@@ -25,26 +25,26 @@ See: `.planning/PROJECT.md` (updated 2026-08-03)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** Milestone v1.2 — Phase 10 Story 3 `applyPull` strengthen (EXP-03); ready to execute
+**Current focus:** Milestone v1.2 — Phase 11 Story 4 `/lint` (LINT-01); Phase 10 EXP-03 complete
 
 ## Current Position
 
-Phase: 10 — plan-check passed
-Plan: 10-01 (checkpoint D-08 + tracer units + E2E)
-Status: VERIFICATION PASSED — see `10-PLAN-CHECK.md` (revision 2)
-Last activity: 2026-08-03 — Re-verified after VALIDATION.md + Open Questions + `@wip` fix
+Phase: 10 complete → next Phase 11
+Plan: 10-01 complete (SUMMARY written)
+Status: Phase 10 executed — classify→apply + E2E create flip green
+Last activity: 2026-08-03 — Completed 10-01-PLAN.md
 
-Progress: [█████████░] 88%
+Progress: [████████░░] 80%
 
-**Next:** `/gsd-execute-phase 10`
+**Next:** `/gsd-discuss-phase 11` or `/gsd-plan-phase 11`
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 7 (this milestone)
-- Average duration: ~12min
-- Total execution time: 77min
+- Total plans completed: 8 (this milestone)
+- Average duration: ~10min
+- Total execution time: 80min
 
 **By Phase:**
 
@@ -53,6 +53,7 @@ Progress: [█████████░] 88%
 | 07 | 3/3 | 44min | 15min |
 | 08 | 2/2 | 24min | 12min |
 | 09 | 2/2 | 9min | 5min |
+| 10 | 1/1 | 3min | 3min |
 
 *Updated after each plan completion*
 **Per-Plan Metrics:**
@@ -66,6 +67,7 @@ Progress: [█████████░] 88%
 | Phase 08 P02 | 4min | 2 tasks | 1 files |
 | Phase 09 P01 | 6min | 3 tasks | 7 files |
 | Phase 09 P02 | 3min | 2 tasks | 1 files |
+| Phase 10 P01 | 3min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -98,6 +100,9 @@ Decisions are logged in PROJECT.md Key Decisions table. Roadmap-shaping decision
 - [Phase 9]: Reserved reject E2E via note title log + empty workspace dry-run
 - [Phase 9]: EXP-02 closed — units + targeted cli_sync_dry_run E2E green
 - [Phase 10]: One coarse plan 10-01 — D-08 reversibility checkpoint + apply+units tracer + cli_sync_pull E2E; EXP-03; HYG-02 import-only classify
+- [Phase 10]: auto-selected invert-create (D-08); applyPull classify→apply + gated baseline
+- [Phase 10]: baseline merge patches prior map for applied paths only (A1); move = write+unlink fromPath (A2)
+- [Phase 10]: EXP-03 closed — units + targeted cli_sync_pull E2E green; HYG-02 intact
 
 ### Pending Todos
 
@@ -120,7 +125,7 @@ Items acknowledged and deferred at milestone close on 2026-07-25:
 
 ## Session Continuity
 
-**Last session:** 2026-08-03T07:30:00.000Z
-**Stopped at:** Phase 10 plan created (10-01)
-**Next action:** `/gsd-execute-phase 10`
-**Resume file:** .planning/phases/10-resolve-incremental-pull-story-3/10-01-PLAN.md
+**Last session:** 2026-08-03T07:35:01.550Z
+**Stopped at:** Completed 10-01-PLAN.md
+**Next action:** `/gsd-discuss-phase 11` or `/gsd-plan-phase 11`
+**Resume file:** None
