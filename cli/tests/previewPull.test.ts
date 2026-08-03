@@ -42,12 +42,12 @@ describe('previewPull', () => {
         }),
     })
 
-  test('reports a changed note as a diff', async () => {
+  test('reports a changed note as a labeled update', async () => {
     write('less.md', 'Hello')
 
     await expect(preview({ 'less.md': 'Hello world!' })).resolves.toBe(
       [
-        'less.md',
+        'less.md (update)',
         '  --- workspace',
         '  +++ Doughnut',
         '  - Hello',
@@ -58,7 +58,7 @@ describe('previewPull', () => {
     )
   })
 
-  test('reports two changed notes', async () => {
+  test('reports two changed notes as labeled updates', async () => {
     write('less.md', 'Hello')
     write('scrum.md', 'Sprint')
 
@@ -66,13 +66,13 @@ describe('previewPull', () => {
       preview({ 'less.md': 'Hello world!', 'scrum.md': 'Sprint review' })
     ).resolves.toBe(
       [
-        'less.md',
+        'less.md (update)',
         '  --- workspace',
         '  +++ Doughnut',
         '  - Hello',
         '  + Hello world!',
         '',
-        'scrum.md',
+        'scrum.md (update)',
         '  --- workspace',
         '  +++ Doughnut',
         '  - Sprint',
@@ -103,7 +103,7 @@ describe('previewPull', () => {
       preview({ 'LeSS in Action/team.md': 'Sprint review' })
     ).resolves.toBe(
       [
-        'LeSS in Action/team.md',
+        'LeSS in Action/team.md (update)',
         '  --- workspace',
         '  +++ Doughnut',
         '  - Sprint',
@@ -135,7 +135,7 @@ describe('previewPull', () => {
       preview({ 'less.md': '# less\n\nHello world!' })
     ).resolves.toBe(
       [
-        'less.md',
+        'less.md (update)',
         '  --- workspace',
         '  +++ Doughnut',
         '    # less',
@@ -156,12 +156,12 @@ describe('previewPull', () => {
     ).resolves.toBe('No changes to pull.')
   })
 
-  test('reports a locally edited note as what a pull would overwrite', async () => {
+  test('reports a locally edited note as a labeled update a pull would overwrite', async () => {
     write('less.md', 'Hello from Obsidian')
 
     await expect(preview({ 'less.md': 'Hello' })).resolves.toBe(
       [
-        'less.md',
+        'less.md (update)',
         '  --- workspace',
         '  +++ Doughnut',
         '  - Hello from Obsidian',
@@ -175,14 +175,14 @@ describe('previewPull', () => {
   // The side headers name the two sides of the comparison, not two files the
   // way `git diff`'s `/dev/null` does, so the side a pull would write into is
   // still `workspace` when it holds no file for the note yet.
-  test('reports a note the pull would create as all added lines', async () => {
+  test('reports a note the pull would create with an explicit create label', async () => {
     write('less.md', 'Hello')
 
     await expect(
       preview({ 'less.md': 'Hello', 'scrum.md': 'Sprint plan' })
     ).resolves.toBe(
       [
-        'scrum.md',
+        'scrum.md (create)',
         '  --- workspace',
         '  +++ Doughnut',
         '  + Sprint plan',
