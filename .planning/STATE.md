@@ -5,10 +5,10 @@ milestone_name: Clean up LIA training participant code
 current_phase: 7
 current_phase_name: Publish triage decisions
 status: ready_to_execute
-stopped_at: Phase 7 plans revised (checker feedback)
-last_updated: "2026-08-03T05:50:00.000Z"
+stopped_at: Phase 7 plans revised (checker iteration 2)
+last_updated: "2026-08-03T05:55:00.000Z"
 last_activity: 2026-08-03
-last_activity_desc: Phase 7 plans revised — split story tasks, hardened verify, 07-VALIDATION.md
+last_activity_desc: Phase 7 plans revised (iter 2) — 07-01 Task 2 citation+verdict gates; 07-03 Task 4 split pointer verifies
 progress:
   total_phases: 8
   completed_phases: 0
@@ -32,7 +32,7 @@ See: `.planning/PROJECT.md` (updated 2026-08-03)
 Phase: 7 of 14 (Publish triage decisions)
 Plan: 07-01 (next)
 Status: Ready to execute
-Last activity: 2026-08-03 — Phase 7 plans revised for checker (story task splits, completeness asserts, 07-VALIDATION.md)
+Last activity: 2026-08-03 — Phase 7 plans revised (checker iter 2: Story 1 verify gates + Task 4 pointer alignment)
 
 Progress: [░░░░░░░░░░] 0%
 
