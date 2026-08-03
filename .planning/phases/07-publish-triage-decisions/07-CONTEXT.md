@@ -40,6 +40,9 @@ Publish a keep / strengthen / remove decision for each portable-workspace story 
 ### Acceptance oracle
 - `.planning/notes/2026-07-24-portable-notebook-workspace.md` — Stories 1–6 acceptance examples (keep/remove oracle); stories 7–10 out of scope
 
+### Published triage (Phases 8–13 action source)
+- `.planning/phases/07-publish-triage-decisions/TRIAGE.md`
+
 ### Participant surface (audit targets)
 - `cli/` — CLI commands and workspace sync/lint/push behavior
 - `e2e_test/features/cli/` — Capability E2E (`cli_export`, `cli_sync_*`, `cli_lint_workspace`, `cli_push*`)

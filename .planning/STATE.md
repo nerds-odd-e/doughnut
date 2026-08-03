@@ -4,17 +4,17 @@ milestone: v1.2
 milestone_name: Clean up LIA training participant code
 current_phase: 7
 current_phase_name: Publish triage decisions
-status: in_progress
-stopped_at: Completed 07-02-PLAN.md
-last_updated: "2026-08-03T06:02:27.617Z"
+status: ready_for_next_phase
+stopped_at: Completed 07-03-PLAN.md — Phase 7 triage published
+last_updated: "2026-08-03T06:20:00.000Z"
 last_activity: 2026-08-03
-last_activity_desc: "Completed 07-02 — Stories 2–4 strengthen dossiers + D-03 shared tags"
+last_activity_desc: "Completed 07-03 — Stories 5–6 dossiers + completeness; Phase 7 triage published"
 progress:
   total_phases: 8
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 2
-  percent: 67
+  completed_plans: 3
+  percent: 100
 ---
 
 # State
@@ -25,16 +25,18 @@ See: `.planning/PROJECT.md` (updated 2026-08-03)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** Milestone v1.2 — Phase 7 plan 07-03 next (Stories 5–6 + pointers)
+**Current focus:** Milestone v1.2 — Phase 7 triage published; next = Phase 8 (Resolve pull/export)
 
 ## Current Position
 
-Phase: 7 of 14 (Publish triage decisions)
-Plan: 07-03 (next)
-Status: In progress — 07-01 and 07-02 complete (Stories 1–4 dossiers published)
-Last activity: 2026-08-03 — Completed 07-02: Stories 2–4 strengthen dossiers + D-03 shared tags
+Phase: 7 of 14 (Publish triage decisions) — **triage published**
+Plan: 07-03 (complete — all Phase 7 plans done)
+Status: Phase 7 complete — ready for Phase 8 execute
+Last activity: 2026-08-03 — Completed 07-03: Stories 5–6 + author-filter completeness; CONTEXT/STATE/ROADMAP point at TRIAGE.md
 
-Progress: [███████░░░] 67%
+Progress: [██████████] 100% (Phase 7 plans)
+
+**Next:** Phase 8 — Resolve pull/export (story 1) from `.planning/phases/07-publish-triage-decisions/TRIAGE.md`
 
 ## Performance Metrics
 
@@ -72,7 +74,9 @@ Decisions are logged in PROJECT.md Key Decisions table. Roadmap-shaping decision
 - [Phase 7]: Story 2 Verdict = strengthen — valuable non-mutating /sync --dry-run, gap on reserved/duplicate/invalid-mapping reporting
 - [Phase 7]: Story 3 Verdict = strengthen — valuable intersecting applyPull, gaps on create/rename/move and sync-metadata updates
 - [Phase 7]: Story 4 Verdict = strengthen — valuable OKF /lint, gaps vs portable contract (duplicate ids, broken links, missing indexes, path mappings)
-- [Phase 7]: Stories 5–6 remain Pending until plan 03
+- [Phase 7]: Story 5 Verdict = strengthen — valuable /push --dry-run with conflicts, gaps on create/update actions and baseline metadata write
+- [Phase 7]: Story 6 Verdict = remove — no mutate push; @ignore cli_push.feature WIP debris
+- [Phase 7]: TRIAGE.md published — Phases 8–13 sole action source
 
 ### Pending Todos
 
@@ -95,7 +99,7 @@ Items acknowledged and deferred at milestone close on 2026-07-25:
 
 ## Session Continuity
 
-**Last session:** 2026-08-03T06:02:27.611Z
-**Stopped at:** Completed 07-02-PLAN.md
-**Next action:** Execute `07-03-PLAN.md` (Stories 5–6 + pointers)
-**Resume file:** .planning/phases/07-publish-triage-decisions/07-03-PLAN.md
+**Last session:** 2026-08-03T06:20:00.000Z
+**Stopped at:** Completed 07-03-PLAN.md — Phase 7 triage published
+**Next action:** Plan/execute Phase 8 (Resolve pull/export — story 1 strengthen from TRIAGE.md)
+**Resume file:** None
