@@ -13,7 +13,7 @@
 | 2 | preview-before-pull | strengthen | 9 |
 | 3 | incremental pull | strengthen | 10 |
 | 4 | workspace lint | strengthen | 11 |
-| 5 | push dry-run | Pending | 12 |
+| 5 | push dry-run | strengthen | 12 |
 | 6 | safe push | Pending | 13 |
 
 ## Story 1: Pull a notebook into a usable Markdown workspace
@@ -338,3 +338,84 @@ Whole participant-touched inventory under the Story 4 workspace-lint surface (au
 | OKF-only vs portable Doughnut contract | Capability is OKF-shaped (`Workspace follows the OKF format.`); oracle asks for portable knowledge contract including identities — no Doughnut id uniqueness check |
 
 **Phase 11 finish sketch (discretion):** keep OKF malformed-frontmatter / unknown-key / success-report behavior; add (or deliberately scope) duplicate-identity, broken local link, missing-index, and unsupported path-mapping checks to match the portable-workspace oracle.
+
+## Story 5: Preview local edits and conflicts before pushing
+
+### Verdict
+
+strengthen
+
+**Author basis:** Evidence from LIA participant commits only — Ben Huang (primary on `/push --dry-run`, `previewPush`, `pushArgument`, E2E), etta.huang (baseline / export priming), plus Logan, XinxinKao, Eric Yeh on unit coverage. Excluded from triage basis: Terry Yin, Tan Yeong Sheng, `terryyin` variants (HYG-02).
+
+**Bar:** `/push --dry-run` + `previewPush` deliver externally valuable, non-WIP conflict-aware previews with E2E (`cli_push_dry_run.feature` has no `@wip`/`@ignore`) and unit coverage, but acceptance is incomplete — create/update action taxonomy is missing, and the preview writes `.doughnut-sync/baseline.json` (sync metadata) contrary to the oracle’s no-metadata-mutation bullet — so Phase 12 should strengthen rather than keep as-is or remove.
+
+### Acceptance citations
+
+- "The preview distinguishes unchanged, locally changed, remotely changed, and divergent notes." — match — `classify` + report labels: unchanged omitted / `No changes to push.`; local-only → `(push)`; remote-only → `(pull)`; both diverged → `(CONFLICT)` (`cli/src/sync/previewPush.ts`); E2E scenarios `A note changed only in the workspace would go out on a push`, `…only in Doughnut would come in on a pull`, `…changed on both sides… is a conflict` (`cli_push_dry_run.feature`).
+- "It reports exact create and update actions." — gap — report is path + content unified diff + push/pull/conflict status (`renderNoteDiff` / `renderDiffReport`); no participant create vs update action taxonomy; remote-only / local-only **new** paths are not reported as creates (`previewPush` only iterates exported intersecting `.md` with a local counterpart).
+- "Divergent edits are conflicts, not last-write-wins updates." — match — both sides changed and disagree → `conflict` / `(CONFLICT)` (`classify`); E2E `A note changed on both sides since the last preview is a conflict`; unit `labels a note CONFLICT when both sides changed and diverged…`.
+- "The preview does not mutate Doughnut, local files, or sync metadata." — gap — Doughnut and workspace `.md` files are read-only (E2E Rule `The preview leaves the workspace and Doughnut untouched`), but `previewPush` always `savePushBaseline` → writes `.doughnut-sync/baseline.json` (E2E `The preview's only addition is its own baseline file`); oracle forbids sync-metadata mutation.
+
+### Capability entrypoints
+
+| Role | Path / command |
+|------|----------------|
+| CLI | `/push --dry-run` (`pushSlashCommandFor` → `previewPush`) |
+| Module | `cli/src/commands/notebook/pushSlashCommand.tsx` |
+| Module | `cli/src/sync/previewPush.ts` |
+| Module | `cli/src/sync/pushArgument.ts` (`parsePushArgument`) |
+| Module | `cli/src/sync/pushBaseline.ts` |
+| Module | `cli/src/sync/diffReport.ts`, `readWorkspace.ts`, `exportNotebook.ts`, `unzip.ts` |
+| Module | `cli/src/sync/writeNotebookExport.ts` (baseline seed on export; shared) |
+| E2E | `e2e_test/features/cli/cli_push_dry_run.feature` |
+| Unit | `cli/tests/previewPush.test.ts`, `cli/tests/pushArgument.test.ts`, `cli/tests/pushBaseline.test.ts` |
+| Registry | `cli/src/commands/notebook/notebookStageSlashCommands.ts` (registers `/push`) |
+
+### Delete / keep file set
+
+| Path | Action | Shared? |
+|------|--------|---------|
+| `cli/src/commands/notebook/pushSlashCommand.tsx` | keep | shared → Story 6 (dry-run-only surface) |
+| `cli/src/sync/previewPush.ts` | strengthen | shared → Story 6 |
+| `cli/src/sync/pushArgument.ts` | keep | shared → Story 6 |
+| `cli/src/sync/pushBaseline.ts` | keep | shared → Stories 1, 3, 6 |
+| `cli/src/sync/diffReport.ts` | keep | shared → Story 2 |
+| `cli/src/sync/readWorkspace.ts` | keep | shared → Stories 1–4, 6 |
+| `cli/src/sync/exportNotebook.ts` | keep | shared → Stories 1–3, 6 |
+| `cli/src/sync/unzip.ts` | keep | shared → Stories 1–3, 6 |
+| `cli/src/sync/writeNotebookExport.ts` | keep | shared → Stories 1, 6 (baseline seed) |
+| `cli/src/commands/notebook/notebookStageSlashCommands.ts` | keep | shared → Stories 1–3, 6 |
+| `e2e_test/features/cli/cli_push_dry_run.feature` | keep | — |
+| `cli/tests/previewPush.test.ts` | keep | — |
+| `cli/tests/pushArgument.test.ts` | keep | shared → Story 6 |
+| `cli/tests/pushBaseline.test.ts` | keep | shared → Stories 1, 6 |
+
+### Participant-touched inventory
+
+Whole participant-touched inventory under the Story 5 push dry-run surface (author filter applied; D-03 shared tags noted for Story 6 / earlier stories — shared-tag writes that need Story 6 inventory deferred until Task 2 where noted):
+
+| Path | Participant authors (sample) | Notes |
+|------|------------------------------|-------|
+| `cli/src/commands/notebook/pushSlashCommand.tsx` | Ben Huang | `/push`; dry-run-only doc; shared → Story 6 |
+| `cli/src/sync/previewPush.ts` | Ben Huang | conflict-aware preview; shared → Story 6 |
+| `cli/src/sync/pushArgument.ts` | Ben Huang | requires `--dry-run`; shared → Story 6 |
+| `cli/src/sync/pushBaseline.ts` | Ben Huang, etta.huang | shared → Stories 1, 3, 6 |
+| `cli/src/sync/diffReport.ts` | Ben Huang | shared → Story 2 |
+| `cli/src/sync/readWorkspace.ts` | Logan, Ben Huang, Eric Yeh | shared → Stories 1–4, 6 |
+| `cli/src/sync/exportNotebook.ts` | XinxinKao, Logan, etta.huang, Eric Yeh | shared → Stories 1–3, 6 |
+| `cli/src/sync/unzip.ts` | Logan | shared → Stories 1–3, 6 |
+| `cli/src/sync/writeNotebookExport.ts` | XinxinKao, etta.huang | baseline seed; shared → Stories 1, 6 |
+| `cli/src/commands/notebook/notebookStageSlashCommands.ts` | (registry) | shared → Stories 1–3, 6 |
+| `e2e_test/features/cli/cli_push_dry_run.feature` | Ben Huang, etta.huang | capability E2E |
+| `cli/tests/previewPush.test.ts` | Ben Huang, Logan, etta.huang, XinxinKao, Eric Yeh | unit coverage |
+| `cli/tests/pushArgument.test.ts` | Ben Huang | shared → Story 6 |
+| `cli/tests/pushBaseline.test.ts` | Ben Huang | shared → Stories 1, 6 |
+
+### WIP / gap signals
+
+| Label | Proof |
+|-------|-------|
+| wrong acceptance — no create/update action report | Oracle bullet "It reports exact create and update actions"; `previewPush` emits path + unified diff + push/pull/conflict only; no create rows for new local/remote notes |
+| wrong acceptance — sync metadata mutated | Oracle bullet "The preview does not mutate … sync metadata"; `savePushBaseline` in `previewPush`; E2E `The preview's only addition is its own baseline file` |
+
+**Phase 12 finish sketch (discretion):** keep conflict-aware dry-run labeling and non-mutation of Doughnut / `.md` files; either stop writing baseline on preview (or treat baseline write as out-of-oracle bookkeeping with an explicit product decision) and add create vs update (and non-intersecting path) reporting the oracle expects.
