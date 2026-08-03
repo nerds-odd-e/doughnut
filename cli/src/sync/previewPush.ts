@@ -1,16 +1,24 @@
+import { basename } from 'node:path'
 import {
   renderDiffReport,
   renderNoteDiff,
   type NoteDiffStatus,
+  type ReportedNoteDiff,
 } from './diffReport.js'
 import type { ExportNotebookAsZip } from './exportNotebook.js'
-import { loadPushBaseline, savePushBaseline } from './pushBaseline.js'
+import { classifyCreateOrUpdate } from './previewPullActions.js'
+import { loadPushBaseline } from './pushBaseline.js'
 import { readWorkspace } from './readWorkspace.js'
 import { unzipToEntries } from './unzip.js'
 
 const NOTHING_TO_PUSH = 'No changes to push.'
 
 const MARKDOWN_SUFFIX = '.md'
+
+/** Reserved basenames that are never ordinary create/update rows. */
+const RESERVED_BASENAMES = new Set(['index.md', 'log.md'])
+
+const SYNC_METADATA_SEGMENT = '.doughnut-sync'
 
 /**
  * What a note's difference means: nothing to report, a difference whose
@@ -41,34 +49,37 @@ function classify(
   return local === remote ? 'nothing' : 'difference'
 }
 
-/**
- * The baseline the next run will compare against: the content the two sides
- * were last seen to agree on for a note — a merge base — never simply the
- * newest remote content.
- *
- * So an entry is recorded only for a note whose two sides agree in this very
- * run, and otherwise the entry already there is carried forward untouched.
- * Recording a side of a difference the run is reporting would make the next
- * run — with nothing edited in between — see only the other side as changed,
- * and name a direction nothing had established: a conflict or a pull read as a
- * push, which is the stale-local-over-newer-remote push this command exists to
- * prevent. A note that has never yet agreed therefore gets no entry at all,
- * this run's remote content included, and stays an unlabeled difference until
- * the two sides do agree once. Paths the export no longer holds are dropped,
- * keeping the baseline to the notebook as it stands.
- */
-function nextBaseline(
-  baseline: ReadonlyMap<string, string>,
-  workspace: ReadonlyMap<string, string>,
-  exported: readonly (readonly [string, string])[]
-): ReadonlyMap<string, string> {
-  return new Map(
-    exported.flatMap(([path, remote]) => {
-      if (workspace.get(path) === remote) return [[path, remote] as const]
-      const agreed = baseline.get(path)
-      return agreed === undefined ? [] : [[path, agreed] as const]
-    })
-  )
+function isOrdinaryNotePath(path: string): boolean {
+  if (path.split('/').includes(SYNC_METADATA_SEGMENT)) return false
+  return !RESERVED_BASENAMES.has(basename(path))
+}
+
+function reportCreate(
+  path: string,
+  workspaceContent: string,
+  notebookContent: string,
+  status: NoteDiffStatus | undefined
+): ReportedNoteDiff {
+  return {
+    status,
+    diff: renderNoteDiff(
+      path,
+      workspaceContent,
+      notebookContent,
+      status,
+      'create'
+    ),
+  }
+}
+
+function reportIntersecting(
+  path: string,
+  local: string,
+  remote: string,
+  outcome: Exclude<NoteOutcome, 'nothing'>
+): ReportedNoteDiff {
+  const status = outcome === 'difference' ? undefined : outcome
+  return { status, diff: renderNoteDiff(path, local, remote, status) }
 }
 
 export type PreviewPushRequest = {
@@ -86,9 +97,10 @@ export type PreviewPushRequest = {
  * Doughnut changed, `(push)` when only the workspace did, `(CONFLICT)` when
  * both did and they disagree. A note the two sides have never yet been seen to
  * agree on has no such merge base, so its difference is reported plainly the
- * way `previewPull` does, unlabeled.
- * Doughnut and the workspace are only ever read; the only write is the updated
- * baseline.
+ * way `previewPull` does, unlabeled. Local-only and remote-only Markdown are
+ * reported as creates.
+ *
+ * Doughnut, the workspace, and sync metadata are only ever read — never written.
  */
 export async function previewPush({
   notebookId,
@@ -100,26 +112,45 @@ export async function previewPush({
   const { bytes } = await exportNotebookAsZip(notebookId, signal)
   const exported = unzipToEntries(bytes)
 
-  const markdownExported = [...exported]
-    .filter(([path]) => path.endsWith(MARKDOWN_SUFFIX))
-    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+  const markdownExported = new Map(
+    [...exported]
+      .filter(([path]) => path.endsWith(MARKDOWN_SUFFIX))
+      .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+  )
 
   const baseline = loadPushBaseline(workspacePath, notebookId)
 
-  const reported = markdownExported.flatMap(([path, remote]) => {
+  const paths = [
+    ...new Set([
+      ...markdownExported.keys(),
+      ...[...workspace.keys()].filter((path) => path.endsWith(MARKDOWN_SUFFIX)),
+    ]),
+  ]
+    .filter(isOrdinaryNotePath)
+    .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0))
+
+  const reported = paths.flatMap((path): ReportedNoteDiff[] => {
     const local = workspace.get(path)
-    if (local === undefined) return []
+    const remote = markdownExported.get(path)
+
+    if (remote === undefined) {
+      if (local === undefined) return []
+      return [reportCreate(path, local, '', 'push')]
+    }
+
+    if (local === undefined) {
+      const action = classifyCreateOrUpdate(undefined, remote)
+      return [
+        {
+          diff: renderNoteDiff(path, '', remote, undefined, action),
+        },
+      ]
+    }
+
     const outcome = classify(baseline.get(path), local, remote)
     if (outcome === 'nothing') return []
-    const status = outcome === 'difference' ? undefined : outcome
-    return [{ status, diff: renderNoteDiff(path, local, remote, status) }]
+    return [reportIntersecting(path, local, remote, outcome)]
   })
-
-  savePushBaseline(
-    workspacePath,
-    notebookId,
-    nextBaseline(baseline, workspace, markdownExported)
-  )
 
   return renderDiffReport(reported, NOTHING_TO_PUSH)
 }

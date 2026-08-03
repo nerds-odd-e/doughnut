@@ -7,9 +7,10 @@ Feature: Preview what a push would change
   I want to preview local edits before pushing
   So that I can review them before any push happens
 
-  `/push --dry-run` never writes to Doughnut and never writes any `.md` file in
-  the workspace. Its only mutation is its own `.doughnut-sync/baseline.json`
-  bookkeeping file, used to tell local and remote changes apart on later runs.
+  `/push --dry-run` never writes to Doughnut, never writes any `.md` file in the
+  workspace, and never writes sync metadata under `.doughnut-sync/`. Directional
+  labels come from a baseline seeded by `/export` or a successful pull — not by
+  the dry-run itself.
 
   Background:
     Given I am logged in as an existing user
@@ -45,15 +46,16 @@ Feature: Preview what a push would change
       When I enter the slash command "/push --dry-run ./BenNotebook" in the interactive CLI
       Then I should see "No changes to push." in past CLI assistant messages
 
-  Rule: A later preview says which side changed since the last one
+  Rule: A later preview says which side changed since export primed the baseline
 
     Background:
       Given I have a notebook "Ben Notebook" with notes:
         | Title | Content |
         | less  | Hello   |
-      And the workspace "./BenNotebook" holds the same content as "Ben Notebook"
+      And an empty export destination "./ExportTarget"
       And I enter the slash command "/use Ben Notebook" in the interactive CLI
-      And I enter the slash command "/push --dry-run ./BenNotebook" in the interactive CLI
+      And I export the notebook into "./ExportTarget"
+      And the workspace "./BenNotebook" is the notebook "Ben Notebook" exported into "./ExportTarget"
 
     Scenario: A note changed only in Doughnut would come in on a pull
       When the note "less" is changed in Doughnut to "Hello world!"
@@ -89,7 +91,7 @@ Feature: Preview what a push would change
         1 note would change.
         """
 
-    Scenario: A note changed on both sides since the last preview is a conflict
+    Scenario: A note changed on both sides since the baseline is a conflict
       When I edit the content of "less.md" in the workspace "./BenNotebook" to "Hello from Obsidian"
       And the note "less" is changed in Doughnut to "Hello world!"
       And I enter the slash command "/push --dry-run ./BenNotebook" in the interactive CLI
@@ -133,6 +135,54 @@ Feature: Preview what a push would change
         1 note would change.
         """
 
+  Rule: The preview reports creates for notes on only one side
+
+    Scenario: A note only in Doughnut is reported as a create
+      Given I have a notebook "Ben Notebook" with notes:
+        | Title | Content     |
+        | less  | Hello       |
+        | scrum | Sprint plan |
+      And the workspace "./BenNotebook" holds the same content as "Ben Notebook"
+      And the file "scrum.md" is removed from the workspace "./BenNotebook"
+      And I enter the slash command "/use Ben Notebook" in the interactive CLI
+      When I enter the slash command "/push --dry-run ./BenNotebook" in the interactive CLI
+      Then I should see the preview in past CLI assistant messages:
+        """
+        scrum.md (create)
+          --- workspace
+          +++ Doughnut
+        """
+      And I should see the preview in past CLI assistant messages:
+        """
+          + Sprint plan
+
+        1 note would change.
+        """
+
+    Scenario: A note only in the workspace is reported as a create
+      Given I have a notebook "Ben Notebook" with notes:
+        | Title | Content |
+        | less  | Hello   |
+      And the workspace "./BenNotebook" holds the same content as "Ben Notebook"
+      And the workspace "./BenNotebook" has an extra file "scrum.md" with content:
+        """
+        Sprint plan
+        """
+      And I enter the slash command "/use Ben Notebook" in the interactive CLI
+      When I enter the slash command "/push --dry-run ./BenNotebook" in the interactive CLI
+      Then I should see the preview in past CLI assistant messages:
+        """
+        scrum.md (create)
+          --- Doughnut
+          +++ workspace
+        """
+      And I should see the preview in past CLI assistant messages:
+        """
+          + Sprint plan
+
+        1 note would change.
+        """
+
   Rule: The preview leaves the workspace and Doughnut untouched
 
     Background:
@@ -147,12 +197,11 @@ Feature: Preview what a push would change
       And I enter the slash command "/push --dry-run ./BenNotebook" in the interactive CLI
       Then the file "less.md" in the workspace "./BenNotebook" should hold "Hello"
 
-    Scenario: The preview's only addition is its own baseline file
+    Scenario: The preview adds no files of its own
       When I enter the slash command "/push --dry-run ./BenNotebook" in the interactive CLI
       Then the workspace "./BenNotebook" should hold only:
-        | Path                          |
-        | less.md                       |
-        | .doughnut-sync/baseline.json  |
+        | Path    |
+        | less.md |
 
     Scenario: The remote note is not modified by the preview
       When the note "less" is changed in Doughnut to "Hi world!"
