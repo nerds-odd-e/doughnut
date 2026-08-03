@@ -114,7 +114,7 @@ status: complete
 3. **Task 3: Author-filter and completeness verification** - `c18d66043f` (docs) + `5500d44c7b` (fix)
 4. **Task 4: Pointer updates in CONTEXT, STATE, and ROADMAP** - `fc602d9847` (docs)
 
-**Plan metadata:** *(pending final docs commit)*
+**Plan metadata:** `8551f4ce03` (docs: complete plan)
 
 ## Files Created/Modified
 
