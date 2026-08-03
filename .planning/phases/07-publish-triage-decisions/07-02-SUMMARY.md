@@ -100,7 +100,7 @@ status: complete
 2. **Task 2: Publish Story 3 incremental-pull dossier with D-03 shared sync tagging** - `572783aa7c` (docs)
 3. **Task 3: Publish Story 4 workspace lint dossier** - `2f4a21aa43` (docs)
 
-**Plan metadata:** (pending final docs commit)
+**Plan metadata:** `53cf2ccbf4` (docs: complete plan)
 
 ## Files Created/Modified
 
