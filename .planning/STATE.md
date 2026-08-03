@@ -3,11 +3,11 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Clean up LIA training participant code
 current_phase: 11
-status: planning_complete
-stopped_at: Phase 11 plan created (11-01)
-last_updated: "2026-08-03T08:00:00.000Z"
+status: plan_check_passed
+stopped_at: Phase 11 plan check passed — ready to execute
+last_updated: "2026-08-03T15:50:00.000Z"
 last_activity: 2026-08-03
-last_activity_desc: Wrote 11-01-PLAN.md for Story 4 /lint strengthen
+last_activity_desc: Plan-check PASSED for 11-01 (LINT-01); wrote 11-PLAN-CHECK.md
 progress:
   total_phases: 8
   completed_phases: 2
@@ -25,14 +25,14 @@ See: `.planning/PROJECT.md` (updated 2026-08-03)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** Milestone v1.2 — Phase 11 Story 4 `/lint` (LINT-01); plan ready to execute
+**Current focus:** Milestone v1.2 — Phase 11 Story 4 `/lint` (LINT-01); plan check passed
 
 ## Current Position
 
 Phase: 11 — Resolve workspace lint (story 4)
-Plan: 11-01 (ready)
-Status: Phase 11 PLAN written — one coarse plan for portable lint strengthen
-Last activity: 2026-08-03 — Phase 11 planning complete
+Plan: 11-01 (ready to execute)
+Status: Phase 11 plan check PASSED — see `11-PLAN-CHECK.md`
+Last activity: 2026-08-03 — Plan-check verified LINT-01 / D-01..D-11 coverage
 
 Progress: [████████░░] 80%
 
