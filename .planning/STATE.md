@@ -40,9 +40,10 @@ Items acknowledged and deferred at milestone close on 2026-07-25:
 | quick_task | 260724-db-timezone-fix | closed — kept as forensics for migration comments |
 | milestone_audit | v1.1 formal `/gsd-audit-milestone` | skipped by acknowledgment |
 
+**Parked direction (seed):** [SEED-001](./seeds/SEED-001-mcq-fuzzy-notebook-title-spelling-match.md) — MCQ / fuzzy / `Notebook:Title` spelling match; resume after current detour. Surfaces on `/gsd-new-milestone` or `/gsd-capture --list-seeds`.
 
 ## Session Continuity
 
-**Last session:** 2026-07-25
-**Stopped at:** Milestone v1.1 complete + spent phase history cleaned
-**Next action:** `/gsd-new-milestone`
+**Last session:** 2026-08-03
+**Stopped at:** Planted SEED-001; pausing spelling follow-ons for a different direction
+**Next action:** `/gsd-new-milestone` for the new focus (seed keeps spelling follow-ons from being forgotten)
