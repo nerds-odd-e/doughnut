@@ -1,5 +1,6 @@
 import { renderDiffReport, renderNoteDiff } from './diffReport.js'
 import type { ExportNotebookAsZip } from './exportNotebook.js'
+import { classifyCreateOrUpdate } from './previewPullActions.js'
 import { readWorkspace } from './readWorkspace.js'
 import { unzipToEntries } from './unzip.js'
 
@@ -32,13 +33,24 @@ export async function previewPull({
   const { bytes } = await exportNotebookAsZip(notebookId, signal)
   const exported = unzipToEntries(bytes)
 
-  const changed = [...exported]
+  const reported = [...exported]
     .filter(([path]) => path.endsWith(MARKDOWN_SUFFIX))
     .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
-    .filter(([path, content]) => workspace.get(path) !== content)
-    .map(([path, content]) => ({
-      diff: renderNoteDiff(path, workspace.get(path) ?? '', content),
-    }))
+    .flatMap(([path, content]) => {
+      const action = classifyCreateOrUpdate(workspace.get(path), content)
+      if (action === 'unchanged') return []
+      return [
+        {
+          diff: renderNoteDiff(
+            path,
+            workspace.get(path) ?? '',
+            content,
+            undefined,
+            action
+          ),
+        },
+      ]
+    })
 
-  return renderDiffReport(changed, NOTHING_TO_PULL)
+  return renderDiffReport(reported, NOTHING_TO_PULL)
 }

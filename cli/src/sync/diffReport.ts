@@ -1,3 +1,4 @@
+import type { PreviewPullAction } from './previewPullActions.js'
 import { diffLines } from './unifiedDiff.js'
 
 /** How a note's difference is labeled, and which way its diff then reads. */
@@ -15,9 +16,11 @@ const labelOf = (status: NoteDiffStatus) =>
  * One note's diff, formatted the way `/sync --dry-run` and `/push --dry-run`
  * both report it. `status`, when given, is appended to the path header in
  * parentheses — `less.md (push)` — to say which way the difference would
- * flow. For `push`, the diff is shown notebook-to-workspace (what pushing
- * would write into Doughnut); every other case (including unlabeled) is
- * shown workspace-to-notebook, as `/sync --dry-run` already reads.
+ * flow. Pull dry-run instead passes `action` (`create` / `update` / …) so the
+ * Story 2 taxonomy stays off the push status union. For `push`, the diff is
+ * shown notebook-to-workspace (what pushing would write into Doughnut); every
+ * other case (including unlabeled) is shown workspace-to-notebook, as
+ * `/sync --dry-run` already reads.
  *
  * Because that direction flips, `-` and `+` alone cannot say which side a line
  * came from, so each diff names its two sides `git diff` style — `--- <side
@@ -28,7 +31,8 @@ export function renderNoteDiff(
   path: string,
   workspaceContent: string,
   notebookContent: string,
-  status?: NoteDiffStatus
+  status?: NoteDiffStatus,
+  action?: PreviewPullAction
 ): string {
   const workspaceSide = { name: 'workspace', content: workspaceContent }
   const doughnutSide = { name: 'Doughnut', content: notebookContent }
@@ -44,7 +48,13 @@ export function renderNoteDiff(
         : `  ${kind === 'removed' ? '-' : '+'} ${text}`
     ),
   ])
-  const heading = status === undefined ? path : `${path} (${labelOf(status)})`
+  const paren =
+    action !== undefined
+      ? action
+      : status !== undefined
+        ? labelOf(status)
+        : undefined
+  const heading = paren === undefined ? path : `${path} (${paren})`
   return [
     heading,
     `  --- ${before.name}`,
