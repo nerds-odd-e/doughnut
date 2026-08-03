@@ -4,15 +4,15 @@ milestone: v1.2
 milestone_name: Clean up LIA training participant code
 current_phase: 14
 current_phase_name: Class-ready hygiene verify
-status: phase_complete
-stopped_at: Phase 14 context gathered
-last_updated: "2026-08-03T08:51:19.422Z"
+status: ready_to_execute
+stopped_at: Phase 14 plan created (14-01)
+last_updated: "2026-08-03T09:05:00.000Z"
 last_activity: 2026-08-03
-last_activity_desc: Executed 13-01 (trash `cli_push.feature` + D-04 help polish + planning close)
+last_activity_desc: Created 14-01-PLAN.md — one coarse tracer for HYG-01/02/03
 progress:
   total_phases: 8
   completed_phases: 3
-  total_plans: 15
+  total_plans: 16
   completed_plans: 11
   percent: 38
 ---
@@ -25,18 +25,18 @@ See: `.planning/PROJECT.md` (updated 2026-08-03)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** Milestone v1.2 — Phase 14 hygiene verify; Phase 13 PUSH-02 closed as **removed cleanly**
+**Current focus:** Milestone v1.2 — Phase 14 plan ready (HYG-01/02/03); Phase 13 PUSH-02 closed as **removed cleanly**
 
 ## Current Position
 
 Phase: 14 — Class-ready hygiene verify
-Plan: TBD
-Status: Phase 13 complete — Story 6 WIP gone; dry-run kept; PUSH-02 removed cleanly
-Last activity: 2026-08-03 — Executed 13-01 (trash `cli_push.feature` + D-04 help polish + planning close)
+Plan: 14-01
+Status: Plan ready — 1 coarse tracer (trash D-02 docs + HYG-02 audit + cli:test + five E2E + close)
+Last activity: 2026-08-03 — Created 14-01-PLAN.md
 
 Progress: [████████░░] 79%
 
-**Next:** `/gsd-plan-phase 14` or `/gsd-discuss-phase 14`
+**Next:** `/gsd-execute-phase 14`
 
 ## Performance Metrics
 
