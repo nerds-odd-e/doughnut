@@ -20,7 +20,7 @@ public class NotebookExportService {
     this.noteRepository = noteRepository;
   }
 
-  public byte[] exportNotebookAsZip(Notebook notebook) {
+  public byte[] exportNotebookAsZip(Notebook notebook, String publicOrigin) {
     List<ExportFolderRow> folders =
         folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()).stream()
             .map(
@@ -38,7 +38,8 @@ public class NotebookExportService {
                         n.getTitle(),
                         n.getContent()))
             .toList();
-    return NotebookZipBuilder.build(notebook.getReadmeContent(), folders, notes);
+    return NotebookZipBuilder.build(
+        notebook.getReadmeContent(), folders, notes, notebook.getName(), publicOrigin);
   }
 
   public String exportFileName(Notebook notebook) {

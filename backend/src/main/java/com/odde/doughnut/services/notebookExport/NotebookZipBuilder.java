@@ -1,10 +1,11 @@
 package com.odde.doughnut.services.notebookExport;
 
-import com.odde.doughnut.algorithms.NoteLeadingFrontmatter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,7 +19,11 @@ public final class NotebookZipBuilder {
   private NotebookZipBuilder() {}
 
   public static byte[] build(
-      String notebookReadmeContent, List<ExportFolderRow> folders, List<ExportNoteRow> notes) {
+      String notebookReadmeContent,
+      List<ExportFolderRow> folders,
+      List<ExportNoteRow> notes,
+      String notebookName,
+      String publicOrigin) {
     Map<Integer, List<ExportFolderRow>> childFoldersByParent =
         folders.stream()
             .collect(
@@ -27,6 +32,20 @@ public final class NotebookZipBuilder {
     Map<Integer, List<ExportNoteRow>> notesByFolder =
         notes.stream()
             .collect(Collectors.groupingBy(n -> n.folderId() == null ? ROOT_KEY : n.folderId()));
+
+    Map<Integer, String> noteIdToZipPath = new LinkedHashMap<>();
+    collectNotePaths(
+        "",
+        childFoldersByParent.getOrDefault(ROOT_KEY, List.of()),
+        notesByFolder.getOrDefault(ROOT_KEY, List.of()),
+        childFoldersByParent,
+        notesByFolder,
+        noteIdToZipPath);
+
+    Map<String, Integer> titleToNoteId = new LinkedHashMap<>();
+    notes.stream()
+        .sorted(Comparator.comparing(ExportNoteRow::id))
+        .forEach(n -> titleToNoteId.putIfAbsent(n.title(), n.id()));
 
     try {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -38,11 +57,44 @@ public final class NotebookZipBuilder {
             childFoldersByParent.getOrDefault(ROOT_KEY, List.of()),
             notesByFolder.getOrDefault(ROOT_KEY, List.of()),
             childFoldersByParent,
-            notesByFolder);
+            notesByFolder,
+            notebookName,
+            publicOrigin,
+            noteIdToZipPath,
+            titleToNoteId);
       }
       return baos.toByteArray();
     } catch (IOException e) {
       throw new UncheckedIOException(e);
+    }
+  }
+
+  private static void collectNotePaths(
+      String pathPrefix,
+      List<ExportFolderRow> childFolders,
+      List<ExportNoteRow> notesHere,
+      Map<Integer, List<ExportFolderRow>> childFoldersByParent,
+      Map<Integer, List<ExportNoteRow>> notesByFolder,
+      Map<Integer, String> noteIdToZipPath) {
+    Map<Integer, String> noteFileNames =
+        NotebookExportFilenames.uniqueFileNames(
+            notesHere.stream().map(n -> Map.entry(n.id(), n.title())).toList(), ".md");
+    for (ExportNoteRow note : notesHere) {
+      noteIdToZipPath.put(note.id(), pathPrefix + noteFileNames.get(note.id()));
+    }
+
+    Map<Integer, String> folderDirNames =
+        NotebookExportFilenames.uniqueFileNames(
+            childFolders.stream().map(f -> Map.entry(f.id(), f.name())).toList(), "");
+    for (ExportFolderRow folder : childFolders) {
+      String subPath = pathPrefix + folderDirNames.get(folder.id()) + "/";
+      collectNotePaths(
+          subPath,
+          childFoldersByParent.getOrDefault(folder.id(), List.of()),
+          notesByFolder.getOrDefault(folder.id(), List.of()),
+          childFoldersByParent,
+          notesByFolder,
+          noteIdToZipPath);
     }
   }
 
@@ -53,7 +105,11 @@ public final class NotebookZipBuilder {
       List<ExportFolderRow> childFolders,
       List<ExportNoteRow> notesHere,
       Map<Integer, List<ExportFolderRow>> childFoldersByParent,
-      Map<Integer, List<ExportNoteRow>> notesByFolder)
+      Map<Integer, List<ExportNoteRow>> notesByFolder,
+      String notebookName,
+      String publicOrigin,
+      Map<Integer, String> noteIdToZipPath,
+      Map<String, Integer> titleToNoteId)
       throws IOException {
     if (readmeContentOrNull != null && !readmeContentOrNull.isBlank()) {
       writeEntry(zos, pathPrefix + "index.md", readmeContentOrNull);
@@ -63,7 +119,12 @@ public final class NotebookZipBuilder {
         NotebookExportFilenames.uniqueFileNames(
             notesHere.stream().map(n -> Map.entry(n.id(), n.title())).toList(), ".md");
     for (ExportNoteRow note : notesHere) {
-      writeEntry(zos, pathPrefix + noteFileNames.get(note.id()), noteFileContent(note));
+      String zipRelativePath = pathPrefix + noteFileNames.get(note.id());
+      writeEntry(
+          zos,
+          zipRelativePath,
+          ExportNoteMarkdown.assemble(
+              note, notebookName, publicOrigin, zipRelativePath, noteIdToZipPath, titleToNoteId));
     }
 
     Map<Integer, String> folderDirNames =
@@ -78,25 +139,12 @@ public final class NotebookZipBuilder {
           childFoldersByParent.getOrDefault(folder.id(), List.of()),
           notesByFolder.getOrDefault(folder.id(), List.of()),
           childFoldersByParent,
-          notesByFolder);
+          notesByFolder,
+          notebookName,
+          publicOrigin,
+          noteIdToZipPath,
+          titleToNoteId);
     }
-  }
-
-  /**
-   * A note as a Markdown file: its properties as it holds them, then its title as a heading, then
-   * its body.
-   *
-   * <p>The properties are the note's leading frontmatter, written out untouched — this is the file
-   * the user edits, so the block they wrote is the block they get back. The heading is the one
-   * addition: a title lives in a column of its own, so without it the file would never say its own
-   * name. A note with no frontmatter gets no fenced block at all, rather than an empty one.
-   */
-  private static String noteFileContent(ExportNoteRow note) {
-    String rawContent = note.content() == null ? "" : note.content();
-    String heading = "# " + note.title() + "\n\n";
-    return NoteLeadingFrontmatter.splitVerbatim(rawContent)
-        .map(split -> split.frontmatterBlock() + "\n\n" + heading + split.body().stripLeading())
-        .orElseGet(() -> heading + rawContent.stripLeading());
   }
 
   private static void writeEntry(ZipOutputStream zos, String path, String content)

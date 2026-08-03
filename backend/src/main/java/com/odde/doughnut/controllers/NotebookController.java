@@ -37,6 +37,7 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.validators.AuthoredNoteContent;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
@@ -439,15 +440,27 @@ class NotebookController {
   @GetMapping(value = "/{notebook}/export", produces = "application/zip")
   @Transactional(readOnly = true)
   public ResponseEntity<byte[]> exportNotebook(
+      HttpServletRequest request,
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(notebook);
-    byte[] zipBytes = notebookExportService.exportNotebookAsZip(notebook);
+    byte[] zipBytes =
+        notebookExportService.exportNotebookAsZip(notebook, publicOriginFrom(request));
     String filename = notebookExportService.exportFileName(notebook);
     return ResponseEntity.ok()
         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
         .contentType(MediaType.valueOf("application/zip"))
         .body(zipBytes);
+  }
+
+  static String publicOriginFrom(HttpServletRequest request) {
+    String scheme = request.getScheme();
+    String host = request.getServerName();
+    int port = request.getServerPort();
+    boolean defaultPort =
+        ("http".equalsIgnoreCase(scheme) && port == 80)
+            || ("https".equalsIgnoreCase(scheme) && port == 443);
+    return scheme + "://" + host + (defaultPort ? "" : ":" + port);
   }
 
   private Notebook resolveDestinationNotebookForFolderMove(FolderMoveRequest request)

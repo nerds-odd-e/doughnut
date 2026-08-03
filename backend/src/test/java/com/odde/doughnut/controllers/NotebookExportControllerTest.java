@@ -14,14 +14,23 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 class NotebookExportControllerTest extends NotebookControllerTestBase {
+
+  private MockHttpServletRequest exportRequest() {
+    MockHttpServletRequest request = new MockHttpServletRequest();
+    request.setScheme("http");
+    request.setServerName("localhost");
+    request.setServerPort(9081);
+    return request;
+  }
 
   @Test
   void exportsNotebookAsAttachmentZip() throws UnexpectedNoAccessRightException, IOException {
     Notebook nb = topNote.getNotebook();
 
-    ResponseEntity<byte[]> response = controller.exportNotebook(nb);
+    ResponseEntity<byte[]> response = controller.exportNotebook(exportRequest(), nb);
 
     assertThat(response.getStatusCode(), equalTo(HttpStatus.OK));
     assertThat(
@@ -37,6 +46,8 @@ class NotebookExportControllerTest extends NotebookControllerTestBase {
   @Test
   void deniesExportForNotebookTheCurrentUserCannotRead() {
     Notebook other = makeMe.aNotebook().please();
-    assertThrows(UnexpectedNoAccessRightException.class, () -> controller.exportNotebook(other));
+    assertThrows(
+        UnexpectedNoAccessRightException.class,
+        () -> controller.exportNotebook(exportRequest(), other));
   }
 }
