@@ -85,7 +85,7 @@ status: complete
 1. **Task 1: Create TRIAGE.md skeleton** - `e0f6f5bef4` (docs)
 2. **Task 2: Audit Story 1 and fill complete dossier** - `01b75d3cc7` (docs)
 
-**Plan metadata:** `680195f340` (docs: complete plan)
+**Plan metadata:** `5ade545d31` (docs: complete plan)
 
 ## Files Created/Modified
 
