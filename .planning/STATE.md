@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Clean up LIA training participant code
-current_phase: 9
-current_phase_name: Resolve preview-before-pull (story 2)
+current_phase: 8
 status: ready
-stopped_at: Completed 08-02-PLAN.md — Phase 8 complete
-last_updated: "2026-08-03T06:45:00.000Z"
+stopped_at: Phase 9 context gathered
+last_updated: "2026-08-03T06:48:29.108Z"
 last_activity: 2026-08-03
-last_activity_desc: Completed 08-02 CLI /export E2E proofs; Phase 8 / EXP-01 done
+last_activity_desc: Completed 08-02-PLAN.md
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 5
   completed_plans: 5
-  percent: 100
+  percent: 25
+current_phase_name: Resolve preview-before-pull (story 2)
 ---
 
 # State
@@ -108,7 +108,7 @@ Items acknowledged and deferred at milestone close on 2026-07-25:
 
 ## Session Continuity
 
-**Last session:** 2026-08-03T06:45:00.000Z
-**Stopped at:** Completed 08-02-PLAN.md — Phase 8 complete
+**Last session:** 2026-08-03T06:48:29.102Z
+**Stopped at:** Phase 9 context gathered
 **Next action:** Plan/execute Phase 9 (Story 2 preview-before-pull)
-**Resume file:** None
+**Resume file:** .planning/phases/09-resolve-preview-before-pull-story-2/09-CONTEXT.md
