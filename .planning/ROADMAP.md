@@ -67,15 +67,10 @@
   3. Decisions are based only on participant work (authors exclude Terry Yin and Tan Yeong Sheng)
   4. A later maintainer can act on Phases 8–13 from the published triage alone (no re-audit required)
 
-**Plans**:
+**Plans** (2/3 executed):
 
-- [x] 07-01-PLAN.md
-- [ ] 07-02-PLAN.md
-- [ ] 07-03-PLAN.md
-
-1/3 plans executed
-
-- [ ] `07-02-PLAN.md` — Wave 2: Story 2, Story 3 (+ D-03), Story 4 dossiers
+- [x] `07-01-PLAN.md` — Wave 1: TRIAGE.md schema + Story 1 dossier
+- [x] `07-02-PLAN.md` — Wave 2: Story 2, Story 3 (+ D-03), Story 4 dossiers
 - [ ] `07-03-PLAN.md` — Wave 3: Story 5, Story 6 (+ D-03), hardened completeness verify, CONTEXT/STATE pointers
 
 **Notes**: Standing constraint HYG-02 applies to all subsequent action phases; verified in Phase 14. Deliverable: `.planning/phases/07-publish-triage-decisions/TRIAGE.md` (docs only; no tree apply).
@@ -191,7 +186,7 @@
 |-------|-----------|----------------|--------|-----------|
 | 1–7 Health lint / purge | v1.0 | 13/13 | Complete | 2026-07-23 |
 | 1–6 Spelling match & link | v1.1 | 16/16 | Complete | 2026-07-25 |
-| 7. Publish triage decisions | v1.2 | 1/3 | In Progress|  |
+| 7. Publish triage decisions | v1.2 | 2/3 | In Progress|  |
 | 8. Resolve pull/export (story 1) | v1.2 | 0/? | Not started | - |
 | 9. Resolve preview-before-pull (story 2) | v1.2 | 0/? | Not started | - |
 | 10. Resolve incremental pull (story 3) | v1.2 | 0/? | Not started | - |
@@ -201,4 +196,4 @@
 | 14. Class-ready hygiene verify | v1.2 | 0/? | Not started | - |
 
 ---
-*Last updated: 2026-08-03 after 07-01 Story 1 triage published*
+*Last updated: 2026-08-03 after 07-02 Stories 2–4 triage published*
