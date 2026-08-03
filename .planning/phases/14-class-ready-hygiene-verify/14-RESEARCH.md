@@ -317,17 +317,17 @@ Verified this research session:
 
 **If this table is empty:** N/A — three low-risk assumptions above.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Discretionary extra docs under `docs/refinement/`?**
    - What we know: Not in D-02; QUESTIONS is labeled historical; SPEC-sync-pull cites oracle Story 3 narrow slice.
    - What's unclear: Whether maintainer wants them trashed as spent training notes.
-   - Recommendation: **Keep** by default (D-03 spirit / discretion bar: trash only if unambiguously Stories 1–6 debris that misrepresents the tree).
+   - **RESOLVED:** Keep by default (D-03 spirit / discretion bar: trash only if unambiguously Stories 1–6 debris that misrepresents the tree).
 
 2. **E2E wall-clock vs 10-minute slice rule**
    - What we know: ~38 scenarios across five features; prior single specs ~minutes.
    - What's unclear: Exact full-matrix duration on this machine.
-   - Recommendation: Still one D-08 task; treat multi-minute E2E as stated good reason to continue (planning.mdc exception for targeted test runtime).
+   - **RESOLVED:** Still one D-08 task; treat multi-minute E2E as stated good reason to continue (planning.mdc exception for targeted test runtime).
 
 ## Environment Availability
 
