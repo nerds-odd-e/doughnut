@@ -14,7 +14,7 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Export & pull (stories 1–3)
 
-- [ ] **EXP-01**: Kept or strengthened pull/export behavior matches story 1 acceptance (hierarchy, identity frontmatter, indexes, links, no secrets, failed pull not presented as success) — or the incomplete/incorrect path is removed cleanly
+- [x] **EXP-01**: Kept or strengthened pull/export behavior matches story 1 acceptance (hierarchy, identity frontmatter, indexes, links, no secrets, failed pull not presented as success) — or the incomplete/incorrect path is removed cleanly
 - [ ] **EXP-02**: Kept or strengthened preview-before-pull matches story 2 (paths/actions reported; preview mutates nothing) — or removed cleanly
 - [ ] **EXP-03**: Kept or strengthened incremental pull matches story 3 (unchanged files undisturbed; idempotent re-pull) — or removed cleanly
 
@@ -64,7 +64,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | TRIAGE-01 | Phase 7 | Complete |
 | TRIAGE-02 | Phase 7 | Complete |
-| EXP-01 | Phase 8 | Pending |
+| EXP-01 | Phase 8 | Complete |
 | EXP-02 | Phase 9 | Pending |
 | EXP-03 | Phase 10 | Pending |
 | LINT-01 | Phase 11 | Pending |

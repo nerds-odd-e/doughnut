@@ -44,7 +44,7 @@
 **Decision bar:** Keep = correct + no WIP + external user value; Strengthen = minor gaps on valuable work; Remove = WIP/incorrect/non-valuable.
 
 - [x] **Phase 7: Publish triage decisions** - Maintainer has cited keep/strengthen/remove for stories 1–6 (3 plans)
-- [ ] **Phase 8: Resolve pull/export (story 1)** - Keep/strengthen or cleanly remove story 1 participant work
+- [x] **Phase 8: Resolve pull/export (story 1)** - Keep/strengthen or cleanly remove story 1 participant work
 - [ ] **Phase 9: Resolve preview-before-pull (story 2)** - Keep/strengthen or cleanly remove story 2 participant work
 - [ ] **Phase 10: Resolve incremental pull (story 3)** - Keep/strengthen or cleanly remove story 3 participant work
 - [ ] **Phase 11: Resolve workspace lint (story 4)** - Keep/strengthen or cleanly remove story 4 participant work
@@ -88,12 +88,12 @@
   3. If remove: incomplete/incorrect story 1 path and related debris are gone with no half-wired CLI/E2E left for that path
   4. Terry Yin and Tan Yeong Sheng changes remain untouched (HYG-02 standing constraint)
 
-**Plans**: 1/2 plans executed
+**Plans**: 2/2 plans executed
 
 Plans:
 
 - [x] 08-01-PLAN.md — Backend zip: doughnut_id merge + wiki→relative MD + absolute attachment URLs (+ units)
-- [ ] 08-02-PLAN.md — CLI `/export` E2E proofs for three Story 1 gaps + phase wrap-up
+- [x] 08-02-PLAN.md — CLI `/export` E2E proofs for three Story 1 gaps + phase wrap-up
 
 ### Phase 9: Resolve preview-before-pull (story 2)
 
@@ -192,7 +192,7 @@ Plans:
 | 1–7 Health lint / purge | v1.0 | 13/13 | Complete | 2026-07-23 |
 | 1–6 Spelling match & link | v1.1 | 16/16 | Complete | 2026-07-25 |
 | 7. Publish triage decisions | v1.2 | 3/3 | Complete | 2026-08-03 |
-| 8. Resolve pull/export (story 1) | v1.2 | 1/2 | In Progress|  |
+| 8. Resolve pull/export (story 1) | v1.2 | 2/2 | Complete | 2026-08-03 |
 | 9. Resolve preview-before-pull (story 2) | v1.2 | 0/? | Not started | - |
 | 10. Resolve incremental pull (story 3) | v1.2 | 0/? | Not started | - |
 | 11. Resolve workspace lint (story 4) | v1.2 | 0/? | Not started | - |
@@ -201,4 +201,4 @@ Plans:
 | 14. Class-ready hygiene verify | v1.2 | 0/? | Not started | - |
 
 ---
-*Last updated: 2026-08-03 after 07-03 — triage published; Phase 7 complete*
+*Last updated: 2026-08-03 after 08-02 — Story 1 strengthen complete (EXP-01)*

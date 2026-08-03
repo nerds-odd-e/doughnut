@@ -1,9 +1,9 @@
 ---
 phase: 8
 slug: resolve-pull-export-story-1
-status: ready
-nyquist_compliant: false
-wave_0_complete: false
+status: complete
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-08-03
 ---
 
@@ -39,23 +39,24 @@ created: 2026-08-03
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 08-01-01 | 01 | 1 | EXP-01 | T-08-01, T-08-02, T-08-03, T-08-04 | Auth before zip; same-notebook wiki resolve; canonical attachment rewrite; no secrets in zip | unit | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` | ✅ extend | ⬜ pending |
-| 08-01-02 | 01 | 1 | EXP-01 | T-08-01, T-08-02 | Unresolved wiki safe; relative paths; no attachment blobs | unit | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` | ✅ extend | ⬜ pending |
-| 08-01-03 | 01 | 1 | EXP-01 | T-08-04 | Allowlist HYG-02 / D-07 | unit + review | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` | ✅ | ⬜ pending |
-| 08-02-01 | 02 | 2 | EXP-01 | T-08-03 | @wip scenarios seed no credentials | e2e | `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_export.feature` | ✅ extend | ⬜ pending |
-| 08-02-02 | 02 | 2 | EXP-01 | T-08-03, T-08-04 | On-disk identity/link/attachment proofs; inventory stays secret-free | e2e | `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_export.feature` | ✅ extend | ⬜ pending |
-| 08-02-03 | 02 | 2 | EXP-01 / HYG-02 | T-08-* | Jidoka allowlist + nyquist sign-off | unit + e2e + review | backend:test_only + cli_export.feature | ✅ | ⬜ pending |
+| 08-01-01 | 01 | 1 | EXP-01 | T-08-01, T-08-02, T-08-03, T-08-04 | Auth before zip; same-notebook wiki resolve; canonical attachment rewrite; no secrets in zip | unit | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` | ✅ extend | ✅ green |
+| 08-01-02 | 01 | 1 | EXP-01 | T-08-01, T-08-02 | Unresolved wiki safe; relative paths; no attachment blobs | unit | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` | ✅ extend | ✅ green |
+| 08-01-03 | 01 | 1 | EXP-01 | T-08-04 | Allowlist HYG-02 / D-07 | unit + review | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` | ✅ | ✅ green |
+| 08-02-01 | 02 | 2 | EXP-01 | T-08-03, T-08-04 | On-disk identity/link/attachment proofs; inventory stays secret-free; no credentials in seeds | e2e | `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli_export.feature` | ✅ extend | ✅ green |
+| 08-02-02 | 02 | 2 | EXP-01 / HYG-02 | T-08-* | Jidoka allowlist + nyquist sign-off | unit + e2e + review | backend:test_only + cli_export.feature | ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
+
+*Note: Plan 08-02 used standard granularity — one green E2E pass (merged former 08-02-01/08-02-02 RED/GREEN rows into 08-02-01).*
 
 ---
 
 ## Wave 0 Requirements
 
-- [ ] Extend `NotebookZipBuilderTest` — identity merge (with and without author FM) — **08-01-01 / 08-01-02**
-- [ ] Extend `NotebookZipBuilderTest` — wiki relative link + unresolved fallback + nested relativize — **08-01-01 / 08-01-02**
-- [ ] Extend `NotebookZipBuilderTest` — attachment absolute URL; zip has no attachment entries — **08-01-01**
-- [ ] Extend `cli_export.feature` — scenarios for `doughnut_id`, ordinary MD link, absolute attachment URL (`@wip` until green) — **08-02-01 / 08-02-02**
+- [x] Extend `NotebookZipBuilderTest` — identity merge (with and without author FM) — **08-01-01 / 08-01-02**
+- [x] Extend `NotebookZipBuilderTest` — wiki relative link + unresolved fallback + nested relativize — **08-01-01 / 08-01-02**
+- [x] Extend `NotebookZipBuilderTest` — attachment absolute URL; zip has no attachment entries — **08-01-01**
+- [x] Extend `cli_export.feature` — scenarios for `doughnut_id`, ordinary MD link, absolute attachment URL (no `@wip` at close) — **08-02-01**
 
 *Existing infrastructure covers frameworks; Wave 0 is test-case gaps, not new tooling. Mark checked during execute.*
 
@@ -65,7 +66,7 @@ created: 2026-08-03
 
 | Behavior | Requirement | Why Manual | Test Instructions |
 |----------|-------------|------------|-------------------|
-| Terry/YS hunks untouched | HYG-02 | Author attribution | At Jidoka (08-02-03): review diff authors; do not rewrite Terry Yin / Tan Yeong Sheng owned hunks |
+| Terry/YS hunks untouched | HYG-02 | Author attribution | At Jidoka (08-02-02): review diff authors; do not rewrite Terry Yin / Tan Yeong Sheng owned hunks — **done 2026-08-03**: phase diff excludes Frontmatter.java / applyPull / writeNotebookExport |
 
 ---
 
@@ -76,6 +77,6 @@ created: 2026-08-03
 - [x] Wave 0 covers all MISSING references (mapped to plan tasks)
 - [x] No watch-mode flags
 - [x] Feedback latency < 180s
-- [ ] `nyquist_compliant: true` set in frontmatter *(set after Wave 0 checkboxes green in execute)*
+- [x] `nyquist_compliant: true` set in frontmatter *(Wave 0 checkboxes green after execute)*
 
-**Approval:** pending execute
+**Approval:** executed 2026-08-03 — Wave 0 complete; EXP-01 E2E + unit green
