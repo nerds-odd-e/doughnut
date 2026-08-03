@@ -1,62 +1,16 @@
-import {
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from 'node:fs'
-import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { afterEach, beforeEach, describe, expect, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import { previewPull } from '../src/sync/previewPull.js'
-import { buildZip, zipOfNotes } from './zipFixture.js'
+import { usePreviewPullWorkspace } from './previewPullHarness.js'
+import { zipOfNotes } from './zipFixture.js'
 
 describe('previewPull', () => {
-  let workspace: string
-
-  beforeEach(() => {
-    workspace = mkdtempSync(join(tmpdir(), 'doughnut-previewPull-'))
-  })
-
-  afterEach(() => {
-    rmSync(workspace, { recursive: true, force: true })
-  })
-
-  const write = (relativePath: string, content: string) => {
-    const full = join(workspace, relativePath)
-    mkdirSync(join(full, '..'), { recursive: true })
-    writeFileSync(full, content, 'utf8')
-  }
-
-  const readBack = (relativePath: string) =>
-    readFileSync(join(workspace, relativePath), 'utf8')
-
-  const preview = (notes: Record<string, string>, path = workspace) =>
-    previewPull({
-      notebookId: 1,
-      workspacePath: path,
-      exportNotebookAsZip: () =>
-        Promise.resolve({
-          bytes: zipOfNotes(notes),
-          fileName: 'Ben Notebook.zip',
-        }),
-    })
-
-  const previewZip = (bytes: Buffer, path = workspace) =>
-    previewPull({
-      notebookId: 1,
-      workspacePath: path,
-      exportNotebookAsZip: () =>
-        Promise.resolve({
-          bytes,
-          fileName: 'Ben Notebook.zip',
-        }),
-    })
+  const ws = usePreviewPullWorkspace()
 
   test('reports a changed note as a labeled update', async () => {
-    write('less.md', 'Hello')
+    ws.write('less.md', 'Hello')
 
-    await expect(preview({ 'less.md': 'Hello world!' })).resolves.toBe(
+    await expect(ws.preview({ 'less.md': 'Hello world!' })).resolves.toBe(
       [
         'less.md (update)',
         '  --- workspace',
@@ -70,11 +24,11 @@ describe('previewPull', () => {
   })
 
   test('reports two changed notes as labeled updates', async () => {
-    write('less.md', 'Hello')
-    write('scrum.md', 'Sprint')
+    ws.write('less.md', 'Hello')
+    ws.write('scrum.md', 'Sprint')
 
     await expect(
-      preview({ 'less.md': 'Hello world!', 'scrum.md': 'Sprint review' })
+      ws.preview({ 'less.md': 'Hello world!', 'scrum.md': 'Sprint review' })
     ).resolves.toBe(
       [
         'less.md (update)',
@@ -95,10 +49,10 @@ describe('previewPull', () => {
   })
 
   test('leaves an unchanged note out of the report', async () => {
-    write('less.md', 'Hello')
-    write('scrum.md', 'Sprint')
+    ws.write('less.md', 'Hello')
+    ws.write('scrum.md', 'Sprint')
 
-    const report = await preview({
+    const report = await ws.preview({
       'less.md': 'Hello world!',
       'scrum.md': 'Sprint',
     })
@@ -108,10 +62,10 @@ describe('previewPull', () => {
   })
 
   test('reports the path of a note in a folder', async () => {
-    write('LeSS in Action/team.md', 'Sprint')
+    ws.write('LeSS in Action/team.md', 'Sprint')
 
     await expect(
-      preview({ 'LeSS in Action/team.md': 'Sprint review' })
+      ws.preview({ 'LeSS in Action/team.md': 'Sprint review' })
     ).resolves.toBe(
       [
         'LeSS in Action/team.md (update)',
@@ -126,10 +80,10 @@ describe('previewPull', () => {
   })
 
   test('orders changed notes by path', async () => {
-    write('LeSS in Action/team.md', 'Sprint')
-    write('Engineering/tech.md', 'Trunk')
+    ws.write('LeSS in Action/team.md', 'Sprint')
+    ws.write('Engineering/tech.md', 'Trunk')
 
-    const report = await preview({
+    const report = await ws.preview({
       'LeSS in Action/team.md': 'Sprint review',
       'Engineering/tech.md': 'Trunk based',
     })
@@ -140,10 +94,10 @@ describe('previewPull', () => {
   })
 
   test('compares a note the export writes with its title as a heading', async () => {
-    write('less.md', '# less\n\nHello')
+    ws.write('less.md', '# less\n\nHello')
 
     await expect(
-      preview({ 'less.md': '# less\n\nHello world!' })
+      ws.preview({ 'less.md': '# less\n\nHello world!' })
     ).resolves.toBe(
       [
         'less.md (update)',
@@ -160,17 +114,17 @@ describe('previewPull', () => {
   })
 
   test('ignores an exported file that is not Markdown', async () => {
-    write('less.md', 'Hello')
+    ws.write('less.md', 'Hello')
 
     await expect(
-      preview({ 'less.md': 'Hello', 'notes.txt': 'whatever' })
+      ws.preview({ 'less.md': 'Hello', 'notes.txt': 'whatever' })
     ).resolves.toBe('No changes to pull.')
   })
 
   test('reports a locally edited note as a labeled update a pull would overwrite', async () => {
-    write('less.md', 'Hello from Obsidian')
+    ws.write('less.md', 'Hello from Obsidian')
 
-    await expect(preview({ 'less.md': 'Hello' })).resolves.toBe(
+    await expect(ws.preview({ 'less.md': 'Hello' })).resolves.toBe(
       [
         'less.md (update)',
         '  --- workspace',
@@ -187,10 +141,10 @@ describe('previewPull', () => {
   // way `git diff`'s `/dev/null` does, so the side a pull would write into is
   // still `workspace` when it holds no file for the note yet.
   test('reports a note the pull would create with an explicit create label', async () => {
-    write('less.md', 'Hello')
+    ws.write('less.md', 'Hello')
 
     await expect(
-      preview({ 'less.md': 'Hello', 'scrum.md': 'Sprint plan' })
+      ws.preview({ 'less.md': 'Hello', 'scrum.md': 'Sprint plan' })
     ).resolves.toBe(
       [
         'scrum.md (create)',
@@ -204,133 +158,41 @@ describe('previewPull', () => {
   })
 
   test('reports nothing to pull when the two sides match', async () => {
-    write('less.md', 'Hello')
+    ws.write('less.md', 'Hello')
 
-    await expect(preview({ 'less.md': 'Hello' })).resolves.toBe(
+    await expect(ws.preview({ 'less.md': 'Hello' })).resolves.toBe(
       'No changes to pull.'
     )
   })
 
   test('reports nothing to pull when only the line endings differ', async () => {
-    write('less.md', 'Sprint planning\r\nDaily standup')
+    ws.write('less.md', 'Sprint planning\r\nDaily standup')
 
     await expect(
-      preview({ 'less.md': 'Sprint planning\nDaily standup' })
+      ws.preview({ 'less.md': 'Sprint planning\nDaily standup' })
     ).resolves.toBe('No changes to pull.')
   })
 
   test('does not write to the workspace', async () => {
-    write('less.md', 'Hello')
+    ws.write('less.md', 'Hello')
 
-    await preview({ 'less.md': 'Hello world!' })
+    await ws.preview({ 'less.md': 'Hello world!' })
 
-    expect(readBack('less.md')).toBe('Hello')
-  })
-
-  test('reports a move when the same doughnut_id is at a different path', async () => {
-    write('less.md', '---\ndoughnut_id: 42\n---\n\n# less\n\nHello')
-
-    const report = await preview({
-      'scrum.md': '---\ndoughnut_id: 42\n---\n\n# scrum\n\nHello',
-    })
-
-    expect(report).toContain('scrum.md (move)')
-    expect(report).toContain('less.md')
-    expect(report).not.toMatch(/scrum\.md \(create\)/)
-    expect(readBack('less.md')).toBe(
-      '---\ndoughnut_id: 42\n---\n\n# less\n\nHello'
-    )
-  })
-
-  test('does not infer a move when the export note lacks doughnut_id', async () => {
-    write('less.md', 'Hello')
-
-    const report = await preview({ 'scrum.md': 'Sprint plan' })
-
-    expect(report).toContain('scrum.md (create)')
-    expect(report).not.toContain('(move)')
-  })
-
-  test('rejects a reserved log.md basename with a short reason', async () => {
-    write('less.md', 'Hello')
-
-    const report = await preview({
-      'less.md': 'Hello',
-      'log.md': 'Daily standup notes',
-    })
-
-    expect(report).toContain('log.md (reject)')
-    expect(report.toLowerCase()).toMatch(/reserved/)
-    expect(report).not.toMatch(/log\.md \(create\)/)
-    expect(report).not.toMatch(/log\.md \(update\)/)
-  })
-
-  test('rejects a reserved index.md even when content differs', async () => {
-    write('index.md', 'Old readme')
-
-    const report = await preview({ 'index.md': 'New readme' })
-
-    expect(report).toContain('index.md (reject)')
-    expect(report.toLowerCase()).toMatch(/reserved/)
-    expect(report).not.toMatch(/index\.md \(update\)/)
-  })
-
-  test('rejects paths under .doughnut-sync as sync metadata', async () => {
-    const report = await preview({
-      '.doughnut-sync/baseline.json.md': 'not a note',
-    })
-
-    expect(report).toContain('.doughnut-sync/baseline.json.md (reject)')
-    expect(report.toLowerCase()).toMatch(/sync metadata|doughnut-sync/)
-    expect(report).not.toBe('No changes to pull.')
-  })
-
-  test('rejects duplicate export paths', async () => {
-    write('less.md', 'Hello')
-
-    const report = await previewZip(
-      buildZip([
-        { name: 'twin.md', content: 'First' },
-        { name: 'twin.md', content: 'Second' },
-      ])
-    )
-
-    expect(report).toContain('twin.md (reject)')
-    expect(report.toLowerCase()).toMatch(/duplicate/)
-    expect(report).not.toBe('No changes to pull.')
-  })
-
-  test('rejects an unsafe path without writing the workspace', async () => {
-    write('less.md', 'Hello')
-
-    const report = await previewZip(
-      buildZip([{ name: '../evil.md', content: 'pwned' }])
-    )
-
-    expect(report).toContain('../evil.md (reject)')
-    expect(report.toLowerCase()).toMatch(/unsafe|invalid/)
-    expect(readBack('less.md')).toBe('Hello')
-  })
-
-  test('reports rejects-only instead of the clean no-op sentinel', async () => {
-    const report = await preview({ 'log.md': 'reserved only' })
-
-    expect(report).toContain('log.md (reject)')
-    expect(report).not.toBe('No changes to pull.')
+    expect(ws.readBack('less.md')).toBe('Hello')
   })
 
   test('reports the same difference when run twice', async () => {
-    write('less.md', 'Hello')
+    ws.write('less.md', 'Hello')
 
-    const first = await preview({ 'less.md': 'Hello world!' })
-    const second = await preview({ 'less.md': 'Hello world!' })
+    const first = await ws.preview({ 'less.md': 'Hello world!' })
+    const second = await ws.preview({ 'less.md': 'Hello world!' })
 
     expect(second).toBe(first)
   })
 
   test('reports a missing workspace directory', async () => {
-    await expect(preview({}, join(workspace, 'nowhere'))).rejects.toThrow(
-      `No directory at ${join(workspace, 'nowhere')}.`
+    await expect(ws.preview({}, join(ws.workspace, 'nowhere'))).rejects.toThrow(
+      `No directory at ${join(ws.workspace, 'nowhere')}.`
     )
   })
 
@@ -340,7 +202,7 @@ describe('previewPull', () => {
     await expect(
       previewPull({
         notebookId: 1,
-        workspacePath: join(workspace, 'nowhere'),
+        workspacePath: join(ws.workspace, 'nowhere'),
         exportNotebookAsZip: () => {
           asked = true
           return Promise.resolve({
@@ -355,12 +217,12 @@ describe('previewPull', () => {
   })
 
   test('surfaces a failed export', async () => {
-    write('less.md', 'Hello')
+    ws.write('less.md', 'Hello')
 
     await expect(
       previewPull({
         notebookId: 1,
-        workspacePath: workspace,
+        workspacePath: ws.workspace,
         exportNotebookAsZip: () =>
           Promise.reject(
             new Error('Ben Notebook no longer exists in Doughnut.')
