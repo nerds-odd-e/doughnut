@@ -17,11 +17,11 @@ progress:
 
 ## Project Reference
 
-See: `.planning/PROJECT.md` (updated 2026-07-25)
+See: `.planning/PROJECT.md` (updated 2026-08-03)
 
-**Core value:** During spelling recall, an answer that names a *different* note becomes a learning opportunity — penalized lightly, both notes revealed, and a link offered — turning recall confusion into connection-building; and overlapping-but-distinct notes are kept distinct by asking the user for a more specific answer.
+**Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** Planning next milestone (`/gsd-new-milestone`)
+**Current focus:** Milestone v1.2 — defining requirements for LIA training cleanup
 
 ## Current Position
 
@@ -44,5 +44,5 @@ Items acknowledged and deferred at milestone close on 2026-07-25:
 ## Session Continuity
 
 **Last session:** 2026-08-03
-**Stopped at:** Planted SEED-001; pausing spelling follow-ons for a different direction
-**Next action:** `/gsd-new-milestone` for the new focus (seed keeps spelling follow-ons from being forgotten)
+**Stopped at:** Milestone v1.2 started; awaiting research choice then requirements
+**Next action:** Define REQUIREMENTS.md → roadmap (after research decision)
