@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Clean up LIA training participant code
-current_phase: 9
-current_phase_name: Resolve preview-before-pull (story 2)
-status: in_progress
-stopped_at: Completed 09-01-PLAN.md
-last_updated: "2026-08-03T07:11:00.000Z"
+current_phase: 10
+current_phase_name: Resolve incremental pull (story 3)
+status: ready_to_plan
+stopped_at: Completed 09-02-PLAN.md — Phase 9 complete (EXP-02)
+last_updated: "2026-08-03T07:15:00.000Z"
 last_activity: 2026-08-03
-last_activity_desc: Completed 09-01 previewPull taxonomy + diagnostics units
+last_activity_desc: Completed Phase 9 — preview-before-pull Story 2 (units + E2E)
 progress:
   total_phases: 8
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 8
-  completed_plans: 6
-  percent: 75
+  completed_plans: 7
+  percent: 88
 ---
 
 # State
@@ -25,26 +25,26 @@ See: `.planning/PROJECT.md` (updated 2026-08-03)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** Milestone v1.2 — Phase 9 Plan 01 complete (units); next 09-02 E2E dry-run
+**Current focus:** Milestone v1.2 — Phase 9 complete (EXP-02); next Phase 10 Story 3 applyPull
 
 ## Current Position
 
-Phase: 9 — IN PROGRESS (1/2 plans)
-Plan: 09-01 complete; 09-02 next (Wave 2 E2E)
-Status: previewPull create/update/move/reject + diagnostics unit-green; applyPull frozen; EXP-02 E2E remains for 09-02
-Last activity: 2026-08-03 — Completed 09-01-PLAN.md
+Phase: 9 — COMPLETE (2/2 plans)
+Plan: 09-01 + 09-02 done
+Status: Story 2 preview-before-pull strengthened end-to-end; applyPull still frozen for Phase 10; EXP-02 closed
+Last activity: 2026-08-03 — Completed 09-02-PLAN.md
 
-Progress: [████████░░] 75%
+Progress: [█████████░] 88%
 
-**Next:** Execute 09-02 — CLI `/sync --dry-run` E2E labels, rejects, non-mutation
+**Next:** Discuss/plan Phase 10 — Resolve incremental pull (story 3)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 5 (this milestone)
-- Average duration: 14min
-- Total execution time: 68min
+- Total plans completed: 7 (this milestone)
+- Average duration: ~12min
+- Total execution time: 77min
 
 **By Phase:**
 
@@ -52,6 +52,7 @@ Progress: [████████░░] 75%
 |-------|-------|-------|----------|
 | 07 | 3/3 | 44min | 15min |
 | 08 | 2/2 | 24min | 12min |
+| 09 | 2/2 | 9min | 5min |
 
 *Updated after each plan completion*
 **Per-Plan Metrics:**
@@ -64,6 +65,7 @@ Progress: [████████░░] 75%
 | Phase 08 P01 | 20min | 3 tasks | 8 files |
 | Phase 08 P02 | 4min | 2 tasks | 1 files |
 | Phase 09 P01 | 6min | 3 tasks | 7 files |
+| Phase 09 P02 | 3min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -92,6 +94,9 @@ Decisions are logged in PROJECT.md Key Decisions table. Roadmap-shaping decision
 - [Phase 9]: Pull actions use PreviewPullAction parallel to NoteDiffStatus
 - [Phase 9]: Move only via doughnut_id; missing id stays path-keyed create/update
 - [Phase 9]: Rejects counted separately; rejects-only ≠ No changes to pull.
+- [Phase 9]: E2E asserts less.md (update) matching Plan 01 unit wording
+- [Phase 9]: Reserved reject E2E via note title log + empty workspace dry-run
+- [Phase 9]: EXP-02 closed — units + targeted cli_sync_dry_run E2E green
 
 ### Pending Todos
 
@@ -114,7 +119,7 @@ Items acknowledged and deferred at milestone close on 2026-07-25:
 
 ## Session Continuity
 
-**Last session:** 2026-08-03T07:10:37.658Z
-**Stopped at:** Completed 09-01-PLAN.md
-**Next action:** `/gsd-execute-phase 9`
+**Last session:** 2026-08-03T07:15:00.000Z
+**Stopped at:** Completed 09-02-PLAN.md — Phase 9 complete
+**Next action:** `/gsd-discuss-phase 10` (or `/gsd-plan-phase 10`)
 **Resume file:** None
