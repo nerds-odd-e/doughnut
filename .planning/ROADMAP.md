@@ -206,7 +206,11 @@ Plans:
   3. Targeted CLI/unit and relevant CLI E2E for retained capabilities pass
   4. A future class can start from this tree without leftover training debris for stories 1–6
 
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+
+- [ ] 14-01-PLAN.md — Trash spent docs/plans trio + HYG-02 audit + retained CLI green matrix + close HYG-01/02/03
 
 ## Progress
 
