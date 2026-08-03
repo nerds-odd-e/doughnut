@@ -59,7 +59,7 @@ Define via `/gsd-new-milestone`. Likely candidates:
 
 ## Context
 
-v1.2 cleaned LIA training participant code against portable-workspace stories 1–6. Strengthen path won for stories 1–5; Story 6 was remove. Retained surface: CLI `/export`, `/sync` (+ `--dry-run`), `/lint`, `/push --dry-run`. Phase diaries archived under `.planning/milestones/v1.2-phases/`.
+v1.2 cleaned LIA training participant code against portable-workspace stories 1–6. Strengthen path won for stories 1–5; Story 6 was remove. Retained surface: CLI `/export`, `/sync` (+ `--dry-run`), `/lint`, `/push --dry-run`. Spent phase diaries pruned; see `.planning/milestones/v1.2-ROADMAP.md` and `MILESTONES.md`.
 
 ## Constraints
 

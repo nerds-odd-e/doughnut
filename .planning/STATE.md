@@ -150,9 +150,9 @@ Items acknowledged and deferred at milestone close on 2026-08-03 (v1.2 `override
 
 ## Session Continuity
 
-**Last session:** 2026-08-03T09:14:00.000Z
-**Stopped at:** v1.2 milestone archived (`override_closeout`)
-**Next action:** `/gsd-new-milestone`
+**Last session:** 2026-08-03T09:16:00.000Z
+**Stopped at:** v1.2 archived; spent phase diaries trashed (`v1.0-phases`, `v1.2-phases`)
+**Next action:** `/gsd-new-milestone` (optional: push tag `v1.2` + 2 archive commits)
 **Resume file:** None
 
 ## Operator Next Steps
