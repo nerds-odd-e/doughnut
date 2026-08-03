@@ -1,8 +1,15 @@
-import { renderDiffReport, renderNoteDiff } from './diffReport.js'
+import {
+  renderDiffReport,
+  renderNoteDiff,
+  renderRejectFinding,
+} from './diffReport.js'
 import type { ExportNotebookAsZip } from './exportNotebook.js'
-import { classifyPreviewPullNotes } from './previewPullActions.js'
+import {
+  classifyPreviewPullNotes,
+  type ClassifiedPullNote,
+} from './previewPullActions.js'
 import { readWorkspace } from './readWorkspace.js'
-import { unzipToEntries } from './unzip.js'
+import { listZipFileNames, unzipToEntries } from './unzip.js'
 
 const NOTHING_TO_PULL = 'No changes to pull.'
 
@@ -13,9 +20,16 @@ export type PreviewPullRequest = {
   readonly signal?: AbortSignal
 }
 
-function renderClassifiedNote(
-  note: ReturnType<typeof classifyPreviewPullNotes>[number]
-): string {
+function renderClassifiedNote(note: ClassifiedPullNote): {
+  readonly diff: string
+  readonly pullAction: ClassifiedPullNote['action']
+} {
+  if (note.action === 'reject') {
+    return {
+      diff: renderRejectFinding(note.path, note.reason),
+      pullAction: 'reject',
+    }
+  }
   const diff = renderNoteDiff(
     note.path,
     note.workspaceContent,
@@ -23,9 +37,14 @@ function renderClassifiedNote(
     undefined,
     note.action
   )
-  if (note.action !== 'move') return diff
+  if (note.action !== 'move') {
+    return { diff, pullAction: note.action }
+  }
   const [heading, ...rest] = diff.split('\n')
-  return [`${heading}`, `  from ${note.fromPath}`, ...rest].join('\n')
+  return {
+    diff: [heading, `  from ${note.fromPath}`, ...rest].join('\n'),
+    pullAction: 'move',
+  }
 }
 
 /**
@@ -44,13 +63,14 @@ export async function previewPull({
 }: PreviewPullRequest): Promise<string> {
   const workspace = readWorkspace(workspacePath)
   const { bytes } = await exportNotebookAsZip(notebookId, signal)
+  const zipFileNames = listZipFileNames(bytes)
   const exported = unzipToEntries(bytes)
 
-  const reported = classifyPreviewPullNotes(workspace, exported).map(
-    (note) => ({
-      diff: renderClassifiedNote(note),
-    })
-  )
+  const reported = classifyPreviewPullNotes(
+    workspace,
+    exported,
+    zipFileNames
+  ).map(renderClassifiedNote)
 
   return renderDiffReport(reported, NOTHING_TO_PULL)
 }

@@ -36,9 +36,35 @@ function contentAt(
 }
 
 /**
+ * File entry names in central-directory order, including duplicates. Directory
+ * entries are skipped. Prefer this when duplicate / case-clash detection must
+ * see every name before a Map collapse.
+ */
+export function listZipFileNames(zip: Buffer): string[] {
+  if (zip.length < 22) throw new Error(NOT_A_ZIP)
+
+  const end = endOfCentralDirectory(zip)
+  const count = zip.readUInt16LE(end + 10)
+  let at = zip.readUInt32LE(end + 16)
+  const names: string[] = []
+
+  for (let read = 0; read < count; read++) {
+    if (zip.readUInt32LE(at) !== CENTRAL_FILE_HEADER) throw new Error(NOT_A_ZIP)
+    const nameLength = zip.readUInt16LE(at + 28)
+    const extraLength = zip.readUInt16LE(at + 30)
+    const commentLength = zip.readUInt16LE(at + 32)
+    const name = zip.subarray(at + 46, at + 46 + nameLength).toString('utf8')
+    if (!name.endsWith('/')) names.push(name)
+    at += 46 + nameLength + extraLength + commentLength
+  }
+  return names
+}
+
+/**
  * Read a zip into its file entries, keyed by the path recorded in the archive
  * and in the order the archive lists them. Directory entries are skipped: the
- * paths of the files describe the tree.
+ * paths of the files describe the tree. Duplicate names collapse to the last
+ * content (callers that need duplicates should use `listZipFileNames` first).
  */
 export function unzipToEntries(zip: Buffer): Map<string, string> {
   if (zip.length < 22) throw new Error(NOT_A_ZIP)

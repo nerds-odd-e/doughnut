@@ -68,6 +68,13 @@ export function renderNoteDiff(
 export type ReportedNoteDiff = {
   readonly diff: string
   readonly status?: NoteDiffStatus
+  /** Pull dry-run action; rejects are counted apart from notes that would change. */
+  readonly pullAction?: PreviewPullAction
+}
+
+/** Path + short reason for a pull reject — no unified hunks. */
+export function renderRejectFinding(path: string, reason: string): string {
+  return [`${path} (reject)`, `  ${reason}`, ''].join('\n')
 }
 
 const counted = (count: number, noun: string) =>
@@ -75,8 +82,9 @@ const counted = (count: number, noun: string) =>
 
 /**
  * The reported notes, or `nothingChanged` when there is nothing to report.
- * Conflicts are counted on their own, apart from the notes that would change,
- * because a conflict is not something a run could apply.
+ * Conflicts and pull rejects are counted on their own, apart from the notes
+ * that would change, because neither is something a run could apply as a
+ * content write.
  */
 export function renderDiffReport(
   reported: readonly ReportedNoteDiff[],
@@ -86,9 +94,13 @@ export function renderDiffReport(
   const conflicts = reported.filter(
     ({ status }) => status === 'conflict'
   ).length
-  const changes = reported.length - conflicts
+  const rejects = reported.filter(
+    ({ pullAction }) => pullAction === 'reject'
+  ).length
+  const changes = reported.length - conflicts - rejects
   const summary = [
     ...(changes === 0 ? [] : [`${counted(changes, 'note')} would change.`]),
+    ...(rejects === 0 ? [] : [`${counted(rejects, 'reject')}.`]),
     ...(conflicts === 0 ? [] : [`${counted(conflicts, 'conflict')}.`]),
   ].join(' ')
   return [...reported.map(({ diff }) => diff), summary].join('\n')
