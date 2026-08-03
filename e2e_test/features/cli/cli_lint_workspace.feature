@@ -14,6 +14,10 @@ Feature: Check whether a workspace follows the OKF format
       """
       # apple
       """
+    And the workspace "./Workspace" has a file "index.md" with content:
+      """
+      # Workspace
+      """
     When I enter the slash command "/lint ./Workspace" in the interactive CLI
     Then I should see "a.md:1 error Frontmatter is missing" with any spacing in past CLI assistant messages
     And I should see "1 error in 1 file." in past CLI assistant messages
@@ -27,6 +31,10 @@ Feature: Check whether a workspace follows the OKF format
 
       # apple
       """
+    And the workspace "./Workspace" has a file "index.md" with content:
+      """
+      # Workspace
+      """
     And the workspace "./Workspace" has a file "a.json" with content:
       """
       {}
@@ -36,8 +44,7 @@ Feature: Check whether a workspace follows the OKF format
     And I should see "Workspace follows the OKF format." in past CLI assistant messages
     And I should see "1 warning in 1 file." in past CLI assistant messages
 
-  # A clean report is what proves the dot folder was not walked and the link in
-  # the body was not followed; either would raise an error otherwise.
+  # A clean report proves the dot folder was not walked and portable links resolve.
   Scenario: A conformant bundle reports nothing
     Given the workspace "./Workspace" has a file "a.md" with content:
       """
@@ -48,6 +55,18 @@ Feature: Check whether a workspace follows the OKF format
       # apple
 
       See [banana](./banana.md)
+      """
+    And the workspace "./Workspace" has a file "banana.md" with content:
+      """
+      ---
+      type: concept
+      ---
+
+      # banana
+      """
+    And the workspace "./Workspace" has a file "index.md" with content:
+      """
+      # Workspace
       """
     And the workspace "./Workspace" has a file ".git/config.md" with content:
       """
@@ -72,7 +91,91 @@ Feature: Check whether a workspace follows the OKF format
       """
       # banana
       """
+    And the workspace "./Workspace" has a file "index.md" with content:
+      """
+      # Workspace
+      """
     When I enter the slash command "/lint ./Workspace" in the interactive CLI
     Then I should see "a.md" in past CLI assistant messages
     And I should see "b.md" in past CLI assistant messages
     And I should see "2 errors, 1 warning in 2 files." in past CLI assistant messages
+
+  Scenario: Duplicate doughnut_id values are errors
+    Given the workspace "./Workspace" has a file "apple.md" with content:
+      """
+      ---
+      type: concept
+      doughnut_id: shared-note
+      ---
+
+      # apple
+      """
+    And the workspace "./Workspace" has a file "pear.md" with content:
+      """
+      ---
+      type: concept
+      doughnut_id: shared-note
+      ---
+
+      # pear
+      """
+    And the workspace "./Workspace" has a file "index.md" with content:
+      """
+      # Workspace
+      """
+    When I enter the slash command "/lint ./Workspace" in the interactive CLI
+    Then I should see "doughnut_id" in past CLI assistant messages
+    And I should see "apple.md" in past CLI assistant messages
+    And I should see "pear.md" in past CLI assistant messages
+    And I should see "error" in past CLI assistant messages
+
+  Scenario: A broken local link is an error
+    Given the workspace "./Workspace" has a file "apple.md" with content:
+      """
+      ---
+      type: concept
+      ---
+
+      # apple
+
+      See [missing](./no-such-note.md)
+      """
+    And the workspace "./Workspace" has a file "index.md" with content:
+      """
+      # Workspace
+      """
+    When I enter the slash command "/lint ./Workspace" in the interactive CLI
+    Then I should see "error" in past CLI assistant messages
+    And I should see "no-such-note" in past CLI assistant messages
+
+  Scenario: A concept-bearing directory without index.md is an error
+    Given the workspace "./Workspace" has a file "apple.md" with content:
+      """
+      ---
+      type: concept
+      ---
+
+      # apple
+      """
+    When I enter the slash command "/lint ./Workspace" in the interactive CLI
+    Then I should see "index.md" in past CLI assistant messages
+    And I should see "error" in past CLI assistant messages
+
+  Scenario: An unsafe local link target is an error
+    Given the workspace "./Workspace" has a file "apple.md" with content:
+      """
+      ---
+      type: concept
+      ---
+
+      # apple
+
+      See [out](../outside.md)
+      """
+    And the workspace "./Workspace" has a file "index.md" with content:
+      """
+      # Workspace
+      """
+    When I enter the slash command "/lint ./Workspace" in the interactive CLI
+    Then I should see "unsafe" in past CLI assistant messages
+    And I should see "error" in past CLI assistant messages
