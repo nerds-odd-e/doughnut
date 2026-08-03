@@ -50,4 +50,10 @@ class NotebookExportControllerTest extends NotebookControllerTestBase {
         UnexpectedNoAccessRightException.class,
         () -> controller.exportNotebook(exportRequest(), other));
   }
+
+  @Test
+  void publicOriginIncludesNonDefaultPort() {
+    assertThat(
+        NotebookController.publicOriginFrom(exportRequest()), equalTo("http://localhost:9081"));
+  }
 }

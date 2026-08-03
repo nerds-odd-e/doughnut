@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.odde.doughnut.entities.Folder;
@@ -53,6 +54,26 @@ class NotebookExportServiceTest {
     assertThat(
         entries.get("Recipes/Pasta.md"),
         equalTo("---\ndoughnut_id: " + pasta.getId() + "\n---\n\n# Pasta\n\nBoil water"));
+  }
+
+  @Test
+  void forwardsPublicOriginIntoExportedAttachmentUrls() throws IOException {
+    User user = makeMe.aUser().please();
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+    makeMe
+        .aNote("Illustrated")
+        .notebook(notebook)
+        .content("![fig](/attachments/images/12/fig.png)")
+        .please();
+    makeMe.entityPersister.flush();
+
+    byte[] zipBytes =
+        notebookExportService.exportNotebookAsZip(notebook, "http://example.test:9081");
+
+    Map<String, String> entries = readZipEntries(zipBytes);
+    assertThat(
+        entries.get("Illustrated.md"),
+        containsString("http://example.test:9081/attachments/images/12/fig.png"));
   }
 
   @Test
