@@ -168,7 +168,11 @@ Plans:
   3. If remove: story 5 participant path and related debris are gone cleanly
   4. Terry Yin and Tan Yeong Sheng changes remain untouched (HYG-02 standing constraint)
 
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+
+- [ ] 12-01-PLAN.md — Strengthen `/push --dry-run` (load-only baseline + create/update + units + cli_push_dry_run E2E)
 
 ### Phase 13: Resolve safe push (story 6)
 

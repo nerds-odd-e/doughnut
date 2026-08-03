@@ -4,11 +4,11 @@ milestone: v1.2
 milestone_name: Clean up LIA training participant code
 current_phase: 12
 current_phase_name: Resolve push dry-run (story 5)
-status: research_complete
-stopped_at: Phase 12 research complete
-last_updated: "2026-08-03T08:20:00.000Z"
+status: planning_complete
+stopped_at: Phase 12 plan created (12-01)
+last_updated: "2026-08-03T08:15:00.000Z"
 last_activity: 2026-08-03
-last_activity_desc: Wrote 12-RESEARCH.md (push dry-run strengthen: baseline load-only + create/update)
+last_activity_desc: Wrote 12-01-PLAN.md (coarse strengthen: load-only baseline + create/update)
 progress:
   total_phases: 8
   completed_phases: 2
@@ -30,13 +30,13 @@ See: `.planning/PROJECT.md` (updated 2026-08-03)
 ## Current Position
 
 Phase: 12 — Resolve push dry-run (story 5)
-Plan: (next — plan Phase 12 from RESEARCH)
-Status: Phase 12 research complete — PUSH-01 strengthen path documented
-Last activity: 2026-08-03 — Wrote 12-RESEARCH.md (baseline load-only + create/update taxonomy)
+Plan: 12-01 ready to execute
+Status: Phase 12 planning complete — 12-01-PLAN.md (1 coarse plan / 1 tracer task)
+Last activity: 2026-08-03 — Wrote 12-01-PLAN.md (load-only baseline + create/update)
 
 Progress: [████████░░] 75%
 
-**Next:** `/gsd-plan-phase 12` (CONTEXT + RESEARCH ready)
+**Next:** `/gsd-execute-phase 12`
 
 ## Performance Metrics
 
@@ -109,6 +109,7 @@ Decisions are logged in PROJECT.md Key Decisions table. Roadmap-shaping decision
 - [Phase 11]: Auto-selected invert-portable (D-03); OKF+portableContractFindings closes LINT-01
 - [Phase 11]: Path-oriented wiki; /href workspace-root-relative; index on concept-bearing dirs; E2E unsafe via ../ link
 - [Phase 11]: LINT-01 closed — units + targeted cli_lint_workspace E2E green; HYG-02 intact
+- [Phase 12]: One coarse plan 12-01 — single tracer (units+E2E); D-01 both gaps; D-02/D-03 load-only + export prime; D-04/D-05 create/update path-union; D-06 Story 6 boundary; D-07 proof; D-08 fewer commits than Phase 11
 
 ### Pending Todos
 
@@ -131,7 +132,7 @@ Items acknowledged and deferred at milestone close on 2026-07-25:
 
 ## Session Continuity
 
-**Last session:** 2026-08-03T08:03:50.354Z
-**Stopped at:** Phase 12 research complete
-**Next action:** `/gsd-plan-phase 12`
-**Resume file:** .planning/phases/12-resolve-push-dry-run-story-5/12-RESEARCH.md
+**Last session:** 2026-08-03T16:20:00.000Z
+**Stopped at:** Phase 12 planning complete (12-01-PLAN.md)
+**Next action:** `/gsd-execute-phase 12`
+**Resume file:** .planning/phases/12-resolve-push-dry-run-story-5/12-01-PLAN.md
