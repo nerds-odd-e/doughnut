@@ -52,7 +52,7 @@
     "@vue/compiler-core": "3.5.40",
     "@vue/server-renderer": "3.5.40",
     "@vue/test-utils": "2.4.11",
-    "daisyui": "5.7.8",
+    "daisyui": "5.7.11",
     "doughnut-test-fixtures": "workspace:*",
     "es-toolkit": "^1.50.0",
     "esbuild": ">=0.28.1",
