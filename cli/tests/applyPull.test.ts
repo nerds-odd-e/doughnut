@@ -1,4 +1,5 @@
 import {
+  existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
@@ -9,7 +10,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { applyPull, NOTHING_TO_PULL } from '../src/sync/applyPull.js'
-import { zipOfNotes } from './zipFixture.js'
+import { buildZip, zipOfNotes } from './zipFixture.js'
 
 describe('applyPull', () => {
   let workspace: string
@@ -31,6 +32,10 @@ describe('applyPull', () => {
   const readBack = (relativePath: string) =>
     readFileSync(join(workspace, relativePath), 'utf8')
 
+  const baselinePath = () => join(workspace, '.doughnut-sync', 'baseline.json')
+
+  const readBaseline = () => JSON.parse(readFileSync(baselinePath(), 'utf8'))
+
   const pull = (notes: Record<string, string>, path = workspace) =>
     applyPull({
       notebookId: 1,
@@ -38,6 +43,17 @@ describe('applyPull', () => {
       exportNotebookAsZip: () =>
         Promise.resolve({
           bytes: zipOfNotes(notes),
+          fileName: 'Ben Notebook.zip',
+        }),
+    })
+
+  const pullZip = (bytes: Buffer, path = workspace) =>
+    applyPull({
+      notebookId: 1,
+      workspacePath: path,
+      exportNotebookAsZip: () =>
+        Promise.resolve({
+          bytes,
           fileName: 'Ben Notebook.zip',
         }),
     })
@@ -51,13 +67,100 @@ describe('applyPull', () => {
     expect(readBack('less.md')).toBe('Hello world!')
   })
 
-  test('does not create a file for a remote-only note', async () => {
+  test('creates a file for a remote-only note', async () => {
     write('less.md', 'Hello')
 
-    await expect(
-      pull({ 'less.md': 'Hello', 'scrum.md': 'Sprint' })
-    ).resolves.toBe(NOTHING_TO_PULL)
-    expect(() => readBack('scrum.md')).toThrow()
+    const result = await pull({ 'less.md': 'Hello', 'scrum.md': 'Sprint' })
+    expect(result).not.toBe(NOTHING_TO_PULL)
+    expect(result).toMatch(/1 note updated/)
+    expect(readBack('scrum.md')).toBe('Sprint')
+    expect(readBack('less.md')).toBe('Hello')
+  })
+
+  test('applies a move when the same doughnut_id is at a different path', async () => {
+    write('less.md', '---\ndoughnut_id: 42\n---\n\n# less\n\nHello')
+    write('local-only.md', 'keep me')
+
+    const remote = '---\ndoughnut_id: 42\n---\n\n# scrum\n\nHello'
+    const result = await pull({ 'scrum.md': remote })
+
+    expect(result).not.toBe(NOTHING_TO_PULL)
+    expect(readBack('scrum.md')).toBe(remote)
+    expect(() => readBack('less.md')).toThrow()
+    expect(readBack('local-only.md')).toBe('keep me')
+  })
+
+  test('rejects a reserved log.md without writing it', async () => {
+    write('less.md', 'Hello')
+
+    const result = await pull({
+      'less.md': 'Hello',
+      'log.md': 'Daily standup notes',
+    })
+
+    expect(result).toContain('log.md (reject)')
+    expect(result.toLowerCase()).toMatch(/reserved/)
+    expect(() => readBack('log.md')).toThrow()
+    expect(existsSync(baselinePath())).toBe(false)
+  })
+
+  test('rejects duplicate export paths without writing them', async () => {
+    write('less.md', 'Hello')
+
+    const result = await pullZip(
+      buildZip([
+        { name: 'twin.md', content: 'First' },
+        { name: 'twin.md', content: 'Second' },
+      ])
+    )
+
+    expect(result).toContain('twin.md (reject)')
+    expect(result.toLowerCase()).toMatch(/duplicate/)
+    expect(() => readBack('twin.md')).toThrow()
+    expect(existsSync(baselinePath())).toBe(false)
+  })
+
+  test('rejects an unsafe path without writing the workspace', async () => {
+    write('less.md', 'Hello')
+
+    const result = await pullZip(
+      buildZip([{ name: '../evil.md', content: 'pwned' }])
+    )
+
+    expect(result).toContain('../evil.md (reject)')
+    expect(result.toLowerCase()).toMatch(/unsafe|invalid/)
+    expect(readBack('less.md')).toBe('Hello')
+    expect(existsSync(baselinePath())).toBe(false)
+  })
+
+  test('writes baseline after a mutating create', async () => {
+    write('less.md', 'Hello')
+
+    await pull({ 'less.md': 'Hello', 'scrum.md': 'Sprint' })
+
+    expect(readBaseline()).toEqual({
+      notebookId: 1,
+      notes: { 'scrum.md': 'Sprint' },
+    })
+  })
+
+  test('baseline drops fromPath after a move', async () => {
+    write('less.md', '---\ndoughnut_id: 42\n---\n\n# less\n\nHello')
+
+    const remote = '---\ndoughnut_id: 42\n---\n\n# scrum\n\nHello'
+    await pull({ 'scrum.md': remote })
+
+    expect(readBaseline()).toEqual({
+      notebookId: 1,
+      notes: { 'scrum.md': remote },
+    })
+  })
+
+  test('does not write baseline on matching-content no-op', async () => {
+    write('less.md', 'Hello')
+
+    await expect(pull({ 'less.md': 'Hello' })).resolves.toBe(NOTHING_TO_PULL)
+    expect(existsSync(baselinePath())).toBe(false)
   })
 
   test('leaves a local-only file unchanged when another note updates', async () => {

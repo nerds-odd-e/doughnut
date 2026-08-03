@@ -39,6 +39,7 @@ Feature: Pull remote note changes into a workspace
     Then the file "less.md" in the workspace "./BenNotebook" should hold "Hello world!"
     And the file "Less 2.md" in the workspace "./BenNotebook" should hold "local only"
 
+  @wip
   Scenario: No new local file for a remote-only note
     Given I have a notebook "Ben Notebook" with notes:
       | Title | Content |
