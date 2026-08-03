@@ -4,14 +4,14 @@ milestone: v1.2
 milestone_name: Clean up LIA training participant code
 current_phase: 9
 status: ready
-stopped_at: Phase 9 research complete
-last_updated: "2026-08-03T06:55:00.000Z"
+stopped_at: Phase 9 plans created
+last_updated: "2026-08-03T07:10:00.000Z"
 last_activity: 2026-08-03
-last_activity_desc: Completed 09-RESEARCH.md
+last_activity_desc: Created 09-01 and 09-02 PLAN.md
 progress:
   total_phases: 8
   completed_phases: 2
-  total_plans: 5
+  total_plans: 7
   completed_plans: 5
   percent: 25
 current_phase_name: Resolve preview-before-pull (story 2)
@@ -25,18 +25,18 @@ See: `.planning/PROJECT.md` (updated 2026-08-03)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** Milestone v1.2 — Phase 9 research done (EXP-02); next plan Phase 9
+**Current focus:** Milestone v1.2 — Phase 9 planned (EXP-02); next execute Phase 9
 
 ## Current Position
 
-Phase: 9 — RESEARCH COMPLETE
-Plan: none yet
-Status: 09-RESEARCH.md written — strengthen previewPull taxonomy + diagnostics; applyPull frozen
-Last activity: 2026-08-03 — Completed 09-RESEARCH.md
+Phase: 9 — PLANNED
+Plan: 09-01 ready (wave 1), 09-02 depends on 09-01
+Status: 2 plans — strengthen previewPull+units then E2E dry-run wrap-up; applyPull frozen
+Last activity: 2026-08-03 — Created 09-01 and 09-02 PLAN.md
 
-Progress: Phase 8 complete; Phase 9 ready to plan
+Progress: Phase 8 complete; Phase 9 plans ready to execute
 
-**Next:** Plan Phase 9 — Resolve preview-before-pull (story 2) / EXP-02
+**Next:** `/gsd-execute-phase 9` — Wave 1: 09-01 preview taxonomy + units
 
 ## Performance Metrics
 
@@ -86,6 +86,7 @@ Decisions are logged in PROJECT.md Key Decisions table. Roadmap-shaping decision
 - [Phase 8]: Wiki resolve is same-notebook title→lowest-id→path map; unresolved keeps [[wiki]]
 - [Phase 8]: Attachment rewrite only matches /attachments/images/{digits}/… prefixed with publicOrigin
 - [Phase 8]: CLI /export E2E proves doughnut_id, wiki→MD links, absolute attachment URLs without CLI rewrite (D-06)
+- [Phase 9]: Plans created — previewPull+units (09-01) then cli_sync_dry_run E2E (09-02); D-01..D-09 locked; applyPull frozen
 
 ### Pending Todos
 
@@ -108,7 +109,7 @@ Items acknowledged and deferred at milestone close on 2026-07-25:
 
 ## Session Continuity
 
-**Last session:** 2026-08-03T06:55:00.000Z
-**Stopped at:** Phase 9 research complete
-**Next action:** `/gsd-plan-phase` / create PLAN.md for Phase 9 (Story 2 preview-before-pull)
-**Resume file:** .planning/phases/09-resolve-preview-before-pull-story-2/09-RESEARCH.md
+**Last session:** 2026-08-03T07:10:00.000Z
+**Stopped at:** Phase 9 plans created
+**Next action:** `/gsd-execute-phase 9`
+**Resume file:** .planning/phases/09-resolve-preview-before-pull-story-2/09-01-PLAN.md
