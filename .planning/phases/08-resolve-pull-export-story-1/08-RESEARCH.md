@@ -325,22 +325,13 @@ Optional<WikiLinkTargetReference> ref =
 
 **If A2 is wrong:** Planner should pass an explicit configured public base URL property instead of request Host.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Alias resolution depth**
-   - What we know: Product resolve uses `WikiLinkResolver` + alias index.
-   - What's unclear: Whether Story 1 acceptance requires alias parity in export.
-   - Recommendation: Title/qualified-only now; keep unresolved wiki as fallback; revisit only if E2E product review demands aliases.
+1. **Alias resolution depth** — **RESOLVED:** Title/qualified-only for Phase 8; unresolved wiki keeps `[[…]]` fallback. Alias-index parity deferred unless product review demands it (not required for EXP-01).
 
-2. **Public origin behind reverse proxy**
-   - What we know: Local LB fronts app; CLI sets `DOUGHNUT_API_BASE_URL`.
-   - What's unclear: Whether `HttpServletRequest` sees external Host correctly in all envs.
-   - Recommendation: Implement with request origin + E2E assert; if flaky, add optional config override in a tiny follow-up (still Phase 8 if blocked).
+2. **Public origin behind reverse proxy** — **RESOLVED:** Derive origin from `HttpServletRequest` (scheme + Host) and prove absolute attachment URLs in `cli_export.feature`. If Host flakes behind local LB, fix origin plumbing on the backend export path (still D-06) before inventing CLI rewrite.
 
-3. **Frontmatter wiki values**
-   - What we know: D-04 says “exported bodies”; oracle says “internal references”.
-   - What's unclear: Property values with `[[Note]]`.
-   - Recommendation: Prefer whole-file wiki rewrite after assembly so FM scalars are covered without special cases.
+3. **Frontmatter wiki values** — **RESOLVED:** Whole-file wiki rewrite after note assembly so FM scalars containing `[[Note]]` are covered without a separate FM pass (plans implement this).
 
 ## Environment Availability
 
