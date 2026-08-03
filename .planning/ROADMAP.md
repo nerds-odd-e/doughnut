@@ -187,7 +187,11 @@ Plans:
   3. If remove: story 6 participant path and related debris are gone cleanly
   4. Terry Yin and Tan Yeong Sheng changes remain untouched (HYG-02 standing constraint)
 
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+
+- [ ] 13-01-PLAN.md — Remove Story 6 WIP (`cli_push.feature`) + close PUSH-02 as removed cleanly
 
 ### Phase 14: Class-ready hygiene verify
 
@@ -216,8 +220,8 @@ Plans:
 | 10. Resolve incremental pull (story 3) | v1.2 | 1/1 | Complete | 2026-08-03 |
 | 11. Resolve workspace lint (story 4) | v1.2 | 1/1 | Complete | 2026-08-03 |
 | 12. Resolve push dry-run (story 5) | v1.2 | 1/1 | Complete | 2026-08-03 |
-| 13. Resolve safe push (story 6) | v1.2 | 0/? | Not started | - |
+| 13. Resolve safe push (story 6) | v1.2 | 0/1 | Planned | - |
 | 14. Class-ready hygiene verify | v1.2 | 0/? | Not started | - |
 
 ---
-*Last updated: 2026-08-03 after Phase 12 execute — PUSH-01 closed via 12-01*
+*Last updated: 2026-08-03 after Phase 13 plan — 13-01 remove PUSH-02*
