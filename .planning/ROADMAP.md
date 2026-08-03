@@ -108,10 +108,11 @@ Plans:
   3. If remove: story 2 participant path and related debris are gone cleanly
   4. Terry Yin and Tan Yeong Sheng changes remain untouched (HYG-02 standing constraint)
 
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
-- [ ] 09-01-PLAN.md — Strengthen previewPull taxonomy + diagnostics (create/update/move/reject) + units
+
+- [x] 09-01-PLAN.md — Strengthen previewPull taxonomy + diagnostics (create/update/move/reject) + units
 - [ ] 09-02-PLAN.md — CLI `/sync --dry-run` E2E: action labels, rejects, non-mutation
 
 ### Phase 10: Resolve incremental pull (story 3)
@@ -197,7 +198,7 @@ Plans:
 | 1–6 Spelling match & link | v1.1 | 16/16 | Complete | 2026-07-25 |
 | 7. Publish triage decisions | v1.2 | 3/3 | Complete | 2026-08-03 |
 | 8. Resolve pull/export (story 1) | v1.2 | 2/2 | Complete | 2026-08-03 |
-| 9. Resolve preview-before-pull (story 2) | v1.2 | 0/2 | Planned | - |
+| 9. Resolve preview-before-pull (story 2) | v1.2 | 1/2 | In Progress|  |
 | 10. Resolve incremental pull (story 3) | v1.2 | 0/? | Not started | - |
 | 11. Resolve workspace lint (story 4) | v1.2 | 0/? | Not started | - |
 | 12. Resolve push dry-run (story 5) | v1.2 | 0/? | Not started | - |

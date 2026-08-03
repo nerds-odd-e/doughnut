@@ -65,7 +65,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TRIAGE-01 | Phase 7 | Complete |
 | TRIAGE-02 | Phase 7 | Complete |
 | EXP-01 | Phase 8 | Complete |
-| EXP-02 | Phase 9 | Pending |
+| EXP-02 | Phase 9 | In Progress (09-01 units done; 09-02 E2E pending) |
 | EXP-03 | Phase 10 | Pending |
 | LINT-01 | Phase 11 | Pending |
 | PUSH-01 | Phase 12 | Pending |
