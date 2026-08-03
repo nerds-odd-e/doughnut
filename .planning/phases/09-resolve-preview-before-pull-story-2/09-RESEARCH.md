@@ -362,22 +362,19 @@ CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli
 
 **If empty:** N/A — assumptions listed above need planner/discretion confirmation only where noted; locked D-01..D-09 do not.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Reject wording for reserved `index.md` that export intentionally writes**
+1. **Reject wording for reserved `index.md` that export intentionally writes** — **RESOLVED**
    - What we know: D-04 says not ordinary create/update; export writes `index.md` from readme.
-   - What's unclear: Whether every differing `index.md` is a reject row or omitted/special-cased.
-   - Recommendation: Prefer reject + actionable reason (A1); keep E2E scenarios focused on concept notes + explicit reserved fixtures so healthy notebooks without readme stay quiet.
+   - **Decision (Plan 01):** Basename `index.md` or `log.md` → **reject** with short actionable reason (A1); prefer reject over update when reserved and content differs. E2E focuses on concept notes + explicit reserved fixtures.
 
-2. **Destination path occupied by a different `doughnut_id` during move**
+2. **Destination path occupied by a different `doughnut_id` during move** — **RESOLVED**
    - What we know: Move is id-based path mismatch (D-03).
-   - What's unclear: Whether to emit move+update, move+reject, or single reject.
-   - Recommendation: Prefer **reject** on the destination (“path holds a different doughnut_id”) plus **move** for the id if still informative — or single reject if report noise is high (discretion).
+   - **Decision (Plan 01):** Prefer **reject** on the destination (“path holds a different doughnut_id”); optionally still report move for the id if informative.
 
-3. **Empty-segment / trailing-slash paths**
+3. **Empty-segment / trailing-slash paths** — **RESOLVED**
    - What we know: unsafe rules cover `/`, `\`, `..`.
-   - What's unclear: Whether zip ever emits empty segments.
-   - Recommendation: Treat empty segments as invalid-mapping rejects in the same helper.
+   - **Decision (Plan 01):** Treat empty segments as invalid-mapping **reject** rows in the same non-throwing helper (with other unsafe-path rejects).
 
 ## Environment Availability
 
