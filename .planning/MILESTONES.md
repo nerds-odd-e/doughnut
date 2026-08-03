@@ -1,5 +1,28 @@
 # Milestones
 
+## v1.2 Clean up LIA training participant code (Shipped: 2026-08-03)
+
+**Phases completed:** 8 phases, 12 plans, 28 tasks
+
+**Delivered:** Class-ready portable-workspace CLI for stories 1–5; Story 6 mutate-push WIP removed; Terry/YS untouched.
+
+**Key accomplishments:**
+
+- Published TRIAGE.md — strengthen stories 1–5, remove story 6 (participant-only evidence)
+- Strengthened `/export` — `doughnut_id`, wiki→relative MD, absolute attachment URLs
+- Strengthened `/sync --dry-run` + mutating pull (create/update/move + gated baseline)
+- Strengthened OKF `/lint` portable contract (dup ids, broken links, missing indexes, unsafe paths)
+- Strengthened `/push --dry-run` (load-only); removed Story 6 mutate WIP cleanly
+- Class-ready hygiene — spent docs trashed; HYG-02 audit; retained CLI units + five E2E features green
+
+**Closeout type:** override_closeout
+**Known verification overrides:** 4 (see STATE.md Deferred Items) — quick task `260724-db-timezone-fix` forensics; SEED-001 dormant; formal `/gsd-audit-milestone` skipped; Phases 8–13 lack GSD VERIFICATION.md (shipped via SUMMARY + Phase 14 HYG-03).
+
+**Git range:** `e6b7bea993` → `d861343db2` (~122 commits; ~131 files, +17.6k/−2.9k lines)
+**Timeline:** 2026-08-03 (~6h wall; 111min plan execution)
+
+---
+
 ## v1.1 Spelling Answer Match & Link (Shipped: 2026-07-25)
 
 **Phases completed:** 6 phases, 16 plans, 32 tasks

@@ -2,41 +2,37 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Clean up LIA training participant code
-current_phase: 14
-current_phase_name: Class-ready hygiene verify
-status: milestone_ready
-stopped_at: Phase 14 Complete — HYG-01/02/03 closed; next /gsd-complete-milestone
-last_updated: "2026-08-03T09:12:00.000Z"
+status: Awaiting next milestone
+stopped_at: Phase 14 Complete — HYG-01/02/03 closed
+last_updated: "2026-08-03T09:14:02.233Z"
 last_activity: 2026-08-03
-last_activity_desc: Completed 14-01 — class-ready hygiene verify
+last_activity_desc: Milestone v1.2 completed and archived
 progress:
   total_phases: 8
-  completed_phases: 8
-  total_plans: 12
+  completed_phases: 4
+  total_plans: 16
   completed_plans: 12
-  percent: 100
+  percent: 50
+current_phase: 14
+current_phase_name: Class-ready hygiene verify
 ---
 
 # State
 
 ## Project Reference
 
-See: `.planning/PROJECT.md` (updated 2026-08-03)
+See: `.planning/PROJECT.md` (updated 2026-08-03 after v1.2)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** Milestone v1.2 — Phase 14 Complete; HYG-01/02/03 closed; class-ready for `/gsd-complete-milestone`
+**Current focus:** Planning next milestone — `/gsd-new-milestone`
 
 ## Current Position
 
-Phase: 14 — Class-ready hygiene verify
-Plan: 14-01
-Status: **Complete** — spent docs trashed; HYG-02 audit recorded; cli:test + five CLI E2E green; HYG checkboxes Complete
-Last activity: 2026-08-03 — Executed 14-01-PLAN.md
-
-Progress: [██████████] 100%
-
-**Next:** `/gsd-complete-milestone` (bulk archive of `.planning/phases/07–13` diaries) — do **not** re-open Stories 1–6
+Phase: —
+Plan: —
+Status: Awaiting next milestone (v1.2 archived)
+Last activity: 2026-08-03 — Archived v1.2; REQUIREMENTS cleared for next cycle
 
 ## Performance Metrics
 
@@ -139,20 +135,26 @@ None yet.
 
 ## Deferred Items
 
-Items acknowledged and deferred at milestone close on 2026-07-25:
+Items acknowledged and deferred at milestone close on 2026-08-03 (v1.2 `override_closeout`):
 
 | Category | Item | Status |
 |----------|------|--------|
-| quick_task | 260724-db-timezone-fix | closed — kept as forensics for migration comments |
-| milestone_audit | v1.1 formal `/gsd-audit-milestone` | skipped by acknowledgment |
+| quick_task | 260724-db-timezone-fix | missing — kept as forensics for migration comments (carried from v1.1) |
+| seed | SEED-001-mcq-fuzzy-notebook-title-spelling-match | dormant — resume after cleanup detour |
+| milestone_audit | v1.2 formal `/gsd-audit-milestone` | skipped by acknowledgment |
+| verification | Phases 8–13 formal GSD VERIFICATION.md | missing — shipped via SUMMARY + HYG-03 CLI green matrix; only Phases 7 and 14 have VERIFICATION.md |
 
 **Parked direction (seed):** [SEED-001](./seeds/SEED-001-mcq-fuzzy-notebook-title-spelling-match.md) — MCQ / fuzzy / `Notebook:Title` spelling match; resume after current detour.
 
-**Deferred from Phase 14:** Bulk archive of `.planning/phases/07–13` diaries → `/gsd-complete-milestone` / `/gsd-cleanup`. Story 6 mutate push remains out of milestone.
+**Prior close (v1.1, 2026-07-25):** timezone quick-task forensics + skipped v1.1 audit — superseded by the table above.
 
 ## Session Continuity
 
-**Last session:** 2026-08-03T09:12:00.000Z
-**Stopped at:** Phase 14 Complete — HYG-01/02/03 closed
-**Next action:** `/gsd-complete-milestone` (archive phase diaries; do not re-open Stories 1–6)
+**Last session:** 2026-08-03T09:14:00.000Z
+**Stopped at:** v1.2 milestone archived (`override_closeout`)
+**Next action:** `/gsd-new-milestone`
 **Resume file:** None
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone
