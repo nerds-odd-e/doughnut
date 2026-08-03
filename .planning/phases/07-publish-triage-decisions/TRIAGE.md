@@ -512,12 +512,12 @@ Whole participant-touched inventory under the Story 6 safe-push surface (author 
 
 | Story | Verdict | Author-filter confirmation |
 |-------|---------|----------------------------|
-| 1 | strengthen | Author basis lists only LIA participants; no Terry/YS-only paths drove the verdict |
-| 2 | strengthen | Author basis lists only LIA participants; no Terry/YS-only paths drove the verdict |
-| 3 | strengthen | Author basis lists only LIA participants; no Terry/YS-only paths drove the verdict |
-| 4 | strengthen | Author basis lists Eric Yeh (+ shared helpers from peers); no Terry/YS-only basis |
-| 5 | strengthen | Author basis lists Ben Huang / etta.huang / peers; no Terry/YS-only basis |
-| 6 | remove | Author basis lists Eric Yeh (`@ignore` E2E) + shared dry-run participants; remove targets WIP debris, not Terry/YS work |
+| Story 1 | strengthen | Author basis lists only LIA participants; no Terry/YS-only paths drove the verdict |
+| Story 2 | strengthen | Author basis lists only LIA participants; no Terry/YS-only paths drove the verdict |
+| Story 3 | strengthen | Author basis lists only LIA participants; no Terry/YS-only paths drove the verdict |
+| Story 4 | strengthen | Author basis lists Eric Yeh (+ shared helpers from peers); no Terry/YS-only basis |
+| Story 5 | strengthen | Author basis lists Ben Huang / etta.huang / peers; no Terry/YS-only basis |
+| Story 6 | remove | Author basis lists Eric Yeh (`@ignore` E2E) + shared dry-run participants; remove targets WIP debris, not Terry/YS work |
 
 **Completeness (this publish):** Summary rows 1–6 each `keep` \| `strengthen` \| `remove` (zero Pending/TBD). Citation oracle counts 7 / 3 / 5 / 4 / 4 / 5. Each story has Verdict, Acceptance citations, Capability entrypoints, Delete/keep file set, Participant-touched inventory; strengthen/remove have WIP/gap proofs. Inventories use paths, commands, and scenario names only — no secrets, tokens, or credentials.
 
