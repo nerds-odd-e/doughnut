@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Clean up LIA training participant code
-current_phase: 9
+current_phase: 10
 current_phase_name: Resolve incremental pull (story 3)
 status: ready_to_plan
-stopped_at: Phase 10 context gathered
-last_updated: "2026-08-03T07:19:02.559Z"
+stopped_at: Phase 10 research complete
+last_updated: "2026-08-03T07:22:30.000Z"
 last_activity: 2026-08-03
-last_activity_desc: Completed 09-02-PLAN.md
+last_activity_desc: Wrote 10-RESEARCH.md
 progress:
   total_phases: 8
   completed_phases: 2
@@ -25,18 +25,18 @@ See: `.planning/PROJECT.md` (updated 2026-08-03)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** Milestone v1.2 — Phase 9 complete (EXP-02); next Phase 10 Story 3 applyPull
+**Current focus:** Milestone v1.2 — Phase 10 Story 3 `applyPull` strengthen (EXP-03); research done, ready to plan
 
 ## Current Position
 
-Phase: 9 — COMPLETE (2/2 plans)
-Plan: 09-01 + 09-02 done
-Status: Story 2 preview-before-pull strengthened end-to-end; applyPull still frozen for Phase 10; EXP-02 closed
-Last activity: 2026-08-03 — Completed 09-02-PLAN.md
+Phase: 10 — research complete (CONTEXT + RESEARCH)
+Plan: TBD (prefer 1 coarse plan / 2–3 larger tasks per D-10)
+Status: Story 3 strengthen researched — classify→apply create/update/move + baseline gate; anti-create invert
+Last activity: 2026-08-03 — Wrote 10-RESEARCH.md
 
 Progress: [█████████░] 88%
 
-**Next:** Discuss/plan Phase 10 — Resolve incremental pull (story 3)
+**Next:** `/gsd-plan-phase 10` — create PLAN.md from RESEARCH
 
 ## Performance Metrics
 
@@ -119,7 +119,7 @@ Items acknowledged and deferred at milestone close on 2026-07-25:
 
 ## Session Continuity
 
-**Last session:** 2026-08-03T07:19:02.550Z
-**Stopped at:** Phase 10 context gathered
-**Next action:** `/gsd-discuss-phase 10` (or `/gsd-plan-phase 10`)
-**Resume file:** .planning/phases/10-resolve-incremental-pull-story-3/10-CONTEXT.md
+**Last session:** 2026-08-03T07:22:30.000Z
+**Stopped at:** Phase 10 research complete
+**Next action:** `/gsd-plan-phase 10`
+**Resume file:** .planning/phases/10-resolve-incremental-pull-story-3/10-RESEARCH.md
