@@ -20,7 +20,7 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Workspace lint (story 4)
 
-- [ ] **LINT-01**: Kept or strengthened `/lint` (or equivalent) matches story 4 acceptance (malformed frontmatter, duplicate identities, broken links, missing indexes, actionable findings; valid workspace succeeds) — or removed cleanly
+- [x] **LINT-01**: Kept or strengthened `/lint` (or equivalent) matches story 4 acceptance (malformed frontmatter, duplicate identities, broken links, missing indexes, actionable findings; valid workspace succeeds) — or removed cleanly
 
 ### Push preview & push (stories 5–6)
 
@@ -67,7 +67,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EXP-01 | Phase 8 | Complete |
 | EXP-02 | Phase 9 | Complete |
 | EXP-03 | Phase 10 | Complete |
-| LINT-01 | Phase 11 | Pending |
+| LINT-01 | Phase 11 | Complete |
 | PUSH-01 | Phase 12 | Pending |
 | PUSH-02 | Phase 13 | Pending |
 | HYG-01 | Phase 14 | Pending |

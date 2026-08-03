@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Clean up LIA training participant code
-current_phase: 11
-status: plan_check_passed
-stopped_at: Phase 11 plan check passed — ready to execute
-last_updated: "2026-08-03T15:50:00.000Z"
+current_phase: 12
+current_phase_name: Resolve push dry-run (story 5)
+status: phase_complete
+stopped_at: Completed 11-01-PLAN.md — LINT-01 closed
+last_updated: "2026-08-03T07:59:00.000Z"
 last_activity: 2026-08-03
-last_activity_desc: Plan-check PASSED for 11-01 (LINT-01); wrote 11-PLAN-CHECK.md
+last_activity_desc: Phase 11 executed — portable /lint strengthen; LINT-01 complete
 progress:
   total_phases: 8
-  completed_phases: 2
-  total_plans: 11
-  completed_plans: 8
-  percent: 25
-current_phase_name: Resolve workspace lint (story 4)
+  completed_phases: 5
+  total_plans: 12
+  completed_plans: 9
+  percent: 75
 ---
 
 # State
@@ -25,26 +25,26 @@ See: `.planning/PROJECT.md` (updated 2026-08-03)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** Milestone v1.2 — Phase 11 Story 4 `/lint` (LINT-01); plan check passed
+**Current focus:** Milestone v1.2 — Phase 12 Story 5 push dry-run (PUSH-01); Phase 11 LINT-01 closed
 
 ## Current Position
 
-Phase: 11 — Resolve workspace lint (story 4)
-Plan: 11-01 (ready to execute)
-Status: Phase 11 plan check PASSED — see `11-PLAN-CHECK.md`
-Last activity: 2026-08-03 — Plan-check verified LINT-01 / D-01..D-11 coverage
+Phase: 12 — Resolve push dry-run (story 5)
+Plan: (next — discuss/plan Phase 12)
+Status: Phase 11 complete — LINT-01 satisfied via portable `/lint` strengthen
+Last activity: 2026-08-03 — Executed 11-01 (portableContract + units + cli_lint_workspace E2E)
 
-Progress: [████████░░] 80%
+Progress: [████████░░] 75%
 
-**Next:** `/gsd-execute-phase 11` (or execute-plan on 11-01)
+**Next:** `/gsd-discuss-phase 12` or `/gsd-plan-phase 12`
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 8 (this milestone)
+- Total plans completed: 9 (this milestone)
 - Average duration: ~10min
-- Total execution time: 80min
+- Total execution time: 86min
 
 **By Phase:**
 
@@ -54,6 +54,7 @@ Progress: [████████░░] 80%
 | 08 | 2/2 | 24min | 12min |
 | 09 | 2/2 | 9min | 5min |
 | 10 | 1/1 | 3min | 3min |
+| 11 | 1/1 | 6min | 6min |
 
 *Updated after each plan completion*
 **Per-Plan Metrics:**
@@ -68,6 +69,7 @@ Progress: [████████░░] 80%
 | Phase 09 P01 | 6min | 3 tasks | 7 files |
 | Phase 09 P02 | 3min | 2 tasks | 1 files |
 | Phase 10 P01 | 3min | 3 tasks | 4 files |
+| Phase 11 P01 | 6min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -104,6 +106,9 @@ Decisions are logged in PROJECT.md Key Decisions table. Roadmap-shaping decision
 - [Phase 10]: baseline merge patches prior map for applied paths only (A1); move = write+unlink fromPath (A2)
 - [Phase 10]: EXP-03 closed — units + targeted cli_sync_pull E2E green; HYG-02 intact
 - [Phase 11]: One coarse plan 11-01 — D-03 invert checkpoint + portableContract+units tracer + cli_lint_workspace E2E; LINT-01; HYG-02 import-only extractDoughnutId/unsafePathReason
+- [Phase 11]: Auto-selected invert-portable (D-03); OKF+portableContractFindings closes LINT-01
+- [Phase 11]: Path-oriented wiki; /href workspace-root-relative; index on concept-bearing dirs; E2E unsafe via ../ link
+- [Phase 11]: LINT-01 closed — units + targeted cli_lint_workspace E2E green; HYG-02 intact
 
 ### Pending Todos
 
@@ -126,7 +131,7 @@ Items acknowledged and deferred at milestone close on 2026-07-25:
 
 ## Session Continuity
 
-**Last session:** 2026-08-03T08:00:00.000Z
-**Stopped at:** Phase 11 plan created (11-01)
-**Next action:** `/gsd-execute-phase 11`
-**Resume file:** .planning/phases/11-resolve-workspace-lint-story-4/11-01-PLAN.md
+**Last session:** 2026-08-03T07:59:00.000Z
+**Stopped at:** Completed 11-01-PLAN.md — LINT-01 closed
+**Next action:** `/gsd-discuss-phase 12` or `/gsd-plan-phase 12`
+**Resume file:** None
