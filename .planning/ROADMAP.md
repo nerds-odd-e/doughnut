@@ -50,7 +50,7 @@
 - [x] **Phase 11: Resolve workspace lint (story 4)** - Keep/strengthen or cleanly remove story 4 participant work
 - [x] **Phase 12: Resolve push dry-run (story 5)** - Keep/strengthen or cleanly remove story 5 participant work
 - [x] **Phase 13: Resolve safe push (story 6)** - Keep/strengthen or cleanly remove story 6 participant work
-- [ ] **Phase 14: Class-ready hygiene verify** - No training WIP left; Terry/YS untouched; targeted tests green
+- [x] **Phase 14: Class-ready hygiene verify** - No training WIP left; Terry/YS untouched; targeted tests green
 
 ## Phase Details
 
@@ -206,11 +206,12 @@ Plans:
   3. Targeted CLI/unit and relevant CLI E2E for retained capabilities pass
   4. A future class can start from this tree without leftover training debris for stories 1–6
 
-**Plans**: 1 plan
+**Plans**: 1/1 plans executed
+**Status:** Complete
 
 Plans:
 
-- [ ] 14-01-PLAN.md — Trash spent docs/plans trio + HYG-02 audit + retained CLI green matrix + close HYG-01/02/03
+- [x] 14-01-PLAN.md — Trash spent docs/plans trio + HYG-02 audit + retained CLI green matrix + close HYG-01/02/03
 
 ## Progress
 
@@ -225,7 +226,7 @@ Plans:
 | 11. Resolve workspace lint (story 4) | v1.2 | 1/1 | Complete | 2026-08-03 |
 | 12. Resolve push dry-run (story 5) | v1.2 | 1/1 | Complete | 2026-08-03 |
 | 13. Resolve safe push (story 6) | v1.2 | 1/1 | Complete | 2026-08-03 |
-| 14. Class-ready hygiene verify | v1.2 | 0/? | Not started | - |
+| 14. Class-ready hygiene verify | v1.2 | 1/1 | Complete   | 2026-08-03 |
 
 ---
-*Last updated: 2026-08-03 after Phase 13 execute — PUSH-02 removed cleanly*
+*Last updated: 2026-08-03 after Phase 14 execute — HYG-01/02/03 Complete; milestone-ready for /gsd-complete-milestone*

@@ -29,9 +29,9 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Hygiene & class readiness
 
-- [ ] **HYG-01**: WIP, incorrect, or non-valuable participant code for stories 1–6 is gone (including orphaned tests, `@wip` scenarios that will not be finished, and spent training plans/docs that no longer describe the tree)
-- [ ] **HYG-02**: Terry Yin and Tan Yeong Sheng changes remain untouched by this milestone’s removals/rewrites
-- [ ] **HYG-03**: After triage actions, targeted CLI/unit and relevant CLI E2E for retained capabilities pass; the tree has no leftover training WIP for stories 1–6
+- [x] **HYG-01**: WIP, incorrect, or non-valuable participant code for stories 1–6 is gone (including orphaned tests, `@wip` scenarios that will not be finished, and spent training plans/docs that no longer describe the tree)
+- [x] **HYG-02**: Terry Yin and Tan Yeong Sheng changes remain untouched by this milestone’s removals/rewrites
+- [x] **HYG-03**: After triage actions, targeted CLI/unit and relevant CLI E2E for retained capabilities pass; the tree has no leftover training WIP for stories 1–6
 
 ## v2 Requirements
 
@@ -70,9 +70,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LINT-01 | Phase 11 | Complete |
 | PUSH-01 | Phase 12 | Complete |
 | PUSH-02 | Phase 13 | Complete |
-| HYG-01 | Phase 14 | Pending |
-| HYG-02 | Phase 14 | Pending |
-| HYG-03 | Phase 14 | Pending |
+| HYG-01 | Phase 14 | Complete |
+| HYG-02 | Phase 14 | Complete |
+| HYG-03 | Phase 14 | Complete |
 
 **Coverage:**
 
@@ -84,4 +84,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-08-03*
-*Last updated: 2026-08-03 after Phase 13 — PUSH-02 removed cleanly*
+*Last updated: 2026-08-03 after Phase 14 — HYG-01/02/03 Complete; class-ready hygiene closed*

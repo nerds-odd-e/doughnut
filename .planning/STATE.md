@@ -4,17 +4,17 @@ milestone: v1.2
 milestone_name: Clean up LIA training participant code
 current_phase: 14
 current_phase_name: Class-ready hygiene verify
-status: ready_to_execute
-stopped_at: Phase 14 plans ready — auto-advancing to execute
-last_updated: "2026-08-03T09:04:04.088Z"
+status: milestone_ready
+stopped_at: Phase 14 Complete — HYG-01/02/03 closed; next /gsd-complete-milestone
+last_updated: "2026-08-03T09:12:00.000Z"
 last_activity: 2026-08-03
-last_activity_desc: Created 14-01-PLAN.md
+last_activity_desc: Completed 14-01 — class-ready hygiene verify
 progress:
   total_phases: 8
-  completed_phases: 3
-  total_plans: 16
-  completed_plans: 11
-  percent: 38
+  completed_phases: 8
+  total_plans: 12
+  completed_plans: 12
+  percent: 100
 ---
 
 # State
@@ -25,26 +25,26 @@ See: `.planning/PROJECT.md` (updated 2026-08-03)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** Milestone v1.2 — Phase 14 plan ready (HYG-01/02/03); Phase 13 PUSH-02 closed as **removed cleanly**
+**Current focus:** Milestone v1.2 — Phase 14 Complete; HYG-01/02/03 closed; class-ready for `/gsd-complete-milestone`
 
 ## Current Position
 
 Phase: 14 — Class-ready hygiene verify
 Plan: 14-01
-Status: Plan ready — 1 coarse tracer (trash D-02 docs + HYG-02 audit + cli:test + five E2E + close)
-Last activity: 2026-08-03 — Created 14-01-PLAN.md
+Status: **Complete** — spent docs trashed; HYG-02 audit recorded; cli:test + five CLI E2E green; HYG checkboxes Complete
+Last activity: 2026-08-03 — Executed 14-01-PLAN.md
 
-Progress: [████████░░] 79%
+Progress: [██████████] 100%
 
-**Next:** `/gsd-execute-phase 14`
+**Next:** `/gsd-complete-milestone` (bulk archive of `.planning/phases/07–13` diaries) — do **not** re-open Stories 1–6
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 11 (this milestone)
+- Total plans completed: 12 (this milestone)
 - Average duration: ~9min
-- Total execution time: 99min
+- Total execution time: 111min
 
 **By Phase:**
 
@@ -57,6 +57,7 @@ Progress: [████████░░] 79%
 | 11 | 1/1 | 6min | 6min |
 | 12 | 1/1 | 7min | 7min |
 | 13 | 1/1 | 6min | 6min |
+| 14 | 1/1 | 12min | 12min |
 
 *Updated after each plan completion*
 **Per-Plan Metrics:**
@@ -74,6 +75,7 @@ Progress: [████████░░] 79%
 | Phase 11 P01 | 6min | 3 tasks | 7 files |
 | Phase 12 P01 | 7min | 1 tasks | 8 files |
 | Phase 13 P01 | 6min | 1 tasks | 6 files |
+| Phase 14 P01 | 12min | 1 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -122,6 +124,10 @@ Decisions are logged in PROJECT.md Key Decisions table. Roadmap-shaping decision
 - [Phase 13]: Plan 13-01 — one tracer: trash cli_push.feature + optional D-04 help polish + PUSH-02 removed-cleanly close (D-01..D-06)
 - [Phase 13]: PUSH-02 closed as **removed cleanly** — deleted `cli_push.feature`; Phase 12 dry-run kept; no applyPush
 - [Phase 13]: D-04 help: `Requires --dry-run.` durable product copy; drop “so far” foreshadowing
+- [Phase 14]: D-02 trashed three spent `docs/plans/` training files; D-03 kept oracle + phase diaries
+- [Phase 14]: HYG-02 audit — Terry `previewPullActions.ts` import-only / not rewritten; TRIAGE names no YS delete/rewrite path
+- [Phase 14]: HYG-03 green — `pnpm cli:test` (492) + five retained CLI E2E (38 scenarios)
+- [Phase 14]: HYG-01/02/03 Complete; milestone-ready handoff → `/gsd-complete-milestone`
 
 ### Pending Todos
 
@@ -142,9 +148,11 @@ Items acknowledged and deferred at milestone close on 2026-07-25:
 
 **Parked direction (seed):** [SEED-001](./seeds/SEED-001-mcq-fuzzy-notebook-title-spelling-match.md) — MCQ / fuzzy / `Notebook:Title` spelling match; resume after current detour.
 
+**Deferred from Phase 14:** Bulk archive of `.planning/phases/07–13` diaries → `/gsd-complete-milestone` / `/gsd-cleanup`. Story 6 mutate push remains out of milestone.
+
 ## Session Continuity
 
-**Last session:** 2026-08-03T09:04:04.079Z
-**Stopped at:** Phase 14 plans ready — auto-advancing to execute
-**Next action:** `/gsd-execute-phase 14`
-**Resume file:** .planning/phases/14-class-ready-hygiene-verify/14-01-PLAN.md
+**Last session:** 2026-08-03T09:12:00.000Z
+**Stopped at:** Phase 14 Complete — HYG-01/02/03 closed
+**Next action:** `/gsd-complete-milestone` (archive phase diaries; do not re-open Stories 1–6)
+**Resume file:** None
