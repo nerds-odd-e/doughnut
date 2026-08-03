@@ -9,7 +9,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import { previewPull } from '../src/sync/previewPull.js'
-import { zipOfNotes } from './zipFixture.js'
+import { buildZip, zipOfNotes } from './zipFixture.js'
 
 describe('previewPull', () => {
   let workspace: string
@@ -38,6 +38,17 @@ describe('previewPull', () => {
       exportNotebookAsZip: () =>
         Promise.resolve({
           bytes: zipOfNotes(notes),
+          fileName: 'Ben Notebook.zip',
+        }),
+    })
+
+  const previewZip = (bytes: Buffer, path = workspace) =>
+    previewPull({
+      notebookId: 1,
+      workspacePath: path,
+      exportNotebookAsZip: () =>
+        Promise.resolve({
+          bytes,
           fileName: 'Ben Notebook.zip',
         }),
     })
@@ -238,6 +249,74 @@ describe('previewPull', () => {
 
     expect(report).toContain('scrum.md (create)')
     expect(report).not.toContain('(move)')
+  })
+
+  test('rejects a reserved log.md basename with a short reason', async () => {
+    write('less.md', 'Hello')
+
+    const report = await preview({
+      'less.md': 'Hello',
+      'log.md': 'Daily standup notes',
+    })
+
+    expect(report).toContain('log.md (reject)')
+    expect(report.toLowerCase()).toMatch(/reserved/)
+    expect(report).not.toMatch(/log\.md \(create\)/)
+    expect(report).not.toMatch(/log\.md \(update\)/)
+  })
+
+  test('rejects a reserved index.md even when content differs', async () => {
+    write('index.md', 'Old readme')
+
+    const report = await preview({ 'index.md': 'New readme' })
+
+    expect(report).toContain('index.md (reject)')
+    expect(report.toLowerCase()).toMatch(/reserved/)
+    expect(report).not.toMatch(/index\.md \(update\)/)
+  })
+
+  test('rejects paths under .doughnut-sync as sync metadata', async () => {
+    const report = await preview({
+      '.doughnut-sync/baseline.json.md': 'not a note',
+    })
+
+    expect(report).toContain('.doughnut-sync/baseline.json.md (reject)')
+    expect(report.toLowerCase()).toMatch(/sync metadata|doughnut-sync/)
+    expect(report).not.toBe('No changes to pull.')
+  })
+
+  test('rejects duplicate export paths', async () => {
+    write('less.md', 'Hello')
+
+    const report = await previewZip(
+      buildZip([
+        { name: 'twin.md', content: 'First' },
+        { name: 'twin.md', content: 'Second' },
+      ])
+    )
+
+    expect(report).toContain('twin.md (reject)')
+    expect(report.toLowerCase()).toMatch(/duplicate/)
+    expect(report).not.toBe('No changes to pull.')
+  })
+
+  test('rejects an unsafe path without writing the workspace', async () => {
+    write('less.md', 'Hello')
+
+    const report = await previewZip(
+      buildZip([{ name: '../evil.md', content: 'pwned' }])
+    )
+
+    expect(report).toContain('../evil.md (reject)')
+    expect(report.toLowerCase()).toMatch(/unsafe|invalid/)
+    expect(readBack('less.md')).toBe('Hello')
+  })
+
+  test('reports rejects-only instead of the clean no-op sentinel', async () => {
+    const report = await preview({ 'log.md': 'reserved only' })
+
+    expect(report).toContain('log.md (reject)')
+    expect(report).not.toBe('No changes to pull.')
   })
 
   test('reports the same difference when run twice', async () => {
