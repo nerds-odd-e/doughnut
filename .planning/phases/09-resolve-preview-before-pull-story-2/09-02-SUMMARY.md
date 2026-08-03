@@ -106,7 +106,7 @@ Each task was committed atomically:
 1. **Task 1: E2E tracer — action label visible on /sync --dry-run** — `2820fdcffb` (test)
 2. **Task 2: E2E expand — reject finding + non-mutation Rule** — `f8164c06fc` (test)
 
-**Plan metadata:** (pending docs commit)
+**Plan metadata:** `1f92fb0bdd` (docs: complete plan + Phase 9 / EXP-02 close)
 
 ## Files Created/Modified
 
