@@ -4,10 +4,10 @@ milestone: v1.2
 milestone_name: Clean up LIA training participant code
 current_phase: 7
 status: completed
-stopped_at: Phase 8 context gathered
-last_updated: "2026-08-03T06:16:29.799Z"
+stopped_at: Phase 8 research complete
+last_updated: "2026-08-03T06:25:00.000Z"
 last_activity: 2026-08-03
-last_activity_desc: Phase 7 marked complete
+last_activity_desc: Phase 8 research written
 progress:
   total_phases: 8
   completed_phases: 1
@@ -101,6 +101,6 @@ Items acknowledged and deferred at milestone close on 2026-07-25:
 ## Session Continuity
 
 **Last session:** 2026-08-03T06:16:29.793Z
-**Stopped at:** Phase 8 context gathered
-**Next action:** Plan/execute Phase 8 (Resolve pull/export — story 1 strengthen from TRIAGE.md)
-**Resume file:** .planning/phases/08-resolve-pull-export-story-1/08-CONTEXT.md
+**Stopped at:** Phase 8 research complete
+**Next action:** Plan Phase 8 (create PLAN.md from 08-RESEARCH.md + 08-CONTEXT.md)
+**Resume file:** .planning/phases/08-resolve-pull-export-story-1/08-RESEARCH.md
