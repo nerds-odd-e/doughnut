@@ -1,0 +1,84 @@
+# Requirements: v1.2 Clean up LIA training participant code
+
+**Defined:** 2026-08-03
+**Core Value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
+
+## v1 Requirements
+
+Requirements for this milestone. Each maps to roadmap phases.
+
+### Triage
+
+- [ ] **TRIAGE-01**: Maintainer has a keep / strengthen / remove decision for each of stories 1–6, based only on non–Terry / non–Yeong Sheng participant work
+- [ ] **TRIAGE-02**: Each decision cites the matching acceptance examples from `.planning/notes/2026-07-24-portable-notebook-workspace.md`
+
+### Export & pull (stories 1–3)
+
+- [ ] **EXP-01**: Kept or strengthened pull/export behavior matches story 1 acceptance (hierarchy, identity frontmatter, indexes, links, no secrets, failed pull not presented as success) — or the incomplete/incorrect path is removed cleanly
+- [ ] **EXP-02**: Kept or strengthened preview-before-pull matches story 2 (paths/actions reported; preview mutates nothing) — or removed cleanly
+- [ ] **EXP-03**: Kept or strengthened incremental pull matches story 3 (unchanged files undisturbed; idempotent re-pull) — or removed cleanly
+
+### Workspace lint (story 4)
+
+- [ ] **LINT-01**: Kept or strengthened `/lint` (or equivalent) matches story 4 acceptance (malformed frontmatter, duplicate identities, broken links, missing indexes, actionable findings; valid workspace succeeds) — or removed cleanly
+
+### Push preview & push (stories 5–6)
+
+- [ ] **PUSH-01**: Kept or strengthened push dry-run / conflict preview matches story 5 (unchanged / local / remote / divergent; no mutation) — or removed cleanly
+- [ ] **PUSH-02**: Kept or strengthened push of existing notes matches story 6 (body + supported frontmatter; version-safe; conflicts not silent overwrite; successful push refreshes sync metadata) — or removed cleanly
+
+### Hygiene & class readiness
+
+- [ ] **HYG-01**: WIP, incorrect, or non-valuable participant code for stories 1–6 is gone (including orphaned tests, `@wip` scenarios that will not be finished, and spent training plans/docs that no longer describe the tree)
+- [ ] **HYG-02**: Terry Yin and Tan Yeong Sheng changes remain untouched by this milestone’s removals/rewrites
+- [ ] **HYG-03**: After triage actions, targeted CLI/unit and relevant CLI E2E for retained capabilities pass; the tree has no leftover training WIP for stories 1–6
+
+## v2 Requirements
+
+Deferred — not in this milestone’s roadmap.
+
+### Portable workspace (later)
+
+- Stories 7–10: create note from local file; rename via filename; move between folders; reconcile deletions
+- Further portable-workspace capabilities beyond keep/strengthen of existing participant work
+
+### Spelling follow-ons (parked)
+
+- MCQ accidental-match; fuzzy/partial matching; `Notebook:Title` typing — see [SEED-001](./seeds/SEED-001-mcq-fuzzy-notebook-title-spelling-match.md)
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| Stories 7–10 | Not attempted in this LIA class |
+| Terry Yin / Tan Yeong Sheng changes | Explicit skip — do not revert or rewrite |
+| New portable-workspace features beyond keep/strengthen | Cleanup milestone only |
+| Spelling MCQ / fuzzy / `Notebook:Title` | Parked as SEED-001 |
+| Broad unrelated refactors | Not required by triage decisions |
+
+## Traceability
+
+Which phases cover which requirements. Updated during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| TRIAGE-01 | — | Pending |
+| TRIAGE-02 | — | Pending |
+| EXP-01 | — | Pending |
+| EXP-02 | — | Pending |
+| EXP-03 | — | Pending |
+| LINT-01 | — | Pending |
+| PUSH-01 | — | Pending |
+| PUSH-02 | — | Pending |
+| HYG-01 | — | Pending |
+| HYG-02 | — | Pending |
+| HYG-03 | — | Pending |
+
+**Coverage:**
+- v1 requirements: 11 total
+- Mapped to phases: 0
+- Unmapped: 11 ⚠️
+
+---
+*Requirements defined: 2026-08-03*
+*Last updated: 2026-08-03 after milestone v1.2 scoping*
