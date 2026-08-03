@@ -1,33 +1,38 @@
 ---
 name: post-change-refactor
 description: >-
-  Refactor and clean up the uncommitted change before committing. Eliminate
-  duplication, rename unclear domain concepts, collapse shotgun surgery when
-  another similar change is likely, remove dead / test-only / redundant code,
-  split files larger than 250 lines into cohesive modules, and confirm
-  related tests still pass. Use after finishing a phase or sub-phase and
-  before commit, or whenever the developer asks to clean up the current
-  change. Triggers on: refactor change, clean up change, post-change
-  refactor, before commit cleanup, tidy current change.
+  Refactor concepts implicated by the current uncommitted change before commit.
+  Use concept-bounded scope even when completion requires untouched code, but
+  Jidoka-stop before unapproved cross-subsystem refactoring. Remove duplication,
+  unclear naming, shotgun surgery, dead / test-only / redundant code, and
+  oversized files; run related tests. Use after a phase or sub-phase, before
+  commit, or on: refactor change, clean up change, post-change refactor, before
+  commit cleanup, tidy current change.
 ---
 
 <objective>
-Clean the **current uncommitted change** so it is cohesive, capability-named,
-and free of speculative structure — then hand control back for commit.
+Clean concepts implicated by the **current uncommitted change** so they are
+cohesive, capability-named, and non-speculative, then return control for commit.
 
 Purpose: Local wrap-up gate required by `execute-plan` / `/gsd-execute-phase`
 (see `.cursor/rules/gsd-coexistence.mdc`). Structure-only: no new behavior.
 
-Output: Refactored working tree + short summary ending with
-`## REFACTOR COMPLETE`. **Do not commit** — the caller commits.
+Output: Refactored tree + `## REFACTOR COMPLETE`, or an impact report +
+`## REFACTOR JIDOKA STOP`. **Do not commit** — the caller commits after success.
 </objective>
 
 <context>
 **Mandatory first read:** `.cursor/agent-map.md` (navigation + focused test commands).
 
-**Scope — "the current change":** files touched since the last commit
-(staged + unstaged + untracked), plus files that directly depend on them or
-are depended on by them. Do **not** sweep unrelated parts of the repo.
+**Scope is concept-bounded, not file-bounded.** A candidate must be triggered
+by an issue introduced, exposed, or materially aggravated by the current change
+or highly related code. Such code represents the same concept, duplicates the
+same knowledge, or must change to leave it coherent. Dependency adjacency alone
+is neither required nor sufficient.
+
+Find the smallest complete set of representations, callers, tests, fixtures,
+and configuration needed for coherence, including untouched code when needed.
+Every edit must serve that candidate; do not initiate nearby cleanup.
 
 Discover scope:
 
@@ -50,7 +55,15 @@ Behavior/Structure unit in the active plan
 (`.planning/phases/*/`, `.planning/quick/*/`, or legacy `ongoing/*.md`).
 Anything justified only by a later phase, or by "we might need it later",
 is speculative — remove it. No plan → justification comes only from the
-current change.
+current change. The immediate next plan unit may justify retaining code, but
+does not independently trigger unrelated refactoring.
+
+**Subsystem boundary:** Backend production code, frontend production code, CLI,
+MCP server, and database schema are separate subsystems. Tests, E2E, fixtures,
+generated artifacts, and configuration following one production seam do not
+alone create a crossing. Existing behavior work spanning subsystems also does
+not trigger the gate; the **refactoring itself** must require coordinated
+production edits across boundaries.
 
 **Invokers:** `execute-plan` (fresh sub-agent before commit), `bug-fixing`,
 `test-optimization`, or on-demand developer request.
@@ -63,7 +76,31 @@ Run the git discovery commands above. If there is no uncommitted change,
 report empty scope and emit `## REFACTOR COMPLETE` with no edits.
 </preflight_gate>
 
-Run each check below **in order**. After all pass, return to the caller —
+<preflight_gate name="map_concept_impact">
+Before editing, perform a fast read-only pass over every check. For each
+candidate, record:
+
+1. The triggering issue and its connection to the current change.
+2. The minimum concept-bounded edit set needed for coherent completion.
+3. The production subsystems that edit set would touch.
+
+Use references as navigation, not automatic scope. Do not inventory general
+repository cleanup.
+</preflight_gate>
+
+<preflight_gate name="cross_subsystem_jidoka">
+If a candidate requires production refactoring in more than one subsystem,
+stop before editing unless the human explicitly authorized that named concept
+and those subsystems. Generic "clean up" or "refactor" requests do not qualify.
+
+Return the `<output>` Jidoka report; do not enter the edit/test pass or
+substitute a partial refactoring. If discovered while editing, stop before the
+first cross-subsystem edit and leave no partial candidate: reverse only this
+agent's edits for that candidate, never pre-existing user changes.
+</preflight_gate>
+
+After the gate passes, execute the recorded candidates **in check order**.
+Do not repeat broad discovery. After all checks pass, return to the caller —
 **do not commit** from inside this skill.
 
 <step name="duplication">
@@ -122,7 +159,7 @@ When in doubt, **delete**. The next phase will reintroduce only what it needs.
 </step>
 
 <step name="file_size">
-For every file touched by the change:
+For every file in the current diff and every file proposed for editing:
 
 ```bash
 wc -l <path>
@@ -156,7 +193,9 @@ the refactor (not the original change), fix it now.
 </process>
 
 <success_criteria>
-- Scope limited to the current change (+ direct dependents/dependencies)
+- Every candidate is triggered by the current change or highly related code
+- Edits are the smallest coherent concept-bounded set, including untouched files
+- No cross-subsystem refactoring without concept-specific human authorization
 - No speculative structure beyond current change / immediate next plan unit
 - Duplication, naming, shotgun, dead-code, and 250-line checks applied
 - Related focused tests green
@@ -165,7 +204,7 @@ the refactor (not the original change), fix it now.
 </success_criteria>
 
 <output>
-Report a short summary to the caller, then the completion marker:
+On successful completion, report a short summary to the caller:
 
 1. Which checks led to changes — duplication / naming / shotgun / dead code /
    file size (or "none — already clean").
@@ -177,10 +216,30 @@ Report a short summary to the caller, then the completion marker:
 ```
 
 Hand control back. **Do not commit** — the caller commits.
+
+On a cross-subsystem gate, report only decision-relevant facts:
+
+1. Triggering issue and its connection to the current change.
+2. Concept requiring refactoring.
+3. Affected subsystems and representative files.
+4. Why a single-subsystem edit would be partial or misleading.
+5. Expected risk and focused validation.
+6. Choices: authorize it, defer it, or approve a described narrow exception.
+
+End with:
+
+```
+## REFACTOR JIDOKA STOP
+```
+
+Do not emit `## REFACTOR COMPLETE`. The caller must surface the decision and
+must not consider refactoring complete or commit until the human decides.
 </output>
 
 <out_of_scope>
-- Do not redesign code outside the changed files.
+- Do not initiate unrelated refactoring discovered during concept tracing.
+- Do not apply cross-subsystem refactoring without explicit, concept-specific
+  human authorization.
 - Do not start a new phase or add new behavior — Structure only.
 - Do not run the entire test suite or trigger CI.
 - Do not regenerate the OpenAPI client unless controller/DTO signatures
