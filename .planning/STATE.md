@@ -4,17 +4,17 @@ milestone: v1.2
 milestone_name: Clean up LIA training participant code
 current_phase: 12
 current_phase_name: Resolve push dry-run (story 5)
-status: planning_complete
-stopped_at: Phase 12 plan created (12-01)
-last_updated: "2026-08-03T08:15:00.000Z"
+status: phase_complete
+stopped_at: Completed 12-01-PLAN.md
+last_updated: "2026-08-03T08:23:52.144Z"
 last_activity: 2026-08-03
-last_activity_desc: Wrote 12-01-PLAN.md (coarse strengthen: load-only baseline + create/update)
+last_activity_desc: Executed 12-01 — PUSH-01 strengthen green (units + E2E)
 progress:
   total_phases: 8
-  completed_phases: 2
-  total_plans: 12
-  completed_plans: 9
-  percent: 25
+  completed_phases: 3
+  total_plans: 13
+  completed_plans: 10
+  percent: 77
 ---
 
 # State
@@ -25,26 +25,26 @@ See: `.planning/PROJECT.md` (updated 2026-08-03)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** Milestone v1.2 — Phase 12 Story 5 push dry-run (PUSH-01); Phase 11 LINT-01 closed
+**Current focus:** Milestone v1.2 — Phase 12 PUSH-01 closed; next Phase 13 Story 6 (PUSH-02)
 
 ## Current Position
 
 Phase: 12 — Resolve push dry-run (story 5)
-Plan: 12-01 ready to execute
-Status: Phase 12 planning complete — 12-01-PLAN.md (1 coarse plan / 1 tracer task)
-Last activity: 2026-08-03 — Wrote 12-01-PLAN.md (load-only baseline + create/update)
+Plan: 12-01 complete (1/1)
+Status: Phase 12 complete — PUSH-01 strengthen landed (load-only baseline + create/update)
+Last activity: 2026-08-03 — Executed 12-01 (feat d29f3b841b); units 30/30 + E2E 11/11
 
-Progress: [████████░░] 75%
+Progress: [████████░░] 77%
 
-**Next:** `/gsd-execute-phase 12`
+**Next:** `/gsd-progress` or discuss/plan Phase 13 (PUSH-02)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 9 (this milestone)
-- Average duration: ~10min
-- Total execution time: 86min
+- Total plans completed: 10 (this milestone)
+- Average duration: ~9min
+- Total execution time: 93min
 
 **By Phase:**
 
@@ -55,6 +55,7 @@ Progress: [████████░░] 75%
 | 09 | 2/2 | 9min | 5min |
 | 10 | 1/1 | 3min | 3min |
 | 11 | 1/1 | 6min | 6min |
+| 12 | 1/1 | 7min | 7min |
 
 *Updated after each plan completion*
 **Per-Plan Metrics:**
@@ -70,6 +71,7 @@ Progress: [████████░░] 75%
 | Phase 09 P02 | 3min | 2 tasks | 1 files |
 | Phase 10 P01 | 3min | 3 tasks | 4 files |
 | Phase 11 P01 | 6min | 3 tasks | 7 files |
+| Phase 12 P01 | 7min | 1 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -110,6 +112,10 @@ Decisions are logged in PROJECT.md Key Decisions table. Roadmap-shaping decision
 - [Phase 11]: Path-oriented wiki; /href workspace-root-relative; index on concept-bearing dirs; E2E unsafe via ../ link
 - [Phase 11]: LINT-01 closed — units + targeted cli_lint_workspace E2E green; HYG-02 intact
 - [Phase 12]: One coarse plan 12-01 — single tracer (units+E2E); D-01 both gaps; D-02/D-03 load-only + export prime; D-04/D-05 create/update path-union; D-06 Story 6 boundary; D-07 proof; D-08 fewer commits than Phase 11
+- [Phase 12]: D-02: previewPush never writes .doughnut-sync; loadPushBaseline only
+- [Phase 12]: D-04/A1: intersecting keep (push)/(pull)/(CONFLICT); creates use (create) heading
+- [Phase 12]: D-08: one implementation commit for code+units+E2E
+- [Phase 12]: PUSH-01 closed — units + targeted cli_push_dry_run E2E green; HYG-02 intact
 
 ### Pending Todos
 
@@ -132,7 +138,7 @@ Items acknowledged and deferred at milestone close on 2026-07-25:
 
 ## Session Continuity
 
-**Last session:** 2026-08-03T16:20:00.000Z
-**Stopped at:** Phase 12 planning complete (12-01-PLAN.md)
-**Next action:** `/gsd-execute-phase 12`
-**Resume file:** .planning/phases/12-resolve-push-dry-run-story-5/12-01-PLAN.md
+**Last session:** 2026-08-03T08:23:52.136Z
+**Stopped at:** Completed 12-01-PLAN.md
+**Next action:** Discuss/plan Phase 13 (PUSH-02) or `/gsd-progress`
+**Resume file:** None

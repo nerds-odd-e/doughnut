@@ -24,7 +24,7 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Push preview & push (stories 5–6)
 
-- [ ] **PUSH-01**: Kept or strengthened push dry-run / conflict preview matches story 5 (unchanged / local / remote / divergent; no mutation) — or removed cleanly
+- [x] **PUSH-01**: Kept or strengthened push dry-run / conflict preview matches story 5 (unchanged / local / remote / divergent; no mutation) — or removed cleanly
 - [ ] **PUSH-02**: Kept or strengthened push of existing notes matches story 6 (body + supported frontmatter; version-safe; conflicts not silent overwrite; successful push refreshes sync metadata) — or removed cleanly
 
 ### Hygiene & class readiness
@@ -68,7 +68,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EXP-02 | Phase 9 | Complete |
 | EXP-03 | Phase 10 | Complete |
 | LINT-01 | Phase 11 | Complete |
-| PUSH-01 | Phase 12 | Pending |
+| PUSH-01 | Phase 12 | Complete |
 | PUSH-02 | Phase 13 | Pending |
 | HYG-01 | Phase 14 | Pending |
 | HYG-02 | Phase 14 | Pending |
