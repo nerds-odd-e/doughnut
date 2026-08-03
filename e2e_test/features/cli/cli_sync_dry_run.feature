@@ -80,6 +80,21 @@ Feature: Preview what a pull would change
       When I enter the slash command "/sync --dry-run ./BenNotebook" in the interactive CLI
       Then I should see "No changes to pull." in past CLI assistant messages
 
+  Rule: Reserved role files are reported as rejects
+
+    Scenario: Preview reports a reserved log.md as a reject
+      Given I have a notebook "Ben Notebook" with notes:
+        | Title | Content             |
+        | log   | Daily standup notes |
+      And an empty workspace "./BenNotebook"
+      And I enter the slash command "/use Ben Notebook" in the interactive CLI
+      When I enter the slash command "/sync --dry-run ./BenNotebook" in the interactive CLI
+      Then I should see "log.md (reject)" in past CLI assistant messages
+      And I should see "reserved" with any spacing in past CLI assistant messages
+      And I should see "1 reject." in past CLI assistant messages
+      And the workspace "./BenNotebook" should hold only:
+        | Path |
+
   Rule: The preview leaves nothing behind
 
     Background:
