@@ -25,6 +25,9 @@ describe('lintWorkspace', () => {
   const concept = (keys: string, body: string) =>
     `---\n${keys}\n---\n\n# ${body}`
 
+  /** Root listing required once concept-bearing directories must carry index.md. */
+  const writeRootIndex = () => write('index.md', '# Workspace\n')
+
   describe('the path the user typed', () => {
     test('says so when nothing is there, rather than throwing', () => {
       const missing = join(root, 'nowhere')
@@ -41,6 +44,7 @@ describe('lintWorkspace', () => {
 
     test('strips surrounding quotes, as a shell would', () => {
       write('apple.md', concept('type: concept', 'apple'))
+      writeRootIndex()
 
       expect(lintWorkspace(`"${root}"`)).toBe(
         'Workspace follows the OKF format.'
@@ -68,12 +72,14 @@ describe('lintWorkspace', () => {
 
   test('names the concept the problem was found in', () => {
     write('banana.md', '# banana')
+    writeRootIndex()
 
     expect(lintWorkspace(root)).toContain('banana.md:1')
   })
 
   test('reports frontmatter the closing `---` is missing from', () => {
     write('apple.md', '---\ntype: concept\n\n# apple')
+    writeRootIndex()
 
     expect(lintWorkspace(root)).toContain(
       'Frontmatter is not closed with `---`'
@@ -82,42 +88,49 @@ describe('lintWorkspace', () => {
 
   test('reports frontmatter that does not say what type the concept is', () => {
     write('apple.md', concept('title: apple', 'apple'))
+    writeRootIndex()
 
     expect(lintWorkspace(root)).toContain('Frontmatter has no `type` key')
   })
 
   test('reports frontmatter no YAML parser can read', () => {
     write('apple.md', concept('type: concept\n\ttitle: apple', 'apple'))
+    writeRootIndex()
 
     expect(lintWorkspace(root)).toContain('Frontmatter is not valid YAML')
   })
 
   test('reports a `type` key left without a value', () => {
     write('apple.md', concept('type:', 'apple'))
+    writeRootIndex()
 
     expect(lintWorkspace(root)).toContain('`type` has no value')
   })
 
   test('reports a `type` that is not a string', () => {
     write('apple.md', concept('type: 123', 'apple'))
+    writeRootIndex()
 
     expect(lintWorkspace(root)).toContain('`type` is not a string')
   })
 
   test('names the line a `type` without a value is on', () => {
     write('apple.md', concept('title: apple\ntype:', 'apple'))
+    writeRootIndex()
 
     expect(lintWorkspace(root)).toContain('apple.md:3  error')
   })
 
   test('names the line `tags` is on', () => {
     write('apple.md', concept('type: concept\ntitle: apple\ntags: fruit', 'a'))
+    writeRootIndex()
 
     expect(lintWorkspace(root)).toContain('apple.md:4  warning')
   })
 
   test('warns about `tags` that are not a list, without failing the check', () => {
     write('apple.md', concept('type: concept\ntags: fruit', 'apple'))
+    writeRootIndex()
 
     const report = lintWorkspace(root)
 
@@ -127,6 +140,7 @@ describe('lintWorkspace', () => {
 
   test('reports every problem a concept has, not only the first', () => {
     write('apple.md', concept('tags: fruit', 'apple'))
+    writeRootIndex()
 
     const report = lintWorkspace(root)
 
@@ -137,6 +151,8 @@ describe('lintWorkspace', () => {
   test('counts a warning apart from an error', () => {
     write('apple.md', concept('type: concept\ntags: fruit', 'apple'))
     write('fruit/banana.md', '# banana')
+    writeRootIndex()
+    write('fruit/index.md', '# Fruit\n')
 
     expect(lintWorkspace(root)).toContain('1 error, 1 warning in 2 files.')
   })
@@ -144,6 +160,8 @@ describe('lintWorkspace', () => {
   test('counts the problems and the files they were found in', () => {
     write('apple.md', '# apple')
     write('fruit/banana.md', '# banana')
+    writeRootIndex()
+    write('fruit/index.md', '# Fruit\n')
 
     expect(lintWorkspace(root)).toContain('2 errors in 2 files.')
   })
@@ -180,6 +198,7 @@ describe('lintWorkspace', () => {
   test('warns about a file OKF has no rules for, naming no line', () => {
     write('apple.md', concept('type: concept', 'apple'))
     write('a.json', '{}')
+    writeRootIndex()
 
     const report = lintWorkspace(root)
 
@@ -192,6 +211,7 @@ describe('lintWorkspace', () => {
   test('walks past a dot file as readily as a dot folder', () => {
     write('apple.md', concept('type: concept', 'apple'))
     write('.hidden.md', 'no frontmatter here')
+    writeRootIndex()
 
     expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
   })
@@ -200,6 +220,7 @@ describe('lintWorkspace', () => {
     write('apple.md', concept('type: concept', 'apple'))
     write('.git/config.md', 'no frontmatter here')
     write('.obsidian/plugins/notes.md', 'nor here')
+    writeRootIndex()
 
     expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
   })
@@ -227,6 +248,7 @@ describe('lintWorkspace', () => {
   test('asks nothing of a reserved log.md', () => {
     write('apple.md', concept('type: concept', 'apple'))
     write('fruit/log.md', '# Log\n\n## 2026-07-30\n')
+    writeRootIndex()
 
     expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
   })
@@ -234,6 +256,8 @@ describe('lintWorkspace', () => {
   test('reports nothing when every concept has frontmatter', () => {
     write('apple.md', concept('type: concept', 'apple'))
     write('fruit/banana.md', concept('type: concept', 'banana'))
+    writeRootIndex()
+    write('fruit/index.md', '# Fruit\n')
 
     expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
   })
@@ -245,6 +269,7 @@ describe('lintWorkspace', () => {
   describe('what OKF says a bundle must not be rejected over', () => {
     test('a type nobody recognises', () => {
       write('apple.md', concept('type: greengrocery-invoice', 'apple'))
+      writeRootIndex()
 
       expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
     })
@@ -254,18 +279,90 @@ describe('lintWorkspace', () => {
         'apple.md',
         concept('type: concept\nripeness: 7\nfarm: Ben', 'apple')
       )
+      writeRootIndex()
 
       expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
     })
+  })
 
-    test('a link to a concept that is not in the bundle', () => {
+  describe('portable knowledge contract', () => {
+    test('reports a link to a concept that is not in the bundle', () => {
       write('apple.md', `${concept('type: concept', 'apple')}\n\n[go](/pear)`)
+      writeRootIndex()
+
+      const report = lintWorkspace(root)
+      expect(report).toMatch(/error/i)
+      expect(report).toMatch(/pear|link|missing|broken/i)
+    })
+
+    test('reports one concept carrying only a `type`, and no index.md', () => {
+      write('apple.md', concept('type: concept', 'apple'))
+
+      const report = lintWorkspace(root)
+      expect(report).toMatch(/index\.md/i)
+      expect(report).not.toBe('Workspace follows the OKF format.')
+    })
+
+    test('reports each concept that shares a doughnut_id', () => {
+      write(
+        'apple.md',
+        concept('type: concept\ndoughnut_id: shared-1', 'apple')
+      )
+      write('pear.md', concept('type: concept\ndoughnut_id: shared-1', 'pear'))
+      writeRootIndex()
+
+      const report = lintWorkspace(root)
+      expect(report).toMatch(/doughnut_id/i)
+      expect(report).toContain('apple.md')
+      expect(report).toContain('pear.md')
+      expect(report).toMatch(/error/i)
+    })
+
+    test('does not require doughnut_id on every concept', () => {
+      write('apple.md', concept('type: concept', 'apple'))
+      writeRootIndex()
 
       expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
     })
 
-    test('one concept carrying only a `type`, and no index.md', () => {
+    test('reports a broken wiki target', () => {
+      write(
+        'apple.md',
+        `${concept('type: concept', 'apple')}\n\nSee [[missing-note]]`
+      )
+      writeRootIndex()
+
+      const report = lintWorkspace(root)
+      expect(report).toMatch(/error/i)
+      expect(report).toMatch(/missing-note|link|broken|missing/i)
+    })
+
+    test('does not flag remote https or /attachments/ links', () => {
+      write(
+        'apple.md',
+        `${concept('type: concept', 'apple')}\n\n[web](https://example.com/a)\n[img](/attachments/images/1/x.png)`
+      )
+      writeRootIndex()
+
+      expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
+    })
+
+    test('reports an unsafe local link target', () => {
+      write(
+        'apple.md',
+        `${concept('type: concept', 'apple')}\n\n[out](../outside.md)`
+      )
+      writeRootIndex()
+
+      const report = lintWorkspace(root)
+      expect(report).toMatch(/error/i)
+      expect(report).toMatch(/unsafe path/i)
+    })
+
+    test('ignores empty directories when checking for index.md', () => {
       write('apple.md', concept('type: concept', 'apple'))
+      writeRootIndex()
+      mkdirSync(join(root, 'empty-dir'), { recursive: true })
 
       expect(lintWorkspace(root)).toBe('Workspace follows the OKF format.')
     })

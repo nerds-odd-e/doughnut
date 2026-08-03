@@ -6,6 +6,7 @@ import { conceptProblems } from './okfConcept.js'
 import { indexProblems } from './okfIndex.js'
 import { logProblems } from './okfLog.js'
 import type { OkfProblem } from './okfProblem.js'
+import { portableContractFindings } from './portableContract.js'
 
 function basename(path: string): string {
   return path.slice(path.lastIndexOf('/') + 1)
@@ -36,13 +37,13 @@ export function lintWorkspace(argument: string): string {
   if (parsed.error !== undefined) return parsed.error
   const bundle = parsed.directory
 
-  const inConcepts = [...readWorkspace(bundle)]
-    .filter(([path]) => !isHidden(path))
-    .flatMap(([path, content]) =>
-      problemsIn(path, content).map((problem) => ({ ...problem, path }))
-    )
+  const notes = [...readWorkspace(bundle)].filter(([path]) => !isHidden(path))
+  const okfFindings = notes.flatMap(([path, content]) =>
+    problemsIn(path, content).map((problem) => ({ ...problem, path }))
+  )
   return lintReport([
-    ...inConcepts,
+    ...okfFindings,
+    ...portableContractFindings(new Map(notes)),
     ...nonMarkdownPaths(bundle).map(notAConcept),
   ])
 }
