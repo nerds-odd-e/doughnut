@@ -124,7 +124,7 @@ Each task was committed atomically (TDD red → green):
 
 **Post-change refactor:** `79536cc641` — split oversized previewPull tests + shared harness
 
-**Plan metadata:** (pending docs commit)
+**Plan metadata:** `611d691ef0` (docs: complete plan)
 
 ## Files Created/Modified
 
