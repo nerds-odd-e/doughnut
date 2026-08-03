@@ -11,7 +11,7 @@
 |-------|------------|---------|----------------|
 | 1 | pull/export | strengthen | 8 |
 | 2 | preview-before-pull | strengthen | 9 |
-| 3 | incremental pull | Pending | 10 |
+| 3 | incremental pull | strengthen | 10 |
 | 4 | workspace lint | Pending | 11 |
 | 5 | push dry-run | Pending | 12 |
 | 6 | safe push | Pending | 13 |
@@ -41,7 +41,7 @@ strengthen
 | Role | Path / command |
 |------|----------------|
 | CLI | `/export` (`exportSlashCommandFor`) |
-| CLI (pull overlap → stories 2–3) | `/sync` non-dry-run via `applyPull` — shared candidate with Story 3 |
+| CLI (pull overlap → stories 2–3) | `/sync` non-dry-run via `applyPull` — shared → Stories 2–3 |
 | Module | `cli/src/commands/notebook/exportSlashCommand.tsx` |
 | Module | `cli/src/sync/writeNotebookExport.ts` |
 | Module | `cli/src/sync/exportNotebook.ts` |
@@ -60,12 +60,14 @@ strengthen
 |------|--------|---------|
 | `cli/src/commands/notebook/exportSlashCommand.tsx` | keep | — |
 | `cli/src/sync/writeNotebookExport.ts` | strengthen | shared → also Stories 5–6 (baseline seed) |
-| `cli/src/sync/exportNotebook.ts` | keep | shared → Stories 2–3 (same zip fetch shape) |
+| `cli/src/sync/exportNotebook.ts` | keep | shared → Stories 2–3 |
 | `cli/src/sync/exportDestination.ts` | keep | — |
 | `cli/src/sync/unzip.ts` | keep | shared → Stories 2–3 |
+| `cli/src/sync/readWorkspace.ts` | keep | shared → Stories 2–3 (and Story 4 lint) |
 | `cli/src/sync/contentDispositionFileName.ts` | keep | — |
 | `cli/src/sync/pushBaseline.ts` | keep | shared → Stories 5–6 |
-| `cli/src/commands/notebook/notebookStageSlashCommands.ts` | keep | shared → all notebook-stage stories |
+| `cli/src/commands/notebook/syncSlashCommand.tsx` | keep (defer action to Stories 2–3) | shared → Stories 2–3 |
+| `cli/src/commands/notebook/notebookStageSlashCommands.ts` | keep | shared → Stories 2–3 (+ push) |
 | `e2e_test/features/cli/cli_export.feature` | keep | — |
 | `cli/tests/writeNotebookExport.test.ts` | keep | — |
 | `backend/.../NotebookZipBuilder.java` (identity + link/attachment gaps) | strengthen | shared → Stories 2–3 (zip consumers) |
@@ -74,27 +76,27 @@ strengthen
 
 ### Participant-touched inventory
 
-Whole participant-touched inventory under the Story 1 export/pull surface (author filter applied; paths listed once here; shared tags note later-story overlap):
+Whole participant-touched inventory under the Story 1 export/pull surface (author filter applied; D-03 shared tags duplicated under Stories 2–3 where overlapping):
 
 | Path | Participant authors (sample) | Notes |
 |------|------------------------------|-------|
 | `cli/src/commands/notebook/exportSlashCommand.tsx` | XinxinKao, Ben Huang | `/export` slash command |
 | `cli/src/sync/writeNotebookExport.ts` | XinxinKao, etta.huang | unzip → filesystem; baseline seed |
-| `cli/src/sync/exportNotebook.ts` | XinxinKao, Logan, etta.huang, Eric Yeh | zip fetch type / contract |
+| `cli/src/sync/exportNotebook.ts` | XinxinKao, Logan, etta.huang, Eric Yeh | shared → Stories 2–3 |
 | `cli/src/sync/exportDestination.ts` | Ben Huang, Eric Yeh, etta.huang | destination parse / missing-dir reject |
-| `cli/src/sync/unzip.ts` | Logan | zip → entries |
+| `cli/src/sync/unzip.ts` | Logan | shared → Stories 2–3 |
 | `cli/src/sync/contentDispositionFileName.ts` | XinxinKao, etta.huang | download filename |
-| `cli/src/sync/pushBaseline.ts` | etta.huang | shared with push |
-| `cli/src/sync/readWorkspace.ts` | Logan, Ben Huang, Eric Yeh | shared with sync pull |
+| `cli/src/sync/pushBaseline.ts` | etta.huang | shared → Stories 5–6 |
+| `cli/src/sync/readWorkspace.ts` | Logan, Ben Huang, Eric Yeh | shared → Stories 2–3 (+ Story 4) |
 | `cli/src/sync/applyPull.ts` | Joy-kgo, XinxinKao | shared → Story 3 |
+| `cli/src/commands/notebook/syncSlashCommand.tsx` | Ben Huang, Eric Yeh, Joy-kgo, Logan | shared → Stories 2–3 |
+| `cli/src/commands/notebook/notebookStageSlashCommands.ts` | (registry) | shared → Stories 2–3 |
 | `cli/tests/writeNotebookExport.test.ts` | XinxinKao, Ben Huang, etta.huang | unit coverage |
 | `e2e_test/features/cli/cli_export.feature` | Joy-kgo, Ben Huang, etta.huang, XinxinKao | capability E2E |
 | `e2e_test/features/cli/cli_sync_pull.feature` | Joy-kgo | shared → Story 3 |
 | `backend/.../NotebookExportService.java` | Ben Huang | zip orchestration |
-| `backend/.../notebookExport/NotebookZipBuilder.java` | Ben Huang, Eric Yeh | hierarchy, index.md, frontmatter shape |
+| `backend/.../notebookExport/NotebookZipBuilder.java` | Ben Huang, Eric Yeh | shared → Stories 2–3 (zip shape) |
 | `backend/.../notebookExport/NotebookExportFilenames.java` | Ben Huang | deterministic path names |
-
-Likely shared candidates for plan 02 D-03 tagging (not fully duplicated yet): `exportNotebook.ts`, `unzip.ts`, `applyPull.ts`, `readWorkspace.ts`, `cli_sync_pull.feature`, `pushBaseline.ts`, `notebookStageSlashCommands.ts`.
 
 ### WIP / gap signals
 
@@ -140,38 +142,37 @@ strengthen
 
 | Path | Action | Shared? |
 |------|--------|---------|
-| `cli/src/commands/notebook/syncSlashCommand.tsx` | keep | shared candidate → Story 3 (dry-run vs apply branch) |
+| `cli/src/commands/notebook/syncSlashCommand.tsx` | keep | shared → Stories 1, 3 |
 | `cli/src/sync/previewPull.ts` | keep | — |
-| `cli/src/sync/syncArgument.ts` | keep | shared candidate → Story 3 |
+| `cli/src/sync/syncArgument.ts` | keep | shared → Story 3 |
 | `cli/src/sync/diffReport.ts` | keep | — |
 | `cli/src/sync/unifiedDiff.ts` | keep | — |
-| `cli/src/sync/readWorkspace.ts` | keep | shared → Story 1 (and Story 3) |
-| `cli/src/sync/exportNotebook.ts` | keep | shared → Story 1 |
-| `cli/src/sync/unzip.ts` | keep | shared → Story 1 |
-| `cli/src/commands/notebook/notebookStageSlashCommands.ts` | keep | shared → notebook-stage stories |
+| `cli/src/sync/readWorkspace.ts` | keep | shared → Stories 1, 3 (+ Story 4) |
+| `cli/src/sync/exportNotebook.ts` | keep | shared → Stories 1, 3 |
+| `cli/src/sync/unzip.ts` | keep | shared → Stories 1, 3 |
+| `cli/src/commands/notebook/notebookStageSlashCommands.ts` | keep | shared → Stories 1, 3 |
 | `e2e_test/features/cli/cli_sync_dry_run.feature` | keep | — |
 | `cli/tests/previewPull.test.ts` | keep | — |
-| `cli/tests/syncArgument.test.ts` | keep | shared candidate → Story 3 |
-
-Likely shared sync candidates for D-03 (full shared-tag duplication deferred to Story 3 task): `syncSlashCommand.tsx`, `syncArgument.ts`, `readWorkspace.ts`, `exportNotebook.ts`, `unzip.ts`, `notebookStageSlashCommands.ts`.
+| `cli/tests/syncArgument.test.ts` | keep | shared → Story 3 |
 
 ### Participant-touched inventory
 
-Whole participant-touched inventory under the Story 2 preview-before-pull surface (author filter applied):
+Whole participant-touched inventory under the Story 2 preview-before-pull surface (author filter applied; D-03 shared paths duplicated):
 
 | Path | Participant authors (sample) | Notes |
 |------|------------------------------|-------|
-| `cli/src/commands/notebook/syncSlashCommand.tsx` | Ben Huang, Eric Yeh, Joy-kgo, Logan | `/sync` dry-run → `previewPull` |
+| `cli/src/commands/notebook/syncSlashCommand.tsx` | Ben Huang, Eric Yeh, Joy-kgo, Logan | shared → Stories 1, 3 |
 | `cli/src/sync/previewPull.ts` | Ben Huang, Logan, XinxinKao | dry-run compare |
-| `cli/src/sync/syncArgument.ts` | Ben Huang, Eric Yeh, Joy-kgo, Logan | `--dry-run` parse |
+| `cli/src/sync/syncArgument.ts` | Ben Huang, Eric Yeh, Joy-kgo, Logan | shared → Story 3 |
 | `cli/src/sync/diffReport.ts` | Ben Huang | report assembly |
 | `cli/src/sync/unifiedDiff.ts` | Eric Yeh, Logan | note diff hunks |
-| `cli/src/sync/readWorkspace.ts` | Logan, Ben Huang, Eric Yeh | shared with export/pull |
-| `cli/src/sync/exportNotebook.ts` | XinxinKao, Logan, etta.huang, Eric Yeh | zip fetch (shared Story 1) |
-| `cli/src/sync/unzip.ts` | Logan | zip → entries (shared Story 1) |
+| `cli/src/sync/readWorkspace.ts` | Logan, Ben Huang, Eric Yeh | shared → Stories 1, 3 (+ Story 4) |
+| `cli/src/sync/exportNotebook.ts` | XinxinKao, Logan, etta.huang, Eric Yeh | shared → Stories 1, 3 |
+| `cli/src/sync/unzip.ts` | Logan | shared → Stories 1, 3 |
+| `cli/src/commands/notebook/notebookStageSlashCommands.ts` | (registry) | shared → Stories 1, 3 |
 | `e2e_test/features/cli/cli_sync_dry_run.feature` | Eric Yeh, Logan | capability E2E |
 | `cli/tests/previewPull.test.ts` | Ben Huang, Eric Yeh, Logan, XinxinKao | unit coverage |
-| `cli/tests/syncArgument.test.ts` | Eric Yeh, Joy-kgo, Logan | argument parse |
+| `cli/tests/syncArgument.test.ts` | Eric Yeh, Joy-kgo, Logan | shared → Story 3 |
 
 ### WIP / gap signals
 
@@ -181,3 +182,79 @@ Whole participant-touched inventory under the Story 2 preview-before-pull surfac
 | wrong acceptance — action taxonomy incomplete vs story intent | Story wants create / update / move / leave unchanged / reject; report is "path + content would change" only — remote-only notes and moves are not previewed as distinct actions (`previewPull` iterates exported `.md` and diffs against workspace map) |
 
 **Phase 9 finish sketch (discretion):** keep non-mutating dry-run; add clear reporting for reserved/duplicate/invalid mappings; expand preview actions beyond content overwrite diffs where the oracle expects create/move/reject.
+
+## Story 3: Pull only remote changes
+
+### Verdict
+
+strengthen
+
+**Author basis:** Evidence from LIA participant commits only — Joy-kgo, XinxinKao, Ben Huang, Logan, Eric Yeh (and peers on shared sync helpers). Excluded from triage basis: Terry Yin, Tan Yeong Sheng, `terryyin` variants (HYG-02).
+
+**Bar:** `/sync` non-dry-run + `applyPull` deliver valuable, non-WIP incremental updates of intersecting local Markdown (E2E + unit + `@perfSync`), but acceptance is incomplete — remote-only create / rename / move are not applied, and pull never updates `.doughnut-sync` sync metadata — so Phase 10 should strengthen rather than keep as-is or remove.
+
+### Acceptance citations
+
+- "Unchanged files retain their content and modification time." — match — `applyPull` only `writeFileSync`s when remote content differs for an existing `.md` path; intersecting equals and local-only files are skipped (`cli/src/sync/applyPull.ts`); E2E `Extra local-only file is untouched` / `No-op when already in sync` (`cli_sync_pull.feature`).
+- "New, changed, renamed, and moved remote notes produce the expected local changes." — gap — changed intersecting notes update (`Pull updates one remote change`); **new** remote-only notes are intentionally not created (`No new local file for a remote-only note`; `does not create a file for a remote-only note` unit); rename/move not implemented (path-keyed content overwrite only).
+- "Running pull twice with no intervening changes produces no filesystem changes." — match — second pull with equal content hits `remote === localContent` continue and returns `No changes to pull.` (`applyPull` + E2E `No-op when already in sync`).
+- "Sync metadata is updated only after a successful operation." — gap — `applyPull` never writes `.doughnut-sync/baseline.json` (baseline is seeded by export / used by push via `pushBaseline.ts`); successful pull updates note files only.
+- "A no-change pull creates no irrelevant differences for version-control tools." — match — no writes when content already matches (`No changes to pull.`); E2E asserts file content unchanged on no-op.
+
+### Capability entrypoints
+
+| Role | Path / command |
+|------|----------------|
+| CLI | `/sync` (non-dry-run) (`syncSlashCommandFor` → `applyPull`) |
+| Module | `cli/src/commands/notebook/syncSlashCommand.tsx` |
+| Module | `cli/src/sync/applyPull.ts` |
+| Module | `cli/src/sync/syncArgument.ts` |
+| Module | `cli/src/sync/readWorkspace.ts`, `exportNotebook.ts`, `unzip.ts` |
+| E2E | `e2e_test/features/cli/cli_sync_pull.feature` |
+| Unit | `cli/tests/applyPull.test.ts`, `cli/tests/syncArgument.test.ts` |
+| Registry | `cli/src/commands/notebook/notebookStageSlashCommands.ts` |
+
+### Delete / keep file set
+
+| Path | Action | Shared? |
+|------|--------|---------|
+| `cli/src/commands/notebook/syncSlashCommand.tsx` | keep | shared → Stories 1, 2 |
+| `cli/src/sync/applyPull.ts` | strengthen | shared → Story 1 |
+| `cli/src/sync/syncArgument.ts` | keep | shared → Story 2 |
+| `cli/src/sync/readWorkspace.ts` | keep | shared → Stories 1, 2 (+ Story 4) |
+| `cli/src/sync/exportNotebook.ts` | keep | shared → Stories 1, 2 |
+| `cli/src/sync/unzip.ts` | keep | shared → Stories 1, 2 |
+| `cli/src/sync/pushBaseline.ts` | keep (metadata gap; push/export owns writes) | shared → Stories 1, 5–6 |
+| `cli/src/commands/notebook/notebookStageSlashCommands.ts` | keep | shared → Stories 1, 2 |
+| `backend/.../NotebookZipBuilder.java` | strengthen (zip shape) | shared → Stories 1, 2 |
+| `e2e_test/features/cli/cli_sync_pull.feature` | keep | shared → Story 1 |
+| `cli/tests/applyPull.test.ts` | keep | — |
+| `cli/tests/syncArgument.test.ts` | keep | shared → Story 2 |
+
+### Participant-touched inventory
+
+Whole participant-touched inventory under the Story 3 incremental-pull surface (author filter applied; D-03 shared paths duplicated under Stories 1–2):
+
+| Path | Participant authors (sample) | Notes |
+|------|------------------------------|-------|
+| `cli/src/commands/notebook/syncSlashCommand.tsx` | Ben Huang, Eric Yeh, Joy-kgo, Logan | shared → Stories 1, 2 |
+| `cli/src/sync/applyPull.ts` | Joy-kgo, XinxinKao | shared → Story 1 |
+| `cli/src/sync/syncArgument.ts` | Ben Huang, Eric Yeh, Joy-kgo, Logan | shared → Story 2 |
+| `cli/src/sync/readWorkspace.ts` | Logan, Ben Huang, Eric Yeh | shared → Stories 1, 2 (+ Story 4) |
+| `cli/src/sync/exportNotebook.ts` | XinxinKao, Logan, etta.huang, Eric Yeh | shared → Stories 1, 2 |
+| `cli/src/sync/unzip.ts` | Logan | shared → Stories 1, 2 |
+| `cli/src/sync/pushBaseline.ts` | etta.huang, Ben Huang | shared → Stories 1, 5–6; not written by pull |
+| `cli/src/commands/notebook/notebookStageSlashCommands.ts` | (registry) | shared → Stories 1, 2 |
+| `backend/.../NotebookZipBuilder.java` | Ben Huang, Eric Yeh | shared → Stories 1, 2 |
+| `e2e_test/features/cli/cli_sync_pull.feature` | Joy-kgo | shared → Story 1 |
+| `cli/tests/applyPull.test.ts` | Joy-kgo, XinxinKao | unit + perf |
+| `cli/tests/syncArgument.test.ts` | Eric Yeh, Joy-kgo, Logan | shared → Story 2 |
+
+### WIP / gap signals
+
+| Label | Proof |
+|-------|-------|
+| wrong acceptance — no remote create / rename / move | Oracle bullet "New, changed, renamed, and moved remote notes…"; E2E `No new local file for a remote-only note`; `applyPull` only overwrites existing intersecting paths |
+| wrong acceptance — sync metadata not updated on pull | Oracle bullet "Sync metadata is updated only after a successful operation"; `applyPull` has no `pushBaseline` / `.doughnut-sync` write |
+
+**Phase 10 finish sketch (discretion):** keep intersecting-path update + no-op safety; add create/rename/move behaviors the oracle expects (or document intentional subset only if product decides — currently strengthen); update sync metadata after successful mutate pulls.
