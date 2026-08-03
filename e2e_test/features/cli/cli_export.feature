@@ -94,3 +94,34 @@ Feature: Export a notebook to a local Markdown tree
     And I enter the slash command "/use Ben Notebook" in the interactive CLI
     When I export the notebook into "./NoSuchDirectory"
     Then I should see "No directory at" in past CLI assistant messages
+
+  Scenario: Export includes doughnut_id frontmatter on each note
+    Given I have a notebook "Ben Notebook" with notes:
+      | Title | Content |
+      | less  | Hello   |
+    And an empty export destination "./ExportTarget"
+    And I enter the slash command "/use Ben Notebook" in the interactive CLI
+    When I export the notebook into "./ExportTarget"
+    Then the file "Ben Notebook/less.md" in the export destination "./ExportTarget" should hold "doughnut_id:"
+
+  Scenario: Export rewrites resolvable wiki links to ordinary Markdown links
+    Given I have a notebook "Ben Notebook" with notes:
+      | Title  | Content        |
+      | source | See [[target]] |
+      | target | Target body    |
+    And an empty export destination "./ExportTarget"
+    And I enter the slash command "/use Ben Notebook" in the interactive CLI
+    When I export the notebook into "./ExportTarget"
+    Then the file "Ben Notebook/source.md" in the export destination "./ExportTarget" should hold "]("
+    And the file "Ben Notebook/source.md" in the export destination "./ExportTarget" should hold "target.md"
+
+  Scenario: Export rewrites attachment refs to absolute remote URLs
+    Given I have a notebook "Ben Notebook" with notes:
+      | Title | Content |
+      | photo | Hello   |
+    And I upload an image from fixture "moon.jpg" to the note "photo"
+    And an empty export destination "./ExportTarget"
+    And I enter the slash command "/use Ben Notebook" in the interactive CLI
+    When I export the notebook into "./ExportTarget"
+    Then the file "Ben Notebook/photo.md" in the export destination "./ExportTarget" should hold "http"
+    And the file "Ben Notebook/photo.md" in the export destination "./ExportTarget" should hold "/attachments/images/"
