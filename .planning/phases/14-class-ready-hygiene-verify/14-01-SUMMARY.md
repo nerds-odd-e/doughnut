@@ -105,7 +105,7 @@ status: complete
 
 ## Task Commits
 
-1. **Task 1: End-to-end class-ready hygiene** — `bf3cee4d09` (chore)
+1. **Task 1: End-to-end class-ready hygiene** — `32a7378f75` (chore)
 
 **Plan metadata:** bundled in same commit per D-08
 
