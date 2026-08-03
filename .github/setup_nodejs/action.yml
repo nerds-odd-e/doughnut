@@ -4,9 +4,6 @@ inputs:
   node_version:
     description: "NodeJS Version"
     required: true
-  pnpm_version:
-    description: "PNPM Version"
-    required: true
   force_install:
     description: "Force install Cypress binary (emergency only)"
     required: false
@@ -18,10 +15,10 @@ runs:
       uses: actions/setup-node@v7
       with:
         node-version: ${{ inputs.node_version }}
+    # Omit version so pnpm/action-setup reads package.json packageManager
+    # (keeps CI in sync with Dependabot bumps; do not reintroduce vars.PNPM_VERSION).
     - name: Install pnpm
       uses: pnpm/action-setup@v6
-      with:
-        version: ${{ inputs.pnpm_version }}
     - name: Install dependencies
       shell: bash
       run: pnpm --frozen-lockfile recursive install

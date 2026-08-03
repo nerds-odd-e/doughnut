@@ -48,7 +48,6 @@ jobs:
       - uses: ./.github/setup_nodejs_with_cache
         with:
           node_version: ${{ vars.NODE_VERSION }}
-          pnpm_version: ${{ vars.PNPM_VERSION }}
       - run: bash -c ./assert_generated_type_script_up_to_date.sh
       - run: pnpm lint:all
 
@@ -79,7 +78,6 @@ jobs:
       - uses: ./.github/setup_nodejs_with_cache
         with:
           node_version: ${{ vars.NODE_VERSION }}
-          pnpm_version: ${{ vars.PNPM_VERSION }}
       - name: Boot jar reproducibility (phase 1)
         env:
           GOOGLE_CLIENT_ID: ${{ env.GOOGLE_CLIENT_ID }}
@@ -108,7 +106,6 @@ jobs:
       - uses: ./.github/setup_nodejs_with_cache
         with:
           node_version: ${{ vars.NODE_VERSION }}
-          pnpm_version: ${{ vars.PNPM_VERSION }}
       - run: pnpm frontend:test --shard=${{ matrix.shard }}/2
 
   Other-unit-tests:
@@ -119,7 +116,6 @@ jobs:
       - uses: ./.github/setup_nodejs_with_cache
         with:
           node_version: ${{ vars.NODE_VERSION }}
-          pnpm_version: ${{ vars.PNPM_VERSION }}
       - run: pnpm mcp-server:test
       - run: pnpm cli:test
       - name: Run script unit tests
@@ -136,7 +132,6 @@ jobs:
       - uses: ./.github/setup_nodejs_with_cache
         with:
           node_version: ${{ vars.NODE_VERSION }}
-          pnpm_version: ${{ vars.PNPM_VERSION }}
       - name: Bundle MCP server & Compile & transform frontend assets for bundling with Backend
         run: pnpm bundle:all
       - name: Build application jar artifact
@@ -217,7 +212,6 @@ jobs:
         uses: ./.github/setup_nodejs_with_cache
         with:
           node_version: ${{ vars.NODE_VERSION }}
-          pnpm_version: ${{ vars.PNPM_VERSION }}
       - name: Restore E2E bundled dist cache
         id: e2e-dist-cache
         uses: actions/cache@v6

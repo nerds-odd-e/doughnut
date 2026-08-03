@@ -4,9 +4,6 @@ inputs:
   java_version:
     description: "JDK Version"
     required: true
-  pnpm_version:
-    description: "PNMP Version"
-    required: true
   mysql_version:
     description: "MySQL DB Server Version"
     required: true
@@ -44,10 +41,10 @@ runs:
         mysql -uroot -e "GRANT ALL PRIVILEGES ON *.* TO '${{ inputs.dbuser }}'@'localhost'"
         mysql -uroot -e "FLUSH PRIVILEGES"
       shell: bash
+    # Omit version so pnpm/action-setup reads package.json packageManager.
     - name: Setup pnpm & install deps
       uses: pnpm/action-setup@v6
       with:
-        version: ${{ inputs.pnpm_version }}
         run_install: |
           - recursive: true
             args: [--frozen-lockfile, --strict-peer-dependencies]
