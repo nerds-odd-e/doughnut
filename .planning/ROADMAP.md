@@ -88,7 +88,11 @@
   3. If remove: incomplete/incorrect story 1 path and related debris are gone with no half-wired CLI/E2E left for that path
   4. Terry Yin and Tan Yeong Sheng changes remain untouched (HYG-02 standing constraint)
 
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 08-01-PLAN.md — Backend zip: doughnut_id merge + wiki→relative MD + absolute attachment URLs (+ units)
+- [ ] 08-02-PLAN.md — CLI `/export` E2E proofs for three Story 1 gaps + phase wrap-up
 
 ### Phase 9: Resolve preview-before-pull (story 2)
 

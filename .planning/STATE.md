@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Clean up LIA training participant code
-current_phase: 7
-status: completed
-stopped_at: Phase 8 research complete
-last_updated: "2026-08-03T06:25:00.000Z"
+current_phase: 8
+status: ready_to_execute
+stopped_at: Phase 8 plans created
+last_updated: "2026-08-03T06:40:00.000Z"
 last_activity: 2026-08-03
-last_activity_desc: Phase 8 research written
+last_activity_desc: Phase 8 PLAN.md files written (08-01, 08-02)
 progress:
   total_phases: 8
   completed_phases: 1
-  total_plans: 3
+  total_plans: 5
   completed_plans: 3
   percent: 13
-current_phase_name: Publish triage decisions
+current_phase_name: Resolve pull/export (story 1)
 ---
 
 # State
@@ -25,18 +25,18 @@ See: `.planning/PROJECT.md` (updated 2026-08-03)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** Milestone v1.2 — Phase 7 triage published; next = Phase 8 (Resolve pull/export)
+**Current focus:** Milestone v1.2 — Phase 8 plans ready (Resolve pull/export story 1)
 
 ## Current Position
 
-Phase: 7 — COMPLETE
-Plan: 07-03 (complete — all Phase 7 plans done)
-Status: Phase 7 complete
-Last activity: 2026-08-03 — Phase 7 marked complete
+Phase: 8 — PLANNED (ready to execute)
+Plan: 08-01 (next)
+Status: Phase 8 plans created (2 plans, 2 waves)
+Last activity: 2026-08-03 — Phase 8 PLAN.md written
 
-Progress: [██████████] 100% (Phase 7 plans)
+Progress: Phase 7 complete; Phase 8 planned
 
-**Next:** Phase 8 — Resolve pull/export (story 1) from `.planning/phases/07-publish-triage-decisions/TRIAGE.md`
+**Next:** `/gsd-execute-phase 8` (or execute-plan on `08-01-PLAN.md` → `08-02-PLAN.md`)
 
 ## Performance Metrics
 
@@ -78,6 +78,7 @@ Decisions are logged in PROJECT.md Key Decisions table. Roadmap-shaping decision
 - [Phase 7]: Story 5 Verdict = strengthen — valuable /push --dry-run with conflicts, gaps on create/update actions and baseline metadata write
 - [Phase 7]: Story 6 Verdict = remove — no mutate push; @ignore cli_push.feature WIP debris
 - [Phase 7]: TRIAGE.md published — Phases 8–13 sole action source
+- [Phase 8]: Plans created — backend zip strengthen (08-01) then cli_export E2E (08-02); D-01..D-08 locked
 
 ### Pending Todos
 
@@ -100,7 +101,7 @@ Items acknowledged and deferred at milestone close on 2026-07-25:
 
 ## Session Continuity
 
-**Last session:** 2026-08-03T06:16:29.793Z
-**Stopped at:** Phase 8 research complete
-**Next action:** Plan Phase 8 (create PLAN.md from 08-RESEARCH.md + 08-CONTEXT.md)
-**Resume file:** .planning/phases/08-resolve-pull-export-story-1/08-RESEARCH.md
+**Last session:** 2026-08-03T06:40:00.000Z
+**Stopped at:** Phase 8 plans created (08-01, 08-02)
+**Next action:** Execute Phase 8 — `/gsd-execute-phase 8`
+**Resume file:** .planning/phases/08-resolve-pull-export-story-1/08-01-PLAN.md
