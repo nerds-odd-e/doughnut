@@ -112,9 +112,9 @@ status: complete
 
 ## Task Commits
 
-1. **Task 1: End-to-end remove Story 6 WIP** - *(hash filled after commit)* (chore)
+1. **Task 1: End-to-end remove Story 6 WIP** - `a37801a17f` (chore)
 
-**Plan metadata:** *(docs commit if separate — prefer bundled)*
+**Plan metadata:** bundled in same commit (D-06)
 
 ## Files Created/Modified
 
@@ -124,6 +124,7 @@ status: complete
 - `.planning/REQUIREMENTS.md` — PUSH-02 `[x]`; Traceability Complete
 - `.planning/ROADMAP.md` — Phase 13 plan + Progress Complete
 - `.planning/STATE.md` — position / decision: PUSH-02 removed cleanly
+- `.planning/phases/13-resolve-safe-push-story-6/13-01-SUMMARY.md` — this summary
 
 ## Decisions Made
 
@@ -148,6 +149,9 @@ None.
 
 None — no new endpoints, auth paths, or mutate surface; `--dry-run` remains mandatory (T-13-01..T-13-04 mitigations held).
 
-## Self-Check
+## Self-Check: PASSED
 
-Pending commit hash fill — see Self-Check section after commit.
+- FOUND: `e2e_test/features/cli/cli_push.feature` absent
+- FOUND: `cli/src/commands/notebook/pushSlashCommand.tsx` durable help
+- FOUND: `.planning/phases/13-resolve-safe-push-story-6/13-01-SUMMARY.md`
+- FOUND: commit `a37801a17f`
