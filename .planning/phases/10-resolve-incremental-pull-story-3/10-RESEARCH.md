@@ -420,18 +420,17 @@ CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/cli/cli
 
 ## Open Questions
 
-1. **Baseline when zip-seeded workspace has no prior `.doughnut-sync`**
+1. **Baseline when zip-seeded workspace has no prior `.doughnut-sync`** (RESOLVED)
    - What we know: E2E `createCliWorkspaceFromZip` writes zip entries only — no `savePushBaseline` `[VERIFIED: e2e_test/config/cliE2ePluginWorkspaceTasks.ts:85-94]`. Export CLI seeds full baseline separately.
-   - What's unclear: After first mutating pull, should baseline contain **only mutated paths** or **all currently matching export paths**?
-   - Recommendation: A1 — mutate-path merge; if first pull leaves push stories weak, extend to seed all matching paths when prior empty (still one `savePushBaseline` call). Planner: lock in plan task acceptance.
+   - **Resolution (A1 / 10-01 PLAN assumptions):** mutate-path merge — `loadPushBaseline` prior map + set applied create/update paths; on move delete `fromPath` then set new path. When prior empty, mutate-path-only map is enough for Phase 10; push stories can widen later if needed.
 
-2. **Rejects mixed with mutations — summary shape**
+2. **Rejects mixed with mutations — summary shape** (RESOLVED)
    - What we know: D-03 requires clear reject reporting; mutations may still apply.
-   - Recommendation: Reuse `renderRejectFinding` lines + a short applied-count summary (discretion). Rejects-only must not be bare `No changes to pull.` alone (align Phase 9 rejects-only ≠ clean no-op).
+   - **Resolution (A4 / plan discretion):** Reuse `renderRejectFinding` lines + applied-count summary. Rejects-only must not be bare `No changes to pull.` alone.
 
-3. **Destination path occupied during move**
+3. **Destination path occupied during move** (RESOLVED)
    - What we know: Phase 9 plan preferred reject when destination holds a different `doughnut_id`.
-   - Recommendation: Trust `classifyPreviewPullNotes` outcome; do not invent extra apply-only rules in this phase unless units expose a hole.
+   - **Resolution:** Trust `classifyPreviewPullNotes` outcome; do not invent extra apply-only rules in this phase unless units expose a hole.
 
 ## Environment Availability
 

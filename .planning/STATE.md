@@ -5,10 +5,10 @@ milestone_name: Clean up LIA training participant code
 current_phase: 10
 current_phase_name: Resolve incremental pull (story 3)
 status: ready_to_execute
-stopped_at: Phase 10 plan created (10-01)
-last_updated: "2026-08-03T07:30:00.000Z"
+stopped_at: Phase 10 plan-check passed (revision 2)
+last_updated: "2026-08-03T07:40:00.000Z"
 last_activity: 2026-08-03
-last_activity_desc: Wrote 10-01-PLAN.md + 10-COVERAGE.md
+last_activity_desc: Re-verified 10-PLAN-CHECK.md — VERIFICATION PASSED
 progress:
   total_phases: 8
   completed_phases: 2
@@ -25,14 +25,14 @@ See: `.planning/PROJECT.md` (updated 2026-08-03)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** Milestone v1.2 — Phase 10 Story 3 `applyPull` strengthen (EXP-03); plan ready
+**Current focus:** Milestone v1.2 — Phase 10 Story 3 `applyPull` strengthen (EXP-03); ready to execute
 
 ## Current Position
 
-Phase: 10 — plan created (1 coarse plan / D-10)
+Phase: 10 — plan-check passed
 Plan: 10-01 (checkpoint D-08 + tracer units + E2E)
-Status: Story 3 strengthen planned — classify→apply create/update/move + baseline gate; anti-create invert
-Last activity: 2026-08-03 — Wrote 10-01-PLAN.md + 10-COVERAGE.md
+Status: VERIFICATION PASSED — see `10-PLAN-CHECK.md` (revision 2)
+Last activity: 2026-08-03 — Re-verified after VALIDATION.md + Open Questions + `@wip` fix
 
 Progress: [█████████░] 88%
 
