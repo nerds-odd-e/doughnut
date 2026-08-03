@@ -101,4 +101,46 @@ class NotebookZipBuilderTest {
     assertThat(
         entries.keySet().stream().anyMatch(k -> k.contains("attachments/images/")), equalTo(false));
   }
+
+  @Test
+  void leavesUnresolvedWikiAsDoubleBracketText() throws IOException {
+    ExportNoteRow note =
+        new ExportNoteRow(1, null, "Alone", "Missing [[Nowhere]] and [[Other Nb:Ghost]]");
+
+    Map<String, String> entries = readZipEntries(buildZip(null, List.of(), List.of(note)));
+    String md = entries.get("Alone.md");
+
+    assertThat(md, containsString("[[Nowhere]]"));
+    assertThat(md, containsString("[[Other Nb:Ghost]]"));
+  }
+
+  @Test
+  void usesRelativePathFromNestedFolderToSibling() throws IOException {
+    ExportFolderRow folderA = new ExportFolderRow(10, null, "FolderA", null);
+    ExportFolderRow folderB = new ExportFolderRow(11, null, "FolderB", null);
+    ExportNoteRow source = new ExportNoteRow(1, 10, "Source", "See [[Sibling]]");
+    ExportNoteRow sibling = new ExportNoteRow(2, 11, "Sibling", "Hi");
+
+    Map<String, String> entries =
+        readZipEntries(buildZip(null, List.of(folderA, folderB), List.of(source, sibling)));
+    String md = entries.get("FolderA/Source.md");
+
+    assertThat(md, containsString("[Sibling](../FolderB/Sibling.md)"));
+    assertThat(md, not(containsString("](/Folder")));
+  }
+
+  @Test
+  void resolvesDuplicateTitlesViaLowestIdToCollisionSafeFilename() throws IOException {
+    ExportNoteRow first = new ExportNoteRow(1, null, "Dup", "first");
+    ExportNoteRow second = new ExportNoteRow(2, null, "Dup", "second");
+    ExportNoteRow linker = new ExportNoteRow(3, null, "Linker", "See [[Dup]]");
+
+    Map<String, String> entries =
+        readZipEntries(buildZip(null, List.of(), List.of(first, second, linker)));
+
+    assertThat(entries.containsKey("Dup.md"), equalTo(true));
+    assertThat(entries.containsKey("Dup (2).md"), equalTo(true));
+    assertThat(entries.get("Linker.md"), containsString("[Dup](Dup.md)"));
+    assertThat(entries.get("Linker.md"), not(containsString("Dup%20(2)")));
+  }
 }
