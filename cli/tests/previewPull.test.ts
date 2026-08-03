@@ -216,6 +216,30 @@ describe('previewPull', () => {
     expect(readBack('less.md')).toBe('Hello')
   })
 
+  test('reports a move when the same doughnut_id is at a different path', async () => {
+    write('less.md', '---\ndoughnut_id: 42\n---\n\n# less\n\nHello')
+
+    const report = await preview({
+      'scrum.md': '---\ndoughnut_id: 42\n---\n\n# scrum\n\nHello',
+    })
+
+    expect(report).toContain('scrum.md (move)')
+    expect(report).toContain('less.md')
+    expect(report).not.toMatch(/scrum\.md \(create\)/)
+    expect(readBack('less.md')).toBe(
+      '---\ndoughnut_id: 42\n---\n\n# less\n\nHello'
+    )
+  })
+
+  test('does not infer a move when the export note lacks doughnut_id', async () => {
+    write('less.md', 'Hello')
+
+    const report = await preview({ 'scrum.md': 'Sprint plan' })
+
+    expect(report).toContain('scrum.md (create)')
+    expect(report).not.toContain('(move)')
+  })
+
   test('reports the same difference when run twice', async () => {
     write('less.md', 'Hello')
 
