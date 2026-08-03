@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Clean up LIA training participant code
-current_phase: 8
+current_phase: 9
 status: ready
-stopped_at: Phase 9 context gathered
-last_updated: "2026-08-03T06:48:29.108Z"
+stopped_at: Phase 9 research complete
+last_updated: "2026-08-03T06:55:00.000Z"
 last_activity: 2026-08-03
-last_activity_desc: Completed 08-02-PLAN.md
+last_activity_desc: Completed 09-RESEARCH.md
 progress:
   total_phases: 8
   completed_phases: 2
@@ -25,18 +25,18 @@ See: `.planning/PROJECT.md` (updated 2026-08-03)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** Milestone v1.2 — Phase 8 complete (EXP-01); next Phase 9 (Story 2)
+**Current focus:** Milestone v1.2 — Phase 9 research done (EXP-02); next plan Phase 9
 
 ## Current Position
 
-Phase: 8 — COMPLETE
-Plan: 08-02 (done)
-Status: Phase 8 strengthen verified — backend zip + CLI `/export` E2E for identity/links/attachments
-Last activity: 2026-08-03 — Completed 08-02-PLAN.md
+Phase: 9 — RESEARCH COMPLETE
+Plan: none yet
+Status: 09-RESEARCH.md written — strengthen previewPull taxonomy + diagnostics; applyPull frozen
+Last activity: 2026-08-03 — Completed 09-RESEARCH.md
 
-Progress: [██████████] 100% (plans in milestone so far)
+Progress: Phase 8 complete; Phase 9 ready to plan
 
-**Next:** Phase 9 — Resolve preview-before-pull (story 2) / EXP-02
+**Next:** Plan Phase 9 — Resolve preview-before-pull (story 2) / EXP-02
 
 ## Performance Metrics
 
@@ -108,7 +108,7 @@ Items acknowledged and deferred at milestone close on 2026-07-25:
 
 ## Session Continuity
 
-**Last session:** 2026-08-03T06:48:29.102Z
-**Stopped at:** Phase 9 context gathered
-**Next action:** Plan/execute Phase 9 (Story 2 preview-before-pull)
-**Resume file:** .planning/phases/09-resolve-preview-before-pull-story-2/09-CONTEXT.md
+**Last session:** 2026-08-03T06:55:00.000Z
+**Stopped at:** Phase 9 research complete
+**Next action:** `/gsd-plan-phase` / create PLAN.md for Phase 9 (Story 2 preview-before-pull)
+**Resume file:** .planning/phases/09-resolve-preview-before-pull-story-2/09-RESEARCH.md
