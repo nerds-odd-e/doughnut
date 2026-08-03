@@ -503,3 +503,21 @@ Whole participant-touched inventory under the Story 6 safe-push surface (author 
 | no external mutate value | No `applyPush` (or equivalent) under `cli/src/sync/`; non–dry-run `/push` cannot update Doughnut notes |
 
 **Phase 13 finish sketch (discretion):** delete `cli_push.feature` (and any other Story-6-only WIP debris); leave shared dry-run modules to Phase 12 (Story 5). A future safe mutate push is new work, not strengthen of this empty surface.
+
+## Author-filter verification (HYG-02)
+
+**Excluded authors (not triage basis):** Terry Yin, Tan Yeong Sheng, and `terryyin` variants.
+
+**In-scope participant evidence used:** Eric Yeh, Ben Huang, etta.huang, Joy-kgo, Logan, XinxinKao (and peers named per dossier).
+
+| Story | Verdict | Author-filter confirmation |
+|-------|---------|----------------------------|
+| 1 | strengthen | Author basis lists only LIA participants; no Terry/YS-only paths drove the verdict |
+| 2 | strengthen | Author basis lists only LIA participants; no Terry/YS-only paths drove the verdict |
+| 3 | strengthen | Author basis lists only LIA participants; no Terry/YS-only paths drove the verdict |
+| 4 | strengthen | Author basis lists Eric Yeh (+ shared helpers from peers); no Terry/YS-only basis |
+| 5 | strengthen | Author basis lists Ben Huang / etta.huang / peers; no Terry/YS-only basis |
+| 6 | remove | Author basis lists Eric Yeh (`@ignore` E2E) + shared dry-run participants; remove targets WIP debris, not Terry/YS work |
+
+**Completeness (this publish):** Summary rows 1–6 each `keep` \| `strengthen` \| `remove` (zero Pending/TBD). Citation oracle counts 7 / 3 / 5 / 4 / 4 / 5. Each story has Verdict, Acceptance citations, Capability entrypoints, Delete/keep file set, Participant-touched inventory; strengthen/remove have WIP/gap proofs. Inventories use paths, commands, and scenario names only — no secrets, tokens, or credentials.
+
