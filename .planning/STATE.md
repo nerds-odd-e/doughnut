@@ -4,15 +4,15 @@ milestone: v1.2
 milestone_name: Clean up LIA training participant code
 current_phase: 10
 current_phase_name: Resolve incremental pull (story 3)
-status: ready_to_plan
-stopped_at: Phase 10 research complete
-last_updated: "2026-08-03T07:22:30.000Z"
+status: ready_to_execute
+stopped_at: Phase 10 plan created (10-01)
+last_updated: "2026-08-03T07:30:00.000Z"
 last_activity: 2026-08-03
-last_activity_desc: Wrote 10-RESEARCH.md
+last_activity_desc: Wrote 10-01-PLAN.md + 10-COVERAGE.md
 progress:
   total_phases: 8
   completed_phases: 2
-  total_plans: 8
+  total_plans: 9
   completed_plans: 7
   percent: 25
 ---
@@ -25,18 +25,18 @@ See: `.planning/PROJECT.md` (updated 2026-08-03)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** Milestone v1.2 — Phase 10 Story 3 `applyPull` strengthen (EXP-03); research done, ready to plan
+**Current focus:** Milestone v1.2 — Phase 10 Story 3 `applyPull` strengthen (EXP-03); plan ready
 
 ## Current Position
 
-Phase: 10 — research complete (CONTEXT + RESEARCH)
-Plan: TBD (prefer 1 coarse plan / 2–3 larger tasks per D-10)
-Status: Story 3 strengthen researched — classify→apply create/update/move + baseline gate; anti-create invert
-Last activity: 2026-08-03 — Wrote 10-RESEARCH.md
+Phase: 10 — plan created (1 coarse plan / D-10)
+Plan: 10-01 (checkpoint D-08 + tracer units + E2E)
+Status: Story 3 strengthen planned — classify→apply create/update/move + baseline gate; anti-create invert
+Last activity: 2026-08-03 — Wrote 10-01-PLAN.md + 10-COVERAGE.md
 
 Progress: [█████████░] 88%
 
-**Next:** `/gsd-plan-phase 10` — create PLAN.md from RESEARCH
+**Next:** `/gsd-execute-phase 10`
 
 ## Performance Metrics
 
@@ -97,6 +97,7 @@ Decisions are logged in PROJECT.md Key Decisions table. Roadmap-shaping decision
 - [Phase 9]: E2E asserts less.md (update) matching Plan 01 unit wording
 - [Phase 9]: Reserved reject E2E via note title log + empty workspace dry-run
 - [Phase 9]: EXP-02 closed — units + targeted cli_sync_dry_run E2E green
+- [Phase 10]: One coarse plan 10-01 — D-08 reversibility checkpoint + apply+units tracer + cli_sync_pull E2E; EXP-03; HYG-02 import-only classify
 
 ### Pending Todos
 
@@ -119,7 +120,7 @@ Items acknowledged and deferred at milestone close on 2026-07-25:
 
 ## Session Continuity
 
-**Last session:** 2026-08-03T07:22:30.000Z
-**Stopped at:** Phase 10 research complete
-**Next action:** `/gsd-plan-phase 10`
-**Resume file:** .planning/phases/10-resolve-incremental-pull-story-3/10-RESEARCH.md
+**Last session:** 2026-08-03T07:30:00.000Z
+**Stopped at:** Phase 10 plan created (10-01)
+**Next action:** `/gsd-execute-phase 10`
+**Resume file:** .planning/phases/10-resolve-incremental-pull-story-3/10-01-PLAN.md

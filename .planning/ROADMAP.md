@@ -129,7 +129,10 @@ Plans:
   3. If remove: story 3 participant path and related debris are gone cleanly
   4. Terry Yin and Tan Yeong Sheng changes remain untouched (HYG-02 standing constraint)
 
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [ ] 10-01-PLAN.md — Strengthen applyPull (create/update/move + gated baseline) + units + cli_sync_pull E2E
 
 ### Phase 11: Resolve workspace lint (story 4)
 
