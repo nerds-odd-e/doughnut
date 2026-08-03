@@ -14,7 +14,7 @@
 | 3 | incremental pull | strengthen | 10 |
 | 4 | workspace lint | strengthen | 11 |
 | 5 | push dry-run | strengthen | 12 |
-| 6 | safe push | Pending | 13 |
+| 6 | safe push | remove | 13 |
 
 ## Story 1: Pull a notebook into a usable Markdown workspace
 
@@ -419,3 +419,87 @@ Whole participant-touched inventory under the Story 5 push dry-run surface (auth
 | wrong acceptance — sync metadata mutated | Oracle bullet "The preview does not mutate … sync metadata"; `savePushBaseline` in `previewPush`; E2E `The preview's only addition is its own baseline file` |
 
 **Phase 12 finish sketch (discretion):** keep conflict-aware dry-run labeling and non-mutation of Doughnut / `.md` files; either stop writing baseline on preview (or treat baseline write as out-of-oracle bookkeeping with an explicit product decision) and add create vs update (and non-intersecting path) reporting the oracle expects.
+
+## Story 6: Push edits to existing notes safely
+
+### Verdict
+
+remove
+
+**Author basis:** Evidence from LIA participant commits only — Eric Yeh authored `cli_push.feature` (ignored scenarios); Ben Huang / etta.huang own the dry-run-only `/push` surface shared with Story 5. Excluded from triage basis: Terry Yin, Tan Yeong Sheng, `terryyin` variants (HYG-02).
+
+**Bar:** Mutating `/push` (non–dry-run) is **not implemented** — `parsePushArgument` requires `--dry-run`, `pushDoc` states only dry-run is supported, and there is no `applyPush` (or equivalent) module. The only Story-6-specific participant artifact is `e2e_test/features/cli/cli_push.feature` tagged `@ignore`. Per PROJECT WIP remove-by-default: incomplete / half-wired work without a keepable mutate capability → **remove** the WIP E2E debris; do not treat building safe push from scratch as a Phase-7 “strengthen” of existing code. Shared dry-run modules stay under Story 5 (keep/strengthen).
+
+### Acceptance citations
+
+- "The body and supported frontmatter fields of an identified note can be updated." — gap — no mutating push path; `/push` without `--dry-run` is a usage error (`pushArgument.ts` USAGE); `@ignore` E2E scenarios `A body edited locally reaches Doughnut` / `A property edited locally reaches Doughnut` are not executable proofs.
+- "The update succeeds only when the Doughnut note still matches the version last synchronized." — gap — no participant mutate/push version-guard implementation under `cli/src/sync/` or `pushSlashCommand.tsx`.
+- "A concurrent remote edit produces a conflict and neither version is silently overwritten." — gap — conflict labeling exists only in dry-run `previewPush` (Story 5); no mutating push that refuses overwrite on conflict.
+- "A successful push refreshes the local representation and sync metadata." — gap — no successful mutate push; baseline writes are dry-run/export bookkeeping only (`pushBaseline.ts` / `writeNotebookExport.ts`).
+- "Repeating the push without further changes has no effect." — gap — no idempotent mutate push; `@ignore` scenarios never run.
+
+### Capability entrypoints
+
+| Role | Path / command |
+|------|----------------|
+| CLI (intended) | `/push` non–dry-run — **missing**; only `/push --dry-run` works |
+| Module | `cli/src/commands/notebook/pushSlashCommand.tsx` (dry-run-only; shared → Story 5) |
+| Module | `cli/src/sync/pushArgument.ts` (rejects non–dry-run; shared → Story 5) |
+| Module | `cli/src/sync/previewPush.ts` (preview only; shared → Story 5) |
+| Module | `cli/src/sync/pushBaseline.ts` (shared → Stories 1, 3, 5) |
+| E2E (WIP) | `e2e_test/features/cli/cli_push.feature` (`@ignore`) |
+| Mutate module | **none** — no `applyPush` / equivalent under `cli/src/sync/` |
+| Registry | `cli/src/commands/notebook/notebookStageSlashCommands.ts` (registers dry-run `/push`; shared → Story 5) |
+
+### Delete / keep file set
+
+| Path | Action | Shared? |
+|------|--------|---------|
+| `e2e_test/features/cli/cli_push.feature` | delete | — |
+| `cli/src/commands/notebook/pushSlashCommand.tsx` | keep (defer to Story 5) | shared → Story 5 |
+| `cli/src/sync/previewPush.ts` | keep (defer to Story 5 strengthen) | shared → Story 5 |
+| `cli/src/sync/pushArgument.ts` | keep (defer to Story 5) | shared → Story 5 |
+| `cli/src/sync/pushBaseline.ts` | keep | shared → Stories 1, 3, 5 |
+| `cli/src/sync/diffReport.ts` | keep | shared → Stories 2, 5 |
+| `cli/src/sync/readWorkspace.ts` | keep | shared → Stories 1–5 |
+| `cli/src/sync/exportNotebook.ts` | keep | shared → Stories 1–3, 5 |
+| `cli/src/sync/unzip.ts` | keep | shared → Stories 1–3, 5 |
+| `cli/src/sync/writeNotebookExport.ts` | keep | shared → Stories 1, 5 |
+| `cli/src/commands/notebook/notebookStageSlashCommands.ts` | keep | shared → Stories 1–3, 5 |
+| `cli/tests/previewPush.test.ts` | keep | shared → Story 5 |
+| `cli/tests/pushArgument.test.ts` | keep | shared → Story 5 |
+| `cli/tests/pushBaseline.test.ts` | keep | shared → Stories 1, 5 |
+| *(no applyPush / mutate push module)* | N/A — absent | — |
+
+### Participant-touched inventory
+
+Whole participant-touched inventory under the Story 6 safe-push surface (author filter applied; D-03: shared push/sync paths duplicated from Story 5 and earlier stories):
+
+| Path | Participant authors (sample) | Notes |
+|------|------------------------------|-------|
+| `e2e_test/features/cli/cli_push.feature` | Eric Yeh | `@ignore` WIP scenarios — delete target |
+| `cli/src/commands/notebook/pushSlashCommand.tsx` | Ben Huang | shared → Story 5; dry-run only |
+| `cli/src/sync/previewPush.ts` | Ben Huang | shared → Story 5 |
+| `cli/src/sync/pushArgument.ts` | Ben Huang | shared → Story 5; mandating `--dry-run` |
+| `cli/src/sync/pushBaseline.ts` | Ben Huang, etta.huang | shared → Stories 1, 3, 5 |
+| `cli/src/sync/diffReport.ts` | Ben Huang | shared → Stories 2, 5 |
+| `cli/src/sync/readWorkspace.ts` | Logan, Ben Huang, Eric Yeh | shared → Stories 1–5 |
+| `cli/src/sync/exportNotebook.ts` | XinxinKao, Logan, etta.huang, Eric Yeh | shared → Stories 1–3, 5 |
+| `cli/src/sync/unzip.ts` | Logan | shared → Stories 1–3, 5 |
+| `cli/src/sync/writeNotebookExport.ts` | XinxinKao, etta.huang | shared → Stories 1, 5 |
+| `cli/src/commands/notebook/notebookStageSlashCommands.ts` | (registry) | shared → Stories 1–3, 5 |
+| `cli/tests/previewPush.test.ts` | Ben Huang, Logan, etta.huang, XinxinKao, Eric Yeh | shared → Story 5 |
+| `cli/tests/pushArgument.test.ts` | Ben Huang | shared → Story 5 |
+| `cli/tests/pushBaseline.test.ts` | Ben Huang | shared → Stories 1, 5 |
+
+**D-03 overlap proof:** Stories 5 and 6 share the `/push` command modules, baseline, and export/read/unzip helpers listed above (tagged `shared` under both dossiers). No separate mutate-push module exists to share. Story 5 already lists these paths with `shared → Story 6`; this dossier mirrors them. Earlier stories 1/3 already tag `pushBaseline` / `writeNotebookExport` shared → Stories 5–6.
+
+### WIP / gap signals
+
+| Label | Proof |
+|-------|-------|
+| `@ignore` / WIP E2E | `e2e_test/features/cli/cli_push.feature` line 1 `@ignore`; scenarios never run in CI |
+| half-wired — dry-run only | `pushDoc` description "Only --dry-run is supported so far." (`pushSlashCommand.tsx`); `parsePushArgument` returns USAGE unless `--dry-run` present |
+| no external mutate value | No `applyPush` (or equivalent) under `cli/src/sync/`; non–dry-run `/push` cannot update Doughnut notes |
+
+**Phase 13 finish sketch (discretion):** delete `cli_push.feature` (and any other Story-6-only WIP debris); leave shared dry-run modules to Phase 12 (Story 5). A future safe mutate push is new work, not strengthen of this empty surface.
