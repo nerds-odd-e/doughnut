@@ -43,7 +43,7 @@
 **Participant surface:** `cli/` export/lint/push, `e2e_test/features/cli/`, related docs/plans.
 **Decision bar:** Keep = correct + no WIP + external user value; Strengthen = minor gaps on valuable work; Remove = WIP/incorrect/non-valuable.
 
-- [ ] **Phase 7: Publish triage decisions** - Maintainer has cited keep/strengthen/remove for stories 1–6
+- [ ] **Phase 7: Publish triage decisions** - Maintainer has cited keep/strengthen/remove for stories 1–6 (3 plans)
 - [ ] **Phase 8: Resolve pull/export (story 1)** - Keep/strengthen or cleanly remove story 1 participant work
 - [ ] **Phase 9: Resolve preview-before-pull (story 2)** - Keep/strengthen or cleanly remove story 2 participant work
 - [ ] **Phase 10: Resolve incremental pull (story 3)** - Keep/strengthen or cleanly remove story 3 participant work
@@ -64,8 +64,11 @@
   2. Each decision cites the matching acceptance examples from `.planning/notes/2026-07-24-portable-notebook-workspace.md`
   3. Decisions are based only on participant work (authors exclude Terry Yin and Tan Yeong Sheng)
   4. A later maintainer can act on Phases 8–13 from the published triage alone (no re-audit required)
-**Plans**: TBD
-**Notes**: Standing constraint HYG-02 applies to all subsequent action phases; verified in Phase 14.
+**Plans**:
+- [ ] `07-01-PLAN.md` — Wave 1 tracer: TRIAGE.md schema + Story 1 dossier
+- [ ] `07-02-PLAN.md` — Wave 2: Story 2, Story 3 (+ D-03), Story 4 dossiers
+- [ ] `07-03-PLAN.md` — Wave 3: Story 5, Story 6 (+ D-03), hardened completeness verify, CONTEXT/STATE pointers
+**Notes**: Standing constraint HYG-02 applies to all subsequent action phases; verified in Phase 14. Deliverable: `.planning/phases/07-publish-triage-decisions/TRIAGE.md` (docs only; no tree apply).
 
 ### Phase 8: Resolve pull/export (story 1)
 **Goal**: Story 1 pull/export participant work is either healthy against acceptance or cleanly gone
@@ -157,7 +160,7 @@
 |-------|-----------|----------------|--------|-----------|
 | 1–7 Health lint / purge | v1.0 | 13/13 | Complete | 2026-07-23 |
 | 1–6 Spelling match & link | v1.1 | 16/16 | Complete | 2026-07-25 |
-| 7. Publish triage decisions | v1.2 | 0/? | Not started | - |
+| 7. Publish triage decisions | v1.2 | 0/3 | Planned | - |
 | 8. Resolve pull/export (story 1) | v1.2 | 0/? | Not started | - |
 | 9. Resolve preview-before-pull (story 2) | v1.2 | 0/? | Not started | - |
 | 10. Resolve incremental pull (story 3) | v1.2 | 0/? | Not started | - |
@@ -167,4 +170,4 @@
 | 14. Class-ready hygiene verify | v1.2 | 0/? | Not started | - |
 
 ---
-*Last updated: 2026-08-03 after v1.2 roadmap creation*
+*Last updated: 2026-08-03 after Phase 7 plans written*

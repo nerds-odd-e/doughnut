@@ -4,15 +4,15 @@ milestone: v1.2
 milestone_name: Clean up LIA training participant code
 current_phase: 7
 current_phase_name: Publish triage decisions
-status: planning
-stopped_at: Phase 7 context gathered
-last_updated: "2026-08-03T04:41:53.558Z"
+status: ready_to_execute
+stopped_at: Phase 7 plans revised (checker feedback)
+last_updated: "2026-08-03T05:50:00.000Z"
 last_activity: 2026-08-03
-last_activity_desc: v1.2 roadmap created (Phases 7–14)
+last_activity_desc: Phase 7 plans revised — split story tasks, hardened verify, 07-VALIDATION.md
 progress:
   total_phases: 8
   completed_phases: 0
-  total_plans: 0
+  total_plans: 3
   completed_plans: 0
   percent: 0
 ---
@@ -25,14 +25,14 @@ See: `.planning/PROJECT.md` (updated 2026-08-03)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** Milestone v1.2 — roadmap created; ready to discuss/plan Phase 7
+**Current focus:** Milestone v1.2 — Phase 7 plans ready; execute publish of `TRIAGE.md`
 
 ## Current Position
 
 Phase: 7 of 14 (Publish triage decisions)
-Plan: —
-Status: Ready to plan
-Last activity: 2026-08-03 — v1.2 roadmap created (Phases 7–14)
+Plan: 07-01 (next)
+Status: Ready to execute
+Last activity: 2026-08-03 — Phase 7 plans revised for checker (story task splits, completeness asserts, 07-VALIDATION.md)
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -84,7 +84,7 @@ Items acknowledged and deferred at milestone close on 2026-07-25:
 
 ## Session Continuity
 
-**Last session:** 2026-08-03T04:41:53.552Z
-**Stopped at:** Phase 7 context gathered
-**Next action:** `/gsd-discuss-phase 7` or `/gsd-plan-phase 7`
-**Resume file:** .planning/phases/07-publish-triage-decisions/07-CONTEXT.md
+**Last session:** 2026-08-03T05:50:00.000Z
+**Stopped at:** Phase 7 plans revised (checker feedback)
+**Next action:** `/gsd-execute-phase 7` or local `execute-plan` on `.planning/phases/07-publish-triage-decisions/`
+**Resume file:** .planning/phases/07-publish-triage-decisions/07-01-PLAN.md
