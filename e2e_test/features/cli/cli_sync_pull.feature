@@ -6,7 +6,7 @@
 Feature: Pull remote note changes into a workspace
 
   As a notebook owner
-  I want `/sync` to update local files that already exist
+  I want `/sync` to create, update, and move local Markdown files from the remote notebook
   So that remote edits in Doughnut reach my Markdown workspace without disturbing other files
 
   Background:
@@ -23,6 +23,10 @@ Feature: Pull remote note changes into a workspace
     And I pull into the workspace "./BenNotebook"
     Then I should see "1 note updated." in past CLI assistant messages
     And the file "less.md" in the workspace "./BenNotebook" should hold "Hello world!"
+    And the workspace "./BenNotebook" should hold only:
+      | Path                         |
+      | less.md                      |
+      | .doughnut-sync/baseline.json |
 
   Scenario: Extra local-only file is untouched
     Given I have a notebook "Ben Notebook" with notes:
@@ -39,8 +43,7 @@ Feature: Pull remote note changes into a workspace
     Then the file "less.md" in the workspace "./BenNotebook" should hold "Hello world!"
     And the file "Less 2.md" in the workspace "./BenNotebook" should hold "local only"
 
-  @wip
-  Scenario: No new local file for a remote-only note
+  Scenario: Pull creates a remote-only note
     Given I have a notebook "Ben Notebook" with notes:
       | Title | Content |
       | less  | Hello   |
@@ -50,8 +53,14 @@ Feature: Pull remote note changes into a workspace
     And I enter the slash command "/use Ben Notebook" in the interactive CLI
     When the note "scrum" is changed in Doughnut to "Sprint review"
     And I pull into the workspace "./BenNotebook"
-    Then the workspace "./BenNotebook" should not contain "scrum.md"
+    Then I should see "1 note updated." in past CLI assistant messages
+    And the file "scrum.md" in the workspace "./BenNotebook" should hold "Sprint review"
     And the file "less.md" in the workspace "./BenNotebook" should hold "Hello"
+    And the workspace "./BenNotebook" should hold only:
+      | Path                         |
+      | less.md                      |
+      | scrum.md                     |
+      | .doughnut-sync/baseline.json |
 
   Scenario: No-op when already in sync
     Given I have a notebook "Ben Notebook" with notes:
@@ -62,6 +71,7 @@ Feature: Pull remote note changes into a workspace
     When I pull into the workspace "./BenNotebook"
     Then I should see "No changes to pull." in past CLI assistant messages
     And the file "less.md" in the workspace "./BenNotebook" should hold "Hello"
+    And the workspace "./BenNotebook" should not contain ".doughnut-sync/baseline.json"
 
 @perfSync
   Scenario: One change among 1000 notes completes within 5 seconds

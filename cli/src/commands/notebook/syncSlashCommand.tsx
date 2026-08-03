@@ -17,7 +17,7 @@ const syncDoc: CommandDoc = {
   name: '/sync',
   usage: '/sync [--dry-run] <workspace path>',
   description:
-    'Pull remote note changes into a local Markdown workspace, or preview them with --dry-run. Only updates files that already exist locally and match an exported note path.',
+    'Pull remote note changes into a local Markdown workspace, or preview them with --dry-run. Creates, updates, and moves Markdown notes to match the remote export; reserved and unsafe paths are rejected.',
 }
 
 type SyncRunStageProps = InteractiveSlashCommandSettleProps & {
