@@ -12,7 +12,7 @@
 | 1 | pull/export | strengthen | 8 |
 | 2 | preview-before-pull | strengthen | 9 |
 | 3 | incremental pull | strengthen | 10 |
-| 4 | workspace lint | Pending | 11 |
+| 4 | workspace lint | strengthen | 11 |
 | 5 | push dry-run | Pending | 12 |
 | 6 | safe push | Pending | 13 |
 
@@ -63,8 +63,9 @@ strengthen
 | `cli/src/sync/exportNotebook.ts` | keep | shared → Stories 2–3 |
 | `cli/src/sync/exportDestination.ts` | keep | — |
 | `cli/src/sync/unzip.ts` | keep | shared → Stories 2–3 |
-| `cli/src/sync/readWorkspace.ts` | keep | shared → Stories 2–3 (and Story 4 lint) |
+| `cli/src/sync/readWorkspace.ts` | keep | shared → Stories 2–4 |
 | `cli/src/sync/contentDispositionFileName.ts` | keep | — |
+| `cli/src/sync/directoryArgument.ts` | keep | shared → Story 4 (also via `exportDestination`) |
 | `cli/src/sync/pushBaseline.ts` | keep | shared → Stories 5–6 |
 | `cli/src/commands/notebook/syncSlashCommand.tsx` | keep (defer action to Stories 2–3) | shared → Stories 2–3 |
 | `cli/src/commands/notebook/notebookStageSlashCommands.ts` | keep | shared → Stories 2–3 (+ push) |
@@ -87,8 +88,9 @@ Whole participant-touched inventory under the Story 1 export/pull surface (autho
 | `cli/src/sync/unzip.ts` | Logan | shared → Stories 2–3 |
 | `cli/src/sync/contentDispositionFileName.ts` | XinxinKao, etta.huang | download filename |
 | `cli/src/sync/pushBaseline.ts` | etta.huang | shared → Stories 5–6 |
-| `cli/src/sync/readWorkspace.ts` | Logan, Ben Huang, Eric Yeh | shared → Stories 2–3 (+ Story 4) |
+| `cli/src/sync/readWorkspace.ts` | Logan, Ben Huang, Eric Yeh | shared → Stories 2–4 |
 | `cli/src/sync/applyPull.ts` | Joy-kgo, XinxinKao | shared → Story 3 |
+| `cli/src/sync/directoryArgument.ts` | Eric Yeh | shared → Story 4 |
 | `cli/src/commands/notebook/syncSlashCommand.tsx` | Ben Huang, Eric Yeh, Joy-kgo, Logan | shared → Stories 2–3 |
 | `cli/src/commands/notebook/notebookStageSlashCommands.ts` | (registry) | shared → Stories 2–3 |
 | `cli/tests/writeNotebookExport.test.ts` | XinxinKao, Ben Huang, etta.huang | unit coverage |
@@ -147,7 +149,7 @@ strengthen
 | `cli/src/sync/syncArgument.ts` | keep | shared → Story 3 |
 | `cli/src/sync/diffReport.ts` | keep | — |
 | `cli/src/sync/unifiedDiff.ts` | keep | — |
-| `cli/src/sync/readWorkspace.ts` | keep | shared → Stories 1, 3 (+ Story 4) |
+| `cli/src/sync/readWorkspace.ts` | keep | shared → Stories 1, 3–4 |
 | `cli/src/sync/exportNotebook.ts` | keep | shared → Stories 1, 3 |
 | `cli/src/sync/unzip.ts` | keep | shared → Stories 1, 3 |
 | `cli/src/commands/notebook/notebookStageSlashCommands.ts` | keep | shared → Stories 1, 3 |
@@ -166,7 +168,7 @@ Whole participant-touched inventory under the Story 2 preview-before-pull surfac
 | `cli/src/sync/syncArgument.ts` | Ben Huang, Eric Yeh, Joy-kgo, Logan | shared → Story 3 |
 | `cli/src/sync/diffReport.ts` | Ben Huang | report assembly |
 | `cli/src/sync/unifiedDiff.ts` | Eric Yeh, Logan | note diff hunks |
-| `cli/src/sync/readWorkspace.ts` | Logan, Ben Huang, Eric Yeh | shared → Stories 1, 3 (+ Story 4) |
+| `cli/src/sync/readWorkspace.ts` | Logan, Ben Huang, Eric Yeh | shared → Stories 1, 3–4 |
 | `cli/src/sync/exportNotebook.ts` | XinxinKao, Logan, etta.huang, Eric Yeh | shared → Stories 1, 3 |
 | `cli/src/sync/unzip.ts` | Logan | shared → Stories 1, 3 |
 | `cli/src/commands/notebook/notebookStageSlashCommands.ts` | (registry) | shared → Stories 1, 3 |
@@ -221,7 +223,7 @@ strengthen
 | `cli/src/commands/notebook/syncSlashCommand.tsx` | keep | shared → Stories 1, 2 |
 | `cli/src/sync/applyPull.ts` | strengthen | shared → Story 1 |
 | `cli/src/sync/syncArgument.ts` | keep | shared → Story 2 |
-| `cli/src/sync/readWorkspace.ts` | keep | shared → Stories 1, 2 (+ Story 4) |
+| `cli/src/sync/readWorkspace.ts` | keep | shared → Stories 1–2, 4 |
 | `cli/src/sync/exportNotebook.ts` | keep | shared → Stories 1, 2 |
 | `cli/src/sync/unzip.ts` | keep | shared → Stories 1, 2 |
 | `cli/src/sync/pushBaseline.ts` | keep (metadata gap; push/export owns writes) | shared → Stories 1, 5–6 |
@@ -240,7 +242,7 @@ Whole participant-touched inventory under the Story 3 incremental-pull surface (
 | `cli/src/commands/notebook/syncSlashCommand.tsx` | Ben Huang, Eric Yeh, Joy-kgo, Logan | shared → Stories 1, 2 |
 | `cli/src/sync/applyPull.ts` | Joy-kgo, XinxinKao | shared → Story 1 |
 | `cli/src/sync/syncArgument.ts` | Ben Huang, Eric Yeh, Joy-kgo, Logan | shared → Story 2 |
-| `cli/src/sync/readWorkspace.ts` | Logan, Ben Huang, Eric Yeh | shared → Stories 1, 2 (+ Story 4) |
+| `cli/src/sync/readWorkspace.ts` | Logan, Ben Huang, Eric Yeh | shared → Stories 1–2, 4 |
 | `cli/src/sync/exportNotebook.ts` | XinxinKao, Logan, etta.huang, Eric Yeh | shared → Stories 1, 2 |
 | `cli/src/sync/unzip.ts` | Logan | shared → Stories 1, 2 |
 | `cli/src/sync/pushBaseline.ts` | etta.huang, Ben Huang | shared → Stories 1, 5–6; not written by pull |
@@ -258,3 +260,81 @@ Whole participant-touched inventory under the Story 3 incremental-pull surface (
 | wrong acceptance — sync metadata not updated on pull | Oracle bullet "Sync metadata is updated only after a successful operation"; `applyPull` has no `pushBaseline` / `.doughnut-sync` write |
 
 **Phase 10 finish sketch (discretion):** keep intersecting-path update + no-op safety; add create/rename/move behaviors the oracle expects (or document intentional subset only if product decides — currently strengthen); update sync metadata after successful mutate pulls.
+
+## Story 4: Check whether a workspace follows the portable knowledge contract
+
+### Verdict
+
+strengthen
+
+**Author basis:** Evidence from LIA participant commits only — Eric Yeh (lint surface authorship). Shared readers `readWorkspace` / `directoryArgument` also carry Ben Huang, Logan, and peers. Excluded from triage basis: Terry Yin, Tan Yeong Sheng, `terryyin` variants (HYG-02).
+
+**Bar:** `/lint` + OKF modules deliver valuable, non-WIP workspace checks with E2E (`cli_lint_workspace.feature`) and unit coverage, but the oracle portable-contract checklist is only partially covered — duplicate identities, broken local links, missing indexes, and unsupported path mappings are not identified (some are explicitly accepted under OKF “must not reject” tests) — so Phase 11 should strengthen rather than keep as-is or remove.
+
+### Acceptance citations
+
+- "The check identifies malformed frontmatter, duplicate identities, broken local links, missing indexes, and unsupported path mappings." — gap — malformed frontmatter is identified (`Frontmatter is missing` / invalid YAML / missing `type` — E2E + `okfConcept.ts`); **duplicate identities**, **broken local links**, **missing indexes**, and **unsupported path mappings** are not reported — unit tests nail that missing links and missing `index.md` must **not** fail OKF lint (`what OKF says a bundle must not be rejected over` in `cli/tests/lintWorkspace.test.ts`).
+- "Unknown frontmatter properties are accepted and preserved." — match — unknown keys (e.g. `ripeness`, `farm`) pass (`keys OKF says nothing about`); lint is read-only (does not strip frontmatter).
+- "Findings name the affected file and provide an actionable explanation." — match — `lintReport` emits `path[:line]  severity  message` (`cli/src/lint/lintReport.ts`); E2E `a.md:1 error Frontmatter is missing`.
+- "A valid workspace produces a clear successful result." — match — empty findings → `Workspace follows the OKF format.` (`lintReport`); E2E `A conformant bundle reports nothing`.
+
+### Capability entrypoints
+
+| Role | Path / command |
+|------|----------------|
+| CLI | `/lint` (`lintSlashCommand`) |
+| Module | `cli/src/commands/lintSlashCommand.ts` |
+| Module | `cli/src/lint/lintWorkspace.ts` |
+| Module | `cli/src/lint/okfConcept.ts`, `okfIndex.ts`, `okfLog.ts`, `okfProblem.ts` |
+| Module | `cli/src/lint/lintReport.ts`, `bundleFiles.ts` |
+| Module | `cli/src/sync/readWorkspace.ts`, `directoryArgument.ts` (inputs) |
+| E2E | `e2e_test/features/cli/cli_lint_workspace.feature` |
+| Unit | `cli/tests/lintWorkspace.test.ts` |
+| Registry | `cli/src/commands/interactiveSlashCommands.ts` (outside notebook stage) |
+
+### Delete / keep file set
+
+| Path | Action | Shared? |
+|------|--------|---------|
+| `cli/src/commands/lintSlashCommand.ts` | keep | — |
+| `cli/src/lint/lintWorkspace.ts` | strengthen | — |
+| `cli/src/lint/okfConcept.ts` | keep | — |
+| `cli/src/lint/okfIndex.ts` | keep | — |
+| `cli/src/lint/okfLog.ts` | keep | — |
+| `cli/src/lint/okfProblem.ts` | keep | — |
+| `cli/src/lint/lintReport.ts` | keep | — |
+| `cli/src/lint/bundleFiles.ts` | keep | — |
+| `cli/src/sync/readWorkspace.ts` | keep | shared → Stories 1–3 |
+| `cli/src/sync/directoryArgument.ts` | keep | shared → Story 1 (`exportDestination`) |
+| `cli/src/commands/interactiveSlashCommands.ts` | keep | shared registry (hosts `/lint`) |
+| `e2e_test/features/cli/cli_lint_workspace.feature` | keep | — |
+| `cli/tests/lintWorkspace.test.ts` | keep | — |
+
+### Participant-touched inventory
+
+Whole participant-touched inventory under the Story 4 workspace-lint surface (author filter applied; D-03 shared paths duplicated under Stories 1–3):
+
+| Path | Participant authors (sample) | Notes |
+|------|------------------------------|-------|
+| `cli/src/commands/lintSlashCommand.ts` | Eric Yeh | `/lint` |
+| `cli/src/lint/lintWorkspace.ts` | Eric Yeh | orchestrates OKF rules |
+| `cli/src/lint/okfConcept.ts` | Eric Yeh | concept frontmatter |
+| `cli/src/lint/okfIndex.ts` | Eric Yeh | `index.md` rules |
+| `cli/src/lint/okfLog.ts` | Eric Yeh | `log.md` rules |
+| `cli/src/lint/okfProblem.ts` | Eric Yeh | problem helpers |
+| `cli/src/lint/lintReport.ts` | Eric Yeh | findings formatting |
+| `cli/src/lint/bundleFiles.ts` | Eric Yeh | hidden / non-md paths |
+| `cli/src/sync/readWorkspace.ts` | Logan, Ben Huang, Eric Yeh | shared → Stories 1–3 |
+| `cli/src/sync/directoryArgument.ts` | Eric Yeh | shared → Story 1 |
+| `cli/src/commands/interactiveSlashCommands.ts` | (registry) | hosts `/lint` outside notebook stage |
+| `e2e_test/features/cli/cli_lint_workspace.feature` | Eric Yeh | capability E2E |
+| `cli/tests/lintWorkspace.test.ts` | Eric Yeh | unit coverage |
+
+### WIP / gap signals
+
+| Label | Proof |
+|-------|-------|
+| wrong acceptance — no duplicate-identity / broken-link / missing-index / path-mapping checks | Oracle bullet listing those five classes; `lintWorkspace.test.ts` explicitly accepts broken links and missing `index.md`; no duplicate-id or unsupported-mapping rules in `cli/src/lint/` |
+| OKF-only vs portable Doughnut contract | Capability is OKF-shaped (`Workspace follows the OKF format.`); oracle asks for portable knowledge contract including identities — no Doughnut id uniqueness check |
+
+**Phase 11 finish sketch (discretion):** keep OKF malformed-frontmatter / unknown-key / success-report behavior; add (or deliberately scope) duplicate-identity, broken local link, missing-index, and unsupported path-mapping checks to match the portable-workspace oracle.
