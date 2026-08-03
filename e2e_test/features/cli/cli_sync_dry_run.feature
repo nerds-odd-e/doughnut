@@ -46,7 +46,7 @@ Feature: Preview what a pull would change
       And I enter the slash command "/use Ben Notebook" in the interactive CLI
       When the note "less" is changed in Doughnut to "Hello world!"
       And I enter the slash command "/sync --dry-run ./BenNotebook" in the interactive CLI
-      Then I should see "less.md" in past CLI assistant messages
+      Then I should see "less.md (update)" in past CLI assistant messages
       And I should see the preview in past CLI assistant messages:
         """
           - Hello
@@ -67,7 +67,7 @@ Feature: Preview what a pull would change
     Scenario: A note edited locally is reported as what a pull would overwrite
       When I edit the content of "less.md" in the workspace "./BenNotebook" to "Hello from Obsidian"
       And I enter the slash command "/sync --dry-run ./BenNotebook" in the interactive CLI
-      Then I should see "less.md" in past CLI assistant messages
+      Then I should see "less.md (update)" in past CLI assistant messages
       And I should see the preview in past CLI assistant messages:
         """
           - Hello from Obsidian
