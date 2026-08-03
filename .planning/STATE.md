@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Clean up LIA training participant code
 current_phase: 11
-status: research_complete
-stopped_at: Phase 11 research complete
-last_updated: "2026-08-03T07:45:00.000Z"
+status: planning_complete
+stopped_at: Phase 11 plan created (11-01)
+last_updated: "2026-08-03T08:00:00.000Z"
 last_activity: 2026-08-03
-last_activity_desc: Wrote 11-RESEARCH.md for Story 4 /lint
+last_activity_desc: Wrote 11-01-PLAN.md for Story 4 /lint strengthen
 progress:
   total_phases: 8
   completed_phases: 2
-  total_plans: 10
+  total_plans: 11
   completed_plans: 8
   percent: 25
 current_phase_name: Resolve workspace lint (story 4)
@@ -25,18 +25,18 @@ See: `.planning/PROJECT.md` (updated 2026-08-03)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** Milestone v1.2 — Phase 11 Story 4 `/lint` (LINT-01); research complete, ready to plan
+**Current focus:** Milestone v1.2 — Phase 11 Story 4 `/lint` (LINT-01); plan ready to execute
 
 ## Current Position
 
 Phase: 11 — Resolve workspace lint (story 4)
-Plan: none yet (research done)
-Status: Phase 11 RESEARCH.md written — strengthen `/lint` with four portable gaps
-Last activity: 2026-08-03 — Phase 11 research complete
+Plan: 11-01 (ready)
+Status: Phase 11 PLAN written — one coarse plan for portable lint strengthen
+Last activity: 2026-08-03 — Phase 11 planning complete
 
 Progress: [████████░░] 80%
 
-**Next:** `/gsd-plan-phase 11`
+**Next:** `/gsd-execute-phase 11` (or execute-plan on 11-01)
 
 ## Performance Metrics
 
@@ -103,6 +103,7 @@ Decisions are logged in PROJECT.md Key Decisions table. Roadmap-shaping decision
 - [Phase 10]: auto-selected invert-create (D-08); applyPull classify→apply + gated baseline
 - [Phase 10]: baseline merge patches prior map for applied paths only (A1); move = write+unlink fromPath (A2)
 - [Phase 10]: EXP-03 closed — units + targeted cli_sync_pull E2E green; HYG-02 intact
+- [Phase 11]: One coarse plan 11-01 — D-03 invert checkpoint + portableContract+units tracer + cli_lint_workspace E2E; LINT-01; HYG-02 import-only extractDoughnutId/unsafePathReason
 
 ### Pending Todos
 
@@ -125,7 +126,7 @@ Items acknowledged and deferred at milestone close on 2026-07-25:
 
 ## Session Continuity
 
-**Last session:** 2026-08-03T07:45:00.000Z
-**Stopped at:** Phase 11 research complete
-**Next action:** `/gsd-plan-phase 11`
-**Resume file:** .planning/phases/11-resolve-workspace-lint-story-4/11-RESEARCH.md
+**Last session:** 2026-08-03T08:00:00.000Z
+**Stopped at:** Phase 11 plan created (11-01)
+**Next action:** `/gsd-execute-phase 11`
+**Resume file:** .planning/phases/11-resolve-workspace-lint-story-4/11-01-PLAN.md
