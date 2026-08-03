@@ -82,17 +82,15 @@ status: complete
 
 ## Task Commits
 
-1. **Task 1: Create TRIAGE.md skeleton** - `e0f6f5bef4` (docs)
-2. **Task 2: Audit Story 1 and fill complete dossier** - `01b75d3cc7` (docs)
+1. **Task 1: Create TRIAGE.md skeleton** - `4d1bcc9bbd` (docs)
+2. **Task 2: Audit Story 1 and fill complete dossier** - `f81bbbea0d` (docs)
 
-**Plan metadata:** `5ade545d31` (docs: complete plan)
+**Plan metadata:** `6d874ae96b` (docs: complete plan); hash fix `6aef22987e`
 
 ## Files Created/Modified
-
 - `.planning/phases/07-publish-triage-decisions/TRIAGE.md` — schema + Story 1 dossier
 
 ## Decisions Made
-
 - **Story 1 = strengthen** because `/export` + E2E deliver hierarchy, `index.md`, sync-state separation, and failure reporting, but Eric Yeh’s export change removed Doughnut id from frontmatter and there is no participant proof for ordinary Markdown link rewrite or usable attachment references.
 - Stories 2–6 left **Pending** (plan 01 tracer only).
 
@@ -116,8 +114,9 @@ None - no external service configuration required.
 ## Self-Check: PASSED
 
 - FOUND: `.planning/phases/07-publish-triage-decisions/TRIAGE.md`
-- FOUND: commit `e0f6f5bef4`
-- FOUND: commit `01b75d3cc7`
+- FOUND: commit `4d1bcc9bbd`
+- FOUND: commit `f81bbbea0d`
+- FOUND: commit `6d874ae96b`
 - Verify: Summary Story 1 verdict `strengthen`; citation count 7
 
 ---
