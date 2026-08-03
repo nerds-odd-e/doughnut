@@ -10,7 +10,7 @@
 | Story | Capability | Verdict | Consumer phase |
 |-------|------------|---------|----------------|
 | 1 | pull/export | strengthen | 8 |
-| 2 | preview-before-pull | Pending | 9 |
+| 2 | preview-before-pull | strengthen | 9 |
 | 3 | incremental pull | Pending | 10 |
 | 4 | workspace lint | Pending | 11 |
 | 5 | push dry-run | Pending | 12 |
@@ -105,3 +105,79 @@ Likely shared candidates for plan 02 D-03 tagging (not fully duplicated yet): `e
 | wrong acceptance — attachment refs not proven usable | Oracle bullet "Attachments remain remote but their references remain usable"; zip has no attachment entries and no ref-rewrite tests under export/pull |
 
 **Phase 8 finish sketch (discretion):** restore or introduce a stable identity in exported frontmatter that round-trips with push/lint; cover wiki→ordinary links and attachment remote refs with E2E proofs; keep existing hierarchy / `index.md` / sync-state separation behavior.
+
+## Story 2: Preview changes before updating an existing workspace
+
+### Verdict
+
+strengthen
+
+**Author basis:** Evidence from LIA participant commits only — Ben Huang, Logan, XinxinKao, Eric Yeh, Joy-kgo (and peers on shared sync helpers). Excluded from triage basis: Terry Yin, Tan Yeong Sheng, `terryyin` variants (HYG-02).
+
+**Bar:** `/sync --dry-run` + `previewPull` deliver externally valuable, non-mutating previews with E2E/unit coverage and no `@wip`/`@ignore`, but acceptance is incomplete — reserved/duplicate/invalid-mapping reporting is absent, and the report is content-diff oriented rather than full create/update/move/reject actions — so Phase 9 should strengthen rather than keep as-is or remove.
+
+### Acceptance citations
+
+- "The preview reports exact target paths and actions." — match — `previewPull` emits each differing `.md` path plus a unified note diff and a "N note(s) would change" summary (`cli/src/sync/previewPull.ts`, `diffReport.ts`); E2E `Preview one changed note` asserts `less.md` and the would-change body (`cli_sync_dry_run.feature`); unit `reports a changed note as a diff` / `reports the path of a note in a folder` (`cli/tests/previewPull.test.ts`).
+- "Reserved filenames, duplicate paths, and invalid mappings are reported clearly." — gap — no participant code under `previewPull` / `syncArgument` / dry-run E2E reports reserved names, duplicate paths, or invalid path mappings; preview only content-diffs intersecting Markdown paths.
+- "Running the preview does not mutate Doughnut, the workspace, or sync metadata." — match — `previewPull` only `readWorkspace` + export zip + in-memory unzip (no `writeFile` / baseline writes); E2E Rule `The preview leaves nothing behind` (`The workspace is not written to`, `The preview adds no files of its own`).
+
+### Capability entrypoints
+
+| Role | Path / command |
+|------|----------------|
+| CLI | `/sync --dry-run` (`syncSlashCommandFor` → `previewPull`) |
+| Module | `cli/src/commands/notebook/syncSlashCommand.tsx` |
+| Module | `cli/src/sync/previewPull.ts` |
+| Module | `cli/src/sync/syncArgument.ts` (`parseSyncArgument`) |
+| Module | `cli/src/sync/diffReport.ts`, `unifiedDiff.ts` |
+| Module | `cli/src/sync/readWorkspace.ts`, `exportNotebook.ts`, `unzip.ts` (compare inputs) |
+| E2E | `e2e_test/features/cli/cli_sync_dry_run.feature` |
+| Unit | `cli/tests/previewPull.test.ts`, `cli/tests/syncArgument.test.ts` |
+| Registry | `cli/src/commands/notebook/notebookStageSlashCommands.ts` (registers `/sync`) |
+
+### Delete / keep file set
+
+| Path | Action | Shared? |
+|------|--------|---------|
+| `cli/src/commands/notebook/syncSlashCommand.tsx` | keep | shared candidate → Story 3 (dry-run vs apply branch) |
+| `cli/src/sync/previewPull.ts` | keep | — |
+| `cli/src/sync/syncArgument.ts` | keep | shared candidate → Story 3 |
+| `cli/src/sync/diffReport.ts` | keep | — |
+| `cli/src/sync/unifiedDiff.ts` | keep | — |
+| `cli/src/sync/readWorkspace.ts` | keep | shared → Story 1 (and Story 3) |
+| `cli/src/sync/exportNotebook.ts` | keep | shared → Story 1 |
+| `cli/src/sync/unzip.ts` | keep | shared → Story 1 |
+| `cli/src/commands/notebook/notebookStageSlashCommands.ts` | keep | shared → notebook-stage stories |
+| `e2e_test/features/cli/cli_sync_dry_run.feature` | keep | — |
+| `cli/tests/previewPull.test.ts` | keep | — |
+| `cli/tests/syncArgument.test.ts` | keep | shared candidate → Story 3 |
+
+Likely shared sync candidates for D-03 (full shared-tag duplication deferred to Story 3 task): `syncSlashCommand.tsx`, `syncArgument.ts`, `readWorkspace.ts`, `exportNotebook.ts`, `unzip.ts`, `notebookStageSlashCommands.ts`.
+
+### Participant-touched inventory
+
+Whole participant-touched inventory under the Story 2 preview-before-pull surface (author filter applied):
+
+| Path | Participant authors (sample) | Notes |
+|------|------------------------------|-------|
+| `cli/src/commands/notebook/syncSlashCommand.tsx` | Ben Huang, Eric Yeh, Joy-kgo, Logan | `/sync` dry-run → `previewPull` |
+| `cli/src/sync/previewPull.ts` | Ben Huang, Logan, XinxinKao | dry-run compare |
+| `cli/src/sync/syncArgument.ts` | Ben Huang, Eric Yeh, Joy-kgo, Logan | `--dry-run` parse |
+| `cli/src/sync/diffReport.ts` | Ben Huang | report assembly |
+| `cli/src/sync/unifiedDiff.ts` | Eric Yeh, Logan | note diff hunks |
+| `cli/src/sync/readWorkspace.ts` | Logan, Ben Huang, Eric Yeh | shared with export/pull |
+| `cli/src/sync/exportNotebook.ts` | XinxinKao, Logan, etta.huang, Eric Yeh | zip fetch (shared Story 1) |
+| `cli/src/sync/unzip.ts` | Logan | zip → entries (shared Story 1) |
+| `e2e_test/features/cli/cli_sync_dry_run.feature` | Eric Yeh, Logan | capability E2E |
+| `cli/tests/previewPull.test.ts` | Ben Huang, Eric Yeh, Logan, XinxinKao | unit coverage |
+| `cli/tests/syncArgument.test.ts` | Eric Yeh, Joy-kgo, Logan | argument parse |
+
+### WIP / gap signals
+
+| Label | Proof |
+|-------|-------|
+| wrong acceptance — no reserved/duplicate/invalid-mapping report | Oracle bullet "Reserved filenames, duplicate paths, and invalid mappings are reported clearly"; `previewPull` filters only content inequality on `.md` paths — no reserved/duplicate/mapping diagnostics in module or `cli_sync_dry_run.feature` |
+| wrong acceptance — action taxonomy incomplete vs story intent | Story wants create / update / move / leave unchanged / reject; report is "path + content would change" only — remote-only notes and moves are not previewed as distinct actions (`previewPull` iterates exported `.md` and diffs against workspace map) |
+
+**Phase 9 finish sketch (discretion):** keep non-mutating dry-run; add clear reporting for reserved/duplicate/invalid mappings; expand preview actions beyond content overwrite diffs where the oracle expects create/move/reject.
