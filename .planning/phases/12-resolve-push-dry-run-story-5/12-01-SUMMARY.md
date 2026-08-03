@@ -120,7 +120,7 @@ status: complete
 
 1. **Task 1: End-to-end strengthen previewPush — load-only baseline + create/update (units + E2E)** - `d29f3b841b` (feat)
 
-**Plan metadata:** (see docs commit below)
+**Plan metadata:** `ea566e90df` (docs: complete plan)
 
 ## Deviations from Plan
 
