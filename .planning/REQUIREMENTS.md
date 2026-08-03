@@ -62,23 +62,25 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TRIAGE-01 | — | Pending |
-| TRIAGE-02 | — | Pending |
-| EXP-01 | — | Pending |
-| EXP-02 | — | Pending |
-| EXP-03 | — | Pending |
-| LINT-01 | — | Pending |
-| PUSH-01 | — | Pending |
-| PUSH-02 | — | Pending |
-| HYG-01 | — | Pending |
-| HYG-02 | — | Pending |
-| HYG-03 | — | Pending |
+| TRIAGE-01 | Phase 7 | Pending |
+| TRIAGE-02 | Phase 7 | Pending |
+| EXP-01 | Phase 8 | Pending |
+| EXP-02 | Phase 9 | Pending |
+| EXP-03 | Phase 10 | Pending |
+| LINT-01 | Phase 11 | Pending |
+| PUSH-01 | Phase 12 | Pending |
+| PUSH-02 | Phase 13 | Pending |
+| HYG-01 | Phase 14 | Pending |
+| HYG-02 | Phase 14 | Pending |
+| HYG-03 | Phase 14 | Pending |
 
 **Coverage:**
 - v1 requirements: 11 total
-- Mapped to phases: 0
-- Unmapped: 11 ⚠️
+- Mapped to phases: 11
+- Unmapped: 0 ✓
+
+**Notes:** HYG-02 (do not touch Terry Yin / Tan Yeong Sheng) is a standing constraint for Phases 8–13; requirement ID maps to Phase 14 for final verification.
 
 ---
 *Requirements defined: 2026-08-03*
-*Last updated: 2026-08-03 after milestone v1.2 scoping*
+*Last updated: 2026-08-03 after v1.2 roadmap creation*
