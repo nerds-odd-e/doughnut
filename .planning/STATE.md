@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: null
-milestone_name: null
-status: Awaiting next milestone
-stopped_at: Milestone v1.1 archived; spent phase history removed
-last_updated: "2026-07-25T00:00:00.000Z"
-last_activity: 2026-07-25
-last_activity_desc: Milestone v1.1 completed, archived, and spent docs cleaned
+milestone: v1.2
+milestone_name: Clean up LIA training participant code
+status: planning
+last_updated: "2026-08-03T03:28:02.143Z"
+last_activity: 2026-08-03
 progress:
   total_phases: 0
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
+  percent: 0
 ---
 
 # State
@@ -26,10 +25,10 @@ See: `.planning/PROJECT.md` (updated 2026-07-25)
 
 ## Current Position
 
-- **Milestone:** v1.1 Spelling Answer Match & Link — SHIPPED 2026-07-25
-- **Status:** Awaiting next milestone
-- **Archives:** `.planning/milestones/v1.1-ROADMAP.md`, `.planning/milestones/v1.1-REQUIREMENTS.md`
-- **Summary:** `.planning/MILESTONES.md`
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-08-03 — Milestone v1.2 started
 
 ## Deferred Items
 
