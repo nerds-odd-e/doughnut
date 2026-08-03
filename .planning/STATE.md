@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Clean up LIA training participant code
-current_phase: 10
-status: phase_complete
-stopped_at: Phase 11 context gathered
-last_updated: "2026-08-03T07:39:06.418Z"
+current_phase: 11
+status: research_complete
+stopped_at: Phase 11 research complete
+last_updated: "2026-08-03T07:45:00.000Z"
 last_activity: 2026-08-03
-last_activity_desc: Completed 10-01-PLAN.md
+last_activity_desc: Wrote 11-RESEARCH.md for Story 4 /lint
 progress:
   total_phases: 8
   completed_phases: 2
@@ -25,18 +25,18 @@ See: `.planning/PROJECT.md` (updated 2026-08-03)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** Milestone v1.2 — Phase 11 Story 4 `/lint` (LINT-01); Phase 10 EXP-03 complete
+**Current focus:** Milestone v1.2 — Phase 11 Story 4 `/lint` (LINT-01); research complete, ready to plan
 
 ## Current Position
 
-Phase: 10 complete → next Phase 11
-Plan: 10-01 complete (SUMMARY written)
-Status: Phase 10 executed — classify→apply + E2E create flip green
-Last activity: 2026-08-03 — Completed 10-01-PLAN.md
+Phase: 11 — Resolve workspace lint (story 4)
+Plan: none yet (research done)
+Status: Phase 11 RESEARCH.md written — strengthen `/lint` with four portable gaps
+Last activity: 2026-08-03 — Phase 11 research complete
 
 Progress: [████████░░] 80%
 
-**Next:** `/gsd-discuss-phase 11` or `/gsd-plan-phase 11`
+**Next:** `/gsd-plan-phase 11`
 
 ## Performance Metrics
 
@@ -125,7 +125,7 @@ Items acknowledged and deferred at milestone close on 2026-07-25:
 
 ## Session Continuity
 
-**Last session:** 2026-08-03T07:39:06.411Z
-**Stopped at:** Phase 11 context gathered
-**Next action:** `/gsd-discuss-phase 11` or `/gsd-plan-phase 11`
-**Resume file:** .planning/phases/11-resolve-workspace-lint-story-4/11-CONTEXT.md
+**Last session:** 2026-08-03T07:45:00.000Z
+**Stopped at:** Phase 11 research complete
+**Next action:** `/gsd-plan-phase 11`
+**Resume file:** .planning/phases/11-resolve-workspace-lint-story-4/11-RESEARCH.md
