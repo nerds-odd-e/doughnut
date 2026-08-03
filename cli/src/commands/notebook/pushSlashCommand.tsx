@@ -16,7 +16,7 @@ const pushDoc: CommandDoc = {
   name: '/push',
   usage: '/push --dry-run <workspace path>',
   description:
-    'Preview what pushing the workspace would change in Doughnut. Only --dry-run is supported so far.',
+    'Preview what pushing the workspace would change in Doughnut. Requires --dry-run.',
 }
 
 type PushRunStageProps = InteractiveSlashCommandSettleProps & {

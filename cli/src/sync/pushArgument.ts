@@ -9,9 +9,8 @@ export type PushArgument =
   | { readonly error: string; readonly workspacePath?: undefined }
 
 /**
- * Read `--dry-run <workspace path>`. The flag is mandatory, unlike `/sync`'s:
- * a real, mutating push is not implemented yet, so any call without it is a
- * usage error rather than a second mode.
+ * Read `--dry-run <workspace path>`. `/push` is dry-run-only: the flag is
+ * mandatory, unlike `/sync`. Any call without it is a usage error.
  */
 export function parsePushArgument(argument: string | undefined): PushArgument {
   const trimmed = (argument ?? '').trim()
