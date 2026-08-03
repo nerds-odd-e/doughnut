@@ -9,8 +9,8 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Triage
 
-- [ ] **TRIAGE-01**: Maintainer has a keep / strengthen / remove decision for each of stories 1–6, based only on non–Terry / non–Yeong Sheng participant work
-- [ ] **TRIAGE-02**: Each decision cites the matching acceptance examples from `.planning/notes/2026-07-24-portable-notebook-workspace.md`
+- [x] **TRIAGE-01**: Maintainer has a keep / strengthen / remove decision for each of stories 1–6, based only on non–Terry / non–Yeong Sheng participant work
+- [x] **TRIAGE-02**: Each decision cites the matching acceptance examples from `.planning/notes/2026-07-24-portable-notebook-workspace.md`
 
 ### Export & pull (stories 1–3)
 
@@ -62,8 +62,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TRIAGE-01 | Phase 7 | Pending |
-| TRIAGE-02 | Phase 7 | Pending |
+| TRIAGE-01 | Phase 7 | Complete |
+| TRIAGE-02 | Phase 7 | Complete |
 | EXP-01 | Phase 8 | Pending |
 | EXP-02 | Phase 9 | Pending |
 | EXP-03 | Phase 10 | Pending |
@@ -75,6 +75,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | HYG-03 | Phase 14 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 11 total
 - Mapped to phases: 11
 - Unmapped: 0 ✓

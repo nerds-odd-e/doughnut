@@ -4,17 +4,17 @@ milestone: v1.2
 milestone_name: Clean up LIA training participant code
 current_phase: 7
 current_phase_name: Publish triage decisions
-status: ready_to_execute
-stopped_at: Phase 7 plans revised (checker iteration 2)
-last_updated: "2026-08-03T05:55:00.000Z"
+status: in_progress
+stopped_at: Completed 07-01-PLAN.md
+last_updated: "2026-08-03T05:56:51.531Z"
 last_activity: 2026-08-03
-last_activity_desc: Phase 7 plans revised (iter 2) — 07-01 Task 2 citation+verdict gates; 07-03 Task 4 split pointer verifies
+last_activity_desc: "Completed 07-01 — TRIAGE.md schema + Story 1 strengthen dossier"
 progress:
   total_phases: 8
   completed_phases: 0
   total_plans: 3
-  completed_plans: 0
-  percent: 0
+  completed_plans: 1
+  percent: 33
 ---
 
 # State
@@ -25,32 +25,37 @@ See: `.planning/PROJECT.md` (updated 2026-08-03)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** Milestone v1.2 — Phase 7 plans ready; execute publish of `TRIAGE.md`
+**Current focus:** Milestone v1.2 — Phase 7 plan 07-02 next (Stories 2–3 dossiers)
 
 ## Current Position
 
 Phase: 7 of 14 (Publish triage decisions)
-Plan: 07-01 (next)
-Status: Ready to execute
-Last activity: 2026-08-03 — Phase 7 plans revised (checker iter 2: Story 1 verify gates + Task 4 pointer alignment)
+Plan: 07-02 (next)
+Status: In progress — 07-01 complete (Story 1 tracer published)
+Last activity: 2026-08-03 — Completed 07-01: TRIAGE.md schema + Story 1 strengthen dossier
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [███░░░░░░░] 33%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 0 (this milestone)
-- Average duration: —
-- Total execution time: —
+- Total plans completed: 1 (this milestone)
+- Average duration: 12min
+- Total execution time: 12min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 07 | 1/3 | 12min | 12min |
 
 *Updated after each plan completion*
+**Per-Plan Metrics:**
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase 07 P01 | 12min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -62,6 +67,8 @@ Decisions are logged in PROJECT.md Key Decisions table. Roadmap-shaping decision
 - One Behavior phase per story resolution area after triage (stop-safe)
 - HYG-02 maps to Phase 14 for verify; standing constraint on Phases 8–13
 - No Structure phases in this milestone — triage then direct keep/strengthen/remove per story
+- [Phase 7]: Story 1 Verdict = strengthen — valuable /export + E2E, but gap on stable Doughnut identity (and link/attachment refs)
+- [Phase 7]: Stories 2–6 remain Pending stubs until plans 02–03 (stop-safe tracer)
 
 ### Pending Todos
 
@@ -84,7 +91,7 @@ Items acknowledged and deferred at milestone close on 2026-07-25:
 
 ## Session Continuity
 
-**Last session:** 2026-08-03T05:50:00.000Z
-**Stopped at:** Phase 7 plans revised (checker feedback)
-**Next action:** `/gsd-execute-phase 7` or local `execute-plan` on `.planning/phases/07-publish-triage-decisions/`
-**Resume file:** .planning/phases/07-publish-triage-decisions/07-01-PLAN.md
+**Last session:** 2026-08-03T05:56:51.525Z
+**Stopped at:** Completed 07-01-PLAN.md
+**Next action:** Execute `07-02-PLAN.md` (Stories 2–3 dossiers)
+**Resume file:** .planning/phases/07-publish-triage-decisions/07-02-PLAN.md
