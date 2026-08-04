@@ -1,8 +1,5 @@
 import { dirname, posix } from 'node:path'
-import {
-  extractDoughnutId,
-  unsafePathReason,
-} from '../sync/previewPullActions.js'
+import { unsafePathReason } from '../sync/previewPullActions.js'
 import type { Finding } from './lintReport.js'
 
 const MARKDOWN_SUFFIX = '.md'
@@ -72,31 +69,6 @@ function targetExists(
   candidates: readonly string[]
 ): boolean {
   return candidates.some((candidate) => notes.has(candidate))
-}
-
-function duplicateIdFindings(notes: ReadonlyMap<string, string>): Finding[] {
-  const byId = new Map<string, string[]>()
-  for (const [path, content] of notes) {
-    if (!isConceptPath(path)) continue
-    const id = extractDoughnutId(content)
-    if (id === undefined) continue
-    const paths = byId.get(id) ?? []
-    paths.push(path)
-    byId.set(id, paths)
-  }
-  const findings: Finding[] = []
-  for (const [id, paths] of byId) {
-    if (paths.length < 2) continue
-    for (const path of paths) {
-      findings.push({
-        path,
-        severity: 'error',
-        line: 1,
-        message: `Duplicate doughnut_id "${id}" — also used by another concept`,
-      })
-    }
-  }
-  return findings
 }
 
 function missingIndexFindings(notes: ReadonlyMap<string, string>): Finding[] {
@@ -189,7 +161,6 @@ export function portableContractFindings(
   notes: ReadonlyMap<string, string>
 ): Finding[] {
   return [
-    ...duplicateIdFindings(notes),
     ...linkFindings(notes),
     ...missingIndexFindings(notes),
     ...unsafeWorkspacePathFindings(notes),

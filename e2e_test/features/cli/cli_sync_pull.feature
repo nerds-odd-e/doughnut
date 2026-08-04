@@ -6,7 +6,7 @@
 Feature: Pull remote note changes into a workspace
 
   As a notebook owner
-  I want `/sync` to create, update, and move local Markdown files from the remote notebook
+  I want `/sync` to create and update local Markdown files from the remote notebook
   So that remote edits in Doughnut reach my Markdown workspace without disturbing other files
 
   Background:

@@ -5,28 +5,13 @@ import { buildZip } from './zipFixture.js'
 describe('previewPull diagnostics', () => {
   const ws = usePreviewPullWorkspace()
 
-  test('reports a move when the same doughnut_id is at a different path', async () => {
-    ws.write('less.md', '---\ndoughnut_id: 42\n---\n\n# less\n\nHello')
-
-    const report = await ws.preview({
-      'scrum.md': '---\ndoughnut_id: 42\n---\n\n# scrum\n\nHello',
-    })
-
-    expect(report).toContain('scrum.md (move)')
-    expect(report).toContain('less.md')
-    expect(report).not.toMatch(/scrum\.md \(create\)/)
-    expect(ws.readBack('less.md')).toBe(
-      '---\ndoughnut_id: 42\n---\n\n# less\n\nHello'
-    )
-  })
-
-  test('does not infer a move when the export note lacks doughnut_id', async () => {
+  test('creates a remote-only note by path when workspace has a different file', async () => {
     ws.write('less.md', 'Hello')
 
     const report = await ws.preview({ 'scrum.md': 'Sprint plan' })
 
     expect(report).toContain('scrum.md (create)')
-    expect(report).not.toContain('(move)')
+    expect(ws.readBack('less.md')).toBe('Hello')
   })
 
   test('rejects a reserved log.md basename with a short reason', async () => {

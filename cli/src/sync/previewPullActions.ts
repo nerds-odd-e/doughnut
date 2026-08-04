@@ -4,49 +4,15 @@
  * Kept separate from push `NoteDiffStatus` (`pull` | `push` | `conflict`) so
  * `/push --dry-run` labeling stays untouched.
  */
-export type PreviewPullAction = 'create' | 'update' | 'move' | 'reject'
+export type PreviewPullAction = 'create' | 'update' | 'reject'
 
 const MARKDOWN_SUFFIX = '.md'
 const RESERVED_BASENAMES = new Set(['index.md', 'log.md'])
 const SYNC_METADATA_SEGMENT = '.doughnut-sync'
 
-/** Case-insensitive `doughnut_id:` line, aligned with backend DOUGHNUT_ID_LINE. */
-const DOUGHNUT_ID_LINE = /^doughnut_id\s*:\s*(.*?)\s*$/i
-
 /**
- * Read the note id from a leading YAML fence when present. Missing or empty →
- * undefined (path-keyed create/update only; never invent a move).
- */
-export function extractDoughnutId(content: string): string | undefined {
-  const lines = content.replace(/\r\n/g, '\n').split('\n')
-  if (lines[0] !== '---') return
-  for (let i = 1; i < lines.length; i++) {
-    if (lines[i] === '---') return
-    const match = DOUGHNUT_ID_LINE.exec(lines[i])
-    if (match) {
-      const id = match[1]?.trim()
-      return id === undefined || id === '' ? undefined : id
-    }
-  }
-  return
-}
-
-/** id → first workspace path that holds that doughnut_id. */
-export function indexPathsByDoughnutId(
-  notes: ReadonlyMap<string, string>
-): Map<string, string> {
-  const byId = new Map<string, string>()
-  for (const [path, content] of notes) {
-    if (!path.endsWith(MARKDOWN_SUFFIX)) continue
-    const id = extractDoughnutId(content)
-    if (id !== undefined && !byId.has(id)) byId.set(id, path)
-  }
-  return byId
-}
-
-/**
- * Path-keyed create/update for one export entry. Move and reject are classified
- * elsewhere once identity and diagnostics are in play.
+ * Path-keyed create/update for one export entry. Rejects are classified
+ * elsewhere once diagnostics are in play.
  */
 export function classifyCreateOrUpdate(
   workspaceContent: string | undefined,
@@ -114,13 +80,6 @@ export type ClassifiedPullNote =
       readonly exportContent: string
     }
   | {
-      readonly action: 'move'
-      readonly path: string
-      readonly fromPath: string
-      readonly workspaceContent: string
-      readonly exportContent: string
-    }
-  | {
       readonly action: 'reject'
       readonly path: string
       readonly reason: string
@@ -146,8 +105,7 @@ function rejectReason(
 
 /**
  * Classify export Markdown notes against the workspace: reject diagnostics
- * first, then identity move when the same doughnut_id sits at different paths,
- * otherwise path-keyed create/update.
+ * first, otherwise path-keyed create/update.
  */
 export function classifyPreviewPullNotes(
   workspace: ReadonlyMap<string, string>,
@@ -155,7 +113,6 @@ export function classifyPreviewPullNotes(
   zipFileNames: readonly string[] = [...exported.keys()]
 ): ClassifiedPullNote[] {
   const duplicates = duplicateMarkdownPaths(zipFileNames)
-  const workspaceById = indexPathsByDoughnutId(workspace)
   const paths = new Set([
     ...[...exported.keys()].filter((path) => path.endsWith(MARKDOWN_SUFFIX)),
     ...[...duplicates].filter((path) => path.endsWith(MARKDOWN_SUFFIX)),
@@ -172,18 +129,6 @@ export function classifyPreviewPullNotes(
     const exportContent = exported.get(path)
     if (exportContent === undefined) continue
 
-    const id = extractDoughnutId(exportContent)
-    const fromPath = id === undefined ? undefined : workspaceById.get(id)
-    if (fromPath !== undefined && fromPath !== path) {
-      classified.push({
-        action: 'move',
-        path,
-        fromPath,
-        workspaceContent: workspace.get(fromPath) ?? '',
-        exportContent,
-      })
-      continue
-    }
     const action = classifyCreateOrUpdate(workspace.get(path), exportContent)
     if (action === 'unchanged') continue
     classified.push({

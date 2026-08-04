@@ -15,7 +15,7 @@ Feature: Export a notebook to a local Markdown tree
     Given I am logged in as an existing user
     And I set the access token for "old_learner" in the interactive CLI
 
-  Scenario: Export writes folder structure, note bodies, and identity frontmatter
+  Scenario: Export writes folder structure and note bodies
     Given I have a notebook "Ben Notebook" with notes:
       | Title | Content         | Folder         |
       | intro | Hello from root |                |
@@ -31,7 +31,7 @@ Feature: Export a notebook to a local Markdown tree
       | Ben Notebook/intro.md                     |
       | Ben Notebook/LeSS in Action/team.md       |
     And the file "Ben Notebook/LeSS in Action/team.md" in the export destination "./ExportTarget" should hold "Sprint"
-    And the file "Ben Notebook/intro.md" in the export destination "./ExportTarget" should hold "doughnut_id:"
+    And the file "Ben Notebook/intro.md" in the export destination "./ExportTarget" should hold "Hello from root"
 
   Scenario: Exporting again reflects a changed note
     Given I have a notebook "Ben Notebook" with notes:

@@ -25,27 +25,6 @@ describe('lintWorkspace portable knowledge contract', () => {
     expect(report).not.toBe('Workspace follows the OKF format.')
   })
 
-  test('reports each concept that shares a doughnut_id', () => {
-    write('apple.md', concept('type: concept\ndoughnut_id: shared-1', 'apple'))
-    write('pear.md', concept('type: concept\ndoughnut_id: shared-1', 'pear'))
-    writeRootIndex()
-
-    const report = lintWorkspace(workspaceRoot())
-    expect(report).toMatch(/doughnut_id/i)
-    expect(report).toContain('apple.md')
-    expect(report).toContain('pear.md')
-    expect(report).toMatch(/error/i)
-  })
-
-  test('does not require doughnut_id on every concept', () => {
-    write('apple.md', concept('type: concept', 'apple'))
-    writeRootIndex()
-
-    expect(lintWorkspace(workspaceRoot())).toBe(
-      'Workspace follows the OKF format.'
-    )
-  })
-
   test('reports a broken wiki target', () => {
     write(
       'apple.md',

@@ -17,7 +17,7 @@ const labelOf = (status: NoteDiffStatus) =>
  * both report it. `status`, when given, is appended to the path header in
  * parentheses — `less.md (push)` — to say which way the difference would
  * flow. Pull dry-run instead passes `action` (`create` / `update` / …) so the
- * Story 2 taxonomy stays off the push status union. For `push`, the diff is
+ * pull-action taxonomy stays off the push status union. For `push`, the diff is
  * shown notebook-to-workspace (what pushing would write into Doughnut); every
  * other case (including unlabeled) is shown workspace-to-notebook, as
  * `/sync --dry-run` already reads.

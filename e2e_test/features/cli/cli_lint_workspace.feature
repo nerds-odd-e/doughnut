@@ -100,35 +100,6 @@ Feature: Check whether a workspace follows the OKF format
     And I should see "b.md" in past CLI assistant messages
     And I should see "2 errors, 1 warning in 2 files." in past CLI assistant messages
 
-  Scenario: Duplicate doughnut_id values are errors
-    Given the workspace "./Workspace" has a file "apple.md" with content:
-      """
-      ---
-      type: concept
-      doughnut_id: shared-note
-      ---
-
-      # apple
-      """
-    And the workspace "./Workspace" has a file "pear.md" with content:
-      """
-      ---
-      type: concept
-      doughnut_id: shared-note
-      ---
-
-      # pear
-      """
-    And the workspace "./Workspace" has a file "index.md" with content:
-      """
-      # Workspace
-      """
-    When I enter the slash command "/lint ./Workspace" in the interactive CLI
-    Then I should see "doughnut_id" in past CLI assistant messages
-    And I should see "apple.md" in past CLI assistant messages
-    And I should see "pear.md" in past CLI assistant messages
-    And I should see "error" in past CLI assistant messages
-
   Scenario: A broken local link is an error
     Given the workspace "./Workspace" has a file "apple.md" with content:
       """

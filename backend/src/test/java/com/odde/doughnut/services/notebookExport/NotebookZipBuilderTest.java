@@ -47,9 +47,7 @@ class NotebookZipBuilderTest {
     Map<String, String> entries = readZipEntries(zipBytes);
 
     assertThat(entries.get("index.md"), equalTo("# Notebook readme"));
-    assertThat(
-        entries.get("First note.md"),
-        equalTo("---\ndoughnut_id: 1\n---\n\n# First note\n\nFirst body"));
+    assertThat(entries.get("First note.md"), equalTo("# First note\n\nFirst body"));
   }
 
   @Test
@@ -66,11 +64,11 @@ class NotebookZipBuilderTest {
     assertThat(entries.containsKey("Child Folder/index.md"), equalTo(false));
     assertThat(
         entries.get("Parent Folder/Child Folder/Nested note.md"),
-        equalTo("---\ndoughnut_id: 2\n---\n\n# Nested note\n\nNested body"));
+        equalTo("# Nested note\n\nNested body"));
   }
 
   @Test
-  void mergesDoughnutIdIntoAuthorFrontmatterWithoutStrippingProperties() throws IOException {
+  void preservesAuthorFrontmatterWithoutStrippingProperties() throws IOException {
     String contentWithFrontmatter = "---\nwikidata_id: Q123\n---\n\nActual body text";
     ExportNoteRow note = new ExportNoteRow(3, null, "My Note", contentWithFrontmatter);
 
@@ -79,7 +77,7 @@ class NotebookZipBuilderTest {
     Map<String, String> entries = readZipEntries(zipBytes);
     assertThat(
         entries.get("My Note.md"),
-        equalTo("---\nwikidata_id: Q123\ndoughnut_id: 3\n---\n\n# My Note\n\nActual body text"));
+        equalTo("---\nwikidata_id: Q123\n---\n\n# My Note\n\nActual body text"));
   }
 
   @Test
@@ -94,7 +92,7 @@ class NotebookZipBuilderTest {
     Map<String, String> entries = readZipEntries(zipBytes);
     String sourceMd = entries.get("Source.md");
 
-    assertThat(sourceMd, containsString("doughnut_id: 1"));
+    assertThat(sourceMd, not(containsString("doughnut_id")));
     assertThat(sourceMd, containsString("[Target Title](Target%20Title.md)"));
     assertThat(sourceMd, not(containsString("[[Target Title]]")));
     assertThat(sourceMd, containsString("http://localhost:9081/attachments/images/9/photo.png"));

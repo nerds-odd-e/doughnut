@@ -12,15 +12,21 @@ import org.junit.jupiter.api.Test;
 class ExportNoteMarkdownTest {
 
   @Test
-  void mergesDoughnutIdReplacingExistingCaseInsensitiveLine() {
-    String block = "---\nDOUGHNUT_ID: 99\nwikidata_id: Q1\n---";
-    assertThat(
-        ExportNoteMarkdown.mergeDoughnutId(block, 7),
-        equalTo("---\ndoughnut_id: 7\nwikidata_id: Q1\n---"));
+  void preservesAuthorFrontmatterWithoutInjectingIdentity() {
+    ExportNoteRow note =
+        new ExportNoteRow(7, null, "With Fm", "---\nwikidata_id: Q1\n---\n\nBody text");
+    Map<Integer, String> paths = Map.of(7, "With Fm.md");
+    Map<String, Integer> titles = Map.of("With Fm", 7);
+
+    String md =
+        ExportNoteMarkdown.assemble(
+            note, "Nb", "http://localhost:9081", "With Fm.md", paths, titles);
+
+    assertThat(md, equalTo("---\nwikidata_id: Q1\n---\n\n# With Fm\n\nBody text"));
   }
 
   @Test
-  void emitsMinimalIdentityFenceWhenNoFrontmatter() {
+  void emitsTitleHeadingAndBodyWhenNoFrontmatter() {
     ExportNoteRow note = new ExportNoteRow(4, null, "Lone", "Body only");
     Map<Integer, String> paths = Map.of(4, "Lone.md");
     Map<String, Integer> titles = Map.of("Lone", 4);
@@ -28,7 +34,7 @@ class ExportNoteMarkdownTest {
     String md =
         ExportNoteMarkdown.assemble(note, "Nb", "http://localhost:9081", "Lone.md", paths, titles);
 
-    assertThat(md, equalTo("---\ndoughnut_id: 4\n---\n\n# Lone\n\nBody only"));
+    assertThat(md, equalTo("# Lone\n\nBody only"));
   }
 
   @Test

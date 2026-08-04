@@ -30,20 +30,15 @@ function renderClassifiedNote(note: ClassifiedPullNote): {
       pullAction: 'reject',
     }
   }
-  const diff = renderNoteDiff(
-    note.path,
-    note.workspaceContent,
-    note.exportContent,
-    undefined,
-    note.action
-  )
-  if (note.action !== 'move') {
-    return { diff, pullAction: note.action }
-  }
-  const [heading, ...rest] = diff.split('\n')
   return {
-    diff: [heading, `  from ${note.fromPath}`, ...rest].join('\n'),
-    pullAction: 'move',
+    diff: renderNoteDiff(
+      note.path,
+      note.workspaceContent,
+      note.exportContent,
+      undefined,
+      note.action
+    ),
+    pullAction: note.action,
   }
 }
 

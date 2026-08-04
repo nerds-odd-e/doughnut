@@ -77,19 +77,6 @@ describe('applyPull', () => {
     expect(readBack('less.md')).toBe('Hello')
   })
 
-  test('applies a move when the same doughnut_id is at a different path', async () => {
-    write('less.md', '---\ndoughnut_id: 42\n---\n\n# less\n\nHello')
-    write('local-only.md', 'keep me')
-
-    const remote = '---\ndoughnut_id: 42\n---\n\n# scrum\n\nHello'
-    const result = await pull({ 'scrum.md': remote })
-
-    expect(result).not.toBe(NOTHING_TO_PULL)
-    expect(readBack('scrum.md')).toBe(remote)
-    expect(() => readBack('less.md')).toThrow()
-    expect(readBack('local-only.md')).toBe('keep me')
-  })
-
   test('rejects a reserved log.md without writing it', async () => {
     write('less.md', 'Hello')
 
@@ -141,18 +128,6 @@ describe('applyPull', () => {
     expect(readBaseline()).toEqual({
       notebookId: 1,
       notes: { 'scrum.md': 'Sprint' },
-    })
-  })
-
-  test('baseline drops fromPath after a move', async () => {
-    write('less.md', '---\ndoughnut_id: 42\n---\n\n# less\n\nHello')
-
-    const remote = '---\ndoughnut_id: 42\n---\n\n# scrum\n\nHello'
-    await pull({ 'scrum.md': remote })
-
-    expect(readBaseline()).toEqual({
-      notebookId: 1,
-      notes: { 'scrum.md': remote },
     })
   })
 

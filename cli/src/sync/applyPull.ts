@@ -1,4 +1,4 @@
-import { mkdirSync, unlinkSync, writeFileSync } from 'node:fs'
+import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, join, posix } from 'node:path'
 import { renderRejectFinding } from './diffReport.js'
 import type { ExportNotebookAsZip } from './exportNotebook.js'
@@ -48,9 +48,9 @@ function writeNote(
 /**
  * Write remote note content into the local Markdown workspace.
  *
- * Classifies the export the same way dry-run does, then applies create,
- * update, and move. Rejects are reported and never written. Sync baseline
- * updates only after at least one successful mutation.
+ * Classifies the export the same way dry-run does, then applies create and
+ * update. Rejects are reported and never written. Sync baseline updates only
+ * after at least one successful mutation.
  */
 export async function applyPull({
   notebookId,
@@ -94,17 +94,7 @@ function applyClassifiedNote(
     return
   }
 
-  if (note.action === 'create' || note.action === 'update') {
-    writeNote(workspacePath, note.path, note.exportContent)
-    nextBaseline.set(note.path, note.exportContent)
-    onMutate()
-    return
-  }
-
-  // move
   writeNote(workspacePath, note.path, note.exportContent)
-  unlinkSync(workspaceFullPath(workspacePath, note.fromPath))
-  nextBaseline.delete(note.fromPath)
   nextBaseline.set(note.path, note.exportContent)
   onMutate()
 }
