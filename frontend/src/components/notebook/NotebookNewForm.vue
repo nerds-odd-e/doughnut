@@ -7,11 +7,10 @@
       editor-role="textbox"
       placeholder="Notebook name"
     />
-    <TextArea
+    <TextInput
       scope-name="notebook"
       field="description"
       v-model="noteFormData.description"
-      :rows="3"
       :error-message="errors.description"
       placeholder="Optional short plain-text message (shown on notebook cards)"
     />
@@ -21,7 +20,7 @@
 
 <script lang="ts">
 import PathNameEditor from "@/components/notes/core/PathNameEditor.vue"
-import TextArea from "@/components/form/TextArea.vue"
+import TextInput from "@/components/form/TextInput.vue"
 import type {
   Circle,
   NotebookCreationRequest,
@@ -38,7 +37,7 @@ export default {
   props: { circle: { type: Object as PropType<Circle> } },
   components: {
     PathNameEditor,
-    TextArea,
+    TextInput,
   },
   data() {
     return {

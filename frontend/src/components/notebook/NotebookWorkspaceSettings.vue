@@ -65,11 +65,10 @@
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="flex flex-col gap-2 col-span-full">
-          <TextArea
+          <TextInput
             scope-name="notebook"
             field="description"
             v-model="settingsBody.description"
-            :rows="3"
             placeholder="Optional short plain-text message (shown on notebook cards)"
           />
           <p class="text-xs text-base-content/60 leading-snug mt-1">
@@ -144,7 +143,7 @@ import usePopups from "@/components/commons/Popups/usePopups"
 import { GitMerge, Share2, Download } from "@lucide/vue"
 import NotebookMoveForm from "@/components/notebook/NotebookMoveForm.vue"
 import CheckInput from "@/components/form/CheckInput.vue"
-import TextArea from "@/components/form/TextArea.vue"
+import TextInput from "@/components/form/TextInput.vue"
 import NotebookAttachedBookSection from "@/components/notebook/NotebookAttachedBookSection.vue"
 import {
   downloadNotebookExport,

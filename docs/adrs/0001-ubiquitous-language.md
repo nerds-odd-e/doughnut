@@ -22,8 +22,9 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 |------|---------|
 | **Note** | Atomic knowledge document (title, content, markdown / rich content, frontmatter; may be nested under another note) |
 | **Notebook** | Top-level collection of notes a user owns or subscribes to |
+| **Notebook description** | One-line short plain-text blurb of a notebook (catalog/settings; not markdown, not the Readme) |
 | **Folder** | Hierarchical path segment inside a notebook |
-| **Readme** | Descriptive text on a notebook or folder |
+| **Readme** | Markdown body on a notebook or folder (workspace landing content; separate from notebook description) |
 | **Notebook catalog** | List of a user’s notebooks (and notebook groups) |
 | **Notebook group** | Named catalog grouping of notebooks (not a Circle) |
 | **Notebook workspace** | In-app notebook shell with Readme, Settings, and Health |
@@ -77,6 +78,7 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 | **Property** | Reduced relationship field; wiki property from accidental match; property memory tracker key |
 | **Chat / conversation / message** | Human note threads and AI chat share the same nouns without a clear split |
 | **My notes / my notebooks** | Notebook catalog; note search scope; subscribed notebook appearing among the user’s notebooks |
+| **Description / Readme** | Catalog blurb (`notebook description`) vs workspace markdown body (`readme`) — both “about the notebook” but different fields |
 
 #### Redundant (several names, one concept)
 
@@ -112,7 +114,9 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 |------|---------|
 | **Note** | Atomic knowledge document |
 | **Notebook** | Top-level note collection a user owns or subscribes to |
+| **Notebook description** | One-line short plain-text blurb of a notebook (catalog/settings; not markdown, not the Readme) |
 | **Folder** | Hierarchical path segment inside a notebook |
+| **Readme** | Markdown body on a notebook or folder (workspace landing content; separate from notebook description) |
 | **Notebook catalog** | UI list of a user’s notebooks and notebook groups |
 | **Notebook group** | Named catalog grouping of notebooks |
 | **Circle** | Multi-user shared space with members and notebooks |
@@ -154,6 +158,9 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
    - Prefer **recall question** over bare **quiz** when naming the prompt type.
    - Prefer **spaced-repetition schedule** over **space setting** in new copy.
    - Prefer **semantic search** over **semantical search**.
+   - Use **notebook description** for the one-line plain-text catalog blurb;
+     use **readme** for the markdown workspace body — never treat them as the
+     same concept.
 
 4. **Alignment policy** — On Accept:
 
