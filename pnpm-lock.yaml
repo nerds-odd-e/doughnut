@@ -85,7 +85,7 @@ importers:
         version: 0.99.0(typescript@6.0.3)
       '@hono/node-server':
         specifier: '>=2.0.12'
-        version: 2.0.12(hono@4.12.33)
+        version: 2.0.12(hono@4.12.34)
       '@mbtest/mountebank':
         specifier: 2.9.4
         version: 2.9.4(supports-color@8.1.1)
@@ -120,8 +120,8 @@ importers:
         specifier: ^15.1.0
         version: 15.1.0
       hono:
-        specifier: 4.12.33
-        version: 4.12.33
+        specifier: 4.12.34
+        version: 4.12.34
       npm-run-all2:
         specifier: ^9.0.3
         version: 9.0.3
@@ -3770,8 +3770,8 @@ packages:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
     hasBin: true
 
-  hono@4.12.33:
-    resolution: {integrity: sha512-+SwvkaiJtxsiPjhy9LivY/1m7UsNqCJetM1BrZl9A5DkQhlbHQDU730mMiDPWjnoCYOM8Chf3WrCJw27kNTPFQ==}
+  hono@4.12.34:
+    resolution: {integrity: sha512-GqXJqY/xJkJmuloTrnV1ZEXG3fqte+VjkUqoRNZXcrUidiUOP4fMSIHHY4tsqZBK++kVyWmt/AAfSUuy57/eSA==}
     engines: {node: '>=16.9.0'}
 
   hookable@5.5.3:
@@ -7321,9 +7321,9 @@ snapshots:
 
   '@hey-api/types@0.1.4': {}
 
-  '@hono/node-server@2.0.12(hono@4.12.33)':
+  '@hono/node-server@2.0.12(hono@4.12.34)':
     dependencies:
-      hono: 4.12.33
+      hono: 4.12.34
 
   '@inkjs/ui@2.0.0(ink@7.1.1(@types/react@19.2.18)(react@19.2.8))(react@19.2.8)':
     dependencies:
@@ -7566,7 +7566,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.30.0(supports-color@10.2.2)(zod@4.4.3)':
     dependencies:
-      '@hono/node-server': 2.0.12(hono@4.12.33)
+      '@hono/node-server': 2.0.12(hono@4.12.34)
       ajv: 8.20.0
       ajv-formats: 3.0.1(ajv@8.20.0)
       content-type: 1.0.5
@@ -7576,7 +7576,7 @@ snapshots:
       eventsource-parser: 3.1.0
       express: 5.2.1(supports-color@10.2.2)
       express-rate-limit: 8.6.0(express@5.2.1(supports-color@8.1.1))(supports-color@10.2.2)
-      hono: 4.12.33
+      hono: 4.12.34
       jose: 6.2.3
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
@@ -7588,7 +7588,7 @@ snapshots:
 
   '@modelcontextprotocol/sdk@1.30.0(supports-color@8.1.1)(zod@4.4.3)':
     dependencies:
-      '@hono/node-server': 2.0.12(hono@4.12.33)
+      '@hono/node-server': 2.0.12(hono@4.12.34)
       ajv: 8.20.0
       ajv-formats: 3.0.1(ajv@8.20.0)
       content-type: 1.0.5
@@ -7598,7 +7598,7 @@ snapshots:
       eventsource-parser: 3.1.0
       express: 5.2.1(supports-color@8.1.1)
       express-rate-limit: 8.6.0(express@5.2.1(supports-color@8.1.1))(supports-color@8.1.1)
-      hono: 4.12.33
+      hono: 4.12.34
       jose: 6.2.3
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
@@ -10193,7 +10193,7 @@ snapshots:
 
   he@1.2.0: {}
 
-  hono@4.12.33: {}
+  hono@4.12.34: {}
 
   hookable@5.5.3: {}
 
