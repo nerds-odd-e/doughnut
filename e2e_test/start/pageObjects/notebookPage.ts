@@ -194,6 +194,15 @@ const notebookPage = () => {
       cy.get('[data-testid="notebook-attached-book"]').should('not.exist')
       return this
     },
+    renameFromSummary(newName: string) {
+      cy.get('[data-testid="notebook-page-name-edit"]').click()
+      cy.get('[data-test="notebook-page-name-input"]').click()
+      cy.clearFocusedText().type(newName)
+      cy.get('[data-testid="notebook-page-name-update"]').click()
+      cy.findByRole('button', { name: 'OK' }).click()
+      waitUntilAppIsNotBusy()
+      return this
+    },
     shareNotebookToBazaar() {
       openSettingsTab()
       cy.findByRole('button', { name: 'Share notebook to bazaar' }).click()
