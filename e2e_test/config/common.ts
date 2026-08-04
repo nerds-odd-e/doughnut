@@ -106,15 +106,15 @@ const commonConfig = {
           })
         },
 
-        fileShouldExistSoon(filePath, retryCount = 50): Promise<boolean> {
-          const checker = (count: number): Promise<boolean> => {
+        fileShouldExistSoon(filePath, retryCount = 50): Promise<string> {
+          const checker = (count: number): Promise<string> => {
             return new Promise((resolve) => {
               if (existsSync(filePath)) {
-                resolve(true)
+                resolve(filePath)
                 return
               }
               if (count === 0) {
-                resolve(false)
+                resolve(`file not found: ${filePath}`)
                 return
               }
               setTimeout(() => {

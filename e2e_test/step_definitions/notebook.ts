@@ -95,7 +95,7 @@ Then(
   (notebookName: string) => {
     const downloadsFolder = Cypress.config('downloadsFolder')
     const filePath = `${downloadsFolder}/${notebookName}.zip`
-    cy.task('fileShouldExistSoon', filePath).should('equal', true)
+    cy.task('fileShouldExistSoon', filePath).should('equal', filePath)
     cy.readFile(filePath, 'binary').then((content: string) => {
       expect(content.startsWith('PK')).to.equal(true)
     })
