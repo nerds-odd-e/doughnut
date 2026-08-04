@@ -66,10 +66,13 @@ export const clickNotebookCardTitleToOpenNotebookPage = (
   waitUntilAppIsNotBusy()
 }
 
+export const NOTEBOOK_CATALOG_EXPORT_ACTION =
+  'Export as markdowns in a zip file'
+
 const OVERFLOW_MENU_ACTION_NAMES = [
   'Edit subscription',
   'Move to group…',
-  'Export',
+  NOTEBOOK_CATALOG_EXPORT_ACTION,
 ] as const
 
 function usesCatalogOverflowMenu(name: string): boolean {

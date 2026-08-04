@@ -38,11 +38,11 @@
           <button
             type="button"
             :class="dropdownMenuButtonClass"
-            title="Export"
+            :title="NOTEBOOK_EXPORT_BUTTON_LABEL"
             data-testid="notebook-catalog-export"
             @click="exportNotebook(closeDropdown)"
           >
-            Export
+            {{ NOTEBOOK_EXPORT_BUTTON_LABEL }}
           </button>
         </DropdownMenuItem>
       </DropdownMenu>
@@ -66,8 +66,6 @@
 <script setup lang="ts">
 import { computed, inject, ref, type ComputedRef } from "vue"
 import { useRouter } from "vue-router"
-import { saveAs } from "file-saver"
-import { useToast } from "vue-toastification"
 import { BookOpen, MoreHorizontal } from "@lucide/vue"
 import type { Notebook, User } from "@generated/doughnut-backend-api"
 import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue"
@@ -81,8 +79,10 @@ import {
   type CatalogMoveToGroupInjected,
 } from "@/components/notebook/catalogMoveToGroupContext"
 import NotebookCatalogMoveToGroupForm from "@/components/notebook/NotebookCatalogMoveToGroupForm.vue"
-import { contentDispositionFileName } from "@/utils/contentDispositionFileName"
-import { isPrintableAscii } from "@/utils/isPrintableAscii"
+import {
+  downloadNotebookExport,
+  NOTEBOOK_EXPORT_BUTTON_LABEL,
+} from "@/utils/notebookExport"
 
 const router = useRouter()
 
@@ -127,22 +127,7 @@ const openMoveToGroup = (closeDropdown: () => void) => {
 
 const exportNotebook = async (closeDropdown: () => void) => {
   closeDropdown()
-  const response = await fetch(`/api/notebooks/${props.notebook.id}/export`, {
-    credentials: "same-origin",
-  })
-  if (!response.ok) {
-    useToast().error("Failed to export notebook.")
-    return
-  }
-  const blob = await response.blob()
-  const parsed = contentDispositionFileName(
-    response.headers.get("content-disposition")
-  )
-  const fileName =
-    parsed !== undefined && isPrintableAscii(parsed)
-      ? parsed
-      : `${props.notebook.name}.zip`
-  saveAs(blob, fileName)
+  await downloadNotebookExport(props.notebook.id, props.notebook.name)
 }
 
 const closeMoveToGroup = () => {

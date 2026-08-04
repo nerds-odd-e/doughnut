@@ -38,6 +38,18 @@
             <span>Share notebook to bazaar</span>
           </div>
         </button>
+        <button
+          class="daisy-btn daisy-btn-outline daisy-btn-sm"
+          type="button"
+          data-testid="notebook-settings-export"
+          :title="NOTEBOOK_EXPORT_BUTTON_LABEL"
+          @click="downloadNotebookExport(notebook.id, notebook.name)"
+        >
+          <div class="flex items-center gap-2">
+            <Download class="w-6 h-6" />
+            <span>{{ NOTEBOOK_EXPORT_BUTTON_LABEL }}</span>
+          </div>
+        </button>
       </div>
     </section>
 
@@ -129,11 +141,15 @@ import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { useToast } from "@/composables/useToast"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
-import { GitMerge, Share2 } from "@lucide/vue"
+import { GitMerge, Share2, Download } from "@lucide/vue"
 import NotebookMoveForm from "@/components/notebook/NotebookMoveForm.vue"
 import CheckInput from "@/components/form/CheckInput.vue"
 import TextArea from "@/components/form/TextArea.vue"
 import NotebookAttachedBookSection from "@/components/notebook/NotebookAttachedBookSection.vue"
+import {
+  downloadNotebookExport,
+  NOTEBOOK_EXPORT_BUTTON_LABEL,
+} from "@/utils/notebookExport"
 
 const props = defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },

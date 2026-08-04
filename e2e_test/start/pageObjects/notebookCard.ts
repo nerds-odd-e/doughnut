@@ -2,6 +2,7 @@ import { waitUntilAppIsNotBusy } from '../pageBase'
 import {
   clickNotebookCardTitleToOpenNotebookPage,
   findNotebookCardButton,
+  NOTEBOOK_CATALOG_EXPORT_ACTION,
   notebookList,
 } from './NotebookList'
 import notebookPage from './notebookPage'
@@ -12,7 +13,7 @@ export const notebookCard = (notebook: string) => ({
     findNotebookCardButton(notebook, 'Move to group…').click()
   },
   exportNotebook() {
-    findNotebookCardButton(notebook, 'Export').click()
+    findNotebookCardButton(notebook, NOTEBOOK_CATALOG_EXPORT_ACTION).click()
   },
   updateSubscription() {
     findNotebookCardButton(notebook, 'Edit subscription').click()
