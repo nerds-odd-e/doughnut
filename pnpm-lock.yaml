@@ -50,7 +50,7 @@ overrides:
   serialize-javascript: '>=7.0.5'
   systeminformation: '>=5.31.6'
   tmp: '>=0.2.6'
-  undici: '>=8.5.0'
+  undici: '>=8.9.0'
   uuid: '>=14.0.0'
   yaml: '>=2.9.0'
   yauzl: '>=3.2.1'
@@ -5984,8 +5984,8 @@ packages:
   undici-types@8.3.0:
     resolution: {integrity: sha512-j375ScV60dom+YkPFIfTLcOiPxkN/buHz5GobjLhixFuANaNs3C9l4GmrWqejgXWJ7BbJcFYpTEUkS1Ge8bpZQ==}
 
-  undici@8.7.0:
-    resolution: {integrity: sha512-N7iQtfyLhIMOFgQubvmLV26svHpO0bqKnAiWotTQCVKCmWrcGbBotPuW1x+xwYZ2VHdSTVUfPQQnlEt1/LouTQ==}
+  undici@8.9.0:
+    resolution: {integrity: sha512-aWZpUj7XoGonMClx4gdDRfgBjqeA+F473aDmROQQbM9n6PRfK/u1q/a0X4wMTgcHfT8H6fpbt98PFuDUwFg2YA==}
     engines: {node: '>=22.19.0'}
 
   unicorn-magic@0.3.0:
@@ -6551,7 +6551,7 @@ snapshots:
   '@actions/http-client@3.0.2':
     dependencies:
       tunnel: 0.0.6
-      undici: 8.7.0
+      undici: 8.9.0
 
   '@actions/io@2.0.0': {}
 
@@ -12490,7 +12490,7 @@ snapshots:
 
   undici-types@8.3.0: {}
 
-  undici@8.7.0: {}
+  undici@8.9.0: {}
 
   unicorn-magic@0.3.0: {}
 
