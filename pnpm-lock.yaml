@@ -44,6 +44,7 @@ overrides:
   nodemailer: '>=9.0.1'
   path-to-regexp: '>=8.4.0'
   picomatch: '>=4.0.4'
+  postcss: '>=8.5.23'
   protobufjs: '>=7.5.5'
   qs: '>=6.14.2'
   rollup: '>=4.59.0'
@@ -3147,7 +3148,7 @@ packages:
     resolution: {integrity: sha512-DZ7M/hWPZyr17ZUdoQ+TVXaPj70mYr4XXrAE+GeJbca44haCvZgb191L/jLJmFYewhxRJuBd4lUtNSu986TXag==}
     engines: {node: '>=18'}
     peerDependencies:
-      postcss: ^8.4.47
+      postcss: '>=8.5.23'
 
   detective-sass@6.0.2:
     resolution: {integrity: sha512-i3xpXHDKS0qI2aFW4asQ7fqlPK00ndOVZELvQapFJCaF0VxYmsNWtd0AmvXbTLMk7bfO5VdIeorhY9KfmHVoVA==}
@@ -5025,11 +5026,7 @@ packages:
     resolution: {integrity: sha512-YLJpK0N1brcNJrs9WatuJFtHaV9q5aAOj+S4DI5S7jgHlRfm0PIbDCAFRYMQD5SHq7Fy6xsDhyutgS0QOAs0qw==}
     engines: {node: '>=10'}
     peerDependencies:
-      postcss: ^8.2.9
-
-  postcss@8.5.20:
-    resolution: {integrity: sha512-lW616l85ucIQL+FocMmL7pQFPqBmwejrCMg+iPxyImlrANNJG9NHq/RkyCZopDhd8C3LA03PHRJDjkbGu8vvug==}
-    engines: {node: ^10 || ^12 || >=14}
+      postcss: '>=8.5.23'
 
   postcss@8.5.25:
     resolution: {integrity: sha512-DTPx3RWSSnWyzLxQnlH0rJP+EW5ekl16ZU4/psbIhA0e53kJfdgaN5vKM+xP7yJtXVu+nfdVFmlgFDEKAe4Pyw==}
@@ -9400,11 +9397,11 @@ snapshots:
     dependencies:
       node-source-walk: 7.0.2
 
-  detective-postcss@8.0.4(postcss@8.5.20):
+  detective-postcss@8.0.4(postcss@8.5.25):
     dependencies:
       is-url-superb: 4.0.0
-      postcss: 8.5.20
-      postcss-values-parser: 6.0.2(postcss@8.5.20)
+      postcss: 8.5.25
+      postcss-values-parser: 6.0.2(postcss@8.5.25)
 
   detective-sass@6.0.2:
     dependencies:
@@ -11420,18 +11417,12 @@ snapshots:
       cssesc: 3.0.0
       util-deprecate: 1.0.2
 
-  postcss-values-parser@6.0.2(postcss@8.5.20):
+  postcss-values-parser@6.0.2(postcss@8.5.25):
     dependencies:
       color-name: 1.1.4
       is-url-superb: 4.0.0
-      postcss: 8.5.20
+      postcss: 8.5.25
       quote-unquote: 1.0.0
-
-  postcss@8.5.20:
-    dependencies:
-      nanoid: 3.3.16
-      picocolors: 1.1.1
-      source-map-js: 1.2.1
 
   postcss@8.5.25:
     dependencies:
@@ -11463,7 +11454,7 @@ snapshots:
       detective-amd: 6.1.0
       detective-cjs: 6.1.1
       detective-es6: 5.0.2
-      detective-postcss: 8.0.4(postcss@8.5.20)
+      detective-postcss: 8.0.4(postcss@8.5.25)
       detective-sass: 6.0.2
       detective-scss: 5.0.2
       detective-stylus: 5.0.1
@@ -11471,7 +11462,7 @@ snapshots:
       detective-vue2: 2.3.0(supports-color@8.1.1)(typescript@5.9.3)
       module-definition: 6.0.2
       node-source-walk: 7.0.2
-      postcss: 8.5.20
+      postcss: 8.5.25
       typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
