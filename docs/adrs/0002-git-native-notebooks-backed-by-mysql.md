@@ -7,11 +7,21 @@
 
 ## Context
 
-Doughnut stores the live notebook domain in MySQL. Notes, folders, readmes,
-wiki links, permissions, subscriptions, memory tracking, and other product
-behavior are updated through application services and database transactions.
-The current notebook export is a generated ZIP of Markdown files, and CLI sync
-uses a private local baseline rather than a Git commit graph.
+Doughnut currently stores notes, folders, readmes, permissions, subscriptions,
+memory tracking, and other product behavior as mutable relational state in
+MySQL. Its local notebook export is a generated ZIP of Markdown files, and CLI
+sync uses a private local baseline rather than a Git commit graph.
+
+The desired architecture makes Git revisions stored by Doughnut the
+authoritative record of version-controlled notebook content. The relational
+note and folder content used by the web application becomes a projection of
+the latest accepted Git snapshot.
+
+Only the portable knowledge content belongs to Git: notebook and folder
+readmes, folders, and notes. Images may join the Git-managed content later.
+Permissions, subscriptions, memory trackers, questions, answer history,
+conversations, and other Doughnut-specific behavior remain authoritative
+relational data.
 
 We want a local notebook copy to be:
 
@@ -22,117 +32,68 @@ We want a local notebook copy to be:
 - able to synchronize in both directions with a remote Doughnut notebook;
 - free of Doughnut note IDs, UUIDs, or other opaque stable per-note identity
   in the local Markdown tree; and
-- compatible with Doughnut continuing to use MySQL as its main operational
-  storage.
+- compatible with Doughnut continuing to use MySQL as its operational
+  database.
 
 OKF represents a concept as a Markdown file and defines its public concept ID
 as its path without the `.md` suffix. It recommends a Git repository as a
 distribution form, but does not define synchronization behavior.
 
-Git and MySQL cannot participate in one atomic transaction. A plain Git hook
-is not a sufficient consistency boundary: `pre-receive` runs before Git
-updates refs, while `post-receive` runs after refs are updated and cannot
-change the push result. Doughnut must therefore define which system owns each
-kind of state and how interrupted updates converge.
+The authoritative Git objects and refs are stored behind Doughnut's database
+boundary rather than maintained as a second independently authoritative
+filesystem repository. Advancing the accepted Git ref, recording internal
+identity lineage, and updating the current relational projection can therefore
+share a transactional acceptance boundary. Immutable objects that are uploaded
+but never become reachable from an accepted ref are harmless and may be
+garbage-collected.
 
-The web application also autosaves more frequently than users would normally
-create Git commits. Treating every content PATCH as a Git commit would produce
-noisy history and couple the web editing experience to repository operations.
-
-## Alternatives considered
-
-### Optional Git with filename and modified-time synchronization
-
-Keep Git optional and infer local changes using paths and filesystem modified
-times.
-
-This has a low entry cost but has no trustworthy common ancestor, depends on
-unstable timestamps, and cannot reliably distinguish edits, renames, copies,
-and delete-and-recreate operations. It would require Doughnut to invent a
-weaker version-control protocol while still retaining private sync state.
-
-**Not selected for two-way synchronization.** A non-Git OKF/ZIP export may
-remain available as a portability feature.
-
-### Require a local Git repository but keep the remote non-Git-native
-
-Use local commits as the merge baseline while translating push and pull
-through bespoke Doughnut APIs.
-
-This improves local conflict handling but does not make Doughnut a Git host:
-standard Git clients cannot clone or fetch the remote without Doughnut-aware
-tooling. A
-[Git remote helper](https://git-scm.com/docs/gitremote-helpers.html) may use
-this model as an incremental delivery step, but it is not the target
-architecture.
-
-### Make Git authoritative and rebuild MySQL from Git
-
-Store notebook state primarily as Git trees and treat MySQL as a search and
-application projection.
-
-This is the purest Git model, but it would require substantial changes to
-Doughnut's existing transactional domain behavior. It would also force web
-autosave, permissions, note relationships, deletion side effects, and other
-database-backed behavior through a Git-first write path.
-
-**Not selected now.** This ADR can be superseded later if operating experience
-shows that Git should become the primary notebook store.
-
-### Allow Git and MySQL to update current notebook state independently
-
-Treat both the Git `main` ref and current MySQL rows as writable authorities
-and reconcile conflicts after the fact.
-
-**Rejected.** This creates split-brain behavior and leaves ordinary reads
-without a deterministic answer when the two stores disagree.
-
-### Host Git repositories while retaining MySQL as the live domain authority
-
-Give Git and MySQL distinct ownership boundaries. Git provides standard
-transport and durable version history; MySQL owns the accepted live notebook
-state and Doughnut-specific behavior.
-
-**Selected.**
+The web application autosaves more frequently than users would normally create
+Git commits. Durable notebook content must nevertheless enter the authoritative
+Git revision store before, or atomically with, its current projection. Any
+state that is persisted without an accepted Git revision is explicitly a draft,
+not the current notebook.
 
 ## Decision
 
-### 1. One Git repository per synchronized notebook
+### 1. Represent each Git-enabled notebook as a Git repository
 
-Doughnut will work toward exposing each sync-enabled notebook as a Git
-repository. The repository's working tree is the canonical OKF representation
-of the notebook.
+Each Git-enabled notebook is represented and served as a Git repository. Its
+accepted branch is the canonical version history of the notebook's portable
+knowledge content, and its working tree is the canonical OKF representation of
+that content.
 
-Standard clone and fetch over Git HTTPS are the target. SSH transport, pull
-requests, arbitrary server-side refs, Git LFS, and branch-aware web editing are
-deferred capabilities, not prerequisites for the initial Git-native host.
+Doughnut exposes standard clone, fetch, and push over Git HTTPS. Other Git
+hosting capabilities are outside the content and authority decisions in this
+ADR.
 
 ZIP/OKF export may remain available for portability. A local copy that
 participates in two-way synchronization must be a Git repository; Doughnut
 will not offer filename-and-modified-time synchronization as an equivalent
 mode.
 
-### 2. Divide authority by concern
+### 2. Make Git revisions authoritative for portable notebook content
 
-MySQL is authoritative for:
+The Git revision store in Doughnut's database is authoritative for:
 
-- current notes, folders, readmes, links, and other live notebook state;
-- Doughnut permissions and product-domain behavior;
-- internal note and folder identities;
-- the monotonically increasing accepted notebook revision;
-- the Git commit accepted as the notebook's `main`; and
-- the private mapping between accepted paths and internal entities.
+- immutable blobs, trees, commits, and their parent graph;
+- the accepted `main` ref;
+- notebook and folder readmes;
+- folder paths; and
+- note paths, titles, frontmatter, and bodies.
 
-Git is authoritative for:
+Authoritative relational state remains responsible for:
 
-- immutable commit objects and their parent graph;
-- commit authorship, timestamps, and messages; and
-- non-main branch and tag refs that Doughnut chooses to support.
+- notebook ownership, authorization, and sharing;
+- stable internal note and folder identities and their Git path lineage;
+- memory trackers, questions, answer history, conversations, and other
+  Doughnut-specific behavior; and
+- non-content application state that has no portable Git representation.
 
-The Git `main` ref must correspond to the commit recorded for the accepted
-MySQL notebook revision. If they disagree, the MySQL accepted-revision mapping
-determines the live notebook and the Git ref is repaired. Neither system may
-silently overwrite divergent state in the other.
+Relational note and folder fields that reproduce the accepted Git tree are a
+current-head projection, not a second source of truth. They carry the commit ID
+from which they were projected and must be rebuildable from the accepted Git
+snapshot plus the internal identity lineage. Application code must not update
+projected content independently of a Git revision.
 
 ### 3. Keep internal identity out of the working tree
 
@@ -140,108 +101,141 @@ The canonical Git tree will not contain a Doughnut note ID, database key,
 UUID, or opaque stable identity token in Markdown frontmatter, Markdown body,
 filename, or a committed sync manifest.
 
-The OKF path is the public concept identity. Doughnut keeps its existing
-internal entity identity and the accepted path-to-entity mapping privately in
-MySQL.
+The OKF path is the public concept identity. Doughnut keeps stable internal note
+and folder identities and their path lineage privately in its relational
+database so DB-only learning and application data can remain attached when a
+file moves or its title changes.
 
 For an incoming change:
 
 - an unchanged path addresses the entity previously accepted at that path;
 - a new path normally creates a new entity;
-- deletion removes the entity at the accepted path;
-- an unambiguous rename may preserve the internal entity; and
-- an ambiguous delete/add or rename must be rejected for explicit resolution,
-  or deliberately applied as delete plus create. Doughnut must not guess.
+- deletion tombstones the internal identity and removes it from the current
+  projection without erasing DB-only history;
+- an exact or otherwise unambiguous rename preserves the internal identity;
+- a whole-folder move preserves uniquely corresponding descendant identities;
+  and
+- an ambiguous delete/add, rename, or copy is rejected for explicit resolution,
+  or deliberately accepted as delete plus create. Doughnut must not guess.
+
+Explicit rename, restore, or identity resolution is recorded as server-side
+lineage associated with the accepted commit, not as identity metadata in the
+working tree. A path that disappears and later reappears is a new identity by
+default unless an explicit restore associates it with the tombstone.
 
 Filename collisions use human-readable path allocation, such as
 `Recipe.md` and `Recipe (2).md`. A collision suffix must not expose the
 database key, and existing surviving paths must not be renumbered merely
 because another colliding note is removed.
 
-OKF-required or author-owned semantic frontmatter, such as `type: Note`, is
-permitted because it describes the concept rather than identifying the
-Doughnut database entity. Unknown author frontmatter must survive a round
-trip.
+The identity row and lineage are authoritative relational data even though the
+row's current title, body, and folder fields are projections. Rebuilding a
+projection must update or recreate projected values without allocating new
+identities or breaking references from memory trackers, questions, and answer
+history.
 
-### 4. Convert Git changes into Doughnut domain operations
+### 4. Accept all durable content changes as Git revisions
 
-A push to the accepted branch is a proposal to change the live notebook, not
-a direct filesystem write to MySQL.
+Git pushes and web-originated content edits use the same acceptance boundary.
+A durable web edit constructs a commit based on the accepted head; a pushed
+commit proposes its existing Git objects and parent graph.
 
-Before accepting it, Doughnut must:
+Before advancing the accepted branch, Doughnut must:
 
 1. authenticate the Git user and authorize the notebook operation;
-2. require the proposed history to be based on the currently accepted commit;
+2. require the proposed change to be based on the currently accepted commit;
 3. validate repository, blob, file-count, path, and canonical OKF rules;
 4. compare the proposed tree with its accepted parent;
-5. map the diff to Doughnut create, edit, rename/move, and delete domain
-   operations;
-6. execute those operations through the existing application services in a
-   MySQL transaction using an expected notebook revision; and
-7. reject the whole update if any commit or operation cannot be represented
+5. resolve the note and folder identity lineage;
+6. atomically advance `main`, record lineage, and update the current relational
+   projection; and
+7. reject the whole ref update if its content or identity cannot be represented
    safely in the Doughnut domain.
 
-When practical, accepted canonical commits pushed by a user retain their Git
-commit IDs. Web-originated changes create server-authored commits.
+Accepted commits pushed by a user retain their Git commit IDs. Web-originated
+changes create server-authored commits. Derived indexes such as embeddings,
+search data, aliases, properties, and wiki-link caches may update
+asynchronously because they are neither authoritative Git content nor stable
+identity.
 
 Non-main branches may exist only in Git until they are merged. They do not
-change the live MySQL notebook merely by being pushed.
+change the current relational projection merely by being pushed.
 
-### 5. Use explicit revision, outbox, and reconciliation state
+### 5. Use an OKF- and Obsidian-compatible canonical Markdown profile
 
-Every MySQL transaction that changes the canonical Git view records a notebook
-revision and a transactional outbox entry. An idempotent projector materializes
-that revision as a Git commit and advances `main`.
+Every note is a Markdown concept document with valid YAML frontmatter and a
+non-empty `type`, as required by OKF. Doughnut uses `type: Note` for ordinary
+notes and preserves author-owned and unknown frontmatter when round-tripping.
 
-Inbound pushes use an idempotent receipt/state machine so an interrupted
-MySQL-write/Git-ref-update sequence can be resumed without applying the domain
-change twice. The design follows the
-[transactional outbox pattern](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html)
-rather than assuming a distributed transaction.
+The filename is the ordinary note title. This matches Obsidian's inline-title
+model and OKF's rule that a title may be derived from the filename. Doughnut
+does not generate a repeated H1 heading in the body. An H1 written by the
+author is ordinary note content and is preserved.
 
-A reconciliation process verifies the accepted MySQL revision, canonical
-rendered tree, recorded commit, and Git `main` ref. It reports or repairs
-incomplete projection work. Repository reads must never advertise an
-unaccepted commit as the live notebook state.
+An explicit `title` frontmatter property is used when the exact Doughnut title
+cannot be faithfully derived from the filesystem-safe filename, including
+sanitization, truncation, and duplicate-name suffixes. When present, `title` is
+the exact display title; the collision suffix belongs to the path, not the
+title.
 
-### 6. Treat Git commits as durable notebook checkpoints
+Internal links in the canonical tree use standard Markdown paths compatible
+with OKF and Obsidian. The readme-to-`index.md` representation must respect
+OKF's reserved index semantics. The canonical format must preserve a stable
+round trip without injecting or stripping author content.
 
-MySQL may retain the web application's fine-grained autosaves. The Git
-projector may coalesce them into a meaningful edit-session checkpoint after an
-idle, navigation, or explicit-flush boundary.
+Because Git does not store empty directories, a Doughnut folder exists in the
+canonical tree only when represented by tracked content. Empty folders require
+an OKF-compatible tracked index or marker rather than relying on filesystem
+directory state.
 
-Before a Git operation that needs the latest remote state, pending canonical
-changes must be projected or the operation must clearly report that projection
-is pending. The Git history represents durable notebook checkpoints; it does
-not promise one commit per HTTP write.
+Git-managed images and other binary attachments are deferred. Until they are
+included, notes may reference attachments outside the Git repository using
+portable URLs.
 
-### 7. Deliver the architecture incrementally
+### 6. Serve application reads from a verifiable current-head projection
 
-Implementation will be gated in this order:
+The Doughnut application may read current note and folder content from
+relational projection tables for efficient queries and compatibility with its
+existing domain model. Each projected aggregate records the accepted commit it
+represents.
 
-1. prove a deterministic, reversible MySQL-to-OKF codec on representative
-   notebooks;
-2. add notebook revisions, transactional outbox, projection status, and
-   reconciliation;
-3. provide read-only standard Git clone/fetch from a MySQL-backed repository;
-4. validate writable import through a Doughnut-aware CLI or Git remote helper;
-5. expose standard Git push only after authorization, idempotency, conflict,
-   and recovery behavior are proven; and
-6. consider richer branch/review hosting separately.
+Projection updates required for a coherent notebook view are part of commit
+acceptance. Expensive derived indexes may lag and recover independently. A
+projection can be discarded and rebuilt from the accepted Git snapshot and
+the authoritative identity lineage without changing note IDs or DB-only
+history.
 
-An ADR does not itself prioritize these implementation phases.
+Repository reads advertise only accepted refs. Application reads must not
+silently treat a projection from a different commit as current.
+
+### 7. Keep non-content Git hosting capabilities outside this decision
+
+Standard Git clone, fetch, and push are part of the desired notebook host.
+ZIP/OKF export may remain as a non-Git portability mechanism, but it is not an
+equivalent two-way synchronization mode.
+
+SSH transport, pull-request workflows, arbitrary server-side refs, Git LFS,
+branch-aware web editing, and storage of images in Git are deferred. Deferring
+them does not change the authority or representation decisions above.
 
 ## Consequences
 
-- Doughnut becomes a genuine Git knowledge host without replacing the
-  existing MySQL-backed product domain.
+- Git revisions, rather than mutable note content rows, determine the current
+  portable notebook content.
+- Doughnut remains a MySQL-backed application, but its database contains both
+  authoritative Git revision/identity state and rebuildable current-head
+  projections with different responsibilities.
 - A Git clone replaces `.doughnut-sync` baseline content for Git-based local
   workspaces; the Git commit graph supplies the common ancestor.
-- MySQL remains optimized for current application behavior, while Git adds
-  offline history, attribution, diffs, branches, backups, and interoperability
-  with developer and agent tooling.
+- Stable note identity remains available to memory trackers, questions, answer
+  history, and other DB-only data without appearing in the local Markdown.
+- Web content writes must create Git commits. Autosave batching can exist only
+  as explicit draft behavior until a commit is accepted.
 - The canonical OKF codec becomes a cross-cutting compatibility contract. A
-  lossy or nondeterministic export is no longer acceptable.
+  lossy or nondeterministic projection is not acceptable.
+- Ordinary title changes are filename changes and can preserve identity as
+  exact-content Git renames. Generated title H1 headings disappear; author H1
+  headings remain content.
 - The system gains operational responsibility for Git object storage,
   authentication, pack validation, quotas, garbage collection, backup,
   recovery, and abuse prevention.
@@ -252,8 +246,9 @@ An ADR does not itself prioritize these implementation phases.
   edit cannot be represented by Doughnut, or identity-free rename inference is
   ambiguous. Users must fetch and merge/rebase, or resolve the operation
   explicitly.
-- Web autosaves and Git commits have different granularity. The UI and API must
-  expose projection lag where it is user-visible.
+- Rebuilding the current relational projection must preserve internal identity
+  and DB-only history; dropping and recreating note rows is not a valid cache
+  rebuild strategy.
 
 ## Pros
 
@@ -262,43 +257,44 @@ An ADR does not itself prioritize these implementation phases.
 - Aligns notebook distribution with OKF's recommended Git form.
 - Keeps internal database identity and implementation metadata out of the
   user's Markdown.
-- Preserves existing MySQL transactions, permissions, search, relationships,
-  and learning features.
+- Preserves MySQL-backed permissions, learning history, conversations, and
+  other Doughnut-specific features while making portable content independent.
 - Allows branches to remain cheap Git-only state until a merge affects the
   live notebook.
-- Supports a staged path from read-only hosting to standard two-way Git
-  without committing to a GitHub-scale feature set.
+- Makes the current application representation rebuildable and verifiable
+  against an accepted commit.
 
 ## Cons
 
-- Introduces a consistency boundary between MySQL and Git that requires
-  idempotency, projection status, and repair tooling.
-- Requires an inverse importer and canonical renderer rather than the current
-  one-way ZIP exporter.
+- Requires Git object/ref storage, an identity lineage model, and a canonical
+  projector rather than the current mutable-row and one-way ZIP model.
+- Requires existing write paths to create commits instead of directly mutating
+  projected content.
 - Adds repository storage and Git server operational costs.
 - Identity-free Markdown makes some rename/copy cases inherently ambiguous.
 - Git history complicates retention, erasure, and authorization changes after
   content has been cloned.
-- A special CLI/remote-helper bridge may be needed before standard Git push is
-  safe.
+- Filename-derived titles require explicit `title` frontmatter for names that
+  cannot round-trip through a portable filesystem path.
 
-## Prerequisites / Assumptions
+## Architectural constraints / Assumptions
 
-- A representative corpus can round-trip through
-  `MySQL -> canonical OKF tree -> import -> MySQL -> canonical OKF tree`
-  without unintended semantic or textual drift.
+- Git blobs, trees, commits, and refs are stored with enough fidelity to serve
+  and retain the exact accepted Git object IDs.
+- The accepted ref, internal identity lineage, and coherent current projection
+  share a transactional acceptance boundary.
+- A projection round-trip from accepted Git tree to relational state and back
+  reproduces the accepted tree without unintended semantic or textual drift.
 - The canonical codec defines title, folder/readme, link, attachment, reserved
   filename, frontmatter, duplicate-name, and filename-sanitization behavior.
-- Every application mutation that affects the canonical tree can record a
-  notebook revision and outbox event in the same MySQL transaction.
+- Every durable application mutation that affects portable notebook content
+  creates an accepted Git revision.
 - Existing Doughnut authorization remains the source of Git read/write
   permissions.
-- Initial repositories can constrain refs, blob sizes, file counts, pack sizes,
-  and force pushes.
-- Attachments may remain remote URLs initially; offline binary storage and Git
-  LFS are separate decisions.
-- Repository history has an explicit backup, retention, privacy, and erasure
-  policy before writable hosting is generally available.
+- Repository operations constrain refs, blob sizes, file counts, pack sizes,
+  and force pushes according to Doughnut's product and security policies.
+- Repository history and DB-only learning data have explicit backup, retention,
+  privacy, and erasure semantics.
 
 ## Related
 
@@ -308,7 +304,6 @@ An ADR does not itself prioritize these implementation phases.
   - ADR-0000 [Use Architectural Decision Records](./0000-use-adrs-accepted.md)
   - [ADR playbook](./README.md)
   - [Open Knowledge Format v0.2](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)
-  - [Git remote helpers](https://git-scm.com/docs/gitremote-helpers.html)
-  - [Git hooks](https://git-scm.com/docs/githooks)
-  - [Git receive-pack](https://git-scm.com/docs/git-receive-pack)
-  - [Transactional outbox pattern](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html)
+  - [Obsidian settings: inline titles](https://obsidian.md/help/settings)
+  - [Obsidian note management](https://obsidian.md/help/manage-notes)
+  - [Git rename detection](https://git-scm.com/docs/git-status.html)
