@@ -4,9 +4,6 @@ import bookReadingPage from './bookReadingPage'
 import { sidebarChildNotePageMethods } from './sidebarChildNotePageMethods'
 
 const notebookPage = () => {
-  const clickButton = (name: string) =>
-    cy.findByRole('button', { name }).click()
-
   const openSettingsTab = () => {
     cy.get('[data-testid="notebook-workspace-tab-settings"]').click()
     cy.get('[data-testid="notebook-workspace-settings"]').should('be.visible')
@@ -146,13 +143,15 @@ const notebookPage = () => {
     expectSettingsSectionsVisible() {
       cy.get('[data-testid="notebook-workspace-settings"]').should('be.visible')
       cy.get('[data-testid="notebook-workspace-settings"]').within(() => {
+        cy.contains('Description').should('exist')
         cy.contains('Notebook Management').should('exist')
-        cy.contains('Notebook Settings').should('exist')
         cy.contains('Notebook Indexing').should('exist')
         cy.contains('Share notebook to bazaar').should('exist')
         cy.contains('Skip Memory Tracking').should('exist')
         cy.contains('Update index').should('exist')
         cy.contains('Reset notebook index').should('exist')
+        cy.contains('Notebook Settings').should('not.exist')
+        cy.contains('Update Settings').should('not.exist')
       })
       return this
     },
@@ -165,7 +164,6 @@ const notebookPage = () => {
     skipMemoryTracking() {
       openSettingsTab()
       form.getField('Skip Memory Tracking').check()
-      clickButton('Update Settings')
       waitUntilAppIsNotBusy()
     },
 

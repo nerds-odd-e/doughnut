@@ -3,6 +3,45 @@
     class="notebook-workspace-settings"
     data-testid="notebook-workspace-settings"
   >
+    <section class="bg-base-100 border border-base-300 rounded-lg p-6 mb-6">
+      <div class="flex flex-col gap-2">
+        <TextInput
+          scope-name="notebook"
+          field="description"
+          v-model="settingsBody.description"
+          placeholder="Optional short plain-text message (shown on notebook cards)"
+        />
+        <p class="text-xs text-base-content/60 leading-snug mt-1">
+          Plain text only, up to 500 characters. This is separate from notebook page body
+          content.
+        </p>
+      </div>
+      <button
+        class="daisy-btn daisy-btn-primary daisy-btn-sm mt-4"
+        type="button"
+        data-testid="notebook-description-save"
+        @click="saveDescription"
+      >
+        Save Description
+      </button>
+    </section>
+
+    <section class="bg-base-100 border border-base-300 rounded-lg p-6 mb-6">
+      <div class="flex flex-col gap-2">
+        <CheckInput
+          scope-name="notebook"
+          field="skipMemoryTrackingEntirely"
+          title="Skip Memory Tracking"
+          :model-value="settingsBody.skipMemoryTrackingEntirely"
+          :error-message="errors.skipMemoryTrackingEntirely"
+          @update:model-value="onSkipMemoryTrackingChange"
+        />
+        <p class="text-xs text-base-content/60 leading-snug mt-1">
+          When enabled, notes in this notebook will not be included in memory tracking and recall sessions.
+        </p>
+      </div>
+    </section>
+
     <NotebookAttachedBookSection :notebook-id="notebook.id" />
 
     <section class="bg-base-100 border border-base-300 rounded-lg p-6 mb-6">
@@ -51,47 +90,6 @@
           </div>
         </button>
       </div>
-    </section>
-
-    <section class="bg-base-100 border border-base-300 rounded-lg p-6 mb-6">
-      <div class="mb-5">
-        <h4 class="text-lg font-semibold mb-2 text-base-content">
-          Notebook Settings
-        </h4>
-        <p class="text-sm text-base-content/70 leading-normal">
-          Configure memory tracking and an optional short plain-text message
-          for this notebook.
-        </p>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="flex flex-col gap-2 col-span-full">
-          <TextInput
-            scope-name="notebook"
-            field="description"
-            v-model="settingsBody.description"
-            placeholder="Optional short plain-text message (shown on notebook cards)"
-          />
-          <p class="text-xs text-base-content/60 leading-snug mt-1">
-            Plain text only, up to 500 characters. This is separate from notebook page body
-            content.
-          </p>
-        </div>
-        <div class="flex flex-col gap-2">
-          <CheckInput
-            scope-name="notebook"
-            field="skipMemoryTrackingEntirely"
-            title="Skip Memory Tracking"
-            v-model="settingsBody.skipMemoryTrackingEntirely"
-            :error-message="errors.skipMemoryTrackingEntirely"
-          />
-          <p class="text-xs text-base-content/60 leading-snug mt-1">
-            When enabled, notes in this notebook will not be included in memory tracking and recall sessions.
-          </p>
-        </div>
-      </div>
-      <button class="daisy-btn daisy-btn-primary daisy-btn-sm mt-4" @click="processForm">
-        Update Settings
-      </button>
     </section>
 
     <section class="bg-base-100 border border-base-300 rounded-lg p-6 mb-6">
@@ -185,7 +183,7 @@ const shareNotebook = async () => {
   }
 }
 
-const processForm = async () => {
+const persistSettings = async (successMessage: string) => {
   const { data: updatedNotebook, error } = await apiCallWithLoading(() =>
     NotebookController.updateNotebook({
       path: { notebook: props.notebook.id },
@@ -194,11 +192,20 @@ const processForm = async () => {
   )
   if (!error) {
     emit("notebook-updated", updatedNotebook!)
-    showSuccessToast("Notebook settings updated successfully")
-  } else {
-    const errorObj = toOpenApiError(error)
-    errors.value = { ...errors.value, ...(errorObj.errors || {}) }
+    showSuccessToast(successMessage)
+    return
   }
+  const errorObj = toOpenApiError(error)
+  errors.value = { ...errors.value, ...(errorObj.errors || {}) }
+}
+
+const saveDescription = async () => {
+  await persistSettings("Notebook description updated")
+}
+
+const onSkipMemoryTrackingChange = async (checked: boolean) => {
+  props.settingsBody.skipMemoryTrackingEntirely = checked
+  await persistSettings("Memory tracking setting updated")
 }
 
 const reindexNotebook = async () => {
