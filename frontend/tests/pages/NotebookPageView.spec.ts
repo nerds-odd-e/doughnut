@@ -28,7 +28,7 @@ describe("NotebookPageView.spec", () => {
     await Promise.resolve()
   }
 
-  it("shows notebook name and description in summary with no link row in the summary", async () => {
+  it("shows notebook name in title hero without catalog description", async () => {
     const nb: Notebook = {
       ...makeMe.aNotebook.please(),
       name: "My Notebook Title",
@@ -46,28 +46,9 @@ describe("NotebookPageView.spec", () => {
       wrapper.find('[data-testid="notebook-page-kind-label"]').text()
     ).toContain("Notebook")
     expect(summary.text()).toContain("My Notebook Title")
-    expect(summary.text()).toContain("A short message for the notebook.")
+    expect(summary.text()).not.toContain("A short message for the notebook.")
     expect(summary.text()).not.toContain("Head note")
     expect(summary.find("a").exists()).toBe(false)
-  })
-
-  it("shows notebook name in summary without description block when description is absent", async () => {
-    const nb: Notebook = {
-      ...makeMe.aNotebook.please(),
-      name: "Title Only NB",
-      description: undefined,
-    }
-    const wrapper = helper
-      .component(NotebookPageView)
-      .withRouter()
-      .withProps({ notebook: nb, fetchNotebookPage: noopFetchNotebookPage })
-      .mount()
-
-    const summary = wrapper.find('[data-testid="notebook-page-summary"]')
-    expect(summary.text()).toContain("Title Only NB")
-    expect(summary.find(".notebook-page-summary-description").exists()).toBe(
-      false
-    )
   })
 
   it("shows home landmarks and hides admin sections on first paint", async () => {
@@ -94,7 +75,7 @@ describe("NotebookPageView.spec", () => {
     ).toContain("Workspace Home NB")
     expect(
       wrapper.find('[data-testid="notebook-page-summary"]').text()
-    ).toContain("Home cue")
+    ).not.toContain("Home cue")
     expect(
       wrapper.find('[data-testid="notebook-workspace-readme"]').exists()
     ).toBe(true)

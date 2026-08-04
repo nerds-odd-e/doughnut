@@ -13,9 +13,6 @@
         :settings-body="formData"
         @notebook-updated="(n) => emit('notebook-updated', n)"
       />
-      <p v-if="notebook.description" class="notebook-page-summary-description">
-        {{ notebook.description }}
-      </p>
     </div>
 
     <WorkspaceReadmeSettingsTabs
@@ -107,11 +104,5 @@ watch(
   border-radius: 8px;
   margin-bottom: 1.5rem;
   padding: 1.5rem;
-}
-
-.notebook-page-summary-description {
-  color: color-mix(in oklch, var(--color-base-content) 60%, transparent);
-  line-height: 1.6;
-  margin-top: 0.5rem;
 }
 </style>
