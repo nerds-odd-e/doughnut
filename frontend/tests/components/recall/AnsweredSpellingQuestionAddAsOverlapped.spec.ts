@@ -91,7 +91,7 @@ describe("AnsweredSpellingQuestion add as overlapped note", () => {
     expect(wrapper.emitted("retry")).toBeUndefined()
   })
 
-  it("does not update content when overlap wiki-link is already in overlaps", async () => {
+  it("disables add as overlapped when the match is already in overlaps", async () => {
     const { answeredQuestion, reviewedRealm, matchedA, matchedB } =
       accidentalMatchWithTwoMatchedNotes()
     const overlapToken = buildWikiLinkText(
@@ -109,11 +109,6 @@ overlaps:
 
 ## Body
 `
-    const updateSpy = mockSdkService(
-      TextContentController,
-      "updateNoteContent",
-      reviewedRealm
-    )
 
     wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {
       currentUser: makeMe.aUser.please(),
@@ -123,19 +118,61 @@ overlaps:
     await flushPromises()
     await openResolveAccidentalMatch(wrapper)
 
-    updateSpy.mockClear()
-    ;(
-      document.body.querySelector(
-        '[data-testid="add-as-overlapped-note-10"]'
-      ) as HTMLElement
-    ).click()
-    await flushPromises()
-
-    expect(updateSpy).not.toHaveBeenCalled()
+    const alreadyDeclared = document.body.querySelector(
+      '[data-testid="add-as-overlapped-note-10"]'
+    ) as HTMLButtonElement
+    const otherMatch = document.body.querySelector(
+      '[data-testid="add-as-overlapped-note-20"]'
+    ) as HTMLButtonElement
+    expect(alreadyDeclared.disabled).toBe(true)
+    expect(otherMatch.disabled).toBe(false)
     expect(
       document.body.querySelector(
-        '[data-testid="accidental-match-resolve-dialog"]'
-      )
-    ).toBeTruthy()
+        '[data-testid="link-to-matched-note-10"]'
+      ) as HTMLButtonElement
+    ).not.toBeNull()
+    expect(
+      (
+        document.body.querySelector(
+          '[data-testid="link-to-matched-note-10"]'
+        ) as HTMLButtonElement
+      ).disabled
+    ).toBe(false)
+  })
+
+  it("disables add as overlapped when the match is a legacy wiki-link in aliases", async () => {
+    const { answeredQuestion, reviewedRealm, matchedA, matchedB } =
+      accidentalMatchWithTwoMatchedNotes()
+    const overlapToken = buildWikiLinkText(
+      {
+        noteTopology: matchedA.note.noteTopology,
+        notebookId: matchedA.notebookRealm.notebook.id,
+        notebookName: matchedA.notebookRealm.notebook.name,
+      },
+      { notebookId: reviewedRealm.notebookRealm.notebook.id }
+    )
+    reviewedRealm.note.content = `---
+aliases:
+  - "${overlapToken}"
+---
+
+## Body
+`
+
+    wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {
+      currentUser: makeMe.aUser.please(),
+      seedRealms: [reviewedRealm, matchedA, matchedB],
+      withRouter: true,
+    })
+    await flushPromises()
+    await openResolveAccidentalMatch(wrapper)
+
+    expect(
+      (
+        document.body.querySelector(
+          '[data-testid="add-as-overlapped-note-10"]'
+        ) as HTMLButtonElement
+      ).disabled
+    ).toBe(true)
   })
 })

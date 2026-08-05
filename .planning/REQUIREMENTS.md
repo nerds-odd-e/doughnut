@@ -39,7 +39,7 @@ Real product gaps found after milestone audit. Plan: `.planning/quick/002-overla
 - [x] **OVL-03**: Rich-mode `overlaps` authoring matches `aliases` list UX; each item shown as a clickable wiki link
 - [x] **OVL-04**: OVERLAP grading resolves declarations from `overlaps` (not wiki-link items in `aliases`)
 - [x] **OVL-05**: **Add as overlapped note** appends into `overlaps` (not `aliases`); still no try-again / no SRS reclaim on this accidental-match result
-- [ ] **OVL-06**: When overlap toward that match already exists, **Add as overlapped note** is disabled
+- [x] **OVL-06**: When overlap toward that match already exists, **Add as overlapped note** is disabled
 - [ ] **OVL-07**: `aliases` accepts plain alias strings only; wiki-in-`aliases` migrated or dual-read until removed
 
 ## v2 Requirements
@@ -102,11 +102,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Plan phase | Status |
 |-------------|------------|--------|
 | OVL-01 | Quick 002 / Phase 1 | Done |
-| OVL-02 | Quick 002 / Phase 3 | Planned |
-| OVL-03 | Quick 002 / Phase 3 | Planned |
-| OVL-04 | Quick 002 / Phase 4 | Planned |
-| OVL-05 | Quick 002 / Phase 5 | Planned |
-| OVL-06 | Quick 002 / Phase 6 | Planned |
+| OVL-02 | Quick 002 / Phase 3 | Done |
+| OVL-03 | Quick 002 / Phase 3 | Done |
+| OVL-04 | Quick 002 / Phase 4 | Done |
+| OVL-05 | Quick 002 / Phase 5 | Done |
+| OVL-06 | Quick 002 / Phase 6 | Done |
 | OVL-07 | Quick 002 / Phase 7 | Planned |
 
 ---

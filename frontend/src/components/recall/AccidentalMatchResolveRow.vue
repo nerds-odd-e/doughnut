@@ -30,6 +30,7 @@
         :data-testid="`add-as-overlapped-note-${matched.id}`"
         title="Add as overlapped note"
         aria-label="Add as overlapped note"
+        :disabled="addAsOverlappedDisabled"
         @click="$emit('addAsOverlapped')"
       >
         Add as overlapped note
@@ -51,6 +52,10 @@ const props = defineProps({
     required: true,
   },
   canMutate: {
+    type: Boolean,
+    default: false,
+  },
+  addAsOverlappedDisabled: {
     type: Boolean,
     default: false,
   },

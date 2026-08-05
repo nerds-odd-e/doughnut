@@ -98,7 +98,7 @@ Map OVL-* into REQUIREMENTS.md when this plan is accepted onto the roadmap / mil
 - **Learnings:** Kept helper name; swapped aliases wrapper for shared list-key append. Null-on-duplicate now keys off `overlaps` only (legacy wiki-in-aliases still grades via dual-read until Phase 7; Phase 6 disable should check overlaps ∪ legacy).
 
 ### Phase 6 — Disable Add as overlapped when already declared
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
 - **Requirements:** OVL-06
 - **Observable:**
@@ -108,6 +108,7 @@ Map OVL-* into REQUIREMENTS.md when this plan is accepted onto the roadmap / mil
 - **Tests:** Vitest (seeded overlaps → disabled CTA); E2E optional
 - **Done when:** No silent null-append as the only signal; disabled state is explicit
 - **Stop-safe:** Prevents duplicate declares after Phase 5
+- **Learnings:** FE dual-read via `gradingOverlapWikiLinkTokensFromNoteContent` / `noteContentDeclaresOverlapWikiLink` (overlaps ∪ legacy wiki-in-aliases). Row prop `addAsOverlappedDisabled` is independent of `canMutate` (readonly still hides both CTAs).
 
 ### Phase 7 — Aliases plain-only + retire wiki-in-aliases
 - **Status:** planned
@@ -136,7 +137,8 @@ Map OVL-* into REQUIREMENTS.md when this plan is accepted onto the roadmap / mil
 ## Interim behavior
 
 - Dual-read wiki-in-`aliases` during Phases 4–6 is allowed; **remove** in Phase 7.
-- **Phase 5 done:** Dialog **Add as overlapped note** appends under `overlaps`. Grading still dual-reads legacy wiki-in-`aliases` until Phase 7.
+- **Phase 5 done:** Dialog **Add as overlapped note** appends under `overlaps`.
+- **Phase 6 done:** Disable CTA dual-reads overlaps ∪ legacy wiki-in-`aliases`. Grading still dual-reads until Phase 7.
 
 ## Anti-patterns to avoid
 
@@ -156,7 +158,7 @@ Map OVL-* into REQUIREMENTS.md when this plan is accepted onto the roadmap / mil
 | 3 Rich `overlaps` + validation + link display | done |
 | 4 Grading from `overlaps` (+ dual-read) | done |
 | 5 Dialog writes `overlaps` | done |
-| 6 Disable when already declared | planned |
+| 6 Disable when already declared | done |
 | 7 Aliases plain-only + migrate | planned |
 
 ---

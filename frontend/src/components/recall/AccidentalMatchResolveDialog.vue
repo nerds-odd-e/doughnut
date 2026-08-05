@@ -17,6 +17,7 @@
         :key="matched.id"
         :matched="matched"
         :can-mutate="canOfferMutatingAction(matched.id)"
+        :add-as-overlapped-disabled="isOverlapAlreadyDeclared(matched.id)"
         @build-link="openLinkOffer(matched.id)"
         @add-as-overlapped="addAsOverlappedNote(matched.id)"
       />
@@ -37,6 +38,8 @@ import AccidentalMatchResolveRow from "@/components/recall/AccidentalMatchResolv
 import MatchedNoteLinkOffer from "@/components/recall/MatchedNoteLinkOffer.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { appendOverlapWikiLinkToNoteContent } from "@/utils/appendOverlapWikiLinkToNoteContent"
+import { buildWikiLinkText } from "@/utils/buildWikiLinkText"
+import { noteContentDeclaresOverlapWikiLink } from "@/utils/gradingOverlapWikiLinkTokens"
 
 const props = defineProps({
   matchedNotes: {
@@ -72,6 +75,32 @@ function canOfferMutatingAction(matchedNoteId: number): boolean {
   return !!matchedRealm
 }
 
+function overlapAppendContext(matchedNoteId: number) {
+  const reviewed = reviewedRealm.value
+  const matched = storageAccessor.value
+    .storedApi()
+    .getNoteRealmRefAndLoadWhenNeeded(matchedNoteId).value
+  if (!reviewed?.note || !matched) return null
+  return {
+    content: reviewed.note.content ?? "",
+    target: {
+      noteTopology: matched.note.noteTopology,
+      notebookId: matched.notebookRealm.notebook.id,
+      notebookName: matched.notebookRealm.notebook.name,
+    },
+    source: { notebookId: reviewed.notebookRealm.notebook.id },
+  }
+}
+
+function isOverlapAlreadyDeclared(matchedNoteId: number): boolean {
+  const ctx = overlapAppendContext(matchedNoteId)
+  if (!ctx) return false
+  return noteContentDeclaresOverlapWikiLink(
+    ctx.content,
+    buildWikiLinkText(ctx.target, ctx.source)
+  )
+}
+
 function openLinkOffer(matchedNoteId: number) {
   step.value = { kind: "link", matchedNoteId }
 }
@@ -81,20 +110,13 @@ function returnToList() {
 }
 
 async function addAsOverlappedNote(matchedNoteId: number) {
-  const reviewed = reviewedRealm.value
-  const matched = storageAccessor.value
-    .storedApi()
-    .getNoteRealmRefAndLoadWhenNeeded(matchedNoteId).value
-  if (!reviewed?.note || !matched) return
+  const ctx = overlapAppendContext(matchedNoteId)
+  if (!ctx) return
 
   const composed = appendOverlapWikiLinkToNoteContent(
-    reviewed.note.content ?? "",
-    {
-      noteTopology: matched.note.noteTopology,
-      notebookId: matched.notebookRealm.notebook.id,
-      notebookName: matched.notebookRealm.notebook.name,
-    },
-    { notebookId: reviewed.notebookRealm.notebook.id }
+    ctx.content,
+    ctx.target,
+    ctx.source
   )
   if (composed === null) return
 
