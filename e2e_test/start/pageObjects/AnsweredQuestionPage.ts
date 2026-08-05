@@ -96,8 +96,10 @@ const assumeAnsweredQuestionPage = () => {
         .should('be.visible')
         .and('contain.text', matchedNoteTitle)
         .and('contain.text', 'English practice')
+        .and('contain.text', 'largely overlaps with the current note')
         .within(() => {
           cy.contains('a', matchedNoteTitle).should('be.visible')
+          cy.findByTestId('resolve-overlap-explanation').should('be.visible')
         })
       cy.get('.close-button').filter(':visible').first().click()
       cy.findByTestId('accidental-match-resolve-dialog').should('not.exist')

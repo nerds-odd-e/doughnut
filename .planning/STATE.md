@@ -4,11 +4,11 @@ milestone: v1.2
 milestone_name: Accidental Match Resolve UX
 current_phase: 12
 current_phase_name: Title navigate, reopen, E2E polish
-status: phase_complete
-stopped_at: Phase 12 complete (AMR-05); v1.2 phases done — no auto-transition
-last_updated: "2026-08-05T14:13:00.933Z"
-last_activity: 2026-08-05
-last_activity_desc: test(12-01) reopen-after-title-navigate E2E
+status: gap_closure_in_progress
+stopped_at: Quick 002 Phase 1 done (OVL-01); next Phase 2 Structure shared list helpers
+last_updated: "2026-08-06T07:35:00Z"
+last_activity: 2026-08-06
+last_activity_desc: Quick 002 Phase 1 — resolve dialog overlap explanation (OVL-01)
 progress:
   total_phases: 6
   completed_phases: 6
@@ -30,8 +30,8 @@ See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 Phase: 12 of 12 (Title navigate, reopen, E2E polish) — complete
 Plan: 12-01 executed; 12-02 skipped (KeepAlive sufficient)
-Status: AMR-05 green; v1.2 roadmap phases done — ready for milestone audit/archive (`--no-transition`)
-Last activity: 2026-08-05 — Phase 12 discuss → plan → execute complete
+Status: Gap closure quick/002 — Phase 1 (OVL-01) done; Phase 2 next
+Last activity: 2026-08-06 — resolve dialog explains overlap
 
 Progress: [██████████] 100% (6/6 v1.2 phases; 11/11 plans accounted — 10 executed + 1 skipped)
 
@@ -107,12 +107,15 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 
 ### Pending Todos
 
-None.
+- Continue `.planning/quick/002-overlaps-property-and-resolve-polish/` from Phase 2 (OVL-02..07 remain)
+- Confirm D-mig (legacy wiki-in-aliases migration) at Phase 7 Jidoka; D-copy draft shipped in Phase 1 (tweak OK)
+- Process: still missing `*-VERIFICATION.md` for phases 7–12 (audit process gate)
 
 ### Blockers/Concerns
 
 - Resolved (12-01): KeepAlive live session preserves `matchedNotes` after history back — no OpenAPI enrichment
-- Do not conflate dialog overlap declare with `AnswerOutcome.OVERLAP` try-again / SRS reclaim (ADR 0003) — Phase 11 locked
+- Do not conflate dialog overlap declare with `AnswerOutcome.OVERLAP` try-again / SRS reclaim (ADR 0003) — Phase 11 locked; OVL plan keeps that policy, changes storage only
+- Product: overlap must leave `aliases` — dual-purpose wiki-in-aliases is the gap being closed
 
 ## Deferred Items
 
@@ -125,7 +128,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-08-05T14:13:00.926Z
-Stopped at: Phase 12 complete (AMR-05); v1.2 phases done — no auto-transition
-Resume file: .planning/phases/12-title-navigate-reopen-e2e-polish/12-01-SUMMARY.md
-Next action: Skip 12-02 (or mark skipped) → ship / complete milestone v1.2
+Last session: 2026-08-06
+Stopped at: Quick 002 Phase 1 done (OVL-01 overlap explanation in resolve dialog)
+Resume file: .planning/quick/002-overlaps-property-and-resolve-polish/PLAN.md
+Next action: `execute-plan` Phase 2 — Structure: shared string-list frontmatter helpers

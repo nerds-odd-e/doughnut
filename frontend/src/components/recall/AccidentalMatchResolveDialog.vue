@@ -1,18 +1,27 @@
 <template>
-  <ul
+  <div
     v-if="step.kind === 'list'"
-    class="flex flex-col gap-2"
+    class="flex flex-col gap-3"
     data-testid="accidental-match-resolve-dialog"
   >
-    <AccidentalMatchResolveRow
-      v-for="matched in matchedNotes"
-      :key="matched.id"
-      :matched="matched"
-      :can-mutate="canOfferMutatingAction(matched.id)"
-      @build-link="openLinkOffer(matched.id)"
-      @add-as-overlapped="addAsOverlappedNote(matched.id)"
-    />
-  </ul>
+    <p
+      class="text-sm opacity-80"
+      data-testid="resolve-overlap-explanation"
+    >
+      Overlap is for a note that largely overlaps with the current note. It may
+      be a technically correct answer, but we expect a more precise answer here.
+    </p>
+    <ul class="flex flex-col gap-2">
+      <AccidentalMatchResolveRow
+        v-for="matched in matchedNotes"
+        :key="matched.id"
+        :matched="matched"
+        :can-mutate="canOfferMutatingAction(matched.id)"
+        @build-link="openLinkOffer(matched.id)"
+        @add-as-overlapped="addAsOverlappedNote(matched.id)"
+      />
+    </ul>
+  </div>
   <MatchedNoteLinkOffer
     v-else
     :reviewed-note-id="reviewedNoteId"
