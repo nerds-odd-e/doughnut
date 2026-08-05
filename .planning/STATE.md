@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Clean up LIA training participant code
-status: Idle — quick task 260805 shipped; planning diary cleaned
-stopped_at: Late-success penalty removed; spent plan history trashed
-last_updated: "2026-08-05T11:10:00+08:00"
+status: Discussing ADR 0002
+stopped_at: Git-native notebooks ADR (0002) under discussion
+last_updated: "2026-08-05T11:05:00+08:00"
 last_activity: 2026-08-05
-last_activity_desc: Shipped late-success fix; cleaned .planning/quick/260805 diary
+last_activity_desc: Clarifying Proposed ADR 0002 architecture and authority division
 progress:
   total_phases: 8
   completed_phases: 4
@@ -25,14 +25,14 @@ See: `.planning/PROJECT.md` (updated 2026-08-03 after v1.2)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** None active — late-success penalty fix shipped (`735b96623a`); Proposed spaced-repetition ADR still paused
+**Current focus:** Proposed [ADR 0002 — Git-native notebooks backed by MySQL](../docs/adrs/0002-git-native-notebooks-backed-by-mysql.md)
 
 ## Current Position
 
-Phase: — (no active quick task)
+Phase: —
 Plan: —
-Status: Idle
-Last activity: 2026-08-05 — Overdue correct recall keeps on-time interval; spent `260805-late-success-penalty` plan diary trashed
+Status: ADR discussion (v1.2 archived; next milestone not started)
+Last activity: 2026-08-05 — ADR 0002 clarification (architecture / authority division)
 
 ## Performance Metrics
 
@@ -124,15 +124,14 @@ Decisions are logged in PROJECT.md Key Decisions table. Roadmap-shaping decision
 - [Phase 14]: HYG-02 audit — Terry `previewPullActions.ts` import-only / not rewritten; TRIAGE names no YS delete/rewrite path
 - [Phase 14]: HYG-03 green — `pnpm cli:test` (492) + five retained CLI E2E (38 scenarios)
 - [Phase 14]: HYG-01/02/03 Complete; milestone-ready handoff → `/gsd-complete-milestone`
-- [Quick 260805]: Late-success penalty removed from `ForgettingCurve.succeeded`; controller regression `lateCorrectAnswerDoesNotShortenTheNextInterval`; plan diary cleaned after ship
 
 ### Pending Todos
 
-None.
+None yet.
 
 ### Blockers/Concerns
 
-None.
+None yet.
 
 ## Deferred Items
 
@@ -151,11 +150,12 @@ Items acknowledged and deferred at milestone close on 2026-08-03 (v1.2 `override
 
 ## Session Continuity
 
-**Last session:** 2026-08-05T11:10:00+08:00
-**Stopped at:** Quick task 260805 complete; planning diary cleaned
-**Next action:** Optional — resume Proposed spaced-repetition ADR review (bounded late-success bonus / FSRS / `nextRecallAt` authority)
-**Resume file:** —
+**Last session:** 2026-08-05T11:05:00+08:00
+**Stopped at:** ADR 0002 under discussion
+**Next action:** Continue advice/discussion on Proposed ADR 0002
+**Resume file:** [ADR 0002](../docs/adrs/0002-git-native-notebooks-backed-by-mysql.md)
 
 ## Operator Next Steps
 
-- Optional: resume Proposed spaced-repetition ADR now that the narrow late-success defect is fixed.
+- Continue Proposed ADR 0002 (Git-native notebooks backed by MySQL).
+- Optional later: `/gsd-new-milestone` when ready for the next delivery cycle.

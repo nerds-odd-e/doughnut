@@ -80,6 +80,5 @@ Number sequentially from `0000`. Prefer capability-named titles, not phase numbe
 | [0000](./0000-use-adrs-accepted.md) | Accepted | Use ADRs for architectural decisions |
 | [0001](./0001-ubiquitous-language.md) | Proposed | Ubiquitous language for Doughnut domain concepts |
 | [0002](./0002-git-native-notebooks-backed-by-mysql.md) | Proposed | Host Git-native notebooks backed by MySQL |
-| [0003](./0003-spaced-repetition-scheduling-policy.md) | Proposed | Spaced-repetition scheduling policy |
 
 Keep this table current when you accept, reject, or supersede an ADR.
