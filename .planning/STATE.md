@@ -5,15 +5,15 @@ milestone_name: Accidental Match Resolve UX
 current_phase: 8
 current_phase_name: Match path and clickable titles
 status: planning_complete
-stopped_at: Phase 8 plans ready
-last_updated: "2026-08-05T09:28:36.443Z"
+stopped_at: Completed 08-01-PLAN.md
+last_updated: "2026-08-05T09:38:43.368Z"
 last_activity: 2026-08-05
 last_activity_desc: Plan-check passed; RESEARCH Open Questions marked RESOLVED
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 4
-  completed_plans: 2
+  completed_plans: 3
   percent: 17
 ---
 
@@ -33,7 +33,7 @@ Plan: 08-01 pending (wave 1); 08-02 pending (wave 2)
 Status: Phase 8 planning complete (plan-check passed)
 Last activity: 2026-08-05 — Plan-check passed; RESEARCH Open Questions marked RESOLVED
 
-Progress: [██░░░░░░░░] ~17% (v1.2 milestone plans executed)
+Progress: [██░░░░░░░░] ~[████████░░] 75% (v1.2 milestone plans executed)
 
 ## Performance Metrics
 
@@ -51,6 +51,7 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 |------|----------|-------|-------|
 | Phase 07 P01 | 6min | 2 tasks | 5 files |
 | Phase 07 P02 | 2min | 2 tasks | 2 files |
+| Phase 08 P01 | 4min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -68,6 +69,8 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 - [Phase 8]: Keep NoteTopology[]; hydrate via getNoteRealmRefAndLoadWhenNeeded (D-01, D-02)
 - [Phase 8]: AccidentalMatchResolveRow — NoteTitleWithLink above BreadcrumbWithCircle (D-03..D-06)
 - [Phase 8]: No AMR-05 reopen this phase; hydrate on dialog mount; Vitest then E2E (D-07..D-11)
+- [Phase ?]: [Phase 8]: Assert router-link to under RenderingHelper stub for title navigation
+- [Phase ?]: [Phase 8]: Distinct notebook names via accidentalMatchWithTwoMatchedNotes notebookNames option
 
 ### Pending Todos
 
@@ -89,7 +92,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-08-05T09:28:28.499Z
-Stopped at: Phase 8 plans ready
-Resume file: .planning/phases/08-match-path-and-clickable-titles/08-01-PLAN.md
+Last session: 2026-08-05T09:38:43.362Z
+Stopped at: Completed 08-01-PLAN.md
+Resume file: None
 Next action: `/gsd-execute-phase 8` (or plan-checker first if enabled)

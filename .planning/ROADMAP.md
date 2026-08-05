@@ -83,12 +83,12 @@ Plans:
   2. Each match title is clickable (navigates toward that note)
   3. Dialog still lists all current matches with title + path together
 
-**Plans**: 0/2 plans executed
+**Plans**: 1/2 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 08-01-PLAN.md — Tracer: AccidentalMatchResolveRow title link + path breadcrumb (Vitest)
+- [x] 08-01-PLAN.md — Tracer: AccidentalMatchResolveRow title link + path breadcrumb (Vitest)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -163,7 +163,7 @@ Plans:
 | 1–7 Health lint / purge | v1.0 | 13/13 | Complete | 2026-07-23 |
 | 1–6 Spelling match & link | v1.1 | 16/16 | Complete | 2026-07-25 |
 | 7. Compact result + Resolve dialog shell | v1.2 | 2/2 | Complete | 2026-08-05 |
-| 8. Match path and clickable titles | v1.2 | 0/2 | Planned    |  |
+| 8. Match path and clickable titles | v1.2 | 1/2 | In Progress|  |
 | 9. Build a link from resolve dialog | v1.2 | 0/? | Not started | - |
 | 10. Overlap alias append util | v1.2 | 0/? | Not started | - |
 | 11. Add as overlapped note | v1.2 | 0/? | Not started | - |
