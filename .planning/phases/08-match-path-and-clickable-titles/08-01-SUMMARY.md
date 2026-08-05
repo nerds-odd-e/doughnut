@@ -89,8 +89,8 @@ status: complete
 
 ## Task Commits
 
-1. **Task 1 (RED): Tracer failing test** — `d5807d722f` (test)
-2. **Task 1 (GREEN) + Task 2 fixtures:** AccidentalMatchResolveRow + dialog wire + path-delta asserts — `9cb07d1a7c` (feat)
+1. **Task 1 (RED): Tracer failing test** — `7693487c07` (test)
+2. **Task 1 (GREEN) + Task 2 fixtures:** AccidentalMatchResolveRow + dialog wire + path-delta asserts — `af7376cd81` (feat)
 
 _Task 2 had no separate product commit: `notebookNames` helper landed in RED; multi-row path delta assert landed with GREEN._
 
@@ -116,12 +116,12 @@ _Task 2 had no separate product commit: `notebookNames` helper landed in RED; mu
 - **Issue:** RenderingHelper stubs `router-link` with `href="#"` and puts the route on `to`; `.toMatch(/10/)` on href failed with `"#"`
 - **Fix:** Assert `a.router-link[to]` contains the match id; document stub behavior in the test
 - **Files modified:** `AnsweredSpellingQuestionAccidentalMatch.spec.ts`
-- **Commit:** `9cb07d1a7c`
+- **Commit:** `af7376cd81`
 
 ## TDD Gate Compliance
 
-- RED: `d5807d722f` test(08-01)
-- GREEN: `9cb07d1a7c` feat(08-01)
+- RED: `7693487c07` test(08-01)
+- GREEN: `af7376cd81` feat(08-01)
 - REFACTOR: none (post-change-refactor found no concept-bound edits)
 
 ## Known Stubs
@@ -136,5 +136,5 @@ None — reused existing authenticated hydrate and title/breadcrumb chrome; no n
 
 - FOUND: `frontend/src/components/recall/AccidentalMatchResolveRow.vue`
 - FOUND: `frontend/src/components/recall/AccidentalMatchResolveDialog.vue`
-- FOUND: `d5807d722f`
-- FOUND: `9cb07d1a7c`
+- FOUND: `7693487c07`
+- FOUND: `af7376cd81`
