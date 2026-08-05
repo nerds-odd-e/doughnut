@@ -4,15 +4,15 @@ milestone: v1.2
 milestone_name: Accidental Match Resolve UX
 current_phase: 12
 current_phase_name: Title navigate, reopen, E2E polish
-status: ready_for_planning
-stopped_at: Phase 12 research complete
-last_updated: "2026-08-05T14:00:00.000Z"
+status: ready_to_execute
+stopped_at: Phase 12 plans created
+last_updated: "2026-08-05T14:30:00.000Z"
 last_activity: 2026-08-05
-last_activity_desc: docs(12) research remount/matchedNotes fidelity for AMR-05
+last_activity_desc: docs(12) plan AMR-05 E2E-first + KeepAlive contingency
 progress:
   total_phases: 6
   completed_phases: 5
-  total_plans: 9
+  total_plans: 11
   completed_plans: 9
   percent: 83
 ---
@@ -24,16 +24,16 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 **Core value:** Healthy mainline for learning and knowledge work — reviewed note stays primary during accidental-match results.
-**Current focus:** Phase 12 research done — plan AMR-05 (title navigate / reopen / E2E polish)
+**Current focus:** Phase 12 planned — execute AMR-05 E2E reopen (12-01); KeepAlive contingency (12-02) only if remount
 
 ## Current Position
 
-Phase: 12 of 12 (Title navigate, reopen, E2E polish) — research complete, ready for planning
-Plan: none yet — RESEARCH.md recommends E2E-first (KeepAlive likely enough; no OpenAPI unless proven)
-Status: Phase 12 research complete; blocker resolved: remount drops matchedNotes, live KeepAlive keeps them
-Last activity: 2026-08-05 — docs(12) research remount/matchedNotes fidelity
+Phase: 12 of 12 (Title navigate, reopen, E2E polish) — plans ready
+Plan: 12-01 (E2E reopen) → optional 12-02 (KeepAlive name if remount)
+Status: Phase 12 planned; execute E2E-first; skip 12-02 if KeepAlive already green
+Last activity: 2026-08-05 — docs(12) create phase plans
 
-Progress: [████████░░] 83% (5/6 v1.2 phases complete; 10/10 plans executed through Phase 11)
+Progress: [████████░░] 83% (5/6 v1.2 phases complete; 9/11 plans executed; Phase 12 0/2)
 
 ## Performance Metrics
 
@@ -123,5 +123,5 @@ None.
 
 Last session: 2026-08-05T14:00:00.000Z
 Stopped at: Phase 12 research complete
-Resume file: .planning/phases/12-title-navigate-reopen-e2e-polish/12-RESEARCH.md
-Next action: Plan Phase 12 (AMR-05) from RESEARCH.md — E2E-first waves
+Resume file: .planning/phases/12-title-navigate-reopen-e2e-polish/12-01-PLAN.md
+Next action: Execute Phase 12 — `/gsd-execute-phase 12`
