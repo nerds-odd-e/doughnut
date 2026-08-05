@@ -17,7 +17,7 @@ plugins {
   id 'org.springframework.boot' version '4.1.0'
   // Spotless for the code style
   id "com.diffplug.spotless" version "8.9.0"
-  id "com.github.ben-manes.versions" version "0.56.0"
+  id "io.github.ben-manes.versions" version "0.59.0"
 }
 
 apply plugin: 'io.spring.dependency-management'
@@ -59,7 +59,7 @@ repositories {
 def jdkUnsafeMemoryAccessJvmArgs = ['--sun-misc-unsafe-memory-access=allow']
 
 dependencies {
-  implementation platform('com.google.cloud:libraries-bom:26.85.1')
+  implementation platform('com.google.cloud:libraries-bom:26.86.0')
   implementation 'com.google.cloud:google-cloud-storage'
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
   implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate7:2.22.1'
@@ -74,7 +74,7 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-security'
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
   implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:3.0.3'
-  implementation 'com.openai:openai-java:4.45.0'
+  implementation 'com.openai:openai-java:4.50.0'
   implementation 'org.yaml:snakeyaml:2.6'
   // RxJava2 for Flowable streaming support
   implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
