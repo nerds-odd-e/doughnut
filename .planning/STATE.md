@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Clean up LIA training participant code
-status: Discussing ADR 0002
-stopped_at: Git-native notebooks ADR (0002) under discussion
-last_updated: "2026-08-05T11:05:00+08:00"
+status: Quick task complete
+stopped_at: Quick task 260805-j23 executed — portable sync/lint removed; catalog ZIP kept
+last_updated: "2026-08-05T14:01:00+08:00"
 last_activity: 2026-08-05
-last_activity_desc: Clarifying Proposed ADR 0002 architecture and authority division
+last_activity_desc: Completed quick task 260805-j23 — remove training portable sync after ADR 0002
 progress:
   total_phases: 8
   completed_phases: 4
@@ -25,14 +25,14 @@ See: `.planning/PROJECT.md` (updated 2026-08-03 after v1.2)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** Proposed [ADR 0002 — Git-native notebooks backed by MySQL](../docs/adrs/0002-git-native-notebooks-backed-by-mysql.md)
+**Current focus:** Approved [ADR 0002 — Git-native notebooks backed by MySQL](../docs/adrs/0002-git-native-notebooks-backed-by-mysql.md); portable-workspace sync stack removed via quick task 260805-j23.
 
 ## Current Position
 
 Phase: —
 Plan: —
-Status: Quick task 260805-j23 planned — remove LIA portable-workspace sync/lint after ADR 0002
-Last activity: 2026-08-05 — quick plan for aggressive portable-workspace cleanup
+Status: Quick task 260805-j23 complete — CLI sync/lint gone; minimal catalog ZIP green
+Last activity: 2026-08-05 — executed portable-workspace cleanup (fe0691c403, 878d44537a)
 
 ## Performance Metrics
 
@@ -72,6 +72,7 @@ Last activity: 2026-08-05 — quick plan for aggressive portable-workspace clean
 | Phase 12 P01 | 7min | 1 tasks | 8 files |
 | Phase 13 P01 | 6min | 1 tasks | 6 files |
 | Phase 14 P01 | 12min | 1 tasks | 8 files |
+| Quick 260805-j23 | 12min | 3 tasks | 84 files |
 
 ## Accumulated Context
 
@@ -124,6 +125,7 @@ Decisions are logged in PROJECT.md Key Decisions table. Roadmap-shaping decision
 - [Phase 14]: HYG-02 audit — Terry `previewPullActions.ts` import-only / not rewritten; TRIAGE names no YS delete/rewrite path
 - [Phase 14]: HYG-03 green — `pnpm cli:test` (492) + five retained CLI E2E (38 scenarios)
 - [Phase 14]: HYG-01/02/03 Complete; milestone-ready handoff → `/gsd-complete-milestone`
+- [Quick 260805-j23]: After ADR 0002 Approved — trash entire CLI portable sync/lint stacks; keep minimal catalog ZIP; strip wiki/attachment/publicOrigin strengthen
 
 ### Pending Todos
 
@@ -132,6 +134,12 @@ None yet.
 ### Blockers/Concerns
 
 None yet.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260805-j23 | Clean up code from last week training participants | 2026-08-05 | 878d44537a | [260805-j23-clean-up-code-from-last-week-training-pa](./quick/260805-j23-clean-up-code-from-last-week-training-pa/) |
 
 ## Deferred Items
 
@@ -150,12 +158,12 @@ Items acknowledged and deferred at milestone close on 2026-08-03 (v1.2 `override
 
 ## Session Continuity
 
-**Last session:** 2026-08-05T13:46:00+08:00
-**Stopped at:** Quick plan 260805-j23 created (portable-workspace cleanup)
-**Next action:** Execute `.planning/quick/260805-j23-clean-up-code-from-last-week-training-pa/260805-j23-PLAN.md`
-**Resume file:** [260805-j23-PLAN.md](./quick/260805-j23-clean-up-code-from-last-week-training-pa/260805-j23-PLAN.md)
+**Last session:** 2026-08-05T14:01:00+08:00
+**Stopped at:** Completed quick task 260805-j23 (portable-workspace cleanup)
+**Next action:** Optional `/gsd-new-milestone` when ready for ADR 0002 Level 1
+**Resume file:** None
 
 ## Operator Next Steps
 
-- Execute quick task 260805-j23 (trash CLI sync/lint; strip ZIP strengthen; prove `notebook_export.feature`).
-- Optional later: `/gsd-new-milestone` when ready for the next delivery cycle.
+- Optional: `/gsd-new-milestone` for git-native notebooks (ADR 0002 Level 1).
+- Resume SEED-001 after that detour if desired.
