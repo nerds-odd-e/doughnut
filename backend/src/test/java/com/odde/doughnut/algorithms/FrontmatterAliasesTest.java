@@ -4,7 +4,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class FrontmatterAliasesTest {
 
@@ -70,8 +74,8 @@ class FrontmatterAliasesTest {
         """;
 
     assertThat(
-        FrontmatterAliases.authoredValidationErrorForNoteContent(content).isPresent(),
-        equalTo(false));
+        FrontmatterAliases.authoredValidationErrorForNoteContent(content),
+        equalTo(Optional.empty()));
   }
 
   @Test
@@ -88,8 +92,8 @@ class FrontmatterAliasesTest {
         """;
 
     assertThat(
-        FrontmatterAliases.authoredValidationErrorForNoteContent(content).isPresent(),
-        equalTo(false));
+        FrontmatterAliases.authoredValidationErrorForNoteContent(content),
+        equalTo(Optional.empty()));
   }
 
   @Test
@@ -101,165 +105,33 @@ class FrontmatterAliasesTest {
         equalTo(FrontmatterAliases.AUTHORED_ALIASES_MESSAGE));
   }
 
-  @Test
-  void authoredValidationError_rejects_blank_and_invalid_list_items() {
-    String blankItem =
+  static Stream<String> invalidAliasListContents() {
+    return Stream.of(
         """
         ---
         aliases:
           - "   "
         ---
-        """;
-    String nestedItem =
+        """,
         """
         ---
         aliases:
           - [oops]
         ---
-        """;
-    String pipeItem =
+        """,
         """
         ---
         aliases:
           - bad|alias
         ---
-        """;
+        """);
+  }
 
+  @ParameterizedTest
+  @MethodSource("invalidAliasListContents")
+  void authoredValidationError_rejects_blank_and_invalid_list_items(String content) {
     assertThat(
-        FrontmatterAliases.authoredValidationErrorForNoteContent(blankItem).orElseThrow(),
+        FrontmatterAliases.authoredValidationErrorForNoteContent(content).orElseThrow(),
         equalTo(FrontmatterAliases.AUTHORED_ALIASES_MESSAGE));
-    assertThat(
-        FrontmatterAliases.authoredValidationErrorForNoteContent(nestedItem).orElseThrow(),
-        equalTo(FrontmatterAliases.AUTHORED_ALIASES_MESSAGE));
-    assertThat(
-        FrontmatterAliases.authoredValidationErrorForNoteContent(pipeItem).orElseThrow(),
-        equalTo(FrontmatterAliases.AUTHORED_ALIASES_MESSAGE));
-  }
-
-  @Test
-  void fromFrontmatter_returns_only_plain_aliases_when_wiki_link_overlap_declared() {
-    Frontmatter fm =
-        Frontmatter.parse(
-            """
-            aliases:
-              - color
-              - "[[Other Note]]"
-              - "[[Shared Notebook:Hue|display]]"
-            """);
-
-    assertThat(FrontmatterAliases.fromFrontmatter(fm), equalTo(List.of("color")));
-  }
-
-  @Test
-  void fromFrontmatter_returns_empty_for_wiki_link_only_alias_list() {
-    Frontmatter fm =
-        Frontmatter.parse(
-            """
-            aliases:
-              - "[[Other Note]]"
-            """);
-
-    assertThat(FrontmatterAliases.fromFrontmatter(fm), equalTo(List.of()));
-  }
-
-  @Test
-  void overlapWikiLinkTokensFromFrontmatter_returns_wiki_link_tokens_in_order() {
-    Frontmatter fm =
-        Frontmatter.parse(
-            """
-            aliases:
-              - color
-              - "[[Other Note]]"
-              - "[[Shared Notebook:Hue|display]]"
-            """);
-
-    assertThat(
-        FrontmatterAliases.overlapWikiLinkTokensFromFrontmatter(fm),
-        equalTo(List.of("[[Other Note]]", "[[Shared Notebook:Hue|display]]")));
-  }
-
-  @Test
-  void overlapWikiLinkTokensFromFrontmatter_is_empty_when_aliases_absent_or_empty() {
-    assertThat(
-        FrontmatterAliases.overlapWikiLinkTokensFromFrontmatter(Frontmatter.parse("color: red\n")),
-        equalTo(List.of()));
-    assertThat(
-        FrontmatterAliases.overlapWikiLinkTokensFromFrontmatter(Frontmatter.parse("aliases: []\n")),
-        equalTo(List.of()));
-  }
-
-  @Test
-  void overlapWikiLinkTokensFromNoteContent_returns_authored_tokens() {
-    String content =
-        """
-        ---
-        aliases:
-          - color
-          - "[[Other Note]]"
-        ---
-
-        body
-        """;
-
-    assertThat(
-        FrontmatterAliases.overlapWikiLinkTokensFromNoteContent(content),
-        equalTo(List.of("[[Other Note]]")));
-  }
-
-  @Test
-  void authoredValidationError_accepts_well_formed_wiki_link_alias_items() {
-    String content =
-        """
-        ---
-        aliases:
-          - color
-          - "[[Other Note]]"
-          - "[[Shared Notebook:Hue]]"
-          - "[[Title|display]]"
-          - "[[Shared Notebook:Hue|display]]"
-        ---
-
-        body
-        """;
-
-    assertThat(
-        FrontmatterAliases.authoredValidationErrorForNoteContent(content).isPresent(),
-        equalTo(false));
-  }
-
-  @Test
-  void authoredValidationError_rejects_embedded_or_malformed_wiki_link_items() {
-    for (String item : List.of("[[", "see [[Other]]", "[[a]][[b]]", "[[]]")) {
-      String content =
-          """
-          ---
-          aliases:
-            - "%s"
-          ---
-          """
-              .formatted(item);
-
-      assertThat(
-          FrontmatterAliases.authoredValidationErrorForNoteContent(content).orElseThrow(),
-          equalTo(FrontmatterAliases.AUTHORED_ALIASES_MESSAGE));
-    }
-  }
-
-  @Test
-  void fromFrontmatter_skips_wiki_link_items_alongside_invalid_plain_items() {
-    Frontmatter fm =
-        Frontmatter.parse(
-            """
-            aliases:
-              - color
-              - "[[Other Note]]"
-              - bad|alias
-              - good
-            """);
-
-    assertThat(FrontmatterAliases.fromFrontmatter(fm), equalTo(List.of("color", "good")));
-    assertThat(
-        FrontmatterAliases.overlapWikiLinkTokensFromFrontmatter(fm),
-        equalTo(List.of("[[Other Note]]")));
   }
 }

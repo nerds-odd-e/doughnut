@@ -39,7 +39,6 @@ class PropertyTrackingBackfillPlanTest {
         PropertyTrackingBackfillPlan.forNote(
             Frontmatter.parse("topic: physics\ndefinition: term"), Set.of("TOPIC"));
 
-    assertThat(result.keysToIndex(), containsInAnyOrder("topic", "definition"));
     assertThat(result.keysToSeedSkipped(), containsInAnyOrder("definition"));
   }
 

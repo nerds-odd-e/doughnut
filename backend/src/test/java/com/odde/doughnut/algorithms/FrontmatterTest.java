@@ -2,7 +2,6 @@ package com.odde.doughnut.algorithms;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,9 +39,9 @@ class FrontmatterTest {
             empty: null
             """);
 
-    assertTrue(fm.getString("tags").isEmpty());
-    assertTrue(fm.getString("nested").isEmpty());
-    assertTrue(fm.getString("empty").isEmpty());
+    assertThat(fm.getString("tags"), equalTo(Optional.empty()));
+    assertThat(fm.getString("nested"), equalTo(Optional.empty()));
+    assertThat(fm.getString("empty"), equalTo(Optional.empty()));
   }
 
   @Test
@@ -112,14 +111,14 @@ class FrontmatterTest {
               child: x
             """);
 
-    assertTrue(fm.getPropertyValue("null_scalar").isEmpty());
-    assertTrue(fm.getPropertyValue("nested_list").isEmpty());
-    assertTrue(fm.getPropertyValue("map_value").isEmpty());
-    assertTrue(fm.getPropertyValue("missing").isEmpty());
+    assertThat(fm.getPropertyValue("null_scalar"), equalTo(Optional.empty()));
+    assertThat(fm.getPropertyValue("nested_list"), equalTo(Optional.empty()));
+    assertThat(fm.getPropertyValue("map_value"), equalTo(Optional.empty()));
+    assertThat(fm.getPropertyValue("missing"), equalTo(Optional.empty()));
   }
 
   @Test
-  void valueStringsInInsertionOrder_respects_scalar_vs_list_item_inclusion() {
+  void valueStringsInInsertionOrder_scalars_only() {
     Frontmatter fm =
         Frontmatter.parse(
             """
@@ -133,6 +132,22 @@ class FrontmatterTest {
             """);
 
     assertThat(fm.stringValuesInInsertionOrder(), equalTo(List.of("one", "2")));
+  }
+
+  @Test
+  void supportedValueStringsInInsertionOrder_includes_list_items() {
+    Frontmatter fm =
+        Frontmatter.parse(
+            """
+            first: one
+            tags:
+              - a
+              - b
+            second: 2
+            nested:
+              child: x
+            """);
+
     assertThat(fm.supportedValueStringsInInsertionOrder(), equalTo(List.of("one", "a", "b", "2")));
   }
 }

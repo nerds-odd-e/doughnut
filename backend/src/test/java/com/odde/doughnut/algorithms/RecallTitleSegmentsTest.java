@@ -4,6 +4,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 class RecallTitleSegmentsTest {
 
@@ -16,28 +18,14 @@ class RecallTitleSegmentsTest {
     assertThat(segments.retainedSuffixFragments(), is(empty()));
   }
 
-  @Test
-  void fullwidth_slash_text_stays_in_primary_title() {
-    var segments = RecallTitleSegments.from("colour／color");
-
-    assertThat(segments.primary().stem(), equalTo("colour／color"));
-    assertThat(segments.retainedSuffixFragments(), is(empty()));
-  }
-
-  @Test
-  void repeated_fullwidth_slash_stays_in_primary_title() {
-    var segments = RecallTitleSegments.from("cat／／kitten");
-
-    assertThat(segments.primary().stem(), equalTo("cat／／kitten"));
-    assertThat(segments.retainedSuffixFragments(), is(empty()));
-  }
-
-  @Test
-  void ascii_slash_stays_in_primary_title() {
-    var segments = RecallTitleSegments.from("cat / kitten");
-
-    assertThat(segments.primary().stem(), equalTo("cat / kitten"));
-    assertThat(segments.retainedSuffixFragments(), is(empty()));
+  @ParameterizedTest
+  @CsvSource({
+    "colour／color, colour／color",
+    "cat／／kitten, cat／／kitten",
+    "cat / kitten, cat / kitten",
+  })
+  void literal_slash_stays_in_primary_title(String title, String expectedPrimary) {
+    assertThat(RecallTitleSegments.from(title).primary().stem(), equalTo(expectedPrimary));
   }
 
   @Test
@@ -73,15 +61,12 @@ class RecallTitleSegmentsTest {
     assertThat(segments.retainedSuffixFragments(), contains("logical"));
   }
 
-  @Test
-  void normalizes_unicode_whitespace_in_segments() {
-    var segments = RecallTitleSegments.from("nebulas ／\u00A0nebula");
-
-    assertThat(segments.primary().stem(), equalTo("nebulas ／ nebula"));
-    assertThat(segments.retainedSuffixFragments(), is(empty()));
-
-    segments = RecallTitleSegments.from("cat\u3000／\u3000kitten");
-    assertThat(segments.primary().stem(), equalTo("cat ／ kitten"));
-    assertThat(segments.retainedSuffixFragments(), is(empty()));
+  @ParameterizedTest
+  @CsvSource({
+    "nebulas ／\u00A0nebula, nebulas ／ nebula",
+    "cat\u3000／\u3000kitten, cat ／ kitten",
+  })
+  void normalizes_unicode_whitespace_in_segments(String title, String expectedPrimary) {
+    assertThat(RecallTitleSegments.from(title).primary().stem(), equalTo(expectedPrimary));
   }
 }

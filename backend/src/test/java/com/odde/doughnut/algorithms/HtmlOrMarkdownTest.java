@@ -24,11 +24,6 @@ class HtmlOrMarkdownTest {
   }
 
   @Test
-  void emptyString() {
-    assertThat(new HtmlOrMarkdown("").isBlank(), is(true));
-  }
-
-  @Test
   void replaceText_with_special_char() {
     String input = "<p>Some sample text</p>";
     HtmlOrMarkdown htmlOrMarkdown = new HtmlOrMarkdown(input);

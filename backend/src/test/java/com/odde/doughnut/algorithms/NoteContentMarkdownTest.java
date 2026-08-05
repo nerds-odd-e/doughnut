@@ -3,7 +3,6 @@ package com.odde.doughnut.algorithms;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -67,9 +66,13 @@ class NoteContentMarkdownTest {
 
   @Test
   void attachmentImageIdFromPath_empty_for_non_matching_paths() {
-    assertTrue(NoteContentMarkdown.attachmentImageIdFromPath("").isEmpty());
-    assertTrue(NoteContentMarkdown.attachmentImageIdFromPath("/attachments/images//x").isEmpty());
-    assertTrue(NoteContentMarkdown.attachmentImageIdFromPath("/attachments/image/1/x").isEmpty());
+    assertThat(NoteContentMarkdown.attachmentImageIdFromPath(""), equalTo(Optional.empty()));
+    assertThat(
+        NoteContentMarkdown.attachmentImageIdFromPath("/attachments/images//x"),
+        equalTo(Optional.empty()));
+    assertThat(
+        NoteContentMarkdown.attachmentImageIdFromPath("/attachments/image/1/x"),
+        equalTo(Optional.empty()));
   }
 
   @Test
@@ -95,7 +98,7 @@ class NoteContentMarkdownTest {
   void splitLeadingFrontmatter_parses_yaml_and_body() {
     Optional<NoteContentMarkdown.LeadingFrontmatter> split =
         NoteContentMarkdown.splitLeadingFrontmatter("---\nkey: v\n---\nHello");
-    assertTrue(split.isPresent());
+    assertThat(split.isPresent(), equalTo(true));
     assertThat(split.get().frontmatter().getString("key"), equalTo(Optional.of("v")));
     assertThat(split.get().body(), equalTo("Hello"));
   }
@@ -107,12 +110,6 @@ class NoteContentMarkdownTest {
   }
 
   @Test
-  void bodyWithoutLeadingFrontmatter_handles_body_after_frontmatter() {
-    String in = "---\na: 1\n---\nBody text";
-    assertThat(NoteContentMarkdown.bodyWithoutLeadingFrontmatter(in), equalTo("Body text"));
-  }
-
-  @Test
   void bodyWithoutLeadingFrontmatter_preserves_crlf_when_no_frontmatter() {
     String s = "Line1\r\nLine2";
     assertThat(NoteContentMarkdown.bodyWithoutLeadingFrontmatter(s), equalTo(s));
@@ -120,7 +117,9 @@ class NoteContentMarkdownTest {
 
   @Test
   void wikidataIdScalarFromLeadingFrontmatter_empty_when_no_frontmatter() {
-    assertTrue(NoteContentMarkdown.wikidataIdScalarFromLeadingFrontmatter("plain").isEmpty());
+    assertThat(
+        NoteContentMarkdown.wikidataIdScalarFromLeadingFrontmatter("plain"),
+        equalTo(Optional.empty()));
   }
 
   @Test

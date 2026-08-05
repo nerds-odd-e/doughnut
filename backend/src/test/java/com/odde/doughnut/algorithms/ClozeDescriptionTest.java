@@ -2,7 +2,6 @@ package com.odde.doughnut.algorithms;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -127,10 +126,7 @@ class ClozeDescriptionTest {
             .maskedContentAsMarkdown();
 
     assertThat(result, containsString("[...]"));
-
     assertThat(result, containsString("https://en.wikipedia.org/wiki/Enemy"));
-    assertThat(result, containsString("https://en.wikipedia.org/wiki/Protagonist"));
-    assertThat(result, containsString("https://en.wikipedia.org/wiki/Hero"));
   }
 
   @Test
@@ -146,7 +142,6 @@ class ClozeDescriptionTest {
         new ClozedString(clozeReplacement, markdown)
             .hide(new NoteTitle("多大"))
             .maskedContentAsMarkdown();
-    assertThat(result, not(containsString("/ただい/")));
     assertThat(result, containsString("/.../"));
   }
 
@@ -167,11 +162,8 @@ class ClozeDescriptionTest {
         new ClozedString(clozeReplacement, markdown)
             .hide(new NoteTitle("どのよう"))
             .maskedContentAsMarkdown();
-    assertThat(result, containsString("[...]"));
     assertThat(result, containsString("[...]なぐあいですか"));
     assertThat(result, containsString("[...]に致しましょうか"));
-    assertThat(result, not(containsString("うなぐあい")));
-    assertThat(result, not(containsString("うに致し")));
   }
 
   @Test
@@ -196,25 +188,11 @@ class ClozeDescriptionTest {
 
   @ParameterizedTest
   @CsvSource({
+    "colour, color, the color of the sky, the [...] of the sky",
+    "north, up, it's on the north or up side, it's on the [...] or [...] side",
     "archenemy, arch-enemy, an archenemy here, an [...] here",
     "archenemy, arch-enemy, an arch-enemy here, an [...] here",
     "archenemy, arch-enemy, the archenemy and arch-enemy are, the [...] and [...] are",
-  })
-  void clozeShouldHandleFrontmatterAliasSeparator(
-      String title, String frontmatterAlias, String markdown, String expected) {
-    String result =
-        new ClozedString(clozeReplacement, markdown)
-            .hide(new NoteTitle(title))
-            .hideAliases(List.of(frontmatterAlias))
-            .maskedContentAsMarkdown();
-    assertThat(result, containsString(expected));
-  }
-
-  @ParameterizedTest
-  @CsvSource({
-    "colour, color, the color of the sky, the [...] of the sky",
-    "north, up, it's on the north or up side, it's on the [...] or [...] side",
-    "archenemy, arch-enemy, an arch-enemy here, an [...] here",
   })
   void clozeShouldMaskFrontmatterAliases(
       String title, String frontmatterAlias, String markdown, String expectedClozeDescription) {

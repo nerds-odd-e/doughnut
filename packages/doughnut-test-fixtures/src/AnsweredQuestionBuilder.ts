@@ -68,7 +68,10 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
   }
 
   /** Incorrect spelling that accidentally matches other note title(s)/alias(es). */
-  accidentalMatch(spellingAnswer: string, matchedNotes: NoteTopology[] = []): this {
+  accidentalMatch(
+    spellingAnswer: string,
+    matchedNotes: NoteTopology[] = []
+  ): this {
     this.questionType = 'SPELLING'
     this.isCorrect = false
     this.answerToUse = {
