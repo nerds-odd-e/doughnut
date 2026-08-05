@@ -1,6 +1,6 @@
 # Backend unit tests → "small test" style
 
-**Status:** in progress (Phase 1 done)  
+**Status:** in progress (Phase 2 done)  
 **Type:** test renovation (no product behavior change)  
 **Verify each phase:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only`  
 **Style:** `.cursor/rules/unit-testing.mdc` + `.cursor/rules/backend-testing.mdc`  
@@ -49,7 +49,7 @@ For each file in the phase file list:
 - **Done when:** rubric applied; suite green.
 
 ### Phase 2 — Validators, utils, factoryServices, integration
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
 - **Observable:** small pure-contract packages follow rubric.
 - **Files:**
@@ -279,7 +279,8 @@ If a Behavior phase cannot express fixtures concisely:
 | Phase | Status | Notes |
 |-------|--------|-------|
 | 1 | done | Light pass: focused asserts, merge/dedupe parameterized cases, Optional.empty positives; split FrontmatterAliasesWikiLinkOverlapTest (>250). Suite green after local doughnut_test recreate (post-squash stale history). |
-| 2–26 | planned | — |
+| 2 | done | Focused asserts / parameterized merges; FailureReportFactoryTest → real repo + only GithubService mock; TextContent uses Spring Validator. DisplayNamePathSeparatorsTrim / RealRandomizer / Robots already clean. |
+| 3–26 | planned | — |
 
 ---
 
@@ -290,3 +291,4 @@ If a Behavior phase cannot express fixtures concisely:
 - QGen batch is ~32 service tests — keep at service boundary; style-only renovation.
 - Algorithms package was already domain-stable; main debt was repeated full-payload / negative asserts and a few multi-behavior tests.
 - Local `doughnut_test` after Flyway squash may still hold pre-squash history without baseline tables — recreate DB + `migrateTestDB` if `backend:test_only` fails with missing tables/columns.
+- Phase 2 pure-contract packages were mostly light debt; main win was dropping collaborator mocks on FailureReportFactory (keep GithubService as external).

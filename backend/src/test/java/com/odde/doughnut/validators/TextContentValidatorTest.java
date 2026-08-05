@@ -8,12 +8,11 @@ import static org.hamcrest.Matchers.not;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.testability.MakeMe;
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
 import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 import java.util.Set;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -22,50 +21,30 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class TextContentValidatorTest {
+class TextContentValidatorTest {
 
   @Autowired MakeMe makeMe;
+  @Autowired Validator validator;
 
-  private Validator validator;
-  private Note newNote;
+  @Test
+  void defaultNoteIsValid() {
+    assertThat(getViolations(makeMe.aNote().inMemoryPlease()), is(empty()));
+  }
 
-  @BeforeEach
-  public void setUp() {
-    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-    newNote = makeMe.aNote().inMemoryPlease();
-    validator = factory.getValidator();
+  @ParameterizedTest
+  @ValueSource(strings = {"", "   "})
+  void blankTitleIsInvalid(String title) {
+    assertThat(getViolations(makeMe.aNote().title(title).inMemoryPlease()), is(not(empty())));
   }
 
   @Test
-  public void defaultNoteFromMakeMeIsValidate() {
-    assertThat(getViolations(), is(empty()));
+  void titleCannotBeTooLong() {
+    assertThat(
+        getViolations(makeMe.aNote().title(makeMe.aStringOfLength(151)).inMemoryPlease()),
+        is(not(empty())));
   }
 
-  @Test
-  public void titleIsNotOptional() {
-    newNote.setTitle("");
-    assertThat(getViolations(), is(not(empty())));
-  }
-
-  @Test
-  public void titleCannotBeTooLong() {
-    newNote.setTitle(makeMe.aStringOfLength(151));
-    assertThat(getViolations(), is(not(empty())));
-  }
-
-  @Test
-  public void whitespaceOnlyTitleIsInvalid() {
-    newNote.setTitle("   ");
-    assertThat(getViolations(), is(not(empty())));
-  }
-
-  @Test
-  public void noteWithoutTargetNoteCanHaveTitle() {
-    newNote.setTitle("Valid Title");
-    assertThat(getViolations(), is(empty()));
-  }
-
-  private Set<ConstraintViolation<Note>> getViolations() {
-    return validator.validate(newNote);
+  private Set<ConstraintViolation<Note>> getViolations(Note note) {
+    return validator.validate(note);
   }
 }

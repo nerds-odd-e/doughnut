@@ -4,28 +4,51 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
+import com.odde.doughnut.controllers.currentUser.CurrentUserFetcherFromRequest;
 import com.odde.doughnut.entities.FailureReport;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.FailureReportRepository;
+import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.services.GithubService;
-import jakarta.servlet.http.HttpServletRequest;
+import com.odde.doughnut.services.UserService;
+import com.odde.doughnut.testability.MakeMe;
 import java.io.IOException;
+import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
+@SpringBootTest
+@ActiveProfiles("test")
+@Transactional
+@ExtendWith(MockitoExtension.class)
 class FailureReportFactoryTest {
 
+  @Autowired FailureReportRepository failureReportRepository;
+  @Autowired UserRepository userRepository;
+  @Autowired UserService userService;
+  @Autowired MakeMe makeMe;
+  @Mock GithubService githubService;
+
+  MockHttpServletRequest request = new MockHttpServletRequest();
+
+  @BeforeEach
+  void setUp() throws IOException, InterruptedException {
+    doReturn(null).when(githubService).createGithubIssue(any());
+  }
+
   @Test
-  void recordsExceptionClassNameAndStackTrace() throws IOException, InterruptedException {
-    FailureReport report = createReport(new RuntimeException(), fetcherWithExternalId(null), null);
+  void recordsFailureReportForUnauthenticatedRequest() throws IOException, InterruptedException {
+    FailureReport report = createReport();
 
     assertEquals("java.lang.RuntimeException", report.getErrorName());
     assertThat(report.getErrorDetail(), containsString("user external Id: null"));
@@ -33,45 +56,24 @@ class FailureReportFactoryTest {
   }
 
   @Test
-  void failureReportIncludesAuthenticatedUserInfo() throws IOException, InterruptedException {
-    User user = new User();
-    user.setExternalIdentifier("ext-test-user");
-    user.setName("Test User");
+  void includesAuthenticatedUserInFailureReport() throws IOException, InterruptedException {
+    User user = makeMe.aUser().please();
+    request.setUserPrincipal(() -> user.getExternalIdentifier());
 
-    FailureReport report =
-        createReport(
-            new RuntimeException("boom"),
-            fetcherWithExternalId(user.getExternalIdentifier()),
-            user);
+    FailureReport report = createReport();
 
     assertThat(report.getErrorDetail(), containsString(user.getExternalIdentifier()));
     assertThat(report.getErrorDetail(), containsString(user.getName()));
   }
 
-  private FailureReport createReport(
-      RuntimeException exception, CurrentUserFetcher fetcher, User user)
-      throws IOException, InterruptedException {
-    HttpServletRequest request = new MockHttpServletRequest();
-    if (user != null) {
-      when(fetcher.getUser()).thenReturn(user);
-    }
-    FailureReportRepository repository = mock(FailureReportRepository.class);
-    when(repository.save(any(FailureReport.class)))
-        .thenAnswer(invocation -> invocation.getArgument(0));
-    GithubService githubService = mock(GithubService.class);
-    doReturn(null).when(githubService).createGithubIssue(any());
+  private FailureReport createReport() throws IOException, InterruptedException {
+    CurrentUserFetcherFromRequest fetcher =
+        new CurrentUserFetcherFromRequest(request, userRepository, userService, Optional.empty());
 
-    new FailureReportFactory(request, exception, fetcher, githubService, repository)
+    new FailureReportFactory(
+            request, new RuntimeException(), fetcher, githubService, failureReportRepository)
         .createUnlessAllowed();
 
-    ArgumentCaptor<FailureReport> captor = ArgumentCaptor.forClass(FailureReport.class);
-    verify(repository, atLeastOnce()).save(captor.capture());
-    return captor.getAllValues().getFirst();
-  }
-
-  private static CurrentUserFetcher fetcherWithExternalId(String externalId) {
-    CurrentUserFetcher fetcher = mock(CurrentUserFetcher.class);
-    when(fetcher.getExternalIdentifier()).thenReturn(externalId);
-    return fetcher;
+    return failureReportRepository.findAll().iterator().next();
   }
 }

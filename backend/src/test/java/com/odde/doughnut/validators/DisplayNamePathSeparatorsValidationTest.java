@@ -1,7 +1,9 @@
 package com.odde.doughnut.validators;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasToString;
 
 import com.odde.doughnut.controllers.dto.FolderCreationRequest;
 import com.odde.doughnut.controllers.dto.NoteUpdateTitleDTO;
@@ -29,27 +31,25 @@ class DisplayNamePathSeparatorsValidationTest {
   void noteTitle_rejectsSeparators(String sep) {
     NoteUpdateTitleDTO dto = new NoteUpdateTitleDTO();
     dto.setNewTitle("a" + sep + "b");
-    Set<ConstraintViolation<NoteUpdateTitleDTO>> violations = validator.validate(dto);
-    assertEquals(1, violations.size());
-    assertTrue(
-        violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("newTitle")));
+    assertViolatesProperty(validator.validate(dto), "newTitle");
   }
 
   @Test
   void notebookUpdateName_rejectsSeparators() {
     NotebookUpdateRequest req = new NotebookUpdateRequest();
     req.setName("x/y");
-    Set<ConstraintViolation<NotebookUpdateRequest>> violations = validator.validate(req);
-    assertEquals(1, violations.size());
-    assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("name")));
+    assertViolatesProperty(validator.validate(req), "name");
   }
 
   @Test
   void folderCreationName_rejectsSeparators() {
     FolderCreationRequest req = new FolderCreationRequest();
     req.setName("a:b");
-    Set<ConstraintViolation<FolderCreationRequest>> violations = validator.validate(req);
-    assertEquals(1, violations.size());
-    assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("name")));
+    assertViolatesProperty(validator.validate(req), "name");
+  }
+
+  private static <T> void assertViolatesProperty(
+      Set<ConstraintViolation<T>> violations, String property) {
+    assertThat(violations, hasItem(hasProperty("propertyPath", hasToString(property))));
   }
 }

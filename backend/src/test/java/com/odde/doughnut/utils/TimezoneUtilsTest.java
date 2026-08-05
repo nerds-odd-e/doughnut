@@ -5,29 +5,20 @@ import static org.hamcrest.Matchers.equalTo;
 
 import java.time.ZoneId;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class TimezoneUtilsTest {
   @Test
   void shouldParseValidTimezone() {
-    ZoneId result = TimezoneUtils.parseTimezone("Asia/Shanghai");
-    assertThat(result, equalTo(ZoneId.of("Asia/Shanghai")));
+    assertThat(TimezoneUtils.parseTimezone("Asia/Shanghai"), equalTo(ZoneId.of("Asia/Shanghai")));
   }
 
-  @Test
-  void shouldDefaultToUTCForInvalidTimezone() {
-    ZoneId result = TimezoneUtils.parseTimezone("Etc/Unknown");
-    assertThat(result, equalTo(ZoneId.of("UTC")));
-  }
-
-  @Test
-  void shouldDefaultToUTCForEmptyString() {
-    ZoneId result = TimezoneUtils.parseTimezone("");
-    assertThat(result, equalTo(ZoneId.of("UTC")));
-  }
-
-  @Test
-  void shouldDefaultToUTCForNull() {
-    ZoneId result = TimezoneUtils.parseTimezone(null);
-    assertThat(result, equalTo(ZoneId.of("UTC")));
+  @ParameterizedTest
+  @NullAndEmptySource
+  @ValueSource(strings = {"Etc/Unknown"})
+  void shouldDefaultToUTCForMissingOrInvalidTimezone(String timezone) {
+    assertThat(TimezoneUtils.parseTimezone(timezone), equalTo(ZoneId.of("UTC")));
   }
 }

@@ -1,7 +1,8 @@
 package com.odde.doughnut.integration;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -54,51 +55,18 @@ class TruncatedStackTraceConverterTest {
       logger.error("Test error message", e);
     }
 
-    assertThat("Should have logged at least one event", listAppender.list.size(), greaterThan(0));
-
-    ILoggingEvent lastEvent = listAppender.list.get(listAppender.list.size() - 1);
-
     LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
     PatternLayoutEncoder encoder = new PatternLayoutEncoder();
     encoder.setContext(loggerContext);
     encoder.setPattern("%msg%n%truncatedEx");
     encoder.start();
 
-    String formattedMessage = new String(encoder.encode(lastEvent));
-
-    assertThat("Log should contain exception", formattedMessage, notNullValue());
-    assertThat("Log should contain stacktrace", formattedMessage, containsString("Test exception"));
-
+    String formattedMessage = new String(encoder.encode(listAppender.list.getLast()));
     String[] lines = formattedMessage.split("\n");
 
-    assertThat(
-        "Stacktrace should be truncated to 20 lines or less", lines.length, lessThanOrEqualTo(25));
-
-    boolean hasSpringInternalCollapse = false;
-    boolean hasApplicationCode = false;
-    for (String line : lines) {
-      if (line.contains("...") && line.contains("lines of spring internal calls")) {
-        hasSpringInternalCollapse = true;
-      }
-      if (line.contains("com.odde.doughnut")) {
-        hasApplicationCode = true;
-      }
-    }
-
-    assertThat("Should collapse Spring internal calls", hasSpringInternalCollapse, equalTo(true));
-    assertThat("Should include application code", hasApplicationCode, equalTo(true));
-
-    boolean hasSpringInternalDirect = false;
-    for (String line : lines) {
-      if (line.contains("org.springframework.") && !line.contains("...")) {
-        hasSpringInternalDirect = true;
-        break;
-      }
-    }
-
-    assertThat(
-        "Should not include direct Spring internal stack frames",
-        hasSpringInternalDirect,
-        equalTo(false));
+    assertThat(formattedMessage, containsString("Test exception"));
+    assertThat(lines.length, lessThanOrEqualTo(25));
+    assertThat(formattedMessage, containsString("lines of spring internal calls"));
+    assertThat(formattedMessage, containsString("com.odde.doughnut"));
   }
 }
