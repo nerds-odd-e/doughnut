@@ -5,10 +5,10 @@ milestone_name: Accidental Match Resolve UX
 current_phase: 8
 current_phase_name: Match path and clickable titles
 status: phase_complete
-stopped_at: Completed 08-02-PLAN.md
-last_updated: "2026-08-05T09:43:30.000Z"
+stopped_at: Phase 9 context gathered
+last_updated: "2026-08-05T09:47:45.768Z"
 last_activity: 2026-08-05
-last_activity_desc: Executed 08-02 — E2E path + clickable title asserts
+last_activity_desc: Executed 08-02 E2E path + clickable titles
 progress:
   total_phases: 6
   completed_phases: 2
@@ -96,7 +96,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-08-05T09:43:02.821Z
-Stopped at: Completed 08-02-PLAN.md
-Resume file: None
+Last session: 2026-08-05T09:47:45.760Z
+Stopped at: Phase 9 context gathered
+Resume file: .planning/phases/09-build-a-link-from-resolve-dialog/09-CONTEXT.md
 Next action: Discuss/plan Phase 9 (Build a link from resolve dialog) or /gsd-verify-work for Phase 8
