@@ -95,11 +95,11 @@ status: complete
 
 ## Task Commits
 
-1. **Task 1 RED: Tracer failing Vitest** - `0ad4e1138a` (test)
-2. **Task 1 GREEN: Same-Modal Build a link step** - `c9726497b6` (feat)
-3. **Task 2: AMR-07 gate Vitest + open-resolve helper** - `2a9e293373` (test)
+1. **Task 1 RED: Tracer failing Vitest** - `67f1c25550` (test)
+2. **Task 1 GREEN: Same-Modal Build a link step** - `32f049d6a3` (feat)
+3. **Task 2: AMR-07 gate Vitest + open-resolve helper** - `1e5c0c5337` (test)
 
-**Plan metadata:** included in `2a9e293373` (SUMMARY + STATE + ROADMAP + REQUIREMENTS)
+**Plan metadata:** included in `1e5c0c5337` (SUMMARY + STATE + ROADMAP + REQUIREMENTS); hash fixup `77f3852bdb`
 
 ## Deviations from Plan
 
@@ -119,8 +119,8 @@ status: complete
 
 ## TDD Gate Compliance
 
-- RED commit `0ad4e1138a` present
-- GREEN commit `c9726497b6` present after RED
+- RED commit `67f1c25550` present
+- GREEN commit `32f049d6a3` present after RED
 - Task 2 gates were already implemented in tracer GREEN (D-06/D-07 in Task 1 action); Task 2 added verification coverage only
 
 ## Self-Check: PASSED
@@ -128,5 +128,5 @@ status: complete
 - AccidentalMatchResolveDialog.vue FOUND
 - AccidentalMatchResolveRow Build a link FOUND
 - reviewed-note-id wiring FOUND
-- Commits 0ad4e1138a, c9726497b6 FOUND
+- Commits 67f1c25550, 32f049d6a3, 1e5c0c5337 FOUND
 - Vitest 7/7 green
