@@ -4,15 +4,15 @@ milestone: v1.2
 milestone_name: Accidental Match Resolve UX
 current_phase: 9
 current_phase_name: Build a link from resolve dialog
-status: ui_spec_draft
-stopped_at: Phase 9 UI-SPEC approved — pattern map + plan next
-last_updated: "2026-08-05T11:53:37.041Z"
+status: ready_to_execute
+stopped_at: Phase 9 plans written — ready for execute
+last_updated: "2026-08-05T12:05:00.000Z"
 last_activity: 2026-08-05
-last_activity_desc: Phase 9 UI design contract (Build a link step + gates)
+last_activity_desc: Phase 9 plans created (Build a link Vitest + E2E)
 progress:
   total_phases: 6
   completed_phases: 2
-  total_plans: 4
+  total_plans: 6
   completed_plans: 4
   percent: 33
 ---
@@ -24,16 +24,16 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 **Core value:** Healthy mainline for learning and knowledge work — reviewed note stays primary during accidental-match results.
-**Current focus:** Phase 9 UI-SPEC draft complete — ready for ui-checker / plan
+**Current focus:** Phase 9 plans ready — execute Wave 1 Vitest then Wave 2 E2E
 
 ## Current Position
 
-Phase: 9 of 12 (Build a link from resolve dialog) — UI-SPEC draft; plans TBD
-Plan: none yet
-Status: Phase 9 09-UI-SPEC.md written — AMR-06/AMR-07 design contract ready for checker
-Last activity: 2026-08-05 — Phase 9 UI design contract (Build a link step + gates)
+Phase: 9 of 12 (Build a link from resolve dialog) — planned (2 plans)
+Plan: 09-01 next (Wave 1)
+Status: Phase 9 PLAN.md files written — AMR-06/AMR-07 ready to execute
+Last activity: 2026-08-05 — Phase 9 plans created (Build a link Vitest + E2E)
 
-Progress: [███░░░░░░░] 33% (2/6 v1.2 phases; 4 plans executed across phases 7–8)
+Progress: [███░░░░░░░] 33% (2/6 v1.2 phases; 4/6 plans executed across phases 7–9)
 
 ## Performance Metrics
 
@@ -75,6 +75,11 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 - [Phase 8]: Distinct notebook names via accidentalMatchWithTwoMatchedNotes notebookNames option
 - [Phase 08]: Same-notebook English practice path assert is enough for E2E AMR-04 (D-11)
 - [Phase 08]: Assert visible title anchor without click-through; AMR-05 reopen deferred to Phase 12
+- [Phase 9]: Single-Modal step swap to MatchedNoteLinkOffer — never nest PopButton (D-01)
+- [Phase 9]: Step state in AccidentalMatchResolveDialog; pass reviewedNoteId (D-02)
+- [Phase 9]: Per-row Build a link; reuse offer; closeDialog → return to list (D-03..D-05)
+- [Phase 9]: Hide Build a link when readonly or realms unloaded (D-06, D-07)
+- [Phase 9]: Vitest Wave 1 then E2E untag @wip Wave 2 (D-08, D-09)
 
 ### Pending Todos
 
@@ -96,7 +101,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-08-05T11:53:37.034Z
-Stopped at: Phase 9 UI-SPEC approved — pattern map + plan next
-Resume file: .planning/phases/09-build-a-link-from-resolve-dialog/09-UI-SPEC.md
-Next action: gsd-ui-checker on 09-UI-SPEC.md, then /gsd-plan-phase 9
+Last session: 2026-08-05T12:05:00.000Z
+Stopped at: Phase 9 plans written — ready for execute
+Resume file: .planning/phases/09-build-a-link-from-resolve-dialog/09-01-PLAN.md
+Next action: /gsd-execute-phase 9 (or local execute-plan on 09-01 then 09-02)
