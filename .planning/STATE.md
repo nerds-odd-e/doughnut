@@ -5,10 +5,10 @@ milestone_name: Accidental Match Resolve UX
 current_phase: 7
 current_phase_name: Compact result + Resolve dialog shell
 status: planning
-stopped_at: Phase 7 context gathered
-last_updated: "2026-08-05T08:34:02.142Z"
+stopped_at: Phase 7 research complete
+last_updated: "2026-08-05T08:40:00.000Z"
 last_activity: 2026-08-05
-last_activity_desc: v1.2 roadmap created (phases 7–12)
+last_activity_desc: Phase 7 RESEARCH.md written — ready to plan
 progress:
   total_phases: 6
   completed_phases: 0
@@ -24,14 +24,14 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 **Core value:** Healthy mainline for learning and knowledge work — reviewed note stays primary during accidental-match results.
-**Current focus:** Phase 7 — Compact result + Resolve dialog shell (ready to plan)
+**Current focus:** Phase 7 — Compact result + Resolve dialog shell (research done; ready to plan)
 
 ## Current Position
 
 Phase: 7 of 12 (Compact result + Resolve dialog shell)
 Plan: —
-Status: Ready to plan
-Last activity: 2026-08-05 — v1.2 roadmap created (phases 7–12)
+Status: Research complete — ready to plan
+Last activity: 2026-08-05 — Phase 7 RESEARCH.md committed
 
 Progress: [░░░░░░░░░░] 0%
 
