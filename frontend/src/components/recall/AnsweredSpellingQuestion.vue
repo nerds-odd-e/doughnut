@@ -15,6 +15,7 @@
   >
     <AccidentalMatchResolveDialog
       :matched-notes="answeredQuestion.matchedNotes ?? []"
+      :reviewed-note-id="answeredQuestion.recalledNote.noteTopology.id"
     />
   </PopButton>
   <NoteUnderQuestion

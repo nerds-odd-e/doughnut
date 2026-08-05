@@ -13,6 +13,17 @@
         :notebook-realm="matchRealmRef.notebookRealm"
       />
     </div>
+    <button
+      v-if="canBuildLink"
+      type="button"
+      class="daisy-btn daisy-btn-secondary daisy-btn-sm"
+      :data-testid="`link-to-matched-note-${matched.id}`"
+      title="Build a link"
+      aria-label="Build a link"
+      @click="$emit('buildLink')"
+    >
+      Build a link
+    </button>
   </li>
 </template>
 
@@ -28,7 +39,15 @@ const props = defineProps({
     type: Object as PropType<NoteTopology>,
     required: true,
   },
+  canBuildLink: {
+    type: Boolean,
+    default: false,
+  },
 })
+
+defineEmits<{
+  (e: "buildLink"): void
+}>()
 
 const storageAccessor = useStorageAccessor()
 const matchRealmRef = storageAccessor.value
