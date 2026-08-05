@@ -1,10 +1,11 @@
 ---
 phase: 8
 slug: match-path-and-clickable-titles
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-08-05
+reviewed_at: 2026-08-05T17:19:00+08:00
 ---
 
 # Phase 8 — UI Design Contract
