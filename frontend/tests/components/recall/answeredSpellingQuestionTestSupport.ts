@@ -63,30 +63,14 @@ export function mountAnsweredSpellingQuestion(
 
 export function accidentalMatchWithTwoMatchedNotes() {
   const reviewedRealm = makeMe.aNoteRealm.title("Reviewed Note").please()
-  const matchedA = makeMe.aNoteRealm.title("Matched A").please()
-  matchedA.id = 10
-  matchedA.note.id = 10
-  matchedA.note.noteTopology.id = 10
-  matchedA.note.noteTopology.title = "Matched A"
-  const matchedB = makeMe.aNoteRealm.title("Matched B").please()
-  matchedB.id = 20
-  matchedB.note.id = 20
-  matchedB.note.noteTopology.id = 20
-  matchedB.note.noteTopology.title = "Matched B"
-
+  const matchedA = makeMe.aNoteRealm.id(10).title("Matched A").please()
+  const matchedB = makeMe.aNoteRealm.id(20).title("Matched B").please()
   const answeredQuestion = makeMe.anAnsweredQuestion
     .withNote(reviewedRealm.note)
-    .spelling()
-    .answerCorrect(false)
-    .withAnswer({
-      id: 1,
-      correct: false,
-      spellingAnswer: "matched a",
-      outcome: "ACCIDENTAL_MATCH",
-      matchedNoteId: 10,
-    })
-    .withMatchedNotes([matchedA.note.noteTopology, matchedB.note.noteTopology])
+    .accidentalMatch("matched a", [
+      matchedA.note.noteTopology,
+      matchedB.note.noteTopology,
+    ])
     .please()
-
   return { answeredQuestion, reviewedRealm, matchedA, matchedB }
 }

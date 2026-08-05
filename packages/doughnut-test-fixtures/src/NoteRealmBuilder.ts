@@ -43,6 +43,11 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
     return this
   }
 
+  id(value: number): NoteRealmBuilder {
+    this.noteBuilder.id(value)
+    return this
+  }
+
   createdAt(value: string): NoteRealmBuilder {
     this.noteBuilder.createdAt(value)
     return this

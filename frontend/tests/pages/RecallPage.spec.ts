@@ -339,9 +339,7 @@ describe("repeat page", () => {
     })
 
     it("should handle spelling questions correctly", async () => {
-      const note = makeMe.aNote.please()
-      note.id = 42
-      note.noteTopology.id = 42
+      const note = makeMe.aNote.id(42).please()
       const answerResult: AnsweredQuestion = makeMe.anAnsweredQuestion
         .withNote(note)
         .spelling()
@@ -361,37 +359,29 @@ describe("repeat page", () => {
       const wrapper = await mountPage()
       await flushPromises()
 
-      // Debug: print the wrapper's HTML
       await wrapper.find("input#memory_tracker-answer").setValue("test answer")
       await flushPromises()
       await wrapper.find("form").trigger("submit")
       await flushPromises()
       expect(mockedAnswerSpellingCall).toHaveBeenCalled()
 
-      // Verify that a spelling result was created and displayed correctly
       const answeredSpellingQuestion = wrapper.findComponent({
         name: "AnsweredSpellingQuestion",
       })
       expect(answeredSpellingQuestion.exists()).toBe(true)
-      const spellingAlert = answeredSpellingQuestion.find(".daisy-alert-error")
-      expect(spellingAlert.exists()).toBe(true)
-      expect(spellingAlert.text()).toContain(
-        "Your answer `test answer` is incorrect."
-      )
-
-      // Verify note is displayed
-      const noteShow = answeredSpellingQuestion.findComponent({
-        name: "NoteShow",
-      })
-      expect(noteShow.exists()).toBe(true)
-      expect(noteShow.props("noteId")).toBe(42)
-
-      // Verify View Memory Tracker link is displayed
-      const viewMemoryTrackerLink = answeredSpellingQuestion.findComponent({
-        name: "ViewMemoryTrackerLink",
-      })
-      expect(viewMemoryTrackerLink.exists()).toBe(true)
-      expect(viewMemoryTrackerLink.props("memoryTrackerId")).toBe(123)
+      expect(
+        answeredSpellingQuestion.find(".daisy-alert-error").text()
+      ).toContain("Your answer `test answer` is incorrect.")
+      expect(
+        answeredSpellingQuestion
+          .findComponent({ name: "NoteShow" })
+          .props("noteId")
+      ).toBe(42)
+      expect(
+        answeredSpellingQuestion
+          .findComponent({ name: "ViewMemoryTrackerLink" })
+          .props("memoryTrackerId")
+      ).toBe(123)
     })
   })
 

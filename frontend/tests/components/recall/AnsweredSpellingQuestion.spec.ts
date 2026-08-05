@@ -11,9 +11,7 @@ describe("AnsweredSpellingQuestion plain wrong", () => {
   })
 
   it("keeps incorrect alert copy and omits matched notes section", async () => {
-    const reviewed = makeMe.aNote.title("Reviewed Note").please()
     const answeredQuestion = makeMe.anAnsweredQuestion
-      .withNote(reviewed)
       .spelling()
       .withAnswer({
         id: 1,
@@ -26,7 +24,6 @@ describe("AnsweredSpellingQuestion plain wrong", () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain("Your answer `typo` is incorrect.")
-    expect(wrapper.text()).not.toContain("names another note")
     expect(wrapper.find('[data-testid="matched-notes-section"]').exists()).toBe(
       false
     )

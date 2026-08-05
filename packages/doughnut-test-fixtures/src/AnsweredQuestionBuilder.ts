@@ -67,6 +67,36 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
     return this
   }
 
+  /** Incorrect spelling that accidentally matches other note title(s)/alias(es). */
+  accidentalMatch(spellingAnswer: string, matchedNotes: NoteTopology[] = []): this {
+    this.questionType = 'SPELLING'
+    this.isCorrect = false
+    this.answerToUse = {
+      id: generateId(),
+      correct: false,
+      spellingAnswer,
+      outcome: 'ACCIDENTAL_MATCH',
+      ...(matchedNotes[0] !== undefined && {
+        matchedNoteId: matchedNotes[0].id,
+      }),
+    }
+    this.matchedNotesToUse = matchedNotes
+    return this
+  }
+
+  /** Correct-looking spelling that is non-distinguishing overlap — try again. */
+  overlap(spellingAnswer: string): this {
+    this.questionType = 'SPELLING'
+    this.isCorrect = false
+    this.answerToUse = {
+      id: generateId(),
+      correct: false,
+      spellingAnswer,
+      outcome: 'OVERLAP',
+    }
+    return this
+  }
+
   fromMcqHistoryItem(
     pending: RecallPromptHistoryItem,
     note: Note,

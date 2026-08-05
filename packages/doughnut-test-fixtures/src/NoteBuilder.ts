@@ -45,6 +45,12 @@ class NoteBuilder extends Builder<Note> {
     return this
   }
 
+  id(value: number): NoteBuilder {
+    this.data.id = value
+    this.data.noteTopology.id = value
+    return this
+  }
+
   content(value: string | undefined): NoteBuilder {
     this.data.content = value
     return this

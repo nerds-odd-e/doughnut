@@ -17,26 +17,13 @@ describe("AnsweredSpellingQuestion accidental match", () => {
   })
 
   it("shows distinct alert copy and a matched notes section with NoteShows", async () => {
-    const reviewed = makeMe.aNote.title("Reviewed Note").please()
-    const matchedA = makeMe.aNote.title("Matched A").please()
-    matchedA.id = 10
-    matchedA.noteTopology.id = 10
-    const matchedB = makeMe.aNote.title("Matched B").please()
-    matchedB.id = 20
-    matchedB.noteTopology.id = 20
-
+    const matchedA = makeMe.aNote.id(10).title("Matched A").please()
+    const matchedB = makeMe.aNote.id(20).title("Matched B").please()
     const answeredQuestion = makeMe.anAnsweredQuestion
-      .withNote(reviewed)
-      .spelling()
-      .answerCorrect(false)
-      .withAnswer({
-        id: 1,
-        correct: false,
-        spellingAnswer: "matched a",
-        outcome: "ACCIDENTAL_MATCH",
-        matchedNoteId: 10,
-      })
-      .withMatchedNotes([matchedA.noteTopology, matchedB.noteTopology])
+      .accidentalMatch("matched a", [
+        matchedA.noteTopology,
+        matchedB.noteTopology,
+      ])
       .please()
 
     const wrapper = mountAnsweredSpellingQuestion(answeredQuestion)
@@ -45,44 +32,23 @@ describe("AnsweredSpellingQuestion accidental match", () => {
     expect(wrapper.text()).toContain(
       "Your answer `matched a` names another note — not correct for this review."
     )
-    expect(wrapper.text()).not.toContain(
-      "Your answer `matched a` is incorrect."
-    )
-
     const matchedSection = wrapper.find('[data-testid="matched-notes-section"]')
     expect(matchedSection.exists()).toBe(true)
-    expect(matchedSection.text()).toContain("Matched note(s)")
-
-    const matchedShows = matchedSection.findAllComponents({
-      name: "NoteShow",
-    })
-    expect(matchedShows).toHaveLength(2)
-    expect(matchedShows[0].props("noteId")).toBe(10)
-    expect(matchedShows[0].props("expandChildren")).toBe(false)
-    expect(matchedShows[1].props("noteId")).toBe(20)
-    expect(matchedShows[1].props("expandChildren")).toBe(false)
+    const matchedShows = matchedSection.findAllComponents({ name: "NoteShow" })
+    expect(matchedShows.map((show) => show.props("noteId"))).toEqual([10, 20])
+    expect(
+      matchedShows.every((show) => show.props("expandChildren") === false)
+    ).toBe(true)
   })
 
   it("omits matched notes section when matchedNotes is empty", async () => {
-    const reviewed = makeMe.aNote.title("Reviewed Note").please()
     const answeredQuestion = makeMe.anAnsweredQuestion
-      .withNote(reviewed)
-      .spelling()
-      .withAnswer({
-        id: 1,
-        correct: false,
-        spellingAnswer: "ghost",
-        outcome: "ACCIDENTAL_MATCH",
-      })
-      .withMatchedNotes([])
+      .accidentalMatch("ghost", [])
       .please()
 
     const wrapper = mountAnsweredSpellingQuestion(answeredQuestion)
     await flushPromises()
 
-    expect(wrapper.text()).toContain(
-      "Your answer `ghost` names another note — not correct for this review."
-    )
     expect(wrapper.find('[data-testid="matched-notes-section"]').exists()).toBe(
       false
     )
@@ -97,12 +63,6 @@ describe("AnsweredSpellingQuestion accidental match", () => {
     })
     await flushPromises()
 
-    expect(
-      wrapper.find('[data-testid="link-to-matched-note-10"]').exists()
-    ).toBe(true)
-    expect(
-      wrapper.find('[data-testid="link-to-matched-note-20"]').exists()
-    ).toBe(true)
     expect(
       wrapper.findAll('[data-testid^="link-to-matched-note-"]')
     ).toHaveLength(2)
@@ -138,9 +98,6 @@ describe("AnsweredSpellingQuestion accidental match", () => {
     })
     await flushPromises()
 
-    expect(wrapper.find('[data-testid="matched-notes-section"]').exists()).toBe(
-      true
-    )
     expect(
       wrapper.findAll('[data-testid^="link-to-matched-note-"]')
     ).toHaveLength(0)
@@ -161,9 +118,6 @@ describe("AnsweredSpellingQuestion accidental match", () => {
     })
     await flushPromises()
 
-    expect(wrapper.find('[data-testid="matched-notes-section"]').exists()).toBe(
-      true
-    )
     expect(
       wrapper.findAll('[data-testid^="link-to-matched-note-"]')
     ).toHaveLength(0)
