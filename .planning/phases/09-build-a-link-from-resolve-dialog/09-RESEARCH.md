@@ -406,17 +406,19 @@ Keep Gherkin step text; change page object only (D-09).
 
 **If this table is empty:** — not empty; A1–A3 need planner awareness only (A1 discretionary; A2 reinforces locked decision; A3 port from v1.1).
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should go-back leave an extra host chrome button?**
    - What we know: `LinkInsertionChoice` already emits `goBack` → offer `closeDialog`.
    - What's unclear: Whether list needs a visible “Back” when on offer step beyond offer’s Reply button.
    - Recommendation: Rely solely on offer go-back (discretion default); no duplicate chrome.
+   - **RESOLVED:** Rely solely on offer go-back; no duplicate host Back chrome. Encoded in 09-01-PLAN / 09-UI-SPEC.
 
 2. **E2E stay-on-result: must dialog stay open after link?**
    - What we know: D-04 returns to match **list inside same Modal**; product E2E says “still on the accidental match **result**” (alert + recall URL).
    - What's unclear: Whether Cypress should assert dialog still open after link.
    - Recommendation: Minimum = still on result chrome; prefer also assert resolve dialog/list still open after link success to lock D-04.
+   - **RESOLVED:** Prefer assert resolve dialog/list still available after link success (locks D-04); minimum stay-on-result chrome still required. Encoded in 09-02-PLAN.
 
 ## Environment Availability
 
