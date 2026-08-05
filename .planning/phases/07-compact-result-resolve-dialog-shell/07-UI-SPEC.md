@@ -1,10 +1,11 @@
 ---
 phase: 7
 slug: compact-result-resolve-dialog-shell
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-08-05
+reviewed_at: 2026-08-05T16:43:00+08:00
 ---
 
 # Phase 7 — UI Design Contract
