@@ -1,23 +1,31 @@
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
-import { flushPromises } from "@vue/test-utils"
+import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { mockSdkService } from "@tests/helpers"
+import { closeButtonEl } from "@tests/commons/modalTestSupport"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import { beforeEach, describe, it, expect } from "vitest"
+import { afterEach, beforeEach, describe, it, expect } from "vitest"
 import {
   accidentalMatchWithTwoMatchedNotes,
   mountAnsweredSpellingQuestion,
 } from "./answeredSpellingQuestionTestSupport"
 
 describe("AnsweredSpellingQuestion accidental match", () => {
+  let wrapper: VueWrapper
+
   beforeEach(() => {
     mockSdkService(NoteController, "showNote", makeMe.aNoteRealm.please())
+  })
+
+  afterEach(() => {
+    wrapper?.unmount()
+    document.body.innerHTML = ""
   })
 
   it("shows compact accidental-match result with Resolve CTA and no stacked matches", async () => {
     const { answeredQuestion } = accidentalMatchWithTwoMatchedNotes()
     const reviewedId = answeredQuestion.recalledNote.noteTopology.id
 
-    const wrapper = mountAnsweredSpellingQuestion(answeredQuestion)
+    wrapper = mountAnsweredSpellingQuestion(answeredQuestion)
     await flushPromises()
 
     expect(wrapper.text()).toContain(
@@ -40,7 +48,7 @@ describe("AnsweredSpellingQuestion accidental match", () => {
 
   it("opens resolve dialog listing matched note titles only", async () => {
     const { answeredQuestion } = accidentalMatchWithTwoMatchedNotes()
-    const wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {
+    wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {
       withRouter: true,
     })
     await flushPromises()
@@ -62,5 +70,49 @@ describe("AnsweredSpellingQuestion accidental match", () => {
       document.body.querySelector('[data-testid="resolve-match-row-20"]')
         ?.textContent
     ).toContain("Matched B")
+  })
+
+  it("omits Resolve CTA when matchedNotes is empty", async () => {
+    const answeredQuestion = makeMe.anAnsweredQuestion
+      .accidentalMatch("ghost", [])
+      .please()
+
+    wrapper = mountAnsweredSpellingQuestion(answeredQuestion)
+    await flushPromises()
+
+    expect(
+      wrapper.find('[data-testid="resolve-accidental-match"]').exists()
+    ).toBe(false)
+  })
+
+  it("dismisses resolve dialog via close button and stays on accidental-match result", async () => {
+    const { answeredQuestion } = accidentalMatchWithTwoMatchedNotes()
+    wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {
+      withRouter: true,
+    })
+    await flushPromises()
+
+    await wrapper
+      .find('[data-testid="resolve-accidental-match"]')
+      .trigger("click")
+    await flushPromises()
+
+    expect(
+      document.body.querySelector(
+        '[data-testid="accidental-match-resolve-dialog"]'
+      )
+    ).toBeTruthy()
+
+    closeButtonEl()!.click()
+    await flushPromises()
+
+    expect(
+      document.body.querySelector(
+        '[data-testid="accidental-match-resolve-dialog"]'
+      )
+    ).toBeNull()
+    expect(
+      wrapper.find('[data-testid="accidental-match-alert"]').exists()
+    ).toBe(true)
   })
 })
