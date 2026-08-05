@@ -86,8 +86,12 @@ Plans:
 **Plans**: 0/2 plans executed
 
 Plans:
+**Wave 1**
 
 - [ ] 08-01-PLAN.md — Tracer: AccidentalMatchResolveRow title link + path breadcrumb (Vitest)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 08-02-PLAN.md — E2E: path identity + clickable title in resolve dialog (no AMR-05)
 
 **UI hint**: yes
