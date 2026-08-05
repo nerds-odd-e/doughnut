@@ -2,12 +2,18 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.AttachmentBlob;
 import com.odde.doughnut.entities.Image;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
 public class ImageBuilder extends EntityBuilder<Image> {
   public ImageBuilder(Image entity, MakeMe makeMe) {
     super(makeMe, entity);
+  }
+
+  public ImageBuilder forNote(Note note) {
+    entity.setNote(note);
+    return this;
   }
 
   @Override
