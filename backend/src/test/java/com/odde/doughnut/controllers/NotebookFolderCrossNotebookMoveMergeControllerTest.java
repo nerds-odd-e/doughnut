@@ -6,13 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.controllers.dto.ApiError;
-import com.odde.doughnut.controllers.dto.FolderListing;
-import com.odde.doughnut.controllers.dto.FolderMoveRequest;
 import com.odde.doughnut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import org.junit.jupiter.api.Test;
@@ -23,57 +20,45 @@ class NotebookFolderCrossNotebookMoveMergeControllerTest
   @Test
   void mergesRecursivelyAcrossNotebooksWhenMergeRequested()
       throws UnexpectedNoAccessRightException {
-    User owner = currentUser.getUser();
-    Notebook nbA = makeMe.aNotebook().creatorAndOwner(owner).please();
-    Notebook nbB = makeMe.aNotebook().creatorAndOwner(owner).please();
-    Folder target = makeMe.aFolder().notebook(nbB).name("Dup").please();
+    Notebook nbA = ownedNotebook();
+    Notebook nbB = ownedNotebook();
+    Folder target = ownedFolder(nbB, "Dup");
     Folder innerTarget = makeMe.aFolder().parentFolder(target).name("Inner").please();
     Note deepNoteInTarget = makeMe.aNote("DeepTarget").folder(innerTarget).please();
-    Folder holder = makeMe.aFolder().notebook(nbA).name("Holder").please();
+    Folder holder = ownedFolder(nbA, "Holder");
     Folder source = makeMe.aFolder().parentFolder(holder).name("Dup").please();
     Folder innerSource = makeMe.aFolder().parentFolder(source).name("Inner").please();
     Note deepNoteInSource = makeMe.aNote("DeepSource").folder(innerSource).please();
 
-    FolderMoveRequest req = new FolderMoveRequest();
-    req.setDestinationNotebookId(nbB.getId());
-    req.setNewParentFolderId(null);
-    req.setMerge(true);
-    Folder result = controller.moveFolder(nbA, source, req);
+    Folder result = controller.moveFolder(nbA, source, folderMergeTo(nbB, null));
 
     assertThat(result.getId(), equalTo(target.getId()));
     makeMe.refresh(deepNoteInTarget);
     makeMe.refresh(deepNoteInSource);
     assertThat(deepNoteInTarget.getFolder().getId(), equalTo(innerTarget.getId()));
     assertThat(deepNoteInSource.getFolder().getId(), equalTo(innerTarget.getId()));
-    assertThat(deepNoteInTarget.getNotebook().getId(), equalTo(nbB.getId()));
     assertThat(deepNoteInSource.getNotebook().getId(), equalTo(nbB.getId()));
-    FolderListing rootB = controller.listNotebookFolderListing(nbB, null);
-    assertTrue(rootB.folders().stream().anyMatch(f -> f.getId().equals(target.getId())));
-    assertTrue(rootB.folders().stream().noneMatch(f -> f.getId().equals(source.getId())));
-    FolderListing rootA = controller.listNotebookFolderListing(nbA, null);
-    assertTrue(rootA.folders().stream().noneMatch(f -> f.getId().equals(source.getId())));
+    assertTrue(listingHasFolder(nbB, null, target));
+    assertThat(listingHasFolder(nbB, null, source), equalTo(false));
+    assertThat(listingHasFolder(nbA, null, source), equalTo(false));
   }
 
   @Test
-  void rejectsCrossNotebookMergeWhenSoftDeletedNoteHasSameTitleAtDestinationFolder()
-      throws UnexpectedNoAccessRightException {
-    User owner = currentUser.getUser();
-    Notebook nbA = makeMe.aNotebook().creatorAndOwner(owner).please();
-    Notebook nbB = makeMe.aNotebook().creatorAndOwner(owner).please();
-    Folder target = makeMe.aFolder().notebook(nbB).name("Dup").please();
+  void rejectsCrossNotebookMergeWhenSoftDeletedNoteHasSameTitleAtDestinationFolder() {
+    Notebook nbA = ownedNotebook();
+    Notebook nbB = ownedNotebook();
+    Folder target = ownedFolder(nbB, "Dup");
     Note deleted = makeMe.aNote().folder(target).title("ConflictTitle").please();
-    noteService.destroy(deleted, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, owner);
+    noteService.destroy(
+        deleted, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, currentUser.getUser());
 
-    Folder holder = makeMe.aFolder().notebook(nbA).name("Holder").please();
+    Folder holder = ownedFolder(nbA, "Holder");
     Folder source = makeMe.aFolder().parentFolder(holder).name("Dup").please();
     makeMe.aNote().folder(source).title("ConflictTitle").please();
 
-    FolderMoveRequest req = new FolderMoveRequest();
-    req.setDestinationNotebookId(nbB.getId());
-    req.setNewParentFolderId(null);
-    req.setMerge(true);
     ApiException ex =
-        assertThrows(ApiException.class, () -> controller.moveFolder(nbA, source, req));
+        assertThrows(
+            ApiException.class, () -> controller.moveFolder(nbA, source, folderMergeTo(nbB, null)));
     assertThat(
         ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.SOFT_DELETED_TITLE_CONFLICT));
     assertThat(
@@ -86,31 +71,22 @@ class NotebookFolderCrossNotebookMoveMergeControllerTest
   @Test
   void mergesAcrossNotebooksWhenNoSoftDeletedTitleConflictAtDestination()
       throws UnexpectedNoAccessRightException {
-    User owner = currentUser.getUser();
-    Notebook nbA = makeMe.aNotebook().creatorAndOwner(owner).please();
-    Notebook nbB = makeMe.aNotebook().creatorAndOwner(owner).please();
-    Folder parentP = makeMe.aFolder().notebook(nbB).name("P").please();
+    Notebook nbA = ownedNotebook();
+    Notebook nbB = ownedNotebook();
+    Folder parentP = ownedFolder(nbB, "P");
     Folder target = makeMe.aFolder().parentFolder(parentP).name("Dup").please();
-    Note noteInTarget = makeMe.aNote("KeptInTarget").folder(target).please();
-    Folder holder = makeMe.aFolder().notebook(nbA).name("Holder").please();
+    makeMe.aNote("KeptInTarget").folder(target).please();
+    Folder holder = ownedFolder(nbA, "Holder");
     Folder source = makeMe.aFolder().parentFolder(holder).name("Dup").please();
     Note noteInSource = makeMe.aNote("FromSource").folder(source).please();
 
-    FolderMoveRequest req = new FolderMoveRequest();
-    req.setDestinationNotebookId(nbB.getId());
-    req.setNewParentFolderId(parentP.getId());
-    req.setMerge(true);
-    Folder result = controller.moveFolder(nbA, source, req);
+    Folder result = controller.moveFolder(nbA, source, folderMergeTo(nbB, parentP.getId()));
 
     assertThat(result.getId(), equalTo(target.getId()));
-    makeMe.refresh(noteInTarget);
     makeMe.refresh(noteInSource);
-    assertThat(noteInTarget.getFolder().getId(), equalTo(target.getId()));
     assertThat(noteInSource.getFolder().getId(), equalTo(target.getId()));
-    assertThat(noteInTarget.getNotebook().getId(), equalTo(nbB.getId()));
     assertThat(noteInSource.getNotebook().getId(), equalTo(nbB.getId()));
-    FolderListing underP = controller.listNotebookFolderListing(nbB, parentP.getId());
-    assertTrue(underP.folders().stream().anyMatch(f -> f.getId().equals(target.getId())));
-    assertTrue(underP.folders().stream().noneMatch(f -> f.getId().equals(source.getId())));
+    assertTrue(listingHasFolder(nbB, parentP.getId(), target));
+    assertThat(listingHasFolder(nbB, parentP.getId(), source), equalTo(false));
   }
 }

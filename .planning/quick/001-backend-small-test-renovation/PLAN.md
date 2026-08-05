@@ -1,6 +1,6 @@
 # Backend unit tests → "small test" style
 
-**Status:** in progress (Phase 9 done)  
+**Status:** in progress (Phase 10 done)  
 **Type:** test renovation (no product behavior change)  
 **Verify each phase:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only`  
 **Style:** `.cursor/rules/unit-testing.mdc` + `.cursor/rules/backend-testing.mdc`  
@@ -130,7 +130,7 @@ For each file in the phase file list:
 - **Done when:** those files renovated; suite green.
 
 ### Phase 10 — Controllers: notebook folder move
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
 - **Files / scope:**
   - `NotebookFolderMoveControllerTest.java` (same-notebook move / merge)
@@ -311,7 +311,8 @@ If a Behavior phase cannot express fixtures concisely:
 | 7 | done | Text content: `notebookOwnedBy` / `underSameNotebookAs`; `InboundWiki` helper; canonical wiki/alias asserts + parameterized invalid aliases; `ImageBuilder.forNote`. Post-refactor split grab-bag into capability files + shared base. |
 | 8 | done | Note satellites: `notebookOwnedBy` / `underSameNotebookAs` / `.content()`; drop unused root notes & shared BeforeEach fixtures; Attachment → ControllerTestBase; RecentNotes drop unused HttpClientAdapter; SoftDeleted conflict shape once + sibling delta; schema persistence tests already clean. Post-refactor: `ownedFolder`/`ownedNotebook`/`expectSoftDeletedTitleConflict`. |
 | 9 | done | Create/rename/dissolve: `ownedNotebook` + `folderCreate` / `listingHasFolder`; drop controller `createNotebook` fixture dance; trim via ObjectMapper only where Jackson deserializer matters; conflict/404 shape once + sibling deltas. Post-refactor: split oversized grab-bag into capability files + shared base (Phase 10 paths updated). |
-| 10–26 | planned | — |
+| 10 | done | Move/cross-notebook/merge/link-rewrite: `ownedNotebook`/`ownedFolder` + `folderMove`/`folderMoveTo`/`folderMerge`/`folderMergeTo`; `.content()` for wiki fixtures; listing via `listingHasFolder`; conflict/404/BAD_REQUEST shape once + sibling deltas; drop overlapping dest-access denial. |
+| 11–26 | planned | — |
 
 ---
 
@@ -330,3 +331,4 @@ If a Behavior phase cannot express fixtures concisely:
 - Phase 7: Inbound-wiki rename fixtures share `noteWithInboundWiki` (target + carrier via content update). Display-text wiki-title sibling asserts delta only after full-shape canonical. Invalid authored-alias rejects: BINDING_ERROR + unchanged content once; sibling invalid list items parameterized on message only. `ImageBuilder.forNote` replaces post-`please` `setNote` + save. Oversized grab-bag split to title / inbound-wiki / content / aliases (+ shared base).
 - Phase 8: Relation move tests: named notebooks still need `creatorAndOwner` + name (wiki link qualification); notes use `notebookOwnedBy` / `underSameNotebookAs` / `.content()`. Drop mid-state folder assert before idempotent rematch; same-notebook no-rewrite drops redundant wiki-title list when content unchanged. SoftDeleted MVC: canonical conflict asserts deletedNoteId once; siblings status+errorType only. Schema/constraint persistence tests (title NOT NULL, folder unique index) already domain-stable — leave in place.
 - Phase 9: Folder name trim is Jackson `DisplayNameTrimmingDeserializer` — keep `objectMapper.readValue` for trim cases; plain setters skip trim. Create fixtures via `ownedNotebook()` not `controller.createNotebook`. Post-refactor split grab-bag into create/rename/dissolve + move/cross-notebook/merge/link-rewrite (+ shared base); Phase 10 targets the move files.
+- Phase 10: Shared base gains `ownedFolder`, named `ownedNotebook`, and move/merge request helpers. Cross-notebook wiki rewrite still needs named notebooks (`ownedNotebook("NbA")`). Sibling 404/BAD_REQUEST/access-denial cases assert delta only; dest-parent access denial overlaps root dest denial — one case enough.
