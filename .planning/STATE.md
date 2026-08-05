@@ -4,11 +4,11 @@ milestone: v1.2
 milestone_name: Accidental Match Resolve UX
 current_phase: 8
 current_phase_name: Match path and clickable titles
-status: research_complete
-stopped_at: Phase 8 research complete
-last_updated: "2026-08-05T09:16:00.000Z"
+status: ui_spec_complete
+stopped_at: Phase 8 UI-SPEC complete
+last_updated: "2026-08-05T09:20:00.000Z"
 last_activity: 2026-08-05
-last_activity_desc: Wrote 08-RESEARCH.md for match path + clickable titles
+last_activity_desc: Wrote 08-UI-SPEC.md design contract for match path + clickable titles
 progress:
   total_phases: 6
   completed_phases: 1
