@@ -1,4 +1,7 @@
-import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
+import {
+  NoteController,
+  TextContentController,
+} from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { mockSdkService } from "@tests/helpers"
 import { closeButtonEl } from "@tests/commons/modalTestSupport"
@@ -128,6 +131,68 @@ describe("AnsweredSpellingQuestion accidental match", () => {
         '[data-testid="accidental-match-resolve-dialog"]'
       )
     ).toBeNull()
+    expect(
+      wrapper.find('[data-testid="accidental-match-alert"]').exists()
+    ).toBe(true)
+  })
+
+  it("builds a link as a same-Modal step and returns to the match list after success", async () => {
+    const { answeredQuestion, reviewedRealm, matchedA, matchedB } =
+      accidentalMatchWithTwoMatchedNotes()
+    mockSdkService(TextContentController, "updateNoteContent", reviewedRealm)
+
+    wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {
+      currentUser: makeMe.aUser.please(),
+      seedRealms: [reviewedRealm, matchedA, matchedB],
+      withRouter: true,
+    })
+    await flushPromises()
+
+    await wrapper
+      .find('[data-testid="resolve-accidental-match"]')
+      .trigger("click")
+    await flushPromises()
+
+    const linkButtons = [
+      ...document.body.querySelectorAll(
+        '[data-testid^="link-to-matched-note-"]'
+      ),
+    ]
+    expect(linkButtons).toHaveLength(2)
+    expect(
+      linkButtons.every((btn) => btn.textContent?.includes("Build a link"))
+    ).toBe(true)
+
+    ;(
+      document.body.querySelector(
+        '[data-testid="link-to-matched-note-10"]'
+      ) as HTMLElement
+    ).click()
+    await flushPromises()
+
+    expect(document.body.textContent).toContain("Link to:")
+    expect(document.body.textContent).toContain("Matched A")
+    expect(
+      document.body.querySelector(
+        '[data-testid="accidental-match-resolve-dialog"]'
+      )
+    ).toBeNull()
+    expect(
+      document.body.querySelectorAll('[data-testid^="link-to-matched-note-"]')
+    ).toHaveLength(0)
+
+    const propertyButton = [...document.body.querySelectorAll("button")].find(
+      (b) => b.textContent?.includes("Add wiki link as a new property")
+    )
+    expect(propertyButton).toBeTruthy()
+    propertyButton!.click()
+    await flushPromises()
+
+    expect(
+      document.body.querySelector(
+        '[data-testid="accidental-match-resolve-dialog"]'
+      )
+    ).toBeTruthy()
     expect(
       wrapper.find('[data-testid="accidental-match-alert"]').exists()
     ).toBe(true)
