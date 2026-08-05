@@ -8,18 +8,6 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 
 abstract class NotebookFolderManagementControllerTestBase extends NotebookControllerTestBase {
 
-  protected Notebook ownedNotebook() {
-    return makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-  }
-
-  protected Notebook ownedNotebook(String name) {
-    return makeMe.aNotebook().name(name).creatorAndOwner(currentUser.getUser()).please();
-  }
-
-  protected Folder ownedFolder(Notebook notebook, String name) {
-    return makeMe.aFolder().notebook(notebook).name(name).please();
-  }
-
   protected FolderCreationRequest folderCreate(String name) {
     FolderCreationRequest req = new FolderCreationRequest();
     req.setName(name);

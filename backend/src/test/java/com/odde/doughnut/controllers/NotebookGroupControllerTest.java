@@ -23,11 +23,15 @@ class NotebookGroupControllerTest extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
   }
 
+  private CreateNotebookGroupRequest groupCreate(String name) {
+    CreateNotebookGroupRequest req = new CreateNotebookGroupRequest();
+    req.setName(name);
+    return req;
+  }
+
   @Test
   void createsGroupForCurrentUser() throws UnexpectedNoAccessRightException {
-    CreateNotebookGroupRequest req = new CreateNotebookGroupRequest();
-    req.setName("Alpha");
-    var group = notebookGroupController.createGroup(req);
+    var group = notebookGroupController.createGroup(groupCreate("Alpha"));
     makeMe.refresh(group);
     assertThat(group.getName(), equalTo("Alpha"));
     assertThat(group.getOwnership().getId(), equalTo(currentUser.getUser().getOwnership().getId()));
@@ -36,29 +40,25 @@ class NotebookGroupControllerTest extends ControllerTestBase {
   @Test
   void rejectsWhenNotLoggedIn() {
     currentUser.setUser(null);
-    CreateNotebookGroupRequest req = new CreateNotebookGroupRequest();
-    req.setName("X");
-    assertThrows(ResponseStatusException.class, () -> notebookGroupController.createGroup(req));
+    assertThrows(
+        ResponseStatusException.class, () -> notebookGroupController.createGroup(groupCreate("X")));
   }
 
   @Test
   void createsGroupOnCircleOwnershipWhenCircleIdSet() throws UnexpectedNoAccessRightException {
     Circle circle = makeMe.aCircle().please();
     circleService.joinAndSave(circle, currentUser.getUser());
-    CreateNotebookGroupRequest req = new CreateNotebookGroupRequest();
-    req.setName("Circle group");
+    CreateNotebookGroupRequest req = groupCreate("Circle group");
     req.setCircleId(circle.getId());
     var group = notebookGroupController.createGroup(req);
     makeMe.refresh(group);
-    assertThat(group.getName(), equalTo("Circle group"));
     assertThat(group.getOwnership().getId(), equalTo(circle.getOwnership().getId()));
   }
 
   @Test
   void rejectsCircleGroupWhenNotMember() {
     Circle circle = makeMe.aCircle().please();
-    CreateNotebookGroupRequest req = new CreateNotebookGroupRequest();
-    req.setName("X");
+    CreateNotebookGroupRequest req = groupCreate("X");
     req.setCircleId(circle.getId());
     assertThrows(
         UnexpectedNoAccessRightException.class, () -> notebookGroupController.createGroup(req));

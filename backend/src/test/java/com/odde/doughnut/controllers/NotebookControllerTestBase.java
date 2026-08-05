@@ -7,6 +7,7 @@ import com.odde.doughnut.controllers.dto.NotebookCatalogGroupItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogNotebookItem;
 import com.odde.doughnut.controllers.dto.NotebookCatalogSubscribedNotebookItem;
+import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookSettings;
@@ -49,6 +50,18 @@ abstract class NotebookControllerTestBase extends ControllerTestBase {
       case NotebookCatalogSubscribedNotebookItem s -> s.notebook.getId();
       case NotebookCatalogGroupItem g -> null;
     };
+  }
+
+  protected Notebook ownedNotebook() {
+    return makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+  }
+
+  protected Notebook ownedNotebook(String name) {
+    return makeMe.aNotebook().name(name).creatorAndOwner(currentUser.getUser()).please();
+  }
+
+  protected Folder ownedFolder(Notebook notebook, String name) {
+    return makeMe.aFolder().notebook(notebook).name(name).please();
   }
 
   @BeforeEach

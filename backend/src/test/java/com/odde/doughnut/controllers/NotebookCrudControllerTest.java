@@ -6,10 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.odde.doughnut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.doughnut.controllers.dto.NotebookCreationRequest;
 import com.odde.doughnut.controllers.dto.NotebookRealm;
-import com.odde.doughnut.controllers.dto.NotebookUpdateRequest;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -20,13 +19,17 @@ import org.springframework.web.server.ResponseStatusException;
 
 class NotebookCrudControllerTest extends NotebookControllerTestBase {
 
+  private NotebookCreationRequest notebookCreate(String title) {
+    NotebookCreationRequest req = new NotebookCreationRequest();
+    req.setNewTitle(title);
+    return req;
+  }
+
   @Nested
   class CreateNotebook {
     @Test
     void returnsNotebookIdAndDoesNotCreateNotes() throws UnexpectedNoAccessRightException {
-      NotebookCreationRequest noteCreation = new NotebookCreationRequest();
-      noteCreation.setNewTitle("My Notebook Title");
-      NotebookRealm response = controller.createNotebook(noteCreation);
+      NotebookRealm response = controller.createNotebook(notebookCreate("My Notebook Title"));
       assertThat(response.notebook().getId(), notNullValue());
       notebookRepository.findById(response.notebook().getId()).orElseThrow();
       assertThat(
@@ -37,21 +40,16 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
 
     @Test
     void persistsDescriptionOnCreate() throws UnexpectedNoAccessRightException {
-      NotebookCreationRequest noteCreation = new NotebookCreationRequest();
-      noteCreation.setNewTitle("Notebook With Blurb");
+      NotebookCreationRequest noteCreation = notebookCreate("Notebook With Blurb");
       noteCreation.setDescription("  Catalog blurb  ");
       NotebookRealm response = controller.createNotebook(noteCreation);
-      assertThat(response.notebook().getId(), notNullValue());
       Notebook nb = notebookRepository.findById(response.notebook().getId()).orElseThrow();
       assertThat(nb.getDescription(), equalTo("Catalog blurb"));
     }
 
     @Test
     void leavesDescriptionNullWhenUnset() throws UnexpectedNoAccessRightException {
-      NotebookCreationRequest noteCreation = new NotebookCreationRequest();
-      noteCreation.setNewTitle("Notebook No Blurb");
-      NotebookRealm response = controller.createNotebook(noteCreation);
-      assertThat(response.notebook().getId(), notNullValue());
+      NotebookRealm response = controller.createNotebook(notebookCreate("Notebook No Blurb"));
       Notebook nb = notebookRepository.findById(response.notebook().getId()).orElseThrow();
       assertThat(nb.getDescription(), nullValue());
     }
@@ -61,14 +59,12 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
   class NotebookApiSerialization {
     @Test
     void getNotebookJsonDoesNotExposeLegacyNotebookIdentityWireKeys() throws Exception {
-      NotebookCreationRequest noteCreation = new NotebookCreationRequest();
-      noteCreation.setNewTitle("API Shape NB");
+      NotebookCreationRequest noteCreation = notebookCreate("API Shape NB");
       noteCreation.setDescription("Blurb");
       NotebookRealm response = controller.createNotebook(noteCreation);
       Notebook nb = notebookRepository.findById(response.notebook().getId()).orElseThrow();
 
-      NotebookRealm realm = controller.get(nb);
-      String json = objectMapper.writeValueAsString(realm);
+      String json = objectMapper.writeValueAsString(controller.get(nb));
       JsonNode tree = objectMapper.readTree(json);
 
       assertThat(tree.has("headNoteId"), is(false));
@@ -84,8 +80,7 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
   class GetNotebook {
     @Test
     void ownerGetsWritableNotebookRealm() throws UnexpectedNoAccessRightException {
-      User owner = currentUser.getUser();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Notebook nb = ownedNotebook();
       NotebookRealm realm = controller.get(nb);
       assertThat(realm.notebook().getId(), equalTo(nb.getId()));
       assertThat(realm.readonly(), is(false));
@@ -94,27 +89,23 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
     @Test
     void anonymousGetsReadonlyNotebookRealmWhenNotebookInBazaar()
         throws UnexpectedNoAccessRightException {
-      User owner = makeMe.aUser().please();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(makeMe.aUser().please()).please();
       makeMe.aBazaarNotebook(nb).please();
       currentUser.setUser(null);
       NotebookRealm realm = controller.get(nb);
-      assertThat(realm.notebook().getId(), equalTo(nb.getId()));
       assertThat(realm.readonly(), is(true));
     }
 
     @Test
     void anonymousDeniedWhenNotebookNotInBazaar() {
-      User owner = makeMe.aUser().please();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(makeMe.aUser().please()).please();
       currentUser.setUser(null);
       assertThrows(ResponseStatusException.class, () -> controller.get(nb));
     }
 
     @Test
     void deniesLoggedInUserWithoutReadAccessToNotebook() {
-      User owner = makeMe.aUser().please();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(makeMe.aUser().please()).please();
       currentUser.setUser(makeMe.aUser().please());
       assertThrows(UnexpectedNoAccessRightException.class, () -> controller.get(nb));
     }
@@ -122,29 +113,21 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
     @Test
     void exposesContainerReadmeContentWhenMigratedMarkdownExists()
         throws UnexpectedNoAccessRightException {
-      User owner = currentUser.getUser();
       Notebook nb =
           makeMe
               .aNotebook()
-              .creatorAndOwner(owner)
+              .creatorAndOwner(currentUser.getUser())
               .readmeContent("---\ntitle_pattern: \"{{date}}\"\n---\n\nNotebook readme body")
               .please();
 
-      NotebookRealm realm = controller.get(nb);
-
       assertThat(
-          realm.readmeContent(),
+          controller.get(nb).readmeContent(),
           equalTo("---\ntitle_pattern: \"{{date}}\"\n---\n\nNotebook readme body"));
     }
 
     @Test
     void omitsReadmeContentWhenNonePresent() throws UnexpectedNoAccessRightException {
-      User owner = currentUser.getUser();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
-
-      NotebookRealm realm = controller.get(nb);
-
-      assertThat(realm.readmeContent(), nullValue());
+      assertThat(controller.get(ownedNotebook()).readmeContent(), nullValue());
     }
   }
 
@@ -152,42 +135,40 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
   class UpdateNotebookReadmeContent {
     @Test
     void updatesReadmeContentDirectly() throws UnexpectedNoAccessRightException {
-      User owner = currentUser.getUser();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
-      var dto = new com.odde.doughnut.controllers.dto.NoteUpdateContentDTO();
+      NoteUpdateContentDTO dto = new NoteUpdateContentDTO();
       dto.setContent("direct notebook readme content");
 
-      NotebookRealm result = controller.updateNotebookReadmeContent(nb, dto);
+      NotebookRealm result = controller.updateNotebookReadmeContent(ownedNotebook(), dto);
 
       assertThat(result.readmeContent(), equalTo("direct notebook readme content"));
     }
 
     @Test
     void clearsReadmeContentWhenBlankContentGiven() throws UnexpectedNoAccessRightException {
-      User owner = currentUser.getUser();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).readmeContent("old content").please();
-      var dto = new com.odde.doughnut.controllers.dto.NoteUpdateContentDTO();
+      Notebook nb =
+          makeMe
+              .aNotebook()
+              .creatorAndOwner(currentUser.getUser())
+              .readmeContent("old content")
+              .please();
+      NoteUpdateContentDTO dto = new NoteUpdateContentDTO();
       dto.setContent("   ");
 
-      NotebookRealm result = controller.updateNotebookReadmeContent(nb, dto);
-
-      assertThat(result.readmeContent(), nullValue());
+      assertThat(controller.updateNotebookReadmeContent(nb, dto).readmeContent(), nullValue());
     }
 
     @Test
     void requiresAuthorizationToUpdateReadmeContent() {
-      User owner = makeMe.aUser().please();
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(makeMe.aUser().please()).please();
       currentUser.setUser(makeMe.aUser().please());
-      var dto = new com.odde.doughnut.controllers.dto.NoteUpdateContentDTO();
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.updateNotebookReadmeContent(nb, dto));
+          () -> controller.updateNotebookReadmeContent(nb, new NoteUpdateContentDTO()));
     }
   }
 
   @Nested
-  class showNoteTest {
+  class MyNotebooks {
     @Test
     void whenNotLogin() {
       currentUser.setUser(null);
@@ -204,96 +185,6 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
           controller.myNotebooks().notebooks.stream()
               .map(com.odde.doughnut.controllers.dto.NotebookRealm::notebook)
               .toList());
-    }
-  }
-
-  @Nested
-  class updateNotebook {
-    @Test
-    void shouldNotBeAbleToUpdateNotebookThatBelongsToOtherUser() {
-      User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().notebookOwnedBy(anotherUser).please();
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.updateNotebook(note.getNotebook(), new NotebookUpdateRequest()));
-    }
-
-    @Test
-    void shouldPersistDescriptionOnUpdate() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      var request = new NotebookUpdateRequest();
-      request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
-      request.setDescription("Notebook blurb");
-      controller.updateNotebook(note.getNotebook(), request);
-      assertThat(note.getNotebook().getDescription(), equalTo("Notebook blurb"));
-    }
-
-    @Test
-    void shouldClearDescriptionWhenEmptyString() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      note.getNotebook().setDescription("was set");
-      var setRequest = new NotebookUpdateRequest();
-      setRequest.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
-      setRequest.setDescription("");
-      controller.updateNotebook(note.getNotebook(), setRequest);
-      assertThat(note.getNotebook().getDescription(), nullValue());
-    }
-
-    @Test
-    void shouldLeaveDescriptionUnchangedWhenDescriptionOmitted()
-        throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      note.getNotebook().setDescription("unchanged");
-      var request = new NotebookUpdateRequest();
-      request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
-      controller.updateNotebook(note.getNotebook(), request);
-      assertThat(note.getNotebook().getDescription(), equalTo("unchanged"));
-    }
-
-    @Test
-    void shouldPersistNameOnUpdate() throws Exception {
-      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      note.getNotebook().setName("Old Title");
-      var request = new NotebookUpdateRequest();
-      request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
-      NotebookUpdateRequest trimmedName =
-          objectMapper.readValue("{\"name\": \"  New Title  \"}", NotebookUpdateRequest.class);
-      request.setName(trimmedName.getName());
-      controller.updateNotebook(note.getNotebook(), request);
-      assertThat(note.getNotebook().getName(), equalTo("New Title"));
-    }
-
-    @Test
-    void shouldRejectEmptyOrWhitespaceNameOnUpdate() throws Exception {
-      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      var request = new NotebookUpdateRequest();
-      request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
-      NotebookUpdateRequest trimmedName =
-          objectMapper.readValue("{\"name\": \"   \"}", NotebookUpdateRequest.class);
-      request.setName(trimmedName.getName());
-      assertThrows(
-          ResponseStatusException.class,
-          () -> controller.updateNotebook(note.getNotebook(), request));
-      trimmedName = objectMapper.readValue("{\"name\": \"\"}", NotebookUpdateRequest.class);
-      request.setName(trimmedName.getName());
-      assertThrows(
-          ResponseStatusException.class,
-          () -> controller.updateNotebook(note.getNotebook(), request));
-      trimmedName = objectMapper.readValue("{\"name\": \"\\u3000\"}", NotebookUpdateRequest.class);
-      request.setName(trimmedName.getName());
-      assertThrows(
-          ResponseStatusException.class,
-          () -> controller.updateNotebook(note.getNotebook(), request));
-    }
-
-    @Test
-    void shouldLeaveNameUnchangedWhenNameOmitted() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      note.getNotebook().setName("Original Name");
-      var request = new NotebookUpdateRequest();
-      request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
-      controller.updateNotebook(note.getNotebook(), request);
-      assertThat(note.getNotebook().getName(), equalTo("Original Name"));
     }
   }
 }

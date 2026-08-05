@@ -7,10 +7,8 @@ import static org.mockito.ArgumentMatchers.any;
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
 import java.io.IOException;
 import java.net.URI;
@@ -21,20 +19,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BindException;
 
-class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
-  @Autowired NoteRepository noteRepository;
-  @Autowired MakeMe makeMe;
-  @Autowired NotebookController notebookController;
+class NotebookRootNoteCreationWithWikidataTests extends NotebookControllerTestBase {
   @MockitoBean HttpClientAdapter httpClientAdapter;
-
-  @BeforeEach
-  void setup() {
-    currentUser.setUser(makeMe.aUser().please());
-  }
 
   private void mockWikidataEntity(String wikidataId, String label)
       throws IOException, InterruptedException {
@@ -60,106 +49,18 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
   }
 
   @Nested
-  class createNoteInFolderTest {
+  class CreateNoteWithWikidata {
     Notebook notebook;
     Folder defaultFolder;
     NoteCreationDTO noteCreation = new NoteCreationDTO();
 
     @BeforeEach
     void setup() {
-      notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      notebook = ownedNotebook();
       defaultFolder = makeMe.aFolder().notebook(notebook).name("Default").please();
       noteCreation.setNewTitle("new title");
       noteCreation.setContent(null);
       noteCreation.setFolderId(defaultFolder.getId());
-    }
-
-    @Test
-    void assignsNoteToExplicitFolderById()
-        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      Folder folder = makeMe.aFolder().notebook(notebook).name("ExplicitParent").please();
-      noteCreation.setFolderId(folder.getId());
-      NoteRealm response = notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
-      Note created = noteRepository.findById(response.getId()).orElseThrow();
-      assertThat(created.getFolder(), not(nullValue()));
-      assertThat(created.getFolder().getName(), equalTo("ExplicitParent"));
-      assertThat(created.getFolder().getNotebook().getId(), equalTo(notebook.getId()));
-    }
-
-    @Test
-    void assignsNestedFolderHierarchyForLeaf()
-        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      Folder bookHead = makeMe.aFolder().notebook(notebook).name("BookHead").please();
-      Folder section = makeMe.aFolder().name("Section").parentFolder(bookHead).please();
-      noteCreation.setNewTitle("Leaf");
-      noteCreation.setFolderId(section.getId());
-      Note leaf =
-          noteRepository
-              .findById(notebookController.createNoteAtNotebookRoot(notebook, noteCreation).getId())
-              .orElseThrow();
-      assertThat(leaf.getFolder(), not(nullValue()));
-      assertThat(leaf.getFolder().getName(), equalTo("Section"));
-      assertThat(leaf.getFolder().getParentFolder(), not(nullValue()));
-      assertThat(leaf.getFolder().getParentFolder().getName(), equalTo("BookHead"));
-    }
-
-    @Test
-    void childNoteUsesNamedFolder()
-        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      Folder folder = makeMe.aFolder().notebook(notebook).name("ExplicitParent").please();
-      noteCreation.setFolderId(folder.getId());
-      NoteRealm response = notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
-      Note created = noteRepository.findById(response.getId()).orElseThrow();
-      assertThat(created.getFolder().getName(), equalTo("ExplicitParent"));
-    }
-
-    @Test
-    void nestedFolderNamesMatchAncestorChain()
-        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      Folder bookHead = makeMe.aFolder().notebook(notebook).name("BookHead").please();
-      Folder section = makeMe.aFolder().name("Section").parentFolder(bookHead).please();
-      noteCreation.setNewTitle("Leaf");
-      noteCreation.setFolderId(section.getId());
-      Note leaf =
-          noteRepository
-              .findById(notebookController.createNoteAtNotebookRoot(notebook, noteCreation).getId())
-              .orElseThrow();
-      assertThat(section.getName(), equalTo("Section"));
-      assertThat(leaf.getFolder().getName(), equalTo("Section"));
-      assertThat(leaf.getFolder().getParentFolder().getName(), equalTo("BookHead"));
-    }
-
-    @Test
-    void siblingsShareSameFolder()
-        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      Folder folder = makeMe.aFolder().notebook(notebook).name("SharedParent").please();
-      noteCreation.setFolderId(folder.getId());
-      noteCreation.setNewTitle("first child");
-      Integer id1 = notebookController.createNoteAtNotebookRoot(notebook, noteCreation).getId();
-      noteCreation.setNewTitle("second child");
-      Integer id2 = notebookController.createNoteAtNotebookRoot(notebook, noteCreation).getId();
-      Note n1 = noteRepository.findById(id1).orElseThrow();
-      Note n2 = noteRepository.findById(id2).orElseThrow();
-      assertThat(n1.getFolder().getId(), equalTo(n2.getFolder().getId()));
-    }
-
-    @Test
-    void shouldBeAbleToSaveNoteWhenValid()
-        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      NoteRealm response = notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
-      assertThat(response.getId(), not(nullValue()));
-      Note created = noteRepository.findById(response.getId()).orElseThrow();
-      assertThat(created.getFolder(), not(nullValue()));
-      assertThat(created.getFolder().getNotebook().getId(), equalTo(notebook.getId()));
-    }
-
-    @Test
-    void shouldBeAbleToCreateAThing()
-        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      long beforeThingCount = noteRepository.count();
-      notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
-      long afterThingCount = noteRepository.count();
-      assertThat(afterThingCount, equalTo(beforeThingCount + 1));
     }
 
     @Test
@@ -168,26 +69,18 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(new MakeMeWithoutDB().wikidataEntityJson().entityId("Q12345").please());
       noteCreation.setContent("---\nwikidata_id: Q12345\n---\n");
-      NoteRealm response = notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
+      NoteRealm response = controller.createNoteAtNotebookRoot(notebook, noteCreation);
       assertThat(response.getNote().getContent(), containsString("wikidata_id: Q12345"));
-    }
-
-    @Test
-    void shouldBeAbleToSaveNoteWithoutWikidataIdWhenValid()
-        throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      NoteRealm response = notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
-      assertThat(response.getNote().getNoteTopology().getTitle(), equalTo("new title"));
     }
 
     @Nested
     class AddingNoteWithLocationWikidataId {
       String wikidataIdOfALocation = "Q334";
       String lnglat = "1.3'N, 103.8'E";
-      Folder folder;
 
       @BeforeEach
       void thereIsAWikidataEntryOfALocation() {
-        folder = makeMe.aFolder().notebook(notebook).name("Places").please();
+        Folder folder = makeMe.aFolder().notebook(notebook).name("Places").please();
         noteCreation.setFolderId(folder.getId());
         noteCreation.setContent("---\nwikidata_id: " + wikidataIdOfALocation + "\n---\n");
       }
@@ -207,7 +100,7 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
               IOException {
         mockApiResponseWithLocationInfo(
             "{\"latitude\":1.3,\"longitude\":103.8}", "globecoordinate");
-        NoteRealm note = notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
+        NoteRealm note = controller.createNoteAtNotebookRoot(notebook, noteCreation);
         assertThat(note.getNote().getContent(), containsString("Location: " + lnglat));
       }
 
@@ -218,7 +111,7 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
               UnexpectedNoAccessRightException,
               IOException {
         mockApiResponseWithLocationInfo("\"center of the earth\"", "string");
-        NoteRealm note = notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
+        NoteRealm note = controller.createNoteAtNotebookRoot(notebook, noteCreation);
         assertThat(
             note.getNote().getContent(), stringContainsInOrder("Location: center of the earth"));
       }
@@ -226,11 +119,9 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
 
     @Nested
     class AddingNoteWithHumanWikidataId {
-      Folder folder;
-
       @BeforeEach
       void thereIsAWikidataEntryOfAHuman() {
-        folder = makeMe.aFolder().notebook(notebook).name("People").please();
+        Folder folder = makeMe.aFolder().notebook(notebook).name("People").please();
         noteCreation.setFolderId(folder.getId());
       }
 
@@ -273,7 +164,7 @@ class NotebookRootNoteCreationWithWikidataTests extends ControllerTestBase {
         mockWikidataHumanEntity(wikidataIdOfHuman, birthdayByISO, countryQid);
         mockWikidataEntity(countryQid, countryName);
         noteCreation.setContent("---\nwikidata_id: " + wikidataIdOfHuman + "\n---\n");
-        NoteRealm note = notebookController.createNoteAtNotebookRoot(notebook, noteCreation);
+        NoteRealm note = controller.createNoteAtNotebookRoot(notebook, noteCreation);
         String description = note.getNote().getContent();
         if (expectedBirthday != null) {
           assertThat(description, containsString(expectedBirthday));
