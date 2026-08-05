@@ -5,10 +5,10 @@ milestone_name: Accidental Match Resolve UX
 current_phase: 12
 current_phase_name: Title navigate, reopen, E2E polish
 status: ready_for_planning
-stopped_at: Phase 12 context gathered
-last_updated: "2026-08-05T13:54:25.715Z"
+stopped_at: Phase 12 research complete
+last_updated: "2026-08-05T14:00:00.000Z"
 last_activity: 2026-08-05
-last_activity_desc: feat(11-02) Add as overlapped note E2E stay without try-again
+last_activity_desc: docs(12) research remount/matchedNotes fidelity for AMR-05
 progress:
   total_phases: 6
   completed_phases: 5
@@ -24,14 +24,14 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 **Core value:** Healthy mainline for learning and knowledge work — reviewed note stays primary during accidental-match results.
-**Current focus:** Phase 11 complete — next Phase 12 title navigate / reopen / E2E polish (AMR-05)
+**Current focus:** Phase 12 research done — plan AMR-05 (title navigate / reopen / E2E polish)
 
 ## Current Position
 
-Phase: 12 of 12 (Title navigate, reopen, E2E polish) — ready for planning
-Plan: none yet (Phase 11 both waves done)
-Status: Phase 11 complete (AMR-08/AMR-09); Vitest + E2E prove declare stay without try-again
-Last activity: 2026-08-05 — feat(11-02) Add as overlapped note E2E stay without try-again
+Phase: 12 of 12 (Title navigate, reopen, E2E polish) — research complete, ready for planning
+Plan: none yet — RESEARCH.md recommends E2E-first (KeepAlive likely enough; no OpenAPI unless proven)
+Status: Phase 12 research complete; blocker resolved: remount drops matchedNotes, live KeepAlive keeps them
+Last activity: 2026-08-05 — docs(12) research remount/matchedNotes fidelity
 
 Progress: [████████░░] 83% (5/6 v1.2 phases complete; 10/10 plans executed through Phase 11)
 
@@ -107,7 +107,7 @@ None.
 
 ### Blockers/Concerns
 
-- Phase 12: answer remount/session on title navigate may need plan-time research
+- Phase 12 research: KeepAlive live session preserves `matchedNotes`; `previouslyAnswered` omits them — enrich OpenAPI only if E2E proves KeepAlive fails
 - Do not conflate dialog overlap declare with `AnswerOutcome.OVERLAP` try-again / SRS reclaim (ADR 0003) — Phase 11 locked
 
 ## Deferred Items
@@ -121,7 +121,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-08-05T13:54:25.708Z
-Stopped at: Phase 12 context gathered
-Resume file: .planning/phases/12-title-navigate-reopen-e2e-polish/12-CONTEXT.md
-Next action: Plan Phase 12 (AMR-05) when ready — do not auto-discuss (--no-transition)
+Last session: 2026-08-05T14:00:00.000Z
+Stopped at: Phase 12 research complete
+Resume file: .planning/phases/12-title-navigate-reopen-e2e-polish/12-RESEARCH.md
+Next action: Plan Phase 12 (AMR-05) from RESEARCH.md — E2E-first waves
