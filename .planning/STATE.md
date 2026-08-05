@@ -5,10 +5,10 @@ milestone_name: Accidental Match Resolve UX
 current_phase: 12
 current_phase_name: Title navigate, reopen, E2E polish
 status: gap_closure_in_progress
-stopped_at: Quick 002 Phase 1 done (OVL-01); next Phase 2 Structure shared list helpers
-last_updated: "2026-08-06T07:35:00Z"
+stopped_at: Quick 002 Phase 2 done (shared string-list helpers); next Phase 3 rich overlaps
+last_updated: "2026-08-06T07:40:00Z"
 last_activity: 2026-08-06
-last_activity_desc: Quick 002 Phase 1 — resolve dialog overlap explanation (OVL-01)
+last_activity_desc: Quick 002 Phase 2 — shared frontmatter string-list helpers (Structure)
 progress:
   total_phases: 6
   completed_phases: 6
@@ -30,8 +30,8 @@ See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 Phase: 12 of 12 (Title navigate, reopen, E2E polish) — complete
 Plan: 12-01 executed; 12-02 skipped (KeepAlive sufficient)
-Status: Gap closure quick/002 — Phase 1 (OVL-01) done; Phase 2 next
-Last activity: 2026-08-06 — resolve dialog explains overlap
+Status: Gap closure quick/002 — Phase 2 (shared list helpers) done; Phase 3 next
+Last activity: 2026-08-06 — extract frontmatterStringList + authoredListPropertyValidation
 
 Progress: [██████████] 100% (6/6 v1.2 phases; 11/11 plans accounted — 10 executed + 1 skipped)
 
@@ -104,10 +104,11 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 - [Phase 11 P02]: openAddAsOverlappedNote + no-try-again E2E; accidental_match.ts step extract; overlap_try_again uncoupled
 - [Phase 12]: KeepAlive live matchedNotes sufficient for AMR-05 reopen; Plan 12-02 can be skipped
 - [Phase 12]: AMR-05 return path is cy.go('back') only — not Resume or full remount
+- [Quick 002 Phase 2]: Shared seam = `frontmatterStringList` + `authoredListPropertyValidation`; aliases remain the only authored list key until Phase 3
 
 ### Pending Todos
 
-- Continue `.planning/quick/002-overlaps-property-and-resolve-polish/` from Phase 2 (OVL-02..07 remain)
+- Continue `.planning/quick/002-overlaps-property-and-resolve-polish/` from Phase 3 (OVL-02..07 remain)
 - Confirm D-mig (legacy wiki-in-aliases migration) at Phase 7 Jidoka; D-copy draft shipped in Phase 1 (tweak OK)
 - Process: still missing `*-VERIFICATION.md` for phases 7–12 (audit process gate)
 
@@ -129,6 +130,6 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 ## Session Continuity
 
 Last session: 2026-08-06
-Stopped at: Quick 002 Phase 1 done (OVL-01 overlap explanation in resolve dialog)
+Stopped at: Quick 002 Phase 2 done (shared string-list frontmatter helpers)
 Resume file: .planning/quick/002-overlaps-property-and-resolve-polish/PLAN.md
-Next action: `execute-plan` Phase 2 — Structure: shared string-list frontmatter helpers
+Next action: `execute-plan` Phase 3 — Behavior: rich-mode `overlaps` property

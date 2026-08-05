@@ -50,13 +50,14 @@ Map OVL-* into REQUIREMENTS.md when this plan is accepted onto the roadmap / mil
 - **Stop-safe:** Clarifies UX before model migration
 - **Learnings:** Dialog list root is now a wrapper `div` (explanation + `ul`); draft D-copy wording shipped — tweak with developer if needed. Explanation Vitest lives in focused `AnsweredSpellingQuestionResolveOverlapExplanation.spec.ts` to keep AccidentalMatch suite under 250 lines.
 ### Phase 2 — Structure: shared string-list frontmatter helpers
-- **Status:** planned
+- **Status:** done
 - **Type:** Structure
 - **Requirements:** — (enables Phase 3)
 - **Change:** Extract shared helpers used by aliases today (merge into named list key, list validation hook points, rich-list insert/popup paths) so Phase 3 can add `overlaps` without cloning stacks. Refactor only; aliases UX and grading unchanged.
-- **Tests:** Existing aliases / append / authoredAliases suites stay green
+- **Tests:** Existing aliases / append / authoredAliases suites stay green; thin contracts for `frontmatterStringList` + `authoredListPropertyValidation`
 - **Done when:** No observable product delta; helpers ready for a second key
 - **Stop-safe:** Pure cohesion prep for the next behavior only
+- **Learnings:** Shared seam is `frontmatterStringList` (merge/append by key) + `authoredListPropertyValidation` (`isAuthoredListPropertyKey` + validation dispatch). Phase 3 adds `overlaps` to the key registry, preset list, and item rules — not a second rich-list stack. Deleted obsolete `frontmatterAliases` wrapper after inlining into the shared module.
 
 ### Phase 3 — Rich-mode `overlaps` property (wiki-link list, shown as links)
 - **Status:** planned
@@ -149,7 +150,7 @@ Map OVL-* into REQUIREMENTS.md when this plan is accepted onto the roadmap / mil
 | Phase | Status |
 |-------|--------|
 | 1 Explain overlap in dialog | done |
-| 2 Shared list-property Structure | planned |
+| 2 Shared list-property Structure | done |
 | 3 Rich `overlaps` + validation + link display | planned |
 | 4 Grading from `overlaps` (+ dual-read) | planned |
 | 5 Dialog writes `overlaps` | planned |

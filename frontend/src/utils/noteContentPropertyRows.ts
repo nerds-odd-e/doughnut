@@ -2,9 +2,9 @@ import { composeNoteContentMarkdown } from "@/utils/noteContentFrontmatter"
 import { parseNoteContentMarkdown } from "@/utils/noteContentFrontmatterParse"
 import { findPropertyRowIndexByExactKey } from "@/utils/noteContentPropertyKeys"
 import {
-  authoredAliasesValidationErrorForPropertyRow,
-  isAliasesPropertyKey,
-} from "@/utils/authoredAliasesValidation"
+  authoredListPropertyValidationErrorForPropertyRow,
+  isAuthoredListPropertyKey,
+} from "@/utils/authoredListPropertyValidation"
 import {
   type NoteProperties,
   type PropertyValue,
@@ -25,7 +25,7 @@ export function propertyRowForInsertedKey(
   key: string,
   value: string
 ): PropertyRow {
-  if (isAliasesPropertyKey(key)) {
+  if (isAuthoredListPropertyKey(key)) {
     return { key, value: listPropertyValue([value.trim()]) }
   }
   return propertyRowWithScalar(key, value)
@@ -117,9 +117,9 @@ export function validatePropertyRowsForRichEdit(
     seen.add(k)
   }
   for (const row of trimmed) {
-    const aliasError = authoredAliasesValidationErrorForPropertyRow(row)
-    if (aliasError) {
-      return { ok: false, message: aliasError }
+    const listError = authoredListPropertyValidationErrorForPropertyRow(row)
+    if (listError) {
+      return { ok: false, message: listError }
     }
   }
   return { ok: true }

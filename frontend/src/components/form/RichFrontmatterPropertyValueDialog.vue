@@ -127,10 +127,7 @@
 import { ChevronDown, ChevronUp, Minus } from "@lucide/vue"
 import { ref, watch } from "vue"
 import Modal from "@/components/commons/Modal.vue"
-import {
-  authoredAliasesValidationErrorForPropertyValue,
-  isAliasesPropertyKey,
-} from "@/utils/authoredAliasesValidation"
+import { authoredListPropertyValidationErrorForPropertyValue } from "@/utils/authoredListPropertyValidation"
 import {
   compactDisplayForPropertyValue,
   listPropertyValue,
@@ -205,16 +202,21 @@ function moveListItemDown(index: number) {
   if (index < draftListItems.value.length - 1) moveListItem(index, index + 1)
 }
 
+function authoredListValidationError(value: PropertyValue): string | undefined {
+  return authoredListPropertyValidationErrorForPropertyValue(
+    props.propertyKey,
+    value
+  )
+}
+
 function onSave() {
   validationMessage.value = ""
   if (mode.value === "text") {
     const value = scalarPropertyValue(draftText.value)
-    if (isAliasesPropertyKey(props.propertyKey)) {
-      const aliasError = authoredAliasesValidationErrorForPropertyValue(value)
-      if (aliasError) {
-        validationMessage.value = aliasError
-        return
-      }
+    const listError = authoredListValidationError(value)
+    if (listError) {
+      validationMessage.value = listError
+      return
     }
     emit("save", value)
     return
@@ -228,12 +230,10 @@ function onSave() {
   const value = listPropertyValue(
     draftListItems.value.map((item) => item.trim())
   )
-  if (isAliasesPropertyKey(props.propertyKey)) {
-    const aliasError = authoredAliasesValidationErrorForPropertyValue(value)
-    if (aliasError) {
-      validationMessage.value = aliasError
-      return
-    }
+  const listError = authoredListValidationError(value)
+  if (listError) {
+    validationMessage.value = listError
+    return
   }
 
   emit("save", value)
