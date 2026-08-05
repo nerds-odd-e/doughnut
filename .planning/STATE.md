@@ -5,16 +5,16 @@ milestone_name: Accidental Match Resolve UX
 current_phase: 12
 current_phase_name: Title navigate, reopen, E2E polish
 status: phase_complete
-stopped_at: Completed 12-01-PLAN.md — KeepAlive green; skip 12-02
-last_updated: "2026-08-05T14:11:47.283Z"
+stopped_at: Phase 12 complete (AMR-05); v1.2 phases done — no auto-transition
+last_updated: "2026-08-05T14:13:00.933Z"
 last_activity: 2026-08-05
-last_activity_desc: test(12-01) AMR-05 reopen E2E green via KeepAlive
+last_activity_desc: test(12-01) reopen-after-title-navigate E2E
 progress:
   total_phases: 6
   completed_phases: 6
   total_plans: 11
-  completed_plans: 10
-  percent: 91
+  completed_plans: 11
+  percent: 100
 ---
 
 # Project State
@@ -125,7 +125,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-08-05T14:11:47.276Z
-Stopped at: Completed 12-01-PLAN.md — KeepAlive green; skip 12-02
-Resume file: None
+Last session: 2026-08-05T14:13:00.926Z
+Stopped at: Phase 12 complete (AMR-05); v1.2 phases done — no auto-transition
+Resume file: .planning/phases/12-title-navigate-reopen-e2e-polish/12-01-SUMMARY.md
 Next action: Skip 12-02 (or mark skipped) → ship / complete milestone v1.2

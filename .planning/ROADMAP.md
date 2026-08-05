@@ -46,7 +46,7 @@ v1.2 replaces stacked matched-note bodies on accidental-match spelling results w
 - [x] **Phase 9: Build a link from resolve dialog** - Single-Modal link offer; stay on result; readonly/unload gates (2/2 plans)
 - [x] **Phase 10: Overlap alias append util** - Structure: wiki-link overlap append helper for the next behavior
 - [x] **Phase 11: Add as overlapped note** - Declare overlap from dialog; no try-again / no SRS credit reclaim (2/2 plans)
-- [ ] **Phase 12: Title navigate, reopen, E2E polish** - Return to result and reopen resolve with same matches
+- [x] **Phase 12: Title navigate, reopen, E2E polish** - Return to result and reopen resolve with same matches
 
 ## Phase Details
 
@@ -180,7 +180,7 @@ Plans:
 Plans:
 
 - [x] 12-01-PLAN.md — E2E reopen after title navigate + history back (AMR-05; KeepAlive expected)
-- [ ] 12-02-PLAN.md — Contingency KeepAlive name harden (skip if 12-01 already green)
+- [x] 12-02-PLAN.md — Contingency KeepAlive name harden — **skipped** (12-01 KeepAlive green)
 
 **UI hint**: yes
 
