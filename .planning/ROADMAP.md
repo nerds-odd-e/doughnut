@@ -188,7 +188,7 @@ Plans:
 | 8. Match path and clickable titles | v1.2 | 2/2 | Complete | 2026-08-05 |
 | 9. Build a link from resolve dialog | v1.2 | 2/2 | Complete | 2026-08-05 |
 | 10. Overlap alias append util | v1.2 | 1/1 | Complete | 2026-08-05 |
-| 11. Add as overlapped note | v1.2 | 1/2 | In progress | - |
+| 11. Add as overlapped note | v1.2 | 2/2 | Complete | 2026-08-05 |
 | 12. Title navigate, reopen, E2E polish | v1.2 | 0/? | Not started | - |
 
 ### Coverage
