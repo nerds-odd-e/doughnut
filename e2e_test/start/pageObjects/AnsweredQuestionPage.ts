@@ -26,6 +26,7 @@ function expectOverlapTryAgainAlert() {
 function expectNoMatchedNotesOrAccidentalMatch() {
   cy.findByTestId('matched-notes-section').should('not.exist')
   cy.findByTestId('accidental-match-alert').should('not.exist')
+  cy.findByTestId('resolve-accidental-match').should('not.exist')
 }
 
 function expectMatchedNoteInSection(matchedNoteTitle: string) {
