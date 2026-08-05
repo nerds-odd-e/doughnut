@@ -1,12 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: —
-milestone_name: —
-status: Idle — awaiting next milestone
-stopped_at: Answer outcomes API simplified
-last_updated: "2026-08-05T14:37:36+08:00"
+milestone: v1.2
+milestone_name: Accidental Match Resolve UX
+status: planning
+last_updated: "2026-08-05T08:17:49.571Z"
 last_activity: 2026-08-05
-last_activity_desc: Slimmed AnswerOutcome to ACCIDENTAL_MATCH/OVERLAP; dropped redundant overlap flag
+progress:
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # State
@@ -21,10 +25,10 @@ See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 ## Current Position
 
-Phase: —
+Phase: Not started (defining requirements)
 Plan: —
-Status: Idle — awaiting next milestone
-Last activity: 2026-08-05 — pruned superseded milestone history
+Status: Defining requirements
+Last activity: 2026-08-05 — Milestone v1.2 started
 
 ## Performance Metrics
 

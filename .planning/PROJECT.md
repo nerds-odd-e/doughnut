@@ -16,12 +16,17 @@ Healthy mainline for learning and knowledge work. Approved [ADR 0002](../docs/ad
 
 Portable content direction is ADR 0002 (git-native notebooks). Catalog ZIP download remains (`notebook_export.feature`); path-keyed CLI sync / `.doughnut-sync` is not part of the product.
 
-## Next Milestone Goals
+## Current Milestone: v1.2 Accidental Match Resolve UX
 
-Define via `/gsd-new-milestone`. Likely candidates:
+**Goal:** Replace stacked matched-note NoteShows with a compact, optional resolve dialog so the reviewed note keeps the full-height focus.
 
-- ADR 0002 Level 1 (git-native notebooks)
-- SEED-001 spelling follow-ons (MCQ / fuzzy / `Notebook:Title`)
+**Target features:**
+- Remove stacked matched notes from the accidental-match result
+- CTA under the alert: "Resolve accidental match" → opens a dialog
+- Dialog lists each match with clickable title + notebook path/breadcrumb (no note body)
+- Per match: "Build a link" (property/relationship) or "Add as overlapped note" (declare overlap)
+- Resolving is optional; after navigating away via a title, user can return and reopen the dialog
+- Choosing "Add as overlapped note" does not prompt try-again or reclaim SRS credit
 
 ## Requirements
 
@@ -38,12 +43,13 @@ Define via `/gsd-new-milestone`. Likely candidates:
 
 ### Active
 
-(None — define in `/gsd-new-milestone`)
+- Accidental-match resolve dialog UX (v1.2) — see REQUIREMENTS.md
 
 ### Out of Scope
 
 - Reintroducing `.doughnut-sync` / path-keyed CLI sync — superseded by ADR 0002
 - Spelling follow-ons (MCQ / fuzzy / `Notebook:Title`) — parked as SEED-001
+- ADR 0002 Level 1 (git-native notebooks) — deferred to a later milestone
 - Broad unrelated refactors not required by the current milestone
 
 ## Context
@@ -62,7 +68,24 @@ Milestone archives: `.planning/milestones/`, `MILESTONES.md`. Accepted ADRs unde
 |----------|-----------|---------|
 | ADR 0002 git-native notebooks | Git authoritative for portable content; retire `.doughnut-sync` | ✓ Approved 2026-08-04 |
 | Keep catalog ZIP only | One-way portability still useful; E2E `notebook_export.feature` | ✓ Retained |
+| Accidental-match resolve via dialog (not stacked notes) | Full-height reviewed note stays primary; resolution is optional and compact | Active — v1.2 |
+| Overlap from dialog skips try-again / credit reclaim | Declaring overlap is the action; no secondary retry/credit flow | Active — v1.2 |
 
 ## Evolution
 
-This file updates as milestones complete. Last updated: 2026-08-05.
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd-transition`):
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd-complete-milestone`):
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
+
+Last updated: 2026-08-05.
