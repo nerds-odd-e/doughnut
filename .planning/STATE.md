@@ -5,15 +5,15 @@ milestone_name: Accidental Match Resolve UX
 current_phase: 12
 current_phase_name: Title navigate, reopen, E2E polish
 status: ready_for_planning
-stopped_at: Phase 11 complete — Phase 12 (AMR-05) next; do not auto-transition (--no-transition)
-last_updated: "2026-08-05T14:00:00.000Z"
+stopped_at: Phase 12 context gathered
+last_updated: "2026-08-05T13:54:25.715Z"
 last_activity: 2026-08-05
-last_activity_desc: Completed Phase 11 Add as overlapped note (11-01 Vitest + 11-02 E2E)
+last_activity_desc: feat(11-02) Add as overlapped note E2E stay without try-again
 progress:
   total_phases: 6
   completed_phases: 5
-  total_plans: 10
-  completed_plans: 10
+  total_plans: 9
+  completed_plans: 9
   percent: 83
 ---
 
@@ -121,7 +121,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-08-05T14:00:00.000Z
-Stopped at: Phase 11 complete (both plans)
-Resume file: .planning/ROADMAP.md (Phase 12)
+Last session: 2026-08-05T13:54:25.708Z
+Stopped at: Phase 12 context gathered
+Resume file: .planning/phases/12-title-navigate-reopen-e2e-polish/12-CONTEXT.md
 Next action: Plan Phase 12 (AMR-05) when ready — do not auto-discuss (--no-transition)
