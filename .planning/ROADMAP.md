@@ -175,7 +175,7 @@ Plans:
   2. Targeted E2E covers resolve dialog open/dismiss, multi-match identity, and reopen-after-navigate (capability-named; no phase numbers in product tests)
   3. Existing `overlap_try_again` coverage remains green
 
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans (1 executed + 1 skipped contingency)
 
 Plans:
 
@@ -195,7 +195,7 @@ Plans:
 | 9. Build a link from resolve dialog | v1.2 | 2/2 | Complete | 2026-08-05 |
 | 10. Overlap alias append util | v1.2 | 1/1 | Complete | 2026-08-05 |
 | 11. Add as overlapped note | v1.2 | 2/2 | Complete | 2026-08-05 |
-| 12. Title navigate, reopen, E2E polish | v1.2 | 1/2 | In Progress|  |
+| 12. Title navigate, reopen, E2E polish | v1.2 | 2/2 | Complete | 2026-08-05 |
 
 ### Coverage
 

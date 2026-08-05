@@ -24,16 +24,16 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 **Core value:** Healthy mainline for learning and knowledge work — reviewed note stays primary during accidental-match results.
-**Current focus:** Phase 12 — 12-01 complete (AMR-05 E2E); 12-02 KeepAlive contingency skippable
+**Current focus:** v1.2 Accidental Match Resolve UX — all phases 7–12 complete (AMR-01..09)
 
 ## Current Position
 
-Phase: 12 of 12 (Title navigate, reopen, E2E polish) — 12-01 done
-Plan: 12-01 complete → skip optional 12-02 (KeepAlive already green)
-Status: AMR-05 E2E green; Plan 12-02 contingency not needed
-Last activity: 2026-08-05 — test(12-01) reopen-after-title-navigate E2E
+Phase: 12 of 12 (Title navigate, reopen, E2E polish) — complete
+Plan: 12-01 executed; 12-02 skipped (KeepAlive sufficient)
+Status: AMR-05 green; v1.2 roadmap phases done — ready for milestone audit/archive (`--no-transition`)
+Last activity: 2026-08-05 — Phase 12 discuss → plan → execute complete
 
-Progress: [█████████░] 91% (6/6 v1.2 phases behavior delivered; 10/11 plans executed; Phase 12 1/2 — 12-02 skip)
+Progress: [██████████] 100% (6/6 v1.2 phases; 11/11 plans accounted — 10 executed + 1 skipped)
 
 ## Performance Metrics
 
