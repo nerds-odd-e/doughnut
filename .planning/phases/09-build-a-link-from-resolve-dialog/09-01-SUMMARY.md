@@ -97,7 +97,9 @@ status: complete
 
 1. **Task 1 RED: Tracer failing Vitest** - `0ad4e1138a` (test)
 2. **Task 1 GREEN: Same-Modal Build a link step** - `c9726497b6` (feat)
-3. **Task 2: AMR-07 gate Vitest + open-resolve helper** - (this wrap-up commit)
+3. **Task 2: AMR-07 gate Vitest + open-resolve helper** - `2a9e293373` (test)
+
+**Plan metadata:** included in `2a9e293373` (SUMMARY + STATE + ROADMAP + REQUIREMENTS)
 
 ## Deviations from Plan
 
