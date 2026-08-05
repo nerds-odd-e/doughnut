@@ -52,7 +52,6 @@ Feature: Accidental match reveal
     Then I should still be on the accidental match result for spelling answer "sedation" with matched note "sedation"
     And I should not see overlap try-again on the accidental match result
 
-  @wip
   Scenario: Reopen resolve after navigating matched title and returning
     Given It's day 1
     And the note "sedition" was assimilated on day 1
