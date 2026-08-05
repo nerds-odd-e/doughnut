@@ -29,18 +29,6 @@ function expectNoMatchedNotesOrAccidentalMatch() {
   cy.findByTestId('resolve-accidental-match').should('not.exist')
 }
 
-function expectMatchedNoteInSection(matchedNoteTitle: string) {
-  cy.findByTestId('matched-notes-section')
-    .scrollIntoView()
-    .should('be.visible')
-    .within(() => {
-      cy.findByText('Matched note(s)').should('be.visible')
-      cy.get('[data-test="note-title"]')
-        .filter(`:contains("${matchedNoteTitle}")`)
-        .should('have.length.at.least', 1)
-    })
-}
-
 const assumeAnsweredQuestionPage = () => {
   cy.get('body').should('be.visible')
 
@@ -100,12 +88,20 @@ const assumeAnsweredQuestionPage = () => {
       return self
     },
     openLinkToMatchedNote(matchedNoteTitle: string) {
-      expectMatchedNoteInSection(matchedNoteTitle)
-      cy.findByTestId('matched-notes-section')
-        .find('[data-testid^="link-to-matched-note-"]')
+      cy.findByTestId('resolve-accidental-match')
+        .scrollIntoView()
         .should('be.visible')
-        .and('contain.text', 'Link to this note')
         .click()
+      waitUntilAppIsNotBusy()
+      cy.findByTestId('accidental-match-resolve-dialog')
+        .should('be.visible')
+        .and('contain.text', matchedNoteTitle)
+        .within(() => {
+          cy.get('[data-testid^="link-to-matched-note-"]')
+            .should('be.visible')
+            .and('contain.text', 'Build a link')
+            .click()
+        })
       cy.contains('Link to:')
         .should('be.visible')
         .parent()
@@ -142,7 +138,12 @@ const assumeAnsweredQuestionPage = () => {
     ) {
       cy.url().should('include', '/recall')
       expectAccidentalMatchAlert(answer)
-      expectMatchedNoteInSection(matchedNoteTitle)
+      cy.findByTestId('resolve-accidental-match')
+        .scrollIntoView()
+        .should('be.visible')
+      cy.findByTestId('accidental-match-resolve-dialog')
+        .should('be.visible')
+        .and('contain.text', matchedNoteTitle)
       return self
     },
     expectOverlapTryAgainForSpelling() {
