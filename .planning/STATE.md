@@ -4,11 +4,11 @@ milestone: v1.2
 milestone_name: Accidental Match Resolve UX
 current_phase: 9
 current_phase_name: Build a link from resolve dialog
-status: research_complete
-stopped_at: Phase 9 research complete — ready for planning
-last_updated: "2026-08-05T09:55:00.000Z"
+status: ui_spec_draft
+stopped_at: Phase 9 UI-SPEC draft written — ready for ui-checker
+last_updated: "2026-08-05T10:00:00.000Z"
 last_activity: 2026-08-05
-last_activity_desc: Wrote 09-RESEARCH.md for Build a link from resolve dialog
+last_activity_desc: Wrote 09-UI-SPEC.md for Build a link from resolve dialog
 progress:
   total_phases: 6
   completed_phases: 2
@@ -24,14 +24,14 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 **Core value:** Healthy mainline for learning and knowledge work — reviewed note stays primary during accidental-match results.
-**Current focus:** Phase 9 research complete — ready to plan Build a link from resolve dialog
+**Current focus:** Phase 9 UI-SPEC draft complete — ready for ui-checker / plan
 
 ## Current Position
 
-Phase: 9 of 12 (Build a link from resolve dialog) — research complete; plans TBD
+Phase: 9 of 12 (Build a link from resolve dialog) — UI-SPEC draft; plans TBD
 Plan: none yet
-Status: Phase 9 RESEARCH.md written — AMR-06/AMR-07 ready for planning
-Last activity: 2026-08-05 — Phase 9 research (single-Modal step swap + gates)
+Status: Phase 9 09-UI-SPEC.md written — AMR-06/AMR-07 design contract ready for checker
+Last activity: 2026-08-05 — Phase 9 UI design contract (Build a link step + gates)
 
 Progress: [███░░░░░░░] 33% (2/6 v1.2 phases; 4 plans executed across phases 7–8)
 
@@ -96,7 +96,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-08-05T09:55:00.000Z
-Stopped at: Phase 9 research complete
-Resume file: .planning/phases/09-build-a-link-from-resolve-dialog/09-RESEARCH.md
-Next action: /gsd-plan-phase 9 (planner consumes 09-RESEARCH.md + 09-CONTEXT.md)
+Last session: 2026-08-05T10:00:00.000Z
+Stopped at: Phase 9 UI-SPEC draft written
+Resume file: .planning/phases/09-build-a-link-from-resolve-dialog/09-UI-SPEC.md
+Next action: gsd-ui-checker on 09-UI-SPEC.md, then /gsd-plan-phase 9

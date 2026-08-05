@@ -93,13 +93,12 @@ const config = defineConfig({
   },
   base: '/',
   build: {
-    minify: 'terser',
+    // terser drops pdf.js private field decls in the worker chunk (e.g. `#wasmUrl`),
+    // which breaks module workers and fake-worker fallback in production/CI.
+    minify: 'esbuild',
     cssMinify: 'lightningcss',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true
-      },
+    esbuild: {
+      drop: ['console', 'debugger'],
     },
     reportCompressedSize: false,
     outDir: 'dist',
