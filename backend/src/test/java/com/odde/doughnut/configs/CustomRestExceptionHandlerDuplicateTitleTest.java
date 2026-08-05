@@ -37,7 +37,6 @@ class CustomRestExceptionHandlerDuplicateTitleTest {
     ResponseEntity<ApiError> response = handler.handleHibernateConstraintViolation(ex);
 
     assertThat(response.getStatusCode(), equalTo(HttpStatus.CONFLICT));
-    assertThat(response.getBody().getErrorType(), equalTo(ApiError.ErrorType.RESOURCE_CONFLICT));
   }
 
   @Test

@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.odde.doughnut.controllers.dto.ApiError;
 import java.util.stream.Stream;
@@ -43,11 +42,9 @@ class ControllerSetupMultipartExceptionTest {
       String expectedMessageFragment) {
     ResponseEntity<ApiError> res = controllerSetup.handleMultipartException(exception);
     assertEquals(expectedStatus, res.getStatusCode());
-    ApiError body = res.getBody();
-    assertNotNull(body);
-    assertThat(body.getErrorType(), equalTo(expectedErrorType));
+    assertThat(res.getBody().getErrorType(), equalTo(expectedErrorType));
     if (expectedMessageFragment != null) {
-      assertThat(body.getMessage(), containsString(expectedMessageFragment));
+      assertThat(res.getBody().getMessage(), containsString(expectedMessageFragment));
     }
   }
 }

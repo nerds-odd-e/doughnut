@@ -1,11 +1,17 @@
 package com.odde.doughnut.configs;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.RecallPrompt;
 import java.lang.reflect.Method;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,20 +30,19 @@ class NullToNotFoundResponseBodyAdviceTest {
 
   private final NullToNotFoundResponseBodyAdvice advice = new NullToNotFoundResponseBodyAdvice();
 
-  @Test
-  void supportsAppliesOnlyToNonResponseEntityReturnTypes() throws NoSuchMethodException {
-    Method recallPromptMethod = SampleController.class.getDeclaredMethod("returnsRecallPrompt");
-    Method responseEntityMethod = SampleController.class.getDeclaredMethod("returnsResponseEntity");
+  @ParameterizedTest
+  @MethodSource("supportCases")
+  void supportsNonResponseEntityReturnTypesOnly(String methodName, boolean expected)
+      throws NoSuchMethodException {
+    Method method = SampleController.class.getDeclaredMethod(methodName);
     assertThat(
-            advice.supports(
-                new MethodParameter(recallPromptMethod, -1),
-                MappingJackson2HttpMessageConverter.class))
-        .isTrue();
-    assertThat(
-            advice.supports(
-                new MethodParameter(responseEntityMethod, -1),
-                MappingJackson2HttpMessageConverter.class))
-        .isFalse();
+        advice.supports(new MethodParameter(method, -1), MappingJackson2HttpMessageConverter.class),
+        is(expected));
+  }
+
+  static Stream<Arguments> supportCases() {
+    return Stream.of(
+        Arguments.of("returnsRecallPrompt", true), Arguments.of("returnsResponseEntity", false));
   }
 
   @Test
@@ -60,8 +65,8 @@ class NullToNotFoundResponseBodyAdviceTest {
                     request,
                     response));
 
-    assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-    assertThat(ex.getReason()).isEqualTo("Resource not found");
+    assertThat(ex.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
+    assertThat(ex.getReason(), equalTo("Resource not found"));
   }
 
   static class SampleController {

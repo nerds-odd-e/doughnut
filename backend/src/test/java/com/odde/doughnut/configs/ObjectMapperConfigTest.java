@@ -13,18 +13,11 @@ class ObjectMapperConfigTest {
 
   @Test
   void shouldExcludeNullFieldsFromJsonSerialization() throws JsonProcessingException {
-    // Arrange
-    TestObject testObject = new TestObject("value1", null, "value3");
-
-    // Act
-    String jsonString = objectMapper.writeValueAsString(testObject);
+    String jsonString = objectMapper.writeValueAsString(new TestObject("value1", null, "value3"));
     JsonNode jsonNode = objectMapper.readTree(jsonString);
 
-    // Assert
-    assertThat(jsonNode.has("field1"), is(true));
     assertThat(jsonNode.get("field1").asText(), is("value1"));
-    assertThat(jsonNode.has("field2"), is(false)); // null field should be excluded
-    assertThat(jsonNode.has("field3"), is(true));
+    assertThat(jsonNode.has("field2"), is(false));
     assertThat(jsonNode.get("field3").asText(), is("value3"));
   }
 
