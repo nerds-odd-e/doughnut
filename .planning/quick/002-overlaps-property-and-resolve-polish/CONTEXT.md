@@ -14,14 +14,15 @@ v1.2 “Add as overlapped note” reuses the `aliases` YAML list: whole-item wik
 2. **Disable Add as overlapped** in the resolve dialog when that overlap is already declared.
 3. **Dialog copy** — explain that overlap means the match is largely overlapped with the reviewed note: may be technically acceptable, but recall expects a more precise answer here.
 
-## Current mechanism (baseline)
+## Current mechanism (after Phase 5)
 
 ```
+overlaps: YAML list of [[wiki]] → authoring + dialog declare + OVERLAP grading
 aliases: YAML list
 ├── plain items  → index, search, matchAnswer, cloze
-└── [[wiki]] items → OVERLAP grading (FrontmatterAliases.overlapWikiLinkTokens*)
+└── legacy [[wiki]] items → still dual-read by grader until Phase 7
          ↑
-   appendOverlapWikiLinkToNoteContent → appendAliasToNoteContent
+   appendOverlapWikiLinkToNoteContent → appendItemToFrontmatterStringList(..., "overlaps")
 ```
 
 ADR 0003 defines overlap *scheduling* (no credit / try-again) but does **not** prescribe `aliases` vs a separate property. Storage change is product/schema, not an ADR conflict — consider a short human ADR if the team wants the key locked.

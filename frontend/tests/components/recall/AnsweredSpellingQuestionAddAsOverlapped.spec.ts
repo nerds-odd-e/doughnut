@@ -71,7 +71,9 @@ describe("AnsweredSpellingQuestion add as overlapped note", () => {
       body: { content?: string }
     }
     expect(callArgs.path.note).toBe(reviewedRealm.id)
+    expect(callArgs.body.content).toMatch(/overlaps:/)
     expect(callArgs.body.content).toContain("[[")
+    expect(callArgs.body.content).not.toMatch(/aliases:/)
     expect(
       document.body.querySelector(
         '[data-testid="accidental-match-resolve-dialog"]'
@@ -89,7 +91,7 @@ describe("AnsweredSpellingQuestion add as overlapped note", () => {
     expect(wrapper.emitted("retry")).toBeUndefined()
   })
 
-  it("does not update content when overlap wiki-link is already present", async () => {
+  it("does not update content when overlap wiki-link is already in overlaps", async () => {
     const { answeredQuestion, reviewedRealm, matchedA, matchedB } =
       accidentalMatchWithTwoMatchedNotes()
     const overlapToken = buildWikiLinkText(
@@ -101,7 +103,7 @@ describe("AnsweredSpellingQuestion add as overlapped note", () => {
       { notebookId: reviewedRealm.notebookRealm.notebook.id }
     )
     reviewedRealm.note.content = `---
-aliases:
+overlaps:
   - "${overlapToken}"
 ---
 

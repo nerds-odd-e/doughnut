@@ -85,16 +85,17 @@ Map OVL-* into REQUIREMENTS.md when this plan is accepted onto the roadmap / mil
 - **Learnings:** Grader dual-reads via `FrontmatterOverlaps.gradingOverlapWikiLinkTokensFromNoteContent` (overlaps ∪ legacy wiki-in-aliases). `NoteBuilder.overlapPartner`/`overlapWikiLink` write `overlaps`; `legacyOverlapPartner` covers dual-read. Dialog still appends aliases until Phase 5.
 
 ### Phase 5 — Dialog declares into `overlaps`
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
 - **Requirements:** OVL-05
 - **Observable:**
   - **Pre:** Accidental-match resolve dialog; writable reviewed note
   - **Trigger:** **Add as overlapped note**
   - **Post:** Reviewed note content gains wiki-link under `overlaps` (not under `aliases`); stay on accidental-match; no try-again / no reclaim
-- **Tests:** Update `appendOverlapWikiLinkToNoteContent` (+ rename if needed) to target `overlaps`; Vitest AddAsOverlapped; E2E content or durable assert if feasible
+- **Tests:** `appendOverlapWikiLinkToNoteContent` → `appendItemToFrontmatterStringList(..., "overlaps")`; Vitest AddAsOverlapped asserts `overlaps:` / no `aliases:`; E2E stay + no try-again (accidental_match_reveal)
 - **Done when:** Dialog write path uses `overlaps`; Phase 11-era aliases-append path gone
 - **Stop-safe:** New declares use the correct property
+- **Learnings:** Kept helper name; swapped aliases wrapper for shared list-key append. Null-on-duplicate now keys off `overlaps` only (legacy wiki-in-aliases still grades via dual-read until Phase 7; Phase 6 disable should check overlaps ∪ legacy).
 
 ### Phase 6 — Disable Add as overlapped when already declared
 - **Status:** planned
@@ -135,7 +136,7 @@ Map OVL-* into REQUIREMENTS.md when this plan is accepted onto the roadmap / mil
 ## Interim behavior
 
 - Dual-read wiki-in-`aliases` during Phases 4–6 is allowed; **remove** in Phase 7.
-- **Phase 4 done:** OVERLAP grading reads `overlaps` and still honors legacy wiki-in-`aliases`. Dialog write path still targets `aliases` until Phase 5.
+- **Phase 5 done:** Dialog **Add as overlapped note** appends under `overlaps`. Grading still dual-reads legacy wiki-in-`aliases` until Phase 7.
 
 ## Anti-patterns to avoid
 
@@ -154,7 +155,7 @@ Map OVL-* into REQUIREMENTS.md when this plan is accepted onto the roadmap / mil
 | 2 Shared list-property Structure | done |
 | 3 Rich `overlaps` + validation + link display | done |
 | 4 Grading from `overlaps` (+ dual-read) | done |
-| 5 Dialog writes `overlaps` | planned |
+| 5 Dialog writes `overlaps` | done |
 | 6 Disable when already declared | planned |
 | 7 Aliases plain-only + migrate | planned |
 

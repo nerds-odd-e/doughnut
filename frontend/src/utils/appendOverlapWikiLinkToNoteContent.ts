@@ -1,5 +1,5 @@
 import { buildWikiLinkText } from "./buildWikiLinkText"
-import { appendAliasToNoteContent } from "./wikidataTitleActions"
+import { appendItemToFrontmatterStringList } from "./frontmatterStringList"
 
 export function appendOverlapWikiLinkToNoteContent(
   contentMarkdown: string,
@@ -11,5 +11,5 @@ export function appendOverlapWikiLinkToNoteContent(
   source: { notebookId?: number }
 ): string | null {
   const token = buildWikiLinkText(target, { notebookId: source.notebookId })
-  return appendAliasToNoteContent(contentMarkdown, token)
+  return appendItemToFrontmatterStringList(contentMarkdown, "overlaps", token)
 }

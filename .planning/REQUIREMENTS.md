@@ -35,10 +35,10 @@ Real product gaps found after milestone audit. Plan: `.planning/quick/002-overla
 ### Distinct overlaps property + resolve polish
 
 - [x] **OVL-01**: Resolve dialog explains that overlap is for a note largely overlapped with the reviewed note; it may be technically acceptable but recall expects a more precise answer
-- [ ] **OVL-02**: Notes support an `overlaps` frontmatter list; every item must be a well-formed wiki link; invalid shapes rejected on save (FE+BE)
-- [ ] **OVL-03**: Rich-mode `overlaps` authoring matches `aliases` list UX; each item shown as a clickable wiki link
-- [ ] **OVL-04**: OVERLAP grading resolves declarations from `overlaps` (not wiki-link items in `aliases`)
-- [ ] **OVL-05**: **Add as overlapped note** appends into `overlaps` (not `aliases`); still no try-again / no SRS reclaim on this accidental-match result
+- [x] **OVL-02**: Notes support an `overlaps` frontmatter list; every item must be a well-formed wiki link; invalid shapes rejected on save (FE+BE)
+- [x] **OVL-03**: Rich-mode `overlaps` authoring matches `aliases` list UX; each item shown as a clickable wiki link
+- [x] **OVL-04**: OVERLAP grading resolves declarations from `overlaps` (not wiki-link items in `aliases`)
+- [x] **OVL-05**: **Add as overlapped note** appends into `overlaps` (not `aliases`); still no try-again / no SRS reclaim on this accidental-match result
 - [ ] **OVL-06**: When overlap toward that match already exists, **Add as overlapped note** is disabled
 - [ ] **OVL-07**: `aliases` accepts plain alias strings only; wiki-in-`aliases` migrated or dual-read until removed
 

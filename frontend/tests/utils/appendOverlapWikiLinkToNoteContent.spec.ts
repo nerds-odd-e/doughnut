@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest"
 import { appendOverlapWikiLinkToNoteContent } from "@/utils/appendOverlapWikiLinkToNoteContent"
-import { authoredAliasesValidationErrorForPropertyValue } from "@/utils/authoredAliasesValidation"
+import { authoredOverlapsValidationErrorForPropertyValue } from "@/utils/authoredOverlapsValidation"
 import { isListPropertyValue, listPropertyValue } from "@/utils/noteProperties"
 import { parseNoteContentMarkdown } from "@/utils/noteContentFrontmatter"
 
@@ -8,19 +8,19 @@ function makeTarget(title: string, notebookId: number, notebookName?: string) {
   return { noteTopology: { title }, notebookId, notebookName }
 }
 
-function aliasListItems(markdown: string): string[] {
+function overlapListItems(markdown: string): string[] {
   const parsed = parseNoteContentMarkdown(markdown)
   expect(parsed.ok).toBe(true)
   if (!parsed.ok) return []
-  const aliases = parsed.properties.aliases
-  expect(aliases).toBeDefined()
-  expect(isListPropertyValue(aliases!)).toBe(true)
-  if (!aliases || !isListPropertyValue(aliases)) return []
-  return [...aliases.items]
+  const overlaps = parsed.properties.overlaps
+  expect(overlaps).toBeDefined()
+  expect(isListPropertyValue(overlaps!)).toBe(true)
+  if (!overlaps || !isListPropertyValue(overlaps)) return []
+  return [...overlaps.items]
 }
 
 describe("appendOverlapWikiLinkToNoteContent", () => {
-  it("appends a whole-item wiki-link alias when content has no aliases", () => {
+  it("appends a whole-item wiki-link under overlaps when content has none", () => {
     const result = appendOverlapWikiLinkToNoteContent(
       "## Body\n",
       makeTarget("Sedation", 1, "NB"),
@@ -30,11 +30,12 @@ describe("appendOverlapWikiLinkToNoteContent", () => {
     expect(result).not.toBeNull()
     expect(result).toContain("[[Sedation]]")
     expect(result).not.toContain("|")
+    expect(result).not.toMatch(/^aliases:/m)
 
-    const items = aliasListItems(result!)
+    const items = overlapListItems(result!)
     expect(items).toContain("[[Sedation]]")
     expect(
-      authoredAliasesValidationErrorForPropertyValue(listPropertyValue(items))
+      authoredOverlapsValidationErrorForPropertyValue(listPropertyValue(items))
     ).toBeUndefined()
   })
 
@@ -46,10 +47,26 @@ describe("appendOverlapWikiLinkToNoteContent", () => {
     )
 
     expect(result).toContain("[[Other NB:Deep Note]]")
-    expect(aliasListItems(result!)).toContain("[[Other NB:Deep Note]]")
+    expect(overlapListItems(result!)).toContain("[[Other NB:Deep Note]]")
   })
 
-  it("merges a wiki-link into an existing plain-alias list", () => {
+  it("merges a wiki-link into an existing overlaps list", () => {
+    const markdown = `---
+overlaps:
+  - "[[Existing]]"
+---
+
+# Body`
+    const result = appendOverlapWikiLinkToNoteContent(
+      markdown,
+      makeTarget("Canine", 1, "NB"),
+      { notebookId: 1 }
+    )
+
+    expect(overlapListItems(result!)).toEqual(["[[Existing]]", "[[Canine]]"])
+  })
+
+  it("leaves aliases untouched when appending an overlap", () => {
     const markdown = `---
 aliases:
   - puppy
@@ -62,12 +79,16 @@ aliases:
       { notebookId: 1 }
     )
 
-    expect(aliasListItems(result!)).toEqual(["puppy", "[[Canine]]"])
+    expect(overlapListItems(result!)).toEqual(["[[Canine]]"])
+    const parsed = parseNoteContentMarkdown(result!)
+    expect(parsed.ok).toBe(true)
+    if (!parsed.ok) return
+    expect(parsed.properties.aliases).toEqual(listPropertyValue(["puppy"]))
   })
 
-  it("returns null when the same wiki-link is already present", () => {
+  it("returns null when the same wiki-link is already in overlaps", () => {
     const markdown = `---
-aliases:
+overlaps:
   - "[[Sedation]]"
 ---
 
@@ -81,9 +102,9 @@ aliases:
     ).toBeNull()
   })
 
-  it("returns null when aliases is not a YAML list", () => {
+  it("returns null when overlaps is not a YAML list", () => {
     const markdown = `---
-aliases: puppy
+overlaps: "[[Sedation]]"
 ---
 
 # Body`
