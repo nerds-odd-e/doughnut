@@ -24,14 +24,14 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 **Core value:** Healthy mainline for learning and knowledge work — reviewed note stays primary during accidental-match results.
-**Current focus:** Phase 8 research complete — ready for `/gsd-plan-phase` planning; Phase 7 still ready for verification
+**Current focus:** Phase 8 UI-SPEC complete — ready for UI checker + `/gsd-plan-phase`; Phase 7 still ready for verification
 
 ## Current Position
 
-Phase: 8 of 12 (Match path and clickable titles) — research done; Phase 7 plans still complete
+Phase: 8 of 12 (Match path and clickable titles) — UI-SPEC drafted; Phase 7 plans still complete
 Plan: Phase 8 plans TBD
-Status: Phase 8 research complete — planner can create PLAN.md
-Last activity: 2026-08-05 — Wrote 08-RESEARCH.md
+Status: Phase 8 UI-SPEC complete — checker can validate; then planner creates PLAN.md
+Last activity: 2026-08-05 — Wrote 08-UI-SPEC.md
 
 Progress: [██████████] 100% (phase plans)
 
@@ -86,7 +86,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-08-05T09:16:00.000Z
-Stopped at: Phase 8 research complete
-Resume file: .planning/phases/08-match-path-and-clickable-titles/08-RESEARCH.md
-Next action: Plan Phase 8 (`/gsd-plan-phase` → PLAN.md) or verify Phase 7
+Last session: 2026-08-05T09:20:00.000Z
+Stopped at: Phase 8 UI-SPEC complete
+Resume file: .planning/phases/08-match-path-and-clickable-titles/08-UI-SPEC.md
+Next action: UI-check Phase 8 contract, then `/gsd-plan-phase` (or verify Phase 7)
