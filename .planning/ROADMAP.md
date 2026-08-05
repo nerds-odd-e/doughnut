@@ -129,7 +129,11 @@ Plans:
   2. A unit-tested helper appends an overlap wiki-link alias token (not a plain alias) suitable for frontmatter merge
   3. No new user-facing **Add as overlapped note** action yet
 
-**Plans**: TBD
+**Plans:** 1 plan
+
+Plans:
+- [ ] 10-01-PLAN.md — Structure tracer: appendOverlapWikiLinkToNoteContent util + Vitest (D-01..D-09)
+
 **UI hint**: yes
 
 ### Phase 11: Add as overlapped note
