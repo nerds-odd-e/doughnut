@@ -371,7 +371,7 @@ class NotebookController {
     authorizationService.assertAuthorization(notebook);
     String content = dto.getContent();
     if (content != null && !content.isBlank()) {
-      AuthoredNoteContent.assertAliasesValidForSave(content);
+      AuthoredNoteContent.assertValidForSave(content);
     }
     notebook.setReadmeContent(content == null || content.isBlank() ? null : content);
     entityPersister.save(notebook);
@@ -396,7 +396,7 @@ class NotebookController {
     assertFolderInNotebook(notebook, folder);
     String content = dto.getContent();
     if (content != null && !content.isBlank()) {
-      AuthoredNoteContent.assertAliasesValidForSave(content);
+      AuthoredNoteContent.assertValidForSave(content);
     }
     folder.setReadmeContent(content == null || content.isBlank() ? null : content);
     entityPersister.save(folder);

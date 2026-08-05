@@ -60,7 +60,7 @@ Map OVL-* into REQUIREMENTS.md when this plan is accepted onto the roadmap / mil
 - **Learnings:** Shared seam is `frontmatterStringList` (merge/append by key) + `authoredListPropertyValidation` (`isAuthoredListPropertyKey` + validation dispatch). Phase 3 adds `overlaps` to the key registry, preset list, and item rules — not a second rich-list stack. Deleted obsolete `frontmatterAliases` wrapper after inlining into the shared module.
 
 ### Phase 3 — Rich-mode `overlaps` property (wiki-link list, shown as links)
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
 - **Requirements:** OVL-02, OVL-03
 - **Observable:**
@@ -68,8 +68,8 @@ Map OVL-* into REQUIREMENTS.md when this plan is accepted onto the roadmap / mil
   - **Trigger:** Insert/edit `overlaps` list items
   - **Post:** List UX matches aliases shape; items must be wiki links (reject plain); items render as links; save rejected when invalid (FE+BE)
 - **Tests:** Vitest rich editor / property rows (mirror aliases property tests); BE `AuthoredNoteContent` / frontmatter validation for `overlaps`
-- **Done when:** Manual authoring works; grading still may ignore `overlaps` until Phase 4 (document interim: authored overlaps not yet graded — prefer landing Phase 4 immediately after)
-- **Note:** Prefer execute Phase 4 in the same session so stop-safe “overlaps work for learning” is not left half-done overnight
+- **Done when:** Manual authoring works
+- **Learnings:** Registered `overlaps` on shared authored-list seam (`isAuthoredListPropertyKey` + preset + wiki-link-only validation). List display uses `propertyValuePlainToDisplayHtml` for overlaps only. Shared `wholeWikiLinkItem` / `WikiLinkMarkdown.isWellFormedWholeLinkToken`. **Interim:** OVERLAP grading still reads wiki-in-`aliases` only — authored `overlaps` are ignored by the grader until Phase 4. Prefer landing Phase 4 immediately.
 
 ### Phase 4 — OVERLAP grading reads `overlaps` (+ dual-read legacy)
 - **Status:** planned
@@ -134,7 +134,7 @@ Map OVL-* into REQUIREMENTS.md when this plan is accepted onto the roadmap / mil
 ## Interim behavior
 
 - Dual-read wiki-in-`aliases` during Phases 4–6 is allowed; **remove** in Phase 7.
-- Phase 3 without Phase 4 is interim and should not be left as the long-term stop point.
+- **Phase 3 complete without Phase 4:** users can author valid `overlaps` lists (FE+BE reject invalid shapes; rich UI shows wiki links), but **OVERLAP grading still ignores `overlaps`** until Phase 4. Do not leave this as a long-term stop point.
 
 ## Anti-patterns to avoid
 
@@ -151,7 +151,7 @@ Map OVL-* into REQUIREMENTS.md when this plan is accepted onto the roadmap / mil
 |-------|--------|
 | 1 Explain overlap in dialog | done |
 | 2 Shared list-property Structure | done |
-| 3 Rich `overlaps` + validation + link display | planned |
+| 3 Rich `overlaps` + validation + link display | done |
 | 4 Grading from `overlaps` (+ dual-read) | planned |
 | 5 Dialog writes `overlaps` | planned |
 | 6 Disable when already declared | planned |

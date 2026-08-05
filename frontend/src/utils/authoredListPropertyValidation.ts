@@ -2,6 +2,10 @@ import {
   authoredAliasesValidationErrorForPropertyValue,
   isAliasesPropertyKey,
 } from "@/utils/authoredAliasesValidation"
+import {
+  authoredOverlapsValidationErrorForPropertyValue,
+  isOverlapsPropertyKey,
+} from "@/utils/authoredOverlapsValidation"
 import type { PropertyValue } from "@/utils/noteProperties"
 
 /**
@@ -9,7 +13,7 @@ import type { PropertyValue } from "@/utils/noteProperties"
  * list validation). Add further keys here without forking rich-list insert/popup paths.
  */
 export function isAuthoredListPropertyKey(key: string): boolean {
-  return isAliasesPropertyKey(key)
+  return isAliasesPropertyKey(key) || isOverlapsPropertyKey(key)
 }
 
 export function authoredListPropertyValidationErrorForPropertyValue(
@@ -18,6 +22,9 @@ export function authoredListPropertyValidationErrorForPropertyValue(
 ): string | undefined {
   if (isAliasesPropertyKey(key)) {
     return authoredAliasesValidationErrorForPropertyValue(value)
+  }
+  if (isOverlapsPropertyKey(key)) {
+    return authoredOverlapsValidationErrorForPropertyValue(value)
   }
   return
 }

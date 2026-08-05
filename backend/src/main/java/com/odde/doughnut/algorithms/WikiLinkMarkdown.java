@@ -43,6 +43,22 @@ public final class WikiLinkMarkdown {
     return new WikiInnerSplit(target, display);
   }
 
+  /**
+   * True when {@code trimmed} is exactly one well-formed {@code [[target]]} or {@code
+   * [[target|display]]} token with a non-empty target.
+   */
+  public static boolean isWellFormedWholeLinkToken(String trimmed) {
+    Matcher matcher = INNER_LINK_PATTERN.matcher(trimmed);
+    if (!matcher.matches()) {
+      return false;
+    }
+    String inner = matcher.group(1).trim();
+    if (inner.isEmpty()) {
+      return false;
+    }
+    return !splitInner(inner).target().trim().isEmpty();
+  }
+
   public static List<String> innerTitlesInOccurrenceOrder(String markdown) {
     if (markdown == null || markdown.isEmpty()) {
       return List.of();

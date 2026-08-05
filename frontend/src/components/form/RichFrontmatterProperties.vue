@@ -33,8 +33,8 @@
     <RichFrontmatterReadOnlyList
       v-if="propertyRows.length > 0 && isReadOnly"
       :property-rows="propertyRows"
-    />
-    <div
+      :wiki-titles="wikiTitles"
+    />    <div
       v-else-if="propertyRows.length > 0"
       class="flex flex-col gap-2 text-sm"
     >

@@ -9,6 +9,7 @@
         v-if="listValue"
         :value="listValue"
         :property-key="propertyKey"
+        :wiki-titles="wikiTitles"
       />
     </div>
     <div

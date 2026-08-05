@@ -111,11 +111,12 @@ public final class PropertyKeyNaming {
         || isRelationshipNoteStructuralPropertyKey(key);
   }
 
-  /** Obsidian passthrough keys excluded from property indexing and tracker seeding. */
+  /** Keys excluded from property indexing and tracker seeding (Obsidian passthrough + overlaps). */
   public static boolean isPassthroughPropertyKey(String key) {
     String normalized = normalizedBaseWithoutUnderscores(key);
     return "tags".equals(normalized)
         || "aliases".equals(normalized)
+        || "overlaps".equals(normalized)
         || "cssclasses".equals(normalized);
   }
 

@@ -3,6 +3,7 @@ import type { PropertyRow } from "@/utils/noteContentPropertyRows"
 /** Preset property keys offered in rich-mode property name UI. */
 export const RICH_MODE_PRESET_PROPERTY_KEYS = [
   "aliases",
+  "overlaps",
   "image",
   "wikidata_id",
   "url",
@@ -117,6 +118,8 @@ export function propertyKeyMatchesPresetFamily(
   switch (presetKey) {
     case "aliases":
       return propertyKeyBaseMatches(key, "aliases")
+    case "overlaps":
+      return propertyKeyBaseMatches(key, "overlaps")
     case "image":
       return isImagePropertyKey(key)
     case "wikidata_id":

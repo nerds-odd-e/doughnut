@@ -5,10 +5,10 @@ milestone_name: Accidental Match Resolve UX
 current_phase: 12
 current_phase_name: Title navigate, reopen, E2E polish
 status: gap_closure_in_progress
-stopped_at: Quick 002 Phase 2 done (shared string-list helpers); next Phase 3 rich overlaps
-last_updated: "2026-08-06T07:40:00Z"
+stopped_at: Quick 002 Phase 3 done (rich overlaps authoring); next Phase 4 grading from overlaps
+last_updated: "2026-08-06T08:00:00Z"
 last_activity: 2026-08-06
-last_activity_desc: Quick 002 Phase 2 — shared frontmatter string-list helpers (Structure)
+last_activity_desc: Quick 002 Phase 3 — rich-mode overlaps property (wiki-link list + FE/BE validation)
 progress:
   total_phases: 6
   completed_phases: 6
@@ -30,8 +30,8 @@ See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 Phase: 12 of 12 (Title navigate, reopen, E2E polish) — complete
 Plan: 12-01 executed; 12-02 skipped (KeepAlive sufficient)
-Status: Gap closure quick/002 — Phase 2 (shared list helpers) done; Phase 3 next
-Last activity: 2026-08-06 — extract frontmatterStringList + authoredListPropertyValidation
+Status: Gap closure quick/002 — Phase 3 (rich overlaps authoring) done; Phase 4 next (grading still ignores overlaps until then)
+Last activity: 2026-08-06 — overlaps wiki-link list property + FE/BE validation + link display
 
 Progress: [██████████] 100% (6/6 v1.2 phases; 11/11 plans accounted — 10 executed + 1 skipped)
 

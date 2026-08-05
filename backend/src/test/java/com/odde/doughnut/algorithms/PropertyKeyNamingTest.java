@@ -82,6 +82,7 @@ class PropertyKeyNamingTest {
   @CsvSource({
     "tags, true",
     "aliases, true",
+    "overlaps, true",
     "cssclasses, true",
     "cssClasses, true",
     "topic, false",

@@ -98,7 +98,7 @@ public class NoteConstructionService {
     }
     Note note = createNote(notebook, folder, noteCreation.getNewTitle());
     if (noteCreation.getContent() != null) {
-      AuthoredNoteContent.assertAliasesValidForSave(noteCreation.getContent());
+      AuthoredNoteContent.assertValidForSave(noteCreation.getContent());
       Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
       note.setContent(noteCreation.getContent());
       note.setUpdatedAt(ts);
@@ -132,8 +132,8 @@ public class NoteConstructionService {
 
     Note newNote =
         createNote(originalNote.getNotebook(), originalNote.getFolder(), aiResult.newNoteTitle);
-    AuthoredNoteContent.assertAliasesValidForSave(newNoteContent);
-    AuthoredNoteContent.assertAliasesValidForSave(aiResult.updatedOriginalNoteContent);
+    AuthoredNoteContent.assertValidForSave(newNoteContent);
+    AuthoredNoteContent.assertValidForSave(aiResult.updatedOriginalNoteContent);
     newNote.setContent(newNoteContent);
     newNote.setUpdatedAt(currentUTCTimestamp);
     entityPersister.save(newNote);

@@ -9,6 +9,7 @@
           v-if="isListPropertyValue(row.value)"
           :value="row.value"
           :property-key="row.key"
+          :wiki-titles="wikiTitles"
           compact
         />
         <template v-else-if="isRelationPropertyKey(row.key)">{{
@@ -47,6 +48,7 @@
 <script setup lang="ts">
 import RichFrontmatterListPropertyValue from "@/components/form/RichFrontmatterListPropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
+import type { WikiTitle } from "@generated/doughnut-backend-api"
 import { relationLabelFromKebab } from "@/models/relationTypeOptions"
 import {
   isRelationPropertyKey,
@@ -56,5 +58,5 @@ import {
 } from "@/utils/noteContentFrontmatter"
 import { isListPropertyValue } from "@/utils/noteProperties"
 
-defineProps<{ propertyRows: PropertyRow[] }>()
+defineProps<{ propertyRows: PropertyRow[]; wikiTitles: WikiTitle[] }>()
 </script>

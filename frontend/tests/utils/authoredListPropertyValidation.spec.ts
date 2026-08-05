@@ -5,17 +5,19 @@ import {
   isAuthoredListPropertyKey,
 } from "@/utils/authoredListPropertyValidation"
 import { AUTHORED_ALIASES_MESSAGE } from "@/utils/authoredAliasesValidation"
+import { AUTHORED_OVERLAPS_MESSAGE } from "@/utils/authoredOverlapsValidation"
 import { listPropertyValue, scalarPropertyValue } from "@/utils/noteProperties"
 
 describe("isAuthoredListPropertyKey", () => {
-  it("recognizes aliases as the authored list key today", () => {
+  it("recognizes aliases and overlaps as authored list keys", () => {
     expect(isAuthoredListPropertyKey("aliases")).toBe(true)
+    expect(isAuthoredListPropertyKey("overlaps")).toBe(true)
     expect(isAuthoredListPropertyKey("tags")).toBe(false)
   })
 })
 
 describe("authoredListPropertyValidationErrorForPropertyValue", () => {
-  it("dispatches aliases validation and ignores other keys", () => {
+  it("dispatches aliases and overlaps validation and ignores other keys", () => {
     expect(
       authoredListPropertyValidationErrorForPropertyValue(
         "aliases",
@@ -26,6 +28,18 @@ describe("authoredListPropertyValidationErrorForPropertyValue", () => {
       authoredListPropertyValidationErrorForPropertyValue(
         "aliases",
         listPropertyValue(["color"])
+      )
+    ).toBeUndefined()
+    expect(
+      authoredListPropertyValidationErrorForPropertyValue(
+        "overlaps",
+        listPropertyValue(["plain"])
+      )
+    ).toBe(AUTHORED_OVERLAPS_MESSAGE)
+    expect(
+      authoredListPropertyValidationErrorForPropertyValue(
+        "overlaps",
+        listPropertyValue(["[[Other]]"])
       )
     ).toBeUndefined()
     expect(
@@ -51,5 +65,11 @@ describe("authoredListPropertyValidationErrorForPropertyRow", () => {
         value: scalarPropertyValue("x"),
       })
     ).toBe(AUTHORED_ALIASES_MESSAGE)
+    expect(
+      authoredListPropertyValidationErrorForPropertyRow({
+        key: "overlaps",
+        value: listPropertyValue(["plain"]),
+      })
+    ).toBe(AUTHORED_OVERLAPS_MESSAGE)
   })
 })

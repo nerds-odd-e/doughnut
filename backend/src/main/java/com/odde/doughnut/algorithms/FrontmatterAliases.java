@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /** Reads valid frontmatter {@code aliases} list items for recall and wiki-link behavior. */
@@ -133,15 +132,7 @@ public final class FrontmatterAliases {
   }
 
   private static boolean isWikiLinkAliasItem(String trimmed) {
-    Matcher matcher = WikiLinkMarkdown.INNER_LINK_PATTERN.matcher(trimmed);
-    if (!matcher.matches()) {
-      return false;
-    }
-    String inner = matcher.group(1).trim();
-    if (inner.isEmpty()) {
-      return false;
-    }
-    return !WikiLinkMarkdown.splitInner(inner).target().trim().isEmpty();
+    return WikiLinkMarkdown.isWellFormedWholeLinkToken(trimmed);
   }
 
   private static boolean isValidPlainAliasText(String trimmed) {
