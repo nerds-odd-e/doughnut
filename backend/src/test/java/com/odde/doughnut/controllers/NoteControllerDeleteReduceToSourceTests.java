@@ -7,13 +7,11 @@ import com.odde.doughnut.controllers.dto.NoteDeleteDTO;
 import com.odde.doughnut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import java.sql.Timestamp;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,35 +35,23 @@ class NoteControllerDeleteReduceToSourceTests extends ControllerTestBase {
     return dto;
   }
 
-  private static String relationshipNoteContent(String sourceTitle, String targetTitle) {
-    return relationshipNoteContent("a-part-of", sourceTitle, targetTitle);
-  }
-
-  private static String relationshipNoteContent(
-      String relationKebab, String sourceTitle, String targetTitle) {
-    return "---\n"
-        + "type: relationship\n"
-        + "relation: "
-        + relationKebab
-        + "\n"
-        + "source: \"[["
-        + sourceTitle
-        + "]]\"\n"
-        + "target: \"[["
-        + targetTitle
-        + "]]\"\n"
-        + "---\n\n";
+  private Note aRelation(Note source, Note target, String relationLabel) {
+    Note relation =
+        makeMe
+            .aNote()
+            .underSameNotebookAs(source)
+            .asRelationship(relationLabel, source, target)
+            .please();
+    wikiTitleCacheService.refreshForNote(relation, currentUser.getUser());
+    return relation;
   }
 
   @Test
   void shouldAddRelationLabelPropertyToSourceAndSoftDeleteRelationNote()
       throws UnexpectedNoAccessRightException {
-    Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-    Note moon = makeMe.aNote("Moon").notebook(nb).please();
-    Note earth = makeMe.aNote("Earth").notebook(nb).please();
-    Note relation =
-        makeMe.aNote().notebook(nb).content(relationshipNoteContent("Moon", "Earth")).please();
-    wikiTitleCacheService.refreshForNote(relation, currentUser.getUser());
+    Note moon = makeMe.aNote("Moon").notebookOwnedBy(currentUser.getUser()).please();
+    Note earth = makeMe.aNote("Earth").underSameNotebookAs(moon).please();
+    Note relation = aRelation(moon, earth, "a part of");
 
     controller.deleteNote(relation, reduceToSourcePropertyDeleteRequest("a part of"));
 
@@ -78,16 +64,12 @@ class NoteControllerDeleteReduceToSourceTests extends ControllerTestBase {
   @Test
   void shouldRehomeRelationNoteLevelTrackerAsPropertyTrackerOnSource()
       throws UnexpectedNoAccessRightException {
-    Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-    Note moon = makeMe.aNote("Moon").notebook(nb).please();
-    makeMe.aNote("Earth").notebook(nb).please();
-    Note relation =
-        makeMe.aNote().notebook(nb).content(relationshipNoteContent("Moon", "Earth")).please();
-    wikiTitleCacheService.refreshForNote(relation, currentUser.getUser());
+    Note moon = makeMe.aNote("Moon").notebookOwnedBy(currentUser.getUser()).please();
+    Note earth = makeMe.aNote("Earth").underSameNotebookAs(moon).please();
+    Note relation = aRelation(moon, earth, "a part of");
     MemoryTracker relationTracker =
         makeMe
             .aMemoryTrackerFor(relation)
-            .by(currentUser.getUser())
             .afterNthStrictRecall(3)
             .forgettingCurveAndNextRecallAt(5.5f)
             .please();
@@ -109,25 +91,22 @@ class NoteControllerDeleteReduceToSourceTests extends ControllerTestBase {
     assertThat(
         memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), relation.getId()),
         empty());
-    List<MemoryTracker> sourceTrackers =
-        memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), moon.getId());
-    assertThat(sourceTrackers, hasSize(1));
-    assertThat(sourceTrackers.getFirst().getId(), equalTo(trackerId));
   }
 
   @Test
   void shouldUseSuffixedPropertyKeyWhenSourceAlreadyHasPropertyKey()
       throws UnexpectedNoAccessRightException {
-    Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
     Note moon =
-        makeMe.aNote("Moon").notebook(nb).content("---\na part of: \"[[Mars]]\"\n---\n").please();
-    makeMe.aNote("Earth").notebook(nb).please();
-    Note relation =
-        makeMe.aNote().notebook(nb).content(relationshipNoteContent("Moon", "Earth")).please();
+        makeMe
+            .aNote("Moon")
+            .notebookOwnedBy(currentUser.getUser())
+            .content("---\na part of: \"[[Mars]]\"\n---\n")
+            .please();
+    Note earth = makeMe.aNote("Earth").underSameNotebookAs(moon).please();
+    Note relation = aRelation(moon, earth, "a part of");
 
     controller.deleteNote(relation, reduceToSourcePropertyDeleteRequest("a part of"));
 
-    assertThat(relation.getDeletedAt(), is(not(nullValue())));
     assertThat(moon.getContent(), containsString("a part of 2"));
     assertThat(moon.getContent(), containsString("[[Earth]]"));
   }
@@ -135,51 +114,36 @@ class NoteControllerDeleteReduceToSourceTests extends ControllerTestBase {
   @Test
   void shouldRehomeTrackerWithSuffixedPropertyKeyWhenSourceAlreadyHasPropertyKey()
       throws UnexpectedNoAccessRightException {
-    Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
     Note moon =
-        makeMe.aNote("Moon").notebook(nb).content("---\na part of: \"[[Mars]]\"\n---\n").please();
-    makeMe.aNote("Earth").notebook(nb).please();
-    Note relation =
-        makeMe.aNote().notebook(nb).content(relationshipNoteContent("Moon", "Earth")).please();
-    MemoryTracker relationTracker =
-        makeMe.aMemoryTrackerFor(relation).by(currentUser.getUser()).please();
-    int trackerId = relationTracker.getId();
+        makeMe
+            .aNote("Moon")
+            .notebookOwnedBy(currentUser.getUser())
+            .content("---\na part of: \"[[Mars]]\"\n---\n")
+            .please();
+    Note earth = makeMe.aNote("Earth").underSameNotebookAs(moon).please();
+    Note relation = aRelation(moon, earth, "a part of");
+    int trackerId = makeMe.aMemoryTrackerFor(relation).please().getId();
 
     controller.deleteNote(relation, reduceToSourcePropertyDeleteRequest("a part of"));
 
     MemoryTracker reloaded = memoryTrackerRepository.findById(trackerId).orElseThrow();
-    assertThat(reloaded.getDeletedAt(), is(nullValue()));
     assertThat(reloaded.getNote().getId(), equalTo(moon.getId()));
     assertThat(reloaded.getPropertyKey(), equalTo("a part of 2"));
-    assertThat(
-        memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), moon.getId()),
-        hasSize(1));
   }
 
   @Test
   void shouldUseExampleOfPropertyKeyWhenReducingExampleOfRelation()
       throws UnexpectedNoAccessRightException {
-    Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-    Note word = makeMe.aNote("Word").notebook(nb).please();
-    makeMe.aNote("Earth").notebook(nb).please();
-    Note relation =
-        makeMe
-            .aNote()
-            .notebook(nb)
-            .content(relationshipNoteContent("an-example-of", "Word", "Earth"))
-            .please();
-    wikiTitleCacheService.refreshForNote(relation, currentUser.getUser());
-    MemoryTracker relationTracker =
-        makeMe.aMemoryTrackerFor(relation).by(currentUser.getUser()).please();
-    int trackerId = relationTracker.getId();
+    Note word = makeMe.aNote("Word").notebookOwnedBy(currentUser.getUser()).please();
+    Note earth = makeMe.aNote("Earth").underSameNotebookAs(word).please();
+    Note relation = aRelation(word, earth, "an example of");
+    int trackerId = makeMe.aMemoryTrackerFor(relation).please().getId();
 
     controller.deleteNote(relation, reduceToSourcePropertyDeleteRequest("an example of"));
 
-    assertThat(relation.getDeletedAt(), is(not(nullValue())));
     assertThat(word.getContent(), containsString("example of:"));
     assertThat(word.getContent(), containsString("[[Earth]]"));
     MemoryTracker reloaded = memoryTrackerRepository.findById(trackerId).orElseThrow();
-    assertThat(reloaded.getNote().getId(), equalTo(word.getId()));
     assertThat(reloaded.getPropertyKey(), equalTo("example of"));
   }
 }

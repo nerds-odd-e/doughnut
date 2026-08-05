@@ -13,6 +13,7 @@ import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import java.sql.Timestamp;
+import java.time.ZoneId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -47,12 +48,11 @@ class NoteControllerDeleteTests extends ControllerTestBase {
   @Test
   void shouldRemoveDeletedNoteLinksFromReferrerPropertiesOnly()
       throws UnexpectedNoAccessRightException {
-    Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-    Note target = makeMe.aNote("Target").notebook(nb).please();
+    Note target = makeMe.aNote("Target").notebookOwnedBy(currentUser.getUser()).please();
     Note referrer =
         makeMe
             .aNote("Referrer")
-            .notebook(nb)
+            .underSameNotebookAs(target)
             .content("---\nsource: \"[[Referrer]]\"\ntarget: \"[[Target]]\"\n---\nBody [[Target]]")
             .please();
     wikiTitleCacheService.refreshForNote(referrer, currentUser.getUser());
@@ -73,8 +73,7 @@ class NoteControllerDeleteTests extends ControllerTestBase {
 
     @Test
     void shouldNotBeAbleToDeleteNoteThatBelongsToOtherUser() {
-      User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().notebookOwnedBy(anotherUser).please();
+      Note note = makeMe.aNote().notebookOwnedBy(makeMe.aUser().please()).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.deleteNote(note, leaveDeadLinksDeleteRequest()));
@@ -88,51 +87,46 @@ class NoteControllerDeleteTests extends ControllerTestBase {
 
     @Nested
     class MemoryTrackerExclusionWhenNoteDeleted {
+      private static final ZoneId ZONE = ZoneId.of("Asia/Shanghai");
+
+      private Note anotherNoteWithTracker() {
+        Note other = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+        makeMe.aMemoryTrackerFor(other).please();
+        return other;
+      }
+
       @Test
       void shouldExcludeMemoryTrackersForDeletedNotesFromRecallLists()
           throws UnexpectedNoAccessRightException {
-        makeMe.aMemoryTrackerFor(subject).by(currentUser.getUser()).please();
-        Note otherNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-        makeMe.aMemoryTrackerFor(otherNote).by(currentUser.getUser()).please();
+        makeMe.aMemoryTrackerFor(subject).please();
+        anotherNoteWithTracker();
         testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
 
         controller.deleteNote(subject, leaveDeadLinksDeleteRequest());
 
         Timestamp currentTime = testabilitySettings.getCurrentUTCTimestamp();
-        int toRecallCount =
-            recallService.getToRecallCount(
-                currentUser.getUser(), currentTime, java.time.ZoneId.of("Asia/Shanghai"));
-        assertThat(toRecallCount, is(1));
+        assertThat(recallService.getToRecallCount(currentUser.getUser(), currentTime, ZONE), is(1));
       }
 
       @Test
       void shouldExcludeMemoryTrackersForDeletedNotesFromRecentLists()
           throws UnexpectedNoAccessRightException {
-        MemoryTracker deletedTracker =
-            makeMe.aMemoryTrackerFor(subject).by(currentUser.getUser()).please();
-        Note otherNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-        MemoryTracker activeTracker =
-            makeMe.aMemoryTrackerFor(otherNote).by(currentUser.getUser()).please();
+        makeMe.aMemoryTrackerFor(subject).please();
+        Note other = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+        MemoryTracker activeTracker = makeMe.aMemoryTrackerFor(other).please();
 
         controller.deleteNote(subject, leaveDeadLinksDeleteRequest());
 
         assertThat(
-            memoryTrackerService.findLast100ByUser(currentUser.getUser().getId()), hasSize(1));
-        assertThat(
             memoryTrackerService.findLast100ByUser(currentUser.getUser().getId()),
             contains(activeTracker));
-        assertThat(
-            memoryTrackerService.findLast100ByUser(currentUser.getUser().getId()),
-            not(hasItem(deletedTracker)));
       }
 
       @Test
       void shouldExcludeMemoryTrackersForDeletedNotesFromRecentlyRecalled()
           throws UnexpectedNoAccessRightException {
-        MemoryTracker deletedTracker =
-            makeMe.aMemoryTrackerFor(subject).by(currentUser.getUser()).please();
-        Note otherNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-        makeMe.aMemoryTrackerFor(otherNote).by(currentUser.getUser()).please();
+        MemoryTracker deletedTracker = makeMe.aMemoryTrackerFor(subject).please();
+        anotherNoteWithTracker();
 
         controller.deleteNote(subject, leaveDeadLinksDeleteRequest());
 
@@ -144,23 +138,22 @@ class NoteControllerDeleteTests extends ControllerTestBase {
       @Test
       void shouldExcludeMemoryTrackersForDeletedNotesFromTotalAssimilatedCount()
           throws UnexpectedNoAccessRightException {
-        makeMe.aMemoryTrackerFor(subject).by(currentUser.getUser()).please();
-        Note otherNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-        makeMe.aMemoryTrackerFor(otherNote).by(currentUser.getUser()).please();
+        makeMe.aMemoryTrackerFor(subject).please();
+        anotherNoteWithTracker();
 
         controller.deleteNote(subject, leaveDeadLinksDeleteRequest());
 
         Timestamp currentTime = testabilitySettings.getCurrentUTCTimestamp();
-        var status =
-            recallService.getDueMemoryTrackers(
-                currentUser.getUser(), currentTime, java.time.ZoneId.of("Asia/Shanghai"), 0);
-        assertThat(status.totalAssimilatedCount, is(1));
+        assertThat(
+            recallService.getDueMemoryTrackers(currentUser.getUser(), currentTime, ZONE, 0)
+                .totalAssimilatedCount,
+            is(1));
       }
 
       @Test
       void shouldExcludeMemoryTrackersForDeletedNotesFromGetMemoryTrackersFor()
           throws UnexpectedNoAccessRightException {
-        makeMe.aMemoryTrackerFor(subject).by(currentUser.getUser()).please();
+        makeMe.aMemoryTrackerFor(subject).please();
 
         controller.deleteNote(subject, leaveDeadLinksDeleteRequest());
 
@@ -169,10 +162,9 @@ class NoteControllerDeleteTests extends ControllerTestBase {
 
       @Test
       void shouldRestoreMemoryTrackersWhenNoteIsRestored() throws UnexpectedNoAccessRightException {
-        makeMe.aMemoryTrackerFor(subject).by(currentUser.getUser()).please();
+        makeMe.aMemoryTrackerFor(subject).please();
 
         controller.deleteNote(subject, leaveDeadLinksDeleteRequest());
-        assertThat(userService.getMemoryTrackersFor(currentUser.getUser(), subject), hasSize(0));
         controller.undoDeleteNote(subject);
 
         assertThat(userService.getMemoryTrackersFor(currentUser.getUser(), subject), hasSize(1));

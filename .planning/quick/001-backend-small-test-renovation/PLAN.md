@@ -1,6 +1,6 @@
 # Backend unit tests → "small test" style
 
-**Status:** in progress (Phase 5 done)  
+**Status:** in progress (Phase 6 done)  
 **Type:** test renovation (no product behavior change)  
 **Verify each phase:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only`  
 **Style:** `.cursor/rules/unit-testing.mdc` + `.cursor/rules/backend-testing.mdc`  
@@ -85,13 +85,16 @@ For each file in the phase file list:
 - **Done when:** those files renovated; suite green.
 
 ### Phase 6 — Controllers: note delete / upload / graph / AI context
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
 - **Observable:** remaining note-controller tests follow rubric.
 - **Files / scope:**
   - `NoteControllerDeleteReduceToSourceTests.java`
   - `NoteControllerDeleteTests.java`
-  - `NoteControllerTests.java` — `UploadNoteImage`, `UpdateNoteRecallSetting`, `GraphTests`, `AiContextMarkdownTests`
+  - `NoteControllerUploadNoteImageTests.java`
+  - `NoteControllerUpdateNoteRecallSettingTests.java`
+  - `NoteControllerGraphTests.java`
+  - `NoteControllerAiContextMarkdownTests.java`
 - **Done when:** those files complete vs rubric; suite green.
 
 ### Phase 7 — Controllers: text content
@@ -290,7 +293,8 @@ If a Behavior phase cannot express fixtures concisely:
 | 3 | done | Real FailureReportRepository for excluded exceptions (was mock that always returned count 0); ControllerSetup uses @MockitoBean GithubService + real TestabilitySettings; merged ExcludedExceptions into ControllerSetupTest; focused asserts / delta-only on duplicate-title + OpenAI handlers; ObjectMapper/NullToNotFound cleaned. TZ migration + DatabaseTimeZone already clean. |
 | 4 | done | PredefinedQuestionTest: AiQuestionGenerator → OpenAIClient + OpenAiStructuredResponseMock (+ enqueue for multi-call); OwnershipTest real User/Circle; NoteEmbeddingTests pure (no Spring); deleted empty NoteAsConstructionTest; focused/delta asserts + notebookOwnedBy; ForgettingCurve parameterized. |
 | 5 | done | Show/stats/spelling: focused asserts + `.aliases()` / `underSameNotebookAs`; parameterized literal spelling; skipped trackers on own note (drop subscription). Post-refactor split oversized `NoteControllerTests` into capability-named files (show / note-info / spelling / delete*). |
-| 6–26 | planned | — |
+| 6 | done | Delete/upload/graph/AI: `notebookOwnedBy` + `underSameNotebookAs`; `asRelationship` MakeMe; tracker rehome canonical once / delta siblings; drop mid-state restore assert; graph relatedNotes fixture (was vacuous). Post-refactor: split remaining nesteds to capability files; extract `RelationshipNoteMarkdown` from NoteBuilder (>250). |
+| 7–26 | planned | — |
 
 ---
 
@@ -305,3 +309,4 @@ If a Behavior phase cannot express fixtures concisely:
 - Phase 3: ControllerSetupExcludedExceptionsTest’s mocked `count()` always returned 0 — did not prove no report was saved; real repo is required for that claim. Framework/config contracts stay in place (TZ repair migrations, ObjectMapper, advice).
 - Phase 4: PredefinedQuestionTest lived as a service-orchestration test under entities/; keep in place with OpenAI external mock. `OpenAiStructuredResponseMock.enqueueStructuredResponse` needed for same-type multi-call (generate → regenerate). Assert stems not full MCQ equality — postProcess / persistence can flip `choicesMayBeShuffled`. NoteEmbedding float round-trip does not need SpringBootTest.
 - Phase 5: Wiki-title canonical shape once; siblings assert noteId (or pipe/qualified deltas). `.aliases()` already refreshes alias index — only refresh wiki cache on the viewer. Note-info skipped-tracker claim does not need subscription wiring when the note is owned by current user. Oversized `NoteControllerTests` split along capability seams during post-change-refactor; Phase 6 paths updated accordingly.
+- Phase 6: `NoteBuilder.asRelationship` + extracted `RelationshipNoteMarkdown` replace local relationship-content helpers. Graph `relatedNotesExpose…` was vacuous with only a root note — needs a linked peer fixture. Tracker-rehome siblings assert property-key delta only after the canonical rehome case. Restore test drops mid-delete assert covered by exclusion sibling. Remaining grab-bag `NoteControllerTests` nesteds split to upload / recall-setting / graph / AI-context files.
