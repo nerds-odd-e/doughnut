@@ -16,13 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class NotebookTest {
   @Autowired MakeMe makeMe;
-  Note rootNote;
   Notebook notebook;
 
   @BeforeEach
   void setup() {
-    notebook = makeMe.aNotebook().creatorAndOwner(makeMe.aUser().please()).please();
-    rootNote = makeMe.aNote().notebook(notebook).please();
+    User user = makeMe.aUser().please();
+    notebook = makeMe.aNotebook().creatorAndOwner(user).please();
+    makeMe.aNote().notebook(notebook).please();
   }
 
   @Nested

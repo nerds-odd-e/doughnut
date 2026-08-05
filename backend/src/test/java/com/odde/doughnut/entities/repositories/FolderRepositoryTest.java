@@ -48,7 +48,6 @@ class FolderRepositoryTest {
 
     Folder loaded = folderRepository.findById(child.getId()).orElseThrow();
 
-    assertThat(loaded.getParentFolder(), notNullValue());
     assertThat(loaded.getParentFolder().getId(), equalTo(parent.getId()));
   }
 
@@ -61,7 +60,6 @@ class FolderRepositoryTest {
 
     Note loaded = noteRepository.findById(note.getId()).orElseThrow();
 
-    assertThat(loaded.getFolder(), notNullValue());
     assertThat(loaded.getFolder().getId(), equalTo(folder.getId()));
   }
 
@@ -73,6 +71,5 @@ class FolderRepositoryTest {
     Note loaded = noteRepository.findById(note.getId()).orElseThrow();
 
     assertThat(loaded.getFolder(), nullValue());
-    assertThat(loaded.getId(), notNullValue());
   }
 }

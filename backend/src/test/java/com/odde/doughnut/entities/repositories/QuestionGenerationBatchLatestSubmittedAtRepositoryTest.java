@@ -2,7 +2,6 @@ package com.odde.doughnut.entities.repositories;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
 
 import com.odde.doughnut.entities.QuestionGenerationBatch;
 import com.odde.doughnut.entities.QuestionGenerationBatchStatus;
@@ -36,7 +35,7 @@ class QuestionGenerationBatchLatestSubmittedAtRepositoryTest {
   @Test
   void returnsEmptyWhenUserHasNoSubmittedBatch() {
     Optional<Timestamp> latest = repository.findLatestSubmittedAtByUser_Id(user.getId());
-    assertThat(latest.isPresent(), is(false));
+    assertThat(latest, equalTo(Optional.empty()));
   }
 
   @Nested
@@ -79,7 +78,7 @@ class QuestionGenerationBatchLatestSubmittedAtRepositoryTest {
       makeMe.entityPersister.flush();
 
       Optional<Timestamp> latest = repository.findLatestSubmittedAtByUser_Id(user.getId());
-      assertThat(latest.isPresent(), is(false));
+      assertThat(latest, equalTo(Optional.empty()));
     }
   }
 

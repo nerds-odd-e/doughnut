@@ -1,7 +1,9 @@
 package com.odde.doughnut.entities;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.controllers.dto.SpellingQuestion;
@@ -19,24 +21,34 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class RecallPromptTest {
   @Autowired MakeMe makeMe;
+  User user;
   Note note;
   MemoryTracker memoryTracker;
 
   @BeforeEach
   void setup() {
-    note = makeMe.aNote("sedition").content("Sedition means incite violence").please();
-    memoryTracker = makeMe.aMemoryTrackerFor(note).by(makeMe.aUser().please()).please();
+    user = makeMe.aUser().please();
+    note =
+        makeMe
+            .aNote("sedition")
+            .notebookOwnedBy(user)
+            .content("Sedition means incite violence")
+            .please();
+    memoryTracker = makeMe.aMemoryTrackerFor(note).please();
+  }
+
+  private RecallPrompt spellingPromptFor(MemoryTracker tracker) {
+    RecallPrompt recallPrompt = new RecallPrompt();
+    recallPrompt.setQuestionType(QuestionType.SPELLING);
+    recallPrompt.setMemoryTracker(tracker);
+    return recallPrompt;
   }
 
   @Nested
   class GetNotebook {
     @Test
     void shouldReturnNotebookFromMemoryTrackerWhenSpellingAndNoPredefinedQuestion() {
-      RecallPrompt recallPrompt = new RecallPrompt();
-      recallPrompt.setQuestionType(QuestionType.SPELLING);
-      recallPrompt.setMemoryTracker(memoryTracker);
-
-      assertThat(recallPrompt.getNotebook(), equalTo(note.getNotebook()));
+      assertThat(spellingPromptFor(memoryTracker).getNotebook(), equalTo(note.getNotebook()));
     }
   }
 
@@ -44,16 +56,9 @@ class RecallPromptTest {
   class GetSpellingQuestion {
     @Test
     void shouldReturnSpellingQuestionWhenQuestionTypeIsSpelling() {
-      RecallPrompt recallPrompt = new RecallPrompt();
-      recallPrompt.setQuestionType(QuestionType.SPELLING);
-      recallPrompt.setMemoryTracker(memoryTracker);
+      SpellingQuestion spellingQuestion = spellingPromptFor(memoryTracker).getSpellingQuestion();
 
-      SpellingQuestion spellingQuestion = recallPrompt.getSpellingQuestion();
-
-      assertThat(spellingQuestion, org.hamcrest.Matchers.notNullValue());
-      assertThat(
-          spellingQuestion.getStem(),
-          org.hamcrest.Matchers.containsString("means incite violence"));
+      assertThat(spellingQuestion.getStem(), containsString("means incite violence"));
       assertThat(spellingQuestion.getNotebook(), equalTo(note.getNotebook()));
     }
 
@@ -62,27 +67,15 @@ class RecallPromptTest {
       Note noteWithFm =
           makeMe
               .aNote("sedition")
+              .notebookOwnedBy(user)
               .content(
                   "---\n" + "see: \"[[Other]]\"\n" + "---\n" + "Sedition means incite violence")
               .please();
-      MemoryTracker tracker =
-          makeMe.aMemoryTrackerFor(noteWithFm).by(makeMe.aUser().please()).please();
-      RecallPrompt recallPrompt = new RecallPrompt();
-      recallPrompt.setQuestionType(QuestionType.SPELLING);
-      recallPrompt.setMemoryTracker(tracker);
+      SpellingQuestion spellingQuestion =
+          spellingPromptFor(makeMe.aMemoryTrackerFor(noteWithFm).please()).getSpellingQuestion();
 
-      SpellingQuestion spellingQuestion = recallPrompt.getSpellingQuestion();
-
-      assertThat(spellingQuestion, org.hamcrest.Matchers.notNullValue());
-      assertThat(
-          spellingQuestion.getStem(),
-          org.hamcrest.Matchers.containsString("means incite violence"));
-      assertThat(
-          spellingQuestion.getStem(),
-          org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("see:")));
-      assertThat(
-          spellingQuestion.getStem(),
-          org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("---")));
+      assertThat(spellingQuestion.getStem(), not(containsString("see:")));
+      assertThat(spellingQuestion.getStem(), not(containsString("---")));
     }
 
     @Test
@@ -91,9 +84,7 @@ class RecallPromptTest {
       recallPrompt.setQuestionType(QuestionType.MCQ);
       recallPrompt.setMemoryTracker(memoryTracker);
 
-      SpellingQuestion spellingQuestion = recallPrompt.getSpellingQuestion();
-
-      assertThat(spellingQuestion, nullValue());
+      assertThat(recallPrompt.getSpellingQuestion(), nullValue());
     }
   }
 }

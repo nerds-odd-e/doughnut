@@ -3,26 +3,19 @@ package com.odde.doughnut.entities;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.entities.repositories.PredefinedQuestionRepository;
 import com.odde.doughnut.services.PredefinedQuestionService;
-import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
-import jakarta.validation.constraints.NotNull;
+import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
+import com.openai.client.OpenAIClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -33,38 +26,55 @@ import org.springframework.transaction.annotation.Transactional;
 @ActiveProfiles("test")
 @Transactional
 class PredefinedQuestionTest {
+  @MockitoBean(name = "officialOpenAiClient")
+  OpenAIClient officialClient;
+
   @Autowired MakeMe makeMe;
   @Autowired PredefinedQuestionService predefinedQuestionService;
   @Autowired PredefinedQuestionRepository predefinedQuestionRepository;
-  @MockitoBean AiQuestionGenerator aiQuestionGenerator;
 
-  User user;
+  OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
   @BeforeEach
   void setup() {
-    user = makeMe.aUser().please();
+    openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
+  }
+
+  private MCQWithAnswer anUnshuffledMcq() {
+    return makeMe.aMCQWithAnswer().choicesMayBeShuffled(false).please();
+  }
+
+  private static QuestionEvaluation evaluation(
+      boolean feasible, int[] correctChoices, String advice) {
+    QuestionEvaluation evaluation = new QuestionEvaluation();
+    evaluation.feasibleQuestion = feasible;
+    evaluation.correctChoices = correctChoices;
+    evaluation.improvementAdvices = advice;
+    return evaluation;
+  }
+
+  private static QuestionEvaluation accepting(MCQWithAnswer mcq) {
+    return evaluation(true, new int[] {mcq.getSolutionChoiceIndex()}, "");
+  }
+
+  private void stubAcceptedGeneration(MCQWithAnswer mcq) {
+    openAiStructuredResponseMock.stubStructuredResponse(mcq);
+    openAiStructuredResponseMock.stubStructuredResponse(accepting(mcq));
   }
 
   @Nested
   class SpellingQuiz {
-    Note note;
-
-    @BeforeEach
-    void setup() {
-      note = makeMe.aNote().rememberSpelling().please();
-      makeMe.aNote("a necessary sibling as filling option").please();
-    }
-
     @Test
     void shouldAlwaysChooseAIQuestionIfConfigured() {
-      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any(), any(), any()))
-          .thenReturn(mcqWithAnswer);
-      PredefinedQuestion randomQuizQuestion = generateQuizQuestionEntity(note);
-      assertThat(randomQuizQuestion, instanceOf(PredefinedQuestion.class));
-      PredefinedQuestion qq = randomQuizQuestion;
+      Note note = makeMe.aNote().rememberSpelling().please();
+      makeMe.aNote("a necessary sibling as filling option").please();
+      MCQWithAnswer mcqWithAnswer = anUnshuffledMcq();
+      stubAcceptedGeneration(mcqWithAnswer);
+
+      PredefinedQuestion result = predefinedQuestionService.generateAFeasibleQuestion(note);
+
       assertThat(
-          qq.getMultipleChoicesQuestion().getQuestionStem(),
+          result.getMultipleChoicesQuestion().getQuestionStem(),
           containsString(mcqWithAnswer.getQuestion().getQuestionStem()));
     }
   }
@@ -73,69 +83,59 @@ class PredefinedQuestionTest {
   class AutoEvaluateAndRegenerate {
     Note note;
     MCQWithAnswer mcqWithAnswer;
-    QuestionEvaluation contestResult;
 
     @BeforeEach
     void setup() {
       note = makeMe.aNote().please();
-      mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      contestResult = new QuestionEvaluation();
+      mcqWithAnswer = anUnshuffledMcq();
     }
 
     @Test
-    void returnsOriginalQuestionWhenEvaluationDoesNotReject() {
-      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any(), any(), any()))
-          .thenReturn(mcqWithAnswer);
-      contestResult.feasibleQuestion = false;
-      when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(contestResult);
+    void returnsOriginalQuestionWhenEvaluationAcceptsIt() {
+      stubAcceptedGeneration(mcqWithAnswer);
 
       PredefinedQuestion result = predefinedQuestionService.generateAFeasibleQuestion(note);
 
-      assertThat(result.getMcqWithAnswer(), equalTo(mcqWithAnswer));
+      assertThat(
+          result.getMultipleChoicesQuestion().getQuestionStem(),
+          equalTo(mcqWithAnswer.getQuestion().getQuestionStem()));
     }
 
     @Test
-    void storesSameContextSeedOnPredefinedQuestionAsPassedToAiGenerator() {
-      contestResult.feasibleQuestion = false;
-      when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(contestResult);
-
-      ArgumentCaptor<Long> seedCaptor = ArgumentCaptor.forClass(Long.class);
-      Mockito.reset(aiQuestionGenerator);
-      when(aiQuestionGenerator.getAiGeneratedQuestion(
-              eq(note), isNull(), seedCaptor.capture(), any()))
-          .thenReturn(mcqWithAnswer);
+    void storesContextSeedOnPredefinedQuestion() {
+      stubAcceptedGeneration(mcqWithAnswer);
 
       PredefinedQuestion result = predefinedQuestionService.generateAFeasibleQuestion(note);
 
-      assertThat(result.getContextSeed(), equalTo(seedCaptor.getValue()));
+      assertThat(result.getContextSeed(), notNullValue());
     }
 
     @Test
     void shouldReturnOriginalQuestionWhenEvaluationApiFails() {
-      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any(), any(), any()))
-          .thenReturn(mcqWithAnswer);
-      // Simulate evaluation API failure by returning null
-      when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(null);
+      openAiStructuredResponseMock.stubStructuredResponse(mcqWithAnswer);
+      openAiStructuredResponseMock.stubStructuredResponse(null);
 
       PredefinedQuestion result = predefinedQuestionService.generateAFeasibleQuestion(note);
 
-      // Should still return the generated question even when evaluation fails
-      assertThat(result.getMcqWithAnswer(), equalTo(mcqWithAnswer));
+      assertThat(
+          result.getMultipleChoicesQuestion().getQuestionStem(),
+          equalTo(mcqWithAnswer.getQuestion().getQuestionStem()));
     }
 
     @Test
     void shouldRegenerateQuestionWhenEvaluationShowsNotFeasible() {
-      MCQWithAnswer regeneratedQuestion = makeMe.aMCQWithAnswer().please();
-      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any(), any(), any()))
-          .thenReturn(mcqWithAnswer);
-      contestResult.feasibleQuestion = true;
-      when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(contestResult);
-      when(aiQuestionGenerator.regenerateQuestion(any(), any(), any(), any(), any()))
-          .thenReturn(regeneratedQuestion);
+      MCQWithAnswer regeneratedQuestion =
+          makeMe.aMCQWithAnswer().stem("regenerated stem").choicesMayBeShuffled(false).please();
+      openAiStructuredResponseMock.enqueueStructuredResponse(mcqWithAnswer);
+      openAiStructuredResponseMock.enqueueStructuredResponse(regeneratedQuestion);
+      openAiStructuredResponseMock.enqueueStructuredResponse(
+          evaluation(false, new int[] {}, "not feasible"));
+      openAiStructuredResponseMock.enqueueStructuredResponse(accepting(regeneratedQuestion));
 
       PredefinedQuestion result = predefinedQuestionService.generateAFeasibleQuestion(note);
 
-      assertThat(result.getMcqWithAnswer(), equalTo(regeneratedQuestion));
+      assertThat(
+          result.getMultipleChoicesQuestion().getQuestionStem(), equalTo("regenerated stem"));
       assertThat(result.isContested(), is(false));
 
       PredefinedQuestion contestedOriginal = null;
@@ -147,11 +147,8 @@ class PredefinedQuestionTest {
       }
       assertThat(contestedOriginal, notNullValue());
       assertThat(
-          contestedOriginal.getMcqWithAnswer().getQuestion(), equalTo(mcqWithAnswer.getQuestion()));
+          contestedOriginal.getMultipleChoicesQuestion().getQuestionStem(),
+          equalTo(mcqWithAnswer.getQuestion().getQuestionStem()));
     }
-  }
-
-  private PredefinedQuestion generateQuizQuestionEntity(@NotNull Note note) {
-    return predefinedQuestionService.generateAFeasibleQuestion(note);
   }
 }

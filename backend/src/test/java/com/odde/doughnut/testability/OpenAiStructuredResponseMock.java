@@ -53,24 +53,31 @@ public class OpenAiStructuredResponseMock {
     return responseService;
   }
 
-  /** Stubs the next {@code officialClient.responses().create(...)} result. */
+  /**
+   * Stubs the next {@code officialClient.responses().create(...)} result, replacing any prior stub
+   * of the same type.
+   */
   public void stubStructuredResponse(Object result) {
+    if (result != null) {
+      structuredResults.computeIfAbsent(result.getClass(), ignored -> new LinkedList<>()).clear();
+    }
+    enqueueStructuredResponse(result);
+  }
+
+  /**
+   * Enqueues a structured result without clearing prior stubs of the same type (for multi-call
+   * flows that return the same response type more than once).
+   */
+  public void enqueueStructuredResponse(Object result) {
     if (result == null) {
       fallbackStructuredResults.add(null);
-    } else {
-      addStructuredResult(result);
+      return;
     }
+    structuredResults.computeIfAbsent(result.getClass(), ignored -> new LinkedList<>()).add(result);
   }
 
   public void stubStructuredResponseMalformed(String malformedJson) {
     fallbackStructuredResults.add(new MalformedStructuredContent(malformedJson));
-  }
-
-  private void addStructuredResult(Object result) {
-    Queue<Object> resultsForType =
-        structuredResults.computeIfAbsent(result.getClass(), ignored -> new LinkedList<>());
-    resultsForType.clear();
-    resultsForType.add(result);
   }
 
   private Object pollStructuredResult(Class<?> responseType) {

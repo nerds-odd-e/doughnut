@@ -1,6 +1,6 @@
 # Backend unit tests → "small test" style
 
-**Status:** in progress (Phase 3 done)  
+**Status:** in progress (Phase 4 done)  
 **Type:** test renovation (no product behavior change)  
 **Verify each phase:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only`  
 **Style:** `.cursor/rules/unit-testing.mdc` + `.cursor/rules/backend-testing.mdc`  
@@ -67,7 +67,7 @@ For each file in the phase file list:
 - **Done when:** rubric applied; suite green.
 
 ### Phase 4 — Entities and entity repositories
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
 - **Observable:** entity/repo tests follow rubric; illicit mocks removed where possible.
 - **Files:** `backend/src/test/java/com/odde/doughnut/entities/**`
@@ -281,7 +281,8 @@ If a Behavior phase cannot express fixtures concisely:
 | 1 | done | Light pass: focused asserts, merge/dedupe parameterized cases, Optional.empty positives; split FrontmatterAliasesWikiLinkOverlapTest (>250). Suite green after local doughnut_test recreate (post-squash stale history). |
 | 2 | done | Focused asserts / parameterized merges; FailureReportFactoryTest → real repo + only GithubService mock; TextContent uses Spring Validator. DisplayNamePathSeparatorsTrim / RealRandomizer / Robots already clean. |
 | 3 | done | Real FailureReportRepository for excluded exceptions (was mock that always returned count 0); ControllerSetup uses @MockitoBean GithubService + real TestabilitySettings; merged ExcludedExceptions into ControllerSetupTest; focused asserts / delta-only on duplicate-title + OpenAI handlers; ObjectMapper/NullToNotFound cleaned. TZ migration + DatabaseTimeZone already clean. |
-| 4–26 | planned | — |
+| 4 | done | PredefinedQuestionTest: AiQuestionGenerator → OpenAIClient + OpenAiStructuredResponseMock (+ enqueue for multi-call); OwnershipTest real User/Circle; NoteEmbeddingTests pure (no Spring); deleted empty NoteAsConstructionTest; focused/delta asserts + notebookOwnedBy; ForgettingCurve parameterized. |
+| 5–26 | planned | — |
 
 ---
 
@@ -294,3 +295,4 @@ If a Behavior phase cannot express fixtures concisely:
 - Local `doughnut_test` after Flyway squash may still hold pre-squash history without baseline tables — recreate DB + `migrateTestDB` if `backend:test_only` fails with missing tables/columns.
 - Phase 2 pure-contract packages were mostly light debt; main win was dropping collaborator mocks on FailureReportFactory (keep GithubService as external).
 - Phase 3: ControllerSetupExcludedExceptionsTest’s mocked `count()` always returned 0 — did not prove no report was saved; real repo is required for that claim. Framework/config contracts stay in place (TZ repair migrations, ObjectMapper, advice).
+- Phase 4: PredefinedQuestionTest lived as a service-orchestration test under entities/; keep in place with OpenAI external mock. `OpenAiStructuredResponseMock.enqueueStructuredResponse` needed for same-type multi-call (generate → regenerate). Assert stems not full MCQ equality — postProcess / persistence can flip `choicesMayBeShuffled`. NoteEmbedding float round-trip does not need SpringBootTest.

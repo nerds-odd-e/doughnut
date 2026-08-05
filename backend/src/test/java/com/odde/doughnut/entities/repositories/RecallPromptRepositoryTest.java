@@ -49,12 +49,11 @@ public class RecallPromptRepositoryTest {
 
     @Test
     void shouldCountWrongAnswersOnly() {
-      // correctAnswerIndex defaults to 0, so answerChoiceIndex(1) = wrong
       makeMe
           .aRecallPrompt()
           .withPredefinedQuestionForNote(note)
           .forMemoryTracker(memoryTracker)
-          .answerChoiceIndex(1) // wrong answer
+          .answerChoiceIndex(1)
           .answerTimestamp(now)
           .please();
 
@@ -70,7 +69,7 @@ public class RecallPromptRepositoryTest {
           .aRecallPrompt()
           .withPredefinedQuestionForNote(note)
           .forMemoryTracker(memoryTracker)
-          .answerChoiceIndex(0) // correct answer
+          .answerChoiceIndex(0)
           .answerTimestamp(now)
           .please();
 
@@ -87,7 +86,7 @@ public class RecallPromptRepositoryTest {
           .aRecallPrompt()
           .withPredefinedQuestionForNote(note)
           .forMemoryTracker(memoryTracker)
-          .answerChoiceIndex(1) // wrong answer
+          .answerChoiceIndex(1)
           .answerTimestamp(beforePeriod)
           .please();
 

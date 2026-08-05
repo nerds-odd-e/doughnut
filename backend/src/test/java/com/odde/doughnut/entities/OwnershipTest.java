@@ -1,8 +1,6 @@
 package com.odde.doughnut.entities;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -21,10 +19,10 @@ class OwnershipTest {
   }
 
   static Stream<Arguments> ownerNameCases() {
-    User user = mock(User.class);
-    when(user.getName()).thenReturn("John Doe");
-    Circle circle = mock(Circle.class);
-    when(circle.getName()).thenReturn("Circle Name");
+    User user = new User();
+    user.setName("John Doe");
+    Circle circle = new Circle();
+    circle.setName("Circle Name");
     return Stream.of(
         Arguments.of("John Doe", (OwnerSetup) o -> o.setUser(user)),
         Arguments.of("Circle Name", (OwnerSetup) o -> o.setCircle(circle)));
