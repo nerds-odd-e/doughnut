@@ -14,6 +14,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     AcceptRejectButtons: typeof import('./src/components/commons/AcceptRejectButtons.vue')['default']
     AccidentalMatchResolveDialog: typeof import('./src/components/recall/AccidentalMatchResolveDialog.vue')['default']
+    AccidentalMatchResolveRow: typeof import('./src/components/recall/AccidentalMatchResolveRow.vue')['default']
     AccountMenuItem: typeof import('./src/components/toolbars/AccountMenuItem.vue')['default']
     AddRelationshipFinalize: typeof import('./src/components/links/AddRelationshipFinalize.vue')['default']
     AiRequestExportDialog: typeof import('./src/components/commons/AiRequestExportDialog.vue')['default']
@@ -270,6 +271,7 @@ declare module 'vue' {
 declare global {
   const AcceptRejectButtons: typeof import('./src/components/commons/AcceptRejectButtons.vue')['default']
   const AccidentalMatchResolveDialog: typeof import('./src/components/recall/AccidentalMatchResolveDialog.vue')['default']
+  const AccidentalMatchResolveRow: typeof import('./src/components/recall/AccidentalMatchResolveRow.vue')['default']
   const AccountMenuItem: typeof import('./src/components/toolbars/AccountMenuItem.vue')['default']
   const AddRelationshipFinalize: typeof import('./src/components/links/AddRelationshipFinalize.vue')['default']
   const AiRequestExportDialog: typeof import('./src/components/commons/AiRequestExportDialog.vue')['default']
