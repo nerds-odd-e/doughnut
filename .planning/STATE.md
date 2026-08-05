@@ -31,8 +31,8 @@ See: `.planning/PROJECT.md` (updated 2026-08-03 after v1.2)
 
 Phase: —
 Plan: —
-Status: ADR discussion (v1.2 archived; next milestone not started)
-Last activity: 2026-08-05 — ADR 0002 clarification (architecture / authority division)
+Status: Quick task 260805-j23 planned — remove LIA portable-workspace sync/lint after ADR 0002
+Last activity: 2026-08-05 — quick plan for aggressive portable-workspace cleanup
 
 ## Performance Metrics
 
@@ -150,12 +150,12 @@ Items acknowledged and deferred at milestone close on 2026-08-03 (v1.2 `override
 
 ## Session Continuity
 
-**Last session:** 2026-08-05T11:05:00+08:00
-**Stopped at:** ADR 0002 under discussion
-**Next action:** Continue advice/discussion on Proposed ADR 0002
-**Resume file:** [ADR 0002](../docs/adrs/0002-git-native-notebooks-backed-by-mysql.md)
+**Last session:** 2026-08-05T13:46:00+08:00
+**Stopped at:** Quick plan 260805-j23 created (portable-workspace cleanup)
+**Next action:** Execute `.planning/quick/260805-j23-clean-up-code-from-last-week-training-pa/260805-j23-PLAN.md`
+**Resume file:** [260805-j23-PLAN.md](./quick/260805-j23-clean-up-code-from-last-week-training-pa/260805-j23-PLAN.md)
 
 ## Operator Next Steps
 
-- Continue Proposed ADR 0002 (Git-native notebooks backed by MySQL).
+- Execute quick task 260805-j23 (trash CLI sync/lint; strip ZIP strengthen; prove `notebook_export.feature`).
 - Optional later: `/gsd-new-milestone` when ready for the next delivery cycle.
