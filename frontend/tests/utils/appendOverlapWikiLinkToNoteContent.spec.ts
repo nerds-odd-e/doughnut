@@ -37,4 +37,62 @@ describe("appendOverlapWikiLinkToNoteContent", () => {
       authoredAliasesValidationErrorForPropertyValue(listPropertyValue(items))
     ).toBeUndefined()
   })
+
+  it("appends a qualified wiki-link for cross-notebook targets", () => {
+    const result = appendOverlapWikiLinkToNoteContent(
+      "## Body\n",
+      makeTarget("Deep Note", 2, "Other NB"),
+      { notebookId: 1 }
+    )
+
+    expect(result).toContain("[[Other NB:Deep Note]]")
+    expect(aliasListItems(result!)).toContain("[[Other NB:Deep Note]]")
+  })
+
+  it("merges a wiki-link into an existing plain-alias list", () => {
+    const markdown = `---
+aliases:
+  - puppy
+---
+
+# Body`
+    const result = appendOverlapWikiLinkToNoteContent(
+      markdown,
+      makeTarget("Canine", 1, "NB"),
+      { notebookId: 1 }
+    )
+
+    expect(aliasListItems(result!)).toEqual(["puppy", "[[Canine]]"])
+  })
+
+  it("returns null when the same wiki-link is already present", () => {
+    const markdown = `---
+aliases:
+  - "[[Sedation]]"
+---
+
+# Body`
+    expect(
+      appendOverlapWikiLinkToNoteContent(
+        markdown,
+        makeTarget("Sedation", 1, "NB"),
+        { notebookId: 1 }
+      )
+    ).toBeNull()
+  })
+
+  it("returns null when aliases is not a YAML list", () => {
+    const markdown = `---
+aliases: puppy
+---
+
+# Body`
+    expect(
+      appendOverlapWikiLinkToNoteContent(
+        markdown,
+        makeTarget("Canine", 1, "NB"),
+        { notebookId: 1 }
+      )
+    ).toBeNull()
+  })
 })
