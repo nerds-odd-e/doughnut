@@ -4,17 +4,17 @@ milestone: v1.2
 milestone_name: Accidental Match Resolve UX
 current_phase: 7
 current_phase_name: Compact result + Resolve dialog shell
-status: ready_to_execute
-stopped_at: Phase 7 planned — ready to execute
-last_updated: "2026-08-05T08:55:51.760Z"
+status: in_progress
+stopped_at: Completed 07-01-PLAN.md
+last_updated: "2026-08-05T09:03:24.179Z"
 last_activity: 2026-08-05
-last_activity_desc: Phase 7 07-01/07-02 PLAN.md created
+last_activity_desc: Completed 07-01 compact resolve dialog shell
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 2
-  completed_plans: 0
-  percent: 0
+  completed_plans: 1
+  percent: 50
 ---
 
 # Project State
@@ -24,16 +24,16 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 **Core value:** Healthy mainline for learning and knowledge work — reviewed note stays primary during accidental-match results.
-**Current focus:** Phase 7 — Compact result + Resolve dialog shell (plans ready to execute)
+**Current focus:** Phase 7 — Compact result + Resolve dialog shell (07-01 done; 07-02 next)
 
 ## Current Position
 
 Phase: 7 of 12 (Compact result + Resolve dialog shell)
-Plan: 07-01 next
-Status: Plans written — ready for `/gsd-execute-phase 7`
-Last activity: 2026-08-05 — Phase 7 07-01/07-02 PLAN.md created
+Plan: 07-02 next (of 2)
+Status: 07-01 complete — ready for 07-02 execute
+Last activity: 2026-08-05 — Completed 07-01 compact resolve dialog shell
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
@@ -43,7 +43,13 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 07 | 1/2 | 6min | 6min |
+
+**Per-Plan Metrics:**
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase 07 P01 | 6min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -54,6 +60,8 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 - AMR-07 (readonly gating) lives with first mutating action (Phase 9 Build a link)
 - Phase 10 is Structure-only (overlap alias append util) immediately before Phase 11
 - SEED-001 and AMR-10..13 deferred to v2 — not on this roadmap
+- [Phase 7]: Slot AccidentalMatchResolveDialog without closer — Modal dismiss covers AMR-03
+- [Phase 7]: Keep MatchedNoteLinkOffer.vue unused until Phase 9 Build a link
 
 ### Pending Todos
 
@@ -75,7 +83,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-08-05T08:55:51.754Z
-Stopped at: Phase 7 planned — ready to execute
-Resume file: .planning/phases/07-compact-result-resolve-dialog-shell/07-01-PLAN.md
-Next action: `/gsd-execute-phase 7`
+Last session: 2026-08-05T09:03:24.173Z
+Stopped at: Completed 07-01-PLAN.md
+Resume file: None
+Next action: Execute 07-02-PLAN.md (E2E rewrite)

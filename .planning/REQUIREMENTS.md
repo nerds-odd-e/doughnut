@@ -9,9 +9,9 @@ Requirements for milestone v1.2. Each maps to roadmap phases.
 
 ### Compact result chrome
 
-- [ ] **AMR-01**: On an accidental-match spelling result, the UI does not stack full matched-note bodies under the reviewed note (reviewed note keeps primary focus)
-- [ ] **AMR-02**: User sees a **Resolve accidental match** control under the accidental-match alert that opens a resolve dialog when matches exist
-- [ ] **AMR-03**: User can dismiss the resolve dialog anytime and continue without resolving any match
+- [x] **AMR-01**: On an accidental-match spelling result, the UI does not stack full matched-note bodies under the reviewed note (reviewed note keeps primary focus)
+- [x] **AMR-02**: User sees a **Resolve accidental match** control under the accidental-match alert that opens a resolve dialog when matches exist
+- [x] **AMR-03**: User can dismiss the resolve dialog anytime and continue without resolving any match
 
 ### Match identity in dialog
 
@@ -62,9 +62,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AMR-01 | Phase 7 | Pending |
-| AMR-02 | Phase 7 | Pending |
-| AMR-03 | Phase 7 | Pending |
+| AMR-01 | Phase 7 | Complete |
+| AMR-02 | Phase 7 | Complete |
+| AMR-03 | Phase 7 | Complete |
 | AMR-04 | Phase 8 | Pending |
 | AMR-05 | Phase 12 | Pending |
 | AMR-06 | Phase 9 | Pending |
@@ -73,11 +73,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AMR-09 | Phase 11 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 9 total
 - Mapped to phases: 9
 - Unmapped: 0
 
 **Phase notes:**
+
 - Phase 10 is Structure (overlap alias append util) — no requirement ID; enables Phase 11
 - AMR-07 mapped with first mutating action (Phase 9 Build a link)
 
