@@ -92,9 +92,11 @@ status: complete
 
 ## Task Commits
 
-1. **Task 1 + Task 2: path/clickable title asserts + feature wording** — `3661589449` — test(08-02): assert path identity and clickable title in resolve dialog
+1. **Task 1 + Task 2: path/clickable title asserts + feature wording** — `a890de8e57` — test(08-02): assert path identity and clickable title in resolve dialog
 
 _Task 2 Feature blurb landed in the same commit (parallel edit during Task 1 commit)._
+
+**Plan metadata:** `ad8658aa20` (docs: complete plan); `602262be2d` (docs: mark Phase 8 complete)
 
 ## Files Created/Modified
 
