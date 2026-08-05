@@ -70,6 +70,25 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
   }
 
   @Test
+  void shouldGradeAsOverlapWhenLegacyWikiLinkDeclaredUnderAliases()
+      throws UnexpectedNoAccessRightException {
+    Note partner =
+        makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("Shared Legacy").please();
+    Note reviewed =
+        makeMe
+            .aNote()
+            .notebookOwnedBy(currentUser.getUser())
+            .rememberSpelling()
+            .title("Shared Legacy")
+            .legacyOverlapPartner(partner)
+            .please();
+
+    AnsweredQuestion result = answerSpelling(ownedSpellingTracker(reviewed), "Shared Legacy");
+
+    assertThat(result.getAnswer().getOutcome(), is(AnswerOutcome.OVERLAP));
+  }
+
+  @Test
   void shouldGradeCorrectWithCreditWhenDistinguishingPlainAlias()
       throws UnexpectedNoAccessRightException {
     Integer recallCountBefore = memoryTracker.getRecallCount();

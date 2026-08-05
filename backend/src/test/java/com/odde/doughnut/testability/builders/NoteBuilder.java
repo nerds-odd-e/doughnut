@@ -18,9 +18,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   private List<PredefinedQuestionBuilder> predefinedQuestionBuilders = new ArrayList<>();
   private List<NoteBuilder> childrenBuilders = new ArrayList<>();
   private Folder folder;
-  private final List<String> plainAliases = new ArrayList<>();
-  private final List<String> overlapWikiLinkInners = new ArrayList<>();
-  private boolean refreshAliasIndex;
+  private final NoteFrontmatterLists frontmatterLists = new NoteFrontmatterLists();
 
   public NoteBuilder(Note note, MakeMe makeMe) {
     super(makeMe, note);
@@ -93,14 +91,16 @@ public class NoteBuilder extends EntityBuilder<Note> {
     if (folder != null) {
       entity.setFolder(folder);
     }
-    applyPendingAliasFrontmatter();
+    applyPendingFrontmatterLists();
   }
 
   @Override
   protected void afterCreate(boolean needPersist) {
     childrenBuilders.forEach(bu -> bu.please(needPersist));
     predefinedQuestionBuilders.forEach(bu -> bu.please(needPersist));
-    if (needPersist && refreshAliasIndex && makeMe.noteAliasIndexService != null) {
+    if (needPersist
+        && frontmatterLists.shouldRefreshAliasIndex()
+        && makeMe.noteAliasIndexService != null) {
       makeMe.noteAliasIndexService.refreshForNote(entity);
     }
   }
@@ -150,44 +150,48 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   /** Adds plain frontmatter aliases and refreshes the alias index after persist. */
   public NoteBuilder aliases(String... aliases) {
-    plainAliases.addAll(List.of(aliases));
-    refreshAliasIndex = true;
+    frontmatterLists.addPlainAliases(aliases);
     return this;
   }
 
   /**
-   * Declares an overlap wiki-link alias targeting {@code partner} ({@code notebook:title} form).
-   * Partner must already be persisted so its notebook name is available.
+   * Declares an overlap under frontmatter {@code overlaps} targeting {@code partner} ({@code
+   * notebook:title} form). Partner must already be persisted so its notebook name is available.
    */
   public NoteBuilder overlapPartner(Note partner) {
-    Notebook notebook = partner.getNotebook();
-    overlapWikiLinkInners.add(notebook.getName() + ":" + partner.getTitle());
+    frontmatterLists.addOverlapPartner(partner);
     return this;
   }
 
   /**
-   * Declares an overlap wiki-link alias with the given inner token (e.g. {@code Title} or {@code
-   * NB:Title}).
+   * Declares an overlap under frontmatter {@code overlaps} with the given inner token (e.g. {@code
+   * Title} or {@code NB:Title}).
    */
   public NoteBuilder overlapWikiLink(String wikiLinkInner) {
-    overlapWikiLinkInners.add(wikiLinkInner);
-    refreshAliasIndex = true;
+    frontmatterLists.addOverlapWikiLink(wikiLinkInner);
     return this;
   }
 
-  private void applyPendingAliasFrontmatter() {
-    if (plainAliases.isEmpty() && overlapWikiLinkInners.isEmpty()) {
-      return;
+  /**
+   * Declares a legacy wiki-link overlap under {@code aliases} (dual-read path until aliases are
+   * plain-only).
+   */
+  public NoteBuilder legacyOverlapPartner(Note partner) {
+    frontmatterLists.addLegacyOverlapPartner(partner);
+    return this;
+  }
+
+  /** Declares a legacy wiki-link overlap under {@code aliases}. */
+  public NoteBuilder legacyOverlapWikiLink(String wikiLinkInner) {
+    frontmatterLists.addLegacyOverlapWikiLink(wikiLinkInner);
+    return this;
+  }
+
+  private void applyPendingFrontmatterLists() {
+    String composed = frontmatterLists.composedContentOrEmpty();
+    if (!composed.isEmpty()) {
+      content(composed);
     }
-    StringBuilder yaml = new StringBuilder("---\naliases:\n");
-    for (String alias : plainAliases) {
-      yaml.append("  - ").append(alias).append('\n');
-    }
-    for (String inner : overlapWikiLinkInners) {
-      yaml.append("  - \"[[").append(inner).append("]]\"\n");
-    }
-    yaml.append("---\n\nBody text");
-    content(yaml.toString());
   }
 
   public NoteBuilder updatedAt(Timestamp timestamp) {

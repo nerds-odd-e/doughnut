@@ -1,6 +1,6 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.algorithms.FrontmatterAliases;
+import com.odde.doughnut.algorithms.FrontmatterOverlaps;
 import com.odde.doughnut.algorithms.WikiLinkMarkdown;
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
@@ -311,7 +311,8 @@ public class MemoryTrackerService {
 
   private boolean isNonDistinguishingOverlap(Note reviewedNote, String spellingAnswer, User user) {
     for (String token :
-        FrontmatterAliases.overlapWikiLinkTokensFromNoteContent(reviewedNote.getContent())) {
+        FrontmatterOverlaps.gradingOverlapWikiLinkTokensFromNoteContent(
+            reviewedNote.getContent())) {
       Matcher matcher = WikiLinkMarkdown.INNER_LINK_PATTERN.matcher(token);
       if (!matcher.matches()) {
         continue;

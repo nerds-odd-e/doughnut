@@ -5,10 +5,10 @@ milestone_name: Accidental Match Resolve UX
 current_phase: 12
 current_phase_name: Title navigate, reopen, E2E polish
 status: gap_closure_in_progress
-stopped_at: Quick 002 Phase 3 done (rich overlaps authoring); next Phase 4 grading from overlaps
-last_updated: "2026-08-06T08:00:00Z"
+stopped_at: Quick 002 Phase 4 done (OVERLAP grading dual-reads overlaps + legacy aliases); next Phase 5 dialog writes overlaps
+last_updated: "2026-08-06T08:30:00Z"
 last_activity: 2026-08-06
-last_activity_desc: Quick 002 Phase 3 — rich-mode overlaps property (wiki-link list + FE/BE validation)
+last_activity_desc: Quick 002 Phase 4 — OVERLAP grading from overlaps with dual-read legacy wiki-in-aliases
 progress:
   total_phases: 6
   completed_phases: 6
@@ -30,8 +30,8 @@ See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 Phase: 12 of 12 (Title navigate, reopen, E2E polish) — complete
 Plan: 12-01 executed; 12-02 skipped (KeepAlive sufficient)
-Status: Gap closure quick/002 — Phase 3 (rich overlaps authoring) done; Phase 4 next (grading still ignores overlaps until then)
-Last activity: 2026-08-06 — overlaps wiki-link list property + FE/BE validation + link display
+Status: Gap closure quick/002 — Phase 4 (grading dual-read) done; Phase 5 next (dialog still writes aliases)
+Last activity: 2026-08-06 — OVERLAP grading reads `overlaps` ∪ legacy wiki-in-`aliases`
 
 Progress: [██████████] 100% (6/6 v1.2 phases; 11/11 plans accounted — 10 executed + 1 skipped)
 
@@ -105,10 +105,11 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 - [Phase 12]: KeepAlive live matchedNotes sufficient for AMR-05 reopen; Plan 12-02 can be skipped
 - [Phase 12]: AMR-05 return path is cy.go('back') only — not Resume or full remount
 - [Quick 002 Phase 2]: Shared seam = `frontmatterStringList` + `authoredListPropertyValidation`; aliases remain the only authored list key until Phase 3
+- [Quick 002 Phase 4]: Grading dual-reads `FrontmatterOverlaps.gradingOverlapWikiLinkTokensFromNoteContent`; NoteBuilder prefers `overlaps`; dialog still writes aliases until Phase 5
 
 ### Pending Todos
 
-- Continue `.planning/quick/002-overlaps-property-and-resolve-polish/` from Phase 3 (OVL-02..07 remain)
+- Continue `.planning/quick/002-overlaps-property-and-resolve-polish/` from Phase 5 (OVL-05..07 remain)
 - Confirm D-mig (legacy wiki-in-aliases migration) at Phase 7 Jidoka; D-copy draft shipped in Phase 1 (tweak OK)
 - Process: still missing `*-VERIFICATION.md` for phases 7–12 (audit process gate)
 
@@ -116,7 +117,7 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 
 - Resolved (12-01): KeepAlive live session preserves `matchedNotes` after history back — no OpenAPI enrichment
 - Do not conflate dialog overlap declare with `AnswerOutcome.OVERLAP` try-again / SRS reclaim (ADR 0003) — Phase 11 locked; OVL plan keeps that policy, changes storage only
-- Product: overlap must leave `aliases` — dual-purpose wiki-in-aliases is the gap being closed
+- Product: overlap must leave `aliases` — dual-read active; dialog write + aliases plain-only remain for Phases 5–7
 
 ## Deferred Items
 
@@ -130,6 +131,6 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 ## Session Continuity
 
 Last session: 2026-08-06
-Stopped at: Quick 002 Phase 2 done (shared string-list frontmatter helpers)
+Stopped at: Quick 002 Phase 4 done (OVERLAP grading dual-read)
 Resume file: .planning/quick/002-overlaps-property-and-resolve-polish/PLAN.md
-Next action: `execute-plan` Phase 3 — Behavior: rich-mode `overlaps` property
+Next action: `execute-plan` Phase 5 — Behavior: dialog declares into `overlaps`

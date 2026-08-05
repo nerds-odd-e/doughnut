@@ -72,7 +72,7 @@ Map OVL-* into REQUIREMENTS.md when this plan is accepted onto the roadmap / mil
 - **Learnings:** Registered `overlaps` on shared authored-list seam (`isAuthoredListPropertyKey` + preset + wiki-link-only validation). List display uses `propertyValuePlainToDisplayHtml` for overlaps only. Shared `wholeWikiLinkItem` / `WikiLinkMarkdown.isWellFormedWholeLinkToken`. **Interim:** OVERLAP grading still reads wiki-in-`aliases` only — authored `overlaps` are ignored by the grader until Phase 4. Prefer landing Phase 4 immediately.
 
 ### Phase 4 — OVERLAP grading reads `overlaps` (+ dual-read legacy)
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
 - **Requirements:** OVL-04 (partial dual-read)
 - **Observable:**
@@ -82,6 +82,7 @@ Map OVL-* into REQUIREMENTS.md when this plan is accepted onto the roadmap / mil
 - **Tests:** BE recall/overlap tests via `NoteBuilder` / controller boundary; update fixtures to prefer `overlaps`
 - **Done when:** New declarations in `overlaps` grade correctly; legacy wiki-in-aliases still work until Phase 7
 - **Stop-safe:** Existing notebooks keep working
+- **Learnings:** Grader dual-reads via `FrontmatterOverlaps.gradingOverlapWikiLinkTokensFromNoteContent` (overlaps ∪ legacy wiki-in-aliases). `NoteBuilder.overlapPartner`/`overlapWikiLink` write `overlaps`; `legacyOverlapPartner` covers dual-read. Dialog still appends aliases until Phase 5.
 
 ### Phase 5 — Dialog declares into `overlaps`
 - **Status:** planned
@@ -134,7 +135,7 @@ Map OVL-* into REQUIREMENTS.md when this plan is accepted onto the roadmap / mil
 ## Interim behavior
 
 - Dual-read wiki-in-`aliases` during Phases 4–6 is allowed; **remove** in Phase 7.
-- **Phase 3 complete without Phase 4:** users can author valid `overlaps` lists (FE+BE reject invalid shapes; rich UI shows wiki links), but **OVERLAP grading still ignores `overlaps`** until Phase 4. Do not leave this as a long-term stop point.
+- **Phase 4 done:** OVERLAP grading reads `overlaps` and still honors legacy wiki-in-`aliases`. Dialog write path still targets `aliases` until Phase 5.
 
 ## Anti-patterns to avoid
 
@@ -152,7 +153,7 @@ Map OVL-* into REQUIREMENTS.md when this plan is accepted onto the roadmap / mil
 | 1 Explain overlap in dialog | done |
 | 2 Shared list-property Structure | done |
 | 3 Rich `overlaps` + validation + link display | done |
-| 4 Grading from `overlaps` (+ dual-read) | planned |
+| 4 Grading from `overlaps` (+ dual-read) | done |
 | 5 Dialog writes `overlaps` | planned |
 | 6 Disable when already declared | planned |
 | 7 Aliases plain-only + migrate | planned |
