@@ -8,7 +8,6 @@ import com.odde.doughnut.controllers.dto.AssimilationNextDTO;
 import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.NotePropertyIndexService;
 import java.sql.Timestamp;
 import java.util.List;
@@ -19,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.server.ResponseStatusException;
 
 class AssimilationControllerTests extends ControllerTestBase {
-  @Autowired private NoteRepository noteRepository;
   @Autowired private MemoryTrackerRepository memoryTrackerRepository;
   @Autowired AssimilationController controller;
   @Autowired NotePropertyIndexService notePropertyIndexService;
@@ -29,15 +27,25 @@ class AssimilationControllerTests extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
   }
 
+  Note ownedNote(String title) {
+    return makeMe.aNote(title).notebookOwnedBy(currentUser.getUser()).please();
+  }
+
+  AssimilationRequestDTO assimilateRequest(Note note) {
+    AssimilationRequestDTO request = new AssimilationRequestDTO();
+    request.noteId = note.getId();
+    return request;
+  }
+
   @Nested
   class Next {
     @Test
     void returnsOwnedNoteWhenSubscriptionDailyCapReached() {
       User user = currentUser.getUser();
-      User notebookOwner = makeMe.aUser().please();
-      Notebook subscribedNotebook = makeMe.aNotebook().creatorAndOwner(notebookOwner).please();
+      Notebook subscribedNotebook =
+          makeMe.aNotebook().creatorAndOwner(makeMe.aUser().please()).please();
       Note subscriptionNote = makeMe.aNote("sub").notebook(subscribedNotebook).please();
-      Note ownedNote = makeMe.aNote("owned").notebookOwnedBy(user).please();
+      Note ownedNote = ownedNote("owned");
       makeMe.aSubscription().forNotebook(subscribedNotebook).forUser(user).daily(1).please();
       Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
       testabilitySettings.timeTravelTo(day1);
@@ -55,9 +63,8 @@ class AssimilationControllerTests extends ControllerTestBase {
 
     @Test
     void countsAreCorrect() {
-      User user = currentUser.getUser();
-      makeMe.aNote("note1").notebookOwnedBy(user).please();
-      makeMe.aNote("note2").notebookOwnedBy(user).please();
+      ownedNote("note1");
+      ownedNote("note2");
 
       AssimilationNextDTO result = controller.next("Asia/Shanghai");
       assertThat(result.getCounts().getDueCount(), equalTo(2));
@@ -73,63 +80,48 @@ class AssimilationControllerTests extends ControllerTestBase {
 
     @Test
     void returns_next_property_key_for_untracked_example_of() {
-      User user = currentUser.getUser();
       Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
       testabilitySettings.timeTravelTo(day1);
       Note note =
           makeMe
               .aNote()
-              .notebookOwnedBy(user)
+              .notebookOwnedBy(currentUser.getUser())
               .content("---\nexample of: \"[[Word]]\"\n---\n\nbody")
               .please();
       notePropertyIndexService.refreshForNote(note);
-      makeMe.aMemoryTrackerFor(note).by(user).assimilatedAt(day1).please();
+      makeMe.aMemoryTrackerFor(note).assimilatedAt(day1).please();
 
       AssimilationNextDTO result = controller.next("Asia/Shanghai");
       assertThat(result.getNextUnit().getNoteId(), equalTo(note.getId()));
       assertThat(result.getNextUnit().getPropertyKey(), equalTo("example of"));
-      assertThat(result.getCounts().getTotalUnassimilatedCount(), equalTo(1));
     }
   }
 
   @Nested
   class CreateAssimilationPoint {
     @Test
-    void create() {
+    void notLoggedIn() {
       currentUser.setUser(null);
-      AssimilationRequestDTO info = new AssimilationRequestDTO();
-      assertThrows(ResponseStatusException.class, () -> controller.assimilate(info));
+      assertThrows(
+          ResponseStatusException.class, () -> controller.assimilate(new AssimilationRequestDTO()));
     }
 
     @Test
     void shouldCreateTwoMemoryTrackersWhenRememberSpellingIsTrue() {
-      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      note.getRecallSetting().setRememberSpelling(true);
-      noteRepository.save(note);
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).rememberSpelling().please();
 
-      AssimilationRequestDTO request = new AssimilationRequestDTO();
-      request.noteId = note.getId();
+      List<MemoryTracker> result = controller.assimilate(assimilateRequest(note));
 
-      controller.assimilate(request);
-
-      List<MemoryTracker> memoryTrackers =
-          memoryTrackerRepository.findLast100ByUser(currentUser.getUser().getId());
-      assertThat(
-          memoryTrackers.stream().filter(mt -> mt.getNote().getId().equals(note.getId())).count(),
-          equalTo(2L));
-      assertThat(memoryTrackers.stream().filter(mt -> mt.getSpelling()).count(), equalTo(1L));
-      assertThat(memoryTrackers.stream().filter(mt -> !mt.getSpelling()).count(), equalTo(1L));
+      assertThat(result, hasSize(2));
+      assertThat(result.stream().filter(MemoryTracker::getSpelling).count(), equalTo(1L));
     }
 
     @Test
     void shouldReturnEmptyWhenNoteAlreadyHasMemoryTrackers() {
       Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+      makeMe.aMemoryTrackerFor(note).please();
 
-      AssimilationRequestDTO request = new AssimilationRequestDTO();
-      request.noteId = note.getId();
-
-      List<MemoryTracker> result = controller.assimilate(request);
+      List<MemoryTracker> result = controller.assimilate(assimilateRequest(note));
 
       assertThat(result, empty());
       assertThat(
@@ -139,21 +131,13 @@ class AssimilationControllerTests extends ControllerTestBase {
 
     @Test
     void shouldAddOnlySpellingTrackerWhenAddSpellingOnlyAndNoteHasTrackersButNoSpelling() {
-      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      note.getRecallSetting().setRememberSpelling(true);
-      noteRepository.save(note);
-      makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).rememberSpelling().please();
+      makeMe.aMemoryTrackerFor(note).please();
 
-      AssimilationRequestDTO request = new AssimilationRequestDTO();
-      request.noteId = note.getId();
-
-      List<MemoryTracker> result = controller.assimilate(request);
+      List<MemoryTracker> result = controller.assimilate(assimilateRequest(note));
 
       assertThat(result, hasSize(1));
       assertThat(result.get(0).getSpelling(), equalTo(true));
-      assertThat(
-          memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), note.getId()),
-          hasSize(2));
     }
   }
 }

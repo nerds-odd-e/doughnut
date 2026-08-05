@@ -5,55 +5,43 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.RelationshipLiteralSearchHit;
-import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.testability.RelationshipLiteralSearchHits;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.web.server.ResponseStatusException;
 
-class SearchControllerWithinTests extends ControllerTestBase {
-  @Autowired SearchController controller;
+class SearchControllerWithinTests extends SearchControllerTestBase {
 
   Note referenceNote;
 
   @BeforeEach
-  void setup() {
-    currentUser.setUser(makeMe.aUser().please());
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-    referenceNote = makeMe.aNote("Reference Note").notebook(notebook).please();
+  void setupReference() {
+    referenceNote = ownedNote("Reference Note");
   }
 
   @Test
   void shouldReturnEmptyListWhenNoMatchingNotesInRelation()
       throws UnexpectedNoAccessRightException {
-    SearchTerm searchTerm = new SearchTerm();
-    searchTerm.setSearchKey("nonexistent");
-    searchTerm.setAllMyNotebooksAndSubscriptions(true);
-
-    var result = controller.searchForRelationshipTargetWithin(referenceNote, searchTerm);
-
-    assertThat(result, empty());
+    assertThat(
+        controller.searchForRelationshipTargetWithin(referenceNote, searchTerm("nonexistent")),
+        empty());
   }
 
   @Test
   void shouldReturnMatchingNotesInRelationToReference() throws UnexpectedNoAccessRightException {
-    makeMe.aNote("Child Java Note").notebook(referenceNote.getNotebook()).please();
-    makeMe.aNote("Child JavaScript Note").notebook(referenceNote.getNotebook()).please();
-    Notebook unrelatedNb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-    makeMe.aNote("Unrelated Java Note").notebook(unrelatedNb).please();
+    makeMe.aNote("Child Java Note").underSameNotebookAs(referenceNote).please();
+    makeMe.aNote("Child JavaScript Note").underSameNotebookAs(referenceNote).please();
+    ownedNote("Unrelated Java Note");
 
-    SearchTerm searchTerm = new SearchTerm();
-    searchTerm.setSearchKey("Java");
-    searchTerm.setAllMyNotebooksAndSubscriptions(true);
+    var notes =
+        RelationshipLiteralSearchHits.noteMatches(
+            controller.searchForRelationshipTargetWithin(referenceNote, searchTerm("Java")));
 
-    var result = controller.searchForRelationshipTargetWithin(referenceNote, searchTerm);
-
-    var notes = RelationshipLiteralSearchHits.noteMatches(result);
-    assertThat(notes, hasSize(greaterThanOrEqualTo(2)));
     assertThat(
         notes.stream().map(r -> r.getNoteTopology().getTitle()).toList(),
         hasItems("Child Java Note", "Unrelated Java Note"));
@@ -61,17 +49,14 @@ class SearchControllerWithinTests extends ControllerTestBase {
 
   @Test
   void shouldRespectSearchScopeSettingsWithinRelation() throws UnexpectedNoAccessRightException {
-    makeMe.aNote("Local Child Note").notebook(referenceNote.getNotebook()).please();
-    makeMe.aNote("Shared Child Note").notebook(referenceNote.getNotebook()).please();
+    makeMe.aNote("Local Child Note").underSameNotebookAs(referenceNote).please();
+    makeMe.aNote("Shared Child Note").underSameNotebookAs(referenceNote).please();
 
-    SearchTerm searchTerm = new SearchTerm();
-    searchTerm.setSearchKey("Child");
-    searchTerm.setAllMyNotebooksAndSubscriptions(true);
-    searchTerm.setAllMyCircles(false);
-
-    var result = controller.searchForRelationshipTargetWithin(referenceNote, searchTerm);
-
-    assertThat(RelationshipLiteralSearchHits.noteMatches(result), hasSize(2));
+    assertThat(
+        RelationshipLiteralSearchHits.noteMatches(
+            controller.searchForRelationshipTargetWithin(
+                referenceNote, searchTermInMyNotebooksOnly("Child"))),
+        hasSize(2));
   }
 
   @Test
@@ -85,12 +70,9 @@ class SearchControllerWithinTests extends ControllerTestBase {
             .please();
     makeMe.aNote().notebook(orphanNb).please();
 
-    SearchTerm searchTerm = new SearchTerm();
-    searchTerm.setSearchKey("Orphan");
-    searchTerm.setAllMyNotebooksAndSubscriptions(false);
-    searchTerm.setAllMyCircles(false);
-
-    var result = controller.searchForRelationshipTargetWithin(referenceNote, searchTerm);
+    var result =
+        controller.searchForRelationshipTargetWithin(
+            referenceNote, searchTermWithoutGlobalScope("Orphan"));
 
     assertThat(result.stream().noneMatch(RelationshipLiteralSearchHit::isNotebook), is(true));
   }
@@ -98,46 +80,17 @@ class SearchControllerWithinTests extends ControllerTestBase {
   @Test
   void shouldNotAllowSearchWhenNotLoggedIn() {
     currentUser.setUser(null);
-
-    SearchTerm searchTerm = new SearchTerm();
-    searchTerm.setSearchKey("test");
-    searchTerm.setAllMyNotebooksAndSubscriptions(true);
-
     assertThrows(
         ResponseStatusException.class,
-        () -> controller.searchForRelationshipTargetWithin(referenceNote, searchTerm));
+        () -> controller.searchForRelationshipTargetWithin(referenceNote, searchTerm("test")));
   }
 
-  @Test
-  void shouldNotAllowSearchForRelationshipTargetWithinWhenNotLoggedIn() {
-    currentUser.setUser(null);
-    Note note = makeMe.aNote().please();
-    SearchTerm searchTerm = new SearchTerm();
-    assertThrows(
-        ResponseStatusException.class,
-        () -> controller.searchForRelationshipTargetWithin(note, searchTerm));
-  }
-
-  @Test
-  void shouldHandleEmptySearchKey() throws UnexpectedNoAccessRightException {
-    SearchTerm searchTerm = new SearchTerm();
-    searchTerm.setSearchKey("");
-    searchTerm.setAllMyNotebooksAndSubscriptions(true);
-
-    var result = controller.searchForRelationshipTargetWithin(referenceNote, searchTerm);
-
-    assertThat(result, empty());
-  }
-
-  @Test
-  void shouldHandleWhitespaceOnlySearchKey() throws UnexpectedNoAccessRightException {
-    SearchTerm searchTerm = new SearchTerm();
-    searchTerm.setSearchKey("   ");
-    searchTerm.setAllMyNotebooksAndSubscriptions(true);
-
-    var result = controller.searchForRelationshipTargetWithin(referenceNote, searchTerm);
-
-    assertThat(result, empty());
+  @ParameterizedTest
+  @ValueSource(strings = {"", "   "})
+  void shouldHandleBlankSearchKey(String searchKey) throws UnexpectedNoAccessRightException {
+    assertThat(
+        controller.searchForRelationshipTargetWithin(referenceNote, searchTerm(searchKey)),
+        empty());
   }
 
   @Test
