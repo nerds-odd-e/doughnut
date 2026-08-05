@@ -9,6 +9,7 @@ import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.QuestionType;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
@@ -30,18 +31,25 @@ class RecallsControllerTests extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
   }
 
-  RecallsController nullUserController() {
-    currentUser.setUser(null);
-    return controller;
+  private Note ownedNote() {
+    return makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+  }
+
+  private MemoryTracker dueTracker(Note note, Timestamp nextRecallAt) {
+    return makeMe.aMemoryTrackerFor(note).nextRecallAt(nextRecallAt).please();
+  }
+
+  private MemoryTracker dueTracker(Timestamp nextRecallAt) {
+    return makeMe.aMemoryTrackerBy(currentUser.getUser()).nextRecallAt(nextRecallAt).please();
   }
 
   @Nested
   class Repeat {
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
+      currentUser.setUser(null);
       assertThrows(
-          ResponseStatusException.class,
-          () -> nullUserController().recalling("Asia/Shanghai", null));
+          ResponseStatusException.class, () -> controller.recalling("Asia/Shanghai", null));
     }
 
     @ParameterizedTest
@@ -62,10 +70,7 @@ class RecallsControllerTests extends ControllerTestBase {
         int nextRecallAtHours, String timezone, int expectedCount) {
       Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
       testabilitySettings.timeTravelTo(currentTime);
-      makeMe
-          .aMemoryTrackerBy(currentUser.getUser())
-          .nextRecallAt(TimestampOperations.addHoursToTimestamp(currentTime, nextRecallAtHours))
-          .please();
+      dueTracker(TimestampOperations.addHoursToTimestamp(currentTime, nextRecallAtHours));
       DueMemoryTrackers dueMemoryTrackers = controller.recalling(timezone, null);
       assertThat(dueMemoryTrackers.getToRepeat(), hasSize(expectedCount));
     }
@@ -74,17 +79,10 @@ class RecallsControllerTests extends ControllerTestBase {
     void shouldIncludePropertyKeyOnDueMemoryTrackerLite() {
       Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
       testabilitySettings.timeTravelTo(currentTime);
-      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      makeMe
-          .aMemoryTrackerFor(note)
-          .by(currentUser.getUser())
-          .propertyKey("topic")
-          .nextRecallAt(currentTime)
-          .please();
+      makeMe.aMemoryTrackerFor(ownedNote()).propertyKey("topic").nextRecallAt(currentTime).please();
 
       DueMemoryTrackers dueMemoryTrackers = controller.recalling("Asia/Shanghai", 0);
 
-      assertThat(dueMemoryTrackers.getToRepeat(), hasSize(1));
       assertEquals("topic", dueMemoryTrackers.getToRepeat().get(0).getPropertyKey());
     }
 
@@ -92,16 +90,11 @@ class RecallsControllerTests extends ControllerTestBase {
     void shouldIncludeRecallStatusInDueMemoryTrackers() {
       Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
       testabilitySettings.timeTravelTo(currentTime);
-      makeMe.aMemoryTrackerBy(currentUser.getUser()).nextRecallAt(currentTime).please();
+      dueTracker(currentTime);
 
       DueMemoryTrackers dueMemoryTrackers = controller.recalling("Asia/Shanghai", 0);
 
-      assertEquals(1, dueMemoryTrackers.getToRepeat().size());
       assertEquals(1, dueMemoryTrackers.totalAssimilatedCount);
-      // currentTime is 1989-01-01 00:00:00 UTC, which is 1989-01-01 08:00:00 in Asia/Shanghai
-      // Since hour < 12, alignByHalfADay returns same day at 12:00:00 Asia/Shanghai = 04:00:00 UTC
-      Timestamp expectedEndAt = TimestampOperations.addHoursToTimestamp(currentTime, 4);
-      assertEquals(expectedEndAt, dueMemoryTrackers.getCurrentRecallWindowEndAt());
     }
 
     @ParameterizedTest
@@ -112,34 +105,24 @@ class RecallsControllerTests extends ControllerTestBase {
         int currentHour, int expectedHoursToAdd) {
       Timestamp currentTime = makeMe.aTimestamp().of(1, currentHour).fromShanghai().please();
       testabilitySettings.timeTravelTo(currentTime);
-      makeMe.aMemoryTrackerBy(currentUser.getUser()).nextRecallAt(currentTime).please();
-
-      DueMemoryTrackers dueMemoryTrackers = controller.recalling("Asia/Shanghai", 0);
+      dueTracker(currentTime);
 
       Timestamp expectedEndAt =
           TimestampOperations.addHoursToTimestamp(currentTime, expectedHoursToAdd);
-      assertEquals(expectedEndAt, dueMemoryTrackers.getCurrentRecallWindowEndAt());
-      // Verify it's not affected by dueInDays
-      DueMemoryTrackers dueMemoryTrackersWithDays = controller.recalling("Asia/Shanghai", 3);
-      assertEquals(expectedEndAt, dueMemoryTrackersWithDays.getCurrentRecallWindowEndAt());
+      assertEquals(
+          expectedEndAt, controller.recalling("Asia/Shanghai", 0).getCurrentRecallWindowEndAt());
+      assertEquals(
+          expectedEndAt, controller.recalling("Asia/Shanghai", 3).getCurrentRecallWindowEndAt());
     }
 
     @Test
     void shouldExcludeMemoryTrackersForDeletedNotesFromRecallLists() {
       Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
       testabilitySettings.timeTravelTo(currentTime);
-      Note activeNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      Note deletedNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      makeMe
-          .aMemoryTrackerFor(activeNote)
-          .by(currentUser.getUser())
-          .nextRecallAt(currentTime)
-          .please();
-      makeMe
-          .aMemoryTrackerFor(deletedNote)
-          .by(currentUser.getUser())
-          .nextRecallAt(currentTime)
-          .please();
+      Note activeNote = ownedNote();
+      Note deletedNote = ownedNote();
+      dueTracker(activeNote, currentTime);
+      dueTracker(deletedNote, currentTime);
 
       noteService.destroy(
           deletedNote, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, currentUser.getUser());
@@ -155,28 +138,23 @@ class RecallsControllerTests extends ControllerTestBase {
   class PreviouslyAnswered {
     @Test
     void shouldNotBeAbleToAccessWithoutLogin() {
+      currentUser.setUser(null);
       assertThrows(
-          ResponseStatusException.class,
-          () -> nullUserController().previouslyAnswered("Asia/Shanghai"));
+          ResponseStatusException.class, () -> controller.previouslyAnswered("Asia/Shanghai"));
     }
 
     @Test
     void shouldReturnEmptyListWhenNoAnsweredRecallPrompts() {
-      List<AnsweredQuestion> results = controller.previouslyAnswered("Asia/Shanghai");
-      assertThat(results, hasSize(0));
+      assertThat(controller.previouslyAnswered("Asia/Shanghai"), hasSize(0));
     }
 
     @Test
     void shouldReturnAnsweredRecallPromptsInCurrentWindow() {
-      // Set current time to 10:00 AM Shanghai time (window: 0:00-12:00)
       Timestamp currentTime = makeMe.aTimestamp().of(1, 2).fromShanghai().please();
       testabilitySettings.timeTravelTo(currentTime);
 
-      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      MemoryTracker memoryTracker =
-          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
-
-      // Create an answered recall prompt with answer timestamp within current window
+      Note note = ownedNote();
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
       makeMe
           .aRecallPrompt()
           .withPredefinedQuestionForNote(note)
@@ -188,19 +166,16 @@ class RecallsControllerTests extends ControllerTestBase {
       List<AnsweredQuestion> results = controller.previouslyAnswered("Asia/Shanghai");
 
       assertThat(results, hasSize(1));
-      assertEquals(com.odde.doughnut.entities.QuestionType.MCQ, results.get(0).getQuestionType());
+      assertEquals(QuestionType.MCQ, results.get(0).getQuestionType());
     }
 
     @Test
     void shouldNotReturnAnsweredRecallPromptsFromPreviousWindow() {
-      // Answer a question in a previous window (yesterday at 10:00 AM)
       Timestamp previousWindowTime = makeMe.aTimestamp().of(0, 2).fromShanghai().please();
       testabilitySettings.timeTravelTo(previousWindowTime);
 
-      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      MemoryTracker memoryTracker =
-          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
-
+      Note note = ownedNote();
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
       makeMe
           .aRecallPrompt()
           .withPredefinedQuestionForNote(note)
@@ -209,13 +184,9 @@ class RecallsControllerTests extends ControllerTestBase {
           .answerTimestamp(previousWindowTime)
           .please();
 
-      // Move to current window (next day at 10:00 AM)
-      Timestamp currentTime = makeMe.aTimestamp().of(1, 2).fromShanghai().please();
-      testabilitySettings.timeTravelTo(currentTime);
+      testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(1, 2).fromShanghai().please());
 
-      List<AnsweredQuestion> results = controller.previouslyAnswered("Asia/Shanghai");
-
-      assertThat(results, hasSize(0));
+      assertThat(controller.previouslyAnswered("Asia/Shanghai"), hasSize(0));
     }
 
     @Test
@@ -223,11 +194,8 @@ class RecallsControllerTests extends ControllerTestBase {
       Timestamp currentTime = makeMe.aTimestamp().of(1, 2).fromShanghai().please();
       testabilitySettings.timeTravelTo(currentTime);
 
-      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      MemoryTracker memoryTracker =
-          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
-
-      // Create an answered spelling recall prompt
+      Note note = ownedNote();
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
       makeMe
           .aRecallPrompt()
           .forMemoryTracker(memoryTracker)
@@ -236,11 +204,9 @@ class RecallsControllerTests extends ControllerTestBase {
           .answerTimestamp(currentTime)
           .please();
 
-      List<AnsweredQuestion> results = controller.previouslyAnswered("Asia/Shanghai");
-
-      assertThat(results, hasSize(1));
       assertEquals(
-          com.odde.doughnut.entities.QuestionType.SPELLING, results.get(0).getQuestionType());
+          QuestionType.SPELLING,
+          controller.previouslyAnswered("Asia/Shanghai").get(0).getQuestionType());
     }
   }
 }

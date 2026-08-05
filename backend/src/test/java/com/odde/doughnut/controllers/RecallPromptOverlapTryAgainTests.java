@@ -4,8 +4,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.odde.doughnut.controllers.dto.*;
-import com.odde.doughnut.entities.*;
+import com.odde.doughnut.controllers.dto.AnsweredQuestion;
+import com.odde.doughnut.entities.AnswerOutcome;
+import com.odde.doughnut.entities.MemoryTracker;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.MemoryTrackerService;
 import java.sql.Timestamp;
@@ -13,16 +15,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-class RecallPromptOverlapTryAgainTests extends ControllerTestBase {
+class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
 
-  @Autowired RecallPromptController controller;
   @Autowired MemoryTrackerService memoryTrackerService;
 
   MemoryTracker memoryTracker;
 
   @BeforeEach
   void setup() {
-    currentUser.setUser(makeMe.aUser().please());
     Note partnerNote =
         makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("Shared Title").please();
     Note reviewedNote =
@@ -34,30 +34,17 @@ class RecallPromptOverlapTryAgainTests extends ControllerTestBase {
             .aliases("color")
             .overlapPartner(partnerNote)
             .please();
-    memoryTracker =
-        makeMe
-            .aMemoryTrackerFor(reviewedNote)
-            .forgettingCurveAndNextRecallAt(200.0f)
-            .spelling()
-            .please();
+    memoryTracker = ownedSpellingTracker(reviewedNote);
   }
 
   private AnsweredQuestion answerSpelling(MemoryTracker tracker, String answer)
       throws UnexpectedNoAccessRightException {
-    AnswerSpellingDTO answerDTO = new AnswerSpellingDTO();
-    answerDTO.setSpellingAnswer(answer);
-    return controller.answerSpelling(
-        makeMe.aRecallPrompt().forMemoryTracker(tracker).spelling().please(), answerDTO);
+    return controller.answerSpelling(spellingPrompt(tracker), spellingAnswer(answer));
   }
 
   private void assertCorrectWithRecallCredit(Note reviewed)
       throws UnexpectedNoAccessRightException {
-    MemoryTracker tracker =
-        makeMe
-            .aMemoryTrackerFor(reviewed)
-            .forgettingCurveAndNextRecallAt(200.0f)
-            .spelling()
-            .please();
+    MemoryTracker tracker = ownedSpellingTracker(reviewed);
     Integer recallCountBefore = tracker.getRecallCount();
 
     AnsweredQuestion result = answerSpelling(tracker, reviewed.getTitle());
@@ -96,7 +83,6 @@ class RecallPromptOverlapTryAgainTests extends ControllerTestBase {
   @Test
   void shouldNotCountOverlapTowardWrongAnswerThreshold() throws UnexpectedNoAccessRightException {
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
-    assertThat(memoryTrackerService.isThresholdExceeded(memoryTracker, now), is(false));
 
     for (int i = 0; i < 5; i++) {
       answerSpelling(memoryTracker, "Shared Title");

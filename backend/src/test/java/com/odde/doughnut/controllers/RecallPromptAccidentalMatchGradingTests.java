@@ -4,31 +4,29 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.odde.doughnut.controllers.dto.*;
-import com.odde.doughnut.entities.*;
+import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
+import com.odde.doughnut.controllers.dto.AnsweredQuestion;
+import com.odde.doughnut.controllers.dto.NoteTopology;
+import com.odde.doughnut.entities.AnswerOutcome;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
-class RecallPromptAccidentalMatchGradingTests extends ControllerTestBase {
-
-  @Autowired RecallPromptController controller;
+class RecallPromptAccidentalMatchGradingTests extends RecallPromptControllerTestBase {
 
   Note secondNote;
   RecallPrompt recallPrompt;
-  AnswerSpellingDTO answerDTO = new AnswerSpellingDTO();
+  AnswerSpellingDTO answerDTO;
 
   @BeforeEach
   void setup() {
-    currentUser.setUser(makeMe.aUser().please());
-    Note answerNote =
-        makeMe.aNote().notebookOwnedBy(currentUser.getUser()).rememberSpelling().please();
-    MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(answerNote).spelling().please();
-    recallPrompt = makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
+    Note answerNote = ownedSpellingNote();
+    recallPrompt = spellingPrompt(ownedSpellingTracker(answerNote));
     secondNote =
         makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("Another Note Title").please();
-    answerDTO.setSpellingAnswer(secondNote.getTitle());
+    answerDTO = spellingAnswer(secondNote.getTitle());
   }
 
   @Test
@@ -73,7 +71,7 @@ class RecallPromptAccidentalMatchGradingTests extends ControllerTestBase {
             .title("AliasOnlyNoteTitle")
             .aliases(shared)
             .please();
-    answerDTO.setSpellingAnswer(shared);
+    answerDTO = spellingAnswer(shared);
 
     AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
 
@@ -94,7 +92,7 @@ class RecallPromptAccidentalMatchGradingTests extends ControllerTestBase {
             .notebookOwnedBy(currentUser.getUser())
             .aliases("AccidentalAliasMatch")
             .please();
-    answerDTO.setSpellingAnswer("AccidentalAliasMatch");
+    answerDTO = spellingAnswer("AccidentalAliasMatch");
 
     AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
 
@@ -111,7 +109,7 @@ class RecallPromptAccidentalMatchGradingTests extends ControllerTestBase {
         .notebookOwnedBy(currentUser.getUser())
         .overlapWikiLink("OverlapTargetTitle")
         .please();
-    answerDTO.setSpellingAnswer("OverlapTargetTitle");
+    answerDTO = spellingAnswer("OverlapTargetTitle");
 
     AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
 
@@ -122,7 +120,7 @@ class RecallPromptAccidentalMatchGradingTests extends ControllerTestBase {
   void shouldGradeAsAccidentalMatchWhenWrongAnswerMatchesAliasAfterTrim()
       throws UnexpectedNoAccessRightException {
     makeMe.aNote().notebookOwnedBy(currentUser.getUser()).aliases("AccidentalAliasMatch").please();
-    answerDTO.setSpellingAnswer("  AccidentalAliasMatch  ");
+    answerDTO = spellingAnswer("  AccidentalAliasMatch  ");
 
     AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
 

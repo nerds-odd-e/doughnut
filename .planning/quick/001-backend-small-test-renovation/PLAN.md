@@ -1,6 +1,6 @@
 # Backend unit tests → "small test" style
 
-**Status:** in progress (Phase 14 done)
+**Status:** in progress (Phase 15 done)
 **Type:** test renovation (no product behavior change)
 **Verify each phase:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
 **Style:** `.cursor/rules/unit-testing.mdc` + `.cursor/rules/backend-testing.mdc`
@@ -189,14 +189,18 @@ For each file in the phase file list:
 - **Done when:** rubric applied; suite green.
 
 ### Phase 15 — Controllers: recall prompts and recalls
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
-- **Files:**
-  - `RecallPromptControllerTests.java`
-  - `RecallPromptAccidentalMatchEdgeTests.java`
-  - `RecallPromptAccidentalMatchGradingTests.java`
+- **Files / scope (post-refactor capability splits):**
+  - `RecallPromptAnswerQuizControllerTest.java` (answer quiz + wrong-answer curve)
+  - `RecallPromptRegenerateControllerTest.java`
+  - `RecallPromptContestControllerTest.java`
+  - `RecallPromptAnswerSpellingControllerTest.java` (spelling answer / curve / auth)
+  - `RecallPromptSpellingStemMaskingControllerTest.java`
+  - `RecallPromptAccidentalMatchGradingTests.java`, `RecallPromptAccidentalMatchEdgeTests.java`
   - `RecallPromptOverlapTryAgainTests.java`
-  - `RecallsControllerTests.java`
+  - `RecallsControllerTests.java` (due recalling + previously answered)
+  - base: `RecallPromptControllerTestBase.java` (`ownedNote` / `ownedSpellingTracker` / `mcqPrompt` / `spellingPrompt` / OpenAI stub)
 - **Done when:** rubric applied; suite green.
 
 ### Phase 16 — Controllers: assimilation + search
@@ -326,7 +330,8 @@ If a Behavior phase cannot express fixtures concisely:
 | 12 | done | Books attach/retrieve/reading: split mega attach into outline / getBook / file bytes / Full-view; drop duplicate PDF locator + PDF/EPUB position persist twins; canonical reading-record shape once + skimmed/skipped vs invalid status; `textBlock`/`contentListAttachRequest` helpers. Post-refactor: attach-content / book-file / get-reading-position capability splits (≤250). |
 | 13 | done | Block content/depth: `textBlock` + chapter helpers; drop indent twins subsumed by subtree move; merge outdent subtree duplicates; suggestion builders shared; OpenAI mock only for suggest. Post-refactor: create-from-content / suggest-layout / apply-layout splits + block/layout-reorg bases (≤250). |
 | 14 | done | Memory tracker: `notebookOwnedBy` + drop redundant `.by`; threshold parameterized; recycle asserts id only; deleted-note lists assert contains only; `removedFromTracking()` builder; prompt helpers. Post-refactor: threshold / ask / show / tracking / recent / recall-prompts / update-property-key + base. |
-| 15–26 | planned | — |
+| 15 | done | Split mega `RecallPromptControllerTests` → quiz / regenerate / contest / spelling / stem-masking + base; accidental-match canonical shape once + sibling deltas; drop redundant `.by` on recalls; merge duplicate spelling answer-entity asserts. |
+| 16–26 | planned | — |
 
 ---
 
@@ -350,3 +355,4 @@ If a Behavior phase cannot express fixtures concisely:
 - Phase 12: PDF locator “heading+body” and “match bboxes” were the same claim — keep one. Patch PDF via `lastReadBody` already covers PdfLocator DTO path; EPUB wire helper covers EpubLocator. Put reading-record return shape is enough without re-asserting the repository row. Content-list attach fixtures share `contentListAttachRequest` + `textBlock`. Post-refactor splits: attach-content / book-file / get-reading-position.
 - Phase 13: Indent “depth+1” and “full book size” were subsumed by indent-moves-descendants; two outdent-subtree cases collapsed to one with sibling W. Suggest/apply share `suggestionWithDepths` / `nestBAndCDepths`. Create-from-content fixtures use `chapterWithHeadingAndBody` / `textBlock`. Post-refactor: create-from-content / suggest-layout / apply-layout + `blockByTitle` / layout-reorg bases.
 - Phase 14: `aMemoryTrackerFor` already inherits notebook owner — drop `.by(currentUser)` when note is `notebookOwnedBy`. Threshold below/at/above → one parameterized case. Ask recycle asserts prompt id only after spelling shape. Deleted-note recent lists: `contains(active)` enough without `not(hasItem)`. Post-refactor split show vs tracking mutations; `spellingTracker()` helper.
+- Phase 15: Accidental-match title case is the full-shape canonical; alias/trim/unreadable/floor siblings assert outcome or matched-id delta only. Spelling `thinkingTimeMs` + answer-entity twins collapsed to one persist assert. Stem-masking: mark/not-color once; overlap-wiki siblings keep Other Note / no-mark deltas. Recalling window-end covered by half-day param — status case keeps `totalAssimilatedCount` only; previously-answered spelling asserts type only after MCQ window canonical. Post-refactor: stem-masking split; accidental/overlap onto shared base.
