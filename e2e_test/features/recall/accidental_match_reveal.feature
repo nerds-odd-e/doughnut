@@ -2,7 +2,7 @@
 @disableOpenAiService
 Feature: Accidental match reveal
   As a learner doing spelling recall
-  I want an optional resolve dialog listing matched note titles when my answer names another note
+  I want an optional resolve dialog listing matched note titles and notebook path when my answer names another note
   So that I can see the conflict without losing focus on the reviewed note
 
   Background:

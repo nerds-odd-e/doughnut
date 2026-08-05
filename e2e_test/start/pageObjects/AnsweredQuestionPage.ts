@@ -82,9 +82,14 @@ const assumeAnsweredQuestionPage = () => {
       cy.findByTestId('matched-notes-section').should('not.exist')
 
       cy.findByTestId('resolve-accidental-match').click()
+      waitUntilAppIsNotBusy()
       cy.findByTestId('accidental-match-resolve-dialog')
         .should('be.visible')
         .and('contain.text', matchedNoteTitle)
+        .and('contain.text', 'English practice')
+        .within(() => {
+          cy.contains('a', matchedNoteTitle).should('be.visible')
+        })
       cy.get('.close-button').filter(':visible').first().click()
       cy.findByTestId('accidental-match-resolve-dialog').should('not.exist')
 
