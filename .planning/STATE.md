@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Clean up LIA training participant code
-status: Quick task complete
-stopped_at: Quick task 260805 Phase 1 done — late-success penalty removed
-last_updated: "2026-08-05T11:05:00+08:00"
+status: Idle — quick task 260805 shipped; planning diary cleaned
+stopped_at: Late-success penalty removed; spent plan history trashed
+last_updated: "2026-08-05T11:10:00+08:00"
 last_activity: 2026-08-05
-last_activity_desc: Removed late-success penalty; overdue correct recall keeps on-time interval
+last_activity_desc: Shipped late-success fix; cleaned .planning/quick/260805 diary
 progress:
   total_phases: 8
   completed_phases: 4
@@ -25,14 +25,14 @@ See: `.planning/PROJECT.md` (updated 2026-08-03 after v1.2)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** Quick task 260805 complete — late-success penalty removed from `ForgettingCurve.succeeded`
+**Current focus:** None active — late-success penalty fix shipped (`735b96623a`); Proposed spaced-repetition ADR still paused
 
 ## Current Position
 
-Phase: Quick task 260805, Phase 1 (Behavior) — **Done**
-Plan: [Remove the late-success penalty](./quick/260805-late-success-penalty/PLAN.md)
-Status: Complete
-Last activity: 2026-08-05 — Late correct recall keeps at least the on-time interval; Proposed ADR still paused
+Phase: — (no active quick task)
+Plan: —
+Status: Idle
+Last activity: 2026-08-05 — Overdue correct recall keeps on-time interval; spent `260805-late-success-penalty` plan diary trashed
 
 ## Performance Metrics
 
@@ -124,14 +124,15 @@ Decisions are logged in PROJECT.md Key Decisions table. Roadmap-shaping decision
 - [Phase 14]: HYG-02 audit — Terry `previewPullActions.ts` import-only / not rewritten; TRIAGE names no YS delete/rewrite path
 - [Phase 14]: HYG-03 green — `pnpm cli:test` (492) + five retained CLI E2E (38 scenarios)
 - [Phase 14]: HYG-01/02/03 Complete; milestone-ready handoff → `/gsd-complete-milestone`
+- [Quick 260805]: Late-success penalty removed from `ForgettingCurve.succeeded`; controller regression `lateCorrectAnswerDoesNotShortenTheNextInterval`; plan diary cleaned after ship
 
 ### Pending Todos
 
-- Execute quick task 260805 test-first; keep the broader spaced-repetition ADR Proposed and untouched.
+None.
 
 ### Blockers/Concerns
 
-None yet.
+None.
 
 ## Deferred Items
 
@@ -150,12 +151,11 @@ Items acknowledged and deferred at milestone close on 2026-08-03 (v1.2 `override
 
 ## Session Continuity
 
-**Last session:** 2026-08-05T10:46:03+08:00
-**Stopped at:** Quick task 260805 plan written; no implementation started
-**Next action:** Execute the late-success penalty plan test-first
-**Resume file:** [Quick task plan](./quick/260805-late-success-penalty/PLAN.md)
+**Last session:** 2026-08-05T11:10:00+08:00
+**Stopped at:** Quick task 260805 complete; planning diary cleaned
+**Next action:** Optional — resume Proposed spaced-repetition ADR review (bounded late-success bonus / FSRS / `nextRecallAt` authority)
+**Resume file:** —
 
 ## Operator Next Steps
 
-- Run the quick task with the `execute-plan` skill using [PLAN.md](./quick/260805-late-success-penalty/PLAN.md).
-- Resume ADR review only after the narrow production defect is fixed and verified.
+- Optional: resume Proposed spaced-repetition ADR now that the narrow late-success defect is fixed.
