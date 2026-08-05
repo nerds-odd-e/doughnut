@@ -4,17 +4,17 @@ milestone: v1.2
 milestone_name: Accidental Match Resolve UX
 current_phase: 9
 current_phase_name: Build a link from resolve dialog
-status: ready_to_execute
-stopped_at: Phase 9 plans written — ready for execute
-last_updated: "2026-08-05T12:05:00.000Z"
+status: executing
+stopped_at: Completed 09-01-PLAN.md
+last_updated: "2026-08-05T12:08:13.119Z"
 last_activity: 2026-08-05
-last_activity_desc: Phase 9 plans created (Build a link Vitest + E2E)
+last_activity_desc: Phase 9 Plan 01 complete — Build a link Vitest green; 09-02 E2E next
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 6
-  completed_plans: 4
-  percent: 33
+  completed_plans: 5
+  percent: 83
 ---
 
 # Project State
@@ -24,16 +24,16 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 **Core value:** Healthy mainline for learning and knowledge work — reviewed note stays primary during accidental-match results.
-**Current focus:** Phase 9 plans ready — execute Wave 1 Vitest then Wave 2 E2E
+**Current focus:** Phase 9 Plan 01 done — execute 09-02 E2E untag next
 
 ## Current Position
 
-Phase: 9 of 12 (Build a link from resolve dialog) — planned (2 plans)
-Plan: 09-01 next (Wave 1)
-Status: Phase 9 PLAN.md files written — AMR-06/AMR-07 ready to execute
-Last activity: 2026-08-05 — Phase 9 plans created (Build a link Vitest + E2E)
+Phase: 9 of 12 (Build a link from resolve dialog) — in progress (1/2 plans)
+Plan: 09-02 next (Wave 2 E2E)
+Status: 09-01 Vitest complete (AMR-06/AMR-07 unit); ready for 09-02
+Last activity: 2026-08-05 — Completed 09-01 Build a link Vitest
 
-Progress: [███░░░░░░░] 33% (2/6 v1.2 phases; 4/6 plans executed across phases 7–9)
+Progress: [████████░░] 83% (2/6 v1.2 phases; 5/6 plans executed across phases 7–9)
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 | Phase 07 P02 | 2min | 2 tasks | 2 files |
 | Phase 08 P01 | 4min | 2 tasks | 5 files |
 | Phase 08 P02 | 2min | 2 tasks | 2 files |
+| Phase 09 P01 | 4min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -80,6 +81,8 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 - [Phase 9]: Per-row Build a link; reuse offer; closeDialog → return to list (D-03..D-05)
 - [Phase 9]: Hide Build a link when readonly or realms unloaded (D-06, D-07)
 - [Phase 9]: Vitest Wave 1 then E2E untag @wip Wave 2 (D-08, D-09)
+- [Phase 9]: Single-Modal step swap hosts MatchedNoteLinkOffer; closeDialog returns to list
+- [Phase 9]: canOfferBuildLink hides Build a link when readonly or realms unloaded
 
 ### Pending Todos
 
@@ -101,7 +104,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-08-05T12:05:00.000Z
-Stopped at: Phase 9 plans written — ready for execute
-Resume file: .planning/phases/09-build-a-link-from-resolve-dialog/09-01-PLAN.md
-Next action: /gsd-execute-phase 9 (or local execute-plan on 09-01 then 09-02)
+Last session: 2026-08-05T12:08:13.113Z
+Stopped at: Completed 09-01-PLAN.md
+Resume file: .planning/phases/09-build-a-link-from-resolve-dialog/09-02-PLAN.md
+Next action: Execute 09-02 (E2E untag Build a link scenarios)

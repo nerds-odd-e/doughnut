@@ -7,6 +7,7 @@ import type {
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import helper from "@tests/helpers"
 import makeMe from "doughnut-test-fixtures/makeMe"
+import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { vi } from "vitest"
 
 vi.mock("vue-router", async (importOriginal) => {
@@ -59,6 +60,13 @@ export function mountAnsweredSpellingQuestion(
       },
     },
   })
+}
+
+export async function openResolveAccidentalMatch(wrapper: VueWrapper) {
+  await wrapper
+    .find('[data-testid="resolve-accidental-match"]')
+    .trigger("click")
+  await flushPromises()
 }
 
 export function accidentalMatchWithTwoMatchedNotes(

@@ -108,10 +108,11 @@ Plans:
   2. After building a link, user remains on the accidental-match result
   3. Build-a-link (and Add-as-overlapped when present) are unavailable when the reviewed notebook is readonly or required note data is not loaded
 
-**Plans**: 2 plans
+**Plans**: 1/2 plans executed
 
 Plans:
-- [ ] 09-01-PLAN.md — Vitest tracer: same-Modal Build a link + AMR-07 gates
+
+- [x] 09-01-PLAN.md — Vitest tracer: same-Modal Build a link + AMR-07 gates
 - [ ] 09-02-PLAN.md — E2E: page-object Resolve → Build a link; untag @wip link scenarios
 
 **UI hint**: yes
@@ -169,7 +170,7 @@ Plans:
 | 1–6 Spelling match & link | v1.1 | 16/16 | Complete | 2026-07-25 |
 | 7. Compact result + Resolve dialog shell | v1.2 | 2/2 | Complete | 2026-08-05 |
 | 8. Match path and clickable titles | v1.2 | 2/2 | Complete | 2026-08-05 |
-| 9. Build a link from resolve dialog | v1.2 | 0/2 | Planned | 2026-08-05 |
+| 9. Build a link from resolve dialog | v1.2 | 1/2 | In Progress|  |
 | 10. Overlap alias append util | v1.2 | 0/? | Not started | - |
 | 11. Add as overlapped note | v1.2 | 0/? | Not started | - |
 | 12. Title navigate, reopen, E2E polish | v1.2 | 0/? | Not started | - |

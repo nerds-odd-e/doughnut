@@ -20,8 +20,8 @@ Requirements for milestone v1.2. Each maps to roadmap phases.
 
 ### Build a link
 
-- [ ] **AMR-06**: From a resolve-dialog row, user can **Build a link** to that matched note using the existing property/relationship link offer and remains on the accidental-match result afterward
-- [ ] **AMR-07**: Build-a-link and Add-as-overlapped actions are unavailable when the reviewed notebook is readonly or required note data is not loaded
+- [x] **AMR-06**: From a resolve-dialog row, user can **Build a link** to that matched note using the existing property/relationship link offer and remains on the accidental-match result afterward
+- [x] **AMR-07**: Build-a-link and Add-as-overlapped actions are unavailable when the reviewed notebook is readonly or required note data is not loaded
 
 ### Add as overlapped note
 
@@ -67,8 +67,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AMR-03 | Phase 7 | Complete |
 | AMR-04 | Phase 8 | Complete |
 | AMR-05 | Phase 12 | Pending |
-| AMR-06 | Phase 9 | Pending |
-| AMR-07 | Phase 9 | Pending |
+| AMR-06 | Phase 9 | Complete |
+| AMR-07 | Phase 9 | Complete |
 | AMR-08 | Phase 11 | Pending |
 | AMR-09 | Phase 11 | Pending |
 

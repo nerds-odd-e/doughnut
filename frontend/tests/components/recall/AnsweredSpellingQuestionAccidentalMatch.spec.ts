@@ -3,13 +3,17 @@ import {
   TextContentController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
-import { mockSdkService } from "@tests/helpers"
+import {
+  mockSdkService,
+  mockSdkServiceWithImplementation,
+} from "@tests/helpers"
 import { closeButtonEl } from "@tests/commons/modalTestSupport"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { afterEach, beforeEach, describe, it, expect } from "vitest"
 import {
   accidentalMatchWithTwoMatchedNotes,
   mountAnsweredSpellingQuestion,
+  openResolveAccidentalMatch,
 } from "./answeredSpellingQuestionTestSupport"
 
 describe("AnsweredSpellingQuestion accidental match", () => {
@@ -59,11 +63,7 @@ describe("AnsweredSpellingQuestion accidental match", () => {
       seedRealms: [matchedA, matchedB],
     })
     await flushPromises()
-
-    await wrapper
-      .find('[data-testid="resolve-accidental-match"]')
-      .trigger("click")
-    await flushPromises()
+    await openResolveAccidentalMatch(wrapper)
 
     const dialog = document.body.querySelector(
       '[data-testid="accidental-match-resolve-dialog"]'
@@ -111,11 +111,7 @@ describe("AnsweredSpellingQuestion accidental match", () => {
       withRouter: true,
     })
     await flushPromises()
-
-    await wrapper
-      .find('[data-testid="resolve-accidental-match"]')
-      .trigger("click")
-    await flushPromises()
+    await openResolveAccidentalMatch(wrapper)
 
     expect(
       document.body.querySelector(
@@ -147,11 +143,7 @@ describe("AnsweredSpellingQuestion accidental match", () => {
       withRouter: true,
     })
     await flushPromises()
-
-    await wrapper
-      .find('[data-testid="resolve-accidental-match"]')
-      .trigger("click")
-    await flushPromises()
+    await openResolveAccidentalMatch(wrapper)
 
     const linkButtons = [
       ...document.body.querySelectorAll(
@@ -196,5 +188,46 @@ describe("AnsweredSpellingQuestion accidental match", () => {
     expect(
       wrapper.find('[data-testid="accidental-match-alert"]').exists()
     ).toBe(true)
+  })
+
+  it("omits Build a link when reviewed notebook is readonly", async () => {
+    const { answeredQuestion, reviewedRealm, matchedA, matchedB } =
+      accidentalMatchWithTwoMatchedNotes()
+    reviewedRealm.notebookRealm.readonly = true
+
+    wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {
+      currentUser: makeMe.aUser.please(),
+      seedRealms: [reviewedRealm, matchedA, matchedB],
+      withRouter: true,
+    })
+    await flushPromises()
+    await openResolveAccidentalMatch(wrapper)
+
+    expect(
+      document.body.querySelectorAll('[data-testid^="link-to-matched-note-"]')
+    ).toHaveLength(0)
+  })
+
+  it("omits Build a link when note realms are not loaded", async () => {
+    mockSdkServiceWithImplementation(
+      NoteController,
+      "showNote",
+      () =>
+        new Promise(() => {
+          // never settles — realms stay unloaded for AMR-07 gate
+        })
+    )
+    const { answeredQuestion } = accidentalMatchWithTwoMatchedNotes()
+
+    wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {
+      currentUser: makeMe.aUser.please(),
+      withRouter: true,
+    })
+    await flushPromises()
+    await openResolveAccidentalMatch(wrapper)
+
+    expect(
+      document.body.querySelectorAll('[data-testid^="link-to-matched-note-"]')
+    ).toHaveLength(0)
   })
 })
