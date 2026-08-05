@@ -4,17 +4,17 @@ milestone: v1.2
 milestone_name: Accidental Match Resolve UX
 current_phase: 7
 current_phase_name: Compact result + Resolve dialog shell
-status: in_progress
-stopped_at: Completed 07-01-PLAN.md
-last_updated: "2026-08-05T09:03:24.179Z"
+status: ready_for_verification
+stopped_at: Completed 07-02-PLAN.md
+last_updated: "2026-08-05T09:07:52.141Z"
 last_activity: 2026-08-05
-last_activity_desc: Completed 07-01 compact resolve dialog shell
+last_activity_desc: Completed 07-02 E2E resolve dialog rewrite
 progress:
   total_phases: 6
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
-  percent: 50
+  completed_plans: 2
+  percent: 17
 ---
 
 # Project State
@@ -24,16 +24,16 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 **Core value:** Healthy mainline for learning and knowledge work — reviewed note stays primary during accidental-match results.
-**Current focus:** Phase 7 — Compact result + Resolve dialog shell (07-01 done; 07-02 next)
+**Current focus:** Phase 7 plans complete — ready for verification; then Phase 8
 
 ## Current Position
 
 Phase: 7 of 12 (Compact result + Resolve dialog shell)
-Plan: 07-02 next (of 2)
-Status: 07-01 complete — ready for 07-02 execute
-Last activity: 2026-08-05 — Completed 07-01 compact resolve dialog shell
+Plan: 2/2 complete
+Status: ready_for_verification — 07-01 + 07-02 done
+Last activity: 2026-08-05 — Completed 07-02 E2E resolve dialog rewrite
 
-Progress: [█████░░░░░] 50%
+Progress: [██████████] 100% (phase plans)
 
 ## Performance Metrics
 
@@ -43,13 +43,14 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 07 | 1/2 | 6min | 6min |
+| 07 | 2/2 | 8min | 4min |
 
 **Per-Plan Metrics:**
 
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
 | Phase 07 P01 | 6min | 2 tasks | 5 files |
+| Phase 07 P02 | 2min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -62,6 +63,8 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 - SEED-001 and AMR-10..13 deferred to v2 — not on this roadmap
 - [Phase 7]: Slot AccidentalMatchResolveDialog without closer — Modal dismiss covers AMR-03
 - [Phase 7]: Keep MatchedNoteLinkOffer.vue unused until Phase 9 Build a link
+- [Phase 7]: Keep link page-object helpers callable for Phase 9; only tag Gherkin scenarios @wip
+- [Phase 7]: Prefer page-object behavior change over Gherkin step text changes
 
 ### Pending Todos
 
@@ -83,7 +86,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-08-05T09:03:24.173Z
-Stopped at: Completed 07-01-PLAN.md
+Last session: 2026-08-05T09:07:52.135Z
+Stopped at: Completed 07-02-PLAN.md
 Resume file: None
-Next action: Execute 07-02-PLAN.md (E2E rewrite)
+Next action: Verify Phase 7 (or discuss/plan Phase 8)
