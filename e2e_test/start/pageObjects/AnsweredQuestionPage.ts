@@ -70,11 +70,27 @@ const assumeAnsweredQuestionPage = () => {
       cy.findByText(`Your answer \`${answer}\` is incorrect.`).should(
         'not.exist'
       )
+      cy.findByTestId('resolve-accidental-match')
+        .scrollIntoView()
+        .should('be.visible')
+        .and('contain.text', 'Resolve accidental match')
       cy.findByText('Note under question').should('be.visible')
       cy.get('[data-test="note-title"]')
         .filter(`:contains("${reviewedNoteTitle}")`)
         .should('have.length.at.least', 1)
-      expectMatchedNoteInSection(matchedNoteTitle)
+      cy.findByTestId('matched-notes-section').should('not.exist')
+
+      cy.findByTestId('resolve-accidental-match').click()
+      cy.findByTestId('accidental-match-resolve-dialog')
+        .should('be.visible')
+        .and('contain.text', matchedNoteTitle)
+      cy.get('.close-button').filter(':visible').first().click()
+      cy.findByTestId('accidental-match-resolve-dialog').should('not.exist')
+
+      expectAccidentalMatchAlert(answer)
+      cy.get('[data-test="note-title"]')
+        .filter(`:contains("${reviewedNoteTitle}")`)
+        .should('have.length.at.least', 1)
       return self
     },
     openLinkToMatchedNote(matchedNoteTitle: string) {

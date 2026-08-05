@@ -1,1 +1,9 @@
-{"content":"SRS community consensus: linking related cards must not corrupt already-logged grades; do not regrade or invent reclaim flows after the user marks relatedness. Doughnut ADR 0003 already separates ACCIDENTAL_MATCH (graded lightly) from OVERLAP (no credit, try-again) — declaring overlap post-grade is note mutation for future reviews only.","source":"web","provider":"websearch","confidence":"MEDIUM","fetched_at":"2026-08-05T08:24:15.178Z","ttl":86400000,"kind":"web"}
+{
+  "content": "SRS community consensus: linking related cards must not corrupt already-logged grades; do not regrade or invent reclaim flows after the user marks relatedness. Doughnut ADR 0003 already separates ACCIDENTAL_MATCH (graded lightly) from OVERLAP (no credit, try-again) — declaring overlap post-grade is note mutation for future reviews only.",
+  "source": "web",
+  "provider": "websearch",
+  "confidence": "MEDIUM",
+  "fetched_at": "2026-08-05T08:24:15.178Z",
+  "ttl": 86400000,
+  "kind": "web"
+}
