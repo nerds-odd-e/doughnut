@@ -28,7 +28,6 @@
 </template>
 
 <script setup lang="ts">
-import "@/lib/pdfjsWorker"
 import {
   attachPdfBookViewerGeometryResampleListeners,
   createCoalescedRequestAnimationFrameEmitter,
@@ -44,7 +43,7 @@ import { usePdfBlockHighlight } from "@/composables/book-reading/usePdfBlockHigh
 import { usePdfNavigation } from "@/composables/book-reading/usePdfNavigation"
 import { usePdfLocatorGeometry } from "@/composables/book-reading/usePdfLocatorGeometry"
 import { usePdfGestureZoom } from "@/composables/book-reading/usePdfGestureZoom"
-import { getDocument, type PDFDocumentProxy } from "pdfjs-dist/build/pdf.mjs"
+import { getDocument, type PDFDocumentProxy } from "@/lib/pdfjsWorker"
 import {
   EventBus,
   PDFLinkService,
