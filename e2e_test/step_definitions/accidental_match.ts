@@ -73,3 +73,26 @@ Then(
 When('I click overlap try again', () => {
   start.assumeAnsweredQuestionPage().clickOverlapTryAgain()
 })
+
+When(
+  'I open resolve and navigate to matched note {string}',
+  (matchedNoteTitle: string) => {
+    start
+      .assumeAnsweredQuestionPage()
+      .openResolveDialog()
+      .clickMatchedNoteTitle(matchedNoteTitle)
+  }
+)
+
+When('I return to recall via history back', () => {
+  start.assumeAnsweredQuestionPage().returnToRecallViaHistoryBack()
+})
+
+Then(
+  'I should see resolve available again for spelling answer {string} with matched note {string}',
+  (answer: string, matchedNoteTitle: string) => {
+    start
+      .assumeAnsweredQuestionPage()
+      .expectResolveAvailableAgainWithMatch(answer, matchedNoteTitle)
+  }
+)

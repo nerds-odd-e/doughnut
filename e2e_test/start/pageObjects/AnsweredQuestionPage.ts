@@ -172,6 +172,44 @@ const assumeAnsweredQuestionPage = () => {
         .and('contain.text', matchedNoteTitle)
       return self
     },
+    openResolveDialog() {
+      cy.findByTestId('resolve-accidental-match')
+        .scrollIntoView()
+        .should('be.visible')
+        .click()
+      waitUntilAppIsNotBusy()
+      cy.findByTestId('accidental-match-resolve-dialog').should('be.visible')
+      return self
+    },
+    clickMatchedNoteTitle(title: string) {
+      cy.findByTestId('accidental-match-resolve-dialog').within(() => {
+        cy.contains('a', title).should('be.visible').click()
+      })
+      waitUntilAppIsNotBusy()
+      cy.url({ timeout: 15000 }).should('match', /\/d\/n\/\d+|\/n\/\d+|\/n\d+/)
+      return self
+    },
+    returnToRecallViaHistoryBack() {
+      cy.go('back')
+      waitUntilAppIsNotBusy()
+      cy.url().should('include', '/recall')
+      return self
+    },
+    expectResolveAvailableAgainWithMatch(
+      answer: string,
+      matchedNoteTitle: string
+    ) {
+      expectAccidentalMatchAlert(answer)
+      cy.findByTestId('resolve-accidental-match')
+        .scrollIntoView()
+        .should('be.visible')
+      cy.findByTestId('accidental-match-resolve-dialog').should('not.exist')
+      self.openResolveDialog()
+      cy.findByTestId('accidental-match-resolve-dialog')
+        .should('be.visible')
+        .and('contain.text', matchedNoteTitle)
+      return self
+    },
     expectOverlapTryAgainForSpelling() {
       expectOverlapTryAgainAlert()
       return self
