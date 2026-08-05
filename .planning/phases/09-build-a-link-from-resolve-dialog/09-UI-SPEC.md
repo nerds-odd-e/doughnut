@@ -1,10 +1,11 @@
 ---
 phase: 9
 slug: build-a-link-from-resolve-dialog
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-08-05
+reviewed_at: 2026-08-05T11:51:00Z
 ---
 
 # Phase 9 — UI Design Contract
