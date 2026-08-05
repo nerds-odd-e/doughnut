@@ -5,14 +5,14 @@ milestone_name: Accidental Match Resolve UX
 current_phase: 11
 current_phase_name: Add as overlapped note
 status: ready
-stopped_at: Phase 11 research complete
-last_updated: "2026-08-05T13:25:00.000Z"
+stopped_at: Phase 11 plans created (11-01, 11-02)
+last_updated: "2026-08-05T13:35:00.000Z"
 last_activity: 2026-08-05
-last_activity_desc: Wrote 11-RESEARCH.md
+last_activity_desc: Created Phase 11 plans (Vitest tracer + E2E)
 progress:
   total_phases: 6
   completed_phases: 4
-  total_plans: 7
+  total_plans: 9
   completed_plans: 7
   percent: 67
 ---
@@ -24,16 +24,16 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 **Core value:** Healthy mainline for learning and knowledge work — reviewed note stays primary during accidental-match results.
-**Current focus:** Phase 10 complete — next Phase 11 Add as overlapped note (AMR-08/AMR-09)
+**Current focus:** Phase 11 planned — execute Add as overlapped note (AMR-08/AMR-09)
 
 ## Current Position
 
-Phase: 11 of 12 (Add as overlapped note) — ready to plan/discuss
-Plan: Phase 10 (10-01) complete
-Status: Phase 10 Structure util shipped — execute Phase 11 next
-Last activity: 2026-08-05 — Completed 10-01-PLAN.md
+Phase: 11 of 12 (Add as overlapped note) — plans ready to execute
+Plan: 11-01 (Wave 1) next
+Status: Phase 11 planned (2 plans: Vitest then E2E)
+Last activity: 2026-08-05 — Created 11-01-PLAN.md and 11-02-PLAN.md
 
-Progress: [██████░░░░] 67% (4/6 v1.2 phases; 7/7 plans executed across phases 7–10)
+Progress: [██████░░░░] 67% (4/6 v1.2 phases complete; 7/9 plans executed; Phase 11 0/2)
 
 ## Performance Metrics
 
@@ -91,6 +91,10 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 - [Phase 9]: Stay-on-result asserts alert + Resolve CTA + dialog list (D-04); no matched-notes-section
 - [Phase 10]: One-line appendOverlapWikiLinkToNoteContent composes buildWikiLinkText (no displayText) → appendAliasToNoteContent
 - [Phase 10]: Structure-only util + Vitest; Phase 11 wires Add as overlapped note CTA
+- [Phase 11]: Per-row Add as overlapped note → appendOverlapWikiLinkToNoteContent → updateTextField; stay on list (D-01..D-05)
+- [Phase 11]: Content-only declare — no retry / no OVERLAP try-again / no SRS reclaim (D-06, D-07)
+- [Phase 11]: Shared mutating gate for Build a link + Add as overlapped (D-08, D-09)
+- [Phase 11]: Wave 1 Vitest then Wave 2 E2E (D-10, D-11); CTA testid add-as-overlapped-note-{id}
 
 ### Pending Todos
 
@@ -112,7 +116,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-08-05T13:25:00.000Z
-Stopped at: Phase 11 research complete
-Resume file: .planning/phases/11-add-as-overlapped-note/11-RESEARCH.md
-Next action: `/gsd-plan-phase 11`
+Last session: 2026-08-05T13:35:00.000Z
+Stopped at: Phase 11 plans created (11-01, 11-02)
+Resume file: .planning/phases/11-add-as-overlapped-note/11-01-PLAN.md
+Next action: `/gsd-execute-phase 11`
