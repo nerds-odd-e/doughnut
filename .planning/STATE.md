@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Accidental Match Resolve UX
-current_phase: 9
-current_phase_name: Build a link from resolve dialog
-status: executing
-stopped_at: Completed 09-01-PLAN.md
-last_updated: "2026-08-05T12:08:13.119Z"
+current_phase: 10
+current_phase_name: Overlap alias append util
+status: ready
+stopped_at: Completed 09-02-PLAN.md
+last_updated: "2026-08-05T12:13:44.840Z"
 last_activity: 2026-08-05
-last_activity_desc: Phase 9 Plan 01 complete — Build a link Vitest green; 09-02 E2E next
+last_activity_desc: Phase 9 Plan 02 complete — Build a link E2E untagged
 progress:
   total_phases: 6
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 6
-  completed_plans: 5
-  percent: 83
+  completed_plans: 6
+  percent: 50
 ---
 
 # Project State
@@ -24,16 +24,16 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 **Core value:** Healthy mainline for learning and knowledge work — reviewed note stays primary during accidental-match results.
-**Current focus:** Phase 9 Plan 01 done — execute 09-02 E2E untag next
+**Current focus:** Phase 9 complete (AMR-06/AMR-07) — next Phase 10 Structure
 
 ## Current Position
 
-Phase: 9 of 12 (Build a link from resolve dialog) — in progress (1/2 plans)
-Plan: 09-02 next (Wave 2 E2E)
-Status: 09-01 Vitest complete (AMR-06/AMR-07 unit); ready for 09-02
-Last activity: 2026-08-05 — Completed 09-01 Build a link Vitest
+Phase: 10 of 12 (Overlap alias append util) — ready
+Plan: Phase 10 next (Structure)
+Status: Phase 9 complete — Vitest + E2E Build a link green without @wip
+Last activity: 2026-08-05 — Completed 09-02 Build a link E2E
 
-Progress: [████████░░] 83% (2/6 v1.2 phases; 5/6 plans executed across phases 7–9)
+Progress: [█████░░░░░] 50% (3/6 v1.2 phases; 6/6 plans executed across phases 7–9)
 
 ## Performance Metrics
 
@@ -45,6 +45,7 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 |-------|-------|-------|----------|
 | 07 | 2/2 | 8min | 4min |
 | 08 | 2/2 | 6min | 3min |
+| 09 | 2/2 | 7min | 3.5min |
 
 **Per-Plan Metrics:**
 
@@ -55,6 +56,7 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 | Phase 08 P01 | 4min | 2 tasks | 5 files |
 | Phase 08 P02 | 2min | 2 tasks | 2 files |
 | Phase 09 P01 | 4min | 2 tasks | 5 files |
+| Phase 09 P02 | 3min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -83,6 +85,8 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 - [Phase 9]: Vitest Wave 1 then E2E untag @wip Wave 2 (D-08, D-09)
 - [Phase 9]: Single-Modal step swap hosts MatchedNoteLinkOffer; closeDialog returns to list
 - [Phase 9]: canOfferBuildLink hides Build a link when readonly or realms unloaded
+- [Phase 9]: Page-object-only Resolve → Build a link path; Gherkin unchanged (D-09)
+- [Phase 9]: Stay-on-result asserts alert + Resolve CTA + dialog list (D-04); no matched-notes-section
 
 ### Pending Todos
 
@@ -104,7 +108,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-08-05T12:08:13.113Z
-Stopped at: Completed 09-01-PLAN.md
-Resume file: .planning/phases/09-build-a-link-from-resolve-dialog/09-02-PLAN.md
-Next action: Execute 09-02 (E2E untag Build a link scenarios)
+Last session: 2026-08-05T12:13:44.834Z
+Stopped at: Completed 09-02-PLAN.md
+Resume file: None
+Next action: Discuss/plan Phase 10 (Overlap alias append util)
