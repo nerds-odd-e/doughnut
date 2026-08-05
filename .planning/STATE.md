@@ -5,10 +5,10 @@ milestone_name: Accidental Match Resolve UX
 current_phase: 9
 current_phase_name: Build a link from resolve dialog
 status: ui_spec_draft
-stopped_at: Phase 9 UI-SPEC draft written — ready for ui-checker
-last_updated: "2026-08-05T10:00:00.000Z"
+stopped_at: Phase 9 UI-SPEC approved — pattern map + plan next
+last_updated: "2026-08-05T11:53:37.041Z"
 last_activity: 2026-08-05
-last_activity_desc: Wrote 09-UI-SPEC.md for Build a link from resolve dialog
+last_activity_desc: Phase 9 UI design contract (Build a link step + gates)
 progress:
   total_phases: 6
   completed_phases: 2
@@ -96,7 +96,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-08-05T10:00:00.000Z
-Stopped at: Phase 9 UI-SPEC draft written
+Last session: 2026-08-05T11:53:37.034Z
+Stopped at: Phase 9 UI-SPEC approved — pattern map + plan next
 Resume file: .planning/phases/09-build-a-link-from-resolve-dialog/09-UI-SPEC.md
 Next action: gsd-ui-checker on 09-UI-SPEC.md, then /gsd-plan-phase 9
