@@ -1,6 +1,6 @@
 # 0002 — Host Git-native notebooks backed by MySQL
 
-**Status:** Proposed  
+**Status:** Approved
 **Date:** 2026-08-04  
 **Decision makers:** Terry Yin  
 **Consulted:** None
