@@ -21,7 +21,6 @@ Feature: Accidental match reveal
     When I type my answer "sedation"
     Then I should see an accidental match reveal for spelling answer "sedation" with reviewed note "sedition" and matched note "sedation"
 
-  @wip
   Scenario: Offer links the matched note as a wiki property without leaving the result
     Given It's day 1
     And the note "sedition" was assimilated on day 1
@@ -32,7 +31,6 @@ Feature: Accidental match reveal
     When I link the matched note "sedation" as a wiki property from the accidental match result
     Then I should still be on the accidental match result for spelling answer "sedation" with matched note "sedation"
 
-  @wip
   Scenario: Offer links the matched note as a relationship without leaving the result
     Given It's day 1
     And the note "sedition" was assimilated on day 1
