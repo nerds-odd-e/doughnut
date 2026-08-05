@@ -61,10 +61,16 @@ export function mountAnsweredSpellingQuestion(
   })
 }
 
-export function accidentalMatchWithTwoMatchedNotes() {
+export function accidentalMatchWithTwoMatchedNotes(
+  options: { notebookNames?: [string, string] } = {}
+) {
   const reviewedRealm = makeMe.aNoteRealm.title("Reviewed Note").please()
   const matchedA = makeMe.aNoteRealm.id(10).title("Matched A").please()
   const matchedB = makeMe.aNoteRealm.id(20).title("Matched B").please()
+  if (options.notebookNames) {
+    matchedA.notebookRealm.notebook.name = options.notebookNames[0]
+    matchedB.notebookRealm.notebook.name = options.notebookNames[1]
+  }
   const answeredQuestion = makeMe.anAnsweredQuestion
     .withNote(reviewedRealm.note)
     .accidentalMatch("matched a", [

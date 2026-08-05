@@ -46,10 +46,14 @@ describe("AnsweredSpellingQuestion accidental match", () => {
     expect(resolveCta.attributes("aria-label")).toBe("Resolve accidental match")
   })
 
-  it("opens resolve dialog listing matched note titles only", async () => {
-    const { answeredQuestion } = accidentalMatchWithTwoMatchedNotes()
+  it("opens resolve dialog with clickable titles and notebook path identity", async () => {
+    const { answeredQuestion, matchedA, matchedB } =
+      accidentalMatchWithTwoMatchedNotes({
+        notebookNames: ["Notebook Alpha", "Notebook Beta"],
+      })
     wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {
       withRouter: true,
+      seedRealms: [matchedA, matchedB],
     })
     await flushPromises()
 
@@ -62,14 +66,28 @@ describe("AnsweredSpellingQuestion accidental match", () => {
       '[data-testid="accidental-match-resolve-dialog"]'
     )
     expect(dialog).toBeTruthy()
+
+    const row10 = document.body.querySelector(
+      '[data-testid="resolve-match-row-10"]'
+    )
+    expect(row10?.textContent).toContain("Matched A")
+    expect(row10?.querySelector("a")?.getAttribute("href")).toMatch(/10/)
     expect(
-      document.body.querySelector('[data-testid="resolve-match-row-10"]')
+      document.body.querySelector('[data-testid="resolve-match-path-10"]')
         ?.textContent
-    ).toContain("Matched A")
+    ).toContain("Notebook Alpha")
+
+    const row20 = document.body.querySelector(
+      '[data-testid="resolve-match-row-20"]'
+    )
+    expect(row20?.textContent).toContain("Matched B")
+    expect(row20?.querySelector("a")?.getAttribute("href")).toMatch(/20/)
     expect(
-      document.body.querySelector('[data-testid="resolve-match-row-20"]')
+      document.body.querySelector('[data-testid="resolve-match-path-20"]')
         ?.textContent
-    ).toContain("Matched B")
+    ).toContain("Notebook Beta")
+
+    expect(dialog?.querySelector('[data-testid="note-show-stub"]')).toBeNull()
   })
 
   it("omits Resolve CTA when matchedNotes is empty", async () => {
