@@ -1,6 +1,6 @@
 # Backend unit tests → "small test" style
 
-**Status:** in progress (Phase 13 done)
+**Status:** in progress (Phase 14 done)
 **Type:** test renovation (no product behavior change)
 **Verify each phase:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
 **Style:** `.cursor/rules/unit-testing.mdc` + `.cursor/rules/backend-testing.mdc`
@@ -175,9 +175,17 @@ For each file in the phase file list:
 - **Done when:** rubric applied; suite green.
 
 ### Phase 14 — Controllers: memory tracker
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
-- **Files:** `MemoryTrackerControllerTest.java`
+- **Files / scope (post-refactor capability splits):**
+  - `MemoryTrackerThresholdControllerTest.java` (wrong-answer threshold + auth)
+  - `MemoryTrackerAskQuestionControllerTest.java`
+  - `MemoryTrackerShowControllerTest.java` (show / recalled-note shape)
+  - `MemoryTrackerTrackingControllerTest.java` (remove / re-enable / mark-as-recalled)
+  - `MemoryTrackerRecentControllerTest.java` (recent trackers + recently recalled)
+  - `MemoryTrackerRecallPromptsControllerTest.java` (list + delete unanswered)
+  - `MemoryTrackerUpdatePropertyKeyControllerTest.java`
+  - base: `MemoryTrackerControllerTestBase.java` (`ownedNote` / `ownedTracker` / `addWrongAnswers` / `renameTo`)
 - **Done when:** rubric applied; suite green.
 
 ### Phase 15 — Controllers: recall prompts and recalls
@@ -317,7 +325,8 @@ If a Behavior phase cannot express fixtures concisely:
 | 11 | done | CRUD/notes-folder/sharing/export/health/groups: lift `ownedNotebook`/`ownedFolder` to `NotebookControllerTestBase`; drop controller `createNotebook` fixtures; focused asserts + parameterized empty-name/reserved-title/health opt-in; catalog suite uses fresh user (avoid `topNote` pollution). Post-refactor: split NotesFolder → note-create/listing/folder-page; CRUD update → `NotebookUpdateControllerTest`; catalog → `NotebookCatalogControllerTest`; Wikidata suite trimmed to wikidata-only. |
 | 12 | done | Books attach/retrieve/reading: split mega attach into outline / getBook / file bytes / Full-view; drop duplicate PDF locator + PDF/EPUB position persist twins; canonical reading-record shape once + skimmed/skipped vs invalid status; `textBlock`/`contentListAttachRequest` helpers. Post-refactor: attach-content / book-file / get-reading-position capability splits (≤250). |
 | 13 | done | Block content/depth: `textBlock` + chapter helpers; drop indent twins subsumed by subtree move; merge outdent subtree duplicates; suggestion builders shared; OpenAI mock only for suggest. Post-refactor: create-from-content / suggest-layout / apply-layout splits + block/layout-reorg bases (≤250). |
-| 14–26 | planned | — |
+| 14 | done | Memory tracker: `notebookOwnedBy` + drop redundant `.by`; threshold parameterized; recycle asserts id only; deleted-note lists assert contains only; `removedFromTracking()` builder; prompt helpers. Post-refactor: threshold / ask / show / tracking / recent / recall-prompts / update-property-key + base. |
+| 15–26 | planned | — |
 
 ---
 
@@ -340,3 +349,4 @@ If a Behavior phase cannot express fixtures concisely:
 - Phase 11: Lift `ownedNotebook`/`ownedFolder` to `NotebookControllerTestBase` (folder-management base inherits). Catalog exact-list asserts need a fresh user in `@BeforeEach` because base setup creates `topNote`. Wikidata root-note suite overlaps note-create folder assignment — keep only wikidata enrichment cases. Post-refactor capability splits: note-create / folder-listing / folder-page / update / catalog.
 - Phase 12: PDF locator “heading+body” and “match bboxes” were the same claim — keep one. Patch PDF via `lastReadBody` already covers PdfLocator DTO path; EPUB wire helper covers EpubLocator. Put reading-record return shape is enough without re-asserting the repository row. Content-list attach fixtures share `contentListAttachRequest` + `textBlock`. Post-refactor splits: attach-content / book-file / get-reading-position.
 - Phase 13: Indent “depth+1” and “full book size” were subsumed by indent-moves-descendants; two outdent-subtree cases collapsed to one with sibling W. Suggest/apply share `suggestionWithDepths` / `nestBAndCDepths`. Create-from-content fixtures use `chapterWithHeadingAndBody` / `textBlock`. Post-refactor: create-from-content / suggest-layout / apply-layout + `blockByTitle` / layout-reorg bases.
+- Phase 14: `aMemoryTrackerFor` already inherits notebook owner — drop `.by(currentUser)` when note is `notebookOwnedBy`. Threshold below/at/above → one parameterized case. Ask recycle asserts prompt id only after spelling shape. Deleted-note recent lists: `contains(active)` enough without `not(hasItem)`. Post-refactor split show vs tracking mutations; `spellingTracker()` helper.
