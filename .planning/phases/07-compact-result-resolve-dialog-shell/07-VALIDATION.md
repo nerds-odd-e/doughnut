@@ -40,11 +40,10 @@ created: 2026-08-05
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|---------|-----------------|-----------|-------------------|-------------|--------|
-| TBD | 01 | 1 | AMR-01 | — | N/A (UI presentation) | unit | AccidentalMatch spec rewrite | ✅ rewrite | ⬜ pending |
-| TBD | 01 | 1 | AMR-02 | — | N/A | unit + E2E | AccidentalMatch; reveal scenario 1 | ✅ update | ⬜ pending |
-| TBD | 01 | 1 | AMR-03 | — | N/A | unit and/or E2E | Dismiss dialog; remain on result | ✅ extend | ⬜ pending |
-| TBD | 01 | 1 | (regression) | — | No resolve CTA on OVERLAP | unit + E2E | Overlap.spec; overlap_try_again | ✅ update | ⬜ pending |
-| TBD | 01 | 1 | (interim) | — | Link scenarios paused | E2E `@wip` | Reveal feature scenarios 2–3 | ✅ tag `@wip` | ⬜ pending |
+| 07-01-T1 | 01 | 1 | AMR-01, AMR-02 | T-07-01 | Title text interpolation (no v-html) | unit | AccidentalMatch.spec (tracer RED→GREEN) | ✅ rewrite | ⬜ pending |
+| 07-01-T2 | 01 | 1 | AMR-03 | T-07-01 | Dismiss-only Modal; no mutate | unit | AccidentalMatch + Overlap specs | ✅ update | ⬜ pending |
+| 07-02-T1 | 02 | 2 | AMR-01, AMR-02, AMR-03 | T-07-05 | E2E asserts title text visibility | E2E | accidental_match_reveal Scenario 1 | ✅ update | ⬜ pending |
+| 07-02-T2 | 02 | 2 | (regression / interim) | — | No resolve on OVERLAP; link @wip | E2E | reveal (non-@wip) + overlap_try_again | ✅ update | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 

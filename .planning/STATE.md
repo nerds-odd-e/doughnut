@@ -4,15 +4,15 @@ milestone: v1.2
 milestone_name: Accidental Match Resolve UX
 current_phase: 7
 current_phase_name: Compact result + Resolve dialog shell
-status: planning
-stopped_at: Phase 7 UI-SPEC drafted
-last_updated: "2026-08-05T08:45:00.000Z"
+status: ready_to_execute
+stopped_at: Phase 7 plans written
+last_updated: "2026-08-05T16:50:00.000Z"
 last_activity: 2026-08-05
-last_activity_desc: Phase 7 UI-SPEC.md written — ready for UI checker / plan
+last_activity_desc: Phase 7 PLAN.md files created (07-01, 07-02) — ready for execute
 progress:
   total_phases: 6
   completed_phases: 0
-  total_plans: 0
+  total_plans: 2
   completed_plans: 0
   percent: 0
 ---
@@ -24,14 +24,14 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 **Core value:** Healthy mainline for learning and knowledge work — reviewed note stays primary during accidental-match results.
-**Current focus:** Phase 7 — Compact result + Resolve dialog shell (UI-SPEC drafted; ready to plan)
+**Current focus:** Phase 7 — Compact result + Resolve dialog shell (plans ready to execute)
 
 ## Current Position
 
 Phase: 7 of 12 (Compact result + Resolve dialog shell)
-Plan: —
-Status: UI-SPEC draft complete — ready for checker / plan
-Last activity: 2026-08-05 — Phase 7 UI-SPEC.md written
+Plan: 07-01 next
+Status: Plans written — ready for `/gsd-execute-phase 7`
+Last activity: 2026-08-05 — Phase 7 07-01/07-02 PLAN.md created
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -77,5 +77,5 @@ None.
 
 Last session: 2026-08-05T08:34:02.136Z
 Stopped at: Phase 7 context gathered
-Resume file: .planning/phases/07-compact-result-resolve-dialog-shell/07-UI-SPEC.md
-Next action: UI checker then `/gsd-plan-phase 7`
+Resume file: .planning/phases/07-compact-result-resolve-dialog-shell/07-01-PLAN.md
+Next action: `/gsd-execute-phase 7`

@@ -41,7 +41,7 @@ v1.2 replaces stacked matched-note bodies on accidental-match spelling results w
 
 **Milestone Goal:** Compact optional resolve dialog for accidental-match results; reviewed note stays primary.
 
-- [ ] **Phase 7: Compact result + Resolve dialog shell** - Drop stacked matches; CTA opens dismissible dialog with title list
+- [ ] **Phase 7: Compact result + Resolve dialog shell** - Drop stacked matches; CTA opens dismissible dialog with title list (2 plans)
 - [ ] **Phase 8: Match path and clickable titles** - Per-row notebook breadcrumb and clickable match titles (no body peek)
 - [ ] **Phase 9: Build a link from resolve dialog** - Single-Modal link offer; stay on result; readonly/unload gates
 - [ ] **Phase 10: Overlap alias append util** - Structure: wiki-link overlap append helper for the next behavior
@@ -60,7 +60,10 @@ v1.2 replaces stacked matched-note bodies on accidental-match spelling results w
   2. When matches exist, user sees **Resolve accidental match** under the alert and opening it shows a dialog listing match titles (no note body)
   3. User can dismiss the resolve dialog anytime and continue without resolving any match
   4. OVERLAP try-again chrome remains outcome-gated and unchanged on overlap answers
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 07-01-PLAN.md — Tracer: compact result + Resolve CTA title Modal + Vitest edges
+- [ ] 07-02-PLAN.md — E2E reveal rewrite, @wip link scenarios, overlap uncoupled
 **UI hint**: yes
 
 ### Phase 8: Match path and clickable titles
@@ -129,7 +132,7 @@ v1.2 replaces stacked matched-note bodies on accidental-match spelling results w
 |-------|-----------|----------------|--------|-----------|
 | 1–7 Health lint / purge | v1.0 | 13/13 | Complete | 2026-07-23 |
 | 1–6 Spelling match & link | v1.1 | 16/16 | Complete | 2026-07-25 |
-| 7. Compact result + Resolve dialog shell | v1.2 | 0/? | Not started | - |
+| 7. Compact result + Resolve dialog shell | v1.2 | 0/2 | Planned | - |
 | 8. Match path and clickable titles | v1.2 | 0/? | Not started | - |
 | 9. Build a link from resolve dialog | v1.2 | 0/? | Not started | - |
 | 10. Overlap alias append util | v1.2 | 0/? | Not started | - |
