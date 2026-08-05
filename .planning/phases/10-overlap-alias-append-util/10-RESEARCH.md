@@ -392,17 +392,19 @@ Prefer positive wiki-link shape + parsing list items + `authoredAliasesValidatio
 
 **If this table is empty:** — not empty; A1–A4 are discretion/edge assumptions, not blockers.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should the util reject tokens that fail `isWikiLinkAliasItem` (e.g. `[[]]`)?**
    - What we know: authored validation rejects `[[]]`; real matches have titles.
    - What's unclear: whether to harden the util or leave caller responsibility.
    - Recommendation: Skip hardening in Phase 10 unless a test demands it; document in PLAN that Phase 11 passes real titles.
+   - **RESOLVED:** Skip util hardening in Phase 10; Phase 11 passes real match titles (`10-01-PLAN.md` Task 1).
 
 2. **Exact filename vs co-locate in `wikidataTitleActions.ts`?**
    - What we know: D-01 wants a **named sibling**; Wikidata file is plain-alias oriented.
    - What's unclear: new file vs export alongside appendAlias.
    - Recommendation: **New file** `appendOverlapWikiLinkToNoteContent.ts` for capability clarity and to avoid implying Wikidata ownership of overlap.
+   - **RESOLVED:** New file `frontend/src/utils/appendOverlapWikiLinkToNoteContent.ts` (not co-located in `wikidataTitleActions.ts`).
 
 ## Environment Availability
 
