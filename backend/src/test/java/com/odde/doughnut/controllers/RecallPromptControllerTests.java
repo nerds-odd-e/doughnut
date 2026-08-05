@@ -688,6 +688,47 @@ class RecallPromptControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void lateCorrectAnswerDoesNotShortenTheNextInterval() throws UnexpectedNoAccessRightException {
+      Note lateNote = makeMe.aNote().rememberSpelling().please();
+      MemoryTracker lateTracker =
+          makeMe
+              .aMemoryTrackerFor(lateNote)
+              .by(currentUser.getUser())
+              .forgettingCurveAndNextRecallAt(200.0f)
+              .spelling()
+              .please();
+
+      Integer thinkingTimeMs = ForgettingCurve.BASE_THINKING_TIME_MS;
+      Timestamp scheduledAt = memoryTracker.getNextRecallAt();
+      assertThat(scheduledAt.getTime(), greaterThan(memoryTracker.getLastRecalledAt().getTime()));
+
+      testabilitySettings.timeTravelTo(scheduledAt);
+      AnswerSpellingDTO onTimeAnswer = new AnswerSpellingDTO();
+      onTimeAnswer.setSpellingAnswer(answerNote.getTitle());
+      onTimeAnswer.setThinkingTimeMs(thinkingTimeMs);
+      assertTrue(controller.answerSpelling(recallPrompt, onTimeAnswer).getAnswer().getCorrect());
+      Timestamp onTimeAnsweredAt = testabilitySettings.getCurrentUTCTimestamp();
+      long onTimeIntervalMs =
+          memoryTracker.getNextRecallAt().getTime() - onTimeAnsweredAt.getTime();
+      assertThat(onTimeIntervalMs, greaterThan(0L));
+
+      Timestamp lateAnswerAt =
+          TimestampOperations.addHoursToTimestamp(lateTracker.getNextRecallAt(), 100 * 24);
+      testabilitySettings.timeTravelTo(lateAnswerAt);
+      AnswerSpellingDTO lateAnswer = new AnswerSpellingDTO();
+      lateAnswer.setSpellingAnswer(lateNote.getTitle());
+      lateAnswer.setThinkingTimeMs(thinkingTimeMs);
+      RecallPrompt latePrompt =
+          makeMe.aRecallPrompt().forMemoryTracker(lateTracker).spelling().please();
+      assertTrue(controller.answerSpelling(latePrompt, lateAnswer).getAnswer().getCorrect());
+      Timestamp lateAnsweredAt = testabilitySettings.getCurrentUTCTimestamp();
+      long lateIntervalMs = lateTracker.getNextRecallAt().getTime() - lateAnsweredAt.getTime();
+
+      assertThat(lateIntervalMs, greaterThanOrEqualTo(onTimeIntervalMs));
+      assertThat(lateTracker.getNextRecallAt().getTime(), greaterThan(lateAnsweredAt.getTime()));
+    }
+
+    @Test
     void fastAnswer_shouldIncreaseIndexMoreThanSlowAnswer()
         throws UnexpectedNoAccessRightException {
       testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());

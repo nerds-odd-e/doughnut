@@ -32,17 +32,14 @@ public class ForgettingCurve {
   }
 
   float succeeded(long delayInHours, Integer thinkingTimeMs) {
-    float delayAdjustment = DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
+    float successIncrement = DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
     Integer oldRepeatInHours = getRepeatInHours();
-    if (oldRepeatInHours > 0) {
-      delayAdjustment =
-          DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT
-              - Math.abs(delayInHours)
-                  * DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT
-                  / (float) oldRepeatInHours;
+    if (oldRepeatInHours > 0 && delayInHours < 0) {
+      successIncrement +=
+          delayInHours * DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT / (float) oldRepeatInHours;
     }
     float thinkingTimeAdjustment = calculateThinkingTimeAdjustment(thinkingTimeMs);
-    return add(delayAdjustment + thinkingTimeAdjustment);
+    return add(successIncrement + thinkingTimeAdjustment);
   }
 
   private float calculateThinkingTimeAdjustment(Integer thinkingTimeMs) {

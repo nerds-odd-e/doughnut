@@ -75,20 +75,14 @@ public class ForgettingCurveThinkingTimeTest {
   }
 
   @Test
-  void thinkingTimeAdjustmentCombinedWithDelayAdjustment() {
+  void thinkingTimeAdjustmentCombinedWithEarlyRecallDiscount() {
     ForgettingCurve curve = createForgettingCurve(DEFAULT_FORGETTING_CURVE_INDEX + 20);
     float indexOnTimeWithBase = curve.succeeded(0, BASE_THINKING_TIME_MS);
-    float indexOnTimeWith10Seconds = curve.succeeded(0, 10000);
-    float indexLateWithBase = curve.succeeded(24, BASE_THINKING_TIME_MS);
-    float indexLateWith10Seconds = curve.succeeded(24, 10000);
+    float indexEarlyWithBase = curve.succeeded(-24, BASE_THINKING_TIME_MS);
+    float indexEarlyWith10Seconds = curve.succeeded(-24, 10000);
 
-    // Fast thinking time should increase index more than base thinking time
-    assertThat(indexOnTimeWith10Seconds, greaterThan(indexOnTimeWithBase));
-    assertThat(indexLateWith10Seconds, greaterThan(indexLateWithBase));
-
-    // Late recall should have lower index than on-time recall
-    assertThat(indexOnTimeWithBase, greaterThan(indexLateWithBase));
-    assertThat(indexOnTimeWith10Seconds, greaterThan(indexLateWith10Seconds));
+    assertThat(indexOnTimeWithBase, greaterThan(indexEarlyWithBase));
+    assertThat(indexEarlyWith10Seconds, greaterThan(indexEarlyWithBase));
   }
 
   @Test

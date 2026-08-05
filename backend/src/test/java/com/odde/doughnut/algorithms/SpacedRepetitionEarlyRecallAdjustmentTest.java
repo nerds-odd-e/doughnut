@@ -16,7 +16,7 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.utils.TimestampOperations;
 import org.junit.jupiter.api.Test;
 
-public class SpacedRepetitionEarlyRewardsAndLatePenaltyTest {
+public class SpacedRepetitionEarlyRecallAdjustmentTest {
   final float currentForgettingCurveIndex =
       DEFAULT_FORGETTING_CURVE_INDEX + DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT * 2;
   final float baselineForgettingCurveIndex =
@@ -46,33 +46,6 @@ public class SpacedRepetitionEarlyRewardsAndLatePenaltyTest {
     float index = getNextForgettingCurveIndexWithDelay(-1);
     assertThat(index, greaterThan(currentForgettingCurveIndex));
     assertThat(index, lessThanOrEqualTo(baselineForgettingCurveIndex));
-  }
-
-  @Test
-  void repeatLate_byOneHour() {
-    float index = getNextForgettingCurveIndexWithDelay(1);
-    assertThat(index, greaterThan(currentForgettingCurveIndex));
-    assertThat(index, lessThanOrEqualTo(baselineForgettingCurveIndex));
-  }
-
-  @Test
-  void repeatLate_byOneDay() {
-    float index = getNextForgettingCurveIndexWithDelay(24);
-    assertThat(index, greaterThan(currentForgettingCurveIndex));
-    assertThat(index, lessThan(baselineForgettingCurveIndex));
-  }
-
-  @Test
-  void repeatLate_by10Days() {
-    float index = getNextForgettingCurveIndexWithDelay(10 * 24);
-    assertThat(index, lessThan(currentForgettingCurveIndex));
-    assertThat(index, greaterThan(DEFAULT_FORGETTING_CURVE_INDEX));
-  }
-
-  @Test
-  void repeatLate_byOneHundredDays() {
-    float index = getNextForgettingCurveIndexWithDelay(100 * 24);
-    assertThat(index, equalTo(DEFAULT_FORGETTING_CURVE_INDEX));
   }
 
   private float getNextForgettingCurveIndexWithDelay(int delayInHours) {

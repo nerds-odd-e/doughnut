@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Clean up LIA training participant code
-status: Quick task planned
-stopped_at: Quick task 260805 plan written — awaiting execution
-last_updated: "2026-08-05T10:46:03+08:00"
+status: Quick task complete
+stopped_at: Quick task 260805 Phase 1 done — late-success penalty removed
+last_updated: "2026-08-05T11:05:00+08:00"
 last_activity: 2026-08-05
-last_activity_desc: Planned narrow removal of the late-success penalty; broader ADR paused
+last_activity_desc: Removed late-success penalty; overdue correct recall keeps on-time interval
 progress:
   total_phases: 8
   completed_phases: 4
@@ -25,14 +25,14 @@ See: `.planning/PROJECT.md` (updated 2026-08-03 after v1.2)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** [Quick task 260805 — remove the late-success penalty](./quick/260805-late-success-penalty/PLAN.md)
+**Current focus:** Quick task 260805 complete — late-success penalty removed from `ForgettingCurve.succeeded`
 
 ## Current Position
 
-Phase: Quick task 260805, Phase 1 (Behavior)
+Phase: Quick task 260805, Phase 1 (Behavior) — **Done**
 Plan: [Remove the late-success penalty](./quick/260805-late-success-penalty/PLAN.md)
-Status: Planned; awaiting execution
-Last activity: 2026-08-05 — Reduced scope to the current late-success penalty defect; ADR review paused
+Status: Complete
+Last activity: 2026-08-05 — Late correct recall keeps at least the on-time interval; Proposed ADR still paused
 
 ## Performance Metrics
 

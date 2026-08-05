@@ -97,15 +97,13 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
     }
 
     @Nested
-    class EarlyAndLateRecall {
+    class OnTimeAndEarlyRecall {
       @ParameterizedTest
       @CsvSource({
         "0, 0,  100.0",
         "0, 1,  110.0",
         "2, -1,  115.0",
         "2, 0, 120.0",
-        "2, 1, 115.0",
-        "2, 100, 100.0",
       })
       void aMemoryTrackerHasBeenRecalledStrictly(
           int ntimes, Integer daysDelay, float expectedForgettingCurveIndex) {
