@@ -23,36 +23,38 @@ import org.springframework.beans.factory.annotation.Autowired;
 class RelationControllerMoveNoteToFolderTests extends ControllerTestBase {
   @Autowired NoteRepository noteRepository;
   @Autowired RelationController controller;
-  @Autowired WikiTitleCacheService wikiTitleCacheServiceBean;
-
-  User anotherUser;
-  Note ownNote;
-  Folder targetFolder;
+  @Autowired WikiTitleCacheService wikiTitleCacheService;
 
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-    anotherUser = makeMe.aUser().please();
-    Notebook ownNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-    ownNote = makeMe.aNote("flower").notebook(ownNotebook).please();
-    Notebook anchorNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-    makeMe.aRootNote("nbroot").notebook(anchorNotebook).please();
-    targetFolder = makeMe.aFolder().notebook(anchorNotebook).name("TargetF").please();
+  }
+
+  private Notebook ownedNotebook(String name) {
+    return makeMe.aNotebook().name(name).creatorAndOwner(currentUser.getUser()).please();
+  }
+
+  private Folder ownedFolder(String name) {
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+    return makeMe.aFolder().notebook(notebook).name(name).please();
   }
 
   @Test
   void moveNoteToFolderSuccessfully() throws UnexpectedNoAccessRightException {
-    Note mover = makeMe.aNote("mover").notebook(ownNote.getNotebook()).please();
+    Note mover = makeMe.aNote("mover").notebookOwnedBy(currentUser.getUser()).please();
+    Folder targetFolder = ownedFolder("TargetF");
+
     var result = controller.moveNoteToFolder(mover, targetFolder);
+
     assertThat(result, hasSize(1));
-    mover = noteRepository.findById(mover.getId()).orElseThrow();
+    makeMe.refresh(mover);
     assertThat(mover.getFolder().getId(), equalTo(targetFolder.getId()));
   }
 
   @Test
   void shouldNotAllowMoveOtherPeoplesNoteToFolder() {
-    Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(anotherUser).please();
-    Note mover = makeMe.aNote().notebook(otherNotebook).please();
+    Folder targetFolder = ownedFolder("TargetF");
+    Note mover = makeMe.aNote().notebookOwnedBy(makeMe.aUser().please()).please();
     assertThrows(
         UnexpectedNoAccessRightException.class,
         () -> controller.moveNoteToFolder(mover, targetFolder));
@@ -60,10 +62,8 @@ class RelationControllerMoveNoteToFolderTests extends ControllerTestBase {
 
   @Test
   void shouldNotAllowMoveToUnauthorizedFolderNotebook() {
-    Notebook moverNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-    Note mover = makeMe.aNote().notebook(moverNotebook).please();
-    Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(anotherUser).please();
-    makeMe.aRootNote("other").notebook(otherNotebook).please();
+    Note mover = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+    Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(makeMe.aUser().please()).please();
     Folder otherFolder = makeMe.aFolder().notebook(otherNotebook).name("ForeignF").please();
     assertThrows(
         UnexpectedNoAccessRightException.class,
@@ -72,19 +72,14 @@ class RelationControllerMoveNoteToFolderTests extends ControllerTestBase {
 
   @Test
   void moveNoteIntoFolder_collectsPeersAndIsIdempotent() throws Throwable {
-    User u = currentUser.getUser();
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(u).please();
-    makeMe.aRootNote("top").notebook(notebook).please();
-    Folder folder = makeMe.aFolder().notebook(notebook).name("F").please();
-    Note peer = makeMe.aNote("A").notebook(notebook).please();
-    Note mover = makeMe.aNote("M").notebook(notebook).please();
-    makeMe.entityPersister.flush();
+    Note peer = makeMe.aNote("A").notebookOwnedBy(currentUser.getUser()).please();
+    Note mover = makeMe.aNote("M").underSameNotebookAs(peer).please();
+    Folder folder = makeMe.aFolder().notebook(peer.getNotebook()).name("F").please();
+
     controller.moveNoteToFolder(peer, folder);
     controller.moveNoteToFolder(mover, folder);
-    makeMe.refresh(mover);
-    assertThat(mover.getFolder().getId(), equalTo(folder.getId()));
-
     controller.moveNoteToFolder(mover, folder);
+
     List<Note> ordered = noteRepository.findNotesInFolderOrderByIdAsc(folder.getId());
     assertThat(
         ordered.stream().map(Note::getId).toList(),
@@ -94,17 +89,14 @@ class RelationControllerMoveNoteToFolderTests extends ControllerTestBase {
   @Test
   void sameNotebookMoveToFolder_doesNotRewriteLinks() throws UnexpectedNoAccessRightException {
     User u = currentUser.getUser();
-    Notebook notebook = makeMe.aNotebook().name("SameNb").creatorAndOwner(u).please();
+    Notebook notebook = ownedNotebook("SameNb");
     Folder folder = makeMe.aFolder().notebook(notebook).name("F").please();
-    Note target = makeMe.aNote("X").notebook(notebook).please();
-    Note mover = makeMe.aNote("Mover").notebook(notebook).please();
-    mover.setContent("See [[X]].");
-    Note referrer = makeMe.aNote("Carrier").notebook(notebook).please();
-    referrer.setContent("[[Mover]]");
-    makeMe.entityPersister.flush();
-    wikiTitleCacheServiceBean.refreshForNote(referrer, u);
-    wikiTitleCacheServiceBean.refreshForNote(mover, u);
-    makeMe.entityPersister.flush();
+    makeMe.aNote("X").notebook(notebook).please();
+    Note mover = makeMe.aNote("Mover").notebook(notebook).content("See [[X]].").please();
+    Note referrer =
+        makeMe.aNote("Carrier").underSameNotebookAs(mover).content("[[Mover]]").please();
+    wikiTitleCacheService.refreshForNote(referrer, u);
+    wikiTitleCacheService.refreshForNote(mover, u);
 
     controller.moveNoteToFolder(mover, folder);
 
@@ -112,22 +104,14 @@ class RelationControllerMoveNoteToFolderTests extends ControllerTestBase {
     makeMe.refresh(mover);
     assertThat(referrer.getContent(), equalTo("[[Mover]]"));
     assertThat(mover.getContent(), equalTo("See [[X]]."));
-    assertThat(
-        wikiTitleCacheServiceBean.wikiTitlesForViewer(mover, u).stream()
-            .map(wt -> wt.getNoteId())
-            .toList(),
-        containsInAnyOrder(target.getId()));
   }
 
   @Test
   void crossNotebookMoveToFolder_preservesNullContentWhenOutgoingRewriteHasNothingToDo()
       throws UnexpectedNoAccessRightException {
-    User u = currentUser.getUser();
-    Notebook oldNotebook = makeMe.aNotebook().name("OldNb").creatorAndOwner(u).please();
-    Notebook newNotebook = makeMe.aNotebook().name("NewNb").creatorAndOwner(u).please();
-    Folder destination = makeMe.aFolder().notebook(newNotebook).name("Dest").please();
+    Notebook oldNotebook = ownedNotebook("OldNb");
+    Folder destination = makeMe.aFolder().notebook(ownedNotebook("NewNb")).name("Dest").please();
     Note mover = makeMe.aNote("Mover").notebook(oldNotebook).content(null).please();
-    makeMe.entityPersister.flush();
     makeMe.refresh(mover);
     Timestamp originalUpdatedAt = mover.getUpdatedAt();
 

@@ -1,6 +1,6 @@
 # Backend unit tests → "small test" style
 
-**Status:** in progress (Phase 7 done)  
+**Status:** in progress (Phase 8 done)  
 **Type:** test renovation (no product behavior change)  
 **Verify each phase:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only`  
 **Style:** `.cursor/rules/unit-testing.mdc` + `.cursor/rules/backend-testing.mdc`  
@@ -109,7 +109,7 @@ For each file in the phase file list:
 - **Done when:** rubric applied; suite green.
 
 ### Phase 8 — Controllers: note satellites
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
 - **Files:**
   - `RelationControllerTests.java`, `RelationControllerMoveNoteToFolderTests.java`
@@ -300,7 +300,8 @@ If a Behavior phase cannot express fixtures concisely:
 | 5 | done | Show/stats/spelling: focused asserts + `.aliases()` / `underSameNotebookAs`; parameterized literal spelling; skipped trackers on own note (drop subscription). Post-refactor split oversized `NoteControllerTests` into capability-named files (show / note-info / spelling / delete*). |
 | 6 | done | Delete/upload/graph/AI: `notebookOwnedBy` + `underSameNotebookAs`; `asRelationship` MakeMe; tracker rehome canonical once / delta siblings; drop mid-state restore assert; graph relatedNotes fixture (was vacuous). Post-refactor: split remaining nesteds to capability files; extract `RelationshipNoteMarkdown` from NoteBuilder (>250). |
 | 7 | done | Text content: `notebookOwnedBy` / `underSameNotebookAs`; `InboundWiki` helper; canonical wiki/alias asserts + parameterized invalid aliases; `ImageBuilder.forNote`. Post-refactor split grab-bag into capability files + shared base. |
-| 8–26 | planned | — |
+| 8 | done | Note satellites: `notebookOwnedBy` / `underSameNotebookAs` / `.content()`; drop unused root notes & shared BeforeEach fixtures; Attachment → ControllerTestBase; RecentNotes drop unused HttpClientAdapter; SoftDeleted conflict shape once + sibling delta; schema persistence tests already clean. Post-refactor: `ownedFolder`/`ownedNotebook`/`expectSoftDeletedTitleConflict`. |
+| 9–26 | planned | — |
 
 ---
 
@@ -317,3 +318,4 @@ If a Behavior phase cannot express fixtures concisely:
 - Phase 5: Wiki-title canonical shape once; siblings assert noteId (or pipe/qualified deltas). `.aliases()` already refreshes alias index — only refresh wiki cache on the viewer. Note-info skipped-tracker claim does not need subscription wiring when the note is owned by current user. Oversized `NoteControllerTests` split along capability seams during post-change-refactor; Phase 6 paths updated accordingly.
 - Phase 6: `NoteBuilder.asRelationship` + extracted `RelationshipNoteMarkdown` replace local relationship-content helpers. Graph `relatedNotesExpose…` was vacuous with only a root note — needs a linked peer fixture. Tracker-rehome siblings assert property-key delta only after the canonical rehome case. Restore test drops mid-delete assert covered by exclusion sibling. Remaining grab-bag `NoteControllerTests` nesteds split to upload / recall-setting / graph / AI-context files.
 - Phase 7: Inbound-wiki rename fixtures share `noteWithInboundWiki` (target + carrier via content update). Display-text wiki-title sibling asserts delta only after full-shape canonical. Invalid authored-alias rejects: BINDING_ERROR + unchanged content once; sibling invalid list items parameterized on message only. `ImageBuilder.forNote` replaces post-`please` `setNote` + save. Oversized grab-bag split to title / inbound-wiki / content / aliases (+ shared base).
+- Phase 8: Relation move tests: named notebooks still need `creatorAndOwner` + name (wiki link qualification); notes use `notebookOwnedBy` / `underSameNotebookAs` / `.content()`. Drop mid-state folder assert before idempotent rematch; same-notebook no-rewrite drops redundant wiki-title list when content unchanged. SoftDeleted MVC: canonical conflict asserts deletedNoteId once; siblings status+errorType only. Schema/constraint persistence tests (title NOT NULL, folder unique index) already domain-stable — leave in place.
