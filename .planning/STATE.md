@@ -5,10 +5,10 @@ milestone_name: Accidental Match Resolve UX
 current_phase: 7
 current_phase_name: Compact result + Resolve dialog shell
 status: ready_for_verification
-stopped_at: Phase 8 context gathered
-last_updated: "2026-08-05T09:11:32.641Z"
+stopped_at: Phase 8 research complete
+last_updated: "2026-08-05T09:16:00.000Z"
 last_activity: 2026-08-05
-last_activity_desc: Completed 07-02 E2E resolve dialog rewrite
+last_activity_desc: Wrote 08-RESEARCH.md for match path + clickable titles
 progress:
   total_phases: 6
   completed_phases: 1
@@ -24,14 +24,14 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 **Core value:** Healthy mainline for learning and knowledge work — reviewed note stays primary during accidental-match results.
-**Current focus:** Phase 7 plans complete — ready for verification; then Phase 8
+**Current focus:** Phase 8 research complete — ready for `/gsd-plan-phase` planning; Phase 7 still ready for verification
 
 ## Current Position
 
-Phase: 7 of 12 (Compact result + Resolve dialog shell)
-Plan: 2/2 complete
-Status: ready_for_verification — 07-01 + 07-02 done
-Last activity: 2026-08-05 — Completed 07-02 E2E resolve dialog rewrite
+Phase: 8 of 12 (Match path and clickable titles) — research done; Phase 7 plans still complete
+Plan: Phase 8 plans TBD
+Status: Phase 8 research complete — planner can create PLAN.md
+Last activity: 2026-08-05 — Wrote 08-RESEARCH.md
 
 Progress: [██████████] 100% (phase plans)
 
@@ -86,7 +86,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-08-05T09:11:32.635Z
-Stopped at: Phase 8 context gathered
-Resume file: .planning/phases/08-match-path-and-clickable-titles/08-CONTEXT.md
-Next action: Verify Phase 7 (or discuss/plan Phase 8)
+Last session: 2026-08-05T09:16:00.000Z
+Stopped at: Phase 8 research complete
+Resume file: .planning/phases/08-match-path-and-clickable-titles/08-RESEARCH.md
+Next action: Plan Phase 8 (`/gsd-plan-phase` → PLAN.md) or verify Phase 7
