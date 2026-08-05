@@ -44,7 +44,7 @@ v1.2 replaces stacked matched-note bodies on accidental-match spelling results w
 - [x] **Phase 7: Compact result + Resolve dialog shell** - Drop stacked matches; CTA opens dismissible dialog with title list (2/2 plans)
 - [x] **Phase 8: Match path and clickable titles** - Per-row notebook breadcrumb and clickable match titles (no body peek)
 - [x] **Phase 9: Build a link from resolve dialog** - Single-Modal link offer; stay on result; readonly/unload gates (2/2 plans)
-- [ ] **Phase 10: Overlap alias append util** - Structure: wiki-link overlap append helper for the next behavior
+- [x] **Phase 10: Overlap alias append util** - Structure: wiki-link overlap append helper for the next behavior
 - [ ] **Phase 11: Add as overlapped note** - Declare overlap from dialog; no try-again / no SRS credit reclaim
 - [ ] **Phase 12: Title navigate, reopen, E2E polish** - Return to result and reopen resolve with same matches
 
@@ -129,10 +129,11 @@ Plans:
   2. A unit-tested helper appends an overlap wiki-link alias token (not a plain alias) suitable for frontmatter merge
   3. No new user-facing **Add as overlapped note** action yet
 
-**Plans:** 1 plan
+**Plans:** 1/1 plans executed
 
 Plans:
-- [ ] 10-01-PLAN.md — Structure tracer: appendOverlapWikiLinkToNoteContent util + Vitest (D-01..D-09)
+
+- [x] 10-01-PLAN.md — Structure tracer: appendOverlapWikiLinkToNoteContent util + Vitest (D-01..D-09)
 
 **UI hint**: yes
 
@@ -174,8 +175,8 @@ Plans:
 | 1–6 Spelling match & link | v1.1 | 16/16 | Complete | 2026-07-25 |
 | 7. Compact result + Resolve dialog shell | v1.2 | 2/2 | Complete | 2026-08-05 |
 | 8. Match path and clickable titles | v1.2 | 2/2 | Complete | 2026-08-05 |
-| 9. Build a link from resolve dialog | v1.2 | 2/2 | In Progress|  |
-| 10. Overlap alias append util | v1.2 | 0/? | Not started | - |
+| 9. Build a link from resolve dialog | v1.2 | 2/2 | Complete | 2026-08-05 |
+| 10. Overlap alias append util | v1.2 | 1/1 | Complete | 2026-08-05 |
 | 11. Add as overlapped note | v1.2 | 0/? | Not started | - |
 | 12. Title navigate, reopen, E2E polish | v1.2 | 0/? | Not started | - |
 

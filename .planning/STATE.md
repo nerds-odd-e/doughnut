@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Accidental Match Resolve UX
-current_phase: 10
-current_phase_name: Overlap alias append util
+current_phase: 11
+current_phase_name: Add as overlapped note
 status: ready
-stopped_at: Phase 10 planning complete
-last_updated: "2026-08-05T12:33:28.192Z"
+stopped_at: Completed 10-01-PLAN.md
+last_updated: "2026-08-05T12:38:00Z"
 last_activity: 2026-08-05
-last_activity_desc: Wrote 10-01-PLAN.md
+last_activity_desc: Completed 10-01 overlap wiki-link append util
 progress:
   total_phases: 6
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 7
-  completed_plans: 6
-  percent: 50
+  completed_plans: 7
+  percent: 67
 ---
 
 # Project State
@@ -24,16 +24,16 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 **Core value:** Healthy mainline for learning and knowledge work — reviewed note stays primary during accidental-match results.
-**Current focus:** Phase 9 complete (AMR-06/AMR-07) — next Phase 10 Structure
+**Current focus:** Phase 10 complete — next Phase 11 Add as overlapped note (AMR-08/AMR-09)
 
 ## Current Position
 
-Phase: 10 of 12 (Overlap alias append util) — planned
-Plan: 10-01 ready (Structure util + Vitest)
-Status: Phase 10 plan created — execute next
-Last activity: 2026-08-05 — Wrote 10-01-PLAN.md
+Phase: 11 of 12 (Add as overlapped note) — ready to plan/discuss
+Plan: Phase 10 (10-01) complete
+Status: Phase 10 Structure util shipped — execute Phase 11 next
+Last activity: 2026-08-05 — Completed 10-01-PLAN.md
 
-Progress: [█████░░░░░] 50% (3/6 v1.2 phases; 6/6 plans executed across phases 7–9)
+Progress: [██████░░░░] 67% (4/6 v1.2 phases; 7/7 plans executed across phases 7–10)
 
 ## Performance Metrics
 
@@ -46,6 +46,7 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 | 07 | 2/2 | 8min | 4min |
 | 08 | 2/2 | 6min | 3min |
 | 09 | 2/2 | 7min | 3.5min |
+| 10 | 1/1 | 4min | 4min |
 
 **Per-Plan Metrics:**
 
@@ -57,6 +58,7 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 | Phase 08 P02 | 2min | 2 tasks | 2 files |
 | Phase 09 P01 | 4min | 2 tasks | 5 files |
 | Phase 09 P02 | 3min | 2 tasks | 2 files |
+| Phase 10 P01 | 4min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -87,6 +89,8 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 - [Phase 9]: canOfferBuildLink hides Build a link when readonly or realms unloaded
 - [Phase 9]: Page-object-only Resolve → Build a link path; Gherkin unchanged (D-09)
 - [Phase 9]: Stay-on-result asserts alert + Resolve CTA + dialog list (D-04); no matched-notes-section
+- [Phase 10]: One-line appendOverlapWikiLinkToNoteContent composes buildWikiLinkText (no displayText) → appendAliasToNoteContent
+- [Phase 10]: Structure-only util + Vitest; Phase 11 wires Add as overlapped note CTA
 
 ### Pending Todos
 
@@ -108,7 +112,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-08-05T12:33:28.184Z
-Stopped at: Phase 10 planning complete
-Resume file: .planning/phases/10-overlap-alias-append-util/10-01-PLAN.md
-Next action: `/gsd-execute-phase 10`
+Last session: 2026-08-05T12:38:00Z
+Stopped at: Completed 10-01-PLAN.md
+Resume file: None
+Next action: `/gsd-discuss-phase 11` or `/gsd-plan-phase 11`
