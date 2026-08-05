@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Clean up LIA training participant code
-status: Awaiting next milestone
-stopped_at: Phase 14 Complete — HYG-01/02/03 closed
-last_updated: "2026-08-03T09:14:02.233Z"
-last_activity: 2026-08-03
-last_activity_desc: Milestone v1.2 completed and archived
+status: Quick task planned
+stopped_at: Quick task 260805 plan written — awaiting execution
+last_updated: "2026-08-05T10:46:03+08:00"
+last_activity: 2026-08-05
+last_activity_desc: Planned narrow removal of the late-success penalty; broader ADR paused
 progress:
   total_phases: 8
   completed_phases: 4
@@ -25,14 +25,14 @@ See: `.planning/PROJECT.md` (updated 2026-08-03 after v1.2)
 
 **Core value:** Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
 
-**Current focus:** Planning next milestone — `/gsd-new-milestone`
+**Current focus:** [Quick task 260805 — remove the late-success penalty](./quick/260805-late-success-penalty/PLAN.md)
 
 ## Current Position
 
-Phase: —
-Plan: —
-Status: Awaiting next milestone (v1.2 archived)
-Last activity: 2026-08-03 — Archived v1.2; REQUIREMENTS cleared for next cycle
+Phase: Quick task 260805, Phase 1 (Behavior)
+Plan: [Remove the late-success penalty](./quick/260805-late-success-penalty/PLAN.md)
+Status: Planned; awaiting execution
+Last activity: 2026-08-05 — Reduced scope to the current late-success penalty defect; ADR review paused
 
 ## Performance Metrics
 
@@ -127,7 +127,7 @@ Decisions are logged in PROJECT.md Key Decisions table. Roadmap-shaping decision
 
 ### Pending Todos
 
-None yet.
+- Execute quick task 260805 test-first; keep the broader spaced-repetition ADR Proposed and untouched.
 
 ### Blockers/Concerns
 
@@ -150,11 +150,12 @@ Items acknowledged and deferred at milestone close on 2026-08-03 (v1.2 `override
 
 ## Session Continuity
 
-**Last session:** 2026-08-03T09:16:00.000Z
-**Stopped at:** v1.2 archived; spent phase diaries trashed (`v1.0-phases`, `v1.2-phases`)
-**Next action:** `/gsd-new-milestone` (optional: push tag `v1.2` + 2 archive commits)
-**Resume file:** None
+**Last session:** 2026-08-05T10:46:03+08:00
+**Stopped at:** Quick task 260805 plan written; no implementation started
+**Next action:** Execute the late-success penalty plan test-first
+**Resume file:** [Quick task plan](./quick/260805-late-success-penalty/PLAN.md)
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Run the quick task with the `execute-plan` skill using [PLAN.md](./quick/260805-late-success-penalty/PLAN.md).
+- Resume ADR review only after the narrow production defect is fixed and verified.
