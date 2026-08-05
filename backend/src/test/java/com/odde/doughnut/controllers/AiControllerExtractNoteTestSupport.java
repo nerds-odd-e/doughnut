@@ -18,17 +18,34 @@ import org.springframework.web.server.ResponseStatusException;
 
 final class AiControllerExtractNoteTestSupport {
 
+  static final String EXTRACTABLE_CONTENT = "Original content with a key suggestion to extract.";
+
   private AiControllerExtractNoteTestSupport() {}
 
   static Note newRootNoteWithExtractableContent(MakeMe makeMe, User user) {
-    Note note = makeMe.aNote().notebookOwnedBy(user).please();
-    note.setContent("Original content with a key suggestion to extract.");
-    return note;
+    return makeMe.aNote().notebookOwnedBy(user).content(EXTRACTABLE_CONTENT).please();
   }
 
   static NoteRefinementLayout layoutWithItem(String id, String text) {
     return new NoteRefinementLayout(
         List.of(new NoteRefinementLayoutItem(id, text, false, List.of())));
+  }
+
+  static NoteRefinementLayout nestedLayout(
+      String parentId,
+      String parentText,
+      String childId,
+      String childText,
+      String siblingId,
+      String siblingText) {
+    return new NoteRefinementLayout(
+        List.of(
+            new NoteRefinementLayoutItem(
+                parentId,
+                parentText,
+                false,
+                List.of(new NoteRefinementLayoutItem(childId, childText, false, List.of()))),
+            new NoteRefinementLayoutItem(siblingId, siblingText, false, List.of())));
   }
 
   static NoteRefinementLayoutSelectionRequestDTO layoutSelectionRequest(
@@ -38,6 +55,10 @@ final class AiControllerExtractNoteTestSupport {
     requestDTO.setLayout(layout);
     requestDTO.setSelectedItemIds(selectedItemIds);
     return requestDTO;
+  }
+
+  static NoteRefinementLayoutSelectionRequestDTO selectSingleLayoutItem(String id, String text) {
+    return layoutSelectionRequest(layoutWithItem(id, text), List.of(id));
   }
 
   static NoteExtractionResult extractionResult(
@@ -56,5 +77,11 @@ final class AiControllerExtractNoteTestSupport {
   static void assertResponseStatus(Executable action, HttpStatus expected) {
     assertThat(assertThrows(ResponseStatusException.class, action).getStatusCode())
         .isEqualTo(expected);
+  }
+
+  static void assertBadRequestContaining(Executable action, String substring) {
+    ResponseStatusException ex = assertThrows(ResponseStatusException.class, action);
+    assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    assertThat(ex.getReason()).contains(substring);
   }
 }

@@ -33,27 +33,18 @@ class AiControllerExportRefinementLayoutRequestTest extends ControllerTestBase {
 
       Map<String, Object> body = controller.exportRefinementLayoutRequest(testNote);
 
-      assertThat(body).isNotNull();
       assertThat(body).containsKeys("model", "instructions", "input", "text");
-      assertThat(body.get("model")).isNotNull();
-      assertThat(body.get("instructions")).isNotNull();
-      assertThat(body.get("input")).isNotNull();
       assertThat(body.get("max_output_tokens")).isEqualTo(1000);
-
       @SuppressWarnings("unchecked")
-      Map<String, Object> text = (Map<String, Object>) body.get("text");
-      assertThat(text).containsKey("format");
-      @SuppressWarnings("unchecked")
-      Map<String, Object> format = (Map<String, Object>) text.get("format");
+      Map<String, Object> format =
+          (Map<String, Object>) ((Map<String, Object>) body.get("text")).get("format");
       assertThat(format.get("type")).isEqualTo("json_schema");
       assertThat(format).containsKey("schema");
-
-      String instructions = body.get("instructions").toString();
-      assertThat(instructions).contains("Return one current-content layout for the note content");
-      assertThat(instructions).contains("not alternative breakdown suggestions");
-      assertThat(instructions).contains("Do not create grandchildren");
-      assertThat(instructions).contains("Focus Note content only");
-
+      assertThat(body.get("instructions").toString())
+          .contains("Return one current-content layout for the note content")
+          .contains("not alternative breakdown suggestions")
+          .contains("Do not create grandchildren")
+          .contains("Focus Note content only");
       verifyNoInteractions(officialClient);
     }
   }

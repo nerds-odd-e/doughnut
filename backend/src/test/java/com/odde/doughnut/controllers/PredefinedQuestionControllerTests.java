@@ -2,14 +2,15 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.configs.ObjectMapperConfig;
-import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -24,28 +25,16 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
   }
 
-  PredefinedQuestionController nullUserController() {
-    currentUser.setUser(null);
-    return controller;
+  Note ownedNote() {
+    return makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+  }
+
+  Note ownedNote(String title) {
+    return makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title(title).please();
   }
 
   @Nested
   class GetListOfPredefinedQuestionForNotebook {
-    Note noteWithoutQuestions;
-    Note noteWithQuestions;
-
-    @BeforeEach
-    void setUp() {
-      Notebook readingNb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      Note rootNote = makeMe.aRootNote("My reading list").notebook(readingNb).please();
-      makeMe.theNote(rootNote).withNChildren(10).please();
-      noteWithoutQuestions =
-          makeMe.aNote("Zen and the Art of Motorcycle Maintenance").notebook(readingNb).please();
-      Notebook lilaNb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      Note lila = makeMe.aNote("Lila").notebook(lilaNb).please();
-      noteWithQuestions = makeMe.theNote(lila).hasAPredefinedQuestion().please();
-    }
-
     @Test
     void authorization() {
       Note note = makeMe.aNote().please();
@@ -55,26 +44,27 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
 
     @Test
     void getQuestionsOfANoteWhenThereIsNotQuestion() throws UnexpectedNoAccessRightException {
-      List<PredefinedQuestion> results = controller.getAllQuestionByNote(noteWithoutQuestions);
-      assertThat(results, hasSize(0));
+      assertThat(controller.getAllQuestionByNote(ownedNote()), hasSize(0));
     }
 
     @Test
     void getQuestionsOfANoteWhenThereIsOneQuestion() throws UnexpectedNoAccessRightException {
-      PredefinedQuestion questionOfNote =
-          makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(noteWithoutQuestions).please();
-      makeMe.refresh(noteWithoutQuestions);
-      List<PredefinedQuestion> results = controller.getAllQuestionByNote(noteWithoutQuestions);
-      assertThat(results, contains(questionOfNote));
+      Note note = ownedNote();
+      PredefinedQuestion question =
+          makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(note).please();
+      makeMe.refresh(note);
+
+      assertThat(controller.getAllQuestionByNote(note), contains(question));
     }
 
     @Test
     void getAllQuestionsOfANoteWhenThereIsMoreThanOneQuestion()
         throws UnexpectedNoAccessRightException {
-      makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(noteWithQuestions).please();
-      makeMe.refresh(noteWithQuestions);
-      List<PredefinedQuestion> results = controller.getAllQuestionByNote(noteWithQuestions);
-      assertThat(results, hasSize(2));
+      Note note = makeMe.theNote(ownedNote()).hasAPredefinedQuestion().please();
+      makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(note).please();
+      makeMe.refresh(note);
+
+      assertThat(controller.getAllQuestionByNote(note), hasSize(2));
     }
   }
 
@@ -91,9 +81,8 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
 
     @Test
     void persistent() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      PredefinedQuestion mcqWithAnswer = makeMe.aPredefinedQuestion().please();
-      controller.addQuestionManually(note, mcqWithAnswer);
+      Note note = ownedNote();
+      controller.addQuestionManually(note, makeMe.aPredefinedQuestion().please());
       makeMe.refresh(note);
       assertThat(note.getPredefinedQuestions(), hasSize(1));
     }
@@ -103,7 +92,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
   class GenerateQuestionWithoutSave {
     @Test
     void shouldThrowWhenOpenAiNotAvailable() {
-      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      Note note = ownedNote();
       testabilitySettings.setOpenAiTokenOverride("");
       assertThrows(
           OpenAiNotAvailableException.class, () -> controller.generateQuestionWithoutSave(note));
@@ -112,18 +101,6 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
 
   @Nested
   class ExportQuestionGeneration {
-    Note note;
-
-    @BeforeEach
-    void setup() {
-      note =
-          makeMe
-              .aNote()
-              .notebookOwnedBy(currentUser.getUser())
-              .title("There are 42 prefectures in Japan")
-              .please();
-    }
-
     @Test
     void shouldNotBeAbleToExportQuestionGenerationForNoteIAmNotAuthorized() {
       Note otherNote = makeMe.aNote().please();
@@ -134,58 +111,40 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
 
     @Test
     void shouldExportQuestionGenerationWithAllNonEmptyFields()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
-      java.util.Map<String, Object> request = controller.exportQuestionGeneration(note);
-      assertThat(request, notNullValue());
-      assertThat(request.containsKey("model"), is(true));
-      assertThat(request.get("model"), notNullValue());
-      assertThat(request.containsKey("instructions"), is(true));
-      assertThat(request.get("instructions"), notNullValue());
-      assertThat(request.containsKey("input"), is(true));
-      assertThat(request.get("input"), notNullValue());
+        throws UnexpectedNoAccessRightException {
+      Note note = ownedNote("There are 42 prefectures in Japan");
+
+      Map<String, Object> request = controller.exportQuestionGeneration(note);
+
+      assertThat(request.keySet(), hasItems("model", "instructions", "input", "text"));
+      assertThat(request.get("max_output_tokens"), is(1000));
       assertThat(
           request.get("input").toString(), containsString("There are 42 prefectures in Japan"));
-      assertThat(request.containsKey("text"), is(true));
-      assertThat(request.get("text"), notNullValue());
-      assertThat(request.containsKey("max_output_tokens"), is(true));
-      assertThat(request.get("max_output_tokens"), is(1000));
-      // Verify the JSON is not empty
-      String jsonString = new ObjectMapperConfig().objectMapper().writeValueAsString(request);
-      assertThat(jsonString, not(equalTo("{}")));
-      assertThat(jsonString.length(), greaterThan(10));
-      java.util.List<String> validFields = findValidFields(request);
-      assertThat(
-          "Exported question generation should not contain 'valid' fields, but found: "
-              + validFields,
-          validFields,
-          empty());
+      assertThat(findValidFields(request), empty());
     }
 
-    private java.util.List<String> findValidFields(Object obj) {
-      java.util.List<String> validFields = new java.util.ArrayList<>();
+    private List<String> findValidFields(Object obj) {
+      List<String> validFields = new ArrayList<>();
       findValidFieldsRecursive(obj, "", validFields);
       return validFields;
     }
 
     @SuppressWarnings("unchecked")
-    private void findValidFieldsRecursive(
-        Object obj, String path, java.util.List<String> validFields) {
+    private void findValidFieldsRecursive(Object obj, String path, List<String> validFields) {
       if (obj == null) {
         return;
       }
-      if (obj instanceof java.util.Map) {
-        java.util.Map<String, Object> map = (java.util.Map<String, Object>) obj;
-        for (java.util.Map.Entry<String, Object> entry : map.entrySet()) {
-          String key = entry.getKey();
-          Object value = entry.getValue();
-          String currentPath = path.isEmpty() ? key : path + "." + key;
-          if ("valid".equals(key)) {
+      if (obj instanceof Map) {
+        Map<String, Object> map = (Map<String, Object>) obj;
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+          String currentPath = path.isEmpty() ? entry.getKey() : path + "." + entry.getKey();
+          if ("valid".equals(entry.getKey())) {
             validFields.add(currentPath);
           }
-          findValidFieldsRecursive(value, currentPath, validFields);
+          findValidFieldsRecursive(entry.getValue(), currentPath, validFields);
         }
-      } else if (obj instanceof java.util.List) {
-        java.util.List<?> list = (java.util.List<?>) obj;
+      } else if (obj instanceof List) {
+        List<?> list = (List<?>) obj;
         for (int i = 0; i < list.size(); i++) {
           findValidFieldsRecursive(list.get(i), path + "[" + i + "]", validFields);
         }

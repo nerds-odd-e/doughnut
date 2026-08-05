@@ -1,9 +1,8 @@
 package com.odde.doughnut.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.SuggestedTitleDTO;
@@ -15,7 +14,6 @@ import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
 import com.openai.models.responses.ResponseTextConfig;
 import com.openai.models.responses.StructuredResponseCreateParams;
-import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,15 +25,12 @@ import org.springframework.web.server.ResponseStatusException;
 class AiControllerTest extends ControllerTestBase {
   @Autowired AiController controller;
 
-  Note note;
-
   @MockitoBean(name = "officialOpenAiClient")
   OpenAIClient officialClient;
 
   @BeforeEach
-  void Setup() {
+  void setup() {
     currentUser.setUser(makeMe.aUser().please());
-    note = makeMe.aNote().please();
   }
 
   @Nested
@@ -57,17 +52,18 @@ class AiControllerTest extends ControllerTestBase {
     void setup() {
       testNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
+    }
+
+    private void stubSuggestedTitle(String title) {
       TitleReplacement suggestedTopic = new TitleReplacement();
-      suggestedTopic.setNewTitle("Suggested Title");
+      suggestedTopic.setNewTitle(title);
       openAiStructuredResponseMock.stubStructuredResponse(suggestedTopic);
     }
 
     @Test
     void shouldSanitizePathSeparatorsInSuggestedTitle()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
-      TitleReplacement suggestedTopic = new TitleReplacement();
-      suggestedTopic.setNewTitle("TCP/IP: Overview");
-      openAiStructuredResponseMock.stubStructuredResponse(suggestedTopic);
+      stubSuggestedTitle("TCP/IP: Overview");
 
       SuggestedTitleDTO result = controller.suggestTitle(testNote);
 
@@ -77,9 +73,7 @@ class AiControllerTest extends ControllerTestBase {
     @Test
     void shouldTrimSurroundingWhitespaceFromSuggestedTitle()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
-      TitleReplacement suggestedTopic = new TitleReplacement();
-      suggestedTopic.setNewTitle("\u3000Suggested Title\u3000");
-      openAiStructuredResponseMock.stubStructuredResponse(suggestedTopic);
+      stubSuggestedTitle("\u3000Suggested Title\u3000");
 
       SuggestedTitleDTO result = controller.suggestTitle(testNote);
 
@@ -89,22 +83,19 @@ class AiControllerTest extends ControllerTestBase {
     @Test
     void shouldCallResponsesApiWithStructuredInstructions()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
+      stubSuggestedTitle("Suggested Title");
+
       SuggestedTitleDTO result = controller.suggestTitle(testNote);
+
       assertThat(result.getTitle()).isEqualTo("Suggested Title");
       @SuppressWarnings({"unchecked", "rawtypes"})
       ArgumentCaptor<StructuredResponseCreateParams<TitleReplacement>> paramsCaptor =
           ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
       verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
       StructuredResponseCreateParams<TitleReplacement> params = paramsCaptor.getValue();
-      String instructions = params.rawParams().instructions().orElse("");
-      MatcherAssert.assertThat(
-          "Instructions should contain the title suggestion prompt",
-          instructions.contains("Please suggest a better title for the note"),
-          is(true));
-      MatcherAssert.assertThat(
-          "Should use Responses structured text format",
-          params.rawParams().text().flatMap(ResponseTextConfig::format).isPresent(),
-          is(true));
+      assertThat(params.rawParams().instructions().orElse(""))
+          .contains("Please suggest a better title for the note");
+      assertThat(params.rawParams().text().flatMap(ResponseTextConfig::format)).isPresent();
     }
 
     @Test

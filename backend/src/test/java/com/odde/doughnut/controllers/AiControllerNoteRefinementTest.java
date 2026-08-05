@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 
 import ch.qos.logback.classic.Level;
@@ -11,33 +11,26 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.NoteRefinementLayoutDTO;
-import com.odde.doughnut.controllers.dto.NoteRefinementLayoutSelectionRequestDTO;
-import com.odde.doughnut.controllers.dto.RefinedContentResponseDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.ai.NoteRefinementLayout;
 import com.odde.doughnut.services.ai.NoteRefinementLayoutItem;
 import com.odde.doughnut.services.ai.NoteRefinementLayoutValidator;
-import com.odde.doughnut.services.ai.RegeneratedNoteContent;
 import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
 import com.openai.models.responses.ResponseTextConfig;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import java.util.List;
 import java.util.Optional;
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -47,22 +40,18 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
   @MockitoBean(name = "officialOpenAiClient")
   OpenAIClient officialClient;
 
+  OpenAiStructuredResponseMock openAiStructuredResponseMock;
+  Note testNote;
+
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
+    testNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+    openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
   }
 
   @Nested
   class GenerateRefinementSuggestions {
-    Note testNote;
-    OpenAiStructuredResponseMock openAiStructuredResponseMock;
-
-    @BeforeEach
-    void setup() {
-      testNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
-    }
-
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {"   "})
@@ -70,15 +59,13 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       testNote.setContent(content);
 
-      NoteRefinementLayoutDTO result = controller.generateRefinementSuggestions(testNote);
-
-      assertThat(result.getItems()).isEmpty();
+      assertThat(controller.generateRefinementSuggestions(testNote).getItems()).isEmpty();
     }
 
     @Test
     void shouldCallResponsesApiWithStructuredInstructions()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
-      NoteRefinementLayout layout =
+      openAiStructuredResponseMock.stubStructuredResponse(
           new NoteRefinementLayout(
               List.of(
                   new NoteRefinementLayoutItem(
@@ -88,11 +75,11 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
                       List.of(
                           new NoteRefinementLayoutItem(
                               "p1-1", "[[Already extracted note]]", true, List.of()))),
-                  new NoteRefinementLayoutItem("p2", "Point 2", false, List.of())));
-      openAiStructuredResponseMock.stubStructuredResponse(layout);
+                  new NoteRefinementLayoutItem("p2", "Point 2", false, List.of()))));
       testNote.setContent("Some note content");
 
       NoteRefinementLayoutDTO result = controller.generateRefinementSuggestions(testNote);
+
       assertThat(result.getItems()).hasSize(2);
       assertThat(result.getItems().getFirst().getText()).isEqualTo("Point 1");
       assertThat(result.getItems().getFirst().getChildren().getFirst().isAlreadyExtracted())
@@ -104,37 +91,16 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
       verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
       StructuredResponseCreateParams<NoteRefinementLayout> params = paramsCaptor.getValue();
       String instructions = params.rawParams().instructions().orElse("");
-      MatcherAssert.assertThat(
-          "Instructions should request one current-content layout",
-          instructions.contains("Return one current-content layout for the note content"),
-          Matchers.is(true));
-      MatcherAssert.assertThat(
-          "Instructions should prohibit alternative breakdown suggestions",
-          instructions.contains("not alternative breakdown suggestions"),
-          Matchers.is(true));
-      MatcherAssert.assertThat(
-          "Instructions should prohibit grandchildren",
-          instructions.contains("Do not create grandchildren"),
-          Matchers.is(true));
-      MatcherAssert.assertThat(
-          "Instructions should describe wiki-link-only extracted markers",
-          instructions.contains("simple standalone wiki-link-only lines"),
-          Matchers.is(true));
-      MatcherAssert.assertThat(
-          "Instructions should scope layout to Focus Note content only",
-          instructions.contains("Focus Note content only")
-              && instructions.contains("only source for layout items"),
-          Matchers.is(true));
-      MatcherAssert.assertThat(
-          "Instructions should treat Retrieved Notes as secondary context",
-          instructions.contains("Retrieved Notes are secondary context only")
-              && instructions.contains(
-                  "do not add layout items for content that appears only in Retrieved Notes"),
-          Matchers.is(true));
-      MatcherAssert.assertThat(
-          "Should use Responses structured text format",
-          params.rawParams().text().flatMap(ResponseTextConfig::format).isPresent(),
-          Matchers.is(true));
+      assertThat(instructions)
+          .contains("Return one current-content layout for the note content")
+          .contains("not alternative breakdown suggestions")
+          .contains("Do not create grandchildren")
+          .contains("simple standalone wiki-link-only lines")
+          .contains("Focus Note content only")
+          .contains("only source for layout items")
+          .contains("Retrieved Notes are secondary context only")
+          .contains("do not add layout items for content that appears only in Retrieved Notes");
+      assertThat(params.rawParams().text().flatMap(ResponseTextConfig::format)).isPresent();
       assertThat(params.rawParams().input().flatMap(input -> input.text()).orElse("")).isNotBlank();
       assertThat(params.rawParams().maxOutputTokens()).isEqualTo(Optional.of(1000L));
     }
@@ -151,17 +117,14 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
       logAppender.start();
       validatorLogger.addAppender(logAppender);
       try {
-        NoteRefinementLayout layoutWithDuplicateIds =
+        openAiStructuredResponseMock.stubStructuredResponse(
             new NoteRefinementLayout(
                 List.of(
                     new NoteRefinementLayoutItem("same", "Point 1", false, List.of()),
-                    new NoteRefinementLayoutItem("same", "Point 2", false, List.of())));
-        openAiStructuredResponseMock.stubStructuredResponse(layoutWithDuplicateIds);
+                    new NoteRefinementLayoutItem("same", "Point 2", false, List.of()))));
         testNote.setContent("Some note content");
 
-        NoteRefinementLayoutDTO result = controller.generateRefinementSuggestions(testNote);
-
-        assertThat(result.getItems()).isEmpty();
+        assertThat(controller.generateRefinementSuggestions(testNote).getItems()).isEmpty();
         assertThat(logAppender.list)
             .anyMatch(
                 event ->
@@ -180,95 +143,5 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
       assertThrows(
           ResponseStatusException.class, () -> controller.generateRefinementSuggestions(testNote));
     }
-  }
-
-  @Nested
-  class RemoveRefinementSuggestion {
-    Note testNote;
-    OpenAiStructuredResponseMock openAiStructuredResponseMock;
-
-    @BeforeEach
-    void setup() {
-      testNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
-    }
-
-    private NoteRefinementLayout sampleLayout() {
-      return new NoteRefinementLayout(
-          List.of(
-              new NoteRefinementLayoutItem(
-                  "p1",
-                  "Main concept",
-                  false,
-                  List.of(
-                      new NoteRefinementLayoutItem(
-                          "p1-1", "suggestion to remove", false, List.of()))),
-              new NoteRefinementLayoutItem("p2", "Other point", false, List.of())));
-    }
-
-    private NoteRefinementLayoutSelectionRequestDTO layoutSelectionRequest(
-        NoteRefinementLayout layout, List<String> selectedItemIds) {
-      NoteRefinementLayoutSelectionRequestDTO requestDTO =
-          new NoteRefinementLayoutSelectionRequestDTO();
-      requestDTO.setLayout(layout);
-      requestDTO.setSelectedItemIds(selectedItemIds);
-      return requestDTO;
-    }
-
-    @Test
-    void shouldReturnRegeneratedContentAfterRemovingSelectedLayoutPoints()
-        throws UnexpectedNoAccessRightException, JsonProcessingException {
-      openAiStructuredResponseMock.stubStructuredResponse(
-          new RegeneratedNoteContent("Remaining content."));
-      String originalContent = "Original with a suggestion to remove.";
-      testNote.setContent(originalContent);
-      NoteRefinementLayout layout = sampleLayout();
-      RefinedContentResponseDTO response =
-          controller.removeRefinementSuggestion(
-              testNote, layoutSelectionRequest(layout, List.of("p1-1", "p2")));
-      assertThat(response.getContent()).isEqualTo("Remaining content.");
-      makeMe.entityPersister.refresh(testNote);
-      assertThat(testNote.getContent()).isEqualTo(originalContent);
-
-      @SuppressWarnings({"unchecked", "rawtypes"})
-      ArgumentCaptor<StructuredResponseCreateParams<RegeneratedNoteContent>> paramsCaptor =
-          ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
-      verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
-      StructuredResponseCreateParams<RegeneratedNoteContent> params = paramsCaptor.getValue();
-      String instructions = params.rawParams().instructions().orElse("");
-      assertThat(params.rawParams().maxOutputTokens()).isEqualTo(Optional.of(2000L));
-      assertThat(instructions).contains("Full note layout:");
-      assertThat(instructions).contains("\"id\" : \"p1-1\"");
-      assertThat(instructions).contains("Selected layout item ids to remove");
-      assertThat(instructions).contains("[p1-1, p2]");
-      assertThat(instructions).contains("- p1-1: \"suggestion to remove\"");
-      assertThat(instructions).contains("- p2: \"Other point\"");
-    }
-
-    @Test
-    void shouldThrowWhenSelectedItemIdsIsEmpty() {
-      testNote.setContent("Some note content.");
-      assertBadRequestContaining(
-          () ->
-              controller.removeRefinementSuggestion(
-                  testNote, layoutSelectionRequest(sampleLayout(), List.of())),
-          "selectedItemIds cannot be empty");
-    }
-
-    @Test
-    void shouldThrowWhenNoteContentIsEmpty() {
-      testNote.setContent("");
-      assertBadRequestContaining(
-          () ->
-              controller.removeRefinementSuggestion(
-                  testNote, layoutSelectionRequest(sampleLayout(), List.of("p1-1"))),
-          "Note content cannot be empty");
-    }
-  }
-
-  private static void assertBadRequestContaining(Executable action, String substring) {
-    ResponseStatusException ex = assertThrows(ResponseStatusException.class, action);
-    assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    assertThat(ex.getReason()).contains(substring);
   }
 }

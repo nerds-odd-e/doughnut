@@ -9,7 +9,6 @@ import com.odde.doughnut.services.ai.NoteRefinementLayoutItem;
 import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
 import java.util.List;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -33,68 +32,62 @@ class AiControllerExtractNoteValidationTest extends ControllerTestBase {
 
   @Nested
   class ExtractNotePreviewValidation {
+    private Note extractableNote() {
+      return newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
+    }
+
     @Test
     void shouldRequireUserToBeLoggedIn() {
-      Note testNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
+      Note testNote = extractableNote();
       currentUser.setUser(null);
-      NoteRefinementLayout layout = layoutWithItem("p1", "a suggestion");
       assertThrows(
           ResponseStatusException.class,
           () ->
               controller.extractNotePreview(
-                  testNote, layoutSelectionRequest(layout, List.of("p1"))));
-    }
-
-    static Stream<List<String>> invalidSelectedItemIds() {
-      return AiControllerExtractNoteTestSupport.invalidSelectedItemIds();
+                  testNote, selectSingleLayoutItem("p1", "a suggestion")));
     }
 
     @ParameterizedTest
-    @MethodSource("invalidSelectedItemIds")
+    @MethodSource(
+        "com.odde.doughnut.controllers.AiControllerExtractNoteTestSupport#invalidSelectedItemIds")
     void shouldRejectInvalidSelectedItemIds(List<String> selectedItemIds) {
-      Note testNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
-      NoteRefinementLayout layout = layoutWithItem("p1", "a suggestion");
       assertResponseStatus(
           () ->
               controller.extractNotePreview(
-                  testNote, layoutSelectionRequest(layout, selectedItemIds)),
+                  extractableNote(),
+                  layoutSelectionRequest(layoutWithItem("p1", "a suggestion"), selectedItemIds)),
           HttpStatus.BAD_REQUEST);
     }
 
     @Test
     void shouldRejectInvalidLayout() {
-      Note testNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
       NoteRefinementLayout layout =
           new NoteRefinementLayout(
               List.of(new NoteRefinementLayoutItem("", "a suggestion", false, List.of())));
       assertResponseStatus(
           () ->
               controller.extractNotePreview(
-                  testNote, layoutSelectionRequest(layout, List.of("p1"))),
+                  extractableNote(), layoutSelectionRequest(layout, List.of("p1"))),
           HttpStatus.BAD_REQUEST);
     }
 
     @Test
     void shouldThrowWhenAiReturnsNull() {
-      Note testNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
       new OpenAiStructuredResponseMock(officialClient).stubStructuredResponse(null);
-      NoteRefinementLayout layout = layoutWithItem("p1", "a suggestion");
       assertResponseStatus(
           () ->
               controller.extractNotePreview(
-                  testNote, layoutSelectionRequest(layout, List.of("p1"))),
+                  extractableNote(), selectSingleLayoutItem("p1", "a suggestion")),
           HttpStatus.SERVICE_UNAVAILABLE);
     }
 
     @Test
     void shouldRejectBlankNoteContent() {
-      Note testNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
+      Note testNote = extractableNote();
       testNote.setContent("");
-      NoteRefinementLayout layout = layoutWithItem("p1", "a suggestion");
       assertResponseStatus(
           () ->
-              controller.extractNotePreview(
-                  testNote, layoutSelectionRequest(layout, List.of("p1"))),
+              controller.extractNotePreview(testNote, selectSingleLayoutItem("p1", "a suggestion")),
           HttpStatus.BAD_REQUEST);
     }
   }

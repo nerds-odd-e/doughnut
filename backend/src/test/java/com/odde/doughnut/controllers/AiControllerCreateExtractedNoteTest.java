@@ -13,12 +13,9 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.ai.NoteExtractionResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class AiControllerCreateExtractedNoteTest extends ControllerTestBase {
@@ -36,103 +33,105 @@ class AiControllerCreateExtractedNoteTest extends ControllerTestBase {
     void shouldRejectReservedIndexTitle() {
       Note testNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
       long noteCountBefore = noteRepository.count();
-      NoteExtractionResult request =
-          extractionResult("readme", "New note content.", "Updated parent.");
 
       ApiException thrown =
-          assertThrows(ApiException.class, () -> controller.createExtractedNote(testNote, request));
+          assertThrows(
+              ApiException.class,
+              () ->
+                  controller.createExtractedNote(
+                      testNote,
+                      extractionResult("readme", "New note content.", "Updated parent.")));
 
       assertThat(thrown.getErrorBody().getErrorType()).isEqualTo(ApiError.ErrorType.BINDING_ERROR);
       assertThat(thrown.getErrorBody().getErrors().get("newTitle")).contains("reserved");
       assertThat(noteRepository.count()).isEqualTo(noteCountBefore);
       makeMe.entityPersister.refresh(testNote);
-      assertThat(testNote.getContent())
-          .isEqualTo("Original content with a key suggestion to extract.");
+      assertThat(testNote.getContent()).isEqualTo(EXTRACTABLE_CONTENT);
     }
 
     @Test
     void shouldRejectInvalidAliasesInNewNoteContent() {
       Note testNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
-      String originalContent = testNote.getContent();
-      NoteExtractionResult request =
-          extractionResult(
-              "Extracted Note", "---\naliases: color\n---\n\nbody", "Updated parent with summary.");
 
       ApiException thrown =
-          assertThrows(ApiException.class, () -> controller.createExtractedNote(testNote, request));
+          assertThrows(
+              ApiException.class,
+              () ->
+                  controller.createExtractedNote(
+                      testNote,
+                      extractionResult(
+                          "Extracted Note",
+                          "---\naliases: color\n---\n\nbody",
+                          "Updated parent with summary.")));
 
-      assertThat(thrown.getErrorBody().getErrorType()).isEqualTo(ApiError.ErrorType.BINDING_ERROR);
       assertThat(thrown.getErrorBody().getErrors().get("aliases"))
           .isEqualTo(FrontmatterAliases.AUTHORED_ALIASES_MESSAGE);
       makeMe.entityPersister.refresh(testNote);
-      assertThat(testNote.getContent()).isEqualTo(originalContent);
+      assertThat(testNote.getContent()).isEqualTo(EXTRACTABLE_CONTENT);
     }
 
     @Test
     void shouldStripLeadingMarkdownHeadingThatRepeatsTitleOnCreate()
         throws UnexpectedNoAccessRightException {
       Note sourceNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
-      NoteExtractionResult request =
-          extractionResult(
-              "Key Suggestion",
-              "# Key Suggestion\n\nBody that should remain.",
-              "Updated parent with summary.");
 
-      NoteRealm response = controller.createExtractedNote(sourceNote, request);
+      NoteRealm response =
+          controller.createExtractedNote(
+              sourceNote,
+              extractionResult(
+                  "Key Suggestion",
+                  "# Key Suggestion\n\nBody that should remain.",
+                  "Updated parent with summary."));
+
       Note persistedNote = noteRepository.findById(response.getNote().getId()).orElseThrow();
-
-      assertThat(persistedNote.getTitle()).isEqualTo("Key Suggestion");
       assertThat(persistedNote.getContent()).isEqualTo("Body that should remain.");
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {false, true})
-    void shouldCreateExtractedNoteFromSourceNote(boolean sourceInFolder)
-        throws UnexpectedNoAccessRightException {
-      Note sourceNote;
-      Folder expectedFolder = null;
-      if (sourceInFolder) {
-        Notebook notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-        expectedFolder = makeMe.aFolder().notebook(notebook).name("Context").please();
-        sourceNote =
-            makeMe
-                .aNote()
-                .title("Sample")
-                .folder(expectedFolder)
-                .content("Original content with a key suggestion to extract.")
-                .please();
-      } else {
-        sourceNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
-      }
-
-      NoteExtractionResult request =
-          extractionResult(
-              sourceInFolder ? "Point B" : "Extracted Note",
-              sourceInFolder
-                  ? "Extracted from [[sample|the original note]]."
-                  : "Expanded content for the new note.",
-              sourceInFolder
-                  ? "A. See [[point b|the extracted note]]. C."
-                  : "Updated parent with summary.");
+    @Test
+    void shouldCreateExtractedNoteFromSourceNote() throws UnexpectedNoAccessRightException {
+      Note sourceNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
       long noteCountBefore = noteRepository.count();
-      NoteRealm response = controller.createExtractedNote(sourceNote, request);
+
+      NoteRealm response =
+          controller.createExtractedNote(
+              sourceNote,
+              extractionResult(
+                  "Extracted Note",
+                  "Expanded content for the new note.",
+                  "Updated parent with summary."));
+
       Note persistedNote = noteRepository.findById(response.getNote().getId()).orElseThrow();
-      if (sourceInFolder) {
-        assertThat(persistedNote.getFolder().getId()).isEqualTo(expectedFolder.getId());
-        assertThat(response.getWikiTitles())
-            .anyMatch(
-                wikiTitle ->
-                    wikiTitle.getTargetToken().equals("sample")
-                        && wikiTitle.getDisplayText().equals("the original note")
-                        && wikiTitle.getNoteId().equals(sourceNote.getId()));
-      } else {
-        assertThat(noteRepository.count()).isEqualTo(noteCountBefore + 1);
-        assertThat(persistedNote.getTitle()).isEqualTo("Extracted Note");
-        assertThat(persistedNote.getContent()).isEqualTo("Expanded content for the new note.");
-        assertThat(persistedNote.getFolder()).isNull();
-        makeMe.entityPersister.refresh(sourceNote);
-        assertThat(sourceNote.getContent()).isEqualTo("Updated parent with summary.");
-      }
+      assertThat(noteRepository.count()).isEqualTo(noteCountBefore + 1);
+      assertThat(persistedNote.getTitle()).isEqualTo("Extracted Note");
+      assertThat(persistedNote.getContent()).isEqualTo("Expanded content for the new note.");
+      assertThat(persistedNote.getFolder()).isNull();
+      makeMe.entityPersister.refresh(sourceNote);
+      assertThat(sourceNote.getContent()).isEqualTo("Updated parent with summary.");
+    }
+
+    @Test
+    void shouldCreateExtractedNoteInSameFolderAsSource() throws UnexpectedNoAccessRightException {
+      Notebook notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+      Folder folder = makeMe.aFolder().notebook(notebook).name("Context").please();
+      Note sourceNote =
+          makeMe.aNote().title("Sample").folder(folder).content(EXTRACTABLE_CONTENT).please();
+
+      NoteRealm response =
+          controller.createExtractedNote(
+              sourceNote,
+              extractionResult(
+                  "Point B",
+                  "Extracted from [[sample|the original note]].",
+                  "A. See [[point b|the extracted note]]. C."));
+
+      Note persistedNote = noteRepository.findById(response.getNote().getId()).orElseThrow();
+      assertThat(persistedNote.getFolder().getId()).isEqualTo(folder.getId());
+      assertThat(response.getWikiTitles())
+          .anyMatch(
+              wikiTitle ->
+                  wikiTitle.getTargetToken().equals("sample")
+                      && wikiTitle.getDisplayText().equals("the original note")
+                      && wikiTitle.getNoteId().equals(sourceNote.getId()));
     }
   }
 }

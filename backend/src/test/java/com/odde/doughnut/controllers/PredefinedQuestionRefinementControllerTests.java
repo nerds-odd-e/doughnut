@@ -4,6 +4,7 @@ import static com.odde.doughnut.controllers.dto.Randomization.RandomStrategy.fir
 import static com.odde.doughnut.controllers.dto.Randomization.RandomStrategy.last;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 
@@ -12,7 +13,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
 import com.openai.models.responses.StructuredResponseCreateParams;
@@ -52,16 +52,16 @@ class PredefinedQuestionRefinementControllerTests extends ControllerTestBase {
   void givenQuestion_thenReturnPostProcessedRefinedQuestion()
       throws UnexpectedNoAccessRightException {
     testabilitySettings.setRandomization(new Randomization(last, 0));
-    MCQWithAnswer mcqWithAnswer =
+    openAiStructuredResponseMock.stubStructuredResponse(
         makeMe
             .aMCQWithAnswer()
             .choices("Blue", "Green", "Red")
             .correctChoiceIndex(0)
             .choicesMayBeShuffled(true)
-            .please();
-    openAiStructuredResponseMock.stubStructuredResponse(mcqWithAnswer);
+            .please());
 
     PredefinedQuestion result = controller.refineQuestion(note, predefinedQuestion);
+
     assertThat(
         result.getMcqWithAnswer().getQuestion().getResponseChoices(),
         equalTo(List.of("Red", "Green", "Blue")));
@@ -70,18 +70,15 @@ class PredefinedQuestionRefinementControllerTests extends ControllerTestBase {
 
   @Test
   void invalidRefinedQuestionIsRejected() throws UnexpectedNoAccessRightException {
-    MCQWithAnswer invalidQuestion =
+    openAiStructuredResponseMock.stubStructuredResponse(
         makeMe
             .aMCQWithAnswer()
             .choices("Blue", "Green", "Red")
             .correctChoiceIndex(3)
             .choicesMayBeShuffled(true)
-            .please();
-    openAiStructuredResponseMock.stubStructuredResponse(invalidQuestion);
+            .please());
 
-    PredefinedQuestion result = controller.refineQuestion(note, predefinedQuestion);
-
-    assertThat(result, equalTo(null));
+    assertThat(controller.refineQuestion(note, predefinedQuestion), nullValue());
   }
 
   @Test
@@ -97,6 +94,6 @@ class PredefinedQuestionRefinementControllerTests extends ControllerTestBase {
     testabilitySettings.setOpenAiTokenOverride("");
     assertThrows(
         OpenAiNotAvailableException.class,
-        () -> controller.refineQuestion(note, makeMe.aPredefinedQuestion().please()));
+        () -> controller.refineQuestion(note, predefinedQuestion));
   }
 }
