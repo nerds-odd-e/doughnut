@@ -184,6 +184,17 @@ abstract class NotebookBooksControllerTestBase extends ControllerTestBase {
     return h;
   }
 
+  static Map<String, Object> textBlock(String text, int pageIdx, List<Double> bbox) {
+    Map<String, Object> t = new LinkedHashMap<>();
+    t.put("type", "text");
+    t.put("text", text);
+    t.put("page_idx", pageIdx);
+    if (bbox != null) {
+      t.put("bbox", new ArrayList<>(bbox));
+    }
+    return t;
+  }
+
   static AttachBookRequest attachRequest(AttachBookLayoutNodeRequest... roots) {
     AttachBookLayoutRequest layout = new AttachBookLayoutRequest();
     layout.setRoots(new ArrayList<>(List.of(roots)));
@@ -191,6 +202,14 @@ abstract class NotebookBooksControllerTestBase extends ControllerTestBase {
     r.setBookName("Linear Algebra");
     r.setFormat(BookReadingWireConstants.BOOK_FORMAT_PDF);
     r.setLayout(layout);
+    return r;
+  }
+
+  static AttachBookRequest contentListAttachRequest(String bookName, List<Object> contentList) {
+    AttachBookRequest r = new AttachBookRequest();
+    r.setBookName(bookName);
+    r.setFormat(BookReadingWireConstants.BOOK_FORMAT_PDF);
+    r.setContentList(contentList);
     return r;
   }
 

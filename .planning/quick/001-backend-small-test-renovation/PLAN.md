@@ -1,9 +1,9 @@
 # Backend unit tests → "small test" style
 
-**Status:** in progress (Phase 11 done)  
-**Type:** test renovation (no product behavior change)  
-**Verify each phase:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only`  
-**Style:** `.cursor/rules/unit-testing.mdc` + `.cursor/rules/backend-testing.mdc`  
+**Status:** in progress (Phase 12 done)
+**Type:** test renovation (no product behavior change)
+**Verify each phase:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+**Style:** `.cursor/rules/unit-testing.mdc` + `.cursor/rules/backend-testing.mdc`
 **Resume:** this `PLAN.md` progress log only — **do not edit** trunk `.planning/STATE.md` (parallel trunk-based work).
 
 ---
@@ -154,14 +154,14 @@ For each file in the phase file list:
 - **Done when:** rubric applied; suite green.
 
 ### Phase 12 — Controllers: notebook books (attach / retrieve / reading)
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
-- **Files:**
-  - `NotebookBooksAttachControllerTest.java`
-  - `NotebookBooksRetrievalControllerTest.java`
-  - `NotebookBooksReadingPositionControllerTest.java`
+- **Files / scope (post-refactor capability splits):**
+  - `NotebookBooksAttachControllerTest.java`, `NotebookBooksAttachContentControllerTest.java`
+  - `NotebookBooksRetrievalControllerTest.java`, `NotebookBooksBookFileControllerTest.java`
+  - `NotebookBooksReadingPositionControllerTest.java`, `NotebookBooksGetReadingPositionControllerTest.java`
   - `NotebookBooksReadingRecordControllerTest.java`
-  - `NotebookBooksControllerTestBase.java` (style only if needed)
+  - base: `NotebookBooksControllerTestBase.java` (`textBlock` / `contentListAttachRequest`)
 - **Done when:** rubric applied; suite green.
 
 ### Phase 13 — Controllers: notebook books (block content / depth)
@@ -313,7 +313,8 @@ If a Behavior phase cannot express fixtures concisely:
 | 9 | done | Create/rename/dissolve: `ownedNotebook` + `folderCreate` / `listingHasFolder`; drop controller `createNotebook` fixture dance; trim via ObjectMapper only where Jackson deserializer matters; conflict/404 shape once + sibling deltas. Post-refactor: split oversized grab-bag into capability files + shared base (Phase 10 paths updated). |
 | 10 | done | Move/cross-notebook/merge/link-rewrite: `ownedNotebook`/`ownedFolder` + `folderMove`/`folderMoveTo`/`folderMerge`/`folderMergeTo`; `.content()` for wiki fixtures; listing via `listingHasFolder`; conflict/404/BAD_REQUEST shape once + sibling deltas; drop overlapping dest-access denial. |
 | 11 | done | CRUD/notes-folder/sharing/export/health/groups: lift `ownedNotebook`/`ownedFolder` to `NotebookControllerTestBase`; drop controller `createNotebook` fixtures; focused asserts + parameterized empty-name/reserved-title/health opt-in; catalog suite uses fresh user (avoid `topNote` pollution). Post-refactor: split NotesFolder → note-create/listing/folder-page; CRUD update → `NotebookUpdateControllerTest`; catalog → `NotebookCatalogControllerTest`; Wikidata suite trimmed to wikidata-only. |
-| 12–26 | planned | — |
+| 12 | done | Books attach/retrieve/reading: split mega attach into outline / getBook / file bytes / Full-view; drop duplicate PDF locator + PDF/EPUB position persist twins; canonical reading-record shape once + skimmed/skipped vs invalid status; `textBlock`/`contentListAttachRequest` helpers. Post-refactor: attach-content / book-file / get-reading-position capability splits (≤250). |
+| 13–26 | planned | — |
 
 ---
 
@@ -334,3 +335,4 @@ If a Behavior phase cannot express fixtures concisely:
 - Phase 9: Folder name trim is Jackson `DisplayNameTrimmingDeserializer` — keep `objectMapper.readValue` for trim cases; plain setters skip trim. Create fixtures via `ownedNotebook()` not `controller.createNotebook`. Post-refactor split grab-bag into create/rename/dissolve + move/cross-notebook/merge/link-rewrite (+ shared base); Phase 10 targets the move files.
 - Phase 10: Shared base gains `ownedFolder`, named `ownedNotebook`, and move/merge request helpers. Cross-notebook wiki rewrite still needs named notebooks (`ownedNotebook("NbA")`). Sibling 404/BAD_REQUEST/access-denial cases assert delta only; dest-parent access denial overlaps root dest denial — one case enough.
 - Phase 11: Lift `ownedNotebook`/`ownedFolder` to `NotebookControllerTestBase` (folder-management base inherits). Catalog exact-list asserts need a fresh user in `@BeforeEach` because base setup creates `topNote`. Wikidata root-note suite overlaps note-create folder assignment — keep only wikidata enrichment cases. Post-refactor capability splits: note-create / folder-listing / folder-page / update / catalog.
+- Phase 12: PDF locator “heading+body” and “match bboxes” were the same claim — keep one. Patch PDF via `lastReadBody` already covers PdfLocator DTO path; EPUB wire helper covers EpubLocator. Put reading-record return shape is enough without re-asserting the repository row. Content-list attach fixtures share `contentListAttachRequest` + `textBlock`. Post-refactor splits: attach-content / book-file / get-reading-position.
