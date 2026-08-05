@@ -7,6 +7,8 @@ alwaysApply: false
 
 Use this rule when creating or updating backend Java tests.
 
+**Style (focused assertions, concise makeMe):** always-applied `unit-testing.mdc` — follow that first.
+
 ## Commands
 
 Run backend verification from the repo root:
@@ -73,17 +75,14 @@ class RestNoteControllerTests {
 
 ## MakeMe Builders
 
-- Use the central `makeMe` factory to create test data.
-- Each entity has its own builder, such as `NoteBuilder` or `ConversationBuilder`.
-- Use method chaining for readability.
-- End with `please()` to build the object.
-- Use `please(boolean needPersist)` to control database persistence.
-- Builders handle relationships and dependencies automatically.
+- Use the central `makeMe` factory; chain methods; end with `please()` (or `please(boolean)` for persistence control).
+- Builders handle relationships and defaults — see `unit-testing.mdc` for when to extend them vs set fields in the test.
+- Ownership: prefer `notebookOwnedBy(user)` so `aMemoryTrackerFor(note)` inherits the owner.
 
 ```java
 Note note = makeMe.aNote()
-                 .creatorAndOwner(userModel)
-                 .titleConstructor("title")
+                 .notebookOwnedBy(user)
+                 .title("title")
                  .content("description")
                  .please();
 ```
@@ -92,43 +91,10 @@ Note note = makeMe.aNote()
 
 - Group related tests with `@Nested`.
 - Use `@BeforeEach` for common setup, keeping setup minimal and relevant to the group.
-- Initialize test data using MakeMe builders.
 - Use mocking sparingly, mainly for external services.
 - Mock `OpenAIClient` structured Responses output with `OpenAiStructuredResponseMock` in controller tests.
 
-```java
-@Nested
-class CreateNoteTest {
-  Note parent;
-  NoteCreationDTO noteCreation;
-
-  @BeforeEach
-  void setup() {
-    // ...
-  }
-
-  @Test
-  void shouldBeAbleToSaveNoteWhenValid() {
-    // ...
-  }
-}
-```
-
 ## Assertions
 
-- Use `assertThat` with descriptive matchers for readable failures.
-- Test both happy paths and error cases.
-- Use `assertThrows` for exception testing.
-- Use `@ParameterizedTest` for multiple scenarios with less code.
-- Each test should create its own data and avoid sharing mutable state.
-
-```java
-assertThat(noteRealm.getNote().getTopicConstructor(), equalTo(note.getTopicConstructor()));
-assertThat(noteRealm.getFromBazaar(), is(true));
-```
-
-```java
-assertThrows(
-    UnexpectedNoAccessRightException.class,
-    () -> controller.show(note));
-```
+- Use `assertThat` with descriptive matchers; `assertThrows` for exceptions; `@ParameterizedTest` when inputs vary but the assertion focus stays the same.
+- Assertion **scope** and avoiding cross-test redundancy: `unit-testing.mdc`.

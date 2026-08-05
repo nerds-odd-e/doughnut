@@ -50,13 +50,7 @@ Note: Rebuild the bundle before running the e2e `mcp_services.feature`.
 
 ### Running Unit Tests
 
-The MCP server has comprehensive unit tests using Vitest. **Tests are located in the `tests/` folder**, not mixed with production code. Run tests with:
-
-```sh
-CURSOR_DEV=true nix develop -c pnpm mcp-server:test
-```
-
-Or from the root directory:
+The MCP server has Vitest unit tests under `tests/` (not mixed with `src/`). **Style (focused assertions, concise makeMe):** always-applied `unit-testing.mdc`.
 
 ```sh
 CURSOR_DEV=true nix develop -c pnpm mcp-server:test
@@ -64,16 +58,9 @@ CURSOR_DEV=true nix develop -c pnpm mcp-server:test
 
 ### Test Organization
 
-- **Production code**: Located in `src/` folder
-- **Test files**: Located in `tests/` folder with `.test.ts` extension
-- **Test configuration**: `vitest.config.ts` points to `tests/**/*.test.ts`
-- **TypeScript config**: `tsconfig.json` includes both `src/` and `tests/` folders
-
-This separation ensures:
-- Clean, organized codebase structure
-- Easy identification of production vs. test code
-- Better maintainability and readability
-- Standard practice followed by most TypeScript projects
+- **Production code**: `src/`
+- **Test files**: `tests/**/*.test.ts` (see `vitest.config.ts`)
+- Prefer high-level tool/server entry points; use `makeMe` from `doughnut-test-fixtures/makeMe` for API-shaped data when mocking backend responses.
 
 ### Formatting Code
 

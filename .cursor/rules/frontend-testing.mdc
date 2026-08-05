@@ -7,6 +7,8 @@ alwaysApply: false
 
 Use this rule when creating or updating frontend Vitest tests. For canonical lint and format commands, use `linting_formating.mdc`.
 
+**Style (focused assertions, concise makeMe):** always-applied `unit-testing.mdc` — follow that first.
+
 ## Test Commands
 
 From the repo root:
@@ -117,12 +119,12 @@ await wrapper.setProps({ value: newValue })
 
 - Use `makeMe` for API-shaped test data; implementation lives in `packages/doughnut-test-fixtures`.
 - Import `doughnut-test-fixtures/makeMe` only. Do not import the bare package name or deep paths into `src/`.
-- Builders handle complex object creation.
+- Concise setup, defaults, and extending builders: `unit-testing.mdc`.
 
 ```typescript
-const note = makeMe.aNoteRealm
-  .topicConstructor("Dummy Title")
-  .content("Description")
+const note = makeMe.aNoteRealm.title("Dummy Title").content("Description").please()
+const answered = makeMe.anAnsweredQuestion
+  .accidentalMatch("alias", [note.note.noteTopology])
   .please()
 ```
 

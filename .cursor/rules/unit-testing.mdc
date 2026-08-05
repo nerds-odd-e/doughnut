@@ -1,0 +1,65 @@
+---
+description: Preferred unit test style — focused assertions, concise makeMe setup (all packages)
+alwaysApply: true
+---
+
+# Unit Test Style
+
+Cross-cutting practice for **backend, frontend, CLI, and MCP** unit tests. Stack commands, entry points, and tooling stay in the package rules (`backend-testing.mdc`, `frontend-testing.mdc`, `cli.mdc`, `mcp-server.mdc`).
+
+## Focused assertions
+
+- **One behavior per test.** Assert only what this scenario uniquely establishes.
+- **Canonical shape once.** Shared post-conditions belong in **one** test. Sibling scenarios assert only their delta.
+- **Different precondition ≠ re-assert unrelated post-condition.** If outcome X is clearly independent of what changed in the setup, do not repeat X.
+- Prefer asserting the **positive** signal over “not the other message/alert” when the positive already distinguishes the case.
+- In loops (thresholds, retries, frame polls), assert the **loop result**, not the same intermediate outcome every iteration.
+
+```java
+// ❌ every related case repeats the full payload
+assertFalse(result.getAnswer().getCorrect());
+assertThat(result.getAnswer().getOutcome(), is(ACCIDENTAL_MATCH));
+assertThat(result.getMatchedNotes(), hasSize(1));
+
+// ✅ canonical case asserts the shape; this case only the delta
+assertThat(result.getAnswer().getOutcome(), is(ACCIDENTAL_MATCH));
+```
+
+```typescript
+// ❌ re-check section when the unique claim is “no link CTAs”
+expect(wrapper.find('[data-testid="matched-notes-section"]').exists()).toBe(true)
+expect(wrapper.findAll('[data-testid^="link-to-matched-note-"]')).toHaveLength(0)
+
+// ✅
+expect(wrapper.findAll('[data-testid^="link-to-matched-note-"]')).toHaveLength(0)
+```
+
+## Concise makeMe setup
+
+- Build fixtures with **`makeMe`** (`doughnut-test-fixtures/makeMe` on TS; backend `MakeMe` on Java). Rely on **builder defaults** when a value is unused in assertions and does not affect the logic under test.
+- Do **not** create users, notebooks, or owners only to satisfy wiring if the builder already defaults them and the test never refers to them.
+- Prefer ownership helpers so dependents inherit the owner (e.g. backend `notebookOwnedBy` → tracker `.by` default).
+- Prefer builder APIs over **post-construction mutation** (e.g. `.id(10)`, not `note.id = 10`).
+- Prefer **domain-shaped helpers** over field soup when the same shape repeats (e.g. `.accidentalMatch(...)`, `.overlap(...)`, `.aliases(...)`).
+- If a mandatory dependency or repeated fixture cannot be expressed concisely, **extend the makeMe builder** — do not leave verbose setup in every test.
+
+```java
+// ❌
+Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+Note n = makeMe.aNote().notebook(nb).title("X").please();
+makeMe.aMemoryTrackerFor(n).by(currentUser.getUser()).spelling().please();
+
+// ✅
+Note n = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("X").please();
+makeMe.aMemoryTrackerFor(n).spelling().please();
+```
+
+```typescript
+// ❌
+const note = makeMe.aNote.please()
+note.id = 10
+note.noteTopology.id = 10
+
+// ✅
+const note = makeMe.aNote.id(10).please()
+```
