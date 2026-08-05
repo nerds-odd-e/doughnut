@@ -5,16 +5,16 @@ milestone_name: Accidental Match Resolve UX
 current_phase: 8
 current_phase_name: Match path and clickable titles
 status: in_progress
-stopped_at: Completed 08-01-PLAN.md
-last_updated: "2026-08-05T09:38:43.368Z"
+stopped_at: Completed 08-02-PLAN.md
+last_updated: "2026-08-05T09:43:02.827Z"
 last_activity: 2026-08-05
-last_activity_desc: Executed 08-01 — AccidentalMatchResolveRow Vitest green
+last_activity_desc: Executed 08-01 AccidentalMatchResolveRow (AMR-04 Vitest)
 progress:
   total_phases: 6
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 4
-  completed_plans: 3
-  percent: 75
+  completed_plans: 4
+  percent: 33
 ---
 
 # Project State
@@ -33,7 +33,7 @@ Plan: 08-01 complete; 08-02 pending (wave 2)
 Status: Phase 8 in progress — Plan 01 SUMMARY written
 Last activity: 2026-08-05 — Executed 08-01 AccidentalMatchResolveRow (AMR-04 Vitest)
 
-Progress: [████████░░] 75% (v1.2 milestone plans executed)
+Progress: [██████████] 100% (v1.2 milestone plans executed)
 
 ## Performance Metrics
 
@@ -52,6 +52,7 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 | Phase 07 P01 | 6min | 2 tasks | 5 files |
 | Phase 07 P02 | 2min | 2 tasks | 2 files |
 | Phase 08 P01 | 4min | 2 tasks | 5 files |
+| Phase 08 P02 | 2min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -71,6 +72,8 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 - [Phase 8]: No AMR-05 reopen this phase; hydrate on dialog mount; Vitest then E2E (D-07..D-11)
 - [Phase 8]: Assert router-link to under RenderingHelper stub for title navigation
 - [Phase 8]: Distinct notebook names via accidentalMatchWithTwoMatchedNotes notebookNames option
+- [Phase 08]: Same-notebook English practice path assert is enough for E2E AMR-04 (D-11)
+- [Phase 08]: Assert visible title anchor without click-through; AMR-05 reopen deferred to Phase 12
 
 ### Pending Todos
 
@@ -92,7 +95,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-08-05T09:38:43.362Z
-Stopped at: Completed 08-01-PLAN.md
+Last session: 2026-08-05T09:43:02.821Z
+Stopped at: Completed 08-02-PLAN.md
 Resume file: None
 Next action: Execute 08-02-PLAN.md (E2E path + clickable title asserts)
