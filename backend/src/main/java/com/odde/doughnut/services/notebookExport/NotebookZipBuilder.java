@@ -4,8 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,11 +17,7 @@ public final class NotebookZipBuilder {
   private NotebookZipBuilder() {}
 
   public static byte[] build(
-      String notebookReadmeContent,
-      List<ExportFolderRow> folders,
-      List<ExportNoteRow> notes,
-      String notebookName,
-      String publicOrigin) {
+      String notebookReadmeContent, List<ExportFolderRow> folders, List<ExportNoteRow> notes) {
     Map<Integer, List<ExportFolderRow>> childFoldersByParent =
         folders.stream()
             .collect(
@@ -32,20 +26,6 @@ public final class NotebookZipBuilder {
     Map<Integer, List<ExportNoteRow>> notesByFolder =
         notes.stream()
             .collect(Collectors.groupingBy(n -> n.folderId() == null ? ROOT_KEY : n.folderId()));
-
-    Map<Integer, String> noteIdToZipPath = new LinkedHashMap<>();
-    collectNotePaths(
-        "",
-        childFoldersByParent.getOrDefault(ROOT_KEY, List.of()),
-        notesByFolder.getOrDefault(ROOT_KEY, List.of()),
-        childFoldersByParent,
-        notesByFolder,
-        noteIdToZipPath);
-
-    Map<String, Integer> titleToNoteId = new LinkedHashMap<>();
-    notes.stream()
-        .sorted(Comparator.comparing(ExportNoteRow::id))
-        .forEach(n -> titleToNoteId.putIfAbsent(n.title(), n.id()));
 
     try {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -57,44 +37,11 @@ public final class NotebookZipBuilder {
             childFoldersByParent.getOrDefault(ROOT_KEY, List.of()),
             notesByFolder.getOrDefault(ROOT_KEY, List.of()),
             childFoldersByParent,
-            notesByFolder,
-            notebookName,
-            publicOrigin,
-            noteIdToZipPath,
-            titleToNoteId);
+            notesByFolder);
       }
       return baos.toByteArray();
     } catch (IOException e) {
       throw new UncheckedIOException(e);
-    }
-  }
-
-  private static void collectNotePaths(
-      String pathPrefix,
-      List<ExportFolderRow> childFolders,
-      List<ExportNoteRow> notesHere,
-      Map<Integer, List<ExportFolderRow>> childFoldersByParent,
-      Map<Integer, List<ExportNoteRow>> notesByFolder,
-      Map<Integer, String> noteIdToZipPath) {
-    Map<Integer, String> noteFileNames =
-        NotebookExportFilenames.uniqueFileNames(
-            notesHere.stream().map(n -> Map.entry(n.id(), n.title())).toList(), ".md");
-    for (ExportNoteRow note : notesHere) {
-      noteIdToZipPath.put(note.id(), pathPrefix + noteFileNames.get(note.id()));
-    }
-
-    Map<Integer, String> folderDirNames =
-        NotebookExportFilenames.uniqueFileNames(
-            childFolders.stream().map(f -> Map.entry(f.id(), f.name())).toList(), "");
-    for (ExportFolderRow folder : childFolders) {
-      String subPath = pathPrefix + folderDirNames.get(folder.id()) + "/";
-      collectNotePaths(
-          subPath,
-          childFoldersByParent.getOrDefault(folder.id(), List.of()),
-          notesByFolder.getOrDefault(folder.id(), List.of()),
-          childFoldersByParent,
-          notesByFolder,
-          noteIdToZipPath);
     }
   }
 
@@ -105,11 +52,7 @@ public final class NotebookZipBuilder {
       List<ExportFolderRow> childFolders,
       List<ExportNoteRow> notesHere,
       Map<Integer, List<ExportFolderRow>> childFoldersByParent,
-      Map<Integer, List<ExportNoteRow>> notesByFolder,
-      String notebookName,
-      String publicOrigin,
-      Map<Integer, String> noteIdToZipPath,
-      Map<String, Integer> titleToNoteId)
+      Map<Integer, List<ExportNoteRow>> notesByFolder)
       throws IOException {
     if (readmeContentOrNull != null && !readmeContentOrNull.isBlank()) {
       writeEntry(zos, pathPrefix + "index.md", readmeContentOrNull);
@@ -119,12 +62,7 @@ public final class NotebookZipBuilder {
         NotebookExportFilenames.uniqueFileNames(
             notesHere.stream().map(n -> Map.entry(n.id(), n.title())).toList(), ".md");
     for (ExportNoteRow note : notesHere) {
-      String zipRelativePath = pathPrefix + noteFileNames.get(note.id());
-      writeEntry(
-          zos,
-          zipRelativePath,
-          ExportNoteMarkdown.assemble(
-              note, notebookName, publicOrigin, zipRelativePath, noteIdToZipPath, titleToNoteId));
+      writeEntry(zos, pathPrefix + noteFileNames.get(note.id()), ExportNoteMarkdown.assemble(note));
     }
 
     Map<Integer, String> folderDirNames =
@@ -139,11 +77,7 @@ public final class NotebookZipBuilder {
           childFoldersByParent.getOrDefault(folder.id(), List.of()),
           notesByFolder.getOrDefault(folder.id(), List.of()),
           childFoldersByParent,
-          notesByFolder,
-          notebookName,
-          publicOrigin,
-          noteIdToZipPath,
-          titleToNoteId);
+          notesByFolder);
     }
   }
 

@@ -3,7 +3,6 @@ package com.odde.doughnut.services.notebookExport;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.not;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -16,9 +15,6 @@ import java.util.zip.ZipInputStream;
 import org.junit.jupiter.api.Test;
 
 class NotebookZipBuilderTest {
-
-  private static final String NOTEBOOK = "My Notebook";
-  private static final String ORIGIN = "http://localhost:9081";
 
   private Map<String, String> readZipEntries(byte[] zipBytes) throws IOException {
     Map<String, String> entries = new LinkedHashMap<>();
@@ -33,7 +29,7 @@ class NotebookZipBuilderTest {
 
   private byte[] buildZip(
       String notebookReadmeContent, List<ExportFolderRow> folders, List<ExportNoteRow> notes) {
-    return NotebookZipBuilder.build(notebookReadmeContent, folders, notes, NOTEBOOK, ORIGIN);
+    return NotebookZipBuilder.build(notebookReadmeContent, folders, notes);
   }
 
   @Test
@@ -81,64 +77,24 @@ class NotebookZipBuilderTest {
   }
 
   @Test
-  void rewritesResolvableWikiLinkToRelativeMarkdownAndAttachmentToAbsoluteUrl() throws IOException {
-    ExportNoteRow source =
-        new ExportNoteRow(
-            1, null, "Source", "See [[Target Title]] and ![](/attachments/images/9/photo.png)");
+  void leavesWikiLinksUnchangedInExportedNotes() throws IOException {
+    ExportNoteRow source = new ExportNoteRow(1, null, "Source", "See [[Target Title]]");
     ExportNoteRow target = new ExportNoteRow(2, null, "Target Title", "Target body");
 
-    byte[] zipBytes = buildZip(null, List.of(), List.of(source, target));
-
-    Map<String, String> entries = readZipEntries(zipBytes);
-    String sourceMd = entries.get("Source.md");
-
-    assertThat(sourceMd, not(containsString("doughnut_id")));
-    assertThat(sourceMd, containsString("[Target Title](Target%20Title.md)"));
-    assertThat(sourceMd, not(containsString("[[Target Title]]")));
-    assertThat(sourceMd, containsString("http://localhost:9081/attachments/images/9/photo.png"));
-    assertThat(
-        entries.keySet().stream().anyMatch(k -> k.contains("attachments/images/")), equalTo(false));
-  }
-
-  @Test
-  void leavesUnresolvedWikiAsDoubleBracketText() throws IOException {
-    ExportNoteRow note =
-        new ExportNoteRow(1, null, "Alone", "Missing [[Nowhere]] and [[Other Nb:Ghost]]");
-
-    Map<String, String> entries = readZipEntries(buildZip(null, List.of(), List.of(note)));
-    String md = entries.get("Alone.md");
-
-    assertThat(md, containsString("[[Nowhere]]"));
-    assertThat(md, containsString("[[Other Nb:Ghost]]"));
-  }
-
-  @Test
-  void usesRelativePathFromNestedFolderToSibling() throws IOException {
-    ExportFolderRow folderA = new ExportFolderRow(10, null, "FolderA", null);
-    ExportFolderRow folderB = new ExportFolderRow(11, null, "FolderB", null);
-    ExportNoteRow source = new ExportNoteRow(1, 10, "Source", "See [[Sibling]]");
-    ExportNoteRow sibling = new ExportNoteRow(2, 11, "Sibling", "Hi");
-
     Map<String, String> entries =
-        readZipEntries(buildZip(null, List.of(folderA, folderB), List.of(source, sibling)));
-    String md = entries.get("FolderA/Source.md");
+        readZipEntries(buildZip(null, List.of(), List.of(source, target)));
 
-    assertThat(md, containsString("[Sibling](../FolderB/Sibling.md)"));
-    assertThat(md, not(containsString("](/Folder")));
+    assertThat(entries.get("Source.md"), containsString("[[Target Title]]"));
   }
 
   @Test
-  void resolvesDuplicateTitlesViaLowestIdToCollisionSafeFilename() throws IOException {
+  void usesCollisionSafeFilenamesForDuplicateTitles() throws IOException {
     ExportNoteRow first = new ExportNoteRow(1, null, "Dup", "first");
     ExportNoteRow second = new ExportNoteRow(2, null, "Dup", "second");
-    ExportNoteRow linker = new ExportNoteRow(3, null, "Linker", "See [[Dup]]");
 
-    Map<String, String> entries =
-        readZipEntries(buildZip(null, List.of(), List.of(first, second, linker)));
+    Map<String, String> entries = readZipEntries(buildZip(null, List.of(), List.of(first, second)));
 
     assertThat(entries.containsKey("Dup.md"), equalTo(true));
     assertThat(entries.containsKey("Dup (2).md"), equalTo(true));
-    assertThat(entries.get("Linker.md"), containsString("[Dup](Dup.md)"));
-    assertThat(entries.get("Linker.md"), not(containsString("Dup%20(2)")));
   }
 }
