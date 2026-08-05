@@ -1,6 +1,5 @@
--- Repairs quiz_answer.created_at for a confirmed ~11-month window where rows were
--- stored 8h ahead of their true instant (see .planning/quick/260724-db-timezone-fix/PLAN.md
--- for the read-only prod forensics that established this window and direction).
+-- Repairs quiz_answer.created_at for a confirmed window where rows were stored
+-- 8h ahead of their true instant.
 --
 -- No-op everywhere by default (`spring.flyway.placeholders.tz_repair=1=0` in
 -- application.yml). Enabled (`1=1`) only via a system property on the production

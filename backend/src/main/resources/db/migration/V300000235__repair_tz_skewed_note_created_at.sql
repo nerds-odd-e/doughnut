@@ -1,7 +1,7 @@
 -- Repairs note.created_at for the same confirmed 8h-ahead skew window as
--- V300000233/V300000234 (see .planning/quick/260724-db-timezone-fix/PLAN.md).
--- created_at is set once at note creation and never rewritten, so no
--- self-healing join is needed (unlike memory_tracker's scheduling columns).
+-- V300000233/V300000234. created_at is set once at note creation and never
+-- rewritten, so no self-healing join is needed (unlike memory_tracker's
+-- scheduling columns).
 --
 -- Scoped to created_at only: note.updated_at showed a much less consistent
 -- hourly pattern in prod (large spikes not matching the personal-review-time

@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Clean up LIA training participant code
 status: Idle — awaiting next milestone
-stopped_at: Pruned spent quick-task planning diary after ADR 0002 cleanup
-last_updated: "2026-08-05T14:05:00+08:00"
+stopped_at: Removed 260724-db-timezone-fix planning/forensics trail
+last_updated: "2026-08-05T14:10:00+08:00"
 last_activity: 2026-08-05
-last_activity_desc: Pruned 260805-j23 PLAN/SUMMARY/CONTEXT; PROJECT aligned with ADR 0002
+last_activity_desc: Dropped timezone-fix deferred item, PLAN, and migration plan refs
 ---
 
 # State
@@ -54,7 +54,6 @@ None.
 
 | Category | Item | Status |
 |----------|------|--------|
-| quick_task | 260724-db-timezone-fix | missing — forensics for migration comments |
 | seed | SEED-001-mcq-fuzzy-notebook-title-spelling-match | dormant |
 | milestone_audit | v1.2 formal `/gsd-audit-milestone` | skipped at v1.2 close |
 
@@ -62,8 +61,8 @@ None.
 
 ## Session Continuity
 
-**Last session:** 2026-08-05T14:05:00+08:00
-**Stopped at:** Planning history pruned; ready to push
+**Last session:** 2026-08-05T14:10:00+08:00
+**Stopped at:** Timezone-fix planning trail removed
 **Next action:** `/gsd-new-milestone` for ADR 0002 Level 1 when ready
 **Resume file:** None
 

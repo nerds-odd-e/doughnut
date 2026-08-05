@@ -27,7 +27,6 @@
 - OVERLAP try-again: dual-match withholds SRS credit, remount retry, Flyway-persisted `quiz_answer.outcome` excluded from wrong-count; live E2E green.
 
 **Closeout type:** override_closeout
-**Known verification overrides:** 1 (see STATE.md Deferred Items) — quick task `260724-db-timezone-fix` is closed forensics kept for migration comments; milestone audit skipped by acknowledgment at close.
 
 ---
 

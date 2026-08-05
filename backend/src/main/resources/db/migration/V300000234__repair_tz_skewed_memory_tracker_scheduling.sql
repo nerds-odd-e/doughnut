@@ -1,6 +1,5 @@
 -- Repairs memory_tracker scheduling columns for the same confirmed 8h-ahead
--- skew as V300000233 (see .planning/quick/260724-db-timezone-fix/PLAN.md for
--- the read-only prod forensics that established the window and direction).
+-- skew as V300000233.
 --
 -- No-op everywhere by default (`spring.flyway.placeholders.tz_repair=1=0` in
 -- application.yml, same placeholder V300000233 uses). Enabled (`1=1`) only via
