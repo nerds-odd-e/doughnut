@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Accidental Match Resolve UX
-current_phase: 7
-current_phase_name: Compact result + Resolve dialog shell
-status: ready_for_verification
+current_phase: 8
+current_phase_name: Match path and clickable titles
+status: research_complete
 stopped_at: Phase 8 research complete
 last_updated: "2026-08-05T09:16:00.000Z"
 last_activity: 2026-08-05
