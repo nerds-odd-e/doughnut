@@ -50,7 +50,7 @@ Note: Rebuild the bundle before running the e2e `mcp_services.feature`.
 
 ### Running Unit Tests
 
-The MCP server has Vitest unit tests under `tests/` (not mixed with `src/`). **Style (focused assertions, concise makeMe):** always-applied `unit-testing.mdc`.
+The MCP server has Vitest unit tests under `tests/` (not mixed with `src/`). **Style ("small test" practice — stable boundary, data over mocks, focused assertions, concise makeMe):** always-applied `unit-testing.mdc`.
 
 ```sh
 CURSOR_DEV=true nix develop -c pnpm mcp-server:test
@@ -60,7 +60,7 @@ CURSOR_DEV=true nix develop -c pnpm mcp-server:test
 
 - **Production code**: `src/`
 - **Test files**: `tests/**/*.test.ts` (see `vitest.config.ts`)
-- Prefer high-level tool/server entry points; use `makeMe` from `doughnut-test-fixtures/makeMe` for API-shaped data when mocking backend responses.
+- Drive high-level tool/server entry points; cover lower layers with realistic `makeMe` data. Mock only backend HTTP responses (external dependency), with `makeMe` for API-shaped payloads.
 
 ### Formatting Code
 

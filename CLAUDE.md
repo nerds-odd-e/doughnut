@@ -8,7 +8,7 @@ Start with `.cursor/agent-map.md` for repo navigation, generated API guidance, f
 
 Run repo tooling with `CURSOR_DEV=true nix develop -c …` unless documented otherwise (e.g. Cloud VM). **Git commands do not need the Nix prefix** — run `git` directly.
 
-Repo conventions live in `.cursor/rules/`; use the relevant rule for backend, frontend, E2E, linting, migrations, MCP, or shell-script work. Unit test style (always applied): `.cursor/rules/unit-testing.mdc`.
+Repo conventions live in `.cursor/rules/`; use the relevant rule for backend, frontend, E2E, linting, migrations, MCP, or shell-script work. "Small test" style for unit tests (always applied): `.cursor/rules/unit-testing.mdc`.
 
 For local MySQL or Redis failures, inspect `mysql/mysql.log` or `redis/redis.log`; the Nix shell setup is defined by `process-compose.yaml` and `scripts/shell_setup.sh`.
 

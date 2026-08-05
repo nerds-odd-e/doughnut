@@ -7,7 +7,7 @@ alwaysApply: false
 
 Use this rule when creating or updating frontend Vitest tests. For canonical lint and format commands, use `linting_formating.mdc`.
 
-**Style (focused assertions, concise makeMe):** always-applied `unit-testing.mdc` — follow that first.
+**Style ("small test" practice — stable boundary, data over mocks, focused assertions, concise makeMe):** always-applied `unit-testing.mdc` — follow that first.
 
 ## Test Commands
 
@@ -53,11 +53,10 @@ In most situations, run all unit tests instead of a selected file only. Use a si
 
 ## Component Behavior
 
-- Test through user interactions.
-- Avoid testing implementation details.
-- For cross-cutting guidance about observable outcomes, high-level entry points, and avoiding 1:1 test/file mapping, use the `phased-planning` skill's Observable behavior first section.
+- Drive the mounted component / page ("small test" style per `unit-testing.mdc`); cover lower layers with realistic `makeMe` props/state, not by testing internal helpers in isolation.
+- Test through user interactions; assert observable DOM outcomes.
 - Use `data-testid` for test selectors.
-- Use Vitest browser mode and prefer real browser rendering over mocking; stop using jsdom.
+- Use Vitest browser mode and prefer real browser rendering over mocking sibling components or internal modules; stop using jsdom.
 
 ## Avoid Role Queries
 
@@ -67,11 +66,14 @@ In most situations, run all unit tests instead of a selected file only. Use a si
 
 ## Mock SDK Services
 
+The backend HTTP API is an **external** dependency from the frontend’s perspective (`unit-testing.mdc` mocking exception).
+
 - Use `mockSdkService` from `@tests/helpers` for type-safe mocking: pass the generated **controller class** and the **method name** (same static methods as `@generated/doughnut-backend-api/sdk.gen`).
 - It automatically wraps responses in the standard format `{ data, error, request, response }`.
 - It returns a spy that can be reconfigured in tests.
 - Use `wrapSdkResponse` when updating mock return values.
 - Use `mockSdkServiceWithImplementation` only for custom async logic based on options.
+- Build response payloads with `makeMe`; do not mock in-process collaborators to “reach” coverage.
 
 ```typescript
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"

@@ -82,18 +82,11 @@ The setup script is designed to be idempotent - you can run it multiple times sa
 
 ### Test Types
 
-The backend has two types of tests:
+The backend has **unit tests** only (written in the "small test" style — `unit-testing.mdc`). Some need MySQL; some do not:
 
-1. **Pure Unit Tests** (no database required)
-   - Use `MakeMeWithoutDB` for test data
-   - Can run without MySQL
-   - Example: `QuestionEvaluationTest`
+1. **No database** — Use `MakeMeWithoutDB` for test data; can run without MySQL. Example: `QuestionEvaluationTest`.
 
-2. **Integration Tests** (require database)
-   - Use `@SpringBootTest` and `@Transactional`
-   - Require MySQL to be running
-   - Use `MakeMe` (autowired) for test data
-   - Example: `TextContentValidatorTest`, `RestNoteControllerTests`
+2. **With database** — Use `@SpringBootTest` and `@Transactional`; require MySQL; use `MakeMe` (autowired). Example: `TextContentValidatorTest`, `RestNoteControllerTests`.
 
 ## Comparison: Local vs Cloud Agent
 
@@ -165,7 +158,7 @@ whoami  # Should show "ubuntu" or similar non-root user
 - **Azul Zulu JDK 25**: Chosen for compatibility and reliability
 - **MySQL 8.4 Community**: Latest stable version with good performance
 - **Gradle**: Uses project's wrapper (ensures consistent Gradle version)
-- **Spring Boot Test**: Integration test framework with real database
+- **Spring Boot Test**: runs unit tests with a real database (`@SpringBootTest`, `@Transactional`)
 
 ### File Locations
 

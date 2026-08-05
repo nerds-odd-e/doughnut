@@ -11,7 +11,7 @@ Run Stryker mutation tests and interpret survived mutants to improve real test
 coverage — without adding shallow structure-pinning tests.
 
 Purpose: Validate that unit tests exercise module logic after extract/refactor,
-or compare integration coverage vs mutation kill rate on pure/narrow modules.
+or compare broad boundary coverage vs mutation kill rate on pure/narrow modules.
 
 Output: Mutation run results + interpretation + summary ending with
 `## MUTATION TEST COMPLETE`.
@@ -31,16 +31,19 @@ branch — **or** the code is dead/unreachable. **Do not automatically add
 tests.** First consider delete dead path, merge redundant logic, or prove the
 code is still required from product/domain behavior.
 
+Follow always-applied `.cursor/rules/unit-testing.mdc` ("small test" style: stable
+boundary, data over mocks, focused assertions).
+
 **Do not** add shallow tests that reach into inner structure, call
 non-entry-point helpers, or assert on internal state just to flip Stryker green.
 
-**Do** add or extend coverage by driving a **high-level entry point**
-(controller, mounted page, `runInteractive`, real CLI). Assert only what a user
-or integrator can observe: HTTP response, CLI stdout, DOM, black-box
-inputs/outputs.
+**Do** add or extend coverage by driving a **stable boundary** (controller,
+mounted page, `runInteractive`, real CLI) with crafted preconditions so lower
+layers run for real. Assert only what a user or integrator can observe: HTTP
+response, CLI stdout, DOM, black-box inputs/outputs.
 
 **Pure helpers** (inputs → result, no hidden globals) may keep direct-import
-black-box tests only when that API is the intentional stable contract.
+black-box unit tests only when that API is the intentional stable contract.
 
 If a good observable test is hard to compose, **ask the developer** whether the
 mutated code deserves to exist.

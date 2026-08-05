@@ -5,11 +5,11 @@ Short navigation index — start here before generated API files or long docs. S
 ## Work Areas
 
 - Backend HTTP/API behavior: start in `backend/src/main/java/com/odde/doughnut/controllers/`, then follow services in `backend/src/main/java/com/odde/doughnut/services/` and entities/repositories in `backend/src/main/java/com/odde/doughnut/entities/`.
-- Backend tests: prefer controller-level tests under `backend/src/test/java/com/odde/doughnut/controllers/`; use `makeMe` fixtures and real database transactions. Style: `unit-testing.mdc` (always applied); stack details: `backend-testing.mdc`.
+- Backend tests: prefer controller-level unit tests under `backend/src/test/java/com/odde/doughnut/controllers/`; use `makeMe` fixtures and real database transactions ("small test" style: `unit-testing.mdc`). Stack details: `backend-testing.mdc`.
 - Frontend pages and components: start in `frontend/src/pages/`, `frontend/src/components/`, `frontend/src/composables/`, and `frontend/src/store/`.
-- Frontend tests: use `frontend/tests/`; mock generated API calls with `mockSdkService()` and build API-shaped data with `doughnut-test-fixtures/makeMe`. Style: `unit-testing.mdc` (always applied); stack details: `frontend-testing.mdc`.
+- Frontend tests: use `frontend/tests/`; drive mounted components; mock only the backend API via `mockSdkService()` and build payloads with `doughnut-test-fixtures/makeMe` (`unit-testing.mdc`). Stack details: `frontend-testing.mdc`.
 - E2E behavior: start with `e2e_test/features/`, then the matching step definitions in `e2e_test/step_definitions/`, then page objects in `e2e_test/start/`. After UI actions that leave the app busy (`data-app-busy`), wait with `waitUntilAppIsNotBusy()` (paired in `frontend-api.mdc` / `e2e-authoring.mdc`).
-- CLI behavior: start in `cli/src/`; run focused CLI tests from `cli/` rather than broad workspace verification. Style: `unit-testing.mdc`; stack details: `cli.mdc`.
+- CLI behavior: start in `cli/src/`; run focused CLI unit tests from `cli/` rather than broad workspace verification. Style: `unit-testing.mdc`; stack details: `cli.mdc`.
 - MCP server behavior: start in `mcp-server/`; use `.cursor/rules/mcp-server.mdc` only for MCP-specific build/test details. Style: `unit-testing.mdc`.
 - Database schema changes: add a new migration in `backend/src/main/resources/db/migration/`; never edit committed migrations.
 

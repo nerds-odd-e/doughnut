@@ -74,7 +74,7 @@ Prefer GSD phase dirs and filenames. Local flat `.planning/<name>.md` is legacy-
 ## Testing And Completion
 
 - Name tests and permanent artifacts by capability, not phase number.
-- Prefer observable behavior tests through high-level entry points; use direct unit tests for pure helpers and edge paths.
+- Prefer unit tests through high-level entry points in the "small test" style (`unit-testing.mdc`); use direct unit tests only for pure helpers / edge paths that are themselves a domain-stable contract.
 - Run targeted E2E for touched behavior, not the full suite unless explicitly required.
 - Do not leave failing tests at a phase boundary; remove `@wip` once scenarios pass.
 - Clean up dead code and update the plan before closing a phase.

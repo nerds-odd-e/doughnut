@@ -112,7 +112,7 @@
 ## Module Design
 
 **Exports:**
-- Keep public surfaces small (especially CLI). Test through high-level entry points (`run`, `runInteractive`, controllers, mounted components) rather than widening exports for unit tests.
+- Keep public surfaces small (especially CLI). Test through stable-boundary entry points (`run`, `runInteractive`, controllers, mounted components) rather than widening exports for unit tests (`.cursor/rules/unit-testing.mdc` — "small test" style).
 
 **Barrel Files:**
 - Frontend tests re-export helpers from `frontend/tests/helpers/index.ts` (`helper`, `mockSdkService`, `wrapSdkResponse`, …).

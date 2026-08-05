@@ -152,8 +152,8 @@ justified by the current change or the immediate next phase:
 - Unit tests that overlap another test on the same observable surface
   (same input/output, same entry point).
 - Tests that pin internal structure rather than observable behavior — prefer
-  the test that drives a high-level entry point (controller, mounted
-  component, Cypress scenario).
+  the test that drives a stable boundary (controller, mounted component,
+  Cypress scenario) per `unit-testing.mdc` ("small test" style).
 
 When in doubt, **delete**. The next phase will reintroduce only what it needs.
 </step>
@@ -184,7 +184,7 @@ Use `CURSOR_DEV=true nix develop -c …` for all commands except `git`.
 | MCP server | `CURSOR_DEV=true nix develop -c pnpm mcp-server:test` |
 
 Prefer controller-level backend tests and mounted-component / E2E tests over
-tests that only exercise internal helpers.
+tests that only exercise internal helpers (`unit-testing.mdc`).
 
 All related tests must pass before returning. If a test breaks because of
 the refactor (not the original change), fix it now.

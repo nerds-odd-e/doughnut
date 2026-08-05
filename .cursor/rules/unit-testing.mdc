@@ -1,11 +1,20 @@
 ---
-description: Preferred unit test style — focused assertions, concise makeMe setup (all packages)
+description: "small test" style for unit tests — stable boundary, data over mocks, focused assertions, concise makeMe (all packages)
 alwaysApply: true
 ---
 
-# Unit Test Style
+# "Small test" style
 
-Cross-cutting practice for **backend, frontend, CLI, and MCP** unit tests. Stack commands, entry points, and tooling stay in the package rules (`backend-testing.mdc`, `frontend-testing.mdc`, `cli.mdc`, `mcp-server.mdc`).
+This repo’s automated tests are **E2E** or **unit tests** — nothing in between. Write unit tests in the **"small test"** style below.
+
+A **"small test"** means: a fast, in-process unit test (JUnit, Vitest, Bach, …) that drives a **stable boundary** with crafted data/`makeMe`, exercises real lower-level production code, and mocks only external dependencies. Stack commands, entry points, and tooling stay in the package rules (`backend-testing.mdc`, `frontend-testing.mdc`, `cli.mdc`, `mcp-server.mdc`).
+
+## Stable boundary
+
+- **Drive the outermost (or domain-stable) interface.** Prefer the public surface under test — e.g. a controller, mounted component, CLI `run` / `runInteractive`, MCP tool — or an interface that is itself a deliberate, domain-stable contract (pure algorithm, validation API). Do not add a test class per internal production class, and do not widen exports only so tests can reach helpers.
+- **Cover lower layers with data, not with more test surfaces.** Craft realistic, scenario-specific preconditions and fixtures so one boundary test exercises the real lower-level production routines. Prefer that over isolating each collaborator behind mocks or thin wrapper tests.
+- **Build those fixtures with `makeMe`** — keep construction concise (see below).
+- **Do not mock unless external or exceptional.** Mock only true external dependencies (third-party APIs, network services, and the like) or extremely rare special cases. Package rules name the allowed exceptions (`OpenAIClient`, frontend `mockSdkService` for the backend HTTP API, CLI spies on `doughnut-api`, etc.). Prefer the real database, real in-process collaborators, and real browser rendering inside the system under test.
 
 ## Focused assertions
 

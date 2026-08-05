@@ -132,7 +132,7 @@ Targeted checks:
 Notes:
 - No Cypress: this is a server-side cron/scheduling contract; the stable boundary is
   `QuestionGenerationBatchPlanningService` (`findUsersEligibleForBatchSubmission`,
-  `getNextBatchQuestionSchedule`) plus the `submitDueUsers` integration test, matching existing
+  `getNextBatchQuestionSchedule`) plus the `submitDueUsers` unit test, matching existing
   test structure.
 
 ### Phase 2 — Structure: derive last submission functionally; remove the saved-state table

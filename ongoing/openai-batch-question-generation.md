@@ -417,7 +417,7 @@ Postcondition: existing nonterminal batches are polled and completed batches are
 
 Implementation notes:
 
-- This may be mostly an integration test over Phases 12-15.
+- This may be mostly a unit test spanning Phases 12-15.
 - Avoid relying on in-memory queues.
 
 Tests:

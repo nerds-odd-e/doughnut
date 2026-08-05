@@ -23,9 +23,10 @@ Output: Passing focused tests + short summary ending with `## BUG FIX COMPLETE`.
 **Test level choice:**
 - Bug matches an **existing E2E scenario** (same feature, same user interaction)
   → extend or add an E2E test.
-- Otherwise → **unit/integration** test driving a **high-level entry point**
-  (controller, mounted component, CLI `run`/`runInteractive`) — not an internal
-  helper.
+- Otherwise → a **unit test** in the **"small test"** style per `unit-testing.mdc`
+  (stable-boundary JUnit/Vitest/…): drive a **stable boundary** (controller, mounted
+  component, CLI `run`/`runInteractive`), cover lower layers with crafted data/`makeMe`,
+  mock only externals.
 
 **Before commit:** run **post-change-refactor**
 (`.agents/skills/post-change-refactor/SKILL.md`) on the full uncommitted change.
@@ -95,7 +96,7 @@ Before commit, run **post-change-refactor** on the full uncommitted change.
 <output>
 Report a short summary to the caller, then the completion marker:
 
-1. Bug location and test level chosen (E2E vs unit/integration).
+1. Bug location and test level chosen (E2E vs unit test).
 2. Test file(s) added or updated.
 3. Fix summary (what changed).
 4. Related tests run and confirmed passing.
@@ -107,7 +108,7 @@ Report a short summary to the caller, then the completion marker:
 
 <out_of_scope>
 - Do not run the full E2E suite unless explicitly requested.
-- Do not add tests that only exercise internal helpers when a high-level entry
-  point is available.
+- Do not add tests that only exercise internal helpers when a stable boundary
+  entry point is available (see `unit-testing.mdc`).
 - Do not skip the failing-test confirmation step.
 </out_of_scope>

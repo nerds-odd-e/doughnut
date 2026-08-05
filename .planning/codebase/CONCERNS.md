@@ -47,7 +47,7 @@
 - Issue: Note content properties live as YAML frontmatter; discoverability depends on derived tables refreshed via `WikiTitleCacheService.refreshForNote` and related backfills. Missed refresh sites recreate assimilation/search bugs.
 - Files: `backend/src/main/java/com/odde/doughnut/services/WikiTitleCacheService.java` (and call sites in `NoteService`, `NoteConstructionService`, `TextContentController`, wiki-link rewrite), `backend/src/main/java/com/odde/doughnut/services/NotePropertyIndex*.java`, `ongoing/note-property-index-and-backfill.md`
 - Impact: Stale assimilation queues, wrong wiki resolution, skipped property trackers after content edits if a write path skips refresh.
-- Fix approach: Keep one refresh boundary for content saves; when adding a write path, always call the same refresh seam; prefer integration tests that assert index rows after content PATCH.
+- Fix approach: Keep one refresh boundary for content saves; when adding a write path, always call the same refresh seam; prefer a controller-level unit test that asserts index rows after content PATCH ("small test" style: `unit-testing.mdc`).
 
 ## Known Bugs
 

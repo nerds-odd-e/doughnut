@@ -82,20 +82,22 @@ routinely blow past 5–10 minutes.
 | Layer | Role |
 |--------|------|
 | **E2E** | Each phase: tests covering the **main user behavior** for that phase. |
-| **Unit tests** | Formatting, errors, invalid input, edge paths. Black-box, minimal, full coverage of those concerns. |
+| **Unit tests** | Formatting, errors, invalid input, edge paths — written in the **"small test"** style (`unit-testing.mdc`). Black-box, minimal, full coverage of those concerns. |
 
 **Tests are owned by capability; phases only schedule work.**
 
 **Observable behavior first:**
 
+- Unit tests follow the **"small test"** style (stable boundary, cover lower layers with crafted data /
+  `makeMe`, mock only externals): always-applied `.cursor/rules/unit-testing.mdc`.
 - Prefer tests driving **high-level entry points** (controllers, mounted components,
-  CLI `run` / `runInteractive`) — not internal helpers unless that API **is** the
+  CLI `run` / `runInteractive`, E2E) — not internal helpers unless that API **is** the
   deliberate isolated contract.
-- Avoid tests mirroring code structure (internal-only parameters, bespoke mocks).
-- **Minimum tests for same coverage** — fewer integration-style tests over many
-  scattered unit tests pinning private functions.
+- **Minimum tests for same coverage** — fewer boundary tests over many scattered
+  tests pinning private functions.
 - **Cohesion** — assertions for one user-visible behavior live together when practical.
-- **Small unit tests** — pure functions, validation, error messages: inputs → outputs.
+- **Pure-contract unit tests** — pure functions, validation, error messages: inputs → outputs
+  when that API is the stable contract (still "small test" style).
 
 - **Test-driven:** tests first or alongside implementation.
 - **Phase-complete:** everything in a phase justified and tested inside that phase.

@@ -12,7 +12,7 @@ alwaysApply: true
 - When deleting files, prefer `trash` from the Nix environment instead of `rm -f` or `rm -rf`.
 - Keep high cohesion: minimize duplication, keep one representation for each concept, and place related code together.
 - Keep changes simple. Do not add defensive layers unless observed behavior requires them.
-- Unit tests: focused assertions and concise `makeMe` setup — always-applied `unit-testing.mdc`.
+- Unit tests use the "small test" style (stable boundary, data over mocks, focused assertions, concise `makeMe`) — always-applied `unit-testing.mdc`.
 - Name permanent artifacts by product capability, not development history.
 - Do not add comments or docs about past implementations in product code, tests, or permanent docs; code readers care about the current state.
 - **`.planning/` exception:** while a plan is **in progress**, keep enough history (STATE, CONTEXT, PLAN status, brief learnings) to **stop and resume** across sessions. When the plan is **fully executed** into code and permanent docs, **actively clean up** spent planning history (see `planning.mdc`).

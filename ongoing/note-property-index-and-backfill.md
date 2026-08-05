@@ -92,7 +92,7 @@ justifies the structure below.
   `run(Connection, Timestamp now)` that uses the pure algorithm classes. The decision
   logic (which keys to index, which to seed-skip) is a **pure, fully unit-tested**
   function; the JDBC plumbing is thin and additionally covered by a connection-level
-  integration test (set up notes, run against the test connection, assert).
+  unit test (set up notes, run against the test connection, assert).
 - **Seed user = notebook owner** (`ownership.user_id`). **Circle-owned notebooks
   (no `user_id`) are skipped** in the backfill (no single owner to assign). *(Assumption —
   see open questions.)*
@@ -141,7 +141,7 @@ Enables B2 (the immediate next phase). No observable behavior on its own.
   listed in Grounding. *(Optional structure tidy: if maintaining two parallel call lists
   feels like shotgun surgery, extract a `NoteDerivedDataService.refreshForNote` that fans
   out to both caches — only if it stays a no-behavior-change refactor.)*
-  - **Tests (this commit):** service-level integration tests (precedent:
+  - **Tests (this commit):** service-level unit tests (precedent:
     `WikiTitleCacheServiceTest`) using `makeMe`: save with content + reserved keys → rows
     for content keys only (`example of` included, `image`/`url` excluded); edit a key →
     rows updated; remove a key → its row gone; no frontmatter → no rows; delete note → rows
@@ -163,7 +163,7 @@ pending and pre-existing trackers are untouched.
   - **Tests:** inputs→outputs — reserved keys excluded from both sets; `example of`/`example
     of 2` indexed but never skip-seeded; case-insensitive already-tracked skip; empty
     frontmatter. **Commit.**
-- **B3b — Backfill runner + Java migration + integration test** *(behavior/data)* ✅
+- **B3b — Backfill runner + Java migration + unit test** *(behavior/data)* ✅
   - Static `NotePropertyTrackingBackfill.run(Connection, Timestamp now)`: iterate
     non-deleted notes; parse keys via `NoteContentMarkdown`/`Frontmatter`; apply the B3a
     planner; `INSERT IGNORE` index rows for `keysToIndex`; resolve owner `user_id` via
@@ -173,7 +173,7 @@ pending and pre-existing trackers are untouched.
   - Java migration `backend/src/main/java/db/migration/
     V300000206__seed_note_property_index_and_skipped_property_trackers.java` calls
     `run(context.getConnection(), now)`. Confirm Flyway discovers it (it runs during tests).
-  - **Tests (this commit):** integration test that builds notes (`makeMe`) with content
+  - **Tests (this commit):** unit test that builds notes (`makeMe`) with content
     properties + reserved keys + some pre-existing trackers, runs `run(connection, now)`
     against the test connection, and asserts via repository/`note-info`: index rows for
     non-reserved keys only; skipped trackers for non-`example of` untracked keys

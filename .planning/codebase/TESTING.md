@@ -138,7 +138,7 @@ describe("LoadingModal", () => {
 ```
 
 **Patterns:**
-- **Observable behavior first:** Drive controllers, mounted pages/components, CLI `run` / `runInteractive`, or E2E — not a 1:1 map of production classes (`.agents/skills/phased-planning/SKILL.md`, backend/frontend testing rules).
+- **Stable boundary first ("small test" style):** Drive controllers, mounted pages/components, CLI `run` / `runInteractive`, or E2E; cover lower layers with crafted `makeMe` data; mock only externals (`.cursor/rules/unit-testing.mdc`; package rules for stack exceptions).
 - Group with `@Nested` (Java) or `describe` (TS); minimal `@BeforeEach` / `beforeEach` shared setup.
 - One behavior per test; descriptive names.
 - Frontend: use `data-testid` selectors; avoid `getByRole` / `findByRole` (slow visibility checks). Prefer `getByText`, `getByLabelText`, `getByTitle`, or `querySelector`.
@@ -221,7 +221,7 @@ const note = makeMe.aNoteRealm
 - MCP: optional Vitest v8 coverage config present in `mcp-server/vitest.config.ts` — not a gate for normal development.
 - Backend: no Jacoco gate required for routine PR work; confidence comes from Spring + DB controller tests.
 - CLI: Stryker mutation testing available (`pnpm test:mutation` under `cli/` via `mutation-testing` skill) — use only when explicitly requested or a plan phase includes it.
-- Philosophy: observable behavior and E2E for happy paths; unit tests for pure algorithms, edges, and non–happy-path. Production happy-path code should be justified by E2E or equivalent, not unit tests alone (phased-planning skill).
+- Philosophy: observable behavior and E2E for happy paths; unit tests (in the "small test" style) for pure algorithms, edges, and non–happy-path (`unit-testing.mdc`). Production happy-path code should be justified by E2E or equivalent, not unit tests alone (phased-planning skill).
 
 **View Coverage:**
 ```bash
@@ -231,16 +231,14 @@ CURSOR_DEV=true nix develop -c pnpm -C mcp-server exec vitest run --coverage
 
 ## Test Types
 
-**Unit Tests:**
-- **Backend algorithms:** Direct tests under `backend/src/test/java/com/odde/doughnut/algorithms/` (e.g. `ClozeDescriptionTest` with `@ParameterizedTest` / `@CsvSource`).
-- **Frontend utils/composables/models:** `frontend/tests/utils/`, `composables/`, `models/` — pure inputs → outputs.
+This repo uses **E2E** and **unit tests** only — nothing in between. Write unit tests in the **"small test"** style (`.cursor/rules/unit-testing.mdc`).
+
+**Unit tests** ("small test" style — stable-boundary JUnit/Vitest/…):
+- **Backend:** Prefer controller tests with real MySQL transactions (`ControllerTestBase`). Direct algorithm tests under `backend/src/test/java/com/odde/doughnut/algorithms/` when that API is the stable contract (e.g. `ClozeDescriptionTest` with `@ParameterizedTest` / `@CsvSource`).
+- **Frontend:** Component/page tests in browser mode with mocked SDK + real Vue render; utils/composables/models under `frontend/tests/utils/`, `composables/`, `models/` for pure inputs → outputs.
 - **CLI:** argv routing via `run` (`cli/tests/index.test.ts`); interactive via `runInteractive` + mock TTY / Ink helpers.
 - **MCP:** tool registry shape and utils in `mcp-server/tests/`.
-
-**Integration Tests:**
-- Backend controller tests with real MySQL transactions (`ControllerTestBase`) — primary backend style.
-- Frontend component/page tests in browser mode with mocked SDK + real Vue render.
-- Infra/path-routing Node tests under `infra/` (also run from `lint:all` scripts).
+- **Infra:** path-routing Node tests under `infra/` (also run from `lint:all` scripts).
 
 **E2E Tests:**
 - Cypress + Cucumber under `e2e_test/`. Default tag filter: `not @ignore` (CI also excludes `@wip`). Do not commit `@focus` / `@only` (`scripts/check_focus_tags.sh`).

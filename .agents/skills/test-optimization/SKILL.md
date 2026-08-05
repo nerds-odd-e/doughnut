@@ -2,10 +2,10 @@
 name: test-optimization
 description: >-
   Profile a test suite, optimize the slowest top 10% in phased groups, and
-  close with a re-profile. Works for unit/integration tests in any sub-project
-  (backend, frontend, cli, mcp-server) or Cypress E2E. Use when the developer
-  asks to optimize, speed up, or profile slow tests, top 10% slowest, or test
-  performance. With `--resolve`, run resolve-only mode: triage the blacklist
+  close with a re-profile. Works for unit tests (JUnit/Vitest/…; "small test" style)
+  in any sub-project (backend, frontend, cli, mcp-server) or Cypress E2E. Use when
+  the developer asks to optimize, speed up, or profile slow tests, top 10% slowest,
+  or test performance. With `--resolve`, run resolve-only mode: triage the blacklist
   Candidates (tag / plan / ask) with no profiling or optimization.
 ---
 
@@ -78,8 +78,8 @@ whether a cheaper test gives the same protection.
 For **each** Candidate:
 
 1. **Read the actual test** (feature/scenario or unit test) plus the sibling
-   scenarios in the same file and any unit/backend tests the blacklist note
-   references. Confirm what unique behavior it actually protects.
+   scenarios in the same file and any backend/frontend unit tests the blacklist
+   note references. Confirm what unique behavior it actually protects.
 2. **Weigh the slow test against alternatives.** Ask whether one or more **unit
    tests** (or a **mocked** E2E scenario) could give the **same coverage,
    behavioral protection, and external user-value clarity**. Remember: unit tests
@@ -209,7 +209,7 @@ Work **only** tests in the current group. Prefer first applicable tactic.
 ### All layers
 
 - Delete or merge redundant tests; hoist shared setup to `beforeEach` / Background.
-- Replace broad integration with narrower entry (pure helper, slimmer fixture).
+- Replace a broad boundary fixture with a narrower entry (pure helper, slimmer fixture).
 - Parameterize (`it.each` / `@ParameterizedTest`) instead of copy-paste cases.
 
 ### Unit / component (Vitest, JUnit)
