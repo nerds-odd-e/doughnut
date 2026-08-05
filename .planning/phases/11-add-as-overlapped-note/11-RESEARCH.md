@@ -406,17 +406,11 @@ await closeDialogThen(() =>
 **If this table is empty:** All claims in this research were verified or cited — no user confirmation needed.  
 *(A1–A3 are discretion / verification-depth only; locked decisions do not need reconfirmation.)*
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Exact E2E feature file placement**
-   - What we know: D-11 allows extend `accidental_match_reveal.feature` or sibling; page-object preferred.
-   - What's unclear: Product preference for one more scenario vs new feature file.
-   - Recommendation: Extend `accidental_match_reveal.feature` with one scenario + page-object helper (mirrors Build a link).
+1. **Exact E2E feature file placement** — RESOLVED: extend `accidental_match_reveal.feature` with one scenario + page-object helper (mirrors Build a link; matches Claude’s Discretion + 11-02).
 
-2. **Schedule field assertion depth**
-   - What we know: D-07 asks schedule unchanged; Pitfall 4 lists memory tracker.
-   - What's unclear: Whether Vitest chrome + no retry is enough for Wave 1.
-   - Recommendation: Wave 1 = chrome + no retry + wiki-link write; Wave 2 = stay on accidental-match + no try-again; skip Memory Tracker unless a cheap page-object path already exists.
+2. **Schedule field assertion depth** — RESOLVED: prove schedule-unchanged by construction (D-06 content-only / no re-grade) + ACCIDENTAL_MATCH chrome / no try-again; skip Memory Tracker unless a cheap path appears (matches A3 + plan coverage).
 
 ## Environment Availability
 
