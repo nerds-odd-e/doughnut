@@ -2,6 +2,7 @@ package com.odde.doughnut.testability;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.EntityPersister;
+import com.odde.doughnut.services.NoteAliasIndexService;
 import com.odde.doughnut.services.NoteEmbeddingService;
 import com.odde.doughnut.services.book.BookStorage;
 import com.odde.doughnut.testability.builders.*;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 public class MakeMe extends MakeMeWithoutDB {
   @Autowired public EntityPersister entityPersister;
   @Autowired public NoteEmbeddingService noteEmbeddingService;
+  @Autowired public NoteAliasIndexService noteAliasIndexService;
   @Autowired public BookStorage bookStorage;
   @Autowired public TestabilitySettings testabilitySettings;
 

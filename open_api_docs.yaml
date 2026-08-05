@@ -3672,8 +3672,6 @@ components:
         outcome:
           type: string
           enum:
-          - CORRECT
-          - WRONG
           - ACCIDENTAL_MATCH
           - OVERLAP
       required:
@@ -3699,8 +3697,6 @@ components:
           $ref: "#/components/schemas/Answer"
         predefinedQuestion:
           $ref: "#/components/schemas/PredefinedQuestion"
-        overlap:
-          type: boolean
         matchedNotes:
           type: array
           items:

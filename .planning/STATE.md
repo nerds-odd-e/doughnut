@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: —
 milestone_name: —
 status: Idle — awaiting next milestone
-stopped_at: Pruned superseded milestone history; awaiting next milestone
-last_updated: "2026-08-05T14:15:00+08:00"
+stopped_at: Answer outcomes API simplified
+last_updated: "2026-08-05T14:37:36+08:00"
 last_activity: 2026-08-05
-last_activity_desc: Cleared superseded milestone from planning docs; trashed portable notes
+last_activity_desc: Slimmed AnswerOutcome to ACCIDENTAL_MATCH/OVERLAP; dropped redundant overlap flag
 ---
 
 # State

@@ -146,9 +146,8 @@ class RecallsControllerTests extends ControllerTestBase {
 
       DueMemoryTrackers dueMemoryTrackers = controller.recalling("Asia/Shanghai", 0);
 
-      assertEquals(1, dueMemoryTrackers.getToRepeat().size());
-      assertEquals(1, dueMemoryTrackers.totalAssimilatedCount);
       assertThat(dueMemoryTrackers.getToRepeat(), hasSize(1));
+      assertEquals(1, dueMemoryTrackers.totalAssimilatedCount);
     }
   }
 
@@ -190,10 +189,6 @@ class RecallsControllerTests extends ControllerTestBase {
 
       assertThat(results, hasSize(1));
       assertEquals(com.odde.doughnut.entities.QuestionType.MCQ, results.get(0).getQuestionType());
-      assertNull(results.get(0).getOverlap());
-      assertNull(results.get(0).getMatchedNotes());
-      assertNull(results.get(0).getAnswer().getMatchedNoteId());
-      assertNull(results.get(0).getAnswer().getOutcome());
     }
 
     @Test

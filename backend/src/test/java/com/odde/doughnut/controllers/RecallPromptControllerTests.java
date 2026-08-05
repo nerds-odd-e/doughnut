@@ -14,8 +14,6 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.MemoryTrackerService;
-import com.odde.doughnut.services.NoteAliasIndexService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
@@ -23,7 +21,6 @@ import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.odde.doughnut.utils.TimestampOperations;
 import com.openai.client.OpenAIClient;
 import com.openai.models.responses.StructuredResponseCreateParams;
-import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,9 +39,6 @@ class RecallPromptControllerTests extends ControllerTestBase {
   @Autowired MakeMe makeMe;
   @Autowired RecallPromptController controller;
   @Autowired GlobalSettingsService globalSettingsService;
-  @Autowired NoteAliasIndexService noteAliasIndexService;
-  @Autowired MemoryTrackerService memoryTrackerService;
-  @Autowired EntityManager entityManager;
   OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
   @BeforeEach
@@ -79,13 +73,9 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      Note answerNote = makeMe.aNote().please();
+      Note answerNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       memoryTracker =
-          makeMe
-              .aMemoryTrackerFor(answerNote)
-              .by(currentUser.getUser())
-              .forgettingCurveAndNextRecallAt(200.0f)
-              .please();
+          makeMe.aMemoryTrackerFor(answerNote).forgettingCurveAndNextRecallAt(200.0f).please();
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       recallPrompt =
           makeMe
@@ -107,17 +97,12 @@ class RecallPromptControllerTests extends ControllerTestBase {
     @Test
     void shouldUpdateLinkedPropertyMemoryTrackerWhenAnsweringPropertyQuestion()
         throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().please();
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       MemoryTracker noteLevelTracker =
-          makeMe
-              .aMemoryTrackerFor(note)
-              .by(currentUser.getUser())
-              .forgettingCurveAndNextRecallAt(200.0f)
-              .please();
+          makeMe.aMemoryTrackerFor(note).forgettingCurveAndNextRecallAt(200.0f).please();
       MemoryTracker propertyTracker =
           makeMe
               .aMemoryTrackerFor(note)
-              .by(currentUser.getUser())
               .propertyKey("topic")
               .forgettingCurveAndNextRecallAt(200.0f)
               .please();
@@ -296,9 +281,8 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
     @BeforeEach
     void setUp() {
-      note = makeMe.aNote().please();
-      MemoryTracker memoryTracker =
-          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+      note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
       recallPrompt =
           makeMe
               .aRecallPrompt()
@@ -390,9 +374,8 @@ class RecallPromptControllerTests extends ControllerTestBase {
       questionEvaluation.improvementAdvices = "what a horrible question!";
 
       MCQWithAnswer aiGeneratedQuestion = makeMe.aMCQWithAnswer().please();
-      Note note = makeMe.aNote().please();
-      MemoryTracker memoryTracker =
-          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
       recallPrompt =
           makeMe
               .aRecallPrompt()
@@ -469,12 +452,12 @@ class RecallPromptControllerTests extends ControllerTestBase {
     AnswerSpellingDTO answerDTO = new AnswerSpellingDTO();
 
     @BeforeEach
-    void setup() throws UnexpectedNoAccessRightException {
-      answerNote = makeMe.aNote().rememberSpelling().please();
+    void setup() {
+      answerNote =
+          makeMe.aNote().notebookOwnedBy(currentUser.getUser()).rememberSpelling().please();
       memoryTracker =
           makeMe
               .aMemoryTrackerFor(answerNote)
-              .by(currentUser.getUser())
               .forgettingCurveAndNextRecallAt(200.0f)
               .spelling()
               .please();
@@ -615,7 +598,6 @@ class RecallPromptControllerTests extends ControllerTestBase {
               makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please(),
               overlapTitleAnswer);
       assertFalse(overlapTitleResult.getAnswer().getCorrect());
-      assertNull(overlapTitleResult.getOverlap());
 
       AnswerSpellingDTO rawTokenAnswer = new AnswerSpellingDTO();
       rawTokenAnswer.setSpellingAnswer("[[Other Note]]");
@@ -624,7 +606,6 @@ class RecallPromptControllerTests extends ControllerTestBase {
               makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please(),
               rawTokenAnswer);
       assertFalse(rawTokenResult.getAnswer().getCorrect());
-      assertNull(rawTokenResult.getOverlap());
     }
 
     @Test
@@ -689,11 +670,11 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
     @Test
     void lateCorrectAnswerDoesNotShortenTheNextInterval() throws UnexpectedNoAccessRightException {
-      Note lateNote = makeMe.aNote().rememberSpelling().please();
+      Note lateNote =
+          makeMe.aNote().notebookOwnedBy(currentUser.getUser()).rememberSpelling().please();
       MemoryTracker lateTracker =
           makeMe
               .aMemoryTrackerFor(lateNote)
-              .by(currentUser.getUser())
               .forgettingCurveAndNextRecallAt(200.0f)
               .spelling()
               .please();
@@ -804,9 +785,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
         throws UnexpectedNoAccessRightException {
       AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
       assertTrue(answerResult.getAnswer().getCorrect());
-      assertNull(answerResult.getAnswer().getMatchedNoteId());
       assertNull(answerResult.getAnswer().getOutcome());
-      assertNull(answerResult.getOverlap());
       assertNull(answerResult.getMatchedNotes());
     }
 
@@ -823,6 +802,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
         Integer oldRecallCount = memoryTracker.getRecallCount();
         AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
         assertFalse(answerResult.getAnswer().getCorrect());
+        assertNull(answerResult.getAnswer().getOutcome());
         assertThat(memoryTracker.getRecallCount(), greaterThan(oldRecallCount));
       }
 
@@ -845,578 +825,6 @@ class RecallPromptControllerTests extends ControllerTestBase {
                 TimestampOperations.addHoursToTimestamp(
                     testabilitySettings.getCurrentUTCTimestamp(), 25)));
       }
-
-      @Test
-      void shouldNotPopulateAccidentalMatchFieldsOnWrongSpellingAnswer()
-          throws UnexpectedNoAccessRightException {
-        AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
-        assertFalse(answerResult.getAnswer().getCorrect());
-        assertNull(answerResult.getAnswer().getMatchedNoteId());
-        assertNull(answerResult.getAnswer().getOutcome());
-        assertNull(answerResult.getOverlap());
-        assertNull(answerResult.getMatchedNotes());
-      }
-    }
-  }
-
-  @Nested
-  class AccidentalMatch {
-    Note answerNote;
-    Note secondNote;
-    MemoryTracker memoryTracker;
-    RecallPrompt recallPrompt;
-    AnswerSpellingDTO answerDTO = new AnswerSpellingDTO();
-
-    @BeforeEach
-    void setup() {
-      answerNote = makeMe.aNote().rememberSpelling().please();
-      memoryTracker =
-          makeMe
-              .aMemoryTrackerFor(answerNote)
-              .by(currentUser.getUser())
-              .forgettingCurveAndNextRecallAt(200.0f)
-              .spelling()
-              .please();
-      recallPrompt = makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
-      Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      secondNote = makeMe.aNote().notebook(otherNotebook).title("Another Note Title").please();
-      answerDTO.setSpellingAnswer(secondNote.getTitle());
-    }
-
-    @Test
-    void shouldGradeAsAccidentalMatchWhenWrongAnswerMatchesAnotherReadableNoteTitle()
-        throws UnexpectedNoAccessRightException {
-      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
-      assertFalse(answerResult.getAnswer().getCorrect());
-      assertThat(answerResult.getAnswer().getOutcome(), is(AnswerOutcome.ACCIDENTAL_MATCH));
-      assertThat(
-          answerResult.getAnswer().getMatchedNoteId(), equalTo(secondNote.getId().longValue()));
-      assertThat(answerResult.getMatchedNotes(), notNullValue());
-      assertThat(answerResult.getMatchedNotes(), hasSize(1));
-      assertThat(answerResult.getMatchedNotes().getFirst().getId(), equalTo(secondNote.getId()));
-      assertThat(
-          answerResult.getAnswer().getMatchedNoteId(),
-          equalTo((long) answerResult.getMatchedNotes().getFirst().getId()));
-      assertThat(
-          answerResult.getMatchedNotes().getFirst().getTitle(), equalTo(secondNote.getTitle()));
-      assertNull(answerResult.getOverlap());
-    }
-
-    @Test
-    void shouldPreferLowestNoteIdWhenMultipleReadableNotesShareTitle()
-        throws UnexpectedNoAccessRightException {
-      Notebook thirdNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      Note thirdNote = makeMe.aNote().notebook(thirdNotebook).title(secondNote.getTitle()).please();
-      assertThat(secondNote.getId(), lessThan(thirdNote.getId()));
-
-      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
-
-      assertFalse(answerResult.getAnswer().getCorrect());
-      assertThat(answerResult.getAnswer().getOutcome(), is(AnswerOutcome.ACCIDENTAL_MATCH));
-      assertThat(
-          answerResult.getAnswer().getMatchedNoteId(), equalTo(secondNote.getId().longValue()));
-      assertThat(answerResult.getMatchedNotes(), notNullValue());
-      assertThat(
-          answerResult.getMatchedNotes().stream().map(NoteTopology::getId).toList(),
-          contains(secondNote.getId(), thirdNote.getId()));
-      assertThat(
-          answerResult.getAnswer().getMatchedNoteId(),
-          equalTo((long) answerResult.getMatchedNotes().getFirst().getId()));
-    }
-
-    @Test
-    void shouldIncludeTitleAndAliasMatchesInMatchedNotesOrderedById()
-        throws UnexpectedNoAccessRightException {
-      String shared = "TitlePreferredMatch";
-      Notebook notebookA = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      Note noteA = makeMe.aNote().notebook(notebookA).title(shared).please();
-      Notebook notebookB = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      Note noteB =
-          makeMe
-              .aNote()
-              .notebook(notebookB)
-              .title("AliasOnlyNoteTitle")
-              .content("---\naliases:\n  - " + shared + "\n---\n\nbody")
-              .please();
-      noteAliasIndexService.refreshForNote(noteB);
-      answerDTO.setSpellingAnswer(shared);
-
-      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
-
-      int minId = Math.min(noteA.getId(), noteB.getId());
-      int maxId = Math.max(noteA.getId(), noteB.getId());
-      assertFalse(answerResult.getAnswer().getCorrect());
-      assertThat(answerResult.getAnswer().getOutcome(), is(AnswerOutcome.ACCIDENTAL_MATCH));
-      assertThat(answerResult.getMatchedNotes(), notNullValue());
-      assertThat(
-          answerResult.getMatchedNotes().stream().map(NoteTopology::getId).toList(),
-          contains(minId, maxId));
-      assertThat(answerResult.getAnswer().getMatchedNoteId(), equalTo((long) minId));
-      assertThat(
-          answerResult.getAnswer().getMatchedNoteId(),
-          equalTo((long) answerResult.getMatchedNotes().getFirst().getId()));
-    }
-
-    @Test
-    void shouldGradeBlankAnswerAsPlainWrongEvenWhenEmptyTitleReadableNoteExists()
-        throws UnexpectedNoAccessRightException {
-      Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      Note emptyTitleNote = makeMe.aNote().notebook(otherNotebook).title("temp").please();
-      entityManager
-          .createQuery("UPDATE Note n SET n.title = '' WHERE n.id = :id")
-          .setParameter("id", emptyTitleNote.getId())
-          .executeUpdate();
-      entityManager.flush();
-      answerDTO.setSpellingAnswer("");
-
-      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
-
-      assertFalse(answerResult.getAnswer().getCorrect());
-      assertNull(answerResult.getAnswer().getOutcome());
-      assertNull(answerResult.getAnswer().getMatchedNoteId());
-      assertNull(answerResult.getMatchedNotes());
-      assertNull(answerResult.getOverlap());
-    }
-
-    @Test
-    void shouldGradeWhitespaceOnlyAnswerAsPlainWrong() throws UnexpectedNoAccessRightException {
-      answerDTO.setSpellingAnswer("   \t  ");
-
-      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
-
-      assertFalse(answerResult.getAnswer().getCorrect());
-      assertNull(answerResult.getAnswer().getOutcome());
-      assertNull(answerResult.getAnswer().getMatchedNoteId());
-    }
-
-    @Test
-    void shouldApplyLighterPenaltyThanWrongAnswer() throws UnexpectedNoAccessRightException {
-      testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-      controller.answerSpelling(recallPrompt, answerDTO);
-      assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(190.0f));
-      assertThat(
-          memoryTracker.getNextRecallAt(),
-          greaterThan(testabilitySettings.getCurrentUTCTimestamp()));
-      assertThat(
-          memoryTracker.getNextRecallAt(),
-          not(
-              equalTo(
-                  TimestampOperations.addHoursToTimestamp(
-                      testabilitySettings.getCurrentUTCTimestamp(), 12))));
-    }
-
-    @Test
-    void shouldNotLeakMatchedNoteIdFromUnreadableNotebook()
-        throws UnexpectedNoAccessRightException {
-      User otherUser = makeMe.aUser().please();
-      Notebook unreadableNotebook = makeMe.aNotebook().creatorAndOwner(otherUser).please();
-      Note unreadableNote =
-          makeMe.aNote().notebook(unreadableNotebook).title("Unreadable Accidental Title").please();
-      answerDTO.setSpellingAnswer(unreadableNote.getTitle());
-
-      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
-
-      assertFalse(answerResult.getAnswer().getCorrect());
-      assertNull(answerResult.getAnswer().getOutcome());
-      assertNull(answerResult.getAnswer().getMatchedNoteId());
-      assertNull(answerResult.getMatchedNotes());
-      assertNull(answerResult.getOverlap());
-    }
-
-    @Test
-    void shouldOmitUnreadableNotesFromMatchedNotesWhenReadableMatchAlsoExists()
-        throws UnexpectedNoAccessRightException {
-      String sharedTitle = "Shared Accidental Title";
-      User otherUser = makeMe.aUser().please();
-      Notebook unreadableNotebook = makeMe.aNotebook().creatorAndOwner(otherUser).please();
-      Note unreadableNote = makeMe.aNote().notebook(unreadableNotebook).title(sharedTitle).please();
-      Notebook readableNotebook =
-          makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      Note readableNote = makeMe.aNote().notebook(readableNotebook).title(sharedTitle).please();
-      answerDTO.setSpellingAnswer(sharedTitle);
-
-      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
-
-      assertFalse(answerResult.getAnswer().getCorrect());
-      assertThat(answerResult.getAnswer().getOutcome(), is(AnswerOutcome.ACCIDENTAL_MATCH));
-      assertThat(answerResult.getMatchedNotes(), notNullValue());
-      assertThat(answerResult.getMatchedNotes(), hasSize(1));
-      assertThat(answerResult.getMatchedNotes().getFirst().getId(), equalTo(readableNote.getId()));
-      assertThat(
-          answerResult.getAnswer().getMatchedNoteId(), equalTo(readableNote.getId().longValue()));
-      assertThat(
-          answerResult.getMatchedNotes().stream().map(NoteTopology::getId).toList(),
-          not(hasItem(unreadableNote.getId())));
-    }
-
-    @Test
-    void shouldSkipAccidentalMatchSearchWhenAnswerMatchesReviewedNoteEvenIfAnotherNoteSharesTitle()
-        throws UnexpectedNoAccessRightException {
-      Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      makeMe.aNote().notebook(otherNotebook).title(answerNote.getTitle()).please();
-      answerDTO.setSpellingAnswer(answerNote.getTitle());
-
-      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
-
-      assertTrue(answerResult.getAnswer().getCorrect());
-      assertNull(answerResult.getAnswer().getOutcome());
-      assertNull(answerResult.getAnswer().getMatchedNoteId());
-      assertNull(answerResult.getMatchedNotes());
-      assertNull(answerResult.getOverlap());
-    }
-
-    @Test
-    void shouldGradeAsAccidentalMatchWhenWrongAnswerMatchesAnotherReadableNoteAlias()
-        throws UnexpectedNoAccessRightException {
-      Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      String alias = "AccidentalAliasMatch";
-      Note aliasBearingNote =
-          makeMe
-              .aNote()
-              .notebook(otherNotebook)
-              .title("Unrelated Note Title")
-              .content("---\naliases:\n  - " + alias + "\n---\n\nbody")
-              .please();
-      noteAliasIndexService.refreshForNote(aliasBearingNote);
-      answerDTO.setSpellingAnswer(alias);
-
-      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
-
-      assertFalse(answerResult.getAnswer().getCorrect());
-      assertThat(answerResult.getAnswer().getOutcome(), is(AnswerOutcome.ACCIDENTAL_MATCH));
-      assertThat(
-          answerResult.getAnswer().getMatchedNoteId(),
-          equalTo(aliasBearingNote.getId().longValue()));
-      assertThat(answerResult.getMatchedNotes(), notNullValue());
-      assertThat(answerResult.getMatchedNotes(), hasSize(1));
-      assertThat(
-          answerResult.getMatchedNotes().getFirst().getId(), equalTo(aliasBearingNote.getId()));
-      assertThat(
-          answerResult.getAnswer().getMatchedNoteId(),
-          equalTo((long) answerResult.getMatchedNotes().getFirst().getId()));
-      assertNull(answerResult.getOverlap());
-    }
-
-    @Test
-    void shouldNotAccidentalMatchViaWikiLinkOverlapAliasItem()
-        throws UnexpectedNoAccessRightException {
-      Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      String overlapTargetTitle = "OverlapTargetTitle";
-      Note overlapDeclarer =
-          makeMe
-              .aNote()
-              .notebook(otherNotebook)
-              .title("Unrelated Overlap Declarer")
-              .content(
-                  """
-                  ---
-                  aliases:
-                    - "[[OverlapTargetTitle]]"
-                  ---
-
-                  body
-                  """)
-              .please();
-      noteAliasIndexService.refreshForNote(overlapDeclarer);
-      answerDTO.setSpellingAnswer(overlapTargetTitle);
-
-      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
-
-      assertFalse(answerResult.getAnswer().getCorrect());
-      assertNull(answerResult.getAnswer().getOutcome());
-      assertNull(answerResult.getAnswer().getMatchedNoteId());
-      assertNull(answerResult.getMatchedNotes());
-      assertNull(answerResult.getOverlap());
-    }
-
-    @Test
-    void shouldGradeAsAccidentalMatchWhenWrongAnswerMatchesAliasAfterTrim()
-        throws UnexpectedNoAccessRightException {
-      Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      String alias = "AccidentalAliasMatch";
-      Note aliasBearingNote =
-          makeMe
-              .aNote()
-              .notebook(otherNotebook)
-              .title("Unrelated Note Title For Trim")
-              .content("---\naliases:\n  - " + alias + "\n---\n\nbody")
-              .please();
-      noteAliasIndexService.refreshForNote(aliasBearingNote);
-      answerDTO.setSpellingAnswer("  " + alias + "  ");
-
-      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
-
-      assertFalse(answerResult.getAnswer().getCorrect());
-      assertThat(answerResult.getAnswer().getOutcome(), is(AnswerOutcome.ACCIDENTAL_MATCH));
-      assertThat(
-          answerResult.getAnswer().getMatchedNoteId(),
-          equalTo(aliasBearingNote.getId().longValue()));
-      assertThat(answerResult.getMatchedNotes(), notNullValue());
-      assertThat(answerResult.getMatchedNotes(), hasSize(1));
-      assertThat(
-          answerResult.getMatchedNotes().getFirst().getId(), equalTo(aliasBearingNote.getId()));
-      assertThat(
-          answerResult.getAnswer().getMatchedNoteId(),
-          equalTo((long) answerResult.getMatchedNotes().getFirst().getId()));
-    }
-
-    @Test
-    void shouldNotDropForgettingCurveIndexBelowFloorOnAccidentalMatch()
-        throws UnexpectedNoAccessRightException {
-      memoryTracker.setForgettingCurveIndex(ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX);
-      memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
-      makeMe.entityPersister.save(memoryTracker);
-      answerDTO.setSpellingAnswer(secondNote.getTitle());
-      testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-
-      AnsweredQuestion answerResult = controller.answerSpelling(recallPrompt, answerDTO);
-
-      assertThat(answerResult.getAnswer().getOutcome(), is(AnswerOutcome.ACCIDENTAL_MATCH));
-      assertThat(
-          memoryTracker.getForgettingCurveIndex(),
-          equalTo(ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX));
-      assertThat(
-          memoryTracker.getNextRecallAt(),
-          greaterThanOrEqualTo(testabilitySettings.getCurrentUTCTimestamp()));
-    }
-
-    @Test
-    void shouldStillCountAccidentalMatchTowardWrongAnswerThreshold()
-        throws UnexpectedNoAccessRightException {
-      answerDTO.setSpellingAnswer(secondNote.getTitle());
-      Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
-      assertThat(memoryTrackerService.isThresholdExceeded(memoryTracker, now), is(false));
-
-      for (int i = 0; i < 4; i++) {
-        RecallPrompt prompt =
-            makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
-        AnsweredQuestion result = controller.answerSpelling(prompt, answerDTO);
-        assertThat(result.getAnswer().getOutcome(), is(AnswerOutcome.ACCIDENTAL_MATCH));
-        assertFalse(result.getAnswer().getCorrect());
-      }
-      assertThat(memoryTrackerService.isThresholdExceeded(memoryTracker, now), is(false));
-
-      AnsweredQuestion fifth =
-          controller.answerSpelling(
-              makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please(),
-              answerDTO);
-      assertThat(fifth.getAnswer().getOutcome(), is(AnswerOutcome.ACCIDENTAL_MATCH));
-      assertFalse(fifth.getAnswer().getCorrect());
-      assertThat(memoryTrackerService.isThresholdExceeded(memoryTracker, now), is(true));
-    }
-  }
-
-  @Nested
-  class OverlapTryAgain {
-    Note reviewedNote;
-    Note partnerNote;
-    MemoryTracker memoryTracker;
-
-    @BeforeEach
-    void setup() {
-      Notebook partnerNotebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      partnerNote = makeMe.aNote().notebook(partnerNotebook).title("Shared Title").please();
-      String overlapToken = partnerNotebook.getName() + ":Shared Title";
-      reviewedNote =
-          makeMe
-              .aNote()
-              .rememberSpelling()
-              .title("Shared Title")
-              .content(
-                  """
-                  ---
-                  aliases:
-                    - color
-                    - "[[%s]]"
-                  ---
-                  Body text
-                  """
-                      .formatted(overlapToken))
-              .please();
-      memoryTracker =
-          makeMe
-              .aMemoryTrackerFor(reviewedNote)
-              .by(currentUser.getUser())
-              .forgettingCurveAndNextRecallAt(200.0f)
-              .spelling()
-              .please();
-    }
-
-    @Test
-    void shouldGradeAsOverlapWhenAnswerMatchesReviewedAndResolvedOverlapTarget()
-        throws UnexpectedNoAccessRightException {
-      Integer recallCountBefore = memoryTracker.getRecallCount();
-      Float forgettingCurveBefore = memoryTracker.getForgettingCurveIndex();
-      Timestamp nextRecallAtBefore = memoryTracker.getNextRecallAt();
-
-      AnswerSpellingDTO answerDTO = new AnswerSpellingDTO();
-      answerDTO.setSpellingAnswer("Shared Title");
-      RecallPrompt prompt =
-          makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
-
-      AnsweredQuestion result = controller.answerSpelling(prompt, answerDTO);
-
-      assertFalse(result.getAnswer().getCorrect());
-      assertThat(result.getAnswer().getOutcome(), is(AnswerOutcome.OVERLAP));
-      assertThat(result.getOverlap(), is(true));
-      assertThat(result.getMatchedNotes(), anyOf(nullValue(), empty()));
-      assertThat(memoryTracker.getRecallCount(), equalTo(recallCountBefore));
-      assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(forgettingCurveBefore));
-      assertThat(memoryTracker.getNextRecallAt(), equalTo(nextRecallAtBefore));
-    }
-
-    @Test
-    void shouldGradeCorrectWithCreditWhenDistinguishingPlainAlias()
-        throws UnexpectedNoAccessRightException {
-      Integer recallCountBefore = memoryTracker.getRecallCount();
-
-      AnswerSpellingDTO answerDTO = new AnswerSpellingDTO();
-      answerDTO.setSpellingAnswer("color");
-      RecallPrompt prompt =
-          makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
-
-      AnsweredQuestion result = controller.answerSpelling(prompt, answerDTO);
-
-      assertTrue(result.getAnswer().getCorrect());
-      assertThat(result.getAnswer().getOutcome(), not(is(AnswerOutcome.OVERLAP)));
-      assertThat(result.getOverlap(), anyOf(nullValue(), is(false)));
-      assertThat(memoryTracker.getRecallCount(), equalTo(recallCountBefore + 1));
-    }
-
-    @Test
-    void shouldNotCountOverlapTowardWrongAnswerThreshold() throws UnexpectedNoAccessRightException {
-      AnswerSpellingDTO answerDTO = new AnswerSpellingDTO();
-      answerDTO.setSpellingAnswer("Shared Title");
-      Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
-      assertThat(memoryTrackerService.isThresholdExceeded(memoryTracker, now), is(false));
-
-      for (int i = 0; i < 5; i++) {
-        RecallPrompt prompt =
-            makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
-        AnsweredQuestion result = controller.answerSpelling(prompt, answerDTO);
-        assertThat(result.getAnswer().getOutcome(), is(AnswerOutcome.OVERLAP));
-        assertFalse(result.getAnswer().getCorrect());
-      }
-      assertThat(memoryTrackerService.isThresholdExceeded(memoryTracker, now), is(false));
-    }
-
-    @Test
-    void shouldGradeCorrectWithCreditWhenOverlapTargetDoesNotExist()
-        throws UnexpectedNoAccessRightException {
-      Note noteWithDeadOverlap =
-          makeMe
-              .aNote()
-              .rememberSpelling()
-              .title("Reviewed Alone")
-              .content(
-                  """
-                  ---
-                  aliases:
-                    - "[[No Such Notebook:Missing Partner Title]]"
-                  ---
-                  Body text
-                  """)
-              .please();
-      MemoryTracker tracker =
-          makeMe
-              .aMemoryTrackerFor(noteWithDeadOverlap)
-              .by(currentUser.getUser())
-              .forgettingCurveAndNextRecallAt(200.0f)
-              .spelling()
-              .please();
-      Integer recallCountBefore = tracker.getRecallCount();
-
-      AnswerSpellingDTO answerDTO = new AnswerSpellingDTO();
-      answerDTO.setSpellingAnswer("Reviewed Alone");
-      RecallPrompt prompt = makeMe.aRecallPrompt().forMemoryTracker(tracker).spelling().please();
-
-      AnsweredQuestion result = controller.answerSpelling(prompt, answerDTO);
-
-      assertTrue(result.getAnswer().getCorrect());
-      assertThat(result.getAnswer().getOutcome(), not(is(AnswerOutcome.OVERLAP)));
-      assertThat(result.getOverlap(), anyOf(nullValue(), is(false)));
-      assertThat(tracker.getRecallCount(), equalTo(recallCountBefore + 1));
-    }
-
-    @Test
-    void shouldGradeCorrectWithCreditWhenOverlapPartnerIsUnreadable()
-        throws UnexpectedNoAccessRightException {
-      User otherUser = makeMe.aUser().please();
-      Notebook unreadableNotebook = makeMe.aNotebook().creatorAndOwner(otherUser).please();
-      makeMe.aNote().notebook(unreadableNotebook).title("Shared Unreadable").please();
-      String overlapToken = unreadableNotebook.getName() + ":Shared Unreadable";
-      Note reviewed =
-          makeMe
-              .aNote()
-              .rememberSpelling()
-              .title("Shared Unreadable")
-              .content(
-                  """
-                  ---
-                  aliases:
-                    - "[[%s]]"
-                  ---
-                  Body text
-                  """
-                      .formatted(overlapToken))
-              .please();
-      MemoryTracker tracker =
-          makeMe
-              .aMemoryTrackerFor(reviewed)
-              .by(currentUser.getUser())
-              .forgettingCurveAndNextRecallAt(200.0f)
-              .spelling()
-              .please();
-      Integer recallCountBefore = tracker.getRecallCount();
-
-      AnswerSpellingDTO answerDTO = new AnswerSpellingDTO();
-      answerDTO.setSpellingAnswer("Shared Unreadable");
-      RecallPrompt prompt = makeMe.aRecallPrompt().forMemoryTracker(tracker).spelling().please();
-
-      AnsweredQuestion result = controller.answerSpelling(prompt, answerDTO);
-
-      assertTrue(result.getAnswer().getCorrect());
-      assertThat(result.getAnswer().getOutcome(), not(is(AnswerOutcome.OVERLAP)));
-      assertThat(result.getOverlap(), anyOf(nullValue(), is(false)));
-      assertThat(tracker.getRecallCount(), equalTo(recallCountBefore + 1));
-    }
-
-    @Test
-    void shouldGradeCorrectWithCreditWhenOverlapTokenIsSelfReferential()
-        throws UnexpectedNoAccessRightException {
-      Note selfOverlapping =
-          makeMe
-              .aNote()
-              .rememberSpelling()
-              .title("Self Referential Title")
-              .content(
-                  """
-                  ---
-                  aliases:
-                    - "[[Self Referential Title]]"
-                  ---
-                  Body text
-                  """)
-              .please();
-      MemoryTracker tracker =
-          makeMe
-              .aMemoryTrackerFor(selfOverlapping)
-              .by(currentUser.getUser())
-              .forgettingCurveAndNextRecallAt(200.0f)
-              .spelling()
-              .please();
-      Integer recallCountBefore = tracker.getRecallCount();
-
-      AnswerSpellingDTO answerDTO = new AnswerSpellingDTO();
-      answerDTO.setSpellingAnswer("Self Referential Title");
-      RecallPrompt prompt = makeMe.aRecallPrompt().forMemoryTracker(tracker).spelling().please();
-
-      AnsweredQuestion result = controller.answerSpelling(prompt, answerDTO);
-
-      assertTrue(result.getAnswer().getCorrect());
-      assertThat(result.getAnswer().getOutcome(), not(is(AnswerOutcome.OVERLAP)));
-      assertThat(result.getOverlap(), anyOf(nullValue(), is(false)));
-      assertThat(tracker.getRecallCount(), equalTo(recallCountBefore + 1));
     }
   }
 }

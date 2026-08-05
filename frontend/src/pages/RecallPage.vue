@@ -80,12 +80,7 @@ import AnsweredQuestionComponent from "@/components/recall/AnsweredQuestionCompo
 import AnsweredSpellingQuestion from "@/components/recall/AnsweredSpellingQuestion.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import type { AnsweredQuestion } from "@generated/doughnut-backend-api"
-import {
-  RecallsController,
-  MemoryTrackerController,
-} from "@generated/doughnut-backend-api/sdk.gen"
-import usePopups from "@/components/commons/Popups/usePopups"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import { RecallsController } from "@generated/doughnut-backend-api/sdk.gen"
 import getEnvironment from "@/managedApi/window/getEnvironment"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { shuffle } from "es-toolkit"
@@ -99,9 +94,9 @@ import {
 } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 import { useRecallTrackerNavigation } from "@/composables/useRecallTrackerNavigation"
+import { useRecallAnswerHandling } from "@/composables/useRecallAnswerHandling"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 
-const { popups } = usePopups()
 const { dueCount, setDueCount } = useAssimilationCount()
 const {
   currentRecallWindowEndAt,
@@ -180,6 +175,16 @@ const viewLastAnsweredQuestion = (cursor: number | undefined) => {
   previousAnsweredQuestionCursor.value = cursor
 }
 
+const { onAnswered, onOverlapRetry, onJustReviewed } = useRecallAnswerHandling({
+  previousAnsweredQuestions,
+  previousAnsweredQuestionCursor,
+  spellingRetryNonce,
+  dueCount,
+  setDueCount,
+  moveToNextMemoryTracker,
+  viewLastAnsweredQuestion,
+})
+
 watch(
   () => previousAnsweredQuestionCursor.value,
   (cursor) => {
@@ -227,59 +232,6 @@ const loadMore = async (dueInDays?: number) => {
   } finally {
     isLoadingMore.value = false
   }
-}
-
-const offerReAssimilation = async (answerResult: AnsweredQuestion) => {
-  const memoryTrackerId = answerResult.memoryTrackerId
-  if (memoryTrackerId === undefined) return
-  const propertyKey = answerResult.recalledNote?.propertyKey
-  const message = propertyKey
-    ? `You have answered the "${propertyKey}" property incorrectly too many times. Would you like to re-assimilate it?`
-    : "You have answered this note incorrectly too many times. Would you like to re-assimilate it?"
-  const confirmed = await popups.confirm(message)
-  if (confirmed) {
-    await MemoryTrackerController.softDelete({
-      path: { memoryTracker: memoryTrackerId },
-    })
-    setDueCount((dueCount.value ?? 0) + 1)
-  }
-}
-
-const onAnswered = async (answerResult: AnsweredQuestion) => {
-  const isOverlap =
-    answerResult.answer?.outcome === "OVERLAP" || answerResult.overlap === true
-  if (isOverlap) {
-    previousAnsweredQuestions.value.push(answerResult)
-    viewLastAnsweredQuestion(previousAnsweredQuestions.value.length - 1)
-    return
-  }
-
-  moveToNextMemoryTracker()
-  previousAnsweredQuestions.value.push(answerResult)
-  if (!answerResult.answer?.correct) {
-    viewLastAnsweredQuestion(previousAnsweredQuestions.value.length - 1)
-    const memoryTrackerId = answerResult.memoryTrackerId
-    if (memoryTrackerId !== undefined) {
-      const { data } = await apiCallWithLoading(() =>
-        MemoryTrackerController.getThresholdExceeded({
-          path: { memoryTracker: memoryTrackerId },
-        })
-      )
-      if (data?.thresholdExceeded) {
-        await offerReAssimilation(answerResult)
-      }
-    }
-  }
-}
-
-const onOverlapRetry = () => {
-  previousAnsweredQuestionCursor.value = undefined
-  spellingRetryNonce.value += 1
-}
-
-const onJustReviewed = () => {
-  moveToNextMemoryTracker()
-  previousAnsweredQuestions.value.push(undefined)
 }
 
 const loadPreviouslyAnsweredRecallPrompts = async () => {

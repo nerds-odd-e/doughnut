@@ -98,9 +98,7 @@ const reviewedRealm = computed(
 )
 
 const isOverlap = computed(
-  () =>
-    props.answeredQuestion.answer.outcome === "OVERLAP" ||
-    props.answeredQuestion.overlap === true
+  () => props.answeredQuestion.answer.outcome === "OVERLAP"
 )
 
 const showMatchedNotesSection = computed(

@@ -6,7 +6,7 @@
 
 **Key accomplishments:**
 
-- Extended `Answer`/`AnsweredQuestion` with `AnswerOutcome` (CORRECT / WRONG / ACCIDENTAL_MATCH / OVERLAP), `@Transient matchedNoteId`, optional `overlap` + `matchedNotes`; OpenAPI client regenerated.
+- Extended `Answer`/`AnsweredQuestion` with `AnswerOutcome` (`ACCIDENTAL_MATCH` / `OVERLAP` beyond the boolean `correct` flag), `@Transient matchedNoteId`, optional `matchedNotes`; OpenAPI client regenerated.
 - Accidental-match grading across readable notebooks (title then alias) with lighter −10 SRS penalty (no 12h override).
 - Spelling result reveals reviewed + matched notes and offers property/relationship link with matched note pre-selected (stay-on-page for relationship).
 - Alias-as-wiki-link overlap declaration via `FrontmatterAliases` plain-only `from*` + `overlapWikiLinkTokensFrom*`, preserving wiki-resolve / search / cloze.
