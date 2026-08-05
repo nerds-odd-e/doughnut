@@ -95,7 +95,7 @@ status: complete
 2. **Task 1 GREEN: Implement overlap wiki-link append util** - `5515715e98` (feat)
 3. **Task 2: Expand merge/null/cross-notebook cases** - `1145e8f239` (test)
 
-**Plan metadata:** see docs commit after state update
+**Plan metadata:** `19b9055628` (docs: complete plan)
 
 ## Files Created/Modified
 
