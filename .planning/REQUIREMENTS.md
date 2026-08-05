@@ -62,21 +62,25 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AMR-01 | — | Pending |
-| AMR-02 | — | Pending |
-| AMR-03 | — | Pending |
-| AMR-04 | — | Pending |
-| AMR-05 | — | Pending |
-| AMR-06 | — | Pending |
-| AMR-07 | — | Pending |
-| AMR-08 | — | Pending |
-| AMR-09 | — | Pending |
+| AMR-01 | Phase 7 | Pending |
+| AMR-02 | Phase 7 | Pending |
+| AMR-03 | Phase 7 | Pending |
+| AMR-04 | Phase 8 | Pending |
+| AMR-05 | Phase 12 | Pending |
+| AMR-06 | Phase 9 | Pending |
+| AMR-07 | Phase 9 | Pending |
+| AMR-08 | Phase 11 | Pending |
+| AMR-09 | Phase 11 | Pending |
 
 **Coverage:**
 - v1 requirements: 9 total
-- Mapped to phases: 0
-- Unmapped: 9
+- Mapped to phases: 9
+- Unmapped: 0
+
+**Phase notes:**
+- Phase 10 is Structure (overlap alias append util) — no requirement ID; enables Phase 11
+- AMR-07 mapped with first mutating action (Phase 9 Build a link)
 
 ---
 *Requirements defined: 2026-08-05*
-*Last updated: 2026-08-05 after milestone v1.2 scoping (auto)*
+*Last updated: 2026-08-05 after v1.2 roadmap (phases 7–12)*
