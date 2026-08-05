@@ -190,7 +190,7 @@ describe("AnsweredSpellingQuestion accidental match", () => {
     ).toBe(true)
   })
 
-  it("omits Build a link when reviewed notebook is readonly", async () => {
+  it("omits mutating CTAs when reviewed notebook is readonly", async () => {
     const { answeredQuestion, reviewedRealm, matchedA, matchedB } =
       accidentalMatchWithTwoMatchedNotes()
     reviewedRealm.notebookRealm.readonly = true
@@ -206,9 +206,12 @@ describe("AnsweredSpellingQuestion accidental match", () => {
     expect(
       document.body.querySelectorAll('[data-testid^="link-to-matched-note-"]')
     ).toHaveLength(0)
+    expect(
+      document.body.querySelectorAll('[data-testid^="add-as-overlapped-note-"]')
+    ).toHaveLength(0)
   })
 
-  it("omits Build a link when note realms are not loaded", async () => {
+  it("omits mutating CTAs when note realms are not loaded", async () => {
     mockSdkServiceWithImplementation(
       NoteController,
       "showNote",
@@ -228,6 +231,9 @@ describe("AnsweredSpellingQuestion accidental match", () => {
 
     expect(
       document.body.querySelectorAll('[data-testid^="link-to-matched-note-"]')
+    ).toHaveLength(0)
+    expect(
+      document.body.querySelectorAll('[data-testid^="add-as-overlapped-note-"]')
     ).toHaveLength(0)
   })
 })

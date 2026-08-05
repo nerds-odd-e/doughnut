@@ -149,15 +149,15 @@ Plans:
   2. After that action, the current result does not show try-again and does not reclaim SRS credit
   3. Answer outcome stays accidental-match and the schedule for this answer is unchanged
 
-**Plans**: 2 plans
+**Plans**: 1/2 plans executed
 
 Plans:
 
 **Wave 1**
 
-- [ ] 11-01-PLAN.md — Vitest tracer: Add as overlapped note + AMR-07 gates + no try-again
+- [x] 11-01-PLAN.md — Vitest tracer: Add as overlapped note + AMR-07 gates + no try-again
 
-**Wave 2** *(blocked on Wave 1 completion)*
+**Wave 2** *(unblocked — Wave 1 complete)*
 
 - [ ] 11-02-PLAN.md — E2E: Resolve → Add as overlapped; stay without try-again; overlap uncoupled
 
@@ -188,7 +188,7 @@ Plans:
 | 8. Match path and clickable titles | v1.2 | 2/2 | Complete | 2026-08-05 |
 | 9. Build a link from resolve dialog | v1.2 | 2/2 | Complete | 2026-08-05 |
 | 10. Overlap alias append util | v1.2 | 1/1 | Complete | 2026-08-05 |
-| 11. Add as overlapped note | v1.2 | 0/2 | Planned | - |
+| 11. Add as overlapped note | v1.2 | 1/2 | In progress | - |
 | 12. Title navigate, reopen, E2E polish | v1.2 | 0/? | Not started | - |
 
 ### Coverage

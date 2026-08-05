@@ -4,17 +4,17 @@ milestone: v1.2
 milestone_name: Accidental Match Resolve UX
 current_phase: 11
 current_phase_name: Add as overlapped note
-status: ready
-stopped_at: Phase 11 planning complete
-last_updated: "2026-08-05T13:35:50.440Z"
+status: in_progress
+stopped_at: Phase 11 Wave 1 (11-01) complete — Wave 2 (11-02 E2E) next
+last_updated: "2026-08-05T13:45:00.000Z"
 last_activity: 2026-08-05
-last_activity_desc: Created 11-01-PLAN.md and 11-02-PLAN.md
+last_activity_desc: Completed 11-01 Add as overlapped note Vitest declare path
 progress:
   total_phases: 6
   completed_phases: 4
   total_plans: 9
-  completed_plans: 7
-  percent: 67
+  completed_plans: 8
+  percent: 78
 ---
 
 # Project State
@@ -24,16 +24,16 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 **Core value:** Healthy mainline for learning and knowledge work — reviewed note stays primary during accidental-match results.
-**Current focus:** Phase 11 planned — execute Add as overlapped note (AMR-08/AMR-09)
+**Current focus:** Phase 11 Wave 1 done — next 11-02 E2E Add as overlapped (AMR-08/AMR-09)
 
 ## Current Position
 
-Phase: 11 of 12 (Add as overlapped note) — plans ready to execute
-Plan: 11-01 (Wave 1) next
-Status: Phase 11 planned (2 plans: Vitest then E2E)
-Last activity: 2026-08-05 — Created 11-01-PLAN.md and 11-02-PLAN.md
+Phase: 11 of 12 (Add as overlapped note) — Wave 1 complete
+Plan: 11-02 (Wave 2 E2E) next
+Status: 11-01 done; Vitest proves declare + shared gates + no try-again
+Last activity: 2026-08-05 — feat(11-01) Add as overlapped note Vitest declare path
 
-Progress: [██████░░░░] 67% (4/6 v1.2 phases complete; 7/9 plans executed; Phase 11 0/2)
+Progress: [████████░░] 78% (4/6 v1.2 phases complete; 8/9 plans executed; Phase 11 1/2)
 
 ## Performance Metrics
 
@@ -47,6 +47,7 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 | 08 | 2/2 | 6min | 3min |
 | 09 | 2/2 | 7min | 3.5min |
 | 10 | 1/1 | 4min | 4min |
+| 11 | 1/2 | 8min | 8min |
 
 **Per-Plan Metrics:**
 
@@ -59,6 +60,7 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 | Phase 09 P01 | 4min | 2 tasks | 5 files |
 | Phase 09 P02 | 3min | 2 tasks | 2 files |
 | Phase 10 P01 | 4min | 2 tasks | 2 files |
+| Phase 11 P01 | 8min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -95,6 +97,7 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 - [Phase 11]: Content-only declare — no retry / no OVERLAP try-again / no SRS reclaim (D-06, D-07)
 - [Phase 11]: Shared mutating gate for Build a link + Add as overlapped (D-08, D-09)
 - [Phase 11]: Wave 1 Vitest then Wave 2 E2E (D-10, D-11); CTA testid add-as-overlapped-note-{id}
+- [Phase 11 P01]: canOfferMutatingAction → canMutate; declare Vitest split to AddAsOverlapped.spec (250-line)
 
 ### Pending Todos
 
@@ -116,7 +119,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-08-05T13:35:50.431Z
-Stopped at: Phase 11 planning complete
-Resume file: .planning/phases/11-add-as-overlapped-note/11-01-PLAN.md
-Next action: `/gsd-execute-phase 11`
+Last session: 2026-08-05T13:45:00.000Z
+Stopped at: Phase 11 Wave 1 (11-01) complete
+Resume file: .planning/phases/11-add-as-overlapped-note/11-02-PLAN.md
+Next action: Execute 11-02 (E2E Add as overlapped)
