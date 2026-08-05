@@ -5,10 +5,10 @@ milestone_name: Accidental Match Resolve UX
 current_phase: 8
 current_phase_name: Match path and clickable titles
 status: planning_complete
-stopped_at: Phase 8 plans created — ready for execute
-last_updated: "2026-08-05T09:30:00.000Z"
+stopped_at: Phase 8 plans ready
+last_updated: "2026-08-05T09:28:28.506Z"
 last_activity: 2026-08-05
-last_activity_desc: Wrote 08-01 and 08-02 PLAN.md for AMR-04 path + clickable titles
+last_activity_desc: Plan-check passed; RESEARCH Open Questions marked RESOLVED
 progress:
   total_phases: 6
   completed_phases: 1
@@ -24,14 +24,14 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 **Core value:** Healthy mainline for learning and knowledge work — reviewed note stays primary during accidental-match results.
-**Current focus:** Phase 8 plans complete — ready for `/gsd-execute-phase 8`
+**Current focus:** Phase 8 plan-check passed — ready for `/gsd-execute-phase 8`
 
 ## Current Position
 
-Phase: 8 of 12 (Match path and clickable titles) — 2 plans ready (Vitest tracer → E2E)
+Phase: 8 of 12 (Match path and clickable titles) — 2 plans verified (Vitest tracer → E2E)
 Plan: 08-01 pending (wave 1); 08-02 pending (wave 2)
-Status: Phase 8 planning complete
-Last activity: 2026-08-05 — Wrote 08-01-PLAN.md and 08-02-PLAN.md
+Status: Phase 8 planning complete (plan-check passed)
+Last activity: 2026-08-05 — Plan-check passed; RESEARCH Open Questions marked RESOLVED
 
 Progress: [██░░░░░░░░] ~17% (v1.2 milestone plans executed)
 
@@ -89,7 +89,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-08-05T09:30:00.000Z
-Stopped at: Phase 8 plans created
+Last session: 2026-08-05T09:28:28.499Z
+Stopped at: Phase 8 plans ready
 Resume file: .planning/phases/08-match-path-and-clickable-titles/08-01-PLAN.md
 Next action: `/gsd-execute-phase 8` (or plan-checker first if enabled)

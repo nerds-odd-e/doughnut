@@ -438,17 +438,10 @@ Extend here: within dialog, assert notebook path text (e.g. `"English practice"`
 
 **If this table is empty:** — not empty; A1–A3 are discretion/E2E scope assumptions only.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Should Vitest extend `NoteRealmBuilder` with `.notebookName(...)`?**
-   - What we know: Builder overwrites notebook name to note title in `do()`; MatchedNoteLinkOffer mutates after `please()`.
-   - What's unclear: Whether Phase 8 wants a one-line builder helper vs post-`please()` mutation in test support.
-   - Recommendation: Prefer concise helper in `answeredSpellingQuestionTestSupport` (mutate names on seeded realms); only extend `NoteRealmBuilder` if mutation repeats awkwardly — keep phase focused on Behavior.
-
-2. **How strong should E2E “clickable” be?**
-   - What we know: D-11 wants clickable title asserts without AMR-05 round-trip.
-   - What's unclear: Assert `a[href]` vs actually click and stop on note page.
-   - Recommendation: Assert link presence/href (or `cy.findByTestId(...).find('a')`) without full leave/return; clicking away is Phase 12.
+1. **Should Vitest extend `NoteRealmBuilder` with `.notebookName(...)`?** — RESOLVED: Prefer concise helper (or mutate-before-seed) in `answeredSpellingQuestionTestSupport`; only extend `NoteRealmBuilder` if mutation is awkward. Locked by Plan 01 Task 2.
+2. **How strong should E2E “clickable” be?** — RESOLVED: Assert visible `a` / href toward match inside the dialog without clicking through to noteShow or reopen round-trip. Locked by Plan 02 Task 1 / D-11; Phase 12 owns leave/return.
 
 ## Environment Availability
 
