@@ -45,7 +45,7 @@ v1.2 replaces stacked matched-note bodies on accidental-match spelling results w
 - [x] **Phase 8: Match path and clickable titles** - Per-row notebook breadcrumb and clickable match titles (no body peek)
 - [x] **Phase 9: Build a link from resolve dialog** - Single-Modal link offer; stay on result; readonly/unload gates (2/2 plans)
 - [x] **Phase 10: Overlap alias append util** - Structure: wiki-link overlap append helper for the next behavior
-- [ ] **Phase 11: Add as overlapped note** - Declare overlap from dialog; no try-again / no SRS credit reclaim
+- [x] **Phase 11: Add as overlapped note** - Declare overlap from dialog; no try-again / no SRS credit reclaim (2/2 plans)
 - [ ] **Phase 12: Title navigate, reopen, E2E polish** - Return to result and reopen resolve with same matches
 
 ## Phase Details
@@ -149,7 +149,7 @@ Plans:
   2. After that action, the current result does not show try-again and does not reclaim SRS credit
   3. Answer outcome stays accidental-match and the schedule for this answer is unchanged
 
-**Plans**: 1/2 plans executed
+**Plans**: 2/2 plans complete
 
 Plans:
 
@@ -157,9 +157,9 @@ Plans:
 
 - [x] 11-01-PLAN.md — Vitest tracer: Add as overlapped note + AMR-07 gates + no try-again
 
-**Wave 2** *(unblocked — Wave 1 complete)*
+**Wave 2**
 
-- [ ] 11-02-PLAN.md — E2E: Resolve → Add as overlapped; stay without try-again; overlap uncoupled
+- [x] 11-02-PLAN.md — E2E: Resolve → Add as overlapped; stay without try-again; overlap uncoupled
 
 **UI hint**: yes
 

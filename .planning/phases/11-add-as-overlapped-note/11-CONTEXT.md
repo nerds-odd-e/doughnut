@@ -1,7 +1,7 @@
 # Phase 11: Add as overlapped note - Context
 
 **Gathered:** 2026-08-05
-**Status:** Ready for planning
+**Status:** Complete (11-01 Vitest + 11-02 E2E) — keep for Phase 12 reuse
 **Mode:** `--auto` (recommended defaults from roadmap + v1.2 research Pitfalls 4–5 + Phases 9–10)
 
 <domain>

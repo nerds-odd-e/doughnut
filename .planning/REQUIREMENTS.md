@@ -25,8 +25,8 @@ Requirements for milestone v1.2. Each maps to roadmap phases.
 
 ### Add as overlapped note
 
-- [ ] **AMR-08**: From a resolve-dialog row, user can **Add as overlapped note**, which declares an overlap wiki-link alias on the reviewed note toward that match
-- [ ] **AMR-09**: After **Add as overlapped note**, the current result does not show try-again and does not reclaim SRS credit (outcome stays accidental-match; schedule unchanged for this answer)
+- [x] **AMR-08**: From a resolve-dialog row, user can **Add as overlapped note**, which declares an overlap wiki-link alias on the reviewed note toward that match
+- [x] **AMR-09**: After **Add as overlapped note**, the current result does not show try-again and does not reclaim SRS credit (outcome stays accidental-match; schedule unchanged for this answer)
 
 ## v2 Requirements
 
@@ -69,8 +69,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AMR-05 | Phase 12 | Pending |
 | AMR-06 | Phase 9 | Complete |
 | AMR-07 | Phase 9 | Complete |
-| AMR-08 | Phase 11 | Pending |
-| AMR-09 | Phase 11 | Pending |
+| AMR-08 | Phase 11 | Complete |
+| AMR-09 | Phase 11 | Complete |
 
 **Coverage:**
 

@@ -40,3 +40,14 @@ Feature: Accidental match reveal
     Then I should see an accidental match reveal for spelling answer "sedation" with reviewed note "sedition" and matched note "sedation"
     When I link the matched note "sedation" as relationship "similar to" from the accidental match result
     Then I should still be on the accidental match result for spelling answer "sedation" with matched note "sedation"
+
+  Scenario: Add as overlapped note stays on accidental match without try-again
+    Given It's day 1
+    And the note "sedition" was assimilated on day 1
+    When I visit recall for a due quiz question on day 2
+    Then I should be asked spelling question "means incite violence" from notebook "English practice"
+    When I type my answer "sedation"
+    Then I should see an accidental match reveal for spelling answer "sedation" with reviewed note "sedition" and matched note "sedation"
+    When I add the matched note "sedation" as overlapped from the accidental match result
+    Then I should still be on the accidental match result for spelling answer "sedation" with matched note "sedation"
+    And I should not see overlap try-again on the accidental match result

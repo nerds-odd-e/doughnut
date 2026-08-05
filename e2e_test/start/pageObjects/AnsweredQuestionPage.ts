@@ -29,6 +29,27 @@ function expectNoMatchedNotesOrAccidentalMatch() {
   cy.findByTestId('resolve-accidental-match').should('not.exist')
 }
 
+function openResolveAndClickMatchedNoteCta(
+  matchedNoteTitle: string,
+  testIdPrefix: string,
+  buttonLabel: string
+) {
+  cy.findByTestId('resolve-accidental-match')
+    .scrollIntoView()
+    .should('be.visible')
+    .click()
+  waitUntilAppIsNotBusy()
+  cy.findByTestId('accidental-match-resolve-dialog')
+    .should('be.visible')
+    .and('contain.text', matchedNoteTitle)
+    .within(() => {
+      cy.get(`[data-testid^="${testIdPrefix}"]`)
+        .should('be.visible')
+        .and('contain.text', buttonLabel)
+        .click()
+    })
+}
+
 const assumeAnsweredQuestionPage = () => {
   cy.get('body').should('be.visible')
 
@@ -88,20 +109,11 @@ const assumeAnsweredQuestionPage = () => {
       return self
     },
     openLinkToMatchedNote(matchedNoteTitle: string) {
-      cy.findByTestId('resolve-accidental-match')
-        .scrollIntoView()
-        .should('be.visible')
-        .click()
-      waitUntilAppIsNotBusy()
-      cy.findByTestId('accidental-match-resolve-dialog')
-        .should('be.visible')
-        .and('contain.text', matchedNoteTitle)
-        .within(() => {
-          cy.get('[data-testid^="link-to-matched-note-"]')
-            .should('be.visible')
-            .and('contain.text', 'Build a link')
-            .click()
-        })
+      openResolveAndClickMatchedNoteCta(
+        matchedNoteTitle,
+        'link-to-matched-note-',
+        'Build a link'
+      )
       cy.contains('Link to:')
         .should('be.visible')
         .parent()
@@ -110,6 +122,20 @@ const assumeAnsweredQuestionPage = () => {
       cy.findByRole('button', { name: 'Insert as a wiki link' }).should(
         'not.exist'
       )
+      return self
+    },
+    openAddAsOverlappedNote(matchedNoteTitle: string) {
+      openResolveAndClickMatchedNoteCta(
+        matchedNoteTitle,
+        'add-as-overlapped-note-',
+        'Add as overlapped note'
+      )
+      waitUntilAppIsNotBusy()
+      return self
+    },
+    expectNoOverlapTryAgainOnAccidentalMatchResult() {
+      cy.findByTestId('overlap-try-again').should('not.exist')
+      cy.findByTestId('overlap-try-again-alert').should('not.exist')
       return self
     },
     linkMatchedNoteAsProperty(matchedNoteTitle: string) {
