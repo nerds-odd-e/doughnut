@@ -86,7 +86,7 @@ status: complete
 1. **Task 1: E2E page object Resolve then Build a link** - `2ff8b21375` (feat)
 2. **Task 2: Untag @wip on link scenarios** - `7f40c22879` (test)
 
-**Plan metadata:** (docs commit after state update)
+**Plan metadata:** `06682491d6` (docs: complete plan)
 
 ## Deviations from Plan
 
