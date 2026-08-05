@@ -58,24 +58,6 @@ Then(
       .expectInstalledCliVersionBanner()
 )
 
-Then(
-  'I should see the preview in past CLI assistant messages:',
-  (expected: string) =>
-    cli
-      .interactiveCli()
-      .pastCliAssistantMessages()
-      .expectContainsBlock(expected)
-)
-
-Then(
-  'I should see {string} with any spacing in past CLI assistant messages',
-  (expected: string) =>
-    cli
-      .interactiveCli()
-      .pastCliAssistantMessages()
-      .expectContainsIgnoringSpacing(expected)
-)
-
 Then('I should see {string} in answered questions', (expected: string) =>
   cli.interactiveCli().answeredQuestions().expectContains(expected)
 )
@@ -93,11 +75,7 @@ When(
 When(
   'I enter the slash command {string} in the interactive CLI',
   (command: string) => {
-    cli
-      .interactiveCli()
-      .enterSlashCommandInInteractiveCli(
-        cli.workspace.resolveWorkspaceNames(command)
-      )
+    cli.interactiveCli().enterSlashCommandInInteractiveCli(command)
   }
 )
 

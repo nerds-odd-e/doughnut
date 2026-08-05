@@ -1,10 +1,8 @@
 /**
  * Read a notebook export zip into its file entries.
  *
- * The CLI has its own reader (`cli/src/sync/unzip.ts`) that this deliberately
- * does not import: the E2E config compiles under `e2e_test` and cannot reach
- * outside it. Keeping a separate reader here also means a scenario's idea of
- * what the export contains never comes from the code under test.
+ * Kept under `e2e_test` so scenarios can assert zip contents without importing
+ * product code. The web catalog export path is the producer under test.
  */
 import { inflateRawSync } from 'node:zlib'
 

@@ -4,7 +4,6 @@ import { exitSlashCommand } from './exit.js'
 import { createHelpSlashCommand } from './help.js'
 import type { InteractiveSlashCommand } from './interactiveSlashCommand.js'
 import { lastEmailSlashCommand } from './gmail/lastEmail/lastEmailSlashCommand.js'
-import { lintSlashCommand } from './lintSlashCommand.js'
 import { recallSlashCommand } from './recall/recall.js'
 import { useNotebookSlashCommand } from './notebook/useNotebookSlashCommand.js'
 import { recallStatusSlashCommand } from './recallStatus.js'
@@ -16,7 +15,6 @@ export const interactiveSlashCommands: readonly InteractiveSlashCommand[] = [
   recallSlashCommand,
   recallStatusSlashCommand,
   useNotebookSlashCommand,
-  lintSlashCommand,
   exitSlashCommand,
 ]
 

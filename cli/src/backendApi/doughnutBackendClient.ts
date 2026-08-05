@@ -7,8 +7,6 @@ import {
   type BookFull,
   type RequestOptions,
 } from 'doughnut-api'
-import { contentDispositionFileName } from '../sync/contentDispositionFileName.js'
-import type { NotebookExport } from '../sync/exportNotebook.js'
 import { loadStoredAccessToken } from './accessTokenStorage.js'
 
 /**
@@ -340,59 +338,4 @@ export async function attachNotebookBookFile(
     }
     return (await res.json()) as BookFull
   })
-}
-
-/**
- * Download a notebook as the zip the backend builds from its notes and folders.
- *
- * Shared entry point for both `/export` (writes the zip to disk) and
- * `/sync --dry-run` (previews a pull against a workspace without writing
- * anything) — see `exportNotebook.ts`.
- */
-export async function downloadNotebookExportZip(
-  notebookId: number,
-  signal?: AbortSignal
-): Promise<NotebookExport> {
-  const stored = loadStoredAccessToken()
-  if (!stored) {
-    throw new Error(authenticatedBackendCallFailureAdvice.noAccessTokenInConfig)
-  }
-
-  const { apiBaseUrl } = getApiConfig()
-  const { bytes, contentDisposition } = await withBackendClient(
-    stored.token,
-    async () => {
-      const res = await fetch(
-        `${apiBaseUrl}/api/notebooks/${notebookId}/export`,
-        {
-          method: 'GET',
-          headers: { Authorization: `Bearer ${stored.token}` },
-          signal,
-        }
-      )
-      if (res.status === 404) {
-        throw {
-          status: 404,
-          message:
-            'The notebook no longer exists in Doughnut, or you no longer have read access to it.',
-        }
-      }
-      if (!res.ok) {
-        throw { body: await res.text(), status: res.status }
-      }
-      return {
-        bytes: Buffer.from(await res.arrayBuffer()),
-        contentDisposition: res.headers.get('content-disposition'),
-      }
-    }
-  )
-
-  // Parsed outside withBackendClient: a plain `throw new Error(...)` here would
-  // otherwise be reclassified into a generic "service unreachable" message by
-  // withBackendClient's SDK-error classifier, since it has no `.status`.
-  const fileName = contentDispositionFileName(contentDisposition)
-  if (fileName === undefined) {
-    throw new Error('The export response did not name a file.')
-  }
-  return { bytes, fileName }
 }

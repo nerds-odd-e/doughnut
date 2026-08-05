@@ -14,12 +14,12 @@ const aNotebook = () =>
     .do()
 
 describe('getSlashTabCompletion', () => {
-  test('/ex stops short of a full command: /export and /exit share the prefix', () => {
+  test('/ex completes to /exit when it is the only match', () => {
     const commands = notebookStageSlashCommandsFor(aNotebook())
 
     expect(getSlashTabCompletion('/ex', commands)).toEqual({
-      completed: '/ex',
-      count: 2,
+      completed: '/exit ',
+      count: 1,
     })
   })
 })
@@ -74,7 +74,7 @@ describe('slash guidance filtering', () => {
     expect(
       listed('/re', [
         command('/recall', '/recall'),
-        command('/lint', '/lint <workspace directory>'),
+        command('/help', '/help <resource name>'),
       ])
     ).toEqual(['/recall'])
   })
