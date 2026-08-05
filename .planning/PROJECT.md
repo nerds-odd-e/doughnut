@@ -1,16 +1,18 @@
-# Doughnut — Portable Workspace Training Cleanup
+# Doughnut
 
 ## What This Is
 
-Doughnut is a Personal Knowledge Management tool combining zettelkasten-style note capture, spaced repetition, and knowledge sharing. After v1.2, the CLI portable Markdown workspace paths for stories 1–5 are class-ready (export identity/links/attachments, sync dry-run + pull, OKF lint, push dry-run); Story 6 mutate push was removed cleanly as WIP.
+Doughnut is a Personal Knowledge Management tool combining zettelkasten-style note capture, spaced repetition, and knowledge sharing.
 
 ## Core Value
 
-Keep a healthy mainline for future classes: retain only participant work that matches the portable-workspace stories, has no WIP, and delivers external user value — strengthen near-misses; remove the rest. Never touch Terry or Yeong Sheng changes.
+Healthy mainline for learning and knowledge work. Approved [ADR 0002](../docs/adrs/0002-git-native-notebooks-backed-by-mysql.md) sets git-native notebooks (MySQL-backed) as the direction for portable content; one-way catalog ZIP export remains.
 
 ## Current State
 
-**Shipped v1.2 (2026-08-03):** Triaged LIA participant work for portable-workspace stories 1–6; strengthened export/sync/lint/push-dry-run; removed Story 6 mutate-push WIP; class-ready hygiene verified (HYG-01/02/03).
+**2026-08-05:** After ADR 0002, removed the CLI portable-workspace sync stack (Markdown-tree `/export`, `/sync`, `/push --dry-run`, `/lint`, `.doughnut-sync`). Kept catalog ZIP download (`notebook_export.feature`).
+
+**Shipped v1.2 (2026-08-03):** Triaged LIA training participant work for portable-workspace stories 1–6 (later largely removed — see above).
 
 **Shipped v1.1 (2026-07-25):** Accidental-match + overlap spelling recall loop end-to-end.
 
@@ -20,8 +22,7 @@ Keep a healthy mainline for future classes: retain only participant work that ma
 
 Define via `/gsd-new-milestone`. Likely candidates:
 
-- Stories 7–10 (create from local file, rename, move, reconcile deletions)
-- Mutating `/push` (Story 6 proper) if/when designed
+- ADR 0002 Level 1 (git-native notebooks)
 - SEED-001 spelling follow-ons (MCQ / fuzzy / `Notebook:Title`)
 
 ## Requirements
@@ -35,15 +36,8 @@ Define via `/gsd-new-milestone`. Likely candidates:
 - ✓ Add-link UI (wiki / property / relationship) — existing
 - ✓ Notebook Health lint + tab + gated empty-folder purge — v1.0
 - ✓ Accidental-match + overlap spelling recall loop — v1.1
-- ✓ Baseline portable-workspace direction documented in `.planning/notes/2026-07-24-portable-notebook-workspace.md`
-- ✓ Triage keep/strengthen/remove for stories 1–6 (participant-only) — v1.2
-- ✓ Export with `doughnut_id`, wiki→MD links, absolute attachment URLs — v1.2
-- ✓ `/sync --dry-run` create/update/move/reject with non-mutation — v1.2
-- ✓ Mutating `/sync` create/update/move + gated baseline — v1.2
-- ✓ OKF `/lint` portable contract (dup ids, broken links, missing indexes, unsafe paths) — v1.2
-- ✓ `/push --dry-run` load-only baseline + create/update conflict labels — v1.2
-- ✓ Story 6 mutate-push WIP removed cleanly — v1.2
-- ✓ Class-ready hygiene (no training WIP; Terry/YS untouched; retained CLI green) — v1.2
+- ✓ Catalog notebook ZIP export (one-way) — retained after ADR 0002 cleanup
+- ✓ Portable-workspace CLI sync/lint stack removed — 2026-08-05 (ADR 0002)
 
 ### Active
 
@@ -51,51 +45,28 @@ Define via `/gsd-new-milestone`. Likely candidates:
 
 ### Out of Scope
 
-- Stories 7–10 (create from local file, rename, move, reconcile deletions) — not attempted in this class; leave for later
-- Terry Yin and Tan Yeong Sheng changes — skip entirely
+- Reintroducing `.doughnut-sync` / path-keyed CLI sync — superseded by ADR 0002
 - Spelling follow-ons (MCQ / fuzzy / `Notebook:Title`) — parked as SEED-001
-- Mutating `/push` (Story 6 product path) — removed as WIP in v1.2; redesign later if needed
-- Broad unrelated refactors not required by triage decisions
+- Broad unrelated refactors not required by the current milestone
 
 ## Context
 
-v1.2 cleaned LIA training participant code against portable-workspace stories 1–6. Strengthen path won for stories 1–5; Story 6 was remove. Retained surface: CLI `/export`, `/sync` (+ `--dry-run`), `/lint`, `/push --dry-run`. Spent phase diaries pruned; see `.planning/milestones/v1.2-ROADMAP.md` and `MILESTONES.md`.
+v1.2 strengthened LIA portable-workspace CLI paths; ADR 0002 then retired that sync model. Baseline story notes remain in `.planning/notes/2026-07-24-portable-notebook-workspace.md` for history. Milestone archives: `.planning/milestones/`, `MILESTONES.md`.
 
 ## Constraints
 
-- **Authors:** Do not revert, rewrite, or "clean" commits/changes attributable to Terry Yin or Tan Yeong Sheng
-- **Acceptance bar:** Story acceptance examples in the portable-workspace note are the keep/remove oracle
-- **WIP:** Incomplete or `@wip` / half-wired work is remove-by-default unless strengthening is cheaper and clearly valuable
-- **Stack:** Prefer CLI + E2E capability tests; Behavior/Structure phased delivery; Nix tooling via `CURSOR_DEV=true nix develop -c …`
+- **Stack:** Prefer high-level tests; Behavior/Structure phased delivery; Nix tooling via `CURSOR_DEV=true nix develop -c …`
 - **Stop-safe:** After each phase the tree must remain healthier (or no worse) than before
+- **ADRs:** Follow Accepted ADRs; humans own approval (`docs/adrs/`)
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Include story 5 (push dry-run / conflict preview) in audit | Students landed it; part of the push safety loop with story 6 | ✓ Strengthened (PUSH-01) |
-| Skip Terry and Yeong Sheng | Instructors / non-participant work; out of triage | ✓ HYG-02 verified |
-| Keep only correct + no WIP + external value | Class-ready mainline over preserving every experiment | ✓ Applied via TRIAGE.md |
-| Strengthen minor gaps on valuable work | Prefer keeping usable capability over delete-and-rebuild | ✓ Stories 1–5 |
-| Story 6 → remove | No mutate push; `@ignore` cli_push.feature WIP debris | ✓ PUSH-02 removed cleanly |
-| v1.1 spelling follow-ons → SEED-001 | Detour for training cleanup; do not lose the idea | ✓ Parked |
-
-<details>
-<summary>Pre-v1.2 spelling-era project framing (archived)</summary>
-
-Earlier PROJECT.md framed the active product around spelling accidental-match & overlap (v1.1). See `.planning/milestones/v1.1-ROADMAP.md` and `.planning/MILESTONES.md` for the shipped record. Spelling follow-ons live in SEED-001.
-
-</details>
+| ADR 0002 git-native notebooks | Git authoritative for portable content; retire `.doughnut-sync` | ✓ Approved 2026-08-04; CLI sync stack removed 2026-08-05 |
+| Keep catalog ZIP only | One-way portability still useful; E2E `notebook_export.feature` | ✓ Retained |
+| Skip Terry/Yeong Sheng in v1.2 triage | Instructors / non-participant work | ✓ Applied in v1.2 |
 
 ## Evolution
 
-This document evolves at phase transitions and milestone boundaries.
-
-**After each milestone** (via `/gsd-complete-milestone`):
-1. Full review of all sections
-2. Core Value check — still the right priority?
-3. Audit Out of Scope — reasons still valid?
-4. Update Context with current state
-
----
-*Last updated: 2026-08-03 after v1.2 milestone*
+This file updates as milestones complete. Last updated: 2026-08-05 (ADR 0002 cleanup).

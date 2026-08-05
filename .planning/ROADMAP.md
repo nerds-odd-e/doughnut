@@ -4,21 +4,14 @@
 
 - ✅ **v1.0 Notebook Lint & Auto-Fix** — Phases 1-7 ([archive](./milestones/v1.0-ROADMAP.md)) — shipped 2026-07-23
 - ✅ **v1.1 Spelling Answer Match & Link** — Phases 1-6 ([archive](./milestones/v1.1-ROADMAP.md)) — shipped 2026-07-25
-- ✅ **v1.2 Clean up LIA training participant code** — Phases 7-14 ([archive](./milestones/v1.2-ROADMAP.md)) — shipped 2026-08-03
+- ✅ **v1.2 Clean up LIA training participant code** — Phases 7-14 ([summary](./MILESTONES.md)) — shipped 2026-08-03; portable sync superseded 2026-08-05 (ADR 0002)
 
 ## Phases
 
 <details>
-<summary>✅ v1.2 Clean up LIA training participant code (Phases 7-14) — SHIPPED 2026-08-03</summary>
+<summary>✅ v1.2 Clean up LIA training participant code (Phases 7-14) — SHIPPED 2026-08-03; sync stack removed 2026-08-05</summary>
 
-- [x] Phase 7: Publish triage decisions (3/3 plans) — completed 2026-08-03
-- [x] Phase 8: Resolve pull/export (story 1) (2/2 plans) — completed 2026-08-03
-- [x] Phase 9: Resolve preview-before-pull (story 2) (2/2 plans) — completed 2026-08-03
-- [x] Phase 10: Resolve incremental pull (story 3) (1/1 plans) — completed 2026-08-03
-- [x] Phase 11: Resolve workspace lint (story 4) (1/1 plans) — completed 2026-08-03
-- [x] Phase 12: Resolve push dry-run (story 5) (1/1 plans) — completed 2026-08-03
-- [x] Phase 13: Resolve safe push (story 6) (1/1 plans) — completed 2026-08-03
-- [x] Phase 14: Class-ready hygiene verify (1/1 plans) — completed 2026-08-03
+Phase archive pruned after ADR 0002 removed the strengthened portable-workspace CLI. See [MILESTONES.md](./MILESTONES.md).
 
 </details>
 
@@ -53,7 +46,7 @@
 |-------|-----------|----------------|--------|-----------|
 | 1–7 Health lint / purge | v1.0 | 13/13 | Complete | 2026-07-23 |
 | 1–6 Spelling match & link | v1.1 | 16/16 | Complete | 2026-07-25 |
-| 7–14 LIA training cleanup | v1.2 | 12/12 | Complete | 2026-08-03 |
+| 7–14 LIA training cleanup | v1.2 | 12/12 | Complete (sync later removed) | 2026-08-03 |
 
 ---
-*Last updated: 2026-08-03 after archiving v1.2 — awaiting `/gsd-new-milestone`*
+*Last updated: 2026-08-05 — pruned spent v1.2 phase archive after ADR 0002 cleanup*

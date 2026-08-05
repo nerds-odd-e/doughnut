@@ -4,43 +4,19 @@
 
 ## Milestone: v1.2 — Clean up LIA training participant code
 
-**Shipped:** 2026-08-03
+**Shipped:** 2026-08-03 · **Superseded:** 2026-08-05 (ADR 0002)
 **Phases:** 8 | **Plans:** 12
 
-### What Was Built
-- TRIAGE.md with keep/strengthen/remove for portable-workspace stories 1–6
-- Strengthened `/export` (`doughnut_id`, wiki→MD, absolute attachments)
-- Strengthened `/sync --dry-run` + mutating pull with gated baseline
-- Strengthened OKF `/lint` portable contract
-- Strengthened `/push --dry-run`; removed Story 6 mutate-push WIP
-- Class-ready hygiene verify (spent docs, Terry/YS untouched, CLI green)
+### Outcome (current)
+Portable-workspace CLI sync/lint stack removed after ADR 0002; catalog ZIP kept. Spent v1.2 phase archives and quick-task PLAN/SUMMARY pruned.
 
-### What Worked
-- Publish triage first (Phase 7 docs-only), then one Behavior phase per story
-- Strengthen-over-rebuild for near-miss valuable CLI work (stories 1–5)
-- HYG-02 as standing constraint + final Phase 14 audit instead of per-phase author archaeology
-- Coarse single-tracer plans (10–14) kept commit count and wall time low
-
-### What Was Inefficient
-- Formal GSD VERIFICATION.md skipped for Phases 8–13; closeout needed override
-- Formal `/gsd-audit-milestone` skipped again (same as v1.1)
-- init.manager still saw "incomplete" because plan_count vs summary_count drifted on research/validation stubs
-
-### Patterns Established
-- TRIAGE.md as sole action source for keep/strengthen/remove phases
-- Identity merge via textual inject into splitVerbatim fences (never Frontmatter.fenced)
-- Preview taxonomy (`PreviewPullAction`) parallel to apply path; dry-run never writes baseline
-- Push dry-run load-only; mutate push deferred until designed
-
-### Key Lessons
-1. For training cleanup, triage-then-strengthen beats re-implementing from scratch.
-2. Remove WIP cleanly (Story 6) is a valid requirement outcome — not every story must ship product.
-3. Phase 14 hygiene (spent docs + author audit + retained green matrix) is the real class-ready gate.
+### Process lessons worth keeping
+1. Triage-then-strengthen beats re-implementing from scratch for training debris — until architecture ADRs supersede the direction.
+2. Remove WIP cleanly is a valid requirement outcome.
+3. Prune spent planning diaries at close; do not leave strengthen diaries as permanent product truth.
 
 ### Cost Observations
-- Model mix: not recorded
-- Sessions: single calendar day (2026-08-03)
-- Notable: 12 plans / 8 phases in ~111min execution (~6h wall)
+- Sessions: single calendar day (2026-08-03); ~111min plan execution
 
 ---
 
