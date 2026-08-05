@@ -40,8 +40,10 @@ created: 2026-08-05
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 08-*-* | TBD | TBD | AMR-04 | — | N/A (display + nav reuse) | unit | `pnpm frontend:test tests/components/recall/AnsweredSpellingQuestionAccidentalMatch.spec.ts` | ✅ extend | ⬜ pending |
-| 08-*-* | TBD | TBD | AMR-04 | — | N/A | e2e | `pnpm cypress run --spec e2e_test/features/recall/accidental_match_reveal.feature` | ✅ extend | ⬜ pending |
+| 08-01-01 | 01 | 1 | AMR-04 | T-08-01 | Text interpolation via NoteTitleWithLink / BreadcrumbWithCircle | unit | `CURSOR_DEV=true nix develop -c pnpm -C frontend test tests/components/recall/AnsweredSpellingQuestionAccidentalMatch.spec.ts` | ✅ extend | ⬜ pending |
+| 08-01-02 | 01 | 1 | AMR-04 | T-08-01 | Deterministic seedRealms path names | unit | `CURSOR_DEV=true nix develop -c pnpm -C frontend test tests/components/recall/AnsweredSpellingQuestionAccidentalMatch.spec.ts` | ✅ extend | ⬜ pending |
+| 08-02-01 | 02 | 2 | AMR-04 | T-08-01 | E2E asserts visible path + title link only | e2e | `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/recall/accidental_match_reveal.feature` | ✅ extend | ⬜ pending |
+| 08-02-02 | 02 | 2 | AMR-04 | — | N/A (wording / scope guard) | e2e | `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/recall/accidental_match_reveal.feature` | ✅ extend | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
