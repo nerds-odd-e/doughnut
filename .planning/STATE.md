@@ -4,17 +4,17 @@ milestone: v1.2
 milestone_name: Accidental Match Resolve UX
 current_phase: 12
 current_phase_name: Title navigate, reopen, E2E polish
-status: ready_to_execute
-stopped_at: Phase 12 planning complete
-last_updated: "2026-08-05T14:08:40.231Z"
+status: phase_complete
+stopped_at: Completed 12-01-PLAN.md — KeepAlive green; skip 12-02
+last_updated: "2026-08-05T14:11:47.283Z"
 last_activity: 2026-08-05
-last_activity_desc: docs(12) create phase plans
+last_activity_desc: test(12-01) AMR-05 reopen E2E green via KeepAlive
 progress:
   total_phases: 6
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 11
-  completed_plans: 9
-  percent: 82
+  completed_plans: 10
+  percent: 91
 ---
 
 # Project State
@@ -24,16 +24,16 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 **Core value:** Healthy mainline for learning and knowledge work — reviewed note stays primary during accidental-match results.
-**Current focus:** Phase 12 planned — execute AMR-05 E2E reopen (12-01); KeepAlive contingency (12-02) only if remount
+**Current focus:** Phase 12 — 12-01 complete (AMR-05 E2E); 12-02 KeepAlive contingency skippable
 
 ## Current Position
 
-Phase: 12 of 12 (Title navigate, reopen, E2E polish) — plans ready
-Plan: 12-01 (E2E reopen) → optional 12-02 (KeepAlive name if remount)
-Status: Phase 12 planned; execute E2E-first; skip 12-02 if KeepAlive already green
-Last activity: 2026-08-05 — docs(12) create phase plans
+Phase: 12 of 12 (Title navigate, reopen, E2E polish) — 12-01 done
+Plan: 12-01 complete → skip optional 12-02 (KeepAlive already green)
+Status: AMR-05 E2E green; Plan 12-02 contingency not needed
+Last activity: 2026-08-05 — test(12-01) reopen-after-title-navigate E2E
 
-Progress: [████████░░] 83% (5/6 v1.2 phases complete; 9/11 plans executed; Phase 12 0/2)
+Progress: [█████████░] 91% (6/6 v1.2 phases behavior delivered; 10/11 plans executed; Phase 12 1/2 — 12-02 skip)
 
 ## Performance Metrics
 
@@ -48,6 +48,7 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 | 09 | 2/2 | 7min | 3.5min |
 | 10 | 1/1 | 4min | 4min |
 | 11 | 2/2 | 14min | 7min |
+| 12 | 1/2 (02 skip) | 2min | 2min |
 
 **Per-Plan Metrics:**
 
@@ -62,6 +63,7 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 | Phase 10 P01 | 4min | 2 tasks | 2 files |
 | Phase 11 P01 | 8min | 2 tasks | 4 files |
 | Phase 11 P02 | 6min | 2 tasks | 4 files |
+| Phase 12 P01 | 2min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -100,6 +102,8 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 - [Phase 11]: Wave 1 Vitest then Wave 2 E2E (D-10, D-11); CTA testid add-as-overlapped-note-{id}
 - [Phase 11 P01]: canOfferMutatingAction → canMutate; declare Vitest split to AddAsOverlapped.spec (250-line)
 - [Phase 11 P02]: openAddAsOverlappedNote + no-try-again E2E; accidental_match.ts step extract; overlap_try_again uncoupled
+- [Phase 12]: KeepAlive live matchedNotes sufficient for AMR-05 reopen; Plan 12-02 can be skipped
+- [Phase 12]: AMR-05 return path is cy.go('back') only — not Resume or full remount
 
 ### Pending Todos
 
@@ -107,7 +111,7 @@ None.
 
 ### Blockers/Concerns
 
-- Phase 12 research: KeepAlive live session preserves `matchedNotes`; `previouslyAnswered` omits them — enrich OpenAPI only if E2E proves KeepAlive fails
+- Resolved (12-01): KeepAlive live session preserves `matchedNotes` after history back — no OpenAPI enrichment
 - Do not conflate dialog overlap declare with `AnswerOutcome.OVERLAP` try-again / SRS reclaim (ADR 0003) — Phase 11 locked
 
 ## Deferred Items
@@ -121,7 +125,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-08-05T14:08:40.224Z
-Stopped at: Phase 12 planning complete
-Resume file: .planning/phases/12-title-navigate-reopen-e2e-polish/12-01-PLAN.md
-Next action: Execute Phase 12 — `/gsd-execute-phase 12`
+Last session: 2026-08-05T14:11:47.276Z
+Stopped at: Completed 12-01-PLAN.md — KeepAlive green; skip 12-02
+Resume file: None
+Next action: Skip 12-02 (or mark skipped) → ship / complete milestone v1.2

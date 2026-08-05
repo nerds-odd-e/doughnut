@@ -16,7 +16,7 @@ Requirements for milestone v1.2. Each maps to roadmap phases.
 ### Match identity in dialog
 
 - [x] **AMR-04**: Resolve dialog lists each matched note with a clickable title and notebook path/breadcrumb only (no note body / peek)
-- [ ] **AMR-05**: After navigating away via a matched title and returning to the accidental-match result, user can open the resolve dialog again and see the same matches
+- [x] **AMR-05**: After navigating away via a matched title and returning to the accidental-match result, user can open the resolve dialog again and see the same matches
 
 ### Build a link
 
@@ -66,7 +66,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AMR-02 | Phase 7 | Complete |
 | AMR-03 | Phase 7 | Complete |
 | AMR-04 | Phase 8 | Complete |
-| AMR-05 | Phase 12 | Pending |
+| AMR-05 | Phase 12 | Complete |
 | AMR-06 | Phase 9 | Complete |
 | AMR-07 | Phase 9 | Complete |
 | AMR-08 | Phase 11 | Complete |
