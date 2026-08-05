@@ -10,13 +10,11 @@ Healthy mainline for learning and knowledge work. Approved [ADR 0002](../docs/ad
 
 ## Current State
 
-**2026-08-05:** After ADR 0002, removed the CLI portable-workspace sync stack (Markdown-tree `/export`, `/sync`, `/push --dry-run`, `/lint`, `.doughnut-sync`). Kept catalog ZIP download (`notebook_export.feature`).
-
-**Shipped v1.2 (2026-08-03):** Triaged LIA training participant work for portable-workspace stories 1–6 (later largely removed — see above).
-
 **Shipped v1.1 (2026-07-25):** Accidental-match + overlap spelling recall loop end-to-end.
 
 **Shipped v1.0 (2026-07-23):** Notebook Health lint + Health tab + gated empty-folder purge.
+
+Portable content direction is ADR 0002 (git-native notebooks). Catalog ZIP download remains (`notebook_export.feature`); path-keyed CLI sync / `.doughnut-sync` is not part of the product.
 
 ## Next Milestone Goals
 
@@ -36,8 +34,7 @@ Define via `/gsd-new-milestone`. Likely candidates:
 - ✓ Add-link UI (wiki / property / relationship) — existing
 - ✓ Notebook Health lint + tab + gated empty-folder purge — v1.0
 - ✓ Accidental-match + overlap spelling recall loop — v1.1
-- ✓ Catalog notebook ZIP export (one-way) — retained after ADR 0002 cleanup
-- ✓ Portable-workspace CLI sync/lint stack removed — 2026-08-05 (ADR 0002)
+- ✓ Catalog notebook ZIP export (one-way) — retained
 
 ### Active
 
@@ -51,7 +48,7 @@ Define via `/gsd-new-milestone`. Likely candidates:
 
 ## Context
 
-v1.2 strengthened LIA portable-workspace CLI paths; ADR 0002 then retired that sync model. Baseline story notes remain in `.planning/notes/2026-07-24-portable-notebook-workspace.md` for history. Milestone archives: `.planning/milestones/`, `MILESTONES.md`.
+Milestone archives: `.planning/milestones/`, `MILESTONES.md`. Accepted ADRs under `docs/adrs/`.
 
 ## Constraints
 
@@ -63,10 +60,9 @@ v1.2 strengthened LIA portable-workspace CLI paths; ADR 0002 then retired that s
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| ADR 0002 git-native notebooks | Git authoritative for portable content; retire `.doughnut-sync` | ✓ Approved 2026-08-04; CLI sync stack removed 2026-08-05 |
+| ADR 0002 git-native notebooks | Git authoritative for portable content; retire `.doughnut-sync` | ✓ Approved 2026-08-04 |
 | Keep catalog ZIP only | One-way portability still useful; E2E `notebook_export.feature` | ✓ Retained |
-| Skip Terry/Yeong Sheng in v1.2 triage | Instructors / non-participant work | ✓ Applied in v1.2 |
 
 ## Evolution
 
-This file updates as milestones complete. Last updated: 2026-08-05 (ADR 0002 cleanup).
+This file updates as milestones complete. Last updated: 2026-08-05.

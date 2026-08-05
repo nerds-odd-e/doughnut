@@ -1,12 +1,12 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.2
-milestone_name: Clean up LIA training participant code
+milestone: —
+milestone_name: —
 status: Idle — awaiting next milestone
-stopped_at: Removed 260724-db-timezone-fix planning/forensics trail
-last_updated: "2026-08-05T14:10:00+08:00"
+stopped_at: Pruned superseded milestone history; awaiting next milestone
+last_updated: "2026-08-05T14:15:00+08:00"
 last_activity: 2026-08-05
-last_activity_desc: Dropped timezone-fix deferred item, PLAN, and migration plan refs
+last_activity_desc: Cleared superseded milestone from planning docs; trashed portable notes
 ---
 
 # State
@@ -23,12 +23,12 @@ See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 Phase: —
 Plan: —
-Status: Idle after portable-workspace CLI removal (2026-08-05)
-Last activity: 2026-08-05 — pruned spent quick-task planning artifacts
+Status: Idle — awaiting next milestone
+Last activity: 2026-08-05 — pruned superseded milestone history
 
 ## Performance Metrics
 
-Preserved in `MILESTONES.md` for v1.0–v1.2. Not restated here.
+Preserved in `MILESTONES.md` for v1.0–v1.1. Not restated here.
 
 ## Accumulated Context
 
@@ -46,27 +46,23 @@ None.
 
 ### Quick Tasks Completed
 
-| # | Description | Date | Commit | Notes |
-|---|-------------|------|--------|-------|
-| 260805-j23 | Remove LIA portable sync/lint after ADR 0002; keep catalog ZIP | 2026-08-05 | 878d44537a | Planning diary pruned |
+None.
 
 ## Deferred Items
 
 | Category | Item | Status |
 |----------|------|--------|
 | seed | SEED-001-mcq-fuzzy-notebook-title-spelling-match | dormant |
-| milestone_audit | v1.2 formal `/gsd-audit-milestone` | skipped at v1.2 close |
 
 **Parked:** [SEED-001](./seeds/SEED-001-mcq-fuzzy-notebook-title-spelling-match.md)
 
 ## Session Continuity
 
-**Last session:** 2026-08-05T14:10:00+08:00
-**Stopped at:** Timezone-fix planning trail removed
+**Last session:** 2026-08-05T14:15:00+08:00
+**Stopped at:** Superseded milestone history removed
 **Next action:** `/gsd-new-milestone` for ADR 0002 Level 1 when ready
 **Resume file:** None
 
 ## Operator Next Steps
 
-- Push current `main` (cleanup + planning prune).
 - Optional: `/gsd-new-milestone` for git-native notebooks.

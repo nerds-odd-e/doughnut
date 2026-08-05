@@ -2,24 +2,6 @@
 
 *A living document updated after each milestone. Lessons feed forward into future planning.*
 
-## Milestone: v1.2 — Clean up LIA training participant code
-
-**Shipped:** 2026-08-03 · **Superseded:** 2026-08-05 (ADR 0002)
-**Phases:** 8 | **Plans:** 12
-
-### Outcome (current)
-Portable-workspace CLI sync/lint stack removed after ADR 0002; catalog ZIP kept. Spent v1.2 phase archives and quick-task PLAN/SUMMARY pruned.
-
-### Process lessons worth keeping
-1. Triage-then-strengthen beats re-implementing from scratch for training debris — until architecture ADRs supersede the direction.
-2. Remove WIP cleanly is a valid requirement outcome.
-3. Prune spent planning diaries at close; do not leave strengthen diaries as permanent product truth.
-
-### Cost Observations
-- Sessions: single calendar day (2026-08-03); ~111min plan execution
-
----
-
 ## Milestone: v1.1 — Spelling Answer Match & Link
 
 **Shipped:** 2026-07-25
@@ -66,19 +48,16 @@ Portable-workspace CLI sync/lint stack removed after ADR 0002; catalog ZIP kept.
 |-----------|----------|--------|------------|
 | v1.0 | multi-day | 7 | Health lint → tab → gated purge; override closeout |
 | v1.1 | ~2 days exec | 6 | Spelling match/link/overlap; slim archive + spent-history cleanup |
-| v1.2 | 1 day | 8 | Triage→strengthen/remove LIA CLI; coarse tracers; HYG gate |
 
 ### Cumulative Quality
 
 | Milestone | Formal verify | Closeout |
 |-----------|---------------|----------|
 | v1.0 | partial (override) | override_closeout |
-| v1.1 | all 6 phases passed | override_closeout (quick-task forensics + skipped audit) |
-| v1.2 | Phases 7+14 only | override_closeout (skipped audit; Phases 8–13 SUMMARY+HYG-03) |
+| v1.1 | all 6 phases passed | override_closeout |
 
 ### Top Lessons (Verified Across Milestones)
 
 1. Ship report-only / contract structure before mutating behavior.
 2. Prefer capability-named E2E over phase-numbered tests.
 3. Clean spent `.planning/` diaries at milestone close; keep product-useful archives only.
-4. Triage-then-act beats speculative rewrite for inherited WIP.

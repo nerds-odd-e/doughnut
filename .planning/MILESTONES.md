@@ -1,19 +1,5 @@
 # Milestones
 
-## v1.2 Clean up LIA training participant code (Shipped: 2026-08-03; superseded 2026-08-05)
-
-**Phases completed:** 8 phases, 12 plans, 28 tasks
-
-**Delivered (at close):** Strengthened portable-workspace CLI for stories 1–5; Story 6 mutate-push WIP removed.
-
-**Superseded (2026-08-05):** Approved ADR 0002 retired `.doughnut-sync` sync. Quick task removed CLI `/export` tree write, `/sync`, `/push --dry-run`, `/lint`; kept catalog ZIP only. Spent phase diaries and the 260805-j23 quick PLAN/SUMMARY were pruned.
-
-**Closeout type:** override_closeout
-**Git range (v1.2):** `e6b7bea993` → `d861343db2`
-**Timeline:** 2026-08-03 (~6h wall; 111min plan execution)
-
----
-
 ## v1.1 Spelling Answer Match & Link (Shipped: 2026-07-25)
 
 **Phases completed:** 6 phases, 16 plans, 32 tasks
@@ -51,6 +37,6 @@
 - Health Fix is a secondary action-bar control that posts `removeEmptyFolders: true`, refreshes the sidebar, auto re-lints, and is proven by targeted `notebook_health` E2E.
 
 **Closeout type:** override_closeout
-**Known verification overrides:** 6 (see STATE.md Deferred Items) — phases 1, 3, 4, 5, 6, 7 shipped (implementation complete + `notebook_health` E2E) without a formal GSD `/gsd-verify-work` report; only phase 2 was formally verified. Accepted as override at archive time to retire the milestone cleanly before starting a separate project.
+**Known verification overrides:** 6 — phases 1, 3, 4, 5, 6, 7 shipped (implementation complete + `notebook_health` E2E) without a formal GSD `/gsd-verify-work` report; only phase 2 was formally verified. Accepted as override at archive time.
 
 ---

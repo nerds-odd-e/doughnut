@@ -4,16 +4,8 @@
 
 - ✅ **v1.0 Notebook Lint & Auto-Fix** — Phases 1-7 ([archive](./milestones/v1.0-ROADMAP.md)) — shipped 2026-07-23
 - ✅ **v1.1 Spelling Answer Match & Link** — Phases 1-6 ([archive](./milestones/v1.1-ROADMAP.md)) — shipped 2026-07-25
-- ✅ **v1.2 Clean up LIA training participant code** — Phases 7-14 ([summary](./MILESTONES.md)) — shipped 2026-08-03; portable sync superseded 2026-08-05 (ADR 0002)
 
 ## Phases
-
-<details>
-<summary>✅ v1.2 Clean up LIA training participant code (Phases 7-14) — SHIPPED 2026-08-03; sync stack removed 2026-08-05</summary>
-
-Phase archive pruned after ADR 0002 removed the strengthened portable-workspace CLI. See [MILESTONES.md](./MILESTONES.md).
-
-</details>
 
 <details>
 <summary>✅ v1.1 Spelling Answer Match & Link (Phases 1-6) — SHIPPED 2026-07-25</summary>
@@ -46,7 +38,6 @@ Phase archive pruned after ADR 0002 removed the strengthened portable-workspace 
 |-------|-----------|----------------|--------|-----------|
 | 1–7 Health lint / purge | v1.0 | 13/13 | Complete | 2026-07-23 |
 | 1–6 Spelling match & link | v1.1 | 16/16 | Complete | 2026-07-25 |
-| 7–14 LIA training cleanup | v1.2 | 12/12 | Complete (sync later removed) | 2026-08-03 |
 
 ---
-*Last updated: 2026-08-05 — pruned spent v1.2 phase archive after ADR 0002 cleanup*
+*Last updated: 2026-08-05 — awaiting next milestone*
