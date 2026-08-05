@@ -63,7 +63,7 @@ v1.2 replaces stacked matched-note bodies on accidental-match spelling results w
 **Plans**: 2 plans
 Plans:
 - [ ] 07-01-PLAN.md — Tracer: compact result + Resolve CTA title Modal + Vitest edges
-- [ ] 07-02-PLAN.md — E2E reveal rewrite, @wip link scenarios, overlap uncoupled
+- [ ] 07-02-PLAN.md — E2E: @wip links then reveal rewrite (CI=true); overlap uncoupled
 **UI hint**: yes
 
 ### Phase 8: Match path and clickable titles

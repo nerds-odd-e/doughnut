@@ -22,17 +22,17 @@ created: 2026-08-05
 | **Framework** | Vitest 4.1.10 (browser mode) + Cypress/Cucumber E2E |
 | **Config file** | `frontend/vitest.config.ts`; E2E `e2e_test/config/ci.ts` (CI skips `@wip`) |
 | **Quick run command** | `CURSOR_DEV=true nix develop -c pnpm -C frontend test tests/components/recall/AnsweredSpellingQuestionAccidentalMatch.spec.ts` |
-| **Full suite command** | AccidentalMatch + Overlap unit files; targeted Cypress: `accidental_match_reveal.feature`, `overlap_try_again.feature` |
-| **Estimated runtime** | ~60–180 seconds (unit); E2E targeted longer |
+| **Full suite command** | AccidentalMatch + Overlap unit files; targeted Cypress with `CI=true` (skips `@wip`): `accidental_match_reveal.feature`, `overlap_try_again.feature` |
+| **Estimated runtime** | ~60–180 seconds (unit = fast gate); E2E targeted is wave/phase gate (>30s; often 2–5+ min) |
 
 ---
 
 ## Sampling Rate
 
-- **After every task commit:** AccidentalMatch (+ Overlap) Vitest file(s)
-- **After every plan wave:** Same + targeted Cypress specs above
-- **Before `/gsd-verify-work`:** Targeted E2E green (non-`@wip`); no failing unit tests
-- **Max feedback latency:** Prefer < 3 minutes for unit sampling
+- **After every task commit:** AccidentalMatch (+ Overlap) Vitest file(s) — **fast gate**
+- **After every plan wave / phase gate:** Same Vitest + targeted Cypress with `CI=true` (skips `@wip`; expect >30s)
+- **Before `/gsd-verify-work`:** Targeted E2E green (non-`@wip` under `CI=true`); no failing unit tests
+- **Max feedback latency:** Prefer < 3 minutes for unit sampling; do not treat Cypress as a per-task fast gate
 
 ---
 
@@ -42,8 +42,8 @@ created: 2026-08-05
 |---------|------|------|-------------|---------|-----------------|-----------|-------------------|-------------|--------|
 | 07-01-T1 | 01 | 1 | AMR-01, AMR-02 | T-07-01 | Title text interpolation (no v-html) | unit | AccidentalMatch.spec (tracer RED→GREEN) | ✅ rewrite | ⬜ pending |
 | 07-01-T2 | 01 | 1 | AMR-03 | T-07-01 | Dismiss-only Modal; no mutate | unit | AccidentalMatch + Overlap specs | ✅ update | ⬜ pending |
-| 07-02-T1 | 02 | 2 | AMR-01, AMR-02, AMR-03 | T-07-05 | E2E asserts title text visibility | E2E | accidental_match_reveal Scenario 1 | ✅ update | ⬜ pending |
-| 07-02-T2 | 02 | 2 | (regression / interim) | — | No resolve on OVERLAP; link @wip | E2E | reveal (non-@wip) + overlap_try_again | ✅ update | ⬜ pending |
+| 07-02-T1 | 02 | 2 | AMR-01, AMR-02, AMR-03 | T-07-05 | E2E asserts title text visibility; @wip before Cypress | E2E (wave gate, CI=true) | @wip links + reveal Scenario 1 | ✅ update | ⬜ pending |
+| 07-02-T2 | 02 | 2 | (regression) | — | No resolve on OVERLAP | E2E (wave gate, CI=true) | reveal (skip @wip) + overlap_try_again | ✅ update | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 

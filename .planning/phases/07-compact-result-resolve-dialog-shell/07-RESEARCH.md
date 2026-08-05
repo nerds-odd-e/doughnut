@@ -366,17 +366,19 @@ Replace `expectMatchedNoteInSection` stacked asserts with: alert → click `reso
 
 Discretion items (testids, presentational vs closer, Tailwind density) are recommendations, not assumptions about product truth.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should Phase 7 unit-test Modal dismiss explicitly?**
    - What we know: `Modal.spec.ts` already covers close button + ESC; AMR-03 is product-level optional dismiss.
    - What's unclear: Whether AccidentalMatch mount should click `.close-button` once for regression.
    - Recommendation: One light unit assert (open → close → dialog gone) **or** cover dismiss primarily in E2E reveal scenario; avoid duplicating full Modal suite.
+   - **RESOLVED:** Plan 07-01 Task 2 requires one light AccidentalMatch unit assert (open → `.close-button` → dialog gone) for AMR-03; E2E dismiss in 07-02 remains complementary. Do not duplicate the full `Modal.spec.ts` suite.
 
 2. **Dialog header title copy?**
    - What we know: CTA copy is locked; dialog body is titles only.
    - What's unclear: Whether Modal `#header` should show “Resolve accidental match” or stay body-only.
    - Recommendation: Body-only list is enough for Phase 7; optional short header is discretionary polish, not a requirement ID.
+   - **RESOLVED:** Body-only Modal (no `#header` slot content) per UI-SPEC Copywriting Contract and Plan 07-01 dialog implementation.
 
 ## Environment Availability
 
