@@ -4,11 +4,11 @@ milestone: v1.2
 milestone_name: Accidental Match Resolve UX
 current_phase: 8
 current_phase_name: Match path and clickable titles
-status: in_progress
+status: phase_complete
 stopped_at: Completed 08-02-PLAN.md
-last_updated: "2026-08-05T09:43:02.827Z"
+last_updated: "2026-08-05T09:43:30.000Z"
 last_activity: 2026-08-05
-last_activity_desc: Executed 08-01 AccidentalMatchResolveRow (AMR-04 Vitest)
+last_activity_desc: Executed 08-02 — E2E path + clickable title asserts
 progress:
   total_phases: 6
   completed_phases: 2
@@ -24,16 +24,16 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 **Core value:** Healthy mainline for learning and knowledge work — reviewed note stays primary during accidental-match results.
-**Current focus:** Phase 8 Plan 01 complete — next is 08-02 E2E path + clickable titles
+**Current focus:** Phase 8 complete — next is Phase 9 Build a link from resolve dialog
 
 ## Current Position
 
-Phase: 8 of 12 (Match path and clickable titles) — 1/2 plans complete (Vitest tracer done; E2E pending)
-Plan: 08-01 complete; 08-02 pending (wave 2)
-Status: Phase 8 in progress — Plan 01 SUMMARY written
-Last activity: 2026-08-05 — Executed 08-01 AccidentalMatchResolveRow (AMR-04 Vitest)
+Phase: 8 of 12 (Match path and clickable titles) — 2/2 plans complete
+Plan: 08-02 complete (wave 2)
+Status: Phase 8 complete — AMR-04 Vitest + E2E evidenced
+Last activity: 2026-08-05 — Executed 08-02 E2E path + clickable titles
 
-Progress: [██████████] 100% (v1.2 milestone plans executed)
+Progress: [███░░░░░░░] 33% (2/6 v1.2 phases; 4 plans executed across phases 7–8)
 
 ## Performance Metrics
 
@@ -44,6 +44,7 @@ Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first pla
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 07 | 2/2 | 8min | 4min |
+| 08 | 2/2 | 6min | 3min |
 
 **Per-Plan Metrics:**
 
@@ -98,4 +99,4 @@ None.
 Last session: 2026-08-05T09:43:02.821Z
 Stopped at: Completed 08-02-PLAN.md
 Resume file: None
-Next action: Execute 08-02-PLAN.md (E2E path + clickable title asserts)
+Next action: Discuss/plan Phase 9 (Build a link from resolve dialog) or /gsd-verify-work for Phase 8
