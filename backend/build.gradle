@@ -83,7 +83,7 @@ dependencies {
   compileOnly 'org.projectlombok:lombok:1.18.46'
   annotationProcessor 'org.projectlombok:lombok:1.18.46'
   developmentOnly 'org.springframework.boot:spring-boot-devtools'
-  runtimeOnly 'com.mysql:mysql-connector-j:9.7.0'
+  runtimeOnly 'com.mysql:mysql-connector-j:26.7.0'
   annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
