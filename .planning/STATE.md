@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Accidental Match Resolve UX
-current_phase: 8
-current_phase_name: Match path and clickable titles
-status: phase_complete
-stopped_at: Phase 9 context gathered
-last_updated: "2026-08-05T09:47:45.768Z"
+current_phase: 9
+current_phase_name: Build a link from resolve dialog
+status: research_complete
+stopped_at: Phase 9 research complete — ready for planning
+last_updated: "2026-08-05T09:55:00.000Z"
 last_activity: 2026-08-05
-last_activity_desc: Executed 08-02 E2E path + clickable titles
+last_activity_desc: Wrote 09-RESEARCH.md for Build a link from resolve dialog
 progress:
   total_phases: 6
   completed_phases: 2
@@ -24,14 +24,14 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-08-05)
 
 **Core value:** Healthy mainline for learning and knowledge work — reviewed note stays primary during accidental-match results.
-**Current focus:** Phase 8 complete — next is Phase 9 Build a link from resolve dialog
+**Current focus:** Phase 9 research complete — ready to plan Build a link from resolve dialog
 
 ## Current Position
 
-Phase: 8 of 12 (Match path and clickable titles) — 2/2 plans complete
-Plan: 08-02 complete (wave 2)
-Status: Phase 8 complete — AMR-04 Vitest + E2E evidenced
-Last activity: 2026-08-05 — Executed 08-02 E2E path + clickable titles
+Phase: 9 of 12 (Build a link from resolve dialog) — research complete; plans TBD
+Plan: none yet
+Status: Phase 9 RESEARCH.md written — AMR-06/AMR-07 ready for planning
+Last activity: 2026-08-05 — Phase 9 research (single-Modal step swap + gates)
 
 Progress: [███░░░░░░░] 33% (2/6 v1.2 phases; 4 plans executed across phases 7–8)
 
@@ -96,7 +96,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-08-05T09:47:45.760Z
-Stopped at: Phase 9 context gathered
-Resume file: .planning/phases/09-build-a-link-from-resolve-dialog/09-CONTEXT.md
-Next action: Discuss/plan Phase 9 (Build a link from resolve dialog) or /gsd-verify-work for Phase 8
+Last session: 2026-08-05T09:55:00.000Z
+Stopped at: Phase 9 research complete
+Resume file: .planning/phases/09-build-a-link-from-resolve-dialog/09-RESEARCH.md
+Next action: /gsd-plan-phase 9 (planner consumes 09-RESEARCH.md + 09-CONTEXT.md)
