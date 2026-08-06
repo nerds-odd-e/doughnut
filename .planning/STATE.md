@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: idle
 stopped_at: null
-last_updated: "2026-08-06T07:00:00Z"
+last_updated: "2026-08-06T07:55:00Z"
 last_activity: 2026-08-06
-last_activity_desc: Quick 003 refine-note-after-mcq complete (all 6 phases)
+last_activity_desc: Cleaned spent quick/003 refine-note-after-mcq planning history
 progress:
   total_phases: 0
   completed_phases: 0
@@ -30,7 +30,7 @@ See: `.planning/PROJECT.md` (updated 2026-08-06)
 
 Milestone v1.2 Accidental Match Resolve UX — **shipped 2026-08-06**.
 
-Quick task [`.planning/quick/003-refine-note-after-mcq/PLAN.md`](./quick/003-refine-note-after-mcq/PLAN.md) — **done** (Phases 1–6).
+No active roadmap phase or quick plan.
 
 ## Deferred Items
 
@@ -39,7 +39,7 @@ Quick task [`.planning/quick/003-refine-note-after-mcq/PLAN.md`](./quick/003-ref
 | quick_task | 002-frontend-cli-mcp-small-test-renovation | separate track |
 | seed | SEED-001-mcq-fuzzy-notebook-title-spelling-match | dormant |
 | tech_debt | Drop grading/disable wiki-in-`aliases` read bridge after data migrated | open |
-| deferred | Refine note on answered spelling (out of 003 scope) | deferred |
+| deferred | Refine note on answered spelling questions | deferred |
 
 ## Session Continuity
 
