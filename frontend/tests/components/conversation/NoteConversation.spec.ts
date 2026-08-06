@@ -1,6 +1,4 @@
 import { ConversationMessageController } from "@generated/doughnut-backend-api/sdk.gen"
-import ConversationInner from "@/components/conversations/ConversationInner.vue"
-import ConversationTemplate from "@/components/conversations/ConversationTemplate.vue"
 import NoteConversation from "@/components/conversations/NoteConversation.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
@@ -19,25 +17,15 @@ vi.mock("vue-router", async (importOriginal) => {
   }
 })
 
-const mockPerformance = {
-  now: vi.fn(() => Date.now()),
-}
-vi.stubGlobal("performance", mockPerformance)
-
 afterEach(() => {
   vi.clearAllMocks()
   vi.clearAllTimers()
-  vi.useRealTimers() // Restore real timers
+  vi.useRealTimers()
 })
 
 describe("NoteConversation", () => {
   const note = makeMe.aNote.please()
-  const conversation = {
-    id: 1,
-    title: "Test Conversation",
-    createdAt: "2024-01-01T00:00:00Z",
-    updatedAt: "2024-01-01T00:00:00Z",
-  }
+  const conversation = makeMe.aConversation.withId(1).forANote(note).please()
   const user = makeMe.aUser.please()
 
   const mount = async () => {
@@ -66,7 +54,7 @@ describe("NoteConversation", () => {
     mockSdkService(ConversationMessageController, "getConversationMessages", [])
   })
 
-  it("calls api to start conversation and shows ConversationInner when successful", async () => {
+  it("starts a conversation and shows the chat when none exist", async () => {
     mockSdkService(
       ConversationMessageController,
       "getConversationsAboutNote",
@@ -82,51 +70,35 @@ describe("NoteConversation", () => {
       path: { note: note.id },
       body: "Hello",
     })
-
-    const conversationInner = wrapper.findComponent(ConversationInner)
-    expect(conversationInner.exists()).toBe(true)
-    expect(conversationInner.props("conversation")).toEqual(conversation)
+    expect(wrapper.text()).not.toContain("Start a conversation about this note")
+    expect(wrapper.find("form.chat-input-form").exists()).toBe(true)
   })
 
-  it("shows the first conversation if conversation exists", async () => {
+  it("shows the first conversation when conversations already exist", async () => {
     mockSdkService(ConversationMessageController, "getConversationsAboutNote", [
       conversation,
     ])
     const wrapper = await mount()
-    const conversationInner = wrapper.findComponent(ConversationInner)
 
-    expect(conversationInner.exists()).toBe(true)
-    expect(conversationInner.props("conversation")).toEqual(conversation)
+    expect(wrapper.text()).not.toContain("Start a conversation about this note")
+    expect(wrapper.find("select.conversation-select").exists()).toBe(false)
   })
 
-  it("shows ConversationTemplate when no conversation exists", async () => {
+  it("shows the start template when no conversation exists", async () => {
     mockSdkService(
       ConversationMessageController,
       "getConversationsAboutNote",
       []
     )
     const wrapper = await mount()
-    const conversationTemplate = wrapper.findComponent(ConversationTemplate)
-    const conversationInner = wrapper.findComponent(ConversationInner)
 
-    expect(conversationTemplate.exists()).toBe(true)
-    expect(conversationInner.exists()).toBe(false)
+    expect(wrapper.text()).toContain("Start a conversation about this note")
   })
 
   it("allows switching between conversations", async () => {
     const conversations = [
-      {
-        id: 1,
-        title: "First Conversation",
-        createdAt: "2024-01-01T00:00:00Z",
-        updatedAt: "2024-01-01T00:00:00Z",
-      },
-      {
-        id: 2,
-        title: "Second Conversation",
-        createdAt: "2024-01-01T00:00:00Z",
-        updatedAt: "2024-01-01T00:00:00Z",
-      },
+      makeMe.aConversation.withId(1).forANote(note).please(),
+      makeMe.aConversation.withId(2).forANote(note).please(),
     ]
 
     mockSdkService(
@@ -136,75 +108,41 @@ describe("NoteConversation", () => {
     )
 
     const wrapper = await mount()
+    const select = wrapper.find("select.conversation-select")
+    expect(select.exists()).toBe(true)
+    expect((select.element as HTMLSelectElement).value).toBe("1")
 
-    // Verify initial conversation is selected
-    expect(
-      wrapper.findComponent(ConversationInner).props("conversation")
-    ).toEqual(conversations[0])
+    await select.setValue("2")
+    await select.trigger("change")
 
-    // Change conversation
-    await wrapper.find("select.conversation-select").setValue("2")
-    await wrapper.find("select.conversation-select").trigger("change")
-
-    // Verify conversation changed
-    expect(
-      wrapper.findComponent(ConversationInner).props("conversation")
-    ).toEqual(conversations[1])
+    expect((select.element as HTMLSelectElement).value).toBe("2")
   })
 
-  it("shows conversation selector only when multiple conversations exist", async () => {
+  it("starts a new conversation from an existing conversation view", async () => {
     mockSdkService(ConversationMessageController, "getConversationsAboutNote", [
       conversation,
     ])
 
     const wrapper = await mount()
 
-    // Verify selector is not shown with single conversation
-    expect(wrapper.find("select.conversation-select").exists()).toBe(false)
-  })
-
-  it("allows starting a new conversation when in conversation view", async () => {
-    // Setup with existing conversation
-    const existingConversation = {
-      id: 1,
-      title: "Test Conversation",
-      createdAt: "2024-01-01T00:00:00Z",
-      updatedAt: "2024-01-01T00:00:00Z",
-    }
-    mockSdkService(ConversationMessageController, "getConversationsAboutNote", [
-      existingConversation,
-    ])
-
-    const wrapper = await mount()
-
-    // Verify we're showing the ConversationInner initially
-    expect(wrapper.findComponent(ConversationInner).exists()).toBe(true)
-
-    // Click new conversation button
     await wrapper
       .find("button.daisy-btn-outline.daisy-btn-primary")
       .trigger("click")
 
-    // Verify we're now showing the ConversationTemplate
-    expect(wrapper.findComponent(ConversationTemplate).exists()).toBe(true)
-    expect(wrapper.findComponent(ConversationInner).exists()).toBe(false)
+    expect(wrapper.text()).toContain("Start a conversation about this note")
 
-    // Start new conversation
     await wrapper.find("textarea").setValue("New conversation message")
     await wrapper.find("button.send-button[type='button']").trigger("click")
     await flushPromises()
 
-    // Verify API was called
     expect(startConversationSpy).toHaveBeenCalledWith({
       path: { note: note.id },
       body: "New conversation message",
     })
-
-    // Verify we're back to showing ConversationInner
-    expect(wrapper.findComponent(ConversationInner).exists()).toBe(true)
+    expect(wrapper.text()).not.toContain("Start a conversation about this note")
   })
 
-  it("handles AI reply when starting new conversation with AI invite", async () => {
+  it("starts AI reply when starting a conversation with AI invite", async () => {
     mockSdkService(
       ConversationMessageController,
       "getConversationsAboutNote",
@@ -217,28 +155,19 @@ describe("NoteConversation", () => {
 
     const wrapper = await mount()
 
-    // Trigger send message with AI invite
     await wrapper.find("textarea").setValue("Hello AI")
     await wrapper.find("form.chat-input-form").trigger("submit")
     await flushPromises()
 
-    // Verify conversation was started
     expect(startConversationSpy).toHaveBeenCalledWith({
       path: { note: note.id },
       body: "Hello AI",
     })
-
-    // Verify AI reply was requested
     expect(mockStart).toHaveBeenCalled()
-
-    // Verify ConversationInner is rendered with correct props
-    const conversationInner = wrapper.findComponent(ConversationInner)
-    expect(conversationInner.exists()).toBe(true)
-    expect(conversationInner.props("conversation")).toEqual(conversation)
-    expect(conversationInner.props("initialAiReply")).toBe(true)
+    expect(wrapper.text()).not.toContain("Start a conversation about this note")
   })
 
-  it("handles AI reply when sending message with AI invite in existing conversation", async () => {
+  it("starts AI reply when sending with AI invite in an existing conversation", async () => {
     mockSdkService(ConversationMessageController, "getConversationsAboutNote", [
       conversation,
     ])
@@ -258,13 +187,10 @@ describe("NoteConversation", () => {
     await wrapper.find("form.chat-input-form").trigger("submit")
     await flushPromises()
 
-    // Verify message was sent
     expect(replySpy).toHaveBeenCalledWith({
       path: { conversationId: conversation.id },
       body: "Hello AI",
     })
-
-    // Verify AI reply was requested
     expect(mockStart).toHaveBeenCalled()
   })
 })

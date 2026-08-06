@@ -28,22 +28,19 @@ afterEach(() => {
 })
 
 describe("ConversationComponent", () => {
-  let wrapper
   const note = makeMe.aNote.please()
   const conversation = makeMe.aConversation.forANote(note).please()
   const user = makeMe.aUser.please()
 
-  beforeEach(() => {
-    mockedPush.mockClear()
+  const mountConversation = () => {
     mockSdkService(
       ConversationMessageController,
       "getConversationsAboutNote",
       []
     )
     mockSdkService(ConversationMessageController, "getConversationMessages", [])
-    // Mock showNote to prevent real API calls from StoredApiCollection
     mockSdkService(NoteController, "showNote", makeMe.aNoteRealm.please())
-    wrapper = helper
+    return helper
       .component(ConversationComponent)
       .withCleanStorage()
       .withProps({
@@ -51,42 +48,28 @@ describe("ConversationComponent", () => {
         user,
       })
       .mount()
+  }
+
+  beforeEach(() => {
+    mockedPush.mockClear()
   })
 
   it("routes to note show page when minimize button is clicked and subject is a note", async () => {
-    const minimizeButton = wrapper.find("button.minimize-button")
-    await minimizeButton.trigger("click")
+    const wrapper = mountConversation()
+    await wrapper.find("button.minimize-button").trigger("click")
 
     expect(mockedPush).toHaveBeenCalledWith(
       noteShowLocation(note.noteTopology.id)
     )
   })
 
-  describe("maximize/restore functionality", () => {
-    it("should toggle maximize state when maximize button is clicked", async () => {
-      const note = makeMe.aNote.please()
-      const conversation = makeMe.aConversation.forANote(note).please()
-      const user = makeMe.aUser.please()
+  it("toggles maximize state when maximize button is clicked", async () => {
+    const wrapper = mountConversation()
 
-      mockSdkService(
-        ConversationMessageController,
-        "getConversationMessages",
-        []
-      )
-      const wrapper = helper
-        .component(ConversationComponent)
-        .withCleanStorage()
-        .withProps({
-          conversation,
-          user,
-        })
-        .mount()
+    await wrapper.find('[aria-label="Toggle maximize"]').trigger("click")
+    expect(wrapper.find(".subject-container").exists()).toBe(false)
 
-      await wrapper.find('[aria-label="Toggle maximize"]').trigger("click")
-      expect(wrapper.find(".subject-container").exists()).toBe(false)
-
-      await wrapper.find('[aria-label="Toggle maximize"]').trigger("click")
-      expect(wrapper.find(".subject-container").exists()).toBe(true)
-    })
+    await wrapper.find('[aria-label="Toggle maximize"]').trigger("click")
+    expect(wrapper.find(".subject-container").exists()).toBe(true)
   })
 })

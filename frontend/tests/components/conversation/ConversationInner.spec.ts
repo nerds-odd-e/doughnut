@@ -5,7 +5,6 @@ import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService, mockShowNote } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { expect, vi } from "vitest"
-// Import helper function - need to define it here since Browser Mode handles module mocks differently
 import AiReplyEventSource from "@/managedApi/AiReplyEventSource"
 import {
   getLastInstance,
@@ -17,26 +16,21 @@ const simulateAiResponse = (content = "## I'm ChatGPT") => {
   if (!instance) {
     throw new Error("No AiReplyEventSource instance available")
   }
-  const chunk = {
-    choices: [
-      {
-        index: 0,
-        message: {
-          role: "assistant",
-          content,
+  instance.onMessageCallback(
+    "chat.completion.chunk",
+    JSON.stringify({
+      choices: [
+        {
+          index: 0,
+          message: { role: "assistant", content },
+          finish_reason: null,
         },
-        finish_reason: null,
-      },
-    ],
-  }
-
-  instance.onMessageCallback("chat.completion.chunk", JSON.stringify(chunk))
+      ],
+    })
+  )
 }
 
-// Browser Mode: No IntersectionObserver mock needed - real API available!
-// Browser Mode: No window.performance mock needed - real API available!
-
-// Mock AiReplyEventSource to track instances (shared with AiResponse.spec.ts)
+// Track AiReplyEventSource instances for streaming simulation (SSE external).
 vi.mock("@/managedApi/AiReplyEventSource", async () => {
   const actual = await vi.importActual<
     typeof import("@/managedApi/AiReplyEventSource")
@@ -69,10 +63,8 @@ const mountComponent = (conversation, user) =>
     .mount()
 
 const submitMessage = async (wrapper, message: string) => {
-  const form = wrapper.find("form.chat-input-form")
-  const textarea = wrapper.find("textarea")
-  await textarea.setValue(message)
-  await form.trigger("submit")
+  await wrapper.find("textarea").setValue(message)
+  await wrapper.find("form.chat-input-form").trigger("submit")
   await flushPromises()
 }
 
@@ -105,20 +97,16 @@ describe("ConversationInner", () => {
     resetInstance()
   })
 
-  describe("ScrollTo behavior", () => {
-    it("updates ScrollTo component trigger when messages change", async () => {
-      const messages: ConversationMessage[] = [
-        { id: 1, message: "Hello", sender: user },
-        { id: 2, message: "Hi", sender: user },
-      ]
+  it("updates ScrollTo trigger when messages change", async () => {
+    wrapper.vm.currentConversationMessages = [
+      { id: 1, message: "Hello", sender: user },
+      { id: 2, message: "Hi", sender: user },
+    ] satisfies ConversationMessage[]
+    await wrapper.vm.$nextTick()
 
-      wrapper.vm.currentConversationMessages = messages
-      await wrapper.vm.$nextTick()
-
-      expect(
-        wrapper.findComponent({ name: "ScrollTo" }).props("scrollTrigger")
-      ).toBe(2)
-    })
+    expect(
+      wrapper.findComponent({ name: "ScrollTo" }).props("scrollTrigger")
+    ).toBe(2)
   })
 
   describe("Form submission", () => {
@@ -161,84 +149,62 @@ describe("ConversationInner", () => {
 
   describe("Message formatting", () => {
     it("renders user messages in pre tags", async () => {
-      const messages: ConversationMessage[] = [
+      wrapper.vm.currentConversationMessages = [
         { id: 1, message: "Hello\nWorld", sender: user },
-      ]
-      wrapper.vm.currentConversationMessages = messages
+      ] satisfies ConversationMessage[]
       await wrapper.vm.$nextTick()
 
       const userMessage = wrapper.find(".user-message")
-      expect(userMessage.exists()).toBe(true)
       expect(userMessage.element.tagName).toBe("PRE")
       expect(userMessage.text()).toBe("Hello\nWorld")
     })
 
     it("renders AI messages as markdown HTML", async () => {
-      const messages: ConversationMessage[] = [
+      wrapper.vm.currentConversationMessages = [
         { id: 2, message: "## Hello\n**World**", sender: undefined },
-      ]
-      wrapper.vm.currentConversationMessages = messages
+      ] satisfies ConversationMessage[]
       await wrapper.vm.$nextTick()
 
       const aiMessage = wrapper.find(".ai-chat")
-      expect(aiMessage.exists()).toBe(true)
       expect(aiMessage.find("h2").exists()).toBe(true)
       expect(aiMessage.find("strong").exists()).toBe(true)
     })
   })
 
   describe("Default questions", () => {
-    it("shows default messages for recall conversations with no messages", async () => {
-      const recallConversation = {
-        ...conversation,
-        subject: {
-          recallPrompt: makeMe.anAnsweredQuestion.please(),
-        },
-      }
-      wrapper = mountComponent(recallConversation, user)
+    const mountRecallConversation = () => {
+      const recallConversation = makeMe.aConversation
+        .forAnsweredQuestion(makeMe.anAnsweredQuestion.please())
+        .please()
+      return mountComponent(recallConversation, user)
+    }
 
-      // Simulate empty conversation messages
+    it("shows default messages for recall conversations with no messages", async () => {
+      wrapper = mountRecallConversation()
       wrapper.vm.currentConversationMessages = []
       await wrapper.vm.$nextTick()
 
       const defaultButtons = wrapper.findAll(".default-message-button")
-      expect(defaultButtons.length).toBe(4)
+      expect(defaultButtons).toHaveLength(4)
       expect(defaultButtons[0].text()).toBe("Why is my answer wrong?")
     })
 
     it("doesn't show default messages for non-recall conversations", async () => {
-      const nonRecallConversation = {
-        ...conversation,
-        subject: {
-          recallPrompt: undefined,
-        },
-      }
-      wrapper = mountComponent(nonRecallConversation, user)
-
       wrapper.vm.currentConversationMessages = []
       await wrapper.vm.$nextTick()
 
-      const defaultButtons = wrapper.findAll(".default-message-button")
-      expect(defaultButtons.length).toBe(0)
+      expect(wrapper.findAll(".default-message-button")).toHaveLength(0)
     })
 
     it("sends message when default question is clicked", async () => {
-      const recallConversation = {
-        ...conversation,
-        subject: {
-          recallPrompt: makeMe.anAnsweredQuestion.please(),
-        },
-      }
-      wrapper = mountComponent(recallConversation, user)
-
+      wrapper = mountRecallConversation()
       wrapper.vm.currentConversationMessages = []
       await wrapper.vm.$nextTick()
 
-      const firstButton = wrapper.find(".default-message-button")
-      await firstButton.trigger("click")
+      await wrapper.find(".default-message-button").trigger("click")
 
       expect(replyToConversationSpy).toHaveBeenCalledWith({
-        path: { conversationId: recallConversation.id },
+        path: { conversationId: wrapper.props("conversation").id },
         body: "Why is my answer wrong?",
       })
     })
