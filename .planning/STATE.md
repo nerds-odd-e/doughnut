@@ -39,6 +39,8 @@ Progress: [██████████] 100% (6/6 v1.2 phases; 11/11 plans; q
 
 - Drop grading/disable wiki-in-`aliases` read bridge once leftover notebook data is migrated (save already heals on edit).
 
-## Performance Metrics
+## Session Continuity
 
-Preserved in `MILESTONES.md` for v1.0–v1.1. v1.2 metrics start after first plan completion.
+Next action: Re-audit / complete milestone v1.2 (`/gsd-audit-milestone` then `/gsd-complete-milestone v1.2`), or drop legacy read bridge when ready.
+Resume: `.planning/quick/002-overlaps-property-and-resolve-polish/PLAN.md` (complete summary)
+
