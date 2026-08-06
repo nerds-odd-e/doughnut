@@ -229,6 +229,8 @@
 
 ## Error Handling
 
+**Policy:** `.cursor/rules/error-handling.mdc` (prevent → propagate → enrich → deliberate catch; never swallow).
+
 **Strategy:** Map domain/API failures to structured `ApiError` JSON; log unexpected failures as failure reports; frontend toasts from wrapped calls.
 
 **Patterns:**

@@ -8,7 +8,7 @@ Start with `.cursor/agent-map.md` for repo navigation, generated API guidance, f
 
 Run repo tooling with `CURSOR_DEV=true nix develop -c …` unless documented otherwise (e.g. Cloud VM). **Git commands do not need the Nix prefix** — run `git` directly.
 
-Repo conventions live in `.cursor/rules/`; use the relevant rule for backend, frontend, E2E, linting, migrations, MCP, or shell-script work. "Small test" style for unit tests (always applied): `.cursor/rules/unit-testing.mdc`.
+Repo conventions live in `.cursor/rules/`. Cursor injects `alwaysApply: true` rules automatically. **Codex / Claude Code:** read these always-applied rules before coding — `general.mdc`, `error-handling.mdc`, `unit-testing.mdc`, `planning.mdc`, `gsd-coexistence.mdc`, `architecture-decisions.mdc` — then the stack rule for the area you touch (backend, frontend, E2E, linting, migrations, MCP, CLI).
 
 For local MySQL or Redis failures, inspect `mysql/mysql.log` or `redis/redis.log`; the Nix shell setup is defined by `process-compose.yaml` and `scripts/shell_setup.sh`.
 
@@ -18,12 +18,13 @@ Legacy notes may remain under `ongoing/` — do not migrate unless asked.
 
 ## Principles
 
+Portable digest (details live in the cited always-applied rules — keep `AGENTS.md` and `CLAUDE.md` in sync):
+
 1. High cohesion — one concept, one place (`general.mdc`)
-2. Keep it simple — minimum code; no defensive programming (`error-handling.mdc`)
-3. Capability naming — no phase numbers in product artifacts
-4. Test observables via high-level entry points — not internal structure (`unit-testing.mdc`)
-5. Never silently swallow failures — prevent, propagate, enrich, then
-   deliberate catch (`error-handling.mdc`)
+2. Keep it simple — minimum code; no defensive programming (`general.mdc`)
+3. Capability naming — no phase numbers in product artifacts (`general.mdc`, `planning.mdc`)
+4. Test observables via high-level entry points (`unit-testing.mdc`)
+5. Never silently swallow failures — prevent → propagate → enrich → deliberate catch (`error-handling.mdc`)
 
 ## Planning and phased delivery
 

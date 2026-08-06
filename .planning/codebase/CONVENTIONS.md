@@ -129,7 +129,7 @@ deliberate catch; never swallow).
 
 **High cohesion:**
 - Minimize duplication; one representation per concept; place related code together (`.cursor/rules/general.mdc`).
-- Do not add speculative structure or defensive layers unless observed behavior requires them.
+- Do not add speculative structure or defensive layers unless observed behavior requires them (`.cursor/rules/general.mdc`).
 
 ## Tooling Commands (prescriptive)
 
