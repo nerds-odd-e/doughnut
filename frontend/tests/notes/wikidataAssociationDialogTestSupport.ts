@@ -3,7 +3,7 @@ import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDia
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
-import { expect } from "vitest"
+import { afterEach, beforeEach, expect, vi } from "vitest"
 
 export type WikidataDialogSdkSpies = {
   searchWikidataSpy: ReturnType<typeof mockSdkService>
@@ -99,6 +99,40 @@ export function mountWikidataAssociationDialog(
       ...options,
     })
     .mount({ attachTo: document.body })
+}
+
+/** Shared lifecycle for WikidataAssociationDialog capability specs. */
+export function useWikidataAssociationDialogTestLifecycle() {
+  // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
+  let wrapper: VueWrapper<any> | undefined
+  let sdkSpies!: WikidataDialogSdkSpies
+
+  beforeEach(() => {
+    vi.resetAllMocks()
+    document.body.innerHTML = ""
+    sdkSpies = setupWikidataDialogSdkMocks()
+  })
+
+  afterEach(() => {
+    wrapper?.unmount()
+    document.body.innerHTML = ""
+  })
+
+  return {
+    getSdkSpies: () => sdkSpies,
+    mountDialog(
+      searchKey: string,
+      options?: WikidataDialogMountOptions
+      // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
+    ): VueWrapper<any> {
+      wrapper = mountWikidataAssociationDialog(searchKey, options)
+      return wrapper
+    },
+    // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
+    trackWrapper(mounted: VueWrapper<any>) {
+      wrapper = mounted
+    },
+  }
 }
 
 export async function mountWikidataDialogReady(options: {

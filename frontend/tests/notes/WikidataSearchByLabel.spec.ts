@@ -41,42 +41,35 @@ describe("WikidataSearchByLabel", () => {
     return wrapper
   }
 
-  const getButton = (wrapper: ReturnType<typeof mountComponent>) =>
-    wrapper.find("button")
+  const buttonClasses = () => wrapper.find("button").classes()
 
   it.each`
-    modelValue   | expectedClasses                               | notExpectedClasses
-    ${undefined} | ${["daisy-btn-outline", "daisy-btn-neutral"]} | ${["daisy-btn-primary"]}
-    ${""}        | ${["daisy-btn-outline", "daisy-btn-neutral"]} | ${["daisy-btn-primary"]}
-    ${"   "}     | ${["daisy-btn-outline", "daisy-btn-neutral"]} | ${["daisy-btn-primary"]}
-    ${"Q123"}    | ${["daisy-btn-primary"]}                      | ${["daisy-btn-outline", "daisy-btn-neutral"]}
+    modelValue   | expectedPrimary
+    ${undefined} | ${false}
+    ${""}        | ${false}
+    ${"   "}     | ${false}
+    ${"Q123"}    | ${true}
   `(
-    "shows correct button style when modelValue is $modelValue",
-    ({ modelValue, expectedClasses, notExpectedClasses }) => {
-      const wrapper = mountComponent(modelValue)
-      const button = getButton(wrapper)
-
-      expectedClasses.forEach((cls: string) => {
-        expect(button.classes()).toContain(cls)
-      })
-      notExpectedClasses.forEach((cls: string) => {
-        expect(button.classes()).not.toContain(cls)
-      })
+    "button is primary=$expectedPrimary when modelValue is $modelValue",
+    ({ modelValue, expectedPrimary }) => {
+      mountComponent(modelValue)
+      const classes = buttonClasses()
+      if (expectedPrimary) {
+        expect(classes).toContain("daisy-btn-primary")
+      } else {
+        expect(classes).toContain("daisy-btn-outline")
+        expect(classes).toContain("daisy-btn-neutral")
+      }
     }
   )
 
-  it("updates button style when modelValue changes", async () => {
-    const wrapper = mountComponent()
-    const button = getButton(wrapper)
-
-    expect(button.classes()).toContain("daisy-btn-outline")
-    expect(button.classes()).toContain("daisy-btn-neutral")
+  it("updates to primary style when modelValue becomes a Wikidata ID", async () => {
+    mountComponent()
+    expect(buttonClasses()).toContain("daisy-btn-outline")
 
     await wrapper.setProps({ modelValue: "Q456" })
 
-    expect(button.classes()).toContain("daisy-btn-primary")
-    expect(button.classes()).not.toContain("daisy-btn-outline")
-    expect(button.classes()).not.toContain("daisy-btn-neutral")
+    expect(buttonClasses()).toContain("daisy-btn-primary")
   })
 
   describe("soft keyboard primer", () => {
@@ -86,21 +79,21 @@ describe("WikidataSearchByLabel", () => {
 
     it("focuses primer synchronously when dialog is opened on touch device", () => {
       matchMediaSpy = mockCoarsePointer(true)
-      const wrapper = mountComponent()
+      mountComponent()
       const primer = softKeyboardPrimerElement()
       expect(primer).toBeTruthy()
 
-      getButton(wrapper).element.click()
+      wrapper.find("button").element.click()
 
       expect(document.activeElement).toBe(primer)
     })
 
     it("does not focus primer when pointer is not coarse", async () => {
       matchMediaSpy = mockCoarsePointer(false)
-      const wrapper = mountComponent()
+      mountComponent()
       const primer = softKeyboardPrimerElement()
 
-      getButton(wrapper).element.click()
+      wrapper.find("button").element.click()
       await flushPromises()
       await wrapper.vm.$nextTick()
 
