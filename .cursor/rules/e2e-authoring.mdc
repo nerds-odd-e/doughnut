@@ -197,7 +197,7 @@ A scenario describes one fixed path. Prefer dumb automation: the path is visible
 - Do not rely on test order.
 - Do not use hardcoded waits.
 - Do not fire a user action that starts app-busy loading and then assert domain state without `waitUntilAppIsNotBusy()` (or a clearer user-visible success signal) first.
-- Do not skip error handling.
+- Do not silently swallow failures in steps or page objects (`error-handling.mdc`).
 - Do not mix different levels of abstraction in scenarios.
 - Do not ignore linting errors that appear in the terminal.
 - Do not add OCR or DOM text layers to production just to satisfy E2E; run OCR in Cypress Node tasks instead.

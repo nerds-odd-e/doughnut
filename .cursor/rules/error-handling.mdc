@@ -1,0 +1,29 @@
+---
+description: Never silently swallow failures; prefer unrepresentable invalid states, fail-visible, then deliberate catch
+alwaysApply: true
+---
+
+<objective>
+Never silently swallow failures. Prefer preventing them, then failing visibly,
+then enriching context, and only then catching for a deliberate outcome.
+</objective>
+
+<context>
+
+Prefer, in order:
+
+1. **Prevent** — make invalid states unrepresentable so the failure cannot arise.
+2. **Propagate** — leave the raw failure untouched so it fails visibly in tests
+   or production.
+3. **Enrich** — add context only when the raw failure is unclear or may go
+   unnoticed; preserve the original cause.
+4. **Catch** — only to deliberately recover, retry, compensate, or contain an
+   explicitly best-effort operation.
+
+</context>
+
+<guardrails>
+- NEVER catch merely to log, ignore, return a default, or continue in an
+  uncertain state
+- NEVER empty `catch` / bare catch that discards the failure
+</guardrails>

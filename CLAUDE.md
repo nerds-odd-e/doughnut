@@ -16,6 +16,15 @@ Planning lives under `.planning/` (GSD + local). Canonical coexistence:
 `.cursor/rules/gsd-coexistence.mdc`. Phase quality: `.cursor/rules/planning.mdc`.
 Legacy notes may remain under `ongoing/` — do not migrate unless asked.
 
+## Principles
+
+1. High cohesion — one concept, one place (`general.mdc`)
+2. Keep it simple — minimum code; no defensive programming (`error-handling.mdc`)
+3. Capability naming — no phase numbers in product artifacts
+4. Test observables via high-level entry points — not internal structure (`unit-testing.mdc`)
+5. Never silently swallow failures — prevent, propagate, enrich, then
+   deliberate catch (`error-handling.mdc`)
+
 ## Planning and phased delivery
 
 - **Layout (GSD-aligned):** `.planning/phases/NN-slug/`, `.planning/quick/NNN-slug/`, plus GSD `PROJECT` / `ROADMAP` / `STATE` / `codebase/`. See `planning.mdc` and `gsd-coexistence.mdc`.

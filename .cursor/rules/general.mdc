@@ -11,7 +11,7 @@ alwaysApply: true
 - For Cursor Cloud VM without Nix, use the `cloud-vm-setup` skill.
 - When deleting files, prefer `trash` from the Nix environment instead of `rm -f` or `rm -rf`.
 - Keep high cohesion: minimize duplication, keep one representation for each concept, and place related code together.
-- Keep changes simple. Do not add defensive layers unless observed behavior requires them.
+- Keep changes simple. Do not add defensive layers unless observed behavior requires them (failure policy: `error-handling.mdc`).
 - Unit tests use the "small test" style (stable boundary, data over mocks, focused assertions, concise `makeMe`) — always-applied `unit-testing.mdc`.
 - Name permanent artifacts by product capability, not development history.
 - Do not add comments or docs about past implementations in product code, tests, or permanent docs; code readers care about the current state.
