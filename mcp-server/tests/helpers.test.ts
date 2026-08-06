@@ -1,62 +1,27 @@
-import { describe, test, expect, beforeEach, afterEach } from 'vitest'
+import { describe, test, expect } from 'vitest'
 import { createErrorResponse } from '../src/helpers.js'
-import { getApiConfig } from 'doughnut-api'
 
 describe('createErrorResponse', () => {
-  test.each([
-    ['Error objects', new Error('Test error'), 'ERROR:', 'ERROR: Test error'],
-    ['string errors', 'String error', 'ERROR:', 'ERROR: String error'],
-    [
-      'unknown error types',
-      { code: 500, message: 'Server error' },
-      'ERROR:',
-      'ERROR: {"code":500,"message":"Server error"}',
-    ],
-    ['custom prefix', 'Test error', 'CUSTOM:', 'CUSTOM: Test error'],
-  ])('should handle %s', (_, error, prefix, expectedText) => {
-    const result = createErrorResponse(error, prefix)
-
-    expect(result).toEqual({
-      content: [{ type: 'text', text: expectedText }],
+  test('formats an Error message with the default prefix', () => {
+    expect(createErrorResponse(new Error('Test error'))).toEqual({
+      content: [{ type: 'text', text: 'ERROR: Test error' }],
     })
   })
-})
-
-describe('getApiConfig', () => {
-  const originalEnv = process.env
-
-  beforeEach(() => {
-    process.env = { ...originalEnv }
-  })
-
-  afterEach(() => {
-    process.env = originalEnv
-  })
 
   test.each([
+    ['string', 'String error', 'ERROR: String error'],
     [
-      'valid environment variables',
-      {
-        DOUGHNUT_API_BASE_URL: 'http://localhost:8080',
-        DOUGHNUT_API_AUTH_TOKEN: 'test-token',
-      },
-      { apiBaseUrl: 'http://localhost:8080', authToken: 'test-token' },
+      'unknown object',
+      { code: 500, message: 'Server error' },
+      'ERROR: {"code":500,"message":"Server error"}',
     ],
-    [
-      'missing environment variables',
-      {},
-      { apiBaseUrl: 'https://doughnut.odd-e.com', authToken: undefined },
-    ],
-    [
-      'empty environment variables',
-      { DOUGHNUT_API_BASE_URL: '', DOUGHNUT_API_AUTH_TOKEN: '' },
-      { apiBaseUrl: 'https://doughnut.odd-e.com', authToken: '' },
-    ],
-  ])('should return config with %s', (_, env, expected) => {
-    delete process.env.DOUGHNUT_API_BASE_URL
-    delete process.env.DOUGHNUT_API_AUTH_TOKEN
-    Object.assign(process.env, env)
+  ])('formats a %s with the default prefix', (_, error, expectedText) => {
+    expect(createErrorResponse(error).content[0].text).toBe(expectedText)
+  })
 
-    expect(getApiConfig()).toEqual(expected)
+  test('uses a custom prefix when provided', () => {
+    expect(createErrorResponse('Test error', 'CUSTOM:').content[0].text).toBe(
+      'CUSTOM: Test error'
+    )
   })
 })

@@ -14,8 +14,7 @@ describe('MCP tool registry', () => {
     for (const name of EXPECTED_TOOL_NAMES) {
       const tool = findTool(name)
       expect(tool.description).toBeTruthy()
-      expect(tool.inputSchema).toBeDefined()
-      expect(typeof tool.inputSchema).toBe('object')
+      expect(tool.inputSchema).toMatchObject({ type: expect.any(String) })
       expect(tool.handle).toBeTypeOf('function')
     }
   })
