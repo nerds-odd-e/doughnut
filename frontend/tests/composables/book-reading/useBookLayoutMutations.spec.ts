@@ -2,11 +2,11 @@ import { useBookLayoutMutations } from "@/composables/book-reading/useBookLayout
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
 import type { BookBlockFull, BookFull } from "@generated/doughnut-backend-api"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
-import helper, { wrapSdkResponse } from "@tests/helpers"
+import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
 import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
-import { afterEach, describe, expect, it, vi } from "vitest"
+import { afterEach, describe, expect, it } from "vitest"
 import { computed, defineComponent, ref } from "vue"
 
 function blockStub(
@@ -60,22 +60,15 @@ describe("useBookLayoutMutations", () => {
       .blocks([blockStub({ id: 1, depth: 0, title: "A" })])
       .please()
 
-    let resolveIndent: (
-      value: ReturnType<
-        typeof NotebookBooksController.changeBookBlockDepth
-      > extends Promise<infer R>
-        ? R
-        : never
-    ) => void = () => undefined
+    let resolveIndent: (value: BookFull) => void = () => undefined
 
-    vi.spyOn(
+    mockSdkServiceWithImplementation(
       NotebookBooksController,
-      "changeBookBlockDepth"
-    ).mockImplementation(
+      "changeBookBlockDepth",
       () =>
         new Promise((resolve) => {
           resolveIndent = resolve
-        }) as ReturnType<typeof NotebookBooksController.changeBookBlockDepth>
+        })
     )
 
     const wrapper = mountMutationsHarness(book)
@@ -87,12 +80,12 @@ describe("useBookLayoutMutations", () => {
     expect(loadingModal()).toBeTruthy()
     expect(document.body.textContent).toContain("Updating book layout…")
 
-    resolveIndent(
-      wrapSdkResponse({
-        ...book,
-        blocks: [{ id: 1, depth: 1, title: "A", contentLocators: [] }],
-      })
-    )
+    resolveIndent({
+      ...book,
+      blocks: [
+        { id: 1, depth: 1, title: "A", contentLocators: [], contentBlocks: [] },
+      ],
+    })
     await flushPromises()
 
     expect(loadingModal()).toBeNull()

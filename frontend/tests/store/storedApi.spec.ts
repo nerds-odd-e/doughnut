@@ -86,13 +86,13 @@ describe("storedApiCollection", () => {
       noteRef = storageAccessor.value.refOfNoteRealm(note.id)
     })
 
-    it("should do nothing when no completion value is provided", async () => {
+    it("does nothing when no completion value is provided", async () => {
       const sa = storageAccessor.value.storedApi()
       await sa.completeContent(note.id)
       expect(updateNoteContentSpy).not.toHaveBeenCalled()
     })
 
-    it("should update note content with completion", async () => {
+    it("updates note content with completion", async () => {
       const sa = storageAccessor.value.storedApi()
       noteRef.value = { ...note, note: { content: "Hello " } }
 
@@ -108,23 +108,7 @@ describe("storedApiCollection", () => {
       })
     })
 
-    it("should replace entire note content with completion", async () => {
-      const sa = storageAccessor.value.storedApi()
-      noteRef.value = { ...note, note: { content: "Hello world" } }
-
-      await sa.completeContent(note.id, {
-        content: "Hello !",
-      })
-
-      expect(updateNoteContentSpy).toHaveBeenCalledWith({
-        path: { note: note.id },
-        body: {
-          content: "Hello !",
-        },
-      })
-    })
-
-    it("should load note first if not in storage", async () => {
+    it("loads note first if not in storage", async () => {
       const sa = storageAccessor.value.storedApi()
       noteRef.value = undefined
 

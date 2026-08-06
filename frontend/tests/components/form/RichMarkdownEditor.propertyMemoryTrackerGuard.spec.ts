@@ -59,9 +59,7 @@ Workshop body.`
   })
 
   function mockNoteInfoWithPropertyTracker(key: string, id: number) {
-    const tracker = makeMe.aMemoryTracker.please()
-    tracker.id = id
-    tracker.propertyKey = key
+    const tracker = makeMe.aMemoryTracker.id(id).withPropertyKey(key).please()
     getNoteInfoSpy.mockResolvedValue(
       wrapSdkResponse(makeMe.aNoteRecallInfo.memoryTrackers([tracker]).please())
     )

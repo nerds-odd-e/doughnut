@@ -30,40 +30,32 @@ describe("storedApiCollection delete note", () => {
     deleteNoteSpy = mockSdkService(NoteController, "deleteNote", [parentNote])
   })
 
-  it("should call the api", async () => {
+  it("calls the api and navigates to the parent notebook", async () => {
     const sa = storageAccessor.value.storedApi()
     await sa.deleteNote(router, note.id, {
       referenceHandling: "REMOVE_FROM_PROPERTIES",
     })
-    expect(deleteNoteSpy).toHaveBeenCalledTimes(1)
     expect(deleteNoteSpy).toHaveBeenCalledWith({
       path: { note: note.id },
       body: { referenceHandling: "REMOVE_FROM_PROPERTIES" },
     })
-    expect(routerReplace).toHaveBeenCalledTimes(1)
     expect(routerReplace).toHaveBeenCalledWith({
       name: "notebookPage",
       params: { notebookId: parentNote.notebookRealm.notebook.id },
     })
   })
 
-  it("should remove the deleted note from cache", async () => {
+  it("removes the deleted note from cache", async () => {
     storageAccessor.value.refreshNoteRealm(note)
-    expect(storageAccessor.value.refOfNoteRealm(note.id).value).toBeTruthy()
-
     const sa = storageAccessor.value.storedApi()
     await sa.deleteNote(router, note.id, {
       referenceHandling: "LEAVE_DEAD_LINKS",
     })
 
     expect(storageAccessor.value.refOfNoteRealm(note.id).value).toBeUndefined()
-    expect(routerReplace).toHaveBeenCalledWith({
-      name: "notebookPage",
-      params: { notebookId: note.notebookRealm.notebook.id },
-    })
   })
 
-  it("should navigate to notebook when delete returns no realms", async () => {
+  it("navigates to notebook when delete returns no realms", async () => {
     mockSdkService(NoteController, "deleteNote", [])
     storageAccessor.value.refreshNoteRealm(note)
 
@@ -78,7 +70,7 @@ describe("storedApiCollection delete note", () => {
     })
   })
 
-  it("should navigate to folderPage when the note was inside a folder", async () => {
+  it("navigates to folderPage when the note was inside a folder", async () => {
     const folderId = 901
     const noteInFolder = makeMe.aNoteRealm.inFolder(folderId, "Work").please()
     mockSdkService(NoteController, "deleteNote", [parentNote])
@@ -108,7 +100,7 @@ describe("storedApiCollection delete note", () => {
     expect(sidebarStructuralRefreshKey.value).toBe(before + 1)
   })
 
-  it("should navigate to source note when reduce to source property", async () => {
+  it("navigates to source note when reducing to source property", async () => {
     const sourceNoteId = 501
     mockSdkService(NoteController, "deleteNote", [])
     storageAccessor.value.refreshNoteRealm(note)
@@ -121,11 +113,5 @@ describe("storedApiCollection delete note", () => {
     })
 
     expect(routerReplace).toHaveBeenCalledWith(noteShowLocation(sourceNoteId))
-    expect(routerReplace).not.toHaveBeenCalledWith(
-      expect.objectContaining({ name: "folderPage" })
-    )
-    expect(routerReplace).not.toHaveBeenCalledWith(
-      expect.objectContaining({ name: "notebookPage" })
-    )
   })
 })

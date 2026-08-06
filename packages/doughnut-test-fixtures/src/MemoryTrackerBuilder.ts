@@ -28,6 +28,11 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
     }
   }
 
+  id(value: number): MemoryTrackerBuilder {
+    this.data.id = value
+    return this
+  }
+
   withPropertyKey(propertyKey: string): MemoryTrackerBuilder {
     this.propertyKey = propertyKey
     return this

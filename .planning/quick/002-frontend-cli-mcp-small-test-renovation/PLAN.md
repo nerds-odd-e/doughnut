@@ -1,6 +1,6 @@
 # Frontend / CLI / MCP unit tests → "small test" style
 
-**Status:** in progress (Phases 1–5 done)
+**Status:** in progress (Phases 1–6 done)
 **Type:** test renovation (no product behavior change)  
 **Resume:** this `PLAN.md` progress log only — **do not edit** trunk `.planning/STATE.md` (parallel trunk-based work).
 
@@ -104,7 +104,7 @@ While iterating a single large frontend file, `pnpm frontend:test tests/path/to/
 - **Done when:** rubric applied; suite green.
 
 ### Phase 6 — Frontend: composables, models, store, managedApi, routes
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
 - **Files:**
   - `frontend/tests/composables/**`
@@ -114,7 +114,7 @@ While iterating a single large frontend file, `pnpm frontend:test tests/path/to/
   - `frontend/tests/routes/**`
   - `frontend/tests/storybook/**` if present
   - `frontend/tests/DoughnutApp.loadingThinBar.spec.ts` if present
-- **Verify:** `pnpm frontend:test`
+- **Verify:** `pnpm frontend:test` — green (259 files / 1684 tests).
 - **Done when:** rubric applied; suite green.
 
 ### Phase 7 — Frontend: components — form + commons
@@ -226,7 +226,8 @@ If a Behavior phase cannot express fixtures concisely: add a **Structure** sub-p
 | 3 | done | Ink shell / InteractiveCliApp / MainInteractivePrompt / guidanceList / useNotebookSlashCommand renovated; oversized suites split by capability; suite green |
 | 4 | done | Recall MCQ / spelling / just-review renovated; capability splits + shared helpers; suite green |
 | 5 | done | FE helpers/commons/utils/lib renovated; illicit AiReply mocks dropped; property-rows split; suite green |
-| 6–18 | planned | — |
+| 6 | done | FE composables/models/store/managedApi/routes renovated; MemoryTrackerBuilder.id; aiReplyState + audioProcessingScheduler capability splits; suite green |
+| 7–18 | planned | — |
 
 ---
 
@@ -240,3 +241,4 @@ If a Behavior phase cannot express fixtures concisely: add a **Structure** sub-p
 - Phase 3: Trimmed post-`waitFor*` re-asserts in InteractiveCliApp; makeMe for interactive recall-status due list; split oversized Ink suites by capability (`MainInteractivePrompt.*`, `guidanceListWindowInk` slash/numbered, addGmail vs lastEmail, useNotebook shell vs attach, useNotebookSlashCommand resolve vs picker) with shared testHelpers; MinerU subprocess mock retained for PDF attach; `mainInteractivePromptHistory` left as domain-stable pure contract.
 - Phase 4: Consolidated `startRecall` / `leaveRecallWithYnRe` / `RecallInkWaitHelpers` / `reLiteral` in `recallInteractiveShared`; MCQ split into answer/escape/contest/guidance + suite; spelling into answer/escape + suite; just-review already split — dropped post-construction `ancestorFolders` mutation (use `.inFolder`), unused `createdAt`/`updatedAt`, redundant asserts; mocks remain doughnut-api spies only.
 - Phase 5: Helpers have no specs (support only). Most utils/lib already pure-contract. Commons: removed unnecessary `AiReplyEventSource` mocks from Modal/PopButton (no import path); dropped PopButton autofocus re-cover of Modal; deleted usePopups listener-spy internals test; slimmed popButtonTestSupport. Utils: `NoteRealmBuilder.wikiTitles()` for relation reduce; split `noteContentPropertyRows` mutate vs validate (+ trim alias duplicates); dropped `questionStemWikiPlain` markdownizer re-cover. FullScreen/browser API mocks kept as true externals.
+- Phase 6: Most managedApi/routes/storybook/DoughnutApp already drove stable surfaces. Added `MemoryTrackerBuilder.id()`; dropped tracker post-construction mutation (also related form/notes helpers). Split oversized `aiReplyState` (content/toolCalls + support) and `audioProcessingScheduler` (flush/stop). Focused asserts in assimilation/store/deleteNote; pending SDK calls via `mockSdkServiceWithImplementation`. Kept popup/toast/router/timezone mocks as side-effect boundaries for composable APIs (not illicit internals).

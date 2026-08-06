@@ -22,6 +22,18 @@ function findRouteRecordByName(
   return
 }
 
+function expectNoteShowProps(
+  route: { params: Record<string, unknown> },
+  noteId: number
+) {
+  const meta = findRouteRecordByName(routes, "noteShow")
+  expect(meta).toBeDefined()
+  expect(typeof meta!.props).toBe("function")
+  expect((meta!.props as (r: typeof route) => unknown)(route)).toEqual({
+    noteId,
+  })
+}
+
 /** Absorbs otherwise-unmatched URLs so legacy-path tests do not trigger Vue Router warnings. */
 const testCatchAll: RouteRecordRaw = {
   path: "/:pathMatch(.*)*",
@@ -40,20 +52,13 @@ describe("routes", () => {
   })
 
   describe("noteShow route", () => {
-    it("should match /n:noteId and pass noteId prop", async () => {
+    it("matches /n:noteId and passes noteId prop", async () => {
       await router.push("/n123")
 
       const route = router.currentRoute.value
       expect(route.name).toBe("noteShow")
       expect(route.params.noteId).toBe("123")
-
-      const meta = findRouteRecordByName(routes, "noteShow")
-      expect(meta).toBeDefined()
-      if (meta && typeof meta.props === "function") {
-        expect(meta.props(route)).toEqual({
-          noteId: 123,
-        })
-      }
+      expectNoteShowProps(route, 123)
     })
 
     it("redirects legacy /d/n/:noteId to /n:noteId", async () => {
@@ -74,7 +79,7 @@ describe("routes", () => {
       expect(route.params.noteId).toBe("888")
     })
 
-    it("should navigate by name with noteId param", async () => {
+    it("navigates by name with noteId param", async () => {
       await router.push({
         name: "noteShow",
         params: {
@@ -85,13 +90,7 @@ describe("routes", () => {
       const route = router.currentRoute.value
       expect(route.name).toBe("noteShow")
       expect(route.params.noteId).toBe("456")
-      const meta = findRouteRecordByName(routes, "noteShow")
-      expect(meta).toBeDefined()
-      if (meta && typeof meta.props === "function") {
-        expect(meta.props(route)).toEqual({
-          noteId: 456,
-        })
-      }
+      expectNoteShowProps(route, 456)
     })
 
     it("does not absorb legacy slash paths under notebooks", async () => {
