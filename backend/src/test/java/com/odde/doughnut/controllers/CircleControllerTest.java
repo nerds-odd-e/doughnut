@@ -79,6 +79,22 @@ class CircleControllerTest extends ControllerTestBase {
               response.notebook().getId()),
           empty());
     }
+
+    @Test
+    void assignsToCircleGroupWhenNotebookGroupIdGiven() throws UnexpectedNoAccessRightException {
+      User user = currentUser.getUser();
+      Circle circle = makeMe.aCircle().hasMember(user).please();
+      NotebookGroup group =
+          notebookGroupService.createGroup(user, circle.getOwnership(), "Circle create group");
+      NotebookCreationRequest noteCreation = new NotebookCreationRequest();
+      noteCreation.setNewTitle("In Circle Group");
+      noteCreation.setNotebookGroupId(group.getId());
+
+      NotebookRealm response = controller.createNotebookInCircle(circle, noteCreation);
+
+      Notebook nb = notebookRepository.findById(response.notebook().getId()).orElseThrow();
+      assertThat(nb.getNotebookGroup().getId(), equalTo(group.getId()));
+    }
   }
 
   @Nested

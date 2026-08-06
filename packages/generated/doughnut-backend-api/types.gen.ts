@@ -587,6 +587,7 @@ export type NotebookCreationRequest = {
     newTitle: string;
     referenceHandling?: 'UPDATE_VISIBLE_TEXT' | 'KEEP_VISIBLE_TEXT';
     description?: string;
+    notebookGroupId?: number;
 };
 
 export type CreateNotebookGroupRequest = {

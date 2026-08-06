@@ -15,6 +15,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.services.NotebookCatalogService;
+import com.odde.doughnut.services.NotebookGroupService;
 import com.odde.doughnut.services.NotebookService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -38,6 +39,7 @@ class CircleController {
   private final NotebookGroupRepository notebookGroupRepository;
   private final NotebookRepository notebookRepository;
   private final NotebookCatalogService notebookCatalogService;
+  private final NotebookGroupService notebookGroupService;
 
   public CircleController(
       CircleService circleService,
@@ -46,7 +48,8 @@ class CircleController {
       AuthorizationService authorizationService,
       NotebookGroupRepository notebookGroupRepository,
       NotebookRepository notebookRepository,
-      NotebookCatalogService notebookCatalogService) {
+      NotebookCatalogService notebookCatalogService,
+      NotebookGroupService notebookGroupService) {
     this.circleService = circleService;
     this.notebookService = notebookService;
     this.testabilitySettings = testabilitySettings;
@@ -54,6 +57,7 @@ class CircleController {
     this.notebookGroupRepository = notebookGroupRepository;
     this.notebookRepository = notebookRepository;
     this.notebookCatalogService = notebookCatalogService;
+    this.notebookGroupService = notebookGroupService;
   }
 
   @GetMapping("/{circle}")
@@ -124,6 +128,8 @@ class CircleController {
             testabilitySettings.getCurrentUTCTimestamp(),
             noteCreation.getNewTitle(),
             noteCreation.getDescription());
+    notebookGroupService.assignNotebookToGroupById(
+        user, notebook, noteCreation.getNotebookGroupId());
     return notebookCatalogService.notebookRealmFor(notebook, user);
   }
 }

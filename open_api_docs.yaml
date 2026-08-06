@@ -4207,6 +4207,9 @@ components:
           type: string
           maxLength: 500
           minLength: 0
+        notebookGroupId:
+          type: integer
+          format: int32
       required:
       - newTitle
     CreateNotebookGroupRequest:

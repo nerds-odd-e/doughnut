@@ -5,17 +5,23 @@ import com.odde.doughnut.entities.NotebookGroup;
 import com.odde.doughnut.entities.Ownership;
 import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.NotebookGroupRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class NotebookGroupService {
 
   private final EntityPersister entityPersister;
+  private final NotebookGroupRepository notebookGroupRepository;
 
-  public NotebookGroupService(EntityPersister entityPersister) {
+  public NotebookGroupService(
+      EntityPersister entityPersister, NotebookGroupRepository notebookGroupRepository) {
     this.entityPersister = entityPersister;
+    this.notebookGroupRepository = notebookGroupRepository;
   }
 
   public NotebookGroup createGroup(User actor, Ownership ownership, String name)
@@ -41,6 +47,18 @@ public class NotebookGroupService {
     }
     notebook.setNotebookGroup(group);
     entityPersister.save(notebook);
+  }
+
+  public void assignNotebookToGroupById(User actor, Notebook notebook, Integer notebookGroupId)
+      throws UnexpectedNoAccessRightException {
+    if (notebookGroupId == null) {
+      return;
+    }
+    NotebookGroup group =
+        notebookGroupRepository
+            .findById(notebookGroupId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    assignNotebookToGroup(actor, notebook, group);
   }
 
   public void clearNotebookGroup(User actor, Notebook notebook)

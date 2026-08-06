@@ -125,7 +125,8 @@ class NotebookController {
 
   @PostMapping({"/create"})
   @Transactional
-  public NotebookRealm createNotebook(@Valid @RequestBody NotebookCreationRequest noteCreation) {
+  public NotebookRealm createNotebook(@Valid @RequestBody NotebookCreationRequest noteCreation)
+      throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
     User userEntity = authorizationService.getCurrentUser();
     Notebook notebook =
@@ -135,6 +136,8 @@ class NotebookController {
             testabilitySettings.getCurrentUTCTimestamp(),
             noteCreation.getNewTitle(),
             noteCreation.getDescription());
+    notebookGroupService.assignNotebookToGroupById(
+        userEntity, notebook, noteCreation.getNotebookGroupId());
     return notebookCatalogService.notebookRealmFor(notebook, userEntity);
   }
 
@@ -279,11 +282,7 @@ class NotebookController {
     if (request.getNotebookGroupId() == null) {
       notebookGroupService.clearNotebookGroup(user, notebook);
     } else {
-      NotebookGroup group =
-          notebookGroupRepository
-              .findById(request.getNotebookGroupId())
-              .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-      notebookGroupService.assignNotebookToGroup(user, notebook, group);
+      notebookGroupService.assignNotebookToGroupById(user, notebook, request.getNotebookGroupId());
     }
     return notebook;
   }

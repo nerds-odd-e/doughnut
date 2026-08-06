@@ -10,4 +10,6 @@ public class NotebookCreationRequest extends NoteUpdateTitleDTO {
 
   @Size(max = 500)
   private String description;
+
+  private Integer notebookGroupId;
 }
