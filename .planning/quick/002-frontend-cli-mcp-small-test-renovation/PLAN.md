@@ -1,6 +1,6 @@
 # Frontend / CLI / MCP unit tests → "small test" style
 
-**Status:** in progress (Phases 1–14 done)
+**Status:** in progress (Phases 1–15 done)
 **Type:** test renovation (no product behavior change)  
 **Resume:** this `PLAN.md` progress log only — **do not edit** trunk `.planning/STATE.md` (parallel trunk-based work).
 
@@ -176,10 +176,10 @@ While iterating a single large frontend file, `pnpm frontend:test tests/path/to/
 - **Done when:** rubric applied; suite green.
 
 ### Phase 15 — Frontend: pages — NoteShow + assimilation / conversation panels
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
 - **Files:** `NoteShowPage.spec.ts`, `NoteShowPageAssimilationPanel.spec.ts`, `NoteShowPageConversation.spec.ts`
-- **Verify:** `pnpm frontend:test`
+- **Verify:** `pnpm frontend:test` — green (292 files / 1670 tests).
 - **Done when:** rubric applied; suite green.
 
 ### Phase 16 — Frontend: pages — Recall + MemoryTracker
@@ -235,7 +235,8 @@ If a Behavior phase cannot express fixtures concisely: add a **Structure** sub-p
 | 12 | done | FE notes audio + Wikidata renovated; NoteAudioTools capability splits (recording/device/processing/title/advanced) + mocks/support; WikidataAssociationDialog search/titleActions/openLink + shared lifecycle; appendAlias → utils; suite green |
 | 13 | done | FE links + toolbars renovated; MainMenu nav/assimilate/recall/resume + NoteUndoButton visibility/confirmation/actions splits; shared mocks/support; focused asserts; suite green |
 | 14 | done | FE notebooks/catalog/folder/circle/bazaar/home/settings/misc pages renovated; NotebookBuilder.title; notebooksPageTestSupport; focused asserts; suite green |
-| 15–18 | planned | — |
+| 15 | done | FE NoteShow + assimilation/conversation panels renovated; noteShowPageTestSupport mount/DOM helpers; render + router.push for conversation query; focused asserts; suite green |
+| 16–18 | planned | — |
 
 ---
 
@@ -258,3 +259,4 @@ If a Behavior phase cannot express fixtures concisely: add a **Structure** sub-p
 - Phase 12: Split oversized `NoteAudioTools` (~1021) into recording / deviceSelection / processing / titleSuggestion / advancedOptions + `noteAudioToolsMocks` / `noteAudioToolsTestSupport` (`audioChunk`/`midSpeechChunk`/`processAudio`). Kept audioRecorder/wakeLocker/recorderWorklet mocks as hardware side-effect boundaries (same Phase 6/10 pattern); per-spec `vi.mock` required for Vitest browser-mode. Focused recording asserts (canonical controls; merged start+Web Audio). Split `WikidataAssociationDialog` into search / titleActions / openLink + shared lifecycle helper; moved `appendAliasToNoteContent` to `utils/wikidataTitleActions.spec.ts` (pure util). Slimmed SearchByLabel button-style table. `NoteNewForm.wikidata` already renovated in Phase 10 — left alone.
 - Phase 13: Split oversized `MainMenu` (~667) into nav / assimilate / recall / resume + `mainMenuMocks` / `mainMenuTestSupport` (per-file `createMemoryHistory` router; keep `useRecallData` / `useGoToNextAssimilation` / AiReply mocks as Phase 8 side-effect boundaries). Split `NoteUndoButton` (~434) into visibility / confirmation / actions; router mock must live in lean `noteUndoButtonMocks` (importing support from `vi.mock` deadlocks Vitest). AddRelationship: DOM radio select via `[id="…"]` (spaces in relation labels); sibling navigateOnSuccess asserts delta only. Dropped redundant Breadcrumb ancestorFolders re-cover; renamed GlobalBar undo-absence test. SearchDialog / HorizontalMenu / InsertWikiLink already rubric-compliant.
 - Phase 14: Added `NotebookBuilder.title()`; shared `notebooksPageTestSupport` (`mockMyNotebooks` / `mountNotebooksPage` / `emitNotebookUpdated` / `catalogHeadingTexts`). NotebooksPageUpdates*: DOM heading asserts + emit via NotebooksPageView (NotebookButtons no longer emits notebook-updated). Dropped getByRole (title/text); RecentSettingsTab uses real router + DOM tab panels; MessageCenter push via router spy; FailureReport/RecallStats focused asserts; name edit via `[data-test="notebook-page-name-input"]` innerText; HomePage dropped GlobalBar stub. FolderPage* / NotebookPageView / AccessTokens / General / Bazaar already rubric-compliant — left largely untouched. RouterLink group-nav still uses `findComponent` props (`href` stays `#` in VTU).
+- Phase 15: Shared `noteShowPageTestSupport` (`setupNoteShowPageMocks` / assimilation+conversation setups / `renderNoteShowPage` / `renderNoteShowPageWithConversation` / DOM `*El` helpers). Conversation visibility needs real `router.push` (not `currentRoute` `$route` mock — `useRoute().query`). Assimilation: `render()` + `assimilateButtonSelector` over mount/`wrapper.find`. Conversation: focused maximize toggle vs close-after-maximize delta (drop route name/params re-assert). NoteShow load: single showNote spy from beforeEach.

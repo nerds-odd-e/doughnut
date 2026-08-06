@@ -1,41 +1,27 @@
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
-import NoteShowPageWithNotebookSidebarLayout from "@tests/fixtures/NoteShowPageWithNotebookSidebarLayout.vue"
 import { within } from "@testing-library/vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import helper, {
-  mockNotebookGetForNoteRealm,
-  mockSdkService,
-} from "@tests/helpers"
-import { noteShowLocation } from "@/routes/noteShowLocation"
-import { createNoteShowPageRouter } from "@tests/pages/noteShowPageTestSupport"
-import { flushPromises } from "@vue/test-utils"
+import { mockNotebookGetForNoteRealm, mockSdkService } from "@tests/helpers"
+import {
+  createNoteShowPageRouter,
+  renderNoteShowPage,
+} from "@tests/pages/noteShowPageTestSupport"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
 describe("note show page", () => {
   const noteRealm = makeMe.aNoteRealm.please()
   let router: ReturnType<typeof createNoteShowPageRouter>
+  let showNoteSpy: ReturnType<typeof mockSdkService>
 
   beforeEach(() => {
     router = createNoteShowPageRouter()
-    mockSdkService(NoteController, "showNote", noteRealm)
-    mockNotebookGetForNoteRealm(noteRealm, {
-      id: 101,
-      name: "a circle",
-    })
+    showNoteSpy = mockSdkService(NoteController, "showNote", noteRealm)
+    mockNotebookGetForNoteRealm(noteRealm, { id: 101, name: "a circle" })
   })
 
   it("loads note by id from route", async () => {
-    const showNoteSpy = mockSdkService(NoteController, "showNote", noteRealm)
+    await renderNoteShowPage(router, noteRealm.id)
 
-    helper
-      .component(NoteShowPageWithNotebookSidebarLayout)
-      .withCleanStorage()
-      .withProps({ noteId: noteRealm.id })
-      .withRouter(router)
-      .currentRoute(noteShowLocation(noteRealm.id))
-      .render()
-
-    await flushPromises()
     await vi.waitFor(() => {
       const main = document.getElementById("main-note-content")
       expect(main).not.toBeNull()

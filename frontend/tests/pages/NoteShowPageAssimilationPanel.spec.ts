@@ -1,15 +1,11 @@
 import { useAssimilationView } from "@/composables/useAssimilationView"
-import NoteShowPageWithNotebookSidebarLayout from "@tests/fixtures/NoteShowPageWithNotebookSidebarLayout.vue"
-import makeMe from "doughnut-test-fixtures/makeMe"
-import helper from "@tests/helpers"
-import { noteShowLocation } from "@/routes/noteShowLocation"
 import {
   createNoteShowPageRouter,
+  renderNoteShowPage,
   setupNoteShowPageAssimilationPanelMocks,
   withStubbedInnerWidth,
 } from "@tests/pages/noteShowPageTestSupport"
 import { assimilateButtonSelector } from "@tests/components/recall/assimilationPanelTestSupport"
-import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
 describe("note show page inline assimilation panel", () => {
@@ -24,17 +20,7 @@ describe("note show page inline assimilation panel", () => {
   it("keeps assimilation settings within main column when sidebar is open", async () => {
     await withStubbedInnerWidth(1024, async () => {
       useAssimilationView().openForNote(noteRealm.id)
-
-      helper
-        .component(NoteShowPageWithNotebookSidebarLayout)
-        .withCurrentUser(makeMe.aUser.please())
-        .withCleanStorage()
-        .withProps({ noteId: noteRealm.id })
-        .withRouter(router)
-        .currentRoute(noteShowLocation(noteRealm.id))
-        .render()
-
-      await flushPromises()
+      await renderNoteShowPage(router, noteRealm.id)
 
       const settingsFooter = document.querySelector(
         'footer[aria-label="Assimilation settings"]'
@@ -51,36 +37,18 @@ describe("note show page inline assimilation panel", () => {
 
   it("renders assimilate button when assimilation settings are on", async () => {
     useAssimilationView().openForNote(noteRealm.id)
+    await renderNoteShowPage(router, noteRealm.id)
 
-    const wrapper = helper
-      .component(NoteShowPageWithNotebookSidebarLayout)
-      .withCurrentUser(makeMe.aUser.please())
-      .withCleanStorage()
-      .withProps({ noteId: noteRealm.id })
-      .withRouter(router)
-      .currentRoute(noteShowLocation(noteRealm.id))
-      .mount()
-
-    await flushPromises()
     await vi.waitFor(() => {
-      expect(wrapper.find(assimilateButtonSelector).exists()).toBe(true)
+      expect(document.querySelector(assimilateButtonSelector)).not.toBeNull()
     })
   })
 
   it("does not render assimilation panel when settings are off", async () => {
-    helper
-      .component(NoteShowPageWithNotebookSidebarLayout)
-      .withCurrentUser(makeMe.aUser.please())
-      .withCleanStorage()
-      .withProps({ noteId: noteRealm.id })
-      .withRouter(router)
-      .currentRoute(noteShowLocation(noteRealm.id))
-      .render()
+    await renderNoteShowPage(router, noteRealm.id)
 
-    await flushPromises()
     await vi.waitFor(() => {
-      const main = document.getElementById("main-note-content")
-      expect(main).not.toBeNull()
+      expect(document.getElementById("main-note-content")).not.toBeNull()
     })
 
     expect(document.querySelector(assimilateButtonSelector)).toBeNull()

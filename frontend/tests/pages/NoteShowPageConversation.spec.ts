@@ -1,118 +1,64 @@
 import {
-  ConversationMessageController,
-  NoteController,
-} from "@generated/doughnut-backend-api/sdk.gen"
-import NoteShowPageWithNotebookSidebarLayout from "@tests/fixtures/NoteShowPageWithNotebookSidebarLayout.vue"
-import makeMe from "doughnut-test-fixtures/makeMe"
-import helper, {
-  mockNotebookGetForNoteRealm,
-  mockSdkService,
-} from "@tests/helpers"
-import { createNoteShowPageRouter } from "@tests/pages/noteShowPageTestSupport"
+  closeConversationButtonEl,
+  conversationContainerEl,
+  conversationWrapperEl,
+  createNoteShowPageRouter,
+  noteContentWrapperEl,
+  renderNoteShowPageWithConversation,
+  setupNoteShowPageConversationMocks,
+  toggleMaximizeButtonEl,
+} from "@tests/pages/noteShowPageTestSupport"
 import { flushPromises } from "@vue/test-utils"
-import { beforeEach, describe, expect, it } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 
 describe("note show page conversation", () => {
-  const note = makeMe.aNoteRealm.please()
   let router: ReturnType<typeof createNoteShowPageRouter>
+  let noteId: number
 
   beforeEach(() => {
     router = createNoteShowPageRouter()
-    mockSdkService(NoteController, "showNote", note)
-    mockSdkService(
-      ConversationMessageController,
-      "getConversationsAboutNote",
-      []
-    )
-    mockNotebookGetForNoteRealm(note)
+    noteId = setupNoteShowPageConversationMocks().id
   })
 
-  it("should maximize conversation when maximize button is clicked", async () => {
-    const wrapper = helper
-      .component(NoteShowPageWithNotebookSidebarLayout)
-      .withCurrentUser(makeMe.aUser.please())
-      .withCleanStorage()
-      .withProps({
-        noteId: note.id,
-      })
-      .withRouter(router)
-      .mount()
+  it("maximizes and restores note content when maximize is toggled", async () => {
+    await renderNoteShowPageWithConversation(router, noteId)
 
-    await flushPromises()
-
-    await router.push({
-      name: "noteShow",
-      params: {
-        noteId: String(note.id),
-      },
-      query: { conversation: "true" },
+    await vi.waitFor(() => {
+      expect(toggleMaximizeButtonEl()).not.toBeNull()
     })
+
+    toggleMaximizeButtonEl()!.click()
     await flushPromises()
+    expect(noteContentWrapperEl()).toBeNull()
 
-    await wrapper.find('[aria-label="Toggle maximize"]').trigger("click")
-    expect(wrapper.find(".note-content-wrapper").exists()).toBe(false)
-
-    await wrapper.find('[aria-label="Toggle maximize"]').trigger("click")
-    expect(wrapper.find(".note-content-wrapper").exists()).toBe(true)
+    toggleMaximizeButtonEl()!.click()
+    await flushPromises()
+    expect(noteContentWrapperEl()).not.toBeNull()
   })
 
-  it("should restore maximized state before closing conversation", async () => {
-    const wrapper = helper
-      .component(NoteShowPageWithNotebookSidebarLayout)
-      .withCurrentUser(makeMe.aUser.please())
-      .withCleanStorage()
-      .withProps({
-        noteId: note.id,
-      })
-      .withRouter(router)
-      .mount()
+  it("restores note content and clears conversation query on close", async () => {
+    await renderNoteShowPageWithConversation(router, noteId)
 
-    await flushPromises()
-
-    await router.push({
-      name: "noteShow",
-      params: {
-        noteId: String(note.id),
-      },
-      query: { conversation: "true" },
+    await vi.waitFor(() => {
+      expect(toggleMaximizeButtonEl()).not.toBeNull()
     })
+
+    toggleMaximizeButtonEl()!.click()
     await flushPromises()
 
-    await wrapper.find('[aria-label="Toggle maximize"]').trigger("click")
-    expect(wrapper.find(".note-content-wrapper").exists()).toBe(false)
-
-    await wrapper.find('[aria-label="Close dialog"]').trigger("click")
+    closeConversationButtonEl()!.click()
     await flushPromises()
 
-    expect(router.currentRoute.value.name).toBe("noteShow")
-    expect(router.currentRoute.value.params.noteId).toBe(String(note.id))
     expect(router.currentRoute.value.query.conversation).toBeUndefined()
-    expect(wrapper.find(".note-content-wrapper").exists()).toBe(true)
-    expect(wrapper.find(".conversation-container").exists()).toBe(false)
+    expect(noteContentWrapperEl()).not.toBeNull()
+    expect(conversationContainerEl()).toBeNull()
   })
 
-  it("should open conversation when URL has conversation=true", async () => {
-    router.push({
-      name: "noteShow",
-      params: {
-        noteId: String(note.id),
-      },
-      query: { conversation: "true" },
+  it("opens conversation when URL has conversation=true", async () => {
+    await renderNoteShowPageWithConversation(router, noteId)
+
+    await vi.waitFor(() => {
+      expect(conversationWrapperEl()).not.toBeNull()
     })
-    await flushPromises()
-
-    const wrapper = helper
-      .component(NoteShowPageWithNotebookSidebarLayout)
-      .withCurrentUser(makeMe.aUser.please())
-      .withCleanStorage()
-      .withProps({
-        noteId: note.id,
-      })
-      .withRouter(router)
-      .mount()
-
-    await flushPromises()
-
-    expect(wrapper.find(".conversation-wrapper").exists()).toBe(true)
   })
 })
