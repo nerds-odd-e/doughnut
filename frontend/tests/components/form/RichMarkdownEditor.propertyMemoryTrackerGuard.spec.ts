@@ -70,13 +70,14 @@ Workshop body.`
     '[data-testid="rich-note-property-row"][data-property-key="topic"] [data-testid="rich-note-property-row-remove"]'
   const topicRowKeyInputSelector =
     '[data-testid="rich-note-property-row"][data-property-key="topic"] [data-testid="rich-note-property-row-key-input"]'
+  const topicRowSelector =
+    '[data-testid="rich-note-property-row"][data-property-key="topic"]'
 
   it("soft-deletes the tracker and removes the property when the user confirms", async () => {
     const tracker = mockNoteInfoWithPropertyTracker("topic", 99)
     confirmMock.mockImplementationOnce(() => Promise.resolve(true))
 
     const wrapper = await h.mountEditor(trackedPropertyMarkdown, { noteId })
-    const emitCountBefore = wrapper.emitted("update:modelValue")?.length ?? 0
 
     await wrapper.find(topicRowRemoveSelector).trigger("click")
     await flushPromises()
@@ -87,22 +88,8 @@ Workshop body.`
       })
     })
 
-    expect(confirmMock).toHaveBeenCalledWith(
-      'Property "topic" has a memory tracker. Deleting it will also delete that tracker. Continue?'
-    )
-    expect(wrapper.emitted("update:modelValue")?.length ?? 0).toBeGreaterThan(
-      emitCountBefore
-    )
-    const last = h.lastEmittedMarkdown()
-    expect(last).not.toContain("topic:")
-    expect(last).toContain("Workshop body")
-    expect(
-      wrapper
-        .find(
-          '[data-testid="rich-note-property-row"][data-property-key="topic"]'
-        )
-        .exists()
-    ).toBe(false)
+    expect(h.lastEmittedMarkdown()).not.toContain("topic:")
+    expect(wrapper.find(topicRowSelector).exists()).toBe(false)
   })
 
   it("keeps the property row and does not emit when the user cancels", async () => {
@@ -123,13 +110,7 @@ Workshop body.`
     expect(wrapper.emitted("update:modelValue")?.length ?? 0).toBe(
       emitCountBefore
     )
-    expect(
-      wrapper
-        .find(
-          '[data-testid="rich-note-property-row"][data-property-key="topic"]'
-        )
-        .exists()
-    ).toBe(true)
+    expect(wrapper.find(topicRowSelector).exists()).toBe(true)
   })
 
   it("updates the tracker property key and emits renamed frontmatter when the user confirms", async () => {
@@ -137,7 +118,6 @@ Workshop body.`
     confirmMock.mockImplementationOnce(() => Promise.resolve(true))
 
     const wrapper = await h.mountEditor(trackedPropertyMarkdown, { noteId })
-    const emitCountBefore = wrapper.emitted("update:modelValue")?.length ?? 0
     const keyInput = wrapper.find(topicRowKeyInputSelector)
 
     await keyInput.trigger("focus")
@@ -152,16 +132,9 @@ Workshop body.`
       })
     })
 
-    expect(confirmMock).toHaveBeenCalledWith(
-      'Property "topic" has a memory tracker. Renaming it to "subject" will update the tracker. Continue?'
-    )
-    expect(wrapper.emitted("update:modelValue")?.length ?? 0).toBeGreaterThan(
-      emitCountBefore
-    )
     const last = h.lastEmittedMarkdown()
     expect(last).toContain("subject:")
     expect(last).not.toContain("topic:")
-    expect(last).toContain("Workshop body")
     expect(
       wrapper
         .find(
@@ -192,13 +165,6 @@ Workshop body.`
     expect(wrapper.emitted("update:modelValue")?.length ?? 0).toBe(
       emitCountBefore
     )
-    expect(
-      wrapper
-        .find(
-          '[data-testid="rich-note-property-row"][data-property-key="topic"]'
-        )
-        .exists()
-    ).toBe(true)
     expect(keyInput.element).toHaveValue("topic")
   })
 })

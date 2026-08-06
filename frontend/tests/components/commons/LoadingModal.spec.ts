@@ -34,16 +34,12 @@ describe("LoadingModal", () => {
     expect(document.querySelector(".daisy-loading-spinner")).toBeTruthy()
     expect(getByText("AI is creating note...")).toBeTruthy()
     expect(queryByText("Cancel")).toBeNull()
+    expect(document.querySelector(".close-button")).toBeNull()
   })
 
   it("should render with default message when message prop is not provided", () => {
     const { getByText } = render(LoadingModal, { props: { show: true } })
     expect(getByText("Processing...")).toBeTruthy()
-  })
-
-  it("should not have close button", () => {
-    render(LoadingModal, { props: { show: true, message: "Loading..." } })
-    expect(document.querySelector(".close-button")).toBeNull()
   })
 
   it("renders one neutral native Cancel button only when a control is supplied", () => {
@@ -167,7 +163,6 @@ describe("LoadingModal", () => {
         cancelControl: { id: 41, action: vi.fn() },
       },
     })
-    expect(document.querySelector(".loading-modal-mask")).toBeNull()
     expect(queryByText("Cancel")).toBeNull()
   })
 

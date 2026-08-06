@@ -21,10 +21,34 @@ export function createRichMarkdownEditorTestHarness() {
     return emitted![emitted!.length - 1]![0] as string
   }
 
+  function lastEmittedPasteComplete(): string {
+    const emitted = wrapper.emitted("pasteComplete")
+    expect(emitted?.length).toBeGreaterThan(0)
+    return emitted![emitted!.length - 1]![0] as string
+  }
+
+  function quillComponent() {
+    return wrapper.findComponent({ name: "QuillEditor" })
+  }
+
   function quillEditorEl(): HTMLElement {
-    return wrapper
-      .findComponent({ name: "QuillEditor" })
-      .vm.$el.querySelector(".ql-editor") as HTMLElement
+    return quillComponent().vm.$el.querySelector(".ql-editor") as HTMLElement
+  }
+
+  function quillModelHtml(): string {
+    return String(quillComponent().props("modelValue"))
+  }
+
+  function quillReadonly(): boolean {
+    return Boolean(quillComponent().props("readonly"))
+  }
+
+  function emitQuillModelValue(html: string) {
+    quillComponent().vm.$emit("update:modelValue", html)
+  }
+
+  function emitQuillPasteComplete(html: string) {
+    quillComponent().vm.$emit("pasteComplete", html)
   }
 
   async function dispatchPasteHtmlToQuill(html: string) {
@@ -110,7 +134,12 @@ export function createRichMarkdownEditorTestHarness() {
     cleanup,
     setWikiPropertyValueField,
     lastEmittedMarkdown,
+    lastEmittedPasteComplete,
     quillEditorEl,
+    quillModelHtml,
+    quillReadonly,
+    emitQuillModelValue,
+    emitQuillPasteComplete,
     dispatchPasteHtmlToQuill,
     tapAddProperty,
     pointerdownPropertyValueField,

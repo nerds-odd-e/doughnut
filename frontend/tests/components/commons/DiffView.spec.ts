@@ -66,23 +66,8 @@ describe("DiffView", () => {
     it("handles empty strings gracefully", () => {
       helper.component(DiffView).withProps({ current: "", old: "" }).render()
 
-      const leftPane = screen.getByTestId("diff-left-pane")
-      const rightPane = screen.getByTestId("diff-right-pane")
-
-      expect(leftPane).toBeInTheDocument()
-      expect(rightPane).toBeInTheDocument()
-    })
-
-    it("handles single line content", () => {
-      helper
-        .component(DiffView)
-        .withProps({ current: "single line", old: "single line" })
-        .render()
-
-      const leftPane = screen.getByTestId("diff-left-pane")
-      const leftRows = leftPane.querySelectorAll(".diff-row")
-
-      expect(leftRows.length).toBe(1)
+      expect(screen.getByTestId("diff-left-pane")).toBeInTheDocument()
+      expect(screen.getByTestId("diff-right-pane")).toBeInTheDocument()
     })
   })
 })

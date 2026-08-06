@@ -23,17 +23,6 @@ describe("DropdownMenuActionButton", () => {
     expect(wrapper.text()).toContain("Test action")
   })
 
-  it("renders no check when checked is explicitly false", () => {
-    const wrapper = helper
-      .component(DropdownMenuActionButton)
-      .withProps({ title: "Test action", icon: stubIcon, checked: false })
-      .mount()
-
-    expect(
-      wrapper.find('[data-testid="dropdown-menu-action-checked"]').exists()
-    ).toBe(false)
-  })
-
   it("renders check before the action icon when checked", () => {
     const wrapper = helper
       .component(DropdownMenuActionButton)

@@ -1,6 +1,6 @@
 # Frontend / CLI / MCP unit tests → "small test" style
 
-**Status:** in progress (Phases 1–6 done)
+**Status:** in progress (Phases 1–7 done)
 **Type:** test renovation (no product behavior change)  
 **Resume:** this `PLAN.md` progress log only — **do not edit** trunk `.planning/STATE.md` (parallel trunk-based work).
 
@@ -118,10 +118,10 @@ While iterating a single large frontend file, `pnpm frontend:test tests/path/to/
 - **Done when:** rubric applied; suite green.
 
 ### Phase 7 — Frontend: components — form + commons
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
 - **Files:** `frontend/tests/components/form/**`, `frontend/tests/components/commons/**`
-- **Verify:** `pnpm frontend:test`
+- **Verify:** `pnpm frontend:test` — green (263 files / 1681 tests).
 - **Done when:** rubric applied; suite green.
 
 ### Phase 8 — Frontend: components — recall (+ recallStats)
@@ -227,7 +227,8 @@ If a Behavior phase cannot express fixtures concisely: add a **Structure** sub-p
 | 4 | done | Recall MCQ / spelling / just-review renovated; capability splits + shared helpers; suite green |
 | 5 | done | FE helpers/commons/utils/lib renovated; illicit AiReply mocks dropped; property-rows split; suite green |
 | 6 | done | FE composables/models/store/managedApi/routes renovated; MemoryTrackerBuilder.id; aiReplyState + audioProcessingScheduler capability splits; suite green |
-| 7–18 | planned | — |
+| 7 | done | FE form + commons component tests renovated; markdownizer + list-properties capability splits; harness Quill helpers; focused asserts; suite green |
+| 8–18 | planned | — |
 
 ---
 
@@ -242,3 +243,4 @@ If a Behavior phase cannot express fixtures concisely: add a **Structure** sub-p
 - Phase 4: Consolidated `startRecall` / `leaveRecallWithYnRe` / `RecallInkWaitHelpers` / `reLiteral` in `recallInteractiveShared`; MCQ split into answer/escape/contest/guidance + suite; spelling into answer/escape + suite; just-review already split — dropped post-construction `ancestorFolders` mutation (use `.inFolder`), unused `createdAt`/`updatedAt`, redundant asserts; mocks remain doughnut-api spies only.
 - Phase 5: Helpers have no specs (support only). Most utils/lib already pure-contract. Commons: removed unnecessary `AiReplyEventSource` mocks from Modal/PopButton (no import path); dropped PopButton autofocus re-cover of Modal; deleted usePopups listener-spy internals test; slimmed popButtonTestSupport. Utils: `NoteRealmBuilder.wikiTitles()` for relation reduce; split `noteContentPropertyRows` mutate vs validate (+ trim alias duplicates); dropped `questionStemWikiPlain` markdownizer re-cover. FullScreen/browser API mocks kept as true externals.
 - Phase 6: Most managedApi/routes/storybook/DoughnutApp already drove stable surfaces. Added `MemoryTrackerBuilder.id()`; dropped tracker post-construction mutation (also related form/notes helpers). Split oversized `aiReplyState` (content/toolCalls + support) and `audioProcessingScheduler` (flush/stop). Focused asserts in assimilation/store/deleteNote; pending SDK calls via `mockSdkServiceWithImplementation`. Kept popup/toast/router/timezone mocks as side-effect boundaries for composable APIs (not illicit internals).
+- Phase 7: Form/commons already mostly mounted-component. Split oversized `markdownizer` (markdownToHtml / formatting / htmlToMarkdown + `replaceWikiLinksInHtml`) and list properties out of `RichMarkdownEditor.properties`; harness Quill helpers (`emitQuill*`, `quillModelHtml`, `lastEmittedPasteComplete`). Slimmed MemoryTrackerGuard UI asserts (composable owns confirm/SDK shape); dropped redundant DiffView/Dropdown/LoadingModal/Image/CJK asserts; cleaned QuillEditor/TextInput narrative. Kept `usePopups` mock as popup side-effect boundary (same as Phase 6).

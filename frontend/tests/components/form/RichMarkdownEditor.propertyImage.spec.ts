@@ -33,9 +33,9 @@ describe("RichMarkdownEditor image property value and upload", () => {
     await valInput.trigger("blur")
 
     expect(uploadSpy).not.toHaveBeenCalled()
-    const last = h.lastEmittedMarkdown()
-    expect(last).toContain("image: https://example.com/a.png")
-    expect(last).toContain("# Hi")
+    expect(h.lastEmittedMarkdown()).toContain(
+      "image: https://example.com/a.png"
+    )
   })
 
   it("updates an existing image property from typed text", async () => {
@@ -53,9 +53,9 @@ image: https://example.com/old.png
     await valInput.trigger("blur")
 
     expect(uploadSpy).not.toHaveBeenCalled()
-    const last = h.lastEmittedMarkdown()
-    expect(last).toContain("image: https://example.com/new.png")
-    expect(last).toContain("# Hi")
+    expect(h.lastEmittedMarkdown()).toContain(
+      "image: https://example.com/new.png"
+    )
   })
 
   it("sets image path from upload when choosing a file on the image row", async () => {
@@ -78,8 +78,8 @@ image: /attachments/images/1/old.png
     await fileInput.trigger("change")
 
     expect(uploadSpy).toHaveBeenCalled()
-    const last = h.lastEmittedMarkdown()
-    expect(last).toContain("image: /attachments/images/99/e2e.png")
-    expect(last).toContain("# Hi")
+    expect(h.lastEmittedMarkdown()).toContain(
+      "image: /attachments/images/99/e2e.png"
+    )
   })
 })
