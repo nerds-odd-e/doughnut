@@ -1,9 +1,12 @@
 package com.odde.doughnut.services;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.lessThan;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 class ApproximateUtf8TokenBudgetTest {
 
@@ -15,18 +18,17 @@ class ApproximateUtf8TokenBudgetTest {
     int asciiLen = ApproximateUtf8TokenBudget.truncateByApproxTokens(ascii, 1000).length();
     int cjkLen = ApproximateUtf8TokenBudget.truncateByApproxTokens(cjk, 1000).length();
 
-    assertTrue(
-        cjkLen < asciiLen,
-        () ->
-            String.format(
-                "CJK should truncate shorter at same token cap; ascii=%d cjk=%d",
-                asciiLen, cjkLen));
+    assertThat(cjkLen, lessThan(asciiLen));
+  }
+
+  @ParameterizedTest
+  @NullAndEmptySource
+  void estimateApproxTokensIsZeroForBlank(String input) {
+    assertThat(ApproximateUtf8TokenBudget.estimateApproxTokens(input), equalTo(0));
   }
 
   @Test
-  void estimateApproxTokens_emptyNullAndSingleChar() {
-    assertEquals(0, ApproximateUtf8TokenBudget.estimateApproxTokens(null));
-    assertEquals(0, ApproximateUtf8TokenBudget.estimateApproxTokens(""));
-    assertEquals(1, ApproximateUtf8TokenBudget.estimateApproxTokens("x"));
+  void estimateApproxTokensIsOneForSingleChar() {
+    assertThat(ApproximateUtf8TokenBudget.estimateApproxTokens("x"), equalTo(1));
   }
 }

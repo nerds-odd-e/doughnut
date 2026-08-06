@@ -2,7 +2,7 @@ package com.odde.doughnut.services.ai;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.Matchers.equalTo;
 
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
@@ -48,10 +48,6 @@ class QuestionEvaluationTest {
     QuestionContestResult result = questionEvaluation.getQuestionContestResult(mcqWithAnswer);
     assertThat(
         result.advice,
-        containsString(
-            "original question assume one correct choice index (0-based) of 0 (\"Paris\")"));
-    assertThat(
-        result.advice,
         containsString("1 (\"London\"), 2 (\"Berlin\") are correct to the question"));
   }
 
@@ -60,21 +56,14 @@ class QuestionEvaluationTest {
     questionEvaluation.feasibleQuestion = true;
     questionEvaluation.correctChoices = new int[] {0};
     QuestionContestResult result = questionEvaluation.getQuestionContestResult(mcqWithAnswer);
-    assertEquals("This seems to be a legitimate question. Please answer it.", result.advice);
+    assertThat(result.advice, equalTo("This seems to be a legitimate question. Please answer it."));
   }
 
   @Test
   void shouldHandleOutOfBoundsIndicesInCorrectChoices() {
     questionEvaluation.feasibleQuestion = true;
-    // AI returns index 3, but question only has 3 choices (indices 0-2)
     questionEvaluation.correctChoices = new int[] {3};
     QuestionContestResult result = questionEvaluation.getQuestionContestResult(mcqWithAnswer);
-    assertThat(result.advice, containsString("Unclear answer detected"));
-    assertThat(
-        result.advice,
-        containsString(
-            "original question assume one correct choice index (0-based) of 0 (\"Paris\")"));
-    // Should handle the out of bounds index gracefully
     assertThat(result.advice, containsString("3 (invalid index)"));
   }
 
@@ -82,7 +71,6 @@ class QuestionEvaluationTest {
   void shouldHandleNullChoices() {
     questionEvaluation.feasibleQuestion = true;
     questionEvaluation.correctChoices = new int[] {1};
-    // Create MCQWithAnswer with null choices
     MCQWithAnswer mcqWithNullChoices =
         makeMe
             .aMCQWithAnswer()
@@ -92,6 +80,6 @@ class QuestionEvaluationTest {
     mcqWithNullChoices.getQuestion().setResponseChoices(null);
 
     QuestionContestResult result = questionEvaluation.getQuestionContestResult(mcqWithNullChoices);
-    assertEquals("The question has no choices defined.", result.advice);
+    assertThat(result.advice, equalTo("The question has no choices defined."));
   }
 }

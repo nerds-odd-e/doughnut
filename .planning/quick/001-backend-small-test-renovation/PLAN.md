@@ -1,6 +1,6 @@
 # Backend unit tests → "small test" style
 
-**Status:** in progress (Phase 25a done; 25b planned)
+**Status:** in progress (Phase 25 done; 26 planned)
 **Type:** test renovation (no product behavior change)
 **Verify each phase:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
 **Style:** `.cursor/rules/unit-testing.mdc` + `.cursor/rules/backend-testing.mdc`
@@ -347,12 +347,15 @@ For each file in the phase file list:
 - **Done when:** rubric applied; suite green.
 
 ### Phase 25b — Services: ai / book + remaining root leftovers
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
-- **Files:**
-  - `services/ai/**`
-  - `services/book/**`
-  - root leftovers: `AuthorizationServiceTest`, `ApproximateUtf8TokenBudgetTest`, `SRTProcessorTests`, `AiOpenAiAssistantFactory*`, `Conversation*`, `NotebookReindexing*`, `NotebookGroupServiceTest`, and any other unrenovated service tests
+- **Deleted (controller duplicates):**
+  - `NotebookGroupServiceTest` — create/assign/clear covered by NotebookGroupController + NotebookSharingGroupController
+  - `ConversationMessageServiceTest` — recall-prompt start covered by ConversationStartControllerTest
+- **Kept (style renovated):**
+  - `services/ai/**` (OpenAI mocks kept; layout size twins collapsed; capabilities parameterized; tool factory merged)
+  - `services/book/**` (already domain-stable / parameterized; GCS Storage mock kept)
+  - root: Authorization / ApproximateUtf8TokenBudget / SRT / AiOpenAiAssistantFactory* / Conversation list-limit / NotebookReindexing (JDBC candidate selection — only coverage)
 - **Done when:** remaining service leftovers renovated or deleted as redundant; suite green.
 
 ### Phase 26 — Final anti-pattern sweep
@@ -408,7 +411,8 @@ If a Behavior phase cannot express fixtures concisely:
 | 23 | done | QGen submit/poll/import/output/retention/jsonl: builders for manual batch/request fixtures; ImportPayloadSupport; focused sibling deltas; parameterized terminal poll skip; AtomicTestSupport split ≤250. Loop test keeps collaborator mocks (continue-after-failure). |
 | 24 | done | QGen maintenance/admin/concurrency/locks/jobs: builders + OutputCollectionTestSupport; AdminStatus → real DB; merge resume-failure job cases; lock/concurrency already clean. JobTests keeps collaborator mocks (orchestration). |
 | 25a | done | Health/search/export/openAi/entities: drop runner DTO tautology + purge opt-in (controller covers); focused sibling deltas; `.aliases` / `.content`; blank search parameterized; Wikidata empty cases parameterized. Zip wiki twin deleted (markdown assemble covers). |
-| 25b–26 | planned | — |
+| 25b | done | Deleted NotebookGroupServiceTest + ConversationMessageServiceTest (controller duplicates). AI: collapse layout size twins; merge tool-factory / focus-context asserts; parameterize model capabilities; drop SpringBoot from pure AiToolFactory registry test. Book already clean (GCS mock kept). Reindexing kept for JDBC candidate-selection coverage. |
+| 26 | planned | — |
 
 ---
 
@@ -443,3 +447,4 @@ If a Behavior phase cannot express fixtures concisely:
 - Phase 23: Reused Phase 22 batch/request builders (+ `importedAt`/`outputCollectedAt`). Collapsed triplicate import success-line JSON into `ImportPayloadSupport`. `SubmitDueUsersServiceLoopTest` collaborator mocks kept for continue-after-failure summary — Phase 26 may revisit if Spring coverage appears.
 - Phase 24: MaintenanceService uses builders + OutputCollectionTestSupport; AdminStatus counts/runs use real DB (ScheduledTask mock only for scheduler-active string match). JobTests/resume-order Nested keep collaborator mocks — Phase 26 sweep. SchedulerLock + JDBC concurrency already domain-stable.
 - Phase 25a: Health rules stay service-level (deeper than NotebookHealthController). Bulk-purge opt-in reject deleted as controller duplicate. HealthRuleRunner DTO-retention test was not exercising the runner — removed. Dead-wiki alias via `.aliases()` (auto-refreshes index). Search exact-match siblings assert first-id delta only after canonical size+title+id. ZipBuilder wiki-link twin dropped; ExportNoteMarkdown already asserts preservation.
+- Phase 25b: NotebookGroup + ConversationMessage service suites were controller duplicates. NotebookReindexingService was removed from production — test kept only for `selectNoteIdsNeedingIndexUpdateByNotebookId` + store path (no other coverage). AiNoteAutomationServiceExtractRequestTest keeps FocusContext collaborator mocks for request-body shape isolation. ConversationServiceConversationListLimitTest keeps repo mock for PageRequest(50) contract.

@@ -19,16 +19,14 @@ import org.springframework.web.server.ResponseStatusException;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class AuthorizationServiceTest {
+class AuthorizationServiceTest {
   @Autowired MakeMe makeMe;
   @Autowired AuthorizationService authorizationService;
   User user;
-  User anotherUser;
 
   @BeforeEach
   void setup() {
     user = makeMe.aUser().please();
-    anotherUser = makeMe.aUser().please();
   }
 
   @Nested
@@ -43,14 +41,14 @@ public class AuthorizationServiceTest {
     }
 
     @Test
-    void userCanNotAccessNotesBelongToCircle() {
+    void nonMemberCannotAccess() {
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> authorizationService.assertAuthorization(user, note));
     }
 
     @Test
-    void userCanAccessNotesBelongToCircleIfIsAMember() throws UnexpectedNoAccessRightException {
+    void memberCanAccess() throws UnexpectedNoAccessRightException {
       makeMe.theCircle(circle).hasMember(user).please();
       authorizationService.assertAuthorization(user, note);
     }
@@ -58,15 +56,9 @@ public class AuthorizationServiceTest {
 
   @Nested
   class readAuthority {
-    Note note;
-
-    @BeforeEach
-    void setup() {
-      note = makeMe.aNote().please();
-    }
-
     @Test
-    void userCanNotAccessNotesBelongToCircle() {
+    void anonymousUserCannotRead() {
+      Note note = makeMe.aNote().please();
       assertThrows(
           ResponseStatusException.class,
           () -> authorizationService.assertReadAuthorization((User) null, note));

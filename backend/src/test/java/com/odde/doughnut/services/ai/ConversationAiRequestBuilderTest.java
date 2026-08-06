@@ -1,6 +1,7 @@
 package com.odde.doughnut.services.ai;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.Note;
@@ -34,33 +35,18 @@ class ConversationAiRequestBuilderTest {
   class BuildParams {
 
     @Test
-    void shouldIncludeNoteContextAsFirstDeveloperMessage() {
-      Note note = makeMe.aNote().please();
-      Conversation conversation = makeMe.aConversation().forANote(note).please();
-
-      List<ResponseInputItem> items = inputItems(conversation);
-
-      assertFalse(items.isEmpty());
-      ResponseInputItem firstMessage = items.getFirst();
-      assertTrue(firstMessage.easyInputMessage().isPresent());
-      EasyInputMessage easy = firstMessage.easyInputMessage().orElseThrow();
-      assertEquals(EasyInputMessage.Role.DEVELOPER, easy.role());
-      String body = easy.content().asTextInput();
-      assertTrue(body.contains(note.getTitle()));
-      assertTrue(body.contains("# Focus Context"));
-    }
-
-    @Test
-    void firstDeveloperMessageShouldIncludeFocusNoteNotebookLabelAndContent() {
+    void firstDeveloperMessageIncludesFocusContext() {
       Note note = makeMe.aNote().content("description").please();
       Conversation conversation = makeMe.aConversation().forANote(note).please();
 
       String body = firstDeveloperMessageBody(conversation);
 
-      assertTrue(body.contains("## Focus Note"));
-      assertTrue(body.contains("Notebook:"));
-      assertTrue(body.contains("Content:"));
-      assertTrue(body.contains(note.getContent()));
+      assertThat(body, containsString(note.getTitle()));
+      assertThat(body, containsString("# Focus Context"));
+      assertThat(body, containsString("## Focus Note"));
+      assertThat(body, containsString("Notebook:"));
+      assertThat(body, containsString("Content:"));
+      assertThat(body, containsString(note.getContent()));
     }
 
     @Test
@@ -75,17 +61,18 @@ class ConversationAiRequestBuilderTest {
 
       List<ResponseInputItem> items = inputItems(conversation);
 
-      assertEquals(5, items.size());
-      assertEquals(EasyInputMessage.Role.DEVELOPER, easyInput(items, 0).role());
-      assertEquals(EasyInputMessage.Role.DEVELOPER, easyInput(items, 1).role());
-      assertTrue(
-          easyInputText(items, 1).contains("Make tool calls when user asks to update the note."));
-      assertEquals(EasyInputMessage.Role.USER, easyInput(items, 2).role());
-      assertEquals("First question", easyInputText(items, 2));
-      assertEquals(EasyInputMessage.Role.ASSISTANT, easyInput(items, 3).role());
-      assertEquals("AI response", easyInputText(items, 3));
-      assertEquals(EasyInputMessage.Role.USER, easyInput(items, 4).role());
-      assertEquals("Follow up question", easyInputText(items, 4));
+      assertThat(items, hasSize(5));
+      assertThat(easyInput(items, 0).role(), equalTo(EasyInputMessage.Role.DEVELOPER));
+      assertThat(easyInput(items, 1).role(), equalTo(EasyInputMessage.Role.DEVELOPER));
+      assertThat(
+          easyInputText(items, 1),
+          containsString("Make tool calls when user asks to update the note."));
+      assertThat(easyInput(items, 2).role(), equalTo(EasyInputMessage.Role.USER));
+      assertThat(easyInputText(items, 2), equalTo("First question"));
+      assertThat(easyInput(items, 3).role(), equalTo(EasyInputMessage.Role.ASSISTANT));
+      assertThat(easyInputText(items, 3), equalTo("AI response"));
+      assertThat(easyInput(items, 4).role(), equalTo(EasyInputMessage.Role.USER));
+      assertThat(easyInputText(items, 4), equalTo("Follow up question"));
     }
 
     @Test
@@ -99,7 +86,7 @@ class ConversationAiRequestBuilderTest {
       Note note = makeMe.aNote().notebook(notebook).please();
       Conversation conversation = makeMe.aConversation().forANote(note).from(user).please();
 
-      assertFalse(firstDeveloperMessageBody(conversation).contains("NOT_FOR_CHAT"));
+      assertThat(firstDeveloperMessageBody(conversation), not(containsString("NOT_FOR_CHAT")));
     }
 
     @Test
@@ -109,9 +96,9 @@ class ConversationAiRequestBuilderTest {
 
       List<ResponseInputItem> items = inputItems(conversation);
 
-      assertEquals(2, items.size());
-      assertEquals(EasyInputMessage.Role.DEVELOPER, easyInput(items, 0).role());
-      assertEquals(EasyInputMessage.Role.DEVELOPER, easyInput(items, 1).role());
+      assertThat(items, hasSize(2));
+      assertThat(easyInput(items, 0).role(), equalTo(EasyInputMessage.Role.DEVELOPER));
+      assertThat(easyInput(items, 1).role(), equalTo(EasyInputMessage.Role.DEVELOPER));
     }
 
     private ConversationAiRequestBuilder builder() {

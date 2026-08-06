@@ -36,18 +36,14 @@ class NotebookReindexingServiceTests {
   @Autowired NoteRepository noteRepository;
   @Autowired MakeMe makeMe;
 
-  // Service removed; keep tests minimal for update/reset endpoints in controller
   Notebook notebook;
 
   @BeforeEach
   void setup() {
-    // Service removed; tests below will use noteEmbeddingService directly where applicable
     notebook = makeMe.aNotebook().please();
     makeMe.aNote().notebook(notebook).please();
     makeMe.aNote().notebook(notebook).please();
-    makeMe.aNote().notebook(notebook).please();
     makeMe.refresh(notebook);
-    // Default: mock batched streaming embeddings to return a vector for every note
     when(embeddingService.streamEmbeddingsForNoteList(any()))
         .thenAnswer(
             invocation -> {
@@ -61,29 +57,15 @@ class NotebookReindexingServiceTests {
             });
   }
 
-  // Reindex service removed
-
-  // Reindex service removed
-
-  // Reindex service removed
-
   @Test
-  void updateNotebookIndex_shouldOnlyUpdateNotesWithoutEmbeddingsOrStaleOnes() {
-    // Arrange: create embeddings for one note to be up-to-date, and leave another without
+  void updateNotebookIndexUpdatesNotesWithoutEmbeddingsOrStaleOnes() {
     List<Note> notes = notebook.getNotes();
     Note first = notes.get(0);
     Note second = notes.get(1);
-
-    // Seed an existing embedding for the first note
     makeMe.aNoteEmbedding(first).please();
-
-    // Make sure first note is not updated after embedding, and second is updated now
-    // Update second's updatedAt to be "newer" by touching content
     makeMe.theNote(second).content("newer content").please();
     makeMe.refresh(notebook);
 
-    // Act
-    // mimic controller update behavior by streaming embeddings for selected candidates
     List<Integer> candidateIds =
         noteEmbeddingJdbcRepository.selectNoteIdsNeedingIndexUpdateByNotebookId(notebook.getId());
     List<Note> candidates = (List<Note>) noteRepository.findAllById(candidateIds);
@@ -95,10 +77,7 @@ class NotebookReindexingServiceTests {
                     .ifPresent(
                         embedding -> noteEmbeddingService.storeEmbedding(item.note(), embedding)));
 
-    // Assert: both notes should have TITLE embeddings (first already had; second should now)
     assertThat(noteEmbeddingRepository.existsByNoteId(first.getId()), is(true));
     assertThat(noteEmbeddingRepository.existsByNoteId(second.getId()), is(true));
   }
-
-  // Reindex service removed
 }

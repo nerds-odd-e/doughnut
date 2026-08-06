@@ -5,90 +5,75 @@ import static org.hamcrest.Matchers.is;
 
 import com.openai.models.ReasoningEffort;
 import com.openai.models.responses.ResponseTextConfig;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class OpenAiModelCapabilitiesTest {
 
-  @Nested
-  class SupportsReasoningEffort {
-    @Test
-    void returnsTrueForReasoningModelPrefixes() {
-      assertThat(OpenAiModelCapabilities.supportsReasoningEffort("o3-mini"), is(true));
-      assertThat(OpenAiModelCapabilities.supportsReasoningEffort("o4-mini"), is(true));
-      assertThat(OpenAiModelCapabilities.supportsReasoningEffort("gpt-5"), is(true));
-      assertThat(OpenAiModelCapabilities.supportsReasoningEffort("GPT-5-preview"), is(true));
-    }
-
-    @Test
-    void returnsFalseForNonReasoningModels() {
-      assertThat(OpenAiModelCapabilities.supportsReasoningEffort("gpt-4.1-mini"), is(false));
-      assertThat(OpenAiModelCapabilities.supportsReasoningEffort("gpt-4o"), is(false));
-      assertThat(OpenAiModelCapabilities.supportsReasoningEffort(""), is(false));
-      assertThat(OpenAiModelCapabilities.supportsReasoningEffort(null), is(false));
-    }
+  @ParameterizedTest
+  @ValueSource(strings = {"o3-mini", "o4-mini", "gpt-5", "GPT-5-preview"})
+  void supportsReasoningEffortForReasoningModelPrefixes(String model) {
+    assertThat(OpenAiModelCapabilities.supportsReasoningEffort(model), is(true));
   }
 
-  @Nested
-  class QuestionGenerationReasoningEffort {
-    @Test
-    void usesMediumForSyncAndHighForBatchWhenSupported() {
-      assertThat(
-          OpenAiModelCapabilities.questionGenerationReasoningEffort("o3-mini", false),
-          is(ReasoningEffort.MEDIUM));
-      assertThat(
-          OpenAiModelCapabilities.questionGenerationReasoningEffort("o3-mini", true),
-          is(ReasoningEffort.HIGH));
-    }
-
-    @Test
-    void usesNoneWhenModelDoesNotSupportReasoning() {
-      assertThat(
-          OpenAiModelCapabilities.questionGenerationReasoningEffort("gpt-4.1-mini", false),
-          is(ReasoningEffort.NONE));
-      assertThat(
-          OpenAiModelCapabilities.questionGenerationReasoningEffort("gpt-4.1-mini", true),
-          is(ReasoningEffort.NONE));
-    }
+  @ParameterizedTest
+  @NullAndEmptySource
+  @ValueSource(strings = {"gpt-4.1-mini", "gpt-4o"})
+  void doesNotSupportReasoningEffortForNonReasoningModels(String model) {
+    assertThat(OpenAiModelCapabilities.supportsReasoningEffort(model), is(false));
   }
 
-  @Nested
-  class ResponseTextVerbosity {
-    @Test
-    void usesMediumForGpt41Mini() {
-      assertThat(
-          OpenAiModelCapabilities.responseTextVerbosity("gpt-4.1-mini"),
-          is(ResponseTextConfig.Verbosity.MEDIUM));
-    }
-
-    @Test
-    void usesLowForOtherModels() {
-      assertThat(
-          OpenAiModelCapabilities.responseTextVerbosity("gpt-4o"),
-          is(ResponseTextConfig.Verbosity.LOW));
-    }
+  @ParameterizedTest
+  @CsvSource({
+    "o3-mini, false",
+    "o3-mini, true",
+  })
+  void questionGenerationReasoningEffortWhenSupported(String model, boolean batch) {
+    assertThat(
+        OpenAiModelCapabilities.questionGenerationReasoningEffort(model, batch),
+        is(batch ? ReasoningEffort.HIGH : ReasoningEffort.MEDIUM));
   }
 
-  @Nested
-  class QuestionGenerationMaxOutputTokens {
-    @Test
-    void usesDefaultBudgetWithoutReasoning() {
-      assertThat(
-          OpenAiModelCapabilities.questionGenerationMaxOutputTokens(ReasoningEffort.NONE, false),
-          is(1000L));
-      assertThat(
-          OpenAiModelCapabilities.questionGenerationMaxOutputTokens(ReasoningEffort.NONE, true),
-          is(1000L));
-    }
+  @ParameterizedTest
+  @CsvSource({"gpt-4.1-mini, false", "gpt-4.1-mini, true"})
+  void questionGenerationReasoningEffortNoneWhenUnsupported(String model, boolean batch) {
+    assertThat(
+        OpenAiModelCapabilities.questionGenerationReasoningEffort(model, batch),
+        is(ReasoningEffort.NONE));
+  }
 
-    @Test
-    void usesHigherBudgetWhenReasoningIsEnabled() {
-      assertThat(
-          OpenAiModelCapabilities.questionGenerationMaxOutputTokens(ReasoningEffort.MEDIUM, false),
-          is(2000L));
-      assertThat(
-          OpenAiModelCapabilities.questionGenerationMaxOutputTokens(ReasoningEffort.HIGH, true),
-          is(12000L));
-    }
+  @ParameterizedTest
+  @CsvSource({
+    "gpt-4.1-mini, true",
+    "gpt-4o, false",
+  })
+  void responseTextVerbosity(String model, boolean medium) {
+    assertThat(
+        OpenAiModelCapabilities.responseTextVerbosity(model),
+        is(medium ? ResponseTextConfig.Verbosity.MEDIUM : ResponseTextConfig.Verbosity.LOW));
+  }
+
+  @ParameterizedTest
+  @CsvSource({
+    "false, 1000",
+    "true, 1000",
+  })
+  void questionGenerationMaxOutputTokensWithoutReasoning(boolean batch, long expected) {
+    assertThat(
+        OpenAiModelCapabilities.questionGenerationMaxOutputTokens(ReasoningEffort.NONE, batch),
+        is(expected));
+  }
+
+  @ParameterizedTest
+  @CsvSource({
+    "false, 2000",
+    "true, 12000",
+  })
+  void questionGenerationMaxOutputTokensWithReasoning(boolean batch, long expected) {
+    ReasoningEffort effort = batch ? ReasoningEffort.HIGH : ReasoningEffort.MEDIUM;
+    assertThat(
+        OpenAiModelCapabilities.questionGenerationMaxOutputTokens(effort, batch), is(expected));
   }
 }

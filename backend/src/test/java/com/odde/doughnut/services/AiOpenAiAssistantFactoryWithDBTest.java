@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.Note;
@@ -31,11 +32,10 @@ class AiOpenAiAssistantFactoryWithDBTest {
   private OpenAIClient officialClient;
 
   @Autowired MakeMe makeMe;
-  @Autowired GlobalSettingsService globalSettingsService;
   private OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
   @BeforeEach
-  void Setup() {
+  void setup() {
     openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
   }
 
@@ -63,29 +63,26 @@ class AiOpenAiAssistantFactoryWithDBTest {
     }
 
     @Test
-    void rejected() {
+    void rejectedWhenFeasible() {
       questionEvaluation.feasibleQuestion = true;
       openAiStructuredResponseMock.stubStructuredResponse(questionEvaluation);
 
-      MCQWithAnswer mcqWithAnswer = predefinedQuestion.getMcqWithAnswer();
-      QuestionContestResult contest =
-          aiQuestionGenerator
-              .getQuestionContestResult(predefinedQuestion.getNote(), mcqWithAnswer)
-              .getQuestionContestResult(mcqWithAnswer);
-      assertTrue(contest.rejected);
+      assertThat(contest().rejected, is(true));
     }
 
     @Test
-    void acceptTheContest() {
+    void acceptedWhenNotFeasible() {
       questionEvaluation.feasibleQuestion = false;
       openAiStructuredResponseMock.stubStructuredResponse(questionEvaluation);
 
+      assertThat(contest().rejected, is(false));
+    }
+
+    private QuestionContestResult contest() {
       MCQWithAnswer mcqWithAnswer = predefinedQuestion.getMcqWithAnswer();
-      QuestionContestResult contest =
-          aiQuestionGenerator
-              .getQuestionContestResult(predefinedQuestion.getNote(), mcqWithAnswer)
-              .getQuestionContestResult(mcqWithAnswer);
-      assertFalse(contest.rejected);
+      return aiQuestionGenerator
+          .getQuestionContestResult(predefinedQuestion.getNote(), mcqWithAnswer)
+          .getQuestionContestResult(mcqWithAnswer);
     }
   }
 }

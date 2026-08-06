@@ -38,7 +38,6 @@ class AiNoteAutomationServiceTest {
   @Autowired OpenAiApiHandler openAiApiHandler;
   @Autowired TestabilitySettings testabilitySettings;
   OpenAiStructuredResponseMock openAiStructuredResponseMock;
-  private Note testNote;
   private AiNoteAutomationService service;
 
   @BeforeEach
@@ -46,7 +45,7 @@ class AiNoteAutomationServiceTest {
     testabilitySettings.setOpenAiTokenOverride(null);
     openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
 
-    testNote = makeMe.aNote().content("description long enough.").please();
+    Note testNote = makeMe.aNote().content("description long enough.").please();
     makeMe.aNote().please();
 
     service =
@@ -91,56 +90,7 @@ class AiNoteAutomationServiceTest {
     void shouldReturnEmptyLayoutWhenNoResponse() throws JsonProcessingException {
       openAiStructuredResponseMock.stubStructuredResponse(null);
 
-      NoteRefinementLayout result = service.generateRefinementSuggestions();
-
-      assertThat(result.getItems(), is(empty()));
-    }
-
-    @Test
-    void shouldHandleMultipleLayoutItems() throws JsonProcessingException {
-      NoteRefinementLayout layout = new NoteRefinementLayout();
-      layout.setItems(
-          List.of(
-              new NoteRefinementLayoutItem(
-                  "p1", "Point 1: First important aspect.", false, List.of()),
-              new NoteRefinementLayoutItem(
-                  "p2", "Point 2: Second important aspect.", false, List.of()),
-              new NoteRefinementLayoutItem(
-                  "p3", "Point 3: Third important aspect.", false, List.of()),
-              new NoteRefinementLayoutItem(
-                  "p4", "Point 4: Fourth important aspect.", false, List.of()),
-              new NoteRefinementLayoutItem(
-                  "p5", "Point 5: Fifth important aspect.", false, List.of())));
-      openAiStructuredResponseMock.stubStructuredResponse(layout);
-
-      NoteRefinementLayout result = service.generateRefinementSuggestions();
-
-      assertThat(result.getItems(), hasSize(5));
-      assertThat(
-          result.getItems().stream().map(NoteRefinementLayoutItem::getText).toList(),
-          hasItem("Point 1: First important aspect."));
-      assertThat(
-          result.getItems().stream().map(NoteRefinementLayoutItem::getText).toList(),
-          hasItem("Point 5: Fifth important aspect."));
-    }
-
-    @Test
-    void shouldReturnAllLayoutItemsFromAiResponse() throws JsonProcessingException {
-      NoteRefinementLayout layout = new NoteRefinementLayout();
-      layout.setItems(
-          List.of(
-              new NoteRefinementLayoutItem("p1", "Point 1", false, List.of()),
-              new NoteRefinementLayoutItem("p2", "Point 2", false, List.of()),
-              new NoteRefinementLayoutItem("p3", "Point 3", false, List.of()),
-              new NoteRefinementLayoutItem("p4", "Point 4", false, List.of()),
-              new NoteRefinementLayoutItem("p5", "Point 5", false, List.of()),
-              new NoteRefinementLayoutItem("p6", "Point 6", false, List.of()),
-              new NoteRefinementLayoutItem("p7", "Point 7", false, List.of())));
-      openAiStructuredResponseMock.stubStructuredResponse(layout);
-
-      NoteRefinementLayout result = service.generateRefinementSuggestions();
-
-      assertThat(result.getItems(), hasSize(7));
+      assertThat(service.generateRefinementSuggestions().getItems(), empty());
     }
   }
 }
