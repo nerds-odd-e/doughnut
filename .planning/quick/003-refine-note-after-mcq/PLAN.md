@@ -79,13 +79,15 @@ Prior `/gsd-quick` packed button + shared modal + DTO + AI schema + preselect + 
 
 ### Phase 5: Pass question + preselect `ledToQuestion`
 **Type:** Behavior  
-**Status:** planned
+**Status:** done
 
 **Pre-condition:** Phases 1–4 done; answered MCQ refine open.  
 **Trigger:** Layout generation runs from answered MCQ refine.  
 **Post-condition:** Generate request includes MCQ context; items with `ledToQuestion=true` are selected by default (user can extract or remove). Assimilation refine (no context) still starts with empty selection.
 
 **Tests:** `NoteRefinement` / layout selection unit tests + `AnsweredQuestionComponent` asserting request body.
+
+**Learnings:** Thread optional `questionContext` AnsweredQuestion → RefineNoteModal → NoteRefinement → composables; preselect via `selectWhere(ledToQuestion)` only when context present so assimilation still clears. Export breakdown also forwards the same body.
 
 ---
 

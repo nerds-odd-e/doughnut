@@ -1,16 +1,23 @@
-import type { Note } from "@generated/doughnut-backend-api"
+import type {
+  Note,
+  NoteRefinementQuestionContextDto,
+} from "@generated/doughnut-backend-api"
 import { useNoteExtractionPreview } from "@/composables/useNoteExtractionPreview"
 import { useNoteRefinementLayout } from "@/composables/useNoteRefinementLayout"
 import { type Ref } from "vue"
 
 export function useNoteRefinement(
   note: Ref<Note>,
-  onContentUpdated: (newContent: string) => void
+  onContentUpdated: (newContent: string) => void,
+  questionContext?: Ref<NoteRefinementQuestionContextDto | undefined>
 ) {
   let onLayoutReset: () => void = () => undefined
 
-  const layout = useNoteRefinementLayout(note, onContentUpdated, () =>
-    onLayoutReset()
+  const layout = useNoteRefinementLayout(
+    note,
+    onContentUpdated,
+    () => onLayoutReset(),
+    questionContext
   )
 
   const extraction = useNoteExtractionPreview(note, layout.layoutSelectionBody)

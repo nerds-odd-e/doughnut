@@ -138,5 +138,80 @@ describe("AnsweredQuestionComponent", () => {
         wrapper.find('[data-test="open-refine-note-modal"]').exists()
       ).toBe(false)
     })
+
+    it("passes MCQ context and preselects ledToQuestion layout items", async () => {
+      const predefinedQuestion = makeMe.aPredefinedQuestion
+        .withQuestionStem("What is the capital of France?")
+        .withChoices(["Paris", "London", "Berlin"])
+        .correctAnswerIndex(0)
+        .testedFocus("capital city")
+        .please()
+
+      const generateSpy = mockSdkService(
+        AiController,
+        "generateRefinementSuggestions",
+        {
+          items: [
+            {
+              id: "p1",
+              text: "Paris is the capital",
+              alreadyExtracted: false,
+              ledToQuestion: true,
+              children: [],
+            },
+            {
+              id: "p2",
+              text: "Other fact",
+              alreadyExtracted: false,
+              ledToQuestion: false,
+              children: [],
+            },
+          ],
+        }
+      )
+
+      const noteRealm = makeMe.aNoteRealm
+        .title("Contentful Note")
+        .content("Paris is the capital of France. Other fact.")
+        .please()
+      const answeredQuestion = makeMe.anAnsweredQuestion
+        .withNote(noteRealm.note)
+        .withPredefinedQuestion(predefinedQuestion)
+        .please()
+      const chain = helper
+        .component(AnsweredQuestionComponent)
+        .withCleanStorage()
+      useStorageAccessor().value.refreshNoteRealm(noteRealm)
+      wrapper = chain
+        .withProps({ answeredQuestion, conversationButton: false })
+        .mount({ attachTo: document.body })
+      await flushPromises()
+
+      await wrapper
+        .find('[data-test="open-refine-note-modal"]')
+        .trigger("click")
+      await flushPromises()
+
+      expect(generateSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: { note: noteRealm.note.id },
+          body: {
+            stem: "What is the capital of France?",
+            choices: ["Paris", "London", "Berlin"],
+            correctAnswerIndex: 0,
+            testedFocus: "capital city",
+          },
+        })
+      )
+
+      const ledCheckbox = document.querySelector(
+        '[data-test-id="refinement-layout-checkbox-p1"]'
+      ) as HTMLInputElement
+      const otherCheckbox = document.querySelector(
+        '[data-test-id="refinement-layout-checkbox-p2"]'
+      ) as HTMLInputElement
+      expect(ledCheckbox.checked).toBe(true)
+      expect(otherCheckbox.checked).toBe(false)
+    })
   })
 })

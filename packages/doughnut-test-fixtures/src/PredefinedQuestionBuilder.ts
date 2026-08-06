@@ -29,6 +29,11 @@ class PredefinedQuestionBuilder extends Builder<PredefinedQuestion> {
     return this
   }
 
+  testedFocus(focus: string) {
+    this.predefinedQuestion.testedFocus = focus
+    return this
+  }
+
   do(): PredefinedQuestion {
     return this.predefinedQuestion
   }

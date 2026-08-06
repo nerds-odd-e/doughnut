@@ -15,6 +15,7 @@ import type {
   Note,
   NoteExtractionResult,
   NoteRefinementLayoutItem,
+  NoteRefinementQuestionContextDto,
 } from "@generated/doughnut-backend-api"
 import { afterEach, beforeEach, expect, vi } from "vitest"
 import { defineComponent, type PropType } from "vue"
@@ -27,11 +28,16 @@ const NoteRefinementWithGlobalLoading = defineComponent({
   components: { GlobalApiLoadingModal, NoteRefinement },
   props: {
     note: { type: Object as PropType<Note>, required: true },
+    questionContext: {
+      type: Object as PropType<NoteRefinementQuestionContextDto>,
+      required: false,
+    },
   },
   emits: ["contentUpdated"],
   template: `
     <NoteRefinement
       :note="note"
+      v-bind="questionContext ? { questionContext } : {}"
       @contentUpdated="$emit('contentUpdated', $event)"
     />
     <GlobalApiLoadingModal />
@@ -77,16 +83,23 @@ export function setupNoteRefinementTests() {
 
 export function mountNoteRefinement(
   layoutItemTexts: string[],
-  overrides?: { note?: typeof note }
+  overrides?: {
+    note?: typeof note
+    questionContext?: NoteRefinementQuestionContextDto
+  }
 ) {
   return mountNoteRefinementWithLayout(refinementLayoutItems(layoutItemTexts), {
     note: overrides?.note,
+    questionContext: overrides?.questionContext,
   })
 }
 
 export function mountNoteRefinementWithLayout(
   items: NoteRefinementLayoutItem[],
-  overrides?: { note?: typeof note }
+  overrides?: {
+    note?: typeof note
+    questionContext?: NoteRefinementQuestionContextDto
+  }
 ) {
   mockSdkService(AiController, "generateRefinementSuggestions", {
     items,
@@ -95,6 +108,9 @@ export function mountNoteRefinementWithLayout(
     .withCleanStorage()
     .withProps({
       note: overrides?.note ?? note,
+      ...(overrides?.questionContext !== undefined && {
+        questionContext: overrides.questionContext,
+      }),
     })
     .mount()
 }
@@ -127,7 +143,10 @@ export async function mountNoteRefinementReady(layoutItemTexts: string[]) {
 
 export async function mountNoteRefinementWithLayoutReady(
   items: NoteRefinementLayoutItem[],
-  overrides?: { note?: typeof note }
+  overrides?: {
+    note?: typeof note
+    questionContext?: NoteRefinementQuestionContextDto
+  }
 ) {
   const wrapper = mountNoteRefinementWithLayout(items, overrides)
   await flushPromises()

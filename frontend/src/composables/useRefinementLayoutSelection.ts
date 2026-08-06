@@ -76,6 +76,17 @@ export function useRefinementLayoutSelection(
     selectedItemIds.value = []
   }
 
+  const selectWhere = (
+    predicate: (item: NoteRefinementLayoutItem) => boolean
+  ) => {
+    clearSelection()
+    for (const item of allLayoutItems.value) {
+      if (predicate(item)) {
+        setItemSelection(item, true)
+      }
+    }
+  }
+
   return {
     selectedItemIds,
     layoutItemsById,
@@ -83,5 +94,6 @@ export function useRefinementLayoutSelection(
     isPartiallySelected,
     setItemSelection,
     clearSelection,
+    selectWhere,
   }
 }

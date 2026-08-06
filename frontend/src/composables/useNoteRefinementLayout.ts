@@ -1,6 +1,7 @@
 import type {
   Note,
   NoteRefinementLayoutItem,
+  NoteRefinementQuestionContextDto,
 } from "@generated/doughnut-backend-api"
 import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
 import {
@@ -15,7 +16,8 @@ import { onMounted, ref, type Ref } from "vue"
 export function useNoteRefinementLayout(
   note: Ref<Note>,
   onContentUpdated: (newContent: string) => void,
-  onLayoutReset: () => void
+  onLayoutReset: () => void,
+  questionContext?: Ref<NoteRefinementQuestionContextDto | undefined>
 ) {
   const refinementLayoutItems = ref<NoteRefinementLayoutItem[]>([])
   const layoutLoadSettled = ref(false)
@@ -28,6 +30,7 @@ export function useNoteRefinementLayout(
     isPartiallySelected,
     setItemSelection,
     clearSelection,
+    selectWhere,
   } = useRefinementLayoutSelection(refinementLayoutItems)
 
   const { popups } = usePopups()
@@ -38,6 +41,9 @@ export function useNoteRefinementLayout(
     selectedItemIds: selectedItemIds.value,
   })
 
+  const questionContextBody = () =>
+    questionContext?.value !== undefined ? { body: questionContext.value } : {}
+
   const loadRefinementLayout = async ({
     blockUi = true,
   }: {
@@ -45,7 +51,11 @@ export function useNoteRefinementLayout(
   } = {}) => {
     const settleLayout = (items: NoteRefinementLayoutItem[]) => {
       refinementLayoutItems.value = items
-      clearSelection()
+      if (questionContext?.value) {
+        selectWhere((item) => item.ledToQuestion)
+      } else {
+        clearSelection()
+      }
       onLayoutReset()
       layoutLoadSettled.value = true
     }
@@ -61,6 +71,7 @@ export function useNoteRefinementLayout(
     const requestLayout = (signal?: AbortSignal) =>
       AiController.generateRefinementSuggestions({
         path: { note: note.value.id },
+        ...questionContextBody(),
         signal,
       })
 
@@ -140,6 +151,7 @@ export function useNoteRefinementLayout(
     const { data: response, error } =
       await AiController.exportRefinementLayoutRequest({
         path: { note: note.value.id },
+        ...questionContextBody(),
       })
     if (!error && response) {
       return response

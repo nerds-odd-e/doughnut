@@ -6,15 +6,15 @@ current_phase: null
 current_phase_name: null
 status: in_progress
 stopped_at: null
-last_updated: "2026-08-06T06:40:00Z"
+last_updated: "2026-08-06T06:45:00Z"
 last_activity: 2026-08-06
-last_activity_desc: Phase 4 done — optional MCQ context on layout generate/export; Phase 5 next
+last_activity_desc: Phase 5 done — MCQ context + ledToQuestion preselect; Phase 6 next
 progress:
   total_phases: 6
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 1
   completed_plans: 0
-  percent: 67
+  percent: 83
 ---
 
 # Project State
@@ -30,7 +30,7 @@ See: `.planning/PROJECT.md` (updated 2026-08-06)
 
 Milestone v1.2 Accidental Match Resolve UX — **shipped 2026-08-06**.
 
-Active ad-hoc plan: [`.planning/quick/003-refine-note-after-mcq/PLAN.md`](./quick/003-refine-note-after-mcq/PLAN.md) — Phases 1–4 done; **Phase 5 next** (pass question + preselect `ledToQuestion`).
+Active ad-hoc plan: [`.planning/quick/003-refine-note-after-mcq/PLAN.md`](./quick/003-refine-note-after-mcq/PLAN.md) — Phases 1–5 done; **Phase 6 next** (E2E refine-after-MCQ with mocked OpenAI).
 
 ## Deferred Items
 
@@ -45,4 +45,4 @@ Items acknowledged at milestone close on 2026-08-06:
 
 ## Session Continuity
 
-Next action: execute Phase 5 of `.planning/quick/003-refine-note-after-mcq/PLAN.md` (pass MCQ context from answered page; preselect `ledToQuestion` items).
+Next action: execute Phase 6 of `.planning/quick/003-refine-note-after-mcq/PLAN.md` (E2E refine after answered MCQ with mocked OpenAI layout / preselect).

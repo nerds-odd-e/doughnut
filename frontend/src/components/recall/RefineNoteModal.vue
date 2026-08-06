@@ -13,6 +13,7 @@
           v-if="open"
           :key="note.id"
           :note="note"
+          :question-context="questionContext"
           @content-updated="emit('contentUpdated')"
         />
         <div v-if="open" class="daisy-modal-action mt-4">
@@ -34,7 +35,10 @@
 </template>
 
 <script setup lang="ts">
-import type { Note } from "@generated/doughnut-backend-api"
+import type {
+  Note,
+  NoteRefinementQuestionContextDto,
+} from "@generated/doughnut-backend-api"
 import { useDaisyDialog } from "@/composables/useDaisyDialog"
 import { ref, toRef, watch } from "vue"
 import NoteRefinement from "./NoteRefinement.vue"
@@ -42,6 +46,7 @@ import NoteRefinement from "./NoteRefinement.vue"
 const props = defineProps<{
   open: boolean
   note: Note
+  questionContext?: NoteRefinementQuestionContextDto
 }>()
 
 const emit = defineEmits<{

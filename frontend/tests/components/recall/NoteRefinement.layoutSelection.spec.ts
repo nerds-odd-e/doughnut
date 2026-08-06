@@ -1,3 +1,4 @@
+import type { NoteRefinementLayoutItem } from "@generated/doughnut-backend-api"
 import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
 import { describe, expect, it } from "vitest"
 import { flushPromises } from "@vue/test-utils"
@@ -124,5 +125,59 @@ describe("NoteRefinement layout selection", () => {
     expect(removeLayoutSpy).toHaveBeenCalledWith(
       refinementLayoutSelectionApiCall(note.id, layout, ["p1-1", "p2"])
     )
+  })
+
+  it("preselects ledToQuestion items when question context is provided", async () => {
+    const layout: NoteRefinementLayoutItem[] = [
+      {
+        id: "p1",
+        text: "Question-led point",
+        alreadyExtracted: false,
+        ledToQuestion: true,
+        children: [],
+      },
+      {
+        id: "p2",
+        text: "Other point",
+        alreadyExtracted: false,
+        ledToQuestion: false,
+        children: [],
+      },
+    ]
+    const wrapper = await mountNoteRefinementWithLayoutReady(layout, {
+      questionContext: {
+        stem: "What is the capital?",
+        choices: ["Paris", "London"],
+        correctAnswerIndex: 0,
+      },
+    })
+
+    expect(AiController.generateRefinementSuggestions).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: { note: note.id },
+        body: {
+          stem: "What is the capital?",
+          choices: ["Paris", "London"],
+          correctAnswerIndex: 0,
+        },
+      })
+    )
+    expect(layoutCheckbox(wrapper, "p1").checked).toBe(true)
+    expect(layoutCheckbox(wrapper, "p2").checked).toBe(false)
+  })
+
+  it("starts with empty selection when no question context", async () => {
+    const layout: NoteRefinementLayoutItem[] = [
+      {
+        id: "p1",
+        text: "Flagged without context",
+        alreadyExtracted: false,
+        ledToQuestion: true,
+        children: [],
+      },
+    ]
+    const wrapper = await mountNoteRefinementWithLayoutReady(layout)
+
+    expect(layoutCheckbox(wrapper, "p1").checked).toBe(false)
   })
 })

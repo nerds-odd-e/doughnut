@@ -36,11 +36,16 @@
     v-if="hasNoteContent && note"
     v-model:open="showRefineNoteModal"
     :note="note"
+    :question-context="questionContext"
   />
 </template>
 
 <script setup lang="ts">
-import type { AnsweredQuestion, Note } from "@generated/doughnut-backend-api"
+import type {
+  AnsweredQuestion,
+  Note,
+  NoteRefinementQuestionContextDto,
+} from "@generated/doughnut-backend-api"
 import type { PropType } from "vue"
 import { computed, ref } from "vue"
 import QuestionDisplay from "./QuestionDisplay.vue"
@@ -74,4 +79,17 @@ const note = computed<Note | undefined>(() => {
 })
 
 const hasNoteContent = computed(() => !!(note.value?.content ?? "").trim())
+
+const questionContext = computed<NoteRefinementQuestionContextDto | undefined>(
+  () => {
+    const predefined = props.answeredQuestion.predefinedQuestion
+    if (!predefined?.multipleChoicesQuestion) return undefined
+    return {
+      stem: predefined.multipleChoicesQuestion.questionStem,
+      choices: predefined.multipleChoicesQuestion.responseChoices,
+      correctAnswerIndex: predefined.correctAnswerIndex,
+      testedFocus: predefined.testedFocus,
+    }
+  }
+)
 </script>

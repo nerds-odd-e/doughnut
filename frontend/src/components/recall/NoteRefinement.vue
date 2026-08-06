@@ -121,7 +121,10 @@
 </template>
 
 <script setup lang="ts">
-import type { Note } from "@generated/doughnut-backend-api"
+import type {
+  Note,
+  NoteRefinementQuestionContextDto,
+} from "@generated/doughnut-backend-api"
 import AiRequestExportDialog from "@/components/commons/AiRequestExportDialog.vue"
 import { useNoteRefinement } from "@/composables/useNoteRefinement"
 import NoteExtractionPreview from "./NoteExtractionPreview.vue"
@@ -131,6 +134,7 @@ import { toRef } from "vue"
 
 const props = defineProps<{
   note: Note
+  questionContext?: NoteRefinementQuestionContextDto
 }>()
 
 const emit = defineEmits<{
@@ -158,7 +162,9 @@ const {
   fetchExtractRequestExport,
   fetchBreakdownRequestExport,
   createExtractedNote,
-} = useNoteRefinement(toRef(props, "note"), (newContent) =>
-  emit("contentUpdated", newContent)
+} = useNoteRefinement(
+  toRef(props, "note"),
+  (newContent) => emit("contentUpdated", newContent),
+  toRef(props, "questionContext")
 )
 </script>
