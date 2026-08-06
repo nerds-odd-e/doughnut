@@ -17,7 +17,7 @@
 - [x] Phase 10: Overlap alias append util — completed 2026-08-05
 - [x] Phase 11: Add as overlapped note — completed 2026-08-05
 - [x] Phase 12: Title navigate, reopen, E2E polish — completed 2026-08-05
-- [x] Gap closure: distinct `overlaps` + resolve polish (OVL-01..07) — completed 2026-08-06
+- [x] Gap closure: distinct `overlaps` + plain-only `aliases` (OVL-01..07) — completed 2026-08-06
 
 </details>
 
