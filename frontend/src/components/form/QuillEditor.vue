@@ -22,6 +22,7 @@ registerDoughnutQuillBlots()
 const props = defineProps({
   modelValue: String,
   readonly: Boolean,
+  placeholder: { type: String, default: "Enter note content here..." },
 })
 
 const emits = defineEmits<{
@@ -101,7 +102,7 @@ const options: QuillOptions = {
     "horizontalrule",
     "table",
   ],
-  placeholder: props.readonly ? "" : "Enter note content here...",
+  placeholder: props.readonly ? "" : props.placeholder,
   readOnly: props.readonly,
   theme: "bubble",
 }

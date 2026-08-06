@@ -30,6 +30,9 @@
       v-bind="{ multipleLine, scopeName, field, title, errors }"
       :model-value="htmlValue"
       :readonly="effectiveReadonly"
+      :placeholder="
+        isReadmeContext ? 'Enter readme content here...' : undefined
+      "
       @update:model-value="htmlValueUpdated"
       @blur="$emit('blur')"
       @paste-complete="onPasteComplete"

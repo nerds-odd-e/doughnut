@@ -16,6 +16,13 @@ describe("RichMarkdownEditor", () => {
     expect(h.getWrapper().emitted()["update:modelValue"]).toBeUndefined()
   })
 
+  it("prompts for readme content when empty in readme context", async () => {
+    await h.mountEditor("", { isReadmeContext: true, attachToBody: true })
+    expect(h.quillEditorEl().getAttribute("data-placeholder")).toBe(
+      "Enter readme content here..."
+    )
+  })
+
   it("converts pasted HTML to markdown", async () => {
     await h.mountEditor("", { attachToBody: true })
     await h.dispatchPasteHtmlToQuill("<p><strong>Bold text</strong></p>")
