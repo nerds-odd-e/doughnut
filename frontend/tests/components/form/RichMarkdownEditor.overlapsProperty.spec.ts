@@ -4,6 +4,7 @@ import {
   listPropertyValue,
   parseNoteContentMarkdown,
 } from "@/utils/noteContentFrontmatter"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 import { wikiTitleFromInnerAndNoteId } from "@/utils/wikiPropertyValueField"
 import {
   addNewOverlapsProperty,
@@ -83,7 +84,7 @@ describe("RichMarkdownEditor overlaps property", () => {
     expect(wrapper.emitted("update:modelValue")).toBeUndefined()
   })
 
-  it("renders overlaps list items as wiki links", async () => {
+  it("renders overlaps list items as in-app wiki links", async () => {
     const wrapper = await h.mountEditor(OVERLAPS_LIST_MARKDOWN, {
       wikiTitles: [wikiTitleFromInnerAndNoteId("Other Note", 42)],
     })
@@ -98,9 +99,12 @@ describe("RichMarkdownEditor overlaps property", () => {
     const listValue = overlapsRow!.find(
       '[data-testid="rich-note-property-row-list-value"]'
     )
-    expect(listValue.find("a.doughnut-link").exists()).toBe(true)
-    expect(
-      listValue.find("a.doughnut-link").attributes("data-wiki-title")
-    ).toBe("Other Note")
+    const link = listValue.find("a.router-link")
+    expect(link.exists()).toBe(true)
+    expect(link.text()).toBe("Other Note")
+    expect(listValue.text()).not.toContain("[[")
+    expect(JSON.parse(link.attributes("to") ?? "{}")).toEqual(
+      noteShowLocation(42)
+    )
   })
 })

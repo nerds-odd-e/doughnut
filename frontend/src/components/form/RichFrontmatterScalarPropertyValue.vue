@@ -10,6 +10,7 @@
         :value="listValue"
         :property-key="propertyKey"
         :wiki-titles="wikiTitles"
+        @dead-link-click="emit('dead-link-click', $event)"
       />
     </div>
     <div

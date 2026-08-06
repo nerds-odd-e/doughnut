@@ -8,15 +8,16 @@
   >
   <span
     v-else-if="showWikiLinks"
-    class="inline-flex min-w-0 max-w-full flex-wrap items-center text-sm text-base-content/90"
+    class="rich-content-links inline-flex min-w-0 max-w-full flex-wrap items-center text-sm text-base-content/90"
     :title="title"
     data-testid="rich-note-property-row-list-value"
   >
     <template v-for="(item, index) in value.items" :key="index">
       <span v-if="index > 0" aria-hidden="true">, </span>
-      <span
-        class="rich-content-links inline min-w-0 max-w-full"
-        v-html="wikiItemDisplayHtml(item)"
+      <WikiLinkToken
+        :token="item"
+        :wiki-titles="wikiTitles ?? []"
+        @dead-link-click="emit('deadLinkClick', $event)"
       />
     </template>
   </span>
@@ -44,6 +45,7 @@
 <script setup lang="ts">
 import { computed } from "vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
+import WikiLinkToken from "@/components/notes/WikiLinkToken.vue"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
 import { isOverlapsPropertyKey } from "@/utils/authoredOverlapsValidation"
 import { isUrlPropertyKey } from "@/utils/noteContentPropertyKeys"
@@ -51,13 +53,17 @@ import {
   compactDisplayForPropertyValue,
   type PropertyValue,
 } from "@/utils/noteProperties"
-import { propertyValuePlainToDisplayHtml } from "@/utils/wikiPropertyValueField"
+import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
 
 const props = defineProps<{
   value: Extract<PropertyValue, { kind: "list" }>
   propertyKey?: string
   wikiTitles?: WikiTitle[]
   compact?: boolean
+}>()
+
+const emit = defineEmits<{
+  deadLinkClick: [payload: DeadLinkPayload]
 }>()
 
 const showUrlLinks = computed(
@@ -72,8 +78,4 @@ const showWikiLinks = computed(
 const title = computed(() =>
   props.value.items.length === 0 ? "[]" : props.value.items.join("\n")
 )
-
-function wikiItemDisplayHtml(item: string): string {
-  return propertyValuePlainToDisplayHtml(item, props.wikiTitles ?? [])
-}
 </script>

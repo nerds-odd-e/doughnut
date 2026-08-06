@@ -58,6 +58,19 @@ export function splitWikiLinkInner(rawBetweenBrackets: string): {
   return { target, display }
 }
 
+/** Lookup keys: trimmed wiki target token and full `linkText` from the note realm. */
+export function wikiTitleNoteIdLookup(
+  wikiTitles: readonly WikiTitle[]
+): Map<string, number> {
+  const map = new Map<string, number>()
+  for (const w of wikiTitles) {
+    const { target } = wikiTitleParts(w)
+    map.set(target.trim(), w.noteId)
+    map.set(w.linkText.trim(), w.noteId)
+  }
+  return map
+}
+
 /**
  * Renders a YAML property scalar with clickable wiki links. Only well-formed `[[title]]` segments
  * (non-empty title, no `[`/`]`/newlines inside) become links; everything else stays plain text.
@@ -66,12 +79,7 @@ export function propertyValuePlainToDisplayHtml(
   plain: string,
   wikiTitles: WikiTitle[]
 ): string {
-  const map = new Map<string, number>()
-  for (const w of wikiTitles) {
-    const { target } = wikiTitleParts(w)
-    map.set(target.trim(), w.noteId)
-    map.set(w.linkText.trim(), w.noteId)
-  }
+  const map = wikiTitleNoteIdLookup(wikiTitles)
 
   const re = /\[\[([^\[\]\r\n]*)\]\]/g
   let out = ""

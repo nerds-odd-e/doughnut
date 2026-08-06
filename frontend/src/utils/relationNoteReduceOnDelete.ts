@@ -6,7 +6,7 @@ import {
 } from "@/utils/noteContentFrontmatter"
 import {
   splitWikiLinkInner,
-  wikiTitleParts,
+  wikiTitleNoteIdLookup,
 } from "@/utils/wikiPropertyValueField"
 
 const RELATIONSHIP_NOTE_TYPE = "relationship"
@@ -27,11 +27,7 @@ function noteIdForWikiLinkInner(
   inner: string,
   wikiTitles: WikiTitle[]
 ): number | undefined {
-  const map = new Map<string, number>()
-  for (const w of wikiTitles) {
-    map.set(w.linkText.trim(), w.noteId)
-    map.set(wikiTitleParts(w).target.trim(), w.noteId)
-  }
+  const map = wikiTitleNoteIdLookup(wikiTitles)
   const { target } = splitWikiLinkInner(inner)
   return map.get(inner) ?? map.get(target.trim())
 }

@@ -263,6 +263,7 @@ declare module 'vue' {
     WikidataAssociationDialog: typeof import('./src/components/notes/WikidataAssociationDialog.vue')['default']
     WikidataAssociationDialogBody: typeof import('./src/components/notes/WikidataAssociationDialogBody.vue')['default']
     WikidataSearchByLabel: typeof import('./src/components/notes/WikidataSearchByLabel.vue')['default']
+    WikiLinkToken: typeof import('./src/components/notes/WikiLinkToken.vue')['default']
     WikiPropertyValueField: typeof import('./src/components/form/WikiPropertyValueField.vue')['default']
     WorkspaceReadmeSettingsTabs: typeof import('./src/components/commons/WorkspaceReadmeSettingsTabs.vue')['default']
   }
@@ -521,6 +522,7 @@ declare global {
   const WikidataAssociationDialog: typeof import('./src/components/notes/WikidataAssociationDialog.vue')['default']
   const WikidataAssociationDialogBody: typeof import('./src/components/notes/WikidataAssociationDialogBody.vue')['default']
   const WikidataSearchByLabel: typeof import('./src/components/notes/WikidataSearchByLabel.vue')['default']
+  const WikiLinkToken: typeof import('./src/components/notes/WikiLinkToken.vue')['default']
   const WikiPropertyValueField: typeof import('./src/components/form/WikiPropertyValueField.vue')['default']
   const WorkspaceReadmeSettingsTabs: typeof import('./src/components/commons/WorkspaceReadmeSettingsTabs.vue')['default']
 }
