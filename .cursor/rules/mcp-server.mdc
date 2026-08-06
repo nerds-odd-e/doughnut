@@ -81,7 +81,7 @@ The unit tests cover:
 
 ## CI/CD Integration
 
-- Unit tests run as part of the "Frontend & MCP Unit Tests" job in GitHub Actions
+- Unit tests run as part of the "Other Unit Tests" job in GitHub Actions
 - Formatting is included in the workspace format command; see `.cursor/rules/linting_formating.mdc`
 - Tests are automatically executed on every push to main branch
 

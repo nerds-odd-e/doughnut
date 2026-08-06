@@ -75,7 +75,7 @@ jobs:
           java_version: ${{ vars.JAVA_VERSION }}
       - run: backend/gradlew -p backend migrateTestDB -Dspring.profiles.active=test
       - run: backend/gradlew -p backend test -Dspring.profiles.active=test --parallel
-      # Fat jar no longer embeds SPA/CLI/MCP (those go to GCS). Jar repro is Gradle-only.
+      # Fat jar does not embed SPA/CLI (uploaded to GCS separately). Jar repro is Gradle-only.
       - name: Boot jar reproducibility
         run: bash backend/scripts/boot-jar-reproducible.sh
 
@@ -124,8 +124,8 @@ jobs:
       - uses: ./.github/setup_nodejs_with_cache
         with:
           node_version: ${{ vars.NODE_VERSION }}
-      - name: Bundle MCP server & Compile & transform frontend assets for bundling with Backend
-        run: pnpm bundle:all
+      - name: Build SPA and CLI for GCS upload
+        run: pnpm cli:bundle && pnpm frontend:build
       - name: Build application jar artifact
         run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel
       - uses: ./.github/gcloud_auth_n_sdk

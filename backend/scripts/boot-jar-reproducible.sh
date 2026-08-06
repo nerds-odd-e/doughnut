@@ -3,7 +3,7 @@
 # Two clean bootJar runs from the same tree must yield the same SHA-256 (conditional deploy compares this hash).
 # Real Gradle (not Bach). See docs/gcp/conditional-backend-deploy.md.
 #
-# The deployable jar does not embed SPA/CLI/MCP (those upload to GCS). This check is Java packaging only.
+# The deployable jar does not embed SPA/CLI (those upload to GCS). This check is Java packaging only.
 #
 # Local:  CURSOR_DEV=true nix develop -c bash backend/scripts/boot-jar-reproducible.sh
 # CI:     same (Backend Unit tests job)

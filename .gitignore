@@ -110,7 +110,6 @@ infra/ssl/
 frontend/node_modules
 frontend/dist/
 frontend/tsconfig.tsbuildinfo
-frontend/public/mcp-server.bundle.mjs
 mcp-server/dist/
 cli/dist/
 
