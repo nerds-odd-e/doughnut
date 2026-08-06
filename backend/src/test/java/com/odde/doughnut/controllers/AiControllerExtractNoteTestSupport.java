@@ -8,7 +8,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.services.ai.NoteExtractionResult;
 import com.odde.doughnut.services.ai.NoteRefinementLayout;
-import com.odde.doughnut.services.ai.NoteRefinementLayoutItem;
+import com.odde.doughnut.services.ai.NoteRefinementLayoutItems;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import java.util.stream.Stream;
@@ -27,8 +27,7 @@ final class AiControllerExtractNoteTestSupport {
   }
 
   static NoteRefinementLayout layoutWithItem(String id, String text) {
-    return new NoteRefinementLayout(
-        List.of(new NoteRefinementLayoutItem(id, text, false, false, List.of())));
+    return new NoteRefinementLayout(List.of(NoteRefinementLayoutItems.leaf(id, text)));
   }
 
   static NoteRefinementLayout nestedLayout(
@@ -40,13 +39,9 @@ final class AiControllerExtractNoteTestSupport {
       String siblingText) {
     return new NoteRefinementLayout(
         List.of(
-            new NoteRefinementLayoutItem(
-                parentId,
-                parentText,
-                false,
-                false,
-                List.of(new NoteRefinementLayoutItem(childId, childText, false, false, List.of()))),
-            new NoteRefinementLayoutItem(siblingId, siblingText, false, false, List.of())));
+            NoteRefinementLayoutItems.parent(
+                parentId, parentText, List.of(NoteRefinementLayoutItems.leaf(childId, childText))),
+            NoteRefinementLayoutItems.leaf(siblingId, siblingText)));
   }
 
   static NoteRefinementLayoutSelectionRequestDTO layoutSelectionRequest(

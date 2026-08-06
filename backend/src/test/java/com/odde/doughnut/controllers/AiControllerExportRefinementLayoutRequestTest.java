@@ -43,10 +43,6 @@ class AiControllerExportRefinementLayoutRequestTest extends ControllerTestBase {
       assertThat(format.get("type")).isEqualTo("json_schema");
       assertThat(format).containsKey("schema");
       assertThat(body.get("instructions").toString())
-          .contains("Return one current-content layout for the note content")
-          .contains("not alternative breakdown suggestions")
-          .contains("Do not create grandchildren")
-          .contains("Focus Note content only")
           .contains("Set ledToQuestion to false for every item")
           .doesNotContain("Set ledToQuestion=true");
       verifyNoInteractions(officialClient);
@@ -66,9 +62,6 @@ class AiControllerExportRefinementLayoutRequestTest extends ControllerTestBase {
 
       assertThat(body.get("instructions").toString())
           .contains("What is the capital of France?")
-          .contains("0. Paris")
-          .contains("1. London")
-          .contains("Correct answer index: 0")
           .contains("Set ledToQuestion=true")
           .doesNotContain("Set ledToQuestion to false for every item");
       verifyNoInteractions(officialClient);

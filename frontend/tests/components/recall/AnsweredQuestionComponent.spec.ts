@@ -139,7 +139,7 @@ describe("AnsweredQuestionComponent", () => {
       ).toBe(false)
     })
 
-    it("passes MCQ context and preselects ledToQuestion layout items", async () => {
+    it("passes MCQ context when opening Refine note", async () => {
       const predefinedQuestion = makeMe.aPredefinedQuestion
         .withQuestionStem("What is the capital of France?")
         .withChoices(["Paris", "London", "Berlin"])
@@ -151,22 +151,7 @@ describe("AnsweredQuestionComponent", () => {
         AiController,
         "generateRefinementSuggestions",
         {
-          items: [
-            {
-              id: "p1",
-              text: "Paris is the capital",
-              alreadyExtracted: false,
-              ledToQuestion: true,
-              children: [],
-            },
-            {
-              id: "p2",
-              text: "Other fact",
-              alreadyExtracted: false,
-              ledToQuestion: false,
-              children: [],
-            },
-          ],
+          items: refinementLayoutItems([]),
         }
       )
 
@@ -203,15 +188,6 @@ describe("AnsweredQuestionComponent", () => {
           },
         })
       )
-
-      const ledCheckbox = document.querySelector(
-        '[data-test-id="refinement-layout-checkbox-p1"]'
-      ) as HTMLInputElement
-      const otherCheckbox = document.querySelector(
-        '[data-test-id="refinement-layout-checkbox-p2"]'
-      ) as HTMLInputElement
-      expect(ledCheckbox.checked).toBe(true)
-      expect(otherCheckbox.checked).toBe(false)
     })
   })
 })

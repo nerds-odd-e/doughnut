@@ -96,14 +96,10 @@ class AiNoteAutomationServiceExtractRequestTest {
   private static NoteRefinementLayout sampleLayout() {
     return new NoteRefinementLayout(
         List.of(
-            new NoteRefinementLayoutItem(
+            NoteRefinementLayoutItems.parent(
                 "p1",
                 "Main concept",
-                false,
-                false,
-                List.of(
-                    new NoteRefinementLayoutItem(
-                        "p1-1", "key suggestion to extract", false, false, List.of()))),
-            new NoteRefinementLayoutItem("p2", "Other point", false, false, List.of())));
+                List.of(NoteRefinementLayoutItems.leaf("p1-1", "key suggestion to extract"))),
+            NoteRefinementLayoutItems.leaf("p2", "Other point")));
   }
 }

@@ -1,14 +1,8 @@
 import {
+  layoutCheckboxForPoint,
   openRefineNoteModalIfNeeded,
   refinementLayoutPanel,
 } from './assimilationPage/shared'
-
-function layoutCheckboxForPoint(layoutPointText: string) {
-  return refinementLayoutPanel()
-    .contains('[data-layout-level] > label', layoutPointText)
-    .find('input[type="checkbox"]')
-    .first()
-}
 
 export function answeredQuestionRefineMethods<T extends object>(self: T) {
   return {

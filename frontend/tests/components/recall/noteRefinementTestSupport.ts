@@ -13,16 +13,32 @@ import usePopups from "@/components/commons/Popups/usePopups"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
 import type {
   Note,
-  NoteExtractionResult,
   NoteRefinementLayoutItem,
   NoteRefinementQuestionContextDto,
 } from "@generated/doughnut-backend-api"
-import { afterEach, beforeEach, expect, vi } from "vitest"
+import { afterEach, beforeEach, vi } from "vitest"
 import { defineComponent, type PropType } from "vue"
+import {
+  refinementLayoutItems,
+  sampleExtractionPreview,
+  selectRefinementLayoutItem,
+} from "./noteRefinementLayoutFixtures"
 
 export const noteRealm = makeMe.aNoteRealm.please()
 export const memoryTracker = makeMe.aMemoryTracker.ofNote(noteRealm).please()
 export const { note } = memoryTracker
+
+export {
+  extractNoteButtonTitle,
+  threePointLayoutTexts,
+  threePointLayout,
+  sampleExtractionPreview,
+  layoutCheckbox,
+  selectRefinementLayoutItem,
+  refinementActionButton,
+  refinementLayoutItems,
+  refinementLayoutSelectionApiCall,
+} from "./noteRefinementLayoutFixtures"
 
 const NoteRefinementWithGlobalLoading = defineComponent({
   components: { GlobalApiLoadingModal, NoteRefinement },
@@ -127,14 +143,6 @@ export async function selectFirstLayoutItem(
   await selectRefinementLayoutItem(wrapper, "p1")
 }
 
-export const extractNoteButtonTitle = "Extract selected to a new note"
-
-export const threePointLayoutTexts = ["Point 1", "Point 2", "Point 3"] as const
-
-export function threePointLayout() {
-  return refinementLayoutItems([...threePointLayoutTexts])
-}
-
 export async function mountNoteRefinementReady(layoutItemTexts: string[]) {
   const wrapper = mountNoteRefinement(layoutItemTexts)
   await flushPromises()
@@ -169,83 +177,6 @@ export async function mountNoteRefinementWithFirstItemSelected(
   await flushPromises()
   await selectFirstLayoutItem(wrapper)
   return wrapper
-}
-
-export const sampleExtractionPreview = (
-  overrides?: Partial<NoteExtractionResult>
-): NoteExtractionResult => ({
-  newNoteTitle: "Extracted title",
-  newNoteContent: "Extracted content",
-  updatedOriginalNoteContent: "Updated original content",
-  ...overrides,
-})
-
-export function layoutCheckbox(
-  wrapper: ReturnType<typeof mountNoteRefinementWithLayout>,
-  itemId: string
-): HTMLInputElement {
-  return wrapper.find(`[data-test-id="refinement-layout-checkbox-${itemId}"]`)
-    .element as HTMLInputElement
-}
-
-export function refinementActionButton(
-  wrapper: ReturnType<typeof mountNoteRefinement>,
-  testId:
-    | "extract-refinement-layout"
-    | "export-extract-request"
-    | "export-breakdown-request"
-    | "remove-refinement-layout"
-): HTMLButtonElement {
-  return wrapper.find(`[data-test-id="${testId}"]`).element as HTMLButtonElement
-}
-
-export async function selectRefinementLayoutItem(
-  wrapper: ReturnType<typeof mountNoteRefinement>,
-  itemId: string,
-  checked = true
-) {
-  await wrapper
-    .find(`[data-test-id="refinement-layout-checkbox-${itemId}"]`)
-    .setValue(checked)
-  await flushPromises()
-}
-
-export function refinementLayoutItems(
-  texts: string[]
-): NoteRefinementLayoutItem[] {
-  return texts.map((text, index) => ({
-    id: `p${index + 1}`,
-    text,
-    alreadyExtracted: false,
-    ledToQuestion: false,
-    children: [],
-  }))
-}
-
-export function refinementLayoutSelectionApiCall(
-  noteId: number,
-  items: NoteRefinementLayoutItem[],
-  selectedItemIds: string[],
-  options?: { signal?: boolean }
-) {
-  const call: {
-    path: { note: number }
-    body: {
-      layout: { items: NoteRefinementLayoutItem[] }
-      selectedItemIds: string[]
-    }
-    signal?: AbortSignal
-  } = {
-    path: { note: noteId },
-    body: {
-      layout: { items },
-      selectedItemIds,
-    },
-  }
-  if (options?.signal) {
-    return { ...call, signal: expect.any(AbortSignal) }
-  }
-  return call
 }
 
 export {

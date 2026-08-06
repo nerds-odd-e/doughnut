@@ -51,6 +51,13 @@ export const refinementLayoutPanel = () =>
     .contains('Note layout:')
     .closest('.bg-accent')
 
+export function layoutCheckboxForPoint(layoutPointText: string) {
+  return refinementLayoutPanel()
+    .contains('[data-layout-level] > label', layoutPointText)
+    .find('input[type="checkbox"]')
+    .first()
+}
+
 export const removeRefinementLayoutButton = () =>
   refinementLayoutPanel().find('[data-test-id="remove-refinement-layout"]')
 

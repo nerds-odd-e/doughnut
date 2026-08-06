@@ -1,5 +1,7 @@
 package com.odde.doughnut.services.ai;
 
+import static com.odde.doughnut.services.ai.NoteRefinementLayoutItems.leaf;
+import static com.odde.doughnut.services.ai.NoteRefinementLayoutItems.parent;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
@@ -11,14 +13,8 @@ class NoteRefinementLayoutValidatorTest {
     NoteRefinementLayout layout =
         new NoteRefinementLayout(
             List.of(
-                new NoteRefinementLayoutItem(
-                    "parent",
-                    "Parent point",
-                    false,
-                    false,
-                    List.of(
-                        new NoteRefinementLayoutItem(
-                            "child", "Child point", true, false, List.of())))));
+                parent(
+                    "parent", "Parent point", List.of(leaf("child", "Child point", true, false)))));
 
     assertThat(NoteRefinementLayoutValidator.isValid(layout)).isTrue();
   }
@@ -28,24 +24,16 @@ class NoteRefinementLayoutValidatorTest {
     NoteRefinementLayout layout =
         new NoteRefinementLayout(
             List.of(
-                new NoteRefinementLayoutItem(
+                parent(
                     "parent",
                     "Parent point",
-                    false,
-                    false,
                     List.of(
                         new NoteRefinementLayoutItem(
                             "child",
                             "Child point",
                             false,
                             false,
-                            List.of(
-                                new NoteRefinementLayoutItem(
-                                    "grandchild",
-                                    "Grandchild point",
-                                    false,
-                                    false,
-                                    List.of())))))));
+                            List.of(leaf("grandchild", "Grandchild point")))))));
 
     assertThat(NoteRefinementLayoutValidator.isValid(layout)).isFalse();
   }
@@ -53,19 +41,14 @@ class NoteRefinementLayoutValidatorTest {
   @Test
   void rejectsDuplicateIds() {
     NoteRefinementLayout layout =
-        new NoteRefinementLayout(
-            List.of(
-                new NoteRefinementLayoutItem("same", "Point 1", false, false, List.of()),
-                new NoteRefinementLayoutItem("same", "Point 2", false, false, List.of())));
+        new NoteRefinementLayout(List.of(leaf("same", "Point 1"), leaf("same", "Point 2")));
 
     assertThat(NoteRefinementLayoutValidator.isValid(layout)).isFalse();
   }
 
   @Test
   void rejectsBlankText() {
-    NoteRefinementLayout layout =
-        new NoteRefinementLayout(
-            List.of(new NoteRefinementLayoutItem("p1", " ", false, false, List.of())));
+    NoteRefinementLayout layout = new NoteRefinementLayout(List.of(leaf("p1", " ")));
 
     assertThat(NoteRefinementLayoutValidator.isValid(layout)).isFalse();
   }

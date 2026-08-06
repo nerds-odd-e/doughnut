@@ -15,10 +15,6 @@ export function useRefinementLayoutSelection(
 ) {
   const allLayoutItems = computed(() => flattenLayoutItems(layoutItems.value))
 
-  const layoutItemsById = computed(
-    () => new Map(allLayoutItems.value.map((item) => [item.id, item]))
-  )
-
   const descendantIds = (item: NoteRefinementLayoutItem): string[] =>
     flattenLayoutItems([item]).map(({ id }) => id)
 
@@ -89,7 +85,6 @@ export function useRefinementLayoutSelection(
 
   return {
     selectedItemIds,
-    layoutItemsById,
     isFullySelected,
     isPartiallySelected,
     setItemSelection,

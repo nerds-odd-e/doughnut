@@ -15,7 +15,7 @@ import com.odde.doughnut.controllers.dto.NoteRefinementQuestionContextDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.ai.NoteRefinementLayout;
-import com.odde.doughnut.services.ai.NoteRefinementLayoutItem;
+import com.odde.doughnut.services.ai.NoteRefinementLayoutItems;
 import com.odde.doughnut.services.ai.NoteRefinementLayoutValidator;
 import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
@@ -69,15 +69,13 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
       openAiStructuredResponseMock.stubStructuredResponse(
           new NoteRefinementLayout(
               List.of(
-                  new NoteRefinementLayoutItem(
+                  NoteRefinementLayoutItems.parent(
                       "p1",
                       "Point 1",
-                      false,
-                      false,
                       List.of(
-                          new NoteRefinementLayoutItem(
-                              "p1-1", "[[Already extracted note]]", true, false, List.of()))),
-                  new NoteRefinementLayoutItem("p2", "Point 2", false, false, List.of()))));
+                          NoteRefinementLayoutItems.leaf(
+                              "p1-1", "[[Already extracted note]]", true, false))),
+                  NoteRefinementLayoutItems.leaf("p2", "Point 2"))));
       testNote.setContent("Some note content");
 
       NoteRefinementLayoutDTO result = controller.generateRefinementSuggestions(testNote, null);
@@ -114,9 +112,7 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       openAiStructuredResponseMock.stubStructuredResponse(
           new NoteRefinementLayout(
-              List.of(
-                  new NoteRefinementLayoutItem(
-                      "p1", "Capital of France", false, true, List.of()))));
+              List.of(NoteRefinementLayoutItems.leaf("p1", "Capital of France", false, true))));
       testNote.setContent("Paris is the capital of France.");
 
       NoteRefinementQuestionContextDTO questionContext = new NoteRefinementQuestionContextDTO();
@@ -168,8 +164,8 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
         openAiStructuredResponseMock.stubStructuredResponse(
             new NoteRefinementLayout(
                 List.of(
-                    new NoteRefinementLayoutItem("same", "Point 1", false, false, List.of()),
-                    new NoteRefinementLayoutItem("same", "Point 2", false, false, List.of()))));
+                    NoteRefinementLayoutItems.leaf("same", "Point 1"),
+                    NoteRefinementLayoutItems.leaf("same", "Point 2"))));
         testNote.setContent("Some note content");
 
         assertThat(controller.generateRefinementSuggestions(testNote, null).getItems()).isEmpty();

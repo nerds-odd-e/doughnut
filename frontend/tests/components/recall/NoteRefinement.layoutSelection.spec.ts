@@ -1,4 +1,3 @@
-import type { NoteRefinementLayoutItem } from "@generated/doughnut-backend-api"
 import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
 import { describe, expect, it } from "vitest"
 import { flushPromises } from "@vue/test-utils"
@@ -13,6 +12,7 @@ import {
   layoutCheckbox,
   mountNoteRefinementWithLayoutReady,
   note,
+  refinementLayoutItems,
   refinementLayoutSelectionApiCall,
   sampleExtractionPreview,
   selectRefinementLayoutItem,
@@ -128,22 +128,10 @@ describe("NoteRefinement layout selection", () => {
   })
 
   it("preselects ledToQuestion items when question context is provided", async () => {
-    const layout: NoteRefinementLayoutItem[] = [
-      {
-        id: "p1",
-        text: "Question-led point",
-        alreadyExtracted: false,
-        ledToQuestion: true,
-        children: [],
-      },
-      {
-        id: "p2",
-        text: "Other point",
-        alreadyExtracted: false,
-        ledToQuestion: false,
-        children: [],
-      },
-    ]
+    const layout = refinementLayoutItems(
+      ["Question-led point", "Other point"],
+      { ledToQuestion: [true, false] }
+    )
     const wrapper = await mountNoteRefinementWithLayoutReady(layout, {
       questionContext: {
         stem: "What is the capital?",
@@ -152,30 +140,14 @@ describe("NoteRefinement layout selection", () => {
       },
     })
 
-    expect(AiController.generateRefinementSuggestions).toHaveBeenCalledWith(
-      expect.objectContaining({
-        path: { note: note.id },
-        body: {
-          stem: "What is the capital?",
-          choices: ["Paris", "London"],
-          correctAnswerIndex: 0,
-        },
-      })
-    )
     expect(layoutCheckbox(wrapper, "p1").checked).toBe(true)
     expect(layoutCheckbox(wrapper, "p2").checked).toBe(false)
   })
 
   it("starts with empty selection when no question context", async () => {
-    const layout: NoteRefinementLayoutItem[] = [
-      {
-        id: "p1",
-        text: "Flagged without context",
-        alreadyExtracted: false,
-        ledToQuestion: true,
-        children: [],
-      },
-    ]
+    const layout = refinementLayoutItems(["Flagged without context"], {
+      ledToQuestion: [true],
+    })
     const wrapper = await mountNoteRefinementWithLayoutReady(layout)
 
     expect(layoutCheckbox(wrapper, "p1").checked).toBe(false)

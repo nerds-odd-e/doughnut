@@ -1,5 +1,6 @@
 import { waitUntilAppIsNotBusy } from '../../pageBase'
 import {
+  layoutCheckboxForPoint,
   refinementLayoutPanel,
   removeRefinementLayoutButton,
   waitForExtractNote,
@@ -68,13 +69,8 @@ export function assimilationRefinementLayoutExpectations() {
     },
     selectRefinementLayoutPoints(...layoutPointTexts: string[]) {
       showRefinementLayout.call(this)
-      refinementLayoutPanel().within(() => {
-        layoutPointTexts.forEach((layoutPointText) => {
-          cy.contains('[data-layout-level] > label', layoutPointText)
-            .find('input[type="checkbox"]')
-            .first()
-            .check()
-        })
+      layoutPointTexts.forEach((layoutPointText) => {
+        layoutCheckboxForPoint(layoutPointText).check()
       })
       return this
     },

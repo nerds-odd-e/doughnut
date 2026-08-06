@@ -64,18 +64,10 @@ class AiNoteAutomationServiceTest {
       NoteRefinementLayout layout = new NoteRefinementLayout();
       layout.setItems(
           List.of(
-              new NoteRefinementLayoutItem(
-                  "p1",
-                  "English is a language that is spoken in many countries.",
-                  false,
-                  false,
-                  List.of()),
-              new NoteRefinementLayoutItem(
-                  "p2",
-                  "It is also the most widely spoken language in the world.",
-                  false,
-                  false,
-                  List.of())));
+              NoteRefinementLayoutItems.leaf(
+                  "p1", "English is a language that is spoken in many countries."),
+              NoteRefinementLayoutItems.leaf(
+                  "p2", "It is also the most widely spoken language in the world.")));
       openAiStructuredResponseMock.stubStructuredResponse(layout);
 
       NoteRefinementLayout result = service.generateRefinementSuggestions(null);

@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.NoteRefinementLayout;
-import com.odde.doughnut.services.ai.NoteRefinementLayoutItem;
+import com.odde.doughnut.services.ai.NoteRefinementLayoutItems;
 import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
 import com.openai.client.OpenAIClient;
 import java.util.List;
@@ -62,8 +62,7 @@ class AiControllerExtractNoteValidationTest extends ControllerTestBase {
     @Test
     void shouldRejectInvalidLayout() {
       NoteRefinementLayout layout =
-          new NoteRefinementLayout(
-              List.of(new NoteRefinementLayoutItem("", "a suggestion", false, false, List.of())));
+          new NoteRefinementLayout(List.of(NoteRefinementLayoutItems.leaf("", "a suggestion")));
       assertResponseStatus(
           () ->
               controller.extractNotePreview(
