@@ -1,19 +1,19 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.2
-milestone_name: Accidental Match Resolve UX
-current_phase: 12
-current_phase_name: Title navigate, reopen, E2E polish
-status: gap_closure_complete
-stopped_at: Quick 002 complete (OVL-01..07); ready for milestone archive
-last_updated: "2026-08-06T08:15:00Z"
+milestone: null
+milestone_name: null
+current_phase: null
+current_phase_name: null
+status: milestone_complete
+stopped_at: v1.2 shipped; planning artifacts cleaned (no archive)
+last_updated: "2026-08-06T02:30:00Z"
 last_activity: 2026-08-06
-last_activity_desc: Quick 002 Phase 7 — aliases plain-only + migrate-on-save; grading read bridge retained
+last_activity_desc: Complete milestone v1.2 with cleanup (no historical archive)
 progress:
-  total_phases: 6
-  completed_phases: 6
-  total_plans: 11
-  completed_plans: 11
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
   percent: 100
 ---
 
@@ -21,26 +21,27 @@ progress:
 
 ## Project Reference
 
-See: `.planning/PROJECT.md` (updated 2026-08-05)
+See: `.planning/PROJECT.md` (updated 2026-08-06)
 
 **Core value:** Healthy mainline for learning and knowledge work — reviewed note stays primary during accidental-match results.
-**Current focus:** v1.2 Accidental Match Resolve UX — all phases 7–12 complete (AMR-01..09); gap closure quick/002 complete (OVL-01..07)
+**Current focus:** Planning next milestone (`/gsd-new-milestone`)
 
 ## Current Position
 
-Phase: 12 of 12 (Title navigate, reopen, E2E polish) — complete
-Plan: 12-01 executed; 12-02 skipped (KeepAlive sufficient)
-Status: Gap closure `.planning/quick/002-overlaps-property-and-resolve-polish/` — **complete**
-Last activity: 2026-08-06 — aliases plain-only; migrate wiki-in-aliases → overlaps on save; grading/disable keep legacy read bridge
+Milestone v1.2 Accidental Match Resolve UX — **shipped 2026-08-06** (override closeout: no formal VERIFICATION.md; AMR-01..09 + OVL-01..07 delivered in product/tests).
 
-Progress: [██████████] 100% (6/6 v1.2 phases; 11/11 plans; quick/002 OVL gap closure done)
+No active roadmap phase. Parallel work: `.planning/quick/001-backend-small-test-renovation/` (in progress).
 
-## Gap closure tech debt
+## Deferred Items
 
-- Drop grading/disable wiki-in-`aliases` read bridge once leftover notebook data is migrated (save already heals on edit).
+Items acknowledged at milestone close on 2026-08-06:
+
+| Category | Item | Status |
+|----------|------|--------|
+| quick_task | 001-backend-small-test-renovation | in progress (separate track) |
+| seed | SEED-001-mcq-fuzzy-notebook-title-spelling-match | dormant |
+| tech_debt | Drop grading/disable wiki-in-`aliases` read bridge after data migrated | open |
 
 ## Session Continuity
 
-Next action: Re-audit / complete milestone v1.2 (`/gsd-audit-milestone` then `/gsd-complete-milestone v1.2`), or drop legacy read bridge when ready.
-Resume: `.planning/quick/002-overlaps-property-and-resolve-polish/PLAN.md` (complete summary)
-
+Next action: `/gsd-new-milestone` (or continue quick/001).

@@ -1,9 +1,0 @@
-{
-  "content": "Vue Router modal patterns warn that component-local dialog open state is lost on route leave; history.state/backgroundView or explicit reopen affordance is required when titles navigate away. Portaled dialogs can also break across route remounts.",
-  "source": "web",
-  "provider": "websearch",
-  "confidence": "MEDIUM",
-  "fetched_at": "2026-08-05T08:24:15.112Z",
-  "ttl": 86400000,
-  "kind": "web"
-}

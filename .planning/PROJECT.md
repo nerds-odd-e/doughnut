@@ -10,23 +10,21 @@ Healthy mainline for learning and knowledge work. Approved [ADR 0002](../docs/ad
 
 ## Current State
 
+**Shipped v1.2 (2026-08-06):** Accidental-match resolve dialog UX; distinct `overlaps` frontmatter; reviewed note stays primary.
+
 **Shipped v1.1 (2026-07-25):** Accidental-match + overlap spelling recall loop end-to-end.
 
 **Shipped v1.0 (2026-07-23):** Notebook Health lint + Health tab + gated empty-folder purge.
 
 Portable content direction is ADR 0002 (git-native notebooks). Catalog ZIP download remains (`notebook_export.feature`); path-keyed CLI sync / `.doughnut-sync` is not part of the product.
 
-## Current Milestone: v1.2 Accidental Match Resolve UX
+## Next Milestone Goals
 
-**Goal:** Replace stacked matched-note NoteShows with a compact, optional resolve dialog so the reviewed note keeps the full-height focus.
+Define via `/gsd-new-milestone`. Candidates already noted:
 
-**Target features:**
-- Remove stacked matched notes from the accidental-match result
-- CTA under the alert: "Resolve accidental match" → opens a dialog
-- Dialog lists each match with clickable title + notebook path/breadcrumb (no note body)
-- Per match: "Build a link" (property/relationship) or "Add as overlapped note" (declare overlap)
-- Resolving is optional; after navigating away via a title, user can return and reopen the dialog
-- Choosing "Add as overlapped note" does not prompt try-again or reclaim SRS credit
+- SEED-001: MCQ / fuzzy / `Notebook:Title` spelling match
+- Drop grading/disable wiki-in-`aliases` read bridge once leftover notebook data is migrated
+- ADR 0002 Level 1 (git-native notebooks)
 
 ## Requirements
 
@@ -39,11 +37,13 @@ Portable content direction is ADR 0002 (git-native notebooks). Catalog ZIP downl
 - ✓ Add-link UI (wiki / property / relationship) — existing
 - ✓ Notebook Health lint + tab + gated empty-folder purge — v1.0
 - ✓ Accidental-match + overlap spelling recall loop — v1.1
+- ✓ Accidental-match resolve dialog (compact CTA, identity-only rows, Build a link, Add as overlapped) — v1.2
+- ✓ Distinct `overlaps` frontmatter + plain-only `aliases` (migrate wiki-in-aliases on save) — v1.2
 - ✓ Catalog notebook ZIP export (one-way) — retained
 
 ### Active
 
-- Accidental-match resolve dialog UX (v1.2) — see REQUIREMENTS.md
+(None — define in next milestone via `/gsd-new-milestone`)
 
 ### Out of Scope
 
@@ -51,10 +51,13 @@ Portable content direction is ADR 0002 (git-native notebooks). Catalog ZIP downl
 - Spelling follow-ons (MCQ / fuzzy / `Notebook:Title`) — parked as SEED-001
 - ADR 0002 Level 1 (git-native notebooks) — deferred to a later milestone
 - Broad unrelated refactors not required by the current milestone
+- Stacked matched `NoteShow` bodies on accidental-match result — replaced by dialog
+- Content peek in resolve dialog — identity only
+- Forced resolve / try-again or SRS reclaim after dialog overlap declare — locked anti-features
 
 ## Context
 
-Milestone archives: `.planning/milestones/`, `MILESTONES.md`. Accepted ADRs under `docs/adrs/`.
+Accepted ADRs under `docs/adrs/`. Planning history for completed milestones is not retained under `.planning/` (product + ADRs are the record).
 
 ## Constraints
 
@@ -68,19 +71,13 @@ Milestone archives: `.planning/milestones/`, `MILESTONES.md`. Accepted ADRs unde
 |----------|-----------|---------|
 | ADR 0002 git-native notebooks | Git authoritative for portable content; retire `.doughnut-sync` | ✓ Approved 2026-08-04 |
 | Keep catalog ZIP only | One-way portability still useful; E2E `notebook_export.feature` | ✓ Retained |
-| Accidental-match resolve via dialog (not stacked notes) | Full-height reviewed note stays primary; resolution is optional and compact | Active — v1.2 |
-| Overlap from dialog skips try-again / credit reclaim | Declaring overlap is the action; no secondary retry/credit flow | Active — v1.2 |
+| Accidental-match resolve via dialog (not stacked notes) | Full-height reviewed note stays primary; resolution is optional and compact | ✓ Shipped v1.2 |
+| Overlap from dialog skips try-again / credit reclaim | Declaring overlap is the action; no secondary retry/credit flow | ✓ Shipped v1.2 |
+| Distinct `overlaps` vs plain `aliases` | Wiki-link overlap declarations are not aliases; grading reads `overlaps` | ✓ Shipped v1.2 |
 
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
-
-**After each phase transition** (via `/gsd-transition`):
-1. Requirements invalidated? → Move to Out of Scope with reason
-2. Requirements validated? → Move to Validated with phase reference
-3. New requirements emerged? → Add to Active
-4. Decisions to log? → Add to Key Decisions
-5. "What This Is" still accurate? → Update if drifted
 
 **After each milestone** (via `/gsd-complete-milestone`):
 1. Full review of all sections
@@ -88,4 +85,5 @@ This document evolves at phase transitions and milestone boundaries.
 3. Audit Out of Scope — reasons still valid?
 4. Update Context with current state
 
-Last updated: 2026-08-05.
+---
+*Last updated: 2026-08-06 after v1.2 milestone*
