@@ -79,14 +79,18 @@ export function focusTargetWithin(
   return true
 }
 
+function scheduleFocus(run: () => void) {
+  nextTick(() => {
+    requestAnimationFrame(run)
+  })
+}
+
 export function scheduleFocusTargetWithin(
   element: Element | null,
   options: FocusTargetOptions = {}
 ) {
-  nextTick(() => {
-    requestAnimationFrame(() => {
-      focusTargetWithin(element, options)
-    })
+  scheduleFocus(() => {
+    focusTargetWithin(element, options)
   })
 }
 
@@ -97,5 +101,11 @@ export function focusAutofocusTargetWithin(element: Element | null): boolean {
     selectAll:
       autofocusTarget instanceof HTMLElement &&
       autofocusTarget.dataset.autofocusSelectAll === "true",
+  })
+}
+
+export function scheduleFocusAutofocusTargetWithin(element: Element | null) {
+  scheduleFocus(() => {
+    focusAutofocusTargetWithin(element)
   })
 }

@@ -1,6 +1,7 @@
 import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
 import type { MemoryTrackerLite } from "@generated/doughnut-backend-api/types.gen"
+import { primeSoftKeyboard } from "@/utils/focusTarget"
 
 const toRepeat = ref<MemoryTrackerLite[] | undefined>(undefined)
 const currentRecallWindowEndAt = ref<string | undefined>(undefined)
@@ -39,6 +40,7 @@ export function useRecallData() {
   }
 
   const resumeRecall = () => {
+    primeSoftKeyboard()
     shouldResumeRecall.value = true
     router.push({ name: "recall" })
   }

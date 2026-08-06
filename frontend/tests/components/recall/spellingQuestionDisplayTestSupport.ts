@@ -34,7 +34,8 @@ export function flushCapturedAnimationFrames(
   callbacks: FrameRequestCallback[],
   time = 0
 ) {
-  for (const callback of callbacks) {
+  const pending = callbacks.splice(0, callbacks.length)
+  for (const callback of pending) {
     callback(time)
   }
 }

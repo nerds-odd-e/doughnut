@@ -1,5 +1,5 @@
 <template>
-  <div class="recall-page h-full flex flex-col">
+  <div ref="recallPageRoot" class="recall-page h-full flex flex-col">
     <GlobalBar
       v-if="isProgressBarVisible"
       :class="[
@@ -80,22 +80,13 @@ import AnsweredQuestionComponent from "@/components/recall/AnsweredQuestionCompo
 import AnsweredSpellingQuestion from "@/components/recall/AnsweredSpellingQuestion.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import type { AnsweredQuestion } from "@generated/doughnut-backend-api"
-import { RecallsController } from "@generated/doughnut-backend-api/sdk.gen"
-import getEnvironment from "@/managedApi/window/getEnvironment"
-import timezoneParam from "@/managedApi/window/timezoneParam"
-import { shuffle } from "es-toolkit"
-import {
-  computed,
-  ref,
-  onActivated,
-  onDeactivated,
-  onMounted,
-  watch,
-} from "vue"
+import { computed, ref, watch } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 import { useRecallTrackerNavigation } from "@/composables/useRecallTrackerNavigation"
 import { useRecallAnswerHandling } from "@/composables/useRecallAnswerHandling"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
+import { useRecallPageLoading } from "@/composables/useRecallPageLoading"
+import { scheduleFocusAutofocusTargetWithin } from "@/utils/focusTarget"
 
 const { dueCount, setDueCount } = useAssimilationCount()
 const {
@@ -122,11 +113,9 @@ defineProps({
 const currentIndex = ref(0)
 const previousAnsweredQuestions = ref<(AnsweredQuestion | undefined)[]>([])
 const previousAnsweredQuestionCursor = ref<number | undefined>(undefined)
-const isProgressBarVisible = ref(true)
-const isLoadingMore = ref(false)
 const spellingRetryNonce = ref(0)
+const recallPageRoot = ref<HTMLElement | null>(null)
 
-// Sync currentIndex with useRecallData
 watch(
   () => currentIndex.value,
   (index) => {
@@ -135,7 +124,6 @@ watch(
   { immediate: true }
 )
 
-// Computed list of memory trackers that should not be modified
 const memoryTrackers = computed(() => toRepeat.value ?? [])
 
 const {
@@ -197,91 +185,28 @@ watch(
   () => shouldResumeRecall.value,
   (shouldResume) => {
     if (shouldResume) {
-      // Reset the cursor to show the current question instead of previously answered question
       previousAnsweredQuestionCursor.value = undefined
       clearShouldResumeRecall()
+      scheduleFocusAutofocusTargetWithin(recallPageRoot.value)
     }
   }
 )
 
-const loadMore = async (dueInDays?: number) => {
-  isLoadingMore.value = true
-  try {
-    const { data: response, error } = await RecallsController.recalling({
-      query: {
-        timezone: timezoneParam(),
-        dueindays: dueInDays,
-      },
-    })
-    if (!error && response) {
-      let trackers = response.toRepeat
-      currentIndex.value = 0
-      setTotalAssimilatedCount(response.totalAssimilatedCount)
-      setDiligentMode((dueInDays ?? 0) > 0)
-      if (trackers?.length === 0) {
-        setToRepeat(trackers)
-        return response
-      }
-      if (getEnvironment() !== "testing" && trackers) {
-        trackers = shuffle(trackers)
-      }
-      setToRepeat(trackers)
-      return response
-    }
-    return undefined
-  } finally {
-    isLoadingMore.value = false
-  }
-}
-
-const loadPreviouslyAnsweredRecallPrompts = async () => {
-  const { data: response, error } = await RecallsController.previouslyAnswered({
-    query: {
-      timezone: timezoneParam(),
-    },
-  })
-  if (!error && response) {
-    previousAnsweredQuestions.value = [
-      ...response,
-      ...previousAnsweredQuestions.value,
-    ]
-  }
-}
-
-const loadCurrentDueRecalls = async () => {
-  setToRepeat(undefined)
-  const response = await loadMore(0)
-  if (response) {
-    setCurrentRecallWindowEndAt(response.currentRecallWindowEndAt)
-  }
-}
-
-watch(dueRecallsRefreshNonce, async () => {
-  await loadCurrentDueRecalls()
-})
-
-onMounted(() => {
-  loadPreviouslyAnsweredRecallPrompts()
-})
-
-onActivated(() => {
-  isProgressBarVisible.value = true
-  const currentTime = new Date().toISOString()
-  if (
-    currentRecallWindowEndAt.value &&
-    currentTime > currentRecallWindowEndAt.value
-  ) {
-    loadCurrentDueRecalls()
-  }
-})
-
-onDeactivated(() => {
-  isProgressBarVisible.value = false
+const { isProgressBarVisible, isLoadingMore, loadMore } = useRecallPageLoading({
+  currentIndex,
+  previousAnsweredQuestions,
+  currentRecallWindowEndAt,
+  dueRecallsRefreshNonce,
+  setToRepeat,
+  setTotalAssimilatedCount,
+  setDiligentMode,
+  setCurrentRecallWindowEndAt,
 })
 
 defineExpose({
   toRepeat,
   currentIndex,
+  loadMore,
 })
 </script>
 
