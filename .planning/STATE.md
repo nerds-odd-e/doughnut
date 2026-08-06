@@ -4,17 +4,17 @@ milestone: null
 milestone_name: null
 current_phase: null
 current_phase_name: null
-status: milestone_complete
-stopped_at: v1.2 shipped; planning artifacts cleaned (no archive)
-last_updated: "2026-08-06T02:30:00Z"
+status: in_progress
+stopped_at: null
+last_updated: "2026-08-06T06:25:00Z"
 last_activity: 2026-08-06
-last_activity_desc: Complete milestone v1.2 with cleanup (no historical archive)
+last_activity_desc: Phase 1 done — refine note entry from answered MCQ; Phase 2 next
 progress:
-  total_phases: 0
-  completed_phases: 0
-  total_plans: 0
+  total_phases: 6
+  completed_phases: 1
+  total_plans: 1
   completed_plans: 0
-  percent: 100
+  percent: 17
 ---
 
 # Project State
@@ -24,13 +24,13 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-08-06)
 
 **Core value:** Healthy mainline for learning and knowledge work — reviewed note stays primary during accidental-match results.
-**Current focus:** Planning next milestone (`/gsd-new-milestone`)
+**Current focus:** Quick task — refine note after answered MCQ (phased)
 
 ## Current Position
 
-Milestone v1.2 Accidental Match Resolve UX — **shipped 2026-08-06** (override closeout: no formal VERIFICATION.md; AMR-01..09 + OVL-01..07 delivered in product/tests).
+Milestone v1.2 Accidental Match Resolve UX — **shipped 2026-08-06**.
 
-No active roadmap phase. Parallel work: `.planning/quick/001-backend-small-test-renovation/` (in progress).
+Active ad-hoc plan: [`.planning/quick/003-refine-note-after-mcq/PLAN.md`](./quick/003-refine-note-after-mcq/PLAN.md) — Phase 1 done; **Phase 2 next** (Shared RefineNoteModal).
 
 ## Deferred Items
 
@@ -38,10 +38,11 @@ Items acknowledged at milestone close on 2026-08-06:
 
 | Category | Item | Status |
 |----------|------|--------|
-| quick_task | 001-backend-small-test-renovation | in progress (separate track) |
+| quick_task | 002-frontend-cli-mcp-small-test-renovation | separate track |
 | seed | SEED-001-mcq-fuzzy-notebook-title-spelling-match | dormant |
 | tech_debt | Drop grading/disable wiki-in-`aliases` read bridge after data migrated | open |
+| deferred | Refine note on answered spelling (out of 003 scope) | deferred |
 
 ## Session Continuity
 
-Next action: `/gsd-new-milestone` (or continue quick/001).
+Next action: execute Phase 2 of `.planning/quick/003-refine-note-after-mcq/PLAN.md` (extract shared RefineNoteModal).

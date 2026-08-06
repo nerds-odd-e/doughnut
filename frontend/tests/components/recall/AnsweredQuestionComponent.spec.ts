@@ -1,8 +1,13 @@
 import AnsweredQuestionComponent from "@/components/recall/AnsweredQuestionComponent.vue"
-import { flushPromises } from "@vue/test-utils"
-import helper from "@tests/helpers"
+import type { NoteRealm } from "@generated/doughnut-backend-api"
+import { AiController } from "@generated/doughnut-backend-api/sdk.gen"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { flushPromises, type VueWrapper } from "@vue/test-utils"
+import helper, { mockSdkService, mockShowNote } from "@tests/helpers"
+import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import { describe, it, expect, vi } from "vitest"
+import { refinementLayoutItems } from "./noteRefinementTestSupport"
+import { afterEach, beforeEach, describe, it, expect, vi } from "vitest"
 
 vi.mock("vue-router", async (importOriginal) => {
   const actual = await importOriginal<typeof import("vue-router")>()
@@ -15,12 +20,25 @@ vi.mock("vue-router", async (importOriginal) => {
 })
 
 describe("AnsweredQuestionComponent", () => {
+  let wrapper: VueWrapper | undefined
+
+  beforeEach(() => {
+    mockShowNote()
+  })
+
+  afterEach(() => {
+    wrapper?.unmount()
+    wrapper = undefined
+    teardownGlobalClientForTesting()
+    document.body.innerHTML = ""
+  })
+
   describe("note under question", () => {
     it("renders note under question when note is present", async () => {
       const note = makeMe.aNote.title("Test Note Title").please()
       const answeredQuestion = makeMe.anAnsweredQuestion.withNote(note).please()
 
-      const wrapper = helper
+      wrapper = helper
         .component(AnsweredQuestionComponent)
         .withProps({ answeredQuestion, conversationButton: false })
         .mount()
@@ -40,7 +58,7 @@ describe("AnsweredQuestionComponent", () => {
         .withNote(note2)
         .please()
 
-      const wrapper = helper
+      wrapper = helper
         .component(AnsweredQuestionComponent)
         .withProps({
           answeredQuestion: answeredQuestion1,
@@ -61,6 +79,64 @@ describe("AnsweredQuestionComponent", () => {
       // Verify second note is now displayed
       expect(wrapper.text()).toContain("Second Note")
       expect(wrapper.text()).not.toContain("First Note")
+    })
+  })
+
+  describe("refine note", () => {
+    beforeEach(() => {
+      mockSdkService(AiController, "generateRefinementSuggestions", {
+        items: refinementLayoutItems([]),
+      })
+    })
+
+    function mountWithSeededNote(noteRealm: NoteRealm) {
+      const answeredQuestion = makeMe.anAnsweredQuestion
+        .withNote(noteRealm.note)
+        .please()
+      const chain = helper
+        .component(AnsweredQuestionComponent)
+        .withCleanStorage()
+      useStorageAccessor().value.refreshNoteRealm(noteRealm)
+      return chain
+        .withProps({ answeredQuestion, conversationButton: false })
+        .mount({ attachTo: document.body })
+    }
+
+    it("shows Refine note next to View Memory Tracker and opens refine modal", async () => {
+      const noteRealm = makeMe.aNoteRealm
+        .title("Contentful Note")
+        .content("Body to refine")
+        .please()
+
+      wrapper = mountWithSeededNote(noteRealm)
+      await flushPromises()
+
+      expect(wrapper.text()).toContain("View Memory Tracker")
+      const refineButton = wrapper.find('[data-test="open-refine-note-modal"]')
+      expect(refineButton.exists()).toBe(true)
+      expect(refineButton.text()).toContain("Refine note")
+
+      await refineButton.trigger("click")
+      await flushPromises()
+
+      const modal = document.querySelector('[data-test="refine-note-modal"]')
+      expect(modal).not.toBeNull()
+      expect(modal!.classList.contains("daisy-modal-open")).toBe(true)
+      expect(
+        document.querySelector('[data-test-id="refinement-layout-empty"]')
+      ).not.toBeNull()
+    })
+
+    it("hides Refine note when recalled note content is blank", async () => {
+      const noteRealm = makeMe.aNoteRealm.content("   ").please()
+
+      wrapper = mountWithSeededNote(noteRealm)
+      await flushPromises()
+
+      expect(wrapper.text()).toContain("View Memory Tracker")
+      expect(
+        wrapper.find('[data-test="open-refine-note-modal"]').exists()
+      ).toBe(false)
     })
   })
 })
