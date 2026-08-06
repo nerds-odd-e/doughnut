@@ -39,9 +39,9 @@ describe("NoteInfoComponent", () => {
 
   it("should make skipped memory trackers clickable", async () => {
     const skippedMemoryTracker = makeMe.aMemoryTracker
+      .id(123)
       .removedFromTracking(true)
       .please()
-    skippedMemoryTracker.id = 123
     const noteRealm = makeMe.aNoteRealm.please()
     const noteRecallInfo = makeMe.aNoteRecallInfo
       .memoryTrackers([skippedMemoryTracker])

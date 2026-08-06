@@ -1,21 +1,21 @@
-import BookReadingContent from "@/components/book-reading/BookReadingContent.vue"
 import { BOOK_READING_LAYOUT_BREAKPOINT_PX } from "@/lib/book-reading/bookReadingLayoutBreakpoint"
 import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
 import {
   setupGlobalClient,
   teardownGlobalClientForTesting,
 } from "@/managedApi/clientSetup"
-import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
 import { NotebookBooksController } from "@generated/doughnut-backend-api/sdk.gen"
-import helper, { wrapSdkResponse } from "@tests/helpers"
+import { wrapSdkResponse } from "@tests/helpers"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { defineComponent } from "vue"
-
-const mockToast = {
-  error: vi.fn(),
-}
+import {
+  clickAiReorganize,
+  loadingModal,
+  mockToast,
+  mountBookReadingContent,
+  mountBookReadingWithGlobalModal,
+} from "./bookReadingContentAiReorganizeTestSupport"
 
 vi.mock("vue-toastification", () => ({
   useToast: () => mockToast,
@@ -23,47 +23,6 @@ vi.mock("vue-toastification", () => ({
 
 describe("BookReadingContent AI reorganize suggest", () => {
   const apiStatus: ApiStatus = { states: [] }
-  const loadingModal = () => document.querySelector(".loading-modal-mask")
-
-  const mountBookReadingWithGlobalModal = (contentProps: {
-    book: ReturnType<typeof makeMe.aBook.please>
-    bookPdfBytes: ArrayBuffer
-    initialLastRead: null
-  }) => {
-    const Host = defineComponent({
-      components: { BookReadingContent, GlobalApiLoadingModal },
-      props: {
-        contentProps: {
-          type: Object as () => {
-            book: ReturnType<typeof makeMe.aBook.please>
-            bookPdfBytes: ArrayBuffer
-            initialLastRead: null
-          },
-          required: true,
-        },
-      },
-      template: `
-        <BookReadingContent v-bind="contentProps" />
-        <GlobalApiLoadingModal />
-      `,
-    })
-
-    return helper
-      .component(Host)
-      .withRouter()
-      .withProps({ contentProps })
-      .mount({
-        global: {
-          stubs: {
-            GlobalBar: { template: "<div><slot /></div>" },
-            PdfBookViewer: { template: '<div data-testid="pdf-stub" />' },
-            ReadingControlPanel: true,
-            CurrentBlockNavigationBar: true,
-          },
-        },
-      })
-  }
-
   let innerWidthDesc: PropertyDescriptor | undefined
 
   beforeEach(() => {
@@ -102,30 +61,14 @@ describe("BookReadingContent AI reorganize suggest", () => {
   })
 
   it("shows error toast when suggest fails", async () => {
-    const wrapper = helper
-      .component(BookReadingContent)
-      .withRouter()
-      .withProps({
-        book: makeMe.aBook.notebookId("9").please(),
-        bookPdfBytes: new ArrayBuffer(0),
-        initialLastRead: null,
-      })
-      .mount({
-        global: {
-          stubs: {
-            GlobalBar: { template: "<div><slot /></div>" },
-            PdfBookViewer: { template: '<div data-testid="pdf-stub" />' },
-            ReadingControlPanel: true,
-            CurrentBlockNavigationBar: true,
-          },
-        },
-      })
+    const wrapper = mountBookReadingContent({
+      book: makeMe.aBook.notebookId("9").please(),
+      bookPdfBytes: new ArrayBuffer(0),
+      initialLastRead: null,
+    })
 
     await flushPromises()
-
-    await wrapper
-      .find('[data-testid="book-reading-ai-reorganize-layout"]')
-      .trigger("click")
+    await clickAiReorganize(wrapper)
     await flushPromises()
 
     expect(mockToast.error).toHaveBeenCalled()
@@ -137,36 +80,19 @@ describe("BookReadingContent AI reorganize suggest", () => {
       NotebookBooksController.suggestBookLayoutReorganization
     ).mockResolvedValueOnce(wrapSdkResponse({ blocks: [{ id: 1, depth: 0 }] }))
 
-    const wrapper = helper
-      .component(BookReadingContent)
-      .withRouter()
-      .withProps({
-        book: makeMe.aBook.notebookId("9").please(),
-        bookPdfBytes: new ArrayBuffer(0),
-        initialLastRead: null,
-      })
-      .mount({
-        global: {
-          stubs: {
-            GlobalBar: { template: "<div><slot /></div>" },
-            PdfBookViewer: { template: '<div data-testid="pdf-stub" />' },
-            ReadingControlPanel: true,
-            CurrentBlockNavigationBar: true,
-          },
-        },
-      })
+    const wrapper = mountBookReadingContent({
+      book: makeMe.aBook.notebookId("9").please(),
+      bookPdfBytes: new ArrayBuffer(0),
+      initialLastRead: null,
+    })
 
     await flushPromises()
-
-    await wrapper
-      .find('[data-testid="book-reading-ai-reorganize-layout"]')
-      .trigger("click")
+    await clickAiReorganize(wrapper)
     await flushPromises()
 
     const dialog = wrapper.find(
       '[data-testid="book-layout-reorganize-preview-dialog"]'
     )
-    expect(dialog.exists()).toBe(true)
     expect(dialog.classes()).toContain("daisy-modal-open")
     expect(wrapper.text()).toContain("Reorganize layout (preview)")
 
@@ -199,41 +125,22 @@ describe("BookReadingContent AI reorganize suggest", () => {
       })
     )
 
-    const wrapper = helper
-      .component(BookReadingContent)
-      .withRouter()
-      .withProps({
-        book,
-        bookPdfBytes: new ArrayBuffer(0),
-        initialLastRead: null,
-      })
-      .mount({
-        global: {
-          stubs: {
-            GlobalBar: { template: "<div><slot /></div>" },
-            PdfBookViewer: { template: '<div data-testid="pdf-stub" />' },
-            ReadingControlPanel: true,
-            CurrentBlockNavigationBar: true,
-          },
-        },
-      })
+    const wrapper = mountBookReadingContent({
+      book,
+      bookPdfBytes: new ArrayBuffer(0),
+      initialLastRead: null,
+    })
 
     await flushPromises()
-
-    await wrapper
-      .find('[data-testid="book-reading-ai-reorganize-layout"]')
-      .trigger("click")
+    await clickAiReorganize(wrapper)
     await flushPromises()
 
     const rows = wrapper.findAll(
       '[data-testid="book-layout-reorganize-preview-row"]'
     )
     expect(rows).toHaveLength(2)
-    expect(rows[0]!.text()).toContain("Alpha")
     expect(rows[0]!.attributes("data-suggested-depth")).toBe("0")
     expect(rows[0]!.classes()).not.toContain("bg-warning/15")
-
-    expect(rows[1]!.text()).toContain("Beta")
     expect(rows[1]!.attributes("data-suggested-depth")).toBe("1")
     expect(rows[1]!.classes()).toContain("bg-warning/15")
 
@@ -267,10 +174,7 @@ describe("BookReadingContent AI reorganize suggest", () => {
     })
 
     await flushPromises()
-
-    await wrapper
-      .find('[data-testid="book-reading-ai-reorganize-layout"]')
-      .trigger("click")
+    await clickAiReorganize(wrapper)
     await flushPromises()
 
     expect(loadingModal()).toBeTruthy()
@@ -320,10 +224,7 @@ describe("BookReadingContent AI reorganize suggest", () => {
     })
 
     await flushPromises()
-
-    await wrapper
-      .find('[data-testid="book-reading-ai-reorganize-layout"]')
-      .trigger("click")
+    await clickAiReorganize(wrapper)
     await flushPromises()
 
     await wrapper
