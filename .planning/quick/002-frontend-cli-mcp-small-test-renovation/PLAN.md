@@ -1,6 +1,6 @@
 # Frontend / CLI / MCP unit tests → "small test" style
 
-**Status:** in progress (Phases 1–12 done)
+**Status:** in progress (Phases 1–13 done)
 **Type:** test renovation (no product behavior change)  
 **Resume:** this `PLAN.md` progress log only — **do not edit** trunk `.planning/STATE.md` (parallel trunk-based work).
 
@@ -161,10 +161,10 @@ While iterating a single large frontend file, `pnpm frontend:test tests/path/to/
 - **Done when:** rubric applied; oversized file split; suite green.
 
 ### Phase 13 — Frontend: links + toolbars
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
-- **Files:** `frontend/tests/links/**`, `frontend/tests/toolbars/**` (MainMenu ~667 LOC — split if needed).
-- **Verify:** `pnpm frontend:test`
+- **Files:** `frontend/tests/links/**`, `frontend/tests/toolbars/**` (MainMenu + NoteUndoButton capability splits).
+- **Verify:** `pnpm frontend:test` — green (285 files / 1673 tests; links+toolbars cohort 104 tests).
 - **Done when:** rubric applied; suite green.
 
 ### Phase 14 — Frontend: pages — notebooks / catalog / folder / circle / bazaar / home / settings / misc
@@ -233,7 +233,8 @@ If a Behavior phase cannot express fixtures concisely: add a **Structure** sub-p
 | 10 | done | FE notes show/edit/new/toolbar renovated; NoteTextContent split (titleEdit/wikiLinks); EditableContent/toolbar/more-options focused asserts; NoteAudioTools + Wikidata* deferred to Phase 12; suite green |
 | 11 | done | FE notes sidebar renovated; makeMe `.inNotebook`/`.readonly`/`.aFolder`; shared `stubIntersectionObserver`; focused asserts; support split (folderListing/mount); suite green |
 | 12 | done | FE notes audio + Wikidata renovated; NoteAudioTools capability splits (recording/device/processing/title/advanced) + mocks/support; WikidataAssociationDialog search/titleActions/openLink + shared lifecycle; appendAlias → utils; suite green |
-| 13–18 | planned | — |
+| 13 | done | FE links + toolbars renovated; MainMenu nav/assimilate/recall/resume + NoteUndoButton visibility/confirmation/actions splits; shared mocks/support; focused asserts; suite green |
+| 14–18 | planned | — |
 
 ---
 
@@ -254,3 +255,4 @@ If a Behavior phase cannot express fixtures concisely: add a **Structure** sub-p
 - Phase 10: Split oversized `NoteTextContent` into titleEdit + wikiLinks + support; deleted dead assertion-free unmount test; `makeMe.content("")` instead of post-construction mutation; `[data-test="note-title"]` + relation row `data-testid`/`data-property-key` over `findComponent`. EditableContent: deterministic navigation asserts; paste popup cases split; quill paste via support harness (Phase 7 pattern); memoryTracker uses `setupPopupsMock` confirm override. Toolbar more-options + MoreOptionsForm: DOM over `findComponent` / duplicate ul text; delete cancel uses SDK spy. Delete-support relation fixtures use `.id()` builders. Dropped unused `AiReplyEventSource` mock from NoteNewButton. Attempted consolidating NoteNewForm `vi.mock` into support — **reverted**: Vitest browser-mode needs per-spec `vi.mock` (same lesson as Phase 9 AiReply). Left NoteAudioTools + WikidataAssociation/Search for Phase 12.
 - Phase 11: Sidebar suite already capability-split and mostly mounted-Sidebar + allowed `mockSdkService`. Replaced `uncachedNoteInSameNotebook` post-construction `notebookRealm` mutation with `.inNotebook`; bazaar toolbar uses `.readonly()`; FolderItem folder props via `makeMe.aFolder`. Shared `stubIntersectionObserver` (returns restore). Dropped AncestorLoading order re-assert (FirstGeneration owns peer order) and FolderListingReload pre-existence assert. Post-refactor: split oversized `sidebarTestSupport` into `sidebarFolderListingSupport` + `sidebarMountSupport` + slim barrel (≤250 lines). ActiveFolder / NotebookShell / PeerSort / RouteNavigation already rubric-compliant — left largely untouched.
 - Phase 12: Split oversized `NoteAudioTools` (~1021) into recording / deviceSelection / processing / titleSuggestion / advancedOptions + `noteAudioToolsMocks` / `noteAudioToolsTestSupport` (`audioChunk`/`midSpeechChunk`/`processAudio`). Kept audioRecorder/wakeLocker/recorderWorklet mocks as hardware side-effect boundaries (same Phase 6/10 pattern); per-spec `vi.mock` required for Vitest browser-mode. Focused recording asserts (canonical controls; merged start+Web Audio). Split `WikidataAssociationDialog` into search / titleActions / openLink + shared lifecycle helper; moved `appendAliasToNoteContent` to `utils/wikidataTitleActions.spec.ts` (pure util). Slimmed SearchByLabel button-style table. `NoteNewForm.wikidata` already renovated in Phase 10 — left alone.
+- Phase 13: Split oversized `MainMenu` (~667) into nav / assimilate / recall / resume + `mainMenuMocks` / `mainMenuTestSupport` (per-file `createMemoryHistory` router; keep `useRecallData` / `useGoToNextAssimilation` / AiReply mocks as Phase 8 side-effect boundaries). Split `NoteUndoButton` (~434) into visibility / confirmation / actions; router mock must live in lean `noteUndoButtonMocks` (importing support from `vi.mock` deadlocks Vitest). AddRelationship: DOM radio select via `[id="…"]` (spaces in relation labels); sibling navigateOnSuccess asserts delta only. Dropped redundant Breadcrumb ancestorFolders re-cover; renamed GlobalBar undo-absence test. SearchDialog / HorizontalMenu / InsertWikiLink already rubric-compliant.

@@ -82,7 +82,7 @@ describe("global bar", () => {
     matchMediaSpy = undefined
   })
 
-  it("fetch API to be called ONCE", async () => {
+  it("hides undo when there is nothing to undo", async () => {
     helper.component(GlobalBar).withCurrentUser(user).render()
 
     expect(screen.queryByTitle("undo")).toBeNull()

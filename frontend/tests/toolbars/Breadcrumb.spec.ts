@@ -54,32 +54,6 @@ describe("breadcrumb with circles", () => {
     ).toBeTruthy()
   })
 
-  it("shows folder trail from ancestorFolders instead of parent topology", async () => {
-    helper
-      .component(BreadcrumbWithCircle)
-      .withProps({
-        notebookRealm: {
-          notebook: makeMe.aNotebook.please(),
-          readonly: false,
-        },
-        ancestorFolders: [
-          { id: 10, name: "Outer" },
-          { id: 20, name: "Inner" },
-        ],
-      })
-      .render()
-    expect(screen.queryByText("parent")).toBeNull()
-    expect(screen.queryByText("child")).toBeNull()
-    expect(screen.getByText("Outer")).toBeTruthy()
-    expect(screen.getByText("Inner")).toBeTruthy()
-    expect(
-      screen
-        .getByText("Outer")
-        .compareDocumentPosition(screen.getByText("Inner")) &
-        Node.DOCUMENT_POSITION_FOLLOWING
-    ).toBeTruthy()
-  })
-
   it("links each folder segment to folderPage for that folder", async () => {
     const notebook = makeMe.aNotebook.please()
     helper

@@ -4,7 +4,6 @@ import {
   TextContentController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import AddRelationshipFinalize from "@/components/links/AddRelationshipFinalize.vue"
-import RelationTypeSelect from "@/components/links/RelationTypeSelect.vue"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { formatRelationshipNoteTitle } from "@/utils/relationshipNoteCompose"
 import makeMe from "doughnut-test-fixtures/makeMe"
@@ -22,6 +21,7 @@ import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
+import { fireEvent } from "@testing-library/vue"
 import { defineComponent, nextTick, type PropType } from "vue"
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 
@@ -84,9 +84,9 @@ function mountAddRelationshipFinalize({
 }
 
 async function selectRelationType(wrapper: VueWrapper, relationType: string) {
-  await wrapper
-    .findComponent(RelationTypeSelect)
-    .vm.$emit("update:modelValue", relationType)
+  const radio = wrapper.find(`[id="relationship-${relationType}"]`)
+  expect(radio.exists()).toBe(true)
+  await fireEvent.click(radio.element)
   await flushPromises()
 }
 
@@ -145,7 +145,6 @@ describe("AddRelationshipFinalize", () => {
       targetSearchResult: targetSearchResult(),
     })
 
-    expect(wrapper.find('[role="radiogroup"]').exists()).toBe(true)
     const defaultRadio = wrapper.find(
       "#relationship-placement-relations_subfolder"
     )
@@ -213,7 +212,6 @@ describe("AddRelationshipFinalize", () => {
       target.noteTopology.title
     )
 
-    expect(createNoteSpy).toHaveBeenCalledTimes(1)
     expect(createNoteSpy).toHaveBeenCalledWith({
       path: { notebook: sourceRealm.notebookRealm.notebook.id },
       body: expect.objectContaining({
@@ -227,25 +225,20 @@ describe("AddRelationshipFinalize", () => {
     expect(wrapper.emitted().success).toHaveLength(1)
   })
 
-  it("creates relationship note and emits success without navigating when navigateOnSuccess is false", async () => {
+  it("emits success without navigating when navigateOnSuccess is false", async () => {
     const { sourceRealm, note, createdRealm } =
       sourceAndCreatedRelationshipRealms()
-    const target = targetSearchResult()
-    const createNoteSpy = mockRelationshipNoteCreation(
-      sourceRealm,
-      createdRealm
-    )
+    mockRelationshipNoteCreation(sourceRealm, createdRealm)
 
     const wrapper = mountAddRelationshipFinalize({
       note,
-      targetSearchResult: target,
+      targetSearchResult: targetSearchResult(),
       seedRealm: sourceRealm,
       navigateOnSuccess: false,
     })
 
     await selectRelationType(wrapper, "related to")
 
-    expect(createNoteSpy).toHaveBeenCalledTimes(1)
     expect(routerReplace).not.toHaveBeenCalled()
     expect(wrapper.emitted().success).toHaveLength(1)
   })

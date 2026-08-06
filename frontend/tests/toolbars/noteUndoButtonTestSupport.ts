@@ -8,7 +8,7 @@ import { flushPromises } from "@vue/test-utils"
 import { beforeEach, expect, vi } from "vitest"
 import NoteUndoButton from "@/components/toolbars/NoteUndoButton.vue"
 
-export const mockedPush = vi.fn()
+export { mockedPush } from "./noteUndoButtonMocks"
 
 export let noteEditingHistory: NoteEditingHistory
 
@@ -36,27 +36,27 @@ export function refreshNoteRealms(...noteRealms: NoteRealm[]) {
   }
 }
 
-export function undoButtonEl(title: string) {
+function undoButtonEl(title: string) {
   return document.querySelector(`[title="${title}"]`) as HTMLElement | null
 }
 
-export function confirmUndoHeadingEl() {
+function confirmUndoHeadingEl() {
   return document.querySelector(".undo-confirmation h2")
 }
 
-export function dialogOkButtonEl() {
+function dialogOkButtonEl() {
   return document.querySelector(
     ".undo-confirmation .daisy-btn-success"
   ) as HTMLElement | null
 }
 
-export function dialogCancelButtonEl() {
+function dialogCancelButtonEl() {
   return document.querySelector(
     ".undo-confirmation .daisy-btn-secondary"
   ) as HTMLElement | null
 }
 
-export function dialogDiscardButtonEl() {
+function dialogDiscardButtonEl() {
   return document.querySelector(
     ".undo-confirmation .daisy-btn-warning"
   ) as HTMLElement | null
