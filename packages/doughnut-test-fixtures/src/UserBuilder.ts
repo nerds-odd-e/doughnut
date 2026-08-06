@@ -24,6 +24,31 @@ class UserBuilder extends Builder<User> {
     return this
   }
 
+  name(value: string) {
+    this.data.name = value
+    return this
+  }
+
+  dailyAssimilationCount(value: number) {
+    this.data.dailyAssimilationCount = value
+    return this
+  }
+
+  spaceIntervals(value: string) {
+    this.data.spaceIntervals = value
+    return this
+  }
+
+  healthRemoveEmptyFoldersDefault(value: boolean) {
+    this.data.healthRemoveEmptyFoldersDefault = value
+    return this
+  }
+
+  withoutHealthRemoveEmptyFoldersDefault() {
+    delete this.data.healthRemoveEmptyFoldersDefault
+    return this
+  }
+
   do(): User {
     return this.data
   }

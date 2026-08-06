@@ -1,6 +1,6 @@
 # Frontend / CLI / MCP unit tests → "small test" style
 
-**Status:** in progress (Phases 1–17 done)
+**Status:** complete
 **Type:** test renovation (no product behavior change)  
 **Resume:** this `PLAN.md` progress log only — **do not edit** trunk `.planning/STATE.md` (parallel trunk-based work).
 
@@ -197,16 +197,12 @@ While iterating a single large frontend file, `pnpm frontend:test tests/path/to/
 - **Done when:** rubric applied; oversized file split; suite green.
 
 ### Phase 18 — Final anti-pattern sweep (all three packages)
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
 - **Observable:** remaining smells cleared or explicitly excepted in this PLAN.
-- **Method:**
-  1. Grep for post-construction `makeMe` mutation / field soup; illicit `vi.mock` of internals; repeated full-payload asserts.
-  2. Fix stragglers across `frontend/tests`, `cli/tests`, `mcp-server/tests`.
-  3. Document permanent exceptions (and why) in this PLAN.
-  4. Mark plan **complete**.
-- **Verify:** run all three package test commands green.
-- **Done when:** sweep clean (or exceptions documented); plan complete.
+- **Fixed stragglers:** `NoteInfoMemoryTracker` → `.withPropertyKey` / `.spelling()`; Quiz spelling support dropped dead `clozeDescription` mutation; `NotebookBuilder.id()` + `NotebookNewForm.group`; `UserBuilder` preference helpers + `NotebookHealthPanel`. CLI/MCP already clean (allowed API/subprocess mocks only).
+- **Verify:** MCP 5/10, CLI 58/298, Frontend 303/1663 — all green.
+- **Done when:** sweep clean (or exceptions documented); plan complete — **met**.
 
 ---
 
@@ -237,7 +233,26 @@ If a Behavior phase cannot express fixtures concisely: add a **Structure** sub-p
 | 15 | done | FE NoteShow + assimilation/conversation panels renovated; noteShowPageTestSupport mount/DOM helpers; render + router.push for conversation query; focused asserts; suite green |
 | 16 | done | FE Recall + MemoryTracker pages renovated; Overlap uses shared recallPageTestSupport; MemoryTrackerPage slimmed to fetch/load/error/revive; View capability splits + display statuses moved from Page; focused treadmill/diligent/spelling asserts; suite green |
 | 17 | done | FE BookReadingPage monolith (~1819) split into capability specs + support modules; mockSdkService defaults; createMemoryHistory per mount; focused panel/nav asserts; suite green |
-| 18 | planned | — |
+| 18 | done | Final sweep: cleared remaining makeMe field soup / dead cloze mutation; builders extended; permanent exceptions documented below; all three packages green; plan complete |
+
+---
+
+## Permanent exceptions (Phase 18)
+
+Allowed mocks / boundaries that remain by design (not illicit internals):
+
+| Exception | Why permanent |
+|-----------|----------------|
+| **Frontend `mockSdkService` / SDK controller spies** | Backend HTTP API is a true external (`frontend-testing.mdc`). |
+| **`usePopups` / `useToast` / `useRecallData` / `useGoToNextAssimilation` / vue-router partial mocks** | Popup, toast, recall-count inject, and navigation side-effect boundaries for composable/page surfaces (Phases 6–8, 13, 16). |
+| **`AiReplyEventSource` per-spec `vi.mock`** | SSE transport external; Vitest browser-mode requires the mock in each consuming `*.spec.ts` (not only support modules) — Phases 9–10. |
+| **Audio hardware mocks** (`audioRecorder`, `wakeLocker`, `recorderWorklet`) | Browser/hardware side-effect boundaries; per-spec `vi.mock` required — Phase 12. |
+| **Book-file `fetch` / pdfjs / toast stubs; `vi.hoisted`+`vi.mock` for intervalScrollSuppression in snap specs** | True externals / Vitest browser hoist constraint — Phase 17. |
+| **CLI `doughnut-api` spies; `node:child_process` / `node:fs` for update & MinerU; MinerU subprocess mock on PDF attach** | Network / OS / subprocess externals (`cli.mdc`) — Phases 2–4. |
+| **MCP `vi.mock('@generated/doughnut-backend-api/sdk.gen')`** | Doughnut API is the MCP server’s external — Phase 1. |
+| **VTU stubs:** `router-link`/`router-view` (RenderingHelper), `Teleport`, Modal soft-keyboard primer, sidebar RouterLink, AnsweredSpelling `NoteShow`/link stubs | Harness plumbing or keep answered-spelling focused on resolve CTAs without mounting full NoteShow page. |
+| **Scenario deltas via `{ ...fixture, oneField }`** | One-field response/prop updates (e.g. user id change, PATCH response flip) are not makeMe field soup. |
+| **`findComponent` where no DOM path** (Quiz `$emit("answered")`, RouterLink `href` stays `#`) | No stable DOM selector for the claim — Phases 14, 16. |
 
 ---
 
@@ -263,3 +278,4 @@ If a Behavior phase cannot express fixtures concisely: add a **Structure** sub-p
 - Phase 15: Shared `noteShowPageTestSupport` (`setupNoteShowPageMocks` / assimilation+conversation setups / `renderNoteShowPage` / `renderNoteShowPageWithConversation` / DOM `*El` helpers). Conversation visibility needs real `router.push` (not `currentRoute` `$route` mock — `useRoute().query`). Assimilation: `render()` + `assimilateButtonSelector` over mount/`wrapper.find`. Conversation: focused maximize toggle vs close-after-maximize delta (drop route name/params re-assert). NoteShow load: single showNote spy from beforeEach.
 - Phase 16: RecallPage already capability-split on trunk (~898 monolith gone). Overlap deduped onto `recallPageTestSupport`; treadmill/diligent merged redundant cases; spelling DOM alert. MemoryTrackerPage: page-boundary only (SDK fetch/loading/error/empty/revive refetch) via `memoryTrackerPageTestSupport`; View owns prompt meta / delete / skipped / spelling splits + `mockMemoryTrackerPageViewDefaults`. Kept `useRecallData` / `usePopups` / vue-router mocks as side-effect boundaries (Phase 8 pattern). Quiz `$emit("answered")` still via findComponent where no DOM path.
 - Phase 17: Split `BookReadingPage.spec.ts` (~1819) into load / layout / readingPosition / readingControlPanel.visibility+marking / snap (+ panelGeometry without mock; budgets with own hoisted mock) / navigationBar. Shared support split ≤250 LOC (mount/fixtures, interaction, pdfViewer exposed spies, readingPosition, panel, snap, navigationBar). Defaults via `mockSdkService`; book-file `fetch` kept as true external; `createMemoryHistory` per mount. PdfLocator snapshot stub uses `spyOn`+`satisfies PdfLocatorFull` (union typing vs mockSdkService). **Confirmed:** `vi.hoisted`+`vi.mock` for intervalScrollSuppression must live in each mock-using snap spec — importing a factory from another module fails Vitest browser hoist. Focused asserts: panel hide siblings drop current-block rechecks; nav bar drops setup re-asserts.
+- Phase 18: Grep across FE/CLI/MCP found no illicit internal mocks beyond documented side-effect boundaries. Cleared remaining makeMe stragglers: `NoteInfoMemoryTracker` post-construction `propertyKey`/`spelling`; dead Quiz `clozeDescription` mutation; Notebook id field soup → `NotebookBuilder.id()`; User preference spreads → `UserBuilder` helpers. CLI/MCP suites already rubric-clean. Permanent exceptions consolidated in PLAN section above. Verify: MCP 5/10, CLI 58/298, FE 303/1663.

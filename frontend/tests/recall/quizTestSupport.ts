@@ -134,15 +134,11 @@ export function mockSpellingRecallServices(stem = "Spell the word 'cat'") {
     .withSpellingStem(stem)
     .please()
   askAQuestionSpy.mockResolvedValue(wrapSdkResponse(spellingRecallPrompt))
-
-  const memoryTracker = makeMe.aMemoryTracker.please()
-  if (memoryTracker.note) {
-    // @ts-expect-error - clozeDescription is a method on Note, not a property
-    memoryTracker.note.clozeDescription = {
-      clozeDetails: () => `<p>${stem}</p>\n`,
-    }
-  }
-  mockSdkService(MemoryTrackerController, "showMemoryTracker", memoryTracker)
+  mockSdkService(
+    MemoryTrackerController,
+    "showMemoryTracker",
+    makeMe.aMemoryTracker.spelling().please()
+  )
   return spellingRecallPrompt
 }
 

@@ -37,6 +37,11 @@ class NotebookBuilder extends Builder<Notebook> {
     return this
   }
 
+  id(value: number) {
+    this.data.id = value
+    return this
+  }
+
   skipMemoryTrackingEntirely(value: boolean) {
     this.data.notebookSettings.skipMemoryTrackingEntirely = value
     return this

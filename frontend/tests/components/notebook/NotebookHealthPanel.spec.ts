@@ -149,10 +149,9 @@ describe("NotebookHealthPanel", () => {
   })
 
   it("prefills Remove empty folders from currentUser without calling lint", async () => {
-    const wrapper = mountPanel({
-      ...makeMe.aUser.please(),
-      healthRemoveEmptyFoldersDefault: true,
-    })
+    const wrapper = mountPanel(
+      makeMe.aUser.healthRemoveEmptyFoldersDefault(true).please()
+    )
     await flushPromises()
 
     expect(
@@ -163,10 +162,9 @@ describe("NotebookHealthPanel", () => {
   })
 
   it("prefills Remove empty folders unchecked when preference is missing or false", async () => {
-    const withoutPreference = makeMe.aUser.please()
-    delete withoutPreference.healthRemoveEmptyFoldersDefault
-
-    const missingWrapper = mountPanel(withoutPreference)
+    const missingWrapper = mountPanel(
+      makeMe.aUser.withoutHealthRemoveEmptyFoldersDefault().please()
+    )
     await flushPromises()
     expect(
       (removeEmptyFoldersCheckbox(missingWrapper).element as HTMLInputElement)
@@ -174,10 +172,9 @@ describe("NotebookHealthPanel", () => {
     ).toBe(false)
     expect(lintSpy).not.toHaveBeenCalled()
 
-    const falseWrapper = mountPanel({
-      ...makeMe.aUser.please(),
-      healthRemoveEmptyFoldersDefault: false,
-    })
+    const falseWrapper = mountPanel(
+      makeMe.aUser.healthRemoveEmptyFoldersDefault(false).please()
+    )
     await flushPromises()
     expect(
       (removeEmptyFoldersCheckbox(falseWrapper).element as HTMLInputElement)
@@ -187,10 +184,7 @@ describe("NotebookHealthPanel", () => {
   })
 
   it("shows Save as defaults and does not PATCH when only toggling the checkbox", async () => {
-    const user = {
-      ...makeMe.aUser.please(),
-      healthRemoveEmptyFoldersDefault: false,
-    }
+    const user = makeMe.aUser.healthRemoveEmptyFoldersDefault(false).please()
     const wrapper = mountPanel(user)
     await flushPromises()
 
@@ -207,13 +201,12 @@ describe("NotebookHealthPanel", () => {
   })
 
   it("saves full UserDTO-shaped defaults without calling lint and updates currentUser", async () => {
-    const user = {
-      ...makeMe.aUser.please(),
-      name: "Health Owner",
-      dailyAssimilationCount: 12,
-      spaceIntervals: "0, 1, 2",
-      healthRemoveEmptyFoldersDefault: false,
-    }
+    const user = makeMe.aUser
+      .name("Health Owner")
+      .dailyAssimilationCount(12)
+      .spaceIntervals("0, 1, 2")
+      .healthRemoveEmptyFoldersDefault(false)
+      .please()
     const updatedUser = {
       ...user,
       healthRemoveEmptyFoldersDefault: true,

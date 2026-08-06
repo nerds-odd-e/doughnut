@@ -6,7 +6,7 @@ import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 
 describe("NotebookNewForm with notebook group", () => {
-  const createdNotebook = { ...makeMe.aNotebook.please(), id: 42 }
+  const createdNotebook = makeMe.aNotebook.id(42).please()
 
   beforeEach(() => {
     mockSdkService(NotebookController, "createNotebook", {

@@ -35,8 +35,8 @@ describe("NoteInfoMemoryTracker", () => {
   it("should display property memory tracker type", () => {
     const memoryTracker = makeMe.aMemoryTracker
       .removedFromTracking(false)
+      .withPropertyKey("topic")
       .please()
-    memoryTracker.propertyKey = "topic"
 
     wrapper = helper
       .component(NoteInfoMemoryTracker)
@@ -51,8 +51,8 @@ describe("NoteInfoMemoryTracker", () => {
   it("should display spelling memory tracker", () => {
     const memoryTracker = makeMe.aMemoryTracker
       .removedFromTracking(false)
+      .spelling()
       .please()
-    memoryTracker.spelling = true
 
     wrapper = helper
       .component(NoteInfoMemoryTracker)
