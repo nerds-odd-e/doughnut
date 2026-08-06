@@ -119,15 +119,16 @@ export const mountAiResponse = (conversation: Conversation) =>
     .withProps({ conversation, aiReplyTrigger: 0 })
     .mount()
 
-export const submitAiReply = async (wrapper: {
-  vm: { getAiReply: () => Promise<void> }
-}) => {
-  await wrapper.vm.getAiReply()
+export const submitAiReply = async (
+  wrapper: ReturnType<typeof mountAiResponse>
+) => {
+  const current = Number(wrapper.props("aiReplyTrigger") ?? 0)
+  await wrapper.setProps({ aiReplyTrigger: current + 1 })
   await flushPromises()
 }
 
 export const submitMessageAndSimulateToolCall = async (
-  wrapper: { vm: { getAiReply: () => Promise<void> } },
+  wrapper: ReturnType<typeof mountAiResponse>,
   toolCallChunks: ReturnType<typeof createToolCallChunk> | object
 ) => {
   await submitAiReply(wrapper)

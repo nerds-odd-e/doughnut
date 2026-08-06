@@ -164,10 +164,6 @@ watch(
     await getAiReply()
   }
 )
-
-defineExpose({
-  getAiReply,
-})
 </script>
 
 <style scoped>
