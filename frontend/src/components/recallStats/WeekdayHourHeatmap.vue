@@ -65,6 +65,8 @@ const cellSize = 16
 const leftGutter = 28
 const topGutter = 16
 const bottomGutter = 16
+const RETENTION_TARGET_PCT = 85
+const RETENTION_GRANULARITY_SPAN = 15
 
 const cells: { wd: number; hr: number }[] = []
 for (let wd = 0; wd < 7; wd++) {
@@ -110,8 +112,29 @@ const cellClass = (wd: number, hr: number) => {
   const answered = countAt(wd, hr)
   if (answered < 3) return "rs-hm-insufficient"
   const pct = retentionPct(wd, hr)
-  const level = Math.min(4, Math.max(1, Math.ceil((pct / 100) * 4)))
-  return `rs-hm-r${level}`
+  // Anchored at the RETENTION_TARGET_PCT threshold rather than a plain 0-100%
+  // scale: real-world retention clusters tightly in the 85-92% band, so a
+  // linear 0-100 scale renders nearly every day as the same top-bucket color.
+  if (pct >= RETENTION_TARGET_PCT) {
+    const level = Math.min(
+      4,
+      Math.max(
+        1,
+        Math.ceil(
+          ((pct - RETENTION_TARGET_PCT) / RETENTION_GRANULARITY_SPAN) * 4
+        )
+      )
+    )
+    return `rs-hm-r${level}`
+  }
+  const level = Math.min(
+    4,
+    Math.max(
+      1,
+      Math.ceil(((RETENTION_TARGET_PCT - pct) / RETENTION_GRANULARITY_SPAN) * 4)
+    )
+  )
+  return `rs-hm-bad${level}`
 }
 
 const cellTitle = (wd: number, hr: number) => {
@@ -140,16 +163,28 @@ const cellTitle = (wd: number, hr: number) => {
   fill: color-mix(in oklab, var(--color-base-content) 25%, transparent);
 }
 .rs-hm-r1 {
-  fill: color-mix(in oklab, var(--color-base-300), var(--color-primary) 40%);
+  fill: color-mix(in oklab, var(--color-base-300), var(--color-success) 40%);
 }
 .rs-hm-r2 {
-  fill: color-mix(in oklab, var(--color-base-300), var(--color-primary) 65%);
+  fill: color-mix(in oklab, var(--color-base-300), var(--color-success) 65%);
 }
 .rs-hm-r3 {
-  fill: color-mix(in oklab, var(--color-base-300), var(--color-primary) 85%);
+  fill: color-mix(in oklab, var(--color-base-300), var(--color-success) 85%);
 }
 .rs-hm-r4 {
-  fill: var(--color-primary);
+  fill: var(--color-success);
+}
+.rs-hm-bad1 {
+  fill: color-mix(in oklab, var(--color-base-300), var(--color-error) 40%);
+}
+.rs-hm-bad2 {
+  fill: color-mix(in oklab, var(--color-base-300), var(--color-error) 65%);
+}
+.rs-hm-bad3 {
+  fill: color-mix(in oklab, var(--color-base-300), var(--color-error) 85%);
+}
+.rs-hm-bad4 {
+  fill: var(--color-error);
 }
 .rs-hm-caption {
   fill: var(--color-base-content);

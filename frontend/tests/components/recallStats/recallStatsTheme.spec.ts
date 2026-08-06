@@ -21,6 +21,18 @@ function fillOf(el: Element): string {
   return window.getComputedStyle(el).fill
 }
 
+function hueOf(fill: string): number {
+  const oklch = fill.match(/oklch\([^)]*\s([\d.]+)\)/)
+  if (oklch) return Number(oklch[1])
+  const oklab = fill.match(/oklab\(\s*[\d.]+\s+(-?[\d.]+)\s+(-?[\d.]+)\)/)
+  if (oklab) {
+    const [, a, b] = oklab
+    const degrees = (Math.atan2(Number(b), Number(a)) * 180) / Math.PI
+    return degrees < 0 ? degrees + 360 : degrees
+  }
+  throw new Error(`Unrecognized fill format: ${fill}`)
+}
+
 afterEach(() => {
   document.documentElement.removeAttribute("data-theme")
 })
@@ -88,30 +100,41 @@ describe("recall stats charts use theme tokens (dark-mode safe)", () => {
     expect(fillOf(filled.element)).not.toBe(OLD_DARK_GREEN)
   })
 
-  it("retention heatmap ramp is distinct across levels (single-hue, not red-to-green)", () => {
+  it("retention heatmap uses a red/green scale anchored at 85%, with granularity within each side", () => {
     const answered = emptyGrid()
     const correct = emptyGrid()
     setCell(answered, 0, 0, 10)
-    setCell(correct, 0, 0, 10)
+    setCell(correct, 0, 0, 10) // 100% -> deep green
     setCell(answered, 1, 0, 10)
-    setCell(correct, 1, 0, 1)
+    setCell(correct, 1, 0, 9) // 90% -> mild green (above 85% target)
     setCell(answered, 2, 0, 10)
-    setCell(correct, 2, 0, 3)
+    setCell(correct, 2, 0, 8) // 80% -> mild red (below 85% target)
+    setCell(answered, 3, 0, 10)
+    setCell(correct, 3, 0, 6) // 60% -> deep red
     const wrapper = helper
       .component(WeekdayHourHeatmap)
       .withProps({ mode: "retention", counts: answered, correct })
       .mount({ attachTo: document.body })
 
     const cells = wrapper.findAll('[data-testid="heatmap-cell"]')
-    const r4 = cells.find((c) => c.attributes("data-correct") === "10")!
-    const r1 = cells.find((c) => c.attributes("data-correct") === "1")!
-    const r2 = cells.find((c) => c.attributes("data-correct") === "3")!
+    const byWeekday = (wd: number) =>
+      cells.find((c) => c.attributes("data-weekday") === String(wd))!
+    const deepGreen = byWeekday(0)
+    const mildGreen = byWeekday(1)
+    const mildRed = byWeekday(2)
+    const deepRed = byWeekday(3)
 
     setTheme("light")
-    const f1 = fillOf(r1.element)
-    const f2 = fillOf(r2.element)
-    const f4 = fillOf(r4.element)
-    expect(new Set([f1, f2, f4]).size).toBe(3)
+
+    // granularity: cells on the same side of 85% still render distinct colors
+    expect(fillOf(deepGreen.element)).not.toBe(fillOf(mildGreen.element))
+    expect(fillOf(mildRed.element)).not.toBe(fillOf(deepRed.element))
+
+    // hue direction: >= 85% is greenish, < 85% is reddish
+    expect(hueOf(fillOf(deepGreen.element))).toBeGreaterThan(90)
+    expect(hueOf(fillOf(mildGreen.element))).toBeGreaterThan(90)
+    expect(hueOf(fillOf(mildRed.element))).toBeLessThan(60)
+    expect(hueOf(fillOf(deepRed.element))).toBeLessThan(60)
   })
 
   it("AM/PM label and bars adapt to dark theme (readable)", () => {
