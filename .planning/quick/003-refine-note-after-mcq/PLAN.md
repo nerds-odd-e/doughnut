@@ -43,11 +43,13 @@ Prior `/gsd-quick` packed button + shared modal + DTO + AI schema + preselect + 
 
 ### Phase 2: Shared RefineNoteModal
 **Type:** Structure  
-**Status:** planned
+**Status:** done
 
 **Structure change:** Extract dialog chrome shared by assimilation and answered MCQ so both call one `RefineNoteModal` wrapping `NoteRefinement`.  
 **Unlocks:** Phase 3+ can add optional question props in one place without forked UIs.  
 **Verify:** Existing assimilation refine unit/E2E still pass; answered entry still opens refine.
+
+**Learnings:** Shared API is `v-model:open` + `note` + optional `contentUpdated`; note-id watch to close lives in the modal. Keep open buttons at call sites (different layouts). No question props yet.
 
 ---
 

@@ -120,46 +120,12 @@
       </div>
     </div>
   </footer>
-  <Teleport to="body">
-    <dialog
-      v-if="(note.content ?? '').trim()"
-      ref="refineNoteDialogRef"
-      class="daisy-modal"
-      :class="{ 'daisy-modal-open': showRefineNoteModal }"
-      data-test="refine-note-modal"
-      @close="closeRefineNoteModal"
-    >
-      <div
-        class="daisy-modal-box max-w-4xl max-h-[90vh] overflow-y-auto"
-      >
-        <h3
-          v-if="showRefineNoteModal"
-          class="font-bold text-lg mb-3"
-        >
-          Refine note
-        </h3>
-        <NoteRefinement
-          v-if="showRefineNoteModal"
-          :key="note.id"
-          :note="note"
-          @content-updated="emit('refinementContentUpdated')"
-        />
-        <div v-if="showRefineNoteModal" class="daisy-modal-action mt-4">
-          <button
-            type="button"
-            class="daisy-btn"
-            data-test="close-refine-note-modal"
-            @click="closeRefineNoteModal"
-          >
-            Close
-          </button>
-        </div>
-      </div>
-      <form method="dialog" class="daisy-modal-backdrop">
-        <button type="button" @click="closeRefineNoteModal">close</button>
-      </form>
-    </dialog>
-  </Teleport>
+  <RefineNoteModal
+    v-if="(note.content ?? '').trim()"
+    v-model:open="showRefineNoteModal"
+    :note="note"
+    @content-updated="emit('refinementContentUpdated')"
+  />
 </template>
 
 <script setup lang="ts">
@@ -167,8 +133,7 @@ import type { Note, NoteRecallInfo } from "@generated/doughnut-backend-api"
 import NoteInfoBar from "../notes/NoteInfoBar.vue"
 import AssimilationButtons from "./AssimilationButtons.vue"
 import AssimilationProgressSummary from "./AssimilationProgressSummary.vue"
-import NoteRefinement from "./NoteRefinement.vue"
-import { useDaisyDialog } from "@/composables/useDaisyDialog"
+import RefineNoteModal from "./RefineNoteModal.vue"
 import type { AssimilateEvent } from "@/composables/useAssimilateUnit"
 import { isSkippedForRecall } from "@/composables/useReviveMemoryTracker"
 import {
@@ -177,7 +142,7 @@ import {
 } from "@/utils/noteContentFrontmatter"
 import { compactDisplayForPropertyValue } from "@/utils/noteProperties"
 import { usePendingAssimilationProperty } from "@/composables/usePendingAssimilationProperty"
-import { computed, ref, toRef, watch } from "vue"
+import { computed, ref, toRef } from "vue"
 
 const { note, noteInfoLoaded, assimilateDisabled, assimilatingPropertyKey } =
   defineProps<{
@@ -197,12 +162,10 @@ const emit = defineEmits<{
 }>()
 
 const showRefineNoteModal = ref(false)
-const refineNoteDialogRef = ref<HTMLDialogElement | null>(null)
 const noteInfoBarRef = ref<InstanceType<typeof NoteInfoBar> | null>(null)
 const noteRecallInfo = ref<NoteRecallInfo | null>(null)
 const { propertiesSectionOpen, isPendingProperty, setPropertyRowRef } =
   usePendingAssimilationProperty(toRef(() => note.id))
-useDaisyDialog(showRefineNoteModal, refineNoteDialogRef)
 
 const propertyRows = computed(() => {
   const parsed = parseNoteContentMarkdown(note.content ?? "")
@@ -227,15 +190,4 @@ const reloadNoteInfo = async () => {
 }
 
 defineExpose({ reloadNoteInfo })
-
-watch(
-  () => note.id,
-  () => {
-    showRefineNoteModal.value = false
-  }
-)
-
-const closeRefineNoteModal = () => {
-  showRefineNoteModal.value = false
-}
 </script>
