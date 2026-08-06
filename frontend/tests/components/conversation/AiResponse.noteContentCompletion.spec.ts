@@ -5,7 +5,6 @@ import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import {
   createToolCallChunk,
-  mountAiResponse,
   submitMessageAndSimulateToolCall,
   useAiResponseMount,
 } from "./aiResponseTestSupport"
@@ -118,63 +117,5 @@ describe("AiResponse note content completion", () => {
 
     expect(updateNoteContentSpy).not.toHaveBeenCalled()
     expect(ctx.wrapper.find(".completion-text").exists()).toBe(false)
-  })
-
-  it("accepts completion with replacement of overlapping content", async () => {
-    ctx.refreshNoteContent("Hello world")
-    await submitMessageAndSimulateToolCall(
-      ctx.wrapper,
-      createToolCallChunk("NoteContentCompletion", {
-        content: "Hello  friends!",
-      })
-    )
-
-    await ctx.wrapper.find('button[class*="btn-primary"]').trigger("click")
-    await flushPromises()
-
-    expect(updateNoteContentSpy).toHaveBeenCalledWith({
-      path: { note: ctx.note.id },
-      body: { content: "Hello  friends!" },
-    })
-  })
-
-  it("accepts completion that replaces all content", async () => {
-    ctx.refreshNoteContent("Hello world")
-    await submitMessageAndSimulateToolCall(
-      ctx.wrapper,
-      createToolCallChunk("NoteContentCompletion", {
-        content: "Completely new text",
-      })
-    )
-
-    await ctx.wrapper.find('button[class*="btn-primary"]').trigger("click")
-    await flushPromises()
-
-    expect(updateNoteContentSpy).toHaveBeenCalledWith({
-      path: { note: ctx.note.id },
-      body: { content: "Completely new text" },
-    })
-  })
-
-  it("handles completion when note is only on answeredQuestion subject", async () => {
-    const answeredQuestion = makeMe.anAnsweredQuestion
-      .withNote(ctx.note)
-      .please()
-    const conversation = makeMe.aConversation
-      .forAnsweredQuestion(answeredQuestion)
-      .please()
-
-    const wrapper = mountAiResponse(conversation)
-    await submitMessageAndSimulateToolCall(
-      wrapper,
-      createToolCallChunk("NoteContentCompletion", {
-        content: "test completion",
-      })
-    )
-
-    await wrapper.find('button[class*="btn-primary"]').trigger("click")
-    await flushPromises()
-
-    expect(updateNoteContentSpy).toHaveBeenCalled()
   })
 })

@@ -1,6 +1,6 @@
 # Frontend / CLI / MCP unit tests → "small test" style
 
-**Status:** in progress (Phases 1–8 done)
+**Status:** in progress (Phases 1–9 done)
 **Type:** test renovation (no product behavior change)  
 **Resume:** this `PLAN.md` progress log only — **do not edit** trunk `.planning/STATE.md` (parallel trunk-based work).
 
@@ -133,10 +133,10 @@ While iterating a single large frontend file, `pnpm frontend:test tests/path/to/
 - **Done when:** rubric applied; suite green.
 
 ### Phase 9 — Frontend: components — notebook, book-reading, search, conversation, admin, recent, notes
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
 - **Files:** remaining under `frontend/tests/components/` not covered in Phases 7–8.
-- **Verify:** `pnpm frontend:test`
+- **Verify:** `pnpm frontend:test` — green (271 files / 1691 tests).
 - **Done when:** rubric applied; suite green.
 
 ### Phase 10 — Frontend: notes — show / edit / new / toolbar
@@ -229,7 +229,8 @@ If a Behavior phase cannot express fixtures concisely: add a **Structure** sub-p
 | 6 | done | FE composables/models/store/managedApi/routes renovated; MemoryTrackerBuilder.id; aiReplyState + audioProcessingScheduler capability splits; suite green |
 | 7 | done | FE form + commons component tests renovated; markdownizer + list-properties capability splits; harness Quill helpers; focused asserts; suite green |
 | 8 | done | FE recall/recallStats/Quiz renovated; NoteRealm/MemoryTracker builders; extractNote preview/create/loading splits; AssimilationPanel uses real assimilation count; suite green |
-| 9–18 | planned | — |
+| 9 | done | FE notebook/book-reading/search/conversation/admin/recent/notes components; AiResponse + SearchResults capability splits (search also advanced on trunk); suite green |
+| 10–18 | planned | — |
 
 ---
 
@@ -246,3 +247,4 @@ If a Behavior phase cannot express fixtures concisely: add a **Structure** sub-p
 - Phase 6: Most managedApi/routes/storybook/DoughnutApp already drove stable surfaces. Added `MemoryTrackerBuilder.id()`; dropped tracker post-construction mutation (also related form/notes helpers). Split oversized `aiReplyState` (content/toolCalls + support) and `audioProcessingScheduler` (flush/stop). Focused asserts in assimilation/store/deleteNote; pending SDK calls via `mockSdkServiceWithImplementation`. Kept popup/toast/router/timezone mocks as side-effect boundaries for composable APIs (not illicit internals).
 - Phase 7: Form/commons already mostly mounted-component. Split oversized `markdownizer` (markdownToHtml / formatting / htmlToMarkdown + `replaceWikiLinksInHtml`) and list properties out of `RichMarkdownEditor.properties`; harness Quill helpers (`emitQuill*`, `quillModelHtml`, `lastEmittedPasteComplete`). Slimmed MemoryTrackerGuard UI asserts (composable owns confirm/SDK shape); dropped redundant DiffView/Dropdown/LoadingModal/Image/CJK asserts; cleaned QuillEditor/TextInput narrative. Kept `usePopups` mock as popup side-effect boundary (same as Phase 6).
 - Phase 8: Recall/recallStats/Quiz already mostly mounted-component. Added `NoteRealmBuilder.inNotebook` / `notebookName` / `readonly` and `MemoryTrackerBuilder.spelling`; dropped post-construction realm/content mutations and dead clozeDescription fixture. Split oversized `NoteRefinement.extractNote` into preview / create / loading. AssimilationPanel: real `useAssimilationCount`; kept `useRecallData` + `useGoToNextAssimilation` mocks (router inject / navigation side-effect — same Phase 6 toast/router pattern). Dropped `useRecallData` mock from RecallSessionOptionsDialog. recallStats/Quiz already rubric-compliant.
+- Phase 9: Conversation: split oversized `AiResponse` (streaming / noteContentCompletion / titleAndUnknown) + shared support; `vi.mock` for AiReplyEventSource tracking must live in each `*.spec.ts` (not only support); NoteConversation uses makeMe + DOM asserts; ConversationInner shares SSE mock/helpers. Book-reading: extracted AiReorganize mount support; toast/pdfjs stubs kept as externals. Notes: `MemoryTrackerBuilder.id` instead of post-construction mutation. Search: trunk already split SearchResults (caching/recent/hitLinks/emptyShorterPhrase) during parallel work — left origin’s search suite. Admin/notebook/recent already rubric-compliant.

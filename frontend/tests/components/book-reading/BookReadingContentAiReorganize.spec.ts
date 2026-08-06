@@ -10,6 +10,7 @@ import makeMe from "doughnut-test-fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import {
+  bookReadingContentProps,
   clickAiReorganize,
   loadingModal,
   mockToast,
@@ -20,6 +21,48 @@ import {
 vi.mock("vue-toastification", () => ({
   useToast: () => mockToast,
 }))
+
+type SuggestResult = Awaited<
+  ReturnType<typeof NotebookBooksController.suggestBookLayoutReorganization>
+>
+type ApplyResult = Awaited<
+  ReturnType<typeof NotebookBooksController.applyBookLayoutReorganization>
+>
+
+function mockPendingSuggest() {
+  let resolveSuggest: (value: SuggestResult) => void = () => undefined
+  vi.mocked(
+    NotebookBooksController.suggestBookLayoutReorganization
+  ).mockImplementation(
+    () =>
+      new Promise((resolve) => {
+        resolveSuggest = resolve
+      }) as ReturnType<
+        typeof NotebookBooksController.suggestBookLayoutReorganization
+      >
+  )
+  return {
+    resolve: (value: SuggestResult) => resolveSuggest(value),
+  }
+}
+
+function mockPendingApply() {
+  let resolveApply: (value: ApplyResult) => void = () => undefined
+  vi.spyOn(
+    NotebookBooksController,
+    "applyBookLayoutReorganization"
+  ).mockImplementation(
+    () =>
+      new Promise((resolve) => {
+        resolveApply = resolve
+      }) as ReturnType<
+        typeof NotebookBooksController.applyBookLayoutReorganization
+      >
+  )
+  return {
+    resolve: (value: ApplyResult) => resolveApply(value),
+  }
+}
 
 describe("BookReadingContent AI reorganize suggest", () => {
   const apiStatus: ApiStatus = { states: [] }
@@ -61,11 +104,7 @@ describe("BookReadingContent AI reorganize suggest", () => {
   })
 
   it("shows error toast when suggest fails", async () => {
-    const wrapper = mountBookReadingContent({
-      book: makeMe.aBook.notebookId("9").please(),
-      bookPdfBytes: new ArrayBuffer(0),
-      initialLastRead: null,
-    })
+    const wrapper = mountBookReadingContent(bookReadingContentProps())
 
     await flushPromises()
     await clickAiReorganize(wrapper)
@@ -80,11 +119,7 @@ describe("BookReadingContent AI reorganize suggest", () => {
       NotebookBooksController.suggestBookLayoutReorganization
     ).mockResolvedValueOnce(wrapSdkResponse({ blocks: [{ id: 1, depth: 0 }] }))
 
-    const wrapper = mountBookReadingContent({
-      book: makeMe.aBook.notebookId("9").please(),
-      bookPdfBytes: new ArrayBuffer(0),
-      initialLastRead: null,
-    })
+    const wrapper = mountBookReadingContent(bookReadingContentProps())
 
     await flushPromises()
     await clickAiReorganize(wrapper)
@@ -125,11 +160,7 @@ describe("BookReadingContent AI reorganize suggest", () => {
       })
     )
 
-    const wrapper = mountBookReadingContent({
-      book,
-      bookPdfBytes: new ArrayBuffer(0),
-      initialLastRead: null,
-    })
+    const wrapper = mountBookReadingContent(bookReadingContentProps(book))
 
     await flushPromises()
     await clickAiReorganize(wrapper)
@@ -148,30 +179,8 @@ describe("BookReadingContent AI reorganize suggest", () => {
   })
 
   it("shows the global loading modal while suggest API is pending", async () => {
-    let resolveSuggest: (
-      value: ReturnType<
-        typeof NotebookBooksController.suggestBookLayoutReorganization
-      > extends Promise<infer R>
-        ? R
-        : never
-    ) => void = () => undefined
-
-    vi.mocked(
-      NotebookBooksController.suggestBookLayoutReorganization
-    ).mockImplementation(
-      () =>
-        new Promise((resolve) => {
-          resolveSuggest = resolve
-        }) as ReturnType<
-          typeof NotebookBooksController.suggestBookLayoutReorganization
-        >
-    )
-
-    const wrapper = mountBookReadingWithGlobalModal({
-      book: makeMe.aBook.notebookId("9").please(),
-      bookPdfBytes: new ArrayBuffer(0),
-      initialLastRead: null,
-    })
+    const pending = mockPendingSuggest()
+    const wrapper = mountBookReadingWithGlobalModal(bookReadingContentProps())
 
     await flushPromises()
     await clickAiReorganize(wrapper)
@@ -180,7 +189,7 @@ describe("BookReadingContent AI reorganize suggest", () => {
     expect(loadingModal()).toBeTruthy()
     expect(document.body.textContent).toContain("Analyzing book layout…")
 
-    resolveSuggest(wrapSdkResponse({ blocks: [{ id: 1, depth: 0 }] }))
+    pending.resolve(wrapSdkResponse({ blocks: [{ id: 1, depth: 0 }] }))
     await flushPromises()
 
     expect(loadingModal()).toBeNull()
@@ -197,31 +206,10 @@ describe("BookReadingContent AI reorganize suggest", () => {
       NotebookBooksController.suggestBookLayoutReorganization
     ).mockResolvedValueOnce(wrapSdkResponse({ blocks: [{ id: 1, depth: 1 }] }))
 
-    let resolveApply: (
-      value: ReturnType<
-        typeof NotebookBooksController.applyBookLayoutReorganization
-      > extends Promise<infer R>
-        ? R
-        : never
-    ) => void = () => undefined
-
-    vi.spyOn(
-      NotebookBooksController,
-      "applyBookLayoutReorganization"
-    ).mockImplementation(
-      () =>
-        new Promise((resolve) => {
-          resolveApply = resolve
-        }) as ReturnType<
-          typeof NotebookBooksController.applyBookLayoutReorganization
-        >
+    const pending = mockPendingApply()
+    const wrapper = mountBookReadingWithGlobalModal(
+      bookReadingContentProps(book)
     )
-
-    const wrapper = mountBookReadingWithGlobalModal({
-      book,
-      bookPdfBytes: new ArrayBuffer(0),
-      initialLastRead: null,
-    })
 
     await flushPromises()
     await clickAiReorganize(wrapper)
@@ -235,7 +223,7 @@ describe("BookReadingContent AI reorganize suggest", () => {
     expect(loadingModal()).toBeTruthy()
     expect(document.body.textContent).toContain("Applying layout changes…")
 
-    resolveApply(
+    pending.resolve(
       wrapSdkResponse({
         ...book,
         blocks: [{ id: 1, depth: 1, title: "A", contentLocators: [] }],

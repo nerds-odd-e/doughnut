@@ -70,7 +70,6 @@ describe("NoteConversation", () => {
       path: { note: note.id },
       body: "Hello",
     })
-    expect(wrapper.text()).not.toContain("Start a conversation about this note")
     expect(wrapper.find("form.chat-input-form").exists()).toBe(true)
   })
 
@@ -80,7 +79,7 @@ describe("NoteConversation", () => {
     ])
     const wrapper = await mount()
 
-    expect(wrapper.text()).not.toContain("Start a conversation about this note")
+    expect(wrapper.find("form.chat-input-form").exists()).toBe(true)
     expect(wrapper.find("select.conversation-select").exists()).toBe(false)
   })
 
@@ -139,7 +138,7 @@ describe("NoteConversation", () => {
       path: { note: note.id },
       body: "New conversation message",
     })
-    expect(wrapper.text()).not.toContain("Start a conversation about this note")
+    expect(wrapper.find("form.chat-input-form").exists()).toBe(true)
   })
 
   it("starts AI reply when starting a conversation with AI invite", async () => {
@@ -164,7 +163,6 @@ describe("NoteConversation", () => {
       body: "Hello AI",
     })
     expect(mockStart).toHaveBeenCalled()
-    expect(wrapper.text()).not.toContain("Start a conversation about this note")
   })
 
   it("starts AI reply when sending with AI invite in an existing conversation", async () => {

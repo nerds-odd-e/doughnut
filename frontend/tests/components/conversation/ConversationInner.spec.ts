@@ -6,46 +6,14 @@ import helper, { mockSdkService, mockShowNote } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { expect, vi } from "vitest"
 import AiReplyEventSource from "@/managedApi/AiReplyEventSource"
-import {
-  getLastInstance,
-  resetInstance,
-} from "@tests/helpers/aiReplyEventSourceTracker"
+import { resetInstance } from "@tests/helpers/aiReplyEventSourceTracker"
+import { simulateAiResponse } from "./aiResponseTestSupport"
 
-const simulateAiResponse = (content = "## I'm ChatGPT") => {
-  const instance = getLastInstance()
-  if (!instance) {
-    throw new Error("No AiReplyEventSource instance available")
-  }
-  instance.onMessageCallback(
-    "chat.completion.chunk",
-    JSON.stringify({
-      choices: [
-        {
-          index: 0,
-          message: { role: "assistant", content },
-          finish_reason: null,
-        },
-      ],
-    })
-  )
-}
-
-// Track AiReplyEventSource instances for streaming simulation (SSE external).
 vi.mock("@/managedApi/AiReplyEventSource", async () => {
-  const actual = await vi.importActual<
-    typeof import("@/managedApi/AiReplyEventSource")
-  >("@/managedApi/AiReplyEventSource")
-  const { setLastInstance } = await import(
-    "@tests/helpers/aiReplyEventSourceTracker"
+  const { aiReplyEventSourceTrackingMock } = await import(
+    "./aiReplyEventSourceTrackingMock"
   )
-  return {
-    default: class extends actual.default {
-      constructor(conversationId: number) {
-        super(conversationId)
-        setLastInstance(this)
-      }
-    },
-  }
+  return aiReplyEventSourceTrackingMock()
 })
 
 const setupTestData = () => {

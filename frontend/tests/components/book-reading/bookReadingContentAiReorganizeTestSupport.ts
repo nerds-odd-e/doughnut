@@ -22,6 +22,16 @@ export type BookReadingContentProps = {
   initialLastRead: null
 }
 
+export function bookReadingContentProps(
+  book: BookReadingContentProps["book"] = makeMe.aBook.notebookId("9").please()
+): BookReadingContentProps {
+  return {
+    book,
+    bookPdfBytes: new ArrayBuffer(0),
+    initialLastRead: null,
+  }
+}
+
 export function mountBookReadingContent(contentProps: BookReadingContentProps) {
   return helper
     .component(BookReadingContent)
