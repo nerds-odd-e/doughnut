@@ -7,7 +7,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@generated/doughnut-backend-api': resolve(
-        __dirname,
+        import.meta.dirname,
         '../packages/generated/doughnut-backend-api'
       ),
     },
