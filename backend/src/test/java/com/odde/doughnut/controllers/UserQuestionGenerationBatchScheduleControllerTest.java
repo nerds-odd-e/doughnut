@@ -28,7 +28,6 @@ class UserQuestionGenerationBatchScheduleControllerTest extends ControllerTestBa
     var memoryTracker =
         makeMe
             .aMemoryTrackerFor(note)
-            .by(currentUser.getUser())
             .nextRecallAt(TimestampOperations.addHoursToTimestamp(currentTime, 24))
             .please();
     makeMe

@@ -2,6 +2,8 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.QuestionGenerationBatchAdminStatusDTO;
@@ -13,6 +15,9 @@ import com.odde.doughnut.services.GlobalSettingsService;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class AdminQuestionGenerationBatchControllerTest extends ControllerTestBase {
@@ -25,13 +30,14 @@ class AdminQuestionGenerationBatchControllerTest extends ControllerTestBase {
   @BeforeEach
   void setup() {
     currentTime = makeMe.aTimestamp().please();
+    testabilitySettings.timeTravelTo(currentTime);
     globalSettingsService
         .globalSettingQuestionGeneration()
         .setKeyValue(currentTime, "gpt-batch-question-generation");
   }
 
   @Test
-  void adminGetsZeroFilledStatusMapsWhenNoBatchesExist() throws UnexpectedNoAccessRightException {
+  void adminGetsZeroFilledStatusWhenNoBatchesExist() throws UnexpectedNoAccessRightException {
     currentUser.setUser(makeMe.anAdmin().please());
 
     QuestionGenerationBatchAdminStatusDTO status = controller.getQuestionGenerationBatchStatus();
@@ -45,15 +51,8 @@ class AdminQuestionGenerationBatchControllerTest extends ControllerTestBase {
     }
     assertThat(status.isOpenAiTokenConfigured(), equalTo(true));
     assertThat(status.isSchedulerActive(), equalTo(false));
-  }
-
-  @Test
-  void nonAdminCannotGetStatus() {
-    currentUser.setUser(makeMe.aUser().please());
-
-    assertThrows(
-        UnexpectedNoAccessRightException.class,
-        () -> controller.getQuestionGenerationBatchStatus());
+    assertThat(status.getLastScheduledMaintenanceStartedAt(), nullValue());
+    assertThat(status.getLastManualMaintenanceStartedAt(), nullValue());
   }
 
   @Test
@@ -69,28 +68,29 @@ class AdminQuestionGenerationBatchControllerTest extends ControllerTestBase {
   }
 
   @Test
-  void nonAdminCannotTriggerRecentRecallUsersSubmission() {
-    currentUser.setUser(makeMe.aUser().please());
-
-    assertThrows(
-        UnexpectedNoAccessRightException.class, () -> controller.submitRecentRecallUsers());
-  }
-
-  @Test
-  void adminGetsNullMaintenanceRunTimestampsWhenNoRunsExist()
-      throws UnexpectedNoAccessRightException {
+  void adminResumeRecordsManualMaintenanceTimestamps() throws UnexpectedNoAccessRightException {
     currentUser.setUser(makeMe.anAdmin().please());
 
-    QuestionGenerationBatchAdminStatusDTO status = controller.getQuestionGenerationBatchStatus();
+    QuestionGenerationBatchAdminStatusDTO status = controller.resumeExistingBatches();
 
-    assertThat(status.getLastScheduledMaintenanceStartedAt(), equalTo(null));
-    assertThat(status.getLastManualMaintenanceStartedAt(), equalTo(null));
+    assertThat(status.getLastManualMaintenanceStartedAt(), equalTo(currentTime));
+    assertThat(status.getLastManualMaintenanceFinishedAt(), notNullValue());
+    assertThat(status.getLastManualMaintenanceError(), nullValue());
   }
 
-  @Test
-  void nonAdminCannotResumeExistingBatches() {
+  @ParameterizedTest
+  @ValueSource(strings = {"status", "submit", "resume"})
+  void nonAdminDenied(String action) {
     currentUser.setUser(makeMe.aUser().please());
+    assertThrows(UnexpectedNoAccessRightException.class, actionFor(action));
+  }
 
-    assertThrows(UnexpectedNoAccessRightException.class, () -> controller.resumeExistingBatches());
+  private Executable actionFor(String action) {
+    return switch (action) {
+      case "status" -> controller::getQuestionGenerationBatchStatus;
+      case "submit" -> controller::submitRecentRecallUsers;
+      case "resume" -> controller::resumeExistingBatches;
+      default -> throw new IllegalArgumentException(action);
+    };
   }
 }

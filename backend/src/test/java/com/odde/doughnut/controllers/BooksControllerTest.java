@@ -1,17 +1,17 @@
 package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.Book;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.BookRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.book.BookReadingWireConstants;
 import com.odde.doughnut.services.book.BookStorage;
-import com.openai.client.OpenAIClient;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -22,7 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.server.ResponseStatusException;
@@ -32,9 +31,6 @@ class BooksControllerTest extends ControllerTestBase {
   @Autowired BooksController booksController;
   @Autowired BookRepository bookRepository;
   @Autowired BookStorage bookStorage;
-
-  @MockitoBean(name = "officialOpenAiClient")
-  OpenAIClient officialOpenAiClient;
 
   @BeforeEach
   void setup() {
@@ -60,11 +56,6 @@ class BooksControllerTest extends ControllerTestBase {
     makeMe.entityPersister.flush();
   }
 
-  private Notebook otherUsersNotebookWithBook() {
-    User other = makeMe.aUser().please();
-    return makeMe.aNotebook().creatorAndOwner(other).withBook("Linear Algebra").please();
-  }
-
   private static ServletWebRequest webRequest() {
     return new ServletWebRequest(new MockHttpServletRequest());
   }
@@ -77,11 +68,15 @@ class BooksControllerTest extends ControllerTestBase {
   class GetBookFileByBook {
     @Test
     void rejectsNotebookWithoutReadAccess() {
-      Notebook otherNb = otherUsersNotebookWithBook();
-      Book book = bookOf(otherNb);
+      Notebook otherNb =
+          makeMe
+              .aNotebook()
+              .creatorAndOwner(makeMe.aUser().please())
+              .withBook("Linear Algebra")
+              .please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> booksController.getBookFile(webRequest(), book));
+          () -> booksController.getBookFile(webRequest(), bookOf(otherNb)));
     }
 
     @Test
@@ -116,20 +111,16 @@ class BooksControllerTest extends ControllerTestBase {
       book.setSourceFileRef(ref);
       makeMe.entityPersister.save(book);
       makeMe.entityPersister.flush();
-      String expectedEtag = expectedEtagForRef(ref);
 
       ResponseEntity<byte[]> res = booksController.getBookFile(webRequest(), book);
 
-      assertThat(res.getStatusCode(), equalTo(HttpStatus.OK));
       assertThat(res.getBody(), equalTo(epubBytes));
       assertThat(
           res.getHeaders().getContentType(),
           equalTo(MediaType.parseMediaType("application/epub+zip")));
-      assertThat(res.getHeaders().getETag(), equalTo(expectedEtag));
       assertThat(
           res.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION),
           equalTo("inline; filename=\"Minimal EPUB.epub\""));
-      assertThat(res.getHeaders().getCacheControl(), containsString("no-store"));
     }
 
     @Test

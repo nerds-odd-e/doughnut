@@ -1,7 +1,8 @@
 package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.UserForListing;
@@ -27,53 +28,39 @@ class AdminUserControllerTest extends ControllerTestBase {
 
   @Nested
   class AdminAccessUserListing {
-    User admin;
-
     @BeforeEach
     void setup() {
-      admin = makeMe.anAdmin().please();
-      currentUser.setUser(admin);
+      currentUser.setUser(makeMe.anAdmin().please());
     }
 
     @Test
-    void canListUsersWithCorrectMemoryTrackerCountAndLastAssimilationTime()
-        throws UnexpectedNoAccessRightException {
+    void listsMemoryTrackerCountAndLastAssimilationTime() throws UnexpectedNoAccessRightException {
       User userWithTrackers = makeMe.aUser().please();
       Note note = makeMe.aNote().please();
       Timestamp assimilationTime = makeMe.aTimestamp().of(2025, 5).please();
       makeMe.aMemoryTrackerFor(note).by(userWithTrackers).assimilatedAt(assimilationTime).please();
 
-      UserListingPage result = controller.listUsers(0, 10);
+      UserForListing userListing = listingFor(userWithTrackers);
 
-      UserForListing userListing =
-          result.getUsers().stream()
-              .filter(u -> u.getId().equals(userWithTrackers.getId()))
-              .findFirst()
-              .orElseThrow();
       assertThat(userListing.getMemoryTrackerCount(), equalTo(1L));
       assertThat(userListing.getLastAssimilationTime(), equalTo(assimilationTime));
     }
 
     @Test
-    void canListUsersWithCorrectNoteCountAndLastNoteTime() throws UnexpectedNoAccessRightException {
+    void listsNoteCountAndLastNoteTime() throws UnexpectedNoAccessRightException {
       User userWithNotes = makeMe.aUser().please();
       Timestamp noteTime = makeMe.aTimestamp().of(2025, 6).please();
       Note note = makeMe.aNote().createdAt(noteTime).please();
       makeMe.entityPersister.save(NoteCreator.forNoteAndUser(note, userWithNotes));
 
-      UserListingPage result = controller.listUsers(0, 10);
+      UserForListing userListing = listingFor(userWithNotes);
 
-      UserForListing userListing =
-          result.getUsers().stream()
-              .filter(u -> u.getId().equals(userWithNotes.getId()))
-              .findFirst()
-              .orElseThrow();
       assertThat(userListing.getNoteCount(), equalTo(1L));
       assertThat(userListing.getLastNoteTime(), equalTo(noteTime));
     }
 
     @Test
-    void paginationWorksCorrectly() throws UnexpectedNoAccessRightException {
+    void paginatesUsers() throws UnexpectedNoAccessRightException {
       for (int i = 0; i < 3; i++) {
         makeMe.aUser().please();
       }
@@ -86,6 +73,13 @@ class AdminUserControllerTest extends ControllerTestBase {
       assertThat(firstPage.getPageSize(), equalTo(3));
       assertThat(secondPage.getUsers().size(), greaterThanOrEqualTo(1));
       assertThat(secondPage.getPageIndex(), equalTo(1));
+    }
+
+    private UserForListing listingFor(User user) throws UnexpectedNoAccessRightException {
+      return controller.listUsers(0, 10).getUsers().stream()
+          .filter(u -> u.getId().equals(user.getId()))
+          .findFirst()
+          .orElseThrow();
     }
   }
 }

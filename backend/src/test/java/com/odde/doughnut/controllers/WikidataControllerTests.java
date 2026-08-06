@@ -1,7 +1,9 @@
 package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 
@@ -15,35 +17,22 @@ import java.net.URI;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.platform.commons.util.StringUtils;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
 class WikidataControllerTests extends ControllerTestBase {
   @Autowired WikidataController controller;
   @MockitoBean HttpClientAdapter httpClientAdapter;
 
-  MakeMeWithoutDB makeMe = new MakeMeWithoutDB();
+  MakeMeWithoutDB wikidataJson = new MakeMeWithoutDB();
 
   @Nested
-  class FetchWikidata {
-
-    private String getEntityDataJsonSearch(String search) {
-      return getString(search, "{\"id\":\"Q64\",\"label\":\"" + search + "\"" + "}");
-    }
-
-    private String getString(String search, String entity) {
-      return "{\"searchinfo\":{\"search\":\"" + search + "\"},\"search\":[" + entity + "]}";
-    }
-
+  class FetchWikidataEntity {
     @Test
     void serviceNotAvailable() throws IOException, InterruptedException {
       Mockito.when(httpClientAdapter.getResponseString(any())).thenThrow(new IOException());
@@ -52,116 +41,110 @@ class WikidataControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void shouldFetchInfoViaWikidataApi() throws IOException, InterruptedException, BindException {
+    void fetchesEntityDataViaWikidataApi() throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
-          .thenReturn(makeMe.wikidataEntityJson().entityId("Q1").entitleTitle("Mohawk").please());
-      controller.fetchWikidataEntityDataByID("Q1");
+          .thenReturn(
+              wikidataJson.wikidataEntityJson().entityId("Q1").entitleTitle("Mohawk").please());
+
+      WikidataEntityData result = controller.fetchWikidataEntityDataByID("Q1").get();
+
+      assertThat(result.WikidataTitleInEnglish, equalTo("Mohawk"));
       Mockito.verify(httpClientAdapter)
           .getResponseString(
               URI.create("https://www.wikidata.org/wiki/Special:EntityData/Q1.json"));
     }
 
     @Test
-    void shouldParseAndGetTheInfo() throws IOException, InterruptedException, BindException {
-      Mockito.when(httpClientAdapter.getResponseString(any()))
-          .thenReturn(makeMe.wikidataEntityJson().entityId("Q1").entitleTitle("Mohawk").please());
-      WikidataEntityData result = controller.fetchWikidataEntityDataByID("Q1").get();
-      assertThat(result.WikidataTitleInEnglish, equalTo("Mohawk"));
-    }
-
-    @Test
-    void shouldRetrieveTheEnglishWikipediaLinkIfExists()
+    void retrievesEnglishWikipediaLinkWhenPresent()
         throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(
-              makeMe
+              wikidataJson
                   .wikidataEntityJson()
                   .entityId("Q13339")
                   .entitleTitle("Mohawk")
                   .enwiki("https://en.wikipedia.org/wiki/Mohawk_language")
                   .please());
-      WikidataEntityData result = controller.fetchWikidataEntityDataByID("Q13339").get();
+
       assertThat(
-          result.WikipediaEnglishUrl, equalTo("https://en.wikipedia.org/wiki/Mohawk_language"));
+          controller.fetchWikidataEntityDataByID("Q13339").get().WikipediaEnglishUrl,
+          equalTo("https://en.wikipedia.org/wiki/Mohawk_language"));
     }
 
     @Test
-    void shouldBuildEnglishWikipediaLinkFromSitelinkTitleWhenUrlIsAbsent()
+    void buildsEnglishWikipediaLinkFromSitelinkTitleWhenUrlAbsent()
         throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(
-              makeMe
+              wikidataJson
                   .wikidataEntityJson()
                   .entityId("Q12345")
                   .entitleTitle("Count von Count")
                   .enwikiTitleOnly("Count von Count")
                   .please());
-      WikidataEntityData result = controller.fetchWikidataEntityDataByID("Q12345").get();
+
       assertThat(
-          result.WikipediaEnglishUrl, equalTo("https://en.wikipedia.org/wiki/Count_von_Count"));
+          controller.fetchWikidataEntityDataByID("Q12345").get().WikipediaEnglishUrl,
+          equalTo("https://en.wikipedia.org/wiki/Count_von_Count"));
     }
 
     @Test
-    void shouldReturnEmptyIfEnglishWikipediaLinkNotExist()
+    void blankWikipediaUrlWhenEnglishLinkMissing()
         throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
-          .thenReturn(makeMe.wikidataEntityJson().entityId("Q13339").please());
-      WikidataEntityData result = controller.fetchWikidataEntityDataByID("Q13339").get();
-      assertThat(StringUtils.isBlank(result.WikipediaEnglishUrl), is(true));
+          .thenReturn(wikidataJson.wikidataEntityJson().entityId("Q13339").please());
+
+      assertThat(
+          StringUtils.isBlank(
+              controller.fetchWikidataEntityDataByID("Q13339").get().WikipediaEnglishUrl),
+          is(true));
+    }
+  }
+
+  @Nested
+  class SearchWikidata {
+    private String searchJson(String search, String entity) {
+      return "{\"searchinfo\":{\"search\":\"" + search + "\"},\"search\":[" + entity + "]}";
     }
 
     @Test
-    void serviceNotAvailableAtSearchWikidata() throws IOException, InterruptedException {
+    void serviceNotAvailable() throws IOException, InterruptedException {
       Mockito.when(httpClientAdapter.getResponseString(any())).thenThrow(new IOException());
       assertThrows(WikidataServiceErrorException.class, () -> controller.searchWikidata("berlin"));
     }
 
     @Test
-    void shouldFetchDataAtSearchWikidata() throws IOException, InterruptedException, BindException {
+    void parsesSearchResults() throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
-          .thenReturn(getEntityDataJsonSearch("berlin"));
-      controller.searchWikidata("berlin");
-      Mockito.verify(httpClientAdapter).getResponseString(any());
-    }
+          .thenReturn(searchJson("berlin", "{\"id\":\"Q64\",\"label\":\"berlin\"}"));
 
-    @Test
-    void shouldParseAndGetAtSearchWikidata()
-        throws IOException, InterruptedException, BindException {
-      Mockito.when(httpClientAdapter.getResponseString(any()))
-          .thenReturn(getEntityDataJsonSearch("berlin"));
       List<WikidataSearchEntity> result = controller.searchWikidata("berlin");
+
+      assertThat(result, hasSize(1));
       assertThat(result.get(0).label, equalTo("berlin"));
     }
 
     @Test
-    void shouldReturnEmptyAtSearchWikidata()
-        throws IOException, InterruptedException, BindException {
-      Mockito.when(httpClientAdapter.getResponseString(any())).thenReturn(getString("key", ""));
-      List<WikidataSearchEntity> result = controller.searchWikidata("key");
-      assertThat(result.size(), is(0));
+    void emptyWhenNoSearchHits() throws IOException, InterruptedException, BindException {
+      Mockito.when(httpClientAdapter.getResponseString(any())).thenReturn(searchJson("key", ""));
+
+      assertThat(controller.searchWikidata("key"), hasSize(0));
     }
 
-    @Test
-    void shouldUseTheProperlyEncodedSearchKey()
+    @ParameterizedTest
+    @CsvSource({"john cena, john%20cena", "梵我一如, %E6%A2%B5%E6%88%91%E4%B8%80%E5%A6%82"})
+    void encodesSearchKeyInRequestUri(String search, String encoded)
         throws IOException, InterruptedException, BindException {
-      Mockito.when(httpClientAdapter.getResponseString(any()))
-          .thenReturn(getString("john cena", ""));
-      controller.searchWikidata("john cena");
+      Mockito.when(httpClientAdapter.getResponseString(any())).thenReturn(searchJson(search, ""));
+
+      controller.searchWikidata(search);
+
       Mockito.verify(httpClientAdapter)
           .getResponseString(
               URI.create(
-                  "https://www.wikidata.org/w/api.php?action=wbsearchentities&search=john%20cena&format=json&language=en&uselang=en&type=item&limit=10"));
-    }
-
-    @Test
-    void shouldUseTheProperlyEncodedSearchKeyForUnicode()
-        throws IOException, InterruptedException, BindException {
-      Mockito.when(httpClientAdapter.getResponseString(any())).thenReturn(getString("梵我一如", ""));
-      controller.searchWikidata("梵我一如");
-      Mockito.verify(httpClientAdapter)
-          .getResponseString(
-              URI.create(
-                  "https://www.wikidata.org/w/api.php?action=wbsearchentities&search=%E6%A2%B5%E6%88%91%E4%B8%80%E5%A6%82&format=json&language=en&uselang=en&type=item&limit=10"));
+                  "https://www.wikidata.org/w/api.php?action=wbsearchentities&search="
+                      + encoded
+                      + "&format=json&language=en&uselang=en&type=item&limit=10"));
     }
   }
 }

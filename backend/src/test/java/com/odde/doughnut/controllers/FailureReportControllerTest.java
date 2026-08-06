@@ -4,15 +4,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.FailureReport;
 import com.odde.doughnut.entities.repositories.FailureReportRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -24,7 +21,7 @@ class FailureReportControllerTest extends ControllerTestBase {
   @Autowired FailureReportController controller;
 
   @Test
-  void whenNonAdminAccessTheFailureReport() {
+  void nonAdminCannotShowFailureReport() {
     currentUser.setUser(makeMe.aUser().please());
     FailureReport failureReport = makeMe.aFailureReport().please();
     assertThrows(
@@ -32,7 +29,7 @@ class FailureReportControllerTest extends ControllerTestBase {
   }
 
   @Nested
-  class TriggerExceptionTest {
+  class TriggerException {
     @Test
     void adminCanTriggerException() {
       currentUser.setUser(makeMe.anAdmin().please());
@@ -47,56 +44,44 @@ class FailureReportControllerTest extends ControllerTestBase {
   }
 
   @Nested
-  class DeleteFailureReportsTest {
-    List<FailureReport> failureReports;
+  class DeleteFailureReports {
+    FailureReport first;
+    FailureReport second;
 
     @BeforeEach
     void setup() {
       currentUser.setUser(makeMe.anAdmin().please());
-
-      // Clear all existing failure reports first to ensure test independence
       failureReportRepository.deleteAll();
-
-      failureReports = new ArrayList<>();
-      failureReports.add(makeMe.aFailureReport().please());
-      failureReports.add(makeMe.aFailureReport().please());
+      first = makeMe.aFailureReport().please();
+      second = makeMe.aFailureReport().please();
     }
 
     @Test
-    void adminCanDeleteFailureReports() throws UnexpectedNoAccessRightException {
-      List<Integer> idsToDelete =
-          failureReports.stream().map(FailureReport::getId).collect(Collectors.toList());
+    void adminCanDeleteAllListedReports() throws UnexpectedNoAccessRightException {
+      controller.deleteFailureReports(List.of(first.getId(), second.getId()));
 
-      controller.deleteFailureReports(idsToDelete);
-
-      Iterable<FailureReport> remainingReports = controller.failureReports();
-      List<FailureReport> reportList =
-          StreamSupport.stream(remainingReports.spliterator(), false).collect(Collectors.toList());
-      assertThat(reportList, is(empty()));
+      assertThat(remainingReports(), empty());
     }
 
     @Test
     void adminCanDeleteOneFailureReport() throws UnexpectedNoAccessRightException {
-      List<Integer> idsToDelete = List.of(failureReports.get(0).getId());
+      controller.deleteFailureReports(List.of(first.getId()));
 
-      controller.deleteFailureReports(idsToDelete);
-
-      Iterable<FailureReport> remainingReports = controller.failureReports();
-      List<FailureReport> reportList =
-          StreamSupport.stream(remainingReports.spliterator(), false).collect(Collectors.toList());
-      assertThat(reportList, hasSize(1));
-      assertThat(reportList.get(0).getId(), equalTo(failureReports.get(1).getId()));
+      List<FailureReport> remaining = remainingReports();
+      assertThat(remaining, hasSize(1));
+      assertThat(remaining.getFirst().getId(), equalTo(second.getId()));
     }
 
     @Test
     void nonAdminCannotDeleteFailureReports() {
       currentUser.setUser(makeMe.aUser().please());
-      List<Integer> idsToDelete =
-          failureReports.stream().map(FailureReport::getId).collect(Collectors.toList());
-
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.deleteFailureReports(idsToDelete));
+          () -> controller.deleteFailureReports(List.of(first.getId(), second.getId())));
+    }
+
+    private List<FailureReport> remainingReports() throws UnexpectedNoAccessRightException {
+      return StreamSupport.stream(controller.failureReports().spliterator(), false).toList();
     }
   }
 }

@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.GlobalAiModelSettings;
@@ -15,14 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 class GlobalSettingsControllerTest extends ControllerTestBase {
   @Autowired GlobalSettingsController controller;
-
-  Timestamp currentTime;
-
   @Autowired GlobalSettingsService globalSettingsService;
   @Autowired GlobalSettingRepository globalSettingRepository;
 
+  Timestamp currentTime;
+
   @BeforeEach
-  void Setup() {
+  void setup() {
     currentTime = makeMe.aTimestamp().please();
     testabilitySettings.timeTravelTo(currentTime);
     currentUser.setUser(makeMe.anAdmin().please());
@@ -31,18 +31,20 @@ class GlobalSettingsControllerTest extends ControllerTestBase {
   @Nested
   class GetCurrentModelVersions {
     @Test
-    void ShouldUseGpt35ByDefault() {
+    void defaultsToConfiguredChatModel() {
       GlobalAiModelSettings currentModelVersions = controller.getCurrentModelVersions();
-      assertEquals(
-          GlobalSettingsService.DEFAULT_CHAT_MODEL,
-          currentModelVersions.getQuestionGenerationModel());
-      assertEquals(
-          GlobalSettingsService.DEFAULT_CHAT_MODEL, currentModelVersions.getEvaluationModel());
-      assertEquals(GlobalSettingsService.DEFAULT_CHAT_MODEL, currentModelVersions.getOthersModel());
+      assertThat(
+          currentModelVersions.getQuestionGenerationModel(),
+          equalTo(GlobalSettingsService.DEFAULT_CHAT_MODEL));
+      assertThat(
+          currentModelVersions.getEvaluationModel(),
+          equalTo(GlobalSettingsService.DEFAULT_CHAT_MODEL));
+      assertThat(
+          currentModelVersions.getOthersModel(), equalTo(GlobalSettingsService.DEFAULT_CHAT_MODEL));
     }
 
     @Test
-    void ShouldUseDbSettingsIfExists() {
+    void usesPersistedSettingsWhenPresent() {
       globalSettingsService
           .globalSettingEvaluation()
           .setKeyValue(currentTime, "any-evaluation-model-version");
@@ -52,12 +54,15 @@ class GlobalSettingsControllerTest extends ControllerTestBase {
       globalSettingsService
           .globalSettingOthers()
           .setKeyValue(currentTime, "any-other-model-version");
+
       GlobalAiModelSettings currentModelVersions = controller.getCurrentModelVersions();
-      assertEquals(
-          "any-question-generation-model-version",
-          currentModelVersions.getQuestionGenerationModel());
-      assertEquals("any-evaluation-model-version", currentModelVersions.getEvaluationModel());
-      assertEquals("any-other-model-version", currentModelVersions.getOthersModel());
+
+      assertThat(
+          currentModelVersions.getQuestionGenerationModel(),
+          equalTo("any-question-generation-model-version"));
+      assertThat(
+          currentModelVersions.getEvaluationModel(), equalTo("any-evaluation-model-version"));
+      assertThat(currentModelVersions.getOthersModel(), equalTo("any-other-model-version"));
     }
   }
 
@@ -66,7 +71,7 @@ class GlobalSettingsControllerTest extends ControllerTestBase {
     GlobalAiModelSettings settings = new GlobalAiModelSettings("gpt-3.5", "gpt-4", "gpt-5");
 
     @Test
-    void authentication() {
+    void nonAdminDenied() {
       currentUser.setUser(makeMe.aUser().please());
       assertThrows(
           UnexpectedNoAccessRightException.class,
@@ -74,29 +79,26 @@ class GlobalSettingsControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void setValues() throws UnexpectedNoAccessRightException {
+    void persistsAllModelSettings() throws UnexpectedNoAccessRightException {
       controller.setCurrentModelVersions(settings);
-      GlobalSettingsService.GlobalSettingsKeyValue globalSettingQuestionQuestion =
-          globalSettingsService.globalSettingQuestionGeneration();
-      assertEquals("gpt-3.5", globalSettingQuestionQuestion.getValue());
-      assertEquals(currentTime, globalSettingQuestionQuestion.getCreatedAt());
-    }
 
-    @Test
-    void allValues() throws UnexpectedNoAccessRightException {
-      controller.setCurrentModelVersions(settings);
       GlobalAiModelSettings currentModelVersions = controller.getCurrentModelVersions();
-      assertEquals("gpt-3.5", currentModelVersions.getQuestionGenerationModel());
-      assertEquals("gpt-4", currentModelVersions.getEvaluationModel());
-      assertEquals("gpt-5", currentModelVersions.getOthersModel());
+      assertThat(currentModelVersions.getQuestionGenerationModel(), equalTo("gpt-3.5"));
+      assertThat(currentModelVersions.getEvaluationModel(), equalTo("gpt-4"));
+      assertThat(currentModelVersions.getOthersModel(), equalTo("gpt-5"));
+      assertThat(
+          globalSettingsService.globalSettingQuestionGeneration().getCreatedAt(),
+          equalTo(currentTime));
     }
 
     @Test
-    void avoidDuplicate() throws UnexpectedNoAccessRightException {
+    void avoidsDuplicateRowsForSameValues() throws UnexpectedNoAccessRightException {
       controller.setCurrentModelVersions(settings);
       long count = globalSettingRepository.count();
+
       controller.setCurrentModelVersions(settings);
-      assertEquals(count, globalSettingRepository.count());
+
+      assertThat(globalSettingRepository.count(), equalTo(count));
     }
   }
 }
