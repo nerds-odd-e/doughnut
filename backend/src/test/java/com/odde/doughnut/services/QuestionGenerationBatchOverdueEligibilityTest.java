@@ -6,16 +6,17 @@ import static org.hamcrest.Matchers.empty;
 
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuestionGenerationBatch;
-import com.odde.doughnut.entities.QuestionGenerationBatchStatus;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -28,7 +29,6 @@ class QuestionGenerationBatchOverdueEligibilityTest {
 
   @Autowired MakeMe makeMe;
   @Autowired QuestionGenerationBatchPlanningService planningService;
-  @Autowired QuestionGenerationBatchRepository batchRepository;
 
   User user;
   Note note;
@@ -38,62 +38,39 @@ class QuestionGenerationBatchOverdueEligibilityTest {
   void setup() {
     user = makeMe.aUser().please();
     note = makeMe.aNote().notebookOwnedBy(user).please();
-    memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
+    memoryTracker = makeMe.aMemoryTrackerFor(note).please();
   }
 
-  @Test
-  void includesUserWhenOverdueAfterTargetTimePassed() {
-    Timestamp cronTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 10, 30));
-    Timestamp recallTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 30));
-    createAnsweredRecall(recallTime);
+  @ParameterizedTest
+  @MethodSource("overdueScenarios")
+  void includesUserWhenOverdueAfterTargetTimePassed(LocalDateTime cron, LocalDateTime recall) {
+    createAnsweredRecall(Timestamp.valueOf(recall));
 
-    List<User> candidates = planningService.findUsersEligibleForBatchSubmission(cronTime);
+    List<User> candidates =
+        planningService.findUsersEligibleForBatchSubmission(Timestamp.valueOf(cron));
 
     assertThat(candidates.stream().map(User::getId).toList(), contains(user.getId()));
   }
 
-  @Test
-  void includesUserWhenOverdueHoursAfterTargetTime() {
-    Timestamp cronTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 12, 15));
-    Timestamp recallTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 30));
-    createAnsweredRecall(recallTime);
-
-    List<User> candidates = planningService.findUsersEligibleForBatchSubmission(cronTime);
-
-    assertThat(candidates.stream().map(User::getId).toList(), contains(user.getId()));
-  }
-
-  @Test
-  void includesUserWhoseTargetCrossesMidnightWhenOverdue() {
-    Timestamp cronTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 16, 0, 30));
-    Timestamp recallTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 23, 45));
-    createAnsweredRecall(recallTime);
-
-    List<User> candidates = planningService.findUsersEligibleForBatchSubmission(cronTime);
-
-    assertThat(candidates.stream().map(User::getId).toList(), contains(user.getId()));
+  static Stream<Arguments> overdueScenarios() {
+    return Stream.of(
+        Arguments.of(LocalDateTime.of(2024, 6, 15, 10, 30), LocalDateTime.of(2024, 6, 15, 9, 30)),
+        Arguments.of(LocalDateTime.of(2024, 6, 15, 12, 15), LocalDateTime.of(2024, 6, 15, 9, 30)),
+        Arguments.of(LocalDateTime.of(2024, 6, 16, 0, 30), LocalDateTime.of(2024, 6, 15, 23, 45)));
   }
 
   @Test
   void excludesUserWhoSubmittedAfterDueInstant() {
     Timestamp cronTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 10, 30));
-    Timestamp recallTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 0));
-    createAnsweredRecall(recallTime);
-    saveSubmittedBatchAt(Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 10, 0)));
-
-    List<User> candidates = planningService.findUsersEligibleForBatchSubmission(cronTime);
-
-    assertThat(candidates, empty());
-  }
-
-  private void saveSubmittedBatchAt(Timestamp submittedAt) {
-    QuestionGenerationBatch batch = new QuestionGenerationBatch();
-    batch.setUser(user);
-    batch.setStatus(QuestionGenerationBatchStatus.COMPLETED);
-    batch.setPlannedAt(submittedAt);
-    batch.setSubmittedAt(submittedAt);
-    batchRepository.save(batch);
+    createAnsweredRecall(Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 0)));
+    makeMe
+        .aQuestionGenerationBatch()
+        .forUser(user)
+        .completedAt(Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 10, 0)))
+        .please();
     makeMe.entityPersister.flush();
+
+    assertThat(planningService.findUsersEligibleForBatchSubmission(cronTime), empty());
   }
 
   private void createAnsweredRecall(Timestamp answerTime) {

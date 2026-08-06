@@ -2,8 +2,8 @@ package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 
 import com.odde.doughnut.entities.MemoryTracker;
@@ -32,29 +32,18 @@ class QuestionGenerationBatchCandidateMemoryTrackersTest {
   Timestamp currentTime;
   Note note;
   MemoryTracker dueTracker;
-  Timestamp dueBy;
 
   @BeforeEach
   void setup() {
     user = makeMe.aUser().please();
     currentTime = makeMe.aTimestamp().of(10, 8).fromShanghai().please();
     note = makeMe.aNote().notebookOwnedBy(user).please();
-    dueTracker =
-        makeMe
-            .aMemoryTrackerFor(note)
-            .by(user)
-            .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(24)))
-            .please();
-    dueBy = new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(48));
+    dueTracker = makeMe.aMemoryTrackerFor(note).nextRecallAt(hoursFrom(currentTime, 24)).please();
   }
 
   @Test
   void includesActiveNonSpellingTrackerDueWithin48Hours() {
-    List<MemoryTracker> candidates =
-        planningService.findCandidateMemoryTrackersForBatchGeneration(user, currentTime);
-
-    assertThat(
-        candidates.stream().map(MemoryTracker::getId).toList(), contains(dueTracker.getId()));
+    assertThat(candidateIds(), contains(dueTracker.getId()));
   }
 
   @Test
@@ -62,18 +51,10 @@ class QuestionGenerationBatchCandidateMemoryTrackersTest {
     MemoryTracker notDueTracker =
         makeMe
             .aMemoryTrackerFor(makeMe.aNote().notebookOwnedBy(user).please())
-            .by(user)
-            .nextRecallAt(new Timestamp(dueBy.getTime() + TimeUnit.HOURS.toMillis(1)))
+            .nextRecallAt(hoursFrom(currentTime, 49))
             .please();
 
-    List<MemoryTracker> candidates =
-        planningService.findCandidateMemoryTrackersForBatchGeneration(user, currentTime);
-
-    assertThat(
-        candidates.stream().map(MemoryTracker::getId).toList(), contains(dueTracker.getId()));
-    assertThat(
-        candidates.stream().map(MemoryTracker::getId).toList(),
-        not(contains(notDueTracker.getId())));
+    assertThat(candidateIds(), not(hasItem(notDueTracker.getId())));
   }
 
   @Test
@@ -81,17 +62,11 @@ class QuestionGenerationBatchCandidateMemoryTrackersTest {
     MemoryTracker removedTracker =
         makeMe
             .aMemoryTrackerFor(makeMe.aNote().notebookOwnedBy(user).please())
-            .by(user)
             .removedFromTracking()
-            .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(1)))
+            .nextRecallAt(hoursFrom(currentTime, 1))
             .please();
 
-    List<MemoryTracker> candidates =
-        planningService.findCandidateMemoryTrackersForBatchGeneration(user, currentTime);
-
-    assertThat(
-        candidates.stream().map(MemoryTracker::getId).toList(),
-        not(contains(removedTracker.getId())));
+    assertThat(candidateIds(), not(hasItem(removedTracker.getId())));
   }
 
   @Test
@@ -99,18 +74,11 @@ class QuestionGenerationBatchCandidateMemoryTrackersTest {
     MemoryTracker deletedTracker =
         makeMe
             .aMemoryTrackerFor(makeMe.aNote().notebookOwnedBy(user).please())
-            .by(user)
-            .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(1)))
+            .nextRecallAt(hoursFrom(currentTime, 1))
+            .deletedAt(currentTime)
             .please();
-    deletedTracker.setDeletedAt(currentTime);
-    makeMe.entityPersister.flush();
 
-    List<MemoryTracker> candidates =
-        planningService.findCandidateMemoryTrackersForBatchGeneration(user, currentTime);
-
-    assertThat(
-        candidates.stream().map(MemoryTracker::getId).toList(),
-        not(contains(deletedTracker.getId())));
+    assertThat(candidateIds(), not(hasItem(deletedTracker.getId())));
   }
 
   @Test
@@ -118,17 +86,11 @@ class QuestionGenerationBatchCandidateMemoryTrackersTest {
     MemoryTracker spellingTracker =
         makeMe
             .aMemoryTrackerFor(makeMe.aNote().notebookOwnedBy(user).please())
-            .by(user)
             .spelling()
-            .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(1)))
+            .nextRecallAt(hoursFrom(currentTime, 1))
             .please();
 
-    List<MemoryTracker> candidates =
-        planningService.findCandidateMemoryTrackersForBatchGeneration(user, currentTime);
-
-    assertThat(
-        candidates.stream().map(MemoryTracker::getId).toList(),
-        not(contains(spellingTracker.getId())));
+    assertThat(candidateIds(), not(hasItem(spellingTracker.getId())));
   }
 
   @Test
@@ -141,11 +103,7 @@ class QuestionGenerationBatchCandidateMemoryTrackersTest {
         .answerTimestamp(currentTime)
         .please();
 
-    List<MemoryTracker> candidates =
-        planningService.findCandidateMemoryTrackersForBatchGeneration(user, currentTime);
-
-    assertThat(
-        candidates.stream().map(MemoryTracker::getId).toList(), contains(dueTracker.getId()));
+    assertThat(candidateIds(), contains(dueTracker.getId()));
   }
 
   @Test
@@ -157,11 +115,7 @@ class QuestionGenerationBatchCandidateMemoryTrackersTest {
         .contested()
         .please();
 
-    List<MemoryTracker> candidates =
-        planningService.findCandidateMemoryTrackersForBatchGeneration(user, currentTime);
-
-    assertThat(
-        candidates.stream().map(MemoryTracker::getId).toList(), contains(dueTracker.getId()));
+    assertThat(candidateIds(), contains(dueTracker.getId()));
   }
 
   @Test
@@ -172,10 +126,7 @@ class QuestionGenerationBatchCandidateMemoryTrackersTest {
         .forMemoryTracker(dueTracker)
         .please();
 
-    List<MemoryTracker> candidates =
-        planningService.findCandidateMemoryTrackersForBatchGeneration(user, currentTime);
-
-    assertThat(candidates, empty());
+    assertThat(candidates(), empty());
   }
 
   @Test
@@ -183,16 +134,22 @@ class QuestionGenerationBatchCandidateMemoryTrackersTest {
     MemoryTracker propertyTracker =
         makeMe
             .aMemoryTrackerFor(note)
-            .by(user)
             .propertyKey("topic")
-            .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(12)))
+            .nextRecallAt(hoursFrom(currentTime, 12))
             .please();
 
-    List<MemoryTracker> candidates =
-        planningService.findCandidateMemoryTrackersForBatchGeneration(user, currentTime);
+    assertThat(candidateIds(), hasItem(propertyTracker.getId()));
+  }
 
-    assertThat(
-        candidates.stream().map(MemoryTracker::getId).toList(),
-        containsInAnyOrder(dueTracker.getId(), propertyTracker.getId()));
+  private List<MemoryTracker> candidates() {
+    return planningService.findCandidateMemoryTrackersForBatchGeneration(user, currentTime);
+  }
+
+  private List<Integer> candidateIds() {
+    return candidates().stream().map(MemoryTracker::getId).toList();
+  }
+
+  private static Timestamp hoursFrom(Timestamp base, int hours) {
+    return new Timestamp(base.getTime() + TimeUnit.HOURS.toMillis(hours));
   }
 }

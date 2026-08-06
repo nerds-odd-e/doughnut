@@ -1,6 +1,6 @@
 # Backend unit tests → "small test" style
 
-**Status:** in progress (Phase 21 done)
+**Status:** in progress (Phase 22 done)
 **Type:** test renovation (no product behavior change)
 **Verify each phase:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
 **Style:** `.cursor/rules/unit-testing.mdc` + `.cursor/rules/backend-testing.mdc`
@@ -299,9 +299,15 @@ For each file in the phase file list:
 - **Done when:** rubric applied; suite green.
 
 ### Phase 22 — Services: QuestionGeneration batch (planning / eligibility / candidates)
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
-- **Files:** QGen tests for planning, eligibility, candidates, request builder, user schedule, metrics, local planning — roughly half of `QuestionGenerationBatch*.java` excluding import/output/submit/maintenance (see Phase 23–24). Exact split: take alphabetically first half of remaining QGen files after skimming for cohesion.
+- **Kept (job/pipeline contract; style renovated in place):**
+  - Planning: `QuestionGenerationBatchPlanningServiceTest`, `QuestionGenerationBatchLocalPlanningTest`
+  - Eligibility: `QuestionGenerationBatchManualEligibilityTest`, `…OverdueEligibilityTest`, `…RetryEligibilityTest`
+  - Candidates: `QuestionGenerationBatchCandidateMemoryTrackersTest`, `…QueuedRequestCandidateTest`
+  - Schedule/metrics/request: `QuestionGenerationBatchUserScheduleTest`, `…MetricsTest`, `QuestionGenerationRequestBuilderTests`
+- **MakeMe:** `QuestionGenerationBatchBuilder` / `QuestionGenerationBatchRequestBuilder`; `MemoryTrackerBuilder.deletedAt`
+- **Deleted:** mocked `QuestionGenerationBatchUserScheduleNoCandidateTrackersTest` — merged into UserScheduleTest with real DB (unanswered prompt excludes candidates)
 - **Done when:** rubric applied in place (service boundary OK); suite green.
 
 ### Phase 23 — Services: QuestionGeneration batch (submit / poll / import / output)
@@ -378,7 +384,9 @@ If a Behavior phase cannot express fixtures concisely:
 | 18b | done | Conversation/books/admin/wikidata/settings/failure-report: focused asserts; drop unused OpenAI mock on Books; fold resume happy path into admin QGen (delete mock ResumeTest — error orchestration covered by MaintenanceJobTests); drop redundant `.by` on schedule; Wikidata HttpClientAdapter only; Install already clean. Post-refactor: conversation → mark/reply / listing / start / AI-reply + base. |
 | 19 | done | Deleted MemoryTrackerServiceTest + RecallQuestionServiceTest after lifting unique asserts to Assimilation/Tracking/AskQuestion controllers. Kept AssimilationService* / UnassimilatedProperty / SR algorithm / RecallStats (+ perf) as domain-stable; renovated makeMe + focused asserts. |
 | 20 | done | Deleted NoteAutomation / NoteMotion / WikiLinkRewrite (controller duplicates). Slimmed NoteService to restore-by-deletedAt; lifted cascade + AI null/empty responses to controllers. Kept realm/wiki/alias/property/embedding/QGen as domain contracts; notebookOwnedBy + `.aliases`; post-refactor split oversized realm/wiki/property files. Notebook* leftovers → Phase 25. EmbeddingMaintenanceJob keeps collaborator mocks (thin loop). |
-| 21–26 | planned | — |
+| 21 | done | Focus-context retrieval kept at service boundary; capability splits ≤250; `FolderBuilder.notebookOwnedBy`. |
+| 22 | done | QGen planning/eligibility/candidates/schedule/metrics/request-builder: focused asserts + drop redundant `.by`; batch/request MakeMe builders; delete mocked NoCandidateTrackers (real DB via unanswered prompt); overdue/retry parameterized. |
+| 23–26 | planned | — |
 
 ---
 
@@ -409,3 +417,4 @@ If a Behavior phase cannot express fixtures concisely:
 - Phase 18b: Mock-heavy `AdminQuestionGenerationBatchControllerResumeTest` replaced by real controller resume asserting manual-maintenance timestamps; job/service suites already cover recordError orchestration. Books EPUB/304 assert deltas after PDF canonical. Conversation mark-read merges empty-return + read flag. Wikidata: rename `MakeMeWithoutDB` field (was shadowing MakeMe); drop weak search `verify(any)` twin; parameterize encoding. Install + DisplayName trim already domain-stable.
 - Phase 19: Assimilation queue/property units/wiki-link gates and UnassimilatedPropertyService stay at service boundary (scheduling + index contracts). MemoryTrackerServiceTest was almost entirely controller-duplicative once soft-delete/property-assimilate asserts moved up. RecallStats aggregate stays pure-unit (fixtures); PerformanceTest is intentional N+1 guard on `compute()`. Keep `.by(user)` when assimilating subscribed notes owned by someone else.
 - Phase 20: Wiki/alias/property index + NoteRealm assembly stay service-level (cache/index/DTO contracts beyond HTTP smoke). NoteAutomation/Motion/WikiLinkRewrite folder-move were pure controller duplicates. NoteService restore matching deletedAt timestamps is intentional service contract (controller undo is all-or-nothing via destroy). EmbeddingMaintenanceJobTests keeps NotebookRepository/IndexingService mocks — thin scheduled for-loop, not worth SpringBoot+OpenAI. Named notebooks still needed for qualified wiki links.
+- Phase 22: QGen planning stays at service boundary. Repo-mock NoCandidateTrackers replaced by real DB (answered recall + unanswered non-contested prompt). Batch/request builders for COMPLETED/SUBMITTED/FAILED fixtures. Phase 23 may reuse builders for submit/poll/import manual construction.

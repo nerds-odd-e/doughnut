@@ -50,14 +50,12 @@ class QuestionGenerationBatchPlanningServiceTest {
     @BeforeEach
     void setupRecallFixtures() {
       note = makeMe.aNote().notebookOwnedBy(user).please();
-      memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
+      memoryTracker = makeMe.aMemoryTrackerFor(note).please();
     }
 
     @Test
     void excludesUserWithNoRecentRecallActivity() {
-      List<User> candidates = planningService.findUsersEligibleForBatchSubmission(currentTime);
-
-      assertThat(candidates, empty());
+      assertThat(planningService.findUsersEligibleForBatchSubmission(currentTime), empty());
     }
 
     @Test
@@ -87,9 +85,7 @@ class QuestionGenerationBatchPlanningServiceTest {
           .answerTimestamp(eightDaysAgo)
           .please();
 
-      List<User> candidates = planningService.findUsersEligibleForBatchSubmission(currentTime);
-
-      assertThat(candidates, empty());
+      assertThat(planningService.findUsersEligibleForBatchSubmission(currentTime), empty());
     }
   }
 }

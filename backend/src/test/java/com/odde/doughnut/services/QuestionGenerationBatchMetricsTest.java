@@ -71,7 +71,6 @@ class QuestionGenerationBatchMetricsTest {
     Note note = makeMe.aNote().notebookOwnedBy(user).please();
     makeMe
         .aMemoryTrackerFor(note)
-        .by(user)
         .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(24)))
         .please();
 

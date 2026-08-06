@@ -7,12 +7,9 @@ import static org.hamcrest.Matchers.empty;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuestionGenerationBatch;
-import com.odde.doughnut.entities.QuestionGenerationBatchRequest;
 import com.odde.doughnut.entities.QuestionGenerationBatchRequestStatus;
 import com.odde.doughnut.entities.QuestionGenerationBatchStatus;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository;
-import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.util.List;
@@ -31,8 +28,6 @@ class QuestionGenerationBatchQueuedRequestCandidateTest {
 
   @Autowired MakeMe makeMe;
   @Autowired QuestionGenerationBatchPlanningService planningService;
-  @Autowired QuestionGenerationBatchRepository batchRepository;
-  @Autowired QuestionGenerationBatchRequestRepository batchRequestRepository;
 
   User user;
   Timestamp currentTime;
@@ -46,7 +41,6 @@ class QuestionGenerationBatchQueuedRequestCandidateTest {
     dueTracker =
         makeMe
             .aMemoryTrackerFor(note)
-            .by(user)
             .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(24)))
             .please();
   }
@@ -55,23 +49,17 @@ class QuestionGenerationBatchQueuedRequestCandidateTest {
   void excludesTrackerAlreadyQueuedInLiveBatchBeforePromptIsImported() {
     saveBatchRequest(QuestionGenerationBatchStatus.SUBMITTED);
 
-    List<MemoryTracker> candidates =
-        planningService.findCandidateMemoryTrackersForBatchGeneration(user, currentTime);
-
-    assertThat(candidates, empty());
+    assertThat(
+        planningService.findCandidateMemoryTrackersForBatchGeneration(user, currentTime), empty());
   }
 
   @Test
   void excludesTrackerWithOutputReadyBatchRequestBeforePromptIsImported() {
-    QuestionGenerationBatchRequest request =
-        saveBatchRequest(QuestionGenerationBatchStatus.COMPLETED);
-    request.setStatus(QuestionGenerationBatchRequestStatus.OUTPUT_READY);
-    batchRequestRepository.saveAndFlush(request);
+    saveBatchRequest(
+        QuestionGenerationBatchStatus.COMPLETED, QuestionGenerationBatchRequestStatus.OUTPUT_READY);
 
-    List<MemoryTracker> candidates =
-        planningService.findCandidateMemoryTrackersForBatchGeneration(user, currentTime);
-
-    assertThat(candidates, empty());
+    assertThat(
+        planningService.findCandidateMemoryTrackersForBatchGeneration(user, currentTime), empty());
   }
 
   @Test
@@ -85,20 +73,25 @@ class QuestionGenerationBatchQueuedRequestCandidateTest {
         candidates.stream().map(MemoryTracker::getId).toList(), contains(dueTracker.getId()));
   }
 
-  private QuestionGenerationBatchRequest saveBatchRequest(
-      QuestionGenerationBatchStatus batchStatus) {
-    QuestionGenerationBatch batch = new QuestionGenerationBatch();
-    batch.setUser(user);
-    batch.setStatus(batchStatus);
-    batch.setPlannedAt(currentTime);
-    batch = batchRepository.saveAndFlush(batch);
+  private void saveBatchRequest(QuestionGenerationBatchStatus batchStatus) {
+    saveBatchRequest(batchStatus, QuestionGenerationBatchRequestStatus.PENDING);
+  }
 
-    QuestionGenerationBatchRequest request = new QuestionGenerationBatchRequest();
-    request.setBatch(batch);
-    request.setMemoryTracker(dueTracker);
-    request.setContextSeed(42L);
-    request.setCustomId(
-        QuestionGenerationBatchRequest.customIdFor(batch.getId(), dueTracker.getId()));
-    return batchRequestRepository.saveAndFlush(request);
+  private void saveBatchRequest(
+      QuestionGenerationBatchStatus batchStatus,
+      QuestionGenerationBatchRequestStatus requestStatus) {
+    QuestionGenerationBatch batch =
+        makeMe
+            .aQuestionGenerationBatch()
+            .forUser(user)
+            .status(batchStatus)
+            .plannedAt(currentTime)
+            .please();
+    makeMe
+        .aQuestionGenerationBatchRequest()
+        .batch(batch)
+        .memoryTracker(dueTracker)
+        .status(requestStatus)
+        .please();
   }
 }

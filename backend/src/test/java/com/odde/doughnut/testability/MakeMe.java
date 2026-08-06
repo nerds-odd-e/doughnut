@@ -141,4 +141,12 @@ public class MakeMe extends MakeMeWithoutDB {
   public NoteEmbeddingBuilder aNoteEmbedding(Note note) {
     return new NoteEmbeddingBuilder(note, this);
   }
+
+  public QuestionGenerationBatchBuilder aQuestionGenerationBatch() {
+    return new QuestionGenerationBatchBuilder(this);
+  }
+
+  public QuestionGenerationBatchRequestBuilder aQuestionGenerationBatchRequest() {
+    return new QuestionGenerationBatchRequestBuilder(this);
+  }
 }

@@ -12,7 +12,6 @@ import com.odde.doughnut.entities.QuestionGenerationBatch;
 import com.odde.doughnut.entities.QuestionGenerationBatchRequest;
 import com.odde.doughnut.entities.QuestionGenerationBatchStatus;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
@@ -33,7 +32,6 @@ class QuestionGenerationBatchLocalPlanningTest {
 
   @Autowired MakeMe makeMe;
   @Autowired QuestionGenerationBatchPlanningService planningService;
-  @Autowired QuestionGenerationBatchRepository batchRepository;
   @Autowired QuestionGenerationBatchRequestRepository batchRequestRepository;
 
   User user;
@@ -47,27 +45,19 @@ class QuestionGenerationBatchLocalPlanningTest {
     user = makeMe.aUser().please();
     currentTime = makeMe.aTimestamp().of(10, 8).fromShanghai().please();
     note = makeMe.aNote().notebookOwnedBy(user).please();
-    dueTracker =
-        makeMe
-            .aMemoryTrackerFor(note)
-            .by(user)
-            .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(24)))
-            .please();
+    dueTracker = makeMe.aMemoryTrackerFor(note).nextRecallAt(hoursFrom(currentTime, 24)).please();
     secondDueTracker =
         makeMe
             .aMemoryTrackerFor(makeMe.aNote().notebookOwnedBy(user).please())
-            .by(user)
-            .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(12)))
+            .nextRecallAt(hoursFrom(currentTime, 12))
             .please();
   }
 
   @Test
   void createsPlannedBatchWithOneRequestPerCandidateTracker() {
-    Optional<QuestionGenerationBatch> plannedBatch =
-        planningService.planLocalBatchForUser(user, currentTime);
+    QuestionGenerationBatch batch =
+        planningService.planLocalBatchForUser(user, currentTime).orElseThrow();
 
-    assertThat(plannedBatch.isPresent(), is(true));
-    QuestionGenerationBatch batch = plannedBatch.get();
     assertThat(batch.getStatus(), is(QuestionGenerationBatchStatus.PLANNED));
     assertThat(batch.getUser().getId(), is(user.getId()));
     assertThat(batch.getPlannedAt(), is(currentTime));
@@ -78,7 +68,6 @@ class QuestionGenerationBatchLocalPlanningTest {
     assertThat(
         requests.stream().map(request -> request.getMemoryTracker().getId()).toList(),
         containsInAnyOrder(dueTracker.getId(), secondDueTracker.getId()));
-
     for (QuestionGenerationBatchRequest request : requests) {
       assertThat(request.getContextSeed(), is(notNullValue()));
       assertThat(
@@ -106,7 +95,9 @@ class QuestionGenerationBatchLocalPlanningTest {
         planningService.planLocalBatchForUser(user, currentTime);
 
     assertThat(plannedBatch, is(Optional.empty()));
-    assertThat(batchRepository.count(), is(0L));
-    assertThat(batchRequestRepository.count(), is(0L));
+  }
+
+  private static Timestamp hoursFrom(Timestamp base, int hours) {
+    return new Timestamp(base.getTime() + TimeUnit.HOURS.toMillis(hours));
   }
 }

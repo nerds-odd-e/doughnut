@@ -6,10 +6,8 @@ import static org.hamcrest.Matchers.empty;
 
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuestionGenerationBatch;
 import com.odde.doughnut.entities.QuestionGenerationBatchStatus;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -29,7 +27,6 @@ class QuestionGenerationBatchManualEligibilityTest {
 
   @Autowired MakeMe makeMe;
   @Autowired QuestionGenerationBatchPlanningService planningService;
-  @Autowired QuestionGenerationBatchRepository batchRepository;
 
   User user;
   Timestamp currentTime;
@@ -41,7 +38,7 @@ class QuestionGenerationBatchManualEligibilityTest {
     user = makeMe.aUser().please();
     currentTime = makeMe.aTimestamp().of(10, 8).fromShanghai().please();
     note = makeMe.aNote().notebookOwnedBy(user).please();
-    memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
+    memoryTracker = makeMe.aMemoryTrackerFor(note).please();
   }
 
   @Test
@@ -49,7 +46,11 @@ class QuestionGenerationBatchManualEligibilityTest {
     Timestamp cronTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 10, 0));
     Timestamp recallTime = Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 30));
     createAnsweredRecall(recallTime);
-    saveSubmittedBatchAt(Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 0)));
+    makeMe
+        .aQuestionGenerationBatch()
+        .forUser(user)
+        .completedAt(Timestamp.valueOf(LocalDateTime.of(2024, 6, 15, 9, 0)))
+        .please();
     makeMe.entityPersister.flush();
 
     List<User> scheduledCandidates = planningService.findUsersEligibleForBatchSubmission(cronTime);
@@ -62,16 +63,14 @@ class QuestionGenerationBatchManualEligibilityTest {
 
   @Test
   void excludesUserWithNoRecentRecallActivity() {
-    List<User> candidates = planningService.findUsersEligibleForManualBatchSubmission(currentTime);
-
-    assertThat(candidates, empty());
+    assertThat(planningService.findUsersEligibleForManualBatchSubmission(currentTime), empty());
   }
 
   @Test
   void includesUserWithPriorSubmittedBatchRegardlessOfOverdueRule() {
     Timestamp oneHourAgo = new Timestamp(currentTime.getTime() - TimeUnit.HOURS.toMillis(1));
     createAnsweredRecall(oneHourAgo);
-    saveSubmittedBatchAt(oneHourAgo);
+    makeMe.aQuestionGenerationBatch().forUser(user).completedAt(oneHourAgo).please();
     makeMe.entityPersister.flush();
 
     List<User> candidates = planningService.findUsersEligibleForManualBatchSubmission(currentTime);
@@ -83,29 +82,24 @@ class QuestionGenerationBatchManualEligibilityTest {
   void excludesUserWithSubmittedBatchInFlight() {
     Timestamp oneHourAgo = new Timestamp(currentTime.getTime() - TimeUnit.HOURS.toMillis(1));
     createAnsweredRecall(oneHourAgo);
-    QuestionGenerationBatch batch = new QuestionGenerationBatch();
-    batch.setUser(user);
-    batch.setStatus(QuestionGenerationBatchStatus.SUBMITTED);
-    batch.setPlannedAt(oneHourAgo);
-    batchRepository.save(batch);
+    makeMe.aQuestionGenerationBatch().forUser(user).submittedInFlight(oneHourAgo).please();
     makeMe.entityPersister.flush();
 
-    List<User> candidates = planningService.findUsersEligibleForManualBatchSubmission(currentTime);
-
-    assertThat(candidates, empty());
+    assertThat(planningService.findUsersEligibleForManualBatchSubmission(currentTime), empty());
   }
 
   @Test
   void includesUserWithOpenAiFailureBatchWhenNoSubmittedBatchInFlight() {
     Timestamp oneHourAgo = new Timestamp(currentTime.getTime() - TimeUnit.HOURS.toMillis(1));
     createAnsweredRecall(oneHourAgo);
-    saveSubmittedBatchAt(oneHourAgo);
-    QuestionGenerationBatch failedBatch = new QuestionGenerationBatch();
-    failedBatch.setUser(user);
-    failedBatch.setStatus(QuestionGenerationBatchStatus.FAILED);
-    failedBatch.setOpenaiBatchId("batch-failed");
-    failedBatch.setPlannedAt(oneHourAgo);
-    batchRepository.save(failedBatch);
+    makeMe.aQuestionGenerationBatch().forUser(user).completedAt(oneHourAgo).please();
+    makeMe
+        .aQuestionGenerationBatch()
+        .forUser(user)
+        .status(QuestionGenerationBatchStatus.FAILED)
+        .openaiBatchId("batch-failed")
+        .plannedAt(oneHourAgo)
+        .please();
     makeMe.entityPersister.flush();
 
     List<User> candidates = planningService.findUsersEligibleForManualBatchSubmission(currentTime);
@@ -121,14 +115,5 @@ class QuestionGenerationBatchManualEligibilityTest {
         .answerChoiceIndex(0)
         .answerTimestamp(answerTime)
         .please();
-  }
-
-  private void saveSubmittedBatchAt(Timestamp submittedAt) {
-    QuestionGenerationBatch batch = new QuestionGenerationBatch();
-    batch.setUser(user);
-    batch.setStatus(QuestionGenerationBatchStatus.COMPLETED);
-    batch.setPlannedAt(submittedAt);
-    batch.setSubmittedAt(submittedAt);
-    batchRepository.save(batch);
   }
 }

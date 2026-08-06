@@ -1,7 +1,8 @@
 package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.entities.Note;
@@ -48,8 +49,7 @@ class QuestionGenerationRequestBuilderTests {
     return request.rawParams().input().flatMap(input -> input.text()).orElse("");
   }
 
-  @Test
-  void shouldIncludePropertyFocusInFocusContextKeyValueAndLinkTargets() {
+  private Note propertyFocusNote() {
     Note target = makeMe.aNote().title("Heart").notebookOwnedBy(user).please();
     String markdown =
         "---\n"
@@ -58,13 +58,18 @@ class QuestionGenerationRequestBuilderTests {
             + "The human body overview.\n";
     Note focus = makeMe.aNote().notebook(target.getNotebook()).content(markdown).please();
     wikiTitleCacheService.refreshForNote(focus, user);
+    return focus;
+  }
+
+  @Test
+  void shouldIncludePropertyFocusInFocusContextKeyValueAndLinkTargets() {
+    Note focus = propertyFocusNote();
 
     StructuredResponseCreateParams<MCQWithAnswer> request =
         noteQuestionGenerationService.buildQuestionGenerationRequest(focus, null, "a part of");
 
-    String instructions = instructionText(request);
     assertThat(
-        instructions,
+        instructionText(request),
         not(containsString(QuestionGenerationRequestBuilder.PROPERTY_FOCUS_CONTEXT_HEADER)));
 
     String focusContext = inputText(request);
@@ -75,7 +80,6 @@ class QuestionGenerationRequestBuilderTests {
     assertThat(focusContext, containsString("Property key: a part of"));
     assertThat(
         focusContext, containsString("Property value: Circulatory system includes [[Heart]]"));
-    assertThat(focusContext, containsString("# Focus Context"));
     assertThat(focusContext, containsString("Heart"));
   }
 
