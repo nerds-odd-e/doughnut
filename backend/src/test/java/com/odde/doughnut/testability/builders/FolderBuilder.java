@@ -2,6 +2,7 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
@@ -59,6 +60,10 @@ public class FolderBuilder extends EntityBuilder<Folder> {
     }
     this.notebook = notebook;
     return this;
+  }
+
+  public FolderBuilder notebookOwnedBy(User user) {
+    return notebook(makeMe.aNotebook().creatorAndOwner(user).please());
   }
 
   public FolderBuilder name(String name) {

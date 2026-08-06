@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 class RetrievalConfigTest {
 
   @Test
-  void forQuestionGeneration_default_uses_combined_content_budget() {
+  void forQuestionGenerationDefaultUsesCombinedContentBudget() {
     RetrievalConfig config = RetrievalConfig.forQuestionGeneration(null);
     assertThat(
         config.getFocusContextContentTokenBudget(),
@@ -16,14 +16,14 @@ class RetrievalConfigTest {
   }
 
   @Test
-  void forQuestionGeneration_with_budget_overrides_default() {
+  void forQuestionGenerationWithBudgetOverridesDefault() {
     int reducedBudget = FocusContextConstants.FOCUS_CONTEXT_COMBINED_CONTENT_TOKEN_BUDGET - 42;
     RetrievalConfig config = RetrievalConfig.forQuestionGeneration(null, reducedBudget);
     assertThat(config.getFocusContextContentTokenBudget(), equalTo(reducedBudget));
   }
 
   @Test
-  void forQuestionGeneration_with_budget_preserves_seed_and_depth() {
+  void forQuestionGenerationWithBudgetPreservesSeedAndDepth() {
     RetrievalConfig config = RetrievalConfig.forQuestionGeneration(99L, 1800);
     assertThat(config.getSampleSeed().orElse(null), equalTo(99L));
     assertThat(config.getMaxDepth(), equalTo(2));

@@ -1,6 +1,6 @@
 # Backend unit tests → "small test" style
 
-**Status:** in progress (Phase 20 done)
+**Status:** in progress (Phase 21 done)
 **Type:** test renovation (no product behavior change)
 **Verify each phase:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
 **Style:** `.cursor/rules/unit-testing.mdc` + `.cursor/rules/backend-testing.mdc`
@@ -286,10 +286,17 @@ For each file in the phase file list:
 - **Done when:** rubric applied; suite green.
 
 ### Phase 21 — Services: focus context
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
-- **Files:** `services/focusContext/**` (includes large `FocusContextRetrievalServiceTest`)
-- **Done when:** rubric applied; keep if this service is the intentional contract for focus-context assembly; suite green.
+- **Kept (domain-stable contract for focus-context assembly; style renovated + capability splits ≤250):**
+  - `FocusContextRetrievalTestBase` + `FocusContextRetrievalServiceTest` (focus note / outgoing / inbound / dedup)
+  - `FocusContextRetrievalInboundSamplingTest`
+  - `FocusContextRetrievalDepthTraversalTest`
+  - `FocusContextRetrievalFolderSiblingTest`
+  - `FocusContextMarkdownRendererTest`, `RetrievalConfigTest`
+- **MakeMe:** `FolderBuilder.notebookOwnedBy` for folder-sibling fixtures
+- **Note:** graph HTTP metadata stays in `NoteControllerGraphTests`; retrieval assembly stays at service boundary
+- **Done when:** rubric applied; suite green.
 
 ### Phase 22 — Services: QuestionGeneration batch (planning / eligibility / candidates)
 - **Status:** planned

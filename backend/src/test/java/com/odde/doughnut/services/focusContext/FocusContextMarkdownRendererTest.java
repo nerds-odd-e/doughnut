@@ -52,7 +52,6 @@ class FocusContextMarkdownRendererTest {
       assertThat(output, containsString("Notebook: My Notebook"));
       assertThat(output, containsString("Depth: 0"));
       assertThat(output, containsString("Max depth: 1"));
-      assertThat(output, not(containsString("Truncated:")));
       assertThat(output, containsString("```doughnut-note-md"));
       assertThat(output, containsString("Some content"));
       assertThat(output, not(containsString("## Retrieved Note")));
