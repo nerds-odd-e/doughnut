@@ -15,6 +15,11 @@ Feature: Notebook group
     When I set notebook "E2E grouping" to ungrouped from the catalog
     Then notebook "E2E grouping" should appear at the top level of the notebook catalog
 
+  Scenario: Create notebook into an existing group from the catalog
+    When I create a notebook group named "E2E Create Into Group" by moving owned notebook "E2E grouping" from the catalog
+    When I add a notebook "E2E Grouped New" to notebook group "E2E Create Into Group" from the catalog
+    Then I should see notebook group "E2E Create Into Group" with a hint including "E2E Grouped New"
+
   Scenario: Catalog group for subscribed notebook
     Given I have a notebook "Bazaar sub fixture" with notes:
       | Title |

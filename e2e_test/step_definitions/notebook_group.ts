@@ -35,6 +35,15 @@ When(
   }
 )
 
+When(
+  'I add a notebook {string} to notebook group {string} from the catalog',
+  (notebookName: string, groupName: string) => {
+    start
+      .navigateToNotebooksPage()
+      .addingNotebookToGroupFromCatalog(groupName, notebookName)
+  }
+)
+
 Then(
   'I should see notebook group {string} with a hint including {string}',
   (groupName: string, hintSubstring: string) => {

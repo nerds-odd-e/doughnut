@@ -27,7 +27,7 @@ From a notebook group on `/notebooks` (or the group page that reuses the same pa
 
 ### Phase 2 — Behavior: group menu → form shows group → notebook in group
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
 - E2E: add notebook from group overflow; form shows group; notebook listed under group.

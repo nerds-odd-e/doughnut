@@ -1,5 +1,12 @@
 <template>
   <form @submit.prevent.once="processForm">
+    <p
+      v-if="notebookGroup"
+      class="mb-3 text-sm text-base-content/70"
+      data-testid="notebook-new-form-group-hint"
+    >
+      Creates in group "{{ notebookGroup.name }}".
+    </p>
     <PathNameEditor
       v-model="noteFormData.newTitle"
       :error-message="errors.newTitle"
@@ -34,7 +41,12 @@ import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { PropType } from "vue"
 
 export default {
-  props: { circle: { type: Object as PropType<Circle> } },
+  props: {
+    circle: { type: Object as PropType<Circle> },
+    notebookGroup: {
+      type: Object as PropType<{ id: number; name: string }>,
+    },
+  },
   components: {
     PathNameEditor,
     TextInput,
@@ -52,15 +64,24 @@ export default {
     }
   },
   methods: {
+    creationBody(): NotebookCreationRequest {
+      return {
+        ...this.noteFormData,
+        ...(this.notebookGroup
+          ? { notebookGroupId: this.notebookGroup.id }
+          : {}),
+      }
+    },
     async processForm() {
+      const body = this.creationBody()
       const { data: result, error } = await apiCallWithLoading(() =>
         this.circle
           ? CircleController.createNotebookInCircle({
               path: { circle: this.circle.id },
-              body: this.noteFormData,
+              body,
             })
           : NotebookController.createNotebook({
-              body: this.noteFormData,
+              body,
             })
       )
       if (!error) {

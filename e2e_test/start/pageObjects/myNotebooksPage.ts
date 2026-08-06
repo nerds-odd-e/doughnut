@@ -112,6 +112,23 @@ export const myNotebooksPage = () => {
       waitUntilAppIsNotBusy()
       return this as any
     },
+    addingNotebookToGroupFromCatalog(groupName: string, notebookName: string) {
+      cy.contains('[data-cy="notebook-group-card"]', groupName)
+        .find('[data-cy="notebook-group-overflow"]')
+        .click()
+      cy.findByTestId('notebook-group-add-notebook').click()
+      cy.findByRole('dialog', { name: 'New notebook' }).within(() => {
+        cy.findByTestId('notebook-new-form-group-hint').should(
+          'contain.text',
+          `Creates in group "${groupName}".`
+        )
+      })
+      notebookCreationForm.createNotebookWithNameAndDescription(notebookName)
+      waitUntilAppIsNotBusy()
+      router().push('/notebooks', 'notebooks', {})
+      waitUntilAppIsNotBusy()
+      return myNotebooksPage()
+    },
     expectNotebookAtTopLevelOfCatalog(notebookName: string) {
       cy.get('.notebook-catalog-section--list > [data-cy="notebook-card"]')
         .contains('h5', notebookName)

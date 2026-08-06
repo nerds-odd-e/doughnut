@@ -5,31 +5,12 @@
     class="notebook-catalog-group rounded-box border border-primary/25 bg-primary/5 p-4"
     :aria-label="hint.ariaLabel"
   >
-    <component
-      :is="headerNavigatesToGroup ? RouterLink : 'div'"
-      :data-cy="
-        headerNavigatesToGroup
-          ? 'notebook-group-header-link'
-          : 'notebook-group-header'
-      "
-      v-bind="
-        headerNavigatesToGroup
-          ? {
-              to: { name: 'notebookGroup', params: { groupId: group.id } },
-              class: headerLinkClassList,
-            }
-          : {}
-      "
-    >
-      <div class="mb-3 flex flex-col gap-0.5">
-        <h3 class="m-0 text-base font-semibold text-base-content">
-          {{ group.name }}
-        </h3>
-        <p class="m-0 text-sm text-base-content/65">
-          {{ hint.subtitle }}
-        </p>
-      </div>
-    </component>
+    <NotebookCatalogGroupHeader
+      :group="group"
+      :subtitle="hint.subtitle"
+      layout="list"
+      :header-navigates-to-group="headerNavigatesToGroup"
+    />
     <div class="flex flex-col gap-2 border-l-2 border-primary/30 pl-3">
       <NotebookListRow
         v-for="nb in previewNotebooks"
@@ -61,31 +42,12 @@
     class="notebook-catalog-group col-span-full rounded-box border border-primary/25 bg-primary/5 p-4"
     :aria-label="hint.ariaLabel"
   >
-    <component
-      :is="headerNavigatesToGroup ? RouterLink : 'div'"
-      :data-cy="
-        headerNavigatesToGroup
-          ? 'notebook-group-header-link'
-          : 'notebook-group-header'
-      "
-      v-bind="
-        headerNavigatesToGroup
-          ? {
-              to: { name: 'notebookGroup', params: { groupId: group.id } },
-              class: headerLinkClassList,
-            }
-          : {}
-      "
-    >
-      <div class="mb-4 flex flex-col gap-0.5">
-        <h3 class="m-0 text-lg font-semibold text-base-content">
-          {{ group.name }}
-        </h3>
-        <p class="m-0 text-sm text-base-content/65">
-          {{ hint.subtitle }}
-        </p>
-      </div>
-    </component>
+    <NotebookCatalogGroupHeader
+      :group="group"
+      :subtitle="hint.subtitle"
+      layout="grid"
+      :header-navigates-to-group="headerNavigatesToGroup"
+    />
     <div
       class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
     >
@@ -125,7 +87,6 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { computed } from "vue"
-import { RouterLink } from "vue-router"
 import type {
   Notebook,
   NotebookCatalogGroupItem,
@@ -134,6 +95,7 @@ import type {
 } from "@generated/doughnut-backend-api"
 import NotebookButtons from "./NotebookButtons.vue"
 import NotebookCard from "../notebooks/NotebookCard.vue"
+import NotebookCatalogGroupHeader from "./NotebookCatalogGroupHeader.vue"
 import NotebookListRow from "./NotebookListRow.vue"
 import SubscriptionNoteButtons from "../subscriptions/SubscriptionNoteButtons.vue"
 import { groupCatalogMemberPreviewHint } from "./groupMemberHint"
@@ -177,9 +139,6 @@ defineEmits<{
   (e: "notebook-updated", notebook: Notebook): void
   (e: "refresh"): void
 }>()
-
-const headerLinkClassList =
-  "block rounded-md no-underline text-inherit outline-offset-2 hover:bg-primary/10"
 
 const previewNotebooks = computed(() => {
   const all = props.group.notebooks
