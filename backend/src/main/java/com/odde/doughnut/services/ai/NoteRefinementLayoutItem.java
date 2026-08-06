@@ -31,6 +31,11 @@ public class NoteRefinementLayoutItem {
       "True only when this item represents a simple standalone wiki-link-only line that has already been extracted, such as [[Target note]] or [[Target note|Label]]. These items should be shown as Already extracted but remain selectable.")
   public boolean alreadyExtracted;
 
+  @JsonProperty(required = true)
+  @JsonPropertyDescription(
+      "True when this item represents content that led to the quiz question the learner just answered. Without question context, always false.")
+  public boolean ledToQuestion;
+
   @Valid
   @NotNull
   @JsonProperty(required = true)

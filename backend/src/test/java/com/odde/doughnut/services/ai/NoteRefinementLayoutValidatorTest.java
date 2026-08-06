@@ -15,8 +15,10 @@ class NoteRefinementLayoutValidatorTest {
                     "parent",
                     "Parent point",
                     false,
+                    false,
                     List.of(
-                        new NoteRefinementLayoutItem("child", "Child point", true, List.of())))));
+                        new NoteRefinementLayoutItem(
+                            "child", "Child point", true, false, List.of())))));
 
     assertThat(NoteRefinementLayoutValidator.isValid(layout)).isTrue();
   }
@@ -30,14 +32,20 @@ class NoteRefinementLayoutValidatorTest {
                     "parent",
                     "Parent point",
                     false,
+                    false,
                     List.of(
                         new NoteRefinementLayoutItem(
                             "child",
                             "Child point",
                             false,
+                            false,
                             List.of(
                                 new NoteRefinementLayoutItem(
-                                    "grandchild", "Grandchild point", false, List.of())))))));
+                                    "grandchild",
+                                    "Grandchild point",
+                                    false,
+                                    false,
+                                    List.of())))))));
 
     assertThat(NoteRefinementLayoutValidator.isValid(layout)).isFalse();
   }
@@ -47,8 +55,8 @@ class NoteRefinementLayoutValidatorTest {
     NoteRefinementLayout layout =
         new NoteRefinementLayout(
             List.of(
-                new NoteRefinementLayoutItem("same", "Point 1", false, List.of()),
-                new NoteRefinementLayoutItem("same", "Point 2", false, List.of())));
+                new NoteRefinementLayoutItem("same", "Point 1", false, false, List.of()),
+                new NoteRefinementLayoutItem("same", "Point 2", false, false, List.of())));
 
     assertThat(NoteRefinementLayoutValidator.isValid(layout)).isFalse();
   }
@@ -57,7 +65,7 @@ class NoteRefinementLayoutValidatorTest {
   void rejectsBlankText() {
     NoteRefinementLayout layout =
         new NoteRefinementLayout(
-            List.of(new NoteRefinementLayoutItem("p1", " ", false, List.of())));
+            List.of(new NoteRefinementLayoutItem("p1", " ", false, false, List.of())));
 
     assertThat(NoteRefinementLayoutValidator.isValid(layout)).isFalse();
   }

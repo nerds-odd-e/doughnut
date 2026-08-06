@@ -72,10 +72,11 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
                       "p1",
                       "Point 1",
                       false,
+                      false,
                       List.of(
                           new NoteRefinementLayoutItem(
-                              "p1-1", "[[Already extracted note]]", true, List.of()))),
-                  new NoteRefinementLayoutItem("p2", "Point 2", false, List.of()))));
+                              "p1-1", "[[Already extracted note]]", true, false, List.of()))),
+                  new NoteRefinementLayoutItem("p2", "Point 2", false, false, List.of()))));
       testNote.setContent("Some note content");
 
       NoteRefinementLayoutDTO result = controller.generateRefinementSuggestions(testNote);
@@ -129,8 +130,8 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
         openAiStructuredResponseMock.stubStructuredResponse(
             new NoteRefinementLayout(
                 List.of(
-                    new NoteRefinementLayoutItem("same", "Point 1", false, List.of()),
-                    new NoteRefinementLayoutItem("same", "Point 2", false, List.of()))));
+                    new NoteRefinementLayoutItem("same", "Point 1", false, false, List.of()),
+                    new NoteRefinementLayoutItem("same", "Point 2", false, false, List.of()))));
         testNote.setContent("Some note content");
 
         assertThat(controller.generateRefinementSuggestions(testNote).getItems()).isEmpty();

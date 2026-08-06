@@ -24,6 +24,7 @@ type RefinementLayoutItem = {
   id: string
   text: string
   alreadyExtracted: boolean
+  ledToQuestion: boolean
   children: RefinementLayoutItem[]
 }
 
@@ -41,6 +42,7 @@ function refinementLayoutFromTable(data: DataTable) {
       id: row.id,
       text: row.text,
       alreadyExtracted: parseAlreadyExtracted(row.alreadyExtracted),
+      ledToQuestion: false,
       children: [],
     })
   })

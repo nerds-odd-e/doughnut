@@ -63,7 +63,7 @@ class AiControllerExtractNoteValidationTest extends ControllerTestBase {
     void shouldRejectInvalidLayout() {
       NoteRefinementLayout layout =
           new NoteRefinementLayout(
-              List.of(new NoteRefinementLayoutItem("", "a suggestion", false, List.of())));
+              List.of(new NoteRefinementLayoutItem("", "a suggestion", false, false, List.of())));
       assertResponseStatus(
           () ->
               controller.extractNotePreview(

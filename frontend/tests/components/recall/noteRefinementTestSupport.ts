@@ -198,6 +198,7 @@ export function refinementLayoutItems(
     id: `p${index + 1}`,
     text,
     alreadyExtracted: false,
+    ledToQuestion: false,
     children: [],
   }))
 }

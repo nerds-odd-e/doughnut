@@ -43,7 +43,13 @@ describe("NoteRefinement export breakdown request", () => {
       sampleExportData
     )
     const wrapper = mountNoteRefinementWithLayout([
-      { id: "p1", text: "Point 1", alreadyExtracted: false, children: [] },
+      {
+        id: "p1",
+        text: "Point 1",
+        alreadyExtracted: false,
+        ledToQuestion: false,
+        children: [],
+      },
     ])
     await flushPromises()
 

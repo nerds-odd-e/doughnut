@@ -13,17 +13,20 @@ export const sampleNestedLayout = (): NoteRefinementLayoutItem[] => [
     id: "p1",
     text: "Parent point",
     alreadyExtracted: false,
+    ledToQuestion: false,
     children: [
       {
         id: "p1-1",
         text: "Child point A",
         alreadyExtracted: false,
+        ledToQuestion: false,
         children: [],
       },
       {
         id: "p1-2",
         text: "Child point B",
         alreadyExtracted: true,
+        ledToQuestion: false,
         children: [],
       },
     ],
@@ -32,6 +35,7 @@ export const sampleNestedLayout = (): NoteRefinementLayoutItem[] => [
     id: "p2",
     text: "Separate point",
     alreadyExtracted: false,
+    ledToQuestion: false,
     children: [],
   },
 ]

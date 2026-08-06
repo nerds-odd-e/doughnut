@@ -68,10 +68,12 @@ class AiNoteAutomationServiceTest {
                   "p1",
                   "English is a language that is spoken in many countries.",
                   false,
+                  false,
                   List.of()),
               new NoteRefinementLayoutItem(
                   "p2",
                   "It is also the most widely spoken language in the world.",
+                  false,
                   false,
                   List.of())));
       openAiStructuredResponseMock.stubStructuredResponse(layout);

@@ -100,9 +100,10 @@ class AiNoteAutomationServiceExtractRequestTest {
                 "p1",
                 "Main concept",
                 false,
+                false,
                 List.of(
                     new NoteRefinementLayoutItem(
-                        "p1-1", "key suggestion to extract", false, List.of()))),
-            new NoteRefinementLayoutItem("p2", "Other point", false, List.of())));
+                        "p1-1", "key suggestion to extract", false, false, List.of()))),
+            new NoteRefinementLayoutItem("p2", "Other point", false, false, List.of())));
   }
 }

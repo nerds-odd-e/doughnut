@@ -685,6 +685,7 @@ export type NoteRefinementLayoutItem = {
     id: string;
     text: string;
     alreadyExtracted: boolean;
+    ledToQuestion: boolean;
     children: Array<NoteRefinementLayoutItem>;
 };
 

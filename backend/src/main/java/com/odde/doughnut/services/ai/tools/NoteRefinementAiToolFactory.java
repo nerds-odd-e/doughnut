@@ -27,6 +27,7 @@ final class NoteRefinementAiToolFactory {
         Each item text should describe the Focus Note content represented by that point.
         Give every item a stable id that is unique within the layout.
         Set alreadyExtracted to true only for simple standalone wiki-link-only lines that point to content already extracted into another note, for example [[Target note]] or [[Target note|Label]]. These items should be marked Already extracted in the UI but remain selectable.
+        Set ledToQuestion to false for every item.
         """,
         NoteRefinementLayout.class);
   }

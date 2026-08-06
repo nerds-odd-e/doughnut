@@ -28,7 +28,7 @@ final class AiControllerExtractNoteTestSupport {
 
   static NoteRefinementLayout layoutWithItem(String id, String text) {
     return new NoteRefinementLayout(
-        List.of(new NoteRefinementLayoutItem(id, text, false, List.of())));
+        List.of(new NoteRefinementLayoutItem(id, text, false, false, List.of())));
   }
 
   static NoteRefinementLayout nestedLayout(
@@ -44,8 +44,9 @@ final class AiControllerExtractNoteTestSupport {
                 parentId,
                 parentText,
                 false,
-                List.of(new NoteRefinementLayoutItem(childId, childText, false, List.of()))),
-            new NoteRefinementLayoutItem(siblingId, siblingText, false, List.of())));
+                false,
+                List.of(new NoteRefinementLayoutItem(childId, childText, false, false, List.of()))),
+            new NoteRefinementLayoutItem(siblingId, siblingText, false, false, List.of())));
   }
 
   static NoteRefinementLayoutSelectionRequestDTO layoutSelectionRequest(

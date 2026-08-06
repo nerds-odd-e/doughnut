@@ -4396,6 +4396,8 @@ components:
           minLength: 1
         alreadyExtracted:
           type: boolean
+        ledToQuestion:
+          type: boolean
         children:
           type: array
           items:
@@ -4404,6 +4406,7 @@ components:
       - alreadyExtracted
       - children
       - id
+      - ledToQuestion
       - text
     NoteRefinementLayoutSelectionRequestDTO:
       type: object

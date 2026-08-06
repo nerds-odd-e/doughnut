@@ -55,11 +55,13 @@ Prior `/gsd-quick` packed button + shared modal + DTO + AI schema + preselect + 
 
 ### Phase 3: `ledToQuestion` on layout item schema
 **Type:** Structure  
-**Status:** planned
+**Status:** done
 
 **Structure change:** Add required boolean `ledToQuestion` to `NoteRefinementLayoutItem`; update constructors/fixtures/validators as needed; regenerate API client. Without question context, AI/tooling still yields `false` (or tests stub false).  
 **Unlocks:** Phase 4–5 can mark and preselect.  
 **Verify:** Backend + frontend layout tests still green; assimilation refine unchanged externally.
+
+**Learnings:** Required schema field + AllArgsConstructor means every fixture/constructor gains a `false` stub; AI instruction says set `ledToQuestion` false until Phase 4 adds question context. E2E OpenAI layout stubs must include the field so mocked JSON stays schema-complete.
 
 ---
 

@@ -6,15 +6,15 @@ current_phase: null
 current_phase_name: null
 status: in_progress
 stopped_at: null
-last_updated: "2026-08-06T06:30:00Z"
+last_updated: "2026-08-06T06:35:00Z"
 last_activity: 2026-08-06
-last_activity_desc: Phase 2 done — shared RefineNoteModal; Phase 3 next
+last_activity_desc: Phase 3 done — ledToQuestion on layout item schema; Phase 4 next
 progress:
   total_phases: 6
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 1
   completed_plans: 0
-  percent: 33
+  percent: 50
 ---
 
 # Project State
@@ -30,7 +30,7 @@ See: `.planning/PROJECT.md` (updated 2026-08-06)
 
 Milestone v1.2 Accidental Match Resolve UX — **shipped 2026-08-06**.
 
-Active ad-hoc plan: [`.planning/quick/003-refine-note-after-mcq/PLAN.md`](./quick/003-refine-note-after-mcq/PLAN.md) — Phases 1–2 done; **Phase 3 next** (`ledToQuestion` on layout item schema).
+Active ad-hoc plan: [`.planning/quick/003-refine-note-after-mcq/PLAN.md`](./quick/003-refine-note-after-mcq/PLAN.md) — Phases 1–3 done; **Phase 4 next** (optional MCQ context on layout generate API).
 
 ## Deferred Items
 
@@ -45,4 +45,4 @@ Items acknowledged at milestone close on 2026-08-06:
 
 ## Session Continuity
 
-Next action: execute Phase 3 of `.planning/quick/003-refine-note-after-mcq/PLAN.md` (add `ledToQuestion` to layout item schema).
+Next action: execute Phase 4 of `.planning/quick/003-refine-note-after-mcq/PLAN.md` (optional `NoteRefinementQuestionContextDTO` on layout generate).
