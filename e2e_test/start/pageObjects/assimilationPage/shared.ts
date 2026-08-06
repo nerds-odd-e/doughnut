@@ -33,6 +33,18 @@ export function noteLevelReviveElements(doc: Document | ParentNode): Element[] {
   )
 }
 
+export function openRefineNoteModalIfNeeded() {
+  cy.get('[data-test="refine-note-modal"]').then(($modal) => {
+    if ($modal.hasClass('daisy-modal-open')) {
+      waitUntilAppIsNotBusy()
+      return
+    }
+    cy.get('[data-test="open-refine-note-modal"]').scrollIntoView().click()
+    cy.get('[data-test="refine-note-modal"].daisy-modal-open').should('exist')
+    waitUntilAppIsNotBusy()
+  })
+}
+
 export const refinementLayoutPanel = () =>
   cy
     .get('[data-test="refine-note-modal"]')

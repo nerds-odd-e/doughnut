@@ -4,17 +4,17 @@ milestone: null
 milestone_name: null
 current_phase: null
 current_phase_name: null
-status: in_progress
+status: idle
 stopped_at: null
-last_updated: "2026-08-06T06:45:00Z"
+last_updated: "2026-08-06T07:00:00Z"
 last_activity: 2026-08-06
-last_activity_desc: Phase 5 done — MCQ context + ledToQuestion preselect; Phase 6 next
+last_activity_desc: Quick 003 refine-note-after-mcq complete (all 6 phases)
 progress:
-  total_phases: 6
-  completed_phases: 5
-  total_plans: 1
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
   completed_plans: 0
-  percent: 83
+  percent: 0
 ---
 
 # Project State
@@ -24,17 +24,15 @@ progress:
 See: `.planning/PROJECT.md` (updated 2026-08-06)
 
 **Core value:** Healthy mainline for learning and knowledge work — reviewed note stays primary during accidental-match results.
-**Current focus:** Quick task — refine note after answered MCQ (phased)
+**Current focus:** Idle — no active milestone or quick task
 
 ## Current Position
 
 Milestone v1.2 Accidental Match Resolve UX — **shipped 2026-08-06**.
 
-Active ad-hoc plan: [`.planning/quick/003-refine-note-after-mcq/PLAN.md`](./quick/003-refine-note-after-mcq/PLAN.md) — Phases 1–5 done; **Phase 6 next** (E2E refine-after-MCQ with mocked OpenAI).
+Quick task [`.planning/quick/003-refine-note-after-mcq/PLAN.md`](./quick/003-refine-note-after-mcq/PLAN.md) — **done** (Phases 1–6).
 
 ## Deferred Items
-
-Items acknowledged at milestone close on 2026-08-06:
 
 | Category | Item | Status |
 |----------|------|--------|
@@ -45,4 +43,4 @@ Items acknowledged at milestone close on 2026-08-06:
 
 ## Session Continuity
 
-Next action: execute Phase 6 of `.planning/quick/003-refine-note-after-mcq/PLAN.md` (E2E refine after answered MCQ with mocked OpenAI layout / preselect).
+Next action: idle — start `/gsd-new-milestone` or a new quick task when ready.

@@ -28,10 +28,8 @@ type RefinementLayoutItem = {
   children: RefinementLayoutItem[]
 }
 
-function parseAlreadyExtracted(value?: string) {
-  return ['true', 'yes', 'already extracted'].includes(
-    value?.trim().toLowerCase() ?? ''
-  )
+function parseLayoutFlag(value: string | undefined, ...aliases: string[]) {
+  return ['true', 'yes', ...aliases].includes(value?.trim().toLowerCase() ?? '')
 }
 
 function refinementLayoutFromTable(data: DataTable) {
@@ -41,8 +39,11 @@ function refinementLayoutFromTable(data: DataTable) {
     itemsById.set(row.id, {
       id: row.id,
       text: row.text,
-      alreadyExtracted: parseAlreadyExtracted(row.alreadyExtracted),
-      ledToQuestion: false,
+      alreadyExtracted: parseLayoutFlag(
+        row.alreadyExtracted,
+        'already extracted'
+      ),
+      ledToQuestion: parseLayoutFlag(row.ledToQuestion),
       children: [],
     })
   })
@@ -216,3 +217,25 @@ When('I export the breakdown request from refinement layout', () => {
 Then('the export request dialog should show AI request JSON', () => {
   start.assumeAssimilationPage().expectExportRequestDialogShowsAiRequestJson()
 })
+
+When('I open Refine note from the answered question', () => {
+  start.assumeAnsweredQuestionPage().openRefineNoteModal()
+})
+
+Then(
+  'refinement layout points {string} should be selected',
+  (layoutPointText: string) => {
+    start
+      .assumeAnsweredQuestionPage()
+      .expectRefinementLayoutPointsSelected(layoutPointText)
+  }
+)
+
+Then(
+  'refinement layout points {string} and {string} should not be selected',
+  (firstPoint: string, secondPoint: string) => {
+    start
+      .assumeAnsweredQuestionPage()
+      .expectRefinementLayoutPointsNotSelected(firstPoint, secondPoint)
+  }
+)
