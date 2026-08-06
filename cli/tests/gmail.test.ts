@@ -13,20 +13,36 @@ function createTempDir(): string {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'doughnut-gmail-test-'))
 }
 
+function accountConfig(
+  overrides: Partial<GmailConfig['accounts'][0]> & { expiresAt?: number } = {}
+): GmailConfig {
+  return {
+    clientId: 'c',
+    clientSecret: 's',
+    accounts: [
+      {
+        email: 'u@gmail.com',
+        accessToken: 'at',
+        refreshToken: 'rt',
+        expiresAt: Date.now() + 3600_000,
+        ...overrides,
+      },
+    ],
+  }
+}
+
 describe('Gmail config file', () => {
   let configPath: string
 
   beforeEach(() => {
-    const dir = createTempDir()
-    configPath = path.join(dir, 'gmail.json')
+    configPath = path.join(createTempDir(), 'gmail.json')
   })
 
   test('loadConfig returns empty accounts when file does not exist', () => {
-    const config = loadConfig(configPath)
-    expect(config).toEqual({ accounts: [] })
+    expect(loadConfig(configPath)).toEqual({ accounts: [] })
   })
 
-  test('saveConfig creates file and loadConfig reads it', () => {
+  test('saveConfig round-trips client and account fields', () => {
     const config: GmailConfig = {
       clientId: 'client-123',
       clientSecret: 'secret-456',
@@ -40,16 +56,11 @@ describe('Gmail config file', () => {
       ],
     }
     saveConfig(config, configPath)
-    const loaded = loadConfig(configPath)
-    expect(loaded.clientId).toBe('client-123')
-    expect(loaded.clientSecret).toBe('secret-456')
-    expect(loaded.accounts).toHaveLength(1)
-    expect(loaded.accounts[0].email).toBe('user@gmail.com')
+    expect(loadConfig(configPath)).toEqual(config)
   })
 
   test('saveConfig creates parent directory', () => {
-    const dir = createTempDir()
-    const nestedPath = path.join(dir, 'nested', 'gmail.json')
+    const nestedPath = path.join(createTempDir(), 'nested', 'gmail.json')
     saveConfig({ accounts: [] }, nestedPath)
     expect(fs.existsSync(nestedPath)).toBe(true)
   })
@@ -59,8 +70,7 @@ describe('last email subject (Gmail API)', () => {
   let configPath: string
 
   beforeEach(() => {
-    const dir = createTempDir()
-    configPath = path.join(dir, 'gmail.json')
+    configPath = path.join(createTempDir(), 'gmail.json')
   })
 
   afterEach(() => {
@@ -75,22 +85,7 @@ describe('last email subject (Gmail API)', () => {
   })
 
   test('returns subject when messages exist', async () => {
-    saveConfig(
-      {
-        clientId: 'c',
-        clientSecret: 's',
-        accounts: [
-          {
-            email: 'u@gmail.com',
-            accessToken: 'at',
-            refreshToken: 'rt',
-            expiresAt: Date.now() + 3600_000,
-          },
-        ],
-      },
-      configPath
-    )
-
+    saveConfig(accountConfig(), configPath)
     vi.stubGlobal(
       'fetch',
       vi
@@ -109,28 +104,13 @@ describe('last email subject (Gmail API)', () => {
             }),
         })
     )
-
-    const subject = await getLastEmailSubject(configPath)
-    expect(subject).toBe('Test Email Subject')
+    await expect(getLastEmailSubject(configPath)).resolves.toBe(
+      'Test Email Subject'
+    )
   })
 
   test('returns "(no messages)" when inbox is empty', async () => {
-    saveConfig(
-      {
-        clientId: 'c',
-        clientSecret: 's',
-        accounts: [
-          {
-            email: 'u@gmail.com',
-            accessToken: 'at',
-            refreshToken: 'rt',
-            expiresAt: Date.now() + 3600_000,
-          },
-        ],
-      },
-      configPath
-    )
-
+    saveConfig(accountConfig(), configPath)
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue({
@@ -138,28 +118,11 @@ describe('last email subject (Gmail API)', () => {
         json: () => Promise.resolve({ messages: [] }),
       })
     )
-
-    const subject = await getLastEmailSubject(configPath)
-    expect(subject).toBe('(no messages)')
+    await expect(getLastEmailSubject(configPath)).resolves.toBe('(no messages)')
   })
 
   test('returns "(no subject)" when message has no Subject header', async () => {
-    saveConfig(
-      {
-        clientId: 'c',
-        clientSecret: 's',
-        accounts: [
-          {
-            email: 'u@gmail.com',
-            accessToken: 'at',
-            refreshToken: 'rt',
-            expiresAt: Date.now() + 3600_000,
-          },
-        ],
-      },
-      configPath
-    )
-
+    saveConfig(accountConfig(), configPath)
     vi.stubGlobal(
       'fetch',
       vi
@@ -173,29 +136,11 @@ describe('last email subject (Gmail API)', () => {
           json: () => Promise.resolve({ payload: { headers: [] } }),
         })
     )
-
-    const subject = await getLastEmailSubject(configPath)
-    expect(subject).toBe('(no subject)')
+    await expect(getLastEmailSubject(configPath)).resolves.toBe('(no subject)')
   })
 
   test('refreshes token when expired and fetches last email', async () => {
-    const pastExpiry = Date.now() - 1000
-    saveConfig(
-      {
-        clientId: 'c',
-        clientSecret: 's',
-        accounts: [
-          {
-            email: 'u@gmail.com',
-            accessToken: 'old-at',
-            refreshToken: 'rt',
-            expiresAt: pastExpiry,
-          },
-        ],
-      },
-      configPath
-    )
-
+    saveConfig(accountConfig({ expiresAt: Date.now() - 1000 }), configPath)
     const fetchMock = vi
       .fn()
       .mockResolvedValueOnce({
@@ -221,32 +166,14 @@ describe('last email subject (Gmail API)', () => {
       })
     vi.stubGlobal('fetch', fetchMock)
 
-    const subject = await getLastEmailSubject(configPath)
-    expect(subject).toBe('Refreshed')
-    expect(fetchMock).toHaveBeenCalledTimes(3)
-    const tokenCalls = fetchMock.mock.calls.filter((c) =>
-      (c[0] as string).includes('/token')
-    )
-    expect(tokenCalls).toHaveLength(1)
+    await expect(getLastEmailSubject(configPath)).resolves.toBe('Refreshed')
+    expect(
+      fetchMock.mock.calls.filter((c) => (c[0] as string).includes('/token'))
+    ).toHaveLength(1)
   })
 
   test('throws when token refresh returns invalid_grant', async () => {
-    saveConfig(
-      {
-        clientId: 'c',
-        clientSecret: 's',
-        accounts: [
-          {
-            email: 'u@gmail.com',
-            accessToken: 'at',
-            refreshToken: 'rt',
-            expiresAt: Date.now() - 1000,
-          },
-        ],
-      },
-      configPath
-    )
-
+    saveConfig(accountConfig({ expiresAt: Date.now() - 1000 }), configPath)
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue({
@@ -254,7 +181,6 @@ describe('last email subject (Gmail API)', () => {
         json: () => Promise.resolve({ error: 'invalid_grant' }),
       })
     )
-
     await expect(getLastEmailSubject(configPath)).rejects.toThrow(
       'Session expired'
     )

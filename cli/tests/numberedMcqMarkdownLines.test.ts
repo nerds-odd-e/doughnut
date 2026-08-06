@@ -4,31 +4,21 @@ import { numberedTerminalListLines } from '../src/terminalColumns.js'
 import { stripAnsi } from './inkTestHelpers.js'
 
 describe('numberedMcqMarkdownLinesForTerminal', () => {
-  test('wraps long plain-text choice to multiple rows (no single-line truncate)', () => {
+  test('wraps long plain-text choice to multiple rows without ellipsis', () => {
     const width = 32
     const longChoice =
       'one two three four five six seven eight nine ten eleven twelve'
     const lines = numberedMcqMarkdownLinesForTerminal([longChoice], width)
-    const plain = lines.map((l) => ({
-      itemIndex: l.itemIndex,
-      text: stripAnsi(l.text),
-    }))
-    const forFirst = plain.filter((l) => l.itemIndex === 0)
+    const forFirst = lines
+      .filter((l) => l.itemIndex === 0)
+      .map((l) => stripAnsi(l.text))
     expect(forFirst.length).toBeGreaterThan(1)
-    expect(forFirst[0]!.text).toMatch(/^\d+\.\s/)
-    expect(forFirst.slice(1).every((l) => l.text.startsWith('   '))).toBe(true)
+    expect(forFirst[0]).toMatch(/^\d+\.\s/)
+    expect(forFirst.slice(1).every((l) => l.startsWith('   '))).toBe(true)
+    expect(forFirst.every((l) => !l.includes('…'))).toBe(true)
   })
 
-  test('MCQ lines do not use ellipsis truncation from terminalColumns', () => {
-    const width = 28
-    const longChoice = 'word '.repeat(12).trim()
-    const lines = numberedMcqMarkdownLinesForTerminal([longChoice], width)
-    for (const l of lines) {
-      expect(stripAnsi(l.text)).not.toContain('…')
-    }
-  })
-
-  test('contrast: numberedTerminalListLines truncates same payload to one line with ellipsis', () => {
+  test('contrast: numberedTerminalListLines truncates same payload to one ellipsis line', () => {
     const width = 28
     const longChoice = 'word '.repeat(12).trim()
     const tokenLines = numberedTerminalListLines([longChoice], width)

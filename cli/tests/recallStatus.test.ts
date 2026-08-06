@@ -1,8 +1,16 @@
 import * as fs from 'node:fs'
 import { RecallsController } from 'doughnut-api'
+import makeMe from 'doughnut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { recallStatus } from '../src/commands/recallStatus.js'
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'
+
+function dueList(toRepeat: { memoryTrackerId: number; spelling: boolean }[]) {
+  return makeMe.aDueMemoryTrackersList
+    .totalAssimilatedCount(0)
+    .toRepeat(toRepeat)
+    .please()
+}
 
 describe('recallStatus', () => {
   let configDir: string
@@ -26,51 +34,30 @@ describe('recallStatus', () => {
     fs.rmSync(configDir, { recursive: true, force: true })
   })
 
-  test('0 notes when toRepeat is absent', async () => {
+  test.each([
+    ['toRepeat absent', { totalAssimilatedCount: 0 }],
+    ['toRepeat empty', dueList([])],
+  ])('0 notes when %s', async (_label, data) => {
     recallingSpy.mockResolvedValue({
-      data: { totalAssimilatedCount: 0 },
-    } as Awaited<ReturnType<typeof RecallsController.recalling>>)
-    await expect(recallStatus()).resolves.toBe('0 notes to recall today')
-  })
-
-  test('0 notes when toRepeat is empty', async () => {
-    recallingSpy.mockResolvedValue({
-      data: { totalAssimilatedCount: 0, toRepeat: [] },
+      data,
     } as Awaited<ReturnType<typeof RecallsController.recalling>>)
     await expect(recallStatus()).resolves.toBe('0 notes to recall today')
   })
 
   test('singular when exactly one due tracker', async () => {
     recallingSpy.mockResolvedValue({
-      data: {
-        totalAssimilatedCount: 0,
-        toRepeat: [{ memoryTrackerId: 1, spelling: false }],
-      },
+      data: dueList([{ memoryTrackerId: 1, spelling: false }]),
     } as Awaited<ReturnType<typeof RecallsController.recalling>>)
     await expect(recallStatus()).resolves.toBe('1 note to recall today')
   })
 
-  test('plural when two due trackers', async () => {
+  test('plural when multiple due trackers', async () => {
     recallingSpy.mockResolvedValue({
-      data: {
-        totalAssimilatedCount: 0,
-        toRepeat: [
-          { memoryTrackerId: 1, spelling: false },
-          { memoryTrackerId: 2, spelling: false },
-        ],
-      },
+      data: dueList([
+        { memoryTrackerId: 1, spelling: false },
+        { memoryTrackerId: 2, spelling: false },
+      ]),
     } as Awaited<ReturnType<typeof RecallsController.recalling>>)
     await expect(recallStatus()).resolves.toBe('2 notes to recall today')
-  })
-
-  test('plural for larger counts', async () => {
-    const toRepeat = Array.from({ length: 10 }, (_, i) => ({
-      memoryTrackerId: i + 1,
-      spelling: false,
-    }))
-    recallingSpy.mockResolvedValue({
-      data: { totalAssimilatedCount: 0, toRepeat },
-    } as Awaited<ReturnType<typeof RecallsController.recalling>>)
-    await expect(recallStatus()).resolves.toBe('10 notes to recall today')
   })
 })

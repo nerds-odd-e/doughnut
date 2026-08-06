@@ -29,16 +29,15 @@ describe('run entry routing', () => {
     exitSpy.mockRestore()
   })
 
-  test('invalid option and exit 1 for disallowed argv', async () => {
-    for (const argv of [['-c', 'hello'], ['-c=hello']] as const) {
-      errorSpy.mockClear()
-      exitSpy.mockClear()
+  test.each([['-c', 'hello'], ['-c=hello']] as const)(
+    'invalid option %j exits 1',
+    async (...argv) => {
       await expect(run([...argv])).rejects.toThrow(ProcessExitForTest)
       await new Promise((r) => setImmediate(r))
       expect(errorSpy).toHaveBeenCalledWith('doughnut: invalid option')
       expect(exitSpy).toHaveBeenCalledWith(1)
     }
-  })
+  )
 
   test('help subcommand is rejected with exit 1', async () => {
     await expect(run(['help'])).rejects.toThrow(ProcessExitForTest)

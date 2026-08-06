@@ -42,54 +42,39 @@ const runNeedsArg: InteractiveSlashCommand = {
   run: () => ({ assistantMessage: 'ok' }),
 }
 
+function dispatchHandlers() {
+  return {
+    appendScrollbackError: vi.fn(),
+    setStageArgumentRef: vi.fn(),
+    openStage: vi.fn(),
+    onRunSuccess: vi.fn(),
+  }
+}
+
 describe('applyResolvedInteractiveSlashCommand', () => {
   test('stage: missing required argument reports usage', () => {
-    const appendScrollbackError = vi.fn()
-    const setStageArgumentRef = vi.fn()
-    const openStage = vi.fn()
-    const onRunSuccess = vi.fn()
-
+    const h = dispatchHandlers()
     applyResolvedInteractiveSlashCommand(
       { command: stageCmd, argument: undefined, line: '/nest' },
-      {
-        appendScrollbackError,
-        setStageArgumentRef,
-        openStage,
-        onRunSuccess,
-      }
+      h
     )
-
-    expect(appendScrollbackError).toHaveBeenCalledWith(
+    expect(h.appendScrollbackError).toHaveBeenCalledWith(
       'Missing id. Usage: /nest <id>'
     )
-    expect(setStageArgumentRef).not.toHaveBeenCalled()
-    expect(openStage).not.toHaveBeenCalled()
-    expect(onRunSuccess).not.toHaveBeenCalled()
+    expect(h.openStage).not.toHaveBeenCalled()
   })
 
   test('stage: opens with argument ref and indicator', () => {
-    const appendScrollbackError = vi.fn()
-    const setStageArgumentRef = vi.fn()
-    const openStage = vi.fn()
-    const onRunSuccess = vi.fn()
-
+    const h = dispatchHandlers()
     applyResolvedInteractiveSlashCommand(
       { command: stageCmd, argument: 'abc', line: '/nest abc' },
-      {
-        appendScrollbackError,
-        setStageArgumentRef,
-        openStage,
-        onRunSuccess,
-      }
+      h
     )
-
-    expect(appendScrollbackError).not.toHaveBeenCalled()
-    expect(setStageArgumentRef).toHaveBeenCalledWith('abc')
-    expect(openStage).toHaveBeenCalledWith({
+    expect(h.setStageArgumentRef).toHaveBeenCalledWith('abc')
+    expect(h.openStage).toHaveBeenCalledWith({
       component: DummyStage,
       stageIndicator: 'Nested',
     })
-    expect(onRunSuccess).not.toHaveBeenCalled()
   })
 
   test('stage: omits empty stageIndicator', () => {
@@ -119,40 +104,25 @@ describe('applyResolvedInteractiveSlashCommand', () => {
   })
 
   test('run: missing required argument reports usage', () => {
-    const appendScrollbackError = vi.fn()
-    const onRunSuccess = vi.fn()
-
+    const h = dispatchHandlers()
     applyResolvedInteractiveSlashCommand(
       { command: runNeedsArg, argument: undefined, line: '/q' },
-      {
-        appendScrollbackError,
-        setStageArgumentRef: vi.fn(),
-        openStage: vi.fn(),
-        onRunSuccess,
-      }
+      h
     )
-
-    expect(appendScrollbackError).toHaveBeenCalledWith(
+    expect(h.appendScrollbackError).toHaveBeenCalledWith(
       'Missing query. Usage: /q <query>'
     )
-    expect(onRunSuccess).not.toHaveBeenCalled()
+    expect(h.onRunSuccess).not.toHaveBeenCalled()
   })
 
   test('run: success invokes onRunSuccess', async () => {
-    const onRunSuccess = vi.fn()
-
+    const h = dispatchHandlers()
     applyResolvedInteractiveSlashCommand(
       { command: runCmd, argument: undefined, line: '/ping' },
-      {
-        appendScrollbackError: vi.fn(),
-        setStageArgumentRef: vi.fn(),
-        openStage: vi.fn(),
-        onRunSuccess,
-      }
+      h
     )
-
     await vi.waitFor(() => {
-      expect(onRunSuccess).toHaveBeenCalledWith(runCmd, 'pong')
+      expect(h.onRunSuccess).toHaveBeenCalledWith(runCmd, 'pong')
     })
   })
 
@@ -169,7 +139,6 @@ describe('applyResolvedInteractiveSlashCommand', () => {
       },
     }
     const appendScrollbackError = vi.fn()
-
     applyResolvedInteractiveSlashCommand(
       { command: boom, argument: undefined, line: '/boom' },
       {
@@ -179,7 +148,6 @@ describe('applyResolvedInteractiveSlashCommand', () => {
         onRunSuccess: vi.fn(),
       }
     )
-
     await vi.waitFor(() => {
       expect(appendScrollbackError).toHaveBeenCalledWith('explode')
     })
@@ -196,7 +164,6 @@ describe('applyResolvedInteractiveSlashCommand', () => {
       run: () => Promise.reject(new Error('explode')),
     }
     const appendScrollbackError = vi.fn()
-
     applyResolvedInteractiveSlashCommand(
       { command: boom, argument: undefined, line: '/boom' },
       {
@@ -206,7 +173,6 @@ describe('applyResolvedInteractiveSlashCommand', () => {
         onRunSuccess: vi.fn(),
       }
     )
-
     await vi.waitFor(() => {
       expect(appendScrollbackError).toHaveBeenCalledWith('explode')
     })

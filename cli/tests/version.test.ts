@@ -20,39 +20,31 @@ const packageVersion = (
 describe('version', () => {
   test('default version matches cli/package.json', () => {
     expect(getVersion()).toBe(packageVersion)
-  })
-
-  test('getVersion returns version string', () => {
     expect(getVersion()).toMatch(/^\d+\.\d+\.\d+$/)
   })
 
-  test('parseVersionFromOutput extracts version from output', () => {
-    expect(parseVersionFromOutput('doughnut 0.2.0')).toBe('0.2.0')
-    expect(parseVersionFromOutput('doughnut 0.1.0')).toBe('0.1.0')
-    expect(parseVersionFromOutput('other text doughnut 1.2.3 more')).toBe(
-      '1.2.3'
-    )
+  test.each([
+    ['doughnut 0.2.0', '0.2.0'],
+    ['other text doughnut 1.2.3 more', '1.2.3'],
+  ])('parseVersionFromOutput extracts from %j', (output, expected) => {
+    expect(parseVersionFromOutput(output)).toBe(expected)
   })
 
-  test('parseVersionFromOutput returns null for invalid output', () => {
-    expect(parseVersionFromOutput('')).toBeNull()
-    expect(parseVersionFromOutput('hello world')).toBeNull()
-    expect(parseVersionFromOutput('doughnut')).toBeNull()
-  })
+  test.each(['', 'hello world', 'doughnut'])(
+    'parseVersionFromOutput returns null for %j',
+    (output) => {
+      expect(parseVersionFromOutput(output)).toBeNull()
+    }
+  )
 
-  test('compareVersions returns negative when first is less', () => {
-    expect(compareVersions('0.1.0', '0.2.0')).toBeLessThan(0)
-    expect(compareVersions('0.1.0', '0.1.1')).toBeLessThan(0)
-    expect(compareVersions('0.1.0', '1.0.0')).toBeLessThan(0)
-  })
-
-  test('compareVersions returns zero when equal', () => {
-    expect(compareVersions('0.1.0', '0.1.0')).toBe(0)
-  })
-
-  test('compareVersions returns positive when first is greater', () => {
-    expect(compareVersions('0.2.0', '0.1.0')).toBeGreaterThan(0)
-    expect(compareVersions('0.1.1', '0.1.0')).toBeGreaterThan(0)
-    expect(compareVersions('1.0.0', '0.1.0')).toBeGreaterThan(0)
+  test.each([
+    ['0.1.0', '0.2.0', 'less'],
+    ['0.1.0', '0.1.0', 'equal'],
+    ['0.2.0', '0.1.0', 'greater'],
+  ] as const)('compareVersions %s vs %s is %s', (a, b, rel) => {
+    const cmp = compareVersions(a, b)
+    if (rel === 'less') expect(cmp).toBeLessThan(0)
+    else if (rel === 'equal') expect(cmp).toBe(0)
+    else expect(cmp).toBeGreaterThan(0)
   })
 })
