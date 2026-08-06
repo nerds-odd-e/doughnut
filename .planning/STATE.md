@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: idle
 stopped_at: null
-last_updated: "2026-08-06T07:55:00Z"
+last_updated: "2026-08-06T08:05:00Z"
 last_activity: 2026-08-06
-last_activity_desc: Cleaned spent quick/003 refine-note-after-mcq planning history
+last_activity_desc: Completed quick/004 skip search after empty shorter phrase
 progress:
   total_phases: 0
   completed_phases: 0
@@ -21,14 +21,11 @@ progress:
 
 ## Project Reference
 
-See: `.planning/PROJECT.md` (updated 2026-08-06)
+See: `.planning/PROJECT.md`
 
-**Core value:** Healthy mainline for learning and knowledge work — reviewed note stays primary during accidental-match results.
 **Current focus:** Idle — no active milestone or quick task
 
 ## Current Position
-
-Milestone v1.2 Accidental Match Resolve UX — **shipped 2026-08-06**.
 
 No active roadmap phase or quick plan.
 

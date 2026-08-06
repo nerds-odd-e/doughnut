@@ -104,6 +104,28 @@ export function useSearchExecution(opts: {
       const snapshotNotebookId = opts.notebookId.value
       const snapshotSemantic = opts.semanticSearchEnabled.value
 
+      const applyIfCurrent = () =>
+        gen === searchGeneration.value &&
+        snapshotTrimmed === trimmedSearchKey.value &&
+        snapshotGlobal === isGlobalSearch.value &&
+        snapshotSemantic === opts.semanticSearchEnabled.value
+
+      if (
+        !snapshotSemantic &&
+        snapshotTrimmed !== "" &&
+        model.isImpliedEmptyByShorterPhrase(snapshotTrimmed, snapshotGlobal)
+      ) {
+        if (!applyIfCurrent()) return
+        model.mergeAndCacheResults({
+          trimmedSearchKey: snapshotTrimmed,
+          isGlobal: snapshotGlobal,
+          literalResults: [],
+          currentNotebookId: snapshotNotebookId,
+        })
+        model.completeSearch()
+        return
+      }
+
       const literalPromise = opts.noteId.value
         ? SearchController.searchForRelationshipTargetWithin({
             path: { note: opts.noteId.value },
@@ -119,12 +141,6 @@ export function useSearchExecution(opts: {
             })
           : SearchController.semanticSearch({ body: term })
         : null
-
-      const applyIfCurrent = () =>
-        gen === searchGeneration.value &&
-        snapshotTrimmed === trimmedSearchKey.value &&
-        snapshotGlobal === isGlobalSearch.value &&
-        snapshotSemantic === opts.semanticSearchEnabled.value
 
       literalPromise.then((literalRes) => {
         if (!applyIfCurrent()) return

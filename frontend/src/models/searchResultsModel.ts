@@ -72,6 +72,20 @@ export class SearchResultsModel {
     return this.getCachedSearches(isGlobal)[searchKey]
   }
 
+  /** Empty cached key is a case-insensitive substring of current (literal LIKE). */
+  isImpliedEmptyByShorterPhrase(
+    trimmedSearchKey: string,
+    isGlobal: boolean
+  ): boolean {
+    const lower = trimmedSearchKey.toLowerCase()
+    if (lower === "") return false
+    const cache = this.getCachedSearches(isGlobal)
+    return Object.entries(cache).some(([key, results]) => {
+      if (results.length !== 0 || key === "") return false
+      return lower.includes(key.toLowerCase())
+    })
+  }
+
   setCachedResult(
     searchKey: string,
     isGlobal: boolean,
