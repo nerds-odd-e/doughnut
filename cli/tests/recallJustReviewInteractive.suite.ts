@@ -17,11 +17,10 @@ import {
   waitForLastFrame,
 } from './inkTestHelpers.js'
 import { tempConfigWithToken } from './tempConfigTestHelpers.js'
+import { leaveRecallWithYnRe, startRecall } from './recallInteractiveShared.js'
 import {
   alphaNoteRealm,
-  baseNoteTimes,
   childNoteUnderEnglish,
-  leaveRecallWithYnRe,
 } from './recallJustReviewInteractive.fixtures.js'
 import {
   mockAlphaBetaNoteCards,
@@ -36,18 +35,11 @@ import {
   emptyEnterAndInvalidLineStayOnRemember,
   recallSingleAlphaToLoadMore,
   reachLeaveRecallOnRemember,
-  startRecall,
   waitLoadMore,
   waitRecalledSummary,
   waitRememberCard,
   waitReturnsToSingleRememberCard,
 } from './recallJustReviewInteractive.waits.js'
-
-export {
-  baseNoteTimes,
-  leaveRecallWithYnRe,
-} from './recallJustReviewInteractive.fixtures.js'
-export type { InkWaitHelpers } from './recallJustReviewInteractive.waits.js'
 
 export type RecallJustReviewInteractiveApi = {
   test: typeof test
@@ -61,7 +53,6 @@ export type RecallJustReviewInteractiveApi = {
   RECALL_SESSION_STOPPED_LINE: typeof RECALL_SESSION_STOPPED_LINE
   RECALL_LOADING_NEXT_QUESTION_LABEL: typeof RECALL_LOADING_NEXT_QUESTION_LABEL
   leaveRecallWithYnRe: typeof leaveRecallWithYnRe
-  baseNoteTimes: typeof baseNoteTimes
   renderInkWhenCommandLineReady: typeof renderInkWhenCommandLineReady
   pressEscape: typeof pressEscape
   pressEscapeAndWaitForCancelledLine: typeof pressEscapeAndWaitForCancelledLine
@@ -196,7 +187,6 @@ export function describeRecallJustReviewInteractive(
       RECALL_SESSION_STOPPED_LINE,
       RECALL_LOADING_NEXT_QUESTION_LABEL,
       leaveRecallWithYnRe,
-      baseNoteTimes,
       renderInkWhenCommandLineReady,
       pressEscape,
       pressEscapeAndWaitForCancelledLine,

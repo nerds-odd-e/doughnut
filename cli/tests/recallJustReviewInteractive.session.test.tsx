@@ -26,7 +26,6 @@ describeRecallJustReviewInteractive((api) => {
     mockShowMemoryTrackerCardForRealm,
     mockMarkAsRecalledCounting,
     setupTwoDueJustReviewItemsMocks,
-    baseNoteTimes,
   } = api
   test('shows busy label in bordered input while markAsRecalled is pending', async () => {
     mockShowMemoryTrackerCardForRealm(alphaNoteRealm())
@@ -68,8 +67,6 @@ describeRecallJustReviewInteractive((api) => {
     const noteRealmBeta = makeMe.aNoteRealm
       .title('Beta')
       .content('body-beta')
-      .createdAt(baseNoteTimes.createdAt)
-      .updatedAt(baseNoteTimes.updatedAt)
       .please()
 
     const { resolveSecondCard } = mockShowMemoryTrackerSecondCardDelayed(
@@ -124,10 +121,6 @@ describeRecallJustReviewInteractive((api) => {
     stdin.write('n\r')
     await waitRecalledSummary(ink, 'Recalled 2 notes')
     expect(markAsRecalledCount.n).toBe(2)
-
-    const out = ink.lastStrippedFrame()
-    expect(out).toContain('body')
-    expect(out).toContain('Reviewed: Alpha')
   })
 
   test('just-review answered block: breadcrumb folder › note, content, Reviewed line', async () => {
@@ -147,12 +140,7 @@ describeRecallJustReviewInteractive((api) => {
 
   test('missing note title falls back to Note; empty content; no notebook line', async () => {
     mockShowMemoryTrackerCardForRealm(
-      makeMe.aNoteRealm
-        .title('   ')
-        .content('')
-        .createdAt(baseNoteTimes.createdAt)
-        .updatedAt(baseNoteTimes.updatedAt)
-        .please()
+      makeMe.aNoteRealm.title('   ').content('').please()
     )
 
     const { stdin, ...ink } = await renderInkWhenCommandLineReady(
@@ -166,8 +154,6 @@ describeRecallJustReviewInteractive((api) => {
         !f.includes('Alpha')
     )
 
-    expect(ink.lastStrippedFrame()).toContain('Note')
-    expect(ink.lastStrippedFrame()).not.toContain('Alpha')
     stdin.write('n\r')
     await ink.waitForLastFrameToInclude('Reduced memory index.')
   })

@@ -13,7 +13,6 @@ describeRecallJustReviewInteractive((api) => {
     waitRememberCard,
     recallSingleAlphaToLoadMore,
     mockMarkAsRecalledCounting,
-    baseNoteTimes,
   } = api
 
   test('load more y shows first card in shuffled order for extended window', async () => {
@@ -59,8 +58,6 @@ describeRecallJustReviewInteractive((api) => {
         const noteRealm = makeMe.aNoteRealm
           .title(title)
           .content('body')
-          .createdAt(baseNoteTimes.createdAt)
-          .updatedAt(baseNoteTimes.updatedAt)
           .please()
         return {
           data: makeMe.aMemoryTracker

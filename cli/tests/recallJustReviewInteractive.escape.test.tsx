@@ -1,6 +1,6 @@
 import { describeRecallJustReviewInteractive } from './recallJustReviewInteractive.suite.js'
 import { pendingUntilAbort } from './inkTestHelpers.js'
-import type { InkWaitHelpers } from './recallJustReviewInteractive.waits.js'
+import type { RecallInkWaitHelpers } from './recallInteractiveShared.js'
 
 describeRecallJustReviewInteractive((api) => {
   const {
@@ -35,7 +35,7 @@ describeRecallJustReviewInteractive((api) => {
       name: 'after Esc on remember card, y settles Recall session stopped without markAsRecalled',
       run: async (
         stdin: { write: (s: string) => void },
-        ink: InkWaitHelpers
+        ink: RecallInkWaitHelpers
       ) => {
         stdin.write('y\r')
         await ink.waitForLastFrameToInclude(RECALL_SESSION_STOPPED_LINE)
@@ -45,7 +45,7 @@ describeRecallJustReviewInteractive((api) => {
       name: 'after Esc on remember card, n returns to Yes, I remember without markAsRecalled',
       run: async (
         _stdin: { write: (s: string) => void },
-        ink: InkWaitHelpers
+        ink: RecallInkWaitHelpers
       ) => {
         _stdin.write('n\r')
         await waitReturnsToSingleRememberCard(ink, 'Alpha')
@@ -55,7 +55,7 @@ describeRecallJustReviewInteractive((api) => {
       name: 'empty Enter on leave recall confirm stays on confirm; n returns to remember card',
       run: async (
         stdin: { write: (s: string) => void },
-        ink: InkWaitHelpers
+        ink: RecallInkWaitHelpers
       ) => {
         stdin.write('\r')
         await ink.waitForLastFrameToInclude(/Leave recall\?/)

@@ -4,8 +4,12 @@ import {
   RECALL_LOADING_NEXT_QUESTION_LABEL,
 } from '../src/commands/recall/recallBusyInputCopy.js'
 
-export type InkLastFrameWait = {
+export type RecallInkWaitHelpers = {
   waitForLastFrameToInclude: (
+    pattern: string | RegExp,
+    maxTicks?: number
+  ) => Promise<void>
+  waitForFramesToInclude: (
     pattern: string | RegExp,
     maxTicks?: number
   ) => Promise<void>
@@ -13,6 +17,17 @@ export type InkLastFrameWait = {
     predicate: (stripped: string) => boolean,
     maxTicks?: number
   ) => Promise<void>
+  lastStrippedFrame: () => string
+}
+
+export function reLiteral(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+export const leaveRecallWithYnRe = /(?=.*Leave recall\?)(?=.*\(y\/n\))/s
+
+export function startRecall(stdin: { write(data: string): void }) {
+  stdin.write('/recall\r')
 }
 
 export function deferred<T>(): {
@@ -27,19 +42,19 @@ export function deferred<T>(): {
 }
 
 export async function waitBusyRecordReview(
-  ink: InkLastFrameWait
+  ink: Pick<RecallInkWaitHelpers, 'waitForLastFrameToInclude'>
 ): Promise<void> {
   await ink.waitForLastFrameToInclude(RECALL_BUSY_RECORD_REVIEW_LABEL)
 }
 
 export async function waitBusySubmitAnswer(
-  ink: InkLastFrameWait
+  ink: Pick<RecallInkWaitHelpers, 'waitForLastFrameToInclude'>
 ): Promise<void> {
   await ink.waitForLastFrameToInclude(RECALL_BUSY_SUBMIT_ANSWER_LABEL)
 }
 
 export async function waitLoadingNextQuestion(
-  ink: InkLastFrameWait
+  ink: Pick<RecallInkWaitHelpers, 'waitUntilLastFrame'>
 ): Promise<void> {
   await ink.waitUntilLastFrame(
     (p) =>
@@ -48,7 +63,7 @@ export async function waitLoadingNextQuestion(
 }
 
 export async function waitLoadingSpellingNext(
-  ink: InkLastFrameWait,
+  ink: Pick<RecallInkWaitHelpers, 'waitUntilLastFrame'>,
   hidePlaceholder: string
 ): Promise<void> {
   await ink.waitUntilLastFrame(

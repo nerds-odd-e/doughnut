@@ -1,24 +1,12 @@
 import { LEAVE_RECALL_PROMPT } from '../src/commands/recall/leaveRecallSessionCopy.js'
 import { pressEscape } from './inkTestHelpers.js'
-
-export type InkWaitHelpers = {
-  waitForLastFrameToInclude: (
-    pattern: string | RegExp,
-    maxTicks?: number
-  ) => Promise<void>
-  waitForFramesToInclude: (
-    pattern: string | RegExp,
-    maxTicks?: number
-  ) => Promise<void>
-  waitUntilLastFrame: (
-    predicate: (stripped: string) => boolean,
-    maxTicks?: number
-  ) => Promise<void>
-  lastStrippedFrame: () => string
-}
+import {
+  type RecallInkWaitHelpers,
+  startRecall,
+} from './recallInteractiveShared.js'
 
 export async function waitRememberCard(
-  ink: InkWaitHelpers,
+  ink: RecallInkWaitHelpers,
   title: string,
   opts?: { ynHint: boolean }
 ) {
@@ -28,21 +16,21 @@ export async function waitRememberCard(
   await ink.waitForLastFrameToInclude(re)
 }
 
-export async function waitLoadMore(ink: InkWaitHelpers) {
+export async function waitLoadMore(ink: RecallInkWaitHelpers) {
   await ink.waitForLastFrameToInclude(
     /(?=.*Load more from next 3 days\?)(?=.*\(Y\/n\))/s
   )
 }
 
 export async function waitRecalledSummary(
-  ink: InkWaitHelpers,
+  ink: RecallInkWaitHelpers,
   summary: 'Recalled 1 note' | 'Recalled 2 notes'
 ) {
   await ink.waitForLastFrameToInclude(summary)
 }
 
 export async function waitReturnsToSingleRememberCard(
-  ink: InkWaitHelpers,
+  ink: RecallInkWaitHelpers,
   noteTitle: string
 ) {
   await ink.waitUntilLastFrame((plain) => {
@@ -57,7 +45,7 @@ export async function waitReturnsToSingleRememberCard(
 
 async function backspaceClearsTyped(
   stdin: { write(data: string): void },
-  ink: InkWaitHelpers,
+  ink: RecallInkWaitHelpers,
   rejectedInBuffer: string
 ) {
   stdin.write('\x7f')
@@ -68,7 +56,7 @@ async function backspaceClearsTyped(
 
 export async function emptyEnterAndInvalidLineStayOnRemember(
   stdin: { write(data: string): void },
-  ink: InkWaitHelpers,
+  ink: RecallInkWaitHelpers,
   noteTitle: string,
   summaryNotYet: string,
   opts?: { readonly skipInitialWait?: boolean }
@@ -90,7 +78,7 @@ export async function emptyEnterAndInvalidLineStayOnRemember(
 
 export async function recallSingleAlphaToLoadMore(
   stdin: { write(data: string): void },
-  ink: InkWaitHelpers
+  ink: RecallInkWaitHelpers
 ) {
   startRecall(stdin)
   await waitRememberCard(ink, 'Alpha')
@@ -98,13 +86,9 @@ export async function recallSingleAlphaToLoadMore(
   await waitLoadMore(ink)
 }
 
-export function startRecall(stdin: { write(data: string): void }) {
-  stdin.write('/recall\r')
-}
-
 export async function reachLeaveRecallOnRemember(
   stdin: { write(data: string): void },
-  ink: InkWaitHelpers,
+  ink: RecallInkWaitHelpers,
   noteTitle: string
 ) {
   await waitRememberCard(ink, noteTitle)

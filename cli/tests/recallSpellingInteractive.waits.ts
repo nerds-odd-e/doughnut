@@ -1,31 +1,10 @@
 import { LEAVE_RECALL_PROMPT } from '../src/commands/recall/leaveRecallSessionCopy.js'
+import {
+  type RecallInkWaitHelpers,
+  reLiteral,
+} from './recallInteractiveShared.js'
 
-export type InkWaitHelpers = {
-  waitForLastFrameToInclude: (
-    pattern: string | RegExp,
-    maxTicks?: number
-  ) => Promise<void>
-  waitForFramesToInclude: (
-    pattern: string | RegExp,
-    maxTicks?: number
-  ) => Promise<void>
-  waitUntilLastFrame: (
-    predicate: (stripped: string) => boolean,
-    maxTicks?: number
-  ) => Promise<void>
-}
-
-function reLiteral(s: string): string {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
-
-export const leaveRecallWithYnRe = /(?=.*Leave recall\?)(?=.*\(y\/n\))/s
-
-export function startRecall(stdin: { write(data: string): void }) {
-  stdin.write('/recall\r')
-}
-
-export async function waitSpellingPromptVisible(ink: InkWaitHelpers) {
+export async function waitSpellingPromptVisible(ink: RecallInkWaitHelpers) {
   await ink.waitUntilLastFrame(
     (p) =>
       p.includes('Spell the title') &&
@@ -35,7 +14,7 @@ export async function waitSpellingPromptVisible(ink: InkWaitHelpers) {
 }
 
 export async function waitSpellingIncorrect(
-  ink: InkWaitHelpers,
+  ink: RecallInkWaitHelpers,
   answer: string
 ) {
   await ink.waitForFramesToInclude(
@@ -43,14 +22,17 @@ export async function waitSpellingIncorrect(
   )
 }
 
-export async function waitSpellingCorrect(ink: InkWaitHelpers, answer: string) {
+export async function waitSpellingCorrect(
+  ink: RecallInkWaitHelpers,
+  answer: string
+) {
   await ink.waitForFramesToInclude(
     new RegExp(`(?=.*Correct!)(?=.*Your answer: ${reLiteral(answer)})`, 's')
   )
 }
 
 export async function waitReturnsToSpellingWithBuffer(
-  ink: InkWaitHelpers,
+  ink: RecallInkWaitHelpers,
   bufferSuffix: string
 ) {
   await ink.waitUntilLastFrame(

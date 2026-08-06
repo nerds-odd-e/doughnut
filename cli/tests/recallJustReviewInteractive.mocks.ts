@@ -1,7 +1,6 @@
 import type { MemoryTrackerController, RecallsController } from 'doughnut-api'
 import makeMe from 'doughnut-test-fixtures/makeMe'
 import type { MockInstance } from 'vitest'
-import { baseNoteTimes } from './recallJustReviewInteractive.fixtures.js'
 import { deferred } from './recallInteractiveShared.js'
 
 export type RecallJustReviewSpies = {
@@ -38,12 +37,7 @@ export function mockAlphaBetaNoteCards(spies: RecallJustReviewSpies) {
     async (opts: { path: { memoryTracker: number } }) => {
       const id = opts.path.memoryTracker
       const title = id === 1 ? 'Alpha' : 'Beta'
-      const noteRealm = makeMe.aNoteRealm
-        .title(title)
-        .content('body')
-        .createdAt(baseNoteTimes.createdAt)
-        .updatedAt(baseNoteTimes.updatedAt)
-        .please()
+      const noteRealm = makeMe.aNoteRealm.title(title).content('body').please()
 
       return {
         data: makeMe.aMemoryTracker
@@ -132,6 +126,7 @@ export function mockShowMemoryTrackerSecondCardDelayed(
           ReturnType<typeof MemoryTrackerController.showMemoryTracker>
         >
       }
+
       if (id === 2) {
         return promise
       }
