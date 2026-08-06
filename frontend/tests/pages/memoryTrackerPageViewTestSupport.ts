@@ -46,6 +46,14 @@ export type MountMemoryTrackerPageViewProps = {
   memoryTrackerId?: number
 }
 
+export function mockMemoryTrackerPageViewDefaults() {
+  mockSdkService(
+    MemoryTrackerController,
+    "removeFromRepeating",
+    makeMe.aMemoryTracker.please()
+  )
+}
+
 export function mountMemoryTrackerPageView({
   recallPrompts,
   memoryTracker = defaultMemoryTracker(),
@@ -119,3 +127,14 @@ export function recallPromptWithThinkingTime(thinkingTimeMs: number) {
     })
     .please()
 }
+
+export function noteUnderQuestionSections(wrapper: VueWrapper) {
+  return wrapper.findAll(".note-under-question")
+}
+
+export function skippedMemoryTracker() {
+  return makeMe.aMemoryTracker.removedFromTracking(true).please()
+}
+
+export const spellingDetailsNotNeeded =
+  "This is a spelling question. Details are not needed."

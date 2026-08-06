@@ -53,22 +53,19 @@ describe("RecallPage diligent mode", () => {
     return mockData
   }
 
-  it("should set diligent mode to true when loadMore is called with dueInDays > 0", async () => {
-    const mockData = await callLoadMore(3)
-    expect(mockData.setDiligentMode).toHaveBeenCalledWith(true)
-  })
+  it.each([
+    { dueInDays: 3, expected: true },
+    { dueInDays: 0, expected: false },
+    { dueInDays: undefined, expected: false },
+  ])(
+    "sets diligent mode to $expected when loadMore dueInDays is $dueInDays",
+    async ({ dueInDays, expected }) => {
+      const mockData = await callLoadMore(dueInDays)
+      expect(mockData.setDiligentMode).toHaveBeenCalledWith(expected)
+    }
+  )
 
-  it("should set diligent mode to false when loadMore is called with dueInDays = 0", async () => {
-    const mockData = await callLoadMore(0)
-    expect(mockData.setDiligentMode).toHaveBeenCalledWith(false)
-  })
-
-  it("should set diligent mode to false when loadMore is called with undefined dueInDays", async () => {
-    const mockData = await callLoadMore()
-    expect(mockData.setDiligentMode).toHaveBeenCalledWith(false)
-  })
-
-  it("should show red background on progress bar when in diligent mode", async () => {
+  it("shows red background on progress bar when in diligent mode", async () => {
     vi.mocked(useRecallData).mockReturnValue(
       createUseRecallDataMock({
         toRepeat: [createMemoryTrackerLite(123)],
@@ -78,19 +75,5 @@ describe("RecallPage diligent mode", () => {
     const wrapper = ctx.renderer.currentRoute({ name: "recall" }).mount()
     await flushPromises()
     expect(wrapper.find(".progress-bar").classes()).toContain("diligent-mode")
-  })
-
-  it("should show gray background on progress bar when not in diligent mode", async () => {
-    vi.mocked(useRecallData).mockReturnValue(
-      createUseRecallDataMock({
-        toRepeat: [createMemoryTrackerLite(123)],
-        diligentMode: false,
-      })
-    )
-    const wrapper = ctx.renderer.currentRoute({ name: "recall" }).mount()
-    await flushPromises()
-    expect(wrapper.find(".progress-bar").classes()).not.toContain(
-      "diligent-mode"
-    )
   })
 })

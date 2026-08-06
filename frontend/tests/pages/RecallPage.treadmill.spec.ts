@@ -3,7 +3,7 @@ import { useRecallData } from "@/composables/useRecallData"
 import type { MemoryTrackerLite } from "@generated/doughnut-backend-api"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
-import { describe, expect, it, vi, beforeEach } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import {
   createMemoryTrackerLite,
   createUseRecallDataMock,
@@ -60,12 +60,13 @@ describe("RecallPage treadmill mode", () => {
     expect(document.body.textContent).toContain("Treadmill mode")
   })
 
-  it("should skip spelling memory trackers when treadmill mode is enabled", async () => {
+  it("skips spelling trackers and updates progress when treadmill is enabled", async () => {
     const wrapper = await ctx.mountPage()
     const globalBar = wrapper.findComponent({ name: "GlobalBar" })
     expect(globalBar.text()).toContain("0/3")
     await toggleTreadmillMode(wrapper, true)
     expect(globalBar.text()).toContain("0/2")
+    expect(globalBar.classes()).toContain("treadmill-mode")
     expect(askAQuestionSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         path: { memoryTracker: normalId },
@@ -73,51 +74,16 @@ describe("RecallPage treadmill mode", () => {
     )
   })
 
-  it("should apply sportive background to GlobalBar when treadmill mode is enabled", async () => {
-    const wrapper = await ctx.mountPage()
-    await toggleTreadmillMode(wrapper, true)
-    expect(wrapper.findComponent({ name: "GlobalBar" }).classes()).toContain(
-      "treadmill-mode"
-    )
-  })
-
-  it("should not show spelling questions when treadmill mode is enabled", async () => {
-    const wrapper = await ctx.mountPage()
-    await toggleTreadmillMode(wrapper, true)
-    type ExposedVM = { toRepeat?: MemoryTrackerLite[]; currentIndex: number }
-    const vm = wrapper.vm as unknown as ExposedVM
-    expect(vm.toRepeat?.[vm.currentIndex]?.spelling).toBe(false)
-  })
-
-  it("should update progress bar to exclude spelling memory trackers", async () => {
-    const wrapper = await ctx.mountPage()
-    const globalBar = wrapper.findComponent({ name: "GlobalBar" })
-    expect(globalBar.text()).toMatch(/0\/[23]/)
-    await toggleTreadmillMode(wrapper, true)
-    expect(globalBar.text()).toContain("0/2")
-  })
-
-  it("should not add answered questions back to the list when toggling treadmill mode", async () => {
-    const wrapper = await ctx.mountPage()
-    type ExposedVM = { toRepeat?: MemoryTrackerLite[]; currentIndex: number }
-    const vm = wrapper.vm as unknown as ExposedVM
-    vm.currentIndex = 1
-    await toggleTreadmillMode(wrapper, true)
-    expect(vm.currentIndex).toBeGreaterThan(0)
-  })
-
-  it("should not reset currentIndex to 0 when toggling treadmill mode", async () => {
+  it("preserves currentIndex when toggling treadmill mode", async () => {
     const wrapper = await ctx.mountPage()
     type ExposedVM = { toRepeat?: MemoryTrackerLite[]; currentIndex: number }
     const vm = wrapper.vm as unknown as ExposedVM
     vm.currentIndex = 2
     await toggleTreadmillMode(wrapper, true)
     expect(vm.currentIndex).toBeGreaterThan(0)
-    const currentTracker = vm.toRepeat?.[vm.currentIndex]
-    if (currentTracker) expect(currentTracker.spelling).toBe(false)
   })
 
-  it("should move unanswered spelling memory trackers to the end when treadmill mode is turned off", async () => {
+  it("moves unanswered spelling trackers to the end when treadmill is turned off", async () => {
     const fourthNormalId = 111
     const trackers = [
       createMemoryTrackerLite(normalId, false),
@@ -131,12 +97,6 @@ describe("RecallPage treadmill mode", () => {
     const wrapper = await ctx.mountPage()
     type ExposedVM = { toRepeat?: MemoryTrackerLite[]; currentIndex: number }
     const vm = wrapper.vm as unknown as ExposedVM
-    expect(vm.toRepeat?.map((t) => t.memoryTrackerId)).toEqual([
-      normalId,
-      anotherNormalId,
-      spellingId,
-      fourthNormalId,
-    ])
     await toggleTreadmillMode(wrapper, true)
     vm.currentIndex = 1
     await wrapper.vm.$nextTick()

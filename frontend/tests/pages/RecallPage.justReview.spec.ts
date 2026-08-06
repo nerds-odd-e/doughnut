@@ -52,7 +52,7 @@ describe('RecallPage "just review" quiz', () => {
     )
   })
 
-  it("shows the progress", async () => {
+  it("shows initial progress and asks the first tracker", async () => {
     const wrapper = await ctx.mountPage()
     expect(wrapper.findComponent({ name: "GlobalBar" }).text()).toContain("0/3")
     expect(askAQuestionSpy).toHaveBeenCalledWith(
@@ -62,7 +62,7 @@ describe('RecallPage "just review" quiz', () => {
     )
   })
 
-  it("should show progress", async () => {
+  it("advances progress after marking the current tracker as recalled", async () => {
     const wrapper = await ctx.mountPage()
     const mockedMarkAsRepeatedCall = mockSdkService(
       MemoryTrackerController,

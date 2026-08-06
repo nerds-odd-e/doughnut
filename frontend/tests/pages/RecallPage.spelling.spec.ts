@@ -77,21 +77,12 @@ describe("RecallPage spelling quiz", () => {
     await wrapper.find("form").trigger("submit")
     await flushPromises()
     expect(mockedAnswerSpellingCall).toHaveBeenCalled()
-
-    const answeredSpellingQuestion = wrapper.findComponent({
-      name: "AnsweredSpellingQuestion",
-    })
-    expect(answeredSpellingQuestion.exists()).toBe(true)
+    expect(wrapper.find(".daisy-alert-error").text()).toContain(
+      "Your answer `test answer` is incorrect."
+    )
+    expect(wrapper.findComponent({ name: "NoteShow" }).props("noteId")).toBe(42)
     expect(
-      answeredSpellingQuestion.find(".daisy-alert-error").text()
-    ).toContain("Your answer `test answer` is incorrect.")
-    expect(
-      answeredSpellingQuestion
-        .findComponent({ name: "NoteShow" })
-        .props("noteId")
-    ).toBe(42)
-    expect(
-      answeredSpellingQuestion
+      wrapper
         .findComponent({ name: "ViewMemoryTrackerLink" })
         .props("memoryTrackerId")
     ).toBe(123)

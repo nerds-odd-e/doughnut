@@ -1,6 +1,6 @@
 # Frontend / CLI / MCP unit tests → "small test" style
 
-**Status:** in progress (Phases 1–15 done)
+**Status:** in progress (Phases 1–16 done)
 **Type:** test renovation (no product behavior change)  
 **Resume:** this `PLAN.md` progress log only — **do not edit** trunk `.planning/STATE.md` (parallel trunk-based work).
 
@@ -183,11 +183,10 @@ While iterating a single large frontend file, `pnpm frontend:test tests/path/to/
 - **Done when:** rubric applied; suite green.
 
 ### Phase 16 — Frontend: pages — Recall + MemoryTracker
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
-- **Files:** `RecallPage.spec.ts` (~898 LOC), `RecallPageOverlap.spec.ts`, `MemoryTrackerPage.spec.ts`, `MemoryTrackerPageView.spec.ts`
-- Expect capability splits.
-- **Verify:** `pnpm frontend:test`
+- **Files:** `RecallPage*.spec.ts` (already capability-split), `RecallPageOverlap.spec.ts`, `MemoryTrackerPage.spec.ts`, `MemoryTrackerPageView*` (display / deleteUnanswered / skipped / spelling) + page/view test support.
+- **Verify:** `pnpm frontend:test` — green (295 files / 1663 tests).
 - **Done when:** rubric applied; suite green.
 
 ### Phase 17 — Frontend: pages — BookReading
@@ -236,7 +235,8 @@ If a Behavior phase cannot express fixtures concisely: add a **Structure** sub-p
 | 13 | done | FE links + toolbars renovated; MainMenu nav/assimilate/recall/resume + NoteUndoButton visibility/confirmation/actions splits; shared mocks/support; focused asserts; suite green |
 | 14 | done | FE notebooks/catalog/folder/circle/bazaar/home/settings/misc pages renovated; NotebookBuilder.title; notebooksPageTestSupport; focused asserts; suite green |
 | 15 | done | FE NoteShow + assimilation/conversation panels renovated; noteShowPageTestSupport mount/DOM helpers; render + router.push for conversation query; focused asserts; suite green |
-| 16–18 | planned | — |
+| 16 | done | FE Recall + MemoryTracker pages renovated; Overlap uses shared recallPageTestSupport; MemoryTrackerPage slimmed to fetch/load/error/revive; View capability splits + display statuses moved from Page; focused treadmill/diligent/spelling asserts; suite green |
+| 17–18 | planned | — |
 
 ---
 
@@ -260,3 +260,4 @@ If a Behavior phase cannot express fixtures concisely: add a **Structure** sub-p
 - Phase 13: Split oversized `MainMenu` (~667) into nav / assimilate / recall / resume + `mainMenuMocks` / `mainMenuTestSupport` (per-file `createMemoryHistory` router; keep `useRecallData` / `useGoToNextAssimilation` / AiReply mocks as Phase 8 side-effect boundaries). Split `NoteUndoButton` (~434) into visibility / confirmation / actions; router mock must live in lean `noteUndoButtonMocks` (importing support from `vi.mock` deadlocks Vitest). AddRelationship: DOM radio select via `[id="…"]` (spaces in relation labels); sibling navigateOnSuccess asserts delta only. Dropped redundant Breadcrumb ancestorFolders re-cover; renamed GlobalBar undo-absence test. SearchDialog / HorizontalMenu / InsertWikiLink already rubric-compliant.
 - Phase 14: Added `NotebookBuilder.title()`; shared `notebooksPageTestSupport` (`mockMyNotebooks` / `mountNotebooksPage` / `emitNotebookUpdated` / `catalogHeadingTexts`). NotebooksPageUpdates*: DOM heading asserts + emit via NotebooksPageView (NotebookButtons no longer emits notebook-updated). Dropped getByRole (title/text); RecentSettingsTab uses real router + DOM tab panels; MessageCenter push via router spy; FailureReport/RecallStats focused asserts; name edit via `[data-test="notebook-page-name-input"]` innerText; HomePage dropped GlobalBar stub. FolderPage* / NotebookPageView / AccessTokens / General / Bazaar already rubric-compliant — left largely untouched. RouterLink group-nav still uses `findComponent` props (`href` stays `#` in VTU).
 - Phase 15: Shared `noteShowPageTestSupport` (`setupNoteShowPageMocks` / assimilation+conversation setups / `renderNoteShowPage` / `renderNoteShowPageWithConversation` / DOM `*El` helpers). Conversation visibility needs real `router.push` (not `currentRoute` `$route` mock — `useRoute().query`). Assimilation: `render()` + `assimilateButtonSelector` over mount/`wrapper.find`. Conversation: focused maximize toggle vs close-after-maximize delta (drop route name/params re-assert). NoteShow load: single showNote spy from beforeEach.
+- Phase 16: RecallPage already capability-split on trunk (~898 monolith gone). Overlap deduped onto `recallPageTestSupport`; treadmill/diligent merged redundant cases; spelling DOM alert. MemoryTrackerPage: page-boundary only (SDK fetch/loading/error/empty/revive refetch) via `memoryTrackerPageTestSupport`; View owns prompt meta / delete / skipped / spelling splits + `mockMemoryTrackerPageViewDefaults`. Kept `useRecallData` / `usePopups` / vue-router mocks as side-effect boundaries (Phase 8 pattern). Quiz `$emit("answered")` still via findComponent where no DOM path.
