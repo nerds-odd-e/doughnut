@@ -14,7 +14,6 @@ import {
   countFolderListingCallsForParent,
   findSidebarItem,
   folderListingForQueryParent,
-  isBefore,
   mountSidebar,
   neverResolving,
   prepareSidebarDefaultMountContext,
@@ -79,31 +78,9 @@ describe("Sidebar gradual ancestor population", () => {
     expect(
       findSidebarItem(
         wrapper,
-        fixtures.topNoteRealm.note.noteTopology.title
-      )?.exists()
-    ).toBe(true)
-    expect(
-      findSidebarItem(
-        wrapper,
-        fixtures.firstGeneration.note.noteTopology.title
-      )?.exists()
-    ).toBe(true)
-    expect(
-      findSidebarItem(
-        wrapper,
         fixtures.firstGenerationSibling.note.noteTopology.title
       )?.exists()
     ).toBe(true)
-
-    const secondGenEl = findSidebarItem(
-      wrapper,
-      fixtures.secondGeneration.note.noteTopology.title
-    )!.element
-    const siblingEl = findSidebarItem(
-      wrapper,
-      fixtures.firstGenerationSibling.note.noteTopology.title
-    )!.element
-    expect(isBefore(secondGenEl, siblingEl)).toBe(true)
   })
 
   it("shows previously fetched ancestor rows from cache when API is blocked on remount", async () => {

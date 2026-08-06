@@ -1,6 +1,5 @@
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import SidebarToolbar from "@/components/notes/SidebarToolbar.vue"
-import type { NoteRealm } from "@generated/doughnut-backend-api"
 import helper from "@tests/helpers"
 import { notebookSidebarClosedPlugin } from "@tests/helpers/notebookSidebarTestProvide"
 import { flushPromises } from "@vue/test-utils"
@@ -69,13 +68,7 @@ describe("Sidebar toolbar", () => {
   })
 
   it("hides New folder when note realm is from bazaar", async () => {
-    const bazaarRealm = {
-      ...fixtures.firstGeneration,
-      notebookRealm: {
-        ...fixtures.firstGeneration.notebookRealm,
-        readonly: true,
-      },
-    } as NoteRealm
+    const bazaarRealm = makeMe.aNoteRealm.title("bazaar").readonly().please()
     wrapper = mountSidebarSignedIn(
       helper,
       bazaarRealm,

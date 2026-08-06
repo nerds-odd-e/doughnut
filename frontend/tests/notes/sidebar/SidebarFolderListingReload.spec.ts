@@ -61,12 +61,6 @@ describe("Sidebar folder listing reload", () => {
     const rootRequestCount = () =>
       countFolderListingCallsForParent(listingSpy, undefined)
     expect(rootRequestCount()).toBe(1)
-    expect(
-      findSidebarItem(
-        wrapper,
-        fixtures.topNoteRealm.note.noteTopology.title
-      )?.exists()
-    ).toBe(true)
 
     await wrapper.setProps({
       activeNoteRealm: fixtures.secondGeneration,

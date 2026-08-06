@@ -1,6 +1,6 @@
 # Frontend / CLI / MCP unit tests → "small test" style
 
-**Status:** in progress (Phases 1–10 done)
+**Status:** in progress (Phases 1–11 done)
 **Type:** test renovation (no product behavior change)  
 **Resume:** this `PLAN.md` progress log only — **do not edit** trunk `.planning/STATE.md` (parallel trunk-based work).
 
@@ -147,10 +147,10 @@ While iterating a single large frontend file, `pnpm frontend:test tests/path/to/
 - **Done when:** listed files renovated; suite green.
 
 ### Phase 11 — Frontend: notes — sidebar
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
 - **Files:** `frontend/tests/notes/sidebar/**`
-- **Verify:** `pnpm frontend:test`
+- **Verify:** `pnpm frontend:test` — green (273 files / 1687 tests).
 - **Done when:** rubric applied; suite green.
 
 ### Phase 12 — Frontend: notes — audio + Wikidata
@@ -231,7 +231,8 @@ If a Behavior phase cannot express fixtures concisely: add a **Structure** sub-p
 | 8 | done | FE recall/recallStats/Quiz renovated; NoteRealm/MemoryTracker builders; extractNote preview/create/loading splits; AssimilationPanel uses real assimilation count; suite green |
 | 9 | done | FE notebook/book-reading/search/conversation/admin/recent/notes components; AiResponse + SearchResults capability splits (search also advanced on trunk); suite green |
 | 10 | done | FE notes show/edit/new/toolbar renovated; NoteTextContent split (titleEdit/wikiLinks); EditableContent/toolbar/more-options focused asserts; NoteAudioTools + Wikidata* deferred to Phase 12; suite green |
-| 11–18 | planned | — |
+| 11 | done | FE notes sidebar renovated; makeMe `.inNotebook`/`.readonly`/`.aFolder`; shared `stubIntersectionObserver`; focused asserts; support split (folderListing/mount); suite green |
+| 12–18 | planned | — |
 
 ---
 
@@ -250,3 +251,4 @@ If a Behavior phase cannot express fixtures concisely: add a **Structure** sub-p
 - Phase 8: Recall/recallStats/Quiz already mostly mounted-component. Added `NoteRealmBuilder.inNotebook` / `notebookName` / `readonly` and `MemoryTrackerBuilder.spelling`; dropped post-construction realm/content mutations and dead clozeDescription fixture. Split oversized `NoteRefinement.extractNote` into preview / create / loading. AssimilationPanel: real `useAssimilationCount`; kept `useRecallData` + `useGoToNextAssimilation` mocks (router inject / navigation side-effect — same Phase 6 toast/router pattern). Dropped `useRecallData` mock from RecallSessionOptionsDialog. recallStats/Quiz already rubric-compliant.
 - Phase 9: Conversation: split oversized `AiResponse` (streaming / noteContentCompletion / titleAndUnknown) + shared support; `vi.mock` for AiReplyEventSource tracking must live in each `*.spec.ts` (not only support); NoteConversation uses makeMe + DOM asserts; ConversationInner shares SSE mock/helpers. Book-reading: extracted AiReorganize mount support; toast/pdfjs stubs kept as externals. Notes: `MemoryTrackerBuilder.id` instead of post-construction mutation. Search: trunk already split SearchResults (caching/recent/hitLinks/emptyShorterPhrase) during parallel work — left origin’s search suite. Admin/notebook/recent already rubric-compliant.
 - Phase 10: Split oversized `NoteTextContent` into titleEdit + wikiLinks + support; deleted dead assertion-free unmount test; `makeMe.content("")` instead of post-construction mutation; `[data-test="note-title"]` + relation row `data-testid`/`data-property-key` over `findComponent`. EditableContent: deterministic navigation asserts; paste popup cases split; quill paste via support harness (Phase 7 pattern); memoryTracker uses `setupPopupsMock` confirm override. Toolbar more-options + MoreOptionsForm: DOM over `findComponent` / duplicate ul text; delete cancel uses SDK spy. Delete-support relation fixtures use `.id()` builders. Dropped unused `AiReplyEventSource` mock from NoteNewButton. Attempted consolidating NoteNewForm `vi.mock` into support — **reverted**: Vitest browser-mode needs per-spec `vi.mock` (same lesson as Phase 9 AiReply). Left NoteAudioTools + WikidataAssociation/Search for Phase 12.
+- Phase 11: Sidebar suite already capability-split and mostly mounted-Sidebar + allowed `mockSdkService`. Replaced `uncachedNoteInSameNotebook` post-construction `notebookRealm` mutation with `.inNotebook`; bazaar toolbar uses `.readonly()`; FolderItem folder props via `makeMe.aFolder`. Shared `stubIntersectionObserver` (returns restore). Dropped AncestorLoading order re-assert (FirstGeneration owns peer order) and FolderListingReload pre-existence assert. Post-refactor: split oversized `sidebarTestSupport` into `sidebarFolderListingSupport` + `sidebarMountSupport` + slim barrel (≤250 lines). ActiveFolder / NotebookShell / PeerSort / RouteNavigation already rubric-compliant — left largely untouched.

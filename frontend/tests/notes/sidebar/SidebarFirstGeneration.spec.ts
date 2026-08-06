@@ -8,6 +8,7 @@ import {
   isBefore,
   mountSidebar,
   prepareSidebarDefaultMountContext,
+  stubIntersectionObserver,
   teardownSidebarComponentTest,
 } from "./sidebarTestSupport"
 
@@ -49,18 +50,7 @@ describe("Sidebar first generation", () => {
   })
 
   it("should not scroll if already visible", async () => {
-    const originalIntersectionObserver = window.IntersectionObserver
-    window.IntersectionObserver = class extends originalIntersectionObserver {
-      constructor(callback: IntersectionObserverCallback) {
-        super(callback)
-        setTimeout(() => {
-          callback(
-            [{ isIntersecting: true }] as IntersectionObserverEntry[],
-            this
-          )
-        }, 0)
-      }
-    } as typeof IntersectionObserver
+    const restoreIntersectionObserver = stubIntersectionObserver(true)
 
     wrapper = mountSidebar(helper, fixtures.firstGeneration)
     await flushPromises()
@@ -69,7 +59,7 @@ describe("Sidebar first generation", () => {
     )
     await flushPromises()
     expect(HTMLElement.prototype.scrollIntoView).not.toHaveBeenCalled()
-    window.IntersectionObserver = originalIntersectionObserver
+    restoreIntersectionObserver()
   })
 
   it("orders nested child note before same-folder sibling when deeper note is active", async () => {

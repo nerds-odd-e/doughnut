@@ -4,6 +4,7 @@ import makeMe from "doughnut-test-fixtures/makeMe"
 import { flushPromises, mount, type VueWrapper } from "@vue/test-utils"
 import { createRouter, createWebHistory } from "vue-router"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { stubIntersectionObserver } from "./sidebarTestSupport"
 
 function mountFolderItem(
   router: ReturnType<typeof createRouter>,
@@ -14,15 +15,9 @@ function mountFolderItem(
     activePathFolderIds?: Set<number>
   }
 ) {
-  const folder = {
-    id: options.folderId,
-    name: "Alpha",
-    createdAt: "2020-01-01T00:00:00Z",
-    updatedAt: "2020-01-01T00:00:00Z",
-  }
   return mount(SidebarFolderItem, {
     props: {
-      folder,
+      folder: makeMe.aFolder.folder(options.folderId, "Alpha").please(),
       notebookId: options.notebookId,
       expandedFolderIds: new Set<number>(),
       activePathFolderIds: options.activePathFolderIds ?? new Set<number>(),
@@ -37,7 +32,7 @@ function mountFolderItem(
 describe("SidebarFolderItem", () => {
   let router: ReturnType<typeof createRouter>
   let wrapper: VueWrapper | undefined
-  const originalIntersectionObserver = globalThis.IntersectionObserver
+  let restoreIntersectionObserver: (() => void) | undefined
 
   beforeEach(async () => {
     router = createRouter({
@@ -57,7 +52,8 @@ describe("SidebarFolderItem", () => {
   afterEach(() => {
     wrapper?.unmount()
     wrapper = undefined
-    globalThis.IntersectionObserver = originalIntersectionObserver
+    restoreIntersectionObserver?.()
+    restoreIntersectionObserver = undefined
     vi.restoreAllMocks()
   })
 
@@ -87,23 +83,7 @@ describe("SidebarFolderItem", () => {
 
   it("scrolls folder row into view when active folder row is not intersecting", async () => {
     const scrollSpy = vi.spyOn(HTMLElement.prototype, "scrollIntoView")
-    globalThis.IntersectionObserver = class {
-      constructor(private readonly cb: IntersectionObserverCallback) {}
-      observe() {
-        setTimeout(() => {
-          this.cb(
-            [{ isIntersecting: false }] as IntersectionObserverEntry[],
-            this as unknown as IntersectionObserver
-          )
-        }, 0)
-      }
-      disconnect() {
-        /* no-op mock */
-      }
-      unobserve() {
-        /* no-op mock */
-      }
-    } as unknown as typeof IntersectionObserver
+    restoreIntersectionObserver = stubIntersectionObserver(false)
 
     const activeFolder = makeMe.aFolder.folder(42, "Alpha").please()
     wrapper = mountFolderItem(router, {
@@ -120,23 +100,7 @@ describe("SidebarFolderItem", () => {
 
   it("does not scroll folder row when active folder row is already intersecting", async () => {
     const scrollSpy = vi.spyOn(HTMLElement.prototype, "scrollIntoView")
-    globalThis.IntersectionObserver = class {
-      constructor(private readonly cb: IntersectionObserverCallback) {}
-      observe() {
-        setTimeout(() => {
-          this.cb(
-            [{ isIntersecting: true }] as IntersectionObserverEntry[],
-            this as unknown as IntersectionObserver
-          )
-        }, 0)
-      }
-      disconnect() {
-        /* no-op mock */
-      }
-      unobserve() {
-        /* no-op mock */
-      }
-    } as unknown as typeof IntersectionObserver
+    restoreIntersectionObserver = stubIntersectionObserver(true)
 
     const activeFolder = makeMe.aFolder.folder(42, "Alpha").please()
     wrapper = mountFolderItem(router, {
