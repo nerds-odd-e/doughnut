@@ -10,10 +10,23 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.OpenAiNotAvailableException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
+import com.openai.client.OpenAIClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.server.ResponseStatusException;
 
 class MemoryTrackerAskQuestionControllerTest extends MemoryTrackerControllerTestBase {
+  @MockitoBean(name = "officialOpenAiClient")
+  OpenAIClient officialClient;
+
+  OpenAiStructuredResponseMock openAiStructuredResponseMock;
+
+  @BeforeEach
+  void setupOpenAiMock() {
+    openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
+  }
 
   private MemoryTracker spellingTracker() {
     Note note =
@@ -41,6 +54,24 @@ class MemoryTrackerAskQuestionControllerTest extends MemoryTrackerControllerTest
         makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
 
     assertThat(controller.askAQuestion(memoryTracker).getId(), equalTo(existingPrompt.getId()));
+  }
+
+  @Test
+  void shouldRecycleMostRecentUnansweredMcqPrompt() throws UnexpectedNoAccessRightException {
+    MemoryTracker tracker = ownedTracker();
+    makeMe.aRecallPrompt().forMemoryTracker(tracker).please();
+    RecallPrompt mostRecent = makeMe.aRecallPrompt().forMemoryTracker(tracker).please();
+    makeMe.entityPersister.flush();
+
+    assertThat(controller.askAQuestion(tracker).getId(), equalTo(mostRecent.getId()));
+  }
+
+  @Test
+  void shouldGenerateMcqWhenNoUnansweredPromptExists() throws UnexpectedNoAccessRightException {
+    openAiStructuredResponseMock.stubStructuredResponse(makeMe.aMCQWithAnswer().please());
+
+    assertThat(
+        controller.askAQuestion(ownedTracker()).getMultipleChoicesQuestion(), notNullValue());
   }
 
   @Test

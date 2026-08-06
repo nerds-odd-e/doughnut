@@ -36,7 +36,7 @@ class AssimilationServiceQueueOrderingTest extends AssimilationServiceTestBase {
     void shouldReturnTheFirstNoteAndThenTheSecondWhenThereAreTwo() {
       assertThat(assimilationService.getCounts().getDueCount(), equalTo(2));
       assertThat(getNextNoteToAssimilate(assimilationService), equalTo(note1));
-      makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(day1).please();
+      makeMe.aMemoryTrackerFor(note1).assimilatedAt(day1).please();
       assertThat(assimilationService.getCounts().getDueCount(), equalTo(1));
       assertThat(getNextNoteToAssimilate(assimilationService), equalTo(note2));
     }
@@ -55,11 +55,11 @@ class AssimilationServiceQueueOrderingTest extends AssimilationServiceTestBase {
     }
 
     @Nested
-    class MemoryTrackerFromLink {
+    class WithAdditionalOwnedNote {
       Note anotherNote;
 
       @BeforeEach
-      void thereIsALinkAndAnotherNote() {
+      void thereIsAnotherNote() {
         anotherNote = makeMe.aNote("another note").notebookOwnedBy(user).please();
       }
 
@@ -69,7 +69,7 @@ class AssimilationServiceQueueOrderingTest extends AssimilationServiceTestBase {
         while ((next = assimilationService.getNextNoteToAssimilate()).isPresent()) {
           Note note = next.get();
           notes.add(note);
-          makeMe.aMemoryTrackerFor(note).by(user).assimilatedAt(day1).please();
+          makeMe.aMemoryTrackerFor(note).assimilatedAt(day1).please();
         }
         return notes;
       }
@@ -77,27 +77,20 @@ class AssimilationServiceQueueOrderingTest extends AssimilationServiceTestBase {
       @Nested
       class WithLevels {
         @BeforeEach
-        void Note1And2HaveDifferentLevels() {
+        void note1And2HaveDifferentLevels() {
           makeMe.theNote(note1).level(5).please();
           makeMe.theNote(note2).level(2).please();
         }
 
         @Test
-        void shouldReturnMemoryTrackerForLowerLevelNoteOrLink() {
-          List<Note> memoryTrackers = collectNextNotesInOrder();
-          assertThat(memoryTrackers, hasSize(3));
-          assertThat(memoryTrackers.get(0), equalTo(anotherNote));
-          assertThat(memoryTrackers.get(1), equalTo(note2));
-          assertThat(memoryTrackers.get(2), equalTo(note1));
+        void shouldReturnNotesOrderedByAscendingLevel() {
+          assertThat(collectNextNotesInOrder(), contains(anotherNote, note2, note1));
         }
 
         @Test
-        void shouldNotReturnMemoryTrackerForLinkIfCreatedByOtherPeople() {
+        void shouldExcludeNoteWhenOwnershipTransferredAway() {
           makeMe.theNote(note1).notebookOwnership(makeMe.aUser().please()).please();
-          List<Note> memoryTrackers = collectNextNotesInOrder();
-          assertThat(memoryTrackers, hasSize(2));
-          assertThat(memoryTrackers.get(0), equalTo(anotherNote));
-          assertThat(memoryTrackers.get(1), equalTo(note2));
+          assertThat(collectNextNotesInOrder(), contains(anotherNote, note2));
         }
       }
     }

@@ -13,16 +13,11 @@ class AssimilationServiceSubscriptionQueueTest extends AssimilationServiceTestBa
 
   @Nested
   class WhenNoteHasOnlyPropertyTracker {
-    Note note;
-
-    @BeforeEach
-    void setup() {
-      note = makeMe.aNote("vitamins").notebookOwnedBy(user).please();
-      makeMe.aMemoryTrackerFor(note).by(user).propertyKey("topic").assimilatedAt(day1).please();
-    }
-
     @Test
     void shouldAppearInUnassimilatedNotes() {
+      Note note = makeMe.aNote("vitamins").notebookOwnedBy(user).please();
+      makeMe.aMemoryTrackerFor(note).propertyKey("topic").assimilatedAt(day1).please();
+
       assertThat(
           userService.getUnassimilatedNotes(user).map(Note::getId).toList(), hasItem(note.getId()));
     }
@@ -32,11 +27,12 @@ class AssimilationServiceSubscriptionQueueTest extends AssimilationServiceTestBa
   class RecallSubscribedNote {
     Note note1;
     Note note2;
+    Notebook topNb;
 
     @BeforeEach
     void setup() {
-      User anotherUser = makeMe.aUser().please();
-      Notebook topNb = makeMe.aNotebook().creatorAndOwner(anotherUser).please();
+      User notebookOwner = makeMe.aUser().please();
+      topNb = makeMe.aNotebook().creatorAndOwner(notebookOwner).please();
       note1 = makeMe.aNote().notebook(topNb).please();
       note2 = makeMe.aNote().notebook(topNb).please();
       makeMe.aSubscription().forNotebook(topNb).forUser(user).daily(1).please();
@@ -52,7 +48,7 @@ class AssimilationServiceSubscriptionQueueTest extends AssimilationServiceTestBa
     void shouldReturnMemoryTrackerForLink() {
       makeMe.theNote(note2).skipMemoryTracking().please();
       makeMe.theNote(note1).skipMemoryTracking().please();
-      Note link = makeMe.aNote().notebook(note1.getNotebook()).please();
+      Note link = makeMe.aNote().notebook(topNb).please();
       makeMe.refresh(user);
       Subscription sub = user.getSubscriptions().stream().findFirst().orElseThrow();
       List<Integer> dueInSubscribedNotebook =
@@ -70,16 +66,12 @@ class AssimilationServiceSubscriptionQueueTest extends AssimilationServiceTestBa
 
   @Nested
   class NotesInCircle {
-
-    @BeforeEach
-    void setup() {
-      Circle please = makeMe.aCircle().hasMember(user).please();
-      makeMe.aNote().inCircle(please).please();
-      makeMe.refresh(user);
-    }
-
     @Test
     void shouldNotBeRecalled() {
+      Circle circle = makeMe.aCircle().hasMember(user).please();
+      makeMe.aNote().inCircle(circle).please();
+      makeMe.refresh(user);
+
       assertThat(getNextNoteToAssimilate(assimilationService), is(nullValue()));
     }
   }

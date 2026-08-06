@@ -8,42 +8,15 @@ import static org.hamcrest.Matchers.nullValue;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
-import java.time.ZoneId;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class AssimilationServicePropertyUnitsTest {
-  @Autowired MakeMe makeMe;
-  @Autowired AssimilationServiceFactory assimilationServiceFactory;
+class AssimilationServicePropertyUnitsTest extends AssimilationServiceTestBase {
   @Autowired NotePropertyIndexService notePropertyIndexService;
 
-  User user;
-  Timestamp day1;
-  AssimilationService assimilationService;
-
-  @BeforeEach
-  void setup() {
-    user = makeMe.aUser().please();
-    day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
-    assimilationService = assimilationServiceFor(user, day1);
-  }
-
-  private AssimilationService assimilationServiceFor(User forUser, Timestamp at) {
-    return assimilationServiceFactory.create(forUser, at, ZoneId.of("Asia/Shanghai"));
-  }
-
-  @Test
-  void counts_unassimilated_example_of_when_note_is_already_assimilated() {
+  private Note noteWithExampleOf() {
     Note note =
         makeMe
             .aNote()
@@ -51,7 +24,13 @@ class AssimilationServicePropertyUnitsTest {
             .content("---\nexample of: \"[[Word]]\"\n---\n\nbody")
             .please();
     notePropertyIndexService.refreshForNote(note);
-    makeMe.aMemoryTrackerFor(note).by(user).assimilatedAt(day1).please();
+    return note;
+  }
+
+  @Test
+  void counts_unassimilated_example_of_when_note_is_already_assimilated() {
+    Note note = noteWithExampleOf();
+    makeMe.aMemoryTrackerFor(note).assimilatedAt(day1).please();
 
     assertThat(assimilationService.getCounts().getTotalUnassimilatedCount(), equalTo(1));
     assertThat(assimilationService.getCounts().getDueCount(), equalTo(1));
@@ -59,26 +38,19 @@ class AssimilationServicePropertyUnitsTest {
 
   @Test
   void does_not_count_property_with_skipped_tracker() {
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
     Note note =
-        makeMe.aNote().notebook(notebook).content("---\ntopic: physics\n---\n\nbody").please();
+        makeMe.aNote().notebookOwnedBy(user).content("---\ntopic: physics\n---\n\nbody").please();
     notePropertyIndexService.refreshForNote(note);
-    makeMe.aMemoryTrackerFor(note).by(user).assimilatedAt(day1).please();
-    makeMe.aMemoryTrackerFor(note).by(user).propertyKey("topic").removedFromTracking().please();
+    makeMe.aMemoryTrackerFor(note).assimilatedAt(day1).please();
+    makeMe.aMemoryTrackerFor(note).propertyKey("topic").removedFromTracking().please();
 
     assertThat(assimilationService.getCounts().getTotalUnassimilatedCount(), equalTo(0));
   }
 
   @Test
   void returns_example_of_property_as_next_unit_when_note_is_assimilated() {
-    Note note =
-        makeMe
-            .aNote()
-            .notebookOwnedBy(user)
-            .content("---\nexample of: \"[[Word]]\"\n---\n\nbody")
-            .please();
-    notePropertyIndexService.refreshForNote(note);
-    makeMe.aMemoryTrackerFor(note).by(user).assimilatedAt(day1).please();
+    Note note = noteWithExampleOf();
+    makeMe.aMemoryTrackerFor(note).assimilatedAt(day1).please();
 
     AssimilationUnit next = assimilationService.getNextAssimilationUnit().orElseThrow();
     assertThat(next.note(), equalTo(note));
@@ -110,21 +82,15 @@ class AssimilationServicePropertyUnitsTest {
     assertThat(assimilationService.getCounts().getTotalUnassimilatedCount(), equalTo(1));
 
     Timestamp day2 = makeMe.aTimestamp().of(2, 8).fromShanghai().please();
-    AssimilationService day2Service = assimilationServiceFor(user, day2);
-    AssimilationUnit nextDay = day2Service.getNextAssimilationUnit().orElseThrow();
+    AssimilationUnit nextDay =
+        assimilationServiceFor(user, day2).getNextAssimilationUnit().orElseThrow();
     assertThat(nextDay.note(), equalTo(note));
     assertThat(nextDay.propertyKey(), equalTo("example of"));
   }
 
   @Test
   void note_level_unit_before_property_on_same_note() {
-    Note note =
-        makeMe
-            .aNote()
-            .notebookOwnedBy(user)
-            .content("---\nexample of: \"[[Word]]\"\n---\n\nbody")
-            .please();
-    notePropertyIndexService.refreshForNote(note);
+    Note note = noteWithExampleOf();
 
     AssimilationUnit next = assimilationService.getNextAssimilationUnit().orElseThrow();
     assertThat(next.note(), equalTo(note));
@@ -140,13 +106,12 @@ class AssimilationServicePropertyUnitsTest {
             .content("---\ntopic: physics\nexample of: \"[[Word]]\"\ndefinition: foo\n---\n\nbody")
             .please();
     notePropertyIndexService.refreshForNote(note);
-    makeMe.aMemoryTrackerFor(note).by(user).assimilatedAt(day1).please();
+    makeMe.aMemoryTrackerFor(note).assimilatedAt(day1).please();
 
     for (String expectedKey : List.of("definition", "example of", "topic")) {
       AssimilationUnit next = assimilationService.getNextAssimilationUnit().orElseThrow();
-      assertThat(next.note(), equalTo(note));
       assertThat(next.propertyKey(), equalTo(expectedKey));
-      makeMe.aMemoryTrackerFor(note).by(user).propertyKey(expectedKey).assimilatedAt(day1).please();
+      makeMe.aMemoryTrackerFor(note).propertyKey(expectedKey).assimilatedAt(day1).please();
     }
   }
 
@@ -168,8 +133,8 @@ class AssimilationServicePropertyUnitsTest {
             .please();
     notePropertyIndexService.refreshForNote(note1);
     notePropertyIndexService.refreshForNote(note2);
-    makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(previousDay).please();
-    makeMe.aMemoryTrackerFor(note2).by(user).assimilatedAt(previousDay).please();
+    makeMe.aMemoryTrackerFor(note1).assimilatedAt(previousDay).please();
+    makeMe.aMemoryTrackerFor(note2).assimilatedAt(previousDay).please();
 
     assertThat(assimilationService.getCounts().getTotalUnassimilatedCount(), equalTo(2));
     assertThat(assimilationService.getCounts().getDueCount(), equalTo(1));

@@ -70,7 +70,7 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
     void whenThereIsOneRecalledNotesForUser(
         Integer recallDone, Integer recallDay, Boolean expectedToRepeat) {
       MemoryTracker memoryTracker =
-          makeMe.aMemoryTrackerFor(note).by(user).afterNthStrictRecall(recallDone).please();
+          makeMe.aMemoryTrackerFor(note).afterNthStrictRecall(recallDone).please();
       MemoryTracker mostUrgentMemoryTracker =
           getOneMemoryTrackerNeedToRepeat(daysAfterBase(memoryTracker, recallDay));
       assertThat(mostUrgentMemoryTracker != null, is(expectedToRepeat));
@@ -87,7 +87,7 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
       })
       void atHourInTheNextDay(
           Integer lastRepeatHour, Integer currentHour, Boolean expectedToRepeat) {
-        MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
+        MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
         memoryTracker.setNextRecallAt(
             makeMe.aTimestamp().of(2, lastRepeatHour).fromShanghai().please());
         final Timestamp timestamp = makeMe.aTimestamp().of(2, currentHour).fromShanghai().please();
@@ -108,7 +108,7 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
       void aMemoryTrackerHasBeenRecalledStrictly(
           int ntimes, Integer daysDelay, float expectedForgettingCurveIndex) {
         MemoryTracker memoryTracker =
-            makeMe.aMemoryTrackerFor(note).by(user).afterNthStrictRecall(ntimes).please();
+            makeMe.aMemoryTrackerFor(note).afterNthStrictRecall(ntimes).please();
         Timestamp currentUTCTimestamp =
             TimestampOperations.addHoursToTimestamp(
                 memoryTracker.getNextRecallAt(), daysDelay * 24);

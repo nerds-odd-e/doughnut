@@ -37,6 +37,12 @@ class AssimilationControllerTests extends ControllerTestBase {
     return request;
   }
 
+  AssimilationRequestDTO assimilatePropertyRequest(Note note, String propertyKey) {
+    AssimilationRequestDTO request = assimilateRequest(note);
+    request.propertyKey = propertyKey;
+    return request;
+  }
+
   @Nested
   class Next {
     @Test
@@ -138,6 +144,62 @@ class AssimilationControllerTests extends ControllerTestBase {
 
       assertThat(result, hasSize(1));
       assertThat(result.get(0).getSpelling(), equalTo(true));
+    }
+
+    @Test
+    void shouldSetAssimilatedAtAndLastRecalledAt() {
+      Timestamp now = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
+      testabilitySettings.timeTravelTo(now);
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+
+      MemoryTracker tracker = controller.assimilate(assimilateRequest(note)).get(0);
+
+      assertThat(tracker.getAssimilatedAt(), equalTo(now));
+      assertThat(tracker.getLastRecalledAt(), equalTo(now));
+    }
+
+    @Test
+    void shouldCreatePropertyTrackerWhenPropertyKeyProvided() {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+
+      List<MemoryTracker> result =
+          controller.assimilate(assimilatePropertyRequest(note, "a part of"));
+
+      assertThat(result, hasSize(1));
+      assertThat(result.get(0).getPropertyKey(), equalTo("a part of"));
+      assertThat(result.get(0).getSpelling(), equalTo(false));
+    }
+
+    @Test
+    void shouldCreatePropertyTrackerRemovedFromTrackingWhenSkipMemoryTracking() {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      AssimilationRequestDTO request = assimilatePropertyRequest(note, "a part of");
+      request.skipMemoryTracking = true;
+
+      assertThat(controller.assimilate(request).get(0).getRemovedFromTracking(), equalTo(true));
+    }
+
+    @Test
+    void shouldReturnEmptyWhenPropertyTrackerAlreadyExists() {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      AssimilationRequestDTO request = assimilatePropertyRequest(note, "a part of");
+      controller.assimilate(request);
+
+      assertThat(controller.assimilate(request), empty());
+      assertThat(
+          memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), note.getId()),
+          hasSize(1));
+    }
+
+    @Test
+    void shouldCoexistNoteLevelAndPropertyTrackersOnSameNote() {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      controller.assimilate(assimilateRequest(note));
+      controller.assimilate(assimilatePropertyRequest(note, "a part of"));
+
+      assertThat(
+          memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), note.getId()),
+          hasSize(2));
     }
   }
 }

@@ -32,7 +32,7 @@ class AssimilationServiceDailyCapTest extends AssimilationServiceTestBase {
 
     @Test
     void shouldNotCountSkippedMemoryTracker() {
-      makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(day1).removedFromTracking().please();
+      makeMe.aMemoryTrackerFor(note1).assimilatedAt(day1).removedFromTracking().please();
       assertThat(getNextNoteToAssimilate(assimilationService), is(note2));
     }
 
@@ -44,62 +44,53 @@ class AssimilationServiceDailyCapTest extends AssimilationServiceTestBase {
 
     @Test
     void theDailyCountShouldNotBeResetOnSameDayDifferentHour() {
-      makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(day1).please();
+      makeMe.aMemoryTrackerFor(note1).assimilatedAt(day1).please();
       Timestamp day1_23 = makeMe.aTimestamp().of(1, 23).fromShanghai().please();
-      AssimilationService recallService = assimilationServiceFor(user, day1_23);
-      assertThat(getNextNoteToAssimilate(recallService), equalTo(note2));
-      assertThat(recallService.getCounts().getDueCount(), equalTo(0));
+      AssimilationService day1Evening = assimilationServiceFor(user, day1_23);
+      assertThat(getNextNoteToAssimilate(day1Evening), equalTo(note2));
+      assertThat(day1Evening.getCounts().getDueCount(), equalTo(0));
     }
 
     @Test
     void theDailyCountShouldBeResetOnNextDay() {
-      makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(day1).please();
+      makeMe.aMemoryTrackerFor(note1).assimilatedAt(day1).please();
       Timestamp day2 = makeMe.aTimestamp().of(2, 1).fromShanghai().please();
-      AssimilationService recallService = assimilationServiceFor(user, day2);
-      assertThat(getNextNoteToAssimilate(recallService), equalTo(note2));
+      assertThat(getNextNoteToAssimilate(assimilationServiceFor(user, day2)), equalTo(note2));
     }
   }
 
   @Nested
   class WhenRecalledMoreThanDailyLimitLastNight {
-    Note note1;
-    Note note2;
-    Note note3;
-    AssimilationService earlyMorningService;
-    Timestamp earlyMorning;
-    Timestamp lateMorning;
+    AssimilationService lateMorningService;
 
     @BeforeEach
     void setup() {
       makeMe.theUser(user).dailyAssimilationCount(2).please();
-      User anotherUser = makeMe.aUser().please();
-      Notebook topNb = makeMe.aNotebook().creatorAndOwner(anotherUser).please();
-      note1 = makeMe.aNote().notebook(topNb).please();
-      note2 = makeMe.aNote().notebook(topNb).please();
-      note3 = makeMe.aNote().notebook(topNb).please();
+      User notebookOwner = makeMe.aUser().please();
+      Notebook topNb = makeMe.aNotebook().creatorAndOwner(notebookOwner).please();
+      Note note1 = makeMe.aNote().notebook(topNb).please();
+      Note note2 = makeMe.aNote().notebook(topNb).please();
+      Note note3 = makeMe.aNote().notebook(topNb).please();
       makeMe.aNote().notebook(topNb).please();
 
       makeMe.aSubscription().forNotebook(topNb).forUser(user).daily(1).please();
-
-      Notebook userNb = makeMe.aNotebook().creatorAndOwner(user).please();
-      makeMe.aNote().notebook(userNb).please();
-
+      makeMe.aNote().notebookOwnedBy(user).please();
       makeMe.refresh(user);
 
-      earlyMorning = makeMe.aTimestamp().of(1, 6).fromShanghai().please();
-      lateMorning = makeMe.aTimestamp().of(1, 10).fromShanghai().please();
+      Timestamp earlyMorning = makeMe.aTimestamp().of(1, 6).fromShanghai().please();
+      Timestamp lateMorning = makeMe.aTimestamp().of(1, 10).fromShanghai().please();
 
       makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(earlyMorning).please();
       makeMe.aMemoryTrackerFor(note2).by(user).assimilatedAt(earlyMorning).please();
       makeMe.aMemoryTrackerFor(note3).by(user).assimilatedAt(earlyMorning).please();
 
-      earlyMorningService = assimilationServiceFor(user, lateMorning);
+      lateMorningService = assimilationServiceFor(user, lateMorning);
     }
 
     @Test
     void returnsNextNoteWithZeroDueCountWhenUserDailyPlanComplete() {
-      assertThat(earlyMorningService.getNextNoteToAssimilate().isPresent(), is(true));
-      assertThat(earlyMorningService.getCounts().getDueCount(), equalTo(0));
+      assertThat(lateMorningService.getNextNoteToAssimilate().isPresent(), is(true));
+      assertThat(lateMorningService.getCounts().getDueCount(), equalTo(0));
     }
   }
 }
