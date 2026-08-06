@@ -1,15 +1,13 @@
 import NotebooksPageView from "@/pages/NotebooksPageView.vue"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import { NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY } from "@/composables/useNoteSidebarPeerSort"
 import helper from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
+import { clearNotebooksPageStorage } from "./notebooksPageTestSupport"
 
 describe("filter", () => {
   beforeEach(() => {
-    localStorage.removeItem("doughnut.notebooksPage.sortOrder")
-    localStorage.removeItem("doughnut.notebooksPage.layout")
-    sessionStorage.removeItem(NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY)
+    clearNotebooksPageStorage()
   })
 
   it("focuses the filter input when the catalog has notebooks", async () => {

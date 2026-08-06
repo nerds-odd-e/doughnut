@@ -1,25 +1,20 @@
-import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
-import NotebooksPage from "@/pages/NotebooksPage.vue"
 import { beforeEach, describe, expect, it } from "vitest"
-import makeMe, {
-  type NotebookCatalogEntry,
-} from "doughnut-test-fixtures/makeMe"
-import { NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY } from "@/composables/useNoteSidebarPeerSort"
-import helper, { mockSdkService } from "@tests/helpers"
-import { flushPromises } from "@vue/test-utils"
+import makeMe from "doughnut-test-fixtures/makeMe"
+import {
+  catalogHeadingTexts,
+  clearNotebooksPageStorage,
+  emitNotebookUpdated,
+  mockMyNotebooks,
+  mountNotebooksPage,
+} from "./notebooksPageTestSupport"
 
-describe("notebook updates", () => {
+describe("notebook updates for grouped catalog", () => {
   beforeEach(() => {
-    localStorage.removeItem("doughnut.notebooksPage.sortOrder")
-    localStorage.removeItem("doughnut.notebooksPage.layout")
-    sessionStorage.removeItem(NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY)
+    clearNotebooksPageStorage()
   })
 
-  it("patches grouped notebook in catalogItems when notebook-updated fires", async () => {
-    const member = {
-      ...makeMe.aNotebook.please(),
-      name: "Member Title",
-    }
+  it("patches grouped notebook title when notebook-updated fires", async () => {
+    const member = makeMe.aNotebook.title("Member Title").please()
     const catalogItems = [
       makeMe.notebookCatalogGroup
         .id(1)
@@ -29,67 +24,37 @@ describe("notebook updates", () => {
         .please(),
     ]
 
-    mockSdkService(NotebookController, "myNotebooks", {
+    mockMyNotebooks({
       notebooks: [{ notebook: member }],
       catalogItems,
-      subscriptions: [],
     })
 
-    const wrapper = helper
-      .component(NotebooksPage)
-      .withCurrentUser(makeMe.aUser.please())
-      .withRouter()
-      .mount()
+    const wrapper = await mountNotebooksPage()
+    await emitNotebookUpdated(wrapper, { ...member, name: "Renamed Member" })
 
-    await flushPromises()
-
-    const vm = wrapper.vm as unknown as {
-      catalogItems: NotebookCatalogEntry[] | undefined
-    }
-
-    const updated = { ...member, name: "Renamed Member" }
-    const buttons = wrapper.findComponent({ name: "NotebookButtons" })
-    buttons.vm.$emit("notebook-updated", updated)
-    await flushPromises()
-
-    const grp = vm.catalogItems?.[0]
-    expect(grp?.type).toBe("notebookGroup")
-    if (grp?.type === "notebookGroup") {
-      expect(grp.notebooks[0]?.notebook.name).toBe("Renamed Member")
-    }
+    expect(catalogHeadingTexts(wrapper)).toContain("Renamed Member")
   })
 
   it("preserves hasAttachedBook when notebook-updated payload omits it", async () => {
-    const notebookEntity = { ...makeMe.aNotebook.please(), name: "T" }
-    const updatedNotebook = { ...notebookEntity, name: "Updated" }
+    const notebookEntity = makeMe.aNotebook.title("T").please()
 
-    mockSdkService(NotebookController, "myNotebooks", {
+    mockMyNotebooks({
       notebooks: [{ notebook: notebookEntity, hasAttachedBook: true }],
-      catalogItems: makeMe.notebookCatalog
-        .notebooks({ ...notebookEntity, hasAttachedBook: true })
-        .please(),
-      subscriptions: [],
     })
 
-    const wrapper = helper
-      .component(NotebooksPage)
-      .withCurrentUser(makeMe.aUser.please())
-      .withRouter()
-      .mount()
+    const wrapper = await mountNotebooksPage()
+    expect(
+      wrapper.find('[data-testid="notebook-catalog-read-book"]').exists()
+    ).toBe(true)
 
-    await flushPromises()
+    await emitNotebookUpdated(wrapper, {
+      ...notebookEntity,
+      name: "Updated",
+    })
 
-    const vm = wrapper.vm as unknown as {
-      catalogItems: NotebookCatalogEntry[] | undefined
-    }
-
-    const notebookButtons = wrapper.findComponent({ name: "NotebookButtons" })
-    notebookButtons.vm.$emit("notebook-updated", updatedNotebook)
-    await flushPromises()
-
-    if (vm.catalogItems?.[0]?.type === "notebook") {
-      expect(vm.catalogItems[0].hasAttachedBook).toBe(true)
-      expect(vm.catalogItems[0].notebook.name).toBe("Updated")
-    }
+    expect(
+      wrapper.find('[data-testid="notebook-catalog-read-book"]').exists()
+    ).toBe(true)
+    expect(catalogHeadingTexts(wrapper)).toContain("Updated")
   })
 })

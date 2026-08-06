@@ -2,6 +2,7 @@ import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { wrapSdkResponse } from "@tests/helpers"
 import { beforeEach, describe, it, expect, vi } from "vitest"
+import { flushPromises } from "@vue/test-utils"
 import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDebounceTestSupport"
 import {
   hideSidebarButtonEl,
@@ -16,18 +17,13 @@ describe("NotebookPage.spec", () => {
     await notebookPageRouter.push("/")
   })
 
-  it("shows New note in main column when sidebar is hidden", async () => {
+  it("shows New note in the main column", async () => {
     const notebook = makeMe.aNotebook.please()
     const { wrapper } = await mountNotebookPageReady(notebook)
 
     const hideSidebar = hideSidebarButtonEl()
-    if (hideSidebar != null) {
-      expect(
-        wrapper.find('[data-testid="note-main-creation-toolbar"]').exists()
-      ).toBe(false)
-      await hideSidebar.click()
-      await wrapper.vm.$nextTick()
-    }
+    await hideSidebar?.click()
+    await flushPromises()
 
     expect(
       wrapper.find('[data-testid="note-main-creation-toolbar"]').exists()

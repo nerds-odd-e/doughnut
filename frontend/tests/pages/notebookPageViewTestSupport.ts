@@ -35,8 +35,10 @@ export function mountNotebookPageView(
 }
 
 export function aNotebook(overrides: Partial<Notebook> = {}): Notebook {
-  return {
-    ...makeMe.aNotebook.please(),
-    ...overrides,
-  }
+  const { name, ...rest } = overrides
+  const notebook =
+    name === undefined
+      ? makeMe.aNotebook.please()
+      : makeMe.aNotebook.title(name).please()
+  return { ...notebook, ...rest }
 }

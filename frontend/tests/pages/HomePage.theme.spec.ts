@@ -36,7 +36,6 @@ describe("HomePage backgrounds follow bright/dark theme", () => {
       .withCurrentUser(makeMe.aUser.please())
       .mount({
         attachTo: document.body,
-        global: { stubs: { GlobalBar: true } },
       })
 
     const upperHalf = wrapper.find(".upper-half").element

@@ -6,7 +6,7 @@ import helper, { mockSdkService } from "@tests/helpers"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 
-describe("circle show page", () => {
+describe("NotebookMoveForm", () => {
   const notebook = makeMe.aNotebook.please()
   const circle1 = makeMe.aCircle.please()
   const circle2 = makeMe.aCircle.please()

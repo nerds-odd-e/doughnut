@@ -1,5 +1,4 @@
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
-import SeamlessTextEditor from "@/components/form/SeamlessTextEditor.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { wrapSdkResponse } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
@@ -88,9 +87,10 @@ describe("NotebookPageView settings", () => {
     await wrapper
       .get('[data-testid="notebook-page-name-edit"]')
       .trigger("click")
-    wrapper
-      .findComponent(SeamlessTextEditor)
-      .vm.$emit("update:modelValue", "Edited title")
+    const nameInput = wrapper.find('[data-test="notebook-page-name-input"]')
+      .element as HTMLElement
+    nameInput.innerText = "Edited title"
+    nameInput.dispatchEvent(new Event("input", { bubbles: true }))
     await flushPromises()
     await wrapper
       .get('[data-testid="notebook-page-name-update"]')

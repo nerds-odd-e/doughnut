@@ -2,10 +2,13 @@ import NotebooksPageView from "@/pages/NotebooksPageView.vue"
 import { beforeEach, describe, expect, it } from "vitest"
 import { RouterLink } from "vue-router"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import { NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY } from "@/composables/useNoteSidebarPeerSort"
 import helper from "@tests/helpers"
 import { fireEvent } from "@testing-library/vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
+import {
+  catalogHeadingTexts,
+  clearNotebooksPageStorage,
+} from "./notebooksPageTestSupport"
 
 async function pickNotebookCatalogPeerSort(
   wrapper: VueWrapper,
@@ -24,9 +27,7 @@ async function pickNotebookCatalogPeerSort(
 
 describe("catalog list", () => {
   beforeEach(() => {
-    localStorage.removeItem("doughnut.notebooksPage.sortOrder")
-    localStorage.removeItem("doughnut.notebooksPage.layout")
-    sessionStorage.removeItem(NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY)
+    clearNotebooksPageStorage()
   })
 
   it("sorts catalog by title A–Z by default (list layout)", async () => {
@@ -49,8 +50,7 @@ describe("catalog list", () => {
 
     await flushPromises()
 
-    const headingTexts = wrapper.findAll("h3, h5").map((w) => w.text())
-    expect(headingTexts).toEqual([
+    expect(catalogHeadingTexts(wrapper)).toEqual([
       "Bottom Loose",
       "Middle Group",
       "Inside One",
@@ -79,8 +79,7 @@ describe("catalog list", () => {
     await flushPromises()
     await pickNotebookCatalogPeerSort(wrapper, "title", "desc")
 
-    const headingTexts = wrapper.findAll("h3, h5").map((w) => w.text())
-    expect(headingTexts).toEqual([
+    expect(catalogHeadingTexts(wrapper)).toEqual([
       "Top Loose",
       "Middle Group",
       "Inside One",
@@ -135,8 +134,7 @@ describe("catalog list", () => {
     await pickNotebookCatalogPeerSort(wrapper, "title", "desc")
     await pickNotebookCatalogPeerSort(wrapper, "title", "asc")
 
-    const headingTexts = wrapper.findAll("h3, h5").map((w) => w.text())
-    expect(headingTexts).toEqual([
+    expect(catalogHeadingTexts(wrapper)).toEqual([
       "Bottom Loose",
       "Middle Group",
       "Inside One",
@@ -162,8 +160,7 @@ describe("catalog list", () => {
 
     await flushPromises()
 
-    const headingTexts = wrapper.findAll("h3, h5").map((w) => w.text())
-    expect(headingTexts).toEqual(["My Group", "Alpha", "Zebra"])
+    expect(catalogHeadingTexts(wrapper)).toEqual(["My Group", "Alpha", "Zebra"])
   })
 
   it("shows member hint for groups with many notebooks", async () => {
@@ -226,9 +223,12 @@ describe("catalog list", () => {
 
     await flushPromises()
 
-    const groupCard = wrapper.get('[data-cy="notebook-group-card"]')
-    const headerRouterLink = groupCard.findAllComponents(RouterLink)[0]
-    expect(headerRouterLink.props("to")).toEqual({
+    expect(
+      wrapper
+        .get('[data-cy="notebook-group-card"]')
+        .findComponent(RouterLink)
+        .props("to")
+    ).toEqual({
       name: "notebookGroup",
       params: { groupId: 42 },
     })

@@ -1,21 +1,11 @@
 import { ConversationMessageController } from "@generated/doughnut-backend-api/sdk.gen"
 import MessageCenterPage from "@/pages/MessageCenterPage.vue"
+import routes from "@/routes/routes"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import helper, { mockSdkService } from "@tests/helpers"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
-
-const { mockedPush } = vi.hoisted(() => ({ mockedPush: vi.fn() }))
-
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRouter: () => ({
-      push: mockedPush,
-    }),
-  }
-})
+import { createMemoryHistory, createRouter } from "vue-router"
 
 describe("MessageCenterPage", () => {
   it("fetch API to be called ONCE on mount", async () => {
@@ -26,6 +16,7 @@ describe("MessageCenterPage", () => {
     )
     helper
       .component(MessageCenterPage)
+      .withRouter()
       .withCleanStorage()
       .withProps({})
       .render()
@@ -41,6 +32,7 @@ describe("MessageCenterPage", () => {
     )
     helper
       .component(MessageCenterPage)
+      .withRouter()
       .withCleanStorage()
       .withProps({})
       .render()
@@ -54,7 +46,6 @@ describe("MessageCenterPage", () => {
       makeMe.aConversationListItem.please(),
     ]
     beforeEach(() => {
-      vi.clearAllMocks()
       mockSdkService(
         ConversationMessageController,
         "getConversationsOfCurrentUser",
@@ -75,6 +66,7 @@ describe("MessageCenterPage", () => {
     it("should highlight the selected conversation", async () => {
       helper
         .component(MessageCenterPage)
+        .withRouter()
         .withCleanStorage()
         .withProps({ conversationId: conversations[1]?.id })
         .render()
@@ -87,8 +79,14 @@ describe("MessageCenterPage", () => {
     })
 
     it("should navigate when conversation clicked", async () => {
+      const router = createRouter({
+        history: createMemoryHistory(),
+        routes,
+      })
+      const pushSpy = vi.spyOn(router, "push")
       helper
         .component(MessageCenterPage)
+        .withRouter(router)
         .withCleanStorage()
         .withProps({})
         .render()
@@ -99,7 +97,7 @@ describe("MessageCenterPage", () => {
       await (items[0] as HTMLElement).click()
       await flushPromises()
 
-      expect(mockedPush).toHaveBeenCalledWith({
+      expect(pushSpy).toHaveBeenCalledWith({
         name: "messageCenter",
         params: { conversationId: conversations[0]?.id },
       })

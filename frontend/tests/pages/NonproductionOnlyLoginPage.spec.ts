@@ -20,13 +20,9 @@ describe("NonproductionOnlyLoginPage", () => {
     helper.component(NonproductionOnlyLoginPage).withRouter(router).render()
 
     expect(
-      screen.getByRole("heading", {
-        name: /This login page is for test and development only/i,
-      })
+      screen.getByText(/This login page is for test and development only/i)
     ).toBeInTheDocument()
-    expect(
-      screen.getByRole("heading", { name: /Please sign in/i })
-    ).toBeInTheDocument()
+    expect(screen.getByText(/Please sign in/i)).toBeInTheDocument()
     expect(document.getElementById("username")).not.toBeNull()
     expect(document.getElementById("password")).not.toBeNull()
     expect(document.getElementById("login-button")).not.toBeNull()

@@ -1,27 +1,19 @@
 import NotebooksPageView from "@/pages/NotebooksPageView.vue"
 import { beforeEach, describe, expect, it } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import { NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY } from "@/composables/useNoteSidebarPeerSort"
 import helper from "@tests/helpers"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
+import { clearNotebooksPageStorage } from "./notebooksPageTestSupport"
 
 describe("subscribed notebooks in merged catalog", () => {
   beforeEach(() => {
-    localStorage.removeItem("doughnut.notebooksPage.sortOrder")
-    localStorage.removeItem("doughnut.notebooksPage.layout")
-    sessionStorage.removeItem(NOTE_SIDEBAR_PEER_SORT_STORAGE_KEY)
+    clearNotebooksPageStorage()
   })
 
   it("shows subscription actions for a subscribed member inside a group", async () => {
-    const ownedMember = {
-      ...makeMe.aNotebook.please(),
-      name: "Owned In Group",
-    }
-    const subMember = {
-      ...makeMe.aNotebook.please(),
-      name: "Subscribed In Group",
-    }
+    const ownedMember = makeMe.aNotebook.title("Owned In Group").please()
+    const subMember = makeMe.aNotebook.title("Subscribed In Group").please()
     const catalogItems = [
       makeMe.notebookCatalogGroup
         .id(1)
@@ -52,12 +44,11 @@ describe("subscribed notebooks in merged catalog", () => {
 
     await flushPromises()
 
-    const unsubButtons = wrapper.findAll('button[title="Unsubscribe"]')
-    expect(unsubButtons.length).toBe(1)
+    expect(wrapper.findAll('button[title="Unsubscribe"]')).toHaveLength(1)
     const subMemberCard = wrapper
       .findAll('[data-cy="notebook-card"]')
       .find((c) => c.text().includes("Subscribed In Group"))
-    expect(subMemberCard?.exists()).toBe(true)
+    expect(subMemberCard).toBeDefined()
     await fireEvent.click(
       subMemberCard!.get('[data-cy="notebook-catalog-overflow"]').element
     )

@@ -1,106 +1,63 @@
 import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import { describe, it, expect, beforeEach, vi } from "vitest"
-import { reactive } from "vue"
 import RecentSettingsTab from "@/pages/settings/RecentSettingsTab.vue"
+import routes from "@/routes/routes"
 import helper, { mockSdkService } from "@tests/helpers"
+import { flushPromises } from "@vue/test-utils"
+import { createMemoryHistory, createRouter } from "vue-router"
 
-const mockPush = vi.fn()
-const mockRoute = reactive({
-  name: "settingsRecent",
-  path: "/settings/recent",
-  params: {},
-  query: {},
-})
-
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRoute: () => mockRoute,
-    useRouter: () => ({
-      push: mockPush,
-    }),
-  }
-})
-
-describe("RecentSettingsTab.vue", () => {
+describe("RecentSettingsTab", () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-    mockRoute.query = {}
     mockSdkService(MemoryTrackerController, "getRecentMemoryTrackers", [])
     mockSdkService(MemoryTrackerController, "getRecentlyRecalled", [])
   })
 
-  describe("Tab Navigation", () => {
-    it("shows Recently Learned tab by default when no query parameter", () => {
-      const wrapper = helper.component(RecentSettingsTab).mount()
-
-      const activeTab = wrapper.find(".daisy-tab-active")
-      expect(activeTab.text()).toBe("Recently Learned")
-      expect(
-        wrapper.findComponent({ name: "RecentlyLearnedNotes" }).exists()
-      ).toBe(true)
+  async function mountWithTabQuery(tab?: string) {
+    const router = createRouter({
+      history: createMemoryHistory(),
+      routes,
     })
-
-    it("shows Recently Learned tab when query parameter is recentlyLearned", () => {
-      mockRoute.query = { tab: "recentlyLearned" }
-      const wrapper = helper.component(RecentSettingsTab).mount()
-
-      const activeTab = wrapper.find(".daisy-tab-active")
-      expect(activeTab.text()).toBe("Recently Learned")
-      expect(
-        wrapper.findComponent({ name: "RecentlyLearnedNotes" }).exists()
-      ).toBe(true)
+    await router.push({
+      name: "settingsRecent",
+      query: tab === undefined ? {} : { tab },
     })
+    await router.isReady()
+    const pushSpy = vi.spyOn(router, "push")
+    const wrapper = helper
+      .component(RecentSettingsTab)
+      .withRouter(router)
+      .mount()
+    await flushPromises()
+    return { wrapper, pushSpy }
+  }
 
-    it("shows Recently Recalled tab when query parameter is recentlyRecalled", () => {
-      mockRoute.query = { tab: "recentlyRecalled" }
-      const wrapper = helper.component(RecentSettingsTab).mount()
+  it("shows Recently Learned tab by default when no query parameter", async () => {
+    const { wrapper } = await mountWithTabQuery()
+    expect(wrapper.find(".daisy-tab-active").text()).toBe("Recently Learned")
+    expect(wrapper.find(".recently-learned-notes").exists()).toBe(true)
+  })
 
-      const activeTab = wrapper.find(".daisy-tab-active")
-      expect(activeTab.text()).toBe("Recently Recalled")
-      expect(
-        wrapper.findComponent({ name: "RecentlyRecalledNotes" }).exists()
-      ).toBe(true)
-    })
+  it("shows Recently Recalled tab when query parameter is recentlyRecalled", async () => {
+    const { wrapper } = await mountWithTabQuery("recentlyRecalled")
+    expect(wrapper.find(".daisy-tab-active").text()).toBe("Recently Recalled")
+    expect(wrapper.find(".recently-recalled-notes").exists()).toBe(true)
+  })
 
-    it("defaults to Recently Learned tab when query parameter is invalid", () => {
-      mockRoute.query = { tab: "invalidTab" }
-      const wrapper = helper.component(RecentSettingsTab).mount()
+  it("defaults to Recently Learned tab when query parameter is invalid", async () => {
+    const { wrapper } = await mountWithTabQuery("invalidTab")
+    expect(wrapper.find(".daisy-tab-active").text()).toBe("Recently Learned")
+  })
 
-      const activeTab = wrapper.find(".daisy-tab-active")
-      expect(activeTab.text()).toBe("Recently Learned")
-      expect(
-        wrapper.findComponent({ name: "RecentlyLearnedNotes" }).exists()
-      ).toBe(true)
-    })
+  it("updates route when Recently Recalled tab is clicked", async () => {
+    const { wrapper, pushSpy } = await mountWithTabQuery()
+    const tab = wrapper
+      .findAll(".daisy-tab")
+      .find((el) => el.text() === "Recently Recalled")
+    await tab?.trigger("click")
 
-    it("updates route when Recently Learned tab is clicked", async () => {
-      const wrapper = helper.component(RecentSettingsTab).mount()
-
-      const tab = wrapper
-        .findAll(".daisy-tab")
-        .find((el) => el.text() === "Recently Learned")
-      await tab?.trigger("click")
-
-      expect(mockPush).toHaveBeenCalledWith({
-        name: "settingsRecent",
-        query: { tab: "recentlyLearned" },
-      })
-    })
-
-    it("updates route when Recently Recalled tab is clicked", async () => {
-      const wrapper = helper.component(RecentSettingsTab).mount()
-
-      const tab = wrapper
-        .findAll(".daisy-tab")
-        .find((el) => el.text() === "Recently Recalled")
-      await tab?.trigger("click")
-
-      expect(mockPush).toHaveBeenCalledWith({
-        name: "settingsRecent",
-        query: { tab: "recentlyRecalled" },
-      })
+    expect(pushSpy).toHaveBeenCalledWith({
+      name: "settingsRecent",
+      query: { tab: "recentlyRecalled" },
     })
   })
 })

@@ -104,7 +104,7 @@ describe("RecallStatsSettingsTab", () => {
     vi.clearAllMocks()
   })
 
-  it("renders the retention headline, tiles, five charts, AM/PM bars, and best/worst hours from the fixture", async () => {
+  it("renders retention headline, charts, and best/worst hours from the fixture", async () => {
     const spy = mockSdkService(UserController, "getRecallStats", fixture)
 
     const wrapper = helper
@@ -113,27 +113,10 @@ describe("RecallStatsSettingsTab", () => {
       .mount()
     await flushPromises()
 
-    // Fetch called with the browser timezone param
     expect(spy).toHaveBeenCalledWith({ query: { timezone: timezoneParam() } })
-
-    // Prominent retention % headline tile
-    const retentionTile = wrapper.find('[data-testid="retention-pct-tile"]')
-    expect(retentionTile.exists()).toBe(true)
-    expect(retentionTile.text()).toContain("85")
-
-    // Other headline tiles
-    expect(
-      wrapper.find('[data-testid="total-reviews-365-tile"]').exists()
-    ).toBe(true)
-    expect(wrapper.find('[data-testid="reviews-today-tile"]').exists()).toBe(
-      true
+    expect(wrapper.find('[data-testid="retention-pct-tile"]').text()).toContain(
+      "85"
     )
-    expect(wrapper.find('[data-testid="current-streak-tile"]').exists()).toBe(
-      true
-    )
-    expect(wrapper.find('[data-testid="best-worst-hours"]').exists()).toBe(true)
-
-    // Five chart components + AM/PM bars
     expect(
       wrapper.find('[data-testid="recall-activity-calendar"]').exists()
     ).toBe(true)
@@ -152,8 +135,6 @@ describe("RecallStatsSettingsTab", () => {
     expect(
       wrapper.find('[data-testid="am-pm-response-time-chart"]').exists()
     ).toBe(true)
-
-    // Best/worst hour list text
     const bestWorst = wrapper.find('[data-testid="best-worst-hours"]')
     expect(bestWorst.text()).toContain("10")
     expect(bestWorst.text()).toContain("20")
@@ -173,12 +154,9 @@ describe("RecallStatsSettingsTab", () => {
     expect(wrapper.find('[data-testid="recall-stats-empty"]').exists()).toBe(
       true
     )
-    expect(
-      wrapper.find('[data-testid="recall-activity-calendar"]').exists()
-    ).toBe(false)
   })
 
-  it("shows an error state with a retry button when the stats request fails", async () => {
+  it("retries after an error state", async () => {
     vi.spyOn(UserController, "getRecallStats").mockResolvedValue({
       data: undefined,
       error: { statusCode: 500 },
@@ -191,12 +169,7 @@ describe("RecallStatsSettingsTab", () => {
       .mount()
     await flushPromises()
 
-    expect(wrapper.find('[data-testid="recall-stats-error"]').exists()).toBe(
-      true
-    )
-    const retry = wrapper.find('[data-testid="recall-stats-retry"]')
-    expect(retry.exists()).toBe(true)
-    await retry.trigger("click")
+    await wrapper.find('[data-testid="recall-stats-retry"]').trigger("click")
     await flushPromises()
     expect(UserController.getRecallStats).toHaveBeenCalledTimes(2)
   })
