@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
@@ -43,17 +42,11 @@ class QuestionGenerationBatchMaintenanceJobTests {
     @Mock QuestionGenerationBatchImportService batchImportService;
     @Mock QuestionGenerationBatchRetentionService retentionService;
 
-    QuestionGenerationBatchMaintenanceService batchMaintenanceService;
-
-    @BeforeEach
-    void setup() {
-      batchMaintenanceService =
-          new QuestionGenerationBatchMaintenanceService(
-              pollingService, outputCollectionService, batchImportService, retentionService);
-    }
-
     @Test
     void shouldPruneTerminalBatchesAfterImport() {
+      QuestionGenerationBatchMaintenanceService batchMaintenanceService =
+          new QuestionGenerationBatchMaintenanceService(
+              pollingService, outputCollectionService, batchImportService, retentionService);
       Timestamp currentTime = new Timestamp(System.currentTimeMillis());
 
       batchMaintenanceService.resumeExistingBatches(currentTime);
@@ -77,17 +70,6 @@ class QuestionGenerationBatchMaintenanceJobTests {
   }
 
   @Test
-  void shouldStillSubmitDueUsersWhenResumeExistingBatchesFails() {
-    doThrow(new RuntimeException("resume failed"))
-        .when(maintenanceService)
-        .resumeExistingBatches(any(Timestamp.class));
-
-    job.runHourlyMaintenance();
-
-    verify(submitDueUsersService).submitDueUsers(any(Timestamp.class));
-  }
-
-  @Test
   void recordsStartedAndFinishedTimestampsForScheduledRuns() {
     job.runHourlyMaintenance();
 
@@ -97,23 +79,20 @@ class QuestionGenerationBatchMaintenanceJobTests {
   }
 
   @Test
-  void recordsResumeErrorWhenResumeFailsAndStillSubmitsDueUsers() {
+  void recordsResumeErrorAndStillSubmitsDueUsersWhenResumeFails() {
     doThrow(new RuntimeException("resume failed"))
         .when(maintenanceService)
         .resumeExistingBatches(any(Timestamp.class));
 
     job.runHourlyMaintenance();
 
-    verify(submitDueUsersService).submitDueUsers(any(Timestamp.class));
     verify(maintenanceRunService).recordError(any(RuntimeException.class));
+    verify(submitDueUsersService).submitDueUsers(any(Timestamp.class));
   }
 
   @Test
   void recordsSubmissionErrorWhenSubmitFails() {
-    doAnswer(
-            invocation -> {
-              throw new RuntimeException("submit failed");
-            })
+    doThrow(new RuntimeException("submit failed"))
         .when(submitDueUsersService)
         .submitDueUsers(any(Timestamp.class));
 

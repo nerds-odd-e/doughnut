@@ -1,6 +1,6 @@
 # Backend unit tests → "small test" style
 
-**Status:** in progress (Phase 23 done)
+**Status:** in progress (Phase 24 done)
 **Type:** test renovation (no product behavior change)
 **Verify each phase:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
 **Style:** `.cursor/rules/unit-testing.mdc` + `.cursor/rules/backend-testing.mdc`
@@ -324,9 +324,15 @@ For each file in the phase file list:
 - **Done when:** rubric applied in place (service boundary OK); suite green.
 
 ### Phase 24 — Services: QuestionGeneration batch (maintenance / admin / concurrency)
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
-- **Files:** remaining `QuestionGenerationBatch*.java` (maintenance, admin status, concurrency, locks, jobs)
+- **Kept (job/pipeline contract; style renovated in place):**
+  - `QuestionGenerationBatchMaintenanceServiceTest` — builders + autowired service; reuse OutputCollectionTestSupport OpenAI fixtures
+  - `QuestionGenerationBatchMaintenanceJobTests` — merged duplicate resume-failure cases; focused orchestration asserts
+  - `QuestionGenerationBatchMaintenanceJobSchedulerLockTest` — already clean (annotation contract)
+  - `QuestionGenerationBatchMaintenanceConcurrencyTest` (+ `ShedLockConfigProdTest`) — already clean (JDBC lock / prod config)
+  - `QuestionGenerationBatchAdminStatusServiceTest` — SpringBootTest + real repos/runs; ScheduledTask mock only for scheduler-active
+- **Exception:** `MaintenanceJobTests` keeps collaborator mocks for job/resume step-order and continue-after-failure orchestration
 - **Done when:** all QGen batch tests renovated; suite green.
 
 ### Phase 25 — Services: nested packages + leftovers
@@ -394,7 +400,8 @@ If a Behavior phase cannot express fixtures concisely:
 | 21 | done | Focus-context retrieval kept at service boundary; capability splits ≤250; `FolderBuilder.notebookOwnedBy`. |
 | 22 | done | QGen planning/eligibility/candidates/schedule/metrics/request-builder: focused asserts + drop redundant `.by`; batch/request MakeMe builders; delete mocked NoCandidateTrackers (real DB via unanswered prompt); overdue/retry parameterized. |
 | 23 | done | QGen submit/poll/import/output/retention/jsonl: builders for manual batch/request fixtures; ImportPayloadSupport; focused sibling deltas; parameterized terminal poll skip; AtomicTestSupport split ≤250. Loop test keeps collaborator mocks (continue-after-failure). |
-| 24–26 | planned | — |
+| 24 | done | QGen maintenance/admin/concurrency/locks/jobs: builders + OutputCollectionTestSupport; AdminStatus → real DB; merge resume-failure job cases; lock/concurrency already clean. JobTests keeps collaborator mocks (orchestration). |
+| 25–26 | planned | — |
 
 ---
 
@@ -427,3 +434,4 @@ If a Behavior phase cannot express fixtures concisely:
 - Phase 20: Wiki/alias/property index + NoteRealm assembly stay service-level (cache/index/DTO contracts beyond HTTP smoke). NoteAutomation/Motion/WikiLinkRewrite folder-move were pure controller duplicates. NoteService restore matching deletedAt timestamps is intentional service contract (controller undo is all-or-nothing via destroy). EmbeddingMaintenanceJobTests keeps NotebookRepository/IndexingService mocks — thin scheduled for-loop, not worth SpringBoot+OpenAI. Named notebooks still needed for qualified wiki links.
 - Phase 22: QGen planning stays at service boundary. Repo-mock NoCandidateTrackers replaced by real DB (answered recall + unanswered non-contested prompt). Batch/request builders for COMPLETED/SUBMITTED/FAILED fixtures. Phase 23 may reuse builders for submit/poll/import manual construction.
 - Phase 23: Reused Phase 22 batch/request builders (+ `importedAt`/`outputCollectedAt`). Collapsed triplicate import success-line JSON into `ImportPayloadSupport`. `SubmitDueUsersServiceLoopTest` collaborator mocks kept for continue-after-failure summary — Phase 26 may revisit if Spring coverage appears.
+- Phase 24: MaintenanceService uses builders + OutputCollectionTestSupport; AdminStatus counts/runs use real DB (ScheduledTask mock only for scheduler-active string match). JobTests/resume-order Nested keep collaborator mocks — Phase 26 sweep. SchedulerLock + JDBC concurrency already domain-stable.

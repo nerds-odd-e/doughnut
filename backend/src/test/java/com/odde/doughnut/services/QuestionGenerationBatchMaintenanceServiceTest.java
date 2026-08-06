@@ -1,5 +1,7 @@
 package com.odde.doughnut.services;
 
+import static com.odde.doughnut.services.QuestionGenerationBatchOutputCollectionTestSupport.completedOpenAiBatch;
+import static com.odde.doughnut.services.QuestionGenerationBatchOutputCollectionTestSupport.successLine;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
@@ -20,7 +22,6 @@ import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
-import com.openai.models.batches.Batch;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
@@ -41,62 +42,46 @@ class QuestionGenerationBatchMaintenanceServiceTest {
   @MockitoBean OpenAiApiHandler openAiApiHandler;
 
   @Autowired MakeMe makeMe;
+  @Autowired QuestionGenerationBatchMaintenanceService maintenanceService;
   @Autowired QuestionGenerationBatchRepository batchRepository;
   @Autowired QuestionGenerationBatchRequestRepository batchRequestRepository;
-  @Autowired QuestionGenerationBatchRowImportService rowImportService;
-  @Autowired QuestionGenerationBatchRetentionService retentionService;
-  @Autowired QuestionGenerationBatchMetrics batchMetrics;
   @Autowired RecallPromptRepository recallPromptRepository;
 
-  User user;
   Timestamp currentTime;
   QuestionGenerationBatch submittedBatch;
   QuestionGenerationBatchRequest request;
-  MCQWithAnswer mcqWithAnswer;
-  QuestionGenerationBatchMaintenanceService maintenanceService;
 
   @BeforeEach
   void setup() {
-    maintenanceService =
-        new QuestionGenerationBatchMaintenanceService(
-            new QuestionGenerationBatchPollingService(
-                batchRepository, openAiApiHandler, batchMetrics),
-            new QuestionGenerationBatchOutputCollectionService(
-                batchRepository, batchRequestRepository, openAiApiHandler, batchMetrics),
-            new QuestionGenerationBatchImportService(
-                batchRepository, batchRequestRepository, rowImportService, batchMetrics),
-            retentionService);
-
-    user = makeMe.aUser().please();
+    User user = makeMe.aUser().please();
     currentTime = makeMe.aTimestamp().please();
 
     Note note = makeMe.aNote().notebookOwnedBy(user).please();
     MemoryTracker memoryTracker =
         makeMe
             .aMemoryTrackerFor(note)
-            .by(user)
             .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(24)))
             .please();
 
-    submittedBatch = new QuestionGenerationBatch();
-    submittedBatch.setUser(user);
-    submittedBatch.setStatus(QuestionGenerationBatchStatus.SUBMITTED);
-    submittedBatch.setPlannedAt(currentTime);
-    submittedBatch.setSubmittedAt(currentTime);
-    submittedBatch.setOpenaiBatchId("batch-openai-1");
-    submittedBatch.setOpenaiInputFileId("file-abc");
-    submittedBatch = batchRepository.saveAndFlush(submittedBatch);
+    submittedBatch =
+        makeMe
+            .aQuestionGenerationBatch()
+            .forUser(user)
+            .submittedInFlight(currentTime)
+            .submittedAt(currentTime)
+            .openaiBatchId("batch-openai-1")
+            .please();
+    makeMe.entityPersister.flush();
 
-    request = new QuestionGenerationBatchRequest();
-    request.setBatch(submittedBatch);
-    request.setMemoryTracker(memoryTracker);
-    request.setContextSeed(42L);
-    request.setCustomId(
-        QuestionGenerationBatchRequest.customIdFor(submittedBatch.getId(), memoryTracker.getId()));
-    request.setStatus(QuestionGenerationBatchRequestStatus.PENDING);
-    batchRequestRepository.saveAndFlush(request);
+    request =
+        makeMe
+            .aQuestionGenerationBatchRequest()
+            .batch(submittedBatch)
+            .memoryTracker(memoryTracker)
+            .please();
+    makeMe.entityPersister.flush();
 
-    mcqWithAnswer =
+    MCQWithAnswer mcqWithAnswer =
         makeMe
             .aMCQWithAnswer()
             .stem("What color is the sky on a clear day?")
@@ -130,24 +115,5 @@ class QuestionGenerationBatchMaintenanceServiceTest {
         recallPromptRepository.findAllByMemoryTracker_IdOrderByIdDesc(
             request.getMemoryTracker().getId());
     assertThat(recallPrompts.size(), is(1));
-  }
-
-  private Batch completedOpenAiBatch() {
-    return Batch.builder()
-        .id("batch-openai-1")
-        .completionWindow("24h")
-        .createdAt(1L)
-        .endpoint("/v1/responses")
-        .inputFileId("file-abc")
-        .outputFileId("file-output")
-        .errorFileId("file-error")
-        .status(Batch.Status.COMPLETED)
-        .build();
-  }
-
-  private String successLine(String customId) {
-    return """
-        {"id":"batch_req_1","custom_id":"%s","response":{"status_code":200,"body":{"id":"resp-1"}},"error":null}"""
-        .formatted(customId);
   }
 }
