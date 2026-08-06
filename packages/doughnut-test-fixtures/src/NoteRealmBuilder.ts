@@ -2,6 +2,7 @@ import type {
   Folder,
   NoteRealm,
   NotebookRealm,
+  WikiTitle,
 } from '@generated/doughnut-backend-api'
 import Builder from './Builder'
 import FolderBuilder from './FolderBuilder'
@@ -65,6 +66,11 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
 
   content(value: string): NoteRealmBuilder {
     this.noteBuilder.content(value)
+    return this
+  }
+
+  wikiTitles(value: WikiTitle[]): NoteRealmBuilder {
+    this.data.wikiTitles = value
     return this
   }
 

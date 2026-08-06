@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest"
-import markdownizer from "@/components/form/markdownizer"
 import { replaceWellFormedWikiLinksWithDisplayPlain } from "@/utils/questionStemWikiPlain"
 
 describe("replaceWellFormedWikiLinksWithDisplayPlain", () => {
@@ -40,15 +39,5 @@ describe("replaceWellFormedWikiLinksWithDisplayPlain", () => {
     expect(replaceWellFormedWikiLinksWithDisplayPlain(md)).toBe(
       `<mark title='Hidden text that is matching the answer'>[...]</mark> uses shown end`
     )
-  })
-
-  it("markdownToHtml still renders mark-wrapped cloze after wiki strip", () => {
-    const md = `<mark title='Hidden text that is matching the answer'>[...]</mark> uses [[T|shown]] end`
-    const html = markdownizer.markdownToHtml(
-      replaceWellFormedWikiLinksWithDisplayPlain(md)
-    )
-    expect(html).toContain("mark")
-    expect(html).toContain("shown")
-    expect(html).not.toContain("[[")
   })
 })

@@ -9,15 +9,13 @@ describe("qualifyRelationNoteForReduceOnDelete", () => {
   const earthId = 102
 
   it("qualifies when type, relation, resolvable source, and target are present", () => {
-    const realm = {
-      ...makeMe.aNoteRealm
-        .content(relationshipNoteContent("a-part-of", "[[Moon]]", "[[Earth]]"))
-        .please(),
-      wikiTitles: [
+    const realm = makeMe.aNoteRealm
+      .content(relationshipNoteContent("a-part-of", "[[Moon]]", "[[Earth]]"))
+      .wikiTitles([
         wikiTitleFromInnerAndNoteId("Moon", moonId),
         wikiTitleFromInnerAndNoteId("Earth", earthId),
-      ],
-    }
+      ])
+      .please()
 
     expect(qualifyRelationNoteForReduceOnDelete(realm)).toEqual({
       sourcePropertyKey: "a part of",
@@ -26,33 +24,32 @@ describe("qualifyRelationNoteForReduceOnDelete", () => {
   })
 
   it("returns undefined for a normal note", () => {
-    const realm = makeMe.aNoteRealm.content("Just a note").please()
-    expect(qualifyRelationNoteForReduceOnDelete(realm)).toBeUndefined()
+    expect(
+      qualifyRelationNoteForReduceOnDelete(
+        makeMe.aNoteRealm.content("Just a note").please()
+      )
+    ).toBeUndefined()
   })
 
   it("returns undefined when source wiki link does not resolve", () => {
-    const realm = {
-      ...makeMe.aNoteRealm
-        .content(relationshipNoteContent("a-part-of", "[[Moon]]", "[[Earth]]"))
-        .please(),
-      wikiTitles: [wikiTitleFromInnerAndNoteId("Earth", earthId)],
-    }
+    const realm = makeMe.aNoteRealm
+      .content(relationshipNoteContent("a-part-of", "[[Moon]]", "[[Earth]]"))
+      .wikiTitles([wikiTitleFromInnerAndNoteId("Earth", earthId)])
+      .please()
 
     expect(qualifyRelationNoteForReduceOnDelete(realm)).toBeUndefined()
   })
 
   it("returns undefined when relation label cannot be derived", () => {
-    const realm = {
-      ...makeMe.aNoteRealm
-        .content(`---
+    const realm = makeMe.aNoteRealm
+      .content(`---
 type: relationship
 source: "[[Moon]]"
 target: "[[Earth]]"
 ---
 `)
-        .please(),
-      wikiTitles: [wikiTitleFromInnerAndNoteId("Moon", moonId)],
-    }
+      .wikiTitles([wikiTitleFromInnerAndNoteId("Moon", moonId)])
+      .please()
 
     expect(qualifyRelationNoteForReduceOnDelete(realm)).toBeUndefined()
   })

@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest"
-import { AUTHORED_ALIASES_MESSAGE } from "@/utils/authoredAliasesValidation"
 import {
   composeNoteContentFromPropertyRows,
   insertPropertyRowAt,
@@ -10,7 +9,6 @@ import {
   renamePropertyRowKeyAt,
   scalarRecordFromNoteProperties,
   sortedPropertyRowsFromNoteProperties,
-  validatePropertyRowsForRichEdit,
 } from "@/utils/noteContentFrontmatter"
 
 describe("property rows compose / mutate", () => {
@@ -48,9 +46,6 @@ describe("property rows compose / mutate", () => {
       alphaRenamed: "one",
       beta: "two",
     })
-    expect(
-      again.ok && scalarRecordFromNoteProperties(again.properties).alpha
-    ).toBeUndefined()
   })
 
   it("remove: dropping one row leaves remaining props only", () => {
@@ -77,9 +72,6 @@ describe("property rows compose / mutate", () => {
     expect(
       again.ok && scalarRecordFromNoteProperties(again.properties)
     ).toEqual({ a: "1" })
-    expect(
-      again.ok && scalarRecordFromNoteProperties(again.properties).b
-    ).toBeUndefined()
   })
 
   it("remove: clearing every row yields body-only content without frontmatter fence", () => {
@@ -91,7 +83,6 @@ describe("property rows compose / mutate", () => {
     rows = removePropertyRowAt(rows, 0)
     const md = composeNoteContentFromPropertyRows(rows, parsed.body)
     expect(md).toBe("Rest\n")
-    expect(md.startsWith("---")).toBe(false)
     const again = parseNoteContentMarkdown(md)
     expect(
       again.ok && scalarRecordFromNoteProperties(again.properties)
@@ -107,7 +98,6 @@ describe("property rows compose / mutate", () => {
     rows = removePropertyRowAt(rows, 0)
     const md = composeNoteContentFromPropertyRows(rows, parsed.body)
     expect(md).toBe("Paragraph.\n")
-    expect(md.startsWith("---")).toBe(false)
     const again = parseNoteContentMarkdown(md)
     expect(
       again.ok && scalarRecordFromNoteProperties(again.properties)
@@ -128,8 +118,6 @@ describe("property rows compose / mutate", () => {
     expect(scalarRecordFromNoteProperties(parsed.properties)).toEqual({
       topic: "training",
     })
-    expect(md).toContain("- alpha")
-    expect(md).toContain("- beta")
   })
 
   it("sortedPropertyRowsFromNoteProperties includes list values", () => {
@@ -148,109 +136,5 @@ Body`)
       listPropertyValue(["a", "b"])
     )
     expect(rows.find((r) => r.key === "topic")?.value.kind).toBe("scalar")
-  })
-})
-
-describe("validatePropertyRowsForRichEdit", () => {
-  it("accepts distinct keys after trim", () => {
-    expect(
-      validatePropertyRowsForRichEdit([
-        propertyRowWithScalar(" a ", "x"),
-        propertyRowWithScalar("b", " y "),
-      ])
-    ).toEqual({ ok: true })
-  })
-
-  it("allows one draft row with empty key when value is non-empty", () => {
-    expect(
-      validatePropertyRowsForRichEdit([
-        propertyRowWithScalar("   ", "[[Note]]"),
-      ])
-    ).toEqual({ ok: true })
-  })
-
-  it("rejects empty key when scalar value is empty", () => {
-    const r = validatePropertyRowsForRichEdit([propertyRowWithScalar("", "  ")])
-    expect(r.ok).toBe(false)
-    if (!r.ok) {
-      expect(r.message).toContain("empty key")
-    }
-  })
-
-  it("allows empty key when list value is non-empty", () => {
-    expect(
-      validatePropertyRowsForRichEdit([
-        { key: "", value: listPropertyValue(["draft"]) },
-      ])
-    ).toEqual({ ok: true })
-  })
-
-  it("rejects more than one row with empty key", () => {
-    const r = validatePropertyRowsForRichEdit([
-      propertyRowWithScalar("", "a"),
-      propertyRowWithScalar("  ", "b"),
-    ])
-    expect(r.ok).toBe(false)
-    if (!r.ok) {
-      expect(r.message).toContain("Only one property")
-    }
-  })
-
-  it("rejects duplicate keys after trim", () => {
-    const r = validatePropertyRowsForRichEdit([
-      propertyRowWithScalar("same", "a"),
-      propertyRowWithScalar("same", "b"),
-    ])
-    expect(r.ok).toBe(false)
-    if (!r.ok) {
-      expect(r.message).toContain("Duplicate")
-    }
-  })
-
-  it("accepts list property rows", () => {
-    expect(
-      validatePropertyRowsForRichEdit([
-        { key: "tags", value: listPropertyValue(["a", "b"]) },
-      ])
-    ).toEqual({ ok: true })
-  })
-
-  it("rejects scalar aliases values", () => {
-    const r = validatePropertyRowsForRichEdit([
-      propertyRowWithScalar("aliases", "color"),
-    ])
-    expect(r.ok).toBe(false)
-    if (!r.ok) expect(r.message).toBe(AUTHORED_ALIASES_MESSAGE)
-  })
-
-  it("accepts valid aliases list rows", () => {
-    expect(
-      validatePropertyRowsForRichEdit([
-        { key: "aliases", value: listPropertyValue(["color", "hue"]) },
-      ])
-    ).toEqual({ ok: true })
-  })
-
-  it("rejects wiki-link items in aliases list rows", () => {
-    const r = validatePropertyRowsForRichEdit([
-      {
-        key: "aliases",
-        value: listPropertyValue([
-          "color",
-          "[[Other Note]]",
-          "[[Shared Notebook:Hue|display]]",
-        ]),
-      },
-    ])
-    expect(r.ok).toBe(false)
-    if (!r.ok) expect(r.message).toBe(AUTHORED_ALIASES_MESSAGE)
-  })
-
-  it("rejects invalid alias list items", () => {
-    const r = validatePropertyRowsForRichEdit([
-      { key: "aliases", value: listPropertyValue(["good", "bad|alias"]) },
-    ])
-    expect(r.ok).toBe(false)
-    if (!r.ok) expect(r.message).toBe(AUTHORED_ALIASES_MESSAGE)
   })
 })

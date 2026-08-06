@@ -1,19 +1,17 @@
-import { softKeyboardPrimerId } from "@/utils/focusTarget"
-import { flushPromises } from "@vue/test-utils"
 import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
+import {
+  expectSoftKeyboardPrimerIsFocused,
+  expectSoftKeyboardPrimerIsNotFocused,
+  mountSoftKeyboardPrimer,
+} from "@tests/helpers/softKeyboardPrimerTestSupport"
+import { flushPromises } from "@vue/test-utils"
 import { afterEach, describe, expect, it, vi } from "vitest"
 import {
   modalCloseButtonEl,
   mountPopButton,
-  mountPopButtonWithPrimer,
   openPopButtonDialog,
   popButtonEl,
-  waitForActiveElementId,
 } from "./popButtonTestSupport"
-
-vi.mock("@/managedApi/AiReplyEventSource", () => ({
-  default: class {},
-}))
 
 describe("PopButton", () => {
   let matchMediaSpy: ReturnType<typeof mockCoarsePointer> | undefined
@@ -27,41 +25,23 @@ describe("PopButton", () => {
   describe("soft keyboard primer", () => {
     it("focuses primer synchronously on tap when touch input is primary", () => {
       matchMediaSpy = mockCoarsePointer(true)
-      const wrapper = mountPopButtonWithPrimer(
-        '<input autofocus id="target-input" />'
-      )
-      const primer = document.getElementById(softKeyboardPrimerId)
-      expect(primer).toBeTruthy()
+      mountSoftKeyboardPrimer()
+      const wrapper = mountPopButton('<input autofocus id="target-input" />')
 
       wrapper.find("button").trigger("click")
 
-      expect(document.activeElement).toBe(primer)
-      wrapper.unmount()
-    })
-
-    it("transfers focus to autofocus target after modal mounts", async () => {
-      matchMediaSpy = mockCoarsePointer(true)
-      const wrapper = mountPopButtonWithPrimer(
-        '<input autofocus id="target-input" />'
-      )
-
-      await openPopButtonDialog(wrapper)
-      await waitForActiveElementId("target-input")
-
-      expect(document.activeElement?.id).toBe("target-input")
+      expectSoftKeyboardPrimerIsFocused()
       wrapper.unmount()
     })
 
     it("does not focus primer on tap when pointer is not coarse", () => {
       matchMediaSpy = mockCoarsePointer(false)
-      const wrapper = mountPopButtonWithPrimer(
-        '<input autofocus id="target-input" />'
-      )
-      const primer = document.getElementById(softKeyboardPrimerId)
+      mountSoftKeyboardPrimer()
+      const wrapper = mountPopButton('<input autofocus id="target-input" />')
 
       wrapper.find("button").trigger("click")
 
-      expect(document.activeElement).not.toBe(primer)
+      expectSoftKeyboardPrimerIsNotFocused()
       wrapper.unmount()
     })
   })
@@ -70,9 +50,7 @@ describe("PopButton", () => {
     {
       name: "close_request",
       closeDialog: async () => {
-        const closeButton = modalCloseButtonEl()
-        expect(closeButton).toBeTruthy()
-        closeButton!.click()
+        modalCloseButtonEl()!.click()
         await flushPromises()
       },
     },

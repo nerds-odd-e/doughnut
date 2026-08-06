@@ -1,6 +1,6 @@
 import { useStableModalTop } from "@/composables/modalTopAnchor"
 import { flushPromises, mount, type VueWrapper } from "@vue/test-utils"
-import { vi, afterEach, describe, it, expect } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 import { reactive } from "vue"
 import {
   ModalComp,
@@ -10,16 +10,11 @@ import {
   mountDefaultModal,
   mountModal,
   settleModalAutofocus,
-  topAlignedDialogEl,
   waitForActiveElementId,
   waitForDialog,
   waitForDialogCount,
   waitForTopAlignedDialog,
 } from "./modalTestSupport"
-
-vi.mock("@/managedApi/AiReplyEventSource", () => ({
-  default: class {},
-}))
 
 describe("Modal", () => {
   let wrapper: VueWrapper
@@ -51,16 +46,13 @@ describe("Modal", () => {
     })
 
     await waitForTopAlignedDialog()
-    expect(topAlignedDialogEl()).toBeTruthy()
   })
 
   it.each([
     {
       name: "close button",
       close: async () => {
-        const button = closeButtonEl()
-        expect(button).toBeTruthy()
-        button!.click()
+        closeButtonEl()!.click()
       },
     },
     {
@@ -122,9 +114,7 @@ describe("Modal", () => {
   it("closes when modal backdrop is clicked", async () => {
     wrapper = mountDefaultModal()
     await waitForDialog()
-    const panelWrapper = modalPanelWrapperEl()
-    expect(panelWrapper).toBeTruthy()
-    panelWrapper!.dispatchEvent(
+    modalPanelWrapperEl()!.dispatchEvent(
       new MouseEvent("mousedown", { bubbles: true, cancelable: true })
     )
     expect(wrapper.emitted().close_request).toHaveLength(1)

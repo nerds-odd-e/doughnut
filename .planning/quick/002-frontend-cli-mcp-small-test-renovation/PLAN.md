@@ -1,6 +1,6 @@
 # Frontend / CLI / MCP unit tests → "small test" style
 
-**Status:** in progress (Phases 1–4 done)  
+**Status:** in progress (Phases 1–5 done)
 **Type:** test renovation (no product behavior change)  
 **Resume:** this `PLAN.md` progress log only — **do not edit** trunk `.planning/STATE.md` (parallel trunk-based work).
 
@@ -92,15 +92,15 @@ While iterating a single large frontend file, `pnpm frontend:test tests/path/to/
 - **Done when:** CLI suite fully renovated; suite green.
 
 ### Phase 5 — Frontend: helpers, commons, utils, lib
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
 - **Files:**
-  - `frontend/tests/helpers/**` (support only — style if tests live here; otherwise skip)
+  - `frontend/tests/helpers/**` (support only — no specs; skipped)
   - `frontend/tests/commons/**`, `frontend/tests/common/**`
   - `frontend/tests/utils/**`
   - `frontend/tests/lib/**`
 - Prefer pure-contract style; delete tests that only re-cover a mounted component path already asserted elsewhere when safe.
-- **Verify:** `pnpm frontend:test`
+- **Verify:** `pnpm frontend:test` — green (257 files / 1689 tests).
 - **Done when:** rubric applied; suite green.
 
 ### Phase 6 — Frontend: composables, models, store, managedApi, routes
@@ -225,7 +225,8 @@ If a Behavior phase cannot express fixtures concisely: add a **Structure** sub-p
 | 2 | done | CLI non-Ink helpers/commands renovated; oversized selectList + mineru tests split by capability; suite green |
 | 3 | done | Ink shell / InteractiveCliApp / MainInteractivePrompt / guidanceList / useNotebookSlashCommand renovated; oversized suites split by capability; suite green |
 | 4 | done | Recall MCQ / spelling / just-review renovated; capability splits + shared helpers; suite green |
-| 5–18 | planned | — |
+| 5 | done | FE helpers/commons/utils/lib renovated; illicit AiReply mocks dropped; property-rows split; suite green |
+| 6–18 | planned | — |
 
 ---
 
@@ -238,3 +239,4 @@ If a Behavior phase cannot express fixtures concisely: add a **Structure** sub-p
 - Phase 2: Most Phase 2 files already drove stable pure helpers / `run` / command surfaces with allowed externals. Main gaps were makeMe for `recallStatus`, focused assertions (drop redundant full-payload / plural-count rechecks), table-driven siblings, and >250-line `selectListInteraction` + `mineruOutlineSubprocess` suites — split into capability-named modules under 250 lines. Files already rubric-compliant left largely untouched (`welcomeBanner`, `spellingAnswerLine`, `terminalColumnsTruncate`, `contestAndRegenerateMcq`, `slashCommandCompletion`, `notebookStageSlashCommands`, `doughnutBackendClient.errors`, `update`, mineru e2e stub).
 - Phase 3: Trimmed post-`waitFor*` re-asserts in InteractiveCliApp; makeMe for interactive recall-status due list; split oversized Ink suites by capability (`MainInteractivePrompt.*`, `guidanceListWindowInk` slash/numbered, addGmail vs lastEmail, useNotebook shell vs attach, useNotebookSlashCommand resolve vs picker) with shared testHelpers; MinerU subprocess mock retained for PDF attach; `mainInteractivePromptHistory` left as domain-stable pure contract.
 - Phase 4: Consolidated `startRecall` / `leaveRecallWithYnRe` / `RecallInkWaitHelpers` / `reLiteral` in `recallInteractiveShared`; MCQ split into answer/escape/contest/guidance + suite; spelling into answer/escape + suite; just-review already split — dropped post-construction `ancestorFolders` mutation (use `.inFolder`), unused `createdAt`/`updatedAt`, redundant asserts; mocks remain doughnut-api spies only.
+- Phase 5: Helpers have no specs (support only). Most utils/lib already pure-contract. Commons: removed unnecessary `AiReplyEventSource` mocks from Modal/PopButton (no import path); dropped PopButton autofocus re-cover of Modal; deleted usePopups listener-spy internals test; slimmed popButtonTestSupport. Utils: `NoteRealmBuilder.wikiTitles()` for relation reduce; split `noteContentPropertyRows` mutate vs validate (+ trim alias duplicates); dropped `questionStemWikiPlain` markdownizer re-cover. FullScreen/browser API mocks kept as true externals.
