@@ -106,6 +106,15 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
     }
 
     @Test
+    void shouldReturnEmptyLayoutWhenAiReturnsNoResponse()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      openAiStructuredResponseMock.stubStructuredResponse(null);
+      testNote.setContent("Some note content");
+
+      assertThat(controller.generateRefinementSuggestions(testNote).getItems()).isEmpty();
+    }
+
+    @Test
     void shouldReturnEmptyLayoutWhenAiReturnsInvalidLayout()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();

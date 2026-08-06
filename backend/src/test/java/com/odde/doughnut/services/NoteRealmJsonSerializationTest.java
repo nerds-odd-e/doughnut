@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
@@ -40,19 +39,14 @@ class NoteRealmJsonSerializationTest {
   @Test
   void serializes_realm_with_wiki_cache_references() throws Exception {
     User user = makeMe.aUser().please();
-    Notebook nb = makeMe.aNotebook().creatorAndOwner(user).please();
-    Note focal = makeMe.aNote().title("Focal").notebook(nb).please();
-    Note subject = makeMe.aNote().title("Subject").notebook(nb).please();
-    Note relation = makeMe.aNote().notebook(nb).please();
-    relation.setContent(
-        "---\n"
-            + "type: relationship\n"
-            + "relation: a-specialization-of\n"
-            + "source: \"[[Subject]]\"\n"
-            + "target: \"[[Focal]]\"\n"
-            + "---\n\n");
-    makeMe.entityPersister.merge(relation);
-    makeMe.entityPersister.flush();
+    Note focal = makeMe.aNote().title("Focal").notebookOwnedBy(user).please();
+    Note subject = makeMe.aNote().title("Subject").underSameNotebookAs(focal).please();
+    Note relation =
+        makeMe
+            .aNote()
+            .underSameNotebookAs(focal)
+            .withWikiLinksInFrontmatter(subject, focal)
+            .please();
     wikiTitleCacheService.refreshForNote(relation, user);
 
     NoteRealm realm = noteRealmService.build(subject, user);

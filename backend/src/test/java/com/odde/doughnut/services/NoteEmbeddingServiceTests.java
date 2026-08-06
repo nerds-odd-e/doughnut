@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.is;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.repositories.NoteEmbeddingRepository;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +24,6 @@ class NoteEmbeddingServiceTests {
 
   @Autowired NoteEmbeddingRepository noteEmbeddingRepository;
   @Autowired NoteEmbeddingService service;
-  @Autowired NoteRepository noteRepository;
   @Autowired MakeMe makeMe;
 
   Note note;
@@ -34,7 +32,7 @@ class NoteEmbeddingServiceTests {
   @BeforeEach
   void setup() {
     notebook = makeMe.aNotebook().please();
-    note = makeMe.aNote().please();
+    note = makeMe.aNote().notebook(notebook).please();
   }
 
   @Test
@@ -48,8 +46,7 @@ class NoteEmbeddingServiceTests {
 
   @Test
   void shouldDeleteNotebookEmbeddings() {
-    makeMe.aNote().please();
-
+    makeMe.aNote().notebook(notebook).please();
     makeMe.refresh(notebook);
     notebook.getNotes().forEach(n -> makeMe.aNoteEmbedding(n).please());
 
@@ -72,8 +69,6 @@ class NoteEmbeddingServiceTests {
 
   @Test
   void shouldReturnEmptyWhenEmbeddingNotFound() {
-    Optional<List<Float>> result = service.getEmbedding(note.getId());
-
-    assertThat(result.isPresent(), is(false));
+    assertThat(service.getEmbedding(note.getId()).isPresent(), is(false));
   }
 }

@@ -35,10 +35,9 @@ class NotePropertyIndexTargetNoteBackfillTest {
   @Test
   void run_sets_target_note_id_for_link_properties_from_note_table() throws Exception {
     User owner = makeMe.aUser().please();
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
-    Note target = makeMe.aNote().title("Target").notebook(notebook).please();
+    Note target = makeMe.aNote().title("Target").notebookOwnedBy(owner).please();
     String markdown = "---\n" + "example of: \"[[Target]]\"\n" + "topic: physics\n" + "---\n\nbody";
-    Note note = makeMe.aNote().notebook(notebook).content(markdown).please();
+    Note note = makeMe.aNote().underSameNotebookAs(target).content(markdown).please();
 
     runPropertyTrackingBackfill(makeMe.aTimestamp().of(1, 1).please());
     runTargetNoteResolutionBackfill();
@@ -99,12 +98,11 @@ class NotePropertyIndexTargetNoteBackfillTest {
   @Test
   void run_is_idempotent_when_reapplied() throws Exception {
     User owner = makeMe.aUser().please();
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
-    Note target = makeMe.aNote().title("Target").notebook(notebook).please();
+    Note target = makeMe.aNote().title("Target").notebookOwnedBy(owner).please();
     Note note =
         makeMe
             .aNote()
-            .notebook(notebook)
+            .underSameNotebookAs(target)
             .content("---\nexample of: \"[[Target]]\"\n---\n")
             .please();
 

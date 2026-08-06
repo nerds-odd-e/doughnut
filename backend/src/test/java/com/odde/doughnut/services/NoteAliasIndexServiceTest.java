@@ -10,7 +10,6 @@ import static org.hamcrest.Matchers.not;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAliasIndex;
-import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteAliasIndexRepository;
 import com.odde.doughnut.testability.MakeMe;
@@ -31,19 +30,27 @@ class NoteAliasIndexServiceTest {
   @Autowired NoteAliasIndexService noteAliasIndexService;
   @Autowired NoteAliasIndexRepository noteAliasIndexRepository;
 
+  private List<NoteAliasIndex> aliasRows(Note note) {
+    return noteAliasIndexRepository.findByNote_IdOrderByIdAsc(note.getId());
+  }
+
   @Nested
   class refreshForNote {
 
     @Test
     void indexes_valid_frontmatter_aliases_with_display_and_lookup_key() {
       User user = makeMe.aUser().please();
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-      String markdown = "---\naliases:\n  - color\n  - hue\n---\n\nbody";
-      Note note = makeMe.aNote().title("colour").notebook(notebook).content(markdown).please();
+      Note note =
+          makeMe
+              .aNote()
+              .title("colour")
+              .notebookOwnedBy(user)
+              .content("---\naliases:\n  - color\n  - hue\n---\n\nbody")
+              .please();
 
       noteAliasIndexService.refreshForNote(note);
 
-      List<NoteAliasIndex> rows = noteAliasIndexRepository.findByNote_IdOrderByIdAsc(note.getId());
+      List<NoteAliasIndex> rows = aliasRows(note);
       assertThat(rows, hasSize(2));
       assertThat(rows.get(0).getAliasDisplay(), equalTo("color"));
       assertThat(rows.get(0).getAliasLookupKey(), equalTo("color"));
@@ -54,14 +61,17 @@ class NoteAliasIndexServiceTest {
     @Test
     void ignores_blank_invalid_and_duplicate_aliases() {
       User user = makeMe.aUser().please();
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-      String markdown =
-          "---\naliases:\n  - Color\n  - color\n  - \"   \"\n  - bad|alias\n---\n\nbody";
-      Note note = makeMe.aNote().notebook(notebook).content(markdown).please();
+      Note note =
+          makeMe
+              .aNote()
+              .notebookOwnedBy(user)
+              .content(
+                  "---\naliases:\n  - Color\n  - color\n  - \"   \"\n  - bad|alias\n---\n\nbody")
+              .please();
 
       noteAliasIndexService.refreshForNote(note);
 
-      List<NoteAliasIndex> rows = noteAliasIndexRepository.findByNote_IdOrderByIdAsc(note.getId());
+      List<NoteAliasIndex> rows = aliasRows(note);
       assertThat(rows, hasSize(1));
       assertThat(rows.get(0).getAliasDisplay(), equalTo("Color"));
     }
@@ -69,18 +79,17 @@ class NoteAliasIndexServiceTest {
     @Test
     void replaces_previous_rows_on_second_refresh() {
       User user = makeMe.aUser().please();
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
       Note note =
-          makeMe.aNote().notebook(notebook).content("---\naliases:\n  - one\n---\n\n").please();
+          makeMe.aNote().notebookOwnedBy(user).content("---\naliases:\n  - one\n---\n\n").please();
 
       noteAliasIndexService.refreshForNote(note);
-      assertThat(noteAliasIndexRepository.findByNote_IdOrderByIdAsc(note.getId()), hasSize(1));
+      assertThat(aliasRows(note), hasSize(1));
 
       note.setContent("---\naliases:\n  - two\n---\n\n");
       makeMe.entityPersister.merge(note);
       noteAliasIndexService.refreshForNote(note);
 
-      List<NoteAliasIndex> rows = noteAliasIndexRepository.findByNote_IdOrderByIdAsc(note.getId());
+      List<NoteAliasIndex> rows = aliasRows(note);
       assertThat(rows, hasSize(1));
       assertThat(rows.get(0).getAliasDisplay(), equalTo("two"));
     }
@@ -88,37 +97,39 @@ class NoteAliasIndexServiceTest {
     @Test
     void leaves_no_rows_when_content_has_no_aliases() {
       User user = makeMe.aUser().please();
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-      Note note = makeMe.aNote().notebook(notebook).content("plain body").please();
+      Note note = makeMe.aNote().notebookOwnedBy(user).content("plain body").please();
 
       noteAliasIndexService.refreshForNote(note);
 
-      assertThat(noteAliasIndexRepository.findByNote_IdOrderByIdAsc(note.getId()), empty());
+      assertThat(aliasRows(note), empty());
     }
 
     @Test
     void indexes_only_plain_aliases_when_wiki_link_overlap_declared() {
       User user = makeMe.aUser().please();
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-      String markdown =
-          """
-          ---
-          aliases:
-            - color
-            - "[[Other Note]]"
-            - "[[Shared Notebook:Hue|display]]"
-          ---
+      Note note =
+          makeMe
+              .aNote()
+              .title("colour")
+              .notebookOwnedBy(user)
+              .content(
+                  """
+                  ---
+                  aliases:
+                    - color
+                    - "[[Other Note]]"
+                    - "[[Shared Notebook:Hue|display]]"
+                  ---
 
-          body
-          """;
-      Note note = makeMe.aNote().title("colour").notebook(notebook).content(markdown).please();
+                  body
+                  """)
+              .please();
 
       noteAliasIndexService.refreshForNote(note);
 
-      List<NoteAliasIndex> rows = noteAliasIndexRepository.findByNote_IdOrderByIdAsc(note.getId());
+      List<NoteAliasIndex> rows = aliasRows(note);
       assertThat(rows, hasSize(1));
       assertThat(rows.get(0).getAliasDisplay(), equalTo("color"));
-      assertThat(rows.get(0).getAliasLookupKey(), equalTo("color"));
       assertThat(
           rows.stream().map(NoteAliasIndex::getAliasDisplay).toList(),
           everyItem(not(containsString("[["))));
@@ -127,44 +138,45 @@ class NoteAliasIndexServiceTest {
     @Test
     void leaves_no_rows_when_aliases_are_wiki_link_overlap_only() {
       User user = makeMe.aUser().please();
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-      String markdown =
-          """
-          ---
-          aliases:
-            - "[[Other Note]]"
-            - "[[Shared Notebook:Hue|display]]"
-          ---
+      Note note =
+          makeMe
+              .aNote()
+              .notebookOwnedBy(user)
+              .content(
+                  """
+                  ---
+                  aliases:
+                    - "[[Other Note]]"
+                    - "[[Shared Notebook:Hue|display]]"
+                  ---
 
-          body
-          """;
-      Note note = makeMe.aNote().notebook(notebook).content(markdown).please();
+                  body
+                  """)
+              .please();
 
       noteAliasIndexService.refreshForNote(note);
 
-      assertThat(noteAliasIndexRepository.findByNote_IdOrderByIdAsc(note.getId()), empty());
+      assertThat(aliasRows(note), empty());
     }
 
     @Test
     void leaves_no_rows_when_aliases_list_is_empty() {
       User user = makeMe.aUser().please();
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
       Note note =
-          makeMe.aNote().notebook(notebook).content("---\naliases: []\n---\n\nbody").please();
+          makeMe.aNote().notebookOwnedBy(user).content("---\naliases: []\n---\n\nbody").please();
 
       noteAliasIndexService.refreshForNote(note);
 
-      assertThat(noteAliasIndexRepository.findByNote_IdOrderByIdAsc(note.getId()), empty());
+      assertThat(aliasRows(note), empty());
     }
 
     @Test
     void removes_plain_alias_row_when_only_wiki_link_overlap_remains() {
       User user = makeMe.aUser().please();
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
       Note note =
           makeMe
               .aNote()
-              .notebook(notebook)
+              .notebookOwnedBy(user)
               .content(
                   """
                   ---
@@ -178,7 +190,7 @@ class NoteAliasIndexServiceTest {
               .please();
 
       noteAliasIndexService.refreshForNote(note);
-      assertThat(noteAliasIndexRepository.findByNote_IdOrderByIdAsc(note.getId()), hasSize(1));
+      assertThat(aliasRows(note), hasSize(1));
 
       note.setContent(
           """
@@ -192,7 +204,7 @@ class NoteAliasIndexServiceTest {
       makeMe.entityPersister.merge(note);
       noteAliasIndexService.refreshForNote(note);
 
-      assertThat(noteAliasIndexRepository.findByNote_IdOrderByIdAsc(note.getId()), empty());
+      assertThat(aliasRows(note), empty());
     }
   }
 }

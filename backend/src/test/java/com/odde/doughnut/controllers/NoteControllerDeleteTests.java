@@ -85,6 +85,17 @@ class NoteControllerDeleteTests extends ControllerTestBase {
       assertThat(subject.getDeletedAt(), is(not(nullValue())));
     }
 
+    @Test
+    void shouldNotCascadeSoftDeleteToStructuralChildNotes()
+        throws UnexpectedNoAccessRightException {
+      Note child = makeMe.aNote("child").underSameNotebookAs(subject).please();
+
+      controller.deleteNote(subject, leaveDeadLinksDeleteRequest());
+
+      assertThat(subject.getDeletedAt(), is(not(nullValue())));
+      assertThat(child.getDeletedAt(), nullValue());
+    }
+
     @Nested
     class MemoryTrackerExclusionWhenNoteDeleted {
       private static final ZoneId ZONE = ZoneId.of("Asia/Shanghai");

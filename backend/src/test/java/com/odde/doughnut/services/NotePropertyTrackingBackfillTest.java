@@ -40,7 +40,6 @@ class NotePropertyTrackingBackfillTest {
   @Test
   void run_indexes_non_reserved_keys_and_seeds_skipped_trackers_for_owner() throws Exception {
     User owner = makeMe.aUser().please();
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
     Timestamp existingTrackerTime = makeMe.aTimestamp().of(1, 2).please();
     String markdown =
         "---\n"
@@ -50,11 +49,10 @@ class NotePropertyTrackingBackfillTest {
             + "image: /attachments/1\n"
             + "url: https://example.com\n"
             + "---\n\nbody";
-    Note note = makeMe.aNote().notebook(notebook).content(markdown).please();
+    Note note = makeMe.aNote().notebookOwnedBy(owner).content(markdown).please();
     MemoryTracker existingTopicTracker =
         makeMe
             .aMemoryTrackerFor(note)
-            .by(owner)
             .propertyKey("topic")
             .assimilatedAt(existingTrackerTime)
             .please();
@@ -107,8 +105,7 @@ class NotePropertyTrackingBackfillTest {
   @Test
   void run_leaves_notes_without_frontmatter_unindexed() throws Exception {
     User owner = makeMe.aUser().please();
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
-    Note note = makeMe.aNote().notebook(notebook).content("plain body").please();
+    Note note = makeMe.aNote().notebookOwnedBy(owner).content("plain body").please();
 
     runBackfill(makeMe.aTimestamp().of(4, 4).please());
 

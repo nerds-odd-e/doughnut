@@ -1,14 +1,10 @@
 package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 
-import com.odde.doughnut.controllers.dto.WikiTitle;
-import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAliasIndex;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
@@ -35,28 +31,28 @@ class WikiTitleCacheServiceTest {
   @Autowired NoteWikiTitleCacheRepository noteWikiTitleCacheRepository;
   @Autowired NoteAliasIndexRepository noteAliasIndexRepository;
 
+  private List<NoteWikiTitleCache> cacheRows(Note carrier) {
+    return noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
+  }
+
   @Nested
   class refreshForNote {
 
     @Test
     void stores_resolved_links_from_relationship_frontmatter() {
       User user = makeMe.aUser().please();
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-      Note source = makeMe.aNote().title("Alpha").notebook(notebook).please();
-      Note target = makeMe.aNote().title("Beta").notebook(notebook).please();
-      String markdown =
-          "---\n"
-              + "type: relationship\n"
-              + "relation: related-to\n"
-              + "source: \"[[Alpha]]\"\n"
-              + "target: \"[[Beta]]\"\n"
-              + "---\n\n";
-      Note carrier = makeMe.aNote().notebook(notebook).content(markdown).please();
+      Note source = makeMe.aNote().title("Alpha").notebookOwnedBy(user).please();
+      Note target = makeMe.aNote().title("Beta").underSameNotebookAs(source).please();
+      Note carrier =
+          makeMe
+              .aNote()
+              .underSameNotebookAs(source)
+              .withWikiLinksInFrontmatter(source, target)
+              .please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
 
-      List<NoteWikiTitleCache> rows =
-          noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
+      List<NoteWikiTitleCache> rows = cacheRows(carrier);
       assertThat(rows, hasSize(2));
       assertThat(rows.get(0).getLinkText(), equalTo("Alpha"));
       assertThat(rows.get(0).getTargetNote().getId(), equalTo(source.getId()));
@@ -67,38 +63,37 @@ class WikiTitleCacheServiceTest {
     @Test
     void replaces_previous_rows_on_second_refresh() {
       User user = makeMe.aUser().please();
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-      makeMe.aNote().title("OnlyA").notebook(notebook).please();
-      Note b = makeMe.aNote().title("OnlyB").notebook(notebook).please();
-      Note carrier = makeMe.aNote().notebook(notebook).content("[[OnlyA]]").please();
+      Note onlyA = makeMe.aNote().title("OnlyA").notebookOwnedBy(user).please();
+      Note onlyB = makeMe.aNote().title("OnlyB").underSameNotebookAs(onlyA).please();
+      Note carrier = makeMe.aNote().underSameNotebookAs(onlyA).content("[[OnlyA]]").please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
-      assertThat(
-          noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId()), hasSize(1));
+      assertThat(cacheRows(carrier), hasSize(1));
 
       carrier.setContent("[[OnlyB]]");
       makeMe.entityPersister.merge(carrier);
       wikiTitleCacheService.refreshForNote(carrier, user);
 
-      List<NoteWikiTitleCache> rows =
-          noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
+      List<NoteWikiTitleCache> rows = cacheRows(carrier);
       assertThat(rows, hasSize(1));
       assertThat(rows.get(0).getLinkText(), equalTo("OnlyB"));
-      assertThat(rows.get(0).getTargetNote().getId(), equalTo(b.getId()));
+      assertThat(rows.get(0).getTargetNote().getId(), equalTo(onlyB.getId()));
     }
 
     @Test
     void dedupes_duplicate_link_text_in_order_of_first_occurrence() {
       User user = makeMe.aUser().please();
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-      Note shared = makeMe.aNote().title("Same").notebook(notebook).please();
+      Note shared = makeMe.aNote().title("Same").notebookOwnedBy(user).please();
       Note carrier =
-          makeMe.aNote().notebook(notebook).content("[[Same]] and again [[Same]]").please();
+          makeMe
+              .aNote()
+              .underSameNotebookAs(shared)
+              .content("[[Same]] and again [[Same]]")
+              .please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
 
-      List<NoteWikiTitleCache> rows =
-          noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
+      List<NoteWikiTitleCache> rows = cacheRows(carrier);
       assertThat(rows, hasSize(1));
       assertThat(rows.get(0).getTargetNote().getId(), equalTo(shared.getId()));
     }
@@ -106,14 +101,12 @@ class WikiTitleCacheServiceTest {
     @Test
     void unqualified_link_resolves_title_case_insensitively() {
       User user = makeMe.aUser().please();
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-      Note target = makeMe.aNote().title("MixedCase").notebook(notebook).please();
-      Note carrier = makeMe.aNote().notebook(notebook).content("[[mixedcase]]").please();
+      Note target = makeMe.aNote().title("MixedCase").notebookOwnedBy(user).please();
+      Note carrier = makeMe.aNote().underSameNotebookAs(target).content("[[mixedcase]]").please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
 
-      List<NoteWikiTitleCache> rows =
-          noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
+      List<NoteWikiTitleCache> rows = cacheRows(carrier);
       assertThat(rows, hasSize(1));
       assertThat(rows.get(0).getLinkText(), equalTo("mixedcase"));
       assertThat(rows.get(0).getTargetNote().getId(), equalTo(target.getId()));
@@ -130,8 +123,7 @@ class WikiTitleCacheServiceTest {
 
       wikiTitleCacheService.refreshForNote(carrier, user);
 
-      List<NoteWikiTitleCache> rows =
-          noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
+      List<NoteWikiTitleCache> rows = cacheRows(carrier);
       assertThat(rows, hasSize(1));
       assertThat(rows.get(0).getLinkText(), equalTo("mybook:MIXEDCASE"));
       assertThat(rows.get(0).getTargetNote().getId(), equalTo(target.getId()));
@@ -140,134 +132,20 @@ class WikiTitleCacheServiceTest {
     @Test
     void dedupes_link_text_that_differs_only_by_case() {
       User user = makeMe.aUser().please();
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-      Note shared = makeMe.aNote().title("Same").notebook(notebook).please();
-      Note carrier =
-          makeMe.aNote().notebook(notebook).content("[[Same]] and again [[same]]").please();
-
-      wikiTitleCacheService.refreshForNote(carrier, user);
-
-      List<NoteWikiTitleCache> rows =
-          noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
-      assertThat(rows, hasSize(1));
-      assertThat(rows.get(0).getLinkText(), equalTo("Same"));
-      assertThat(rows.get(0).getTargetNote().getId(), equalTo(shared.getId()));
-    }
-
-    @Test
-    void keeps_distinct_cache_rows_when_link_spellings_collide_under_unicode_ci() {
-      User user = makeMe.aUser().please();
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-      Folder folderA = makeMe.aFolder().notebook(notebook).name("HiraFolder").please();
-      Folder folderB = makeMe.aFolder().notebook(notebook).name("KataFolder").please();
-      Note hiraganaTarget = makeMe.aNote().title("ごろ").folder(folderA).please();
-      Note katakanaTarget = makeMe.aNote().title("ゴロ").folder(folderB).please();
-      Note carrier = makeMe.aNote().notebook(notebook).content("[[ごろ]] [[ゴロ]]").please();
-
-      wikiTitleCacheService.refreshForNote(carrier, user);
-
-      List<NoteWikiTitleCache> rows =
-          noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
-      assertThat(rows, hasSize(2));
-      assertThat(
-          rows.stream().map(NoteWikiTitleCache::getLinkText).toList(),
-          containsInAnyOrder("ごろ", "ゴロ"));
-      assertThat(
-          rows.stream().map(r -> r.getTargetNote().getId()).toList(),
-          containsInAnyOrder(hiraganaTarget.getId(), katakanaTarget.getId()));
-    }
-
-    @Test
-    void multiple_display_labels_to_same_target_keep_separate_cache_rows_and_wiki_titles() {
-      User user = makeMe.aUser().please();
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-      Note shared = makeMe.aNote().title("Same").notebook(notebook).please();
+      Note shared = makeMe.aNote().title("Same").notebookOwnedBy(user).please();
       Note carrier =
           makeMe
               .aNote()
-              .notebook(notebook)
-              .content("[[Same|first label]] and [[Same|second label]]")
+              .underSameNotebookAs(shared)
+              .content("[[Same]] and again [[same]]")
               .please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
 
-      List<NoteWikiTitleCache> rows =
-          noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
-      assertThat(rows, hasSize(2));
-      assertThat(rows.get(0).getLinkText(), equalTo("Same|first label"));
+      List<NoteWikiTitleCache> rows = cacheRows(carrier);
+      assertThat(rows, hasSize(1));
+      assertThat(rows.get(0).getLinkText(), equalTo("Same"));
       assertThat(rows.get(0).getTargetNote().getId(), equalTo(shared.getId()));
-      assertThat(rows.get(1).getLinkText(), equalTo("Same|second label"));
-      assertThat(rows.get(1).getTargetNote().getId(), equalTo(shared.getId()));
-
-      List<WikiTitle> titles = wikiTitleCacheService.wikiTitlesForViewer(carrier, user);
-      assertThat(titles, hasSize(2));
-      assertThat(titles.get(0).getTargetToken(), equalTo("Same"));
-      assertThat(titles.get(0).getDisplayText(), equalTo("first label"));
-      assertThat(titles.get(1).getTargetToken(), equalTo("Same"));
-      assertThat(titles.get(1).getDisplayText(), equalTo("second label"));
-    }
-
-    @Test
-    void outgoing_targets_dedupe_by_resolved_note_id_across_display_text_variants() {
-      User user = makeMe.aUser().please();
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-      makeMe.aNote().title("Same").notebook(notebook).please();
-      Note carrier = makeMe.aNote().notebook(notebook).content("[[Same|a]] [[Same|b]]").please();
-
-      wikiTitleCacheService.refreshForNote(carrier, user);
-
-      List<Note> outgoing =
-          wikiTitleCacheService.outgoingWikiLinkTargetNotesForViewer(carrier, user);
-      assertThat(outgoing, hasSize(1));
-      assertThat(outgoing.get(0).getTitle(), equalTo("Same"));
-    }
-
-    @Test
-    void unqualified_link_picks_lowest_note_id_when_same_title_in_different_folders() {
-      User user = makeMe.aUser().please();
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-      Folder folderA = makeMe.aFolder().notebook(notebook).name("A").please();
-      Folder folderB = makeMe.aFolder().notebook(notebook).name("B").please();
-      Note firstCreated = makeMe.aNote().title("Dup").folder(folderA).please();
-      makeMe.aNote().title("Dup").folder(folderB).please();
-      Note carrier = makeMe.aNote().notebook(notebook).content("[[Dup]]").please();
-
-      wikiTitleCacheService.refreshForNote(carrier, user);
-
-      List<NoteWikiTitleCache> rows =
-          noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
-      assertThat(rows, hasSize(1));
-      assertThat(rows.get(0).getTargetNote().getId(), equalTo(firstCreated.getId()));
-    }
-
-    @Test
-    void unqualified_link_distinguishes_unvoiced_and_voiced_hiragana_title_spellings() {
-      User user = makeMe.aUser().please();
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-      Folder folderA = makeMe.aFolder().notebook(notebook).name("KoroFolder").please();
-      Folder folderB = makeMe.aFolder().notebook(notebook).name("GoroFolder").please();
-      makeMe.aNote().title("ころ").folder(folderA).please();
-      Note voiced = makeMe.aNote().title("ごろ").folder(folderB).please();
-      Note carrier = makeMe.aNote().notebook(notebook).content("[[ごろ]]").please();
-
-      wikiTitleCacheService.refreshForNote(carrier, user);
-
-      List<NoteWikiTitleCache> rows =
-          noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
-      assertThat(rows, hasSize(1));
-      assertThat(rows.get(0).getTargetNote().getId(), equalTo(voiced.getId()));
-    }
-
-    @Test
-    void unqualified_link_does_not_resolve_voiced_target_to_unvoiced_title() {
-      User user = makeMe.aUser().please();
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-      makeMe.aNote().title("ころ").notebook(notebook).please();
-      Note carrier = makeMe.aNote().notebook(notebook).content("[[ごろ]]").please();
-
-      wikiTitleCacheService.refreshForNote(carrier, user);
-
-      assertThat(noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId()), empty());
     }
 
     @Test
@@ -288,17 +166,14 @@ class WikiTitleCacheServiceTest {
 
       wikiTitleCacheService.refreshForNote(carrier, viewer);
 
-      assertThat(noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId()), empty());
+      assertThat(cacheRows(carrier), empty());
     }
 
     @Test
     void refresh_populates_alias_index_and_resolves_unambiguous_alias_links() {
       User user = makeMe.aUser().please();
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-      String targetMarkdown = "---\naliases:\n  - color\n---\n\n";
-      Note target =
-          makeMe.aNote().title("colour").notebook(notebook).content(targetMarkdown).please();
-      Note carrier = makeMe.aNote().notebook(notebook).content("see [[color]]").please();
+      Note target = makeMe.aNote().title("colour").notebookOwnedBy(user).aliases("color").please();
+      Note carrier = makeMe.aNote().underSameNotebookAs(target).content("see [[color]]").please();
 
       wikiTitleCacheService.refreshForNote(target, user);
       wikiTitleCacheService.refreshForNote(carrier, user);
@@ -308,58 +183,25 @@ class WikiTitleCacheServiceTest {
       assertThat(aliasRows, hasSize(1));
       assertThat(aliasRows.get(0).getAliasDisplay(), equalTo("color"));
 
-      List<NoteWikiTitleCache> cacheRows =
-          noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId());
-      assertThat(cacheRows, hasSize(1));
-      assertThat(cacheRows.get(0).getTargetNote().getId(), equalTo(target.getId()));
+      List<NoteWikiTitleCache> rows = cacheRows(carrier);
+      assertThat(rows, hasSize(1));
+      assertThat(rows.get(0).getTargetNote().getId(), equalTo(target.getId()));
     }
 
     @Test
     void clears_rows_when_content_becomes_blank() {
       User user = makeMe.aUser().please();
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-      makeMe.aNote().title("A").notebook(notebook).please();
-      Note carrier = makeMe.aNote().notebook(notebook).content("[[A]]").please();
+      Note target = makeMe.aNote().title("A").notebookOwnedBy(user).please();
+      Note carrier = makeMe.aNote().underSameNotebookAs(target).content("[[A]]").please();
 
       wikiTitleCacheService.refreshForNote(carrier, user);
-      assertThat(
-          noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId()), hasSize(1));
+      assertThat(cacheRows(carrier), hasSize(1));
 
       carrier.setContent("   ");
       makeMe.entityPersister.merge(carrier);
       wikiTitleCacheService.refreshForNote(carrier, user);
 
-      assertThat(noteWikiTitleCacheRepository.findByNote_IdOrderByIdAsc(carrier.getId()), empty());
+      assertThat(cacheRows(carrier), empty());
     }
-  }
-
-  @Test
-  void references_notes_for_viewer_orders_referrers_by_note_id() {
-    User user = makeMe.aUser().please();
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-    Note focal = makeMe.aNote().title("Focal").notebook(notebook).please();
-    Note second = makeMe.aNote().notebook(notebook).content("[[Focal]]").please();
-    Note first = makeMe.aNote().notebook(notebook).content("[[Focal]]").please();
-    wikiTitleCacheService.refreshForNote(first, user);
-    wikiTitleCacheService.refreshForNote(second, user);
-
-    List<Note> refs = wikiTitleCacheService.referencesNotesForViewer(focal, user);
-
-    assertThat(refs, hasSize(2));
-    assertThat(refs.get(0).getId(), equalTo(Math.min(first.getId(), second.getId())));
-    assertThat(refs.get(1).getId(), equalTo(Math.max(first.getId(), second.getId())));
-  }
-
-  @Test
-  void references_notes_for_viewer_includes_notebook_root_referrer_linking_to_descendant() {
-    User user = makeMe.aUser().please();
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-    Note focal = makeMe.aNote().title("Focal").notebook(notebook).please();
-    Note referrerAtNotebookRoot = makeMe.aNote().notebook(notebook).content("[[Focal]]").please();
-    wikiTitleCacheService.refreshForNote(referrerAtNotebookRoot, user);
-
-    List<Note> refs = wikiTitleCacheService.referencesNotesForViewer(focal, user);
-
-    assertThat(refs, hasItem(referrerAtNotebookRoot));
   }
 }

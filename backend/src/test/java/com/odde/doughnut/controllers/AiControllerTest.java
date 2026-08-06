@@ -99,6 +99,14 @@ class AiControllerTest extends ControllerTestBase {
     }
 
     @Test
+    void shouldReturnNullTitleWhenAiReturnsNoToolCall()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      openAiStructuredResponseMock.stubStructuredResponse(null);
+
+      assertThat(controller.suggestTitle(testNote).getTitle()).isNull();
+    }
+
+    @Test
     void shouldRequireUserToBeLoggedIn() {
       currentUser.setUser(null);
       assertThrows(ResponseStatusException.class, () -> controller.suggestTitle(testNote));

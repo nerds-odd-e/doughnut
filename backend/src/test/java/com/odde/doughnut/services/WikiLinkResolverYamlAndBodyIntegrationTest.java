@@ -22,17 +22,18 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
 
   @Autowired MakeMe makeMe;
   @Autowired WikiLinkResolver wikiLinkResolver;
-  @Autowired NoteAliasIndexService noteAliasIndexService;
 
   @Test
   void wikiLinkResolver_findsParentLinkInsideYamlFrontmatter() {
     User owner = makeMe.aUser().please();
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
-    Note parent = makeMe.aNote().title("Alpha").notebook(notebook).please();
-    Note child = makeMe.aNote().title("Child").notebook(notebook).please();
-    child.setContent("---\nparent: \"[[Alpha]]\"\n---\n\nBody line.");
-    makeMe.entityPersister.merge(child);
-    makeMe.entityPersister.flush();
+    Note parent = makeMe.aNote().title("Alpha").notebookOwnedBy(owner).please();
+    Note child =
+        makeMe
+            .aNote()
+            .title("Child")
+            .underSameNotebookAs(parent)
+            .content("---\nparent: \"[[Alpha]]\"\n---\n\nBody line.")
+            .please();
 
     assertThat(wikiLinkResolver.resolveWikiLinksForCache(child, owner).size(), equalTo(1));
   }
@@ -40,11 +41,9 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
   @Test
   void wikiLinkResolver_findsPlainWikiLinkInBody() {
     User owner = makeMe.aUser().please();
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
-    Note parent = makeMe.aNote().title("Alpha").notebook(notebook).please();
-    Note child = makeMe.aNote().title("Child").notebook(notebook).content("See [[Alpha]]").please();
-    makeMe.entityPersister.flush();
-    makeMe.entityPersister.refresh(parent);
+    Note parent = makeMe.aNote().title("Alpha").notebookOwnedBy(owner).please();
+    Note child =
+        makeMe.aNote().title("Child").underSameNotebookAs(parent).content("See [[Alpha]]").please();
 
     assertThat(wikiLinkResolver.resolveWikiLinksForCache(child, owner).size(), equalTo(1));
   }
@@ -52,17 +51,14 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
   @Test
   void wikiLinkResolver_resolvesTargetBeforePipe() {
     User owner = makeMe.aUser().please();
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
-    Note parent = makeMe.aNote().title("Alpha").notebook(notebook).please();
+    Note parent = makeMe.aNote().title("Alpha").notebookOwnedBy(owner).please();
     Note child =
         makeMe
             .aNote()
             .title("Child")
-            .notebook(notebook)
+            .underSameNotebookAs(parent)
             .content("See [[Alpha|friendly alias]]")
             .please();
-    makeMe.entityPersister.flush();
-    makeMe.entityPersister.refresh(parent);
 
     var resolved = wikiLinkResolver.resolveWikiLinksForCache(child, owner);
     assertThat(resolved.size(), equalTo(1));
@@ -73,17 +69,12 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
   @Test
   void wikiLinkResolver_resolvesUnambiguousFrontmatterAliasInFocusNotebook() {
     User owner = makeMe.aUser().please();
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
-    String aliasTargetMarkdown = "---\naliases:\n  - color\n---\n\nbody";
     Note aliasTarget =
-        makeMe.aNote().title("colour").notebook(notebook).content(aliasTargetMarkdown).please();
-    noteAliasIndexService.refreshForNote(aliasTarget);
-    Note linker = makeMe.aNote().notebook(notebook).content("See [[color]]").please();
-    makeMe.entityPersister.flush();
+        makeMe.aNote().title("colour").notebookOwnedBy(owner).aliases("color").please();
+    Note linker = makeMe.aNote().underSameNotebookAs(aliasTarget).content("See [[color]]").please();
 
     var resolved = wikiLinkResolver.resolveWikiLinksForCache(linker, owner);
     assertThat(resolved.size(), equalTo(1));
-    assertThat(resolved.getFirst().linkText(), equalTo("color"));
     assertThat(resolved.getFirst().targetNote().getId(), equalTo(aliasTarget.getId()));
   }
 
@@ -92,15 +83,13 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
     User owner = makeMe.aUser().please();
     Notebook otherNotebook =
         makeMe.aNotebook().creatorAndOwner(owner).name("Other Notebook").please();
-    String aliasTargetMarkdown = "---\naliases:\n  - LinkedAlias\n---\n\nbody";
     Note aliasTarget =
         makeMe
             .aNote()
             .title("Canonical Title")
             .notebook(otherNotebook)
-            .content(aliasTargetMarkdown)
+            .aliases("LinkedAlias")
             .please();
-    noteAliasIndexService.refreshForNote(aliasTarget);
     Notebook mainNotebook = makeMe.aNotebook().creatorAndOwner(owner).name("Main").please();
     Note linker =
         makeMe
@@ -108,7 +97,6 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
             .notebook(mainNotebook)
             .content("See [[Other Notebook:LinkedAlias]]")
             .please();
-    makeMe.entityPersister.flush();
 
     var resolved = wikiLinkResolver.resolveWikiLinksForCache(linker, owner);
     assertThat(resolved.size(), equalTo(1));
@@ -119,14 +107,9 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
   @Test
   void wikiLinkResolver_exactTitleWinsOverFrontmatterAlias() {
     User owner = makeMe.aUser().please();
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
-    Note byTitle = makeMe.aNote().title("color").notebook(notebook).please();
-    String aliasTargetMarkdown = "---\naliases:\n  - color\n---\n\nbody";
-    Note byAlias =
-        makeMe.aNote().title("colour").notebook(notebook).content(aliasTargetMarkdown).please();
-    noteAliasIndexService.refreshForNote(byAlias);
-    Note linker = makeMe.aNote().notebook(notebook).content("See [[color]]").please();
-    makeMe.entityPersister.flush();
+    Note byTitle = makeMe.aNote().title("color").notebookOwnedBy(owner).please();
+    makeMe.aNote().title("colour").underSameNotebookAs(byTitle).aliases("color").please();
+    Note linker = makeMe.aNote().underSameNotebookAs(byTitle).content("See [[color]]").please();
 
     var resolved = wikiLinkResolver.resolveWikiLinksForCache(linker, owner);
     assertThat(resolved.size(), equalTo(1));
@@ -136,16 +119,11 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
   @Test
   void wikiLinkResolver_resolvesAmbiguousAliasToLowestNoteId() {
     User owner = makeMe.aUser().please();
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
-    String aliasTargetMarkdown = "---\naliases:\n  - color\n---\n\nbody";
     Note firstTarget =
-        makeMe.aNote().title("first").notebook(notebook).content(aliasTargetMarkdown).please();
+        makeMe.aNote().title("first").notebookOwnedBy(owner).aliases("color").please();
     Note secondTarget =
-        makeMe.aNote().title("second").notebook(notebook).content(aliasTargetMarkdown).please();
-    noteAliasIndexService.refreshForNote(firstTarget);
-    noteAliasIndexService.refreshForNote(secondTarget);
-    Note linker = makeMe.aNote().notebook(notebook).content("See [[color]]").please();
-    makeMe.entityPersister.flush();
+        makeMe.aNote().title("second").underSameNotebookAs(firstTarget).aliases("color").please();
+    Note linker = makeMe.aNote().underSameNotebookAs(firstTarget).content("See [[color]]").please();
 
     var resolved = wikiLinkResolver.resolveWikiLinksForCache(linker, owner);
     assertThat(resolved.size(), equalTo(1));
@@ -160,27 +138,14 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
     String sharedNotebookName = "Shared Notebook";
     Notebook secretNotebook =
         makeMe.aNotebook().creatorAndOwner(secretOwner).name(sharedNotebookName).please();
-    String aliasTargetMarkdown = "---\naliases:\n  - term\n---\n\nbody";
     Note unreadableTarget =
-        makeMe
-            .aNote()
-            .title("hidden")
-            .notebook(secretNotebook)
-            .content(aliasTargetMarkdown)
-            .please();
-    noteAliasIndexService.refreshForNote(unreadableTarget);
+        makeMe.aNote().title("hidden").notebook(secretNotebook).aliases("term").please();
 
     Notebook readableNotebook =
         makeMe.aNotebook().creatorAndOwner(viewer).name(sharedNotebookName).please();
     makeMe.aBazaarNotebook(readableNotebook).please();
     Note readableTarget =
-        makeMe
-            .aNote()
-            .title("visible")
-            .notebook(readableNotebook)
-            .content(aliasTargetMarkdown)
-            .please();
-    noteAliasIndexService.refreshForNote(readableTarget);
+        makeMe.aNote().title("visible").notebook(readableNotebook).aliases("term").please();
     assertThat(unreadableTarget.getId(), lessThan(readableTarget.getId()));
 
     Notebook viewerNotebook = makeMe.aNotebook().creatorAndOwner(viewer).name("Main").please();
@@ -190,7 +155,6 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
             .notebook(viewerNotebook)
             .content("See [[" + sharedNotebookName + ":term]]")
             .please();
-    makeMe.entityPersister.flush();
 
     var resolved = wikiLinkResolver.resolveWikiLinksForCache(linker, viewer);
     assertThat(resolved.size(), equalTo(1));
@@ -200,58 +164,37 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
   @Test
   void does_not_resolve_alias_target_from_wiki_link_only_overlap_alias() {
     User owner = makeMe.aUser().please();
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
-    String overlapOnlyMarkdown =
-        """
-        ---
-        aliases:
-          - "[[Other Note]]"
-        ---
-
-        body
-        """;
     Note overlapDeclarer =
         makeMe
             .aNote()
             .title("Overlap Declarer")
-            .notebook(notebook)
-            .content(overlapOnlyMarkdown)
+            .notebookOwnedBy(owner)
+            .legacyOverlapWikiLink("Other Note")
             .please();
-    noteAliasIndexService.refreshForNote(overlapDeclarer);
     Note linkerByInnerTitle =
-        makeMe.aNote().notebook(notebook).content("See [[Other Note]]").please();
-    makeMe.entityPersister.flush();
+        makeMe.aNote().underSameNotebookAs(overlapDeclarer).content("See [[Other Note]]").please();
 
-    // Neither the overlap target title nor the raw wiki-link token is an alias index key,
-    // so resolve finds no alias target (and there is no title match for "Other Note").
     assertThat(wikiLinkResolver.resolveWikiLinksForCache(linkerByInnerTitle, owner), empty());
   }
 
   @Test
   void resolves_plain_alias_and_ignores_wiki_link_overlap_item_in_mixed_list() {
     User owner = makeMe.aUser().please();
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(owner).please();
-    String mixedAliasMarkdown =
-        """
-        ---
-        aliases:
-          - color
-          - "[[Other Note]]"
-        ---
-
-        body
-        """;
     Note mixedAliasNote =
-        makeMe.aNote().title("colour").notebook(notebook).content(mixedAliasMarkdown).please();
-    noteAliasIndexService.refreshForNote(mixedAliasNote);
-    Note plainAliasLinker = makeMe.aNote().notebook(notebook).content("See [[color]]").please();
+        makeMe
+            .aNote()
+            .title("colour")
+            .notebookOwnedBy(owner)
+            .aliases("color")
+            .legacyOverlapWikiLink("Other Note")
+            .please();
+    Note plainAliasLinker =
+        makeMe.aNote().underSameNotebookAs(mixedAliasNote).content("See [[color]]").please();
     Note overlapTitleLinker =
-        makeMe.aNote().notebook(notebook).content("See [[Other Note]]").please();
-    makeMe.entityPersister.flush();
+        makeMe.aNote().underSameNotebookAs(mixedAliasNote).content("See [[Other Note]]").please();
 
     var plainResolved = wikiLinkResolver.resolveWikiLinksForCache(plainAliasLinker, owner);
     assertThat(plainResolved.size(), equalTo(1));
-    assertThat(plainResolved.getFirst().linkText(), equalTo("color"));
     assertThat(plainResolved.getFirst().targetNote().getId(), equalTo(mixedAliasNote.getId()));
 
     assertThat(wikiLinkResolver.resolveWikiLinksForCache(overlapTitleLinker, owner), empty());

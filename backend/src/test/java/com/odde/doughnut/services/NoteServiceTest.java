@@ -5,15 +5,12 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
-import com.odde.doughnut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,80 +20,36 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class NoteServiceTest {
+class NoteServiceTest {
   @Autowired MakeMe makeMe;
   @Autowired NoteService noteService;
   @Autowired UserService userService;
 
-  @Nested
-  class Destroy {
-    @Test
-    void shouldSoftDeleteMemoryTrackersWhenNoteIsDeleted() {
-      User owner = makeMe.aUser().please();
-      Note note = makeMe.aNote().notebookOwnedBy(owner).please();
-      MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(owner).please();
+  @Test
+  void restore_only_restores_memory_trackers_with_same_deleted_at_as_note() {
+    Timestamp t1 = makeMe.aTimestamp().of(1, 0).please();
+    Timestamp t2 = TimestampOperations.addHoursToTimestamp(t1, 1);
 
-      noteService.destroy(note, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, owner);
+    User owner = makeMe.aUser().please();
+    Note note = makeMe.aNote().notebookOwnedBy(owner).please();
+    MemoryTracker mtDeletedAtT1 = makeMe.aMemoryTrackerFor(note).please();
+    MemoryTracker mtDeletedAtT2 = makeMe.aMemoryTrackerFor(note).spelling().please();
 
-      MemoryTracker refreshed =
-          makeMe.entityPersister.find(MemoryTracker.class, memoryTracker.getId());
-      assertThat(refreshed.getDeletedAt(), notNullValue());
-    }
+    mtDeletedAtT1.setDeletedAt(t1);
+    makeMe.entityPersister.merge(mtDeletedAtT1);
+    note.setDeletedAt(t2);
+    mtDeletedAtT2.setDeletedAt(t2);
+    makeMe.entityPersister.merge(note);
+    makeMe.entityPersister.merge(mtDeletedAtT2);
 
-    @Test
-    void shouldExcludeSoftDeletedMemoryTrackersFromGetMemoryTrackersFor() {
-      User owner = makeMe.aUser().please();
-      Note note = makeMe.aNote().notebookOwnedBy(owner).please();
-      makeMe.aMemoryTrackerFor(note).by(owner).please();
+    noteService.restore(note);
 
-      noteService.destroy(note, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, owner);
-
-      assertThat(userService.getMemoryTrackersFor(owner, note), hasSize(0));
-    }
-
-    @Test
-    void shouldNotCascadeSoftDeleteToStructuralChildNotes() {
-      User u = makeMe.aUser().please();
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(u).please();
-      Note parent = makeMe.aNote().notebook(notebook).please();
-      Note subject = makeMe.aNote().notebook(notebook).please();
-      Note child = makeMe.aNote("child").notebook(notebook).please();
-
-      noteService.destroy(subject, NoteDeleteReferenceHandling.LEAVE_DEAD_LINKS, u);
-
-      assertThat(subject.getDeletedAt(), notNullValue());
-      assertThat(child.getDeletedAt(), nullValue());
-    }
-  }
-
-  @Nested
-  class Restore {
-    @Test
-    void shouldRestoreOnlyMemoryTrackersWithSameDeletedAt() {
-      Timestamp t1 = makeMe.aTimestamp().of(1, 0).please();
-      Timestamp t2 = TimestampOperations.addHoursToTimestamp(t1, 1);
-
-      User owner = makeMe.aUser().please();
-      Note note = makeMe.aNote().notebookOwnedBy(owner).please();
-      MemoryTracker mtDeletedAtT1 = makeMe.aMemoryTrackerFor(note).by(owner).please();
-      MemoryTracker mtDeletedAtT2 = makeMe.aMemoryTrackerFor(note).by(owner).spelling().please();
-
-      mtDeletedAtT1.setDeletedAt(t1);
-      makeMe.entityPersister.merge(mtDeletedAtT1);
-      note.setDeletedAt(t2);
-      mtDeletedAtT2.setDeletedAt(t2);
-      makeMe.entityPersister.merge(note);
-      makeMe.entityPersister.merge(mtDeletedAtT2);
-
-      noteService.restore(note);
-
-      MemoryTracker refreshedT1 =
-          makeMe.entityPersister.find(MemoryTracker.class, mtDeletedAtT1.getId());
-      MemoryTracker refreshedT2 =
-          makeMe.entityPersister.find(MemoryTracker.class, mtDeletedAtT2.getId());
-      assertThat(refreshedT1.getDeletedAt(), notNullValue());
-      assertThat(refreshedT2.getDeletedAt(), nullValue());
-      assertThat(userService.getMemoryTrackersFor(owner, note), hasSize(1));
-    }
+    assertThat(
+        makeMe.entityPersister.find(MemoryTracker.class, mtDeletedAtT1.getId()).getDeletedAt(),
+        notNullValue());
+    assertThat(
+        makeMe.entityPersister.find(MemoryTracker.class, mtDeletedAtT2.getId()).getDeletedAt(),
+        nullValue());
+    assertThat(userService.getMemoryTrackersFor(owner, note), hasSize(1));
   }
 }
