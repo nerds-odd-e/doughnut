@@ -1,4 +1,4 @@
-import { describe, it } from "vitest"
+import { beforeEach, describe, it } from "vitest"
 import { render } from "vitest-browser-vue"
 import type { Meta, StoryObj } from "@storybook/vue3"
 import { createRouter, createWebHistory } from "vue-router"
@@ -7,6 +7,7 @@ import { routeMetadata } from "@/routes/routeMetadata"
 import { ref } from "vue"
 import type { User } from "@generated/doughnut-backend-api"
 import makeMe from "doughnut-test-fixtures/makeMe"
+import { mockShowNote } from "@tests/helpers"
 import { storyFiles } from "../../storyFiles.generated"
 
 // Mock router for components that use vue-router (same as Storybook preview)
@@ -32,6 +33,10 @@ const router = createRouter({
 
 describe("All Storybook Stories", () => {
   const storyFilesList = storyFiles
+
+  beforeEach(() => {
+    mockShowNote()
+  })
 
   if (storyFilesList.length === 0) {
     it("should find story files", () => {
