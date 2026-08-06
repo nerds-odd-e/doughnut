@@ -125,16 +125,16 @@ export function qualifyingRelationRealmForDelete(options?: {
 } {
   const moonId = options?.moonId ?? 501
   const earthId = options?.earthId ?? 502
-  const relationRealm = {
-    ...makeMe.aNoteRealm
-      .content(relationshipNoteContent("a-part-of", "[[Moon]]", "[[Earth]]"))
-      .please(),
-    ...(options?.relationId === undefined ? {} : { id: options.relationId }),
-    wikiTitles: [
+  const relationBuilder = makeMe.aNoteRealm
+    .content(relationshipNoteContent("a-part-of", "[[Moon]]", "[[Earth]]"))
+    .wikiTitles([
       wikiTitleFromInnerAndNoteId("Moon", moonId),
       wikiTitleFromInnerAndNoteId("Earth", earthId),
-    ],
-  }
+    ])
+  const relationRealm =
+    options?.relationId === undefined
+      ? relationBuilder.please()
+      : relationBuilder.id(options.relationId).please()
 
   return { moonId, earthId, relationRealm }
 }
@@ -159,31 +159,15 @@ export function relationNotesForPropChangeTest(options?: {
 } {
   const moonId = options?.moonId ?? 501
   const relationId = options?.relationId ?? 503
-  const moonNote = {
-    ...makeMe.aNote.please(),
-    id: moonId,
-    noteTopology: {
-      ...makeMe.aNote.please().noteTopology,
-      id: moonId,
-      title: "Moon",
-    },
-  }
+  const moonNote = makeMe.aNote.id(moonId).title("Moon").please()
   const { relationRealm } = qualifyingRelationRealmForDelete({
     moonId,
     relationId,
   })
-  const relationNote = {
-    ...relationRealm.note,
-    id: relationId,
-    noteTopology: {
-      ...relationRealm.note.noteTopology,
-      id: relationId,
-    },
-  }
-  useStorageAccessor().value.refreshNoteRealm({
-    ...makeMe.aNoteRealm.title("Moon").please(),
-    id: moonId,
-  })
+  const relationNote = relationRealm.note
+  useStorageAccessor().value.refreshNoteRealm(
+    makeMe.aNoteRealm.id(moonId).title("Moon").please()
+  )
   useStorageAccessor().value.refreshNoteRealm(relationRealm)
 
   return { moonId, relationId, moonNote, relationNote }

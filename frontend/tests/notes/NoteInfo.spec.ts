@@ -19,7 +19,7 @@ describe("note info", () => {
     document.body.innerHTML = ""
   })
 
-  it("should render values", async () => {
+  it("loads note info and renders the info table", async () => {
     const getNoteInfoSpy = mockSdkService(
       NoteController,
       "getNoteInfo",
@@ -35,9 +35,9 @@ describe("note info", () => {
       .withRouter()
       .mount({ attachTo: document.body })
     await flushPromises()
-    expect(wrapper.find("table").exists()).toBe(true)
     expect(getNoteInfoSpy).toBeCalledWith({
       path: { note: noteRealm.id },
     })
+    expect(wrapper.find("table").exists()).toBe(true)
   })
 })

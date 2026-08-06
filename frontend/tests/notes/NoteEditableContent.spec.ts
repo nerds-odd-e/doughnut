@@ -40,7 +40,6 @@ describe("NoteEditableContent", () => {
     )
     await flushPromises()
 
-    const contentTextarea = textareaEl(wrapper)
     await setTextareaValue(wrapper, "Edited content from first note")
 
     await wrapper.setProps({
@@ -49,12 +48,10 @@ describe("NoteEditableContent", () => {
     })
     await flushPromises()
 
-    expect(contentTextarea.value).toBe("Second note content")
+    expect(textareaEl(wrapper).value).toBe("Second note content")
 
-    contentTextarea.value = "New edits on second note"
-    contentTextarea.dispatchEvent(new Event("input"))
-    contentTextarea.dispatchEvent(new Event("blur"))
-    await flushPromises()
+    await setTextareaValue(wrapper, "New edits on second note")
+    await blurTextarea(wrapper)
 
     const calls = updateNoteContentSpy.mock.calls as Array<
       [UpdateNoteContentData]
@@ -67,15 +64,10 @@ describe("NoteEditableContent", () => {
       )
     ).toBe(false)
     expect(calls.some((call) => call[0].path?.note === firstNoteId)).toBe(false)
-    if (calls.length > 0) {
-      expect(
-        calls.some(
-          (call) =>
-            call[0].path?.note === secondNoteId &&
-            call[0].body?.content === "New edits on second note"
-        )
-      ).toBe(true)
-    }
+    expect(updateNoteContentSpy).toHaveBeenCalledWith({
+      path: { note: secondNoteId },
+      body: { content: "New edits on second note" },
+    })
     wrapper.unmount()
   })
 

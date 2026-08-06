@@ -1,4 +1,3 @@
-import usePopups from "@/components/commons/Popups/usePopups"
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest"
 import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDebounceTestSupport"
 import {
@@ -6,6 +5,7 @@ import {
   mockNoteInfoWithPropertyTracker,
   setTextareaValue,
   setupMemoryTrackerSdkMocks,
+  setupPopupsMock,
   setupUpdateNoteContentMock,
   trackedPropertyMarkdown,
   trackedPropertyNoteId,
@@ -36,16 +36,7 @@ describe("NoteEditableContent property memory tracker guard on markdown", () => 
       setupMemoryTrackerSdkMocks())
     mockPopupsOptions = vi.fn().mockResolvedValue(null)
     confirmMock = vi.fn<(msg: string) => Promise<boolean>>()
-    vi.mocked(usePopups).mockReturnValue({
-      popups: {
-        options: mockPopupsOptions,
-        alert: vi.fn(),
-        confirm: confirmMock,
-        done: vi.fn(),
-        register: vi.fn(),
-        peek: vi.fn(),
-      },
-    })
+    setupPopupsMock(mockPopupsOptions, { confirm: confirmMock })
   })
 
   afterEach(() => {

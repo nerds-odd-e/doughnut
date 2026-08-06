@@ -1,11 +1,12 @@
 import { flushPromises } from "@vue/test-utils"
-import { describe, expect, it, vi } from "vitest"
+import { describe, expect, it } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { wrapSdkResponse } from "@tests/helpers"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import {
   noteMoreOptionsDeleteFormNote as note,
+  clickDeleteNote,
   deleteNoteSpy,
   renderer,
   setupNoteMoreOptionsDeleteFormTests,
@@ -20,10 +21,7 @@ describe("NoteMoreOptionsForm delete note", () => {
     const wrapper = renderer.withProps({ note }).mount()
 
     await flushPromises()
-
-    const deleteButton = wrapper.find('button[title="Delete note (d)"]')
-    await deleteButton.trigger("click")
-    await flushPromises()
+    await clickDeleteNote(wrapper)
 
     const popups = usePopups().popups.peek()
     expect(popups?.length).toBe(1)
@@ -49,10 +47,7 @@ describe("NoteMoreOptionsForm delete note", () => {
     const wrapper = renderer.withProps({ note: noteRealm.note }).mount()
 
     await flushPromises()
-
-    const deleteButton = wrapper.find('button[title="Delete note (d)"]')
-    await deleteButton.trigger("click")
-    await flushPromises()
+    await clickDeleteNote(wrapper)
 
     const popups = usePopups().popups.peek()
     expect(popups?.length).toBe(1)
@@ -76,15 +71,7 @@ describe("NoteMoreOptionsForm delete note", () => {
     const wrapper = renderer.withProps({ note }).mount()
 
     await flushPromises()
-
-    const storageAccessor = useStorageAccessor()
-    const deleteNoteMock = vi.fn()
-    const storedApi = storageAccessor.value.storedApi()
-    storedApi.deleteNote = deleteNoteMock
-
-    const deleteButton = wrapper.find('button[title="Delete note (d)"]')
-    await deleteButton.trigger("click")
-    await flushPromises()
+    await clickDeleteNote(wrapper)
 
     const popups = usePopups().popups.peek()
     expect(popups?.length).toBe(1)
@@ -92,6 +79,6 @@ describe("NoteMoreOptionsForm delete note", () => {
     usePopups().popups.done(false)
     await flushPromises()
 
-    expect(deleteNoteMock).not.toHaveBeenCalled()
+    expect(deleteNoteSpy).not.toHaveBeenCalled()
   })
 })

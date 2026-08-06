@@ -86,6 +86,15 @@ export function createClipboardEvent(html: string): ClipboardEvent {
   return event
 }
 
+export function emitRichEditorPasteComplete(
+  wrapper: VueWrapper<ComponentPublicInstance>,
+  newContent: string
+) {
+  const richEditor = wrapper.findComponent({ name: "RichMarkdownEditor" })
+  richEditor.vm.$emit("update:modelValue", newContent)
+  richEditor.vm.$emit("pasteComplete", newContent)
+}
+
 export function setupUpdateNoteContentMock() {
   return mockSdkService(
     TextContentController,
@@ -94,13 +103,18 @@ export function setupUpdateNoteContentMock() {
   )
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: Mock type for testing
-export function setupPopupsMock(mockPopupsOptions: any) {
+export function setupPopupsMock(
+  // biome-ignore lint/suspicious/noExplicitAny: Mock type for testing
+  mockPopupsOptions: any,
+  overrides?: {
+    confirm?: (msg: string) => Promise<boolean>
+  }
+) {
   vi.mocked(usePopups).mockReturnValue({
     popups: {
       options: mockPopupsOptions,
       alert: vi.fn(),
-      confirm: vi.fn(),
+      confirm: overrides?.confirm ?? vi.fn(),
       done: vi.fn(),
       register: vi.fn(),
       peek: vi.fn(),

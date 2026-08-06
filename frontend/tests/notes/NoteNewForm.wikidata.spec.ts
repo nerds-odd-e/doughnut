@@ -20,8 +20,8 @@ import {
   wikidataDialogIsOpen,
   type NoteNewFormSdkSpies,
 } from "@tests/notes/noteNewFormTestSupport"
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import { RESERVED_README_TITLE_MESSAGE } from "@/utils/reservedReadmeTitles"
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 
 const popupsMock = {
   confirm: vi.fn().mockResolvedValue(false),

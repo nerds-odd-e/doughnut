@@ -2,6 +2,7 @@ import { flushPromises } from "@vue/test-utils"
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest"
 import {
   createClipboardEvent,
+  emitRichEditorPasteComplete,
   mountNoteEditableContent,
   setupPopupsMock,
   setupUpdateNoteContentMock,
@@ -46,37 +47,40 @@ describe("NoteEditableContent paste", () => {
   })
 
   describe("textarea", () => {
-    it.each([
-      {
-        name: "shows options popup when content contains links after paste",
-        initialContent: "",
-        pasteHtml: '<p>Check <a href="https://example.com">this link</a></p>',
-        expectPopup: true,
-      },
-      {
-        name: "does not show popup when entire content has no links or images",
-        initialContent: "plain text",
-        pasteHtml: "<p><strong>Bold text</strong></p>",
-        expectPopup: false,
-      },
-    ])("$name", async ({ initialContent, pasteHtml, expectPopup }) => {
+    it("shows options popup when pasted content contains links", async () => {
       const wrapper = mountNoteEditableContent(
-        { noteId: 1, noteContent: initialContent },
+        { noteId: 1, noteContent: "" },
         { attachTo: document.body }
       )
       await flushPromises()
 
-      await textareaEl(wrapper).dispatchEvent(createClipboardEvent(pasteHtml))
+      await textareaEl(wrapper).dispatchEvent(
+        createClipboardEvent(
+          '<p>Check <a href="https://example.com">this link</a></p>'
+        )
+      )
       await flushPromises()
 
-      if (expectPopup) {
-        expect(mockPopupsOptions).toHaveBeenCalledWith(
-          "The content contains 1 links.",
-          expect.arrayContaining([{ label: "Remove 1 links", value: "links" }])
-        )
-      } else {
-        expect(mockPopupsOptions).not.toHaveBeenCalled()
-      }
+      expect(mockPopupsOptions).toHaveBeenCalledWith(
+        "The content contains 1 links.",
+        expect.arrayContaining([{ label: "Remove 1 links", value: "links" }])
+      )
+      wrapper.unmount()
+    })
+
+    it("does not show popup when pasted content has no links or images", async () => {
+      const wrapper = mountNoteEditableContent(
+        { noteId: 1, noteContent: "plain text" },
+        { attachTo: document.body }
+      )
+      await flushPromises()
+
+      await textareaEl(wrapper).dispatchEvent(
+        createClipboardEvent("<p><strong>Bold text</strong></p>")
+      )
+      await flushPromises()
+
+      expect(mockPopupsOptions).not.toHaveBeenCalled()
       wrapper.unmount()
     })
 
@@ -116,41 +120,31 @@ describe("NoteEditableContent paste", () => {
       )
     }
 
-    function emitPaste(
-      wrapper: ReturnType<typeof mountRichEditor>,
-      newContent: string
-    ) {
-      const richEditor = wrapper.findComponent({ name: "RichMarkdownEditor" })
-      richEditor.vm.$emit("update:modelValue", newContent)
-      richEditor.vm.$emit("pasteComplete", newContent)
-    }
-
-    it.each([
-      {
-        name: "shows options popup based on content AFTER paste, not before",
-        newContent: "plain text [new link](https://example.com)",
-        expectPopup: true,
-      },
-      {
-        name: "does not show popup when quill content has no links or images",
-        newContent: "plain text with more plain text",
-        expectPopup: false,
-      },
-    ])("$name", async ({ newContent, expectPopup }) => {
+    it("shows options popup based on content after paste", async () => {
       const wrapper = mountRichEditor("plain text")
       await flushPromises()
 
-      emitPaste(wrapper, newContent)
+      emitRichEditorPasteComplete(
+        wrapper,
+        "plain text [new link](https://example.com)"
+      )
       await flushPromises()
 
-      if (expectPopup) {
-        expect(mockPopupsOptions).toHaveBeenCalledWith(
-          "The content contains 1 links.",
-          expect.arrayContaining([{ label: "Remove 1 links", value: "links" }])
-        )
-      } else {
-        expect(mockPopupsOptions).not.toHaveBeenCalled()
-      }
+      expect(mockPopupsOptions).toHaveBeenCalledWith(
+        "The content contains 1 links.",
+        expect.arrayContaining([{ label: "Remove 1 links", value: "links" }])
+      )
+      wrapper.unmount()
+    })
+
+    it("does not show popup when quill content has no links or images", async () => {
+      const wrapper = mountRichEditor("plain text")
+      await flushPromises()
+
+      emitRichEditorPasteComplete(wrapper, "plain text with more plain text")
+      await flushPromises()
+
+      expect(mockPopupsOptions).not.toHaveBeenCalled()
       wrapper.unmount()
     })
   })

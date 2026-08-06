@@ -11,14 +11,6 @@ import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { screen } from "@testing-library/vue"
 
-vi.mock("@/managedApi/AiReplyEventSource", () => ({
-  default: class {
-    onMessage = vi.fn(() => this)
-    onError = vi.fn(() => this)
-    start = vi.fn()
-  },
-}))
-
 vi.mock("@/components/commons/Popups/usePopups", () => ({
   default: () => ({
     popups: {

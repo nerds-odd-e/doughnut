@@ -2,42 +2,52 @@ import { flushPromises } from "@vue/test-utils"
 import { describe, it, expect, afterEach } from "vitest"
 import { mountNoteEditableContent } from "./noteEditableContentTestSupport"
 
+function relationTypeSelectInRow(): Element | null {
+  return document.querySelector(
+    '[data-testid="rich-note-property-row"][data-property-key="relation"] button[aria-label="Relation Type"]'
+  )
+}
+
 describe("NoteEditableContent relation property row in rich mode", () => {
   afterEach(() => {
     document.body.innerHTML = ""
   })
 
-  it.each([
-    {
-      name: "shows RelationTypeSelectCompact when noteContent include relation frontmatter",
-      markdown: `---
+  it("shows relation type picker when noteContent includes relation frontmatter", async () => {
+    const wrapper = mountNoteEditableContent(
+      {
+        noteId: 99,
+        noteContent: `---
 relation: parent-of
 ---
 
 # Body`,
-      expectRelationSelect: true,
-    },
-    {
-      name: "omits RelationTypeSelectCompact when noteContent omit relation property",
-      markdown: `---
-topic: training
----
-
-# Body`,
-      expectRelationSelect: false,
-    },
-  ])("$name", async ({ markdown, expectRelationSelect }) => {
-    const wrapper = mountNoteEditableContent(
-      { noteId: 99, noteContent: markdown, asMarkdown: false },
+        asMarkdown: false,
+      },
       { attachTo: document.body }
     )
     await flushPromises()
 
-    const rfp = wrapper.findComponent({ name: "RichFrontmatterProperties" })
-    expect(rfp.exists()).toBe(true)
-    expect(
-      rfp.findComponent({ name: "RelationTypeSelectCompact" }).exists()
-    ).toBe(expectRelationSelect)
+    expect(relationTypeSelectInRow()).not.toBeNull()
+    wrapper.unmount()
+  })
+
+  it("omits relation type picker when noteContent has no relation property", async () => {
+    const wrapper = mountNoteEditableContent(
+      {
+        noteId: 99,
+        noteContent: `---
+topic: training
+---
+
+# Body`,
+        asMarkdown: false,
+      },
+      { attachTo: document.body }
+    )
+    await flushPromises()
+
+    expect(relationTypeSelectInRow()).toBeNull()
     wrapper.unmount()
   })
 })

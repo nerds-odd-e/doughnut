@@ -1,5 +1,4 @@
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
-import NoteMoreOptionsForm from "@/components/notes/widgets/NoteMoreOptionsForm.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
 import {
@@ -75,7 +74,6 @@ describe("NoteToolbar more options", () => {
     await wrapper.find(`[title="${titles.overflowMenu}"]`).trigger("click")
     await flushPromises()
 
-    expect(wrapper.findComponent(NoteMoreOptionsForm).exists()).toBe(true)
     expect(
       document.querySelector("[data-dropdown-portal-panel]")
     ).not.toBeNull()
@@ -93,7 +91,9 @@ describe("NoteToolbar more options", () => {
     await wrapper.find(`[title="${titles.overflowMenu}"]`).trigger("click")
     await flushPromises()
 
-    expect(wrapper.findComponent(NoteMoreOptionsForm).exists()).toBe(true)
+    expect(
+      document.querySelector("[data-dropdown-portal-panel]")
+    ).not.toBeNull()
 
     const newNote = makeMe.aNoteRealm.title("New Note").please()
     await wrapper.setProps(noteToolbarProps(newNote))

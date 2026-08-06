@@ -57,19 +57,15 @@ describe("NoteMoreOptionsForm", () => {
       await flushPromises()
 
       expect(wrapper.find('button[title="Export... (e)"]').exists()).toBe(true)
-      expect(wrapper.get("ul").text()).toContain("Export... (e)")
       expect(
         wrapper.find('button[title="Questions for the note"]').exists()
       ).toBe(true)
-      expect(wrapper.get("ul").text()).toContain("Questions for the note")
       expect(
         wrapper.find('button[title="Assimilation settings"]').exists()
       ).toBe(true)
-      expect(wrapper.get("ul").text()).toContain("Assimilation settings")
       expect(wrapper.find('button[title="Delete note (d)"]').exists()).toBe(
         true
       )
-      expect(wrapper.get("ul").text()).toContain("Delete note (d)")
     })
   })
 

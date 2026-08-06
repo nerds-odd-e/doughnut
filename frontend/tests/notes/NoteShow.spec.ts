@@ -33,17 +33,14 @@ describe("new/updated pink banner", () => {
       await flushPromises()
       const element = wrapper.find(".note-recent-update-indicator")
         .element as HTMLElement
-      // Browser might return spaces in rgb values, e.g. "rgb(208, 237, 23)" vs "rgb(208,237,23)"
-      // Normalize both expected and actual by removing spaces
       const actualColor = element.style.color.replace(/\s/g, "")
-      const expectedColorNormalized = expectedColor.replace(/\s/g, "")
-      expect(actualColor).toBe(expectedColorNormalized)
+      expect(actualColor).toBe(expectedColor.replace(/\s/g, ""))
       wrapper.unmount()
     }
   )
 })
 
-describe("note wth children", () => {
+describe("note without children", () => {
   const note = makeMe.aNoteRealm.please()
 
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
@@ -67,7 +64,7 @@ describe("note wth children", () => {
     document.body.innerHTML = ""
   })
 
-  it("should call the api", () => {
+  it("calls showNote for the note id", () => {
     const showNoteSpy = mockSdkService(NoteController, "showNote", note)
     render(note)
 
@@ -76,7 +73,7 @@ describe("note wth children", () => {
     })
   })
 
-  it("should not render children control if no child", async () => {
+  it("does not render children control when note has no children", async () => {
     render(note)
     await flushPromises()
     expect(wrapper.findAll('[title="collapse children"]')).toHaveLength(0)
