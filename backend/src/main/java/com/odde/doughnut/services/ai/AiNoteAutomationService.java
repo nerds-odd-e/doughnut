@@ -3,6 +3,7 @@ package com.odde.doughnut.services.ai;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.algorithms.NoteContentTitleHeading;
 import com.odde.doughnut.algorithms.WikiLinkMarkdown;
+import com.odde.doughnut.controllers.dto.NoteRefinementQuestionContextDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.builder.OpenAIResponseRequestBuilder;
@@ -53,15 +54,17 @@ public class AiNoteAutomationService {
             null));
   }
 
-  public StructuredResponseCreateParams<NoteRefinementLayout> buildRefinementLayoutRequest() {
-    InstructionAndSchema tool = AiToolFactory.generateNoteRefinementLayoutAiTool();
+  public StructuredResponseCreateParams<NoteRefinementLayout> buildRefinementLayoutRequest(
+      NoteRefinementQuestionContextDTO questionContext) {
+    InstructionAndSchema tool = AiToolFactory.generateNoteRefinementLayoutAiTool(questionContext);
     return buildStructuredResponseParams(
         NoteRefinementLayout.class, tool, NOTE_REFINEMENT_LAYOUT_MAX_OUTPUT_TOKENS);
   }
 
-  public NoteRefinementLayout generateRefinementSuggestions() throws JsonProcessingException {
+  public NoteRefinementLayout generateRefinementSuggestions(
+      NoteRefinementQuestionContextDTO questionContext) throws JsonProcessingException {
     return executeWithParams(
-        buildRefinementLayoutRequest(),
+        buildRefinementLayoutRequest(questionContext),
         NoteRefinementLayoutValidator::validOrEmpty,
         NoteRefinementLayout.empty());
   }

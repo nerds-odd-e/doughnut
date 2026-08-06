@@ -1085,7 +1085,14 @@ export class AiController {
     }
     
     public static generateRefinementSuggestions<ThrowOnError extends boolean = false>(options: Options<GenerateRefinementSuggestionsData, ThrowOnError>): RequestResult<GenerateRefinementSuggestionsResponses, unknown, ThrowOnError> {
-        return (options.client ?? client).post<GenerateRefinementSuggestionsResponses, unknown, ThrowOnError>({ url: '/api/ai/generate-refinement-suggestions/{note}', ...options });
+        return (options.client ?? client).post<GenerateRefinementSuggestionsResponses, unknown, ThrowOnError>({
+            url: '/api/ai/generate-refinement-suggestions/{note}',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
     }
     
     /**
@@ -1096,6 +1103,22 @@ export class AiController {
     public static extractNotePreview<ThrowOnError extends boolean = false>(options: Options<ExtractNotePreviewData, ThrowOnError>): RequestResult<ExtractNotePreviewResponses, unknown, ThrowOnError> {
         return (options.client ?? client).post<ExtractNotePreviewResponses, unknown, ThrowOnError>({
             url: '/api/ai/extract-note-preview/{note}',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
+    }
+    
+    /**
+     * Export refinement-layout AI request JSON
+     *
+     * Returns the OpenAI structured-response request body for note refinement layout generation (breakdown) without calling OpenAI. Optional MCQ question context uses the same question-aware instruction builder as generate-refinement-suggestions.
+     */
+    public static exportRefinementLayoutRequest<ThrowOnError extends boolean = false>(options: Options<ExportRefinementLayoutRequestData, ThrowOnError>): RequestResult<ExportRefinementLayoutRequestResponses, unknown, ThrowOnError> {
+        return (options.client ?? client).post<ExportRefinementLayoutRequestResponses, unknown, ThrowOnError>({
+            url: '/api/ai/export-refinement-layout-request/{note}',
             ...options,
             headers: {
                 'Content-Type': 'application/json',
@@ -1134,15 +1157,6 @@ export class AiController {
                 ...options.headers
             }
         });
-    }
-    
-    /**
-     * Export refinement-layout AI request JSON
-     *
-     * Returns the OpenAI structured-response request body for note refinement layout generation (breakdown) without calling OpenAI.
-     */
-    public static exportRefinementLayoutRequest<ThrowOnError extends boolean = false>(options: Options<ExportRefinementLayoutRequestData, ThrowOnError>): RequestResult<ExportRefinementLayoutRequestResponses, unknown, ThrowOnError> {
-        return (options.client ?? client).get<ExportRefinementLayoutRequestResponses, unknown, ThrowOnError>({ url: '/api/ai/export-refinement-layout-request/{note}', ...options });
     }
     
     public static dummyEntryToGenerateDataTypesThatAreRequiredInEventStream<ThrowOnError extends boolean = false>(options?: Options<DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamData, ThrowOnError>): RequestResult<DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamResponses, unknown, ThrowOnError> {

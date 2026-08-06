@@ -1610,6 +1610,11 @@ paths:
         required: true
         schema:
           type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteRefinementQuestionContextDTO"
       responses:
         "200":
           description: OK
@@ -1645,6 +1650,34 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NoteExtractionResult"
+  /api/ai/export-refinement-layout-request/{note}:
+    post:
+      tags:
+      - ai-controller
+      summary: Export refinement-layout AI request JSON
+      description: Returns the OpenAI structured-response request body for note refinement
+        layout generation (breakdown) without calling OpenAI. Optional MCQ question
+        context uses the same question-aware instruction builder as generate-refinement-suggestions.
+      operationId: exportRefinementLayoutRequest
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteRefinementQuestionContextDTO"
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: {}
   /api/ai/export-extract-request/{note}:
     post:
       tags:
@@ -2928,28 +2961,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AssimilationNextDTO"
-  /api/ai/export-refinement-layout-request/{note}:
-    get:
-      tags:
-      - ai-controller
-      summary: Export refinement-layout AI request JSON
-      description: Returns the OpenAI structured-response request body for note refinement
-        layout generation (breakdown) without calling OpenAI.
-      operationId: exportRefinementLayoutRequest
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: object
-                additionalProperties: {}
   /api/ai/dummy:
     get:
       tags:
@@ -4422,6 +4433,24 @@ components:
       properties:
         content:
           type: string
+    NoteRefinementQuestionContextDTO:
+      type: object
+      properties:
+        stem:
+          type: string
+          description: MCQ question stem (markdown allowed)
+        choices:
+          type: array
+          description: MCQ response choices (markdown allowed)
+          items:
+            type: string
+        correctAnswerIndex:
+          type: integer
+          format: int32
+          description: "Zero-based index of the correct choice, when known"
+        testedFocus:
+          type: string
+          description: Optional description of what the question was testing
     NoteRefinementLayoutDTO:
       type: object
       properties:

@@ -11,6 +11,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.NoteRefinementLayoutDTO;
+import com.odde.doughnut.controllers.dto.NoteRefinementQuestionContextDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.ai.NoteRefinementLayout;
@@ -59,7 +60,7 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       testNote.setContent(content);
 
-      assertThat(controller.generateRefinementSuggestions(testNote).getItems()).isEmpty();
+      assertThat(controller.generateRefinementSuggestions(testNote, null).getItems()).isEmpty();
     }
 
     @Test
@@ -79,7 +80,7 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
                   new NoteRefinementLayoutItem("p2", "Point 2", false, false, List.of()))));
       testNote.setContent("Some note content");
 
-      NoteRefinementLayoutDTO result = controller.generateRefinementSuggestions(testNote);
+      NoteRefinementLayoutDTO result = controller.generateRefinementSuggestions(testNote, null);
 
       assertThat(result.getItems()).hasSize(2);
       assertThat(result.getItems().getFirst().getText()).isEqualTo("Point 1");
@@ -100,10 +101,47 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
           .contains("Focus Note content only")
           .contains("only source for layout items")
           .contains("Retrieved Notes are secondary context only")
-          .contains("do not add layout items for content that appears only in Retrieved Notes");
+          .contains("do not add layout items for content that appears only in Retrieved Notes")
+          .contains("Set ledToQuestion to false for every item")
+          .doesNotContain("Set ledToQuestion=true");
       assertThat(params.rawParams().text().flatMap(ResponseTextConfig::format)).isPresent();
       assertThat(params.rawParams().input().flatMap(input -> input.text()).orElse("")).isNotBlank();
       assertThat(params.rawParams().maxOutputTokens()).isEqualTo(Optional.of(1000L));
+    }
+
+    @Test
+    void shouldAppendQuestionLedGuidanceWhenQuestionContextProvided()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      openAiStructuredResponseMock.stubStructuredResponse(
+          new NoteRefinementLayout(
+              List.of(
+                  new NoteRefinementLayoutItem(
+                      "p1", "Capital of France", false, true, List.of()))));
+      testNote.setContent("Paris is the capital of France.");
+
+      NoteRefinementQuestionContextDTO questionContext = new NoteRefinementQuestionContextDTO();
+      questionContext.setStem("What is the capital of France?");
+      questionContext.setChoices(List.of("Paris", "London", "Berlin"));
+      questionContext.setCorrectAnswerIndex(0);
+      questionContext.setTestedFocus("capital city");
+
+      controller.generateRefinementSuggestions(testNote, questionContext);
+
+      @SuppressWarnings({"unchecked", "rawtypes"})
+      ArgumentCaptor<StructuredResponseCreateParams<NoteRefinementLayout>> paramsCaptor =
+          ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
+      verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
+      String instructions = paramsCaptor.getValue().rawParams().instructions().orElse("");
+      assertThat(instructions)
+          .contains("What is the capital of France?")
+          .contains("0. Paris")
+          .contains("1. London")
+          .contains("2. Berlin")
+          .contains("Correct answer index: 0")
+          .contains("Tested focus: capital city")
+          .contains("Set ledToQuestion=true")
+          .contains("Set ledToQuestion=false on all other items")
+          .doesNotContain("Set ledToQuestion to false for every item");
     }
 
     @Test
@@ -112,7 +150,7 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
       openAiStructuredResponseMock.stubStructuredResponse(null);
       testNote.setContent("Some note content");
 
-      assertThat(controller.generateRefinementSuggestions(testNote).getItems()).isEmpty();
+      assertThat(controller.generateRefinementSuggestions(testNote, null).getItems()).isEmpty();
     }
 
     @Test
@@ -134,7 +172,7 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
                     new NoteRefinementLayoutItem("same", "Point 2", false, false, List.of()))));
         testNote.setContent("Some note content");
 
-        assertThat(controller.generateRefinementSuggestions(testNote).getItems()).isEmpty();
+        assertThat(controller.generateRefinementSuggestions(testNote, null).getItems()).isEmpty();
         assertThat(logAppender.list)
             .anyMatch(
                 event ->
@@ -151,7 +189,8 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
     void shouldRequireUserToBeLoggedIn() {
       currentUser.setUser(null);
       assertThrows(
-          ResponseStatusException.class, () -> controller.generateRefinementSuggestions(testNote));
+          ResponseStatusException.class,
+          () -> controller.generateRefinementSuggestions(testNote, null));
     }
   }
 }

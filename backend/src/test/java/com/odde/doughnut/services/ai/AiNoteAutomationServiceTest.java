@@ -78,7 +78,7 @@ class AiNoteAutomationServiceTest {
                   List.of())));
       openAiStructuredResponseMock.stubStructuredResponse(layout);
 
-      NoteRefinementLayout result = service.generateRefinementSuggestions();
+      NoteRefinementLayout result = service.generateRefinementSuggestions(null);
 
       assertThat(result.getItems(), hasSize(2));
       assertThat(
@@ -92,7 +92,7 @@ class AiNoteAutomationServiceTest {
     void shouldReturnEmptyLayoutWhenNoResponse() throws JsonProcessingException {
       openAiStructuredResponseMock.stubStructuredResponse(null);
 
-      assertThat(service.generateRefinementSuggestions().getItems(), empty());
+      assertThat(service.generateRefinementSuggestions(null).getItems(), empty());
     }
   }
 }

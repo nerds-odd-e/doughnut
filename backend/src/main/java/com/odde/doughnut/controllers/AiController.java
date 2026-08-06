@@ -76,7 +76,8 @@ public class AiController {
   @PostMapping("/generate-refinement-suggestions/{note}")
   @Transactional
   public NoteRefinementLayoutDTO generateRefinementSuggestions(
-      @PathVariable(value = "note") @Schema(type = "integer") Note note)
+      @PathVariable(value = "note") @Schema(type = "integer") Note note,
+      @RequestBody(required = false) NoteRefinementQuestionContextDTO questionContext)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
     authorizationService.assertAuthorization(note);
     String content = note.getContent();
@@ -87,7 +88,7 @@ public class AiController {
       NoteRefinementLayout layout =
           notebookAssistantForNoteServiceFactory
               .createNoteAutomationService(note)
-              .generateRefinementSuggestions();
+              .generateRefinementSuggestions(questionContext);
       return new NoteRefinementLayoutDTO(layout);
     } catch (OpenAiNotAvailableException e) {
       return new NoteRefinementLayoutDTO(NoteRefinementLayout.empty());
@@ -149,18 +150,19 @@ public class AiController {
   @Operation(
       summary = "Export refinement-layout AI request JSON",
       description =
-          "Returns the OpenAI structured-response request body for note refinement layout generation (breakdown) without calling OpenAI.")
-  @GetMapping("/export-refinement-layout-request/{note}")
+          "Returns the OpenAI structured-response request body for note refinement layout generation (breakdown) without calling OpenAI. Optional MCQ question context uses the same question-aware instruction builder as generate-refinement-suggestions.")
+  @PostMapping("/export-refinement-layout-request/{note}")
   @Transactional(readOnly = true)
   public Map<String, Object> exportRefinementLayoutRequest(
-      @PathVariable(value = "note") @Schema(type = "integer") Note note)
+      @PathVariable(value = "note") @Schema(type = "integer") Note note,
+      @RequestBody(required = false) NoteRefinementQuestionContextDTO questionContext)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
     assertNoteContentNotEmpty(note);
     StructuredResponseCreateParams<NoteRefinementLayout> params =
         notebookAssistantForNoteServiceFactory
             .createNoteAutomationService(note)
-            .buildRefinementLayoutRequest();
+            .buildRefinementLayoutRequest(questionContext);
     return paramsSerializer.toBodyMap(params);
   }
 

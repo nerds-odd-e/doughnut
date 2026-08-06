@@ -698,6 +698,25 @@ export type RefinedContentResponseDto = {
     content?: string;
 };
 
+export type NoteRefinementQuestionContextDto = {
+    /**
+     * MCQ question stem (markdown allowed)
+     */
+    stem?: string;
+    /**
+     * MCQ response choices (markdown allowed)
+     */
+    choices?: Array<string>;
+    /**
+     * Zero-based index of the correct choice, when known
+     */
+    correctAnswerIndex?: number;
+    /**
+     * Optional description of what the question was testing
+     */
+    testedFocus?: string;
+};
+
 export type NoteRefinementLayoutDto = {
     items?: Array<NoteRefinementLayoutItem>;
 };
@@ -2536,7 +2555,7 @@ export type RemoveRefinementSuggestionResponses = {
 export type RemoveRefinementSuggestionResponse = RemoveRefinementSuggestionResponses[keyof RemoveRefinementSuggestionResponses];
 
 export type GenerateRefinementSuggestionsData = {
-    body?: never;
+    body?: NoteRefinementQuestionContextDto;
     path: {
         note: number;
     };
@@ -2570,6 +2589,26 @@ export type ExtractNotePreviewResponses = {
 };
 
 export type ExtractNotePreviewResponse = ExtractNotePreviewResponses[keyof ExtractNotePreviewResponses];
+
+export type ExportRefinementLayoutRequestData = {
+    body?: NoteRefinementQuestionContextDto;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/ai/export-refinement-layout-request/{note}';
+};
+
+export type ExportRefinementLayoutRequestResponses = {
+    /**
+     * OK
+     */
+    200: {
+        [key: string]: unknown;
+    };
+};
+
+export type ExportRefinementLayoutRequestResponse = ExportRefinementLayoutRequestResponses[keyof ExportRefinementLayoutRequestResponses];
 
 export type ExportExtractRequestData = {
     body: NoteRefinementLayoutSelectionRequestDto;
@@ -3756,26 +3795,6 @@ export type NextResponses = {
 };
 
 export type NextResponse = NextResponses[keyof NextResponses];
-
-export type ExportRefinementLayoutRequestData = {
-    body?: never;
-    path: {
-        note: number;
-    };
-    query?: never;
-    url: '/api/ai/export-refinement-layout-request/{note}';
-};
-
-export type ExportRefinementLayoutRequestResponses = {
-    /**
-     * OK
-     */
-    200: {
-        [key: string]: unknown;
-    };
-};
-
-export type ExportRefinementLayoutRequestResponse = ExportRefinementLayoutRequestResponses[keyof ExportRefinementLayoutRequestResponses];
 
 export type DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamData = {
     body?: never;

@@ -4,9 +4,11 @@ import static com.odde.doughnut.controllers.AiControllerExtractNoteTestSupport.n
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verifyNoInteractions;
 
+import com.odde.doughnut.controllers.dto.NoteRefinementQuestionContextDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.openai.client.OpenAIClient;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -31,7 +33,7 @@ class AiControllerExportRefinementLayoutRequestTest extends ControllerTestBase {
     void shouldExportRefinementLayoutRequestWithBodyMap() throws UnexpectedNoAccessRightException {
       Note testNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
 
-      Map<String, Object> body = controller.exportRefinementLayoutRequest(testNote);
+      Map<String, Object> body = controller.exportRefinementLayoutRequest(testNote, null);
 
       assertThat(body).containsKeys("model", "instructions", "input", "text");
       assertThat(body.get("max_output_tokens")).isEqualTo(1000);
@@ -44,7 +46,31 @@ class AiControllerExportRefinementLayoutRequestTest extends ControllerTestBase {
           .contains("Return one current-content layout for the note content")
           .contains("not alternative breakdown suggestions")
           .contains("Do not create grandchildren")
-          .contains("Focus Note content only");
+          .contains("Focus Note content only")
+          .contains("Set ledToQuestion to false for every item")
+          .doesNotContain("Set ledToQuestion=true");
+      verifyNoInteractions(officialClient);
+    }
+
+    @Test
+    void shouldExportQuestionAwareInstructionsWhenQuestionContextProvided()
+        throws UnexpectedNoAccessRightException {
+      Note testNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
+      NoteRefinementQuestionContextDTO questionContext = new NoteRefinementQuestionContextDTO();
+      questionContext.setStem("What is the capital of France?");
+      questionContext.setChoices(List.of("Paris", "London"));
+      questionContext.setCorrectAnswerIndex(0);
+
+      Map<String, Object> body =
+          controller.exportRefinementLayoutRequest(testNote, questionContext);
+
+      assertThat(body.get("instructions").toString())
+          .contains("What is the capital of France?")
+          .contains("0. Paris")
+          .contains("1. London")
+          .contains("Correct answer index: 0")
+          .contains("Set ledToQuestion=true")
+          .doesNotContain("Set ledToQuestion to false for every item");
       verifyNoInteractions(officialClient);
     }
   }

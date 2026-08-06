@@ -3,6 +3,7 @@ package com.odde.doughnut.services.ai.tools;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.BookLayoutReorganizationSuggestion;
+import com.odde.doughnut.controllers.dto.NoteRefinementQuestionContextDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.services.ai.*;
 import java.util.List;
@@ -149,8 +150,9 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
         suggestNoteTitle());
   }
 
-  public static InstructionAndSchema generateNoteRefinementLayoutAiTool() {
-    return NoteRefinementAiToolFactory.generateNoteRefinementLayoutAiTool();
+  public static InstructionAndSchema generateNoteRefinementLayoutAiTool(
+      NoteRefinementQuestionContextDTO questionContext) {
+    return NoteRefinementAiToolFactory.generateNoteRefinementLayoutAiTool(questionContext);
   }
 
   public static InstructionAndSchema bookLayoutReorganizationAiTool() {

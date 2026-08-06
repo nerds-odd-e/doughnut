@@ -67,11 +67,13 @@ Prior `/gsd-quick` packed button + shared modal + DTO + AI schema + preselect + 
 
 ### Phase 4: Optional MCQ context on layout generate API
 **Type:** Structure  
-**Status:** planned
+**Status:** done
 
 **Structure change:** Optional `NoteRefinementQuestionContextDTO` on `POST generate-refinement-suggestions` (and matching export builder if GET cannot carry body — prefer POST). When body present, append tool instructions: separate question-led points at proper levels and set `ledToQuestion=true`. When absent, identical to today.  
 **Unlocks:** Phase 5 frontend can pass context and rely on the flag.  
 **Verify:** Controller tests with/without body; regenerate client. No answered-page wiring yet.
+
+**Learnings:** Export switched GET→POST so optional body matches generate; both call the same `buildRefinementLayoutRequest(questionContext)`. Absent body keeps assimilation `ledToQuestion=false` instruction unchanged.
 
 ---
 

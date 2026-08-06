@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.doughnut.controllers.dto.NoteRefinementQuestionContextDTO;
 import com.odde.doughnut.services.ai.AiNoteAutomationService;
 import com.odde.doughnut.services.ai.NoteExtractionResult;
 import com.odde.doughnut.services.ai.NoteRefinementLayout;
@@ -18,12 +19,14 @@ public final class NoteAutomationService {
     return aiNoteAutomationService.suggestTitle();
   }
 
-  public NoteRefinementLayout generateRefinementSuggestions() throws JsonProcessingException {
-    return aiNoteAutomationService.generateRefinementSuggestions();
+  public NoteRefinementLayout generateRefinementSuggestions(
+      NoteRefinementQuestionContextDTO questionContext) throws JsonProcessingException {
+    return aiNoteAutomationService.generateRefinementSuggestions(questionContext);
   }
 
-  public StructuredResponseCreateParams<NoteRefinementLayout> buildRefinementLayoutRequest() {
-    return aiNoteAutomationService.buildRefinementLayoutRequest();
+  public StructuredResponseCreateParams<NoteRefinementLayout> buildRefinementLayoutRequest(
+      NoteRefinementQuestionContextDTO questionContext) {
+    return aiNoteAutomationService.buildRefinementLayoutRequest(questionContext);
   }
 
   public NoteExtractionResult extractNote(NoteRefinementLayout layout, List<String> selectedItemIds)

@@ -2,18 +2,25 @@ package com.odde.doughnut.services.ai.tools;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
+import com.odde.doughnut.controllers.dto.NoteRefinementQuestionContextDTO;
 import com.odde.doughnut.services.ai.NoteExtractionResult;
 import com.odde.doughnut.services.ai.NoteRefinementLayout;
 import com.odde.doughnut.services.ai.NoteRefinementLayoutValidator;
 import com.odde.doughnut.services.ai.RegeneratedNoteContent;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 final class NoteRefinementAiToolFactory {
 
   private NoteRefinementAiToolFactory() {}
 
-  static InstructionAndSchema generateNoteRefinementLayoutAiTool() {
+  static InstructionAndSchema generateNoteRefinementLayoutAiTool(
+      NoteRefinementQuestionContextDTO questionContext) {
+    String ledToQuestionGuidance =
+        questionContext == null
+            ? "Set ledToQuestion to false for every item."
+            : questionLedLayoutGuidance(questionContext);
     return new InstructionAndSchema(
         """
         Return one current-content layout for the note content, not alternative breakdown suggestions.
@@ -27,9 +34,54 @@ final class NoteRefinementAiToolFactory {
         Each item text should describe the Focus Note content represented by that point.
         Give every item a stable id that is unique within the layout.
         Set alreadyExtracted to true only for simple standalone wiki-link-only lines that point to content already extracted into another note, for example [[Target note]] or [[Target note|Label]]. These items should be marked Already extracted in the UI but remain selectable.
-        Set ledToQuestion to false for every item.
-        """,
+        %s
+        """
+            .formatted(ledToQuestionGuidance),
         NoteRefinementLayout.class);
+  }
+
+  private static String questionLedLayoutGuidance(
+      NoteRefinementQuestionContextDTO questionContext) {
+    StringBuilder questionBlock = new StringBuilder();
+    questionBlock.append("The learner answered this multiple-choice question about the note:\n");
+    questionBlock.append("Question stem:\n");
+    questionBlock.append(nullToEmpty(questionContext.getStem())).append("\n\n");
+    questionBlock.append("Choices:\n");
+    List<String> choices =
+        questionContext.getChoices() == null ? List.of() : questionContext.getChoices();
+    if (choices.isEmpty()) {
+      questionBlock.append("(none)\n");
+    } else {
+      IntStream.range(0, choices.size())
+          .forEach(
+              i ->
+                  questionBlock
+                      .append(i)
+                      .append(". ")
+                      .append(nullToEmpty(choices.get(i)))
+                      .append('\n'));
+    }
+    if (questionContext.getCorrectAnswerIndex() != null) {
+      questionBlock
+          .append("Correct answer index: ")
+          .append(questionContext.getCorrectAnswerIndex())
+          .append('\n');
+    }
+    if (questionContext.getTestedFocus() != null && !questionContext.getTestedFocus().isBlank()) {
+      questionBlock.append("Tested focus: ").append(questionContext.getTestedFocus()).append('\n');
+    }
+    return """
+        %s
+        When building the layout:
+        - Separate content points that led to or are tested by this question as distinct layout items at the appropriate hierarchy level (top-level or child).
+        - Set ledToQuestion=true on those items that capture the knowledge the question was testing or that led to this question.
+        - Set ledToQuestion=false on all other items.
+        """
+        .formatted(questionBlock.toString().stripTrailing());
+  }
+
+  private static String nullToEmpty(String value) {
+    return value == null ? "" : value;
   }
 
   static InstructionAndSchema removeSelectedLayoutPointsFromContentAiTool(
