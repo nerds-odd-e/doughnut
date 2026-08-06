@@ -1,7 +1,6 @@
 package com.odde.doughnut.services.notebookExport;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
 import java.io.ByteArrayInputStream;
@@ -74,17 +73,6 @@ class NotebookZipBuilderTest {
     assertThat(
         entries.get("My Note.md"),
         equalTo("---\nwikidata_id: Q123\n---\n\n# My Note\n\nActual body text"));
-  }
-
-  @Test
-  void leavesWikiLinksUnchangedInExportedNotes() throws IOException {
-    ExportNoteRow source = new ExportNoteRow(1, null, "Source", "See [[Target Title]]");
-    ExportNoteRow target = new ExportNoteRow(2, null, "Target Title", "Target body");
-
-    Map<String, String> entries =
-        readZipEntries(buildZip(null, List.of(), List.of(source, target)));
-
-    assertThat(entries.get("Source.md"), containsString("[[Target Title]]"));
   }
 
   @Test

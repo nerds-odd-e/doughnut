@@ -2,7 +2,6 @@ package com.odde.doughnut.services.search;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.controllers.dto.RelationshipLiteralSearchHit;
@@ -28,11 +27,10 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class UserModelSearchTest {
+class UserModelSearchTest {
   @Autowired MakeMe makeMe;
   @Autowired NoteSearchService noteSearchService;
   User user;
-  User anotherUser;
   Note note;
   Notebook notebook;
   final SearchTerm searchTerm = new SearchTerm();
@@ -42,7 +40,6 @@ public class UserModelSearchTest {
     user = makeMe.aUser().please();
     notebook = makeMe.aNotebook().creatorAndOwner(user).please();
     note = makeMe.aNote().notebook(notebook).please();
-    anotherUser = makeMe.aUser().please();
   }
 
   private List<RelationshipLiteralSearchHit> search() {
@@ -50,33 +47,32 @@ public class UserModelSearchTest {
   }
 
   @Test
-  void returnNullWhenNoteKeyIsGiven() {
-    assertTrue(search().isEmpty());
+  void returnEmptyWhenNoteKeyIsBlank() {
+    assertThat(search(), empty());
   }
 
   @Test
   void theNoteItselfIsNotIncludedInTheResult() {
     searchTerm.setSearchKey(note.getTitle());
-    assertTrue(RelationshipLiteralSearchHits.noteMatches(search()).isEmpty());
+    assertThat(RelationshipLiteralSearchHits.noteMatches(search()), empty());
   }
 
   @Test
   void theSearchIsCaseInsensitive() {
     Note anotherNote = makeMe.aNote("Some Note").notebook(notebook).please();
     searchTerm.setSearchKey("not");
-    NoteTopology expected = anotherNote.getNoteTopology();
     assertThat(
         RelationshipLiteralSearchHits.noteMatches(search()).stream()
             .map(r -> r.getNoteTopology())
             .toList(),
-        contains(expected));
+        contains(anotherNote.getNoteTopology()));
   }
 
   @Test
   void theSearchResultShouldNotIncludeSoftDeletedNote() {
     makeMe.aNote("Some Note").notebook(notebook).softDeleted().please();
     searchTerm.setSearchKey("not");
-    assertTrue(search().isEmpty());
+    assertThat(search(), empty());
   }
 
   @Test
@@ -86,7 +82,7 @@ public class UserModelSearchTest {
       makeMe.aNote(commonTitle + i).notebook(notebook).please();
     }
     searchTerm.setSearchKey("CommonTitle");
-    assertThat(RelationshipLiteralSearchHits.noteMatches(search()).size(), lessThanOrEqualTo(20));
+    assertThat(RelationshipLiteralSearchHits.noteMatches(search()), hasSize(lessThanOrEqualTo(20)));
   }
 
   @Nested
@@ -98,15 +94,13 @@ public class UserModelSearchTest {
     final String commonPhrase = "viva la";
 
     @BeforeEach
-    void setupBazaarNotes() {
+    void setup() {
+      User anotherUser = makeMe.aUser().please();
       subscribedBazaarNote =
           makeMe.aNote(commonPhrase + " subscription").notebookOwnedBy(anotherUser).please();
       makeMe.aBazaarNotebook(subscribedBazaarNote.getNotebook()).please();
       makeMe.aSubscription().forNotebook(subscribedBazaarNote.getNotebook()).forUser(user).please();
-    }
 
-    @BeforeEach
-    void setup() {
       noteInTheSameNotebook =
           makeMe.aNote(commonPhrase + " same notebook").notebook(notebook).please();
       Notebook otherNb = makeMe.aNotebook().creatorAndOwner(user).please();

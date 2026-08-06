@@ -1,6 +1,8 @@
 package com.odde.doughnut.services.openAiApis;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,9 +33,9 @@ class ResponseStreamToLegacyChatChunkMapperTest {
                     .sequenceNumber(1L)
                     .logprobs(List.of())
                     .build()));
-    assertEquals(1, deltas.size());
+    assertThat(deltas, hasSize(1));
     JsonNode chunk = objectMapper.readTree(deltas.getFirst());
-    assertEquals("Hi", chunk.get("choices").get(0).get("delta").get("content").asText());
+    assertThat(chunk.get("choices").get(0).get("delta").get("content").asText(), equalTo("Hi"));
 
     List<String> done =
         mapper.map(
@@ -46,8 +48,8 @@ class ResponseStreamToLegacyChatChunkMapperTest {
                     .sequenceNumber(2L)
                     .logprobs(List.of())
                     .build()));
-    assertEquals(1, done.size());
+    assertThat(done, hasSize(1));
     JsonNode doneChunk = objectMapper.readTree(done.getFirst());
-    assertEquals("stop", doneChunk.get("choices").get(0).get("finish_reason").asText());
+    assertThat(doneChunk.get("choices").get(0).get("finish_reason").asText(), equalTo("stop"));
   }
 }

@@ -1,6 +1,8 @@
 package com.odde.doughnut.services.entities;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
 
 import com.odde.doughnut.services.wikidataApis.WikidataValue;
 import com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataClaimItem;
@@ -15,6 +17,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class WikidataEntityTest {
   WikidataDatavalue wikidataDataValue;
@@ -42,38 +46,28 @@ class WikidataEntityTest {
   }
 
   @Test
-  void getSingleValuePropertyIfThePropertyExists() {
-    Optional<WikidataValue> result = wikidataEntity.getFirstClaimValue("P31");
-    assertEquals(Optional.of(new WikidataValue(wikidataDataValue)), result);
+  void getFirstClaimValueWhenPropertyExists() {
+    assertThat(
+        wikidataEntity.getFirstClaimValue("P31"),
+        equalTo(Optional.of(new WikidataValue(wikidataDataValue))));
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"P32", "P33"})
+  void getFirstClaimValueEmptyWhenMissingOrEmpty(String property) {
+    assertThat(wikidataEntity.getFirstClaimValue(property), equalTo(Optional.empty()));
   }
 
   @Test
-  void getSingleValuePropertyIfThePropertyDoesNotExists() {
-    Optional<WikidataValue> result = wikidataEntity.getFirstClaimValue("P33");
-    assertEquals(Optional.empty(), result);
+  void getClaimValuesWhenPropertyExists() {
+    assertThat(
+        wikidataEntity.getClaimValues("P31").toList(),
+        equalTo(List.of(new WikidataValue(wikidataDataValue))));
   }
 
-  @Test
-  void getSingleValuePropertyIfThePropertyIsEmpty() {
-    Optional<WikidataValue> result = wikidataEntity.getFirstClaimValue("P32");
-    assertEquals(Optional.empty(), result);
-  }
-
-  @Test
-  void getMultipleValuePropertyIfThePropertyExists() {
-    List<WikidataValue> result = wikidataEntity.getClaimValues("P31").toList();
-    assertEquals(List.of(new WikidataValue(wikidataDataValue)), result);
-  }
-
-  @Test
-  void getMultipleValuePropertyDoesNotExist() {
-    List<WikidataValue> result = wikidataEntity.getClaimValues("P33").toList();
-    assertEquals(Collections.emptyList(), result);
-  }
-
-  @Test
-  void getMultipleValuePropertyIsEmpty() {
-    List<WikidataValue> result = wikidataEntity.getClaimValues("P32").toList();
-    assertEquals(Collections.emptyList(), result);
+  @ParameterizedTest
+  @ValueSource(strings = {"P32", "P33"})
+  void getClaimValuesEmptyWhenMissingOrEmpty(String property) {
+    assertThat(wikidataEntity.getClaimValues(property).toList(), empty());
   }
 }

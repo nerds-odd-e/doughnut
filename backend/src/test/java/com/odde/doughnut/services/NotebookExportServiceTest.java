@@ -46,16 +46,16 @@ class NotebookExportServiceTest {
     makeMe.aNote("Pasta").folder(folder).content("Boil water").please();
     makeMe.entityPersister.flush();
 
-    byte[] zipBytes = notebookExportService.exportNotebookAsZip(notebook);
+    Map<String, String> entries =
+        readZipEntries(notebookExportService.exportNotebookAsZip(notebook));
 
-    Map<String, String> entries = readZipEntries(zipBytes);
     assertThat(entries.get("Recipes/Pasta.md"), equalTo("# Pasta\n\nBoil water"));
   }
 
   @Test
   void exportFileNameUsesSanitizedNotebookName() {
-    User user = makeMe.aUser().please();
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).name("Q&A: Notes").please();
+    Notebook notebook =
+        makeMe.aNotebook().creatorAndOwner(makeMe.aUser().please()).name("Q&A: Notes").please();
 
     assertThat(notebookExportService.exportFileName(notebook), equalTo("Q&A Notes.zip"));
   }

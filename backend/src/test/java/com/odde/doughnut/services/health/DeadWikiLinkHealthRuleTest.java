@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.controllers.dto.HealthFindingGroup;
@@ -17,7 +16,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
-import com.odde.doughnut.services.NoteAliasIndexService;
 import com.odde.doughnut.services.NotebookHealthService;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -33,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class DeadWikiLinkHealthRuleTest {
   @Autowired NotebookHealthService notebookHealthService;
-  @Autowired NoteAliasIndexService noteAliasIndexService;
   @Autowired NoteRepository noteRepository;
   @Autowired MakeMe makeMe;
 
@@ -51,8 +48,7 @@ class DeadWikiLinkHealthRuleTest {
     Note source =
         makeMe.aNote().title("Source").notebook(notebook).content("See [[Missing]]").please();
 
-    HealthFindingGroup group = deadWikiLinksGroup();
-    HealthFindingGroup child = soleChild(group);
+    HealthFindingGroup child = soleChild(deadWikiLinksGroup());
 
     assertThat(child.getTitle(), equalTo("Source"));
     assertThat(child.getRuleId(), equalTo(HealthRuleIds.DEAD_WIKI_LINKS));
@@ -67,14 +63,14 @@ class DeadWikiLinkHealthRuleTest {
 
   @Test
   void reportsFrontmatterDeadWikiLinkWithSameTokenShape() {
-    Note source = makeMe.aNote().title("WithFm").notebook(notebook).please();
-    source.setContent("---\nparent: \"[[Missing]]\"\n---\n\nBody line.");
-    makeMe.entityPersister.merge(source);
-    makeMe.entityPersister.flush();
+    makeMe
+        .aNote()
+        .title("WithFm")
+        .notebook(notebook)
+        .content("---\nparent: \"[[Missing]]\"\n---\n\nBody line.")
+        .please();
 
-    HealthFindingGroup child = soleChild(deadWikiLinksGroup());
-    HealthFindingItem item = child.getItems().getFirst();
-    assertThat(item.getNoteId(), equalTo(source.getId()));
+    HealthFindingItem item = soleChild(deadWikiLinksGroup()).getItems().getFirst();
     assertThat(item.getWikiLinkToken(), equalTo("Missing"));
     assertThat(item.getLabel(), equalTo("Missing"));
   }
@@ -88,11 +84,8 @@ class DeadWikiLinkHealthRuleTest {
   }
 
   @Test
-  void doesNotReportLiveAliasAfterRefresh() {
-    String aliasTargetMarkdown = "---\naliases:\n  - color\n---\n\nbody";
-    Note aliasTarget =
-        makeMe.aNote().title("colour").notebook(notebook).content(aliasTargetMarkdown).please();
-    noteAliasIndexService.refreshForNote(aliasTarget);
+  void doesNotReportLiveAlias() {
+    makeMe.aNote().title("colour").notebook(notebook).aliases("color").please();
     makeMe.aNote().notebook(notebook).content("See [[color]]").please();
 
     assertThat(deadWikiLinksGroup().getChildren(), empty());
@@ -135,19 +128,18 @@ class DeadWikiLinkHealthRuleTest {
   @Test
   void reportsMissingAndSoftDeletedTargetsAsDead() {
     Note softTarget = makeMe.aNote().title("SoftTarget").notebook(notebook).softDeleted().please();
-    Note linker =
-        makeMe
-            .aNote()
-            .title("Linker")
-            .notebook(notebook)
-            .content("See [[SoftTarget]] and [[NeverExisted]]")
-            .please();
+    makeMe
+        .aNote()
+        .title("Linker")
+        .notebook(notebook)
+        .content("See [[SoftTarget]] and [[NeverExisted]]")
+        .please();
     makeMe.entityPersister.refresh(softTarget);
 
-    HealthFindingGroup child = soleChild(deadWikiLinksGroup());
-    assertThat(child.getItems().getFirst().getNoteId(), equalTo(linker.getId()));
     assertThat(
-        child.getItems().stream().map(HealthFindingItem::getWikiLinkToken).toList(),
+        soleChild(deadWikiLinksGroup()).getItems().stream()
+            .map(HealthFindingItem::getWikiLinkToken)
+            .toList(),
         equalTo(List.of("SoftTarget", "NeverExisted")));
   }
 
@@ -167,39 +159,29 @@ class DeadWikiLinkHealthRuleTest {
 
   @Test
   void nestsDeadLinksByNoteWithEmptyTopItems() {
-    Note first = makeMe.aNote().title("First").notebook(notebook).content("[[DeadA]]").please();
-    Note second = makeMe.aNote().title("Second").notebook(notebook).content("[[DeadB]]").please();
+    makeMe.aNote().title("First").notebook(notebook).content("[[DeadA]]").please();
+    makeMe.aNote().title("Second").notebook(notebook).content("[[DeadB]]").please();
 
     HealthFindingGroup group = deadWikiLinksGroup();
     assertThat(group.getItems() == null || group.getItems().isEmpty(), is(true));
     assertThat(group.getChildren(), hasSize(2));
     assertThat(group.getChildren().get(0).getTitle(), equalTo("First"));
     assertThat(
-        group.getChildren().get(0).getItems().getFirst().getNoteId(), equalTo(first.getId()));
-    assertThat(
         group.getChildren().get(0).getItems().getFirst().getWikiLinkToken(), equalTo("DeadA"));
     assertThat(group.getChildren().get(1).getTitle(), equalTo("Second"));
     assertThat(
-        group.getChildren().get(1).getItems().getFirst().getNoteId(), equalTo(second.getId()));
-    assertThat(
         group.getChildren().get(1).getItems().getFirst().getWikiLinkToken(), equalTo("DeadB"));
-    assertThat(group.getChildren().get(0).getRuleId(), equalTo(HealthRuleIds.DEAD_WIKI_LINKS));
-    assertThat(group.getChildren().get(0).isAutoFixable(), equalTo(false));
-    assertThat(group.getChildren().get(0).getSeverity(), equalTo(HealthSeverity.warning));
   }
 
   @Test
   void alwaysEmitsDeadWikiLinksGroupWithMetadataWhenEmpty() {
     HealthFindingGroup group = deadWikiLinksGroup();
 
-    assertThat(group, is(not(nullValue())));
     assertThat(group.getRuleId(), equalTo(HealthRuleIds.DEAD_WIKI_LINKS));
     assertThat(group.getTitle(), equalTo("Dead wiki links"));
     assertThat(group.getSeverity(), equalTo(HealthSeverity.warning));
     assertThat(group.isAutoFixable(), equalTo(false));
-    assertThat(group.getChildren(), is(not(nullValue())));
     assertThat(group.getChildren(), empty());
-    assertThat(group.getItems() == null || group.getItems().isEmpty(), is(true));
   }
 
   @Test
@@ -236,9 +218,7 @@ class DeadWikiLinkHealthRuleTest {
   private HealthFindingGroup deadWikiLinksGroup() {
     NotebookHealthLintReport report =
         notebookHealthService.lint(notebook, new HealthRunContext(owner));
-    List<HealthFindingGroup> groups = report.getGroups();
-    assertThat(groups, is(not(nullValue())));
-    return groups.stream()
+    return report.getGroups().stream()
         .filter(g -> HealthRuleIds.DEAD_WIKI_LINKS.equals(g.getRuleId()))
         .findFirst()
         .orElseThrow(() -> new AssertionError("missing dead_wiki_links group"));

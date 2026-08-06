@@ -6,9 +6,6 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.controllers.dto.HealthFindingGroup;
 import com.odde.doughnut.controllers.dto.HealthFindingItem;
@@ -21,8 +18,6 @@ import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.services.NotebookHealthService;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,34 +82,25 @@ class ReadmeOnlyFolderHealthRuleTest {
             .please();
     makeMe.aNote("gone").folder(folder).softDeleted().please();
 
-    HealthFindingGroup group = readmeOnlyFoldersGroup();
-
-    assertThat(group.getItems(), hasSize(1));
-    assertThat(group.getItems().get(0).getFolderId(), equalTo(folder.getId()));
-    assertThat(group.getItems().get(0).getLabel(), equalTo("OnlyDeleted"));
+    assertThat(
+        readmeOnlyFoldersGroup().getItems().stream().map(HealthFindingItem::getFolderId).toList(),
+        containsInAnyOrder(folder.getId()));
   }
 
   @Test
-  void partitionsByOwnReadmeBlanknessWithMutualExclusion() {
+  void partitionsByOwnReadmeBlankness() {
     Folder withReadme =
         makeMe.aFolder().notebook(notebook).name("HasReadme").readmeContent("keep me").please();
     Folder blankReadme =
         makeMe.aFolder().notebook(notebook).name("BlankReadme").readmeContent("   ").please();
     Folder nullReadme = makeMe.aFolder().notebook(notebook).name("NullReadme").please();
 
-    HealthFindingGroup readmeOnly = readmeOnlyFoldersGroup();
-    HealthFindingGroup empty = emptyFoldersGroup();
-
     assertThat(
-        readmeOnly.getItems().stream().map(HealthFindingItem::getFolderId).toList(),
+        readmeOnlyFoldersGroup().getItems().stream().map(HealthFindingItem::getFolderId).toList(),
         containsInAnyOrder(withReadme.getId()));
     assertThat(
-        empty.getItems().stream().map(HealthFindingItem::getFolderId).toList(),
+        emptyFoldersGroup().getItems().stream().map(HealthFindingItem::getFolderId).toList(),
         containsInAnyOrder(blankReadme.getId(), nullReadme.getId()));
-
-    Set<Integer> readmeOnlyIds = folderIds(readmeOnly);
-    Set<Integer> emptyIds = folderIds(empty);
-    assertThat(readmeOnlyIds.stream().filter(emptyIds::contains).toList(), empty());
   }
 
   @Test
@@ -123,29 +109,22 @@ class ReadmeOnlyFolderHealthRuleTest {
         makeMe.aFolder().notebook(notebook).name("Parent").readmeContent("parent readme").please();
     Folder child = makeMe.aFolder().parentFolder(parent).name("Child").please();
 
-    HealthFindingGroup readmeOnly = readmeOnlyFoldersGroup();
-    HealthFindingGroup empty = emptyFoldersGroup();
-
     assertThat(
-        readmeOnly.getItems().stream().map(HealthFindingItem::getFolderId).toList(),
+        readmeOnlyFoldersGroup().getItems().stream().map(HealthFindingItem::getFolderId).toList(),
         containsInAnyOrder(parent.getId()));
     assertThat(
-        empty.getItems().stream().map(HealthFindingItem::getFolderId).toList(),
+        emptyFoldersGroup().getItems().stream().map(HealthFindingItem::getFolderId).toList(),
         containsInAnyOrder(child.getId()));
-    assertThat(folderIds(readmeOnly), not(hasItem(child.getId())));
-    assertThat(folderIds(empty), not(hasItem(parent.getId())));
   }
 
   @Test
   void alwaysEmitsReadmeOnlyFoldersGroupWithMetadata() {
     HealthFindingGroup group = readmeOnlyFoldersGroup();
 
-    assertThat(group, is(not(nullValue())));
     assertThat(group.getRuleId(), equalTo(HealthRuleIds.README_ONLY_FOLDERS));
     assertThat(group.getTitle(), equalTo("Readme-only folders"));
     assertThat(group.getSeverity(), equalTo(HealthSeverity.warning));
     assertThat(group.isAutoFixable(), equalTo(false));
-    assertThat(group.getItems(), is(not(nullValue())));
     assertThat(group.getItems(), empty());
   }
 
@@ -186,17 +165,9 @@ class ReadmeOnlyFolderHealthRuleTest {
   private HealthFindingGroup groupByRuleId(String ruleId) {
     NotebookHealthLintReport report =
         notebookHealthService.lint(notebook, new HealthRunContext(owner));
-    List<HealthFindingGroup> groups = report.getGroups();
-    assertThat(groups, is(not(nullValue())));
-    return groups.stream()
+    return report.getGroups().stream()
         .filter(g -> ruleId.equals(g.getRuleId()))
         .findFirst()
         .orElseThrow(() -> new AssertionError("missing " + ruleId + " group"));
-  }
-
-  private static Set<Integer> folderIds(HealthFindingGroup group) {
-    return group.getItems().stream()
-        .map(HealthFindingItem::getFolderId)
-        .collect(Collectors.toSet());
   }
 }

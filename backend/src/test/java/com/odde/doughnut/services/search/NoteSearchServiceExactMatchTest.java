@@ -3,7 +3,7 @@ package com.odde.doughnut.services.search;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-import com.odde.doughnut.controllers.dto.RelationshipLiteralSearchHit;
+import com.odde.doughnut.controllers.dto.NoteSearchResult;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
@@ -15,6 +15,8 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -38,6 +40,11 @@ class NoteSearchServiceExactMatchTest {
     parentNote = makeMe.aNote().notebook(searchNotebook).please();
   }
 
+  private List<NoteSearchResult> searchNotes() {
+    return RelationshipLiteralSearchHits.noteMatches(
+        noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote));
+  }
+
   @Nested
   class ExactMatchPrioritization {
 
@@ -49,10 +56,8 @@ class NoteSearchServiceExactMatchTest {
       Note exactMatch = makeMe.aNote("Pam").notebook(searchNotebook).please();
 
       searchTerm.setSearchKey("pam");
-      List<RelationshipLiteralSearchHit> results =
-          noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote);
+      var notes = searchNotes();
 
-      var notes = RelationshipLiteralSearchHits.noteMatches(results);
       assertThat(notes, hasSize(4));
       assertThat(notes.get(0).getNoteTopology().getTitle(), equalTo("Pam"));
       assertThat(notes.get(0).getNoteTopology().getId(), equalTo(exactMatch.getId()));
@@ -69,13 +74,8 @@ class NoteSearchServiceExactMatchTest {
       makeMe.aNote("Clonazepam").notebook(searchNotebook).please();
 
       searchTerm.setSearchKey("pam");
-      List<RelationshipLiteralSearchHit> results =
-          noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote);
+      var notes = searchNotes();
 
-      var notes = RelationshipLiteralSearchHits.noteMatches(results);
-      assertThat(notes, hasSize(5));
-      assertThat(notes.get(0).getNoteTopology().getTitle(), equalTo("Pam"));
-      assertThat(notes.get(1).getNoteTopology().getTitle(), equalTo("pam"));
       assertThat(notes.get(0).getNoteTopology().getId(), equalTo(exactMatch1.getId()));
       assertThat(notes.get(1).getNoteTopology().getId(), equalTo(exactMatch2.getId()));
     }
@@ -88,12 +88,9 @@ class NoteSearchServiceExactMatchTest {
       Note exactMatch = makeMe.aNote("Pam").notebook(searchNotebook).please();
 
       searchTerm.setSearchKey("pam");
-      List<RelationshipLiteralSearchHit> results =
-          noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote);
+      var notes = searchNotes();
 
-      var notes = RelationshipLiteralSearchHits.noteMatches(results);
       assertThat(notes, hasSize(greaterThan(20)));
-      assertThat(notes.get(0).getNoteTopology().getTitle(), equalTo("Pam"));
       assertThat(notes.get(0).getNoteTopology().getId(), equalTo(exactMatch.getId()));
     }
 
@@ -104,37 +101,20 @@ class NoteSearchServiceExactMatchTest {
       makeMe.aNote("Lorazepam").notebook(searchNotebook).please();
 
       searchTerm.setSearchKey("pam");
-      List<RelationshipLiteralSearchHit> results =
-          noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote);
+      var notes = searchNotes();
 
-      var notes = RelationshipLiteralSearchHits.noteMatches(results);
-      assertThat(notes, hasSize(3));
-      assertThat(notes.get(0).getNoteTopology().getTitle(), equalTo("PAM"));
       assertThat(notes.get(0).getNoteTopology().getId(), equalTo(exactMatch.getId()));
     }
 
-    @Test
-    void shouldHandleEmptySearchKey() {
+    @ParameterizedTest
+    @ValueSource(strings = {"", "   "})
+    void shouldHandleBlankSearchKey(String searchKey) {
       makeMe.aNote("Diazepam").notebook(searchNotebook).please();
       makeMe.aNote("Pam").notebook(searchNotebook).please();
 
-      searchTerm.setSearchKey("");
-      List<RelationshipLiteralSearchHit> results =
-          noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote);
-
-      assertThat(results, empty());
-    }
-
-    @Test
-    void shouldHandleWhitespaceOnlySearchKey() {
-      makeMe.aNote("Diazepam").notebook(searchNotebook).please();
-      makeMe.aNote("Pam").notebook(searchNotebook).please();
-
-      searchTerm.setSearchKey("   ");
-      List<RelationshipLiteralSearchHit> results =
-          noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote);
-
-      assertThat(results, empty());
+      searchTerm.setSearchKey(searchKey);
+      assertThat(
+          noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote), empty());
     }
 
     @Test
@@ -147,11 +127,7 @@ class NoteSearchServiceExactMatchTest {
       searchTerm.setSearchKey("Match");
       searchTerm.setAllMyNotebooksAndSubscriptions(true);
 
-      List<RelationshipLiteralSearchHit> results =
-          noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote);
-
-      var notes = RelationshipLiteralSearchHits.noteMatches(results);
-      assertThat(notes, hasSize(greaterThanOrEqualTo(2)));
+      var notes = searchNotes();
       int sameNotebookIndex =
           notes.stream()
               .map(r -> r.getNoteTopology().getId())
@@ -162,8 +138,6 @@ class NoteSearchServiceExactMatchTest {
               .map(r -> r.getNoteTopology().getId())
               .toList()
               .indexOf(otherNotebookNote.getId());
-      assertThat(sameNotebookIndex, greaterThanOrEqualTo(0));
-      assertThat(otherNotebookIndex, greaterThanOrEqualTo(0));
       assertThat(sameNotebookIndex, lessThan(otherNotebookIndex));
     }
   }

@@ -1,6 +1,6 @@
 # Backend unit tests → "small test" style
 
-**Status:** in progress (Phase 24 done)
+**Status:** in progress (Phase 25a done; 25b planned)
 **Type:** test renovation (no product behavior change)
 **Verify each phase:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
 **Style:** `.cursor/rules/unit-testing.mdc` + `.cursor/rules/backend-testing.mdc`
@@ -335,19 +335,25 @@ For each file in the phase file list:
 - **Exception:** `MaintenanceJobTests` keeps collaborator mocks for job/resume step-order and continue-after-failure orchestration
 - **Done when:** all QGen batch tests renovated; suite green.
 
-### Phase 25 — Services: nested packages + leftovers
+### Phase 25a — Services: health / search / export / openAiApis / entities
+- **Status:** done
+- **Type:** Behavior
+- **Files:**
+  - `services/health/**` (runner / empty-folder / readme-only / dead-wiki / bulk purge)
+  - `services/search/**` (exact-match / user-model / empty-embedding — embedding mock kept)
+  - `services/notebookExport/**` + root `NotebookExportServiceTest`
+  - `services/openAiApis/**` (stream mapper + structured params — already mostly clean)
+  - `services/entities/WikidataEntityTest`
+- **Done when:** rubric applied; suite green.
+
+### Phase 25b — Services: ai / book + remaining root leftovers
 - **Status:** planned
 - **Type:** Behavior
 - **Files:**
   - `services/ai/**`
   - `services/book/**`
-  - `services/health/**`
-  - `services/search/**`
-  - `services/notebookExport/**`
-  - `services/openAiApis/**`
-  - `services/entities/**`
-  - root leftovers: `AuthorizationServiceTest`, `ApproximateUtf8TokenBudgetTest`, `SRTProcessorTests`, `AiOpenAiAssistantFactory*`, `Conversation*`, `NotebookReindexing*`, etc.
-- **Done when:** all service tests renovated or deleted as redundant; suite green.
+  - root leftovers: `AuthorizationServiceTest`, `ApproximateUtf8TokenBudgetTest`, `SRTProcessorTests`, `AiOpenAiAssistantFactory*`, `Conversation*`, `NotebookReindexing*`, `NotebookGroupServiceTest`, and any other unrenovated service tests
+- **Done when:** remaining service leftovers renovated or deleted as redundant; suite green.
 
 ### Phase 26 — Final anti-pattern sweep
 - **Status:** planned
@@ -401,7 +407,8 @@ If a Behavior phase cannot express fixtures concisely:
 | 22 | done | QGen planning/eligibility/candidates/schedule/metrics/request-builder: focused asserts + drop redundant `.by`; batch/request MakeMe builders; delete mocked NoCandidateTrackers (real DB via unanswered prompt); overdue/retry parameterized. |
 | 23 | done | QGen submit/poll/import/output/retention/jsonl: builders for manual batch/request fixtures; ImportPayloadSupport; focused sibling deltas; parameterized terminal poll skip; AtomicTestSupport split ≤250. Loop test keeps collaborator mocks (continue-after-failure). |
 | 24 | done | QGen maintenance/admin/concurrency/locks/jobs: builders + OutputCollectionTestSupport; AdminStatus → real DB; merge resume-failure job cases; lock/concurrency already clean. JobTests keeps collaborator mocks (orchestration). |
-| 25–26 | planned | — |
+| 25a | done | Health/search/export/openAi/entities: drop runner DTO tautology + purge opt-in (controller covers); focused sibling deltas; `.aliases` / `.content`; blank search parameterized; Wikidata empty cases parameterized. Zip wiki twin deleted (markdown assemble covers). |
+| 25b–26 | planned | — |
 
 ---
 
@@ -435,3 +442,4 @@ If a Behavior phase cannot express fixtures concisely:
 - Phase 22: QGen planning stays at service boundary. Repo-mock NoCandidateTrackers replaced by real DB (answered recall + unanswered non-contested prompt). Batch/request builders for COMPLETED/SUBMITTED/FAILED fixtures. Phase 23 may reuse builders for submit/poll/import manual construction.
 - Phase 23: Reused Phase 22 batch/request builders (+ `importedAt`/`outputCollectedAt`). Collapsed triplicate import success-line JSON into `ImportPayloadSupport`. `SubmitDueUsersServiceLoopTest` collaborator mocks kept for continue-after-failure summary — Phase 26 may revisit if Spring coverage appears.
 - Phase 24: MaintenanceService uses builders + OutputCollectionTestSupport; AdminStatus counts/runs use real DB (ScheduledTask mock only for scheduler-active string match). JobTests/resume-order Nested keep collaborator mocks — Phase 26 sweep. SchedulerLock + JDBC concurrency already domain-stable.
+- Phase 25a: Health rules stay service-level (deeper than NotebookHealthController). Bulk-purge opt-in reject deleted as controller duplicate. HealthRuleRunner DTO-retention test was not exercising the runner — removed. Dead-wiki alias via `.aliases()` (auto-refreshes index). Search exact-match siblings assert first-id delta only after canonical size+title+id. ZipBuilder wiki-link twin dropped; ExportNoteMarkdown already asserts preservation.
