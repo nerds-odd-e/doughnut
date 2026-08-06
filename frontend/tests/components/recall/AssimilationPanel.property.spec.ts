@@ -1,6 +1,7 @@
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it, vi, beforeEach } from "vitest"
+import makeMe from "doughnut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { mockedGoToNextAssimilation } from "./assimilationPanelMocks"
 import {
@@ -10,14 +11,13 @@ import {
 } from "./assimilationPropertyTestSupport"
 import {
   assimilateSpy,
-  mockedIncrementAssimilatedCount,
+  assimilatedCountOfTheDay,
   mockedRequestDueRecallsRefresh,
   renderer,
   setupAssimilationPanelTests,
 } from "./assimilationPanelTestSupport"
 
 vi.mock("@/composables/useRecallData")
-vi.mock("@/composables/useAssimilationCount")
 vi.mock("@/composables/useGoToNextAssimilation", () => ({
   useGoToNextAssimilation: () => ({
     goToNextAssimilation: mockedGoToNextAssimilation,
@@ -42,7 +42,7 @@ describe("AssimilationPanel property assimilation", () => {
 
   it("advances to the next unit and reloads note info when assimilating a property", async () => {
     assimilateSpy.mockResolvedValue(
-      wrapSdkResponse([{ id: 1, removedFromTracking: false }])
+      wrapSdkResponse([makeMe.aMemoryTracker.id(1).please()])
     )
     const wrapper = mountPanelWithProperties()
     await flushPromises()
@@ -56,7 +56,7 @@ describe("AssimilationPanel property assimilation", () => {
       },
     })
     expect(mockedGoToNextAssimilation).toHaveBeenCalled()
-    expect(mockedIncrementAssimilatedCount).toHaveBeenCalledWith(1)
+    expect(assimilatedCountOfTheDay.value).toBe(1)
     expect(mockedRequestDueRecallsRefresh).toHaveBeenCalled()
     expect(getNoteInfoSpy.mock.calls.length).toBeGreaterThanOrEqual(2)
     wrapper.unmount()

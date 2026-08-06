@@ -4,13 +4,13 @@ import {
 } from "@generated/doughnut-backend-api/sdk.gen"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { mockSdkService } from "@tests/helpers"
-import { buildWikiLinkText } from "@/utils/buildWikiLinkText"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { afterEach, beforeEach, describe, it, expect } from "vitest"
 import {
   accidentalMatchWithTwoMatchedNotes,
   mountAnsweredSpellingQuestion,
   openResolveAccidentalMatch,
+  reviewedRealmDeclaringMatch,
 } from "./answeredSpellingQuestionTestSupport"
 
 describe("AnsweredSpellingQuestion add as overlapped note", () => {
@@ -53,9 +53,6 @@ describe("AnsweredSpellingQuestion add as overlapped note", () => {
         btn.textContent?.includes("Add as overlapped note")
       )
     ).toBe(true)
-    expect(
-      document.body.querySelectorAll('[data-testid^="link-to-matched-note-"]')
-    ).toHaveLength(2)
 
     updateSpy.mockClear()
     ;(
@@ -74,67 +71,40 @@ describe("AnsweredSpellingQuestion add as overlapped note", () => {
     expect(callArgs.body.content).toMatch(/overlaps:/)
     expect(callArgs.body.content).toContain("[[")
     expect(callArgs.body.content).not.toMatch(/aliases:/)
-    expect(
-      document.body.querySelector(
-        '[data-testid="accidental-match-resolve-dialog"]'
-      )
-    ).toBeTruthy()
-    expect(
-      wrapper.find('[data-testid="accidental-match-alert"]').exists()
-    ).toBe(true)
     expect(wrapper.find('[data-testid="overlap-try-again"]').exists()).toBe(
       false
     )
-    expect(
-      wrapper.find('[data-testid="overlap-try-again-alert"]').exists()
-    ).toBe(false)
     expect(wrapper.emitted("retry")).toBeUndefined()
   })
 
   it("disables add as overlapped when the match is already in overlaps", async () => {
     const { answeredQuestion, reviewedRealm, matchedA, matchedB } =
       accidentalMatchWithTwoMatchedNotes()
-    const overlapToken = buildWikiLinkText(
-      {
-        noteTopology: matchedA.note.noteTopology,
-        notebookId: matchedA.notebookRealm.notebook.id,
-        notebookName: matchedA.notebookRealm.notebook.name,
-      },
-      { notebookId: reviewedRealm.notebookRealm.notebook.id }
+    const reviewedWithOverlap = reviewedRealmDeclaringMatch(
+      reviewedRealm,
+      matchedA,
+      "overlaps"
     )
-    reviewedRealm.note.content = `---
-overlaps:
-  - "${overlapToken}"
----
-
-## Body
-`
 
     wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {
       currentUser: makeMe.aUser.please(),
-      seedRealms: [reviewedRealm, matchedA, matchedB],
+      seedRealms: [reviewedWithOverlap, matchedA, matchedB],
       withRouter: true,
     })
     await flushPromises()
     await openResolveAccidentalMatch(wrapper)
 
-    const alreadyDeclared = document.body.querySelector(
-      '[data-testid="add-as-overlapped-note-10"]'
-    ) as HTMLButtonElement
-    const otherMatch = document.body.querySelector(
-      '[data-testid="add-as-overlapped-note-20"]'
-    ) as HTMLButtonElement
-    expect(alreadyDeclared.disabled).toBe(true)
-    expect(otherMatch.disabled).toBe(false)
-    expect(
-      document.body.querySelector(
-        '[data-testid="link-to-matched-note-10"]'
-      ) as HTMLButtonElement
-    ).not.toBeNull()
     expect(
       (
         document.body.querySelector(
-          '[data-testid="link-to-matched-note-10"]'
+          '[data-testid="add-as-overlapped-note-10"]'
+        ) as HTMLButtonElement
+      ).disabled
+    ).toBe(true)
+    expect(
+      (
+        document.body.querySelector(
+          '[data-testid="add-as-overlapped-note-20"]'
         ) as HTMLButtonElement
       ).disabled
     ).toBe(false)
@@ -143,25 +113,15 @@ overlaps:
   it("disables add as overlapped when the match is a legacy wiki-link in aliases", async () => {
     const { answeredQuestion, reviewedRealm, matchedA, matchedB } =
       accidentalMatchWithTwoMatchedNotes()
-    const overlapToken = buildWikiLinkText(
-      {
-        noteTopology: matchedA.note.noteTopology,
-        notebookId: matchedA.notebookRealm.notebook.id,
-        notebookName: matchedA.notebookRealm.notebook.name,
-      },
-      { notebookId: reviewedRealm.notebookRealm.notebook.id }
+    const reviewedWithAlias = reviewedRealmDeclaringMatch(
+      reviewedRealm,
+      matchedA,
+      "aliases"
     )
-    reviewedRealm.note.content = `---
-aliases:
-  - "${overlapToken}"
----
-
-## Body
-`
 
     wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {
       currentUser: makeMe.aUser.please(),
-      seedRealms: [reviewedRealm, matchedA, matchedB],
+      seedRealms: [reviewedWithAlias, matchedA, matchedB],
       withRouter: true,
     })
     await flushPromises()

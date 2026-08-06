@@ -63,6 +63,11 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
     return this
   }
 
+  spelling(value = true): MemoryTrackerBuilder {
+    this.data.spelling = value
+    return this
+  }
+
   ofNote(note: NoteRealm): MemoryTrackerBuilder {
     this.data.note = note.note
     this.notebookId = note.notebookRealm.notebook.id

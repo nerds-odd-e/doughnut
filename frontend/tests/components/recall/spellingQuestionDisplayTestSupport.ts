@@ -14,14 +14,11 @@ export function mockSpellingQuestionServices() {
     "askAQuestion",
     makeMe.aRecallQuestion.withSpellingStem("Spell the word").please()
   )
-  const memoryTracker = makeMe.aMemoryTracker.please()
-  if (memoryTracker.note) {
-    // @ts-expect-error - clozeDescription is a method on Note, not a property
-    memoryTracker.note.clozeDescription = {
-      clozeDetails: () => "<p>Spell the word 'cat'</p>\n",
-    }
-  }
-  mockSdkService(MemoryTrackerController, "showMemoryTracker", memoryTracker)
+  mockSdkService(
+    MemoryTrackerController,
+    "showMemoryTracker",
+    makeMe.aMemoryTracker.please()
+  )
 }
 
 export function captureRequestAnimationFrame() {

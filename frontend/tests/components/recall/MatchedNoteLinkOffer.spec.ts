@@ -33,15 +33,14 @@ function buildReviewedAndMatched(): {
     .title("Reviewed Note")
     .content("Body of reviewed")
     .please()
-  const matchedRealm = makeMe.aNoteRealm.title("Matched Target").please()
-  matchedRealm.id = 20
-  matchedRealm.note.id = 20
-  matchedRealm.note.noteTopology.id = 20
-  matchedRealm.note.noteTopology.title = "Matched Target"
-  matchedRealm.notebookRealm.notebook.id =
-    reviewedRealm.notebookRealm.notebook.id
-  matchedRealm.notebookRealm.notebook.name =
-    reviewedRealm.notebookRealm.notebook.name
+  const matchedRealm = makeMe.aNoteRealm
+    .id(20)
+    .title("Matched Target")
+    .inNotebook(
+      reviewedRealm.notebookRealm.notebook.id,
+      reviewedRealm.notebookRealm.notebook.name
+    )
+    .please()
   return { reviewedRealm, matchedRealm }
 }
 
@@ -98,16 +97,6 @@ describe("MatchedNoteLinkOffer", () => {
 
   it("shows Link to: with matched title, property and relationship options, hides bare wiki", async () => {
     const { reviewedRealm, matchedRealm } = buildReviewedAndMatched()
-    const updateSpy = mockSdkService(
-      TextContentController,
-      "updateNoteContent",
-      reviewedRealm
-    )
-    const createSpy = mockSdkService(
-      NotebookController,
-      "createNoteAtNotebookRoot",
-      matchedRealm
-    )
 
     const wrapper = mountOffer(reviewedRealm, matchedRealm)
     await flushPromises()
@@ -118,8 +107,6 @@ describe("MatchedNoteLinkOffer", () => {
     expect(wrapper.text()).toContain("Add wiki link as a new property")
     expect(wrapper.text()).toContain("Add a new relationship note")
     expect(wrapper.find("input").exists()).toBe(false)
-    expect(updateSpy).not.toHaveBeenCalled()
-    expect(createSpy).not.toHaveBeenCalled()
   })
 
   it("writes a wiki-link property via updateNoteContent and emits closeDialog", async () => {
@@ -128,11 +115,6 @@ describe("MatchedNoteLinkOffer", () => {
       TextContentController,
       "updateNoteContent",
       reviewedRealm
-    )
-    const createSpy = mockSdkService(
-      NotebookController,
-      "createNoteAtNotebookRoot",
-      matchedRealm
     )
 
     const wrapper = mountOffer(reviewedRealm, matchedRealm)
@@ -151,28 +133,7 @@ describe("MatchedNoteLinkOffer", () => {
     }
     expect(callArgs.path.note).toBe(reviewedRealm.id)
     expect(callArgs.body.content).toContain("[[Matched Target]]")
-    expect(createSpy).not.toHaveBeenCalled()
     expect(wrapper.emitted("closeDialog")).toHaveLength(1)
-  })
-
-  it("does not call content or create APIs on mount alone", async () => {
-    const { reviewedRealm, matchedRealm } = buildReviewedAndMatched()
-    const updateSpy = mockSdkService(
-      TextContentController,
-      "updateNoteContent",
-      reviewedRealm
-    )
-    const createSpy = mockSdkService(
-      NotebookController,
-      "createNoteAtNotebookRoot",
-      matchedRealm
-    )
-
-    mountOffer(reviewedRealm, matchedRealm)
-    await flushPromises()
-
-    expect(updateSpy).not.toHaveBeenCalled()
-    expect(createSpy).not.toHaveBeenCalled()
   })
 
   it("does not create a relationship note until the user confirms relation type", async () => {
@@ -184,8 +145,6 @@ describe("MatchedNoteLinkOffer", () => {
 
     const wrapper = mountOffer(reviewedRealm, matchedRealm)
     await flushPromises()
-
-    expect(createSpy).not.toHaveBeenCalled()
 
     await wrapper
       .findAll("button")

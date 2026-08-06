@@ -10,13 +10,13 @@ import { mockedGoToNextAssimilation } from "./assimilationPanelMocks"
 import {
   assimilateButtonEl,
   assimilateSpy,
+  assimilatedCountOfTheDay,
   clickAssimilate,
   clickVerifySpelling,
   closeSpellingVerificationPopup,
-  mountAssimilationPanelReady,
-  mockedIncrementAssimilatedCount,
   mockedRequestDueRecallsRefresh,
   mockedTotalAssimilatedCount,
+  mountAssimilationPanelReady,
   note,
   opaqueContentBlockerEl,
   setupAssimilationPanelTests,
@@ -25,7 +25,6 @@ import {
 } from "./assimilationPanelTestSupport"
 
 vi.mock("@/composables/useRecallData")
-vi.mock("@/composables/useAssimilationCount")
 vi.mock("@/composables/useGoToNextAssimilation", () => ({
   useGoToNextAssimilation: () => ({
     goToNextAssimilation: mockedGoToNextAssimilation,
@@ -36,12 +35,12 @@ setupAssimilationPanelTests()
 
 describe("AssimilationPanel", () => {
   describe("normal assimilation", () => {
-    it("calls goToNextAssimilation and increments counts correctly when assimilating normally", async () => {
+    it("advances via next assimilation and increments counts when assimilating", async () => {
       assimilateSpy.mockResolvedValue(
         wrapSdkResponse([
-          { id: 1, removedFromTracking: false },
-          { id: 2, removedFromTracking: true },
-          { id: 3, removedFromTracking: false },
+          makeMe.aMemoryTracker.id(1).please(),
+          makeMe.aMemoryTracker.id(2).removedFromTracking(true).please(),
+          makeMe.aMemoryTracker.id(3).please(),
         ])
       )
       const wrapper = await mountAssimilationPanelReady()
@@ -53,7 +52,7 @@ describe("AssimilationPanel", () => {
       })
       expect(mockedGoToNextAssimilation).toHaveBeenCalled()
       expect(mockedTotalAssimilatedCount.value).toBe(2)
-      expect(mockedIncrementAssimilatedCount).toHaveBeenCalledWith(2)
+      expect(assimilatedCountOfTheDay.value).toBe(2)
       expect(mockedRequestDueRecallsRefresh).toHaveBeenCalled()
     })
   })
@@ -106,12 +105,11 @@ describe("AssimilationPanel", () => {
     it("enables assimilate when note has only a property memory tracker", async () => {
       mockSdkService(NoteController, "getNoteInfo", {
         memoryTrackers: [
-          {
-            ...makeMe.aMemoryTracker.please(),
-            id: 1,
-            propertyKey: "topic",
-            spelling: false,
-          },
+          makeMe.aMemoryTracker
+            .id(1)
+            .withPropertyKey("topic")
+            .spelling(false)
+            .please(),
         ],
       })
       const wrapper = await mountAssimilationPanelReady()
@@ -128,12 +126,12 @@ describe("AssimilationPanel", () => {
         }
         return {
           memoryTrackers: [
-            { ...makeMe.aMemoryTracker.please(), id: 1, spelling: false },
+            makeMe.aMemoryTracker.id(1).spelling(false).please(),
           ],
         }
       })
       assimilateSpy.mockResolvedValue(
-        wrapSdkResponse([{ id: 1, removedFromTracking: false }])
+        wrapSdkResponse([makeMe.aMemoryTracker.id(1).please()])
       )
 
       const wrapper = await mountAssimilationPanelReady()
@@ -148,9 +146,7 @@ describe("AssimilationPanel", () => {
 
     it("disables assimilate when note has memory trackers and no add-spelling-only mode", async () => {
       mockSdkService(NoteController, "getNoteInfo", {
-        memoryTrackers: [
-          { ...makeMe.aMemoryTracker.please(), id: 1, spelling: false },
-        ],
+        memoryTrackers: [makeMe.aMemoryTracker.id(1).spelling(false).please()],
       })
       const wrapper = await mountAssimilationPanelReady()
 
@@ -160,9 +156,7 @@ describe("AssimilationPanel", () => {
     it("enables assimilate when remember spelling on and no spelling tracker", async () => {
       mockSdkService(NoteController, "getNoteInfo", {
         recallSetting: { rememberSpelling: true },
-        memoryTrackers: [
-          { ...makeMe.aMemoryTracker.please(), id: 1, spelling: false },
-        ],
+        memoryTrackers: [makeMe.aMemoryTracker.id(1).spelling(false).please()],
       })
       const wrapper = await mountAssimilationPanelReady()
 
@@ -172,20 +166,11 @@ describe("AssimilationPanel", () => {
     it("adds only spelling memory tracker when in add-spelling-only mode", async () => {
       mockSdkService(NoteController, "getNoteInfo", {
         recallSetting: { rememberSpelling: true },
-        memoryTrackers: [
-          { ...makeMe.aMemoryTracker.please(), id: 1, spelling: false },
-        ],
+        memoryTrackers: [makeMe.aMemoryTracker.id(1).spelling(false).please()],
       })
       mockSdkService(NoteController, "verifySpelling", { correct: true })
       assimilateSpy.mockResolvedValue(
-        wrapSdkResponse([
-          {
-            ...makeMe.aMemoryTracker.please(),
-            id: 2,
-            spelling: true,
-            removedFromTracking: false,
-          },
-        ])
+        wrapSdkResponse([makeMe.aMemoryTracker.id(2).spelling(true).please()])
       )
       const wrapper = await mountAssimilationPanelReady()
 

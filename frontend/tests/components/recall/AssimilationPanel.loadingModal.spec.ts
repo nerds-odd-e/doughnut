@@ -23,7 +23,6 @@ import {
 } from "./assimilationPanelTestSupport"
 
 vi.mock("@/composables/useRecallData")
-vi.mock("@/composables/useAssimilationCount")
 
 setupAssimilationPanelTests()
 

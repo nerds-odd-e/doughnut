@@ -48,11 +48,7 @@ describe("AssimilationSettings", () => {
       wrapSdkResponse(
         makeMe.aNoteRecallInfo
           .memoryTrackers([
-            {
-              ...makeMe.aMemoryTracker.please(),
-              id: 1,
-              propertyKey: "topic",
-            },
+            makeMe.aMemoryTracker.id(1).withPropertyKey("topic").please(),
           ])
           .please()
       )
@@ -78,12 +74,11 @@ describe("AssimilationSettings", () => {
         wrapSdkResponse(
           makeMe.aNoteRecallInfo
             .memoryTrackers([
-              {
-                ...makeMe.aMemoryTracker.please(),
-                id: 1,
-                propertyKey: "topic",
-                removedFromTracking: true,
-              },
+              makeMe.aMemoryTracker
+                .id(1)
+                .withPropertyKey("topic")
+                .removedFromTracking(true)
+                .please(),
             ])
             .please()
         )

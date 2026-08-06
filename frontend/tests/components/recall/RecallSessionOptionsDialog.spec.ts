@@ -23,13 +23,6 @@ vi.mock("vue-router", async (importOriginal) => {
   }
 })
 
-vi.mock("@/composables/useRecallData", () => ({
-  useRecallData: () => ({
-    treadmillMode: { value: false },
-    setTreadmillMode: vi.fn(),
-  }),
-}))
-
 describe("RecallSessionOptionsDialog", () => {
   const defaultProps = {
     canMoveToEnd: false,

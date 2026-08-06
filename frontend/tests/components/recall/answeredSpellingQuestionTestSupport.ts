@@ -5,6 +5,7 @@ import type {
   User,
 } from "@generated/doughnut-backend-api"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { buildWikiLinkText } from "@/utils/buildWikiLinkText"
 import helper from "@tests/helpers"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
@@ -70,15 +71,21 @@ export async function openResolveAccidentalMatch(wrapper: VueWrapper) {
 }
 
 export function accidentalMatchWithTwoMatchedNotes(
-  options: { notebookNames?: [string, string] } = {}
+  options: { notebookNames?: [string, string]; reviewedReadonly?: boolean } = {}
 ) {
-  const reviewedRealm = makeMe.aNoteRealm.title("Reviewed Note").please()
-  const matchedA = makeMe.aNoteRealm.id(10).title("Matched A").please()
-  const matchedB = makeMe.aNoteRealm.id(20).title("Matched B").please()
-  if (options.notebookNames) {
-    matchedA.notebookRealm.notebook.name = options.notebookNames[0]
-    matchedB.notebookRealm.notebook.name = options.notebookNames[1]
+  let reviewedBuilder = makeMe.aNoteRealm.title("Reviewed Note")
+  if (options.reviewedReadonly) {
+    reviewedBuilder = reviewedBuilder.readonly()
   }
+  const reviewedRealm = reviewedBuilder.please()
+  let matchedABuilder = makeMe.aNoteRealm.id(10).title("Matched A")
+  let matchedBBuilder = makeMe.aNoteRealm.id(20).title("Matched B")
+  if (options.notebookNames) {
+    matchedABuilder = matchedABuilder.notebookName(options.notebookNames[0])
+    matchedBBuilder = matchedBBuilder.notebookName(options.notebookNames[1])
+  }
+  const matchedA = matchedABuilder.please()
+  const matchedB = matchedBBuilder.please()
   const answeredQuestion = makeMe.anAnsweredQuestion
     .withNote(reviewedRealm.note)
     .accidentalMatch("matched a", [
@@ -87,4 +94,36 @@ export function accidentalMatchWithTwoMatchedNotes(
     ])
     .please()
   return { answeredQuestion, reviewedRealm, matchedA, matchedB }
+}
+
+export function reviewedRealmDeclaringMatch(
+  reviewedRealm: NoteRealm,
+  matchedRealm: NoteRealm,
+  property: "overlaps" | "aliases"
+) {
+  const token = buildWikiLinkText(
+    {
+      noteTopology: matchedRealm.note.noteTopology,
+      notebookId: matchedRealm.notebookRealm.notebook.id,
+      notebookName: matchedRealm.notebookRealm.notebook.name,
+    },
+    { notebookId: reviewedRealm.notebookRealm.notebook.id }
+  )
+  return makeMe.aNoteRealm
+    .id(reviewedRealm.id)
+    .title(reviewedRealm.note.noteTopology.title)
+    .content(
+      `---
+${property}:
+  - "${token}"
+---
+
+## Body
+`
+    )
+    .inNotebook(
+      reviewedRealm.notebookRealm.notebook.id,
+      reviewedRealm.notebookRealm.notebook.name
+    )
+    .please()
 }

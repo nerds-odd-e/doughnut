@@ -192,8 +192,7 @@ describe("AnsweredSpellingQuestion accidental match", () => {
 
   it("omits mutating CTAs when reviewed notebook is readonly", async () => {
     const { answeredQuestion, reviewedRealm, matchedA, matchedB } =
-      accidentalMatchWithTwoMatchedNotes()
-    reviewedRealm.notebookRealm.readonly = true
+      accidentalMatchWithTwoMatchedNotes({ reviewedReadonly: true })
 
     wrapper = mountAnsweredSpellingQuestion(answeredQuestion, {
       currentUser: makeMe.aUser.please(),

@@ -25,10 +25,12 @@ export const { note } = memoryTracker
 export let renderer: RenderingHelper<typeof AssimilationPanel>
 export let assimilateSpy: ReturnType<typeof mockSdkService>
 
-export const mockedIncrementAssimilatedCount = vi.fn()
 export const mockedRequestDueRecallsRefresh = vi.fn()
 export const mockedTotalAssimilatedCount = ref(0)
 const toRepeat = ref<MemoryTrackerLite[] | undefined>(undefined)
+
+const assimilationCount = useAssimilationCount()
+export const { assimilatedCountOfTheDay } = assimilationCount
 
 export function setupAssimilationPanelTests() {
   afterEach(() => {
@@ -43,6 +45,11 @@ export function setupAssimilationPanelTests() {
   beforeEach(() => {
     mockedGoToNextAssimilation.mockClear()
     mockedGoToNextAssimilation.mockResolvedValue(true)
+    mockedTotalAssimilatedCount.value = 0
+    assimilationCount.setAssimilatedCountOfTheDay(0)
+    assimilationCount.setDueCount(0)
+    assimilationCount.setTotalUnassimilatedCount(0)
+
     assimilateSpy = mockSdkService(AssimilationController, "assimilate", [])
     mockSdkService(NoteController, "getNoteInfo", {})
     mockSdkService(AiController, "generateRefinementSuggestions", {
@@ -70,17 +77,6 @@ export function setupAssimilationPanelTests() {
       setDiligentMode: vi.fn(),
       dueRecallsRefreshNonce: ref(0),
       requestDueRecallsRefresh: mockedRequestDueRecallsRefresh,
-    })
-
-    vi.mocked(useAssimilationCount).mockReturnValue({
-      incrementAssimilatedCount: mockedIncrementAssimilatedCount,
-      dueCount: ref(0),
-      setDueCount: vi.fn(),
-      assimilatedCountOfTheDay: ref(0),
-      setAssimilatedCountOfTheDay: vi.fn(),
-      totalUnassimilatedCount: ref(0),
-      setTotalUnassimilatedCount: vi.fn(),
-      applyAssimilationCountDto: vi.fn(),
     })
 
     renderer = helper.component(AssimilationPanel)

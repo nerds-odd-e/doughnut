@@ -15,7 +15,6 @@ import {
 } from "./assimilationPanelTestSupport"
 
 vi.mock("@/composables/useRecallData")
-vi.mock("@/composables/useAssimilationCount")
 vi.mock("@/composables/useGoToNextAssimilation", () => ({
   useGoToNextAssimilation: () => ({
     goToNextAssimilation: mockedGoToNextAssimilation,
@@ -30,24 +29,23 @@ describe("AssimilationPanel revive", () => {
   it("calls reEnable for all skipped note-level trackers and reloads note info", async () => {
     mockSdkService(NoteController, "getNoteInfo", {
       memoryTrackers: [
-        {
-          ...makeMe.aMemoryTracker.please(),
-          id: 10,
-          spelling: false,
-          removedFromTracking: true,
-        },
-        {
-          ...makeMe.aMemoryTracker.please(),
-          id: 11,
-          spelling: true,
-          removedFromTracking: true,
-        },
+        makeMe.aMemoryTracker
+          .id(10)
+          .spelling(false)
+          .removedFromTracking(true)
+          .please(),
+        makeMe.aMemoryTracker
+          .id(11)
+          .spelling(true)
+          .removedFromTracking(true)
+          .please(),
       ],
     })
-    const reEnableSpy = mockSdkService(MemoryTrackerController, "reEnable", {
-      ...makeMe.aMemoryTracker.please(),
-      removedFromTracking: false,
-    })
+    const reEnableSpy = mockSdkService(
+      MemoryTrackerController,
+      "reEnable",
+      makeMe.aMemoryTracker.removedFromTracking(false).please()
+    )
     const wrapper = mountAssimilationPanel()
     await flushPromises()
 
@@ -71,14 +69,7 @@ describe("AssimilationPanel revive", () => {
 
   it("shows Skip recall when note-level trackers are active", async () => {
     mockSdkService(NoteController, "getNoteInfo", {
-      memoryTrackers: [
-        {
-          ...makeMe.aMemoryTracker.please(),
-          id: 1,
-          spelling: false,
-          removedFromTracking: false,
-        },
-      ],
+      memoryTrackers: [makeMe.aMemoryTracker.id(1).spelling(false).please()],
     })
     const wrapper = mountAssimilationPanel()
     await flushPromises()

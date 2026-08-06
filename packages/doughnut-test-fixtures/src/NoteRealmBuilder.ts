@@ -13,6 +13,8 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
 
   noteBuilder
 
+  private notebookNameOverride?: string
+
   constructor() {
     super()
     this.noteBuilder = new NoteBuilder()
@@ -74,6 +76,24 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
     return this
   }
 
+  inNotebook(notebookId: number, name?: string): NoteRealmBuilder {
+    this.noteBuilder.realmNotebookId = notebookId
+    if (name !== undefined) {
+      this.notebookNameOverride = name
+    }
+    return this
+  }
+
+  notebookName(name: string): NoteRealmBuilder {
+    this.notebookNameOverride = name
+    return this
+  }
+
+  readonly(value = true): NoteRealmBuilder {
+    this.data.notebookRealm.readonly = value
+    return this
+  }
+
   inFolder(folderId: number, folderName: string): NoteRealmBuilder {
     this.data.ancestorFolders = [
       new FolderBuilder().folder(folderId, folderName).do(),
@@ -102,7 +122,7 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
     const nb = this.data.notebookRealm.notebook
     if (nb) {
       nb.id = this.noteBuilder.realmNotebookId
-      nb.name = this.data.note.noteTopology.title
+      nb.name = this.notebookNameOverride ?? this.data.note.noteTopology.title
     }
     this.data.wikiTitles ??= []
     return this.data
