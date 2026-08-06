@@ -1,6 +1,6 @@
 # Frontend / CLI / MCP unit tests → "small test" style
 
-**Status:** in progress (Phases 1–16 done)
+**Status:** in progress (Phases 1–17 done)
 **Type:** test renovation (no product behavior change)  
 **Resume:** this `PLAN.md` progress log only — **do not edit** trunk `.planning/STATE.md` (parallel trunk-based work).
 
@@ -190,10 +190,10 @@ While iterating a single large frontend file, `pnpm frontend:test tests/path/to/
 - **Done when:** rubric applied; suite green.
 
 ### Phase 17 — Frontend: pages — BookReading
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
-- **Files:** `BookReadingPage.spec.ts` (~1819 LOC — must split into capability-named specs during/after renovation).
-- **Verify:** `pnpm frontend:test`
+- **Files:** capability-split `BookReadingPage.*.spec.ts` (load / layout / readingPosition / readingControlPanel.visibility+marking / snap[+panelGeometry+budgets] / navigationBar) + shared `bookReadingPage*TestSupport` modules.
+- **Verify:** `pnpm frontend:test` — green (300 files / 1663 tests; BookReading cohort 9 files / 47 tests).
 - **Done when:** rubric applied; oversized file split; suite green.
 
 ### Phase 18 — Final anti-pattern sweep (all three packages)
@@ -236,7 +236,8 @@ If a Behavior phase cannot express fixtures concisely: add a **Structure** sub-p
 | 14 | done | FE notebooks/catalog/folder/circle/bazaar/home/settings/misc pages renovated; NotebookBuilder.title; notebooksPageTestSupport; focused asserts; suite green |
 | 15 | done | FE NoteShow + assimilation/conversation panels renovated; noteShowPageTestSupport mount/DOM helpers; render + router.push for conversation query; focused asserts; suite green |
 | 16 | done | FE Recall + MemoryTracker pages renovated; Overlap uses shared recallPageTestSupport; MemoryTrackerPage slimmed to fetch/load/error/revive; View capability splits + display statuses moved from Page; focused treadmill/diligent/spelling asserts; suite green |
-| 17–18 | planned | — |
+| 17 | done | FE BookReadingPage monolith (~1819) split into capability specs + support modules; mockSdkService defaults; createMemoryHistory per mount; focused panel/nav asserts; suite green |
+| 18 | planned | — |
 
 ---
 
@@ -261,3 +262,4 @@ If a Behavior phase cannot express fixtures concisely: add a **Structure** sub-p
 - Phase 14: Added `NotebookBuilder.title()`; shared `notebooksPageTestSupport` (`mockMyNotebooks` / `mountNotebooksPage` / `emitNotebookUpdated` / `catalogHeadingTexts`). NotebooksPageUpdates*: DOM heading asserts + emit via NotebooksPageView (NotebookButtons no longer emits notebook-updated). Dropped getByRole (title/text); RecentSettingsTab uses real router + DOM tab panels; MessageCenter push via router spy; FailureReport/RecallStats focused asserts; name edit via `[data-test="notebook-page-name-input"]` innerText; HomePage dropped GlobalBar stub. FolderPage* / NotebookPageView / AccessTokens / General / Bazaar already rubric-compliant — left largely untouched. RouterLink group-nav still uses `findComponent` props (`href` stays `#` in VTU).
 - Phase 15: Shared `noteShowPageTestSupport` (`setupNoteShowPageMocks` / assimilation+conversation setups / `renderNoteShowPage` / `renderNoteShowPageWithConversation` / DOM `*El` helpers). Conversation visibility needs real `router.push` (not `currentRoute` `$route` mock — `useRoute().query`). Assimilation: `render()` + `assimilateButtonSelector` over mount/`wrapper.find`. Conversation: focused maximize toggle vs close-after-maximize delta (drop route name/params re-assert). NoteShow load: single showNote spy from beforeEach.
 - Phase 16: RecallPage already capability-split on trunk (~898 monolith gone). Overlap deduped onto `recallPageTestSupport`; treadmill/diligent merged redundant cases; spelling DOM alert. MemoryTrackerPage: page-boundary only (SDK fetch/loading/error/empty/revive refetch) via `memoryTrackerPageTestSupport`; View owns prompt meta / delete / skipped / spelling splits + `mockMemoryTrackerPageViewDefaults`. Kept `useRecallData` / `usePopups` / vue-router mocks as side-effect boundaries (Phase 8 pattern). Quiz `$emit("answered")` still via findComponent where no DOM path.
+- Phase 17: Split `BookReadingPage.spec.ts` (~1819) into load / layout / readingPosition / readingControlPanel.visibility+marking / snap (+ panelGeometry without mock; budgets with own hoisted mock) / navigationBar. Shared support split ≤250 LOC (mount/fixtures, interaction, pdfViewer exposed spies, readingPosition, panel, snap, navigationBar). Defaults via `mockSdkService`; book-file `fetch` kept as true external; `createMemoryHistory` per mount. PdfLocator snapshot stub uses `spyOn`+`satisfies PdfLocatorFull` (union typing vs mockSdkService). **Confirmed:** `vi.hoisted`+`vi.mock` for intervalScrollSuppression must live in each mock-using snap spec — importing a factory from another module fails Vitest browser hoist. Focused asserts: panel hide siblings drop current-block rechecks; nav bar drops setup re-asserts.
