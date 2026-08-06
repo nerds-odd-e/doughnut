@@ -231,19 +231,19 @@ describe("validatePropertyRowsForRichEdit", () => {
     ).toEqual({ ok: true })
   })
 
-  it("accepts wiki-link overlap alias list rows", () => {
-    expect(
-      validatePropertyRowsForRichEdit([
-        {
-          key: "aliases",
-          value: listPropertyValue([
-            "color",
-            "[[Other Note]]",
-            "[[Shared Notebook:Hue|display]]",
-          ]),
-        },
-      ])
-    ).toEqual({ ok: true })
+  it("rejects wiki-link items in aliases list rows", () => {
+    const r = validatePropertyRowsForRichEdit([
+      {
+        key: "aliases",
+        value: listPropertyValue([
+          "color",
+          "[[Other Note]]",
+          "[[Shared Notebook:Hue|display]]",
+        ]),
+      },
+    ])
+    expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.message).toBe(AUTHORED_ALIASES_MESSAGE)
   })
 
   it("rejects invalid alias list items", () => {

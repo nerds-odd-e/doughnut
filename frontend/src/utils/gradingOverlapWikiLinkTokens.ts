@@ -33,8 +33,10 @@ function wikiLinkTokensFromListKey(
 
 /**
  * Tokens used for overlap declaration checks: authored `overlaps` plus legacy
- * wiki-link items in `aliases` (union, overlaps first, normalized dedupe).
- * Mirrors backend `FrontmatterOverlaps.gradingOverlapWikiLinkTokensFromNoteContent`.
+ * wiki-link items still in `aliases` (union, overlaps first, normalized dedupe).
+ * Read-time bridge for notebooks that have not re-saved; save migrates into
+ * `overlaps`. Mirrors backend
+ * `FrontmatterOverlaps.gradingOverlapWikiLinkTokensFromNoteContent`.
  */
 export function gradingOverlapWikiLinkTokensFromNoteContent(
   contentMarkdown: string

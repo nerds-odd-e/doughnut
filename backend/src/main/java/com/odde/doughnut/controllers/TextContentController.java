@@ -104,8 +104,8 @@ class TextContentController {
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @Valid @RequestBody NoteUpdateContentDTO contentDTO)
       throws UnexpectedNoAccessRightException {
-    AuthoredNoteContent.assertValidForSave(contentDTO.getContent());
-    return updateNote(note, n -> n.setContent(contentDTO.getContent()), true, true);
+    String prepared = AuthoredNoteContent.prepareContentForSave(contentDTO.getContent());
+    return updateNote(note, n -> n.setContent(prepared), true, true);
   }
 
   private NoteRealm updateNote(

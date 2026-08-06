@@ -17,6 +17,7 @@ Feature: Overlap try again
       ---
       aliases:
         - color
+      overlaps:
         - "[[Partner]]"
       ---
       Colour means a hue

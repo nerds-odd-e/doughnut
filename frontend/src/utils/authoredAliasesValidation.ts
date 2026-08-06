@@ -1,8 +1,7 @@
 import type { PropertyValue } from "@/utils/noteProperties"
-import { isWellFormedWholeWikiLinkItem } from "@/utils/wholeWikiLinkItem"
 
 export const AUTHORED_ALIASES_MESSAGE =
-  "aliases must be a one-level YAML list of nonblank plain alias strings or well-formed wiki-link overlap declarations."
+  "aliases must be a one-level YAML list of nonblank plain alias strings."
 
 const INVALID_ALIAS_CHARACTERS = /[|#^:]|\\|\/|＼|／|[\r\n]/
 
@@ -15,12 +14,6 @@ function isValidPlainAliasText(trimmed: string): boolean {
   return !INVALID_ALIAS_CHARACTERS.test(trimmed)
 }
 
-function isAcceptableAuthoredAliasItem(trimmed: string): boolean {
-  return (
-    isWellFormedWholeWikiLinkItem(trimmed) || isValidPlainAliasText(trimmed)
-  )
-}
-
 export function authoredAliasesValidationErrorForPropertyValue(
   value: PropertyValue
 ): string | undefined {
@@ -29,7 +22,7 @@ export function authoredAliasesValidationErrorForPropertyValue(
   }
   for (const item of value.items) {
     const trimmed = item.trim()
-    if (trimmed === "" || !isAcceptableAuthoredAliasItem(trimmed)) {
+    if (trimmed === "" || !isValidPlainAliasText(trimmed)) {
       return AUTHORED_ALIASES_MESSAGE
     }
   }

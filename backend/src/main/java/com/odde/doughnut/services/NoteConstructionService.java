@@ -98,9 +98,9 @@ public class NoteConstructionService {
     }
     Note note = createNote(notebook, folder, noteCreation.getNewTitle());
     if (noteCreation.getContent() != null) {
-      AuthoredNoteContent.assertValidForSave(noteCreation.getContent());
+      String prepared = AuthoredNoteContent.prepareContentForSave(noteCreation.getContent());
       Timestamp ts = testabilitySettings.getCurrentUTCTimestamp();
-      note.setContent(noteCreation.getContent());
+      note.setContent(prepared);
       note.setUpdatedAt(ts);
       entityPersister.save(note);
     }
@@ -132,14 +132,15 @@ public class NoteConstructionService {
 
     Note newNote =
         createNote(originalNote.getNotebook(), originalNote.getFolder(), aiResult.newNoteTitle);
-    AuthoredNoteContent.assertValidForSave(newNoteContent);
-    AuthoredNoteContent.assertValidForSave(aiResult.updatedOriginalNoteContent);
-    newNote.setContent(newNoteContent);
+    String preparedNew = AuthoredNoteContent.prepareContentForSave(newNoteContent);
+    String preparedOriginal =
+        AuthoredNoteContent.prepareContentForSave(aiResult.updatedOriginalNoteContent);
+    newNote.setContent(preparedNew);
     newNote.setUpdatedAt(currentUTCTimestamp);
     entityPersister.save(newNote);
 
     originalNote.setUpdatedAt(currentUTCTimestamp);
-    originalNote.setContent(aiResult.updatedOriginalNoteContent);
+    originalNote.setContent(preparedOriginal);
     entityPersister.save(originalNote);
 
     noteService.deleteOrphanImagesForPersistedContent(newNote);

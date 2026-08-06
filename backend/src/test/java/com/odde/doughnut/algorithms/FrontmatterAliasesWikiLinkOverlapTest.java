@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -100,30 +99,19 @@ class FrontmatterAliasesWikiLinkOverlapTest {
         equalTo(List.of("[[Other Note]]")));
   }
 
-  @Test
-  void authoredValidationError_accepts_well_formed_wiki_link_alias_items() {
-    String content =
-        """
-        ---
-        aliases:
-          - color
-          - "[[Other Note]]"
-          - "[[Shared Notebook:Hue]]"
-          - "[[Title|display]]"
-          - "[[Shared Notebook:Hue|display]]"
-        ---
-
-        body
-        """;
-
-    assertThat(
-        FrontmatterAliases.authoredValidationErrorForNoteContent(content),
-        equalTo(Optional.empty()));
-  }
-
   @ParameterizedTest
-  @ValueSource(strings = {"[[", "see [[Other]]", "[[a]][[b]]", "[[]]"})
-  void authoredValidationError_rejects_embedded_or_malformed_wiki_link_items(String item) {
+  @ValueSource(
+      strings = {
+        "[[Other Note]]",
+        "[[Shared Notebook:Hue]]",
+        "[[Title|display]]",
+        "[[Shared Notebook:Hue|display]]",
+        "[[",
+        "see [[Other]]",
+        "[[a]][[b]]",
+        "[[]]"
+      })
+  void authoredValidationError_rejects_wiki_link_alias_items(String item) {
     String content =
         """
         ---

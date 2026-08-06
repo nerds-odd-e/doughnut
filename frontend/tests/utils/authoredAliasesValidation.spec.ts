@@ -69,18 +69,20 @@ describe("authoredAliasesValidationErrorForPropertyValue", () => {
     }
   })
 
-  it("accepts well-formed wiki-link overlap alias items", () => {
-    expect(
-      authoredAliasesValidationErrorForPropertyValue(
-        listPropertyValue([
-          "color",
-          "[[Other Note]]",
-          "[[Shared Notebook:Hue]]",
-          "[[Title|display]]",
-          "[[Shared Notebook:Hue|display]]",
-        ])
-      )
-    ).toBeUndefined()
+  it("rejects well-formed wiki-link items (overlaps belong under overlaps)", () => {
+    for (const item of [
+      "[[Other Note]]",
+      "[[Shared Notebook:Hue]]",
+      "[[Title|display]]",
+      "[[Shared Notebook:Hue|display]]",
+    ]) {
+      expect(
+        authoredAliasesValidationErrorForPropertyValue(
+          listPropertyValue(["color", item])
+        ),
+        item
+      ).toBe(AUTHORED_ALIASES_MESSAGE)
+    }
   })
 
   it("rejects embedded or malformed wiki-link alias items", () => {

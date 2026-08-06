@@ -47,8 +47,10 @@ public final class FrontmatterOverlaps {
   }
 
   /**
-   * Tokens used for OVERLAP grading: authored {@code overlaps} plus legacy wiki-link items in
-   * {@code aliases} (union, overlaps first, normalized dedupe).
+   * Tokens used for OVERLAP grading: authored {@code overlaps} plus legacy wiki-link items still
+   * sitting in {@code aliases} (union, overlaps first, normalized dedupe). Read-time bridge so
+   * notebooks that have not re-saved yet keep OVERLAP matching; save migrates into {@code
+   * overlaps}.
    */
   public static List<String> gradingOverlapWikiLinkTokensFromNoteContent(String content) {
     return NoteContentMarkdown.splitLeadingFrontmatter(content == null ? "" : content)
@@ -63,6 +65,23 @@ public final class FrontmatterOverlaps {
     return mergeDedupePreserveOrder(
         overlapWikiLinkTokensFromFrontmatter(frontmatter),
         FrontmatterAliases.overlapWikiLinkTokensFromFrontmatter(frontmatter));
+  }
+
+  /** Merges two wiki-link token lists with normalized dedupe, preserving first-seen order. */
+  static List<String> mergeDedupePreserveOrder(List<String> first, List<String> second) {
+    List<String> out = new ArrayList<>(first.size() + second.size());
+    Set<String> seenNormalized = new HashSet<>();
+    for (String item : first) {
+      if (seenNormalized.add(FrontmatterAliases.normalizedLookupKey(item))) {
+        out.add(item);
+      }
+    }
+    for (String item : second) {
+      if (seenNormalized.add(FrontmatterAliases.normalizedLookupKey(item))) {
+        out.add(item);
+      }
+    }
+    return List.copyOf(out);
   }
 
   private static Optional<String> authoredValidationErrorForFrontmatter(Frontmatter frontmatter) {
@@ -100,22 +119,6 @@ public final class FrontmatterOverlaps {
           .ifPresent(tokens::add);
     }
     return dedupePreserveOrder(tokens);
-  }
-
-  private static List<String> mergeDedupePreserveOrder(List<String> first, List<String> second) {
-    List<String> out = new ArrayList<>(first.size() + second.size());
-    Set<String> seenNormalized = new HashSet<>();
-    for (String item : first) {
-      if (seenNormalized.add(FrontmatterAliases.normalizedLookupKey(item))) {
-        out.add(item);
-      }
-    }
-    for (String item : second) {
-      if (seenNormalized.add(FrontmatterAliases.normalizedLookupKey(item))) {
-        out.add(item);
-      }
-    }
-    return List.copyOf(out);
   }
 
   private static List<String> dedupePreserveOrder(List<String> items) {

@@ -144,6 +144,31 @@ public final class Frontmatter {
     return new Frontmatter(copy);
   }
 
+  /**
+   * Returns a new {@code Frontmatter} with the given key set to a YAML sequence of {@code items}.
+   * If a key exists (case-insensitive), it is replaced in-place; otherwise it is appended. An empty
+   * or null list removes the key.
+   */
+  public Frontmatter setSequenceItems(String key, List<String> items) {
+    if (items == null || items.isEmpty()) {
+      return remove(Set.of(key));
+    }
+    LinkedHashMap<String, Object> copy = new LinkedHashMap<>();
+    boolean replaced = false;
+    for (Map.Entry<String, Object> entry : data.entrySet()) {
+      if (entry.getKey().equalsIgnoreCase(key)) {
+        copy.put(key, new ArrayList<>(items));
+        replaced = true;
+      } else {
+        copy.put(entry.getKey(), entry.getValue());
+      }
+    }
+    if (!replaced) {
+      copy.put(key, new ArrayList<>(items));
+    }
+    return new Frontmatter(copy);
+  }
+
   /** Returns a new {@code Frontmatter} with all keys in {@code keys} removed (case-insensitive). */
   public Frontmatter remove(Set<String> keys) {
     LinkedHashMap<String, Object> copy = new LinkedHashMap<>();

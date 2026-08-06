@@ -139,6 +139,7 @@ import {
   validatePropertyRowsForRichEdit,
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
+import { migrateLegacyAliasWikiLinksToOverlaps } from "@/utils/migrateLegacyAliasWikiLinksToOverlaps"
 import { scalarPropertyValue } from "@/utils/noteProperties"
 import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
 
@@ -244,6 +245,11 @@ function rowKeyPresetListId(idx: number) {
 function buildPropertyRows(): PropertyRow[] {
   const p = parsed.value
   if (!p.ok) return []
+  const migrated = migrateLegacyAliasWikiLinksToOverlaps(props.contentMarkdown)
+  if (migrated) {
+    const m = parseNoteContentMarkdown(migrated)
+    if (m.ok) return sortedPropertyRowsFromNoteProperties(m.properties)
+  }
   return sortedPropertyRowsFromNoteProperties(p.properties)
 }
 

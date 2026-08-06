@@ -173,8 +173,8 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   /**
-   * Declares a legacy wiki-link overlap under {@code aliases} (dual-read path until aliases are
-   * plain-only).
+   * Declares a legacy wiki-link overlap under {@code aliases} (grading read bridge until content is
+   * re-saved and migrated into {@code overlaps}).
    */
   public NoteBuilder legacyOverlapPartner(Note partner) {
     frontmatterLists.addLegacyOverlapPartner(partner);

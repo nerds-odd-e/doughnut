@@ -40,7 +40,7 @@ Real product gaps found after milestone audit. Plan: `.planning/quick/002-overla
 - [x] **OVL-04**: OVERLAP grading resolves declarations from `overlaps` (not wiki-link items in `aliases`)
 - [x] **OVL-05**: **Add as overlapped note** appends into `overlaps` (not `aliases`); still no try-again / no SRS reclaim on this accidental-match result
 - [x] **OVL-06**: When overlap toward that match already exists, **Add as overlapped note** is disabled
-- [ ] **OVL-07**: `aliases` accepts plain alias strings only; wiki-in-`aliases` migrated or dual-read until removed
+- [x] **OVL-07**: `aliases` accepts plain alias strings only; wiki-in-`aliases` migrated on save; grading keeps a read bridge for unsaved legacy until data is gone
 
 ## v2 Requirements
 
@@ -107,7 +107,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | OVL-04 | Quick 002 / Phase 4 | Done |
 | OVL-05 | Quick 002 / Phase 5 | Done |
 | OVL-06 | Quick 002 / Phase 6 | Done |
-| OVL-07 | Quick 002 / Phase 7 | Planned |
+| OVL-07 | Quick 002 / Phase 7 | Done |
 
 ---
 *Requirements defined: 2026-08-05*

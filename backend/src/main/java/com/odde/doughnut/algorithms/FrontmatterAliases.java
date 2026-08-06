@@ -16,8 +16,7 @@ public final class FrontmatterAliases {
   private static final String ALIASES_KEY = "aliases";
 
   public static final String AUTHORED_ALIASES_MESSAGE =
-      "aliases must be a one-level YAML list of nonblank plain alias strings or well-formed"
-          + " wiki-link overlap declarations.";
+      "aliases must be a one-level YAML list of nonblank plain alias strings.";
 
   private static final Pattern INVALID_ALIAS_CHARACTERS =
       Pattern.compile("[|#^:]|\\\\|/|＼|／|[\\r\\n]");
@@ -62,8 +61,7 @@ public final class FrontmatterAliases {
 
   /**
    * Returns a validation error when {@code content} has an authored {@code aliases} property that
-   * is not a one-level YAML list of nonblank plain aliases or well-formed wiki-link overlap
-   * declarations. Empty when absent or valid.
+   * is not a one-level YAML list of nonblank plain alias strings. Empty when absent or valid.
    */
   public static Optional<String> authoredValidationErrorForNoteContent(String content) {
     return NoteContentMarkdown.splitLeadingFrontmatter(content == null ? "" : content)
@@ -88,7 +86,7 @@ public final class FrontmatterAliases {
         return Optional.of(AUTHORED_ALIASES_MESSAGE);
       }
       String trimmed = DisplayNamePathSeparators.trimSurroundingWhitespace(scalar.get());
-      if (trimmed.isBlank() || !isAcceptableAuthoredAliasItem(trimmed)) {
+      if (trimmed.isBlank() || !isValidPlainAliasText(trimmed)) {
         return Optional.of(AUTHORED_ALIASES_MESSAGE);
       }
     }
@@ -125,10 +123,6 @@ public final class FrontmatterAliases {
           .ifPresent(tokens::add);
     }
     return dedupePreserveOrder(tokens);
-  }
-
-  private static boolean isAcceptableAuthoredAliasItem(String trimmed) {
-    return isWikiLinkAliasItem(trimmed) || isValidPlainAliasText(trimmed);
   }
 
   private static boolean isWikiLinkAliasItem(String trimmed) {
