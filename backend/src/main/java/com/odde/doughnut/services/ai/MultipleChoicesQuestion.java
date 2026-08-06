@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MultipleChoicesQuestion {
   @JsonPropertyDescription(
-      "The question stem — the full, self-contained text of the prompt. Must not reference external context.")
+      "The question stem — the full, self-contained text of the prompt. Markdown allowed. Must not reference external context.")
   @JsonProperty(required = true)
   @JsonAlias({"f0__stem", "stem"})
   private String questionStem;
