@@ -12,7 +12,6 @@ import com.odde.doughnut.entities.QuestionGenerationBatch;
 import com.odde.doughnut.entities.QuestionGenerationBatchRequest;
 import com.odde.doughnut.entities.QuestionGenerationBatchStatus;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.openAiApis.StructuredResponseCreateParamsSerializer;
@@ -40,7 +39,6 @@ class QuestionGenerationBatchJsonlRendererTest {
   @Autowired MakeMe makeMe;
   @Autowired QuestionGenerationBatchJsonlRenderer jsonlRenderer;
   @Autowired QuestionGenerationBatchRequestRepository batchRequestRepository;
-  @Autowired QuestionGenerationBatchRepository batchRepository;
   @Autowired QuestionGenerationRequestBuilder requestBuilder;
   @Autowired GlobalSettingsService globalSettingsService;
   @Autowired StructuredResponseCreateParamsSerializer paramsSerializer;
@@ -94,7 +92,6 @@ class QuestionGenerationBatchJsonlRendererTest {
       MemoryTracker tracker =
           makeMe
               .aMemoryTrackerFor(note)
-              .by(user)
               .propertyKey("topic")
               .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(12)))
               .please();
@@ -126,15 +123,7 @@ class QuestionGenerationBatchJsonlRendererTest {
 
         @SuppressWarnings("unchecked")
         Map<String, Object> body = (Map<String, Object>) line.get("body");
-        Map<String, Object> expectedBody = expectedBodyForRequest(batch, request);
-        assertThat(body, is(expectedBody));
-        assertThat(body.get("model"), is("gpt-batch-question-generation"));
-        assertThat(body.get("max_output_tokens"), is(1000));
-        assertThat(body.containsKey("reasoning"), is(false));
-        assertThat(body.containsKey("text"), is(true));
-        @SuppressWarnings("unchecked")
-        Map<String, Object> text = (Map<String, Object>) body.get("text");
-        assertThat(text.containsKey("format"), is(true));
+        assertThat(body, is(expectedBodyForRequest(batch, request)));
       }
     }
 
@@ -145,7 +134,6 @@ class QuestionGenerationBatchJsonlRendererTest {
       String jsonl = jsonlRenderer.renderInputJsonl(batch);
 
       assertThat(jsonl, is(""));
-      assertThat(parseJsonl(jsonl), empty());
     }
 
     @Test
@@ -155,7 +143,6 @@ class QuestionGenerationBatchJsonlRendererTest {
       MemoryTracker tracker =
           makeMe
               .aMemoryTrackerFor(note)
-              .by(user)
               .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(24)))
               .please();
 
@@ -170,7 +157,6 @@ class QuestionGenerationBatchJsonlRendererTest {
       @SuppressWarnings("unchecked")
       Map<String, Object> body = (Map<String, Object>) lines.get(0).get("body");
       assertThat(body, is(expectedBodyForRequest(batch, requests.get(0))));
-      assertThat(body.get("max_output_tokens"), is(12000));
       @SuppressWarnings("unchecked")
       Map<String, Object> reasoning = (Map<String, Object>) body.get("reasoning");
       assertThat(reasoning.get("effort"), is("high"));
@@ -178,19 +164,18 @@ class QuestionGenerationBatchJsonlRendererTest {
   }
 
   private QuestionGenerationBatch savePlannedBatch() {
-    QuestionGenerationBatch batch = new QuestionGenerationBatch();
-    batch.setUser(user);
-    batch.setStatus(QuestionGenerationBatchStatus.PLANNED);
-    batch.setPlannedAt(currentTime);
-    return batchRepository.saveAndFlush(batch);
+    QuestionGenerationBatch batch =
+        makeMe
+            .aQuestionGenerationBatch()
+            .forUser(user)
+            .status(QuestionGenerationBatchStatus.PLANNED)
+            .plannedAt(currentTime)
+            .please();
+    makeMe.entityPersister.flush();
+    return batch;
   }
 
   private void saveBatchRequest(QuestionGenerationBatch batch, MemoryTracker tracker) {
-    QuestionGenerationBatchRequest request = new QuestionGenerationBatchRequest();
-    request.setBatch(batch);
-    request.setMemoryTracker(tracker);
-    request.setContextSeed(42L);
-    request.setCustomId(QuestionGenerationBatchRequest.customIdFor(batch.getId(), tracker.getId()));
-    batchRequestRepository.saveAndFlush(request);
+    makeMe.aQuestionGenerationBatchRequest().batch(batch).memoryTracker(tracker).please();
   }
 }

@@ -60,25 +60,37 @@ class QuestionGenerationBatchOutputCollectionDirectBatchTest {
     MemoryTracker firstTracker =
         makeMe
             .aMemoryTrackerFor(firstNote)
-            .by(user)
             .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(24)))
             .please();
     MemoryTracker secondTracker =
         makeMe
             .aMemoryTrackerFor(secondNote)
-            .by(user)
             .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(24)))
             .please();
 
-    completedBatch = new QuestionGenerationBatch();
-    completedBatch.setUser(user);
-    completedBatch.setStatus(QuestionGenerationBatchStatus.COMPLETED);
-    completedBatch.setPlannedAt(currentTime);
-    completedBatch.setOpenaiBatchId("batch-openai-1");
-    completedBatch = batchRepository.saveAndFlush(completedBatch);
+    completedBatch =
+        makeMe
+            .aQuestionGenerationBatch()
+            .forUser(user)
+            .status(QuestionGenerationBatchStatus.COMPLETED)
+            .plannedAt(currentTime)
+            .openaiBatchId("batch-openai-1")
+            .please();
+    makeMe.entityPersister.flush();
 
-    firstRequest = saveBatchRequest(completedBatch, firstTracker);
-    secondRequest = saveBatchRequest(completedBatch, secondTracker);
+    firstRequest =
+        makeMe
+            .aQuestionGenerationBatchRequest()
+            .batch(completedBatch)
+            .memoryTracker(firstTracker)
+            .please();
+    secondRequest =
+        makeMe
+            .aQuestionGenerationBatchRequest()
+            .batch(completedBatch)
+            .memoryTracker(secondTracker)
+            .please();
+    makeMe.entityPersister.flush();
   }
 
   @Test
@@ -156,15 +168,5 @@ class QuestionGenerationBatchOutputCollectionDirectBatchTest {
     outputCollectionService.collectOutputForCompletedBatches(currentTime);
 
     verify(openAiApiHandler, never()).retrieveBatch(anyString());
-  }
-
-  private QuestionGenerationBatchRequest saveBatchRequest(
-      QuestionGenerationBatch batch, MemoryTracker tracker) {
-    QuestionGenerationBatchRequest request = new QuestionGenerationBatchRequest();
-    request.setBatch(batch);
-    request.setMemoryTracker(tracker);
-    request.setContextSeed(42L);
-    request.setCustomId(QuestionGenerationBatchRequest.customIdFor(batch.getId(), tracker.getId()));
-    return batchRequestRepository.saveAndFlush(request);
   }
 }

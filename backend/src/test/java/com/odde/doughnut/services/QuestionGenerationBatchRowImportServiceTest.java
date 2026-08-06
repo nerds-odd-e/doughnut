@@ -2,12 +2,11 @@ package com.odde.doughnut.services;
 
 import static com.odde.doughnut.controllers.dto.Randomization.RandomStrategy.first;
 import static com.odde.doughnut.controllers.dto.Randomization.RandomStrategy.last;
+import static com.odde.doughnut.services.QuestionGenerationBatchImportPayloadSupport.batchSuccessLine;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
@@ -19,7 +18,6 @@ import com.odde.doughnut.entities.QuestionGenerationBatchStatus;
 import com.odde.doughnut.entities.QuestionType;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.doughnut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -42,11 +40,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class QuestionGenerationBatchRowImportServiceTest {
 
-  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapperConfig().objectMapper();
-
   @Autowired MakeMe makeMe;
   @Autowired QuestionGenerationBatchRowImportService rowImportService;
-  @Autowired QuestionGenerationBatchRepository batchRepository;
   @Autowired QuestionGenerationBatchRequestRepository batchRequestRepository;
   @Autowired RecallPromptRepository recallPromptRepository;
   @Autowired TestabilitySettings testabilitySettings;
@@ -66,22 +61,17 @@ class QuestionGenerationBatchRowImportServiceTest {
     memoryTracker =
         makeMe
             .aMemoryTrackerFor(note)
-            .by(user)
             .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(24)))
             .please();
 
-    QuestionGenerationBatch batch = new QuestionGenerationBatch();
-    batch.setUser(user);
-    batch.setStatus(QuestionGenerationBatchStatus.COMPLETED);
-    batch.setPlannedAt(currentTime);
-    batch = batchRepository.saveAndFlush(batch);
-
-    outputReadyRequest = new QuestionGenerationBatchRequest();
-    outputReadyRequest.setBatch(batch);
-    outputReadyRequest.setMemoryTracker(memoryTracker);
-    outputReadyRequest.setContextSeed(42L);
-    outputReadyRequest.setCustomId(
-        QuestionGenerationBatchRequest.customIdFor(batch.getId(), memoryTracker.getId()));
+    QuestionGenerationBatch batch =
+        makeMe
+            .aQuestionGenerationBatch()
+            .forUser(user)
+            .status(QuestionGenerationBatchStatus.COMPLETED)
+            .plannedAt(currentTime)
+            .please();
+    makeMe.entityPersister.flush();
 
     mcqWithAnswer =
         makeMe
@@ -90,7 +80,14 @@ class QuestionGenerationBatchRowImportServiceTest {
             .choices("Blue", "Green", "Red")
             .correctChoiceIndex(0)
             .please();
-    outputReadyRequest.setStatus(QuestionGenerationBatchRequestStatus.OUTPUT_READY);
+
+    outputReadyRequest =
+        makeMe
+            .aQuestionGenerationBatchRequest()
+            .batch(batch)
+            .memoryTracker(memoryTracker)
+            .status(QuestionGenerationBatchRequestStatus.OUTPUT_READY)
+            .please();
     outputReadyRequest.setRawSuccessPayload(
         batchSuccessLine(outputReadyRequest.getCustomId(), mcqWithAnswer));
     batchRequestRepository.saveAndFlush(outputReadyRequest);
@@ -140,39 +137,11 @@ class QuestionGenerationBatchRowImportServiceTest {
       assertThat(rowImportService.importRow(outputReadyRequest), is(true));
       assertThat(rowImportService.importRow(outputReadyRequest), is(false));
 
-      List<RecallPrompt> recallPrompts =
-          recallPromptRepository.findAllByMemoryTracker_IdOrderByIdDesc(memoryTracker.getId());
-      assertThat(recallPrompts.size(), is(1));
+      assertThat(
+          recallPromptRepository
+              .findAllByMemoryTracker_IdOrderByIdDesc(memoryTracker.getId())
+              .size(),
+          is(1));
     }
-  }
-
-  private static String batchSuccessLine(String customId, MCQWithAnswer mcqWithAnswer)
-      throws JsonProcessingException {
-    String structuredOutput = OBJECT_MAPPER.writeValueAsString(mcqWithAnswer);
-    String responseBody =
-        """
-        {
-          "id": "resp-1",
-          "status": "completed",
-          "output": [
-            {
-              "type": "message",
-              "id": "msg-1",
-              "status": "completed",
-              "content": [
-                {
-                  "type": "output_text",
-                  "text": %s
-                }
-              ]
-            }
-          ]
-        }
-        """
-            .formatted(OBJECT_MAPPER.writeValueAsString(structuredOutput));
-
-    return """
-        {"id":"batch_req_1","custom_id":"%s","response":{"status_code":200,"body":%s},"error":null}"""
-        .formatted(customId, responseBody);
   }
 }

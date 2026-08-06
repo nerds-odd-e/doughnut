@@ -23,6 +23,8 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -61,7 +63,6 @@ class QuestionGenerationBatchPollingServiceTest {
     Note note = makeMe.aNote().notebookOwnedBy(user).please();
     makeMe
         .aMemoryTrackerFor(note)
-        .by(user)
         .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(24)))
         .please();
 
@@ -152,29 +153,12 @@ class QuestionGenerationBatchPollingServiceTest {
 
   @Nested
   class TerminalBatchesAreNotPolled {
-    @Test
-    void completedBatchIsNotPolledAgain() {
-      submittedBatch.setStatus(QuestionGenerationBatchStatus.COMPLETED);
-      batchRepository.saveAndFlush(submittedBatch);
-
-      pollingService.pollSubmittedBatches();
-
-      verify(openAiApiHandler, never()).retrieveBatch(anyString());
-    }
-
-    @Test
-    void failedBatchIsNotPolledAgain() {
-      submittedBatch.setStatus(QuestionGenerationBatchStatus.FAILED);
-      batchRepository.saveAndFlush(submittedBatch);
-
-      pollingService.pollSubmittedBatches();
-
-      verify(openAiApiHandler, never()).retrieveBatch(anyString());
-    }
-
-    @Test
-    void expiredBatchIsNotPolledAgain() {
-      submittedBatch.setStatus(QuestionGenerationBatchStatus.EXPIRED);
+    @ParameterizedTest
+    @EnumSource(
+        value = QuestionGenerationBatchStatus.class,
+        names = {"COMPLETED", "FAILED", "EXPIRED"})
+    void terminalBatchIsNotPolledAgain(QuestionGenerationBatchStatus terminalStatus) {
+      submittedBatch.setStatus(terminalStatus);
       batchRepository.saveAndFlush(submittedBatch);
 
       pollingService.pollSubmittedBatches();
@@ -187,12 +171,14 @@ class QuestionGenerationBatchPollingServiceTest {
   class PollingIsolation {
     @Test
     void onlyPollsSubmittedBatchesAmongMixedStatuses() {
-      QuestionGenerationBatch completedBatch = new QuestionGenerationBatch();
-      completedBatch.setUser(user);
-      completedBatch.setStatus(QuestionGenerationBatchStatus.COMPLETED);
-      completedBatch.setPlannedAt(currentTime);
-      completedBatch.setOpenaiBatchId("batch-completed");
-      batchRepository.saveAndFlush(completedBatch);
+      makeMe
+          .aQuestionGenerationBatch()
+          .forUser(user)
+          .status(QuestionGenerationBatchStatus.COMPLETED)
+          .plannedAt(currentTime)
+          .openaiBatchId("batch-completed")
+          .please();
+      makeMe.entityPersister.flush();
 
       when(openAiApiHandler.retrieveBatch("batch-openai-1"))
           .thenReturn(openAiBatchWithStatus(Batch.Status.IN_PROGRESS));

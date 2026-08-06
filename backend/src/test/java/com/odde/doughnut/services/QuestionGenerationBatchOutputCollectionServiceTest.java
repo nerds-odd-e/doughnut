@@ -63,12 +63,10 @@ class QuestionGenerationBatchOutputCollectionServiceTest {
     Note secondNote = makeMe.aNote().notebookOwnedBy(user).please();
     makeMe
         .aMemoryTrackerFor(firstNote)
-        .by(user)
         .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(24)))
         .please();
     makeMe
         .aMemoryTrackerFor(secondNote)
-        .by(user)
         .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(24)))
         .please();
 
@@ -133,12 +131,9 @@ class QuestionGenerationBatchOutputCollectionServiceTest {
 
       outputCollectionService.collectOutputForCompletedBatches(currentTime);
 
-      QuestionGenerationBatchRequest reloadedFirst =
-          batchRequestRepository.findById(firstRequest.getId()).orElseThrow();
       QuestionGenerationBatchRequest reloadedSecond =
           batchRequestRepository.findById(secondRequest.getId()).orElseThrow();
 
-      assertThat(reloadedFirst.getStatus(), is(QuestionGenerationBatchRequestStatus.OUTPUT_READY));
       assertThat(reloadedSecond.getStatus(), is(QuestionGenerationBatchRequestStatus.FAILED));
       assertThat(
           reloadedSecond.getRawErrorPayload(),

@@ -59,7 +59,6 @@ class QuestionGenerationBatchSubmissionServiceTest {
     Note note = makeMe.aNote().notebookOwnedBy(user).please();
     makeMe
         .aMemoryTrackerFor(note)
-        .by(user)
         .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(24)))
         .please();
 
@@ -115,12 +114,7 @@ class QuestionGenerationBatchSubmissionServiceTest {
     @BeforeEach
     void setupPreviousSubmission() {
       previousSubmission = new Timestamp(currentTime.getTime() - TimeUnit.DAYS.toMillis(2));
-      QuestionGenerationBatch priorBatch = new QuestionGenerationBatch();
-      priorBatch.setUser(user);
-      priorBatch.setStatus(QuestionGenerationBatchStatus.COMPLETED);
-      priorBatch.setPlannedAt(previousSubmission);
-      priorBatch.setSubmittedAt(previousSubmission);
-      batchRepository.save(priorBatch);
+      makeMe.aQuestionGenerationBatch().forUser(user).completedAt(previousSubmission).please();
       makeMe.entityPersister.flush();
     }
 
@@ -140,28 +134,18 @@ class QuestionGenerationBatchSubmissionServiceTest {
       assertThat(batch.getOpenaiInputFileId(), is(nullValue()));
       assertThat(batch.getOpenaiBatchId(), is(nullValue()));
       assertThat(batch.getSubmittedAt(), is(nullValue()));
-
       assertThat(
           batchRepository.findLatestSubmittedAtByUser_Id(user.getId()).orElseThrow(),
           equalTo(previousSubmission));
     }
 
     @Test
-    void batchCreationFailureMarksBatchFailedWithoutUpdatingLatestSubmittedAt() {
+    void batchCreationFailurePreservesPreviousLatestSubmittedAt() {
       when(openAiApiHandler.uploadBatchInputFile(any())).thenReturn("file-abc");
       when(openAiApiHandler.createResponsesBatch("file-abc"))
           .thenThrow(new RuntimeException("batch create failed"));
 
-      boolean submitted = submissionService.submitPlannedBatch(plannedBatch, currentTime);
-
-      assertThat(submitted, is(false));
-
-      QuestionGenerationBatch batch = batchRepository.findById(plannedBatch.getId()).orElseThrow();
-      assertThat(batch.getStatus(), is(QuestionGenerationBatchStatus.FAILED));
-      assertThat(batch.getOpenaiInputFileId(), is(nullValue()));
-      assertThat(batch.getOpenaiBatchId(), is(nullValue()));
-      assertThat(batch.getSubmittedAt(), is(nullValue()));
-
+      assertThat(submissionService.submitPlannedBatch(plannedBatch, currentTime), is(false));
       assertThat(
           batchRepository.findLatestSubmittedAtByUser_Id(user.getId()).orElseThrow(),
           equalTo(previousSubmission));

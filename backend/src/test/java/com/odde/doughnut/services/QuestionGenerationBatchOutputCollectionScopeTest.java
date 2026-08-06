@@ -63,11 +63,15 @@ class QuestionGenerationBatchOutputCollectionScopeTest {
   }
 
   private QuestionGenerationBatch saveCompletedBatch() {
-    QuestionGenerationBatch batch = new QuestionGenerationBatch();
-    batch.setUser(user);
-    batch.setStatus(QuestionGenerationBatchStatus.COMPLETED);
-    batch.setPlannedAt(currentTime);
-    batch.setOpenaiBatchId("batch-openai-1");
-    return batchRepository.saveAndFlush(batch);
+    QuestionGenerationBatch batch =
+        makeMe
+            .aQuestionGenerationBatch()
+            .forUser(user)
+            .status(QuestionGenerationBatchStatus.COMPLETED)
+            .plannedAt(currentTime)
+            .openaiBatchId("batch-openai-1")
+            .please();
+    makeMe.entityPersister.flush();
+    return batch;
   }
 }

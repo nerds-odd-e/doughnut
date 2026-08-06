@@ -1,12 +1,11 @@
 package com.odde.doughnut.services;
 
+import static com.odde.doughnut.services.QuestionGenerationBatchImportPayloadSupport.batchSuccessLine;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuestionGenerationBatch;
@@ -36,8 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class QuestionGenerationBatchImportServiceTest {
 
-  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapperConfig().objectMapper();
-
   @Autowired MakeMe makeMe;
   @Autowired QuestionGenerationBatchImportService batchImportService;
   @Autowired QuestionGenerationBatchRepository batchRepository;
@@ -58,17 +55,15 @@ class QuestionGenerationBatchImportServiceTest {
     user = makeMe.aUser().please();
     currentTime = makeMe.aTimestamp().please();
 
-    batch = new QuestionGenerationBatch();
-    batch.setUser(user);
-    batch.setStatus(QuestionGenerationBatchStatus.COMPLETED);
-    batch.setPlannedAt(currentTime);
-    batch.setOutputCollectedAt(currentTime);
-    batch = batchRepository.saveAndFlush(batch);
-
-    importableRequest = createRequest("importable");
-    failedRequest = createRequest("failed");
-    malformedRequest = createRequest("malformed");
-    alreadyImportedRequest = createRequest("already-imported");
+    batch =
+        makeMe
+            .aQuestionGenerationBatch()
+            .forUser(user)
+            .status(QuestionGenerationBatchStatus.COMPLETED)
+            .plannedAt(currentTime)
+            .outputCollectedAt(currentTime)
+            .please();
+    makeMe.entityPersister.flush();
 
     mcqWithAnswer =
         makeMe
@@ -78,20 +73,24 @@ class QuestionGenerationBatchImportServiceTest {
             .correctChoiceIndex(0)
             .please();
 
-    importableRequest.setStatus(QuestionGenerationBatchRequestStatus.OUTPUT_READY);
+    importableRequest =
+        createRequest("importable", QuestionGenerationBatchRequestStatus.OUTPUT_READY);
     importableRequest.setRawSuccessPayload(
         batchSuccessLine(importableRequest.getCustomId(), mcqWithAnswer));
 
-    failedRequest.setStatus(QuestionGenerationBatchRequestStatus.FAILED);
+    failedRequest = createRequest("failed", QuestionGenerationBatchRequestStatus.FAILED);
     failedRequest.setErrorDetail("model unavailable");
 
-    malformedRequest.setStatus(QuestionGenerationBatchRequestStatus.OUTPUT_READY);
+    malformedRequest =
+        createRequest("malformed", QuestionGenerationBatchRequestStatus.OUTPUT_READY);
     malformedRequest.setRawSuccessPayload(
         """
         {"id":"batch_req_1","custom_id":"%s","response":{"status_code":200,"body":{"id":"resp-1"}},"error":null}"""
             .formatted(malformedRequest.getCustomId()));
 
-    alreadyImportedRequest.setStatus(QuestionGenerationBatchRequestStatus.IMPORTED);
+    alreadyImportedRequest =
+        createRequest("already-imported", QuestionGenerationBatchRequestStatus.IMPORTED);
+
     batchRequestRepository.saveAll(
         List.of(importableRequest, failedRequest, malformedRequest, alreadyImportedRequest));
   }
@@ -100,22 +99,21 @@ class QuestionGenerationBatchImportServiceTest {
     return batchRequestRepository.findById(request.getId()).orElseThrow();
   }
 
-  private QuestionGenerationBatchRequest createRequest(String label) {
+  private QuestionGenerationBatchRequest createRequest(
+      String label, QuestionGenerationBatchRequestStatus status) {
     Note note = makeMe.aNote().notebookOwnedBy(user).title(label).please();
     MemoryTracker memoryTracker =
         makeMe
             .aMemoryTrackerFor(note)
-            .by(user)
             .nextRecallAt(new Timestamp(currentTime.getTime() + TimeUnit.HOURS.toMillis(24)))
             .please();
 
-    QuestionGenerationBatchRequest request = new QuestionGenerationBatchRequest();
-    request.setBatch(batch);
-    request.setMemoryTracker(memoryTracker);
-    request.setContextSeed(42L);
-    request.setCustomId(
-        QuestionGenerationBatchRequest.customIdFor(batch.getId(), memoryTracker.getId()));
-    return request;
+    return makeMe
+        .aQuestionGenerationBatchRequest()
+        .batch(batch)
+        .memoryTracker(memoryTracker)
+        .status(status)
+        .please();
   }
 
   @Nested
@@ -173,8 +171,8 @@ class QuestionGenerationBatchImportServiceTest {
 
       batchImportService.importCompletedBatches(currentTime);
 
-      QuestionGenerationBatch reloadedBatch = batchRepository.findById(batch.getId()).orElseThrow();
-      assertThat(reloadedBatch.getImportedAt(), is(nullValue()));
+      assertThat(
+          batchRepository.findById(batch.getId()).orElseThrow().getImportedAt(), is(nullValue()));
       assertThat(
           reloadRequest(importableRequest).getStatus(),
           is(QuestionGenerationBatchRequestStatus.OUTPUT_READY));
@@ -191,35 +189,5 @@ class QuestionGenerationBatchImportServiceTest {
           reloadRequest(importableRequest).getStatus(),
           is(QuestionGenerationBatchRequestStatus.OUTPUT_READY));
     }
-  }
-
-  private static String batchSuccessLine(String customId, MCQWithAnswer mcqWithAnswer)
-      throws JsonProcessingException {
-    String structuredOutput = OBJECT_MAPPER.writeValueAsString(mcqWithAnswer);
-    String responseBody =
-        """
-        {
-          "id": "resp-1",
-          "status": "completed",
-          "output": [
-            {
-              "type": "message",
-              "id": "msg-1",
-              "status": "completed",
-              "content": [
-                {
-                  "type": "output_text",
-                  "text": %s
-                }
-              ]
-            }
-          ]
-        }
-        """
-            .formatted(OBJECT_MAPPER.writeValueAsString(structuredOutput));
-
-    return """
-        {"id":"batch_req_1","custom_id":"%s","response":{"status_code":200,"body":%s},"error":null}"""
-        .formatted(customId, responseBody);
   }
 }

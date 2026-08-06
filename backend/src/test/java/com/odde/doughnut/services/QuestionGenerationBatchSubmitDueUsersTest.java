@@ -26,15 +26,10 @@ class QuestionGenerationBatchSubmitDueUsersTest
         () -> {
           dueUser[0] = uniqueUser();
 
-          Note note =
-              makeMe
-                  .aNote()
-                  .notebook(makeMe.aNotebook().creatorAndOwner(dueUser[0]).please())
-                  .please();
+          Note note = makeMe.aNote().notebookOwnedBy(dueUser[0]).please();
           var tracker =
               makeMe
                   .aMemoryTrackerFor(note)
-                  .by(dueUser[0])
                   .nextRecallAt(new Timestamp(cronTime.getTime() + TimeUnit.HOURS.toMillis(24)))
                   .please();
           Timestamp recallTime = Timestamp.valueOf(LocalDateTime.of(2024, 8, 3, 15, 45));

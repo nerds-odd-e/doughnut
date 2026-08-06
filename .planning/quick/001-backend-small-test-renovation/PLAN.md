@@ -1,6 +1,6 @@
 # Backend unit tests → "small test" style
 
-**Status:** in progress (Phase 22 done)
+**Status:** in progress (Phase 23 done)
 **Type:** test renovation (no product behavior change)
 **Verify each phase:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
 **Style:** `.cursor/rules/unit-testing.mdc` + `.cursor/rules/backend-testing.mdc`
@@ -311,10 +311,17 @@ For each file in the phase file list:
 - **Done when:** rubric applied in place (service boundary OK); suite green.
 
 ### Phase 23 — Services: QuestionGeneration batch (submit / poll / import / output)
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
-- **Files:** submit/poll/import/output/collection/retention/jsonl/row-import related `QuestionGenerationBatch*.java`
-- **Done when:** rubric applied; suite green.
+- **Kept (job/pipeline contract; style renovated in place):**
+  - Submit: `QuestionGenerationBatchSubmissionServiceTest`, `…SubmitDueUsersTest` (+ TestBase), `…SubmitDueUsersServiceLoopTest`
+  - Poll: `QuestionGenerationBatchPollingServiceTest`
+  - Import/row-import: `…ImportServiceTest`, `…RowImportServiceTest`, `…RowImportServiceAtomicTest` (+ AtomicTestSupport)
+  - Output: `…OutputCollectionServiceTest`, `…DirectBatchTest`, `…ScopeTest`, `…OutputFixtureTest`, `…OutputCollectionTestSupport`
+  - Retention/jsonl: `…RetentionServiceTest`, `…JsonlRendererTest`
+- **MakeMe:** batch builder gains `importedAt` / `outputCollectedAt`; shared `ImportPayloadSupport` for success JSONL
+- **Exception:** `SubmitDueUsersServiceLoopTest` keeps collaborator mocks — isolates continue-after-failure summary aggregation (REQUIRES_NEW Spring path is heavy)
+- **Done when:** rubric applied in place (service boundary OK); suite green.
 
 ### Phase 24 — Services: QuestionGeneration batch (maintenance / admin / concurrency)
 - **Status:** planned
@@ -386,7 +393,8 @@ If a Behavior phase cannot express fixtures concisely:
 | 20 | done | Deleted NoteAutomation / NoteMotion / WikiLinkRewrite (controller duplicates). Slimmed NoteService to restore-by-deletedAt; lifted cascade + AI null/empty responses to controllers. Kept realm/wiki/alias/property/embedding/QGen as domain contracts; notebookOwnedBy + `.aliases`; post-refactor split oversized realm/wiki/property files. Notebook* leftovers → Phase 25. EmbeddingMaintenanceJob keeps collaborator mocks (thin loop). |
 | 21 | done | Focus-context retrieval kept at service boundary; capability splits ≤250; `FolderBuilder.notebookOwnedBy`. |
 | 22 | done | QGen planning/eligibility/candidates/schedule/metrics/request-builder: focused asserts + drop redundant `.by`; batch/request MakeMe builders; delete mocked NoCandidateTrackers (real DB via unanswered prompt); overdue/retry parameterized. |
-| 23–26 | planned | — |
+| 23 | done | QGen submit/poll/import/output/retention/jsonl: builders for manual batch/request fixtures; ImportPayloadSupport; focused sibling deltas; parameterized terminal poll skip; AtomicTestSupport split ≤250. Loop test keeps collaborator mocks (continue-after-failure). |
+| 24–26 | planned | — |
 
 ---
 
@@ -418,3 +426,4 @@ If a Behavior phase cannot express fixtures concisely:
 - Phase 19: Assimilation queue/property units/wiki-link gates and UnassimilatedPropertyService stay at service boundary (scheduling + index contracts). MemoryTrackerServiceTest was almost entirely controller-duplicative once soft-delete/property-assimilate asserts moved up. RecallStats aggregate stays pure-unit (fixtures); PerformanceTest is intentional N+1 guard on `compute()`. Keep `.by(user)` when assimilating subscribed notes owned by someone else.
 - Phase 20: Wiki/alias/property index + NoteRealm assembly stay service-level (cache/index/DTO contracts beyond HTTP smoke). NoteAutomation/Motion/WikiLinkRewrite folder-move were pure controller duplicates. NoteService restore matching deletedAt timestamps is intentional service contract (controller undo is all-or-nothing via destroy). EmbeddingMaintenanceJobTests keeps NotebookRepository/IndexingService mocks — thin scheduled for-loop, not worth SpringBoot+OpenAI. Named notebooks still needed for qualified wiki links.
 - Phase 22: QGen planning stays at service boundary. Repo-mock NoCandidateTrackers replaced by real DB (answered recall + unanswered non-contested prompt). Batch/request builders for COMPLETED/SUBMITTED/FAILED fixtures. Phase 23 may reuse builders for submit/poll/import manual construction.
+- Phase 23: Reused Phase 22 batch/request builders (+ `importedAt`/`outputCollectedAt`). Collapsed triplicate import success-line JSON into `ImportPayloadSupport`. `SubmitDueUsersServiceLoopTest` collaborator mocks kept for continue-after-failure summary — Phase 26 may revisit if Spring coverage appears.

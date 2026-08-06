@@ -38,6 +38,16 @@ public class QuestionGenerationBatchBuilder extends EntityBuilder<QuestionGenera
     return this;
   }
 
+  public QuestionGenerationBatchBuilder outputCollectedAt(Timestamp outputCollectedAt) {
+    entity.setOutputCollectedAt(outputCollectedAt);
+    return this;
+  }
+
+  public QuestionGenerationBatchBuilder importedAt(Timestamp importedAt) {
+    entity.setImportedAt(importedAt);
+    return this;
+  }
+
   public QuestionGenerationBatchBuilder completedAt(Timestamp completedAt) {
     return status(QuestionGenerationBatchStatus.COMPLETED)
         .plannedAt(completedAt)

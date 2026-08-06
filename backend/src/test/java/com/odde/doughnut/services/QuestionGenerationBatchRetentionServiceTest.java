@@ -45,7 +45,7 @@ class QuestionGenerationBatchRetentionServiceTest {
   void setup() {
     user = makeMe.aUser().please();
     Note note = makeMe.aNote().notebookOwnedBy(user).please();
-    memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
+    memoryTracker = makeMe.aMemoryTrackerFor(note).please();
     currentTime = makeMe.aTimestamp().please();
     retentionWindow = Duration.ofDays(30);
   }
@@ -57,7 +57,6 @@ class QuestionGenerationBatchRetentionServiceTest {
     void removesFailedBatchAndRequestRows() {
       QuestionGenerationBatch batch =
           saveBatch(QuestionGenerationBatchStatus.FAILED, oldTimestamp(), null, "batch-failed");
-
       QuestionGenerationBatchRequest request = saveRequest(batch);
 
       retentionService.pruneTerminalBatches(currentTime, retentionWindow);
@@ -70,7 +69,6 @@ class QuestionGenerationBatchRetentionServiceTest {
     void removesExpiredBatchAndRequestRows() {
       QuestionGenerationBatch batch =
           saveBatch(QuestionGenerationBatchStatus.EXPIRED, oldTimestamp(), null, "batch-expired");
-
       QuestionGenerationBatchRequest request = saveRequest(batch);
 
       retentionService.pruneTerminalBatches(currentTime, retentionWindow);
@@ -88,7 +86,6 @@ class QuestionGenerationBatchRetentionServiceTest {
               oldImportedAt,
               oldImportedAt,
               "batch-completed");
-
       QuestionGenerationBatchRequest request = saveRequest(batch);
 
       retentionService.pruneTerminalBatches(currentTime, retentionWindow);
@@ -106,7 +103,6 @@ class QuestionGenerationBatchRetentionServiceTest {
       QuestionGenerationBatch batch =
           saveBatch(
               QuestionGenerationBatchStatus.FAILED, recentTimestamp(), null, "batch-recent-failed");
-
       QuestionGenerationBatchRequest request = saveRequest(batch);
 
       retentionService.pruneTerminalBatches(currentTime, retentionWindow);
@@ -124,7 +120,6 @@ class QuestionGenerationBatchRetentionServiceTest {
               recentImportedAt,
               recentImportedAt,
               "batch-recent-completed");
-
       QuestionGenerationBatchRequest request = saveRequest(batch);
 
       retentionService.pruneTerminalBatches(currentTime, retentionWindow);
@@ -141,7 +136,6 @@ class QuestionGenerationBatchRetentionServiceTest {
     void neverRemovesPlannedBatch() {
       QuestionGenerationBatch batch =
           saveBatch(QuestionGenerationBatchStatus.PLANNED, oldTimestamp(), null, null);
-
       QuestionGenerationBatchRequest request = saveRequest(batch);
 
       retentionService.pruneTerminalBatches(currentTime, retentionWindow);
@@ -155,7 +149,6 @@ class QuestionGenerationBatchRetentionServiceTest {
       QuestionGenerationBatch batch =
           saveBatch(
               QuestionGenerationBatchStatus.SUBMITTED, oldTimestamp(), null, "batch-submitted");
-
       QuestionGenerationBatchRequest request = saveRequest(batch);
 
       retentionService.pruneTerminalBatches(currentTime, retentionWindow);
@@ -172,7 +165,6 @@ class QuestionGenerationBatchRetentionServiceTest {
               oldTimestamp(),
               null,
               "batch-awaiting-import");
-
       QuestionGenerationBatchRequest request = saveRequest(batch);
 
       retentionService.pruneTerminalBatches(currentTime, retentionWindow);
@@ -196,24 +188,26 @@ class QuestionGenerationBatchRetentionServiceTest {
       Timestamp plannedAt,
       Timestamp importedAt,
       String openaiBatchId) {
-    QuestionGenerationBatch batch = new QuestionGenerationBatch();
-    batch.setUser(user);
-    batch.setStatus(status);
-    batch.setPlannedAt(plannedAt);
-    batch.setSubmittedAt(plannedAt);
-    batch.setImportedAt(importedAt);
-    batch.setOpenaiBatchId(openaiBatchId);
-    return batchRepository.saveAndFlush(batch);
+    QuestionGenerationBatch batch =
+        makeMe
+            .aQuestionGenerationBatch()
+            .forUser(user)
+            .status(status)
+            .plannedAt(plannedAt)
+            .submittedAt(plannedAt)
+            .importedAt(importedAt)
+            .openaiBatchId(openaiBatchId)
+            .please();
+    makeMe.entityPersister.flush();
+    return batch;
   }
 
   private QuestionGenerationBatchRequest saveRequest(QuestionGenerationBatch batch) {
-    QuestionGenerationBatchRequest request = new QuestionGenerationBatchRequest();
-    request.setBatch(batch);
-    request.setMemoryTracker(memoryTracker);
-    request.setContextSeed(42L);
-    request.setCustomId(
-        QuestionGenerationBatchRequest.customIdFor(batch.getId(), memoryTracker.getId()));
-    request.setStatus(QuestionGenerationBatchRequestStatus.IMPORTED);
-    return batchRequestRepository.saveAndFlush(request);
+    return makeMe
+        .aQuestionGenerationBatchRequest()
+        .batch(batch)
+        .memoryTracker(memoryTracker)
+        .status(QuestionGenerationBatchRequestStatus.IMPORTED)
+        .please();
   }
 }
