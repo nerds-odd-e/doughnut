@@ -103,55 +103,28 @@ describe("richModeKeyDropdownPresetKeysForPropertyRows", () => {
   })
 
   it("resolves occupied presets to the next suffixed key", () => {
+    const defaults = richModeKeyDropdownPresetKeys(false)
     expect(
       richModeKeyDropdownPresetKeysForPropertyRows(false, [
         propertyRowWithScalar("image", "/a.png"),
       ])
-    ).toEqual([
-      "aliases",
-      "image 2",
-      "wikidata_id",
-      "url",
-      "example of",
-      "question_generation_instruction",
-    ])
+    ).toEqual(defaults.map((k) => (k === "image" ? "image 2" : k)))
     expect(
       richModeKeyDropdownPresetKeysForPropertyRows(false, [
         propertyRowWithScalar("wikidataId", "Q1"),
       ])
-    ).toEqual([
-      "aliases",
-      "image",
-      "wikidata_id 2",
-      "url",
-      "example of",
-      "question_generation_instruction",
-    ])
+    ).toEqual(defaults.map((k) => (k === "wikidata_id" ? "wikidata_id 2" : k)))
     expect(
       richModeKeyDropdownPresetKeysForPropertyRows(false, [
         propertyRowWithScalar("url", "https://x"),
       ])
-    ).toEqual([
-      "aliases",
-      "image",
-      "wikidata_id",
-      "url 2",
-      "example of",
-      "question_generation_instruction",
-    ])
+    ).toEqual(defaults.map((k) => (k === "url" ? "url 2" : k)))
     expect(
       richModeKeyDropdownPresetKeysForPropertyRows(false, [
         propertyRowWithScalar("example of", "[[A]]"),
         propertyRowWithScalar("example of 2", "[[B]]"),
       ])
-    ).toEqual([
-      "aliases",
-      "image",
-      "wikidata_id",
-      "url",
-      "example of 3",
-      "question_generation_instruction",
-    ])
+    ).toEqual(defaults.map((k) => (k === "example of" ? "example of 3" : k)))
   })
 
   it("ignores rows with empty keys", () => {
@@ -165,9 +138,10 @@ describe("richModeKeyDropdownPresetKeysForPropertyRows", () => {
 })
 
 describe("richModeKeyDropdownPresetKeys", () => {
-  it("includes question_generation_instruction in default presets", () => {
+  it("returns the default rich-mode preset keys", () => {
     expect(richModeKeyDropdownPresetKeys(false)).toEqual([
       "aliases",
+      "overlaps",
       "image",
       "wikidata_id",
       "url",
@@ -178,12 +152,7 @@ describe("richModeKeyDropdownPresetKeys", () => {
 
   it("appends readme-only keys when isReadmeContext is true", () => {
     expect(richModeKeyDropdownPresetKeys(true)).toEqual([
-      "aliases",
-      "image",
-      "wikidata_id",
-      "url",
-      "example of",
-      "question_generation_instruction",
+      ...richModeKeyDropdownPresetKeys(false),
       "title_pattern",
     ])
   })
