@@ -12,7 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 class AssimilationServicePropertyWikiLinkGateTest extends AssimilationServiceTestBase {
   @Autowired NotePropertyIndexService notePropertyIndexService;
 
+  private Note carrierWithExampleOf(Note sibling, String content) {
+    return carrierOnNotebook(sibling.getNotebook(), content);
+  }
+
   private Note carrierWithExampleOf(Notebook notebook, String content) {
+    return carrierOnNotebook(notebook, content);
+  }
+
+  private Note carrierOnNotebook(Notebook notebook, String content) {
     Note carrier = makeMe.aNote().notebook(notebook).content(content).please();
     notePropertyIndexService.refreshForNote(carrier);
     makeMe.aMemoryTrackerFor(carrier).assimilatedAt(day1).please();
@@ -21,12 +29,11 @@ class AssimilationServicePropertyWikiLinkGateTest extends AssimilationServiceTes
 
   @Test
   void gates_list_property_until_all_resolved_targets_are_assimilated() {
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-    Note targetA = makeMe.aNote().title("A").notebook(notebook).please();
-    Note targetB = makeMe.aNote().title("B").notebook(notebook).please();
+    Note targetA = makeMe.aNote().title("A").notebookOwnedBy(user).please();
+    Note targetB = makeMe.aNote().title("B").underSameNotebookAs(targetA).please();
     Note carrier =
         carrierWithExampleOf(
-            notebook,
+            targetA,
             "---\n" + "example of:\n" + "  - \"[[A]]\"\n" + "  - \"[[B]]\"\n" + "---\n\nbody");
 
     assertThat(assimilationService.getCounts().getTotalUnassimilatedCount(), equalTo(2));
@@ -48,9 +55,8 @@ class AssimilationServicePropertyWikiLinkGateTest extends AssimilationServiceTes
 
   @Test
   void gates_property_while_target_note_is_still_pending() {
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-    Note target = makeMe.aNote().title("Word").notebook(notebook).please();
-    Note carrier = carrierWithExampleOf(notebook, "---\nexample of: \"[[Word]]\"\n---\n\nbody");
+    Note target = makeMe.aNote().title("Word").notebookOwnedBy(user).please();
+    Note carrier = carrierWithExampleOf(target, "---\nexample of: \"[[Word]]\"\n---\n\nbody");
 
     AssimilationUnit next = assimilationService.getNextAssimilationUnit().orElseThrow();
     assertThat(next.note(), equalTo(target));
@@ -78,9 +84,8 @@ class AssimilationServicePropertyWikiLinkGateTest extends AssimilationServiceTes
 
   @Test
   void offers_property_when_target_skips_memory_tracking() {
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-    makeMe.aNote().title("Word").notebook(notebook).skipMemoryTracking().please();
-    Note carrier = carrierWithExampleOf(notebook, "---\nexample of: \"[[Word]]\"\n---\n\nbody");
+    Note target = makeMe.aNote().title("Word").notebookOwnedBy(user).skipMemoryTracking().please();
+    Note carrier = carrierWithExampleOf(target, "---\nexample of: \"[[Word]]\"\n---\n\nbody");
 
     AssimilationUnit next = assimilationService.getNextAssimilationUnit().orElseThrow();
     assertThat(next.note(), equalTo(carrier));
@@ -89,12 +94,11 @@ class AssimilationServicePropertyWikiLinkGateTest extends AssimilationServiceTes
 
   @Test
   void offers_property_when_target_note_is_deleted() {
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-    Note target = makeMe.aNote().title("Word").notebook(notebook).please();
+    Note target = makeMe.aNote().title("Word").notebookOwnedBy(user).please();
     Note carrier =
         makeMe
             .aNote()
-            .notebook(notebook)
+            .underSameNotebookAs(target)
             .content("---\nexample of: \"[[Word]]\"\n---\n\nbody")
             .please();
     notePropertyIndexService.refreshForNote(carrier);

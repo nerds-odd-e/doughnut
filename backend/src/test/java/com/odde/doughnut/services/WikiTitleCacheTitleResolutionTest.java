@@ -36,8 +36,8 @@ class WikiTitleCacheTitleResolutionTest {
   @Test
   void keeps_distinct_cache_rows_when_link_spellings_collide_under_unicode_ci() {
     User user = makeMe.aUser().please();
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-    Folder folderA = makeMe.aFolder().notebook(notebook).name("HiraFolder").please();
+    Folder folderA = makeMe.aFolder().notebookOwnedBy(user).name("HiraFolder").please();
+    Notebook notebook = folderA.getNotebook();
     Folder folderB = makeMe.aFolder().notebook(notebook).name("KataFolder").please();
     Note hiraganaTarget = makeMe.aNote().title("ごろ").folder(folderA).please();
     Note katakanaTarget = makeMe.aNote().title("ゴロ").folder(folderB).please();
@@ -58,8 +58,8 @@ class WikiTitleCacheTitleResolutionTest {
   @Test
   void unqualified_link_picks_lowest_note_id_when_same_title_in_different_folders() {
     User user = makeMe.aUser().please();
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-    Folder folderA = makeMe.aFolder().notebook(notebook).name("A").please();
+    Folder folderA = makeMe.aFolder().notebookOwnedBy(user).name("A").please();
+    Notebook notebook = folderA.getNotebook();
     Folder folderB = makeMe.aFolder().notebook(notebook).name("B").please();
     Note firstCreated = makeMe.aNote().title("Dup").folder(folderA).please();
     makeMe.aNote().title("Dup").folder(folderB).please();
@@ -75,8 +75,8 @@ class WikiTitleCacheTitleResolutionTest {
   @Test
   void unqualified_link_distinguishes_unvoiced_and_voiced_hiragana_title_spellings() {
     User user = makeMe.aUser().please();
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-    Folder folderA = makeMe.aFolder().notebook(notebook).name("KoroFolder").please();
+    Folder folderA = makeMe.aFolder().notebookOwnedBy(user).name("KoroFolder").please();
+    Notebook notebook = folderA.getNotebook();
     Folder folderB = makeMe.aFolder().notebook(notebook).name("GoroFolder").please();
     makeMe.aNote().title("ころ").folder(folderA).please();
     Note voiced = makeMe.aNote().title("ごろ").folder(folderB).please();

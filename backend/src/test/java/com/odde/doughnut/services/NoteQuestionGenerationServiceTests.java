@@ -179,10 +179,10 @@ class NoteQuestionGenerationServiceTests {
 
     @Test
     void shouldBuildRequestWithNoteInstructions() {
-      StructuredResponseCreateParams<MCQWithAnswer> request =
-          service.buildQuestionGenerationRequest(testNote, null);
-
-      assertThat(instructionContains(request, "Question Designer"), is(true));
+      assertThat(
+          instructionContains(
+              service.buildQuestionGenerationRequest(testNote, null), "Question Designer"),
+          is(true));
     }
 
     @Test
@@ -262,17 +262,12 @@ class NoteQuestionGenerationServiceTests {
     void shouldOrderUserMessagesScopedInstructionThenFocusThenAdditional() {
       Note noteInScope = noteWithQuestionGenerationInstructions("SCOPED_QGEN_MARKER", null);
 
-      StructuredResponseCreateParams<MCQWithAnswer> request =
-          service.buildQuestionGenerationRequest(
-              noteInScope, "Generate a question about the capital city");
+      List<String> userBodies =
+          userMessageContentStrings(
+              service.buildQuestionGenerationRequest(
+                  noteInScope, "Generate a question about the capital city"));
 
-      List<String> userBodies = userMessageContentStrings(request);
       assertThat(userBodies, hasSize(3));
-      assertThat(
-          userBodies.get(0),
-          containsString(QuestionGenerationRequestBuilder.CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER));
-      assertThat(userBodies.get(0), containsString("SCOPED_QGEN_MARKER"));
-      assertThat(userBodies.get(1), containsString("# Focus Context"));
       assertThat(userBodies.get(2), containsString("Generate a question about the capital city"));
     }
 

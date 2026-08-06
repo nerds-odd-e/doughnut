@@ -1,6 +1,6 @@
 # Backend unit tests → "small test" style
 
-**Status:** in progress (Phase 25 done; 26 planned)
+**Status:** complete (Phase 26 done)
 **Type:** test renovation (no product behavior change)
 **Verify each phase:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
 **Style:** `.cursor/rules/unit-testing.mdc` + `.cursor/rules/backend-testing.mdc`
@@ -359,15 +359,16 @@ For each file in the phase file list:
 - **Done when:** remaining service leftovers renovated or deleted as redundant; suite green.
 
 ### Phase 26 — Final anti-pattern sweep
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
 - **Observable:** repo-wide backend test smells from the rubric are cleared or explicitly excepted in this plan.
-- **Method:**
-  1. Grep for remaining verbose `creatorAndOwner` + separate notebook wiring where `notebookOwnedBy` fits.
-  2. Grep for collaborator mocks beyond allowed externals.
-  3. Spot-check largest remaining files for repeated full-payload asserts.
-  4. Fix stragglers; update this plan with any permanent exceptions (and why).
-- **Done when:** sweep clean (or exceptions documented); suite green; plan marked complete.
+- **Fixed:**
+  - `notebookOwnedBy` / `FolderBuilder.notebookOwnedBy` / `underSameNotebookAs` stragglers (Assimilation wiki-link gate, UnassimilatedProperty owner case, NotebookExport zip, WikiTitleCache title resolution, AiController create-extracted folder).
+  - Dropped illicit `CurrentUserFetcher` mock — `CurrentUserInfoControllerTest` now uses real `CurrentUserFetcherFromRequest` + test token.
+  - Dropped `TestabilitySettings` Mockito in `GeneratedQuestionPostProcessorTest` (real settings + subclass for custom shuffle).
+  - Focused-assert deltas in `NoteQuestionGenerationServiceTests` siblings.
+- **Permanent exceptions** (see section below).
+- **Done when:** sweep clean (or exceptions documented); suite green; plan marked complete. — **met.**
 
 ---
 
@@ -412,7 +413,28 @@ If a Behavior phase cannot express fixtures concisely:
 | 24 | done | QGen maintenance/admin/concurrency/locks/jobs: builders + OutputCollectionTestSupport; AdminStatus → real DB; merge resume-failure job cases; lock/concurrency already clean. JobTests keeps collaborator mocks (orchestration). |
 | 25a | done | Health/search/export/openAi/entities: drop runner DTO tautology + purge opt-in (controller covers); focused sibling deltas; `.aliases` / `.content`; blank search parameterized; Wikidata empty cases parameterized. Zip wiki twin deleted (markdown assemble covers). |
 | 25b | done | Deleted NotebookGroupServiceTest + ConversationMessageServiceTest (controller duplicates). AI: collapse layout size twins; merge tool-factory / focus-context asserts; parameterize model capabilities; drop SpringBoot from pure AiToolFactory registry test. Book already clean (GCS mock kept). Reindexing kept for JDBC candidate-selection coverage. |
-| 26 | planned | — |
+| 26 | done | Final sweep: notebookOwnedBy stragglers; CurrentUserInfo + GeneratedQuestionPostProcessor mock removals; QGen request assert deltas. Permanent exceptions listed below. Plan **complete**. |
+
+---
+
+## Permanent exceptions (Phase 26)
+
+Allowed / retained collaborator mocks and verbose notebook wiring that remain **by design**:
+
+| Exception | Why kept |
+|-----------|----------|
+| **OpenAI** (`OpenAIClient` / `OpenAiApiHandler` / `OpenAiStructuredResponseMock`) | True external API. |
+| **HttpClientAdapter** (Wikidata / note controllers) | True HTTP external. |
+| **GCS `Storage`** (`GcsBookStorageTest`) | True cloud storage external. |
+| **GithubService** (FailureReportFactory / ControllerSetup) | True GitHub API external. |
+| **EmbeddingService** stubs on notebook/soft-delete controller bases + `NotebookReindexingServiceTests` + semantic empty-embedding | Stands in for OpenAI embeddings; avoids live embedding calls while exercising indexing/search paths. |
+| **`QuestionGenerationBatchMaintenanceJobTests`** collaborator mocks | Job/resume step-order and continue-after-failure orchestration (heavy Spring `REQUIRES_NEW` otherwise). |
+| **`QuestionGenerationBatchSubmitDueUsersServiceLoopTest`** collaborator mocks | Continue-after-failure summary aggregation isolation. |
+| **`EmbeddingMaintenanceJobTests`** NotebookRepository / IndexingService mocks | Thin scheduled for-loop; not worth SpringBoot+OpenAI. |
+| **`AiNoteAutomationServiceExtractRequestTest`** FocusContext collaborator mocks | Request-body shape isolation without full retrieval graph. |
+| **`ConversationServiceConversationListLimitTest`** ConversationRepository mock | `PageRequest(50)` contract verification. |
+| **`QuestionGenerationBatchAdminStatusServiceTest`** ScheduledTask mock | Scheduler-active string only; counts/runs use real DB. |
+| **`creatorAndOwner` for named notebooks / subscriptions / shared fixtures / notebook-under-test** | Needed when the Notebook is the subject, has a display name (wiki qualification), is owned by another user (subscription), or is shared across many notes/folders in `@BeforeEach`. Prefer `notebookOwnedBy` / `underSameNotebookAs` / `FolderBuilder.notebookOwnedBy` when a single owned note/folder is enough. |
 
 ---
 
@@ -448,3 +470,4 @@ If a Behavior phase cannot express fixtures concisely:
 - Phase 24: MaintenanceService uses builders + OutputCollectionTestSupport; AdminStatus counts/runs use real DB (ScheduledTask mock only for scheduler-active string match). JobTests/resume-order Nested keep collaborator mocks — Phase 26 sweep. SchedulerLock + JDBC concurrency already domain-stable.
 - Phase 25a: Health rules stay service-level (deeper than NotebookHealthController). Bulk-purge opt-in reject deleted as controller duplicate. HealthRuleRunner DTO-retention test was not exercising the runner — removed. Dead-wiki alias via `.aliases()` (auto-refreshes index). Search exact-match siblings assert first-id delta only after canonical size+title+id. ZipBuilder wiki-link twin dropped; ExportNoteMarkdown already asserts preservation.
 - Phase 25b: NotebookGroup + ConversationMessage service suites were controller duplicates. NotebookReindexingService was removed from production — test kept only for `selectNoteIdsNeedingIndexUpdateByNotebookId` + store path (no other coverage). AiNoteAutomationServiceExtractRequestTest keeps FocusContext collaborator mocks for request-body shape isolation. ConversationServiceConversationListLimitTest keeps repo mock for PageRequest(50) contract.
+- Phase 26: Remaining `creatorAndOwner` uses are justified (named nb / subscription / shared fixture / notebook SUT). Illicit CurrentUserFetcher + TestabilitySettings mocks removed. Largest files already had canonical+delta asserts from earlier phases — only clear QGen request sibling deltas fixed. Permanent exceptions table finalized; plan complete.

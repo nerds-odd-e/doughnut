@@ -2,8 +2,6 @@ package com.odde.doughnut.services.ai;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.Randomizer;
@@ -16,9 +14,8 @@ class GeneratedQuestionPostProcessorTest {
 
   @Test
   void preservesChoiceOrderWhenChoicesMayNotBeShuffled() {
-    TestabilitySettings testabilitySettings = mock(TestabilitySettings.class);
     GeneratedQuestionPostProcessor postProcessor =
-        new GeneratedQuestionPostProcessor(testabilitySettings);
+        new GeneratedQuestionPostProcessor(new TestabilitySettings());
     MCQWithAnswer originalQuestion =
         new MCQWithAnswer(
             new MultipleChoicesQuestion(
@@ -36,10 +33,14 @@ class GeneratedQuestionPostProcessorTest {
 
   @Test
   void preservesCorrectChoiceIndexWhenShuffledChoicesHaveDuplicateText() {
-    TestabilitySettings testabilitySettings = mock(TestabilitySettings.class);
-    when(testabilitySettings.getRandomizer()).thenReturn(new ReorderingRandomizer(0, 2, 1, 3));
     GeneratedQuestionPostProcessor postProcessor =
-        new GeneratedQuestionPostProcessor(testabilitySettings);
+        new GeneratedQuestionPostProcessor(
+            new TestabilitySettings() {
+              @Override
+              public Randomizer getRandomizer() {
+                return new ReorderingRandomizer(0, 2, 1, 3);
+              }
+            });
     MCQWithAnswer originalQuestion =
         new MCQWithAnswer(
             new MultipleChoicesQuestion(

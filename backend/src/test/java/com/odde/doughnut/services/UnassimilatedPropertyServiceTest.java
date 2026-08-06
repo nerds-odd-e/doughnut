@@ -122,7 +122,9 @@ class UnassimilatedPropertyServiceTest {
   @Test
   void does_not_count_stale_reserved_structural_keys_for_owner() {
     User user = makeMe.aUser().please();
-    Note note = noteWithExampleOfAndUrl(makeMe.aNotebook().creatorAndOwner(user).please());
+    Note note =
+        noteWithContent(
+            user, "---\nexample of: \"[[Word]]\"\nurl: https://example.com\n---\n\nbody");
     insertAdditionalIndexRow(note, "url", 0);
 
     List<AssimilationUnit> pending =

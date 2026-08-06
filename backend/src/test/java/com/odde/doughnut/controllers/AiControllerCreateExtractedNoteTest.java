@@ -9,7 +9,6 @@ import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -111,8 +110,8 @@ class AiControllerCreateExtractedNoteTest extends ControllerTestBase {
 
     @Test
     void shouldCreateExtractedNoteInSameFolderAsSource() throws UnexpectedNoAccessRightException {
-      Notebook notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      Folder folder = makeMe.aFolder().notebook(notebook).name("Context").please();
+      Folder folder =
+          makeMe.aFolder().notebookOwnedBy(currentUser.getUser()).name("Context").please();
       Note sourceNote =
           makeMe.aNote().title("Sample").folder(folder).content(EXTRACTABLE_CONTENT).please();
 

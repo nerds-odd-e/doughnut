@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.equalTo;
 
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -40,14 +39,13 @@ class NotebookExportServiceTest {
 
   @Test
   void exportsNotesInsideFoldersAsMarkdownFiles() throws IOException {
-    User user = makeMe.aUser().please();
-    Notebook notebook = makeMe.aNotebook().creatorAndOwner(user).please();
-    Folder folder = makeMe.aFolder().notebook(notebook).name("Recipes").please();
+    Folder folder =
+        makeMe.aFolder().notebookOwnedBy(makeMe.aUser().please()).name("Recipes").please();
     makeMe.aNote("Pasta").folder(folder).content("Boil water").please();
     makeMe.entityPersister.flush();
 
     Map<String, String> entries =
-        readZipEntries(notebookExportService.exportNotebookAsZip(notebook));
+        readZipEntries(notebookExportService.exportNotebookAsZip(folder.getNotebook()));
 
     assertThat(entries.get("Recipes/Pasta.md"), equalTo("# Pasta\n\nBoil water"));
   }
