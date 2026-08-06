@@ -44,4 +44,6 @@ export async function selectPresetKey(presetKey: string) {
   btn!.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }))
   btn!.click()
   await flushPromises()
+  await nextTick()
+  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
 }

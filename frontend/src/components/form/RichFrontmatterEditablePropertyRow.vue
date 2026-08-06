@@ -31,78 +31,80 @@
         @select="onPresetSelected"
       />
     </div>
-    <RichFrontmatterScalarPropertyValue
-      v-if="isTextCapablePropertyRow(modelValue)"
-      :model-value="scalarValue"
-      :property-row="modelValue"
-      :wiki-titles="wikiTitles"
-      :row-index="idx"
-      @update:model-value="onValueUpdate"
-      @update:property-value="onPropertyValueUpdate"
-      @focus="emit('row-focus')"
-      @commit="emit('commit')"
-      @dead-link-click="emit('dead-link-click', $event)"
-    />
-    <RelationTypeSelectCompact
-      v-else-if="isRelationPropertyKey(modelValue.key)"
-      field="relationType"
-      scope-name="rich-note-relation-property"
-      hide-label
-      :model-value="relationModelValue"
-      :inverse-icon="true"
-      @update:model-value="emit('relation-type-selected', $event)"
-    />
-    <RichFrontmatterImagePropertyValue
-      v-else-if="isImagePropertyKey(modelValue.key)"
-      :model-value="scalarValue"
-      :note-id="noteId"
-      :ariaLabel="`Existing note image property value (row ${idx + 1})`"
-      value-test-id="rich-note-property-row-value-input"
-      file-input-test-id="rich-note-image-property-file-input"
-      choose-button-test-id="rich-note-image-property-choose"
-      requires-note-test-id="rich-note-image-upload-requires-note"
-      @update:model-value="onValueUpdate"
-      @focus="emit('row-focus')"
-      @commit="emit('commit')"
-      @image-upload-state="emit('image-upload-state', $event)"
-    />
-    <div
-      v-else-if="isWikidataIdPropertyKey(modelValue.key)"
-      class="flex min-w-0 items-center gap-2"
-      :class="scalarValue.trim() ? '' : 'justify-between'"
-    >
-      <template v-if="scalarValue.trim()">
-        <button
-          type="button"
-          class="daisy-btn daisy-btn-ghost daisy-btn-sm h-auto min-h-0 min-w-0 max-w-full shrink truncate justify-start py-0.5 px-1 font-mono text-sm font-normal text-base-content/90 normal-case"
-          :title="scalarValue.trim()"
-          data-testid="rich-note-wikidata-property-edit"
-          :aria-label="`Edit Wikidata ID ${scalarValue.trim()}`"
-          @click="emit('wikidata-dialog-open')"
-        >
-          {{ scalarValue.trim() }}
-        </button>
-        <RichFrontmatterPropertyExternalLink
-          kind="wikidata"
-          :value="scalarValue"
-        />
-      </template>
-      <template v-else>
-        <span
-          class="truncate font-mono text-sm text-base-content/90"
-          aria-hidden="true"
-          >—</span
-        >
-        <button
-          type="button"
-          class="daisy-btn daisy-btn-sm daisy-btn-outline shrink-0"
-          data-testid="rich-note-wikidata-property-edit"
-          aria-label="Set Wikidata ID"
-          @click="emit('wikidata-dialog-open')"
-        >
-          Set…
-        </button>
-      </template>
+    <div ref="valueAreaRef" class="min-w-0">
+      <RichFrontmatterScalarPropertyValue
+        v-if="isTextCapablePropertyRow(modelValue)"
+        :model-value="scalarValue"
+        :property-row="modelValue"
+        :wiki-titles="wikiTitles"
+        :row-index="idx"
+        @update:model-value="onValueUpdate"
+        @update:property-value="onPropertyValueUpdate"
+        @focus="emit('row-focus')"
+        @commit="emit('commit')"
+        @dead-link-click="emit('dead-link-click', $event)"
+      />
+      <RelationTypeSelectCompact
+        v-else-if="isRelationPropertyKey(modelValue.key)"
+        field="relationType"
+        scope-name="rich-note-relation-property"
+        hide-label
+        :model-value="relationModelValue"
+        :inverse-icon="true"
+        @update:model-value="emit('relation-type-selected', $event)"
+      />
+      <RichFrontmatterImagePropertyValue
+        v-else-if="isImagePropertyKey(modelValue.key)"
+        :model-value="scalarValue"
+        :note-id="noteId"
+        :ariaLabel="`Existing note image property value (row ${idx + 1})`"
+        value-test-id="rich-note-property-row-value-input"
+        file-input-test-id="rich-note-image-property-file-input"
+        choose-button-test-id="rich-note-image-property-choose"
+        requires-note-test-id="rich-note-image-upload-requires-note"
+        @update:model-value="onValueUpdate"
+        @focus="emit('row-focus')"
+        @commit="emit('commit')"
+        @image-upload-state="emit('image-upload-state', $event)"
+      />
+      <div
+        v-else-if="isWikidataIdPropertyKey(modelValue.key)"
+        class="flex min-w-0 items-center gap-2"
+        :class="scalarValue.trim() ? '' : 'justify-between'"
+      >
+        <template v-if="scalarValue.trim()">
+          <button
+            type="button"
+            class="daisy-btn daisy-btn-ghost daisy-btn-sm h-auto min-h-0 min-w-0 max-w-full shrink truncate justify-start py-0.5 px-1 font-mono text-sm font-normal text-base-content/90 normal-case"
+            :title="scalarValue.trim()"
+            data-testid="rich-note-wikidata-property-edit"
+            :aria-label="`Edit Wikidata ID ${scalarValue.trim()}`"
+            @click="emit('wikidata-dialog-open')"
+          >
+            {{ scalarValue.trim() }}
+          </button>
+          <RichFrontmatterPropertyExternalLink
+            kind="wikidata"
+            :value="scalarValue"
+          />
+        </template>
+        <template v-else>
+          <span
+            class="truncate font-mono text-sm text-base-content/90"
+            aria-hidden="true"
+            >—</span
+          >
+          <button
+            type="button"
+            class="daisy-btn daisy-btn-sm daisy-btn-outline shrink-0"
+            data-testid="rich-note-wikidata-property-edit"
+            aria-label="Set Wikidata ID"
+            @click="emit('wikidata-dialog-open')"
+          >
+            Set…
+          </button>
+        </template>
+      </div>
     </div>
     <button
       type="button"
@@ -132,6 +134,7 @@ import {
   isWikidataIdPropertyKey,
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
+import { scheduleFocusTargetWithin } from "@/utils/focusTarget"
 import {
   scalarPropertyValue,
   scalarStringFromPropertyValue,
@@ -164,6 +167,7 @@ const emit = defineEmits<{
 }>()
 
 const presetPanelOpen = ref(false)
+const valueAreaRef = ref<HTMLElement | null>(null)
 
 const scalarValue = computed(
   () => scalarStringFromPropertyValue(props.modelValue.value) ?? ""
@@ -211,8 +215,6 @@ function onKeyPresetWrapperFocusOut(event: FocusEvent) {
 function onPresetSelected(key: string) {
   emit("update:modelValue", { ...props.modelValue, key })
   presetPanelOpen.value = false
-  requestAnimationFrame(() => {
-    document.getElementById(props.keyInputId)?.focus()
-  })
+  scheduleFocusTargetWithin(valueAreaRef.value)
 }
 </script>

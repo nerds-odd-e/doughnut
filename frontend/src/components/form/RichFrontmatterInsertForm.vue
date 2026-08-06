@@ -35,6 +35,7 @@
         </div>
       </label>
       <label
+        ref="valueAreaRef"
         class="daisy-form-control w-full sm:flex-1 min-w-[8rem]"
       >
         <span class="daisy-label text-xs">Property value</span>
@@ -60,7 +61,6 @@
         </div>
         <RichFrontmatterImagePropertyValue
           v-else-if="isImagePropertyKey(draftKey)"
-          ref="valueInputRef"
           :model-value="draftValue"
           :note-id="noteId"
           ariaLabel="Property value"
@@ -87,7 +87,6 @@
             "
           >
             <WikiPropertyValueField
-              ref="valueInputRef"
               :model-value="draftValue"
               :wiki-titles="wikiTitles"
               aria-label="Property value"
@@ -121,9 +120,10 @@ import {
   isWikidataIdPropertyKey,
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
+import { scheduleFocusTargetWithin } from "@/utils/focusTarget"
 import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
 
-const props = defineProps<{
+defineProps<{
   insertOpen: boolean
   draftKey: string
   draftValue: string
@@ -144,7 +144,7 @@ const emit = defineEmits<{
 }>()
 
 const presetPanelOpen = ref(false)
-const valueInputRef = ref<{ focus: () => void } | null>(null)
+const valueAreaRef = ref<HTMLElement | null>(null)
 
 function onKeyInput(event: Event) {
   emit("update:draftKey", (event.target as HTMLInputElement).value)
@@ -157,17 +157,13 @@ function onKeyPresetWrapperFocusOut(event: FocusEvent) {
   presetPanelOpen.value = false
 }
 
+function focusValueInput() {
+  scheduleFocusTargetWithin(valueAreaRef.value)
+}
+
 function onPresetSelected(key: string) {
   emit("update:draftKey", key)
   presetPanelOpen.value = false
-  requestAnimationFrame(() => {
-    document.getElementById(props.insertKeyInputId)?.focus()
-  })
+  focusValueInput()
 }
-
-function focusValueInput() {
-  valueInputRef.value?.focus()
-}
-
-defineExpose({ focusValueInput })
 </script>

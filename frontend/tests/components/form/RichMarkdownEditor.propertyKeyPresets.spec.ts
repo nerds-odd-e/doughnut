@@ -3,6 +3,7 @@ import {
   PRESET_DROPDOWN_CASES,
   preparePropertyKeyPresetDropdown,
 } from "./propertyKeyPresetsTestSupport"
+import { expectElementFocused } from "./propertyTouchFocusTestSupport"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 describe("RichMarkdownEditor property key presets", () => {
@@ -40,6 +41,7 @@ describe("RichMarkdownEditor property key presets", () => {
       existingRows,
       selectPreset,
       expectedKeyValue,
+      expectedFocusTestId,
     }) => {
       await preparePropertyKeyPresetDropdown(h, markdown, {
         keyInputTestId,
@@ -47,6 +49,7 @@ describe("RichMarkdownEditor property key presets", () => {
       })
       await selectPresetKey(selectPreset)
       expect(keyInputValue(keyInputTestId)).toBe(expectedKeyValue)
+      expectElementFocused(`[data-testid="${expectedFocusTestId}"]`)
     }
   )
 })

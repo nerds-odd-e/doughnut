@@ -39,6 +39,7 @@ export const PRESET_DROPDOWN_CASES = [
     existingRows: [] as PropertyRow[],
     selectPreset: "wikidata_id",
     expectedKeyValue: "wikidata_id",
+    expectedFocusTestId: "rich-note-wikidata-property-insert-edit",
   },
   {
     case: "existing row",
@@ -51,6 +52,7 @@ status: ok
     existingRows: [propertyRowWithScalar("status", "ok")],
     selectPreset: "url",
     expectedKeyValue: "url",
+    expectedFocusTestId: "rich-note-property-row-value-input",
   },
   {
     case: "occupied image preset",
@@ -63,6 +65,7 @@ image: /x.png
     existingRows: [propertyRowWithScalar("image", "/x.png")],
     selectPreset: "image 2",
     expectedKeyValue: "image 2",
+    expectedFocusTestId: "rich-note-property-value",
   },
   {
     case: "occupied url preset",
@@ -75,5 +78,6 @@ url: https://example.com
     existingRows: [propertyRowWithScalar("url", "https://example.com")],
     selectPreset: "url 2",
     expectedKeyValue: "url 2",
+    expectedFocusTestId: "rich-note-property-value",
   },
 ] as const

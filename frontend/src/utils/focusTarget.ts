@@ -1,7 +1,7 @@
 import { nextTick } from "vue"
 
 const preferredFocusableSelector = [
-  "input:not([type='hidden']):not([disabled])",
+  "input:not([type='hidden']):not([type='file']):not([disabled])",
   "textarea:not([disabled])",
   "select:not([disabled])",
   "[contenteditable='true']",
