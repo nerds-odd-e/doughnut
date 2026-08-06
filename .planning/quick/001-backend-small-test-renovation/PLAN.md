@@ -1,6 +1,6 @@
 # Backend unit tests → "small test" style
 
-**Status:** in progress (Phase 17 done)
+**Status:** in progress (Phase 18a done)
 **Type:** test renovation (no product behavior change)
 **Verify each phase:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
 **Style:** `.cursor/rules/unit-testing.mdc` + `.cursor/rules/backend-testing.mdc`
@@ -226,19 +226,30 @@ For each file in the phase file list:
   - support: `AiControllerExtractNoteTestSupport.java` (`EXTRACTABLE_CONTENT` / `nestedLayout` / `selectSingleLayoutItem` / `assertBadRequestContaining`)
 - **Done when:** rubric applied; suite green. Keep `OpenAiStructuredResponseMock` usage.
 
-### Phase 18 — Controllers: remaining HTTP surfaces
+### Phase 18a — Controllers: user / circle / bazaar / subscription
+- **Status:** done
+- **Type:** Behavior
+- **Observable:** user, circle, bazaar, and subscription controller/DTO tests follow rubric.
+- **Files / scope (post-refactor capability splits):**
+  - `UserControllerTest.java` (profile), `UserTokenControllerTest.java`, `UserMenuDataControllerTest.java`, `UserRecallStatsControllerTest.java`
+  - `CurrentUserInfoControllerTest.java`
+  - `currentUser/CurrentUserFetcherFromRequestTest.java` (already rubric-clean; reviewed)
+  - `CircleControllerTest.java`, `BazaarControllerTest.java`, `SubscriptionControllerTest.java`
+  - `dto/NoteUpdateTitleDTOTest.java`, `dto/UserDTOTest.java`
+- **Done when:** those files renovated; suite green.
+
+### Phase 18b — Controllers: conversation / books / admin / remaining HTTP
 - **Status:** planned
 - **Type:** Behavior
-- **Files:** remaining under `controllers/` not covered above, including but not limited to:
-  - `UserControllerTest.java`, `CurrentUserInfoControllerTest.java`, `currentUser/*`
-  - `CircleControllerTest.java`, `BazaarControllerTest.java`, `SubscriptionControllerTest.java`
+- **Files:**
   - `ConversationMessageControllerTest.java`, `BooksControllerTest.java`
-  - `AdminUserControllerTest.java`, `AdminQuestionGenerationBatchController*.java`
+  - `AdminUserControllerTest.java`, `AdminQuestionGenerationBatchControllerTest.java`, `AdminQuestionGenerationBatchControllerResumeTest.java`
   - `UserQuestionGenerationBatchScheduleControllerTest.java`
   - `WikidataControllerTests.java`, `GlobalSettingsControllerTest.java`
   - `FailureReportControllerTest.java`, `InstallControllerTest.java`
+  - `dto/DisplayNameTrimmingDeserializerTest.java` — only if still outside rubric
   - `ControllerTestBase.java` — only if shared helpers need concise makeMe fixes for this wave
-- **Done when:** all controller tests renovated; suite green.
+- **Done when:** remaining controller tests renovated; suite green.
 
 ### Phase 19 — Services: assimilate / memory / recall — consolidate into controllers
 - **Status:** planned
@@ -341,7 +352,8 @@ If a Behavior phase cannot express fixtures concisely:
 | 15 | done | Split mega `RecallPromptControllerTests` → quiz / regenerate / contest / spelling / stem-masking + base; accidental-match canonical shape once + sibling deltas; drop redundant `.by` on recalls; merge duplicate spelling answer-entity asserts. |
 | 16 | done | Assimilation: `rememberSpelling` builder + assimilate return value; drop redundant `.by` / count delta; Search shared base + blank-key params; `.aliases` / `overlapWikiLink`; drop duplicate auth; OpenAI embedding mock only for semantic. |
 | 17 | done | AI controllers: drop unused fixtures / verbose notebook wiring; `.content()` + shared extract helpers; canonical reject/export shapes once + sibling deltas; Audio onto ControllerTestBase; split remove-refinement from note-refinement. OpenAI mocks kept. |
-| 18–26 | planned | — |
+| 18a | done | User/circle/bazaar/subscription + DTOs: focused asserts, parameterized auth/blank cases, `hasMember` / drop redundant `.by`, drop unused fixtures. Post-refactor: split User → profile / token / menu-data / recall-stats; drop dead CircleService; fix unread-read-by-receiver fixture. currentUser fetcher already clean. |
+| 18b–26 | planned | — |
 
 ---
 
@@ -368,3 +380,4 @@ If a Behavior phase cannot express fixtures concisely:
 - Phase 15: Accidental-match title case is the full-shape canonical; alias/trim/unreadable/floor siblings assert outcome or matched-id delta only. Spelling `thinkingTimeMs` + answer-entity twins collapsed to one persist assert. Stem-masking: mark/not-color once; overlap-wiki siblings keep Other Note / no-mark deltas. Recalling window-end covered by half-day param — status case keeps `totalAssimilatedCount` only; previously-answered spelling asserts type only after MCQ window canonical. Post-refactor: stem-masking split; accidental/overlap onto shared base.
 - Phase 16: Assimilation spelling twin uses `.rememberSpelling()` + assimilate return list (drop `NoteRepository` mutation/`findLast100`). Property-index still needs explicit `refreshForNote` (no MakeMe hook yet — one call). Search: shared base for term helpers; blank empty/whitespace parameterized; drop duplicate not-logged-in twins; alias fixtures via `.aliases` / `overlapWikiLink` (drop `NoteAliasIndexService` wiring). Semantic keeps OpenAI embedding mock as true external; empty embedding → literal fallback.
 - Phase 17: Extract fixtures use `.content(EXTRACTABLE_CONTENT)` not post-`please` mutation; shared `AiControllerExtractNoteTestSupport` (`selectSingleLayoutItem` / `assertBadRequestContaining`). PredefinedQuestion list drops unused root+N-children notebooks. Create-extracted reserved title is BINDING_ERROR canonical; alias sibling asserts message only. Export refinement/question maps assert keys + unique deltas. Audio extends ControllerTestBase; OpenAI + transcription mocks stay. Post-refactor: remove-refinement split to `AiControllerRemoveRefinementSuggestionTest`; collapse duplicate bad-request helper; wire `selectSingleLayoutItem` into preview/validation.
+- Phase 18a: Split Phase 18 mid-flight — ConversationMessage/Books/Admin/Wikidata/etc. deferred to 18b (ConversationMessage ~375 lines, not a quick pass). Circle: prefer `hasMember` over joinAndSave. Bazaar: owner-can + admin-removes share empty-list return; drop duplicate return-shape twin. User menu unread “already read” needs other-sender + `readByReceiver` (own-sender case overlaps zero-own-messages). Token/menu/recall-stats capability split during post-change-refactor.

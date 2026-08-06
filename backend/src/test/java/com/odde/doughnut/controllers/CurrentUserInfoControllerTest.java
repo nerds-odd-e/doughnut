@@ -17,28 +17,20 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class CurrentUserInfoControllerTest {
   @Mock CurrentUserFetcher currentUserFetcher;
 
-  CurrentUserInfoController controller(CurrentUserFetcher currentUserFetcher) {
-    return new CurrentUserInfoController(currentUserFetcher);
-  }
-
   @Test
-  void shouldReturnUserInfoIncludingRoleForLearner() {
+  void returnsExternalIdentifierAndUser() {
     User user = userWith("learner-ext", "Learner");
-    CurrentUserInfo currentUserInfo = currentUserInfoFor(user);
+    CurrentUserInfo info = currentUserInfoFor(user);
 
-    assertThat(currentUserInfo.externalIdentifier, equalTo("learner-ext"));
-    assertThat(currentUserInfo.user, equalTo(user));
-    assertFalse(currentUserInfo.user.isAdmin());
+    assertThat(info.externalIdentifier, equalTo("learner-ext"));
+    assertThat(info.user, equalTo(user));
+    assertFalse(info.user.isAdmin());
   }
 
   @Test
-  void shouldReturnUserInfoIncludingRoleForAdmin() {
+  void adminUserIsFlagged() {
     User user = userWith("admin", "Admin");
-    CurrentUserInfo currentUserInfo = currentUserInfoFor(user);
-
-    assertThat(currentUserInfo.externalIdentifier, equalTo("admin"));
-    assertThat(currentUserInfo.user, equalTo(user));
-    assertTrue(currentUserInfo.user.isAdmin());
+    assertTrue(currentUserInfoFor(user).user.isAdmin());
   }
 
   private static User userWith(String externalId, String name) {
@@ -51,6 +43,6 @@ class CurrentUserInfoControllerTest {
   private CurrentUserInfo currentUserInfoFor(User user) {
     when(currentUserFetcher.getExternalIdentifier()).thenReturn(user.getExternalIdentifier());
     when(currentUserFetcher.getUser()).thenReturn(user);
-    return controller(currentUserFetcher).currentUserInfo();
+    return new CurrentUserInfoController(currentUserFetcher).currentUserInfo();
   }
 }

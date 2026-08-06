@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.BazaarNotebook;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -18,9 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 class BazaarControllerTest extends ControllerTestBase {
   @Autowired private BazaarService bazaarService;
-
   @Autowired BazaarController controller;
-  private Note topNote;
+
   private Notebook notebook;
   private BazaarNotebook bazaarNotebook;
   private User notebookOwnerUser;
@@ -29,15 +27,14 @@ class BazaarControllerTest extends ControllerTestBase {
   void setup() {
     currentUser.setUser(makeMe.anAdmin().please());
     notebookOwnerUser = makeMe.aUser().please();
-    topNote = makeMe.aNote().notebookOwnedBy(notebookOwnerUser).please();
-    notebook = topNote.getNotebook();
+    notebook = makeMe.aNote().notebookOwnedBy(notebookOwnerUser).please().getNotebook();
     bazaarNotebook = makeMe.aBazaarNotebook(notebook).please();
   }
 
   @Nested
   class RemoveFromBazaar {
     @Test
-    void otherPeopleCannot() {
+    void nonOwnerDenied() {
       currentUser.setUser(makeMe.aUser().please());
       assertThrows(
           UnexpectedNoAccessRightException.class,
@@ -46,21 +43,15 @@ class BazaarControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void notebookOwnerCan() throws UnexpectedNoAccessRightException {
+    void notebookOwnerCanRemove() throws UnexpectedNoAccessRightException {
       currentUser.setUser(notebookOwnerUser);
-      controller.removeFromBazaar(bazaarNotebook);
+      assertThat(controller.removeFromBazaar(bazaarNotebook), empty());
     }
 
     @Test
-    void removeFromBazaarSuccessfully() throws UnexpectedNoAccessRightException {
-      controller.removeFromBazaar(bazaarNotebook);
+    void adminRemovesAndReturnsEmptyList() throws UnexpectedNoAccessRightException {
+      assertThat(controller.removeFromBazaar(bazaarNotebook), empty());
       assertThat(getAllBazaarNotebooks(), not(hasItem(notebook)));
-    }
-
-    @Test
-    void returnCurrentBazaarNotes() throws UnexpectedNoAccessRightException {
-      List<BazaarNotebook> notebooksViewedByUser = controller.removeFromBazaar(bazaarNotebook);
-      assertThat(notebooksViewedByUser, hasSize(0));
     }
   }
 

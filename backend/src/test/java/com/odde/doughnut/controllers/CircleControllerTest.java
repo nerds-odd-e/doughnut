@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -21,7 +20,6 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.NotebookRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.services.NotebookGroupService;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +30,6 @@ import org.springframework.validation.BindException;
 import org.springframework.web.server.ResponseStatusException;
 
 class CircleControllerTest extends ControllerTestBase {
-  @Autowired CircleService circleService;
   @Autowired CircleController controller;
   @Autowired NotebookGroupService notebookGroupService;
   @Autowired NoteRepository noteRepository;
@@ -44,22 +41,18 @@ class CircleControllerTest extends ControllerTestBase {
   }
 
   @Nested
-  class circleIndex {
+  class CircleIndex {
     @Test
-    void itShouldNotAllowNonMemberToSeeACircle() {
+    void requiresLogin() {
       currentUser.setUser(null);
-      assertThrows(
-          ResponseStatusException.class,
-          () -> {
-            controller.index();
-          });
+      assertThrows(ResponseStatusException.class, () -> controller.index());
     }
   }
 
   @Nested
-  class showNoteTest {
+  class CreateNotebookInCircle {
     @Test
-    void whenTheUserIsNotAMemberOfTheCircle() {
+    void nonMemberDenied() {
       Circle circle = makeMe.aCircle().please();
       NotebookCreationRequest noteCreation = new NotebookCreationRequest();
       noteCreation.setNewTitle("new title");
@@ -67,19 +60,17 @@ class CircleControllerTest extends ControllerTestBase {
           UnexpectedNoAccessRightException.class,
           () -> controller.createNotebookInCircle(circle, noteCreation));
     }
-  }
 
-  @Nested
-  class CreateNotebookInCircle {
     @Test
     void persistsDescriptionWhenMember() throws UnexpectedNoAccessRightException {
       User user = currentUser.getUser();
-      Circle circle = makeMe.aCircle().please();
-      circleService.joinAndSave(circle, user);
+      Circle circle = makeMe.aCircle().hasMember(user).please();
       NotebookCreationRequest noteCreation = new NotebookCreationRequest();
       noteCreation.setNewTitle("Circle Owned Nb");
       noteCreation.setDescription("Circle catalog blurb");
+
       NotebookRealm response = controller.createNotebookInCircle(circle, noteCreation);
+
       assertThat(response.notebook().getId(), notNullValue());
       Notebook nb = notebookRepository.findById(response.notebook().getId()).orElseThrow();
       assertThat(nb.getDescription(), equalTo("Circle catalog blurb"));
@@ -93,45 +84,27 @@ class CircleControllerTest extends ControllerTestBase {
   @Nested
   class ShowCircle {
     @Test
-    void itShouldCircleForUserViewIfAuthorized() throws UnexpectedNoAccessRightException {
-      currentUser.setUser(makeMe.aUser().please());
-
-      Circle circle = makeMe.aCircle().please();
-      circle.setName("Some circle");
-
-      circleService.joinAndSave(circle, currentUser.getUser());
-
-      CircleForUserView expected = new CircleForUserView();
-      expected.setId(circle.getId());
-      expected.setName(circle.getName());
-      expected.setInvitationCode(circle.getInvitationCode());
+    void returnsCircleForMember() throws UnexpectedNoAccessRightException {
+      Circle circle = makeMe.aCircle().hasMember(currentUser.getUser()).please();
 
       CircleForUserView actual = controller.showCircle(circle);
 
-      assertEquals(expected.getId(), actual.getId());
-      assertEquals(expected.getName(), actual.getName());
-      assertEquals(expected.getInvitationCode(), actual.getInvitationCode());
+      assertThat(actual.getId(), equalTo(circle.getId()));
+      assertThat(actual.getName(), equalTo(circle.getName()));
+      assertThat(actual.getInvitationCode(), equalTo(circle.getInvitationCode()));
     }
 
     @Test
-    void itShouldAskToLoginOfVisitorIsNotLogin() {
+    void requiresLogin() {
       Circle circle = makeMe.aCircle().please();
       currentUser.setUser(null);
-      assertThrows(
-          ResponseStatusException.class,
-          () -> {
-            controller.showCircle(circle);
-          });
+      assertThrows(ResponseStatusException.class, () -> controller.showCircle(circle));
     }
 
     @Test
-    void itShouldNotAllowNonMemberToSeeACircle() {
+    void nonMemberDenied() {
       Circle circle = makeMe.aCircle().please();
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> {
-            controller.showCircle(circle);
-          });
+      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.showCircle(circle));
     }
 
     @Test
@@ -145,8 +118,7 @@ class CircleControllerTest extends ControllerTestBase {
           notebookGroupService.createGroup(user, circle.getOwnership(), "Circle group");
       notebookGroupService.assignNotebookToGroup(user, inGroup, group);
 
-      CircleForUserView view = controller.showCircle(circle);
-      var notebooksView = view.getNotebooks();
+      var notebooksView = controller.showCircle(circle).getNotebooks();
 
       assertThat(notebooksView.notebooks.size(), equalTo(2));
       assertFalse(

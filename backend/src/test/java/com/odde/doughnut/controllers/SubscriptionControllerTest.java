@@ -31,21 +31,18 @@ class SubscriptionControllerTest extends ControllerTestBase {
   @Autowired SubscriptionController controller;
   @Autowired NotebookGroupService notebookGroupService;
   @Autowired ObjectMapper objectMapper;
-  private Note topNote;
   private Notebook notebook;
 
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-    topNote = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-    notebook = topNote.getNotebook();
-    makeMe.aBazaarNotebook(topNote.getNotebook()).please();
+    notebook = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please().getNotebook();
+    makeMe.aBazaarNotebook(notebook).please();
   }
 
   @Test
-  void subscribeToNoteSuccessfully() throws UnexpectedNoAccessRightException {
-    SubscriptionDTO subscription = new SubscriptionDTO();
-    Subscription result = controller.createSubscription(notebook, subscription);
+  void createsSubscriptionForBazaarNotebook() throws UnexpectedNoAccessRightException {
+    Subscription result = controller.createSubscription(notebook, new SubscriptionDTO());
     assertEquals(notebook.getId(), result.getNotebook().getId());
     assertEquals(currentUser.getUser(), result.getUser());
   }
@@ -67,18 +64,17 @@ class SubscriptionControllerTest extends ControllerTestBase {
   }
 
   @Test
-  void notAllowToSubscribeToNoneBazaarNote() {
+  void deniesNonBazaarNotebook() {
     Note anotherNote = makeMe.aNote().notebookOwnedBy(makeMe.aUser().please()).please();
-    SubscriptionDTO subscription = new SubscriptionDTO();
     assertThrows(
         UnexpectedNoAccessRightException.class,
-        () -> controller.createSubscription(anotherNote.getNotebook(), subscription));
+        () -> controller.createSubscription(anotherNote.getNotebook(), new SubscriptionDTO()));
   }
 
   @Nested
   class Unsubscribe {
     @Test
-    void shouldRemoveTheSubscription() throws UnexpectedNoAccessRightException {
+    void removesSubscription() throws UnexpectedNoAccessRightException {
       Subscription subscription = makeMe.aSubscription().forUser(currentUser.getUser()).please();
       long beforeDestroy = subscriptionRepository.count();
       controller.destroySubscription(subscription);
@@ -86,9 +82,8 @@ class SubscriptionControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void notAllowToUnsubscribeForOtherPeople() {
-      User anotherUser = makeMe.aUser().please();
-      Subscription subscription = makeMe.aSubscription().forUser(anotherUser).please();
+    void deniesOtherUsersSubscription() {
+      Subscription subscription = makeMe.aSubscription().forUser(makeMe.aUser().please()).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.destroySubscription(subscription));
@@ -101,12 +96,15 @@ class SubscriptionControllerTest extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      User subscriber = currentUser.getUser();
       User owner = makeMe.aUser().please();
       Notebook bazaarNotebook = makeMe.aNotebook().creatorAndOwner(owner).please();
       makeMe.aBazaarNotebook(bazaarNotebook).please();
       subscription =
-          makeMe.aSubscription().forNotebook(bazaarNotebook).forUser(subscriber).please();
+          makeMe
+              .aSubscription()
+              .forNotebook(bazaarNotebook)
+              .forUser(currentUser.getUser())
+              .please();
     }
 
     @Test
@@ -116,8 +114,9 @@ class SubscriptionControllerTest extends ControllerTestBase {
           notebookGroupService.createGroup(subscriber, subscriber.getOwnership(), "G");
       UpdateNotebookGroupRequest req = new UpdateNotebookGroupRequest();
       req.setNotebookGroupId(group.getId());
-      Subscription result = controller.updateSubscriptionGroup(subscription, req);
-      assertThat(result.getNotebookGroup().getId(), equalTo(group.getId()));
+      assertThat(
+          controller.updateSubscriptionGroup(subscription, req).getNotebookGroup().getId(),
+          equalTo(group.getId()));
     }
 
     @Test
@@ -128,14 +127,14 @@ class SubscriptionControllerTest extends ControllerTestBase {
       notebookGroupService.assignSubscriptionToGroup(subscriber, subscription, group);
       UpdateNotebookGroupRequest req = new UpdateNotebookGroupRequest();
       req.setNotebookGroupId(null);
-      Subscription result = controller.updateSubscriptionGroup(subscription, req);
-      assertThat(result.getNotebookGroup(), nullValue());
+      assertThat(
+          controller.updateSubscriptionGroup(subscription, req).getNotebookGroup(), nullValue());
     }
 
     @Test
     void rejectsGroupFromAnotherOwnership() {
-      User other = makeMe.aUser().please();
-      NotebookGroup otherGroup = makeMe.aNotebookGroup().ownership(other.getOwnership()).please();
+      NotebookGroup otherGroup =
+          makeMe.aNotebookGroup().ownership(makeMe.aUser().please().getOwnership()).please();
       UpdateNotebookGroupRequest req = new UpdateNotebookGroupRequest();
       req.setNotebookGroupId(otherGroup.getId());
       assertThrows(

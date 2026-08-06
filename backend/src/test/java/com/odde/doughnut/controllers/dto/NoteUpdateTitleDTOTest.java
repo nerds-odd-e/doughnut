@@ -47,18 +47,11 @@ class NoteUpdateTitleDTOTest {
         violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("newTitle")));
   }
 
-  @Test
-  void rejectsEmptyTitle() {
-    dto.setNewTitle("");
-    Set<ConstraintViolation<NoteUpdateTitleDTO>> violations = validator.validate(dto);
-    assertEquals(1, violations.size());
-  }
-
-  @Test
-  void rejectsWhitespaceOnlyTitle() {
-    dto.setNewTitle("   ");
-    Set<ConstraintViolation<NoteUpdateTitleDTO>> violations = validator.validate(dto);
-    assertEquals(1, violations.size());
+  @ParameterizedTest
+  @ValueSource(strings = {"", "   "})
+  void rejectsBlankOrWhitespaceTitle(String title) {
+    dto.setNewTitle(title);
+    assertEquals(1, validator.validate(dto).size());
   }
 
   @Test

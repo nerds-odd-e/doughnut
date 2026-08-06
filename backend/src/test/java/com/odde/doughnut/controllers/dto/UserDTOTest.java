@@ -1,6 +1,8 @@
 package com.odde.doughnut.controllers.dto;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
 
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
@@ -9,13 +11,15 @@ import jakarta.validation.Validator;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
-public class UserDTOTest {
+class UserDTOTest {
 
   @Autowired MakeMe makeMe;
   @Autowired private Validator validator;
@@ -29,29 +33,21 @@ public class UserDTOTest {
   }
 
   @Test
-  void validate() {
-    Set<ConstraintViolation<UserDTO>> violations = validator.validate(userDTO);
-    assertEquals(0, violations.size());
+  void validDefaults() {
+    assertThat(validator.validate(userDTO), empty());
   }
 
   @Test
-  void validateName() {
+  void rejectsBlankName() {
     userDTO.setName("");
-    Set<ConstraintViolation<UserDTO>> violations = validator.validate(userDTO);
-    assertEquals(1, violations.size());
+    assertThat(validator.validate(userDTO), hasSize(1));
   }
 
-  @Test
-  void validateSpacing() {
-    userDTO.setSpaceIntervals("1,2a");
+  @ParameterizedTest
+  @CsvSource({"'1,2a', 1", "'1,2,33, 444', 0"})
+  void spaceIntervalsValidation(String intervals, int violationCount) {
+    userDTO.setSpaceIntervals(intervals);
     Set<ConstraintViolation<UserDTO>> violations = validator.validate(userDTO);
-    assertEquals(1, violations.size());
-  }
-
-  @Test
-  void validateSpacingValid() {
-    userDTO.setSpaceIntervals("1,2,33, 444");
-    Set<ConstraintViolation<UserDTO>> violations = validator.validate(userDTO);
-    assertEquals(0, violations.size());
+    assertThat(violations, hasSize(violationCount));
   }
 }
