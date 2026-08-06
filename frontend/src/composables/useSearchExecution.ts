@@ -1,11 +1,5 @@
-import type {
-  RelationshipLiteralSearchHit,
-  SearchTerm,
-} from "@generated/doughnut-backend-api"
-import {
-  NoteController,
-  SearchController,
-} from "@generated/doughnut-backend-api/sdk.gen"
+import type { SearchTerm } from "@generated/doughnut-backend-api"
+import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import { debounce } from "mini-debounce"
 import {
   computed,
@@ -15,8 +9,8 @@ import {
   watch,
   type Ref,
 } from "vue"
+import { executeDebouncedSearch } from "@/composables/executeDebouncedSearch"
 import { SearchResultsModel } from "@/models/searchResultsModel"
-import { appendSearchKeyToHistory } from "@/utils/searchKeyHistoryCookie"
 
 const SEARCH_DEBOUNCE_MS = 1000
 
@@ -54,7 +48,7 @@ export function useSearchExecution(opts: {
       : model.recentNotes
   )
 
-  const recentNotesAsHits = computed((): RelationshipLiteralSearchHit[] =>
+  const recentNotesAsHits = computed(() =>
     filteredRecentNotes.value.map((r) => ({
       hitKind: "NOTE" as const,
       noteSearchResult: r,
@@ -101,81 +95,19 @@ export function useSearchExecution(opts: {
       }
       const snapshotTrimmed = term.searchKey.trim()
       const snapshotGlobal = term.allMyNotebooksAndSubscriptions === true
-      const snapshotNotebookId = opts.notebookId.value
       const snapshotSemantic = opts.semanticSearchEnabled.value
-
-      const applyIfCurrent = () =>
-        gen === searchGeneration.value &&
-        snapshotTrimmed === trimmedSearchKey.value &&
-        snapshotGlobal === isGlobalSearch.value &&
-        snapshotSemantic === opts.semanticSearchEnabled.value
-
-      if (
-        !snapshotSemantic &&
-        snapshotTrimmed !== "" &&
-        model.isImpliedEmptyByShorterPhrase(snapshotTrimmed, snapshotGlobal)
-      ) {
-        if (!applyIfCurrent()) return
-        model.mergeAndCacheResults({
-          trimmedSearchKey: snapshotTrimmed,
-          isGlobal: snapshotGlobal,
-          literalResults: [],
-          currentNotebookId: snapshotNotebookId,
-        })
-        model.completeSearch()
-        return
-      }
-
-      const literalPromise = opts.noteId.value
-        ? SearchController.searchForRelationshipTargetWithin({
-            path: { note: opts.noteId.value },
-            body: term,
-          })
-        : SearchController.searchForRelationshipTarget({ body: term })
-
-      const semanticPromise = snapshotSemantic
-        ? opts.noteId.value
-          ? SearchController.semanticSearchWithin({
-              path: { note: opts.noteId.value },
-              body: term,
-            })
-          : SearchController.semanticSearch({ body: term })
-        : null
-
-      literalPromise.then((literalRes) => {
-        if (!applyIfCurrent()) return
-        const literal = literalRes.error ? [] : literalRes.data || []
-        model.mergeAndCacheResults({
-          trimmedSearchKey: snapshotTrimmed,
-          isGlobal: snapshotGlobal,
-          literalResults: literal,
-          currentNotebookId: snapshotNotebookId,
-        })
+      await executeDebouncedSearch({
+        model,
+        term,
+        noteId: opts.noteId.value,
+        notebookId: opts.notebookId.value,
+        semanticEnabled: snapshotSemantic,
+        isStillCurrent: () =>
+          gen === searchGeneration.value &&
+          snapshotTrimmed === trimmedSearchKey.value &&
+          snapshotGlobal === isGlobalSearch.value &&
+          snapshotSemantic === opts.semanticSearchEnabled.value,
       })
-
-      if (semanticPromise) {
-        semanticPromise.then((semanticRes) => {
-          if (!applyIfCurrent()) return
-          const semantic = semanticRes.error ? [] : semanticRes.data || []
-          model.mergeAndCacheResults({
-            trimmedSearchKey: snapshotTrimmed,
-            isGlobal: snapshotGlobal,
-            semanticResults: semantic,
-            currentNotebookId: snapshotNotebookId,
-          })
-        })
-      }
-
-      if (semanticPromise) {
-        await Promise.all([literalPromise, semanticPromise])
-      } else {
-        await literalPromise
-      }
-      if (!applyIfCurrent()) return
-      model.completeSearch()
-      if (snapshotTrimmed !== "") {
-        appendSearchKeyToHistory(term.searchKey)
-      }
     })
   }
 
