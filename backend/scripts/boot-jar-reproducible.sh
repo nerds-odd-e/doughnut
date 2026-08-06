@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 #
 # Two clean bootJar runs from the same tree must yield the same SHA-256 (conditional deploy compares this hash).
-# Real Gradle + pnpm (not Bach). See docs/gcp/conditional-backend-deploy.md.
+# Real Gradle (not Bach). See docs/gcp/conditional-backend-deploy.md.
 #
-# Local (full cost):  CURSOR_DEV=true nix develop -c bash backend/scripts/boot-jar-reproducible.sh
-# CI (after bundle+build): BOOT_JAR_REPRO_SKIP_BUNDLE=1 bash backend/scripts/boot-jar-reproducible.sh
+# The deployable jar does not embed SPA/CLI/MCP (those upload to GCS). This check is Java packaging only.
 #
-# CLI bundle inlines env; pin these so two runs match (see plan doc).
+# Local:  CURSOR_DEV=true nix develop -c bash backend/scripts/boot-jar-reproducible.sh
+# CI:     same (Backend Unit tests job)
 
 set -euo pipefail
 
@@ -14,10 +14,6 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$REPO_ROOT"
 
 JAR="backend/build/libs/doughnut-0.0.1-SNAPSHOT.jar"
-
-export GOOGLE_CLIENT_ID="${GOOGLE_CLIENT_ID:-repro-test-google-client-id}"
-export GOOGLE_CLIENT_SECRET="${GOOGLE_CLIENT_SECRET:-repro-test-google-client-secret}"
-export CLI_VERSION="${CLI_VERSION:-repro-test-cli-version}"
 
 fail() {
 	echo "boot-jar-reproducible.sh: $*" >&2
@@ -48,6 +44,8 @@ if ! command -v sha256sum >/dev/null; then
 	fail "sha256sum not in PATH (install GNU coreutils, e.g. CURSOR_DEV=true nix develop)"
 fi
 
+[[ -x backend/gradlew ]] || fail "backend/gradlew missing or not executable"
+
 # Gradle settings below are required for stable jar bytes across runs; assert they stay in the tree.
 assert_boot_jar_reproducibility_gradle_config() {
 	local f="backend/build.gradle"
@@ -62,27 +60,11 @@ assert_boot_jar_reproducibility_gradle_config() {
 
 assert_boot_jar_reproducibility_gradle_config
 
-if [[ "${BOOT_JAR_REPRO_SKIP_BUNDLE:-}" == "1" ]]; then
-	[[ -f "$JAR" ]] || fail "BOOT_JAR_REPRO_SKIP_BUNDLE=1 but no jar yet — run pnpm bundle:all then backend/gradlew -p backend build -x test -Dspring.profiles.active=prod (same as CI Backend-unit-tests)"
-	run_boot_jar
-	h1=$(hash_jar)
-	sleep_between_rebuilds
-	run_boot_jar
-	h2=$(hash_jar)
-else
-	command -v pnpm >/dev/null || fail "pnpm not in PATH — full mode runs bundle:all twice; use nix develop or install Node tooling"
-	[[ -x backend/gradlew ]] || fail "backend/gradlew missing or not executable"
-
-	pnpm bundle:all
-	run_boot_jar
-	h1=$(hash_jar)
-
-	sleep_between_rebuilds
-
-	pnpm bundle:all
-	run_boot_jar
-	h2=$(hash_jar)
-fi
+run_boot_jar
+h1=$(hash_jar)
+sleep_between_rebuilds
+run_boot_jar
+h2=$(hash_jar)
 
 if [[ "$h1" != "$h2" ]]; then
 	fail "two clean bootJar runs produced different SHA-256 ($h1 vs $h2). Same backend sources should yield identical jars (deploy jar excludes classpath static). Check backend/build.gradle: preserveFileTimestamps=false on AbstractArchiveTask, JavaCompile UTF-8."
