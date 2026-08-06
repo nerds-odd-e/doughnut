@@ -44,9 +44,17 @@ skill — no nix prefix there).
 yourself (except a single interactive phase). Delegate each phase to a **fresh
 sub-agent** so context does not accumulate.
 
+**Wrap-up ownership (hard):** The **coordinator** owns post-change-refactor,
+plan update, commit, and push. Implementers must **not** commit and must **not**
+run post-change-refactor themselves (nested agents routinely skip spawning a
+second Task). The coordinator spawns a **fresh** refactor agent and must see
+`## REFACTOR COMPLETE` (or handle `## REFACTOR JIDOKA STOP`) before committing.
+
 **Parallelism:** Run multiple independent plans/phases in parallel (GSD waves or
 Task agents) when `files_modified` / touch sets do not overlap and they do not
-contend on the same PLAN/STATE writes. Otherwise run sequentially.
+contend on the same PLAN/STATE writes. Otherwise run sequentially. Each parallel
+unit still gets its own coordinator-owned refactor → commit before the next
+dependent unit starts.
 </context>
 
 <process>
@@ -84,7 +92,7 @@ decision** the developer needs. Then wait.
 - **Before** (coordinator, on the phase *description*) — safe to start
   autonomously? Value/design forks, ambiguity, missing credentials, Behavior/Structure
   grammar.
-- **After** (sub-agent, on what was *learned*) — did work reveal something the
+- **After** (implementer return + refactor return) — did work reveal something the
   plan did not anticipate? Stop even if the phase succeeded.
 </preflight_gate>
 
@@ -94,14 +102,37 @@ decision** the developer needs. Then wait.
 2. Find the next unit whose status is NOT "done"
 3. Pre-phase Jidoka + Behavior/Structure check
    → If stop condition → report & STOP
-4. DELEGATE the phase to a sub-agent (or fan out a safe parallel wave)
-5. When sub-agent finishes:
-   a. Verify the plan shows the phase as "done" (and SUMMARY updated if GSD)
-   b. Verify a new commit was pushed (`git log -1`, `git status`)
-   c. If sub-agent reported Jidoka stop → relay to developer & STOP
-   d. If sub-agent reported REVERT & SPLIT → re-read plan, continue loop
-6. Go to step 1 (next phase)
-7. All phases done → clean up spent plan history (planning.mdc) → report & STOP
+4. DELEGATE implementation only to a fresh sub-agent (see delegation)
+5. When implementer finishes:
+   a. If Jidoka stop / REVERT & SPLIT → handle as below; do not wrap up
+   b. Verify tests were reported green and `git status` shows uncommitted work
+      (or a deliberate empty phase with a stated reason)
+   c. If the implementer already committed → process failure: stop and report
+      (do not continue as if wrap-up succeeded). Prefer fixing by soft-resetting
+      an unpushed commit only when safe and the developer has not forbidden it;
+      otherwise wait for developer judgment.
+6. COORDINATOR WRAP-UP (required — do not skip):
+   a. Spawn a fresh Task (`generalPurpose`) whose prompt is: read and follow
+      `.agents/skills/post-change-refactor/SKILL.md` end-to-end on the current
+      uncommitted change. Pass phase text, plan path, nix prefix. Instruct:
+      do not commit; return must include `## REFACTOR COMPLETE` or
+      `## REFACTOR JIDOKA STOP`.
+   b. Accept only when the refactor agent output contains `## REFACTOR COMPLETE`.
+      On `## REFACTOR JIDOKA STOP`, relay to the developer and STOP (leave
+      working tree as the refactor agent left it).
+      On missing marker → re-dispatch refactor once; if still missing, STOP.
+   c. Lint & format: `CURSOR_DEV=true nix develop -c pnpm lint:all` and
+      `CURSOR_DEV=true nix develop -c pnpm format:all`. Fix issues.
+   d. If backend controller/DTO signatures changed and client not yet regenerated,
+      run generate-api-client.
+   e. Update PLAN (and STATE/SUMMARY if present): mark phase done; brief
+      learnings; prune obsolete detail; adjust future phases if warranted.
+   f. Post-phase Jidoka — if learnings need developer judgment: commit and push
+      work so far, then STOP.
+   g. Commit (capability-named message) then `git push`.
+   h. Verify: `## REFACTOR COMPLETE` was observed this phase AND commit is pushed.
+7. Go to step 1 (next phase)
+8. All phases done → clean up spent plan history (planning.mdc) → report & STOP
 ```
 
 Recognize units by headings/status or GSD plan tasks. Typical local section:
@@ -122,9 +153,10 @@ When the **entire** plan is complete: actively clean spent planning history per
 
 <step name="delegation">
 Use the **Task tool** (`subagent_type: "generalPurpose"`; or GSD `gsd-executor`
-when inside `/gsd-execute-phase` — still require wrap-up below).
+when inside `/gsd-execute-phase` — still require **coordinator-owned** wrap-up
+below; do not rely on `gsd-executor` to run local post-change-refactor).
 
-The sub-agent prompt **must** include:
+The implementer prompt **must** include:
 
 1. **Plan file path** and **which phase/sub-phase** to implement (paste the
    phase text).
@@ -133,35 +165,46 @@ The sub-agent prompt **must** include:
    discipline, **time budget** ~5 min fuzzy / >10 min hard finer-decompose),
    `gsd-coexistence.mdc`, and other applicable rules. **Naming:**
    permanent artifacts by **capability/domain**, never phase number.
-4. **Wrap-up checklist** (see `wrap_up` step).
+4. **Hard stop before wrap-up:** Do **not** commit. Do **not** push. Do **not**
+   update PLAN/STATE to `done`. Do **not** run post-change-refactor (and do not
+   "apply the refactor skill yourself"). Leave the working tree uncommitted
+   with tests green for the coordinator.
 5. **Revert & split** instructions (see `revert_and_split` step).
 6. **Nix prefix**: `CURSOR_DEV=true nix develop -c <command>` unless Cloud VM
    (`cloud-vm-setup`). **Git commands do not need the Nix prefix.**
-7. **Return**: short summary — phase done, Jidoka stop, or reverted and split.
+7. **Return**: short summary — implementation ready for wrap-up (tests run),
+   Jidoka stop, or reverted and split. Do not claim phase "done" in git terms.
 
 **Do NOT pass entire plan history** — only the current phase. Resume context
 lives in STATE / PLAN files on disk.
 </step>
 
 <step name="wrap_up">
-Sub-agent wrap-up checklist (after tests pass):
+**Coordinator-owned** (after implementer returns with green tests, uncommitted):
 
-1. **Delegate refactoring** — Spawn a fresh sub-agent running **post-change-refactor**
-   (`.agents/skills/post-change-refactor/SKILL.md`) on the uncommitted change.
-   Pass phase text, plan path, nix prefix; **do not commit** from the refactor agent.
-2. **Lint & format** — `CURSOR_DEV=true nix develop -c pnpm lint:all` and
+1. **Spawn post-change-refactor** — Fresh Task (`generalPurpose`) that reads
+   `.agents/skills/post-change-refactor/SKILL.md` and runs it end-to-end on the
+   current uncommitted change. Pass:
+   - Phase text being closed
+   - Plan file path (for immediate-next-phase justification)
+   - Nix prefix rule
+   - Do **not** commit
+   - Return must end with `## REFACTOR COMPLETE` or `## REFACTOR JIDOKA STOP`
+2. **Gate** — Proceed only on `## REFACTOR COMPLETE`. On Jidoka stop or missing
+   marker, follow the coordinator_loop rules above (do not commit).
+3. **Lint & format** — `CURSOR_DEV=true nix develop -c pnpm lint:all` and
    `CURSOR_DEV=true nix develop -c pnpm format:all`. Fix any issues.
-3. **Regenerate API client** — if backend controller or DTO signatures changed,
+4. **Regenerate API client** — if backend controller or DTO signatures changed,
    run **generate-api-client** before committing.
-4. **Reflect & re-plan** — update PLAN (and STATE/SUMMARY if present):
+5. **Reflect & re-plan** — update PLAN (and STATE/SUMMARY if present):
    - Brief learnings that change remaining work.
    - Mark phase **done**; prune obsolete detail from that phase.
    - Adjust future phases when warranted.
-5. **Post-phase Jidoka** — if learnings need developer judgment: commit and push
+6. **Post-phase Jidoka** — if learnings need developer judgment: commit and push
    work so far, then return a Jidoka stop (do not silently continue).
-6. **Commit** — stage all changes; message may use GSD-style
+7. **Commit** — stage all changes; message may use GSD-style
    `{type}({phase}-{plan}): …` or the repo's recent convention.
-7. **Push** — `git push`.
+8. **Push** — `git push`.
 </step>
 
 <step name="revert_and_split">
@@ -189,9 +232,9 @@ When this happens:
 </process>
 
 <success_criteria>
-- Each phase delegated to a fresh sub-agent (coordinator does not accumulate context)
+- Each phase implemented by a fresh sub-agent (coordinator does not accumulate implementation context)
+- Coordinator owns wrap-up: fresh post-change-refactor Task → `## REFACTOR COMPLETE` → lint/format → plan update → commit → push
 - Pre- and post-phase Jidoka checks applied
-- Every completed phase: post-change-refactor → lint/format → plan update → commit → push
 - Parallel waves only when touch sets and PLAN/STATE writes do not conflict
 - Spent planning history cleaned when entire plan is done
 - Final output includes `## PLAN EXECUTION COMPLETE` when all phases finish
@@ -214,7 +257,8 @@ When the loop ends (all phases done or a stop condition):
 
 <out_of_scope>
 - Do not implement phases in the coordinator agent (except single interactive phase).
-- Do not skip post-change-refactor, commit, or push per phase.
+- Do not skip coordinator-owned post-change-refactor, commit, or push per phase.
+- Do not accept an implementer self-refactor or a missing `## REFACTOR COMPLETE` as wrap-up.
 - Do not pass full plan history to sub-agents.
 - Do not continue past a Jidoka stop without developer input.
 </out_of_scope>
