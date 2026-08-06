@@ -1,6 +1,6 @@
 # Frontend / CLI / MCP unit tests → "small test" style
 
-**Status:** in progress (Phases 1–2 done)  
+**Status:** in progress (Phases 1–3 done)  
 **Type:** test renovation (no product behavior change)  
 **Resume:** this `PLAN.md` progress log only — **do not edit** trunk `.planning/STATE.md` (parallel trunk-based work).
 
@@ -72,16 +72,16 @@ While iterating a single large frontend file, `pnpm frontend:test tests/path/to/
 - **Done when:** listed files renovated; suite green.
 
 ### Phase 3 — CLI: Ink shell and main interactive app
-- **Status:** planned
+- **Status:** done
 - **Type:** Behavior
 - **Files:**
   - `interactiveInkSession.test.ts`
-  - `InteractiveCliApp*.test.tsx` (base, useNotebook, setAccessToken, addGmail, recallStatus)
-  - `MainInteractivePrompt.test.tsx`, `mainInteractivePromptHistory.test.ts`
+  - `InteractiveCliApp*.test.tsx` (base, useNotebook[+attach], setAccessToken, addGmail, lastEmail, recallStatus)
+  - `MainInteractivePrompt.*.test.tsx` (capability splits), `mainInteractivePromptHistory.test.ts`
   - `YesNoStagePrompt`, `AsyncAssistantFetchStage`, past user/assistant blocks
-  - `borderedSingleLinePromptInputInk`, `guidanceListWindowInk`
-  - `useNotebookSlashCommand.test.tsx`
-- **Verify:** `pnpm cli:test`
+  - `borderedSingleLinePromptInputInk`, `guidanceListWindowInk` (slash/numbered splits)
+  - `useNotebookSlashCommand` (resolve/picker splits)
+- **Verify:** `pnpm cli:test` — green (54 files / 298 tests).
 - **Done when:** rubric applied; suite green.
 
 ### Phase 4 — CLI: recall interactive
@@ -223,7 +223,8 @@ If a Behavior phase cannot express fixtures concisely: add a **Structure** sub-p
 |-------|--------|-------|
 | 1 | done | MCP suite renovated; redundant schema suite + unused API-client setup removed |
 | 2 | done | CLI non-Ink helpers/commands renovated; oversized selectList + mineru tests split by capability; suite green |
-| 3–18 | planned | — |
+| 3 | done | Ink shell / InteractiveCliApp / MainInteractivePrompt / guidanceList / useNotebookSlashCommand renovated; oversized suites split by capability; suite green |
+| 4–18 | planned | — |
 
 ---
 
@@ -234,3 +235,4 @@ If a Behavior phase cannot express fixtures concisely: add a **Structure** sub-p
 - Trunk `STATE.md` must not claim exclusive focus for this quick task.
 - Phase 1: `tool-schemas.test.ts` duplicated registry shape already covered by `server.test.ts` — deleted. `getApiConfig` lives in `doughnut-api`, not MCP — dropped from MCP helpers tests. With full `vi.mock` of SDK controllers, `setupMockApiClient` was dead — removed. No makeMe graph builder needed (single small fixture).
 - Phase 2: Most Phase 2 files already drove stable pure helpers / `run` / command surfaces with allowed externals. Main gaps were makeMe for `recallStatus`, focused assertions (drop redundant full-payload / plural-count rechecks), table-driven siblings, and >250-line `selectListInteraction` + `mineruOutlineSubprocess` suites — split into capability-named modules under 250 lines. Files already rubric-compliant left largely untouched (`welcomeBanner`, `spellingAnswerLine`, `terminalColumnsTruncate`, `contestAndRegenerateMcq`, `slashCommandCompletion`, `notebookStageSlashCommands`, `doughnutBackendClient.errors`, `update`, mineru e2e stub).
+- Phase 3: Trimmed post-`waitFor*` re-asserts in InteractiveCliApp; makeMe for interactive recall-status due list; split oversized Ink suites by capability (`MainInteractivePrompt.*`, `guidanceListWindowInk` slash/numbered, addGmail vs lastEmail, useNotebook shell vs attach, useNotebookSlashCommand resolve vs picker) with shared testHelpers; MinerU subprocess mock retained for PDF attach; `mainInteractivePromptHistory` left as domain-stable pure contract.

@@ -1,5 +1,6 @@
 import * as fs from 'node:fs'
 import { RecallsController } from 'doughnut-api'
+import makeMe from 'doughnut-test-fixtures/makeMe'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { InteractiveCliApp } from '../src/InteractiveCliApp.js'
 import {
@@ -63,21 +64,17 @@ describe('InteractiveCliApp /recall-status', () => {
         stripAnsi(c).includes('/recall-status') &&
         stripAnsi(c).includes('Cancelled.')
     )
-
-    const combined = stripAnsi(frames.join('\n'))
-    expect(combined).toContain('/recall-status')
-    expect(combined).toContain('Cancelled.')
   })
 
   test('fast recalling mock shows due count line', async () => {
     recallingSpy.mockResolvedValue({
-      data: {
-        totalAssimilatedCount: 0,
-        toRepeat: [
+      data: makeMe.aDueMemoryTrackersList
+        .totalAssimilatedCount(0)
+        .toRepeat([
           { memoryTrackerId: 1, spelling: false },
           { memoryTrackerId: 2, spelling: false },
-        ],
-      },
+        ])
+        .please(),
     } as Awaited<ReturnType<typeof RecallsController.recalling>>)
 
     const { stdin, lastStrippedFrame, waitForFramesToInclude } =

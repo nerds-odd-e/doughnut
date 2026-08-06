@@ -49,7 +49,6 @@ describe('AsyncAssistantFetchStage', () => {
       (s) => s === 'Cancelled.'
     )
 
-    expect(aborted).toBe('Cancelled.')
     expect(settled).toBeNull()
   })
 

@@ -17,6 +17,15 @@ function farewellFollowedByCommandPrompt(ansiStrippedFrame: string): boolean {
   return /\n[^\n]*→/.test(after)
 }
 
+function lastFrameWithFarewell(frames: string[]): string {
+  for (let i = frames.length - 1; i >= 0; i--) {
+    if (stripAnsi(frames[i] ?? '').includes('Bye.')) {
+      return frames[i] ?? ''
+    }
+  }
+  return frames.at(-1) ?? ''
+}
+
 describe('InteractiveCliApp (ink-testing-library)', () => {
   test('empty committed line leaves transcript unchanged; later line still commits', async () => {
     const { stdin, frames } = await renderInkWhenCommandLineReady(
@@ -63,6 +72,22 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
     expect(combined).toMatch(/Interactive commands/)
   })
 
+  test('plain committed line records user message and Not supported', async () => {
+    const { stdin, frames } = await renderInkWhenCommandLineReady(
+      <InteractiveCliApp />
+    )
+
+    stdin.write('hello\r')
+    await waitForFrames(
+      () => frames.join('\n'),
+      (c) =>
+        c.includes('hello') &&
+        c.includes('Not supported') &&
+        c.includes('\x1b[100m') &&
+        c.includes('\x1b[41m')
+    )
+  })
+
   test('bare recall without slash is Not supported, not a command', async () => {
     const { stdin, frames } = await renderInkWhenCommandLineReady(
       <InteractiveCliApp />
@@ -78,31 +103,7 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
         c.includes('\x1b[41m')
     )
 
-    const combined = frames.join('\n')
-    expect(combined).toContain('recall')
-    expect(combined).toContain('Not supported')
-    expect(combined).not.toContain('Recalling')
-  })
-
-  test('plain committed line records user message and Not supported', async () => {
-    const { stdin, frames } = await renderInkWhenCommandLineReady(
-      <InteractiveCliApp />
-    )
-
-    stdin.write('hello\r')
-    await waitForFrames(
-      () => frames.join('\n'),
-      (c) =>
-        c.includes('hello') &&
-        c.includes('Not supported') &&
-        c.includes('\x1b[100m') &&
-        c.includes('\x1b[41m')
-    )
-
-    const combined = frames.join('\n')
-    expect(combined).toContain('hello')
-    expect(combined).toContain('Not supported')
-    expect(combined).toContain('\x1b[100m')
+    expect(frames.join('\n')).not.toContain('Recalling')
   })
 
   test('unknown slash command records user line and unsupported command', async () => {
@@ -120,10 +121,7 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
         c.includes('\x1b[41m')
     )
 
-    const combined = frames.join('\n')
-    expect(combined).toContain('/no-such-command')
-    expect(combined).toContain('unsupported command')
-    expect(combined).not.toContain('Not supported')
+    expect(frames.join('\n')).not.toContain('Not supported')
   })
 
   test('submitting /exit as one chunk line+CR records it in output', async () => {
@@ -131,25 +129,15 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
       <InteractiveCliApp />
     )
 
-    function lastFrameWithFarewell(): string {
-      for (let i = frames.length - 1; i >= 0; i--) {
-        if (stripAnsi(frames[i] ?? '').includes('Bye.')) {
-          return frames[i] ?? ''
-        }
-      }
-      return frames.at(-1) ?? ''
-    }
-
     stdin.write('/exit\r')
     await waitForFrames(
-      () => stripAnsi(lastFrameWithFarewell()),
+      () => stripAnsi(lastFrameWithFarewell(frames)),
       (f) => f.includes('Bye.')
     )
 
-    const farewellFrame = lastFrameWithFarewell()
+    const farewellFrame = lastFrameWithFarewell(frames)
     const plain = stripAnsi(farewellFrame)
     expect(plain).toContain('/exit')
-    expect(plain).toContain('Bye.')
     expect(
       frames.some(
         (f) => stripAnsi(f).includes('/exit') && f.includes('\x1b[100m')
@@ -175,7 +163,7 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
     ).toBe(false)
 
     await waitTurnsWithoutRepaint(
-      () => stripAnsi(lastFrameWithFarewell()),
+      () => stripAnsi(lastFrameWithFarewell(frames)),
       farewellFollowedByCommandPrompt
     )
   })
@@ -191,22 +179,10 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
       (c) => c.includes('exit') && c.includes('Bye.') && c.includes('\x1b[100m')
     )
 
-    const combined = frames.join('\n')
-    expect(combined).toContain('Bye.')
     expect(
-      farewellFollowedByCommandPrompt(stripAnsi(combined)),
+      farewellFollowedByCommandPrompt(stripAnsi(frames.join('\n'))),
       'bare exit must not leave a live command prompt after Bye.'
     ).toBe(false)
-
-    const snapshot =
-      [...frames].reverse().find((f) => {
-        const lines = stripAnsi(f).split('\n')
-        return lines.some((l) => l.trim() === 'exit')
-      }) ?? ''
-    expect(snapshot).toMatch(/\S/)
-    const lines = stripAnsi(snapshot).split('\n')
-    const userIdx = lines.findIndex((l) => l.trim() === 'exit')
-    expect(userIdx).toBeGreaterThanOrEqual(0)
   })
 
   test('submitting /exit character by character records it in output', async () => {
@@ -231,10 +207,5 @@ describe('InteractiveCliApp (ink-testing-library)', () => {
       (c) =>
         c.includes('/exit') && c.includes('Bye.') && c.includes('\x1b[100m')
     )
-
-    const combined = frames.join('\n')
-    expect(combined).toContain('/exit')
-    expect(combined).toContain('Bye.')
-    expect(combined).toContain('\x1b[100m')
   })
 })
