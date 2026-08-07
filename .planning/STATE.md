@@ -25,15 +25,13 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-- Idle (no active milestone).
-- Optional resume: `.planning/quick/004-e2e-authoring-improvement/` (in progress — phases 1–13 done, next 14).
+Idle (no active milestone or quick plan).
 
 ## Deferred Items
 
 | Category | Item | Status |
 |----------|------|--------|
 | backlog | 999.1 Learning with help from a teacher | parking lot — promote via `/gsd-review-backlog` |
-| quick_task | 004-e2e-authoring-improvement | in progress — resume by choice |
 | seed | SEED-001-mcq-fuzzy-notebook-title-spelling-match | dormant |
 | seed | SEED-002-host-mcp-over-https | dormant |
 | tech_debt | OpenAPI/`outgoingLinks`/`linkText` glossary rename (ADR 0001) | open |
@@ -42,4 +40,4 @@ See: `.planning/PROJECT.md`
 
 ## Session Continuity
 
-`/gsd-new-milestone`, resume 004, or a new quick.
+Next: `/gsd-new-milestone` or a new quick task when ready.
