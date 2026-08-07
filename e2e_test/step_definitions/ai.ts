@@ -134,8 +134,8 @@ Given('OpenAI evaluates the question as not legitimate', () => {
   })
 })
 
-Then('I contest the question', () => {
-  cy.findByRole('button', { name: "Doesn't make sense?" }).click()
+When('I contest the question', () => {
+  start.assumeQuestionPage().contestQuestion()
 })
 
 Given('OpenAI will reply below for user messages:', (data: DataTable) => {
@@ -165,7 +165,7 @@ Given(
   }
 )
 
-Then('I should see the suggested completion in the chat dialog', () => {
+Then('I should see the suggested completion', () => {
   start.assumeConversationAboutNotePage().shouldShowCompletion()
 })
 

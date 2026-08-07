@@ -1,12 +1,14 @@
-Feature: feature toggle
-  As a developer or Product Owner, I want to toggle some feature off in production by default,
-  so that the end-user won't see the unfinished feature.
+Feature: Feature toggle
+  As a developer or Product Owner, I want unfinished features hidden by default in production,
+  so that end users do not see them until the toggle is turned on.
 
   @featureToggle
-  Scenario: A scenario with feature toggle should toggle the feature
-    Then The "Feature Toggle is On" alert "should exist"
+  Scenario: Feature toggle on shows the unfinished feature indicator
+    When I visit the home page
+    Then I should see the unfinished feature indicator
 
-  Scenario: A scenario without feature toggle should toggle the feature off
-    Then The "Feature Toggle is On" alert "should not exist"
-    When I go to the testability page to turn on the feature toggle
-    Then The "Feature Toggle is On" alert "should exist"
+  Scenario: Feature toggle off hides the indicator until turned on
+    When I visit the home page
+    Then I should not see the unfinished feature indicator
+    When I turn on the feature toggle
+    Then I should see the unfinished feature indicator

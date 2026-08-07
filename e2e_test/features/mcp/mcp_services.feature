@@ -9,12 +9,11 @@ Feature: MCP (Model Context Protocol) Services
     And I have a valid Doughnut Access Token with label "For MCP services"
     And I connect to an MCP client that connects to Doughnut MCP service
     And I have a notebook "CS concepts" with notes:
-      | Title                | Folder               |
-      | Programming Concepts |                      |
-      | Object Oriented      | Programming Concepts |
-      | Functional           | Programming Concepts |
+      | Title           | Folder               |
+      | Object Oriented | Programming Concepts |
+      | Functional      | Programming Concepts |
 
-  Scenario Outline: AI agent learns from Doughnut via MCP client
+  Scenario Outline: AI agent finds relevant notes via MCP
     When AI agent searches for relevant notes using MCP tool with the term "<search_term>"
     Then the response should contain "<note_title>"
 
@@ -24,7 +23,7 @@ Feature: MCP (Model Context Protocol) Services
       | Functional      | Functional              |
       | Fiona           | No relevant note found. |
 
-  Scenario Outline: AI agent respects different token limits for graph retrieval
+  Scenario Outline: AI agent respects token limits when retrieving a note graph
     When AI agent searches for relevant notes using MCP tool with the term "Functional"
     Then the response should contain "Functional"
     When AI agent extracts note ID and calls get graph MCP tool with token limit "<token_limit>"

@@ -1,11 +1,12 @@
-Feature: failure report
-  As a developer, I want to see the failure report when there is an exception,
-  so that I can investigate the root cause of the exception.
+Feature: Failure report
+  As a developer, I want exceptions recorded in the failure report so I can investigate the root cause.
 
-  Scenario: exception should be reported
+  Scenario: Exception appears in the failure report
     When Someone triggered an exception
     Then an admin should see "RuntimeException" in the failure report
-    And each item in the failure report should have a checkbox
-    When I check the checkbox for the failure report item
-    And I click the delete button
+
+  Scenario: Admin clears a failure report item
+    Given Someone triggered an exception
+    And an admin is viewing the failure report
+    When I clear the selected failure report item
     Then the failure report should be empty

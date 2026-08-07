@@ -26,7 +26,7 @@ import {
 import { assumeAudioTools } from './pageObjects/audioToolsPage'
 import { assumeBazaarPage, navigateToBazaar } from './pageObjects/bazaarPage'
 import { assumeCirclePage, navigateToCircle } from './pageObjects/circlePage'
-import { assumeHomePage } from './pageObjects/homePage'
+import { assumeHomePage, visitHomePage } from './pageObjects/homePage'
 import { assumeConversationAboutNotePage } from './pageObjects/conversationAboutNotePage'
 import { mainMenu } from './pageObjects/mainMenu'
 import { mcpAgentActions } from './pageObjects/mcpAgentActions'
@@ -71,6 +71,7 @@ const start = {
   assumeAudioTools,
   assumeCirclePage,
   assumeHomePage,
+  visitHomePage,
   assumeConversationAboutNotePage,
   assumeMessageCenterPage,
   assumeNotePage,

@@ -3,8 +3,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
-import { clickDaisyDialogButton } from '../support/daisyModalHelpers'
+import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 
 When('Someone triggered an exception', () => {
@@ -21,35 +20,30 @@ Then(
   }
 )
 
-Then('each item in the failure report should have a checkbox', () => {
-  cy.get('.daisy-card').find('input[type="checkbox"]').should('exist')
+Given('an admin is viewing the failure report', () => {
+  start.loginAsAdminAndGoToAdminDashboard().goToFailureReportList()
 })
 
-When('I check the checkbox for the failure report item', () => {
-  cy.get('.daisy-card').find('input[type="checkbox"]').first().check()
-})
-
-When('I click the delete button', () => {
-  cy.get('button').contains('Delete Selected').click()
-  clickDaisyDialogButton('dialog.daisy-modal', 'Delete')
+When('I clear the selected failure report item', () => {
+  start.assumeAdminDashboardPage().goToFailureReportList().clearSelected()
 })
 
 Then('the failure report should be empty', () => {
-  cy.findByText('All Clear!').should('exist')
+  start.assumeAdminDashboardPage().goToFailureReportList().shouldBeEmpty()
 })
 
-Then(
-  'The {string} alert {string}',
-  (expectedContent: string, shouldExistOrNot: string) => {
-    cy.visit('/')
-    cy.contains('Welcome')
-    cy.contains(expectedContent).should(
-      shouldExistOrNot === 'should exist' ? 'exist' : 'not.exist'
-    )
-  }
-)
+When('I visit the home page', () => {
+  start.visitHomePage()
+})
 
-When('I go to the testability page to turn on the feature toggle', () => {
-  cy.get('button[title="Testability"]').click()
-  start.form.getField('Feature Toggle').click()
+Then('I should see the unfinished feature indicator', () => {
+  start.assumeHomePage().expectUnfinishedFeatureIndicator()
+})
+
+Then('I should not see the unfinished feature indicator', () => {
+  start.assumeHomePage().expectNoUnfinishedFeatureIndicator()
+})
+
+When('I turn on the feature toggle', () => {
+  start.assumeHomePage().turnOnFeatureToggle()
 })

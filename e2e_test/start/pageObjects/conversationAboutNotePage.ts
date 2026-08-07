@@ -78,8 +78,12 @@ export class ConversationAboutNotePage {
     cy.findByRole('dialog')
       .should('be.visible')
       .within(() => {
-        // Check that the completion dialog contains diff content
-        cy.get('.completion-text').should('be.visible')
+        cy.get('.completion-text').should(($el) => {
+          expect(
+            $el.is(':visible'),
+            'Expected suggested note content completion to be visible'
+          ).to.be.true
+        })
       })
     return this
   }
@@ -88,6 +92,7 @@ export class ConversationAboutNotePage {
     cy.findByRole('dialog').within(() => {
       cy.findByRole('button', { name: 'Accept' }).click()
     })
+    waitUntilAppIsNotBusy()
     return this
   }
 
@@ -95,6 +100,7 @@ export class ConversationAboutNotePage {
     cy.findByRole('dialog').within(() => {
       cy.findByRole('button', { name: 'Cancel' }).click()
     })
+    waitUntilAppIsNotBusy()
     return this
   }
 

@@ -39,6 +39,11 @@ const assumeQuestionPage = (stem?: string) => {
       cy.get('[data-test="answered-overlay"]').should('not.exist')
       return this
     },
+    contestQuestion() {
+      cy.findByRole('button', { name: "Doesn't make sense?" }).click()
+      waitUntilAppIsNotBusy()
+      return this
+    },
   }
 }
 

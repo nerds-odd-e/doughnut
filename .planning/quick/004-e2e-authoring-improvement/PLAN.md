@@ -228,16 +228,14 @@ Improve all E2E feature files (and supporting steps/page objects as needed) so t
 
 ### Phase 17 — MCP, AI-generated, and testability E2E authoring
 
-**Status:** planned  
+**Status:** done  
 **Type:** Behavior
 
-- **Pre:** Remaining feature folders may violate checklist.
-- **Trigger:** Audit + improve.
-- **Post:** Checklist satisfied; Cypress green.
+- Domain Gherkin; MCP graph `noteSearchResult`; contest/completion busy waits; feature-toggle on home PO; failure-report clear consolidated.
 
 **Files:** `mcp/mcp_services.feature`, `ai_generated_content/note_content_completion.feature`, `ai_generated_recall_questions/question_contest.feature`, `testability/feature_toggle.feature`, `testability/show_failure_report.feature`
 
-**Done when:** checklist applied; targeted Cypress passes.
+**Done when:** checklist applied; targeted Cypress passes. ✅ 15/15
 
 ## Out of scope
 
