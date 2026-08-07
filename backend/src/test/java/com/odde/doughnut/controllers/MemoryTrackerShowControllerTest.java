@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.MemoryTracker;
+import com.odde.doughnut.entities.MemoryTrackerType;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -25,6 +26,19 @@ class MemoryTrackerShowControllerTest extends MemoryTrackerControllerTestBase {
     @Test
     void shouldBeAbleToSeeOwn() throws UnexpectedNoAccessRightException {
       assertThat(controller.showMemoryTracker(tracker), equalTo(tracker));
+    }
+
+    @Test
+    void ordinaryTrackerDefaultsToUnderstandingType() throws UnexpectedNoAccessRightException {
+      MemoryTracker shown = controller.showMemoryTracker(tracker);
+      assertThat(shown.getType(), equalTo(MemoryTrackerType.UNDERSTANDING));
+    }
+
+    @Test
+    void spellingTrackerHasSpellingType() throws UnexpectedNoAccessRightException {
+      MemoryTracker spellingTracker = makeMe.aMemoryTrackerFor(ownedNote()).spelling().please();
+      MemoryTracker shown = controller.showMemoryTracker(spellingTracker);
+      assertThat(shown.getType(), equalTo(MemoryTrackerType.SPELLING));
     }
 
     @Test

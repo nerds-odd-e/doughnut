@@ -611,6 +611,7 @@ export type MemoryTracker = {
     forgettingCurveIndex?: number;
     removedFromTracking?: boolean;
     spelling?: boolean;
+    type?: 'UNDERSTANDING' | 'SPELLING' | 'COMMISSIONED';
     propertyKey?: string;
     recalledNote?: RecalledNote;
 };
@@ -1175,6 +1176,7 @@ export type MemoryTrackerWritable = {
     forgettingCurveIndex?: number;
     removedFromTracking?: boolean;
     spelling?: boolean;
+    type?: 'UNDERSTANDING' | 'SPELLING' | 'COMMISSIONED';
     propertyKey?: string;
     recalledNote?: RecalledNote;
 };

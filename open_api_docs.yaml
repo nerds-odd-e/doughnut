@@ -4264,6 +4264,12 @@ components:
           type: boolean
         spelling:
           type: boolean
+        type:
+          type: string
+          enum:
+          - UNDERSTANDING
+          - SPELLING
+          - COMMISSIONED
         propertyKey:
           type: string
         recalledNote:

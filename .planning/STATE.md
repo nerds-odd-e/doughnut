@@ -4,17 +4,17 @@ milestone: v1.3
 milestone_name: Commissioned Learning Session MVP
 current_phase: 1
 current_phase_name: Commissioned tracker model
-status: planned
-last_updated: "2026-08-07T14:06:38.530Z"
+status: paused
+last_updated: "2026-08-07T14:25:00.000Z"
 last_activity: 2026-08-07
-last_activity_desc: Phase 1 PLAN/VALIDATION/RESEARCH revised for checker issues
+last_activity_desc: Quick 006 Phase 1 done — type column + backfill + dual-write
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 2
   completed_plans: 0
   percent: 0
-stopped_at: null
+stopped_at: "Unique-key / commissioned representation — superseded by type enum"
 ---
 
 # Project State
@@ -25,10 +25,11 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-Phase: 1 — Commissioned tracker model (Structure)
-Plan: 01-01 (Wave 1) → 01-02 (Wave 2)
-Status: Planned — plans revised after checker; ready to re-check / execute
-Last activity: 2026-08-07 — Phase 1 PLAN/VALIDATION/RESEARCH revised for checker issues
+**Active ad-hoc:** `.planning/quick/006-memory-tracker-type/PLAN.md`
+- Phase 1 done (type column + backfill + dual-write)
+- Next: Phase 2 (domain code uses `type`)
+
+Milestone Phase 1 (boolean `commissioned`) remains **paused / to replan** after 006.
 
 ## Deferred Items
 
@@ -43,6 +44,4 @@ Last activity: 2026-08-07 — Phase 1 PLAN/VALIDATION/RESEARCH revised for check
 
 ## Session Continuity
 
-Phase 1 plans: `01-01-PLAN.md` (tracer + unique-key checkpoint → `01-UNIQUE-KEY-DECISION.md`), `01-02-PLAN.md` (join/batch assertion/ERD/SC1 unit gate).
-RESEARCH Open Questions Q1/Q2 RESOLVED (leave recent lists unfiltered; keep `user_note_spelling_active` name).
-Next: `/gsd-execute-phase 1` (Wave 1 starts with blocking unique-key decision).
+Continue execute-plan on quick 006 Phase 2 → 3. Then replan GSD Phase 1 for `type=COMMISSIONED`.

@@ -7,6 +7,8 @@ import com.odde.doughnut.utils.TimestampOperations;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -82,13 +84,29 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
 
   @Column(name = "spelling")
   @Getter
-  @Setter
   private Boolean spelling = false;
+
+  @Column(name = "type")
+  @Enumerated(EnumType.STRING)
+  @Getter
+  private MemoryTrackerType type = MemoryTrackerType.UNDERSTANDING;
 
   @Column(name = "property_key")
   @Getter
   @Setter
   private String propertyKey = "";
+
+  public void setSpelling(Boolean spelling) {
+    setType(
+        Boolean.TRUE.equals(spelling)
+            ? MemoryTrackerType.SPELLING
+            : MemoryTrackerType.UNDERSTANDING);
+  }
+
+  public void setType(MemoryTrackerType type) {
+    this.type = type == null ? MemoryTrackerType.UNDERSTANDING : type;
+    this.spelling = this.type == MemoryTrackerType.SPELLING;
+  }
 
   /**
    * JPQL fragment for joined alias {@code rp}; must stay aligned with {@link
