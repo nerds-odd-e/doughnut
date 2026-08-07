@@ -24,11 +24,18 @@ export const manageAccessTokensPage = () => {
       waitUntilAppIsNotBusy()
       return this
     },
-    checkTokenWithLabelNotExists(label: string) {
+    expectTokenWithLabelNotListed(label: string) {
       cy.findByText(label).should('not.exist')
+      return this
     },
-    checkTokenWithLabelExists(label: string) {
-      cy.findByText(label).should('exist')
+    expectTokenWithLabelListed(label: string) {
+      cy.contains(label).should(($el) => {
+        expect(
+          $el.text().trim(),
+          `Expected token label "${label}" to be listed`
+        ).to.equal(label)
+      })
+      return this
     },
   }
 }

@@ -1,12 +1,11 @@
 Feature: Access control
 
-  Scenario Outline: Only Admins can see failure report page
+  Scenario Outline: Only admins can open failure reports
     Given I am logged in as "<user>"
-    When I visit the falure reports on the admin page
-    Then The "<displayed page>" page is displayed
+    When I open the failure reports
+    Then the failure reports access outcome is "<outcome>"
     Examples:
-      | user      | displayed page    |
-      | none      | LoginPage         |
-      | admin     | FailureReportPage |
-      | non_admin | ErrorPage         |
-
+      | user      | outcome          |
+      | none      | sign in          |
+      | admin     | failure reports  |
+      | non_admin | access denied    |

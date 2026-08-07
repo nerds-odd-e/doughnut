@@ -20,6 +20,15 @@ function removeNotebookFromBazaarTableRow(notebook: string) {
   waitUntilAppIsNotBusy()
 }
 
+function modelManagement() {
+  return {
+    chooseModel(model: string, task: string) {
+      submittableForm.submitWith({ [task]: model })
+      return this
+    },
+  }
+}
+
 export function assumeAdminDashboardPage() {
   return {
     goToFailureReportList() {
@@ -45,6 +54,35 @@ export function assumeAdminDashboardPage() {
       }
     },
 
+    openFailureReports() {
+      cy.on('uncaught:exception', () => false)
+      const tab = ADMIN_DASHBOARD_TAB_QUERY['Failure Reports']
+      cy.visit(`/admin-dashboard?tab=${tab}`)
+      waitUntilAppIsNotBusy()
+      return this
+    },
+
+    expectFailureReportsAccessOutcome(outcome: string) {
+      switch (outcome) {
+        case 'sign in':
+          cy.contains('Please sign in').should('be.visible')
+          break
+        case 'failure reports':
+          cy.get('h2').should('contain', 'Failure Reports')
+          break
+        case 'access denied':
+          cy.findByText('It seems you cannot access this page.').should(
+            'be.visible'
+          )
+          break
+        default:
+          throw new Error(
+            `Unknown failure reports access outcome: "${outcome}"`
+          )
+      }
+      return this
+    },
+
     openAdminDashboardTab(tabName: string) {
       const tab = ADMIN_DASHBOARD_TAB_QUERY[tabName]
       if (!tab) {
@@ -54,6 +92,10 @@ export function assumeAdminDashboardPage() {
       cy.location('search').should('include', `tab=${tab}`)
       waitUntilAppIsNotBusy()
       return this
+    },
+
+    openBazaarAdminList() {
+      return this.openAdminDashboardTab('Manage Bazaar')
     },
 
     goToTabInAdminDashboard(tabName: string) {
@@ -73,11 +115,7 @@ export function assumeAdminDashboardPage() {
 
     goToModelManagement() {
       this.openAdminDashboardTab('Manage Models')
-      return {
-        chooseModel(model: string, task: string) {
-          submittableForm.submitWith({ [task]: model })
-        },
-      }
+      return modelManagement()
     },
 
     expectBazaarAdminNotebooks(notebooks: string) {
@@ -87,7 +125,12 @@ export function assumeAdminDashboardPage() {
       const expected = commonSenseSplit(notebooks, ',')
       cy.get('[data-testid="manage-bazaar-table"] tbody tr', {
         timeout: 15000,
-      }).should('have.length', expected.length)
+      }).should(($rows) => {
+        expect(
+          $rows.length,
+          `Expected bazaar admin list to have ${expected.length} notebook(s) [${expected.join(', ')}], but found ${$rows.length}`
+        ).to.equal(expected.length)
+      })
       for (const name of expected) {
         cy.get('[data-testid="manage-bazaar-table"] tbody tr')
           .contains('a', name)

@@ -149,31 +149,27 @@ Improve all E2E feature files (and supporting steps/page objects as needed) so t
 
 ### Phase 11 — Circles and relationships E2E authoring
 
-**Status:** planned  
+**Status:** done
 **Type:** Behavior
 
-- **Pre:** Circles/relationships features may violate checklist.
-- **Trigger:** Audit + improve.
-- **Post:** Checklist satisfied; Cypress green.
+- Domain Gherkin; “wiki link or relationship” connect wording; dropped presentation-only circle catalog check. (Landed with Phase 10 wrap-up commit due to parallel agents.)
 
 **Files:** `circles/creating_circles.feature`, `circles/notebooks_in_circles.feature`, `relationships/add_relationship.feature`, `relationships/relationship_edit_and_remove.feature`
 
-**Done when:** checklist applied; targeted Cypress passes.
+**Done when:** checklist applied; targeted Cypress passes. ✅ 18/18
 
 ---
 
 ### Phase 12 — Users and admin E2E authoring
 
-**Status:** planned  
+**Status:** done  
 **Type:** Behavior
 
-- **Pre:** Users/admin features may violate checklist.
-- **Trigger:** Audit + improve.
-- **Post:** Checklist satisfied; Cypress green.
+- Domain Gherkin; missing AI-model Then; admin tab open via PO; failure-report steps in `admin.ts`.
 
 **Files:** `users/account_control.feature`, `users/new_user.feature`, `users/user_access_token.feature`, `users/user_profile.feature`, `user_admin/manage_ai_models.feature`, `user_admin/manage_bazaar.feature`
 
-**Done when:** checklist applied; targeted Cypress passes.
+**Done when:** checklist applied; targeted Cypress passes. ✅ 9/9
 
 ---
 

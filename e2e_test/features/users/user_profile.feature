@@ -1,9 +1,8 @@
-Feature: user profile
+Feature: User profile
 
   Background:
     Given I am logged in as an existing user
 
-  Scenario: Edit user profile
-    When I edit user profile to change my name to "Barbie"
-    Then My name "Barbie" is in the user action menu
-
+  Scenario: Change display name
+    When I change my display name to "Barbie"
+    Then my display name "Barbie" is shown in the account menu

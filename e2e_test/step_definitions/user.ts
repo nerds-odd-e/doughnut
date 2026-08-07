@@ -29,11 +29,11 @@ Given('I am logged in as an existing user', () => {
   start.loginAs('old_learner')
 })
 
-Given('I am logged in as an admin', (_tabName: string) => {
+Given('I am logged in as an admin', () => {
   start.loginAsAdmin()
 })
 
-Given('I am re-logged in as an admin', (_tabName: string) => {
+Given('I am re-logged in as an admin', () => {
   start.reloginAsAdmin()
 })
 
@@ -41,7 +41,7 @@ Given('my session is logged out', () => {
   return start.waitUntilAppIsNotBusy().logout()
 })
 
-Given("I'm on the login page", () => {
+Given('I am on the sign-in page', () => {
   cy.visit('/users/identify')
 })
 
@@ -88,9 +88,12 @@ Then(
   }
 )
 
-Then('My name {string} is in the user action menu', (name: string) => {
-  start.mainMenu().userOptions().userSettingsButton(name)
-})
+Then(
+  'my display name {string} is shown in the account menu',
+  (name: string) => {
+    start.mainMenu().userOptions().userSettingsButton(name)
+  }
+)
 
 Then('my daily new notes to assimilate is set to {int}', (number: string) => {
   start
@@ -106,37 +109,7 @@ Then("I haven't login", () => {
   start.logout()
 })
 
-When('I visit the falure reports on the admin page', () => {
-  cy.on('uncaught:exception', () => false)
-  cy.visit('/admin-dashboard')
-  cy.get('body').then(($body) => {
-    const hasFailureReportsTab = $body
-      .find('[role="button"]')
-      .toArray()
-      .some((el) => el.textContent?.trim() === 'Failure Reports')
-    if (hasFailureReportsTab) {
-      cy.findByRole('button', { name: 'Failure Reports' }).click()
-    }
-  })
-})
-
-Then('The {string} page is displayed', (pageName) => {
-  switch (pageName) {
-    case 'LoginPage':
-      cy.contains('Please sign in')
-      break
-    case 'FailureReportPage':
-      cy.get('h2').contains('Failure Reports')
-      break
-    case 'ErrorPage':
-      cy.findAllByText('It seems you cannot access this page.')
-      break
-    default:
-      throw new Error('Deliberate CYPRESS test Failure!!!')
-  }
-})
-
-Then('I edit user profile to change my name to {string}', (name: string) => {
+When('I change my display name to {string}', (name: string) => {
   start.mainMenu().userOptions().userSettings('Old Learner').changeName(name)
 })
 
@@ -177,7 +150,7 @@ When(
   (label: string) => {
     visitManageAccessTokensPage()
       .deleteToken(label)
-      .checkTokenWithLabelNotExists(label)
+      .expectTokenWithLabelNotListed(label)
   }
 )
 
@@ -189,9 +162,6 @@ Given('calling token-info with the Doughnut Access Token succeeds', () => {
   start.mcpApi().getTokenInfo().shouldBeAccepted()
 })
 
-Then(
-  'I can see the token with label {string} in the list of tokens',
-  (label: string) => {
-    visitManageAccessTokensPage().checkTokenWithLabelExists(label)
-  }
-)
+Then('the token with label {string} is listed', (label: string) => {
+  visitManageAccessTokensPage().expectTokenWithLabelListed(label)
+})
