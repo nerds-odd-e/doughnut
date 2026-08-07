@@ -63,4 +63,19 @@ describe("RecallProgressBar potential learning sessions", () => {
     expect(rows[0]!.text()).toContain('"Spanish conversation"')
     expect(rows[1]!.text()).toContain('"Kanji"')
   })
+
+  it("keeps the full long notebook title in the row text", () => {
+    const longTitle =
+      "Advanced Spanish conversation practice for intermediate learners who want to master subjunctive mood"
+    const wrapper = mountBar([
+      {
+        notebookId: 3,
+        notebookName: longTitle,
+        trackerIds: [31],
+      },
+    ])
+    const row = wrapper.find('[data-test="potential-learning-session"]')
+    expect(row.classes()).toContain("break-words")
+    expect(row.text()).toContain(`"${longTitle}"`)
+  })
 })

@@ -66,7 +66,7 @@
         :key="session.notebookId"
         data-test="potential-learning-session"
         role="status"
-        class="text-base font-normal text-base-content"
+        class="text-base font-normal text-base-content break-words"
       >
         1 potential learning session to commission for notebook "{{ session.notebookName }}"
       </div>

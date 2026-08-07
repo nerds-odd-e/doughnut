@@ -25,7 +25,6 @@ Feature: Commissioned learning session
     Then I should see that I have 0 notes to recall
     And I should see 1 potential learning session to commission for notebook "Spanish conversation"
 
-  @wip
   Scenario: Notes from different notebooks are commissioned as separate learning sessions
     Given I have a notebook "Kanji" with notes:
       | Title | Content |
