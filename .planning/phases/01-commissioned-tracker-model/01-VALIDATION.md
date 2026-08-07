@@ -42,7 +42,7 @@ created: 2026-08-07
 | 01-01-T1 | 01 | 1 | SC3 | T-01-02 | Literal `type <> 'COMMISSIONED'` + `@Param` only | unit | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` | ❌ W0 | ⬜ pending |
 | 01-01-T2 | 01 | 1 | SC2 | T-01-03 | UK on type already (006); do not weaken | unit | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` | ✅ | ⬜ pending |
 | 01-02-T1 | 02 | 2 | Phase2-ready queue | T-01-02 | JPQL enum filter, no user concat | unit | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` | ❌ W0 | ⬜ pending |
-| 01-02-T2 | 02 | 2 | Phase2-ready batch | T-01-02 | Literal type filter in batch SQL | unit | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` | ❌ W0 | ⬜ pending |
+| 01-02-T2 | 02 | 2 | Phase2-ready batch | T-01-02 | Literal type filter in batch SQL | unit (`QuestionGenerationBatchCandidateMemoryTrackersTest`) | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` | ❌ W0 | ⬜ pending |
 | 01-02-T3 | 02 | 2 | SC1 | — | N/A | unit | `CURSOR_DEV=true nix develop -c pnpm backend:verify` | ✅ | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
@@ -53,7 +53,7 @@ created: 2026-08-07
 
 - [ ] `RecallsControllerTests` — due ordinary + due commissioned → `toRepeat` size 1 (SC3)
 - [ ] Assimilation queue — commissioned-only note still unassimilated for ordinary path
-- [ ] `QuestionGenerationBatchLocalPlanningTest` — commissioned due tracker not in planned batch
+- [ ] `QuestionGenerationBatchCandidateMemoryTrackersTest` — commissioned due tracker not in batch candidates
 - [x] `MemoryTrackerBuilder.commissioned()` — already exists (006)
 - [x] Coexistence persist test — already exists
 - [x] Framework / Flyway tip — no new migration; tip `V300000239`

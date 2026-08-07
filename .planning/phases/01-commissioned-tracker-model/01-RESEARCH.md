@@ -174,7 +174,7 @@ backend/src/main/java/com/odde/doughnut/
 backend/src/test/java/com/odde/doughnut/
 ├── controllers/RecallsControllerTests.java
 ├── controllers/AssimilationControllerTests.java  # coexistence already present
-└── services/QuestionGenerationBatchLocalPlanningTest.java
+└── services/QuestionGenerationBatchCandidateMemoryTrackersTest.java
 ```
 
 ### Pattern 1: Native SQL type filter (mirror SPELLING)
@@ -266,7 +266,7 @@ makeMe.aMemoryTrackerFor(note).commissioned().please();
 ### Pitfall 4: Batch candidates pull commissioned IDs
 **What goes wrong:** AI question prep treats commissioned trackers as ordinary due work.
 **Why it happens:** `findBatchQuestionGenerationCandidatesByUser` excludes SPELLING only `[VERIFIED: MemoryTrackerRepository.java:104]`.
-**How to avoid:** Add `AND mt.type <> 'COMMISSIONED'` beside SPELLING filter; assert in `QuestionGenerationBatchLocalPlanningTest`.
+**How to avoid:** Add `AND mt.type <> 'COMMISSIONED'` beside SPELLING filter; assert in `QuestionGenerationBatchCandidateMemoryTrackersTest`.
 **Warning signs:** Planned batch requests include a commissioned tracker id.
 
 ### Pitfall 5: Over-scoping assimilate create logic
@@ -353,17 +353,11 @@ public enum MemoryTrackerType {
 
 **If empty rows were preferred:** A1/A2 are the only planner-facing confirmation items; core filter locations are verified in-repo.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Property target-note gate**
-   - What we know: Target assimilation gate joins note-level trackers without excluding COMMISSIONED `[VERIFIED: NotePropertyIndexRepository.java:19-29]`.
-   - What's unclear: Whether Phase 1 must fix this for Phase 2 stop-safe, or leave until property/commissioned interaction appears.
-   - Recommendation: Include in Phase 1 Wave 2 alongside `NoteRepository.joinMemoryTracker` if cheap (same JPQL pattern); otherwise explicitly defer to Phase 2 with a plan note.
+1. **Property target-note gate** — RESOLVED: Include in Phase 1 Wave 2 (`01-02`) alongside `NoteRepository.joinMemoryTracker` (same JPQL pattern; A2). Planned in `01-02-PLAN.md` T1.
 
-2. **`totalAssimilatedCount` semantics**
-   - What we know: Uses `countByUserNotRemoved` → `byUserIdFrom`.
-   - What's unclear: Whether ordinary “total assimilated” should exclude commissioned before any UI shows potential sessions.
-   - Recommendation: Exclude via `byUserIdFrom` (A1); Phase 3 can refine counts for potential sessions separately.
+2. **`totalAssimilatedCount` semantics** — RESOLVED: Exclude COMMISSIONED via shared `byUserIdFrom` (A1), so `countByUserNotRemoved` / recalling totals stay ordinary-only. Planned in `01-01-PLAN.md` T1. Phase 3 may refine potential-session counts separately.
 
 ## Environment Availability
 
@@ -399,7 +393,7 @@ Step 2.6: tooling is in-repo + Nix; no new external services.
 | SC3 | Due-recall never returns commissioned | unit (controller) | `pnpm backend:test_only` | ❌ Wave 0 — extend `RecallsControllerTests` |
 | SC1 | Existing assimilation/recall suites green | unit (full backend) | `pnpm backend:verify` | ✅ existing suites |
 | Phase2-ready | Commissioned-only note still in ordinary assimilation queue | unit | `pnpm backend:test_only` | ❌ Wave 0 — AssimilationControllerTests / AssimilationService test |
-| Phase2-ready | Batch planning excludes due commissioned | unit | `pnpm backend:test_only` | ❌ Wave 0 — `QuestionGenerationBatchLocalPlanningTest` |
+| Phase2-ready | Batch planning excludes due commissioned | unit | `pnpm backend:test_only` | ❌ Wave 0 — `QuestionGenerationBatchCandidateMemoryTrackersTest` |
 | — | E2E | — | N/A for Structure unless product path touched | — |
 
 ### Sampling Rate
@@ -410,7 +404,7 @@ Step 2.6: tooling is in-repo + Nix; no new external services.
 ### Wave 0 Gaps
 - [ ] `RecallsControllerTests` — due ordinary + due commissioned → `toRepeat` size 1 (SC3)
 - [ ] Assimilation queue assertion — commissioned-only note still unassimilated for ordinary path
-- [ ] `QuestionGenerationBatchLocalPlanningTest` — commissioned due tracker not in planned batch
+- [ ] `QuestionGenerationBatchCandidateMemoryTrackersTest` — commissioned due tracker not in planned batch
 - [x] `MemoryTrackerBuilder.commissioned()` — already exists
 - [x] Coexistence persist test — already exists
 - [x] Framework / Flyway tip — no new migration; tip `V300000239`
