@@ -8,30 +8,21 @@ import noteCreationForm from '../start/pageObjects/forms/noteCreationForm'
 import { assumeAssociateWikidataDialog } from '../start/pageObjects/associateWikidataDialog'
 
 When(
-  'I associate the note {string} with wikidata id {string}',
-  (title: string, wikiID: string) => {
+  'I associate the note {string} with Wikidata ID {string}',
+  (title: string, wikidataId: string) => {
     const page = start.jumpToNotePage(title)
-    page.associateWikidataDialog().associate(wikiID)
+    page.associateWikidataDialog().associate(wikidataId)
     page.flushPendingContentSave()
   }
 )
 
 When(
-  'I change the note {string} to associate with wikidata id {string}',
-  (title: string, wikiID: string) => {
-    const page = start.jumpToNotePage(title)
-    page.associateWikidataDialog().associate(wikiID)
-    page.flushPendingContentSave()
-  }
-)
-
-When(
-  'I need to confirm the association with different label {string}',
-  (wikidataTitle: string) => {
-    assumeAssociateWikidataDialog().confirmAssociationWithDifferentLabel(
-      wikidataTitle
+  'I confirm the association using the suggested title {string}',
+  (suggestedTitle: string) => {
+    assumeAssociateWikidataDialog().confirmAssociationWithSuggestedTitle(
+      suggestedTitle
     )
-    start.assumeNotePage(wikidataTitle).flushPendingContentSave()
+    start.assumeNotePage(suggestedTitle).flushPendingContentSave()
   }
 )
 
@@ -69,26 +60,26 @@ Given(
   }
 )
 
-Given('The wikidata service is not available', () => {
+Given('The Wikidata service is not available', () => {
   // The service should be mocked, but no stubbing is done
 })
 
 Then(
-  'I should see an error {string} on Wikidata Id in note creation',
+  'I should see the error {string} on Wikidata ID when creating a note',
   (message: string) => {
     noteCreationForm.wikidataSearch().expectErrorOnWikidataId(message)
   }
 )
 
 Then(
-  'I should see an error {string} on Wikidata Id in association',
+  'I should see the error {string} on Wikidata ID when associating',
   (message: string) => {
     assumeAssociateWikidataDialog().expectErrorOnWikidataId(message)
   }
 )
 
 Then(
-  'the Wiki association of note {string} should link to {string}',
+  'the Wikidata association of note {string} should link to {string}',
   (noteTitle: string, associationUrl: string) => {
     start
       .jumpToNotePage(noteTitle, true)
@@ -97,7 +88,7 @@ Then(
 )
 
 Then(
-  'the Wiki association on the current note should link to {string}',
+  'the Wikidata association on the current note should link to {string}',
   (associationUrl: string) => {
     start.assumeNotePage().expectWikidataBrowseLinkOpensUrl(associationUrl)
   }
@@ -110,28 +101,21 @@ Given(
   }
 )
 
-When('I search with phrase {string} on Wikidata', (phrase: string) => {
+When('I search Wikidata for {string}', (phrase: string) => {
   noteCreationForm.searchWikidata(phrase)
 })
 
 When(
-  'I select wikidataID {string} from the Wikidata search result',
-  (wikidataID: string) => {
-    assumeAssociateWikidataDialog().selectResult(wikidataID)
+  'I select Wikidata ID {string} from the search results',
+  (wikidataId: string) => {
+    assumeAssociateWikidataDialog().selectResult(wikidataId)
   }
 )
 
-Then('I should see that the Title becomes {string}', (value: string) => {
+Then('the note creation Title should be {string}', (value: string) => {
   start.form.getField('Title').shouldHaveValue(value)
 })
 
-Then('I should see that the Wikidata Id becomes {string}', (value: string) => {
+Then('the note creation Wikidata ID should be {string}', (value: string) => {
   noteCreationForm.wikidataSearch().expectWikidataIdValue(value)
 })
-
-Then(
-  'a map pointing to lat: {string}, lon: {string} is added to the note',
-  (latitude: string, longitude: string) => {
-    cy.findByText(`Location: ${latitude}'N, ${longitude}'E`)
-  }
-)

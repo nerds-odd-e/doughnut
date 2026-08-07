@@ -1,6 +1,5 @@
-Feature: Note creation should have content if wikidata is a person
-  As a learner, I want to to create a note. If the note is a person I want the birthday and country
-  to be included in the content of the new note.
+Feature: Create person notes from Wikidata
+  As a learner, I want a person note from Wikidata to include birthday and country of origin.
 
   Background:
     Given I am logged in as an existing user
@@ -14,11 +13,11 @@ Feature: Note creation should have content if wikidata is a person
 
   @usingMockedWikidataService
   @skipOptimizationDueToKnownNecessarySlowness
-  Scenario Outline: Create a note for a person with wikidata should auto fill the content
-    When I create a note with title "<person name>" and wikidata id "<Wikidata Id>" in the notebook "Notable people"
+  Scenario Outline: Creating a person note from Wikidata fills birthday and country
+    When I create a note titled "<person name>" with Wikidata ID "<Wikidata ID>" in the notebook "Notable people"
     Then the note content on the current page should be "<expected content>"
 
     Examples:
-      | person name     | Wikidata Id | expected content         |
+      | person name     | Wikidata ID | expected content         |
       | Wang Chien-ming | Q706446     | Taiwan, 31 March 1980    |
       | Confucius       | Q4604       | Lu, 09 October 0553 B.C. |

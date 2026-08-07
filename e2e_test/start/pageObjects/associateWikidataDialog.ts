@@ -1,4 +1,5 @@
 import { form } from '../forms'
+import { waitUntilAppIsNotBusy } from '../pageBase'
 
 export const assumeAssociateWikidataDialog = () => {
   cy.findByText('Associate Wikidata').should('be.visible')
@@ -10,11 +11,11 @@ export const assumeAssociateWikidataDialog = () => {
   }
 
   return {
-    // Actions - Input/Selection
-    associate(wikiID: string) {
+    associate(wikidataId: string) {
       withinModalContainer(() => {
-        form.getField('Wikidata Id').assignValue(wikiID).type('{enter}')
+        form.getField('Wikidata Id').assignValue(wikidataId).type('{enter}')
       })
+      waitUntilAppIsNotBusy()
       return this
     },
     setWikidataId(wikidataId: string) {
@@ -23,35 +24,32 @@ export const assumeAssociateWikidataDialog = () => {
       })
       return this
     },
-    selectResult(wikidataID: string) {
+    selectResult(wikidataId: string) {
       withinModalContainer(() => {
-        cy.get(`[data-wikidata-id="${wikidataID}"]`)
+        cy.get(`[data-wikidata-id="${wikidataId}"]`)
           .should('be.visible')
           .click()
       })
+      waitUntilAppIsNotBusy()
       return this
     },
-    confirmAssociationWithDifferentLabel(wikidataTitle: string) {
+    confirmAssociationWithSuggestedTitle(suggestedTitle: string) {
       withinModalContainer(() => {
-        // Wait for title-choice controls and check the suggested label is visible
         cy.findByText(/Suggested Title:/)
           .should('be.visible')
-          .should('contain.text', wikidataTitle)
-        // Select "Replace title" option - this will immediately save and close the dialog
+          .should('contain.text', suggestedTitle)
         cy.findByText('Replace title').click()
       })
-      // Dialog should close automatically after selecting Replace title
+      waitUntilAppIsNotBusy()
       return this
     },
     close() {
       withinModalContainer(() => {
         cy.findByRole('button', { name: 'Close' }).click()
       })
-      // Wait for the dialog to fully disappear
       cy.findByText('Associate Wikidata').should('not.exist')
     },
 
-    // Assertions
     expectErrorOnWikidataId(message: string) {
       withinModalContainer(() => {
         form.getField('Wikidata Id').expectError(message)

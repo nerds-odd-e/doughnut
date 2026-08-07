@@ -35,7 +35,7 @@ When(
 )
 
 When(
-  'I create a note with title {string} and wikidata id {string} in the notebook {string}',
+  'I create a note titled {string} with Wikidata ID {string} in the notebook {string}',
   (title: string, wikidataId: string, notebook: string) => {
     mock_services.wikidata().stubWikidataSearchResult(title, wikidataId)
     start
@@ -48,7 +48,7 @@ When(
 )
 
 When(
-  'I attempt to create a note with title {string} and wikidata id {string} in the notebook {string}',
+  'I attempt to create a note titled {string} with Wikidata ID {string} in the notebook {string}',
   (title: string, wikidataId: string, notebook: string) => {
     mock_services.wikidata().stubWikidataSearchResult(title, wikidataId)
     start

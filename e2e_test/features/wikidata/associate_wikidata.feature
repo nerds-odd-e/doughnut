@@ -1,27 +1,26 @@
-Feature: associate wikidata ID to note
-    As a learner, I want to associate my note to wikidata IDs, so that I can
-    * keep my concepts in sync with the rest of the world
-    * get extensive content from Wikidata, Wikipedia and other knowledge base
-    * Identify the duplicate note in my own notebooks and the circles I'm in
+Feature: Associate Wikidata ID to note
+  As a learner, I want to associate my notes with Wikidata IDs, so that I can
+  * keep my concepts in sync with the rest of the world
+  * get extensive content from Wikidata, Wikipedia and other knowledge bases
+  * identify duplicate notes in my notebooks and circles
 
   Background:
     Given I am logged in as an existing user
     And I have a notebook "TDD study" with a note "TDD"
 
   @usingMockedWikidataService
-  Scenario: Associate note to wikidata when the service is not available
-    Given The wikidata service is not available
+  Scenario: Association fails when Wikidata is unavailable
+    Given The Wikidata service is not available
     And Wikidata search result always has "TDD" with ID "Q1"
-    When I associate the note "TDD" with wikidata id "Q1"
-    Then I should see an error "The wikidata service is not available" on Wikidata Id in association
-
+    When I associate the note "TDD" with Wikidata ID "Q1"
+    Then I should see the error "The wikidata service is not available" on Wikidata ID when associating
 
   @usingMockedWikidataService
-  Scenario Outline: Associate note to wikipedia via wikidata
+  Scenario Outline: Associate note with Wikidata linking to Wikipedia when available
     Given Wikidata search result always has "TDD" with ID "<id>"
     And Wikidata.org has an entity "<id>" with label "TDD" and link to wikipedia "<wikipedia link>"
-    When I associate the note "TDD" with wikidata id "<id>"
-    Then the Wiki association of note "TDD" should link to "<expected url>"
+    When I associate the note "TDD" with Wikidata ID "<id>"
+    Then the Wikidata association of note "TDD" should link to "<expected url>"
 
     Examples:
       | id | wikipedia link               | expected url                     |
@@ -30,7 +29,7 @@ Feature: associate wikidata ID to note
 
   @usingRealWikidataService
   @skipOptimizationDueToKnownNecessarySlowness
-  Scenario: Associate note to wikipedia via wikidata using real service
-    When I associate the note "TDD" with wikidata id "Q12345"
-    Then I need to confirm the association with different label "Count von Count"
-    And the Wiki association on the current note should link to "https://en.wikipedia.org/wiki/Count_von_Count"
+  Scenario: Associate note via real Wikidata when labels differ
+    When I associate the note "TDD" with Wikidata ID "Q12345"
+    And I confirm the association using the suggested title "Count von Count"
+    Then the Wikidata association on the current note should link to "https://en.wikipedia.org/wiki/Count_von_Count"

@@ -175,16 +175,14 @@ Improve all E2E feature files (and supporting steps/page objects as needed) so t
 
 ### Phase 13 — Wikidata E2E authoring
 
-**Status:** planned  
+**Status:** done  
 **Type:** Behavior
 
-- **Pre:** Wikidata features may violate checklist.
-- **Trigger:** Audit + improve.
-- **Post:** Checklist satisfied; Cypress green.
+- Domain Gherkin; merged location scenarios; busy waits; `confirmAssociationWithSuggestedTitle` naming.
 
 **Files:** `wikidata/associate_wikidata.feature`, `wikidata/associate_wikidata_person_entries.feature`, `wikidata/associate_wikidata_location_entries.feature`, `wikidata/note_create_with_wikidata_id.feature`
 
-**Done when:** checklist applied; targeted Cypress passes.
+**Done when:** checklist applied; targeted Cypress passes. ✅ 10/10
 
 ---
 

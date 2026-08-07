@@ -174,7 +174,13 @@ export const noteRichPropertyMethods = () => ({
             cy.wrap($btn).click()
             cy.get('@open').should('have.been.called')
             cy.wrap(() => popupWindowStub.location.href)
-              .should((cb) => expect(cb()).equal(expectedUrl))
+              .should((cb) => {
+                const actualUrl = cb()
+                expect(
+                  actualUrl,
+                  `Expected Wikidata association to open ${expectedUrl}, but opened ${actualUrl}`
+                ).to.equal(expectedUrl)
+              })
               .then(() => {
                 expect(popupWindowStub.focus).to.have.been.called
               })
