@@ -24,8 +24,8 @@ test('render from routing JSON substitutes SHA in static rewrites', () => {
   assert.ok(out.includes(`/frontend/${sha}/index.html`))
   assert.ok(out.includes('pathTemplateRewrite:'))
   assert.ok(out.includes('pathTemplateMatch: /**'))
-  // 6 static rewrites with SHA + catch-all pathTemplateRewrite to index.html
-  assert.equal((out.match(new RegExp(sha, 'g')) ?? []).length, 7)
+  // 5 static rewrites with SHA + catch-all pathTemplateRewrite to index.html
+  assert.equal((out.match(new RegExp(sha, 'g')) ?? []).length, 6)
 })
 
 test('render rejects non-hex or wrong length', () => {
