@@ -33,9 +33,9 @@ function overlapWikiLinkTokensFromProperties(
 /**
  * Tokens used for overlap declaration checks: authored `overlaps` only.
  * Wiki-link items under `aliases` do not contribute. Mirrors backend
- * `FrontmatterOverlaps.gradingOverlapWikiLinkTokensFromNoteContent`.
+ * `FrontmatterOverlaps.overlapWikiLinkTokensFromNoteContent`.
  */
-export function gradingOverlapWikiLinkTokensFromNoteContent(
+export function overlapWikiLinkTokensFromNoteContent(
   contentMarkdown: string
 ): string[] {
   const parsed = parseNoteContentMarkdown(contentMarkdown)
@@ -43,7 +43,7 @@ export function gradingOverlapWikiLinkTokensFromNoteContent(
   return overlapWikiLinkTokensFromProperties(parsed.properties)
 }
 
-/** True when `wikiLinkToken` is already among grading overlap tokens. */
+/** True when `wikiLinkToken` is already among authored `overlaps` tokens. */
 export function noteContentDeclaresOverlapWikiLink(
   contentMarkdown: string,
   wikiLinkToken: string
@@ -51,7 +51,7 @@ export function noteContentDeclaresOverlapWikiLink(
   const trimmed = wikiLinkToken.trim()
   if (!trimmed) return false
   const targetKey = normalizedLookupKey(trimmed)
-  return gradingOverlapWikiLinkTokensFromNoteContent(contentMarkdown).some(
+  return overlapWikiLinkTokensFromNoteContent(contentMarkdown).some(
     (existing) => normalizedLookupKey(existing) === targetKey
   )
 }

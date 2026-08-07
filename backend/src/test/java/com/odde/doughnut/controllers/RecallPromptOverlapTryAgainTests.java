@@ -80,7 +80,7 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
             .notebookOwnedBy(currentUser.getUser())
             .rememberSpelling()
             .title("Shared Legacy")
-            .legacyOverlapPartner(partner)
+            .wikiLinkUnderAliasesPartner(partner)
             .please();
 
     AnsweredQuestion result = answerSpelling(ownedSpellingTracker(reviewed), "Shared Legacy");

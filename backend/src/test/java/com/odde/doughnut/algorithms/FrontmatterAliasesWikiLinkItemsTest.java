@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class FrontmatterAliasesWikiLinkOverlapTest {
+class FrontmatterAliasesWikiLinkItemsTest {
 
   @Test
   void fromFrontmatter_returns_only_plain_aliases_when_wiki_link_overlap_declared() {
@@ -49,54 +49,6 @@ class FrontmatterAliasesWikiLinkOverlapTest {
             """);
 
     assertThat(FrontmatterAliases.fromFrontmatter(fm), equalTo(List.of("color", "good")));
-  }
-
-  @Test
-  void overlapWikiLinkTokensFromFrontmatter_returns_wiki_link_tokens_in_order() {
-    Frontmatter fm =
-        Frontmatter.parse(
-            """
-            aliases:
-              - color
-              - "[[Other Note]]"
-              - "[[Shared Notebook:Hue|display]]"
-            """);
-
-    assertThat(
-        FrontmatterAliases.overlapWikiLinkTokensFromFrontmatter(fm),
-        equalTo(List.of("[[Other Note]]", "[[Shared Notebook:Hue|display]]")));
-  }
-
-  @Test
-  void overlapWikiLinkTokensFromFrontmatter_is_empty_when_aliases_absent() {
-    assertThat(
-        FrontmatterAliases.overlapWikiLinkTokensFromFrontmatter(Frontmatter.parse("color: red\n")),
-        equalTo(List.of()));
-  }
-
-  @Test
-  void overlapWikiLinkTokensFromFrontmatter_is_empty_for_empty_alias_list() {
-    assertThat(
-        FrontmatterAliases.overlapWikiLinkTokensFromFrontmatter(Frontmatter.parse("aliases: []\n")),
-        equalTo(List.of()));
-  }
-
-  @Test
-  void overlapWikiLinkTokensFromNoteContent_returns_authored_tokens() {
-    String content =
-        """
-        ---
-        aliases:
-          - color
-          - "[[Other Note]]"
-        ---
-
-        body
-        """;
-
-    assertThat(
-        FrontmatterAliases.overlapWikiLinkTokensFromNoteContent(content),
-        equalTo(List.of("[[Other Note]]")));
   }
 
   @ParameterizedTest

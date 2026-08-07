@@ -39,7 +39,7 @@ import MatchedNoteWikiLinkOrRelationshipOffer from "@/components/recall/MatchedN
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { appendOverlapWikiLinkToNoteContent } from "@/utils/appendOverlapWikiLinkToNoteContent"
 import { buildWikiLinkText } from "@/utils/buildWikiLinkText"
-import { noteContentDeclaresOverlapWikiLink } from "@/utils/gradingOverlapWikiLinkTokens"
+import { noteContentDeclaresOverlapWikiLink } from "@/utils/overlapWikiLinkTokens"
 
 const props = defineProps({
   matchedNotes: {

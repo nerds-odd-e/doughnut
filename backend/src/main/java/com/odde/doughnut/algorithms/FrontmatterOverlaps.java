@@ -46,31 +46,6 @@ public final class FrontmatterOverlaps {
         .orElse(List.of());
   }
 
-  /**
-   * Tokens used for OVERLAP grading: authored {@code overlaps} only. Wiki-link items under {@code
-   * aliases} do not contribute.
-   */
-  public static List<String> gradingOverlapWikiLinkTokensFromNoteContent(String content) {
-    return overlapWikiLinkTokensFromNoteContent(content);
-  }
-
-  /** Merges two wiki-link token lists with normalized dedupe, preserving first-seen order. */
-  static List<String> mergeDedupePreserveOrder(List<String> first, List<String> second) {
-    List<String> out = new ArrayList<>(first.size() + second.size());
-    Set<String> seenNormalized = new HashSet<>();
-    for (String item : first) {
-      if (seenNormalized.add(FrontmatterAliases.normalizedLookupKey(item))) {
-        out.add(item);
-      }
-    }
-    for (String item : second) {
-      if (seenNormalized.add(FrontmatterAliases.normalizedLookupKey(item))) {
-        out.add(item);
-      }
-    }
-    return List.copyOf(out);
-  }
-
   private static Optional<String> authoredValidationErrorForFrontmatter(Frontmatter frontmatter) {
     if (!frontmatter.containsKeyIgnoreCase(OVERLAPS_KEY)) {
       return Optional.empty();
@@ -109,6 +84,13 @@ public final class FrontmatterOverlaps {
   }
 
   private static List<String> dedupePreserveOrder(List<String> items) {
-    return mergeDedupePreserveOrder(items, List.of());
+    List<String> out = new ArrayList<>();
+    Set<String> seenNormalized = new HashSet<>();
+    for (String item : items) {
+      if (seenNormalized.add(FrontmatterAliases.normalizedLookupKey(item))) {
+        out.add(item);
+      }
+    }
+    return List.copyOf(out);
   }
 }

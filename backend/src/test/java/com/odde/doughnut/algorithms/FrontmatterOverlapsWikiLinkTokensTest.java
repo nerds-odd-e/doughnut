@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-class FrontmatterOverlapsGradingTokensTest {
+class FrontmatterOverlapsWikiLinkTokensTest {
 
   @Test
   void overlapWikiLinkTokensFromFrontmatter_returns_overlaps_list_tokens() {
@@ -53,7 +53,7 @@ class FrontmatterOverlapsGradingTokensTest {
   }
 
   @Test
-  void gradingOverlapWikiLinkTokensFromNoteContent_reads_overlaps_only() {
+  void overlapWikiLinkTokensFromNoteContent_reads_overlaps_only() {
     String content =
         """
         ---
@@ -68,7 +68,7 @@ class FrontmatterOverlapsGradingTokensTest {
         """;
 
     assertThat(
-        FrontmatterOverlaps.gradingOverlapWikiLinkTokensFromNoteContent(content),
+        FrontmatterOverlaps.overlapWikiLinkTokensFromNoteContent(content),
         equalTo(List.of("[[Other Note]]")));
   }
 }

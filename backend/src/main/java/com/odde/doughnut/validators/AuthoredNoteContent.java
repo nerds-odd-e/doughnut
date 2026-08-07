@@ -2,7 +2,6 @@ package com.odde.doughnut.validators;
 
 import com.odde.doughnut.algorithms.FrontmatterAliases;
 import com.odde.doughnut.algorithms.FrontmatterOverlaps;
-import com.odde.doughnut.algorithms.LegacyAliasOverlapMigration;
 import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.exceptions.ApiException;
 
@@ -12,13 +11,11 @@ public final class AuthoredNoteContent {
   private AuthoredNoteContent() {}
 
   /**
-   * Migrates legacy wiki-link items from {@code aliases} into {@code overlaps}, then validates
-   * authored list properties. Returns the (possibly rewritten) content to persist.
+   * Validates authored list properties and returns the content to persist (unchanged when valid).
    */
   public static String prepareContentForSave(String content) {
-    String migrated = LegacyAliasOverlapMigration.migrate(content);
-    assertValidForSave(migrated);
-    return migrated;
+    assertValidForSave(content);
+    return content == null ? "" : content;
   }
 
   /** Validates authored list properties ({@code aliases}, {@code overlaps}) before save. */

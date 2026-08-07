@@ -9,7 +9,7 @@ import java.util.List;
 final class NoteFrontmatterLists {
   private final List<String> plainAliases = new ArrayList<>();
   private final List<String> overlapWikiLinkInners = new ArrayList<>();
-  private final List<String> legacyAliasOverlapWikiLinkInners = new ArrayList<>();
+  private final List<String> wikiLinkUnderAliasesInners = new ArrayList<>();
   private boolean refreshAliasIndex;
 
   void addPlainAliases(String... aliases) {
@@ -26,13 +26,15 @@ final class NoteFrontmatterLists {
     overlapWikiLinkInners.add(wikiLinkInner);
   }
 
-  void addLegacyOverlapPartner(Note partner) {
+  /** Wiki-link item under {@code aliases} (invalid for save; used for read-path fixtures). */
+  void addWikiLinkUnderAliasesPartner(Note partner) {
     Notebook notebook = partner.getNotebook();
-    legacyAliasOverlapWikiLinkInners.add(notebook.getName() + ":" + partner.getTitle());
+    wikiLinkUnderAliasesInners.add(notebook.getName() + ":" + partner.getTitle());
   }
 
-  void addLegacyOverlapWikiLink(String wikiLinkInner) {
-    legacyAliasOverlapWikiLinkInners.add(wikiLinkInner);
+  /** Wiki-link item under {@code aliases} (invalid for save; used for read-path fixtures). */
+  void addWikiLinkUnderAliases(String wikiLinkInner) {
+    wikiLinkUnderAliasesInners.add(wikiLinkInner);
     refreshAliasIndex = true;
   }
 
@@ -44,16 +46,16 @@ final class NoteFrontmatterLists {
   String composedContentOrEmpty() {
     if (plainAliases.isEmpty()
         && overlapWikiLinkInners.isEmpty()
-        && legacyAliasOverlapWikiLinkInners.isEmpty()) {
+        && wikiLinkUnderAliasesInners.isEmpty()) {
       return "";
     }
     StringBuilder yaml = new StringBuilder("---\n");
-    if (!plainAliases.isEmpty() || !legacyAliasOverlapWikiLinkInners.isEmpty()) {
+    if (!plainAliases.isEmpty() || !wikiLinkUnderAliasesInners.isEmpty()) {
       yaml.append("aliases:\n");
       for (String alias : plainAliases) {
         yaml.append("  - ").append(alias).append('\n');
       }
-      for (String inner : legacyAliasOverlapWikiLinkInners) {
+      for (String inner : wikiLinkUnderAliasesInners) {
         yaml.append("  - \"[[").append(inner).append("]]\"\n");
       }
     }

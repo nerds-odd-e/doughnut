@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.algorithms.FrontmatterAliases;
-import com.odde.doughnut.algorithms.FrontmatterOverlaps;
 import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -89,8 +88,7 @@ class TextContentControllerRejectInvalidAuthoredAliasesTests extends TextContent
   }
 
   @Test
-  void migrates_well_formed_wiki_link_alias_items_into_overlaps_on_save()
-      throws UnexpectedNoAccessRightException {
+  void rejects_well_formed_wiki_link_alias_items_on_save() {
     String content =
         """
         ---
@@ -102,13 +100,15 @@ class TextContentControllerRejectInvalidAuthoredAliasesTests extends TextContent
 
         body
         """;
-    String saved = controller.updateNoteContent(note, contentDto(content)).getNote().getContent();
-    assertThat(FrontmatterAliases.fromNoteContent(saved), equalTo(java.util.List.of("color")));
+    ApiException thrown =
+        assertThrows(
+            ApiException.class, () -> controller.updateNoteContent(note, contentDto(content)));
+
+    assertThat(thrown.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.BINDING_ERROR));
     assertThat(
-        FrontmatterOverlaps.overlapWikiLinkTokensFromNoteContent(saved),
-        equalTo(java.util.List.of("[[Other Note]]", "[[Shared Notebook:Hue|display]]")));
-    assertThat(
-        FrontmatterAliases.overlapWikiLinkTokensFromNoteContent(saved),
-        equalTo(java.util.List.of()));
+        thrown.getErrorBody().getErrors().get("aliases"),
+        equalTo(FrontmatterAliases.AUTHORED_ALIASES_MESSAGE));
+    makeMe.refresh(note);
+    assertThat(note.getContent(), equalTo(initialContent));
   }
 }

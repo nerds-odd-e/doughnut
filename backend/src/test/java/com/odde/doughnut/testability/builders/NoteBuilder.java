@@ -172,15 +172,21 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
-  /** Declares a wiki-link item under frontmatter {@code aliases} (not an authored overlap). */
-  public NoteBuilder legacyOverlapPartner(Note partner) {
-    frontmatterLists.addLegacyOverlapPartner(partner);
+  /**
+   * Puts a wiki-link item under frontmatter {@code aliases} targeting {@code partner}. Invalid for
+   * authored save; used only for read-path fixtures.
+   */
+  public NoteBuilder wikiLinkUnderAliasesPartner(Note partner) {
+    frontmatterLists.addWikiLinkUnderAliasesPartner(partner);
     return this;
   }
 
-  /** Declares a wiki-link item under frontmatter {@code aliases} (not an authored overlap). */
-  public NoteBuilder legacyOverlapWikiLink(String wikiLinkInner) {
-    frontmatterLists.addLegacyOverlapWikiLink(wikiLinkInner);
+  /**
+   * Puts a wiki-link item under frontmatter {@code aliases}. Invalid for authored save; used only
+   * for read-path fixtures.
+   */
+  public NoteBuilder wikiLinkUnderAliases(String wikiLinkInner) {
+    frontmatterLists.addWikiLinkUnderAliases(wikiLinkInner);
     return this;
   }
 

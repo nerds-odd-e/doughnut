@@ -39,22 +39,6 @@ public final class FrontmatterAliases {
         .orElse(List.of());
   }
 
-  public static List<String> overlapWikiLinkTokensFromNoteContent(String content) {
-    return NoteContentMarkdown.splitLeadingFrontmatter(content == null ? "" : content)
-        .map(lf -> overlapWikiLinkTokensFromFrontmatter(lf.frontmatter()))
-        .orElse(List.of());
-  }
-
-  public static List<String> overlapWikiLinkTokensFromFrontmatter(Frontmatter frontmatter) {
-    if (frontmatter == null) {
-      return List.of();
-    }
-    return frontmatter
-        .getSequenceItemsIgnoreCase(ALIASES_KEY)
-        .map(FrontmatterAliases::overlapWikiLinkTokensFromRawItems)
-        .orElse(List.of());
-  }
-
   public static boolean matchesFromNoteContent(String content, String answer) {
     return anyMatches(fromNoteContent(content), answer);
   }
@@ -111,22 +95,6 @@ public final class FrontmatterAliases {
           .ifPresent(valid::add);
     }
     return dedupePreserveOrder(valid);
-  }
-
-  private static List<String> overlapWikiLinkTokensFromRawItems(List<?> items) {
-    List<String> tokens = new ArrayList<>();
-    for (Object item : items) {
-      FrontmatterPropertyValues.scalarStringFromYamlObject(item)
-          .map(DisplayNamePathSeparators::trimSurroundingWhitespace)
-          .filter(s -> !s.isBlank())
-          .filter(FrontmatterAliases::isWikiLinkAliasItem)
-          .ifPresent(tokens::add);
-    }
-    return dedupePreserveOrder(tokens);
-  }
-
-  private static boolean isWikiLinkAliasItem(String trimmed) {
-    return WikiLinkMarkdown.isWellFormedWholeLinkToken(trimmed);
   }
 
   private static boolean isValidPlainAliasText(String trimmed) {

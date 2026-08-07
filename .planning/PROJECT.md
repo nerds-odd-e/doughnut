@@ -23,7 +23,6 @@ Portable content direction is ADR 0002 (git-native notebooks). Catalog ZIP downl
 Define via `/gsd-new-milestone`. Candidates already noted:
 
 - SEED-001: MCQ / fuzzy / `Notebook:Title` spelling match
-- Drop grading/disable wiki-in-`aliases` read bridge once leftover notebook data is migrated
 - ADR 0002 Level 1 (git-native notebooks)
 
 ## Requirements
@@ -38,7 +37,7 @@ Define via `/gsd-new-milestone`. Candidates already noted:
 - ✓ Notebook Health lint + tab + gated empty-folder purge — v1.0
 - ✓ Accidental-match + overlap spelling recall loop — v1.1
 - ✓ Accidental-match resolve dialog (compact CTA, identity-only rows, Build a link, Add as overlapped) — v1.2
-- ✓ Distinct `overlaps` frontmatter + plain-only `aliases` (migrate wiki-in-aliases on save) — v1.2
+- ✓ Distinct `overlaps` frontmatter + plain-only `aliases` (wiki-in-aliases rejected on save) — v1.2
 - ✓ Catalog notebook ZIP export (one-way) — retained
 
 ### Active

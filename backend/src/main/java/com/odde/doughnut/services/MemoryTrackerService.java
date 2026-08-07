@@ -311,8 +311,7 @@ public class MemoryTrackerService {
 
   private boolean isNonDistinguishingOverlap(Note reviewedNote, String spellingAnswer, User user) {
     for (String token :
-        FrontmatterOverlaps.gradingOverlapWikiLinkTokensFromNoteContent(
-            reviewedNote.getContent())) {
+        FrontmatterOverlaps.overlapWikiLinkTokensFromNoteContent(reviewedNote.getContent())) {
       Matcher matcher = WikiLinkMarkdown.INNER_LINK_PATTERN.matcher(token);
       if (!matcher.matches()) {
         continue;

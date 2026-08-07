@@ -162,14 +162,14 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
   }
 
   @Test
-  void does_not_resolve_alias_target_from_wiki_link_only_overlap_alias() {
+  void does_not_resolve_alias_target_from_wiki_link_item_under_aliases() {
     User owner = makeMe.aUser().please();
     Note overlapDeclarer =
         makeMe
             .aNote()
             .title("Overlap Declarer")
             .notebookOwnedBy(owner)
-            .legacyOverlapWikiLink("Other Note")
+            .wikiLinkUnderAliases("Other Note")
             .please();
     Note linkerByInnerTitle =
         makeMe.aNote().underSameNotebookAs(overlapDeclarer).content("See [[Other Note]]").please();
@@ -178,7 +178,7 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
   }
 
   @Test
-  void resolves_plain_alias_and_ignores_wiki_link_overlap_item_in_mixed_list() {
+  void resolves_plain_alias_and_ignores_wiki_link_item_under_aliases_in_mixed_list() {
     User owner = makeMe.aUser().please();
     Note mixedAliasNote =
         makeMe
@@ -186,7 +186,7 @@ class WikiLinkResolverYamlAndBodyIntegrationTest {
             .title("colour")
             .notebookOwnedBy(owner)
             .aliases("color")
-            .legacyOverlapWikiLink("Other Note")
+            .wikiLinkUnderAliases("Other Note")
             .please();
     Note plainAliasLinker =
         makeMe.aNote().underSameNotebookAs(mixedAliasNote).content("See [[color]]").please();
