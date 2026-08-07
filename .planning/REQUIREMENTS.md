@@ -19,7 +19,7 @@ and CONTEXT.md. Glossary: ADR 0001 §3. Protocol: ADR 0005. Score→schedule: AD
 ### Potential learning session
 
 - [x] **POT-01**: User sees potential learning sessions (due commissioned trackers grouped by notebook) from the recall page progress bar
-- [ ] **POT-02**: Due commissioned trackers from different notebooks form separate potential learning sessions
+- [x] **POT-02**: Due commissioned trackers from different notebooks form separate potential learning sessions
 
 ### Commission and request
 
@@ -77,7 +77,7 @@ Filled by roadmap.
 | TRK-02 | Phase 2 | Complete |
 | TRK-03 | Phase 3 | Complete |
 | POT-01 | Phase 3 | Complete |
-| POT-02 | Phase 3 | Pending |
+| POT-02 | Phase 3 | Complete |
 | COM-01 | Phase 5 | Pending |
 | COM-02 | Phase 5 | Pending |
 | COM-03 | Phase 5 | Pending |

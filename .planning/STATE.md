@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Commissioned Learning Session MVP
 status: in_progress
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-08-07T23:50:53.029Z"
+stopped_at: Completed 03-02-PLAN.md
+last_updated: "2026-08-07T23:54:33.473Z"
 progress:
   total_phases: 7
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 6
-  completed_plans: 5
-current_phase: 3
-current_phase_name: potential-learning-sessions
+  completed_plans: 6
+current_phase: 4
+current_phase_name: learning-session-request-builder
 last_activity: 2026-08-08
-last_activity_desc: Completed 03-01 potential learning sessions tracer
+last_activity_desc: Completed 03-02 multi-notebook potential sessions
 ---
 
 # Project State
@@ -37,10 +37,11 @@ coexistence green; `pnpm backend:verify` green; no user-visible create path.
 6/6). Caret → COMMISSIONED create, Commissioned label, stay-on-note, primary
 Assimilate with commissioned-only, ordinary+commissioned coexistence (TRK-01/02).
 
-**Phase 3** — **03-01 done** (tracer: dueCommissioned + one-notebook strip +
-E2E Tutor-await green). Next: execute `03-02-PLAN.md` (multi-notebook).
+**Phase 3** — both plans executed (03-01 tracer + 03-02 multi-notebook). Both
+D-06 E2E scenarios green without `@wip` (POT-01/POT-02/TRK-03). Phase Behavior
+complete pending formal `/gsd-verify-work` if desired.
 
-**Next:** Execute Phase 3 plan 02 (`03-02-PLAN.md`).
+**Next:** Plan or discuss Phase 4 (Learning Session / Request builder Structure).
 
 ## Deferred Items
 
@@ -55,11 +56,11 @@ E2E Tutor-await green). Next: execute `03-02-PLAN.md` (multi-notebook).
 
 ## Session Continuity
 
-**Last session:** 2026-08-07T23:50:53.023Z
-**Stopped at:** Completed 03-01-PLAN.md
-**Resume file:** .planning/phases/03-potential-learning-sessions/03-02-PLAN.md
+**Last session:** 2026-08-07T23:54:33.467Z
+**Stopped at:** Completed 03-02-PLAN.md
+**Resume file:** None
 
-03-01 complete. Continue with 03-02 multi-notebook expansion.
+03-02 complete. Phase 3 Behavior delivered (both D-06 scenarios). Next: Phase 4.
 
 ## Performance Metrics
 
@@ -68,6 +69,7 @@ E2E Tutor-await green). Next: execute `03-02-PLAN.md` (multi-notebook).
 | Phase 02 P01 | 4 min | 3 tasks | 19 files |
 | Phase 02 P02 | 3 min | 2 tasks | 7 files |
 | Phase 03 P01 | 7min | 2 tasks | 26 files |
+| Phase 03-potential-learning-sessions P02 | 4min | 2 tasks | 5 files |
 
 ## Decisions
 
@@ -80,3 +82,5 @@ E2E Tutor-await green). Next: execute `03-02-PLAN.md` (multi-notebook).
 - [Phase 03]: D-03/D-04 display-only progress-bar strip; D-05 ordinary-only counts; D-06 two E2E scenarios
 - [Phase 03]: Row copy is 1 potential learning session per notebook (not tracker count)
 - [Phase 03]: expectCount(0) asserts absent recall-count badge
+- [Phase 03]: Multi-row potential-session page object matches by full copy via cy.contains
+- [Phase 03]: Long notebook titles use break-words; full title stays in DOM for E2E

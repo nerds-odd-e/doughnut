@@ -87,7 +87,7 @@ Plans:
 
 **Context:** `.planning/phases/03-potential-learning-sessions/`
 
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans executed
 
 Plans:
 **Wave 1**
@@ -96,7 +96,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1)*
 
-- [ ] 03-02-PLAN.md — Expansion: multi-notebook E2E + long-title wrap polish (POT-02)
+- [x] 03-02-PLAN.md — Expansion: multi-notebook E2E + long-title wrap polish (POT-02)
 
 ---
 
@@ -203,4 +203,4 @@ Plans:
 Parked elsewhere: SEED-001, ADR 0002 Level 1.
 
 ---
-*Last updated: 2026-08-08 — Phase 3 plan 03-01 complete; 03-02 remaining*
+*Last updated: 2026-08-08 — Phase 3 plans 03-01 and 03-02 complete (POT-01/POT-02)*
