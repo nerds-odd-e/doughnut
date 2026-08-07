@@ -96,16 +96,14 @@ Improve all E2E feature files (and supporting steps/page objects as needed) so t
 
 ### Phase 7 — Note questions / live audio E2E authoring
 
-**Status:** planned  
+**Status:** done  
 **Type:** Behavior
 
-- **Pre:** Remaining note_creation_and_update features may violate checklist.
-- **Trigger:** Audit + improve.
-- **Post:** Checklist satisfied; Cypress green (respect real-OpenAI tags / mocks).
+- Shared Backgrounds; domain wording; busy waits on audio stop/upload; `@usingRealOpenAiService` marker (mocked specs verified; real OpenAI not run without credentials).
 
 **Files:** `note_creation_and_update/predefined_questions_management.feature`, `note_creation_and_update/record_live_audio.feature`, `note_creation_and_update/record_live_audio_with_real_open_ai_service.feature`
 
-**Done when:** checklist applied; targeted Cypress passes (or documented skip if real-service scenario is CI-excluded by tag).
+**Done when:** checklist applied; targeted Cypress passes. ✅ 5/5 mocked
 
 ---
 

@@ -1,18 +1,22 @@
+import { waitUntilAppIsNotBusy } from '../pageBase'
+
 const audioToolsPage = () => {
   return {
-    startRecording: () => {
+    startRecording() {
       cy.findByRole('button', { name: 'Record Audio' }).click()
       return this
     },
-    stopRecording: () => {
+    stopRecording() {
       cy.findByRole('button', { name: 'Stop Recording' }).click()
+      waitUntilAppIsNotBusy()
       cy.findByRole('button', { name: 'Save Audio Locally' }).should(
         'not.be.disabled'
       )
       return this
     },
-    startToUploadAudioFile: (fileName: string) => {
+    startToUploadAudioFile(fileName: string) {
       cy.get('#note-uploadAudioFile').attachFile(fileName)
+      waitUntilAppIsNotBusy()
       return this
     },
     downloadAudioFile(fileName: string) {
@@ -20,6 +24,7 @@ const audioToolsPage = () => {
       const filePath = `${downloadsFolder}/${fileName}`
       cy.findByRole('button', { name: `Save Audio Locally` }).click()
       cy.task('fileShouldExistSoon', filePath).should('equal', filePath)
+      return this
     },
   }
 }

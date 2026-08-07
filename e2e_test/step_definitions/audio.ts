@@ -29,9 +29,6 @@ When('I stop recording audio', () => {
   start.assumeAudioTools().stopRecording()
 })
 
-Then(
-  'I must be able to download the audio file to my local machine and it matches the size {int}',
-  (_expectedSize: number) => {
-    start.assumeAudioTools().downloadAudioFile('recorded_audio.wav')
-  }
-)
+Then('I can download the recorded audio', () => {
+  start.assumeAudioTools().downloadAudioFile('recorded_audio.wav')
+})

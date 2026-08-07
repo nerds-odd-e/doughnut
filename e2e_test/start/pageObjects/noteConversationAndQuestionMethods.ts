@@ -6,6 +6,7 @@ import {
 import { assumeConversationAboutNotePage } from './conversationAboutNotePage'
 import { form } from '../forms'
 import { makeSureNoteMoreOptionsFormIsOpen } from './noteMoreOptionsForm'
+import { addQuestionPage } from './addQuestionPage'
 import { questionListPage } from './questionListPage'
 import { toolbarButton } from './toolbarButton'
 
@@ -34,12 +35,16 @@ export const noteConversationAndQuestionMethods = () => ({
   refineQuestion(row: Record<string, string>) {
     this.openQuestionList().addQuestionPage().refineQuestion(row)
   },
+  expectQuestionInForm(expected: Record<string, string>) {
+    addQuestionPage().expectQuestionInForm(expected)
+    return this
+  },
   expectQuestionsInList(expectedQuestions: Record<string, string>[]) {
     cy.get('body').then(($body) => {
       if ($body.find('.question-table').length > 0) {
-        questionListPage().expectQuestion(expectedQuestions)
+        questionListPage().expectQuestions(expectedQuestions)
       } else {
-        this.openQuestionList().expectQuestion(expectedQuestions)
+        this.openQuestionList().expectQuestions(expectedQuestions)
       }
     })
   },

@@ -31,7 +31,7 @@ When(
   }
 )
 
-Given(
+When(
   'I refine the following question for the note {string}:',
   (noteTopology: string, data: DataTable) => {
     expect(data.hashes().length, 'please add one question at a time.').to.equal(
@@ -102,21 +102,16 @@ Then(
   }
 )
 
-When('I generate question by AI for note {string}', (noteName: string) => {
+When('I generate a question with AI for note {string}', (noteName: string) => {
   start
     .jumpToNotePage(noteName, true)
     .openQuestionList()
     .addQuestionPage()
-    .generateQuestionByAI()
+    .generateQuestionWithAI()
 })
 
 Then('the question in the form becomes:', (data: DataTable) => {
-  const expectedQuestions = data.hashes()[0]!
-  ;['Stem', 'Choice 0', 'Choice 1', 'Choice 2', 'Correct Choice Index'].forEach(
-    (key) => {
-      cy.findByLabelText(key).should('have.value', expectedQuestions[key]!)
-    }
-  )
+  start.assumeNotePage().expectQuestionInForm(data.hashes()[0]!)
 })
 
 // This step definition is for demo purpose
