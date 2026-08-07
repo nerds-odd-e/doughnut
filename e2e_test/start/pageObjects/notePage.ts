@@ -33,9 +33,9 @@ const titleRenameReferenceSaveTestId: Record<
   UPDATE_VISIBLE_TEXT: 'referenced-title-save-update-visible-text',
 }
 
-function wikiLinkInNoteContentFluent(linkText: string) {
+function wikiLinkInNoteContentFluent(wikiLinkText: string) {
   const locator = () =>
-    findNoteContentRegion().find('a.doughnut-link').contains(linkText)
+    findNoteContentRegion().find('a.doughnut-link').contains(wikiLinkText)
   return {
     expectNoteShowHref() {
       locator().should('have.attr', 'href').and('match', noteShowHref)
@@ -164,13 +164,16 @@ export const assumeNotePage = (
       waitUntilAppIsNotBusy()
       return assumeNotePage()
     },
-    expectDeadWikiLink(linkText: string) {
-      findNoteContentRegion().find('a.dead-link').contains(linkText)
+    expectDeadWikiLink(wikiLinkText: string) {
+      findNoteContentRegion().find('a.dead-link').contains(wikiLinkText)
       return this
     },
-    followDeadLink(linkTitle: string) {
+    followDeadWikiLink(wikiLinkTitle: string) {
       this.switchToRichContent()
-      findNoteContentRegion().find('a.dead-link').contains(linkTitle).click()
+      findNoteContentRegion()
+        .find('a.dead-link')
+        .contains(wikiLinkTitle)
+        .click()
       return {
         createNote: () => {
           cy.findByRole('button', { name: /Create a new note/ }).click()
@@ -183,12 +186,12 @@ export const assumeNotePage = (
           cy.findByRole('button', { name: 'Point at an existing note' }).click()
           assumeNoteTargetSearchDialog()
             .findTarget(existingNoteTitle)
-            .insertDeadLinkToTarget(existingNoteTitle, displayText)
+            .pointWikiLinkAtTarget(existingNoteTitle, displayText)
         },
       }
     },
-    wikiLinkInNoteContent(linkText: string) {
-      return wikiLinkInNoteContentFluent(linkText)
+    wikiLinkInNoteContent(wikiLinkText: string) {
+      return wikiLinkInNoteContentFluent(wikiLinkText)
     },
     ...noteContentEditingMethods(),
     ...noteRichPropertyMethods(),

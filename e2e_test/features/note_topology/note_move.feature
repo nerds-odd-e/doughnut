@@ -11,7 +11,7 @@ Feature: note move
     And I have a notebook "Sedative drugs" with a note "Sedative" and content "Sleep medicine"
 
   @mockBrowserTime
-  Scenario: link and move
+  Scenario: Move a note under another note
     Given I move note "Sedition" to be under note "Sedation"
     Then I should see sidebar folder "Sedation" containing these notes:
       | note-title   |

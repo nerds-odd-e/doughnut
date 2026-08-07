@@ -16,8 +16,8 @@ export const noteConversationAndQuestionMethods = () => ({
   deleteRelationshipNote() {
     this.moreOptions().deleteRelationshipNote()
   },
-  deleteNoteAndLeaveReferencesAsDeadLinks() {
-    this.moreOptions().deleteNoteAndLeaveReferencesAsDeadLinks()
+  deleteNoteAndLeaveReferencesAsDeadWikiLinks() {
+    this.moreOptions().deleteNoteAndLeaveReferencesAsDeadWikiLinks()
   },
   deleteNoteAndRemoveFromReferenceProperties() {
     this.moreOptions().deleteNoteAndRemoveFromReferenceProperties()

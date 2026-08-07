@@ -15,7 +15,7 @@ Then(
 )
 
 When(
-  'I link the matched note {string} as a wiki property from the accidental match result',
+  'I add the matched note {string} as a wiki property from the accidental match result',
   (matchedNoteTitle: string) => {
     start
       .assumeAnsweredQuestionPage()
@@ -24,7 +24,7 @@ When(
 )
 
 When(
-  'I link the matched note {string} as relationship {string} from the accidental match result',
+  'I add the matched note {string} as relationship {string} from the accidental match result',
   (matchedNoteTitle: string, relationType: string) => {
     start
       .assumeAnsweredQuestionPage()

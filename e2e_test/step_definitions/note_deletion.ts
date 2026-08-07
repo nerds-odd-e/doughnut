@@ -18,9 +18,11 @@ When('I delete note {string}', (noteTopology: string) => {
 })
 
 When(
-  'I delete note {string} and leave references as dead links',
+  'I delete note {string} and leave references as dead wiki links',
   (noteTopology: string) => {
-    start.jumpToNotePage(noteTopology).deleteNoteAndLeaveReferencesAsDeadLinks()
+    start
+      .jumpToNotePage(noteTopology)
+      .deleteNoteAndLeaveReferencesAsDeadWikiLinks()
   }
 )
 

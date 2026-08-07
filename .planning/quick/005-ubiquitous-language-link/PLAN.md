@@ -98,22 +98,18 @@ Where Doughnut means a **wiki link** and/or **relationship**, stop using bare **
 
 ### Phase 8 — Behavior: wiki-link E2E Gherkin uses “wiki link”
 
-**Status:** planned  
+**Status:** done  
 **Type:** Behavior
 
-- **Pre:** Wiki-link feature/steps say `the link "…"`, `dead link`, `via the link toolbar`, scenario `link and move`, etc.
-- **Trigger:** Audit + rewrite Gherkin/steps/POs for wiki-link capability files.
-- **Post:** Scenarios speak **wiki link** / **dead wiki link** / toolbar wording aligned with Phase 1; product behavior unchanged.
+- Renamed `wiki_link.feature` / `wiki_link.ts`; Gherkin speaks wiki link / dead wiki link / wiki link or relationship toolbar; related Cypress green.
 
-**Touch:** `e2e_test/features/note_topology/link.feature` (consider rename to `wiki_link.feature` in this phase), `folder_organization.feature` steps that say `the link`, `step_definitions/link.ts` / `note.ts`, related POs. Keep accidental-match “I link the matched note…” verbs only if they still read as actions; prefer “I connect…” or “I add … as wiki property / relationship” when editing those steps.
-
-**Done when:** Targeted Cypress for wiki-link (and any rewritten specs) passes.
+**Done when:** Targeted Cypress for wiki-link (and any rewritten specs) passes. ✅
 
 ---
 
 ### Phase 9 — Structure: frontend wiki-link / relationship module names
 
-**Status:** planned
+**Status:** planned  
 **Type:** Structure
 
 - **Enables:** Immediate consistency for maintainers after Behavior copy is done; no user-visible change.

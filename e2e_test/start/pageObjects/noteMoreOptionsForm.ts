@@ -63,7 +63,7 @@ const noteMoreOptionsPage = () => {
     deleteRelationshipNote() {
       deleteNoteWithConfirmation(/^Delete "/)
     },
-    deleteNoteAndLeaveReferencesAsDeadLinks() {
+    deleteNoteAndLeaveReferencesAsDeadWikiLinks() {
       deleteNoteWithConfirmation('Leave all references as dead wiki links')
     },
     deleteNoteAndRemoveFromReferenceProperties() {

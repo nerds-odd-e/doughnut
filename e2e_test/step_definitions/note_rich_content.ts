@@ -8,7 +8,29 @@ import {
   Then,
   When,
 } from '@badeball/cypress-cucumber-preprocessor'
+import type NotePath from '../support/NotePath'
 import start from '../start'
+
+Then(
+  'I should see note {notepath} has content {string}',
+  (notePath: NotePath, expectedContent: string) => {
+    start
+      .navigateToNotebooksPage()
+      .navigateToPath(notePath)
+      .findNoteContent(expectedContent)
+  }
+)
+
+Then(
+  'note {string} should have content {string}',
+  (noteTitle: string, expectedContent: string) => {
+    start.jumpToNotePage(noteTitle).findNoteContent(expectedContent)
+  }
+)
+
+Then('the note content should contain a line break', () => {
+  start.assumeNotePage().expectNoteContentContainLineBreak()
+})
 
 Given('I open the note {string} for editing', (noteTopology: string) => {
   start.jumpToNotePage(noteTopology)

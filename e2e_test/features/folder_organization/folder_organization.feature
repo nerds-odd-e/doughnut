@@ -90,7 +90,7 @@ Feature: Folder organization
     Then the note content markdown source should contain "[[FolderXMove New NB:Carrier|Carrier]]"
     When I route to the note "Carrier"
     And I view the note content as rich content
-    Then the link "Target" should open the note titled "Target"
+    Then the wiki link "Target" should open the note titled "Target"
     And the note content on the current page should be "old notebook target"
 
   Scenario: Move a folder into a folder in another notebook

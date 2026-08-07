@@ -160,7 +160,7 @@ export const assumeNoteTargetSearchDialog = () => {
       cy.findByRole('button', { name: 'Insert as a wiki link' }).click()
       waitUntilAppIsNotBusy()
     },
-    insertDeadLinkToTarget(toNoteTopic: string, displayText: string) {
+    pointWikiLinkAtTarget(toNoteTopic: string, displayText: string) {
       clickUseThisNoteOnTargetNote(toNoteTopic)
       cy.findByRole('button', {
         name: `Point wiki link "${displayText}" at this note`,
