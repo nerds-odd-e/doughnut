@@ -23,7 +23,7 @@
         :class="[
           'daisy-btn daisy-btn-primary list-none cursor-pointer px-2',
           sizeClass,
-          { 'pointer-events-none opacity-50': disabled || assimilateDisabled },
+          { 'pointer-events-none opacity-50': disabled },
         ]"
         aria-label="Assimilate options"
       >
@@ -35,7 +35,7 @@
             type="button"
             data-test="assimilate-as-commissioned"
             :class="dropdownMenuButtonClass"
-            :disabled="disabled || assimilateDisabled"
+            :disabled="disabled"
             @click="
               $emit('assimilateAsCommissioned');
               closeDropdown()

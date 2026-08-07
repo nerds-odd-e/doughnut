@@ -67,6 +67,27 @@ describe("AssimilationPanel commissioned assimilation", () => {
     expect(assimilateAsCommissionedCaretEl(wrapper)).toBeNull()
   })
 
+  it("keeps commissioned caret usable when ordinary trackers already exist", async () => {
+    mockSdkService(NoteController, "getNoteInfo", {
+      memoryTrackers: [makeMe.aMemoryTracker.id(1).spelling(false).please()],
+    })
+    assimilateSpy.mockResolvedValue(
+      wrapSdkResponse([makeMe.aMemoryTracker.id(2).commissioned().please()])
+    )
+    const wrapper = await mountAssimilationPanelReady()
+
+    expect(assimilateButtonEl(wrapper)?.hasAttribute("disabled")).toBe(true)
+    const caret = assimilateAsCommissionedCaretEl(wrapper)
+    expect(caret).not.toBeNull()
+    expect(caret?.classList.contains("pointer-events-none")).toBe(false)
+
+    await clickAssimilateAsCommissioned(wrapper)
+
+    expect(assimilateSpy).toHaveBeenCalledWith({
+      body: { noteId: note.id, assimilateAsCommissioned: true },
+    })
+  })
+
   it("does not offer commissioned caret on property assimilation rows", async () => {
     const noteWithProperty = makeMe.aNote
       .id(note.id)
