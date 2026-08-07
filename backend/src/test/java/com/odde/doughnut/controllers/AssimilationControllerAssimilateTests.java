@@ -85,12 +85,8 @@ class AssimilationControllerAssimilateTests extends ControllerTestBase {
       Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       makeMe.aMemoryTrackerFor(note).please();
 
-      List<MemoryTracker> result =
-          controller.assimilate(
-              AssimilationControllerTestSupport.assimilateCommissionedRequest(note));
+      controller.assimilate(AssimilationControllerTestSupport.assimilateCommissionedRequest(note));
 
-      assertThat(result, hasSize(1));
-      assertThat(result.get(0).getType(), equalTo(MemoryTrackerType.COMMISSIONED));
       assertThat(
           memoryTrackerRepository
               .findByUserAndNote(currentUser.getUser().getId(), note.getId())

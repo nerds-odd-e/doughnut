@@ -54,10 +54,6 @@ export const assumeAssimilationPage = () => ({
     waitUntilAppIsNotBusy()
     return this
   },
-  expectCommissionedMemoryTracker() {
-    this.expectMemoryTrackerInfo([{ type: 'Commissioned' }])
-    return this
-  },
   expectOrdinaryAndCommissionedMemoryTrackers() {
     this.expectMemoryTrackerInfo([{ type: 'normal' }, { type: 'Commissioned' }])
     return this

@@ -34,13 +34,6 @@ Then(
 )
 
 Then(
-  'I should see a commissioned memory tracker for {string}',
-  (_noteTitle: string) => {
-    start.assumeAssimilationPage().expectCommissionedMemoryTracker()
-  }
-)
-
-Then(
   'I should see ordinary and commissioned memory trackers for {string}',
   (_noteTitle: string) => {
     start.assumeAssimilationPage().expectOrdinaryAndCommissionedMemoryTrackers()

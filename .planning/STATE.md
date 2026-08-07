@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Commissioned Learning Session MVP
 status: in_progress
-stopped_at: Completed 02-02-PLAN.md
-last_updated: "2026-08-07T23:23:44.692Z"
+stopped_at: Phase 2 verification passed
+last_updated: "2026-08-07T23:25:49Z"
 progress:
   total_phases: 7
   completed_phases: 2
@@ -13,7 +13,7 @@ progress:
 current_phase: 2
 current_phase_name: assimilate-as-commissioned
 last_activity: 2026-08-08
-last_activity_desc: Phase 2 plan 02-02 executed (TRK-02 coexistence)
+last_activity_desc: Phase 2 goal verified passed (02-VERIFICATION.md, 6/6)
 ---
 
 # Project State
@@ -32,13 +32,12 @@ Quick plan **006 memory-tracker type** is **done** (see slim PLAN under
 6/6). Due-recall / assimilation join / batch candidates exclude COMMISSIONED;
 coexistence green; `pnpm backend:verify` green; no user-visible create path.
 
-**Phase 2** — both plans executed: `02-01` (assimilate as commissioned create path,
-caret UX, Commissioned label) and `02-02` (ordinary+commissioned coexistence /
-TRK-02 / D-02). Summaries under
-`.planning/phases/02-assimilate-as-commissioned/`.
+**Phase 2** — both plans executed; goal **verified passed**
+(`.planning/phases/02-assimilate-as-commissioned/02-VERIFICATION.md`, score
+6/6). Caret → COMMISSIONED create, Commissioned label, stay-on-note, primary
+Assimilate with commissioned-only, ordinary+commissioned coexistence (TRK-01/02).
 
-**Next:** Phase 2 verification (`/gsd-verify-work` or phase verifier), then ship
-or Phase 3.
+**Next:** Ship Phase 2 or start Phase 3 (potential learning sessions).
 
 ## Deferred Items
 
@@ -53,11 +52,11 @@ or Phase 3.
 
 ## Session Continuity
 
-**Last session:** 2026-08-07T23:23:44.686Z
-**Stopped at:** Completed 02-02-PLAN.md
+**Last session:** 2026-08-07T23:25:49Z
+**Stopped at:** Phase 2 verification passed
 **Resume file:** None
 
-Phase 2 plans 02-01 and 02-02 complete. Resume with phase verification.
+Phase 2 verified. Ready for Phase 3 or ship.
 
 ## Performance Metrics
 

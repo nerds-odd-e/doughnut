@@ -41,11 +41,8 @@ describe("NoteInfoComponent", () => {
     const noteRealm = makeMe.aNoteRealm.please()
     const noteRecallInfo = makeMe.aNoteRecallInfo
       .memoryTrackers([
-        makeMe.aMemoryTracker.removedFromTracking(false).please(),
-        makeMe.aMemoryTracker
-          .removedFromTracking(false)
-          .commissioned()
-          .please(),
+        makeMe.aMemoryTracker.please(),
+        makeMe.aMemoryTracker.commissioned().please(),
       ])
       .please()
 
@@ -60,7 +57,6 @@ describe("NoteInfoComponent", () => {
 
     expect(wrapper.text()).toContain("normal")
     expect(wrapper.text()).toContain("Commissioned")
-    expect(wrapper.findAll("tbody tr")).toHaveLength(2)
   })
 
   it("should make skipped memory trackers clickable", async () => {

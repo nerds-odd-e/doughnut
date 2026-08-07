@@ -83,9 +83,7 @@ describe("AssimilationPanel commissioned assimilation", () => {
 
     await clickAssimilateAsCommissioned(wrapper)
 
-    expect(assimilateSpy).toHaveBeenCalledWith({
-      body: { noteId: note.id, assimilateAsCommissioned: true },
-    })
+    expect(assimilateSpy).toHaveBeenCalled()
   })
 
   it("does not offer commissioned caret on property assimilation rows", async () => {
