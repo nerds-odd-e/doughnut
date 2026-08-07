@@ -1,24 +1,23 @@
-Feature: note move
-  As a learner, I want to move a note to become a child of another note,   so that I can recall them in the
-  future.
+Feature: Note move
+  As a learner, I want to move a note under a folder in another notebook
+  so I can reorganize related notes.
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook "Sedition law" with a note "Sedition" and content "Incite violence"
+    And I have a notebook "Sedition law" with a note "Sedition"
     And I have a notebook "Sedation care" with notes:
-      | Title    | Content | Folder   |
-      | Sedation | Put to sleep | Sedation |
-    And I have a notebook "Sedative drugs" with a note "Sedative" and content "Sleep medicine"
+      | Title    | Folder   |
+      | Sedation | Sedation |
 
   @mockBrowserTime
-  Scenario: Move a note under another note
-    Given I move note "Sedition" to be under note "Sedation"
+  Scenario: Move a note under a folder and undo
+    When I move note "Sedition" under folder "Sedation"
     Then I should see sidebar folder "Sedation" containing these notes:
-      | note-title   |
-      | Sedation     |
-      | Sedition     |
+      | note-title |
+      | Sedation   |
+      | Sedition   |
     When I undo "move note"
-    When I jump to the notebook "Sedation care"
+    And I jump to the notebook "Sedation care"
     Then I should see sidebar folder "Sedation" containing these notes:
-      | note-title   |
-      | Sedation     |
+      | note-title |
+      | Sedation   |

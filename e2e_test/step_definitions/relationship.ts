@@ -55,13 +55,13 @@ When(
 )
 
 When(
-  'I move note {string} to be under note {string}',
-  (fromNoteTopic: string, toNoteTopic: string) => {
+  'I move note {string} under folder {string}',
+  (fromNoteTopic: string, folderTitle: string) => {
     start
       .jumpToNotePage(fromNoteTopic)
       .startSearchingAndAddRelationship()
-      .findTarget(toNoteTopic)
-      .moveUnder(toNoteTopic)
+      .findTarget(folderTitle)
+      .moveUnder(folderTitle)
   }
 )
 

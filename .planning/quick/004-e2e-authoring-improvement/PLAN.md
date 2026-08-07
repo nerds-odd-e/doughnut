@@ -12,6 +12,7 @@ Improve all E2E feature files (and supporting steps/page objects as needed) so t
 4. **`Folder` column** — remove only when parent/child inject order suffices; keep when folder hierarchy is the capability under test.
 5. **CLI `@ignore` features** — improve Gherkin/domain language only; do not add a second Cypress PTY harness (see e2e-authoring).
 6. **Do not encode phase numbers** in feature/scenario names.
+7. **Progress lives in this directory’s `STATE.md`** — not the shared `.planning/STATE.md` (avoids conflicts with other workstreams).
 
 ## Phases
 
@@ -109,16 +110,14 @@ Improve all E2E feature files (and supporting steps/page objects as needed) so t
 
 ### Phase 8 — Note topology E2E authoring
 
-**Status:** planned  
+**Status:** done  
 **Type:** Behavior
 
-- **Pre:** Topology features may violate checklist.
-- **Trigger:** Audit + improve.
-- **Post:** Checklist satisfied; Cypress green.
+- Domain Gherkin for wiki links / move / tree view; Kind labels `wiki link` / `dead wiki link` / `live wiki link`; open notebook sidebar naming.
 
-**Files:** `note_topology/link.feature`, `note_topology/note_move.feature`, `note_topology/note_tree_view.feature`
+**Files:** `note_topology/wiki_link.feature`, `note_topology/note_move.feature`, `note_topology/note_tree_view.feature`
 
-**Done when:** checklist applied; targeted Cypress passes.
+**Done when:** checklist applied; targeted Cypress passes. ✅ 17/17
 
 ---
 
@@ -264,6 +263,7 @@ Improve all E2E feature files (and supporting steps/page objects as needed) so t
 
 ## Execution notes
 
+- Progress tracker: **`STATE.md` in this directory** (not `.planning/STATE.md`).
 - Phases 1–7 done and pushed (2026-08-07).
 - Concurrent `.planning/quick/005-ubiquitous-language-link/` rewrote wiki-link Gherkin/steps/modules; caused rebase conflicts on Phase 4/6. Phase 6 merge kept Kind/Text assertions + glossary “wiki link” wording.
-- **Jidoka pause** before Phase 8+: prefer finishing or coordinating with 005 to avoid further topology/frontend collisions. Resume Phase 8 (note topology) when ready.
+- **Jidoka pause** before Phase 8+: prefer finishing or coordinating with 005 to avoid further topology/frontend collisions. Resume Phase 8 (note topology) when ready — update this plan’s `STATE.md` only.

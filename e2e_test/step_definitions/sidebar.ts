@@ -15,11 +15,11 @@ Then('I am on a window {int} * {int}', (width: number, height: number) => {
   cy.viewport(width, height)
 })
 
-function expandSideBar() {
+function openNotebookSidebar() {
   start.noteSidebar()
 }
 
-When('I expand the side bar', expandSideBar)
+When('I open the notebook sidebar', openNotebookSidebar)
 
 When('I open the note {string} from the sidebar', (noteTopology: string) => {
   start.noteSidebar().navigateToNote(noteTopology)

@@ -29,3 +29,9 @@ CURSOR_DEV=true nix develop -c pnpm cypress run --spec '<comma-or-glob of group 
 ```
 
 Assume `pnpm sut` is running. Do not run the full E2E suite.
+
+## Progress tracking
+
+Use **`STATE.md` in this directory** (`.planning/quick/004-e2e-authoring-improvement/STATE.md`) for phase progress and resume.
+
+Do **not** use the shared `.planning/STATE.md` for this plan — other workstreams own that file.

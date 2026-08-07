@@ -6,15 +6,12 @@
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 
-When(
-  'I insert a wiki link to {string} via the wiki link or relationship toolbar',
-  (targetNoteTitle: string) => {
-    start.assumeNotePage().insertWikiLinkToNote(targetNoteTitle)
-  }
-)
+When('I insert a wiki link to {string}', (targetNoteTitle: string) => {
+  start.assumeNotePage().insertWikiLinkToNote(targetNoteTitle)
+})
 
 When(
-  'I move the current note to notebook {string} root via the wiki link or relationship toolbar',
+  'I move the current note to notebook {string} root',
   (notebookName: string) => {
     start
       .assumeNotePage()
@@ -25,7 +22,7 @@ When(
 )
 
 When(
-  'I move the current note under folder {string} in notebook {string} via the wiki link or relationship toolbar',
+  'I move the current note under folder {string} in notebook {string}',
   (folderName: string, notebookName: string) => {
     start
       .assumeNotePage()
@@ -64,8 +61,8 @@ Then(
   }
 )
 
-Then(
-  'I should be able to create a new note by following the dead wiki link {string}',
+When(
+  'I create a new note by following the dead wiki link {string}',
   (wikiLinkTitle: string) => {
     start.assumeNotePage().followDeadWikiLink(wikiLinkTitle).createNote()
     start.testability().rememberUiCreatedNote(wikiLinkTitle)
