@@ -123,6 +123,17 @@ class AssimilationControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void understandingAndCommissionedTrackersCanCoexistOnSameNote() {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      makeMe.aMemoryTrackerFor(note).please();
+      makeMe.aMemoryTrackerFor(note).commissioned().please();
+
+      assertThat(
+          memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), note.getId()),
+          hasSize(2));
+    }
+
+    @Test
     void shouldReturnEmptyWhenNoteAlreadyHasMemoryTrackers() {
       Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       makeMe.aMemoryTrackerFor(note).please();

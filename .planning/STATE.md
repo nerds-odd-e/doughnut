@@ -4,17 +4,17 @@ milestone: v1.3
 milestone_name: Commissioned Learning Session MVP
 current_phase: 1
 current_phase_name: Commissioned tracker model
-status: paused
-last_updated: "2026-08-07T14:25:00.000Z"
+status: planned
+last_updated: "2026-08-07T15:00:00.000Z"
 last_activity: 2026-08-07
-last_activity_desc: Quick 006 Phase 2 done — domain uses type
+last_activity_desc: Quick 006 memory-tracker type done — replan Phase 1 for COMMISSIONED
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 2
   completed_plans: 0
   percent: 0
-stopped_at: "Unique-key / commissioned representation — superseded by type enum"
+stopped_at: null
 ---
 
 # Project State
@@ -25,11 +25,13 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-**Active ad-hoc:** `.planning/quick/006-memory-tracker-type/PLAN.md`
-- Phase 1–2 done
-- Next: Phase 3 (unique key on `type`, drop `spelling`, ERD)
+Quick plan **006 memory-tracker type** is **done** (see slim PLAN under
+`.planning/quick/006-memory-tracker-type/`).
 
-Milestone Phase 1 (boolean `commissioned`) remains **paused / to replan** after 006.
+**Next:** Replan GSD Phase 1 (commissioned tracker model) to use
+`MemoryTrackerType.COMMISSIONED` instead of a boolean `commissioned` column —
+due-recall exclusion, assimilation join, etc. Existing Phase 1 PLANs under
+`.planning/phases/01-commissioned-tracker-model/` are stale relative to `type`.
 
 ## Deferred Items
 
@@ -44,4 +46,4 @@ Milestone Phase 1 (boolean `commissioned`) remains **paused / to replan** after 
 
 ## Session Continuity
 
-Continue execute-plan on quick 006 Phase 2 → 3. Then replan GSD Phase 1 for `type=COMMISSIONED`.
+`/gsd-plan-phase 1` (or revise 01-01/01-02) for COMMISSIONED-on-type; then execute.

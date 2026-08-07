@@ -82,10 +82,6 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   @Setter
   private Boolean removedFromTracking = false;
 
-  @Column(name = "spelling")
-  @JsonIgnore
-  private Boolean spelling = false;
-
   @Column(name = "type")
   @Enumerated(EnumType.STRING)
   @Getter
@@ -110,7 +106,6 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
 
   public void setType(MemoryTrackerType type) {
     this.type = type == null ? MemoryTrackerType.UNDERSTANDING : type;
-    this.spelling = this.type == MemoryTrackerType.SPELLING;
   }
 
   @JsonIgnore

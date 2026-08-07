@@ -56,7 +56,6 @@ public final class NotePropertyTrackingBackfill {
       INSERT INTO memory_tracker (
         user_id,
         note_id,
-        spelling,
         type,
         property_key,
         removed_from_tracking,
@@ -65,7 +64,7 @@ public final class NotePropertyTrackingBackfill {
         next_recall_at,
         forgetting_curve_index,
         recall_count
-      ) VALUES (?, ?, 0, 'UNDERSTANDING', ?, 1, ?, ?, ?, ?, 0)
+      ) VALUES (?, ?, 'UNDERSTANDING', ?, 1, ?, ?, ?, ?, 0)
       """;
 
   private NotePropertyTrackingBackfill() {}

@@ -55,6 +55,11 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
     return this;
   }
 
+  public MemoryTrackerBuilder commissioned() {
+    entity.setType(MemoryTrackerType.COMMISSIONED);
+    return this;
+  }
+
   public MemoryTrackerBuilder propertyKey(String propertyKey) {
     entity.setPropertyKey(propertyKey);
     return this;
