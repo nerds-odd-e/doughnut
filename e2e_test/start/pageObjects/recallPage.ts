@@ -153,12 +153,10 @@ export const recall = () => {
     },
     expectPotentialLearningSession(count: number, notebookTitle: string) {
       this.navigateToRecallPage()
-      cy.get('[data-test="potential-learning-session"]')
-        .should('be.visible')
-        .and(
-          'contain',
-          `${count} potential learning session to commission for notebook "${notebookTitle}"`
-        )
+      const expected = `${count} potential learning session to commission for notebook "${notebookTitle}"`
+      cy.contains('[data-test="potential-learning-session"]', expected).should(
+        'be.visible'
+      )
       return this
     },
     expectResumeAvailable() {

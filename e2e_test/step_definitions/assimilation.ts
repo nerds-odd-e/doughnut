@@ -55,6 +55,16 @@ Given(
 )
 
 Given(
+  'the notes {string} in notebook {string} are assimilated as commissioned on day {int}',
+  (noteTitles: string, _notebookTitle: string, day: number) => {
+    start.testability().backendTimeTravelTo(day, 8)
+    commonSenseSplit(noteTitles, ', ').forEach((title) => {
+      start.testability().assimilateNoteAsCommissioned(title)
+    })
+  }
+)
+
+Given(
   'the note {string} has assimilated property {string}',
   (noteTitle: string, propertyKey: string) => {
     start.testability().assimilateNoteProperty(noteTitle, propertyKey)
