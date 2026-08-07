@@ -176,7 +176,7 @@ Plans:
 | Phase | Name | Type | Req | Status |
 |-------|------|------|-----|--------|
 | 1 | Commissioned tracker model | Structure | — | Complete    |
-| 2 | Assimilate as commissioned | Behavior | TRK-01, TRK-02 | In Progress|
+| 2 | Assimilate as commissioned | Behavior | TRK-01, TRK-02 | Plans complete |
 | 3 | Potential learning sessions | Behavior | TRK-03, POT-01, POT-02 | Pending |
 | 4 | Learning Session and Request builder | Structure | — | Pending |
 | 5 | Commission Learning Session | Behavior | COM-01–03 | Pending |
@@ -192,4 +192,4 @@ Plans:
 Parked elsewhere: SEED-001, ADR 0002 Level 1.
 
 ---
-*Last updated: 2026-08-08 — Phase 2 plan 02-01 executed (assimilate as commissioned)*
+*Last updated: 2026-08-08 — Phase 2 plan 02-02 executed (TRK-02 coexistence)*
