@@ -17,6 +17,7 @@
           totalAssimilatedCount: totalAssimilatedCount ?? 0,
           diligentMode: diligentMode,
           previousAnsweredQuestions,
+          potentialLearningSessions,
         }"
         @view-last-answered-question="viewLastAnsweredQuestion($event)"
         @move-to-end="moveMemoryTrackerToEnd($event)"
@@ -101,6 +102,8 @@ const {
   setCurrentIndex,
   toRepeat,
   setToRepeat,
+  setDueCommissioned,
+  potentialLearningSessions,
   diligentMode,
   setDiligentMode,
   dueRecallsRefreshNonce,
@@ -198,6 +201,7 @@ const { isProgressBarVisible, isLoadingMore, loadMore } = useRecallPageLoading({
   currentRecallWindowEndAt,
   dueRecallsRefreshNonce,
   setToRepeat,
+  setDueCommissioned,
   setTotalAssimilatedCount,
   setDiligentMode,
   setCurrentRecallWindowEndAt,

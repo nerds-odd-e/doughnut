@@ -579,6 +579,21 @@ const testability = () => {
       })
     },
 
+    assimilateNoteAsCommissioned(noteTitle: string) {
+      return this.getInjectedNoteIdByTitle(noteTitle).then((noteId) => {
+        return cy.wrap(
+          AssimilationController.assimilate({
+            body: {
+              noteId,
+              skipMemoryTracking: false,
+              assimilateAsCommissioned: true,
+            },
+          }),
+          { log: false }
+        )
+      })
+    },
+
     assimilateNoteProperty(noteTitle: string, propertyKey: string) {
       return this.getInjectedNoteIdByTitle(noteTitle).then((noteId) => {
         return cy.wrap(

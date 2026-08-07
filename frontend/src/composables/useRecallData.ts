@@ -1,9 +1,21 @@
 import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
-import type { MemoryTrackerLite } from "@generated/doughnut-backend-api/types.gen"
+import type {
+  DueCommissionedMemoryTrackerLite,
+  MemoryTrackerLite,
+} from "@generated/doughnut-backend-api/types.gen"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
 
+export type PotentialLearningSession = {
+  notebookId: number
+  notebookName: string
+  trackerIds: number[]
+}
+
 const toRepeat = ref<MemoryTrackerLite[] | undefined>(undefined)
+const dueCommissioned = ref<DueCommissionedMemoryTrackerLite[] | undefined>(
+  undefined
+)
 const currentRecallWindowEndAt = ref<string | undefined>(undefined)
 const totalAssimilatedCount = ref<number | undefined>(undefined)
 const isRecallPaused = ref(false)
@@ -20,11 +32,35 @@ const toRepeatCount = computed(() => {
   return Math.max(0, length - index)
 })
 
+const potentialLearningSessions = computed((): PotentialLearningSession[] => {
+  const trackers = dueCommissioned.value ?? []
+  const byNotebook = new Map<number, PotentialLearningSession>()
+  for (const tracker of trackers) {
+    const existing = byNotebook.get(tracker.notebookId)
+    if (existing) {
+      existing.trackerIds.push(tracker.memoryTrackerId)
+    } else {
+      byNotebook.set(tracker.notebookId, {
+        notebookId: tracker.notebookId,
+        notebookName: tracker.notebookName,
+        trackerIds: [tracker.memoryTrackerId],
+      })
+    }
+  }
+  return [...byNotebook.values()]
+})
+
 export function useRecallData() {
   const router = useRouter()
 
   const setToRepeat = (trackers: MemoryTrackerLite[] | undefined) => {
     toRepeat.value = trackers
+  }
+
+  const setDueCommissioned = (
+    trackers: DueCommissionedMemoryTrackerLite[] | undefined
+  ) => {
+    dueCommissioned.value = trackers
   }
 
   const setCurrentRecallWindowEndAt = (endAt: string | undefined) => {
@@ -68,6 +104,8 @@ export function useRecallData() {
   return {
     toRepeatCount,
     toRepeat,
+    dueCommissioned,
+    potentialLearningSessions,
     currentRecallWindowEndAt,
     totalAssimilatedCount,
     isRecallPaused,
@@ -76,6 +114,7 @@ export function useRecallData() {
     currentIndex,
     diligentMode,
     setToRepeat,
+    setDueCommissioned,
     setCurrentRecallWindowEndAt,
     setTotalAssimilatedCount,
     setIsRecallPaused,

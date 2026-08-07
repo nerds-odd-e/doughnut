@@ -69,6 +69,14 @@ public class UserService {
         user.getId(), timestamp);
   }
 
+  public Stream<MemoryTracker> getCommissionedMemoryTrackersNeedToRepeat(
+      User user, Timestamp currentUTCTimestamp, ZoneId timeZone) {
+    final Timestamp timestamp = TimestampOperations.alignByHalfADay(currentUTCTimestamp, timeZone);
+    return memoryTrackerRepository
+        .findAllCommissionedByUserAndNextRecallAtLessThanEqualOrderByNextRecallAt(
+            user.getId(), timestamp);
+  }
+
   public List<MemoryTracker> getMemoryTrackersFor(User user, Note note) {
     if (user == null) return List.of();
     return memoryTrackerRepository.findByUserAndNote(user.getId(), note.getId());

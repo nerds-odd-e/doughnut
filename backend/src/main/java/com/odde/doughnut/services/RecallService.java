@@ -1,8 +1,10 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.controllers.dto.DueCommissionedMemoryTrackerLite;
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.MemoryTrackerLite;
 import com.odde.doughnut.entities.MemoryTracker;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
@@ -44,6 +46,14 @@ public class RecallService {
         timeZone);
   }
 
+  private Stream<MemoryTracker> getCommissionedMemoryTrackersNeedToRepeat(
+      User user, Timestamp currentUTCTimestamp, ZoneId timeZone, int dueInDays) {
+    return userService.getCommissionedMemoryTrackersNeedToRepeat(
+        user,
+        TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, dueInDays * 24),
+        timeZone);
+  }
+
   public DueMemoryTrackers getDueMemoryTrackers(
       User user, Timestamp currentUTCTimestamp, ZoneId timeZone, int dueInDays) {
     List<MemoryTrackerLite> toRepeat =
@@ -59,9 +69,22 @@ public class RecallService {
                   return lite;
                 })
             .toList();
+    List<DueCommissionedMemoryTrackerLite> dueCommissioned =
+        getCommissionedMemoryTrackersNeedToRepeat(user, currentUTCTimestamp, timeZone, dueInDays)
+            .map(
+                mt -> {
+                  DueCommissionedMemoryTrackerLite lite = new DueCommissionedMemoryTrackerLite();
+                  lite.setMemoryTrackerId(mt.getId());
+                  Notebook notebook = mt.getNote().getNotebook();
+                  lite.setNotebookId(notebook.getId());
+                  lite.setNotebookName(notebook.getName());
+                  return lite;
+                })
+            .toList();
     DueMemoryTrackers dueMemoryTrackers = new DueMemoryTrackers();
     dueMemoryTrackers.setDueInDays(dueInDays);
     dueMemoryTrackers.setToRepeat(toRepeat);
+    dueMemoryTrackers.setDueCommissioned(dueCommissioned);
 
     // Set recall status
     dueMemoryTrackers.totalAssimilatedCount = totalAssimilatedCount(user);

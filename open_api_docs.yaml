@@ -4851,6 +4851,21 @@ components:
         totalUnassimilatedCount:
           type: integer
           format: int32
+    DueCommissionedMemoryTrackerLite:
+      type: object
+      properties:
+        memoryTrackerId:
+          type: integer
+          format: int32
+        notebookId:
+          type: integer
+          format: int32
+        notebookName:
+          type: string
+      required:
+      - memoryTrackerId
+      - notebookId
+      - notebookName
     DueMemoryTrackers:
       type: object
       properties:
@@ -4864,6 +4879,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/MemoryTrackerLite"
+        dueCommissioned:
+          type: array
+          items:
+            $ref: "#/components/schemas/DueCommissionedMemoryTrackerLite"
         dueInDays:
           type: integer
           format: int32

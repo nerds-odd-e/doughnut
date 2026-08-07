@@ -42,8 +42,12 @@ const { upperNavItems, lowerNavItems } = useNavigationItems()
 const isHomePage = computed(() => route.name === "home")
 
 const { applyAssimilationCountDto } = useAssimilationCount()
-const { setToRepeat, setCurrentRecallWindowEndAt, setTotalAssimilatedCount } =
-  useRecallData()
+const {
+  setToRepeat,
+  setDueCommissioned,
+  setCurrentRecallWindowEndAt,
+  setTotalAssimilatedCount,
+} = useRecallData()
 
 const fetchMenuData = async () => {
   const { data: menuData, error } = await UserController.getMenuData({
@@ -53,6 +57,7 @@ const fetchMenuData = async () => {
     applyAssimilationCountDto(menuData.assimilationCount)
     if (menuData.recallStatus) {
       setToRepeat(menuData.recallStatus.toRepeat)
+      setDueCommissioned(menuData.recallStatus.dueCommissioned)
       setCurrentRecallWindowEndAt(
         menuData.recallStatus.currentRecallWindowEndAt
       )

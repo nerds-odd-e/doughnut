@@ -58,6 +58,13 @@ Then(
 )
 
 Then(
+  'I should see {int} potential learning session to commission for notebook {string}',
+  (count: number, notebookTitle: string) => {
+    start.recall().expectPotentialLearningSession(count, notebookTitle)
+  }
+)
+
+Then(
   'On day {int} I should have {string} note for assimilation and {string} for recall',
   (day: number, toAssimilateAndTotal: string, numberOfRecalls: string) => {
     assertAssimilationDueOnDay(day, toAssimilateAndTotal)

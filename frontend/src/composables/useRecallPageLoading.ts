@@ -1,5 +1,6 @@
 import type {
   AnsweredQuestion,
+  DueCommissionedMemoryTrackerLite,
   MemoryTrackerLite,
 } from "@generated/doughnut-backend-api"
 import { RecallsController } from "@generated/doughnut-backend-api/sdk.gen"
@@ -21,6 +22,9 @@ export function useRecallPageLoading(options: {
   currentRecallWindowEndAt: Ref<string | undefined>
   dueRecallsRefreshNonce: Ref<number>
   setToRepeat: (trackers: MemoryTrackerLite[] | undefined) => void
+  setDueCommissioned: (
+    trackers: DueCommissionedMemoryTrackerLite[] | undefined
+  ) => void
   setTotalAssimilatedCount: (count: number | undefined) => void
   setDiligentMode: (enabled: boolean) => void
   setCurrentRecallWindowEndAt: (endAt: string | undefined) => void
@@ -31,6 +35,7 @@ export function useRecallPageLoading(options: {
     currentRecallWindowEndAt,
     dueRecallsRefreshNonce,
     setToRepeat,
+    setDueCommissioned,
     setTotalAssimilatedCount,
     setDiligentMode,
     setCurrentRecallWindowEndAt,
@@ -49,6 +54,7 @@ export function useRecallPageLoading(options: {
         },
       })
       if (!error && response) {
+        setDueCommissioned(response.dueCommissioned ?? [])
         let trackers = response.toRepeat
         currentIndex.value = 0
         setTotalAssimilatedCount(response.totalAssimilatedCount)

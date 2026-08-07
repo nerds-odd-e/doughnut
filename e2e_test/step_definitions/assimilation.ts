@@ -4,6 +4,7 @@
 
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
+import { commonSenseSplit } from 'support/string_util'
 import start from '../start'
 
 When('I assimilate these in sequence:', (data: DataTable) => {
@@ -40,6 +41,16 @@ Given(
   (noteTitle: string, day: number) => {
     start.testability().backendTimeTravelTo(day, 8)
     start.testability().assimilateNote(noteTitle)
+  }
+)
+
+Given(
+  'the notes {string} are assimilated as commissioned on day {int}',
+  (noteTitles: string, day: number) => {
+    start.testability().backendTimeTravelTo(day, 8)
+    commonSenseSplit(noteTitles, ', ').forEach((title) => {
+      start.testability().assimilateNoteAsCommissioned(title)
+    })
   }
 )
 

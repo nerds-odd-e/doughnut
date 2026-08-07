@@ -4,8 +4,12 @@ import {
   RecallsController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import { useRecallData } from "@/composables/useRecallData"
+import type { PotentialLearningSession } from "@/composables/useRecallData"
 import RecallPage from "@/pages/RecallPage.vue"
-import type { MemoryTrackerLite } from "@generated/doughnut-backend-api"
+import type {
+  DueCommissionedMemoryTrackerLite,
+  MemoryTrackerLite,
+} from "@generated/doughnut-backend-api"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
@@ -15,6 +19,8 @@ import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
 
 export function createUseRecallDataMock(overrides?: {
   toRepeat?: MemoryTrackerLite[]
+  dueCommissioned?: DueCommissionedMemoryTrackerLite[]
+  potentialLearningSessions?: PotentialLearningSession[]
   currentRecallWindowEndAt?: string
   totalAssimilatedCount?: number
   isRecallPaused?: boolean
@@ -24,13 +30,21 @@ export function createUseRecallDataMock(overrides?: {
   diligentMode?: boolean
 }) {
   const toRepeatRef = ref<MemoryTrackerLite[] | undefined>(overrides?.toRepeat)
+  const dueCommissionedRef = ref<
+    DueCommissionedMemoryTrackerLite[] | undefined
+  >(overrides?.dueCommissioned)
   const treadmillModeRef = ref(overrides?.treadmillMode ?? false)
   const currentIndexRef = ref(overrides?.currentIndex ?? 0)
   const diligentModeRef = ref(overrides?.diligentMode ?? false)
   const dueRecallsRefreshNonce = ref(0)
+  const potentialLearningSessions = computed(
+    () => overrides?.potentialLearningSessions ?? []
+  )
   return {
     toRepeatCount: computed(() => toRepeatRef.value?.length ?? 0),
     toRepeat: toRepeatRef,
+    dueCommissioned: dueCommissionedRef,
+    potentialLearningSessions,
     currentRecallWindowEndAt: ref(overrides?.currentRecallWindowEndAt),
     totalAssimilatedCount: ref(overrides?.totalAssimilatedCount ?? 0),
     isRecallPaused: ref(overrides?.isRecallPaused ?? false),
@@ -41,6 +55,11 @@ export function createUseRecallDataMock(overrides?: {
     setToRepeat: vi.fn((trackers: MemoryTrackerLite[] | undefined) => {
       toRepeatRef.value = trackers
     }),
+    setDueCommissioned: vi.fn(
+      (trackers: DueCommissionedMemoryTrackerLite[] | undefined) => {
+        dueCommissionedRef.value = trackers
+      }
+    ),
     setCurrentRecallWindowEndAt: vi.fn(),
     setTotalAssimilatedCount: vi.fn(),
     setIsRecallPaused: vi.fn(),

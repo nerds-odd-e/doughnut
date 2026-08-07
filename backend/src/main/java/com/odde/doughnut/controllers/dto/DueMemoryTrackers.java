@@ -10,5 +10,6 @@ public class DueMemoryTrackers {
   @NotNull public int totalAssimilatedCount;
   @Getter @Setter private Timestamp currentRecallWindowEndAt;
   @Getter @Setter private List<MemoryTrackerLite> toRepeat;
+  @Getter @Setter private List<DueCommissionedMemoryTrackerLite> dueCommissioned;
   @Getter @Setter private Integer dueInDays;
 }

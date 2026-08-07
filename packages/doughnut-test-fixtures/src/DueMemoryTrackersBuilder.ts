@@ -1,11 +1,14 @@
 import type {
   DueMemoryTrackers,
+  DueCommissionedMemoryTrackerLite,
   MemoryTrackerLite,
 } from '@generated/doughnut-backend-api'
 import Builder from './Builder'
 
 class DueMemoryTrackersBuilder extends Builder<DueMemoryTrackers> {
   memoryTrackersToRepeat: MemoryTrackerLite[] = []
+
+  private dueCommissionedTrackers: DueCommissionedMemoryTrackerLite[] = []
 
   private totalAssimilatedCountToUse = 100
 
@@ -19,10 +22,16 @@ class DueMemoryTrackersBuilder extends Builder<DueMemoryTrackers> {
     return this
   }
 
+  dueCommissioned(trackers: DueCommissionedMemoryTrackerLite[]) {
+    this.dueCommissionedTrackers = trackers
+    return this
+  }
+
   // eslint-disable-next-line class-methods-use-this
   do(): DueMemoryTrackers {
     return {
       toRepeat: this.memoryTrackersToRepeat,
+      dueCommissioned: this.dueCommissionedTrackers,
       dueInDays: 0,
       totalAssimilatedCount: this.totalAssimilatedCountToUse,
       currentRecallWindowEndAt: new Date().toISOString(),

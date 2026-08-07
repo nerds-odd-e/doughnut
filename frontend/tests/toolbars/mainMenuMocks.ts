@@ -47,6 +47,8 @@ export const createUseRecallDataMock = (overrides?: {
       return Math.max(0, length - index)
     }),
     toRepeat,
+    dueCommissioned: ref(undefined),
+    potentialLearningSessions: computed(() => []),
     currentRecallWindowEndAt: ref(undefined),
     totalAssimilatedCount: ref(0),
     isRecallPaused: ref(overrides?.isRecallPaused ?? false),
@@ -55,6 +57,7 @@ export const createUseRecallDataMock = (overrides?: {
     currentIndex,
     diligentMode: ref(overrides?.diligentMode ?? false),
     setToRepeat: vi.fn(),
+    setDueCommissioned: vi.fn(),
     setCurrentRecallWindowEndAt: vi.fn(),
     setTotalAssimilatedCount: vi.fn(),
     setIsRecallPaused: vi.fn(),

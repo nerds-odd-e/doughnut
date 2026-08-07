@@ -920,10 +920,17 @@ export type AssimilationCountDto = {
     totalUnassimilatedCount?: number;
 };
 
+export type DueCommissionedMemoryTrackerLite = {
+    memoryTrackerId: number;
+    notebookId: number;
+    notebookName: string;
+};
+
 export type DueMemoryTrackers = {
     totalAssimilatedCount: number;
     currentRecallWindowEndAt?: string;
     toRepeat?: Array<MemoryTrackerLite>;
+    dueCommissioned?: Array<DueCommissionedMemoryTrackerLite>;
     dueInDays?: number;
 };
 

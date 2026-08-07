@@ -6,7 +6,7 @@ import {
   mountSoftKeyboardPrimer,
 } from "@tests/helpers/softKeyboardPrimerTestSupport"
 import { mount } from "@vue/test-utils"
-import { afterEach, describe, it } from "vitest"
+import { afterEach, describe, expect, it } from "vitest"
 import { defineComponent } from "vue"
 import { createMemoryHistory, createRouter } from "vue-router"
 
@@ -16,6 +16,15 @@ const ResumeHarness = defineComponent({
     return { resumeRecall }
   },
   template: `<button type="button" @click="resumeRecall">Resume</button>`,
+})
+
+const PotentialSessionHarness = defineComponent({
+  setup() {
+    const { setDueCommissioned, potentialLearningSessions, toRepeatCount } =
+      useRecallData()
+    return { setDueCommissioned, potentialLearningSessions, toRepeatCount }
+  },
+  template: `<div />`,
 })
 
 function mountResumeHarness() {
@@ -64,4 +73,40 @@ describe("useRecallData resumeRecall", () => {
       wrapper.unmount()
     }
   )
+})
+
+describe("useRecallData potentialLearningSessions", () => {
+  it("groups dueCommissioned by notebookId without affecting toRepeatCount", () => {
+    const wrapper = mount(PotentialSessionHarness, {
+      global: {
+        plugins: [
+          createRouter({
+            history: createMemoryHistory(),
+            routes: [{ path: "/", component: { template: "<div />" } }],
+          }),
+        ],
+      },
+    })
+    wrapper.vm.setDueCommissioned([
+      {
+        memoryTrackerId: 1,
+        notebookId: 10,
+        notebookName: "Spanish conversation",
+      },
+      {
+        memoryTrackerId: 2,
+        notebookId: 10,
+        notebookName: "Spanish conversation",
+      },
+    ])
+    expect(wrapper.vm.potentialLearningSessions).toEqual([
+      {
+        notebookId: 10,
+        notebookName: "Spanish conversation",
+        trackerIds: [1, 2],
+      },
+    ])
+    expect(wrapper.vm.toRepeatCount).toBe(0)
+    wrapper.unmount()
+  })
 })
