@@ -55,9 +55,19 @@ Frontend Vite checker terminal errors still matter even though the browser overl
 - `e2e_test/start/pageObjects/cli/` contains CLI page objects with the `cli.xxx` prefix.
 - `e2e_test/support/` contains support files.
 
+## Focus on Behavior
+
+**Behavior** (external behavior) has 3 parts: **pre-condition**, **trigger**, and **post-condition**. Each part is:
+
+  * externally observable
+  * of user value
+  * typically involves state change.
+
+Avoid e2e test that is only about the presentation of a state and having no state change after setup / given.
+
 ## Gherkin
 
-- Write features in Gherkin syntax focused on business value.
+- Write features in Gherkin syntax focused on behaviors that has business value.
 - Group related features in domain-specific folders.
 - Name feature files and titles by domain/capability, such as `note_creation.feature` or `spaced_repetition.feature`. Never name them by phase or delivery order.
 - Use tags, such as `@usingMockedOpenAiService` or `@mockBrowserTime`, to control test execution.
@@ -194,10 +204,9 @@ A scenario describes one fixed path. Prefer dumb automation: the path is visible
 
 - Do not put complex logic in step definitions.
 - Do not create long scenarios with many steps.
+- Avoid using UI language like "click a button" in Gerhkin. Use intention and domain language. 
 - Do not rely on test order.
 - Do not use hardcoded waits.
 - Do not fire a user action that starts app-busy loading and then assert domain state without `waitUntilAppIsNotBusy()` (or a clearer user-visible success signal) first.
 - Do not silently swallow failures in steps or page objects (`error-handling.mdc`).
 - Do not mix different levels of abstraction in scenarios.
-- Do not ignore linting errors that appear in the terminal.
-- Do not add OCR or DOM text layers to production just to satisfy E2E; run OCR in Cypress Node tasks instead.
