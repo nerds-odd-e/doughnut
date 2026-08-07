@@ -4,7 +4,6 @@
 
 import {
   type DataTable,
-  Given,
   Then,
   When,
   defineParameterType,

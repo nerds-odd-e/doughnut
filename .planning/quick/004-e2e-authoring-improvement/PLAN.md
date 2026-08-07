@@ -261,3 +261,9 @@ Improve all E2E feature files (and supporting steps/page objects as needed) so t
 - Product feature changes (Jidoka if required)
 - Second Cypress interactive CLI harness
 - Committing `@focus` / `@only`
+
+## Execution notes
+
+- Phases 1–7 done and pushed (2026-08-07).
+- Concurrent `.planning/quick/005-ubiquitous-language-link/` rewrote wiki-link Gherkin/steps/modules; caused rebase conflicts on Phase 4/6. Phase 6 merge kept Kind/Text assertions + glossary “wiki link” wording.
+- **Jidoka pause** before Phase 8+: prefer finishing or coordinating with 005 to avoid further topology/frontend collisions. Resume Phase 8 (note topology) when ready.
