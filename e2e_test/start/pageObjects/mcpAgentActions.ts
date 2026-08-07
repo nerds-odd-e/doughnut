@@ -42,11 +42,11 @@ export const mcpAgentActions = () => {
     getNoteGraphFromLastSearch(tokenLimit: number) {
       getResponseText('@MCPApiResponse').then((responseText) => {
         const searchResult = JSON.parse(responseText)
-        const noteTopology = searchResult.noteSearchResult?.noteTopology
+        const noteTopology = searchResult.noteTopology
 
         if (!(noteTopology && noteTopology.id)) {
           throw new Error(
-            `Expected MCP search result with noteSearchResult.noteTopology.id, but found: ${responseText}`
+            `Expected MCP search result with noteTopology.id, but found: ${responseText}`
           )
         }
 
