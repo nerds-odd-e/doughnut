@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Commissioned Learning Session MVP
 status: in_progress
-stopped_at: Phase 3 context gathered
-last_updated: "2026-08-07T23:29:18.513Z"
+stopped_at: Phase 3 research complete
+last_updated: "2026-08-08T00:00:00.000Z"
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 4
   completed_plans: 4
-current_phase: 2
-current_phase_name: assimilate-as-commissioned
+current_phase: 3
+current_phase_name: potential-learning-sessions
 last_activity: 2026-08-08
-last_activity_desc: Phase 2 goal verified passed (02-VERIFICATION.md, 6/6)
+last_activity_desc: Phase 3 RESEARCH.md written (ready for plan-phase)
 ---
 
 # Project State
@@ -37,7 +37,11 @@ coexistence green; `pnpm backend:verify` green; no user-visible create path.
 6/6). Caret → COMMISSIONED create, Commissioned label, stay-on-note, primary
 Assimilate with commissioned-only, ordinary+commissioned coexistence (TRK-01/02).
 
-**Next:** Ship Phase 2 or start Phase 3 (potential learning sessions).
+**Phase 3** — context gathered; **research complete**
+(`.planning/phases/03-potential-learning-sessions/03-RESEARCH.md`). Ready for
+`/gsd-plan-phase` planning.
+
+**Next:** Plan Phase 3 (potential learning sessions).
 
 ## Deferred Items
 
@@ -53,10 +57,10 @@ Assimilate with commissioned-only, ordinary+commissioned coexistence (TRK-01/02)
 ## Session Continuity
 
 **Last session:** 2026-08-07T23:29:18.507Z
-**Stopped at:** Phase 3 context gathered
-**Resume file:** .planning/phases/03-potential-learning-sessions/03-CONTEXT.md
+**Stopped at:** Phase 3 research complete
+**Resume file:** .planning/phases/03-potential-learning-sessions/03-RESEARCH.md
 
-Phase 2 verified. Ready for Phase 3 or ship.
+Phase 3 research done. Ready to plan.
 
 ## Performance Metrics
 
