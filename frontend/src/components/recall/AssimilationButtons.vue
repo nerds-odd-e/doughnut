@@ -1,18 +1,20 @@
 <template>
-  <div
-    v-if="showCommissionedOption"
-    class="daisy-join"
-  >
+  <div :class="{ 'daisy-join': showCommissionedOption }">
     <input
       type="submit"
       name="submit"
       value="Assimilate"
-      :class="['daisy-btn daisy-btn-primary daisy-join-item', sizeClass]"
+      :class="[
+        'daisy-btn daisy-btn-primary',
+        sizeClass,
+        { 'daisy-join-item': showCommissionedOption },
+      ]"
       data-test="assimilate"
       :disabled="disabled || assimilateDisabled"
       @click="$emit('assimilate', false)"
     />
     <AutoCollapseDropdown
+      v-if="showCommissionedOption"
       v-slot="{ closeDropdown }"
       class="daisy-dropdown daisy-dropdown-end daisy-dropdown-top daisy-join-item shrink-0"
     >
@@ -45,16 +47,6 @@
       </DropdownMenu>
     </AutoCollapseDropdown>
   </div>
-  <input
-    v-else
-    type="submit"
-    name="submit"
-    value="Assimilate"
-    :class="['daisy-btn daisy-btn-primary', sizeClass]"
-    data-test="assimilate"
-    :disabled="disabled || assimilateDisabled"
-    @click="$emit('assimilate', false)"
-  />
   <input
     v-if="showSkip && skippedForRecall"
     type="submit"

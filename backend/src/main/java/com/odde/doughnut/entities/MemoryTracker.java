@@ -113,6 +113,11 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     return getType() == MemoryTrackerType.SPELLING;
   }
 
+  @JsonIgnore
+  public boolean isCommissioned() {
+    return getType() == MemoryTrackerType.COMMISSIONED;
+  }
+
   /**
    * JPQL fragment for joined alias {@code rp}; must stay aligned with {@link
    * #isNoteLevelTracker()}.

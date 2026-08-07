@@ -39,7 +39,7 @@ final class MemoryTrackerAssimilation {
       boolean commissionedExists =
           existingTrackers.stream()
               .filter(MemoryTracker::isNoteLevelTracker)
-              .anyMatch(mt -> mt.getType() == MemoryTrackerType.COMMISSIONED);
+              .anyMatch(MemoryTracker::isCommissioned);
       if (commissionedExists) {
         return List.of();
       }
@@ -66,7 +66,7 @@ final class MemoryTrackerAssimilation {
     List<MemoryTracker> existingNoteLevelTrackers =
         existingTrackers.stream()
             .filter(MemoryTracker::isNoteLevelTracker)
-            .filter(mt -> mt.getType() != MemoryTrackerType.COMMISSIONED)
+            .filter(mt -> !mt.isCommissioned())
             .toList();
 
     boolean addSpellingOnly =
