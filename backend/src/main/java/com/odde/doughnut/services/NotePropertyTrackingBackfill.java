@@ -32,7 +32,7 @@ public final class NotePropertyTrackingBackfill {
       WHERE user_id = ?
         AND note_id = ?
         AND deleted_at IS NULL
-        AND spelling = 0
+        AND type = 'UNDERSTANDING'
         AND property_key <> ''
       """;
 
@@ -45,7 +45,7 @@ public final class NotePropertyTrackingBackfill {
       FROM memory_tracker
       WHERE user_id = ?
         AND note_id = ?
-        AND spelling = 0
+        AND type = 'UNDERSTANDING'
         AND property_key = ?
         AND deleted_at IS NULL
       LIMIT 1
@@ -57,6 +57,7 @@ public final class NotePropertyTrackingBackfill {
         user_id,
         note_id,
         spelling,
+        type,
         property_key,
         removed_from_tracking,
         assimilated_at,
@@ -64,7 +65,7 @@ public final class NotePropertyTrackingBackfill {
         next_recall_at,
         forgetting_curve_index,
         recall_count
-      ) VALUES (?, ?, 0, ?, 1, ?, ?, ?, ?, 0)
+      ) VALUES (?, ?, 0, 'UNDERSTANDING', ?, 1, ?, ?, ?, ?, 0)
       """;
 
   private NotePropertyTrackingBackfill() {}

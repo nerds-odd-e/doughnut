@@ -4262,8 +4262,6 @@ components:
           format: float
         removedFromTracking:
           type: boolean
-        spelling:
-          type: boolean
         type:
           type: string
           enum:
@@ -4274,6 +4272,8 @@ components:
           type: string
         recalledNote:
           $ref: "#/components/schemas/RecalledNote"
+        spelling:
+          type: boolean
       required:
       - id
       - nextRecallAt

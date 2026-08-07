@@ -52,7 +52,7 @@ public class RecallService {
                 mt -> {
                   MemoryTrackerLite lite = new MemoryTrackerLite();
                   lite.setMemoryTrackerId(mt.getId());
-                  lite.setSpelling(mt.getSpelling() != null && mt.getSpelling());
+                  lite.setSpelling(mt.isSpelling());
                   String propertyKey = mt.getPropertyKey();
                   lite.setPropertyKey(
                       propertyKey == null || propertyKey.isEmpty() ? null : propertyKey);

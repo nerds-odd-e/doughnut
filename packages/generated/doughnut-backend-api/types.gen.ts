@@ -610,10 +610,10 @@ export type MemoryTracker = {
     recallCount?: number;
     forgettingCurveIndex?: number;
     removedFromTracking?: boolean;
-    spelling?: boolean;
     type?: 'UNDERSTANDING' | 'SPELLING' | 'COMMISSIONED';
     propertyKey?: string;
     recalledNote?: RecalledNote;
+    spelling?: boolean;
 };
 
 export type ConversationMessage = {
@@ -1175,10 +1175,10 @@ export type MemoryTrackerWritable = {
     recallCount?: number;
     forgettingCurveIndex?: number;
     removedFromTracking?: boolean;
-    spelling?: boolean;
     type?: 'UNDERSTANDING' | 'SPELLING' | 'COMMISSIONED';
     propertyKey?: string;
     recalledNote?: RecalledNote;
+    spelling?: boolean;
 };
 
 export type ConversationWritable = {

@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.*;
 import com.odde.doughnut.controllers.dto.NoteDeleteDTO;
 import com.odde.doughnut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.doughnut.entities.MemoryTracker;
+import com.odde.doughnut.entities.MemoryTrackerType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -84,7 +85,7 @@ class NoteControllerDeleteReduceToSourceTests extends ControllerTestBase {
     assertThat(reloaded.getDeletedAt(), is(nullValue()));
     assertThat(reloaded.getNote().getId(), equalTo(moon.getId()));
     assertThat(reloaded.getPropertyKey(), equalTo("a part of"));
-    assertThat(reloaded.getSpelling(), equalTo(false));
+    assertThat(reloaded.getType(), equalTo(MemoryTrackerType.UNDERSTANDING));
     assertThat(reloaded.getRecallCount(), equalTo(recallCountBefore));
     assertThat(reloaded.getForgettingCurveIndex(), equalTo(forgettingCurveBefore));
     assertThat(reloaded.getNextRecallAt(), equalTo(nextRecallBefore));

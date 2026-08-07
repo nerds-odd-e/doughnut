@@ -39,7 +39,7 @@ public class RecallQuestionService {
 
   public RecallPrompt generateAQuestion(MemoryTracker memoryTracker) {
     // Spelling memory trackers should not have AI-generated questions
-    if (Boolean.TRUE.equals(memoryTracker.getSpelling())) {
+    if (memoryTracker.isSpelling()) {
       return null;
     }
 

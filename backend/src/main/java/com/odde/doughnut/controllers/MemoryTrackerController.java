@@ -50,7 +50,7 @@ class MemoryTrackerController {
     authorizationService.assertLoggedIn();
     authorizationService.assertReadAuthorization(memoryTracker);
     RecallPrompt recallPrompt;
-    if (Boolean.TRUE.equals(memoryTracker.getSpelling())) {
+    if (memoryTracker.isSpelling()) {
       recallPrompt = memoryTrackerService.getSpellingQuestion(memoryTracker);
     } else {
       recallPrompt = recallQuestionService.generateAQuestion(memoryTracker);

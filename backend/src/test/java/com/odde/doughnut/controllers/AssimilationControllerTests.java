@@ -119,7 +119,7 @@ class AssimilationControllerTests extends ControllerTestBase {
       List<MemoryTracker> result = controller.assimilate(assimilateRequest(note));
 
       assertThat(result, hasSize(2));
-      assertThat(result.stream().filter(MemoryTracker::getSpelling).count(), equalTo(1L));
+      assertThat(result.stream().filter(MemoryTracker::isSpelling).count(), equalTo(1L));
     }
 
     @Test
@@ -143,7 +143,7 @@ class AssimilationControllerTests extends ControllerTestBase {
       List<MemoryTracker> result = controller.assimilate(assimilateRequest(note));
 
       assertThat(result, hasSize(1));
-      assertThat(result.get(0).getSpelling(), equalTo(true));
+      assertThat(result.get(0).getType(), equalTo(MemoryTrackerType.SPELLING));
     }
 
     @Test
@@ -167,7 +167,7 @@ class AssimilationControllerTests extends ControllerTestBase {
 
       assertThat(result, hasSize(1));
       assertThat(result.get(0).getPropertyKey(), equalTo("a part of"));
-      assertThat(result.get(0).getSpelling(), equalTo(false));
+      assertThat(result.get(0).getType(), equalTo(MemoryTrackerType.UNDERSTANDING));
     }
 
     @Test

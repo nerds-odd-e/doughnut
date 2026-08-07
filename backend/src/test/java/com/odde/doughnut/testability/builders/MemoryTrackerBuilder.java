@@ -51,7 +51,7 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
   }
 
   public MemoryTrackerBuilder spelling() {
-    entity.setSpelling(true);
+    entity.setType(MemoryTrackerType.SPELLING);
     return this;
   }
 

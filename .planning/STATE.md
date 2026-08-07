@@ -7,7 +7,7 @@ current_phase_name: Commissioned tracker model
 status: paused
 last_updated: "2026-08-07T14:25:00.000Z"
 last_activity: 2026-08-07
-last_activity_desc: Quick 006 Phase 1 done — type column + backfill + dual-write
+last_activity_desc: Quick 006 Phase 2 done — domain uses type
 progress:
   total_phases: 7
   completed_phases: 0
@@ -26,8 +26,8 @@ See: `.planning/PROJECT.md`
 ## Current Position
 
 **Active ad-hoc:** `.planning/quick/006-memory-tracker-type/PLAN.md`
-- Phase 1 done (type column + backfill + dual-write)
-- Next: Phase 2 (domain code uses `type`)
+- Phase 1–2 done
+- Next: Phase 3 (unique key on `type`, drop `spelling`, ERD)
 
 Milestone Phase 1 (boolean `commissioned`) remains **paused / to replan** after 006.
 

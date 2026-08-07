@@ -54,7 +54,9 @@ Unique key still on `spelling` this phase.
 ## Phase 2: Domain code reads/writes `type` (keep derived `spelling`)
 
 Type: Structure  
-Status: planned
+Status: done
+
+**Learnings:** Jackson treated `isSpelling()` as a `spelling` bean property and collided with the field — keep wire `spelling` via `@JsonProperty getSpelling()` derived from `type`, persist column until Phase 3. Assimilate/create and spelling grading extracted to `MemoryTrackerAssimilation` / `SpellingRecallGrading`; note reference handling to `NoteReferenceHandling`. `isCommissioned()` unused — drop until a caller needs it.
 
 **Structure change:** Switch production callers of `getSpelling`/`setSpelling` on
 `MemoryTracker` to `getType`/`setType` (or `isSpelling()` / `isCommissioned()`

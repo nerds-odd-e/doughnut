@@ -83,7 +83,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   private Boolean removedFromTracking = false;
 
   @Column(name = "spelling")
-  @Getter
+  @JsonIgnore
   private Boolean spelling = false;
 
   @Column(name = "type")
@@ -96,6 +96,11 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   @Setter
   private String propertyKey = "";
 
+  @JsonProperty("spelling")
+  public Boolean getSpelling() {
+    return isSpelling();
+  }
+
   public void setSpelling(Boolean spelling) {
     setType(
         Boolean.TRUE.equals(spelling)
@@ -106,6 +111,11 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   public void setType(MemoryTrackerType type) {
     this.type = type == null ? MemoryTrackerType.UNDERSTANDING : type;
     this.spelling = this.type == MemoryTrackerType.SPELLING;
+  }
+
+  @JsonIgnore
+  public boolean isSpelling() {
+    return getType() == MemoryTrackerType.SPELLING;
   }
 
   /**
