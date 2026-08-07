@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Commissioned Learning Session MVP
-status: verified
-stopped_at: Phase 2 context gathered
-last_updated: "2026-08-07T22:59:52.326Z"
+status: researched
+stopped_at: Phase 2 research complete
+last_updated: "2026-08-08T00:00:00.000Z"
 progress:
   total_phases: 7
   completed_phases: 1
@@ -12,8 +12,8 @@ progress:
   completed_plans: 2
 current_phase: 2
 current_phase_name: assimilate-as-commissioned
-last_activity: 2026-08-07
-last_activity_desc: Phase 1 goal verified passed (01-VERIFICATION.md)
+last_activity: 2026-08-08
+last_activity_desc: Phase 2 RESEARCH.md written (assimilate-as-commissioned)
 ---
 
 # Project State
@@ -32,7 +32,10 @@ Quick plan **006 memory-tracker type** is **done** (see slim PLAN under
 6/6). Due-recall / assimilation join / batch candidates exclude COMMISSIONED;
 coexistence green; `pnpm backend:verify` green; no user-visible create path.
 
-**Next:** `/gsd-discuss-phase 2` or `/gsd-plan-phase 2` — assimilate as commissioned (Behavior).
+**Phase 2** — context gathered; **research complete**
+(`.planning/phases/02-assimilate-as-commissioned/02-RESEARCH.md`).
+
+**Next:** `/gsd-plan-phase 2` — create PLAN.md for assimilate as commissioned.
 
 ## Deferred Items
 
@@ -47,9 +50,8 @@ coexistence green; `pnpm backend:verify` green; no user-visible create path.
 
 ## Session Continuity
 
-**Last session:** 2026-08-07T22:59:52.319Z
-**Stopped at:** Phase 2 context gathered
-**Resume file:** .planning/phases/02-assimilate-as-commissioned/02-CONTEXT.md
+**Last session:** 2026-08-08
+**Stopped at:** Phase 2 research complete
+**Resume file:** .planning/phases/02-assimilate-as-commissioned/02-RESEARCH.md
 
-Phase 1 verification complete (`status: passed`). Ready for Phase 2 planning
-after any remaining Phase 1 close-out.
+Phase 2 research complete. Ready for `/gsd-plan-phase 2`.
