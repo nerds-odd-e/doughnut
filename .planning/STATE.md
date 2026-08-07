@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Commissioned Learning Session MVP
 status: in_progress
-stopped_at: Completed 03-02-PLAN.md
-last_updated: "2026-08-07T23:54:33.473Z"
+stopped_at: Phase 3 verified passed (03-VERIFICATION.md)
+last_updated: "2026-08-07T23:58:00Z"
 progress:
   total_phases: 7
   completed_phases: 3
@@ -13,7 +13,7 @@ progress:
 current_phase: 4
 current_phase_name: learning-session-request-builder
 last_activity: 2026-08-08
-last_activity_desc: Completed 03-02 multi-notebook potential sessions
+last_activity_desc: Phase 3 verified passed — potential learning sessions
 ---
 
 # Project State
@@ -37,9 +37,10 @@ coexistence green; `pnpm backend:verify` green; no user-visible create path.
 6/6). Caret → COMMISSIONED create, Commissioned label, stay-on-note, primary
 Assimilate with commissioned-only, ordinary+commissioned coexistence (TRK-01/02).
 
-**Phase 3** — both plans executed (03-01 tracer + 03-02 multi-notebook). Both
-D-06 E2E scenarios green without `@wip` (POT-01/POT-02/TRK-03). Phase Behavior
-complete pending formal `/gsd-verify-work` if desired.
+**Phase 3** — both plans executed; goal **verified passed**
+(`.planning/phases/03-potential-learning-sessions/03-VERIFICATION.md`, score
+6/6). Due COMMISSIONED → `dueCommissioned` + FE notebook-grouped potential
+sessions on recall progress bar; ordinary recall stays 0 (TRK-03, POT-01/02).
 
 **Next:** Plan or discuss Phase 4 (Learning Session / Request builder Structure).
 
@@ -56,11 +57,11 @@ complete pending formal `/gsd-verify-work` if desired.
 
 ## Session Continuity
 
-**Last session:** 2026-08-07T23:54:33.467Z
-**Stopped at:** Completed 03-02-PLAN.md
+**Last session:** 2026-08-07T23:58:00Z
+**Stopped at:** Phase 3 verified passed (03-VERIFICATION.md)
 **Resume file:** None
 
-03-02 complete. Phase 3 Behavior delivered (both D-06 scenarios). Next: Phase 4.
+Phase 3 verified 6/6. Next: Phase 4.
 
 ## Performance Metrics
 
