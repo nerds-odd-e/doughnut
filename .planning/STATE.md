@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: idle
 stopped_at: null
-last_updated: "2026-08-07T09:10:00Z"
+last_updated: "2026-08-07T09:05:00Z"
 last_activity: 2026-08-07
-last_activity_desc: "Quick 260807-n4j complete — dropped wiki-in-aliases bridge"
+last_activity_desc: "Planning idle after history cleanup"
 progress:
   total_phases: 0
   completed_phases: 0
@@ -25,22 +25,15 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-- Idle.
-- Last quick: drop wiki-in-`aliases` read bridge + save migration (done 2026-08-07).
-
-## Quick Tasks Completed
-
-| ID | Description | Completed |
-|----|-------------|-----------|
-| 260807-n4j | Drop wiki-in-aliases grading bridge; reject on save (no migration) | 2026-08-07 |
+- Idle (no active milestone).
+- Optional resume: `.planning/quick/004-e2e-authoring-improvement/` (in progress — phases 1–13 done, next 14).
 
 ## Deferred Items
 
 | Category | Item | Status |
 |----------|------|--------|
 | backlog | 999.1 Learning with help from a teacher | parking lot — promote via `/gsd-review-backlog` |
-| quick_task | 002-frontend-cli-mcp-small-test-renovation | separate track |
-| quick_task | 004-e2e-authoring-improvement | paused — resume by choice |
+| quick_task | 004-e2e-authoring-improvement | in progress — resume by choice |
 | seed | SEED-001-mcq-fuzzy-notebook-title-spelling-match | dormant |
 | seed | SEED-002-host-mcp-over-https | dormant |
 | tech_debt | OpenAPI/`outgoingLinks`/`linkText` glossary rename (ADR 0001) | open |
@@ -49,4 +42,4 @@ See: `.planning/PROJECT.md`
 
 ## Session Continuity
 
-Define next work via `/gsd-new-milestone` or another quick.
+`/gsd-new-milestone`, resume 004, or a new quick.

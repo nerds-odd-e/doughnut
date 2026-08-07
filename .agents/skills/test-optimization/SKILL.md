@@ -277,8 +277,7 @@ When optimization pass is **done**:
 
 1. **Do not keep two plans for the same scope** — merge or delete duplicates.
 2. Optionally keep one-line note in STATE/ROADMAP; otherwise delete spent `quick/`
-   PLAN and SUMMARY noise. See `ongoing/archive/test-optimization-history.md` for
-   archive format.
+   PLAN and SUMMARY noise (see `planning.mdc` history cleanup).
 3. **Never commit** profile JSON.
 4. Leave **`ongoing/test-optimization-blacklist.md`** and active GSD milestone
    artifacts untouched.

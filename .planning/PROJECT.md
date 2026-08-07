@@ -85,4 +85,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-08-06 after v1.2 milestone*
+*Last updated: 2026-08-07 — pruned spent planning history*

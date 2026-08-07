@@ -41,11 +41,11 @@
 - Issue: Note and book-reading Cucumber glue / page objects accumulate every scenario’s helpers in a few files.
 - Files: `e2e_test/step_definitions/note.ts`, `e2e_test/start/pageObjects/notePage.ts`, `e2e_test/step_definitions/book_reading.ts`, `e2e_test/start/pageObjects/bookReadingPage.ts`
 - Impact: Merge conflicts, unclear ownership, slow discovery of the right helper.
-- Fix approach: Continue splitting by feature (pattern already used for search steps in `ongoing/wiki-link-target-recent-mode.md`); keep page objects feature-scoped.
+- Fix approach: Continue splitting by feature (search/link-target step modules already split); keep page objects feature-scoped.
 
 **Derived index coherence (wiki title / property / alias):**
 - Issue: Note content properties live as YAML frontmatter; discoverability depends on derived tables refreshed via `WikiTitleCacheService.refreshForNote` and related backfills. Missed refresh sites recreate assimilation/search bugs.
-- Files: `backend/src/main/java/com/odde/doughnut/services/WikiTitleCacheService.java` (and call sites in `NoteService`, `NoteConstructionService`, `TextContentController`, wiki-link rewrite), `backend/src/main/java/com/odde/doughnut/services/NotePropertyIndex*.java`, `ongoing/note-property-index-and-backfill.md`
+- Files: `backend/src/main/java/com/odde/doughnut/services/WikiTitleCacheService.java` (and call sites in `NoteService`, `NoteConstructionService`, `TextContentController`, wiki-link rewrite), `backend/src/main/java/com/odde/doughnut/services/NotePropertyIndex*.java`
 - Impact: Stale assimilation queues, wrong wiki resolution, skipped property trackers after content edits if a write path skips refresh.
 - Fix approach: Keep one refresh boundary for content saves; when adding a write path, always call the same refresh seam; prefer a controller-level unit test that asserts index rows after content PATCH ("small test" style: `unit-testing.mdc`).
 
@@ -65,7 +65,7 @@
 
 **Quill rich-editor wiki-link selection crash class:**
 - Symptoms: Replacing `quill.root.innerHTML` while the browser selection still points at detached text nodes can throw `Cannot read properties of null (reading 'offset')` inside Quill selection normalization.
-- Files: `frontend/src/components/form/QuillEditor.vue` (`updateQuillContent` still assigns `root.innerHTML`), investigation `ongoing/rich-wiki-link-quill-selection-investigation.md`
+- Files: `frontend/src/components/form/QuillEditor.vue` (`updateQuillContent` still assigns `root.innerHTML`)
 - Trigger: Completing `[[wiki]]` tokens / refreshing wiki link HTML while a native selection exists in the editor.
 - Workaround: Avoid broad HTML root replacement for wiki-link-only transitions; use Quill APIs that preserve selection (per investigation). Add the documented browser-mode reproduction before changing this path.
 
@@ -95,7 +95,7 @@
 - Problem: Prod job iterates `notebookRepository.findAll()` then indexes each notebook.
 - Files: `backend/src/main/java/com/odde/doughnut/services/EmbeddingMaintenanceJob.java`, `backend/src/main/java/com/odde/doughnut/services/NotebookIndexingService.java`
 - Cause: Full catalog scan on a fixed cron (`0 */5 * * * *`); each notebook may still call OpenAI for notes needing embeddings.
-- Improvement path: Query only notebooks with dirty notes; batch/limit work per tick; keep ShedLock/pool sizing aligned with question-generation maintenance (`ongoing/batch-question-generation-prod-reliability.md` already raised pool size for scheduler contention).
+- Improvement path: Query only notebooks with dirty notes; batch/limit work per tick; keep ShedLock/pool sizing aligned with question-generation maintenance.
 
 **EPUB structure extraction cost and size:**
 - Problem: Large EPUB packages stress a monolithic extractor with XML DOM walks and size caps.
@@ -118,7 +118,7 @@
 ## Fragile Areas
 
 **Rich Quill editor + wiki links:**
-- Files: `frontend/src/components/form/QuillEditor.vue`, `frontend/src/components/form/replaceWikiLinksInHtml.ts`, `frontend/src/components/form/quillHtmlToMarkdown.ts`, `ongoing/rich-wiki-link-quill-selection-investigation.md`
+- Files: `frontend/src/components/form/QuillEditor.vue`, `frontend/src/components/form/replaceWikiLinksInHtml.ts`, `frontend/src/components/form/quillHtmlToMarkdown.ts`
 - Why fragile: Selection depends on browser native ranges; HTML root replacement detaches nodes Quill still inspects; markdown ↔ HTML round-trip must preserve `data-wiki-title` / display.
 - Safe modification: Prefer Quill delta/API mutations for wiki-link upgrades; add browser-mode reproduction from the investigation before changing `updateQuillContent`.
 - Test coverage: Unit helpers alone miss the crash; require Vitest browser tests with real Quill + selection.
@@ -127,16 +127,16 @@
 - Files: `frontend/src/components/book-reading/PdfBookViewer.vue`, `EpubBookViewer.vue`, `BookReadingContent.vue`, `BookReadingBookLayout.vue`, `backend/.../services/book/BookService.java`, `BookFormat.java`
 - Why fragile: Shared shell (position, records, layout) with format-specific viewers; EPUB E2E currently `@ignore`; PDF attach is CLI/MinerU while EPUB attaches in-browser.
 - Safe modification: Change shared reader-shell seams carefully; pin format branches with controller + mounted tests; un-ignore EPUB E2E before large EPUB UX changes.
-- Test coverage: Gap on full EPUB Cypress path; skim/skip and reading-record behavior rely more on unit/controller tests (`ongoing/book-reading-phase-4-skim-skip-plan.md`).
+- Test coverage: Gap on full EPUB Cypress path; skim/skip and reading-record behavior rely more on unit/controller tests.
 
 **Property memory trackers + frontmatter edits:**
-- Files: `frontend/src/components/form/RichFrontmatterProperties.vue`, `frontend/src/components/notes/core/TextContentWrapper.vue`, property guard composables, `ongoing/property-tracker-guard.md`
+- Files: `frontend/src/components/form/RichFrontmatterProperties.vue`, `frontend/src/components/notes/core/TextContentWrapper.vue`, property guard composables
 - Why fragile: Debounced markdown save vs rich row edits must both run confirmation; race between async guard, debounce, and assimilation `note-info` refresh caused E2E flakiness in early attempts.
 - Safe modification: Keep guard in `TextContentWrapper.changerInner` before save; invalidate note-info cache after tracker mutations; chain Cypress confirm + `pageIsNotLoading` before flush.
 - Test coverage: Prefer targeted E2E for delete/rename; watch for async bleed between Vitest mocks.
 
 **Assimilation queue ordering / caps:**
-- Files: `backend/src/main/java/com/odde/doughnut/services/AssimilationService.java`, `AssimilationUnitSource` implementations, `ongoing/assimilation-queue-restructure.md`
+- Files: `backend/src/main/java/com/odde/doughnut/services/AssimilationService.java`, `AssimilationUnitSource` implementations
 - Why fragile: Unified ordering and subscription daily budgets intertwine note and property units; easy to reintroduce count/queue drift or subscription-cap bugs.
 - Safe modification: Extend `AssimilationServicePropertyUnitsTest` / ordering regression tests when changing sources; do not reintroduce eager in-memory sort of full streams.
 - Test coverage: Stronger after restructure, but still sensitive to JPQL order vs `AssimilationUnit.ORDER`.
@@ -158,17 +158,17 @@
 **Notebook embedding maintenance:**
 - Current capacity: Cron every 5 minutes over all notebooks; OpenAI embedding generation for dirty notes.
 - Limit: Large notebook counts or large note bodies increase per-tick OpenAI and DB work; can contend with other scheduled jobs if pool size regresses.
-- Scaling path: Dirty-notebook query; rate limits; optional ANN vector index on Cloud SQL (`ongoing/semantic_search_implementation.md` / `docs/tech_stack.md`).
+- Scaling path: Dirty-notebook query; rate limits; optional ANN vector index on Cloud SQL (`docs/tech_stack.md`).
 
 **Question-generation batch job:**
-- Current capacity: Hourly maintenance with ShedLock for multi-instance safety (phases in `ongoing/batch-question-generation-prod-reliability.md` marked done).
+- Current capacity: Hourly maintenance with ShedLock for multi-instance safety.
 - Limit: Stuck `SUBMITTED` batches if polling/scheduling regresses; dual-instance double-submit without ShedLock.
 - Scaling path: Keep durable run-state + ShedLock; monitor admin resume path; avoid shrinking `spring.task.scheduling.pool.size` in prod.
 
 **EPUB attach / parse:**
 - Current capacity: Size-capped package reads (`MAX_*_BYTES` in `EpubPackageIo`).
 - Limit: Very large or exotic EPUBs fail or time out; fixed-layout / DRM intentionally unsupported.
-- Scaling path: Clearer fail-fast errors; deferred formats per `ongoing/book-reading-epub-support-plan.md`.
+- Scaling path: Clearer fail-fast errors; deferred formats when needed.
 
 ## Dependencies at Risk
 
@@ -180,7 +180,7 @@
 **Quill editor selection model:**
 - Risk: Quill APIs inspect native selection even for `SILENT` mutations; DOM HTML replacement is unsafe.
 - Impact: Production editor crashes during wiki-link completion.
-- Migration plan: Selection-safe wiki-link upgrade path documented in `ongoing/rich-wiki-link-quill-selection-investigation.md`; consider Quill major upgrades only with browser-mode selection suites.
+- Migration plan: Prefer selection-safe wiki-link upgrades (Quill APIs, not `innerHTML` replacement); consider Quill major upgrades only with browser-mode selection suites.
 
 **OpenAI Java SDK + batch APIs:**
 - Risk: External API shape/latency changes; cost and rate limits.
@@ -195,19 +195,19 @@
 ## Missing Critical Features
 
 **Obsidian ↔ Doughnut sync (user stories ahead of implementation):**
-- Problem: Broad sync/wiki-link product stories in `ongoing/obsidian_sync.md` are not fully productized as a complete CLI sync contract.
+- Problem: Bidirectional Obsidian sync is not a complete CLI product contract (ADR 0002 points at git-native notebooks instead of `.doughnut-sync`).
 - Blocks: Reliable bidirectional Obsidian workflows (dry-run sync, deletion rules, parent property sync).
 
 **Semantic search maturity:**
-- Problem: `ongoing/semantic_search_implementation.md` still describes limitations of literal search and a vector roadmap; embedding maintenance exists, but product search UX/quality may still lag the proposed design.
-- Blocks: Content-aware fuzzy search and relevance ranking as specified in that plan.
+- Problem: Embedding maintenance exists, but product search UX/quality may still lag a full vector/relevance design (`docs/tech_stack.md`).
+- Blocks: Content-aware fuzzy search and relevance ranking.
 
 **EPUB CI confidence:**
 - Problem: EPUB feature file ignored in CI.
 - Blocks: Safe continuous delivery of EPUB reading improvements without manual regression.
 
 **Mobile soft-keyboard completeness:**
-- Problem: Primer mechanism shipped for several flows (`SoftKeyboardPrimer.vue`, `primeSoftKeyboard` in `focusTarget.ts`), but remaining tap-to-reveal surfaces may still need wiring; real keyboard visibility is manual-only (`ongoing/mobile-soft-keyboard-on-tap.md`).
+- Problem: Primer mechanism shipped for several flows (`SoftKeyboardPrimer.vue`, `primeSoftKeyboard` in `focusTarget.ts`), but remaining tap-to-reveal surfaces may still need wiring; real keyboard visibility is manual-only.
 - Blocks: Consistent mobile editing UX across all dialogs.
 
 ## Test Coverage Gaps

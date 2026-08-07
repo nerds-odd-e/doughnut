@@ -14,7 +14,7 @@ For local MySQL or Redis failures, inspect `mysql/mysql.log` or `redis/redis.log
 
 Planning lives under `.planning/` (GSD + local). Canonical coexistence:
 `.cursor/rules/gsd-coexistence.mdc`. Phase quality: `.cursor/rules/planning.mdc`.
-Legacy notes may remain under `ongoing/` — do not migrate unless asked.
+Legacy holdouts may remain under `ongoing/` (e.g. test-optimization blacklist) — do not put new plans there.
 
 ## Principles
 

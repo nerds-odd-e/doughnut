@@ -36,11 +36,11 @@ Keep each module’s **public surface small**: `export` only what other modules 
 | Format | `pnpm cli:format` |
 | Lint | `pnpm cli:lint` |
 
-## Architecture Roadmap
+## Architecture notes
 
-The architecture roadmap is at `ongoing/cli-architecture-roadmap.md` (legacy location; leave in place). New planning artifacts go under `.planning/phases/` or `.planning/quick/` — see `gsd-coexistence.mdc`.
+CLI architecture guidance lives in this rule and in `cli/` code layout. New planning artifacts go under `.planning/phases/` or `.planning/quick/` — see `gsd-coexistence.mdc`.
 
-It is a guideline for growing the architecture, not a direct implementation checklist. Apply it when a feature needs it; challenge the fit first. Update it as decisions land and refine the forward-looking parts as understanding changes.
+Apply architectural changes when a feature needs them; challenge the fit first.
 
 **Session scrollback (interactive)** — Past session lines use **one** Ink `<Static>` (append-only) above the live column (stage + `MainInteractivePrompt`). Generic `SessionScrollback` stays domain-agnostic; shell transcript shapes live in `interactiveCliTranscript.tsx`; recall “answered” outcomes use `recallAnsweredScrollback.tsx`; stages append via `sessionScrollbackAppendContext`.
 
