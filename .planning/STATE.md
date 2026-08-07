@@ -33,6 +33,7 @@ No active roadmap phase or quick plan.
 
 | Category | Item | Status |
 |----------|------|--------|
+| backlog | 999.1 Learning with help from a teacher | parking lot — promote via `/gsd-review-backlog` |
 | quick_task | 002-frontend-cli-mcp-small-test-renovation | separate track |
 | seed | SEED-001-mcq-fuzzy-notebook-title-spelling-match | dormant |
 | seed | SEED-002-host-mcp-over-https | dormant |

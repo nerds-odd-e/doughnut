@@ -56,5 +56,16 @@
 
 Next: `/gsd-new-milestone`
 
+## Backlog
+
+### Phase 999.1: Learning with help from a teacher (BACKLOG)
+
+**Goal:** New memory-tracker type for teacher-assisted recall: group due trackers by notebook, emit a teaching instruction (focus notes, merged graph, learning status, expected content), accept structured teacher feedback (scores + descriptive per tracker), update trackers and keep a feedback log. Instruction targets human teacher, ChatGPT, or future agentic teacher (mostly offline today). Dumb then smart instruction generation; prefer a conventional Doughnut↔teacher protocol. Same pattern may apply to assimilation; later step: agentic teacher for assimilating a note.
+**Requirements:** TBD
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (promote with /gsd-review-backlog when ready)
+
 ---
-*Last updated: 2026-08-06 — v1.2 shipped; planning diary cleaned*
+*Last updated: 2026-08-07 — backlog 999.1 teacher-assisted learning captured*
