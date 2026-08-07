@@ -14,8 +14,8 @@
       <PopButton
         v-if="!readonly"
         ref="linkPopButtonRef"
-        aria-label="Link"
-        title="Link (Ctrl+Shift+F / Cmd+Shift+F)"
+        :aria-label="wikiLinkOrRelationshipLabel"
+        :title="`${wikiLinkOrRelationshipLabel} (Ctrl+Shift+F / Cmd+Shift+F)`"
         :show-close-button="false"
       >
         <template #button_face>
@@ -87,6 +87,8 @@ import NoteCreationNewButton from "../NoteCreationNewButton.vue"
 import { useNotebookSidebarOpened } from "@/composables/notebookSidebarOpened"
 import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
 import { useNoteShortcutScope } from "@/composables/noteShortcutScope"
+
+const wikiLinkOrRelationshipLabel = "Wiki link or relationship"
 
 const props = withDefaults(
   defineProps<{

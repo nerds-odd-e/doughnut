@@ -49,7 +49,7 @@ describe("NoteToolbar", () => {
     })
   })
 
-  function dispatchLinkSearchShortcut() {
+  function dispatchWikiLinkOrRelationshipShortcut() {
     document.dispatchEvent(
       new KeyboardEvent("keydown", {
         key: "f",
@@ -62,7 +62,24 @@ describe("NoteToolbar", () => {
     )
   }
 
-  it("opens Link search on Ctrl+Shift+F when not readonly", async () => {
+  it("names the connect control as wiki link or relationship", async () => {
+    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
+
+    wrapper = await mountNoteToolbar(noteRealm)
+
+    expect(
+      wrapper.find('[aria-label="Wiki link or relationship"]').exists()
+    ).toBe(true)
+    expect(
+      wrapper
+        .find(
+          '[title="Wiki link or relationship (Ctrl+Shift+F / Cmd+Shift+F)"]'
+        )
+        .exists()
+    ).toBe(true)
+  })
+
+  it("opens wiki link or relationship search on Ctrl+Shift+F when not readonly", async () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
     mockSdkService(SearchController, "searchForRelationshipTarget", [])
     mockSdkService(SearchController, "searchForRelationshipTargetWithin", [])
@@ -72,19 +89,19 @@ describe("NoteToolbar", () => {
     wrapper = await mountNoteToolbar(noteRealm)
     expect(screen.queryByPlaceholderText("Search")).toBeNull()
 
-    dispatchLinkSearchShortcut()
+    dispatchWikiLinkOrRelationshipShortcut()
     await flushPromises()
 
     expect(await screen.findByPlaceholderText("Search")).toBeInTheDocument()
   })
 
-  it("does not open Link search on Ctrl+Shift+F when readonly", async () => {
+  it("does not open wiki link or relationship search on Ctrl+Shift+F when readonly", async () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
 
     wrapper = await mountNoteToolbar(noteRealm, {
       propsOverrides: { readonly: true },
     })
-    dispatchLinkSearchShortcut()
+    dispatchWikiLinkOrRelationshipShortcut()
     await flushPromises()
 
     expect(screen.queryByPlaceholderText("Search")).toBeNull()

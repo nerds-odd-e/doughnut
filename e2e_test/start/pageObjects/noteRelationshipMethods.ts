@@ -4,6 +4,8 @@ import { commonSenseSplit } from '../../support/string_util'
 import { assumeNoteTargetSearchDialog } from './noteTargetSearchDialog'
 import { toolbarButton } from './toolbarButton'
 
+const wikiLinkOrRelationshipToolbarLabel = 'Wiki link or relationship'
+
 export const noteRelationshipMethods = () => ({
   addRelationshipTo: (target: string) => {
     return {
@@ -52,11 +54,11 @@ export const noteRelationshipMethods = () => ({
   },
 
   startSearchingAndAddRelationship() {
-    toolbarButton('Link').click()
+    toolbarButton(wikiLinkOrRelationshipToolbarLabel).click()
     return assumeNoteTargetSearchDialog()
   },
   insertWikiLinkToNote(toNoteTopic: string) {
-    toolbarButton('Link').click()
+    toolbarButton(wikiLinkOrRelationshipToolbarLabel).click()
     assumeNoteTargetSearchDialog()
       .findTarget(toNoteTopic)
       .insertWikiLinkToTarget(toNoteTopic)
