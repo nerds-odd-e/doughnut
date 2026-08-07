@@ -56,9 +56,7 @@ describe("NotebookPageView.spec", () => {
     expect(
       wrapper.find('[data-testid="notebook-page-summary"]').text()
     ).not.toContain("Home cue")
-    expect(
-      wrapper.find('[data-testid="notebook-readme"]').exists()
-    ).toBe(true)
+    expect(wrapper.find('[data-testid="notebook-readme"]').exists()).toBe(true)
     expect(
       wrapper.find('[data-testid="notebook-readme-editor"]').exists()
     ).toBe(true)
@@ -68,15 +66,13 @@ describe("NotebookPageView.spec", () => {
         .classes()
         .includes("scoped-readme-editor--flush")
     ).toBe(true)
-    expect(
-      wrapper.find('[data-testid="notebook-settings"]').exists()
-    ).toBe(false)
-    expect(
-      wrapper.find('[data-testid="notebook-health"]').exists()
-    ).toBe(false)
-    expect(
-      wrapper.find('[data-testid="notebook-tab-health"]').exists()
-    ).toBe(true)
+    expect(wrapper.find('[data-testid="notebook-settings"]').exists()).toBe(
+      false
+    )
+    expect(wrapper.find('[data-testid="notebook-health"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="notebook-tab-health"]').exists()).toBe(
+      true
+    )
     expect(wrapper.text()).not.toContain("Notebook Management")
     expect(wrapper.text()).not.toContain("Notebook Settings")
     expect(wrapper.text()).not.toContain("Notebook Indexing")
@@ -89,42 +85,32 @@ describe("NotebookPageView.spec", () => {
   it("shows Health panel and hides Settings after opening Health tab", async () => {
     const wrapper = mountNotebookPageView(notebook)
 
-    expect(
-      wrapper.find('[data-testid="notebook-health"]').exists()
-    ).toBe(false)
-    expect(
-      wrapper.find('[data-testid="notebook-settings"]').exists()
-    ).toBe(false)
+    expect(wrapper.find('[data-testid="notebook-health"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="notebook-settings"]').exists()).toBe(
+      false
+    )
 
-    await wrapper
-      .get('[data-testid="notebook-tab-health"]')
-      .trigger("click")
+    await wrapper.get('[data-testid="notebook-tab-health"]').trigger("click")
     await flushPromises()
 
-    expect(
-      wrapper.find('[data-testid="notebook-health"]').exists()
-    ).toBe(true)
-    expect(
-      wrapper.find('[data-testid="notebook-settings"]').exists()
-    ).toBe(false)
-    expect(
-      wrapper.find('[data-testid="notebook-readme"]').exists()
-    ).toBe(false)
+    expect(wrapper.find('[data-testid="notebook-health"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="notebook-settings"]').exists()).toBe(
+      false
+    )
+    expect(wrapper.find('[data-testid="notebook-readme"]').exists()).toBe(false)
   })
 
   it("shows admin sections only after opening Settings tab", async () => {
     const wrapper = mountNotebookPageView(notebook)
 
-    expect(
-      wrapper.find('[data-testid="notebook-settings"]').exists()
-    ).toBe(false)
+    expect(wrapper.find('[data-testid="notebook-settings"]').exists()).toBe(
+      false
+    )
     expect(
       wrapper.find('[data-testid="notebook-readme-editor"]').exists()
     ).toBe(true)
 
-    await wrapper
-      .get('[data-testid="notebook-tab-settings"]')
-      .trigger("click")
+    await wrapper.get('[data-testid="notebook-tab-settings"]').trigger("click")
     await flushPromises()
 
     const settings = wrapper.find('[data-testid="notebook-settings"]')
@@ -138,9 +124,7 @@ describe("NotebookPageView.spec", () => {
     expect(settings.text()).toContain("Reset notebook index")
     expect(settings.text()).not.toContain("Notebook Settings")
     expect(settings.text()).not.toContain("Update Settings")
-    expect(
-      wrapper.find('[data-testid="notebook-readme"]').exists()
-    ).toBe(false)
+    expect(wrapper.find('[data-testid="notebook-readme"]').exists()).toBe(false)
     expect(
       wrapper.find('[data-testid="notebook-readme-editor"]').exists()
     ).toBe(false)
@@ -148,9 +132,7 @@ describe("NotebookPageView.spec", () => {
 
   it("shows no-book copy without Read when getBook has no book", async () => {
     const wrapper = mountNotebookPageView(notebook)
-    await wrapper
-      .get('[data-testid="notebook-tab-settings"]')
-      .trigger("click")
+    await wrapper.get('[data-testid="notebook-tab-settings"]').trigger("click")
     await flushPromises()
 
     const empty = wrapper.find('[data-testid="notebook-no-book"]')

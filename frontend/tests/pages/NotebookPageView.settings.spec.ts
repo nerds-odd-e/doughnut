@@ -19,9 +19,7 @@ describe("NotebookPageView settings", () => {
       .mockResolvedValue(wrapSdkResponse({ ...nb, description: "Saved blurb" }))
     const wrapper = mountNotebookPageView(nb)
 
-    await wrapper
-      .get('[data-testid="notebook-tab-settings"]')
-      .trigger("click")
+    await wrapper.get('[data-testid="notebook-tab-settings"]').trigger("click")
     await flushPromises()
 
     await wrapper.find("[name='description']").setValue("Saved blurb")
@@ -57,9 +55,7 @@ describe("NotebookPageView settings", () => {
       )
     const wrapper = mountNotebookPageView(nb)
 
-    await wrapper
-      .get('[data-testid="notebook-tab-settings"]')
-      .trigger("click")
+    await wrapper.get('[data-testid="notebook-tab-settings"]').trigger("click")
     await flushPromises()
 
     await wrapper.find("[name='skipMemoryTrackingEntirely']").setValue(true)
