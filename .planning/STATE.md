@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Commissioned Learning Session MVP
 status: in_progress
-stopped_at: Phase 3 plans verified — ready to execute
-last_updated: "2026-08-07T23:43:02.093Z"
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-08-07T23:50:53.029Z"
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 6
-  completed_plans: 4
+  completed_plans: 5
 current_phase: 3
 current_phase_name: potential-learning-sessions
 last_activity: 2026-08-08
-last_activity_desc: Phase 3 plans verified (03-01, 03-02); ready to execute
+last_activity_desc: Completed 03-01 potential learning sessions tracer
 ---
 
 # Project State
@@ -37,11 +37,10 @@ coexistence green; `pnpm backend:verify` green; no user-visible create path.
 6/6). Caret → COMMISSIONED create, Commissioned label, stay-on-note, primary
 Assimilate with commissioned-only, ordinary+commissioned coexistence (TRK-01/02).
 
-**Phase 3** — context + research + UI-SPEC approved; **plans ready**
-(`03-01-PLAN.md` tracer, `03-02-PLAN.md` multi-notebook expansion). No Flyway;
-additive `dueCommissioned` + FE group-by-notebook strip.
+**Phase 3** — **03-01 done** (tracer: dueCommissioned + one-notebook strip +
+E2E Tutor-await green). Next: execute `03-02-PLAN.md` (multi-notebook).
 
-**Next:** Execute Phase 3 (`/gsd-execute-phase 3`).
+**Next:** Execute Phase 3 plan 02 (`03-02-PLAN.md`).
 
 ## Deferred Items
 
@@ -56,11 +55,11 @@ additive `dueCommissioned` + FE group-by-notebook strip.
 
 ## Session Continuity
 
-**Last session:** 2026-08-07T23:43:02.086Z
-**Stopped at:** Phase 3 plans verified — ready to execute
-**Resume file:** .planning/phases/03-potential-learning-sessions/03-01-PLAN.md
+**Last session:** 2026-08-07T23:50:53.023Z
+**Stopped at:** Completed 03-01-PLAN.md
+**Resume file:** .planning/phases/03-potential-learning-sessions/03-02-PLAN.md
 
-Phase 3 plans written. Ready for `/gsd-execute-phase 3`.
+03-01 complete. Continue with 03-02 multi-notebook expansion.
 
 ## Performance Metrics
 
@@ -68,6 +67,7 @@ Phase 3 plans written. Ready for `/gsd-execute-phase 3`.
 |------|----------|-------|-------|
 | Phase 02 P01 | 4 min | 3 tasks | 19 files |
 | Phase 02 P02 | 3 min | 2 tasks | 7 files |
+| Phase 03 P01 | 7min | 2 tasks | 26 files |
 
 ## Decisions
 
@@ -78,3 +78,5 @@ Phase 3 plans written. Ready for `/gsd-execute-phase 3`.
 - [Phase 02]: TRK-02: ordinary-then-commissioned coexistence locked at controller + E2E
 - [Phase 03]: D-01 dueCommissioned on recalling path; D-02 FE group-by-notebook; no PLS table
 - [Phase 03]: D-03/D-04 display-only progress-bar strip; D-05 ordinary-only counts; D-06 two E2E scenarios
+- [Phase 03]: Row copy is 1 potential learning session per notebook (not tracker count)
+- [Phase 03]: expectCount(0) asserts absent recall-count badge

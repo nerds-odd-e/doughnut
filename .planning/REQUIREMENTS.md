@@ -14,11 +14,11 @@ and CONTEXT.md. Glossary: ADR 0001 §3. Protocol: ADR 0005. Score→schedule: AD
 
 - [x] **TRK-01**: User can assimilate a note as a commissioned memory tracker via a caret dropdown next to Assimilate (not offered for properties in the UI)
 - [x] **TRK-02**: A commissioned memory tracker coexists with ordinary trackers for the same note
-- [ ] **TRK-03**: Due commissioned memory trackers do not appear as ordinary recall work
+- [x] **TRK-03**: Due commissioned memory trackers do not appear as ordinary recall work
 
 ### Potential learning session
 
-- [ ] **POT-01**: User sees potential learning sessions (due commissioned trackers grouped by notebook) from the recall page progress bar
+- [x] **POT-01**: User sees potential learning sessions (due commissioned trackers grouped by notebook) from the recall page progress bar
 - [ ] **POT-02**: Due commissioned trackers from different notebooks form separate potential learning sessions
 
 ### Commission and request
@@ -75,8 +75,8 @@ Filled by roadmap.
 |-------------|-------|--------|
 | TRK-01 | Phase 2 | Complete |
 | TRK-02 | Phase 2 | Complete |
-| TRK-03 | Phase 3 | Pending |
-| POT-01 | Phase 3 | Pending |
+| TRK-03 | Phase 3 | Complete |
+| POT-01 | Phase 3 | Complete |
 | POT-02 | Phase 3 | Pending |
 | COM-01 | Phase 5 | Pending |
 | COM-02 | Phase 5 | Pending |
