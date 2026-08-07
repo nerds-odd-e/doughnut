@@ -76,22 +76,18 @@ Where Doughnut means a **wiki link** and/or **relationship**, stop using bare **
 
 ### Phase 6 — Behavior: rename warnings mention wiki links
 
-**Status:** planned  
+**Status:** done  
 **Type:** Behavior
 
-- **Pre:** Path/title and notebook-name warnings say bare `Links` / `links`.
-- **Trigger:** User enters illegal wiki-link characters in a title, or renames a notebook that other notebooks wiki-link into.
-- **Post:** Warnings explicitly say **wiki links**.
+- Path + notebook rename warnings say **wiki links**; shared confirm constant; unit coverage green.
 
-**Touch:** `PathNameEditor.vue`, `NotebookPageNameEditor.vue`; existing unit specs for the path warning; notebook-rename confirm if covered by tests (add focused unit if only string change and no E2E).
-
-**Done when:** Specs covering those warnings pass with glossary wording.
+**Done when:** Specs covering those warnings pass with glossary wording. ✅
 
 ---
 
 ### Phase 7 — Behavior: relationship assimilation wording in E2E
 
-**Status:** planned
+**Status:** planned  
 **Type:** Behavior
 
 - **Pre:** Assimilation/recall E2E uses type `link` and “notes and links” for **relationship** assimilation.

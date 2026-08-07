@@ -61,7 +61,7 @@ const FULLWIDTH_REPLACE: Record<string, string> = {
 const LINK_BREAK_CHARS = "#^[]|"
 
 const LINK_NAME_WARNING =
-  "Links will not work with names containing any of `#^[]|`"
+  "Wiki links will not work with names containing any of `#^[]|`"
 
 function processIllegalPathChars(raw: string): {
   value: string

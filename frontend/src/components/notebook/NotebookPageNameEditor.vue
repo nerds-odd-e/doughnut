@@ -23,8 +23,7 @@
       class="text-sm text-base-content/80 m-0"
       data-testid="notebook-page-name-rename-warning"
     >
-      If you change this notebook&apos;s name, links from other notebooks to notes here may
-      stop working.
+      {{ notebookRenameWikiLinkWarning }}
     </p>
     <PathNameEditor
       v-model="draftNotebookName"
@@ -90,6 +89,9 @@ const emit = defineEmits<{
 const { popups } = usePopups()
 const { showSuccessToast } = useToast()
 
+const notebookRenameWikiLinkWarning =
+  "If you change this notebook's name, wiki links from other notebooks to notes here may stop working."
+
 const editingNotebookName = ref(false)
 const draftNotebookName = ref("")
 const updatingNotebookName = ref(false)
@@ -122,7 +124,7 @@ const submitNotebookNameUpdate = async () => {
   const previousName = (props.name ?? "").trim()
   if (trimmed !== previousName) {
     const confirmed = await popups.confirm(
-      "If you change this notebook name, links from other notebooks to notes here may stop working. Continue?"
+      `${notebookRenameWikiLinkWarning} Continue?`
     )
     if (!confirmed) {
       return

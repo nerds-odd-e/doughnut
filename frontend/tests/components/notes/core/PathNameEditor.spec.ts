@@ -41,7 +41,7 @@ describe("PathNameEditor.vue", () => {
     )
   })
 
-  it("shows the link warning when the title contains # ^ [ ] or |", async () => {
+  it("shows the wiki link warning when the title contains # ^ [ ] or |", async () => {
     const wrapper = mount(PathNameEditor, {
       props: { modelValue: "" },
     })
@@ -49,7 +49,7 @@ describe("PathNameEditor.vue", () => {
     const warn = wrapper.find(".text-warning")
     expect(warn.exists()).toBe(true)
     expect(warn.text()).toContain(
-      "Links will not work with names containing any of `#^[]|`"
+      "Wiki links will not work with names containing any of `#^[]|`"
     )
   })
 
@@ -75,14 +75,14 @@ describe("PathNameEditor.vue", () => {
     expect(wrapper.find(".text-warning").exists()).toBe(false)
   })
 
-  it("combines replacement and link warnings when both apply", async () => {
+  it("combines replacement and wiki link warnings when both apply", async () => {
     const wrapper = mount(PathNameEditor, {
       props: { modelValue: "" },
     })
     await emitEditorValue(wrapper, "a|b:c")
     const warn = wrapper.find(".text-warning").text()
     expect(warn).toContain("fullwidth")
-    expect(warn).toContain("Links will not work")
+    expect(warn).toContain("Wiki links will not work")
   })
 
   it("does not replace path-illegal characters when readonly", async () => {
