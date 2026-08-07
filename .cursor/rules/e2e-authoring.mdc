@@ -72,6 +72,7 @@ Avoid e2e test that is only about the presentation of a state and having no stat
 - Name feature files and titles by domain/capability, such as `note_creation.feature` or `spaced_repetition.feature`. Never name them by phase or delivery order.
 - Use tags, such as `@usingMockedOpenAiService` or `@mockBrowserTime`, to control test execution.
 - Keep scenarios focused and concise.
+- Prefer `Scenario Outline` with an `Examples` table when the path and assertion focus are the same and only data varies. Do not copy-paste near-identical Scenarios for different inputs. Keep separate Scenarios when the observable behavior differs (see Explicit Conditions and step-definition guidance on variants).
 
 ## Step Definitions
 
