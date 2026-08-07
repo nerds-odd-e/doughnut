@@ -118,7 +118,7 @@ export async function selectCrossNotebookDestination(
 
 export async function openFolderSettingsTab(wrapper: VueWrapper) {
   const settingsTab = wrapper.find(
-    '[data-testid="folder-workspace-tab-settings"]'
+    '[data-testid="folder-tab-settings"]'
   )
   if (settingsTab.exists()) {
     await settingsTab.trigger("click")

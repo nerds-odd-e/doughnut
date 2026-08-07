@@ -15,13 +15,13 @@
       />
     </div>
 
-    <WorkspaceReadmeSettingsTabs
+    <ReadmeSettingsTabs
       v-model="activeTab"
-      test-id-prefix="notebook-workspace"
+      test-id-prefix="notebook"
       include-health
     />
 
-    <div v-if="activeTab === 'readme'" data-testid="notebook-workspace-readme">
+    <div v-if="activeTab === 'readme'" data-testid="notebook-readme">
       <ScopedReadmeEditor
         :notebook-id="notebook.id"
         :readme-content="readmeContent"
@@ -30,7 +30,7 @@
       />
     </div>
 
-    <NotebookWorkspaceSettings
+    <NotebookSettings
       v-else-if="activeTab === 'settings'"
       :notebook="notebook"
       :user="user"
@@ -51,11 +51,11 @@ import { ref, watch } from "vue"
 import type { Notebook, User } from "@generated/doughnut-backend-api"
 import NotebookHealthPanel from "@/components/notebook/NotebookHealthPanel.vue"
 import NotebookPageNameEditor from "@/components/notebook/NotebookPageNameEditor.vue"
-import NotebookWorkspaceSettings from "@/components/notebook/NotebookWorkspaceSettings.vue"
+import NotebookSettings from "@/components/notebook/NotebookSettings.vue"
 import ScopedReadmeEditor from "@/components/notebook/ScopedReadmeEditor.vue"
-import WorkspaceReadmeSettingsTabs, {
-  type WorkspaceReadmeSettingsTab,
-} from "@/components/commons/WorkspaceReadmeSettingsTabs.vue"
+import ReadmeSettingsTabs, {
+  type ReadmeSettingsTab,
+} from "@/components/commons/ReadmeSettingsTabs.vue"
 
 const props = defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },
@@ -76,7 +76,7 @@ const emit = defineEmits<{
   (e: "readme-content-updated"): void
 }>()
 
-const activeTab = ref<WorkspaceReadmeSettingsTab>("readme")
+const activeTab = ref<ReadmeSettingsTab>("readme")
 
 const { skipMemoryTrackingEntirely } = props.notebook.notebookSettings
 

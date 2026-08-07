@@ -1,7 +1,7 @@
 <template>
   <div
-    class="notebook-workspace-health bg-base-100 border border-base-300 rounded-lg p-6"
-    data-testid="notebook-workspace-health"
+    class="notebook-health bg-base-100 border border-base-300 rounded-lg p-6"
+    data-testid="notebook-health"
   >
     <div class="flex flex-wrap items-center gap-2 mb-6">
       <button

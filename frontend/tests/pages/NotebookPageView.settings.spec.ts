@@ -20,7 +20,7 @@ describe("NotebookPageView settings", () => {
     const wrapper = mountNotebookPageView(nb)
 
     await wrapper
-      .get('[data-testid="notebook-workspace-tab-settings"]')
+      .get('[data-testid="notebook-tab-settings"]')
       .trigger("click")
     await flushPromises()
 
@@ -58,7 +58,7 @@ describe("NotebookPageView settings", () => {
     const wrapper = mountNotebookPageView(nb)
 
     await wrapper
-      .get('[data-testid="notebook-workspace-tab-settings"]')
+      .get('[data-testid="notebook-tab-settings"]')
       .trigger("click")
     await flushPromises()
 

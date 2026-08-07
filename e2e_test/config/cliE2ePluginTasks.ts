@@ -12,7 +12,7 @@ import {
   createCliE2eManagedPty,
   waitForPtyExit,
 } from './cliE2eManagedPty'
-import { createCliE2ePluginWorkspaceTasks } from './cliE2ePluginWorkspaceTasks'
+import { createCliE2ePluginConfigDirTasks } from './cliE2ePluginConfigDirTasks'
 import {
   bundleCliE2eInstall,
   CLI_E2E_INSTALL_BUNDLE_RELATIVE_PATH,
@@ -76,7 +76,7 @@ export function createCliE2ePluginTasks(
   })
 
   return {
-    ...createCliE2ePluginWorkspaceTasks(),
+    ...createCliE2ePluginConfigDirTasks(),
     getMineruE2eMockSitePath(): string {
       return join(repoRoot, 'e2e_test', 'python_stubs', 'mineru_site')
     },

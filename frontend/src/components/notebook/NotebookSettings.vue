@@ -1,7 +1,7 @@
 <template>
   <div
-    class="notebook-workspace-settings"
-    data-testid="notebook-workspace-settings"
+    class="notebook-settings"
+    data-testid="notebook-settings"
   >
     <section class="bg-base-100 border border-base-300 rounded-lg p-6 mb-6">
       <div class="flex flex-col gap-2">

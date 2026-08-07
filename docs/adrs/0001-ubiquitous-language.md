@@ -30,7 +30,6 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 | **Accidental match** | Recall result that matches an unintended note |
 | **Property** | Attribute on a note; may result from reducing a relationship note to the source |
 | **Reading record** | Progress through a book |
-| **Push / pull** | Sync local workspace to or from a remote notebook |
 | **Space setting** | User’s spaced-repetition interval list (e.g. `1, 2, 4, 8`) |
 | **Access token** | Credential for API / CLI access to Doughnut |
 
@@ -40,7 +39,6 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 
 | Term | Colliding senses |
 |------|------------------|
-| **Workspace** | Local filesystem tree for CLI sync — avoid using the same word for the in-app notebook page (Readme / Settings / Health tabs) |
 | **Link** | Wiki link in note body; linking a matched note as relationship or property; circle invitation URL |
 | **Learning** | Overall learner metaphor; alias for subscription (“add to learning”); “target of learning N notes per day” as assimilation quota |
 | **Layout** | Refinement layout for a note vs book layout for an attached book |
@@ -66,10 +64,9 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 |-----|----------------|
 | No umbrella for **recall question** kinds | Spelling / AI / predefined / contested lack a shared type name |
 | **Focus context** | Used in AI flows but not established as a first-class domain noun |
-| **OKF** (Open Knowledge Format) | Named in CLI lint but not introduced beside local workspace |
-| **Sync baseline** | CLI sync state on disk has no stable domain name elsewhere |
+| **OKF** (Open Knowledge Format) | Named in CLI lint but not introduced as a first-class glossary noun |
 | **Owned vs subscribed notebook** | Distinction exists in behavior but not as glossary entries |
-| **Notebook health** vs **lint workspace** | Same lint/findings idea at two layers without a shared term family |
+| **Notebook health** vs export/lint tooling | Same findings idea at two layers without a shared term family |
 
 ## Decision
 
@@ -106,8 +103,7 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 | **Conversation** | Thread of messages about a note (human or AI participant) |
 | **Message** | One utterance in a conversation |
 | **Message center** | UI for conversations and unread state |
-| **Local workspace** | On-disk Markdown / Open Knowledge Format (OKF) tree used by CLI sync |
-| **OKF** | [Open Knowledge Format](https://cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing): portable directory of markdown concept files with YAML frontmatter; CLI lint and sync expect a local workspace to follow it |
+| **OKF** | [Open Knowledge Format](https://cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing): portable directory of markdown concept files with YAML frontmatter |
 | **Spaced-repetition schedule** | User interval list for recall |
 | **Daily assimilation target** | Max new notes to assimilate per day (profile or subscription) |
 | **Notebook health** | In-app lint, findings, and fixes for a notebook |
@@ -116,9 +112,8 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 
 3. **Disambiguation rules**
 
-   - Use **local workspace** for the on-disk CLI sync tree; do not call the
-     in-app notebook page a “workspace” — speak of the **notebook**, its
-     **readme**, **settings**, and **health** as needed.
+   - Speak of the **notebook** or **folder**, its **readme**, **settings**, and
+     **health** as needed — do not call the in-app notebook page a “workspace”.
    - Always qualify **layout** as **refinement** or **book**.
    - Use **wiki link**, **relationship**, or **Wikidata association** — never
      bare **link** or **wiki** when the kind matters.
@@ -146,12 +141,15 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 
 ## Consequences
 
-- Product language converges on fewer overloaded words (**workspace**,
-  **link**, **learning**, **layout**).
+- Product language converges on fewer overloaded words (**link**,
+  **learning**, **layout**).
 - Humans and agents share an explicit dictionary instead of inferring synonyms.
-- Some existing strings (`add to learning`, `space setting`, bare `workspace`)
-  become known debt until renamed.
+- Some existing strings (`add to learning`, `space setting`) become known debt
+  until renamed.
 - Circles, notebook groups, and folders stay clearly separated in speech.
+- Retired product concepts (**workspace** as CLI sync tree, **push / pull**
+  sync, **sync baseline** / `.doughnut-sync`) must not reappear in product
+  code or glossary; portable content follows ADR 0002.
 
 ## Pros
 

@@ -8,8 +8,8 @@
 ## Context
 
 Doughnut stores notes, folders, and readmes as mutable MySQL rows. Local
-export is a ZIP of Markdown; CLI sync uses a private `.doughnut-sync` baseline,
-not a Git commit graph.
+export is a ZIP of Markdown. Path-keyed CLI sync and private `.doughnut-sync`
+baselines are retired (not part of the product).
 
 We want Git revisions stored by Doughnut to be authoritative for portable
 notebook content (notes, folders, readmes). Relational note/folder *content*
@@ -49,8 +49,8 @@ Authority and representation:
    resolve lineage → atomically advance `main`, lineage, and projection — or
    reject entirely. Force push is forbidden. Web autosave may be draft until a
    commit is accepted. Existing notebooks migrate as a single initial commit.
-5. **MVP transport and concurrency.** Accept only `main`. Local workspace is a
-   real Git repo; push/pull with the server go through the Doughnut CLI (not
+5. **MVP transport and concurrency.** Accept only `main`. The local OKF tree is a
+   real Git repo; Git fetch/push with the server go through the Doughnut CLI (not
    yet a Git remote). While a push is accepted, the server notebook is locked;
    the server never merges — merge/rebase and conflict resolution are always
    local. ZIP/OKF export may remain for one-way portability, not as equivalent
@@ -70,7 +70,7 @@ Does not change Level 1 authority. Deferred until needed:
 
 ## Consequences
 
-- `.doughnut-sync` baselines give way to the Git commit graph as merge-base.
+- Retired `.doughnut-sync` baselines are replaced by the Git commit graph as merge-base.
 - Hardest Level 1 work: identity-free rename lineage, and web writes → commits.
 - History outlives soft-deleted MySQL rows and local clones; retention/erasure
   must account for that.

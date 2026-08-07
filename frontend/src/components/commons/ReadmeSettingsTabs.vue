@@ -29,9 +29,9 @@
 </template>
 
 <script setup lang="ts">
-export type WorkspaceReadmeSettingsTab = "readme" | "settings" | "health"
+export type ReadmeSettingsTab = "readme" | "settings" | "health"
 
-const model = defineModel<WorkspaceReadmeSettingsTab>({ required: true })
+const model = defineModel<ReadmeSettingsTab>({ required: true })
 
 withDefaults(
   defineProps<{
@@ -39,11 +39,11 @@ withDefaults(
     includeHealth?: boolean
   }>(),
   {
-    testIdPrefix: "workspace",
+    testIdPrefix: "readme-settings",
     includeHealth: false,
   }
 )
 
-const tabClass = (tab: WorkspaceReadmeSettingsTab) =>
+const tabClass = (tab: ReadmeSettingsTab) =>
   `daisy-tab daisy-tab-lg ${model.value === tab ? "daisy-tab-active" : ""}`
 </script>

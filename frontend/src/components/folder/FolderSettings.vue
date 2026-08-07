@@ -1,7 +1,7 @@
 <template>
   <div
-    class="folder-workspace-settings"
-    data-testid="folder-workspace-settings"
+    class="folder-settings"
+    data-testid="folder-settings"
   >
     <div class="daisy-card w-full mb-6" data-testid="folder-move-dialog">
       <div class="daisy-card-body">
@@ -108,7 +108,7 @@ import type { FolderRealm } from "@generated/doughnut-backend-api"
 import { toRef } from "vue"
 import PathNameEditor from "@/components/notes/core/PathNameEditor.vue"
 import FolderSelector from "@/components/notes/FolderSelector.vue"
-import { useFolderWorkspaceAdmin } from "@/composables/useFolderWorkspaceAdmin"
+import { useFolderAdmin } from "@/composables/useFolderAdmin"
 
 const props = defineProps<{
   folderRealm: FolderRealm
@@ -134,5 +134,5 @@ const {
   submitRename,
   submitMove,
   dissolve,
-} = useFolderWorkspaceAdmin(toRef(props, "folderRealm"), props.fetchFolderPage)
+} = useFolderAdmin(toRef(props, "folderRealm"), props.fetchFolderPage)
 </script>

@@ -34,7 +34,7 @@ describe("NotebookPageView.spec", () => {
 
   it("shows home landmarks and hides admin sections on first paint", async () => {
     const nb = aNotebook({
-      name: "Workspace Home NB",
+      name: "Notebook Home NB",
       description: "Home cue",
     })
     const wrapper = helper
@@ -52,12 +52,12 @@ describe("NotebookPageView.spec", () => {
     ).toContain("Notebook")
     expect(
       wrapper.find('[data-testid="notebook-page-summary"]').text()
-    ).toContain("Workspace Home NB")
+    ).toContain("Notebook Home NB")
     expect(
       wrapper.find('[data-testid="notebook-page-summary"]').text()
     ).not.toContain("Home cue")
     expect(
-      wrapper.find('[data-testid="notebook-workspace-readme"]').exists()
+      wrapper.find('[data-testid="notebook-readme"]').exists()
     ).toBe(true)
     expect(
       wrapper.find('[data-testid="notebook-readme-editor"]').exists()
@@ -69,13 +69,13 @@ describe("NotebookPageView.spec", () => {
         .includes("scoped-readme-editor--flush")
     ).toBe(true)
     expect(
-      wrapper.find('[data-testid="notebook-workspace-settings"]').exists()
+      wrapper.find('[data-testid="notebook-settings"]').exists()
     ).toBe(false)
     expect(
-      wrapper.find('[data-testid="notebook-workspace-health"]').exists()
+      wrapper.find('[data-testid="notebook-health"]').exists()
     ).toBe(false)
     expect(
-      wrapper.find('[data-testid="notebook-workspace-tab-health"]').exists()
+      wrapper.find('[data-testid="notebook-tab-health"]').exists()
     ).toBe(true)
     expect(wrapper.text()).not.toContain("Notebook Management")
     expect(wrapper.text()).not.toContain("Notebook Settings")
@@ -90,25 +90,25 @@ describe("NotebookPageView.spec", () => {
     const wrapper = mountNotebookPageView(notebook)
 
     expect(
-      wrapper.find('[data-testid="notebook-workspace-health"]').exists()
+      wrapper.find('[data-testid="notebook-health"]').exists()
     ).toBe(false)
     expect(
-      wrapper.find('[data-testid="notebook-workspace-settings"]').exists()
+      wrapper.find('[data-testid="notebook-settings"]').exists()
     ).toBe(false)
 
     await wrapper
-      .get('[data-testid="notebook-workspace-tab-health"]')
+      .get('[data-testid="notebook-tab-health"]')
       .trigger("click")
     await flushPromises()
 
     expect(
-      wrapper.find('[data-testid="notebook-workspace-health"]').exists()
+      wrapper.find('[data-testid="notebook-health"]').exists()
     ).toBe(true)
     expect(
-      wrapper.find('[data-testid="notebook-workspace-settings"]').exists()
+      wrapper.find('[data-testid="notebook-settings"]').exists()
     ).toBe(false)
     expect(
-      wrapper.find('[data-testid="notebook-workspace-readme"]').exists()
+      wrapper.find('[data-testid="notebook-readme"]').exists()
     ).toBe(false)
   })
 
@@ -116,18 +116,18 @@ describe("NotebookPageView.spec", () => {
     const wrapper = mountNotebookPageView(notebook)
 
     expect(
-      wrapper.find('[data-testid="notebook-workspace-settings"]').exists()
+      wrapper.find('[data-testid="notebook-settings"]').exists()
     ).toBe(false)
     expect(
       wrapper.find('[data-testid="notebook-readme-editor"]').exists()
     ).toBe(true)
 
     await wrapper
-      .get('[data-testid="notebook-workspace-tab-settings"]')
+      .get('[data-testid="notebook-tab-settings"]')
       .trigger("click")
     await flushPromises()
 
-    const settings = wrapper.find('[data-testid="notebook-workspace-settings"]')
+    const settings = wrapper.find('[data-testid="notebook-settings"]')
     expect(settings.exists()).toBe(true)
     expect(settings.text()).toContain("Description")
     expect(settings.text()).toContain("Notebook Management")
@@ -139,7 +139,7 @@ describe("NotebookPageView.spec", () => {
     expect(settings.text()).not.toContain("Notebook Settings")
     expect(settings.text()).not.toContain("Update Settings")
     expect(
-      wrapper.find('[data-testid="notebook-workspace-readme"]').exists()
+      wrapper.find('[data-testid="notebook-readme"]').exists()
     ).toBe(false)
     expect(
       wrapper.find('[data-testid="notebook-readme-editor"]').exists()
@@ -149,7 +149,7 @@ describe("NotebookPageView.spec", () => {
   it("shows no-book copy without Read when getBook has no book", async () => {
     const wrapper = mountNotebookPageView(notebook)
     await wrapper
-      .get('[data-testid="notebook-workspace-tab-settings"]')
+      .get('[data-testid="notebook-tab-settings"]')
       .trigger("click")
     await flushPromises()
 

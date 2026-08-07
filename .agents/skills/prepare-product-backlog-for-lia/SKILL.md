@@ -295,8 +295,8 @@ Retain these lessons:
    without being one indivisible feature.
 4. Do not turn an inexpensive, familiar workflow such as local Git history or
    publishing to an existing remote into a product story merely to put Git or
-   GitHub in the backlog. Once the workspace is stable, users already have that
-   capability. Fold Git-friendly behavior into the workspace contract unless
+   GitHub in the backlog. Once the local OKF/Git tree is stable, users already have that
+   capability. Fold Git-friendly behavior into that on-disk contract unless
    Doughnut adds domain-specific value.
 5. Delegate authentication to existing secure mechanisms and design CI around
    local substitutes when possible.

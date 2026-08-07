@@ -10,13 +10,13 @@ describe("FolderPage Health tab", () => {
     const { wrapper } = await mountFolderPageReady(router, 1, "Folder Root")
 
     expect(
-      wrapper.find('[data-testid="folder-workspace-tab-readme"]').exists()
+      wrapper.find('[data-testid="folder-tab-readme"]').exists()
     ).toBe(true)
     expect(
-      wrapper.find('[data-testid="folder-workspace-tab-settings"]').exists()
+      wrapper.find('[data-testid="folder-tab-settings"]').exists()
     ).toBe(true)
     expect(
-      wrapper.find('[data-testid="folder-workspace-tab-health"]').exists()
+      wrapper.find('[data-testid="folder-tab-health"]').exists()
     ).toBe(false)
   })
 })

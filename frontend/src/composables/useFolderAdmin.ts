@@ -19,7 +19,7 @@ import {
 /**
  * Move / rename / dissolve admin state for the folder Settings tab.
  */
-export function useFolderWorkspaceAdmin(
+export function useFolderAdmin(
   folderRealm: Ref<FolderRealm>,
   fetchFolderPage: () => Promise<void>
 ) {

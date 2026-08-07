@@ -38,7 +38,7 @@ const props = withDefaults(
     readmeContent?: string | null
     testIdPrefix?: string
     richEditorScopeName?: string
-    /** No nested card chrome — full column width, no top margin (workspace Readme). */
+    /** No nested card chrome — full column width, no top margin (notebook/folder Readme). */
     flush?: boolean
   }>(),
   {

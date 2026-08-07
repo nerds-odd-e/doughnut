@@ -71,7 +71,7 @@ profile. Codec round-trips must be lossless for these rules.
 - Export, lint, import, and Git accept share one codec contract.
 - Title changes are usually filename changes; identity preservation across
   renames is ADR 0002 lineage, not Markdown metadata.
-- Obsidian and OKF consumers can open a Doughnut workspace without Doughnut
+- Obsidian and OKF consumers can open a Doughnut notebook tree without Doughnut
   IDs in the files.
 
 ## Pros

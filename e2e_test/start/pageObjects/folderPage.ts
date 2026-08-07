@@ -2,8 +2,8 @@ import { waitUntilAppIsNotBusy } from '../pageBase'
 
 const folderPage = () => ({
   openSettingsTab() {
-    cy.get('[data-testid="folder-workspace-tab-settings"]').click()
-    cy.get('[data-testid="folder-workspace-settings"]').should('be.visible')
+    cy.get('[data-testid="folder-tab-settings"]').click()
+    cy.get('[data-testid="folder-settings"]').should('be.visible')
     return this
   },
 

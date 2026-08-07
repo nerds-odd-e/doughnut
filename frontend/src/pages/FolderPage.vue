@@ -18,12 +18,12 @@
         </h1>
       </div>
 
-      <WorkspaceReadmeSettingsTabs
+      <ReadmeSettingsTabs
         v-model="activeTab"
-        test-id-prefix="folder-workspace"
+        test-id-prefix="folder"
       />
 
-      <div v-if="activeTab === 'readme'" data-testid="folder-workspace-readme">
+      <div v-if="activeTab === 'readme'" data-testid="folder-readme">
         <ScopedReadmeEditor
           :notebook-id="folderForView.notebookRealm.notebook.id"
           :folder-id="folderForView.folder.id"
@@ -35,7 +35,7 @@
         />
       </div>
 
-      <FolderWorkspaceSettings
+      <FolderSettings
         v-else
         :folder-realm="folderForView"
         :fetch-folder-page="fetchFolderPage"
@@ -48,12 +48,12 @@
 import type { FolderRealm } from "@generated/doughnut-backend-api"
 import { computed, ref } from "vue"
 import NotebookPageReadonlySummary from "@/components/notebook/NotebookPageReadonlySummary.vue"
-import FolderWorkspaceSettings from "@/components/folder/FolderWorkspaceSettings.vue"
+import FolderSettings from "@/components/folder/FolderSettings.vue"
 import ScopedReadmeEditor from "@/components/notebook/ScopedReadmeEditor.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-import WorkspaceReadmeSettingsTabs, {
-  type WorkspaceReadmeSettingsTab,
-} from "@/components/commons/WorkspaceReadmeSettingsTabs.vue"
+import ReadmeSettingsTabs, {
+  type ReadmeSettingsTab,
+} from "@/components/commons/ReadmeSettingsTabs.vue"
 
 const props = defineProps<{
   folderRealm: FolderRealm | undefined
@@ -66,7 +66,7 @@ const folderForView = computed((): FolderRealm | undefined => {
   return r
 })
 
-const activeTab = ref<WorkspaceReadmeSettingsTab>("readme")
+const activeTab = ref<ReadmeSettingsTab>("readme")
 
 const refreshFolderPage = () => props.fetchFolderPage()
 </script>

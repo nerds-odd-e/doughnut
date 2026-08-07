@@ -5,13 +5,13 @@ import { sidebarChildNotePageMethods } from './sidebarChildNotePageMethods'
 
 const notebookPage = () => {
   const openSettingsTab = () => {
-    cy.get('[data-testid="notebook-workspace-tab-settings"]').click()
-    cy.get('[data-testid="notebook-workspace-settings"]').should('be.visible')
+    cy.get('[data-testid="notebook-tab-settings"]').click()
+    cy.get('[data-testid="notebook-settings"]').should('be.visible')
   }
 
   const openHealthTab = () => {
-    cy.get('[data-testid="notebook-workspace-tab-health"]').click()
-    cy.get('[data-testid="notebook-workspace-health"]').should('be.visible')
+    cy.get('[data-testid="notebook-tab-health"]').click()
+    cy.get('[data-testid="notebook-health"]').should('be.visible')
   }
 
   return {

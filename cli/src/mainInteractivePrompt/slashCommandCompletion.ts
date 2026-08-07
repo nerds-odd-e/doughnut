@@ -66,7 +66,7 @@ export function getSlashTabCompletion(
   return { completed: buffer, count: matches.length }
 }
 
-/** Match the name only: a `<workspace directory>` holding "re" is not a match for `/re`. */
+/** Match the name only: a path argument holding "re" is not a match for `/re`. */
 function filterSlashCommandsByPrefix(
   commands: readonly InteractiveSlashCommand[],
   prefix: string
