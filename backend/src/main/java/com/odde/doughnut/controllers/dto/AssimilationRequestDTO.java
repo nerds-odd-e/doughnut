@@ -4,4 +4,5 @@ public class AssimilationRequestDTO {
   public Integer noteId;
   public Boolean skipMemoryTracking;
   public String propertyKey;
+  public Boolean assimilateAsCommissioned;
 }

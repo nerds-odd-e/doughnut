@@ -109,8 +109,15 @@
                 :disabled="!noteInfoLoaded"
                 :assimilate-disabled="assimilateDisabled"
                 :skipped-for-recall="isSkippedForRecall(noteRecallInfo)"
+                :show-commissioned-option="true"
                 @assimilate="
                   (skip) => emit('assimilate', { skipMemoryTracking: skip })
+                "
+                @assimilate-as-commissioned="
+                  emit('assimilate', {
+                    skipMemoryTracking: false,
+                    assimilateAsCommissioned: true,
+                  })
                 "
                 @revive="emit('revive', {})"
               />

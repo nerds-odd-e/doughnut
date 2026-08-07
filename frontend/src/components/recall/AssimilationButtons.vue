@@ -1,5 +1,52 @@
 <template>
+  <div
+    v-if="showCommissionedOption"
+    class="daisy-join"
+  >
+    <input
+      type="submit"
+      name="submit"
+      value="Assimilate"
+      :class="['daisy-btn daisy-btn-primary daisy-join-item', sizeClass]"
+      data-test="assimilate"
+      :disabled="disabled || assimilateDisabled"
+      @click="$emit('assimilate', false)"
+    />
+    <AutoCollapseDropdown
+      v-slot="{ closeDropdown }"
+      class="daisy-dropdown daisy-dropdown-end daisy-dropdown-top daisy-join-item shrink-0"
+    >
+      <summary
+        data-test="assimilate-as-commissioned-caret"
+        :class="[
+          'daisy-btn daisy-btn-primary list-none cursor-pointer px-2',
+          sizeClass,
+          { 'pointer-events-none opacity-50': disabled || assimilateDisabled },
+        ]"
+        aria-label="Assimilate options"
+      >
+        <ChevronDown class="h-4 w-4" aria-hidden="true" />
+      </summary>
+      <DropdownMenu>
+        <DropdownMenuItem>
+          <button
+            type="button"
+            data-test="assimilate-as-commissioned"
+            :class="dropdownMenuButtonClass"
+            :disabled="disabled || assimilateDisabled"
+            @click="
+              $emit('assimilateAsCommissioned');
+              closeDropdown()
+            "
+          >
+            Assimilate as commissioned
+          </button>
+        </DropdownMenuItem>
+      </DropdownMenu>
+    </AutoCollapseDropdown>
+  </div>
   <input
+    v-else
     type="submit"
     name="submit"
     value="Assimilate"
@@ -31,8 +78,19 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
+import { ChevronDown } from "@lucide/vue"
+import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
+import DropdownMenu from "@/components/commons/DropdownMenu.vue"
+import DropdownMenuItem from "@/components/commons/DropdownMenuItem.vue"
+import { dropdownMenuButtonClass } from "@/components/commons/dropdownMenuClasses"
 
 export default defineComponent({
+  components: {
+    AutoCollapseDropdown,
+    ChevronDown,
+    DropdownMenu,
+    DropdownMenuItem,
+  },
   props: {
     disabled: {
       type: Boolean,
@@ -55,8 +113,15 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    showCommissionedOption: {
+      type: Boolean,
+      default: false,
+    },
   },
-  emits: ["assimilate", "revive"],
+  emits: ["assimilate", "revive", "assimilateAsCommissioned"],
+  setup() {
+    return { dropdownMenuButtonClass }
+  },
   computed: {
     sizeClass(): string {
       return this.size === "sm" ? "daisy-btn-sm" : ""

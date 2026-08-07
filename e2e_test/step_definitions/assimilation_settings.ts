@@ -31,6 +31,10 @@ When('I assimilate on the assimilation panel', () => {
   start.assumeAssimilationPage().assimilateOnPanel()
 })
 
+When('I assimilate it as commissioned', () => {
+  start.assumeAssimilationPage().assimilateAsCommissioned()
+})
+
 When('I skip recall on the assimilation panel', () => {
   start.assumeAssimilationPage().skipRecallOnPanel()
 })

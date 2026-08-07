@@ -34,6 +34,13 @@ Then(
 )
 
 Then(
+  'I should see a commissioned memory tracker for {string}',
+  (_noteTitle: string) => {
+    start.assumeAssimilationPage().expectCommissionedMemoryTracker()
+  }
+)
+
+Then(
   'the property memory tracker for {string} should be absent',
   (propertyKey: string) => {
     start

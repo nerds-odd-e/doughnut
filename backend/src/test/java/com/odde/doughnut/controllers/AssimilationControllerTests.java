@@ -43,6 +43,12 @@ class AssimilationControllerTests extends ControllerTestBase {
     return request;
   }
 
+  AssimilationRequestDTO assimilateCommissionedRequest(Note note) {
+    AssimilationRequestDTO request = assimilateRequest(note);
+    request.assimilateAsCommissioned = true;
+    return request;
+  }
+
   @Nested
   class Next {
     @Test
@@ -170,6 +176,43 @@ class AssimilationControllerTests extends ControllerTestBase {
               .map(MemoryTracker::getType)
               .toList(),
           containsInAnyOrder(MemoryTrackerType.UNDERSTANDING, MemoryTrackerType.COMMISSIONED));
+    }
+
+    @Test
+    void assimilatingAsCommissionedCreatesOnlyCommissionedTracker() {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+
+      List<MemoryTracker> result = controller.assimilate(assimilateCommissionedRequest(note));
+
+      assertThat(result, hasSize(1));
+      assertThat(result.get(0).getType(), equalTo(MemoryTrackerType.COMMISSIONED));
+      assertThat(result.get(0).isNoteLevelTracker(), equalTo(true));
+      assertThat(
+          memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), note.getId()),
+          hasSize(1));
+    }
+
+    @Test
+    void assimilatingAsCommissionedWithPropertyKeyReturnsEmpty() {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      AssimilationRequestDTO request = assimilateCommissionedRequest(note);
+      request.propertyKey = "a part of";
+
+      assertThat(controller.assimilate(request), empty());
+      assertThat(
+          memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), note.getId()),
+          empty());
+    }
+
+    @Test
+    void assimilatingAsCommissionedWhenCommissionedExistsReturnsEmpty() {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      makeMe.aMemoryTrackerFor(note).commissioned().please();
+
+      assertThat(controller.assimilate(assimilateCommissionedRequest(note)), empty());
+      assertThat(
+          memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), note.getId()),
+          hasSize(1));
     }
 
     @Test

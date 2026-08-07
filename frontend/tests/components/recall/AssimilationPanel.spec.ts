@@ -12,6 +12,7 @@ import {
   assimilateSpy,
   assimilatedCountOfTheDay,
   clickAssimilate,
+  clickAssimilateAsCommissioned,
   clickVerifySpelling,
   closeSpellingVerificationPopup,
   mockedRequestDueRecallsRefresh,
@@ -54,6 +55,24 @@ describe("AssimilationPanel", () => {
       expect(mockedTotalAssimilatedCount.value).toBe(2)
       expect(assimilatedCountOfTheDay.value).toBe(2)
       expect(mockedRequestDueRecallsRefresh).toHaveBeenCalled()
+    })
+
+    it("posts assimilateAsCommissioned and stays on note without navigating", async () => {
+      assimilateSpy.mockResolvedValue(
+        wrapSdkResponse([makeMe.aMemoryTracker.id(1).commissioned().please()])
+      )
+      const wrapper = await mountAssimilationPanelReady()
+
+      await clickAssimilateAsCommissioned(wrapper)
+
+      expect(assimilateSpy).toHaveBeenCalledWith({
+        body: { noteId: note.id, assimilateAsCommissioned: true },
+      })
+      expect(mockedGoToNextAssimilation).not.toHaveBeenCalled()
+      expect(mockedTotalAssimilatedCount.value).toBe(0)
+      expect(assimilatedCountOfTheDay.value).toBe(0)
+      expect(mockedRequestDueRecallsRefresh).toHaveBeenCalled()
+      expect(spellingVerificationPopupEl()).toBeNull()
     })
   })
 

@@ -95,7 +95,16 @@ const assimilateDisabled = computed(
 const processAssimilate = async ({
   skipMemoryTracking,
   propertyKey,
+  assimilateAsCommissioned,
 }: AssimilateEvent) => {
+  if (assimilateAsCommissioned) {
+    await doAssimilate({
+      skipMemoryTracking: false,
+      assimilateAsCommissioned: true,
+    })
+    return
+  }
+
   if (skipMemoryTracking) {
     const confirmed = await popups.confirm(
       skipRecallConfirmMessage(propertyKey)
@@ -128,6 +137,7 @@ const processRevive = async ({ propertyKey }: { propertyKey?: string }) => {
 const doAssimilate = async ({
   skipMemoryTracking,
   propertyKey,
+  assimilateAsCommissioned,
 }: AssimilateEvent) => {
   assimilatingPropertyKey.value = propertyKey ?? null
   try {
@@ -135,6 +145,7 @@ const doAssimilate = async ({
       noteId: note.id,
       skipMemoryTracking,
       propertyKey,
+      assimilateAsCommissioned,
     })
 
     if (!result.success) {

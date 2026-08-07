@@ -4391,6 +4391,8 @@ components:
           type: boolean
         propertyKey:
           type: string
+        assimilateAsCommissioned:
+          type: boolean
     SuggestedTitleDTO:
       type: object
       properties:

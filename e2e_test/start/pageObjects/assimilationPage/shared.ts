@@ -3,6 +3,10 @@ import { waitUntilAppIsNotBusy } from '../../pageBase'
 export const assimilateButtonSelector = '[data-test="assimilate"]'
 export const reviveButtonSelector = '[data-test="revive"]'
 export const skipRecallButtonSelector = '[value="Skip recall"]'
+export const assimilateAsCommissionedCaretSelector =
+  '[data-test="assimilate-as-commissioned-caret"]'
+export const assimilateAsCommissionedSelector =
+  '[data-test="assimilate-as-commissioned"]'
 
 export const assimilationPropertyRow = (propertyKey: string) =>
   cy.get(
@@ -15,6 +19,18 @@ export const isNoteLevelAssimilationControl = (el: Element) =>
 export const assimilateButton = (options?: { timeout?: number }) =>
   cy
     .get(assimilateButtonSelector, options ?? {})
+    .filter((_, el) => isNoteLevelAssimilationControl(el))
+
+export const assimilateAsCommissionedCaret = (options?: { timeout?: number }) =>
+  cy
+    .get(assimilateAsCommissionedCaretSelector, options ?? {})
+    .filter((_, el) => isNoteLevelAssimilationControl(el))
+
+export const assimilateAsCommissionedButton = (options?: {
+  timeout?: number
+}) =>
+  cy
+    .get(assimilateAsCommissionedSelector, options ?? {})
     .filter((_, el) => isNoteLevelAssimilationControl(el))
 
 export const reviveButton = (options?: { timeout?: number }) =>

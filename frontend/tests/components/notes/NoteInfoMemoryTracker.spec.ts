@@ -64,6 +64,22 @@ describe("NoteInfoMemoryTracker", () => {
     expect(wrapper.text()).toContain("spelling")
   })
 
+  it("should display commissioned memory tracker type", () => {
+    const memoryTracker = makeMe.aMemoryTracker
+      .removedFromTracking(false)
+      .commissioned()
+      .please()
+
+    wrapper = helper
+      .component(NoteInfoMemoryTracker)
+      .withProps({
+        modelValue: memoryTracker,
+      })
+      .mount({ attachTo: document.body })
+
+    expect(wrapper.text()).toContain("Commissioned")
+  })
+
   it("should apply strikethrough styling to skipped memory trackers", () => {
     const memoryTracker = makeMe.aMemoryTracker
       .removedFromTracking(true)

@@ -151,3 +151,27 @@ export async function clickAssimilate(
   assimilateButtonEl(wrapper)!.click()
   await flushPromises()
 }
+
+export function assimilateAsCommissionedCaretEl(
+  wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
+) {
+  return wrapper.element.querySelector(
+    '[data-test="assimilate-as-commissioned-caret"]'
+  ) as HTMLElement | null
+}
+
+export function assimilateAsCommissionedButtonEl() {
+  return document.body.querySelector(
+    '[data-test="assimilate-as-commissioned"]'
+  ) as HTMLButtonElement | null
+}
+
+export async function clickAssimilateAsCommissioned(
+  wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
+) {
+  const caret = assimilateAsCommissionedCaretEl(wrapper)
+  caret!.click()
+  await flushPromises()
+  assimilateAsCommissionedButtonEl()!.click()
+  await flushPromises()
+}

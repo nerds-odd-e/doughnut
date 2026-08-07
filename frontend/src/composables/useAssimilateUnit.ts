@@ -9,11 +9,12 @@ export type AssimilateUnitRequest = {
   noteId: number
   skipMemoryTracking: boolean
   propertyKey?: string
+  assimilateAsCommissioned?: boolean
 }
 
 export type AssimilateEvent = Pick<
   AssimilateUnitRequest,
-  "skipMemoryTracking" | "propertyKey"
+  "skipMemoryTracking" | "propertyKey" | "assimilateAsCommissioned"
 >
 
 export type AssimilateUnitResult = {
@@ -45,6 +46,9 @@ export function useAssimilateUnit() {
               ? { propertyKey: request.propertyKey }
               : {}),
             ...(request.skipMemoryTracking ? { skipMemoryTracking: true } : {}),
+            ...(request.assimilateAsCommissioned
+              ? { assimilateAsCommissioned: true }
+              : {}),
           },
         }),
       { blockUi: true, message: "Assimilating..." }
@@ -54,6 +58,12 @@ export function useAssimilateUnit() {
       return { success: false, navigated: false }
     }
 
+    requestDueRecallsRefresh()
+
+    if (request.assimilateAsCommissioned) {
+      return { success: true, navigated: false, memoryTrackers }
+    }
+
     const newTrackerCount = memoryTrackers.filter(
       (tracker) => !tracker.removedFromTracking
     ).length
@@ -61,7 +71,6 @@ export function useAssimilateUnit() {
       totalAssimilatedCount.value += newTrackerCount
     }
     incrementAssimilatedCount(newTrackerCount)
-    requestDueRecallsRefresh()
 
     const navigated = await goToNextAssimilation()
     return { success: true, navigated, memoryTrackers }

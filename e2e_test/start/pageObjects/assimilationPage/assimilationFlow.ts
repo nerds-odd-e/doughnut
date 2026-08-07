@@ -5,6 +5,8 @@ import { assimilationPropertyMemoryTrackerExpectations } from './propertyMemoryT
 import { assimilationPropertyFlow } from './assimilationPropertyFlow'
 import { assimilationRefinementLayoutExpectations } from './refinementLayoutExpectations'
 import {
+  assimilateAsCommissionedButton,
+  assimilateAsCommissionedCaret,
   assimilateButton,
   mainNoteHeadingTitleSelector,
   noteLevelReviveElements,
@@ -44,6 +46,16 @@ export const assumeAssimilationPage = () => ({
   assimilateOnPanel() {
     this.clickAssimilate()
     waitUntilAppIsNotBusy()
+    return this
+  },
+  assimilateAsCommissioned() {
+    assimilateAsCommissionedCaret().click()
+    assimilateAsCommissionedButton().click()
+    waitUntilAppIsNotBusy()
+    return this
+  },
+  expectCommissionedMemoryTracker() {
+    this.expectMemoryTrackerInfo([{ type: 'Commissioned' }])
     return this
   },
   skipRecallOnPanel() {

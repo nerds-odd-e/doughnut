@@ -32,6 +32,22 @@ final class MemoryTrackerAssimilation {
     boolean skipMemoryTracking =
         request.skipMemoryTracking != null ? request.skipMemoryTracking : false;
 
+    if (Boolean.TRUE.equals(request.assimilateAsCommissioned)) {
+      if (request.propertyKey != null && !request.propertyKey.isEmpty()) {
+        return List.of();
+      }
+      boolean commissionedExists =
+          existingTrackers.stream()
+              .filter(MemoryTracker::isNoteLevelTracker)
+              .anyMatch(mt -> mt.getType() == MemoryTrackerType.COMMISSIONED);
+      if (commissionedExists) {
+        return List.of();
+      }
+      return List.of(
+          createNoteLevelTracker(
+              note, currentUser, currentTime, skipMemoryTracking, MemoryTrackerType.COMMISSIONED));
+    }
+
     if (request.propertyKey != null && !request.propertyKey.isEmpty()) {
       boolean propertyTrackerExists =
           existingTrackers.stream().anyMatch(mt -> request.propertyKey.equals(mt.getPropertyKey()));

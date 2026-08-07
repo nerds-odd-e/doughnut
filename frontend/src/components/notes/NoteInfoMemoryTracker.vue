@@ -36,7 +36,10 @@ const isSkipped = computed(
 )
 
 const trackerTypeLabel = computed(() => {
-  const { propertyKey, spelling } = localMemoryTracker.value
+  const { propertyKey, spelling, type } = localMemoryTracker.value
+  if (type === "COMMISSIONED") {
+    return "Commissioned"
+  }
   if (propertyKey) {
     return `property: ${propertyKey}`
   }

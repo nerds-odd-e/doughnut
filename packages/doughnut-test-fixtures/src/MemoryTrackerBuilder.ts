@@ -68,6 +68,12 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
     return this
   }
 
+  commissioned(): MemoryTrackerBuilder {
+    this.data.type = 'COMMISSIONED'
+    this.data.spelling = false
+    return this
+  }
+
   ofNote(note: NoteRealm): MemoryTrackerBuilder {
     this.data.note = note.note
     this.notebookId = note.notebookRealm.notebook.id
