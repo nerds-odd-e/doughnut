@@ -1,4 +1,4 @@
-@disableOpenAiService @mockBrowserTime @wip
+@disableOpenAiService @mockBrowserTime
 Feature: Commissioned learning session
   As a learner, I want to assimilate a note as a commissioned memory tracker
   so that a tutor can later conduct a learning session for it.
