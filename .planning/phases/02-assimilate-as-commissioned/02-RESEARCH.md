@@ -334,16 +334,13 @@ commissioned(): MemoryTrackerBuilder {
 
 **If wrong:** Confirm A1/A3 quickly at plan Jidoka; A2/A4 inherit current assimilate posture.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Enhance graduated E2E for coexistence (SC3) without adding a second scenario?**
-   - What we know: D-08 allows only one graduated scenario; CONTEXT specifics ask to cover ordinary-already-present.
-   - What's unclear: Whether to expand that scenario’s Given/Then or rely on backend+Vitest for coexistence.
-   - Recommendation: Keep one E2E scenario name; add a Given that ordinary assimilation already happened (or assert both `normal` and `Commissioned` after a prior ordinary assimilate in the same scenario). Supplement with `AssimilationControllerTests` create-commissioned-when-understanding-exists.
+   - **RESOLVED:** Keep one graduated E2E scenario name (D-08). Cover ordinary-already-present via enriched Given/Then in that scenario and/or `AssimilationControllerTests` create-commissioned-when-understanding-exists (plan 02-02). Do not add a second E2E scenario.
 
 2. **Hide vs disable commissioned menu when COMMISSIONED exists (D-05)?**
-   - What we know: Either is allowed.
-   - Recommendation: **Hide** the caret entirely when COMMISSIONED exists (cleaner; avoids disabled empty menu). If join looks odd with lone Assimilate, render caret only when option available.
+   - **RESOLVED:** **Hide** the caret entirely when COMMISSIONED exists (render caret only when the option is available).
 
 ## Environment Availability
 
