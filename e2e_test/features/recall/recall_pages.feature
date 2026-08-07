@@ -1,5 +1,5 @@
 Feature: Assimilation and Recall Pages
-  As a learner, I want to assimilate and recall my notes and links so that I have fresh memory.
+  As a learner, I want to assimilate and recall my notes and relationships so that I have fresh memory.
 
   Background:
     Given I am logged in as an existing user
@@ -17,7 +17,7 @@ Feature: Assimilation and Recall Pages
       | single note       | Sedition | Incite violence             |
       | single note       | Sedation | Put to sleep                |
       | image note        | Sedative | Sleep medicine; a_slide.jpg |
-      | link              | Sedition | similar to; Sedation        |
+      | relationship      | Sedition | similar to; Sedation        |
     Then I should see the no more notes to assimilate toast
 
   Scenario: Count of recall and assimilate notes

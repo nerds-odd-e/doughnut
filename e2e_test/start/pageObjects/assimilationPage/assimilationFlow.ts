@@ -120,7 +120,7 @@ export const assumeAssimilationPage = () => ({
         break
       }
 
-      case 'link': {
+      case 'relationship': {
         if (additionalInfo) {
           const [relationType, targetNote] = commonSenseSplit(
             additionalInfo,

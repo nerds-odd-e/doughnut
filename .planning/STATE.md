@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: null
 milestone_name: null
-current_phase: "7"
-current_phase_name: Relationship assimilation E2E wording
+current_phase: "8"
+current_phase_name: Wiki-link E2E Gherkin wording
 status: executing
 stopped_at: null
-last_updated: "2026-08-07T08:25:00Z"
+last_updated: "2026-08-07T08:40:00Z"
 last_activity: 2026-08-07
-last_activity_desc: "Quick 005 Phase 6 done; starting Phase 7"
+last_activity_desc: "Quick 005 Phase 7 done; starting Phase 8"
 progress:
   total_phases: 10
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 1
   completed_plans: 0
-  percent: 60
+  percent: 70
 ---
 
 # Project State
@@ -29,7 +29,7 @@ See: `.planning/PROJECT.md`
 
 - Plan: `.planning/quick/005-ubiquitous-language-link/PLAN.md`
 - Context: `.planning/quick/005-ubiquitous-language-link/CONTEXT.md`
-- Next: Phase 7 — Behavior: relationship assimilation wording in E2E
+- Next: Phase 8 — Behavior: wiki-link E2E Gherkin uses “wiki link”
 
 ## Deferred Items
 

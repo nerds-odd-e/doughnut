@@ -87,22 +87,18 @@ Where Doughnut means a **wiki link** and/or **relationship**, stop using bare **
 
 ### Phase 7 — Behavior: relationship assimilation wording in E2E
 
-**Status:** planned  
+**Status:** done  
 **Type:** Behavior
 
-- **Pre:** Assimilation/recall E2E uses type `link` and “notes and links” for **relationship** assimilation.
-- **Trigger:** Author/run relationship assimilation scenario.
-- **Post:** Gherkin and helpers say **relationship** (not bare link); product assimilation UI unchanged unless it also shows bare link (fix only if found).
+- Assimilation type / feature blurb use **relationship**; `recall_pages.feature` green.
 
-**Touch:** `recall_pages.feature`, `assimilationFlow.ts` (`case 'link'`), related steps only as needed.
-
-**Done when:** Targeted Cypress for that feature passes with relationship wording.
+**Done when:** Targeted Cypress for that feature passes with relationship wording. ✅
 
 ---
 
 ### Phase 8 — Behavior: wiki-link E2E Gherkin uses “wiki link”
 
-**Status:** planned
+**Status:** planned  
 **Type:** Behavior
 
 - **Pre:** Wiki-link feature/steps say `the link "…"`, `dead link`, `via the link toolbar`, scenario `link and move`, etc.
