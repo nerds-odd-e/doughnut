@@ -80,6 +80,27 @@ class AssimilationControllerAssimilateTests extends ControllerTestBase {
     }
 
     @Test
+    void
+        assimilatingAsCommissionedWhenUnderstandingExistsCreatesCommissionedAndLeavesUnderstanding() {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      makeMe.aMemoryTrackerFor(note).please();
+
+      List<MemoryTracker> result =
+          controller.assimilate(
+              AssimilationControllerTestSupport.assimilateCommissionedRequest(note));
+
+      assertThat(result, hasSize(1));
+      assertThat(result.get(0).getType(), equalTo(MemoryTrackerType.COMMISSIONED));
+      assertThat(
+          memoryTrackerRepository
+              .findByUserAndNote(currentUser.getUser().getId(), note.getId())
+              .stream()
+              .map(MemoryTracker::getType)
+              .toList(),
+          containsInAnyOrder(MemoryTrackerType.UNDERSTANDING, MemoryTrackerType.COMMISSIONED));
+    }
+
+    @Test
     void assimilatingAsCommissionedWithPropertyKeyReturnsEmpty() {
       Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       AssimilationRequestDTO request =
