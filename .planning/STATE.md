@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: null
-milestone_name: null
-current_phase: null
-current_phase_name: null
-status: idle
+milestone: v1.3
+milestone_name: Commissioned Learning Session MVP
+current_phase: 1
+current_phase_name: Commissioned tracker model
+status: planning
 stopped_at: null
-last_updated: "2026-08-07T13:30:00Z"
+last_updated: "2026-08-07T13:40:00Z"
 last_activity: 2026-08-07
-last_activity_desc: "Commissioned learning session MVP scope agreed; ADR 0005 drafted"
+last_activity_desc: "v1.3 requirements and roadmap written; Phase 1 next"
 progress:
-  total_phases: 0
+  total_phases: 7
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -25,25 +25,23 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-- Milestone being defined: commissioned learning session MVP (Learning Orchestrator commissions a Tutor).
-- Behavioral scope agreed in
-  `.planning/phases/999.1-commissioned-learning-session/commissioned_learning_session.feature`;
-  design decisions in the sibling `CONTEXT.md`. Requirements + roadmap not written yet.
-- Protocol drafted as ADR 0005 (Proposed); score-to-schedule policy added to ADR 0003 (Proposed).
-- Amend recomputation deliberately deferred to planning — not in any ADR yet.
-- Next: human review of both ADRs, then requirements + roadmap for the milestone.
+Phase: 1 — Commissioned tracker model (Structure)
+Plan: —
+Status: Roadmap ready — discuss or plan Phase 1
+Last activity: 2026-08-07 — Milestone v1.3 requirements + roadmap created
 
 ## Deferred Items
 
 | Category | Item | Status |
 |----------|------|--------|
-| backlog | 999.1 Commissioned learning session | MVP scope agreed — promote to a milestone |
 | seed | SEED-001-mcq-fuzzy-notebook-title-spelling-match | dormant |
 | seed | SEED-002-host-mcp-over-https | dormant |
 | tech_debt | OpenAPI/`outgoingLinks`/`linkText` glossary rename (ADR 0001) | open |
 | deferred | Refine note on answered spelling questions | deferred |
+| plan_later | Amend recomputation (snapshot vs compound) | decide in `/gsd-plan-phase 7` |
 | known | `pnpm lint:all` / `test:path-routing` fails pre-existing (`render from routing JSON substitutes SHA` 6==7) | unrelated |
 
 ## Session Continuity
 
-Next: requirements + roadmap for the commissioned learning session milestone (`/gsd-new-milestone`).
+`/gsd-discuss-phase 1` — gather context for Structure phase, then `/gsd-plan-phase 1`.
+Or `/gsd-plan-phase 1` directly (MVP brief already in `01-commissioned-tracker-model/CONTEXT.md`).

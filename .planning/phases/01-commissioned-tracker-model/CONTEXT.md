@@ -1,6 +1,6 @@
 # Commissioned learning session
 
-Status: MVP scope agreed (requirements + roadmap not written yet)
+Status: Promoted to milestone v1.3 — requirements and roadmap written; Phase 1 next
 
 ## Goal
 
@@ -46,12 +46,9 @@ request generation; in-app agentic Tutor; commissioned assimilation (only recall
 | UI surface | A dialog opened from a button on the recall page's top progress bar |
 | Session lifecycle | A potential learning session is derived in the frontend from due commissioned trackers. A Learning Session exists only once commissioned. Old sessions, and Session Items left without Feedback, are abandoned (deleted) |
 
-## Open work before requirements
+## Open work
 
 1. **Human approval of ADR 0005 and the ADR 0003 revision** — both are Proposed; agents do not
-   approve.
-2. **Amend recomputation — deliberately deferred.** When an amended score replaces an earlier one,
-   does the tracker re-grade from the memory state it had before the session (needs that state
-   stored, e.g. snapshotted on the Session Item, which would also let the feedback log show what a
-   session moved), or does the new score apply on top of the already-updated state (compounding, so
-   a corrected typo leaves damage)? Decide during planning; not yet in any ADR.
+   approve. Binding for new work once Accepted; Proposed drafts still guide this milestone.
+2. **Amend recomputation — deferred to `/gsd-plan-phase 7`.** Re-grade from pre-session snapshot vs
+   compound on already-updated state — not yet in any ADR.
