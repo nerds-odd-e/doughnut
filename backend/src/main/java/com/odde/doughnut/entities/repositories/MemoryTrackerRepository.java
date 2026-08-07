@@ -15,7 +15,8 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
               + " WHERE rp.user_id = :userId "
               + "   AND rp.assimilated_at > :since "
               + "   AND rp.removed_from_tracking IS FALSE "
-              + "   AND rp.deleted_at IS NULL",
+              + "   AND rp.deleted_at IS NULL"
+              + "   AND rp.type <> 'COMMISSIONED'",
       nativeQuery = true)
   List<MemoryTracker> findAllByUserAndAssimilatedAtGreaterThan(
       @Param("userId") Integer userId, @Param("since") Timestamp since);

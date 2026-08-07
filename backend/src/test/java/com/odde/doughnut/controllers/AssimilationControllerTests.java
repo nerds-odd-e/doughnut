@@ -89,6 +89,17 @@ class AssimilationControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void assimilatedCountOfTheDayExcludesCommissionedTrackers() {
+      Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
+      testabilitySettings.timeTravelTo(day1);
+      Note note = ownedNote("commissioned-today");
+      makeMe.aMemoryTrackerFor(note).commissioned().assimilatedAt(day1).please();
+
+      AssimilationNextDTO result = controller.next("Asia/Shanghai");
+      assertThat(result.getCounts().getAssimilatedCountOfTheDay(), equalTo(0));
+    }
+
+    @Test
     void notLoggedIn() {
       currentUser.setUser(null);
       assertThrows(ResponseStatusException.class, () -> controller.next("Asia/Shanghai"));
