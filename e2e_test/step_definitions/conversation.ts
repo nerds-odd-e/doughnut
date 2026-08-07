@@ -45,29 +45,15 @@ When(
   }
 )
 
-Then(
-  "I should see the new message {string} on the current user's side of the conversation",
-  (message: string) => {
-    start.assumeMessageCenterPage().expectMessageDisplayAtUserSide(message)
-  }
-)
-
-Then(
-  "I should see the new message {string} on the other user's side of the conversation",
-  (message: string) => {
-    start.assumeMessageCenterPage().expectMessageDisplayAtOtherSide(message)
-  }
-)
-
-Then(
-  'I read the conversation with {string} for the subject {string} in the message center',
+When(
+  'I read the conversation with {string} about {string}',
   (partner: string, subject: string) => {
     start.navigateToMessageCenter().openConversation(subject, partner)
   }
 )
 
 Then(
-  '{string} can see the conversation with {string} for the subject {string} in the message center:',
+  '{string} can see the conversation with {string} about {string} in the message center:',
   (user: string, partner: string, subject: string, data: DataTable) => {
     expectConversationInMessageCenter(
       subject,
@@ -79,7 +65,7 @@ Then(
 )
 
 Then(
-  'I can see the conversation with {string} for the subject {string} in the message center:',
+  'I can see the conversation with {string} about {string} in the message center:',
   (partner: string, subject: string, data: DataTable) => {
     expectConversationInMessageCenter(
       subject,
@@ -89,22 +75,12 @@ Then(
   }
 )
 
-Then(
-  'I can see the message {string} in the conversation {string}',
-  (message: string, conversation: string) => {
-    start
-      .assumeMessageCenterPage()
-      .conversation(conversation)
-      .expectMessage(message)
-  }
-)
-
 Then('I should have no unread messages', () => {
   start.messageCenterIndicator().expectNoCount()
 })
 
 Then(
-  '{string} should have {int} unread messages',
+  '{string} should have an unread message count of {int}',
   (user: string, unreadMessageCount: number) => {
     waitForMenuDataUnreadCount()
     start.reloginAs(user)
@@ -114,7 +90,7 @@ Then(
 )
 
 When(
-  '{string} start a conversation about the note {string} with a message {string}',
+  '{string} starts a conversation about the note {string} with the message {string}',
   (externalIdentifier: string, note: string, conversation: string) => {
     start.reloginAs(externalIdentifier)
     return start.testability().startConversationAboutNote(note, conversation)
@@ -122,7 +98,7 @@ When(
 )
 
 When(
-  'I start a conversation about the note {string} with a message {string} to AI',
+  'I ask AI about the note {string} with the message {string}',
   (note: string, conversation: string) => {
     start.jumpToNotePage(note).sendMessageToAI(conversation)
   }
@@ -134,7 +110,7 @@ When('I send the message {string} to AI', (question: string) => {
     .replyToConversationAndInviteAiToReply(question)
 })
 
-Then('I should receive the following chat messages:', (data: DataTable) => {
+Then('I should see the following chat messages:', (data: DataTable) => {
   start.assumeConversationAboutNotePage().expectMessages(data.hashes())
 })
 

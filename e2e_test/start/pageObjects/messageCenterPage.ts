@@ -4,18 +4,13 @@ import router from 'start/router'
 function conversationPane() {
   return {
     expectMessage(message: string) {
-      cy.findByText(message).should('be.visible')
-      return this
-    },
-    reply(message: string) {
-      cy.get('textarea')
-        .should('be.visible')
-        .and('be.enabled')
-        .clear()
-        .type(message)
-      cy.findByRole('button', { name: 'Send message' }).click()
-      cy.findByText(message).should('be.visible')
-      waitUntilAppIsNotBusy()
+      cy.findByText(message).should(($el) => {
+        const actual = $el.text().trim()
+        expect(
+          actual,
+          `Expected conversation message "${message}", but found "${actual}"`
+        ).to.equal(message)
+      })
       return this
     },
   }
@@ -35,13 +30,6 @@ export const assumeMessageCenterPage = () => {
   cy.findByText('Message Center').should('be.visible')
 
   return {
-    expectConversation(subject: string, partner: string) {
-      withinConversationList(() => {
-        cy.findByText(subject).should('be.visible')
-        cy.findByText(partner).should('be.visible')
-      })
-      return this
-    },
     openConversation(subject: string, partner: string) {
       withinConversationList(() => {
         cy.findByText(subject).should('be.visible')
@@ -54,45 +42,6 @@ export const assumeMessageCenterPage = () => {
       })
       waitUntilAppIsNotBusy()
       return conversationPane()
-    },
-    expectMessageDisplayAtUserSide(message: string) {
-      cy.findByText(message).parents('.justify-end').should('be.visible')
-      return this
-    },
-    expectMessageDisplayAtOtherSide(message: string) {
-      cy.findByText(message)
-        .parent()
-        .should('be.visible')
-        .and('not.have.class', 'justify-end')
-      return this
-    },
-    conversation(conversationSubject: string) {
-      withinConversationList(() => {
-        cy.get(
-          `[data-testid="message-center-conversation-item"][data-conversation-subject="${conversationSubject}"]`
-        )
-          .should('be.visible')
-          .click()
-      })
-      waitUntilAppIsNotBusy()
-      return conversationPane()
-    },
-    replyToConversation(
-      conversationSubject: string,
-      messages: readonly string[]
-    ) {
-      this.conversation(conversationSubject)
-      cy.wrap(messages).each((message: string) => {
-        cy.get('textarea')
-          .should('be.visible')
-          .and('be.enabled')
-          .clear()
-          .type(message)
-        cy.findByRole('button', { name: 'Send message' }).click()
-        cy.findByText(message).should('be.visible')
-        waitUntilAppIsNotBusy()
-      })
-      return this
     },
   }
 }

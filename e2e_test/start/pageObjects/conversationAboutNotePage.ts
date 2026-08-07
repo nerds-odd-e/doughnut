@@ -1,3 +1,5 @@
+import { waitUntilAppIsNotBusy } from '../pageBase'
+
 function flattenExportContent(content: unknown): string {
   if (typeof content === 'string') return content
   if (Array.isArray(content)) {
@@ -44,24 +46,24 @@ function exportMessagesFromJson(json: Record<string, unknown>): Array<{
 }
 
 export class ConversationAboutNotePage {
-  replyToConversation(msg: string) {
-    cy.focused().type(msg)
-    cy.get('#chat-button').click()
-    return this
-  }
-
   replyToConversationAndInviteAiToReply(msg: string) {
     cy.focused().type(msg)
     cy.findByRole('button', {
       name: 'Send message and invite AI to reply',
     }).click()
+    waitUntilAppIsNotBusy()
     return this
   }
 
   expectMessages(messages: Record<'role' | 'message', string>[]) {
     messages.forEach(({ role, message }) => {
-      cy.findByText(message, {
-        selector: role === 'user' ? 'pre' : '.ai-chat *',
+      const selector = role === 'user' ? 'pre' : '.ai-chat *'
+      cy.findByText(message, { selector }).should(($el) => {
+        const actual = $el.text().trim()
+        expect(
+          actual,
+          `Expected ${role} chat message "${message}", but found "${actual}"`
+        ).to.equal(message)
       })
     })
     return this
@@ -103,38 +105,21 @@ export class ConversationAboutNotePage {
   }
 
   expectExportContainsUserMessage(message: string) {
-    cy.get('[data-testid="export-textarea"]')
-      .should(($textarea) => {
-        const content = $textarea.val() as string
-        expect(content).to.not.be.empty
-        expect(content.trim()).to.match(/^\{/)
-      })
-      .then(($textarea) => {
-        const content = $textarea.val() as string
-        const json = JSON.parse(content) as Record<string, unknown>
-        const messages = exportMessagesFromJson(json)
-        if (!messages || messages.length === 0) {
-          throw new Error(
-            `No messages found in export. JSON structure: ${JSON.stringify(json, null, 2)}`
-          )
-        }
-        const userMessages = messages.filter((m) => {
-          const isUser = m.role === 'user'
-          if (!isUser) return false
-          const messageContent = m.content || ''
-          return messageContent.includes(message)
-        })
-        expect(userMessages.length).to.be.greaterThan(0)
-      })
+    this.expectExportContainsRoleMessage('user', message)
     return this
   }
 
   expectExportContainsAssistantReply(reply: string) {
+    this.expectExportContainsRoleMessage('assistant', reply)
+    return this
+  }
+
+  private expectExportContainsRoleMessage(role: string, expected: string) {
     cy.get('[data-testid="export-textarea"]')
       .should(($textarea) => {
         const content = $textarea.val() as string
-        expect(content).to.not.be.empty
-        expect(content.trim()).to.match(/^\{/)
+        expect(content, 'export JSON should not be empty').to.not.be.empty
+        expect(content.trim(), 'export should be JSON').to.match(/^\{/)
       })
       .then(($textarea) => {
         const content = $textarea.val() as string
@@ -145,15 +130,16 @@ export class ConversationAboutNotePage {
             `No messages found in export. JSON structure: ${JSON.stringify(json, null, 2)}`
           )
         }
-        const assistantMessages = messages.filter((m) => {
-          const isAssistant = m.role === 'assistant'
-          if (!isAssistant) return false
-          const messageContent = m.content || ''
-          return messageContent.includes(reply)
-        })
-        expect(assistantMessages.length).to.be.greaterThan(0)
+        const matching = messages.filter(
+          (m) => m.role === role && (m.content || '').includes(expected)
+        )
+        expect(
+          matching.length,
+          `Expected export to include ${role} message containing "${expected}", but found roles: ${messages
+            .map((m) => `${m.role}:${m.content}`)
+            .join(' | ')}`
+        ).to.be.greaterThan(0)
       })
-    return this
   }
 
   copyExport() {

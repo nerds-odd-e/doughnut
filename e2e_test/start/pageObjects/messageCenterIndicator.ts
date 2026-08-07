@@ -11,9 +11,16 @@ export function messageCenterIndicator() {
   ) => cy.get('.main-menu').within(() => fn(cy.get('li[title="Messages"]')))
 
   return {
-    expectCount(numberOfNotes: number) {
+    expectCount(unreadMessageCount: number) {
       getMessageInSidebar(($el) => {
-        $el.findByText(`${numberOfNotes}`, { selector: '.unread-count' })
+        $el
+          .findByText(`${unreadMessageCount}`, { selector: '.unread-count' })
+          .should(($badge) => {
+            expect(
+              $badge.text().trim(),
+              `Expected unread message count ${unreadMessageCount}, but found ${$badge.text().trim()}`
+            ).to.equal(`${unreadMessageCount}`)
+          })
       })
       return this
     },
@@ -21,6 +28,7 @@ export function messageCenterIndicator() {
       getMessageInSidebar(($el) => {
         $el.get('.unread-count').should('not.exist')
       })
+      return this
     },
     go() {
       getMessageInSidebar(($el) => {

@@ -1,20 +1,20 @@
-Feature: User having a conversation regarding a note
-  As a user, I want to have a conversation regarding a note,
-  so that trainers can improve the content and I can learn more about the subject.
+Feature: Conversation about a note
+  As a learner, I want to start a conversation about a note,
+  so that trainers and circle members can discuss the subject.
 
-  Scenario: User send message about a note shared to a bazaar
+  Scenario: Conversation about a Bazaar note appears in the owner's message center
     Given there is a notebook "Trainer demos" with a note "Rocket Science" from user "a_trainer" shared to the Bazaar
-    When "old_learner" start a conversation about the note "Rocket Science" with a message "Hi"
-    Then "a_trainer" can see the conversation with "Old Learner" for the subject "Rocket Science" in the message center:
+    When "old_learner" starts a conversation about the note "Rocket Science" with the message "Hi"
+    Then "a_trainer" can see the conversation with "Old Learner" about "Rocket Science" in the message center:
       | message |
       | Hi      |
 
-  Scenario: User send message about a note in a circle
+  Scenario: Conversation about a circle notebook is visible to both parties
     Given There is a circle "Odd-e SG Team" with "a_trainer, old_learner" members and notebook "Team agreement" by "a_trainer"
-    When "old_learner" start a conversation about the note "Team agreement" with a message "Hi"
-    And I can see the conversation with "Odd-e SG Team" for the subject "Team agreement" in the message center:
+    When "old_learner" starts a conversation about the note "Team agreement" with the message "Hi"
+    Then I can see the conversation with "Odd-e SG Team" about "Team agreement" in the message center:
       | message |
       | Hi      |
-    Then "a_trainer" can see the conversation with "Old Learner" for the subject "Team agreement" in the message center:
+    And "a_trainer" can see the conversation with "Old Learner" about "Team agreement" in the message center:
       | message |
       | Hi      |

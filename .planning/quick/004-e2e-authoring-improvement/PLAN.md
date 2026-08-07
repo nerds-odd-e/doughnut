@@ -136,16 +136,14 @@ Improve all E2E feature files (and supporting steps/page objects as needed) so t
 
 ### Phase 10 — Messages E2E authoring
 
-**Status:** planned  
+**Status:** done  
 **Type:** Behavior
 
-- **Pre:** Message features may violate checklist.
-- **Trigger:** Audit + improve.
-- **Post:** Checklist satisfied; Cypress green.
+- Domain Gherkin; split unread/AI scenarios; busy waits; dead message helper cleanup.
 
 **Files:** `messages/message_center_with_unread_message_count.feature`, `messages/chat_about_a_note.feature`, `messages/message_for_note.feature`
 
-**Done when:** checklist applied; targeted Cypress passes.
+**Done when:** checklist applied; targeted Cypress passes. ✅ 9/9
 
 ---
 

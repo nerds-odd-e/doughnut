@@ -48,22 +48,9 @@ export const noteConversationAndQuestionMethods = () => ({
       }
     })
   },
-  sendMessageToNoteOwner(message: string) {
-    cy.intercept('POST', '**/api/conversation/note/**').as(
-      'startNoteConversation'
-    )
-    toolbarButton('Star a conversation about this note').click()
-    cy.findByRole('textbox').type(message)
-    cy.findByRole('button', { name: 'Send message' }).click()
-    cy.wait('@startNoteConversation').should(({ response }) => {
-      expect(response?.statusCode, 'start conversation about note').to.equal(
-        200
-      )
-    })
-  },
-
   startAConversationAboutNote() {
     toolbarButton('Star a conversation about this note').click()
+    waitUntilAppIsNotBusy()
     return assumeConversationAboutNotePage()
   },
 
