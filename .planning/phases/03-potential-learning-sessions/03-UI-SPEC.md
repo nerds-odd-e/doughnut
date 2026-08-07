@@ -1,10 +1,11 @@
 ---
 phase: 3
 slug: potential-learning-sessions
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-08-08
+reviewed_at: 2026-08-08T07:35:00+08:00
 ---
 
 # Phase 3 — UI Design Contract
@@ -46,6 +47,8 @@ Declared values (must be multiples of 4). Align to Tailwind spacing already used
 **Exceptions:** none for this phase. Do **not** introduce 44px touch-target chrome for display-only rows (Phase 5 may promote to controls).
 
 **Layout placement (auto default — RESEARCH open Q1):** Render a **sibling strip below the ordinary progress bar**, still inside the recall `GlobalBar` content column (or immediately under `ProgressBar` within `RecallProgressBar`), so ordinary progress math / `#buttons` / cog remain untouched. Prefer a vertical stack: `[nav buttons][progress bar]` then `[potential learning session rows]`. Do **not** inject rows into the gray/blue progress fill.
+
+**Focal point (recall top bar):** The ordinary progress bar (gray track / blue fill + finished/`toRepeatCount` title) remains the **primary visual anchor**. Potential-session rows are a **secondary** text strip beneath it — readable body copy, no accent, no button chrome — so they never compete with or visually merge into ordinary progress.
 
 ---
 
@@ -188,11 +191,11 @@ Choices made under `--auto` (no user questions):
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved — 2026-08-08 (gsd-ui-checker; focal-point line added under Spacing / Layout)
