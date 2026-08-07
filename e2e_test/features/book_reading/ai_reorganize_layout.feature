@@ -1,13 +1,15 @@
 @usingMockedOpenAiService
 Feature: AI-assisted book layout reorganization
 
-  @skipOptimizationDueToKnownNecessarySlowness
-  Scenario: AI reorganize opens preview dialog and applies on confirm
+  Background:
     Given I am logged in as an existing user
     And I have a notebook "Refactoring read" with a note "Code Refactoring Book"
-    When I attach a fake blank pdf book with layout of "refactoring" to the notebook "Code Refactoring Book"
+    And I attach a fake blank pdf book with layout of "refactoring" to the notebook "Code Refactoring Book"
     And I open the book attached to notebook "Refactoring read"
-    And OpenAI returns a layout suggestion that indents block "2. The Usual Defi nition Is Not Enough" for notebook "Code Refactoring Book"
+
+  @skipOptimizationDueToKnownNecessarySlowness
+  Scenario: AI reorganize opens preview dialog and applies on confirm
+    Given OpenAI returns a layout suggestion that indents block "2. The Usual Defi nition Is Not Enough" for notebook "Code Refactoring Book"
     When I request AI reorganization of the book layout
     Then I should see a reorganization preview dialog
     And the preview should show block "2. The Usual Defi nition Is Not Enough" with suggested depth 1

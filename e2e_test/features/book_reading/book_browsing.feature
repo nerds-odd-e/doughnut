@@ -3,7 +3,7 @@ Feature: Book browsing
   Background:
     Given I am logged in as an existing user
     And I have a notebook "Refactoring read" with a note "Code Refactoring Book"
-    When I attach a fake blank pdf book with layout of "refactoring" to the notebook "Code Refactoring Book"
+    And I attach a fake blank pdf book with layout of "refactoring" to the notebook "Code Refactoring Book"
     And I open the book attached to notebook "Refactoring read"
 
   Scenario: See book layout and beginning of PDF in the browser
@@ -18,13 +18,15 @@ Feature: Book browsing
     Then the book reader PDF viewport should be on page 2
     And the book block "2.2 Refactoring as Strengthening the Code" should be the current selection in the book reader
 
-  Scenario: Scrolling the PDF updates the current block; short viewport keeps aside scrolled to it
+  Scenario: Scrolling the PDF updates the current block
     When I scroll the PDF book reader to bring page 2 into primary view
     Then the book reader PDF viewport should be on page 2
     And the book block "2.2 Refactoring as Strengthening the Code" should be the current block in the book reader
+
+  Scenario: Short viewport keeps the book layout aside scrolled to the current block
     When I choose the book block "1. Refactoring: Protecting Intention in Working Software"
     And I set the book reading viewport to 1200 by 280
-    When I scroll the PDF book reader to bring page 2 into primary view
+    And I scroll the PDF book reader to bring page 2 into primary view
     Then the book reader PDF viewport should be on page 2
     And the book block "2.2 Refactoring as Strengthening the Code" should be the current block and visible in the book layout aside
 

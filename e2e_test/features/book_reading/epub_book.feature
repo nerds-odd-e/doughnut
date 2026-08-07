@@ -6,11 +6,11 @@ Feature: EPUB book
     Background:
       Given I am logged in as an existing user
       And I have a notebook "EPUB smoke" with a note "EPUB E2E Notebook"
-      When I open the notebook settings for "EPUB smoke"
+      And I open the notebook settings for "EPUB smoke"
       And I attach the EPUB file "book_reading/epub_valid_minimal.epub"
-      When I open the reading view for the attached book "epub_valid_minimal"
+      And I open the reading view for the attached book "epub_valid_minimal"
 
-    Scenario: Structure, navigation, resume, and reading control panel anchor
+    Scenario: See EPUB structure and opening content
       Then I should see the EPUB reading view with book name "epub_valid_minimal"
       And I should see the book layout in the browser:
         | 0 | Part One          |
@@ -19,27 +19,35 @@ Feature: EPUB book
         | 1 | Section Beta-One  |
         | 1 | Section Beta-Two  |
       And I should see the text "Opening paragraph for part one." in the EPUB reader
-      When I click "Chapter Beta" in the book layout
+
+    Scenario: Navigate the EPUB via the book layout
+      When I choose the book block "Chapter Beta"
       Then I should see the text "Cell One" in the EPUB reader
       And the book layout block "Section Beta-Two" should have epub start href containing "#section-beta-two"
-      When I click "Section Beta-Two" in the book layout
+      When I choose the book block "Section Beta-Two"
+      Then I should see the text "Unique content in section beta-two." in the EPUB reader
+
+    Scenario: Resume EPUB reading at the last position
+      When I choose the book block "Section Beta-Two"
       Then I should see the text "Unique content in section beta-two." in the EPUB reader
       When I leave the EPUB reading view and return to it
       Then I should see the text "Unique content in section beta-two." in the EPUB reader
-      When I click "Chapter Alpha" in the book layout
+
+    Scenario: EPUB reading control panel is content-anchored
+      When I choose the book block "Chapter Alpha"
       Then I should see the text "Body text with an illustration." in the EPUB reader
       And the EPUB Reading Control Panel should be content-anchored
 
     Scenario: EPUB reading resumes at the scrolled fragment, not the inferred block start
-      When I click "Chapter Beta" in the book layout
-      When I scroll the EPUB reader host to the top
+      When I choose the book block "Chapter Beta"
+      And I scroll the EPUB reader host to the top
       Then I should see the text "Chapter Beta" in the EPUB reader
       When I scroll the EPUB reader until the text "Cell One" is in the viewport
-      When I leave the EPUB reading view and return to it
+      And I leave the EPUB reading view and return to it
       Then I should see the text "Cell One" in the EPUB reader
 
     Scenario: Current block updates on scroll while explicit layout selection is unchanged
-      When I click "Chapter Alpha" in the book layout
+      When I choose the book block "Chapter Alpha"
       Then the book block "Chapter Alpha" should be the current selection in the book reader
       And the book block "Chapter Alpha" should be the current block in the book reader
       When I scroll the EPUB reader until the text "Cell One" is in the viewport
@@ -48,18 +56,18 @@ Feature: EPUB book
 
     Scenario: Entering the next EPUB block auto-marks a structural-only predecessor as read
       Then I should see the text "Opening paragraph for part one." in the EPUB reader
-      When I click "Chapter Alpha" in the book layout
+      When I choose the book block "Chapter Alpha"
       Then I should see the text "Body text with an illustration." in the EPUB reader
       And I should see that book block "Part One" is marked as read in the book layout
 
     Scenario: Mark an EPUB block as read advances the selection
-      When I click "Chapter Alpha" in the book layout
+      When I choose the book block "Chapter Alpha"
       And I mark the book block "Chapter Alpha" as read in the Reading Control Panel
       Then I should see that book block "Chapter Alpha" is marked as read in the book layout
       And I should see that book block "Chapter Beta" is selected in the book layout
 
     Scenario: Mark an EPUB block as skimmed advances the selection
-      When I click "Chapter Alpha" in the book layout
+      When I choose the book block "Chapter Alpha"
       And I mark the book block "Chapter Alpha" as skimmed in the Reading Control Panel
       Then I should see that book block "Chapter Alpha" is marked as skimmed in the book layout
       And I should see that book block "Chapter Beta" is selected in the book layout

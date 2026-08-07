@@ -188,16 +188,15 @@ Improve all E2E feature files (and supporting steps/page objects as needed) so t
 
 ### Phase 14 — Book reading E2E authoring
 
-**Status:** planned  
+**Status:** done  
 **Type:** Behavior
 
-- **Pre:** Book reading features may violate checklist (heavy “click” / “press key” wording).
-- **Trigger:** Audit + improve toward domain intention where possible without losing Explicit Conditions for key variants.
-- **Post:** Checklist satisfied; Cypress green.
+- Domain Gherkin (choose block, start reading / go back); explicit Tab/Shift+Tab/Backspace steps; split mega-scenarios; split oversized book-reading PO/steps.
+- Note: `@ignore` `epub_book` still fails `chooseBookBlockByTitle` `data-current-block` wait when forced; default CI excludes it.
 
 **Files:** `book_reading/book_browsing.feature`, `book_reading/epub_book.feature`, `book_reading/reading_record.feature`, `book_reading/reorganize_layout.feature`, `book_reading/ai_reorganize_layout.feature`
 
-**Done when:** checklist applied; targeted Cypress passes.
+**Done when:** checklist applied; targeted Cypress passes. ✅ 20/20 non-`@ignore`
 
 ---
 

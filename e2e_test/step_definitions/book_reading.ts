@@ -1,56 +1,14 @@
 /**
- * Book-reading scenarios: thin glue to `e2e_test/start/pageObjects/bookReadingPage`.
+ * Book-reading attach / open / browse: thin glue to `bookReadingPage`.
  */
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
-import type { BookFull, NoteRealm } from '@generated/doughnut-backend-api'
-import {
-  NoteController,
-  NotebookBooksController,
-} from '@generated/doughnut-backend-api/sdk.gen'
-import bookReadingPage, {
-  type BookLayoutRow,
-} from '../start/pageObjects/bookReadingPage'
+import bookReadingPage from '../start/pageObjects/bookReadingPage'
 import { cli } from '../start/pageObjects/cli'
 import notebookPage from '../start/pageObjects/notebookPage'
-import start, { mock_services } from '../start'
+import start from '../start'
 import testability from '../start/testability'
-
-function unwrapData<T>(result: T | { data: T } | undefined): T {
-  if (result && typeof result === 'object' && 'data' in result) {
-    return (result as { data: T }).data
-  }
-  return result as T
-}
-
-function parseBookLayoutTable(data: DataTable): BookLayoutRow[] {
-  return data.raw().map((row) => {
-    const depth = parseInt(row[0] ?? '0', 10)
-    const title = (row[1] ?? '').trim()
-    return { depth, title }
-  })
-}
-
-function pdfFixtureStem(fixtureFilename: string): string {
-  return fixtureFilename.replace(/\.pdf$/i, '')
-}
-
-const MAX_BOOK_LAYOUT_DEPTH = 64
-
-function validatePreorderDepths(depths: number[]): void {
-  if (depths.length === 0) {
-    return
-  }
-  if (depths[0] !== 0 || depths[0] > MAX_BOOK_LAYOUT_DEPTH) {
-    throw new Error('Suggested depths do not form a valid outline')
-  }
-  for (let i = 1; i < depths.length; i++) {
-    const d = depths[i]!
-    if (d < 0 || d > MAX_BOOK_LAYOUT_DEPTH || d > depths[i - 1]! + 1) {
-      throw new Error('Suggested depths do not form a valid outline')
-    }
-  }
-}
+import { parseBookLayoutTable, pdfFixtureStem } from './book_reading_helpers'
 
 Given(
   'I set the book reading viewport to {int} by {int}',
@@ -127,125 +85,10 @@ When(
 )
 
 Then(
-  'I should see the EPUB reading view with book name {string}',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (name: string) => {
-    return bookReadingPage().expectEpubReadingViewShowsBookName(name)
-  }
-)
-
-Then(
-  'I should see the text {string} in the EPUB reader',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (text: string) => {
-    return bookReadingPage().expectEpubContentTextVisible(text)
-  }
-)
-
-Then(
-  'the book layout block {string} should have epub start href containing {string}',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (title: string, substring: string) => {
-    return bookReadingPage().expectBookLayoutBlockEpubStartHrefContains(
-      title,
-      substring
-    )
-  }
-)
-
-Then(
   'I should see an EPUB attach error containing {string}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (messageSubstring: string) => {
     return notebookPage().expectEpubAttachErrorContaining(messageSubstring)
-  }
-)
-
-Given(
-  'OpenAI returns a layout suggestion that indents block {string} for notebook {string}',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (blockTitle: string, notebookName: string) => {
-    return testability()
-      .getInjectedNoteIdByTitle(notebookName)
-      .then((noteId) =>
-        cy.wrap(NoteController.showNote({ path: { note: noteId } }), {
-          log: false,
-        })
-      )
-      .then((showResponse) => {
-        const realm = unwrapData<NoteRealm>(showResponse)
-        const notebookId = realm.notebookRealm.notebook.id
-        expect(notebookId, 'note must belong to a notebook').to.be.a('number')
-        return cy
-          .wrap(
-            NotebookBooksController.getBook({ path: { notebook: notebookId } }),
-            { log: false }
-          )
-          .then((bookResponse) => {
-            const book = unwrapData<BookFull>(bookResponse)
-            expect(book.blocks, 'book must have blocks').to.be.an('array')
-            const depths = book.blocks.map((b) => b.depth)
-            const idx = book.blocks.findIndex((b) => b.title === blockTitle)
-            expect(
-              idx,
-              `no block with title "${blockTitle}"`
-            ).to.be.greaterThan(0)
-            depths[idx] = depths[idx]! + 1
-            expect(() => validatePreorderDepths(depths)).not.to.throw()
-            const suggestion = {
-              blocks: book.blocks.map((b, i) => ({
-                id: b.id,
-                depth: depths[i]!,
-              })),
-            }
-            const reply = JSON.stringify(suggestion)
-            return cy.then(async () => {
-              await mock_services
-                .openAi()
-                .responses()
-                .requestMessageMatches({
-                  role: 'developer',
-                  content: '.*You reorganize the outline nesting.*',
-                })
-                .stubOutputText(reply)
-            })
-          })
-      })
-  }
-)
-
-When(
-  'I request AI reorganization of the book layout',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  () => {
-    return bookReadingPage().clickAiReorganizeLayout()
-  }
-)
-
-Then(
-  'I should see a reorganization preview dialog',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  () => {
-    return bookReadingPage().expectReorganizationPreviewDialog()
-  }
-)
-
-Then(
-  'the preview should show block {string} with suggested depth {int}',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (blockTitle: string, suggestedDepth: number) => {
-    return bookReadingPage().expectReorganizationPreviewBlockSuggestedDepth(
-      blockTitle,
-      suggestedDepth
-    )
-  }
-)
-
-When(
-  'I confirm the AI suggestion',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  () => {
-    return bookReadingPage().confirmAiReorganizeSuggestion()
   }
 )
 
@@ -286,101 +129,7 @@ When(
   'I choose the book block {string}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (title: string) => {
-    return bookReadingPage().clickBookBlockByTitle(title)
-  }
-)
-
-When(
-  'I click {string} in the book layout',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (title: string) => {
-    return bookReadingPage().clickBookLayoutBlockByTitle(title)
-  }
-)
-
-When(
-  'I leave the EPUB reading view and return to it',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  () => {
-    return bookReadingPage().leaveEpubReadingViewAndReturn()
-  }
-)
-
-When(
-  'I scroll the EPUB reader until the text {string} is in the viewport',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (markerText: string) => {
-    return bookReadingPage().scrollEpubReaderUntilTextInViewport(markerText)
-  }
-)
-
-When(
-  'I scroll the EPUB reader host to the top',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  () => {
-    return bookReadingPage().scrollEpubReaderHostToTop()
-  }
-)
-
-When(
-  'I scroll the PDF book reader until the Reading Control Panel shows for {string}',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (selectedBlockTitle: string) => {
-    return bookReadingPage().scrollPdfUntilReadingControlPanelVisible(
-      selectedBlockTitle
-    )
-  }
-)
-
-When(
-  'I mark the book block {string} as read in the Reading Control Panel',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (blockTitle: string) => {
-    return bookReadingPage().markBookBlockAsReadInReadingControlPanel(
-      blockTitle
-    )
-  }
-)
-
-When(
-  'I mark the book block {string} as skimmed in the Reading Control Panel',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (blockTitle: string) => {
-    return bookReadingPage().markBookBlockAsSkimmedInReadingControlPanel(
-      blockTitle
-    )
-  }
-)
-
-Then(
-  'I should see that book block {string} is marked as read in the book layout',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (title: string) => {
-    return bookReadingPage().expectBookBlockMarkedAsReadInBookLayout(title)
-  }
-)
-
-Then(
-  'I should see that book block {string} is marked as skimmed in the book layout',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (title: string) => {
-    return bookReadingPage().expectBookBlockMarkedAsSkimmedInBookLayout(title)
-  }
-)
-
-Then(
-  'the EPUB Reading Control Panel should be content-anchored',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  () => {
-    return bookReadingPage().expectEpubReadingControlPanelContentAnchored()
-  }
-)
-
-Then(
-  'I should see that book block {string} is selected in the book layout',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (title: string) => {
-    return bookReadingPage().expectBookBlockIsCurrentSelectionByTitle(title)
+    return bookReadingPage().chooseBookBlockByTitle(title)
   }
 )
 
@@ -389,14 +138,6 @@ Then(
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (pageNumber: number) => {
     return bookReadingPage().expectCurrentPage(pageNumber)
-  }
-)
-
-Then(
-  'the book block {string} should be focused in the book layout',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (title: string) => {
-    return bookReadingPage().expectBookBlockIsFocusedByTitle(title)
   }
 )
 
@@ -433,135 +174,9 @@ Then(
 )
 
 Then(
-  'I should see the current block navigation bar showing {string}',
+  'I should see that book block {string} is selected in the book layout',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (title: string) => {
-    return bookReadingPage().expectCurrentBlockNavigationBar(title)
-  }
-)
-
-When(
-  'I click "Read from here" in the current block navigation bar',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  () => {
-    return bookReadingPage().clickReadFromHere()
-  }
-)
-
-When(
-  'I click "Back to selected" in the current block navigation bar',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  () => {
-    return bookReadingPage().clickBackToSelected()
-  }
-)
-
-Then(
-  'the current block navigation bar should not be visible',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  () => {
-    return bookReadingPage().expectCurrentBlockNavigationBarNotVisible()
-  }
-)
-
-Given(
-  'the book layout shows block {string} at depth {int}',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (title: string, depth: number) => {
-    return bookReadingPage().expectBookBlockAtDepth(title, depth)
-  }
-)
-
-When(
-  'I press {string} on the book layout',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (key: string) => {
-    if (key === 'Shift+Tab') {
-      return bookReadingPage().pressShiftTabOnBookLayout()
-    }
-    if (key === 'Backspace') {
-      return bookReadingPage().pressBackspaceOnBookLayout()
-    }
-    return bookReadingPage().pressTabOnBookLayout()
-  }
-)
-
-Then(
-  'the book block {string} should no longer appear in the book layout',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (title: string) => {
-    return bookReadingPage().expectBookBlockNotPresent(title)
-  }
-)
-
-Then(
-  'the book block {string} should be at depth {int} in the book layout',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (title: string, depth: number) => {
-    return bookReadingPage().expectBookBlockAtDepth(title, depth)
-  }
-)
-
-Then(
-  'I should see content block bbox overlays on the PDF',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  () => {
-    return bookReadingPage().expectContentBlockBboxOverlaysVisible()
-  }
-)
-
-When(
-  'I click on a content block bbox overlay in the PDF',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  () => {
-    return bookReadingPage().clickContentBlockBboxOverlay()
-  }
-)
-
-When(
-  'I click on a long-text content block bbox overlay in the PDF',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  () => {
-    return bookReadingPage().clickLongTextContentBlockBboxOverlay()
-  }
-)
-
-Then(
-  'I should see the {string} callout',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (_label: string) => {
-    return bookReadingPage().expectNewBlockCallout()
-  }
-)
-
-When(
-  'I confirm creating a new block',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  () => {
-    return bookReadingPage().confirmNewBlockCallout()
-  }
-)
-
-Then(
-  'the book layout should contain a new block as a child of the selected block',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  () => {
-    return bookReadingPage().expectNewChildBlockInLayout()
-  }
-)
-
-Then(
-  'I should be prompted to enter a title defaulting to truncated content',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  () => {
-    return bookReadingPage().expectTitlePromptWithDefaultTitle()
-  }
-)
-
-When(
-  'I confirm the title',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  () => {
-    return bookReadingPage().confirmTitlePrompt()
+    return bookReadingPage().expectBookBlockIsCurrentSelectionByTitle(title)
   }
 )
