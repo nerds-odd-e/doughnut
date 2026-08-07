@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Commissioned Learning Session MVP
 status: in_progress
-stopped_at: Phase 3 UI-SPEC draft complete
+stopped_at: Phase 3 plans ready for execute
 last_updated: "2026-08-08T00:00:00.000Z"
 progress:
   total_phases: 7
   completed_phases: 2
-  total_plans: 4
+  total_plans: 6
   completed_plans: 4
 current_phase: 3
 current_phase_name: potential-learning-sessions
 last_activity: 2026-08-08
-last_activity_desc: Phase 3 UI-SPEC.md written (ready for ui-checker / plan-phase)
+last_activity_desc: Phase 3 plans written (03-01 tracer, 03-02 expansion)
 ---
 
 # Project State
@@ -37,11 +37,11 @@ coexistence green; `pnpm backend:verify` green; no user-visible create path.
 6/6). Caret → COMMISSIONED create, Commissioned label, stay-on-note, primary
 Assimilate with commissioned-only, ordinary+commissioned coexistence (TRK-01/02).
 
-**Phase 3** — context + research complete; **UI-SPEC draft**
-(`.planning/phases/03-potential-learning-sessions/03-UI-SPEC.md`). Ready for
-ui-checker then `/gsd-plan-phase`.
+**Phase 3** — context + research + UI-SPEC approved; **plans ready**
+(`03-01-PLAN.md` tracer, `03-02-PLAN.md` multi-notebook expansion). No Flyway;
+additive `dueCommissioned` + FE group-by-notebook strip.
 
-**Next:** Verify UI-SPEC, then plan Phase 3 (potential learning sessions).
+**Next:** `/gsd-execute-phase 3` (Wave 1 tracer then Wave 2).
 
 ## Deferred Items
 
@@ -57,10 +57,10 @@ ui-checker then `/gsd-plan-phase`.
 ## Session Continuity
 
 **Last session:** 2026-08-08
-**Stopped at:** Phase 3 UI-SPEC draft complete
-**Resume file:** .planning/phases/03-potential-learning-sessions/03-UI-SPEC.md
+**Stopped at:** Phase 3 plans ready for execute
+**Resume file:** .planning/phases/03-potential-learning-sessions/03-01-PLAN.md
 
-Phase 3 UI design contract drafted. Ready for checker / plan-phase.
+Phase 3 plans written. Ready for `/gsd-execute-phase 3`.
 
 ## Performance Metrics
 
@@ -76,3 +76,5 @@ Phase 3 UI design contract drafted. Ready for checker / plan-phase.
 - [Phase 02]: Commissioned assimilate stays on note; no ordinary count increment (D-06)
 - [Phase 02]: D-02: commissioned caret ignores assimilateDisabled when COMMISSIONED absent
 - [Phase 02]: TRK-02: ordinary-then-commissioned coexistence locked at controller + E2E
+- [Phase 03]: D-01 dueCommissioned on recalling path; D-02 FE group-by-notebook; no PLS table
+- [Phase 03]: D-03/D-04 display-only progress-bar strip; D-05 ordinary-only counts; D-06 two E2E scenarios

@@ -87,6 +87,17 @@ Plans:
 
 **Context:** `.planning/phases/03-potential-learning-sessions/`
 
+**Plans:** 2 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 03-01-PLAN.md — Tracer: dueCommissioned + FE potential-session strip + first E2E green (TRK-03, POT-01)
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 03-02-PLAN.md — Expansion: multi-notebook E2E + long-title wrap polish (POT-02)
+
 ---
 
 ### Phase 4: Learning Session and Request builder (Structure)
@@ -177,7 +188,7 @@ Plans:
 |-------|------|------|-----|--------|
 | 1 | Commissioned tracker model | Structure | — | Complete    |
 | 2 | Assimilate as commissioned | Behavior | TRK-01, TRK-02 | Plans complete |
-| 3 | Potential learning sessions | Behavior | TRK-03, POT-01, POT-02 | Pending |
+| 3 | Potential learning sessions | Behavior | TRK-03, POT-01, POT-02 | Plans ready |
 | 4 | Learning Session and Request builder | Structure | — | Pending |
 | 5 | Commission Learning Session | Behavior | COM-01–03 | Pending |
 | 6 | Record report and schedule | Behavior | REC-01–05 | Pending |
@@ -192,4 +203,4 @@ Plans:
 Parked elsewhere: SEED-001, ADR 0002 Level 1.
 
 ---
-*Last updated: 2026-08-08 — Phase 2 plan 02-02 executed (TRK-02 coexistence)*
+*Last updated: 2026-08-08 — Phase 3 plans written (03-01 tracer, 03-02 expansion)*
