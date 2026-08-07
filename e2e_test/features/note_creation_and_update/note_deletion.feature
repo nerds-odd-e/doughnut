@@ -3,32 +3,36 @@ Feature: Note deletion
   Background:
     Given I am logged in as an existing user
     And I have a notebook "LeSS training" with notes:
-      | Title     | Folder               |
-      | LeSS in Action | |
-      | team      | LeSS in Action       |
-      | tech      | LeSS in Action       |
-      | TDD       | LeSS in Action/tech  |
-      | CI System | LeSS in Action/tech  |
+      | Title          | Folder              |
+      | LeSS in Action |                     |
+      | team           | LeSS in Action      |
+      | tech           | LeSS in Action      |
+      | TDD            | LeSS in Action/tech |
+      | CI System      | LeSS in Action/tech |
 
   Scenario: Delete a note
     When I delete note "TDD"
     Then I should see the note "TDD" is marked as deleted
 
-  Scenario: Deleting a note in a folder navigates to that folder page
+  Scenario: Deleting a note in a folder opens that folder page
     When I delete note "TDD"
-    Then I should be on a notebook folder page in the browser
+    Then I should be on a notebook folder page
 
-  Scenario: Deleting a note at notebook root navigates to the notebook page
+  Scenario: Deleting a note at notebook root opens the notebook page
     When I delete note "LeSS in Action"
-    Then I should be on the notebook root page in the browser
+    Then I should be on the notebook root page
 
-  Scenario: Deleting a note leaves folder peers; undo restores relationships
+  Scenario: Deleting a note leaves folder peers
     Given there is "a part of" relationship between note "TDD" and "tech" in notebook "LeSS training"
     And I should see "TDD" has relationship "a part of" "tech"
     When I delete note "TDD" and leave references as dead wiki links
     Then I should see folder "LeSS training/LeSS in Action/tech" containing these notes:
       | note-title |
       | CI System  |
+
+  Scenario: Undo delete restores relationships
+    Given there is "a part of" relationship between note "TDD" and "tech" in notebook "LeSS training"
+    And I delete note "TDD" and leave references as dead wiki links
     When I undo "delete note"
     Then I should see "TDD" has relationship "a part of" "tech"
 
@@ -40,7 +44,7 @@ Feature: Note deletion
     And I should see folder "LeSS training/LeSS in Action/tech" containing these notes:
       | note-title |
       | CI System  |
-    When I undo delete note to recover note "TDD" again
+    When I undo delete note to recover note "TDD"
     And I should see folder "LeSS training/LeSS in Action/tech" containing these notes:
       | note-title |
       | CI System  |
@@ -48,11 +52,11 @@ Feature: Note deletion
 
   Scenario: Deleting a note does not remove other notes by structural descent
     Given I have a notebook "Descendants suite" with notes:
-      | Title     | Folder                        |
-      | Descendants Test | |
-      | parent    | Descendants Test               |
-      | child     | Descendants Test/parent        |
-      | Unit Test | Descendants Test/parent/child  |
+      | Title            | Folder                        |
+      | Descendants Test |                               |
+      | parent           | Descendants Test              |
+      | child            | Descendants Test/parent       |
+      | Unit Test        | Descendants Test/parent/child |
     When I delete note "child"
     Then I should see the note "child" is marked as deleted
     And I should see folder "Descendants suite/Descendants Test/parent/child" containing these notes:
@@ -61,10 +65,10 @@ Feature: Note deletion
 
   Scenario: Deleting a note leaves inbound relationship notes and folder peers
     Given I have a notebook "References suite" with notes:
-      | Title  | Folder          |
-      | References Test | |
-      | source | References Test |
-      | target | References Test |
+      | Title           | Folder          |
+      | References Test |                 |
+      | source          | References Test |
+      | target          | References Test |
     And there is "a part of" relationship between note "source" and "target" in notebook "References suite"
     And I should see "source" has relationship "a part of" "target"
     When I delete note "target" and leave references as dead wiki links
@@ -76,9 +80,9 @@ Feature: Note deletion
 
   Scenario: Deleting a referenced note can remove it from reference properties while leaving body wiki links dead
     Given I have a notebook "Reference cleanup suite" with notes:
-      | Title  | Folder            |
-      | Reference Cleanup | |
-      | target | Reference Cleanup |
+      | Title             | Folder            |
+      | Reference Cleanup |                   |
+      | target            | Reference Cleanup |
     And I have a note "source" under notebook "Reference cleanup suite" in folder "Reference Cleanup" with content:
       """
       ---

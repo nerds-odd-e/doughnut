@@ -17,6 +17,15 @@ When(
   }
 )
 
+When(
+  'I insert a soft line break in note {string} between {string} and {string}',
+  (noteTopology: string, before: string, after: string) => {
+    start
+      .jumpToNotePage(noteTopology)
+      .insertSoftLineBreakInContent(before, after)
+  }
+)
+
 When('I should see note {string} has an image', (noteTopology: string) => {
   start.jumpToNotePage(noteTopology)
   cy.get('#note-image').should('exist')
@@ -88,3 +97,10 @@ Then('the note title should be {string}', (title: string) => {
 Then('the note content should include {string}', (fragment: string) => {
   start.assumeNotePage().expectContentContaining(fragment)
 })
+
+Then(
+  'the note content should contain a soft line break between {string} and {string}',
+  (before: string, after: string) => {
+    start.assumeNotePage().expectSoftLineBreakBetween(before, after)
+  }
+)

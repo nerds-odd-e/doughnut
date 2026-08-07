@@ -41,7 +41,7 @@ When(
   (fixturePath: string, noteTopology: string) => {
     start
       .jumpToNotePage(noteTopology)
-      .switchToRichContentMode()
+      .switchToRichContent()
       .uploadRichNoteImagePropertyFromFixture(fixturePath)
   }
 )
@@ -51,7 +51,7 @@ When(
   (url: string, noteTopology: string) => {
     start
       .jumpToNotePage(noteTopology)
-      .switchToRichContentMode()
+      .switchToRichContent()
       .setRichNoteImagePropertyUrl(url)
   }
 )
@@ -168,7 +168,7 @@ Then(
 )
 
 When('I view the note content as rich content', () => {
-  start.assumeNotePage().switchToRichContentMode()
+  start.assumeNotePage().switchToRichContent()
 })
 
 When('I view the note content as markdown', () => {
@@ -188,31 +188,21 @@ Then(
   }
 )
 
-Then(
-  'I should see the rich content elements in the note content:',
-  (data: DataTable) => {
-    start.assumeNotePage().expectRichContent(data.hashes())
-  }
-)
+Then('I should see the note content rendered as:', (data: DataTable) => {
+  start
+    .assumeNotePage()
+    .switchToRichContent()
+    .expectRenderedNoteContent(data.hashes())
+})
 
 Then(
-  'note {string} should show the rich content elements in the note content:',
+  'note {string} should show the note content rendered as:',
   (noteTitle: string, data: DataTable) => {
     start.jumpToNotePage(noteTitle, true)
     start.waitUntilAppIsNotBusy()
     start
       .assumeNotePage(noteTitle)
       .switchToRichContent()
-      .expectRichContent(data.hashes())
-  }
-)
-
-Then(
-  'I should see the rich content of the note with content:',
-  (data: DataTable) => {
-    start
-      .assumeNotePage()
-      .switchToRichContent()
-      .expectRichContent(data.hashes())
+      .expectRenderedNoteContent(data.hashes())
   }
 )

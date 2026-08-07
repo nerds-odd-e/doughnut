@@ -6,18 +6,23 @@ Feature: Note Edit
     Given I am logged in as an existing user
     And I have a notebook "LeSS training" with a note "LeSS in Action" and content "Before"
 
-  Scenario: Edit a note title and edit content and undo
+  Scenario: Undo content edit restores previous content
     Given I update note title "LeSS in Action" to become "Odd-e CSD"
     And I update note "Odd-e CSD" content to become "After"
     When I undo "edit content"
     Then the note content should include "Before"
-    When I undo "edit title" again
+
+  Scenario: Undo title edit restores previous title
+    Given I update note title "LeSS in Action" to become "Odd-e CSD"
+    And I update note "Odd-e CSD" content to become "After"
+    And I undo "edit content"
+    When I undo "edit title"
     Then the note title should be "LeSS in Action"
-    And there should be no more undo to do
+    And there should be nothing left to undo
 
   Scenario: Edit note content with bullet points
     When I update note "LeSS in Action" to become:
-      | Title     | Content |
+      | Title     | Content    |
       | Odd-e CSD | * must join |
     Then the note content should include "must join"
 
@@ -33,11 +38,11 @@ Feature: Note Edit
         * Living documentation
       * Test-Driven Development
       """
-    Then I should see the rich content of the note with content:
-      | Tag            | Content                  |
-      | h1             | Odd-e LiA                |
-      | li             | Specification by Example |
-      | li.ql-indent-1 | Living documentation     |
+    Then I should see the note content rendered as:
+      | Kind               | Text                     |
+      | heading 1          | Odd-e LiA                |
+      | list item          | Specification by Example |
+      | indented list item | Living documentation     |
 
   Scenario: Edit a note's content with a markdown table
     When I update note "LeSS in Action" content using markdown to become:
@@ -47,20 +52,15 @@ Feature: Note Edit
       | Alice   |  95   |
       | Bob     |  88   |
       """
-    Then I should see the rich content of the note with content:
-      | Tag    | Content |
-      | table  |         |
-      | thead  |         |
-      | tr     |         |
-      | th     | Name    |
-      | th     | Score   |
-      | tbody  |         |
-      | tr     |         |
-      | td     | Alice   |
-      | td     | 95      |
-      | tr     |         |
-      | td     | Bob     |
-      | td     | 88      |
+    Then I should see the note content rendered as:
+      | Kind         | Text |
+      | table        |      |
+      | table header | Name |
+      | table header | Score |
+      | table cell   | Alice |
+      | table cell   | 95    |
+      | table cell   | Bob   |
+      | table cell   | 88    |
 
   Scenario: Edit a note title should update the sidebar
     Given I have a notebook "LeSS training" with notes:
@@ -72,15 +72,13 @@ Feature: Note Edit
       | Critical thinking |
       | LeSS in Action    |
 
-  Scenario: Edit note content with Shift-Enter adds line break
-    When I update note "LeSS in Action" to become:
-      | Title     | Content |
-      | Odd-e CSD | Hello<Shift-Enter>World |
+  Scenario: Soft line break in note content
+    When I insert a soft line break in note "LeSS in Action" between "Hello" and "World"
     Then the note content should include "Hello"
     And the note content should include "World"
-    And the note content should contain a line break
+    And the note content should contain a soft line break between "Hello" and "World"
 
-  Scenario: Note YAML properties round-trip through markdown and rich editing
+  Scenario: YAML frontmatter appears as rich note properties
     Given note "LeSS in Action" has content:
       """
       ---
@@ -94,6 +92,19 @@ Feature: Note Edit
     When I visit note "LeSS in Action"
     Then I should see rich note property "diligence" with value "high"
     And I should see rich note property "topic" with value "training"
+
+  Scenario: Rich note property edits persist after reload
+    Given note "LeSS in Action" has content:
+      """
+      ---
+      diligence: high
+      topic: training
+      ---
+
+      # Workshop Body
+      Main content here.
+      """
+    And I visit note "LeSS in Action"
     When I add a rich note property with key "status" and value "draft"
     And I edit the rich note property with key "topic" to key "domain" and value "wiki"
     And I reload the current page for note "LeSS in Action"
@@ -101,6 +112,21 @@ Feature: Note Edit
     And I should not see rich note property "topic"
     And I should see rich note property "domain" with value "wiki"
     And I should see rich note property "diligence" with value "high"
+
+  Scenario: Markdown source reflects rich note property edits
+    Given note "LeSS in Action" has content:
+      """
+      ---
+      diligence: high
+      topic: training
+      ---
+
+      # Workshop Body
+      Main content here.
+      """
+    And I visit note "LeSS in Action"
+    And I add a rich note property with key "status" and value "draft"
+    And I edit the rich note property with key "topic" to key "domain" and value "wiki"
     When I open the note content markdown editor
     Then the note content markdown source should contain "domain: wiki"
     And the note content markdown source should contain "diligence: high"

@@ -114,15 +114,23 @@ export const assumeNotePage = (
         }
       })
     },
-    expectNoteContentContainLineBreak: () => {
+    expectSoftLineBreakBetween(before: string, after: string) {
+      const escapedBefore = before.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      const escapedAfter = after.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      const softBreak = new RegExp(
+        `${escapedBefore}\\s*<br[^>]*>\\s*${escapedAfter}`,
+        'i'
+      )
       findNoteContentRegion().within(() => {
         cy.get('.ql-editor, [contenteditable]').should(($el) => {
           const html = $el.html()
-          const match = html.match(/Hello\s*<br[^>]*>/i)
-          expect(match).to.not.be.null
-          expect(html).to.match(/Hello\s*<br[^>]*>\s*World/i)
+          expect(
+            html,
+            `Expected soft line break between "${before}" and "${after}", but found: ${html}`
+          ).to.match(softBreak)
         })
       })
+      return this
     },
     toolbarButton: (btnTextOrTitle: string) => {
       return toolbarButton(btnTextOrTitle)

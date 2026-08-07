@@ -83,16 +83,14 @@ Improve all E2E feature files (and supporting steps/page objects as needed) so t
 
 ### Phase 6 — Note create / edit / delete E2E authoring
 
-**Status:** planned  
+**Status:** done  
 **Type:** Behavior
 
-- **Pre:** Core note mutation features may violate checklist (UI keys, long scenarios).
-- **Trigger:** Audit + improve.
-- **Post:** Checklist satisfied; Cypress green.
+- Domain Gherkin; split undo/YAML; soft line-break without Shift-Enter in features; Kind/Text rich-content assertions; collapsed dual rich-content APIs.
 
 **Files:** `note_creation_and_update/note_creation.feature`, `note_creation_and_update/note_edit.feature`, `note_creation_and_update/note_deletion.feature`
 
-**Done when:** checklist applied; targeted Cypress passes.
+**Done when:** checklist applied; targeted Cypress passes. ✅ 25/25 (+ link smoke)
 
 ---
 

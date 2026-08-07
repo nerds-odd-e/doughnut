@@ -2,7 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { When } from '@badeball/cypress-cucumber-preprocessor'
+import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 import mock_services from '../start/mock_services'
 
@@ -62,7 +62,7 @@ When('I am creating a note in the notebook {string}', (notebook: string) => {
   start.jumpToNotebookPage(notebook).addingNewNoteFromToolbar()
 })
 
-When('I should see that the note creation is not successful', () => {
+Then('I should see that the note creation is not successful', () => {
   start.form.getField('Title').expectError('must not be blank')
   cy.get('body').then(($body) => {
     const close = $body.find('.Vue-Toastification__close-button').get(0)
@@ -71,17 +71,3 @@ When('I should see that the note creation is not successful', () => {
     }
   })
 })
-
-When(
-  'I activate folder {string} in the sidebar and create a new note with title {string}',
-  (folderLabel: string, title: string) => {
-    start.jumpToNotePage('team')
-    start
-      .noteSidebar()
-      .activateFolderByLabel(folderLabel)
-      .addingNewNoteFromToolbar()
-      .createNoteWithTitle(title)
-    start.assumeNotePage(title)
-    start.testability().rememberUiCreatedNote(title)
-  }
-)

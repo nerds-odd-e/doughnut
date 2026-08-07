@@ -15,9 +15,6 @@ export const noteContentEditingMethods = () => ({
     })
     return this
   },
-  switchToRichContentMode() {
-    return this.switchToRichContent()
-  },
   flushPendingContentSave() {
     findNoteContentRegion().then(($noteField) => {
       const $textarea = $noteField.find('textarea').filter(':visible')
@@ -57,23 +54,49 @@ export const noteContentEditingMethods = () => ({
     this.flushPendingContentSave()
     return this.switchToRichContent()
   },
-  expectRichContent(elements: Record<string, string>[]) {
+  expectRenderedNoteContent(elements: Record<string, string>[]) {
+    const kindToSelector: Record<string, string> = {
+      'heading 1': 'h1',
+      'heading 2': 'h2',
+      'list item': 'li',
+      'indented list item': 'li.ql-indent-1',
+      table: 'table',
+      'table header': 'th',
+      'table cell': 'td',
+      link: 'a',
+      'dead link': 'a.dead-link',
+      'live link': 'a:not(.dead-link)',
+    }
     for (const element of elements) {
-      const tag = element.Tag as string
-      const content = element.Content ?? ''
+      const kind = (element.Kind ?? '').trim()
+      const text = element.Text ?? ''
+      const selector = kindToSelector[kind]
+      expect(
+        selector,
+        `Unknown rendered note content kind "${kind}". Known: ${Object.keys(kindToSelector).join(', ')}`
+      ).to.be.a('string')
       cy.get('#main-note-content .note-content .ql-editor').within(() => {
-        if (content === '') {
-          cy.get(tag).should('exist')
+        if (text === '') {
+          cy.get(selector!).should('exist')
         } else {
-          cy.contains(tag, content).should('exist')
+          cy.contains(selector!, text).should('exist')
         }
       })
     }
+    return this
+  },
+  insertSoftLineBreakInContent(before: string, after: string) {
+    cy.findByRole(noteContentRegion.role, {
+      name: noteContentRegion.name,
+    }).within(() => {
+      cy.get('.ql-editor[contenteditable="true"], textarea').first().click()
+    })
+    cy.clearFocusedText().type(`${before}{shift}{enter}${after}`).blur()
+    cy.get('.dirty').should('not.exist')
+    waitUntilAppIsNotBusy()
+    return this
   },
   editTextContent: (noteAttributes: Record<string, string>) => {
-    const parseSpecialKeys = (text: string): string =>
-      text.replace(/<Shift-Enter>/g, '{shift}{enter}')
-
     for (const propName in noteAttributes) {
       const value = noteAttributes[propName]
       if (value) {
@@ -94,8 +117,7 @@ export const noteContentEditingMethods = () => ({
         if (cypressState.state?.('clock')) {
           cy.tick(5000)
         }
-        const parsedValue = parseSpecialKeys(value)
-        cy.clearFocusedText().type(parsedValue).blur()
+        cy.clearFocusedText().type(value).blur()
         cy.get('.dirty').should('not.exist')
       }
     }

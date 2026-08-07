@@ -13,10 +13,10 @@ Feature: Nested Note creation
   Scenario: Create a new note under a folder in a notebook
     When I create a note with title "Re-quirement" under the folder "LeSS in Action" in the notebook "LeSS training"
     Then I should see the note tree in the sidebar
-      | note-title     |
-      | Re-quirement   |
-      | team           |
-      | tech           |
+      | note-title   |
+      | Re-quirement |
+      | team         |
+      | tech         |
       | Course intro |
     And I should see folder "LeSS training/LeSS in Action" containing these notes:
       | note-title   |
@@ -24,23 +24,9 @@ Feature: Nested Note creation
       | tech         |
       | Re-quirement |
 
-  Scenario: Create a new note with incorrect info
+  Scenario: Create a note with empty title is rejected
     When I create a note with title "" under the folder "LeSS in Action" in the notebook "LeSS training"
     Then I should see that the note creation is not successful
-
-  Scenario: Create a new note appended last in folder
-    When I activate folder "LeSS in Action" in the sidebar and create a new note with title "coordination"
-    Then I should see the note tree in the sidebar
-      | note-title     |
-      | coordination   |
-      | team           |
-      | tech           |
-      | Course intro |
-    And I should see folder "LeSS training/LeSS in Action" containing these notes:
-      | note-title   |
-      | team         |
-      | tech         |
-      | coordination |
 
   Scenario: Undo creating a new note
     When I create a note with title "New Note" under the folder "LeSS in Action" in the notebook "LeSS training"

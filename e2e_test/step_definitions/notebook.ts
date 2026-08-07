@@ -216,12 +216,12 @@ Then('I should see my notebooks:', (data: DataTable) => {
   start.navigateToNotebooksPage().expectNotebookCards(data.hashes())
 })
 
-Then('I should be on a notebook folder page in the browser', () => {
+Then('I should be on a notebook folder page', () => {
   start.waitUntilAppIsNotBusy()
   cy.location('pathname').should('match', /^\/notebooks\/\d+\/folders\/\d+$/)
 })
 
-Then('I should be on the notebook root page in the browser', () => {
+Then('I should be on the notebook root page', () => {
   start.waitUntilAppIsNotBusy()
   cy.location('pathname').should('match', /^\/notebooks\/\d+$/)
 })

@@ -15,9 +15,9 @@ Feature: Wiki links in notes
       """
       Technical excellence means supporting [[WikiLinks E2E CI]].
       """
-    Then I should see the rich content of the note with content:
-      | Tag | Content          |
-      | a   | WikiLinks E2E CI |
+    Then I should see the note content rendered as:
+      | Kind | Text             |
+      | link | WikiLinks E2E CI |
     And the wiki link "WikiLinks E2E CI" should link to the note with the same title
 
   Scenario: A qualified wiki link opens a note in another notebook
@@ -29,9 +29,9 @@ Feature: Wiki links in notes
       """
       Read [[WikiCross Tgt NB:WikiCross Deep]].
       """
-    Then I should see the rich content of the note with content:
-      | Tag | Content                            |
-      | a   | WikiCross Tgt NB:WikiCross Deep    |
+    Then I should see the note content rendered as:
+      | Kind | Text                            |
+      | link | WikiCross Tgt NB:WikiCross Deep |
     And the wiki link "WikiCross Tgt NB:WikiCross Deep" should open the note titled "WikiCross Deep"
 
   @mockBrowserTime
@@ -80,9 +80,9 @@ Feature: Wiki links in notes
       Continuous integration is distinct from a [[WikiLinks E2E Missing]].
       """
     And I should be able to create a new note by following the dead wiki link "WikiLinks E2E Missing"
-    Then note "WikiLinks E2E CI" should show the rich content elements in the note content:
-      | Tag               | Content               |
-      | a:not(.dead-link) | WikiLinks E2E Missing |
+    Then note "WikiLinks E2E CI" should show the note content rendered as:
+      | Kind      | Text                  |
+      | live link | WikiLinks E2E Missing |
 
   @mockBrowserTime
   Scenario: A dead wiki link can be pointed at an existing note
@@ -90,13 +90,13 @@ Feature: Wiki links in notes
       """
       Continuous integration relies on [[original text]].
       """
-    Then I should see the rich content of the note with content:
-      | Tag         | Content       |
-      | a.dead-link | original text |
+    Then I should see the note content rendered as:
+      | Kind      | Text          |
+      | dead link | original text |
     When I point dead wiki link "original text" at existing note "WikiLinks E2E Tech"
-    Then I should see the rich content of the note with content:
-      | Tag               | Content       |
-      | a:not(.dead-link) | original text |
+    Then I should see the note content rendered as:
+      | Kind      | Text          |
+      | live link | original text |
     And I view the note content as markdown
     Then the note content markdown source should contain "[[WikiLinks E2E Tech|original text]]"
 
@@ -104,9 +104,9 @@ Feature: Wiki links in notes
   Scenario: Insert a wiki link to a note in the same notebook via the toolbar
     When I navigate to "WikiLinks E2E NB/WikiLinks E2E Root/WikiLinks E2E Tech" note
     And I insert a wiki link to "WikiLinks E2E CI" via the wiki link or relationship toolbar
-    Then I should see the rich content elements in the note content:
-      | Tag | Content          |
-      | a   | WikiLinks E2E CI |
+    Then I should see the note content rendered as:
+      | Kind | Text             |
+      | link | WikiLinks E2E CI |
     And the wiki link "WikiLinks E2E CI" should link to the note with the same title
 
   Scenario: Renaming a referenced note while keeping visible reference text
@@ -117,9 +117,9 @@ Feature: Wiki links in notes
     When I route to the note "WikiLinks E2E CI"
     When I set the note title to "WikiLinks E2E CI Renamed" keeping visible reference text
     When I route to the note "WikiLinks E2E Tech"
-    Then I should see the rich content of the note with content:
-      | Tag | Content          |
-      | a   | WikiLinks E2E CI |
+    Then I should see the note content rendered as:
+      | Kind | Text             |
+      | link | WikiLinks E2E CI |
     And the wiki link "WikiLinks E2E CI" should open the note titled "WikiLinks E2E CI Renamed"
 
   Scenario: Renaming a referenced note while updating visible reference text
@@ -130,9 +130,9 @@ Feature: Wiki links in notes
     When I route to the note "WikiLinks E2E CI"
     When I set the note title to "WikiLinks E2E CI Renamed" updating visible reference text
     When I route to the note "WikiLinks E2E Tech"
-    Then I should see the rich content of the note with content:
-      | Tag | Content                    |
-      | a   | WikiLinks E2E CI Renamed   |
+    Then I should see the note content rendered as:
+      | Kind | Text                     |
+      | link | WikiLinks E2E CI Renamed |
     And the wiki link "WikiLinks E2E CI Renamed" should open the note titled "WikiLinks E2E CI Renamed"
 
   @mockBrowserTime
