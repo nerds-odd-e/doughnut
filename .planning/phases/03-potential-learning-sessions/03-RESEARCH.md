@@ -409,17 +409,11 @@ assimilateNoteAsCommissioned(noteTitle: string) {
 
 **If renaming A1:** still flat lites + FE group; only identifiers change.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Exact UI placement inside vs beside ProgressBar**
-   - What we know: D-03 says top progress bar area; `RecallProgressBar` has `#buttons` slot inside `ProgressBar` `[VERIFIED: RecallProgressBar.vue:1-56]`.
-   - What's unclear: Whether rows sit in `#buttons`, above the bar, or as a sibling in `GlobalBar`.
-   - Recommendation: Sibling strip under/near the bar (or `#buttons` column) with `data-test="potential-learning-session"` — keep ordinary progress math untouched.
+1. **Exact UI placement inside vs beside ProgressBar** — **RESOLVED:** Sibling strip **below** the ordinary progress bar inside the recall `GlobalBar` / `RecallProgressBar` column — not inside `#buttons` or the progress fill. Cited: `03-UI-SPEC.md` Auto Choice Log #1 + Layout placement.
 
-2. **Click affordance styling**
-   - What we know: D-04 display-only — no dialog.
-   - What's unclear: `<div>` vs disabled-looking `<button>` for Phase 5 reuse.
-   - Recommendation: Non-submitting element with stable test id; Phase 5 can promote to open-dialog control without changing copy.
+2. **Click affordance styling** — **RESOLVED:** Prefer `<div role="status">` (or plain `<div>`); **not** `<button>` / `daisy-btn` this phase. Phase 5 may promote without changing copy. Cited: `03-UI-SPEC.md` Auto Choice Log #2 + element type table.
 
 ## Environment Availability
 

@@ -40,9 +40,10 @@ created: 2026-08-08
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 03-01-01 | 01 | 1 | TRK-03 | T-03-01 | User-scoped due COMMISSIONED only | unit | `pnpm backend:test_only` (RecallsController) | ❌ W0 | ⬜ pending |
-| 03-01-02 | 01 | 1 | POT-01 | T-03-02 | Vue text escape notebook names | unit | `pnpm frontend:test` (RecallProgressBar) | ❌ W0 | ⬜ pending |
-| 03-02-01 | 02 | 2 | POT-01/02 | — | N/A | e2e | `pnpm cypress run --spec …/commissioned_learning_session.feature` | ❌ W0 | ⬜ pending |
+| 03-01-01 | 01 | 1 | TRK-03, POT-01 | T-03-01..03 | User-scoped due COMMISSIONED; Vue text escape | unit | `pnpm backend:test_only` (RecallsController) + `pnpm frontend:test` (RecallProgressBar / RecallPage) | ❌ W0 | ⬜ pending |
+| 03-01-02 | 01 | 1 | TRK-03, POT-01 | — | N/A | e2e | `pnpm cypress run --spec e2e_test/features/learning_session/commissioned_learning_session.feature` | ❌ W0 | ⬜ pending |
+| 03-02-01 | 02 | 2 | POT-02 | T-03-02 | Notebook titles only from user due trackers | unit | `pnpm frontend:test` (multi-notebook potential sessions) | ❌ W0 | ⬜ pending |
+| 03-02-02 | 02 | 2 | POT-02, TRK-03, POT-01 | — | N/A | e2e | `pnpm cypress run --spec e2e_test/features/learning_session/commissioned_learning_session.feature` | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
