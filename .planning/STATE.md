@@ -4,15 +4,15 @@ milestone: null
 milestone_name: null
 current_phase: null
 current_phase_name: null
-status: idle
+status: planning
 stopped_at: null
-last_updated: "2026-08-07T08:35:00Z"
+last_updated: "2026-08-07T08:40:00Z"
 last_activity: 2026-08-07
-last_activity_desc: "Planning idle; optional resume 004"
+last_activity_desc: "Quick 260807-n4j drop wiki-in-aliases bridge — plan ready"
 progress:
-  total_phases: 0
+  total_phases: 2
   completed_phases: 0
-  total_plans: 0
+  total_plans: 1
   completed_plans: 0
   percent: 0
 ---
@@ -25,8 +25,10 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-- Idle.
-- Optional resume: `.planning/quick/004-e2e-authoring-improvement/` (paused).
+- Active quick: `.planning/quick/260807-n4j-drop-grading-disable-wiki-in-aliases-rea/`
+- Goal: Drop grading/UI wiki-in-`aliases` read bridge; remove save/edit migration (no production data).
+- Phase 1 planned (overlaps-only grading) → Phase 2 planned (remove migration + dead helpers).
+- Left `/gsd-new-milestone` for this ad-hoc slice.
 
 ## Deferred Items
 
@@ -37,11 +39,10 @@ See: `.planning/PROJECT.md`
 | quick_task | 004-e2e-authoring-improvement | paused — resume by choice |
 | seed | SEED-001-mcq-fuzzy-notebook-title-spelling-match | dormant |
 | seed | SEED-002-host-mcp-over-https | dormant |
-| tech_debt | Drop grading/disable wiki-in-`aliases` read bridge after data migrated | open |
 | tech_debt | OpenAPI/`outgoingLinks`/`linkText` glossary rename (ADR 0001) | open |
 | deferred | Refine note on answered spelling questions | deferred |
 | known | `pnpm lint:all` / `test:path-routing` fails pre-existing (`render from routing JSON substitutes SHA` 6==7) | unrelated |
 
 ## Session Continuity
 
-Resume 004 via execute-plan, or start a new quick for remaining ADR 0001 debt (OpenAPI, bare wiki).
+Execute: `execute-plan` on `.planning/quick/260807-n4j-drop-grading-disable-wiki-in-aliases-rea/PLAN.md`
