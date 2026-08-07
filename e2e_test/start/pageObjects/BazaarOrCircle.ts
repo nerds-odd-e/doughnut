@@ -1,5 +1,9 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
-import { findNotebookCardButton, notebookList } from './NotebookList'
+import {
+  expectNotebookCardButtonAbsent,
+  findNotebookCardButton,
+  notebookList,
+} from './NotebookList'
 
 const addToMyLearning = 'Add to my learning'
 
@@ -7,7 +11,7 @@ export const bazaarOrCircle = () => {
   return {
     ...notebookList(),
     expectCannotAddToMyLearning(noteTopology: string) {
-      findNotebookCardButton(noteTopology, addToMyLearning).shouldNotExist()
+      expectNotebookCardButtonAbsent(noteTopology, addToMyLearning)
     },
     subscribe(notebook: string, dailyLearningCount: string) {
       findNotebookCardButton(notebook, addToMyLearning).click()

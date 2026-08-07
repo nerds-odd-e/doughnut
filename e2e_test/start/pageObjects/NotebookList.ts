@@ -87,6 +87,18 @@ function usesCatalogOverflowMenu(name: string): boolean {
   return (OVERFLOW_MENU_ACTION_NAMES as readonly string[]).includes(name)
 }
 
+/** Assert a catalog action button is absent on the named notebook card. */
+export const expectNotebookCardButtonAbsent = (
+  notebook: string,
+  name: string
+) => {
+  notebookCardsNamed(notebook)
+    .should('have.length.at.least', 1)
+    .first()
+    .find(`button[title="${name}"]`)
+    .should('not.exist')
+}
+
 export const findNotebookCardButton = (notebook: string, name: string) => {
   const finder = () => {
     if (usesCatalogOverflowMenu(name)) {
@@ -111,9 +123,6 @@ export const findNotebookCardButton = (notebook: string, name: string) => {
   return {
     click() {
       finder().click()
-    },
-    shouldNotExist() {
-      finder().should('not.exist')
     },
   }
 }
