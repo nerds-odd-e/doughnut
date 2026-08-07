@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: null
 milestone_name: null
-current_phase: "4"
-current_phase_name: Accidental-match connect CTA
+current_phase: "5"
+current_phase_name: Delete leaves dead wiki links
 status: executing
 stopped_at: null
-last_updated: "2026-08-07T07:40:00Z"
+last_updated: "2026-08-07T07:55:00Z"
 last_activity: 2026-08-07
-last_activity_desc: "Quick 005 Phase 3 done; starting Phase 4"
+last_activity_desc: "Quick 005 Phase 4 done; starting Phase 5"
 progress:
   total_phases: 10
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 1
   completed_plans: 0
-  percent: 30
+  percent: 40
 ---
 
 # Project State
@@ -29,7 +29,7 @@ See: `.planning/PROJECT.md`
 
 - Plan: `.planning/quick/005-ubiquitous-language-link/PLAN.md`
 - Context: `.planning/quick/005-ubiquitous-language-link/CONTEXT.md`
-- Next: Phase 4 — Behavior: accidental-match connect CTA
+- Next: Phase 5 — Behavior: delete leaves dead wiki links
 
 ## Deferred Items
 

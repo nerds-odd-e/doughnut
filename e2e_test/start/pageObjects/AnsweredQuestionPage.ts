@@ -9,6 +9,8 @@ import {
 import { answeredQuestionRefineMethods } from './answeredQuestionRefine'
 import { assumeMemoryTrackerPage } from './memoryTrackerPage'
 
+const addWikiLinkOrRelationshipLabel = 'Add wiki link or relationship'
+
 const assumeAnsweredQuestionPage = () => {
   cy.get('body').should('be.visible')
 
@@ -85,7 +87,7 @@ const assumeAnsweredQuestionPage = () => {
       openResolveAndClickMatchedNoteCta(
         matchedNoteTitle,
         'link-to-matched-note-',
-        'Build a link'
+        addWikiLinkOrRelationshipLabel
       )
       cy.contains('Target:')
         .should('be.visible')

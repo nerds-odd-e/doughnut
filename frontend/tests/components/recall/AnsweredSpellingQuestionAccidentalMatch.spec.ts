@@ -152,7 +152,9 @@ describe("AnsweredSpellingQuestion accidental match", () => {
     ]
     expect(linkButtons).toHaveLength(2)
     expect(
-      linkButtons.every((btn) => btn.textContent?.includes("Build a link"))
+      linkButtons.every((btn) =>
+        btn.textContent?.includes("Add wiki link or relationship")
+      )
     ).toBe(true)
 
     ;(

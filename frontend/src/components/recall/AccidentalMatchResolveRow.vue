@@ -18,11 +18,11 @@
         type="button"
         class="daisy-btn daisy-btn-secondary daisy-btn-sm"
         :data-testid="`link-to-matched-note-${matched.id}`"
-        title="Build a link"
-        aria-label="Build a link"
+        :title="addWikiLinkOrRelationshipLabel"
+        :aria-label="addWikiLinkOrRelationshipLabel"
         @click="$emit('buildLink')"
       >
-        Build a link
+        {{ addWikiLinkOrRelationshipLabel }}
       </button>
       <button
         type="button"
@@ -45,6 +45,8 @@ import type { NoteTopology } from "@generated/doughnut-backend-api"
 import NoteTitleWithLink from "@/components/notes/NoteTitleWithLink.vue"
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
+
+const addWikiLinkOrRelationshipLabel = "Add wiki link or relationship"
 
 const props = defineProps({
   matched: {

@@ -54,7 +54,8 @@ Where Doughnut means a **wiki link** and/or **relationship**, stop using bare **
 
 ### Phase 4 — Behavior: accidental-match connect CTA
 
-**Status:** planned  
+**Status:** in-progress
+
 **Type:** Behavior
 
 - **Pre:** Accidental-match row offers `Build a link`.
