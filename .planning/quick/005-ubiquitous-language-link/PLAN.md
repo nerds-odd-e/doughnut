@@ -30,7 +30,7 @@ Where Doughnut means a **wiki link** and/or **relationship**, stop using bare **
 
 ### Phase 2 — Behavior: target-note chooser entry copy
 
-**Status:** planned  
+**Status:** in-progress  
 **Type:** Behavior
 
 - **Pre:** After selecting a note in the connect search UI, CTA/header say `Add link` / `Link to:`.

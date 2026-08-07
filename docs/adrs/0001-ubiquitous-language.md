@@ -39,7 +39,6 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 
 | Term | Colliding senses |
 |------|------------------|
-| **Link** | Wiki link in note body; linking a matched note as relationship or property; circle invitation URL |
 | **Learning** | Overall learner metaphor; alias for subscription (“add to learning”); “target of learning N notes per day” as assimilation quota |
 | **Layout** | Refinement layout for a note vs book layout for an attached book |
 | **Quiz / question** | Spelling, AI-generated, predefined, and contested prompts without a shared parent name |
