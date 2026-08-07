@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Commissioned Learning Session MVP
 status: in_progress
-stopped_at: Phase 3 research complete
+stopped_at: Phase 3 UI-SPEC draft complete
 last_updated: "2026-08-08T00:00:00.000Z"
 progress:
   total_phases: 7
@@ -13,7 +13,7 @@ progress:
 current_phase: 3
 current_phase_name: potential-learning-sessions
 last_activity: 2026-08-08
-last_activity_desc: Phase 3 RESEARCH.md written (ready for plan-phase)
+last_activity_desc: Phase 3 UI-SPEC.md written (ready for ui-checker / plan-phase)
 ---
 
 # Project State
@@ -37,11 +37,11 @@ coexistence green; `pnpm backend:verify` green; no user-visible create path.
 6/6). Caret → COMMISSIONED create, Commissioned label, stay-on-note, primary
 Assimilate with commissioned-only, ordinary+commissioned coexistence (TRK-01/02).
 
-**Phase 3** — context gathered; **research complete**
-(`.planning/phases/03-potential-learning-sessions/03-RESEARCH.md`). Ready for
-`/gsd-plan-phase` planning.
+**Phase 3** — context + research complete; **UI-SPEC draft**
+(`.planning/phases/03-potential-learning-sessions/03-UI-SPEC.md`). Ready for
+ui-checker then `/gsd-plan-phase`.
 
-**Next:** Plan Phase 3 (potential learning sessions).
+**Next:** Verify UI-SPEC, then plan Phase 3 (potential learning sessions).
 
 ## Deferred Items
 
@@ -56,11 +56,11 @@ Assimilate with commissioned-only, ordinary+commissioned coexistence (TRK-01/02)
 
 ## Session Continuity
 
-**Last session:** 2026-08-07T23:29:18.507Z
-**Stopped at:** Phase 3 research complete
-**Resume file:** .planning/phases/03-potential-learning-sessions/03-RESEARCH.md
+**Last session:** 2026-08-08
+**Stopped at:** Phase 3 UI-SPEC draft complete
+**Resume file:** .planning/phases/03-potential-learning-sessions/03-UI-SPEC.md
 
-Phase 3 research done. Ready to plan.
+Phase 3 UI design contract drafted. Ready for checker / plan-phase.
 
 ## Performance Metrics
 
