@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Commissioned Learning Session MVP
 status: verified
-last_updated: "2026-08-07T15:28:29.874Z"
+stopped_at: Phase 2 context gathered
+last_updated: "2026-08-07T22:59:52.326Z"
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 2
   completed_plans: 2
-stopped_at: null
 current_phase: 2
 current_phase_name: assimilate-as-commissioned
 last_activity: 2026-08-07
@@ -46,6 +46,10 @@ coexistence green; `pnpm backend:verify` green; no user-visible create path.
 | known | `pnpm lint:all` / `test:path-routing` fails pre-existing (`render from routing JSON substitutes SHA` 6==7) | unrelated |
 
 ## Session Continuity
+
+**Last session:** 2026-08-07T22:59:52.319Z
+**Stopped at:** Phase 2 context gathered
+**Resume file:** .planning/phases/02-assimilate-as-commissioned/02-CONTEXT.md
 
 Phase 1 verification complete (`status: passed`). Ready for Phase 2 planning
 after any remaining Phase 1 close-out.
