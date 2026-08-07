@@ -117,6 +117,52 @@ declaration is accidental match when the answer fails the reviewed note.
 4. Allow same-session retry with a more specific answer. Retry grades under
    the normal outcome rules (correct, incorrect, or accidental match).
 
+### Commissioned learning session feedback
+
+A commissioned memory tracker is graded from the Feedback a Tutor returns for its
+Session Item, not from a recall question Doughnut asked. Feedback carries a score
+from 0 to 5. ADR 0001 defines the vocabulary and ADR 0005 defines what the score
+means to the Tutor; this section defines what it does to the schedule.
+
+1. A recorded score is memory evidence of the same standing as a graded recall
+   answer: recording it counts the recall, sets the last-recalled time, and
+   reschedules the tracker.
+2. Scores move memory strength as follows, where **accumulated strength** means
+   strength above the initial level of a newly assimilated tracker:
+
+| Score | Learner demonstrated | Memory-strength result |
+|-------|----------------------|------------------------|
+| 5 | Mastery with full fluency | Successful recall, growth 20% above the standard increment |
+| 4 | Mastery with fluency | Successful recall, standard growth |
+| 3 | Mastery, but not fluent | Successful recall, growth 20% below the standard increment |
+| 2 | Needed a reminder at first, then showed signs of mastery | No growth; accumulated strength reduced by 20% |
+| 1 | Needed several reminders | No growth; accumulated strength reduced by 50% |
+| 0 | Could not reach the learning point even with help | Accumulated strength reset to the initial level |
+
+3. Demonstrated mastery always moves forward. Scores 3 through 5 grow strength,
+   so a learner who masters a learning point without ever becoming fluent still
+   earns lengthening intervals rather than decaying toward permanent due work.
+4. Reductions apply to accumulated strength, so a tracker already at the initial
+   level cannot fall below it.
+5. A learner's spacing list may open with a zero interval. That is legitimate for
+   a newly assimilated tracker but not after a graded score, so schedule the next
+   recall at or after the first positive interval in the list. Resetting strength
+   must never leave a tracker due at the instant its score was recorded.
+6. Otherwise schedule the next recall from the updated memory state through the
+   normal interval path. Do not apply the incorrect-recall relearning override: a
+   commissioned tracker is reviewed only when the learner commissions another
+   Learning Session, so a short forced retry window would express nothing.
+7. A Tutor session carries no trustworthy effort evidence, so effort is neutral.
+8. A late session does not weaken the result. The score is the evidence, per the
+   evidence-versus-schedule separation above.
+9. A Session Item that never receives Feedback is not evidence: its tracker stays
+   unchanged and the item is abandoned with its session.
+
+These are the policy's only quantified adjustments. They are stated against
+accumulated strength rather than any stored field, index, or interval table, so
+an implementation may change representation while preserving them. Policy tests
+assert the resulting schedule movement, not the internal measure.
+
 ### Recall effort
 
 1. Trustworthy effort evidence (e.g. thinking time) may adjust within a correct
@@ -146,6 +192,8 @@ declaration is accidental match when the answer fails the reviewed note.
 - Correct overdue recalls must not create a positive-feedback workload loop.
 - Accidental match and declared overlap remain first-class outcomes with
   distinct scheduling rules.
+- Tutor Feedback becomes a grading source alongside Doughnut's own recall
+  questions, and is the first place this policy quantifies an adjustment.
 - Implementations must distinguish observed retention time from deviation
   relative to a queue target.
 - While history is incomplete, the due-time projection stays operationally
@@ -209,6 +257,8 @@ boundary or sufficient current memory state is persisted.
 
 ## Related
 
+- ADR 0001 [ubiquitous language](./0001-ubiquitous-language.md) — commissioned learning terms
+- ADR 0005 [commissioned learning session protocol](./0005-commissioned-learning-session-protocol.md) — what a score means to the Tutor
 - Anki answer semantics: <https://docs.ankiweb.net/studying.html#answer-buttons>
 - FSRS algorithm and overdue-review behavior: <https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm>
 - Reddy et al., *Unbounded Human Learning: Optimal Scheduling for Spaced Repetition*: <https://arxiv.org/abs/1602.07032>

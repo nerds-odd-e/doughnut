@@ -109,7 +109,22 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 | **Focus context** | Bounded note neighborhood for AI use |
 | **Book** | Attached reading artifact (EPUB, PDF, …), distinct from a notebook |
 
-3. **Disambiguation rules**
+3. **Commissioned learning terms** — Vocabulary for learning that a Tutor
+   conducts outside Doughnut, on commission from Doughnut:
+
+| Term | Meaning |
+|------|---------|
+| **Learning Orchestrator** | The Doughnut component that directs and coordinates learning sessions |
+| **Commissioned memory tracker** | Memory tracker maintained through commissioned learning sessions rather than ordinary recall |
+| **Tutor** | Party that conducts a Learning Session from the request and produces a report; may be a person or an AI assistant, and is outside Doughnut |
+| **Learning Session** | One commissioned unit of tutoring, covering the due commissioned memory trackers of a single notebook |
+| **Potential learning session** | Due commissioned memory trackers that could be commissioned but have no Learning Session yet |
+| **Learning Session Request** | The document Doughnut gives the Tutor to conduct the session |
+| **Learning Session Report** | The document the Tutor returns, carrying Feedback per Session Item |
+| **Session Item** | One memory tracker within a Learning Session, and the Feedback recorded for it |
+| **Feedback** | A Tutor's evaluation of a Session Item (score, and later descriptive feedback and recommendations) |
+
+4. **Disambiguation rules**
 
    - Speak of the **notebook** or **folder**, its **readme**, **settings**, and
      **health** as needed — do not call the in-app notebook page a “workspace”.
@@ -126,8 +141,14 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
    - Use **notebook description** for the one-line plain-text catalog blurb;
      use **readme** for the markdown notebook/folder body — never treat them as the
      same concept.
+   - Use **Tutor** for whoever conducts a Learning Session — not *teacher*,
+     *coach*, or *instructor*.
+   - Use **Learning Session** for the commissioned unit; reserve **recall** for
+     the ordinary spaced review Doughnut conducts itself.
+   - Say a Learning Session is **commissioned** (by the Learning Orchestrator)
+     and later **recorded** (from a Learning Session Report).
 
-4. **Alignment policy** — On Accept:
+5. **Alignment policy** — On Accept:
 
    - **New** features, tests, OpenAPI names, and packages follow this glossary.
    - **Existing** names may remain until a deliberate rename slice; do not
@@ -135,7 +156,7 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
    - Agents treat this ADR as binding for naming choices; conflicts with older
      strings are expected until cleaned up.
 
-5. **Out of scope** — Exact UI microcopy, i18n, and full mechanical rename
+6. **Out of scope** — Exact UI microcopy, i18n, and full mechanical rename
    plans. Those become normal product work citing this ADR.
 
 ## Consequences
@@ -146,6 +167,9 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 - Some existing strings (`add to learning`, `space setting`) become known debt
   until renamed.
 - Circles, notebook groups, and folders stay clearly separated in speech.
+- Commissioned learning names are fixed before the capability is built, so its
+  entities, API, UI copy, and tests start on the glossary instead of renaming
+  later.
 - Retired product concepts (**workspace** as CLI sync tree, **push / pull**
   sync, **sync baseline** / `.doughnut-sync`) must not reappear in product
   code or glossary; portable content follows ADR 0002.
