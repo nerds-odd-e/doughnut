@@ -117,7 +117,7 @@
           class="daisy-btn daisy-btn-primary daisy-btn-sm"
           @click.prevent="emit('selected', noteSearchResult)"
         >
-          Add link
+          Use this note
         </button>
       </template>
       <template

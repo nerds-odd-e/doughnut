@@ -49,7 +49,7 @@ export async function openLinkInsertionChoice(
     { router: options.withRouter }
   )
   await typeInSearch(searchInput, options.searchKey)
-  fireEvent.click(screen.getByText("Add link"))
+  fireEvent.click(screen.getByText("Use this note"))
   await flushPromises()
 }
 

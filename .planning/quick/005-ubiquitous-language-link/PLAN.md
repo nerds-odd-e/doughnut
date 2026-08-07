@@ -30,16 +30,13 @@ Where Doughnut means a **wiki link** and/or **relationship**, stop using bare **
 
 ### Phase 2 — Behavior: target-note chooser entry copy
 
-**Status:** in-progress  
+**Status:** done  
 **Type:** Behavior
 
-- **Pre:** After selecting a note in the connect search UI, CTA/header say `Add link` / `Link to:`.
-- **Trigger:** User selects a search (or recent) hit and sees the insertion choice step.
-- **Post:** Entry CTA and target header use CONTEXT strings (`Use this note`, `Target:`); choice buttons that already say wiki link / relationship stay.
+- CTA `Use this note`; header `Target:`; dead retarget `Point wiki link "…" at this note`.
+- Helpers renamed away from “Add link”; Vitest + `link.feature` green.
 
-**Touch:** `SearchForNoteAndFolder.vue`, `LinkInsertionChoice.vue`; `frontend/tests/links/*`, search specs; page objects looking for `Add link`.
-
-**Done when:** Specs asserting the new strings pass; dead-link retarget primary string updated in the same choice component if still bare `Link "…"`.
+**Done when:** Specs asserting the new strings pass. ✅
 
 ---
 

@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col gap-3">
     <div>
-      Link to:
+      Target:
       <strong>
         <NoteTitleComponent v-bind="{ noteTopology: targetNoteTopology }" />
       </strong>
@@ -65,7 +65,7 @@ const emit = defineEmits<{
 
 const primaryLabel = computed(() =>
   props.deadLinkDisplayText
-    ? `Link "${props.deadLinkDisplayText}" to this note`
+    ? `Point wiki link "${props.deadLinkDisplayText}" at this note`
     : "Insert as a wiki link"
 )
 

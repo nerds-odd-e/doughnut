@@ -18,7 +18,7 @@ import {
   deadLinkPayload,
   makeNoteHit,
   makeNotebookHit,
-  openAddLinkChoice,
+  openUseThisNoteChoice,
   renderSearchForm,
   searchAndClickMoveUnder,
   setupSearchDialogTests,
@@ -33,14 +33,14 @@ describe("SearchForm actions", () => {
     vi.useRealTimers()
   })
 
-  describe("Add link choice step", () => {
+  describe("Use this note choice step", () => {
     beforeEach(() => {
       vi.useFakeTimers()
     })
 
     it("shows link choice buttons and relationship form when Add a new relationship note is clicked", async () => {
       const note = MakeMe.aNote.please()
-      await openAddLinkChoice(note, { router: true })
+      await openUseThisNoteChoice(note, { router: true })
 
       expect(screen.getByText("Insert as a wiki link")).toBeInTheDocument()
       expect(
@@ -202,10 +202,12 @@ describe("SearchForm actions", () => {
       )
       await typeInSearch(searchInput, "Selected")
 
-      fireEvent.click(screen.getByText("Add link"))
+      fireEvent.click(screen.getByText("Use this note"))
       await flushPromises()
 
-      const linkButton = screen.getByText('Link "original text" to this note')
+      const linkButton = screen.getByText(
+        'Point wiki link "original text" at this note'
+      )
       expect(linkButton).toBeInTheDocument()
 
       fireEvent.click(linkButton)

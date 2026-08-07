@@ -199,7 +199,7 @@ describe("SearchResultListItem", () => {
     expect(wrapper.text()).toContain("Move to notebook root")
   })
 
-  it("note hit button slot can show Add link without Move Under", () => {
+  it("note hit button slot can show Use this note without Move Under", () => {
     const searchResult: NoteSearchResult = makeMe.aNoteSearchResult
       .id(1)
       .title("Test Note")
@@ -211,11 +211,11 @@ describe("SearchResultListItem", () => {
       .withProps({ searchHit: noteHit(searchResult) })
       .mount({
         slots: {
-          button: '<button type="button">Add link</button>',
+          button: '<button type="button">Use this note</button>',
         },
       })
 
-    expect(wrapper.text()).toContain("Add link")
+    expect(wrapper.text()).toContain("Use this note")
     expect(wrapper.text()).not.toContain("Move Under")
   })
 })

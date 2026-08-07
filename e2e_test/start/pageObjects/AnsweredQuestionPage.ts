@@ -87,7 +87,7 @@ const assumeAnsweredQuestionPage = () => {
         'link-to-matched-note-',
         'Build a link'
       )
-      cy.contains('Link to:')
+      cy.contains('Target:')
         .should('be.visible')
         .parent()
         .should('contain.text', matchedNoteTitle)

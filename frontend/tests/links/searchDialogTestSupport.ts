@@ -129,7 +129,7 @@ export async function confirmMovePopup() {
   await flushPromises()
 }
 
-export async function openAddLinkChoice(
+export async function openUseThisNoteChoice(
   note: Note,
   options?: { router?: boolean }
 ) {
@@ -138,7 +138,7 @@ export async function openAddLinkChoice(
   ])
   const searchInput = await renderSearchForm({ note }, options)
   await typeInSearch(searchInput, "Target")
-  fireEvent.click(screen.getByText("Add link"))
+  fireEvent.click(screen.getByText("Use this note"))
   await flushPromises()
 }
 

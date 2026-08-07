@@ -95,13 +95,13 @@ describe("MatchedNoteLinkOffer", () => {
     teardownGlobalClientForTesting()
   })
 
-  it("shows Link to: with matched title, property and relationship options, hides bare wiki", async () => {
+  it("shows Target: with matched title, property and relationship options, hides bare wiki", async () => {
     const { reviewedRealm, matchedRealm } = buildReviewedAndMatched()
 
     const wrapper = mountOffer(reviewedRealm, matchedRealm)
     await flushPromises()
 
-    expect(wrapper.text()).toContain("Link to:")
+    expect(wrapper.text()).toContain("Target:")
     expect(wrapper.text()).toContain("Matched Target")
     expect(wrapper.text()).not.toContain("Insert as a wiki link")
     expect(wrapper.text()).toContain("Add wiki link as a new property")

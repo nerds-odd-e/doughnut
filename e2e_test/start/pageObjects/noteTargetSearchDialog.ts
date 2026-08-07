@@ -59,7 +59,7 @@ function searchNote(searchKey: string, options: string[]) {
   cy.tick(1000)
 }
 
-function clickAddLinkOnRelationshipTargetNote(toNoteTopic: string) {
+function clickUseThisNoteOnTargetNote(toNoteTopic: string) {
   cy.get('.search-result [role=listitem]')
     .filter((_, el) => {
       const a = el.querySelector(
@@ -67,7 +67,7 @@ function clickAddLinkOnRelationshipTargetNote(toNoteTopic: string) {
       )
       return a?.textContent?.trim() === toNoteTopic
     })
-    .findByRole('button', { name: 'Add link' })
+    .findByRole('button', { name: 'Use this note' })
     .click()
 }
 
@@ -150,20 +150,20 @@ export const assumeNoteTargetSearchDialog = () => {
       waitUntilAppIsNotBusy()
     },
     createRelationshipToTargetAs(toNoteTopic: string, relationType: string) {
-      clickAddLinkOnRelationshipTargetNote(toNoteTopic)
+      clickUseThisNoteOnTargetNote(toNoteTopic)
       cy.findByRole('button', { name: 'Add a new relationship note' }).click()
       form.getField('Relation Type').clickOption(relationType)
       waitUntilAppIsNotBusy()
     },
     insertWikiLinkToTarget(toNoteTopic: string) {
-      clickAddLinkOnRelationshipTargetNote(toNoteTopic)
+      clickUseThisNoteOnTargetNote(toNoteTopic)
       cy.findByRole('button', { name: 'Insert as a wiki link' }).click()
       waitUntilAppIsNotBusy()
     },
     insertDeadLinkToTarget(toNoteTopic: string, displayText: string) {
-      clickAddLinkOnRelationshipTargetNote(toNoteTopic)
+      clickUseThisNoteOnTargetNote(toNoteTopic)
       cy.findByRole('button', {
-        name: `Link "${displayText}" to this note`,
+        name: `Point wiki link "${displayText}" at this note`,
       }).click()
       waitUntilAppIsNotBusy()
     },

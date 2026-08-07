@@ -162,7 +162,7 @@ describe("AnsweredSpellingQuestion accidental match", () => {
     ).click()
     await flushPromises()
 
-    expect(document.body.textContent).toContain("Link to:")
+    expect(document.body.textContent).toContain("Target:")
     expect(document.body.textContent).toContain("Matched A")
     expect(
       document.body.querySelector(
