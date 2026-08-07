@@ -4,15 +4,15 @@ milestone: v1.3
 milestone_name: Commissioned Learning Session MVP
 current_phase: 1
 current_phase_name: Commissioned tracker model
-status: planning
+status: planned
 stopped_at: null
-last_updated: "2026-08-07T13:50:00Z"
+last_updated: "2026-08-07T14:05:00Z"
 last_activity: 2026-08-07
-last_activity_desc: "Phase 1 research complete (01-RESEARCH.md); ready to plan"
+last_activity_desc: "Phase 1 plans written (01-01, 01-02); ready to execute"
 progress:
   total_phases: 7
   completed_phases: 0
-  total_plans: 0
+  total_plans: 2
   completed_plans: 0
   percent: 0
 ---
@@ -26,9 +26,9 @@ See: `.planning/PROJECT.md`
 ## Current Position
 
 Phase: 1 — Commissioned tracker model (Structure)
-Plan: —
-Status: Research complete — `/gsd-plan-phase 1` can write PLAN.md
-Last activity: 2026-08-07 — Phase 1 domain research written (`01-RESEARCH.md`)
+Plan: 01-01 (Wave 1) → 01-02 (Wave 2)
+Status: Planned — `/gsd-execute-phase 1` or local execute-plan
+Last activity: 2026-08-07 — Phase 1 PLAN.md files created
 
 ## Deferred Items
 
@@ -43,5 +43,5 @@ Last activity: 2026-08-07 — Phase 1 domain research written (`01-RESEARCH.md`)
 
 ## Session Continuity
 
-Phase 1 research: `.planning/phases/01-commissioned-tracker-model/01-RESEARCH.md`.
-Next: `/gsd-plan-phase 1` (planner consumes RESEARCH + CONTEXT).
+Phase 1 plans: `01-01-PLAN.md` (tracer + unique-key checkpoint), `01-02-PLAN.md` (join/batch/ERD).
+Next: `/gsd-execute-phase 1` (Wave 1 starts with blocking unique-key decision).

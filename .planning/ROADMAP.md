@@ -24,6 +24,12 @@
 
 **Context:** `.planning/phases/01-commissioned-tracker-model/`
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Tracer: commissioned column + unique key + due-recall exclusion (SC2/SC3)
+- [ ] 01-02-PLAN.md — Expansion: assimilation join + batch exclusion + ERD (SC1)
+
 ---
 
 ### Phase 2: Assimilate as commissioned (Behavior)
@@ -146,7 +152,7 @@
 
 | Phase | Name | Type | Req | Status |
 |-------|------|------|-----|--------|
-| 1 | Commissioned tracker model | Structure | — | Pending |
+| 1 | Commissioned tracker model | Structure | — | Planned |
 | 2 | Assimilate as commissioned | Behavior | TRK-01, TRK-02 | Pending |
 | 3 | Potential learning sessions | Behavior | TRK-03, POT-01, POT-02 | Pending |
 | 4 | Learning Session and Request builder | Structure | — | Pending |
