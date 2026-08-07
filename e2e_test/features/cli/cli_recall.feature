@@ -1,6 +1,8 @@
+@ignore
 @withCliConfig
 @interactiveCLI
-Feature: CLI recall status and recall session
+Feature: CLI recall
+  As a learner, I want to check recall status and run recall sessions in the interactive CLI.
 
   Background:
     Given I am logged in as an existing user
@@ -10,7 +12,7 @@ Feature: CLI recall status and recall session
 
     Background:
       And I have a notebook "English practice" with notes:
-        | Title    | Content | Skip Memory Tracking |
+        | Title    | Content                        | Skip Memory Tracking |
         | English  |                                | true                 |
         | sedition | Sedition means incite violence |                      |
         | sedation | **Put** to sleep is _sedation_ |                      |
@@ -23,7 +25,7 @@ Feature: CLI recall status and recall session
       Then I should see "1 note to recall today" in past CLI assistant messages
 
     @disableOpenAiService
-    Scenario: Recall using just review
+    Scenario: Just-review recall accepts remembered and declines load more
       Given the note "sedation" was assimilated on day 1
       And It's day 2
       When I enter the slash command "/recall" in the interactive CLI
@@ -39,7 +41,7 @@ Feature: CLI recall status and recall session
       Then I should see "Recalled 1 note" in past CLI assistant messages
 
     @disableOpenAiService
-    Scenario: Complete all due notes, decline load more, then recall from a later window
+    Scenario: Completing due notes then recalling from a later window
       Given the note "sedition" was assimilated on day 1
       And the note "sedation" was assimilated on day 1
       And It's day 2
@@ -54,7 +56,7 @@ Feature: CLI recall status and recall session
       Then I should see "Reviewed: sedition" in answered questions
 
     @usingMockedOpenAiService
-    Scenario: MCQ — choose the correct answer
+    Scenario: MCQ recall accepts the correct choice
       Given OpenAI generates this question:
         | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
         | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
@@ -71,7 +73,7 @@ Feature: CLI recall status and recall session
       And I should see "to incite violence" in answered questions
 
     @usingMockedOpenAiService
-    Scenario: MCQ — wrong choice via down arrow and Enter
+    Scenario: MCQ recall rejects the next choice
       Given OpenAI generates this question:
         | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
         | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
@@ -79,7 +81,7 @@ Feature: CLI recall status and recall session
       And the note "sedition" was assimilated on day 1
       And It's day 2
       When I enter the slash command "/recall" in the interactive CLI
-      And I select the next MCQ choice with down arrow and Enter in the interactive CLI
+      And I choose the next MCQ choice in the interactive CLI
       Then I should see "Incorrect" in answered questions
       And I should see "to sleep" in answered questions
 
@@ -87,12 +89,12 @@ Feature: CLI recall status and recall session
 
     Background:
       And I have a notebook "English practice" with notes:
-        | Title    | Content | Skip Memory Tracking | Remember Spelling |
+        | Title    | Content                        | Skip Memory Tracking | Remember Spelling |
         | English  |                                | true                 |                   |
         | sedition | Sedition means incite violence |                      | true              |
 
     @disableOpenAiService
-    Scenario: Recall spelling — correct answer then just review
+    Scenario: Spelling recall accepts a correct answer then just review
       Given the note "sedition" was assimilated on day 1
       And It's day 2
       When I enter the slash command "/recall" in the interactive CLI
@@ -106,5 +108,5 @@ Feature: CLI recall status and recall session
       Then I should see "sedition" in answered questions
       And I should see "Sedition means incite violence" in answered questions
       And I should see "Reviewed: sedition" in answered questions
-      And I answer "n" in the interactive CLI to prompt "Load more from next 3 days?"
+      When I answer "n" in the interactive CLI to prompt "Load more from next 3 days?"
       Then I should see "Recalled 2 notes" in past CLI assistant messages

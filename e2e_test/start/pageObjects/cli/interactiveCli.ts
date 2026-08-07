@@ -43,7 +43,7 @@ function interactiveCli() {
         writeInteractiveLineToPty(answer)
       )
     },
-    selectNextMcqChoiceWithDownArrowAndEnter(): Cypress.Chainable<null> {
+    chooseNextMcqChoice(): Cypress.Chainable<null> {
       return whenCurrentGuidanceContainsThen(
         'What is the meaning of sedition?',
         () =>
@@ -51,6 +51,13 @@ function interactiveCli() {
             writeInteractiveRawToPty('\r')
           )
       )
+    },
+    saveAccessToken(token: string): Cypress.Chainable<null> {
+      return writeInteractiveLineToPty(`/set-access-token ${token}`).then(
+        () => {
+          pastCliAssistantMessages().expectContains('Access token saved')
+        }
+      ) as Cypress.Chainable<null>
     },
     pastCliAssistantMessages,
     answeredQuestions,

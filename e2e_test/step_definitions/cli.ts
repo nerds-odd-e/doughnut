@@ -86,40 +86,21 @@ When(
   }
 )
 
-When(
-  'I select the next MCQ choice with down arrow and Enter in the interactive CLI',
-  () => cli.interactiveCli().selectNextMcqChoiceWithDownArrowAndEnter()
+When('I choose the next MCQ choice in the interactive CLI', () =>
+  cli.interactiveCli().chooseNextMcqChoice()
 )
 
-When(
-  'I set the saved access token in the interactive CLI using set-access-token',
-  () => {
-    cy.get<string>('@savedAccessToken').then((token) => {
-      expect(token, 'saved access token').to.be.a('string')
-      const interactive = cli.interactiveCli()
-      return interactive
-        .enterSlashCommandInInteractiveCli(`/set-access-token ${token}`)
-        .then(() => {
-          interactive
-            .pastCliAssistantMessages()
-            .expectContains('Access token saved')
-        })
-    })
-  }
-)
+When('I save the Doughnut Access Token in the interactive CLI', () => {
+  cy.get<string>('@savedAccessToken').then((token) => {
+    expect(token, 'saved access token').to.be.a('string')
+    return cli.interactiveCli().saveAccessToken(token)
+  })
+})
 
 When(
   'I set the access token for {string} in the interactive CLI',
   (userIdentifier: string) => {
-    const token = `access-token-of-${userIdentifier}`
-    const interactive = cli.interactiveCli()
-    interactive
-      .enterSlashCommandInInteractiveCli(`/set-access-token ${token}`)
-      .then(() =>
-        interactive
-          .pastCliAssistantMessages()
-          .expectContains('Access token saved')
-      )
+    cli.interactiveCli().saveAccessToken(`access-token-of-${userIdentifier}`)
   }
 )
 

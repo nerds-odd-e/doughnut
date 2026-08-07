@@ -215,16 +215,14 @@ Improve all E2E feature files (and supporting steps/page objects as needed) so t
 
 ### Phase 16 — CLI E2E authoring
 
-**Status:** planned  
+**Status:** done  
 **Type:** Behavior
 
-- **Pre:** CLI features may violate checklist; many are `@ignore` in CI.
-- **Trigger:** Improve Gherkin/domain language and non-ignored install/run paths; do not add Cypress PTY for interactive.
-- **Post:** Checklist satisfied for editable surface; run Cypress only for non-`@ignore` specs in this group (or confirm tag filter skips ignored).
+- Domain Gherkin; `@ignore` on interactive CLI Cypress specs (Vitest remains harness); install/run verified.
 
 **Files:** `cli/cli_install_and_run.feature`, `cli/cli_access_token.feature`, `cli/cli_gmail.feature`, `cli/cli_interactive_mode.feature`, `cli/cli_recall.feature`
 
-**Done when:** checklist applied; appropriate targeted Cypress (or documented ignore) green.
+**Done when:** checklist applied; appropriate targeted Cypress (or documented ignore) green. ✅ install/run 3/3
 
 ---
 
