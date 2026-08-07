@@ -79,6 +79,16 @@ class AssimilationControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void commissionedOnlyNoteStillAppearsInOrdinaryAssimilationQueue() {
+      Note note = ownedNote("commissioned-only");
+      makeMe.aMemoryTrackerFor(note).commissioned().please();
+
+      AssimilationNextDTO result = controller.next("Asia/Shanghai");
+      assertThat(result.getNextUnit().getNoteId(), equalTo(note.getId()));
+      assertThat(result.getCounts().getTotalUnassimilatedCount(), equalTo(1));
+    }
+
+    @Test
     void notLoggedIn() {
       currentUser.setUser(null);
       assertThrows(ResponseStatusException.class, () -> controller.next("Asia/Shanghai"));

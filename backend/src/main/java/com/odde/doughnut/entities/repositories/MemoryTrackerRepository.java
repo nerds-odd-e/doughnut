@@ -103,6 +103,7 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
               + "  AND mt.removed_from_tracking IS FALSE "
               + "  AND mt.deleted_at IS NULL "
               + "  AND mt.type <> 'SPELLING' "
+              + "  AND mt.type <> 'COMMISSIONED' "
               + "  AND mt.next_recall_at <= :dueBy "
               + "  AND NOT EXISTS ("
               + "    SELECT 1 FROM recall_prompt rp "

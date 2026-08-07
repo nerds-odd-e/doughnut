@@ -25,7 +25,7 @@
 
 **Context:** `.planning/phases/01-commissioned-tracker-model/`
 
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans executed
 
 Plans:
 **Wave 1**
@@ -34,7 +34,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 01-02-PLAN.md — Expansion: assimilation join + property target gate + batch candidate exclusion (SC1)
+- [x] 01-02-PLAN.md — Expansion: assimilation join + property target gate + batch candidate exclusion (SC1)
 
 ---
 

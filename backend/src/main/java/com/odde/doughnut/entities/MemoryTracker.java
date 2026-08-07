@@ -121,11 +121,21 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
       "(rp.propertyKey IS NULL OR rp.propertyKey = '')";
 
   /**
-   * JPQL fragment for joined alias {@code tmt}; must stay aligned with {@link
+   * JPQL fragment for joined alias {@code tmtBlock}; must stay aligned with {@link
    * #isNoteLevelTracker()}.
    */
   public static final String JPA_WHERE_NOTE_LEVEL_TARGET_TRACKER =
-      "(tmt.propertyKey IS NULL OR tmt.propertyKey = '')";
+      "(tmtBlock.propertyKey IS NULL OR tmtBlock.propertyKey = '')";
+
+  /** JPQL fragment for joined alias {@code rp}: ordinary assimilation ignores COMMISSIONED. */
+  public static final String JPA_WHERE_NOT_COMMISSIONED_TRACKER =
+      "rp.type <> com.odde.doughnut.entities.MemoryTrackerType.COMMISSIONED";
+
+  /**
+   * JPQL fragment for joined alias {@code tmtBlock}: ordinary assimilation ignores COMMISSIONED.
+   */
+  public static final String JPA_WHERE_NOT_COMMISSIONED_TARGET_TRACKER =
+      "tmtBlock.type <> com.odde.doughnut.entities.MemoryTrackerType.COMMISSIONED";
 
   @Column(name = "deleted_at")
   @JsonIgnore

@@ -4,10 +4,10 @@ milestone: v1.3
 milestone_name: Commissioned Learning Session MVP
 current_phase: 1
 current_phase_name: Commissioned tracker model
-status: planned
-last_updated: "2026-08-07T15:20:00.000Z"
+status: in_progress
+last_updated: "2026-08-07T15:21:00.000Z"
 last_activity: 2026-08-07
-last_activity_desc: Phase 1 replanned for type=COMMISSIONED filters (no boolean column)
+last_activity_desc: 01-02 implementation green; ready for wrap-up (not marked done)
 progress:
   total_phases: 7
   completed_phases: 0
@@ -28,12 +28,13 @@ See: `.planning/PROJECT.md`
 Quick plan **006 memory-tracker type** is **done** (see slim PLAN under
 `.planning/quick/006-memory-tracker-type/`).
 
-**Phase 1** replanned for `MemoryTrackerType.COMMISSIONED` filters (not a
-boolean `commissioned` column): due-recall / assimilation join / batch
-exclusion + unit proofs. Plans: `01-01-PLAN.md` (Wave 1 tracer SC3),
-`01-02-PLAN.md` (Wave 2 join + batch + SC1).
+**Phase 1** — `01-01` committed (due-recall excludes COMMISSIONED). `01-02`
+implementation is **uncommitted / ready for wrap-up**: assimilation join +
+property target gate + batch candidates exclude COMMISSIONED; SC1
+`backend:verify` green. See `01-02-SUMMARY.md`.
 
-**Next:** `/gsd-execute-phase 1`
+**Next:** coordinator wrap-up for 01-02 (post-change-refactor → plan update →
+commit → push). Do not start Phase 2 until Phase 1 wrap-up closes.
 
 ## Deferred Items
 
@@ -48,4 +49,4 @@ exclusion + unit proofs. Plans: `01-01-PLAN.md` (Wave 1 tracer SC3),
 
 ## Session Continuity
 
-Phase 1 PLANs rewritten for type filters — ready to execute.
+01-02 code + tests green, uncommitted; awaiting wrap-up.

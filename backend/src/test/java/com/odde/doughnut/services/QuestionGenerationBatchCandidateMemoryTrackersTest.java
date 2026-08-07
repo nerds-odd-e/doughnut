@@ -94,6 +94,18 @@ class QuestionGenerationBatchCandidateMemoryTrackersTest {
   }
 
   @Test
+  void excludesCommissionedTracker() {
+    MemoryTracker commissionedTracker =
+        makeMe
+            .aMemoryTrackerFor(makeMe.aNote().notebookOwnedBy(user).please())
+            .commissioned()
+            .nextRecallAt(hoursFrom(currentTime, 1))
+            .please();
+
+    assertThat(candidateIds(), not(hasItem(commissionedTracker.getId())));
+  }
+
+  @Test
   void includesTrackerWithAnsweredPrompt() {
     makeMe
         .aRecallPrompt()
