@@ -32,11 +32,11 @@ Then('I recall {string}', (repeatNotes: string) => {
   start.recall().navigateToRecallPage().recallNotes(repeatNotes)
 })
 
-Then('I repeat more old {string}', (repeatNotes: string) => {
+When('I repeat more old {string}', (repeatNotes: string) => {
   start.recall().assumeRecallPage().recallNotes(repeatNotes)
 })
 
-Then(
+When(
   'On day {int} I recall {string} and assimilate new {string}',
   (day: number, repeatNotes: string, initialNotes: string) => {
     start.testability().timeTravelTo(day, 8)
@@ -202,7 +202,7 @@ Then(
   }
 )
 
-Then('choose to remove the last memory tracker from recalls', () => {
+When('I choose to remove the last memory tracker from recalls', () => {
   start
     .assumeAnsweredQuestionPage()
     .goToLastAnsweredQuestion()
@@ -214,12 +214,16 @@ When('I revive the memory tracker on this page', () => {
   assumeMemoryTrackerPage().reviveMemoryTracker()
 })
 
-Then('I should see the resume recall menu item', () => {
-  cy.findByLabelText('Resume').should('exist')
+Then('the memory tracker should be available for recall again', () => {
+  assumeMemoryTrackerPage().expectAvailableForRecall()
 })
 
-When('I click resume recall from the menu', () => {
-  cy.findByLabelText('Resume').click()
+Then('I should be able to resume recalling', () => {
+  start.recall().expectResumeAvailable()
+})
+
+When('I resume recalling', () => {
+  start.recall().resumeRecall()
 })
 
 Then('I should be back to the current question', () => {

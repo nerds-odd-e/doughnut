@@ -147,6 +147,15 @@ export const recall = () => {
       })
       return this
     },
+    expectResumeAvailable() {
+      cy.findByLabelText('Resume').should('exist')
+      return this
+    },
+    resumeRecall() {
+      cy.findByLabelText('Resume').click()
+      waitUntilAppIsNotBusy()
+      return recallPage()
+    },
     visitRecallPage() {
       loadRecallPage()
       return recallPage()

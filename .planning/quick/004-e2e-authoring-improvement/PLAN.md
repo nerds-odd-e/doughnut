@@ -31,16 +31,14 @@ Improve all E2E feature files (and supporting steps/page objects as needed) so t
 
 ### Phase 2 — Recall E2E authoring (browse / pages / spaced / match)
 
-**Status:** planned  
+**Status:** done  
 **Type:** Behavior
 
-- **Pre:** First recall half may violate checklist.
-- **Trigger:** Audit + improve.
-- **Post:** Checklist satisfied; Cypress green for this half.
+- Domain Gherkin (resume recalling, remove/revive with Then); When/Then hygiene; shared Backgrounds; PO renames; split `assimilation_settings.ts` from oversized assimilation steps.
 
 **Files:** `recall/browse_answer_and_notes_while_recalling.feature`, `recall/recall_pages.feature`, `recall/spaced_repetition.feature`, `recall/accidental_match_reveal.feature`, `recall/overlap_try_again.feature`
 
-**Done when:** checklist applied; targeted Cypress passes.
+**Done when:** checklist applied; targeted Cypress passes. ✅ 16/16
 
 ---
 

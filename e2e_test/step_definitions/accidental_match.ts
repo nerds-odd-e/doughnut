@@ -70,8 +70,8 @@ Then(
   }
 )
 
-When('I click overlap try again', () => {
-  start.assumeAnsweredQuestionPage().clickOverlapTryAgain()
+When('I try the spelling question again', () => {
+  start.assumeAnsweredQuestionPage().trySpellingQuestionAgain()
 })
 
 When(
@@ -84,8 +84,8 @@ When(
   }
 )
 
-When('I return to recall via history back', () => {
-  start.assumeAnsweredQuestionPage().returnToRecallViaHistoryBack()
+When('I go back to the recall result', () => {
+  start.assumeAnsweredQuestionPage().goBackToRecallResult()
 })
 
 Then(

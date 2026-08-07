@@ -30,10 +30,10 @@ Feature: Overlap try again
       ---
       Partner note body
       """
+    And It's day 1
+    And the note "colour" was assimilated on day 1
 
   Scenario: Shared non-distinguishing answer shows overlap try-again without credit
-    Given It's day 1
-    And the note "colour" was assimilated on day 1
     When I visit recall for a due quiz question on day 2
     Then I should be asked spelling question "means a hue" from notebook "Overlap practice"
     When I type my answer "colour"
@@ -41,13 +41,11 @@ Feature: Overlap try again
     And I should not see matched notes or accidental match on the overlap result
 
   Scenario: Try again then distinguishing plain alias credits as correct
-    Given It's day 1
-    And the note "colour" was assimilated on day 1
     When I visit recall for a due quiz question on day 2
     Then I should be asked spelling question "means a hue" from notebook "Overlap practice"
     When I type my answer "colour"
     Then I should see an overlap try-again alert for spelling
-    When I click overlap try again
+    When I try the spelling question again
     Then I should be asked spelling question "means a hue" from notebook "Overlap practice"
     When I type my answer "color"
     Then I should see that my last answer to spelling question is correct

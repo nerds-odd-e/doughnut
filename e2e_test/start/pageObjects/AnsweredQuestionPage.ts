@@ -150,7 +150,7 @@ const assumeAnsweredQuestionPage = () => {
       cy.url({ timeout: 15000 }).should('match', /\/d\/n\/\d+|\/n\/\d+|\/n\d+/)
       return self
     },
-    returnToRecallViaHistoryBack() {
+    goBackToRecallResult() {
       cy.go('back')
       waitUntilAppIsNotBusy()
       cy.url().should('include', '/recall')
@@ -179,7 +179,7 @@ const assumeAnsweredQuestionPage = () => {
       expectNoMatchedNotesOrAccidentalMatch()
       return self
     },
-    clickOverlapTryAgain() {
+    trySpellingQuestionAgain() {
       cy.findByTestId('overlap-try-again').scrollIntoView().click()
       waitUntilAppIsNotBusy()
       return self

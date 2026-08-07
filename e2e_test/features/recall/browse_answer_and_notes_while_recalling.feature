@@ -26,22 +26,23 @@ Feature: Browse answers and notes while recalling
     Given I assimilate the note "sedition" with the option of remembering spelling
     When I visit recall for a due quiz question on day 2
     And I type my answer "riot"
-    And I should see that my spelling answer "riot" is incorrect
+    Then I should see that my spelling answer "riot" is incorrect
     When I visit note "medical"
-    Then I should see the resume recall menu item
-    And I click resume recall from the menu
+    Then I should be able to resume recalling
+    When I resume recalling
     Then I should be back to the current question
 
   Scenario: I can remove a note from further recalls
     Given the note "sedition" was assimilated on day 1
     When I visit recall for a due quiz question on day 2
     And I type my answer "sedition"
-    When choose to remove the last memory tracker from recalls
+    And I choose to remove the last memory tracker from recalls
     Then On day 100 I should have "0/2/2" note for assimilation
 
   Scenario: I can revive a memory tracker removed from recalls
     Given the note "sedition" was assimilated on day 1
     When I visit recall for a due quiz question on day 2
     And I type my answer "sedition"
-    When choose to remove the last memory tracker from recalls
+    And I choose to remove the last memory tracker from recalls
     And I revive the memory tracker on this page
+    Then the memory tracker should be available for recall again

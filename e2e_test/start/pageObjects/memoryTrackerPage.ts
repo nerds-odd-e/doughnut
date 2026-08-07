@@ -25,6 +25,10 @@ const assumeMemoryTrackerPage = () => {
       })
         .should('be.visible')
         .click()
+      return assumeMemoryTrackerPage()
+    },
+    expectAvailableForRecall() {
+      expectMemoryTrackerPage()
       cy.findByText(SKIPPED_MEMORY_TRACKER_MESSAGE).should('not.exist')
       cy.findByRole('button', {
         name: /remove this note from recall/i,
