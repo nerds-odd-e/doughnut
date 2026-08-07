@@ -56,6 +56,17 @@ Plans:
 
 **Context:** `.planning/phases/02-assimilate-as-commissioned/`
 
+**Plans:** 2 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 02-01-PLAN.md — Tracer: assimilate as commissioned (caret → COMMISSIONED create → stay on note → Commissioned label → E2E green)
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 02-02-PLAN.md — Expansion: ordinary+commissioned coexistence (TRK-02 / D-02 / SC3)
+
 ---
 
 ### Phase 3: Potential learning sessions (Behavior)
@@ -165,7 +176,7 @@ Plans:
 | Phase | Name | Type | Req | Status |
 |-------|------|------|-----|--------|
 | 1 | Commissioned tracker model | Structure | — | Complete    |
-| 2 | Assimilate as commissioned | Behavior | TRK-01, TRK-02 | Pending |
+| 2 | Assimilate as commissioned | Behavior | TRK-01, TRK-02 | Planned |
 | 3 | Potential learning sessions | Behavior | TRK-03, POT-01, POT-02 | Pending |
 | 4 | Learning Session and Request builder | Structure | — | Pending |
 | 5 | Commission Learning Session | Behavior | COM-01–03 | Pending |
@@ -181,4 +192,4 @@ Plans:
 Parked elsewhere: SEED-001, ADR 0002 Level 1.
 
 ---
-*Last updated: 2026-08-07 — Phase 1 replanned for type=COMMISSIONED filters*
+*Last updated: 2026-08-08 — Phase 2 plans written (assimilate-as-commissioned)*

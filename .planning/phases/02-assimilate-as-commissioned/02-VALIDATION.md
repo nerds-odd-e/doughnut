@@ -40,10 +40,11 @@ created: 2026-08-08
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 02-01-01 | 01 | 1 | TRK-01 | T-02-01 | Logged-in assimilate only; refuse property+commissioned | unit | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` | ✅ extend | ⬜ pending |
-| 02-01-02 | 01 | 1 | TRK-01 / D-03 / D-06 | — | Menu + stay on note; ignore COMMISSIONED for disable | unit | `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/AssimilationPanel.spec.ts` | ✅ extend | ⬜ pending |
-| 02-01-03 | 01 | 1 | TRK-01 / TRK-02 | — | E2E assimilate as commissioned → see Commissioned | e2e | `cypress run --spec e2e_test/features/learning_session/*.feature` | ❌ W0 | ⬜ pending |
-| 02-02-01 | 02 | 2 | TRK-02 / D-07 | — | Coexistence + Commissioned label | unit | backend:test_only + frontend AssimilationPanel / NoteInfo | ✅ extend | ⬜ pending |
+| 02-01-01 | 01 | 1 | TRK-01 | T-02-01..04 | Logged-in assimilate; refuse property+commissioned; create COMMISSIONED only | unit + e2e scaffold | backend AssimilationControllerTests + AssimilationPanel/NoteInfo Vitest | ✅ extend / ❌ W0 feature | ⬜ pending |
+| 02-01-02 | 01 | 1 | TRK-01 / D-03 / D-05 | — | Assimilate enabled when only COMMISSIONED; hide caret when exists | unit | `pnpm frontend:test tests/components/recall/AssimilationPanel.spec.ts` | ✅ extend | ⬜ pending |
+| 02-01-03 | 01 | 1 | TRK-01 / D-08 | — | E2E assimilate as commissioned → see Commissioned; remove @wip | e2e | `cypress run --spec e2e_test/features/learning_session/commissioned_learning_session.feature` | ❌ W0 | ⬜ pending |
+| 02-02-01 | 02 | 2 | TRK-02 / D-02 | T-02-06 | Ordinary-then-commissioned create; idempotent duplicate | unit | backend AssimilationControllerTests | ✅ extend | ⬜ pending |
+| 02-02-02 | 02 | 2 | TRK-02 / D-07 | — | Settings/E2E show ordinary + Commissioned | unit + e2e | frontend specs + learning_session feature | ✅ / ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
