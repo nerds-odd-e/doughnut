@@ -56,7 +56,7 @@ Plans:
 
 **Context:** `.planning/phases/02-assimilate-as-commissioned/`
 
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans executed
 
 Plans:
 **Wave 1**
@@ -65,7 +65,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1)*
 
-- [ ] 02-02-PLAN.md — Expansion: ordinary+commissioned coexistence (TRK-02 / D-02 / SC3)
+- [x] 02-02-PLAN.md — Expansion: ordinary+commissioned coexistence (TRK-02 / D-02 / SC3)
 
 ---
 

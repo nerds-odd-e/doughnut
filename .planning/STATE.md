@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Commissioned Learning Session MVP
 status: in_progress
-stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-08-07T23:16:35.038Z"
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-08-07T23:23:44.692Z"
 progress:
   total_phases: 7
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 4
-  completed_plans: 3
+  completed_plans: 4
 current_phase: 2
 current_phase_name: assimilate-as-commissioned
 last_activity: 2026-08-08
-last_activity_desc: Phase 2 plan 02-01 executed (assimilate as commissioned)
+last_activity_desc: Phase 2 plan 02-02 executed (TRK-02 coexistence)
 ---
 
 # Project State
@@ -32,11 +32,13 @@ Quick plan **006 memory-tracker type** is **done** (see slim PLAN under
 6/6). Due-recall / assimilation join / batch candidates exclude COMMISSIONED;
 coexistence green; `pnpm backend:verify` green; no user-visible create path.
 
-**Phase 2** — plan **02-01 complete** (assimilate as commissioned create path,
-caret UX, Commissioned label, E2E green). Remaining: `02-02-PLAN.md`
-(coexistence when ordinary trackers already exist).
+**Phase 2** — both plans executed: `02-01` (assimilate as commissioned create path,
+caret UX, Commissioned label) and `02-02` (ordinary+commissioned coexistence /
+TRK-02 / D-02). Summaries under
+`.planning/phases/02-assimilate-as-commissioned/`.
 
-**Next:** execute `02-02` — coexistence entry when ordinary already exists (TRK-02).
+**Next:** Phase 2 verification (`/gsd-verify-work` or phase verifier), then ship
+or Phase 3.
 
 ## Deferred Items
 
@@ -51,20 +53,23 @@ caret UX, Commissioned label, E2E green). Remaining: `02-02-PLAN.md`
 
 ## Session Continuity
 
-**Last session:** 2026-08-07T23:16:35.032Z
-**Stopped at:** Completed 02-01-PLAN.md
+**Last session:** 2026-08-07T23:23:44.686Z
+**Stopped at:** Completed 02-02-PLAN.md
 **Resume file:** None
 
-Phase 2 plan 02-01 complete. Resume with 02-02.
+Phase 2 plans 02-01 and 02-02 complete. Resume with phase verification.
 
 ## Performance Metrics
 
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
 | Phase 02 P01 | 4 min | 3 tasks | 19 files |
+| Phase 02 P02 | 3 min | 2 tasks | 7 files |
 
 ## Decisions
 
 - [Phase 02]: assimilateAsCommissioned creates only note-level COMMISSIONED (D-01)
 - [Phase 02]: Ignore COMMISSIONED for assimilateDisabled; hide caret when COMMISSIONED exists (D-03/D-05)
 - [Phase 02]: Commissioned assimilate stays on note; no ordinary count increment (D-06)
+- [Phase 02]: D-02: commissioned caret ignores assimilateDisabled when COMMISSIONED absent
+- [Phase 02]: TRK-02: ordinary-then-commissioned coexistence locked at controller + E2E
