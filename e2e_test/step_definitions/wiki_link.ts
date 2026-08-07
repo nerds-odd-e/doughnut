@@ -15,7 +15,7 @@ When(
   (notebookName: string) => {
     start
       .assumeNotePage()
-      .startSearchingAndAddRelationship()
+      .openWikiLinkOrRelationship()
       .findTarget(notebookName)
       .moveToNotebookRoot(notebookName)
   }
@@ -26,7 +26,7 @@ When(
   (folderName: string, notebookName: string) => {
     start
       .assumeNotePage()
-      .startSearchingAndAddRelationship()
+      .openWikiLinkOrRelationship()
       .findTarget(folderName)
       .moveUnder(folderName, notebookName)
   }

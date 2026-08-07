@@ -103,11 +103,11 @@ Then(
   }
 )
 
-When('I select Recent in the search list mode', () => {
+When('I switch to recently updated notes', () => {
   start.assumeNoteTargetSearchDialog().selectSearchListModeRecent()
 })
 
-When('I select Matches in the search list mode', () => {
+When('I switch to matching notes', () => {
   start.assumeNoteTargetSearchDialog().selectSearchListModeMatches()
 })
 

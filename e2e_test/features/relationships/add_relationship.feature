@@ -1,4 +1,4 @@
-Feature: add relationship
+Feature: Add relationship
   As a learner, I want to maintain my newly acquired knowledge in
   notes that relate to each other, so that I can recall them in the
   future.
@@ -10,52 +10,52 @@ Feature: add relationship
     And I have a notebook "Sedative drugs" with a note "Sedative" and content "Sleep medicine"
 
   @mockBrowserTime
-  Scenario: View all notes that can be related for a note when no relationship exists
-    When I am creating a relationship under note "Sedition"
+  Scenario: Searching for relationship targets when none exist yet
+    When I open wiki link or relationship for note "Sedition"
     Then I should see "Sedation, Sedative" as targets only when searching in all my notebooks " se "
     And I should see note cannot be found when searching in all my notebooks "Sedition"
 
   @mockBrowserTime
-  Scenario Outline: Search note for relationship with partial input
-    Given I am creating a relationship under note "Sedition"
-    And I should see "<targets>" as targets only when searching in all my notebooks "<search key>"
+  Scenario Outline: Searching for relationship targets with partial input
+    When I open wiki link or relationship for note "Sedition"
+    Then I should see "<targets>" as targets only when searching in all my notebooks "<search key>"
     Examples:
       | search key | targets            |
       | Sed        | Sedation, Sedative |
       | Sedatio    | Sedation           |
 
   @mockBrowserTime
-  Scenario: creating relationship
-    When I add relationship from note "Sedition" as "similar to" to note "Sedation"
-     And I add relationship from note "Sedition" as "similar to" to note "Sedative"
+  Scenario: Creating relationships between notes
+    When I add a relationship from note "Sedition" as "similar to" to note "Sedation"
+    And I add a relationship from note "Sedition" as "similar to" to note "Sedative"
     Then I should see "Sedition" has relationship "similar to" "Sedation, Sedative"
-     And I should see "Sedative" has relationship "similar to" "Sedition, Sedative"
+    And I should see "Sedative" has relationship "similar to" "Sedition, Sedative"
 
   @mockBrowserTime
-  Scenario: Show recently updated notes before search results
+  Scenario: Recently updated notes appear before search results
     Given I have a notebook "Recent scratch" with a note "Recent Note" and content "Recently added"
-    When I am creating a relationship under note "Sedition"
+    When I open wiki link or relationship for note "Sedition"
     Then I should see "Recent Note" in the recently updated notes section
     When I search for "Sed" in all my notebooks
     Then I should see "Sedation, Sedative" as targets only when searching in all my notebooks "Sed"
     And I should not see the recently updated notes section
 
   @mockBrowserTime
-  Scenario: Switch to recently updated notes while search key is non-empty
+  Scenario: Switching to recently updated notes while search key is non-empty
     Given I have a notebook "Recent scratch" with a note "Recent Note" and content "Recently added"
-    When I am creating a relationship under note "Sedition"
+    When I open wiki link or relationship for note "Sedition"
     And I search for "Sed" in all my notebooks
     Then I should see relationship targets "Sedation, Sedative"
     And I should not see the recently updated notes section
-    When I select Recent in the search list mode
+    When I switch to recently updated notes
     Then I should see "Recent Note" in the recently updated notes section
     And the note search field should contain "Sed"
-    When I select Matches in the search list mode
+    When I switch to matching notes
     Then I should see relationship targets "Sedation, Sedative"
 
   @mockBrowserTime
-  Scenario: Undo creating relationship
-    When I add relationship from note "Sedition" as "similar to" to note "Sedation"
+  Scenario: Undoing relationship creation
+    When I add a relationship from note "Sedition" as "similar to" to note "Sedation"
     Then I should see "Sedition" has relationship "similar to" "Sedation"
     When I open the relationship from "Sedition" to "Sedation"
     Then I should be on the relationship note page from "Sedition" with relation "similar to" to "Sedation"

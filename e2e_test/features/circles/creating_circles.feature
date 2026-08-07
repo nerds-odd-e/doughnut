@@ -1,7 +1,7 @@
 Feature: Creating circles
   As a learner, I want to create circles so that I can own notes together with other people.
 
-  Scenario: Invite by invitation code
+  Scenario: Joining a circle via invitation code
     Given circle "Odd-e Invite Circle" exists for "old_learner" with invitation link saved
     And I am re-logged in as "another_old_learner"
     When I visit the invitation link
@@ -9,7 +9,7 @@ Feature: Creating circles
     Then I should see the circle "Odd-e Invite Circle" and it has two members in it
 
   @skipOptimizationDueToKnownNecessarySlowness
-  Scenario: New user via circle invitation
+  Scenario: New user joins via circle invitation
     Given circle "Odd-e New User Circle" exists for "old_learner" with invitation link saved
     And my session is logged out
     When I visit the invitation link

@@ -95,7 +95,7 @@ When('I join the circle', () => {
 Then(
   'I should see the circle {string} and it has two members in it',
   (circleName: string) => {
-    cy.findByText(`Circle: ${circleName}`)
+    cy.findByText(`Circle: ${circleName}`).should('be.visible')
     start.assumeCirclePage().haveMembers(2)
   }
 )
@@ -164,10 +164,6 @@ When('I am on {string} circle page', (circleName: string) => {
   start.navigateToCircle(circleName)
 })
 
-Then('I should see circle notebook catalog layout controls', () => {
-  start.assumeCirclePage().expectCatalogLayoutControls()
-})
-
 When(
   'I create a notebook group named {string} by moving notebook {string} from the circle catalog',
   (groupName: string, notebookName: string) => {
@@ -187,7 +183,7 @@ Then(
   }
 )
 
-When(
+Given(
   'There is a notebook {string} in circle {string} by {string}',
   (title: string, circleName: string, externalIdentifier: string) => {
     start
@@ -230,7 +226,7 @@ Given(
   }
 )
 
-Then(
+When(
   'I move the notebook {string} from {string} to {string}',
   (notebook: string, fromCircle: string, toCircle: string) => {
     start.navigateToCircle(fromCircle).moveNotebook(notebook).toCircle(toCircle)

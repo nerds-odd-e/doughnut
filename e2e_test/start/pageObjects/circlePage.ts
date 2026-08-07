@@ -26,12 +26,14 @@ export const assumeCirclePage = () => ({
     )
   },
   haveMembers(count: number) {
-    cy.get('body').find('.circle-member').should('have.length', count)
-  },
-  expectCatalogLayoutControls() {
-    cy.findByRole('button', { name: 'Grid view' }).should('be.visible')
-    cy.findByRole('button', { name: 'List view' }).should('be.visible')
-    return this as any
+    cy.get('body')
+      .find('.circle-member')
+      .should(($members) => {
+        expect(
+          $members.length,
+          `Expected circle to have ${count} members, but found ${$members.length}`
+        ).to.equal(count)
+      })
   },
   creatingNotebookGroupFromCatalogMove(
     notebookName: string,
@@ -48,6 +50,7 @@ export const assumeCirclePage = () => ({
       toCircle(circleName: string) {
         cy.findByText(circleName).click()
         cy.findByText('OK').click()
+        waitUntilAppIsNotBusy()
       },
     }
   },

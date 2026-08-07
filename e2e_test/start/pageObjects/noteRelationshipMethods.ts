@@ -53,13 +53,12 @@ export const noteRelationshipMethods = () => ({
     waitUntilAppIsNotBusy()
   },
 
-  startSearchingAndAddRelationship() {
+  openWikiLinkOrRelationship() {
     toolbarButton(wikiLinkOrRelationshipToolbarLabel).click()
     return assumeNoteTargetSearchDialog()
   },
   insertWikiLinkToNote(toNoteTopic: string) {
-    toolbarButton(wikiLinkOrRelationshipToolbarLabel).click()
-    assumeNoteTargetSearchDialog()
+    this.openWikiLinkOrRelationship()
       .findTarget(toNoteTopic)
       .insertWikiLinkToTarget(toNoteTopic)
     return this

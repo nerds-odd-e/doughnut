@@ -30,18 +30,18 @@ function givenInjectedRelationshipNote(
 }
 
 When(
-  'I am creating a relationship under note {string}',
+  'I open wiki link or relationship for note {string}',
   (noteTopology: string) => {
-    start.jumpToNotePage(noteTopology).startSearchingAndAddRelationship()
+    start.jumpToNotePage(noteTopology).openWikiLinkOrRelationship()
   }
 )
 
 When(
-  'I add relationship from note {string} as {string} to note {string}',
+  'I add a relationship from note {string} as {string} to note {string}',
   (fromNoteTopic: string, relationType: string, toNoteTopic: string) => {
     start
       .jumpToNotePage(fromNoteTopic)
-      .startSearchingAndAddRelationship()
+      .openWikiLinkOrRelationship()
       .findTarget(toNoteTopic)
       .createRelationshipToTargetAs(toNoteTopic, relationType)
   }
@@ -59,7 +59,7 @@ When(
   (fromNoteTopic: string, folderTitle: string) => {
     start
       .jumpToNotePage(fromNoteTopic)
-      .startSearchingAndAddRelationship()
+      .openWikiLinkOrRelationship()
       .findTarget(folderTitle)
       .moveUnder(folderTitle)
   }
@@ -147,10 +147,6 @@ When(
     )
   }
 )
-
-Then('I should be able to delete the relationship', () => {
-  cy.findByRole('button', { name: 'Delete' }).click()
-})
 
 When(
   'I delete the relationship from {string} to {string}',

@@ -1,4 +1,6 @@
-Feature: relationship edit and remove
+Feature: Relationship edit and remove
+  As a learner, I want to change or remove relationships between notes
+  so that my note topology stays accurate.
 
   Background:
     Given I am logged in as an existing user
@@ -13,24 +15,24 @@ Feature: relationship edit and remove
       Observations from orbit.
       """
 
-  Scenario: change relation type keeps user-authored content suffix
+  Scenario: Changing relation type keeps user-authored content suffix
     When I change the relationship from "Moon" to "Earth" to "a specialization of"
-    When I open the note content markdown editor
+    And I open the note content markdown editor
     Then the note content markdown source should contain "relation: a-specialization-of"
     And the note content markdown source should contain "Observations from orbit."
     And the note content markdown source should not contain "relation: a-part-of"
 
-  Scenario: delete relationship
+  Scenario: Deleting a relationship
     When I delete the relationship from "Moon" to "Earth"
     Then I should see "Moon" has no relationship to "Earth"
 
-  Scenario: reduce relationship to source property on delete
+  Scenario: Reducing a relationship to a source property on delete
     When I delete the relationship from "Moon" to "Earth" and reduce it to a property of the source
-    When I open the note content markdown editor on note "Moon"
+    And I open the note content markdown editor on note "Moon"
     Then the note content markdown source should contain "a part of: '[[Earth]]'"
     And I should see "Moon" has no relationship to "Earth"
 
-  Scenario: reduce to source property uses suffixed key when source already has that property
+  Scenario: Reducing to source property uses a suffixed key when the property already exists
     Given note "Moon" has content:
       """
       ---
@@ -39,14 +41,14 @@ Feature: relationship edit and remove
 
       """
     When I delete the relationship from "Moon" to "Earth" and reduce it to a property of the source
-    When I open the note content markdown editor on note "Moon"
+    And I open the note content markdown editor on note "Moon"
     Then the note content markdown source should contain "a part of 2: '[[Earth]]'"
     And I should see "Moon" has no relationship to "Earth"
 
-  Scenario: tracked relationship reduced keeps property memory tracker on source
+  Scenario: Tracked relationship reduced keeps property memory tracker on source
     Given the note "Moon a part of Earth" was assimilated on day 1
     When I delete the relationship from "Moon" to "Earth" and reduce it to a property of the source
-    When I open the note content markdown editor on note "Moon"
+    And I open the note content markdown editor on note "Moon"
     Then the note content markdown source should contain "a part of: '[[Earth]]'"
     And I should see "Moon" has no relationship to "Earth"
     When I am assimilating the note "Moon"
