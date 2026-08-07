@@ -14,8 +14,9 @@ import {
 } from "./registerDoughnutQuillBlots"
 import {
   handleRichContentAnchorClick,
-  type DeadLinkPayload,
+  type DeadWikiLinkPayload,
 } from "@/utils/wikiPropertyValueField"
+import { DEAD_WIKI_LINK_CLASS } from "@/utils/wikiLinkDomMarkers"
 
 registerDoughnutQuillBlots()
 
@@ -29,7 +30,7 @@ const emits = defineEmits<{
   "update:modelValue": [value: string]
   blur: []
   pasteComplete: [content: string]
-  deadLinkClick: [payload: DeadLinkPayload]
+  deadWikiLinkClick: [payload: DeadWikiLinkPayload]
 }>()
 
 const router = getCurrentInstance()?.appContext.config.globalProperties
@@ -151,7 +152,9 @@ onMounted(async () => {
       "mousedown",
       (event: MouseEvent) => {
         if (props.readonly) return
-        const anchor = (event.target as HTMLElement).closest("a.dead-link")
+        const anchor = (event.target as HTMLElement).closest(
+          `a.${DEAD_WIKI_LINK_CLASS}`
+        )
         if (anchor) event.preventDefault()
       },
       true
@@ -166,12 +169,12 @@ onMounted(async () => {
         handleRichContentAnchorClick(
           anchor,
           {
-            onDeadLink: (payload) => emits("deadLinkClick", payload),
+            onDeadWikiLink: (payload) => emits("deadWikiLinkClick", payload),
             navigateInApp: (href) => {
               router?.push(href)
             },
           },
-          { deadLinksEnabled: !props.readonly }
+          { deadWikiLinksEnabled: !props.readonly }
         )
       },
       true

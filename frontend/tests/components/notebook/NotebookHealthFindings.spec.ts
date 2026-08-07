@@ -25,7 +25,9 @@ describe("NotebookHealthFindings dead wiki links", () => {
 
     expect(deadLinks.findAll('input[type="checkbox"]').length).toBe(1)
     expect(
-      deadLinks.find('[data-testid="notebook-health-dead-link-note"]').exists()
+      deadLinks
+        .find('[data-testid="notebook-health-dead-wiki-link-note"]')
+        .exists()
     ).toBe(true)
     expect(deadLinks.text()).toContain("Source")
     expect(deadLinks.text()).toContain("Missing")
@@ -34,9 +36,11 @@ describe("NotebookHealthFindings dead wiki links", () => {
   it("links note title and token items to note show by noteId", () => {
     const wrapper = mountFindings()
     const noteTitle = wrapper.get(
-      '[data-testid="notebook-health-dead-link-note-title"]'
+      '[data-testid="notebook-health-dead-wiki-link-note-title"]'
     )
-    const token = wrapper.get('[data-testid="notebook-health-dead-link-token"]')
+    const token = wrapper.get(
+      '[data-testid="notebook-health-dead-wiki-link-token"]'
+    )
 
     expect(noteTitle.text()).toContain("Source")
     expect(linkTo(noteTitle)).toEqual(noteShowLocation(9))
@@ -44,7 +48,7 @@ describe("NotebookHealthFindings dead wiki links", () => {
     expect(linkTo(token)).toEqual(noteShowLocation(9))
   })
 
-  it("keeps nested collapse for non-dead-link child groups", () => {
+  it("keeps nested collapse for non-dead-wiki-link child groups", () => {
     const groups = [
       {
         ruleId: "empty_folders",
@@ -73,7 +77,7 @@ describe("NotebookHealthFindings dead wiki links", () => {
     expect(nested).toBeDefined()
     expect(nested!.find('input[type="checkbox"]').exists()).toBe(true)
     expect(
-      group.find('[data-testid="notebook-health-dead-link-note"]').exists()
+      group.find('[data-testid="notebook-health-dead-wiki-link-note"]').exists()
     ).toBe(false)
   })
 })

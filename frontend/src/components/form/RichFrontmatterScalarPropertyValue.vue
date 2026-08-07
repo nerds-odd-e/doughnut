@@ -10,7 +10,7 @@
         :value="listValue"
         :property-key="propertyKey"
         :wiki-titles="wikiTitles"
-        @dead-link-click="emit('dead-link-click', $event)"
+        @dead-wiki-link-click="emit('dead-wiki-link-click', $event)"
       />
     </div>
     <div
@@ -26,7 +26,7 @@
         @update:model-value="emit('update:modelValue', $event)"
         @focus="emit('focus')"
         @blur="emit('commit')"
-        @dead-link-click="emit('dead-link-click', $event)"
+        @dead-wiki-link-click="emit('dead-wiki-link-click', $event)"
       />
     </div>
     <button
@@ -74,7 +74,7 @@ import {
   scalarStringFromPropertyValue,
   type PropertyValue,
 } from "@/utils/noteProperties"
-import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
+import type { DeadWikiLinkPayload } from "@/utils/wikiPropertyValueField"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
 
 const props = defineProps<{
@@ -89,7 +89,7 @@ const emit = defineEmits<{
   "update:propertyValue": [value: PropertyValue]
   focus: []
   commit: []
-  "dead-link-click": [payload: DeadLinkPayload]
+  "dead-wiki-link-click": [payload: DeadWikiLinkPayload]
 }>()
 
 const valuePopupOpen = ref(false)

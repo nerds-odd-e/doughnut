@@ -118,11 +118,11 @@ Hello`
   })
 
   it.each(DEAD_LINK_CLICK_CASES)(
-    "emits deadLinkClick for property wiki link ($case)",
+    "emits deadWikiLinkClick for property wiki link ($case)",
     async ({ wikiToken, expected }) => {
       const wrapper = await h.mountEditor(propertyWikiLinkMarkdown(wikiToken))
       await clickDeadWikiLinkInPropertyValue(wrapper)
-      expect(wrapper.emitted("deadLinkClick")?.[0]).toEqual([expected])
+      expect(wrapper.emitted("deadWikiLinkClick")?.[0]).toEqual([expected])
     }
   )
 

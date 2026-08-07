@@ -1,5 +1,9 @@
 import type { WikiTitle } from "@generated/doughnut-backend-api"
 import { noteShowHref } from "@/routes/noteShowLocation"
+import {
+  DEAD_WIKI_LINK_CLASS,
+  DOUGHNUT_WIKI_LINK_CLASS,
+} from "@/utils/wikiLinkDomMarkers"
 
 /** Builds API-shaped {@link WikiTitle} for tests and local fixtures from markdown inner + note id. */
 export function wikiTitleFromInnerAndNoteId(
@@ -107,29 +111,21 @@ export function propertyValuePlainToDisplayHtml(
         ? ` data-wiki-display="${escapeHtmlAttributeValue(display)}"`
         : ""
     if (noteId !== undefined) {
-      out += `<a href="${noteShowHref(noteId)}" class="doughnut-link" data-wiki-title="${attrTarget}"${displayAttr}>${innerHtml}</a>`
+      out += `<a href="${noteShowHref(noteId)}" class="${DOUGHNUT_WIKI_LINK_CLASS}" data-wiki-title="${attrTarget}"${displayAttr}>${innerHtml}</a>`
     } else {
-      out += `<a href="#" class="dead-link" data-wiki-title="${attrTarget}"${displayAttr}>${innerHtml}</a>`
+      out += `<a href="#" class="${DEAD_WIKI_LINK_CLASS}" data-wiki-title="${attrTarget}"${displayAttr}>${innerHtml}</a>`
     }
   }
   out += escapeHtmlForWikiPropertyValue(plain.slice(lastIndex))
   return out
 }
 
-/**
- * Title for dead-link create flow: prefer well-formed `[[title]]` inside visible text;
- * otherwise text after `[[`, or full trimmed text (matches what the user actually typed).
- */
-export function deadLinkCreateTitleFromAnchor(anchor: HTMLElement): string {
-  return deadLinkPayloadFromAnchor(anchor).targetToken
-}
+/** Dead wiki link click payload containing the target token and visible display text. */
+export type DeadWikiLinkPayload = { targetToken: string; displayText: string }
 
-/** Dead-link click payload containing the target token and visible display text. */
-export type DeadLinkPayload = { targetToken: string; displayText: string }
-
-/** Markdown `[[...]]` token for the clicked dead link (matches stored content for replace). */
-export function markdownWikiTokenFromDeadLinkPayload(
-  p: DeadLinkPayload
+/** Markdown `[[...]]` token for the clicked dead wiki link (matches stored content for replace). */
+export function markdownWikiTokenFromDeadWikiLinkPayload(
+  p: DeadWikiLinkPayload
 ): string {
   const { targetToken, displayText } = p
   if (targetToken === displayText) return `[[${targetToken}]]`
@@ -140,13 +136,16 @@ export function markdownWikiTokenFromDeadLinkPayload(
 export function handleRichContentAnchorClick(
   anchor: HTMLAnchorElement,
   handlers: {
-    onDeadLink: (payload: DeadLinkPayload) => void
+    onDeadWikiLink: (payload: DeadWikiLinkPayload) => void
     navigateInApp: (href: string) => void
   },
-  options: { deadLinksEnabled: boolean }
+  options: { deadWikiLinksEnabled: boolean }
 ): void {
-  if (options.deadLinksEnabled && anchor.classList.contains("dead-link")) {
-    handlers.onDeadLink(deadLinkPayloadFromAnchor(anchor))
+  if (
+    options.deadWikiLinksEnabled &&
+    anchor.classList.contains(DEAD_WIKI_LINK_CLASS)
+  ) {
+    handlers.onDeadWikiLink(deadWikiLinkPayloadFromAnchor(anchor))
     return
   }
   const href = anchor.getAttribute("href")
@@ -158,10 +157,10 @@ export function handleRichContentAnchorClick(
   handlers.navigateInApp(href)
 }
 
-/** Extracts target token and display text from a dead-link anchor element. */
-export function deadLinkPayloadFromAnchor(
+/** Extracts target token and display text from a dead-wiki-link anchor element. */
+export function deadWikiLinkPayloadFromAnchor(
   anchor: HTMLElement
-): DeadLinkPayload {
+): DeadWikiLinkPayload {
   const raw = anchor.textContent?.trim() ?? ""
   let targetToken: string
   const fromAttr = anchor.getAttribute("data-wiki-title")
@@ -235,8 +234,8 @@ export function serializeWikiPropertyValueFieldRoot(el: HTMLElement): string {
       continue
     } else if (node instanceof HTMLAnchorElement) {
       if (
-        node.classList.contains("doughnut-link") ||
-        node.classList.contains("dead-link")
+        node.classList.contains(DOUGHNUT_WIKI_LINK_CLASS) ||
+        node.classList.contains(DEAD_WIKI_LINK_CLASS)
       ) {
         out += wikiAnchorToMarkdownToken(node)
         continue

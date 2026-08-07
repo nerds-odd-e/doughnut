@@ -15,14 +15,14 @@
         {{ primaryLabel }}
       </button>
       <button
-        v-if="wikiPropertyOptionAvailable && !deadLinkDisplayText"
+        v-if="wikiPropertyOptionAvailable && !deadWikiLinkDisplayText"
         class="daisy-btn daisy-btn-accent"
         @click="$emit('chooseInsertWikiLinkAsProperty')"
       >
         Add wiki link as a new property
       </button>
       <button
-        v-if="relationshipOptionAvailable && !deadLinkDisplayText"
+        v-if="relationshipOptionAvailable && !deadWikiLinkDisplayText"
         class="daisy-btn daisy-btn-secondary"
         @click="$emit('chooseAddRelationship')"
       >
@@ -45,7 +45,7 @@ const props = withDefaults(
   defineProps<{
     targetNoteTopology: NoteTopology
     wikiPropertyOptionAvailable?: boolean
-    deadLinkDisplayText?: string
+    deadWikiLinkDisplayText?: string
     bareWikiLinkAvailable?: boolean
     relationshipOptionAvailable?: boolean
   }>(),
@@ -59,22 +59,22 @@ const emit = defineEmits<{
   chooseInsertWikiLink: []
   chooseInsertWikiLinkAsProperty: []
   chooseAddRelationship: []
-  chooseLinkDeadLink: []
+  chooseDeadWikiLink: []
   goBack: []
 }>()
 
 const primaryLabel = computed(() =>
-  props.deadLinkDisplayText
-    ? `Point wiki link "${props.deadLinkDisplayText}" at this note`
+  props.deadWikiLinkDisplayText
+    ? `Point wiki link "${props.deadWikiLinkDisplayText}" at this note`
     : "Insert as a wiki link"
 )
 
 const showBareWikiPrimary = computed(
-  () => props.bareWikiLinkAvailable || Boolean(props.deadLinkDisplayText)
+  () => props.bareWikiLinkAvailable || Boolean(props.deadWikiLinkDisplayText)
 )
 
 function onPrimaryClick() {
-  if (props.deadLinkDisplayText) emit("chooseLinkDeadLink")
+  if (props.deadWikiLinkDisplayText) emit("chooseDeadWikiLink")
   else emit("chooseInsertWikiLink")
 }
 </script>

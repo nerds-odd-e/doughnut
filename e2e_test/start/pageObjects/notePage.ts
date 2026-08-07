@@ -35,7 +35,7 @@ const titleRenameReferenceSaveTestId: Record<
 
 function wikiLinkInNoteContentFluent(wikiLinkText: string) {
   const locator = () =>
-    findNoteContentRegion().find('a.doughnut-link').contains(wikiLinkText)
+    findNoteContentRegion().find('a.doughnut-wiki-link').contains(wikiLinkText)
   return {
     expectNoteShowHref() {
       locator().should('have.attr', 'href').and('match', noteShowHref)
@@ -173,13 +173,13 @@ export const assumeNotePage = (
       return assumeNotePage()
     },
     expectDeadWikiLink(wikiLinkText: string) {
-      findNoteContentRegion().find('a.dead-link').contains(wikiLinkText)
+      findNoteContentRegion().find('a.dead-wiki-link').contains(wikiLinkText)
       return this
     },
     followDeadWikiLink(wikiLinkTitle: string) {
       this.switchToRichContent()
       findNoteContentRegion()
-        .find('a.dead-link')
+        .find('a.dead-wiki-link')
         .contains(wikiLinkTitle)
         .click()
       return {

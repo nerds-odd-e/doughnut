@@ -86,7 +86,7 @@ const assumeAnsweredQuestionPage = () => {
     openLinkToMatchedNote(matchedNoteTitle: string) {
       openResolveAndClickMatchedNoteCta(
         matchedNoteTitle,
-        'link-to-matched-note-',
+        'wiki-link-or-relationship-to-matched-note-',
         addWikiLinkOrRelationshipLabel
       )
       cy.contains('Target:')

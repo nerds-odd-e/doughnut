@@ -22,7 +22,7 @@ import { useRouter } from "vue-router"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
 import {
   handleRichContentAnchorClick,
-  type DeadLinkPayload,
+  type DeadWikiLinkPayload,
   propertyValuePlainToDisplayHtml,
   serializeWikiPropertyValueFieldRoot,
 } from "@/utils/wikiPropertyValueField"
@@ -41,7 +41,7 @@ const props = defineProps({
 const emit = defineEmits<{
   "update:modelValue": [value: string]
   blur: []
-  deadLinkClick: [payload: DeadLinkPayload]
+  deadWikiLinkClick: [payload: DeadWikiLinkPayload]
 }>()
 
 const router = useRouter()
@@ -98,10 +98,10 @@ function onClickCapture(event: MouseEvent) {
   handleRichContentAnchorClick(
     anchor,
     {
-      onDeadLink: (payload) => emit("deadLinkClick", payload),
+      onDeadWikiLink: (payload) => emit("deadWikiLinkClick", payload),
       navigateInApp: (href) => router.push(href),
     },
-    { deadLinksEnabled: true }
+    { deadWikiLinksEnabled: true }
   )
 }
 

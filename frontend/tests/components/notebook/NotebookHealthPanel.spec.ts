@@ -143,7 +143,9 @@ describe("NotebookHealthPanel", () => {
     expect(deadLinks.text()).toContain("Source")
     expect(deadLinks.text()).toContain("Missing")
     expect(
-      deadLinks.find('[data-testid="notebook-health-dead-link-note"]').exists()
+      deadLinks
+        .find('[data-testid="notebook-health-dead-wiki-link-note"]')
+        .exists()
     ).toBe(true)
     expect(wrapper.html()).not.toMatch(/v-html|innerHTML/)
   })

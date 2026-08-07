@@ -24,7 +24,9 @@ export function deadWikiLinkInPropertyValueEl(
   const val = root.querySelector(
     '[data-testid="rich-note-property-row-value-input"]'
   )
-  const dead = val?.querySelector("a.dead-link") as HTMLAnchorElement | null
+  const dead = val?.querySelector(
+    "a.dead-wiki-link"
+  ) as HTMLAnchorElement | null
   expect(dead).not.toBeNull()
   return dead!
 }

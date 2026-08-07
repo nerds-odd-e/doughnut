@@ -1,6 +1,15 @@
 import TurndownService from "turndown"
 import { gfm } from "turndown-plugin-gfm"
 import { pathnameLooksLikeInternalNoteShow } from "@/routes/noteShowLocation"
+import {
+  mergeConsecutiveHeaders,
+  normalizeTableCells,
+  preserveCodeBlockContent,
+} from "@/components/form/quillHtmlPreprocess"
+import {
+  DEAD_WIKI_LINK_CLASS,
+  DOUGHNUT_WIKI_LINK_CLASS,
+} from "@/utils/wikiLinkDomMarkers"
 import { wikiAnchorToMarkdownToken } from "@/utils/wikiPropertyValueField"
 
 export const turndownService = new TurndownService({
@@ -26,32 +35,6 @@ turndownService.addRule("quillListItem", {
     return `\n${indent}${bullet} ${content.trim()}`
   },
 })
-
-const isEmptyElement = (el: Element): boolean => {
-  // Check if element has no meaningful text content
-  return el.textContent?.trim() === ""
-}
-
-const mergeConsecutiveHeaders = (tempDiv: HTMLElement): void => {
-  // Merge consecutive headers of the same level, but only if there's evidence
-  // they came from the same block (e.g., empty element remnants from browser normalization)
-  const headers = tempDiv.querySelectorAll("h1, h2, h3, h4, h5, h6")
-  for (let i = 0; i < headers.length; i++) {
-    const current = headers[i] as HTMLElement
-    if (!current.parentNode) continue // Already removed
-    const next = current.nextElementSibling as HTMLElement | null
-    if (next && next.tagName === current.tagName) {
-      // Only merge if there's an empty element before the first header
-      // (evidence of browser normalization pulling headers out of a wrapper)
-      const prev = current.previousElementSibling
-      if (prev && isEmptyElement(prev)) {
-        current.innerHTML += next.innerHTML
-        next.remove()
-        i-- // Check again for more consecutive headers
-      }
-    }
-  }
-}
 
 turndownService.addRule("quillCodeBlockContainer", {
   filter(node) {
@@ -185,119 +168,10 @@ turndownService.addRule("italicWithEscapedEntities", {
   },
 })
 
-// Extract code block lines from a container's HTML content
-const extractCodeBlockLines = (containerContent: string): string[] => {
-  const blockRegex = /<div[^>]*class="ql-code-block"[^>]*>([\s\S]*?)<\/div>/g
-  const lines: string[] = []
-  let blockMatch
-  while ((blockMatch = blockRegex.exec(containerContent)) !== null) {
-    let content = blockMatch[1]!
-      .replace(/&nbsp;/g, " ")
-      .replace(/&lt;/g, "<")
-      .replace(/&gt;/g, ">")
-      .replace(/&amp;/g, "&")
-    if (/^<br\s*\/?>$/i.test(content.trim())) {
-      content = ""
-    }
-    lines.push(content)
-  }
-  return lines
-}
-
-// Pre-process HTML to preserve code block content before DOM parsing
-// Processes each container separately to handle multiple code blocks
-const preserveCodeBlockContent = (html: string): string => {
-  let result = ""
-  let lastIndex = 0
-  const containerOpenRegex = /<div[^>]*class="ql-code-block-container"[^>]*>/g
-  let match
-
-  while ((match = containerOpenRegex.exec(html)) !== null) {
-    result += html.substring(lastIndex, match.index)
-    const openTag = match[0]
-    const contentStart = match.index + openTag.length
-
-    // Find the matching closing </div> by counting div nesting depth
-    let depth = 1
-    let pos = contentStart
-    let containerEnd = html.length
-    while (depth > 0 && pos < html.length) {
-      const openPos = html.indexOf("<div", pos)
-      const closePos = html.indexOf("</div>", pos)
-      if (closePos === -1) break
-      if (openPos !== -1 && openPos < closePos) {
-        depth++
-        pos = openPos + 4
-      } else {
-        depth--
-        if (depth === 0) containerEnd = closePos
-        pos = closePos + 6
-      }
-    }
-
-    const containerContent = html.substring(contentStart, containerEnd)
-    const lines = extractCodeBlockLines(containerContent)
-
-    let newOpenTag = openTag
-    if (lines.length > 0) {
-      const escapedContent = lines.join("\n").replace(/"/g, "&quot;")
-      newOpenTag = openTag.replace(
-        /class="ql-code-block-container"/,
-        `class="ql-code-block-container" data-preserved-content="${escapedContent}"`
-      )
-    }
-
-    result += `${newOpenTag}${containerContent}</div>`
-    lastIndex = containerEnd + 6
-  }
-
-  return result + html.substring(lastIndex)
-}
-
-// Remove <p> tags inside table cells to prevent breaking table structure
-const normalizeTableCells = (tempDiv: HTMLElement): void => {
-  // Find all table cells (th and td)
-  const cells = tempDiv.querySelectorAll("th, td")
-  cells.forEach((cell) => {
-    // Find all <p> tags inside the cell
-    const paragraphs = Array.from(cell.querySelectorAll("p"))
-    paragraphs.forEach((p) => {
-      // Replace <p> with its content (unwrap)
-      const parent = p.parentNode
-      if (parent) {
-        while (p.firstChild) {
-          parent.insertBefore(p.firstChild, p)
-        }
-        parent.removeChild(p)
-      }
-    })
-    // Clean up any remaining whitespace-only text nodes at the start/end
-    const childNodes = Array.from(cell.childNodes)
-    // Remove leading whitespace-only text nodes
-    while (
-      childNodes.length > 0 &&
-      childNodes[0]?.nodeType === Node.TEXT_NODE &&
-      childNodes[0].textContent?.trim() === ""
-    ) {
-      cell.removeChild(childNodes[0]!)
-      childNodes.shift()
-    }
-    // Remove trailing whitespace-only text nodes
-    while (
-      childNodes.length > 0 &&
-      childNodes[childNodes.length - 1]?.nodeType === Node.TEXT_NODE &&
-      childNodes[childNodes.length - 1]?.textContent?.trim() === ""
-    ) {
-      cell.removeChild(childNodes[childNodes.length - 1]!)
-      childNodes.pop()
-    }
-  })
-}
-
 turndownService.addRule("doughnutWikiNoteLink", {
   filter(node) {
     if (node.nodeName !== "A") return false
-    return (node as HTMLElement).classList.contains("doughnut-link")
+    return (node as HTMLElement).classList.contains(DOUGHNUT_WIKI_LINK_CLASS)
   },
   replacement(_content, node) {
     return wikiAnchorToMarkdownToken(node as HTMLAnchorElement)
@@ -307,14 +181,14 @@ turndownService.addRule("doughnutWikiNoteLink", {
 turndownService.addRule("doughnutDeadWikiLink", {
   filter(node) {
     if (node.nodeName !== "A") return false
-    return (node as HTMLElement).classList.contains("dead-link")
+    return (node as HTMLElement).classList.contains(DEAD_WIKI_LINK_CLASS)
   },
   replacement(_content, node) {
     return wikiAnchorToMarkdownToken(node as HTMLAnchorElement)
   },
 })
 
-/** Pasted HTML often has plain note-show hrefs without doughnut-link class. */
+/** Pasted HTML often has plain note-show hrefs without doughnut-wiki-link class. */
 function hrefIsInternalNoteShow(href: string | null): boolean {
   if (!href?.trim()) return false
   try {
@@ -329,7 +203,7 @@ turndownService.addRule("doughnutNoteShowHrefWikiLink", {
   filter(node) {
     if (node.nodeName !== "A") return false
     const el = node as HTMLAnchorElement
-    if (el.classList.contains("doughnut-link")) {
+    if (el.classList.contains(DOUGHNUT_WIKI_LINK_CLASS)) {
       return false
     }
     return hrefIsInternalNoteShow(el.getAttribute("href"))

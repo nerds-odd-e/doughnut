@@ -63,15 +63,15 @@ describe("RichMarkdownEditor", () => {
     await nextTick()
 
     expect(h.quillModelHtml()).toContain(
-      '<a href="/n42" class="doughnut-link" data-wiki-title="MyNote"'
+      '<a href="/n42" class="doughnut-wiki-link" data-wiki-title="MyNote"'
     )
   })
 
-  it("keeps canonical dead-link HTML identical to Quill internal HTML", async () => {
+  it("keeps canonical dead-wiki-link HTML identical to Quill internal HTML", async () => {
     await h.mountEditor("[[Missing Note]]")
     const translatedHtml = h.quillModelHtml()
 
-    expect(translatedHtml).toContain('class="dead-link"')
+    expect(translatedHtml).toContain('class="dead-wiki-link"')
     expect(h.quillEditorEl().innerHTML).toBe(translatedHtml)
   })
 
@@ -81,7 +81,7 @@ describe("RichMarkdownEditor", () => {
     await wrapper.setProps({ modelValue: "Hello [[Missing Note]]" })
     await nextTick()
 
-    expect(h.quillModelHtml()).toContain('class="dead-link"')
+    expect(h.quillModelHtml()).toContain('class="dead-wiki-link"')
     expect(h.quillModelHtml()).toBe(h.quillEditorEl().innerHTML)
   })
 })

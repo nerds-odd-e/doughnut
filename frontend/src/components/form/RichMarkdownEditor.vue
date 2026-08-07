@@ -10,7 +10,7 @@
       :interaction-locked="imageUploadInProgress"
       :is-readme-context="isReadmeContext"
       @properties-changed="onPropertiesChanged"
-      @dead-link-click="$emit('deadLinkClick', $event)"
+      @dead-wiki-link-click="$emit('deadWikiLinkClick', $event)"
       @image-upload-state="imageUploadInProgress = $event"
     />
     <div
@@ -36,7 +36,7 @@
       @update:model-value="htmlValueUpdated"
       @blur="$emit('blur')"
       @paste-complete="onPasteComplete"
-      @dead-link-click="$emit('deadLinkClick', $event)"
+      @dead-wiki-link-click="$emit('deadWikiLinkClick', $event)"
     />
   </div>
 </template>
@@ -53,7 +53,7 @@ import {
   parseNoteContentMarkdown,
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
-import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
+import type { DeadWikiLinkPayload } from "@/utils/wikiPropertyValueField"
 
 const quillRef = ref<InstanceType<typeof QuillEditor> | null>(null)
 
@@ -75,7 +75,7 @@ const emits = defineEmits<{
   (e: "update:modelValue", value: string): void
   (e: "blur"): void
   (e: "pasteComplete", value: string): void
-  (e: "deadLinkClick", payload: DeadLinkPayload): void
+  (e: "deadWikiLinkClick", payload: DeadWikiLinkPayload): void
 }>()
 
 /** Body markdown (or full note content when frontmatter could not be parsed). */

@@ -22,9 +22,11 @@ describe("NoteTextContent wiki link display", () => {
       { readonly: true }
     )
     await flushPromises()
-    await vi.waitUntil(() => document.querySelector(".ql-editor a.dead-link"))
+    await vi.waitUntil(() =>
+      document.querySelector(".ql-editor a.dead-wiki-link")
+    )
     const dead = document.querySelector(
-      ".ql-editor a.dead-link"
+      ".ql-editor a.dead-wiki-link"
     ) as HTMLAnchorElement
     expect(dead.textContent).toContain("friendly label")
     expect(dead.textContent).not.toContain("Unknown Topic|")
@@ -47,10 +49,10 @@ describe("NoteTextContent wiki link display", () => {
     )
     await flushPromises()
     await vi.waitUntil(() =>
-      document.querySelector(".ql-editor a.doughnut-link")
+      document.querySelector(".ql-editor a.doughnut-wiki-link")
     )
     const live = document.querySelector(
-      ".ql-editor a.doughnut-link"
+      ".ql-editor a.doughnut-wiki-link"
     ) as HTMLAnchorElement
     expect(live.textContent).toContain("friendly label")
     expect(live.textContent).not.toContain("Target Title|")

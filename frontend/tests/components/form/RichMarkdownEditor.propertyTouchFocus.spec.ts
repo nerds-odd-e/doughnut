@@ -2,7 +2,7 @@ import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 import {
   addPropertyTapCases,
-  deadLinkPropertyMarkdown,
+  deadWikiLinkPropertyMarkdown,
   existingPropertyValueMarkdown,
   expectElementFocused,
   mountTouchFocusEditor,
@@ -112,13 +112,13 @@ describe("RichMarkdownEditor property touch focus", () => {
     it("does not focus primer when pointerdown hits a dead wiki link", async () => {
       const { matchMediaSpy: spy, primer } = await mountTouchFocusEditor(
         h,
-        deadLinkPropertyMarkdown,
+        deadWikiLinkPropertyMarkdown,
         true
       )
       matchMediaSpy = spy
       const deadLink = h
         .propertyValueFieldElement()
-        .querySelector("a.dead-link")
+        .querySelector("a.dead-wiki-link")
       expect(deadLink).toBeTruthy()
 
       deadLink!.dispatchEvent(

@@ -43,7 +43,7 @@
                     isReadmeContext: isReadmeTitle(noteRealm),
                     hasInboundReferences: noteHasInboundWikiReferences(noteRealm),
                   }"
-                  @dead-link-click="onDeadLinkClick"
+                  @dead-wiki-link-click="onDeadWikiLinkClick"
                 />
                 <ShowImage
                   v-bind="{
@@ -83,8 +83,8 @@
             :note-realm="noteRealm"
           />
 
-          <NoteDeadLinkCreateModal
-            v-model="pendingDeadLink"
+          <NoteDeadWikiLinkCreateModal
+            v-model="pendingDeadWikiLink"
             :notebook-id="noteRealm.notebookRealm.notebook.id"
             :note-realm="noteRealm"
             :source-note-id="noteRealm.id"
@@ -107,8 +107,8 @@ import ShowImage from "./widgets/ShowImage.vue"
 import { noteImageScalarsFromMarkdown } from "@/utils/noteContentFrontmatter"
 import NoteToolbar from "./core/NoteToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
-import NoteDeadLinkCreateModal from "./NoteDeadLinkCreateModal.vue"
-import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
+import NoteDeadWikiLinkCreateModal from "./NoteDeadWikiLinkCreateModal.vue"
+import type { DeadWikiLinkPayload } from "@/utils/wikiPropertyValueField"
 import { provideNoteShortcutScope } from "@/composables/noteShortcutScope"
 import { isReservedReadmeNoteTitle } from "@/utils/reservedReadmeTitles"
 
@@ -137,10 +137,10 @@ const isReadmeTitle = (noteRealm: NoteRealm) =>
 const noteHasInboundWikiReferences = (noteRealm: NoteRealm) =>
   (noteRealm.references?.length ?? 0) > 0
 
-const pendingDeadLink = ref<DeadLinkPayload | null>(null)
+const pendingDeadWikiLink = ref<DeadWikiLinkPayload | null>(null)
 
-const onDeadLinkClick = (payload: DeadLinkPayload) => {
-  pendingDeadLink.value = payload
+const onDeadWikiLinkClick = (payload: DeadWikiLinkPayload) => {
+  pendingDeadWikiLink.value = payload
 }
 
 const asMarkdown = ref(false)
@@ -149,7 +149,7 @@ watch(
   () => props.noteId,
   () => {
     asMarkdown.value = false
-    pendingDeadLink.value = null
+    pendingDeadWikiLink.value = null
   }
 )
 

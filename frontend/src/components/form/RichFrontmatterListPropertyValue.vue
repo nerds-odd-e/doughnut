@@ -17,7 +17,7 @@
       <WikiLinkToken
         :token="item"
         :wiki-titles="wikiTitles ?? []"
-        @dead-link-click="emit('deadLinkClick', $event)"
+        @dead-wiki-link-click="emit('deadWikiLinkClick', $event)"
       />
     </template>
   </span>
@@ -53,7 +53,7 @@ import {
   compactDisplayForPropertyValue,
   type PropertyValue,
 } from "@/utils/noteProperties"
-import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
+import type { DeadWikiLinkPayload } from "@/utils/wikiPropertyValueField"
 
 const props = defineProps<{
   value: Extract<PropertyValue, { kind: "list" }>
@@ -63,7 +63,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  deadLinkClick: [payload: DeadLinkPayload]
+  deadWikiLinkClick: [payload: DeadWikiLinkPayload]
 }>()
 
 const showUrlLinks = computed(

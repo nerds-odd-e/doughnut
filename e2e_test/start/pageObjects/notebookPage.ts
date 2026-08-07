@@ -97,11 +97,11 @@ const notebookPage = () => {
       cy.get('[data-testid="notebook-health-group-dead_wiki_links"]').within(
         () => {
           cy.contains(
-            '[data-testid="notebook-health-dead-link-note-title"]',
+            '[data-testid="notebook-health-dead-wiki-link-note-title"]',
             noteTitle
           ).should('be.visible')
           cy.contains(
-            '[data-testid="notebook-health-dead-link-token"]',
+            '[data-testid="notebook-health-dead-wiki-link-token"]',
             token
           ).should('be.visible')
         }

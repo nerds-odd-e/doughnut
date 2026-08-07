@@ -33,7 +33,7 @@ topic: training
 
 Workshop body.`
 
-export const deadLinkPropertyMarkdown = `---
+export const deadWikiLinkPropertyMarkdown = `---
 topic: "[[Missing Note]]"
 ---
 

@@ -6,7 +6,7 @@
       noteId: note?.id,
       notebookId: notebookId,
       modalCloser,
-      initialSearchKey: deadLinkPayload?.displayText,
+      initialSearchKey: deadWikiLinkPayload?.displayText,
     }"
     @selected="selectedSearchResult = $event"
     @move-under-folder="moveUnderFolder($event)"
@@ -16,11 +16,11 @@
     v-if="selectedSearchResult && !targetSearchResult && note"
     :target-note-topology="selectedSearchResult.noteTopology"
     :wiki-property-option-available="wikiPropertyOptionAvailable"
-    :dead-link-display-text="deadLinkPayload?.displayText"
+    :dead-wiki-link-display-text="deadWikiLinkPayload?.displayText"
     @choose-insert-wiki-link="onInsertWikiLink"
     @choose-insert-wiki-link-as-property="onInsertWikiLinkAsProperty"
     @choose-add-relationship="targetSearchResult = selectedSearchResult!"
-    @choose-link-dead-link="onLinkDeadLinkToNote"
+    @choose-dead-wiki-link="onDeadWikiLinkToNote"
     @go-back="selectedSearchResult = undefined"
   />
   <AddRelationshipFinalize
@@ -42,8 +42,8 @@ import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { buildWikiLinkText } from "@/utils/buildWikiLinkText"
 import { useContentCursorInserter } from "@/composables/useContentCursorInserter"
 import {
-  type DeadLinkPayload,
-  markdownWikiTokenFromDeadLinkPayload,
+  type DeadWikiLinkPayload,
+  markdownWikiTokenFromDeadWikiLinkPayload,
 } from "@/utils/wikiPropertyValueField"
 import {
   moveBlockedBySoftDeletedTitleMessage,
@@ -59,10 +59,10 @@ const wikiPropertyOptionAvailable = computed(() =>
   canInsertWikiLinkAsProperty()
 )
 
-const { note, modalCloser, deadLinkPayload } = defineProps<{
+const { note, modalCloser, deadWikiLinkPayload } = defineProps<{
   note?: Note
   modalCloser?: () => void
-  deadLinkPayload?: DeadLinkPayload
+  deadWikiLinkPayload?: DeadWikiLinkPayload
 }>()
 
 const emit = defineEmits<{
@@ -99,13 +99,14 @@ async function onInsertWikiLinkAsProperty() {
   await closeDialogThen(() => insertWikiLinkAsProperty(linkText))
 }
 
-async function onLinkDeadLinkToNote() {
-  if (!selectedSearchResult.value || !note || !deadLinkPayload) return
+async function onDeadWikiLinkToNote() {
+  if (!selectedSearchResult.value || !note || !deadWikiLinkPayload) return
   const newLinkText = buildWikiLinkText(selectedSearchResult.value, {
     notebookId: notebookId.value,
-    displayText: deadLinkPayload.displayText,
+    displayText: deadWikiLinkPayload.displayText,
   })
-  const originalToken = markdownWikiTokenFromDeadLinkPayload(deadLinkPayload)
+  const originalToken =
+    markdownWikiTokenFromDeadWikiLinkPayload(deadWikiLinkPayload)
   const currentContent =
     storageAccessor.value.refOfNoteRealm(note.id).value?.note.content ?? ""
   const newContent = currentContent.replace(originalToken, newLinkText)

@@ -64,8 +64,8 @@ export const noteContentEditingMethods = () => ({
       'table header': 'th',
       'table cell': 'td',
       'wiki link': 'a',
-      'dead wiki link': 'a.dead-link',
-      'live wiki link': 'a:not(.dead-link)',
+      'dead wiki link': 'a.dead-wiki-link',
+      'live wiki link': 'a:not(.dead-wiki-link)',
     }
     for (const element of elements) {
       const kind = (element.Kind ?? '').trim()

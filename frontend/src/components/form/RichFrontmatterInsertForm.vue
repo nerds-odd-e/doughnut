@@ -93,7 +93,7 @@
               data-testid="rich-note-property-value"
               @update:model-value="emit('update:draftValue', $event)"
               @blur="emit('value-blur')"
-              @dead-link-click="emit('dead-link-click', $event)"
+              @dead-wiki-link-click="emit('dead-wiki-link-click', $event)"
             />
           </div>
           <RichFrontmatterPropertyExternalLink
@@ -121,7 +121,7 @@ import {
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
 import { scheduleFocusTargetWithin } from "@/utils/focusTarget"
-import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
+import type { DeadWikiLinkPayload } from "@/utils/wikiPropertyValueField"
 
 defineProps<{
   insertOpen: boolean
@@ -138,7 +138,7 @@ const emit = defineEmits<{
   "update:draftKey": [string]
   "update:draftValue": [string]
   "value-blur": []
-  "dead-link-click": [payload: DeadLinkPayload]
+  "dead-wiki-link-click": [payload: DeadWikiLinkPayload]
   "wikidata-dialog-open": []
   "image-upload-state": [inProgress: boolean]
 }>()

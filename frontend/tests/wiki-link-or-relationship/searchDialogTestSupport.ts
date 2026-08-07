@@ -22,7 +22,7 @@ import { defineComponent } from "vue"
 
 export const searchResultItemSelector = testIdSelector(searchResultItemTestId)
 
-export const deadLinkPayload = {
+export const deadWikiLinkPayload = {
   targetToken: "original text",
   displayText: "original text",
 } as const
@@ -87,7 +87,7 @@ export async function typeInSearch(input: HTMLElement, value: string) {
 export async function renderSearchForm(
   props: {
     note?: Note | null
-    deadLinkPayload?: {
+    deadWikiLinkPayload?: {
       targetToken: string
       displayText: string
     }

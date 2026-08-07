@@ -9,7 +9,7 @@ describe("replaceWikiLinksInHtml", () => {
         wikiTitleFromInnerAndNoteId("MyNote", 42),
       ])
     ).toBe(
-      '<p><a href="/n42" class="doughnut-link" data-wiki-title="MyNote">MyNote</a></p>'
+      '<p><a href="/n42" class="doughnut-wiki-link" data-wiki-title="MyNote">MyNote</a></p>'
     )
   })
 
@@ -19,7 +19,7 @@ describe("replaceWikiLinksInHtml", () => {
         wikiTitleFromInnerAndNoteId("Target|label", 7),
       ])
     ).toBe(
-      '<p><a href="/n7" class="doughnut-link" data-wiki-title="Target" data-wiki-display="label">label</a></p>'
+      '<p><a href="/n7" class="doughnut-wiki-link" data-wiki-title="Target" data-wiki-display="label">label</a></p>'
     )
   })
 
@@ -28,15 +28,15 @@ describe("replaceWikiLinksInHtml", () => {
     const out = replaceWikiLinksInHtml(html, [
       wikiTitleFromInnerAndNoteId("MyNote", 42),
     ])
-    expect(out).not.toContain("dead-link")
+    expect(out).not.toContain("dead-wiki-link")
     expect(out).toBe(
-      '<p><a href="/n42" class="doughnut-link" data-wiki-title="MyNote">MyNote</a> then <a href="/n42" class="doughnut-link" data-wiki-title="MyNote">MyNote</a></p>'
+      '<p><a href="/n42" class="doughnut-wiki-link" data-wiki-title="MyNote">MyNote</a> then <a href="/n42" class="doughnut-wiki-link" data-wiki-title="MyNote">MyNote</a></p>'
     )
   })
 
   it("marks unknown wikilinks as dead links", () => {
     expect(replaceWikiLinksInHtml("<p>[[Unknown]]</p>", [])).toBe(
-      '<p><a href="#" class="dead-link" data-wiki-title="Unknown">Unknown</a></p>'
+      '<p><a href="#" class="dead-wiki-link" data-wiki-title="Unknown">Unknown</a></p>'
     )
   })
 
@@ -52,14 +52,14 @@ describe("replaceWikiLinksInHtml", () => {
     expect(twice).toBe(once)
   })
 
-  it("upgrades rich-editor dead-link anchors when wikiTitles resolve", () => {
+  it("upgrades rich-editor dead-wiki-link anchors when wikiTitles resolve", () => {
     expect(
       replaceWikiLinksInHtml(
-        '<p><a href="#" class="dead-link">MyNote</a></p>',
+        '<p><a href="#" class="dead-wiki-link">MyNote</a></p>',
         [wikiTitleFromInnerAndNoteId("MyNote", 42)]
       )
     ).toBe(
-      '<p><a href="/n42" class="doughnut-link" data-wiki-title="MyNote">MyNote</a></p>'
+      '<p><a href="/n42" class="doughnut-wiki-link" data-wiki-title="MyNote">MyNote</a></p>'
     )
   })
 })

@@ -17,7 +17,7 @@
       <button
         type="button"
         class="daisy-btn daisy-btn-secondary daisy-btn-sm"
-        :data-testid="`link-to-matched-note-${matched.id}`"
+        :data-testid="`wiki-link-or-relationship-to-matched-note-${matched.id}`"
         :title="addWikiLinkOrRelationshipLabel"
         :aria-label="addWikiLinkOrRelationshipLabel"
         @click="$emit('addWikiLinkOrRelationship')"

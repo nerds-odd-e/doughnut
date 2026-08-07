@@ -42,7 +42,7 @@
         @update:property-value="onPropertyValueUpdate"
         @focus="emit('row-focus')"
         @commit="emit('commit')"
-        @dead-link-click="emit('dead-link-click', $event)"
+        @dead-wiki-link-click="emit('dead-wiki-link-click', $event)"
       />
       <RelationTypeSelectCompact
         v-else-if="isRelationPropertyKey(modelValue.key)"
@@ -140,7 +140,7 @@ import {
   scalarStringFromPropertyValue,
   type PropertyValue,
 } from "@/utils/noteProperties"
-import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
+import type { DeadWikiLinkPayload } from "@/utils/wikiPropertyValueField"
 import {
   isKnownRelationKebab,
   relationTypeFromKebab,
@@ -161,7 +161,7 @@ const emit = defineEmits<{
   commit: []
   remove: []
   "wikidata-dialog-open": []
-  "dead-link-click": [payload: DeadLinkPayload]
+  "dead-wiki-link-click": [payload: DeadWikiLinkPayload]
   "relation-type-selected": [type: string | undefined]
   "image-upload-state": [inProgress: boolean]
 }>()

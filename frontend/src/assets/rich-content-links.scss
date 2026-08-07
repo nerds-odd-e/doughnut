@@ -1,23 +1,24 @@
+/* Class names must match frontend/src/utils/wikiLinkDomMarkers.ts */
 .rich-content-links,
 .ql-editor {
   a {
     cursor: pointer;
   }
 
-  a.doughnut-link {
+  a.doughnut-wiki-link {
     color: var(--color-accent);
     text-decoration: underline;
     text-decoration-style: dotted;
     text-underline-offset: 0.15em;
   }
 
-  a:not(.doughnut-link):not(.dead-link) {
+  a:not(.doughnut-wiki-link):not(.dead-wiki-link) {
     color: var(--color-info);
     text-decoration: underline;
     text-underline-offset: 0.15em;
   }
 
-  a.dead-link {
+  a.dead-wiki-link {
     color: red;
   }
 }

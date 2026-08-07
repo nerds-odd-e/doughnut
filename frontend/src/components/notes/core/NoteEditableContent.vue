@@ -35,7 +35,7 @@
         @update:model-value="update(noteId, $event)"
         @blur="blur"
         @paste-complete="(content) => handlePasteComplete(content, update)"
-        @dead-link-click="emit('deadLinkClick', $event)"
+        @dead-wiki-link-click="emit('deadWikiLinkClick', $event)"
       />
     </template>
   </TextContentWrapper>
@@ -55,10 +55,10 @@ import {
   diffFrontmatterPropertyKeyChanges,
   parseNoteContentMarkdown,
 } from "@/utils/noteContentFrontmatter"
-import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
+import type { DeadWikiLinkPayload } from "@/utils/wikiPropertyValueField"
 
 const emit = defineEmits<{
-  deadLinkClick: [payload: DeadLinkPayload]
+  deadWikiLinkClick: [payload: DeadWikiLinkPayload]
 }>()
 
 const props = defineProps({

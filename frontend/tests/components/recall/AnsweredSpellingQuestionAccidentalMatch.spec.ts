@@ -147,7 +147,7 @@ describe("AnsweredSpellingQuestion accidental match", () => {
 
     const linkButtons = [
       ...document.body.querySelectorAll(
-        '[data-testid^="link-to-matched-note-"]'
+        '[data-testid^="wiki-link-or-relationship-to-matched-note-"]'
       ),
     ]
     expect(linkButtons).toHaveLength(2)
@@ -159,7 +159,7 @@ describe("AnsweredSpellingQuestion accidental match", () => {
 
     ;(
       document.body.querySelector(
-        '[data-testid="link-to-matched-note-10"]'
+        '[data-testid="wiki-link-or-relationship-to-matched-note-10"]'
       ) as HTMLElement
     ).click()
     await flushPromises()
@@ -172,7 +172,9 @@ describe("AnsweredSpellingQuestion accidental match", () => {
       )
     ).toBeNull()
     expect(
-      document.body.querySelectorAll('[data-testid^="link-to-matched-note-"]')
+      document.body.querySelectorAll(
+        '[data-testid^="wiki-link-or-relationship-to-matched-note-"]'
+      )
     ).toHaveLength(0)
 
     const propertyButton = [...document.body.querySelectorAll("button")].find(
@@ -205,7 +207,9 @@ describe("AnsweredSpellingQuestion accidental match", () => {
     await openResolveAccidentalMatch(wrapper)
 
     expect(
-      document.body.querySelectorAll('[data-testid^="link-to-matched-note-"]')
+      document.body.querySelectorAll(
+        '[data-testid^="wiki-link-or-relationship-to-matched-note-"]'
+      )
     ).toHaveLength(0)
     expect(
       document.body.querySelectorAll('[data-testid^="add-as-overlapped-note-"]')
@@ -231,7 +235,9 @@ describe("AnsweredSpellingQuestion accidental match", () => {
     await openResolveAccidentalMatch(wrapper)
 
     expect(
-      document.body.querySelectorAll('[data-testid^="link-to-matched-note-"]')
+      document.body.querySelectorAll(
+        '[data-testid^="wiki-link-or-relationship-to-matched-note-"]'
+      )
     ).toHaveLength(0)
     expect(
       document.body.querySelectorAll('[data-testid^="add-as-overlapped-note-"]')

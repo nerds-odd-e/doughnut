@@ -32,7 +32,7 @@
       <SearchForm
         v-else-if="pointingAtExisting && modelValue !== null"
         :note="noteRealm.note"
-        :dead-link-payload="modelValue"
+        :dead-wiki-link-payload="modelValue"
         :modal-closer="close"
         @close-dialog="close"
       />
@@ -47,7 +47,7 @@ import Modal from "@/components/commons/Modal.vue"
 import { realmLeafFolder } from "./useNoteSidebarTree"
 import NoteNewForm from "./NoteNewForm.vue"
 import SearchForm from "@/components/wiki-link-or-relationship/SearchForm.vue"
-import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
+import type { DeadWikiLinkPayload } from "@/utils/wikiPropertyValueField"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
 
 const pointAtExistingNoteLabel = "Point at an existing note"
@@ -55,12 +55,12 @@ const pointAtExistingNoteLabel = "Point at an existing note"
 const props = defineProps<{
   notebookId: number
   noteRealm: NoteRealm
-  modelValue: DeadLinkPayload | null
+  modelValue: DeadWikiLinkPayload | null
   sourceNoteId: number
 }>()
 
 const emit = defineEmits<{
-  "update:modelValue": [value: DeadLinkPayload | null]
+  "update:modelValue": [value: DeadWikiLinkPayload | null]
 }>()
 
 const pointingAtExisting = ref(false)

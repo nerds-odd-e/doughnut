@@ -27,13 +27,13 @@
             v-for="entry in deadWikiLinkEntries(group)"
             :key="entry.key"
             class="mt-2 space-y-1"
-            data-testid="notebook-health-dead-link-note"
+            data-testid="notebook-health-dead-wiki-link-note"
           >
             <router-link
               v-if="entry.noteId != null"
               :to="noteShowLocation(entry.noteId)"
               class="font-semibold text-base-content no-underline hover:underline"
-              data-testid="notebook-health-dead-link-note-title"
+              data-testid="notebook-health-dead-wiki-link-note-title"
             >
               {{ entry.title }}
             </router-link>
@@ -49,7 +49,7 @@
                   v-if="item.noteId != null"
                   :to="noteShowLocation(item.noteId)"
                   class="text-base-content/80 no-underline hover:underline"
-                  data-testid="notebook-health-dead-link-token"
+                  data-testid="notebook-health-dead-wiki-link-token"
                 >
                   {{ item.label }}
                 </router-link>

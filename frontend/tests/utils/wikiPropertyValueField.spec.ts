@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest"
 import {
-  deadLinkCreateTitleFromAnchor,
+  deadWikiLinkPayloadFromAnchor,
   escapeHtmlForWikiPropertyValue,
   handleRichContentAnchorClick,
-  markdownWikiTokenFromDeadLinkPayload,
+  markdownWikiTokenFromDeadWikiLinkPayload,
   propertyValuePlainToDisplayHtml,
   serializeWikiPropertyValueFieldRoot,
   wikiTitleFromInnerAndNoteId,
@@ -12,34 +12,34 @@ import {
 describe("wikiPropertyValueField utils", () => {
   it("handleRichContentAnchorClick emits dead link before checking href", () => {
     const anchor = document.createElement("a")
-    anchor.className = "dead-link"
+    anchor.className = "dead-wiki-link"
     anchor.setAttribute("data-wiki-title", "Ghost")
     anchor.textContent = "Ghost"
     let payload: { targetToken: string; displayText: string } | undefined
     handleRichContentAnchorClick(
       anchor,
       {
-        onDeadLink: (p) => {
+        onDeadWikiLink: (p) => {
           payload = p
         },
         navigateInApp: () => {
           throw new Error("should not navigate")
         },
       },
-      { deadLinksEnabled: true }
+      { deadWikiLinksEnabled: true }
     )
     expect(payload).toEqual({ targetToken: "Ghost", displayText: "Ghost" })
   })
 
-  it("markdownWikiTokenFromDeadLinkPayload matches simple and piped stored tokens", () => {
+  it("markdownWikiTokenFromDeadWikiLinkPayload matches simple and piped stored tokens", () => {
     expect(
-      markdownWikiTokenFromDeadLinkPayload({
+      markdownWikiTokenFromDeadWikiLinkPayload({
         targetToken: "a",
         displayText: "a",
       })
     ).toBe("[[a]]")
     expect(
-      markdownWikiTokenFromDeadLinkPayload({
+      markdownWikiTokenFromDeadWikiLinkPayload({
         targetToken: "Target",
         displayText: "label",
       })
@@ -55,7 +55,7 @@ describe("wikiPropertyValueField utils", () => {
       "See [[Unknown Topic|friendly label]] here",
       []
     )
-    expect(html).toContain('class="dead-link"')
+    expect(html).toContain('class="dead-wiki-link"')
     expect(html).toContain('data-wiki-title="Unknown Topic"')
     expect(html).toContain('data-wiki-display="friendly label"')
     expect(html).toContain("friendly label")
@@ -73,16 +73,16 @@ describe("wikiPropertyValueField utils", () => {
     )
   })
 
-  it("deadLinkCreateTitleFromAnchor prefers data-wiki-title for piped links", () => {
+  it("deadWikiLinkPayloadFromAnchor prefers data-wiki-title for piped links", () => {
     const wrap = document.createElement("div")
     wrap.innerHTML = propertyValuePlainToDisplayHtml("[[Missing|Shown]]", [])
-    const a = wrap.querySelector("a.dead-link") as HTMLAnchorElement
-    expect(deadLinkCreateTitleFromAnchor(a)).toBe("Missing")
+    const a = wrap.querySelector("a.dead-wiki-link") as HTMLAnchorElement
+    expect(deadWikiLinkPayloadFromAnchor(a).targetToken).toBe("Missing")
   })
 
-  it("turns only well-formed wiki markers into dead-link anchors with visible brackets", () => {
+  it("turns only well-formed wiki markers into dead-wiki-link anchors with visible brackets", () => {
     const html = propertyValuePlainToDisplayHtml("See [[X]] here", [])
-    expect(html).toContain('class="dead-link"')
+    expect(html).toContain('class="dead-wiki-link"')
     expect(html).toContain('class="wiki-bracket"')
     expect(html).toContain("data-wiki-title")
     expect(html).toContain("X")
@@ -91,15 +91,15 @@ describe("wikiPropertyValueField utils", () => {
 
   it("does not treat empty or whitespace-only brackets as a wiki link", () => {
     const html = propertyValuePlainToDisplayHtml("A [[ ]] B [[  ]]", [])
-    expect(html).not.toContain("dead-link")
+    expect(html).not.toContain("dead-wiki-link")
     expect(html).toContain("[[ ]]")
   })
 
   it("does not treat malformed nested brackets as a wiki link", () => {
     const plain = "x[[a[b]]y"
     const html = propertyValuePlainToDisplayHtml(plain, [])
-    expect(html).not.toContain("doughnut-link")
-    expect(html).not.toContain("dead-link")
+    expect(html).not.toContain("doughnut-wiki-link")
+    expect(html).not.toContain("dead-wiki-link")
     expect(html).toContain(escapeHtmlForWikiPropertyValue(plain))
   })
 
@@ -107,7 +107,7 @@ describe("wikiPropertyValueField utils", () => {
     const html = propertyValuePlainToDisplayHtml("[[My Note]]", [
       wikiTitleFromInnerAndNoteId("My Note", 42),
     ])
-    expect(html).toContain("doughnut-link")
+    expect(html).toContain("doughnut-wiki-link")
     expect(html).toContain("/n42")
     expect(html).toContain('class="wiki-bracket"')
   })
@@ -116,7 +116,7 @@ describe("wikiPropertyValueField utils", () => {
     const html = propertyValuePlainToDisplayHtml("[[Target Page|friendly]]", [
       wikiTitleFromInnerAndNoteId("Target Page|friendly", 99),
     ])
-    expect(html).toContain("doughnut-link")
+    expect(html).toContain("doughnut-wiki-link")
     expect(html).toContain("/n99")
     expect(html).toContain("friendly")
     expect(html).not.toContain("Target Page|friendly")
@@ -141,22 +141,22 @@ describe("wikiPropertyValueField utils", () => {
     root.innerHTML = propertyValuePlainToDisplayHtml("[[English]]", [
       wikiTitleFromInnerAndNoteId("English", 1),
     ])
-    const a = root.querySelector("a.doughnut-link") as HTMLAnchorElement
+    const a = root.querySelector("a.doughnut-wiki-link") as HTMLAnchorElement
     a.textContent = "[[Eng]"
     expect(serializeWikiPropertyValueFieldRoot(root)).toBe("[[Eng]")
   })
 
-  it("deadLinkCreateTitleFromAnchor uses visible closed wiki text", () => {
+  it("deadWikiLinkPayloadFromAnchor uses visible closed wiki text", () => {
     const wrap = document.createElement("div")
     wrap.innerHTML = propertyValuePlainToDisplayHtml("see [[X]]", [])
-    const a = wrap.querySelector("a.dead-link") as HTMLAnchorElement
-    expect(deadLinkCreateTitleFromAnchor(a)).toBe("X")
+    const a = wrap.querySelector("a.dead-wiki-link") as HTMLAnchorElement
+    expect(deadWikiLinkPayloadFromAnchor(a).targetToken).toBe("X")
   })
 
-  it("deadLinkCreateTitleFromAnchor reads title from incomplete visible wiki text", () => {
+  it("deadWikiLinkPayloadFromAnchor reads title from incomplete visible wiki text", () => {
     const a = document.createElement("a")
-    a.className = "dead-link"
+    a.className = "dead-wiki-link"
     a.textContent = "[[Eng"
-    expect(deadLinkCreateTitleFromAnchor(a)).toBe("Eng")
+    expect(deadWikiLinkPayloadFromAnchor(a).targetToken).toBe("Eng")
   })
 })

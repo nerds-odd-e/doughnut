@@ -3,7 +3,7 @@ import {
   NotebookController,
   SearchController,
 } from "@generated/doughnut-backend-api/sdk.gen"
-import NoteDeadLinkCreateModal from "@/components/notes/NoteDeadLinkCreateModal.vue"
+import NoteDeadWikiLinkCreateModal from "@/components/notes/NoteDeadWikiLinkCreateModal.vue"
 import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
 import {
   focusDirective,
@@ -43,16 +43,16 @@ const router = createRouter({
 const createNoteLabel = /Create a new note named/
 const pointAtExistingNoteLabel = "Point at an existing note"
 
-describe("NoteDeadLinkCreateModal", () => {
+describe("NoteDeadWikiLinkCreateModal", () => {
   const noteRealm = makeMe.aNoteRealm.title("Ghost Page").please()
-  const deadLinkPayload = {
+  const deadWikiLinkPayload = {
     targetToken: "Ghost Page",
     displayText: "Ghost Page",
   }
   const commonProps = {
     notebookId: noteRealm.notebookRealm.notebook.id,
     noteRealm,
-    modelValue: deadLinkPayload,
+    modelValue: deadWikiLinkPayload,
     sourceNoteId: noteRealm.note.id,
   }
 
@@ -84,7 +84,7 @@ describe("NoteDeadLinkCreateModal", () => {
 
   const mountModal = () => {
     mountSoftKeyboardPrimer()
-    wrapper = mount(NoteDeadLinkCreateModal, {
+    wrapper = mount(NoteDeadWikiLinkCreateModal, {
       props: commonProps,
       attachTo: document.body,
       global: {
@@ -128,7 +128,7 @@ describe("NoteDeadLinkCreateModal", () => {
 
     await wrapper!.setProps({ modelValue: null })
     await flushPromises()
-    await wrapper!.setProps({ modelValue: deadLinkPayload })
+    await wrapper!.setProps({ modelValue: deadWikiLinkPayload })
     await flushPromises()
 
     await waitForChooser()

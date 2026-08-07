@@ -80,7 +80,7 @@ describe("SearchForm", () => {
 
       const searchInput = await renderSearchForm({
         note,
-        deadLinkPayload: {
+        deadWikiLinkPayload: {
           targetToken: "original text",
           displayText: "original text",
         },

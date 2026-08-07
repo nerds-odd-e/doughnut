@@ -15,7 +15,7 @@ import { afterEach, describe, expect, it, vi } from "vitest"
 import { advanceSearchDebounce } from "@tests/helpers/searchDebounceTestSupport"
 import {
   confirmMovePopup,
-  deadLinkPayload,
+  deadWikiLinkPayload,
   makeNoteHit,
   makeNotebookHit,
   openUseThisNoteChoice,
@@ -161,7 +161,7 @@ describe("SearchForm actions", () => {
       helper
         .component(SearchForm)
         .withCleanStorage()
-        .withProps({ note, deadLinkPayload })
+        .withProps({ note, deadWikiLinkPayload })
         .render()
       await flushPromises()
 
@@ -197,7 +197,7 @@ describe("SearchForm actions", () => {
       storageAccessor.value.refreshNoteRealm(noteRealm)
 
       const searchInput = await renderSearchForm(
-        { note, deadLinkPayload },
+        { note, deadWikiLinkPayload },
         { cleanStorage: false }
       )
       await typeInSearch(searchInput, "Selected")

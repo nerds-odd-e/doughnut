@@ -1,145 +1,15 @@
-# Ubiquitous language: replace bare “link”
+# Ubiquitous language: bare “link” — completed
 
-## Goal
+**Status:** completed 2026-08-07  
+**ADR:** Proposed `docs/adrs/0001-ubiquitous-language.md` disambiguation (wiki link / relationship / Wikidata association).
 
-Where Doughnut means a **wiki link** and/or **relationship**, stop using bare **link** in user-facing language (then align tests and local identifiers). Cite ADR 0001 disambiguation rules. Stop-safe after any phase: earlier surfaces already speak glossary language.
+## Shipped outcomes (product)
 
-## Design decisions
+- User-facing connect/dead-wiki-link/accidental-match/delete/rename copy uses glossary language (not bare “link”).
+- E2E speaks wiki link / relationship; feature `wiki_link.feature`.
+- Modules under `frontend/src/components/wiki-link-or-relationship/`.
+- DOM markers: `dead-wiki-link`, `doughnut-wiki-link`, health/accidental-match testids; `wikiLinkDomMarkers.ts`.
 
-1. **ADR status** — Plan follows Proposed ADR 0001; if humans reject or change the glossary, stop and revise. Do not treat Accept as done.
-2. **Copy table** — Use recommended strings in `CONTEXT.md` unless Jidoka picks alternatives; do not invent a new umbrella noun outside the glossary.
-3. **Shared affordance** — Toolbar and accidental-match CTAs that open a *chooser* for wiki link **or** relationship use the compound phrase **wiki link or relationship**, not bare link.
-4. **User copy before identifiers** — Behavior phases change what learners see; Structure phases rename packages/CSS only after copy is stable.
-5. **No OpenAPI/MCP rename in this plan** — `outgoingLinks` / `linkText` stay until a deliberate API slice (breaking for clients).
-6. **Capability-named artifacts** — Feature files stay domain-named (`link.feature` may be renamed to `wiki_link.feature` only as a Structure/Behavior cleanup for the wiki-link capability — not after phase numbers).
-7. **Tests** — Prefer extending existing E2E/unit that assert the old strings; keep at most one intentionally failing test while driving a rename. Targeted Cypress only for touched features.
+## Still out of scope
 
-## Phases
-
-### Phase 1 — Behavior: note toolbar label
-
-**Status:** done
-**Type:** Behavior
-
-- Toolbar aria-label/title → `Wiki link or relationship` (+ shortcut); shared constant in component + E2E PO.
-- Unit: `NoteToolbar.spec.ts`; Cypress: `note_topology/link.feature` green.
-
-**Done when:** Targeted unit and/or E2E that assert the toolbar name pass; no user-facing bare `Link` on that control. ✅
-
----
-
-### Phase 2 — Behavior: target-note chooser entry copy
-
-**Status:** done
-**Type:** Behavior
-
-- CTA `Use this note`; header `Target:`; dead retarget `Point wiki link "…" at this note`.
-- Helpers renamed away from “Add link”; Vitest + `link.feature` green.
-
-**Done when:** Specs asserting the new strings pass. ✅
-
----
-
-### Phase 3 — Behavior: dead wiki link resolution copy
-
-**Status:** done
-**Type:** Behavior
-
-- Modal: `Dead wiki link:` / `Point at an existing note`; identifiers renamed away from bare link.
-- Unit + `link.feature` green.
-
-**Done when:** Dead-wiki-link create/retarget scenarios pass with new copy. ✅
-
----
-
-### Phase 4 — Behavior: accidental-match connect CTA
-
-**Status:** done
-**Type:** Behavior
-
-- CTA → `Add wiki link or relationship`; Vitest + `accidental_match_reveal.feature` green.
-
-**Done when:** Accidental-match offer scenarios pass with new CTA text. ✅
-
----
-
-### Phase 5 — Behavior: delete leaves dead wiki links
-
-**Status:** done  
-**Type:** Behavior
-
-- Option → `Leave all references as dead wiki links`; Vitest + `note_deletion.feature` green.
-
-**Done when:** Deletion scenarios that leave dead wiki links pass with new confirmation label. ✅
-
----
-
-### Phase 6 — Behavior: rename warnings mention wiki links
-
-**Status:** done  
-**Type:** Behavior
-
-- Path + notebook rename warnings say **wiki links**; shared confirm constant; unit coverage green.
-
-**Done when:** Specs covering those warnings pass with glossary wording. ✅
-
----
-
-### Phase 7 — Behavior: relationship assimilation wording in E2E
-
-**Status:** done  
-**Type:** Behavior
-
-- Assimilation type / feature blurb use **relationship**; `recall_pages.feature` green.
-
-**Done when:** Targeted Cypress for that feature passes with relationship wording. ✅
-
----
-
-### Phase 8 — Behavior: wiki-link E2E Gherkin uses “wiki link”
-
-**Status:** done  
-**Type:** Behavior
-
-- Renamed `wiki_link.feature` / `wiki_link.ts`; Gherkin speaks wiki link / dead wiki link / wiki link or relationship toolbar; related Cypress green.
-
-**Done when:** Targeted Cypress for wiki-link (and any rewritten specs) passes. ✅
-
----
-
-### Phase 9 — Structure: frontend wiki-link / relationship module names
-
-**Status:** done  
-**Type:** Structure
-
-- `components/wiki-link-or-relationship/`; `WikiLinkOrRelationshipChoice`, `MatchedNoteWikiLinkOrRelationshipOffer`, `SvgSearchForWikiLinkOrRelationship`, shortcut `wiki-link-or-relationship`. Vitest green.
-
-**Done when:** Frontend unit tests for touched modules pass; no observable UI string regression. ✅
-
----
-
-### Phase 10 — Structure: DOM markers for wiki links
-
-**Status:** planned  
-**Type:** Structure
-
-- **Enables:** Selectors and health testids match glossary (`dead-wiki-link`, etc.) after copy already says dead wiki link.
-- Rename CSS classes / data-testids (`dead-link`, `doughnut-link`, `notebook-health-dead-link-*`, `link-to-matched-note-*`) and update Quill/turndown/wiki-property helpers + E2E selectors together.
-- Keep behavior identical (live vs dead wiki link rendering unchanged).
-
-**Done when:** Targeted frontend unit + wiki-link / notebook-health / accidental-match Cypress pass.
-
-## Out of scope (explicit)
-
-- Accepting ADR 0001
-- Bare **wiki** / Wikidata association copy audit
-- `outgoingLinks`, `linkText`, focus-context `## Link targets`, MCP tool prose (API/docs slice)
-- `components/svgs/link_types/` mass rename (optional follow-up; relationship-type icons already mostly `RelationType*`)
-- Non-domain “link” (URLs, invitation, Quill, DaisyUI)
-
-## Jidoka stops
-
-- Disagree with CONTEXT microcopy table
-- Any change that would alter wiki-link resolution or relationship creation behavior (this plan is naming only)
-- Desire to split toolbar into two controls
-- Desire to include OpenAPI renames in this plan
+- Accepting ADR 0001; OpenAPI/`outgoingLinks`/`linkText`; bare “wiki” / Wikidata copy; `link_types/` SVG folder rename.

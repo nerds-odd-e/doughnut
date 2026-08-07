@@ -25,7 +25,7 @@
         noteTitleForWikidataSearch: note.noteTopology.title,
         isReadmeContext,
       }"
-      @dead-link-click="$emit('deadLinkClick', $event)"
+      @dead-wiki-link-click="$emit('deadWikiLinkClick', $event)"
     />
   </div>
 </template>
@@ -35,7 +35,7 @@ import { type PropType } from "vue"
 import type { Note, WikiTitle } from "@generated/doughnut-backend-api"
 import NoteEditableTitle from "./NoteEditableTitle.vue"
 import NoteEditableContent from "./NoteEditableContent.vue"
-import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
+import type { DeadWikiLinkPayload } from "@/utils/wikiPropertyValueField"
 
 defineProps({
   note: { type: Object as PropType<Note>, required: true },
@@ -46,5 +46,5 @@ defineProps({
   hasInboundReferences: { type: Boolean, default: false },
 })
 
-defineEmits<{ deadLinkClick: [payload: DeadLinkPayload] }>()
+defineEmits<{ deadWikiLinkClick: [payload: DeadWikiLinkPayload] }>()
 </script>

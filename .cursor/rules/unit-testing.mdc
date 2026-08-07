@@ -37,10 +37,10 @@ assertThat(result.getAnswer().getOutcome(), is(ACCIDENTAL_MATCH));
 ```typescript
 // ❌ re-check section when the unique claim is “no link CTAs”
 expect(wrapper.find('[data-testid="matched-notes-section"]').exists()).toBe(true)
-expect(wrapper.findAll('[data-testid^="link-to-matched-note-"]')).toHaveLength(0)
+expect(wrapper.findAll('[data-testid^="wiki-link-or-relationship-to-matched-note-"]')).toHaveLength(0)
 
 // ✅
-expect(wrapper.findAll('[data-testid^="link-to-matched-note-"]')).toHaveLength(0)
+expect(wrapper.findAll('[data-testid^="wiki-link-or-relationship-to-matched-note-"]')).toHaveLength(0)
 ```
 
 ## Concise makeMe setup
