@@ -93,7 +93,7 @@ describe("repeat page loading", () => {
     const row = wrapper.find('[data-test="potential-learning-session"]')
     expect(row.exists()).toBe(true)
     expect(row.text()).toContain(
-      '2 potential learning session to commission for notebook "Spanish conversation"'
+      '1 potential learning session to commission for notebook "Spanish conversation"'
     )
     expect(wrapper.find(".progress-text").text()).toMatch(/0\/0/)
   })

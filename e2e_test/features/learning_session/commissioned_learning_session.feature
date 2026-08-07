@@ -19,7 +19,6 @@ Feature: Commissioned learning session
     And I open assimilation settings
     Then I should see ordinary and commissioned memory trackers for "Hola"
 
-  @wip
   Scenario: Due commissioned trackers await a Tutor rather than ordinary recall
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
     When It's day 2, 9 hour

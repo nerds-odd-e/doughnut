@@ -68,7 +68,7 @@
         role="status"
         class="text-base font-normal text-base-content"
       >
-        {{ session.trackerIds.length }} potential learning session to commission for notebook "{{ session.notebookName }}"
+        1 potential learning session to commission for notebook "{{ session.notebookName }}"
       </div>
     </div>
   </div>

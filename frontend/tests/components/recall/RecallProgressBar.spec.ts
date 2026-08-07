@@ -34,7 +34,7 @@ describe("RecallProgressBar potential learning sessions", () => {
     expect(row.exists()).toBe(true)
     expect(row.attributes("role")).toBe("status")
     expect(row.text()).toBe(
-      '2 potential learning session to commission for notebook "Spanish conversation"'
+      '1 potential learning session to commission for notebook "Spanish conversation"'
     )
   })
 

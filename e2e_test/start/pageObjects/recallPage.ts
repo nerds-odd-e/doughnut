@@ -143,7 +143,11 @@ export const recall = () => {
   return {
     expectCount(numberOfNotes: number) {
       getRecallListItemInSidebar(($el) => {
-        $el.findByText(`${numberOfNotes}`, { selector: '.recall-count' })
+        if (numberOfNotes === 0) {
+          $el.get('.recall-count').should('not.exist')
+        } else {
+          $el.findByText(`${numberOfNotes}`, { selector: '.recall-count' })
+        }
       })
       return this
     },
