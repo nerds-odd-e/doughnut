@@ -10,8 +10,8 @@ progress:
   total_plans: 2
   completed_plans: 2
 stopped_at: null
-current_phase: 1
-current_phase_name: Assimilate as commissioned (Behavior)
+current_phase: 2
+current_phase_name: assimilate-as-commissioned
 last_activity: 2026-08-07
 last_activity_desc: Phase 1 goal verified passed (01-VERIFICATION.md)
 ---
@@ -32,8 +32,7 @@ Quick plan **006 memory-tracker type** is **done** (see slim PLAN under
 6/6). Due-recall / assimilation join / batch candidates exclude COMMISSIONED;
 coexistence green; `pnpm backend:verify` green; no user-visible create path.
 
-**Next:** Phase 1 coordinator close-out if any remaining wrap-up (STATE /
-ROADMAP mark complete), then Phase 2 (assimilate as commissioned Behavior).
+**Next:** `/gsd-discuss-phase 2` or `/gsd-plan-phase 2` — assimilate as commissioned (Behavior).
 
 ## Deferred Items
 
