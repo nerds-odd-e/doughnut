@@ -18,7 +18,7 @@
 **Requirements:** (none user-facing; unlocks TRK-*)
 
 **Success criteria:**
-1. Existing assimilation and recall E2E / unit suites still pass unchanged
+1. Existing assimilation and recall **backend unit** suites still pass unchanged (`pnpm backend:verify`). E2E is N/A for this Structure phase unless a product path is accidentally touched — then run targeted E2E only; do not add or graduate Phase 1 E2E scenarios.
 2. Domain model can represent a commissioned memory tracker (coexisting with ordinary trackers on the same note)
 3. Due-recall selection never returns commissioned trackers
 

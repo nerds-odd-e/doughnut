@@ -327,15 +327,17 @@ private Boolean commissioned = false;
 
 **Recommendation on A4/A5:** Prefer exclude from due + `byUserIdFrom`-backed ordinary counts; keep `findByUserAndNote` returning both (settings/Phase 2). Prefer serialize `commissioned` (A4) so Phase 2 settings can show it without another schema pass.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should recent-assimilations / recently-recalled lists include commissioned trackers?**
    - What we know: Those use `byUserIdWhere` / similar filters; assimilation settings will need to show commissioned (Phase 2 E2E).
    - What's unclear: Whether Phase 1 must change list endpoints or only due selection.
    - Recommendation: Phase 1 **must** exclude from due (+ batch candidates + ordinary assimilated counts). Leave “recent” lists including commissioned if the flag is false by default (no behavior change until fixtures exist). When tests create commissioned, assert settings/show can load them in Phase 2.
+   - **RESOLVED:** Leave `byUserIdWhere` (recent/list queries) **unfiltered** for commissioned in Phase 1. Exclusion applies only to due selection (`byUserIdFrom`), batch candidates, and ordinary assimilation join — not recent lists.
 
 2. **Index rename vs keep `user_note_spelling_active` name after adding `commissioned`?**
    - Recommendation: Keep the existing index name to minimize churn unless a rename migration is desired for clarity (`user_note_spelling_commissioned_active`) — optional.
+   - **RESOLVED:** Keep index name `user_note_spelling_active` (no rename). Rebuild UNIQUE to include `commissioned`; do not introduce `user_note_spelling_commissioned_active`.
 
 ## Environment Availability
 
@@ -367,11 +369,11 @@ Step 2.6 note: Phase depends on MySQL through the running SUT, not on standalone
 
 | Req / Success criterion | Behavior | Test Type | Automated Command | File Exists? |
 |-------------------------|----------|-----------|-------------------|-------------|
-| SC1 Existing suites green | No user-visible regression | unit (full backend) | `pnpm backend:test_only` or `backend:verify` if migration | ✅ existing suites |
+| SC1 Existing suites green | No user-visible regression | unit (full backend); E2E N/A for Structure unless product path touched | `pnpm backend:verify` | ✅ existing suites |
 | SC2 Domain can represent commissioned coexisting with ordinary | Persist two trackers same note; both readable via `findByUserAndNote` / show | unit (controller or service boundary with makeMe) | `pnpm backend:test_only` | ❌ Wave 0 — add focused test |
 | SC3 Due-recall never returns commissioned | Due commissioned + due ordinary → `toRepeat` only ordinary | unit via `RecallsController.recalling` | `pnpm backend:test_only` | ❌ Wave 0 — extend `RecallsControllerTests` |
 | Unique key coexistence | Second insert does not violate unique constraint | unit (persist both) | same | ❌ covered by SC2 |
-| Batch gen exclusion (recommended) | Commissioned due tracker not in candidates | unit on repository/service if cheap | same | ❌ optional Wave 0 |
+| Batch gen exclusion (required) | Commissioned due tracker not in candidates | unit via `planLocalBatchForUser` in `QuestionGenerationBatchLocalPlanningTest` | same | ❌ Wave 0 — required |
 | Unassimilated join (recommended A2) | Commissioned-only note still unassimilated for ordinary | unit AssimilationController / NoteRepository path | same | ❌ optional but recommended |
 
 ### Sampling Rate

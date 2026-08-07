@@ -41,11 +41,15 @@ created: 2026-08-07
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|---------|-----------------|-----------|-------------------|-------------|--------|
-| TBD | 01 | 1 | SC2 coexistence | — | N/A (no new public create) | unit | `pnpm backend:test_only` | ❌ W0 | ⬜ pending |
-| TBD | 01 | 1 | SC3 due-recall exclude | T-SQL | Parameterized queries only | unit | `pnpm backend:test_only` | ❌ W0 | ⬜ pending |
-| TBD | 01 | 1 | SC1 regression | — | Authz paths unchanged | unit | `pnpm backend:test_only` / `backend:verify` | ✅ existing | ⬜ pending |
+| 01-01-T1 | 01 | 1 | Unique-key decision (D-02) | T-01-03 | Decision recorded before Flyway | decision artifact | `grep -E '^selected:[[:space:]]*(boolean-in-unique-key\|separate-table\|property-key-encode)$' .planning/phases/01-commissioned-tracker-model/01-UNIQUE-KEY-DECISION.md` | ❌ until checkpoint | ⬜ pending |
+| 01-01-T2 | 01 | 1 | SC2 coexistence + SC3 due exclude | T-01-02 | Parameterized `@Param` only | unit (tracer) | `CURSOR_DEV=true nix develop -c pnpm backend:verify` | ❌ W0 (RecallsControllerTests + migration) | ⬜ pending |
+| 01-02-T1 | 02 | 2 | Assimilation join + batch exclude | T-01-02 | Literal `commissioned IS FALSE` + `@Param` | unit | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` | ❌ W0 (AssimilationControllerTests + QuestionGenerationBatchLocalPlanningTest) | ⬜ pending |
+| 01-02-T2 | 02 | 2 | ERD / OpenAPI client | — | No hand-edit generated artifacts | script | `CURSOR_DEV=true nix develop -c pnpm export:database-erd && grep -n commissioned docs/database-erd.md` | ✅ ERD skill; client conditional | ⬜ pending |
+| 01-02-T3 | 02 | 2 | SC1 Structure unit gate | T-01-01 | Authz paths unchanged; E2E N/A | unit (full backend) | `CURSOR_DEV=true nix develop -c pnpm backend:verify` | ✅ existing suites | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
+
+*SC1 note:* Phase 1 is Structure — SC1 is satisfied by green backend unit suites (`backend:verify`). E2E is not required unless product paths change.
 
 ---
 
@@ -55,7 +59,9 @@ created: 2026-08-07
 - [ ] Coexistence persist test — ordinary + commissioned same note via `makeMe.aMemoryTrackerFor(note).commissioned()`
 - [ ] `MemoryTrackerBuilder.commissioned()` helper
 - [ ] Flyway migration file version `> 300000237`
-- [ ] (Recommended) Assert unassimilated / assimilation queue still sees note when only commissioned tracker exists
+- [ ] Assert unassimilated / assimilation queue still sees note when only commissioned tracker exists (`AssimilationControllerTests`)
+- [ ] Assert batch planning excludes commissioned due tracker (`QuestionGenerationBatchLocalPlanningTest`)
+- [ ] Decision artifact `01-UNIQUE-KEY-DECISION.md` written after checkpoint
 - [ ] Framework install: none — existing infrastructure covers the phase
 
 *Existing infrastructure covers framework; Wave 0 is focused tests + migration + makeMe helper.*

@@ -8,7 +8,7 @@ status: planned
 stopped_at: null
 last_updated: "2026-08-07T14:05:00Z"
 last_activity: 2026-08-07
-last_activity_desc: "Phase 1 plans written (01-01, 01-02); ready to execute"
+last_activity_desc: "Phase 1 plans revised for checker feedback (research Qs, SC1, batch assert, VALIDATION map)"
 progress:
   total_phases: 7
   completed_phases: 0
@@ -27,8 +27,8 @@ See: `.planning/PROJECT.md`
 
 Phase: 1 — Commissioned tracker model (Structure)
 Plan: 01-01 (Wave 1) → 01-02 (Wave 2)
-Status: Planned — `/gsd-execute-phase 1` or local execute-plan
-Last activity: 2026-08-07 — Phase 1 PLAN.md files created
+Status: Planned — plans revised after checker; ready to re-check / execute
+Last activity: 2026-08-07 — Phase 1 PLAN/VALIDATION/RESEARCH revised for checker issues
 
 ## Deferred Items
 
@@ -43,5 +43,6 @@ Last activity: 2026-08-07 — Phase 1 PLAN.md files created
 
 ## Session Continuity
 
-Phase 1 plans: `01-01-PLAN.md` (tracer + unique-key checkpoint), `01-02-PLAN.md` (join/batch/ERD).
+Phase 1 plans: `01-01-PLAN.md` (tracer + unique-key checkpoint → `01-UNIQUE-KEY-DECISION.md`), `01-02-PLAN.md` (join/batch assertion/ERD/SC1 unit gate).
+RESEARCH Open Questions Q1/Q2 RESOLVED (leave recent lists unfiltered; keep `user_note_spelling_active` name).
 Next: `/gsd-execute-phase 1` (Wave 1 starts with blocking unique-key decision).
