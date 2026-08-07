@@ -18,6 +18,7 @@
 **Requirements:** (none user-facing; unlocks TRK-*)
 
 **Success criteria:**
+
 1. Existing assimilation and recall **backend unit** suites still pass unchanged (`pnpm backend:verify`). E2E is N/A for this Structure phase unless a product path is accidentally touched — then run targeted E2E only; do not add or graduate Phase 1 E2E scenarios.
 2. Domain model can represent a commissioned memory tracker (coexisting with ordinary trackers on the same note)
 3. Due-recall selection never returns commissioned trackers
@@ -27,7 +28,12 @@
 **Plans:** 2 plans
 
 Plans:
+**Wave 1**
+
 - [ ] 01-01-PLAN.md — Tracer: commissioned column + unique key + due-recall exclusion (SC2/SC3)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 01-02-PLAN.md — Expansion: assimilation join + batch exclusion + ERD (SC1)
 
 ---
@@ -41,6 +47,7 @@ Plans:
 **Requirements:** TRK-01, TRK-02
 
 **Success criteria:**
+
 1. Caret next to Assimilate opens a dropdown to assimilate as commissioned (not offered for properties)
 2. Assimilation settings show a commissioned memory tracker for that note
 3. Ordinary trackers for the same note still exist when present (coexistence)
@@ -60,6 +67,7 @@ Plans:
 **Requirements:** TRK-03, POT-01, POT-02
 
 **Success criteria:**
+
 1. With only due commissioned trackers, ordinary recall count is 0
 2. Recall progress bar offers potential learning session(s) grouped by notebook
 3. Two notebooks with due commissioned trackers yield two potential sessions
@@ -79,6 +87,7 @@ Plans:
 **Requirements:** (unlocks COM-*)
 
 **Success criteria:**
+
 1. Existing product behavior unchanged (prior E2E still green)
 2. A Learning Session can be created in domain/API with Session Items for due commissioned trackers of one notebook
 3. Request markdown includes session items, expected learning content, learning status, and the 0–5 rubric
@@ -96,6 +105,7 @@ Plans:
 **Requirements:** COM-01, COM-02, COM-03
 
 **Success criteria:**
+
 1. User opens the dialog from the recall progress bar and commissions a notebook’s potential session
 2. Request lists the due Session Items with content, status, and scoring instruction
 3. Session is in awaiting-report state after commission
@@ -116,6 +126,7 @@ Plans:
 **Requirements:** REC-01, REC-02, REC-03, REC-04, REC-05
 
 **Success criteria:**
+
 1. Pasting a valid Report records Feedback scores on matched Session Items
 2. Trackers reschedule per ADR 0003 shifted-band mapping; high vs low scores diverge on later due work
 3. Feedback score is visible on the commissioned tracker; session is marked recorded
@@ -136,6 +147,7 @@ Plans:
 **Requirements:** AMD-01
 
 **Success criteria:**
+
 1. Re-pasting a Report into a recorded session updates Feedback for matched items
 2. Amended scores drive subsequent potential-session membership
 3. Recorded marking remains visible
