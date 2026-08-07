@@ -25,7 +25,7 @@
 
 **Context:** `.planning/phases/01-commissioned-tracker-model/`
 
-**Plans:** 2/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 **Wave 1**
@@ -164,7 +164,7 @@ Plans:
 
 | Phase | Name | Type | Req | Status |
 |-------|------|------|-----|--------|
-| 1 | Commissioned tracker model | Structure | — | In Progress|
+| 1 | Commissioned tracker model | Structure | — | Complete    |
 | 2 | Assimilate as commissioned | Behavior | TRK-01, TRK-02 | Pending |
 | 3 | Potential learning sessions | Behavior | TRK-03, POT-01, POT-02 | Pending |
 | 4 | Learning Session and Request builder | Structure | — | Pending |

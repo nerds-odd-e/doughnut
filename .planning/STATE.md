@@ -2,19 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Commissioned Learning Session MVP
-current_phase: 1
-current_phase_name: Commissioned tracker model
-status: in_progress
-last_updated: "2026-08-07T15:21:00.000Z"
-last_activity: 2026-08-07
-last_activity_desc: 01-02 implementation green; ready for wrap-up (not marked done)
+status: verified
+last_updated: "2026-08-07T15:28:29.874Z"
 progress:
   total_phases: 7
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 0
-  percent: 0
+  completed_plans: 2
 stopped_at: null
+current_phase: 1
+current_phase_name: Assimilate as commissioned (Behavior)
+last_activity: 2026-08-07
+last_activity_desc: Phase 1 goal verified passed (01-VERIFICATION.md)
 ---
 
 # Project State
@@ -28,13 +27,13 @@ See: `.planning/PROJECT.md`
 Quick plan **006 memory-tracker type** is **done** (see slim PLAN under
 `.planning/quick/006-memory-tracker-type/`).
 
-**Phase 1** — `01-01` committed (due-recall excludes COMMISSIONED). `01-02`
-implementation is **uncommitted / ready for wrap-up**: assimilation join +
-property target gate + batch candidates exclude COMMISSIONED; SC1
-`backend:verify` green. See `01-02-SUMMARY.md`.
+**Phase 1** — both plans executed; goal **verified passed**
+(`.planning/phases/01-commissioned-tracker-model/01-VERIFICATION.md`, score
+6/6). Due-recall / assimilation join / batch candidates exclude COMMISSIONED;
+coexistence green; `pnpm backend:verify` green; no user-visible create path.
 
-**Next:** coordinator wrap-up for 01-02 (post-change-refactor → plan update →
-commit → push). Do not start Phase 2 until Phase 1 wrap-up closes.
+**Next:** Phase 1 coordinator close-out if any remaining wrap-up (STATE /
+ROADMAP mark complete), then Phase 2 (assimilate as commissioned Behavior).
 
 ## Deferred Items
 
@@ -49,4 +48,5 @@ commit → push). Do not start Phase 2 until Phase 1 wrap-up closes.
 
 ## Session Continuity
 
-01-02 code + tests green, uncommitted; awaiting wrap-up.
+Phase 1 verification complete (`status: passed`). Ready for Phase 2 planning
+after any remaining Phase 1 close-out.
