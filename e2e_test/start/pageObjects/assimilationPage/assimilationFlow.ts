@@ -58,6 +58,10 @@ export const assumeAssimilationPage = () => ({
     this.expectMemoryTrackerInfo([{ type: 'Commissioned' }])
     return this
   },
+  expectOrdinaryAndCommissionedMemoryTrackers() {
+    this.expectMemoryTrackerInfo([{ type: 'normal' }, { type: 'Commissioned' }])
+    return this
+  },
   skipRecallOnPanel() {
     cy.findByText('Skip recall').click()
     cy.findByRole('button', { name: 'OK' }).click()

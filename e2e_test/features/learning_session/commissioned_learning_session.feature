@@ -13,7 +13,8 @@ Feature: Commissioned learning session
     And It's day 1, 8 hour
 
   Scenario: Assimilating a note with a tutor creates a commissioned memory tracker
+    Given the note "Hola" was assimilated on day 1
     When I am assimilating the note "Hola"
     And I assimilate it as commissioned
     And I open assimilation settings
-    Then I should see a commissioned memory tracker for "Hola"
+    Then I should see ordinary and commissioned memory trackers for "Hola"

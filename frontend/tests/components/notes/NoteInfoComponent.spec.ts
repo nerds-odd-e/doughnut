@@ -37,6 +37,32 @@ describe("NoteInfoComponent", () => {
     expect(rows).toHaveLength(2)
   })
 
+  it("should show ordinary and commissioned memory trackers together", () => {
+    const noteRealm = makeMe.aNoteRealm.please()
+    const noteRecallInfo = makeMe.aNoteRecallInfo
+      .memoryTrackers([
+        makeMe.aMemoryTracker.removedFromTracking(false).please(),
+        makeMe.aMemoryTracker
+          .removedFromTracking(false)
+          .commissioned()
+          .please(),
+      ])
+      .please()
+
+    wrapper = helper
+      .component(NoteInfoComponent)
+      .withProps({
+        note: noteRealm.note,
+        noteRecallInfo,
+      })
+      .withRouter()
+      .mount({ attachTo: document.body })
+
+    expect(wrapper.text()).toContain("normal")
+    expect(wrapper.text()).toContain("Commissioned")
+    expect(wrapper.findAll("tbody tr")).toHaveLength(2)
+  })
+
   it("should make skipped memory trackers clickable", async () => {
     const skippedMemoryTracker = makeMe.aMemoryTracker
       .id(123)
