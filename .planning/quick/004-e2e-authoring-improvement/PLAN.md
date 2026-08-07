@@ -247,5 +247,6 @@ Improve all E2E feature files (and supporting steps/page objects as needed) so t
 ## Execution notes
 
 - Progress tracker: **`STATE.md` in this directory** (not `.planning/STATE.md`).
-- Phases 1–7 done and pushed (2026-08-07).
-- Resume Phase 8 (note topology) when ready — update this plan’s `STATE.md` only.
+- All 17 phases completed (2026-08-07). Outcomes live in `e2e_test/` features/steps/POs.
+- Residual: `@ignore` `epub_book` may fail `chooseBookBlockByTitle` when forced; CI excludes `@ignore`.
+
