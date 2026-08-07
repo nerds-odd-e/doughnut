@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: idle
 stopped_at: null
-last_updated: "2026-08-07T03:36:00Z"
+last_updated: "2026-08-07T04:06:00Z"
 last_activity: 2026-08-07
-last_activity_desc: Retargeted SEED-002 from GCS MCP bundle download to HTTPS remote MCP
+last_activity_desc: Captured backlog 999.1 — learning with help from a teacher
 progress:
   total_phases: 2
   completed_phases: 2
