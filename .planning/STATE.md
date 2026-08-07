@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: idle
 stopped_at: null
-last_updated: "2026-08-06T13:40:00Z"
-last_activity: 2026-08-06
-last_activity_desc: Dropped orphan MCP prod URL route; planted SEED-002 for GCS MCP hosting
+last_updated: "2026-08-07T03:36:00Z"
+last_activity: 2026-08-07
+last_activity_desc: Retargeted SEED-002 from GCS MCP bundle download to HTTPS remote MCP
 progress:
   total_phases: 2
   completed_phases: 2
@@ -35,10 +35,10 @@ No active roadmap phase or quick plan.
 |----------|------|--------|
 | quick_task | 002-frontend-cli-mcp-small-test-renovation | separate track |
 | seed | SEED-001-mcq-fuzzy-notebook-title-spelling-match | dormant |
-| seed | SEED-002-host-mcp-bundle-on-gcs | dormant |
+| seed | SEED-002-host-mcp-over-https | dormant |
 | tech_debt | Drop grading/disable wiki-in-`aliases` read bridge after data migrated | open |
 | deferred | Refine note on answered spelling questions | deferred |
 
 ## Session Continuity
 
-Next action: idle — start `/gsd-new-milestone` or a new quick task when ready.
+Next action: idle — start `/gsd-new-milestone` or a new quick task when ready. Surface SEED-002 when shipping production HTTPS MCP.
