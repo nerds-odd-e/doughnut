@@ -57,6 +57,9 @@ describe("NoteMoreOptionsForm delete note", () => {
     expect(popup.options[0]?.label).toContain(
       "undo will not recover the removed property"
     )
+    expect(popup.options[1]?.label).toBe(
+      "Leave all references as dead wiki links"
+    )
 
     usePopups().popups.done("REMOVE_FROM_PROPERTIES")
     await awaitDeleteSideEffects()

@@ -18,7 +18,7 @@ Where Doughnut means a **wiki link** and/or **relationship**, stop using bare **
 
 ### Phase 1 — Behavior: note toolbar label
 
-**Status:** done  
+**Status:** done
 **Type:** Behavior
 
 - Toolbar aria-label/title → `Wiki link or relationship` (+ shortcut); shared constant in component + E2E PO.
@@ -30,7 +30,7 @@ Where Doughnut means a **wiki link** and/or **relationship**, stop using bare **
 
 ### Phase 2 — Behavior: target-note chooser entry copy
 
-**Status:** done  
+**Status:** done
 **Type:** Behavior
 
 - CTA `Use this note`; header `Target:`; dead retarget `Point wiki link "…" at this note`.
@@ -42,7 +42,7 @@ Where Doughnut means a **wiki link** and/or **relationship**, stop using bare **
 
 ### Phase 3 — Behavior: dead wiki link resolution copy
 
-**Status:** done  
+**Status:** done
 **Type:** Behavior
 
 - Modal: `Dead wiki link:` / `Point at an existing note`; identifiers renamed away from bare link.
@@ -54,32 +54,23 @@ Where Doughnut means a **wiki link** and/or **relationship**, stop using bare **
 
 ### Phase 4 — Behavior: accidental-match connect CTA
 
-**Status:** in-progress
-
+**Status:** done
 **Type:** Behavior
 
-- **Pre:** Accidental-match row offers `Build a link`.
-- **Trigger:** User opens the offer from a matched note.
-- **Post:** CTA is glossary-safe (`Add wiki link or relationship`); offer still chooses wiki-property vs relationship.
+- CTA → `Add wiki link or relationship`; Vitest + `accidental_match_reveal.feature` green.
 
-**Touch:** `AccidentalMatchResolveRow.vue`; accidental-match E2E / unit / page objects (`Build a link`, `link-to-matched-note-*` testid may wait for Structure).
-
-**Done when:** Accidental-match offer scenarios pass with new CTA text.
+**Done when:** Accidental-match offer scenarios pass with new CTA text. ✅
 
 ---
 
 ### Phase 5 — Behavior: delete leaves dead wiki links
 
-**Status:** planned  
+**Status:** done  
 **Type:** Behavior
 
-- **Pre:** Delete confirmation option is `Leave all references as dead link`.
-- **Trigger:** User deletes a note that is referenced and chooses that option.
-- **Post:** Option text uses **dead wiki links** (plural OK).
+- Option → `Leave all references as dead wiki links`; Vitest + `note_deletion.feature` green.
 
-**Touch:** `useNoteDeleteFlow.ts`; note deletion E2E + `noteMoreOptionsForm` PO.
-
-**Done when:** Deletion scenarios that leave dead wiki links pass with new confirmation label.
+**Done when:** Deletion scenarios that leave dead wiki links pass with new confirmation label. ✅
 
 ---
 
@@ -100,7 +91,7 @@ Where Doughnut means a **wiki link** and/or **relationship**, stop using bare **
 
 ### Phase 7 — Behavior: relationship assimilation wording in E2E
 
-**Status:** planned  
+**Status:** planned
 **Type:** Behavior
 
 - **Pre:** Assimilation/recall E2E uses type `link` and “notes and links” for **relationship** assimilation.
@@ -115,7 +106,7 @@ Where Doughnut means a **wiki link** and/or **relationship**, stop using bare **
 
 ### Phase 8 — Behavior: wiki-link E2E Gherkin uses “wiki link”
 
-**Status:** planned  
+**Status:** planned
 **Type:** Behavior
 
 - **Pre:** Wiki-link feature/steps say `the link "…"`, `dead link`, `via the link toolbar`, scenario `link and move`, etc.
@@ -130,7 +121,7 @@ Where Doughnut means a **wiki link** and/or **relationship**, stop using bare **
 
 ### Phase 9 — Structure: frontend wiki-link / relationship module names
 
-**Status:** planned  
+**Status:** planned
 **Type:** Structure
 
 - **Enables:** Immediate consistency for maintainers after Behavior copy is done; no user-visible change.
@@ -143,7 +134,7 @@ Where Doughnut means a **wiki link** and/or **relationship**, stop using bare **
 
 ### Phase 10 — Structure: DOM markers for wiki links
 
-**Status:** planned  
+**Status:** planned
 **Type:** Structure
 
 - **Enables:** Selectors and health testids match glossary (`dead-wiki-link`, etc.) after copy already says dead wiki link.

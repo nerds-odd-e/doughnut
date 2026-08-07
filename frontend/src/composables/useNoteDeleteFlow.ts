@@ -81,7 +81,7 @@ export function useNoteDeleteFlow(
             value: "REMOVE_FROM_PROPERTIES",
           },
           {
-            label: "Leave all references as dead link",
+            label: "Leave all references as dead wiki links",
             value: "LEAVE_DEAD_LINKS",
           },
         ]

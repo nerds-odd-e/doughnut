@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: null
 milestone_name: null
-current_phase: "5"
-current_phase_name: Delete leaves dead wiki links
+current_phase: "6"
+current_phase_name: Rename warnings mention wiki links
 status: executing
 stopped_at: null
-last_updated: "2026-08-07T07:55:00Z"
+last_updated: "2026-08-07T08:10:00Z"
 last_activity: 2026-08-07
-last_activity_desc: "Quick 005 Phase 4 done; starting Phase 5"
+last_activity_desc: "Quick 005 Phase 5 done; starting Phase 6"
 progress:
   total_phases: 10
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 1
   completed_plans: 0
-  percent: 40
+  percent: 50
 ---
 
 # Project State
@@ -29,7 +29,7 @@ See: `.planning/PROJECT.md`
 
 - Plan: `.planning/quick/005-ubiquitous-language-link/PLAN.md`
 - Context: `.planning/quick/005-ubiquitous-language-link/CONTEXT.md`
-- Next: Phase 5 — Behavior: delete leaves dead wiki links
+- Next: Phase 6 — Behavior: rename warnings mention wiki links
 
 ## Deferred Items
 

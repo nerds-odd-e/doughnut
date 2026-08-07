@@ -64,7 +64,7 @@ const noteMoreOptionsPage = () => {
       deleteNoteWithConfirmation(/^Delete "/)
     },
     deleteNoteAndLeaveReferencesAsDeadLinks() {
-      deleteNoteWithConfirmation('Leave all references as dead link')
+      deleteNoteWithConfirmation('Leave all references as dead wiki links')
     },
     deleteNoteAndRemoveFromReferenceProperties() {
       deleteNoteWithConfirmation(
