@@ -16,11 +16,11 @@ When('I am assimilating the note {string}', (noteTitle: string) => {
   start.jumpToNotePage(noteTitle).moreOptions().openAssimilationSettings()
 })
 
-When('I open assimilation settings from more options', () => {
+When('I open assimilation settings', () => {
   start.assumeNotePage().moreOptions().openAssimilationSettings()
 })
 
-When('I reopen assimilation settings from more options', () => {
+When('I reopen assimilation settings', () => {
   start
     .assumeNotePage()
     .moreOptions()
@@ -35,33 +35,17 @@ When('I skip recall on the assimilation panel', () => {
   start.assumeAssimilationPage().skipRecallOnPanel()
 })
 
-When(
-  'I expand assimilation properties on the assimilation settings panel',
-  () => {
-    start.assumeAssimilationPage().expandAssimilationPropertiesSection()
-  }
-)
+When('I expand assimilation properties', () => {
+  start.assumeAssimilationPage().expandAssimilationPropertiesSection()
+})
 
-When(
-  'I assimilate the property {string} on the assimilation settings panel',
-  (propertyKey: string) => {
-    start.assumeAssimilationPage().assimilateProperty(propertyKey)
-  }
-)
+When('I skip recall on property {string}', (propertyKey: string) => {
+  start.assumeAssimilationPage().skipRecallProperty(propertyKey)
+})
 
-When(
-  'I skip recall on property {string} on the assimilation settings panel',
-  (propertyKey: string) => {
-    start.assumeAssimilationPage().skipRecallProperty(propertyKey)
-  }
-)
-
-When(
-  'I revive recall for property {string} on the assimilation settings panel',
-  (propertyKey: string) => {
-    start.assumeAssimilationPage().reviveRecallProperty(propertyKey)
-  }
-)
+When('I revive recall for property {string}', (propertyKey: string) => {
+  start.assumeAssimilationPage().reviveRecallProperty(propertyKey)
+})
 
 When('I revive recall on the assimilation panel', () => {
   start.assumeAssimilationPage().reviveRecallOnPanel()
@@ -74,22 +58,12 @@ Then(
   }
 )
 
-Then(
-  'assimilate for property {string} should be enabled',
-  (propertyKey: string) => {
-    start.assumeAssimilationPage().expectPropertyAssimilateEnabled(propertyKey)
-  }
-)
+Then('I should see Revive for property {string}', (propertyKey: string) => {
+  start.assumeAssimilationPage().expectReviveForProperty(propertyKey)
+})
 
 Then(
-  'I should see Revive for property {string} on the assimilation settings panel',
-  (propertyKey: string) => {
-    start.assumeAssimilationPage().expectReviveForProperty(propertyKey)
-  }
-)
-
-Then(
-  'I should see Skip recall for property {string} on the assimilation settings panel',
+  'I should see Skip recall for property {string}',
   (propertyKey: string) => {
     start.assumeAssimilationPage().expectSkipRecallForProperty(propertyKey)
   }

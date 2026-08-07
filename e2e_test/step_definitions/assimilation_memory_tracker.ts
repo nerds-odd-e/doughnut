@@ -27,14 +27,14 @@ Then(
 )
 
 Then(
-  'I should see a property memory tracker for {string} on the assimilation settings panel',
+  'I should see a property memory tracker for {string}',
   (propertyKey: string) => {
     start.assumeAssimilationPage().expectPropertyMemoryTracker(propertyKey)
   }
 )
 
 Then(
-  'the property memory tracker for {string} should be absent on the assimilation settings panel',
+  'the property memory tracker for {string} should be absent',
   (propertyKey: string) => {
     start
       .assumeAssimilationPage()
@@ -43,7 +43,7 @@ Then(
 )
 
 When(
-  'I open the property memory tracker for {string} from the assimilation settings panel',
+  'I open the property memory tracker for {string}',
   (propertyKey: string) => {
     start.assumeAssimilationPage().openPropertyMemoryTracker(propertyKey)
   }

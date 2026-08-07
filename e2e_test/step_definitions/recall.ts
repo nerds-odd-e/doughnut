@@ -80,7 +80,7 @@ Then(
   }
 )
 
-Then('I am recalling my note on day {int}', (day: number) => {
+When('I am recalling my note on day {int}', (day: number) => {
   start.testability().backendTimeTravelTo(day, 8)
   cy.reload()
   start.recall().visitRecallPage()
@@ -139,11 +139,11 @@ Then(
   }
 )
 
-Then('I type my answer {string}', (answer: string) => {
+When('I type my answer {string}', (answer: string) => {
   start.recall().assumeRecallPage().typeSpellingAnswer(answer)
 })
 
-Then('I choose answer {string}', (answer: string) => {
+When('I choose answer {string}', (answer: string) => {
   start.assumeQuestionPage().answer(answer)
 })
 
@@ -166,10 +166,6 @@ Then('I should see that my answer is correct as the last question', () => {
     .assumeAnsweredQuestionPage()
     .goToLastAnsweredQuestion()
     .expectMCQAnswerToBeCorrect()
-})
-
-Then('I should see that my answer is correct', () => {
-  // leave empty for now
 })
 
 Then('I should see that my last answer to spelling question is correct', () => {

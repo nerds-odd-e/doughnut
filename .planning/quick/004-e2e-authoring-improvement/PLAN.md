@@ -44,16 +44,14 @@ Improve all E2E feature files (and supporting steps/page objects as needed) so t
 
 ### Phase 3 — Recall E2E authoring (quiz / tracker / refine)
 
-**Status:** planned  
+**Status:** done  
 **Type:** Behavior
 
-- **Pre:** Second recall half may violate checklist.
-- **Trigger:** Audit + improve.
-- **Post:** Checklist satisfied; Cypress green for this half.
+- Real spelling assertions; domain Gherkin; shared Backgrounds; split property skip/revive; busy-wait; collapsed duplicate assimilation step aliases (callers updated).
 
 **Files:** `recall/recall_quiz_spelling_question.feature`, `recall/recall_quiz_ai_question.feature`, `recall/property_memory_tracker.feature`, `recall/re_assimilate.feature`, `recall/refine_note_after_mcq.feature`
 
-**Done when:** checklist applied; targeted Cypress passes.
+**Done when:** checklist applied; targeted Cypress passes. ✅ 18/18 (+ caller smoke)
 
 ---
 

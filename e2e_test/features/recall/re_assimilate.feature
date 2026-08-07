@@ -12,9 +12,9 @@ Feature: Re-assimilate note after too many wrong answers
       | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
     And OpenAI evaluates the question as legitimate
+    And the note "sedition" was assimilated on day 1
 
   Scenario: Note returns to assimilation after 5 wrong answers
-    Given the note "sedition" was assimilated on day 1
     When I make 5 wrong answers over 5 days since day 2, answering "to sleep" to "What is the meaning of sedition?"
     And I confirm re-assimilation
     Then I should see 1 due for assimilation

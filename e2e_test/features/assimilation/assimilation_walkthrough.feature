@@ -32,10 +32,10 @@ Feature: Assimilation walkthrough
     Then I should see the no more notes to assimilate toast
     And I should still be on the note page for "Note 5"
     When I jump to the note page of "Note 1"
-    And I open assimilation settings from more options
+    And I open assimilation settings
     Then the assimilate button should be disabled
     When I jump to the note page of "Note 3"
-    And I open assimilation settings from more options
+    And I open assimilation settings
     Then I should see Revive on the assimilation panel
     When I revive recall on the assimilation panel
     Then I should see Skip recall on the assimilation panel

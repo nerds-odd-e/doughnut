@@ -50,4 +50,4 @@ Feature: relationship edit and remove
     Then the note content markdown source should contain "a part of: '[[Earth]]'"
     And I should see "Moon" has no relationship to "Earth"
     When I am assimilating the note "Moon"
-    Then I should see a property memory tracker for "a part of" on the assimilation settings panel
+    Then I should see a property memory tracker for "a part of"

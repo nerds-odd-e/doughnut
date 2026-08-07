@@ -51,33 +51,47 @@ Feature: Property memory tracker
     And I assimilated one note "Minerals" at the current time
     When I start assimilation from the menu
     Then I should see pending assimilation property "topic"
-    When I skip recall on property "topic" on the assimilation settings panel
+    When I skip recall on property "topic"
     Then I should not see pending assimilation property "topic"
     And assimilate for property "topic" should be disabled
-    When I visit note "Minerals"
-    And I open assimilation settings from more options
-    And I expand assimilation properties on the assimilation settings panel
-    Then I should see Revive for property "topic" on the assimilation settings panel
-    When I revive recall for property "topic" on the assimilation settings panel
-    Then I should see Skip recall for property "topic" on the assimilation settings panel
 
-  Scenario: Property assimilate disabled after assimilation
-    Given I am viewing assimilation settings for note "Vitamins"
-    Then assimilate for property "topic" should be disabled
+  @disableOpenAiService
+  Scenario: Revive skipped property recall from assimilation settings
+    Given I am re-logged in as "another_old_learner"
+    And I have a notebook "Property revive"
+    And I have a note "Minerals" under notebook "Property revive" with content:
+      """
+      ---
+      topic: calcium
+      ---
+
+      Body.
+      """
+    And It's day 1, 8 hour
+    And I assimilated one note "Minerals" at the current time
+    When I start assimilation from the menu
+    And I skip recall on property "topic"
+    And I visit note "Minerals"
+    And I open assimilation settings
+    And I expand assimilation properties
+    Then I should see Revive for property "topic"
+    When I revive recall for property "topic"
+    Then I should see Skip recall for property "topic"
 
   @disableOpenAiService
   Scenario: Note-level assimilation stays available after property-only assimilation
     Given I am viewing assimilation settings for note "Vitamins"
-    Then the assimilate button should be enabled
+    Then assimilate for property "topic" should be disabled
+    And the assimilate button should be enabled
     When I assimilate on the assimilation panel
-    And I open assimilation settings from more options
+    And I open assimilation settings
     Then the note memory tracker should have recall count 0
-    And I should see a property memory tracker for "topic" on the assimilation settings panel
+    And I should see a property memory tracker for "topic"
 
   @disableOpenAiService
-  Scenario: Assimilating a property shows a labeled tracker and recall item
+  Scenario: Assimilated property appears as a labeled tracker and becomes due for recall
     Given I am viewing assimilation settings for note "Vitamins"
-    Then I should see a property memory tracker for "topic" on the assimilation settings panel
+    Then I should see a property memory tracker for "topic"
     When It's day 2, 9 hour
     Then I should see that I have 1 notes to recall
 
@@ -86,55 +100,55 @@ Feature: Property memory tracker
     And It's day 1, 20 hour
     And I assimilated one note "Vitamins" at the current time
     And OpenAI generates this question:
-      | Question Stem                         | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
-      | What does the topic property mean?    | micronutrients | vitamins           | minerals           |
+      | Question Stem                      | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
+      | What does the topic property mean? | micronutrients | vitamins           | minerals           |
     And OpenAI evaluates the question as legitimate
-    When I am recalling my note on day 2
+    When I visit recall for a due quiz question on day 2
     Then I should be asked "What does the topic property mean?"
     When I choose answer "micronutrients"
     And I visit note "Vitamins"
-    And I open assimilation settings from more options
+    And I open assimilation settings
     Then the note memory tracker should have recall count 0
     And the property memory tracker for "topic" should have recall count 1
 
   @usingMockedOpenAiService
   Scenario: Recalling a property tracker sends property focus to OpenAI
     And OpenAI generates this question:
-      | Question Stem                         | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
-      | What does the topic property mean?    | micronutrients | vitamins           | minerals           |
+      | Question Stem                      | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
+      | What does the topic property mean? | micronutrients | vitamins           | minerals           |
     And OpenAI evaluates the question as legitimate
-    When I am recalling my note on day 2
+    When I visit recall for a due quiz question on day 2
     Then I should be asked "What does the topic property mean?"
     And OpenAI Responses POST bodies include property focus for "topic" with value "micronutrients"
 
   Scenario: Removing tracked property deletes property memory tracker
     Given I am viewing assimilation settings for note "Vitamins"
-    Then I should see a property memory tracker for "topic" on the assimilation settings panel
+    Then I should see a property memory tracker for "topic"
     When I remove rich note property "topic" confirming memory tracker change
-    And I reopen assimilation settings from more options
-    Then the property memory tracker for "topic" should be absent on the assimilation settings panel
+    And I reopen assimilation settings
+    Then the property memory tracker for "topic" should be absent
 
   Scenario: Renaming tracked property key updates property memory tracker
     Given I am viewing assimilation settings for note "Vitamins"
-    Then I should see a property memory tracker for "topic" on the assimilation settings panel
+    Then I should see a property memory tracker for "topic"
     When I visit note "Vitamins"
     And I rename rich note property key from "topic" to "subject" confirming memory tracker change
     And I reload the current page for note "Vitamins"
-    And I open assimilation settings from more options
-    Then I should see a property memory tracker for "subject" on the assimilation settings panel
-    And the property memory tracker for "topic" should be absent on the assimilation settings panel
+    And I open assimilation settings
+    Then I should see a property memory tracker for "subject"
+    And the property memory tracker for "topic" should be absent
 
   Scenario: Removing tracked property in markdown mode deletes property memory tracker
     Given I am viewing assimilation settings for note "Vitamins"
-    Then I should see a property memory tracker for "topic" on the assimilation settings panel
+    Then I should see a property memory tracker for "topic"
     When I visit note "Vitamins"
     And I remove markdown note property "topic" confirming memory tracker change
     And I reload the current page for note "Vitamins"
-    And I open assimilation settings from more options
-    Then the property memory tracker for "topic" should be absent on the assimilation settings panel
+    And I open assimilation settings
+    Then the property memory tracker for "topic" should be absent
 
   Scenario: Property memory tracker page shows note and focused property
     Given I am viewing assimilation settings for note "Vitamins"
-    When I open the property memory tracker for "topic" from the assimilation settings panel
+    When I open the property memory tracker for "topic"
     Then I should see note "Vitamins" on the memory tracker page
     And I should see focused property "topic" on the memory tracker page

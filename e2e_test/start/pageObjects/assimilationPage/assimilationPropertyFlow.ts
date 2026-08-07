@@ -86,11 +86,5 @@ export function assimilationPropertyFlow() {
       })
       return this
     },
-    expectPropertyAssimilateEnabled(propertyKey: string) {
-      assimilationPropertyRow(propertyKey).within(() => {
-        cy.get(assimilateButtonSelector).should('not.be.disabled')
-      })
-      return this
-    },
   }
 }

@@ -17,19 +17,31 @@ const assumeAnsweredQuestionPage = () => {
       cy.get('[data-test="question-section"]').within(() => {
         cy.get('.is-correct.is-selected').should('exist')
       })
+      return self
     },
     expectSpellingAnswerToBeCorrect() {
       cy.findByText('Correct!').should('exist')
       return self
     },
     expectMCQAnswerToBeIncorrect(answer: string) {
-      cy.contains('button', answer).should('have.class', 'is-selected')
-      cy.contains('button', answer).should('not.have.class', 'is-correct')
+      cy.contains('button', answer).should(($btn) => {
+        expect(
+          $btn.hasClass('is-selected'),
+          `Expected MCQ choice "${answer}" to be selected`
+        ).to.eq(true)
+        expect(
+          $btn.hasClass('is-correct'),
+          `Expected MCQ choice "${answer}" not to be marked correct`
+        ).to.eq(false)
+      })
       cy.get('.is-correct').should('exist')
+      return self
     },
     expectSpellingAnswerToBeIncorrect(answer: string) {
       cy.findByText(`Your answer \`${answer}\` is incorrect.`).should('exist')
+      return self
     },
+
     expectAccidentalMatchReveal(
       answer: string,
       reviewedNoteTitle: string,
@@ -214,6 +226,8 @@ const assumeAnsweredQuestionPage = () => {
     confirmReAssimilation() {
       cy.contains('re-assimilate').should('be.visible')
       cy.findByRole('button', { name: 'OK' }).click()
+      waitUntilAppIsNotBusy()
+      return self
     },
   }
   return Object.assign(self, answeredQuestionRefineMethods(self))
