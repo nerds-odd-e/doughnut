@@ -70,16 +70,14 @@ Improve all E2E feature files (and supporting steps/page objects as needed) so t
 
 ### Phase 5 — Notebooks E2E authoring
 
-**Status:** planned  
+**Status:** done  
 **Type:** Behavior
 
-- **Pre:** Notebooks features may violate checklist (e.g. presentation-only catalog open).
-- **Trigger:** Audit + improve.
-- **Post:** Checklist satisfied; Cypress green.
+- Dropped presentation-only catalog open; When/Then + domain wording; split group mega-scenario; inject fixtures for health; dedicated `notebookGroupPage` PO.
 
 **Files:** `notebooks/notebook_catalog_navigation.feature`, `notebooks/notebook_creation.feature`, `notebooks/notebook_export.feature`, `notebooks/notebook_group.feature`, `notebooks/notebook_health.feature`
 
-**Done when:** checklist applied; targeted Cypress passes.
+**Done when:** checklist applied; targeted Cypress passes. ✅ 14/14
 
 ---
 

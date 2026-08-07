@@ -98,12 +98,9 @@ Then(
   }
 )
 
-When(
-  'I type notebook readme body {string} on the notebook page and save',
-  (body: string) => {
-    notebookPage().typeNotebookReadmeDraftAndSave(body)
-  }
-)
+When('I save notebook readme {string}', (body: string) => {
+  notebookPage().saveNotebookReadme(body)
+})
 
 When('I reload the notebook page', () => {
   cy.reload()
@@ -122,9 +119,7 @@ Then('I should see popup {string}', (message: string) => {
 })
 
 Then('the notebook page summary shows name {string}', (name: string) => {
-  cy.get('[data-testid="notebook-page-summary"]')
-    .find('h1')
-    .should('contain.text', name)
+  notebookPage().expectSummaryName(name)
 })
 
 When('I open the notebook Health tab', () => {
@@ -139,8 +134,8 @@ When('I apply notebook health empty folder fix', () => {
   notebookPage().applyFix()
 })
 
-When('I check Remove empty folders on the notebook health panel', () => {
-  notebookPage().checkRemoveEmptyFolders()
+When('I enable removing empty folders on the notebook health panel', () => {
+  notebookPage().enableRemovingEmptyFolders()
 })
 
 When('I save notebook health options as defaults', () => {
@@ -151,8 +146,8 @@ Then('the notebook health idle prompt is visible', () => {
   notebookPage().expectHealthIdle()
 })
 
-Then('Remove empty folders on the notebook health panel is checked', () => {
-  notebookPage().expectRemoveEmptyFoldersChecked()
+Then('removing empty folders on the notebook health panel is enabled', () => {
+  notebookPage().expectRemovingEmptyFoldersEnabled()
 })
 
 Then(
@@ -190,12 +185,9 @@ Then(
   }
 )
 
-When(
-  'I rename the notebook from the notebook page summary to {string}',
-  (newName: string) => {
-    notebookPage().renameFromSummary(newName)
-  }
-)
+When('I rename the notebook to {string}', (newName: string) => {
+  notebookPage().rename(newName)
+})
 
 When(
   'I create a notebook with title {string} and description {string}',
@@ -206,6 +198,10 @@ When(
 
 When('I create a notebook with empty title', () => {
   start.navigateToNotebooksPage().creatingNotebook('')
+})
+
+Then('I should see that the notebook creation is not successful', () => {
+  start.form.getField('Title').expectError('must not be blank')
 })
 
 When('I jump to the notebook {string}', (notebookName: string) => {

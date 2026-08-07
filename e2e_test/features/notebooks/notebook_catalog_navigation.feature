@@ -1,17 +1,12 @@
 Feature: Notebook catalog navigation
   As a learner, I want to open a notebook from my catalog
-  so that I land on the notebook page with the notebook name and settings.
+  so that I can rename it from the notebook page.
 
   Background:
     Given I am logged in as an existing user
 
-  Scenario: Opening a notebook from the catalog lands on the notebook page
-    Given I have a notebook "Catalog nav suite"
-    When I open the notebook "Catalog nav suite" from my notebooks catalog
-    And the notebook page summary shows name "Catalog nav suite"
-
-  Scenario: Renaming a notebook from the notebook page summary
+  Scenario: Renaming a notebook opened from the catalog
     Given I have a notebook "Rename me suite"
-    When I open the notebook "Rename me suite" from my notebooks catalog
-    And I rename the notebook from the notebook page summary to "Renamed catalog suite"
+    And I open the notebook "Rename me suite" from my notebooks catalog
+    When I rename the notebook to "Renamed catalog suite"
     Then the notebook page summary shows name "Renamed catalog suite"

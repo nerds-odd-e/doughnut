@@ -10,12 +10,12 @@ Feature: Notebook creation
       | Sedation Wiki  | Quick reference for sedation protocols     |
 
   Scenario: Create notebook readme from notebook page when notebook has no readme
-    When I create a notebook with title "Empty NB E2E Readme" and description "e2e"
+    Given I have a notebook "Empty NB E2E Readme"
     And I open the notebook "Empty NB E2E Readme" from my notebooks catalog
-    And I type notebook readme body "E2E readme body" on the notebook page and save
+    When I save notebook readme "E2E readme body"
     And I reload the notebook page
     Then the notebook readme body includes "E2E readme body"
 
   Scenario: Create a new notebook with invalid information
     When I create a notebook with empty title
-    Then I should see that the note creation is not successful
+    Then I should see that the notebook creation is not successful

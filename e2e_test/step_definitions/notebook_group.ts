@@ -5,13 +5,14 @@
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 import { myNotebooksPage } from '../start/pageObjects/myNotebooksPage'
+import notebookGroupPage from '../start/pageObjects/notebookGroupPage'
 
 When(
   'I create a notebook group named {string} by moving owned notebook {string} from the catalog',
   (groupName: string, notebookName: string) => {
     start
       .navigateToNotebooksPage()
-      .creatingNotebookGroupFromCatalogMove(notebookName, groupName, false)
+      .creatingNotebookGroupFromOwnedCatalogMove(notebookName, groupName)
   }
 )
 
@@ -20,7 +21,7 @@ When(
   (groupName: string, notebookName: string) => {
     start
       .navigateToNotebooksPage()
-      .creatingNotebookGroupFromCatalogMove(notebookName, groupName, true)
+      .creatingNotebookGroupFromSubscribedCatalogMove(notebookName, groupName)
   }
 )
 
@@ -57,11 +58,7 @@ Then(
 Then(
   'I should be on the notebook group page for {string} with notebook {string} listed',
   (groupName: string, notebookName: string) => {
-    cy.url().should('match', /\/notebooks\/groups\/\d+/)
-    cy.contains('h1', groupName).should('be.visible')
-    cy.get('main').within(() => {
-      cy.contains('h5', notebookName).should('be.visible')
-    })
+    notebookGroupPage().expectGroupWithNotebookListed(groupName, notebookName)
   }
 )
 

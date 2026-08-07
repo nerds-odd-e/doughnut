@@ -7,16 +7,22 @@ Feature: Notebook group
       | Group E2E Root |
       | child |
 
-  Scenario: Catalog group for owned notebook, group page, and ungroup
+  Scenario: Catalog group for owned notebook
     When I create a notebook group named "E2E Owned Group" by moving owned notebook "E2E grouping" from the catalog
     Then I should see notebook group "E2E Owned Group" with a hint including "E2E grouping"
+
+  Scenario: Open notebook group page from catalog
+    Given I create a notebook group named "E2E Owned Group" by moving owned notebook "E2E grouping" from the catalog
     When I open notebook group "E2E Owned Group" from the catalog header
     Then I should be on the notebook group page for "E2E Owned Group" with notebook "E2E grouping" listed
+
+  Scenario: Ungroup notebook from catalog
+    Given I create a notebook group named "E2E Owned Group" by moving owned notebook "E2E grouping" from the catalog
     When I set notebook "E2E grouping" to ungrouped from the catalog
     Then notebook "E2E grouping" should appear at the top level of the notebook catalog
 
   Scenario: Create notebook into an existing group from the catalog
-    When I create a notebook group named "E2E Create Into Group" by moving owned notebook "E2E grouping" from the catalog
+    Given I create a notebook group named "E2E Create Into Group" by moving owned notebook "E2E grouping" from the catalog
     When I add a notebook "E2E Grouped New" to notebook group "E2E Create Into Group" from the catalog
     Then I should see notebook group "E2E Create Into Group" with a hint including "E2E Grouped New"
 
@@ -27,5 +33,5 @@ Feature: Notebook group
       | leaf |
     And notebook "Bazaar sub fixture" is shared to the Bazaar
     When I subscribe to notebook "Bazaar sub fixture" in the bazaar, with target of learning 5 notes per day
-    When I create a notebook group named "E2E Subscribed Group" by moving subscribed notebook "Bazaar sub fixture" from the catalog
+    And I create a notebook group named "E2E Subscribed Group" by moving subscribed notebook "Bazaar sub fixture" from the catalog
     Then I should see notebook group "E2E Subscribed Group" with a hint including "Bazaar sub fixture"

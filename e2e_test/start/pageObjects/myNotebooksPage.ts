@@ -11,6 +11,7 @@ import { notebookList } from './NotebookList'
 import { subscribedNotebooks } from './subscribedNotebooks'
 import router from 'start/router'
 import notebookCreationForm from './forms/notebookCreationForm'
+import notebookGroupPage from './notebookGroupPage'
 
 const addNewNotebookButton = () =>
   cy.findByRole('button', { name: 'Add New Notebook' })
@@ -77,16 +78,19 @@ export const myNotebooksPage = () => {
     subscribedNotebooks() {
       return subscribedNotebooks()
     },
-    creatingNotebookGroupFromCatalogMove(
+    creatingNotebookGroupFromOwnedCatalogMove(
       notebookName: string,
-      groupName: string,
-      isSubscribed?: boolean
+      groupName: string
     ) {
-      if (isSubscribed) {
-        subscribedNotebooks().card(notebookName).openMoveToGroupDialog()
-      } else {
-        notebookCard(notebookName).openMoveToGroupDialog()
-      }
+      notebookCard(notebookName).openMoveToGroupDialog()
+      completeMoveNotebookToNewGroupDialog(groupName)
+      return this as any
+    },
+    creatingNotebookGroupFromSubscribedCatalogMove(
+      notebookName: string,
+      groupName: string
+    ) {
+      subscribedNotebooks().card(notebookName).openMoveToGroupDialog()
       completeMoveNotebookToNewGroupDialog(groupName)
       return this as any
     },
@@ -100,8 +104,13 @@ export const myNotebooksPage = () => {
       hintSubstring: string
     ) {
       cy.contains('[data-cy="notebook-group-card"]', groupName).should(
-        'contain.text',
-        hintSubstring
+        ($card) => {
+          const actual = $card.text()
+          expect(
+            actual,
+            `Expected notebook group "${groupName}" hint to include "${hintSubstring}", but found "${actual.trim()}"`
+          ).to.include(hintSubstring)
+        }
       )
       return this as any
     },
@@ -110,7 +119,7 @@ export const myNotebooksPage = () => {
         .find('[data-cy="notebook-group-header-link"]')
         .click()
       waitUntilAppIsNotBusy()
-      return this as any
+      return notebookGroupPage()
     },
     addingNotebookToGroupFromCatalog(groupName: string, notebookName: string) {
       cy.contains('[data-cy="notebook-group-card"]', groupName)

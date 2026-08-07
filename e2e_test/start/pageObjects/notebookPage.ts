@@ -42,7 +42,7 @@ const notebookPage = () => {
       return this
     },
 
-    checkRemoveEmptyFolders() {
+    enableRemovingEmptyFolders() {
       cy.get(
         '[data-testid="notebook-health-remove-empty-folders"] input[type="checkbox"]'
       ).check({ force: true })
@@ -55,7 +55,7 @@ const notebookPage = () => {
       return this
     },
 
-    expectRemoveEmptyFoldersChecked() {
+    expectRemovingEmptyFoldersEnabled() {
       cy.get(
         '[data-testid="notebook-health-remove-empty-folders"] input[type="checkbox"]'
       ).should('be.checked')
@@ -145,7 +145,19 @@ const notebookPage = () => {
       cy.get('[data-testid="notebook-attached-book"]').should('not.exist')
       return this
     },
-    renameFromSummary(newName: string) {
+    expectSummaryName(name: string) {
+      cy.get('[data-testid="notebook-page-summary"]')
+        .find('h1')
+        .should(($heading) => {
+          const actual = $heading.text().trim()
+          expect(
+            actual,
+            `Expected notebook page summary name to include "${name}", but found "${actual}"`
+          ).to.include(name)
+        })
+      return this
+    },
+    rename(newName: string) {
       cy.get('[data-testid="notebook-page-name-edit"]').click()
       cy.get('[data-test="notebook-page-name-input"]').click()
       cy.clearFocusedText().type(newName)
@@ -167,7 +179,7 @@ const notebookPage = () => {
       return this
     },
     ...sidebarChildNotePageMethods(),
-    typeNotebookReadmeDraftAndSave(text: string) {
+    saveNotebookReadme(text: string) {
       cy.get('[data-testid="notebook-readme-editor"] .ql-editor')
         .should('be.visible')
         .click()
