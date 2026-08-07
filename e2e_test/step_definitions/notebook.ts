@@ -11,7 +11,6 @@ import {
 } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 import notebookPage from '../start/pageObjects/notebookPage'
-import workspaceSurfaceLandmarks from '../start/pageObjects/workspaceSurfaceLandmarks'
 import { waitUntilAppIsNotBusy } from '../start/pageBase'
 
 Given(
@@ -211,14 +210,6 @@ Then(
 
 Then('notebook admin settings sections are visible', () => {
   notebookPage().expectSettingsSectionsVisible()
-})
-
-Then('notebook Readme, Settings, and Health tabs are present', () => {
-  workspaceSurfaceLandmarks().expectNotebookWorkspaceTabsPresent()
-})
-
-Then('notebook Readme, Settings, and Health tabs are not present', () => {
-  workspaceSurfaceLandmarks().expectNotebookWorkspaceTabsAbsent()
 })
 
 When(

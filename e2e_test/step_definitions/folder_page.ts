@@ -7,7 +7,6 @@ import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 import folderPage from '../start/pageObjects/folderPage'
 import noteCreationForm from '../start/pageObjects/forms/noteCreationForm'
-import workspaceSurfaceLandmarks from '../start/pageObjects/workspaceSurfaceLandmarks'
 import { waitUntilAppIsNotBusy } from '../start/pageBase'
 
 When(
@@ -56,22 +55,6 @@ When(
 
 Then('the folder readme should contain {string}', (fragment: string) => {
   folderPage().expectFolderReadmeBodyContains(fragment)
-})
-
-Then('the folder admin controls are present', () => {
-  workspaceSurfaceLandmarks().expectFolderAdminControlsPresent()
-})
-
-Then('the folder admin controls are not present', () => {
-  workspaceSurfaceLandmarks().expectFolderAdminControlsAbsent()
-})
-
-Then('folder Readme and Settings tabs are present', () => {
-  workspaceSurfaceLandmarks().expectFolderWorkspaceTabsPresent()
-})
-
-Then('folder Readme and Settings tabs are not present', () => {
-  workspaceSurfaceLandmarks().expectFolderWorkspaceTabsAbsent()
 })
 
 When('I reload the folder page', () => {
