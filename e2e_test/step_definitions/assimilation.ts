@@ -29,14 +29,6 @@ Then(
 )
 
 Then(
-  'I assimilated one note {string} on day {int}',
-  (noteTopology: string, day: number) => {
-    start.testability().backendTimeTravelTo(day, 8)
-    start.testability().assimilateNote(noteTopology)
-  }
-)
-
-Then(
   'I assimilated one note {string} at the current time',
   (noteTitle: string) => {
     start.testability().assimilateNote(noteTitle)
@@ -62,9 +54,12 @@ When('I start assimilation from the menu', () => {
   start.assimilation().startAssimilationFromMenu()
 })
 
-When('I start assimilation from the menu and observe blocking loading', () => {
-  start.assimilation().startAssimilationFromMenuAndObserveBlockingLoading()
-})
+When(
+  'I start assimilation from the menu while the next note loads slowly',
+  () => {
+    start.assimilation().startAssimilationFromMenuWhileNextNoteLoadsSlowly()
+  }
+)
 
 Then('I should be assimilating the note {string}', (noteTitle: string) => {
   start.assumeAssimilationPage().expectAssimilatingNote(noteTitle)
@@ -123,7 +118,7 @@ Then(
   }
 )
 
-Then(
+When(
   'I set the level of {string} to be {int}',
   (noteTopology: string, level: number) => {
     start.assumeNotePage(noteTopology).setLevel(level)
@@ -167,11 +162,11 @@ When('I verify spelling with {string}', (text: string) => {
   start.assumeAssimilationPage().verifySpellingWith(text)
 })
 
-Then('the assimilate button should be disabled', () => {
+Then('assimilate should be disabled', () => {
   start.assumeAssimilationPage().expectAssimilateDisabled()
 })
 
-Then('the assimilate button should be enabled', () => {
+Then('assimilate should be enabled', () => {
   start.assumeAssimilationPage().expectAssimilateEnabled()
 })
 

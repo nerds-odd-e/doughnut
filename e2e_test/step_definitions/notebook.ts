@@ -9,6 +9,7 @@ import {
   When,
   type DataTable,
 } from '@badeball/cypress-cucumber-preprocessor'
+import type NotePath from '../support/NotePath'
 import start from '../start'
 import notebookPage from '../start/pageObjects/notebookPage'
 import { waitUntilAppIsNotBusy } from '../start/pageBase'
@@ -195,3 +196,40 @@ When(
     notebookPage().renameFromSummary(newName)
   }
 )
+
+When(
+  'I create a notebook with title {string} and description {string}',
+  (notebookName: string, description: string) => {
+    start.navigateToNotebooksPage().creatingNotebook(notebookName, description)
+  }
+)
+
+When('I create a notebook with empty title', () => {
+  start.navigateToNotebooksPage().creatingNotebook('')
+})
+
+When('I jump to the notebook {string}', (notebookName: string) => {
+  start.jumpToNotebookPage(notebookName)
+})
+
+When('I visit all my notebooks', () => {
+  start.navigateToNotebooksPage()
+})
+
+Then('I should see my notebooks:', (data: DataTable) => {
+  start.navigateToNotebooksPage().expectNotebookCards(data.hashes())
+})
+
+Then('I should be on a notebook folder page in the browser', () => {
+  start.waitUntilAppIsNotBusy()
+  cy.location('pathname').should('match', /^\/notebooks\/\d+\/folders\/\d+$/)
+})
+
+Then('I should be on the notebook root page in the browser', () => {
+  start.waitUntilAppIsNotBusy()
+  cy.location('pathname').should('match', /^\/notebooks\/\d+$/)
+})
+
+When('I navigate to {notepath} note', (notePath: NotePath) => {
+  start.navigateToNoteFromPath(notePath)
+})

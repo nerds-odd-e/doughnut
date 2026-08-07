@@ -13,9 +13,15 @@ Feature: Assimilation walkthrough
     When I jump to the note page of "Note 2"
     Then I should see assimilation menu progress
 
-  Scenario: Walk through notes with menu, keep, skip, toasts, and panel on note page
+  Scenario: Starting assimilation shows blocking loading for the next note
     Given It's day 1
-    When I start assimilation from the menu and observe blocking loading
+    When I start assimilation from the menu while the next note loads slowly
+    Then I should be assimilating the note "Note 1"
+    And I should see assimilation progress "0/2/5"
+
+  Scenario: Assimilating advances through notes with progress and daily goal toast
+    Given It's day 1
+    When I start assimilation from the menu
     Then I should be assimilating the note "Note 1"
     And I should see assimilation progress "0/2/5"
     When I assimilate on the assimilation panel
@@ -24,6 +30,13 @@ Feature: Assimilation walkthrough
     When I assimilate on the assimilation panel
     Then I should see the daily assimilation goal toast
     And I should be assimilating the note "Note 3"
+
+  Scenario: Skip and continue until no more notes to assimilate
+    Given It's day 1
+    And the note "Note 1" was assimilated on day 1
+    And the note "Note 2" was assimilated on day 1
+    When I start assimilation from the menu
+    Then I should be assimilating the note "Note 3"
     When I skip recall on the assimilation panel
     Then I should be assimilating the note "Note 4"
     When I assimilate on the assimilation panel
@@ -31,10 +44,20 @@ Feature: Assimilation walkthrough
     When I assimilate on the assimilation panel
     Then I should see the no more notes to assimilate toast
     And I should still be on the note page for "Note 5"
+
+  Scenario: Already assimilated note cannot be assimilated again
+    Given the note "Note 1" was assimilated on day 1
     When I jump to the note page of "Note 1"
     And I open assimilation settings
-    Then the assimilate button should be disabled
-    When I jump to the note page of "Note 3"
+    Then assimilate should be disabled
+
+  Scenario: Revive restores skip on a skipped note
+    Given It's day 1
+    And the note "Note 1" was assimilated on day 1
+    And the note "Note 2" was assimilated on day 1
+    When I start assimilation from the menu
+    And I skip recall on the assimilation panel
+    And I jump to the note page of "Note 3"
     And I open assimilation settings
     Then I should see Revive on the assimilation panel
     When I revive recall on the assimilation panel

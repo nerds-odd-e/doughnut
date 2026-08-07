@@ -1,5 +1,5 @@
 @disableOpenAiService
-Feature: Assimilate With Remembering Spelling
+Feature: Assimilate with remembering spelling
   As a learner, I want to assimilate notes with spelling verification.
   Spelling is only available for notes with content.
 
@@ -11,19 +11,19 @@ Feature: Assimilate With Remembering Spelling
 
   Scenario Outline: Remembering spelling availability depends on note content
     Given I have a notebook "English practice" with notes:
-      | Title | Content |
+      | Title | Content   |
       | Word  | <content> |
     When I am assimilating the note "Word"
     Then remembering spelling should be <availability>
 
     Examples:
-      | case                     | content                 | availability |
-      | note has no content      |                         | unavailable  |
-      | note has definition      | Definition content      | available    |
+      | case                | content            | availability |
+      | note has no content |                    | unavailable  |
+      | note has definition | Definition content | available    |
 
   Scenario Outline: Verify spelling proceeds with assimilate
     Given I have a notebook "English practice" with notes:
-      | Title        | Content |
+      | Title        | Content             |
       | <note_title> | Non-empty body text |
     And I am assimilating the note "<note_title>"
     And I assimilate with remembering spelling
@@ -34,7 +34,7 @@ Feature: Assimilate With Remembering Spelling
       | note_title    | spelling_input | expected_result         |
       | sedition      | sedition       | "success"               |
       | sedition      | wrong answer   | "error: wrong spelling" |
-      | colour／color | colour／color | "success"               |
+      | colour／color | colour／color  | "success"               |
       | colour／color | color          | "error: wrong spelling" |
 
   Scenario: Verify spelling accepts frontmatter alias
@@ -54,21 +54,21 @@ Feature: Assimilate With Remembering Spelling
     When I verify spelling with "color"
     Then the spelling verification result for note "colour" should be "success"
 
-  Scenario: Already assimilated note reappears in to-be-assimilated list when remember spelling is added later
+  Scenario: Already assimilated note reappears for assimilation when remember spelling is added later
     Given I have a notebook "English practice" with notes:
-      | Title   | Content |
+      | Title   | Content             |
       | Relearn | Non-empty body text |
-    And I assimilated one note "Relearn" on day 1
+    And the note "Relearn" was assimilated on day 1
     And I add remember spelling to the note "Relearn"
     When I reload the current page for note "Relearn"
     Then I should see 1 due for assimilation
 
   Scenario: Add only spelling memory tracker when note already has trackers
     Given I have a notebook "English practice" with notes:
-      | Title | Content |
+      | Title | Content             |
       | Word  | Non-empty body text |
-    And I assimilated one note "Word" on day 1
+    And the note "Word" was assimilated on day 1
     When I am assimilating the note "Word"
     And I assimilate with remembering spelling
-    When I verify spelling with "Word"
+    And I verify spelling with "Word"
     Then the spelling verification result for note "Word" should be "success"

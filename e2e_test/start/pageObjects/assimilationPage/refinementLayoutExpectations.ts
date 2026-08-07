@@ -139,31 +139,25 @@ export function assimilationRefinementLayoutExpectations() {
       })
       return this
     },
-    expectExtractionPreviewCreateButtonDisabled() {
+    expectCannotCreateNoteFromExtractionPreview() {
       extractionPreviewPanel()
         .find('[data-test-id="extraction-preview-create"]')
         .should('be.disabled')
       return this
     },
-    expectExtractionPreviewOriginalContentTabActive() {
+    expectExtractionPreviewShowsOriginalContent(content: string) {
       extractionPreviewPanel().within(() => {
         cy.get('[data-test-id="extraction-preview-original-tab-content"]')
           .should('have.attr', 'aria-selected', 'true')
           .and('have.class', 'daisy-tab-active')
-        cy.get('[data-test-id="extraction-preview-original-content"]').should(
-          'be.visible'
-        )
+        cy.get('[data-test-id="extraction-preview-original-content"]')
+          .should('be.visible')
+          .and('have.value', content)
         cy.get('[data-testid="diff-left-pane"]').should('not.exist')
       })
       return this
     },
-    expectExtractionPreviewOriginalContentFieldContains(content: string) {
-      extractionPreviewPanel()
-        .find('[data-test-id="extraction-preview-original-content"]')
-        .should('have.value', content)
-      return this
-    },
-    switchExtractionPreviewOriginalSectionToDiffTab() {
+    viewExtractionPreviewOriginalAsDiff() {
       extractionPreviewPanel()
         .find('[data-test-id="extraction-preview-original-tab-diff"]')
         .click()

@@ -14,7 +14,7 @@ Feature: User Contests Question generation by AI
 
   Scenario Outline: The generated question should be contested internally
     Given OpenAI evaluates the question as <Legitimate Question>
-    And I assimilated one note "Scuba Diving" on day 1
+    And the note "Scuba Diving" was assimilated on day 1
     When I am recalling my note on day 2
     Then I should be asked "<Current Question>"
 
@@ -25,7 +25,7 @@ Feature: User Contests Question generation by AI
 
   Scenario: I should be able to contest a question
     Given OpenAI evaluates the question as not legitimate
-    And I assimilated one note "Scuba Diving" on day 1
+    And the note "Scuba Diving" was assimilated on day 1
     And I am recalling my note on day 2
     When I contest the question
     Then I should be asked "Second question"

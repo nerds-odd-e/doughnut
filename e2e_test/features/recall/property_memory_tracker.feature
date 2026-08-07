@@ -82,7 +82,7 @@ Feature: Property memory tracker
   Scenario: Note-level assimilation stays available after property-only assimilation
     Given I am viewing assimilation settings for note "Vitamins"
     Then assimilate for property "topic" should be disabled
-    And the assimilate button should be enabled
+    And assimilate should be enabled
     When I assimilate on the assimilation panel
     And I open assimilation settings
     Then the note memory tracker should have recall count 0

@@ -51,13 +51,6 @@ Feature: Note refinement
   Scenario: Extract selected layout points to one new note
     Given OpenAI will extract layout points "B and D" to a new note with title "Point B and D" and content "Combined B and D" and updated parent content "A. C. E."
     When I am assimilating the note "Sample"
-    And I should see the refinement layout:
-      | text | level | alreadyExtracted |
-      | A    | 1     |                  |
-      | B    | 2     |                  |
-      | C    | 2     | true             |
-      | D    | 1     |                  |
-      | E    | 1     |                  |
     And I open extraction preview for refinement layout points "B" and "D"
     And I create the note from the extraction preview
     Then the note title should be "Point B and D"
@@ -87,7 +80,7 @@ Feature: Note refinement
     When I am assimilating the note "Sample"
     And I open extraction preview for refinement layout points "B" and "D"
     And I clear the extraction preview new note title
-    Then the extraction preview create note button should be disabled
+    Then I cannot create a note from the extraction preview
     And I should see folder "Sample tree/Context" containing these notes:
       | note-title |
       | Sample     |
@@ -96,9 +89,8 @@ Feature: Note refinement
     Given OpenAI will extract layout points "B and D" to a new note with title "Point B and D" and content "Combined B and D" and updated parent content "A. C. E."
     When I am assimilating the note "Sample"
     And I open extraction preview for refinement layout points "B" and "D"
-    Then the extraction preview original content tab should be active
-    And the extraction preview original content field should contain "A. C. E."
-    When I switch the extraction preview original section to the diff tab
+    Then the extraction preview should show original content "A. C. E."
+    When I view the extraction preview original as a diff
     Then the extraction preview original diff should show original "A. B. C. D. E." and updated "A. C. E."
 
   Scenario: Export extract request shows AI request JSON

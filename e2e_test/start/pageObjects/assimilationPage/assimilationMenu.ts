@@ -40,7 +40,7 @@ export const assimilation = () => {
       waitUntilAppIsNotBusy()
       return this
     },
-    startAssimilationFromMenuAndObserveBlockingLoading() {
+    startAssimilationFromMenuWhileNextNoteLoadsSlowly() {
       cy.intercept(
         { method: 'GET', url: '/api/assimilation/next*', times: 1 },
         (req) => {

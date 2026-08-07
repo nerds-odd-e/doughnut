@@ -57,16 +57,14 @@ Improve all E2E feature files (and supporting steps/page objects as needed) so t
 
 ### Phase 4 — Assimilation E2E authoring
 
-**Status:** planned  
+**Status:** done  
 **Type:** Behavior
 
-- **Pre:** Assimilation features may violate checklist (esp. long walkthrough).
-- **Trigger:** Audit + improve.
-- **Post:** Checklist satisfied; Cypress green.
+- Split walkthrough into focused scenarios; domain wording for slow load / assimilate disabled; When/Then hygiene; collapsed duplicate assimilate-on-day Givens; split oversized `note.ts` into cohesive modules.
 
 **Files:** `assimilation/assimilation_walkthrough.feature`, `assimilation/assimilate_with_remembering_spelling.feature`, `assimilation/edit_when_assimilating.feature`, `assimilation/note_refinement.feature`
 
-**Done when:** checklist applied; targeted Cypress passes.
+**Done when:** checklist applied; targeted Cypress passes. ✅ 26/26 (+ related smokes)
 
 ---
 

@@ -61,29 +61,21 @@ When('I clear the extraction preview new note title', () => {
   start.assumeAssimilationPage().clearExtractionPreviewNewNoteTitle()
 })
 
-Then('the extraction preview create note button should be disabled', () => {
-  start.assumeAssimilationPage().expectExtractionPreviewCreateButtonDisabled()
-})
-
-Then('the extraction preview original content tab should be active', () => {
-  start
-    .assumeAssimilationPage()
-    .expectExtractionPreviewOriginalContentTabActive()
+Then('I cannot create a note from the extraction preview', () => {
+  start.assumeAssimilationPage().expectCannotCreateNoteFromExtractionPreview()
 })
 
 Then(
-  'the extraction preview original content field should contain {string}',
+  'the extraction preview should show original content {string}',
   (content: string) => {
     start
       .assumeAssimilationPage()
-      .expectExtractionPreviewOriginalContentFieldContains(content)
+      .expectExtractionPreviewShowsOriginalContent(content)
   }
 )
 
-When('I switch the extraction preview original section to the diff tab', () => {
-  start
-    .assumeAssimilationPage()
-    .switchExtractionPreviewOriginalSectionToDiffTab()
+When('I view the extraction preview original as a diff', () => {
+  start.assumeAssimilationPage().viewExtractionPreviewOriginalAsDiff()
 })
 
 Then(
