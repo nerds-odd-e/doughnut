@@ -6,8 +6,8 @@
     y="0px"
     viewBox="0 0 800 400"
   >
-    <Tool link-role="source" :x="-250 * ifInverse" />
-    <Lnk />
+    <Tag link-role="source" :x="-200 * ifInverse" :y="0" :oheight="400" />
+    <RelationChain />
     <Object1 :stripes="false" link-role="target" :x="250 * ifInverse" />
   </svg>
 </template>

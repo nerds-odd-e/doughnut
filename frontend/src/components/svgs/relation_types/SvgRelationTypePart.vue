@@ -12,7 +12,7 @@
       :oheight="300"
       :y="50"
     />
-    <Lnk />
+    <RelationChain />
     <ObjectRight link-role="target" :x="ifInverse === 1 ? 275 : -200" />
   </svg>
 </template>

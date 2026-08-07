@@ -41,7 +41,7 @@
 - Issue: Note and book-reading Cucumber glue / page objects accumulate every scenario’s helpers in a few files.
 - Files: `e2e_test/step_definitions/note.ts`, `e2e_test/start/pageObjects/notePage.ts`, `e2e_test/step_definitions/book_reading.ts`, `e2e_test/start/pageObjects/bookReadingPage.ts`
 - Impact: Merge conflicts, unclear ownership, slow discovery of the right helper.
-- Fix approach: Continue splitting by feature (pattern already used for search steps in `ongoing/link-target-recent-mode.md`); keep page objects feature-scoped.
+- Fix approach: Continue splitting by feature (pattern already used for search steps in `ongoing/wiki-link-target-recent-mode.md`); keep page objects feature-scoped.
 
 **Derived index coherence (wiki title / property / alias):**
 - Issue: Note content properties live as YAML frontmatter; discoverability depends on derived tables refreshed via `WikiTitleCacheService.refreshForNote` and related backfills. Missed refresh sites recreate assimilation/search bugs.

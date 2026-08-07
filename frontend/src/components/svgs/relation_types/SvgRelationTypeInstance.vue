@@ -6,10 +6,14 @@
     y="0px"
     viewBox="0 0 800 400"
   >
-    <Object1 link-role="source" :x="-250 * ifInverse" />
-    <Lnk />
-    <Person link-role="target" :x="250 * ifInverse" />
-    <Feather link-role="target" :x="280 * ifInverse" :y="150" />
+    <Object1
+      :stripes="false"
+      link-role="source"
+      :x="-250 * ifInverse"
+      :abstract="true"
+    />
+    <RelationChain />
+    <Object1 :stripes="false" link-role="target" :x="250 * ifInverse" />
   </svg>
 </template>
 

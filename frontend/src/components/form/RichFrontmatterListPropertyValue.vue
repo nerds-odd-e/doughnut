@@ -8,7 +8,7 @@
   >
   <span
     v-else-if="showWikiLinks"
-    class="rich-content-links inline-flex min-w-0 max-w-full flex-wrap items-center text-sm text-base-content/90"
+    class="rich-content-wiki-links inline-flex min-w-0 max-w-full flex-wrap items-center text-sm text-base-content/90"
     :title="title"
     data-testid="rich-note-property-row-list-value"
   >

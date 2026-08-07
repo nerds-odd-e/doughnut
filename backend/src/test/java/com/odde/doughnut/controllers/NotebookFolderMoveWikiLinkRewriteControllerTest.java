@@ -12,7 +12,7 @@ import com.odde.doughnut.services.WikiTitleCacheService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-class NotebookFolderMoveLinkRewriteControllerTest
+class NotebookFolderMoveWikiLinkRewriteControllerTest
     extends NotebookFolderManagementControllerTestBase {
 
   @Autowired WikiTitleCacheService wikiTitleCacheServiceBean;

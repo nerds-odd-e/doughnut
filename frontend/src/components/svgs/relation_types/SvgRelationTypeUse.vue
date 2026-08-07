@@ -6,9 +6,9 @@
     y="0px"
     viewBox="0 0 800 400"
   >
-    <ObjectLeft link-role="source" :x="ifInverse === 1 ? -270 : 220" />
-    <Lnk />
-    <ObjectConfuse link-role="target" :x="ifInverse === 1 ? 260 : -220" />
+    <Tool link-role="source" :x="-250 * ifInverse" />
+    <RelationChain />
+    <Object1 :stripes="false" link-role="target" :x="250 * ifInverse" />
   </svg>
 </template>
 

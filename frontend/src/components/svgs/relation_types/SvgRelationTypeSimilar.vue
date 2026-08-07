@@ -7,7 +7,7 @@
     viewBox="0 0 800 400"
   >
     <ObjectLeft :link-role="ifInverse === 1 ? 'source' : 'target'" :x="-270" />
-    <Lnk />
+    <RelationChain />
     <ObjectLeft :link-role="ifInverse === 1 ? 'target' : 'source'" :x="220" />
   </svg>
 </template>

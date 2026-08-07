@@ -7,7 +7,7 @@
     viewBox="0 0 800 400"
   >
     <Object1 :stripes="false" link-role="source" :x="-250 * ifInverse" />
-    <Lnk />
+    <RelationChain />
     <Object1
       :stripes="false"
       link-role="target"

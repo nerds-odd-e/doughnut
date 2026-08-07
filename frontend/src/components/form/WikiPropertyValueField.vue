@@ -2,7 +2,7 @@
   <div
     ref="root"
     tabindex="0"
-    class="wiki-property-value-field rich-content-links daisy-input daisy-input-sm w-full min-h-0 py-1 px-3 leading-normal"
+    class="wiki-property-value-field rich-content-wiki-links daisy-input daisy-input-sm w-full min-h-0 py-1 px-3 leading-normal"
     :class="{ 'daisy-input-disabled': readonly }"
     :contenteditable="!readonly"
     role="textbox"
