@@ -123,16 +123,14 @@ Improve all E2E feature files (and supporting steps/page objects as needed) so t
 
 ### Phase 9 — Note view / search E2E authoring
 
-**Status:** planned  
+**Status:** done  
 **Type:** Behavior
 
-- **Pre:** Note view features may violate checklist.
-- **Trigger:** Audit + improve.
-- **Post:** Checklist satisfied; Cypress green.
+- Domain search wording; shared semantic Background; split recent-update scenarios; renamed `semantical_search` → `semantic_search`; `noteRecentUpdate` PO.
 
-**Files:** `note_view/search_note.feature`, `note_view/semantical_search.feature`, `note_view/note_recent_update.feature`, `note_view/note_frontmatter_image.feature`
+**Files:** `note_view/search_note.feature`, `note_view/semantic_search.feature`, `note_view/note_recent_update.feature`, `note_view/note_frontmatter_image.feature`
 
-**Done when:** checklist applied; targeted Cypress passes.
+**Done when:** checklist applied; targeted Cypress passes. ✅ 13/13
 
 ---
 

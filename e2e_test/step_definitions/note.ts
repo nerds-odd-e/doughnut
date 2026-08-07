@@ -11,6 +11,10 @@ import {
 import NotePath from '../support/NotePath'
 import '../support/string_util'
 import start from '../start'
+import {
+  expectNoteAppearsAsRecentAs,
+  expectNoteAppearsNewerThan,
+} from '../start/pageObjects/noteRecentUpdate'
 
 defineParameterType({
   name: 'notepath',
@@ -40,7 +44,7 @@ When(
   }
 )
 
-Then('I type {string} in the title', (content: string) => {
+When('I type {string} in the title', (content: string) => {
   cy.focused().clear().type(content)
 })
 
@@ -124,28 +128,15 @@ Then(
 )
 
 Then(
-  'I should see {string} is {string} than {string}',
-  (left: string, aging: string, right: string) => {
-    let leftColor = ''
-    start.waitUntilAppIsNotBusy().jumpToNotePage(left)
-    cy.get('.note-recent-update-indicator')
-      .invoke('css', 'color')
-      .then((val) => {
-        leftColor = val as unknown as string
-      })
-    start.jumpToNotePage(right)
-    cy.get('.note-recent-update-indicator')
-      .invoke('css', 'color')
-      .then((val) => {
-        const leftColorIndex = parseInt(leftColor.match(/\d+/)![0])
-        const rightColorIndex = parseInt(
-          JSON.stringify(val).match(/\d+/)?.[0] ?? ''
-        )
-        if (aging === 'newer') {
-          expect(leftColorIndex).to.greaterThan(rightColorIndex)
-        } else {
-          expect(leftColorIndex).to.equal(rightColorIndex)
-        }
-      })
+  'I should see that {string} is newer than {string}',
+  (left: string, right: string) => {
+    expectNoteAppearsNewerThan(left, right)
+  }
+)
+
+Then(
+  'I should see that {string} is as recent as {string}',
+  (left: string, right: string) => {
+    expectNoteAppearsAsRecentAs(left, right)
   }
 )

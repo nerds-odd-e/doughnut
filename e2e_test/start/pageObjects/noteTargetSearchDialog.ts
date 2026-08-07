@@ -17,7 +17,7 @@ function expectExactRelationshipTargetsWithRetry(targets: string[]) {
       }
       if (attempt >= relationshipTargetListMaxAttempts - 1) {
         throw new Error(
-          `expected ${JSON.stringify(actual)} to deeply equal ${JSON.stringify(targets)}`
+          `Expected search targets ${JSON.stringify(targets)}, but found ${JSON.stringify(actual)}`
         )
       }
       cy.wait(relationshipTargetListRetryMs)
@@ -116,9 +116,13 @@ export const assumeNoteTargetSearchDialog = () => {
       cy.findByText('Search result', {
         selector: '.result-section-info',
       }).should('be.visible')
-      cy.get('.dropdown-list a:not(.notebook-hit-title)')
-        .then((elms) => Cypress._.map(elms, (e) => e.textContent?.trim() ?? ''))
-        .should('deep.equal', targets)
+      cy.get('.dropdown-list a:not(.notebook-hit-title)').should(($elms) => {
+        const actual = Cypress._.map($elms, (e) => e.textContent?.trim() ?? '')
+        expect(
+          actual,
+          `Expected duplicate suggestions ${JSON.stringify(targets)}, but found ${JSON.stringify(actual)}`
+        ).to.deep.equal(targets)
+      })
     },
     moveUnder(folderTitle: string, notebookName?: string) {
       let cards = cy.get('[role=listitem]').filter((_, el) => {

@@ -11,16 +11,16 @@ Given('I reindex the notebook {string}', (notebookName: string) => {
   start.testability().updateNotebookIndex(notebookName)
 })
 
-When('I start searching from all my notebooks page', () => {
+When('I start searching notes', () => {
   start.navigateToNotebooksPage()
   start.assumeNotePage().toolbarButton('search note').click()
 })
 
-When('I enable semantic search in the note search dialog', () => {
+When('I enable semantic search', () => {
   start.assumeNoteTargetSearchDialog().enableSemanticSearch()
 })
 
-When(
+Then(
   'I should see {string} as the possible duplicate',
   (noteTopicsAsString: string) => {
     cy.tick(1000)
@@ -32,7 +32,7 @@ When(
   }
 )
 
-When(
+Then(
   'I should see {string} as targets only when searching {string}',
   (noteTopicsAsString: string, searchKey: string) => {
     start
@@ -44,7 +44,7 @@ When(
   }
 )
 
-When(
+Then(
   'I should see {string} as targets only when searching in all my notebooks {string}',
   (noteTopicsAsString: string, searchKey: string) => {
     start
@@ -65,7 +65,7 @@ Then(
   }
 )
 
-When(
+Then(
   'I should see note cannot be found when searching in all my notebooks {string}',
   (searchKey: string) => {
     start

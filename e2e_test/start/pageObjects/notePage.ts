@@ -80,6 +80,15 @@ export const assumeNotePage = (
       findNoteTitle(title)
       return this
     },
+    expectHeaderImage() {
+      cy.get('#note-image').should(($img) => {
+        expect(
+          $img.length,
+          'Expected note header image (#note-image) to be present'
+        ).to.be.greaterThan(0)
+      })
+      return this
+    },
     /** Asserts the rendered note content body contains this substring (plain or rich) */
     expectContentContaining(fragment: string) {
       this.findNoteContent(fragment)

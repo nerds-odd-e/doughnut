@@ -26,9 +26,8 @@ When(
   }
 )
 
-When('I should see note {string} has an image', (noteTopology: string) => {
-  start.jumpToNotePage(noteTopology)
-  cy.get('#note-image').should('exist')
+Then('I should see note {string} has an image', (noteTopology: string) => {
+  start.jumpToNotePage(noteTopology).expectHeaderImage()
 })
 
 When(

@@ -1,24 +1,20 @@
-Feature: see recent note update
+Feature: See recent note updates
   As a learner, I want to see which of my notes are recently updated,
-  so that I can focus on only viewing the newly updated notes.
+  so that I can focus on newly updated notes.
 
   Background:
     Given I am logged in as an existing user
-    And I let the server to time travel to 100 hours ago
+    And it is 100 hours ago on the server
     And I have a notebook "World atlas" with notes:
-      | Title   | Folder        | Content |
-      | Germany | World         |                   |
-      | Japan   | World         |                   |
-      | Berlin  | World/Germany | Berlin has a wall |
-      | Munich  | World/Germany | Munich has beer   |
-      | Italy   | World         |                   |
-    And I let the server to time travel to 24 hours ago
+      | Title  | Content           |
+      | Japan  |                   |
+      | Berlin | Berlin has a wall |
+    And it is 24 hours ago on the server
 
-  Scenario Outline: I should see the color of a newer note is fresher
-    And I update note "Berlin" with content "<new content>"
-    Then I should see "Berlin" is "<aging>" than "Japan"
+  Scenario: Updating note content makes it appear newer
+    When I update note "Berlin" with content "Berlin had a wall"
+    Then I should see that "Berlin" is newer than "Japan"
 
-    Examples:
-      | new content       | aging     |
-      | Berlin had a wall | newer     |
-      | Berlin has a wall | not newer |
+  Scenario: Saving unchanged content does not make a note appear newer
+    When I update note "Berlin" with content "Berlin has a wall"
+    Then I should see that "Berlin" is as recent as "Japan"

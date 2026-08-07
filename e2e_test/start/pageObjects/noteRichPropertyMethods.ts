@@ -73,9 +73,11 @@ export const noteRichPropertyMethods = () => ({
       cy.get(richNotePropertyRow(key)).within(() => {
         cy.get('[data-testid="rich-note-property-row-value-input"]').should(
           ($input) => {
-            expect(String($input.val() ?? '').trim()).to.match(
-              /^\/attachments\/images\/\d+\/.+/
-            )
+            const actual = String($input.val() ?? '').trim()
+            expect(
+              actual,
+              `Expected rich note property "${key}" to be an attachment image path (/attachments/images/...), but found ${JSON.stringify(actual)}`
+            ).to.match(/^\/attachments\/images\/\d+\/.+/)
           }
         )
       })
