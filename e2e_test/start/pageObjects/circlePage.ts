@@ -6,21 +6,13 @@ import {
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import notebookPage from './notebookPage'
 import notebookCreationForm from './forms/notebookCreationForm'
+import { completeMoveNotebookToNewGroupDialog } from './notebookCatalogMoveToGroup'
 
 export const circleIdAlias = (circleName: string) =>
   `circleId-${circleName.replace(/\s+/g, '-')}`
 
 export const circleNotebookIdAlias = (notebookTitle: string) =>
   `circleNotebookId-${notebookTitle.replace(/\s+/g, '-')}`
-
-const completeMoveNotebookToNewGroupDialog = (newGroupName: string) => {
-  cy.findByRole('dialog', { name: 'Move to group' }).within(() => {
-    cy.get('#notebook-catalog-move-to-group-target').select('new')
-    cy.findByLabelText('New group name').type(newGroupName)
-    cy.findByRole('button', { name: 'Move' }).click()
-  })
-  waitUntilAppIsNotBusy()
-}
 
 export const assumeCirclePage = () => ({
   creatingNotebook(notebookTopic: string) {

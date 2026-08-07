@@ -45,20 +45,25 @@ export const notebookList = () => {
   }
 }
 
+/** Catalog cards whose h5 title equals `notebookName` exactly. */
+const notebookCardsNamed = (notebookName: string) => {
+  waitUntilAppIsNotBusy()
+  cy.get('.notebook-card').should('be.visible')
+  return cy.get('[data-cy="notebook-card"]').filter((_index, card) => {
+    const $card = Cypress.$(card)
+    return $card
+      .find('.notebook-card h5')
+      .toArray()
+      .some((heading) => heading.textContent?.trim() === notebookName)
+  })
+}
+
 /** Opens the notebook page via the card title link (same as the user catalog path). */
 export const clickNotebookCardTitleToOpenNotebookPage = (
   notebookName: string
 ) => {
-  waitUntilAppIsNotBusy()
-  cy.get('.notebook-card').should('be.visible')
-  cy.get('[data-cy="notebook-card"]')
-    .filter((_index, card) => {
-      const $card = Cypress.$(card)
-      return $card
-        .find('.notebook-card h5')
-        .toArray()
-        .some((heading) => heading.textContent?.trim() === notebookName)
-    })
+  notebookCardsNamed(notebookName)
+    .should('have.length.at.least', 1)
     .first()
     .within(() => {
       cy.findByText(notebookName, { selector: 'h5' })
@@ -84,44 +89,23 @@ function usesCatalogOverflowMenu(name: string): boolean {
 
 export const findNotebookCardButton = (notebook: string, name: string) => {
   const finder = () => {
-    waitUntilAppIsNotBusy()
-    cy.get('.notebook-card').should('be.visible')
-    return cy
-      .get('[data-cy="notebook-card"]')
-      .filter((_index, card) => {
-        const $card = Cypress.$(card)
-        return $card
-          .find('.notebook-card h5')
-          .toArray()
-          .some((heading) => heading.textContent?.trim() === notebook)
-      })
-      .then(($cards) => {
-        expect($cards.length).to.be.greaterThan(0)
-        const preferredCards = usesCatalogOverflowMenu(name)
-          ? $cards
-          : $cards.filter((_index, card) => {
-              const $card = Cypress.$(card)
-              return $card.find(`button[title="${name}"]`).length > 0
-            })
-        const targetCard =
-          preferredCards.length > 0 ? preferredCards.first() : $cards.first()
+    if (usesCatalogOverflowMenu(name)) {
+      notebookCardsNamed(notebook)
+        .should('have.length.at.least', 1)
+        .first()
+        .find('[data-cy="notebook-catalog-overflow"]')
+        .should('be.visible')
+        .click()
+      return findDropdownPortalButton(name)
+    }
 
-        return cy.wrap(targetCard)
+    return notebookCardsNamed(notebook)
+      .filter((_index, card) => {
+        return Cypress.$(card).find(`button[title="${name}"]`).length > 0
       })
-      .as('notebookCatalogCard')
-      .then(() => {
-        if (usesCatalogOverflowMenu(name)) {
-          cy.get('@notebookCatalogCard')
-            .find('[data-cy="notebook-catalog-overflow"]')
-            .click()
-        }
-      })
-      .then(() => {
-        if (usesCatalogOverflowMenu(name)) {
-          return findDropdownPortalButton(name)
-        }
-        return cy.get('@notebookCatalogCard').findByRole('button', { name })
-      })
+      .should('have.length.at.least', 1)
+      .first()
+      .findByRole('button', { name })
   }
 
   return {

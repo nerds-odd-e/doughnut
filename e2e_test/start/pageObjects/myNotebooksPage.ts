@@ -12,26 +12,13 @@ import { subscribedNotebooks } from './subscribedNotebooks'
 import router from 'start/router'
 import notebookCreationForm from './forms/notebookCreationForm'
 import notebookGroupPage from './notebookGroupPage'
+import {
+  completeMoveNotebookToNewGroupDialog,
+  completeMoveNotebookToUngroupedDialog,
+} from './notebookCatalogMoveToGroup'
 
 const addNewNotebookButton = () =>
   cy.findByRole('button', { name: 'Add New Notebook' })
-
-const completeMoveNotebookToNewGroupDialog = (newGroupName: string) => {
-  cy.findByRole('dialog', { name: 'Move to group' }).within(() => {
-    cy.get('#notebook-catalog-move-to-group-target').select('new')
-    cy.findByLabelText('New group name').type(newGroupName, { delay: 0 })
-    cy.findByRole('button', { name: 'Move' }).click()
-  })
-  waitUntilAppIsNotBusy()
-}
-
-const completeMoveNotebookToUngroupedDialog = () => {
-  cy.findByRole('dialog', { name: 'Move to group' }).within(() => {
-    cy.get('#notebook-catalog-move-to-group-target').select('ungrouped')
-    cy.findByRole('button', { name: 'Move' }).click()
-  })
-  waitUntilAppIsNotBusy()
-}
 
 export const myNotebooksPage = () => {
   cy.contains('h1', 'My notebooks', { timeout: 15000 }).should('be.visible')
