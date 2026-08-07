@@ -5,15 +5,15 @@ Feature: Bazaar subscription
 
   Background:
     Given there are some notes for existing user "another_old_learner" in notebook "Shape"
-      | Title      | Folder              | Skip Memory Tracking |
-      | Shape      |                     | true                 |
-      | Square     | Plane figures       |                      |
-      | Triangle   | Plane figures       |                      |
-      | Big Square | Plane figures/Quads |                      |
+      | Title      | Skip Memory Tracking |
+      | Shape      | true                 |
+      | Square     |                      |
+      | Triangle   |                      |
+      | Big Square |                      |
     And notebook "Shape" is shared to the Bazaar
 
   @skipOptimizationDueToKnownNecessarySlowness
-  Scenario: subscribe to a note and browse
+  Scenario: Subscribe and unsubscribe from a Bazaar notebook
     Given I am logged in as an existing user
     When I subscribe to notebook "Shape" in the bazaar, with target of learning 1 notes per day
     Then I should see I've subscribed to "Shape"
@@ -22,7 +22,7 @@ Feature: Bazaar subscription
     Then I should see I've not subscribed to "Shape"
 
   @mockBrowserTime
-  Scenario: subscribe to a note and recall
+  Scenario: Assimilate notes from a Bazaar subscription
     Given I am logged in as an existing user
     And I have a notebook "Memo pad" with a note "My memo"
     And my daily new notes to assimilate is set to 2
@@ -33,8 +33,7 @@ Feature: Bazaar subscription
     And  On day 2 I recall "Square, My memo, end " and assimilate new "Triangle, end       "
     And  I should be able to edit the subscription to notebook "Shape"
 
-  Scenario: No "add to learning" button for notebook with skip memory tracking
+  Scenario: Notebook with skip recall cannot be added to learning from the Bazaar
     Given I am logged in as "another_old_learner"
     When I change notebook "Shape" to skip recall
-    Then I can not see add the notebook "Shape" to my learning in the bazaar
-
+    Then I should not be able to add notebook "Shape" to my learning from the Bazaar

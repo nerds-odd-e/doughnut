@@ -5,12 +5,11 @@ Feature: Bazaar sharing
   Background:
     Given I am logged in as an existing user
 
-  Scenario: Contributing To Bazaar
+  Scenario: Share a notebook to the Bazaar
     Given I have a notebook "Geometry set" with notes:
-      | Title    | Content |
-      | Shape    | |
+      | Title    | Content                   |
+      | Shape    |                           |
       | Square   | four equal straight sides |
       | Triangle | three sides shape         |
     When I choose to share my notebook "Geometry set"
     Then I should see "Geometry set" shared in the Bazaar
-

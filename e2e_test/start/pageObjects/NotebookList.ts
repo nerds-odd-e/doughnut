@@ -25,7 +25,10 @@ export const notebookList = () => {
       const expected = commonSenseSplit(notebooks, ',')
       cy.get('.notebook-card h5', { timeout: 15000 }).should(($els) => {
         const cardTitles = Array.from($els, (el) => el.innerText)
-        expect(cardTitles, `circle notebook catalog`).to.deep.eq(expected)
+        expect(
+          cardTitles,
+          `Expected notebook cards [${expected.join(', ')}], but found [${cardTitles.join(', ')}]`
+        ).to.deep.eq(expected)
       })
     },
     navigateToNotebook(notebookName: string) {

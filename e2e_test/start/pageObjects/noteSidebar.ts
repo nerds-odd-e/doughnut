@@ -4,6 +4,10 @@ import {
   openFolderPageForOrganize,
   openFolderPageForOrganizeUnderParent,
 } from './sidebarFolderOrganizeNav'
+import {
+  sidebarAddFolderButton,
+  sidebarAddNoteButton,
+} from './sidebarToolbarButtons'
 
 const sidebarActionTimeoutMs = 20000
 
@@ -51,28 +55,6 @@ function openSidebarIfCollapsed() {
   })
   cy.get('aside').should('be.visible')
 }
-
-const sidebarToolbarButton = (
-  selector: () => Cypress.Chainable<JQuery<HTMLElement>>
-) => {
-  return {
-    click: () => {
-      selector().click({ force: true })
-      return noteCreationForm
-    },
-    shouldNotExist: () => selector().should('not.exist'),
-  }
-}
-
-const sidebarAddNoteButton = () =>
-  sidebarToolbarButton(() =>
-    cy.get('aside [data-testid="note-creation-new-button"] button')
-  )
-
-const sidebarAddFolderButton = () =>
-  sidebarToolbarButton(() =>
-    cy.get('aside').findByRole('button', { name: 'New folder' })
-  )
 
 function newNoteSidebarButton() {
   waitUntilAppIsNotBusy()

@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: null
 milestone_name: null
-current_phase: null
-current_phase_name: null
-status: idle
+current_phase: "2"
+current_phase_name: Recall E2E authoring (browse / pages / spaced / match)
+status: executing
 stopped_at: null
-last_updated: "2026-08-07T04:06:00Z"
+last_updated: "2026-08-07T07:00:00Z"
 last_activity: 2026-08-07
-last_activity_desc: Captured backlog 999.1 — learning with help from a teacher
+last_activity_desc: "Quick 004 Phase 1 bazaar E2E authoring done; starting Phase 2"
 progress:
-  total_phases: 2
-  completed_phases: 2
+  total_phases: 17
+  completed_phases: 1
   total_plans: 1
-  completed_plans: 1
-  percent: 100
+  completed_plans: 0
+  percent: 6
 ---
 
 # Project State
@@ -23,11 +23,13 @@ progress:
 
 See: `.planning/PROJECT.md`
 
-**Current focus:** Idle — quick/003-add-notebook-to-group completed
+**Current focus:** `.planning/quick/004-e2e-authoring-improvement/` — improve all E2E features against `e2e-authoring.mdc`
 
 ## Current Position
 
-No active roadmap phase or quick plan.
+- Plan: `.planning/quick/004-e2e-authoring-improvement/PLAN.md`
+- Context: `.planning/quick/004-e2e-authoring-improvement/CONTEXT.md`
+- Next: Phase 2 — Recall E2E authoring (browse / pages / spaced / match)
 
 ## Deferred Items
 
@@ -39,7 +41,8 @@ No active roadmap phase or quick plan.
 | seed | SEED-002-host-mcp-over-https | dormant |
 | tech_debt | Drop grading/disable wiki-in-`aliases` read bridge after data migrated | open |
 | deferred | Refine note on answered spelling questions | deferred |
+| known | `pnpm lint:all` / `test:path-routing` fails pre-existing (`render from routing JSON substitutes SHA` 6==7) | unrelated to E2E authoring |
 
 ## Session Continuity
 
-Next action: idle — start `/gsd-new-milestone` or a new quick task when ready. Surface SEED-002 when shipping production HTTPS MCP.
+Execute via **execute-plan**: one Behavior phase per domain group (audit → improve → targeted Cypress). Shared checklist in CONTEXT.md.

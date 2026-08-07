@@ -49,9 +49,13 @@ export const subscribedNotebooks = () => {
     },
     expectNotebookNotPresent(notebookName: string) {
       cy.get('main').within(() => {
-        cy.findByText(notebookName, { selector: '.notebook-card h5' }).should(
-          'not.exist'
-        )
+        cy.get('.notebook-card h5').should(($els) => {
+          const titles = Array.from($els, (el) => el.textContent?.trim() ?? '')
+          expect(
+            titles,
+            `Expected subscribed notebook "${notebookName}" to be absent from the catalog, but found [${titles.join(', ')}]`
+          ).to.not.include(notebookName)
+        })
       })
     },
     openNotebook(notebookName: string) {

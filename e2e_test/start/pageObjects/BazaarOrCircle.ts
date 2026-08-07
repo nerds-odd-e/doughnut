@@ -6,7 +6,7 @@ const addToMyLearning = 'Add to my learning'
 export const bazaarOrCircle = () => {
   return {
     ...notebookList(),
-    expectNoAddToMyLearningButton(noteTopology: string) {
+    expectCannotAddToMyLearning(noteTopology: string) {
       findNotebookCardButton(noteTopology, addToMyLearning).shouldNotExist()
     },
     subscribe(notebook: string, dailyLearningCount: string) {

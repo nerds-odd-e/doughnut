@@ -13,4 +13,8 @@ export const sidebarChildNotePageMethods = () => ({
   addingNewFolderFromToolbar() {
     return noteSidebar().addingNewFolderFromToolbar()
   },
+  expectCannotEditNotes() {
+    noteSidebar().addingChildNoteButton().shouldNotExist()
+    return this
+  },
 })

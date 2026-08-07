@@ -4,9 +4,7 @@
 // @ts-check
 
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
-import { commonSenseSplit } from 'support/string_util'
 import start from '../start'
-import { navigateWithinOpenNotebook } from '../start/navigateNotePath'
 
 When('I visit the Bazaar', () => {
   start.navigateToBazaar()
@@ -20,23 +18,13 @@ Then('notebook {string} is shared to the Bazaar', (notebookName: string) => {
   return start.testability().shareToBazaar(notebookName)
 })
 
-Then("there shouldn't be any note edit button", () => {
-  start.assumeNotePage().addingChildNoteButton().shouldNotExist()
+Then('I should not be able to edit the notes', () => {
+  start.assumeNotePage().expectCannotEditNotes()
 })
 
 When('I open the notebook {string} in the Bazaar', (noteTopology: string) => {
   start.assumeBazaarPage().navigateToNotebook(noteTopology)
 })
-
-When(
-  'I open note {string} in folder {string} from the sidebar',
-  (noteTitle: string, folderPath: string) => {
-    navigateWithinOpenNotebook([
-      ...commonSenseSplit(folderPath, '/'),
-      noteTitle,
-    ])
-  }
-)
 
 When(
   'I subscribe to notebook {string} in the bazaar, with target of learning {int} notes per day',
@@ -46,9 +34,9 @@ When(
 )
 
 Then(
-  'I can not see add the notebook {string} to my learning in the bazaar',
+  'I should not be able to add notebook {string} to my learning from the Bazaar',
   (noteTopology: string) => {
-    start.navigateToBazaar().expectNoAddToMyLearningButton(noteTopology)
+    start.navigateToBazaar().expectCannotAddToMyLearning(noteTopology)
   }
 )
 

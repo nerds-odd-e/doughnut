@@ -3,25 +3,26 @@ Feature: Bazaar browsing
 
   Background:
     Given there are some notes for existing user "old_learner" in notebook "Geometry set"
-      | Title            | Content | Folder              |
-      | Shape            | The form of something            |                     |
-      | Rectangle        | four equal straight sides        | Topics              |
-      | Triangle         | three sides shape                | Topics              |
-      | Square           | a square but big                 | Topics/Nested       |
-      | In OOP           | a square is not a Rectangle      | Topics/Nested       |
-      | interface        | their interfaces are different   | Topics/Nested/Oop   |
-      | precondition     | square has stronger precondition | Topics/Nested/Oop   |
-      | Shapes are good  |                                  | Topics              |
+      | Title     | Content                   |
+      | Shape     | The form of something     |
+      | Rectangle | four equal straight sides |
+      | Square    | a square but big          |
     And there is "a specialization of" relationship between note "Square" and "Rectangle" in notebook "Geometry set"
     And notebook "Geometry set" is shared to the Bazaar
-
-  Scenario: Browsing as non-user
-    When I haven't login
+    And I haven't login
     And I visit the Bazaar
+
+  Scenario: Non-user sees notebooks shared to the Bazaar
     Then I should see "Geometry set" shared in the Bazaar
+
+  Scenario: Non-user browses a shared notebook as read-only
     When I open the notebook "Geometry set" in the Bazaar
-    Then there shouldn't be any note edit button
+    Then I should not be able to edit the notes
     And I should see "Bazaar" in breadcrumb
-    When I open note "Rectangle" in folder "Topics" from the sidebar
-    Then there shouldn't be any note edit button
-    And I should see it has relationship to "Square a specialization of Rectangle"
+    When I open the note "Rectangle" from the sidebar
+    Then I should not be able to edit the notes
+
+  Scenario: Non-user can see relationships in shared notes
+    When I open the notebook "Geometry set" in the Bazaar
+    And I open the note "Rectangle" from the sidebar
+    Then I should see it has relationship to "Square a specialization of Rectangle"

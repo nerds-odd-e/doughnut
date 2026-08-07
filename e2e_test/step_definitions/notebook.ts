@@ -37,11 +37,7 @@ Then(
       .navigateToNotebooksPage()
       .subscribedNotebooks()
       .openNotebook(noteTopology)
-    start
-      .waitUntilAppIsNotBusy()
-      .assumeNotePage()
-      .addingChildNoteButton()
-      .shouldNotExist()
+    start.waitUntilAppIsNotBusy().assumeNotePage().expectCannotEditNotes()
   }
 )
 
