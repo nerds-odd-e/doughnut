@@ -20,7 +20,7 @@
         :data-testid="`link-to-matched-note-${matched.id}`"
         :title="addWikiLinkOrRelationshipLabel"
         :aria-label="addWikiLinkOrRelationshipLabel"
-        @click="$emit('buildLink')"
+        @click="$emit('addWikiLinkOrRelationship')"
       >
         {{ addWikiLinkOrRelationshipLabel }}
       </button>
@@ -64,7 +64,7 @@ const props = defineProps({
 })
 
 defineEmits<{
-  (e: "buildLink"): void
+  (e: "addWikiLinkOrRelationship"): void
   (e: "addAsOverlapped"): void
 }>()
 

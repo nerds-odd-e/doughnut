@@ -3,10 +3,10 @@ import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import {
   insertedTexts,
-  openLinkInsertionChoice,
+  openWikiLinkOrRelationshipChoice,
   setupInsertWikiLinkTests,
   wikiPropertyInserted,
-} from "@tests/links/insertWikiLinkTestSupport"
+} from "@tests/wiki-link-or-relationship/insertWikiLinkTestSupport"
 import { describe, expect, it } from "vitest"
 
 describe("InsertWikiLink", () => {
@@ -15,7 +15,7 @@ describe("InsertWikiLink", () => {
   it("calls the registered inserter with a wiki link text when Insert as a wiki link is clicked", async () => {
     const note = MakeMe.aNote.please()
     const targetResult = MakeMe.aNoteSearchResult.title("Target CI").please()
-    await openLinkInsertionChoice(note, {
+    await openWikiLinkOrRelationshipChoice(note, {
       searchKey: "CI",
       targetResult,
     })
@@ -33,7 +33,7 @@ describe("InsertWikiLink", () => {
   it("does not call the inserter when Add a new relationship note is clicked", async () => {
     const note = MakeMe.aNote.please()
     const targetResult = MakeMe.aNoteSearchResult.title("Sedation").please()
-    await openLinkInsertionChoice(note, {
+    await openWikiLinkOrRelationshipChoice(note, {
       searchKey: "Sed",
       targetResult,
       withRouter: true,
@@ -49,7 +49,7 @@ describe("InsertWikiLink", () => {
   it("calls the wiki-property inserter when Add wiki link as a new property is clicked", async () => {
     const note = MakeMe.aNote.please()
     const targetResult = MakeMe.aNoteSearchResult.title("PropTarget").please()
-    await openLinkInsertionChoice(note, {
+    await openWikiLinkOrRelationshipChoice(note, {
       searchKey: "Prop",
       targetResult,
       wikiPropertyCanInsert: true,

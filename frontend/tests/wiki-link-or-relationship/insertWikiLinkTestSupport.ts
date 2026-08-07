@@ -8,7 +8,7 @@ import {
   renderSearchForm,
   setupSearchFormSdkMocks,
   typeInSearch,
-} from "@tests/links/searchDialogTestSupport"
+} from "@tests/wiki-link-or-relationship/searchDialogTestSupport"
 import { afterEach, beforeEach, vi } from "vitest"
 
 export const insertedTexts: string[] = []
@@ -31,7 +31,7 @@ function mockRelationshipSearch(targetResult: NoteSearchResult) {
   ])
 }
 
-export async function openLinkInsertionChoice(
+export async function openWikiLinkOrRelationshipChoice(
   note: Note,
   options: {
     searchKey: string

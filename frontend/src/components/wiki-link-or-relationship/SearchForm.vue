@@ -12,7 +12,7 @@
     @move-under-folder="moveUnderFolder($event)"
     @move-to-notebook-root="moveToNotebookRoot($event)"
   />
-  <LinkInsertionChoice
+  <WikiLinkOrRelationshipChoice
     v-if="selectedSearchResult && !targetSearchResult && note"
     :target-note-topology="selectedSearchResult.noteTopology"
     :wiki-property-option-available="wikiPropertyOptionAvailable"
@@ -35,7 +35,7 @@
 import { ref, computed, nextTick } from "vue"
 import type { Note, NoteSearchResult } from "@generated/doughnut-backend-api"
 import AddRelationshipFinalize from "./AddRelationshipFinalize.vue"
-import LinkInsertionChoice from "./LinkInsertionChoice.vue"
+import WikiLinkOrRelationshipChoice from "./WikiLinkOrRelationshipChoice.vue"
 import SearchForNoteAndFolder from "../search/SearchForNoteAndFolder.vue"
 import usePopups from "../commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"

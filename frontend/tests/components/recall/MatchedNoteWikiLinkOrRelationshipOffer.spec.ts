@@ -3,8 +3,8 @@ import {
   NotebookController,
   TextContentController,
 } from "@generated/doughnut-backend-api/sdk.gen"
-import MatchedNoteLinkOffer from "@/components/recall/MatchedNoteLinkOffer.vue"
-import RelationTypeSelect from "@/components/links/RelationTypeSelect.vue"
+import MatchedNoteWikiLinkOrRelationshipOffer from "@/components/recall/MatchedNoteWikiLinkOrRelationshipOffer.vue"
+import RelationTypeSelect from "@/components/wiki-link-or-relationship/RelationTypeSelect.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import helper, { mockSdkService, testFolderStub } from "@tests/helpers"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
@@ -45,7 +45,9 @@ function buildReviewedAndMatched(): {
 }
 
 function mountOffer(reviewedRealm: NoteRealm, matchedRealm: NoteRealm) {
-  const chain = helper.component(MatchedNoteLinkOffer).withCleanStorage()
+  const chain = helper
+    .component(MatchedNoteWikiLinkOrRelationshipOffer)
+    .withCleanStorage()
   useStorageAccessor().value.refreshNoteRealm(reviewedRealm)
   useStorageAccessor().value.refreshNoteRealm(matchedRealm)
   return chain
@@ -84,7 +86,7 @@ function mockRelationshipCreate(
   )
 }
 
-describe("MatchedNoteLinkOffer", () => {
+describe("MatchedNoteWikiLinkOrRelationshipOffer", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     routerReplace.mockResolvedValue(undefined)

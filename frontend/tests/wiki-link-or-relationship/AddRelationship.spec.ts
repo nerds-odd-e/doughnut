@@ -3,7 +3,7 @@ import {
   NotebookController,
   TextContentController,
 } from "@generated/doughnut-backend-api/sdk.gen"
-import AddRelationshipFinalize from "@/components/links/AddRelationshipFinalize.vue"
+import AddRelationshipFinalize from "@/components/wiki-link-or-relationship/AddRelationshipFinalize.vue"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { formatRelationshipNoteTitle } from "@/utils/relationshipNoteCompose"
 import makeMe from "doughnut-test-fixtures/makeMe"

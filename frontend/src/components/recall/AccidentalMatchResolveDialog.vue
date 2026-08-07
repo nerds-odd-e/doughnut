@@ -18,12 +18,12 @@
         :matched="matched"
         :can-mutate="canOfferMutatingAction(matched.id)"
         :add-as-overlapped-disabled="isOverlapAlreadyDeclared(matched.id)"
-        @build-link="openLinkOffer(matched.id)"
+        @add-wiki-link-or-relationship="openWikiLinkOrRelationshipOffer(matched.id)"
         @add-as-overlapped="addAsOverlappedNote(matched.id)"
       />
     </ul>
   </div>
-  <MatchedNoteLinkOffer
+  <MatchedNoteWikiLinkOrRelationshipOffer
     v-else
     :reviewed-note-id="reviewedNoteId"
     :matched-note-id="step.matchedNoteId"
@@ -35,7 +35,7 @@
 import { computed, inject, ref, type PropType, type Ref } from "vue"
 import type { NoteTopology, User } from "@generated/doughnut-backend-api"
 import AccidentalMatchResolveRow from "@/components/recall/AccidentalMatchResolveRow.vue"
-import MatchedNoteLinkOffer from "@/components/recall/MatchedNoteLinkOffer.vue"
+import MatchedNoteWikiLinkOrRelationshipOffer from "@/components/recall/MatchedNoteWikiLinkOrRelationshipOffer.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { appendOverlapWikiLinkToNoteContent } from "@/utils/appendOverlapWikiLinkToNoteContent"
 import { buildWikiLinkText } from "@/utils/buildWikiLinkText"
@@ -52,7 +52,9 @@ const props = defineProps({
   },
 })
 
-type ResolveStep = { kind: "list" } | { kind: "link"; matchedNoteId: number }
+type ResolveStep =
+  | { kind: "list" }
+  | { kind: "wiki-link-or-relationship"; matchedNoteId: number }
 
 const step = ref<ResolveStep>({ kind: "list" })
 
@@ -101,8 +103,8 @@ function isOverlapAlreadyDeclared(matchedNoteId: number): boolean {
   )
 }
 
-function openLinkOffer(matchedNoteId: number) {
-  step.value = { kind: "link", matchedNoteId }
+function openWikiLinkOrRelationshipOffer(matchedNoteId: number) {
+  step.value = { kind: "wiki-link-or-relationship", matchedNoteId }
 }
 
 function returnToList() {

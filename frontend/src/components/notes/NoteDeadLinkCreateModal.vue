@@ -46,7 +46,7 @@ import type { NoteRealm } from "@generated/doughnut-backend-api"
 import Modal from "@/components/commons/Modal.vue"
 import { realmLeafFolder } from "./useNoteSidebarTree"
 import NoteNewForm from "./NoteNewForm.vue"
-import SearchForm from "@/components/links/SearchForm.vue"
+import SearchForm from "@/components/wiki-link-or-relationship/SearchForm.vue"
 import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
 

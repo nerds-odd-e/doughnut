@@ -6,7 +6,7 @@ export type ShortcutAction =
   | "note-export"
   | "note-delete"
   | "note-search"
-  | "note-link"
+  | "wiki-link-or-relationship"
 
 type KeyMatcher = (e: KeyboardEvent) => boolean
 
@@ -47,7 +47,10 @@ const bindings: Record<ShortcutAction, ShortcutBinding> = {
     matches: (e) => ctrlCmdKeyF(e, false),
     guardEditable: false,
   },
-  "note-link": { matches: (e) => ctrlCmdKeyF(e, true), guardEditable: false },
+  "wiki-link-or-relationship": {
+    matches: (e) => ctrlCmdKeyF(e, true),
+    guardEditable: false,
+  },
 }
 
 const handlerStacks = new Map<ShortcutAction, Array<() => void>>()

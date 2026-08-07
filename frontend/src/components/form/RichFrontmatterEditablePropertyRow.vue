@@ -125,7 +125,7 @@ import RichFrontmatterImagePropertyValue from "@/components/form/RichFrontmatter
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import RichFrontmatterPropertyKeyPresets from "@/components/form/RichFrontmatterPropertyKeyPresets.vue"
 import RichFrontmatterScalarPropertyValue from "@/components/form/RichFrontmatterScalarPropertyValue.vue"
-import RelationTypeSelectCompact from "@/components/links/RelationTypeSelectCompact.vue"
+import RelationTypeSelectCompact from "@/components/wiki-link-or-relationship/RelationTypeSelectCompact.vue"
 import type { WikiTitle } from "@generated/doughnut-backend-api"
 import {
   isImagePropertyKey,

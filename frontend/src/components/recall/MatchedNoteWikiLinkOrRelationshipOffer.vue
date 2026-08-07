@@ -1,5 +1,5 @@
 <template>
-  <LinkInsertionChoice
+  <WikiLinkOrRelationshipChoice
     v-if="selectedSearchResult && sourceNote && !targetSearchResult"
     :target-note-topology="selectedSearchResult.noteTopology"
     :bare-wiki-link-available="false"
@@ -21,8 +21,8 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from "vue"
 import type { Note, NoteSearchResult } from "@generated/doughnut-backend-api"
-import AddRelationshipFinalize from "@/components/links/AddRelationshipFinalize.vue"
-import LinkInsertionChoice from "@/components/links/LinkInsertionChoice.vue"
+import AddRelationshipFinalize from "@/components/wiki-link-or-relationship/AddRelationshipFinalize.vue"
+import WikiLinkOrRelationshipChoice from "@/components/wiki-link-or-relationship/WikiLinkOrRelationshipChoice.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { buildWikiLinkText } from "@/utils/buildWikiLinkText"
 import { parseNoteContentMarkdown } from "@/utils/noteContentFrontmatterParse"

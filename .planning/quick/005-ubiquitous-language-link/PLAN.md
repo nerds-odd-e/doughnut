@@ -109,20 +109,18 @@ Where Doughnut means a **wiki link** and/or **relationship**, stop using bare **
 
 ### Phase 9 — Structure: frontend wiki-link / relationship module names
 
-**Status:** planned  
+**Status:** done  
 **Type:** Structure
 
-- **Enables:** Immediate consistency for maintainers after Behavior copy is done; no user-visible change.
-- Rename `frontend/src/components/links/` and `LinkInsertionChoice` / `MatchedNoteLinkOffer` / `SvgSearchForLink` / shortcut `note-link` toward wiki-link or relationship capability names; update imports and tests.
-- Do **not** rename OpenAPI fields in this phase.
+- `components/wiki-link-or-relationship/`; `WikiLinkOrRelationshipChoice`, `MatchedNoteWikiLinkOrRelationshipOffer`, `SvgSearchForWikiLinkOrRelationship`, shortcut `wiki-link-or-relationship`. Vitest green.
 
-**Done when:** Frontend unit tests for touched modules pass; no observable UI string regression.
+**Done when:** Frontend unit tests for touched modules pass; no observable UI string regression. ✅
 
 ---
 
 ### Phase 10 — Structure: DOM markers for wiki links
 
-**Status:** planned
+**Status:** planned  
 **Type:** Structure
 
 - **Enables:** Selectors and health testids match glossary (`dead-wiki-link`, etc.) after copy already says dead wiki link.

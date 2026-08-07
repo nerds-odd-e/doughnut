@@ -3,7 +3,7 @@ import {
   SearchController,
 } from "@generated/doughnut-backend-api/sdk.gen"
 import type { Note } from "@generated/doughnut-backend-api"
-import SearchForm from "@/components/links/SearchForm.vue"
+import SearchForm from "@/components/wiki-link-or-relationship/SearchForm.vue"
 import Modal from "@/components/commons/Modal.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { fireEvent, screen } from "@testing-library/vue"

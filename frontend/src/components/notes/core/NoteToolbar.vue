@@ -13,13 +13,13 @@
       />
       <PopButton
         v-if="!readonly"
-        ref="linkPopButtonRef"
+        ref="wikiLinkOrRelationshipPopButtonRef"
         :aria-label="wikiLinkOrRelationshipLabel"
         :title="`${wikiLinkOrRelationshipLabel} (Ctrl+Shift+F / Cmd+Shift+F)`"
         :show-close-button="false"
       >
         <template #button_face>
-          <SvgSearchForLink />
+          <SvgSearchForWikiLinkOrRelationship />
         </template>
         <template #default="{ closer }">
           <SearchForm
@@ -73,8 +73,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue"
 import type { Folder, Note, NoteRealm } from "@generated/doughnut-backend-api"
-import SvgSearchForLink from "../../svgs/SvgSearchForLink.vue"
-import SearchForm from "../../links/SearchForm.vue"
+import SvgSearchForWikiLinkOrRelationship from "../../svgs/SvgSearchForWikiLinkOrRelationship.vue"
+import SearchForm from "../../wiki-link-or-relationship/SearchForm.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import { FileCode, LayoutTemplate, MessageCircle, Mic } from "@lucide/vue"
 import NoteAudioTools from "../widgets/NoteAudioTools.vue"
@@ -112,7 +112,9 @@ const showRelocatedNewNote = computed(
 const audioTools = ref(false)
 const toolbarNavRef = ref<HTMLElement | null>(null)
 const { showMoreOptionsInline } = useNoteToolbarMoreOptionsInline(toolbarNavRef)
-const linkPopButtonRef = ref<InstanceType<typeof PopButton> | null>(null)
+const wikiLinkOrRelationshipPopButtonRef = ref<InstanceType<
+  typeof PopButton
+> | null>(null)
 const moreOptionsRef = ref<InstanceType<typeof NoteToolbarMoreOptions> | null>(
   null
 )
@@ -131,8 +133,8 @@ useKeyboardShortcut(
 )
 
 useKeyboardShortcut(
-  "note-link",
-  () => linkPopButtonRef.value?.openDialog(),
+  "wiki-link-or-relationship",
+  () => wikiLinkOrRelationshipPopButtonRef.value?.openDialog(),
   () => !props.readonly && shortcutScope.value
 )
 

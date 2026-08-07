@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: null
 milestone_name: null
-current_phase: "9"
-current_phase_name: Frontend wiki-link module renames
+current_phase: "10"
+current_phase_name: DOM markers for wiki links
 status: executing
 stopped_at: null
-last_updated: "2026-08-07T09:00:00Z"
+last_updated: "2026-08-07T09:20:00Z"
 last_activity: 2026-08-07
-last_activity_desc: "Quick 005 Phase 8 done; starting Phase 9"
+last_activity_desc: "Quick 005 Phase 9 done; starting Phase 10"
 progress:
   total_phases: 10
-  completed_phases: 8
+  completed_phases: 9
   total_plans: 1
   completed_plans: 0
-  percent: 80
+  percent: 90
 ---
 
 # Project State
@@ -29,7 +29,7 @@ See: `.planning/PROJECT.md`
 
 - Plan: `.planning/quick/005-ubiquitous-language-link/PLAN.md`
 - Context: `.planning/quick/005-ubiquitous-language-link/CONTEXT.md`
-- Next: Phase 9 — Structure: frontend wiki-link / relationship module names
+- Next: Phase 10 — Structure: DOM markers for wiki links
 
 ## Deferred Items
 

@@ -2,7 +2,7 @@ import {
   NoteController,
   SearchController,
 } from "@generated/doughnut-backend-api/sdk.gen"
-import SearchForm from "@/components/links/SearchForm.vue"
+import SearchForm from "@/components/wiki-link-or-relationship/SearchForm.vue"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import MakeMe from "doughnut-test-fixtures/makeMe"
