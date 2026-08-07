@@ -132,6 +132,20 @@ class RecallsControllerTests extends ControllerTestBase {
       assertThat(dueMemoryTrackers.getToRepeat(), hasSize(1));
       assertEquals(1, dueMemoryTrackers.totalAssimilatedCount);
     }
+
+    @Test
+    void shouldExcludeCommissionedMemoryTrackersFromOrdinaryRecallLists() {
+      Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
+      testabilitySettings.timeTravelTo(currentTime);
+      Note note = ownedNote();
+      dueTracker(note, currentTime);
+      makeMe.aMemoryTrackerFor(note).commissioned().nextRecallAt(currentTime).please();
+
+      DueMemoryTrackers dueMemoryTrackers = controller.recalling("Asia/Shanghai", 0);
+
+      assertThat(dueMemoryTrackers.getToRepeat(), hasSize(1));
+      assertEquals(1, dueMemoryTrackers.totalAssimilatedCount);
+    }
   }
 
   @Nested

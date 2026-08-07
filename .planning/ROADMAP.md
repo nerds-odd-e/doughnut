@@ -25,12 +25,12 @@
 
 **Context:** `.planning/phases/01-commissioned-tracker-model/`
 
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 01-01-PLAN.md — Tracer: `type=COMMISSIONED` due-recall / count exclusion via `byUserIdFrom` + SC3 (SC2 stay green)
+- [x] 01-01-PLAN.md — Tracer: `type=COMMISSIONED` due-recall / count exclusion via `byUserIdFrom` + SC3 (SC2 stay green)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -164,7 +164,7 @@ Plans:
 
 | Phase | Name | Type | Req | Status |
 |-------|------|------|-----|--------|
-| 1 | Commissioned tracker model | Structure | — | Planned |
+| 1 | Commissioned tracker model | Structure | — | In Progress|
 | 2 | Assimilate as commissioned | Behavior | TRK-01, TRK-02 | Pending |
 | 3 | Potential learning sessions | Behavior | TRK-03, POT-01, POT-02 | Pending |
 | 4 | Learning Session and Request builder | Structure | — | Pending |

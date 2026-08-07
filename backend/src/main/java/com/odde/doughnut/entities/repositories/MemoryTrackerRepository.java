@@ -64,7 +64,8 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
       " FROM memory_tracker rp "
           + " WHERE rp.user_id = :userId "
           + "   AND rp.removed_from_tracking IS FALSE "
-          + "   AND rp.deleted_at IS NULL ";
+          + "   AND rp.deleted_at IS NULL "
+          + "   AND rp.type <> 'COMMISSIONED' ";
 
   String byUserIdWhere =
       " WHERE rp.user_id = :userId "
