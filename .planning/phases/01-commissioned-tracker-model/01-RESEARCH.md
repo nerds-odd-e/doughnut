@@ -1,7 +1,7 @@
 # Phase 1: Commissioned tracker model - Research
 
 **Researched:** 2026-08-07
-**Domain:** Backend domain model / Flyway / due-recall selection (MemoryTracker)
+**Domain:** Backend MemoryTracker type=COMMISSIONED filtering (due-recall, assimilation join, batch candidates)
 **Confidence:** HIGH
 
 <user_constraints>
@@ -21,10 +21,23 @@
 | UI surface | A dialog opened from a button on the recall page's top progress bar |
 | Session lifecycle | A potential learning session is derived in the frontend from due commissioned trackers. A Learning Session exists only once commissioned. Old sessions, and Session Items left without Feedback, are abandoned (deleted) |
 
-MVP: full offline loop; glossary ADR 0001 §3; protocol ADR 0005; score policy ADR 0003 (both Proposed — guide work, agents do not approve).
+MVP: full offline loop; glossary ADR 0001 §3; protocol ADR 0005; score policy ADR 0003 (both Proposed — guide naming/work, agents do not approve).
+
+### Critical foundation (quick 006 — supersedes boolean plans)
+
+Quick plan **006 memory-tracker type** is **done**. Phase 1 must use `MemoryTrackerType.COMMISSIONED`, **not** a boolean `commissioned` column and **not** another unique-key rebuild.
+
+Already shipped:
+
+- Enum `UNDERSTANDING | SPELLING | COMMISSIONED`
+- Column `memory_tracker.type` (VARCHAR STRING enum)
+- Unique key `user_note_spelling_active` includes `type` (not `spelling`)
+- DB column `spelling` **dropped**; wire `spelling` derived from `type == SPELLING`
+- `MemoryTrackerBuilder.commissioned()` / `.spelling()`
+- Migrations tip: `V300000239`
 
 ### Claude's Discretion
-(No separate `## Claude's Discretion` section in CONTEXT.md.) Structure-phase implementation choices are at planner/executor discretion within locked coexistence and Structure constraints: column representation, which selection queries exclude commissioned trackers, makeMe API shape, and how narrowly Phase 1 prepares Phase 2 without speculative Phase 3–7 work.
+(No separate `## Claude's Discretion` section in CONTEXT.md.) Structure-phase implementation choices are at planner/executor discretion within locked coexistence and Structure constraints: **which** selection queries exclude `COMMISSIONED`, whether to add a shared JPQL/SQL fragment constant, how narrowly Phase 1 prepares Phase 2 assimilation join without speculative Phase 3–7 work, and whether ERD regen is needed with no schema change.
 
 ### Deferred Ideas (OUT OF SCOPE)
 From CONTEXT.md MVP / Out of MVP and REQUIREMENTS Out of Scope (Phase 1 must not implement):
@@ -38,6 +51,7 @@ From CONTEXT.md MVP / Out of MVP and REQUIREMENTS Out of Scope (Phase 1 must not
 - Score→schedule application (Phase 6; ADR 0003 commissioned section)
 - Amend recomputation — deferred to `/gsd-plan-phase 7`
 - Notebook-level opt-in; replacing ordinary trackers; session identity codes in protocol
+- Boolean `commissioned` column / unique-key rebuild (obsolete — do not plan)
 </user_constraints>
 
 <phase_requirements>
@@ -47,29 +61,29 @@ Phase 1 is **Structure** — no user-facing requirement IDs. It unlocks TRK-* fo
 
 | ID | Description | Research Support |
 |----|-------------|------------------|
-| *(none)* | Persist commissioned MemoryTracker variant; exclude from ordinary due-recall; no user-visible path change | Boolean `commissioned` column + unique-key rebuild; filter in due-selection native query; prove via RecallsController + makeMe; leave assimilate API / UI for Phase 2 |
-| TRK-02 (unlocked) | Coexistence with ordinary trackers | Unique key today blocks a second note-level active tracker with same `(user, note, spelling, property_key)`; must include `commissioned` in uniqueness |
-| TRK-03 (unlocked later) | Due commissioned do not appear as ordinary recall | Gate at `MemoryTrackerRepository.findAllByUserAndNextRecallAtLessThanEqualOrderByNextRecallAt` used by `UserService.getMemoryTrackersNeedToRepeat` → `RecallService` |
+| *(none)* | Persist commissioned MemoryTracker variant; exclude from ordinary due-recall; no user-visible path change | Variant **already persists** via `type=COMMISSIONED` (006). Phase 1 work is **filters + proofs**: due SQL, assimilation join, batch candidates |
+| TRK-02 (unlocked) | Coexistence with ordinary trackers | Unique key already includes `type` `[VERIFIED: V300000239]`; coexistence unit test already exists |
+| TRK-03 (unlocked later) | Due commissioned do not appear as ordinary recall | Gate at `MemoryTrackerRepository.findAllByUserAndNextRecallAtLessThanEqualOrderByNextRecallAt` — **does not yet exclude COMMISSIONED** |
 </phase_requirements>
 
 ## Summary
 
-Phase 1 must add a durable **commissioned memory tracker** variant on the existing `memory_tracker` table and ensure ordinary due-recall selection never returns those rows, without changing assimilation UI or Learning Session entities. Today a note can already hold multiple trackers (note-level, spelling, and property-keyed), but active uniqueness is enforced by `user_note_spelling_active` on `(user_id, note_id, spelling, property_key, soft-delete expression)`. Without extending that key, a commissioned note-level tracker **cannot** coexist with an ordinary note-level tracker — the core locked decision of this milestone.
+Phase 1 is a **Structure** phase: make the commissioned tracker variant usable for later phases by keeping it out of ordinary due-recall (and ordinary assimilation detection), without any user-visible create path. Quick **006** already delivered the durable representation (`MemoryTrackerType.COMMISSIONED`, `type` column, unique key on `type`, makeMe `.commissioned()`). Prior Phase 1 research/plans that add a boolean `commissioned` column or rebuild uniqueness are **obsolete** and must not be followed.
 
-Due recall flows through `RecallsController.recalling` → `RecallService.getDueMemoryTrackers` → `UserService.getMemoryTrackersNeedToRepeat` → `MemoryTrackerRepository.findAllByUserAndNextRecallAtLessThanEqualOrderByNextRecallAt`. That native query (and the shared `byUserIdFrom` fragment used by counts/lists) is the primary exclusion seam. Question-generation candidate selection has a parallel due-style query that should also exclude commissioned trackers so AI prep does not treat them as ordinary recall work.
+What remains unverified in production selection seams: due-recall SQL still returns any active due tracker including `COMMISSIONED`; batch question-gen candidates exclude `SPELLING` but not `COMMISSIONED`; `NoteRepository.joinMemoryTracker` treats any note-level tracker (including commissioned-only) as “already assimilated,” which would block Phase 2 ordinary assimilate of a commissioned-only note. Coexistence is already proven in `AssimilationControllerTests.understandingAndCommissionedTrackersCanCoexistOnSameNote`.
 
-**Primary recommendation:** Add `commissioned` `tinyint(1) NOT NULL DEFAULT 0` (mirror `spelling`), rebuild the unique index to include `commissioned`, default entity/`buildMemoryTracker*` to false, extend `MemoryTrackerBuilder` with `.commissioned()`, filter `AND rp.commissioned IS FALSE` (or equivalent) in due-selection (and batch-candidate) SQL, and prove Structure success with controller-boundary unit tests — do **not** change assimilate request/UI or Learning Session tables in this phase.
+**Primary recommendation:** No new Flyway migration. Add `AND rp.type <> 'COMMISSIONED'` to `byUserIdFrom` (due list + `countByUserNotRemoved`), add the same exclusion to `findBatchQuestionGenerationCandidatesByUser`, and extend `NoteRepository.joinMemoryTracker` with JPQL `rp.type <> MemoryTrackerType.COMMISSIONED` so commissioned-only notes stay ordinarily assimilable. Prove SC3 via `RecallsControllerTests` using `.commissioned()`; prove assimilation-queue + batch exclusion with focused unit tests. Do not change assimilate API/UI or `MemoryTrackerAssimilation` create logic (Phase 2).
 
 ## Architectural Responsibility Map
 
 | Capability | Primary Tier | Secondary Tier | Rationale |
 |------------|-------------|----------------|-----------|
-| Persist commissioned flag on MemoryTracker | Database / Storage | API / Backend | Flyway column + JPA entity field; uniqueness is a DB constraint |
-| Domain representation / builders | API / Backend | — | Entity + makeMe; no browser involvement in Structure phase |
-| Exclude from ordinary due-recall | API / Backend | Database / Storage | Selection query ownership; RecallService is the HTTP-facing aggregator |
-| Exclude from question-gen due candidates | API / Backend | Database / Storage | Same due-work concept; prevents accidental ordinary-path work |
-| Unassimilated-note detection treats only ordinary trackers | API / Backend | Database / Storage | Needed so a commissioned-only note can still be ordinarily assimilable in Phase 2 |
-| Assimilate-as-commissioned UI / DTO | Browser / Client | API / Backend | **Phase 2** — out of Phase 1 |
+| Persist commissioned variant | Database / Storage | API / Backend | **Already done** in 006 (`type` + unique key) |
+| Domain / makeMe fixtures | API / Backend | — | Entity enum + `.commissioned()` already exist |
+| Exclude from ordinary due-recall | API / Backend | Database / Storage | Native SQL in `MemoryTrackerRepository` |
+| Exclude from question-gen due candidates | API / Backend | Database / Storage | Parallel due-style native query |
+| Unassimilated-note detection ignores commissioned | API / Backend | Database / Storage | JPQL join in `NoteRepository` — Phase 2-ready |
+| Assimilate-as-commissioned create path / UI | Browser / Client | API / Backend | **Phase 2** — out of Phase 1 |
 | Potential learning sessions UI | Browser / Client | API / Backend | **Phase 3** |
 | Learning Session / Request / Report | API / Backend | Browser / Client | **Phases 4–7** |
 
@@ -78,26 +92,27 @@ Due recall flows through `RecallsController.recalling` → `RecallService.getDue
 ### Core
 | Library | Version | Purpose | Why Standard |
 |---------|---------|---------|--------------|
-| Spring Data JPA + native `@Query` | project backend stack | MemoryTracker persistence and due selection | Existing repository pattern for due lists `[VERIFIED: backend/src/main/java/com/odde/doughnut/entities/repositories/MemoryTrackerRepository.java:11-33]` |
-| Flyway SQL migrations | project backend stack | Schema change | `db-migration.mdc`; next version **> `300000237`** `[VERIFIED: backend/src/main/resources/db/migration/ — highest V300000237]` |
-| JUnit + MakeMe | project test stack | Structure proofs | Controller-boundary “small tests” per `backend-testing.mdc` / `unit-testing.mdc` |
-| MySQL 8 functional unique key | existing DDL | Soft-delete-aware uniqueness | Already used on `memory_tracker` `[VERIFIED: V100000000__baseline.sql:369]` |
+| Spring Data JPA + native `@Query` | project backend stack | Due selection / batch candidates | Existing repository pattern `[VERIFIED: MemoryTrackerRepository.java:11-126]` |
+| JPA `@Enumerated(EnumType.STRING)` | project entity | `MemoryTracker.type` VARCHAR | Already on entity `[VERIFIED: MemoryTracker.java:85-88]` |
+| JUnit + MakeMe | project test stack | Structure proofs | Controller-boundary “small tests” (`backend-testing.mdc` / `unit-testing.mdc`) |
+| Flyway | project migrations | Schema | Tip `V300000239` — **no new migration for Phase 1** |
 
 ### Supporting
 | Library | Version | Purpose | When to Use |
 |---------|---------|---------|-------------|
-| OpenAPI / `pnpm generateTypeScript` | repo script | Regenerate TS client if `MemoryTracker` schema gains `commissioned` | After entity field is exposed on API responses (Springdoc) — Phase 1 may trigger regen if assimilated/show payloads include the new field |
+| OpenAPI / generated TS client | already includes `type?: 'UNDERSTANDING' \| 'SPELLING' \| 'COMMISSIONED'` | Wire shape | **No regen required** for Phase 1 if no controller/DTO signature change `[VERIFIED: packages/generated/doughnut-backend-api/types.gen.ts:604-613]` |
+| `database-erd` skill | repo script | ERD refresh | Only if planner wants ERD to surface `type`; **no schema change** this phase |
 
 ### Alternatives Considered
 | Instead of | Could Use | Tradeoff |
 |------------|-----------|----------|
-| Boolean `commissioned` | String/enum `tracker_kind` | Enum is more extensible but heavier than existing `spelling` / `removed_from_tracking` boolean flags; Phase 1 only needs one variant |
-| Separate `commissioned_memory_tracker` table | Flag on `memory_tracker` | Duplicate scheduling columns and break shared schedule paths; ADR vocabulary treats it as a MemoryTracker variant |
-| Encode commissioned via reserved `property_key` | Dedicated column | Conflicts with property trackers and glossary; uniqueness semantics become opaque |
+| Filter on `type <> 'COMMISSIONED'` | New boolean `commissioned` | **Obsolete** — conflicts with 006; unique key already uses `type` |
+| Post-load filter in `RecallService` only | SQL exclusion | Counts/streams would disagree; loads then drops rows |
+| Separate commissioned table | Shared `memory_tracker` row | Breaks shared schedule columns; glossary treats it as a MemoryTracker variant (ADR 0001 Proposed) |
 
 **Installation:** none — no new packages.
 
-**Version verification:** N/A (in-repo stack only). Highest migration tip: `V300000237__add_memory_tracker_next_recall_at_index.sql`. Boolean column precedent: `V300000232__add_health_remove_empty_folders_default.sql` uses `tinyint(1) NOT NULL DEFAULT 0`.
+**Version verification:** N/A (in-repo stack only). Migration tip: `V300000239__memory_tracker_unique_on_type_drop_spelling.sql`.
 
 ## Package Legitimacy Audit
 
@@ -116,350 +131,374 @@ Due recall flows through `RecallsController.recalling` → `RecallService.getDue
 
 ```mermaid
 flowchart TD
-  subgraph phase1 [Phase 1 Structure]
-    MT[(memory_tracker<br/>+ commissioned)]
-    Mig[Flyway migration<br/>column + unique index]
-    Entity[MemoryTracker entity]
-    MakeMe[MemoryTrackerBuilder.commissioned]
-    DueQ[findAllByUserAndNextRecallAt...<br/>AND commissioned IS FALSE]
-    BatchQ[findBatchQuestionGenerationCandidates...<br/>AND commissioned IS FALSE]
-    Unassim[NoteRepository joinMemoryTracker<br/>ordinary trackers only]
+  subgraph alreadyDone [Shipped by quick 006]
+    Enum[MemoryTrackerType<br/>UNDERSTANDING / SPELLING / COMMISSIONED]
+    Col[memory_tracker.type VARCHAR]
+    UK[user_note_spelling_active includes type]
+    Builder[makeMe .commissioned]
   end
 
-  Mig --> MT
-  Entity --> MT
-  MakeMe --> Entity
-  DueQ --> MT
-  BatchQ --> MT
-  Unassim --> MT
+  subgraph phase1 [Phase 1 Structure work]
+    DueQ["findAllByUserAndNextRecallAt...<br/>AND type <> 'COMMISSIONED'"]
+    BatchQ["findBatchQuestionGenerationCandidates...<br/>AND type <> 'COMMISSIONED'"]
+    JoinQ["NoteRepository.joinMemoryTracker<br/>AND type <> COMMISSIONED"]
+  end
 
-  HTTP["GET /api/recalls/recalling"] --> RS[RecallService]
+  Recalling[RecallsController.recalling] --> RS[RecallService.getDueMemoryTrackers]
   RS --> US[UserService.getMemoryTrackersNeedToRepeat]
   US --> DueQ
+  DueQ --> Enum
 
-  subgraph later [Later phases - do not touch]
-    UI[Assimilate caret / potential session UI]
-    LS[Learning Session entities]
-  end
+  BatchPlan[QuestionGenerationBatchPlanningService] --> BatchQ
+  AssimQueue[AssimilationService unassimilated notes] --> JoinQ
+
+  Enum --> Col
+  Col --> UK
+  Builder --> Col
 ```
 
 ### Recommended Project Structure
 
 ```
-backend/src/main/resources/db/migration/
-  V300000238__add_memory_tracker_commissioned.sql   # or next free version > 237
-backend/src/main/java/com/odde/doughnut/entities/
-  MemoryTracker.java                                 # commissioned field + defaults
-backend/src/main/java/.../repositories/
-  MemoryTrackerRepository.java                       # due + batch SQL filters
-  NoteRepository.java                                # unassimilated join ignores commissioned
-backend/src/test/java/.../testability/builders/
-  MemoryTrackerBuilder.java                          # .commissioned()
-backend/src/test/java/.../controllers/
-  RecallsControllerTests.java                        # exclusion + coexistence proofs
+backend/src/main/java/com/odde/doughnut/
+├── entities/
+│   ├── MemoryTracker.java          # type field + optional JPQL fragment for ordinary trackers
+│   └── MemoryTrackerType.java      # UNDERSTANDING | SPELLING | COMMISSIONED (done)
+├── entities/repositories/
+│   ├── MemoryTrackerRepository.java  # byUserIdFrom + batch candidates filters
+│   └── NoteRepository.java           # joinMemoryTracker ordinary-only
+└── services/
+    ├── RecallService.java            # consumes due query (no new create path)
+    └── MemoryTrackerAssimilation.java # DO NOT change create logic in Phase 1
+
+backend/src/test/java/com/odde/doughnut/
+├── controllers/RecallsControllerTests.java
+├── controllers/AssimilationControllerTests.java  # coexistence already present
+└── services/QuestionGenerationBatchLocalPlanningTest.java
 ```
 
-### Pattern 1: Boolean discriminator like `spelling`
-**What:** Persist a `tinyint(1)` flag on `memory_tracker`, map to `Boolean` on the entity, default `false` in Java and SQL.
-**When to use:** Binary product variants that share the same scheduling columns.
-**Example (existing spelling field):**
+### Pattern 1: Native SQL type filter (mirror SPELLING)
+**What:** Compare VARCHAR enum column to a **code literal** enum name in native SQL.
+**When to use:** Due-recall and batch-candidate native queries.
+**Example:** Existing SPELLING exclusion already in repo:
+
 ```java
-// Source: backend/src/main/java/com/odde/doughnut/entities/MemoryTracker.java:83-86
-@Column(name = "spelling")
-@Getter
-@Setter
-private Boolean spelling = false;
+// Source: backend/src/main/java/com/odde/doughnut/entities/repositories/MemoryTrackerRepository.java:98-105
+"  AND mt.type <> 'SPELLING' "
 ```
 
-### Pattern 2: Soft-delete-aware uniqueness
-**What:** Keep functional key part `(if((deleted_at is null),1,NULL))` and add `commissioned` into the unique column list.
-**When to use:** Coexistence of ordinary + commissioned active rows for the same note/user/spelling/property_key.
-**Existing DDL (must be rebuilt, not left as-is):**
-```sql
--- Source: backend/src/main/resources/db/migration/V100000000__baseline.sql:369
-UNIQUE KEY `user_note_spelling_active` (`user_id`,`note_id`,`spelling`,`property_key`,(if((`deleted_at` is null),1,NULL))),
-```
+Add parallel:
 
-### Pattern 3: Due selection via shared SQL fragment
-**What:** Ordinary due work uses `byUserIdFrom` + `next_recall_at <= :nextRecallAt`.
-**When to use:** Any change that must keep recall lists and counts consistent.
 ```java
-// Source: MemoryTrackerRepository.java:63-67
-String byUserIdFrom =
-    " FROM memory_tracker rp "
-        + " WHERE rp.user_id = :userId "
-        + "   AND rp.removed_from_tracking IS FALSE "
-        + "   AND rp.deleted_at IS NULL ";
+"  AND mt.type <> 'COMMISSIONED' "
+```
+
+### Pattern 2: JPQL enum constant filter (mirror property unassimilated join)
+**What:** Exclude enum values in JPQL with fully-qualified enum constants.
+**When to use:** `NoteRepository.joinMemoryTracker` (and optionally property target-note gate).
+**Example:** Existing SPELLING exclusion:
+
+```java
+// Source: backend/src/main/java/com/odde/doughnut/entities/repositories/NotePropertyIndexRepository.java:13-17
+" LEFT JOIN n.memoryTrackers mt ON mt.user.id = :userId"
+    + " AND mt.deletedAt IS NULL"
+    + " AND mt.type <> com.odde.doughnut.entities.MemoryTrackerType.SPELLING"
+    + " AND mt.propertyKey = i.propertyKey";
+```
+
+For note-level ordinary assimilation detection, add to `joinMemoryTracker`:
+
+```java
++ " AND rp.type <> com.odde.doughnut.entities.MemoryTrackerType.COMMISSIONED"
+```
+
+Prefer a shared constant on `MemoryTracker` next to `JPA_WHERE_NOTE_LEVEL_TRACKER` if the planner wants one representation.
+
+### Pattern 3: makeMe `.commissioned()` for Structure proofs
+**What:** Persist commissioned fixtures without a product create path.
+**When to use:** All Phase 1 unit proofs (SC2/SC3, assimilation queue, batch).
+**Example:**
+
+```java
+// Source: MemoryTrackerBuilder.java:58-60 + AssimilationControllerTests.java:126-133
+makeMe.aMemoryTrackerFor(note).commissioned().please();
 ```
 
 ### Anti-Patterns to Avoid
-- **Speculative Learning Session schema in Phase 1:** Violates Structure “only for immediate next behavior” (Phase 2 is assimilate-as-commissioned).
-- **Hiding commissioned via `removed_from_tracking`:** That flag means “skip memory tracking” / user opted out — wrong semantics and would break assimilation settings UX later.
-- **Encoding type in `property_key`:** Collides with property memory trackers and ADR glossary.
-- **Changing assimilate HTTP contract now:** Phase 2 owns `AssimilationRequestDTO` / caret; Phase 1 proves via makeMe + selection.
-- **Editing committed migrations / baseline in place:** Always add a new Flyway file (`db-migration.mdc`).
+- **Boolean `commissioned` column / unique-key rebuild:** Obsolete vs 006; wastes a Structure phase and risks dual representations.
+- **Filtering only in Java after load:** Breaks `countByUserNotRemoved` / `totalAssimilatedCount` consistency.
+- **Changing `MemoryTrackerAssimilation.assimilate` in Phase 1:** That is Phase 2 Behavior (create commissioned / ignore commissioned when ordinarily assimilating). Join filter alone makes the note appear in the queue; create path is separate.
+- **Hand-editing `docs/database-erd.md` or generated OpenAPI/TS:** Use skills/scripts only; skip if no schema/DTO change.
+- **Encoding phase numbers in product test names:** Capability-named tests only (`planning.mdc`).
 
 ## Don't Hand-Roll
 
 | Problem | Don't Build | Use Instead | Why |
 |---------|-------------|-------------|-----|
-| Soft-delete uniqueness | App-level uniqueness checks only | MySQL functional UNIQUE like existing key | Race-safe; matches current spelling/property coexistence |
-| Due-list filtering in Java streams | Post-load filter in RecallService only | SQL `AND commissioned IS FALSE` on repository query | Keeps counts/streams consistent; avoids loading then dropping |
-| New microservice / table for commissioned | Separate aggregate | Flag on `memory_tracker` | Shared schedule fields; ADR calls it a MemoryTracker variant |
-| Custom migration runner | Ad-hoc SQL scripts | Flyway `V{n}__*.sql` | Repo standard; auto-runs on startup / tests |
+| Persist commissioned variant | New boolean column + migration | Existing `MemoryTrackerType.COMMISSIONED` | Unique key and API already use `type` |
+| Coexistence uniqueness | App-only checks | Existing `user_note_spelling_active` on `type` | DB constraint; let failures surface (`error-handling.mdc`) |
+| Due exclusion | Custom RecallService stream filter | Native SQL `type <> 'COMMISSIONED'` | Aligns with SPELLING pattern; consistent counts |
+| Test fixtures | Manual `setType` soup | `.commissioned()` | Builder already shipped |
+| SQLi-safe filters | Concatenate user strings into type clause | Literal `'COMMISSIONED'` + `@Param` for userId/dueBy | ASVS L1 parameterized queries |
 
-**Key insight:** The hard problem is **uniqueness + selection**, not scheduling math. Reuse the `spelling` flag pattern end-to-end.
-
-## Runtime State Inventory
-
-> Schema migration / model extension phase — inventory of runtime state for the new discriminator.
-
-| Category | Items Found | Action Required |
-|----------|-------------|------------------|
-| Stored data | All existing `memory_tracker` rows lack `commissioned`; must default to ordinary (`0`) | Migration `DEFAULT 0` — no backfill rewrite of strength/dates |
-| Live service config | None for tracker type | none |
-| OS-registered state | None | none — verified by scope (DB/app only) |
-| Secrets/env vars | None referencing tracker kind | none |
-| Build artifacts | Generated OpenAPI/TS client may gain `commissioned?: boolean` on `MemoryTracker` after regen | Run `pnpm generateTypeScript` if Springdoc schema changes; do not hand-edit generated files |
-
-**Nothing found in category:** Live service config / OS state / secrets — none for this discriminator (verified by codebase scope: only `memory_tracker` DDL + JPA + selection queries).
+**Key insight:** Phase 1 is **selection-seam Structure**, not schema invention. 006 already made coexistence representable; Phase 1 makes ordinary paths ignore COMMISSIONED.
 
 ## Common Pitfalls
 
-### Pitfall 1: Unique key blocks coexistence
-**What goes wrong:** Inserting a commissioned note-level tracker fails with duplicate-key when an ordinary note-level tracker exists.
-**Why it happens:** Unique key is `(user_id, note_id, spelling, property_key, soft-delete expr)` without `commissioned` `[VERIFIED: V100000000__baseline.sql:369]`.
-**How to avoid:** Same migration: `DROP INDEX user_note_spelling_active` then `ADD UNIQUE` including `commissioned`.
-**Warning signs:** Integration/unit persist of two trackers on one note throws; Phase 2 assimilate cannot coexist.
+### Pitfall 1: Following stale boolean PLANs
+**What goes wrong:** Planner/executor adds `V300000238__commissioned` / unique-key work that conflicts with 006.
+**Why it happens:** `01-01-PLAN.md` / `01-02-PLAN.md` / old RESEARCH still describe boolean column.
+**How to avoid:** Treat those plans as **stale**; replan from this RESEARCH. Tip migration remains `V300000239`.
+**Warning signs:** Any task mentioning `commissioned IS FALSE` column or `01-UNIQUE-KEY-DECISION.md`.
 
-### Pitfall 2: Filtering only RecallService, not SQL
-**What goes wrong:** Due list empty in one path but menu/`totalAssimilatedCount` / batch gen still treat commissioned as ordinary.
-**Why it happens:** Multiple consumers of repository queries (`countByUserNotRemoved`, `findBatchQuestionGenerationCandidatesByUser`, recent lists).
-**How to avoid:** Put exclusion in shared `byUserIdFrom` / due query and explicitly decide per-query whether commissioned belongs (due: no; recent assimilations list: maybe yes for settings later — Phase 2).
-**Warning signs:** Tests pass for `toRepeat` but question-gen picks commissioned IDs.
+### Pitfall 2: Due SQL still returns COMMISSIONED
+**What goes wrong:** SC3 fails; Phase 3 “ordinary recall empty” is harder.
+**Why it happens:** `findAllByUserAndNextRecallAtLessThanEqualOrderByNextRecallAt` uses `byUserIdFrom` with no type filter today `[VERIFIED: MemoryTrackerRepository.java:26-33,63-67]`.
+**How to avoid:** Add `AND rp.type <> 'COMMISSIONED'` to `byUserIdFrom` (covers due list + `countByUserNotRemoved` / `totalAssimilatedCount`). Keep `ORDER BY … (rp.type = 'SPELLING') DESC` as-is.
+**Warning signs:** `RecallsController.recalling` returns a lite for a `.commissioned()` due tracker.
 
-### Pitfall 3: Unassimilated join treats commissioned as “already assimilated”
-**What goes wrong:** Note with only a commissioned tracker disappears from ordinary assimilation queue.
-**Why it happens:** `NoteRepository.joinMemoryTracker` joins any non-deleted note-level tracker `[VERIFIED: NoteRepository.java:154-158]`.
-**How to avoid:** Restrict join to non-commissioned (ordinary) trackers in Phase 1 so Phase 2 stop-safe coexistence works.
-**Warning signs:** After makeMe commissioned-only fixture, assimilation due count drops unexpectedly.
+### Pitfall 3: Assimilation join blocks Phase 2
+**What goes wrong:** Note with only a commissioned tracker never appears in ordinary assimilation queue.
+**Why it happens:** `joinMemoryTracker` joins all note-level trackers; `WHERE rp IS NULL` fails when COMMISSIONED exists `[VERIFIED: NoteRepository.java:148-158]`.
+**How to avoid:** Exclude COMMISSIONED on the join (Pattern 2). Prove with AssimilationController / AssimilationService queue assertion.
+**Warning signs:** `getUnassimilatedNotes` / assimilate status omits commissioned-only note.
 
-### Pitfall 4: `assimilate()` short-circuits on any note-level tracker
-**What goes wrong:** Phase 2 cannot add commissioned when ordinary exists (returns empty list).
-**Why it happens:** `MemoryTrackerService.assimilate` treats `existingNoteLevelTrackers` without distinguishing commissioned `[VERIFIED: MemoryTrackerService.java:81-97]`.
-**How to avoid:** **Do not “fix” assimilate in Phase 1** unless needed for Structure tests; document as **Phase 2** required change. Phase 1 proves coexistence via makeMe + DB unique key.
-**Warning signs:** Planner schedules assimilate DTO work in Phase 1.
+### Pitfall 4: Batch candidates pull commissioned IDs
+**What goes wrong:** AI question prep treats commissioned trackers as ordinary due work.
+**Why it happens:** `findBatchQuestionGenerationCandidatesByUser` excludes SPELLING only `[VERIFIED: MemoryTrackerRepository.java:104]`.
+**How to avoid:** Add `AND mt.type <> 'COMMISSIONED'` beside SPELLING filter; assert in `QuestionGenerationBatchLocalPlanningTest`.
+**Warning signs:** Planned batch requests include a commissioned tracker id.
 
-### Pitfall 5: Observability creep / API surface
-**What goes wrong:** Regenerating OpenAPI / frontend fixtures without need, or leaking incomplete UI.
-**Why it happens:** Entity `MemoryTracker` is the assimilate/show response body; new field serializes by default.
-**How to avoid:** Accept wire field default `false` as non-behavioral for Structure; regenerate client if CI/OpenAPI checks require it; no UI copy yet.
-**Warning signs:** Frontend PRs in Phase 1 beyond fixture type updates.
+### Pitfall 5: Over-scoping assimilate create logic
+**What goes wrong:** Phase 1 edits `MemoryTrackerAssimilation` to create COMMISSIONED or to ignore COMMISSIONED on create — Behavior work / Phase 2.
+**Why it happens:** Join fix alone does not make `assimilate()` create ordinary trackers when COMMISSIONED already exists (`existingNoteLevelTrackers` includes commissioned) `[VERIFIED: MemoryTrackerAssimilation.java:50-66]`.
+**How to avoid:** Document for Phase 2; Phase 1 only proves **queue** visibility via join. Structure stop-safe: filters + tests only.
+**Warning signs:** AssimilationRequestDTO / caret UI / create COMMISSIONED in Phase 1 tasks.
 
-### Pitfall 6: Using Proposed ADRs as Accepted
-**What goes wrong:** Agents “approve” or invent conflicting names.
-**Why it happens:** ADR 0001 / 0003 / 0005 are **Proposed** `[VERIFIED: docs/adrs/0001-ubiquitous-language.md:3]` / `[VERIFIED: docs/adrs/0003-spaced-repetition-scheduling-policy.md:3]`.
-**How to avoid:** Use glossary names (`commissioned memory tracker`) for new identifiers; do not implement score→schedule or session protocol in Phase 1; humans approve ADRs.
+### Pitfall 6: Filtering recent lists accidentally
+**What goes wrong:** Settings / recent tracker lists hide commissioned trackers needed later for Feedback visibility.
+**Why it happens:** Putting filter on `byUserIdWhere` as well as `byUserIdFrom`.
+**How to avoid:** Filter **`byUserIdFrom` only** (due + total count). Leave `findByUserAndNote`, `findLast100ByUser` / `byUserIdWhere` unfiltered in Phase 1.
+**Warning signs:** `findLast100ByUser` tests fail for commissioned fixtures.
 
 ## Code Examples
 
-### Due-recall exclusion (recommended SQL delta)
-```sql
--- Extend existing due query fragment (conceptual)
-AND rp.removed_from_tracking IS FALSE
-AND rp.deleted_at IS NULL
-AND rp.commissioned IS FALSE
-```
-Source pattern: `[VERIFIED: MemoryTrackerRepository.java:63-67]` `byUserIdFrom`.
+### Due exclusion via `byUserIdFrom`
 
-### makeMe coexistence fixture (Phase 1 test)
 ```java
+// Target shape — append to existing fragment
+// Source pattern: MemoryTrackerRepository.java:63-67
+String byUserIdFrom =
+    " FROM memory_tracker rp "
+        + " WHERE rp.user_id = :userId "
+        + "   AND rp.removed_from_tracking IS FALSE "
+        + "   AND rp.deleted_at IS NULL "
+        + "   AND rp.type <> 'COMMISSIONED' ";
+```
+
+### SC3 controller-boundary proof
+
+```java
+// Source style: RecallsControllerTests.java Repeat nested + makeMe .commissioned()
 Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
 Timestamp now = makeMe.aTimestamp().of(0, 0).please();
-makeMe.aMemoryTrackerFor(note).nextRecallAt(now).please(); // ordinary
+testabilitySettings.timeTravelTo(now);
+makeMe.aMemoryTrackerFor(note).nextRecallAt(now).please();
 makeMe.aMemoryTrackerFor(note).commissioned().nextRecallAt(now).please();
 
 DueMemoryTrackers due = controller.recalling("Asia/Shanghai", 0);
 assertThat(due.getToRepeat(), hasSize(1)); // only ordinary
 ```
-Drive via `RecallsController` per `backend-testing.mdc` stable boundary.
 
-### Flyway migration skeleton
-```sql
-ALTER TABLE `memory_tracker`
-  ADD COLUMN `commissioned` tinyint(1) NOT NULL DEFAULT 0;
+### Coexistence (already present — keep green)
 
-ALTER TABLE `memory_tracker`
-  DROP INDEX `user_note_spelling_active`,
-  ADD UNIQUE KEY `user_note_spelling_active`
-    (`user_id`,`note_id`,`spelling`,`property_key`,`commissioned`,(if((`deleted_at` is null),1,NULL)));
-```
-Boolean ADD precedent: `[VERIFIED: V300000232__add_health_remove_empty_folders_default.sql:3]`  
-Unique key base: `[VERIFIED: V100000000__baseline.sql:369]`
-
-### Entity field (mirror spelling)
 ```java
-@Column(name = "commissioned")
-@Getter
-@Setter
-private Boolean commissioned = false;
+// Source: AssimilationControllerTests.java:126-133
+makeMe.aMemoryTrackerFor(note).please();
+makeMe.aMemoryTrackerFor(note).commissioned().please();
+assertThat(
+    memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), note.getId()),
+    hasSize(2));
+```
+
+### Enum definition (do not re-add)
+
+```java
+// Source: MemoryTrackerType.java:3-7
+public enum MemoryTrackerType {
+  UNDERSTANDING,
+  SPELLING,
+  COMMISSIONED
+}
 ```
 
 ## State of the Art
 
-| Old Approach | Current Approach | When Changed | Impact |
-|--------------|------------------|--------------|--------|
-| Single note-level tracker per user/note (plus spelling/property axes) | Same axes **plus** commissioned discriminator for coexistence | Phase 1 (this work) | Enables Tutor-path trackers without replacing ordinary recall |
-| Due list = all active trackers by `next_recall_at` | Due list = active **non-commissioned** trackers | Phase 1 | Ordinary recall UX unchanged when commissioned rows exist |
+| Old Approach (stale Phase 1 plans) | Current Approach (post-006) | When Changed | Impact |
+|------------------------------------|----------------------------|--------------|--------|
+| Boolean `commissioned` + unique rebuild | `type` enum includes COMMISSIONED; UK on `type` | 2026-08-07 quick 006 | Phase 1 = filters only |
+| `spelling` tinyint column | Wire `spelling` derived from `type == SPELLING` | 006 V300000238–239 | ORDER BY uses `(rp.type = 'SPELLING')` |
+| Unique on `(…, spelling, …)` | Unique on `(…, type, …)` | V300000239 | Coexistence UNDERSTANDING + COMMISSIONED works |
 
 **Deprecated/outdated:**
-- Treating “skip / remove from tracking” as a stand-in for commissioned — wrong product meaning.
+- `01-01-PLAN.md` / `01-02-PLAN.md` / `01-VALIDATION.md` / `01-PATTERNS.md` boolean/`commissioned IS FALSE` content — **stale**; planner must rewrite
+- `01-UNIQUE-KEY-DECISION.md` checkpoint — **not needed** (006 decided)
 
 ## Assumptions Log
 
 | # | Claim | Section | Risk if Wrong |
 |---|-------|---------|---------------|
-| A1 | Phase 1 should also exclude commissioned from `findBatchQuestionGenerationCandidatesByUser` even though success criteria only name due-recall | Architecture / Pitfalls | LOW — if wrong, Phase 3+ may need a small follow-up; including it is low-cost Structure hygiene |
-| A2 | Unassimilated `joinMemoryTracker` should ignore commissioned trackers in Phase 1 (needed for Phase 2) | Pitfall 3 | MEDIUM — if deferred, Phase 2 must include it or commissioned-only notes break ordinary assimilation queue |
-| A3 | MVP commissioned trackers are note-level (`property_key` empty) and non-spelling; unique key still includes spelling/property for future TRK-04 | Summary | LOW — domain allows properties later; UI deferred |
-| A4 | Exposing `commissioned` on JSON `MemoryTracker` without UI is acceptable Structure (not a user-visible path) | Pitfall 5 | LOW — if team wants strict wire freeze, `@JsonIgnore` until Phase 2 settings UI |
-| A5 | `countByUserNotRemoved` / `totalAssimilatedCount` should exclude commissioned so menu recall status stays ordinary-only | Pitfalls | MEDIUM — if included, counts rise when only makeMe/tests create commissioned; product meaning of “assimilated count” for commissioned is undecided until Phase 3 |
+| A1 | Excluding COMMISSIONED from `byUserIdFrom` (thus `totalAssimilatedCount`) is desired ordinary-only semantics for Structure | Pitfall 2 / Primary recommendation | If product wants commissioned counted in totalAssimilatedCount before Phase 3, filter only the due SELECT instead of shared fragment |
+| A2 | Property-target wiki-link gate (`NotePropertyIndexRepository` target join) should also ignore COMMISSIONED in Phase 1 | Open Questions | If deferred, a commissioned-only target may incorrectly satisfy “target assimilated” until Phase 2 |
 
-**Recommendation on A4/A5:** Prefer exclude from due + `byUserIdFrom`-backed ordinary counts; keep `findByUserAndNote` returning both (settings/Phase 2). Prefer serialize `commissioned` (A4) so Phase 2 settings can show it without another schema pass.
+**If empty rows were preferred:** A1/A2 are the only planner-facing confirmation items; core filter locations are verified in-repo.
 
-## Open Questions (RESOLVED)
+## Open Questions
 
-1. **Should recent-assimilations / recently-recalled lists include commissioned trackers?**
-   - What we know: Those use `byUserIdWhere` / similar filters; assimilation settings will need to show commissioned (Phase 2 E2E).
-   - What's unclear: Whether Phase 1 must change list endpoints or only due selection.
-   - Recommendation: Phase 1 **must** exclude from due (+ batch candidates + ordinary assimilated counts). Leave “recent” lists including commissioned if the flag is false by default (no behavior change until fixtures exist). When tests create commissioned, assert settings/show can load them in Phase 2.
-   - **RESOLVED:** Leave `byUserIdWhere` (recent/list queries) **unfiltered** for commissioned in Phase 1. Exclusion applies only to due selection (`byUserIdFrom`), batch candidates, and ordinary assimilation join — not recent lists.
+1. **Property target-note gate**
+   - What we know: Target assimilation gate joins note-level trackers without excluding COMMISSIONED `[VERIFIED: NotePropertyIndexRepository.java:19-29]`.
+   - What's unclear: Whether Phase 1 must fix this for Phase 2 stop-safe, or leave until property/commissioned interaction appears.
+   - Recommendation: Include in Phase 1 Wave 2 alongside `NoteRepository.joinMemoryTracker` if cheap (same JPQL pattern); otherwise explicitly defer to Phase 2 with a plan note.
 
-2. **Index rename vs keep `user_note_spelling_active` name after adding `commissioned`?**
-   - Recommendation: Keep the existing index name to minimize churn unless a rename migration is desired for clarity (`user_note_spelling_commissioned_active`) — optional.
-   - **RESOLVED:** Keep index name `user_note_spelling_active` (no rename). Rebuild UNIQUE to include `commissioned`; do not introduce `user_note_spelling_commissioned_active`.
+2. **`totalAssimilatedCount` semantics**
+   - What we know: Uses `countByUserNotRemoved` → `byUserIdFrom`.
+   - What's unclear: Whether ordinary “total assimilated” should exclude commissioned before any UI shows potential sessions.
+   - Recommendation: Exclude via `byUserIdFrom` (A1); Phase 3 can refine counts for potential sessions separately.
 
 ## Environment Availability
 
 | Dependency | Required By | Available | Version | Fallback |
 |------------|------------|-----------|---------|----------|
-| SUT (backend/MySQL via process-compose) | Flyway + unit tests | ✓ | healthcheck PASS (2026-08-07) | — |
-| Nix + `pnpm backend:test_only` / `backend:verify` | Run tests / migrations in tests | ✓ | repo standard | Cloud VM skill if no Nix |
-| mysql CLI | Ad-hoc SQL | ✗ | — | Use app/Flyway/tests; ERD skill uses Python against local MySQL |
-| New npm/Maven packages | — | N/A | — | — |
+| Nix + `pnpm backend:test_only` / `backend:verify` | SC1–SC3 verification | ✓ (repo contract) | — | Cloud VM skill if no Nix |
+| Local MySQL (via `pnpm sut`) | `@SpringBootTest` DB | assume running per agent-map | — | `sut:healthcheck` |
+| Java | Backend compile/tests | ✓ | openjdk 24.0.2 (probe) | — |
+| New npm/pip packages | — | N/A | — | — |
 
-**Missing dependencies with no fallback:** none for Phase 1 execution (SUT healthy).
+**Missing dependencies with no fallback:** none identified for code/filter work.
 
-**Missing dependencies with fallback:** mysql CLI missing — use Flyway via backend tests.
+**Missing dependencies with fallback:** none.
 
-Step 2.6 note: Phase depends on MySQL through the running SUT, not on standalone mysql CLI.
+Step 2.6: tooling is in-repo + Nix; no new external services.
 
 ## Validation Architecture
+
+> `workflow.nyquist_validation` is **true** in `.planning/config.json`.
 
 ### Test Framework
 | Property | Value |
 |----------|-------|
-| Framework | JUnit 5 + Spring Boot `@SpringBootTest` / `@Transactional` (backend) |
-| Config file | Spring `test` profile (see existing controller tests) |
+| Framework | JUnit 5 + Spring Boot `@SpringBootTest` / `@Transactional` |
+| Config file | Spring `test` profile (existing controller tests) |
 | Quick run command | `CURSOR_DEV=true nix develop -c pnpm backend:test_only` |
-| Full suite command (migration involved) | `CURSOR_DEV=true nix develop -c pnpm backend:verify` |
-| Structure E2E | Do **not** add Phase 1 E2E; existing assimilation/recall E2E must remain green (targeted if touched — prefer none) |
+| Full suite command | `CURSOR_DEV=true nix develop -c pnpm backend:verify` |
 
 ### Phase Requirements → Test Map
-
-| Req / Success criterion | Behavior | Test Type | Automated Command | File Exists? |
-|-------------------------|----------|-----------|-------------------|-------------|
-| SC1 Existing suites green | No user-visible regression | unit (full backend); E2E N/A for Structure unless product path touched | `pnpm backend:verify` | ✅ existing suites |
-| SC2 Domain can represent commissioned coexisting with ordinary | Persist two trackers same note; both readable via `findByUserAndNote` / show | unit (controller or service boundary with makeMe) | `pnpm backend:test_only` | ❌ Wave 0 — add focused test |
-| SC3 Due-recall never returns commissioned | Due commissioned + due ordinary → `toRepeat` only ordinary | unit via `RecallsController.recalling` | `pnpm backend:test_only` | ❌ Wave 0 — extend `RecallsControllerTests` |
-| Unique key coexistence | Second insert does not violate unique constraint | unit (persist both) | same | ❌ covered by SC2 |
-| Batch gen exclusion (required) | Commissioned due tracker not in candidates | unit via `planLocalBatchForUser` in `QuestionGenerationBatchLocalPlanningTest` | same | ❌ Wave 0 — required |
-| Unassimilated join (recommended A2) | Commissioned-only note still unassimilated for ordinary | unit AssimilationController / NoteRepository path | same | ❌ optional but recommended |
+| Req ID | Behavior | Test Type | Automated Command | File Exists? |
+|--------|----------|-----------|-------------------|-------------|
+| SC2 | Ordinary + commissioned coexist on same note | unit | `pnpm backend:test_only` | ✅ `AssimilationControllerTests.understandingAndCommissionedTrackersCanCoexistOnSameNote` |
+| SC3 | Due-recall never returns commissioned | unit (controller) | `pnpm backend:test_only` | ❌ Wave 0 — extend `RecallsControllerTests` |
+| SC1 | Existing assimilation/recall suites green | unit (full backend) | `pnpm backend:verify` | ✅ existing suites |
+| Phase2-ready | Commissioned-only note still in ordinary assimilation queue | unit | `pnpm backend:test_only` | ❌ Wave 0 — AssimilationControllerTests / AssimilationService test |
+| Phase2-ready | Batch planning excludes due commissioned | unit | `pnpm backend:test_only` | ❌ Wave 0 — `QuestionGenerationBatchLocalPlanningTest` |
+| — | E2E | — | N/A for Structure unless product path touched | — |
 
 ### Sampling Rate
-- **Per task commit:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only` (use `backend:verify` when migration added until green once)
-- **Per wave merge:** same backend verify/test_only
-- **Phase gate:** Backend green; no new `@wip` E2E; no Learning Session / UI files changed
+- **Per task commit:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+- **Per wave merge:** `backend:test_only` (no migration → verify optional; still OK as phase gate)
+- **Phase gate:** `pnpm backend:verify` green before `/gsd-verify-work`; no new `@wip` E2E
 
 ### Wave 0 Gaps
-- [ ] Extend `RecallsControllerTests` (or nested class) — commissioned excluded from `toRepeat` while ordinary remains
-- [ ] Coexistence persist test — ordinary + commissioned same note via `makeMe.aMemoryTrackerFor(note).commissioned()`
-- [ ] `MemoryTrackerBuilder.commissioned()` helper
-- [ ] Flyway migration file version `> 300000237`
-- [ ] (Recommended) Assert unassimilated / assimilation queue still sees note when only commissioned tracker exists
-- [ ] Framework install: none
-
-**Structure-phase proof summary for Nyquist VALIDATION.md:**
-1. **No behavior change for users:** existing assimilation + recall unit suites green; no new E2E scenarios required.
-2. **Represent:** makeMe can create `commissioned=true` alongside ordinary; DB unique allows both.
-3. **Exclude:** `GET /api/recalls/recalling` (`RecallsController`) returns only ordinary due trackers when commissioned due trackers exist.
+- [ ] `RecallsControllerTests` — due ordinary + due commissioned → `toRepeat` size 1 (SC3)
+- [ ] Assimilation queue assertion — commissioned-only note still unassimilated for ordinary path
+- [ ] `QuestionGenerationBatchLocalPlanningTest` — commissioned due tracker not in planned batch
+- [x] `MemoryTrackerBuilder.commissioned()` — already exists
+- [x] Coexistence persist test — already exists
+- [x] Framework / Flyway tip — no new migration; tip `V300000239`
+- [ ] Rewrite stale `01-VALIDATION.md` task rows (remove unique-key decision / boolean migration)
 
 ## Security Domain
+
+> `security_enforcement` enabled; ASVS level 1 per config.
 
 ### Applicable ASVS Categories
 
 | ASVS Category | Applies | Standard Control |
 |---------------|---------|-----------------|
-| V2 Authentication | no | Phase does not change auth |
-| V3 Session Management | no | — |
-| V4 Access Control | yes (unchanged paths) | Existing `AuthorizationService` on recalls/memory-tracker endpoints; no new public create path in Phase 1 |
-| V5 Input Validation | yes (Phase 2+) | Phase 1: boolean column defaulted; no new user input. Later assimilate flag must be boolean/DTO-validated |
+| V2 Authentication | no | No new auth surface |
+| V3 Session Management | no | Unchanged |
+| V4 Access Control | yes (unchanged) | Existing `AuthorizationService` on Recalls/Assimilation; no new create endpoint |
+| V5 Input Validation | yes | Native filters use **literal** enum names; user-bound values stay `@Param` |
 | V6 Cryptography | no | — |
 
-### Known Threat Patterns for MemoryTracker / recall selection
+### Known Threat Patterns for this stack
 
 | Pattern | STRIDE | Standard Mitigation |
 |---------|--------|---------------------|
-| IDOR on memory tracker show/update | Elevation of privilege | Existing authorization checks on controller (unchanged) |
-| Inflating due work / DoS via mass commissioned rows | Denial of service | Phase 1 has no create API; Phase 2 authz same as assimilate |
-| SQL injection in native due queries | Tampering | Parameterized `@Param` queries only — keep that pattern when editing SQL strings |
-| Unique-key race creating duplicate ordinary trackers | Tampering | DB unique constraint (extended), not app-only checks |
+| SQL injection via type filter | Tampering | Literal `<> 'COMMISSIONED'` / JPQL enum constant; never concatenate user input into type clause `[CITED: OWASP ASVS 1.2.4 / Query Parameterization Cheat Sheet]` |
+| IDOR on recall/assimilate | Elevation of privilege | Reuse existing authz; Phase 1 adds no create path (T-01-01 accept) |
+| Unique-key race on dual trackers | Tampering | Existing UK on `type` (006); do not weaken; surface constraint failures |
+| Information disclosure of `type` on wire | Information disclosure | `type` already on OpenAPI MemoryTracker; no UI copy in Phase 1 (accept) |
+| Mass commissioned rows DoS | Denial of service | No public create in Phase 1 |
 
-`security_enforcement`: enabled in `.planning/config.json`.
+### Threat model notes for planner (SQL filters)
+
+| ID | Threat | Severity | Disposition |
+|----|--------|----------|-------------|
+| T-01-01 | IDOR via new endpoints | medium | accept — no new endpoints |
+| T-01-02 | SQLi in due/batch native SQL | high | mitigate — literal type filter + `@Param` userId/dueBy only |
+| T-01-03 | Unique-key race | medium | accept — already secured by 006 UK on `type` |
+| T-01-SC | Package supply chain | high | accept — no package installs |
 
 ## Project Constraints (from .cursor/rules/)
 
-| Directive | Implication for Phase 1 |
-|-----------|-------------------------|
-| Structure phase: no external behavior change; existing tests pass (`planning.mdc`) | No assimilate caret, no Learning Session UI/API, no E2E scenario graduation |
-| One Structure slice enables **immediate next** Behavior only | Prepare Phase 2 assimilate-as-commissioned — not Phases 3–7 entities |
-| Capability naming — no phase numbers in product artifacts | Name column/API `commissioned`, tests by capability |
-| Flyway: new file only; version > tip placeholder/rule (`db-migration.mdc`) | New `V{>300000237}__…sql`; never edit baseline for this change |
-| After schema change regenerate ERD (`database-erd` skill / `backend-code.mdc`) | Plan task: `pnpm export:database-erd` |
-| Unit tests: stable boundary, makeMe, data over mocks (`unit-testing.mdc`, `backend-testing.mdc`) | Prove via `RecallsController` + makeMe, not mocked repository |
-| Never silently swallow failures (`error-handling.mdc`) | Let unique constraint failures surface; no empty catch |
-| Tooling via Nix (`general.mdc`) | `CURSOR_DEV=true nix develop -c …` |
-| ADRs: consume Accepted; Proposed guide naming only (`architecture-decisions.mdc`, adr-awareness) | Use ADR 0001 §3 terms; do not approve 0001/0003/0005 |
-| Commit+push wrap-up is execute-plan / phase close — not research | Researcher writes RESEARCH.md only |
-| Prefer `trash` over `rm -rf` in Nix env | N/A unless deleting files |
+| Rule | Directive for this phase |
+|------|--------------------------|
+| `planning.mdc` | Phase is **Structure**; one Structure goal; stop-safe; no speculative prep beyond immediate next Behavior (Phase 2 assimilate-as-commissioned); capability names in product/tests; ~5 min slice / >10 min finer-decompose |
+| `gsd-coexistence.mdc` | Local Behavior/Structure + Jidoka + post-change-refactor + commit/push wrap-up apply when executing |
+| `unit-testing.mdc` / `backend-testing.mdc` | Drive `RecallsController` / assimilation boundary; data via `makeMe`; one behavior per test; `pnpm backend:test_only` / `backend:verify` |
+| `db-migration.mdc` | New migrations only if schema changes; **do not edit** committed V300000238/239; tip must stay >300000230 — Phase 1 likely **zero** new files |
+| `error-handling.mdc` | Do not swallow unique-constraint failures; no empty catch |
+| `architecture-decisions.mdc` / adr-awareness | Cite ADR 0001 glossary for naming; ADR 0003/0005 Proposed guide only — **do not approve**; only Accepted ADR today is 0000 meta |
+| `backend-code.mdc` | Prefer entity return shapes; regenerate ERD only after real schema change |
+| `general.mdc` | Nix prefix for tooling; no phase numbers in product artifacts; high cohesion (one `type` representation) |
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- `[VERIFIED: backend/.../MemoryTracker.java:18-170]` — entity fields, builders, note-level helper
-- `[VERIFIED: backend/.../MemoryTrackerRepository.java:11-127]` — due query, `byUserIdFrom`, batch candidates
-- `[VERIFIED: backend/.../RecallService.java:39-76]` / `UserService.java:65-69` — due-recall call chain
-- `[VERIFIED: backend/.../MemoryTrackerService.java:62-144]` — assimilate coexistence short-circuit
-- `[VERIFIED: backend/.../NoteRepository.java:148-158]` — unassimilated join
-- `[VERIFIED: V100000000__baseline.sql:355-369]` — table + unique key
-- `[VERIFIED: MemoryTrackerBuilder.java]` / `MakeMe.java:92-98` — fixture patterns
-- `[VERIFIED: docs/adrs/0001-ubiquitous-language.md:112-125]` — commissioned glossary
-- `[VERIFIED: docs/adrs/0003-spaced-repetition-scheduling-policy.md:120-159]` — commissioned score policy (later phases)
-- `.cursor/rules/db-migration.mdc`, `planning.mdc`, `backend-testing.mdc`, `unit-testing.mdc`
+- `backend/src/main/java/com/odde/doughnut/entities/MemoryTrackerType.java` — enum values
+- `backend/src/main/java/com/odde/doughnut/entities/MemoryTracker.java` — `type` field, derived spelling
+- `backend/src/main/java/com/odde/doughnut/entities/repositories/MemoryTrackerRepository.java` — due + batch SQL
+- `backend/src/main/java/com/odde/doughnut/entities/repositories/NoteRepository.java` — assimilation join
+- `backend/src/main/java/com/odde/doughnut/entities/repositories/NotePropertyIndexRepository.java` — SPELLING JPQL pattern + target gate
+- `backend/src/main/resources/db/migration/V300000238__add_memory_tracker_type.sql`
+- `backend/src/main/resources/db/migration/V300000239__memory_tracker_unique_on_type_drop_spelling.sql`
+- `backend/src/test/java/com/odde/doughnut/testability/builders/MemoryTrackerBuilder.java` — `.commissioned()`
+- `backend/src/test/java/com/odde/doughnut/controllers/AssimilationControllerTests.java` — coexistence test
+- `.planning/quick/006-memory-tracker-type/PLAN.md` — foundation status done
+- Context7 `/spring-projects/spring-data-jpa` — `@Param` / native `@Query` patterns
 
 ### Secondary (MEDIUM confidence)
-- MySQL functional unique / soft-delete patterns (WebSearch) — confirms approach already used in baseline DDL
-- OpenAPI `MemoryTracker` shape `[VERIFIED: packages/generated/.../types.gen.ts:604-616]` — regen impact
+- OWASP ASVS 1.2.4 / Query Parameterization Cheat Sheet — parameterized SQL for T-01-02
+- ADR 0001 Proposed §3 commissioned learning terms — naming only
+- Generated `types.gen.ts` MemoryTracker.type union — client already knows COMMISSIONED
 
 ### Tertiary (LOW confidence)
-- A1–A5 assumptions on secondary query exclusions and JSON exposure — see Assumptions Log
+- A1/A2 assumptions on count semantics and property target gate scope
 
 ## Metadata
 
 **Confidence breakdown:**
-- Standard stack: HIGH — reuse in-repo Flyway/JPA/MakeMe; no new deps
-- Architecture: HIGH — call chain and unique key verified in source
-- Pitfalls: HIGH — coexistence unique key and assimilate short-circuit verified; secondary query scope partially assumed (A1/A5)
+- Standard stack: HIGH — in-repo patterns verified by Read this session
+- Architecture: HIGH — due/batch/join seams located; 006 foundation verified
+- Pitfalls: HIGH — stale boolean plans + missing filters confirmed by Read
 
 **Research date:** 2026-08-07
-**Valid until:** 2026-09-06 (stable domain; re-check if `memory_tracker` migrations land elsewhere)
+**Valid until:** 30 days (stable domain; invalidate if further memory_tracker schema migrations land)
+
+### Planner checklist (from this research)
+
+1. **Replan** 01-01 / 01-02 — remove migration/boolean/UK decision tasks.
+2. Wave 1: `byUserIdFrom` COMMISSIONED exclusion + `RecallsControllerTests` SC3 (SC2 already green).
+3. Wave 2: `NoteRepository.joinMemoryTracker` (+ optional property target gate) + batch candidate exclusion + queue/batch unit proofs + `backend:verify`.
+4. Do **not** touch assimilate create UI/DTO/`MemoryTrackerAssimilation` create path.
+5. No OpenAPI regen / ERD regen required unless you change schema or DTO signatures.

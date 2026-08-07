@@ -7,7 +7,7 @@ current_phase_name: Commissioned tracker model
 status: planned
 last_updated: "2026-08-07T15:00:00.000Z"
 last_activity: 2026-08-07
-last_activity_desc: Quick 006 memory-tracker type done — replan Phase 1 for COMMISSIONED
+last_activity_desc: Phase 1 RESEARCH rewritten for type=COMMISSIONED (no boolean column)
 progress:
   total_phases: 7
   completed_phases: 0
