@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: null
 milestone_name: null
-current_phase: null
-current_phase_name: null
-status: planning
+current_phase: 2
+current_phase_name: "save/edit no longer migrates wiki-in-aliases"
+status: executing
 stopped_at: null
-last_updated: "2026-08-07T08:40:00Z"
+last_updated: "2026-08-07T08:55:00Z"
 last_activity: 2026-08-07
-last_activity_desc: "Quick 260807-n4j drop wiki-in-aliases bridge — plan ready"
+last_activity_desc: "Quick 260807-n4j Phase 1 done — overlaps-only grading"
 progress:
   total_phases: 2
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 1
   completed_plans: 0
-  percent: 0
+  percent: 50
 ---
 
 # Project State
@@ -26,9 +26,8 @@ See: `.planning/PROJECT.md`
 ## Current Position
 
 - Active quick: `.planning/quick/260807-n4j-drop-grading-disable-wiki-in-aliases-rea/`
-- Goal: Drop grading/UI wiki-in-`aliases` read bridge; remove save/edit migration (no production data).
-- Phase 1 planned (overlaps-only grading) → Phase 2 planned (remove migration + dead helpers).
-- Left `/gsd-new-milestone` for this ad-hoc slice.
+- Phase 1 done (overlaps-only grading).
+- Next: Phase 2 — remove save/edit migration + dead bridge helpers.
 
 ## Deferred Items
 
@@ -45,4 +44,4 @@ See: `.planning/PROJECT.md`
 
 ## Session Continuity
 
-Execute: `execute-plan` on `.planning/quick/260807-n4j-drop-grading-disable-wiki-in-aliases-rea/PLAN.md`
+Continue execute-plan Phase 2 on `.planning/quick/260807-n4j-drop-grading-disable-wiki-in-aliases-rea/PLAN.md`

@@ -172,16 +172,13 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
-  /**
-   * Declares a legacy wiki-link overlap under {@code aliases} (grading read bridge until content is
-   * re-saved and migrated into {@code overlaps}).
-   */
+  /** Declares a wiki-link item under frontmatter {@code aliases} (not an authored overlap). */
   public NoteBuilder legacyOverlapPartner(Note partner) {
     frontmatterLists.addLegacyOverlapPartner(partner);
     return this;
   }
 
-  /** Declares a legacy wiki-link overlap under {@code aliases}. */
+  /** Declares a wiki-link item under frontmatter {@code aliases} (not an authored overlap). */
   public NoteBuilder legacyOverlapWikiLink(String wikiLinkInner) {
     frontmatterLists.addLegacyOverlapWikiLink(wikiLinkInner);
     return this;

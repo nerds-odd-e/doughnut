@@ -47,24 +47,11 @@ public final class FrontmatterOverlaps {
   }
 
   /**
-   * Tokens used for OVERLAP grading: authored {@code overlaps} plus legacy wiki-link items still
-   * sitting in {@code aliases} (union, overlaps first, normalized dedupe). Read-time bridge so
-   * notebooks that have not re-saved yet keep OVERLAP matching; save migrates into {@code
-   * overlaps}.
+   * Tokens used for OVERLAP grading: authored {@code overlaps} only. Wiki-link items under {@code
+   * aliases} do not contribute.
    */
   public static List<String> gradingOverlapWikiLinkTokensFromNoteContent(String content) {
-    return NoteContentMarkdown.splitLeadingFrontmatter(content == null ? "" : content)
-        .map(lf -> gradingOverlapWikiLinkTokensFromFrontmatter(lf.frontmatter()))
-        .orElse(List.of());
-  }
-
-  public static List<String> gradingOverlapWikiLinkTokensFromFrontmatter(Frontmatter frontmatter) {
-    if (frontmatter == null) {
-      return List.of();
-    }
-    return mergeDedupePreserveOrder(
-        overlapWikiLinkTokensFromFrontmatter(frontmatter),
-        FrontmatterAliases.overlapWikiLinkTokensFromFrontmatter(frontmatter));
+    return overlapWikiLinkTokensFromNoteContent(content);
   }
 
   /** Merges two wiki-link token lists with normalized dedupe, preserving first-seen order. */

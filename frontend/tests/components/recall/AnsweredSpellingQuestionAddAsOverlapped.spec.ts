@@ -110,7 +110,7 @@ describe("AnsweredSpellingQuestion add as overlapped note", () => {
     ).toBe(false)
   })
 
-  it("disables add as overlapped when the match is a legacy wiki-link in aliases", async () => {
+  it("does not disable add as overlapped when the match is only a wiki-link in aliases", async () => {
     const { answeredQuestion, reviewedRealm, matchedA, matchedB } =
       accidentalMatchWithTwoMatchedNotes()
     const reviewedWithAlias = reviewedRealmDeclaringMatch(
@@ -133,6 +133,6 @@ describe("AnsweredSpellingQuestion add as overlapped note", () => {
           '[data-testid="add-as-overlapped-note-10"]'
         ) as HTMLButtonElement
       ).disabled
-    ).toBe(true)
+    ).toBe(false)
   })
 })

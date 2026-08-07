@@ -24,7 +24,7 @@ class FrontmatterOverlapsGradingTokensTest {
   }
 
   @Test
-  void gradingOverlapWikiLinkTokens_unions_overlaps_and_legacy_aliases_wiki_links() {
+  void overlapWikiLinkTokens_ignores_wiki_links_under_aliases() {
     Frontmatter fm =
         Frontmatter.parse(
             """
@@ -36,33 +36,30 @@ class FrontmatterOverlapsGradingTokensTest {
             """);
 
     assertThat(
-        FrontmatterOverlaps.gradingOverlapWikiLinkTokensFromFrontmatter(fm),
-        equalTo(List.of("[[New Partner]]", "[[Legacy Partner]]")));
+        FrontmatterOverlaps.overlapWikiLinkTokensFromFrontmatter(fm),
+        equalTo(List.of("[[New Partner]]")));
   }
 
   @Test
-  void gradingOverlapWikiLinkTokens_dedupes_normalized_tokens_across_keys() {
+  void overlapWikiLinkTokens_wiki_in_aliases_alone_yields_no_tokens() {
     Frontmatter fm =
         Frontmatter.parse(
             """
             aliases:
               - "[[Shared]]"
-            overlaps:
-              - "[[shared]]"
             """);
 
-    assertThat(
-        FrontmatterOverlaps.gradingOverlapWikiLinkTokensFromFrontmatter(fm),
-        equalTo(List.of("[[shared]]")));
+    assertThat(FrontmatterOverlaps.overlapWikiLinkTokensFromFrontmatter(fm), equalTo(List.of()));
   }
 
   @Test
-  void gradingOverlapWikiLinkTokensFromNoteContent_reads_overlaps_only_when_aliases_plain() {
+  void gradingOverlapWikiLinkTokensFromNoteContent_reads_overlaps_only() {
     String content =
         """
         ---
         aliases:
           - color
+          - "[[Legacy Partner]]"
         overlaps:
           - "[[Other Note]]"
         ---

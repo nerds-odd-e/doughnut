@@ -15,16 +15,12 @@ Overlap grading and UI overlap checks use authored `overlaps` only. Legacy wiki-
 
 ### Phase 1 — Behavior: overlap grading reads `overlaps` only
 
-**Status:** planned
+**Status:** done
 **Type:** Behavior
 
 **Observable:** Answering / overlap checks treat only frontmatter `overlaps` as overlap declarations; wiki-link strings under `aliases` do not contribute.
 
-- Change tests that assert union/dedupe across `aliases`+`overlaps` to assert `overlaps`-only (and that wiki-in-`aliases` alone yields no grading tokens).
-- Make backend `gradingOverlapWikiLinkTokens*` and frontend `gradingOverlapWikiLinkTokensFromNoteContent` read `overlaps` only.
-- Rewire recall fixtures that stuffed wiki links under `aliases` for overlap semantics to use `overlaps:` (e.g. stem masking).
-
-**Done when:** targeted backend + frontend unit tests pass; grading no longer unions aliases wiki links.
+**Done:** Backend/frontend grading tokens read `overlaps` only; `gradingOverlapWikiLinkTokensFromNoteContent` delegates to `overlapWikiLinkTokensFromNoteContent`. Fixtures/tests rewired to `overlaps:`. Wiki-in-`aliases` alone no longer yields OVERLAP / disable Add as overlapped.
 
 ### Phase 2 — Behavior: save/edit no longer migrates wiki-in-aliases
 
@@ -37,6 +33,7 @@ Overlap grading and UI overlap checks use authored `overlaps` only. Legacy wiki-
 - Remove `LegacyAliasOverlapMigration` (+ test) and frontend `migrateLegacyAliasWikiLinksToOverlaps` (+ spec); simplify `AuthoredNoteContent.prepareContentForSave` and `richFrontmatterPropertyRowsFromMarkdown`.
 - Delete dead `FrontmatterAliases.overlapWikiLinkTokens*` (+ tests) if unused.
 - Drop this tech-debt line from `.planning/STATE.md` / `PROJECT.md` Active/deferred notes.
+- Optionally collapse thin `gradingOverlapWikiLinkTokensFromNoteContent` aliases onto `overlapWikiLinkTokens*` call sites if still only a rename (post-Phase-1 leftover).
 
 **Done when:** unit tests pass; migration classes gone; wiki-in-`aliases` rejected on save.
 

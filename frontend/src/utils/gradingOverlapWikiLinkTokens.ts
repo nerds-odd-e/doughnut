@@ -9,11 +9,10 @@ import {
 } from "@/utils/noteProperties"
 import { isWellFormedWholeWikiLinkItem } from "@/utils/wholeWikiLinkItem"
 
-function wikiLinkTokensFromListKey(
-  properties: NoteProperties,
-  listKey: string
+function overlapWikiLinkTokensFromProperties(
+  properties: NoteProperties
 ): string[] {
-  const existingKey = findStringListPropertyKey(properties, listKey)
+  const existingKey = findStringListPropertyKey(properties, "overlaps")
   if (!existingKey) return []
   const value = properties[existingKey]
   if (value === undefined || !isListPropertyValue(value)) return []
@@ -32,10 +31,8 @@ function wikiLinkTokensFromListKey(
 }
 
 /**
- * Tokens used for overlap declaration checks: authored `overlaps` plus legacy
- * wiki-link items still in `aliases` (union, overlaps first, normalized dedupe).
- * Read-time bridge for notebooks that have not re-saved; save migrates into
- * `overlaps`. Mirrors backend
+ * Tokens used for overlap declaration checks: authored `overlaps` only.
+ * Wiki-link items under `aliases` do not contribute. Mirrors backend
  * `FrontmatterOverlaps.gradingOverlapWikiLinkTokensFromNoteContent`.
  */
 export function gradingOverlapWikiLinkTokensFromNoteContent(
@@ -43,18 +40,7 @@ export function gradingOverlapWikiLinkTokensFromNoteContent(
 ): string[] {
   const parsed = parseNoteContentMarkdown(contentMarkdown)
   if (!parsed.ok) return []
-
-  const fromOverlaps = wikiLinkTokensFromListKey(parsed.properties, "overlaps")
-  const fromAliases = wikiLinkTokensFromListKey(parsed.properties, "aliases")
-  const seen = new Set(fromOverlaps.map(normalizedLookupKey))
-  const out = [...fromOverlaps]
-  for (const token of fromAliases) {
-    const key = normalizedLookupKey(token)
-    if (seen.has(key)) continue
-    seen.add(key)
-    out.push(token)
-  }
-  return out
+  return overlapWikiLinkTokensFromProperties(parsed.properties)
 }
 
 /** True when `wikiLinkToken` is already among grading overlap tokens. */

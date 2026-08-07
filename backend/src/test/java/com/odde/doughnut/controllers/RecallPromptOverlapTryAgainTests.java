@@ -70,7 +70,7 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
   }
 
   @Test
-  void shouldGradeAsOverlapWhenLegacyWikiLinkDeclaredUnderAliases()
+  void shouldNotGradeAsOverlapWhenWikiLinkOnlyUnderAliases()
       throws UnexpectedNoAccessRightException {
     Note partner =
         makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("Shared Legacy").please();
@@ -85,7 +85,7 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
 
     AnsweredQuestion result = answerSpelling(ownedSpellingTracker(reviewed), "Shared Legacy");
 
-    assertThat(result.getAnswer().getOutcome(), is(AnswerOutcome.OVERLAP));
+    assertThat(result.getAnswer().getOutcome(), is(not(AnswerOutcome.OVERLAP)));
   }
 
   @Test

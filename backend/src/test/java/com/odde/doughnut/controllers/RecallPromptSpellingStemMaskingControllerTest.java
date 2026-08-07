@@ -50,6 +50,7 @@ class RecallPromptSpellingStemMaskingControllerTest extends RecallPromptControll
             ---
             aliases:
               - color
+            overlaps:
               - "[[Other Note]]"
             ---
             The color of Other Note is blue
@@ -63,14 +64,14 @@ class RecallPromptSpellingStemMaskingControllerTest extends RecallPromptControll
   }
 
   @Test
-  void spellingQuestionDoesNotMaskOverlapTargetTitleFromWikiLinkOnlyAlias() {
+  void spellingQuestionDoesNotMaskOverlapTargetTitleFromOverlapsOnly() {
     makeMe
         .theNote(answerNote)
         .title("colour")
         .content(
             """
             ---
-            aliases:
+            overlaps:
               - "[[Other Note]]"
             ---
             Mentions Other Note in the body
