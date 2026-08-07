@@ -48,7 +48,10 @@ final class MemoryTrackerAssimilation {
     }
 
     List<MemoryTracker> existingNoteLevelTrackers =
-        existingTrackers.stream().filter(MemoryTracker::isNoteLevelTracker).toList();
+        existingTrackers.stream()
+            .filter(MemoryTracker::isNoteLevelTracker)
+            .filter(mt -> mt.getType() != MemoryTrackerType.COMMISSIONED)
+            .toList();
 
     boolean addSpellingOnly =
         !existingNoteLevelTrackers.isEmpty()

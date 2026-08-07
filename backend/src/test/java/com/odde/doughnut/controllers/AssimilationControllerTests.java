@@ -155,6 +155,24 @@ class AssimilationControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void assimilatingCommissionedOnlyNoteCreatesUnderstandingAndLeavesCommissioned() {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      makeMe.aMemoryTrackerFor(note).commissioned().please();
+
+      List<MemoryTracker> result = controller.assimilate(assimilateRequest(note));
+
+      assertThat(result, hasSize(1));
+      assertThat(result.get(0).getType(), equalTo(MemoryTrackerType.UNDERSTANDING));
+      assertThat(
+          memoryTrackerRepository
+              .findByUserAndNote(currentUser.getUser().getId(), note.getId())
+              .stream()
+              .map(MemoryTracker::getType)
+              .toList(),
+          containsInAnyOrder(MemoryTrackerType.UNDERSTANDING, MemoryTrackerType.COMMISSIONED));
+    }
+
+    @Test
     void shouldReturnEmptyWhenNoteAlreadyHasMemoryTrackers() {
       Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
       makeMe.aMemoryTrackerFor(note).please();
