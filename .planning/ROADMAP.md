@@ -30,11 +30,11 @@
 Plans:
 **Wave 1**
 
-- [ ] 01-01-PLAN.md — Tracer: commissioned column + unique key + due-recall exclusion (SC2/SC3)
+- [ ] 01-01-PLAN.md — Tracer: `type=COMMISSIONED` due-recall / count exclusion via `byUserIdFrom` + SC3 (SC2 stay green)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 01-02-PLAN.md — Expansion: assimilation join + batch exclusion + ERD (SC1)
+- [ ] 01-02-PLAN.md — Expansion: assimilation join + property target gate + batch candidate exclusion (SC1)
 
 ---
 
@@ -181,4 +181,4 @@ Plans:
 Parked elsewhere: SEED-001, ADR 0002 Level 1.
 
 ---
-*Last updated: 2026-08-07 — v1.3 roadmap created*
+*Last updated: 2026-08-07 — Phase 1 replanned for type=COMMISSIONED filters*

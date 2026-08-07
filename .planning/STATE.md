@@ -5,9 +5,9 @@ milestone_name: Commissioned Learning Session MVP
 current_phase: 1
 current_phase_name: Commissioned tracker model
 status: planned
-last_updated: "2026-08-07T15:00:00.000Z"
+last_updated: "2026-08-07T15:20:00.000Z"
 last_activity: 2026-08-07
-last_activity_desc: Phase 1 RESEARCH rewritten for type=COMMISSIONED (no boolean column)
+last_activity_desc: Phase 1 replanned for type=COMMISSIONED filters (no boolean column)
 progress:
   total_phases: 7
   completed_phases: 0
@@ -28,10 +28,12 @@ See: `.planning/PROJECT.md`
 Quick plan **006 memory-tracker type** is **done** (see slim PLAN under
 `.planning/quick/006-memory-tracker-type/`).
 
-**Next:** Replan GSD Phase 1 (commissioned tracker model) to use
-`MemoryTrackerType.COMMISSIONED` instead of a boolean `commissioned` column —
-due-recall exclusion, assimilation join, etc. Existing Phase 1 PLANs under
-`.planning/phases/01-commissioned-tracker-model/` are stale relative to `type`.
+**Phase 1** replanned for `MemoryTrackerType.COMMISSIONED` filters (not a
+boolean `commissioned` column): due-recall / assimilation join / batch
+exclusion + unit proofs. Plans: `01-01-PLAN.md` (Wave 1 tracer SC3),
+`01-02-PLAN.md` (Wave 2 join + batch + SC1).
+
+**Next:** `/gsd-execute-phase 1`
 
 ## Deferred Items
 
@@ -46,4 +48,4 @@ due-recall exclusion, assimilation join, etc. Existing Phase 1 PLANs under
 
 ## Session Continuity
 
-`/gsd-plan-phase 1` — RESEARCH done for COMMISSIONED-on-type; rewrite stale 01-01/01-02 PLANs then execute.
+Phase 1 PLANs rewritten for type filters — ready to execute.
