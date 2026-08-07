@@ -12,7 +12,7 @@ and CONTEXT.md. Glossary: ADR 0001 §3. Protocol: ADR 0005. Score→schedule: AD
 
 ### Commissioned tracker
 
-- [ ] **TRK-01**: User can assimilate a note as a commissioned memory tracker via a caret dropdown next to Assimilate (not offered for properties in the UI)
+- [x] **TRK-01**: User can assimilate a note as a commissioned memory tracker via a caret dropdown next to Assimilate (not offered for properties in the UI)
 - [ ] **TRK-02**: A commissioned memory tracker coexists with ordinary trackers for the same note
 - [ ] **TRK-03**: Due commissioned memory trackers do not appear as ordinary recall work
 
@@ -73,7 +73,7 @@ Filled by roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TRK-01 | Phase 2 | Pending |
+| TRK-01 | Phase 2 | Complete |
 | TRK-02 | Phase 2 | Pending |
 | TRK-03 | Phase 3 | Pending |
 | POT-01 | Phase 3 | Pending |
