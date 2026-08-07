@@ -130,22 +130,7 @@ Then('the notebook page summary shows name {string}', (name: string) => {
     .should('contain.text', name)
 })
 
-Then(
-  'the notebook workspace readme shows name {string} and readme',
-  (name: string) => {
-    notebookPage().expectReadmeLandmarks(name)
-  }
-)
-
-Then('notebook admin settings sections are not visible', () => {
-  notebookPage().expectAdminSettingsAbsent()
-})
-
-When('I open the notebook workspace Settings tab', () => {
-  notebookPage().openSettingsTab()
-})
-
-When('I open the notebook workspace Health tab', () => {
+When('I open the notebook Health tab', () => {
   notebookPage().openHealthTab()
 })
 
@@ -207,10 +192,6 @@ Then(
     notebookPage().expectDeadWikiLinkFinding(noteTitle, token)
   }
 )
-
-Then('notebook admin settings sections are visible', () => {
-  notebookPage().expectSettingsSectionsVisible()
-})
 
 When(
   'I rename the notebook from the notebook page summary to {string}',

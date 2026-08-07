@@ -20,7 +20,6 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 
 | Term | Meaning |
 |------|---------|
-| **Notebook workspace** | In-app notebook shell with Readme, Settings, and Health |
 | **Add to learning** | Synonym used for starting a subscription |
 | **Re-assimilate** | Return a note to assimilation after failed recall |
 | **Skip recall** | Opt a note or notebook out of recall (panel action or notebook setting) |
@@ -41,7 +40,7 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 
 | Term | Colliding senses |
 |------|------------------|
-| **Workspace** | Local filesystem tree for CLI sync vs in-app notebook shell (Readme / Settings / Health) |
+| **Workspace** | Local filesystem tree for CLI sync — avoid using the same word for the in-app notebook page (Readme / Settings / Health tabs) |
 | **Link** | Wiki link in note body; linking a matched note as relationship or property; circle invitation URL |
 | **Learning** | Overall learner metaphor; alias for subscription (“add to learning”); “target of learning N notes per day” as assimilation quota |
 | **Layout** | Refinement layout for a note vs book layout for an attached book |
@@ -49,7 +48,7 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 | **Property** | Reduced relationship field; wiki property from accidental match; property memory tracker key |
 | **Chat / conversation / message** | Human note threads and AI chat share the same nouns without a clear split |
 | **My notes / my notebooks** | Notebook catalog; note search scope; subscribed notebook appearing among the user’s notebooks |
-| **Description / Readme** | Catalog blurb (`notebook description`) vs workspace markdown body (`readme`) — both “about the notebook” but different fields |
+| **Description / Readme** | Catalog blurb (`notebook description`) vs notebook/folder markdown body (`readme`) — both “about the notebook” but different fields |
 
 #### Redundant (several names, one concept)
 
@@ -87,7 +86,7 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 | **Notebook** | Top-level collection of notes a user owns or subscribes to |
 | **Notebook description** | One-line short plain-text blurb of a notebook (catalog/settings; not markdown, not the Readme) |
 | **Folder** | Hierarchical path segment inside a notebook |
-| **Readme** | Markdown body on a notebook or folder (workspace landing content; separate from notebook description) |
+| **Readme** | Markdown body on a notebook or folder (landing content; separate from notebook description) |
 | **Notebook catalog** | List of a user’s notebooks (and notebook groups) |
 | **Notebook group** | Named catalog grouping of notebooks (not a Circle) |
 | **Circle** | Multi-user shared space with members and notebooks |
@@ -108,7 +107,6 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 | **Message** | One utterance in a conversation |
 | **Message center** | UI for conversations and unread state |
 | **Local workspace** | On-disk Markdown / Open Knowledge Format (OKF) tree used by CLI sync |
-| **Notebook workspace** | In-app notebook shell (Readme / Settings / Health) |
 | **OKF** | [Open Knowledge Format](https://cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing): portable directory of markdown concept files with YAML frontmatter; CLI lint and sync expect a local workspace to follow it |
 | **Spaced-repetition schedule** | User interval list for recall |
 | **Daily assimilation target** | Max new notes to assimilate per day (profile or subscription) |
@@ -118,7 +116,9 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 
 3. **Disambiguation rules**
 
-   - Always qualify **workspace** as **local** or **notebook**.
+   - Use **local workspace** for the on-disk CLI sync tree; do not call the
+     in-app notebook page a “workspace” — speak of the **notebook**, its
+     **readme**, **settings**, and **health** as needed.
    - Always qualify **layout** as **refinement** or **book**.
    - Use **wiki link**, **relationship**, or **Wikidata association** — never
      bare **link** or **wiki** when the kind matters.
@@ -130,7 +130,7 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
    - Prefer **spaced-repetition schedule** over **space setting** in new copy.
    - Prefer **semantic search** over **semantical search**.
    - Use **notebook description** for the one-line plain-text catalog blurb;
-     use **readme** for the markdown workspace body — never treat them as the
+     use **readme** for the markdown notebook/folder body — never treat them as the
      same concept.
 
 4. **Alignment policy** — On Accept:

@@ -14,18 +14,6 @@ const notebookPage = () => {
     cy.get('[data-testid="notebook-workspace-health"]').should('be.visible')
   }
 
-  const expectAdminSettingsAbsent = () => {
-    cy.get('[data-testid="notebook-workspace-settings"]').should('not.exist')
-    cy.contains('Notebook Management').should('not.exist')
-    cy.contains('Notebook Settings').should('not.exist')
-    cy.contains('Notebook Indexing').should('not.exist')
-    cy.contains('Move to ...').should('not.exist')
-    cy.contains('Share notebook to bazaar').should('not.exist')
-    cy.contains('Skip Memory Tracking').should('not.exist')
-    cy.contains('Update index').should('not.exist')
-    cy.contains('Reset notebook index').should('not.exist')
-  }
-
   return {
     openSettingsTab() {
       openSettingsTab()
@@ -118,41 +106,6 @@ const notebookPage = () => {
           ).should('be.visible')
         }
       )
-      return this
-    },
-
-    expectReadmeLandmarks(name: string) {
-      cy.get('[data-testid="notebook-page-kind-label"]').should(
-        'contain.text',
-        'Notebook'
-      )
-      cy.get('[data-testid="notebook-page-summary"]')
-        .find('h1')
-        .should('contain.text', name)
-      cy.get('[data-testid="notebook-workspace-readme"]').should('be.visible')
-      cy.get('[data-testid="notebook-readme-editor"]').should('be.visible')
-      expectAdminSettingsAbsent()
-      return this
-    },
-
-    expectAdminSettingsAbsent() {
-      expectAdminSettingsAbsent()
-      return this
-    },
-
-    expectSettingsSectionsVisible() {
-      cy.get('[data-testid="notebook-workspace-settings"]').should('be.visible')
-      cy.get('[data-testid="notebook-workspace-settings"]').within(() => {
-        cy.contains('Description').should('exist')
-        cy.contains('Notebook Management').should('exist')
-        cy.contains('Notebook Indexing').should('exist')
-        cy.contains('Share notebook to bazaar').should('exist')
-        cy.contains('Skip Memory Tracking').should('exist')
-        cy.contains('Update index').should('exist')
-        cy.contains('Reset notebook index').should('exist')
-        cy.contains('Notebook Settings').should('not.exist')
-        cy.contains('Update Settings').should('not.exist')
-      })
       return this
     },
 
