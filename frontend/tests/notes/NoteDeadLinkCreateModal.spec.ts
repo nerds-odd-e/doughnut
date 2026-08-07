@@ -41,7 +41,7 @@ const router = createRouter({
 })
 
 const createNoteLabel = /Create a new note named/
-const linkNoteLabel = "Link to an existing note"
+const pointAtExistingNoteLabel = "Point at an existing note"
 
 describe("NoteDeadLinkCreateModal", () => {
   const noteRealm = makeMe.aNoteRealm.title("Ghost Page").please()
@@ -112,7 +112,14 @@ describe("NoteDeadLinkCreateModal", () => {
     await wrapper?.vm.$nextTick()
   }
 
-  it("shows create-or-link choice when reopened after modelValue cleared without close", async () => {
+  it("shows create-or-retarget choice with dead wiki link copy", async () => {
+    mountModal()
+    await waitForChooser()
+    expect(screen.getByText(/Dead wiki link:/)).toBeTruthy()
+    expect(screen.getByText(pointAtExistingNoteLabel)).toBeTruthy()
+  })
+
+  it("shows create-or-retarget choice when reopened after modelValue cleared without close", async () => {
     mountModal()
     await waitForChooser()
     await tapChooserAndSettle(createNoteLabel)
@@ -131,7 +138,7 @@ describe("NoteDeadLinkCreateModal", () => {
   describe("soft keyboard primer", () => {
     it.each([
       { branch: "create", label: createNoteLabel },
-      { branch: "link", label: linkNoteLabel },
+      { branch: "point-at-existing", label: pointAtExistingNoteLabel },
     ])(
       "focuses primer synchronously when $branch is tapped on touch device",
       async ({ label }) => {
@@ -157,12 +164,12 @@ describe("NoteDeadLinkCreateModal", () => {
       await waitUntilFocused('[data-test="note-title"]')
     })
 
-    it("transfers focus to search input after link form mounts", async () => {
+    it("transfers focus to search input after point-at-existing form mounts", async () => {
       matchMediaSpy = mockCoarsePointer(true)
       mountModal()
       await waitForChooser()
 
-      await tapChooserAndSettle(linkNoteLabel)
+      await tapChooserAndSettle(pointAtExistingNoteLabel)
 
       await waitUntilFocused('input[placeholder="Search"]')
     })

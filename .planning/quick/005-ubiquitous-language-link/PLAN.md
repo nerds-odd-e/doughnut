@@ -42,16 +42,13 @@ Where Doughnut means a **wiki link** and/or **relationship**, stop using bare **
 
 ### Phase 3 — Behavior: dead wiki link resolution copy
 
-**Status:** planned  
+**Status:** done  
 **Type:** Behavior
 
-- **Pre:** Unresolved `[[…]]` modal says `Dead link:` / `Link to an existing note`.
-- **Trigger:** User follows a dead wiki link and sees create-or-retarget choices.
-- **Post:** Copy says **dead wiki link** / retarget without bare link (CONTEXT table).
+- Modal: `Dead wiki link:` / `Point at an existing note`; identifiers renamed away from bare link.
+- Unit + `link.feature` green.
 
-**Touch:** `NoteDeadLinkCreateModal.vue`; related unit + wiki-link E2E steps/POs that match those labels.
-
-**Done when:** Dead-wiki-link create/retarget scenarios pass with new copy.
+**Done when:** Dead-wiki-link create/retarget scenarios pass with new copy. ✅
 
 ---
 

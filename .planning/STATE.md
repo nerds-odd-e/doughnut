@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: null
 milestone_name: null
-current_phase: "3"
-current_phase_name: Dead wiki link resolution copy
+current_phase: "4"
+current_phase_name: Accidental-match connect CTA
 status: executing
 stopped_at: null
-last_updated: "2026-08-07T07:25:00Z"
+last_updated: "2026-08-07T07:40:00Z"
 last_activity: 2026-08-07
-last_activity_desc: "Quick 005 Phase 2 done; starting Phase 3"
+last_activity_desc: "Quick 005 Phase 3 done; starting Phase 4"
 progress:
   total_phases: 10
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 1
   completed_plans: 0
-  percent: 20
+  percent: 30
 ---
 
 # Project State
@@ -29,7 +29,7 @@ See: `.planning/PROJECT.md`
 
 - Plan: `.planning/quick/005-ubiquitous-language-link/PLAN.md`
 - Context: `.planning/quick/005-ubiquitous-language-link/CONTEXT.md`
-- Next: Phase 3 — Behavior: dead wiki link resolution copy
+- Next: Phase 4 — Behavior: accidental-match connect CTA
 
 ## Deferred Items
 

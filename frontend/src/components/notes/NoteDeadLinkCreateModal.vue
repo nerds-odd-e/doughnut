@@ -1,9 +1,9 @@
 <template>
   <Modal v-if="modelValue !== null" @close_request="close">
     <template #body>
-      <div v-if="!showCreateForm && !linkingToExisting" class="flex flex-col gap-3">
+      <div v-if="!showCreateForm && !pointingAtExisting" class="flex flex-col gap-3">
         <p class="text-sm opacity-70">
-          Dead link: <strong>{{ modelValue.displayText }}</strong>
+          Dead wiki link: <strong>{{ modelValue.displayText }}</strong>
         </p>
         <div class="flex flex-col gap-2">
           <button
@@ -14,9 +14,9 @@
           </button>
           <button
             class="daisy-btn daisy-btn-secondary"
-            @click="onLinkToExistingClick"
+            @click="onPointAtExistingClick"
           >
-            Link to an existing note
+            {{ pointAtExistingNoteLabel }}
           </button>
         </div>
       </div>
@@ -30,7 +30,7 @@
         @close-dialog="close"
       />
       <SearchForm
-        v-else-if="linkingToExisting && modelValue !== null"
+        v-else-if="pointingAtExisting && modelValue !== null"
         :note="noteRealm.note"
         :dead-link-payload="modelValue"
         :modal-closer="close"
@@ -50,6 +50,8 @@ import SearchForm from "@/components/links/SearchForm.vue"
 import type { DeadLinkPayload } from "@/utils/wikiPropertyValueField"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
 
+const pointAtExistingNoteLabel = "Point at an existing note"
+
 const props = defineProps<{
   notebookId: number
   noteRealm: NoteRealm
@@ -61,14 +63,14 @@ const emit = defineEmits<{
   "update:modelValue": [value: DeadLinkPayload | null]
 }>()
 
-const linkingToExisting = ref(false)
+const pointingAtExisting = ref(false)
 const showCreateForm = ref(false)
 
 watch(
   () => props.modelValue,
   (value) => {
     if (value === null) {
-      linkingToExisting.value = false
+      pointingAtExisting.value = false
       showCreateForm.value = false
     }
   }
@@ -79,9 +81,9 @@ const onCreateNewNoteClick = () => {
   showCreateForm.value = true
 }
 
-const onLinkToExistingClick = () => {
+const onPointAtExistingClick = () => {
   primeSoftKeyboard()
-  linkingToExisting.value = true
+  pointingAtExisting.value = true
 }
 
 const close = () => {

@@ -931,6 +931,6 @@ When(
     start
       .assumeNotePage()
       .followDeadLink(deadLinkText)
-      .linkToExistingNote(existingNoteTitle, deadLinkText)
+      .pointAtExistingNote(existingNoteTitle, deadLinkText)
   }
 )
