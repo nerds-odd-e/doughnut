@@ -79,7 +79,9 @@ const onNoteRecallInfoLoaded = (info: NoteRecallInfo) => {
 
 const hasNoteLevelMemoryTrackers = computed(
   () =>
-    noteRecallInfo.value?.memoryTrackers?.some((mt) => !mt.propertyKey) ?? false
+    noteRecallInfo.value?.memoryTrackers?.some(
+      (mt) => !mt.propertyKey && mt.type !== "COMMISSIONED"
+    ) ?? false
 )
 const hasSpellingMemoryTracker = computed(
   () =>

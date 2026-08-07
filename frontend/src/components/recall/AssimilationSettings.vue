@@ -109,7 +109,7 @@
                 :disabled="!noteInfoLoaded"
                 :assimilate-disabled="assimilateDisabled"
                 :skipped-for-recall="isSkippedForRecall(noteRecallInfo)"
-                :show-commissioned-option="true"
+                :show-commissioned-option="showCommissionedOption"
                 @assimilate="
                   (skip) => emit('assimilate', { skipMemoryTracking: skip })
                 "
@@ -189,6 +189,15 @@ const assimilateDisabledForProperty = (propertyKey: string) =>
   noteRecallInfo.value?.memoryTrackers?.some(
     (mt) => mt.propertyKey === propertyKey
   ) ?? false
+
+const showCommissionedOption = computed(
+  () =>
+    !(
+      noteRecallInfo.value?.memoryTrackers?.some(
+        (mt) => !mt.propertyKey && mt.type === "COMMISSIONED"
+      ) ?? false
+    )
+)
 
 const reloadNoteInfo = async () => {
   await noteInfoBarRef.value?.reload()
