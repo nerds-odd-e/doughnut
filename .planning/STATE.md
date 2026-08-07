@@ -46,4 +46,4 @@ due-recall exclusion, assimilation join, etc. Existing Phase 1 PLANs under
 
 ## Session Continuity
 
-`/gsd-plan-phase 1` (or revise 01-01/01-02) for COMMISSIONED-on-type; then execute.
+`/gsd-plan-phase 1` — RESEARCH done for COMMISSIONED-on-type; rewrite stale 01-01/01-02 PLANs then execute.
