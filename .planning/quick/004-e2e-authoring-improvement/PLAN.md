@@ -202,16 +202,14 @@ Improve all E2E feature files (and supporting steps/page objects as needed) so t
 
 ### Phase 15 — Folder organization E2E authoring
 
-**Status:** planned  
+**Status:** done  
 **Type:** Behavior
 
-- **Pre:** Folder features may violate checklist (Folder column is often legitimate here).
-- **Trigger:** Audit + improve without removing Folder when hierarchy is under test.
-- **Post:** Checklist satisfied; Cypress green.
+- Domain Gherkin; Folder columns kept; `folderOrganizeForm` naming; move/dissolve steps on folder page.
 
 **Files:** `folder_organization/folder_organization.feature`, `folder_organization/folder_page_readme.feature`
 
-**Done when:** checklist applied; targeted Cypress passes.
+**Done when:** checklist applied; targeted Cypress passes. ✅ 11/11
 
 ---
 

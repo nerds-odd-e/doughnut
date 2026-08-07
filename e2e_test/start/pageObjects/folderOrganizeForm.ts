@@ -6,18 +6,16 @@ import { waitUntilAppIsNotBusy } from '../pageBase'
 
 const submitTimeoutMs = 20000
 
-export type SidebarFolderOrganizeForm = {
-  selectDestinationNotebook: (notebookName: string) => SidebarFolderOrganizeForm
-  selectNotebookRootAsDestination: () => SidebarFolderOrganizeForm
-  openFolderSearch: () => SidebarFolderOrganizeForm
-  searchFolderDestination: (text: string) => SidebarFolderOrganizeForm
-  selectFolderSearchResultByName: (
-    folderName: string
-  ) => SidebarFolderOrganizeForm
+export type FolderOrganizeForm = {
+  selectDestinationNotebook: (notebookName: string) => FolderOrganizeForm
+  selectNotebookRootAsDestination: () => FolderOrganizeForm
+  openFolderSearch: () => FolderOrganizeForm
+  searchFolderDestination: (text: string) => FolderOrganizeForm
+  selectFolderSearchResultByName: (folderName: string) => FolderOrganizeForm
   confirmMove: () => void
-  tryConfirmMove: () => SidebarFolderOrganizeForm
+  tryConfirmMove: () => FolderOrganizeForm
   confirmMerge: () => void
-  expectErrorText: (text: string) => SidebarFolderOrganizeForm
+  expectErrorText: (text: string) => FolderOrganizeForm
   dissolveFolder: () => void
   dissolveFolderWithMerge: () => void
 }
@@ -25,16 +23,16 @@ export type SidebarFolderOrganizeForm = {
 /**
  * Page object for folder move / rename / dissolve on the folder page (`data-testid="folder-move-dialog"`).
  */
-export function assumeSidebarFolderOrganizeForm(): SidebarFolderOrganizeForm {
+export function assumeFolderOrganizeForm(): FolderOrganizeForm {
   return {
     selectDestinationNotebook(notebookName: string) {
       cy.get('[data-testid="folder-move-notebook-select"]').select(notebookName)
-      return assumeSidebarFolderOrganizeForm()
+      return assumeFolderOrganizeForm()
     },
 
     selectNotebookRootAsDestination() {
       cy.get('[data-testid="folder-move-parent-select"]').select('__root__')
-      return assumeSidebarFolderOrganizeForm()
+      return assumeFolderOrganizeForm()
     },
 
     openFolderSearch() {
@@ -42,12 +40,12 @@ export function assumeSidebarFolderOrganizeForm(): SidebarFolderOrganizeForm {
       cy.get('[data-testid="folder-selector-search-dialog"]').should(
         'be.visible'
       )
-      return assumeSidebarFolderOrganizeForm()
+      return assumeFolderOrganizeForm()
     },
 
     searchFolderDestination(text: string) {
       cy.get('[data-testid="folder-selector-search-input"]').clear().type(text)
-      return assumeSidebarFolderOrganizeForm()
+      return assumeFolderOrganizeForm()
     },
 
     selectFolderSearchResultByName(folderName: string) {
@@ -55,7 +53,7 @@ export function assumeSidebarFolderOrganizeForm(): SidebarFolderOrganizeForm {
         '[data-testid="folder-selector-search-result"]',
         folderName
       ).click()
-      return assumeSidebarFolderOrganizeForm()
+      return assumeFolderOrganizeForm()
     },
 
     confirmMove() {
@@ -70,7 +68,7 @@ export function assumeSidebarFolderOrganizeForm(): SidebarFolderOrganizeForm {
         .should('not.be.disabled')
         .click()
       declineMergeConfirmIfShown()
-      return assumeSidebarFolderOrganizeForm()
+      return assumeFolderOrganizeForm()
     },
 
     confirmMerge() {
@@ -84,8 +82,14 @@ export function assumeSidebarFolderOrganizeForm(): SidebarFolderOrganizeForm {
     expectErrorText(text: string) {
       cy.get('[data-testid="folder-move-dialog"]')
         .find('.text-error')
-        .should('contain.text', text)
-      return assumeSidebarFolderOrganizeForm()
+        .should(($el) => {
+          const actual = $el.text()
+          expect(
+            actual,
+            `Expected folder page error to contain "${text}", but found "${actual}"`
+          ).to.include(text)
+        })
+      return assumeFolderOrganizeForm()
     },
 
     dissolveFolder() {

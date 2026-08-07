@@ -4,27 +4,26 @@ Feature: Folder organization
 
   Background:
     Given I am logged in as an existing user
-    And I have a notebook "Organize NB" with notes:
+
+  Scenario: Move a nested folder to notebook root from the folder page
+    Given I have a notebook "Organize NB" with notes:
       | Title     | Folder |
       | Root note |        |
       | In folder | Alpha  |
-
-  Scenario: Move a nested folder to notebook root from the folder page
-    Given the notebook "Organize NB" has a folder "Beta" under note "In folder"
+    And the notebook "Organize NB" has a folder "Beta" under note "In folder"
     When I view note "In folder"
-    Then I should see sidebar folder "Beta" under open folder "Alpha"
-    When I activate folder "Beta" in the sidebar
-    And I move folder "Beta" to notebook root using the folder page
+    And I activate folder "Beta" in the sidebar
+    And I move folder "Beta" to notebook root
     Then I should see sidebar folder "Beta"
 
   Scenario: Sibling name clash blocks a folder move and shows inline error
     Given I have a notebook "Organize NB" with notes:
-      | Title       | Folder      |
-      | Root Beta   | Beta        |
-      | Nested Beta | Alpha/Beta  |
+      | Title       | Folder     |
+      | Root Beta   | Beta       |
+      | Nested Beta | Alpha/Beta |
     When I view note "Nested Beta"
     And I activate folder "Beta" under the open folder "Alpha" in the sidebar
-    And I attempt to move folder "Beta" under "Alpha" to notebook root using the folder page
+    And I attempt to move folder "Beta" under "Alpha" to notebook root
     Then the folder page shows error "A folder with this name already exists here."
 
   Scenario: Dissolve a folder, promoting its notes and subfolders to the parent
@@ -34,18 +33,18 @@ Feature: Folder organization
       | Deep  | Outer/Mid/Inner |
     When I view note "Loose"
     And I activate folder "Mid" under the open folder "Outer" in the sidebar
-    And I dissolve folder "Mid" under "Outer" using the folder page
+    And I dissolve folder "Mid" under "Outer"
     Then I should see sidebar folder "Inner" under open folder "Outer"
     And I should see note "Loose" under open folder "Outer"
 
   Scenario: Moving a folder into a same-name destination merges them when confirmed
     Given I have a notebook "Organize NB" with notes:
-      | Title       | Folder      |
-      | Root note A | Shared      |
+      | Title       | Folder       |
+      | Root note A | Shared       |
       | Inner note  | Alpha/Shared |
     When I view note "Inner note"
     And I activate folder "Shared" under the open folder "Alpha" in the sidebar
-    And I move folder "Shared" under "Alpha" to notebook root and confirm merge using the folder page
+    And I move folder "Shared" under "Alpha" to notebook root and confirm merge
     Then I should see note "Root note A" under open folder "Shared"
     And I should see note "Inner note" under open folder "Shared"
 
@@ -56,7 +55,7 @@ Feature: Folder organization
       | Mid note   | Outer/Mid/Inner |
     When I view note "Mid note"
     And I activate folder "Mid" under the open folder "Outer" in the sidebar
-    And I dissolve folder "Mid" under "Outer" and confirm merge using the folder page
+    And I dissolve folder "Mid" under "Outer" and confirm merge
     Then I should see note "Outer note" under open folder "Inner"
     And I should see note "Mid note" under open folder "Inner"
 
@@ -67,20 +66,20 @@ Feature: Folder organization
       | n2    | Gamma      |
     When I view note "n1"
     And I activate folder "Beta" under the open folder "Alpha" in the sidebar
-    And I move folder "Beta" under "Alpha" to folder "Gamma" using folder search on the folder page
+    And I move folder "Beta" under "Alpha" to folder "Gamma" using folder search
     Then I should see sidebar folder "Beta" under collapsed folder "Gamma"
 
   @mockBrowserTime
   Scenario: Moving a folder to another notebook root keeps boundary wiki links correct
     Given I have a notebook "FolderXMove Old NB" with notes:
-      | Title   | Content                 | Folder                   |
-      | Target  | old notebook target     | FolderXMove Root         |
-      | Carrier | Read [[Target]].        | FolderXMove Root/Moved   |
-      | Ref     | See [[Carrier]].        | FolderXMove Root         |
+      | Title   | Content              | Folder                 |
+      | Target  | old notebook target  | FolderXMove Root       |
+      | Carrier | Read [[Target]].     | FolderXMove Root/Moved |
+      | Ref     | See [[Carrier]].     | FolderXMove Root       |
     And I have a notebook "FolderXMove New NB" with a note "Placeholder" and content "dest"
     When I view note "Carrier"
     And I activate folder "Moved" under the open folder "FolderXMove Root" in the sidebar
-    And I move folder "Moved" under "FolderXMove Root" to notebook "FolderXMove New NB" root using the folder page
+    And I move folder "Moved" under "FolderXMove Root" to notebook "FolderXMove New NB" root
     Then I should see sidebar folder "Moved"
     When I route to the note "Carrier"
     And I view the note content as markdown
@@ -95,26 +94,26 @@ Feature: Folder organization
 
   Scenario: Move a folder into a folder in another notebook
     Given I have a notebook "FolderXParent Old NB" with notes:
-      | Title | Folder                    |
-      | n1    | FolderXParent Root/Moved  |
+      | Title | Folder                   |
+      | n1    | FolderXParent Root/Moved |
     And I have a notebook "FolderXParent New NB" with notes:
-      | Title | Folder                       |
-      | n2    | FolderXParent Dest           |
+      | Title | Folder             |
+      | n2    | FolderXParent Dest |
     When I view note "n1"
     And I activate folder "Moved" under the open folder "FolderXParent Root" in the sidebar
-    And I move folder "Moved" under "FolderXParent Root" to notebook "FolderXParent New NB" folder "FolderXParent Dest" using the folder page
+    And I move folder "Moved" under "FolderXParent Root" to notebook "FolderXParent New NB" folder "FolderXParent Dest"
     Then I should see sidebar folder "Moved" under open folder "FolderXParent Dest"
 
   Scenario: Moving a folder into another notebook merges same-name folder when confirmed
     Given I have a notebook "FolderXMerge Old NB" with notes:
-      | Title      | Folder                     |
-      | Inner note | FolderXMerge Root/Shared   |
+      | Title      | Folder                   |
+      | Inner note | FolderXMerge Root/Shared |
     And I have a notebook "FolderXMerge New NB" with notes:
-      | Title      | Folder                              |
-      | Root note  | FolderXMerge Dest/Shared            |
-      | Place note | FolderXMerge Dest                   |
+      | Title      | Folder                   |
+      | Root note  | FolderXMerge Dest/Shared |
+      | Place note | FolderXMerge Dest        |
     When I view note "Inner note"
     And I activate folder "Shared" under the open folder "FolderXMerge Root" in the sidebar
-    And I move folder "Shared" under "FolderXMerge Root" to notebook "FolderXMerge New NB" folder "FolderXMerge Dest" and confirm merge using the folder page
+    And I move folder "Shared" under "FolderXMerge Root" to notebook "FolderXMerge New NB" folder "FolderXMerge Dest" and confirm merge
     Then I should see note "Root note" under open folder "Shared"
     And I should see note "Inner note" under open folder "Shared"

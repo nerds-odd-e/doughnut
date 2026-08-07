@@ -28,10 +28,13 @@ const folderPage = () => ({
     cy.get('[data-testid="folder-readme-body"]')
       .scrollIntoView()
       .should('be.visible')
-    cy.get('[data-testid="folder-readme-body"] .ql-editor').should(
-      'contain.text',
-      fragment
-    )
+    cy.get('[data-testid="folder-readme-body"] .ql-editor').should(($el) => {
+      const actual = $el.text()
+      expect(
+        actual,
+        `Expected folder readme to contain "${fragment}", but found "${actual}"`
+      ).to.include(fragment)
+    })
     return this
   },
 })

@@ -3,7 +3,7 @@ import noteCreationForm from './forms/noteCreationForm'
 import {
   openFolderPageForOrganize,
   openFolderPageForOrganizeUnderParent,
-} from './sidebarFolderOrganizeNav'
+} from './folderOrganizeNav'
 import {
   sidebarAddFolderButton,
   sidebarAddNoteButton,
@@ -146,7 +146,12 @@ export const noteSidebar = () => {
 
     expectSidebarFolderVisible(folderLabel: string) {
       waitUntilAppIsNotBusy()
-      folderTreitemByLabel(folderLabel).should('exist')
+      folderTreitemByLabel(folderLabel).should(($el) => {
+        expect(
+          $el.length,
+          `Expected sidebar folder "${folderLabel}" to be visible`
+        ).to.be.at.least(1)
+      })
     },
 
     expectSidebarFolderAbsent(folderLabel: string) {
@@ -167,7 +172,12 @@ export const noteSidebar = () => {
         .find(
           `[role="treeitem"].sidebar-folder-li[aria-label="${childFolderLabel}"]`
         )
-        .should('have.length.at.least', 1)
+        .should(($el) => {
+          expect(
+            $el.length,
+            `Expected sidebar folder "${childFolderLabel}" under open folder "${parentFolderLabel}"`
+          ).to.be.at.least(1)
+        })
     },
 
     expectSidebarNoteUnderOpenFolder(folderLabel: string, noteTitle: string) {
@@ -177,7 +187,12 @@ export const noteSidebar = () => {
         .find(`[role="treeitem"].sidebar-note-li[aria-label="${noteTitle}"]`, {
           timeout: sidebarActionTimeoutMs,
         })
-        .should('have.length.at.least', 1)
+        .should(($el) => {
+          expect(
+            $el.length,
+            `Expected note "${noteTitle}" under open folder "${folderLabel}"`
+          ).to.be.at.least(1)
+        })
     },
 
     navigateToNote(title: string) {

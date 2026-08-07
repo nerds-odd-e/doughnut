@@ -15,9 +15,10 @@ Feature: Folder page readme
     When I reload the folder page
     Then the folder readme should contain "Persistent folder landing"
 
-  Scenario: New note from folder page uses folder readme title_pattern default
+  Scenario: New note from folder page uses the folder title pattern
     When I view note "In Alpha"
     And I open the folder page for "Alpha" from the sidebar
-    When I add a rich note property with key "title_pattern" and value "{{date}}"
+    And I add a rich note property with key "title_pattern" and value "{{date}}"
     And I type and save the folder readme with text "Scoped readme marker"
-    When I create a new note from the sidebar submitting the default title
+    When I create a new note from the sidebar with the default title
+    Then I should see a note titled with today's date
