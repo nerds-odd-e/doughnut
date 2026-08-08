@@ -1,6 +1,6 @@
 # v1.3 post-milestone refactor
 
-**Status:** in-progress (Phases 1–2 done)
+**Status:** in-progress (Phases 1–3 done)
 
 **Type:** ad-hoc quick plan (Structure only)
 
@@ -84,7 +84,7 @@ backend+frontend production edit in one phase without Jidoka).
 **Verify:** affected controller + policy test classes.
 
 ### Phase 3 — Split `LearningSessionControllerTests`
-**Type:** Structure | **Status:** planned | **Subsystem:** backend (tests)
+**Type:** Structure | **Status:** done | **Subsystem:** backend (tests)
 
 Split 758-line class along cohesive seams sharing
 `LearningSessionControllerTestBase` (and hoist Spanish notebook /
