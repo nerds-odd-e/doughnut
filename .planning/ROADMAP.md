@@ -180,6 +180,17 @@ Plans:
 
 **Context:** `.planning/phases/06-record-report-and-schedule/`
 
+**Plans:** 2 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 06-01-PLAN.md — Tracer: record API + parser + scheduling + dialog record state + E2E @wip (REC-01, REC-02, REC-04)
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 06-02-PLAN.md — Expansion: awaiting-report strip + assimilation feedback + REC-05 unit tests + E2E graduation (REC-01, REC-03–REC-05)
+
 ---
 
 ### Phase 7: Amend recorded session (Behavior)
