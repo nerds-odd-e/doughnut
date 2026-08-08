@@ -4983,6 +4983,24 @@ components:
         totalUnassimilatedCount:
           type: integer
           format: int32
+    AwaitingReportLearningSessionLite:
+      type: object
+      properties:
+        notebookId:
+          type: integer
+          format: int32
+        notebookName:
+          type: string
+        learningSessionId:
+          type: integer
+          format: int32
+        requestMarkdown:
+          type: string
+      required:
+      - learningSessionId
+      - notebookId
+      - notebookName
+      - requestMarkdown
     DueCommissionedMemoryTrackerLite:
       type: object
       properties:
@@ -5015,6 +5033,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/DueCommissionedMemoryTrackerLite"
+        awaitingReportSessions:
+          type: array
+          items:
+            $ref: "#/components/schemas/AwaitingReportLearningSessionLite"
         dueInDays:
           type: integer
           format: int32

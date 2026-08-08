@@ -9,4 +9,6 @@ public interface LearningSessionRepository extends JpaRepository<LearningSession
 
   List<LearningSession> findByUser_IdAndNotebook_IdAndStatus(
       Integer userId, Integer notebookId, LearningSessionStatus status);
+
+  List<LearningSession> findByUser_IdAndStatus(Integer userId, LearningSessionStatus status);
 }

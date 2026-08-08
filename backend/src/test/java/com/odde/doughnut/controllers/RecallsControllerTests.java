@@ -208,6 +208,36 @@ class RecallsControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void returnsAwaitingReportSessionsAfterCommission() throws UnexpectedNoAccessRightException {
+      Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
+      testabilitySettings.timeTravelTo(currentTime);
+      Notebook notebook =
+          makeMe
+              .aNotebook()
+              .creatorAndOwner(currentUser.getUser())
+              .name("Spanish conversation")
+              .please();
+      Note hola = makeMe.aNote().notebook(notebook).title("Hola").please();
+      makeMe.aMemoryTrackerFor(hola).commissioned().nextRecallAt(currentTime).please();
+
+      CommissionLearningSessionRequest request = new CommissionLearningSessionRequest();
+      request.notebookId = notebook.getId();
+      learningSessionController.commission(request, "Asia/Shanghai");
+
+      DueMemoryTrackers afterCommission = controller.recalling("Asia/Shanghai", 0);
+      assertThat(afterCommission.getAwaitingReportSessions(), hasSize(1));
+      assertEquals(
+          "Spanish conversation",
+          afterCommission.getAwaitingReportSessions().get(0).getNotebookName());
+      assertEquals(
+          notebook.getId(), afterCommission.getAwaitingReportSessions().get(0).getNotebookId());
+      assertThat(
+          afterCommission.getAwaitingReportSessions().get(0).getRequestMarkdown(),
+          org.hamcrest.Matchers.containsString("### Hola"));
+      assertThat(afterCommission.getDueCommissioned(), hasSize(0));
+    }
+
+    @Test
     void awaitingReportExclusionDoesNotLeakAcrossUsers() throws UnexpectedNoAccessRightException {
       User userA = currentUser.getUser();
       User userB = makeMe.aUser().please();

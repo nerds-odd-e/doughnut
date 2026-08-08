@@ -953,6 +953,13 @@ export type AssimilationCountDto = {
     totalUnassimilatedCount?: number;
 };
 
+export type AwaitingReportLearningSessionLite = {
+    notebookId: number;
+    notebookName: string;
+    learningSessionId: number;
+    requestMarkdown: string;
+};
+
 export type DueCommissionedMemoryTrackerLite = {
     memoryTrackerId: number;
     notebookId: number;
@@ -964,6 +971,7 @@ export type DueMemoryTrackers = {
     currentRecallWindowEndAt?: string;
     toRepeat?: Array<MemoryTrackerLite>;
     dueCommissioned?: Array<DueCommissionedMemoryTrackerLite>;
+    awaitingReportSessions?: Array<AwaitingReportLearningSessionLite>;
     dueInDays?: number;
 };
 

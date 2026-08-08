@@ -73,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref, watch } from "vue"
 import { LearningSessionController } from "@generated/doughnut-backend-api/sdk.gen"
 import type { LearningSessionCommissionResponse } from "@generated/doughnut-backend-api/types.gen"
 import Modal from "@/components/commons/Modal.vue"
@@ -84,6 +84,8 @@ import timezoneParam from "@/managedApi/window/timezoneParam"
 const props = defineProps<{
   notebookId: number
   notebookName: string
+  mode?: "commission" | "record"
+  initialRequestMarkdown?: string
 }>()
 
 const emit = defineEmits<{
@@ -92,10 +94,22 @@ const emit = defineEmits<{
   (e: "recorded"): void
 }>()
 
-const commissioned = ref(false)
-const requestMarkdown = ref("")
+const commissioned = ref(props.mode === "record")
+const requestMarkdown = ref(props.initialRequestMarkdown ?? "")
 const reportMarkdown = ref("")
-const status = ref<LearningSessionCommissionResponse["status"] | "">("")
+const status = ref<LearningSessionCommissionResponse["status"] | "">(
+  props.mode === "record" ? "AWAITING_REPORT" : ""
+)
+
+watch(
+  () => props.initialRequestMarkdown,
+  (markdown) => {
+    if (props.mode === "record" && markdown) {
+      requestMarkdown.value = markdown
+    }
+  },
+  { immediate: true }
+)
 
 const commission = async () => {
   const { data, error } = await apiCallWithLoading(

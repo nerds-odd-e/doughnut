@@ -100,3 +100,67 @@ describe("RecallProgressBar potential learning sessions", () => {
     ).toBeTruthy()
   })
 })
+
+describe("RecallProgressBar awaiting report sessions", () => {
+  const mountBar = (
+    awaitingReportSessions: {
+      notebookId: number
+      notebookName: string
+      learningSessionId: number
+      requestMarkdown: string
+    }[]
+  ) =>
+    helper
+      .component(RecallProgressBar)
+      .withRouter()
+      .withProps({
+        finished: 0,
+        toRepeatCount: 0,
+        canMoveToEnd: false,
+        currentIndex: 0,
+        previousAnsweredQuestions: [],
+        potentialLearningSessions: [],
+        awaitingReportSessions,
+      })
+      .mount()
+
+  it("renders awaiting-report strip with Record report button", () => {
+    const wrapper = mountBar([
+      {
+        notebookId: 1,
+        notebookName: "Spanish conversation",
+        learningSessionId: 42,
+        requestMarkdown: "# Learning Session Request\n\n### Hola\n",
+      },
+    ])
+    const row = wrapper.find('[data-test="awaiting-report-learning-session"]')
+    expect(row.exists()).toBe(true)
+    expect(row.text()).toContain(
+      `1 learning session awaiting the tutor's report for notebook "Spanish conversation"`
+    )
+    expect(
+      row.find('[data-test="record-learning-session-report"]').exists()
+    ).toBe(true)
+  })
+
+  it("opens record dialog with request prefilled when Record report is clicked", async () => {
+    const requestMarkdown = "# Learning Session Request\n\n### Hola\n"
+    const wrapper = mountBar([
+      {
+        notebookId: 1,
+        notebookName: "Spanish conversation",
+        learningSessionId: 42,
+        requestMarkdown,
+      },
+    ])
+    await wrapper
+      .find('[data-test="awaiting-report-learning-session"]')
+      .find('[data-test="record-learning-session-report"]')
+      .trigger("click")
+    const request = document.body.querySelector(
+      '[data-test="learning-session-request"]'
+    ) as HTMLTextAreaElement | null
+    expect(request).toBeTruthy()
+    expect(request?.value).toBe(requestMarkdown)
+  })
+})
