@@ -973,6 +973,7 @@ export type DueMemoryTrackers = {
     toRepeat?: Array<MemoryTrackerLite>;
     dueCommissioned?: Array<DueCommissionedMemoryTrackerLite>;
     awaitingReportSessions?: Array<AwaitingReportLearningSessionLite>;
+    recordedSessions?: Array<RecordedLearningSessionLite>;
     dueInDays?: number;
 };
 
@@ -986,6 +987,13 @@ export type MenuDataDto = {
     assimilationCount?: AssimilationCountDto;
     recallStatus?: DueMemoryTrackers;
     unreadConversations?: Array<ConversationMessage>;
+};
+
+export type RecordedLearningSessionLite = {
+    notebookId: number;
+    notebookName: string;
+    learningSessionId: number;
+    requestMarkdown: string;
 };
 
 export type CurrentUserInfo = {

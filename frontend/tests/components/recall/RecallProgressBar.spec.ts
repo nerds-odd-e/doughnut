@@ -164,3 +164,71 @@ describe("RecallProgressBar awaiting report sessions", () => {
     expect(request?.value).toBe(requestMarkdown)
   })
 })
+
+describe("RecallProgressBar recorded sessions", () => {
+  const mountBar = (
+    recordedSessions: {
+      notebookId: number
+      notebookName: string
+      learningSessionId: number
+      requestMarkdown: string
+    }[]
+  ) =>
+    helper
+      .component(RecallProgressBar)
+      .withRouter()
+      .withProps({
+        finished: 0,
+        toRepeatCount: 0,
+        canMoveToEnd: false,
+        currentIndex: 0,
+        previousAnsweredQuestions: [],
+        potentialLearningSessions: [],
+        awaitingReportSessions: [],
+        recordedSessions,
+      })
+      .mount()
+
+  it("renders recorded-session strip with Amend report button", () => {
+    const wrapper = mountBar([
+      {
+        notebookId: 1,
+        notebookName: "Spanish conversation",
+        learningSessionId: 42,
+        requestMarkdown: "# Learning Session Request\n\n### Hola\n",
+      },
+    ])
+    const row = wrapper.find('[data-test="recorded-learning-session"]')
+    expect(row.exists()).toBe(true)
+    expect(row.text()).toContain(
+      '1 recorded learning session for notebook "Spanish conversation"'
+    )
+    expect(
+      row.find('[data-test="amend-learning-session-report"]').exists()
+    ).toBe(true)
+  })
+
+  it("opens amend dialog with request prefilled when Amend report is clicked", async () => {
+    const requestMarkdown = "# Learning Session Request\n\n### Hola\n"
+    const wrapper = mountBar([
+      {
+        notebookId: 1,
+        notebookName: "Spanish conversation",
+        learningSessionId: 42,
+        requestMarkdown,
+      },
+    ])
+    await wrapper
+      .find('[data-test="recorded-learning-session"]')
+      .find('[data-test="amend-learning-session-report"]')
+      .trigger("click")
+    const request = document.body.querySelector(
+      '[data-test="learning-session-request"]'
+    ) as HTMLTextAreaElement | null
+    expect(request).toBeTruthy()
+    expect(request?.value).toBe(requestMarkdown)
+    expect(
+      document.body.querySelector('[data-test="learning-session-recorded"]')
+    ).toBeTruthy()
+  })
+})

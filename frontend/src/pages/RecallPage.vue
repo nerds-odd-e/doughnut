@@ -19,6 +19,7 @@
           previousAnsweredQuestions,
           potentialLearningSessions,
           awaitingReportSessions,
+          recordedSessions,
         }"
         @view-last-answered-question="viewLastAnsweredQuestion($event)"
         @move-to-end="moveMemoryTrackerToEnd($event)"
@@ -105,8 +106,10 @@ const {
   setToRepeat,
   setDueCommissioned,
   setAwaitingReportSessions,
+  setRecordedSessions,
   potentialLearningSessions,
   awaitingReportSessions,
+  recordedSessions,
   diligentMode,
   setDiligentMode,
   dueRecallsRefreshNonce,
@@ -206,6 +209,7 @@ const { isProgressBarVisible, isLoadingMore, loadMore } = useRecallPageLoading({
   setToRepeat,
   setDueCommissioned,
   setAwaitingReportSessions,
+  setRecordedSessions,
   setTotalAssimilatedCount,
   setDiligentMode,
   setCurrentRecallWindowEndAt,

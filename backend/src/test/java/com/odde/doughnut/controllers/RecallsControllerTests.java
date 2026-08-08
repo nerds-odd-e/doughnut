@@ -291,6 +291,80 @@ class RecallsControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void returnsRecordedSessionsAfterRecord() throws UnexpectedNoAccessRightException {
+      Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
+      testabilitySettings.timeTravelTo(currentTime);
+      Notebook notebook =
+          makeMe
+              .aNotebook()
+              .creatorAndOwner(currentUser.getUser())
+              .name("Spanish conversation")
+              .please();
+      Note hola = makeMe.aNote().notebook(notebook).title("Hola").please();
+      Note gracias = makeMe.aNote().notebook(notebook).title("Gracias").please();
+      makeMe.aMemoryTrackerFor(hola).commissioned().nextRecallAt(currentTime).please();
+      makeMe.aMemoryTrackerFor(gracias).commissioned().nextRecallAt(currentTime).please();
+
+      CommissionLearningSessionRequest request = new CommissionLearningSessionRequest();
+      request.notebookId = notebook.getId();
+      learningSessionController.commission(request, "Asia/Shanghai");
+      learningSessionController.record(
+          recordRequest(
+              notebook,
+              """
+              # Learning Session Report
+
+              Hola: 4
+              Gracias: 1
+              """),
+          "Asia/Shanghai");
+
+      DueMemoryTrackers afterRecord = controller.recalling("Asia/Shanghai", 0);
+      assertThat(afterRecord.getRecordedSessions(), hasSize(1));
+      assertEquals(
+          "Spanish conversation", afterRecord.getRecordedSessions().get(0).getNotebookName());
+      assertEquals(notebook.getId(), afterRecord.getRecordedSessions().get(0).getNotebookId());
+      assertThat(
+          afterRecord.getRecordedSessions().get(0).getRequestMarkdown(),
+          org.hamcrest.Matchers.containsString("### Hola"));
+      assertThat(afterRecord.getAwaitingReportSessions(), hasSize(0));
+    }
+
+    @Test
+    void recordedSessionsDoesNotLeakAcrossUsers() throws UnexpectedNoAccessRightException {
+      User userA = currentUser.getUser();
+      User userB = makeMe.aUser().please();
+      Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
+      testabilitySettings.timeTravelTo(currentTime);
+
+      Notebook notebookA =
+          makeMe.aNotebook().creatorAndOwner(userA).name("Spanish conversation").please();
+      Note holaA = makeMe.aNote().notebook(notebookA).title("Hola").please();
+      Note graciasA = makeMe.aNote().notebook(notebookA).title("Gracias").please();
+      makeMe.aMemoryTrackerFor(holaA).commissioned().nextRecallAt(currentTime).please();
+      makeMe.aMemoryTrackerFor(graciasA).commissioned().nextRecallAt(currentTime).please();
+
+      CommissionLearningSessionRequest request = new CommissionLearningSessionRequest();
+      request.notebookId = notebookA.getId();
+      learningSessionController.commission(request, "Asia/Shanghai");
+      learningSessionController.record(
+          recordRequest(
+              notebookA,
+              """
+              # Learning Session Report
+
+              Hola: 4
+              Gracias: 1
+              """),
+          "Asia/Shanghai");
+
+      currentUser.setUser(userB);
+      DueMemoryTrackers dueForB = controller.recalling("Asia/Shanghai", 0);
+
+      assertThat(dueForB.getRecordedSessions(), hasSize(0));
+    }
+
+    @Test
     void awaitingReportExclusionDoesNotLeakAcrossUsers() throws UnexpectedNoAccessRightException {
       User userA = currentUser.getUser();
       User userB = makeMe.aUser().please();

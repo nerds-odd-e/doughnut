@@ -45,6 +45,7 @@ export function createUseRecallDataMock(overrides?: {
     toRepeat: toRepeatRef,
     dueCommissioned: dueCommissionedRef,
     awaitingReportSessions: ref([]),
+    recordedSessions: ref([]),
     potentialLearningSessions,
     currentRecallWindowEndAt: ref(overrides?.currentRecallWindowEndAt),
     totalAssimilatedCount: ref(overrides?.totalAssimilatedCount ?? 0),
@@ -62,6 +63,7 @@ export function createUseRecallDataMock(overrides?: {
       }
     ),
     setAwaitingReportSessions: vi.fn(),
+    setRecordedSessions: vi.fn(),
     setCurrentRecallWindowEndAt: vi.fn(),
     setTotalAssimilatedCount: vi.fn(),
     setIsRecallPaused: vi.fn(),

@@ -203,6 +203,48 @@ describe("CommissionLearningSessionDialog", () => {
     ).toContain("Unknown: 3")
   })
 
+  it("mode amend shows recorded banner and emits recorded on success", async () => {
+    const recordSpy = mockSdkService(LearningSessionController, "record", {
+      status: "RECORDED",
+      recordedAt: "1989-01-02T09:00:00Z",
+      recordedItems: [{ noteTitle: "Gracias", score: 4, memoryTrackerId: 12 }],
+      rejectedEntries: [],
+    })
+    const wrapper = helper
+      .component(CommissionLearningSessionDialog)
+      .withRouter()
+      .withProps({
+        notebookId: 42,
+        notebookName: "Spanish conversation",
+        mode: "amend",
+        initialRequestMarkdown: canonicalRequestMarkdown,
+      })
+      .mount()
+    await flushPromises()
+
+    expect(
+      document.body.querySelector('[data-test="learning-session-recorded"]')
+    ).toBeTruthy()
+    expect(
+      document.body.querySelector('[data-test="learning-session-report"]')
+    ).toBeTruthy()
+
+    const reportTextarea = document.body.querySelector(
+      '[data-test="learning-session-report"]'
+    ) as HTMLTextAreaElement
+    reportTextarea.value = "# Learning Session Report\n\nGracias: 4\n"
+    reportTextarea.dispatchEvent(new Event("input"))
+
+    const recordButton = document.body.querySelector(
+      '[data-test="record-learning-session-report"]'
+    ) as HTMLButtonElement
+    recordButton.click()
+    await flushPromises()
+
+    expect(recordSpy).toHaveBeenCalled()
+    expect(wrapper.emitted("recorded")).toBeTruthy()
+  })
+
   it("keeps report textarea when record fails", async () => {
     mockSdkService(LearningSessionController, "commission", {
       learningSessionId: 7,

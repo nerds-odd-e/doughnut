@@ -19,6 +19,13 @@ export type AwaitingReportSession = {
   requestMarkdown: string
 }
 
+export type RecordedSession = {
+  notebookId: number
+  notebookName: string
+  learningSessionId: number
+  requestMarkdown: string
+}
+
 const toRepeat = ref<MemoryTrackerLite[] | undefined>(undefined)
 const dueCommissioned = ref<DueCommissionedMemoryTrackerLite[] | undefined>(
   undefined
@@ -26,6 +33,7 @@ const dueCommissioned = ref<DueCommissionedMemoryTrackerLite[] | undefined>(
 const awaitingReportSessions = ref<AwaitingReportSession[] | undefined>(
   undefined
 )
+const recordedSessions = ref<RecordedSession[] | undefined>(undefined)
 const currentRecallWindowEndAt = ref<string | undefined>(undefined)
 const totalAssimilatedCount = ref<number | undefined>(undefined)
 const isRecallPaused = ref(false)
@@ -79,6 +87,10 @@ export function useRecallData() {
     awaitingReportSessions.value = sessions
   }
 
+  const setRecordedSessions = (sessions: RecordedSession[] | undefined) => {
+    recordedSessions.value = sessions
+  }
+
   const setCurrentRecallWindowEndAt = (endAt: string | undefined) => {
     currentRecallWindowEndAt.value = endAt
   }
@@ -122,6 +134,7 @@ export function useRecallData() {
     toRepeat,
     dueCommissioned,
     awaitingReportSessions,
+    recordedSessions,
     potentialLearningSessions,
     currentRecallWindowEndAt,
     totalAssimilatedCount,
@@ -133,6 +146,7 @@ export function useRecallData() {
     setToRepeat,
     setDueCommissioned,
     setAwaitingReportSessions,
+    setRecordedSessions,
     setCurrentRecallWindowEndAt,
     setTotalAssimilatedCount,
     setIsRecallPaused,

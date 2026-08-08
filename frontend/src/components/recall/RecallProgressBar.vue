@@ -109,6 +109,32 @@
         </button>
       </div>
     </div>
+    <div
+      v-if="recordedSessions.length > 0"
+      class="flex flex-col gap-2 px-4"
+    >
+      <div
+        v-for="session in recordedSessions"
+        :key="session.learningSessionId"
+        data-test="recorded-learning-session"
+        role="status"
+        class="flex gap-2 items-start text-base font-normal text-base-content"
+      >
+        <span class="flex-1 break-words">
+          1 recorded learning session for notebook "{{
+            session.notebookName
+          }}"
+        </span>
+        <button
+          type="button"
+          class="daisy-btn daisy-btn-primary shrink-0"
+          data-test="amend-learning-session-report"
+          @click="openAmendDialog(session)"
+        >
+          Amend report
+        </button>
+      </div>
+    </div>
     <CommissionLearningSessionDialog
       v-if="commissionDialogSession"
       :notebook-id="commissionDialogSession.notebookId"
@@ -127,6 +153,16 @@
       @commissioned="onCommissioned"
       @recorded="onRecorded"
     />
+    <CommissionLearningSessionDialog
+      v-if="amendDialogSession"
+      mode="amend"
+      :notebook-id="amendDialogSession.notebookId"
+      :notebook-name="amendDialogSession.notebookName"
+      :initial-request-markdown="amendDialogSession.requestMarkdown"
+      @close="amendDialogSession = undefined"
+      @commissioned="onCommissioned"
+      @recorded="onRecorded"
+    />
   </div>
 </template>
 
@@ -142,6 +178,7 @@ import type { AnsweredQuestion } from "@generated/doughnut-backend-api"
 import type {
   AwaitingReportSession,
   PotentialLearningSession,
+  RecordedSession,
 } from "@/composables/useRecallData"
 
 defineProps({
@@ -164,6 +201,10 @@ defineProps({
     type: Array as () => AwaitingReportSession[],
     default: () => [],
   },
+  recordedSessions: {
+    type: Array as () => RecordedSession[],
+    default: () => [],
+  },
 })
 
 const emit = defineEmits<{
@@ -178,6 +219,7 @@ const commissionDialogSession = ref<PotentialLearningSession | undefined>(
   undefined
 )
 const recordDialogSession = ref<AwaitingReportSession | undefined>(undefined)
+const amendDialogSession = ref<RecordedSession | undefined>(undefined)
 
 const openCommissionDialog = (session: PotentialLearningSession) => {
   commissionDialogSession.value = session
@@ -185,6 +227,10 @@ const openCommissionDialog = (session: PotentialLearningSession) => {
 
 const openRecordDialog = (session: AwaitingReportSession) => {
   recordDialogSession.value = session
+}
+
+const openAmendDialog = (session: RecordedSession) => {
+  amendDialogSession.value = session
 }
 
 const onCommissioned = () => {

@@ -5040,6 +5040,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/AwaitingReportLearningSessionLite"
+        recordedSessions:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecordedLearningSessionLite"
         dueInDays:
           type: integer
           format: int32
@@ -5069,6 +5073,24 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ConversationMessage"
+    RecordedLearningSessionLite:
+      type: object
+      properties:
+        notebookId:
+          type: integer
+          format: int32
+        notebookName:
+          type: string
+        learningSessionId:
+          type: integer
+          format: int32
+        requestMarkdown:
+          type: string
+      required:
+      - learningSessionId
+      - notebookId
+      - notebookName
+      - requestMarkdown
     CurrentUserInfo:
       type: object
       properties:

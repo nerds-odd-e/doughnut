@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.dto.AwaitingReportLearningSessionLite;
 import com.odde.doughnut.controllers.dto.DueCommissionedMemoryTrackerLite;
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.MemoryTrackerLite;
+import com.odde.doughnut.controllers.dto.RecordedLearningSessionLite;
 import com.odde.doughnut.entities.LearningSession;
 import com.odde.doughnut.entities.LearningSessionStatus;
 import com.odde.doughnut.entities.MemoryTracker;
@@ -111,6 +112,12 @@ public class RecallService {
             .stream()
             .map(session -> toAwaitingReportLite(session, timeZone))
             .toList());
+    dueMemoryTrackers.setRecordedSessions(
+        learningSessionRepository
+            .findByUser_IdAndStatus(user.getId(), LearningSessionStatus.RECORDED)
+            .stream()
+            .map(session -> toRecordedLite(session, timeZone))
+            .toList());
 
     // Set recall status
     dueMemoryTrackers.totalAssimilatedCount = totalAssimilatedCount(user);
@@ -123,6 +130,15 @@ public class RecallService {
   private AwaitingReportLearningSessionLite toAwaitingReportLite(
       LearningSession session, ZoneId zoneId) {
     AwaitingReportLearningSessionLite lite = new AwaitingReportLearningSessionLite();
+    lite.setNotebookId(session.getNotebook().getId());
+    lite.setNotebookName(session.getNotebook().getName());
+    lite.setLearningSessionId(session.getId());
+    lite.setRequestMarkdown(learningSessionRequestMarkdownBuilder.build(session, zoneId));
+    return lite;
+  }
+
+  private RecordedLearningSessionLite toRecordedLite(LearningSession session, ZoneId zoneId) {
+    RecordedLearningSessionLite lite = new RecordedLearningSessionLite();
     lite.setNotebookId(session.getNotebook().getId());
     lite.setNotebookName(session.getNotebook().getName());
     lite.setLearningSessionId(session.getId());

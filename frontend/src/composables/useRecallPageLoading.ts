@@ -30,6 +30,11 @@ export function useRecallPageLoading(options: {
       | import("@/composables/useRecallData").AwaitingReportSession[]
       | undefined
   ) => void
+  setRecordedSessions: (
+    sessions:
+      | import("@/composables/useRecallData").RecordedSession[]
+      | undefined
+  ) => void
   setTotalAssimilatedCount: (count: number | undefined) => void
   setDiligentMode: (enabled: boolean) => void
   setCurrentRecallWindowEndAt: (endAt: string | undefined) => void
@@ -42,6 +47,7 @@ export function useRecallPageLoading(options: {
     setToRepeat,
     setDueCommissioned,
     setAwaitingReportSessions,
+    setRecordedSessions,
     setTotalAssimilatedCount,
     setDiligentMode,
     setCurrentRecallWindowEndAt,
@@ -62,6 +68,7 @@ export function useRecallPageLoading(options: {
       if (!error && response) {
         setDueCommissioned(response.dueCommissioned ?? [])
         setAwaitingReportSessions(response.awaitingReportSessions ?? [])
+        setRecordedSessions(response.recordedSessions ?? [])
         let trackers = response.toRepeat
         currentIndex.value = 0
         setTotalAssimilatedCount(response.totalAssimilatedCount)
