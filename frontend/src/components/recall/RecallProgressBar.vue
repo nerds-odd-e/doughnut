@@ -61,118 +61,61 @@
       v-if="potentialLearningSessions.length > 0"
       class="flex flex-col gap-2 px-4"
     >
-      <div
+      <LearningSessionStrip
         v-for="session in potentialLearningSessions"
         :key="session.notebookId"
-        data-test="potential-learning-session"
-        role="status"
-        class="flex gap-2 items-start text-base font-normal text-base-content"
-      >
-        <span class="flex-1 break-words">
-          1 potential learning session to commission for notebook "{{
-            session.notebookName
-          }}"
-        </span>
-        <button
-          type="button"
-          class="daisy-btn daisy-btn-primary shrink-0"
-          data-test="commission-learning-session"
-          @click="openCommissionDialog(session)"
-        >
-          Commission
-        </button>
-      </div>
+        row-test-id="potential-learning-session"
+        :message="potentialSessionMessage(session.notebookName)"
+        cta-test-id="commission-learning-session"
+        cta-label="Commission"
+        @cta-click="openSessionDialog('commission', session)"
+      />
     </div>
     <div
       v-if="awaitingReportSessions.length > 0"
       class="flex flex-col gap-2 px-4"
     >
-      <div
+      <LearningSessionStrip
         v-for="session in awaitingReportSessions"
         :key="session.learningSessionId"
-        data-test="awaiting-report-learning-session"
-        role="status"
-        class="flex gap-2 items-start text-base font-normal text-base-content"
-      >
-        <span class="flex-1 break-words">
-          1 learning session awaiting the tutor's report for notebook "{{
-            session.notebookName
-          }}"
-        </span>
-        <button
-          type="button"
-          class="daisy-btn daisy-btn-primary shrink-0"
-          data-test="record-learning-session-report"
-          @click="openRecordDialog(session)"
-        >
-          Record report
-        </button>
-      </div>
+        row-test-id="awaiting-report-learning-session"
+        :message="awaitingReportSessionMessage(session.notebookName)"
+        cta-test-id="record-learning-session-report"
+        cta-label="Record report"
+        @cta-click="openSessionDialog('record', session)"
+      />
     </div>
     <div
       v-if="recordedSessions.length > 0"
       class="flex flex-col gap-2 px-4"
     >
-      <div
+      <LearningSessionStrip
         v-for="session in recordedSessions"
         :key="session.learningSessionId"
-        data-test="recorded-learning-session"
-        role="status"
-        class="flex gap-2 items-start text-base font-normal text-base-content"
-      >
-        <span class="flex-1 break-words">
-          1 recorded learning session for notebook "{{
-            session.notebookName
-          }}"
-        </span>
-        <button
-          type="button"
-          class="daisy-btn daisy-btn-primary shrink-0"
-          data-test="amend-learning-session-report"
-          @click="openAmendDialog(session)"
-        >
-          Amend report
-        </button>
-      </div>
+        row-test-id="recorded-learning-session"
+        :message="recordedSessionMessage(session.notebookName)"
+        cta-test-id="amend-learning-session-report"
+        cta-label="Amend report"
+        @cta-click="openSessionDialog('amend', session)"
+      />
     </div>
     <CommissionLearningSessionDialog
-      v-if="commissionDialogSession"
-      :notebook-id="commissionDialogSession.notebookId"
-      :notebook-name="commissionDialogSession.notebookName"
-      @close="commissionDialogSession = undefined"
-      @commissioned="onCommissioned"
-      @recorded="onRecorded"
-    />
-    <CommissionLearningSessionDialog
-      v-if="recordDialogSession"
-      mode="record"
-      :notebook-id="recordDialogSession.notebookId"
-      :notebook-name="recordDialogSession.notebookName"
-      :initial-request-markdown="recordDialogSession.requestMarkdown"
-      @close="recordDialogSession = undefined"
-      @commissioned="onCommissioned"
-      @recorded="onRecorded"
-    />
-    <CommissionLearningSessionDialog
-      v-if="amendDialogSession"
-      mode="amend"
-      :notebook-id="amendDialogSession.notebookId"
-      :notebook-name="amendDialogSession.notebookName"
-      :learning-session-id="amendDialogSession.learningSessionId"
-      :initial-request-markdown="amendDialogSession.requestMarkdown"
-      @close="amendDialogSession = undefined"
-      @commissioned="onCommissioned"
-      @recorded="onRecorded"
+      v-if="sessionDialogProps"
+      v-bind="sessionDialogProps"
+      @close="sessionDialog = undefined"
+      @commissioned="onSessionChanged"
+      @recorded="onSessionChanged"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
+import { computed, ref } from "vue"
 import ProgressBar from "../commons/ProgressBar.vue"
 import { Pause, Settings, SkipBack } from "@lucide/vue"
 import RecallSessionOptionsDialog from "./RecallSessionOptionsDialog.vue"
 import CommissionLearningSessionDialog from "./CommissionLearningSessionDialog.vue"
+import LearningSessionStrip from "./LearningSessionStrip.vue"
 import { useRecallData } from "@/composables/useRecallData"
 
 import type {
@@ -180,6 +123,13 @@ import type {
   LearningSessionLite,
 } from "@generated/doughnut-backend-api"
 import type { PotentialLearningSession } from "@/composables/useRecallData"
+
+type SessionDialogMode = "commission" | "record" | "amend"
+
+type SessionDialogState = {
+  mode: SessionDialogMode
+  session: PotentialLearningSession | LearningSessionLite
+}
 
 defineProps({
   finished: { type: Number, required: true },
@@ -215,29 +165,47 @@ const emit = defineEmits<{
 
 const { requestDueRecallsRefresh } = useRecallData()
 const showSettings = ref(false)
-const commissionDialogSession = ref<PotentialLearningSession | undefined>(
-  undefined
-)
-const recordDialogSession = ref<LearningSessionLite | undefined>(undefined)
-const amendDialogSession = ref<LearningSessionLite | undefined>(undefined)
+const sessionDialog = ref<SessionDialogState | undefined>(undefined)
 
-const openCommissionDialog = (session: PotentialLearningSession) => {
-  commissionDialogSession.value = session
+const potentialSessionMessage = (notebookName: string) =>
+  `1 potential learning session to commission for notebook "${notebookName}"`
+
+const awaitingReportSessionMessage = (notebookName: string) =>
+  `1 learning session awaiting the tutor's report for notebook "${notebookName}"`
+
+const recordedSessionMessage = (notebookName: string) =>
+  `1 recorded learning session for notebook "${notebookName}"`
+
+const isLearningSessionLite = (
+  session: PotentialLearningSession | LearningSessionLite
+): session is LearningSessionLite => "learningSessionId" in session
+
+const sessionDialogProps = computed(() => {
+  const dialog = sessionDialog.value
+  if (!dialog) return undefined
+  const session = dialog.session
+  const isLite = isLearningSessionLite(session)
+  return {
+    mode: dialog.mode === "commission" ? undefined : dialog.mode,
+    notebookId: session.notebookId,
+    notebookName: session.notebookName,
+    learningSessionId:
+      dialog.mode === "amend" && isLite ? session.learningSessionId : undefined,
+    initialRequestMarkdown:
+      dialog.mode !== "commission" && isLite
+        ? session.requestMarkdown
+        : undefined,
+  }
+})
+
+const openSessionDialog = (
+  mode: SessionDialogMode,
+  session: PotentialLearningSession | LearningSessionLite
+) => {
+  sessionDialog.value = { mode, session }
 }
 
-const openRecordDialog = (session: LearningSessionLite) => {
-  recordDialogSession.value = session
-}
-
-const openAmendDialog = (session: LearningSessionLite) => {
-  amendDialogSession.value = session
-}
-
-const onCommissioned = () => {
-  requestDueRecallsRefresh()
-}
-
-const onRecorded = () => {
+const onSessionChanged = () => {
   requestDueRecallsRefresh()
 }
 

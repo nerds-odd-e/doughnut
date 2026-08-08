@@ -1,6 +1,6 @@
 # v1.3 post-milestone refactor
 
-**Status:** in-progress (Phases 1–8 done)
+**Status:** in-progress (Phases 1–9 done)
 
 **Type:** ad-hoc quick plan (Structure only)
 
@@ -157,7 +157,7 @@ next touch. Preserve `recordCommissionedFeedback` call sites’ behavior.
 tests.
 
 ### Phase 9 — One strip component + one dialog in `RecallProgressBar`
-**Type:** Structure | **Status:** planned | **Subsystem:** frontend
+**Type:** Structure | **Status:** done | **Subsystem:** frontend
 
 - Extract a single session-strip presentational component (message + CTA
   `data-test` + click).
