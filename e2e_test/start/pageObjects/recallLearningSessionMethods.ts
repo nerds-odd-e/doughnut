@@ -13,15 +13,35 @@ function learningSessionActionEntryLabel(
   return `${notebookTitle} — ${actionLabel}`
 }
 
-function clickSessionActionFromPicker(
+function closeLearningSessionDetailIfOpen() {
+  cy.get('body').then(($body) => {
+    if (
+      $body.find('[data-test="commission-learning-session-dialog"]').length > 0
+    ) {
+      cy.get('[data-test="commission-learning-session-dialog"]')
+        .closest('dialog')
+        .find('.close-button')
+        .click()
+      waitUntilAppIsNotBusy()
+    }
+  })
+}
+
+function openLearningSessionList() {
+  closeLearningSessionDetailIfOpen()
+  cy.get('[data-test="learning-session-actions"]').click()
+  cy.get('[data-test="learning-session-list-dialog"]').should('be.visible')
+}
+
+function clickSessionActionFromList(
   notebookTitle: string,
   actionLabel: LearningSessionActionLabel
 ) {
-  cy.get('[data-test="learning-session-actions-picker"]').should('exist')
   cy.contains(
     '[data-test="learning-session-action-entry"]',
     learningSessionActionEntryLabel(notebookTitle, actionLabel)
   ).click()
+  cy.get('[data-test="learning-session-list-dialog"]').should('not.exist')
   waitUntilAppIsNotBusy()
 }
 
@@ -34,7 +54,7 @@ function selectRecordOrAmendAction(notebookTitle: string) {
     const hasAmend = [...$entries].some((el) =>
       el.textContent?.includes(amendLabel)
     )
-    clickSessionActionFromPicker(
+    clickSessionActionFromList(
       notebookTitle,
       hasAmend ? 'Amend report' : 'Record report'
     )
@@ -46,24 +66,14 @@ export const recallLearningSessionMethods = () => ({
     notebookTitle: string,
     actionLabel: LearningSessionActionLabel
   ) {
-    cy.get('[data-test="learning-session-actions"]').click()
-    clickSessionActionFromPicker(notebookTitle, actionLabel)
+    openLearningSessionList()
+    clickSessionActionFromList(notebookTitle, actionLabel)
     return this
   },
   commissionLearningSession(notebookTitle: string) {
-    cy.get('body').then(($body) => {
-      if (
-        $body.find('[data-test="commission-learning-session-submit"]').length >
-        0
-      ) {
-        cy.get('[data-test="commission-learning-session-submit"]').click()
-        waitUntilAppIsNotBusy()
-        return
-      }
-      this.openLearningSessionAction(notebookTitle, 'Commission')
-      cy.get('[data-test="commission-learning-session-submit"]').click()
-      waitUntilAppIsNotBusy()
-    })
+    this.openLearningSessionAction(notebookTitle, 'Commission')
+    cy.get('[data-test="commission-learning-session-submit"]').click()
+    waitUntilAppIsNotBusy()
     return this
   },
   learningSessionRequestText() {
@@ -142,21 +152,9 @@ export const recallLearningSessionMethods = () => ({
     }
 
     waitUntilAppIsNotBusy()
-    cy.get('[data-test="learning-session-actions"]').should('exist')
-
-    cy.get('body').then(($body) => {
-      if (
-        $body.find('[data-test="record-learning-session-report-submit"]')
-          .length > 0
-      ) {
-        fillAndSubmit()
-        return
-      }
-      cy.get('[data-test="learning-session-actions"]').click()
-      cy.get('[data-test="learning-session-actions-picker"]').should('exist')
-      selectRecordOrAmendAction(options.notebookTitle!)
-      fillAndSubmit()
-    })
+    openLearningSessionList()
+    selectRecordOrAmendAction(options.notebookTitle!)
+    fillAndSubmit()
     return this
   },
   expectLearningSessionRecorded() {
@@ -174,8 +172,7 @@ export const recallLearningSessionMethods = () => ({
   },
   expectPotentialLearningSession(count: number, notebookTitle: string) {
     cy.get('[data-test="learning-session-actions"]').should('be.visible')
-    cy.get('[data-test="learning-session-actions"]').click()
-    cy.get('[data-test="learning-session-actions-picker"]').should('exist')
+    openLearningSessionList()
     if (count === 0) {
       cy.get('[data-test="learning-session-action-entry"]').each(($entry) => {
         expect($entry.text()).not.to.contain(
@@ -188,7 +185,8 @@ export const recallLearningSessionMethods = () => ({
         .filter(':contains("Commission")')
         .should('have.length', count)
     }
-    cy.get('[data-test="learning-session-actions"]').click()
+    cy.get('.close-button').click()
+    cy.get('[data-test="learning-session-list-dialog"]').should('not.exist')
     return this
   },
 })

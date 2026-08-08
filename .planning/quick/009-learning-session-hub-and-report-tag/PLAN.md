@@ -148,7 +148,7 @@ removed; list-first click. Deleted `LearningSessionStrip`.
 
 ### Phase 3 — Behavior: Session list step before session detail
 
-**Status:** planned  
+**Status:** done  
 **Type:** Behavior
 
 **Observable behavior**
@@ -181,7 +181,15 @@ list is not shown concurrently with detail.
 **Done when:** E2E commission, record, amend, multi-notebook scenarios green
 with explicit two-step navigation.
 
+**Completed 2026-08-08:** `LearningSessionListDialog` modal; list closes before
+detail opens.
+
 ---
+
+## Plan complete (2026-08-08)
+
+All three Behavior phases shipped.
+
 
 ## Out of scope
 

@@ -53,16 +53,28 @@ const mountBar = (props?: {
     })
     .mount())
 
-const openLearningSessionActionsPicker = async () => {
+const openLearningSessionList = async () => {
   await wrapper!.find('[data-test="learning-session-actions"]').trigger("click")
 }
 
-const findPickerEntry = (text: string) =>
+const findListEntry = (text: string) =>
   [
     ...document.body.querySelectorAll(
       '[data-test="learning-session-action-entry"]'
     ),
   ].find((entry) => entry.textContent?.includes(text))
+
+const expectListDialogVisible = () => {
+  expect(
+    document.body.querySelector('[data-test="learning-session-list-dialog"]')
+  ).toBeTruthy()
+}
+
+const expectListDialogHidden = () => {
+  expect(
+    document.body.querySelector('[data-test="learning-session-list-dialog"]')
+  ).toBeFalsy()
+}
 
 describe("RecallProgressBar learning session actions", () => {
   it("always shows the session-actions icon even with no sessions", () => {
@@ -86,16 +98,12 @@ describe("RecallProgressBar learning session actions", () => {
     expect(badge.text()).toBe("3")
   })
 
-  it("opens picker when only one potential session exists", async () => {
+  it("opens session list when icon is clicked with one potential session", async () => {
     mountBar({
       potentialLearningSessions: [spanishPotentialSession()],
     })
-    await openLearningSessionActionsPicker()
-    expect(
-      document.body.querySelector(
-        '[data-test="learning-session-actions-picker"]'
-      )
-    ).toBeTruthy()
+    await openLearningSessionList()
+    expectListDialogVisible()
     expect(
       document.body.querySelector(
         '[data-test="commission-learning-session-dialog"]'
@@ -103,46 +111,65 @@ describe("RecallProgressBar learning session actions", () => {
     ).toBeFalsy()
   })
 
-  it("opens picker when only one awaiting session exists", async () => {
+  it("opens session list when icon is clicked with one awaiting session", async () => {
     mountBar({
       awaitingReportSessions: [spanishLearningSession()],
     })
-    await openLearningSessionActionsPicker()
-    expect(
-      document.body.querySelector(
-        '[data-test="learning-session-actions-picker"]'
-      )
-    ).toBeTruthy()
+    await openLearningSessionList()
+    expectListDialogVisible()
     expect(
       document.body.querySelector('[data-test="learning-session-request"]')
     ).toBeFalsy()
   })
 
-  it("opens picker then commission dialog when multiple actionable sessions exist", async () => {
+  it("opens commission detail after picking from session list", async () => {
     mountBar({
       potentialLearningSessions: [
         spanishPotentialSession(),
         kanjiPotentialSession(),
       ],
     })
-    await openLearningSessionActionsPicker()
-    expect(
-      document.body.querySelector(
-        '[data-test="learning-session-actions-picker"]'
-      )
-    ).toBeTruthy()
-    const kanjiEntry = findPickerEntry("Kanji")
+    await openLearningSessionList()
+    expectListDialogVisible()
+    const kanjiEntry = findListEntry("Kanji")
     expect(kanjiEntry).toBeTruthy()
     ;(kanjiEntry as HTMLButtonElement).click()
     await wrapper!.vm.$nextTick()
-    expect(
-      document.body.querySelector(
-        '[data-test="learning-session-actions-picker"]'
-      )
-    ).toBeFalsy()
+    expectListDialogHidden()
     expect(
       document.body.querySelector(
         '[data-test="commission-learning-session-dialog"]'
+      )
+    ).toBeTruthy()
+    expect(
+      document.body.querySelector(
+        '[data-test="commission-learning-session-submit"]'
+      )
+    ).toBeTruthy()
+  })
+
+  it("opens record detail after picking Record report from session list", async () => {
+    mountBar({
+      awaitingReportSessions: [spanishLearningSession()],
+    })
+    await openLearningSessionList()
+    const recordEntry = findListEntry("Record report")
+    expect(recordEntry).toBeTruthy()
+    ;(recordEntry as HTMLButtonElement).click()
+    await wrapper!.vm.$nextTick()
+    expectListDialogHidden()
+    expect(
+      document.body.querySelector(
+        '[data-test="commission-learning-session-dialog"]'
+      )
+    ).toBeTruthy()
+    const request = document.body.querySelector(
+      '[data-test="learning-session-request"]'
+    ) as HTMLTextAreaElement | null
+    expect(request?.value).toBe(canonicalRequestMarkdown)
+    expect(
+      document.body.querySelector(
+        '[data-test="learning-session-awaiting-report"]'
       )
     ).toBeTruthy()
   })
@@ -158,16 +185,17 @@ describe("RecallProgressBar recorded sessions", () => {
     ).toBe(false)
   })
 
-  it("opens amend dialog with request prefilled when Amend report is picked", async () => {
+  it("opens amend detail with request prefilled when Amend report is picked", async () => {
     mountBar({
       recordedSessions: [spanishLearningSession()],
     })
-    await openLearningSessionActionsPicker()
-    const amendEntry = findPickerEntry("Amend report")
+    await openLearningSessionList()
+    const amendEntry = findListEntry("Amend report")
     expect(amendEntry).toBeTruthy()
     expect(amendEntry!.textContent).toContain("Spanish conversation")
     ;(amendEntry as HTMLButtonElement).click()
     await wrapper!.vm.$nextTick()
+    expectListDialogHidden()
     const request = document.body.querySelector(
       '[data-test="learning-session-request"]'
     ) as HTMLTextAreaElement | null

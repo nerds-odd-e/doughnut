@@ -81,9 +81,8 @@ import ProgressBar from "../commons/ProgressBar.vue"
 import { Pause, Settings, SkipBack } from "@lucide/vue"
 import RecallSessionOptionsDialog from "./RecallSessionOptionsDialog.vue"
 import CommissionLearningSessionDialog from "./CommissionLearningSessionDialog.vue"
-import RecallLearningSessionActions, {
-  type LearningSessionActionMode,
-} from "./RecallLearningSessionActions.vue"
+import RecallLearningSessionActions from "./RecallLearningSessionActions.vue"
+import type { LearningSessionActionMode } from "./LearningSessionListDialog.vue"
 import { useRecallData } from "@/composables/useRecallData"
 
 import type {
