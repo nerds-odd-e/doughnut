@@ -149,4 +149,12 @@ public class MakeMe extends MakeMeWithoutDB {
   public QuestionGenerationBatchRequestBuilder aQuestionGenerationBatchRequest() {
     return new QuestionGenerationBatchRequestBuilder(this);
   }
+
+  public LearningSessionBuilder aLearningSession() {
+    return new LearningSessionBuilder(this);
+  }
+
+  public SessionItemBuilder aSessionItem() {
+    return new SessionItemBuilder(this);
+  }
 }

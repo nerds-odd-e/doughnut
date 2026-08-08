@@ -6,29 +6,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.CommissionLearningSessionRequest;
 import com.odde.doughnut.controllers.dto.LearningSessionCommissionResponse;
+import com.odde.doughnut.entities.LearningSession;
 import com.odde.doughnut.entities.LearningSessionStatus;
+import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.repositories.LearningSessionRepository;
-import com.odde.doughnut.entities.repositories.SessionItemRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import java.sql.Timestamp;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.server.ResponseStatusException;
 
-class LearningSessionControllerTests extends ControllerTestBase {
-
-  @Autowired LearningSessionController controller;
-  @Autowired LearningSessionRepository learningSessionRepository;
-  @Autowired SessionItemRepository sessionItemRepository;
-
-  @BeforeEach
-  void setup() {
-    currentUser.setUser(makeMe.aUser().please());
-  }
+class LearningSessionControllerTests extends LearningSessionControllerTestBase {
 
   @Nested
   class Commission {
@@ -50,10 +39,8 @@ class LearningSessionControllerTests extends ControllerTestBase {
       makeMe.aMemoryTrackerFor(hola).commissioned().nextRecallAt(dayTwo).please();
       makeMe.aMemoryTrackerFor(gracias).commissioned().nextRecallAt(dayTwo).please();
 
-      CommissionLearningSessionRequest request = new CommissionLearningSessionRequest();
-      request.notebookId = notebook.getId();
-
-      LearningSessionCommissionResponse response = controller.commission(request, "Asia/Shanghai");
+      LearningSessionCommissionResponse response =
+          controller.commission(commissionRequest(notebook), "Asia/Shanghai");
 
       assertThat(response.getStatus(), equalTo(LearningSessionStatus.AWAITING_REPORT));
       assertThat(response.getLearningSessionId(), greaterThan(0));
@@ -110,11 +97,105 @@ class LearningSessionControllerTests extends ControllerTestBase {
     @Test
     void unauthorizedNotebook() {
       Notebook foreignNotebook = makeMe.aNotebook().please();
-      CommissionLearningSessionRequest request = new CommissionLearningSessionRequest();
-      request.notebookId = foreignNotebook.getId();
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.commission(request, "Asia/Shanghai"));
+          () -> controller.commission(commissionRequest(foreignNotebook), "Asia/Shanghai"));
+    }
+
+    @Test
+    void recommissionSameNotebookAbandonsPriorAwaitingReportSession()
+        throws UnexpectedNoAccessRightException {
+      Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+      testabilitySettings.timeTravelTo(dayTwo);
+
+      Notebook notebook =
+          makeMe
+              .aNotebook()
+              .creatorAndOwner(currentUser.getUser())
+              .name("Spanish conversation")
+              .please();
+      Note hola = makeMe.aNote().notebook(notebook).title("Hola").content("Hello").please();
+      makeMe.aMemoryTrackerFor(hola).commissioned().nextRecallAt(dayTwo).please();
+
+      LearningSessionCommissionResponse first =
+          controller.commission(commissionRequest(notebook), "Asia/Shanghai");
+      Integer abandonedId = first.getLearningSessionId();
+
+      LearningSessionCommissionResponse second =
+          controller.commission(commissionRequest(notebook), "Asia/Shanghai");
+
+      assertThat(second.getLearningSessionId(), not(equalTo(abandonedId)));
+      assertThat(
+          learningSessionRepository.findByUser_IdAndNotebook_IdAndStatus(
+              currentUser.getUser().getId(),
+              notebook.getId(),
+              LearningSessionStatus.AWAITING_REPORT),
+          hasSize(1));
+      assertTrue(learningSessionRepository.findById(abandonedId).isEmpty());
+      assertThat(learningSessionRepository.count(), equalTo(1L));
+    }
+
+    @Test
+    void requestMarkdownReflectsPriorRecordedFeedbackPerTracker()
+        throws UnexpectedNoAccessRightException {
+      Timestamp priorSessionAt = makeMe.aTimestamp().of(5, 10).fromShanghai().please();
+      Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).fromShanghai().please();
+      testabilitySettings.timeTravelTo(dayTwo);
+
+      Notebook notebook =
+          makeMe
+              .aNotebook()
+              .creatorAndOwner(currentUser.getUser())
+              .name("Spanish conversation")
+              .please();
+      Note hola = makeMe.aNote().notebook(notebook).title("Hola").content("Hello").please();
+      Note gracias =
+          makeMe.aNote().notebook(notebook).title("Gracias").content("Thank you").please();
+      MemoryTracker holaTracker =
+          makeMe.aMemoryTrackerFor(hola).commissioned().nextRecallAt(dayTwo).please();
+      makeMe.aMemoryTrackerFor(gracias).commissioned().nextRecallAt(dayTwo).please();
+
+      LearningSession recordedSession = recordedLearningSession(notebook, priorSessionAt);
+      addRecordedFeedback(recordedSession, holaTracker, 4, priorSessionAt);
+
+      LearningSessionCommissionResponse response =
+          controller.commission(commissionRequest(notebook), "Asia/Shanghai");
+
+      String markdown = response.getRequestMarkdown();
+      assertThat(markdown, containsString("### Hola"));
+      assertThat(markdown, containsString("1 previous session, last on 1989-01-06"));
+      assertThat(markdown, containsString("### Gracias"));
+      assertThat(markdown, containsString("- Learning status: not yet tutored"));
+    }
+
+    @Test
+    void recommissionPreservesRecordedSessionsForSameNotebook()
+        throws UnexpectedNoAccessRightException {
+      Timestamp priorSessionAt = makeMe.aTimestamp().of(5, 10).fromShanghai().please();
+      Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).fromShanghai().please();
+      testabilitySettings.timeTravelTo(dayTwo);
+
+      Notebook notebook =
+          makeMe
+              .aNotebook()
+              .creatorAndOwner(currentUser.getUser())
+              .name("Spanish conversation")
+              .please();
+      Note hola = makeMe.aNote().notebook(notebook).title("Hola").content("Hello").please();
+      MemoryTracker holaTracker =
+          makeMe.aMemoryTrackerFor(hola).commissioned().nextRecallAt(dayTwo).please();
+
+      LearningSession recordedSession = recordedLearningSession(notebook, priorSessionAt);
+      addRecordedFeedback(recordedSession, holaTracker, 3, priorSessionAt);
+      Integer recordedSessionId = recordedSession.getId();
+
+      controller.commission(commissionRequest(notebook), "Asia/Shanghai");
+
+      assertTrue(learningSessionRepository.findById(recordedSessionId).isPresent());
+      assertThat(
+          learningSessionRepository.findByUser_IdAndNotebook_IdAndStatus(
+              currentUser.getUser().getId(), notebook.getId(), LearningSessionStatus.RECORDED),
+          hasSize(1));
     }
 
     @Test
@@ -125,12 +206,10 @@ class LearningSessionControllerTests extends ControllerTestBase {
 
       long sessionsBefore = learningSessionRepository.count();
 
-      CommissionLearningSessionRequest request = new CommissionLearningSessionRequest();
-      request.notebookId = notebook.getId();
-
       ResponseStatusException ex =
           assertThrows(
-              ResponseStatusException.class, () -> controller.commission(request, "Asia/Shanghai"));
+              ResponseStatusException.class,
+              () -> controller.commission(commissionRequest(notebook), "Asia/Shanghai"));
       assertThat(ex.getStatusCode().value(), equalTo(400));
       assertThat(learningSessionRepository.count(), equalTo(sessionsBefore));
     }

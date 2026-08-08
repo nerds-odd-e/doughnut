@@ -43,6 +43,8 @@ public class LearningSessionService {
           HttpStatus.BAD_REQUEST, "No due commissioned memory trackers for this notebook.");
     }
 
+    abandonUnfinishedSessions(user, notebook);
+
     LearningSession session = new LearningSession();
     session.setUser(user);
     session.setNotebook(notebook);
@@ -55,6 +57,16 @@ public class LearningSessionService {
     }
 
     return toCommissionResponse(session, zoneId);
+  }
+
+  private void abandonUnfinishedSessions(User user, Notebook notebook) {
+    List<LearningSession> unfinished =
+        learningSessionRepository.findByUser_IdAndNotebook_IdAndStatus(
+            user.getId(), notebook.getId(), LearningSessionStatus.AWAITING_REPORT);
+    for (LearningSession session : unfinished) {
+      sessionItemRepository.deleteByLearningSession_Id(session.getId());
+    }
+    learningSessionRepository.deleteAll(unfinished);
   }
 
   private List<MemoryTracker> dueCommissionedNoteLevelTrackers(

@@ -16,8 +16,10 @@ erDiagram
     folder ||--o{ folder : "parent_folder_id"
     folder ||--o{ "note" : "folder_id"
     image ||--o{ "note" : "image_id"
+    learning_session ||--o{ session_item : "learning_session_id"
     memory_tracker ||--o{ question_generation_batch_request : "memory_tracker_id"
     memory_tracker ||--o{ recall_prompt : "memory_tracker_id"
+    memory_tracker ||--o{ session_item : "memory_tracker_id"
     "note" ||--o{ admin_data_migration_progress : "last_processed_note_id"
     "note" ||--o{ conversation : "note_id"
     "note" ||--o{ image : "note_id"
@@ -32,6 +34,7 @@ erDiagram
     notebook ||--o{ bazaar_notebook : "notebook_id"
     notebook ||--o{ book : "notebook_id"
     notebook ||--o{ folder : "notebook_id"
+    notebook ||--o{ learning_session : "notebook_id"
     notebook ||--o{ "note" : "notebook_id"
     notebook ||--o{ subscription : "notebook_id"
     notebook_group ||--o{ notebook : "notebook_group_id"
@@ -49,6 +52,7 @@ erDiagram
     "user" ||--o{ conversation : "conversation_initiator_id"
     "user" ||--o{ conversation_message : "sender"
     "user" ||--o{ image : "user_id"
+    "user" ||--o{ learning_session : "user_id"
     "user" ||--o{ memory_tracker : "user_id"
     "user" ||--o{ note_creator : "user_id"
     "user" ||--o{ notebook : "creator_id"
@@ -129,6 +133,11 @@ erDiagram
         int attachment_blob_id FK
         int note_id FK
     }
+    learning_session {
+        int id PK
+        int user_id FK
+        int notebook_id FK
+    }
     memory_tracker {
         int id PK
         int user_id FK
@@ -201,6 +210,11 @@ erDiagram
         int memory_tracker_id FK
         int predefined_question_id FK
         int quiz_answer_id FK
+    }
+    session_item {
+        int id PK
+        int learning_session_id FK
+        int memory_tracker_id FK
     }
     shedlock {
         string name PK

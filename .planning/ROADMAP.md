@@ -116,7 +116,7 @@ Plans:
 
 **Context:** `.planning/phases/04-learning-session-request-builder/`
 
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans executed
 
 Plans:
 **Wave 1**
@@ -125,7 +125,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1)*
 
-- [ ] 04-02-PLAN.md — Expansion: abandon lifecycle, learning status, MakeMe builders, OpenAPI regen, regression gate
+- [x] 04-02-PLAN.md — Expansion: abandon lifecycle, learning status, MakeMe builders, ERD regen, regression gate
 
 ---
 

@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Commissioned Learning Session MVP
 status: in_progress
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-08-08T00:11:39.940Z"
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-08-08T00:30:00.000Z"
 progress:
   total_phases: 7
   completed_phases: 3
   total_plans: 8
-  completed_plans: 7
+  completed_plans: 8
 current_phase: 4
 current_phase_name: learning-session-request-builder
 last_activity: 2026-08-08
-last_activity_desc: Phase 4 Plan 04-01 commission tracer complete
+last_activity_desc: Phase 4 Plan 04-02 abandon lifecycle + learning status complete
 ---
 
 # Project State
@@ -42,12 +42,12 @@ Assimilate with commissioned-only, ordinary+commissioned coexistence (TRK-01/02)
 6/6). Due COMMISSIONED → `dueCommissioned` + FE notebook-grouped potential
 sessions on recall progress bar; ordinary recall stays 0 (TRK-03, POT-01/02).
 
-**Phase 4 Plan 04-01** — executed; commission API tracer green
-(`.planning/phases/04-learning-session-request-builder/04-01-SUMMARY.md`).
-`POST /api/learning-sessions/commission` persists session + items; ADR 0005
-markdown for Spanish fixture; guardrails tested; `pnpm backend:verify` green.
+**Phase 4 Plan 04-02** — executed; abandon-on-recommission + learning status aggregation green
+(`.planning/phases/04-learning-session-request-builder/04-02-SUMMARY.md`).
+Re-commission deletes prior `AWAITING_REPORT` sessions; Request markdown reflects recorded
+history; MakeMe builders; `pnpm backend:verify` + Cypress regression green.
 
-**Next:** Execute Phase 4 Plan 04-02 (abandon lifecycle + learning status).
+**Next:** Run Phase 4 verification, then plan Phase 5 (commission UI).
 
 ## Deferred Items
 
@@ -62,11 +62,11 @@ markdown for Spanish fixture; guardrails tested; `pnpm backend:verify` green.
 
 ## Session Continuity
 
-**Last session:** 2026-08-08T00:11:39.934Z
-**Stopped at:** Completed 04-01-PLAN.md
+**Last session:** 2026-08-08T00:30:00.000Z
+**Stopped at:** Completed 04-02-PLAN.md
 **Resume file:** None
 
-Phase 4 Plan 04-01 complete. Next: 04-02.
+Phase 4 Plan 04-02 complete. Next: Phase 5 commission UI.
 
 ## Performance Metrics
 
@@ -77,6 +77,7 @@ Phase 4 Plan 04-01 complete. Next: 04-02.
 | Phase 03 P01 | 7min | 2 tasks | 26 files |
 | Phase 03-potential-learning-sessions P02 | 4min | 2 tasks | 5 files |
 | Phase 04-learning-session-request-builder P01 | 12 | 3 tasks | 14 files |
+| Phase 04-learning-session-request-builder P02 | 18 | 3 tasks | 9 files |
 
 ## Decisions
 
@@ -92,3 +93,5 @@ Phase 4 Plan 04-01 complete. Next: 04-02.
 - [Phase 03]: Multi-row potential-session page object matches by full copy via cy.contains
 - [Phase 03]: Long notebook titles use break-words; full title stays in DOM for E2E
 - [Phase 04-01]: learning status `not yet tutored` hard-coded in tracer; aggregation in 04-02
+- [Phase 04-02]: abandon after due-tracker validation; explicit item delete before session delete
+- [Phase 04-02]: learning status pluralizes sessions when N > 1

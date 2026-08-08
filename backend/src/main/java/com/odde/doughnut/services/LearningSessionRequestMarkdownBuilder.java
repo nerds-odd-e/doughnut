@@ -3,8 +3,10 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.entities.LearningSession;
 import com.odde.doughnut.entities.SessionItem;
+import com.odde.doughnut.entities.repositories.RecordedFeedbackSummary;
 import com.odde.doughnut.entities.repositories.SessionItemRepository;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class LearningSessionRequestMarkdownBuilder {
+
+  private static final DateTimeFormatter ISO_DATE = DateTimeFormatter.ISO_LOCAL_DATE;
 
   private final SessionItemRepository sessionItemRepository;
 
@@ -39,7 +43,7 @@ public class LearningSessionRequestMarkdownBuilder {
             .toList();
 
     for (SessionItem item : items) {
-      appendSessionItem(sb, item);
+      appendSessionItem(sb, item, zoneId);
     }
 
     return sb.toString();
@@ -57,7 +61,7 @@ public class LearningSessionRequestMarkdownBuilder {
     sb.append("- 0 — could not reach the learning point even with help\n");
   }
 
-  private void appendSessionItem(StringBuilder sb, SessionItem item) {
+  private void appendSessionItem(StringBuilder sb, SessionItem item, ZoneId zoneId) {
     String rawContent =
         NoteContentMarkdown.bodyWithoutLeadingFrontmatter(
             item.getMemoryTracker().getNote().getContent());
@@ -65,6 +69,21 @@ public class LearningSessionRequestMarkdownBuilder {
 
     sb.append("\n### ").append(item.getNoteTitle()).append("\n");
     sb.append("- Expected learning content: ").append(content).append("\n");
-    sb.append("- Learning status: not yet tutored\n");
+    sb.append("- Learning status: ")
+        .append(learningStatusLine(item.getMemoryTracker().getId(), zoneId))
+        .append("\n");
+  }
+
+  private String learningStatusLine(Integer memoryTrackerId, ZoneId zoneId) {
+    RecordedFeedbackSummary summary =
+        sessionItemRepository.summarizeRecordedFeedbackByMemoryTrackerId(memoryTrackerId);
+    if (summary.sessionCount() == 0) {
+      return "not yet tutored";
+    }
+
+    String lastDate =
+        summary.lastRecordedAt().toInstant().atZone(zoneId).toLocalDate().format(ISO_DATE);
+    String sessionWord = summary.sessionCount() == 1 ? "session" : "sessions";
+    return summary.sessionCount() + " previous " + sessionWord + ", last on " + lastDate;
   }
 }
