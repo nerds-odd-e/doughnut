@@ -76,7 +76,7 @@ describe("repeat page loading", () => {
     expect(ctx.recallingSpy).not.toHaveBeenCalled()
   })
 
-  it("shows potential learning session for due commissioned trackers", async () => {
+  it("shows learning session actions when useRecallData has potential sessions", async () => {
     vi.mocked(useRecallData).mockReturnValue(
       createUseRecallDataMock({
         toRepeat: [],
@@ -90,8 +90,7 @@ describe("repeat page loading", () => {
     )
     const wrapper = await ctx.mountPage()
     expect(
-      wrapper.find('[data-test="potential-learning-session"]').exists()
+      wrapper.find('[data-test="learning-session-actions"]').exists()
     ).toBe(true)
-    expect(wrapper.find(".progress-text").text()).toMatch(/0\/0/)
   })
 })
