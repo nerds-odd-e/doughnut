@@ -26,7 +26,7 @@ Milestone **v1.3 Commissioned Learning Session MVP** shipped 2026-08-08.
 | Phase | Type | Status | Outcome |
 |-------|------|--------|---------|
 | 1 | Behavior | done | Parse `<session_item_scores>` in reports |
-| 2 | Behavior | planned | Always-visible hub icon + full session list |
+| 2 | Behavior | done | Always-visible hub icon + full session list |
 | 3 | Behavior | planned | List step before session detail |
 
 ## Deferred Items

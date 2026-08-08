@@ -1,6 +1,7 @@
 <template>
-  <div v-if="actionableSessionCount > 0" class="learning-session-actions">
+  <div class="learning-session-actions">
     <button
+      ref="actionsButtonRef"
       type="button"
       class="daisy-btn large-btn learning-session-actions-btn"
       title="Learning session actions"
@@ -9,43 +10,49 @@
     >
       <GraduationCap class="w-8 h-8" />
       <div
+        v-if="actionableSessionCount > 0"
         class="learning-session-actions-badge"
         data-test="learning-session-actions-badge"
       >
         {{ actionableSessionCount }}
       </div>
     </button>
-    <div
-      v-if="showActionPicker"
-      class="learning-session-actions-picker"
-      data-test="learning-session-actions-picker"
-    >
-      <p class="learning-session-actions-picker-title">
-        Learning session actions
-      </p>
-      <button
-        v-for="entry in actionableSessions"
-        :key="entry.key"
-        type="button"
-        class="daisy-btn daisy-btn-outline learning-session-action-entry"
-        data-test="learning-session-action-entry"
-        @click="onPickerEntryClick(entry)"
+    <Teleport to="body">
+      <div
+        v-if="showActionPicker"
+        class="learning-session-actions-picker"
+        data-test="learning-session-actions-picker"
+        :style="pickerStyle"
       >
-        {{ entry.notebookName }} — {{ entry.actionLabel }}
-      </button>
-    </div>
+        <p class="learning-session-actions-picker-title">
+          Learning session actions
+        </p>
+        <button
+          v-for="entry in actionableSessions"
+          :key="entry.key"
+          type="button"
+          class="daisy-btn daisy-btn-outline learning-session-action-entry"
+          data-test="learning-session-action-entry"
+          @click="onPickerEntryClick(entry)"
+        >
+          {{ entry.notebookName }} — {{ entry.actionLabel }}
+        </button>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue"
+import { computed, ref, type CSSProperties } from "vue"
 import { GraduationCap } from "@lucide/vue"
 import type { LearningSessionLite } from "@generated/doughnut-backend-api"
 import type { PotentialLearningSession } from "@/composables/useRecallData"
 
+export type LearningSessionActionMode = "commission" | "record" | "amend"
+
 export type ActionableSessionEntry = {
   key: string
-  mode: "commission" | "record"
+  mode: LearningSessionActionMode
   notebookName: string
   session: PotentialLearningSession | LearningSessionLite
   actionLabel: string
@@ -54,19 +61,22 @@ export type ActionableSessionEntry = {
 const props = defineProps<{
   potentialLearningSessions: PotentialLearningSession[]
   awaitingReportSessions: LearningSessionLite[]
+  recordedSessions: LearningSessionLite[]
 }>()
 
 const emit = defineEmits<{
   (
     e: "select",
     payload: {
-      mode: "commission" | "record"
+      mode: LearningSessionActionMode
       session: PotentialLearningSession | LearningSessionLite
     }
   ): void
 }>()
 
 const showActionPicker = ref(false)
+const actionsButtonRef = ref<HTMLButtonElement | null>(null)
+const pickerStyle = ref<CSSProperties>({})
 
 const actionableSessions = computed((): ActionableSessionEntry[] => {
   const entries: ActionableSessionEntry[] = []
@@ -88,17 +98,27 @@ const actionableSessions = computed((): ActionableSessionEntry[] => {
       actionLabel: "Record report",
     })
   }
+  for (const session of props.recordedSessions) {
+    entries.push({
+      key: `recorded-${session.learningSessionId}`,
+      mode: "amend",
+      notebookName: session.notebookName,
+      session,
+      actionLabel: "Amend report",
+    })
+  }
   return entries
 })
 
 const actionableSessionCount = computed(() => actionableSessions.value.length)
 
 const onSessionActionsClick = () => {
-  if (actionableSessions.value.length === 1) {
-    const entry = actionableSessions.value[0]
-    if (!entry) return
-    emit("select", { mode: entry.mode, session: entry.session })
-    return
+  if (!showActionPicker.value && actionsButtonRef.value) {
+    const rect = actionsButtonRef.value.getBoundingClientRect()
+    pickerStyle.value = {
+      top: `${rect.bottom + 8}px`,
+      left: `${Math.max(8, rect.right - 256)}px`,
+    }
   }
   showActionPicker.value = !showActionPicker.value
 }
@@ -141,10 +161,8 @@ const onPickerEntryClick = (entry: ActionableSessionEntry) => {
 }
 
 .learning-session-actions-picker {
-  position: absolute;
-  top: calc(100% + 0.5rem);
-  right: 0;
-  z-index: 20;
+  position: fixed;
+  z-index: 1000;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;

@@ -110,7 +110,7 @@ E2E record + amend scenarios green with tagged reports.
 
 ### Phase 2 — Behavior: Always-visible hub icon with full session list
 
-**Status:** planned  
+**Status:** done  
 **Type:** Behavior
 
 **Observable behavior**
@@ -140,6 +140,9 @@ report / Amend report); no `recorded-learning-session` strips.
 - `RecallProgressBar`: pass `recordedSessions`; remove recorded strips.
 
 **Done when:** Frontend unit tests + commissioned learning E2E green.
+
+**Completed 2026-08-08:** Always-visible icon; full list incl. recorded; strips
+removed; list-first click. Deleted `LearningSessionStrip`.
 
 ---
 

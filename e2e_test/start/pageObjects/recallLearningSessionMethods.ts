@@ -1,7 +1,10 @@
 import { commonSenseSplit } from 'support/string_util'
 import { waitUntilAppIsNotBusy } from '../pageBase'
 
-type LearningSessionActionLabel = 'Commission' | 'Record report'
+type LearningSessionActionLabel =
+  | 'Commission'
+  | 'Record report'
+  | 'Amend report'
 
 function learningSessionActionEntryLabel(
   notebookTitle: string,
@@ -14,14 +17,27 @@ function clickSessionActionFromPicker(
   notebookTitle: string,
   actionLabel: LearningSessionActionLabel
 ) {
-  cy.get('body').then(($body) => {
-    if ($body.find('[data-test="learning-session-actions-picker"]').length) {
-      cy.contains(
-        '[data-test="learning-session-action-entry"]',
-        learningSessionActionEntryLabel(notebookTitle, actionLabel)
-      ).click()
-    }
-    waitUntilAppIsNotBusy()
+  cy.get('[data-test="learning-session-actions-picker"]').should('exist')
+  cy.contains(
+    '[data-test="learning-session-action-entry"]',
+    learningSessionActionEntryLabel(notebookTitle, actionLabel)
+  ).click()
+  waitUntilAppIsNotBusy()
+}
+
+function selectRecordOrAmendAction(notebookTitle: string) {
+  const amendLabel = learningSessionActionEntryLabel(
+    notebookTitle,
+    'Amend report'
+  )
+  cy.get('[data-test="learning-session-action-entry"]').then(($entries) => {
+    const hasAmend = [...$entries].some((el) =>
+      el.textContent?.includes(amendLabel)
+    )
+    clickSessionActionFromPicker(
+      notebookTitle,
+      hasAmend ? 'Amend report' : 'Record report'
+    )
   })
 }
 
@@ -126,9 +142,7 @@ export const recallLearningSessionMethods = () => ({
     }
 
     waitUntilAppIsNotBusy()
-    cy.get(
-      '[data-test="recorded-learning-session"], [data-test="learning-session-actions"], [data-test="record-learning-session-report-submit"]'
-    ).should('exist')
+    cy.get('[data-test="learning-session-actions"]').should('exist')
 
     cy.get('body').then(($body) => {
       if (
@@ -138,18 +152,9 @@ export const recallLearningSessionMethods = () => ({
         fillAndSubmit()
         return
       }
-      if ($body.find('[data-test="recorded-learning-session"]').length > 0) {
-        cy.contains(
-          '[data-test="recorded-learning-session"]',
-          options.notebookTitle!
-        )
-          .find('[data-test="amend-learning-session-report"]')
-          .click()
-        waitUntilAppIsNotBusy()
-        fillAndSubmit()
-        return
-      }
-      this.openLearningSessionAction(options.notebookTitle!, 'Record report')
+      cy.get('[data-test="learning-session-actions"]').click()
+      cy.get('[data-test="learning-session-actions-picker"]').should('exist')
+      selectRecordOrAmendAction(options.notebookTitle!)
       fillAndSubmit()
     })
     return this
@@ -160,10 +165,7 @@ export const recallLearningSessionMethods = () => ({
     return this
   },
   openAmendLearningSessionReport(notebookTitle: string) {
-    cy.contains('[data-test="recorded-learning-session"]', notebookTitle)
-      .find('[data-test="amend-learning-session-report"]')
-      .click()
-    waitUntilAppIsNotBusy()
+    this.openLearningSessionAction(notebookTitle, 'Amend report')
     cy.get('[data-test="commission-learning-session-dialog"]').should(
       'be.visible'
     )
@@ -171,48 +173,22 @@ export const recallLearningSessionMethods = () => ({
     return this
   },
   expectPotentialLearningSession(count: number, notebookTitle: string) {
-    if (count === 0) {
-      cy.get('body').then(($body) => {
-        if ($body.find('[data-test="learning-session-actions"]').length > 0) {
-          cy.get('[data-test="learning-session-actions"]').click()
-          cy.get('[data-test="learning-session-action-entry"]').each(
-            ($entry) => {
-              expect($entry.text()).not.to.contain(
-                learningSessionActionEntryLabel(notebookTitle, 'Commission')
-              )
-            }
-          )
-          cy.get('[data-test="learning-session-actions"]').click()
-        } else {
-          cy.get('[data-test="learning-session-actions"]').should('not.exist')
-        }
-      })
-      return this
-    }
     cy.get('[data-test="learning-session-actions"]').should('be.visible')
     cy.get('[data-test="learning-session-actions"]').click()
-    cy.get('body').then(($body) => {
-      if ($body.find('[data-test="learning-session-actions-picker"]').length) {
-        const matchingEntries = $body
-          .find('[data-test="learning-session-action-entry"]')
-          .filter((_, el) =>
-            el.textContent?.includes(
-              learningSessionActionEntryLabel(notebookTitle, 'Commission')
-            )
-          )
-        expect(
-          matchingEntries.length,
-          `commission entries for ${notebookTitle}`
-        ).to.eq(count)
-        cy.get('[data-test="learning-session-actions"]').click()
-      } else {
-        cy.get('[data-test="commission-learning-session-dialog"]').should(
-          'be.visible'
+    cy.get('[data-test="learning-session-actions-picker"]').should('exist')
+    if (count === 0) {
+      cy.get('[data-test="learning-session-action-entry"]').each(($entry) => {
+        expect($entry.text()).not.to.contain(
+          learningSessionActionEntryLabel(notebookTitle, 'Commission')
         )
-        cy.contains(`Notebook: "${notebookTitle}"`).should('be.visible')
-        cy.get('.close-button').first().click()
-      }
-    })
+      })
+    } else {
+      cy.get('[data-test="learning-session-action-entry"]')
+        .filter(`:contains("${notebookTitle}")`)
+        .filter(':contains("Commission")')
+        .should('have.length', count)
+    }
+    cy.get('[data-test="learning-session-actions"]').click()
     return this
   },
 })
