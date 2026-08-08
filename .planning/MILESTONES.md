@@ -16,4 +16,9 @@
 
 **Stats:** ~179 files, +21.9k / −636 LOC since milestone start (2026-08-07)
 
+**Post-milestone refactor (2026-08-08):** Structure cleanup across CLS backend,
+frontend, and tests (split oversized test classes, unified `LearningSessionLite`,
+extracted record targeting and feedback scheduling, `LearningSessionStrip`) — no
+observable behavior change.
+
 ---
