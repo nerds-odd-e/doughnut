@@ -291,6 +291,56 @@ class RecallsControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void dayThreeDueCommissionedEmptyAfterAmendGraciasToFour()
+        throws UnexpectedNoAccessRightException {
+      currentUser.setUser(makeMe.aUser().withSpaceIntervals("1, 2, 4, 8").please());
+      Timestamp dayOne = makeMe.aTimestamp().of(0, 8).please();
+      Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+      Timestamp dayThree = makeMe.aTimestamp().of(2, 9).please();
+      testabilitySettings.timeTravelTo(dayOne);
+
+      Notebook notebook =
+          makeMe
+              .aNotebook()
+              .creatorAndOwner(currentUser.getUser())
+              .name("Spanish conversation")
+              .please();
+      Note hola = makeMe.aNote().notebook(notebook).title("Hola").please();
+      Note gracias = makeMe.aNote().notebook(notebook).title("Gracias").please();
+      makeMe.aMemoryTrackerFor(hola).commissioned().nextRecallAt(dayOne).please();
+      makeMe.aMemoryTrackerFor(gracias).commissioned().nextRecallAt(dayOne).please();
+
+      testabilitySettings.timeTravelTo(dayTwo);
+      CommissionLearningSessionRequest request = new CommissionLearningSessionRequest();
+      request.notebookId = notebook.getId();
+      learningSessionController.commission(request, "Asia/Shanghai");
+      learningSessionController.record(
+          recordRequest(
+              notebook,
+              """
+              # Learning Session Report
+
+              Hola: 4
+              Gracias: 1
+              """),
+          "Asia/Shanghai");
+      learningSessionController.record(
+          recordRequest(
+              notebook,
+              """
+              # Learning Session Report
+
+              Gracias: 4
+              """),
+          "Asia/Shanghai");
+
+      testabilitySettings.timeTravelTo(dayThree);
+      DueMemoryTrackers due = controller.recalling("Asia/Shanghai", 0);
+
+      assertThat(due.getDueCommissioned(), hasSize(0));
+    }
+
+    @Test
     void returnsRecordedSessionsAfterRecord() throws UnexpectedNoAccessRightException {
       Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
       testabilitySettings.timeTravelTo(currentTime);

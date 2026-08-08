@@ -81,6 +81,29 @@ class CommissionedLearningSessionFeedbackPolicyTest {
     assertThat(amendedTracker.getNextRecallAt(), is(freshScoreFourTracker.getNextRecallAt()));
   }
 
+  @Test
+  void highToLowAmendFromSnapshotMatchesFreshScoreOneNotCompoundOnScoreFive() {
+    MemoryTracker amendedTracker = commissionedTrackerAtInitialLevel();
+    MemoryTracker freshScoreOneTracker = commissionedTrackerAtInitialLevel();
+
+    float preSessionIndex = amendedTracker.getForgettingCurveIndex();
+    int preSessionRecallCount = amendedTracker.getRecallCount();
+
+    amendedTracker.recordCommissionedFeedback(recordedAt, 5);
+
+    SessionItem snapshotFixture = new SessionItem();
+    snapshotFixture.setPreSessionForgettingCurveIndex(preSessionIndex);
+    snapshotFixture.setPreSessionRecallCount(preSessionRecallCount);
+
+    amendedTracker.restorePreSessionSnapshot(snapshotFixture);
+    amendedTracker.recordCommissionedFeedback(recordedAt, 1);
+
+    freshScoreOneTracker.recordCommissionedFeedback(recordedAt, 1);
+
+    assertThat(amendedTracker.getRecallCount(), is(1));
+    assertThat(amendedTracker.getNextRecallAt(), is(freshScoreOneTracker.getNextRecallAt()));
+  }
+
   private MemoryTracker commissionedTrackerAtInitialLevel() {
     var user = makeMe.aUser().withSpaceIntervals("1, 2, 4, 8").please();
     Note note = makeMe.aNote().notebookOwnedBy(user).please();

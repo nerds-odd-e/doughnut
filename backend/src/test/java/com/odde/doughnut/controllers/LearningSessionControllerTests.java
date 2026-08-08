@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.CommissionLearningSessionRequest;
 import com.odde.doughnut.controllers.dto.LearningSessionCommissionResponse;
+import com.odde.doughnut.controllers.dto.NoteRecallInfo;
 import com.odde.doughnut.controllers.dto.RecordLearningSessionResponse;
 import com.odde.doughnut.entities.LearningSession;
 import com.odde.doughnut.entities.LearningSessionStatus;
@@ -17,9 +18,12 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.server.ResponseStatusException;
 
 class LearningSessionControllerTests extends LearningSessionControllerTestBase {
+
+  @Autowired NoteController noteController;
 
   @Nested
   class Commission {
@@ -396,10 +400,65 @@ class LearningSessionControllerTests extends LearningSessionControllerTestBase {
       assertThat(graciasItem.getFeedbackScore(), equalTo(4));
       assertThat(holaItem.getMemoryTracker().getRecallCount(), equalTo(1));
       assertThat(graciasItem.getMemoryTracker().getRecallCount(), equalTo(1));
+
+      Note graciasNote = graciasItem.getMemoryTracker().getNote();
+      NoteRecallInfo noteInfo = noteController.getNoteInfo(graciasNote);
+      MemoryTracker commissioned =
+          noteInfo.getMemoryTrackers().stream()
+              .filter(MemoryTracker::isCommissioned)
+              .findFirst()
+              .orElseThrow();
+      assertThat(commissioned.getLatestTutorFeedbackScore(), equalTo(4));
     }
 
     @Test
-    void amendNoMatchesLeavesScoresUnchanged() throws UnexpectedNoAccessRightException {
+    void partialAmendUpdatesOnlyMatchedItem() throws UnexpectedNoAccessRightException {
+      Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+      testabilitySettings.timeTravelTo(dayTwo);
+
+      Notebook notebook = spanishNotebook(dayTwo);
+      controller.commission(commissionRequest(notebook), "Asia/Shanghai");
+      controller.record(recordRequest(notebook, HOLA4_GRACIAS1_REPORT), "Asia/Shanghai");
+
+      LearningSession session =
+          learningSessionRepository
+              .findByUser_IdAndNotebook_IdAndStatus(
+                  currentUser.getUser().getId(), notebook.getId(), LearningSessionStatus.RECORDED)
+              .getFirst();
+
+      RecordLearningSessionResponse amendResponse =
+          controller.record(
+              recordRequest(
+                  notebook,
+                  """
+                  # Learning Session Report
+
+                  Hola: 5
+                  """),
+              "Asia/Shanghai");
+
+      assertThat(amendResponse.getStatus(), equalTo(LearningSessionStatus.RECORDED));
+      assertThat(amendResponse.getRecordedItems(), hasSize(1));
+      assertThat(amendResponse.getRecordedItems().getFirst().getNoteTitle(), equalTo("Hola"));
+      assertThat(amendResponse.getRecordedItems().getFirst().getScore(), equalTo(5));
+
+      SessionItem holaItem =
+          sessionItemRepository.findByLearningSession_Id(session.getId()).stream()
+              .filter(item -> item.getNoteTitle().equals("Hola"))
+              .findFirst()
+              .orElseThrow();
+      SessionItem graciasItem =
+          sessionItemRepository.findByLearningSession_Id(session.getId()).stream()
+              .filter(item -> item.getNoteTitle().equals("Gracias"))
+              .findFirst()
+              .orElseThrow();
+
+      assertThat(holaItem.getFeedbackScore(), equalTo(5));
+      assertThat(graciasItem.getFeedbackScore(), equalTo(1));
+    }
+
+    @Test
+    void allRejectedAmendLeavesPriorFeedback() throws UnexpectedNoAccessRightException {
       Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
       testabilitySettings.timeTravelTo(dayTwo);
 
@@ -428,6 +487,7 @@ class LearningSessionControllerTests extends LearningSessionControllerTestBase {
       assertThat(amendResponse.getStatus(), equalTo(LearningSessionStatus.RECORDED));
       assertThat(amendResponse.getRecordedAt(), equalTo(originalRecordedAt));
       assertThat(amendResponse.getRecordedItems(), empty());
+      assertThat(amendResponse.getRejectedEntries(), hasSize(1));
 
       SessionItem holaItem =
           sessionItemRepository.findByLearningSession_Id(session.getId()).stream()
@@ -442,6 +502,42 @@ class LearningSessionControllerTests extends LearningSessionControllerTestBase {
 
       assertThat(holaItem.getFeedbackScore(), equalTo(4));
       assertThat(graciasItem.getFeedbackScore(), equalTo(1));
+    }
+
+    @Test
+    void highToLowAmendReschedulesFromSnapshot() throws UnexpectedNoAccessRightException {
+      Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+      testabilitySettings.timeTravelTo(dayTwo);
+
+      Notebook notebook = spanishNotebook(dayTwo);
+      controller.commission(commissionRequest(notebook), "Asia/Shanghai");
+      controller.record(
+          recordRequest(
+              notebook,
+              """
+              # Learning Session Report
+
+              Hola: 5
+              Gracias: 1
+              """),
+          "Asia/Shanghai");
+
+      MemoryTracker holaTracker = trackerForNote(notebook, "Hola");
+      Timestamp scheduleAfterScoreFive = holaTracker.getNextRecallAt();
+
+      RecordLearningSessionResponse amendResponse =
+          controller.record(
+              recordRequest(
+                  notebook,
+                  """
+                  # Learning Session Report
+
+                  Hola: 1
+                  """),
+              "Asia/Shanghai");
+
+      assertThat(amendResponse.getRecordedItems(), hasSize(1));
+      assertThat(holaTracker.getNextRecallAt(), lessThan(scheduleAfterScoreFive));
     }
 
     private Notebook spanishNotebook(Timestamp dueAt) {
