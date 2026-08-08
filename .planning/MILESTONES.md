@@ -21,4 +21,8 @@ frontend, and tests (split oversized test classes, unified `LearningSessionLite`
 extracted record targeting and feedback scheduling, `LearningSessionStrip`) — no
 observable behavior change.
 
+**Post-v1.3 polish (2026-08-08):** Request brief (tutor instructions, XML
+sections, notebook QGI, report example); recall-bar session-actions icon with
+badge (potential + awaiting). E2E `commissioned_learning_session.feature` green.
+
 ---

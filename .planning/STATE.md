@@ -5,7 +5,7 @@ milestone_name: none
 status: Awaiting next milestone
 last_updated: "2026-08-08T15:00:00.000Z"
 last_activity: 2026-08-08
-last_activity_desc: Quick plan 008 CLS post-v1.3 polish complete
+last_activity_desc: Cleaned up spent quick-plan history
 ---
 
 # Project State
@@ -20,11 +20,8 @@ See: `.planning/PROJECT.md`
 ## Current Position
 
 Milestone **v1.3 Commissioned Learning Session MVP** shipped 2026-08-08 (see
-`.planning/MILESTONES.md`).
-
-Quick plan **008 CLS post-v1.3 polish** completed 2026-08-08 (request brief +
-session badge). Summary retained in
-`.planning/quick/008-cls-request-and-session-badge/PLAN.md`.
+`.planning/MILESTONES.md`). Post-v1.3 CLS polish (request brief, session badge)
+shipped same day — record is in product code and Proposed ADR 0005.
 
 ## Deferred Items
 
