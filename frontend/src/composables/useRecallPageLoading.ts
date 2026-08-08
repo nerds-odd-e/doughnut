@@ -56,6 +56,20 @@ export function useRecallPageLoading(options: {
   const isProgressBarVisible = ref(true)
   const isLoadingMore = ref(false)
 
+  const loadSessionStrips = async () => {
+    const { data: response, error } = await RecallsController.recalling({
+      query: {
+        timezone: timezoneParam(),
+        dueindays: 0,
+      },
+    })
+    if (!error && response) {
+      setDueCommissioned(response.dueCommissioned ?? [])
+      setAwaitingReportSessions(response.awaitingReportSessions ?? [])
+      setRecordedSessions(response.recordedSessions ?? [])
+    }
+  }
+
   const loadMore = async (dueInDays?: number) => {
     isLoadingMore.value = true
     try {
@@ -122,6 +136,7 @@ export function useRecallPageLoading(options: {
 
   onActivated(() => {
     isProgressBarVisible.value = true
+    loadSessionStrips()
     const currentTime = new Date().toISOString()
     if (
       currentRecallWindowEndAt.value &&

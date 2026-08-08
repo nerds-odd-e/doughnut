@@ -64,7 +64,6 @@ Feature: Commissioned learning session
     And I commission a learning session for notebook "Spanish conversation"
     Then the learning session request should list session items for only notes "Gracias"
 
-  @wip
   Scenario: A later report amends the feedback of a recorded learning session
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
     And I have recorded a learning session for notebook "Spanish conversation" on day 2 with scores:

@@ -215,6 +215,17 @@ const recallPage = () => {
       )
       return this
     },
+    openAmendLearningSessionReport(notebookTitle: string) {
+      cy.contains('[data-test="recorded-learning-session"]', notebookTitle)
+        .find('[data-test="amend-learning-session-report"]')
+        .click()
+      waitUntilAppIsNotBusy()
+      cy.get('[data-test="commission-learning-session-dialog"]').should(
+        'be.visible'
+      )
+      cy.get('[data-test="learning-session-recorded"]').should('be.visible')
+      return this
+    },
   }
 }
 export const recall = () => {
