@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Commissioned Learning Session MVP
-status: in_progress
-stopped_at: Completed 07-01-PLAN.md
-last_updated: "2026-08-08T01:40:08.510Z"
+status: complete
+stopped_at: Completed 07-02-PLAN.md
+last_updated: "2026-08-08T02:30:00.000Z"
 progress:
   total_phases: 7
-  completed_phases: 5
+  completed_phases: 7
   total_plans: 14
-  completed_plans: 11
+  completed_plans: 14
 current_phase: 7
 current_phase_name: Amend recorded session (Behavior)
 last_activity: 2026-08-08
-last_activity_desc: Phase 7 Plan 07-01 executed — snapshot amend tracer, @wip E2E green, JUnit amend contract
+last_activity_desc: Phase 7 Plan 07-02 executed — recordedSessions strip, amend E2E green, edge JUnit proofs
 ---
 
 # Project State
@@ -23,6 +23,13 @@ last_activity_desc: Phase 7 Plan 07-01 executed — snapshot amend tracer, @wip 
 See: `.planning/PROJECT.md`
 
 ## Current Position
+
+Quick plan **007 inline container titles** is **planned** at
+`.planning/quick/007-inline-container-titles/PLAN.md`: first make the folder-page
+heading the sole autosaving folder-name editor, then give the notebook page the
+same shared interaction and remove the old manual/duplicate title controls.
+The current milestone resume point remains unchanged while this ad-hoc plan
+awaits execution.
 
 Quick plan **006 memory-tracker type** is **done** (see slim PLAN under
 `.planning/quick/006-memory-tracker-type/`).
@@ -60,10 +67,14 @@ recommission (REC-01, REC-03–REC-05).
 
 **Phase 7 Plan 07-01** — executed
 (`.planning/phases/07-amend-recorded-session/07-01-SUMMARY.md`). Snapshot columns on
-`session_item`; POST record amends latest RECORDED session; dialog amend state; amend E2E
-`@wip` green (Gracias 1→4, day-3 zero potential sessions); JUnit snapshot re-grade contract.
+`session_item`; POST record amends latest RECORDED session; dialog amend state.
 
-**Next:** Phase 7 Plan 07-02 — recorded-session strip, E2E graduation, edge unit tests.
+**Phase 7 Plan 07-02** — executed
+(`.planning/phases/07-amend-recorded-session/07-02-SUMMARY.md`). `recordedSessions` on
+recalling + recorded-session strip re-opens amend dialog; edge JUnit for partial amend,
+scheduling, tutor feedback; amend E2E green without `@wip` (6/6 scenarios).
+
+**Milestone v1.3:** Phase 7 complete — AMD-01 amend recorded session fully observable.
 
 ## Deferred Items
 
@@ -78,11 +89,11 @@ recommission (REC-01, REC-03–REC-05).
 
 ## Session Continuity
 
-**Last session:** 2026-08-08T01:40:08.500Z
-**Stopped at:** Completed 07-01-PLAN.md
-**Resume file:** 07-02-PLAN.md
+**Last session:** 2026-08-08T01:49:14.933Z
+**Stopped at:** Completed 07-02-PLAN.md
+**Resume file:** None
 
-Phase 7 Plan 07-01 complete. Next: 07-02 expansion.
+Phase 7 complete (07-01 + 07-02). Milestone v1.3 commissioned learning session MVP delivered.
 
 ## Performance Metrics
 
@@ -97,6 +108,7 @@ Phase 7 Plan 07-01 complete. Next: 07-02 expansion.
 | Phase 06 P01 | 25 | 3 tasks | 23 files |
 | Phase 06-record-report-and-schedule P02 | 20 | 3 tasks | 32 files |
 | Phase 07-amend-recorded-session P01 | 25 | 2 tasks | 11 files |
+| Phase 07-amend-recorded-session P02 | 45 | 3 tasks | 20 files |
 
 ## Decisions
 
@@ -121,3 +133,5 @@ Phase 7 Plan 07-01 complete. Next: 07-02 expansion.
 - [Phase 06-02]: latestTutorFeedbackScore transient JSON field from latest recorded SessionItem
 - [Phase 07-01]: Option-a: two snapshot columns on session_item (preSessionForgettingCurveIndex + preSessionRecallCount)
 - [Phase 07-01]: Amend: restorePreSessionSnapshot then recordCommissionedFeedback for single recallCount
+- [Phase 07-02]: loadSessionStrips on recall activation refreshes awaiting/recorded strips without queue reset
+- [Phase 07-02]: E2E When opens amend strip only when report dialog is not already open

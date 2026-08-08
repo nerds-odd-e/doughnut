@@ -213,12 +213,12 @@ Plans:
 
 **Context:** `.planning/phases/07-amend-recorded-session/`
 
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans executed
 
 Plans:
 
 - [x] 07-01-PLAN.md — Tracer: snapshot migration + amend API + dialog amend state + amend E2E @wip (AMD-01, D-01–D-05, D-08, D-11–D-13)
-- [ ] 07-02-PLAN.md — Expansion: recordedSessions strip + amend re-open + edge unit tests + E2E graduation (AMD-01, D-05–D-13)
+- [x] 07-02-PLAN.md — Expansion: recordedSessions strip + amend re-open + edge unit tests + E2E graduation (AMD-01, D-05–D-13)
 
 **Wave 1**
 
@@ -226,7 +226,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1)*
 
-- [ ] 07-02-PLAN.md — Expansion: recorded-session strip, scheduling/tutor-feedback proofs, amend E2E green
+- [x] 07-02-PLAN.md — Expansion: recorded-session strip, scheduling/tutor-feedback proofs, amend E2E green
 
 ---
 
@@ -240,7 +240,7 @@ Plans:
 | 4 | Learning Session and Request builder | Structure | — | In Progress|
 | 5 | Commission Learning Session | Behavior | COM-01–03 | Pending |
 | 6 | Record report and schedule | Behavior | REC-01–05 | Complete    |
-| 7 | Amend recorded session | Behavior | AMD-01 | In Progress|
+| 7 | Amend recorded session | Behavior | AMD-01 | Complete    |
 
 **Coverage:** 14/14 v1 requirements mapped ✓
 
