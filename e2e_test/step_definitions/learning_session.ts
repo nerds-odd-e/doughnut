@@ -9,10 +9,7 @@ import start from '../start'
 When(
   'I commission a learning session for notebook {string}',
   (notebookTitle: string) => {
-    start
-      .recall()
-      .navigateToRecallPage()
-      .commissionLearningSession(notebookTitle)
+    start.recall().visitRecallPage().commissionLearningSession(notebookTitle)
   }
 )
 
@@ -78,6 +75,16 @@ Then(
 )
 
 Then(
+  'the learning session request should list session items for only notes {string}',
+  (noteTitles: string) => {
+    start
+      .recall()
+      .assumeRecallPage()
+      .expectLearningSessionRequestListsOnlyNotes(noteTitles)
+  }
+)
+
+Then(
   'the learning session request should include the learning status of {string}',
   (noteTitle: string) => {
     start
@@ -110,3 +117,11 @@ Then(
 Then("the learning session should be awaiting the tutor's report", () => {
   start.recall().assumeRecallPage().expectLearningSessionAwaitingReport()
 })
+
+Then(
+  'I should see tutor feedback score {int} from a learning session for the memory tracker of note {string}',
+  (score: number, noteTitle: string) => {
+    start.jumpToNotePage(noteTitle).moreOptions().openAssimilationSettings()
+    start.assumeAssimilationPage().expectTutorFeedbackScore(score)
+  }
+)

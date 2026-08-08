@@ -58,6 +58,12 @@ export const assumeAssimilationPage = () => ({
     this.expectMemoryTrackerInfo([{ type: 'normal' }, { type: 'Commissioned' }])
     return this
   },
+  expectTutorFeedbackScore(score: number) {
+    cy.get(`[data-test="tutor-feedback-score-${score}"]`)
+      .should('be.visible')
+      .and('contain', `tutor feedback score ${score} from a learning session`)
+    return this
+  },
   skipRecallOnPanel() {
     cy.findByText('Skip recall').click()
     cy.findByRole('button', { name: 'OK' }).click()

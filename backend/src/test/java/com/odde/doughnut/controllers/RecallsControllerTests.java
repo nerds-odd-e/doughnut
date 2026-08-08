@@ -8,6 +8,7 @@ import com.odde.doughnut.controllers.dto.AnsweredQuestion;
 import com.odde.doughnut.controllers.dto.CommissionLearningSessionRequest;
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.NoteDeleteReferenceHandling;
+import com.odde.doughnut.controllers.dto.RecordLearningSessionRequest;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
@@ -46,6 +47,13 @@ class RecallsControllerTests extends ControllerTestBase {
 
   private MemoryTracker dueTracker(Timestamp nextRecallAt) {
     return makeMe.aMemoryTrackerBy(currentUser.getUser()).nextRecallAt(nextRecallAt).please();
+  }
+
+  private RecordLearningSessionRequest recordRequest(Notebook notebook, String reportMarkdown) {
+    RecordLearningSessionRequest request = new RecordLearningSessionRequest();
+    request.notebookId = notebook.getId();
+    request.reportMarkdown = reportMarkdown;
+    return request;
   }
 
   @Nested
@@ -235,6 +243,51 @@ class RecallsControllerTests extends ControllerTestBase {
           afterCommission.getAwaitingReportSessions().get(0).getRequestMarkdown(),
           org.hamcrest.Matchers.containsString("### Hola"));
       assertThat(afterCommission.getDueCommissioned(), hasSize(0));
+    }
+
+    @Test
+    void dayThreeDueCommissionedOnlyGraciasAfterRecordedScores()
+        throws UnexpectedNoAccessRightException {
+      currentUser.setUser(makeMe.aUser().withSpaceIntervals("1, 2, 4, 8").please());
+      Timestamp dayOne = makeMe.aTimestamp().of(0, 8).please();
+      Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+      Timestamp dayThree = makeMe.aTimestamp().of(2, 9).please();
+      testabilitySettings.timeTravelTo(dayOne);
+
+      Notebook notebook =
+          makeMe
+              .aNotebook()
+              .creatorAndOwner(currentUser.getUser())
+              .name("Spanish conversation")
+              .please();
+      Note hola = makeMe.aNote().notebook(notebook).title("Hola").please();
+      Note gracias = makeMe.aNote().notebook(notebook).title("Gracias").please();
+      MemoryTracker holaTracker =
+          makeMe.aMemoryTrackerFor(hola).commissioned().nextRecallAt(dayOne).please();
+      MemoryTracker graciasTracker =
+          makeMe.aMemoryTrackerFor(gracias).commissioned().nextRecallAt(dayOne).please();
+
+      testabilitySettings.timeTravelTo(dayTwo);
+      CommissionLearningSessionRequest request = new CommissionLearningSessionRequest();
+      request.notebookId = notebook.getId();
+      learningSessionController.commission(request, "Asia/Shanghai");
+      learningSessionController.record(
+          recordRequest(
+              notebook,
+              """
+              # Learning Session Report
+
+              Hola: 5
+              Gracias: 1
+              """),
+          "Asia/Shanghai");
+
+      testabilitySettings.timeTravelTo(dayThree);
+      DueMemoryTrackers due = controller.recalling("Asia/Shanghai", 0);
+
+      assertThat(due.getDueCommissioned(), hasSize(1));
+      assertEquals(graciasTracker.getId(), due.getDueCommissioned().get(0).getMemoryTrackerId());
+      assertTrue(holaTracker.getNextRecallAt().after(dayThree));
     }
 
     @Test

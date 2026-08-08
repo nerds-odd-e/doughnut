@@ -153,6 +153,21 @@ const recallPage = () => {
       })
       return this
     },
+    expectLearningSessionRequestListsOnlyNotes(noteTitles: string) {
+      const expected = commonSenseSplit(noteTitles, ',')
+      expected.forEach((title) => {
+        this.learningSessionRequestText().should('contain', `### ${title}`)
+      })
+      this.learningSessionRequestText().then((text) => {
+        const itemHeaders = text.match(/^### .+$/gm) ?? []
+        expect(itemHeaders).to.have.length(expected.length)
+        for (const header of itemHeaders) {
+          const title = header.replace('### ', '')
+          expect(expected).to.include(title)
+        }
+      })
+      return this
+    },
     expectLearningSessionRequestIncludesLearningStatus(noteTitle: string) {
       this.learningSessionRequestText().should((text) => {
         expect(text).to.contain(`### ${noteTitle}`)
@@ -181,11 +196,15 @@ const recallPage = () => {
       return this
     },
     recordLearningSessionReport(reportMarkdown: string) {
-      cy.get('[data-test="learning-session-report"]')
+      // Commission leaves the dialog open; scope to dialog to avoid the awaiting-strip homonym.
+      cy.get('[data-test="commission-learning-session-dialog"]')
+        .find('[data-test="learning-session-report"]')
         .clear()
         .invoke('val', reportMarkdown)
         .trigger('input')
-      cy.get('[data-test="record-learning-session-report"]').click()
+      cy.get('[data-test="commission-learning-session-dialog"]')
+        .find('[data-test="record-learning-session-report"]')
+        .click()
       waitUntilAppIsNotBusy()
       return this
     },
