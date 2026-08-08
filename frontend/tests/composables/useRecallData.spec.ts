@@ -103,7 +103,6 @@ describe("useRecallData potentialLearningSessions", () => {
       {
         notebookId: 10,
         notebookName: "Spanish conversation",
-        trackerIds: [1, 2],
       },
     ])
     expect(wrapper.vm.toRepeatCount).toBe(0)

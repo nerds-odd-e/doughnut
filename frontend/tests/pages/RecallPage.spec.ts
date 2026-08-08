@@ -84,7 +84,6 @@ describe("repeat page loading", () => {
           {
             notebookId: 10,
             notebookName: "Spanish conversation",
-            trackerIds: [1, 2],
           },
         ],
       })

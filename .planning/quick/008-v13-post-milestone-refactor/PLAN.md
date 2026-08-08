@@ -1,6 +1,6 @@
 # v1.3 post-milestone refactor
 
-**Status:** in-progress (Phases 1–5 done)
+**Status:** in-progress (Phases 1–6 done)
 
 **Type:** ad-hoc quick plan (Structure only)
 
@@ -122,7 +122,7 @@ identity changes.
 **Verify:** Recalls CLS tests + compile after regen.
 
 ### Phase 6 — Frontend session types after lite DTO unify
-**Type:** Structure | **Status:** planned | **Subsystem:** frontend
+**Type:** Structure | **Status:** done | **Subsystem:** frontend
 
 - Align `useRecallData` types with regenerated SDK (single strip session shape
   or thin aliases).

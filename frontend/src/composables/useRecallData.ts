@@ -2,38 +2,22 @@ import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
 import type {
   DueCommissionedMemoryTrackerLite,
+  LearningSessionLite,
   MemoryTrackerLite,
 } from "@generated/doughnut-backend-api/types.gen"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
 
-export type PotentialLearningSession = {
-  notebookId: number
-  notebookName: string
-  trackerIds: number[]
-}
-
-export type AwaitingReportSession = {
-  notebookId: number
-  notebookName: string
-  learningSessionId: number
-  requestMarkdown: string
-}
-
-export type RecordedSession = {
-  notebookId: number
-  notebookName: string
-  learningSessionId: number
-  requestMarkdown: string
-}
+export type PotentialLearningSession = Pick<
+  LearningSessionLite,
+  "notebookId" | "notebookName"
+>
 
 const toRepeat = ref<MemoryTrackerLite[] | undefined>(undefined)
 const dueCommissioned = ref<DueCommissionedMemoryTrackerLite[] | undefined>(
   undefined
 )
-const awaitingReportSessions = ref<AwaitingReportSession[] | undefined>(
-  undefined
-)
-const recordedSessions = ref<RecordedSession[] | undefined>(undefined)
+const awaitingReportSessions = ref<LearningSessionLite[] | undefined>(undefined)
+const recordedSessions = ref<LearningSessionLite[] | undefined>(undefined)
 const currentRecallWindowEndAt = ref<string | undefined>(undefined)
 const totalAssimilatedCount = ref<number | undefined>(undefined)
 const isRecallPaused = ref(false)
@@ -54,14 +38,10 @@ const potentialLearningSessions = computed((): PotentialLearningSession[] => {
   const trackers = dueCommissioned.value ?? []
   const byNotebook = new Map<number, PotentialLearningSession>()
   for (const tracker of trackers) {
-    const existing = byNotebook.get(tracker.notebookId)
-    if (existing) {
-      existing.trackerIds.push(tracker.memoryTrackerId)
-    } else {
+    if (!byNotebook.has(tracker.notebookId)) {
       byNotebook.set(tracker.notebookId, {
         notebookId: tracker.notebookId,
         notebookName: tracker.notebookName,
-        trackerIds: [tracker.memoryTrackerId],
       })
     }
   }
@@ -82,12 +62,12 @@ export function useRecallData() {
   }
 
   const setAwaitingReportSessions = (
-    sessions: AwaitingReportSession[] | undefined
+    sessions: LearningSessionLite[] | undefined
   ) => {
     awaitingReportSessions.value = sessions
   }
 
-  const setRecordedSessions = (sessions: RecordedSession[] | undefined) => {
+  const setRecordedSessions = (sessions: LearningSessionLite[] | undefined) => {
     recordedSessions.value = sessions
   }
 

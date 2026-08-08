@@ -1,6 +1,8 @@
 import type {
   AnsweredQuestion,
   DueCommissionedMemoryTrackerLite,
+  DueMemoryTrackers,
+  LearningSessionLite,
   MemoryTrackerLite,
 } from "@generated/doughnut-backend-api"
 import { RecallsController } from "@generated/doughnut-backend-api/sdk.gen"
@@ -26,15 +28,9 @@ export function useRecallPageLoading(options: {
     trackers: DueCommissionedMemoryTrackerLite[] | undefined
   ) => void
   setAwaitingReportSessions: (
-    sessions:
-      | import("@/composables/useRecallData").AwaitingReportSession[]
-      | undefined
+    sessions: LearningSessionLite[] | undefined
   ) => void
-  setRecordedSessions: (
-    sessions:
-      | import("@/composables/useRecallData").RecordedSession[]
-      | undefined
-  ) => void
+  setRecordedSessions: (sessions: LearningSessionLite[] | undefined) => void
   setTotalAssimilatedCount: (count: number | undefined) => void
   setDiligentMode: (enabled: boolean) => void
   setCurrentRecallWindowEndAt: (endAt: string | undefined) => void
@@ -56,6 +52,12 @@ export function useRecallPageLoading(options: {
   const isProgressBarVisible = ref(true)
   const isLoadingMore = ref(false)
 
+  const applySessionStrips = (response: DueMemoryTrackers) => {
+    setDueCommissioned(response.dueCommissioned ?? [])
+    setAwaitingReportSessions(response.awaitingReportSessions ?? [])
+    setRecordedSessions(response.recordedSessions ?? [])
+  }
+
   const loadSessionStrips = async () => {
     const { data: response, error } = await RecallsController.recalling({
       query: {
@@ -64,9 +66,7 @@ export function useRecallPageLoading(options: {
       },
     })
     if (!error && response) {
-      setDueCommissioned(response.dueCommissioned ?? [])
-      setAwaitingReportSessions(response.awaitingReportSessions ?? [])
-      setRecordedSessions(response.recordedSessions ?? [])
+      applySessionStrips(response)
     }
   }
 
@@ -80,9 +80,7 @@ export function useRecallPageLoading(options: {
         },
       })
       if (!error && response) {
-        setDueCommissioned(response.dueCommissioned ?? [])
-        setAwaitingReportSessions(response.awaitingReportSessions ?? [])
-        setRecordedSessions(response.recordedSessions ?? [])
+        applySessionStrips(response)
         let trackers = response.toRepeat
         currentIndex.value = 0
         setTotalAssimilatedCount(response.totalAssimilatedCount)

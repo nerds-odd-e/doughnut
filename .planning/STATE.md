@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: none
 milestone_name: none
-status: Executing quick 008 — Phase 5 done
-last_activity_desc: Quick 008 Phase 5 — collapse session feed lite DTOs
+status: Executing quick 008 — Phase 6 done
+last_activity_desc: Quick 008 Phase 6 — frontend LearningSessionLite alignment
 ---
 
 # Project State
@@ -24,7 +24,7 @@ Active ad-hoc plans:
 
 | Plan | Path | Status |
 |------|------|--------|
-| **008** v1.3 post-milestone refactor | `.planning/quick/008-v13-post-milestone-refactor/PLAN.md` | in-progress (Phase 5/11 done) |
+| **008** v1.3 post-milestone refactor | `.planning/quick/008-v13-post-milestone-refactor/PLAN.md` | in-progress (Phase 6/11 done) |
 | **007** inline container titles | `.planning/quick/007-inline-container-titles/PLAN.md` | planned |
 
 ## Deferred Items

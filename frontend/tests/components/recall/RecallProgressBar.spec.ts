@@ -1,15 +1,11 @@
 import RecallProgressBar from "@/components/recall/RecallProgressBar.vue"
+import type { PotentialLearningSession } from "@/composables/useRecallData"
+import type { LearningSessionLite } from "@generated/doughnut-backend-api"
 import helper from "@tests/helpers"
 import { describe, expect, it } from "vitest"
 
 describe("RecallProgressBar potential learning sessions", () => {
-  const mountBar = (
-    potentialLearningSessions: {
-      notebookId: number
-      notebookName: string
-      trackerIds: number[]
-    }[]
-  ) =>
+  const mountBar = (potentialLearningSessions: PotentialLearningSession[]) =>
     helper
       .component(RecallProgressBar)
       .withRouter()
@@ -28,7 +24,6 @@ describe("RecallProgressBar potential learning sessions", () => {
       {
         notebookId: 1,
         notebookName: "Spanish conversation",
-        trackerIds: [11, 12],
       },
     ])
     const row = wrapper.find('[data-test="potential-learning-session"]')
@@ -51,12 +46,10 @@ describe("RecallProgressBar potential learning sessions", () => {
       {
         notebookId: 1,
         notebookName: "Spanish conversation",
-        trackerIds: [11, 12],
       },
       {
         notebookId: 2,
         notebookName: "Kanji",
-        trackerIds: [21],
       },
     ])
     const rows = wrapper.findAll('[data-test="potential-learning-session"]')
@@ -72,7 +65,6 @@ describe("RecallProgressBar potential learning sessions", () => {
       {
         notebookId: 3,
         notebookName: longTitle,
-        trackerIds: [31],
       },
     ])
     const row = wrapper.find('[data-test="potential-learning-session"]')
@@ -87,7 +79,6 @@ describe("RecallProgressBar potential learning sessions", () => {
       {
         notebookId: 1,
         notebookName: "Spanish conversation",
-        trackerIds: [11],
       },
     ])
     await wrapper
@@ -102,14 +93,7 @@ describe("RecallProgressBar potential learning sessions", () => {
 })
 
 describe("RecallProgressBar awaiting report sessions", () => {
-  const mountBar = (
-    awaitingReportSessions: {
-      notebookId: number
-      notebookName: string
-      learningSessionId: number
-      requestMarkdown: string
-    }[]
-  ) =>
+  const mountBar = (awaitingReportSessions: LearningSessionLite[]) =>
     helper
       .component(RecallProgressBar)
       .withRouter()
@@ -166,14 +150,7 @@ describe("RecallProgressBar awaiting report sessions", () => {
 })
 
 describe("RecallProgressBar recorded sessions", () => {
-  const mountBar = (
-    recordedSessions: {
-      notebookId: number
-      notebookName: string
-      learningSessionId: number
-      requestMarkdown: string
-    }[]
-  ) =>
+  const mountBar = (recordedSessions: LearningSessionLite[]) =>
     helper
       .component(RecallProgressBar)
       .withRouter()

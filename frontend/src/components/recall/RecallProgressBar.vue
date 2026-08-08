@@ -175,12 +175,11 @@ import RecallSessionOptionsDialog from "./RecallSessionOptionsDialog.vue"
 import CommissionLearningSessionDialog from "./CommissionLearningSessionDialog.vue"
 import { useRecallData } from "@/composables/useRecallData"
 
-import type { AnsweredQuestion } from "@generated/doughnut-backend-api"
 import type {
-  AwaitingReportSession,
-  PotentialLearningSession,
-  RecordedSession,
-} from "@/composables/useRecallData"
+  AnsweredQuestion,
+  LearningSessionLite,
+} from "@generated/doughnut-backend-api"
+import type { PotentialLearningSession } from "@/composables/useRecallData"
 
 defineProps({
   finished: { type: Number, required: true },
@@ -199,11 +198,11 @@ defineProps({
     default: () => [],
   },
   awaitingReportSessions: {
-    type: Array as () => AwaitingReportSession[],
+    type: Array as () => LearningSessionLite[],
     default: () => [],
   },
   recordedSessions: {
-    type: Array as () => RecordedSession[],
+    type: Array as () => LearningSessionLite[],
     default: () => [],
   },
 })
@@ -219,18 +218,18 @@ const showSettings = ref(false)
 const commissionDialogSession = ref<PotentialLearningSession | undefined>(
   undefined
 )
-const recordDialogSession = ref<AwaitingReportSession | undefined>(undefined)
-const amendDialogSession = ref<RecordedSession | undefined>(undefined)
+const recordDialogSession = ref<LearningSessionLite | undefined>(undefined)
+const amendDialogSession = ref<LearningSessionLite | undefined>(undefined)
 
 const openCommissionDialog = (session: PotentialLearningSession) => {
   commissionDialogSession.value = session
 }
 
-const openRecordDialog = (session: AwaitingReportSession) => {
+const openRecordDialog = (session: LearningSessionLite) => {
   recordDialogSession.value = session
 }
 
-const openAmendDialog = (session: RecordedSession) => {
+const openAmendDialog = (session: LearningSessionLite) => {
   amendDialogSession.value = session
 }
 
