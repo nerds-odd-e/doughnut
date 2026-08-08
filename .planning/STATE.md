@@ -4,14 +4,14 @@ milestone: v1.3
 milestone_name: Commissioned Learning Session MVP
 status: in_progress
 stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-08-08T00:30:00.000Z"
+last_updated: "2026-08-08T00:31:09.156Z"
 progress:
   total_phases: 7
   completed_phases: 3
-  total_plans: 8
+  total_plans: 10
   completed_plans: 8
-current_phase: 4
-current_phase_name: learning-session-request-builder
+current_phase: 5
+current_phase_name: commission-learning-session
 last_activity: 2026-08-08
 last_activity_desc: Phase 4 Plan 04-02 abandon lifecycle + learning status complete
 ---
@@ -47,7 +47,9 @@ sessions on recall progress bar; ordinary recall stays 0 (TRK-03, POT-01/02).
 Re-commission deletes prior `AWAITING_REPORT` sessions; Request markdown reflects recorded
 history; MakeMe builders; `pnpm backend:verify` + Cypress regression green.
 
-**Next:** Run Phase 4 verification, then plan Phase 5 (commission UI).
+**Phase 5** — planned (2 plans: 05-01 tracer COM-01–03, 05-02 exclusion + E2E graduation).
+
+**Next:** Execute Phase 5 Plan 05-01 (`/gsd-execute-phase 5`).
 
 ## Deferred Items
 

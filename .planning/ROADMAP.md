@@ -148,6 +148,17 @@ Plans:
 
 **Context:** `.planning/phases/05-commission-learning-session/`
 
+**Plans:** 2 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 05-01-PLAN.md — Tracer: commission dialog + progress bar + E2E @wip (COM-01–03)
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 05-02-PLAN.md — Expansion: dueCommissioned awaiting-report exclusion + E2E graduation
+
 ---
 
 ### Phase 6: Record report and schedule (Behavior)
