@@ -73,7 +73,7 @@
               <button
                 type="button"
                 class="daisy-btn daisy-btn-primary mt-4"
-                data-test="record-learning-session-report"
+                data-test="record-learning-session-report-submit"
                 @click="recordReport"
               >
                 Record report

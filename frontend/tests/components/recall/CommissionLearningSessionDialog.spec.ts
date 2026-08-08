@@ -32,6 +32,14 @@ describe("CommissionLearningSessionDialog", () => {
     await flushPromises()
   }
 
+  const clickRecordReportSubmit = async () => {
+    const recordButton = document.body.querySelector(
+      '[data-test="record-learning-session-report-submit"]'
+    ) as HTMLButtonElement
+    recordButton.click()
+    await flushPromises()
+  }
+
   const commissionToAwaiting = async () => {
     mockSdkService(LearningSessionController, "commission", {
       learningSessionId: 7,
@@ -98,11 +106,7 @@ describe("CommissionLearningSessionDialog", () => {
     reportTextarea.value = "# Learning Session Report\n\nHola: 5\nGracias: 1\n"
     reportTextarea.dispatchEvent(new Event("input"))
 
-    const recordButton = document.body.querySelector(
-      '[data-test="record-learning-session-report"]'
-    ) as HTMLButtonElement
-    recordButton.click()
-    await flushPromises()
+    await clickRecordReportSubmit()
 
     expect(recordSpy).toHaveBeenCalledWith({
       body: {
@@ -127,11 +131,7 @@ describe("CommissionLearningSessionDialog", () => {
     })
     await commissionToAwaiting()
 
-    const recordButton = document.body.querySelector(
-      '[data-test="record-learning-session-report"]'
-    ) as HTMLButtonElement
-    recordButton.click()
-    await flushPromises()
+    await clickRecordReportSubmit()
 
     expect(
       document.body.querySelector(
@@ -165,11 +165,7 @@ describe("CommissionLearningSessionDialog", () => {
     reportTextarea.value = "# Learning Session Report\n\nGracias: 4\n"
     reportTextarea.dispatchEvent(new Event("input"))
 
-    const recordButton = document.body.querySelector(
-      '[data-test="record-learning-session-report"]'
-    ) as HTMLButtonElement
-    recordButton.click()
-    await flushPromises()
+    await clickRecordReportSubmit()
 
     expect(recordSpy).toHaveBeenCalledWith({
       body: {
@@ -187,15 +183,11 @@ describe("CommissionLearningSessionDialog", () => {
     recordSpy.mockResolvedValue(wrapSdkError("record failed") as never)
     await commissionToAwaiting()
 
-    const recordButton = document.body.querySelector(
-      '[data-test="record-learning-session-report"]'
-    ) as HTMLButtonElement
-    recordButton.click()
-    await flushPromises()
+    await clickRecordReportSubmit()
 
     expect(
       document.body.querySelector(
-        '[data-test="record-learning-session-report"]'
+        '[data-test="record-learning-session-report-submit"]'
       )
     ).toBeTruthy()
     expect(

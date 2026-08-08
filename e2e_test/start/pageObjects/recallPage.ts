@@ -195,16 +195,26 @@ const recallPage = () => {
       )
       return this
     },
-    recordLearningSessionReport(reportMarkdown: string) {
-      // Commission leaves the dialog open; scope to dialog to avoid the awaiting-strip homonym.
+    recordLearningSessionReport(
+      reportMarkdown: string,
+      options?: { notebookTitle?: string }
+    ) {
+      if (options?.notebookTitle) {
+        cy.get('body').then(($body) => {
+          if (
+            $body.find('[data-test="record-learning-session-report-submit"]')
+              .length === 0
+          ) {
+            this.openAmendLearningSessionReport(options.notebookTitle!)
+          }
+        })
+      }
       cy.get('[data-test="commission-learning-session-dialog"]')
         .find('[data-test="learning-session-report"]')
         .clear()
         .invoke('val', reportMarkdown)
         .trigger('input')
-      cy.get('[data-test="commission-learning-session-dialog"]')
-        .find('[data-test="record-learning-session-report"]')
-        .click()
+      cy.get('[data-test="record-learning-session-report-submit"]').click()
       waitUntilAppIsNotBusy()
       return this
     },
@@ -257,11 +267,7 @@ export const recall = () => {
       return this
     },
     commissionLearningSession(notebookTitle: string) {
-      cy.contains('[data-test="potential-learning-session"]', notebookTitle)
-        .find('[data-test="commission-learning-session"]')
-        .click()
-      cy.get('[data-test="commission-learning-session-submit"]').click()
-      waitUntilAppIsNotBusy()
+      recallPage().commissionLearningSession(notebookTitle)
       return recallPage()
     },
     expectResumeAvailable() {

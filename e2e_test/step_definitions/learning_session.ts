@@ -44,16 +44,10 @@ Given(
 When(
   'I record the learning session report for the learning session of notebook {string}:',
   (notebookTitle: string, reportMarkdown: string) => {
-    const recallPage = start.recall().assumeRecallPage()
-    cy.get('body').then(($body) => {
-      const dialogReport = $body.find(
-        '[data-test="commission-learning-session-dialog"] [data-test="learning-session-report"]'
-      )
-      if (dialogReport.length === 0) {
-        recallPage.openAmendLearningSessionReport(notebookTitle)
-      }
-    })
-    recallPage.recordLearningSessionReport(reportMarkdown)
+    start
+      .recall()
+      .assumeRecallPage()
+      .recordLearningSessionReport(reportMarkdown, { notebookTitle })
   }
 )
 
