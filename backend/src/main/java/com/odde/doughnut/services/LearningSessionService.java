@@ -133,7 +133,7 @@ public class LearningSessionService {
     RecordLearningSessionResponse response = new RecordLearningSessionResponse();
     response.setStatus(session.getStatus());
     response.setRecordedItems(new ArrayList<>());
-    response.setRejectedEntries(toRejectedDto(parseResult.rejected()));
+    response.setRejectedEntries(new ArrayList<>(toRejectedDto(parseResult.rejected())));
 
     for (ParsedReportEntry entry : parseResult.entries()) {
       SessionItem matched =
@@ -152,13 +152,21 @@ public class LearningSessionService {
         continue;
       }
 
+      if (isAmend && matched.getPreSessionRecallCount() == null) {
+        response
+            .getRejectedEntries()
+            .add(
+                rejectedEntry(
+                    entry.noteTitle() + ": " + entry.score(),
+                    "Cannot amend: no pre-session snapshot for this item."));
+        continue;
+      }
+
       matched.setFeedbackScore(entry.score());
       matched.setFeedbackRecordedAt(now);
       MemoryTracker tracker = matched.getMemoryTracker();
       if (isAmend) {
-        if (matched.getPreSessionRecallCount() != null) {
-          tracker.restorePreSessionSnapshot(matched);
-        }
+        tracker.restorePreSessionSnapshot(matched);
       } else if (matched.getPreSessionRecallCount() == null) {
         matched.setPreSessionForgettingCurveIndex(tracker.getForgettingCurveIndex());
         matched.setPreSessionRecallCount(tracker.getRecallCount());

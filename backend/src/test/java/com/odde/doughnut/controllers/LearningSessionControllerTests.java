@@ -505,6 +505,52 @@ class LearningSessionControllerTests extends LearningSessionControllerTestBase {
     }
 
     @Test
+    void amendRejectsWhenPreSessionSnapshotMissing() throws UnexpectedNoAccessRightException {
+      Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+      testabilitySettings.timeTravelTo(dayTwo);
+
+      Notebook notebook =
+          makeMe
+              .aNotebook()
+              .creatorAndOwner(currentUser.getUser())
+              .name("Spanish conversation")
+              .please();
+      Note hola = makeMe.aNote().notebook(notebook).title("Hola").content("Hello").please();
+      MemoryTracker holaTracker =
+          makeMe.aMemoryTrackerFor(hola).commissioned().nextRecallAt(dayTwo).please();
+
+      LearningSession recordedSession = recordedLearningSession(notebook, dayTwo);
+      addRecordedFeedback(recordedSession, holaTracker, 4, dayTwo);
+
+      SessionItem legacyItem =
+          sessionItemRepository.findByLearningSession_Id(recordedSession.getId()).stream()
+              .filter(item -> item.getNoteTitle().equals("Hola"))
+              .findFirst()
+              .orElseThrow();
+      assertThat(legacyItem.getPreSessionRecallCount(), nullValue());
+
+      RecordLearningSessionResponse amendResponse =
+          controller.record(
+              recordRequest(
+                  notebook,
+                  """
+                  # Learning Session Report
+
+                  Hola: 5
+                  """,
+                  recordedSession.getId()),
+              "Asia/Shanghai");
+
+      assertThat(amendResponse.getStatus(), equalTo(LearningSessionStatus.RECORDED));
+      assertThat(amendResponse.getRecordedItems(), empty());
+      assertThat(amendResponse.getRejectedEntries(), hasSize(1));
+      assertThat(
+          amendResponse.getRejectedEntries().getFirst().getReason(),
+          equalTo("Cannot amend: no pre-session snapshot for this item."));
+      assertThat(legacyItem.getFeedbackScore(), equalTo(4));
+    }
+
+    @Test
     void amendWithLearningSessionIdWhileAwaitingSessionExists()
         throws UnexpectedNoAccessRightException {
       Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
