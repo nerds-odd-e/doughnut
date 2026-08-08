@@ -34,6 +34,11 @@
               >
                 <Pause class="w-8 h-8 text-green-600" />
               </button>
+              <RecallLearningSessionActions
+                :potential-learning-sessions="potentialLearningSessions"
+                :awaiting-report-sessions="awaitingReportSessions"
+                @select="onActionableSessionSelect"
+              />
             </div>
             <RecallSessionOptionsDialog
               v-if="showSettings"
@@ -56,34 +61,6 @@
           <Settings class="w-6 h-6" />
         </template>
       </ProgressBar>
-    </div>
-    <div
-      v-if="potentialLearningSessions.length > 0"
-      class="flex flex-col gap-2 px-4"
-    >
-      <LearningSessionStrip
-        v-for="session in potentialLearningSessions"
-        :key="session.notebookId"
-        row-test-id="potential-learning-session"
-        :message="potentialSessionMessage(session.notebookName)"
-        cta-test-id="commission-learning-session"
-        cta-label="Commission"
-        @cta-click="openSessionDialog('commission', session)"
-      />
-    </div>
-    <div
-      v-if="awaitingReportSessions.length > 0"
-      class="flex flex-col gap-2 px-4"
-    >
-      <LearningSessionStrip
-        v-for="session in awaitingReportSessions"
-        :key="session.learningSessionId"
-        row-test-id="awaiting-report-learning-session"
-        :message="awaitingReportSessionMessage(session.notebookName)"
-        cta-test-id="record-learning-session-report"
-        cta-label="Record report"
-        @cta-click="openSessionDialog('record', session)"
-      />
     </div>
     <div
       v-if="recordedSessions.length > 0"
@@ -116,6 +93,7 @@ import { Pause, Settings, SkipBack } from "@lucide/vue"
 import RecallSessionOptionsDialog from "./RecallSessionOptionsDialog.vue"
 import CommissionLearningSessionDialog from "./CommissionLearningSessionDialog.vue"
 import LearningSessionStrip from "./LearningSessionStrip.vue"
+import RecallLearningSessionActions from "./RecallLearningSessionActions.vue"
 import { useRecallData } from "@/composables/useRecallData"
 
 import type {
@@ -167,12 +145,6 @@ const { requestDueRecallsRefresh } = useRecallData()
 const showSettings = ref(false)
 const sessionDialog = ref<SessionDialogState | undefined>(undefined)
 
-const potentialSessionMessage = (notebookName: string) =>
-  `1 potential learning session to commission for notebook "${notebookName}"`
-
-const awaitingReportSessionMessage = (notebookName: string) =>
-  `1 learning session awaiting the tutor's report for notebook "${notebookName}"`
-
 const recordedSessionMessage = (notebookName: string) =>
   `1 recorded learning session for notebook "${notebookName}"`
 
@@ -203,6 +175,16 @@ const openSessionDialog = (
   session: PotentialLearningSession | LearningSessionLite
 ) => {
   sessionDialog.value = { mode, session }
+}
+
+const onActionableSessionSelect = ({
+  mode,
+  session,
+}: {
+  mode: "commission" | "record"
+  session: PotentialLearningSession | LearningSessionLite
+}) => {
+  openSessionDialog(mode, session)
 }
 
 const onSessionChanged = () => {

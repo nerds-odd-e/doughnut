@@ -187,7 +187,7 @@ inside `<session_items>`.
 
 ### Phase 3 — Behavior: Session action icon with badge on recall progress bar
 
-**Status:** planned  
+**Status:** done  
 **Type:** Behavior
 
 **Observable behavior**
@@ -231,7 +231,18 @@ choose an entry.
 **Done when:** Frontend unit tests + commissioned learning E2E green for
 potential, multi-notebook, commission, record, and amend paths.
 
+**Completed 2026-08-08:** GraduationCap icon with badge in progress bar;
+single entry opens dialog directly, multiple shows picker. Extracted
+`RecallLearningSessionActions.vue` and E2E `recallLearningSessionMethods.ts`.
+Recorded/amend strips unchanged.
+
 ---
+
+## Plan complete (2026-08-08)
+
+All three Behavior phases shipped. Request brief and recall-bar session entry
+are in product code and tests.
+
 
 ## Out of scope
 

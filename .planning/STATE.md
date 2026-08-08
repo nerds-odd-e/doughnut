@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: none
 milestone_name: none
-status: Quick plan in progress
-last_updated: "2026-08-08T14:30:00.000Z"
+status: Awaiting next milestone
+last_updated: "2026-08-08T15:00:00.000Z"
 last_activity: 2026-08-08
-last_activity_desc: Phase 2 done — CLS request XML sections
+last_activity_desc: Quick plan 008 CLS post-v1.3 polish complete
 ---
 
 # Project State
@@ -15,21 +15,16 @@ last_activity_desc: Phase 2 done — CLS request XML sections
 See: `.planning/PROJECT.md`
 
 **Core value:** Healthy mainline for learning and knowledge work
-**Current focus:** Ad-hoc quick plan — CLS post-v1.3 polish
+**Current focus:** Planning next milestone (`/gsd-new-milestone`)
 
 ## Current Position
 
 Milestone **v1.3 Commissioned Learning Session MVP** shipped 2026-08-08 (see
 `.planning/MILESTONES.md`).
 
-**Active plan:** `.planning/quick/008-cls-request-and-session-badge/PLAN.md`
-(3 Behavior phases, all planned)
-
-| Phase | Type | Status | Outcome |
-|-------|------|--------|---------|
-| 1 | Behavior | done | Tutor role + notebook QGI + wait-for-learner in Request |
-| 2 | Behavior | done | XML-ish sections, title list first, report example + omit unlearnt |
-| 3 | Behavior | planned | Progress-bar icon + badge for potential + awaiting sessions |
+Quick plan **008 CLS post-v1.3 polish** completed 2026-08-08 (request brief +
+session badge). Summary retained in
+`.planning/quick/008-cls-request-and-session-badge/PLAN.md`.
 
 ## Deferred Items
 
@@ -43,6 +38,4 @@ Milestone **v1.3 Commissioned Learning Session MVP** shipped 2026-08-08 (see
 
 ## Operator Next Steps
 
-- Run **execute-plan** on `.planning/quick/008-cls-request-and-session-badge/PLAN.md`
-  (or start Phase 1 manually)
-- Optional later: `/gsd-new-milestone` for a formal next milestone
+- `/gsd-new-milestone` — start next milestone (requirements + roadmap)

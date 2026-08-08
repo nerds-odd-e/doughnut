@@ -2,6 +2,7 @@ import { RecallsController } from '@generated/doughnut-backend-api/sdk.gen'
 import { commonSenseSplit } from 'support/string_util'
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import router from '../router'
+import { recallLearningSessionMethods } from './recallLearningSessionMethods'
 
 function recallProgressFromTriple(triple: string) {
   const [finished, dailyTotal, totalAssimilated] = triple.split('/').map(Number)
@@ -27,6 +28,7 @@ function loadRecallPage(options?: { waitForQuestion?: boolean }) {
 
 const recallPage = () => {
   return {
+    ...recallLearningSessionMethods(),
     yesIRemember() {
       cy.on('uncaught:exception', (err) => {
         if (
@@ -133,111 +135,6 @@ const recallPage = () => {
       cy.get('[data-test="question-section"]').should('exist')
       return this
     },
-    commissionLearningSession(notebookTitle: string) {
-      cy.contains('[data-test="potential-learning-session"]', notebookTitle)
-        .find('[data-test="commission-learning-session"]')
-        .click()
-      cy.get('[data-test="commission-learning-session-submit"]').click()
-      waitUntilAppIsNotBusy()
-      return this
-    },
-    learningSessionRequestText() {
-      return cy
-        .get('[data-test="learning-session-request"]')
-        .invoke('val')
-        .then((value) => String(value ?? ''))
-    },
-    expectLearningSessionRequestListsNotes(noteTitles: string) {
-      commonSenseSplit(noteTitles, ',').forEach((title) => {
-        this.learningSessionRequestText().should('contain', `### ${title}`)
-      })
-      return this
-    },
-    expectLearningSessionRequestListsOnlyNotes(noteTitles: string) {
-      const expected = commonSenseSplit(noteTitles, ',')
-      expected.forEach((title) => {
-        this.learningSessionRequestText().should('contain', `### ${title}`)
-      })
-      this.learningSessionRequestText().then((text) => {
-        const sessionItemsSection =
-          text.match(/<session_items>([\s\S]*?)<\/session_items>/)?.[1] ?? ''
-        const itemHeaders = sessionItemsSection.match(/^### .+$/gm) ?? []
-        expect(itemHeaders).to.have.length(expected.length)
-        for (const header of itemHeaders) {
-          const title = header.replace('### ', '')
-          expect(expected).to.include(title)
-        }
-      })
-      return this
-    },
-    expectLearningSessionRequestIncludesLearningStatus(noteTitle: string) {
-      this.learningSessionRequestText().should((text) => {
-        expect(text).to.contain(`### ${noteTitle}`)
-        expect(text).to.match(/not yet tutored|Learning status:/)
-      })
-      return this
-    },
-    expectLearningSessionRequestIncludesContent(content: string) {
-      this.learningSessionRequestText().should(
-        'contain',
-        `Expected learning content: ${content}`
-      )
-      return this
-    },
-    expectLearningSessionRequestIncludesRubric() {
-      this.learningSessionRequestText().should(
-        'contain',
-        'score from 0 to 5 per item'
-      )
-      return this
-    },
-    expectLearningSessionAwaitingReport() {
-      cy.get('[data-test="learning-session-awaiting-report"]').should(
-        'be.visible'
-      )
-      return this
-    },
-    recordLearningSessionReport(
-      reportMarkdown: string,
-      options?: { notebookTitle?: string }
-    ) {
-      if (options?.notebookTitle) {
-        cy.get('body').then(($body) => {
-          if (
-            $body.find('[data-test="record-learning-session-report-submit"]')
-              .length === 0
-          ) {
-            this.openAmendLearningSessionReport(options.notebookTitle!)
-          }
-        })
-      }
-      cy.get('[data-test="commission-learning-session-dialog"]')
-        .find('[data-test="learning-session-report"]')
-        .clear()
-        .invoke('val', reportMarkdown)
-        .trigger('input')
-      cy.get('[data-test="record-learning-session-report-submit"]').click()
-      waitUntilAppIsNotBusy()
-      return this
-    },
-    expectLearningSessionRecorded() {
-      cy.get('[data-test="learning-session-recorded"]').should('be.visible')
-      cy.get('[data-test="learning-session-awaiting-report"]').should(
-        'not.exist'
-      )
-      return this
-    },
-    openAmendLearningSessionReport(notebookTitle: string) {
-      cy.contains('[data-test="recorded-learning-session"]', notebookTitle)
-        .find('[data-test="amend-learning-session-report"]')
-        .click()
-      waitUntilAppIsNotBusy()
-      cy.get('[data-test="commission-learning-session-dialog"]').should(
-        'be.visible'
-      )
-      cy.get('[data-test="learning-session-recorded"]').should('be.visible')
-      return this
-    },
   }
 }
 export const recall = () => {
@@ -258,13 +155,9 @@ export const recall = () => {
     },
     expectPotentialLearningSession(count: number, notebookTitle: string) {
       this.navigateToRecallPage()
-      if (count === 0) {
-        cy.get('[data-test="potential-learning-session"]').should('not.exist')
-        return this
-      }
-      const expected = `${count} potential learning session to commission for notebook "${notebookTitle}"`
-      cy.contains('[data-test="potential-learning-session"]', expected).should(
-        'be.visible'
+      recallLearningSessionMethods().expectPotentialLearningSession(
+        count,
+        notebookTitle
       )
       return this
     },
