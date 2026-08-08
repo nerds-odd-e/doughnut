@@ -4,14 +4,14 @@ milestone: v1.3
 milestone_name: Commissioned Learning Session MVP
 status: in_progress
 stopped_at: Completed 06-02-PLAN.md
-last_updated: "2026-08-08T01:22:19.393Z"
+last_updated: "2026-08-08T01:25:57.521Z"
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 12
   completed_plans: 10
 current_phase: 6
-current_phase_name: record-report-and-schedule
+current_phase_name: Amend recorded session (Behavior)
 last_activity: 2026-08-08
 last_activity_desc: Phase 6 Plan 06-02 executed — awaiting-report strip, tutor feedback, REC-05 matrix, E2E green
 ---
