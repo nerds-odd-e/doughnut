@@ -180,7 +180,7 @@ Plans:
 
 **Context:** `.planning/phases/06-record-report-and-schedule/`
 
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans executed
 
 Plans:
 **Wave 1**
@@ -189,7 +189,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1)*
 
-- [ ] 06-02-PLAN.md — Expansion: awaiting-report strip + assimilation feedback + REC-05 unit tests + E2E graduation (REC-01, REC-03–REC-05)
+- [x] 06-02-PLAN.md — Expansion: awaiting-report strip + assimilation feedback + REC-05 unit tests + E2E graduation (REC-01, REC-03–REC-05)
 
 ---
 
