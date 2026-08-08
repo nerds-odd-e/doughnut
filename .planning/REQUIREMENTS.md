@@ -37,7 +37,7 @@ and CONTEXT.md. Glossary: ADR 0001 §3. Protocol: ADR 0005. Score→schedule: AD
 
 ### Amend
 
-- [ ] **AMD-01**: User can paste a later Learning Session Report that amends Feedback on a recorded session and reschedules accordingly
+- [x] **AMD-01**: User can paste a later Learning Session Report that amends Feedback on a recorded session and reschedules accordingly
 
 ## v2 Requirements
 
@@ -86,7 +86,7 @@ Filled by roadmap.
 | REC-03 | Phase 6 | Complete |
 | REC-04 | Phase 6 | Complete |
 | REC-05 | Phase 6 | Complete |
-| AMD-01 | Phase 7 | Pending |
+| AMD-01 | Phase 7 | Complete |
 
 **Coverage:**
 

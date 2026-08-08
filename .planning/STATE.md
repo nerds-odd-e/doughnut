@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Commissioned Learning Session MVP
 status: in_progress
-stopped_at: Phase 7 plans ready for execution
-last_updated: "2026-08-08T01:34:24.862Z"
+stopped_at: Completed 07-01-PLAN.md
+last_updated: "2026-08-08T01:40:08.510Z"
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 14
-  completed_plans: 10
-current_phase: 6
+  completed_plans: 11
+current_phase: 7
 current_phase_name: Amend recorded session (Behavior)
 last_activity: 2026-08-08
-last_activity_desc: Phase 6 Plan 06-02 executed — awaiting-report strip, tutor feedback, REC-05 matrix, E2E green
+last_activity_desc: Phase 7 Plan 07-01 executed — snapshot amend tracer, @wip E2E green, JUnit amend contract
 ---
 
 # Project State
@@ -58,7 +58,12 @@ strip re-opens record dialog; `latestTutorFeedbackScore` on assimilation setting
 parser matrix + rejection UX; recording E2E green without `@wip` including day-3 Gracias-only
 recommission (REC-01, REC-03–REC-05).
 
-**Next:** Phase 6 verification (`/gsd-verify-phase 6`) or Phase 7 amend-recorded-session planning.
+**Phase 7 Plan 07-01** — executed
+(`.planning/phases/07-amend-recorded-session/07-01-SUMMARY.md`). Snapshot columns on
+`session_item`; POST record amends latest RECORDED session; dialog amend state; amend E2E
+`@wip` green (Gracias 1→4, day-3 zero potential sessions); JUnit snapshot re-grade contract.
+
+**Next:** Phase 7 Plan 07-02 — recorded-session strip, E2E graduation, edge unit tests.
 
 ## Deferred Items
 
@@ -68,16 +73,16 @@ recommission (REC-01, REC-03–REC-05).
 | seed | SEED-002-host-mcp-over-https | dormant |
 | tech_debt | OpenAPI/`outgoingLinks`/`linkText` glossary rename (ADR 0001) | open |
 | deferred | Refine note on answered spelling questions | deferred |
-| plan_later | Amend recomputation (snapshot vs compound) | decide in `/gsd-plan-phase 7` |
+| plan_later | Amend recomputation (snapshot vs compound) | resolved in Phase 7 CONTEXT (option-a) |
 | known | `pnpm lint:all` / `test:path-routing` fails pre-existing (`render from routing JSON substitutes SHA` 6==7) | unrelated |
 
 ## Session Continuity
 
-**Last session:** 2026-08-08T01:34:24.851Z
-**Stopped at:** Phase 7 plans ready for execution
-**Resume file:** .planning/phases/07-amend-recorded-session/07-01-PLAN.md
+**Last session:** 2026-08-08T01:40:08.500Z
+**Stopped at:** Completed 07-01-PLAN.md
+**Resume file:** 07-02-PLAN.md
 
-Phase 6 complete (06-01 + 06-02). Next: phase verification or Phase 7.
+Phase 7 Plan 07-01 complete. Next: 07-02 expansion.
 
 ## Performance Metrics
 
@@ -91,6 +96,7 @@ Phase 6 complete (06-01 + 06-02). Next: phase verification or Phase 7.
 | Phase 04-learning-session-request-builder P02 | 18 | 3 tasks | 9 files |
 | Phase 06 P01 | 25 | 3 tasks | 23 files |
 | Phase 06-record-report-and-schedule P02 | 20 | 3 tasks | 32 files |
+| Phase 07-amend-recorded-session P01 | 25 | 2 tasks | 11 files |
 
 ## Decisions
 
@@ -113,3 +119,5 @@ Phase 6 complete (06-01 + 06-02). Next: phase verification or Phase 7.
 - [Phase 06-01]: E2E recording scenario @wip until 06-02 graduates tutor feedback steps
 - [Phase 06-02]: E2E record scoped to dialog; visitRecallPage after time travel for fresh due data
 - [Phase 06-02]: latestTutorFeedbackScore transient JSON field from latest recorded SessionItem
+- [Phase 07-01]: Option-a: two snapshot columns on session_item (preSessionForgettingCurveIndex + preSessionRecallCount)
+- [Phase 07-01]: Amend: restorePreSessionSnapshot then recordCommissionedFeedback for single recallCount
