@@ -89,11 +89,9 @@ describe("repeat page loading", () => {
       })
     )
     const wrapper = await ctx.mountPage()
-    const row = wrapper.find('[data-test="potential-learning-session"]')
-    expect(row.exists()).toBe(true)
-    expect(row.text()).toContain(
-      '1 potential learning session to commission for notebook "Spanish conversation"'
-    )
+    expect(
+      wrapper.find('[data-test="potential-learning-session"]').exists()
+    ).toBe(true)
     expect(wrapper.find(".progress-text").text()).toMatch(/0\/0/)
   })
 })

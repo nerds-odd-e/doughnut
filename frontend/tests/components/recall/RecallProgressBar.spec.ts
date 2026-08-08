@@ -4,83 +4,54 @@ import type { LearningSessionLite } from "@generated/doughnut-backend-api"
 import helper from "@tests/helpers"
 import { describe, expect, it } from "vitest"
 
+const canonicalRequestMarkdown = "# Learning Session Request\n\n### Hola\n"
+
+const spanishLearningSession = (
+  requestMarkdown = canonicalRequestMarkdown
+): LearningSessionLite => ({
+  notebookId: 1,
+  notebookName: "Spanish conversation",
+  learningSessionId: 42,
+  requestMarkdown,
+})
+
+const mountBar = (props?: {
+  potentialLearningSessions?: PotentialLearningSession[]
+  awaitingReportSessions?: LearningSessionLite[]
+  recordedSessions?: LearningSessionLite[]
+}) =>
+  helper
+    .component(RecallProgressBar)
+    .withRouter()
+    .withProps({
+      finished: 0,
+      toRepeatCount: 0,
+      canMoveToEnd: false,
+      currentIndex: 0,
+      previousAnsweredQuestions: [],
+      potentialLearningSessions: props?.potentialLearningSessions ?? [],
+      awaitingReportSessions: props?.awaitingReportSessions ?? [],
+      recordedSessions: props?.recordedSessions ?? [],
+    })
+    .mount()
+
 describe("RecallProgressBar potential learning sessions", () => {
-  const mountBar = (potentialLearningSessions: PotentialLearningSession[]) =>
-    helper
-      .component(RecallProgressBar)
-      .withRouter()
-      .withProps({
-        finished: 0,
-        toRepeatCount: 0,
-        canMoveToEnd: false,
-        currentIndex: 0,
-        previousAnsweredQuestions: [],
-        potentialLearningSessions,
-      })
-      .mount()
-
-  it("renders glossary copy for one notebook session", () => {
-    const wrapper = mountBar([
-      {
-        notebookId: 1,
-        notebookName: "Spanish conversation",
-      },
-    ])
-    const row = wrapper.find('[data-test="potential-learning-session"]')
-    expect(row.exists()).toBe(true)
-    expect(row.attributes("role")).toBe("status")
-    expect(row.find(".break-words").text()).toBe(
-      '1 potential learning session to commission for notebook "Spanish conversation"'
-    )
-  })
-
   it("renders nothing when there are no potential sessions", () => {
-    const wrapper = mountBar([])
+    const wrapper = mountBar()
     expect(
       wrapper.find('[data-test="potential-learning-session"]').exists()
     ).toBe(false)
   })
 
-  it("renders one row per notebook with distinct titles", () => {
-    const wrapper = mountBar([
-      {
-        notebookId: 1,
-        notebookName: "Spanish conversation",
-      },
-      {
-        notebookId: 2,
-        notebookName: "Kanji",
-      },
-    ])
-    const rows = wrapper.findAll('[data-test="potential-learning-session"]')
-    expect(rows).toHaveLength(2)
-    expect(rows[0]!.text()).toContain('"Spanish conversation"')
-    expect(rows[1]!.text()).toContain('"Kanji"')
-  })
-
-  it("keeps the full long notebook title in the row text", () => {
-    const longTitle =
-      "Advanced Spanish conversation practice for intermediate learners who want to master subjunctive mood"
-    const wrapper = mountBar([
-      {
-        notebookId: 3,
-        notebookName: longTitle,
-      },
-    ])
-    const row = wrapper.find('[data-test="potential-learning-session"]')
-    expect(row.find(".break-words").text()).toContain(`"${longTitle}"`)
-    expect(row.find('[data-test="commission-learning-session"]').exists()).toBe(
-      true
-    )
-  })
-
   it("opens commission dialog when Commission is clicked", async () => {
-    const wrapper = mountBar([
-      {
-        notebookId: 1,
-        notebookName: "Spanish conversation",
-      },
-    ])
+    const wrapper = mountBar({
+      potentialLearningSessions: [
+        {
+          notebookId: 1,
+          notebookName: "Spanish conversation",
+        },
+      ],
+    })
     await wrapper
       .find('[data-test="commission-learning-session"]')
       .trigger("click")
@@ -93,30 +64,10 @@ describe("RecallProgressBar potential learning sessions", () => {
 })
 
 describe("RecallProgressBar awaiting report sessions", () => {
-  const mountBar = (awaitingReportSessions: LearningSessionLite[]) =>
-    helper
-      .component(RecallProgressBar)
-      .withRouter()
-      .withProps({
-        finished: 0,
-        toRepeatCount: 0,
-        canMoveToEnd: false,
-        currentIndex: 0,
-        previousAnsweredQuestions: [],
-        potentialLearningSessions: [],
-        awaitingReportSessions,
-      })
-      .mount()
-
   it("renders awaiting-report strip with Record report button", () => {
-    const wrapper = mountBar([
-      {
-        notebookId: 1,
-        notebookName: "Spanish conversation",
-        learningSessionId: 42,
-        requestMarkdown: "# Learning Session Request\n\n### Hola\n",
-      },
-    ])
+    const wrapper = mountBar({
+      awaitingReportSessions: [spanishLearningSession()],
+    })
     const row = wrapper.find('[data-test="awaiting-report-learning-session"]')
     expect(row.exists()).toBe(true)
     expect(row.text()).toContain(
@@ -128,15 +79,9 @@ describe("RecallProgressBar awaiting report sessions", () => {
   })
 
   it("opens record dialog with request prefilled when Record report is clicked", async () => {
-    const requestMarkdown = "# Learning Session Request\n\n### Hola\n"
-    const wrapper = mountBar([
-      {
-        notebookId: 1,
-        notebookName: "Spanish conversation",
-        learningSessionId: 42,
-        requestMarkdown,
-      },
-    ])
+    const wrapper = mountBar({
+      awaitingReportSessions: [spanishLearningSession()],
+    })
     await wrapper
       .find('[data-test="awaiting-report-learning-session"]')
       .find('[data-test="record-learning-session-report"]')
@@ -145,36 +90,15 @@ describe("RecallProgressBar awaiting report sessions", () => {
       '[data-test="learning-session-request"]'
     ) as HTMLTextAreaElement | null
     expect(request).toBeTruthy()
-    expect(request?.value).toBe(requestMarkdown)
+    expect(request?.value).toBe(canonicalRequestMarkdown)
   })
 })
 
 describe("RecallProgressBar recorded sessions", () => {
-  const mountBar = (recordedSessions: LearningSessionLite[]) =>
-    helper
-      .component(RecallProgressBar)
-      .withRouter()
-      .withProps({
-        finished: 0,
-        toRepeatCount: 0,
-        canMoveToEnd: false,
-        currentIndex: 0,
-        previousAnsweredQuestions: [],
-        potentialLearningSessions: [],
-        awaitingReportSessions: [],
-        recordedSessions,
-      })
-      .mount()
-
   it("renders recorded-session strip with Amend report button", () => {
-    const wrapper = mountBar([
-      {
-        notebookId: 1,
-        notebookName: "Spanish conversation",
-        learningSessionId: 42,
-        requestMarkdown: "# Learning Session Request\n\n### Hola\n",
-      },
-    ])
+    const wrapper = mountBar({
+      recordedSessions: [spanishLearningSession()],
+    })
     const row = wrapper.find('[data-test="recorded-learning-session"]')
     expect(row.exists()).toBe(true)
     expect(row.text()).toContain(
@@ -186,15 +110,9 @@ describe("RecallProgressBar recorded sessions", () => {
   })
 
   it("opens amend dialog with request prefilled when Amend report is clicked", async () => {
-    const requestMarkdown = "# Learning Session Request\n\n### Hola\n"
-    const wrapper = mountBar([
-      {
-        notebookId: 1,
-        notebookName: "Spanish conversation",
-        learningSessionId: 42,
-        requestMarkdown,
-      },
-    ])
+    const wrapper = mountBar({
+      recordedSessions: [spanishLearningSession()],
+    })
     await wrapper
       .find('[data-test="recorded-learning-session"]')
       .find('[data-test="amend-learning-session-report"]')
@@ -203,7 +121,7 @@ describe("RecallProgressBar recorded sessions", () => {
       '[data-test="learning-session-request"]'
     ) as HTMLTextAreaElement | null
     expect(request).toBeTruthy()
-    expect(request?.value).toBe(requestMarkdown)
+    expect(request?.value).toBe(canonicalRequestMarkdown)
     expect(
       document.body.querySelector('[data-test="learning-session-recorded"]')
     ).toBeTruthy()

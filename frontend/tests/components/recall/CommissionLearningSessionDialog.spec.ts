@@ -5,41 +5,45 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import { mockSdkService, wrapSdkError } from "@tests/helpers"
 import helper from "@tests/helpers"
 
-const canonicalRequestMarkdown = `# Learning Session Request
-
-Notebook: Spanish conversation
-
-score from 0 to 5 per item:
-
-### Hola
-
-Expected learning content: Hello
-
-- Learning status: not yet tutored
-
-### Gracias
-
-Expected learning content: Thank you
-
-- Learning status: not yet tutored
-`
+const canonicalRequestMarkdown = "# Learning Session Request\n\n### Hola\n"
 
 describe("CommissionLearningSessionDialog", () => {
   beforeEach(() => {
     vi.restoreAllMocks()
     document.body.querySelectorAll("dialog").forEach((el) => el.remove())
   })
-  const mountDialog = () =>
+
+  const mountDialog = (props?: Record<string, unknown>) =>
     helper
       .component(CommissionLearningSessionDialog)
       .withRouter()
       .withProps({
         notebookId: 42,
         notebookName: "Spanish conversation",
+        ...props,
       })
       .mount()
 
-  it("commissions and shows request markdown with awaiting banner", async () => {
+  const clickCommissionSubmit = async () => {
+    const submit = document.body.querySelector(
+      '[data-test="commission-learning-session-submit"]'
+    ) as HTMLButtonElement
+    submit.click()
+    await flushPromises()
+  }
+
+  const commissionToAwaiting = async () => {
+    mockSdkService(LearningSessionController, "commission", {
+      learningSessionId: 7,
+      requestMarkdown: canonicalRequestMarkdown,
+      status: "AWAITING_REPORT",
+    })
+    mountDialog()
+    await flushPromises()
+    await clickCommissionSubmit()
+  }
+
+  it("commissions with notebook id in API body", async () => {
     const commissionSpy = mockSdkService(
       LearningSessionController,
       "commission",
@@ -51,32 +55,12 @@ describe("CommissionLearningSessionDialog", () => {
     )
     mountDialog()
     await flushPromises()
-
-    const submit = document.body.querySelector(
-      '[data-test="commission-learning-session-submit"]'
-    ) as HTMLButtonElement
-    expect(submit).toBeTruthy()
-    submit.click()
-    await flushPromises()
+    await clickCommissionSubmit()
 
     expect(commissionSpy).toHaveBeenCalledWith({
       body: { notebookId: 42 },
       query: { timezone: expect.any(String) },
     })
-
-    const textarea = document.body.querySelector(
-      '[data-test="learning-session-request"]'
-    ) as HTMLTextAreaElement
-    expect(textarea).toBeTruthy()
-    expect(textarea.value).toContain("# Learning Session Request")
-    expect(textarea.value).toContain("### Hola")
-    expect(textarea.value).toContain("score from 0 to 5 per item")
-
-    expect(
-      document.body.querySelector(
-        '[data-test="learning-session-awaiting-report"]'
-      )
-    ).toBeTruthy()
   })
 
   it("keeps pre-commission CTA when commission fails", async () => {
@@ -84,13 +68,7 @@ describe("CommissionLearningSessionDialog", () => {
     commissionSpy.mockResolvedValue(wrapSdkError("commission failed") as never)
     mountDialog()
     await flushPromises()
-
-    const submit = document.body.querySelector(
-      '[data-test="commission-learning-session-submit"]'
-    ) as HTMLButtonElement
-    expect(submit).toBeTruthy()
-    submit.click()
-    await flushPromises()
+    await clickCommissionSubmit()
 
     expect(
       document.body.querySelector(
@@ -102,12 +80,7 @@ describe("CommissionLearningSessionDialog", () => {
     ).toBeNull()
   })
 
-  it("shows report textarea after commission and records report", async () => {
-    mockSdkService(LearningSessionController, "commission", {
-      learningSessionId: 7,
-      requestMarkdown: canonicalRequestMarkdown,
-      status: "AWAITING_REPORT",
-    })
+  it("records report with notebook id in API body", async () => {
     const recordSpy = mockSdkService(LearningSessionController, "record", {
       status: "RECORDED",
       recordedAt: "1989-01-02T09:00:00Z",
@@ -117,19 +90,11 @@ describe("CommissionLearningSessionDialog", () => {
       ],
       rejectedEntries: [],
     })
-    mountDialog()
-    await flushPromises()
-
-    const submit = document.body.querySelector(
-      '[data-test="commission-learning-session-submit"]'
-    ) as HTMLButtonElement
-    submit.click()
-    await flushPromises()
+    await commissionToAwaiting()
 
     const reportTextarea = document.body.querySelector(
       '[data-test="learning-session-report"]'
     ) as HTMLTextAreaElement
-    expect(reportTextarea).toBeTruthy()
     reportTextarea.value = "# Learning Session Report\n\nHola: 5\nGracias: 1\n"
     reportTextarea.dispatchEvent(new Event("input"))
 
@@ -146,22 +111,9 @@ describe("CommissionLearningSessionDialog", () => {
       },
       query: { timezone: expect.any(String) },
     })
-    expect(
-      document.body.querySelector('[data-test="learning-session-recorded"]')
-    ).toBeTruthy()
-    expect(
-      document.body.querySelector(
-        '[data-test="learning-session-awaiting-report"]'
-      )
-    ).toBeNull()
   })
 
-  it("shows rejection warning alongside recorded banner on partial success", async () => {
-    mockSdkService(LearningSessionController, "commission", {
-      learningSessionId: 7,
-      requestMarkdown: canonicalRequestMarkdown,
-      status: "AWAITING_REPORT",
-    })
+  it("shows rejection warning on partial success", async () => {
     mockSdkService(LearningSessionController, "record", {
       status: "RECORDED",
       recordedAt: "1989-01-02T09:00:00Z",
@@ -173,14 +125,7 @@ describe("CommissionLearningSessionDialog", () => {
         },
       ],
     })
-    mountDialog()
-    await flushPromises()
-
-    const submit = document.body.querySelector(
-      '[data-test="commission-learning-session-submit"]'
-    ) as HTMLButtonElement
-    submit.click()
-    await flushPromises()
+    await commissionToAwaiting()
 
     const recordButton = document.body.querySelector(
       '[data-test="record-learning-session-report"]'
@@ -188,9 +133,6 @@ describe("CommissionLearningSessionDialog", () => {
     recordButton.click()
     await flushPromises()
 
-    expect(
-      document.body.querySelector('[data-test="learning-session-recorded"]')
-    ).toBeTruthy()
     expect(
       document.body.querySelector(
         '[data-test="learning-session-report-rejections"]'
@@ -203,32 +145,19 @@ describe("CommissionLearningSessionDialog", () => {
     ).toContain("Unknown: 3")
   })
 
-  it("mode amend shows recorded banner and emits recorded on success", async () => {
+  it("mode amend records with learningSessionId in API body and emits recorded", async () => {
     const recordSpy = mockSdkService(LearningSessionController, "record", {
       status: "RECORDED",
       recordedAt: "1989-01-02T09:00:00Z",
       recordedItems: [{ noteTitle: "Gracias", score: 4, memoryTrackerId: 12 }],
       rejectedEntries: [],
     })
-    const wrapper = helper
-      .component(CommissionLearningSessionDialog)
-      .withRouter()
-      .withProps({
-        notebookId: 42,
-        notebookName: "Spanish conversation",
-        mode: "amend",
-        learningSessionId: 99,
-        initialRequestMarkdown: canonicalRequestMarkdown,
-      })
-      .mount()
+    const wrapper = mountDialog({
+      mode: "amend",
+      learningSessionId: 99,
+      initialRequestMarkdown: canonicalRequestMarkdown,
+    })
     await flushPromises()
-
-    expect(
-      document.body.querySelector('[data-test="learning-session-recorded"]')
-    ).toBeTruthy()
-    expect(
-      document.body.querySelector('[data-test="learning-session-report"]')
-    ).toBeTruthy()
 
     const reportTextarea = document.body.querySelector(
       '[data-test="learning-session-report"]'
@@ -254,21 +183,9 @@ describe("CommissionLearningSessionDialog", () => {
   })
 
   it("keeps report textarea when record fails", async () => {
-    mockSdkService(LearningSessionController, "commission", {
-      learningSessionId: 7,
-      requestMarkdown: canonicalRequestMarkdown,
-      status: "AWAITING_REPORT",
-    })
     const recordSpy = vi.spyOn(LearningSessionController, "record")
     recordSpy.mockResolvedValue(wrapSdkError("record failed") as never)
-    mountDialog()
-    await flushPromises()
-
-    const submit = document.body.querySelector(
-      '[data-test="commission-learning-session-submit"]'
-    ) as HTMLButtonElement
-    submit.click()
-    await flushPromises()
+    await commissionToAwaiting()
 
     const recordButton = document.body.querySelector(
       '[data-test="record-learning-session-report"]'

@@ -1,6 +1,6 @@
 # v1.3 post-milestone refactor
 
-**Status:** in-progress (Phases 1–9 done)
+**Status:** in-progress (Phases 1–10 done)
 
 **Type:** ad-hoc quick plan (Structure only)
 
@@ -168,7 +168,7 @@ tests.
 **Verify:** `RecallProgressBar.spec.ts` (+ dialog mount wiring).
 
 ### Phase 10 — Trim overlapping frontend unit coverage
-**Type:** Structure | **Status:** planned | **Subsystem:** frontend (tests)
+**Type:** Structure | **Status:** done | **Subsystem:** frontend (tests)
 
 - Split or trim `CommissionLearningSessionDialog.spec.ts` under 250: keep API
   body, failure retention, rejection UI, amend `learningSessionId`; drop

@@ -77,12 +77,8 @@ describe("AssimilationPanel commissioned assimilation", () => {
     const wrapper = await mountAssimilationPanelReady()
 
     expect(assimilateButtonEl(wrapper)?.hasAttribute("disabled")).toBe(true)
-    const caret = assimilateAsCommissionedCaretEl(wrapper)
-    expect(caret).not.toBeNull()
-    expect(caret?.classList.contains("pointer-events-none")).toBe(false)
-
+    expect(assimilateAsCommissionedCaretEl(wrapper)).not.toBeNull()
     await clickAssimilateAsCommissioned(wrapper)
-
     expect(assimilateSpy).toHaveBeenCalled()
   })
 
