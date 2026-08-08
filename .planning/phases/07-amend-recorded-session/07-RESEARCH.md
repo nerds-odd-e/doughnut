@@ -530,16 +530,13 @@ Scenario: A later report amends the feedback of a recorded learning session
 | A3 | E2E Given can use UI record or MakeMe/testability to establish recorded state with snapshots | E2E | Flaky Given if snapshots missing |
 | A4 | `findLatestFeedbackScoreByMemoryTrackerId` picks amended score after `feedbackRecordedAt` update | REC-03 carry-over | Stale score display if timestamp not updated |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **`recordedAt` on session on amend**
-   - Recommendation: Update to amend instant for consistency with `feedbackRecordedAt` (D-03 discretion); E2E does not assert.
+1. **`recordedAt` on session on amend** — **RESOLVED:** Update to amend instant (07-01 tracer action); consistent with `feedbackRecordedAt`; E2E does not assert timestamp.
 
-2. **Service split vs single `record` method**
-   - Recommendation: Single `record` with `amending` flag — minimizes OpenAPI surface; private `restoreSnapshotAndRegrade` helper.
+2. **Service split vs single `record` method** — **RESOLVED:** Single `record()` with RECORDED fallback branch; private restore + re-grade helper (07-01).
 
-3. **Given step implementation**
-   - Recommendation: UI path (commission + record on day N) exercises full snapshot path; optional MakeMe helper `aLearningSession().recordedWithScores(...)` for controller unit tests.
+3. **Given step implementation** — **RESOLVED:** UI path commission + record on day N in 07-01 Given; strip re-open polish in 07-02 Task 3; MakeMe helpers for controller tests in 07-01 JUnit task.
 
 ## Environment Availability
 
