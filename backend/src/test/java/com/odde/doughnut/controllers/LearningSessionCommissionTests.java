@@ -32,6 +32,13 @@ class LearningSessionCommissionTests extends LearningSessionControllerTestBase {
 
     String markdown = response.getRequestMarkdown();
     assertThat(markdown, containsString("# Learning Session Request"));
+    assertThat(
+        markdown,
+        containsString("You are the tutor to help the learner to study Spanish conversation."));
+    assertThat(
+        markdown,
+        containsString("Wait for the learner's instruction before starting the learning session."));
+    assertThat(markdown, not(containsString("Focus on conversational phrases")));
     assertThat(markdown, containsString("Notebook: Spanish conversation"));
     assertThat(
         markdown,
@@ -57,6 +64,26 @@ class LearningSessionCommissionTests extends LearningSessionControllerTestBase {
         sessionItemRepository.findByLearningSession_Id(response.getLearningSessionId()),
         hasSize(2));
     assertThat(learningSessionRepository.count(), equalTo(1L));
+  }
+
+  @Test
+  void requestMarkdownIncludesNotebookQuestionGenerationInstruction()
+      throws UnexpectedNoAccessRightException {
+    Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+    testabilitySettings.timeTravelTo(dayTwo);
+
+    Notebook notebook = spanishNotebook(dayTwo);
+    makeMe
+        .theNotebook(notebook)
+        .readmeContent(
+            "---\nquestion_generation_instruction: Focus on conversational phrases.\n---\n")
+        .please();
+
+    LearningSessionCommissionResponse response =
+        controller.commission(commissionRequest(notebook), "Asia/Shanghai");
+
+    String markdown = response.getRequestMarkdown();
+    assertThat(markdown, containsString("Focus on conversational phrases."));
   }
 
   @Test

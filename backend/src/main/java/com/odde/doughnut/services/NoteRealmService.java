@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.algorithms.Frontmatter;
+import com.odde.doughnut.algorithms.FrontmatterQuestionGenerationInstruction;
 import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.controllers.dto.FolderTrailSegments;
 import com.odde.doughnut.controllers.dto.NoteRealm;
@@ -14,7 +15,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import org.springframework.stereotype.Service;
 
@@ -23,10 +23,6 @@ public class NoteRealmService {
 
   /** Canonical `title_pattern` first; legacy camelCase supported for existing notes. */
   private static final List<String> TITLE_PATTERN_KEYS = List.of("title_pattern", "titlePattern");
-
-  /** Canonical key first; legacy camelCase supported for existing notes. */
-  private static final List<String> QUESTION_GENERATION_INSTRUCTION_KEYS =
-      List.of("question_generation_instruction", "questionGenerationInstruction");
 
   private final WikiTitleCacheService wikiTitleCacheService;
   private final NoteRepository noteRepository;
@@ -93,7 +89,7 @@ public class NoteRealmService {
 
   private void addLabeledInstructionBlockIfDistinct(
       List<String> blocks, Set<String> seenInstructionText, String content, String label) {
-    questionGenerationInstructionFromContent(content)
+    FrontmatterQuestionGenerationInstruction.fromNoteContent(content)
         .filter(instruction -> seenInstructionText.add(instruction))
         .ifPresent(instruction -> blocks.add(label + "\n" + instruction));
   }
@@ -134,25 +130,6 @@ public class NoteRealmService {
       }
     }
     return false;
-  }
-
-  private Optional<String> questionGenerationInstructionFromContent(String content) {
-    if (content == null || content.isBlank()) {
-      return Optional.empty();
-    }
-    return NoteContentMarkdown.splitLeadingFrontmatter(content)
-        .map(NoteContentMarkdown.LeadingFrontmatter::frontmatter)
-        .flatMap(this::questionInstructionFromFrontmatter);
-  }
-
-  private Optional<String> questionInstructionFromFrontmatter(Frontmatter fm) {
-    for (String key : QUESTION_GENERATION_INSTRUCTION_KEYS) {
-      Optional<String> value = fm.getString(key).map(String::trim).filter(s -> !s.isEmpty());
-      if (value.isPresent()) {
-        return value;
-      }
-    }
-    return Optional.empty();
   }
 
   /** Re-load notes with associations so JSON serialization does not hit Hibernate proxies. */

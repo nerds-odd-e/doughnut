@@ -59,6 +59,14 @@ content and the learner's learning status for it.
 ```markdown
 # Learning Session Request
 
+## Instructions
+
+You are the tutor to help the learner to study Spanish conversation.
+
+Focus on conversational phrases.
+
+Wait for the learner's instruction before starting the learning session.
+
 Notebook: Spanish conversation
 
 ## How to report

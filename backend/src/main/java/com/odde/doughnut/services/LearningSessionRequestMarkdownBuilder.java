@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.FrontmatterQuestionGenerationInstruction;
 import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.entities.LearningSession;
 import com.odde.doughnut.entities.SessionItem;
@@ -28,6 +29,7 @@ public class LearningSessionRequestMarkdownBuilder {
     StringBuilder sb = new StringBuilder();
 
     sb.append("# Learning Session Request\n\n");
+    appendInstructions(sb, session);
     sb.append("Notebook: ").append(session.getNotebook().getName()).append("\n\n");
 
     appendRubric(sb);
@@ -47,6 +49,17 @@ public class LearningSessionRequestMarkdownBuilder {
     }
 
     return sb.toString();
+  }
+
+  private void appendInstructions(StringBuilder sb, LearningSession session) {
+    sb.append("## Instructions\n\n");
+    sb.append("You are the tutor to help the learner to study ")
+        .append(session.getNotebook().getName())
+        .append(".\n\n");
+    FrontmatterQuestionGenerationInstruction.fromNoteContent(
+            session.getNotebook().getReadmeContent())
+        .ifPresent(instruction -> sb.append(instruction).append("\n\n"));
+    sb.append("Wait for the learner's instruction before starting the learning session.\n\n");
   }
 
   private void appendRubric(StringBuilder sb) {
