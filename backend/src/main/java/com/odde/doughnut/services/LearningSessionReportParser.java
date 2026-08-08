@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class LearningSessionReportParser {
 
+  public static final String SESSION_ITEM_SCORES_OPEN_TAG = "<session_item_scores>";
+  public static final String SESSION_ITEM_SCORES_CLOSE_TAG = "</session_item_scores>";
+
   private static final Pattern SCORE_LINE = Pattern.compile("^(.+?):\\s*(\\d+)(?:\\s.*)?$");
 
   public record ParsedReportEntry(String noteTitle, int score) {}
@@ -29,7 +32,7 @@ public class LearningSessionReportParser {
       return new ParseResult(entries, rejected);
     }
 
-    for (String rawLine : reportMarkdown.split("\\R")) {
+    for (String rawLine : extractScoreContent(reportMarkdown).split("\\R")) {
       String line = rawLine.trim();
       if (line.isEmpty()) {
         continue;
@@ -70,6 +73,20 @@ public class LearningSessionReportParser {
     }
 
     return new ParseResult(entries, rejected);
+  }
+
+  private String extractScoreContent(String reportMarkdown) {
+    int openIndex = reportMarkdown.indexOf(SESSION_ITEM_SCORES_OPEN_TAG);
+    if (openIndex < 0) {
+      return reportMarkdown;
+    }
+
+    int contentStart = openIndex + SESSION_ITEM_SCORES_OPEN_TAG.length();
+    int closeIndex = reportMarkdown.indexOf(SESSION_ITEM_SCORES_CLOSE_TAG, contentStart);
+    if (closeIndex < 0) {
+      return reportMarkdown.substring(contentStart);
+    }
+    return reportMarkdown.substring(contentStart, closeIndex);
   }
 
   public static Set<String> ambiguousTitles(Iterable<String> titles) {

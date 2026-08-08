@@ -86,9 +86,11 @@ public class LearningSessionRequestMarkdownBuilder {
     sb.append("- 0 — could not reach the learning point even with help\n\n");
     sb.append("Example of how to provide feedback:\n\n");
     sb.append("# Learning Session Report\n\n");
+    sb.append(LearningSessionReportParser.SESSION_ITEM_SCORES_OPEN_TAG).append("\n");
     appendExampleReportScores(sb, items);
+    sb.append("\n").append(LearningSessionReportParser.SESSION_ITEM_SCORES_CLOSE_TAG);
     sb.append(
-        "\nOnly score session items that were actually taught in this session. Do not list\n");
+        "\n\nOnly score session items that were actually taught in this session. Do not list\n");
     sb.append("items that were not learnt in the session.\n");
     sb.append("</how_to_report>\n");
   }

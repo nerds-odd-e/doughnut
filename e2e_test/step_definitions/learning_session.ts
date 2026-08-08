@@ -7,6 +7,9 @@ import type { DataTable } from '@cucumber/cucumber'
 import { NoteController } from '@generated/doughnut-backend-api/sdk.gen'
 import start from '../start'
 
+const SESSION_ITEM_SCORES_OPEN_TAG = '<session_item_scores>'
+const SESSION_ITEM_SCORES_CLOSE_TAG = '</session_item_scores>'
+
 When(
   'I commission a learning session for notebook {string}',
   (notebookTitle: string) => {
@@ -31,7 +34,7 @@ Given(
     start.testability().timeTravelTo(day, 9)
     start.recall().visitRecallPage().commissionLearningSession(notebookTitle)
     const lines = dataTable.hashes().map((row) => `${row.Note}: ${row.Score}`)
-    const reportMarkdown = `# Learning Session Report\n\n${lines.join('\n')}\n`
+    const reportMarkdown = `# Learning Session Report\n\n${SESSION_ITEM_SCORES_OPEN_TAG}\n${lines.join('\n')}\n${SESSION_ITEM_SCORES_CLOSE_TAG}\n`
     start
       .recall()
       .assumeRecallPage()

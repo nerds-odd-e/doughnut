@@ -53,8 +53,10 @@ Feature: Commissioned learning session
       """
       # Learning Session Report
 
+      <session_item_scores>
       Hola: 5
       Gracias: 1
+      </session_item_scores>
       """
     Then the learning session for notebook "Spanish conversation" should be marked as recorded
     And the commissioned memory tracker for "Hola" should have recall count 1
@@ -74,7 +76,9 @@ Feature: Commissioned learning session
       """
       # Learning Session Report
 
+      <session_item_scores>
       Gracias: 4
+      </session_item_scores>
       """
     Then I should see tutor feedback score 4 from a learning session for the memory tracker of note "Gracias"
     When It's day 3, 9 hour

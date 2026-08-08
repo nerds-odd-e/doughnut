@@ -97,8 +97,10 @@ Example of how to provide feedback:
 
 # Learning Session Report
 
+<session_item_scores>
 Hola: 5
 Gracias: 1
+</session_item_scores>
 
 Only score session items that were actually taught in this session. Do not list
 items that were not learnt in the session.
@@ -107,17 +109,26 @@ items that were not learnt in the session.
 
 ### Learning Session Report
 
-The Tutor returns one score per note title. Nothing else is required.
+The Tutor returns one score per note title inside a tagged block. Prose and
+markdown headers outside the block are ignored.
 
 ```markdown
 # Learning Session Report
 
+Thanks for a great session today.
+
+<session_item_scores>
 Hola: 5
 Gracias: 1
+</session_item_scores>
 ```
 
-Descriptive prose may accompany a score; the MVP tolerates and ignores it rather
-than rejecting the Report.
+If `<session_item_scores>` is absent, Doughnut falls back to parsing the whole
+document (minus the optional `# Learning Session Report` header) so older pasted
+reports still work.
+
+Descriptive prose may accompany a score line inside the block; the MVP tolerates
+and ignores it rather than rejecting the Report.
 
 ### Matching and recording
 

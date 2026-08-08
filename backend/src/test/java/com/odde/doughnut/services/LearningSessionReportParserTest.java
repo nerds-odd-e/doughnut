@@ -1,5 +1,7 @@
 package com.odde.doughnut.services;
 
+import static com.odde.doughnut.services.LearningSessionReportParser.SESSION_ITEM_SCORES_CLOSE_TAG;
+import static com.odde.doughnut.services.LearningSessionReportParser.SESSION_ITEM_SCORES_OPEN_TAG;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
@@ -94,6 +96,70 @@ class LearningSessionReportParserTest {
 
     assertThat(result.rejected(), empty());
     assertThat(result.entries(), hasSize(2));
+  }
+
+  @Test
+  void parsesScoresInsideTagIgnoringSurroundingProse() {
+    ParseResult result =
+        parser.parse(
+            """
+            # Learning Session Report
+
+            Thanks for a great session today.
+
+            %s
+            Hola: 5
+            Gracias: 1
+            %s
+
+            Hola: 99
+            """
+                .formatted(SESSION_ITEM_SCORES_OPEN_TAG, SESSION_ITEM_SCORES_CLOSE_TAG),
+            SPANISH_TITLES,
+            Set.of());
+
+    assertThat(result.rejected(), empty());
+    assertThat(result.entries(), hasSize(2));
+    assertEquals("Hola", result.entries().get(0).noteTitle());
+    assertEquals(5, result.entries().get(0).score());
+    assertEquals("Gracias", result.entries().get(1).noteTitle());
+    assertEquals(1, result.entries().get(1).score());
+  }
+
+  @Test
+  void returnsNoEntriesForEmptyTag() {
+    ParseResult result =
+        parser.parse(
+            """
+            # Learning Session Report
+
+            %s
+            %s
+            """
+                .formatted(SESSION_ITEM_SCORES_OPEN_TAG, SESSION_ITEM_SCORES_CLOSE_TAG),
+            SPANISH_TITLES,
+            Set.of());
+
+    assertThat(result.entries(), empty());
+    assertThat(result.rejected(), empty());
+  }
+
+  @Test
+  void parsesScoresWhenClosingTagMissing() {
+    ParseResult result =
+        parser.parse(
+            """
+            %s
+            Hola: 3
+            """
+                .formatted(SESSION_ITEM_SCORES_OPEN_TAG),
+            SPANISH_TITLES,
+            Set.of());
+
+    assertThat(result.rejected(), empty());
+    assertThat(result.entries(), hasSize(1));
+    assertEquals("Hola", result.entries().get(0).noteTitle());
+    assertEquals(3, result.entries().get(0).score());
   }
 
   private void assertRejected(RejectedReportEntry rejected, String line, String reasonFragment) {

@@ -10,6 +10,7 @@ import com.odde.doughnut.entities.LearningSession;
 import com.odde.doughnut.entities.LearningSessionStatus;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.services.LearningSessionReportParser;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.server.ResponseStatusException;
@@ -59,7 +60,13 @@ class LearningSessionCommissionTests extends LearningSessionControllerTestBase {
             "Teach the session items above, then return a Learning Session Report giving one"));
     assertThat(markdown, containsString("score from 0 to 5 per item"));
     assertThat(markdown, containsString("Example of how to provide feedback:"));
-    assertThat(markdown, containsString("# Learning Session Report\n\nHola: 5\nGracias: 1"));
+    assertThat(
+        markdown,
+        containsString(
+            "# Learning Session Report\n\n"
+                + LearningSessionReportParser.SESSION_ITEM_SCORES_OPEN_TAG
+                + "\nHola: 5\nGracias: 1\n"
+                + LearningSessionReportParser.SESSION_ITEM_SCORES_CLOSE_TAG));
     assertThat(
         markdown,
         containsString(
