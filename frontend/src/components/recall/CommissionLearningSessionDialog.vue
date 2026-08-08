@@ -49,6 +49,20 @@
             <div v-if="status === 'RECORDED'" class="daisy-alert daisy-alert-info mt-4" data-test="learning-session-recorded">
               <span>This learning session is recorded.</span>
             </div>
+            <div
+              v-if="rejectedEntries.length > 0"
+              class="daisy-alert daisy-alert-warning mt-4"
+              data-test="learning-session-report-rejections"
+            >
+              <div class="flex flex-col gap-1">
+                <span
+                  v-for="(entry, index) in rejectedEntries"
+                  :key="index"
+                >
+                  {{ entry.line }} — {{ entry.reason }}
+                </span>
+              </div>
+            </div>
             <template v-if="status === 'AWAITING_REPORT'">
               <p class="text-sm mt-4">Learning session report</p>
               <textarea
@@ -56,20 +70,6 @@
                 class="daisy-textarea w-full h-48 bg-base-100 font-mono text-xs mt-2"
                 data-test="learning-session-report"
               />
-              <div
-                v-if="rejectedEntries.length > 0"
-                class="daisy-alert daisy-alert-warning mt-4"
-                data-test="learning-session-report-rejections"
-              >
-                <div class="flex flex-col gap-1">
-                  <span
-                    v-for="(entry, index) in rejectedEntries"
-                    :key="index"
-                  >
-                    {{ entry.line }} — {{ entry.reason }}
-                  </span>
-                </div>
-              </div>
               <button
                 type="button"
                 class="daisy-btn daisy-btn-primary mt-4"

@@ -156,6 +156,53 @@ describe("CommissionLearningSessionDialog", () => {
     ).toBeNull()
   })
 
+  it("shows rejection warning alongside recorded banner on partial success", async () => {
+    mockSdkService(LearningSessionController, "commission", {
+      learningSessionId: 7,
+      requestMarkdown: canonicalRequestMarkdown,
+      status: "AWAITING_REPORT",
+    })
+    mockSdkService(LearningSessionController, "record", {
+      status: "RECORDED",
+      recordedAt: "1989-01-02T09:00:00Z",
+      recordedItems: [{ noteTitle: "Hola", score: 5, memoryTrackerId: 11 }],
+      rejectedEntries: [
+        {
+          line: "Unknown: 3",
+          reason: "No session item matched this note title.",
+        },
+      ],
+    })
+    mountDialog()
+    await flushPromises()
+
+    const submit = document.body.querySelector(
+      '[data-test="commission-learning-session-submit"]'
+    ) as HTMLButtonElement
+    submit.click()
+    await flushPromises()
+
+    const recordButton = document.body.querySelector(
+      '[data-test="record-learning-session-report"]'
+    ) as HTMLButtonElement
+    recordButton.click()
+    await flushPromises()
+
+    expect(
+      document.body.querySelector('[data-test="learning-session-recorded"]')
+    ).toBeTruthy()
+    expect(
+      document.body.querySelector(
+        '[data-test="learning-session-report-rejections"]'
+      )
+    ).toBeTruthy()
+    expect(
+      document.body.querySelector(
+        '[data-test="learning-session-report-rejections"]'
+      )?.textContent
+    ).toContain("Unknown: 3")
+  })
+
   it("keeps report textarea when record fails", async () => {
     mockSdkService(LearningSessionController, "commission", {
       learningSessionId: 7,

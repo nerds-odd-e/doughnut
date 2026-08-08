@@ -69,6 +69,17 @@ class LearningSessionReportParserTest {
   }
 
   @Test
+  void rejectsDuplicateTitleInReport() {
+    ParseResult result = parser.parse("Hola: 5\nHola: 3\n", SPANISH_TITLES, Set.of());
+
+    assertThat(result.entries(), hasSize(1));
+    assertEquals("Hola", result.entries().get(0).noteTitle());
+    assertEquals(5, result.entries().get(0).score());
+    assertThat(result.rejected(), hasSize(1));
+    assertRejected(result.rejected().get(0), "Hola: 3", "Duplicate note title");
+  }
+
+  @Test
   void skipsOptionalReportHeader() {
     ParseResult result =
         parser.parse(

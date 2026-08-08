@@ -27,6 +27,7 @@ public class LearningSessionReportParser {
       String reportMarkdown, Set<String> sessionItemTitles, Set<String> ambiguousTitles) {
     List<ParsedReportEntry> entries = new ArrayList<>();
     List<RejectedReportEntry> rejected = new ArrayList<>();
+    Set<String> seenTitles = new HashSet<>();
 
     if (reportMarkdown == null || reportMarkdown.isBlank()) {
       return new ParseResult(entries, rejected);
@@ -61,6 +62,11 @@ public class LearningSessionReportParser {
 
       if (!sessionItemTitles.isEmpty() && !sessionItemTitles.contains(title)) {
         rejected.add(new RejectedReportEntry(line, "No session item matched this note title."));
+        continue;
+      }
+
+      if (!seenTitles.add(title)) {
+        rejected.add(new RejectedReportEntry(line, "Duplicate note title in report."));
         continue;
       }
 
