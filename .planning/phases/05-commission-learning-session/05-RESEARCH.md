@@ -383,18 +383,17 @@ mockSdkService(LearningSessionController, "commission", {
 | A4 | No GET endpoint needed for COM-03 if dialog stays open after commission | Architecture | Re-open flow after navigate away needs GET or re-commission |
 | A5 | Generated SDK already includes `LearningSessionController` — no `pnpm generateTypeScript` required | Standard Stack | Stale client if branch diverged |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Exclude awaiting-report trackers from `dueCommissioned`?**
-   - What we know: Commission does not change `next_recall_at`; trackers stay "due" until Phase 6 recording. Phase 4 left recall DTO unchanged `[VERIFIED: 04-RESEARCH.md Open Q1]`.
-   - What's unclear: Whether potential-session row should remain after commission.
-   - Recommendation: **Yes — exclude** trackers linked to `AWAITING_REPORT` sessions in `RecallService.getDueMemoryTrackers` + controller test; call `requestDueRecallsRefresh()` after commission. Prevents accidental abandon-on-recommission. Commission E2E does not assert strip change; Phase 6 potential-session assertions depend on **recording** rescheduling, not commission alone.
+1. **Exclude awaiting-report trackers from `dueCommissioned`?** — **RESOLVED: Yes**
+   - **Decision:** `05-02-PLAN.md` Task 1 adds `SessionItemRepository.findMemoryTrackerIdsInAwaitingReportSessions` + `RecallService` filter; `RecallsControllerTests` exclusion case.
+   - **UX:** `RecallProgressBar` calls `requestDueRecallsRefresh()` after commission (`05-01-PLAN.md`).
 
-2. **Row UX: whole-row click vs explicit button?**
-   - Recommendation: **Explicit `daisy-btn-primary`** on row (UI-SPEC accent) — clearer than making status text look clickable; keeps `data-test="potential-learning-session"` row for Phase 3 copy assertions.
+2. **Row UX: whole-row click vs explicit button?** — **RESOLVED: Explicit button**
+   - **Decision:** `daisy-btn-primary` `Commission` button per row (`05-UI-SPEC.md` Interaction Contract); `data-test="commission-learning-session"`.
 
-3. **Discuss-phase UI-SPEC (`workflow.ui_phase: true`)?**
-   - No `05-UI-SPEC.md` yet. Phase 3 UI-SPEC supplies spacing, typography, accent rules. Planner may spawn `gsd-ui-phase` for commission dialog copy/layout or extend Phase 3 contract inline in PLAN.
+3. **UI-SPEC (`workflow.ui_phase: true`)?** — **RESOLVED: Generated**
+   - **Decision:** `05-UI-SPEC.md` created via `gsd-ui-phase --auto`; extends Phase 3 spacing/typography/accent rules for commission dialog.
 
 ## Environment Availability
 

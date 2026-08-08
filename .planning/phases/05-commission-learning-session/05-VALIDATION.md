@@ -27,10 +27,24 @@ created: 2026-08-08
 
 ## Sampling Rate
 
-- **After every task commit:** Run targeted Vitest file(s) for touched components
+- **After every FE-component task:** Targeted Vitest (primary fast per-task feedback, seconds)
+- **After every backend-exclusion task:** Targeted JUnit (`RecallsControllerTests`)
+- **Behavior-phase gates (accepted ~120s):** Cypress on **05-01 T1** (`@wip` commission tracer) and **05-02 T2** (full feature graduation) — intentional COM-01–03 observability, not the day-to-day loop
 - **After every plan wave:** Run `learning_session` Cypress spec + `pnpm frontend:test` for recall components
 - **Before `/gsd-verify-work`:** Commission scenario without `@wip`; existing scenarios in same feature still green
-- **Max feedback latency:** 120 seconds
+- **Per-task feedback target:** Vitest/JUnit (seconds). **Gate max:** ~120 seconds Cypress (accepted)
+
+---
+
+## Accepted exceptions
+
+| Warning | Resolution |
+|---------|------------|
+| Plan-checker #1 `[key_links_planned]` — UI-SPEC listed RecallPage as dialog host | **Resolved.** `05-UI-SPEC.md` Component Inventory: dialog hosted in `RecallProgressBar.vue`; `RecallPage.vue` no change. |
+| Plan-checker #2 `[research_resolution]` — Open Questions not marked resolved | **Resolved.** `05-RESEARCH.md` → `## Open Questions (RESOLVED)` with Q1–Q3 decisions. |
+| Plan-checker #3 `[verify_command_format]` — weak grep\|awk on 05-01 T3 | **Resolved.** Verify uses `test "$(grep -c …)" -ge 1`. |
+| Plan-checker #4 `[nyquist_compliance]` — Cypress ~120s on 05-01 T1 / 05-02 T2 | **Accepted.** Behavior-phase gate; Vitest (05-01 T2) and JUnit (05-02 T1) provide fast per-task feedback. Do not restructure verifies to drop Cypress from those tasks. |
+| Plan-checker #5 `[architectural_tier_compliance]` — T-05-05 two-user test missing from 05-02 T1 | **Resolved.** `05-02-PLAN.md` Task 1 action + acceptance_criteria include two-user cross-leakage case. |
 
 ---
 
@@ -74,7 +88,7 @@ created: 2026-08-08
 - [ ] Sampling continuity: no 3 consecutive tasks without automated verify
 - [ ] Wave 0 covers all MISSING references
 - [ ] No watch-mode flags
-- [ ] Feedback latency < 120s
+- [x] Feedback latency: Vitest/JUnit per-task; Cypress ~120s accepted for 05-01 T1 + 05-02 T2 behavior gates
 - [ ] `nyquist_compliant: true` set in frontmatter
 
 **Approval:** pending

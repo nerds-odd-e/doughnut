@@ -13,7 +13,7 @@ progress:
 current_phase: 5
 current_phase_name: commission-learning-session
 last_activity: 2026-08-08
-last_activity_desc: Phase 4 Plan 04-02 abandon lifecycle + learning status complete
+last_activity_desc: Accepted Phase 5 E2E Cypress gate latency (plan-checker #4)
 ---
 
 # Project State
@@ -48,6 +48,7 @@ Re-commission deletes prior `AWAITING_REPORT` sessions; Request markdown reflect
 history; MakeMe builders; `pnpm backend:verify` + Cypress regression green.
 
 **Phase 5** — planned (2 plans: 05-01 tracer COM-01–03, 05-02 exclusion + E2E graduation).
+Plan-checker warning #4 (E2E verify latency) accepted in `05-VALIDATION.md`: Cypress ~120s gates on 05-01 T1 / 05-02 T2; Vitest/JUnit remain the fast per-task loop.
 
 **Next:** Execute Phase 5 Plan 05-01 (`/gsd-execute-phase 5`).
 

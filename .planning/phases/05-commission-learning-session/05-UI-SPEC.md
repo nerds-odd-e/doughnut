@@ -121,7 +121,7 @@ Glossary terms: **potential learning session**, **Learning Session**, **Learning
 | Commission mutation | `apiCallWithLoading(() => LearningSessionController.commission({ body: { notebookId }, query: { timezone: timezoneParam() } }), { blockUi: true, message: "Commissioning learning session…" })`. On success: populate textarea, show awaiting banner, hide pre-commission CTA. |
 | Post-commission dialog | Readonly textarea bound to `response.requestMarkdown`; `CopyButton` copies full markdown; awaiting banner when `response.status === "AWAITING_REPORT"`. |
 | Close dialog | Modal `close_request` — no abandon warning (session already persisted on success). |
-| After success | Emit `commissioned` → parent calls `requestDueRecallsRefresh()`. Recommended backend excludes awaiting-report trackers from `dueCommissioned` so row may disappear. |
+| After success | `RecallProgressBar` calls `requestDueRecallsRefresh()` from local `useRecallData` after dialog emits `commissioned`. Recommended backend excludes awaiting-report trackers from `dueCommissioned` so row may disappear. |
 | Keyboard | Commission buttons are focusable; dialog traps focus per `Modal.vue` / `modalStack`. |
 | Ordinary progress | `#buttons`, settings cog, progress math — **unchanged**. |
 
@@ -134,8 +134,8 @@ Glossary terms: **potential learning session**, **Learning Session**, **Learning
 | Component / slot | Change |
 |------------------|--------|
 | `CommissionLearningSessionDialog.vue` | **New** — `Modal` + pre/post commission states + textarea + `CopyButton` |
-| `RecallProgressBar.vue` | Add `Commission` button per row; wire dialog open state |
-| `RecallPage.vue` | Host dialog; pass notebook props; on `commissioned` → `requestDueRecallsRefresh()` |
+| `RecallProgressBar.vue` | Add `Commission` button per row; host `CommissionLearningSessionDialog` (`v-if` open state); call `requestDueRecallsRefresh()` from local `useRecallData` on `commissioned` |
+| `RecallPage.vue` | **No change** — dialog hosted in `RecallProgressBar`, not page level |
 | `ProgressBar.vue` | **No change** |
 | `Modal.vue`, `CopyButton.vue` | Reuse as-is |
 | `AiRequestExportDialog.vue` | Pattern reference only — no modification |
