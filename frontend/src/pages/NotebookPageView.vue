@@ -7,14 +7,20 @@
       >
         Notebook
       </p>
-      <AutosavingPageNameEditor
-        :name="notebook.name ?? ''"
-        editor-data-test="notebook-page-name"
-        empty-error-message="Notebook name cannot be empty"
-        save-error-message="Failed to rename notebook"
-        :persist-name="persistNotebookName"
-      />
+      <div
+        @focusin="notebookNameFocused = true"
+        @focusout="notebookNameFocused = false"
+      >
+        <AutosavingPageNameEditor
+          :name="notebook.name ?? ''"
+          editor-data-test="notebook-page-name"
+          empty-error-message="Notebook name cannot be empty"
+          save-error-message="Failed to rename notebook"
+          :persist-name="persistNotebookName"
+        />
+      </div>
       <p
+        v-if="notebookNameFocused"
         class="text-sm text-base-content/80 m-0"
         data-testid="notebook-page-name-rename-warning"
       >
@@ -82,6 +88,7 @@ const emit = defineEmits<{
 }>()
 
 const activeTab = ref<ReadmeSettingsTab>("readme")
+const notebookNameFocused = ref(false)
 
 const notebookRenameWikiLinkWarning =
   "If you change this notebook's name, wiki links from other notebooks to notes here may stop working."

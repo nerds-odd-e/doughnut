@@ -1,5 +1,4 @@
 import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
-import usePopups from "@/components/commons/Popups/usePopups"
 import { wrapSdkError, wrapSdkResponse } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, describe, it, expect, vi } from "vitest"
@@ -101,22 +100,23 @@ describe("NotebookPageView settings", () => {
     expect(wrapper.emitted("notebook-updated")).toEqual([[updatedNotebook]])
   })
 
-  it("keeps the wiki-link risk visible without offering the old rename workflow", () => {
+  it("shows the wiki-link risk only while the notebook title is focused", async () => {
     const wrapper = mountNotebookPageView(aNotebook({ name: "Original" }))
-    const summary = wrapper.get('[data-testid="notebook-page-summary"]')
+    const titleEditor = wrapper.get('[data-test="notebook-page-name"]')
 
+    expect(
+      wrapper.find('[data-testid="notebook-page-name-rename-warning"]').exists()
+    ).toBe(false)
+
+    await titleEditor.trigger("focusin")
     expect(wrapper.text()).toContain(
       "wiki links from other notebooks to notes here may stop working"
     )
+
+    await titleEditor.trigger("focusout")
     expect(
-      wrapper
-        .get('[data-test="notebook-page-name"]')
-        .attributes("contenteditable")
-    ).toBe("true")
-    expect(summary.findAll("button")).toHaveLength(0)
-    expect(summary.text()).not.toContain("Update")
-    expect(summary.text()).not.toContain("Cancel")
-    expect(usePopups().popups.peek()).toHaveLength(0)
+      wrapper.find('[data-testid="notebook-page-name-rename-warning"]').exists()
+    ).toBe(false)
   })
 
   it("does not save blank or unchanged headings", async () => {
