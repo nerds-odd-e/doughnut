@@ -1,28 +1,26 @@
 <template>
-  <div class="learning-session-actions">
-    <button
-      type="button"
-      class="daisy-btn large-btn learning-session-actions-btn"
-      title="Learning session actions"
-      data-test="learning-session-actions"
-      @click="showListDialog = true"
+  <button
+    type="button"
+    class="daisy-btn large-btn learning-session-actions-btn"
+    title="Learning session actions"
+    data-test="learning-session-actions"
+    @click="showListDialog = true"
+  >
+    <GraduationCap class="w-8 h-8" />
+    <div
+      v-if="actionableSessionCount > 0"
+      class="learning-session-actions-badge"
+      data-test="learning-session-actions-badge"
     >
-      <GraduationCap class="w-8 h-8" />
-      <div
-        v-if="actionableSessionCount > 0"
-        class="learning-session-actions-badge"
-        data-test="learning-session-actions-badge"
-      >
-        {{ actionableSessionCount }}
-      </div>
-    </button>
-    <LearningSessionListDialog
-      v-if="showListDialog"
-      :entries="actionableSessions"
-      @close="showListDialog = false"
-      @select="onListEntrySelect"
-    />
-  </div>
+      {{ actionableSessionCount }}
+    </div>
+  </button>
+  <LearningSessionListDialog
+    v-if="showListDialog"
+    :entries="actionableSessions"
+    @close="showListDialog = false"
+    @select="onListEntrySelect"
+  />
 </template>
 
 <script setup lang="ts">

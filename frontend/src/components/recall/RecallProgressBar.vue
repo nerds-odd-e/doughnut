@@ -7,7 +7,7 @@
       >
         <template #buttons>
           <div class="btn-group-wrapper relative" style="overflow: visible;">
-            <div class="daisy-btn-group">
+            <div class="daisy-btn-group flex-nowrap items-center">
               <template v-if="previousAnsweredQuestionCursor !== undefined">
                 <button
                   class="daisy-btn large-btn"
