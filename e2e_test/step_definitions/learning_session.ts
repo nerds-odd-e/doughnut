@@ -3,7 +3,6 @@
 // @ts-check
 
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
-import { commonSenseSplit } from 'support/string_util'
 import start from '../start'
 
 When(
