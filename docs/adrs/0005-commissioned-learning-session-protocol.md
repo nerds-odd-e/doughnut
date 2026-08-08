@@ -59,19 +59,31 @@ content and the learner's learning status for it.
 ```markdown
 # Learning Session Request
 
-## Instructions
-
+<instructions>
 You are the tutor to help the learner to study Spanish conversation.
 
 Focus on conversational phrases.
 
 Wait for the learner's instruction before starting the learning session.
+</instructions>
 
-Notebook: Spanish conversation
+<session_item_titles>
+- Hola
+- Gracias
+</session_item_titles>
 
-## How to report
+<session_items>
+### Hola
+- Expected learning content: Hello
+- Learning status: 1 previous session, last on 2026-08-06
 
-Teach the session items below, then return a Learning Session Report giving one
+### Gracias
+- Expected learning content: Thank you
+- Learning status: not yet tutored
+</session_items>
+
+<how_to_report>
+Teach the session items above, then return a Learning Session Report giving one
 score from 0 to 5 per item:
 
 - 5 — mastered the learning point with full fluency
@@ -81,15 +93,16 @@ score from 0 to 5 per item:
 - 1 — needed several reminders
 - 0 — could not reach the learning point even with help
 
-## Session Items
+Example of how to provide feedback:
 
-### Hola
-- Expected learning content: Hello
-- Learning status: 1 previous session, last on 2026-08-06
+# Learning Session Report
 
-### Gracias
-- Expected learning content: Thank you
-- Learning status: not yet tutored
+Hola: 5
+Gracias: 1
+
+Only score session items that were actually taught in this session. Do not list
+items that were not learnt in the session.
+</how_to_report>
 ```
 
 ### Learning Session Report

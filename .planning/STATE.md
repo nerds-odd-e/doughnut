@@ -5,7 +5,7 @@ milestone_name: none
 status: Quick plan in progress
 last_updated: "2026-08-08T14:30:00.000Z"
 last_activity: 2026-08-08
-last_activity_desc: Phase 1 done — CLS request tutor instructions
+last_activity_desc: Phase 2 done — CLS request XML sections
 ---
 
 # Project State
@@ -28,7 +28,7 @@ Milestone **v1.3 Commissioned Learning Session MVP** shipped 2026-08-08 (see
 | Phase | Type | Status | Outcome |
 |-------|------|--------|---------|
 | 1 | Behavior | done | Tutor role + notebook QGI + wait-for-learner in Request |
-| 2 | Behavior | planned | XML-ish sections, title list first, report example + omit unlearnt |
+| 2 | Behavior | done | XML-ish sections, title list first, report example + omit unlearnt |
 | 3 | Behavior | planned | Progress-bar icon + badge for potential + awaiting sessions |
 
 ## Deferred Items

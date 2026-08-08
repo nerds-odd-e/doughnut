@@ -145,7 +145,7 @@ wait-for-learner line. Refactor deduped QGI parsing into `NoteRealmService`.
 
 ### Phase 2 — Behavior: XML sections, title list first, report example
 
-**Status:** planned  
+**Status:** done  
 **Type:** Behavior
 
 **Observable behavior**
@@ -178,6 +178,10 @@ omit-unlearnt guidance.
 - Remove interim Phase 1 headings if they conflict with the tagged sections.
 
 **Done when:** Backend + E2E commission scenarios green; ADR draft matches.
+
+**Completed 2026-08-08:** XML-ish tagged sections, title list before items,
+report example + omit-unlearnt guidance; E2E page object counts `###` only
+inside `<session_items>`.
 
 ---
 

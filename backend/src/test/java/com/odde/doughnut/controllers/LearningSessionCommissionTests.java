@@ -32,6 +32,8 @@ class LearningSessionCommissionTests extends LearningSessionControllerTestBase {
 
     String markdown = response.getRequestMarkdown();
     assertThat(markdown, containsString("# Learning Session Request"));
+    assertThat(markdown, containsString("<instructions>"));
+    assertThat(markdown, containsString("</instructions>"));
     assertThat(
         markdown,
         containsString("You are the tutor to help the learner to study Spanish conversation."));
@@ -39,18 +41,31 @@ class LearningSessionCommissionTests extends LearningSessionControllerTestBase {
         markdown,
         containsString("Wait for the learner's instruction before starting the learning session."));
     assertThat(markdown, not(containsString("Focus on conversational phrases")));
-    assertThat(markdown, containsString("Notebook: Spanish conversation"));
-    assertThat(
-        markdown,
-        containsString(
-            "Teach the session items below, then return a Learning Session Report giving one"));
-    assertThat(markdown, containsString("score from 0 to 5 per item"));
-    assertThat(markdown, containsString("## Session Items"));
+    assertThat(markdown, containsString("<session_item_titles>"));
+    assertThat(markdown, containsString("- Hola\n"));
+    assertThat(markdown, containsString("- Gracias\n"));
+    assertThat(markdown, containsString("</session_item_titles>"));
+    assertThat(markdown, containsString("<session_items>"));
     assertThat(markdown, containsString("### Hola"));
     assertThat(markdown, containsString("### Gracias"));
     assertThat(markdown, containsString("Expected learning content: Hello"));
     assertThat(markdown, containsString("Expected learning content: Thank you"));
     assertThat(markdown, containsString("not yet tutored"));
+    assertThat(markdown, containsString("</session_items>"));
+    assertThat(markdown, containsString("<how_to_report>"));
+    assertThat(
+        markdown,
+        containsString(
+            "Teach the session items above, then return a Learning Session Report giving one"));
+    assertThat(markdown, containsString("score from 0 to 5 per item"));
+    assertThat(markdown, containsString("Example of how to provide feedback:"));
+    assertThat(markdown, containsString("# Learning Session Report\n\nHola: 5\nGracias: 1"));
+    assertThat(
+        markdown,
+        containsString(
+            "Only score session items that were actually taught in this session. Do not list"));
+    assertThat(markdown, containsString("items that were not learnt in the session."));
+    assertThat(markdown, containsString("</how_to_report>"));
     assertThat(markdown, containsString("- 5 — mastered the learning point with full fluency"));
     assertThat(markdown, containsString("- 4 — mastered the learning point with fluency"));
     assertThat(markdown, containsString("- 3 — mastered the learning point, but not fluent"));
@@ -83,7 +98,12 @@ class LearningSessionCommissionTests extends LearningSessionControllerTestBase {
         controller.commission(commissionRequest(notebook), "Asia/Shanghai");
 
     String markdown = response.getRequestMarkdown();
-    assertThat(markdown, containsString("Focus on conversational phrases."));
+    assertThat(
+        markdown,
+        containsString(
+            "<instructions>\nYou are the tutor to help the learner to study Spanish"
+                + " conversation.\n\nFocus on conversational phrases.\n\nWait for the learner's"
+                + " instruction before starting the learning session.\n</instructions>"));
   }
 
   @Test

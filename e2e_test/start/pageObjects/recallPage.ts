@@ -159,7 +159,9 @@ const recallPage = () => {
         this.learningSessionRequestText().should('contain', `### ${title}`)
       })
       this.learningSessionRequestText().then((text) => {
-        const itemHeaders = text.match(/^### .+$/gm) ?? []
+        const sessionItemsSection =
+          text.match(/<session_items>([\s\S]*?)<\/session_items>/)?.[1] ?? ''
+        const itemHeaders = sessionItemsSection.match(/^### .+$/gm) ?? []
         expect(itemHeaders).to.have.length(expected.length)
         for (const header of itemHeaders) {
           const title = header.replace('### ', '')
