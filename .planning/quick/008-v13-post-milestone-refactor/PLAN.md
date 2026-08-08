@@ -1,6 +1,6 @@
 # v1.3 post-milestone refactor
 
-**Status:** in-progress (Phases 1–3 done)
+**Status:** in-progress (Phases 1–4 done)
 
 **Type:** ad-hoc quick plan (Structure only)
 
@@ -99,7 +99,7 @@ Each file under 250 lines. No production changes.
 **Verify:** the three new test classes.
 
 ### Phase 4 — Split CLS feed out of `RecallsControllerTests`
-**Type:** Structure | **Status:** planned | **Subsystem:** backend (tests)
+**Type:** Structure | **Status:** done | **Subsystem:** backend (tests)
 
 Extract commissioned learning-session feed coverage (~awaiting / recorded /
 day-three due) into e.g. `RecallsCommissionedLearningSessionTests`. Leave
