@@ -29,10 +29,10 @@ and CONTEXT.md. Glossary: ADR 0001 §3. Protocol: ADR 0005. Score→schedule: AD
 
 ### Record and schedule
 
-- [ ] **REC-01**: User can paste a Learning Session Report into a Learning Session and record it
-- [ ] **REC-02**: Recording applies a Feedback score to each matched Session Item and reschedules the commissioned tracker per ADR 0003 (shifted-band mapping)
+- [x] **REC-01**: User can paste a Learning Session Report into a Learning Session and record it
+- [x] **REC-02**: Recording applies a Feedback score to each matched Session Item and reschedules the commissioned tracker per ADR 0003 (shifted-band mapping)
 - [ ] **REC-03**: Recorded Feedback score is visible on the commissioned memory tracker
-- [ ] **REC-04**: A Learning Session that has recorded Feedback is visibly marked among sessions
+- [x] **REC-04**: A Learning Session that has recorded Feedback is visibly marked among sessions
 - [ ] **REC-05**: Matched report entries are recorded; unmatched or out-of-range entries are rejected and reported to the learner (unit-test primary; not E2E suite growth)
 
 ### Amend
@@ -81,10 +81,10 @@ Filled by roadmap.
 | COM-01 | Phase 5 | Pending |
 | COM-02 | Phase 5 | Pending |
 | COM-03 | Phase 5 | Pending |
-| REC-01 | Phase 6 | Pending |
-| REC-02 | Phase 6 | Pending |
+| REC-01 | Phase 6 | Complete |
+| REC-02 | Phase 6 | Complete |
 | REC-03 | Phase 6 | Pending |
-| REC-04 | Phase 6 | Pending |
+| REC-04 | Phase 6 | Complete |
 | REC-05 | Phase 6 | Pending |
 | AMD-01 | Phase 7 | Pending |
 

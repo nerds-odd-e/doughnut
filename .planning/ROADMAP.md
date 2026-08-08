@@ -180,12 +180,12 @@ Plans:
 
 **Context:** `.planning/phases/06-record-report-and-schedule/`
 
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 06-01-PLAN.md — Tracer: record API + parser + scheduling + dialog record state + E2E @wip (REC-01, REC-02, REC-04)
+- [x] 06-01-PLAN.md — Tracer: record API + parser + scheduling + dialog record state + E2E @wip (REC-01, REC-02, REC-04)
 
 **Wave 2** *(blocked on Wave 1)*
 
@@ -224,7 +224,7 @@ Plans:
 | 3 | Potential learning sessions | Behavior | TRK-03, POT-01, POT-02 | In Progress|
 | 4 | Learning Session and Request builder | Structure | — | In Progress|
 | 5 | Commission Learning Session | Behavior | COM-01–03 | Pending |
-| 6 | Record report and schedule | Behavior | REC-01–05 | Pending |
+| 6 | Record report and schedule | Behavior | REC-01–05 | In Progress|
 | 7 | Amend recorded session | Behavior | AMD-01 | Pending |
 
 **Coverage:** 14/14 v1 requirements mapped ✓

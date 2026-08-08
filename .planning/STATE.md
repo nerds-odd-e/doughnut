@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Commissioned Learning Session MVP
 status: in_progress
-stopped_at: Phase 6 context gathered
-last_updated: "2026-08-08T00:55:52.329Z"
+stopped_at: Completed 06-01-PLAN.md
+last_updated: "2026-08-08T01:09:44.668Z"
 progress:
   total_phases: 7
   completed_phases: 4
-  total_plans: 10
-  completed_plans: 8
+  total_plans: 12
+  completed_plans: 9
 current_phase: 6
 current_phase_name: record-report-and-schedule
 last_activity: 2026-08-08
-last_activity_desc: Phase 5 executed — commission UI + dueCommissioned exclusion + E2E green
+last_activity_desc: Phase 6 Plan 06-01 executed — record API + dialog + @wip E2E green
 ---
 
 # Project State
@@ -52,7 +52,13 @@ history; MakeMe builders; `pnpm backend:verify` + Cypress regression green.
 `dueCommissioned` excludes trackers in `AWAITING_REPORT` sessions; full
 `commissioned_learning_session.feature` green (4 scenarios).
 
-**Next:** Plan Phase 6 (`/gsd-plan-phase 6`) — record report and schedule.
+**Phase 6 Plan 06-01** — executed
+(`.planning/phases/06-record-report-and-schedule/06-01-SUMMARY.md`). `POST /record`
+parses ADR 0005 reports, applies ADR 0003 commissioned scheduling, dialog record
+textarea + recorded banner; `@wip` E2E Hola:5 Gracias:1 green (REC-01, REC-02, REC-04).
+
+**Next:** Execute Phase 6 Plan 06-02 — awaiting-report strip, tutor feedback visibility,
+parser reject matrix, E2E graduation.
 
 ## Deferred Items
 
@@ -67,11 +73,11 @@ history; MakeMe builders; `pnpm backend:verify` + Cypress regression green.
 
 ## Session Continuity
 
-**Last session:** 2026-08-08T00:55:52.322Z
-**Stopped at:** Phase 6 context gathered
-**Resume file:** .planning/phases/06-record-report-and-schedule/06-CONTEXT.md
+**Last session:** 2026-08-08T01:09:44.661Z
+**Stopped at:** Completed 06-01-PLAN.md
+**Resume file:** None
 
-Phase 4 Plan 04-02 complete. Next: Phase 5 commission UI.
+Phase 6 Plan 06-01 complete. Next: Phase 6 Plan 06-02.
 
 ## Performance Metrics
 
@@ -83,6 +89,7 @@ Phase 4 Plan 04-02 complete. Next: Phase 5 commission UI.
 | Phase 03-potential-learning-sessions P02 | 4min | 2 tasks | 5 files |
 | Phase 04-learning-session-request-builder P01 | 12 | 3 tasks | 14 files |
 | Phase 04-learning-session-request-builder P02 | 18 | 3 tasks | 9 files |
+| Phase 06 P01 | 25 | 3 tasks | 23 files |
 
 ## Decisions
 
@@ -100,3 +107,6 @@ Phase 4 Plan 04-02 complete. Next: Phase 5 commission UI.
 - [Phase 04-01]: learning status `not yet tutored` hard-coded in tracer; aggregation in 04-02
 - [Phase 04-02]: abandon after due-tracker validation; explicit item delete before session delete
 - [Phase 04-02]: learning status pluralizes sessions when N > 1
+- [Phase 06-01]: Record uses notebook-scoped auth symmetric with commission
+- [Phase 06-01]: Session RECORDED only when at least one report line matches
+- [Phase 06-01]: E2E recording scenario @wip until 06-02 graduates tutor feedback steps
