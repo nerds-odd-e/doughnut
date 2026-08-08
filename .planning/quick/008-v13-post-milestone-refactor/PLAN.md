@@ -1,6 +1,6 @@
 # v1.3 post-milestone refactor
 
-**Status:** in-progress (Phases 1–6 done)
+**Status:** in-progress (Phases 1–8 done)
 
 **Type:** ad-hoc quick plan (Structure only)
 
@@ -135,7 +135,7 @@ identity changes.
 `RecallPage.spec.ts`.
 
 ### Phase 7 — Extract record/amend session resolution
-**Type:** Structure | **Status:** planned | **Subsystem:** backend
+**Type:** Structure | **Status:** done | **Subsystem:** backend
 
 Pull awaiting-vs-id-vs-latest-recorded targeting (and rejected-entry factory
 dedupe) out of `LearningSessionService` into a cohesive helper/type so the
@@ -146,7 +146,7 @@ leave `ResponseStatusException` for optional polish.
 **Verify:** LearningSession record/amend controller tests.
 
 ### Phase 8 — Extract commissioned feedback scheduling from `MemoryTracker`
-**Type:** Structure | **Status:** planned | **Subsystem:** backend
+**Type:** Structure | **Status:** done | **Subsystem:** backend
 
 Move `recordCommissionedFeedback`, `restorePreSessionSnapshot`, and closely
 related spacing helpers into a dedicated type (e.g. policy/collaborator used

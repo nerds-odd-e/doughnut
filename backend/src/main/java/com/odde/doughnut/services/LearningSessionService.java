@@ -1,19 +1,17 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.algorithms.CommissionedLearningSessionFeedbackScheduling;
 import com.odde.doughnut.controllers.dto.LearningSessionCommissionResponse;
 import com.odde.doughnut.controllers.dto.RecordLearningSessionResponse;
 import com.odde.doughnut.controllers.dto.RecordedLearningSessionItem;
-import com.odde.doughnut.controllers.dto.RejectedLearningSessionReportEntry;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.LearningSessionRepository;
 import com.odde.doughnut.entities.repositories.SessionItemRepository;
 import com.odde.doughnut.services.LearningSessionReportParser.ParseResult;
 import com.odde.doughnut.services.LearningSessionReportParser.ParsedReportEntry;
-import com.odde.doughnut.services.LearningSessionReportParser.RejectedReportEntry;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,6 +29,7 @@ public class LearningSessionService {
   private final SessionItemRepository sessionItemRepository;
   private final LearningSessionRequestMarkdownBuilder learningSessionRequestMarkdownBuilder;
   private final LearningSessionReportParser learningSessionReportParser;
+  private final LearningSessionRecordTargetResolver learningSessionRecordTargetResolver;
 
   @Autowired
   public LearningSessionService(
@@ -38,12 +37,14 @@ public class LearningSessionService {
       LearningSessionRepository learningSessionRepository,
       SessionItemRepository sessionItemRepository,
       LearningSessionRequestMarkdownBuilder learningSessionRequestMarkdownBuilder,
-      LearningSessionReportParser learningSessionReportParser) {
+      LearningSessionReportParser learningSessionReportParser,
+      LearningSessionRecordTargetResolver learningSessionRecordTargetResolver) {
     this.userService = userService;
     this.learningSessionRepository = learningSessionRepository;
     this.sessionItemRepository = sessionItemRepository;
     this.learningSessionRequestMarkdownBuilder = learningSessionRequestMarkdownBuilder;
     this.learningSessionReportParser = learningSessionReportParser;
+    this.learningSessionRecordTargetResolver = learningSessionRecordTargetResolver;
   }
 
   @Transactional
@@ -79,46 +80,10 @@ public class LearningSessionService {
       String reportMarkdown,
       Integer learningSessionId,
       Timestamp now) {
-    List<LearningSession> awaitingSessions =
-        learningSessionRepository.findByUser_IdAndNotebook_IdAndStatus(
-            user.getId(), notebook.getId(), LearningSessionStatus.AWAITING_REPORT);
-
-    boolean isAmend;
-    LearningSession session;
-    if (learningSessionId != null) {
-      session =
-          learningSessionRepository
-              .findById(learningSessionId)
-              .filter(s -> s.getUser().getId().equals(user.getId()))
-              .filter(s -> s.getNotebook().getId().equals(notebook.getId()))
-              .filter(s -> s.getStatus() == LearningSessionStatus.RECORDED)
-              .orElseThrow(
-                  () ->
-                      new ResponseStatusException(
-                          HttpStatus.NOT_FOUND, "No recorded learning session found for amend."));
-      isAmend = true;
-    } else if (!awaitingSessions.isEmpty()) {
-      session = awaitingSessions.getFirst();
-      isAmend = false;
-    } else {
-      List<LearningSession> recordedSessions =
-          learningSessionRepository.findByUser_IdAndNotebook_IdAndStatus(
-              user.getId(), notebook.getId(), LearningSessionStatus.RECORDED);
-      if (recordedSessions.isEmpty()) {
-        throw new ResponseStatusException(
-            HttpStatus.NOT_FOUND, "No learning session to record or amend for this notebook.");
-      }
-      session =
-          recordedSessions.stream()
-              .sorted(
-                  Comparator.comparing(
-                          LearningSession::getRecordedAt,
-                          Comparator.nullsLast(Comparator.reverseOrder()))
-                      .thenComparing(LearningSession::getId, Comparator.reverseOrder()))
-              .findFirst()
-              .orElseThrow();
-      isAmend = true;
-    }
+    LearningSessionRecordTargetResolver.LearningSessionRecordTarget target =
+        learningSessionRecordTargetResolver.resolve(user, notebook, learningSessionId);
+    LearningSession session = target.session();
+    boolean isAmend = target.isAmend();
     List<SessionItem> sessionItems =
         sessionItemRepository.findByLearningSession_Id(session.getId());
     Set<String> sessionItemTitles =
@@ -132,7 +97,9 @@ public class LearningSessionService {
     RecordLearningSessionResponse response = new RecordLearningSessionResponse();
     response.setStatus(session.getStatus());
     response.setRecordedItems(new ArrayList<>());
-    response.setRejectedEntries(new ArrayList<>(toRejectedDto(parseResult.rejected())));
+    response.setRejectedEntries(
+        new ArrayList<>(
+            RejectedLearningSessionReportEntryMapper.fromParsed(parseResult.rejected())));
 
     for (ParsedReportEntry entry : parseResult.entries()) {
       SessionItem matched =
@@ -145,7 +112,7 @@ public class LearningSessionService {
         response
             .getRejectedEntries()
             .add(
-                rejectedEntry(
+                RejectedLearningSessionReportEntryMapper.of(
                     entry.noteTitle() + ": " + entry.score(),
                     "Cannot amend: no pre-session snapshot for this item."));
         continue;
@@ -155,12 +122,12 @@ public class LearningSessionService {
       matched.setFeedbackRecordedAt(now);
       MemoryTracker tracker = matched.getMemoryTracker();
       if (isAmend) {
-        tracker.restorePreSessionSnapshot(matched);
+        CommissionedLearningSessionFeedbackScheduling.restorePreSessionSnapshot(tracker, matched);
       } else if (matched.getPreSessionRecallCount() == null) {
         matched.setPreSessionForgettingCurveIndex(tracker.getForgettingCurveIndex());
         matched.setPreSessionRecallCount(tracker.getRecallCount());
       }
-      tracker.recordCommissionedFeedback(now, entry.score());
+      CommissionedLearningSessionFeedbackScheduling.recordFeedback(tracker, now, entry.score());
       sessionItemRepository.save(matched);
 
       RecordedLearningSessionItem recorded = new RecordedLearningSessionItem();
@@ -186,25 +153,6 @@ public class LearningSessionService {
     }
 
     return response;
-  }
-
-  private List<RejectedLearningSessionReportEntry> toRejectedDto(
-      List<RejectedReportEntry> rejected) {
-    return rejected.stream().map(this::toRejectedDto).toList();
-  }
-
-  private RejectedLearningSessionReportEntry toRejectedDto(RejectedReportEntry rejected) {
-    RejectedLearningSessionReportEntry dto = new RejectedLearningSessionReportEntry();
-    dto.setLine(rejected.line());
-    dto.setReason(rejected.reason());
-    return dto;
-  }
-
-  private RejectedLearningSessionReportEntry rejectedEntry(String line, String reason) {
-    RejectedLearningSessionReportEntry dto = new RejectedLearningSessionReportEntry();
-    dto.setLine(line);
-    dto.setReason(reason);
-    return dto;
   }
 
   private void abandonUnfinishedSessions(User user, Notebook notebook) {
