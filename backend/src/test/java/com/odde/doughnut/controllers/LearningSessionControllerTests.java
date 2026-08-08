@@ -6,11 +6,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.CommissionLearningSessionRequest;
 import com.odde.doughnut.controllers.dto.LearningSessionCommissionResponse;
+import com.odde.doughnut.controllers.dto.RecordLearningSessionResponse;
 import com.odde.doughnut.entities.LearningSession;
 import com.odde.doughnut.entities.LearningSessionStatus;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.SessionItem;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.Nested;
@@ -212,6 +214,119 @@ class LearningSessionControllerTests extends LearningSessionControllerTestBase {
               () -> controller.commission(commissionRequest(notebook), "Asia/Shanghai"));
       assertThat(ex.getStatusCode().value(), equalTo(400));
       assertThat(learningSessionRepository.count(), equalTo(sessionsBefore));
+    }
+  }
+
+  @Nested
+  class Record {
+    private static final String HOLA_GRACIAS_REPORT =
+        """
+        # Learning Session Report
+
+        Hola: 5
+        Gracias: 1
+        """;
+
+    @Test
+    void recordsSpanishNotebookSessionWithMatchedScores() throws UnexpectedNoAccessRightException {
+      Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+      testabilitySettings.timeTravelTo(dayTwo);
+
+      Notebook notebook = spanishNotebook(dayTwo);
+      controller.commission(commissionRequest(notebook), "Asia/Shanghai");
+
+      RecordLearningSessionResponse response =
+          controller.record(recordRequest(notebook, HOLA_GRACIAS_REPORT), "Asia/Shanghai");
+
+      assertThat(response.getStatus(), equalTo(LearningSessionStatus.RECORDED));
+      assertThat(response.getRecordedAt(), equalTo(dayTwo));
+      assertThat(response.getRecordedItems(), hasSize(2));
+      assertThat(response.getRejectedEntries(), empty());
+
+      LearningSession session =
+          learningSessionRepository
+              .findByUser_IdAndNotebook_IdAndStatus(
+                  currentUser.getUser().getId(), notebook.getId(), LearningSessionStatus.RECORDED)
+              .getFirst();
+      assertThat(session.getRecordedAt(), equalTo(dayTwo));
+
+      for (SessionItem item : sessionItemRepository.findByLearningSession_Id(session.getId())) {
+        assertThat(item.getFeedbackScore(), notNullValue());
+        assertThat(item.getFeedbackRecordedAt(), equalTo(dayTwo));
+        assertThat(item.getMemoryTracker().getRecallCount(), equalTo(1));
+      }
+    }
+
+    @Test
+    void highScoreSchedulesLaterThanLowScoreFromSameStartingState()
+        throws UnexpectedNoAccessRightException {
+      Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+      testabilitySettings.timeTravelTo(dayTwo);
+
+      Notebook notebook = spanishNotebook(dayTwo);
+      controller.commission(commissionRequest(notebook), "Asia/Shanghai");
+      controller.record(recordRequest(notebook, HOLA_GRACIAS_REPORT), "Asia/Shanghai");
+
+      MemoryTracker holaTracker = trackerForNote(notebook, "Hola");
+      MemoryTracker graciasTracker = trackerForNote(notebook, "Gracias");
+
+      assertThat(holaTracker.getNextRecallAt(), greaterThan(graciasTracker.getNextRecallAt()));
+    }
+
+    @Test
+    void scoreZeroSchedulesStrictlyAfterRecordedAt() throws UnexpectedNoAccessRightException {
+      Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+      testabilitySettings.timeTravelTo(dayTwo);
+
+      Notebook notebook = spanishNotebook(dayTwo);
+      controller.commission(commissionRequest(notebook), "Asia/Shanghai");
+
+      RecordLearningSessionResponse response =
+          controller.record(
+              recordRequest(notebook, "# Learning Session Report\n\nHola: 0\n"), "Asia/Shanghai");
+
+      MemoryTracker holaTracker = trackerForNote(notebook, "Hola");
+      assertTrue(holaTracker.getNextRecallAt().after(response.getRecordedAt()));
+    }
+
+    @Test
+    void notFoundWhenNoAwaitingSession() {
+      Notebook notebook =
+          makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).name("Lonely").please();
+
+      ResponseStatusException ex =
+          assertThrows(
+              ResponseStatusException.class,
+              () -> controller.record(recordRequest(notebook, "Hola: 5\n"), "Asia/Shanghai"));
+      assertThat(ex.getStatusCode().value(), equalTo(404));
+    }
+
+    private Notebook spanishNotebook(Timestamp dueAt) {
+      Notebook notebook =
+          makeMe
+              .aNotebook()
+              .creatorAndOwner(currentUser.getUser())
+              .name("Spanish conversation")
+              .please();
+      Note hola = makeMe.aNote().notebook(notebook).title("Hola").content("Hello").please();
+      Note gracias =
+          makeMe.aNote().notebook(notebook).title("Gracias").content("Thank you").please();
+      makeMe.aMemoryTrackerFor(hola).commissioned().nextRecallAt(dueAt).please();
+      makeMe.aMemoryTrackerFor(gracias).commissioned().nextRecallAt(dueAt).please();
+      return notebook;
+    }
+
+    private MemoryTracker trackerForNote(Notebook notebook, String title) {
+      LearningSession session =
+          learningSessionRepository
+              .findByUser_IdAndNotebook_IdAndStatus(
+                  currentUser.getUser().getId(), notebook.getId(), LearningSessionStatus.RECORDED)
+              .getFirst();
+      return sessionItemRepository.findByLearningSession_Id(session.getId()).stream()
+          .filter(item -> item.getNoteTitle().equals(title))
+          .map(SessionItem::getMemoryTracker)
+          .findFirst()
+          .orElseThrow();
     }
   }
 }
