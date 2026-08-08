@@ -209,9 +209,23 @@ Plans:
 
 **E2E:** Scenario "A later report amends the feedback of a recorded learning session"
 
-**Jidoka:** Decide amend recomputation (re-grade from pre-session snapshot vs compound) during `/gsd-plan-phase 7` — not yet in ADRs.
+**Jidoka:** Amend recomputation locked in CONTEXT — re-grade from pre-session snapshot (D-01), not compound.
 
 **Context:** `.planning/phases/07-amend-recorded-session/`
+
+**Plans:** 2 plans
+
+Plans:
+- [ ] 07-01-PLAN.md — Tracer: snapshot migration + amend API + dialog amend state + amend E2E @wip (AMD-01, D-01–D-05, D-08, D-11–D-13)
+- [ ] 07-02-PLAN.md — Expansion: recordedSessions strip + amend re-open + edge unit tests + E2E graduation (AMD-01, D-05–D-13)
+
+**Wave 1**
+
+- [ ] 07-01-PLAN.md — Tracer: snapshot columns, amend on POST record, amend E2E @wip (checkpoint:decision before migration)
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 07-02-PLAN.md — Expansion: recorded-session strip, scheduling/tutor-feedback proofs, amend E2E green
 
 ---
 
