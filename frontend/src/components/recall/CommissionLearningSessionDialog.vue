@@ -103,6 +103,7 @@ const props = defineProps<{
   notebookName: string
   mode?: "commission" | "record" | "amend"
   initialRequestMarkdown?: string
+  learningSessionId?: number
 }>()
 
 const emit = defineEmits<{
@@ -159,6 +160,9 @@ const recordReport = async () => {
       LearningSessionController.record({
         body: {
           notebookId: props.notebookId,
+          ...(props.mode === "amend" && props.learningSessionId != null
+            ? { learningSessionId: props.learningSessionId }
+            : {}),
           reportMarkdown: reportMarkdown.value,
         },
         query: { timezone: timezoneParam() },

@@ -505,6 +505,76 @@ class LearningSessionControllerTests extends LearningSessionControllerTestBase {
     }
 
     @Test
+    void amendWithLearningSessionIdWhileAwaitingSessionExists()
+        throws UnexpectedNoAccessRightException {
+      Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+      testabilitySettings.timeTravelTo(dayTwo);
+
+      Notebook notebook = spanishNotebook(dayTwo);
+      controller.commission(commissionRequest(notebook), "Asia/Shanghai");
+      controller.record(recordRequest(notebook, HOLA4_GRACIAS1_REPORT), "Asia/Shanghai");
+
+      LearningSession recordedSession =
+          learningSessionRepository
+              .findByUser_IdAndNotebook_IdAndStatus(
+                  currentUser.getUser().getId(), notebook.getId(), LearningSessionStatus.RECORDED)
+              .getFirst();
+      Integer recordedSessionId = recordedSession.getId();
+
+      Timestamp dayTwoLater = makeMe.aTimestamp().of(1, 10).please();
+      testabilitySettings.timeTravelTo(dayTwoLater);
+
+      LearningSession awaitingSession =
+          makeMe
+              .aLearningSession()
+              .forNotebook(notebook)
+              .by(currentUser.getUser())
+              .status(LearningSessionStatus.AWAITING_REPORT)
+              .commissionedAt(dayTwoLater)
+              .please();
+      for (SessionItem recordedItem :
+          sessionItemRepository.findByLearningSession_Id(recordedSessionId)) {
+        makeMe
+            .aSessionItem()
+            .learningSession(awaitingSession)
+            .memoryTracker(recordedItem.getMemoryTracker())
+            .please();
+      }
+
+      RecordLearningSessionResponse amendResponse =
+          controller.record(
+              recordRequest(
+                  notebook,
+                  """
+                  # Learning Session Report
+
+                  Gracias: 4
+                  """,
+                  recordedSessionId),
+              "Asia/Shanghai");
+
+      assertThat(amendResponse.getStatus(), equalTo(LearningSessionStatus.RECORDED));
+      assertThat(amendResponse.getRecordedItems(), hasSize(1));
+      assertThat(amendResponse.getRecordedItems().getFirst().getNoteTitle(), equalTo("Gracias"));
+      assertThat(amendResponse.getRecordedItems().getFirst().getScore(), equalTo(4));
+
+      LearningSession awaitingAfter =
+          learningSessionRepository.findById(awaitingSession.getId()).orElseThrow();
+      assertThat(awaitingAfter.getStatus(), equalTo(LearningSessionStatus.AWAITING_REPORT));
+      for (SessionItem item :
+          sessionItemRepository.findByLearningSession_Id(awaitingSession.getId())) {
+        assertThat(item.getFeedbackScore(), nullValue());
+      }
+
+      SessionItem recordedGraciasAfter =
+          sessionItemRepository.findByLearningSession_Id(recordedSessionId).stream()
+              .filter(item -> item.getNoteTitle().equals("Gracias"))
+              .findFirst()
+              .orElseThrow();
+      assertThat(recordedGraciasAfter.getFeedbackScore(), equalTo(4));
+    }
+
+    @Test
     void highToLowAmendReschedulesFromSnapshot() throws UnexpectedNoAccessRightException {
       Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
       testabilitySettings.timeTravelTo(dayTwo);

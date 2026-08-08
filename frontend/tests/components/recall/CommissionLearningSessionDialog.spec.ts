@@ -217,6 +217,7 @@ describe("CommissionLearningSessionDialog", () => {
         notebookId: 42,
         notebookName: "Spanish conversation",
         mode: "amend",
+        learningSessionId: 99,
         initialRequestMarkdown: canonicalRequestMarkdown,
       })
       .mount()
@@ -241,7 +242,14 @@ describe("CommissionLearningSessionDialog", () => {
     recordButton.click()
     await flushPromises()
 
-    expect(recordSpy).toHaveBeenCalled()
+    expect(recordSpy).toHaveBeenCalledWith({
+      body: {
+        notebookId: 42,
+        learningSessionId: 99,
+        reportMarkdown: "# Learning Session Report\n\nGracias: 4\n",
+      },
+      query: { timezone: expect.any(String) },
+    })
     expect(wrapper.emitted("recorded")).toBeTruthy()
   })
 

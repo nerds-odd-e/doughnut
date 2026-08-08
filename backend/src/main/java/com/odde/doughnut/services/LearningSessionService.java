@@ -74,14 +74,31 @@ public class LearningSessionService {
 
   @Transactional
   public RecordLearningSessionResponse record(
-      User user, Notebook notebook, String reportMarkdown, Timestamp now, ZoneId zoneId) {
+      User user,
+      Notebook notebook,
+      String reportMarkdown,
+      Integer learningSessionId,
+      Timestamp now,
+      ZoneId zoneId) {
     List<LearningSession> awaitingSessions =
         learningSessionRepository.findByUser_IdAndNotebook_IdAndStatus(
             user.getId(), notebook.getId(), LearningSessionStatus.AWAITING_REPORT);
 
     boolean isAmend;
     LearningSession session;
-    if (!awaitingSessions.isEmpty()) {
+    if (learningSessionId != null) {
+      session =
+          learningSessionRepository
+              .findById(learningSessionId)
+              .filter(s -> s.getUser().getId().equals(user.getId()))
+              .filter(s -> s.getNotebook().getId().equals(notebook.getId()))
+              .filter(s -> s.getStatus() == LearningSessionStatus.RECORDED)
+              .orElseThrow(
+                  () ->
+                      new ResponseStatusException(
+                          HttpStatus.NOT_FOUND, "No recorded learning session found for amend."));
+      isAmend = true;
+    } else if (!awaitingSessions.isEmpty()) {
       session = awaitingSessions.getFirst();
       isAmend = false;
     } else {

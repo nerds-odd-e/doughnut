@@ -4335,6 +4335,9 @@ components:
         notebookId:
           type: integer
           format: int32
+        learningSessionId:
+          type: integer
+          format: int32
         reportMarkdown:
           type: string
       required:

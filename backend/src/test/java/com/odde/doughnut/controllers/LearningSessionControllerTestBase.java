@@ -30,9 +30,15 @@ abstract class LearningSessionControllerTestBase extends ControllerTestBase {
   }
 
   protected RecordLearningSessionRequest recordRequest(Notebook notebook, String reportMarkdown) {
+    return recordRequest(notebook, reportMarkdown, null);
+  }
+
+  protected RecordLearningSessionRequest recordRequest(
+      Notebook notebook, String reportMarkdown, Integer learningSessionId) {
     RecordLearningSessionRequest request = new RecordLearningSessionRequest();
     request.notebookId = notebook.getId();
     request.reportMarkdown = reportMarkdown;
+    request.learningSessionId = learningSessionId;
     return request;
   }
 

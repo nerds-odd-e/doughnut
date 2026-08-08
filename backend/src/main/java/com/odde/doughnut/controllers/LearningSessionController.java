@@ -81,6 +81,11 @@ class LearningSessionController {
     ZoneId zoneId = TimezoneUtils.parseTimezone(timezone);
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     return learningSessionService.record(
-        authorizationService.getCurrentUser(), notebook, body.reportMarkdown, now, zoneId);
+        authorizationService.getCurrentUser(),
+        notebook,
+        body.reportMarkdown,
+        body.learningSessionId,
+        now,
+        zoneId);
   }
 }

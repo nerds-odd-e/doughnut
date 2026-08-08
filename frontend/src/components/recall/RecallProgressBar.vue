@@ -158,6 +158,7 @@
       mode="amend"
       :notebook-id="amendDialogSession.notebookId"
       :notebook-name="amendDialogSession.notebookName"
+      :learning-session-id="amendDialogSession.learningSessionId"
       :initial-request-markdown="amendDialogSession.requestMarkdown"
       @close="amendDialogSession = undefined"
       @commissioned="onCommissioned"

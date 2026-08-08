@@ -619,6 +619,7 @@ export type MemoryTracker = {
 
 export type RecordLearningSessionRequest = {
     notebookId: number;
+    learningSessionId?: number;
     reportMarkdown: string;
 };
 
