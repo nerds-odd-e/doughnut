@@ -4,11 +4,11 @@ milestone: v1.3
 milestone_name: Commissioned Learning Session MVP
 status: in_progress
 stopped_at: Phase 3 verification passed
-last_updated: "2026-08-07T23:58:06.163Z"
+last_updated: "2026-08-08T00:07:33.562Z"
 progress:
   total_phases: 7
   completed_phases: 3
-  total_plans: 6
+  total_plans: 8
   completed_plans: 6
 current_phase: 4
 current_phase_name: learning-session-request-builder
@@ -42,7 +42,7 @@ Assimilate with commissioned-only, ordinary+commissioned coexistence (TRK-01/02)
 6/6). Due COMMISSIONED → `dueCommissioned` + FE notebook-grouped potential
 sessions on recall progress bar; ordinary recall stays 0 (TRK-03, POT-01/02).
 
-**Next:** Plan or discuss Phase 4 (Learning Session / Request builder Structure).
+**Next:** Execute Phase 4 Plan 04-01 (Learning Session / Request builder Structure).
 
 ## Deferred Items
 

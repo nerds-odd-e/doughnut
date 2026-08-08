@@ -116,6 +116,17 @@ Plans:
 
 **Context:** `.planning/phases/04-learning-session-request-builder/`
 
+**Plans:** 2 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 04-01-PLAN.md — Tracer: migration, entities, commission API, ADR 0005 markdown, controller tests (COM-* unlock)
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 04-02-PLAN.md — Expansion: abandon lifecycle, learning status, MakeMe builders, OpenAPI regen, regression gate
+
 ---
 
 ### Phase 5: Commission Learning Session (Behavior)
@@ -189,7 +200,7 @@ Plans:
 | 1 | Commissioned tracker model | Structure | — | Complete    |
 | 2 | Assimilate as commissioned | Behavior | TRK-01, TRK-02 | Plans complete |
 | 3 | Potential learning sessions | Behavior | TRK-03, POT-01, POT-02 | In Progress|
-| 4 | Learning Session and Request builder | Structure | — | Pending |
+| 4 | Learning Session and Request builder | Structure | — | Plans ready |
 | 5 | Commission Learning Session | Behavior | COM-01–03 | Pending |
 | 6 | Record report and schedule | Behavior | REC-01–05 | Pending |
 | 7 | Amend recorded session | Behavior | AMD-01 | Pending |
