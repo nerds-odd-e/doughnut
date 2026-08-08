@@ -180,6 +180,22 @@ const recallPage = () => {
       )
       return this
     },
+    recordLearningSessionReport(reportMarkdown: string) {
+      cy.get('[data-test="learning-session-report"]')
+        .clear()
+        .invoke('val', reportMarkdown)
+        .trigger('input')
+      cy.get('[data-test="record-learning-session-report"]').click()
+      waitUntilAppIsNotBusy()
+      return this
+    },
+    expectLearningSessionRecorded() {
+      cy.get('[data-test="learning-session-recorded"]').should('be.visible')
+      cy.get('[data-test="learning-session-awaiting-report"]').should(
+        'not.exist'
+      )
+      return this
+    },
   }
 }
 export const recall = () => {

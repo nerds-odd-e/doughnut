@@ -46,6 +46,25 @@
             >
               <span>This learning session is awaiting the tutor's report.</span>
             </div>
+            <div v-if="status === 'RECORDED'" class="daisy-alert daisy-alert-info mt-4" data-test="learning-session-recorded">
+              <span>This learning session is recorded.</span>
+            </div>
+            <template v-if="status === 'AWAITING_REPORT'">
+              <p class="text-sm mt-4">Learning session report</p>
+              <textarea
+                v-model="reportMarkdown"
+                class="daisy-textarea w-full h-48 bg-base-100 font-mono text-xs mt-2"
+                data-test="learning-session-report"
+              />
+              <button
+                type="button"
+                class="daisy-btn daisy-btn-primary mt-4"
+                data-test="record-learning-session-report"
+                @click="recordReport"
+              >
+                Record report
+              </button>
+            </template>
           </template>
         </div>
       </div>
@@ -70,10 +89,12 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "close"): void
   (e: "commissioned"): void
+  (e: "recorded"): void
 }>()
 
 const commissioned = ref(false)
 const requestMarkdown = ref("")
+const reportMarkdown = ref("")
 const status = ref<LearningSessionCommissionResponse["status"] | "">("")
 
 const commission = async () => {
@@ -94,5 +115,28 @@ const commission = async () => {
   status.value = data.status
   commissioned.value = true
   emit("commissioned")
+}
+
+const recordReport = async () => {
+  const { data, error } = await apiCallWithLoading(
+    () =>
+      LearningSessionController.record({
+        body: {
+          notebookId: props.notebookId,
+          reportMarkdown: reportMarkdown.value,
+        },
+        query: { timezone: timezoneParam() },
+      }),
+    { blockUi: true, message: "Recording learning session report…" }
+  )
+
+  if (error || !data) {
+    return
+  }
+
+  if (data.status === "RECORDED") {
+    status.value = "RECORDED"
+    emit("recorded")
+  }
 }
 </script>

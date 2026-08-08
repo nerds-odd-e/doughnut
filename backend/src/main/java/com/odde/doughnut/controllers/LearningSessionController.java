@@ -2,6 +2,8 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.CommissionLearningSessionRequest;
 import com.odde.doughnut.controllers.dto.LearningSessionCommissionResponse;
+import com.odde.doughnut.controllers.dto.RecordLearningSessionRequest;
+import com.odde.doughnut.controllers.dto.RecordLearningSessionResponse;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.repositories.NotebookRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -61,5 +63,24 @@ class LearningSessionController {
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     return learningSessionService.commission(
         authorizationService.getCurrentUser(), notebook, now, zoneId);
+  }
+
+  @PostMapping("/record")
+  @Transactional
+  public RecordLearningSessionResponse record(
+      @RequestBody RecordLearningSessionRequest body,
+      @RequestParam(value = "timezone") String timezone)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertLoggedIn();
+    Notebook notebook =
+        notebookRepository
+            .findById(body.notebookId)
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notebook not found."));
+    authorizationService.assertAuthorization(notebook);
+    ZoneId zoneId = TimezoneUtils.parseTimezone(timezone);
+    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+    return learningSessionService.record(
+        authorizationService.getCurrentUser(), notebook, body.reportMarkdown, now, zoneId);
   }
 }

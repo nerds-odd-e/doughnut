@@ -1,0 +1,18 @@
+package com.odde.doughnut.controllers.dto;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class RecordedLearningSessionItem {
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private String noteTitle;
+
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private int score;
+
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private int memoryTrackerId;
+}

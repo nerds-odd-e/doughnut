@@ -616,6 +616,29 @@ export type MemoryTracker = {
     spelling?: boolean;
 };
 
+export type RecordLearningSessionRequest = {
+    notebookId: number;
+    reportMarkdown: string;
+};
+
+export type RecordLearningSessionResponse = {
+    status: 'AWAITING_REPORT' | 'RECORDED';
+    recordedAt?: string;
+    recordedItems: Array<RecordedLearningSessionItem>;
+    rejectedEntries: Array<RejectedLearningSessionReportEntry>;
+};
+
+export type RecordedLearningSessionItem = {
+    noteTitle: string;
+    score: number;
+    memoryTrackerId: number;
+};
+
+export type RejectedLearningSessionReportEntry = {
+    line: string;
+    reason: string;
+};
+
 export type CommissionLearningSessionRequest = {
     notebookId: number;
 };
@@ -2316,6 +2339,24 @@ export type ReEnableResponses = {
 };
 
 export type ReEnableResponse = ReEnableResponses[keyof ReEnableResponses];
+
+export type RecordData = {
+    body: RecordLearningSessionRequest;
+    path?: never;
+    query: {
+        timezone: string;
+    };
+    url: '/api/learning-sessions/record';
+};
+
+export type RecordResponses = {
+    /**
+     * OK
+     */
+    200: RecordLearningSessionResponse;
+};
+
+export type RecordResponse = RecordResponses[keyof RecordResponses];
 
 export type CommissionData = {
     body: CommissionLearningSessionRequest;

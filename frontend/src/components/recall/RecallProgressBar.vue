@@ -89,6 +89,7 @@
       :notebook-name="commissionDialogSession.notebookName"
       @close="commissionDialogSession = undefined"
       @commissioned="onCommissioned"
+      @recorded="onRecorded"
     />
   </div>
 </template>
@@ -139,6 +140,10 @@ const openCommissionDialog = (session: PotentialLearningSession) => {
 }
 
 const onCommissioned = () => {
+  requestDueRecallsRefresh()
+}
+
+const onRecorded = () => {
   requestDueRecallsRefresh()
 }
 

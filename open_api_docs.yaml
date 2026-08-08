@@ -1308,6 +1308,30 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/MemoryTracker"
+  /api/learning-sessions/record:
+    post:
+      tags:
+      - learning-session-controller
+      operationId: record
+      parameters:
+      - name: timezone
+        in: query
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RecordLearningSessionRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RecordLearningSessionResponse"
   /api/learning-sessions/commission:
     post:
       tags:
@@ -4302,6 +4326,65 @@ components:
       - id
       - nextRecallAt
       - note
+    RecordLearningSessionRequest:
+      type: object
+      properties:
+        notebookId:
+          type: integer
+          format: int32
+        reportMarkdown:
+          type: string
+      required:
+      - notebookId
+      - reportMarkdown
+    RecordLearningSessionResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - AWAITING_REPORT
+          - RECORDED
+        recordedAt:
+          type: string
+          format: date-time
+        recordedItems:
+          type: array
+          items:
+            $ref: "#/components/schemas/RecordedLearningSessionItem"
+        rejectedEntries:
+          type: array
+          items:
+            $ref: "#/components/schemas/RejectedLearningSessionReportEntry"
+      required:
+      - recordedItems
+      - rejectedEntries
+      - status
+    RecordedLearningSessionItem:
+      type: object
+      properties:
+        noteTitle:
+          type: string
+        score:
+          type: integer
+          format: int32
+        memoryTrackerId:
+          type: integer
+          format: int32
+      required:
+      - memoryTrackerId
+      - noteTitle
+      - score
+    RejectedLearningSessionReportEntry:
+      type: object
+      properties:
+        line:
+          type: string
+        reason:
+          type: string
+      required:
+      - line
+      - reason
     CommissionLearningSessionRequest:
       type: object
       properties:

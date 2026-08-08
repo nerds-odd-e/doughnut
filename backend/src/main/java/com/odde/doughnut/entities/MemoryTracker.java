@@ -2,6 +2,8 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.odde.doughnut.algorithms.CommissionedLearningSessionFeedbackPolicy;
+import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
 import com.odde.doughnut.controllers.dto.RecalledNote;
 import com.odde.doughnut.utils.TimestampOperations;
 import jakarta.persistence.CascadeType;
@@ -189,6 +191,33 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     setForgettingCurveIndex(forgettingCurve().partialFail());
     setLastRecalledAt(currentUTCTimestamp);
     setNextRecallAt(calculateNextRecallAt());
+  }
+
+  public void recordCommissionedFeedback(Timestamp now, int score) {
+    setRecallCount(getRecallCount() + 1);
+    setLastRecalledAt(now);
+    setForgettingCurveIndex(
+        CommissionedLearningSessionFeedbackPolicy.applyScore(getForgettingCurveIndex(), score));
+    setNextRecallAt(ensureNextRecallStrictlyAfterNow(now));
+  }
+
+  private Timestamp ensureNextRecallStrictlyAfterNow(Timestamp now) {
+    Timestamp scheduled = calculateNextRecallAt();
+    if (scheduled.after(now)) {
+      return scheduled;
+    }
+    return TimestampOperations.addHoursToTimestamp(now, firstPositiveSpacingHours());
+  }
+
+  private int firstPositiveSpacingHours() {
+    SpacedRepetitionAlgorithm algorithm = getUser().getSpacedRepetitionAlgorithm();
+    for (int spacingIndex = 0; spacingIndex < 30; spacingIndex++) {
+      int hours = algorithm.getRepeatInHours(spacingIndex);
+      if (hours > 0) {
+        return hours;
+      }
+    }
+    return 24;
   }
 
   @JsonIgnore

@@ -2,7 +2,8 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
+import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
+import { NoteController } from '@generated/doughnut-backend-api/sdk.gen'
 import start from '../start'
 
 When(
@@ -12,6 +13,57 @@ When(
       .recall()
       .navigateToRecallPage()
       .commissionLearningSession(notebookTitle)
+  }
+)
+
+Given(
+  'I have commissioned a learning session for notebook {string} on day {int} with session items for notes {string}',
+  (notebookTitle: string, day: number, _noteTitles: string) => {
+    start.testability().timeTravelTo(day, 9)
+    start
+      .recall()
+      .navigateToRecallPage()
+      .commissionLearningSession(notebookTitle)
+  }
+)
+
+When(
+  'I record the learning session report for the learning session of notebook {string}:',
+  (_notebookTitle: string, reportMarkdown: string) => {
+    start
+      .recall()
+      .assumeRecallPage()
+      .recordLearningSessionReport(reportMarkdown)
+  }
+)
+
+Then(
+  'the learning session for notebook {string} should be marked as recorded',
+  (_notebookTitle: string) => {
+    start.recall().assumeRecallPage().expectLearningSessionRecorded()
+  }
+)
+
+Then(
+  'the commissioned memory tracker for {string} should have recall count {int}',
+  (noteTitle: string, recallCount: number) => {
+    start
+      .testability()
+      .getInjectedNoteIdByTitle(noteTitle)
+      .then((noteId) =>
+        cy.wrap(NoteController.getNoteInfo({ path: { note: noteId } }), {
+          log: false,
+        })
+      )
+      .then((noteInfo) => {
+        const commissioned = noteInfo?.memoryTrackers?.find(
+          (tracker) => tracker.type === 'COMMISSIONED'
+        )
+        expect(
+          commissioned?.recallCount,
+          `commissioned recall count for ${noteTitle}`
+        ).to.eq(recallCount)
+      })
   }
 )
 

@@ -45,3 +45,18 @@ Feature: Commissioned learning session
     Then I should see that I have 0 notes to recall
     And I should see 1 potential learning session to commission for notebook "Spanish conversation"
     And I should see 1 potential learning session to commission for notebook "Kanji"
+
+  @wip
+  Scenario: Recording the tutor's report schedules each tracker from its score
+    Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
+    And I have commissioned a learning session for notebook "Spanish conversation" on day 2 with session items for notes "Hola, Gracias"
+    When I record the learning session report for the learning session of notebook "Spanish conversation":
+      """
+      # Learning Session Report
+
+      Hola: 5
+      Gracias: 1
+      """
+    Then the learning session for notebook "Spanish conversation" should be marked as recorded
+    And the commissioned memory tracker for "Hola" should have recall count 1
+    And the commissioned memory tracker for "Gracias" should have recall count 1

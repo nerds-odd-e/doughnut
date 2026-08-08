@@ -1,11 +1,18 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.LearningSessionCommissionResponse;
+import com.odde.doughnut.controllers.dto.RecordLearningSessionResponse;
+import com.odde.doughnut.controllers.dto.RecordedLearningSessionItem;
+import com.odde.doughnut.controllers.dto.RejectedLearningSessionReportEntry;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.LearningSessionRepository;
 import com.odde.doughnut.entities.repositories.SessionItemRepository;
+import com.odde.doughnut.services.LearningSessionReportParser.ParseResult;
+import com.odde.doughnut.services.LearningSessionReportParser.ParsedReportEntry;
+import com.odde.doughnut.services.LearningSessionReportParser.RejectedReportEntry;
 import java.sql.Timestamp;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,17 +27,20 @@ public class LearningSessionService {
   private final LearningSessionRepository learningSessionRepository;
   private final SessionItemRepository sessionItemRepository;
   private final LearningSessionRequestMarkdownBuilder learningSessionRequestMarkdownBuilder;
+  private final LearningSessionReportParser learningSessionReportParser;
 
   @Autowired
   public LearningSessionService(
       UserService userService,
       LearningSessionRepository learningSessionRepository,
       SessionItemRepository sessionItemRepository,
-      LearningSessionRequestMarkdownBuilder learningSessionRequestMarkdownBuilder) {
+      LearningSessionRequestMarkdownBuilder learningSessionRequestMarkdownBuilder,
+      LearningSessionReportParser learningSessionReportParser) {
     this.userService = userService;
     this.learningSessionRepository = learningSessionRepository;
     this.sessionItemRepository = sessionItemRepository;
     this.learningSessionRequestMarkdownBuilder = learningSessionRequestMarkdownBuilder;
+    this.learningSessionReportParser = learningSessionReportParser;
   }
 
   @Transactional
@@ -57,6 +67,90 @@ public class LearningSessionService {
     }
 
     return toCommissionResponse(session, zoneId);
+  }
+
+  @Transactional
+  public RecordLearningSessionResponse record(
+      User user, Notebook notebook, String reportMarkdown, Timestamp now, ZoneId zoneId) {
+    List<LearningSession> awaitingSessions =
+        learningSessionRepository.findByUser_IdAndNotebook_IdAndStatus(
+            user.getId(), notebook.getId(), LearningSessionStatus.AWAITING_REPORT);
+
+    if (awaitingSessions.isEmpty()) {
+      throw new ResponseStatusException(
+          HttpStatus.NOT_FOUND, "No learning session awaiting report for this notebook.");
+    }
+
+    LearningSession session = awaitingSessions.getFirst();
+    List<SessionItem> sessionItems =
+        sessionItemRepository.findByLearningSession_Id(session.getId());
+    ParseResult parseResult = learningSessionReportParser.parse(reportMarkdown);
+
+    RecordLearningSessionResponse response = new RecordLearningSessionResponse();
+    response.setStatus(session.getStatus());
+    response.setRecordedItems(new ArrayList<>());
+    response.setRejectedEntries(toRejectedDto(parseResult.rejected()));
+
+    for (ParsedReportEntry entry : parseResult.entries()) {
+      SessionItem matched =
+          sessionItems.stream()
+              .filter(item -> item.getNoteTitle().equals(entry.noteTitle()))
+              .findFirst()
+              .orElse(null);
+
+      if (matched == null) {
+        response
+            .getRejectedEntries()
+            .add(
+                rejectedEntry(
+                    entry.noteTitle() + ": " + entry.score(),
+                    "No session item matched this note title."));
+        continue;
+      }
+
+      matched.setFeedbackScore(entry.score());
+      matched.setFeedbackRecordedAt(now);
+      MemoryTracker tracker = matched.getMemoryTracker();
+      tracker.recordCommissionedFeedback(now, entry.score());
+      sessionItemRepository.save(matched);
+
+      RecordedLearningSessionItem recorded = new RecordedLearningSessionItem();
+      recorded.setNoteTitle(entry.noteTitle());
+      recorded.setScore(entry.score());
+      recorded.setMemoryTrackerId(tracker.getId());
+      response.getRecordedItems().add(recorded);
+    }
+
+    if (!response.getRecordedItems().isEmpty()) {
+      session.setStatus(LearningSessionStatus.RECORDED);
+      session.setRecordedAt(now);
+      learningSessionRepository.save(session);
+      response.setStatus(LearningSessionStatus.RECORDED);
+      response.setRecordedAt(now);
+    } else {
+      response.setStatus(LearningSessionStatus.AWAITING_REPORT);
+    }
+
+    return response;
+  }
+
+  private List<RejectedLearningSessionReportEntry> toRejectedDto(
+      List<RejectedReportEntry> rejected) {
+    return rejected.stream().map(this::toRejectedDto).toList();
+  }
+
+  private RejectedLearningSessionReportEntry toRejectedDto(RejectedReportEntry rejected) {
+    RejectedLearningSessionReportEntry dto = new RejectedLearningSessionReportEntry();
+    dto.setLine(rejected.line());
+    dto.setReason(rejected.reason());
+    return dto;
+  }
+
+  private RejectedLearningSessionReportEntry rejectedEntry(String line, String reason) {
+    RejectedLearningSessionReportEntry dto = new RejectedLearningSessionReportEntry();
+    dto.setLine(line);
+    dto.setReason(reason);
+    return dto;
   }
 
   private void abandonUnfinishedSessions(User user, Notebook notebook) {
