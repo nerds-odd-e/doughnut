@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class AwaitingReportLearningSessionLite {
+public class LearningSessionLite {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private int notebookId;
 

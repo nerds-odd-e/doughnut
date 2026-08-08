@@ -1,10 +1,9 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.controllers.dto.AwaitingReportLearningSessionLite;
 import com.odde.doughnut.controllers.dto.DueCommissionedMemoryTrackerLite;
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
+import com.odde.doughnut.controllers.dto.LearningSessionLite;
 import com.odde.doughnut.controllers.dto.MemoryTrackerLite;
-import com.odde.doughnut.controllers.dto.RecordedLearningSessionLite;
 import com.odde.doughnut.entities.LearningSession;
 import com.odde.doughnut.entities.LearningSessionStatus;
 import com.odde.doughnut.entities.MemoryTracker;
@@ -107,17 +106,9 @@ public class RecallService {
     dueMemoryTrackers.setToRepeat(toRepeat);
     dueMemoryTrackers.setDueCommissioned(dueCommissioned);
     dueMemoryTrackers.setAwaitingReportSessions(
-        learningSessionRepository
-            .findByUser_IdAndStatus(user.getId(), LearningSessionStatus.AWAITING_REPORT)
-            .stream()
-            .map(session -> toAwaitingReportLite(session, timeZone))
-            .toList());
+        learningSessionLitesFor(user, LearningSessionStatus.AWAITING_REPORT, timeZone));
     dueMemoryTrackers.setRecordedSessions(
-        learningSessionRepository
-            .findByUser_IdAndStatus(user.getId(), LearningSessionStatus.RECORDED)
-            .stream()
-            .map(session -> toRecordedLite(session, timeZone))
-            .toList());
+        learningSessionLitesFor(user, LearningSessionStatus.RECORDED, timeZone));
 
     // Set recall status
     dueMemoryTrackers.totalAssimilatedCount = totalAssimilatedCount(user);
@@ -127,18 +118,15 @@ public class RecallService {
     return dueMemoryTrackers;
   }
 
-  private AwaitingReportLearningSessionLite toAwaitingReportLite(
-      LearningSession session, ZoneId zoneId) {
-    AwaitingReportLearningSessionLite lite = new AwaitingReportLearningSessionLite();
-    lite.setNotebookId(session.getNotebook().getId());
-    lite.setNotebookName(session.getNotebook().getName());
-    lite.setLearningSessionId(session.getId());
-    lite.setRequestMarkdown(learningSessionRequestMarkdownBuilder.build(session, zoneId));
-    return lite;
+  private List<LearningSessionLite> learningSessionLitesFor(
+      User user, LearningSessionStatus status, ZoneId zoneId) {
+    return learningSessionRepository.findByUser_IdAndStatus(user.getId(), status).stream()
+        .map(session -> toLearningSessionLite(session, zoneId))
+        .toList();
   }
 
-  private RecordedLearningSessionLite toRecordedLite(LearningSession session, ZoneId zoneId) {
-    RecordedLearningSessionLite lite = new RecordedLearningSessionLite();
+  private LearningSessionLite toLearningSessionLite(LearningSession session, ZoneId zoneId) {
+    LearningSessionLite lite = new LearningSessionLite();
     lite.setNotebookId(session.getNotebook().getId());
     lite.setNotebookName(session.getNotebook().getName());
     lite.setLearningSessionId(session.getId());

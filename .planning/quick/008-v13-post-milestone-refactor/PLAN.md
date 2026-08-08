@@ -1,6 +1,6 @@
 # v1.3 post-milestone refactor
 
-**Status:** in-progress (Phases 1–4 done)
+**Status:** in-progress (Phases 1–5 done)
 
 **Type:** ad-hoc quick plan (Structure only)
 
@@ -109,7 +109,7 @@ ordinary Repeat / PreviouslyAnswered in `RecallsControllerTests`. Both under
 **Verify:** both Recalls test classes.
 
 ### Phase 5 — Collapse identical session feed lite DTOs
-**Type:** Structure | **Status:** planned | **Subsystem:** backend (+ generated API)
+**Type:** Structure | **Status:** done | **Subsystem:** backend (+ generated API)
 
 - Replace `AwaitingReportLearningSessionLite` and `RecordedLearningSessionLite`
   with one type (e.g. `LearningSessionLite`).
