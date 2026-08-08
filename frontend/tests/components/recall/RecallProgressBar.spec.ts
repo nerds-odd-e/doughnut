@@ -12,6 +12,7 @@ describe("RecallProgressBar potential learning sessions", () => {
   ) =>
     helper
       .component(RecallProgressBar)
+      .withRouter()
       .withProps({
         finished: 0,
         toRepeatCount: 0,
@@ -33,7 +34,7 @@ describe("RecallProgressBar potential learning sessions", () => {
     const row = wrapper.find('[data-test="potential-learning-session"]')
     expect(row.exists()).toBe(true)
     expect(row.attributes("role")).toBe("status")
-    expect(row.text()).toBe(
+    expect(row.find(".break-words").text()).toBe(
       '1 potential learning session to commission for notebook "Spanish conversation"'
     )
   })
@@ -75,7 +76,27 @@ describe("RecallProgressBar potential learning sessions", () => {
       },
     ])
     const row = wrapper.find('[data-test="potential-learning-session"]')
-    expect(row.classes()).toContain("break-words")
-    expect(row.text()).toContain(`"${longTitle}"`)
+    expect(row.find(".break-words").text()).toContain(`"${longTitle}"`)
+    expect(row.find('[data-test="commission-learning-session"]').exists()).toBe(
+      true
+    )
+  })
+
+  it("opens commission dialog when Commission is clicked", async () => {
+    const wrapper = mountBar([
+      {
+        notebookId: 1,
+        notebookName: "Spanish conversation",
+        trackerIds: [11],
+      },
+    ])
+    await wrapper
+      .find('[data-test="commission-learning-session"]')
+      .trigger("click")
+    expect(
+      document.body.querySelector(
+        '[data-test="commission-learning-session-dialog"]'
+      )
+    ).toBeTruthy()
   })
 })

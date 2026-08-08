@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Commissioned Learning Session MVP
 status: in_progress
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-08-08T00:31:09.156Z"
+stopped_at: Completed 05-02-PLAN.md
+last_updated: "2026-08-08T08:45:00.000Z"
 progress:
   total_phases: 7
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 10
-  completed_plans: 8
-current_phase: 5
-current_phase_name: commission-learning-session
+  completed_plans: 10
+current_phase: 6
+current_phase_name: record-report-and-schedule
 last_activity: 2026-08-08
-last_activity_desc: Accepted Phase 5 E2E Cypress gate latency (plan-checker #4)
+last_activity_desc: Phase 5 executed — commission UI + dueCommissioned exclusion + E2E green
 ---
 
 # Project State
@@ -47,10 +47,12 @@ sessions on recall progress bar; ordinary recall stays 0 (TRK-03, POT-01/02).
 Re-commission deletes prior `AWAITING_REPORT` sessions; Request markdown reflects recorded
 history; MakeMe builders; `pnpm backend:verify` + Cypress regression green.
 
-**Phase 5** — planned (2 plans: 05-01 tracer COM-01–03, 05-02 exclusion + E2E graduation).
-Plan-checker warning #4 (E2E verify latency) accepted in `05-VALIDATION.md`: Cypress ~120s gates on 05-01 T1 / 05-02 T2; Vitest/JUnit remain the fast per-task loop.
+**Phase 5** — both plans executed (COM-01–03). Progress bar Commission button →
+`CommissionLearningSessionDialog` → copyable ADR 0005 Request + awaiting-report banner;
+`dueCommissioned` excludes trackers in `AWAITING_REPORT` sessions; full
+`commissioned_learning_session.feature` green (4 scenarios).
 
-**Next:** Execute Phase 5 Plan 05-01 (`/gsd-execute-phase 5`).
+**Next:** Plan Phase 6 (`/gsd-plan-phase 6`) — record report and schedule.
 
 ## Deferred Items
 

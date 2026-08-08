@@ -66,11 +66,30 @@
         :key="session.notebookId"
         data-test="potential-learning-session"
         role="status"
-        class="text-base font-normal text-base-content break-words"
+        class="flex gap-2 items-start text-base font-normal text-base-content"
       >
-        1 potential learning session to commission for notebook "{{ session.notebookName }}"
+        <span class="flex-1 break-words">
+          1 potential learning session to commission for notebook "{{
+            session.notebookName
+          }}"
+        </span>
+        <button
+          type="button"
+          class="daisy-btn daisy-btn-primary shrink-0"
+          data-test="commission-learning-session"
+          @click="openCommissionDialog(session)"
+        >
+          Commission
+        </button>
       </div>
     </div>
+    <CommissionLearningSessionDialog
+      v-if="commissionDialogSession"
+      :notebook-id="commissionDialogSession.notebookId"
+      :notebook-name="commissionDialogSession.notebookName"
+      @close="commissionDialogSession = undefined"
+      @commissioned="onCommissioned"
+    />
   </div>
 </template>
 
@@ -79,6 +98,8 @@ import { ref } from "vue"
 import ProgressBar from "../commons/ProgressBar.vue"
 import { Pause, Settings, SkipBack } from "@lucide/vue"
 import RecallSessionOptionsDialog from "./RecallSessionOptionsDialog.vue"
+import CommissionLearningSessionDialog from "./CommissionLearningSessionDialog.vue"
+import { useRecallData } from "@/composables/useRecallData"
 
 import type { AnsweredQuestion } from "@generated/doughnut-backend-api"
 import type { PotentialLearningSession } from "@/composables/useRecallData"
@@ -107,7 +128,19 @@ const emit = defineEmits<{
   (e: "treadmill-mode-changed"): void
 }>()
 
+const { requestDueRecallsRefresh } = useRecallData()
 const showSettings = ref(false)
+const commissionDialogSession = ref<PotentialLearningSession | undefined>(
+  undefined
+)
+
+const openCommissionDialog = (session: PotentialLearningSession) => {
+  commissionDialogSession.value = session
+}
+
+const onCommissioned = () => {
+  requestDueRecallsRefresh()
+}
 
 const handleMoveToEnd = (index: number) => {
   emit("moveToEnd", index)

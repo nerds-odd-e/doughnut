@@ -133,6 +133,53 @@ const recallPage = () => {
       cy.get('[data-test="question-section"]').should('exist')
       return this
     },
+    commissionLearningSession(notebookTitle: string) {
+      cy.contains('[data-test="potential-learning-session"]', notebookTitle)
+        .find('[data-test="commission-learning-session"]')
+        .click()
+      cy.get('[data-test="commission-learning-session-submit"]').click()
+      waitUntilAppIsNotBusy()
+      return this
+    },
+    learningSessionRequestText() {
+      return cy
+        .get('[data-test="learning-session-request"]')
+        .invoke('val')
+        .then((value) => String(value ?? ''))
+    },
+    expectLearningSessionRequestListsNotes(noteTitles: string) {
+      commonSenseSplit(noteTitles, ',').forEach((title) => {
+        this.learningSessionRequestText().should('contain', `### ${title}`)
+      })
+      return this
+    },
+    expectLearningSessionRequestIncludesLearningStatus(noteTitle: string) {
+      this.learningSessionRequestText().should((text) => {
+        expect(text).to.contain(`### ${noteTitle}`)
+        expect(text).to.match(/not yet tutored|Learning status:/)
+      })
+      return this
+    },
+    expectLearningSessionRequestIncludesContent(content: string) {
+      this.learningSessionRequestText().should(
+        'contain',
+        `Expected learning content: ${content}`
+      )
+      return this
+    },
+    expectLearningSessionRequestIncludesRubric() {
+      this.learningSessionRequestText().should(
+        'contain',
+        'score from 0 to 5 per item'
+      )
+      return this
+    },
+    expectLearningSessionAwaitingReport() {
+      cy.get('[data-test="learning-session-awaiting-report"]').should(
+        'be.visible'
+      )
+      return this
+    },
   }
 }
 export const recall = () => {
@@ -158,6 +205,14 @@ export const recall = () => {
         'be.visible'
       )
       return this
+    },
+    commissionLearningSession(notebookTitle: string) {
+      cy.contains('[data-test="potential-learning-session"]', notebookTitle)
+        .find('[data-test="commission-learning-session"]')
+        .click()
+      cy.get('[data-test="commission-learning-session-submit"]').click()
+      waitUntilAppIsNotBusy()
+      return recallPage()
     },
     expectResumeAvailable() {
       cy.findByLabelText('Resume').should('exist')

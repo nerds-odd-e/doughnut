@@ -5,11 +5,15 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.AnsweredQuestion;
+import com.odde.doughnut.controllers.dto.CommissionLearningSessionRequest;
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.NoteDeleteReferenceHandling;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.QuestionType;
+import com.odde.doughnut.entities.User;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
@@ -24,6 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 class RecallsControllerTests extends ControllerTestBase {
   @Autowired RecallsController controller;
+  @Autowired LearningSessionController learningSessionController;
   @Autowired NoteService noteService;
 
   @BeforeEach
@@ -175,6 +180,59 @@ class RecallsControllerTests extends ControllerTestBase {
           dueMemoryTrackers.getDueCommissioned().get(0).getNotebookId());
       assertEquals(
           "Spanish conversation", dueMemoryTrackers.getDueCommissioned().get(0).getNotebookName());
+    }
+
+    @Test
+    void excludesDueCommissionedTrackersAwaitingReportAfterCommission()
+        throws UnexpectedNoAccessRightException {
+      Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
+      testabilitySettings.timeTravelTo(currentTime);
+      Notebook notebook =
+          makeMe
+              .aNotebook()
+              .creatorAndOwner(currentUser.getUser())
+              .name("Spanish conversation")
+              .please();
+      Note hola = makeMe.aNote().notebook(notebook).title("Hola").please();
+      makeMe.aMemoryTrackerFor(hola).commissioned().nextRecallAt(currentTime).please();
+
+      assertThat(controller.recalling("Asia/Shanghai", 0).getDueCommissioned(), hasSize(1));
+
+      CommissionLearningSessionRequest request = new CommissionLearningSessionRequest();
+      request.notebookId = notebook.getId();
+      learningSessionController.commission(request, "Asia/Shanghai");
+
+      DueMemoryTrackers afterCommission = controller.recalling("Asia/Shanghai", 0);
+      assertThat(afterCommission.getDueCommissioned(), hasSize(0));
+      assertThat(afterCommission.getToRepeat(), hasSize(0));
+    }
+
+    @Test
+    void awaitingReportExclusionDoesNotLeakAcrossUsers() throws UnexpectedNoAccessRightException {
+      User userA = currentUser.getUser();
+      User userB = makeMe.aUser().please();
+      Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
+      testabilitySettings.timeTravelTo(currentTime);
+
+      Notebook notebookA =
+          makeMe.aNotebook().creatorAndOwner(userA).name("Spanish conversation").please();
+      Note holaA = makeMe.aNote().notebook(notebookA).title("Hola").please();
+      makeMe.aMemoryTrackerFor(holaA).commissioned().nextRecallAt(currentTime).please();
+
+      Notebook notebookB = makeMe.aNotebook().creatorAndOwner(userB).name("Kanji").please();
+      Note noteB = makeMe.aNote().notebook(notebookB).title("水").please();
+      MemoryTracker trackerB =
+          makeMe.aMemoryTrackerFor(noteB).commissioned().nextRecallAt(currentTime).please();
+
+      CommissionLearningSessionRequest request = new CommissionLearningSessionRequest();
+      request.notebookId = notebookA.getId();
+      learningSessionController.commission(request, "Asia/Shanghai");
+
+      currentUser.setUser(userB);
+      DueMemoryTrackers dueForB = controller.recalling("Asia/Shanghai", 0);
+
+      assertThat(dueForB.getDueCommissioned(), hasSize(1));
+      assertEquals(trackerB.getId(), dueForB.getDueCommissioned().get(0).getMemoryTrackerId());
     }
   }
 

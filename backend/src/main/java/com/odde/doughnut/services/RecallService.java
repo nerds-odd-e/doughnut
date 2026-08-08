@@ -9,10 +9,13 @@ import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.entities.repositories.RecallPromptRepository;
+import com.odde.doughnut.entities.repositories.SessionItemRepository;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import java.time.ZoneId;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,15 +26,18 @@ public class RecallService {
   private final UserService userService;
   private final MemoryTrackerRepository memoryTrackerRepository;
   private final RecallPromptRepository recallPromptRepository;
+  private final SessionItemRepository sessionItemRepository;
 
   @Autowired
   public RecallService(
       UserService userService,
       MemoryTrackerRepository memoryTrackerRepository,
-      RecallPromptRepository recallPromptRepository) {
+      RecallPromptRepository recallPromptRepository,
+      SessionItemRepository sessionItemRepository) {
     this.userService = userService;
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.recallPromptRepository = recallPromptRepository;
+    this.sessionItemRepository = sessionItemRepository;
   }
 
   private int totalAssimilatedCount(User user) {
@@ -69,8 +75,12 @@ public class RecallService {
                   return lite;
                 })
             .toList();
+    Set<Integer> awaitingReportTrackerIds =
+        new HashSet<>(
+            sessionItemRepository.findMemoryTrackerIdsInAwaitingReportSessions(user.getId()));
     List<DueCommissionedMemoryTrackerLite> dueCommissioned =
         getCommissionedMemoryTrackersNeedToRepeat(user, currentUTCTimestamp, timeZone, dueInDays)
+            .filter(mt -> !awaitingReportTrackerIds.contains(mt.getId()))
             .map(
                 mt -> {
                   DueCommissionedMemoryTrackerLite lite = new DueCommissionedMemoryTrackerLite();
