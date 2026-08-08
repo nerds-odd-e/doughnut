@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Commissioned Learning Session MVP
 status: in_progress
-stopped_at: Phase 3 verification passed
-last_updated: "2026-08-08T00:07:33.562Z"
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-08-08T00:11:39.940Z"
 progress:
   total_phases: 7
   completed_phases: 3
   total_plans: 8
-  completed_plans: 6
+  completed_plans: 7
 current_phase: 4
 current_phase_name: learning-session-request-builder
 last_activity: 2026-08-08
-last_activity_desc: Phase 3 goal verified passed (03-VERIFICATION.md, 6/6)
+last_activity_desc: Phase 4 Plan 04-01 commission tracer complete
 ---
 
 # Project State
@@ -42,7 +42,12 @@ Assimilate with commissioned-only, ordinary+commissioned coexistence (TRK-01/02)
 6/6). Due COMMISSIONED → `dueCommissioned` + FE notebook-grouped potential
 sessions on recall progress bar; ordinary recall stays 0 (TRK-03, POT-01/02).
 
-**Next:** Execute Phase 4 Plan 04-01 (Learning Session / Request builder Structure).
+**Phase 4 Plan 04-01** — executed; commission API tracer green
+(`.planning/phases/04-learning-session-request-builder/04-01-SUMMARY.md`).
+`POST /api/learning-sessions/commission` persists session + items; ADR 0005
+markdown for Spanish fixture; guardrails tested; `pnpm backend:verify` green.
+
+**Next:** Execute Phase 4 Plan 04-02 (abandon lifecycle + learning status).
 
 ## Deferred Items
 
@@ -57,11 +62,11 @@ sessions on recall progress bar; ordinary recall stays 0 (TRK-03, POT-01/02).
 
 ## Session Continuity
 
-**Last session:** 2026-08-07T23:58:06.157Z
-**Stopped at:** Phase 3 verification passed
-**Resume file:** .planning/phases/03-potential-learning-sessions/03-VERIFICATION.md
+**Last session:** 2026-08-08T00:11:39.934Z
+**Stopped at:** Completed 04-01-PLAN.md
+**Resume file:** None
 
-Phase 3 verified 6/6. Next: Phase 4.
+Phase 4 Plan 04-01 complete. Next: 04-02.
 
 ## Performance Metrics
 
@@ -71,6 +76,7 @@ Phase 3 verified 6/6. Next: Phase 4.
 | Phase 02 P02 | 3 min | 2 tasks | 7 files |
 | Phase 03 P01 | 7min | 2 tasks | 26 files |
 | Phase 03-potential-learning-sessions P02 | 4min | 2 tasks | 5 files |
+| Phase 04-learning-session-request-builder P01 | 12 | 3 tasks | 14 files |
 
 ## Decisions
 
@@ -85,3 +91,4 @@ Phase 3 verified 6/6. Next: Phase 4.
 - [Phase 03]: expectCount(0) asserts absent recall-count badge
 - [Phase 03]: Multi-row potential-session page object matches by full copy via cy.contains
 - [Phase 03]: Long notebook titles use break-words; full title stays in DOM for E2E
+- [Phase 04-01]: learning status `not yet tutored` hard-coded in tracer; aggregation in 04-02

@@ -1308,6 +1308,30 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/MemoryTracker"
+  /api/learning-sessions/commission:
+    post:
+      tags:
+      - learning-session-controller
+      operationId: commission
+      parameters:
+      - name: timezone
+        in: query
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommissionLearningSessionRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/LearningSessionCommissionResponse"
   /api/failure-reports/trigger:
     post:
       tags:
@@ -4278,6 +4302,31 @@ components:
       - id
       - nextRecallAt
       - note
+    CommissionLearningSessionRequest:
+      type: object
+      properties:
+        notebookId:
+          type: integer
+          format: int32
+      required:
+      - notebookId
+    LearningSessionCommissionResponse:
+      type: object
+      properties:
+        learningSessionId:
+          type: integer
+          format: int32
+        requestMarkdown:
+          type: string
+        status:
+          type: string
+          enum:
+          - AWAITING_REPORT
+          - RECORDED
+      required:
+      - learningSessionId
+      - requestMarkdown
+      - status
     ConversationMessage:
       type: object
       properties:

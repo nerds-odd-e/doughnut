@@ -152,6 +152,10 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `getRecentMemoryTrackers`: GET `/api/memory-trackers/recent` -> `GetRecentMemoryTrackersResponse` (request: none; response body: Array<MemoryTracker>)
 - `deleteUnansweredRecallPrompts`: DELETE `/api/memory-trackers/{memoryTracker}/recall-prompts/unanswered` -> `DeleteUnansweredRecallPromptsResponse` (request: `DeleteUnansweredRecallPromptsData`; path: memoryTracker; response body: void)
 
+## Learning Session Controller
+
+- `commission`: POST `/api/learning-sessions/commission` -> `CommissionResponse` (request: `CommissionData`; query: timezone; body: CommissionLearningSessionRequest; response body: LearningSessionCommissionResponse)
+
 ## Failure Report Controller
 
 - `triggerFailure`: POST `/api/failure-reports/trigger` -> `TriggerFailureResponse` (request: none; response body: string)

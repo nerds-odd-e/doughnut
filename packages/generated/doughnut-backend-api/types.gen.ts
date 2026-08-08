@@ -616,6 +616,16 @@ export type MemoryTracker = {
     spelling?: boolean;
 };
 
+export type CommissionLearningSessionRequest = {
+    notebookId: number;
+};
+
+export type LearningSessionCommissionResponse = {
+    learningSessionId: number;
+    requestMarkdown: string;
+    status: 'AWAITING_REPORT' | 'RECORDED';
+};
+
 export type ConversationMessage = {
     id: number;
     message: string;
@@ -2306,6 +2316,24 @@ export type ReEnableResponses = {
 };
 
 export type ReEnableResponse = ReEnableResponses[keyof ReEnableResponses];
+
+export type CommissionData = {
+    body: CommissionLearningSessionRequest;
+    path?: never;
+    query: {
+        timezone: string;
+    };
+    url: '/api/learning-sessions/commission';
+};
+
+export type CommissionResponses = {
+    /**
+     * OK
+     */
+    200: LearningSessionCommissionResponse;
+};
+
+export type CommissionResponse = CommissionResponses[keyof CommissionResponses];
 
 export type TriggerFailureData = {
     body?: never;
