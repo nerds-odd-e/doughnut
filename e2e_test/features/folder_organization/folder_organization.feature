@@ -5,6 +5,16 @@ Feature: Folder organization
   Background:
     Given I am logged in as an existing user
 
+  Scenario: Rename a folder from its page heading
+    Given I have a notebook "Organize NB" with notes:
+      | Title     | Folder |
+      | In folder | Alpha  |
+    When I view note "In folder"
+    And I open the folder page for "Alpha" from the sidebar
+    And I rename the folder heading to "Renamed Alpha"
+    And I reload the folder page
+    Then the folder page heading should be "Renamed Alpha"
+
   Scenario: Move a nested folder to notebook root from the folder page
     Given I have a notebook "Organize NB" with notes:
       | Title     | Folder |

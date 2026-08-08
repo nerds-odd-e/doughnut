@@ -1,6 +1,6 @@
 # Inline autosaving folder and notebook titles
 
-**Status:** planned
+**Status:** in progress
 
 **Type:** ad-hoc quick plan
 
@@ -76,75 +76,27 @@ heading, and the former manual title-editing surfaces no longer exist.
 
 | Phase | Type | Status | One observable outcome |
 |---|---|---|---|
-| 1. Folder heading rename | Behavior | planned | On an owned folder page, editing the heading automatically persists the new folder name, and Settings contains no second rename control. |
+| 1. Folder heading rename | Behavior | done | On an owned folder page, editing the heading automatically persists the new folder name, and Settings contains no second rename control. |
 | 2. Notebook heading rename and consolidation | Behavior | planned | On an owned notebook page, editing the same kind of heading automatically persists the new notebook name, with all former manual title controls removed. |
 
 ## Phase 1 — Folder heading rename
 
 **Type:** Behavior
 
-**Status:** planned
+**Status:** done
 
-**Precondition:** The learner owns a notebook with a folder and is viewing that
-folder page.
+**Result:** The owned-folder heading is the autosaving name editor, including
+trim/blank/conflict handling and page/sidebar refresh. The Settings rename form
+and its obsolete state/helpers are gone; move and dissolve remain unchanged.
 
-**Trigger:** The learner changes the folder heading, then pauses, presses Enter,
-or moves focus away.
+**Verification:** Mounted `FolderPage` coverage passed 8/8, the folder
+organization E2E feature passed 10/10, the refactor gate completed, and
+repository lint/format plus diff-whitespace checks passed.
 
-**Postcondition:** The folder name is persisted, the page/sidebar refresh to the
-saved name, API validation or conflict failures appear beside the heading, and
-the Settings tab offers only move/dissolve management—not another rename form.
-
-### Test-first work
-
-1. Extend the mounted `FolderPage` coverage in
-   `frontend/tests/pages/FolderPage.renameDissolve.spec.ts` (and its existing
-   support module) through the page boundary:
-   - the heading is contenteditable;
-   - a changed, trimmed name saves on blur and refreshes the page;
-   - unchanged/blank input cancels any pending intermediate rename, does not
-     call `renameFolder`, and blank input has an actionable inline error;
-   - a `FOLDER_NAME_CONFLICT` response keeps the draft and displays the backend
-     message beside the heading;
-   - opening Settings reveals no folder-name input or rename submit control.
-2. Add one user scenario to the capability-owned
-   `e2e_test/features/folder_organization/folder_organization.feature`: open a
-   folder page, edit its heading, blur it, wait for app-busy to clear, reload,
-   and observe the new title. Update `folder_page.ts` and `folderPage.ts` with
-   intent-named steps/methods; do not put editing logic in the step definition.
-3. Run the new tests red and confirm the failure is the missing inline editor,
-   not setup, selector, or service failure. Use `@wip` only while the new E2E
-   scenario is red and remove it before closing the phase.
-
-### Smallest production change
-
-1. Add a folder-specific page-heading editor under
-   `frontend/src/components/folder/` using `PathNameEditor` and
-   `useDebouncedTextAutosave`; render it in `FolderPage.vue` in place of the
-   plain heading.
-2. Persist through `NotebookController.renameFolder`. On success, call
-   `refreshSidebarStructuralListings()` and `fetchFolderPage()`; on wrapped
-   error, throw/propagate it to the editor's inline error handler.
-3. Remove the rename form and its separator from `FolderSettings.vue`. Remove
-   `renameName`, `renameError`, `renameSubmitDisabled`, and `submitRename` from
-   `useFolderAdmin`; relocate the focused rename mutation out of
-   `folderAdminMutations.ts` into the new title capability while leaving shared
-   move/dissolve error handling intact.
-4. Delete obsolete test helpers/selectors for `folder-name` and
-   `folder-rename-submit`; keep the move and dissolve helpers cohesive.
-
-### Verification and phase boundary
-
-```bash
-CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/FolderPage.renameDissolve.spec.ts
-CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/folder_organization/folder_organization.feature
-scripts/check_diff_whitespace.sh
-```
-
-Run Jidoka, apply `post-change-refactor`, mark this phase done/update remaining
-details, then commit and push before Phase 2. This phase is stop-safe: folder
-users have the complete single-surface behavior even if notebook convergence is
-deferred.
+**Learning for Phase 2:** The concrete folder slice confirms that
+`PathNameEditor` plus `useDebouncedTextAutosave` can own draft, normalization,
+flush, and stale-save cancellation. Consolidation should preserve this behavior
+while keeping each page's persistence and refresh callback domain-specific.
 
 ## Phase 2 — Notebook heading rename and consolidation
 

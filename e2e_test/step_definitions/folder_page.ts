@@ -59,8 +59,15 @@ Then('the folder readme should contain {string}', (fragment: string) => {
 })
 
 When('I reload the folder page', () => {
-  cy.reload()
-  waitUntilAppIsNotBusy()
+  folderPage().reload()
+})
+
+When('I rename the folder heading to {string}', (name: string) => {
+  folderPage().renameHeading(name)
+})
+
+Then('the folder page heading should be {string}', (name: string) => {
+  folderPage().expectHeading(name)
 })
 
 When('I move folder {string} to notebook root', (folderLabel: string) => {

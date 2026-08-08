@@ -124,34 +124,27 @@ export async function openFolderSettingsTab(wrapper: VueWrapper) {
   }
 }
 
+export function folderPageNameEditor(wrapper: VueWrapper) {
+  return wrapper.get('[data-test="folder-page-name"]')
+}
+
+export async function editFolderPageName(
+  wrapper: VueWrapper,
+  name: string,
+  blur = true
+) {
+  const editor = folderPageNameEditor(wrapper)
+  ;(editor.element as HTMLElement).innerText = name
+  await editor.trigger("input")
+  if (blur) await editor.trigger("blur")
+  await flushPromises()
+}
+
 export async function submitMoveForm(wrapper: VueWrapper) {
   await openFolderSettingsTab(wrapper)
   await wrapper
     .find('[data-testid="folder-move-dialog"] form')
     .trigger("submit")
-  await flushPromises()
-}
-
-export async function setRenameName(wrapper: VueWrapper, name: string) {
-  await openFolderSettingsTab(wrapper)
-  const nameInput = wrapper.find('[data-test="folder-name"]')
-    .element as HTMLElement
-  nameInput.innerText = name
-  nameInput.dispatchEvent(new Event("input", { bubbles: true }))
-  await flushPromises()
-}
-
-export async function submitRenameForm(wrapper: VueWrapper) {
-  await openFolderSettingsTab(wrapper)
-  const renameForm = wrapper
-    .find('[data-testid="folder-rename-submit"]')
-    .element.closest("form")
-  if (renameForm == null) {
-    throw new Error("Rename form not found")
-  }
-  renameForm.dispatchEvent(
-    new Event("submit", { bubbles: true, cancelable: true })
-  )
   await flushPromises()
 }
 

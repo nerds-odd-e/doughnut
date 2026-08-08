@@ -13,9 +13,10 @@
         >
           Folder
         </p>
-        <h1 class="text-xl font-semibold text-base-content">
-          {{ folderForView.folder.name }}
-        </h1>
+        <FolderPageNameEditor
+          :folder-realm="folderForView"
+          :fetch-folder-page="fetchFolderPage"
+        />
       </div>
 
       <ReadmeSettingsTabs
@@ -49,6 +50,7 @@ import type { FolderRealm } from "@generated/doughnut-backend-api"
 import { computed, ref } from "vue"
 import NotebookPageReadonlySummary from "@/components/notebook/NotebookPageReadonlySummary.vue"
 import FolderSettings from "@/components/folder/FolderSettings.vue"
+import FolderPageNameEditor from "@/components/folder/FolderPageNameEditor.vue"
 import ScopedReadmeEditor from "@/components/notebook/ScopedReadmeEditor.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import ReadmeSettingsTabs, {

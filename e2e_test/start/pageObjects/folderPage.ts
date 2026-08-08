@@ -1,6 +1,33 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
 
 const folderPage = () => ({
+  renameHeading(name: string) {
+    cy.get('[data-test="folder-page-name"]')
+      .should('be.visible')
+      .clear()
+      .type(name, { delay: 0 })
+      .blur()
+    waitUntilAppIsNotBusy()
+    return this
+  },
+
+  reload() {
+    cy.reload()
+    waitUntilAppIsNotBusy()
+    return this
+  },
+
+  expectHeading(name: string) {
+    cy.get('[data-test="folder-page-name"]').should(($heading) => {
+      const actual = $heading.text().trim()
+      expect(
+        actual,
+        `Expected folder page heading "${name}", but found "${actual}"`
+      ).to.equal(name)
+    })
+    return this
+  },
+
   openSettingsTab() {
     cy.get('[data-testid="folder-tab-settings"]').click()
     cy.get('[data-testid="folder-settings"]').should('be.visible')

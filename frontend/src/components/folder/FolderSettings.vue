@@ -57,30 +57,6 @@
             </button>
           </fieldset>
         </form>
-        <div class="daisy-divider my-4" />
-        <form @submit.prevent="submitRename">
-          <fieldset :disabled="processing">
-            <p class="text-sm mb-3">
-              Rename folder "{{ folderRealm.folder.name }}".
-            </p>
-            <PathNameEditor
-              v-model="renameName"
-              :error-message="renameError"
-              label-text="Folder name"
-              editor-role="textbox"
-              placeholder="Folder name"
-              editor-data-test="folder-name"
-            />
-            <button
-              type="submit"
-              class="daisy-btn daisy-btn-secondary mt-4"
-              data-testid="folder-rename-submit"
-              :disabled="renameSubmitDisabled"
-            >
-              Rename folder
-            </button>
-          </fieldset>
-        </form>
         <div class="daisy-divider my-4">or</div>
         <p class="text-sm mb-2">
           Dissolve "{{ folderRealm.folder.name }}". Notes and subfolders will move
@@ -106,7 +82,6 @@
 <script setup lang="ts">
 import type { FolderRealm } from "@generated/doughnut-backend-api"
 import { toRef } from "vue"
-import PathNameEditor from "@/components/notes/core/PathNameEditor.vue"
 import FolderSelector from "@/components/notes/FolderSelector.vue"
 import { useFolderAdmin } from "@/composables/useFolderAdmin"
 
@@ -119,9 +94,7 @@ const {
   processing,
   moveError,
   dissolveError,
-  renameError,
   selectedParentFolder,
-  renameName,
   destinationNotebooks,
   notebooksLoading,
   notebooksLoadError,
@@ -129,9 +102,7 @@ const {
   folderPickerNotebookId,
   folderPickerContextFolder,
   folderPickerAncestorFolders,
-  renameSubmitDisabled,
   dissolveParentLabel,
-  submitRename,
   submitMove,
   dissolve,
 } = useFolderAdmin(toRef(props, "folderRealm"), props.fetchFolderPage)

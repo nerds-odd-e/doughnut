@@ -6,18 +6,20 @@ import usePopups from "@/components/commons/Popups/usePopups"
 import {
   createFolderPageRouter,
   dissolveWithInitialConfirm,
+  editFolderPageName,
+  folderPageNameEditor,
   folderNameConflictMessage,
   mountFolderPage,
   mountFolderPageReady,
+  openFolderSettingsTab,
   resolveTopConfirm,
-  setRenameName,
   softDeletedTitleConflictMessage,
-  submitRenameForm,
 } from "@tests/pages/folderPageTestSupport"
 import type { Router } from "vue-router"
 
 afterEach(() => {
   document.body.innerHTML = ""
+  vi.useRealTimers()
   vi.restoreAllMocks()
 })
 
@@ -29,6 +31,77 @@ describe("FolderPage rename and dissolve", () => {
   })
 
   describe("rename", () => {
+    async function replacePendingFolderNameWith(finalName: string) {
+      vi.useFakeTimers()
+      const { wrapper } = await mountFolderPageReady(router, 10, "Original")
+      const renameSpy = vi
+        .spyOn(NotebookController, "renameFolder")
+        .mockResolvedValue(wrapSdkResponse(undefined) as never)
+
+      await editFolderPageName(wrapper, "Intermediate", false)
+      await editFolderPageName(wrapper, finalName, false)
+      await vi.runAllTimersAsync()
+      await flushPromises()
+
+      return { wrapper, renameSpy }
+    }
+
+    it("renders the folder name as an editable page heading", async () => {
+      const { wrapper } = await mountFolderPageReady(router, 10, "Original")
+
+      expect(folderPageNameEditor(wrapper).attributes("contenteditable")).toBe(
+        "true"
+      )
+
+      wrapper.unmount()
+    })
+
+    it("saves a trimmed changed heading on blur and refreshes the page", async () => {
+      const fetchFolderPage = vi.fn().mockResolvedValue(undefined)
+      const { wrapper, folderRealm } = await mountFolderPageReady(
+        router,
+        10,
+        "Original",
+        { fetchFolderPage }
+      )
+      const renameSpy = vi
+        .spyOn(NotebookController, "renameFolder")
+        .mockResolvedValue(wrapSdkResponse(folderRealm.folder))
+
+      await editFolderPageName(wrapper, "  Renamed  ")
+
+      expect(renameSpy).toHaveBeenCalledWith({
+        path: {
+          notebook: folderRealm.notebookRealm.notebook.id,
+          folder: folderRealm.folder.id,
+        },
+        body: { name: "Renamed" },
+      })
+      expect(fetchFolderPage).toHaveBeenCalledOnce()
+
+      wrapper.unmount()
+    })
+
+    it("cancels a pending intermediate rename when restored to the saved name", async () => {
+      const { wrapper, renameSpy } =
+        await replacePendingFolderNameWith("Original")
+
+      expect(renameSpy).not.toHaveBeenCalled()
+
+      wrapper.unmount()
+    })
+
+    it("cancels a pending intermediate rename and shows an inline error for a blank name", async () => {
+      const { wrapper, renameSpy } = await replacePendingFolderNameWith("   ")
+
+      expect(renameSpy).not.toHaveBeenCalled()
+      expect(wrapper.text()).toContain(
+        "Folder name cannot be empty. Enter a name to rename this folder."
+      )
+
+      wrapper.unmount()
+    })
+
     it("shows inline conflict error when rename returns 409 FOLDER_NAME_CONFLICT", async () => {
       const { wrapper } = await mountFolderPageReady(router, 10, "Original")
 
@@ -42,12 +115,24 @@ describe("FolderPage rename and dissolve", () => {
           })
         )
 
-      await setRenameName(wrapper, "Existing")
-      await submitRenameForm(wrapper)
+      await editFolderPageName(wrapper, "Existing")
 
       expect(renameSpy).toHaveBeenCalled()
       expect(wrapper.text()).toContain(folderNameConflictMessage)
+      expect(folderPageNameEditor(wrapper).text()).toBe("Existing")
       expect(usePopups().popups.peek()).toHaveLength(0)
+
+      wrapper.unmount()
+    })
+
+    it("does not offer a second rename form in Settings", async () => {
+      const { wrapper } = await mountFolderPageReady(router, 10, "Original")
+
+      await openFolderSettingsTab(wrapper)
+
+      const settings = wrapper.get('[data-testid="folder-settings"]')
+      expect(settings.text()).not.toContain("Folder name")
+      expect(settings.text()).not.toContain("Rename folder")
 
       wrapper.unmount()
     })

@@ -92,27 +92,6 @@ export function buildFolderMoveBody(options: {
 
 export type FolderAdminConfirm = (message: string) => Promise<boolean>
 
-export async function renameFolderOnPage(options: {
-  folderRealm: FolderRealm
-  newName: string
-  fetchFolderPage: () => Promise<void>
-  renameError: Ref<string | undefined>
-}): Promise<void> {
-  options.renameError.value = undefined
-  const renameResult = await apiCallWithLoading(() =>
-    NotebookController.renameFolder({
-      path: {
-        notebook: options.folderRealm.notebookRealm.notebook.id,
-        folder: options.folderRealm.folder.id,
-      },
-      body: { name: options.newName },
-    })
-  )
-  throwIfSdkError(renameResult)
-  refreshSidebarStructuralListings()
-  await options.fetchFolderPage()
-}
-
 export async function moveFolderOnPage(options: {
   folderRealm: FolderRealm
   body: ReturnType<typeof buildFolderMoveBody>

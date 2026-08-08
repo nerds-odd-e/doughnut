@@ -13,11 +13,10 @@ import {
   dissolveFolderOnPage,
   dissolveParentLabelFromChain,
   moveFolderOnPage,
-  renameFolderOnPage,
 } from "@/composables/folderAdminMutations"
 
 /**
- * Move / rename / dissolve admin state for the folder Settings tab.
+ * Move / dissolve admin state for the folder Settings tab.
  */
 export function useFolderAdmin(
   folderRealm: Ref<FolderRealm>,
@@ -29,9 +28,7 @@ export function useFolderAdmin(
   const processing = ref(false)
   const moveError = ref<string | undefined>(undefined)
   const dissolveError = ref<string | undefined>(undefined)
-  const renameError = ref<string | undefined>(undefined)
   const selectedParentFolder = ref<Folder | null>(null)
-  const renameName = ref("")
   const destinationCatalogItems = ref<NotebookCatalogEntry[] | undefined>(
     undefined
   )
@@ -122,46 +119,12 @@ export function useFolderAdmin(
     }
   })
 
-  watch(
-    () => folderRealm.value.folder.id,
-    (id) => {
-      if (id == null) return
-      renameName.value = folderRealm.value.folder.name
-      renameError.value = undefined
-    },
-    { immediate: true }
-  )
-
-  const renameSubmitDisabled = computed(
-    () =>
-      processing.value ||
-      renameName.value.trim().length === 0 ||
-      renameName.value.trim() === folderRealm.value.folder.name
-  )
-
   const dissolveParentLabel = computed(() =>
     dissolveParentLabelFromChain(
       folderRealm.value.folder.id,
       folderRealm.value.ancestorFolders ?? []
     )
   )
-
-  const submitRename = async () => {
-    if (processing.value || renameSubmitDisabled.value) return
-    processing.value = true
-    try {
-      await renameFolderOnPage({
-        folderRealm: folderRealm.value,
-        newName: renameName.value.trim(),
-        fetchFolderPage,
-        renameError,
-      })
-    } catch (e: unknown) {
-      renameError.value = toOpenApiError(e).message ?? "Failed to rename folder"
-    } finally {
-      processing.value = false
-    }
-  }
 
   const submitMove = async (merge = false) => {
     if (processing.value) return
@@ -225,9 +188,7 @@ export function useFolderAdmin(
     processing,
     moveError,
     dissolveError,
-    renameError,
     selectedParentFolder,
-    renameName,
     destinationNotebooks,
     notebooksLoading,
     notebooksLoadError,
@@ -235,9 +196,7 @@ export function useFolderAdmin(
     folderPickerNotebookId,
     folderPickerContextFolder,
     folderPickerAncestorFolders,
-    renameSubmitDisabled,
     dissolveParentLabel,
-    submitRename,
     submitMove,
     dissolve,
   }
