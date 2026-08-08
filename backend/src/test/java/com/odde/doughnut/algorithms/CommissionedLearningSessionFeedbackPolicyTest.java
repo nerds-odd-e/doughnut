@@ -1,117 +1,40 @@
 package com.odde.doughnut.algorithms;
 
 import static com.odde.doughnut.entities.ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX;
+import static com.odde.doughnut.entities.ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.odde.doughnut.entities.MemoryTracker;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.SessionItem;
-import com.odde.doughnut.testability.MakeMe;
-import java.sql.Timestamp;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
 class CommissionedLearningSessionFeedbackPolicyTest {
 
-  @Autowired MakeMe makeMe;
+  @ParameterizedTest
+  @CsvSource({
+    "5, 112", "4, 110", "3, 108", "2, 100", "1, 100", "0, 100",
+  })
+  void applyScoreFromInitialLevel(int score, float expected) {
+    assertThat(
+        CommissionedLearningSessionFeedbackPolicy.applyScore(DEFAULT_FORGETTING_CURVE_INDEX, score),
+        is(expected));
+  }
 
-  private Timestamp recordedAt;
-
-  @BeforeEach
-  void setUp() {
-    recordedAt = makeMe.aTimestamp().of(1, 9).please();
+  @ParameterizedTest
+  @CsvSource({
+    "5, 132", "4, 130", "3, 128", "2, 116", "1, 110", "0, 100",
+  })
+  void applyScoreFromElevatedLevel(int score, float expected) {
+    float elevatedIndex =
+        DEFAULT_FORGETTING_CURVE_INDEX + DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT * 2f;
+    assertThat(
+        CommissionedLearningSessionFeedbackPolicy.applyScore(elevatedIndex, score), is(expected));
   }
 
   @Test
-  void scoreFiveSchedulesLaterThanScoreOneFromSameStartingState() {
-    MemoryTracker highScoreTracker = commissionedTrackerAtInitialLevel();
-    MemoryTracker lowScoreTracker = commissionedTrackerAtInitialLevel();
-
-    highScoreTracker.recordCommissionedFeedback(recordedAt, 5);
-    lowScoreTracker.recordCommissionedFeedback(recordedAt, 1);
-
-    assertThat(highScoreTracker.getNextRecallAt(), greaterThan(lowScoreTracker.getNextRecallAt()));
-  }
-
-  @Test
-  void scoreZeroSchedulesStrictlyAfterRecordedAt() {
-    MemoryTracker tracker = commissionedTrackerAtInitialLevel();
-
-    tracker.recordCommissionedFeedback(recordedAt, 0);
-
-    assertTrue(tracker.getNextRecallAt().after(recordedAt));
-  }
-
-  @Test
-  void applyScoreNeverDropsBelowInitialLevel() {
-    float reduced = CommissionedLearningSessionFeedbackPolicy.applyScore(100f, 1);
-    assertThat(reduced, is(DEFAULT_FORGETTING_CURVE_INDEX));
-  }
-
-  @Test
-  void amendRegradeFromSnapshotMatchesFreshScoreFourNotCompoundOnScoreOne() {
-    MemoryTracker amendedTracker = commissionedTrackerAtInitialLevel();
-    MemoryTracker freshScoreFourTracker = commissionedTrackerAtInitialLevel();
-
-    float preSessionIndex = amendedTracker.getForgettingCurveIndex();
-    int preSessionRecallCount = amendedTracker.getRecallCount();
-
-    amendedTracker.recordCommissionedFeedback(recordedAt, 1);
-
-    SessionItem snapshotFixture = new SessionItem();
-    snapshotFixture.setPreSessionForgettingCurveIndex(preSessionIndex);
-    snapshotFixture.setPreSessionRecallCount(preSessionRecallCount);
-
-    amendedTracker.restorePreSessionSnapshot(snapshotFixture);
-    amendedTracker.recordCommissionedFeedback(recordedAt, 4);
-
-    freshScoreFourTracker.recordCommissionedFeedback(recordedAt, 4);
-
-    assertThat(amendedTracker.getRecallCount(), is(1));
-    assertThat(amendedTracker.getNextRecallAt(), is(freshScoreFourTracker.getNextRecallAt()));
-  }
-
-  @Test
-  void highToLowAmendFromSnapshotMatchesFreshScoreOneNotCompoundOnScoreFive() {
-    MemoryTracker amendedTracker = commissionedTrackerAtInitialLevel();
-    MemoryTracker freshScoreOneTracker = commissionedTrackerAtInitialLevel();
-
-    float preSessionIndex = amendedTracker.getForgettingCurveIndex();
-    int preSessionRecallCount = amendedTracker.getRecallCount();
-
-    amendedTracker.recordCommissionedFeedback(recordedAt, 5);
-
-    SessionItem snapshotFixture = new SessionItem();
-    snapshotFixture.setPreSessionForgettingCurveIndex(preSessionIndex);
-    snapshotFixture.setPreSessionRecallCount(preSessionRecallCount);
-
-    amendedTracker.restorePreSessionSnapshot(snapshotFixture);
-    amendedTracker.recordCommissionedFeedback(recordedAt, 1);
-
-    freshScoreOneTracker.recordCommissionedFeedback(recordedAt, 1);
-
-    assertThat(amendedTracker.getRecallCount(), is(1));
-    assertThat(amendedTracker.getNextRecallAt(), is(freshScoreOneTracker.getNextRecallAt()));
-  }
-
-  private MemoryTracker commissionedTrackerAtInitialLevel() {
-    var user = makeMe.aUser().withSpaceIntervals("1, 2, 4, 8").please();
-    Note note = makeMe.aNote().notebookOwnedBy(user).please();
-    return makeMe
-        .aMemoryTrackerFor(note)
-        .commissioned()
-        .by(user)
-        .forgettingCurveAndNextRecallAt(DEFAULT_FORGETTING_CURVE_INDEX)
-        .please();
+  void applyScoreLeavesIndexUnchangedForInvalidScore() {
+    float unchanged = CommissionedLearningSessionFeedbackPolicy.applyScore(120f, 9);
+    assertThat(unchanged, is(120f));
   }
 }

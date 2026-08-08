@@ -242,7 +242,6 @@ class RecallsControllerTests extends ControllerTestBase {
       assertThat(
           afterCommission.getAwaitingReportSessions().get(0).getRequestMarkdown(),
           org.hamcrest.Matchers.containsString("### Hola"));
-      assertThat(afterCommission.getDueCommissioned(), hasSize(0));
     }
 
     @Test

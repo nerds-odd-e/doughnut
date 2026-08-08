@@ -239,6 +239,13 @@ class LearningSessionControllerTests extends LearningSessionControllerTestBase {
         Gracias: 1
         """;
 
+    private static final String GRACIAS4_REPORT =
+        """
+        # Learning Session Report
+
+        Gracias: 4
+        """;
+
     @Test
     void recordsSpanishNotebookSessionWithMatchedScores() throws UnexpectedNoAccessRightException {
       Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
@@ -347,61 +354,46 @@ class LearningSessionControllerTests extends LearningSessionControllerTestBase {
     }
 
     @Test
-    void amendSpanishNotebookPartialReport() throws UnexpectedNoAccessRightException {
+    void initialRecordCapturesPreSessionSnapshot() throws UnexpectedNoAccessRightException {
       Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
       testabilitySettings.timeTravelTo(dayTwo);
 
-      Notebook notebook = spanishNotebook(dayTwo);
-      controller.commission(commissionRequest(notebook), "Asia/Shanghai");
-      controller.record(recordRequest(notebook, HOLA4_GRACIAS1_REPORT), "Asia/Shanghai");
-
-      LearningSession session =
-          learningSessionRepository
-              .findByUser_IdAndNotebook_IdAndStatus(
-                  currentUser.getUser().getId(), notebook.getId(), LearningSessionStatus.RECORDED)
-              .getFirst();
+      LearningSession session = commissionAndRecordSpanishNotebook(dayTwo);
 
       for (SessionItem item : sessionItemRepository.findByLearningSession_Id(session.getId())) {
         assertThat(item.getPreSessionRecallCount(), equalTo(0));
         assertThat(item.getPreSessionForgettingCurveIndex(), notNullValue());
       }
+    }
+
+    @Test
+    void partialAmendUpdatesGraciasScore() throws UnexpectedNoAccessRightException {
+      Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+      testabilitySettings.timeTravelTo(dayTwo);
+
+      LearningSession session = commissionAndRecordSpanishNotebook(dayTwo);
 
       Timestamp dayTwoLater = makeMe.aTimestamp().of(1, 10).please();
       testabilitySettings.timeTravelTo(dayTwoLater);
 
       RecordLearningSessionResponse amendResponse =
-          controller.record(
-              recordRequest(
-                  notebook,
-                  """
-                  # Learning Session Report
+          controller.record(recordRequest(session.getNotebook(), GRACIAS4_REPORT), "Asia/Shanghai");
 
-                  Gracias: 4
-                  """),
-              "Asia/Shanghai");
-
-      assertThat(amendResponse.getStatus(), equalTo(LearningSessionStatus.RECORDED));
-      assertThat(amendResponse.getRecordedItems(), hasSize(1));
       assertThat(amendResponse.getRecordedItems().getFirst().getNoteTitle(), equalTo("Gracias"));
       assertThat(amendResponse.getRecordedItems().getFirst().getScore(), equalTo(4));
 
-      SessionItem holaItem =
-          sessionItemRepository.findByLearningSession_Id(session.getId()).stream()
-              .filter(item -> item.getNoteTitle().equals("Hola"))
-              .findFirst()
-              .orElseThrow();
-      SessionItem graciasItem =
-          sessionItemRepository.findByLearningSession_Id(session.getId()).stream()
-              .filter(item -> item.getNoteTitle().equals("Gracias"))
-              .findFirst()
-              .orElseThrow();
+      assertThat(sessionItemFor(session.getId(), "Gracias").getFeedbackScore(), equalTo(4));
+    }
 
-      assertThat(holaItem.getFeedbackScore(), equalTo(4));
-      assertThat(graciasItem.getFeedbackScore(), equalTo(4));
-      assertThat(holaItem.getMemoryTracker().getRecallCount(), equalTo(1));
-      assertThat(graciasItem.getMemoryTracker().getRecallCount(), equalTo(1));
+    @Test
+    void amendUpdatesLatestTutorFeedbackScore() throws UnexpectedNoAccessRightException {
+      Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+      testabilitySettings.timeTravelTo(dayTwo);
 
-      Note graciasNote = graciasItem.getMemoryTracker().getNote();
+      LearningSession session = commissionAndRecordSpanishNotebook(dayTwo);
+      controller.record(recordRequest(session.getNotebook(), GRACIAS4_REPORT), "Asia/Shanghai");
+
+      Note graciasNote = trackerForNote(session.getNotebook(), "Gracias").getNote();
       NoteRecallInfo noteInfo = noteController.getNoteInfo(graciasNote);
       MemoryTracker commissioned =
           noteInfo.getMemoryTrackers().stream()
@@ -416,20 +408,12 @@ class LearningSessionControllerTests extends LearningSessionControllerTestBase {
       Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
       testabilitySettings.timeTravelTo(dayTwo);
 
-      Notebook notebook = spanishNotebook(dayTwo);
-      controller.commission(commissionRequest(notebook), "Asia/Shanghai");
-      controller.record(recordRequest(notebook, HOLA4_GRACIAS1_REPORT), "Asia/Shanghai");
-
-      LearningSession session =
-          learningSessionRepository
-              .findByUser_IdAndNotebook_IdAndStatus(
-                  currentUser.getUser().getId(), notebook.getId(), LearningSessionStatus.RECORDED)
-              .getFirst();
+      LearningSession session = commissionAndRecordSpanishNotebook(dayTwo);
 
       RecordLearningSessionResponse amendResponse =
           controller.record(
               recordRequest(
-                  notebook,
+                  session.getNotebook(),
                   """
                   # Learning Session Report
 
@@ -437,24 +421,11 @@ class LearningSessionControllerTests extends LearningSessionControllerTestBase {
                   """),
               "Asia/Shanghai");
 
-      assertThat(amendResponse.getStatus(), equalTo(LearningSessionStatus.RECORDED));
-      assertThat(amendResponse.getRecordedItems(), hasSize(1));
       assertThat(amendResponse.getRecordedItems().getFirst().getNoteTitle(), equalTo("Hola"));
       assertThat(amendResponse.getRecordedItems().getFirst().getScore(), equalTo(5));
 
-      SessionItem holaItem =
-          sessionItemRepository.findByLearningSession_Id(session.getId()).stream()
-              .filter(item -> item.getNoteTitle().equals("Hola"))
-              .findFirst()
-              .orElseThrow();
-      SessionItem graciasItem =
-          sessionItemRepository.findByLearningSession_Id(session.getId()).stream()
-              .filter(item -> item.getNoteTitle().equals("Gracias"))
-              .findFirst()
-              .orElseThrow();
-
-      assertThat(holaItem.getFeedbackScore(), equalTo(5));
-      assertThat(graciasItem.getFeedbackScore(), equalTo(1));
+      assertThat(sessionItemFor(session.getId(), "Hola").getFeedbackScore(), equalTo(5));
+      assertThat(sessionItemFor(session.getId(), "Gracias").getFeedbackScore(), equalTo(1));
     }
 
     @Test
@@ -462,21 +433,13 @@ class LearningSessionControllerTests extends LearningSessionControllerTestBase {
       Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
       testabilitySettings.timeTravelTo(dayTwo);
 
-      Notebook notebook = spanishNotebook(dayTwo);
-      controller.commission(commissionRequest(notebook), "Asia/Shanghai");
-      controller.record(recordRequest(notebook, HOLA4_GRACIAS1_REPORT), "Asia/Shanghai");
-
-      LearningSession session =
-          learningSessionRepository
-              .findByUser_IdAndNotebook_IdAndStatus(
-                  currentUser.getUser().getId(), notebook.getId(), LearningSessionStatus.RECORDED)
-              .getFirst();
+      LearningSession session = commissionAndRecordSpanishNotebook(dayTwo);
       Timestamp originalRecordedAt = session.getRecordedAt();
 
       RecordLearningSessionResponse amendResponse =
           controller.record(
               recordRequest(
-                  notebook,
+                  session.getNotebook(),
                   """
                   # Learning Session Report
 
@@ -484,24 +447,11 @@ class LearningSessionControllerTests extends LearningSessionControllerTestBase {
                   """),
               "Asia/Shanghai");
 
-      assertThat(amendResponse.getStatus(), equalTo(LearningSessionStatus.RECORDED));
       assertThat(amendResponse.getRecordedAt(), equalTo(originalRecordedAt));
-      assertThat(amendResponse.getRecordedItems(), empty());
       assertThat(amendResponse.getRejectedEntries(), hasSize(1));
 
-      SessionItem holaItem =
-          sessionItemRepository.findByLearningSession_Id(session.getId()).stream()
-              .filter(item -> item.getNoteTitle().equals("Hola"))
-              .findFirst()
-              .orElseThrow();
-      SessionItem graciasItem =
-          sessionItemRepository.findByLearningSession_Id(session.getId()).stream()
-              .filter(item -> item.getNoteTitle().equals("Gracias"))
-              .findFirst()
-              .orElseThrow();
-
-      assertThat(holaItem.getFeedbackScore(), equalTo(4));
-      assertThat(graciasItem.getFeedbackScore(), equalTo(1));
+      assertThat(sessionItemFor(session.getId(), "Hola").getFeedbackScore(), equalTo(4));
+      assertThat(sessionItemFor(session.getId(), "Gracias").getFeedbackScore(), equalTo(1));
     }
 
     @Test
@@ -521,12 +471,7 @@ class LearningSessionControllerTests extends LearningSessionControllerTestBase {
               .getFirst();
       Integer recordedSessionId = recordedSession.getId();
 
-      SessionItem recordedGraciasBefore =
-          sessionItemRepository.findByLearningSession_Id(recordedSessionId).stream()
-              .filter(item -> item.getNoteTitle().equals("Gracias"))
-              .findFirst()
-              .orElseThrow();
-      assertThat(recordedGraciasBefore.getFeedbackScore(), equalTo(1));
+      assertThat(sessionItemFor(recordedSessionId, "Gracias").getFeedbackScore(), equalTo(1));
 
       Timestamp dayTwoLater = makeMe.aTimestamp().of(1, 10).please();
       testabilitySettings.timeTravelTo(dayTwoLater);
@@ -559,20 +504,13 @@ class LearningSessionControllerTests extends LearningSessionControllerTestBase {
                   """),
               "Asia/Shanghai");
 
-      assertThat(response.getStatus(), equalTo(LearningSessionStatus.RECORDED));
-      assertThat(response.getRecordedItems(), hasSize(1));
       assertThat(response.getRecordedItems().getFirst().getNoteTitle(), equalTo("Gracias"));
 
       LearningSession awaitingAfter =
           learningSessionRepository.findById(awaitingSession.getId()).orElseThrow();
       assertThat(awaitingAfter.getStatus(), equalTo(LearningSessionStatus.RECORDED));
 
-      SessionItem recordedGraciasAfter =
-          sessionItemRepository.findByLearningSession_Id(recordedSessionId).stream()
-              .filter(item -> item.getNoteTitle().equals("Gracias"))
-              .findFirst()
-              .orElseThrow();
-      assertThat(recordedGraciasAfter.getFeedbackScore(), equalTo(1));
+      assertThat(sessionItemFor(recordedSessionId, "Gracias").getFeedbackScore(), equalTo(1));
     }
 
     @Test
@@ -593,11 +531,7 @@ class LearningSessionControllerTests extends LearningSessionControllerTestBase {
       LearningSession recordedSession = recordedLearningSession(notebook, dayTwo);
       addRecordedFeedback(recordedSession, holaTracker, 4, dayTwo);
 
-      SessionItem legacyItem =
-          sessionItemRepository.findByLearningSession_Id(recordedSession.getId()).stream()
-              .filter(item -> item.getNoteTitle().equals("Hola"))
-              .findFirst()
-              .orElseThrow();
+      SessionItem legacyItem = sessionItemFor(recordedSession.getId(), "Hola");
       assertThat(legacyItem.getPreSessionRecallCount(), nullValue());
 
       RecordLearningSessionResponse amendResponse =
@@ -612,8 +546,6 @@ class LearningSessionControllerTests extends LearningSessionControllerTestBase {
                   recordedSession.getId()),
               "Asia/Shanghai");
 
-      assertThat(amendResponse.getStatus(), equalTo(LearningSessionStatus.RECORDED));
-      assertThat(amendResponse.getRecordedItems(), empty());
       assertThat(amendResponse.getRejectedEntries(), hasSize(1));
       assertThat(
           amendResponse.getRejectedEntries().getFirst().getReason(),
@@ -670,8 +602,6 @@ class LearningSessionControllerTests extends LearningSessionControllerTestBase {
                   recordedSessionId),
               "Asia/Shanghai");
 
-      assertThat(amendResponse.getStatus(), equalTo(LearningSessionStatus.RECORDED));
-      assertThat(amendResponse.getRecordedItems(), hasSize(1));
       assertThat(amendResponse.getRecordedItems().getFirst().getNoteTitle(), equalTo("Gracias"));
       assertThat(amendResponse.getRecordedItems().getFirst().getScore(), equalTo(4));
 
@@ -683,12 +613,7 @@ class LearningSessionControllerTests extends LearningSessionControllerTestBase {
         assertThat(item.getFeedbackScore(), nullValue());
       }
 
-      SessionItem recordedGraciasAfter =
-          sessionItemRepository.findByLearningSession_Id(recordedSessionId).stream()
-              .filter(item -> item.getNoteTitle().equals("Gracias"))
-              .findFirst()
-              .orElseThrow();
-      assertThat(recordedGraciasAfter.getFeedbackScore(), equalTo(4));
+      assertThat(sessionItemFor(recordedSessionId, "Gracias").getFeedbackScore(), equalTo(4));
     }
 
     @Test
@@ -712,19 +637,28 @@ class LearningSessionControllerTests extends LearningSessionControllerTestBase {
       MemoryTracker holaTracker = trackerForNote(notebook, "Hola");
       Timestamp scheduleAfterScoreFive = holaTracker.getNextRecallAt();
 
-      RecordLearningSessionResponse amendResponse =
-          controller.record(
-              recordRequest(
-                  notebook,
-                  """
-                  # Learning Session Report
+      controller.record(
+          recordRequest(
+              notebook,
+              """
+              # Learning Session Report
 
-                  Hola: 1
-                  """),
-              "Asia/Shanghai");
+              Hola: 1
+              """),
+          "Asia/Shanghai");
 
-      assertThat(amendResponse.getRecordedItems(), hasSize(1));
       assertThat(holaTracker.getNextRecallAt(), lessThan(scheduleAfterScoreFive));
+    }
+
+    private LearningSession commissionAndRecordSpanishNotebook(Timestamp dueAt)
+        throws UnexpectedNoAccessRightException {
+      Notebook notebook = spanishNotebook(dueAt);
+      controller.commission(commissionRequest(notebook), "Asia/Shanghai");
+      controller.record(recordRequest(notebook, HOLA4_GRACIAS1_REPORT), "Asia/Shanghai");
+      return learningSessionRepository
+          .findByUser_IdAndNotebook_IdAndStatus(
+              currentUser.getUser().getId(), notebook.getId(), LearningSessionStatus.RECORDED)
+          .getFirst();
     }
 
     private Notebook spanishNotebook(Timestamp dueAt) {
@@ -748,9 +682,12 @@ class LearningSessionControllerTests extends LearningSessionControllerTestBase {
               .findByUser_IdAndNotebook_IdAndStatus(
                   currentUser.getUser().getId(), notebook.getId(), LearningSessionStatus.RECORDED)
               .getFirst();
-      return sessionItemRepository.findByLearningSession_Id(session.getId()).stream()
+      return sessionItemFor(session.getId(), title).getMemoryTracker();
+    }
+
+    private SessionItem sessionItemFor(int sessionId, String title) {
+      return sessionItemRepository.findByLearningSession_Id(sessionId).stream()
           .filter(item -> item.getNoteTitle().equals(title))
-          .map(SessionItem::getMemoryTracker)
           .findFirst()
           .orElseThrow();
     }

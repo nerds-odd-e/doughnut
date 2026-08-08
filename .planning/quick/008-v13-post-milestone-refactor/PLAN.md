@@ -1,6 +1,6 @@
 # v1.3 post-milestone refactor
 
-**Status:** in-progress (Phase 1 done)
+**Status:** in-progress (Phases 1–2 done)
 
 **Type:** ad-hoc quick plan (Structure only)
 
@@ -68,7 +68,7 @@ backend+frontend production edit in one phase without Jidoka).
 **Verify:** focused `LearningSessionControllerTests` + `LearningSessionReportParserTest`.
 
 ### Phase 2 — Trim overlapping CLS unit tests (unit-testing.mdc)
-**Type:** Structure | **Status:** planned | **Subsystem:** backend (tests)
+**Type:** Structure | **Status:** done | **Subsystem:** backend (tests)
 
 - Shrink `CommissionedLearningSessionFeedbackPolicyTest` to pure `applyScore`
   (prefer parameterized 0–5); drop SpringBoot scheduling / snapshot cases
