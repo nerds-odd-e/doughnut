@@ -22,7 +22,8 @@ extracted record targeting and feedback scheduling, `LearningSessionStrip`) — 
 observable behavior change.
 
 **Post-v1.3 polish (2026-08-08):** Request brief (tutor instructions, XML
-sections, notebook QGI, report example); recall-bar session-actions icon with
-badge (potential + awaiting). E2E `commissioned_learning_session.feature` green.
+sections, notebook QGI, report example); learning session hub (always-visible
+bar icon, list modal → detail for commission/record/amend); tagged report scores
+`<session_item_scores>`. E2E `commissioned_learning_session.feature` green.
 
 ---

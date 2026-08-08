@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: none
 milestone_name: none
-status: Quick plan in progress
-last_updated: "2026-08-08T15:30:00.000Z"
+status: Awaiting next milestone
+last_updated: "2026-08-08T15:50:00.000Z"
 last_activity: 2026-08-08
-last_activity_desc: Wrote quick plan 009 learning session hub + report tag
+last_activity_desc: Quick plan 009 hub + report tag complete; planning cleaned up
 ---
 
 # Project State
@@ -15,19 +15,13 @@ last_activity_desc: Wrote quick plan 009 learning session hub + report tag
 See: `.planning/PROJECT.md`
 
 **Core value:** Healthy mainline for learning and knowledge work
-**Current focus:** Quick plan 009 — learning session hub + tagged report
+**Current focus:** Planning next milestone (`/gsd-new-milestone`)
 
 ## Current Position
 
 Milestone **v1.3 Commissioned Learning Session MVP** shipped 2026-08-08.
-
-**Active plan:** `.planning/quick/009-learning-session-hub-and-report-tag/PLAN.md`
-
-| Phase | Type | Status | Outcome |
-|-------|------|--------|---------|
-| 1 | Behavior | done | Parse `<session_item_scores>` in reports |
-| 2 | Behavior | done | Always-visible hub icon + full session list |
-| 3 | Behavior | planned | List step before session detail |
+Post-v1.3 CLS polish (request brief, session hub, tagged reports) shipped same
+day — record in product code and Proposed ADR 0005.
 
 ## Deferred Items
 
@@ -41,4 +35,4 @@ Milestone **v1.3 Commissioned Learning Session MVP** shipped 2026-08-08.
 
 ## Operator Next Steps
 
-- **execute-plan** on `.planning/quick/009-learning-session-hub-and-report-tag/PLAN.md`
+- `/gsd-new-milestone` — start next milestone (requirements + roadmap)

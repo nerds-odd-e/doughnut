@@ -12,7 +12,7 @@ Healthy mainline for learning and knowledge work. Approved [ADR 0002](../docs/ad
 
 **Shipped v1.3 (2026-08-08):** Commissioned learning session MVP — assimilate as commissioned, potential sessions on recall progress bar, commission → ADR 0005 Request markdown, record/amend Report with ADR 0003 scheduling (`e2e_test/features/learning_session/commissioned_learning_session.feature`).
 
-**Post-v1.3 polish (2026-08-08):** Richer Learning Session Request (tutor role, notebook QGI, XML sections, title list, report example); session-actions icon with badge on recall progress bar.
+**Post-v1.3 polish (2026-08-08):** Richer Learning Session Request (tutor role, notebook QGI, XML sections, title list, report example); learning session hub on recall bar (always-visible icon, list → detail for commission/record/amend); `<session_item_scores>` report parsing (ADR 0005).
 
 **Shipped v1.2 (2026-08-06):** Accidental-match resolve dialog UX; distinct `overlaps` frontmatter; reviewed note stays primary.
 
