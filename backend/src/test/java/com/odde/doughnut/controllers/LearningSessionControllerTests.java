@@ -505,6 +505,77 @@ class LearningSessionControllerTests extends LearningSessionControllerTestBase {
     }
 
     @Test
+    void recordWithoutLearningSessionIdPrefersAwaitingOverRecordedAmend()
+        throws UnexpectedNoAccessRightException {
+      Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+      testabilitySettings.timeTravelTo(dayTwo);
+
+      Notebook notebook = spanishNotebook(dayTwo);
+      controller.commission(commissionRequest(notebook), "Asia/Shanghai");
+      controller.record(recordRequest(notebook, HOLA4_GRACIAS1_REPORT), "Asia/Shanghai");
+
+      LearningSession recordedSession =
+          learningSessionRepository
+              .findByUser_IdAndNotebook_IdAndStatus(
+                  currentUser.getUser().getId(), notebook.getId(), LearningSessionStatus.RECORDED)
+              .getFirst();
+      Integer recordedSessionId = recordedSession.getId();
+
+      SessionItem recordedGraciasBefore =
+          sessionItemRepository.findByLearningSession_Id(recordedSessionId).stream()
+              .filter(item -> item.getNoteTitle().equals("Gracias"))
+              .findFirst()
+              .orElseThrow();
+      assertThat(recordedGraciasBefore.getFeedbackScore(), equalTo(1));
+
+      Timestamp dayTwoLater = makeMe.aTimestamp().of(1, 10).please();
+      testabilitySettings.timeTravelTo(dayTwoLater);
+
+      LearningSession awaitingSession =
+          makeMe
+              .aLearningSession()
+              .forNotebook(notebook)
+              .by(currentUser.getUser())
+              .status(LearningSessionStatus.AWAITING_REPORT)
+              .commissionedAt(dayTwoLater)
+              .please();
+      for (SessionItem recordedItem :
+          sessionItemRepository.findByLearningSession_Id(recordedSessionId)) {
+        makeMe
+            .aSessionItem()
+            .learningSession(awaitingSession)
+            .memoryTracker(recordedItem.getMemoryTracker())
+            .please();
+      }
+
+      RecordLearningSessionResponse response =
+          controller.record(
+              recordRequest(
+                  notebook,
+                  """
+                  # Learning Session Report
+
+                  Gracias: 4
+                  """),
+              "Asia/Shanghai");
+
+      assertThat(response.getStatus(), equalTo(LearningSessionStatus.RECORDED));
+      assertThat(response.getRecordedItems(), hasSize(1));
+      assertThat(response.getRecordedItems().getFirst().getNoteTitle(), equalTo("Gracias"));
+
+      LearningSession awaitingAfter =
+          learningSessionRepository.findById(awaitingSession.getId()).orElseThrow();
+      assertThat(awaitingAfter.getStatus(), equalTo(LearningSessionStatus.RECORDED));
+
+      SessionItem recordedGraciasAfter =
+          sessionItemRepository.findByLearningSession_Id(recordedSessionId).stream()
+              .filter(item -> item.getNoteTitle().equals("Gracias"))
+              .findFirst()
+              .orElseThrow();
+      assertThat(recordedGraciasAfter.getFeedbackScore(), equalTo(1));
+    }
+
+    @Test
     void amendRejectsWhenPreSessionSnapshotMissing() throws UnexpectedNoAccessRightException {
       Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
       testabilitySettings.timeTravelTo(dayTwo);
