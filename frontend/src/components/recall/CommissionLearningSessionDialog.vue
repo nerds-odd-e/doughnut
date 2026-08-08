@@ -56,6 +56,20 @@
                 class="daisy-textarea w-full h-48 bg-base-100 font-mono text-xs mt-2"
                 data-test="learning-session-report"
               />
+              <div
+                v-if="rejectedEntries.length > 0"
+                class="daisy-alert daisy-alert-warning mt-4"
+                data-test="learning-session-report-rejections"
+              >
+                <div class="flex flex-col gap-1">
+                  <span
+                    v-for="(entry, index) in rejectedEntries"
+                    :key="index"
+                  >
+                    {{ entry.line }} — {{ entry.reason }}
+                  </span>
+                </div>
+              </div>
               <button
                 type="button"
                 class="daisy-btn daisy-btn-primary mt-4"
@@ -75,7 +89,10 @@
 <script setup lang="ts">
 import { ref, watch } from "vue"
 import { LearningSessionController } from "@generated/doughnut-backend-api/sdk.gen"
-import type { LearningSessionCommissionResponse } from "@generated/doughnut-backend-api/types.gen"
+import type {
+  LearningSessionCommissionResponse,
+  RejectedLearningSessionReportEntry,
+} from "@generated/doughnut-backend-api/types.gen"
 import Modal from "@/components/commons/Modal.vue"
 import CopyButton from "@/components/commons/CopyButton.vue"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
@@ -97,6 +114,7 @@ const emit = defineEmits<{
 const commissioned = ref(props.mode === "record")
 const requestMarkdown = ref(props.initialRequestMarkdown ?? "")
 const reportMarkdown = ref("")
+const rejectedEntries = ref<RejectedLearningSessionReportEntry[]>([])
 const status = ref<LearningSessionCommissionResponse["status"] | "">(
   props.mode === "record" ? "AWAITING_REPORT" : ""
 )
@@ -147,6 +165,8 @@ const recordReport = async () => {
   if (error || !data) {
     return
   }
+
+  rejectedEntries.value = data.rejectedEntries ?? []
 
   if (data.status === "RECORDED") {
     status.value = "RECORDED"

@@ -126,6 +126,7 @@ Every whole-UI blocker and long-running note-refinement AI request must be class
 | Relationship finalize | `Creating relationship note...` | `AddRelationshipFinalize.vue` | `runWithBlockingApiLoading` | Mutation |
 | Attach book upload | `Uploading book…` | `NotebookAttachedBookSection.vue` | `runWithBlockingApiLoading` | Mutation |
 | Commission learning session | `Commissioning learning session…` | `CommissionLearningSessionDialog.vue` | `{ blockUi: true }` | Mutation |
+| Record learning session report | `Recording learning session report…` | `CommissionLearningSessionDialog.vue` | `{ blockUi: true }` | Mutation |
 
 **Nonblocking** (out of Cancel UX — thin-bar or direct SDK; no whole-UI modal):
 

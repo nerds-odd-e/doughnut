@@ -4320,6 +4320,9 @@ components:
           type: string
         recalledNote:
           $ref: "#/components/schemas/RecalledNote"
+        latestTutorFeedbackScore:
+          type: integer
+          format: int32
         spelling:
           type: boolean
       required:

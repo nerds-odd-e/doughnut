@@ -1,7 +1,9 @@
 package com.odde.doughnut.services;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,11 @@ public class LearningSessionReportParser {
   public record ParseResult(List<ParsedReportEntry> entries, List<RejectedReportEntry> rejected) {}
 
   public ParseResult parse(String reportMarkdown) {
+    return parse(reportMarkdown, Set.of(), Set.of());
+  }
+
+  public ParseResult parse(
+      String reportMarkdown, Set<String> sessionItemTitles, Set<String> ambiguousTitles) {
     List<ParsedReportEntry> entries = new ArrayList<>();
     List<RejectedReportEntry> rejected = new ArrayList<>();
 
@@ -47,9 +54,30 @@ public class LearningSessionReportParser {
         continue;
       }
 
+      if (ambiguousTitles.contains(title)) {
+        rejected.add(new RejectedReportEntry(line, "Ambiguous note title in notebook."));
+        continue;
+      }
+
+      if (!sessionItemTitles.isEmpty() && !sessionItemTitles.contains(title)) {
+        rejected.add(new RejectedReportEntry(line, "No session item matched this note title."));
+        continue;
+      }
+
       entries.add(new ParsedReportEntry(title, score));
     }
 
     return new ParseResult(entries, rejected);
+  }
+
+  public static Set<String> ambiguousTitles(Iterable<String> titles) {
+    Set<String> seen = new HashSet<>();
+    Set<String> ambiguous = new HashSet<>();
+    for (String title : titles) {
+      if (!seen.add(title)) {
+        ambiguous.add(title);
+      }
+    }
+    return ambiguous;
   }
 }

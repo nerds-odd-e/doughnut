@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.SessionItemRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
@@ -35,6 +36,7 @@ class NoteController {
   private final FocusContextRetrievalService focusContextRetrievalService;
   private final FocusContextMarkdownRenderer focusContextMarkdownRenderer;
   private final NoteRealmService noteRealmService;
+  private final SessionItemRepository sessionItemRepository;
 
   public NoteController(
       EntityPersister entityPersister,
@@ -43,7 +45,8 @@ class NoteController {
       UserService userService,
       FocusContextRetrievalService focusContextRetrievalService,
       FocusContextMarkdownRenderer focusContextMarkdownRenderer,
-      NoteRealmService noteRealmService) {
+      NoteRealmService noteRealmService,
+      SessionItemRepository sessionItemRepository) {
     this.entityPersister = entityPersister;
     this.noteService = noteService;
     this.authorizationService = authorizationService;
@@ -51,6 +54,7 @@ class NoteController {
     this.focusContextRetrievalService = focusContextRetrievalService;
     this.focusContextMarkdownRenderer = focusContextMarkdownRenderer;
     this.noteRealmService = noteRealmService;
+    this.sessionItemRepository = sessionItemRepository;
   }
 
   @GetMapping("/{note}")
@@ -77,8 +81,16 @@ class NoteController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(note);
     NoteRecallInfo noteRecallInfo = new NoteRecallInfo();
-    noteRecallInfo.setMemoryTrackers(
-        userService.getMemoryTrackersFor(authorizationService.getCurrentUser(), note));
+    List<MemoryTracker> memoryTrackers =
+        userService.getMemoryTrackersFor(authorizationService.getCurrentUser(), note);
+    for (MemoryTracker tracker : memoryTrackers) {
+      if (tracker.isCommissioned()) {
+        sessionItemRepository
+            .findLatestFeedbackScoreByMemoryTrackerId(tracker.getId())
+            .ifPresent(tracker::setLatestTutorFeedbackScore);
+      }
+    }
+    noteRecallInfo.setMemoryTrackers(memoryTrackers);
     noteRecallInfo.setRecallSetting(note.getRecallSetting());
     return noteRecallInfo;
   }

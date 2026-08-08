@@ -80,6 +80,28 @@ describe("NoteInfoMemoryTracker", () => {
     expect(wrapper.text()).toContain("Commissioned")
   })
 
+  it("shows tutor feedback score for commissioned tracker", () => {
+    const memoryTracker = makeMe.aMemoryTracker
+      .removedFromTracking(false)
+      .commissioned()
+      .latestTutorFeedbackScore(5)
+      .please()
+
+    wrapper = helper
+      .component(NoteInfoMemoryTracker)
+      .withProps({
+        modelValue: memoryTracker,
+      })
+      .mount({ attachTo: document.body })
+
+    expect(wrapper.find('[data-test="tutor-feedback-score-5"]').exists()).toBe(
+      true
+    )
+    expect(wrapper.text()).toContain(
+      "tutor feedback score 5 from a learning session"
+    )
+  })
+
   it("should apply strikethrough styling to skipped memory trackers", () => {
     const memoryTracker = makeMe.aMemoryTracker
       .removedFromTracking(true)

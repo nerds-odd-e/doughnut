@@ -14,6 +14,8 @@ import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -84,7 +86,13 @@ public class LearningSessionService {
     LearningSession session = awaitingSessions.getFirst();
     List<SessionItem> sessionItems =
         sessionItemRepository.findByLearningSession_Id(session.getId());
-    ParseResult parseResult = learningSessionReportParser.parse(reportMarkdown);
+    Set<String> sessionItemTitles =
+        sessionItems.stream().map(SessionItem::getNoteTitle).collect(Collectors.toSet());
+    Set<String> ambiguousTitles =
+        LearningSessionReportParser.ambiguousTitles(
+            sessionItems.stream().map(SessionItem::getNoteTitle).toList());
+    ParseResult parseResult =
+        learningSessionReportParser.parse(reportMarkdown, sessionItemTitles, ambiguousTitles);
 
     RecordLearningSessionResponse response = new RecordLearningSessionResponse();
     response.setStatus(session.getStatus());

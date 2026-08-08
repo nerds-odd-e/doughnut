@@ -613,6 +613,7 @@ export type MemoryTracker = {
     type?: 'UNDERSTANDING' | 'SPELLING' | 'COMMISSIONED';
     propertyKey?: string;
     recalledNote?: RecalledNote;
+    latestTutorFeedbackScore?: number;
     spelling?: boolean;
 };
 
@@ -1227,6 +1228,7 @@ export type MemoryTrackerWritable = {
     type?: 'UNDERSTANDING' | 'SPELLING' | 'COMMISSIONED';
     propertyKey?: string;
     recalledNote?: RecalledNote;
+    latestTutorFeedbackScore?: number;
     spelling?: boolean;
 };
 

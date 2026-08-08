@@ -14,6 +14,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import lombok.Getter;
@@ -149,6 +150,12 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   private Timestamp deletedAt;
+
+  @JsonProperty("latestTutorFeedbackScore")
+  @Transient
+  @Getter
+  @Setter
+  private Integer latestTutorFeedbackScore;
 
   private MemoryTracker() {}
 

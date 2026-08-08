@@ -74,6 +74,11 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
     return this
   }
 
+  latestTutorFeedbackScore(score: number): MemoryTrackerBuilder {
+    this.data.latestTutorFeedbackScore = score
+    return this
+  }
+
   ofNote(note: NoteRealm): MemoryTrackerBuilder {
     this.data.note = note.note
     this.notebookId = note.notebookRealm.notebook.id

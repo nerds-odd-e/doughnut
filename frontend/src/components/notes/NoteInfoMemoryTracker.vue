@@ -1,7 +1,14 @@
 <template>
   <tr>
     <td :class="{ 'strikethrough': isSkipped }">
-      {{ trackerTypeLabel }}
+      <div>{{ trackerTypeLabel }}</div>
+      <div
+        v-if="tutorFeedbackScore !== undefined"
+        :data-test="`tutor-feedback-score-${tutorFeedbackScore}`"
+        class="text-sm mt-1"
+      >
+        tutor feedback score {{ tutorFeedbackScore }} from a learning session
+      </div>
     </td>
     <td :class="{ 'strikethrough': isSkipped }">
       <span class="statistics-value">{{ localMemoryTracker.recallCount }}</span>
@@ -44,6 +51,14 @@ const trackerTypeLabel = computed(() => {
     return `property: ${propertyKey}`
   }
   return spelling ? "spelling" : "normal"
+})
+
+const tutorFeedbackScore = computed(() => {
+  const { type, latestTutorFeedbackScore } = localMemoryTracker.value
+  if (type !== "COMMISSIONED" || latestTutorFeedbackScore == null) {
+    return undefined
+  }
+  return latestTutorFeedbackScore
 })
 
 watch(

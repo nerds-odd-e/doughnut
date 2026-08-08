@@ -290,6 +290,37 @@ class LearningSessionControllerTests extends LearningSessionControllerTestBase {
     }
 
     @Test
+    void allLinesRejectedStaysAwaitingReport() throws UnexpectedNoAccessRightException {
+      Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
+      testabilitySettings.timeTravelTo(dayTwo);
+
+      Notebook notebook = spanishNotebook(dayTwo);
+      controller.commission(commissionRequest(notebook), "Asia/Shanghai");
+
+      RecordLearningSessionResponse response =
+          controller.record(
+              recordRequest(
+                  notebook,
+                  """
+                  # Learning Session Report
+
+                  UnknownNote: 3
+                  Hola: six
+                  """),
+              "Asia/Shanghai");
+
+      assertThat(response.getStatus(), equalTo(LearningSessionStatus.AWAITING_REPORT));
+      assertThat(response.getRecordedItems(), empty());
+      assertThat(response.getRejectedEntries(), hasSize(2));
+      assertThat(
+          learningSessionRepository.findByUser_IdAndNotebook_IdAndStatus(
+              currentUser.getUser().getId(),
+              notebook.getId(),
+              LearningSessionStatus.AWAITING_REPORT),
+          hasSize(1));
+    }
+
+    @Test
     void notFoundWhenNoAwaitingSession() {
       Notebook notebook =
           makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).name("Lonely").please();
