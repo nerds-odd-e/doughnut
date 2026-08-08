@@ -21,7 +21,7 @@ export type FolderOrganizeForm = {
 }
 
 /**
- * Page object for folder move / rename / dissolve on the folder page (`data-testid="folder-move-dialog"`).
+ * Page object for folder move / dissolve on the folder page (`data-testid="folder-move-dialog"`).
  */
 export function assumeFolderOrganizeForm(): FolderOrganizeForm {
   return {

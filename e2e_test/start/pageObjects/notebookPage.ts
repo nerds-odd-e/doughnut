@@ -158,11 +158,11 @@ const notebookPage = () => {
       return this
     },
     rename(newName: string) {
-      cy.get('[data-testid="notebook-page-name-edit"]').click()
-      cy.get('[data-test="notebook-page-name-input"]').click()
-      cy.clearFocusedText().type(newName)
-      cy.get('[data-testid="notebook-page-name-update"]').click()
-      cy.findByRole('button', { name: 'OK' }).click()
+      cy.get('[data-test="notebook-page-name"]')
+        .should('be.visible')
+        .clear()
+        .type(newName, { delay: 0 })
+        .blur()
       waitUntilAppIsNotBusy()
       return this
     },

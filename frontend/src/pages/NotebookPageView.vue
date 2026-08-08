@@ -7,12 +7,19 @@
       >
         Notebook
       </p>
-      <NotebookPageNameEditor
-        :notebook-id="notebook.id"
+      <AutosavingPageNameEditor
         :name="notebook.name ?? ''"
-        :settings-body="formData"
-        @notebook-updated="(n) => emit('notebook-updated', n)"
+        editor-data-test="notebook-page-name"
+        empty-error-message="Notebook name cannot be empty"
+        save-error-message="Failed to rename notebook"
+        :persist-name="persistNotebookName"
       />
+      <p
+        class="text-sm text-base-content/80 m-0"
+        data-testid="notebook-page-name-rename-warning"
+      >
+        {{ notebookRenameWikiLinkWarning }}
+      </p>
     </div>
 
     <ReadmeSettingsTabs
@@ -49,21 +56,19 @@
 import type { PropType } from "vue"
 import { ref, watch } from "vue"
 import type { Notebook, User } from "@generated/doughnut-backend-api"
+import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import NotebookHealthPanel from "@/components/notebook/NotebookHealthPanel.vue"
-import NotebookPageNameEditor from "@/components/notebook/NotebookPageNameEditor.vue"
+import AutosavingPageNameEditor from "@/components/commons/AutosavingPageNameEditor.vue"
 import NotebookSettings from "@/components/notebook/NotebookSettings.vue"
 import ScopedReadmeEditor from "@/components/notebook/ScopedReadmeEditor.vue"
 import ReadmeSettingsTabs, {
   type ReadmeSettingsTab,
 } from "@/components/commons/ReadmeSettingsTabs.vue"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const props = defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },
   user: { type: Object as PropType<User>, required: false },
-  fetchNotebookPage: {
-    type: Function as PropType<() => Promise<void>>,
-    required: true,
-  },
   readmeContent: {
     type: String as PropType<string | null>,
     required: false,
@@ -78,12 +83,26 @@ const emit = defineEmits<{
 
 const activeTab = ref<ReadmeSettingsTab>("readme")
 
+const notebookRenameWikiLinkWarning =
+  "If you change this notebook's name, wiki links from other notebooks to notes here may stop working."
+
 const { skipMemoryTrackingEntirely } = props.notebook.notebookSettings
 
 const formData = ref({
   skipMemoryTrackingEntirely,
   description: props.notebook.description ?? "",
 })
+
+const persistNotebookName = async (name: string) => {
+  const { data: updatedNotebook, error } = await apiCallWithLoading(() =>
+    NotebookController.updateNotebook({
+      path: { notebook: props.notebook.id },
+      body: { ...formData.value, name },
+    })
+  )
+  if (error) throw error
+  emit("notebook-updated", updatedNotebook!)
+}
 
 watch(
   () => props.notebook,

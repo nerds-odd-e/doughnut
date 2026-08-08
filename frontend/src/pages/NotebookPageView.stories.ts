@@ -28,16 +28,11 @@ type Story = StoryObj<typeof meta>
 const mockUser: User = makeMe.aUser.please()
 const mockAdminUser: User = makeMe.aUser.admin(true).please()
 
-const noopFetchNotebookPage = async () => {
-  await Promise.resolve()
-}
-
 // Default notebook settings
 export const Default: Story = {
   args: {
     notebook: makeMe.aNotebook.please(),
     user: mockUser,
-    fetchNotebookPage: noopFetchNotebookPage,
   },
 }
 
@@ -46,7 +41,6 @@ export const WithCustomSettings: Story = {
   args: {
     notebook: makeMe.aNotebook.skipMemoryTrackingEntirely(true).please(),
     user: mockUser,
-    fetchNotebookPage: noopFetchNotebookPage,
   },
 }
 
@@ -55,6 +49,5 @@ export const AdminView: Story = {
   args: {
     notebook: makeMe.aNotebook.please(),
     user: mockAdminUser,
-    fetchNotebookPage: noopFetchNotebookPage,
   },
 }

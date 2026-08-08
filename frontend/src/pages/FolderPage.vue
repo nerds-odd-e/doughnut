@@ -13,9 +13,12 @@
         >
           Folder
         </p>
-        <FolderPageNameEditor
-          :folder-realm="folderForView"
-          :fetch-folder-page="fetchFolderPage"
+        <AutosavingPageNameEditor
+          :name="folderForView.folder.name"
+          editor-data-test="folder-page-name"
+          empty-error-message="Folder name cannot be empty. Enter a name to rename this folder."
+          save-error-message="Failed to rename folder"
+          :persist-name="persistFolderName"
         />
       </div>
 
@@ -47,15 +50,18 @@
 
 <script setup lang="ts">
 import type { FolderRealm } from "@generated/doughnut-backend-api"
+import { NotebookController } from "@generated/doughnut-backend-api/sdk.gen"
 import { computed, ref } from "vue"
 import NotebookPageReadonlySummary from "@/components/notebook/NotebookPageReadonlySummary.vue"
 import FolderSettings from "@/components/folder/FolderSettings.vue"
-import FolderPageNameEditor from "@/components/folder/FolderPageNameEditor.vue"
+import AutosavingPageNameEditor from "@/components/commons/AutosavingPageNameEditor.vue"
 import ScopedReadmeEditor from "@/components/notebook/ScopedReadmeEditor.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import ReadmeSettingsTabs, {
   type ReadmeSettingsTab,
 } from "@/components/commons/ReadmeSettingsTabs.vue"
+import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const props = defineProps<{
   folderRealm: FolderRealm | undefined
@@ -69,6 +75,22 @@ const folderForView = computed((): FolderRealm | undefined => {
 })
 
 const activeTab = ref<ReadmeSettingsTab>("readme")
+
+const persistFolderName = async (name: string) => {
+  const folderRealm = folderForView.value!
+  const { error } = await apiCallWithLoading(() =>
+    NotebookController.renameFolder({
+      path: {
+        notebook: folderRealm.notebookRealm.notebook.id,
+        folder: folderRealm.folder.id,
+      },
+      body: { name },
+    })
+  )
+  if (error) throw error
+  refreshSidebarStructuralListings()
+  await props.fetchFolderPage()
+}
 
 const refreshFolderPage = () => props.fetchFolderPage()
 </script>

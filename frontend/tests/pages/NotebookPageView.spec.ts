@@ -5,7 +5,6 @@ import { describe, it, expect } from "vitest"
 import {
   aNotebook,
   mountNotebookPageView,
-  noopFetchNotebookPage,
   stubNotebookPageViewBookAbsent,
 } from "./notebookPageViewTestSupport"
 
@@ -42,7 +41,6 @@ describe("NotebookPageView.spec", () => {
       .withRouter()
       .withProps({
         notebook: nb,
-        fetchNotebookPage: noopFetchNotebookPage,
         readmeContent: "Readme canvas body",
       })
       .mount()

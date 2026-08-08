@@ -9,7 +9,6 @@
       v-else
       :notebook="notebook"
       :user="user"
-      :fetch-notebook-page="fetchNotebookPage"
       :readme-content="props.notebookRealm?.readmeContent ?? null"
       @notebook-updated="() => fetchNotebookPage()"
       @readme-content-updated="fetchNotebookPage"

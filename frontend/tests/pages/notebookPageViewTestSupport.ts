@@ -5,10 +5,6 @@ import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { wrapSdkError } from "@tests/helpers"
 import { beforeEach, vi } from "vitest"
 
-export const noopFetchNotebookPage = async (): Promise<void> => {
-  await Promise.resolve()
-}
-
 export function stubNotebookPageViewBookAbsent() {
   beforeEach(() => {
     vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
@@ -28,7 +24,6 @@ export function mountNotebookPageView(
     .withRouter()
     .withProps({
       notebook,
-      fetchNotebookPage: noopFetchNotebookPage,
       ...props,
     })
     .mount()

@@ -9,6 +9,7 @@ import usePopups from "@/components/commons/Popups/usePopups"
 import { createRouter, createWebHistory, type Router } from "vue-router"
 import routes from "@/routes/routes"
 import { vi } from "vitest"
+import { editPageName } from "./pageNameEditorTestSupport"
 
 export const folderNameConflictMessage =
   "A folder with this name already exists here."
@@ -133,11 +134,7 @@ export async function editFolderPageName(
   name: string,
   blur = true
 ) {
-  const editor = folderPageNameEditor(wrapper)
-  ;(editor.element as HTMLElement).innerText = name
-  await editor.trigger("input")
-  if (blur) await editor.trigger("blur")
-  await flushPromises()
+  await editPageName(wrapper, "folder-page-name", name, blur)
 }
 
 export async function submitMoveForm(wrapper: VueWrapper) {
