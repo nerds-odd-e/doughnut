@@ -78,8 +78,7 @@ public class LearningSessionService {
       Notebook notebook,
       String reportMarkdown,
       Integer learningSessionId,
-      Timestamp now,
-      ZoneId zoneId) {
+      Timestamp now) {
     List<LearningSession> awaitingSessions =
         learningSessionRepository.findByUser_IdAndNotebook_IdAndStatus(
             user.getId(), notebook.getId(), LearningSessionStatus.AWAITING_REPORT);
@@ -140,17 +139,7 @@ public class LearningSessionService {
           sessionItems.stream()
               .filter(item -> item.getNoteTitle().equals(entry.noteTitle()))
               .findFirst()
-              .orElse(null);
-
-      if (matched == null) {
-        response
-            .getRejectedEntries()
-            .add(
-                rejectedEntry(
-                    entry.noteTitle() + ": " + entry.score(),
-                    "No session item matched this note title."));
-        continue;
-      }
+              .orElseThrow();
 
       if (isAmend && matched.getPreSessionRecallCount() == null) {
         response

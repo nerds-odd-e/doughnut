@@ -78,14 +78,12 @@ class LearningSessionController {
             .orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notebook not found."));
     authorizationService.assertAuthorization(notebook);
-    ZoneId zoneId = TimezoneUtils.parseTimezone(timezone);
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     return learningSessionService.record(
         authorizationService.getCurrentUser(),
         notebook,
         body.reportMarkdown,
         body.learningSessionId,
-        now,
-        zoneId);
+        now);
   }
 }

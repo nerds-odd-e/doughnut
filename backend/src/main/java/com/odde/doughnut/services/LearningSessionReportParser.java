@@ -19,10 +19,6 @@ public class LearningSessionReportParser {
 
   public record ParseResult(List<ParsedReportEntry> entries, List<RejectedReportEntry> rejected) {}
 
-  public ParseResult parse(String reportMarkdown) {
-    return parse(reportMarkdown, Set.of(), Set.of());
-  }
-
   public ParseResult parse(
       String reportMarkdown, Set<String> sessionItemTitles, Set<String> ambiguousTitles) {
     List<ParsedReportEntry> entries = new ArrayList<>();
