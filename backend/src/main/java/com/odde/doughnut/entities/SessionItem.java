@@ -31,4 +31,10 @@ public class SessionItem extends EntityIdentifiedByIdOnly {
 
   @Column(name = "feedback_recorded_at")
   private Timestamp feedbackRecordedAt;
+
+  @Column(name = "pre_session_forgetting_curve_index")
+  private Float preSessionForgettingCurveIndex;
+
+  @Column(name = "pre_session_recall_count")
+  private Integer preSessionRecallCount;
 }

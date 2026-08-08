@@ -208,6 +208,11 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     setNextRecallAt(ensureNextRecallStrictlyAfterNow(now));
   }
 
+  public void restorePreSessionSnapshot(SessionItem item) {
+    setForgettingCurveIndex(item.getPreSessionForgettingCurveIndex());
+    setRecallCount(item.getPreSessionRecallCount());
+  }
+
   private Timestamp ensureNextRecallStrictlyAfterNow(Timestamp now) {
     Timestamp scheduled = calculateNextRecallAt();
     if (scheduled.after(now)) {

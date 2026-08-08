@@ -63,7 +63,7 @@
                 </span>
               </div>
             </div>
-            <template v-if="status === 'AWAITING_REPORT'">
+            <template v-if="status === 'AWAITING_REPORT' || status === 'RECORDED'">
               <p class="text-sm mt-4">Learning session report</p>
               <textarea
                 v-model="reportMarkdown"
@@ -101,7 +101,7 @@ import timezoneParam from "@/managedApi/window/timezoneParam"
 const props = defineProps<{
   notebookId: number
   notebookName: string
-  mode?: "commission" | "record"
+  mode?: "commission" | "record" | "amend"
   initialRequestMarkdown?: string
 }>()
 
@@ -111,18 +111,22 @@ const emit = defineEmits<{
   (e: "recorded"): void
 }>()
 
-const commissioned = ref(props.mode === "record")
+const commissioned = ref(props.mode === "record" || props.mode === "amend")
 const requestMarkdown = ref(props.initialRequestMarkdown ?? "")
 const reportMarkdown = ref("")
 const rejectedEntries = ref<RejectedLearningSessionReportEntry[]>([])
 const status = ref<LearningSessionCommissionResponse["status"] | "">(
-  props.mode === "record" ? "AWAITING_REPORT" : ""
+  props.mode === "record"
+    ? "AWAITING_REPORT"
+    : props.mode === "amend"
+      ? "RECORDED"
+      : ""
 )
 
 watch(
   () => props.initialRequestMarkdown,
   (markdown) => {
-    if (props.mode === "record" && markdown) {
+    if ((props.mode === "record" || props.mode === "amend") && markdown) {
       requestMarkdown.value = markdown
     }
   },

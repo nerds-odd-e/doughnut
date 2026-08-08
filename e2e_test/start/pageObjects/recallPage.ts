@@ -235,6 +235,10 @@ export const recall = () => {
     },
     expectPotentialLearningSession(count: number, notebookTitle: string) {
       this.navigateToRecallPage()
+      if (count === 0) {
+        cy.get('[data-test="potential-learning-session"]').should('not.exist')
+        return this
+      }
       const expected = `${count} potential learning session to commission for notebook "${notebookTitle}"`
       cy.contains('[data-test="potential-learning-session"]', expected).should(
         'be.visible'

@@ -38,6 +38,16 @@ public class SessionItemBuilder extends EntityBuilder<SessionItem> {
     return this;
   }
 
+  public SessionItemBuilder preSessionForgettingCurveIndex(Float index) {
+    entity.setPreSessionForgettingCurveIndex(index);
+    return this;
+  }
+
+  public SessionItemBuilder preSessionRecallCount(Integer recallCount) {
+    entity.setPreSessionRecallCount(recallCount);
+    return this;
+  }
+
   @Override
   protected void beforeCreate(boolean needPersist) {
     if (entity.getLearningSession() == null) {

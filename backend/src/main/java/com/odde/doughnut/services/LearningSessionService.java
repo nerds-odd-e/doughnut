@@ -13,6 +13,7 @@ import com.odde.doughnut.services.LearningSessionReportParser.RejectedReportEntr
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -78,12 +79,30 @@ public class LearningSessionService {
         learningSessionRepository.findByUser_IdAndNotebook_IdAndStatus(
             user.getId(), notebook.getId(), LearningSessionStatus.AWAITING_REPORT);
 
-    if (awaitingSessions.isEmpty()) {
-      throw new ResponseStatusException(
-          HttpStatus.NOT_FOUND, "No learning session awaiting report for this notebook.");
+    boolean isAmend;
+    LearningSession session;
+    if (!awaitingSessions.isEmpty()) {
+      session = awaitingSessions.getFirst();
+      isAmend = false;
+    } else {
+      List<LearningSession> recordedSessions =
+          learningSessionRepository.findByUser_IdAndNotebook_IdAndStatus(
+              user.getId(), notebook.getId(), LearningSessionStatus.RECORDED);
+      if (recordedSessions.isEmpty()) {
+        throw new ResponseStatusException(
+            HttpStatus.NOT_FOUND, "No learning session to record or amend for this notebook.");
+      }
+      session =
+          recordedSessions.stream()
+              .sorted(
+                  Comparator.comparing(
+                          LearningSession::getRecordedAt,
+                          Comparator.nullsLast(Comparator.reverseOrder()))
+                      .thenComparing(LearningSession::getId, Comparator.reverseOrder()))
+              .findFirst()
+              .orElseThrow();
+      isAmend = true;
     }
-
-    LearningSession session = awaitingSessions.getFirst();
     List<SessionItem> sessionItems =
         sessionItemRepository.findByLearningSession_Id(session.getId());
     Set<String> sessionItemTitles =
@@ -119,6 +138,14 @@ public class LearningSessionService {
       matched.setFeedbackScore(entry.score());
       matched.setFeedbackRecordedAt(now);
       MemoryTracker tracker = matched.getMemoryTracker();
+      if (isAmend) {
+        if (matched.getPreSessionRecallCount() != null) {
+          tracker.restorePreSessionSnapshot(matched);
+        }
+      } else if (matched.getPreSessionRecallCount() == null) {
+        matched.setPreSessionForgettingCurveIndex(tracker.getForgettingCurveIndex());
+        matched.setPreSessionRecallCount(tracker.getRecallCount());
+      }
       tracker.recordCommissionedFeedback(now, entry.score());
       sessionItemRepository.save(matched);
 
@@ -130,11 +157,16 @@ public class LearningSessionService {
     }
 
     if (!response.getRecordedItems().isEmpty()) {
-      session.setStatus(LearningSessionStatus.RECORDED);
+      if (!isAmend) {
+        session.setStatus(LearningSessionStatus.RECORDED);
+      }
       session.setRecordedAt(now);
       learningSessionRepository.save(session);
       response.setStatus(LearningSessionStatus.RECORDED);
       response.setRecordedAt(now);
+    } else if (isAmend) {
+      response.setStatus(LearningSessionStatus.RECORDED);
+      response.setRecordedAt(session.getRecordedAt());
     } else {
       response.setStatus(LearningSessionStatus.AWAITING_REPORT);
     }

@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.SessionItem;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,6 +56,29 @@ class CommissionedLearningSessionFeedbackPolicyTest {
   void applyScoreNeverDropsBelowInitialLevel() {
     float reduced = CommissionedLearningSessionFeedbackPolicy.applyScore(100f, 1);
     assertThat(reduced, is(DEFAULT_FORGETTING_CURVE_INDEX));
+  }
+
+  @Test
+  void amendRegradeFromSnapshotMatchesFreshScoreFourNotCompoundOnScoreOne() {
+    MemoryTracker amendedTracker = commissionedTrackerAtInitialLevel();
+    MemoryTracker freshScoreFourTracker = commissionedTrackerAtInitialLevel();
+
+    float preSessionIndex = amendedTracker.getForgettingCurveIndex();
+    int preSessionRecallCount = amendedTracker.getRecallCount();
+
+    amendedTracker.recordCommissionedFeedback(recordedAt, 1);
+
+    SessionItem snapshotFixture = new SessionItem();
+    snapshotFixture.setPreSessionForgettingCurveIndex(preSessionIndex);
+    snapshotFixture.setPreSessionRecallCount(preSessionRecallCount);
+
+    amendedTracker.restorePreSessionSnapshot(snapshotFixture);
+    amendedTracker.recordCommissionedFeedback(recordedAt, 4);
+
+    freshScoreFourTracker.recordCommissionedFeedback(recordedAt, 4);
+
+    assertThat(amendedTracker.getRecallCount(), is(1));
+    assertThat(amendedTracker.getNextRecallAt(), is(freshScoreFourTracker.getNextRecallAt()));
   }
 
   private MemoryTracker commissionedTrackerAtInitialLevel() {

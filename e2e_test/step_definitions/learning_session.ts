@@ -3,6 +3,7 @@
 // @ts-check
 
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
+import type { DataTable } from '@cucumber/cucumber'
 import { NoteController } from '@generated/doughnut-backend-api/sdk.gen'
 import start from '../start'
 
@@ -21,6 +22,21 @@ Given(
       .recall()
       .navigateToRecallPage()
       .commissionLearningSession(notebookTitle)
+  }
+)
+
+Given(
+  'I have recorded a learning session for notebook {string} on day {int} with scores:',
+  (notebookTitle: string, day: number, dataTable: DataTable) => {
+    start.testability().timeTravelTo(day, 9)
+    start.recall().visitRecallPage().commissionLearningSession(notebookTitle)
+    const lines = dataTable.hashes().map((row) => `${row.Note}: ${row.Score}`)
+    const reportMarkdown = `# Learning Session Report\n\n${lines.join('\n')}\n`
+    start
+      .recall()
+      .assumeRecallPage()
+      .recordLearningSessionReport(reportMarkdown)
+      .expectLearningSessionRecorded()
   }
 )
 
