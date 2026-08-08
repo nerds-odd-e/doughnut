@@ -213,7 +213,7 @@ Plans:
 
 **Context:** `.planning/phases/07-amend-recorded-session/`
 
-**Plans:** 2/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 
