@@ -6,13 +6,35 @@ import {
   mountSoftKeyboardPrimer,
 } from "@tests/helpers/softKeyboardPrimerTestSupport"
 import { mount } from "@vue/test-utils"
-import { afterEach, describe, expect, it } from "vitest"
+import { afterEach, beforeEach, describe, expect, it } from "vitest"
 import { defineComponent } from "vue"
 import { createMemoryHistory, createRouter } from "vue-router"
 
+function createRecallDataTestRouter() {
+  return createRouter({
+    history: createMemoryHistory(),
+    routes: [
+      { path: "/", component: { template: "<div />" } },
+      {
+        path: "/recall",
+        name: "recall",
+        component: { template: "<div />" },
+      },
+    ],
+  })
+}
+
 const ResumeHarness = defineComponent({
-  setup() {
-    const { resumeRecall } = useRecallData()
+  props: {
+    spelling: { type: Boolean, default: true },
+    treadmillMode: { type: Boolean, default: false },
+  },
+  setup(props) {
+    const { resumeRecall, setToRepeat, setCurrentIndex, setTreadmillMode } =
+      useRecallData()
+    setToRepeat([{ memoryTrackerId: 1, spelling: props.spelling }])
+    setCurrentIndex(0)
+    setTreadmillMode(props.treadmillMode)
     return { resumeRecall }
   },
   template: `<button type="button" @click="resumeRecall">Resume</button>`,
@@ -27,21 +49,40 @@ const PotentialSessionHarness = defineComponent({
   template: `<div />`,
 })
 
-function mountResumeHarness() {
-  const router = createRouter({
-    history: createMemoryHistory(),
-    routes: [
-      { path: "/", component: { template: "<div />" } },
-      {
-        path: "/recall",
-        name: "recall",
-        component: { template: "<div />" },
-      },
-    ],
-  })
+function mountResumeHarness(options?: {
+  spelling?: boolean
+  treadmillMode?: boolean
+}) {
   return mount(ResumeHarness, {
-    global: { plugins: [router] },
+    props: {
+      spelling: options?.spelling ?? true,
+      treadmillMode: options?.treadmillMode ?? false,
+    },
+    global: { plugins: [createRecallDataTestRouter()] },
   })
+}
+
+function resetRecallDataState() {
+  const ResetHarness = defineComponent({
+    setup() {
+      const {
+        setToRepeat,
+        setCurrentIndex,
+        setTreadmillMode,
+        clearShouldResumeRecall,
+      } = useRecallData()
+      setToRepeat(undefined)
+      setCurrentIndex(0)
+      setTreadmillMode(false)
+      clearShouldResumeRecall()
+      return () => null
+    },
+    template: "<div />",
+  })
+  const wrapper = mount(ResetHarness, {
+    global: { plugins: [createRecallDataTestRouter()] },
+  })
+  wrapper.unmount()
 }
 
 describe("useRecallData resumeRecall", () => {
@@ -51,17 +92,40 @@ describe("useRecallData resumeRecall", () => {
     matchMediaSpy?.mockRestore()
     matchMediaSpy = undefined
     document.body.innerHTML = ""
+    resetRecallDataState()
   })
 
   it.each([
-    { coarse: true, expectPrimerFocused: true },
-    { coarse: false, expectPrimerFocused: false },
+    {
+      coarse: true,
+      spelling: true,
+      treadmillMode: false,
+      expectPrimerFocused: true,
+    },
+    {
+      coarse: true,
+      spelling: false,
+      treadmillMode: false,
+      expectPrimerFocused: false,
+    },
+    {
+      coarse: true,
+      spelling: true,
+      treadmillMode: true,
+      expectPrimerFocused: false,
+    },
+    {
+      coarse: false,
+      spelling: true,
+      treadmillMode: false,
+      expectPrimerFocused: false,
+    },
   ])(
-    "primes soft keyboard on resume when coarse=$coarse",
-    ({ coarse, expectPrimerFocused }) => {
+    "primes soft keyboard on resume when coarse=$coarse spelling=$spelling treadmill=$treadmillMode",
+    ({ coarse, spelling, treadmillMode, expectPrimerFocused }) => {
       matchMediaSpy = mockCoarsePointer(coarse)
       mountSoftKeyboardPrimer()
-      const wrapper = mountResumeHarness()
+      const wrapper = mountResumeHarness({ spelling, treadmillMode })
 
       wrapper.find("button").trigger("click")
 
@@ -76,6 +140,10 @@ describe("useRecallData resumeRecall", () => {
 })
 
 describe("useRecallData potentialLearningSessions", () => {
+  beforeEach(() => {
+    resetRecallDataState()
+  })
+
   it("groups dueCommissioned by notebookId without affecting toRepeatCount", () => {
     const wrapper = mount(PotentialSessionHarness, {
       global: {

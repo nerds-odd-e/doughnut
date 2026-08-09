@@ -84,7 +84,10 @@ export function useRecallData() {
   }
 
   const resumeRecall = () => {
-    primeSoftKeyboard()
+    const current = toRepeat.value?.[currentIndex.value]
+    if (current?.spelling && !treadmillMode.value) {
+      primeSoftKeyboard()
+    }
     shouldResumeRecall.value = true
     router.push({ name: "recall" })
   }
