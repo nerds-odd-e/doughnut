@@ -15,6 +15,7 @@
           :note="note"
           :question-context="questionContext"
           @content-updated="emit('contentUpdated')"
+          @extracted="close"
         />
         <div v-if="open" class="daisy-modal-action mt-4">
           <button

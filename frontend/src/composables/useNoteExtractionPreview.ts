@@ -119,11 +119,11 @@ export function useNoteExtractionPreview(
     createError.value = ""
   }
 
-  const createExtractedNote = async () => {
+  const createExtractedNote = async (): Promise<boolean> => {
     createError.value = ""
 
     try {
-      await runWithBlockingApiLoading(async () => {
+      return await runWithBlockingApiLoading(async () => {
         const response = await apiCallWithLoading(() =>
           AiController.createExtractedNote({
             path: { note: note.value.id },
@@ -140,16 +140,18 @@ export function useNoteExtractionPreview(
           const openApiError = toOpenApiError(response.error)
           createError.value =
             openApiError.message ?? "Failed to create note from preview"
-          return
+          return false
         }
 
         await storageAccessor.value
           .storedApi()
           .focusNoteRealm(router, response.data)
+        return true
       }, "AI is creating note...")
     } catch (err) {
       console.error("Failed to create extracted note:", err)
       createError.value = `Error: ${err}`
+      return false
     }
   }
 

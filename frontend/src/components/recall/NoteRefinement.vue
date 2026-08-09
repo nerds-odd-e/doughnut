@@ -86,7 +86,7 @@
       :can-create="canCreateExtractedNote"
       @back="backToLayout"
       @retry="retryExtractionPreview"
-      @create="createExtractedNote"
+      @create="onCreateExtractedNote"
     />
   </div>
 
@@ -139,6 +139,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "contentUpdated", newContent: string): void
+  (e: "extracted"): void
 }>()
 
 const {
@@ -167,4 +168,11 @@ const {
   (newContent) => emit("contentUpdated", newContent),
   toRef(props, "questionContext")
 )
+
+const onCreateExtractedNote = async () => {
+  const created = await createExtractedNote()
+  if (created) {
+    emit("extracted")
+  }
+}
 </script>
