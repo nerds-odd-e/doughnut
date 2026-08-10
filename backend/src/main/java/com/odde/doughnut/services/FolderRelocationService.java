@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.FolderMoveRequest;
 import com.odde.doughnut.controllers.dto.FolderRenameRequest;
+import com.odde.doughnut.entities.DisplayName;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
@@ -231,7 +232,7 @@ public class FolderRelocationService {
       Optional<Folder> tgtChild =
           folderRepository
               .findCandidateChildContainers(
-                  destinationNotebook.getId(), target.getId(), srcChild.getName())
+                  destinationNotebook.getId(), target.getId(), new DisplayName(srcChild.getName()))
               .stream()
               .findFirst();
       if (tgtChild.isPresent()) {
@@ -272,14 +273,15 @@ public class FolderRelocationService {
     if (name.isEmpty()) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Folder name must not be blank.");
     }
-    if (name.equals(folder.getName())) {
+    DisplayName displayName = new DisplayName(name);
+    if (displayName.value().equals(folder.getName())) {
       return folder;
     }
     Integer parentFolderId =
         folder.getParentFolder() == null ? null : folder.getParentFolder().getId();
     folderSiblingNameValidation.requireNoConflictingSibling(
-        notebook.getId(), parentFolderId, name, folder.getId());
-    folder.setName(name);
+        notebook.getId(), parentFolderId, displayName, folder.getId());
+    folder.setName(displayName);
     folder.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     entityPersister.flush();
     entityPersister.merge(folder);

@@ -1,5 +1,6 @@
 package com.odde.doughnut.entities.repositories;
 
+import com.odde.doughnut.entities.DisplayName;
 import com.odde.doughnut.entities.Folder;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
@@ -80,7 +81,7 @@ public interface FolderRepository extends CrudRepository<Folder, Integer> {
   List<Folder> findCandidateChildContainers(
       @Param("notebookId") Integer notebookId,
       @Param("parentFolderId") Integer parentFolderId,
-      @Param("name") String name);
+      @Param("name") DisplayName name);
 
   @Query(
       """

@@ -1,5 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
+import com.odde.doughnut.entities.DisplayName;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
@@ -27,7 +28,7 @@ public class FolderBuilder extends EntityBuilder<Folder> {
       throw new AssertionError("notebook is required for Folder");
     }
     if (Strings.isEmpty(entity.getName())) {
-      entity.setName(nameCounter.generate());
+      entity.setName(new DisplayName(nameCounter.generate()));
     }
     Timestamp now = new Timestamp(System.currentTimeMillis());
     if (entity.getCreatedAt() == null) {
@@ -67,7 +68,7 @@ public class FolderBuilder extends EntityBuilder<Folder> {
   }
 
   public FolderBuilder name(String name) {
-    entity.setName(name);
+    entity.setName(new DisplayName(name));
     return this;
   }
 

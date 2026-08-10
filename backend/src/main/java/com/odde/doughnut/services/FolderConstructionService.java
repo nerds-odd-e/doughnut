@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.FolderCreationRequest;
+import com.odde.doughnut.entities.DisplayName;
 import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
@@ -76,13 +77,15 @@ public class FolderConstructionService {
     }
 
     Integer parentFolderId = parentFolder == null ? null : parentFolder.getId();
-    folderSiblingNameValidation.requireNoConflictingSibling(notebook.getId(), parentFolderId, name);
+    DisplayName displayName = new DisplayName(name);
+    folderSiblingNameValidation.requireNoConflictingSibling(
+        notebook.getId(), parentFolderId, displayName);
 
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     Folder folder = new Folder();
     folder.setNotebook(notebook);
     folder.setParentFolder(parentFolder);
-    folder.setName(name);
+    folder.setName(displayName);
     folder.setCreatedAt(now);
     folder.setUpdatedAt(now);
     entityPersister.save(folder);

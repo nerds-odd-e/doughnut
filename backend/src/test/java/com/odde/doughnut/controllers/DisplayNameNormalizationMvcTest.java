@@ -10,8 +10,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.entities.Folder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.EmbeddingService;
 import java.util.List;
@@ -31,6 +33,7 @@ class DisplayNameNormalizationMvcTest extends ControllerTestBase {
   @Autowired private MockMvc mockMvc;
   @Autowired private ObjectMapper objectMapper;
   @Autowired private NoteRepository noteRepository;
+  @Autowired private FolderRepository folderRepository;
 
   @MockitoBean private EmbeddingService embeddingService;
 
@@ -81,5 +84,39 @@ class DisplayNameNormalizationMvcTest extends ControllerTestBase {
 
     makeMe.refresh(note);
     assertThat(note.getTitle(), equalTo("After"));
+  }
+
+  @Test
+  void createFolderStoresNameWithoutSurroundingWhitespace() throws Exception {
+    Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+
+    MvcResult result =
+        mockMvc
+            .perform(
+                post("/api/notebooks/{notebookId}/folders", nb.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"name\":\"  Inbox  \"}"))
+            .andExpect(status().isOk())
+            .andReturn();
+
+    JsonNode root = objectMapper.readTree(result.getResponse().getContentAsString());
+    Folder created = folderRepository.findById(root.get("id").asInt()).orElseThrow();
+    assertThat(created.getName(), equalTo("Inbox"));
+  }
+
+  @Test
+  void renameFolderStoresNameWithoutSurroundingWhitespace() throws Exception {
+    Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+    Folder folder = makeMe.aFolder().notebook(nb).name("Old").please();
+
+    mockMvc
+        .perform(
+            patch("/api/notebooks/{notebookId}/folders/{folderId}", nb.getId(), folder.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"name\":\"  New  \"}"))
+        .andExpect(status().isOk());
+
+    makeMe.refresh(folder);
+    assertThat(folder.getName(), equalTo("New"));
   }
 }

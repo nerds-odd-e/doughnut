@@ -208,8 +208,10 @@ class TestabilityRestController {
         continue;
       }
       Integer parentFolderId = parent == null ? null : parent.getId();
+      DisplayName segmentName = new DisplayName(name);
       List<Folder> candidates =
-          folderRepository.findCandidateChildContainers(notebook.getId(), parentFolderId, name);
+          folderRepository.findCandidateChildContainers(
+              notebook.getId(), parentFolderId, segmentName);
       if (!candidates.isEmpty()) {
         parent = candidates.getFirst();
         continue;
@@ -217,7 +219,7 @@ class TestabilityRestController {
       Folder created = new Folder();
       created.setNotebook(notebook);
       created.setParentFolder(parent);
-      created.setName(name);
+      created.setName(segmentName);
       created.setCreatedAt(now);
       created.setUpdatedAt(now);
       entityPersister.save(created);

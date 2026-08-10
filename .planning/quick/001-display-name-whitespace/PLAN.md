@@ -138,9 +138,15 @@ data.
 
 ### Phase 2 — Folder names are stored trimmed on create and rename (Behavior)
 
+**Status:** done
+
 Extend `DisplayNameNormalizationMvcTest` with the two folder scenarios; retype
 `Folder.name`; update `FolderConstructionService`, `FolderRelocationService.renameFolder`,
 `TestabilityRestController.resolveOrCreateFolderPath`, `FolderBuilder`.
+
+**Learnings:** `FolderRepository.findCandidateChildContainers` and
+`FolderSiblingNameValidation` need `DisplayName` params for Hibernate equality queries.
+Added `DisplayName` overloads on validation to avoid duplicate construction.
 
 ### Phase 3 — Notebook names are stored trimmed on create and rename (Behavior)
 
