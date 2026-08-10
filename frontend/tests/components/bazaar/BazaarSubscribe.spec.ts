@@ -4,7 +4,7 @@ import makeMe from "doughnut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import { afterEach, describe, expect, it } from "vitest"
 
-describe("Bazaar subscribe vocabulary", () => {
+describe("Bazaar subscribe", () => {
   afterEach(() => {
     document.body.innerHTML = ""
   })
