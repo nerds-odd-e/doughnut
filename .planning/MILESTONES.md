@@ -23,7 +23,12 @@ observable behavior change.
 
 **Post-v1.3 polish (2026-08-08):** Request brief (tutor instructions, XML
 sections, notebook QGI, report example); learning session hub (always-visible
-bar icon, list modal → detail for commission/record/amend); tagged report scores
+bar icon, list modal → detail); tagged report scores
 `<session_item_scores>`. E2E `commissioned_learning_session.feature` green.
+
+**Post-v1.3 CLS refactor (2026-08-10):** Ephemeral request from due trackers;
+session at record time; potential-only recall list; schema cleanup (no status,
+commission, amend, or pre-session snapshots). E2E `commissioned_learning_session.feature`
+green.
 
 ---

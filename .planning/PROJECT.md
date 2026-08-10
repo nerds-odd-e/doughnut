@@ -10,9 +10,11 @@ Healthy mainline for learning and knowledge work. Approved [ADR 0002](../docs/ad
 
 ## Current State
 
-**Shipped v1.3 (2026-08-08):** Commissioned learning session MVP — assimilate as commissioned, potential sessions on recall progress bar, commission → ADR 0005 Request markdown, record/amend Report with ADR 0003 scheduling (`e2e_test/features/learning_session/commissioned_learning_session.feature`).
+**Shipped v1.3 (2026-08-08):** Commissioned learning session MVP — assimilate as commissioned, potential sessions on recall progress bar, ADR 0005 Request markdown, record Report with ADR 0003 scheduling (`e2e_test/features/learning_session/commissioned_learning_session.feature`).
 
-**Post-v1.3 polish (2026-08-08):** Richer Learning Session Request (tutor role, notebook QGI, XML sections, title list, report example); learning session hub on recall bar (always-visible icon, list → detail for commission/record/amend); `<session_item_scores>` report parsing (ADR 0005).
+**Post-v1.3 polish (2026-08-08):** Richer Learning Session Request (tutor role, notebook QGI, XML sections, title list, report example); learning session hub on recall bar; `<session_item_scores>` report parsing (ADR 0005).
+
+**Post-v1.3 CLS refactor (2026-08-10):** Request is ephemeral (`GET /api/learning-sessions/request` from due trackers, no session persisted). Session + feedback created only on record. Recall list shows potential sessions only (no awaiting/recorded strips). Commission API, amend flow, session status, and pre-session snapshots removed.
 
 **Shipped v1.2 (2026-08-06):** Accidental-match resolve dialog UX; distinct `overlaps` frontmatter; reviewed note stays primary.
 
@@ -81,7 +83,7 @@ Accepted ADRs under `docs/adrs/`. Planning history for completed milestones is n
 | Commissioned learning glossary (ADR 0001 §3) | Lock Tutor / Learning Session / Feedback names before build | ✓ Shipped v1.3 (ADR still Proposed) |
 | Markdown copy-paste protocol (ADR 0005) | No existing ed-tech standard fits offline Tutor exchange | ✓ Shipped v1.3 (ADR still Proposed) |
 | Tutor score → schedule (ADR 0003) | Shifted-band 0–5 mapping; mastery always progresses | ✓ Shipped v1.3 (ADR still Proposed) |
-| Amend re-grade from pre-session snapshot | Avoid compound re-scheduling on amend | ✓ Shipped v1.3 |
+| Amend re-grade from pre-session snapshot | Avoid compound re-scheduling on amend | Superseded 2026-08-10 (amend removed) |
 | Memory tracker `type` enum | `COMMISSIONED` alongside `UNDERSTANDING` / `SPELLING` | ✓ Shipped v1.3 (quick 006) |
 
 ## Evolution
@@ -89,4 +91,4 @@ Accepted ADRs under `docs/adrs/`. Planning history for completed milestones is n
 This document evolves at phase transitions and milestone boundaries.
 
 ---
-*Last updated: 2026-08-08 after v1.3 milestone*
+*Last updated: 2026-08-10 after post-v1.3 CLS ephemeral-request refactor*
