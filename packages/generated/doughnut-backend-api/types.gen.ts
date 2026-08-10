@@ -1103,6 +1103,10 @@ export type RecallPromptHistoryItem = {
     multipleChoicesQuestion?: MultipleChoicesQuestion;
 };
 
+export type LearningSessionRequestResponse = {
+    requestMarkdown: string;
+};
+
 export type FailureReport = {
     id?: number;
     errorName: string;
@@ -3677,6 +3681,25 @@ export type GetRecentMemoryTrackersResponses = {
 };
 
 export type GetRecentMemoryTrackersResponse = GetRecentMemoryTrackersResponses[keyof GetRecentMemoryTrackersResponses];
+
+export type RequestData = {
+    body?: never;
+    path?: never;
+    query: {
+        notebookId: number;
+        timezone: string;
+    };
+    url: '/api/learning-sessions/request';
+};
+
+export type RequestResponses = {
+    /**
+     * OK
+     */
+    200: LearningSessionRequestResponse;
+};
+
+export type RequestResponse = RequestResponses[keyof RequestResponses];
 
 export type PingData = {
     body?: never;

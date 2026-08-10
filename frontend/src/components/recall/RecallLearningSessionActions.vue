@@ -56,7 +56,7 @@ const actionableSessions = computed((): ActionableSessionEntry[] => {
   for (const session of props.potentialLearningSessions) {
     entries.push({
       key: `potential-${session.notebookId}`,
-      mode: "commission",
+      mode: "request",
       notebookName: session.notebookName,
       session,
       actionLabel: "Commission",

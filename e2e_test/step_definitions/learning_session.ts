@@ -4,16 +4,35 @@
 
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
-import { NoteController } from '@generated/doughnut-backend-api/sdk.gen'
+import {
+  LearningSessionController,
+  NoteController,
+} from '@generated/doughnut-backend-api/sdk.gen'
 import start from '../start'
 
 const SESSION_ITEM_SCORES_OPEN_TAG = '<session_item_scores>'
 const SESSION_ITEM_SCORES_CLOSE_TAG = '</session_item_scores>'
 
+function commissionLearningSessionViaApi(notebookTitle: string) {
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  return start
+    .testability()
+    .getNotebookIdByName(notebookTitle)
+    .then((notebookId) =>
+      cy.wrap(
+        LearningSessionController.commission({
+          body: { notebookId },
+          query: { timezone },
+        }),
+        { log: false }
+      )
+    )
+}
+
 When(
-  'I commission a learning session for notebook {string}',
+  'I open the learning session request for notebook {string}',
   (notebookTitle: string) => {
-    start.recall().visitRecallPage().commissionLearningSession(notebookTitle)
+    start.recall().visitRecallPage().openLearningSessionRequest(notebookTitle)
   }
 )
 
@@ -21,10 +40,8 @@ Given(
   'I have commissioned a learning session for notebook {string} on day {int} with session items for notes {string}',
   (notebookTitle: string, day: number, _noteTitles: string) => {
     start.testability().timeTravelTo(day, 9)
-    start
-      .recall()
-      .navigateToRecallPage()
-      .commissionLearningSession(notebookTitle)
+    commissionLearningSessionViaApi(notebookTitle)
+    start.recall().visitRecallPage()
   }
 )
 
@@ -32,13 +49,13 @@ Given(
   'I have recorded a learning session for notebook {string} on day {int} with scores:',
   (notebookTitle: string, day: number, dataTable: DataTable) => {
     start.testability().timeTravelTo(day, 9)
-    start.recall().visitRecallPage().commissionLearningSession(notebookTitle)
+    commissionLearningSessionViaApi(notebookTitle)
     const lines = dataTable.hashes().map((row) => `${row.Note}: ${row.Score}`)
     const reportMarkdown = `# Learning Session Report\n\n${SESSION_ITEM_SCORES_OPEN_TAG}\n${lines.join('\n')}\n${SESSION_ITEM_SCORES_CLOSE_TAG}\n`
     start
       .recall()
-      .assumeRecallPage()
-      .recordLearningSessionReport(reportMarkdown)
+      .visitRecallPage()
+      .recordLearningSessionReport(reportMarkdown, { notebookTitle })
       .expectLearningSessionRecorded()
     start.recall().visitRecallPage()
   }
@@ -137,6 +154,16 @@ Then(
 Then("the learning session should be awaiting the tutor's report", () => {
   start.recall().assumeRecallPage().expectLearningSessionAwaitingReport()
 })
+
+Then(
+  'no learning session should exist for notebook {string}',
+  (notebookTitle: string) => {
+    start
+      .recall()
+      .assumeRecallPage()
+      .expectNoLearningSessionForNotebook(notebookTitle)
+  }
+)
 
 Then(
   'I should see tutor feedback score {int} from a learning session for the memory tracker of note {string}',

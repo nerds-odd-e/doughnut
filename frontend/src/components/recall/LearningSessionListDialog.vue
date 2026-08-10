@@ -35,7 +35,7 @@ import Modal from "@/components/commons/Modal.vue"
 import type { LearningSessionLite } from "@generated/doughnut-backend-api"
 import type { PotentialLearningSession } from "@/composables/useRecallData"
 
-export type LearningSessionActionMode = "commission" | "record" | "amend"
+export type LearningSessionActionMode = "request" | "record" | "amend"
 
 export type ActionableSessionEntry = {
   key: string

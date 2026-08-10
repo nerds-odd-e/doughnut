@@ -1,8 +1,9 @@
 import RecallProgressBar from "@/components/recall/RecallProgressBar.vue"
 import type { PotentialLearningSession } from "@/composables/useRecallData"
 import type { LearningSessionLite } from "@generated/doughnut-backend-api"
-import helper from "@tests/helpers"
-import { afterEach, describe, expect, it } from "vitest"
+import { LearningSessionController } from "@generated/doughnut-backend-api/sdk.gen"
+import helper, { mockSdkService } from "@tests/helpers"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import type { VueWrapper } from "@vue/test-utils"
 
 const canonicalRequestMarkdown = "# Learning Session Request\n\n### Hola\n"
@@ -27,6 +28,10 @@ const kanjiPotentialSession = (): PotentialLearningSession => ({
 })
 
 let wrapper: VueWrapper | undefined
+
+beforeEach(() => {
+  vi.restoreAllMocks()
+})
 
 afterEach(() => {
   wrapper?.unmount()
@@ -122,7 +127,10 @@ describe("RecallProgressBar learning session actions", () => {
     ).toBeFalsy()
   })
 
-  it("opens commission detail after picking from session list", async () => {
+  it("opens request detail after picking from session list", async () => {
+    mockSdkService(LearningSessionController, "request", {
+      requestMarkdown: canonicalRequestMarkdown,
+    })
     mountBar({
       potentialLearningSessions: [
         spanishPotentialSession(),
@@ -145,7 +153,7 @@ describe("RecallProgressBar learning session actions", () => {
       document.body.querySelector(
         '[data-test="commission-learning-session-submit"]'
       )
-    ).toBeTruthy()
+    ).toBeFalsy()
   })
 
   it("opens record detail after picking Record report from session list", async () => {

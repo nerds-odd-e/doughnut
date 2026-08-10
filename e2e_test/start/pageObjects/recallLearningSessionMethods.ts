@@ -1,5 +1,7 @@
 import { commonSenseSplit } from 'support/string_util'
 import { waitUntilAppIsNotBusy } from '../pageBase'
+import { RecallsController } from '@generated/doughnut-backend-api/sdk.gen'
+import type { DueMemoryTrackers } from '@generated/doughnut-backend-api'
 
 type LearningSessionActionLabel =
   | 'Commission'
@@ -70,10 +72,35 @@ export const recallLearningSessionMethods = () => ({
     clickSessionActionFromList(notebookTitle, actionLabel)
     return this
   },
-  commissionLearningSession(notebookTitle: string) {
+  openLearningSessionRequest(notebookTitle: string) {
     this.openLearningSessionAction(notebookTitle, 'Commission')
-    cy.get('[data-test="commission-learning-session-submit"]').click()
+    cy.get('[data-test="learning-session-request"]').should('be.visible')
+    cy.get('[data-test="commission-learning-session-submit"]').should(
+      'not.exist'
+    )
+    return this
+  },
+  expectNoLearningSessionForNotebook(notebookTitle: string) {
+    cy.get('[data-test="learning-session-awaiting-report"]').should('not.exist')
+    cy.get('[data-test="commission-learning-session-dialog"]')
+      .closest('dialog')
+      .find('.close-button')
+      .click()
+    cy.get('[data-test="commission-learning-session-dialog"]').should(
+      'not.exist'
+    )
     waitUntilAppIsNotBusy()
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    cy.wrap(
+      RecallsController.recalling({ query: { timezone, dueindays: 0 } }),
+      { log: false }
+    ).then((dueMemoryTrackers: DueMemoryTrackers) => {
+      const awaiting = dueMemoryTrackers.awaitingReportSessions ?? []
+      expect(
+        awaiting.filter((session) => session.notebookName === notebookTitle),
+        `expected no awaiting learning session for ${notebookTitle}`
+      ).to.have.length(0)
+    })
     return this
   },
   learningSessionRequestText() {

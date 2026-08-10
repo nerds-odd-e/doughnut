@@ -4,26 +4,21 @@
       <div data-test="commission-learning-session-dialog" class="daisy-card">
         <div class="daisy-card-body">
           <h3 class="daisy-card-title text-xl font-semibold">
-            Commission learning session
+            Learning session request
           </h3>
           <p class="text-sm text-base-content mt-2">
             Notebook: "{{ notebookName }}"
           </p>
-          <template v-if="!commissioned">
-            <p class="text-base font-normal mt-4">
-              Commissioning creates a Learning Session Request you can copy and
-              send to your tutor.
-            </p>
-            <button
-              type="button"
-              class="daisy-btn daisy-btn-primary mt-4"
-              data-test="commission-learning-session-submit"
-              @click="commission"
-            >
-              Commission learning session
-            </button>
-          </template>
-          <template v-else>
+          <div
+            v-if="loading"
+            class="flex justify-center items-center h-96 mt-4"
+            data-test="learning-session-request-loading"
+          >
+            <span
+              class="daisy-loading daisy-loading-spinner daisy-loading-lg"
+            />
+          </div>
+          <template v-else-if="requestReady">
             <p class="text-sm mt-4">Learning session request</p>
             <textarea
               class="daisy-textarea w-full h-96 bg-base-100 font-mono text-xs mt-2"
@@ -46,7 +41,11 @@
             >
               <span>This learning session is awaiting the tutor's report.</span>
             </div>
-            <div v-if="status === 'RECORDED'" class="daisy-alert daisy-alert-info mt-4" data-test="learning-session-recorded">
+            <div
+              v-if="status === 'RECORDED'"
+              class="daisy-alert daisy-alert-info mt-4"
+              data-test="learning-session-recorded"
+            >
               <span>This learning session is recorded.</span>
             </div>
             <div
@@ -63,22 +62,20 @@
                 </span>
               </div>
             </div>
-            <template v-if="status === 'AWAITING_REPORT' || status === 'RECORDED'">
-              <p class="text-sm mt-4">Learning session report</p>
-              <textarea
-                v-model="reportMarkdown"
-                class="daisy-textarea w-full h-48 bg-base-100 font-mono text-xs mt-2"
-                data-test="learning-session-report"
-              />
-              <button
-                type="button"
-                class="daisy-btn daisy-btn-primary mt-4"
-                data-test="record-learning-session-report-submit"
-                @click="recordReport"
-              >
-                Record report
-              </button>
-            </template>
+            <p class="text-sm mt-4">Learning session report</p>
+            <textarea
+              v-model="reportMarkdown"
+              class="daisy-textarea w-full h-48 bg-base-100 font-mono text-xs mt-2"
+              data-test="learning-session-report"
+            />
+            <button
+              type="button"
+              class="daisy-btn daisy-btn-primary mt-4"
+              data-test="record-learning-session-report-submit"
+              @click="recordReport"
+            >
+              Record report
+            </button>
           </template>
         </div>
       </div>
@@ -87,7 +84,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue"
+import { computed, onMounted, ref, watch } from "vue"
 import { LearningSessionController } from "@generated/doughnut-backend-api/sdk.gen"
 import type {
   LearningSessionCommissionResponse,
@@ -101,18 +98,17 @@ import timezoneParam from "@/managedApi/window/timezoneParam"
 const props = defineProps<{
   notebookId: number
   notebookName: string
-  mode?: "commission" | "record" | "amend"
+  mode?: "request" | "record" | "amend"
   initialRequestMarkdown?: string
   learningSessionId?: number
 }>()
 
 const emit = defineEmits<{
   (e: "close"): void
-  (e: "commissioned"): void
   (e: "recorded"): void
 }>()
 
-const commissioned = ref(props.mode === "record" || props.mode === "amend")
+const loading = ref(false)
 const requestMarkdown = ref(props.initialRequestMarkdown ?? "")
 const reportMarkdown = ref("")
 const rejectedEntries = ref<RejectedLearningSessionReportEntry[]>([])
@@ -122,6 +118,13 @@ const status = ref<LearningSessionCommissionResponse["status"] | "">(
     : props.mode === "amend"
       ? "RECORDED"
       : ""
+)
+
+const requestReady = computed(
+  () =>
+    props.mode === "record" ||
+    props.mode === "amend" ||
+    requestMarkdown.value.length > 0
 )
 
 watch(
@@ -134,25 +137,32 @@ watch(
   { immediate: true }
 )
 
-const commission = async () => {
+const fetchRequest = async () => {
+  loading.value = true
   const { data, error } = await apiCallWithLoading(
     () =>
-      LearningSessionController.commission({
-        body: { notebookId: props.notebookId },
-        query: { timezone: timezoneParam() },
+      LearningSessionController.request({
+        query: {
+          notebookId: props.notebookId,
+          timezone: timezoneParam(),
+        },
       }),
-    { blockUi: true, message: "Commissioning learning session…" }
+    { blockUi: false, message: "Loading learning session request…" }
   )
+  loading.value = false
 
   if (error || !data) {
     return
   }
 
   requestMarkdown.value = data.requestMarkdown
-  status.value = data.status
-  commissioned.value = true
-  emit("commissioned")
 }
+
+onMounted(async () => {
+  if (props.mode !== "record" && props.mode !== "amend") {
+    await fetchRequest()
+  }
+})
 
 const recordReport = async () => {
   const { data, error } = await apiCallWithLoading(

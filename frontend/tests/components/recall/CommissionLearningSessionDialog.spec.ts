@@ -24,14 +24,6 @@ describe("CommissionLearningSessionDialog", () => {
       })
       .mount()
 
-  const clickCommissionSubmit = async () => {
-    const submit = document.body.querySelector(
-      '[data-test="commission-learning-session-submit"]'
-    ) as HTMLButtonElement
-    submit.click()
-    await flushPromises()
-  }
-
   const clickRecordReportSubmit = async () => {
     const recordButton = document.body.querySelector(
       '[data-test="record-learning-session-report-submit"]'
@@ -40,49 +32,55 @@ describe("CommissionLearningSessionDialog", () => {
     await flushPromises()
   }
 
-  const commissionToAwaiting = async () => {
-    mockSdkService(LearningSessionController, "commission", {
-      learningSessionId: 7,
+  const openRequestMode = async () => {
+    mockSdkService(LearningSessionController, "request", {
       requestMarkdown: canonicalRequestMarkdown,
-      status: "AWAITING_REPORT",
     })
-    mountDialog()
+    mountDialog({ mode: "request" })
     await flushPromises()
-    await clickCommissionSubmit()
   }
 
-  it("commissions with notebook id in API body", async () => {
-    const commissionSpy = mockSdkService(
-      LearningSessionController,
-      "commission",
-      {
-        learningSessionId: 7,
-        requestMarkdown: canonicalRequestMarkdown,
-        status: "AWAITING_REPORT",
-      }
-    )
-    mountDialog()
-    await flushPromises()
-    await clickCommissionSubmit()
-
-    expect(commissionSpy).toHaveBeenCalledWith({
-      body: { notebookId: 42 },
-      query: { timezone: expect.any(String) },
+  it("fetches request markdown with notebook id on open", async () => {
+    const requestSpy = mockSdkService(LearningSessionController, "request", {
+      requestMarkdown: canonicalRequestMarkdown,
     })
-  })
-
-  it("keeps pre-commission CTA when commission fails", async () => {
-    const commissionSpy = vi.spyOn(LearningSessionController, "commission")
-    commissionSpy.mockResolvedValue(wrapSdkError("commission failed") as never)
-    mountDialog()
+    mountDialog({ mode: "request" })
     await flushPromises()
-    await clickCommissionSubmit()
 
+    expect(requestSpy).toHaveBeenCalledWith({
+      query: {
+        notebookId: 42,
+        timezone: expect.any(String),
+      },
+    })
+    expect(
+      (
+        document.body.querySelector(
+          '[data-test="learning-session-request"]'
+        ) as HTMLTextAreaElement
+      ).value
+    ).toBe(canonicalRequestMarkdown)
     expect(
       document.body.querySelector(
         '[data-test="commission-learning-session-submit"]'
       )
+    ).toBeNull()
+    expect(
+      document.body.querySelector('[data-test="learning-session-report"]')
     ).toBeTruthy()
+  })
+
+  it("does not show request when fetch fails", async () => {
+    const requestSpy = vi.spyOn(LearningSessionController, "request")
+    requestSpy.mockResolvedValue(wrapSdkError("request failed") as never)
+    mountDialog({ mode: "request" })
+    await flushPromises()
+
+    expect(
+      document.body.querySelector(
+        '[data-test="learning-session-request-loading"]'
+      )
+    ).toBeNull()
     expect(
       document.body.querySelector('[data-test="learning-session-request"]')
     ).toBeNull()
@@ -98,7 +96,7 @@ describe("CommissionLearningSessionDialog", () => {
       ],
       rejectedEntries: [],
     })
-    await commissionToAwaiting()
+    await openRequestMode()
 
     const reportTextarea = document.body.querySelector(
       '[data-test="learning-session-report"]'
@@ -129,7 +127,7 @@ describe("CommissionLearningSessionDialog", () => {
         },
       ],
     })
-    await commissionToAwaiting()
+    await openRequestMode()
 
     await clickRecordReportSubmit()
 
@@ -181,7 +179,7 @@ describe("CommissionLearningSessionDialog", () => {
   it("keeps report textarea when record fails", async () => {
     const recordSpy = vi.spyOn(LearningSessionController, "record")
     recordSpy.mockResolvedValue(wrapSdkError("record failed") as never)
-    await commissionToAwaiting()
+    await openRequestMode()
 
     await clickRecordReportSubmit()
 

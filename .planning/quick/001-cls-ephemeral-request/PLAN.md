@@ -49,21 +49,15 @@ Refactor `LearningSessionRequestMarkdownBuilder` to build from `List<MemoryTrack
 
 ### Phase 2 — Behavior: User views request directly without commission button
 
-**Status:** planned
+**Status:** done
 
-- Backend: New `GET /api/learning-sessions/request?notebookId=…&timezone=…` →
-  `{ requestMarkdown }` from due trackers (no session created). 400 if no due trackers.
-- Frontend: Dialog opens in "request" mode directly — loading spinner, then
-  request markdown + report textarea + record button. No "Commission learning
-  session" button.
-- Old POST /commission kept (unused by frontend) — removed in Phase 6.
-- E2E: user clicks notebook → sees request directly → no session in DB.
+- Backend: `GET /api/learning-sessions/request?notebookId=…&timezone=…` →
+  `{ requestMarkdown }` from due trackers (no session). 400 if none due.
+- Frontend: Dialog opens in request mode (spinner → markdown + report UI). No commission CTA.
+- POST /commission kept (unused by frontend) until Phase 6.
+- E2E: open request → see markdown → no session in DB.
 
-**Remove this phase:**
-- Frontend `CommissionLearningSessionDialog.vue`: pre-commission CTA + button
-  (`data-test="commission-learning-session-submit"`), `commission()` method
-- `CommissionLearningSessionDialog.spec.ts`: commission API tests, pre-commission CTA tests
-- `RecallProgressBar.spec.ts`: commission detail flow tests
+**Learnings:** List/entry still says “Commission” (Phase 4 cleanup). Record still uses old commission-based API until Phase 3. ADR 0001/0003/0005 (Proposed) still describe commission-time sessions — human-owned update.
 
 ### Phase 3 — Behavior: User records a report → session created with feedback
 

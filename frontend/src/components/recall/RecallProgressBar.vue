@@ -69,7 +69,6 @@
       v-if="sessionDialogProps"
       v-bind="sessionDialogProps"
       @close="sessionDialog = undefined"
-      @commissioned="onSessionChanged"
       @recorded="onSessionChanged"
     />
   </div>
@@ -142,15 +141,13 @@ const sessionDialogProps = computed(() => {
   const session = dialog.session
   const isLite = isLearningSessionLite(session)
   return {
-    mode: dialog.mode === "commission" ? undefined : dialog.mode,
+    mode: dialog.mode,
     notebookId: session.notebookId,
     notebookName: session.notebookName,
     learningSessionId:
       dialog.mode === "amend" && isLite ? session.learningSessionId : undefined,
     initialRequestMarkdown:
-      dialog.mode !== "commission" && isLite
-        ? session.requestMarkdown
-        : undefined,
+      dialog.mode !== "request" && isLite ? session.requestMarkdown : undefined,
   }
 })
 

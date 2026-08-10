@@ -25,15 +25,15 @@ Feature: Commissioned learning session
     Then I should see that I have 0 notes to recall
     And I should see 1 potential learning session to commission for notebook "Spanish conversation"
 
-  Scenario: Commissioning a learning session produces a request for the tutor
+  Scenario: Opening a potential learning session shows the request without creating a session
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
     And It's day 2, 9 hour
-    When I commission a learning session for notebook "Spanish conversation"
+    When I open the learning session request for notebook "Spanish conversation"
     Then the learning session request should list session items for notes "Hola, Gracias"
     And the learning session request should include the learning status of "Hola"
     And the learning session request should include focus context with note body "Hello"
     And the learning session request should instruct the tutor to report one score per session item
-    And the learning session should be awaiting the tutor's report
+    And no learning session should exist for notebook "Spanish conversation"
 
   Scenario: Notes from different notebooks are commissioned as separate learning sessions
     Given I have a notebook "Kanji" with notes:
@@ -63,7 +63,7 @@ Feature: Commissioned learning session
     And the commissioned memory tracker for "Gracias" should have recall count 1
     And I should see tutor feedback score 5 from a learning session for the memory tracker of note "Hola"
     When It's day 3, 9 hour
-    And I commission a learning session for notebook "Spanish conversation"
+    And I open the learning session request for notebook "Spanish conversation"
     Then the learning session request should list session items for only notes "Gracias"
 
   Scenario: A later report amends the feedback of a recorded learning session

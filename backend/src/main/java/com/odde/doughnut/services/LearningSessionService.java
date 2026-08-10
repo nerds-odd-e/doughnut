@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.algorithms.CommissionedLearningSessionFeedbackScheduling;
 import com.odde.doughnut.controllers.dto.LearningSessionCommissionResponse;
+import com.odde.doughnut.controllers.dto.LearningSessionRequestResponse;
 import com.odde.doughnut.controllers.dto.RecordLearningSessionResponse;
 import com.odde.doughnut.controllers.dto.RecordedLearningSessionItem;
 import com.odde.doughnut.entities.*;
@@ -47,15 +48,23 @@ public class LearningSessionService {
     this.learningSessionRecordTargetResolver = learningSessionRecordTargetResolver;
   }
 
+  @Transactional(readOnly = true)
+  public LearningSessionRequestResponse request(
+      User user, Notebook notebook, Timestamp now, ZoneId zoneId) {
+    List<MemoryTracker> dueTrackers =
+        requireDueCommissionedNoteLevelTrackers(user, notebook, now, zoneId);
+
+    LearningSessionRequestResponse response = new LearningSessionRequestResponse();
+    response.setRequestMarkdown(
+        learningSessionRequestMarkdownBuilder.build(user, notebook, dueTrackers, zoneId));
+    return response;
+  }
+
   @Transactional
   public LearningSessionCommissionResponse commission(
       User user, Notebook notebook, Timestamp now, ZoneId zoneId) {
-    List<MemoryTracker> dueTrackers = dueCommissionedNoteLevelTrackers(user, notebook, now, zoneId);
-
-    if (dueTrackers.isEmpty()) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "No due commissioned memory trackers for this notebook.");
-    }
+    List<MemoryTracker> dueTrackers =
+        requireDueCommissionedNoteLevelTrackers(user, notebook, now, zoneId);
 
     abandonUnfinishedSessions(user, notebook);
 
@@ -165,13 +174,19 @@ public class LearningSessionService {
     learningSessionRepository.deleteAll(unfinished);
   }
 
-  private List<MemoryTracker> dueCommissionedNoteLevelTrackers(
+  private List<MemoryTracker> requireDueCommissionedNoteLevelTrackers(
       User user, Notebook notebook, Timestamp now, ZoneId zoneId) {
-    return userService
-        .getCommissionedMemoryTrackersNeedToRepeat(user, now, zoneId)
-        .filter(tracker -> tracker.getNote().getNotebook().getId().equals(notebook.getId()))
-        .filter(MemoryTracker::isNoteLevelTracker)
-        .toList();
+    List<MemoryTracker> dueTrackers =
+        userService
+            .getCommissionedMemoryTrackersNeedToRepeat(user, now, zoneId)
+            .filter(tracker -> tracker.getNote().getNotebook().getId().equals(notebook.getId()))
+            .filter(MemoryTracker::isNoteLevelTracker)
+            .toList();
+    if (dueTrackers.isEmpty()) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "No due commissioned memory trackers for this notebook.");
+    }
+    return dueTrackers;
   }
 
   private SessionItem createSessionItem(LearningSession session, MemoryTracker tracker) {

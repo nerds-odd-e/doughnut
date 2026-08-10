@@ -161,10 +161,6 @@ export const recall = () => {
       )
       return this
     },
-    commissionLearningSession(notebookTitle: string) {
-      recallPage().commissionLearningSession(notebookTitle)
-      return recallPage()
-    },
     expectResumeAvailable() {
       cy.findByLabelText('Resume').should('exist')
       return this

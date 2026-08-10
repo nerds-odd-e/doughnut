@@ -2809,6 +2809,30 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/MemoryTracker"
+  /api/learning-sessions/request:
+    get:
+      tags:
+      - learning-session-controller
+      operationId: request
+      parameters:
+      - name: notebookId
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: timezone
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/LearningSessionRequestResponse"
   /api/healthcheck:
     get:
       tags:
@@ -5331,6 +5355,13 @@ components:
       - id
       - questionGeneratedTime
       - questionType
+    LearningSessionRequestResponse:
+      type: object
+      properties:
+        requestMarkdown:
+          type: string
+      required:
+      - requestMarkdown
     FailureReport:
       type: object
       properties:
