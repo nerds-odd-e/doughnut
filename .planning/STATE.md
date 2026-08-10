@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: none
 milestone_name: none
-status: executing
-last_updated: "2026-08-10T15:30:00.000Z"
+status: idle
+last_updated: "2026-08-10T15:35:00.000Z"
 last_activity: 2026-08-10
-last_activity_desc: CLS ephemeral request — Phase 6 done (plan complete)
+last_activity_desc: CLS ephemeral request plan complete; planning history cleaned
 ---
 
 # Project State
@@ -21,8 +21,11 @@ See: `.planning/PROJECT.md`
 Milestone **v1.3 Commissioned Learning Session MVP** shipped 2026-08-08.
 Post-v1.3 CLS polish shipped same day — Proposed ADR 0005.
 
-Active plan: `.planning/quick/001-cls-ephemeral-request/` — **all 6 phases done**.
-Cleanup of spent plan history pending after Phase 6 commit.
+Quick plan **001-cls-ephemeral-request** completed 2026-08-10: request is
+ephemeral (GET from due trackers); session created only on record; recall list
+shows potential sessions only; schema/dead commission path removed.
+
+No active plan.
 
 ## Deferred Items
 
@@ -38,5 +41,6 @@ Cleanup of spent plan history pending after Phase 6 commit.
 
 ## Operator Next Steps
 
-- Human ADR updates for Proposed 0001/0003/0005 (ephemeral request / record-time session)
+- Human review/update of Proposed ADRs 0001 / 0003 / 0005 for ephemeral request + record-time session (no commission/amend/awaiting)
+- Optional: rename `CommissionLearningSessionDialog` to match new vocabulary
 - `/gsd-new-milestone` or pick up a seed/deferred item
