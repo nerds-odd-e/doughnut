@@ -12,7 +12,7 @@ Feature: Notebooks in circles
   Scenario: Subscribing to a circle notebook
     Given I am logged in as "old_learner"
     And There is a notebook "Team agreement" in circle "Odd-e SG Team" by "old_learner"
-    When I subscribe to notebook "Team agreement" in the circle "Odd-e SG Team", with target of learning 1 notes per day
+    When I subscribe to notebook "Team agreement" in the circle "Odd-e SG Team", with daily assimilation target of 1 notes per day
     Then I should be able to edit the subscription to notebook "Team agreement"
 
   Scenario: Moving a notebook to another circle

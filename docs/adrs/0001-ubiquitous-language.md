@@ -20,7 +20,6 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 
 | Term | Meaning |
 |------|---------|
-| **Add to learning** | Synonym used for starting a subscription |
 | **Re-assimilate** | Return a note to assimilation after failed recall |
 | **Skip recall** | Opt a note or notebook out of recall (panel action or notebook setting) |
 | **Revive recall** | Re-enable recall after it was skipped |
@@ -39,7 +38,7 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 
 | Term | Colliding senses |
 |------|------------------|
-| **Learning** | Overall learner metaphor; alias for subscription (“add to learning”); “target of learning N notes per day” as assimilation quota |
+| **Learning** | Overall learner metaphor; commissioned **Learning Session** family — not a synonym for subscription |
 | **Layout** | Refinement layout for a note vs book layout for an attached book |
 | **Quiz / question** | Spelling, AI-generated, predefined, and contested prompts without a shared parent name |
 | **Property** | Reduced relationship field; wiki property from accidental match; property memory tracker key |
@@ -51,8 +50,8 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 
 | Concept | Overlapping names |
 |---------|-------------------|
-| Turning off recall for a note or notebook | skip recall, Skip Memory Tracking, no “add to learning” when memory tracking is off |
-| Following a shared notebook | subscribe, subscription, add to learning |
+| Turning off recall for a note or notebook | skip recall, Skip Memory Tracking |
+| Following a shared notebook | subscribe, subscription |
 | Binding to Wikidata | Wikidata association, Wiki association, associate Wikidata ID |
 | User recall interval list | space setting, spaced repetition |
 | Meaning-based find | semantical search, semantic search |
@@ -176,8 +175,7 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 - Product language converges on fewer overloaded words (**link**,
   **learning**, **layout**).
 - Humans and agents share an explicit dictionary instead of inferring synonyms.
-- Some existing strings (`add to learning`, `space setting`) become known debt
-  until renamed.
+- Some existing strings (`space setting`) become known debt until renamed.
 - Circles, notebook groups, and folders stay clearly separated in speech.
 - Commissioned learning names are fixed before the capability is built, so its
   entities, API, UI copy, and tests start on the glossary instead of renaming
@@ -195,8 +193,8 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 
 - Glossary will need edits as the product grows.
 - Temporary dual vocabulary until renames land.
-- Some metaphors (“add to learning”, “space setting”) may feel colder when
-  replaced with sharper terms.
+- Some metaphors (“space setting”) may feel colder when replaced with sharper
+  terms.
 
 ## Prerequisites / Assumptions
 

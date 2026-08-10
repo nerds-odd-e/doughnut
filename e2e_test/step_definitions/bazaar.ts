@@ -27,7 +27,7 @@ When('I open the notebook {string} in the Bazaar', (noteTopology: string) => {
 })
 
 When(
-  'I subscribe to notebook {string} in the bazaar, with target of learning {int} notes per day',
+  'I subscribe to notebook {string} in the bazaar, with daily assimilation target of {int} notes per day',
   (notebookName: string, count: string) => {
     start.navigateToBazaar().subscribe(notebookName, count)
   }

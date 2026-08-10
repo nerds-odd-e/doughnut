@@ -154,7 +154,7 @@ When(
 )
 
 When(
-  'I subscribe to notebook {string} in the circle {string}, with target of learning {int} notes per day',
+  'I subscribe to notebook {string} in the circle {string}, with daily assimilation target of {int} notes per day',
   (notebookName: string, circleName: string, count: string) => {
     start.navigateToCircle(circleName).subscribe(notebookName, count)
   }

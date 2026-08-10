@@ -32,6 +32,6 @@ Feature: Notebook group
       | Sub E2E Bazaar |
       | leaf |
     And notebook "Bazaar sub fixture" is shared to the Bazaar
-    When I subscribe to notebook "Bazaar sub fixture" in the bazaar, with target of learning 5 notes per day
+    When I subscribe to notebook "Bazaar sub fixture" in the bazaar, with daily assimilation target of 5 notes per day
     And I create a notebook group named "E2E Subscribed Group" by moving subscribed notebook "Bazaar sub fixture" from the catalog
     Then I should see notebook group "E2E Subscribed Group" with a hint including "Bazaar sub fixture"

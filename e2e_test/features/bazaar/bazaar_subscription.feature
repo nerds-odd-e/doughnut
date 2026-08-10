@@ -15,7 +15,7 @@ Feature: Bazaar subscription
   @skipOptimizationDueToKnownNecessarySlowness
   Scenario: Subscribe and unsubscribe from a Bazaar notebook
     Given I am logged in as an existing user
-    When I subscribe to notebook "Shape" in the bazaar, with target of learning 1 notes per day
+    When I subscribe to notebook "Shape" in the bazaar, with daily assimilation target of 1 notes per day
     Then I should see I've subscribed to "Shape"
     And I should see readonly notebook "Shape" in my notes
     When I unsubscribe from notebook "Shape"
@@ -26,7 +26,7 @@ Feature: Bazaar subscription
     Given I am logged in as an existing user
     And I have a notebook "Memo pad" with a note "My memo"
     And my daily new notes to assimilate is set to 2
-    When I subscribe to notebook "Shape" in the bazaar, with target of learning 1 notes per day
+    When I subscribe to notebook "Shape" in the bazaar, with daily assimilation target of 1 notes per day
     And the OpenAI service is unavailable due to invalid system token
     Then On day 1 I should have "0/2/4" note for assimilation and "0/0/0" for recall
     And  On day 1 I recall "                     " and assimilate new "Square, My memo, end"

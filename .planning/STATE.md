@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: none
 milestone_name: none
-status: executing
-last_updated: "2026-08-10T12:15:00.000Z"
+status: idle
+last_updated: "2026-08-10T12:20:00.000Z"
 last_activity: 2026-08-10
-last_activity_desc: Quick 011 Phase 1 done — Subscribe CTA; Phase 2 pending
+last_activity_desc: Subscribe vocabulary alignment shipped; quick 011 plan cleaned up
 ---
 
 # Project State
@@ -21,7 +21,7 @@ See: `.planning/PROJECT.md`
 Milestone **v1.3 Commissioned Learning Session MVP** shipped 2026-08-08.
 Post-v1.3 CLS polish shipped same day — Proposed ADR 0005.
 
-Active ad-hoc plan: `.planning/quick/011-subscribe-vocabulary/PLAN.md` — Phase 1 done, Phase 2 planned.
+No active plan or milestone.
 
 ## Deferred Items
 
@@ -37,6 +37,5 @@ Active ad-hoc plan: `.planning/quick/011-subscribe-vocabulary/PLAN.md` — Phase
 
 ## Operator Next Steps
 
-- Execute `.planning/quick/011-subscribe-vocabulary/PLAN.md` when ready (`execute-plan`)
+- `/gsd-new-milestone` or pick up a seed/deferred item
 - Human review of Proposed ADR 0005 if ready to accept
-- `/gsd-new-milestone` or pick up a seed/deferred item afterward
