@@ -13,7 +13,6 @@ import com.odde.doughnut.entities.SessionItem;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.Test;
-import org.springframework.web.server.ResponseStatusException;
 
 class LearningSessionRecordTests extends LearningSessionControllerTestBase {
 
@@ -23,7 +22,6 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
     testabilitySettings.timeTravelTo(dayTwo);
 
     Notebook notebook = spanishNotebook(dayTwo);
-    controller.commission(commissionRequest(notebook), "Asia/Shanghai");
 
     RecordLearningSessionResponse response =
         controller.record(recordRequest(notebook, HOLA_GRACIAS_REPORT), "Asia/Shanghai");
@@ -54,7 +52,6 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
     testabilitySettings.timeTravelTo(dayTwo);
 
     Notebook notebook = spanishNotebook(dayTwo);
-    controller.commission(commissionRequest(notebook), "Asia/Shanghai");
     controller.record(recordRequest(notebook, HOLA_GRACIAS_REPORT), "Asia/Shanghai");
 
     MemoryTracker holaTracker = trackerForNote(notebook, "Hola");
@@ -69,7 +66,6 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
     testabilitySettings.timeTravelTo(dayTwo);
 
     Notebook notebook = spanishNotebook(dayTwo);
-    controller.commission(commissionRequest(notebook), "Asia/Shanghai");
 
     RecordLearningSessionResponse response =
         controller.record(
@@ -80,12 +76,12 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
   }
 
   @Test
-  void allLinesRejectedStaysAwaitingReport() throws UnexpectedNoAccessRightException {
+  void allLinesRejectedCreatesNoSession() throws UnexpectedNoAccessRightException {
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
     testabilitySettings.timeTravelTo(dayTwo);
 
     Notebook notebook = spanishNotebook(dayTwo);
-    controller.commission(commissionRequest(notebook), "Asia/Shanghai");
+    long sessionsBefore = learningSessionRepository.count();
 
     RecordLearningSessionResponse response =
         controller.record(
@@ -99,39 +95,32 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
                 """),
             "Asia/Shanghai");
 
-    assertThat(response.getStatus(), equalTo(LearningSessionStatus.AWAITING_REPORT));
     assertThat(response.getRecordedItems(), empty());
     assertThat(response.getRejectedEntries(), hasSize(2));
-    assertThat(
-        learningSessionRepository.findByUser_IdAndNotebook_IdAndStatus(
-            currentUser.getUser().getId(), notebook.getId(), LearningSessionStatus.AWAITING_REPORT),
-        hasSize(1));
+    assertThat(learningSessionRepository.count(), equalTo(sessionsBefore));
   }
 
   @Test
-  void notFoundWhenNoSessionToRecordOrAmend() {
-    Notebook notebook =
-        makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).name("Lonely").please();
-
-    ResponseStatusException ex =
-        assertThrows(
-            ResponseStatusException.class,
-            () -> controller.record(recordRequest(notebook, "Hola: 5\n"), "Asia/Shanghai"));
-    assertThat(ex.getStatusCode().value(), equalTo(404));
-    assertThat(
-        ex.getReason(), equalTo("No learning session to record or amend for this notebook."));
-  }
-
-  @Test
-  void initialRecordCapturesPreSessionSnapshot() throws UnexpectedNoAccessRightException {
+  void rejectsTitleWithoutCommissionedTracker() throws UnexpectedNoAccessRightException {
     Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
     testabilitySettings.timeTravelTo(dayTwo);
 
-    LearningSession session = commissionAndRecordSpanishNotebook(dayTwo);
+    Notebook notebook =
+        makeMe
+            .aNotebook()
+            .creatorAndOwner(currentUser.getUser())
+            .name("Spanish conversation")
+            .please();
+    makeMe.aNote().notebook(notebook).title("Hola").content("Hello").please();
 
-    for (SessionItem item : sessionItemRepository.findByLearningSession_Id(session.getId())) {
-      assertThat(item.getPreSessionRecallCount(), equalTo(0));
-      assertThat(item.getPreSessionForgettingCurveIndex(), notNullValue());
-    }
+    RecordLearningSessionResponse response =
+        controller.record(
+            recordRequest(notebook, "# Learning Session Report\n\nHola: 5\n"), "Asia/Shanghai");
+
+    assertThat(response.getRecordedItems(), empty());
+    assertThat(response.getRejectedEntries(), hasSize(1));
+    assertThat(
+        response.getRejectedEntries().getFirst().getReason(),
+        containsString("No commissioned memory tracker"));
   }
 }

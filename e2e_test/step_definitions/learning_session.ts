@@ -13,21 +13,28 @@ import start from '../start'
 const SESSION_ITEM_SCORES_OPEN_TAG = '<session_item_scores>'
 const SESSION_ITEM_SCORES_CLOSE_TAG = '</session_item_scores>'
 
-function commissionLearningSessionViaApi(notebookTitle: string) {
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-  return start
-    .testability()
-    .getNotebookIdByName(notebookTitle)
-    .then((notebookId) =>
-      cy.wrap(
-        LearningSessionController.commission({
-          body: { notebookId },
-          query: { timezone },
-        }),
-        { log: false }
+Given(
+  'I have recorded a learning session for notebook {string} on day {int} with scores:',
+  (notebookTitle: string, day: number, dataTable: DataTable) => {
+    start.testability().timeTravelTo(day, 9)
+    const lines = dataTable.hashes().map((row) => `${row.Note}: ${row.Score}`)
+    const reportMarkdown = `# Learning Session Report\n\n${SESSION_ITEM_SCORES_OPEN_TAG}\n${lines.join('\n')}\n${SESSION_ITEM_SCORES_CLOSE_TAG}\n`
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    start
+      .testability()
+      .getNotebookIdByName(notebookTitle)
+      .then((notebookId) =>
+        cy.wrap(
+          LearningSessionController.record({
+            body: { notebookId, reportMarkdown },
+            query: { timezone },
+          }),
+          { log: false }
+        )
       )
-    )
-}
+    start.recall().visitRecallPage()
+  }
+)
 
 When(
   'I open the learning session request for notebook {string}',
@@ -36,45 +43,14 @@ When(
   }
 )
 
-Given(
-  'I have commissioned a learning session for notebook {string} on day {int} with session items for notes {string}',
-  (notebookTitle: string, day: number, _noteTitles: string) => {
-    start.testability().timeTravelTo(day, 9)
-    commissionLearningSessionViaApi(notebookTitle)
-    start.recall().visitRecallPage()
-  }
-)
-
-Given(
-  'I have recorded a learning session for notebook {string} on day {int} with scores:',
-  (notebookTitle: string, day: number, dataTable: DataTable) => {
-    start.testability().timeTravelTo(day, 9)
-    commissionLearningSessionViaApi(notebookTitle)
-    const lines = dataTable.hashes().map((row) => `${row.Note}: ${row.Score}`)
-    const reportMarkdown = `# Learning Session Report\n\n${SESSION_ITEM_SCORES_OPEN_TAG}\n${lines.join('\n')}\n${SESSION_ITEM_SCORES_CLOSE_TAG}\n`
-    start
-      .recall()
-      .visitRecallPage()
-      .recordLearningSessionReport(reportMarkdown, { notebookTitle })
-      .expectLearningSessionRecorded()
-    start.recall().visitRecallPage()
-  }
-)
-
-When(
-  'I record the learning session report for the learning session of notebook {string}:',
-  (notebookTitle: string, reportMarkdown: string) => {
-    start
-      .recall()
-      .assumeRecallPage()
-      .recordLearningSessionReport(reportMarkdown, { notebookTitle })
-  }
-)
+When('I record the learning session report:', (reportMarkdown: string) => {
+  start.recall().assumeRecallPage().recordLearningSessionReport(reportMarkdown)
+})
 
 Then(
   'the learning session for notebook {string} should be marked as recorded',
   (_notebookTitle: string) => {
-    start.recall().assumeRecallPage().expectLearningSessionRecorded()
+    start.recall().assumeRecallPage().expectLearningSessionReportRecorded()
   }
 )
 
@@ -150,10 +126,6 @@ Then(
       .expectLearningSessionRequestIncludesRubric()
   }
 )
-
-Then("the learning session should be awaiting the tutor's report", () => {
-  start.recall().assumeRecallPage().expectLearningSessionAwaitingReport()
-})
 
 Then(
   'no learning session should exist for notebook {string}',

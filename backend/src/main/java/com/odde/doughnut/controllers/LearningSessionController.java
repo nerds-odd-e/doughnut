@@ -83,11 +83,7 @@ class LearningSessionController {
     Notebook notebook = authorizedNotebook(body.notebookId);
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     return learningSessionService.record(
-        authorizationService.getCurrentUser(),
-        notebook,
-        body.reportMarkdown,
-        body.learningSessionId,
-        now);
+        authorizationService.getCurrentUser(), notebook, body.reportMarkdown, now);
   }
 
   private Notebook authorizedNotebook(Integer notebookId) throws UnexpectedNoAccessRightException {

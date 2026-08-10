@@ -3,10 +3,7 @@ import { waitUntilAppIsNotBusy } from '../pageBase'
 import { RecallsController } from '@generated/doughnut-backend-api/sdk.gen'
 import type { DueMemoryTrackers } from '@generated/doughnut-backend-api'
 
-type LearningSessionActionLabel =
-  | 'Commission'
-  | 'Record report'
-  | 'Amend report'
+type LearningSessionActionLabel = 'Commission'
 
 function learningSessionActionEntryLabel(
   notebookTitle: string,
@@ -45,22 +42,6 @@ function clickSessionActionFromList(
   ).click()
   cy.get('[data-test="learning-session-list-dialog"]').should('not.exist')
   waitUntilAppIsNotBusy()
-}
-
-function selectRecordOrAmendAction(notebookTitle: string) {
-  const amendLabel = learningSessionActionEntryLabel(
-    notebookTitle,
-    'Amend report'
-  )
-  cy.get('[data-test="learning-session-action-entry"]').then(($entries) => {
-    const hasAmend = [...$entries].some((el) =>
-      el.textContent?.includes(amendLabel)
-    )
-    clickSessionActionFromList(
-      notebookTitle,
-      hasAmend ? 'Amend report' : 'Record report'
-    )
-  })
 }
 
 export const recallLearningSessionMethods = () => ({
@@ -158,48 +139,18 @@ export const recallLearningSessionMethods = () => ({
     )
     return this
   },
-  expectLearningSessionAwaitingReport() {
-    cy.get('[data-test="learning-session-awaiting-report"]').should(
-      'be.visible'
-    )
-    return this
-  },
-  recordLearningSessionReport(
-    reportMarkdown: string,
-    options?: { notebookTitle?: string }
-  ) {
-    const fillAndSubmit = () => {
-      cy.get('[data-test="commission-learning-session-dialog"]')
-        .find('[data-test="learning-session-report"]')
-        .clear()
-        .invoke('val', reportMarkdown)
-        .trigger('input')
-      cy.get('[data-test="record-learning-session-report-submit"]').click()
-      waitUntilAppIsNotBusy()
-    }
-
-    if (!options?.notebookTitle) {
-      fillAndSubmit()
-      return this
-    }
-
+  recordLearningSessionReport(reportMarkdown: string) {
+    cy.get('[data-test="commission-learning-session-dialog"]')
+      .find('[data-test="learning-session-report"]')
+      .clear()
+      .invoke('val', reportMarkdown)
+      .trigger('input')
+    cy.get('[data-test="record-learning-session-report-submit"]').click()
     waitUntilAppIsNotBusy()
-    openLearningSessionList()
-    selectRecordOrAmendAction(options.notebookTitle!)
-    fillAndSubmit()
     return this
   },
-  expectLearningSessionRecorded() {
-    cy.get('[data-test="learning-session-recorded"]').should('be.visible')
-    cy.get('[data-test="learning-session-awaiting-report"]').should('not.exist')
-    return this
-  },
-  openAmendLearningSessionReport(notebookTitle: string) {
-    this.openLearningSessionAction(notebookTitle, 'Amend report')
-    cy.get('[data-test="commission-learning-session-dialog"]').should(
-      'be.visible'
-    )
-    cy.get('[data-test="learning-session-recorded"]').should('be.visible')
+  expectLearningSessionReportRecorded() {
+    cy.get('[data-test="learning-session-recorded-items"]').should('be.visible')
     return this
   },
   expectPotentialLearningSession(count: number, notebookTitle: string) {

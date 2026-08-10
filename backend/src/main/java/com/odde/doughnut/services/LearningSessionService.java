@@ -7,6 +7,7 @@ import com.odde.doughnut.controllers.dto.RecordLearningSessionResponse;
 import com.odde.doughnut.controllers.dto.RecordedLearningSessionItem;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.LearningSessionRepository;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.SessionItemRepository;
 import com.odde.doughnut.services.LearningSessionReportParser.ParseResult;
 import com.odde.doughnut.services.LearningSessionReportParser.ParsedReportEntry;
@@ -14,8 +15,8 @@ import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -28,24 +29,24 @@ public class LearningSessionService {
   private final UserService userService;
   private final LearningSessionRepository learningSessionRepository;
   private final SessionItemRepository sessionItemRepository;
+  private final NoteRepository noteRepository;
   private final LearningSessionRequestMarkdownBuilder learningSessionRequestMarkdownBuilder;
   private final LearningSessionReportParser learningSessionReportParser;
-  private final LearningSessionRecordTargetResolver learningSessionRecordTargetResolver;
 
   @Autowired
   public LearningSessionService(
       UserService userService,
       LearningSessionRepository learningSessionRepository,
       SessionItemRepository sessionItemRepository,
+      NoteRepository noteRepository,
       LearningSessionRequestMarkdownBuilder learningSessionRequestMarkdownBuilder,
-      LearningSessionReportParser learningSessionReportParser,
-      LearningSessionRecordTargetResolver learningSessionRecordTargetResolver) {
+      LearningSessionReportParser learningSessionReportParser) {
     this.userService = userService;
     this.learningSessionRepository = learningSessionRepository;
     this.sessionItemRepository = sessionItemRepository;
+    this.noteRepository = noteRepository;
     this.learningSessionRequestMarkdownBuilder = learningSessionRequestMarkdownBuilder;
     this.learningSessionReportParser = learningSessionReportParser;
-    this.learningSessionRecordTargetResolver = learningSessionRecordTargetResolver;
   }
 
   @Transactional(readOnly = true)
@@ -84,84 +85,77 @@ public class LearningSessionService {
 
   @Transactional
   public RecordLearningSessionResponse record(
-      User user,
-      Notebook notebook,
-      String reportMarkdown,
-      Integer learningSessionId,
-      Timestamp now) {
-    LearningSessionRecordTargetResolver.LearningSessionRecordTarget target =
-        learningSessionRecordTargetResolver.resolve(user, notebook, learningSessionId);
-    LearningSession session = target.session();
-    boolean isAmend = target.isAmend();
-    List<SessionItem> sessionItems =
-        sessionItemRepository.findByLearningSession_Id(session.getId());
-    Set<String> sessionItemTitles =
-        sessionItems.stream().map(SessionItem::getNoteTitle).collect(Collectors.toSet());
-    Set<String> ambiguousTitles =
-        LearningSessionReportParser.ambiguousTitles(
-            sessionItems.stream().map(SessionItem::getNoteTitle).toList());
+      User user, Notebook notebook, String reportMarkdown, Timestamp now) {
+    List<Note> notebookNotes =
+        noteRepository.findLiveNotesByNotebookIdOrderByIdAsc(notebook.getId());
+    List<String> notebookTitleList = notebookNotes.stream().map(Note::getTitle).toList();
+    Set<String> notebookTitles = Set.copyOf(notebookTitleList);
+    Set<String> ambiguousTitles = LearningSessionReportParser.ambiguousTitles(notebookTitleList);
     ParseResult parseResult =
-        learningSessionReportParser.parse(reportMarkdown, sessionItemTitles, ambiguousTitles);
+        learningSessionReportParser.parse(reportMarkdown, notebookTitles, ambiguousTitles);
 
     RecordLearningSessionResponse response = new RecordLearningSessionResponse();
-    response.setStatus(session.getStatus());
     response.setRecordedItems(new ArrayList<>());
     response.setRejectedEntries(
         new ArrayList<>(
             RejectedLearningSessionReportEntryMapper.fromParsed(parseResult.rejected())));
 
+    List<MatchedReportEntry> matchedEntries = new ArrayList<>();
     for (ParsedReportEntry entry : parseResult.entries()) {
-      SessionItem matched =
-          sessionItems.stream()
-              .filter(item -> item.getNoteTitle().equals(entry.noteTitle()))
-              .findFirst()
-              .orElseThrow();
-
-      if (isAmend && matched.getPreSessionRecallCount() == null) {
+      Optional<MemoryTracker> tracker =
+          findCommissionedNoteLevelTracker(user, notebookNotes, entry.noteTitle());
+      if (tracker.isEmpty()) {
         response
             .getRejectedEntries()
             .add(
                 RejectedLearningSessionReportEntryMapper.of(
                     entry.noteTitle() + ": " + entry.score(),
-                    "Cannot amend: no pre-session snapshot for this item."));
+                    "No commissioned memory tracker for this note."));
         continue;
       }
+      matchedEntries.add(new MatchedReportEntry(entry, tracker.get()));
+    }
 
-      matched.setFeedbackScore(entry.score());
-      matched.setFeedbackRecordedAt(now);
-      MemoryTracker tracker = matched.getMemoryTracker();
-      if (isAmend) {
-        CommissionedLearningSessionFeedbackScheduling.restorePreSessionSnapshot(tracker, matched);
-      } else if (matched.getPreSessionRecallCount() == null) {
-        matched.setPreSessionForgettingCurveIndex(tracker.getForgettingCurveIndex());
-        matched.setPreSessionRecallCount(tracker.getRecallCount());
-      }
-      CommissionedLearningSessionFeedbackScheduling.recordFeedback(tracker, now, entry.score());
-      sessionItemRepository.save(matched);
+    if (matchedEntries.isEmpty()) {
+      return response;
+    }
+
+    LearningSession session = new LearningSession();
+    session.setUser(user);
+    session.setNotebook(notebook);
+    session.setStatus(LearningSessionStatus.RECORDED);
+    session.setCommissionedAt(now);
+    session.setRecordedAt(now);
+    learningSessionRepository.save(session);
+
+    for (MatchedReportEntry matched : matchedEntries) {
+      SessionItem item = createSessionItem(session, matched.tracker());
+      item.setFeedbackScore(matched.entry().score());
+      item.setFeedbackRecordedAt(now);
+      CommissionedLearningSessionFeedbackScheduling.recordFeedback(
+          matched.tracker(), now, matched.entry().score());
+      sessionItemRepository.save(item);
 
       RecordedLearningSessionItem recorded = new RecordedLearningSessionItem();
-      recorded.setNoteTitle(entry.noteTitle());
-      recorded.setScore(entry.score());
-      recorded.setMemoryTrackerId(tracker.getId());
+      recorded.setNoteTitle(matched.entry().noteTitle());
+      recorded.setScore(matched.entry().score());
+      recorded.setMemoryTrackerId(matched.tracker().getId());
       response.getRecordedItems().add(recorded);
     }
 
-    if (!response.getRecordedItems().isEmpty()) {
-      if (!isAmend) {
-        session.setStatus(LearningSessionStatus.RECORDED);
-      }
-      session.setRecordedAt(now);
-      learningSessionRepository.save(session);
-      response.setStatus(LearningSessionStatus.RECORDED);
-      response.setRecordedAt(now);
-    } else if (isAmend) {
-      response.setStatus(LearningSessionStatus.RECORDED);
-      response.setRecordedAt(session.getRecordedAt());
-    } else {
-      response.setStatus(LearningSessionStatus.AWAITING_REPORT);
-    }
-
+    response.setStatus(LearningSessionStatus.RECORDED);
+    response.setRecordedAt(now);
     return response;
+  }
+
+  private Optional<MemoryTracker> findCommissionedNoteLevelTracker(
+      User user, List<Note> notebookNotes, String noteTitle) {
+    return notebookNotes.stream()
+        .filter(note -> note.getTitle().equals(noteTitle))
+        .flatMap(note -> userService.getMemoryTrackersFor(user, note).stream())
+        .filter(MemoryTracker::isCommissioned)
+        .filter(MemoryTracker::isNoteLevelTracker)
+        .findFirst();
   }
 
   private void abandonUnfinishedSessions(User user, Notebook notebook) {
@@ -207,4 +201,6 @@ public class LearningSessionService {
     response.setStatus(session.getStatus());
     return response;
   }
+
+  private record MatchedReportEntry(ParsedReportEntry entry, MemoryTracker tracker) {}
 }

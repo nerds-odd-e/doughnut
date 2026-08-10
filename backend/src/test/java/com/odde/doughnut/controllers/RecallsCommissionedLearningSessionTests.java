@@ -98,7 +98,6 @@ class RecallsCommissionedLearningSessionTests extends RecallsControllerTestBase 
           makeMe.aMemoryTrackerFor(gracias).commissioned().nextRecallAt(dayOne).please();
 
       testabilitySettings.timeTravelTo(dayTwo);
-      learningSessionController.commission(commissionRequest(notebook), "Asia/Shanghai");
       learningSessionController.record(
           recordRequest(notebook, HOLA_GRACIAS_REPORT), "Asia/Shanghai");
 
@@ -111,33 +110,6 @@ class RecallsCommissionedLearningSessionTests extends RecallsControllerTestBase 
     }
 
     @Test
-    void dayThreeDueCommissionedEmptyAfterAmendGraciasToFour()
-        throws UnexpectedNoAccessRightException {
-      currentUser.setUser(makeMe.aUser().withSpaceIntervals("1, 2, 4, 8").please());
-      Timestamp dayOne = makeMe.aTimestamp().of(0, 8).please();
-      Timestamp dayTwo = makeMe.aTimestamp().of(1, 9).please();
-      Timestamp dayThree = makeMe.aTimestamp().of(2, 9).please();
-      testabilitySettings.timeTravelTo(dayOne);
-
-      Notebook notebook = spanishConversationNotebook();
-      Note hola = makeMe.aNote().notebook(notebook).title("Hola").please();
-      Note gracias = makeMe.aNote().notebook(notebook).title("Gracias").please();
-      makeMe.aMemoryTrackerFor(hola).commissioned().nextRecallAt(dayOne).please();
-      makeMe.aMemoryTrackerFor(gracias).commissioned().nextRecallAt(dayOne).please();
-
-      testabilitySettings.timeTravelTo(dayTwo);
-      learningSessionController.commission(commissionRequest(notebook), "Asia/Shanghai");
-      learningSessionController.record(
-          recordRequest(notebook, HOLA4_GRACIAS1_REPORT), "Asia/Shanghai");
-      learningSessionController.record(recordRequest(notebook, GRACIAS4_REPORT), "Asia/Shanghai");
-
-      testabilitySettings.timeTravelTo(dayThree);
-      DueMemoryTrackers due = controller.recalling("Asia/Shanghai", 0);
-
-      assertThat(due.getDueCommissioned(), hasSize(0));
-    }
-
-    @Test
     void returnsRecordedSessionsAfterRecord() throws UnexpectedNoAccessRightException {
       Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
       testabilitySettings.timeTravelTo(currentTime);
@@ -147,7 +119,6 @@ class RecallsCommissionedLearningSessionTests extends RecallsControllerTestBase 
       makeMe.aMemoryTrackerFor(hola).commissioned().nextRecallAt(currentTime).please();
       makeMe.aMemoryTrackerFor(gracias).commissioned().nextRecallAt(currentTime).please();
 
-      learningSessionController.commission(commissionRequest(notebook), "Asia/Shanghai");
       learningSessionController.record(
           recordRequest(notebook, HOLA4_GRACIAS1_REPORT), "Asia/Shanghai");
 
@@ -175,7 +146,6 @@ class RecallsCommissionedLearningSessionTests extends RecallsControllerTestBase 
       makeMe.aMemoryTrackerFor(holaA).commissioned().nextRecallAt(currentTime).please();
       makeMe.aMemoryTrackerFor(graciasA).commissioned().nextRecallAt(currentTime).please();
 
-      learningSessionController.commission(commissionRequest(notebookA), "Asia/Shanghai");
       learningSessionController.record(
           recordRequest(notebookA, HOLA4_GRACIAS1_REPORT), "Asia/Shanghai");
 

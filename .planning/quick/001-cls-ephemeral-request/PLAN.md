@@ -61,45 +61,16 @@ Refactor `LearningSessionRequestMarkdownBuilder` to build from `List<MemoryTrack
 
 ### Phase 3 — Behavior: User records a report → session created with feedback
 
-**Status:** planned
+**Status:** done
 
-- Backend: Rewrite `LearningSessionService.record()` — create new `LearningSession`
-  + `SessionItem`s from parsed report. Each item: `feedbackScore` +
-  `feedbackRecordedAt` + `noteTitle` + `memoryTracker`. Reschedule trackers.
-  No `learningSessionId`, no amend, no due check, no request-membership check.
-- Frontend: Report textarea + "Record report" button → new POST /record (no
-  `learningSessionId`). Show recorded/rejected items.
-- E2E: user pastes report → session created → trackers rescheduled.
+- Backend: `record()` creates new `LearningSession` + `SessionItem`s with feedback;
+  reschedules trackers. No `learningSessionId`, amend, due/request-membership checks.
+- Frontend: Record from request UI without session id; show recorded/rejected items.
+- E2E: paste report → session created → trackers rescheduled. Amend scenario removed.
 
-**Remove this phase:**
-- Backend `LearningSessionService`: amend branch (`isAmend`, snapshot restore,
-  AWAITING_REPORT transitions), initial-record snapshot capture,
-  `LearningSessionRecordTargetResolver` dependency + usage, `abandonUnfinishedSessions()`
-- Backend `LearningSessionController`: `learningSessionId` wiring to record
-- Frontend `CommissionLearningSessionDialog.vue`: `mode: "amend"`,
-  `learningSessionId` in record body, status alerts, `LearningSessionCommissionResponse`
-  import, `data.status === "RECORDED"` branch
-- Delete `LearningSessionAmendTests.java` entirely
-- `LearningSessionRecordTests.java`: remove `allLinesRejectedStaysAwaitingReport`,
-  `notFoundWhenNoSessionToRecordOrAmend`, `initialRecordCapturesPreSessionSnapshot`;
-  rewrite remaining for record-creates-session
-- `LearningSessionControllerTestBase.java`: remove `commissionRequest()`,
-  `recordRequest(..., learningSessionId)` overload, `recordedLearningSession()`
-  with status+commissionedAt, `commissionAndRecordSpanishNotebook()` commission step,
-  `RecordedAndAwaitingSessions`, `commissionRecordAndRecommission()`
-- `LearningSessionBuilder.java`: remove `commissionedAt()`
-- `SessionItemBuilder.java`: remove `preSessionForgettingCurveIndex()`,
-  `preSessionRecallCount()`
-- `CommissionLearningSessionDialog.spec.ts`: amend + `learningSessionId` tests,
-  record-after-commission tests (rewrite for direct record)
-- `RecallProgressBar.spec.ts`: amend flow describe, "Record report" entry flow
-- E2E `commissioned_learning_session.feature`: remove amend scenario; rewrite
-  record scenario without commission; remove "awaiting the tutor's report"
-- E2E `learning_session.ts`: remove amend steps; rewrite recorded setup without
-  commission
-- E2E `recallLearningSessionMethods.ts`: remove `selectRecordOrAmendAction`,
-  `openAmendLearningSessionReport`, `expectLearningSessionAwaitingReport`,
-  `expectLearningSessionRecorded`; remove 'Record report'/'Amend report' labels
+**Learnings:** `abandonUnfinishedSessions()` + POST `/commission` remain until Phase 6.
+`learningSessionId` DTO field / schema status columns deferred to Phases 5–6.
+Proposed ADRs 0001/0003/0005 still need human update.
 
 ### Phase 4 — Behavior: List shows only potential sessions
 

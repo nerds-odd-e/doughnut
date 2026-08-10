@@ -35,18 +35,19 @@
               />
             </div>
             <div
-              v-if="status === 'AWAITING_REPORT'"
-              class="daisy-alert daisy-alert-info mt-4"
-              data-test="learning-session-awaiting-report"
+              v-if="recordedItems.length > 0"
+              class="daisy-alert daisy-alert-success mt-4"
+              data-test="learning-session-recorded-items"
             >
-              <span>This learning session is awaiting the tutor's report.</span>
-            </div>
-            <div
-              v-if="status === 'RECORDED'"
-              class="daisy-alert daisy-alert-info mt-4"
-              data-test="learning-session-recorded"
-            >
-              <span>This learning session is recorded.</span>
+              <div class="flex flex-col gap-1">
+                <span
+                  v-for="(item, index) in recordedItems"
+                  :key="index"
+                  data-test="learning-session-recorded-item"
+                >
+                  {{ item.noteTitle }}: {{ item.score }}
+                </span>
+              </div>
             </div>
             <div
               v-if="rejectedEntries.length > 0"
@@ -87,7 +88,7 @@
 import { computed, onMounted, ref, watch } from "vue"
 import { LearningSessionController } from "@generated/doughnut-backend-api/sdk.gen"
 import type {
-  LearningSessionCommissionResponse,
+  RecordedLearningSessionItem,
   RejectedLearningSessionReportEntry,
 } from "@generated/doughnut-backend-api/types.gen"
 import Modal from "@/components/commons/Modal.vue"
@@ -98,9 +99,8 @@ import timezoneParam from "@/managedApi/window/timezoneParam"
 const props = defineProps<{
   notebookId: number
   notebookName: string
-  mode?: "request" | "record" | "amend"
+  mode?: "request" | "record"
   initialRequestMarkdown?: string
-  learningSessionId?: number
 }>()
 
 const emit = defineEmits<{
@@ -112,25 +112,16 @@ const loading = ref(false)
 const requestMarkdown = ref(props.initialRequestMarkdown ?? "")
 const reportMarkdown = ref("")
 const rejectedEntries = ref<RejectedLearningSessionReportEntry[]>([])
-const status = ref<LearningSessionCommissionResponse["status"] | "">(
-  props.mode === "record"
-    ? "AWAITING_REPORT"
-    : props.mode === "amend"
-      ? "RECORDED"
-      : ""
-)
+const recordedItems = ref<RecordedLearningSessionItem[]>([])
 
 const requestReady = computed(
-  () =>
-    props.mode === "record" ||
-    props.mode === "amend" ||
-    requestMarkdown.value.length > 0
+  () => props.mode === "record" || requestMarkdown.value.length > 0
 )
 
 watch(
   () => props.initialRequestMarkdown,
   (markdown) => {
-    if ((props.mode === "record" || props.mode === "amend") && markdown) {
+    if (props.mode === "record" && markdown) {
       requestMarkdown.value = markdown
     }
   },
@@ -159,7 +150,7 @@ const fetchRequest = async () => {
 }
 
 onMounted(async () => {
-  if (props.mode !== "record" && props.mode !== "amend") {
+  if (props.mode !== "record") {
     await fetchRequest()
   }
 })
@@ -170,9 +161,6 @@ const recordReport = async () => {
       LearningSessionController.record({
         body: {
           notebookId: props.notebookId,
-          ...(props.mode === "amend" && props.learningSessionId != null
-            ? { learningSessionId: props.learningSessionId }
-            : {}),
           reportMarkdown: reportMarkdown.value,
         },
         query: { timezone: timezoneParam() },
@@ -185,9 +173,9 @@ const recordReport = async () => {
   }
 
   rejectedEntries.value = data.rejectedEntries ?? []
+  recordedItems.value = data.recordedItems ?? []
 
-  if (data.status === "RECORDED") {
-    status.value = "RECORDED"
+  if (recordedItems.value.length > 0) {
     emit("recorded")
   }
 }

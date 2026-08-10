@@ -23,7 +23,7 @@ public class LearningSessionReportParser {
   public record ParseResult(List<ParsedReportEntry> entries, List<RejectedReportEntry> rejected) {}
 
   public ParseResult parse(
-      String reportMarkdown, Set<String> sessionItemTitles, Set<String> ambiguousTitles) {
+      String reportMarkdown, Set<String> notebookTitles, Set<String> ambiguousTitles) {
     List<ParsedReportEntry> entries = new ArrayList<>();
     List<RejectedReportEntry> rejected = new ArrayList<>();
     Set<String> seenTitles = new HashSet<>();
@@ -59,8 +59,8 @@ public class LearningSessionReportParser {
         continue;
       }
 
-      if (!sessionItemTitles.isEmpty() && !sessionItemTitles.contains(title)) {
-        rejected.add(new RejectedReportEntry(line, "No session item matched this note title."));
+      if (!notebookTitles.contains(title)) {
+        rejected.add(new RejectedReportEntry(line, "Note title not found in notebook."));
         continue;
       }
 

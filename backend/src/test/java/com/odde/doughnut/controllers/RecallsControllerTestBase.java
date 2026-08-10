@@ -28,13 +28,6 @@ abstract class RecallsControllerTestBase extends ControllerTestBase {
       Gracias: 1
       """;
 
-  protected static final String GRACIAS4_REPORT =
-      """
-      # Learning Session Report
-
-      Gracias: 4
-      """;
-
   @Autowired RecallsController controller;
   @Autowired LearningSessionController learningSessionController;
 

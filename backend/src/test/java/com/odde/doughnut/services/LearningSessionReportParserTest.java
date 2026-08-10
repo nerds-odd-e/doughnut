@@ -30,7 +30,7 @@ class LearningSessionReportParserTest {
 
     assertThat(result.entries(), empty());
     assertThat(result.rejected(), hasSize(1));
-    assertRejected(result.rejected().get(0), "UnknownNote: 3", "No session item matched");
+    assertRejected(result.rejected().get(0), "UnknownNote: 3", "Note title not found in notebook");
   }
 
   @Test

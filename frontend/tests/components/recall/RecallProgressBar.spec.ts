@@ -155,32 +155,6 @@ describe("RecallProgressBar learning session actions", () => {
       )
     ).toBeFalsy()
   })
-
-  it("opens record detail after picking Record report from session list", async () => {
-    mountBar({
-      awaitingReportSessions: [spanishLearningSession()],
-    })
-    await openLearningSessionList()
-    const recordEntry = findListEntry("Record report")
-    expect(recordEntry).toBeTruthy()
-    ;(recordEntry as HTMLButtonElement).click()
-    await wrapper!.vm.$nextTick()
-    expectListDialogHidden()
-    expect(
-      document.body.querySelector(
-        '[data-test="commission-learning-session-dialog"]'
-      )
-    ).toBeTruthy()
-    const request = document.body.querySelector(
-      '[data-test="learning-session-request"]'
-    ) as HTMLTextAreaElement | null
-    expect(request?.value).toBe(canonicalRequestMarkdown)
-    expect(
-      document.body.querySelector(
-        '[data-test="learning-session-awaiting-report"]'
-      )
-    ).toBeTruthy()
-  })
 })
 
 describe("RecallProgressBar recorded sessions", () => {
@@ -191,26 +165,5 @@ describe("RecallProgressBar recorded sessions", () => {
     expect(
       wrapper!.find('[data-test="recorded-learning-session"]').exists()
     ).toBe(false)
-  })
-
-  it("opens amend detail with request prefilled when Amend report is picked", async () => {
-    mountBar({
-      recordedSessions: [spanishLearningSession()],
-    })
-    await openLearningSessionList()
-    const amendEntry = findListEntry("Amend report")
-    expect(amendEntry).toBeTruthy()
-    expect(amendEntry!.textContent).toContain("Spanish conversation")
-    ;(amendEntry as HTMLButtonElement).click()
-    await wrapper!.vm.$nextTick()
-    expectListDialogHidden()
-    const request = document.body.querySelector(
-      '[data-test="learning-session-request"]'
-    ) as HTMLTextAreaElement | null
-    expect(request).toBeTruthy()
-    expect(request?.value).toBe(canonicalRequestMarkdown)
-    expect(
-      document.body.querySelector('[data-test="learning-session-recorded"]')
-    ).toBeTruthy()
   })
 })

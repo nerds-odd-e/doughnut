@@ -36,8 +36,9 @@ describe("CommissionLearningSessionDialog", () => {
     mockSdkService(LearningSessionController, "request", {
       requestMarkdown: canonicalRequestMarkdown,
     })
-    mountDialog({ mode: "request" })
+    const wrapper = mountDialog({ mode: "request" })
     await flushPromises()
+    return wrapper
   }
 
   it("fetches request markdown with notebook id on open", async () => {
@@ -86,7 +87,7 @@ describe("CommissionLearningSessionDialog", () => {
     ).toBeNull()
   })
 
-  it("records report with notebook id in API body", async () => {
+  it("records report with notebook id in API body and shows recorded items", async () => {
     const recordSpy = mockSdkService(LearningSessionController, "record", {
       status: "RECORDED",
       recordedAt: "1989-01-02T09:00:00Z",
@@ -96,7 +97,7 @@ describe("CommissionLearningSessionDialog", () => {
       ],
       rejectedEntries: [],
     })
-    await openRequestMode()
+    const wrapper = await openRequestMode()
 
     const reportTextarea = document.body.querySelector(
       '[data-test="learning-session-report"]'
@@ -113,6 +114,17 @@ describe("CommissionLearningSessionDialog", () => {
       },
       query: { timezone: expect.any(String) },
     })
+    expect(
+      document.body.querySelector(
+        '[data-test="learning-session-recorded-items"]'
+      )
+    ).toBeTruthy()
+    expect(
+      document.body.querySelector(
+        '[data-test="learning-session-recorded-items"]'
+      )?.textContent
+    ).toContain("Hola: 5")
+    expect(wrapper.emitted("recorded")).toBeTruthy()
   })
 
   it("shows rejection warning on partial success", async () => {
@@ -123,7 +135,7 @@ describe("CommissionLearningSessionDialog", () => {
       rejectedEntries: [
         {
           line: "Unknown: 3",
-          reason: "No session item matched this note title.",
+          reason: "Note title not found in notebook.",
         },
       ],
     })
@@ -141,39 +153,6 @@ describe("CommissionLearningSessionDialog", () => {
         '[data-test="learning-session-report-rejections"]'
       )?.textContent
     ).toContain("Unknown: 3")
-  })
-
-  it("mode amend records with learningSessionId in API body and emits recorded", async () => {
-    const recordSpy = mockSdkService(LearningSessionController, "record", {
-      status: "RECORDED",
-      recordedAt: "1989-01-02T09:00:00Z",
-      recordedItems: [{ noteTitle: "Gracias", score: 4, memoryTrackerId: 12 }],
-      rejectedEntries: [],
-    })
-    const wrapper = mountDialog({
-      mode: "amend",
-      learningSessionId: 99,
-      initialRequestMarkdown: canonicalRequestMarkdown,
-    })
-    await flushPromises()
-
-    const reportTextarea = document.body.querySelector(
-      '[data-test="learning-session-report"]'
-    ) as HTMLTextAreaElement
-    reportTextarea.value = "# Learning Session Report\n\nGracias: 4\n"
-    reportTextarea.dispatchEvent(new Event("input"))
-
-    await clickRecordReportSubmit()
-
-    expect(recordSpy).toHaveBeenCalledWith({
-      body: {
-        notebookId: 42,
-        learningSessionId: 99,
-        reportMarkdown: "# Learning Session Report\n\nGracias: 4\n",
-      },
-      query: { timezone: expect.any(String) },
-    })
-    expect(wrapper.emitted("recorded")).toBeTruthy()
   })
 
   it("keeps report textarea when record fails", async () => {

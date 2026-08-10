@@ -46,10 +46,11 @@ Feature: Commissioned learning session
     And I should see 1 potential learning session to commission for notebook "Spanish conversation"
     And I should see 1 potential learning session to commission for notebook "Kanji"
 
-  Scenario: Recording the tutor's report schedules each tracker from its score
+  Scenario: Recording the tutor's report creates a session and schedules each tracker
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
-    And I have commissioned a learning session for notebook "Spanish conversation" on day 2 with session items for notes "Hola, Gracias"
-    When I record the learning session report for the learning session of notebook "Spanish conversation":
+    And It's day 2, 9 hour
+    When I open the learning session request for notebook "Spanish conversation"
+    And I record the learning session report:
       """
       # Learning Session Report
 
@@ -65,21 +66,3 @@ Feature: Commissioned learning session
     When It's day 3, 9 hour
     And I open the learning session request for notebook "Spanish conversation"
     Then the learning session request should list session items for only notes "Gracias"
-
-  Scenario: A later report amends the feedback of a recorded learning session
-    Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
-    And I have recorded a learning session for notebook "Spanish conversation" on day 2 with scores:
-      | Note    | Score |
-      | Hola    | 4     |
-      | Gracias | 1     |
-    When I record the learning session report for the learning session of notebook "Spanish conversation":
-      """
-      # Learning Session Report
-
-      <session_item_scores>
-      Gracias: 4
-      </session_item_scores>
-      """
-    Then I should see tutor feedback score 4 from a learning session for the memory tracker of note "Gracias"
-    When It's day 3, 9 hour
-    Then I should see 0 potential learning session to commission for notebook "Spanish conversation"

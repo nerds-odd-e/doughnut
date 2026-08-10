@@ -141,11 +141,9 @@ const sessionDialogProps = computed(() => {
   const session = dialog.session
   const isLite = isLearningSessionLite(session)
   return {
-    mode: dialog.mode,
+    mode: dialog.mode === "amend" ? "record" : dialog.mode,
     notebookId: session.notebookId,
     notebookName: session.notebookName,
-    learningSessionId:
-      dialog.mode === "amend" && isLite ? session.learningSessionId : undefined,
     initialRequestMarkdown:
       dialog.mode !== "request" && isLite ? session.requestMarkdown : undefined,
   }

@@ -34,11 +34,6 @@ public class LearningSessionBuilder extends EntityBuilder<LearningSession> {
     return this;
   }
 
-  public LearningSessionBuilder commissionedAt(Timestamp commissionedAt) {
-    entity.setCommissionedAt(commissionedAt);
-    return this;
-  }
-
   public LearningSessionBuilder recordedAt(Timestamp recordedAt) {
     entity.setRecordedAt(recordedAt);
     return this;
