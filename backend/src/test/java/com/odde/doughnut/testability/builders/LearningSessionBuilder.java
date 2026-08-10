@@ -65,12 +65,16 @@ public class LearningSessionBuilder extends EntityBuilder<LearningSession> {
 
   @Override
   protected void afterCreate(boolean needPersist) {
+    Timestamp recordedAt =
+        entity.getRecordedAt() != null ? entity.getRecordedAt() : entity.getCommissionedAt();
     for (MemoryTracker tracker : sessionItemTrackers) {
       makeMe
           .aSessionItem()
           .learningSession(entity)
           .memoryTracker(tracker)
           .noteTitle(tracker.getNote().getTitle())
+          .feedbackScore(3)
+          .feedbackRecordedAt(recordedAt)
           .please(needPersist);
     }
   }

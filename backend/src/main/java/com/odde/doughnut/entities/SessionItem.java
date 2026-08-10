@@ -26,10 +26,10 @@ public class SessionItem extends EntityIdentifiedByIdOnly {
   @Column(name = "note_title", nullable = false)
   private String noteTitle;
 
-  @Column(name = "feedback_score")
+  @Column(name = "feedback_score", nullable = false)
   private Integer feedbackScore;
 
-  @Column(name = "feedback_recorded_at")
+  @Column(name = "feedback_recorded_at", nullable = false)
   private Timestamp feedbackRecordedAt;
 
   @Column(name = "pre_session_forgetting_curve_index")

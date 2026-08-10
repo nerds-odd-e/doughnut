@@ -85,13 +85,13 @@ Dialog filename still `CommissionLearningSessionDialog` (rename deferred / ADR v
 
 ### Phase 5 — Structure: Data migration — clean up old data and constrain
 
-**Status:** planned
+**Status:** done
 
-Flyway migration:
-- Delete `session_item` rows where `feedback_score IS NULL`
-- Delete orphaned `learning_session` rows (no remaining items)
-- Add NOT NULL on `session_item.feedback_score` + `feedback_recorded_at`
-- Existing tests pass (updated for constraint where needed)
+Flyway `V300000242__session_item_feedback_not_null.sql`: delete null-feedback
+items + orphaned sessions; NOT NULL on `feedback_score` + `feedback_recorded_at`.
+Entity/builders updated; commission tests removed (commission creates null feedback).
+
+**Learnings:** POST `/commission` breaks if called until Phase 6 removes it (UI unused).
 
 ### Phase 6 — Structure: Schema + dead code cleanup
 

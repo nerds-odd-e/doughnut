@@ -18,7 +18,6 @@ public interface SessionItemRepository extends JpaRepository<SessionItem, Intege
         COUNT(si), MAX(si.feedbackRecordedAt))
       FROM SessionItem si
       WHERE si.memoryTracker.id = :memoryTrackerId
-      AND si.feedbackScore IS NOT NULL
       AND si.learningSession.status = com.odde.doughnut.entities.LearningSessionStatus.RECORDED
       """)
   RecordedFeedbackSummary summarizeRecordedFeedbackByMemoryTrackerId(
@@ -29,13 +28,11 @@ public interface SessionItemRepository extends JpaRepository<SessionItem, Intege
       SELECT si.feedbackScore
       FROM SessionItem si
       WHERE si.memoryTracker.id = :memoryTrackerId
-      AND si.feedbackScore IS NOT NULL
       AND si.learningSession.status = com.odde.doughnut.entities.LearningSessionStatus.RECORDED
       AND si.feedbackRecordedAt = (
         SELECT MAX(si2.feedbackRecordedAt)
         FROM SessionItem si2
         WHERE si2.memoryTracker.id = :memoryTrackerId
-        AND si2.feedbackScore IS NOT NULL
         AND si2.learningSession.status = com.odde.doughnut.entities.LearningSessionStatus.RECORDED
       )
       """)

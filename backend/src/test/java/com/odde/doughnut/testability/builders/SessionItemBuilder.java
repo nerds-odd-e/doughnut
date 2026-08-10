@@ -49,5 +49,11 @@ public class SessionItemBuilder extends EntityBuilder<SessionItem> {
     if (entity.getNoteTitle() == null || entity.getNoteTitle().isBlank()) {
       entity.setNoteTitle(entity.getMemoryTracker().getNote().getTitle());
     }
+    if (entity.getFeedbackScore() == null) {
+      throw new IllegalStateException("call feedbackScore() before please()");
+    }
+    if (entity.getFeedbackRecordedAt() == null) {
+      throw new IllegalStateException("call feedbackRecordedAt() before please()");
+    }
   }
 }
