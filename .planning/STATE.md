@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: none
 milestone_name: none
-status: jidoka-stop
-last_updated: "2026-08-10T16:30:00.000Z"
+status: idle
+last_updated: "2026-08-10T17:00:00.000Z"
 last_activity: 2026-08-10
-last_activity_desc: phases 1–4 done; phase 5 Jidoka — need production collision decision
+last_activity_desc: completed display-name whitespace invariant (quick/001)
 ---
 
 # Project State
@@ -18,9 +18,8 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-Phases 1–4 **done** and pushed (`.planning/quick/001-display-name-whitespace/PLAN.md`).
-**Phase 5 blocked on Jidoka** — legacy row normalization needs production-like collision
-measurement and a developer decision (fail-loud vs disambiguation).
+No active plan. Last shipped: display-name surrounding-whitespace invariant
+(`.planning/quick/001-display-name-whitespace/` — phases 1–5 done).
 
 ## Deferred Items
 
