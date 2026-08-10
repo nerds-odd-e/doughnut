@@ -11,7 +11,5 @@ public class DueMemoryTrackers {
   @Getter @Setter private Timestamp currentRecallWindowEndAt;
   @Getter @Setter private List<MemoryTrackerLite> toRepeat;
   @Getter @Setter private List<DueCommissionedMemoryTrackerLite> dueCommissioned;
-  @Getter @Setter private List<LearningSessionLite> awaitingReportSessions;
-  @Getter @Setter private List<LearningSessionLite> recordedSessions;
   @Getter @Setter private Integer dueInDays;
 }

@@ -23,7 +23,7 @@ Feature: Commissioned learning session
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
     When It's day 2, 9 hour
     Then I should see that I have 0 notes to recall
-    And I should see 1 potential learning session to commission for notebook "Spanish conversation"
+    And I should see 1 potential learning session for notebook "Spanish conversation"
 
   Scenario: Opening a potential learning session shows the request without creating a session
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
@@ -43,8 +43,8 @@ Feature: Commissioned learning session
     And the notes "水" are assimilated as commissioned on day 1
     When It's day 2, 9 hour
     Then I should see that I have 0 notes to recall
-    And I should see 1 potential learning session to commission for notebook "Spanish conversation"
-    And I should see 1 potential learning session to commission for notebook "Kanji"
+    And I should see 1 potential learning session for notebook "Spanish conversation"
+    And I should see 1 potential learning session for notebook "Kanji"
 
   Scenario: Recording the tutor's report creates a session and schedules each tracker
     Given the notes "Hola, Gracias" are assimilated as commissioned on day 1
@@ -63,6 +63,8 @@ Feature: Commissioned learning session
     And the commissioned memory tracker for "Hola" should have recall count 1
     And the commissioned memory tracker for "Gracias" should have recall count 1
     And I should see tutor feedback score 5 from a learning session for the memory tracker of note "Hola"
+    And I should see 0 potential learning session for notebook "Spanish conversation"
     When It's day 3, 9 hour
-    And I open the learning session request for notebook "Spanish conversation"
+    Then I should see 1 potential learning session for notebook "Spanish conversation"
+    When I open the learning session request for notebook "Spanish conversation"
     Then the learning session request should list session items for only notes "Gracias"

@@ -2,24 +2,17 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.DueCommissionedMemoryTrackerLite;
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
-import com.odde.doughnut.controllers.dto.LearningSessionLite;
 import com.odde.doughnut.controllers.dto.MemoryTrackerLite;
-import com.odde.doughnut.entities.LearningSession;
-import com.odde.doughnut.entities.LearningSessionStatus;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.LearningSessionRepository;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.entities.repositories.RecallPromptRepository;
-import com.odde.doughnut.entities.repositories.SessionItemRepository;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import java.time.ZoneId;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,24 +23,15 @@ public class RecallService {
   private final UserService userService;
   private final MemoryTrackerRepository memoryTrackerRepository;
   private final RecallPromptRepository recallPromptRepository;
-  private final SessionItemRepository sessionItemRepository;
-  private final LearningSessionRepository learningSessionRepository;
-  private final LearningSessionRequestMarkdownBuilder learningSessionRequestMarkdownBuilder;
 
   @Autowired
   public RecallService(
       UserService userService,
       MemoryTrackerRepository memoryTrackerRepository,
-      RecallPromptRepository recallPromptRepository,
-      SessionItemRepository sessionItemRepository,
-      LearningSessionRepository learningSessionRepository,
-      LearningSessionRequestMarkdownBuilder learningSessionRequestMarkdownBuilder) {
+      RecallPromptRepository recallPromptRepository) {
     this.userService = userService;
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.recallPromptRepository = recallPromptRepository;
-    this.sessionItemRepository = sessionItemRepository;
-    this.learningSessionRepository = learningSessionRepository;
-    this.learningSessionRequestMarkdownBuilder = learningSessionRequestMarkdownBuilder;
   }
 
   private int totalAssimilatedCount(User user) {
@@ -85,12 +69,8 @@ public class RecallService {
                   return lite;
                 })
             .toList();
-    Set<Integer> awaitingReportTrackerIds =
-        new HashSet<>(
-            sessionItemRepository.findMemoryTrackerIdsInAwaitingReportSessions(user.getId()));
     List<DueCommissionedMemoryTrackerLite> dueCommissioned =
         getCommissionedMemoryTrackersNeedToRepeat(user, currentUTCTimestamp, timeZone, dueInDays)
-            .filter(mt -> !awaitingReportTrackerIds.contains(mt.getId()))
             .map(
                 mt -> {
                   DueCommissionedMemoryTrackerLite lite = new DueCommissionedMemoryTrackerLite();
@@ -105,10 +85,6 @@ public class RecallService {
     dueMemoryTrackers.setDueInDays(dueInDays);
     dueMemoryTrackers.setToRepeat(toRepeat);
     dueMemoryTrackers.setDueCommissioned(dueCommissioned);
-    dueMemoryTrackers.setAwaitingReportSessions(
-        learningSessionLitesFor(user, LearningSessionStatus.AWAITING_REPORT, timeZone));
-    dueMemoryTrackers.setRecordedSessions(
-        learningSessionLitesFor(user, LearningSessionStatus.RECORDED, timeZone));
 
     // Set recall status
     dueMemoryTrackers.totalAssimilatedCount = totalAssimilatedCount(user);
@@ -116,22 +92,6 @@ public class RecallService {
         TimestampOperations.alignByHalfADay(currentUTCTimestamp, timeZone));
 
     return dueMemoryTrackers;
-  }
-
-  private List<LearningSessionLite> learningSessionLitesFor(
-      User user, LearningSessionStatus status, ZoneId zoneId) {
-    return learningSessionRepository.findByUser_IdAndStatus(user.getId(), status).stream()
-        .map(session -> toLearningSessionLite(session, zoneId))
-        .toList();
-  }
-
-  private LearningSessionLite toLearningSessionLite(LearningSession session, ZoneId zoneId) {
-    LearningSessionLite lite = new LearningSessionLite();
-    lite.setNotebookId(session.getNotebook().getId());
-    lite.setNotebookName(session.getNotebook().getName());
-    lite.setLearningSessionId(session.getId());
-    lite.setRequestMarkdown(learningSessionRequestMarkdownBuilder.build(session, zoneId));
-    return lite;
   }
 
   public int getToRecallCount(User user, Timestamp currentUTCTimestamp, ZoneId timeZone) {

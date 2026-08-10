@@ -966,16 +966,7 @@ export type DueMemoryTrackers = {
     currentRecallWindowEndAt?: string;
     toRepeat?: Array<MemoryTrackerLite>;
     dueCommissioned?: Array<DueCommissionedMemoryTrackerLite>;
-    awaitingReportSessions?: Array<LearningSessionLite>;
-    recordedSessions?: Array<LearningSessionLite>;
     dueInDays?: number;
-};
-
-export type LearningSessionLite = {
-    notebookId: number;
-    notebookName: string;
-    learningSessionId: number;
-    requestMarkdown: string;
 };
 
 export type MemoryTrackerLite = {

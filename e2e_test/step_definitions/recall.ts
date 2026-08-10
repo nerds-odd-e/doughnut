@@ -58,7 +58,7 @@ Then(
 )
 
 Then(
-  'I should see {int} potential learning session to commission for notebook {string}',
+  'I should see {int} potential learning session for notebook {string}',
   (count: number, notebookTitle: string) => {
     start.recall().expectPotentialLearningSession(count, notebookTitle)
   }

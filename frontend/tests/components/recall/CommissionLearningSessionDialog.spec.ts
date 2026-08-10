@@ -36,7 +36,7 @@ describe("CommissionLearningSessionDialog", () => {
     mockSdkService(LearningSessionController, "request", {
       requestMarkdown: canonicalRequestMarkdown,
     })
-    const wrapper = mountDialog({ mode: "request" })
+    const wrapper = mountDialog()
     await flushPromises()
     return wrapper
   }
@@ -45,7 +45,7 @@ describe("CommissionLearningSessionDialog", () => {
     const requestSpy = mockSdkService(LearningSessionController, "request", {
       requestMarkdown: canonicalRequestMarkdown,
     })
-    mountDialog({ mode: "request" })
+    mountDialog()
     await flushPromises()
 
     expect(requestSpy).toHaveBeenCalledWith({
@@ -74,7 +74,7 @@ describe("CommissionLearningSessionDialog", () => {
   it("does not show request when fetch fails", async () => {
     const requestSpy = vi.spyOn(LearningSessionController, "request")
     requestSpy.mockResolvedValue(wrapSdkError("request failed") as never)
-    mountDialog({ mode: "request" })
+    mountDialog()
     await flushPromises()
 
     expect(

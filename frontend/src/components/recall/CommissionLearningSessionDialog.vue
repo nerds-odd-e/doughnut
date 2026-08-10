@@ -85,7 +85,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue"
+import { computed, onMounted, ref } from "vue"
 import { LearningSessionController } from "@generated/doughnut-backend-api/sdk.gen"
 import type {
   RecordedLearningSessionItem,
@@ -99,8 +99,6 @@ import timezoneParam from "@/managedApi/window/timezoneParam"
 const props = defineProps<{
   notebookId: number
   notebookName: string
-  mode?: "request" | "record"
-  initialRequestMarkdown?: string
 }>()
 
 const emit = defineEmits<{
@@ -109,24 +107,12 @@ const emit = defineEmits<{
 }>()
 
 const loading = ref(false)
-const requestMarkdown = ref(props.initialRequestMarkdown ?? "")
+const requestMarkdown = ref("")
 const reportMarkdown = ref("")
 const rejectedEntries = ref<RejectedLearningSessionReportEntry[]>([])
 const recordedItems = ref<RecordedLearningSessionItem[]>([])
 
-const requestReady = computed(
-  () => props.mode === "record" || requestMarkdown.value.length > 0
-)
-
-watch(
-  () => props.initialRequestMarkdown,
-  (markdown) => {
-    if (props.mode === "record" && markdown) {
-      requestMarkdown.value = markdown
-    }
-  },
-  { immediate: true }
-)
+const requestReady = computed(() => requestMarkdown.value.length > 0)
 
 const fetchRequest = async () => {
   loading.value = true
@@ -150,9 +136,7 @@ const fetchRequest = async () => {
 }
 
 onMounted(async () => {
-  if (props.mode !== "record") {
-    await fetchRequest()
-  }
+  await fetchRequest()
 })
 
 const recordReport = async () => {

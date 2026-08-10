@@ -1,21 +1,11 @@
 import RecallProgressBar from "@/components/recall/RecallProgressBar.vue"
 import type { PotentialLearningSession } from "@/composables/useRecallData"
-import type { LearningSessionLite } from "@generated/doughnut-backend-api"
 import { LearningSessionController } from "@generated/doughnut-backend-api/sdk.gen"
 import helper, { mockSdkService } from "@tests/helpers"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import type { VueWrapper } from "@vue/test-utils"
 
 const canonicalRequestMarkdown = "# Learning Session Request\n\n### Hola\n"
-
-const spanishLearningSession = (
-  requestMarkdown = canonicalRequestMarkdown
-): LearningSessionLite => ({
-  notebookId: 1,
-  notebookName: "Spanish conversation",
-  learningSessionId: 42,
-  requestMarkdown,
-})
 
 const spanishPotentialSession = (): PotentialLearningSession => ({
   notebookId: 1,
@@ -40,8 +30,6 @@ afterEach(() => {
 
 const mountBar = (props?: {
   potentialLearningSessions?: PotentialLearningSession[]
-  awaitingReportSessions?: LearningSessionLite[]
-  recordedSessions?: LearningSessionLite[]
 }) =>
   (wrapper = helper
     .component(RecallProgressBar)
@@ -53,8 +41,6 @@ const mountBar = (props?: {
       currentIndex: 0,
       previousAnsweredQuestions: [],
       potentialLearningSessions: props?.potentialLearningSessions ?? [],
-      awaitingReportSessions: props?.awaitingReportSessions ?? [],
-      recordedSessions: props?.recordedSessions ?? [],
     })
     .mount())
 
@@ -92,15 +78,16 @@ describe("RecallProgressBar learning session actions", () => {
     ).toBe(false)
   })
 
-  it("shows badge count for potential, awaiting, and recorded sessions", () => {
+  it("shows badge count for potential sessions only", () => {
     mountBar({
-      potentialLearningSessions: [spanishPotentialSession()],
-      awaitingReportSessions: [spanishLearningSession()],
-      recordedSessions: [spanishLearningSession()],
+      potentialLearningSessions: [
+        spanishPotentialSession(),
+        kanjiPotentialSession(),
+      ],
     })
     const badge = wrapper!.find('[data-test="learning-session-actions-badge"]')
     expect(badge.exists()).toBe(true)
-    expect(badge.text()).toBe("3")
+    expect(badge.text()).toBe("2")
   })
 
   it("opens session list when icon is clicked with one potential session", async () => {
@@ -113,17 +100,6 @@ describe("RecallProgressBar learning session actions", () => {
       document.body.querySelector(
         '[data-test="commission-learning-session-dialog"]'
       )
-    ).toBeFalsy()
-  })
-
-  it("opens session list when icon is clicked with one awaiting session", async () => {
-    mountBar({
-      awaitingReportSessions: [spanishLearningSession()],
-    })
-    await openLearningSessionList()
-    expectListDialogVisible()
-    expect(
-      document.body.querySelector('[data-test="learning-session-request"]')
     ).toBeFalsy()
   })
 
@@ -154,16 +130,5 @@ describe("RecallProgressBar learning session actions", () => {
         '[data-test="commission-learning-session-submit"]'
       )
     ).toBeFalsy()
-  })
-})
-
-describe("RecallProgressBar recorded sessions", () => {
-  it("does not render recorded-session strips below the bar", () => {
-    mountBar({
-      recordedSessions: [spanishLearningSession()],
-    })
-    expect(
-      wrapper!.find('[data-test="recorded-learning-session"]').exists()
-    ).toBe(false)
   })
 })

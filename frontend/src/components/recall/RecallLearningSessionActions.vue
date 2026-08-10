@@ -8,86 +8,40 @@
   >
     <GraduationCap class="w-8 h-8" />
     <div
-      v-if="actionableSessionCount > 0"
+      v-if="potentialLearningSessions.length > 0"
       class="learning-session-actions-badge"
       data-test="learning-session-actions-badge"
     >
-      {{ actionableSessionCount }}
+      {{ potentialLearningSessions.length }}
     </div>
   </button>
   <LearningSessionListDialog
     v-if="showListDialog"
-    :entries="actionableSessions"
+    :sessions="potentialLearningSessions"
     @close="showListDialog = false"
-    @select="onListEntrySelect"
+    @select="onSelect"
   />
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue"
+import { ref } from "vue"
 import { GraduationCap } from "@lucide/vue"
-import type { LearningSessionLite } from "@generated/doughnut-backend-api"
 import type { PotentialLearningSession } from "@/composables/useRecallData"
-import LearningSessionListDialog, {
-  type ActionableSessionEntry,
-  type LearningSessionActionMode,
-} from "./LearningSessionListDialog.vue"
+import LearningSessionListDialog from "./LearningSessionListDialog.vue"
 
-const props = defineProps<{
+defineProps<{
   potentialLearningSessions: PotentialLearningSession[]
-  awaitingReportSessions: LearningSessionLite[]
-  recordedSessions: LearningSessionLite[]
 }>()
 
 const emit = defineEmits<{
-  (
-    e: "select",
-    payload: {
-      mode: LearningSessionActionMode
-      session: PotentialLearningSession | LearningSessionLite
-    }
-  ): void
+  (e: "select", session: PotentialLearningSession): void
 }>()
 
 const showListDialog = ref(false)
 
-const actionableSessions = computed((): ActionableSessionEntry[] => {
-  const entries: ActionableSessionEntry[] = []
-  for (const session of props.potentialLearningSessions) {
-    entries.push({
-      key: `potential-${session.notebookId}`,
-      mode: "request",
-      notebookName: session.notebookName,
-      session,
-      actionLabel: "Commission",
-    })
-  }
-  for (const session of props.awaitingReportSessions) {
-    entries.push({
-      key: `awaiting-${session.learningSessionId}`,
-      mode: "record",
-      notebookName: session.notebookName,
-      session,
-      actionLabel: "Record report",
-    })
-  }
-  for (const session of props.recordedSessions) {
-    entries.push({
-      key: `recorded-${session.learningSessionId}`,
-      mode: "amend",
-      notebookName: session.notebookName,
-      session,
-      actionLabel: "Amend report",
-    })
-  }
-  return entries
-})
-
-const actionableSessionCount = computed(() => actionableSessions.value.length)
-
-const onListEntrySelect = (entry: ActionableSessionEntry) => {
+const onSelect = (session: PotentialLearningSession) => {
   showListDialog.value = false
-  emit("select", { mode: entry.mode, session: entry.session })
+  emit("select", session)
 }
 </script>
 

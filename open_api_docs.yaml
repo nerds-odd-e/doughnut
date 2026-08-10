@@ -5045,37 +5045,11 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/DueCommissionedMemoryTrackerLite"
-        awaitingReportSessions:
-          type: array
-          items:
-            $ref: "#/components/schemas/LearningSessionLite"
-        recordedSessions:
-          type: array
-          items:
-            $ref: "#/components/schemas/LearningSessionLite"
         dueInDays:
           type: integer
           format: int32
       required:
       - totalAssimilatedCount
-    LearningSessionLite:
-      type: object
-      properties:
-        notebookId:
-          type: integer
-          format: int32
-        notebookName:
-          type: string
-        learningSessionId:
-          type: integer
-          format: int32
-        requestMarkdown:
-          type: string
-      required:
-      - learningSessionId
-      - notebookId
-      - notebookName
-      - requestMarkdown
     MemoryTrackerLite:
       type: object
       properties:

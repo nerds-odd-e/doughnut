@@ -74,40 +74,14 @@ Proposed ADRs 0001/0003/0005 still need human update.
 
 ### Phase 4 — Behavior: List shows only potential sessions
 
-**Status:** planned
+**Status:** done
 
-- Frontend: `LearningSessionListDialog` shows only potential sessions.
-- Backend: Remove `awaitingReportSessions` + `recordedSessions` from recall feed.
-  Remove `findMemoryTrackerIdsInAwaitingReportSessions` exclusion logic.
-- E2E: after recording, list only shows potential sessions.
+- Frontend: potential-only list labeled “Request”.
+- Backend: removed awaiting/recorded from recall feed and awaiting-report exclusion.
+- E2E: after recording, list shows only potential sessions.
 
-**Remove this phase:**
-- Backend `DueMemoryTrackers.java`: `awaitingReportSessions`, `recordedSessions` fields
-- Backend `RecallService.java`: `awaitingReportTrackerIds` exclusion filter,
-  `setAwaitingReportSessions` / `setRecordedSessions`, `learningSessionLitesFor` by status
-- Backend `SessionItemRepository.java`: `findMemoryTrackerIdsInAwaitingReportSessions`
-- Backend `LearningSessionRepository.java`: `findByUser_IdAndNotebook_IdAndStatus`,
-  `findByUser_IdAndStatus`
-- Backend `LearningSessionLite.java`: delete if no longer used by recall feed
-- Frontend `RecallLearningSessionActions.vue`: `awaitingReportSessions` /
-  `recordedSessions` props, "Record report" / "Amend report" entry loops
-- Frontend `LearningSessionListDialog.vue`: `"record" | "amend"` from action mode
-- Frontend `RecallProgressBar.vue`: awaiting/recorded props, amend wiring
-  (`learningSessionId`, `initialRequestMarkdown`), `@commissioned` event
-- Frontend `useRecallData.ts`: `awaitingReportSessions`, `recordedSessions`, setters
-- Frontend `useRecallPageLoading.ts`: awaiting/recorded in `applySessionStrips`
-- Frontend `RecallPage.vue`: awaiting/recorded strip props
-- `RecallsCommissionedLearningSessionTests.java`: remove
-  `excludesDueCommissionedTrackersAwaitingReportAfterCommission`,
-  `returnsAwaitingReportSessionsAfterCommission`,
-  `returnsRecordedSessionsAfterRecord`, `recordedSessionsDoesNotLeakAcrossUsers`,
-  `awaitingReportExclusionDoesNotLeakAcrossUsers`; remove commission setup from survivors
-- `RecallProgressBar.spec.ts`: badge count with awaiting+recorded, awaiting list flow
-- `recallPageTestSupport.ts`, `mainMenuMocks.ts`, `assimilationPanelTestSupport.ts`:
-  remove awaiting/recorded mocks
-- E2E `commissioned_learning_session.feature`: remove commission flow scenario
-- E2E `recall.ts`: update "potential learning session to commission" wording
-- E2E `recallLearningSessionMethods.ts`: update `expectPotentialLearningSession`
+**Learnings:** `findByUser_IdAndNotebook_IdAndStatus` kept for lingering commission until Phase 6.
+Dialog filename still `CommissionLearningSessionDialog` (rename deferred / ADR vocabulary).
 
 ### Phase 5 — Structure: Data migration — clean up old data and constrain
 

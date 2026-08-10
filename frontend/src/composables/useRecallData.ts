@@ -2,22 +2,19 @@ import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
 import type {
   DueCommissionedMemoryTrackerLite,
-  LearningSessionLite,
   MemoryTrackerLite,
 } from "@generated/doughnut-backend-api/types.gen"
 import { primeSoftKeyboard } from "@/utils/focusTarget"
 
-export type PotentialLearningSession = Pick<
-  LearningSessionLite,
-  "notebookId" | "notebookName"
->
+export type PotentialLearningSession = {
+  notebookId: number
+  notebookName: string
+}
 
 const toRepeat = ref<MemoryTrackerLite[] | undefined>(undefined)
 const dueCommissioned = ref<DueCommissionedMemoryTrackerLite[] | undefined>(
   undefined
 )
-const awaitingReportSessions = ref<LearningSessionLite[] | undefined>(undefined)
-const recordedSessions = ref<LearningSessionLite[] | undefined>(undefined)
 const currentRecallWindowEndAt = ref<string | undefined>(undefined)
 const totalAssimilatedCount = ref<number | undefined>(undefined)
 const isRecallPaused = ref(false)
@@ -59,16 +56,6 @@ export function useRecallData() {
     trackers: DueCommissionedMemoryTrackerLite[] | undefined
   ) => {
     dueCommissioned.value = trackers
-  }
-
-  const setAwaitingReportSessions = (
-    sessions: LearningSessionLite[] | undefined
-  ) => {
-    awaitingReportSessions.value = sessions
-  }
-
-  const setRecordedSessions = (sessions: LearningSessionLite[] | undefined) => {
-    recordedSessions.value = sessions
   }
 
   const setCurrentRecallWindowEndAt = (endAt: string | undefined) => {
@@ -116,8 +103,6 @@ export function useRecallData() {
     toRepeatCount,
     toRepeat,
     dueCommissioned,
-    awaitingReportSessions,
-    recordedSessions,
     potentialLearningSessions,
     currentRecallWindowEndAt,
     totalAssimilatedCount,
@@ -128,8 +113,6 @@ export function useRecallData() {
     diligentMode,
     setToRepeat,
     setDueCommissioned,
-    setAwaitingReportSessions,
-    setRecordedSessions,
     setCurrentRecallWindowEndAt,
     setTotalAssimilatedCount,
     setIsRecallPaused,

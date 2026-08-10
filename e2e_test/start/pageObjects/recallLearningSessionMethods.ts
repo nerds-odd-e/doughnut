@@ -3,13 +3,8 @@ import { waitUntilAppIsNotBusy } from '../pageBase'
 import { RecallsController } from '@generated/doughnut-backend-api/sdk.gen'
 import type { DueMemoryTrackers } from '@generated/doughnut-backend-api'
 
-type LearningSessionActionLabel = 'Commission'
-
-function learningSessionActionEntryLabel(
-  notebookTitle: string,
-  actionLabel: LearningSessionActionLabel
-) {
-  return `${notebookTitle} — ${actionLabel}`
+function learningSessionRequestEntryLabel(notebookTitle: string) {
+  return `${notebookTitle} — Request`
 }
 
 function closeLearningSessionDetailIfOpen() {
@@ -32,29 +27,19 @@ function openLearningSessionList() {
   cy.get('[data-test="learning-session-list-dialog"]').should('be.visible')
 }
 
-function clickSessionActionFromList(
-  notebookTitle: string,
-  actionLabel: LearningSessionActionLabel
-) {
+function clickRequestFromList(notebookTitle: string) {
   cy.contains(
     '[data-test="learning-session-action-entry"]',
-    learningSessionActionEntryLabel(notebookTitle, actionLabel)
+    learningSessionRequestEntryLabel(notebookTitle)
   ).click()
   cy.get('[data-test="learning-session-list-dialog"]').should('not.exist')
   waitUntilAppIsNotBusy()
 }
 
 export const recallLearningSessionMethods = () => ({
-  openLearningSessionAction(
-    notebookTitle: string,
-    actionLabel: LearningSessionActionLabel
-  ) {
-    openLearningSessionList()
-    clickSessionActionFromList(notebookTitle, actionLabel)
-    return this
-  },
   openLearningSessionRequest(notebookTitle: string) {
-    this.openLearningSessionAction(notebookTitle, 'Commission')
+    openLearningSessionList()
+    clickRequestFromList(notebookTitle)
     cy.get('[data-test="learning-session-request"]').should('be.visible')
     cy.get('[data-test="commission-learning-session-submit"]').should(
       'not.exist'
@@ -62,7 +47,6 @@ export const recallLearningSessionMethods = () => ({
     return this
   },
   expectNoLearningSessionForNotebook(notebookTitle: string) {
-    cy.get('[data-test="learning-session-awaiting-report"]').should('not.exist')
     cy.get('[data-test="commission-learning-session-dialog"]')
       .closest('dialog')
       .find('.close-button')
@@ -76,12 +60,25 @@ export const recallLearningSessionMethods = () => ({
       RecallsController.recalling({ query: { timezone, dueindays: 0 } }),
       { log: false }
     ).then((dueMemoryTrackers: DueMemoryTrackers) => {
-      const awaiting = dueMemoryTrackers.awaitingReportSessions ?? []
+      const dueCommissioned = dueMemoryTrackers.dueCommissioned ?? []
       expect(
-        awaiting.filter((session) => session.notebookName === notebookTitle),
-        `expected no awaiting learning session for ${notebookTitle}`
-      ).to.have.length(0)
+        dueCommissioned.some(
+          (tracker) => tracker.notebookName === notebookTitle
+        ),
+        `expected due commissioned trackers (potential session) still present for ${notebookTitle}`
+      ).to.equal(true)
     })
+    openLearningSessionList()
+    cy.get('[data-test="learning-session-action-entry"]').each(($entry) => {
+      expect($entry.text()).not.to.contain('Record report')
+      expect($entry.text()).not.to.contain('Amend report')
+    })
+    cy.contains(
+      '[data-test="learning-session-action-entry"]',
+      learningSessionRequestEntryLabel(notebookTitle)
+    ).should('be.visible')
+    cy.get('.close-button').click()
+    cy.get('[data-test="learning-session-list-dialog"]').should('not.exist')
     return this
   },
   learningSessionRequestText() {
@@ -156,18 +153,18 @@ export const recallLearningSessionMethods = () => ({
   expectPotentialLearningSession(count: number, notebookTitle: string) {
     cy.get('[data-test="learning-session-actions"]').should('be.visible')
     openLearningSessionList()
-    if (count === 0) {
-      cy.get('[data-test="learning-session-action-entry"]').each(($entry) => {
-        expect($entry.text()).not.to.contain(
-          learningSessionActionEntryLabel(notebookTitle, 'Commission')
-        )
+    cy.get('body').then(($body) => {
+      const entries = $body.find('[data-test="learning-session-action-entry"]')
+      entries.each((_, el) => {
+        const text = Cypress.$(el).text()
+        expect(text).not.to.contain('Record report')
+        expect(text).not.to.contain('Amend report')
       })
-    } else {
-      cy.get('[data-test="learning-session-action-entry"]')
+      const matches = entries
         .filter(`:contains("${notebookTitle}")`)
-        .filter(':contains("Commission")')
-        .should('have.length', count)
-    }
+        .filter(':contains("Request")')
+      expect(matches).to.have.length(count)
+    })
     cy.get('.close-button').click()
     cy.get('[data-test="learning-session-list-dialog"]').should('not.exist')
     return this

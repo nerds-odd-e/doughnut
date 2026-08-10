@@ -9,21 +9,21 @@
         data-test="learning-session-list-dialog"
       >
         <p
-          v-if="entries.length === 0"
+          v-if="sessions.length === 0"
           class="text-sm text-base-content"
           data-test="learning-session-list-empty"
         >
           No learning sessions yet.
         </p>
         <button
-          v-for="entry in entries"
-          :key="entry.key"
+          v-for="session in sessions"
+          :key="session.notebookId"
           type="button"
           class="daisy-btn daisy-btn-outline learning-session-action-entry"
           data-test="learning-session-action-entry"
-          @click="$emit('select', entry)"
+          @click="$emit('select', session)"
         >
-          {{ entry.notebookName }} — {{ entry.actionLabel }}
+          {{ session.notebookName }} — Request
         </button>
       </div>
     </template>
@@ -32,26 +32,15 @@
 
 <script setup lang="ts">
 import Modal from "@/components/commons/Modal.vue"
-import type { LearningSessionLite } from "@generated/doughnut-backend-api"
 import type { PotentialLearningSession } from "@/composables/useRecallData"
 
-export type LearningSessionActionMode = "request" | "record" | "amend"
-
-export type ActionableSessionEntry = {
-  key: string
-  mode: LearningSessionActionMode
-  notebookName: string
-  session: PotentialLearningSession | LearningSessionLite
-  actionLabel: string
-}
-
 defineProps<{
-  entries: ActionableSessionEntry[]
+  sessions: PotentialLearningSession[]
 }>()
 
 defineEmits<{
   (e: "close"): void
-  (e: "select", entry: ActionableSessionEntry): void
+  (e: "select", session: PotentialLearningSession): void
 }>()
 </script>
 

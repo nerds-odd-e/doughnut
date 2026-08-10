@@ -36,11 +36,7 @@
               </button>
               <RecallLearningSessionActions
                 :potential-learning-sessions="potentialLearningSessions"
-                :awaiting-report-sessions="awaitingReportSessions"
-                :recorded-sessions="recordedSessions"
-                @select="
-                  ({ mode, session }) => openSessionDialog(mode, session)
-                "
+                @select="openSessionDialog"
               />
             </div>
             <RecallSessionOptionsDialog
@@ -66,8 +62,8 @@
       </ProgressBar>
     </div>
     <CommissionLearningSessionDialog
-      v-if="sessionDialogProps"
-      v-bind="sessionDialogProps"
+      v-if="sessionDialog"
+      v-bind="sessionDialog"
       @close="sessionDialog = undefined"
       @recorded="onSessionChanged"
     />
@@ -75,25 +71,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue"
+import { ref } from "vue"
 import ProgressBar from "../commons/ProgressBar.vue"
 import { Pause, Settings, SkipBack } from "@lucide/vue"
 import RecallSessionOptionsDialog from "./RecallSessionOptionsDialog.vue"
 import CommissionLearningSessionDialog from "./CommissionLearningSessionDialog.vue"
 import RecallLearningSessionActions from "./RecallLearningSessionActions.vue"
-import type { LearningSessionActionMode } from "./LearningSessionListDialog.vue"
 import { useRecallData } from "@/composables/useRecallData"
 
-import type {
-  AnsweredQuestion,
-  LearningSessionLite,
-} from "@generated/doughnut-backend-api"
+import type { AnsweredQuestion } from "@generated/doughnut-backend-api"
 import type { PotentialLearningSession } from "@/composables/useRecallData"
-
-type SessionDialogState = {
-  mode: LearningSessionActionMode
-  session: PotentialLearningSession | LearningSessionLite
-}
 
 defineProps({
   finished: { type: Number, required: true },
@@ -111,14 +98,6 @@ defineProps({
     type: Array as () => PotentialLearningSession[],
     default: () => [],
   },
-  awaitingReportSessions: {
-    type: Array as () => LearningSessionLite[],
-    default: () => [],
-  },
-  recordedSessions: {
-    type: Array as () => LearningSessionLite[],
-    default: () => [],
-  },
 })
 
 const emit = defineEmits<{
@@ -129,31 +108,10 @@ const emit = defineEmits<{
 
 const { requestDueRecallsRefresh } = useRecallData()
 const showSettings = ref(false)
-const sessionDialog = ref<SessionDialogState | undefined>(undefined)
+const sessionDialog = ref<PotentialLearningSession | undefined>(undefined)
 
-const isLearningSessionLite = (
-  session: PotentialLearningSession | LearningSessionLite
-): session is LearningSessionLite => "learningSessionId" in session
-
-const sessionDialogProps = computed(() => {
-  const dialog = sessionDialog.value
-  if (!dialog) return undefined
-  const session = dialog.session
-  const isLite = isLearningSessionLite(session)
-  return {
-    mode: dialog.mode === "amend" ? "record" : dialog.mode,
-    notebookId: session.notebookId,
-    notebookName: session.notebookName,
-    initialRequestMarkdown:
-      dialog.mode !== "request" && isLite ? session.requestMarkdown : undefined,
-  }
-})
-
-const openSessionDialog = (
-  mode: LearningSessionActionMode,
-  session: PotentialLearningSession | LearningSessionLite
-) => {
-  sessionDialog.value = { mode, session }
+const openSessionDialog = (session: PotentialLearningSession) => {
+  sessionDialog.value = session
 }
 
 const onSessionChanged = () => {

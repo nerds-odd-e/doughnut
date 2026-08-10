@@ -26,15 +26,6 @@ public interface SessionItemRepository extends JpaRepository<SessionItem, Intege
 
   @Query(
       """
-      SELECT si.memoryTracker.id
-      FROM SessionItem si
-      WHERE si.learningSession.user.id = :userId
-      AND si.learningSession.status = com.odde.doughnut.entities.LearningSessionStatus.AWAITING_REPORT
-      """)
-  List<Integer> findMemoryTrackerIdsInAwaitingReportSessions(@Param("userId") Integer userId);
-
-  @Query(
-      """
       SELECT si.feedbackScore
       FROM SessionItem si
       WHERE si.memoryTracker.id = :memoryTrackerId
