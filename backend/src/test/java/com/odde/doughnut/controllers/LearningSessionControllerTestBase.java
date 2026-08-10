@@ -2,7 +2,6 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.RecordLearningSessionRequest;
 import com.odde.doughnut.entities.LearningSession;
-import com.odde.doughnut.entities.LearningSessionStatus;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
@@ -84,8 +83,7 @@ abstract class LearningSessionControllerTestBase extends ControllerTestBase {
   protected MemoryTracker trackerForNote(Notebook notebook, String title) {
     LearningSession session =
         learningSessionRepository
-            .findByUser_IdAndNotebook_IdAndStatus(
-                currentUser.getUser().getId(), notebook.getId(), LearningSessionStatus.RECORDED)
+            .findByUser_IdAndNotebook_Id(currentUser.getUser().getId(), notebook.getId())
             .getFirst();
     return sessionItemFor(session.getId(), title).getMemoryTracker();
   }

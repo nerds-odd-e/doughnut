@@ -155,7 +155,6 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 ## Learning Session Controller
 
 - `record`: POST `/api/learning-sessions/record` -> `RecordResponse` (request: `RecordData`; query: timezone; body: RecordLearningSessionRequest; response body: RecordLearningSessionResponse)
-- `commission`: POST `/api/learning-sessions/commission` -> `CommissionResponse` (request: `CommissionData`; query: timezone; body: CommissionLearningSessionRequest; response body: LearningSessionCommissionResponse)
 - `request`: GET `/api/learning-sessions/request` -> `RequestResponse` (request: `RequestData`; query: notebookId, timezone; response body: LearningSessionRequestResponse)
 
 ## Failure Report Controller

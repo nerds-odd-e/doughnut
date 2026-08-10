@@ -1,7 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.dto.CommissionLearningSessionRequest;
-import com.odde.doughnut.controllers.dto.LearningSessionCommissionResponse;
 import com.odde.doughnut.controllers.dto.LearningSessionRequestResponse;
 import com.odde.doughnut.controllers.dto.RecordLearningSessionRequest;
 import com.odde.doughnut.controllers.dto.RecordLearningSessionResponse;
@@ -58,19 +56,6 @@ class LearningSessionController {
     ZoneId zoneId = TimezoneUtils.parseTimezone(timezone);
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     return learningSessionService.request(
-        authorizationService.getCurrentUser(), notebook, now, zoneId);
-  }
-
-  @PostMapping("/commission")
-  @Transactional
-  public LearningSessionCommissionResponse commission(
-      @RequestBody CommissionLearningSessionRequest body,
-      @RequestParam(value = "timezone") String timezone)
-      throws UnexpectedNoAccessRightException {
-    Notebook notebook = authorizedNotebook(body.notebookId);
-    ZoneId zoneId = TimezoneUtils.parseTimezone(timezone);
-    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
-    return learningSessionService.commission(
         authorizationService.getCurrentUser(), notebook, now, zoneId);
   }
 

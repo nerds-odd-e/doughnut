@@ -10,15 +10,12 @@ public interface SessionItemRepository extends JpaRepository<SessionItem, Intege
 
   List<SessionItem> findByLearningSession_Id(Integer learningSessionId);
 
-  void deleteByLearningSession_Id(Integer learningSessionId);
-
   @Query(
       """
       SELECT new com.odde.doughnut.entities.repositories.RecordedFeedbackSummary(
         COUNT(si), MAX(si.feedbackRecordedAt))
       FROM SessionItem si
       WHERE si.memoryTracker.id = :memoryTrackerId
-      AND si.learningSession.status = com.odde.doughnut.entities.LearningSessionStatus.RECORDED
       """)
   RecordedFeedbackSummary summarizeRecordedFeedbackByMemoryTrackerId(
       @Param("memoryTrackerId") Integer memoryTrackerId);
@@ -28,12 +25,10 @@ public interface SessionItemRepository extends JpaRepository<SessionItem, Intege
       SELECT si.feedbackScore
       FROM SessionItem si
       WHERE si.memoryTracker.id = :memoryTrackerId
-      AND si.learningSession.status = com.odde.doughnut.entities.LearningSessionStatus.RECORDED
       AND si.feedbackRecordedAt = (
         SELECT MAX(si2.feedbackRecordedAt)
         FROM SessionItem si2
         WHERE si2.memoryTracker.id = :memoryTrackerId
-        AND si2.learningSession.status = com.odde.doughnut.entities.LearningSessionStatus.RECORDED
       )
       """)
   java.util.Optional<Integer> findLatestFeedbackScoreByMemoryTrackerId(

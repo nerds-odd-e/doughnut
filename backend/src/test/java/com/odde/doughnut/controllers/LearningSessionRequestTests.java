@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.LearningSessionRequestResponse;
 import com.odde.doughnut.entities.LearningSession;
-import com.odde.doughnut.entities.LearningSessionStatus;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.LearningSessionReportParser;
@@ -124,7 +123,6 @@ class LearningSessionRequestTests extends LearningSessionControllerTestBase {
             .aLearningSession()
             .forNotebook(fixture.notebook())
             .by(currentUser.getUser())
-            .status(LearningSessionStatus.RECORDED)
             .recordedAt(priorSessionAt)
             .please();
     addRecordedFeedback(recordedSession, fixture.holaTracker(), 4, priorSessionAt);

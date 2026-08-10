@@ -1,11 +1,9 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.algorithms.FrontmatterQuestionGenerationInstruction;
-import com.odde.doughnut.entities.LearningSession;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.SessionItem;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.RecordedFeedbackSummary;
 import com.odde.doughnut.entities.repositories.SessionItemRepository;
@@ -37,14 +35,6 @@ public class LearningSessionRequestMarkdownBuilder {
     this.sessionItemRepository = sessionItemRepository;
     this.focusContextRetrievalService = focusContextRetrievalService;
     this.focusContextMarkdownRenderer = focusContextMarkdownRenderer;
-  }
-
-  public String build(LearningSession session, ZoneId zoneId) {
-    List<MemoryTracker> trackers =
-        sessionItemRepository.findByLearningSession_Id(session.getId()).stream()
-            .map(SessionItem::getMemoryTracker)
-            .toList();
-    return build(session.getUser(), session.getNotebook(), trackers, zoneId);
   }
 
   public String build(User user, Notebook notebook, List<MemoryTracker> trackers, ZoneId zoneId) {

@@ -1,7 +1,6 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.algorithms.CommissionedLearningSessionFeedbackScheduling;
-import com.odde.doughnut.controllers.dto.LearningSessionCommissionResponse;
 import com.odde.doughnut.controllers.dto.LearningSessionRequestResponse;
 import com.odde.doughnut.controllers.dto.RecordLearningSessionResponse;
 import com.odde.doughnut.controllers.dto.RecordedLearningSessionItem;
@@ -62,28 +61,6 @@ public class LearningSessionService {
   }
 
   @Transactional
-  public LearningSessionCommissionResponse commission(
-      User user, Notebook notebook, Timestamp now, ZoneId zoneId) {
-    List<MemoryTracker> dueTrackers =
-        requireDueCommissionedNoteLevelTrackers(user, notebook, now, zoneId);
-
-    abandonUnfinishedSessions(user, notebook);
-
-    LearningSession session = new LearningSession();
-    session.setUser(user);
-    session.setNotebook(notebook);
-    session.setStatus(LearningSessionStatus.AWAITING_REPORT);
-    session.setCommissionedAt(now);
-    learningSessionRepository.save(session);
-
-    for (MemoryTracker tracker : dueTrackers) {
-      sessionItemRepository.save(createSessionItem(session, tracker));
-    }
-
-    return toCommissionResponse(session, dueTrackers, zoneId);
-  }
-
-  @Transactional
   public RecordLearningSessionResponse record(
       User user, Notebook notebook, String reportMarkdown, Timestamp now) {
     List<Note> notebookNotes =
@@ -123,15 +100,12 @@ public class LearningSessionService {
     LearningSession session = new LearningSession();
     session.setUser(user);
     session.setNotebook(notebook);
-    session.setStatus(LearningSessionStatus.RECORDED);
-    session.setCommissionedAt(now);
     session.setRecordedAt(now);
     learningSessionRepository.save(session);
 
     for (MatchedReportEntry matched : matchedEntries) {
-      SessionItem item = createSessionItem(session, matched.tracker());
-      item.setFeedbackScore(matched.entry().score());
-      item.setFeedbackRecordedAt(now);
+      SessionItem item =
+          createSessionItem(session, matched.tracker(), matched.entry().score(), now);
       CommissionedLearningSessionFeedbackScheduling.recordFeedback(
           matched.tracker(), now, matched.entry().score());
       sessionItemRepository.save(item);
@@ -143,7 +117,6 @@ public class LearningSessionService {
       response.getRecordedItems().add(recorded);
     }
 
-    response.setStatus(LearningSessionStatus.RECORDED);
     response.setRecordedAt(now);
     return response;
   }
@@ -156,16 +129,6 @@ public class LearningSessionService {
         .filter(MemoryTracker::isCommissioned)
         .filter(MemoryTracker::isNoteLevelTracker)
         .findFirst();
-  }
-
-  private void abandonUnfinishedSessions(User user, Notebook notebook) {
-    List<LearningSession> unfinished =
-        learningSessionRepository.findByUser_IdAndNotebook_IdAndStatus(
-            user.getId(), notebook.getId(), LearningSessionStatus.AWAITING_REPORT);
-    for (LearningSession session : unfinished) {
-      sessionItemRepository.deleteByLearningSession_Id(session.getId());
-    }
-    learningSessionRepository.deleteAll(unfinished);
   }
 
   private List<MemoryTracker> requireDueCommissionedNoteLevelTrackers(
@@ -183,23 +146,15 @@ public class LearningSessionService {
     return dueTrackers;
   }
 
-  private SessionItem createSessionItem(LearningSession session, MemoryTracker tracker) {
+  private SessionItem createSessionItem(
+      LearningSession session, MemoryTracker tracker, int score, Timestamp now) {
     SessionItem item = new SessionItem();
     item.setLearningSession(session);
     item.setMemoryTracker(tracker);
     item.setNoteTitle(tracker.getNote().getTitle());
+    item.setFeedbackScore(score);
+    item.setFeedbackRecordedAt(now);
     return item;
-  }
-
-  private LearningSessionCommissionResponse toCommissionResponse(
-      LearningSession session, List<MemoryTracker> trackers, ZoneId zoneId) {
-    LearningSessionCommissionResponse response = new LearningSessionCommissionResponse();
-    response.setLearningSessionId(session.getId());
-    response.setRequestMarkdown(
-        learningSessionRequestMarkdownBuilder.build(
-            session.getUser(), session.getNotebook(), trackers, zoneId));
-    response.setStatus(session.getStatus());
-    return response;
   }
 
   private record MatchedReportEntry(ParsedReportEntry entry, MemoryTracker tracker) {}

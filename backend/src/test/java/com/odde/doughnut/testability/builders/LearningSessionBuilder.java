@@ -1,7 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.LearningSession;
-import com.odde.doughnut.entities.LearningSessionStatus;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
@@ -29,11 +28,6 @@ public class LearningSessionBuilder extends EntityBuilder<LearningSession> {
     return this;
   }
 
-  public LearningSessionBuilder status(LearningSessionStatus status) {
-    entity.setStatus(status);
-    return this;
-  }
-
   public LearningSessionBuilder recordedAt(Timestamp recordedAt) {
     entity.setRecordedAt(recordedAt);
     return this;
@@ -52,21 +46,14 @@ public class LearningSessionBuilder extends EntityBuilder<LearningSession> {
     if (entity.getNotebook() == null) {
       throw new IllegalStateException("call forNotebook() before please()");
     }
-    if (entity.getStatus() == null) {
-      entity.setStatus(LearningSessionStatus.AWAITING_REPORT);
-    }
-    if (entity.getCommissionedAt() == null) {
-      entity.setCommissionedAt(makeMe.aTimestamp().please());
-    }
-    if (entity.getStatus() == LearningSessionStatus.RECORDED && entity.getRecordedAt() == null) {
-      entity.setRecordedAt(entity.getCommissionedAt());
+    if (entity.getRecordedAt() == null) {
+      entity.setRecordedAt(makeMe.aTimestamp().please());
     }
   }
 
   @Override
   protected void afterCreate(boolean needPersist) {
-    Timestamp recordedAt =
-        entity.getRecordedAt() != null ? entity.getRecordedAt() : entity.getCommissionedAt();
+    Timestamp recordedAt = entity.getRecordedAt();
     for (MemoryTracker tracker : sessionItemTrackers) {
       makeMe
           .aSessionItem()

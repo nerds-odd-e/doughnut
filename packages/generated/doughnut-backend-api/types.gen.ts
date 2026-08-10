@@ -619,12 +619,10 @@ export type MemoryTracker = {
 
 export type RecordLearningSessionRequest = {
     notebookId: number;
-    learningSessionId?: number;
     reportMarkdown: string;
 };
 
 export type RecordLearningSessionResponse = {
-    status: 'AWAITING_REPORT' | 'RECORDED';
     recordedAt?: string;
     recordedItems: Array<RecordedLearningSessionItem>;
     rejectedEntries: Array<RejectedLearningSessionReportEntry>;
@@ -639,16 +637,6 @@ export type RecordedLearningSessionItem = {
 export type RejectedLearningSessionReportEntry = {
     line: string;
     reason: string;
-};
-
-export type CommissionLearningSessionRequest = {
-    notebookId: number;
-};
-
-export type LearningSessionCommissionResponse = {
-    learningSessionId: number;
-    requestMarkdown: string;
-    status: 'AWAITING_REPORT' | 'RECORDED';
 };
 
 export type ConversationMessage = {
@@ -2364,24 +2352,6 @@ export type RecordResponses = {
 };
 
 export type RecordResponse = RecordResponses[keyof RecordResponses];
-
-export type CommissionData = {
-    body: CommissionLearningSessionRequest;
-    path?: never;
-    query: {
-        timezone: string;
-    };
-    url: '/api/learning-sessions/commission';
-};
-
-export type CommissionResponses = {
-    /**
-     * OK
-     */
-    200: LearningSessionCommissionResponse;
-};
-
-export type CommissionResponse = CommissionResponses[keyof CommissionResponses];
 
 export type TriggerFailureData = {
     body?: never;

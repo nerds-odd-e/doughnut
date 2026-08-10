@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.RecordLearningSessionResponse;
 import com.odde.doughnut.entities.LearningSession;
-import com.odde.doughnut.entities.LearningSessionStatus;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.SessionItem;
@@ -26,15 +25,13 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
     RecordLearningSessionResponse response =
         controller.record(recordRequest(notebook, HOLA_GRACIAS_REPORT), "Asia/Shanghai");
 
-    assertThat(response.getStatus(), equalTo(LearningSessionStatus.RECORDED));
     assertThat(response.getRecordedAt(), equalTo(dayTwo));
     assertThat(response.getRecordedItems(), hasSize(2));
     assertThat(response.getRejectedEntries(), empty());
 
     LearningSession session =
         learningSessionRepository
-            .findByUser_IdAndNotebook_IdAndStatus(
-                currentUser.getUser().getId(), notebook.getId(), LearningSessionStatus.RECORDED)
+            .findByUser_IdAndNotebook_Id(currentUser.getUser().getId(), notebook.getId())
             .getFirst();
     assertThat(session.getRecordedAt(), equalTo(dayTwo));
 

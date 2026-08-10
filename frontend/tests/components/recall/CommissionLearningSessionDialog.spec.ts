@@ -89,7 +89,6 @@ describe("CommissionLearningSessionDialog", () => {
 
   it("records report with notebook id in API body and shows recorded items", async () => {
     const recordSpy = mockSdkService(LearningSessionController, "record", {
-      status: "RECORDED",
       recordedAt: "1989-01-02T09:00:00Z",
       recordedItems: [
         { noteTitle: "Hola", score: 5, memoryTrackerId: 11 },
@@ -129,7 +128,6 @@ describe("CommissionLearningSessionDialog", () => {
 
   it("shows rejection warning on partial success", async () => {
     mockSdkService(LearningSessionController, "record", {
-      status: "RECORDED",
       recordedAt: "1989-01-02T09:00:00Z",
       recordedItems: [{ noteTitle: "Hola", score: 5, memoryTrackerId: 11 }],
       rejectedEntries: [

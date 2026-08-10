@@ -95,51 +95,11 @@ Entity/builders updated; commission tests removed (commission creates null feedb
 
 ### Phase 6 — Structure: Schema + dead code cleanup
 
-**Status:** planned
+**Status:** done
 
-Drop obsolete columns and remove all remaining dead code.
-
-**Flyway migration:**
-- Drop `learning_session.status`, `learning_session.commissioned_at`
-- Drop `session_item.pre_session_forgetting_curve_index`,
-  `session_item.pre_session_recall_count`
-- Drop index `idx_learning_session_user_notebook_status`
-
-**Delete entire files:**
-- `LearningSessionStatus.java`
-- `LearningSessionRecordTargetResolver.java`
-- `LearningSessionCommissionResponse.java`
-- `CommissionLearningSessionRequest.java`
-- `LearningSessionCommissionTests.java` (if not deleted earlier)
-
-**Remove from entities:**
-- `LearningSession.java`: `status` field + getter/setter, `commissionedAt` field +
-  getter/setter
-- `SessionItem.java`: `preSessionForgettingCurveIndex`, `preSessionRecallCount`
-  fields + getters/setters
-
-**Remove from algorithms:**
-- `CommissionedLearningSessionFeedbackScheduling.java`:
-  `restorePreSessionSnapshot()` (keep `recordFeedback()`)
-
-**Remove from DTOs:**
-- `RecordLearningSessionRequest.java`: `learningSessionId` field
-- `RecordLearningSessionResponse.java`: `status` (`LearningSessionStatus`) field
-
-**Remove from repositories:**
-- `SessionItemRepository.java`: status-based predicates in
-  `summarizeRecordedFeedbackByMemoryTrackerId` + `findLatestFeedbackScoreByMemoryTrackerId`
-  (methods survive, status filter removed)
-
-**Remove old commission endpoint:**
-- `LearningSessionController.java`: `POST /commission` mapping + `commission()` method
-- `LearningSessionService.java`: `commission()`, `toCommissionResponse()`,
-  `createSessionItem()` without feedback
-
-**Regenerate:**
-- `docs/database-erd.md` (via `database-erd` skill)
-- API client (via `generate-api-client` skill — OpenAPI, `types.gen.ts`, `sdk.gen.ts`,
-  `api-summary.md`)
+Dropped status/commissioned_at/snapshot columns (`V300000243`), removed commission
+API/DTOs/`LearningSessionStatus`, regenerated OpenAPI client. ERD unchanged (PK/FK-only).
+Dialog filename rename deferred.
 
 ## Docs to Update (human-owned ADR process)
 

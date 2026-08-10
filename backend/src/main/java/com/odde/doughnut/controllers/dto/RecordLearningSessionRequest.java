@@ -6,9 +6,6 @@ public class RecordLearningSessionRequest {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   public Integer notebookId;
 
-  @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  public Integer learningSessionId;
-
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   public String reportMarkdown;
 }
