@@ -105,8 +105,10 @@ decision** the developer needs. Then wait.
 4. DELEGATE implementation only to a fresh sub-agent (see delegation)
 5. When implementer finishes:
    a. If Jidoka stop / REVERT & SPLIT → handle as below; do not wrap up
-   b. Verify tests were reported green and `git status` shows uncommitted work
-      (or a deliberate empty phase with a stated reason)
+   b. Verify relevant tests were reported green (no intentional CI-breaking
+      red; unfinished E2E must be `@wip`) and `git status` shows uncommitted
+      work (or a deliberate empty phase with a stated reason). Do not require
+      a full CI run before wrap-up.
    c. If the implementer already committed → process failure: stop and report
       (do not continue as if wrap-up succeeded). Prefer fixing by soft-resetting
       an unpushed commit only when safe and the developer has not forbidden it;
@@ -129,7 +131,8 @@ decision** the developer needs. Then wait.
       learnings; prune obsolete detail; adjust future phases if warranted.
    f. Post-phase Jidoka — if learnings need developer judgment: commit and push
       work so far, then STOP.
-   g. Commit (capability-named message) then `git push`.
+   g. Commit only when CI-safe (no intentional non-`@wip` red; no full-CI
+      preflight) then `git push`.
    h. Verify: `## REFACTOR COMPLETE` was observed this phase AND commit is pushed.
 7. Go to step 1 (next phase)
 8. All phases done → clean up spent plan history (planning.mdc) → report & STOP
@@ -162,13 +165,16 @@ The implementer prompt **must** include:
    phase text).
 2. **Jidoka stop conditions** (copy the list above).
 3. **Implementation rules**: `planning.mdc` (Behavior/Structure, TDD, phase
-   discipline, **time budget** ~5 min fuzzy / >10 min hard finer-decompose),
+   discipline, **time budget** ~5 min fuzzy / >10 min hard finer-decompose,
+   **no commit on red**, **do not deliberately break CI** — unfinished E2E
+   stays `@wip`; run tests relevant to the change, not the full CI suite),
    `gsd-coexistence.mdc`, and other applicable rules. **Naming:**
    permanent artifacts by **capability/domain**, never phase number.
 4. **Hard stop before wrap-up:** Do **not** commit. Do **not** push. Do **not**
    update PLAN/STATE to `done`. Do **not** run post-change-refactor (and do not
    "apply the refactor skill yourself"). Leave the working tree uncommitted
-   with tests green for the coordinator.
+   with relevant tests green for the coordinator (non-`@wip` failures that CI
+   would run are not acceptable).
 5. **Revert & split** instructions (see `revert_and_split` step).
 6. **Nix prefix**: `CURSOR_DEV=true nix develop -c <command>` unless Cloud VM
    (`cloud-vm-setup`). **Git commands do not need the Nix prefix.**
@@ -180,7 +186,8 @@ lives in STATE / PLAN files on disk.
 </step>
 
 <step name="wrap_up">
-**Coordinator-owned** (after implementer returns with green tests, uncommitted):
+**Coordinator-owned** (after implementer returns with relevant tests green /
+non-`@wip` CI-safe, uncommitted):
 
 1. **Spawn post-change-refactor** — Fresh Task (`generalPurpose`) that reads
    `.agents/skills/post-change-refactor/SKILL.md` and runs it end-to-end on the
@@ -202,7 +209,10 @@ lives in STATE / PLAN files on disk.
    - Adjust future phases when warranted.
 6. **Post-phase Jidoka** — if learnings need developer judgment: commit and push
    work so far, then return a Jidoka stop (do not silently continue).
-7. **Commit** — stage all changes; message may use GSD-style
+7. **Commit** — only when the tree would not intentionally break CI: no
+   non-`@wip` failing tests from this change; unfinished E2E must stay `@wip`.
+   Do **not** run the full CI suite as a pre-commit gate — rely on relevant
+   local tests already run. Stage all changes; message may use GSD-style
    `{type}({phase}-{plan}): …` or the repo's recent convention.
 8. **Push** — `git push`.
 </step>
@@ -261,4 +271,6 @@ When the loop ends (all phases done or a stop condition):
 - Do not accept an implementer self-refactor or a missing `## REFACTOR COMPLETE` as wrap-up.
 - Do not pass full plan history to sub-agents.
 - Do not continue past a Jidoka stop without developer input.
+- Do not commit on TDD red alone, or close a phase with deliberate CI-breaking
+  failures (use `@wip` for unfinished E2E). Do not run full CI before commit.
 </out_of_scope>

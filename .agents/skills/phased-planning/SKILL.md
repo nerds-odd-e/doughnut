@@ -112,9 +112,15 @@ See `e2e-authoring.mdc`.
 When a phase spans several user-visible beats:
 
 1. **Red sub-phase** — Write full E2E scenario; tag `@wip`. Run `cypress run --spec`
-   for that feature; confirm failure is for the **right reason**.
+   for that feature; confirm failure is for the **right reason**. **Do not
+   commit here** — red is observe-only.
 2. **Green sub-phase** — Smallest production change toward passing. No dead code.
 3. Repeat until scenario passes; remove `@wip`.
+
+**Commits:** land after one or more full red→green (→refactor) cycles, not
+after red alone. If a commit is needed for substantial progress before the E2E
+can fully pass, keep the scenario `@wip` so CI stays green (`planning.mdc`).
+Plan phases so they do not deliberately end with CI-breaking failures.
 
 ### Test-driven workflow
 
@@ -182,4 +188,7 @@ Then wait for their decision.
 - Do not implement feature code during planning (except tiny fixes from retrospective).
 - Do not add new plans under `ongoing/`.
 - Do not encode phase numbers in product file/test names.
+- Do not plan a phase that deliberately ends with CI-breaking red tests — use
+  `@wip` for unfinished E2E; commit only after full TDD cycle(s) (or mid-progress
+  with `@wip` E2E still skipped by CI).
 </out_of_scope>
