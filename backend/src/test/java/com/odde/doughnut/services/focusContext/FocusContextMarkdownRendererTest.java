@@ -117,7 +117,9 @@ class FocusContextMarkdownRendererTest {
 
       String output = renderer.render(result, depth1Config);
 
-      assertThat(output, containsString("## Retrieved Note"));
+      assertThat(output, containsString(FocusContextConstants.RETRIEVED_NOTE_OPEN_MARKER));
+      assertThat(output, containsString(FocusContextConstants.RETRIEVED_NOTE_CLOSE_TAG));
+      assertThat(output, not(containsString("## Retrieved Note")));
       assertThat(output, containsString("Path: [[A]] -> [[NB: B]]"));
       assertThat(output, containsString("Reached by: OutgoingWikiLink"));
       assertThat(output, containsString("content of B"));

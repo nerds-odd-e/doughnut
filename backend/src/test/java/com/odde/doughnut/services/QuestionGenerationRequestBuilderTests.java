@@ -8,6 +8,7 @@ import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.focusContext.FocusContextConstants;
 import com.odde.doughnut.services.focusContext.FocusContextMarkdownAugmenter;
 import com.odde.doughnut.testability.MakeMe;
 import com.openai.models.responses.StructuredResponseCreateParams;
@@ -102,7 +103,7 @@ class QuestionGenerationRequestBuilderTests {
             focus, null, null, "a part of", viewer);
 
     String focusContext = inputText(request);
-    assertThat(focusContext, containsString("## Retrieved Note"));
+    assertThat(focusContext, containsString(FocusContextConstants.RETRIEVED_NOTE_OPEN_MARKER));
     assertThat(focusContext, containsString("Title: Heart"));
   }
 }

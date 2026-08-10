@@ -106,7 +106,7 @@ Hello
 
 ### Phase 3 — Retrieved note section uses `<retrieved_note>` (Behavior)
 
-**Status:** planned  
+**Status:** done  
 **Observable:** Related notes use `<retrieved_note>…</retrieved_note>` instead of `## Retrieved Note`.
 
 **Stop-safe:** Full Focus Context XML+markdown shape is complete for all consumers. CLS still uses the old content bullet (interim).

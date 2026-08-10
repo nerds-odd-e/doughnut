@@ -27,7 +27,7 @@ final class NoteRefinementAiToolFactory {
         Return one current-content layout for the note content, not alternative breakdown suggestions.
 
         Context:
-        - The user message includes hidden "%s" with a "%s" section and optional "## Retrieved Note" sections.
+        - The user message includes hidden "%s" with a "%s" section and optional "%s" sections.
         - Build the layout from the Focus Note content only. The Focus Note is the only source for layout items.
         - Retrieved Notes are secondary context only: use them to clarify scope or ambiguous Focus Note content, but do not add layout items for content that appears only in Retrieved Notes. If a Retrieved Note clarifies a Focus Note section, reflect that in the Focus Note item text.
 
@@ -40,6 +40,7 @@ final class NoteRefinementAiToolFactory {
             .formatted(
                 FocusContextConstants.FOCUS_CONTEXT_OPEN_MARKER,
                 FocusContextConstants.FOCUS_NOTE_OPEN_MARKER,
+                FocusContextConstants.RETRIEVED_NOTE_OPEN_MARKER,
                 ledToQuestionGuidance),
         NoteRefinementLayout.class);
   }

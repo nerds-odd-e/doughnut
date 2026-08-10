@@ -40,7 +40,35 @@ For **folder siblings**, an anchor at wiki depth `d` uses `sampleCapAtGraphDepth
 
 ## Markdown rendering
 
-For LLM prompts, the same retrieval result is rendered as Markdown with a `# Focus Context` header and fenced `doughnut-note-md` blocks (fence width chosen so note content cannot break out).
+For LLM prompts, the same retrieval result is rendered as an XML envelope with markdown metadata and fenced `doughnut-note-md` bodies (fence width chosen so note content cannot break out):
+
+````markdown
+<focus_context>
+Purpose: Context around the focus note for AI use.
+Max depth: 1
+
+<focus_note>
+Title: My Title
+Notebook: My Notebook
+Folder: path/here
+Depth: 0
+
+```doughnut-note-md
+note body (may include frontmatter)
+```
+</focus_note>
+
+<retrieved_note>
+Title: Related
+…
+Reached by: OutgoingWikiLink
+
+```doughnut-note-md
+…
+```
+</retrieved_note>
+</focus_context>
+````
 
 ## Code
 

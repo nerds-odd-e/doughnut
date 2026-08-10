@@ -46,7 +46,7 @@ public class FocusContextMarkdownRenderer {
   }
 
   private void appendRetrievedNote(StringBuilder sb, FocusContextNote note) {
-    sb.append("\n## Retrieved Note\n\n");
+    sb.append(FocusContextConstants.RETRIEVED_NOTE_SECTION_START);
     sb.append("Title: ").append(note.getTitle() != null ? note.getTitle() : "").append("\n");
     if (note.getNotebook() != null) {
       sb.append("Notebook: ").append(note.getNotebook()).append("\n");
@@ -68,6 +68,7 @@ public class FocusContextMarkdownRenderer {
       sb.append("\nContent:\n\n");
       appendFencedContent(sb, note.getContent());
     }
+    sb.append(FocusContextConstants.RETRIEVED_NOTE_CLOSE_TAG);
   }
 
   private static boolean hasRenderableContent(String content) {
