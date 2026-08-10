@@ -33,7 +33,7 @@ Feature: Bazaar subscription
     And  On day 2 I recall "Square, My memo, end " and assimilate new "Triangle, end       "
     And  I should be able to edit the subscription to notebook "Shape"
 
-  Scenario: Notebook with skip recall cannot be added to learning from the Bazaar
+  Scenario: Notebook with skip recall cannot be subscribed from the Bazaar
     Given I am logged in as "another_old_learner"
     When I change notebook "Shape" to skip recall
-    Then I should not be able to add notebook "Shape" to my learning from the Bazaar
+    Then I should not be able to subscribe to notebook "Shape" from the Bazaar

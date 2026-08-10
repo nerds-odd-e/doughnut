@@ -4,6 +4,7 @@
     <TextInput
       scope-name="subscription"
       field="dailyTargetOfNewNotes"
+      title="Daily assimilation target"
       v-model="formData.dailyTargetOfNewNotes"
       :error-message="errors.dailyTargetOfNewNotes"
     />

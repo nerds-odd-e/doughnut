@@ -34,9 +34,9 @@ When(
 )
 
 Then(
-  'I should not be able to add notebook {string} to my learning from the Bazaar',
+  'I should not be able to subscribe to notebook {string} from the Bazaar',
   (noteTopology: string) => {
-    start.navigateToBazaar().expectCannotAddToMyLearning(noteTopology)
+    start.navigateToBazaar().expectCannotSubscribe(noteTopology)
   }
 )
 

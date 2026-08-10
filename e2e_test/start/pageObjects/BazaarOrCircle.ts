@@ -5,19 +5,19 @@ import {
   notebookList,
 } from './NotebookList'
 
-const addToMyLearning = 'Add to my learning'
+const subscribeButtonTitle = 'Subscribe'
 
 export const bazaarOrCircle = () => {
   return {
     ...notebookList(),
-    expectCannotAddToMyLearning(noteTopology: string) {
-      expectNotebookCardButtonAbsent(noteTopology, addToMyLearning)
+    expectCannotSubscribe(noteTopology: string) {
+      expectNotebookCardButtonAbsent(noteTopology, subscribeButtonTitle)
     },
-    subscribe(notebook: string, dailyLearningCount: string) {
-      findNotebookCardButton(notebook, addToMyLearning).click()
+    subscribe(notebook: string, dailyAssimilationTarget: string) {
+      findNotebookCardButton(notebook, subscribeButtonTitle).click()
       cy.get('#subscription-dailyTargetOfNewNotes')
         .clear()
-        .type(dailyLearningCount)
+        .type(dailyAssimilationTarget)
       cy.findByRole('button', { name: 'Submit' }).click()
       waitUntilAppIsNotBusy()
     },
