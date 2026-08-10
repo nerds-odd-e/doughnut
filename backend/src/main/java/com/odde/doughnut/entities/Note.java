@@ -101,7 +101,7 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public NoteTitle getNoteTitle() {
-    return new NoteTitle(getTitle() != null ? getTitle() : "");
+    return new NoteTitle(getTitle());
   }
 
   @JsonIgnore
@@ -151,7 +151,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   public NoteTopology getNoteTopology() {
     NoteTopology noteTopology = new NoteTopology();
     noteTopology.setId(getId());
-    noteTopology.setTitle(getTitle() != null ? getTitle() : "");
+    noteTopology.setTitle(getTitle());
     Objects.requireNonNull(getNotebook());
     noteTopology.setCreatedAt(getCreatedAt());
     noteTopology.setUpdatedAt(getUpdatedAt());

@@ -66,6 +66,22 @@ class SoftDeletedTitleConflictMvcTest extends ControllerTestBase {
   }
 
   @Test
+  void createNoteReturns409WhenSoftDeletedNoteHasSameTitleWithUnicodeSurroundingWhitespace()
+      throws Exception {
+    Note n = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("A").please();
+    softDelete(n);
+
+    NoteCreationDTO dto = new NoteCreationDTO();
+    dto.setNewTitle("\u3000 A\u3000");
+
+    expectSoftDeletedTitleConflict(
+        mockMvc.perform(
+            post("/api/notebooks/{notebookId}/create-note", n.getNotebook().getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto))));
+  }
+
+  @Test
   void createNoteReturns409WhenSoftDeletedNoteHasSameTitleAtRoot() throws Exception {
     Note n = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("DupTitle").please();
     softDelete(n);

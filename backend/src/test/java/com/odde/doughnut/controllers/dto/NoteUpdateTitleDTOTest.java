@@ -72,7 +72,9 @@ class NoteUpdateTitleDTOTest {
         "readme.md",
         "README.md",
         "Readme.md",
-        " readme.md "
+        " readme.md ",
+        "\u3000readme\u3000",
+        "\u3000readme.md\u3000"
       })
   void rejectsReservedReadmeTitle(String reserved) {
     dto.setNewTitle(reserved);

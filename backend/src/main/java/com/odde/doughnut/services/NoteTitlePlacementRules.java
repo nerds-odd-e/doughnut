@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.ApiException;
+import com.odde.doughnut.validators.DisplayNamePathSeparators;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,8 @@ public class NoteTitlePlacementRules {
   }
 
   public void requireNoSoftDeletedTitleAt(Notebook notebook, Folder folderOrNull, String title) {
-    String trimmed = title != null ? title.trim() : "";
+    String trimmed =
+        title != null ? DisplayNamePathSeparators.trimSurroundingWhitespace(title) : "";
     if (trimmed.isEmpty()) {
       return;
     }

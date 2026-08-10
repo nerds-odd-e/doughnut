@@ -133,7 +133,7 @@ public class FolderRelocationService {
       Integer notebookId, Integer destParentId, Folder folder, FolderMoveRequest request) {
     Optional<Folder> existingSibling =
         folderSiblingNameValidation.findConflictingSibling(
-            notebookId, destParentId, folder.getName(), folder.getId());
+            notebookId, destParentId, new DisplayName(folder.getName()), folder.getId());
     if (existingSibling.isEmpty()) {
       return Optional.empty();
     }
@@ -300,7 +300,7 @@ public class FolderRelocationService {
     for (Folder child : directSubfolders) {
       Optional<Folder> existingSibling =
           folderSiblingNameValidation.findConflictingSibling(
-              notebook.getId(), destinationId, child.getName(), folder.getId());
+              notebook.getId(), destinationId, new DisplayName(child.getName()), folder.getId());
       if (existingSibling.isEmpty()) {
         continue;
       }

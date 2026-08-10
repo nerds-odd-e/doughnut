@@ -24,7 +24,7 @@ public class NotebookBuilder extends EntityBuilder<Notebook> {
     } else if (entity.getUpdatedAt() == null) {
       entity.setUpdatedAt(entity.getCreatedAt());
     }
-    if (entity.getName() == null || entity.getName().isBlank()) {
+    if (entity.getName().isBlank()) {
       entity.setName(new DisplayName(NoteBuilder.notebookTestNameCounter.generate()));
     }
     if (entity.getCreator() == null) {

@@ -57,6 +57,31 @@ class DisplayNameNormalizationMvcTest extends ControllerTestBase {
   }
 
   @Test
+  void createExtractedNoteStoresTitleWithoutSurroundingWhitespace() throws Exception {
+    Note source =
+        makeMe
+            .aNote()
+            .notebookOwnedBy(currentUser.getUser())
+            .content("Content to extract.")
+            .please();
+
+    MvcResult result =
+        mockMvc
+            .perform(
+                post("/api/ai/create-extracted-note/{note}", source.getId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        "{\"newNoteTitle\":\"  Extracted  \",\"newNoteContent\":\"Extracted"
+                            + " body.\",\"updatedOriginalNoteContent\":\"Remaining content.\"}"))
+            .andExpect(status().isOk())
+            .andReturn();
+
+    JsonNode root = objectMapper.readTree(result.getResponse().getContentAsString());
+    Note created = noteRepository.findById(root.get("note").get("id").asInt()).orElseThrow();
+    assertThat(created.getTitle(), equalTo("Extracted"));
+  }
+
+  @Test
   void createNoteStoresTitleWithoutSurroundingUnicodeWhitespace() throws Exception {
     Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
 

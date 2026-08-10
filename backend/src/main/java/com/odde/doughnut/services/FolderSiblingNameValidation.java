@@ -36,11 +36,6 @@ public class FolderSiblingNameValidation {
         notebookId, parentFolderId, name, Set.of(), DUPLICATE_SIBLING_NAME_HERE);
   }
 
-  /** New folder: no existing sibling may use {@code name}. */
-  public void requireNoConflictingSibling(Integer notebookId, Integer parentFolderId, String name) {
-    requireNoConflictingSibling(notebookId, parentFolderId, new DisplayName(name));
-  }
-
   /**
    * Returns a same-name sibling under {@code parentFolderId} in {@code notebookId}, excluding
    * folders whose ids are in {@code excludedFolderIds}.
@@ -57,31 +52,11 @@ public class FolderSiblingNameValidation {
 
   /**
    * Returns a same-name sibling under {@code parentFolderId} in {@code notebookId}, excluding
-   * folders whose ids are in {@code excludedFolderIds}.
-   */
-  public Optional<Folder> findConflictingSibling(
-      Integer notebookId, Integer parentFolderId, String name, Set<Integer> excludedFolderIds) {
-    return findConflictingSibling(
-        notebookId, parentFolderId, new DisplayName(name), excludedFolderIds);
-  }
-
-  /**
-   * Returns a same-name sibling under {@code parentFolderId} in {@code notebookId}, excluding
    * {@code excludedFolderId}.
    */
   public Optional<Folder> findConflictingSibling(
       Integer notebookId, Integer parentFolderId, DisplayName name, int excludedFolderId) {
     return findConflictingSibling(notebookId, parentFolderId, name, Set.of(excludedFolderId));
-  }
-
-  /**
-   * Returns a same-name sibling under {@code parentFolderId} in {@code notebookId}, excluding
-   * {@code excludedFolderId}.
-   */
-  public Optional<Folder> findConflictingSibling(
-      Integer notebookId, Integer parentFolderId, String name, int excludedFolderId) {
-    return findConflictingSibling(
-        notebookId, parentFolderId, new DisplayName(name), excludedFolderId);
   }
 
   /**
@@ -91,15 +66,6 @@ public class FolderSiblingNameValidation {
       Integer notebookId, Integer parentFolderId, DisplayName name, int excludedFolderId) {
     requireNoConflictingSibling(
         notebookId, parentFolderId, name, Set.of(excludedFolderId), DUPLICATE_SIBLING_NAME_HERE);
-  }
-
-  /**
-   * Move folder: destination siblings may not use the moved folder's name except the folder itself.
-   */
-  public void requireNoConflictingSibling(
-      Integer notebookId, Integer parentFolderId, String name, int excludedFolderId) {
-    requireNoConflictingSibling(
-        notebookId, parentFolderId, new DisplayName(name), excludedFolderId);
   }
 
   /**
@@ -115,19 +81,5 @@ public class FolderSiblingNameValidation {
     if (findConflictingSibling(notebookId, parentFolderId, name, excludedFolderIds).isPresent()) {
       throwFolderNameConflict(conflictMessage);
     }
-  }
-
-  /**
-   * Ensures no other folder under {@code parentFolderId} in {@code notebookId} has {@code name},
-   * ignoring folders whose ids are in {@code excludedFolderIds}.
-   */
-  public void requireNoConflictingSibling(
-      Integer notebookId,
-      Integer parentFolderId,
-      String name,
-      Set<Integer> excludedFolderIds,
-      String conflictMessage) {
-    requireNoConflictingSibling(
-        notebookId, parentFolderId, new DisplayName(name), excludedFolderIds, conflictMessage);
   }
 }

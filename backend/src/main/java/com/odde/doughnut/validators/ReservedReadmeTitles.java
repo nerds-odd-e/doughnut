@@ -15,7 +15,7 @@ public final class ReservedReadmeTitles {
     if (title == null) {
       return false;
     }
-    String trimmed = title.trim();
+    String trimmed = DisplayNamePathSeparators.trimSurroundingWhitespace(title);
     return trimmed.equalsIgnoreCase("readme") || trimmed.equalsIgnoreCase("readme.md");
   }
 }
