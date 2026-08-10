@@ -5,7 +5,7 @@ milestone_name: none
 status: Quick 010 in progress — Phase 1 done
 last_updated: "2026-08-10T10:45:00.000Z"
 last_activity: 2026-08-10
-last_activity_desc: Quick 010 Phase 3 — retrieved_note tags; XML shape complete
+last_activity_desc: Quick 010 Phase 4 — RetrievalConfig.focusNoteOnly()
 ---
 
 # Project State
@@ -22,7 +22,7 @@ See: `.planning/PROJECT.md`
 Milestone **v1.3 Commissioned Learning Session MVP** shipped 2026-08-08.
 Post-v1.3 CLS polish shipped same day — Proposed ADR 0005.
 
-**Active ad-hoc plan:** Quick 010 — Phases 1–3 done (full Focus Context XML shape). Phases 4–6 remaining.
+**Active ad-hoc plan:** Quick 010 — Phases 1–4 done. Phases 5–6 remaining (CLS integration).
 
 ## Deferred Items
 

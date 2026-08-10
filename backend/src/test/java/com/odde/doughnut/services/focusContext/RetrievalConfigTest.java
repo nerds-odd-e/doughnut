@@ -29,4 +29,20 @@ class RetrievalConfigTest {
     assertThat(config.getMaxDepth(), equalTo(2));
     assertThat(config.getFocusContextContentTokenBudget(), equalTo(1800));
   }
+
+  @Test
+  void focusNoteOnlyUsesZeroMaxDepthAndDefaultBudget() {
+    RetrievalConfig config = RetrievalConfig.focusNoteOnly();
+    assertThat(config.getMaxDepth(), equalTo(0));
+    assertThat(
+        config.getFocusContextContentTokenBudget(),
+        equalTo(FocusContextConstants.FOCUS_CONTEXT_COMBINED_CONTENT_TOKEN_BUDGET));
+  }
+
+  @Test
+  void focusNoteOnlyWithBudgetOverridesDefault() {
+    int budget = 900;
+    RetrievalConfig config = RetrievalConfig.focusNoteOnly(budget);
+    assertThat(config.getFocusContextContentTokenBudget(), equalTo(budget));
+  }
 }

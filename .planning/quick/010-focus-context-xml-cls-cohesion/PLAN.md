@@ -124,7 +124,7 @@ Hello
 
 ### Phase 4 — `RetrievalConfig.focusNoteOnly()` (Structure)
 
-**Status:** planned  
+**Status:** done  
 **Structure for:** Phase 5 only.  
 **Observable difference:** none (existing tests still pass). New factory returns `maxDepth = 0`.
 
