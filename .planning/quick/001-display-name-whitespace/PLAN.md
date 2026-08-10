@@ -187,6 +187,8 @@ the `NOT NULL` column.
 
 ### Phase 5 — Existing rows are normalized (Behavior)
 
+**Status:** jidoka-stop — awaiting developer decision
+
 **Start with Jidoka.** Local `doughnut_development` has no `note` table and
 `doughnut_test` is wiped, so the affected row count is unknown. Measure against
 production-like data first, because all three tables have scoped unique keys —
@@ -195,6 +197,14 @@ production-like data first, because all three tables have scoped unique keys —
 `deleted_at`. Trimming can therefore collide (`"  A"` + `"A"` in one folder). Bring the
 counts and the collision list to the developer before choosing fail-loud vs. deterministic
 disambiguation.
+
+**Local measurement (2026-08-10):** `doughnut_e2e_test` — 0 ASCII-untrimmed rows
+(`note` 3 rows, `notebook` 1, `folder` 0). `doughnut_test` same. Unicode-only
+surrounding whitespace (e.g. `\u3000`) not measured locally — requires Java using
+`DisplayName` against production/staging dump.
+
+**Decision needed:** fail-loud migration vs deterministic disambiguation when trim
+creates unique-key collisions.
 
 Implement as a **Java** Flyway migration under `backend/src/main/java/db/migration/` (next
 version > `300000243`) reusing `DisplayName`, so migration and application share one
