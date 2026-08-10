@@ -50,9 +50,10 @@ class LearningSessionCommissionTests extends LearningSessionControllerTestBase {
     assertThat(markdown, containsString("<session_items>"));
     assertThat(markdown, containsString("### Hola"));
     assertThat(markdown, containsString("### Gracias"));
-    assertThat(markdown, containsString("Expected learning content: Hello"));
-    assertThat(markdown, containsString("Expected learning content: Thank you"));
-    assertThat(markdown, containsString("not yet tutored"));
+    assertThat(markdown, not(containsString("Expected learning content:")));
+    assertThat(markdown, containsString("- Learning status: not yet tutored"));
+    assertThat(markdown, containsString("Hello"));
+    assertThat(markdown, containsString("Thank you"));
     assertThat(markdown, containsString(FocusContextConstants.FOCUS_CONTEXT_OPEN_MARKER));
     assertThat(markdown, containsString(FocusContextConstants.FOCUS_NOTE_OPEN_MARKER));
     assertThat(markdown, containsString("```doughnut-note-md"));

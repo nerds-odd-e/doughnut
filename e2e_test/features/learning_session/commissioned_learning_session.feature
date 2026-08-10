@@ -31,7 +31,7 @@ Feature: Commissioned learning session
     When I commission a learning session for notebook "Spanish conversation"
     Then the learning session request should list session items for notes "Hola, Gracias"
     And the learning session request should include the learning status of "Hola"
-    And the learning session request should include the expected learning content "Hello"
+    And the learning session request should include focus context with note body "Hello"
     And the learning session request should instruct the tutor to report one score per session item
     And the learning session should be awaiting the tutor's report
 

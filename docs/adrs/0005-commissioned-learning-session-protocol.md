@@ -53,8 +53,8 @@ that a later machine transport can carry the same concepts unchanged.
 ### Learning Session Request
 
 Doughnut states the notebook, how to report (with the rubric inline), and one
-section per Session Item keyed by note title, carrying the expected learning
-content and the learner's learning status for it.
+section per Session Item keyed by note title, carrying the learner's learning
+status and a focus-note-only Focus Context block with the note body.
 
 ```markdown
 # Learning Session Request
@@ -74,12 +74,38 @@ Wait for the learner's instruction before starting the learning session.
 
 <session_items>
 ### Hola
-- Expected learning content: Hello
 - Learning status: 1 previous session, last on 2026-08-06
+<focus_context>
+Purpose: Context around the focus note for AI use.
+Max depth: 0
+
+<focus_note>
+Title: Hola
+Notebook: Spanish conversation
+Depth: 0
+
+```doughnut-note-md
+Hello
+```
+</focus_note>
+</focus_context>
 
 ### Gracias
-- Expected learning content: Thank you
 - Learning status: not yet tutored
+<focus_context>
+Purpose: Context around the focus note for AI use.
+Max depth: 0
+
+<focus_note>
+Title: Gracias
+Notebook: Spanish conversation
+Depth: 0
+
+```doughnut-note-md
+Thank you
+```
+</focus_note>
+</focus_context>
 </session_items>
 
 <how_to_report>

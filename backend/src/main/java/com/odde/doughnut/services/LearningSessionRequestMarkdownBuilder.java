@@ -1,7 +1,6 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.algorithms.FrontmatterQuestionGenerationInstruction;
-import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.entities.LearningSession;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.SessionItem;
@@ -121,11 +120,8 @@ public class LearningSessionRequestMarkdownBuilder {
 
   private void appendSessionItem(StringBuilder sb, User viewer, SessionItem item, ZoneId zoneId) {
     Note note = item.getMemoryTracker().getNote();
-    String rawContent = NoteContentMarkdown.bodyWithoutLeadingFrontmatter(note.getContent());
-    String content = rawContent == null ? "" : rawContent.trim();
 
     sb.append("### ").append(item.getNoteTitle()).append("\n");
-    sb.append("- Expected learning content: ").append(content).append("\n");
     sb.append("- Learning status: ")
         .append(learningStatusLine(item.getMemoryTracker().getId(), zoneId))
         .append("\n");

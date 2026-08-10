@@ -112,11 +112,16 @@ export const recallLearningSessionMethods = () => ({
     })
     return this
   },
-  expectLearningSessionRequestIncludesContent(content: string) {
-    this.learningSessionRequestText().should(
-      'contain',
-      `Expected learning content: ${content}`
-    )
+  expectLearningSessionRequestIncludesFocusContextNoteBody(content: string) {
+    this.learningSessionRequestText().should((text) => {
+      expect(text).not.to.contain('Expected learning content:')
+      expect(text).to.contain('<focus_context>')
+      expect(text).to.contain('```doughnut-note-md')
+      const noteBodies = [
+        ...text.matchAll(/```doughnut-note-md\n([\s\S]*?)\n```/g),
+      ].map((match) => match[1])
+      expect(noteBodies.some((body) => body.includes(content))).to.equal(true)
+    })
     return this
   },
   expectLearningSessionRequestIncludesRubric() {
