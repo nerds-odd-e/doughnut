@@ -88,7 +88,7 @@ Hello
 
 ### Phase 2 — Focus note section uses `<focus_note>` (Behavior)
 
-**Status:** planned  
+**Status:** done  
 **Observable:** Focus note block uses `<focus_note>…</focus_note>` instead of `## Focus Note`.
 
 **Stop-safe:** Focus identity is tagged like the outer envelope; related notes still use `## Retrieved Note` until Phase 3.

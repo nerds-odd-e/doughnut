@@ -5,7 +5,7 @@ milestone_name: none
 status: Quick 010 in progress — Phase 1 done
 last_updated: "2026-08-10T10:45:00.000Z"
 last_activity: 2026-08-10
-last_activity_desc: Quick 010 Phase 1 — focus_context envelope
+last_activity_desc: Quick 010 Phase 2 — focus_note tags + FocusContextMarkdownAugmenter
 ---
 
 # Project State
@@ -22,7 +22,7 @@ See: `.planning/PROJECT.md`
 Milestone **v1.3 Commissioned Learning Session MVP** shipped 2026-08-08.
 Post-v1.3 CLS polish shipped same day — Proposed ADR 0005.
 
-**Active ad-hoc plan:** Quick 010 — 6 small-commit phases. Phase 1 done (`<focus_context>` envelope + `FocusContextConstants`). Phases 2–6 remaining.
+**Active ad-hoc plan:** Quick 010 — Phases 1–2 done. Phases 3–6 remaining.
 
 ## Deferred Items
 

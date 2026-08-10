@@ -24,7 +24,7 @@ public class FocusContextMarkdownRenderer {
   }
 
   private void appendFocusNote(StringBuilder sb, FocusContextFocusNote focusNote) {
-    sb.append("\n## Focus Note\n\n");
+    sb.append(FocusContextConstants.FOCUS_NOTE_SECTION_START);
     sb.append("Title: ")
         .append(focusNote.getTitle() != null ? focusNote.getTitle() : "")
         .append("\n");
@@ -42,6 +42,7 @@ public class FocusContextMarkdownRenderer {
       sb.append("\nContent:\n\n");
       appendFencedContent(sb, focusNote.getContent());
     }
+    sb.append(FocusContextConstants.FOCUS_NOTE_CLOSE_TAG);
   }
 
   private void appendRetrievedNote(StringBuilder sb, FocusContextNote note) {

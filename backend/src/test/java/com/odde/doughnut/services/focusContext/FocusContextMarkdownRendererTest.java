@@ -61,7 +61,9 @@ class FocusContextMarkdownRendererTest {
 
       String output = renderer.render(result, depth1Config);
 
-      assertThat(output, containsString("## Focus Note"));
+      assertThat(output, containsString(FocusContextConstants.FOCUS_NOTE_OPEN_MARKER));
+      assertThat(output, containsString(FocusContextConstants.FOCUS_NOTE_CLOSE_TAG));
+      assertThat(output, not(containsString("## Focus Note")));
       assertThat(output, containsString("Title: My Title"));
       assertThat(output, containsString("Notebook: My Notebook"));
       assertThat(output, containsString("Depth: 0"));

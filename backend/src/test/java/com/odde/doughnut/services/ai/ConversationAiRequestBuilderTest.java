@@ -44,7 +44,8 @@ class ConversationAiRequestBuilderTest {
 
       assertThat(body, containsString(note.getTitle()));
       assertThat(body, containsString(FocusContextConstants.FOCUS_CONTEXT_OPEN_MARKER));
-      assertThat(body, containsString("## Focus Note"));
+      assertThat(body, containsString(FocusContextConstants.FOCUS_NOTE_OPEN_MARKER));
+      assertThat(body, not(containsString("## Focus Note")));
       assertThat(body, containsString("Notebook:"));
       assertThat(body, containsString("Content:"));
       assertThat(body, containsString(note.getContent()));

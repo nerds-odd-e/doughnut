@@ -1,7 +1,5 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.algorithms.NoteContentMarkdown;
-import com.odde.doughnut.controllers.dto.WikiTitle;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
@@ -11,13 +9,13 @@ import com.odde.doughnut.services.ai.builder.OpenAIResponseRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
 import com.odde.doughnut.services.focusContext.FocusContextConstants;
+import com.odde.doughnut.services.focusContext.FocusContextMarkdownAugmenter;
 import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.doughnut.services.focusContext.FocusContextResult;
 import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
 import com.odde.doughnut.services.focusContext.RetrievalConfig;
 import com.openai.models.ReasoningEffort;
 import com.openai.models.responses.StructuredResponseCreateParams;
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +23,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class QuestionGenerationRequestBuilder {
   static final String CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER = "Custom instruction for focus note:";
-  static final String PROPERTY_FOCUS_CONTEXT_HEADER = "Focus on one property of the focus note:";
 
   private final GlobalSettingsService globalSettingsService;
   private final FocusContextRetrievalService focusContextRetrievalService;
@@ -180,7 +177,7 @@ public class QuestionGenerationRequestBuilder {
             : 0;
     String propertyFocusBlock =
         propertyKey != null && !propertyKey.isBlank()
-            ? buildPropertyFocusBlock(focus, propertyKey)
+            ? FocusContextMarkdownAugmenter.buildPropertyFocusBlock(focus, propertyKey)
             : null;
     int propertyFocusTokens =
         propertyFocusBlock != null
@@ -199,9 +196,11 @@ public class QuestionGenerationRequestBuilder {
     String focusContextMarkdown = focusContextMarkdownRenderer.render(focusContextResult, config);
     if (propertyFocusBlock != null) {
       focusContextMarkdown =
-          embedPropertyFocusInFocusContext(focusContextMarkdown, propertyFocusBlock);
-      List<WikiTitle> wikiTitles = wikiTitleCacheService.wikiTitlesForViewer(focus, viewer);
-      focusContextMarkdown = ensureWikiTitlesInFocusContext(focusContextMarkdown, wikiTitles);
+          FocusContextMarkdownAugmenter.embedPropertyFocus(
+              focusContextMarkdown, propertyFocusBlock);
+      focusContextMarkdown =
+          FocusContextMarkdownAugmenter.ensureWikiTitles(
+              focusContextMarkdown, wikiTitleCacheService.wikiTitlesForViewer(focus, viewer));
     }
 
     OpenAIResponseRequestBuilder<T> builder =
@@ -214,63 +213,5 @@ public class QuestionGenerationRequestBuilder {
       builder.addUserMessage(additionalMessage);
     }
     return builder;
-  }
-
-  private static String embedPropertyFocusInFocusContext(
-      String focusContextMarkdown, String propertyFocusBlock) {
-    int focusNoteSection = focusContextMarkdown.indexOf("\n## Focus Note");
-    if (focusNoteSection >= 0) {
-      return focusContextMarkdown.substring(0, focusNoteSection)
-          + "\n"
-          + propertyFocusBlock
-          + focusContextMarkdown.substring(focusNoteSection);
-    }
-    return focusContextMarkdown + "\n\n" + propertyFocusBlock;
-  }
-
-  private static String buildPropertyFocusBlock(Note focus, String propertyKey) {
-    String propertyValue =
-        NoteContentMarkdown.splitLeadingFrontmatter(focus.getContent())
-            .flatMap(split -> split.frontmatter().getString(propertyKey))
-            .orElse("");
-    StringBuilder block = new StringBuilder();
-    block.append(PROPERTY_FOCUS_CONTEXT_HEADER).append("\n");
-    block
-        .append("Focus on property \"")
-        .append(propertyKey)
-        .append("\" of the focus note (not the whole note).\n");
-    block.append(
-        "Infer what this property means from the property name, the focus note content, and"
-            + " the listed link targets in the focus context.\n");
-    block.append("Property key: ").append(propertyKey).append("\n");
-    block.append("Property value: ").append(propertyValue).append("\n");
-    return block.toString();
-  }
-
-  private static String ensureWikiTitlesInFocusContext(
-      String focusContextMarkdown, List<WikiTitle> wikiTitles) {
-    if (wikiTitles.isEmpty()) {
-      return focusContextMarkdown;
-    }
-    List<WikiTitle> missing = new ArrayList<>();
-    for (WikiTitle wikiTitle : wikiTitles) {
-      String linkText = wikiTitle.getLinkText();
-      if (linkText != null && !linkText.isBlank() && !focusContextMarkdown.contains(linkText)) {
-        missing.add(wikiTitle);
-      }
-    }
-    if (missing.isEmpty()) {
-      return focusContextMarkdown;
-    }
-    StringBuilder extended = new StringBuilder(focusContextMarkdown);
-    extended.append("\n\n## Link targets (focus note)\n\n");
-    for (WikiTitle wikiTitle : missing) {
-      extended.append("- ").append(wikiTitle.getLinkText());
-      if (wikiTitle.getNoteId() != null) {
-        extended.append(" (resolved note id: ").append(wikiTitle.getNoteId()).append(")");
-      }
-      extended.append("\n");
-    }
-    return extended.toString();
   }
 }

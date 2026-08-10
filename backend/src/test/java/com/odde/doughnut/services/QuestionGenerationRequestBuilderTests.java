@@ -8,6 +8,7 @@ import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.focusContext.FocusContextMarkdownAugmenter;
 import com.odde.doughnut.testability.MakeMe;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,12 +71,11 @@ class QuestionGenerationRequestBuilderTests {
 
     assertThat(
         instructionText(request),
-        not(containsString(QuestionGenerationRequestBuilder.PROPERTY_FOCUS_CONTEXT_HEADER)));
+        not(containsString(FocusContextMarkdownAugmenter.PROPERTY_FOCUS_CONTEXT_HEADER)));
 
     String focusContext = inputText(request);
     assertThat(
-        focusContext,
-        containsString(QuestionGenerationRequestBuilder.PROPERTY_FOCUS_CONTEXT_HEADER));
+        focusContext, containsString(FocusContextMarkdownAugmenter.PROPERTY_FOCUS_CONTEXT_HEADER));
     assertThat(focusContext, containsString("Focus on property \"a part of\""));
     assertThat(focusContext, containsString("Property key: a part of"));
     assertThat(
