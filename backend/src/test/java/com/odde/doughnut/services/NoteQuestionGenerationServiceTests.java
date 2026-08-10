@@ -11,6 +11,7 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
+import com.odde.doughnut.services.focusContext.FocusContextConstants;
 import com.odde.doughnut.services.openAiApis.StructuredResponseCreateParamsSerializer;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAiStructuredResponseMock;
@@ -174,7 +175,8 @@ class NoteQuestionGenerationServiceTests {
 
       assertThat(request, is(notNullValue()));
       assertThat(modelName(request), is(GlobalSettingsService.DEFAULT_CHAT_MODEL));
-      assertThat(userMessageContains(request, "# Focus Context"), is(true));
+      assertThat(
+          userMessageContains(request, FocusContextConstants.FOCUS_CONTEXT_OPEN_MARKER), is(true));
     }
 
     @Test
@@ -197,7 +199,8 @@ class NoteQuestionGenerationServiceTests {
           userBodies.get(0),
           containsString(QuestionGenerationRequestBuilder.CUSTOM_INSTRUCTION_USER_MESSAGE_HEADER));
       assertThat(userBodies.get(0), containsString("SCOPED_QGEN_MARKER"));
-      assertThat(userBodies.get(1), containsString("# Focus Context"));
+      assertThat(
+          userBodies.get(1), containsString(FocusContextConstants.FOCUS_CONTEXT_OPEN_MARKER));
       assertThat(instructionContains(request, "SCOPED_QGEN_MARKER"), is(false));
       assertThat(
           instructionContains(
@@ -280,7 +283,8 @@ class NoteQuestionGenerationServiceTests {
       assertThat(
           userMessageContains(request, "Generate a question about the capital city"), is(true));
       List<String> userBodies = userMessageContentStrings(request);
-      assertThat(userBodies.get(0), containsString("# Focus Context"));
+      assertThat(
+          userBodies.get(0), containsString(FocusContextConstants.FOCUS_CONTEXT_OPEN_MARKER));
       assertThat(userBodies.get(1), containsString("Generate a question about the capital city"));
     }
 

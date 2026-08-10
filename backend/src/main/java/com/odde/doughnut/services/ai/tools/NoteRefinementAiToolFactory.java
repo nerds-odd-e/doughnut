@@ -7,6 +7,7 @@ import com.odde.doughnut.services.ai.NoteExtractionResult;
 import com.odde.doughnut.services.ai.NoteRefinementLayout;
 import com.odde.doughnut.services.ai.NoteRefinementLayoutValidator;
 import com.odde.doughnut.services.ai.RegeneratedNoteContent;
+import com.odde.doughnut.services.focusContext.FocusContextConstants;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -26,7 +27,7 @@ final class NoteRefinementAiToolFactory {
         Return one current-content layout for the note content, not alternative breakdown suggestions.
 
         Context:
-        - The user message includes hidden "# Focus Context" with a "## Focus Note" section and optional "## Retrieved Note" sections.
+        - The user message includes hidden "%s" with a "## Focus Note" section and optional "## Retrieved Note" sections.
         - Build the layout from the Focus Note content only. The Focus Note is the only source for layout items.
         - Retrieved Notes are secondary context only: use them to clarify scope or ambiguous Focus Note content, but do not add layout items for content that appears only in Retrieved Notes. If a Retrieved Note clarifies a Focus Note section, reflect that in the Focus Note item text.
 
@@ -36,7 +37,7 @@ final class NoteRefinementAiToolFactory {
         Set alreadyExtracted to true only for simple standalone wiki-link-only lines that point to content already extracted into another note, for example [[Target note]] or [[Target note|Label]]. These items should be marked Already extracted in the UI but remain selectable.
         %s
         """
-            .formatted(ledToQuestionGuidance),
+            .formatted(FocusContextConstants.FOCUS_CONTEXT_OPEN_MARKER, ledToQuestionGuidance),
         NoteRefinementLayout.class);
   }
 

@@ -39,6 +39,20 @@ class FocusContextMarkdownRendererTest {
   }
 
   @Nested
+  class FocusContextEnvelope {
+    @Test
+    void outputWrapsContentInFocusContextTags() {
+      FocusContextResult result = new FocusContextResult(focusNote("NB", "Title", "body", false));
+
+      String output = renderer.render(result, depth1Config);
+
+      assertThat(output, startsWith(FocusContextConstants.FOCUS_CONTEXT_OPEN_TAG));
+      assertThat(output, endsWith(FocusContextConstants.FOCUS_CONTEXT_CLOSE_TAG));
+      assertThat(output, not(containsString("# Focus Context")));
+    }
+  }
+
+  @Nested
   class FocusNoteBlock {
     @Test
     void focusNoteSectionIncludesMetadataFenceAndOmitsRetrievedBlockWhenNoRelated() {

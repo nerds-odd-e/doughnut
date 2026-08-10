@@ -7,6 +7,7 @@ import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.services.focusContext.FocusContextConstants;
 import com.odde.doughnut.testability.MakeMe;
 import com.openai.models.responses.EasyInputMessage;
 import com.openai.models.responses.ResponseInputItem;
@@ -42,7 +43,7 @@ class ConversationAiRequestBuilderTest {
       String body = firstDeveloperMessageBody(conversation);
 
       assertThat(body, containsString(note.getTitle()));
-      assertThat(body, containsString("# Focus Context"));
+      assertThat(body, containsString(FocusContextConstants.FOCUS_CONTEXT_OPEN_MARKER));
       assertThat(body, containsString("## Focus Note"));
       assertThat(body, containsString("Notebook:"));
       assertThat(body, containsString("Content:"));

@@ -8,7 +8,7 @@ public class FocusContextMarkdownRenderer {
   public String render(FocusContextResult result, RetrievalConfig config) {
     StringBuilder sb = new StringBuilder();
 
-    sb.append("# Focus Context\n\n");
+    sb.append(FocusContextConstants.FOCUS_CONTEXT_OPEN_TAG);
     sb.append("Purpose: Context around the focus note for AI use.\n");
     sb.append("Max depth: ").append(config.getMaxDepth()).append("\n");
 
@@ -19,6 +19,7 @@ public class FocusContextMarkdownRenderer {
       appendRetrievedNote(sb, note);
     }
 
+    sb.append(FocusContextConstants.FOCUS_CONTEXT_CLOSE_TAG);
     return sb.toString();
   }
 

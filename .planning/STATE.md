@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: none
 milestone_name: none
-status: Quick plan ready — awaiting execute
-last_updated: "2026-08-10T10:35:00.000Z"
+status: Quick 010 in progress — Phase 1 done
+last_updated: "2026-08-10T10:45:00.000Z"
 last_activity: 2026-08-10
-last_activity_desc: Quick 010 refined to 6 small-commit phases
+last_activity_desc: Quick 010 Phase 1 — focus_context envelope
 ---
 
 # Project State
@@ -22,7 +22,7 @@ See: `.planning/PROJECT.md`
 Milestone **v1.3 Commissioned Learning Session MVP** shipped 2026-08-08.
 Post-v1.3 CLS polish shipped same day — Proposed ADR 0005.
 
-**Active ad-hoc plan:** Quick 010 — 6 small-commit phases (XML tags → focusNoteOnly structure → CLS embed interim → drop Expected learning content + ADR). Not started.
+**Active ad-hoc plan:** Quick 010 — 6 small-commit phases. Phase 1 done (`<focus_context>` envelope + `FocusContextConstants`). Phases 2–6 remaining.
 
 ## Deferred Items
 

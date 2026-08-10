@@ -115,7 +115,7 @@ Then('I should see the following chat messages:', (data: DataTable) => {
 })
 
 Then('OpenAI responses were called with Doughnut focus context', () => {
-  mock_services.openAi().expectLastResponsesPostBodyContains('# Focus Context')
+  mock_services.openAi().expectLastResponsesPostBodyContains('<focus_context>')
 })
 
 When('I export the conversation', () => {

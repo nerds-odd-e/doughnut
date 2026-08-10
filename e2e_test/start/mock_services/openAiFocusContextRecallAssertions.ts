@@ -11,7 +11,7 @@ const focusContextQuestionGenerationPostBodies = (
   requests: RecordedImposterRequest[]
 ): string[] =>
   postRequestBodies(requests).filter(
-    (b) => b.includes('Focus Context') && b.includes('"input"')
+    (b) => b.includes('<focus_context>') && b.includes('"input"')
   )
 
 const assertFocusContextRetrievalPromptShapes = (bodies: string[]) => {
@@ -19,7 +19,7 @@ const assertFocusContextRetrievalPromptShapes = (bodies: string[]) => {
     bodies.length,
     [
       'Focus context recall E2E: expected at least 3 OpenAI Responses POST bodies',
-      'that include the rendered focus block (# Focus Context) and JSON "input".',
+      'that include the rendered focus block (<focus_context>) and JSON "input".',
       'Recall eager-fetches one question per due memory tracker, so fewer bodies usually means',
       'fewer assimilated notes, failed requests, Mountebank stubs not matching, or',
       'the assertion ran before eager-fetch finished (increase poll attempts if flaky).',

@@ -6,6 +6,7 @@ import com.odde.doughnut.controllers.dto.BookLayoutReorganizationSuggestion;
 import com.odde.doughnut.controllers.dto.NoteRefinementQuestionContextDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.services.ai.*;
+import com.odde.doughnut.services.focusContext.FocusContextConstants;
 import java.util.List;
 
 public class AiToolFactory {
@@ -36,7 +37,7 @@ public class AiToolFactory {
     Context:
  .  '''
     Input:
-    - The user message contains hidden "# Focus Context".
+    - The user message contains hidden "%s".
     - The learner cannot see this context.
     - "Focus Note" is the primary source.
     - "Retrieved Note" sections are secondary context only.
@@ -72,7 +73,10 @@ public class AiToolFactory {
     - Return only JSON matching the provided schema.
 
         """
-        .formatted(correctAnswerSupportRule, verifyGroundingRule);
+        .formatted(
+            FocusContextConstants.FOCUS_CONTEXT_OPEN_MARKER,
+            correctAnswerSupportRule,
+            verifyGroundingRule);
   }
 
   public static InstructionAndSchema questionEvaluationAiTool(MCQWithAnswer question) {

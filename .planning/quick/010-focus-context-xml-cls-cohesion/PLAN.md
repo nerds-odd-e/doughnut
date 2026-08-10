@@ -1,6 +1,6 @@
 # Quick 010 — Focus Context XML + CLS cohesion
 
-**Status:** planned  
+**Status:** in-progress (Phase 1 done)  
 **Goal:** Make Focus Context presentation XML-tag + markdown (externally consistent across AI surfaces), then have commissioned Learning Session Requests reuse focus-note-only Focus Context (internally cohesive). ADR 0005 is open for change.
 
 ## Design decisions
@@ -71,7 +71,7 @@ Hello
 
 ### Phase 1 — Wrap Focus Context in `<focus_context>` (Behavior)
 
-**Status:** planned  
+**Status:** done  
 **Observable:** Rendered Focus Context opens/closes with `<focus_context>` / `</focus_context>` and no longer uses the `# Focus Context` markdown heading.
 
 **Stop-safe:** Outer structure matches CLS-style XML envelopes; inner `## Focus Note` / `## Retrieved Note` unchanged until later phases.

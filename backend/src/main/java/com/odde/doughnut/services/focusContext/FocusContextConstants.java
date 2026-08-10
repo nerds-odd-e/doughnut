@@ -1,6 +1,11 @@
 package com.odde.doughnut.services.focusContext;
 
 public class FocusContextConstants {
+  public static final String FOCUS_CONTEXT_ELEMENT = "focus_context";
+  public static final String FOCUS_CONTEXT_OPEN_MARKER = "<" + FOCUS_CONTEXT_ELEMENT + ">";
+  public static final String FOCUS_CONTEXT_OPEN_TAG = FOCUS_CONTEXT_OPEN_MARKER + "\n";
+  public static final String FOCUS_CONTEXT_CLOSE_TAG = "</" + FOCUS_CONTEXT_ELEMENT + ">\n";
+
   public static final int FOCUS_NOTE_CONTENT_MAX_TOKENS = 1500;
   public static final int RELATED_NOTE_CONTENT_MAX_TOKENS = 200;
 
