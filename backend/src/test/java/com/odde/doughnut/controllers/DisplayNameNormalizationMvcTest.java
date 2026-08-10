@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -152,5 +153,55 @@ class DisplayNameNormalizationMvcTest extends ControllerTestBase {
 
     makeMe.refresh(nb);
     assertThat(nb.getName(), equalTo("Renamed"));
+  }
+
+  @Test
+  void createNoteRejectsUnicodeWhitespaceOnlyTitle() throws Exception {
+    Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+
+    mockMvc
+        .perform(
+            post("/api/notebooks/{notebookId}/create-note", nb.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"newTitle\":\"\\u3000\"}"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.errorType").value("BINDING_ERROR"));
+  }
+
+  @Test
+  void createFolderRejectsUnicodeWhitespaceOnlyName() throws Exception {
+    Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+
+    mockMvc
+        .perform(
+            post("/api/notebooks/{notebookId}/folders", nb.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"name\":\"\\u3000\"}"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.errorType").value("BINDING_ERROR"));
+  }
+
+  @Test
+  void createNotebookRejectsUnicodeWhitespaceOnlyTitle() throws Exception {
+    mockMvc
+        .perform(
+            post("/api/notebooks/create")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"newTitle\":\"\\u3000\"}"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.errorType").value("BINDING_ERROR"));
+  }
+
+  @Test
+  void renameNotebookRejectsUnicodeWhitespaceOnlyName() throws Exception {
+    Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+
+    mockMvc
+        .perform(
+            post("/api/notebooks/{notebookId}", nb.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"name\":\"\\u3000\",\"notebookSettings\":{}}"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.errorType").value("BINDING_ERROR"));
   }
 }

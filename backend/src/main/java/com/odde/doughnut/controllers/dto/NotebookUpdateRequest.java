@@ -1,10 +1,10 @@
 package com.odde.doughnut.controllers.dto;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NotebookSettings;
 import com.odde.doughnut.validators.DisplayNamePathSeparators;
+import com.odde.doughnut.validators.NotBlankDisplayName;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -20,8 +20,8 @@ public class NotebookUpdateRequest {
   @Size(max = 500)
   private String description;
 
+  @NotBlankDisplayName(allowNull = true)
   @Size(max = Note.MAX_TITLE_LENGTH)
   @Pattern(regexp = DisplayNamePathSeparators.REGEXP, message = DisplayNamePathSeparators.MESSAGE)
-  @JsonDeserialize(using = DisplayNameTrimmingDeserializer.class)
   private String name;
 }

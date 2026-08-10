@@ -64,13 +64,11 @@ public class Ownership {
     notebook.setCreatedAt(currentUTCTimestamp);
     if (titleConstructor != null) {
       DisplayName displayName = new DisplayName(titleConstructor);
-      if (!displayName.value().isEmpty()) {
-        String value = displayName.value();
-        notebook.setName(
-            value.length() > Note.MAX_TITLE_LENGTH
-                ? new DisplayName(value.substring(0, Note.MAX_TITLE_LENGTH))
-                : displayName);
-      }
+      String value = displayName.value();
+      notebook.setName(
+          value.length() > Note.MAX_TITLE_LENGTH
+              ? new DisplayName(value.substring(0, Note.MAX_TITLE_LENGTH))
+              : displayName);
     }
     if (description != null && !description.isBlank()) {
       notebook.setDescription(description.trim());

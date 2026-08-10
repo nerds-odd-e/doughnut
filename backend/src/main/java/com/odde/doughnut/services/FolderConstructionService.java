@@ -38,9 +38,6 @@ public class FolderConstructionService {
 
   public Folder createFolder(Notebook notebook, FolderCreationRequest request) {
     String name = request.getName();
-    if (name.isEmpty()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Folder name must not be blank.");
-    }
 
     Folder parentFolder = null;
     Integer underFolderId = request.getUnderFolderId();

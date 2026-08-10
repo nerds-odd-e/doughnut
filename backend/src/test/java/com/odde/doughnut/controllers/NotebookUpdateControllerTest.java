@@ -7,13 +7,17 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.controllers.dto.NotebookUpdateRequest;
 import com.odde.doughnut.entities.DisplayName;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NotebookSettings;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import jakarta.validation.Validator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 class NotebookUpdateControllerTest extends NotebookControllerTestBase {
+
+  @Autowired private Validator validator;
 
   @Test
   void shouldNotBeAbleToUpdateNotebookThatBelongsToOtherUser() {
@@ -66,16 +70,18 @@ class NotebookUpdateControllerTest extends NotebookControllerTestBase {
     assertThat(note.getNotebook().getName(), equalTo("New Title"));
   }
 
+  @Test
+  void allowsOmittedNameOnUpdateRequest() {
+    assertThat(validator.validate(new NotebookUpdateRequest()), hasSize(0));
+  }
+
   @ParameterizedTest
   @ValueSource(strings = {"", "   ", "\u3000"})
-  void shouldRejectEmptyOrWhitespaceNameOnUpdate(String name) {
-    Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+  void rejectsBlankOrWhitespaceNameOnUpdate(String name) {
     var request = new NotebookUpdateRequest();
-    request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
+    request.setNotebookSettings(new NotebookSettings());
     request.setName(name);
-    assertThrows(
-        ResponseStatusException.class,
-        () -> controller.updateNotebook(note.getNotebook(), request));
+    assertThat(validator.validate(request), hasSize(1));
   }
 
   @Test

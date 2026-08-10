@@ -165,6 +165,8 @@ restored Folder `name` schema drift from phase 2.
 
 ### Phase 4 — Whitespace-only names are rejected with 400 (Behavior)
 
+**Status:** done
+
 Add `@NotBlankDisplayName` to the four DTO fields, replacing `@NotBlank`; delete
 `DisplayNameTrimmingDeserializer`. Extend the MockMvc test with `"\u3000"`-only bodies for
 note title, folder name, notebook name.
@@ -179,6 +181,9 @@ Then remove what became unreachable — this is the deduplication the change is 
 Tests asserting those specific messages move to expecting a binding error. Also fixes a
 latent 500: a `"\u3000"` notebook name currently leaves `Notebook.name` null and violates
 the `NOT NULL` column.
+
+**Learnings:** `NotBlankDisplayNameValidatorTest` removed as duplicate of DTO/MockMvc tests;
+`allowNull` case for optional notebook rename lives in `NotebookUpdateControllerTest`.
 
 ### Phase 5 — Existing rows are normalized (Behavior)
 

@@ -48,7 +48,7 @@ class NoteUpdateTitleDTOTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"", "   "})
+  @ValueSource(strings = {"", "   ", "\u3000"})
   void rejectsBlankOrWhitespaceTitle(String title) {
     dto.setNewTitle(title);
     assertEquals(1, validator.validate(dto).size());

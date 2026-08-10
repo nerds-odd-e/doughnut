@@ -243,11 +243,7 @@ class NotebookController {
       notebook.setDescription(request.getDescription().isBlank() ? null : request.getDescription());
     }
     if (request.getName() != null) {
-      DisplayName displayName = new DisplayName(request.getName());
-      if (displayName.value().isEmpty()) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Notebook name cannot be empty");
-      }
-      notebook.setName(displayName);
+      notebook.setName(new DisplayName(request.getName()));
     }
     entityPersister.save(notebook);
     return notebook;

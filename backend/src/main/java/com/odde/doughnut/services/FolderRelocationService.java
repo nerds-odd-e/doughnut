@@ -269,11 +269,7 @@ public class FolderRelocationService {
     if (!folder.getNotebook().getId().equals(notebook.getId())) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not in notebook.");
     }
-    String name = request.getName();
-    if (name.isEmpty()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Folder name must not be blank.");
-    }
-    DisplayName displayName = new DisplayName(name);
+    DisplayName displayName = new DisplayName(request.getName());
     if (displayName.value().equals(folder.getName())) {
       return folder;
     }

@@ -1,9 +1,8 @@
 package com.odde.doughnut.controllers.dto;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.odde.doughnut.validators.DisplayNamePathSeparators;
+import com.odde.doughnut.validators.NotBlankDisplayName;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -14,10 +13,9 @@ import lombok.Setter;
 @Setter
 public class FolderRenameRequest {
 
-  @NotBlank
+  @NotBlankDisplayName
   @Size(max = 512)
   @Pattern(regexp = DisplayNamePathSeparators.REGEXP, message = DisplayNamePathSeparators.MESSAGE)
-  @JsonDeserialize(using = DisplayNameTrimmingDeserializer.class)
   @Schema(
       requiredMode = Schema.RequiredMode.REQUIRED,
       description = "New display name for the folder")
