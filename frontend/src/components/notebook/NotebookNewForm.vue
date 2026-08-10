@@ -56,7 +56,7 @@ export default {
       noteFormData: {
         newTitle: "",
         description: "",
-      } as NotebookCreationRequest,
+      },
       errors: {
         newTitle: undefined as undefined | string,
         description: undefined as undefined | string,
