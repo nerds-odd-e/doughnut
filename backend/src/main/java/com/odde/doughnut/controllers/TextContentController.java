@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.doughnut.controllers.dto.NoteUpdateTitleDTO;
+import com.odde.doughnut.entities.DisplayName;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.ApiException;
@@ -74,7 +75,7 @@ class TextContentController {
           titleDTO.getReferenceHandling());
     } else {
       note.setUpdatedAt(currentUTCTimestamp);
-      note.setTitle(titleDTO.getNewTitle());
+      note.setTitle(new DisplayName(titleDTO.getNewTitle()));
       entityPersister.save(note);
     }
     return noteRealmService.build(note, viewer);

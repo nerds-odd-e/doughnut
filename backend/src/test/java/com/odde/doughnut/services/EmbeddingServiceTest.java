@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.odde.doughnut.entities.DisplayName;
 import com.odde.doughnut.entities.Note;
 import com.openai.client.OpenAIClient;
 import com.openai.models.embeddings.CreateEmbeddingResponse;
@@ -41,7 +42,7 @@ class EmbeddingServiceTest {
 
     Note note = new Note();
     String longChunk = "你".repeat(10000) + "a".repeat(80000);
-    note.setTitle("Title");
+    note.setTitle(new DisplayName("Title"));
     note.setContent(longChunk);
 
     // Trigger one batch call

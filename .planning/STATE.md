@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: none
 milestone_name: none
-status: idle
-last_updated: "2026-08-10T14:25:00.000Z"
+status: in-progress
+last_updated: "2026-08-10T16:00:00.000Z"
 last_activity: 2026-08-10
-last_activity_desc: idle — no active plan
+last_activity_desc: phase 1 done — display-name whitespace (quick/001)
 ---
 
 # Project State
@@ -18,7 +18,8 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-No active plan. Last shipped work: post-v1.3 CLS ephemeral request (see `PROJECT.md`).
+Plan written, phase 1 done: `.planning/quick/001-display-name-whitespace/PLAN.md` —
+phases 2–5 remain (folder, notebook, blank rejection, legacy migration).
 
 ## Deferred Items
 

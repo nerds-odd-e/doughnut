@@ -4,6 +4,7 @@ import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.algorithms.WikiLinkMarkdown;
 import com.odde.doughnut.algorithms.WikiLinkTargetReference;
 import com.odde.doughnut.controllers.dto.TitleRenameReferenceHandling;
+import com.odde.doughnut.entities.DisplayName;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteWikiTitleCache;
 import com.odde.doughnut.entities.Notebook;
@@ -59,7 +60,7 @@ public class WikiLinkRewriteService {
         handling == TitleRenameReferenceHandling.KEEP_VISIBLE_TEXT
             ? lt -> WikiLinkMarkdown.newInnerForKeepVisibleText(lt, newTitle)
             : lt -> WikiLinkMarkdown.newInnerForUpdateVisibleText(lt, newTitle);
-    targetNote.setTitle(newTitle);
+    targetNote.setTitle(new DisplayName(newTitle));
     targetNote.setUpdatedAt(updatedAt);
     entityPersister.save(targetNote);
     entityManager.flush();

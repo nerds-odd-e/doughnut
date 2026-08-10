@@ -10,6 +10,7 @@ import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.NoteTopology;
+import com.odde.doughnut.entities.converters.DisplayNameConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -48,13 +49,20 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonPropertyDescription("The note content is in markdown format.")
   private String content;
 
+  @Column(name = "title", nullable = false)
+  @Convert(converter = DisplayNameConverter.class)
+  @JsonIgnore
+  private DisplayName title = new DisplayName("");
+
   @NotBlank
   @Size(max = MAX_TITLE_LENGTH)
-  @Getter
-  @Setter
-  @Column(name = "title", nullable = false)
-  @JsonIgnore
-  private String title = "";
+  public String getTitle() {
+    return title.value();
+  }
+
+  public void setTitle(DisplayName title) {
+    this.title = title;
+  }
 
   @Column(name = "created_at")
   @Setter
@@ -169,7 +177,7 @@ public class Note extends EntityIdentifiedByIdOnly {
       Notebook notebookOrNull, Timestamp currentUTCTimestamp, String title) {
     setNotebook(notebookOrNull);
     setUpdatedAt(currentUTCTimestamp);
-    setTitle(title != null ? title : "");
+    setTitle(new DisplayName(title));
     setCreatedAt(currentUTCTimestamp);
   }
 }

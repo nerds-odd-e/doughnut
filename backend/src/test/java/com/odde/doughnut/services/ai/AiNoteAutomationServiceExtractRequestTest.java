@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.configs.ObjectMapperConfig;
+import com.odde.doughnut.entities.DisplayName;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.focusContext.FocusContextFocusNote;
@@ -31,7 +32,7 @@ class AiNoteAutomationServiceExtractRequestTest {
   @BeforeEach
   void setup() {
     note = new Note();
-    note.setTitle("title");
+    note.setTitle(new DisplayName("title"));
     note.setContent("Original content with a key suggestion to extract.");
 
     GlobalSettingsService globalSettingsService = mock(GlobalSettingsService.class);

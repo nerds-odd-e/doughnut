@@ -121,7 +121,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder title(String text) {
-    entity.setTitle(text);
+    entity.setTitle(new DisplayName(text));
     return this;
   }
 

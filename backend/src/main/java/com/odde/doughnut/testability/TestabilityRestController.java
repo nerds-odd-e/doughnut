@@ -128,7 +128,7 @@ class TestabilityRestController {
 
     private Note buildNote(Timestamp currentUTCTimestamp) {
       Note note = new Note();
-      note.setTitle(title);
+      note.setTitle(new DisplayName(title));
       note.setContent(content);
       note.setUpdatedAt(currentUTCTimestamp);
       if (skipMemoryTracking != null) {
@@ -162,9 +162,11 @@ class TestabilityRestController {
     private String notebookName;
 
     private Map<String, Note> buildIndividualNotes(Timestamp currentUTCTimestamp) {
-      return noteTestData.stream()
-          .map(noteTestData -> noteTestData.buildNote(currentUTCTimestamp))
-          .collect(Collectors.toMap(note -> note.getTitle(), n -> n));
+      Map<String, Note> titleNoteMap = new LinkedHashMap<>();
+      for (NoteTestData noteTestData : noteTestData) {
+        titleNoteMap.put(noteTestData.title, noteTestData.buildNote(currentUTCTimestamp));
+      }
+      return titleNoteMap;
     }
 
     private void buildNoteTree(

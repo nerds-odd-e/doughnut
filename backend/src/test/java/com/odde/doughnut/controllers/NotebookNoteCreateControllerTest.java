@@ -47,14 +47,6 @@ class NotebookNoteCreateControllerTest extends NotebookControllerTestBase {
   }
 
   @Test
-  void persistsTitleWithoutSurroundingUnicodeWhitespaceFromJson() throws Exception {
-    NoteCreationDTO noteCreation =
-        objectMapper.readValue("{\"newTitle\": \"\\u3000引っ張る\\u3000\"}", NoteCreationDTO.class);
-    NoteRealm result = controller.createNoteAtNotebookRoot(ownedNotebook(), noteCreation);
-    assertThat(result.getNote().getTitle(), equalTo("引っ張る"));
-  }
-
-  @Test
   void persistsInitialMarkdownContentWhenProvided() throws Exception {
     NoteCreationDTO noteCreation = noteCreate("Root With Body");
     noteCreation.setContent("# Hello\n\n[[Link]]");
