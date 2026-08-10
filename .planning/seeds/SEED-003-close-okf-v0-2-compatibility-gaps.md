@@ -2,7 +2,7 @@
 id: SEED-003
 status: dormant
 planted: 2026-08-10
-planted_during: Quick 010 — focus-context-xml-cls-cohesion (plan ready; not started)
+planted_during: ad-hoc planning session 2026-08-10
 trigger_when: when relevant
 scope: unknown
 ---

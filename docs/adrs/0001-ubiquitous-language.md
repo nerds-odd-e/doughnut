@@ -74,7 +74,9 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
    cite it; they must not invent competing canonical names silently.
 
 2. **Canonical terms** — Prefer these meanings in new UI copy, APIs, tests, and
-   code identifiers:
+   code identifiers.
+
+#### Notebook / note structure and OKF
 
 | Term | Meaning |
 |------|---------|
@@ -87,27 +89,37 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 | **Notebook group** | Named catalog grouping of notebooks (not a Circle) |
 | **Circle** | Multi-user shared space with members and notebooks |
 | **Bazaar** | Marketplace where notebooks are shared for others to browse and subscribe |
+| **Wiki link** | In-content `[[…]]` reference to a note (optionally `Notebook:Title`) |
+| **Relationship** | Typed association between notes (e.g. “similar to”, “a part of”) |
+| **Relationship note** | A note that represents a relationship (`type: relationship` in frontmatter), with source, target, and relation |
+| **Wikidata association** | Binding a note to a Wikidata entity (also called Wiki association) |
+| **Refinement layout** | Layout for decomposing and improving a note while refining |
+| **Book** | Attached reading artifact (EPUB, PDF, …), distinct from a notebook |
+| **Book layout** | Structure of an attached book |
+| **OKF** | [Open Knowledge Format](https://cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing): portable directory of markdown concept files with YAML frontmatter |
+| **Notebook health** | In-app lint, findings, and fixes for a notebook |
+
+#### Learning and recall
+
+| Term | Meaning |
+|------|---------|
 | **Subscription** | Following a shared notebook (from the Bazaar or a Circle) with a daily assimilation quota |
 | **Assimilation** | First-pass intake of a note into the learner’s memory schedule |
 | **Recall** | Spaced review of assimilated material |
 | **Recall question** | A single recall prompt (kinds: spelling, AI-generated, predefined, …) |
 | **Memory tracking** | Whether a note or notebook participates in assimilation and recall |
-| **Wiki link** | In-content `[[…]]` reference to a note (optionally `Notebook:Title`) |
-| **Relationship** | Typed association between notes (e.g. “similar to”, “a part of”) |
-| **Relationship note** | A note that represents a relationship (`type: relationship` in frontmatter), with source, target, and relation |
-| **Wikidata association** | Binding a note to a Wikidata entity (also called Wiki association) |
 | **Property memory tracker** | Recall tracking keyed by a property or relationship label |
-| **Refinement layout** | Layout for decomposing and improving a note while refining |
-| **Book layout** | Structure of an attached book |
+| **Spaced-repetition schedule** | User interval list for recall |
+| **Daily assimilation target** | Max new notes to assimilate per day (profile or subscription) |
+
+#### Conversation and focus
+
+| Term | Meaning |
+|------|---------|
 | **Conversation** | Thread of messages about a note (human or AI participant) |
 | **Message** | One utterance in a conversation |
 | **Message center** | UI for conversations and unread state |
-| **OKF** | [Open Knowledge Format](https://cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing): portable directory of markdown concept files with YAML frontmatter |
-| **Spaced-repetition schedule** | User interval list for recall |
-| **Daily assimilation target** | Max new notes to assimilate per day (profile or subscription) |
-| **Notebook health** | In-app lint, findings, and fixes for a notebook |
 | **Focus context** | Bounded note neighborhood for AI use |
-| **Book** | Attached reading artifact (EPUB, PDF, …), distinct from a notebook |
 
 3. **Commissioned learning terms** — Vocabulary for learning that a Tutor
    conducts outside Doughnut, on commission from Doughnut:
