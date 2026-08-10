@@ -3,9 +3,15 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.algorithms.FrontmatterQuestionGenerationInstruction;
 import com.odde.doughnut.algorithms.NoteContentMarkdown;
 import com.odde.doughnut.entities.LearningSession;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.SessionItem;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.RecordedFeedbackSummary;
 import com.odde.doughnut.entities.repositories.SessionItemRepository;
+import com.odde.doughnut.services.focusContext.FocusContextMarkdownRenderer;
+import com.odde.doughnut.services.focusContext.FocusContextResult;
+import com.odde.doughnut.services.focusContext.FocusContextRetrievalService;
+import com.odde.doughnut.services.focusContext.RetrievalConfig;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
@@ -19,10 +25,17 @@ public class LearningSessionRequestMarkdownBuilder {
   private static final DateTimeFormatter ISO_DATE = DateTimeFormatter.ISO_LOCAL_DATE;
 
   private final SessionItemRepository sessionItemRepository;
+  private final FocusContextRetrievalService focusContextRetrievalService;
+  private final FocusContextMarkdownRenderer focusContextMarkdownRenderer;
 
   @Autowired
-  public LearningSessionRequestMarkdownBuilder(SessionItemRepository sessionItemRepository) {
+  public LearningSessionRequestMarkdownBuilder(
+      SessionItemRepository sessionItemRepository,
+      FocusContextRetrievalService focusContextRetrievalService,
+      FocusContextMarkdownRenderer focusContextMarkdownRenderer) {
     this.sessionItemRepository = sessionItemRepository;
+    this.focusContextRetrievalService = focusContextRetrievalService;
+    this.focusContextMarkdownRenderer = focusContextMarkdownRenderer;
   }
 
   public String build(LearningSession session, ZoneId zoneId) {
@@ -40,7 +53,7 @@ public class LearningSessionRequestMarkdownBuilder {
 
     appendInstructions(sb, session);
     appendSessionItemTitles(sb, items);
-    appendSessionItems(sb, items, zoneId);
+    appendSessionItems(sb, session.getUser(), items, zoneId);
     appendHowToReport(sb, items);
 
     return sb.toString();
@@ -66,10 +79,11 @@ public class LearningSessionRequestMarkdownBuilder {
     sb.append("</session_item_titles>\n\n");
   }
 
-  private void appendSessionItems(StringBuilder sb, List<SessionItem> items, ZoneId zoneId) {
+  private void appendSessionItems(
+      StringBuilder sb, User viewer, List<SessionItem> items, ZoneId zoneId) {
     sb.append("<session_items>\n");
     for (SessionItem item : items) {
-      appendSessionItem(sb, item, zoneId);
+      appendSessionItem(sb, viewer, item, zoneId);
     }
     sb.append("</session_items>\n\n");
   }
@@ -105,10 +119,9 @@ public class LearningSessionRequestMarkdownBuilder {
     }
   }
 
-  private void appendSessionItem(StringBuilder sb, SessionItem item, ZoneId zoneId) {
-    String rawContent =
-        NoteContentMarkdown.bodyWithoutLeadingFrontmatter(
-            item.getMemoryTracker().getNote().getContent());
+  private void appendSessionItem(StringBuilder sb, User viewer, SessionItem item, ZoneId zoneId) {
+    Note note = item.getMemoryTracker().getNote();
+    String rawContent = NoteContentMarkdown.bodyWithoutLeadingFrontmatter(note.getContent());
     String content = rawContent == null ? "" : rawContent.trim();
 
     sb.append("### ").append(item.getNoteTitle()).append("\n");
@@ -116,6 +129,14 @@ public class LearningSessionRequestMarkdownBuilder {
     sb.append("- Learning status: ")
         .append(learningStatusLine(item.getMemoryTracker().getId(), zoneId))
         .append("\n");
+    appendFocusContext(sb, note, viewer);
+  }
+
+  private void appendFocusContext(StringBuilder sb, Note note, User viewer) {
+    RetrievalConfig config = RetrievalConfig.focusNoteOnly();
+    FocusContextResult focusContextResult =
+        focusContextRetrievalService.retrieve(note, viewer, config);
+    sb.append(focusContextMarkdownRenderer.render(focusContextResult, config));
   }
 
   private String learningStatusLine(Integer memoryTrackerId, ZoneId zoneId) {

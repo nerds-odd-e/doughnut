@@ -139,7 +139,7 @@ Hello
 
 ### Phase 5 — CLS session items include focus-note-only Focus Context (Behavior)
 
-**Status:** planned  
+**Status:** done  
 **Observable:** Each commissioned session item still has Learning status and `Expected learning content:`, **and** also embeds a focus-note-only `<focus_context>` block for that note.
 
 **Stop-safe / interim:** Tutors already see Focus Context grammar; old bullet keeps existing E2E green. Phase 6 removes the duplicate.

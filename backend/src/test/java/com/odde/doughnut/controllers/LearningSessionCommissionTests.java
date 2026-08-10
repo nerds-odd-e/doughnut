@@ -11,6 +11,7 @@ import com.odde.doughnut.entities.LearningSessionStatus;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.LearningSessionReportParser;
+import com.odde.doughnut.services.focusContext.FocusContextConstants;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.server.ResponseStatusException;
@@ -52,6 +53,11 @@ class LearningSessionCommissionTests extends LearningSessionControllerTestBase {
     assertThat(markdown, containsString("Expected learning content: Hello"));
     assertThat(markdown, containsString("Expected learning content: Thank you"));
     assertThat(markdown, containsString("not yet tutored"));
+    assertThat(markdown, containsString(FocusContextConstants.FOCUS_CONTEXT_OPEN_MARKER));
+    assertThat(markdown, containsString(FocusContextConstants.FOCUS_NOTE_OPEN_MARKER));
+    assertThat(markdown, containsString("```doughnut-note-md"));
+    assertThat(markdown, containsString("Title: Hola"));
+    assertThat(markdown, containsString("Title: Gracias"));
     assertThat(markdown, containsString("</session_items>"));
     assertThat(markdown, containsString("<how_to_report>"));
     assertThat(
