@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: none
 milestone_name: none
-status: Awaiting next milestone
-last_updated: "2026-08-08T15:50:00.000Z"
-last_activity: 2026-08-08
-last_activity_desc: Quick plan 009 hub + report tag complete; planning cleaned up
+status: Quick plan ready — awaiting execute
+last_updated: "2026-08-10T10:35:00.000Z"
+last_activity: 2026-08-10
+last_activity_desc: Quick 010 refined to 6 small-commit phases
 ---
 
 # Project State
@@ -15,13 +15,14 @@ last_activity_desc: Quick plan 009 hub + report tag complete; planning cleaned u
 See: `.planning/PROJECT.md`
 
 **Core value:** Healthy mainline for learning and knowledge work
-**Current focus:** Planning next milestone (`/gsd-new-milestone`)
+**Current focus:** [`.planning/quick/010-focus-context-xml-cls-cohesion/PLAN.md`](quick/010-focus-context-xml-cls-cohesion/PLAN.md)
 
 ## Current Position
 
 Milestone **v1.3 Commissioned Learning Session MVP** shipped 2026-08-08.
-Post-v1.3 CLS polish (request brief, session hub, tagged reports) shipped same
-day — record in product code and Proposed ADR 0005.
+Post-v1.3 CLS polish shipped same day — Proposed ADR 0005.
+
+**Active ad-hoc plan:** Quick 010 — 6 small-commit phases (XML tags → focusNoteOnly structure → CLS embed interim → drop Expected learning content + ADR). Not started.
 
 ## Deferred Items
 
@@ -32,7 +33,9 @@ day — record in product code and Proposed ADR 0005.
 | tech_debt | OpenAPI/`outgoingLinks`/`linkText` glossary rename (ADR 0001) | open |
 | tech_debt | CLS optional polish (`authorizedNotebook`, domain exceptions, unused record `timezone` param) | open |
 | deferred | Refine note on answered spelling questions | deferred |
+| deferred | CLS session items with related Focus Context notes (Option A) | deferred after Quick 010 |
 
 ## Operator Next Steps
 
-- `/gsd-new-milestone` — start next milestone (requirements + roadmap)
+- Confirm Quick 010, then **execute-plan** on `.planning/quick/010-focus-context-xml-cls-cohesion/PLAN.md`
+- Or `/gsd-new-milestone` if preferring a formal milestone instead
