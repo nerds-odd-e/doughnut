@@ -2,7 +2,9 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.algorithms.FrontmatterQuestionGenerationInstruction;
 import com.odde.doughnut.entities.LearningSession;
+import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.SessionItem;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.RecordedFeedbackSummary;
@@ -38,56 +40,60 @@ public class LearningSessionRequestMarkdownBuilder {
   }
 
   public String build(LearningSession session, ZoneId zoneId) {
-    StringBuilder sb = new StringBuilder();
-
-    sb.append("# Learning Session Request\n\n");
-
-    List<SessionItem> items =
+    List<MemoryTracker> trackers =
         sessionItemRepository.findByLearningSession_Id(session.getId()).stream()
+            .map(SessionItem::getMemoryTracker)
+            .toList();
+    return build(session.getUser(), session.getNotebook(), trackers, zoneId);
+  }
+
+  public String build(User user, Notebook notebook, List<MemoryTracker> trackers, ZoneId zoneId) {
+    List<MemoryTracker> orderedTrackers =
+        trackers.stream()
             .sorted(
                 Comparator.comparing(
-                    item -> item.getMemoryTracker().getNextRecallAt(),
+                    MemoryTracker::getNextRecallAt,
                     Comparator.nullsLast(Comparator.naturalOrder())))
             .toList();
 
-    appendInstructions(sb, session);
-    appendSessionItemTitles(sb, items);
-    appendSessionItems(sb, session.getUser(), items, zoneId);
-    appendHowToReport(sb, items);
-
+    StringBuilder sb = new StringBuilder();
+    sb.append("# Learning Session Request\n\n");
+    appendInstructions(sb, notebook);
+    appendSessionItemTitles(sb, orderedTrackers);
+    appendSessionItems(sb, user, orderedTrackers, zoneId);
+    appendHowToReport(sb, orderedTrackers);
     return sb.toString();
   }
 
-  private void appendInstructions(StringBuilder sb, LearningSession session) {
+  private void appendInstructions(StringBuilder sb, Notebook notebook) {
     sb.append("<instructions>\n");
     sb.append("You are the tutor to help the learner to study ")
-        .append(session.getNotebook().getName())
+        .append(notebook.getName())
         .append(".\n\n");
-    FrontmatterQuestionGenerationInstruction.fromNoteContent(
-            session.getNotebook().getReadmeContent())
+    FrontmatterQuestionGenerationInstruction.fromNoteContent(notebook.getReadmeContent())
         .ifPresent(instruction -> sb.append(instruction).append("\n\n"));
     sb.append("Wait for the learner's instruction before starting the learning session.\n");
     sb.append("</instructions>\n\n");
   }
 
-  private void appendSessionItemTitles(StringBuilder sb, List<SessionItem> items) {
+  private void appendSessionItemTitles(StringBuilder sb, List<MemoryTracker> trackers) {
     sb.append("<session_item_titles>\n");
-    for (SessionItem item : items) {
-      sb.append("- ").append(item.getNoteTitle()).append("\n");
+    for (MemoryTracker tracker : trackers) {
+      sb.append("- ").append(tracker.getNote().getTitle()).append("\n");
     }
     sb.append("</session_item_titles>\n\n");
   }
 
   private void appendSessionItems(
-      StringBuilder sb, User viewer, List<SessionItem> items, ZoneId zoneId) {
+      StringBuilder sb, User viewer, List<MemoryTracker> trackers, ZoneId zoneId) {
     sb.append("<session_items>\n");
-    for (SessionItem item : items) {
-      appendSessionItem(sb, viewer, item, zoneId);
+    for (MemoryTracker tracker : trackers) {
+      appendSessionItem(sb, viewer, tracker, zoneId);
     }
     sb.append("</session_items>\n\n");
   }
 
-  private void appendHowToReport(StringBuilder sb, List<SessionItem> items) {
+  private void appendHowToReport(StringBuilder sb, List<MemoryTracker> trackers) {
     sb.append("<how_to_report>\n");
     sb.append("Teach the session items above, then return a Learning Session Report giving one\n");
     sb.append("score from 0 to 5 per item:\n\n");
@@ -100,7 +106,7 @@ public class LearningSessionRequestMarkdownBuilder {
     sb.append("Example of how to provide feedback:\n\n");
     sb.append("# Learning Session Report\n\n");
     sb.append(LearningSessionReportParser.SESSION_ITEM_SCORES_OPEN_TAG).append("\n");
-    appendExampleReportScores(sb, items);
+    appendExampleReportScores(sb, trackers);
     sb.append("\n").append(LearningSessionReportParser.SESSION_ITEM_SCORES_CLOSE_TAG);
     sb.append(
         "\n\nOnly score session items that were actually taught in this session. Do not list\n");
@@ -108,22 +114,23 @@ public class LearningSessionRequestMarkdownBuilder {
     sb.append("</how_to_report>\n");
   }
 
-  private void appendExampleReportScores(StringBuilder sb, List<SessionItem> items) {
-    if (items.isEmpty()) {
+  private void appendExampleReportScores(StringBuilder sb, List<MemoryTracker> trackers) {
+    if (trackers.isEmpty()) {
       return;
     }
-    sb.append(items.getFirst().getNoteTitle()).append(": 5");
-    if (items.size() > 1) {
-      sb.append("\n").append(items.get(1).getNoteTitle()).append(": 1");
+    sb.append(trackers.getFirst().getNote().getTitle()).append(": 5");
+    if (trackers.size() > 1) {
+      sb.append("\n").append(trackers.get(1).getNote().getTitle()).append(": 1");
     }
   }
 
-  private void appendSessionItem(StringBuilder sb, User viewer, SessionItem item, ZoneId zoneId) {
-    Note note = item.getMemoryTracker().getNote();
+  private void appendSessionItem(
+      StringBuilder sb, User viewer, MemoryTracker tracker, ZoneId zoneId) {
+    Note note = tracker.getNote();
 
-    sb.append("### ").append(item.getNoteTitle()).append("\n");
+    sb.append("### ").append(note.getTitle()).append("\n");
     sb.append("- Learning status: ")
-        .append(learningStatusLine(item.getMemoryTracker().getId(), zoneId))
+        .append(learningStatusLine(tracker.getId(), zoneId))
         .append("\n");
     appendFocusContext(sb, note, viewer);
   }

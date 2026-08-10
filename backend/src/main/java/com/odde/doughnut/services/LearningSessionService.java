@@ -70,7 +70,7 @@ public class LearningSessionService {
       sessionItemRepository.save(createSessionItem(session, tracker));
     }
 
-    return toCommissionResponse(session, zoneId);
+    return toCommissionResponse(session, dueTrackers, zoneId);
   }
 
   @Transactional
@@ -183,10 +183,12 @@ public class LearningSessionService {
   }
 
   private LearningSessionCommissionResponse toCommissionResponse(
-      LearningSession session, ZoneId zoneId) {
+      LearningSession session, List<MemoryTracker> trackers, ZoneId zoneId) {
     LearningSessionCommissionResponse response = new LearningSessionCommissionResponse();
     response.setLearningSessionId(session.getId());
-    response.setRequestMarkdown(learningSessionRequestMarkdownBuilder.build(session, zoneId));
+    response.setRequestMarkdown(
+        learningSessionRequestMarkdownBuilder.build(
+            session.getUser(), session.getNotebook(), trackers, zoneId));
     response.setStatus(session.getStatus());
     return response;
   }
