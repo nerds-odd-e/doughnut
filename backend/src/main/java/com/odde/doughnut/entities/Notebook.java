@@ -1,7 +1,9 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.odde.doughnut.entities.converters.DisplayNameConverter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
@@ -84,15 +86,18 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   private String description;
 
   @Column(name = "name", nullable = false, length = 150)
-  private String name;
+  @Convert(converter = DisplayNameConverter.class)
+  @JsonIgnore
+  private DisplayName name = new DisplayName("");
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("name")
   public String getName() {
-    return name == null ? "" : name;
+    return name.value();
   }
 
-  public void setName(String name) {
-    this.name = name == null ? "" : name;
+  public void setName(DisplayName name) {
+    this.name = name;
   }
 
   @JsonIgnore

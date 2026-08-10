@@ -44,7 +44,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
             : new Timestamp(System.currentTimeMillis());
     notebook.setCreatedAt(ts);
     notebook.setUpdatedAt(ts);
-    notebook.setName(notebookTestNameCounter.generate());
+    notebook.setName(new DisplayName(notebookTestNameCounter.generate()));
     return notebook(notebook);
   }
 

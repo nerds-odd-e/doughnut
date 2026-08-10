@@ -2,6 +2,7 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.odde.doughnut.entities.converters.DisplayNameConverter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -43,6 +44,7 @@ public class Folder extends EntityIdentifiedByIdOnly {
 
   @NotNull
   @Size(min = 1, max = 512)
+  @JsonProperty("name")
   public String getName() {
     return name.value();
   }

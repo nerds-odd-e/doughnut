@@ -1,5 +1,6 @@
 package com.odde.doughnut.entities.repositories;
 
+import com.odde.doughnut.entities.DisplayName;
 import com.odde.doughnut.entities.Notebook;
 import java.util.List;
 import java.util.Optional;
@@ -11,7 +12,7 @@ import org.springframework.data.repository.query.Param;
 public interface NotebookRepository extends CrudRepository<Notebook, Integer> {
   List<Notebook> findByOwnership_IdAndDeletedAtIsNull(Integer ownershipId);
 
-  Optional<Notebook> findFirstByNameAndDeletedAtIsNullOrderByIdAsc(String name);
+  Optional<Notebook> findFirstByNameAndDeletedAtIsNullOrderByIdAsc(DisplayName name);
 
   String notebookNameLike = " WHERE LOWER(nb.name) LIKE LOWER(:pattern) AND nb.deletedAt IS NULL ";
   String notebookNameExact = " WHERE LOWER(nb.name) = LOWER(:key) AND nb.deletedAt IS NULL ";

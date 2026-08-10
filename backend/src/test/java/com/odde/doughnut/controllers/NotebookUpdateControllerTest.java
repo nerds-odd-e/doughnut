@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.NotebookUpdateRequest;
+import com.odde.doughnut.entities.DisplayName;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import org.junit.jupiter.api.Test;
@@ -55,25 +56,23 @@ class NotebookUpdateControllerTest extends NotebookControllerTestBase {
   }
 
   @Test
-  void shouldPersistNameOnUpdate() throws Exception {
+  void shouldPersistNameOnUpdate() throws UnexpectedNoAccessRightException {
     Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-    note.getNotebook().setName("Old Title");
+    note.getNotebook().setName(new DisplayName("Old Title"));
     var request = new NotebookUpdateRequest();
     request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
-    NotebookUpdateRequest trimmedName =
-        objectMapper.readValue("{\"name\": \"  New Title  \"}", NotebookUpdateRequest.class);
-    request.setName(trimmedName.getName());
+    request.setName("  New Title  ");
     controller.updateNotebook(note.getNotebook(), request);
     assertThat(note.getNotebook().getName(), equalTo("New Title"));
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"{\"name\": \"   \"}", "{\"name\": \"\"}", "{\"name\": \"\\u3000\"}"})
-  void shouldRejectEmptyOrWhitespaceNameOnUpdate(String nameJson) throws Exception {
+  @ValueSource(strings = {"", "   ", "\u3000"})
+  void shouldRejectEmptyOrWhitespaceNameOnUpdate(String name) {
     Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
     var request = new NotebookUpdateRequest();
     request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
-    request.setName(objectMapper.readValue(nameJson, NotebookUpdateRequest.class).getName());
+    request.setName(name);
     assertThrows(
         ResponseStatusException.class,
         () -> controller.updateNotebook(note.getNotebook(), request));
@@ -82,7 +81,7 @@ class NotebookUpdateControllerTest extends NotebookControllerTestBase {
   @Test
   void shouldLeaveNameUnchangedWhenNameOmitted() throws UnexpectedNoAccessRightException {
     Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-    note.getNotebook().setName("Original Name");
+    note.getNotebook().setName(new DisplayName("Original Name"));
     var request = new NotebookUpdateRequest();
     request.setNotebookSettings(copyNotebookSettings(note.getNotebook()));
     controller.updateNotebook(note.getNotebook(), request);

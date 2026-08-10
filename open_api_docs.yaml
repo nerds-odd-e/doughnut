@@ -3548,10 +3548,6 @@ components:
           format: int32
         readmeContent:
           type: string
-        name:
-          type: string
-          maxLength: 512
-          minLength: 1
         createdAt:
           type: string
           format: date-time
@@ -3562,6 +3558,10 @@ components:
           type: integer
           format: int32
           description: Parent folder id when nested; omitted at notebook root.
+        name:
+          type: string
+          maxLength: 512
+          minLength: 1
       required:
       - createdAt
       - id

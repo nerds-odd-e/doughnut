@@ -1,6 +1,7 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.Circle;
+import com.odde.doughnut.entities.DisplayName;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.EntityBuilder;
@@ -24,7 +25,7 @@ public class NotebookBuilder extends EntityBuilder<Notebook> {
       entity.setUpdatedAt(entity.getCreatedAt());
     }
     if (entity.getName() == null || entity.getName().isBlank()) {
-      entity.setName(NoteBuilder.notebookTestNameCounter.generate());
+      entity.setName(new DisplayName(NoteBuilder.notebookTestNameCounter.generate()));
     }
     if (entity.getCreator() == null) {
       entity.setCreator(makeMe.aUser().please(needPersist));
@@ -54,7 +55,7 @@ public class NotebookBuilder extends EntityBuilder<Notebook> {
   }
 
   public NotebookBuilder name(String name) {
-    entity.setName(name);
+    entity.setName(new DisplayName(name));
     return this;
   }
 

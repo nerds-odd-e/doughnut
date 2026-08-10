@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.validators.DisplayNamePathSeparators;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -64,12 +63,13 @@ public class Ownership {
     notebook.setUpdatedAt(currentUTCTimestamp);
     notebook.setCreatedAt(currentUTCTimestamp);
     if (titleConstructor != null) {
-      String trimmed = DisplayNamePathSeparators.trimSurroundingWhitespace(titleConstructor);
-      if (!trimmed.isEmpty()) {
+      DisplayName displayName = new DisplayName(titleConstructor);
+      if (!displayName.value().isEmpty()) {
+        String value = displayName.value();
         notebook.setName(
-            trimmed.length() > Note.MAX_TITLE_LENGTH
-                ? trimmed.substring(0, Note.MAX_TITLE_LENGTH)
-                : trimmed);
+            value.length() > Note.MAX_TITLE_LENGTH
+                ? new DisplayName(value.substring(0, Note.MAX_TITLE_LENGTH))
+                : displayName);
       }
     }
     if (description != null && !description.isBlank()) {

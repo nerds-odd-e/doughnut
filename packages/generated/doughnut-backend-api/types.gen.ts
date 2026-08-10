@@ -195,13 +195,13 @@ export type GlobalAiModelSettings = {
 export type Folder = {
     id: number;
     readmeContent?: string;
-    name: string;
     createdAt: string;
     updatedAt: string;
     /**
      * Parent folder id when nested; omitted at notebook root.
      */
     parentFolderId?: number;
+    name: string;
 };
 
 export type Note = {

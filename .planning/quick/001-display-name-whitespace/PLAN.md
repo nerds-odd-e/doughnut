@@ -150,12 +150,18 @@ Added `DisplayName` overloads on validation to avoid duplicate construction.
 
 ### Phase 3 — Notebook names are stored trimmed on create and rename (Behavior)
 
+**Status:** done
+
 Extend the MockMvc test with the two notebook scenarios; retype `Notebook.name`; update
 `NotebookController.updateNotebook`, `Ownership.prepareNotebookForNewNotebook`,
 `NotebookBuilder`, `NoteBuilder` (line 47). Drop `Ownership`'s now-redundant manual trim.
 
 Fix the self-fulfilling `readValue` assertion in `NotebookUpdateControllerTest` here — it
 only passes because the Jackson 2 mapper applies the annotation.
+
+**Learnings:** `@JsonProperty("name")` on getters required when field is `@JsonIgnore` (Folder
+and Notebook). `NotebookRepository` needs `DisplayName` for equality queries. OpenAPI regen
+restored Folder `name` schema drift from phase 2.
 
 ### Phase 4 — Whitespace-only names are rejected with 400 (Behavior)
 

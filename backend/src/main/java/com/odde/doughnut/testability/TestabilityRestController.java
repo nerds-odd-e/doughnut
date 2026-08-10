@@ -258,7 +258,7 @@ class TestabilityRestController {
     if (injections.isEmpty()) {
       Optional<Notebook> existingNotebook =
           notebookRepository.findFirstByNameAndDeletedAtIsNullOrderByIdAsc(
-              notesTestData.notebookName);
+              new DisplayName(notesTestData.notebookName));
       if (existingNotebook.isPresent()) {
         Notebook nb = existingNotebook.get();
         if (!Objects.equals(nb.getOwnership().getId(), ownership.getId())) {
@@ -276,7 +276,8 @@ class TestabilityRestController {
 
     Notebook notebook =
         notebookRepository
-            .findFirstByNameAndDeletedAtIsNullOrderByIdAsc(notesTestData.notebookName)
+            .findFirstByNameAndDeletedAtIsNullOrderByIdAsc(
+                new DisplayName(notesTestData.notebookName))
             .map(
                 nb -> {
                   if (!Objects.equals(nb.getOwnership().getId(), ownership.getId())) {
@@ -328,7 +329,8 @@ class TestabilityRestController {
     }
     Notebook notebook =
         notebookRepository
-            .findFirstByNameAndDeletedAtIsNullOrderByIdAsc(request.getNotebookName())
+            .findFirstByNameAndDeletedAtIsNullOrderByIdAsc(
+                new DisplayName(request.getNotebookName()))
             .orElseThrow(
                 () ->
                     new IllegalArgumentException(

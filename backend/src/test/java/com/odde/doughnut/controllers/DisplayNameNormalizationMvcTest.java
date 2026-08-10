@@ -15,6 +15,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.entities.repositories.NotebookRepository;
 import com.odde.doughnut.services.EmbeddingService;
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +35,7 @@ class DisplayNameNormalizationMvcTest extends ControllerTestBase {
   @Autowired private ObjectMapper objectMapper;
   @Autowired private NoteRepository noteRepository;
   @Autowired private FolderRepository folderRepository;
+  @Autowired private NotebookRepository notebookRepository;
 
   @MockitoBean private EmbeddingService embeddingService;
 
@@ -118,5 +120,37 @@ class DisplayNameNormalizationMvcTest extends ControllerTestBase {
 
     makeMe.refresh(folder);
     assertThat(folder.getName(), equalTo("New"));
+  }
+
+  @Test
+  void createNotebookStoresNameWithoutSurroundingWhitespace() throws Exception {
+    MvcResult result =
+        mockMvc
+            .perform(
+                post("/api/notebooks/create")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"newTitle\":\"  My NB  \"}"))
+            .andExpect(status().isOk())
+            .andReturn();
+
+    JsonNode root = objectMapper.readTree(result.getResponse().getContentAsString());
+    Notebook created =
+        notebookRepository.findById(root.get("notebook").get("id").asInt()).orElseThrow();
+    assertThat(created.getName(), equalTo("My NB"));
+  }
+
+  @Test
+  void renameNotebookStoresNameWithoutSurroundingWhitespace() throws Exception {
+    Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+
+    mockMvc
+        .perform(
+            post("/api/notebooks/{notebookId}", nb.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"name\":\"  Renamed  \",\"notebookSettings\":{}}"))
+        .andExpect(status().isOk());
+
+    makeMe.refresh(nb);
+    assertThat(nb.getName(), equalTo("Renamed"));
   }
 }
