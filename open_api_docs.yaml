@@ -4054,8 +4054,6 @@ components:
           format: int32
         content:
           type: string
-      required:
-      - newTitle
     BlockDepthSuggestion:
       type: object
       properties:
@@ -4258,8 +4256,6 @@ components:
         notebookGroupId:
           type: integer
           format: int32
-      required:
-      - newTitle
     CreateNotebookGroupRequest:
       type: object
       properties:
@@ -4666,8 +4662,6 @@ components:
           enum:
           - UPDATE_VISIBLE_TEXT
           - KEEP_VISIBLE_TEXT
-      required:
-      - newTitle
     NoteUpdateContentDTO:
       type: object
       properties:

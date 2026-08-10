@@ -493,7 +493,7 @@ export type FolderMoveRequest = {
 };
 
 export type NoteCreationDto = {
-    newTitle: string;
+    newTitle?: string;
     referenceHandling?: 'UPDATE_VISIBLE_TEXT' | 'KEEP_VISIBLE_TEXT';
     folderId?: number;
     content?: string;
@@ -584,7 +584,7 @@ export type AttachBookRequestFull = {
 };
 
 export type NotebookCreationRequest = {
-    newTitle: string;
+    newTitle?: string;
     referenceHandling?: 'UPDATE_VISIBLE_TEXT' | 'KEEP_VISIBLE_TEXT';
     description?: string;
     notebookGroupId?: number;
@@ -786,7 +786,7 @@ export type UserDto = {
 };
 
 export type NoteUpdateTitleDto = {
-    newTitle: string;
+    newTitle?: string;
     referenceHandling?: 'UPDATE_VISIBLE_TEXT' | 'KEEP_VISIBLE_TEXT';
 };
 
