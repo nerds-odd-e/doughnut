@@ -17,14 +17,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 class MemoryTrackerRecallPromptsControllerTest extends MemoryTrackerControllerTestBase {
 
-  private RecallPrompt promptFor(MemoryTracker tracker, Note note) {
-    return makeMe
-        .aRecallPrompt()
-        .withPredefinedQuestionForNote(note)
-        .forMemoryTracker(tracker)
-        .please();
-  }
-
   private RecallPrompt answeredPromptFor(MemoryTracker tracker, Note note) {
     return makeMe
         .aRecallPrompt()
@@ -157,9 +149,7 @@ class MemoryTrackerRecallPromptsControllerTest extends MemoryTrackerControllerTe
       controller.deleteUnansweredRecallPrompts(tracker);
 
       makeMe.refresh(conversation);
-      assertThat(
-          conversation.getSubject() == null || conversation.getSubject().getRecallPrompt() == null,
-          is(true));
+      assertConversationHasNoRecallPrompt(conversation);
     }
 
     @Test
