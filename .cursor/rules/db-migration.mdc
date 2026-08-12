@@ -78,6 +78,17 @@ Rare maintenance: collapse applied migrations into the baseline so the repo keep
 7. Commit, deploy the squash. Confirm startup succeeds and `flyway_schema_history` looks sane (baseline checksum repaired; deleted versions gone; tip still present).
 8. Regenerate **`docs/database-erd.md`** if the collapsed schema should be re-exported (see below).
 
+## Destructive DML (`DELETE`, gated `UPDATE`)
+
+**Prefer not to ship one-off data cleanup in the permanent Flyway chain.** Cosmetic or historical row fixes belong in a one-time ops script, not a migration that runs on every startup forever.
+
+If destructive DML **must** ship as a migration:
+
+1. **Placeholder gate** — follow `V300000233`–`V300000235`: wrap the DML in `WHERE ${tz_repair}` (or a dedicated placeholder). Default `spring.flyway.placeholders.tz_repair: "1=0"` in `application.yml` makes it a no-op in dev/test/CI; enable (`1=1`) only via a system property on the production deploy that ships the migration (see `mig-zulu25-openai-app-instance-startup.sh`). Add a migration test that resolves the placeholder to `1=0` and proves zero rows change (see `NoteTimeZoneRepairMigrationTest`).
+2. **Record the production row count** before enabling the gate.
+3. **Walk the FK delete closure** before any `DELETE` — CASCADE edges extend the blast radius; `NO ACTION` / `RESTRICT` edges block it. Regenerate **`docs/database-erd.md`** and read delete-rule labels on every edge in the closure. For declared hard-delete roots, `DeletableEntityFkClosureTest` fails CI when a restricting FK enters the subtree.
+4. **CI cannot validate DML alone** — `migrateTestDB` (see `ci.yml`) runs migrations against an **empty** database, so a `DELETE` that matches zero rows always passes. Row-selection tests and schema-structural guards are both required.
+
 ## Entity-relationship diagram
 
-After adding or changing schema migrations, regenerate **`docs/database-erd.md`** so the Mermaid ERD stays aligned with Flyway. Follow the **`database-erd`** skill (`.agents/skills/database-erd/SKILL.md`): run `CURSOR_DEV=true nix develop -c pnpm export:database-erd` (or `python3 scripts/export_database_erd.py`) against a migrated local MySQL schema.
+After adding or changing schema migrations, regenerate **`docs/database-erd.md`** so the Mermaid ERD stays aligned with Flyway. Follow the **`database-erd`** skill (`.agents/skills/database-erd/SKILL.md`): run `CURSOR_DEV=true nix develop -c pnpm export:database-erd` (or `python3 scripts/export_database_erd.py`) against a migrated local MySQL schema. Edge labels include `DELETE_RULE` — use them when reviewing any destructive change.

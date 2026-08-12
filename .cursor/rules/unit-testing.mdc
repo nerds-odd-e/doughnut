@@ -43,9 +43,17 @@ expect(wrapper.findAll('[data-testid^="wiki-link-or-relationship-to-matched-note
 expect(wrapper.findAll('[data-testid^="wiki-link-or-relationship-to-matched-note-"]')).toHaveLength(0)
 ```
 
+## Destructive operations (hard deletes, delete migrations)
+
+The concise-fixture guidance below is correct for **behavior** tests. For **hard deletes** and **delete migrations**, **fixture completeness beats minimality** — a bare target row with no children only proves row *selection*, not referential *fan-out*.
+
+- **Hard-delete endpoints:** build a row in **every table that holds an FK into the deleted entity** (directly or via CASCADE). Example: `MemoryTrackerDeleteControllerTest` uses `makeMe.aConversation().forARecallPrompt(...)` so deleting a tracker exercises the `conversation → recall_prompt` edge, not just the tracker row.
+- **Delete migrations:** same rule — seed every child table in the FK closure, not only rows the `WHERE` clause selects. Pair with a placeholder-gate test (`NoteTimeZoneRepairMigrationTest` pattern) when the migration is gated.
+- **Schema guard:** `DeletableEntityFkClosureTest` catches restricting FKs without fixtures; it does not replace completeness tests for runtime delete paths.
+
 ## Concise makeMe setup
 
-- Build fixtures with **`makeMe`** (`doughnut-test-fixtures/makeMe` on TS; backend `MakeMe` on Java). Rely on **builder defaults** when a value is unused in assertions and does not affect the logic under test.
+- Build fixtures with **`makeMe`** (`doughnut-test-fixtures/makeMe` on TS; backend `MakeMe` on Java). Rely on **builder defaults** when a value is unused in assertions and does not affect the logic under test. **Exception:** destructive operations above — do not minimize away FK children.
 - Do **not** create users, notebooks, or owners only to satisfy wiring if the builder already defaults them and the test never refers to them.
 - Prefer ownership helpers so dependents inherit the owner (e.g. backend `notebookOwnedBy` → tracker `.by` default).
 - Prefer builder APIs over **post-construction mutation** (e.g. `.id(10)`, not `note.id = 10`).

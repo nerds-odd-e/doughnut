@@ -132,7 +132,8 @@ def main() -> None:
         "ORDER BY TABLE_NAME, ORDINAL_POSITION"
     )
     fk_sql = (
-        "SELECT k.TABLE_NAME, k.COLUMN_NAME, k.REFERENCED_TABLE_NAME, k.REFERENCED_COLUMN_NAME "
+        "SELECT k.TABLE_NAME, k.COLUMN_NAME, k.REFERENCED_TABLE_NAME, k.REFERENCED_COLUMN_NAME, "
+        "r.DELETE_RULE "
         "FROM information_schema.KEY_COLUMN_USAGE k "
         "JOIN information_schema.REFERENTIAL_CONSTRAINTS r "
         "ON k.CONSTRAINT_SCHEMA = r.CONSTRAINT_SCHEMA AND k.CONSTRAINT_NAME = r.CONSTRAINT_NAME "
@@ -152,34 +153,35 @@ def main() -> None:
             continue
         tables.setdefault(t, []).append((col, ctype, ckey))
 
-    edges: list[tuple[str, str, str]] = []
+    edges: list[tuple[str, str, str, str]] = []
     for parts in fk_rows:
-        if len(parts) < 4:
+        if len(parts) < 5:
             continue
-        ct, cc, pt = parts[0], parts[1], parts[2]
-        if ct == "flyway_schema_history" or pt == "flyway_schema_history":
+        child_table, child_column, parent_table, _referenced_column, delete_rule = parts
+        if child_table == "flyway_schema_history" or parent_table == "flyway_schema_history":
             continue
-        edges.append((ct, pt, cc))
+        edges.append((child_table, parent_table, child_column, delete_rule))
 
-    fk_cols = {(child, col) for child, _parent, col in edges}
+    fk_cols = {(child, col) for child, _parent, col, _rule in edges}
 
     lines: list[str] = [
         "# Database ERD",
         "",
-        "Entity-relationship view of the application database: foreign keys as relationships, "
-        "and key columns (PK, UK, FK) per table. The `flyway_schema_history` table is omitted.",
+        "Entity-relationship view of the application database: foreign keys as relationships "
+        "(edge labels include `ON DELETE` rules), and key columns (PK, UK, FK) per table. "
+        "The `flyway_schema_history` table is omitted.",
         "",
         "```mermaid",
         "erDiagram",
     ]
 
     seen_pairs: set[tuple[str, str, str]] = set()
-    for child, parent, col in sorted(edges, key=lambda e: (e[1], e[0], e[2])):
+    for child, parent, col, delete_rule in sorted(edges, key=lambda e: (e[1], e[0], e[2])):
         key = (child, parent, col)
         if key in seen_pairs:
             continue
         seen_pairs.add(key)
-        label = col.replace('"', "'")
+        label = col.replace('"', "'") + f" ON DELETE {delete_rule}"
         lines.append(f"    {_q(parent)} ||--o{{ {_q(child)} : \"{label}\"")
 
     for t in sorted(tables.keys()):
