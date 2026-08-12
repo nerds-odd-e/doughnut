@@ -17,21 +17,22 @@ describe("note show page inline assimilation panel", () => {
     noteRealm = setupNoteShowPageAssimilationPanelMocks()
   })
 
-  it("keeps assimilation settings within main column when sidebar is open", async () => {
+  it("keeps assimilation settings in the shared toolbar panel when sidebar is open", async () => {
     await withStubbedInnerWidth(1024, async () => {
       useAssimilationView().openForNote(noteRealm.id)
       await renderNoteShowPage(router, noteRealm.id)
 
-      const settingsFooter = document.querySelector(
-        'footer[aria-label="Assimilation settings"]'
+      const panelShell = document.querySelector(
+        '[data-testid="note-toolbar-panel-shell"]'
       )
       const aside = document.querySelector("aside")
-      expect(settingsFooter).not.toBeNull()
+      expect(panelShell).not.toBeNull()
       expect(aside).not.toBeNull()
 
       const asideRect = aside!.getBoundingClientRect()
-      const barRect = settingsFooter!.getBoundingClientRect()
-      expect(barRect.left).toBeGreaterThanOrEqual(asideRect.right - 1)
+      const shellRect = panelShell!.getBoundingClientRect()
+      expect(shellRect.left).toBeGreaterThanOrEqual(asideRect.right - 1)
+      expect(aside!.contains(panelShell!)).toBe(false)
     })
   })
 
@@ -52,5 +53,8 @@ describe("note show page inline assimilation panel", () => {
     })
 
     expect(document.querySelector(assimilateButtonSelector)).toBeNull()
+    expect(
+      document.querySelector('[data-testid="note-toolbar-panel-shell"]')
+    ).toBeNull()
   })
 })

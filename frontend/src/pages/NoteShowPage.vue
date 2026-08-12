@@ -28,16 +28,6 @@
           </div>
         </template>
       </NoteShow>
-      <div
-        v-if="noteForPanel"
-        :key="`${noteForPanel.id}-${panelKey}`"
-        class="shrink-0"
-      >
-        <AssimilationPanel
-          :note="noteForPanel"
-          @reload-needed="onAssimilationReloadNeeded"
-        />
-      </div>
     </div>
   </div>
 </template>
@@ -49,16 +39,13 @@ import { useRoute, useRouter } from "vue-router"
 import NoteShow from "../components/notes/NoteShow.vue"
 import NoteConversation from "../components/conversations/NoteConversation.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-import AssimilationPanel from "@/components/recall/AssimilationPanel.vue"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import type { NoteRealm } from "@generated/doughnut-backend-api"
 import { useAssimilationView } from "@/composables/useAssimilationView"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const router = useRouter()
 const route = useRoute()
-const storageAccessor = useStorageAccessor()
-const { showAssimilationSettings, resetForNote } = useAssimilationView()
+const { resetForNote } = useAssimilationView()
 
 const props = defineProps({
   noteId: { type: Number, required: false },
@@ -72,7 +59,6 @@ const resolvedNoteId = computed((): number | undefined => {
 })
 
 const isContentMinimized = ref(false)
-const panelKey = ref(0)
 
 watch(
   resolvedNoteId,
@@ -83,23 +69,6 @@ watch(
   },
   { immediate: true }
 )
-
-const noteForPanel = computed(() => {
-  const id = resolvedNoteId.value
-  if (id == null || !showAssimilationSettings.value) {
-    return undefined
-  }
-  return storageAccessor.value.refOfNoteRealm(id).value?.note
-})
-
-const onAssimilationReloadNeeded = async () => {
-  const id = resolvedNoteId.value
-  if (id == null) {
-    return
-  }
-  await storageAccessor.value.storedApi().loadNoteRealm(id)
-  panelKey.value += 1
-}
 
 const toggleMaximize = () => {
   isContentMinimized.value = !isContentMinimized.value

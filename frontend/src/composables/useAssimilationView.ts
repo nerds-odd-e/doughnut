@@ -1,35 +1,49 @@
-import { ref } from "vue"
+import { computed, ref } from "vue"
+import { useNoteToolbarPanel } from "./useNoteToolbarPanel"
 
-const showAssimilationSettings = ref(false)
 const targetNoteId = ref<number | null>(null)
 const pendingPropertyKey = ref<string | null>(null)
 
-function clearAssimilationView() {
+function clearAssimilationTargets() {
   targetNoteId.value = null
   pendingPropertyKey.value = null
-  showAssimilationSettings.value = false
 }
 
 export function useAssimilationView() {
+  const { activePanel, close: closePanel } = useNoteToolbarPanel()
+
+  const showAssimilationSettings = computed(
+    () => activePanel.value === "assimilation"
+  )
+
   const isOpenForNote = (noteId: number) =>
     showAssimilationSettings.value && targetNoteId.value === noteId
 
   const openForNote = (noteId: number, propertyKey?: string | null) => {
     targetNoteId.value = noteId
     pendingPropertyKey.value = propertyKey ?? null
-    showAssimilationSettings.value = true
+    activePanel.value = "assimilation"
   }
 
   const resetForNote = (noteId: number) => {
-    showAssimilationSettings.value = targetNoteId.value === noteId
+    if (targetNoteId.value === noteId) {
+      activePanel.value = "assimilation"
+      return
+    }
+    if (activePanel.value === "assimilation") {
+      closePanel()
+    }
   }
 
   const dismiss = () => {
-    clearAssimilationView()
+    clearAssimilationTargets()
+    if (activePanel.value === "assimilation") {
+      closePanel()
+    }
   }
 
   const toggle = (noteId: number) => {
-    if (showAssimilationSettings.value && targetNoteId.value === noteId) {
+    if (isOpenForNote(noteId)) {
       dismiss()
       return
     }

@@ -38,35 +38,11 @@ One exclusive under-toolbar panel slot with shared chrome; audio and assimilatio
 
 ---
 
-### Phase 2 — Behavior: Assimilation opens in the shared under-toolbar panel — **planned**
+### Phase 2 — Behavior: Assimilation opens in the shared under-toolbar panel — **done**
 
-**Type:** Behavior  
+**Shipped:** `assimilation` panel id; `useAssimilationView` drives shared slot; `AssimilationPanel` in `NoteToolbarPanelShell` under toolbar; page-bottom mount removed; footer/card/`40vh` cage stripped; `aria-pressed` on inline assimilation toggle; audio↔assimilation exclusivity.
 
-**Pre:** Note show; shared slot may be none or audio.  
-**Trigger:** Toggle Assimilation settings, or `openForNote` / go-to-next.  
-**Post:**
-
-- Assimilation content renders inside the **shared shell** under the toolbar (restyled — not page-bottom card/footer).
-- Slot exclusivity: assimilation hides audio and vice versa.
-- Natural height: no `max-h-[min(40vh,22rem)]` (or equivalent) cage; content grows in the slot.
-- Assimilation control pressed state matches audio (`daisy-btn-active` + `aria-pressed` when open for this note; menu checked when open).
-
-**Change:**
-
-- Extend shared panel id with `assimilation`; wire `useAssimilationView` open/toggle/dismiss to select/clear the slot.
-- Mount `AssimilationPanel` (or its settings content) in the same under-toolbar mount as audio, inside the shared shell; remove `NoteShowPage` bottom mount.
-- Strip footer/card/half-page scroll chrome from assimilation settings so it fits the shared shell.
-- Preserve assimilate / revive / refine / pending-property / reload behavior.
-
-**Verify (targeted):**
-
-- Unit: assimilation under toolbar in shared shell; toggle off removes it.
-- Unit: audio ↔ assimilation exclusivity.
-- Unit: no half-page max-height cage.
-- Placement / assimilate-on/off note-show specs updated and green.
-- More-options assimilation toggle specs still green.
-
-**Stop-safe:** Assimilation UX matches audio panel model; Mic may still sit on the primary toolbar until Phase 3.
+**Learnings:** Assimilation activation lives in `useAssimilationView` (not duplicate `openAssimilation` on panel composable). Assimilation toolbar tests split to `NoteToolbar.assimilationPanel.spec.ts`. Mic still on primary toolbar until Phase 3.
 
 ---
 

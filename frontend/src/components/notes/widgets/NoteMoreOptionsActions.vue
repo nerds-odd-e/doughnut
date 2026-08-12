@@ -77,6 +77,7 @@
       ]"
       :title="titles.assimilation"
       :aria-label="titles.assimilation"
+      :aria-pressed="assimilationChecked"
       @click="onAssimilationToggle"
     >
       <CircleCheck class="w-6 h-6" aria-hidden="true" />

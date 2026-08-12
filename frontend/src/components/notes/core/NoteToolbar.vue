@@ -70,8 +70,14 @@
       />
     </div>
   </nav>
-  <NoteToolbarPanelShell v-if="!readonly && isAudioOpen">
-    <NoteAudioTools v-bind="{ note }" />
+  <NoteToolbarPanelShell v-if="!readonly && isPanelOpen">
+    <NoteAudioTools v-if="isAudioOpen" v-bind="{ note }" />
+    <AssimilationPanel
+      v-else-if="isOpenForNote(note.id)"
+      :key="assimilationPanelKey"
+      :note="note"
+      @reload-needed="onAssimilationReloadNeeded"
+    />
   </NoteToolbarPanelShell>
 </template>
 
@@ -83,8 +89,11 @@ import SearchForm from "../../wiki-link-or-relationship/SearchForm.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import { FileCode, LayoutTemplate, MessageCircle, Mic } from "@lucide/vue"
 import NoteAudioTools from "../widgets/NoteAudioTools.vue"
+import AssimilationPanel from "@/components/recall/AssimilationPanel.vue"
 import NoteToolbarPanelShell from "./NoteToolbarPanelShell.vue"
 import { useNoteToolbarPanel } from "@/composables/useNoteToolbarPanel"
+import { useAssimilationView } from "@/composables/useAssimilationView"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { useRouter } from "vue-router"
 import NoteToolbarMoreOptions from "../widgets/NoteToolbarMoreOptions.vue"
 import { useNoteToolbarMoreOptionsInline } from "@/composables/useNoteToolbarMoreOptionsInline"
@@ -116,7 +125,15 @@ const showRelocatedNewNote = computed(
   () => !sidebarOpened.value && props.readonly !== true
 )
 
-const { isAudioOpen, toggleAudio } = useNoteToolbarPanel()
+const { isAudioOpen, isPanelOpen, toggleAudio } = useNoteToolbarPanel()
+const { isOpenForNote } = useAssimilationView()
+const storageAccessor = useStorageAccessor()
+const assimilationPanelKey = ref(0)
+
+const onAssimilationReloadNeeded = async () => {
+  await storageAccessor.value.storedApi().loadNoteRealm(props.note.id)
+  assimilationPanelKey.value += 1
+}
 const toolbarNavRef = ref<HTMLElement | null>(null)
 const { showMoreOptionsInline } = useNoteToolbarMoreOptionsInline(toolbarNavRef)
 const wikiLinkOrRelationshipPopButtonRef = ref<InstanceType<

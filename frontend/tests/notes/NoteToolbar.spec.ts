@@ -3,7 +3,10 @@ import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { notebookSidebarClosedPlugin } from "@tests/helpers/notebookSidebarTestProvide"
 import { installMockResizeObserver } from "@tests/helpers/mockNoteToolbarNavWidth"
-import { mountNoteToolbar } from "@tests/notes/noteToolbarTestHelpers"
+import {
+  mountNoteToolbar,
+  resetNoteToolbarTestState,
+} from "@tests/notes/noteToolbarTestHelpers"
 import { wrapWithNoteShortcutScope } from "@tests/helpers/noteShortcutScopeTestHelpers"
 import NoteToolbar from "@/components/notes/core/NoteToolbar.vue"
 import { screen } from "@testing-library/vue"
@@ -24,6 +27,7 @@ describe("NoteToolbar", () => {
 
   beforeEach(() => {
     installMockResizeObserver()
+    resetNoteToolbarTestState()
   })
 
   it("routes to note show by id when starting a conversation about the note", async () => {

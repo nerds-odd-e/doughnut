@@ -1,132 +1,117 @@
 <template>
-  <footer
-    class="relative w-full mt-4 pointer-events-none z-40"
+  <section
     aria-label="Assimilation settings"
+    data-testid="assimilation-settings"
+    class="flex flex-col gap-0"
   >
-    <div
-      class="assimilation-settings-inner pointer-events-auto w-full px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-0"
+    <h2 class="text-base font-semibold gap-2 mb-3 flex items-center">
+      Assimilation settings
+      <AssimilationProgressSummary />
+    </h2>
+    <NoteInfoBar
+      ref="noteInfoBarRef"
+      :note-id="note.id"
+      :note="note"
+      @level-changed="emit('levelChanged', $event)"
+      @remember-spelling-changed="emit('rememberSpellingChanged', $event)"
+      @note-recall-info-loaded="onNoteRecallInfoLoaded"
+    />
+    <section
+      v-if="propertyRows.length > 0"
+      data-test="assimilation-properties-section"
+      class="mt-4"
     >
       <div
-        class="daisy-card bg-base-100 border border-base-300 shadow-xl"
+        class="daisy-collapse daisy-collapse-arrow border border-base-300 bg-base-200/50 rounded-lg"
       >
-        <div class="daisy-card-body gap-0 p-4">
-          <h2 class="daisy-card-title mb-3 text-base font-semibold gap-2">
-            Assimilation settings
-            <AssimilationProgressSummary />
-          </h2>
-          <div
-            class="assimilation-settings-scroll max-h-[min(40vh,22rem)] overflow-y-auto pr-1 pb-20"
-          >
-            <NoteInfoBar
-              ref="noteInfoBarRef"
-              :note-id="note.id"
-              :note="note"
-              @level-changed="emit('levelChanged', $event)"
-              @remember-spelling-changed="emit('rememberSpellingChanged', $event)"
-              @note-recall-info-loaded="onNoteRecallInfoLoaded"
-            />
-            <section
-              v-if="propertyRows.length > 0"
-              data-test="assimilation-properties-section"
-              class="mt-4"
+        <input
+          v-model="propertiesSectionOpen"
+          type="checkbox"
+          data-test="assimilation-properties-toggle"
+        />
+        <div class="daisy-collapse-title min-h-0 py-3 text-sm font-medium">
+          Properties
+        </div>
+        <div class="daisy-collapse-content">
+          <ul class="flex flex-col gap-2 pb-3">
+            <li
+              v-for="row in propertyRows"
+              :key="row.key"
+              :ref="(el) => setPropertyRowRef(row.key, el)"
+              data-test="assimilation-property-row"
+              :data-property-key="row.key"
+              :data-test-pending="
+                isPendingProperty(row.key) ? 'true' : undefined
+              "
+              class="flex flex-wrap items-center gap-2 gap-y-1 border-t border-base-300 pt-2 first:border-t-0 first:pt-0"
+              :class="{
+                'rounded bg-primary/10 ring-1 ring-primary/30':
+                  isPendingProperty(row.key),
+              }"
             >
-              <div
-                class="daisy-collapse daisy-collapse-arrow border border-base-300 bg-base-200/50 rounded-lg"
-              >
-                <input
-                  v-model="propertiesSectionOpen"
-                  type="checkbox"
-                  data-test="assimilation-properties-toggle"
+              <span class="font-medium shrink-0">{{ row.key }}</span>
+              <span
+                class="min-w-0 flex-1 truncate text-sm text-base-content/70"
+                :title="compactDisplayForPropertyValue(row.value)"
+              >{{ compactDisplayForPropertyValue(row.value) }}</span>
+              <span class="shrink-0">
+                <AssimilationButtons
+                  size="sm"
+                  :disabled="assimilatingPropertyKey === row.key"
+                  :assimilate-disabled="
+                    assimilateDisabledForProperty(row.key)
+                  "
+                  :skipped-for-recall="
+                    isSkippedForRecall(noteRecallInfo, row.key)
+                  "
+                  @assimilate="
+                    (skip) =>
+                      emit('assimilate', {
+                        skipMemoryTracking: skip,
+                        propertyKey: row.key,
+                      })
+                  "
+                  @revive="emit('revive', { propertyKey: row.key })"
                 />
-                <div class="daisy-collapse-title min-h-0 py-3 text-sm font-medium">
-                  Properties
-                </div>
-                <div class="daisy-collapse-content">
-                  <ul class="flex flex-col gap-2 pb-3">
-                    <li
-                      v-for="row in propertyRows"
-                      :key="row.key"
-                      :ref="(el) => setPropertyRowRef(row.key, el)"
-                      data-test="assimilation-property-row"
-                      :data-property-key="row.key"
-                      :data-test-pending="
-                        isPendingProperty(row.key) ? 'true' : undefined
-                      "
-                      class="flex flex-wrap items-center gap-2 gap-y-1 border-t border-base-300 pt-2 first:border-t-0 first:pt-0"
-                      :class="{
-                        'rounded bg-primary/10 ring-1 ring-primary/30':
-                          isPendingProperty(row.key),
-                      }"
-                    >
-                      <span class="font-medium shrink-0">{{ row.key }}</span>
-                      <span
-                        class="min-w-0 flex-1 truncate text-sm text-base-content/70"
-                        :title="compactDisplayForPropertyValue(row.value)"
-                      >{{ compactDisplayForPropertyValue(row.value) }}</span>
-                      <span class="shrink-0">
-                        <AssimilationButtons
-                          size="sm"
-                          :disabled="assimilatingPropertyKey === row.key"
-                          :assimilate-disabled="
-                            assimilateDisabledForProperty(row.key)
-                          "
-                          :skipped-for-recall="
-                            isSkippedForRecall(noteRecallInfo, row.key)
-                          "
-                          @assimilate="
-                            (skip) =>
-                              emit('assimilate', {
-                                skipMemoryTracking: skip,
-                                propertyKey: row.key,
-                              })
-                          "
-                          @revive="emit('revive', { propertyKey: row.key })"
-                        />
-                      </span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </section>
-          </div>
-          <div class="daisy-divider my-4" />
-          <div
-            class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
-          >
-            <button
-              v-if="(note.content ?? '').trim()"
-              type="button"
-              data-test="open-refine-note-modal"
-              class="daisy-btn daisy-btn-neutral shrink-0"
-              @click="showRefineNoteModal = true"
-            >
-              Refine note
-            </button>
-            <div
-              class="flex flex-wrap items-stretch justify-end gap-2 sm:flex-1"
-            >
-              <AssimilationButtons
-                :disabled="!noteInfoLoaded"
-                :assimilate-disabled="assimilateDisabled"
-                :skipped-for-recall="isSkippedForRecall(noteRecallInfo)"
-                :show-commissioned-option="showCommissionedOption"
-                @assimilate="
-                  (skip) => emit('assimilate', { skipMemoryTracking: skip })
-                "
-                @assimilate-as-commissioned="
-                  emit('assimilate', {
-                    skipMemoryTracking: false,
-                    assimilateAsCommissioned: true,
-                  })
-                "
-                @revive="emit('revive', {})"
-              />
-            </div>
-          </div>
+              </span>
+            </li>
+          </ul>
         </div>
       </div>
+    </section>
+    <div class="daisy-divider my-4" />
+    <div
+      class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <button
+        v-if="(note.content ?? '').trim()"
+        type="button"
+        data-test="open-refine-note-modal"
+        class="daisy-btn daisy-btn-neutral shrink-0"
+        @click="showRefineNoteModal = true"
+      >
+        Refine note
+      </button>
+      <div class="flex flex-wrap items-stretch justify-end gap-2 sm:flex-1">
+        <AssimilationButtons
+          :disabled="!noteInfoLoaded"
+          :assimilate-disabled="assimilateDisabled"
+          :skipped-for-recall="isSkippedForRecall(noteRecallInfo)"
+          :show-commissioned-option="showCommissionedOption"
+          @assimilate="
+            (skip) => emit('assimilate', { skipMemoryTracking: skip })
+          "
+          @assimilate-as-commissioned="
+            emit('assimilate', {
+              skipMemoryTracking: false,
+              assimilateAsCommissioned: true,
+            })
+          "
+          @revive="emit('revive', {})"
+        />
+      </div>
     </div>
-  </footer>
+  </section>
   <RefineNoteModal
     v-if="(note.content ?? '').trim()"
     v-model:open="showRefineNoteModal"
