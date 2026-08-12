@@ -1,0 +1,125 @@
+name: doughnut deploy
+
+on:
+  workflow_run:
+    workflows: ["doughnut CI"]
+    types: [completed]
+    branches: [main]
+
+env:
+  ARTIFACT: "doughnut"
+  VERSION: "0.0.1-SNAPSHOT"
+  FRONTEND_DIST_ARTIFACT: frontend-dist
+  CLI_DIST_ARTIFACT: cli-dist
+  GCS_BUCKET: "dough-01"
+  # Public SPA + CLI only; LB backend bucket must point here (see docs/gcp/prod-frontend-static-lb.md).
+  GCS_FRONTEND_BUCKET: "dough-frontend-01"
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+  GITHUB_SHA: ${{ github.event.workflow_run.head_sha }}
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  Deploy:
+    name: GCP deploy (GCS + MIG + health probe)
+    runs-on: ${{ vars.RUNNER }}
+    if: github.event.workflow_run.conclusion == 'success'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 1
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ vars.NODE_VERSION }}
+      - name: Install yaml for URL map scripts (avoid full monorepo pnpm)
+        run: |
+          mkdir -p node_modules
+          npm install --prefix "$(pwd)/.ci-urlmap-node-deps" yaml@2.8.3
+          ln -sfn "$(pwd)/.ci-urlmap-node-deps/node_modules/yaml" node_modules/yaml
+      - name: Download CI artifacts
+        uses: actions/download-artifact@v8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+          name: ${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
+      - name: Download frontend dist artifact
+        uses: actions/download-artifact@v8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+          name: ${{ env.FRONTEND_DIST_ARTIFACT }}
+          path: frontend/dist
+      - name: Download CLI bundle artifact
+        uses: actions/download-artifact@v8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+          name: ${{ env.CLI_DIST_ARTIFACT }}
+          path: cli/dist
+      - uses: ./.github/gcloud_auth_n_sdk
+        with:
+          credentials_json: ${{ env.GCP_CREDENTIALS }}
+          skip_install: ${{ runner.os == 'Linux' && vars.GCP_FORCE_GCLOUD_INSTALL != 'true' }}
+      - name: Upload frontend static to GCS
+        run: infra/gcp/scripts/upload-frontend-static-to-gcs.sh
+      - name: Upload CLI install binary to GCS
+        run: infra/gcp/scripts/upload-cli-binary-to-gcs.sh
+      - name: Conditional GCS upload, MIG rolling replace, record last success
+        run: |
+          if git log -1 --format=%B "$GITHUB_SHA" | grep -qE 'force-deployment[[:space:]]*:[[:space:]]*true'; then
+            export FORCE_FULL_DEPLOY=1
+          fi
+          infra/gcp/scripts/deploy-backend-jar-to-gcp-mig.sh
+
+  Notify-on-failure:
+    name: Slack notification on deploy failure
+    runs-on: ${{ vars.RUNNER }}
+    needs: [Deploy]
+    if: always() && needs.Deploy.result == 'failure'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 1
+      - name: Compute short SHA, URLs, and sanitized commit subject
+        id: ctx
+        env:
+          DEPLOY_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          echo "short_sha=${DEPLOY_SHA:0:8}" >> "$GITHUB_OUTPUT"
+          echo "commit_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${DEPLOY_SHA}" >> "$GITHUB_OUTPUT"
+          echo "run_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >> "$GITHUB_OUTPUT"
+          echo "ci_run_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${{ github.event.workflow_run.id }}" >> "$GITHUB_OUTPUT"
+          echo "repo_url=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" >> "$GITHUB_OUTPUT"
+          echo "subject=$(git log -1 --format=%s "$DEPLOY_SHA" | tr -d '"')" >> "$GITHUB_OUTPUT"
+      - uses: slackapi/slack-github-action@v4.0.0
+        with:
+          webhook: ${{ env.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            text: "Deploy failure on ${{ github.repository }} @ ${{ steps.ctx.outputs.short_sha }}"
+            attachments:
+              - color: "#E01E5A"
+                blocks:
+                  - type: header
+                    text:
+                      type: plain_text
+                      text: "Failed production deploy"
+                  - type: section
+                    fields:
+                      - type: mrkdwn
+                        text: "*repo*\n<${{ steps.ctx.outputs.repo_url }}|${{ github.repository }}>"
+                      - type: mrkdwn
+                        text: "*message*\n${{ steps.ctx.outputs.subject }}"
+                      - type: mrkdwn
+                        text: "*commit*\n<${{ steps.ctx.outputs.commit_url }}|${{ steps.ctx.outputs.short_sha }}>"
+                      - type: mrkdwn
+                        text: "*deploy run*\n<${{ steps.ctx.outputs.run_url }}|${{ github.workflow }}>"
+                      - type: mrkdwn
+                        text: "*CI run*\n<${{ steps.ctx.outputs.ci_run_url }}|doughnut CI>"
+                      - type: mrkdwn
+                        text: "*event*\nworkflow_run on `${{ github.event.workflow_run.head_branch }}`"

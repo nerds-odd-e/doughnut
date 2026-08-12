@@ -11,9 +11,8 @@ on:
 env:
   ARTIFACT: "doughnut"
   VERSION: "0.0.1-SNAPSHOT"
-  GCS_BUCKET: "dough-01"
-  # Public SPA + CLI only; LB backend bucket must point here (see docs/gcp/prod-frontend-static-lb.md).
-  GCS_FRONTEND_BUCKET: "dough-frontend-01"
+  FRONTEND_DIST_ARTIFACT: frontend-dist
+  CLI_DIST_ARTIFACT: cli-dist
   MYSQL_UT_DB: "doughnut_test"
   MYSQL_E2E_DB: "doughnut_e2e_test"
   MYSQL_DB_USER: ${{ secrets.DBUSER }}
@@ -24,7 +23,6 @@ env:
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
   GITHUB_FOR_ISSUES_API_TOKEN: ${{ secrets.GH_ISSUES_API_TOKEN }}
   OPENAI_API_TOKEN: ${{ secrets.OPENAI_API_TOKEN }}
   DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -75,7 +73,7 @@ jobs:
           java_version: ${{ vars.JAVA_VERSION }}
       - run: backend/gradlew -p backend migrateTestDB -Dspring.profiles.active=test
       - run: backend/gradlew -p backend test -Dspring.profiles.active=test --parallel
-      # Fat jar does not embed SPA/CLI (uploaded to GCS separately). Jar repro is Gradle-only.
+      # Fat jar does not embed SPA/CLI (deploy workflow uploads them to GCS). Jar repro is Gradle-only.
       - name: Boot jar reproducibility
         run: bash backend/scripts/boot-jar-reproducible.sh
 
@@ -124,24 +122,22 @@ jobs:
       - uses: ./.github/setup_nodejs_with_cache
         with:
           node_version: ${{ vars.NODE_VERSION }}
-      - name: Build SPA and CLI for GCS upload
+      - name: Build SPA, CLI, and backend jar for deployment
         run: pnpm cli:bundle && pnpm frontend:build
       - name: Build application jar artifact
         run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel
-      - uses: ./.github/gcloud_auth_n_sdk
-        with:
-          credentials_json: ${{ env.GCP_CREDENTIALS }}
-          skip_install: ${{ runner.os == 'Linux' && vars.GCP_FORCE_GCLOUD_INSTALL != 'true' }}
-      - name: Upload frontend static to GCS
-        env:
-          GITHUB_SHA: ${{ github.sha }}
-        run: infra/gcp/scripts/upload-frontend-static-to-gcs.sh
-      - name: Upload CLI install binary to GCS
-        run: infra/gcp/scripts/upload-cli-binary-to-gcs.sh
       - uses: actions/upload-artifact@v7
         with:
           name: ${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
           path: backend/build/libs/${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ env.FRONTEND_DIST_ARTIFACT }}
+          path: frontend/dist
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ env.CLI_DIST_ARTIFACT }}
+          path: cli/dist
 
   E2E-tests:
     # Explicit feature dirs (not letter globs) keep Cypress load ~even across
@@ -234,45 +230,6 @@ jobs:
           name: cypress-screenshots
           path: e2e_test/screenshots
 
-  Deploy:
-    name: GCP MIG Rolling Update Deploy
-    runs-on: ${{ vars.RUNNER }}
-    needs:
-      [
-        Lint-N-Backend-Generated-Types-For-Frontend,
-        Backend-unit-tests,
-        Frontend-unit-tests,
-        Other-unit-tests,
-        Package-artifacts,
-        E2E-tests,
-      ]
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 1
-      - uses: actions/setup-node@v7
-        with:
-          node-version: ${{ vars.NODE_VERSION }}
-      - name: Install yaml for URL map scripts (avoid full monorepo pnpm)
-        run: |
-          mkdir -p node_modules
-          npm install --prefix "$(pwd)/.ci-urlmap-node-deps" yaml@2.8.3
-          ln -sfn "$(pwd)/.ci-urlmap-node-deps/node_modules/yaml" node_modules/yaml
-      - uses: ./.github/gcloud_auth_n_sdk
-        with:
-          credentials_json: ${{ env.GCP_CREDENTIALS }}
-          skip_install: ${{ runner.os == 'Linux' && vars.GCP_FORCE_GCLOUD_INSTALL != 'true' }}
-      - name: Download production application jar artifact
-        uses: actions/download-artifact@v8
-        with:
-          name: ${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
-      - name: Conditional GCS upload, MIG rolling replace, record last success
-        run: |
-          if git log -1 --format=%B "$GITHUB_SHA" | grep -qE 'force-deployment[[:space:]]*:[[:space:]]*true'; then
-            export FORCE_FULL_DEPLOY=1
-          fi
-          infra/gcp/scripts/deploy-backend-jar-to-gcp-mig.sh
-
   Notify-on-failure:
     name: Single slack/discord notification on CI/CD failure
     runs-on: ${{ vars.RUNNER }}
@@ -284,7 +241,6 @@ jobs:
         Other-unit-tests,
         Package-artifacts,
         E2E-tests,
-        Deploy,
       ]
     if: always() && contains(needs.*.result, 'failure')
     steps:

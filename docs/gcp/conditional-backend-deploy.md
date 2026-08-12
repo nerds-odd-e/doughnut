@@ -2,11 +2,11 @@
 
 **See also:** [prod-frontend-static-lb.md](prod-frontend-static-lb.md) for SPA/CLI buckets, URL map, and frontend rollback (Deploy always applies the URL map; jar rollout is what this page describes).
 
-On a green `main` pipeline, the **Deploy** job runs `infra/gcp/scripts/deploy-backend-jar-to-gcp-mig.sh`. That script compares the built fat jar’s SHA-256 and the MIG startup script SHA-256 to `gs://<bucket>/deploy/last-successful-deploy.json`. When both match, it **skips** uploading the jar and **skips** the MIG rolling replace, and leaves the record unchanged.
+On a green `main` CI run, the separate **deploy** workflow ([`.github/workflows/deploy.yml`](../../.github/workflows/deploy.yml)) runs `infra/gcp/scripts/deploy-backend-jar-to-gcp-mig.sh`. That script compares the built fat jar’s SHA-256 and the MIG startup script SHA-256 to `gs://<bucket>/deploy/last-successful-deploy.json`. When both match, it **skips** uploading the jar and **skips** the MIG rolling replace, and leaves the record unchanged.
 
 ## Last successful deploy record
 
-After a **full** deploy (upload + rolling replace), CI writes JSON to `deploy/last-successful-deploy.json` with `sha256`, `startup_script_sha256`, `git_sha`, and `recorded_at`. The record is updated only when both steps succeed.
+After a **full** deploy (upload + rolling replace), the deploy workflow writes JSON to `deploy/last-successful-deploy.json` with `sha256`, `startup_script_sha256`, `git_sha`, and `recorded_at`. The record is updated only when both steps succeed.
 
 ## MIG template / startup changes without a new jar
 
@@ -16,7 +16,7 @@ Changes made only in the GCP console, instance templates, or other metadata stil
 
 ## Force a full deploy: `force-deployment: true`
 
-Include the following in the **subject or body** of the commit that ends up as **`GITHUB_SHA` on `main`** (the commit CI checks out for the Deploy job):
+Include the following in the **subject or body** of the commit that ends up as **`GITHUB_SHA` on `main`** (the commit the deploy workflow checks out):
 
 ```text
 force-deployment: true
@@ -24,7 +24,7 @@ force-deployment: true
 
 Matching is case-sensitive. Extra spaces around `:` are allowed (for example `force-deployment : true`).
 
-CI sets `FORCE_FULL_DEPLOY=1` for the deploy script when that pattern appears in **`git log -1 --format=%B`** for `$GITHUB_SHA` — i.e. the **tip commit of the push** only.
+CI sets `FORCE_FULL_DEPLOY=1` for the deploy script when that pattern appears in **`git log -1 --format=%B`** for `$GITHUB_SHA` — i.e. the **tip commit of the push** only. The deploy workflow reads that commit message after CI succeeds.
 
 ### Multi-commit pushes
 

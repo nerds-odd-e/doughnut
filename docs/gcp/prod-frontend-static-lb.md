@@ -2,14 +2,14 @@
 
 Runbook for production static hosting: one browser-facing hostname, HTTPS load balancer path rules, backend bucket (and optional Cloud CDN) for the Vue build, managed instance group (MIG) for Spring Boot.
 
-**Related:** CI uploads each commit’s SPA tree to `gs://<GCS_FRONTEND_BUCKET>/frontend/<GITHUB_SHA>/` and the CLI install binary to `gs://<GCS_FRONTEND_BUCKET>/doughnut-cli-latest/doughnut` ([`upload-frontend-static-to-gcs.sh`](../../infra/gcp/scripts/upload-frontend-static-to-gcs.sh), [`upload-cli-binary-to-gcs.sh`](../../infra/gcp/scripts/upload-cli-binary-to-gcs.sh)). In [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml), `GCS_FRONTEND_BUCKET` is the public static bucket (e.g. `dough-frontend-01`); `GCS_BUCKET` is deploy-only (jars, `deploy/`, etc., e.g. `dough-01`).
+**Related:** After green CI on `main`, the [deploy workflow](../../.github/workflows/deploy.yml) uploads each commit’s SPA tree to `gs://<GCS_FRONTEND_BUCKET>/frontend/<GITHUB_SHA>/` and the CLI install binary to `gs://<GCS_FRONTEND_BUCKET>/doughnut-cli-latest/doughnut` ([`upload-frontend-static-to-gcs.sh`](../../infra/gcp/scripts/upload-frontend-static-to-gcs.sh), [`upload-cli-binary-to-gcs.sh`](../../infra/gcp/scripts/upload-cli-binary-to-gcs.sh)). In [`.github/workflows/deploy.yml`](../../.github/workflows/deploy.yml), `GCS_FRONTEND_BUCKET` is the public static bucket (e.g. `dough-frontend-01`); `GCS_BUCKET` is deploy-only (jars, `deploy/`, etc., e.g. `dough-01`).
 
 ## Release at a glance
 
 | Step | What happens |
 |------|----------------|
-| Green `main` **Package-artifacts** | SPA → `gs://<GCS_FRONTEND_BUCKET>/frontend/<GITHUB_SHA>/`; CLI → same bucket; fat jar + `deploy/last-successful-deploy.json` → `GCS_BUCKET` only. |
-| Green `main` **Deploy** | Always runs [`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh) so the LB serves that pipeline’s `frontend/<GITHUB_SHA>/` (including frontend-only commits). |
+| Green `main` **Package-artifacts** (CI) | Builds SPA, CLI, and fat jar; uploads GitHub Actions artifacts for deploy. |
+| Green `main` **Deploy** ([deploy workflow](../../.github/workflows/deploy.yml)) | Downloads CI artifacts; SPA → `gs://<GCS_FRONTEND_BUCKET>/frontend/<GITHUB_SHA>/`; CLI → same bucket; jar + `deploy/last-successful-deploy.json` → `GCS_BUCKET`. Always runs [`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh) so the LB serves that pipeline’s `frontend/<GITHUB_SHA>/` (including frontend-only commits). |
 | Backend MIG | Jar upload + rolling replace when the jar hash or startup script hash differs from the record — [conditional-backend-deploy.md](conditional-backend-deploy.md). |
 | Routing edits | Change [`doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json); CI must pass `pnpm validate:path-routing`. |
 | **Frontend rollback** | Render + validate + `gcloud url-maps import` for an older SHA whose `frontend/<SHA>/` still exists (commands under [Recovery / manual import](#cutover-checklist-new-frontend-bucket) below). |
@@ -31,10 +31,10 @@ Do **not** treat `https://storage.googleapis.com/...` as the primary UI origin: 
 
 | Resource | Name / note |
 |----------|-------------|
-| GCS bucket (public static: SPA + CLI) | `dough-frontend-01` — CI `GCS_FRONTEND_BUCKET` |
-| GCS bucket (deploy / private ops) | `dough-01` — CI `GCS_BUCKET` (jars, `deploy/`, etc.; **no** `allUsers` needed for prod UI) |
+| GCS bucket (public static: SPA + CLI) | `dough-frontend-01` — deploy workflow `GCS_FRONTEND_BUCKET` |
+| GCS bucket (deploy / private ops) | `dough-01` — deploy workflow `GCS_BUCKET` (jars, `deploy/`, etc.; **no** `allUsers` needed for prod UI) |
 | Backend bucket (CDN on) | `doughnut-frontend-backend-bucket` → **`dough-frontend-01`** (not the deploy bucket) |
-| URL map (HTTPS) | `doughnut-app-service-map` — routing source [`infra/gcp/path-routing/doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json); CI renders YAML with `GITHUB_SHA` and imports after each green `main` run |
+| URL map (HTTPS) | `doughnut-app-service-map` — routing source [`infra/gcp/path-routing/doughnut-routing.json`](../../infra/gcp/path-routing/doughnut-routing.json); deploy workflow renders YAML with `GITHUB_SHA` and imports after each green `main` CI run |
 | HTTPS target proxy | `doughnut-app-service-map-target-proxy-2` → above URL map |
 | MIG backend service | `doughnut-app-service` (default path matcher + API traffic) |
 | GCS read for LB + CDN | Prefer **`roles/storage.objectViewer`** on `dough-frontend-01` for `allUsers` **only on this bucket**, or keep the bucket private and grant the default Compute SA, `service-<PROJECT_NUMBER>@compute-system.iam.gserviceaccount.com`, and (with Cloud CDN) `service-<PROJECT_NUMBER>@cloud-cdn-fill.iam.gserviceaccount.com`. With **Cloud CDN** enabled, Google’s docs require the CDN fill SA when the bucket is not publicly readable. |
@@ -43,7 +43,7 @@ Do **not** treat `https://storage.googleapis.com/...` as the primary UI origin: 
 
 Do this **before** the first green `main` run that uses `GCS_FRONTEND_BUCKET`:
 
-1. Create `gs://dough-frontend-01` (or your chosen name; keep [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) in sync).
+1. Create `gs://dough-frontend-01` (or your chosen name; keep [`.github/workflows/deploy.yml`](../../.github/workflows/deploy.yml) in sync).
 2. Point global backend bucket **`doughnut-frontend-backend-bucket`** at that GCS bucket (replace any attachment to `dough-01` for static serving).
 3. Grant IAM on **that** bucket for LB + CDN as in the table above.
 4. Optionally copy existing `frontend/*` and `doughnut-cli-latest/*` objects from the old bucket if you need rollback SHAs to resolve before the next CI upload.
@@ -188,4 +188,4 @@ Confirm: **HTML/JS** responses are from the **expected** revision (e.g. unique h
 
 ## Spring Boot jar (no SPA or CLI inside)
 
-The **deployable boot jar** does **not** embed `classpath:/static/**` (no SPA, no CLI). **Conditional MIG skip** compares only the **jar** hash to `deploy/last-successful-deploy.json`. Each green **`Package-artifacts`** run uploads **frontend** and **CLI** to **`GCS_FRONTEND_BUCKET`**; jars and the deploy record stay on **`GCS_BUCKET`**.
+The **deployable boot jar** does **not** embed `classpath:/static/**` (no SPA, no CLI). **Conditional MIG skip** compares only the **jar** hash to `deploy/last-successful-deploy.json`. Each green **deploy** run uploads **frontend** and **CLI** to **`GCS_FRONTEND_BUCKET`**; jars and the deploy record stay on **`GCS_BUCKET`**.

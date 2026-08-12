@@ -99,10 +99,11 @@
 - Legacy DigitalOcean Packer artifact present (`infra/digital_ocean/packer.json`) — not the active prod path
 
 **CI Pipeline:**
-- GitHub Actions: `.github/workflows/ci.yml` (lint, backend/frontend/other unit tests, E2E, package artifacts, conditional MIG deploy)
+- GitHub Actions: `.github/workflows/ci.yml` (lint, backend/frontend/other unit tests, E2E, package artifacts)
+- Deploy: `.github/workflows/deploy.yml` (triggered by successful CI on `main`; GCS upload, conditional MIG deploy, health probe)
 - Related: `cli-release.yml`, `mig_status_check.yml`
-- Notifications: Slack webhook on CI failure (`SLACK_WEBHOOK_URL`); Discord webhook env present but action commented out
-- Auth to GCP in CI: `GCP_CREDENTIALS` secret via `google-github-actions/auth`
+- Notifications: Slack webhook on CI or deploy failure (`SLACK_WEBHOOK_URL`); Discord webhook env present in CI but action commented out
+- Auth to GCP in deploy: `GCP_CREDENTIALS` secret via `google-github-actions/auth`
 
 ## Environment Configuration
 
@@ -114,7 +115,8 @@
 - `DOUGHNUT_SPA_PUBLIC_BASE_URL` — prod SPA public URL (default `https://doughnut.odd-e.com`)
 - `DOUGHNUT_API_BASE_URL` / `DOUGHNUT_API_AUTH_TOKEN` — CLI and MCP → backend
 - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` — CLI Gmail OAuth (and CI jar reproducibility)
-- CI-only: `GCS_BUCKET`, `GCS_FRONTEND_BUCKET`, `GCP_CREDENTIALS`, DB user/password secrets, Slack/Discord webhooks
+- CI-only: DB user/password secrets, Slack/Discord webhooks
+- Deploy workflow: `GCS_BUCKET`, `GCS_FRONTEND_BUCKET`, `GCP_CREDENTIALS`
 
 **Secrets location:**
 - Local team files: git-secret encrypted (see `docs/secrets_management.md`)

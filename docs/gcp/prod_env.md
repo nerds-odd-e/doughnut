@@ -85,7 +85,7 @@ Green `main` builds may **skip** GCS jar upload and MIG rollout when the jar has
 
 ## 6. Frontend static in GCS (CI publish + prod LB)
 
-Each green `Package-artifacts` run on `main` uploads the SPA tree (Vite output under `frontend/dist/` after `pnpm bundle:all`) to:
+Each green `main` CI run builds the SPA tree (Vite output under `frontend/dist/` after `pnpm bundle:all`) and CLI bundle as GitHub Actions artifacts. The deploy workflow then uploads them to:
 
 `gs://<GCS_FRONTEND_BUCKET>/frontend/<GITHUB_SHA>/`
 

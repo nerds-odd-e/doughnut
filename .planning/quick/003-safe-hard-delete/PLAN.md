@@ -1,6 +1,6 @@
 # Safe hard delete — PLAN
 
-Status: in progress (Phases 1–2 done; Phases 3–8 planned)
+Status: in progress (Phases 1–3 done; Phases 4–8 planned)
 
 ## Incident that motivated this plan
 
@@ -101,34 +101,9 @@ trackers remain; inert under the unique index (see Design decisions).
 
 ---
 
-### Phase 3 — Structure: Deploy is a separate workflow; CI no longer waits on production health — **planned**
+### Phase 3 — Structure: Deploy is a separate workflow; CI no longer waits on production health — **done**
 
-**Justified by:** Phase 2’s probe must stay. Leaving it inside `ci.yml` permanently inflates **CI
-duration**, which we measure. Build/package must remain a CI check; the health wait must not.
-
-**Pre:** `Deploy` is a job in `ci.yml` that `needs` tests + `Package-artifacts`. Frontend/CLI are
-uploaded to GCS inside `Package-artifacts` (before Deploy). Backend jar already flows as a GitHub
-Actions artifact into Deploy.
-
-**Trigger:** CI succeeds on `main`.
-
-**Post:**
-
-- CI ends when checks + artifact packaging succeed (no health wait on the CI critical path).
-- A separate deploy workflow downloads those artifacts, does GCS + MIG rolling replace, runs the
-  Phase 2 health probe, then writes `last-successful-deploy.json`.
-- A failed health probe fails **deploy**, not CI.
-
-**Change:** New workflow (e.g. `deploy.yml`) triggered by successful CI on `main` (`workflow_run` or
-equivalent). Move GCS uploads + MIG + probe + success-record into it. CI `Package-artifacts` keeps
-building jar/SPA/CLI and uploading **GitHub Actions artifacts** (build remains the check; stays
-parallel with tests). Remove the in-CI Deploy job (and any GCS side-effects that force deploy work
-into the CI metric).
-
-**Verify:** A green CI run does not include the probe wait in its wall-clock; a deliberate bad jar
-(or probe against a bogus host in a dry path) fails the deploy workflow only.
-
-**Stop-safe:** Same deploy gate as Phase 2; CI duration returns to “checks + package” only.
+**Done:** New `deploy.yml` on successful CI `workflow_run`; GCS + MIG + health probe moved out of `ci.yml`. CI `Package-artifacts` uploads jar, `frontend-dist`, `cli-dist` only. Deploy failures notify via deploy workflow Slack job.
 
 ---
 
