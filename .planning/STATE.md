@@ -4,15 +4,15 @@ milestone: null
 milestone_name: null
 current_phase: null
 current_phase_name: null
-status: idle
+status: executing
 stopped_at: null
-last_updated: "2026-08-12T08:35:00Z"
+last_updated: "2026-08-12T09:05:00Z"
 last_activity: 2026-08-12
-last_activity_desc: safe-hard-delete shipped; planning history cleaned
+last_activity_desc: 002-toolbar-assimilation-panel phase 1 done; phase 2 next
 progress:
-  total_phases: 0
-  completed_phases: 0
-  total_plans: 0
+  total_phases: 4
+  completed_phases: 1
+  total_plans: 1
   completed_plans: 0
   percent: 0
 ---
@@ -27,10 +27,11 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-Idle. No active plan.
+Active ad-hoc plan: [`.planning/quick/002-toolbar-assimilation-panel/`](quick/002-toolbar-assimilation-panel/PLAN.md) — **executing** (phase 1 done; phase 2 next).
 
 **Recently shipped:** production hard-delete incident response (2026-08-12) — [MILESTONES.md](MILESTONES.md).
 
 ## Operator Next Steps
 
+- Execute [quick/002-toolbar-assimilation-panel](quick/002-toolbar-assimilation-panel/PLAN.md) when ready (A–E confirmed).
 - Human review/update of Proposed ADRs 0001 / 0003 / 0005

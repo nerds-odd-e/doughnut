@@ -54,10 +54,10 @@
       <button
         v-if="!readonly"
         type="button"
-        :class="['daisy-btn daisy-btn-ghost daisy-btn-sm', { 'daisy-btn-active': audioToolsOpen }]"
+        :class="['daisy-btn daisy-btn-ghost daisy-btn-sm', { 'daisy-btn-active': isAudioOpen }]"
         title="Audio tools"
-        :aria-pressed="audioToolsOpen"
-        @click="audioToolsOpen = !audioToolsOpen"
+        :aria-pressed="isAudioOpen"
+        @click="toggleAudio"
       >
         <Mic class="w-6 h-6" />
       </button>
@@ -70,10 +70,9 @@
       />
     </div>
   </nav>
-  <NoteAudioTools
-    v-if="!readonly && audioToolsOpen"
-    v-bind="{ note }"
-  />
+  <NoteToolbarPanelShell v-if="!readonly && isAudioOpen">
+    <NoteAudioTools v-bind="{ note }" />
+  </NoteToolbarPanelShell>
 </template>
 
 <script setup lang="ts">
@@ -84,6 +83,8 @@ import SearchForm from "../../wiki-link-or-relationship/SearchForm.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import { FileCode, LayoutTemplate, MessageCircle, Mic } from "@lucide/vue"
 import NoteAudioTools from "../widgets/NoteAudioTools.vue"
+import NoteToolbarPanelShell from "./NoteToolbarPanelShell.vue"
+import { useNoteToolbarPanel } from "@/composables/useNoteToolbarPanel"
 import { useRouter } from "vue-router"
 import NoteToolbarMoreOptions from "../widgets/NoteToolbarMoreOptions.vue"
 import { useNoteToolbarMoreOptionsInline } from "@/composables/useNoteToolbarMoreOptionsInline"
@@ -115,7 +116,7 @@ const showRelocatedNewNote = computed(
   () => !sidebarOpened.value && props.readonly !== true
 )
 
-const audioToolsOpen = ref(false)
+const { isAudioOpen, toggleAudio } = useNoteToolbarPanel()
 const toolbarNavRef = ref<HTMLElement | null>(null)
 const { showMoreOptionsInline } = useNoteToolbarMoreOptionsInline(toolbarNavRef)
 const wikiLinkOrRelationshipPopButtonRef = ref<InstanceType<

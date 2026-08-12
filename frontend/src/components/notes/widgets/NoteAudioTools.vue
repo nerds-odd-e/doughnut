@@ -1,5 +1,5 @@
 <template>
-  <div class="audio-tools-container bg-dark">
+  <div>
     <Waveform
       class="mb-5"
       :audioRecorder="audioRecorder"
@@ -154,26 +154,6 @@ const tryFlushAudio = async () => {
 </script>
 
 <style scoped>
-.audio-tools-container {
-  position: relative;
-  border-radius: 0 0 12px 12px;
-  padding: 20px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  animation: dropDown 0.3s ease-out;
-  transform-origin: top;
-}
-
-@keyframes dropDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .button-group {
   display: flex;
   justify-content: center;
@@ -202,10 +182,6 @@ const tryFlushAudio = async () => {
 }
 
 @media (max-width: 480px) {
-  .audio-tools-container {
-    padding: 15px;
-  }
-
   .button-group {
     gap: 10px;
   }
