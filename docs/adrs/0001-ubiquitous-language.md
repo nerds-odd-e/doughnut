@@ -20,7 +20,6 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 
 | Term | Meaning |
 |------|---------|
-| **Re-assimilate** | Return a note to assimilation after failed recall |
 | **Skip recall** | Opt a note or notebook out of recall (panel action or notebook setting) |
 | **Revive recall** | Re-enable recall after it was skipped |
 | **Remembering spelling** | Assimilation option that requires verifying the note title by spelling |

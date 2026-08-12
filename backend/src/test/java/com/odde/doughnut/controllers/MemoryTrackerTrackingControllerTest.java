@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 class MemoryTrackerTrackingControllerTest extends MemoryTrackerControllerTestBase {
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
-  @Autowired AssimilationController assimilationController;
 
   @Test
   void removeAndUpdateLastRecalledAt() {
@@ -60,43 +59,5 @@ class MemoryTrackerTrackingControllerTest extends MemoryTrackerControllerTestBas
     assertThat(
         memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), note.getId()),
         hasSize(1));
-  }
-
-  @Test
-  void softDeleteHidesTrackerAndSetsDeletedAt() throws UnexpectedNoAccessRightException {
-    Note note = ownedNote();
-    MemoryTracker tracker = ownedTracker(note);
-
-    controller.softDelete(tracker);
-
-    assertThat(
-        memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), note.getId()),
-        empty());
-    assertThat(
-        makeMe.entityPersister.find(MemoryTracker.class, tracker.getId()).getDeletedAt(),
-        notNullValue());
-  }
-
-  @Test
-  void softDeleteExcludesTrackerFromRecentLists() throws UnexpectedNoAccessRightException {
-    MemoryTracker tracker = ownedTracker();
-
-    controller.softDelete(tracker);
-
-    assertThat(controller.getRecentMemoryTrackers(), empty());
-    assertThat(controller.getRecentlyRecalled(), empty());
-  }
-
-  @Test
-  void softDeleteReturnsNoteToAssimilationQueue() throws UnexpectedNoAccessRightException {
-    Note note = ownedNote();
-    MemoryTracker tracker = ownedTracker(note);
-    assertThat(assimilationController.next("Asia/Shanghai").getNextUnit(), nullValue());
-
-    controller.softDelete(tracker);
-
-    assertThat(
-        assimilationController.next("Asia/Shanghai").getNextUnit().getNoteId(),
-        equalTo(note.getId()));
   }
 }

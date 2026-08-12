@@ -2286,22 +2286,6 @@ export type CreateGroupResponses = {
 
 export type CreateGroupResponse = CreateGroupResponses[keyof CreateGroupResponses];
 
-export type SoftDeleteData = {
-    body?: never;
-    path: {
-        memoryTracker: number;
-    };
-    query?: never;
-    url: '/api/memory-trackers/{memoryTracker}/soft-delete';
-};
-
-export type SoftDeleteResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
-
 export type RemoveFromRepeatingData = {
     body?: never;
     path: {

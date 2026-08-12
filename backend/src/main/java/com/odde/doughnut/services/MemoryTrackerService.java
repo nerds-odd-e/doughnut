@@ -88,11 +88,6 @@ public class MemoryTrackerService {
     return false;
   }
 
-  public void softDelete(MemoryTracker memoryTracker) {
-    memoryTracker.setDeletedAt(new Timestamp(System.currentTimeMillis()));
-    entityPersister.save(memoryTracker);
-  }
-
   public void delete(MemoryTracker memoryTracker) {
     entityPersister.remove(memoryTracker);
   }

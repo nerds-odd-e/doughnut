@@ -90,6 +90,20 @@ special spelling results into boolean correct/incorrect.
 4. Same-session retry and the persisted next-recall time are separate. The
    post-grade schedule must be explicit.
 
+### Frequent-failure warning
+
+When a memory tracker accumulates too many wrong answers in a rolling window,
+Doughnut warns the learner but does not change the schedule or remove the
+tracker.
+
+1. **Threshold:** ≥ 5 incorrect recalls within the last 14 days, per tracker.
+   **Overlap** does not count toward this total.
+2. **Response:** On each incorrect recall while still at or over the threshold,
+   show an informational warning with live counts from the API (`wrongCount`,
+   `threshold`, `periodDays`). No confirm action and no tracker deletion.
+3. **Property trackers:** The warning names the property when the tracker is
+   property-keyed.
+
 #### Accidental match (spelling)
 
 An accidental match is a spelling answer that fails the reviewed note but names
@@ -113,7 +127,7 @@ declaration is accidental match when the answer fails the reviewed note.
    correct.
 2. Not an incorrect or accidental-match recall: no those penalties; do not
    change the tracker's schedule fields.
-3. Do not count toward wrong-answer / re-assimilation failure streaks.
+3. Do not count toward the frequent-failure wrong-answer count.
 4. Allow same-session retry with a more specific answer. Retry grades under
    the normal outcome rules (correct, incorrect, or accidental match).
 

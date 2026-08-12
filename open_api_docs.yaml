@@ -1258,20 +1258,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebookGroup"
-  /api/memory-trackers/{memoryTracker}/soft-delete:
-    post:
-      tags:
-      - memory-tracker-controller
-      operationId: softDelete
-      parameters:
-      - name: memoryTracker
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
   /api/memory-trackers/{memoryTracker}/remove:
     post:
       tags:

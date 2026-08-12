@@ -1,6 +1,6 @@
 # Remove re-assimilate — PLAN
 
-Status: planned  
+Status: complete  
 Context: [CONTEXT.md](./CONTEXT.md)
 
 ## Intent
@@ -68,21 +68,9 @@ Removed `removeMemoryTrackersForReassimilation`, reappears E2E scenario, unit te
 
 ---
 
-### Phase 6 — Behavior: Property removal hard-deletes tracker — **planned**
+### Phase 6 — Behavior: Property removal hard-deletes tracker — **done**
 
-**Pre:** Note has a property with a memory tracker.  
-**Trigger:** Learner removes the property (rich or markdown) and confirms the warning.  
-**Post:** Property saved without that key; tracker row hard-deleted; cancel leaves both intact.
-
-**Work:**
-
-- Point `usePropertyMemoryTrackerGuard` at hard-delete (shared by rich + markdown).
-- Adjust confirm copy if needed (“delete that tracker” OK if accurate).
-- Update guard / markdown / rich unit tests (spies → hard-delete).
-
-**Verify:** Frontend unit tests for confirm, cancel, and hard-delete call.
-
-**Stop-safe:** Property path no longer uses soft-delete. Soft-delete endpoint may remain until Phase 7.
+Property guard uses `MemoryTrackerController.delete`; markdown + rich unit tests updated (shipped with phase 5 API commit).
 
 ---
 

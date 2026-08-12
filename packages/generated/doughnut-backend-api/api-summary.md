@@ -139,7 +139,6 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 
 ## Memory Tracker Controller
 
-- `softDelete`: POST `/api/memory-trackers/{memoryTracker}/soft-delete` -> `SoftDeleteResponse` (request: `SoftDeleteData`; path: memoryTracker; response body: void)
 - `removeFromRepeating`: POST `/api/memory-trackers/{memoryTracker}/remove` -> `RemoveFromRepeatingResponse` (request: `RemoveFromRepeatingData`; path: memoryTracker; response body: MemoryTracker)
 - `reEnable`: POST `/api/memory-trackers/{memoryTracker}/re-enable` -> `ReEnableResponse` (request: `ReEnableData`; path: memoryTracker; response body: MemoryTracker)
 - `updatePropertyKey`: PATCH `/api/memory-trackers/{memoryTracker}/property-key` -> `UpdatePropertyKeyResponse` (request: `UpdatePropertyKeyData`; path: memoryTracker; body: UpdateMemoryTrackerPropertyKeyDto; response body: MemoryTracker)
