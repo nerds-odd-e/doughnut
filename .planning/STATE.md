@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: null
 milestone_name: null
-current_phase: 3
-current_phase_name: Separate deploy workflow
-status: in_progress
+current_phase: null
+current_phase_name: null
+status: idle
 stopped_at: null
-last_updated: "2026-08-12T07:50:00Z"
+last_updated: "2026-08-12T08:30:00Z"
 last_activity: 2026-08-12
-last_activity_desc: Phase 2 done — deploy health gate before success record
+last_activity_desc: safe-hard-delete plan complete (8/8 phases)
 progress:
   total_phases: 8
-  completed_phases: 2
+  completed_phases: 8
   total_plans: 1
-  completed_plans: 0
-  percent: 25
+  completed_plans: 1
+  percent: 100
 ---
 
 # Project State
@@ -27,11 +27,10 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-[safe hard delete](quick/003-safe-hard-delete/PLAN.md): Phases 1–2 done. Phase 2 adds post-rollout
-health probe before `last-successful-deploy.json` (interim in CI Deploy job).
-
-**Next:** Phase 3 — separate deploy workflow so CI duration excludes health wait.
+Idle. Shipped: [safe hard delete](quick/003-safe-hard-delete/) (8 phases) — production recovery,
+deploy health gate, FK delete safety, and prevention autonomation.
 
 ## Operator Next Steps
 
-- Decide Phase 5 policy for `conversation.recall_prompt_id` (SET NULL, recommended, vs CASCADE)
+- Confirm production `/api/healthcheck` after deploy pipeline runs on latest commits
+- Human review/update of Proposed ADRs 0001 / 0003 / 0005
