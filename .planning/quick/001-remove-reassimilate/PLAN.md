@@ -74,40 +74,21 @@ Property guard uses `MemoryTrackerController.delete`; markdown + rich unit tests
 
 ---
 
-### Phase 7 — Structure: Remove user-facing tracker soft-delete — **planned**
+### Phase 7 — Structure: Remove user-facing tracker soft-delete — **done**
 
-**Justified by:** Phase 6 removed the last product caller.
-
-**Change:** Remove `POST …/soft-delete`, service method, and its tests. Regenerate TS client. Scrub any remaining product-code “re-assimilate” / “reassimilation” identifiers left after Phases 2–4.
-
-**Verify:** Grep clean for soft-delete operation and re-assimilate product strings; backend/frontend tests green.
-
-**Stop-safe:** No UX change vs Phase 6; dead API gone. Note→tracker `deletedAt` cascade untouched.
+Removed `/soft-delete` endpoint, service method, and related tests; regenerated client.
 
 ---
 
-### Phase 8 — Behavior: Clean orphan soft-deleted trackers — **planned**
+### Phase 8 — Behavior: Clean orphan soft-deleted trackers — **done**
 
-**Pre:** Live notes may still own trackers with `deleted_at` set.  
-**Trigger:** Migration applies.  
-**Post:** Those tracker rows hard-deleted; trackers on soft-deleted notes remain for restore.
-
-**Work:** Flyway data migration (`DELETE` … note `deleted_at IS NULL`).
-
-**Verify:** Pattern used elsewhere for data migrations; note restore still restores cascaded trackers.
+`V300000245` hard-deletes orphan soft-deleted trackers on live notes; migration test added.
 
 ---
 
-### Phase 9 — Structure: ADR wording — **planned**
+### Phase 9 — Structure: ADR wording — **done**
 
-**Change:**
-
-- ADR 0001: drop **Re-assimilate** from vocabulary lists.
-- ADR 0003: concise frequent-failure **warning** policy; overlap excluded from the count (no “re-assimilation” wording).
-
-**Verify:** Doc review only; no product behavior change.
-
-*(Single Structure phase: both ADRs are terminal doc alignment, ~one edit pass.)*
+ADR 0001 drops Re-assimilate; ADR 0003 documents frequent-failure warning policy.
 
 ---
 
