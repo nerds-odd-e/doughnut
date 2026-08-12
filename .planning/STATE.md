@@ -27,7 +27,7 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-Executing: [`.planning/quick/001-remove-reassimilate/`](quick/001-remove-reassimilate/) — Phase 2 (frequent-failure warning E2E red).
+Executing: [`.planning/quick/001-remove-reassimilate/`](quick/001-remove-reassimilate/) — Phase 3 (frequent-failure warning green).
 
 Last shipped: display-name surrounding-whitespace invariant (`.planning/quick/001-display-name-whitespace/`).
 

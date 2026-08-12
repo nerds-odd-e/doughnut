@@ -225,10 +225,17 @@ const assumeAnsweredQuestionPage = () => {
       cy.findByText('Note under question').should('be.visible')
       return assumeAnsweredQuestionPage()
     },
-    confirmReAssimilation() {
-      cy.contains('re-assimilate').should('be.visible')
-      cy.findByRole('button', { name: 'OK' }).click()
+    expectFrequentFailureWarningForNote(
+      wrongCount: number,
+      periodDays: number
+    ) {
       waitUntilAppIsNotBusy()
+      cy.get('dialog')
+        .filter(':visible')
+        .should(
+          'contain.text',
+          `You've answered incorrectly ${wrongCount} times within the last ${periodDays} days.`
+        )
       return self
     },
   }

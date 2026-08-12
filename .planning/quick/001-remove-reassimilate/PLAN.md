@@ -40,22 +40,13 @@ Replace re-assimilate (confirm → soft-delete tracker) with a frequent-failure 
 
 ---
 
-### Phase 2 — Behavior: Frequent-failure warning E2E (red) — **planned**
+### Phase 2 — Behavior: Frequent-failure warning E2E (red) — **done**
 
-**Pre:** (test setup) Learner hits ≥5 wrong answers in 14 days on a recall item.  
+**Pre:** Learner hits ≥5 wrong answers in 14 days on a recall item.  
 **Trigger:** Another wrong answer while over threshold.  
-**Post:** (desired) Warning alert with CONTEXT copy; no re-assimilate confirm; tracker not removed for assimilation.
+**Post:** `@wip` `frequent_failure_warning.feature` documents desired alert; fails on old re-assimilate confirm (correct red).
 
-**Work:**
-
-- Replace `re_assimilate.feature` with capability-named `frequent_failure_warning.feature` (or equivalent).
-- Scenario asserts alert text (note-level is enough for E2E; property-aware covered by unit tests in Phase 3).
-- Tag `@wip`. Remove confirm-re-assimilation step/page-object bits **only if** unused elsewhere.
-- Run `--spec`; confirm failure is missing warning / old confirm path — not env noise.
-
-**Verify:** Spec fails for the right reason; `@wip` so CI skips.
-
-**Stop-safe:** Product UX unchanged; one `@wip` scenario documents the target.
+**Work done:** Replaced `re_assimilate.feature`; added warning step/page object; removed confirm re-assimilation helpers.
 
 ---
 

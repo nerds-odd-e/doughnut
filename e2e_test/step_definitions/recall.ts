@@ -237,6 +237,11 @@ Then('I should be asked {string}', (expectedQuestionStem: string) => {
   start.assumeQuestionPage(expectedQuestionStem)
 })
 
-When('I confirm re-assimilation', () => {
-  start.assumeAnsweredQuestionPage().confirmReAssimilation()
-})
+Then(
+  'I should see a frequent failure warning for the note with {int} wrong answers in {int} days',
+  (wrongCount: number, periodDays: number) => {
+    start
+      .assumeAnsweredQuestionPage()
+      .expectFrequentFailureWarningForNote(wrongCount, periodDays)
+  }
+)

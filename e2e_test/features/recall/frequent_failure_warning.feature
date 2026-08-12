@@ -1,7 +1,8 @@
+@wip
 @usingMockedOpenAiService
-Feature: Re-assimilate note after too many wrong answers
-  As a learner, when I answer a note wrong too many times,
-  the note should return to assimilate state for re-learning.
+Feature: Frequent failure warning after too many wrong answers
+  As a learner, when I keep answering a note wrong,
+  I should see a warning about how often I've failed.
 
   Background:
     Given I am logged in as an existing user
@@ -14,7 +15,6 @@ Feature: Re-assimilate note after too many wrong answers
     And OpenAI evaluates the question as legitimate
     And the note "sedition" was assimilated on day 1
 
-  Scenario: Note returns to assimilation after 5 wrong answers
+  Scenario: Note-level frequent failure warning after threshold exceeded
     When I make 5 wrong answers over 5 days since day 2, answering "to sleep" to "What is the meaning of sedition?"
-    And I confirm re-assimilation
-    Then I should see 1 due for assimilation
+    Then I should see a frequent failure warning for the note with 5 wrong answers in 14 days
