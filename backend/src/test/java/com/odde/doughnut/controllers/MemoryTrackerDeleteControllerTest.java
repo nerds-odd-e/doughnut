@@ -1,0 +1,44 @@
+package com.odde.doughnut.controllers;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import com.odde.doughnut.entities.MemoryTracker;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.server.ResponseStatusException;
+
+class MemoryTrackerDeleteControllerTest extends MemoryTrackerControllerTestBase {
+  @Autowired MemoryTrackerRepository memoryTrackerRepository;
+
+  @Test
+  void shouldHardDeleteMemoryTracker() throws UnexpectedNoAccessRightException {
+    Note note = ownedNote();
+    MemoryTracker tracker = makeMe.aMemoryTrackerFor(note).propertyKey("topic").please();
+
+    controller.delete(tracker);
+
+    assertThat(memoryTrackerRepository.findById(tracker.getId()).isEmpty(), is(true));
+  }
+
+  @Test
+  void shouldNotBeAbleToDeleteOthersMemoryTracker() {
+    MemoryTracker tracker =
+        makeMe.aMemoryTrackerBy(makeMe.aUser().please()).propertyKey("topic").please();
+
+    assertThrows(UnexpectedNoAccessRightException.class, () -> controller.delete(tracker));
+  }
+
+  @Test
+  void shouldRequireUserToBeLoggedIn() {
+    currentUser.setUser(null);
+    MemoryTracker tracker =
+        makeMe.aMemoryTrackerBy(makeMe.aUser().please()).propertyKey("topic").please();
+
+    assertThrows(ResponseStatusException.class, () -> controller.delete(tracker));
+  }
+}

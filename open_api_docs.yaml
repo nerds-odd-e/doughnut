@@ -2701,6 +2701,19 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/MemoryTracker"
+    delete:
+      tags:
+      - memory-tracker-controller
+      operationId: delete
+      parameters:
+      - name: memoryTracker
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
   /api/memory-trackers/{memoryTracker}/threshold-exceeded:
     get:
       tags:

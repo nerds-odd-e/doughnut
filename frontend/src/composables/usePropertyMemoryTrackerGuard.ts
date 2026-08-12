@@ -78,7 +78,7 @@ export function usePropertyMemoryTrackerGuard(
       return false
     }
 
-    const { error } = await MemoryTrackerController.softDelete({
+    const { error } = await MemoryTrackerController.delete({
       path: { memoryTracker: tracker.id },
     })
     if (error) {

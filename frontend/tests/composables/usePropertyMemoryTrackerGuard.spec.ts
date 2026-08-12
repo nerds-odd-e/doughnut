@@ -26,18 +26,14 @@ vi.mock("@/components/commons/Popups/usePopups", () => ({
 describe("usePropertyMemoryTrackerGuard", () => {
   const noteId = 42
   let getNoteInfoSpy: ReturnType<typeof mockSdkService>
-  let softDeleteSpy: ReturnType<typeof mockSdkService>
+  let deleteSpy: ReturnType<typeof mockSdkService>
   let updatePropertyKeySpy: ReturnType<typeof mockSdkService>
 
   beforeEach(() => {
     getNoteInfoSpy = mockSdkService(NoteController, "getNoteInfo", {
       memoryTrackers: [],
     })
-    softDeleteSpy = mockSdkService(
-      MemoryTrackerController,
-      "softDelete",
-      undefined
-    )
+    deleteSpy = mockSdkService(MemoryTrackerController, "delete", undefined)
     updatePropertyKeySpy = mockSdkService(
       MemoryTrackerController,
       "updatePropertyKey",
@@ -89,7 +85,7 @@ describe("usePropertyMemoryTrackerGuard", () => {
     expect(confirmMock).not.toHaveBeenCalled()
   })
 
-  it("soft-deletes the tracker when the user confirms removal", async () => {
+  it("hard-deletes the tracker when the user confirms removal", async () => {
     mockNoteInfoWithPropertyTrackers([{ key: "topic", id: 99 }])
     confirmMock.mockImplementationOnce(() => Promise.resolve(true))
 
@@ -102,7 +98,7 @@ describe("usePropertyMemoryTrackerGuard", () => {
     expect(confirmMock).toHaveBeenCalledWith(
       'Property "topic" has a memory tracker. Deleting it will also delete that tracker. Continue?'
     )
-    expect(softDeleteSpy).toHaveBeenCalledWith({
+    expect(deleteSpy).toHaveBeenCalledWith({
       path: { memoryTracker: 99 },
     })
   })
@@ -117,13 +113,13 @@ describe("usePropertyMemoryTrackerGuard", () => {
 
     await expect(confirmAndApplyRemoval("topic")).resolves.toBe(false)
 
-    expect(softDeleteSpy).not.toHaveBeenCalled()
+    expect(deleteSpy).not.toHaveBeenCalled()
   })
 
-  it("returns false when softDelete fails", async () => {
+  it("returns false when delete fails", async () => {
     mockNoteInfoWithPropertyTrackers([{ key: "topic", id: 99 }])
     confirmMock.mockImplementationOnce(() => Promise.resolve(true))
-    softDeleteSpy.mockResolvedValue(wrapSdkError("server error"))
+    deleteSpy.mockResolvedValue(wrapSdkError("server error"))
 
     const { confirmAndApplyRemoval } = usePropertyMemoryTrackerGuard(
       () => noteId
@@ -198,12 +194,12 @@ describe("usePropertyMemoryTrackerGuard", () => {
       ])
     ).resolves.toBe(true)
 
-    expect(updatePropertyKeySpy).toHaveBeenCalledBefore(softDeleteSpy)
+    expect(updatePropertyKeySpy).toHaveBeenCalledBefore(deleteSpy)
     expect(updatePropertyKeySpy).toHaveBeenCalledWith({
       path: { memoryTracker: 99 },
       body: { propertyKey: "subject" },
     })
-    expect(softDeleteSpy).toHaveBeenCalledWith({
+    expect(deleteSpy).toHaveBeenCalledWith({
       path: { memoryTracker: 100 },
     })
   })

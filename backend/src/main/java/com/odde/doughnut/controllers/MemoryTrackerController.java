@@ -165,4 +165,14 @@ class MemoryTrackerController {
     memoryTrackerService.updatePropertyKey(memoryTracker, dto.getPropertyKey());
     return memoryTracker;
   }
+
+  @DeleteMapping("/{memoryTracker}")
+  @Transactional
+  public void delete(
+      @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertLoggedIn();
+    authorizationService.assertReadAuthorization(memoryTracker);
+    memoryTrackerService.delete(memoryTracker);
+  }
 }

@@ -126,17 +126,13 @@ export function setupMemoryTrackerSdkMocks() {
   const getNoteInfoSpy = mockSdkService(NoteController, "getNoteInfo", {
     memoryTrackers: [],
   })
-  const softDeleteSpy = mockSdkService(
-    MemoryTrackerController,
-    "softDelete",
-    undefined
-  )
+  const deleteSpy = mockSdkService(MemoryTrackerController, "delete", undefined)
   const updatePropertyKeySpy = mockSdkService(
     MemoryTrackerController,
     "updatePropertyKey",
     undefined
   )
-  return { getNoteInfoSpy, softDeleteSpy, updatePropertyKeySpy }
+  return { getNoteInfoSpy, deleteSpy, updatePropertyKeySpy }
 }
 
 export function mockNoteInfoWithPropertyTracker(

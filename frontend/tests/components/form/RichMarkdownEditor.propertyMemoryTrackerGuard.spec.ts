@@ -37,18 +37,14 @@ topic: training
 Workshop body.`
 
   let getNoteInfoSpy: ReturnType<typeof mockSdkService>
-  let softDeleteSpy: ReturnType<typeof mockSdkService>
+  let deleteSpy: ReturnType<typeof mockSdkService>
   let updatePropertyKeySpy: ReturnType<typeof mockSdkService>
 
   beforeEach(() => {
     getNoteInfoSpy = mockSdkService(NoteController, "getNoteInfo", {
       memoryTrackers: [],
     })
-    softDeleteSpy = mockSdkService(
-      MemoryTrackerController,
-      "softDelete",
-      undefined
-    )
+    deleteSpy = mockSdkService(MemoryTrackerController, "delete", undefined)
     updatePropertyKeySpy = mockSdkService(
       MemoryTrackerController,
       "updatePropertyKey",
@@ -73,7 +69,7 @@ Workshop body.`
   const topicRowSelector = propertyRowSelector("topic")
   const topicRowKeyInputSelector = `${topicRowSelector} [data-testid="rich-note-property-row-key-input"]`
 
-  it("soft-deletes the tracker and removes the property when the user confirms", async () => {
+  it("hard-deletes the tracker and removes the property when the user confirms", async () => {
     const tracker = mockNoteInfoWithPropertyTracker("topic", 99)
     confirmMock.mockImplementationOnce(() => Promise.resolve(true))
 
@@ -83,7 +79,7 @@ Workshop body.`
     await flushPromises()
 
     await vi.waitFor(() => {
-      expect(softDeleteSpy).toHaveBeenCalledWith({
+      expect(deleteSpy).toHaveBeenCalledWith({
         path: { memoryTracker: tracker.id },
       })
     })
@@ -106,7 +102,7 @@ Workshop body.`
       expect(confirmMock).toHaveBeenCalledOnce()
     })
 
-    expect(softDeleteSpy).not.toHaveBeenCalled()
+    expect(deleteSpy).not.toHaveBeenCalled()
     expect(wrapper.emitted("update:modelValue")?.length ?? 0).toBe(
       emitCountBefore
     )

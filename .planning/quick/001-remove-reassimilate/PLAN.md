@@ -62,15 +62,9 @@ Removed `removeMemoryTrackersForReassimilation`, reappears E2E scenario, unit te
 
 ---
 
-### Phase 5 — Structure: Hard-delete memory tracker API — **planned**
+### Phase 5 — Structure: Hard-delete memory tracker API — **done**
 
-**Enables:** Phase 6 property-removal wiring.
-
-**Change:** Add hard-delete endpoint (e.g. `DELETE /api/memory-trackers/{id}`) that removes the row; auth like other tracker mutations; backend controller tests; regenerate TS client.
-
-**Verify:** Backend tests for success + unauthorized; client generated.
-
-**Stop-safe:** API available; UI still soft-deletes on property removal until Phase 6.
+`DELETE /api/memory-trackers/{id}` hard-deletes row; `MemoryTrackerDeleteControllerTest` green; client regenerated.
 
 ---
 

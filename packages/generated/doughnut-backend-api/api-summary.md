@@ -145,6 +145,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `updatePropertyKey`: PATCH `/api/memory-trackers/{memoryTracker}/property-key` -> `UpdatePropertyKeyResponse` (request: `UpdatePropertyKeyData`; path: memoryTracker; body: UpdateMemoryTrackerPropertyKeyDto; response body: MemoryTracker)
 - `markAsRecalled`: PATCH `/api/memory-trackers/{memoryTracker}/mark-as-recalled` -> `MarkAsRecalledResponse` (request: `MarkAsRecalledData`; path: memoryTracker; query: successful; response body: MemoryTracker)
 - `showMemoryTracker`: GET `/api/memory-trackers/{memoryTracker}` -> `ShowMemoryTrackerResponse` (request: `ShowMemoryTrackerData`; path: memoryTracker; response body: MemoryTracker)
+- `delete`: DELETE `/api/memory-trackers/{memoryTracker}` -> `DeleteResponse` (request: `DeleteData`; path: memoryTracker; response body: void)
 - `getThresholdExceeded`: GET `/api/memory-trackers/{memoryTracker}/threshold-exceeded` -> `GetThresholdExceededResponse` (request: `GetThresholdExceededData`; path: memoryTracker; response body: ThresholdExceededResult)
 - `getRecallPrompts`: GET `/api/memory-trackers/{memoryTracker}/recall-prompts` -> `GetRecallPromptsResponse` (request: `GetRecallPromptsData`; path: memoryTracker; response body: Array<RecallPromptHistoryItem>)
 - `askAQuestion`: GET `/api/memory-trackers/{memoryTracker}/question` -> `AskAQuestionResponse` (request: `AskAQuestionData`; path: memoryTracker; response body: RecallQuestion)

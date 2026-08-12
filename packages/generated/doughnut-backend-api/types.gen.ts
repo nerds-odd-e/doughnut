@@ -3542,6 +3542,22 @@ export type GetBookFileResponses = {
 
 export type GetBookFileResponse = GetBookFileResponses[keyof GetBookFileResponses];
 
+export type DeleteData = {
+    body?: never;
+    path: {
+        memoryTracker: number;
+    };
+    query?: never;
+    url: '/api/memory-trackers/{memoryTracker}';
+};
+
+export type DeleteResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type ShowMemoryTrackerData = {
     body?: never;
     path: {

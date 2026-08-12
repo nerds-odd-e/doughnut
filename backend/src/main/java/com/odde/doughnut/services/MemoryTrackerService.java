@@ -93,6 +93,10 @@ public class MemoryTrackerService {
     entityPersister.save(memoryTracker);
   }
 
+  public void delete(MemoryTracker memoryTracker) {
+    entityPersister.remove(memoryTracker);
+  }
+
   public void updatePropertyKey(MemoryTracker memoryTracker, String newPropertyKey) {
     if (memoryTracker.getDeletedAt() != null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Memory tracker is deleted");

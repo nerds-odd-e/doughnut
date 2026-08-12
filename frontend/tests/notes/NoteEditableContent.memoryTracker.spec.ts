@@ -18,9 +18,7 @@ describe("NoteEditableContent property memory tracker guard on markdown", () => 
   let getNoteInfoSpy: ReturnType<
     typeof setupMemoryTrackerSdkMocks
   >["getNoteInfoSpy"]
-  let softDeleteSpy: ReturnType<
-    typeof setupMemoryTrackerSdkMocks
-  >["softDeleteSpy"]
+  let deleteSpy: ReturnType<typeof setupMemoryTrackerSdkMocks>["deleteSpy"]
   let updatePropertyKeySpy: ReturnType<
     typeof setupMemoryTrackerSdkMocks
   >["updatePropertyKeySpy"]
@@ -32,7 +30,7 @@ describe("NoteEditableContent property memory tracker guard on markdown", () => 
     vi.resetAllMocks()
     vi.useFakeTimers()
     updateNoteContentSpy = setupUpdateNoteContentMock()
-    ;({ getNoteInfoSpy, softDeleteSpy, updatePropertyKeySpy } =
+    ;({ getNoteInfoSpy, deleteSpy, updatePropertyKeySpy } =
       setupMemoryTrackerSdkMocks())
     mockPopupsOptions = vi.fn().mockResolvedValue(null)
     confirmMock = vi.fn<(msg: string) => Promise<boolean>>()
@@ -45,7 +43,7 @@ describe("NoteEditableContent property memory tracker guard on markdown", () => 
     vi.useRealTimers()
   })
 
-  it("soft-deletes the tracker and saves when the user confirms removing a tracked property", async () => {
+  it("hard-deletes the tracker and saves when the user confirms removing a tracked property", async () => {
     const tracker = mockNoteInfoWithPropertyTracker(getNoteInfoSpy, "topic", 99)
     confirmMock.mockImplementationOnce(() => Promise.resolve(true))
 
@@ -64,7 +62,7 @@ Workshop body.`
     expect(confirmMock).toHaveBeenCalledWith(
       'Property "topic" has a memory tracker. Deleting it will also delete that tracker. Continue?'
     )
-    expect(softDeleteSpy).toHaveBeenCalledWith({
+    expect(deleteSpy).toHaveBeenCalledWith({
       path: { memoryTracker: tracker.id },
     })
     expect(updateNoteContentSpy).toHaveBeenCalledWith({
@@ -124,7 +122,7 @@ Workshop body.`
     await advanceNoteContentSaveDebounce()
 
     expect(confirmMock).toHaveBeenCalledOnce()
-    expect(softDeleteSpy).not.toHaveBeenCalled()
+    expect(deleteSpy).not.toHaveBeenCalled()
     expect(updateNoteContentSpy).not.toHaveBeenCalled()
     wrapper.unmount()
   })
