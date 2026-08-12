@@ -28,6 +28,7 @@ No active plan. Last shipped: display-name surrounding-whitespace invariant
 | seed | SEED-001-mcq-fuzzy-notebook-title-spelling-match | dormant |
 | seed | SEED-002-host-mcp-over-https | dormant |
 | seed | SEED-003-close-okf-v0-2-compatibility-gaps | dormant |
+| seed | SEED-004-close-spaced-repetition-scheduling-policy-gap | dormant |
 | tech_debt | OpenAPI/`outgoingLinks`/`linkText` glossary rename (ADR 0001) | open |
 | tech_debt | CLS optional polish (`authorizedNotebook`, domain exceptions, unused record `timezone` param) | open |
 | deferred | Refine note on answered spelling questions | deferred |
