@@ -8,7 +8,7 @@ status: in_progress
 stopped_at: null
 last_updated: "2026-08-12T12:50:00Z"
 last_activity: 2026-08-12
-last_activity_desc: shipped rich property options caret (quick/002); remove-reassimilate phase 2 next
+last_activity_desc: remove-reassimilate phase 2 in progress
 progress:
   total_phases: 9
   completed_phases: 1
@@ -28,8 +28,6 @@ See: `.planning/PROJECT.md`
 ## Current Position
 
 Executing: [`.planning/quick/001-remove-reassimilate/`](quick/001-remove-reassimilate/) — Phase 2 (frequent-failure warning E2E).
-
-Also shipped today: rich note property options caret (`.planning/quick/002-rich-property-options/` — Phase 1 done).
 
 ## Deferred Items
 
