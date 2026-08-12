@@ -4,6 +4,11 @@ import {
   mountNoteToolbar,
   resetNoteToolbarTestState,
 } from "@tests/notes/noteToolbarTestHelpers"
+import { noteMoreOptionsTitles } from "@/components/notes/widgets/noteMoreOptionsTitles"
+import {
+  setNoteToolbarNavWidth,
+  wideNoteToolbarNavWidth,
+} from "@tests/helpers/mockNoteToolbarNavWidth"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
@@ -48,6 +53,8 @@ describe("NoteToolbar assimilation panel", () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
 
     wrapper = await mountNoteToolbar(noteRealm)
+    setNoteToolbarNavWidth(wrapper, wideNoteToolbarNavWidth)
+    await flushPromises()
     useAssimilationView().openForNote(noteRealm.note.id)
     await flushPromises()
 
@@ -55,7 +62,9 @@ describe("NoteToolbar assimilation panel", () => {
       true
     )
 
-    await wrapper.find('button[title="Audio tools"]').trigger("click")
+    await wrapper
+      .find(`button[title="${noteMoreOptionsTitles.audio}"]`)
+      .trigger("click")
     await flushPromises()
 
     expect(wrapper.find('[data-testid="assimilation-settings"]').exists()).toBe(

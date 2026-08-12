@@ -51,17 +51,6 @@
         <LayoutTemplate class="w-6 h-6" />
       </button>
 
-      <button
-        v-if="!readonly"
-        type="button"
-        :class="['daisy-btn daisy-btn-ghost daisy-btn-sm', { 'daisy-btn-active': isAudioOpen }]"
-        title="Audio tools"
-        :aria-pressed="isAudioOpen"
-        @click="toggleAudio"
-      >
-        <Mic class="w-6 h-6" />
-      </button>
-
       <NoteToolbarMoreOptions
         v-if="!readonly"
         ref="moreOptionsRef"
@@ -87,7 +76,7 @@ import type { Folder, Note, NoteRealm } from "@generated/doughnut-backend-api"
 import SvgSearchForWikiLinkOrRelationship from "../../svgs/SvgSearchForWikiLinkOrRelationship.vue"
 import SearchForm from "../../wiki-link-or-relationship/SearchForm.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
-import { FileCode, LayoutTemplate, MessageCircle, Mic } from "@lucide/vue"
+import { FileCode, LayoutTemplate, MessageCircle } from "@lucide/vue"
 import NoteAudioTools from "../widgets/NoteAudioTools.vue"
 import AssimilationPanel from "@/components/recall/AssimilationPanel.vue"
 import NoteToolbarPanelShell from "./NoteToolbarPanelShell.vue"
@@ -125,7 +114,7 @@ const showRelocatedNewNote = computed(
   () => !sidebarOpened.value && props.readonly !== true
 )
 
-const { isAudioOpen, isPanelOpen, toggleAudio } = useNoteToolbarPanel()
+const { isAudioOpen, isPanelOpen } = useNoteToolbarPanel()
 const { isOpenForNote } = useAssimilationView()
 const storageAccessor = useStorageAccessor()
 const assimilationPanelKey = ref(0)

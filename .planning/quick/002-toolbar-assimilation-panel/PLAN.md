@@ -1,6 +1,6 @@
 # Toolbar assimilation panel — PLAN
 
-Status: planned  
+Status: complete  
 Context: [CONTEXT.md](./CONTEXT.md)
 
 ## Intent

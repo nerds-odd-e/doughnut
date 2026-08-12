@@ -11,7 +11,9 @@ import { noteMoreOptionsTitles } from "@/components/notes/widgets/noteMoreOption
 import {
   mountNoteToolbar,
   noteToolbarProps,
+  resetNoteToolbarTestState,
 } from "@tests/notes/noteToolbarTestHelpers"
+import { useNoteToolbarPanel } from "@/composables/useNoteToolbarPanel"
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 
@@ -30,6 +32,7 @@ describe("NoteToolbar more options", () => {
 
   beforeEach(() => {
     installMockResizeObserver()
+    resetNoteToolbarTestState()
   })
 
   it("copies export markdown while keeping the export dialog open", async () => {
@@ -125,8 +128,65 @@ describe("NoteToolbar more options", () => {
       false
     )
     expect(wrapper.find(`button[title="${titles.export}"]`).exists()).toBe(true)
+    expect(wrapper.find(`button[title="${titles.audio}"]`).exists()).toBe(true)
     expect(
       wrapper.find(`button[title="${titles.assimilation}"]`).exists()
     ).toBe(true)
+  })
+
+  it("toggles the audio tools panel from the inline more-options button", async () => {
+    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
+    wrapper = await mountNoteToolbar(noteRealm)
+    setNoteToolbarNavWidth(wrapper, wideNoteToolbarNavWidth)
+    await flushPromises()
+
+    const audioToolsButton = wrapper.find(`button[title="${titles.audio}"]`)
+    expect(audioToolsButton.exists()).toBe(true)
+    expect(audioToolsButton.classes()).not.toContain("daisy-btn-active")
+    expect(
+      wrapper.find('[data-testid="note-toolbar-panel-shell"]').exists()
+    ).toBe(false)
+
+    await audioToolsButton.trigger("click")
+    await flushPromises()
+
+    expect(
+      wrapper.find('[data-testid="note-toolbar-panel-shell"]').exists()
+    ).toBe(true)
+    expect(useNoteToolbarPanel().isAudioOpen.value).toBe(true)
+    expect(audioToolsButton.classes()).toContain("daisy-btn-active")
+    expect(audioToolsButton.attributes("aria-pressed")).toBe("true")
+
+    await audioToolsButton.trigger("click")
+    await flushPromises()
+
+    expect(
+      wrapper.find('[data-testid="note-toolbar-panel-shell"]').exists()
+    ).toBe(false)
+    expect(audioToolsButton.classes()).not.toContain("daisy-btn-active")
+    expect(audioToolsButton.attributes("aria-pressed")).toBe("false")
+  })
+
+  it("toggles the audio tools panel from the overflow menu", async () => {
+    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
+    wrapper = await mountNoteToolbar(noteRealm)
+    setNoteToolbarNavWidth(wrapper, narrowNoteToolbarNavWidth)
+    await flushPromises()
+
+    await wrapper.find(`[title="${titles.overflowMenu}"]`).trigger("click")
+    await flushPromises()
+
+    const audioToolsButton = document.querySelector(
+      `button[title="${titles.audio}"]`
+    ) as HTMLButtonElement
+    expect(audioToolsButton).toBeTruthy()
+    audioToolsButton.click()
+    await flushPromises()
+
+    expect(
+      wrapper.find('[data-testid="note-toolbar-panel-shell"]').exists()
+    ).toBe(true)
+    expect(useNoteToolbarPanel().isAudioOpen.value).toBe(true)
+    expect(document.querySelector("[data-dropdown-portal-panel]")).toBeNull()
   })
 })

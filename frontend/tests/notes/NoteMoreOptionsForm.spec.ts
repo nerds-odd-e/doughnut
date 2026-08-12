@@ -9,6 +9,8 @@ import usePopups from "@/components/commons/Popups/usePopups"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
 import { useAssimilationView } from "@/composables/useAssimilationView"
+import { useNoteToolbarPanel } from "@/composables/useNoteToolbarPanel"
+import { noteMoreOptionsTitles } from "@/components/notes/widgets/noteMoreOptionsTitles"
 import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
 import { setupGlobalClient } from "@/managedApi/clientSetup"
 
@@ -32,6 +34,7 @@ afterEach(() => {
 
 beforeEach(() => {
   useAssimilationView().dismiss()
+  useNoteToolbarPanel().close()
   usePopups().popups.register({ popupInfo: [] })
   setupGlobalClient(apiStatus)
   mockToast.error.mockClear()
@@ -56,16 +59,72 @@ describe("NoteMoreOptionsForm", () => {
 
       await flushPromises()
 
-      expect(wrapper.find('button[title="Export... (e)"]').exists()).toBe(true)
       expect(
-        wrapper.find('button[title="Questions for the note"]').exists()
+        wrapper.find(`button[title="${noteMoreOptionsTitles.export}"]`).exists()
       ).toBe(true)
       expect(
-        wrapper.find('button[title="Assimilation settings"]').exists()
+        wrapper
+          .find(`button[title="${noteMoreOptionsTitles.questions}"]`)
+          .exists()
       ).toBe(true)
-      expect(wrapper.find('button[title="Delete note (d)"]').exists()).toBe(
-        true
+      expect(
+        wrapper.find(`button[title="${noteMoreOptionsTitles.audio}"]`).exists()
+      ).toBe(true)
+      expect(
+        wrapper
+          .find(`button[title="${noteMoreOptionsTitles.assimilation}"]`)
+          .exists()
+      ).toBe(true)
+      expect(
+        wrapper.find(`button[title="${noteMoreOptionsTitles.delete}"]`).exists()
+      ).toBe(true)
+    })
+  })
+
+  describe("audio tools toggle", () => {
+    it("opens the audio tools panel and shows checked state", async () => {
+      const wrapper = renderer.withProps({ note }).mount()
+
+      await flushPromises()
+
+      const audioButton = wrapper.find(
+        `button[title="${noteMoreOptionsTitles.audio}"]`
       )
+      await audioButton.trigger("click")
+      await flushPromises()
+
+      expect(useNoteToolbarPanel().isAudioOpen.value).toBe(true)
+      expect(
+        wrapper.find('[data-testid="dropdown-menu-action-checked"]').exists()
+      ).toBe(true)
+    })
+
+    it("emits close-dialog when audio tools button is clicked", async () => {
+      const wrapper = renderer.withProps({ note }).mount()
+
+      await flushPromises()
+
+      const audioButton = wrapper.find(
+        `button[title="${noteMoreOptionsTitles.audio}"]`
+      )
+      await audioButton.trigger("click")
+
+      expect(wrapper.emitted()).toHaveProperty("close-dialog")
+    })
+
+    it("closes the audio tools panel when toggled while already open", async () => {
+      useNoteToolbarPanel().toggleAudio()
+
+      const wrapper = renderer.withProps({ note }).mount()
+      await flushPromises()
+
+      const audioButton = wrapper.find(
+        `button[title="${noteMoreOptionsTitles.audio}"]`
+      )
+      await audioButton.trigger("click")
+      await flushPromises()
+
+      expect(useNoteToolbarPanel().isAudioOpen.value).toBe(false)
     })
   })
 
@@ -77,7 +136,7 @@ describe("NoteMoreOptionsForm", () => {
       await flushPromises()
 
       const assimilateButton = wrapper.find(
-        'button[title="Assimilation settings"]'
+        `button[title="${noteMoreOptionsTitles.assimilation}"]`
       )
       await assimilateButton.trigger("click")
 
@@ -95,7 +154,7 @@ describe("NoteMoreOptionsForm", () => {
       await flushPromises()
 
       const assimilateButton = wrapper.find(
-        'button[title="Assimilation settings"]'
+        `button[title="${noteMoreOptionsTitles.assimilation}"]`
       )
       await assimilateButton.trigger("click")
 
@@ -110,7 +169,7 @@ describe("NoteMoreOptionsForm", () => {
       await flushPromises()
 
       const assimilateButton = wrapper.find(
-        'button[title="Assimilation settings"]'
+        `button[title="${noteMoreOptionsTitles.assimilation}"]`
       )
       await assimilateButton.trigger("click")
       await flushPromises()

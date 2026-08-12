@@ -7,6 +7,7 @@ import {
 import { questionListPage } from './questionListPage'
 
 const titles = {
+  audio: 'Audio tools',
   assimilation: 'Assimilation settings',
   delete: 'Delete note (d)',
   questions: 'Questions for the note',
@@ -21,29 +22,35 @@ const visibleMoreOptionsButton = (title: string) =>
 const assimilationSettingsButton = () =>
   visibleMoreOptionsButton(titles.assimilation)
 
-const openOverflowMenuIfNeeded = () => {
-  cy.get(`button[title="${titles.assimilation}"]`, { timeout: 15000 }).then(
-    ($buttons) => {
-      if ($buttons.filter(':visible').length > 0) {
-        return
-      }
+const audioToolsButton = () => visibleMoreOptionsButton(titles.audio)
 
-      noteShowToolbar()
-        .find(`summary[title="${titles.overflowMenu}"]`)
-        .should('be.visible')
-        .click()
+const peerToggleSelector = [
+  `button[title="${titles.assimilation}"]`,
+  `button[title="${titles.audio}"]`,
+].join(', ')
+
+const openOverflowMenuIfNeeded = () => {
+  cy.get(peerToggleSelector, { timeout: 15000 }).then(($buttons) => {
+    if ($buttons.filter(':visible').length > 0) {
+      return
     }
-  )
+
+    noteShowToolbar()
+      .find(`summary[title="${titles.overflowMenu}"]`)
+      .should('be.visible')
+      .click()
+  })
 }
 
 /**
- * Ensures Export / Questions / Assimilation / Delete are reachable — either on the
+ * Ensures Export / Questions / Audio / Assimilation / Delete are reachable — either on the
  * toolbar (wide note column) or inside the overflow menu (narrow).
  */
 export const makeSureNoteMoreOptionsFormIsOpen = () => {
   noteShowToolbar().should('exist')
   openOverflowMenuIfNeeded()
   assimilationSettingsButton().should('be.visible')
+  audioToolsButton().should('be.visible')
 
   return noteMoreOptionsPage()
 }
@@ -77,6 +84,11 @@ const noteMoreOptionsPage = () => {
     openQuestionList() {
       visibleMoreOptionsButton(titles.questions).click()
       return questionListPage()
+    },
+    openAudioTools() {
+      audioToolsButton().scrollIntoView().click()
+      cy.findByRole('button', { name: 'Record Audio' }).should('be.visible')
+      waitUntilAppIsNotBusy()
     },
     openAssimilationSettings() {
       cy.document().then((doc) => {

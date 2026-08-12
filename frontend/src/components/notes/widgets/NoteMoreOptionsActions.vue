@@ -30,6 +30,15 @@
 
     <DropdownMenuItem>
       <DropdownMenuActionButton
+        :title="titles.audio"
+        :icon="Mic"
+        :checked="isAudioOpen"
+        @click="onAudioToggle"
+      />
+    </DropdownMenuItem>
+
+    <DropdownMenuItem>
+      <DropdownMenuActionButton
         :title="titles.assimilation"
         :icon="CircleCheck"
         :checked="assimilationChecked"
@@ -73,6 +82,20 @@
       type="button"
       :class="[
         toolbarGhostBtnClass,
+        { 'daisy-btn-active': isAudioOpen },
+      ]"
+      :title="titles.audio"
+      :aria-label="titles.audio"
+      :aria-pressed="isAudioOpen"
+      @click="onAudioToggle"
+    >
+      <Mic class="w-6 h-6" aria-hidden="true" />
+    </button>
+
+    <button
+      type="button"
+      :class="[
+        toolbarGhostBtnClass,
         { 'daisy-btn-active': assimilationChecked },
       ]"
       :title="titles.assimilation"
@@ -99,9 +122,16 @@
 import type { Note } from "@generated/doughnut-backend-api"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import Questions from "@/components/notes/Questions.vue"
-import { CircleCheck, MessageCircleQuestion, Trash2, Upload } from "@lucide/vue"
+import {
+  CircleCheck,
+  MessageCircleQuestion,
+  Mic,
+  Trash2,
+  Upload,
+} from "@lucide/vue"
 import NoteExportForm from "@/components/notes/core/NoteExportForm.vue"
 import { useAssimilationView } from "@/composables/useAssimilationView"
+import { useNoteToolbarPanel } from "@/composables/useNoteToolbarPanel"
 import { useNoteDeleteFlow } from "@/composables/useNoteDeleteFlow"
 import DropdownMenuActionButton from "@/components/commons/DropdownMenuActionButton.vue"
 import DropdownMenuItem from "@/components/commons/DropdownMenuItem.vue"
@@ -124,6 +154,7 @@ const emit = defineEmits<{
 }>()
 
 const { toggle, isOpenForNote } = useAssimilationView()
+const { isAudioOpen, toggleAudio } = useNoteToolbarPanel()
 const noteId = computed(() => props.note.id)
 const noteTitle = computed(() => props.note.noteTopology.title)
 const { deleteNote } = useNoteDeleteFlow(noteId, noteTitle)
@@ -143,10 +174,19 @@ useKeyboardShortcut("note-delete", deleteNote, () => shortcutScope.value)
 
 const assimilationChecked = computed(() => isOpenForNote(props.note.id))
 
-const onAssimilationToggle = () => {
-  toggle(props.note.id)
+const closeDialogIfMenu = () => {
   if (props.layout === "menu") {
     emit("close-dialog")
   }
+}
+
+const onAudioToggle = () => {
+  toggleAudio()
+  closeDialogIfMenu()
+}
+
+const onAssimilationToggle = () => {
+  toggle(props.note.id)
+  closeDialogIfMenu()
 }
 </script>

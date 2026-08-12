@@ -179,38 +179,7 @@ describe("NoteToolbar", () => {
     expect(wrapper.emitted("edit-as-markdown")).toBeUndefined()
   })
 
-  it("toggles the audio tools panel from the toolbar button", async () => {
-    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
-
-    wrapper = await mountNoteToolbar(noteRealm)
-    const audioToolsButton = wrapper.find('button[title="Audio tools"]')
-
-    expect(audioToolsButton.exists()).toBe(true)
-    expect(audioToolsButton.classes()).not.toContain("daisy-btn-active")
-    expect(
-      wrapper.find('[data-testid="note-toolbar-panel-shell"]').exists()
-    ).toBe(false)
-
-    await audioToolsButton.trigger("click")
-    await flushPromises()
-
-    expect(
-      wrapper.find('[data-testid="note-toolbar-panel-shell"]').exists()
-    ).toBe(true)
-    expect(audioToolsButton.classes()).toContain("daisy-btn-active")
-    expect(audioToolsButton.attributes("aria-pressed")).toBe("true")
-
-    await audioToolsButton.trigger("click")
-    await flushPromises()
-
-    expect(
-      wrapper.find('[data-testid="note-toolbar-panel-shell"]').exists()
-    ).toBe(false)
-    expect(audioToolsButton.classes()).not.toContain("daisy-btn-active")
-    expect(audioToolsButton.attributes("aria-pressed")).toBe("false")
-  })
-
-  it("does not emit edit-as-markdown when m is pressed and shortcut scope is inactive", async () => {
+  it("does not emit edit-as-markdown when m is pressed and readonly", async () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
 
     const Harness = wrapWithNoteShortcutScope(

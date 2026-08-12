@@ -166,7 +166,7 @@ export const assumeNotePage = (
       testability().renameInjectedNoteTitleForNoteOnPage(newTitle)
     },
     audioTools() {
-      this.toolbarButton('Audio tools').click()
+      makeSureNoteMoreOptionsFormIsOpen().openAudioTools()
       return audioToolsPage()
     },
     navigateToReference: (referenceTopic: string) => {
