@@ -35,19 +35,17 @@ green.
 
 ## Production hard-delete incident & prevention (Shipped: 2026-08-12)
 
-**Quick plan:** `003-safe-hard-delete` (8 phases) — response to outage from `V300000245`.
-
-**Incident:** Cascading `DELETE` on `memory_tracker` blocked by `conversation_ibfk_4` (RESTRICT on `recall_prompt_id`). Flyway fail-stop startup took both MIG instances offline.
+**Incident:** `V300000245` (from [remove re-assimilate](quick/001-remove-reassimilate/) phase 8) ran a cascading `DELETE` on `memory_tracker`; blocked at `conversation_ibfk_4` (RESTRICT on `recall_prompt_id`). Flyway fail-stop startup crash-looped both MIG instances (`503 no healthy upstream`).
 
 **Delivered:**
 
 - Removed failed migration; `conversation.recall_prompt_id` → `ON DELETE SET NULL` (`V300000246`)
-- Deploy gated on `/api/healthcheck`; success record only after verified probe
+- Deploy gated on `/api/healthcheck`; success record only after verified probe (`docs/gcp/conditional-backend-deploy.md`)
 - CI and deploy split (`deploy.yml` on green CI); deploy only latest `main` HEAD
-- `DeletableEntityFkClosureTest`, ERD delete-rule labels, migration/testing rule updates
+- `DeletableEntityFkClosureTest`, ERD delete-rule labels, `db-migration.mdc` / `unit-testing.mdc` updates
 
-**Causal link:** Migration introduced by [remove re-assimilate](quick/001-remove-reassimilate/) phase 8; orphan cleanup was unnecessary (partial unique index already ignores soft-deleted rows).
+**Learnings:** `migrateTestDB` on empty DB cannot validate destructive DML; orphan cleanup was unnecessary (partial unique index ignores soft-deleted rows); fire-and-forget deploy recorded unhealthy releases as successful.
 
-**Detail:** [CONTEXT.md](quick/003-safe-hard-delete/CONTEXT.md)
+**Deferred:** post-deploy API paging; normalising legacy `*_ibfk_*` constraints; re-attempting orphan cleanup.
 
 ---

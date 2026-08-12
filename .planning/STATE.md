@@ -29,7 +29,7 @@ See: `.planning/PROJECT.md`
 
 Idle. No active plan.
 
-**Recently shipped:** [safe hard delete](quick/003-safe-hard-delete/CONTEXT.md) (2026-08-12) — recorded in [MILESTONES.md](MILESTONES.md).
+**Recently shipped:** production hard-delete incident response (2026-08-12) — [MILESTONES.md](MILESTONES.md).
 
 ## Operator Next Steps
 
