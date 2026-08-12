@@ -6,15 +6,15 @@ current_phase: null
 current_phase_name: null
 status: idle
 stopped_at: null
-last_updated: "2026-08-12T09:35:00Z"
+last_updated: "2026-08-12T09:40:00Z"
 last_activity: 2026-08-12
-last_activity_desc: 002-toolbar-assimilation-panel complete (phase 4 skipped)
+last_activity_desc: spent quick-plan history cleaned up
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 1
-  completed_plans: 1
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-Idle. Recently shipped: [toolbar assimilation panel](quick/002-toolbar-assimilation-panel/PLAN.md) (2026-08-12).
+Idle. No active plan.
 
 **Recently shipped:** production hard-delete incident response (2026-08-12) — [MILESTONES.md](MILESTONES.md).
 

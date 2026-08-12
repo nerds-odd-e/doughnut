@@ -35,7 +35,7 @@ green.
 
 ## Production hard-delete incident & prevention (Shipped: 2026-08-12)
 
-**Incident:** `V300000245` (from [remove re-assimilate](quick/001-remove-reassimilate/) phase 8) ran a cascading `DELETE` on `memory_tracker`; blocked at `conversation_ibfk_4` (RESTRICT on `recall_prompt_id`). Flyway fail-stop startup crash-looped both MIG instances (`503 no healthy upstream`).
+**Incident:** `V300000245` (remove re-assimilate phase 8) ran a cascading `DELETE` on `memory_tracker`; blocked at `conversation_ibfk_4` (RESTRICT on `recall_prompt_id`). Flyway fail-stop startup crash-looped both MIG instances (`503 no healthy upstream`).
 
 **Delivered:**
 
