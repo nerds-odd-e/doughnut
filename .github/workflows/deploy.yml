@@ -6,6 +6,10 @@ on:
     types: [completed]
     branches: [main]
 
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
 env:
   ARTIFACT: "doughnut"
   VERSION: "0.0.1-SNAPSHOT"
@@ -23,10 +27,35 @@ permissions:
   contents: read
 
 jobs:
+  main-head-guard:
+    name: Check deploy SHA is still main HEAD
+    runs-on: ${{ vars.RUNNER }}
+    if: github.event.workflow_run.conclusion == 'success'
+    outputs:
+      deploy: ${{ steps.head_guard.outputs.deploy }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 1
+      - name: Skip deploy if main has moved forward
+        id: head_guard
+        run: |
+          git fetch origin main --depth=1
+          MAIN_HEAD=$(git rev-parse origin/main)
+          if [ "$MAIN_HEAD" != "$GITHUB_SHA" ]; then
+            echo "Skipping deploy: origin/main is ${MAIN_HEAD}, this run is for ${GITHUB_SHA}"
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "origin/main matches deploy SHA ${GITHUB_SHA}"
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          fi
+
   Deploy:
     name: GCP deploy (GCS + MIG + health probe)
     runs-on: ${{ vars.RUNNER }}
-    if: github.event.workflow_run.conclusion == 'success'
+    needs: main-head-guard
+    if: needs.main-head-guard.outputs.deploy == 'true'
     steps:
       - uses: actions/checkout@v7
         with:

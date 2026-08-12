@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   ARTIFACT: "doughnut"
   VERSION: "0.0.1-SNAPSHOT"
