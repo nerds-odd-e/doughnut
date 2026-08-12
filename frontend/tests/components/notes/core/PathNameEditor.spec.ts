@@ -1,5 +1,6 @@
 import PathNameEditor from "@/components/notes/core/PathNameEditor.vue"
 import SeamlessTextEditor from "@/components/form/SeamlessTextEditor.vue"
+import { settleScheduledAutofocus } from "@tests/helpers/focusTargetTestSupport"
 import { flushPromises, mount } from "@vue/test-utils"
 import { describe, expect, it } from "vitest"
 
@@ -13,11 +14,6 @@ async function emitEditorValue(
 ) {
   findSeamless(wrapper).vm.$emit("update:modelValue", value)
   await flushPromises()
-}
-
-async function settlePathNameAutofocus() {
-  await flushPromises()
-  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
 }
 
 describe("PathNameEditor.vue", () => {
@@ -104,7 +100,7 @@ describe("PathNameEditor.vue", () => {
       attachTo: document.body,
     })
 
-    await settlePathNameAutofocus()
+    await settleScheduledAutofocus()
 
     expect(document.activeElement?.classList.contains("seamless-editor")).toBe(
       true

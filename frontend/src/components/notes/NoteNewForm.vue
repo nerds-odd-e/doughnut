@@ -24,7 +24,7 @@
               v-model="newTitle"
               :error-message="noteFormErrors.newTitle"
               autofocus
-              initial-select-all
+              :initial-select-all="initialTitle === undefined"
               @update:model-value="onTitleChange"
             >
               <template #append>

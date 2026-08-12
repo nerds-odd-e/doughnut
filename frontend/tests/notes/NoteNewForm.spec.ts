@@ -1,5 +1,6 @@
 import { flushPromises } from "@vue/test-utils"
 import { wrapSdkResponse } from "@tests/helpers"
+import { settleScheduledAutofocus } from "@tests/helpers/focusTargetTestSupport"
 import {
   mountNoteNewForm,
   noteNewFormNote,
@@ -47,7 +48,9 @@ describe("adding new note", () => {
   })
 
   afterEach(() => {
-    vi.runOnlyPendingTimers()
+    if (vi.isFakeTimers()) {
+      vi.runOnlyPendingTimers()
+    }
     vi.useRealTimers()
   })
 
@@ -163,6 +166,40 @@ describe("adding new note", () => {
       path: { note: noteNewFormNote.id },
       body: expect.objectContaining({ searchKey: "myth" }),
     })
+    wrapper.unmount()
+  })
+
+  it("selects all text when the default Untitled title is shown", async () => {
+    vi.useRealTimers()
+    const wrapper = mountNoteNewForm(notebookRootProps, {
+      attachTo: document.body,
+    })
+
+    await settleScheduledAutofocus()
+
+    expect(document.activeElement?.classList.contains("seamless-editor")).toBe(
+      true
+    )
+    expect(window.getSelection()?.toString()).toBe("Untitled")
+    wrapper.unmount()
+  })
+
+  it("does not select all text when initialTitle comes from a template", async () => {
+    vi.useRealTimers()
+    const wrapper = mountNoteNewForm(
+      {
+        ...notebookRootProps,
+        initialTitle: "2026-05-09",
+      },
+      { attachTo: document.body }
+    )
+
+    await settleScheduledAutofocus()
+
+    expect(document.activeElement?.classList.contains("seamless-editor")).toBe(
+      true
+    )
+    expect(window.getSelection()?.toString()).not.toBe("2026-05-09")
     wrapper.unmount()
   })
 })
