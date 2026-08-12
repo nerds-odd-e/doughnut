@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
+import com.odde.doughnut.controllers.dto.ThresholdExceededResult;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
@@ -82,8 +83,7 @@ public class MemoryTrackerService {
     entityPersister.save(memoryTracker);
 
     if (!correct) {
-      return hasExceededWrongAnswerThreshold(
-          memoryTracker, currentUTCTimestamp, WRONG_ANSWER_PERIOD_DAYS, WRONG_ANSWER_THRESHOLD);
+      return isThresholdExceeded(memoryTracker, currentUTCTimestamp);
     }
     return false;
   }
@@ -165,17 +165,26 @@ public class MemoryTrackerService {
         recallPrompt, answerSpellingDTO, user, currentUTCTimestamp);
   }
 
-  public boolean hasExceededWrongAnswerThreshold(
-      MemoryTracker memoryTracker, Timestamp currentTime, int periodDays, int threshold) {
+  public int countWrongAnswersInPeriod(
+      MemoryTracker memoryTracker, Timestamp currentTime, int periodDays) {
     Timestamp since =
         new Timestamp(currentTime.getTime() - (long) periodDays * 24 * 60 * 60 * 1000);
+    return recallPromptRepository.countWrongAnswersSinceForMemoryTracker(
+        memoryTracker.getId(), since);
+  }
+
+  public ThresholdExceededResult getThresholdExceededResult(
+      MemoryTracker memoryTracker, Timestamp currentTime) {
     int wrongCount =
-        recallPromptRepository.countWrongAnswersSinceForMemoryTracker(memoryTracker.getId(), since);
-    return wrongCount >= threshold;
+        countWrongAnswersInPeriod(memoryTracker, currentTime, WRONG_ANSWER_PERIOD_DAYS);
+    return new ThresholdExceededResult(
+        wrongCount >= WRONG_ANSWER_THRESHOLD,
+        wrongCount,
+        WRONG_ANSWER_THRESHOLD,
+        WRONG_ANSWER_PERIOD_DAYS);
   }
 
   public boolean isThresholdExceeded(MemoryTracker memoryTracker, Timestamp currentTime) {
-    return hasExceededWrongAnswerThreshold(
-        memoryTracker, currentTime, WRONG_ANSWER_PERIOD_DAYS, WRONG_ANSWER_THRESHOLD);
+    return getThresholdExceededResult(memoryTracker, currentTime).thresholdExceeded();
   }
 }

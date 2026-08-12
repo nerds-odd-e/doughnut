@@ -5236,6 +5236,15 @@ components:
       properties:
         thresholdExceeded:
           type: boolean
+        wrongCount:
+          type: integer
+          format: int32
+        threshold:
+          type: integer
+          format: int32
+        periodDays:
+          type: integer
+          format: int32
     RecallPromptHistoryItem:
       type: object
       properties:

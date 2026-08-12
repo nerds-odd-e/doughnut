@@ -1,11 +1,20 @@
 ---
 gsd_state_version: 1.0
-milestone: none
-milestone_name: none
-status: idle
-last_updated: "2026-08-10T17:00:00.000Z"
-last_activity: 2026-08-10
-last_activity_desc: completed display-name whitespace invariant (quick/001)
+milestone: null
+milestone_name: null
+current_phase: 2
+current_phase_name: Frequent-failure warning E2E (red)
+status: in_progress
+stopped_at: null
+last_updated: "2026-08-12T12:45:00Z"
+last_activity: 2026-08-12
+last_activity_desc: phase 1 done; starting phase 2
+progress:
+  total_phases: 9
+  completed_phases: 1
+  total_plans: 1
+  completed_plans: 0
+  percent: 11
 ---
 
 # Project State
@@ -18,8 +27,9 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-No active plan. Last shipped: display-name surrounding-whitespace invariant
-(`.planning/quick/001-display-name-whitespace/` — phases 1–5 done).
+Executing: [`.planning/quick/001-remove-reassimilate/`](quick/001-remove-reassimilate/) — Phase 2 (frequent-failure warning E2E red).
+
+Last shipped: display-name surrounding-whitespace invariant (`.planning/quick/001-display-name-whitespace/`).
 
 ## Deferred Items
 
@@ -37,4 +47,4 @@ No active plan. Last shipped: display-name surrounding-whitespace invariant
 ## Operator Next Steps
 
 - Human review/update of Proposed ADRs 0001 / 0003 / 0005 (ephemeral request + record-time session)
-- `/gsd-new-milestone` or pick up a seed/deferred item
+- Execute remaining phases of remove-reassimilate plan after phase 1 wrap-up

@@ -25,7 +25,11 @@ class MemoryTrackerThresholdControllerTest extends MemoryTrackerControllerTestBa
     addWrongAnswers(tracker, note, wrongAnswers, day1);
 
     testabilitySettings.timeTravelTo(day1);
-    assertThat(controller.getThresholdExceeded(tracker).thresholdExceeded(), equalTo(exceeded));
+    var result = controller.getThresholdExceeded(tracker);
+    assertThat(result.thresholdExceeded(), equalTo(exceeded));
+    assertThat(result.wrongCount(), equalTo(wrongAnswers));
+    assertThat(result.threshold(), equalTo(5));
+    assertThat(result.periodDays(), equalTo(14));
   }
 
   @Test
@@ -37,9 +41,12 @@ class MemoryTrackerThresholdControllerTest extends MemoryTrackerControllerTestBa
     addWrongAnswers(propertyTracker, note, 5, day1);
 
     testabilitySettings.timeTravelTo(day1);
-    assertThat(
-        controller.getThresholdExceeded(noteLevelTracker).thresholdExceeded(), equalTo(false));
-    assertThat(controller.getThresholdExceeded(propertyTracker).thresholdExceeded(), equalTo(true));
+    var noteLevelResult = controller.getThresholdExceeded(noteLevelTracker);
+    assertThat(noteLevelResult.thresholdExceeded(), equalTo(false));
+    assertThat(noteLevelResult.wrongCount(), equalTo(0));
+    var propertyResult = controller.getThresholdExceeded(propertyTracker);
+    assertThat(propertyResult.thresholdExceeded(), equalTo(true));
+    assertThat(propertyResult.wrongCount(), equalTo(5));
   }
 
   @Test

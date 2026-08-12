@@ -1069,6 +1069,9 @@ export type BookUserLastReadPosition = {
 
 export type ThresholdExceededResult = {
     thresholdExceeded?: boolean;
+    wrongCount?: number;
+    threshold?: number;
+    periodDays?: number;
 };
 
 export type RecallPromptHistoryItem = {

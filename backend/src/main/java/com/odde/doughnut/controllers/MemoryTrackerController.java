@@ -64,10 +64,8 @@ class MemoryTrackerController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
     authorizationService.assertReadAuthorization(memoryTracker);
-    boolean thresholdExceeded =
-        memoryTrackerService.isThresholdExceeded(
-            memoryTracker, testabilitySettings.getCurrentUTCTimestamp());
-    return new ThresholdExceededResult(thresholdExceeded);
+    return memoryTrackerService.getThresholdExceededResult(
+        memoryTracker, testabilitySettings.getCurrentUTCTimestamp());
   }
 
   @GetMapping("/{memoryTracker}")
