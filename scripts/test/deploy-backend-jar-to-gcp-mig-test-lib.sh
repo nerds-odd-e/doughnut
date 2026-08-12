@@ -20,6 +20,33 @@ assert_not_file_exists() {
 	[[ ! -f "$1" ]] || fail "expected file absent: $1"
 }
 
+init_deploy_test_logs() {
+	local work=$1
+	export GSUTIL_LOG="$work/gsutil.log" ROLLING_LOG="$work/rolling.log" GCLOUD_LOG="$work/gcloud.log" HEALTHCHECK_LOG="$work/healthcheck.log"
+	: >"$GSUTIL_LOG"
+	: >"$GCLOUD_LOG"
+	: >"$HEALTHCHECK_LOG"
+	rm -f "$ROLLING_LOG"
+}
+
+write_matching_deploy_record() {
+	local record_file=$1 jar=$2
+	local hash startup_hash
+	hash=$(sha256sum "$jar" | awk '{print $1}')
+	startup_hash=$(sha256sum "$REPO_ROOT/infra/gcp/scripts/mig-zulu25-openai-app-instance-startup.sh" | awk '{print $1}')
+	printf '{"sha256":"%s","startup_script_sha256":"%s","git_sha":"old","recorded_at":"2020-01-01T00:00:00Z"}\n' "$hash" "$startup_hash" >"$record_file"
+}
+
+assert_healthcheck_invoked() {
+	local log=$1 msg=${2:-healthcheck not invoked}
+	grep -q app-instance-healthcheck.sh "$log" || fail "$msg"
+}
+
+assert_healthcheck_not_invoked() {
+	local log=$1 msg=${2:-healthcheck invoked when deploy skipped}
+	! grep -q app-instance-healthcheck.sh "$log" 2>/dev/null || fail "$msg"
+}
+
 write_fake_bin() {
 	local fake_bin=$1
 	mkdir -p "$fake_bin"
@@ -92,6 +119,13 @@ case "$*" in
 	echo "update-mig-startup-script $*" >>"${ROLLING_LOG:?}"
 	exit 0
 	;;
+*app-instance-healthcheck.sh*)
+	echo "app-instance-healthcheck $*" >>"${HEALTHCHECK_LOG:?}"
+	if [[ "${HEALTHCHECK_SHOULD_FAIL:-}" == "1" ]]; then
+		exit 1
+	fi
+	exit 0
+	;;
 esac
 EOS
 		printf 'exec %q "$@"\n' "$REAL_BASH"
@@ -104,11 +138,12 @@ run_deploy() {
 		cd "$1"
 		PATH="$2:$PATH"
 		export GCS_BUCKET ARTIFACT VERSION GITHUB_SHA
-		export GSUTIL_LOG ROLLING_LOG GCLOUD_LOG
+		export GSUTIL_LOG ROLLING_LOG GCLOUD_LOG HEALTHCHECK_LOG
 		export REPO_ROOT="$REPO_ROOT"
 		export DEPLOY_JAR_PATH="${DEPLOY_JAR_PATH:-}"
 		export RECORD_JSON_FILE="${RECORD_JSON_FILE:-}"
 		export FORCE_FULL_DEPLOY="${FORCE_FULL_DEPLOY:-}"
+		export HEALTHCHECK_SHOULD_FAIL="${HEALTHCHECK_SHOULD_FAIL:-}"
 		bash "$DEPLOY_SCRIPT"
 	)
 }

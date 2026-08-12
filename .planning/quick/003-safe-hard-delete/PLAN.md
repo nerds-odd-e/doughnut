@@ -1,6 +1,6 @@
 # Safe hard delete — PLAN
 
-Status: in progress (Phase 1 done; Phases 2–7 planned)
+Status: in progress (Phases 1–2 done; Phases 3–8 planned)
 
 ## Incident that motivated this plan
 
@@ -29,7 +29,8 @@ conversation gets a 500.
 ## Intent
 
 Restore service, then remove the *class* of mistake rather than defend against it, and add one
-structural CI guard so a future blocking foreign key fails the build.
+structural CI guard so a future blocking foreign key fails the build. Separately: make deploy
+verification real without permanently inflating **CI duration** (a measured metric).
 
 ## Design decisions
 
@@ -41,6 +42,9 @@ structural CI guard so a future blocking foreign key fails the build.
 | Autonomation shape | Schema-structural invariant, no fixtures | One `information_schema` query plus a graph walk. Nothing to rot, immune to unrelated feature work, fires only when a restricting FK enters a deletable subtree |
 | Invariant scope | Declared delete roots only, starting with `memory_tracker` | Narrow and concrete first; broaden after a second root actually appears |
 | Guard-test ordering | After the FK fix | The invariant is red against today's schema; keep at most one intentionally failing test, and never end a phase red in CI |
+| Health probe vs CI time | Interim probe in CI Deploy (Phase 2); then move deploy out of CI (Phase 3) | Fire-and-forget kept CI short but recorded crash-looping releases as success. A real gate **must** wait on `/api/healthcheck`. **CI duration is a measured metric**, so that wait must not permanently sit on the CI critical path. |
+| Deploy vs CI | Separate workflows; deploy consumes CI-built artifacts | Building the jar/SPA/CLI stays a CI check (and can stay parallel with tests). GCS + MIG + health wait belong to deploy. Deploy failure must not read as “CI failed.” |
+| Superseded commits | Cancel in-progress CI on `main`; deploy only if SHA is still `origin/main` HEAD | Avoid stacked builds and deploys when commits land faster than the pipeline. Prefer a HEAD guard over cancelling mid–rolling-replace (half-updated MIG). |
 | Artifact names | Capability names (`DeletableEntityFkClosureTest`) | Phase numbers stay under `.planning/` |
 
 ## FK closure under `memory_tracker` (verified against the migrations)
@@ -57,11 +61,26 @@ Six FKs in the schema are auto-named `*_ibfk_N` (created without a delete rule, 
 forty-four are explicitly named `fk_*` and mostly `ON DELETE CASCADE`. The trap sits on one of the
 six implicit ones, which is why "deletes cascade in this schema" felt true and wasn't.
 
+## Autonomation (jidoka) in this plan
+
+Machine stops that fail the pipeline or refuse a bad release — not docs, not manual checks:
+
+| Phase | Autonomation | What it stops |
+|---|---|---|
+| **2** | Post-rollout `/api/healthcheck` probe; `last-successful-deploy.json` only after OK | Recording a crash-looping release as successful; skipping redeploy of the same jar |
+| **3** | Same probe, owned by a **deploy** workflow (not CI) | Same gate without permanently inflating measured **CI duration** |
+| **4** | CI `concurrency` cancel-in-progress; deploy HEAD guard + serialized deploy | Deploying an older SHA after a newer `main` commit; stacked overlapping deploys |
+| **5** | Controller regression test: hard-delete tracker with conversation on its recall prompt | Shipping a delete path that 500s on real FK data (this incident’s product bug) |
+| **6** | `DeletableEntityFkClosureTest` — `information_schema` FK closure over declared delete roots | Adding a `RESTRICT`/`NO ACTION` FK into a hard-deletable subtree (or a new delete root) without CI going red |
+
+Not autonomation (steer humans/agents, no pipeline stop): Phase 7 ERD delete-rule labels; Phase 8 rule updates.
+
 ## Phase sizing notes
 
-- Target ~5 minutes wall-clock per phase including targeted tests.
-- Jidoka stop before Phase 1 (restore strategy) and Phase 3 (user-data policy).
-- Phase 2 lands before Phase 3 so every later deploy is verified before it is recorded as good.
+- Target ~5 minutes wall-clock per phase including targeted tests (workflow phases may run longer in CI).
+- Jidoka stop before Phase 1 (restore strategy) and Phase 5 (user-data policy).
+- Phase 2 lands before product FK work so later deploys are not recorded successful while unhealthy.
+- Phase 3 exists so Phase 2’s health wait does not permanently inflate the CI-duration metric.
 
 ## Phases
 
@@ -76,30 +95,67 @@ trackers remain; inert under the unique index (see Design decisions).
 
 ---
 
-### Phase 2 — Behavior: An unhealthy release fails the deploy and is not recorded as successful — **planned**
+### Phase 2 — Behavior: An unhealthy release fails the deploy and is not recorded as successful — **done**
 
-**Pre:** `deploy-backend-jar-to-gcp-mig.sh` writes `last-successful-deploy.json` immediately after
-issuing the rolling replace, with no health probe in between. That record is also the skip condition
-for later deploys, so a crash-looping release becomes the baseline and blocks redeploying the same jar.
-
-**Trigger:** The Deploy job runs.
-
-**Post:** The job probes `/api/healthcheck` after the rollout, goes red if it never returns `OK`, and
-writes the success record only after a verified probe.
-
-**Change:** Wire a health probe into the Deploy job after the rolling replace; move the record write
-behind it. Fix `app-instance-healthcheck.sh`: it points at `dough.odd-e.com`, which does not resolve,
-so the existing recovery tool always reports NOT RESPONDING after a 30 × 20s (10 minute) loop. Point
-it at `doughnut.odd-e.com` and shorten the loop.
-
-**Verify:** Run the script against production (expect `OK` after Phase 1) and against a bogus host
-(expect non-zero exit).
-
-**Stop-safe:** No product change. Protects the deploys in every later phase.
+**Done:** `deploy-backend-jar-to-gcp-mig.sh` calls `app-instance-healthcheck.sh` after rollout; success record only after OK. Healthcheck URL fixed (`doughnut.odd-e.com`), loop shortened (~3 min), env overrides for tests. Shell tests added/extended.
 
 ---
 
-### Phase 3 — Behavior: Deleting a tracker whose recall prompt has a conversation succeeds — **planned**
+### Phase 3 — Structure: Deploy is a separate workflow; CI no longer waits on production health — **planned**
+
+**Justified by:** Phase 2’s probe must stay. Leaving it inside `ci.yml` permanently inflates **CI
+duration**, which we measure. Build/package must remain a CI check; the health wait must not.
+
+**Pre:** `Deploy` is a job in `ci.yml` that `needs` tests + `Package-artifacts`. Frontend/CLI are
+uploaded to GCS inside `Package-artifacts` (before Deploy). Backend jar already flows as a GitHub
+Actions artifact into Deploy.
+
+**Trigger:** CI succeeds on `main`.
+
+**Post:**
+
+- CI ends when checks + artifact packaging succeed (no health wait on the CI critical path).
+- A separate deploy workflow downloads those artifacts, does GCS + MIG rolling replace, runs the
+  Phase 2 health probe, then writes `last-successful-deploy.json`.
+- A failed health probe fails **deploy**, not CI.
+
+**Change:** New workflow (e.g. `deploy.yml`) triggered by successful CI on `main` (`workflow_run` or
+equivalent). Move GCS uploads + MIG + probe + success-record into it. CI `Package-artifacts` keeps
+building jar/SPA/CLI and uploading **GitHub Actions artifacts** (build remains the check; stays
+parallel with tests). Remove the in-CI Deploy job (and any GCS side-effects that force deploy work
+into the CI metric).
+
+**Verify:** A green CI run does not include the probe wait in its wall-clock; a deliberate bad jar
+(or probe against a bogus host in a dry path) fails the deploy workflow only.
+
+**Stop-safe:** Same deploy gate as Phase 2; CI duration returns to “checks + package” only.
+
+---
+
+### Phase 4 — Behavior: Only the latest `main` commit is deployed — **planned**
+
+**Pre:** Rapid pushes to `main` can stack overlapping CI/deploy runs; an older successful CI may still
+deploy after a newer commit landed.
+
+**Trigger:** Multiple commits land on `main` before earlier pipelines finish.
+
+**Post:** Superseded CI runs are cancelled; a deploy starts only if its SHA is still `origin/main`
+HEAD (otherwise exits 0 / skips). At most one deploy runs at a time.
+
+**Change:**
+
+- CI `concurrency` on `main` with `cancel-in-progress: true`.
+- Deploy concurrency (serialize; do **not** cancel mid–rolling-replace).
+- Deploy-start HEAD guard: if `git rev-parse origin/main` ≠ this run’s SHA, skip.
+
+**Verify:** Two quick commits to `main` — only the newer CI finishes; deploy for an older SHA skips
+when HEAD has moved.
+
+**Stop-safe:** No product change; less wasted runner time; avoids older jars overwriting newer ones.
+
+---
+
+### Phase 5 — Behavior: Deleting a tracker whose recall prompt has a conversation succeeds — **planned**
 
 **Pre:** `DELETE /api/memory-trackers/{id}` returns 500 (MySQL 1451) when the tracker's recall prompt
 is referenced by a conversation. Shipped live in `a74a00028a`.
@@ -124,9 +180,9 @@ paths and any frontend assumption that a conversation always has a subject).
 
 ---
 
-### Phase 4 — Structure: CI fails when a foreign key blocks deleting a hard-deletable entity — **planned**
+### Phase 6 — Structure: CI fails when a foreign key blocks deleting a hard-deletable entity — **planned**
 
-**Justified by:** Locks in the invariant Phase 3 establishes, for the tables Phase 3 did not touch and
+**Justified by:** Locks in the invariant Phase 5 establishes, for the tables Phase 5 did not touch and
 for tables that do not exist yet.
 
 **Change:** `DeletableEntityFkClosureTest`. Declares the entities the product hard-deletes (start:
@@ -144,14 +200,14 @@ assertion covers both the migration and the runtime endpoint.
 **Escape hatch:** a deliberate `RESTRICT` goes in a documented allowlist entry with a reason, so it is
 a conscious stop rather than a silent one.
 
-**Verify:** Green against the Phase 3 schema. Confirm it genuinely catches the incident by reverting
-Phase 3's migration locally and watching it go red — do not commit that revert.
+**Verify:** Green against the Phase 5 schema. Confirm it genuinely catches the incident by reverting
+Phase 5's migration locally and watching it go red — do not commit that revert.
 
 **Stop-safe:** Test-only; no external behavior change.
 
 ---
 
-### Phase 5 — Behavior: The ERD distinguishes blocking foreign keys from cascading ones — **planned**
+### Phase 7 — Behavior: The ERD distinguishes blocking foreign keys from cascading ones — **planned**
 
 **Pre:** `docs/database-erd.md` renders every FK identically. The edge
 `recall_prompt ||--o{ conversation : "recall_prompt_id"` was already in the diagram and gave no hint
@@ -171,9 +227,9 @@ Mermaid still renders.
 
 ---
 
-### Phase 6 — Structure: Rules steer developers and agents away from the mistake — **planned**
+### Phase 8 — Structure: Rules steer developers and agents away from the mistake — **planned**
 
-**Justified by:** Phases 1–5 fix this instance and guard this subtree. The rules are what stop the next
+**Justified by:** Phases 1–7 fix this instance and guard this subtree. The rules are what stop the next
 one from being written, including by an agent that never sees this plan.
 
 **Change:**
@@ -193,34 +249,19 @@ one from being written, including by an agent that never sees this plan.
 
 **Stop-safe:** Docs only.
 
----
-
-### Phase 7 — Behavior: A dead API pages within minutes — **planned**
-
-**Pre:** `mig_status_check.yml` asserts `status.isStable` on a 6-hourly schedule. A dead JVM on a
-running VM is perfectly stable, so this outage was silent. `add-mig-autohealing.sh` documents the trap
-verbatim — *"a dead JVM leaves the VM running and isStable:true, causing silent 502s"* — and is a
-manual one-shot that the observed instance state says is not attached.
-
-**Trigger:** The API stops serving.
-
-**Post:** The scheduled check probes `/api/healthcheck`, runs on a short interval, and alerts.
-
-**Verify:** Run the check body against production (green) and against a bogus host (red, and the
-notification path fires).
-
-**Stop-safe:** Monitoring only.
-
 ## Deferred, with reasons
 
+- **Post-deploy / ongoing API paging** (probe `/api/healthcheck` on a short schedule; fix
+  `mig_status_check.yml` which only asserts MIG `isStable`). Out of scope: this plan covers release
+  gates and delete-safety, not continuous uptime monitoring.
 - **Broadening the FK invariant to the whole schema** (normalising the six implicit `*_ibfk_*`
   constraints). Valuable, but speculative until a second delete root exists — generalize after real
   repetition, not before.
 - **Attaching MIG autohealing.** It would have recreated crash-looping instances indefinitely without
-  paging anyone. Phase 7 is the honest fix.
+  paging anyone; needs a real pager first.
 - **Re-attempting the orphan cleanup.** Evidence says the rows are inert. If a concrete harm appears,
-  it is trivial after Phase 3.
-- **Splitting data cleanup out of fail-stop startup migration.** Subsumed by the Phase 6 rule: do not
+  it is trivial after Phase 5.
+- **Splitting data cleanup out of fail-stop startup migration.** Subsumed by the Phase 8 rule: do not
   ship one-off cleanup as a permanent migration. No code change needed.
 
 ## Process learning
@@ -228,3 +269,7 @@ notification path fires).
 The planning history for the original work was pruned 35 seconds after the migration commit, before
 production had confirmed anything. "Fully executed into code" should mean verified in production, not
 committed.
+
+Fire-and-forget deploy kept CI wall-clock short (a measured metric) at the cost of recording unhealthy
+releases as successful. The fix is a real health gate **and** keeping that wait off the CI critical
+path (Phases 2 then 3), not dropping the gate to protect the metric.

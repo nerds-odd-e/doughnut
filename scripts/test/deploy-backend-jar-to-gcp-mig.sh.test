@@ -19,10 +19,7 @@ test_fails_when_jar_missing() {
 	trap 'rm -rf "$work"' EXIT
 	fake_bin="$work/fakebin"
 	write_fake_bin "$fake_bin"
-	export GSUTIL_LOG="$work/gsutil.log" ROLLING_LOG="$work/rolling.log" GCLOUD_LOG="$work/gcloud.log"
-	: >"$GSUTIL_LOG"
-	: >"$GCLOUD_LOG"
-	rm -f "$ROLLING_LOG"
+	init_deploy_test_logs "$work"
 	export GCS_BUCKET=b ARTIFACT=a VERSION=1 GITHUB_SHA="$TEST_GIT_SHA"
 	unset DEPLOY_JAR_PATH RECORD_JSON_FILE
 	# no jar at ./a-1.jar or backend/build/libs/a-1.jar
@@ -34,20 +31,15 @@ test_fails_when_jar_missing() {
 }
 
 test_skips_upload_and_replace_when_record_matches_jar_hash() {
-	local work fake_bin jar hash startup_hash
+	local work fake_bin jar
 	work=$(mktemp -d)
 	trap 'rm -rf "$work"' EXIT
 	fake_bin="$work/fakebin"
 	write_fake_bin "$fake_bin"
-	export GSUTIL_LOG="$work/gsutil.log" ROLLING_LOG="$work/rolling.log" GCLOUD_LOG="$work/gcloud.log"
-	: >"$GSUTIL_LOG"
-	: >"$GCLOUD_LOG"
-	rm -f "$ROLLING_LOG"
+	init_deploy_test_logs "$work"
 	jar="$work/a-1.jar"
 	printf 'fixture-jar-bytes' >"$jar"
-	hash=$(sha256sum "$jar" | awk '{print $1}')
-	startup_hash=$(sha256sum "$REPO_ROOT/infra/gcp/scripts/mig-zulu25-openai-app-instance-startup.sh" | awk '{print $1}')
-	printf '{"sha256":"%s","startup_script_sha256":"%s","git_sha":"old","recorded_at":"2020-01-01T00:00:00Z"}\n' "$hash" "$startup_hash" >"$work/record.json"
+	write_matching_deploy_record "$work/record.json" "$jar"
 	export RECORD_JSON_FILE="$work/record.json"
 	export GCS_BUCKET=bucket ARTIFACT=a VERSION=1 GITHUB_SHA="$TEST_GIT_SHA"
 	export DEPLOY_JAR_PATH="$jar"
@@ -55,6 +47,7 @@ test_skips_upload_and_replace_when_record_matches_jar_hash() {
 	assert_file_exists "$work/gcloud.log"
 	grep -q 'url-maps import' "$work/gcloud.log" || fail "url map import not invoked when jar deploy skipped"
 	assert_not_file_exists "$work/rolling.log"
+	assert_healthcheck_not_invoked "$work/healthcheck.log"
 	local cp_count cat_count
 	cp_count=$(grep -c '^cp ' "$GSUTIL_LOG" 2>/dev/null || true)
 	[[ -n "$cp_count" ]] || cp_count=0
@@ -72,10 +65,7 @@ test_deploys_when_startup_script_hash_differs() {
 	trap 'rm -rf "$work"' EXIT
 	fake_bin="$work/fakebin"
 	write_fake_bin "$fake_bin"
-	export GSUTIL_LOG="$work/gsutil.log" ROLLING_LOG="$work/rolling.log" GCLOUD_LOG="$work/gcloud.log"
-	: >"$GSUTIL_LOG"
-	: >"$GCLOUD_LOG"
-	rm -f "$ROLLING_LOG"
+	init_deploy_test_logs "$work"
 	jar="$work/a-1.jar"
 	printf 'fixture-jar-bytes' >"$jar"
 	hash=$(sha256sum "$jar" | awk '{print $1}')
@@ -86,6 +76,7 @@ test_deploys_when_startup_script_hash_differs() {
 	run_deploy "$work" "$fake_bin"
 	assert_file_exists "$work/rolling.log"
 	grep -q update-mig-startup-script.sh "$work/rolling.log" || fail "MIG template update not invoked when startup script hash differs"
+	assert_healthcheck_invoked "$work/healthcheck.log" "healthcheck not invoked when startup script hash differs"
 	grep -q 'cp .*backend_app_jar' "$GSUTIL_LOG" || fail "jar upload not logged when startup script differs"
 	trap - EXIT
 	rm -rf "$work"
@@ -97,10 +88,7 @@ test_deploys_when_no_record() {
 	trap 'rm -rf "$work"' EXIT
 	fake_bin="$work/fakebin"
 	write_fake_bin "$fake_bin"
-	export GSUTIL_LOG="$work/gsutil.log" ROLLING_LOG="$work/rolling.log" GCLOUD_LOG="$work/gcloud.log"
-	: >"$GSUTIL_LOG"
-	: >"$GCLOUD_LOG"
-	rm -f "$ROLLING_LOG"
+	init_deploy_test_logs "$work"
 	jar="$work/doughnut-0.0.1-SNAPSHOT.jar"
 	printf 'new-jar' >"$jar"
 	unset RECORD_JSON_FILE
@@ -109,6 +97,7 @@ test_deploys_when_no_record() {
 	run_deploy "$work" "$fake_bin"
 	assert_file_exists "$work/rolling.log"
 	grep -q update-mig-startup-script.sh "$work/rolling.log" || fail "MIG template update not invoked"
+	assert_healthcheck_invoked "$work/healthcheck.log"
 	grep -q 'cp .*backend_app_jar' "$GSUTIL_LOG" || fail "jar upload not logged"
 	grep -q 'cp - gs://' "$GSUTIL_LOG" || fail "record upload (stdin) not logged"
 	trap - EXIT
@@ -121,10 +110,7 @@ test_deploys_when_record_hash_differs() {
 	trap 'rm -rf "$work"' EXIT
 	fake_bin="$work/fakebin"
 	write_fake_bin "$fake_bin"
-	export GSUTIL_LOG="$work/gsutil.log" ROLLING_LOG="$work/rolling.log" GCLOUD_LOG="$work/gcloud.log"
-	: >"$GSUTIL_LOG"
-	: >"$GCLOUD_LOG"
-	rm -f "$ROLLING_LOG"
+	init_deploy_test_logs "$work"
 	jar="$work/a-1.jar"
 	printf 'v2-content' >"$jar"
 	printf '{"sha256":"0000000000000000000000000000000000000000000000000000000000000000","git_sha":"x","recorded_at":"2020-01-01T00:00:00Z"}\n' >"$work/record.json"
@@ -135,25 +121,21 @@ test_deploys_when_record_hash_differs() {
 	assert_file_exists "$work/rolling.log"
 	grep -q 'cp .*backend_app_jar' "$GSUTIL_LOG" || fail "jar upload not logged on mismatch"
 	grep -q update-mig-startup-script.sh "$work/rolling.log" || fail "MIG template update not invoked on jar mismatch"
+	assert_healthcheck_invoked "$work/healthcheck.log" "healthcheck not invoked on jar mismatch"
 	trap - EXIT
 	rm -rf "$work"
 }
 
 test_force_full_deploy_when_record_matches_jar_hash() {
-	local work fake_bin jar hash startup_hash
+	local work fake_bin jar
 	work=$(mktemp -d)
 	trap 'rm -rf "$work"' EXIT
 	fake_bin="$work/fakebin"
 	write_fake_bin "$fake_bin"
-	export GSUTIL_LOG="$work/gsutil.log" ROLLING_LOG="$work/rolling.log" GCLOUD_LOG="$work/gcloud.log"
-	: >"$GSUTIL_LOG"
-	: >"$GCLOUD_LOG"
-	rm -f "$ROLLING_LOG"
+	init_deploy_test_logs "$work"
 	jar="$work/a-1.jar"
 	printf 'fixture-jar-bytes' >"$jar"
-	hash=$(sha256sum "$jar" | awk '{print $1}')
-	startup_hash=$(sha256sum "$REPO_ROOT/infra/gcp/scripts/mig-zulu25-openai-app-instance-startup.sh" | awk '{print $1}')
-	printf '{"sha256":"%s","startup_script_sha256":"%s","git_sha":"old","recorded_at":"2020-01-01T00:00:00Z"}\n' "$hash" "$startup_hash" >"$work/record.json"
+	write_matching_deploy_record "$work/record.json" "$jar"
 	export RECORD_JSON_FILE="$work/record.json"
 	export GCS_BUCKET=bucket ARTIFACT=a VERSION=1 GITHUB_SHA="$TEST_GIT_SHA"
 	export DEPLOY_JAR_PATH="$jar"
@@ -162,8 +144,34 @@ test_force_full_deploy_when_record_matches_jar_hash() {
 	unset FORCE_FULL_DEPLOY
 	assert_file_exists "$work/rolling.log"
 	grep -q update-mig-startup-script.sh "$work/rolling.log" || fail "MIG template update not invoked when forced"
+	assert_healthcheck_invoked "$work/healthcheck.log" "healthcheck not invoked when forced"
 	grep -q 'cp .*backend_app_jar' "$GSUTIL_LOG" || fail "jar upload not logged when forced"
 	grep -q 'cp - gs://' "$GSUTIL_LOG" || fail "record upload (stdin) not logged when forced"
+	trap - EXIT
+	rm -rf "$work"
+}
+
+test_fails_without_writing_record_when_healthcheck_fails() {
+	local work fake_bin jar cp_count
+	work=$(mktemp -d)
+	trap 'rm -rf "$work"' EXIT
+	fake_bin="$work/fakebin"
+	write_fake_bin "$fake_bin"
+	init_deploy_test_logs "$work"
+	jar="$work/a-1.jar"
+	printf 'new-jar' >"$jar"
+	unset RECORD_JSON_FILE
+	export GCS_BUCKET=b ARTIFACT=a VERSION=1 GITHUB_SHA="$TEST_GIT_SHA"
+	export DEPLOY_JAR_PATH="$jar"
+	export HEALTHCHECK_SHOULD_FAIL=1
+	if run_deploy "$work" "$fake_bin" 2>/dev/null; then
+		fail "expected non-zero exit when healthcheck fails"
+	fi
+	unset HEALTHCHECK_SHOULD_FAIL
+	assert_healthcheck_invoked "$work/healthcheck.log" "healthcheck not invoked before failure"
+	cp_count=$(grep -c 'cp - gs://' "$GSUTIL_LOG" 2>/dev/null || true)
+	[[ -n "$cp_count" ]] || cp_count=0
+	assert_equals "0" "$cp_count" "no success record when healthcheck fails"
 	trap - EXIT
 	rm -rf "$work"
 }
@@ -180,6 +188,7 @@ main() {
 	test_force_full_deploy_when_record_matches_jar_hash
 	test_deploys_when_no_record
 	test_deploys_when_record_hash_differs
+	test_fails_without_writing_record_when_healthcheck_fails
 	echo "ok deploy-backend-jar-to-gcp-mig.sh tests"
 }
 

@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+#
+# Unit tests for infra/gcp/scripts/app-instance-healthcheck.sh
+
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+HEALTHCHECK_SCRIPT="$REPO_ROOT/infra/gcp/scripts/app-instance-healthcheck.sh"
+
+fail() {
+	echo "FAIL: $*" >&2
+	exit 1
+}
+
+write_fake_curl() {
+	local fake_bin=$1 response=$2
+	mkdir -p "$fake_bin"
+	{
+		printf '#!%s\n' "$(command -v bash)"
+		cat <<EOS
+set -e
+url="\${@: -1}"
+echo "curl \$url" >>"\${CURL_LOG:?}"
+printf '%s' "$response"
+EOS
+	} >"$fake_bin/curl"
+	chmod +x "$fake_bin/curl"
+}
+
+test_succeeds_when_response_contains_ok() {
+	local work fake_bin
+	work=$(mktemp -d)
+	trap 'rm -rf "$work"' EXIT
+	fake_bin="$work/fakebin"
+	write_fake_curl "$fake_bin" "OK"
+	export CURL_LOG="$work/curl.log"
+	: >"$CURL_LOG"
+	export HEALTHCHECK_URL="https://example.test/api/healthcheck"
+	export HEALTHCHECK_RETRY_COUNT=1
+	export HEALTHCHECK_RETRY_SLEEP_SECONDS=0
+	PATH="$fake_bin:$PATH" bash "$HEALTHCHECK_SCRIPT"
+	grep -q 'curl https://example.test/api/healthcheck' "$work/curl.log" || fail "expected curl against override URL"
+	trap - EXIT
+	rm -rf "$work"
+}
+
+test_fails_when_response_never_ok() {
+	local work fake_bin
+	work=$(mktemp -d)
+	trap 'rm -rf "$work"' EXIT
+	fake_bin="$work/fakebin"
+	write_fake_curl "$fake_bin" "503 no healthy upstream"
+	export CURL_LOG="$work/curl.log"
+	: >"$CURL_LOG"
+	export HEALTHCHECK_URL="https://bogus.example.test/api/healthcheck"
+	export HEALTHCHECK_RETRY_COUNT=1
+	export HEALTHCHECK_RETRY_SLEEP_SECONDS=0
+	if PATH="$fake_bin:$PATH" bash "$HEALTHCHECK_SCRIPT" 2>/dev/null; then
+		fail "expected non-zero exit when healthcheck never returns OK"
+	fi
+	trap - EXIT
+	rm -rf "$work"
+}
+
+main() {
+	[[ -x "$HEALTHCHECK_SCRIPT" ]] || fail "healthcheck script not found or not executable: $HEALTHCHECK_SCRIPT"
+	test_succeeds_when_response_contains_ok
+	test_fails_when_response_never_ok
+	echo "ok app-instance-healthcheck.sh tests"
+}
+
+main "$@"
