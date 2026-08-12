@@ -1,125 +1,150 @@
 <template>
   <div
-    class="grid grid-cols-[minmax(8rem,auto)_minmax(0,1fr)_auto] gap-x-4 gap-y-1 items-center"
+    class="flex flex-col gap-1"
     data-testid="rich-note-property-row"
     :data-row-index="idx"
     :data-property-key="modelValue.key"
   >
     <div
-      class="relative min-w-[8rem]"
-      @focusout="onKeyPresetWrapperFocusOut"
+      class="grid grid-cols-[auto_minmax(8rem,auto)_minmax(0,1fr)] gap-x-4 items-center"
     >
-      <input
-        :id="keyInputId"
-        :value="modelValue.key"
-        type="text"
-        autocapitalize="off"
-        class="daisy-input daisy-input-sm w-full min-w-[8rem]"
-        :aria-label="`Existing note property key (row ${idx + 1})`"
-        :aria-expanded="presetPanelOpen"
-        :aria-controls="presetPanelOpen ? presetListId : undefined"
-        data-testid="rich-note-property-row-key-input"
-        @input="onKeyInput"
-        @focus="onKeyFocus"
-        @blur="emit('commit')"
-      />
-      <RichFrontmatterPropertyKeyPresets
-        v-if="presetPanelOpen"
-        :list-id="presetListId"
-        :property-rows="propertyRows"
-        :exclude-row-index="idx"
-        @select="onPresetSelected"
-      />
-    </div>
-    <div ref="valueAreaRef" class="min-w-0">
-      <RichFrontmatterScalarPropertyValue
-        v-if="isTextCapablePropertyRow(modelValue)"
-        :model-value="scalarValue"
-        :property-row="modelValue"
-        :wiki-titles="wikiTitles"
-        :row-index="idx"
-        @update:model-value="onValueUpdate"
-        @update:property-value="onPropertyValueUpdate"
-        @focus="emit('row-focus')"
-        @commit="emit('commit')"
-        @dead-wiki-link-click="emit('dead-wiki-link-click', $event)"
-      />
-      <RelationTypeSelectCompact
-        v-else-if="isRelationPropertyKey(modelValue.key)"
-        field="relationType"
-        scope-name="rich-note-relation-property"
-        hide-label
-        :model-value="relationModelValue"
-        :inverse-icon="true"
-        @update:model-value="emit('relation-type-selected', $event)"
-      />
-      <RichFrontmatterImagePropertyValue
-        v-else-if="isImagePropertyKey(modelValue.key)"
-        :model-value="scalarValue"
-        :note-id="noteId"
-        :ariaLabel="`Existing note image property value (row ${idx + 1})`"
-        value-test-id="rich-note-property-row-value-input"
-        file-input-test-id="rich-note-image-property-file-input"
-        choose-button-test-id="rich-note-image-property-choose"
-        requires-note-test-id="rich-note-image-upload-requires-note"
-        @update:model-value="onValueUpdate"
-        @focus="emit('row-focus')"
-        @commit="emit('commit')"
-        @image-upload-state="emit('image-upload-state', $event)"
-      />
-      <div
-        v-else-if="isWikidataIdPropertyKey(modelValue.key)"
-        class="flex min-w-0 items-center gap-2"
-        :class="scalarValue.trim() ? '' : 'justify-between'"
+      <button
+        type="button"
+        class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
+        :aria-label="`Toggle options for note property ${modelValue.key}`"
+        :aria-expanded="optionsExpanded"
+        data-testid="rich-note-property-row-options-toggle"
+        @click="optionsExpanded = !optionsExpanded"
       >
-        <template v-if="scalarValue.trim()">
-          <button
-            type="button"
-            class="daisy-btn daisy-btn-ghost daisy-btn-sm h-auto min-h-0 min-w-0 max-w-full shrink truncate justify-start py-0.5 px-1 font-mono text-sm font-normal text-base-content/90 normal-case"
-            :title="scalarValue.trim()"
-            data-testid="rich-note-wikidata-property-edit"
-            :aria-label="`Edit Wikidata ID ${scalarValue.trim()}`"
-            @click="emit('wikidata-dialog-open')"
-          >
-            {{ scalarValue.trim() }}
-          </button>
-          <RichFrontmatterPropertyExternalLink
-            kind="wikidata"
-            :value="scalarValue"
-          />
-        </template>
-        <template v-else>
-          <span
-            class="truncate font-mono text-sm text-base-content/90"
-            aria-hidden="true"
-            >—</span
-          >
-          <button
-            type="button"
-            class="daisy-btn daisy-btn-sm daisy-btn-outline shrink-0"
-            data-testid="rich-note-wikidata-property-edit"
-            aria-label="Set Wikidata ID"
-            @click="emit('wikidata-dialog-open')"
-          >
-            Set…
-          </button>
-        </template>
+        <ChevronRight
+          v-if="!optionsExpanded"
+          class="h-4 w-4"
+          aria-hidden="true"
+        />
+        <ChevronDown v-else class="h-4 w-4" aria-hidden="true" />
+      </button>
+      <div
+        class="relative min-w-[8rem]"
+        @focusout="onKeyPresetWrapperFocusOut"
+      >
+        <input
+          :id="keyInputId"
+          :value="modelValue.key"
+          type="text"
+          autocapitalize="off"
+          class="daisy-input daisy-input-sm w-full min-w-[8rem]"
+          :aria-label="`Existing note property key (row ${idx + 1})`"
+          :aria-expanded="presetPanelOpen"
+          :aria-controls="presetPanelOpen ? presetListId : undefined"
+          data-testid="rich-note-property-row-key-input"
+          @input="onKeyInput"
+          @focus="onKeyFocus"
+          @blur="emit('commit')"
+        />
+        <RichFrontmatterPropertyKeyPresets
+          v-if="presetPanelOpen"
+          :list-id="presetListId"
+          :property-rows="propertyRows"
+          :exclude-row-index="idx"
+          @select="onPresetSelected"
+        />
+      </div>
+      <div ref="valueAreaRef" class="min-w-0">
+        <RichFrontmatterScalarPropertyValue
+          v-if="isTextCapablePropertyRow(modelValue)"
+          :model-value="scalarValue"
+          :property-row="modelValue"
+          :wiki-titles="wikiTitles"
+          :row-index="idx"
+          @update:model-value="onValueUpdate"
+          @update:property-value="onPropertyValueUpdate"
+          @focus="emit('row-focus')"
+          @commit="emit('commit')"
+          @dead-wiki-link-click="emit('dead-wiki-link-click', $event)"
+        />
+        <RelationTypeSelectCompact
+          v-else-if="isRelationPropertyKey(modelValue.key)"
+          field="relationType"
+          scope-name="rich-note-relation-property"
+          hide-label
+          :model-value="relationModelValue"
+          :inverse-icon="true"
+          @update:model-value="emit('relation-type-selected', $event)"
+        />
+        <RichFrontmatterImagePropertyValue
+          v-else-if="isImagePropertyKey(modelValue.key)"
+          :model-value="scalarValue"
+          :note-id="noteId"
+          :ariaLabel="`Existing note image property value (row ${idx + 1})`"
+          value-test-id="rich-note-property-row-value-input"
+          file-input-test-id="rich-note-image-property-file-input"
+          choose-button-test-id="rich-note-image-property-choose"
+          requires-note-test-id="rich-note-image-upload-requires-note"
+          @update:model-value="onValueUpdate"
+          @focus="emit('row-focus')"
+          @commit="emit('commit')"
+          @image-upload-state="emit('image-upload-state', $event)"
+        />
+        <div
+          v-else-if="isWikidataIdPropertyKey(modelValue.key)"
+          class="flex min-w-0 items-center gap-2"
+          :class="scalarValue.trim() ? '' : 'justify-between'"
+        >
+          <template v-if="scalarValue.trim()">
+            <button
+              type="button"
+              class="daisy-btn daisy-btn-ghost daisy-btn-sm h-auto min-h-0 min-w-0 max-w-full shrink truncate justify-start py-0.5 px-1 font-mono text-sm font-normal text-base-content/90 normal-case"
+              :title="scalarValue.trim()"
+              data-testid="rich-note-wikidata-property-edit"
+              :aria-label="`Edit Wikidata ID ${scalarValue.trim()}`"
+              @click="emit('wikidata-dialog-open')"
+            >
+              {{ scalarValue.trim() }}
+            </button>
+            <RichFrontmatterPropertyExternalLink
+              kind="wikidata"
+              :value="scalarValue"
+            />
+          </template>
+          <template v-else>
+            <span
+              class="truncate font-mono text-sm text-base-content/90"
+              aria-hidden="true"
+              >—</span
+            >
+            <button
+              type="button"
+              class="daisy-btn daisy-btn-sm daisy-btn-outline shrink-0"
+              data-testid="rich-note-wikidata-property-edit"
+              aria-label="Set Wikidata ID"
+              @click="emit('wikidata-dialog-open')"
+            >
+              Set…
+            </button>
+          </template>
+        </div>
       </div>
     </div>
-    <button
-      type="button"
-      class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
-      :aria-label="`Remove note property ${modelValue.key}`"
-      data-testid="rich-note-property-row-remove"
-      @click="emit('remove')"
+    <div
+      v-if="optionsExpanded"
+      class="pl-8"
+      data-testid="rich-note-property-row-options"
     >
-      <Minus class="h-4 w-4" aria-hidden="true" />
-    </button>
+      <button
+        type="button"
+        class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
+        :aria-label="`Remove note property ${modelValue.key}`"
+        data-testid="rich-note-property-row-remove"
+        @click="emit('remove')"
+      >
+        <Minus class="h-4 w-4" aria-hidden="true" />
+      </button>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Minus } from "@lucide/vue"
+import { ChevronDown, ChevronRight, Minus } from "@lucide/vue"
 import { computed, ref } from "vue"
 import RichFrontmatterImagePropertyValue from "@/components/form/RichFrontmatterImagePropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
@@ -167,6 +192,7 @@ const emit = defineEmits<{
 }>()
 
 const presetPanelOpen = ref(false)
+const optionsExpanded = ref(false)
 const valueAreaRef = ref<HTMLElement | null>(null)
 
 const scalarValue = computed(

@@ -93,9 +93,10 @@ export const noteRichPropertyMethods = () => ({
   removeRichNoteProperty(key: string) {
     this.switchToRichContent()
     findNoteContentRegion().within(() => {
-      cy.get(richNotePropertyRow(key))
-        .find('[data-testid="rich-note-property-row-remove"]')
-        .click()
+      cy.get(richNotePropertyRow(key)).within(() => {
+        cy.findByTestId('rich-note-property-row-options-toggle').click()
+        cy.findByTestId('rich-note-property-row-remove').click()
+      })
     })
     confirmPropertyMemoryTrackerChange()
     return this.flushPendingContentSave()

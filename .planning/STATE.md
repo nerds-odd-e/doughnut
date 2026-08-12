@@ -6,9 +6,9 @@ current_phase: 2
 current_phase_name: Frequent-failure warning E2E (red)
 status: in_progress
 stopped_at: null
-last_updated: "2026-08-12T12:45:00Z"
+last_updated: "2026-08-12T12:50:00Z"
 last_activity: 2026-08-12
-last_activity_desc: phase 1 done; starting phase 2
+last_activity_desc: shipped rich property options caret (quick/002); remove-reassimilate phase 2 next
 progress:
   total_phases: 9
   completed_phases: 1
@@ -27,9 +27,9 @@ See: `.planning/PROJECT.md`
 
 ## Current Position
 
-Executing: [`.planning/quick/001-remove-reassimilate/`](quick/001-remove-reassimilate/) — Phase 3 (frequent-failure warning green).
+Executing: [`.planning/quick/001-remove-reassimilate/`](quick/001-remove-reassimilate/) — Phase 2 (frequent-failure warning E2E).
 
-Last shipped: display-name surrounding-whitespace invariant (`.planning/quick/001-display-name-whitespace/`).
+Also shipped today: rich note property options caret (`.planning/quick/002-rich-property-options/` — Phase 1 done).
 
 ## Deferred Items
 
@@ -47,4 +47,4 @@ Last shipped: display-name surrounding-whitespace invariant (`.planning/quick/00
 ## Operator Next Steps
 
 - Human review/update of Proposed ADRs 0001 / 0003 / 0005 (ephemeral request + record-time session)
-- Execute remaining phases of remove-reassimilate plan after phase 1 wrap-up
+- Execute remaining phases of remove-reassimilate plan

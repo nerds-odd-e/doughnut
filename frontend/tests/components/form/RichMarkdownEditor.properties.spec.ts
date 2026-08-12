@@ -1,6 +1,11 @@
 import { flushPromises } from "@vue/test-utils"
 import {
+  expandAndClickPropertyRowRemove,
+  expandPropertyRowOptions,
   propertyRowKeyInputEl,
+  propertyRowOptionsPanelEl,
+  propertyRowOptionsToggleEl,
+  propertyRowSelector,
   propertyRows,
   propertyValidationText,
 } from "./propertiesTestDom"
@@ -175,12 +180,41 @@ beta: two
 Body line`
     const wrapper = await h.mountEditor(markdown)
 
-    await wrapper
-      .findAll('[data-testid="rich-note-property-row-remove"]')[0]!
-      .trigger("click")
+    await expandAndClickPropertyRowRemove(wrapper, propertyRowSelector("alpha"))
 
     const last = h.lastEmittedMarkdown()
     expect(last).not.toContain("alpha:")
     expect(last).toContain("beta:")
+  })
+
+  it("caret toggles options panel and rows expand independently", async () => {
+    const markdown = `---
+alpha: one
+beta: two
+---
+
+Body line`
+    const wrapper = await h.mountEditor(markdown)
+    const rows = propertyRows(wrapper.element)
+
+    const alphaRow = propertyRowSelector("alpha")
+    const betaRow = propertyRowSelector("beta")
+
+    expect(propertyRowOptionsPanelEl(rows[0]!)).toBeNull()
+    expect(propertyRowOptionsPanelEl(rows[1]!)).toBeNull()
+
+    await expandPropertyRowOptions(wrapper, alphaRow)
+
+    expect(
+      propertyRowOptionsPanelEl(wrapper.find(alphaRow).element)
+    ).not.toBeNull()
+    expect(propertyRowOptionsPanelEl(wrapper.find(betaRow).element)).toBeNull()
+
+    expect(
+      propertyRowOptionsToggleEl(rows[0]!).getAttribute("aria-expanded")
+    ).toBe("true")
+    expect(
+      propertyRowOptionsToggleEl(rows[1]!).getAttribute("aria-expanded")
+    ).toBe("false")
   })
 })

@@ -6,6 +6,10 @@ import { flushPromises } from "@vue/test-utils"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import {
+  expandAndClickPropertyRowRemove,
+  propertyRowSelector,
+} from "./propertiesTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 const confirmMock = vi.fn()
@@ -66,12 +70,8 @@ Workshop body.`
     return tracker
   }
 
-  const topicRowRemoveSelector =
-    '[data-testid="rich-note-property-row"][data-property-key="topic"] [data-testid="rich-note-property-row-remove"]'
-  const topicRowKeyInputSelector =
-    '[data-testid="rich-note-property-row"][data-property-key="topic"] [data-testid="rich-note-property-row-key-input"]'
-  const topicRowSelector =
-    '[data-testid="rich-note-property-row"][data-property-key="topic"]'
+  const topicRowSelector = propertyRowSelector("topic")
+  const topicRowKeyInputSelector = `${topicRowSelector} [data-testid="rich-note-property-row-key-input"]`
 
   it("soft-deletes the tracker and removes the property when the user confirms", async () => {
     const tracker = mockNoteInfoWithPropertyTracker("topic", 99)
@@ -79,7 +79,7 @@ Workshop body.`
 
     const wrapper = await h.mountEditor(trackedPropertyMarkdown, { noteId })
 
-    await wrapper.find(topicRowRemoveSelector).trigger("click")
+    await expandAndClickPropertyRowRemove(wrapper, topicRowSelector)
     await flushPromises()
 
     await vi.waitFor(() => {
@@ -99,7 +99,7 @@ Workshop body.`
     const wrapper = await h.mountEditor(trackedPropertyMarkdown, { noteId })
     const emitCountBefore = wrapper.emitted("update:modelValue")?.length ?? 0
 
-    await wrapper.find(topicRowRemoveSelector).trigger("click")
+    await expandAndClickPropertyRowRemove(wrapper, topicRowSelector)
     await flushPromises()
 
     await vi.waitFor(() => {
@@ -135,13 +135,7 @@ Workshop body.`
     const last = h.lastEmittedMarkdown()
     expect(last).toContain("subject:")
     expect(last).not.toContain("topic:")
-    expect(
-      wrapper
-        .find(
-          '[data-testid="rich-note-property-row"][data-property-key="subject"]'
-        )
-        .exists()
-    ).toBe(true)
+    expect(wrapper.find(propertyRowSelector("subject")).exists()).toBe(true)
   })
 
   it("reverts the property key and does not emit when the user cancels a rename", async () => {

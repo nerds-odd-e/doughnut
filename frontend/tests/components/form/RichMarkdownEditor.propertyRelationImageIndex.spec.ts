@@ -9,6 +9,10 @@ import {
   selectCustomRelationRadio,
 } from "./propertyRelationImageIndexTestDom"
 import {
+  expandAndClickPropertyRowRemove,
+  propertyRowSelector,
+} from "./propertiesTestDom"
+import {
   editorRoot,
   emitQuillBodyHtml,
   mountRelationNote,
@@ -78,9 +82,7 @@ Paragraph.\n`
 
     expect(wrapper.text()).toContain("Properties")
 
-    await wrapper
-      .find('[data-testid="rich-note-property-row-remove"]')
-      .trigger("click")
+    await expandAndClickPropertyRowRemove(wrapper, propertyRowSelector("only"))
 
     const last = h.lastEmittedMarkdown()
     expect(last.startsWith("---")).toBe(false)
