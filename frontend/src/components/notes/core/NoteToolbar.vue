@@ -51,7 +51,14 @@
         <LayoutTemplate class="w-6 h-6" />
       </button>
 
-      <button v-if="!readonly && !audioTools" type="button" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Audio tools" @click="audioTools = true">
+      <button
+        v-if="!readonly"
+        type="button"
+        :class="['daisy-btn daisy-btn-ghost daisy-btn-sm', { 'daisy-btn-active': audioToolsOpen }]"
+        title="Audio tools"
+        :aria-pressed="audioToolsOpen"
+        @click="audioToolsOpen = !audioToolsOpen"
+      >
         <Mic class="w-6 h-6" />
       </button>
 
@@ -64,9 +71,8 @@
     </div>
   </nav>
   <NoteAudioTools
-    v-if="!readonly && audioTools"
+    v-if="!readonly && audioToolsOpen"
     v-bind="{ note }"
-    @close-dialog="audioTools = false"
   />
 </template>
 
@@ -109,7 +115,7 @@ const showRelocatedNewNote = computed(
   () => !sidebarOpened.value && props.readonly !== true
 )
 
-const audioTools = ref(false)
+const audioToolsOpen = ref(false)
 const toolbarNavRef = ref<HTMLElement | null>(null)
 const { showMoreOptionsInline } = useNoteToolbarMoreOptionsInline(toolbarNavRef)
 const wikiLinkOrRelationshipPopButtonRef = ref<InstanceType<

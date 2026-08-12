@@ -165,20 +165,15 @@ describe("NoteAudioTools recording controls", () => {
     expect(flushButton.attributes("disabled")).toBeFalsy()
   })
 
-  it("emits closeDialog when close is clicked", async () => {
-    await wrapper.find(".close-btn").trigger("click")
-    expect(wrapper.emitted().closeDialog).toBeTruthy()
-  })
-
-  it("stops recording when close is clicked while recording", async () => {
+  it("stops recording when unmounted while recording", async () => {
     await startRecording(wrapper)
-    await wrapper.find(".close-btn").trigger("click")
-    await flushPromises()
-    await wrapper.vm.$nextTick()
+    const vm = audioToolsVm(wrapper)
 
-    expect(audioToolsVm(wrapper).isRecording).toBe(false)
-    expect(audioToolsVm(wrapper).audioRecorder.stopRecording).toHaveBeenCalled()
-    expect(wrapper.emitted().closeDialog).toBeTruthy()
+    wrapper.unmount()
+    await flushPromises()
+
+    expect(vm.isRecording).toBe(false)
+    expect(vm.audioRecorder.stopRecording).toHaveBeenCalled()
   })
 
   it("enables Save Audio Locally after a recording produces a file", async () => {

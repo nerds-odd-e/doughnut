@@ -1,13 +1,10 @@
 <template>
-  <div class="audio-tools-container bg-dark animate-dropdown">
-    <div class="waveform-container">
-      <Waveform :audioRecorder="audioRecorder" :isRecording="isRecording" />
-      <button class="close-btn" @click="closeDialog" title="Close">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-          <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>
-        </svg>
-      </button>
-    </div>
+  <div class="audio-tools-container bg-dark">
+    <Waveform
+      class="mb-5"
+      :audioRecorder="audioRecorder"
+      :isRecording="isRecording"
+    />
     <div class="daisy-alert daisy-alert-info" v-if="errors">{{ errors }}</div>
     <div class="button-group">
       <template v-if="!isRecording">
@@ -57,126 +54,43 @@
         </svg>
       </button>
     </div>
-    <div v-if="showAdvancedOptions" class="advanced-options animate-dropdown">
-      <div class="input-group">
-        <label for="processingInstructions">Processing Instructions:</label>
-        <input
-          id="processingInstructions"
-          v-model="processingInstructions"
-          type="text"
-          placeholder="Enter additional processing instructions..."
-          class="processing-input"
-        />
-      </div>
-      <FullScreen>
-        <div v-if="errors" class="fullscreen-error">
-          {{ Object.values(errors)[0] }}
-        </div>
-      </FullScreen>
-    </div>
+    <NoteAudioToolsAdvancedOptions
+      v-if="showAdvancedOptions"
+      v-model:processing-instructions="processingInstructions"
+      :errors="errors"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, type PropType } from "vue"
+import { onBeforeUnmount, ref, type PropType } from "vue"
 import { createAudioRecorder } from "../../../models/audio/audioRecorder"
 import { createWakeLocker } from "../../../models/wakeLocker"
 import type { Note } from "@generated/doughnut-backend-api"
-import {
-  AiAudioController,
-  AiController,
-} from "@generated/doughnut-backend-api/sdk.gen"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import Waveform from "./Waveform.vue"
+import NoteAudioToolsAdvancedOptions from "./NoteAudioToolsAdvancedOptions.vue"
 import { Mic } from "@lucide/vue"
-import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
-import FullScreen from "@/components/common/FullScreen.vue"
-
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
-
-const storageAccessor = useStorageAccessor()
+import { useNoteAudioProcessing } from "@/composables/useNoteAudioProcessing"
 
 const { note } = defineProps({
   note: { type: Object as PropType<Note>, required: true },
 })
 
-const emit = defineEmits(["closeDialog"])
-
 const audioFile = ref<Blob | undefined>()
 const errors = ref<Record<string, string | undefined>>()
-
 const isRecording = ref(false)
 const wakeLocker = createWakeLocker()
-
-const isPowerOfTwo = (n: number): boolean => n > 0 && (n & (n - 1)) === 0
-
-const shouldSuggestTitle = (callCount: number): boolean =>
-  isPowerOfTwo(callCount)
-
-const updateTopicIfSuggested = async (noteId: number) => {
-  const { data: suggestedTopic, error } = await apiCallWithLoading(() =>
-    AiController.suggestTitle({
-      path: { note: noteId },
-    })
-  )
-  if (!error && suggestedTopic?.title) {
-    await storageAccessor.value
-      .storedApi()
-      .updateTextField(noteId, "edit title", suggestedTopic.title)
-  }
-}
-
 const showAdvancedOptions = ref(false)
 const processingInstructions = ref("")
-const callCount = ref(0)
+
+const { processAudio, isProcessing } = useNoteAudioProcessing(
+  note,
+  processingInstructions,
+  errors
+)
 
 const toggleAdvancedOptions = () => {
   showAdvancedOptions.value = !showAdvancedOptions.value
-}
-
-const isProcessing = ref(false)
-
-const getLastContentChunk = (
-  content: string | undefined,
-  maxLength = 500
-): string => {
-  if (!content) return ""
-  if (content.length <= maxLength) return content
-  return `...${content.slice(-maxLength)}`
-}
-
-const processAudio = async (chunk: AudioChunk): Promise<string | undefined> => {
-  isProcessing.value = true
-  try {
-    const { data: response, error } = await AiAudioController.audioToText({
-      body: {
-        uploadAudioFile: chunk.data,
-        additionalProcessingInstructions: processingInstructions.value,
-        isMidSpeech: chunk.isMidSpeech,
-        previousNoteContentToAppendTo: getLastContentChunk(note.content),
-      },
-    })
-
-    if (error || !response) {
-      throw new Error("Failed to process audio")
-    }
-
-    await storageAccessor.value
-      .storedApi()
-      .completeContent(note.id, response.completionFromAudio)
-
-    callCount.value++
-    if (shouldSuggestTitle(callCount.value)) {
-      updateTopicIfSuggested(note.id)
-    }
-
-    return response.endTimestamp
-  } catch (error) {
-    errors.value = error as Record<string, string | undefined>
-    return undefined
-  } finally {
-    isProcessing.value = false
-  }
 }
 
 const audioRecorder = createAudioRecorder(processAudio)
@@ -226,12 +140,11 @@ const saveAudioLocally = () => {
   }
 }
 
-const closeDialog = () => {
+onBeforeUnmount(() => {
   if (isRecording.value) {
     stopRecording()
   }
-  emit("closeDialog")
-}
+})
 
 const tryFlushAudio = async () => {
   if (isRecording.value) {
@@ -259,34 +172,6 @@ const tryFlushAudio = async () => {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.waveform-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.waveform-container :deep(.waveform) {
-  flex: 1;
-}
-
-.close-btn {
-  flex-shrink: 0;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #4a5568;
-  transition: color 0.3s ease;
-  padding: 8px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.close-btn:hover {
-  color: #2d3748;
-  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .button-group {
@@ -344,44 +229,5 @@ const tryFlushAudio = async () => {
   outline: none;
   border-color: #3182ce;
   box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
-}
-
-.advanced-options {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.input-group label {
-  color: #a0aec0;
-  font-size: 14px;
-}
-
-.processing-input {
-  padding: 8px 12px;
-  border-radius: 4px;
-  border: 1px solid #4299e1;
-  background-color: rgba(255, 255, 255, 0.1);
-  color: white;
-  font-size: 14px;
-}
-
-.processing-input:focus {
-  outline: none;
-  border-color: #3182ce;
-  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
-}
-
-.fullscreen-error {
-  color: #fc8181;
-  font-size: 14px;
-  text-align: center;
-  max-width: 80%;
 }
 </style>
