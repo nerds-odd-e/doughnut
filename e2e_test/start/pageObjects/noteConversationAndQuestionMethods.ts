@@ -73,12 +73,6 @@ export const noteConversationAndQuestionMethods = () => ({
     waitUntilAppIsNotBusy()
     return this
   },
-  setRememberSpelling() {
-    this.openAssimilationSettings()
-    form.getField('Remember Spelling').check()
-    waitUntilAppIsNotBusy()
-    return this
-  },
   expectWithoutAssimilationPanel() {
     cy.url({ timeout: 15000 }).should('match', /\/d\/n\/\d+|\/n\/\d+|\/n\d+/)
     cy.get(assimilateButtonSelector).should('not.exist')

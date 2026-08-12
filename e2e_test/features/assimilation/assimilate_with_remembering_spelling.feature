@@ -54,15 +54,6 @@ Feature: Assimilate with remembering spelling
     When I verify spelling with "color"
     Then the spelling verification result for note "colour" should be "success"
 
-  Scenario: Already assimilated note reappears for assimilation when remember spelling is added later
-    Given I have a notebook "English practice" with notes:
-      | Title   | Content             |
-      | Relearn | Non-empty body text |
-    And the note "Relearn" was assimilated on day 1
-    And I add remember spelling to the note "Relearn"
-    When I reload the current page for note "Relearn"
-    Then I should see 1 due for assimilation
-
   Scenario: Add only spelling memory tracker when note already has trackers
     Given I have a notebook "English practice" with notes:
       | Title | Content             |

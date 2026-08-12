@@ -56,20 +56,9 @@ Replace re-assimilate (confirm → soft-delete tracker) with a frequent-failure 
 
 ---
 
-### Phase 4 — Behavior: Drop remember-spelling wipe — **planned**
+### Phase 4 — Behavior: Drop remember-spelling wipe — **done**
 
-**Pre:** Note already has a normal note-level tracker.  
-**Trigger:** Learner turns remember spelling on.  
-**Post:** Trackers unchanged; no wipe-driven re-queue (no new queue rule).
-
-**Work (same phase — do not leave failing tests):**
-
-- Delete E2E *“Already assimilated note reappears…”*.
-- Delete `shouldPutNoteBackToAssimilationListWhenRememberSpellingIsAddedLater` (or equivalent).
-- Remove `removeMemoryTrackersForReassimilation` and its call site.
-- No negation count tests; no missing-spelling queue.
-
-**Verify:** Grep wipe helper gone; remaining remember-spelling / assimilate tests pass (including add-spelling-only if present).
+Removed `removeMemoryTrackersForReassimilation`, reappears E2E scenario, unit test, and orphaned step/page-object helpers. No negation tests.
 
 ---
 
