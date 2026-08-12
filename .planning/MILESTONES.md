@@ -32,3 +32,22 @@ commission, amend, or pre-session snapshots). E2E `commissioned_learning_session
 green.
 
 ---
+
+## Production hard-delete incident & prevention (Shipped: 2026-08-12)
+
+**Quick plan:** `003-safe-hard-delete` (8 phases) — response to outage from `V300000245`.
+
+**Incident:** Cascading `DELETE` on `memory_tracker` blocked by `conversation_ibfk_4` (RESTRICT on `recall_prompt_id`). Flyway fail-stop startup took both MIG instances offline.
+
+**Delivered:**
+
+- Removed failed migration; `conversation.recall_prompt_id` → `ON DELETE SET NULL` (`V300000246`)
+- Deploy gated on `/api/healthcheck`; success record only after verified probe
+- CI and deploy split (`deploy.yml` on green CI); deploy only latest `main` HEAD
+- `DeletableEntityFkClosureTest`, ERD delete-rule labels, migration/testing rule updates
+
+**Causal link:** Migration introduced by [remove re-assimilate](quick/001-remove-reassimilate/) phase 8; orphan cleanup was unnecessary (partial unique index already ignores soft-deleted rows).
+
+**Detail:** [CONTEXT.md](quick/003-safe-hard-delete/CONTEXT.md)
+
+---

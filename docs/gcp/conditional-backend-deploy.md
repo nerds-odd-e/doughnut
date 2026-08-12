@@ -6,7 +6,7 @@ On a green `main` CI run, the separate **deploy** workflow ([`.github/workflows/
 
 ## Last successful deploy record
 
-After a **full** deploy (upload + rolling replace), the deploy workflow writes JSON to `deploy/last-successful-deploy.json` with `sha256`, `startup_script_sha256`, `git_sha`, and `recorded_at`. The record is updated only when both steps succeed.
+After a **full** deploy (upload + rolling replace), the deploy workflow probes `https://doughnut.odd-e.com/api/healthcheck` via `infra/gcp/scripts/app-instance-healthcheck.sh`. Only on success does it write JSON to `deploy/last-successful-deploy.json` with `sha256`, `startup_script_sha256`, `git_sha`, and `recorded_at`. A failed probe fails the deploy workflow and leaves the record unchanged.
 
 ## MIG template / startup changes without a new jar
 

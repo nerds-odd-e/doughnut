@@ -17,7 +17,7 @@ Replace re-assimilate (confirm → soft-delete tracker) with a frequent-failure 
 | Remember spelling later | Remove wipe + reappears tests; no queue rule; no negation test | Product drops that side effect |
 | Property tracker on property delete | Hard-delete after cancellable confirm | No user-facing soft-delete |
 | Tracker `deletedAt` | Keep for note delete/restore only | Cascade already works |
-| Orphan soft-deleted trackers | Hard-delete when note not soft-deleted | Match new rules |
+| Orphan soft-deleted trackers | Not migrated — `V300000245` reverted; rows inert under unique index | See [003 CONTEXT](../003-safe-hard-delete/CONTEXT.md) |
 | Artifact names | Capability names (e.g. `frequent_failure_warning.feature`) | No phase numbers in product code |
 
 ## Phase sizing notes
@@ -80,9 +80,9 @@ Removed `/soft-delete` endpoint, service method, and related tests; regenerated 
 
 ---
 
-### Phase 8 — Behavior: Clean orphan soft-deleted trackers — **done**
+### Phase 8 — Behavior: Clean orphan soft-deleted trackers — **done** (migration reverted)
 
-`V300000245` hard-deletes orphan soft-deleted trackers on live notes; migration test added.
+`V300000245` shipped here; **reverted** 2026-08-12 — caused production outage (FK block). See [safe hard delete](../003-safe-hard-delete/CONTEXT.md). Orphan rows remain; inert under partial unique index.
 
 ---
 
