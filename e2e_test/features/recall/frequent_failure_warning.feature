@@ -1,4 +1,3 @@
-@wip
 @usingMockedOpenAiService
 Feature: Frequent failure warning after too many wrong answers
   As a learner, when I keep answering a note wrong,

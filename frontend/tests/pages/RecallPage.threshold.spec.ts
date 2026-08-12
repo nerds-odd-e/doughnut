@@ -24,19 +24,21 @@ vi.mock("vue-router", async (importOriginal) => {
   }
 })
 
-describe("RecallPage re-assimilation threshold", () => {
+describe("RecallPage frequent failure warning", () => {
   const memoryTrackerId = 123
   const ctx = useRecallPageSpecContext({ fakeTimers: true })
   let getThresholdExceededSpy: ReturnType<typeof mockSdkService>
-  let confirmMock: ReturnType<typeof vi.fn<(msg: string) => Promise<boolean>>>
+  let alertMock: ReturnType<typeof vi.fn<(msg: string) => Promise<boolean>>>
 
   beforeEach(() => {
-    confirmMock = vi.fn<(msg: string) => Promise<boolean>>()
+    alertMock = vi
+      .fn<(msg: string) => Promise<boolean>>()
+      .mockResolvedValue(true)
     vi.mocked(usePopups).mockReturnValue({
       popups: {
         options: vi.fn().mockResolvedValue(null),
-        alert: vi.fn(),
-        confirm: confirmMock,
+        alert: alertMock,
+        confirm: vi.fn(),
         done: vi.fn(),
         register: vi.fn(),
         peek: vi.fn(),
@@ -98,11 +100,38 @@ describe("RecallPage re-assimilation threshold", () => {
     )
   })
 
-  it("should offer property-aware re-assimilation when threshold exceeded", async () => {
+  it("should show note-level frequent failure warning when threshold exceeded", async () => {
     getThresholdExceededSpy.mockResolvedValue(
-      wrapSdkResponse({ thresholdExceeded: true })
+      wrapSdkResponse({
+        thresholdExceeded: true,
+        wrongCount: 5,
+        periodDays: 14,
+      })
     )
-    confirmMock.mockResolvedValueOnce(false)
+    const wrongAnswerResult: AnsweredQuestion = makeMe.anAnsweredQuestion
+      .withNote(makeMe.aNote.please())
+      .withPredefinedQuestion(makeMe.aPredefinedQuestion.please())
+      .withAnswer({ id: 1, correct: false, choiceIndex: 1 })
+      .withMemoryTrackerId(memoryTrackerId)
+      .please()
+    const wrapper = await ctx.mountPage()
+    wrapper
+      .findComponent({ name: "Quiz" })
+      .vm.$emit("answered", wrongAnswerResult)
+    await flushPromises()
+    expect(alertMock).toHaveBeenCalledWith(
+      "You've answered incorrectly 5 times within the last 14 days."
+    )
+  })
+
+  it("should show property-aware frequent failure warning when threshold exceeded", async () => {
+    getThresholdExceededSpy.mockResolvedValue(
+      wrapSdkResponse({
+        thresholdExceeded: true,
+        wrongCount: 7,
+        periodDays: 14,
+      })
+    )
     const wrongAnswerResult: AnsweredQuestion = makeMe.anAnsweredQuestion
       .withNote(makeMe.aNote.please())
       .withPredefinedQuestion(makeMe.aPredefinedQuestion.please())
@@ -115,8 +144,8 @@ describe("RecallPage re-assimilation threshold", () => {
       .findComponent({ name: "Quiz" })
       .vm.$emit("answered", wrongAnswerResult)
     await flushPromises()
-    expect(confirmMock).toHaveBeenCalledWith(
-      'You have answered the "topic" property incorrectly too many times. Would you like to re-assimilate it?'
+    expect(alertMock).toHaveBeenCalledWith(
+      'You\'ve answered the "topic" property incorrectly 7 times within the last 14 days.'
     )
   })
 })

@@ -85,11 +85,9 @@ import { computed, ref, watch } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 import { useRecallTrackerNavigation } from "@/composables/useRecallTrackerNavigation"
 import { useRecallAnswerHandling } from "@/composables/useRecallAnswerHandling"
-import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import { useRecallPageLoading } from "@/composables/useRecallPageLoading"
 import { scheduleFocusAutofocusTargetWithin } from "@/utils/focusTarget"
 
-const { dueCount, setDueCount } = useAssimilationCount()
 const {
   currentRecallWindowEndAt,
   setCurrentRecallWindowEndAt,
@@ -170,8 +168,6 @@ const { onAnswered, onOverlapRetry, onJustReviewed } = useRecallAnswerHandling({
   previousAnsweredQuestions,
   previousAnsweredQuestionCursor,
   spellingRetryNonce,
-  dueCount,
-  setDueCount,
   moveToNextMemoryTracker,
   viewLastAnsweredQuestion,
 })

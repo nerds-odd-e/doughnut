@@ -1,4 +1,7 @@
-import type { AnsweredQuestion } from "@generated/doughnut-backend-api"
+import type {
+  AnsweredQuestion,
+  ThresholdExceededResult,
+} from "@generated/doughnut-backend-api"
 import { MemoryTrackerController } from "@generated/doughnut-backend-api/sdk.gen"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
@@ -8,8 +11,6 @@ type RecallAnswerHandlingDeps = {
   previousAnsweredQuestions: Ref<(AnsweredQuestion | undefined)[]>
   previousAnsweredQuestionCursor: Ref<number | undefined>
   spellingRetryNonce: Ref<number>
-  dueCount: Ref<number | undefined>
-  setDueCount: (count: number | undefined) => void
   moveToNextMemoryTracker: () => void
   viewLastAnsweredQuestion: (cursor: number | undefined) => void
 }
@@ -18,27 +19,21 @@ export function useRecallAnswerHandling({
   previousAnsweredQuestions,
   previousAnsweredQuestionCursor,
   spellingRetryNonce,
-  dueCount,
-  setDueCount,
   moveToNextMemoryTracker,
   viewLastAnsweredQuestion,
 }: RecallAnswerHandlingDeps) {
   const { popups } = usePopups()
 
-  const offerReAssimilation = async (answerResult: AnsweredQuestion) => {
-    const memoryTrackerId = answerResult.memoryTrackerId
-    if (memoryTrackerId === undefined) return
+  const showFrequentFailureWarning = async (
+    answerResult: AnsweredQuestion,
+    thresholdResult: ThresholdExceededResult
+  ) => {
     const propertyKey = answerResult.recalledNote?.propertyKey
+    const { wrongCount, periodDays } = thresholdResult
     const message = propertyKey
-      ? `You have answered the "${propertyKey}" property incorrectly too many times. Would you like to re-assimilate it?`
-      : "You have answered this note incorrectly too many times. Would you like to re-assimilate it?"
-    const confirmed = await popups.confirm(message)
-    if (confirmed) {
-      await MemoryTrackerController.softDelete({
-        path: { memoryTracker: memoryTrackerId },
-      })
-      setDueCount((dueCount.value ?? 0) + 1)
-    }
+      ? `You've answered the "${propertyKey}" property incorrectly ${wrongCount} times within the last ${periodDays} days.`
+      : `You've answered incorrectly ${wrongCount} times within the last ${periodDays} days.`
+    await popups.alert(message)
   }
 
   const onAnswered = async (answerResult: AnsweredQuestion) => {
@@ -60,7 +55,7 @@ export function useRecallAnswerHandling({
           })
         )
         if (data?.thresholdExceeded) {
-          await offerReAssimilation(answerResult)
+          await showFrequentFailureWarning(answerResult, data)
         }
       }
     }

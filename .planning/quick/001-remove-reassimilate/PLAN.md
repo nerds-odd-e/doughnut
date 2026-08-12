@@ -50,19 +50,9 @@ Replace re-assimilate (confirm → soft-delete tracker) with a frequent-failure 
 
 ---
 
-### Phase 3 — Behavior: Frequent-failure warning (green) — **planned**
+### Phase 3 — Behavior: Frequent-failure warning (green) — **done**
 
-**Pre / trigger / post:** Same as Phase 2; now true in the app.
-
-**Work:**
-
-- In recall answer handling: on threshold exceeded, `popups.alert` with CONTEXT copy from API fields; **do not** `softDelete` / confirm.
-- Update frontend recall threshold unit tests (note-level + property-aware copy).
-- Make E2E pass; remove `@wip`.
-
-**Verify:** Frontend unit tests + targeted E2E green.
-
-**Stop-safe:** Learners get the warning; no tracker wipe on failure. Soft-delete endpoint may still exist unused by this path.
+**Post:** Alert with live API counts; no softDelete/confirm. E2E `frequent_failure_warning.feature` green (no `@wip`). Unused `dueCount` deps removed from recall answer handling.
 
 ---
 
