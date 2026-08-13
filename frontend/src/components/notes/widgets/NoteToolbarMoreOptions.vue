@@ -26,6 +26,8 @@
       :as-markdown="asMarkdown"
       @close-dialog="closeDropdown"
       @edit-as-markdown="emit('edit-as-markdown', $event)"
+      @open-wiki="emit('open-wiki')"
+      @open-new="emit('open-new')"
     />
   </AutoCollapseDropdown>
 </template>
@@ -53,11 +55,15 @@ const props = defineProps<{
   note: Note
   toolbarNav: HTMLElement | null
   asMarkdown?: boolean
+  hasNewNote?: boolean
+  hasConversation?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: "overflowed-ids", ids: NoteMoreOptionsActionId[]): void
   (e: "edit-as-markdown", value: boolean): void
+  (e: "open-wiki"): void
+  (e: "open-new"): void
 }>()
 
 const overflowDropdownRef = ref<InstanceType<
@@ -78,49 +84,11 @@ const pinnedIds = computed(() => {
   return ids
 })
 
-const moreOptionTitles = new Set<string>([
-  noteMoreOptionsTitles.overflowMenu,
-  ...NOTE_TOOLBAR_MORE_OPTIONS_ORDER.flatMap((id) =>
-    noteToolbarOverflowTitles(id)
-  ),
-])
-
 const closeOverflowMenu = () => {
   overflowDropdownRef.value?.closeDropdown()
 }
 
 defineExpose({ closeOverflowMenu })
-
-const layoutWidth = (el: HTMLElement): number => {
-  if (getComputedStyle(el).display === "contents") {
-    let sum = 0
-    for (const child of el.children) {
-      sum += layoutWidth(child as HTMLElement)
-    }
-    return sum
-  }
-  return el.offsetWidth
-}
-
-const isMoreOptionsControl = (el: HTMLElement) => {
-  const title = el.getAttribute("title")
-  if (title && moreOptionTitles.has(title)) return true
-  for (const labeled of el.querySelectorAll("[title]")) {
-    const labeledTitle = labeled.getAttribute("title")
-    if (labeledTitle && moreOptionTitles.has(labeledTitle)) return true
-  }
-  return false
-}
-
-const precedingSiblingWidth = (group: HTMLElement) => {
-  let sum = 0
-  for (const child of group.children) {
-    const el = child as HTMLElement
-    if (isMoreOptionsControl(el)) break
-    sum += layoutWidth(el)
-  }
-  return sum
-}
 
 const controlByTitle = (root: ParentNode, title: string) => {
   for (const el of root.querySelectorAll("[title]")) {
@@ -154,11 +122,15 @@ const measureAndCompute = () => {
   if (overflowWidth > 0) cachedOverflowButtonWidth = overflowWidth
 
   const nextOverflowedIds = computeNoteToolbarOverflow({
-    presentIds: NOTE_TOOLBAR_MORE_OPTIONS_ORDER,
+    presentIds: NOTE_TOOLBAR_MORE_OPTIONS_ORDER.filter((id) => {
+      if (id === "new") return props.hasNewNote === true
+      if (id === "conversation") return props.hasConversation !== false
+      return true
+    }),
     pinnedIds: pinnedIds.value,
     widthById: cachedWidths,
     overflowButtonWidth: cachedOverflowButtonWidth,
-    availableWidth: nav.clientWidth - precedingSiblingWidth(group),
+    availableWidth: nav.clientWidth,
   })
   if (!sameIds(overflowedIds.value, nextOverflowedIds)) {
     overflowedIds.value = nextOverflowedIds
@@ -191,4 +163,5 @@ watch(
 )
 
 watch(pinnedIds, scheduleUpdate)
+watch(() => [props.hasNewNote, props.hasConversation], scheduleUpdate)
 </script>

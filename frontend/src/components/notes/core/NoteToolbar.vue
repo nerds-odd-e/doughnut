@@ -7,6 +7,8 @@
     <div class="daisy-btn-group daisy-btn-group-sm">
       <NoteCreationNewButton
         v-if="showRelocatedNewNote"
+        v-show="!newOverflowed"
+        ref="newNoteButtonRef"
         :notebook-id="notebookId"
         :active-note-realm="activeNoteRealm"
         :breadcrumb-folders="breadcrumbFolders"
@@ -14,8 +16,9 @@
       <PopButton
         v-if="!readonly"
         ref="wikiLinkOrRelationshipPopButtonRef"
+        :hidden="wikiOverflowed || undefined"
         :aria-label="wikiLinkOrRelationshipLabel"
-        :title="`${wikiLinkOrRelationshipLabel} (Ctrl+Shift+F / Cmd+Shift+F)`"
+        :title="noteMoreOptionsTitles.wiki"
         :show-close-button="false"
       >
         <template #button_face>
@@ -31,7 +34,7 @@
       </PopButton>
 
       <a
-        v-if="!conversationButton"
+        v-if="!conversationButton && !conversationOverflowed"
         class="daisy-btn daisy-btn-ghost daisy-btn-sm"
         role="button"
         aria-label="Star a conversation about this note"
@@ -39,7 +42,7 @@
           ...noteShowLocation(note.noteTopology.id),
           query: { conversation: 'true' },
         })"
-        title="Star a conversation about this note"
+        :title="noteMoreOptionsTitles.conversation"
       >
         <MessageCircle class="w-6 h-6" />
       </a>
@@ -62,8 +65,12 @@
         :note="note"
         :toolbar-nav="toolbarNavRef"
         :as-markdown="asMarkdown"
+        :has-new-note="showRelocatedNewNote"
+        :has-conversation="!conversationButton"
         @overflowed-ids="overflowedIds = $event"
         @edit-as-markdown="emit('edit-as-markdown', $event)"
+        @open-wiki="wikiLinkOrRelationshipPopButtonRef?.openDialog()"
+        @open-new="newNoteButtonRef?.openDialog()"
       />
     </div>
   </nav>
@@ -100,6 +107,7 @@ import { useNotebookSidebarOpened } from "@/composables/notebookSidebarOpened"
 import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
 import { useNoteShortcutScope } from "@/composables/noteShortcutScope"
 import {
+  noteMoreOptionsTitles,
   noteToolbarEditTitle,
   type NoteMoreOptionsActionId,
 } from "../widgets/noteMoreOptionsTitles"
@@ -138,11 +146,19 @@ const toolbarNavRef = ref<HTMLElement | null>(null)
 const wikiLinkOrRelationshipPopButtonRef = ref<InstanceType<
   typeof PopButton
 > | null>(null)
+const newNoteButtonRef = ref<InstanceType<typeof NoteCreationNewButton> | null>(
+  null
+)
 const moreOptionsRef = ref<InstanceType<typeof NoteToolbarMoreOptions> | null>(
   null
 )
 const overflowedIds = ref<NoteMoreOptionsActionId[]>([])
 const editOverflowed = computed(() => overflowedIds.value.includes("edit"))
+const conversationOverflowed = computed(() =>
+  overflowedIds.value.includes("conversation")
+)
+const wikiOverflowed = computed(() => overflowedIds.value.includes("wiki"))
+const newOverflowed = computed(() => overflowedIds.value.includes("new"))
 const editTitle = computed(() => noteToolbarEditTitle(props.asMarkdown))
 
 const router = useRouter()

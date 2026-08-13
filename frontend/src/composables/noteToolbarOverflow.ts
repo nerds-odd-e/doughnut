@@ -1,6 +1,9 @@
 import type { NoteMoreOptionsActionId } from "@/components/notes/widgets/noteMoreOptionsTitles"
 
 export const NOTE_TOOLBAR_MORE_OPTIONS_ORDER = [
+  "new",
+  "wiki",
+  "conversation",
   "edit",
   "export",
   "questions",

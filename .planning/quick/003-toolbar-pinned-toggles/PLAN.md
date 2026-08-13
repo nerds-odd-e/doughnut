@@ -1,6 +1,6 @@
 # Pin on-state note-toolbar toggles
 
-**Status:** in progress (Phases 1–4 done)  
+**Status:** complete  
 **Type:** ad-hoc UX under `.planning/quick/`  
 **Goal:** An on-state Audio / Assimilation control stays on the note toolbar (never in More options), with higher priority than other icons as width shrinks. Off-state toggles can still live in More options.
 
@@ -31,12 +31,13 @@ Do **not** replace the 600px overflow model, rewrite `NoteToolbar`, or introduce
 | D-06 | No new E2E feature file. Cypress viewport stays 1200. Update [`noteMoreOptionsForm.ts`](e2e_test/start/pageObjects/noteMoreOptionsForm.ts) when visibility rules change. |
 | D-07 | Do **not** put New / Wiki / Conversation / Edit in More options until more-options overflow is already measured (Phase 4+). |
 
-## Current code (after Phase 4)
+## Current code (after Phase 5 implementation)
 
-- [`NoteToolbar.vue`](frontend/src/components/notes/core/NoteToolbar.vue) — New / Wiki / Conversation stay inline; Edit hides when overflowed; keyboard `m` stays on the toolbar
-- [`noteToolbarOverflow.ts`](frontend/src/composables/noteToolbarOverflow.ts) — order includes `edit` left of `export`
-- [`NoteMoreOptionsActions.vue`](frontend/src/components/notes/widgets/NoteMoreOptionsActions.vue) — menu-styled Edit when `"edit"` is in `only`
-- E2E: [`noteMoreOptionsForm.ts`](e2e_test/start/pageObjects/noteMoreOptionsForm.ts) `openOverflowMenuIfNeeded(title)` opens `…` only if that title is not already visible
+- [`NoteToolbar.vue`](frontend/src/components/notes/core/NoteToolbar.vue) — Conversation `v-if` hides when overflowed; Wiki/New stay mounted (hidden) so shortcuts still open the same PopButton
+- [`noteToolbarOverflow.ts`](frontend/src/composables/noteToolbarOverflow.ts) — order is `new` → `wiki` → `conversation` → `edit` → …
+- [`NoteMoreOptionsYieldedItems.vue`](frontend/src/components/notes/widgets/NoteMoreOptionsYieldedItems.vue) — menu-styled New / Wiki / Conversation / Edit
+- [`NoteToolbarMoreOptions.vue`](frontend/src/components/notes/widgets/NoteToolbarMoreOptions.vue) — `availableWidth` is nav `clientWidth` (no preceding siblings); `presentIds` drops New when the sidebar has it
+- E2E: [`noteMoreOptionsForm.ts`](e2e_test/start/pageObjects/noteMoreOptionsForm.ts) unchanged (viewport 1200)
 
 ## Learnings (Phase 1)
 
@@ -53,6 +54,12 @@ Do **not** replace the 600px overflow model, rewrite `NoteToolbar`, or introduce
 ## Learnings (Phase 4)
 
 - Add Edit to the overflow order left of Export. Hide the toolbar Edit control when `"edit"` is overflowed; one menu row; keep `m` on NoteToolbar. Do not count Edit as a preceding sibling.
+
+## Learnings (Phase 5)
+
+- One Wiki PopButton (hide trigger with `hidden`, menu row emits `open-wiki`). Same for New (`n` stays on `NoteNewButton`). Do not mount a second PopButton.
+- After New/Wiki/Conversation are overflowable, available width is the full nav `clientWidth`.
+- Tests must mock `offsetWidth` before mount; a first real-width measure can cache ~50px and stick after those controls unmount.
 
 ## Phases
 
@@ -72,13 +79,9 @@ More-options leave the bar from the right (Delete first). On-toggle never leaves
 
 When the bar is still tight after Export overflows, Edit moves into More options (menu-styled). Conversation / Wiki / New stay on the bar. Keyboard `m` still toggles edit mode.
 
-### Phase 5 — Yield Conversation, Wiki, then New note (Behavior) — planned
+### Phase 5 — Yield Conversation, Wiki, then New note (Behavior) — done
 
-**Observable:** Same right-to-left rule continues: Conversation, then Wiki, then New note move into More options. Extreme: only the on-toggle and `…` remain (`…` lists everything hidden). If nothing is on, a tiny bar can be `…` only.
-
-One phase because it is the same overflow rule applied to the remaining three actions, not a new concept.
-
-**Stop-safe:** After Phase 4, Edit already yields; this only helps narrower bars.
+Conversation, then Wiki, then New yield into More options. Extreme: on-toggle + `…`, or `…` only. Wiki/New keep a single PopButton so shortcuts still work. Coverage: `NoteToolbar.conversationWikiNewOverflow.spec.ts`.
 
 ## Out of scope
 

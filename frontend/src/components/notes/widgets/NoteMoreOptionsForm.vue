@@ -7,6 +7,8 @@
       :as-markdown="asMarkdown"
       @close-dialog="$emit('close-dialog')"
       @edit-as-markdown="$emit('edit-as-markdown', $event)"
+      @open-wiki="$emit('open-wiki')"
+      @open-new="$emit('open-new')"
     />
   </DropdownMenu>
 </template>
@@ -26,5 +28,7 @@ defineProps<{
 defineEmits<{
   (e: "close-dialog"): void
   (e: "edit-as-markdown", value: boolean): void
+  (e: "open-wiki"): void
+  (e: "open-new"): void
 }>()
 </script>

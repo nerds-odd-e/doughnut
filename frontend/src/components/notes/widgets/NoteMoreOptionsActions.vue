@@ -1,12 +1,14 @@
 <template>
   <template v-if="layout === 'menu'">
-    <DropdownMenuItem v-if="showMenuAction('edit')">
-      <DropdownMenuActionButton
-        :title="editTitle"
-        :icon="asMarkdown ? LayoutTemplate : FileCode"
-        @click="onEdit"
-      />
-    </DropdownMenuItem>
+    <NoteMoreOptionsYieldedItems
+      :note="note"
+      :only="only"
+      :as-markdown="asMarkdown"
+      @close-dialog="closeDialogIfMenu"
+      @edit-as-markdown="emit('edit-as-markdown', $event)"
+      @open-wiki="emit('open-wiki')"
+      @open-new="emit('open-new')"
+    />
 
     <DropdownMenuItem v-if="showMenuAction('export')">
       <PopButton
@@ -138,8 +140,6 @@ import PopButton from "@/components/commons/Popups/PopButton.vue"
 import Questions from "@/components/notes/Questions.vue"
 import {
   CircleCheck,
-  FileCode,
-  LayoutTemplate,
   MessageCircleQuestion,
   Mic,
   Trash2,
@@ -152,9 +152,9 @@ import { useNoteDeleteFlow } from "@/composables/useNoteDeleteFlow"
 import DropdownMenuActionButton from "@/components/commons/DropdownMenuActionButton.vue"
 import DropdownMenuItem from "@/components/commons/DropdownMenuItem.vue"
 import { dropdownMenuButtonClass } from "@/components/commons/dropdownMenuClasses"
+import NoteMoreOptionsYieldedItems from "./NoteMoreOptionsYieldedItems.vue"
 import {
   noteMoreOptionsTitles,
-  noteToolbarEditTitle,
   type NoteMoreOptionsActionId,
 } from "./noteMoreOptionsTitles"
 import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
@@ -182,6 +182,8 @@ const props = withDefaults(
 const emit = defineEmits<{
   (e: "close-dialog"): void
   (e: "edit-as-markdown", value: boolean): void
+  (e: "open-wiki"): void
+  (e: "open-new"): void
 }>()
 
 const { toggle, isOpenForNote } = useAssimilationView()
@@ -205,7 +207,6 @@ useKeyboardShortcut(
 useKeyboardShortcut("note-delete", deleteNote, shortcutsEnabled)
 
 const isAssimilationOpen = computed(() => isOpenForNote(props.note.id))
-const editTitle = computed(() => noteToolbarEditTitle(props.asMarkdown))
 const showToolbarAction = (id: NoteMoreOptionsActionId) =>
   props.layout === "toolbar" && !props.omit.includes(id)
 const showMenuAction = (id: NoteMoreOptionsActionId) =>
@@ -224,11 +225,6 @@ const onAudioToggle = () => {
 
 const onAssimilationToggle = () => {
   toggle(props.note.id)
-  closeDialogIfMenu()
-}
-
-const onEdit = () => {
-  emit("edit-as-markdown", !props.asMarkdown)
   closeDialogIfMenu()
 }
 </script>

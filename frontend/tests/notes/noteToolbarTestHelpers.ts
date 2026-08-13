@@ -3,6 +3,7 @@ import type { NoteRealm } from "@generated/doughnut-backend-api"
 import NoteToolbar from "@/components/notes/core/NoteToolbar.vue"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
+import { notebookSidebarClosedPlugin } from "@tests/helpers/notebookSidebarTestProvide"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 import { useNoteToolbarPanel } from "@/composables/useNoteToolbarPanel"
 import type { Router } from "vue-router"
@@ -77,4 +78,10 @@ export async function mountNoteToolbar(
   const wrapper = builder.mount({ attachTo: document.body })
   await flushPromises()
   return wrapper
+}
+
+export async function mountOverflowToolbar(): Promise<VueWrapper> {
+  return mountNoteToolbar(makeMe.aNoteRealm.title("Dummy Title").please(), {
+    plugin: notebookSidebarClosedPlugin(),
+  })
 }

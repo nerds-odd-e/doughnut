@@ -1,4 +1,3 @@
-import makeMe from "doughnut-test-fixtures/makeMe"
 import {
   allMoreOptionsFitNavWidth,
   deleteOverflowNavWidth,
@@ -6,17 +5,15 @@ import {
   exportOverflowNavWidth,
   installMockResizeObserver,
   layoutNoteToolbar,
-  noteToolbarActionWidth,
-  noteToolbarOverflowButtonWidth,
+  remainingMoreOptionsNavWidth,
   restoreNoteToolbarWidthMocks,
 } from "@tests/helpers/mockNoteToolbarNavWidth"
-import { notebookSidebarClosedPlugin } from "@tests/helpers/notebookSidebarTestProvide"
 import {
   noteMoreOptionsTitles,
   noteToolbarEditTitles,
 } from "@/components/notes/widgets/noteMoreOptionsTitles"
 import {
-  mountNoteToolbar,
+  mountOverflowToolbar,
   noteToolbarAction,
   overflowMenuItem,
   resetNoteToolbarTestState,
@@ -43,8 +40,7 @@ describe("NoteToolbar more-options overflow", () => {
   })
 
   it("keeps all more-options on the bar when they fit", async () => {
-    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
-    wrapper = await mountNoteToolbar(noteRealm)
+    wrapper = await mountOverflowToolbar()
     await layoutNoteToolbar(wrapper, allMoreOptionsFitNavWidth())
 
     expect(noteToolbarAction(wrapper, titles.overflowMenu).exists()).toBe(false)
@@ -56,8 +52,7 @@ describe("NoteToolbar more-options overflow", () => {
   })
 
   it("hides delete first when the full more-options set does not fit", async () => {
-    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
-    wrapper = await mountNoteToolbar(noteRealm)
+    wrapper = await mountOverflowToolbar()
     await layoutNoteToolbar(wrapper, deleteOverflowNavWidth())
 
     expect(noteToolbarAction(wrapper, titles.overflowMenu).exists()).toBe(true)
@@ -72,8 +67,7 @@ describe("NoteToolbar more-options overflow", () => {
   })
 
   it("lists only overflowed actions in more options", async () => {
-    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
-    wrapper = await mountNoteToolbar(noteRealm)
+    wrapper = await mountOverflowToolbar()
     await layoutNoteToolbar(wrapper, deleteOverflowNavWidth())
 
     await noteToolbarAction(wrapper, titles.overflowMenu).trigger("click")
@@ -88,12 +82,8 @@ describe("NoteToolbar more-options overflow", () => {
   })
 
   it("hides off-state assimilation then audio as the bar shrinks further", async () => {
-    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
-    wrapper = await mountNoteToolbar(noteRealm)
-    await layoutNoteToolbar(
-      wrapper,
-      noteToolbarActionWidth * 4 + noteToolbarOverflowButtonWidth - 1
-    )
+    wrapper = await mountOverflowToolbar()
+    await layoutNoteToolbar(wrapper, remainingMoreOptionsNavWidth(7) - 1)
 
     expect(noteToolbarAction(wrapper, titles.delete).exists()).toBe(false)
     expect(noteToolbarAction(wrapper, titles.assimilation).exists()).toBe(false)
@@ -103,8 +93,7 @@ describe("NoteToolbar more-options overflow", () => {
   })
 
   it("keeps Edit on the bar after Export has overflowed", async () => {
-    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
-    wrapper = await mountNoteToolbar(noteRealm)
+    wrapper = await mountOverflowToolbar()
     await layoutNoteToolbar(wrapper, exportOverflowNavWidth())
 
     expect(
@@ -114,22 +103,15 @@ describe("NoteToolbar more-options overflow", () => {
   })
 
   it("moves Edit into more options when the bar is tighter than Export overflow", async () => {
-    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
-    wrapper = await mountNoteToolbar(noteRealm, {
-      plugin: notebookSidebarClosedPlugin(),
-    })
+    wrapper = await mountOverflowToolbar()
     await layoutNoteToolbar(wrapper, editOverflowNavWidth())
 
     expect(
       noteToolbarAction(wrapper, noteToolbarEditTitles.markdown).exists()
     ).toBe(false)
-    expect(
-      wrapper.find('[title="Star a conversation about this note"]').exists()
-    ).toBe(true)
-    expect(
-      wrapper.find('[aria-label="Wiki link or relationship"]').exists()
-    ).toBe(true)
-    expect(wrapper.find('button[title="New note (n)"]').exists()).toBe(true)
+    expect(noteToolbarAction(wrapper, titles.conversation).exists()).toBe(true)
+    expect(noteToolbarAction(wrapper, titles.wiki).isVisible()).toBe(true)
+    expect(noteToolbarAction(wrapper, titles.new).isVisible()).toBe(true)
 
     await noteToolbarAction(wrapper, titles.overflowMenu).trigger("click")
     await flushPromises()
@@ -141,8 +123,7 @@ describe("NoteToolbar more-options overflow", () => {
   })
 
   it("emits edit-as-markdown from the overflow Edit row", async () => {
-    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
-    wrapper = await mountNoteToolbar(noteRealm)
+    wrapper = await mountOverflowToolbar()
     await layoutNoteToolbar(wrapper, editOverflowNavWidth())
 
     await noteToolbarAction(wrapper, titles.overflowMenu).trigger("click")
@@ -155,8 +136,7 @@ describe("NoteToolbar more-options overflow", () => {
   })
 
   it("still toggles edit mode with m when Edit is in more options", async () => {
-    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
-    wrapper = await mountNoteToolbar(noteRealm)
+    wrapper = await mountOverflowToolbar()
     await layoutNoteToolbar(wrapper, editOverflowNavWidth())
 
     document.dispatchEvent(

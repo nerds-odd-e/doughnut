@@ -1,8 +1,8 @@
 <template>
   <PopButton
     ref="popButtonRef"
-    title="New note (n)"
-    aria-label="New note (n)"
+    :title="noteMoreOptionsTitles.new"
+    :aria-label="noteMoreOptionsTitles.new"
   >
     <template #button_face>
       <slot />
@@ -26,6 +26,7 @@ import type { Folder, Note } from "@generated/doughnut-backend-api"
 import NoteNewForm from "../NoteNewForm.vue"
 import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
 import { useNoteShortcutScope } from "@/composables/noteShortcutScope"
+import { noteMoreOptionsTitles } from "../widgets/noteMoreOptionsTitles"
 import { ref } from "vue"
 
 defineProps<{
@@ -47,4 +48,8 @@ useKeyboardShortcut(
   },
   () => shortcutScope.value
 )
+
+defineExpose({
+  openDialog: () => popButtonRef.value?.openDialog(),
+})
 </script>

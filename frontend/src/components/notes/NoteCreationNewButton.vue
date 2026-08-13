@@ -1,6 +1,7 @@
 <template>
   <span data-testid="note-creation-new-button" class="contents">
     <NoteNewButton
+      ref="noteNewButtonRef"
       :notebook-id="notebookId"
       :initial-folder="parentFolderForCreation ?? undefined"
       :title-search-anchor-note="anchorNote"
@@ -21,6 +22,7 @@ import type {
 import { NotebookPen } from "@lucide/vue"
 import NoteNewButton from "./core/NoteNewButton.vue"
 import { useNoteCreationToolbarContext } from "@/composables/useNoteCreationToolbarContext"
+import { ref } from "vue"
 
 const props = withDefaults(
   defineProps<{
@@ -37,4 +39,10 @@ const { initialTitle, parentFolderForCreation, anchorNote } =
     activeNoteRealm: props.activeNoteRealm,
     activeFolderRealm: props.activeFolderRealm,
   }))
+
+const noteNewButtonRef = ref<InstanceType<typeof NoteNewButton> | null>(null)
+
+defineExpose({
+  openDialog: () => noteNewButtonRef.value?.openDialog(),
+})
 </script>

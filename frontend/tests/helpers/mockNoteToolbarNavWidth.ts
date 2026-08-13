@@ -19,7 +19,6 @@ export const allMoreOptionsWidth =
 type NoteToolbarOffsetWidthLayout = {
   actionWidths: Partial<Record<NoteMoreOptionsActionId, number>>
   overflowWidth: number
-  precedingWidth: number
 }
 
 let offsetWidthLayout: NoteToolbarOffsetWidthLayout | undefined
@@ -49,7 +48,7 @@ function mockedOffsetWidth(el: HTMLElement): number | undefined {
   }
   if (!el.closest("[data-note-toolbar]")) return
   if (el.hasAttribute("data-note-toolbar")) return
-  return offsetWidthLayout.precedingWidth
+  return 0
 }
 
 function installOffsetWidthMock() {
@@ -75,7 +74,10 @@ function installOffsetWidthMock() {
 
 export function installMockResizeObserver() {
   resizeObserverCallbacks.length = 0
-  offsetWidthLayout = undefined
+  offsetWidthLayout = {
+    actionWidths: {},
+    overflowWidth: noteToolbarOverflowButtonWidth,
+  }
   installOffsetWidthMock()
   vi.stubGlobal(
     "ResizeObserver",
@@ -126,13 +128,11 @@ export function setNoteToolbarMeasuredLayout(
     navWidth: number
     actionWidths?: Partial<Record<NoteMoreOptionsActionId, number>>
     overflowWidth?: number
-    precedingWidth?: number
   }
 ) {
   offsetWidthLayout = {
     actionWidths: options.actionWidths ?? {},
     overflowWidth: options.overflowWidth ?? noteToolbarOverflowButtonWidth,
-    precedingWidth: options.precedingWidth ?? 0,
   }
   setNoteToolbarNavWidth(wrapper, options.navWidth)
 }
@@ -142,31 +142,52 @@ export async function layoutNoteToolbar(wrapper: VueWrapper, navWidth: number) {
   await flushPromises()
 }
 
-/** All overflowable actions including Edit fit; overflow button is not needed. */
-export function allMoreOptionsFitNavWidth(precedingWidth = 0) {
-  return precedingWidth + allMoreOptionsWidth
+/** `actionCount` leftover overflowable actions plus the overflow button. */
+export function remainingMoreOptionsNavWidth(actionCount: number) {
+  return noteToolbarActionWidth * actionCount + noteToolbarOverflowButtonWidth
 }
 
-/** Export and the rest of more-options overflow; Edit still fits beside `…`. */
-export function exportOverflowNavWidth(precedingWidth = 0) {
-  return (
-    precedingWidth + noteToolbarActionWidth + noteToolbarOverflowButtonWidth
-  )
+/** All overflowable actions including New fit; overflow button is not needed. */
+export function allMoreOptionsFitNavWidth() {
+  return allMoreOptionsWidth
+}
+
+/** Export and the rest overflow; Edit still fits (New, Wiki, Conversation, Edit). */
+export function exportOverflowNavWidth() {
+  return remainingMoreOptionsNavWidth(4)
 }
 
 /** After Export is omitted, further shrinkage yields Edit into more options. */
-export function editOverflowNavWidth(precedingWidth = 0) {
-  return exportOverflowNavWidth(precedingWidth) - 1
+export function editOverflowNavWidth() {
+  return exportOverflowNavWidth() - 1
+}
+
+/** Conversation overflows; Wiki and New still on the bar. */
+export function conversationOverflowNavWidth() {
+  return remainingMoreOptionsNavWidth(3) - 1
+}
+
+/** Wiki overflows; New still on the bar. */
+export function wikiOverflowNavWidth() {
+  return remainingMoreOptionsNavWidth(2) - 1
+}
+
+/** Everything overflowed; only `…` remains when nothing is pinned. */
+export function overflowOnlyNavWidth() {
+  return remainingMoreOptionsNavWidth(0)
+}
+
+/** On-toggle and `…` only. */
+export function pinnedToggleOnlyNavWidth() {
+  return remainingMoreOptionsNavWidth(1)
 }
 
 /** Full set does not fit; remaining actions plus overflow button do. */
-export function deleteOverflowNavWidth(precedingWidth = 0) {
-  return precedingWidth + allMoreOptionsWidth - 1
+export function deleteOverflowNavWidth() {
+  return allMoreOptionsWidth - 1
 }
 
 /** Off-state audio and assimilation overflow (pin tests). */
-export function overflowTogglesNavWidth(precedingWidth = 0) {
-  return (
-    precedingWidth + noteToolbarActionWidth * 2 + noteToolbarOverflowButtonWidth
-  )
+export function overflowTogglesNavWidth() {
+  return remainingMoreOptionsNavWidth(2)
 }
