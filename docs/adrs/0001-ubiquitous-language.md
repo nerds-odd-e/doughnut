@@ -20,7 +20,8 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 
 | Term | Meaning |
 |------|---------|
-| **Skip recall** | Opt a note or notebook out of recall (panel action or notebook setting) |
+| **Skip recall** | Opt a memory tracker out of recall (assimilation Skip recall or Remove from recall). Not a note setting. |
+| **Skip Memory Tracking** | Notebook setting that opts the whole notebook out of assimilation and recall (blocks Bazaar subscribe) |
 | **Revive recall** | Re-enable recall after it was skipped |
 | **Remembering spelling** | Assimilation option that requires verifying the note title by spelling |
 | **Quiz / question** | A recall prompt (spelling, AI-generated, predefined, contested, …) |
@@ -49,7 +50,6 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 
 | Concept | Overlapping names |
 |---------|-------------------|
-| Turning off recall for a note or notebook | skip recall, Skip Memory Tracking |
 | Following a shared notebook | subscribe, subscription |
 | Binding to Wikidata | Wikidata association, Wiki association, associate Wikidata ID |
 | User recall interval list | space setting, spaced repetition |
@@ -105,7 +105,7 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
 | **Assimilation** | First-pass intake of a note into the learner’s memory schedule |
 | **Recall** | Spaced review of assimilated material |
 | **Recall question** | A single recall prompt (kinds: spelling, AI-generated, predefined, …) |
-| **Memory tracking** | Whether a note or notebook participates in assimilation and recall |
+| **Memory tracking** | Whether a notebook participates in assimilation and recall (notebook setting). Tracker-level opt-out is skip recall. |
 | **Property memory tracker** | Recall tracking keyed by a property or relationship label |
 | **Spaced-repetition schedule** | User interval list for recall |
 | **Daily assimilation target** | Max new notes to assimilate per day (profile or subscription) |
@@ -144,7 +144,8 @@ guides gradual alignment (tests, UI, OpenAPI, packages).
    - Use **subscription** / **subscribe** for following a shared notebook;
      reserve **learning** for the overall learner metaphor, not as a synonym of
      subscription.
-   - Prefer **memory tracking** for the setting; **skip recall** for the action.
+   - Prefer **memory tracking** for the notebook-only setting; **skip recall**
+     for the action. Do not skip memory tracking on a note.
    - Prefer **recall question** over bare **quiz** when naming the prompt type.
    - Prefer **spaced-repetition schedule** over **space setting** in new copy.
    - Prefer **semantic search** over **semantical search**.
