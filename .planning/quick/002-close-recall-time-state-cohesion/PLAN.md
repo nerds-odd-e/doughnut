@@ -1,6 +1,6 @@
 # Close recall-time state cohesion (C1)
 
-**Status:** In progress — Phases 1–7 complete; Phase 8 next
+**Status:** In progress — Phases 1–8 complete; Phase 9 next
 **Plan type:** Ad-hoc phased delivery
 **Created:** 2026-08-13
 **Refined:** 2026-08-13 for small, green commit boundaries
@@ -106,7 +106,7 @@ timestamps without changing `nextRecallAt`.
 | 5 | Behavior | Done | A correct recall after failure is proven to use the failure anchor |
 | 6 | Behavior | Done | Accidental match is protected as an anchor-moving outcome |
 | 7 | Behavior | Done | Overlap is protected as a no-anchor-mutation outcome |
-| 8 | Behavior | Planned | Recorded Tutor Feedback is protected as an anchor-moving outcome |
+| 8 | Behavior | Done | Recorded Tutor Feedback is protected as an anchor-moving outcome |
 | 9 | Behavior | Planned | Missing Tutor Feedback is protected as a no-mutation outcome |
 | 10 | Structure | Planned | A default-off repair gate enables only the next repair behavior |
 | 11 | Behavior | Planned | Legacy normal Answers repair stale anchors |
@@ -308,7 +308,7 @@ feature remained green at 2/2.
 ## Phase 8 — Protect Tutor Feedback anchoring
 
 **Type:** Behavior (existing-behavior regression)
-**Status:** Planned
+**Status:** Done
 
 - **Precondition:** A commissioned tracker has an earlier anchor.
 - **Trigger:** A Tutor report records a score at `t`.
@@ -322,6 +322,10 @@ feature remained green at 2/2.
 
 - `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
 - `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/learning_session/commissioned_learning_session.feature`
+
+**Learning:** The canonical record test now proves accepted Feedback records
+both its own timestamp and the commissioned tracker's anchor at the same grade
+time; restoring only the old anchor made exactly this assertion fail.
 
 **Stop-safe:** The second grading source gains explicit C1 coverage.
 

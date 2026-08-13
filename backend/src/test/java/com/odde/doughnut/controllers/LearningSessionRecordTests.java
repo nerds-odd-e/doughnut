@@ -38,6 +38,7 @@ class LearningSessionRecordTests extends LearningSessionControllerTestBase {
     for (SessionItem item : sessionItemRepository.findByLearningSession_Id(session.getId())) {
       assertThat(item.getFeedbackRecordedAt(), equalTo(dayTwo));
       assertThat(item.getMemoryTracker().getRecallCount(), equalTo(1));
+      assertThat(item.getMemoryTracker().getLastRecalledAt(), equalTo(dayTwo));
     }
   }
 
