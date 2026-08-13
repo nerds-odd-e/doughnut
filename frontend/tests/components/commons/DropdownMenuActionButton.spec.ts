@@ -10,35 +10,14 @@ const stubIcon = markRaw(
 )
 
 describe("DropdownMenuActionButton", () => {
-  it("renders icon and title without a check by default", () => {
+  it("renders icon and title", () => {
     const wrapper = helper
       .component(DropdownMenuActionButton)
       .withProps({ title: "Test action", icon: stubIcon })
       .mount()
 
-    expect(
-      wrapper.find('[data-testid="dropdown-menu-action-checked"]').exists()
-    ).toBe(false)
     expect(wrapper.find('[data-testid="action-icon"]').exists()).toBe(true)
     expect(wrapper.text()).toContain("Test action")
-  })
-
-  it("renders check before the action icon when checked", () => {
-    const wrapper = helper
-      .component(DropdownMenuActionButton)
-      .withProps({ title: "Test action", icon: stubIcon, checked: true })
-      .mount()
-
-    const check = wrapper.find('[data-testid="dropdown-menu-action-checked"]')
-    const actionIcon = wrapper.find('[data-testid="action-icon"]')
-    expect(check.exists()).toBe(true)
-    expect(actionIcon.exists()).toBe(true)
-
-    const checkEl = check.element
-    const iconEl = actionIcon.element
-    expect(
-      checkEl.compareDocumentPosition(iconEl) & Node.DOCUMENT_POSITION_FOLLOWING
-    ).toBeTruthy()
   })
 
   it("emits click when the button is clicked", async () => {

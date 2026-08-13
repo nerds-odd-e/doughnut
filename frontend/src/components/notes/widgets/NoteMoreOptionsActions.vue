@@ -28,20 +28,18 @@
       </PopButton>
     </DropdownMenuItem>
 
-    <DropdownMenuItem>
+    <DropdownMenuItem v-if="!isAudioOpen">
       <DropdownMenuActionButton
         :title="titles.audio"
         :icon="Mic"
-        :checked="isAudioOpen"
         @click="onAudioToggle"
       />
     </DropdownMenuItem>
 
-    <DropdownMenuItem>
+    <DropdownMenuItem v-if="!isAssimilationOpen">
       <DropdownMenuActionButton
         :title="titles.assimilation"
         :icon="CircleCheck"
-        :checked="assimilationChecked"
         @click="onAssimilationToggle"
       />
     </DropdownMenuItem>
@@ -57,6 +55,7 @@
 
   <template v-else>
     <PopButton
+      v-if="layout === 'toolbar'"
       ref="exportPopButtonRef"
       :title="titles.export"
       :aria-label="titles.export"
@@ -69,7 +68,11 @@
       </template>
     </PopButton>
 
-    <PopButton :title="titles.questions" :aria-label="titles.questions">
+    <PopButton
+      v-if="layout === 'toolbar'"
+      :title="titles.questions"
+      :aria-label="titles.questions"
+    >
       <template #button_face>
         <MessageCircleQuestion class="w-6 h-6" aria-hidden="true" />
       </template>
@@ -79,8 +82,12 @@
     </PopButton>
 
     <button
+      v-if="showOnToolbar(isAudioOpen)"
       type="button"
-      :class="toolbarToggleBtnClass(isAudioOpen)"
+      :class="[
+        toolbarToggleBtnClass(isAudioOpen),
+        { 'shrink-0': layout === 'pinned' },
+      ]"
       :title="titles.audio"
       :aria-label="titles.audio"
       :aria-pressed="isAudioOpen"
@@ -90,17 +97,22 @@
     </button>
 
     <button
+      v-if="showOnToolbar(isAssimilationOpen)"
       type="button"
-      :class="toolbarToggleBtnClass(assimilationChecked)"
+      :class="[
+        toolbarToggleBtnClass(isAssimilationOpen),
+        { 'shrink-0': layout === 'pinned' },
+      ]"
       :title="titles.assimilation"
       :aria-label="titles.assimilation"
-      :aria-pressed="assimilationChecked"
+      :aria-pressed="isAssimilationOpen"
       @click="onAssimilationToggle"
     >
       <CircleCheck class="w-6 h-6" aria-hidden="true" />
     </button>
 
     <button
+      v-if="layout === 'toolbar'"
       type="button"
       :class="toolbarGhostBtnClass"
       :title="titles.delete"
@@ -144,7 +156,7 @@ const titles = noteMoreOptionsTitles
 
 const props = defineProps<{
   note: Note
-  layout: "toolbar" | "menu"
+  layout: "toolbar" | "menu" | "pinned"
 }>()
 
 const emit = defineEmits<{
@@ -159,18 +171,20 @@ const { deleteNote } = useNoteDeleteFlow(noteId, noteTitle)
 
 const exportPopButtonRef = ref<InstanceType<typeof PopButton> | null>(null)
 const shortcutScope = useNoteShortcutScope()
+const shortcutsEnabled = () => shortcutScope.value && props.layout !== "pinned"
 
 useKeyboardShortcut(
   "note-export",
   () => {
     exportPopButtonRef.value?.openDialog()
   },
-  () => shortcutScope.value
+  shortcutsEnabled
 )
 
-useKeyboardShortcut("note-delete", deleteNote, () => shortcutScope.value)
+useKeyboardShortcut("note-delete", deleteNote, shortcutsEnabled)
 
-const assimilationChecked = computed(() => isOpenForNote(props.note.id))
+const isAssimilationOpen = computed(() => isOpenForNote(props.note.id))
+const showOnToolbar = (isOn: boolean) => props.layout === "toolbar" || isOn
 
 const closeDialogIfMenu = () => {
   if (props.layout === "menu") {

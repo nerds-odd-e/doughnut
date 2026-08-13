@@ -5,27 +5,32 @@
     v-bind="{ note }"
   />
 
-  <AutoCollapseDropdown
-    v-else
-    v-slot="{ closeDropdown, open }"
-    ref="overflowDropdownRef"
-    class="daisy-dropdown daisy-dropdown-end daisy-dropdown-bottom"
-  >
-    <summary
-      :class="[
-        'daisy-btn daisy-btn-ghost daisy-btn-sm list-none cursor-pointer',
-        { 'daisy-btn-active': open },
-      ]"
-      title="more options"
-      aria-label="more options"
-    >
-      <MoreHorizontal class="w-6 h-6" />
-    </summary>
-    <NoteMoreOptionsForm
+  <template v-else>
+    <NoteMoreOptionsActions
+      layout="pinned"
       v-bind="{ note }"
-      @close-dialog="closeDropdown"
     />
-  </AutoCollapseDropdown>
+    <AutoCollapseDropdown
+      v-slot="{ closeDropdown, open }"
+      ref="overflowDropdownRef"
+      class="daisy-dropdown daisy-dropdown-end daisy-dropdown-bottom"
+    >
+      <summary
+        :class="[
+          'daisy-btn daisy-btn-ghost daisy-btn-sm list-none cursor-pointer',
+          { 'daisy-btn-active': open },
+        ]"
+        title="more options"
+        aria-label="more options"
+      >
+        <MoreHorizontal class="w-6 h-6" />
+      </summary>
+      <NoteMoreOptionsForm
+        v-bind="{ note }"
+        @close-dialog="closeDropdown"
+      />
+    </AutoCollapseDropdown>
+  </template>
 </template>
 
 <script setup lang="ts">

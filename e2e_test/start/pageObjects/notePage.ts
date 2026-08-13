@@ -5,7 +5,7 @@ import audioToolsPage from './audioToolsPage'
 import noteCreationForm from './forms/noteCreationForm'
 import { assumeNoteTargetSearchDialog } from './noteTargetSearchDialog'
 import { sidebarChildNotePageMethods } from './sidebarChildNotePageMethods'
-import { makeSureNoteMoreOptionsFormIsOpen } from './noteMoreOptionsForm'
+import { noteMoreOptions } from './noteMoreOptionsForm'
 import { toolbarButton } from './toolbarButton'
 import { noteContentEditingMethods } from './noteContentEditingMethods'
 import { noteConversationAndQuestionMethods } from './noteConversationAndQuestionMethods'
@@ -94,9 +94,7 @@ export const assumeNotePage = (
       this.findNoteContent(fragment)
       return this
     },
-    moreOptions: () => {
-      return makeSureNoteMoreOptionsFormIsOpen()
-    },
+    moreOptions: noteMoreOptions,
     expandChildren: () => {
       cy.findByRole('button', { name: 'expand children' }).click()
     },
@@ -166,7 +164,7 @@ export const assumeNotePage = (
       testability().renameInjectedNoteTitleForNoteOnPage(newTitle)
     },
     audioTools() {
-      makeSureNoteMoreOptionsFormIsOpen().openAudioTools()
+      noteMoreOptions().openAudioTools()
       return audioToolsPage()
     },
     navigateToReference: (referenceTopic: string) => {

@@ -19,49 +19,39 @@ const noteShowToolbar = () => cy.get('[data-note-toolbar]', { timeout: 15000 })
 const visibleMoreOptionsButton = (title: string) =>
   cy.get(`button[title="${title}"]:visible`, { timeout: 15000 }).first()
 
-const assimilationSettingsButton = () =>
-  visibleMoreOptionsButton(titles.assimilation)
+const openOverflowMenuIfNeeded = (title: string) => {
+  noteShowToolbar()
+    .should('exist')
+    .then(() => {
+      if (Cypress.$(`button[title="${title}"]:visible`).length > 0) {
+        return
+      }
 
-const audioToolsButton = () => visibleMoreOptionsButton(titles.audio)
-
-const peerToggleSelector = [
-  `button[title="${titles.assimilation}"]`,
-  `button[title="${titles.audio}"]`,
-].join(', ')
-
-const openOverflowMenuIfNeeded = () => {
-  cy.get(peerToggleSelector, { timeout: 15000 }).then(($buttons) => {
-    if ($buttons.filter(':visible').length > 0) {
-      return
-    }
-
-    noteShowToolbar()
-      .find(`summary[title="${titles.overflowMenu}"]`)
-      .should('be.visible')
-      .click()
-  })
+      noteShowToolbar()
+        .find(`summary[title="${titles.overflowMenu}"]`)
+        .should('be.visible')
+        .click()
+    })
 }
 
-/**
- * Ensures Export / Questions / Audio / Assimilation / Delete are reachable — either on the
- * toolbar (wide note column) or inside the overflow menu (narrow).
- */
-export const makeSureNoteMoreOptionsFormIsOpen = () => {
-  noteShowToolbar().should('exist')
-  openOverflowMenuIfNeeded()
-  assimilationSettingsButton().should('be.visible')
-  audioToolsButton().should('be.visible')
-
-  return noteMoreOptionsPage()
+const clickMoreOption = (title: string) => {
+  openOverflowMenuIfNeeded(title)
+  visibleMoreOptionsButton(title).scrollIntoView().click()
 }
 
 const deleteNoteWithConfirmation = (confirmButtonName: string | RegExp) => {
-  visibleMoreOptionsButton(titles.delete).click()
+  clickMoreOption(titles.delete)
   cy.findByRole('button', { name: confirmButtonName }).click()
   waitUntilAppIsNotBusy()
 }
 
-const noteMoreOptionsPage = () => {
+/**
+ * Note toolbar more-options actions — on the bar when inline/pinned, otherwise
+ * inside the overflow menu.
+ */
+export const noteMoreOptions = () => {
+  noteShowToolbar().should('exist')
+
   return {
     deleteNote() {
       deleteNoteWithConfirmation('OK')
@@ -82,18 +72,18 @@ const noteMoreOptionsPage = () => {
       deleteNoteWithConfirmation('Reduce to a property of the source')
     },
     openQuestionList() {
-      visibleMoreOptionsButton(titles.questions).click()
+      clickMoreOption(titles.questions)
       return questionListPage()
     },
     openAudioTools() {
-      audioToolsButton().scrollIntoView().click()
+      clickMoreOption(titles.audio)
       cy.findByRole('button', { name: 'Record Audio' }).should('be.visible')
       waitUntilAppIsNotBusy()
     },
     openAssimilationSettings() {
       cy.document().then((doc) => {
         if (!doc.querySelector(assimilateButtonSelector)) {
-          assimilationSettingsButton().scrollIntoView().click()
+          clickMoreOption(titles.assimilation)
         }
       })
       assimilateButton({ timeout: 15000 }).should('be.visible')
@@ -102,10 +92,10 @@ const noteMoreOptionsPage = () => {
     },
     reopenAssimilationSettingsWaitingForRecallInfo() {
       cy.intercept('GET', '**/api/notes/**/note-info**').as('noteRecallInfo')
-      makeSureNoteMoreOptionsFormIsOpen()
-      assimilationSettingsButton().scrollIntoView().click()
+      noteShowToolbar().should('exist')
+      clickMoreOption(titles.assimilation)
       cy.get(assimilateButtonSelector).should('not.exist')
-      assimilationSettingsButton().scrollIntoView().click()
+      clickMoreOption(titles.assimilation)
       cy.wait('@noteRecallInfo', { timeout: 15000 })
       assimilateButton({ timeout: 15000 }).should('be.visible')
       waitUntilAppIsNotBusy()

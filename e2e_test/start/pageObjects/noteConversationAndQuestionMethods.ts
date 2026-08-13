@@ -5,7 +5,6 @@ import {
 } from './assimilationPage'
 import { assumeConversationAboutNotePage } from './conversationAboutNotePage'
 import { form } from '../forms'
-import { makeSureNoteMoreOptionsFormIsOpen } from './noteMoreOptionsForm'
 import { addQuestionPage } from './addQuestionPage'
 import { questionListPage } from './questionListPage'
 import { toolbarButton } from './toolbarButton'
@@ -61,7 +60,7 @@ export const noteConversationAndQuestionMethods = () => ({
   },
 
   openAssimilationSettings() {
-    makeSureNoteMoreOptionsFormIsOpen().openAssimilationSettings()
+    this.moreOptions().openAssimilationSettings()
     waitUntilAppIsNotBusy()
     return assumeAssimilationPage()
   },

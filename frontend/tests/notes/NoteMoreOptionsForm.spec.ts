@@ -82,7 +82,7 @@ describe("NoteMoreOptionsForm", () => {
   })
 
   describe("audio tools toggle", () => {
-    it("opens the audio tools panel and shows checked state", async () => {
+    it("opens the audio tools panel", async () => {
       const wrapper = renderer.withProps({ note }).mount()
 
       await flushPromises()
@@ -94,9 +94,6 @@ describe("NoteMoreOptionsForm", () => {
       await flushPromises()
 
       expect(useNoteToolbarPanel().isAudioOpen.value).toBe(true)
-      expect(
-        wrapper.find('[data-testid="dropdown-menu-action-checked"]').exists()
-      ).toBe(true)
     })
 
     it("emits close-dialog when audio tools button is clicked", async () => {
@@ -112,24 +109,20 @@ describe("NoteMoreOptionsForm", () => {
       expect(wrapper.emitted()).toHaveProperty("close-dialog")
     })
 
-    it("closes the audio tools panel when toggled while already open", async () => {
+    it("omits audio from the menu when audio is already on", async () => {
       useNoteToolbarPanel().toggleAudio()
 
       const wrapper = renderer.withProps({ note }).mount()
       await flushPromises()
 
-      const audioButton = wrapper.find(
-        `button[title="${noteMoreOptionsTitles.audio}"]`
-      )
-      await audioButton.trigger("click")
-      await flushPromises()
-
-      expect(useNoteToolbarPanel().isAudioOpen.value).toBe(false)
+      expect(
+        wrapper.find(`button[title="${noteMoreOptionsTitles.audio}"]`).exists()
+      ).toBe(false)
     })
   })
 
   describe("assimilation settings toggle", () => {
-    it("turns assimilation settings on and shows check without changing route", async () => {
+    it("turns assimilation settings on without changing route", async () => {
       await router.push("/")
       const wrapper = renderer.withProps({ note }).mount()
 
@@ -161,22 +154,18 @@ describe("NoteMoreOptionsForm", () => {
       expect(wrapper.emitted()).toHaveProperty("close-dialog")
     })
 
-    it("turns assimilation settings off when toggled while already on", async () => {
+    it("omits assimilation from the menu when already on", async () => {
       const { openForNote } = useAssimilationView()
       openForNote(note.id)
 
       const wrapper = renderer.withProps({ note }).mount()
       await flushPromises()
 
-      const assimilateButton = wrapper.find(
-        `button[title="${noteMoreOptionsTitles.assimilation}"]`
-      )
-      await assimilateButton.trigger("click")
-      await flushPromises()
-
-      const { showAssimilationSettings, targetNoteId } = useAssimilationView()
-      expect(showAssimilationSettings.value).toBe(false)
-      expect(targetNoteId.value).toBe(null)
+      expect(
+        wrapper
+          .find(`button[title="${noteMoreOptionsTitles.assimilation}"]`)
+          .exists()
+      ).toBe(false)
     })
   })
 })

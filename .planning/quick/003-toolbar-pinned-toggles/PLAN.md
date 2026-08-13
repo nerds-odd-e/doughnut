@@ -1,6 +1,6 @@
 # Pin on-state note-toolbar toggles
 
-**Status:** in progress  
+**Status:** in progress (Phase 1 done)  
 **Type:** ad-hoc UX under `.planning/quick/`  
 **Goal:** An on-state Audio / Assimilation control stays on the note toolbar (never in More options), with higher priority than other icons as width shrinks. Off-state toggles can still live in More options.
 
@@ -31,31 +31,23 @@ Do **not** replace the 600px overflow model, rewrite `NoteToolbar`, or introduce
 | D-06 | No new E2E feature file. Cypress viewport stays 1200. Update [`noteMoreOptionsForm.ts`](e2e_test/start/pageObjects/noteMoreOptionsForm.ts) when visibility rules change. |
 | D-07 | Do **not** put New / Wiki / Conversation / Edit in More options until more-options overflow is already measured (Phase 4+). |
 
-## Current code (do not rip out in Phase 1)
+## Current code (after Phase 1)
 
 - [`NoteToolbar.vue`](frontend/src/components/notes/core/NoteToolbar.vue) — New / Wiki / Conversation / Edit always inline; more-options via [`NoteToolbarMoreOptions.vue`](frontend/src/components/notes/widgets/NoteToolbarMoreOptions.vue)
 - [`useNoteToolbarMoreOptionsInline.ts`](frontend/src/composables/useNoteToolbarMoreOptionsInline.ts) — all more-options inline iff `clientWidth >= 600`
-- [`NoteMoreOptionsActions.vue`](frontend/src/components/notes/widgets/NoteMoreOptionsActions.vue) — `layout: "toolbar" | "menu"`
+- [`NoteMoreOptionsActions.vue`](frontend/src/components/notes/widgets/NoteMoreOptionsActions.vue) — `layout: "toolbar" | "menu" | "pinned"`; pinned shows only the on-toggle; menu omits the on-toggle
+- E2E: [`noteMoreOptionsForm.ts`](e2e_test/start/pageObjects/noteMoreOptionsForm.ts) `openOverflowMenuIfNeeded(title)` opens `…` only if that title is not already visible
+
+## Learnings (Phase 1)
+
+- Pin by mounting `layout="pinned"` beside `…` when not inline; `NoteMoreOptionsActions` decides which button to show. Do not duplicate “is a toggle on” in the parent.
+- E2E helper `noteMoreOptions()` no longer assumes both Audio and Assimilation are visible at once.
 
 ## Phases
 
-### Phase 1 — Pin on-state toggle on a narrow toolbar (Behavior) — in-progress
+### Phase 1 — Pin on-state toggle on a narrow toolbar (Behavior) — done
 
-**Observable:** Toolbar narrower than 600px. Turn Audio **on** from More options. The Audio icon appears on `[data-note-toolbar]` (soft-primary, `aria-pressed="true"`) beside `…`. It is **not** in the overflow menu. Assimilation still in the menu while off. Same for Assimilation on / Audio off. Wide (≥600px) still shows all more-options inline.
-
-**Do:**
-
-- In `NoteToolbarMoreOptions`, when `!inline` and a toggle is on, render that **one** toolbar button next to `…` (`shrink-0`). Reuse the existing toolbar button markup in `NoteMoreOptionsActions` (extract only if duplication is painful in this phase).
-- Omit the on toggle from the menu. Stop passing `:checked`.
-- Remove `checked` from `DropdownMenuActionButton` (only these two callers). Update its spec and `NoteMoreOptionsForm.spec.ts`.
-- Vitest: extend [`NoteToolbar.moreOptions.spec.ts`](frontend/tests/notes/NoteToolbar.moreOptions.spec.ts) using existing `narrowNoteToolbarNavWidth` / `wideNoteToolbarNavWidth`.
-- E2E: `openOverflowMenuIfNeeded` must key off the **requested** title, not “any audio or assimilation visible”.
-
-**Do not:** measure widths; overflow Edit/Wiki/New; rewrite `NoteToolbar`; add a layout engine.
-
-**Tests:** `pnpm frontend:test tests/notes/NoteToolbar.moreOptions.spec.ts` (plus DropdownMenuActionButton / NoteMoreOptionsForm if touched). If the page object changed: `pnpm cypress run --spec e2e_test/features/assimilation/assimilation_walkthrough.feature`.
-
-**Stop-safe:** On-state Audio/Assimilation is reachable on a narrow bar. Crowding of Export/Delete unchanged.
+On a narrow bar, an on-state Audio/Assimilation button sits beside `…` (soft-primary, pressed, `shrink-0`) and is omitted from the menu. Off peer stays in the menu. Wide still inline. Overflow checkmarks removed. Pin coverage: [`NoteToolbar.pinnedToggles.spec.ts`](frontend/tests/notes/NoteToolbar.pinnedToggles.spec.ts).
 
 ### Phase 2 — Independent more-options item visibility (Structure) — planned
 
