@@ -59,6 +59,7 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
     Integer recallCountBefore = memoryTracker.getRecallCount();
     Float forgettingCurveBefore = memoryTracker.getForgettingCurveIndex();
     Timestamp nextRecallAtBefore = memoryTracker.getNextRecallAt();
+    Timestamp lastRecalledAtBefore = memoryTracker.getLastRecalledAt();
 
     AnsweredQuestion result = answerSpelling(memoryTracker, "Shared Title");
 
@@ -67,6 +68,7 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
     assertThat(memoryTracker.getRecallCount(), equalTo(recallCountBefore));
     assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(forgettingCurveBefore));
     assertThat(memoryTracker.getNextRecallAt(), equalTo(nextRecallAtBefore));
+    assertThat(memoryTracker.getLastRecalledAt(), equalTo(lastRecalledAtBefore));
   }
 
   @Test
