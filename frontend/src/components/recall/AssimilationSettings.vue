@@ -84,7 +84,7 @@
       class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
     >
       <button
-        v-if="(note.content ?? '').trim()"
+        v-if="hasNoteContent"
         type="button"
         data-test="open-refine-note-modal"
         class="daisy-btn daisy-btn-neutral shrink-0"
@@ -120,7 +120,7 @@
     </div>
   </section>
   <RefineNoteModal
-    v-if="(note.content ?? '').trim()"
+    v-if="hasNoteContent"
     v-model:open="showRefineNoteModal"
     :note="note"
     @content-updated="emit('refinementContentUpdated')"
@@ -135,6 +135,7 @@ import AssimilationProgressSummary from "./AssimilationProgressSummary.vue"
 import RefineNoteModal from "./RefineNoteModal.vue"
 import type { AssimilateEvent } from "@/composables/useAssimilateUnit"
 import { isSkippedForRecall } from "@/composables/useReviveMemoryTracker"
+import { relationTypeLabelFromNoteContent } from "@/models/relationTypeOptions"
 import {
   parseNoteContentMarkdown,
   sortedPropertyRowsFromNoteProperties,
@@ -183,6 +184,11 @@ const assimilateDisabledForProperty = (propertyKey: string) =>
     (mt) => mt.propertyKey === propertyKey
   ) ?? false
 
+const hasNoteContent = computed(() => !!(note.content ?? "").trim())
+const isLinkNote = computed(
+  () => relationTypeLabelFromNoteContent(note.content) !== undefined
+)
+
 const showCommissionedOption = computed(
   () =>
     !hasNoteLevelTrackerOfType(
@@ -193,6 +199,8 @@ const showCommissionedOption = computed(
 
 const showSpellingOption = computed(
   () =>
+    hasNoteContent.value &&
+    !isLinkNote.value &&
     !hasNoteLevelTrackerOfType(noteRecallInfo.value?.memoryTrackers, "SPELLING")
 )
 

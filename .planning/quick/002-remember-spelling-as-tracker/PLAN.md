@@ -1,6 +1,6 @@
 # Remember spelling as a memory tracker
 
-Status: in-progress (Phase 3 done)
+Status: in-progress (Phase 4 done)
 Plan state: [STATE.md](./STATE.md) (this folder only — do not edit `.planning/STATE.md`)
 
 Each phase is one commit. Type is Behavior or Structure. One observable behavior (or one structure change for the immediate next behavior).
@@ -72,7 +72,7 @@ Shipped: Remember spelling opens `SpellingVerificationPopup`; verified posts `as
 ### Phase 4: Remember spelling is offered only when it applies
 
 Type: Behavior  
-Status: planned
+Status: done
 
 **Pre-condition:** Remember spelling action exists.
 
@@ -80,9 +80,7 @@ Status: planned
 
 **Post-condition:** Remember spelling is absent when: no content, relationship/link note, spelling tracker already exists, or the row is a property. Commissioned-only notes still show Remember spelling if spelling does not exist.
 
-One scenario outline / focused frontend cases — not a new product file named by phase.
-
-**Verify:** frontend assimilation panel tests; Cypress only if an E2E already covers availability (do not revive the checkbox “unavailable without content” outline).
+Shipped in `showSpellingOption` (`hasNoteContent`, `isLinkNote`, no existing SPELLING tracker). Property rows never get the option.
 
 ---
 

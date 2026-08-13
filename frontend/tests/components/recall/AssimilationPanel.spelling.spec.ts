@@ -128,4 +128,29 @@ describe("AssimilationPanel remember spelling", () => {
     await openAssimilateOptions(wrapper)
     expect(rememberSpellingButtonEl()).not.toBeNull()
   })
+
+  it("hides remember spelling when the note has no content", async () => {
+    const noteWithoutContent = makeMe.aNote.id(note.id).content("").please()
+    const wrapper = await mountAssimilationPanelReady({
+      note: noteWithoutContent,
+    })
+
+    expect(assimilateOptionsCaretEl(wrapper)).not.toBeNull()
+    await openAssimilateOptions(wrapper)
+    expect(rememberSpellingButtonEl()).toBeNull()
+  })
+
+  it("hides remember spelling for a relationship note", async () => {
+    const relationshipNote = makeMe.aNote
+      .id(note.id)
+      .relationType("similar to")
+      .please()
+    const wrapper = await mountAssimilationPanelReady({
+      note: relationshipNote,
+    })
+
+    expect(assimilateOptionsCaretEl(wrapper)).not.toBeNull()
+    await openAssimilateOptions(wrapper)
+    expect(rememberSpellingButtonEl()).toBeNull()
+  })
 })
