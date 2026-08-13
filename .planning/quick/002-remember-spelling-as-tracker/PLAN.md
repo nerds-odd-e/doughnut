@@ -1,6 +1,6 @@
 # Remember spelling as a memory tracker
 
-Status: in-progress (Phase 6 done)
+Status: in-progress (Phase 7 done)
 Plan state: [STATE.md](./STATE.md) (this folder only — do not edit `.planning/STATE.md`)
 
 Each phase is one commit. Type is Behavior or Structure. One observable behavior (or one structure change for the immediate next behavior).
@@ -13,7 +13,7 @@ Each phase is one commit. Type is Behavior or Structure. One observable behavior
 - **Verification:** existing title popup, attached to Remember spelling (Phase 3). Phase 2 may ship the action without verification (interim).
 - **Checkbox removed** in Phase 6. Spelling trackers come only from Remember spelling / `assimilateAsSpelling`.
 - **Tests:** delete option-only tests in Phase 6. Keep spelling behavior; move fixtures off the note flag in Phases 4–5.
-- **ADRs:** 0001 and 0003 describe the current model only. Status stays Proposed.
+- **ADRs:** 0001 and 0003 describe the current model (spelling tracker, Remember spelling). Status stays Proposed.
 - **No** notebook-level default. **No** migration of old `remember_spelling` values.
 
 ---
@@ -117,14 +117,11 @@ Shipped: checkbox and flag-driven assimilate path removed. Ordinary assimilate u
 ### Phase 7: ADRs describe spelling as a tracker
 
 Type: Structure  
-Status: planned
+Status: done
 
-Unlocks: none further for product — records the Phase 6 decision in Proposed ADRs (requested). No historical “checkbox used to exist” text. Do not mark Accepted.
+Proposed ADRs record the Phase 6 product: spelling is a learner-created tracker; assimilation due/daily target are understanding-only. No historical checkbox text. Status stays Proposed.
 
-- `docs/adrs/0001-ubiquitous-language.md`: **Spelling memory tracker**, **Remember spelling** (learner action at assimilation, verifies title). Drop glossary that calls it a note option. Ordinary assimilation due = understanding tracker.
-- `docs/adrs/0003-spaced-repetition-scheduling-policy.md`: spelling tracker is learner-created; assimilation due/daily count are understanding-only. Keep accidental-match / overlap grading as they are.
-
-**Verify:** read-through only (no product tests).
+**Learning:** 0001 owns glossary; 0003 cites 0001 and states queue/grading only.
 
 ---
 

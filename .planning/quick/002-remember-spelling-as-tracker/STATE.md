@@ -4,8 +4,8 @@ This file is **only** for `.planning/quick/002-remember-spelling-as-tracker/`. D
 
 ```
 status: in-progress
-current_phase: 7
-current_phase_name: ADRs describe spelling as a tracker
+current_phase: 8
+current_phase_name: Remove rememberSpelling from the note setting type
 last_updated: 2026-08-13
 ```
 
@@ -17,7 +17,7 @@ last_updated: 2026-08-13
 | 4 Offer only when it applies | Behavior | done |
 | 5 Spelling tests off the note flag | Structure | done |
 | 6 Remove note setting | Behavior | done |
-| 7 ADRs | Structure | planned |
+| 7 ADRs | Structure | done |
 | 8 Remove Java/API field | Structure | planned |
 | 9 Drop DB column | Structure | planned |
 

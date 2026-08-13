@@ -107,6 +107,17 @@ may introduce an explicit short-term rule without changing this decision.
    treated as a complete `RecallLog` or used to bulk-reinterpret legacy due
    times.
 
+### Spelling memory tracker
+
+A spelling memory tracker is learner-created (glossary:
+[ADR 0001](./0001-ubiquitous-language.md)). Assimilation due and the **daily
+assimilation target** include understanding note-level trackers only — a
+spelling tracker does not consume either (same as a commissioned tracker for
+that queue).
+
+Spelling recall grading (accidental match, overlap) is unchanged; see Graded
+outcomes.
+
 ### Graded outcomes
 
 Correct, incorrect, accidental match, and overlap are distinct graded outcomes
@@ -255,6 +266,8 @@ assert the resulting schedule movement, not the internal measure.
   (see **Decision**).
 - Busy users are judged on demonstrated recall, not schedule compliance.
 - Correct overdue recalls must not create a positive-feedback workload loop.
+- A spelling memory tracker is extra title practice the learner opts into; it
+  does not consume assimilation due or the daily assimilation target.
 - Accidental match and declared overlap remain first-class outcomes with
   distinct scheduling rules.
 - Tutor Feedback becomes a grading source alongside Doughnut's own recall
@@ -326,7 +339,7 @@ boundary or sufficient current memory state is persisted.
 ## Related
 
 - Working discussion (gap + open issues toward finalizing this ADR): [`.planning/research/FSRS-COMPATIBILITY-GAP.md`](../../.planning/research/FSRS-COMPATIBILITY-GAP.md)
-- ADR 0001 [ubiquitous language](./0001-ubiquitous-language.md) — **recall** (not FSRS **review**); commissioned learning terms
+- ADR 0001 [ubiquitous language](./0001-ubiquitous-language.md) — **recall** (not FSRS **review**); commissioned learning terms; spelling memory tracker
 - ADR 0005 [commissioned learning session protocol](./0005-commissioned-learning-session-protocol.md) — what a score means to the Tutor
 - Anki answer semantics: <https://docs.ankiweb.net/studying.html#answer-buttons>
 - FSRS algorithm and overdue-recall behavior: <https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm>
