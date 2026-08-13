@@ -6,17 +6,17 @@
 
 ## Landscape
 
-ADR 0003 defines **safety properties** for how graded evidence moves the schedule — not a new SRS engine. Findings fall into: **policy gaps**, **already-built outcome rules**, and **Doughnut differentiators**.
+ADR 0003 defines **safety properties** for how a graded recall transitions memory state and moves the schedule — not a new SRS engine. Findings fall into: **policy gaps**, **already-built outcome rules**, and **Doughnut differentiators**.
 
 ### Table stakes
 
 | Feature | Finding |
 |---------|---------|
-| **Evidence vs due-time separation** | **Primary gap.** Success path keys off `nextRecallAt` deviation; should use elapsed since `lastRecalledAt`. No schema change needed. |
+| **Recall-time state cohesion** | **Primary gap.** Elapsed time is implicit behind a due-relative success API, and incorrect recall does not advance `lastRecalledAt`. No schema change needed. |
 | **Correct schedules forward** | Partially met. Commissioned has strictly-future guard; recall paths should share the same invariant. |
 | **No late-success penalty** | **Shipped** 2026-08-05. Overdue correct ≥ on-time (`lateCorrectAnswerDoesNotShortenTheNextInterval`). |
 | **FSRS overdue reward** | **Not built.** Overdue gets the same increment as on-time, not extra stability for long elapsed. Needs C1 first. |
-| **Early = weaker evidence, not failure** | Mostly built via early discount; re-verify after switching to retention-based time. |
+| **Shorter elapsed recall may grow less, but is not failure** | Mostly built: early-success math is algebraically elapsed/current interval; re-verify after making the contract explicit. |
 | **Incorrect shortens without permanent trap** | Built (`recallFailed` + recovery via later correct). |
 | **Distinct outcomes drive schedule** | Routing built (`SpellingRecallGrading`, `AnswerOutcome`); schedule effects must stay distinct. |
 | **User spacing table** | Built (`SpacedRepetitionAlgorithm`). |
@@ -54,16 +54,16 @@ ADR 0003 defines **safety properties** for how graded evidence moves the schedul
 
 ## Dependencies (factual)
 
-- Evidence separation underpins FSRS-compatible updates. The late-success *penalty* is already gone; remaining work is the C1 time base and optional overdue *reward*.
+- A cohesive elapsed-time transition underpins FSRS-compatible updates. The late-success *penalty* is already gone; remaining work is C1 and the optional overdue *reward*.
 - Overlap and accidental match are independent outcome branches.
-- Commissioned feedback is largely independent of the recall-time evidence bug but shares post-grade interval safety.
+- Commissioned feedback is largely independent of the C1 recall-anchor bug but shares post-grade interval safety.
 - Frequent-failure must stay read-only on schedule; accidental-match counting is unresolved vs ADR “incorrect only.”
 
 ## Competitor norms
 
 | Topic | Anki / FSRS | Doughnut |
 |-------|-------------|----------|
-| Overdue success | Not failure; FSRS also **rewards** low-R success (bounded) | Penalty gone; same increment as on-time; no FSRS reward; time base still due deviation |
+| Overdue success | Not failure; FSRS also **rewards** low-R success (bounded) | Penalty gone; same increment as on-time; no FSRS reward; elapsed-time contract still implicit |
 | Grading inputs | Ease buttons / FSRS rating | Spelling grade + optional thinking time; Tutor 0–5 |
 | Ambiguous match | N/A | Accidental + overlap differentiators |
 | Failure streak | Leech / suspend (varies) | Warning only by design |
@@ -72,10 +72,10 @@ ADR 0003 defines **safety properties** for how graded evidence moves the schedul
 
 | Policy area | Doughnut touchpoint | Status |
 |-------------|---------------------|--------|
-| Memory evidence | `lastRecalledAt`, answers / Tutor score | Exists; success path wrong time base |
-| Due metadata | `next_recall_at` | Exists; overdue no longer feeds a strength **penalty**; still used as the success time base (C1) |
-| Correct | `recalledSuccessfully` → `succeeded` | Penalty shipped-removed; **C1** still wrong time base |
-| Incorrect | `recallFailed` | Aligned |
+| Recall transition | `MemoryTracker`, answers / Tutor score | Persisted state exists; elapsed-time contract is implicit and failure leaves stale anchor |
+| Due metadata | `next_recall_at` | Exists; ordinary success recomputes an expected time rather than reading this field |
+| Correct | `recalledSuccessfully` → `succeeded` | Penalty shipped-removed; early math already reduces to elapsed/current interval |
+| Incorrect | `recallFailed` | Strength/retry aligned; `lastRecalledAt` update missing (C1) |
 | Accidental | `partialFail` + normal interval | Aligned — verify |
 | Overlap | Skip `markAsRecalled` | Aligned — verify |
 | Commissioned 0–5 | Feedback policy + scheduling | Aligned — audit |

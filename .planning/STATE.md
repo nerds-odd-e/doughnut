@@ -33,7 +33,7 @@ Idle. No GSD milestone.
 
 **Other ad-hoc (plan-local STATE only):** [`.planning/quick/001-remove-note-skip-memory-tracking/`](quick/001-remove-note-skip-memory-tracking/) — Phase 4 next.
 
-**In discussion:** finalize Proposed ADR 0003 using [FSRS-COMPATIBILITY-GAP.md](research/FSRS-COMPATIBILITY-GAP.md) (open issues O1–O12). **Recall** (not FSRS **review**) is locked in ADR 0001 and ADR 0003 Decision. Late-success penalty is **shipped** (2026-08-05); remaining C1 is due-relative time base; FSRS overdue reward is not implemented.
+**In discussion:** finalize Proposed ADR 0003 using [FSRS-COMPATIBILITY-GAP.md](research/FSRS-COMPATIBILITY-GAP.md) (open issues O1–O12). **Recall** (not FSRS **review**) is locked in ADR 0001 and ADR 0003 Decision. Late-success penalty is **shipped** (2026-08-05); remaining C1 is explicit elapsed-time/state cohesion (`lastRecalledAt` is stale after incorrect recall), not a persisted-due subtraction bug; FSRS overdue reward is not implemented. `RecallLog` is deferred.
 
 ## Operator Next Steps
 

@@ -14,25 +14,29 @@ correct answer could therefore weaken the tracker and, at the floor, become
 due immediately. That **late-success penalty is removed** (`735b96623a`):
 overdue correct keeps the on-time increment.
 
-What remains: success still measures time against the **due projection**
-(`gradedAt − nextRecallAt`), not elapsed since the previous graded recall.
-Early answers are still discounted vs due. Overdue answers are not rewarded
-the way open FSRS rewards low retrievability (longer elapsed → larger bounded
-stability increase).
+What remains: the success API still expresses time as `delayInHours` relative
+to a recomputed expected recall time (`lastRecalledAt + current interval`). For
+an early correct recall, the current formula is algebraically equivalent to
+scaling growth by `elapsed / current interval`; it does not read the persisted
+`nextRecallAt`. The contract nevertheless hides elapsed time, and an incorrect
+recall currently fails to advance `lastRecalledAt`, so a later correct recall
+can span across the failure. Overdue answers are not rewarded the way open FSRS
+rewards low retrievability (longer elapsed → larger bounded stability increase).
 
 The planned recall time is a queue target. Missing it can reflect availability,
 queue size, question readiness, or system behavior — not that the learner forgot.
-Memory evidence is the graded outcome and the actual elapsed time since the
-previous graded recall.
+A memory-state transition uses the recall outcome and the actual elapsed time
+since the previous state-changing recall.
 
-Established schedulers (including FSRS) separate memory evidence from schedule
-compliance: successful overdue recall is not a failure, and retention is judged
-from observed elapsed time. This ADR states Doughnut's durable scheduling policy
-and safety properties. It does not select a formula, model, or constants.
+Established schedulers (including FSRS) separate memory-state inputs from
+schedule compliance: successful overdue recall is not a failure, and retention
+is judged from observed elapsed time. This ADR states Doughnut's durable
+scheduling policy and safety properties. It does not select a formula, model,
+or constants.
 
 Today's due-work projection (`nextRecallAt`) cannot always be rebuilt from
 answer history alone. That operational constraint does not make meeting or
-missing the due time valid memory evidence.
+missing the due time an input to the memory-state transition.
 
 ## Decision
 
@@ -48,23 +52,24 @@ Do not use **review** as a Doughnut domain noun. When citing FSRS, pair once
 
 ## Working draft
 
-### Evidence and scheduling are separate
+### Recall inputs and scheduling are separate
 
-1. Graded recall outcome and actual elapsed time since the previous graded
-   recall are memory evidence.
+1. A memory tracker transitions from its persisted pre-recall state using the
+   graded recall outcome and actual elapsed time since the previous
+   state-changing recall.
 2. The planned next-recall time is scheduling metadata. Being early or overdue
    is not, by itself, success or failure.
 3. Scheduling must not treat backlog age or deviation from the due time as
-   negative memory evidence.
-4. Every state-changing recall path must record the timestamp and outcome
-   evidence the memory model requires. Existing history is a migration input,
-   not proof that past evidence was complete.
+   a negative memory-state input.
+4. Every state-changing recall path must update `lastRecalledAt` to the recall
+   time. Existing history is a migration input, not proof that past recall
+   inputs were recorded completely.
 
 ### Memory state and the due-work projection
 
-1. Conceptual source of truth is memory state, recall evidence, and active
-   policy. The due time is a materialized selection projection, not a
-   memory-strength goal.
+1. Conceptual source of truth is the memory tracker's persisted state, the
+   recall outcome and time, and the active policy. The due time is a
+   materialized selection projection, not a memory-strength goal.
 2. While history remains insufficient for rebuild, the projection must stay
    transactionally consistent with memory state after every scheduling event
    and may remain the authoritative due-work lookup.
@@ -77,6 +82,18 @@ Do not use **review** as a Doughnut domain noun. When citing FSRS, pair once
    bulk-reinterpret historical due times as if history were complete.
 5. Rebuildability is desirable but not a prerequisite for removing the
    late-success penalty.
+
+### Recall history is deferred
+
+1. A future persisted **RecallLog** will be Doughnut's counterpart to the open
+   FSRS review log. It will gather the recall result and enough pre-transition
+   scheduler state, configuration/version, recall time, and resulting schedule
+   data for deterministic replay and parameter fitting.
+2. `RecallLog` is not required for C1. C1 transitions the existing persisted
+   `MemoryTracker` snapshot and does not add a new history table.
+3. Existing answers and Tutor Feedback are partial history. They must not be
+   treated as a complete `RecallLog` or used to bulk-reinterpret legacy due
+   times.
 
 ### Graded outcomes
 
@@ -93,16 +110,16 @@ special spelling results into boolean correct/incorrect.
 3. A correct overdue recall is successful retention over a longer observed
    interval. Its memory-strength result must be no worse than the same correct
    recall at the planned time. Any lateness bonus may be bounded.
-4. A correct early recall may grow less than an on-time recall (weaker
-   evidence) but must not reset learning or make the tracker immediately due.
+4. A correct early recall may grow less than an on-time recall because it
+   demonstrates retention over a shorter interval, but must not reset learning
+   or make the tracker immediately due.
 5. A sequence of correct recalls separated by meaningful time must show forward
    progress toward longer intervals. Backlog alone must not trap a tracker in
    an immediate or daily-recall loop.
 
 #### Incorrect recall
 
-1. Incorrect recall is negative memory evidence and may reduce strength and
-   shorten the next interval.
+1. Incorrect recall may reduce strength and shorten the next interval.
 2. The penalty is based on the failed outcome, not on earliness or lateness.
 3. Failure must not permanently trap the tracker; later correct recalls must be
    able to restore expanding intervals.
@@ -128,12 +145,12 @@ tracker.
 An accidental match is a spelling answer that fails the note under recall but names
 another accessible note (title or plain alias).
 
-1. It is negative evidence, but strictly weaker than incorrect recall on the
-   same tracker state.
+1. Its negative memory-state adjustment is strictly weaker than incorrect
+   recall on the same tracker state.
 2. After grading, schedule a future recall from the updated memory state using
    the normal interval path — not the incorrect-recall relearning override.
 3. Earliness or lateness does not change the grade; timing follows the
-   evidence-vs-schedule separation above.
+   recall-input/scheduling separation above.
 
 #### Overlap (declared, non-distinguishing spelling)
 
@@ -157,9 +174,9 @@ Session Item, not from a recall question Doughnut asked. Feedback carries a scor
 from 0 to 5. ADR 0001 defines the vocabulary and ADR 0005 defines what the score
 means to the Tutor; this section defines what it does to the schedule.
 
-1. A recorded score is memory evidence of the same standing as a graded recall
-   answer: recording it counts the recall, sets the last-recalled time, and
-   reschedules the tracker.
+1. A recorded score drives a memory-state transition of the same standing as a
+   graded recall answer: recording it counts the recall, sets the last-recalled
+   time, and reschedules the tracker.
 2. Scores move memory strength as follows, where **accumulated strength** means
    strength above the initial level of a newly assimilated tracker:
 
@@ -185,11 +202,12 @@ means to the Tutor; this section defines what it does to the schedule.
    normal interval path. Do not apply the incorrect-recall relearning override: a
    commissioned tracker is due only when the learner commissions another
    Learning Session, so a short forced retry window would express nothing.
-7. A Tutor session carries no trustworthy effort evidence, so effort is neutral.
-8. A late session does not weaken the result. The score is the evidence, per the
-   evidence-versus-schedule separation above.
-9. A Session Item that never receives Feedback is not evidence: its tracker stays
-   unchanged and the item is abandoned with its session.
+7. A Tutor session carries no trustworthy effort measurement, so effort is
+   neutral.
+8. A late session does not weaken the result. The score determines the
+   memory-state adjustment; the recorded time advances `lastRecalledAt`.
+9. A Session Item that never receives Feedback supplies no graded recall result:
+   its tracker stays unchanged and the item is abandoned with its session.
 
 These are the policy's only quantified adjustments. They are stated against
 accumulated strength rather than any stored field, index, or interval table, so
@@ -198,8 +216,8 @@ assert the resulting schedule movement, not the internal measure.
 
 ### Recall effort
 
-1. Trustworthy effort evidence (e.g. thinking time) may adjust within a correct
-   or incorrect outcome, within bounds.
+1. A trustworthy effort measurement (e.g. thinking time) may adjust within a
+   correct or incorrect outcome, within bounds.
 2. Effort must not invert the outcome: a correct answer cannot become failure,
    reset, or immediate reschedule solely because it was slow.
 3. Missing or untrustworthy effort data is neutral.
@@ -217,7 +235,7 @@ assert the resulting schedule movement, not the internal measure.
 4. This ADR does not require FSRS. A smaller compatible algorithm may ship
    first; the internal model may change later without changing these rules.
 5. Persisting a due-time projection remains allowed and currently required. Its
-   storage does not make due-time compliance memory evidence.
+   storage does not make due-time compliance a memory-state input.
 
 ## Consequences
 
@@ -242,7 +260,8 @@ assert the resulting schedule movement, not the internal measure.
 
 ## Pros
 
-- Aligns scheduling with memory evidence rather than user availability.
+- Aligns memory-state transitions with recall results rather than user
+  availability.
 - Prevents immediate/daily traps after correct answers.
 - Stabilizes the product contract without freezing the next algorithm.
 - Allows a minimal fix now and a data-fitted scheduler later.
@@ -259,7 +278,7 @@ assert the resulting schedule movement, not the internal measure.
 - Graded outcomes are trustworthy enough to be the primary scheduling signal.
 - Answer time and the current tracker snapshot are available when grading.
   Complete historical events are not assumed reconstructable for legacy data.
-- Thinking time is optional secondary evidence, not a correctness substitute.
+- Thinking time is an optional secondary input, not a correctness substitute.
 - Initial work preserves and updates the existing due-time projection rather
   than attempting an unsafe historical rebuild.
 - Tuning belongs in tests, simulation, and production observation — not in
@@ -296,5 +315,5 @@ boundary or sufficient current memory state is persisted.
 - ADR 0001 [ubiquitous language](./0001-ubiquitous-language.md) — **recall** (not FSRS **review**); commissioned learning terms
 - ADR 0005 [commissioned learning session protocol](./0005-commissioned-learning-session-protocol.md) — what a score means to the Tutor
 - Anki answer semantics: <https://docs.ankiweb.net/studying.html#answer-buttons>
-- FSRS algorithm and overdue-review behavior: <https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm>
+- FSRS algorithm and overdue-recall behavior: <https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm>
 - Reddy et al., *Unbounded Human Learning: Optimal Scheduling for Spaced Repetition*: <https://arxiv.org/abs/1602.07032>

@@ -14,13 +14,15 @@ scope: medium-large
 ADR 0003 is still **Proposed**. The **late-success penalty** (overdue correct
 weakening the tracker / trapping busy learners in immediate or daily loops)
 was **removed 2026-08-05** (`735b96623a`). Remaining work is FSRS-compatible
-policy: success still keys off queue deviation (`gradedAt − nextRecallAt`)
-instead of elapsed since last graded recall, and Doughnut does not yet grant
-FSRS's bounded overdue **reward**. The ADR separates memory evidence (graded
-outcome + elapsed time) from scheduling metadata (the due-time projection)
-and states safety properties for correct, incorrect, accidental-match,
-overlap, commissioned feedback, and effort. Implementation and tests should
-close the remaining gap against that policy, not invent parallel semantics.
+policy: the success API hides elapsed/current-interval math behind a
+due-relative `delayInHours`, incorrect recall does not advance
+`lastRecalledAt`, and Doughnut does not yet grant FSRS's bounded overdue
+**reward**. The ADR separates memory-state transition inputs (persisted
+pre-recall state + outcome + elapsed time) from the due-time projection and
+states safety properties for correct, incorrect, accidental-match, overlap,
+commissioned feedback, and effort. `RecallLog` persistence/replay is explicitly
+deferred. Implementation and tests should close the remaining gap against that
+policy, not invent parallel semantics.
 
 ## When to Surface
 

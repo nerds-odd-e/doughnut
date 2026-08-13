@@ -15,7 +15,7 @@
 | Java 25 | Domain policy math (`ForgettingCurve`, commissioned feedback policy) |
 | Spring Boot 4.1 | Orchestration, transactions (`MemoryTrackerService`, grading, learning sessions) |
 | Spring Data JPA + MySQL | `forgetting_curve_index`, `next_recall_at`, `last_recalled_at` — sufficient; no event store |
-| Flyway | Present; **no migration expected** for evidence-vs-due fix |
+| Flyway | Present; **no migration expected** for C1 |
 | Vue 3 + TypeScript | Displays due state; sends `thinkingTimeMs`; overlap retry UX — no client-side scheduling |
 
 ## In-house modules
@@ -23,13 +23,13 @@
 | Module | Discovery |
 |--------|-----------|
 | `SpacedRepetitionAlgorithm` | Spacing table → hours; keep |
-| `ForgettingCurve` | Late-success penalty gone; `succeeded(delayInHours)` still due-relative (early shrink only) |
-| `MemoryTracker` | Computes delay vs `nextRecallAt` on success (**C1**) |
+| `ForgettingCurve` | Late-success penalty gone; `succeeded(delayInHours)` hides elapsed/current-interval math |
+| `MemoryTracker` | Gathers persisted scheduler state; incorrect recall leaves `lastRecalledAt` stale (**C1**) |
 | `CommissionedLearningSessionFeedbackPolicy` | Already ADR 0–5 table |
 | `CommissionedLearningSessionFeedbackScheduling` | Has post-grade strictly-future helper |
 | `SpellingRecallGrading` | Outcome routing; overlap skips mutation |
 | `MemoryTrackerService` | Threshold constants already ADR-shaped |
-| `TimestampOperations` | Use vs `lastRecalledAt` for retention evidence |
+| `TimestampOperations` | Derive elapsed time from `lastRecalledAt` before the transition |
 
 ## Verification tools (existing)
 
@@ -76,7 +76,7 @@
 |-------|------------|
 | `forgetting_curve_index` | Internal strength (implementation detail) |
 | `next_recall_at` | Due-work projection |
-| `last_recalled_at` | Retention evidence anchor |
+| `last_recalled_at` | Previous state-changing recall anchor |
 | `quiz_answer.outcome` | Correct / accidental / overlap |
 | `quiz_answer.thinking_time_ms` | Effort |
 | User space intervals | Spacing table input |

@@ -6,13 +6,13 @@
 
 ## Critical pitfalls
 
-### 1. Conflating schedule deviation with memory evidence (C1)
+### 1. Hiding elapsed time and leaving a stale recall anchor (C1)
 
-**What goes wrong:** Correct recalls still use deviation from `nextRecallAt` as the time input to strength math. Early answers shrink the success increment vs **due**. Overdue success is **not** penalized (shipped 2026-08-05) but also does **not** get FSRS-style extra credit for longer elapsed time.
+**What goes wrong:** The success API exposes `delayInHours` relative to a recomputed expected recall time instead of explicit elapsed time. More importantly, incorrect recall does not update `lastRecalledAt`, so the next recall interval may span across the failure. Overdue success is **not** penalized (shipped 2026-08-05) but also does **not** get FSRS-style extra credit for longer elapsed time.
 
-**Why:** `MemoryTracker.recalledSuccessfully` passes `getDiffInHours(current, calculateNextRecallAt())` into `ForgettingCurve.succeeded`. Early-only tests (`SpacedRepetitionEarlyRecallAdjustmentTest`) encode due-relative early discount. `lateCorrectAnswerDoesNotShortenTheNextInterval` locks the shipped minimum bar.
+**Why:** `MemoryTracker.recalledSuccessfully` passes `getDiffInHours(current, calculateNextRecallAt())` into `ForgettingCurve.succeeded`. `calculateNextRecallAt()` recomputes `lastRecalledAt + current interval`, so early-success math is algebraically elapsed/current interval; it does not read persisted `nextRecallAt`. `MemoryTracker.recallFailed`, however, leaves `lastRecalledAt` unchanged.
 
-**Avoid:** Split outcome, observed elapsed since `lastRecalledAt`, and due projection. Do not reintroduce an overdue penalty. Any overdue *reward* must be elapsed-based (FSRS), not queue-miss-based.
+**Avoid:** Let `MemoryTracker` transition its persisted pre-recall state using explicit elapsed time, and advance `lastRecalledAt` on every state-changing recall. Keep `nextRecallAt` as the resulting projection. Do not reintroduce an overdue penalty. Any overdue *reward* must be elapsed-based (FSRS), not queue-miss-based.
 
 **Warning signs:** `delayInHours` still from `calculateNextRecallAt()`; tests that treat “late” as due-deviation; assuming the Aug 5 fix already adopted FSRS’s clock or overdue reward.
 
@@ -36,7 +36,7 @@
 
 **Why:** Logic scattered across entity methods, services, and controllers from v1.1–v1.3.
 
-**Avoid:** One seam for “graded evidence → strength + projection”; matrix-test outcomes × entry points on schedule observables.
+**Avoid:** One seam for “graded recall → memory state + projection”; matrix-test outcomes × entry points on schedule observables.
 
 **Warning signs:** Fix only in `ForgettingCurve` while commissioned still writes fields directly; admin APIs used to “fix” schedule.
 
@@ -117,16 +117,16 @@
 | Integration | Mistake | Correct approach |
 |-------------|---------|------------------|
 | Spelling API | Grade without tracker seam | Outcome → single scheduling apply |
-| MCQ recall | Only spelling gets evidence fix | Same evidence rules via shared path |
+| MCQ recall | Only spelling gets the C1 fix | Same recall-transition rules via shared path |
 | Learning Session record | Index updated, due stale | Set `lastRecalledAt`, apply score, strictly-future due |
 | Session item without Feedback | Treat as failure | Tracker unchanged (ADR) |
-| Manual mark-as-recalled | Bypass evidence rules | Document / route carefully |
+| Manual mark-as-recalled | Bypass recall-transition rules | Document / route carefully |
 | Frequent-failure API | Treat as blocking | Informational only |
 
 ## "Looks done but isn't"
 
 - Late-success **penalty** is done (overdue interval ≥ on-time). FSRS overdue **reward** is not.
-- Success time base is still due deviation (C1), not elapsed since `lastRecalledAt`
+- Success contract still names due-relative delay, and incorrect recall leaves `lastRecalledAt` stale (C1)
 - Early correct still `nextRecallAt > gradedAt`
 - Accidental not on 12h failure path; weaker than incorrect
 - Overlap leaves tracker fields unchanged
