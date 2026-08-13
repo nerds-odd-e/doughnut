@@ -3,10 +3,11 @@ import { waitUntilAppIsNotBusy } from '../../pageBase'
 export const assimilateButtonSelector = '[data-test="assimilate"]'
 export const reviveButtonSelector = '[data-test="revive"]'
 export const skipRecallButtonSelector = '[value="Skip recall"]'
-export const assimilateAsCommissionedCaretSelector =
-  '[data-test="assimilate-as-commissioned-caret"]'
+export const assimilateOptionsCaretSelector =
+  '[data-test="assimilate-options-caret"]'
 export const assimilateAsCommissionedSelector =
   '[data-test="assimilate-as-commissioned"]'
+export const rememberSpellingSelector = '[data-test="remember-spelling"]'
 
 export const assimilationPropertyRow = (propertyKey: string) =>
   cy.get(
@@ -16,32 +17,22 @@ export const assimilationPropertyRow = (propertyKey: string) =>
 export const isNoteLevelAssimilationControl = (el: Element) =>
   el.closest('[data-test="assimilation-property-row"]') === null
 
-export const assimilateButton = (options?: { timeout?: number }) =>
-  cy
-    .get(assimilateButtonSelector, options ?? {})
-    .filter((_, el) => isNoteLevelAssimilationControl(el))
+const noteLevelControl =
+  (selector: string) => (options?: { timeout?: number }) =>
+    cy
+      .get(selector, options ?? {})
+      .filter((_, el) => isNoteLevelAssimilationControl(el))
 
-export const assimilateAsCommissionedCaret = (options?: { timeout?: number }) =>
-  cy
-    .get(assimilateAsCommissionedCaretSelector, options ?? {})
-    .filter((_, el) => isNoteLevelAssimilationControl(el))
-
-export const assimilateAsCommissionedButton = (options?: {
-  timeout?: number
-}) =>
-  cy
-    .get(assimilateAsCommissionedSelector, options ?? {})
-    .filter((_, el) => isNoteLevelAssimilationControl(el))
-
-export const reviveButton = (options?: { timeout?: number }) =>
-  cy
-    .get(reviveButtonSelector, options ?? {})
-    .filter((_, el) => isNoteLevelAssimilationControl(el))
-
-export const skipRecallOnPanel = (options?: { timeout?: number }) =>
-  cy
-    .get(skipRecallButtonSelector, options ?? {})
-    .filter((_, el) => isNoteLevelAssimilationControl(el))
+export const assimilateButton = noteLevelControl(assimilateButtonSelector)
+export const assimilateOptionsCaret = noteLevelControl(
+  assimilateOptionsCaretSelector
+)
+export const assimilateAsCommissionedButton = noteLevelControl(
+  assimilateAsCommissionedSelector
+)
+export const rememberSpellingButton = noteLevelControl(rememberSpellingSelector)
+export const reviveButton = noteLevelControl(reviveButtonSelector)
+export const skipRecallOnPanel = noteLevelControl(skipRecallButtonSelector)
 
 export function noteLevelReviveElements(doc: Document | ParentNode): Element[] {
   return [...doc.querySelectorAll(reviveButtonSelector)].filter(

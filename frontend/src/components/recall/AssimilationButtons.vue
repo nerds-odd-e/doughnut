@@ -1,5 +1,5 @@
 <template>
-  <div :class="{ 'daisy-join': showCommissionedOption }">
+  <div :class="{ 'daisy-join': showAssimilateOptions }">
     <input
       type="submit"
       name="submit"
@@ -7,19 +7,19 @@
       :class="[
         'daisy-btn daisy-btn-primary',
         sizeClass,
-        { 'daisy-join-item': showCommissionedOption },
+        { 'daisy-join-item': showAssimilateOptions },
       ]"
       data-test="assimilate"
       :disabled="disabled || assimilateDisabled"
       @click="$emit('assimilate', false)"
     />
     <AutoCollapseDropdown
-      v-if="showCommissionedOption"
+      v-if="showAssimilateOptions"
       v-slot="{ closeDropdown }"
       class="daisy-dropdown daisy-dropdown-end daisy-dropdown-top daisy-join-item shrink-0"
     >
       <summary
-        data-test="assimilate-as-commissioned-caret"
+        data-test="assimilate-options-caret"
         :class="[
           'daisy-btn daisy-btn-primary list-none cursor-pointer px-2',
           sizeClass,
@@ -30,7 +30,7 @@
         <ChevronDown class="h-4 w-4" aria-hidden="true" />
       </summary>
       <DropdownMenu>
-        <DropdownMenuItem>
+        <DropdownMenuItem v-if="showCommissionedOption">
           <button
             type="button"
             data-test="assimilate-as-commissioned"
@@ -42,6 +42,20 @@
             "
           >
             Assimilate as commissioned
+          </button>
+        </DropdownMenuItem>
+        <DropdownMenuItem v-if="showSpellingOption">
+          <button
+            type="button"
+            data-test="remember-spelling"
+            :class="dropdownMenuButtonClass"
+            :disabled="disabled"
+            @click="
+              $emit('rememberSpelling');
+              closeDropdown()
+            "
+          >
+            Remember spelling
           </button>
         </DropdownMenuItem>
       </DropdownMenu>
@@ -109,14 +123,26 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    showSpellingOption: {
+      type: Boolean,
+      default: false,
+    },
   },
-  emits: ["assimilate", "revive", "assimilateAsCommissioned"],
+  emits: [
+    "assimilate",
+    "revive",
+    "assimilateAsCommissioned",
+    "rememberSpelling",
+  ],
   setup() {
     return { dropdownMenuButtonClass }
   },
   computed: {
     sizeClass(): string {
       return this.size === "sm" ? "daisy-btn-sm" : ""
+    },
+    showAssimilateOptions(): boolean {
+      return this.showCommissionedOption || this.showSpellingOption
     },
   },
 })

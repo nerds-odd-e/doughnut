@@ -10,11 +10,15 @@ export type AssimilateUnitRequest = {
   skipMemoryTracking: boolean
   propertyKey?: string
   assimilateAsCommissioned?: boolean
+  assimilateAsSpelling?: boolean
 }
 
 export type AssimilateEvent = Pick<
   AssimilateUnitRequest,
-  "skipMemoryTracking" | "propertyKey" | "assimilateAsCommissioned"
+  | "skipMemoryTracking"
+  | "propertyKey"
+  | "assimilateAsCommissioned"
+  | "assimilateAsSpelling"
 >
 
 export type AssimilateUnitResult = {
@@ -49,6 +53,9 @@ export function useAssimilateUnit() {
             ...(request.assimilateAsCommissioned
               ? { assimilateAsCommissioned: true }
               : {}),
+            ...(request.assimilateAsSpelling
+              ? { assimilateAsSpelling: true }
+              : {}),
           },
         }),
       { blockUi: true, message: "Assimilating..." }
@@ -60,7 +67,9 @@ export function useAssimilateUnit() {
 
     requestDueRecallsRefresh()
 
-    if (request.assimilateAsCommissioned) {
+    const staysOnNote =
+      request.assimilateAsCommissioned || request.assimilateAsSpelling
+    if (staysOnNote) {
       return { success: true, navigated: false, memoryTrackers }
     }
 

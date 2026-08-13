@@ -4,15 +4,15 @@ This file is **only** for `.planning/quick/002-remember-spelling-as-tracker/`. D
 
 ```
 status: in-progress
-current_phase: 2
-current_phase_name: Assimilation offers Remember spelling
+current_phase: 3
+current_phase_name: Remember spelling verifies the title first
 last_updated: 2026-08-13
 ```
 
 | Phase | Type | Status |
 |--|--|--|
 | 1 API creates spelling tracker | Behavior | done |
-| 2 Remember spelling in UI | Behavior | planned |
+| 2 Remember spelling in UI | Behavior | done |
 | 3 Verify title first | Behavior | planned |
 | 4 Offer only when it applies | Behavior | planned |
 | 5 Spelling tests off the note flag | Structure | planned |

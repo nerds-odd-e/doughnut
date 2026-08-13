@@ -65,6 +65,9 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
 
   spelling(value = true): MemoryTrackerBuilder {
     this.data.spelling = value
+    if (value) {
+      this.data.type = 'SPELLING'
+    }
     return this
   }
 

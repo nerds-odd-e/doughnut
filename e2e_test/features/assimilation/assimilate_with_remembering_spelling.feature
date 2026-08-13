@@ -64,3 +64,13 @@ Feature: Assimilate with remembering spelling
     And I assimilate with remembering spelling
     And I verify spelling with "Word"
     Then the spelling verification result for note "Word" should be "success"
+
+  Scenario: Remember spelling creates a spelling tracker without assimilating
+    Given I have a notebook "English practice" with notes:
+      | Title | Content             |
+      | Word  | Non-empty body text |
+    When I am assimilating the note "Word"
+    And I remember spelling
+    Then I should see a spelling memory tracker
+    And assimilate should be enabled
+    And I should be assimilating the note "Word"

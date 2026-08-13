@@ -155,11 +155,14 @@ export async function clickAssimilate(
   await flushPromises()
 }
 
-export function assimilateAsCommissionedCaretEl(
+export const assimilateOptionsCaretSelector =
+  '[data-test="assimilate-options-caret"]' as const
+
+export function assimilateOptionsCaretEl(
   wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
 ) {
   return wrapper.element.querySelector(
-    '[data-test="assimilate-as-commissioned-caret"]'
+    assimilateOptionsCaretSelector
   ) as HTMLElement | null
 }
 
@@ -169,12 +172,31 @@ export function assimilateAsCommissionedButtonEl() {
   ) as HTMLButtonElement | null
 }
 
+export function rememberSpellingButtonEl() {
+  return document.body.querySelector(
+    '[data-test="remember-spelling"]'
+  ) as HTMLButtonElement | null
+}
+
+export async function openAssimilateOptions(
+  wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
+) {
+  assimilateOptionsCaretEl(wrapper)!.click()
+  await flushPromises()
+}
+
 export async function clickAssimilateAsCommissioned(
   wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
 ) {
-  const caret = assimilateAsCommissionedCaretEl(wrapper)
-  caret!.click()
-  await flushPromises()
+  await openAssimilateOptions(wrapper)
   assimilateAsCommissionedButtonEl()!.click()
+  await flushPromises()
+}
+
+export async function clickRememberSpelling(
+  wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
+) {
+  await openAssimilateOptions(wrapper)
+  rememberSpellingButtonEl()!.click()
   await flushPromises()
 }

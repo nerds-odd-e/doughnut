@@ -6,15 +6,24 @@ import { assimilationPropertyFlow } from './assimilationPropertyFlow'
 import { assimilationRefinementLayoutExpectations } from './refinementLayoutExpectations'
 import {
   assimilateAsCommissionedButton,
-  assimilateAsCommissionedCaret,
+  assimilateOptionsCaret,
   assimilateButton,
   mainNoteHeadingTitleSelector,
   noteLevelReviveElements,
   openRefineNoteModalIfNeeded,
+  rememberSpellingButton,
   reviveButton,
   skipRecallOnPanel,
   waitForAssimilationNoteTitle,
 } from './shared'
+
+const chooseAssimilateOption = (
+  optionButton: typeof assimilateAsCommissionedButton
+) => {
+  assimilateOptionsCaret().click()
+  optionButton().click()
+  waitUntilAppIsNotBusy()
+}
 
 export const assumeAssimilationPage = () => ({
   ...assimilationPropertyMemoryTrackerExpectations(),
@@ -49,13 +58,19 @@ export const assumeAssimilationPage = () => ({
     return this
   },
   assimilateAsCommissioned() {
-    assimilateAsCommissionedCaret().click()
-    assimilateAsCommissionedButton().click()
-    waitUntilAppIsNotBusy()
+    chooseAssimilateOption(assimilateAsCommissionedButton)
+    return this
+  },
+  rememberSpelling() {
+    chooseAssimilateOption(rememberSpellingButton)
     return this
   },
   expectOrdinaryAndCommissionedMemoryTrackers() {
     this.expectMemoryTrackerInfo([{ type: 'normal' }, { type: 'Commissioned' }])
+    return this
+  },
+  expectSpellingMemoryTracker() {
+    this.expectMemoryTrackerInfo([{ type: 'spelling' }])
     return this
   },
   expectTutorFeedbackScore(score: number) {

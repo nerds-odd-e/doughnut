@@ -41,6 +41,10 @@ import {
   type AssimilateEvent,
 } from "@/composables/useAssimilateUnit"
 import {
+  hasNoteLevelTrackerOfType,
+  hasUnderstandingNoteLevelTracker,
+} from "./noteLevelMemoryTrackers"
+import {
   trackersToRevive,
   useReviveMemoryTracker,
 } from "@/composables/useReviveMemoryTracker"
@@ -77,16 +81,11 @@ const onNoteRecallInfoLoaded = (info: NoteRecallInfo) => {
   noteInfoLoaded.value = true
 }
 
-const hasNoteLevelMemoryTrackers = computed(
-  () =>
-    noteRecallInfo.value?.memoryTrackers?.some(
-      (mt) => !mt.propertyKey && mt.type !== "COMMISSIONED"
-    ) ?? false
+const hasNoteLevelMemoryTrackers = computed(() =>
+  hasUnderstandingNoteLevelTracker(noteRecallInfo.value?.memoryTrackers)
 )
-const hasSpellingMemoryTracker = computed(
-  () =>
-    noteRecallInfo.value?.memoryTrackers?.some((mt) => mt.spelling === true) ??
-    false
+const hasSpellingMemoryTracker = computed(() =>
+  hasNoteLevelTrackerOfType(noteRecallInfo.value?.memoryTrackers, "SPELLING")
 )
 const assimilateDisabled = computed(
   () =>
@@ -98,11 +97,13 @@ const processAssimilate = async ({
   skipMemoryTracking,
   propertyKey,
   assimilateAsCommissioned,
+  assimilateAsSpelling,
 }: AssimilateEvent) => {
-  if (assimilateAsCommissioned) {
+  if (assimilateAsCommissioned || assimilateAsSpelling) {
     await doAssimilate({
       skipMemoryTracking: false,
-      assimilateAsCommissioned: true,
+      assimilateAsCommissioned,
+      assimilateAsSpelling,
     })
     return
   }
@@ -140,6 +141,7 @@ const doAssimilate = async ({
   skipMemoryTracking,
   propertyKey,
   assimilateAsCommissioned,
+  assimilateAsSpelling,
 }: AssimilateEvent) => {
   assimilatingPropertyKey.value = propertyKey ?? null
   try {
@@ -148,6 +150,7 @@ const doAssimilate = async ({
       skipMemoryTracking,
       propertyKey,
       assimilateAsCommissioned,
+      assimilateAsSpelling,
     })
 
     if (!result.success) {

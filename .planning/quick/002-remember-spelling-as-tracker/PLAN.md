@@ -1,6 +1,6 @@
 # Remember spelling as a memory tracker
 
-Status: in-progress (Phase 1 done)
+Status: in-progress (Phase 2 done)
 Plan state: [STATE.md](./STATE.md) (this folder only — do not edit `.planning/STATE.md`)
 
 Each phase is one commit. Type is Behavior or Structure. One observable behavior (or one structure change for the immediate next behavior).
@@ -38,7 +38,7 @@ Shipped: `assimilateAsSpelling`; ordinary due/daily count are understanding-only
 ### Phase 2: Assimilation offers Remember spelling
 
 Type: Behavior  
-Status: planned
+Status: done
 
 **Pre-condition:** Phase 1 API exists. Learner is assimilating a normal note with content and no spelling tracker.
 
@@ -46,13 +46,9 @@ Status: planned
 
 **Post-condition:** A spelling tracker is created. UI stays on this note. Assimilate (understanding) stays enabled. Daily count in the UI does not bump. Checkbox still present.
 
-Interim: no title verification yet (Phase 3). Caret stays visible when commissioned exists but spelling does not (and the reverse).
+Shipped: **Remember spelling** on `assimilate-options-caret`. No title verification yet. Checkbox still present.
 
-**Implement:** menu item on the existing caret; `useAssimilateUnit` like commissioned (`assimilateAsSpelling`, no navigate, no count). Main Assimilate disabled-state ignores spelling trackers. Frontend tests beside `AssimilationPanel.commissioned.spec.ts`.
-
-**E2E:** `@wip` scenario on `assimilate_with_remembering_spelling.feature` — Remember spelling → spelling tracker visible → Assimilate still enabled → still on this note. Remove `@wip` when green. Do not commit red.
-
-**Verify:** frontend assimilation panel tests; `pnpm cypress run --spec e2e_test/features/assimilation/assimilate_with_remembering_spelling.feature`.
+**Learning:** Caret `data-test` is `assimilate-options-caret` (shared with commissioned). Note-level tracker predicates live in `noteLevelMemoryTrackers.ts`.
 
 ---
 

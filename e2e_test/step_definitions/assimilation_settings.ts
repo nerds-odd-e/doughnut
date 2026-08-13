@@ -35,6 +35,10 @@ When('I assimilate it as commissioned', () => {
   start.assumeAssimilationPage().assimilateAsCommissioned()
 })
 
+When('I remember spelling', () => {
+  start.assumeAssimilationPage().rememberSpelling()
+})
+
 When('I skip recall on the assimilation panel', () => {
   start.assumeAssimilationPage().skipRecallOnPanel()
 })

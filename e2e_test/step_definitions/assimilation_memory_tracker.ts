@@ -40,6 +40,10 @@ Then(
   }
 )
 
+Then('I should see a spelling memory tracker', () => {
+  start.assumeAssimilationPage().expectSpellingMemoryTracker()
+})
+
 Then(
   'the property memory tracker for {string} should be absent',
   (propertyKey: string) => {
