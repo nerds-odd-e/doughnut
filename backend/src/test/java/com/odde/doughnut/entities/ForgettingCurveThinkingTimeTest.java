@@ -22,11 +22,15 @@ class ForgettingCurveThinkingTimeTest {
         new SpacedRepetitionAlgorithm(null), DEFAULT_FORGETTING_CURVE_INDEX + 20);
   }
 
+  private float succeededAfterCurrentInterval(ForgettingCurve curve, Integer thinkingTimeMs) {
+    return curve.succeeded(curve.getRepeatInHours(), thinkingTimeMs);
+  }
+
   @Test
   void baseCase_shouldHaveZeroAdjustment() {
     ForgettingCurve curve = createForgettingCurve();
-    float indexWithoutThinkingTime = curve.succeeded(0, null);
-    float indexWithBaseThinkingTime = curve.succeeded(0, BASE_THINKING_TIME_MS);
+    float indexWithoutThinkingTime = succeededAfterCurrentInterval(curve, null);
+    float indexWithBaseThinkingTime = succeededAfterCurrentInterval(curve, BASE_THINKING_TIME_MS);
     assertThat(indexWithBaseThinkingTime, equalTo(indexWithoutThinkingTime));
   }
 
@@ -39,8 +43,8 @@ class ForgettingCurveThinkingTimeTest {
   })
   void thinkingTimeAdjustsIndexRelativeToBase(int thinkingTimeMs, String direction) {
     ForgettingCurve curve = createForgettingCurve();
-    float indexWithBase = curve.succeeded(0, BASE_THINKING_TIME_MS);
-    float indexWithThinkingTime = curve.succeeded(0, thinkingTimeMs);
+    float indexWithBase = succeededAfterCurrentInterval(curve, BASE_THINKING_TIME_MS);
+    float indexWithThinkingTime = succeededAfterCurrentInterval(curve, thinkingTimeMs);
     Matcher<Float> matcher =
         "greater".equals(direction) ? greaterThan(indexWithBase) : lessThan(indexWithBase);
     assertThat(indexWithThinkingTime, matcher);
@@ -49,27 +53,28 @@ class ForgettingCurveThinkingTimeTest {
   @Test
   void thinkingTimeAboveMax_shouldBeClamped() {
     ForgettingCurve curve = createForgettingCurve();
-    float indexWithMaxThinkingTime = curve.succeeded(0, MAX_THINKING_TIME_MS);
-    float indexWith100Seconds = curve.succeeded(0, 100000);
+    float indexWithMaxThinkingTime = succeededAfterCurrentInterval(curve, MAX_THINKING_TIME_MS);
+    float indexWith100Seconds = succeededAfterCurrentInterval(curve, 100000);
     assertThat(indexWith100Seconds, equalTo(indexWithMaxThinkingTime));
   }
 
   @Test
-  void thinkingTimeAdjustmentCombinedWithEarlyRecallDiscount() {
+  void thinkingTimeAdjustmentCombinedWithElapsedTimeDiscount() {
     ForgettingCurve curve = createForgettingCurve();
-    float indexOnTimeWithBase = curve.succeeded(0, BASE_THINKING_TIME_MS);
-    float indexEarlyWithBase = curve.succeeded(-24, BASE_THINKING_TIME_MS);
-    float indexEarlyWith10Seconds = curve.succeeded(-24, 10000);
+    float indexAfterCurrentIntervalWithBase =
+        succeededAfterCurrentInterval(curve, BASE_THINKING_TIME_MS);
+    float indexWithNoElapsedTimeAtBase = curve.succeeded(0, BASE_THINKING_TIME_MS);
+    float indexWithNoElapsedTimeAt10Seconds = curve.succeeded(0, 10000);
 
-    assertThat(indexOnTimeWithBase, greaterThan(indexEarlyWithBase));
-    assertThat(indexEarlyWith10Seconds, greaterThan(indexEarlyWithBase));
+    assertThat(indexAfterCurrentIntervalWithBase, greaterThan(indexWithNoElapsedTimeAtBase));
+    assertThat(indexWithNoElapsedTimeAt10Seconds, greaterThan(indexWithNoElapsedTimeAtBase));
   }
 
   @Test
   void veryFastThinkingTime_shouldNotExceedHalfIncrement() {
     ForgettingCurve curve = createForgettingCurve();
-    float indexWithBaseThinkingTime = curve.succeeded(0, BASE_THINKING_TIME_MS);
-    float indexWithVeryFastThinkingTime = curve.succeeded(0, 1);
+    float indexWithBaseThinkingTime = succeededAfterCurrentInterval(curve, BASE_THINKING_TIME_MS);
+    float indexWithVeryFastThinkingTime = succeededAfterCurrentInterval(curve, 1);
     float adjustment = indexWithVeryFastThinkingTime - indexWithBaseThinkingTime;
     assertThat(adjustment, lessThanOrEqualTo((float) DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT / 2));
   }

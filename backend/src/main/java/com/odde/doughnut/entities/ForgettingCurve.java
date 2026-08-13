@@ -31,12 +31,14 @@ public class ForgettingCurve {
     return spacedRepetitionAlgorithm.getRepeatInHours(index);
   }
 
-  float succeeded(long delayInHours, Integer thinkingTimeMs) {
+  float succeeded(long elapsedInHours, Integer thinkingTimeMs) {
     float successIncrement = DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
-    Integer oldRepeatInHours = getRepeatInHours();
-    if (oldRepeatInHours > 0 && delayInHours < 0) {
+    Integer currentIntervalInHours = getRepeatInHours();
+    if (currentIntervalInHours > 0 && elapsedInHours < currentIntervalInHours) {
       successIncrement +=
-          delayInHours * DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT / (float) oldRepeatInHours;
+          (elapsedInHours - currentIntervalInHours)
+              * DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT
+              / (float) currentIntervalInHours;
     }
     float thinkingTimeAdjustment = calculateThinkingTimeAdjustment(thinkingTimeMs);
     return add(successIncrement + thinkingTimeAdjustment);

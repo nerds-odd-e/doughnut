@@ -172,10 +172,10 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   }
 
   public void recalledSuccessfully(Timestamp currentUTCTimestamp, Integer thinkingTimeMs) {
-    long delayInHours =
-        TimestampOperations.getDiffInHours(currentUTCTimestamp, calculateNextRecallAt());
+    long elapsedInHours =
+        TimestampOperations.getDiffInHours(currentUTCTimestamp, getLastRecalledAt());
 
-    setForgettingCurveIndex(forgettingCurve().succeeded(delayInHours, thinkingTimeMs));
+    setForgettingCurveIndex(forgettingCurve().succeeded(elapsedInHours, thinkingTimeMs));
 
     setLastRecalledAt(currentUTCTimestamp);
     setNextRecallAt(calculateNextRecallAt());

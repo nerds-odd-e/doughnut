@@ -23,39 +23,39 @@ public class SpacedRepetitionEarlyRecallAdjustmentTest {
       DEFAULT_FORGETTING_CURVE_INDEX + DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT * 3;
 
   @Test
-  void repeatOnTime() {
-    float index = getNextForgettingCurveIndexWithDelay(0);
+  void repeatAfterCurrentInterval() {
+    float index = getNextForgettingCurveIndexWithElapsedHours(9 * 24);
     assertThat(index, equalTo(baselineForgettingCurveIndex));
   }
 
   @Test
   void repeatEarly_immediatelyWhichIsImpossible() {
-    float index = getNextForgettingCurveIndexWithDelay(-9 * 24);
+    float index = getNextForgettingCurveIndexWithElapsedHours(0);
     assertThat(index, equalTo(currentForgettingCurveIndex));
   }
 
   @Test
   void repeatEarly_inOneHour() {
-    float index = getNextForgettingCurveIndexWithDelay(-9 * 24 + 1);
+    float index = getNextForgettingCurveIndexWithElapsedHours(1);
     assertThat(index, greaterThanOrEqualTo(currentForgettingCurveIndex));
     assertThat(index, lessThan(baselineForgettingCurveIndex));
   }
 
   @Test
   void repeatEarly_OneHourEarlier() {
-    float index = getNextForgettingCurveIndexWithDelay(-1);
+    float index = getNextForgettingCurveIndexWithElapsedHours(9 * 24 - 1);
     assertThat(index, greaterThan(currentForgettingCurveIndex));
     assertThat(index, lessThanOrEqualTo(baselineForgettingCurveIndex));
   }
 
-  private float getNextForgettingCurveIndexWithDelay(int delayInHours) {
+  private float getNextForgettingCurveIndexWithElapsedHours(int elapsedInHours) {
     MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
     User user = makeMe.aUser().withSpaceIntervals("3, 6, 9, 12, 15").inMemoryPlease();
     Note note = makeMe.aNote().inMemoryPlease();
     MemoryTracker memoryTracker =
         makeMe.aMemoryTrackerFor(note).by(user).afterNthStrictRecall(3).inMemoryPlease();
     memoryTracker.recalledSuccessfully(
-        TimestampOperations.addHoursToTimestamp(memoryTracker.getNextRecallAt(), delayInHours),
+        TimestampOperations.addHoursToTimestamp(memoryTracker.getLastRecalledAt(), elapsedInHours),
         null);
     return memoryTracker.getForgettingCurveIndex();
   }

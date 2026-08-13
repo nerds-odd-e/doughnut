@@ -1,6 +1,6 @@
 # Close recall-time state cohesion (C1)
 
-**Status:** In progress — Phases 1–2 complete; Phase 3 next
+**Status:** In progress — Phases 1–3 complete; Phase 4 next
 **Plan type:** Ad-hoc phased delivery
 **Created:** 2026-08-13
 **Refined:** 2026-08-13 for small, green commit boundaries
@@ -101,7 +101,7 @@ timestamps without changing `nextRecallAt`.
 |------:|------|--------|--------------------|
 | 1 | Behavior | Done | Correct recall is proven independent of persisted due projection |
 | 2 | Behavior | Done | Correct recall is proven to use whole-hour precision |
-| 3 | Structure | Planned | Success transition speaks elapsed hours without schedule changes |
+| 3 | Structure | Done | Success transition speaks elapsed hours without schedule changes |
 | 4 | Behavior | Planned | Ordinary incorrect recall becomes the new anchor |
 | 5 | Behavior | Planned | A correct recall after failure is proven to use the failure anchor |
 | 6 | Behavior | Planned | Accidental match is protected as an anchor-moving outcome |
@@ -163,7 +163,7 @@ terminology and formula structure change.
 ## Phase 3 — Express success in elapsed hours
 
 **Type:** Structure
-**Status:** Planned
+**Status:** Done
 **Enables only:** Phase 4
 
 **Structural outcome:** `MemoryTracker` computes `elapsedInHours` from its
@@ -181,6 +181,11 @@ Do not change any schedule result or persisted field.
 
 **Verification:** Phases 1–2 remain green; run
 `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
+
+**Learning:** Rewriting the early adjustment as
+`(elapsedInHours - currentIntervalInHours) / currentIntervalInHours` preserved
+all 1,691 backend tests while letting `MemoryTracker` own elapsed-time
+calculation from its persisted anchor.
 
 **Stop-safe:** No external behavior changes. The structure is used immediately
 by the next phase's failed-recall anchor behavior.
