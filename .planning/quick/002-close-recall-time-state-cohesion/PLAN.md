@@ -1,6 +1,6 @@
 # Close recall-time state cohesion (C1)
 
-**Status:** In progress — Phases 1–4 complete; Phase 5 next
+**Status:** In progress — Phases 1–5 complete; Phase 6 next
 **Plan type:** Ad-hoc phased delivery
 **Created:** 2026-08-13
 **Refined:** 2026-08-13 for small, green commit boundaries
@@ -103,7 +103,7 @@ timestamps without changing `nextRecallAt`.
 | 2 | Behavior | Done | Correct recall is proven to use whole-hour precision |
 | 3 | Structure | Done | Success transition speaks elapsed hours without schedule changes |
 | 4 | Behavior | Done | Ordinary incorrect recall becomes the new anchor |
-| 5 | Behavior | Planned | A correct recall after failure is proven to use the failure anchor |
+| 5 | Behavior | Done | A correct recall after failure is proven to use the failure anchor |
 | 6 | Behavior | Planned | Accidental match is protected as an anchor-moving outcome |
 | 7 | Behavior | Planned | Overlap is protected as a no-anchor-mutation outcome |
 | 8 | Behavior | Planned | Recorded Tutor Feedback is protected as an anchor-moving outcome |
@@ -234,7 +234,7 @@ unchanged until later repair phases.
 ## Phase 5 — Protect the next correct recall after failure
 
 **Type:** Behavior (new-behavior regression)
-**Status:** Planned
+**Status:** Done
 
 - **Precondition:** A tracker has an old anchor, receives an incorrect grade at
   `t`, then waits a known whole-hour duration.
@@ -246,6 +246,10 @@ unchanged until later repair phases.
 production change unless Phase 4 failed to deliver the intended behavior.
 
 **Verification:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
+
+**Learning:** With the repaired failure anchor, a correct recall 24 hours after
+failure schedules a 96-hour interval; removing the anchor mutation produced 144
+hours from the stale pre-failure timestamp, confirming the regression's reach.
 
 **Stop-safe:** The cross-recall reason for C1 is protected independently of
 entry-point tests.

@@ -12,15 +12,18 @@ import java.sql.Timestamp;
 import org.junit.jupiter.api.Test;
 
 class SpacedRepetitionRecallSchedulingTest {
+  private final MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
+  private final User user = makeMe.aUser().withSpaceIntervals("3, 6, 9, 12, 15").inMemoryPlease();
+  private final Note note = makeMe.aNote().inMemoryPlease();
+
+  private MemoryTracker aMemoryTrackerAfterThreeStrictRecalls() {
+    return makeMe.aMemoryTrackerFor(note).by(user).afterNthStrictRecall(3).inMemoryPlease();
+  }
+
   @Test
   void correctRecallIntervalIsIndependentOfPersistedDueProjection() {
-    MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
-    User user = makeMe.aUser().withSpaceIntervals("3, 6, 9, 12, 15").inMemoryPlease();
-    Note note = makeMe.aNote().inMemoryPlease();
-    MemoryTracker earlierProjection =
-        makeMe.aMemoryTrackerFor(note).by(user).afterNthStrictRecall(3).inMemoryPlease();
-    MemoryTracker laterProjection =
-        makeMe.aMemoryTrackerFor(note).by(user).afterNthStrictRecall(3).inMemoryPlease();
+    MemoryTracker earlierProjection = aMemoryTrackerAfterThreeStrictRecalls();
+    MemoryTracker laterProjection = aMemoryTrackerAfterThreeStrictRecalls();
     Timestamp gradeTime =
         TimestampOperations.addHoursToTimestamp(earlierProjection.getLastRecalledAt(), 24);
     earlierProjection.setNextRecallAt(TimestampOperations.addHoursToTimestamp(gradeTime, -24));
@@ -38,13 +41,8 @@ class SpacedRepetitionRecallSchedulingTest {
 
   @Test
   void correctRecallIntervalUsesWholeElapsedHours() {
-    MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
-    User user = makeMe.aUser().withSpaceIntervals("3, 6, 9, 12, 15").inMemoryPlease();
-    Note note = makeMe.aNote().inMemoryPlease();
-    MemoryTracker wholeHourRecall =
-        makeMe.aMemoryTrackerFor(note).by(user).afterNthStrictRecall(3).inMemoryPlease();
-    MemoryTracker recallWithSubHourRemainder =
-        makeMe.aMemoryTrackerFor(note).by(user).afterNthStrictRecall(3).inMemoryPlease();
+    MemoryTracker wholeHourRecall = aMemoryTrackerAfterThreeStrictRecalls();
+    MemoryTracker recallWithSubHourRemainder = aMemoryTrackerAfterThreeStrictRecalls();
     Timestamp wholeHourGradeTime =
         TimestampOperations.addHoursToTimestamp(wholeHourRecall.getLastRecalledAt(), 300);
     Timestamp gradeTimeWithSubHourRemainder =
@@ -62,5 +60,20 @@ class SpacedRepetitionRecallSchedulingTest {
     assertThat(wholeHourRecall.getLastRecalledAt(), equalTo(wholeHourGradeTime));
     assertThat(
         recallWithSubHourRemainder.getLastRecalledAt(), equalTo(gradeTimeWithSubHourRemainder));
+  }
+
+  @Test
+  void correctRecallAfterFailureUsesElapsedHoursSinceFailure() {
+    MemoryTracker memoryTracker = aMemoryTrackerAfterThreeStrictRecalls();
+    Timestamp failureTime =
+        TimestampOperations.addHoursToTimestamp(memoryTracker.getLastRecalledAt(), 300);
+    Timestamp correctGradeTime = TimestampOperations.addHoursToTimestamp(failureTime, 24);
+
+    memoryTracker.markAsRecalled(failureTime, false, null);
+    memoryTracker.markAsRecalled(correctGradeTime, true, null);
+
+    long intervalAfterCorrectRecall =
+        TimestampOperations.getDiffInHours(memoryTracker.getNextRecallAt(), correctGradeTime);
+    assertThat(intervalAfterCorrectRecall, equalTo(96L));
   }
 }
