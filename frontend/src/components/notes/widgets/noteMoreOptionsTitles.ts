@@ -6,3 +6,8 @@ export const noteMoreOptionsTitles = {
   delete: "Delete note (d)",
   overflowMenu: "more options",
 } as const
+
+export type NoteMoreOptionsActionId = Exclude<
+  keyof typeof noteMoreOptionsTitles,
+  "overflowMenu"
+>

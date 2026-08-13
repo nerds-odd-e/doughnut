@@ -1,6 +1,6 @@
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
 import makeMe from "doughnut-test-fixtures/makeMe"
-import { mockSdkService } from "@tests/helpers"
+import helper, { mockSdkService } from "@tests/helpers"
 import {
   installMockResizeObserver,
   narrowNoteToolbarNavWidth,
@@ -8,6 +8,7 @@ import {
   wideNoteToolbarNavWidth,
 } from "@tests/helpers/mockNoteToolbarNavWidth"
 import { noteMoreOptionsTitles } from "@/components/notes/widgets/noteMoreOptionsTitles"
+import NoteToolbarMoreOptions from "@/components/notes/widgets/NoteToolbarMoreOptions.vue"
 import {
   mountNoteToolbar,
   noteToolbarProps,
@@ -191,5 +192,27 @@ describe("NoteToolbar more options", () => {
     ).toBe(true)
     expect(useNoteToolbarPanel().isAudioOpen.value).toBe(true)
     expect(document.querySelector("[data-dropdown-portal-panel]")).toBeNull()
+  })
+
+  it("omits listed inline toolbar actions and keeps remaining actions as layout boxes", async () => {
+    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
+    wrapper = helper
+      .component(NoteToolbarMoreOptions)
+      .withRouter()
+      .withCleanStorage()
+      .withProps({
+        note: noteRealm.note,
+        inline: true,
+        omit: ["delete"],
+      })
+      .mount({ attachTo: document.body })
+    await flushPromises()
+
+    const exportBtn = wrapper.find(`button[title="${titles.export}"]`)
+    expect(exportBtn.exists()).toBe(true)
+    expect((exportBtn.element as HTMLElement).offsetWidth).toBeGreaterThan(0)
+    expect(wrapper.find(`button[title="${titles.delete}"]`).exists()).toBe(
+      false
+    )
   })
 })

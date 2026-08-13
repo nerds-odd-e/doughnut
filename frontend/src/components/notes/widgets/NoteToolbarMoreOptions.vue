@@ -2,6 +2,7 @@
   <NoteMoreOptionsActions
     v-if="inline"
     layout="toolbar"
+    :omit="omit"
     v-bind="{ note }"
   />
 
@@ -40,11 +41,16 @@ import { ref } from "vue"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 import NoteMoreOptionsActions from "./NoteMoreOptionsActions.vue"
 import NoteMoreOptionsForm from "./NoteMoreOptionsForm.vue"
+import type { NoteMoreOptionsActionId } from "./noteMoreOptionsTitles"
 
-defineProps<{
-  note: Note
-  inline: boolean
-}>()
+withDefaults(
+  defineProps<{
+    note: Note
+    inline: boolean
+    omit?: NoteMoreOptionsActionId[]
+  }>(),
+  { omit: () => [] }
+)
 
 const overflowDropdownRef = ref<InstanceType<
   typeof AutoCollapseDropdown

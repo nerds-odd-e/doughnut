@@ -55,7 +55,7 @@
 
   <template v-else>
     <PopButton
-      v-if="layout === 'toolbar'"
+      v-if="showToolbarAction('export')"
       ref="exportPopButtonRef"
       :title="titles.export"
       :aria-label="titles.export"
@@ -69,7 +69,7 @@
     </PopButton>
 
     <PopButton
-      v-if="layout === 'toolbar'"
+      v-if="showToolbarAction('questions')"
       :title="titles.questions"
       :aria-label="titles.questions"
     >
@@ -82,7 +82,7 @@
     </PopButton>
 
     <button
-      v-if="showOnToolbar(isAudioOpen)"
+      v-if="showToolbarToggle('audio', isAudioOpen)"
       type="button"
       :class="[
         toolbarToggleBtnClass(isAudioOpen),
@@ -97,7 +97,7 @@
     </button>
 
     <button
-      v-if="showOnToolbar(isAssimilationOpen)"
+      v-if="showToolbarToggle('assimilation', isAssimilationOpen)"
       type="button"
       :class="[
         toolbarToggleBtnClass(isAssimilationOpen),
@@ -112,7 +112,7 @@
     </button>
 
     <button
-      v-if="layout === 'toolbar'"
+      v-if="showToolbarAction('delete')"
       type="button"
       :class="toolbarGhostBtnClass"
       :title="titles.delete"
@@ -142,7 +142,10 @@ import { useNoteDeleteFlow } from "@/composables/useNoteDeleteFlow"
 import DropdownMenuActionButton from "@/components/commons/DropdownMenuActionButton.vue"
 import DropdownMenuItem from "@/components/commons/DropdownMenuItem.vue"
 import { dropdownMenuButtonClass } from "@/components/commons/dropdownMenuClasses"
-import { noteMoreOptionsTitles } from "./noteMoreOptionsTitles"
+import {
+  noteMoreOptionsTitles,
+  type NoteMoreOptionsActionId,
+} from "./noteMoreOptionsTitles"
 import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
 import { useNoteShortcutScope } from "@/composables/noteShortcutScope"
 import { computed, ref } from "vue"
@@ -154,10 +157,14 @@ const toolbarToggleBtnClass = (pressed: boolean) =>
   pressed ? toolbarToggleOnBtnClass : toolbarGhostBtnClass
 const titles = noteMoreOptionsTitles
 
-const props = defineProps<{
-  note: Note
-  layout: "toolbar" | "menu" | "pinned"
-}>()
+const props = withDefaults(
+  defineProps<{
+    note: Note
+    layout: "toolbar" | "menu" | "pinned"
+    omit?: NoteMoreOptionsActionId[]
+  }>(),
+  { omit: () => [] }
+)
 
 const emit = defineEmits<{
   (e: "close-dialog"): void
@@ -184,7 +191,10 @@ useKeyboardShortcut(
 useKeyboardShortcut("note-delete", deleteNote, shortcutsEnabled)
 
 const isAssimilationOpen = computed(() => isOpenForNote(props.note.id))
-const showOnToolbar = (isOn: boolean) => props.layout === "toolbar" || isOn
+const showToolbarAction = (id: NoteMoreOptionsActionId) =>
+  props.layout === "toolbar" && !props.omit.includes(id)
+const showToolbarToggle = (id: NoteMoreOptionsActionId, isOn: boolean) =>
+  showToolbarAction(id) || (props.layout === "pinned" && isOn)
 
 const closeDialogIfMenu = () => {
   if (props.layout === "menu") {

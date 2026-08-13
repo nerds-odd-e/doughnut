@@ -1,6 +1,6 @@
 # Pin on-state note-toolbar toggles
 
-**Status:** in progress (Phase 1 done)  
+**Status:** in progress (Phases 1–2 done)  
 **Type:** ad-hoc UX under `.planning/quick/`  
 **Goal:** An on-state Audio / Assimilation control stays on the note toolbar (never in More options), with higher priority than other icons as width shrinks. Off-state toggles can still live in More options.
 
@@ -31,11 +31,11 @@ Do **not** replace the 600px overflow model, rewrite `NoteToolbar`, or introduce
 | D-06 | No new E2E feature file. Cypress viewport stays 1200. Update [`noteMoreOptionsForm.ts`](e2e_test/start/pageObjects/noteMoreOptionsForm.ts) when visibility rules change. |
 | D-07 | Do **not** put New / Wiki / Conversation / Edit in More options until more-options overflow is already measured (Phase 4+). |
 
-## Current code (after Phase 1)
+## Current code (after Phase 2)
 
 - [`NoteToolbar.vue`](frontend/src/components/notes/core/NoteToolbar.vue) — New / Wiki / Conversation / Edit always inline; more-options via [`NoteToolbarMoreOptions.vue`](frontend/src/components/notes/widgets/NoteToolbarMoreOptions.vue)
-- [`useNoteToolbarMoreOptionsInline.ts`](frontend/src/composables/useNoteToolbarMoreOptionsInline.ts) — all more-options inline iff `clientWidth >= 600`
-- [`NoteMoreOptionsActions.vue`](frontend/src/components/notes/widgets/NoteMoreOptionsActions.vue) — `layout: "toolbar" | "menu" | "pinned"`; pinned shows only the on-toggle; menu omits the on-toggle
+- [`useNoteToolbarMoreOptionsInline.ts`](frontend/src/composables/useNoteToolbarMoreOptionsInline.ts) — all more-options inline iff `clientWidth >= 600` (Phase 3 replaces this for the more-options group)
+- [`NoteMoreOptionsActions.vue`](frontend/src/components/notes/widgets/NoteMoreOptionsActions.vue) — `layout: "toolbar" | "menu" | "pinned"`; toolbar `omit: NoteMoreOptionsActionId[]` hides items with `v-if` (real boxes, no `contents`)
 - E2E: [`noteMoreOptionsForm.ts`](e2e_test/start/pageObjects/noteMoreOptionsForm.ts) `openOverflowMenuIfNeeded(title)` opens `…` only if that title is not already visible
 
 ## Learnings (Phase 1)
@@ -43,19 +43,19 @@ Do **not** replace the 600px overflow model, rewrite `NoteToolbar`, or introduce
 - Pin by mounting `layout="pinned"` beside `…` when not inline; `NoteMoreOptionsActions` decides which button to show. Do not duplicate “is a toggle on” in the parent.
 - E2E helper `noteMoreOptions()` no longer assumes both Audio and Assimilation are visible at once.
 
+## Learnings (Phase 2)
+
+- Parent omit list + `v-if` (not `v-show` / `class="contents"`). Visible items stay real boxes for Phase 3 `offsetWidth`. Default omit is empty so 600px behavior is unchanged.
+
 ## Phases
 
 ### Phase 1 — Pin on-state toggle on a narrow toolbar (Behavior) — done
 
 On a narrow bar, an on-state Audio/Assimilation button sits beside `…` (soft-primary, pressed, `shrink-0`) and is omitted from the menu. Off peer stays in the menu. Wide still inline. Overflow checkmarks removed. Pin coverage: [`NoteToolbar.pinnedToggles.spec.ts`](frontend/tests/notes/NoteToolbar.pinnedToggles.spec.ts).
 
-### Phase 2 — Independent more-options item visibility (Structure) — planned
+### Phase 2 — Independent more-options item visibility (Structure) — done
 
-**Enables Phase 3 only.** No user-visible change: still all more-options inline at ≥600px, all in `…` below (except the pinned on-toggle from Phase 1).
-
-**Do:** Let the parent show/hide individual more-options toolbar items (e.g. omit list or per-item `v-show`) **without** `class="contents"` wrappers (those have `offsetWidth` 0). Existing tests still pass.
-
-**Do not:** replace the 600px rule; overflow main toolbar actions.
+`NoteToolbarMoreOptions` / `NoteMoreOptionsActions` accept `omit`. Toolbar items not listed stay in the DOM as real boxes. Production still omits nothing extra. Seam test in `NoteToolbar.moreOptions.spec.ts`.
 
 ### Phase 3 — Overflow more-options from the right by width (Behavior) — planned
 
