@@ -46,8 +46,8 @@ class AssimilationServiceSubscriptionQueueTest extends AssimilationServiceTestBa
 
     @Test
     void shouldReturnMemoryTrackerForLink() {
-      makeMe.theNote(note2).skipMemoryTracking().please();
-      makeMe.theNote(note1).skipMemoryTracking().please();
+      makeMe.aMemoryTrackerFor(note1).by(user).removedFromTracking().please();
+      makeMe.aMemoryTrackerFor(note2).by(user).removedFromTracking().please();
       Note link = makeMe.aNote().notebook(topNb).please();
       makeMe.refresh(user);
       Subscription sub = user.getSubscriptions().stream().findFirst().orElseThrow();

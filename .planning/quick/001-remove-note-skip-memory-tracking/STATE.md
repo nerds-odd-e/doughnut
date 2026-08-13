@@ -5,13 +5,13 @@ Do **not** write `.planning/STATE.md` — that file is shared. Track this plan h
 ```
 plan: .planning/quick/001-remove-note-skip-memory-tracking/PLAN.md
 status: in-progress
-current_phase: 2
-current_phase_name: Java fixtures exclude notes via skipped trackers
-completed_phases: 1
+current_phase: 3
+current_phase_name: Injected Skip Memory Tracking skip-recalls the note
+completed_phases: 2
 total_phases: 8
 last_updated: 2026-08-13
 ```
 
 ## Position
 
-Phase 1 done (note recall settings have no skip checkbox). Next: Phase 2 Structure.
+Phases 1–2 done. Next: Phase 3 Structure (testability inject → skip-recall).

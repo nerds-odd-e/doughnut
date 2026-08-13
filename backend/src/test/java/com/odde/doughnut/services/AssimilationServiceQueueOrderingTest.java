@@ -48,12 +48,6 @@ class AssimilationServiceQueueOrderingTest extends AssimilationServiceTestBase {
       assertThat(getNextNoteToAssimilate(assimilationService), equalTo(note2));
     }
 
-    @Test
-    void shouldNotIncludeNoteThatIsSkippedForRecall() {
-      makeMe.theNote(note1).skipMemoryTracking().please();
-      assertThat(getNextNoteToAssimilate(assimilationService), equalTo(note2));
-    }
-
     @Nested
     class WithAdditionalOwnedNote {
       Note anotherNote;

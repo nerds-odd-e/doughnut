@@ -83,8 +83,9 @@ class AssimilationServicePropertyWikiLinkGateTest extends AssimilationServiceTes
   }
 
   @Test
-  void offers_property_when_target_skips_memory_tracking() {
-    Note target = makeMe.aNote().title("Word").notebookOwnedBy(user).skipMemoryTracking().please();
+  void offers_property_when_target_has_skipped_note_level_tracker() {
+    Note target = makeMe.aNote().title("Word").notebookOwnedBy(user).please();
+    makeMe.aMemoryTrackerFor(target).removedFromTracking().please();
     Note carrier = carrierWithExampleOf(target, "---\nexample of: \"[[Word]]\"\n---\n\nbody");
 
     AssimilationUnit next = assimilationService.getNextAssimilationUnit().orElseThrow();

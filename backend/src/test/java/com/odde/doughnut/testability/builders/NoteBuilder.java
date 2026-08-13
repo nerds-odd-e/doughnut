@@ -105,11 +105,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
     }
   }
 
-  public NoteBuilder skipMemoryTracking() {
-    entity.getRecallSetting().setSkipMemoryTracking(true);
-    return this;
-  }
-
   public NoteBuilder folder(Folder folder) {
     if (entity.getNotebook() != null) {
       throw new AssertionError(

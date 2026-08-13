@@ -36,27 +36,11 @@ Checkbox removed from `NoteRecallSettingForm`. API field still present. Spec ass
 
 ---
 
-### Phase 2 — Java fixtures exclude notes via skipped trackers — Structure — planned
+### Phase 2 — Java fixtures exclude notes via skipped trackers — Structure — done
 
-**Why:** Enables Phase 4 (queue predicates) without rewriting tests on red.
+Callers use `aMemoryTrackerFor(…).removedFromTracking()`. `NoteBuilder.skipMemoryTracking()` deleted. Dropped `shouldNotIncludeNoteThatIsSkippedForRecall` — any note-level tracker already excludes the note from the unassimilated queue.
 
-**No user-facing change.**
-
-**Work**
-
-- Replace `NoteBuilder.skipMemoryTracking()` callers with a skipped note-level tracker (`removedFromTracking`):
-  - `AssimilationServiceQueueOrderingTest.shouldNotIncludeNoteThatIsSkippedForRecall` → skipped tracker is not in the unassimilated queue (drop if already covered in this class).
-  - `AssimilationServiceSubscriptionQueueTest.shouldReturnMemoryTrackerForLink` → skipped trackers on note1/note2.
-  - `AssimilationServicePropertyWikiLinkGateTest.offers_property_when_target_skips_memory_tracking` → offers property when target has a skipped note-level tracker.
-- Delete `NoteBuilder.skipMemoryTracking()` if it has no callers left.
-
-**Verify**
-
-```bash
-CURSOR_DEV=true nix develop -c pnpm backend:test_only
-```
-
-**Stop-safe:** Production unchanged.
+**Learning:** No remaining Java production tests depend on the note flag. Phase 4 can delete the predicates without rewriting those tests.
 
 ---
 
