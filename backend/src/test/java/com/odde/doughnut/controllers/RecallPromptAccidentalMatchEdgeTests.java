@@ -62,17 +62,17 @@ class RecallPromptAccidentalMatchEdgeTests extends RecallPromptControllerTestBas
   }
 
   @Test
-  void shouldApplyLighterPenaltyThanWrongAnswer() throws UnexpectedNoAccessRightException {
+  void shouldAdvanceRecallAnchorWithPartialFailureSchedule()
+      throws UnexpectedNoAccessRightException {
     testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
+    var gradeTime = testabilitySettings.getCurrentUTCTimestamp();
     controller.answerSpelling(recallPrompt, answerDTO);
 
     assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(190.0f));
+    assertThat(memoryTracker.getLastRecalledAt(), equalTo(gradeTime));
     assertThat(
         memoryTracker.getNextRecallAt(),
-        not(
-            equalTo(
-                TimestampOperations.addHoursToTimestamp(
-                    testabilitySettings.getCurrentUTCTimestamp(), 12))));
+        not(equalTo(TimestampOperations.addHoursToTimestamp(gradeTime, 12))));
   }
 
   @Test

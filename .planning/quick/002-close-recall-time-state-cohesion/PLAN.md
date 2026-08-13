@@ -1,6 +1,6 @@
 # Close recall-time state cohesion (C1)
 
-**Status:** In progress — Phases 1–5 complete; Phase 6 next
+**Status:** In progress — Phases 1–6 complete; Phase 7 next
 **Plan type:** Ad-hoc phased delivery
 **Created:** 2026-08-13
 **Refined:** 2026-08-13 for small, green commit boundaries
@@ -104,7 +104,7 @@ timestamps without changing `nextRecallAt`.
 | 3 | Structure | Done | Success transition speaks elapsed hours without schedule changes |
 | 4 | Behavior | Done | Ordinary incorrect recall becomes the new anchor |
 | 5 | Behavior | Done | A correct recall after failure is proven to use the failure anchor |
-| 6 | Behavior | Planned | Accidental match is protected as an anchor-moving outcome |
+| 6 | Behavior | Done | Accidental match is protected as an anchor-moving outcome |
 | 7 | Behavior | Planned | Overlap is protected as a no-anchor-mutation outcome |
 | 8 | Behavior | Planned | Recorded Tutor Feedback is protected as an anchor-moving outcome |
 | 9 | Behavior | Planned | Missing Tutor Feedback is protected as a no-mutation outcome |
@@ -257,7 +257,7 @@ entry-point tests.
 ## Phase 6 — Protect accidental-match anchoring
 
 **Type:** Behavior (existing-behavior regression)
-**Status:** Planned
+**Status:** Done
 
 - **Precondition:** A spelling tracker has an earlier anchor and the answer
   accidentally names another accessible note.
@@ -273,6 +273,10 @@ a real defect.
 
 - `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
 - `CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/recall/accidental_match_reveal.feature`
+
+**Learning:** The existing accidental-match transition already advanced the
+anchor; mutation-checking that line made only the new controller assertion fail,
+while the targeted feature remained green at 5/5.
 
 **Stop-safe:** A specialized state-changing outcome gains explicit C1 coverage.
 
