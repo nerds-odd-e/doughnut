@@ -166,23 +166,25 @@ class RecallPromptAnswerQuizControllerTest extends RecallPromptControllerTestBas
     }
 
     @Test
-    void shouldNotChangeTheLastRecalledAtTime() throws UnexpectedNoAccessRightException {
+    void shouldMoveLastRecalledAtToGradeTimeAndReduceStrength()
+        throws UnexpectedNoAccessRightException {
       testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-      Timestamp lastRecalledAt = memoryTracker.getLastRecalledAt();
       Float oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
       controller.answerQuiz(recallPrompt, answerDTO);
       assertThat(memoryTracker.getForgettingCurveIndex(), lessThan(oldForgettingCurveIndex));
-      assertThat(memoryTracker.getLastRecalledAt(), equalTo(lastRecalledAt));
+      assertThat(
+          memoryTracker.getLastRecalledAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
     }
 
     @Test
-    void shouldRepeatTheNextDay() throws UnexpectedNoAccessRightException {
+    void shouldRepeatInTwelveHours() throws UnexpectedNoAccessRightException {
+      testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
       controller.answerQuiz(recallPrompt, answerDTO);
       assertThat(
           memoryTracker.getNextRecallAt(),
-          lessThan(
+          equalTo(
               TimestampOperations.addHoursToTimestamp(
-                  testabilitySettings.getCurrentUTCTimestamp(), 25)));
+                  testabilitySettings.getCurrentUTCTimestamp(), 12)));
     }
   }
 }

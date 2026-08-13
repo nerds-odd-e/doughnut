@@ -1,6 +1,6 @@
 # Close recall-time state cohesion (C1)
 
-**Status:** In progress — Phases 1–3 complete; Phase 4 next
+**Status:** In progress — Phases 1–4 complete; Phase 5 next
 **Plan type:** Ad-hoc phased delivery
 **Created:** 2026-08-13
 **Refined:** 2026-08-13 for small, green commit boundaries
@@ -102,7 +102,7 @@ timestamps without changing `nextRecallAt`.
 | 1 | Behavior | Done | Correct recall is proven independent of persisted due projection |
 | 2 | Behavior | Done | Correct recall is proven to use whole-hour precision |
 | 3 | Structure | Done | Success transition speaks elapsed hours without schedule changes |
-| 4 | Behavior | Planned | Ordinary incorrect recall becomes the new anchor |
+| 4 | Behavior | Done | Ordinary incorrect recall becomes the new anchor |
 | 5 | Behavior | Planned | A correct recall after failure is proven to use the failure anchor |
 | 6 | Behavior | Planned | Accidental match is protected as an anchor-moving outcome |
 | 7 | Behavior | Planned | Overlap is protected as a no-anchor-mutation outcome |
@@ -193,7 +193,7 @@ by the next phase's failed-recall anchor behavior.
 ## Phase 4 — Make ordinary incorrect recall the anchor
 
 **Type:** Behavior
-**Status:** Planned
+**Status:** Done
 
 - **Precondition:** An ordinary tracker has an earlier recall anchor.
 - **Trigger:** The learner receives an incorrect MCQ or spelling grade at `t`.
@@ -221,6 +221,12 @@ step/page-object support.
 This is the only intentionally wider commit: the shared production line, both
 contradictory backend assertions, and the required E2E postcondition must turn
 green together to leave a phase-complete deployable boundary.
+
+**Learning:** Both ordinary routes failed only on their stale-anchor assertions;
+one aggregate mutation fixed MCQ and spelling while preserving the exact
+12-hour retry. The E2E observes the grade anchor locale-independently as twelve
+hours before the displayed next recall. Its new tracker steps required a
+capability-named extraction to keep step files under 250 lines.
 
 **Stop-safe:** All new ordinary grades have a correct anchor; legacy data remains
 unchanged until later repair phases.

@@ -5,7 +5,6 @@
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import { commonSenseSplit } from 'support/string_util'
 import start from '../start'
-import { assumeMemoryTrackerPage } from '../start/pageObjects/memoryTrackerPage'
 
 function assertAssimilationDueOnDay(day: number, toAssimilateAndTotal: string) {
   start.testability().backendTimeTravelTo(day, 8)
@@ -180,45 +179,6 @@ Then('I should see that my last answer to spelling question is correct', () => {
     .assumeAnsweredQuestionPage()
     .goToLastAnsweredQuestion()
     .expectSpellingAnswerToBeCorrect()
-})
-
-Then(
-  'I should see spelling memory tracker recall count {int} for the last answer',
-  (count: number) => {
-    start
-      .assumeAnsweredQuestionPage()
-      .goToLastAnsweredQuestion()
-      .viewMemoryTracker()
-    assumeMemoryTrackerPage().expectRecallCount(count).expectSpellingEnabled()
-  }
-)
-
-Then(
-  'I should see that my last spelling answer was correct with recall count {int}',
-  (count: number) => {
-    start
-      .assumeAnsweredQuestionPage()
-      .goToLastAnsweredQuestion()
-      .expectSpellingAnswerToBeCorrect()
-      .viewMemoryTracker()
-    assumeMemoryTrackerPage().expectRecallCount(count).expectSpellingEnabled()
-  }
-)
-
-When('I choose to remove the last memory tracker from recalls', () => {
-  start
-    .assumeAnsweredQuestionPage()
-    .goToLastAnsweredQuestion()
-    .viewMemoryTracker()
-    .removeFromRecall()
-})
-
-When('I revive the memory tracker on this page', () => {
-  assumeMemoryTrackerPage().reviveMemoryTracker()
-})
-
-Then('the memory tracker should be available for recall again', () => {
-  assumeMemoryTrackerPage().expectAvailableForRecall()
 })
 
 Then('I should be able to resume recalling', () => {

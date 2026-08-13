@@ -42,6 +42,28 @@ const assumeMemoryTrackerPage = () => {
         .should('contain', String(count))
       return assumeMemoryTrackerPage()
     },
+    expectLastRecallTimeTwelveHoursBeforeNextRecall() {
+      expectMemoryTrackerPage()
+      cy.contains('span.font-semibold', 'Last Recall Time:')
+        .siblings('span')
+        .invoke('text')
+        .then((lastRecallTime) => {
+          cy.contains('span.font-semibold', 'Next Recall Time:')
+            .siblings('span')
+            .invoke('text')
+            .then((nextRecallTime) => {
+              const intervalInHours =
+                (new Date(nextRecallTime.trim()).getTime() -
+                  new Date(lastRecallTime.trim()).getTime()) /
+                3_600_000
+              expect(
+                intervalInHours,
+                `Expected Last Recall Time (${lastRecallTime.trim()}) to be the incorrect grade time, 12 hours before Next Recall Time (${nextRecallTime.trim()})`
+              ).to.equal(12)
+            })
+        })
+      return assumeMemoryTrackerPage()
+    },
     expectSpellingEnabled() {
       expectMemoryTrackerPage()
       cy.contains('span.font-semibold', 'Spelling:')
