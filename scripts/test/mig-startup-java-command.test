@@ -26,8 +26,6 @@ assert_startup_script_command() {
 	local before_jar="${command%% -jar *}"
 	[[ "$before_jar" == *" -Dspring.datasource.url="* ]] \
 		|| fail "$script must pass datasource properties before -jar"
-	[[ "$before_jar" == *" -Dspring.flyway.placeholders.recall_anchor_repair=1=1 "* ]] \
-		|| fail "$script must enable the recall-anchor repair placeholder before -jar"
 }
 
 main() {

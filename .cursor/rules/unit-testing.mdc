@@ -48,7 +48,7 @@ expect(wrapper.findAll('[data-testid^="wiki-link-or-relationship-to-matched-note
 The concise-fixture guidance below is correct for **behavior** tests. For **hard deletes** and **delete migrations**, **fixture completeness beats minimality** — a bare target row with no children only proves row *selection*, not referential *fan-out*.
 
 - **Hard-delete endpoints:** build a row in **every table that holds an FK into the deleted entity** (directly or via CASCADE). Example: `MemoryTrackerDeleteControllerTest` uses `makeMe.aConversation().forARecallPrompt(...)` so deleting a tracker exercises the `conversation → recall_prompt` edge, not just the tracker row.
-- **Delete migrations:** same rule — seed every child table in the FK closure, not only rows the `WHERE` clause selects. Pair with a placeholder-gate test (`NoteTimeZoneRepairMigrationTest` pattern) when the migration is gated.
+- **Delete migrations:** same rule — seed every child table in the FK closure, not only rows the `WHERE` clause selects. While a gated migration is pending, pair it with a focused temporary test for the placeholder and row selection; remove that migration-only harness after confirmed production application.
 - **Schema guard:** `DeletableEntityFkClosureTest` catches restricting FKs without fixtures; it does not replace completeness tests for runtime delete paths.
 
 ## Concise makeMe setup
