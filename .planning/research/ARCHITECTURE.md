@@ -26,15 +26,17 @@ Parallel: LearningSessionService
 | Component | Finding |
 |-----------|---------|
 | `SpacedRepetitionAlgorithm` | Interval table — not the late-success bug source |
-| `ForgettingCurve` | Success math still keyed off schedule deviation |
-| `MemoryTracker.recalledSuccessfully` | Passes `gradedAt − nextRecallAt` into `succeeded` — **primary gap** |
+| `ForgettingCurve` | Late-success penalty removed 2026-08-05; still consumes due-relative `delayInHours` (early shrink only) |
+| `MemoryTracker.recalledSuccessfully` | Passes `gradedAt − nextRecallAt` into `succeeded` — **C1 remaining** |
 | `MemoryTrackerService` | Orchestration + frequent-failure threshold (informational) |
 | `SpellingRecallGrading` | Outcome classification; overlap skips mutation |
 | `CommissionedLearningSessionFeedbackPolicy` | Score → strength already matches ADR table |
 | `CommissionedLearningSessionFeedbackScheduling` | Has `ensureNextRecallStrictlyAfterNow` |
 | `RecallService` | Due queries from `nextRecallAt` — unchanged by policy semantics |
 
-## Primary violation
+## Remaining C1 (time base)
+
+The late-success **penalty** is shipped-removed. What remains is the wrong clock:
 
 ```174:181:backend/src/main/java/com/odde/doughnut/entities/MemoryTracker.java
   public void recalledSuccessfully(Timestamp currentUTCTimestamp, Integer thinkingTimeMs) {
@@ -52,7 +54,7 @@ ADR requires observed retention (`current − lastRecalledAt`), not queue deviat
 
 | Outcome | ADR expectation | Current finding |
 |---------|-----------------|-----------------|
-| Correct | Grow; timing from elapsed retention; `nextRecallAt` strictly after grade | Uses due deviation; may not enforce strictly-future on all paths |
+| Correct | Grow; timing from elapsed retention; overdue ≥ on-time; optional bounded reward | Penalty gone; uses due deviation; no FSRS overdue reward; may not enforce strictly-future on all paths |
 | Incorrect | Reduce; timing-neutral; optional short retry separate from long schedule | `recallFailed` 12h + strength cut — largely aligned |
 | Accidental match | Weaker than incorrect; normal interval path | `partialFail` + normal path — verify ordering / threshold count |
 | Overlap | No strength/schedule change | Skip `markAsRecalled` — aligned |
@@ -93,4 +95,4 @@ ADR requires observed retention (`current − lastRecalledAt`), not queue deviat
 - `backend/.../SpellingRecallGrading.java`
 
 ---
-*Researched: 2026-08-12*
+*Researched: 2026-08-12; corrected 2026-08-13 (late-success penalty shipped)*

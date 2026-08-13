@@ -2,7 +2,8 @@
 
 **Status:** Open for discussion (feeds finalizing Proposed [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy.md))  
 **Created:** 2026-08-12  
-**Sources:** ADR 0003 draft; SEED-004; `.planning/research/{SUMMARY,ARCHITECTURE,FEATURES,PITFALLS,STACK}.md`; live scheduler (`MemoryTracker`, `ForgettingCurve`, `SpacedRepetitionAlgorithm`, commissioned feedback policy); [FSRS algorithm wiki](https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm); [ts-fsrs](https://open-spaced-repetition.github.io/ts-fsrs/)
+**Corrected:** 2026-08-13 (late-success penalty is shipped; remaining gaps are C1 time base and FSRS overdue reward)  
+**Sources:** ADR 0003 draft; SEED-004; `.planning/research/{SUMMARY,ARCHITECTURE,FEATURES,PITFALLS,STACK}.md`; live scheduler (`MemoryTracker`, `ForgettingCurve`, `SpacedRepetitionAlgorithm`, commissioned feedback policy); commit `735b96623a`; [FSRS algorithm wiki](https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm); [ts-fsrs](https://open-spaced-repetition.github.io/ts-fsrs/)
 
 **Goal of this doc:** One place to track (1) the conceptual/code gap between **current Doughnut** and **open FSRS**, and (2) **open issues** that must be settled before ADR 0003 becomes the durable product shape — expected to be **mostly FSRS-compatible** without requiring an immediate library migration.
 
@@ -25,7 +26,14 @@ Resolve open issues → update ADR 0003 Decision text → mark issues **Decided*
 
 Open FSRS is a **DSR memory model**: per-card **Difficulty (D)** and **Stability (S)**, with **Retrievability (R)** derived from **elapsed time since last review** and S. Grades are **Again / Hard / Good / Easy**. Due time is a projection from desired retention and S — not evidence of forgetting.
 
-Doughnut today is a **single-index + user interval table** scheduler. The important semantic bug is that **success strength still consumes schedule deviation** (`gradedAt − nextRecallAt`) instead of **observed retention** (`gradedAt − lastRecalledAt`). That is incompatible with both FSRS and the current ADR 0003 draft.
+Doughnut today is a **single-index + user interval table** scheduler.
+
+**Shipped 2026-08-05 (`735b96623a`):** the **late-success penalty is gone**. `ForgettingCurve.succeeded` used to shrink the increment with `Math.abs(delayInHours)`, so overdue correct could weaken the tracker and trap busy learners in short intervals. Now overdue (`delayInHours ≥ 0` vs due) gets the **same** standard increment as on-time. Controller test: `lateCorrectAnswerDoesNotShortenTheNextInterval`.
+
+**Still open — do not confuse with that bug:**
+
+1. **C1 (time base):** success still consumes **queue deviation** (`gradedAt − nextRecallAt`), not **observed retention** (`gradedAt − lastRecalledAt`). Early discount is still “before due,” which FSRS does not use.
+2. **FSRS overdue reward (C2 remaining / O5):** open FSRS **increases** stability when a successful recall happens at low retrievability (long elapsed). Doughnut only matches the **minimum bar** (overdue ≥ on-time). It does **not** grant extra credit for longer elapsed time.
 
 **Compatibility strategy assumed for discussion (not decided):**
 
@@ -43,8 +51,8 @@ ADR 0003 should describe **(1)** fully. Whether **(3)** is a committed destinati
 |-----------|----------------|--------------------|
 | **Stability (S)** — days until R ≈ target (default 90%) | `forgettingCurveIndex` → `SpacedRepetitionAlgorithm` spacing table → hours | Rough analog of “how far out”; not probabilistic; no R(t,S) |
 | **Difficulty (D)** ∈ [1, 10] | *None* | Major model gap; mean-reversion / “ease hell” avoidance absent |
-| **Retrievability (R)** = f(elapsed, S) | *Not computed*; early path uses due deviation | **Primary semantic gap** |
-| **Elapsed days/hours since last review** | `lastRecalledAt` exists | Field present; success path does not use it as evidence |
+| **Retrievability (R)** = f(elapsed, S) | *Not computed*; early path uses due deviation | **C1** — R cannot exist until elapsed-since-last-review is the time input |
+| **Elapsed days/hours since last review** | `lastRecalledAt` exists | Field present; success path still does not use it as evidence |
 | **Due / next interval** | `nextRecallAt` | Same role: queue projection, not memory evidence |
 | **Grade G** ∈ {1 Again, 2 Hard, 3 Good, 4 Easy} | Correct / incorrect; accidental match; overlap; Tutor score 0–5; thinking-time continuous | Richer product grades; need explicit mapping onto (or extension of) FSRS grades |
 | **Request retention** | Implicit via fixed space list | FSRS schedules to a retention target; Doughnut walks a table |
@@ -61,9 +69,9 @@ These are the FSRS principles that ADR 0003 should lock as Doughnut product law.
 
 | # | FSRS principle | ADR 0003 draft | Live Doughnut | Status |
 |---|----------------|----------------|---------------|--------|
-| P1 | Memory update uses **grade + elapsed since last review** | States this | Success uses **due deviation** | **Gap (code)** |
-| P2 | Due time is **scheduling metadata**, not negative evidence | States this | Contradicted by P1 bug | **Gap (code)** |
-| P3 | Successful overdue recall is **not failure**; lower R can **increase** next S (bounded) | Overdue ≥ on-time; lateness bonus optional/bounded | No overdue credit; early-only shrink | **Gap (code)**; bonus semantics open |
+| P1 | Memory update uses **grade + elapsed since last review** | States this | Success uses **due deviation** | **Gap (code) — C1** |
+| P2 | Due time is **scheduling metadata**, not negative evidence | States this | Overdue no longer penalized (shipped); early still discounted vs due; time input still due-relative | **Partial** — remaining is C1 |
+| P3 | Successful overdue recall is **not failure**; lower R can **increase** next S (bounded) | Overdue ≥ on-time required; lateness bonus optional/bounded | Minimum bar shipped; **no FSRS-style overdue reward** | Minimum **aligned**; reward **open (O5)** |
 | P4 | Successful review → SInc ≥ 1 (Hard/Good/Easy) relative to failure | Correct grows; post-grade not immediately due | Usually grows; trap possible at floor / zero interval | Mostly; enforce strictly-future |
 | P5 | Failure updates via **post-lapse** path, timing-neutral as “late/early” | Incorrect timing-neutral; short retry separate | `failed()` + 12h — directionally OK | Aligned enough; exact shape open |
 | P6 | Grades are ordered evidence (Again < Hard < Good < Easy) | Correct / incorrect / accidental / Tutor 0–5 | Distinct paths exist | **Gap (model)** — mapping undecided |
@@ -111,8 +119,9 @@ Already detailed in research SUMMARY / ARCHITECTURE; summarized for tracking:
 
 | ID | Gap | Evidence | FSRS / ADR impact |
 |----|-----|----------|-------------------|
-| C1 | Success time base is due deviation | `MemoryTracker.recalledSuccessfully` → `getDiffInHours(..., calculateNextRecallAt())` | Breaks P1–P3 |
-| C2 | Early-only shrink; no overdue retention credit | `ForgettingCurve.succeeded` only adjusts when `delayInHours < 0` | Breaks P3 |
+| ~~Late-success penalty~~ | **Shipped** 2026-08-05 `735b96623a` | Overdue vs due no longer shrinks the increment; overdue interval ≥ on-time | P3 minimum bar |
+| C1 | Success time base is due deviation | `MemoryTracker.recalledSuccessfully` → `getDiffInHours(..., calculateNextRecallAt())` | Breaks P1; blocks FSRS R and overdue reward |
+| C2 | No FSRS overdue reward | `succeeded` gives overdue the **same** increment as on-time; early-only shrink vs due | P3 reward half open (O5); do after C1 |
 | C3 | Strictly-future due not universal on recall success | Commissioned has helper; success path relies on table | Trap risk |
 | C4 | Parallel entry points | Spelling / MCQ / commissioned / manual mark | Divergent semantics risk |
 | C5 | Policy tests on index floats | Early-recall tests encode old semantics | Miss schedule traps |
@@ -187,8 +196,8 @@ Check off as decided. Record the decision in one line; then fold into ADR 0003.
 - [ ] **FSRS-like:** longer elapsed → lower R → larger stability increase, **converging / bounded**  
 - [ ] Linear lateness bonus (SM-2-ish) — generally poorer fit  
 
-**Why it matters:** ADR currently allows a bounded bonus but does not require one. SEED-004 can ship without bonus.  
-**Recommendation to discuss:** Lock **minimum bar** in ADR now; state FSRS-like bounded bonus as **allowed future**, not v1 requirement.
+**Why it matters:** The **minimum bar is already shipped** (overdue ≥ on-time). Open FSRS goes further: longer elapsed → lower R → **larger** (bounded) stability increase. Doughnut does not implement that reward. It only makes FSRS-sense **after C1**, because the reward is “elapsed was long,” not “you missed the queue.”  
+**Recommendation to discuss:** Keep the shipped minimum bar in ADR; decide whether the next behavior slice is C1 only, or C1 plus a bounded FSRS-like reward.
 
 ### O6. Interval source: space table vs request retention
 
@@ -276,7 +285,8 @@ If O1=B and O10=middle option, ADR Decision could be organized as:
 
 | Date | Issue | Decision | Where recorded |
 |------|-------|----------|----------------|
-| *(none yet)* | | | |
+| 2026-08-05 | Late-success penalty (symmetric `abs(delay)` shrink) | **Shipped** — overdue correct keeps on-time increment; not the same as FSRS overdue reward | `735b96623a`; `lateCorrectAnswerDoesNotShortenTheNextInterval` |
+| 2026-08-13 | Doc correction | Research/gap docs no longer describe the shipped penalty as a live bug | This file; SUMMARY / FEATURES / ARCHITECTURE / PITFALLS / SEED-004 |
 
 ---
 

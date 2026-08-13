@@ -6,15 +6,15 @@
 
 ## Critical pitfalls
 
-### 1. Conflating schedule deviation with memory evidence
+### 1. Conflating schedule deviation with memory evidence (C1)
 
-**What goes wrong:** Correct recalls use deviation from `nextRecallAt` as the time input to strength math. Early answers shrink the success increment; overdue success does not get retention credit for longer elapsed time.
+**What goes wrong:** Correct recalls still use deviation from `nextRecallAt` as the time input to strength math. Early answers shrink the success increment vs **due**. Overdue success is **not** penalized (shipped 2026-08-05) but also does **not** get FSRS-style extra credit for longer elapsed time.
 
-**Why:** `MemoryTracker.recalledSuccessfully` passes `getDiffInHours(current, calculateNextRecallAt())` into `ForgettingCurve.succeeded`. Early-only tests (`SpacedRepetitionEarlyRecallAdjustmentTest`) encode that model without late/overdue policy coverage.
+**Why:** `MemoryTracker.recalledSuccessfully` passes `getDiffInHours(current, calculateNextRecallAt())` into `ForgettingCurve.succeeded`. Early-only tests (`SpacedRepetitionEarlyRecallAdjustmentTest`) encode due-relative early discount. `lateCorrectAnswerDoesNotShortenTheNextInterval` locks the shipped minimum bar.
 
-**Avoid:** Split outcome, observed elapsed since `lastRecalledAt`, and due projection. Never weaken strength solely because the answer was overdue. Replace tests that assert lateness weakens strength.
+**Avoid:** Split outcome, observed elapsed since `lastRecalledAt`, and due projection. Do not reintroduce an overdue penalty. Any overdue *reward* must be elapsed-based (FSRS), not queue-miss-based.
 
-**Warning signs:** `delayInHours` still from `calculateNextRecallAt()`; “late” tests that only drop index; correct backlog answers still shorten intervals.
+**Warning signs:** `delayInHours` still from `calculateNextRecallAt()`; tests that treat “late” as due-deviation; assuming the Aug 5 fix already adopted FSRS’s clock or overdue reward.
 
 ---
 
@@ -22,7 +22,7 @@
 
 **What goes wrong:** Tracker stays due at grade instant or loops on short intervals (`nextRecallAt <= now`, or repeat hours = 0).
 
-**Why:** Index floor + zero spacing; early/effort penalties stacking; success path may not enforce strictly-future due; commissioned score 0 needs the same guard on every path.
+**Why:** Index floor + zero spacing; early/effort penalties stacking; success path may not enforce strictly-future due; commissioned score 0 needs the same guard on every path. **Not** the old late-success penalty — that was removed 2026-08-05.
 
 **Avoid:** After every state-changing grade, `nextRecallAt` strictly after grade time; bump zero intervals to first positive spacing (commissioned path already has this helper).
 
@@ -125,7 +125,8 @@
 
 ## "Looks done but isn't"
 
-- Late correct after multi-day delay lengthens schedule (not index drop for lateness)
+- Late-success **penalty** is done (overdue interval ≥ on-time). FSRS overdue **reward** is not.
+- Success time base is still due deviation (C1), not elapsed since `lastRecalledAt`
 - Early correct still `nextRecallAt > gradedAt`
 - Accidental not on 12h failure path; weaker than incorrect
 - Overlap leaves tracker fields unchanged
@@ -145,4 +146,4 @@
 - `.planning/seeds/SEED-004-close-spaced-repetition-scheduling-policy-gap.md`
 
 ---
-*Researched: 2026-08-12*
+*Researched: 2026-08-12; corrected 2026-08-13 (late-success penalty shipped)*

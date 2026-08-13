@@ -14,7 +14,8 @@ ADR 0003 defines **safety properties** for how graded evidence moves the schedul
 |---------|---------|
 | **Evidence vs due-time separation** | **Primary gap.** Success path keys off `nextRecallAt` deviation; should use elapsed since `lastRecalledAt`. No schema change needed. |
 | **Correct schedules forward** | Partially met. Commissioned has strictly-future guard; recall paths should share the same invariant. |
-| **No late-success penalty** | **Gap.** Overdue correct must be ≥ on-time for strength/schedule progress. Legacy early/late index tests encode old semantics. |
+| **No late-success penalty** | **Shipped** 2026-08-05. Overdue correct ≥ on-time (`lateCorrectAnswerDoesNotShortenTheNextInterval`). |
+| **FSRS overdue reward** | **Not built.** Overdue gets the same increment as on-time, not extra stability for long elapsed. Needs C1 first. |
 | **Early = weaker evidence, not failure** | Mostly built via early discount; re-verify after switching to retention-based time. |
 | **Incorrect shortens without permanent trap** | Built (`recallFailed` + recovery via later correct). |
 | **Distinct outcomes drive schedule** | Routing built (`SpellingRecallGrading`, `AnswerOutcome`); schedule effects must stay distinct. |
@@ -39,7 +40,7 @@ ADR 0003 defines **safety properties** for how graded evidence moves the schedul
 
 | Feature | Why problematic |
 |---------|-----------------|
-| Late-success / schedule-compliance penalty | Causes SEED-004 trap |
+| Late-success / schedule-compliance penalty | **Do not reintroduce.** Penalty shipped-removed 2026-08-05; was the old SEED-004 trap |
 | FSRS migration now | ADR deferred; unnecessary to establish policy |
 | Rebuild `nextRecallAt` from incomplete history | Unsafe |
 | Frequent-failure-driven reschedule/delete | ADR informational only |
@@ -53,7 +54,7 @@ ADR 0003 defines **safety properties** for how graded evidence moves the schedul
 
 ## Dependencies (factual)
 
-- Evidence separation underpins correct-forward scheduling and late-success removal.
+- Evidence separation underpins FSRS-compatible updates. The late-success *penalty* is already gone; remaining work is the C1 time base and optional overdue *reward*.
 - Overlap and accidental match are independent outcome branches.
 - Commissioned feedback is largely independent of the recall-time evidence bug but shares post-grade interval safety.
 - Frequent-failure must stay read-only on schedule; accidental-match counting is unresolved vs ADR “incorrect only.”
@@ -62,7 +63,7 @@ ADR 0003 defines **safety properties** for how graded evidence moves the schedul
 
 | Topic | Anki / FSRS | Doughnut |
 |-------|-------------|----------|
-| Overdue success | Not failure solely for lateness; elapsed time matters | ADR aligns; code still uses due deviation |
+| Overdue success | Not failure; FSRS also **rewards** low-R success (bounded) | Penalty gone; same increment as on-time; no FSRS reward; time base still due deviation |
 | Grading inputs | Ease buttons / FSRS rating | Spelling grade + optional thinking time; Tutor 0–5 |
 | Ambiguous match | N/A | Accidental + overlap differentiators |
 | Failure streak | Leech / suspend (varies) | Warning only by design |
@@ -72,8 +73,8 @@ ADR 0003 defines **safety properties** for how graded evidence moves the schedul
 | Policy area | Doughnut touchpoint | Status |
 |-------------|---------------------|--------|
 | Memory evidence | `lastRecalledAt`, answers / Tutor score | Exists; success path wrong time base |
-| Due metadata | `next_recall_at` | Exists; must stop feeding strength penalty |
-| Correct | `recalledSuccessfully` → `succeeded` | **Fix primary** |
+| Due metadata | `next_recall_at` | Exists; overdue no longer feeds a strength **penalty**; still used as the success time base (C1) |
+| Correct | `recalledSuccessfully` → `succeeded` | Penalty shipped-removed; **C1** still wrong time base |
 | Incorrect | `recallFailed` | Aligned |
 | Accidental | `partialFail` + normal interval | Aligned — verify |
 | Overlap | Skip `markAsRecalled` | Aligned — verify |
@@ -91,4 +92,4 @@ ADR 0003 defines **safety properties** for how graded evidence moves the schedul
 - [Anki Studying](https://docs.ankiweb.net/studying.html), [FSRS wiki](https://github.com/open-spaced-repetition/awesome-fsrs/wiki/The-Algorithm)
 
 ---
-*Researched: 2026-08-12*
+*Researched: 2026-08-12; corrected 2026-08-13 (late-success penalty shipped)*

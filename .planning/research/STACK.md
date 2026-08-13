@@ -23,8 +23,8 @@
 | Module | Discovery |
 |--------|-----------|
 | `SpacedRepetitionAlgorithm` | Spacing table → hours; keep |
-| `ForgettingCurve` | **Primary change site** — `succeeded(delayInHours)` still schedule-relative |
-| `MemoryTracker` | Computes delay vs `nextRecallAt` on success |
+| `ForgettingCurve` | Late-success penalty gone; `succeeded(delayInHours)` still due-relative (early shrink only) |
+| `MemoryTracker` | Computes delay vs `nextRecallAt` on success (**C1**) |
 | `CommissionedLearningSessionFeedbackPolicy` | Already ADR 0–5 table |
 | `CommissionedLearningSessionFeedbackScheduling` | Has post-grade strictly-future helper |
 | `SpellingRecallGrading` | Outcome routing; overlap skips mutation |

@@ -7,11 +7,18 @@
 
 ## Context
 
-Doughnut schedules memory trackers from a forgetting-curve model that can treat
-deviation from the planned next-recall time as a negative adjustment. An overdue
-correct answer can therefore weaken the tracker and, at the floor, become due
-immediately. Learners who are repeatedly correct but review a busy backlog late
-can trap themselves in immediate or daily recalls.
+Until 2026-08-05, Doughnut's forgetting-curve success path treated deviation
+from the planned next-recall time symmetrically: both early and overdue
+correct answers reduced the success increment (`Math.abs(delay)`). An overdue
+correct answer could therefore weaken the tracker and, at the floor, become
+due immediately. That **late-success penalty is removed** (`735b96623a`):
+overdue correct keeps the on-time increment.
+
+What remains: success still measures time against the **due projection**
+(`gradedAt − nextRecallAt`), not elapsed since the previous graded recall.
+Early answers are still discounted vs due. Overdue answers are not rewarded
+the way open FSRS rewards low retrievability (longer elapsed → larger bounded
+stability increase).
 
 The planned recall time is a queue target. Missing it can reflect availability,
 queue size, question readiness, or system behavior — not that the learner forgot.

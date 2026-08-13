@@ -6,9 +6,9 @@ current_phase: null
 current_phase_name: null
 status: idle
 stopped_at: null
-last_updated: "2026-08-13T05:30:00Z"
+last_updated: "2026-08-13T04:35:00Z"
 last_activity: 2026-08-13
-last_activity_desc: Note toolbar pin and measured overflow shipped
+last_activity_desc: Note toolbar pin and measured overflow shipped; SRS research docs corrected (late-success penalty shipped)
 progress:
   total_phases: 0
   completed_phases: 0
@@ -33,7 +33,7 @@ Idle. No GSD milestone.
 
 **Other ad-hoc (plan-local STATE only):** [`.planning/quick/001-remove-note-skip-memory-tracking/`](quick/001-remove-note-skip-memory-tracking/) — Phase 4 next.
 
-**In discussion:** finalize Proposed ADR 0003 using [FSRS-COMPATIBILITY-GAP.md](research/FSRS-COMPATIBILITY-GAP.md) (open issues O1–O12).
+**In discussion:** finalize Proposed ADR 0003 using [FSRS-COMPATIBILITY-GAP.md](research/FSRS-COMPATIBILITY-GAP.md) (open issues O1–O12). Late-success penalty is **shipped** (2026-08-05); remaining C1 is due-relative time base; FSRS overdue reward is not implemented.
 
 ## Operator Next Steps
 
