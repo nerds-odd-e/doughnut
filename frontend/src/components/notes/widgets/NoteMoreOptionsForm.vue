@@ -4,7 +4,9 @@
       layout="menu"
       v-bind="{ note }"
       :only="only"
+      :as-markdown="asMarkdown"
       @close-dialog="$emit('close-dialog')"
+      @edit-as-markdown="$emit('edit-as-markdown', $event)"
     />
   </DropdownMenu>
 </template>
@@ -18,9 +20,11 @@ import type { NoteMoreOptionsActionId } from "./noteMoreOptionsTitles"
 defineProps<{
   note: Note
   only?: NoteMoreOptionsActionId[]
+  asMarkdown?: boolean
 }>()
 
 defineEmits<{
   (e: "close-dialog"): void
+  (e: "edit-as-markdown", value: boolean): void
 }>()
 </script>

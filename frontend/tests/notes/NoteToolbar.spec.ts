@@ -12,6 +12,7 @@ import {
 } from "@tests/notes/noteToolbarTestHelpers"
 import { wrapWithNoteShortcutScope } from "@tests/helpers/noteShortcutScopeTestHelpers"
 import NoteToolbar from "@/components/notes/core/NoteToolbar.vue"
+import { noteToolbarEditTitles } from "@/components/notes/widgets/noteMoreOptionsTitles"
 import { screen } from "@testing-library/vue"
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
@@ -160,13 +161,13 @@ describe("NoteToolbar", () => {
     wrapper = await mountNoteToolbar(noteRealm, {
       propsOverrides: { asMarkdown: false },
     })
-    expect(wrapper.find('button[title="Edit as markdown (m)"]').exists()).toBe(
-      true
-    )
+    expect(
+      wrapper.find(`button[title="${noteToolbarEditTitles.markdown}"]`).exists()
+    ).toBe(true)
 
     await wrapper.setProps({ asMarkdown: true })
     expect(
-      wrapper.find('button[title="Edit as rich content (m)"]').exists()
+      wrapper.find(`button[title="${noteToolbarEditTitles.rich}"]`).exists()
     ).toBe(true)
   })
 

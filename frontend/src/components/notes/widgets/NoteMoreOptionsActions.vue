@@ -1,5 +1,13 @@
 <template>
   <template v-if="layout === 'menu'">
+    <DropdownMenuItem v-if="showMenuAction('edit')">
+      <DropdownMenuActionButton
+        :title="editTitle"
+        :icon="asMarkdown ? LayoutTemplate : FileCode"
+        @click="onEdit"
+      />
+    </DropdownMenuItem>
+
     <DropdownMenuItem v-if="showMenuAction('export')">
       <PopButton
         ref="exportPopButtonRef"
@@ -130,6 +138,8 @@ import PopButton from "@/components/commons/Popups/PopButton.vue"
 import Questions from "@/components/notes/Questions.vue"
 import {
   CircleCheck,
+  FileCode,
+  LayoutTemplate,
   MessageCircleQuestion,
   Mic,
   Trash2,
@@ -144,6 +154,7 @@ import DropdownMenuItem from "@/components/commons/DropdownMenuItem.vue"
 import { dropdownMenuButtonClass } from "@/components/commons/dropdownMenuClasses"
 import {
   noteMoreOptionsTitles,
+  noteToolbarEditTitle,
   type NoteMoreOptionsActionId,
 } from "./noteMoreOptionsTitles"
 import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
@@ -163,12 +174,14 @@ const props = withDefaults(
     layout: "toolbar" | "menu"
     omit?: NoteMoreOptionsActionId[]
     only?: NoteMoreOptionsActionId[]
+    asMarkdown?: boolean
   }>(),
-  { omit: () => [] }
+  { omit: () => [], asMarkdown: false }
 )
 
 const emit = defineEmits<{
   (e: "close-dialog"): void
+  (e: "edit-as-markdown", value: boolean): void
 }>()
 
 const { toggle, isOpenForNote } = useAssimilationView()
@@ -192,6 +205,7 @@ useKeyboardShortcut(
 useKeyboardShortcut("note-delete", deleteNote, shortcutsEnabled)
 
 const isAssimilationOpen = computed(() => isOpenForNote(props.note.id))
+const editTitle = computed(() => noteToolbarEditTitle(props.asMarkdown))
 const showToolbarAction = (id: NoteMoreOptionsActionId) =>
   props.layout === "toolbar" && !props.omit.includes(id)
 const showMenuAction = (id: NoteMoreOptionsActionId) =>
@@ -210,6 +224,11 @@ const onAudioToggle = () => {
 
 const onAssimilationToggle = () => {
   toggle(props.note.id)
+  closeDialogIfMenu()
+}
+
+const onEdit = () => {
+  emit("edit-as-markdown", !props.asMarkdown)
   closeDialogIfMenu()
 }
 </script>

@@ -23,7 +23,9 @@
     <NoteMoreOptionsForm
       v-bind="{ note }"
       :only="overflowedIds"
+      :as-markdown="asMarkdown"
       @close-dialog="closeDropdown"
+      @edit-as-markdown="emit('edit-as-markdown', $event)"
     />
   </AutoCollapseDropdown>
 </template>
@@ -43,12 +45,19 @@ import NoteMoreOptionsActions from "./NoteMoreOptionsActions.vue"
 import NoteMoreOptionsForm from "./NoteMoreOptionsForm.vue"
 import {
   noteMoreOptionsTitles,
+  noteToolbarOverflowTitles,
   type NoteMoreOptionsActionId,
 } from "./noteMoreOptionsTitles"
 
 const props = defineProps<{
   note: Note
   toolbarNav: HTMLElement | null
+  asMarkdown?: boolean
+}>()
+
+const emit = defineEmits<{
+  (e: "overflowed-ids", ids: NoteMoreOptionsActionId[]): void
+  (e: "edit-as-markdown", value: boolean): void
 }>()
 
 const overflowDropdownRef = ref<InstanceType<
@@ -69,7 +78,12 @@ const pinnedIds = computed(() => {
   return ids
 })
 
-const moreOptionTitles = new Set<string>(Object.values(noteMoreOptionsTitles))
+const moreOptionTitles = new Set<string>([
+  noteMoreOptionsTitles.overflowMenu,
+  ...NOTE_TOOLBAR_MORE_OPTIONS_ORDER.flatMap((id) =>
+    noteToolbarOverflowTitles(id)
+  ),
+])
 
 const closeOverflowMenu = () => {
   overflowDropdownRef.value?.closeDropdown()
@@ -128,7 +142,9 @@ const measureAndCompute = () => {
   if (!(group instanceof HTMLElement)) return
 
   for (const id of NOTE_TOOLBAR_MORE_OPTIONS_ORDER) {
-    const el = controlByTitle(group, noteMoreOptionsTitles[id])
+    const el = noteToolbarOverflowTitles(id)
+      .map((title) => controlByTitle(group, title))
+      .find((found) => found !== null)
     const width = el?.offsetWidth ?? 0
     if (width > 0) cachedWidths[id] = width
   }
@@ -146,6 +162,7 @@ const measureAndCompute = () => {
   })
   if (!sameIds(overflowedIds.value, nextOverflowedIds)) {
     overflowedIds.value = nextOverflowedIds
+    emit("overflowed-ids", nextOverflowedIds)
   }
 }
 

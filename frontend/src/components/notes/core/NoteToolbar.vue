@@ -44,11 +44,16 @@
         <MessageCircle class="w-6 h-6" />
       </a>
 
-      <button v-if="!readonly && !asMarkdown" type="button" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as markdown (m)" aria-label="Edit as markdown (m)" @click="$emit('edit-as-markdown', true)">
-        <FileCode class="w-6 h-6" />
-      </button>
-      <button v-else-if="!readonly" type="button" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as rich content (m)" aria-label="Edit as rich content (m)" @click="$emit('edit-as-markdown', false)">
-        <LayoutTemplate class="w-6 h-6" />
+      <button
+        v-if="!readonly && !editOverflowed"
+        type="button"
+        class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+        :title="editTitle"
+        :aria-label="editTitle"
+        @click="emit('edit-as-markdown', !asMarkdown)"
+      >
+        <LayoutTemplate v-if="asMarkdown" class="w-6 h-6" />
+        <FileCode v-else class="w-6 h-6" />
       </button>
 
       <NoteToolbarMoreOptions
@@ -56,6 +61,9 @@
         ref="moreOptionsRef"
         :note="note"
         :toolbar-nav="toolbarNavRef"
+        :as-markdown="asMarkdown"
+        @overflowed-ids="overflowedIds = $event"
+        @edit-as-markdown="emit('edit-as-markdown', $event)"
       />
     </div>
   </nav>
@@ -91,6 +99,10 @@ import NoteCreationNewButton from "../NoteCreationNewButton.vue"
 import { useNotebookSidebarOpened } from "@/composables/notebookSidebarOpened"
 import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
 import { useNoteShortcutScope } from "@/composables/noteShortcutScope"
+import {
+  noteToolbarEditTitle,
+  type NoteMoreOptionsActionId,
+} from "../widgets/noteMoreOptionsTitles"
 
 const wikiLinkOrRelationshipLabel = "Wiki link or relationship"
 
@@ -129,6 +141,9 @@ const wikiLinkOrRelationshipPopButtonRef = ref<InstanceType<
 const moreOptionsRef = ref<InstanceType<typeof NoteToolbarMoreOptions> | null>(
   null
 )
+const overflowedIds = ref<NoteMoreOptionsActionId[]>([])
+const editOverflowed = computed(() => overflowedIds.value.includes("edit"))
+const editTitle = computed(() => noteToolbarEditTitle(props.asMarkdown))
 
 const router = useRouter()
 const shortcutScope = useNoteShortcutScope()

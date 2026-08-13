@@ -2,13 +2,19 @@ import makeMe from "doughnut-test-fixtures/makeMe"
 import {
   allMoreOptionsFitNavWidth,
   deleteOverflowNavWidth,
+  editOverflowNavWidth,
+  exportOverflowNavWidth,
   installMockResizeObserver,
   layoutNoteToolbar,
   noteToolbarActionWidth,
   noteToolbarOverflowButtonWidth,
   restoreNoteToolbarWidthMocks,
 } from "@tests/helpers/mockNoteToolbarNavWidth"
-import { noteMoreOptionsTitles } from "@/components/notes/widgets/noteMoreOptionsTitles"
+import { notebookSidebarClosedPlugin } from "@tests/helpers/notebookSidebarTestProvide"
+import {
+  noteMoreOptionsTitles,
+  noteToolbarEditTitles,
+} from "@/components/notes/widgets/noteMoreOptionsTitles"
 import {
   mountNoteToolbar,
   noteToolbarAction,
@@ -60,7 +66,9 @@ describe("NoteToolbar more-options overflow", () => {
     expect(noteToolbarAction(wrapper, titles.questions).exists()).toBe(true)
     expect(noteToolbarAction(wrapper, titles.audio).exists()).toBe(true)
     expect(noteToolbarAction(wrapper, titles.assimilation).exists()).toBe(true)
-    expect(wrapper.find('[title="Edit as markdown (m)"]').exists()).toBe(true)
+    expect(
+      noteToolbarAction(wrapper, noteToolbarEditTitles.markdown).exists()
+    ).toBe(true)
   })
 
   it("lists only overflowed actions in more options", async () => {
@@ -72,6 +80,7 @@ describe("NoteToolbar more-options overflow", () => {
     await flushPromises()
 
     expect(overflowMenuItem(titles.delete)).not.toBeNull()
+    expect(overflowMenuItem(noteToolbarEditTitles.markdown)).toBeNull()
     expect(overflowMenuItem(titles.export)).toBeNull()
     expect(overflowMenuItem(titles.questions)).toBeNull()
     expect(overflowMenuItem(titles.audio)).toBeNull()
@@ -83,7 +92,7 @@ describe("NoteToolbar more-options overflow", () => {
     wrapper = await mountNoteToolbar(noteRealm)
     await layoutNoteToolbar(
       wrapper,
-      noteToolbarActionWidth * 3 + noteToolbarOverflowButtonWidth - 1
+      noteToolbarActionWidth * 4 + noteToolbarOverflowButtonWidth - 1
     )
 
     expect(noteToolbarAction(wrapper, titles.delete).exists()).toBe(false)
@@ -91,5 +100,75 @@ describe("NoteToolbar more-options overflow", () => {
     expect(noteToolbarAction(wrapper, titles.audio).exists()).toBe(false)
     expect(noteToolbarAction(wrapper, titles.questions).exists()).toBe(true)
     expect(noteToolbarAction(wrapper, titles.export).exists()).toBe(true)
+  })
+
+  it("keeps Edit on the bar after Export has overflowed", async () => {
+    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
+    wrapper = await mountNoteToolbar(noteRealm)
+    await layoutNoteToolbar(wrapper, exportOverflowNavWidth())
+
+    expect(
+      noteToolbarAction(wrapper, noteToolbarEditTitles.markdown).exists()
+    ).toBe(true)
+    expect(noteToolbarAction(wrapper, titles.export).exists()).toBe(false)
+  })
+
+  it("moves Edit into more options when the bar is tighter than Export overflow", async () => {
+    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
+    wrapper = await mountNoteToolbar(noteRealm, {
+      plugin: notebookSidebarClosedPlugin(),
+    })
+    await layoutNoteToolbar(wrapper, editOverflowNavWidth())
+
+    expect(
+      noteToolbarAction(wrapper, noteToolbarEditTitles.markdown).exists()
+    ).toBe(false)
+    expect(
+      wrapper.find('[title="Star a conversation about this note"]').exists()
+    ).toBe(true)
+    expect(
+      wrapper.find('[aria-label="Wiki link or relationship"]').exists()
+    ).toBe(true)
+    expect(wrapper.find('button[title="New note (n)"]').exists()).toBe(true)
+
+    await noteToolbarAction(wrapper, titles.overflowMenu).trigger("click")
+    await flushPromises()
+
+    const editItem = overflowMenuItem(noteToolbarEditTitles.markdown)
+    expect(editItem).not.toBeNull()
+    expect(editItem?.textContent).toContain(noteToolbarEditTitles.markdown)
+    expect(overflowMenuItem(titles.export)).not.toBeNull()
+  })
+
+  it("emits edit-as-markdown from the overflow Edit row", async () => {
+    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
+    wrapper = await mountNoteToolbar(noteRealm)
+    await layoutNoteToolbar(wrapper, editOverflowNavWidth())
+
+    await noteToolbarAction(wrapper, titles.overflowMenu).trigger("click")
+    await flushPromises()
+
+    overflowMenuItem(noteToolbarEditTitles.markdown)?.click()
+    await flushPromises()
+
+    expect(wrapper.emitted("edit-as-markdown")).toEqual([[true]])
+  })
+
+  it("still toggles edit mode with m when Edit is in more options", async () => {
+    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
+    wrapper = await mountNoteToolbar(noteRealm)
+    await layoutNoteToolbar(wrapper, editOverflowNavWidth())
+
+    document.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "m",
+        code: "KeyM",
+        bubbles: true,
+        cancelable: true,
+      })
+    )
+    await flushPromises()
+
+    expect(wrapper.emitted("edit-as-markdown")).toEqual([[true]])
   })
 })

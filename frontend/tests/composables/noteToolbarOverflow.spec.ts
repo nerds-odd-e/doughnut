@@ -7,6 +7,7 @@ import { describe, expect, it } from "vitest"
 
 const presentIds = NOTE_TOOLBAR_MORE_OPTIONS_ORDER
 const widths = {
+  edit: 40,
   export: 40,
   questions: 40,
   audio: 40,
@@ -14,7 +15,8 @@ const widths = {
   delete: 40,
 } as const
 const overflowButtonWidth = 32
-const allActionsWidth = 200
+const allActionsWidth = presentIds.reduce((sum, id) => sum + widths[id], 0)
+const editBesideOverflow = widths.edit + overflowButtonWidth
 
 function overflow(
   availableWidth: number,
@@ -49,30 +51,43 @@ describe("computeNoteToolbarOverflow", () => {
     ])
   })
 
-  it("omits from the right: delete, off assimilation, off audio, questions, export", () => {
-    expect(overflow(152)).toEqual(["delete", "assimilation"])
-    expect(overflow(151)).toEqual(["delete", "assimilation", "audio"])
-    expect(overflow(111)).toEqual([
+  it("omits from the right: delete, off assimilation, off audio, questions, export, then edit", () => {
+    expect(overflow(192)).toEqual(["delete", "assimilation"])
+    expect(overflow(191)).toEqual(["delete", "assimilation", "audio"])
+    expect(overflow(151)).toEqual([
       "delete",
       "assimilation",
       "audio",
       "questions",
     ])
-    expect(overflow(71)).toEqual([
+    expect(overflow(editBesideOverflow)).toEqual([
       "delete",
       "assimilation",
       "audio",
       "questions",
       "export",
     ])
+    expect(overflow(editBesideOverflow - 1)).toEqual([
+      "delete",
+      "assimilation",
+      "audio",
+      "questions",
+      "export",
+      "edit",
+    ])
   })
 
   it("never omits a pinned id and still hides from the right around it", () => {
-    expect(overflow(152, ["assimilation"])).toEqual(["delete", "audio"])
+    expect(overflow(152, ["assimilation"])).toEqual([
+      "delete",
+      "audio",
+      "questions",
+    ])
     expect(overflow(120, ["audio"])).toEqual([
       "delete",
       "assimilation",
       "questions",
+      "export",
     ])
   })
 
@@ -82,6 +97,7 @@ describe("computeNoteToolbarOverflow", () => {
       "assimilation",
       "questions",
       "export",
+      "edit",
     ])
   })
 

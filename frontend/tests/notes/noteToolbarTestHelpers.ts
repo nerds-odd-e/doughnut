@@ -13,7 +13,7 @@ export function noteToolbarAction(wrapper: VueWrapper, title: string) {
 }
 
 export function overflowMenuItem(title: string) {
-  return document.querySelector(
+  return document.querySelector<HTMLButtonElement>(
     `[data-dropdown-portal-panel] button[title="${title}"]`
   )
 }

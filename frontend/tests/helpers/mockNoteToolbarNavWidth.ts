@@ -1,7 +1,9 @@
 import {
   noteMoreOptionsTitles,
+  noteToolbarOverflowTitles,
   type NoteMoreOptionsActionId,
 } from "@/components/notes/widgets/noteMoreOptionsTitles"
+import { NOTE_TOOLBAR_MORE_OPTIONS_ORDER } from "@/composables/noteToolbarOverflow"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { vi } from "vitest"
 
@@ -11,7 +13,8 @@ const resizeObserverCallbacks: ResizeObserverCallback[] = []
 
 export const noteToolbarActionWidth = 40
 export const noteToolbarOverflowButtonWidth = 32
-export const allMoreOptionsWidth = noteToolbarActionWidth * 5
+export const allMoreOptionsWidth =
+  noteToolbarActionWidth * NOTE_TOOLBAR_MORE_OPTIONS_ORDER.length
 
 type NoteToolbarOffsetWidthLayout = {
   actionWidths: Partial<Record<NoteMoreOptionsActionId, number>>
@@ -28,14 +31,9 @@ const originalOffsetWidth = Object.getOwnPropertyDescriptor(
 )
 
 const moreOptionTitleToId = new Map(
-  (
-    Object.entries(noteMoreOptionsTitles) as [
-      keyof typeof noteMoreOptionsTitles,
-      string,
-    ][]
+  NOTE_TOOLBAR_MORE_OPTIONS_ORDER.flatMap((id) =>
+    noteToolbarOverflowTitles(id).map((title) => [title, id] as const)
   )
-    .filter(([id]) => id !== "overflowMenu")
-    .map(([id, title]) => [title, id as NoteMoreOptionsActionId])
 )
 
 function mockedOffsetWidth(el: HTMLElement): number | undefined {
@@ -144,12 +142,24 @@ export async function layoutNoteToolbar(wrapper: VueWrapper, navWidth: number) {
   await flushPromises()
 }
 
-/** All five more-options fit; overflow button is not needed. */
+/** All overflowable actions including Edit fit; overflow button is not needed. */
 export function allMoreOptionsFitNavWidth(precedingWidth = 0) {
   return precedingWidth + allMoreOptionsWidth
 }
 
-/** Full set does not fit; remaining four plus overflow button do. */
+/** Export and the rest of more-options overflow; Edit still fits beside `…`. */
+export function exportOverflowNavWidth(precedingWidth = 0) {
+  return (
+    precedingWidth + noteToolbarActionWidth + noteToolbarOverflowButtonWidth
+  )
+}
+
+/** After Export is omitted, further shrinkage yields Edit into more options. */
+export function editOverflowNavWidth(precedingWidth = 0) {
+  return exportOverflowNavWidth(precedingWidth) - 1
+}
+
+/** Full set does not fit; remaining actions plus overflow button do. */
 export function deleteOverflowNavWidth(precedingWidth = 0) {
   return precedingWidth + allMoreOptionsWidth - 1
 }

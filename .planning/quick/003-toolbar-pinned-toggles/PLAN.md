@@ -1,6 +1,6 @@
 # Pin on-state note-toolbar toggles
 
-**Status:** in progress (Phases 1–3 done)  
+**Status:** in progress (Phases 1–4 done)  
 **Type:** ad-hoc UX under `.planning/quick/`  
 **Goal:** An on-state Audio / Assimilation control stays on the note toolbar (never in More options), with higher priority than other icons as width shrinks. Off-state toggles can still live in More options.
 
@@ -31,12 +31,11 @@ Do **not** replace the 600px overflow model, rewrite `NoteToolbar`, or introduce
 | D-06 | No new E2E feature file. Cypress viewport stays 1200. Update [`noteMoreOptionsForm.ts`](e2e_test/start/pageObjects/noteMoreOptionsForm.ts) when visibility rules change. |
 | D-07 | Do **not** put New / Wiki / Conversation / Edit in More options until more-options overflow is already measured (Phase 4+). |
 
-## Current code (after Phase 3)
+## Current code (after Phase 4)
 
-- [`NoteToolbar.vue`](frontend/src/components/notes/core/NoteToolbar.vue) — New / Wiki / Conversation / Edit always inline; passes `toolbarNav` into [`NoteToolbarMoreOptions.vue`](frontend/src/components/notes/widgets/NoteToolbarMoreOptions.vue)
-- [`noteToolbarOverflow.ts`](frontend/src/composables/noteToolbarOverflow.ts) — `computeNoteToolbarOverflow`; hide from the right; pinned ids never omitted
-- [`NoteMoreOptionsActions.vue`](frontend/src/components/notes/widgets/NoteMoreOptionsActions.vue) — `layout: "toolbar" | "menu"`; toolbar `omit` / menu `only`; on-toggle `shrink-0`
-- 600px `useNoteToolbarMoreOptionsInline` is gone. `…` only when `overflowedIds.length > 0`
+- [`NoteToolbar.vue`](frontend/src/components/notes/core/NoteToolbar.vue) — New / Wiki / Conversation stay inline; Edit hides when overflowed; keyboard `m` stays on the toolbar
+- [`noteToolbarOverflow.ts`](frontend/src/composables/noteToolbarOverflow.ts) — order includes `edit` left of `export`
+- [`NoteMoreOptionsActions.vue`](frontend/src/components/notes/widgets/NoteMoreOptionsActions.vue) — menu-styled Edit when `"edit"` is in `only`
 - E2E: [`noteMoreOptionsForm.ts`](e2e_test/start/pageObjects/noteMoreOptionsForm.ts) `openOverflowMenuIfNeeded(title)` opens `…` only if that title is not already visible
 
 ## Learnings (Phase 1)
@@ -50,6 +49,10 @@ Do **not** replace the 600px overflow model, rewrite `NoteToolbar`, or introduce
 ## Learnings (Phase 3)
 
 - Overflow is a pure `computeNoteToolbarOverflow`; Vue measures nav `clientWidth` minus preceding siblings (`display: contents` New must sum children). Cache last non-zero widths. Menu `only` lists overflowed ids. Pinned ids are never omitted — no separate `layout="pinned"`. Do not rewrite `NoteToolbar`.
+
+## Learnings (Phase 4)
+
+- Add Edit to the overflow order left of Export. Hide the toolbar Edit control when `"edit"` is overflowed; one menu row; keep `m` on NoteToolbar. Do not count Edit as a preceding sibling.
 
 ## Phases
 
@@ -65,11 +68,9 @@ On a narrow bar, an on-state Audio/Assimilation button sits beside `…` (soft-p
 
 More-options leave the bar from the right (Delete first). On-toggle never leaves. `…` only when something overflowed; menu lists overflowed items only. New / Wiki / Conversation / Edit stay on the toolbar. Coverage: `noteToolbarOverflow.spec.ts`, `NoteToolbar.moreOptionsOverflow.spec.ts`.
 
-### Phase 4 — Yield Edit into More options (Behavior) — planned
+### Phase 4 — Yield Edit into More options (Behavior) — done
 
-**Observable:** If the bar is still too tight after Phase 3 (typically with an on-toggle pinned), **Edit** moves into More options. Conversation / Wiki / New stay on the bar.
-
-Menu-styled Edit in overflow. Keep keyboard `m`.
+When the bar is still tight after Export overflows, Edit moves into More options (menu-styled). Conversation / Wiki / New stay on the bar. Keyboard `m` still toggles edit mode.
 
 ### Phase 5 — Yield Conversation, Wiki, then New note (Behavior) — planned
 
