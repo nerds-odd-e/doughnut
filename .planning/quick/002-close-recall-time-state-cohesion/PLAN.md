@@ -1,6 +1,6 @@
 # Close recall-time state cohesion (C1)
 
-**Status:** Planned — do not execute until explicitly requested
+**Status:** In progress — Phase 1 complete; Phase 2 next
 **Plan type:** Ad-hoc phased delivery
 **Created:** 2026-08-13
 **Refined:** 2026-08-13 for small, green commit boundaries
@@ -99,7 +99,7 @@ timestamps without changing `nextRecallAt`.
 
 | Phase | Type | Status | One commit outcome |
 |------:|------|--------|--------------------|
-| 1 | Behavior | Planned | Correct recall is proven independent of persisted due projection |
+| 1 | Behavior | Done | Correct recall is proven independent of persisted due projection |
 | 2 | Behavior | Planned | Correct recall is proven to use whole-hour precision |
 | 3 | Structure | Planned | Success transition speaks elapsed hours without schedule changes |
 | 4 | Behavior | Planned | Ordinary incorrect recall becomes the new anchor |
@@ -116,7 +116,7 @@ timestamps without changing `nextRecallAt`.
 ## Phase 1 — Protect due-projection independence
 
 **Type:** Behavior (existing-behavior regression)
-**Status:** Planned
+**Status:** Done
 
 - **Precondition:** Two trackers have identical anchor, strength, user spacing,
   and correct grade time, but different persisted `nextRecallAt` projections.
@@ -130,6 +130,10 @@ production code or assert an index value.
 `SpacedRepetitionEarlyRecallAdjustmentTest` only if it remains cohesive.
 
 **Verification:** `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
+
+**Learning:** An asymmetric pair of persisted projections is required so a
+due-deviation implementation using an absolute value cannot satisfy the
+regression accidentally. The existing transition passed that stronger test.
 
 **Stop-safe:** A shipped invariant gains regression coverage; no behavior or
 structure changes.
