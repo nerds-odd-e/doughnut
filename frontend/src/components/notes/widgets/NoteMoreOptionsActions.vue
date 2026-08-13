@@ -80,10 +80,7 @@
 
     <button
       type="button"
-      :class="[
-        toolbarGhostBtnClass,
-        { 'daisy-btn-active': isAudioOpen },
-      ]"
+      :class="toolbarToggleBtnClass(isAudioOpen)"
       :title="titles.audio"
       :aria-label="titles.audio"
       :aria-pressed="isAudioOpen"
@@ -94,10 +91,7 @@
 
     <button
       type="button"
-      :class="[
-        toolbarGhostBtnClass,
-        { 'daisy-btn-active': assimilationChecked },
-      ]"
+      :class="toolbarToggleBtnClass(assimilationChecked)"
       :title="titles.assimilation"
       :aria-label="titles.assimilation"
       :aria-pressed="assimilationChecked"
@@ -142,6 +136,10 @@ import { useNoteShortcutScope } from "@/composables/noteShortcutScope"
 import { computed, ref } from "vue"
 
 const toolbarGhostBtnClass = "daisy-btn daisy-btn-ghost daisy-btn-sm"
+const toolbarToggleOnBtnClass =
+  "daisy-btn daisy-btn-sm daisy-btn-soft daisy-btn-primary"
+const toolbarToggleBtnClass = (pressed: boolean) =>
+  pressed ? toolbarToggleOnBtnClass : toolbarGhostBtnClass
 const titles = noteMoreOptionsTitles
 
 const props = defineProps<{

@@ -142,7 +142,8 @@ describe("NoteToolbar more options", () => {
 
     const audioToolsButton = wrapper.find(`button[title="${titles.audio}"]`)
     expect(audioToolsButton.exists()).toBe(true)
-    expect(audioToolsButton.classes()).not.toContain("daisy-btn-active")
+    expect(audioToolsButton.classes()).not.toContain("daisy-btn-soft")
+    expect(audioToolsButton.classes()).not.toContain("daisy-btn-primary")
     expect(
       wrapper.find('[data-testid="note-toolbar-panel-shell"]').exists()
     ).toBe(false)
@@ -154,7 +155,8 @@ describe("NoteToolbar more options", () => {
       wrapper.find('[data-testid="note-toolbar-panel-shell"]').exists()
     ).toBe(true)
     expect(useNoteToolbarPanel().isAudioOpen.value).toBe(true)
-    expect(audioToolsButton.classes()).toContain("daisy-btn-active")
+    expect(audioToolsButton.classes()).toContain("daisy-btn-soft")
+    expect(audioToolsButton.classes()).toContain("daisy-btn-primary")
     expect(audioToolsButton.attributes("aria-pressed")).toBe("true")
 
     await audioToolsButton.trigger("click")
@@ -163,7 +165,8 @@ describe("NoteToolbar more options", () => {
     expect(
       wrapper.find('[data-testid="note-toolbar-panel-shell"]').exists()
     ).toBe(false)
-    expect(audioToolsButton.classes()).not.toContain("daisy-btn-active")
+    expect(audioToolsButton.classes()).not.toContain("daisy-btn-soft")
+    expect(audioToolsButton.classes()).not.toContain("daisy-btn-primary")
     expect(audioToolsButton.attributes("aria-pressed")).toBe("false")
   })
 
