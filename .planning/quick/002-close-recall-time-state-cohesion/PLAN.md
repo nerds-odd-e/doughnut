@@ -1,6 +1,6 @@
 # Close recall-time state cohesion (C1)
 
-**Status:** In progress — Phases 1–10 complete; Phase 11 next
+**Status:** In progress — Phases 1–11 complete; Phase 12 next
 **Plan type:** Ad-hoc phased delivery
 **Created:** 2026-08-13
 **Refined:** 2026-08-13 for small, green commit boundaries
@@ -109,7 +109,7 @@ timestamps without changing `nextRecallAt`.
 | 8 | Behavior | Done | Recorded Tutor Feedback is protected as an anchor-moving outcome |
 | 9 | Behavior | Done | Missing Tutor Feedback is protected as a no-mutation outcome |
 | 10 | Structure | Done | A default-off repair gate enables only the next repair behavior |
-| 11 | Behavior | Planned | Legacy normal Answers repair stale anchors |
+| 11 | Behavior | Done | Legacy normal Answers repair stale anchors |
 | 12 | Behavior | Planned | Legacy accidental-match Answers repair stale anchors; overlap does not |
 | 13 | Behavior | Planned | Legacy Tutor Feedback repairs stale anchors |
 
@@ -393,7 +393,7 @@ immediately following normal-Answer repair.
 ## Phase 11 — Repair anchors from normal Answers
 
 **Type:** Behavior
-**Status:** Planned
+**Status:** Done
 
 - **Precondition:** A legacy tracker has one or more normal correct/incorrect
   Answers (`outcome IS NULL`) newer than its stored anchor.
@@ -412,6 +412,11 @@ The SQL selects only `outcome IS NULL` and includes
 
 **Verification:** `CURSOR_DEV=true nix develop -c pnpm backend:verify`. No ERD
 regeneration because the schema is unchanged.
+
+**Learning:** Production contained 130 trackers whose latest normal Answer was
+newer than the persisted anchor. Migration `V300000248` advances only those
+forward, is default-off, preserves `next_recall_at`, excludes non-normal
+outcomes, and is idempotent under migration-test coverage.
 
 **Stop-safe:** The common legacy path is repaired. Accidental and commissioned
 history remain unchanged but no worse than before.
