@@ -9,6 +9,8 @@ import {
   assimilateSpy,
   assimilatedCountOfTheDay,
   clickRememberSpelling,
+  clickVerifySpelling,
+  closeSpellingVerificationPopup,
   mockedRequestDueRecallsRefresh,
   mockedTotalAssimilatedCount,
   mountAssimilationPanelReady,
@@ -29,13 +31,24 @@ vi.mock("@/composables/useGoToNextAssimilation", () => ({
 setupAssimilationPanelTests()
 
 describe("AssimilationPanel remember spelling", () => {
-  it("posts assimilateAsSpelling and stays on note without navigating", async () => {
+  it("shows spelling verification without posting when remember spelling is chosen", async () => {
+    const wrapper = await mountAssimilationPanelReady()
+
+    await clickRememberSpelling(wrapper)
+
+    expect(spellingVerificationPopupEl()).not.toBeNull()
+    expect(assimilateSpy).not.toHaveBeenCalled()
+  })
+
+  it("posts assimilateAsSpelling after verified spelling and stays on note", async () => {
+    mockSdkService(NoteController, "verifySpelling", { correct: true })
     assimilateSpy.mockResolvedValue(
       wrapSdkResponse([makeMe.aMemoryTracker.id(1).spelling().please()])
     )
     const wrapper = await mountAssimilationPanelReady()
 
     await clickRememberSpelling(wrapper)
+    await clickVerifySpelling()
 
     expect(assimilateSpy).toHaveBeenCalledWith({
       body: { noteId: note.id, assimilateAsSpelling: true },
@@ -44,6 +57,15 @@ describe("AssimilationPanel remember spelling", () => {
     expect(mockedTotalAssimilatedCount.value).toBe(0)
     expect(assimilatedCountOfTheDay.value).toBe(0)
     expect(mockedRequestDueRecallsRefresh).toHaveBeenCalled()
+  })
+
+  it("does not post when spelling verification is cancelled", async () => {
+    const wrapper = await mountAssimilationPanelReady()
+
+    await clickRememberSpelling(wrapper)
+    await closeSpellingVerificationPopup()
+
+    expect(assimilateSpy).not.toHaveBeenCalled()
     expect(spellingVerificationPopupEl()).toBeNull()
   })
 
@@ -67,33 +89,27 @@ describe("AssimilationPanel remember spelling", () => {
     expect(rememberSpellingButtonEl()).toBeNull()
   })
 
-  it("keeps remember spelling usable when a commissioned tracker already exists", async () => {
+  it("offers remember spelling when a commissioned tracker already exists", async () => {
     mockSdkService(NoteController, "getNoteInfo", {
       memoryTrackers: [makeMe.aMemoryTracker.id(1).commissioned().please()],
     })
-    assimilateSpy.mockResolvedValue(
-      wrapSdkResponse([makeMe.aMemoryTracker.id(2).spelling().please()])
-    )
     const wrapper = await mountAssimilationPanelReady()
 
     expect(assimilateOptionsCaretEl(wrapper)).not.toBeNull()
-    await clickRememberSpelling(wrapper)
-    expect(assimilateSpy).toHaveBeenCalled()
+    await openAssimilateOptions(wrapper)
+    expect(rememberSpellingButtonEl()).not.toBeNull()
   })
 
-  it("keeps remember spelling usable when ordinary trackers already exist", async () => {
+  it("offers remember spelling when ordinary trackers already exist", async () => {
     mockSdkService(NoteController, "getNoteInfo", {
       memoryTrackers: [makeMe.aMemoryTracker.id(1).spelling(false).please()],
     })
-    assimilateSpy.mockResolvedValue(
-      wrapSdkResponse([makeMe.aMemoryTracker.id(2).spelling().please()])
-    )
     const wrapper = await mountAssimilationPanelReady()
 
     expect(assimilateButtonEl(wrapper)?.hasAttribute("disabled")).toBe(true)
     expect(assimilateOptionsCaretEl(wrapper)).not.toBeNull()
-    await clickRememberSpelling(wrapper)
-    expect(assimilateSpy).toHaveBeenCalled()
+    await openAssimilateOptions(wrapper)
+    expect(rememberSpellingButtonEl()).not.toBeNull()
   })
 
   it("offers remember spelling on the note-level menu when the note has properties", async () => {

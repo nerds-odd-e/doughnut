@@ -4,8 +4,8 @@ This file is **only** for `.planning/quick/002-remember-spelling-as-tracker/`. D
 
 ```
 status: in-progress
-current_phase: 3
-current_phase_name: Remember spelling verifies the title first
+current_phase: 4
+current_phase_name: Remember spelling is offered only when it applies
 last_updated: 2026-08-13
 ```
 
@@ -13,7 +13,7 @@ last_updated: 2026-08-13
 |--|--|--|
 | 1 API creates spelling tracker | Behavior | done |
 | 2 Remember spelling in UI | Behavior | done |
-| 3 Verify title first | Behavior | planned |
+| 3 Verify title first | Behavior | done |
 | 4 Offer only when it applies | Behavior | planned |
 | 5 Spelling tests off the note flag | Structure | planned |
 | 6 Remove note setting | Behavior | planned |

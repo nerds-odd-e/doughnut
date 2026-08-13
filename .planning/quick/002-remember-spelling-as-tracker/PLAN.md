@@ -1,6 +1,6 @@
 # Remember spelling as a memory tracker
 
-Status: in-progress (Phase 2 done)
+Status: in-progress (Phase 3 done)
 Plan state: [STATE.md](./STATE.md) (this folder only — do not edit `.planning/STATE.md`)
 
 Each phase is one commit. Type is Behavior or Structure. One observable behavior (or one structure change for the immediate next behavior).
@@ -46,7 +46,7 @@ Status: done
 
 **Post-condition:** A spelling tracker is created. UI stays on this note. Assimilate (understanding) stays enabled. Daily count in the UI does not bump. Checkbox still present.
 
-Shipped: **Remember spelling** on `assimilate-options-caret`. No title verification yet. Checkbox still present.
+Shipped: **Remember spelling** on `assimilate-options-caret`. Checkbox still present.
 
 **Learning:** Caret `data-test` is `assimilate-options-caret` (shared with commissioned). Note-level tracker predicates live in `noteLevelMemoryTrackers.ts`.
 
@@ -55,7 +55,7 @@ Shipped: **Remember spelling** on `assimilate-options-caret`. No title verificat
 ### Phase 3: Remember spelling verifies the title first
 
 Type: Behavior  
-Status: planned
+Status: done
 
 **Pre-condition:** Remember spelling action exists (Phase 2).
 
@@ -63,11 +63,9 @@ Status: planned
 
 **Post-condition:** Tracker is created only after a correct title (or alias). Wrong spelling stays on the popup with the existing error. Cancel creates nothing.
 
-Reuse `SpellingVerificationPopup`. Checkbox path still has its own verify-on-Assimilate.
+Shipped: Remember spelling opens `SpellingVerificationPopup`; verified posts `assimilateAsSpelling`. Checkbox still verifies on Assimilate.
 
-**E2E:** keep the existing verification examples (success, wrong, title variants, alias) as spelling coverage; drive them through Remember spelling (leave checkbox-driven duplicates for Phase 5 to drop). New `@wip` only if the current outlines cannot yet use the caret.
-
-**Verify:** frontend spelling-popup tests; same assimilation Cypress spec.
+**Learning:** One pending-assimilate after the popup distinguishes caret vs checkbox.
 
 ---
 

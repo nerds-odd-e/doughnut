@@ -17,11 +17,17 @@ import {
   waitForAssimilationNoteTitle,
 } from './shared'
 
-const chooseAssimilateOption = (
+const openAssimilateOption = (
   optionButton: typeof assimilateAsCommissionedButton
 ) => {
   assimilateOptionsCaret().click()
   optionButton().click()
+}
+
+const chooseAssimilateOption = (
+  optionButton: typeof assimilateAsCommissionedButton
+) => {
+  openAssimilateOption(optionButton)
   waitUntilAppIsNotBusy()
 }
 
@@ -62,7 +68,8 @@ export const assumeAssimilationPage = () => ({
     return this
   },
   rememberSpelling() {
-    chooseAssimilateOption(rememberSpellingButton)
+    openAssimilateOption(rememberSpellingButton)
+    cy.get('[data-test="spelling-verification-popup"]').should('be.visible')
     return this
   },
   expectOrdinaryAndCommissionedMemoryTrackers() {
@@ -202,6 +209,7 @@ export const assumeAssimilationPage = () => ({
       .clear()
       .type(text)
     cy.get('[data-test="verify-spelling"]').click()
+    waitUntilAppIsNotBusy()
   },
   expectPopupClosed() {
     cy.get('[data-test="spelling-verification-popup"]', {

@@ -22,12 +22,12 @@ Feature: Assimilate with remembering spelling
       | note has no content |                    | unavailable  |
       | note has definition | Definition content | available    |
 
-  Scenario Outline: Verify spelling proceeds with assimilate
+  Scenario Outline: Remember spelling verifies the title
     Given I have a notebook "English practice" with notes:
       | Title        | Content             |
       | <note_title> | Non-empty body text |
     And I am assimilating the note "<note_title>"
-    And I assimilate with remembering spelling
+    And I remember spelling
     When I verify spelling with "<spelling_input>"
     Then the spelling verification result for note "<note_title>" should be <expected_result>
 
@@ -51,7 +51,7 @@ Feature: Assimilate with remembering spelling
       Non-empty body text
       """
     And I am assimilating the note "colour"
-    And I assimilate with remembering spelling
+    And I remember spelling
     When I verify spelling with "color"
     Then the spelling verification result for note "colour" should be "success"
 
@@ -71,6 +71,7 @@ Feature: Assimilate with remembering spelling
       | Word  | Non-empty body text |
     When I am assimilating the note "Word"
     And I remember spelling
+    And I verify spelling with "Word"
     Then I should see a spelling memory tracker
     And assimilate should be enabled
     And I should be assimilating the note "Word"

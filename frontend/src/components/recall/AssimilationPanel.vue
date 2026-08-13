@@ -65,7 +65,10 @@ const { openForNote } = useAssimilationView()
 
 const settingsRef = ref<InstanceType<typeof AssimilationSettings> | null>(null)
 
-const showSpellingPopup = ref(false)
+const pendingAssimilateAfterSpelling = ref<AssimilateEvent | null>(null)
+const showSpellingPopup = computed(
+  () => pendingAssimilateAfterSpelling.value !== null
+)
 const assimilatingPropertyKey = ref<string | null>(null)
 
 const rememberSpelling = ref(false)
@@ -99,12 +102,19 @@ const processAssimilate = async ({
   assimilateAsCommissioned,
   assimilateAsSpelling,
 }: AssimilateEvent) => {
-  if (assimilateAsCommissioned || assimilateAsSpelling) {
+  if (assimilateAsCommissioned) {
     await doAssimilate({
       skipMemoryTracking: false,
       assimilateAsCommissioned,
-      assimilateAsSpelling,
     })
+    return
+  }
+
+  if (assimilateAsSpelling) {
+    pendingAssimilateAfterSpelling.value = {
+      skipMemoryTracking: false,
+      assimilateAsSpelling: true,
+    }
     return
   }
 
@@ -118,7 +128,7 @@ const processAssimilate = async ({
   }
 
   if (!propertyKey && !skipMemoryTracking && rememberSpelling.value) {
-    showSpellingPopup.value = true
+    pendingAssimilateAfterSpelling.value = { skipMemoryTracking: false }
     return
   }
 
@@ -172,11 +182,12 @@ const doAssimilate = async ({
 }
 
 const handleSpellingVerified = async () => {
-  showSpellingPopup.value = false
-  await doAssimilate({ skipMemoryTracking: false })
+  const pending = pendingAssimilateAfterSpelling.value
+  pendingAssimilateAfterSpelling.value = null
+  await doAssimilate(pending!)
 }
 
 const handleSpellingCancel = () => {
-  showSpellingPopup.value = false
+  pendingAssimilateAfterSpelling.value = null
 }
 </script>
