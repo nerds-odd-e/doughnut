@@ -4486,6 +4486,8 @@ components:
           type: string
         assimilateAsCommissioned:
           type: boolean
+        assimilateAsSpelling:
+          type: boolean
     SuggestedTitleDTO:
       type: object
       properties:

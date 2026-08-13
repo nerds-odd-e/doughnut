@@ -33,19 +33,25 @@ final class MemoryTrackerAssimilation {
         request.skipMemoryTracking != null ? request.skipMemoryTracking : false;
 
     if (Boolean.TRUE.equals(request.assimilateAsCommissioned)) {
-      if (request.propertyKey != null && !request.propertyKey.isEmpty()) {
-        return List.of();
-      }
-      boolean commissionedExists =
-          existingTrackers.stream()
-              .filter(MemoryTracker::isNoteLevelTracker)
-              .anyMatch(MemoryTracker::isCommissioned);
-      if (commissionedExists) {
-        return List.of();
-      }
-      return List.of(
-          createNoteLevelTracker(
-              note, currentUser, currentTime, skipMemoryTracking, MemoryTrackerType.COMMISSIONED));
+      return assimilateAsNoteLevelType(
+          request,
+          existingTrackers,
+          note,
+          currentUser,
+          currentTime,
+          skipMemoryTracking,
+          MemoryTrackerType.COMMISSIONED);
+    }
+
+    if (Boolean.TRUE.equals(request.assimilateAsSpelling)) {
+      return assimilateAsNoteLevelType(
+          request,
+          existingTrackers,
+          note,
+          currentUser,
+          currentTime,
+          skipMemoryTracking,
+          MemoryTrackerType.SPELLING);
     }
 
     if (request.propertyKey != null && !request.propertyKey.isEmpty()) {
@@ -63,16 +69,18 @@ final class MemoryTrackerAssimilation {
               MemoryTrackerType.UNDERSTANDING));
     }
 
-    List<MemoryTracker> existingNoteLevelTrackers =
+    List<MemoryTracker> existingUnderstandingTrackers =
         existingTrackers.stream()
             .filter(MemoryTracker::isNoteLevelTracker)
-            .filter(mt -> !mt.isCommissioned())
+            .filter(MemoryTracker::isUnderstanding)
             .toList();
 
+    boolean spellingExists = hasNoteLevelType(existingTrackers, MemoryTrackerType.SPELLING);
+
     boolean addSpellingOnly =
-        !existingNoteLevelTrackers.isEmpty()
+        !existingUnderstandingTrackers.isEmpty()
             && Boolean.TRUE.equals(note.getRecallSetting().getRememberSpelling())
-            && existingNoteLevelTrackers.stream().noneMatch(MemoryTracker::isSpelling);
+            && !spellingExists;
 
     if (addSpellingOnly) {
       return List.of(
@@ -80,7 +88,7 @@ final class MemoryTrackerAssimilation {
               note, currentUser, currentTime, skipMemoryTracking, MemoryTrackerType.SPELLING));
     }
 
-    if (!existingNoteLevelTrackers.isEmpty()) {
+    if (!existingUnderstandingTrackers.isEmpty()) {
       return List.of();
     }
 
@@ -88,12 +96,36 @@ final class MemoryTrackerAssimilation {
     trackers.add(
         createNoteLevelTracker(
             note, currentUser, currentTime, skipMemoryTracking, MemoryTrackerType.UNDERSTANDING));
-    if (Boolean.TRUE.equals(note.getRecallSetting().getRememberSpelling())) {
+    if (Boolean.TRUE.equals(note.getRecallSetting().getRememberSpelling()) && !spellingExists) {
       trackers.add(
           createNoteLevelTracker(
               note, currentUser, currentTime, skipMemoryTracking, MemoryTrackerType.SPELLING));
     }
     return trackers;
+  }
+
+  private List<MemoryTracker> assimilateAsNoteLevelType(
+      AssimilationRequestDTO request,
+      List<MemoryTracker> existingTrackers,
+      Note note,
+      User currentUser,
+      Timestamp currentTime,
+      boolean skipMemoryTracking,
+      MemoryTrackerType type) {
+    if (request.propertyKey != null && !request.propertyKey.isEmpty()) {
+      return List.of();
+    }
+    if (hasNoteLevelType(existingTrackers, type)) {
+      return List.of();
+    }
+    return List.of(
+        createNoteLevelTracker(note, currentUser, currentTime, skipMemoryTracking, type));
+  }
+
+  private static boolean hasNoteLevelType(List<MemoryTracker> trackers, MemoryTrackerType type) {
+    return trackers.stream()
+        .filter(MemoryTracker::isNoteLevelTracker)
+        .anyMatch(mt -> mt.getType() == type);
   }
 
   private MemoryTracker createNoteLevelTracker(

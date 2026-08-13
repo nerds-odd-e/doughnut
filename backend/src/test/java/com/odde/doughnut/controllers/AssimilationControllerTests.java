@@ -85,6 +85,31 @@ class AssimilationControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void spellingOnlyNoteStillAppearsInOrdinaryAssimilationQueue() {
+      Note note =
+          AssimilationControllerTestSupport.ownedNote(
+              makeMe, currentUser.getUser(), "spelling-only");
+      makeMe.aMemoryTrackerFor(note).spelling().please();
+
+      AssimilationNextDTO result = controller.next("Asia/Shanghai");
+      assertThat(result.getNextUnit().getNoteId(), equalTo(note.getId()));
+      assertThat(result.getCounts().getTotalUnassimilatedCount(), equalTo(1));
+    }
+
+    @Test
+    void assimilatedCountOfTheDayExcludesSpellingTrackers() {
+      Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
+      testabilitySettings.timeTravelTo(day1);
+      Note note =
+          AssimilationControllerTestSupport.ownedNote(
+              makeMe, currentUser.getUser(), "spelling-today");
+      makeMe.aMemoryTrackerFor(note).spelling().assimilatedAt(day1).please();
+
+      AssimilationNextDTO result = controller.next("Asia/Shanghai");
+      assertThat(result.getCounts().getAssimilatedCountOfTheDay(), equalTo(0));
+    }
+
+    @Test
     void notLoggedIn() {
       currentUser.setUser(null);
       assertThrows(ResponseStatusException.class, () -> controller.next("Asia/Shanghai"));

@@ -26,7 +26,7 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
           + " AND "
           + MemoryTracker.JPA_WHERE_NOTE_LEVEL_TARGET_TRACKER
           + " AND "
-          + MemoryTracker.JPA_WHERE_NOT_COMMISSIONED_TARGET_TRACKER
+          + MemoryTracker.JPA_WHERE_UNDERSTANDING_TARGET_TRACKER
           + " WHERE iBlock.note = n AND iBlock.propertyKey = i.propertyKey"
           + " AND tBlock.deletedAt IS NULL"
           + " AND tmtBlock IS NULL"

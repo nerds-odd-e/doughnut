@@ -29,4 +29,10 @@ final class AssimilationControllerTestSupport {
     request.assimilateAsCommissioned = true;
     return request;
   }
+
+  static AssimilationRequestDTO assimilateSpellingRequest(Note note) {
+    AssimilationRequestDTO request = assimilateRequest(note);
+    request.assimilateAsSpelling = true;
+    return request;
+  }
 }

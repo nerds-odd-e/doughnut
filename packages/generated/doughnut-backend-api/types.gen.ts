@@ -697,6 +697,7 @@ export type AssimilationRequestDto = {
     skipMemoryTracking?: boolean;
     propertyKey?: string;
     assimilateAsCommissioned?: boolean;
+    assimilateAsSpelling?: boolean;
 };
 
 export type SuggestedTitleDto = {

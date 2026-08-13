@@ -153,7 +153,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
           + " AND "
           + MemoryTracker.JPA_WHERE_NOTE_LEVEL_TRACKER
           + " AND "
-          + MemoryTracker.JPA_WHERE_NOT_COMMISSIONED_TRACKER;
+          + MemoryTracker.JPA_WHERE_UNDERSTANDING_TRACKER;
 
   String recallOrderByDate = " ORDER BY n.recallSetting.level, n.createdAt, n.id";
 

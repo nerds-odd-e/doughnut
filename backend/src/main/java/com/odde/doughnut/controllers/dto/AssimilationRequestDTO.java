@@ -5,4 +5,5 @@ public class AssimilationRequestDTO {
   public Boolean skipMemoryTracking;
   public String propertyKey;
   public Boolean assimilateAsCommissioned;
+  public Boolean assimilateAsSpelling;
 }

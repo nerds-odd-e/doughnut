@@ -42,6 +42,13 @@ export const assimilateTestabilityMethods = {
     })
   },
 
+  assimilateNoteAsSpelling(this: InjectedNoteIds, noteTitle: string) {
+    return assimilateInjectedNote.call(this, noteTitle, {
+      skipMemoryTracking: false,
+      assimilateAsSpelling: true,
+    })
+  },
+
   assimilateNoteProperty(
     this: InjectedNoteIds,
     noteTitle: string,

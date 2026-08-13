@@ -83,6 +83,17 @@ class AssimilationServicePropertyWikiLinkGateTest extends AssimilationServiceTes
   }
 
   @Test
+  void gates_property_when_target_has_only_spelling_tracker() {
+    Note target = makeMe.aNote().title("Word").notebookOwnedBy(user).please();
+    makeMe.aMemoryTrackerFor(target).spelling().please();
+    Note carrier = carrierWithExampleOf(target, "---\nexample of: \"[[Word]]\"\n---\n\nbody");
+
+    AssimilationUnit next = assimilationService.getNextAssimilationUnit().orElseThrow();
+    assertThat(next.note(), equalTo(target));
+    assertThat(next.propertyKey(), nullValue());
+  }
+
+  @Test
   void offers_property_when_target_has_skipped_note_level_tracker() {
     Note target = makeMe.aNote().title("Word").notebookOwnedBy(user).please();
     makeMe.aMemoryTrackerFor(target).removedFromTracking().please();

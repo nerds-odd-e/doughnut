@@ -119,6 +119,11 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     return getType() == MemoryTrackerType.COMMISSIONED;
   }
 
+  @JsonIgnore
+  public boolean isUnderstanding() {
+    return getType() == MemoryTrackerType.UNDERSTANDING;
+  }
+
   /**
    * JPQL fragment for joined alias {@code rp}; must stay aligned with {@link
    * #isNoteLevelTracker()}.
@@ -133,15 +138,15 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   public static final String JPA_WHERE_NOTE_LEVEL_TARGET_TRACKER =
       "(tmtBlock.propertyKey IS NULL OR tmtBlock.propertyKey = '')";
 
-  /** JPQL fragment for joined alias {@code rp}: ordinary assimilation ignores COMMISSIONED. */
-  public static final String JPA_WHERE_NOT_COMMISSIONED_TRACKER =
-      "rp.type <> com.odde.doughnut.entities.MemoryTrackerType.COMMISSIONED";
+  /** JPQL fragment for joined alias {@code rp}: ordinary assimilation is UNDERSTANDING only. */
+  public static final String JPA_WHERE_UNDERSTANDING_TRACKER =
+      "rp.type = com.odde.doughnut.entities.MemoryTrackerType.UNDERSTANDING";
 
   /**
-   * JPQL fragment for joined alias {@code tmtBlock}: ordinary assimilation ignores COMMISSIONED.
+   * JPQL fragment for joined alias {@code tmtBlock}: ordinary assimilation is UNDERSTANDING only.
    */
-  public static final String JPA_WHERE_NOT_COMMISSIONED_TARGET_TRACKER =
-      "tmtBlock.type <> com.odde.doughnut.entities.MemoryTrackerType.COMMISSIONED";
+  public static final String JPA_WHERE_UNDERSTANDING_TARGET_TRACKER =
+      "tmtBlock.type = com.odde.doughnut.entities.MemoryTrackerType.UNDERSTANDING";
 
   @Column(name = "deleted_at")
   @JsonIgnore
