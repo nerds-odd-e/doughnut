@@ -8,10 +8,10 @@ Feature: Overlap try again
   Background:
     Given I am logged in as an existing user
     And I have a notebook "Overlap practice" with notes:
-      | Title   | Content                  | Remember Spelling |
-      | Overlap |                          |                   |
-      | colour  | Colour means a hue       | true              |
-      | Partner | Partner note body        |                   |
+      | Title   | Content                  |
+      | Overlap |                          |
+      | colour  | Colour means a hue       |
+      | Partner | Partner note body        |
     And the notes "Overlap, Partner" are skip-recalled
     And note "colour" has content:
       """
@@ -32,7 +32,7 @@ Feature: Overlap try again
       Partner note body
       """
     And It's day 1
-    And the note "colour" was assimilated on day 1
+    And the note "colour" was assimilated as spelling on day 1
 
   Scenario: Shared non-distinguishing answer shows overlap try-again without credit
     When I visit recall for a due quiz question on day 2

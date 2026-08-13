@@ -46,7 +46,7 @@ class AiQuestionGeneratorTests {
   }
 
   private Note noteReadyForQuestionGeneration() {
-    Note note = makeMe.aNote().content("description long enough.").rememberSpelling().please();
+    Note note = makeMe.aNote().content("description long enough.").please();
     makeMe.aNote().please();
     return note;
   }

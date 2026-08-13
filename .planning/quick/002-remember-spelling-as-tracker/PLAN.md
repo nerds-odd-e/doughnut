@@ -1,6 +1,6 @@
 # Remember spelling as a memory tracker
 
-Status: in-progress (Phase 4 done)
+Status: in-progress (Phase 5 done)
 Plan state: [STATE.md](./STATE.md) (this folder only — do not edit `.planning/STATE.md`)
 
 Each phase is one commit. Type is Behavior or Structure. One observable behavior (or one structure change for the immediate next behavior).
@@ -87,20 +87,13 @@ Shipped in `showSpellingOption` (`hasNoteContent`, `isLinkNote`, no existing SPE
 ### Phase 5: Spelling tests do not use the note flag
 
 Type: Structure  
-Status: planned
+Status: done
 
 Unlocks Phase 6 (removing the flag must not drop spelling coverage).
 
-No product change. Move fixtures off `rememberSpelling` / Gherkin `Remember Spelling` / `NoteBuilder.rememberSpelling()` for tests that assert spelling *behavior*:
+No product change. Moved spelling-*behavior* fixtures off `rememberSpelling` / Gherkin `Remember Spelling` / `NoteBuilder.rememberSpelling()`. Option-only tests still use the flag (Phase 6).
 
-- Recall E2E: `recall_quiz_spelling_question`, `accidental_match_reveal`, `overlap_try_again`, `browse_answer_and_notes_while_recalling`, CLI spelling rule → `assimilateNoteAsSpelling` (and understanding assimilate only when the scenario needs both).
-- Backend: `RecallPromptOverlapTryAgainTests`, `RecallPromptControllerTestBase` → `aMemoryTrackerFor(note).spelling()`.
-- `AiQuestionGeneratorTests`: drop unused `.rememberSpelling()`.
-- Step `I assimilate the note … with the option of remembering spelling` → Remember spelling + verify (wikilink-stem scenario stays).
-
-Do **not** delete option-only tests yet (Phase 6). Existing tests still pass.
-
-**Verify:** `pnpm backend:test_only`; Cypress specs listed above.
+**Learning:** Browse-and-come-back needs an understanding tracker (Resume returns to the next question) and a real note-page visit so later `jumpToNotePage` stays in the SPA (otherwise `cy.visit` wipes Resume). Keep `I assimilate … with the option of remembering spelling` as Remember spelling + verify. Collapsed identical `ownedSpellingNote()` onto `ownedNote()`.
 
 ---
 

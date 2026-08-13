@@ -27,7 +27,7 @@ class RecallPromptAnswerSpellingControllerTest extends RecallPromptControllerTes
 
   @BeforeEach
   void setup() {
-    answerNote = ownedSpellingNote();
+    answerNote = ownedNote();
     memoryTracker = ownedSpellingTracker(answerNote);
     recallPrompt = spellingPrompt(memoryTracker);
     answerDTO = spellingAnswer(answerNote.getTitle());
@@ -106,7 +106,7 @@ class RecallPromptAnswerSpellingControllerTest extends RecallPromptControllerTes
 
   @Test
   void lateCorrectAnswerDoesNotShortenTheNextInterval() throws UnexpectedNoAccessRightException {
-    Note lateNote = ownedSpellingNote();
+    Note lateNote = ownedNote();
     MemoryTracker lateTracker = ownedSpellingTracker(lateNote);
     Integer thinkingTimeMs = ForgettingCurve.BASE_THINKING_TIME_MS;
 

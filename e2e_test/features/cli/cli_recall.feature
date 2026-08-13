@@ -86,18 +86,19 @@ Feature: CLI recall
       Then I should see "Incorrect" in answered questions
       And I should see "to sleep" in answered questions
 
-  Rule: Spelling recall when the note has remember spelling enabled
+  Rule: Spelling recall when the note was assimilated as spelling
 
     Background:
       And I have a notebook "English practice" with notes:
-        | Title    | Content                        | Remember Spelling |
-        | English  |                                |                   |
-        | sedition | Sedition means incite violence | true              |
+        | Title    | Content                        |
+        | English  |                                |
+        | sedition | Sedition means incite violence |
       And the notes "English" are skip-recalled
 
     @disableOpenAiService
     Scenario: Spelling recall accepts a correct answer then just review
       Given the note "sedition" was assimilated on day 1
+      And the note "sedition" was assimilated as spelling on day 1
       And It's day 2
       When I enter the slash command "/recall" in the interactive CLI
       Then I should see "means incite" in the Current guidance

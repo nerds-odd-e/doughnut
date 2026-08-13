@@ -22,7 +22,7 @@ class RecallPromptAccidentalMatchGradingTests extends RecallPromptControllerTest
 
   @BeforeEach
   void setup() {
-    Note answerNote = ownedSpellingNote();
+    Note answerNote = ownedNote();
     recallPrompt = spellingPrompt(ownedSpellingTracker(answerNote));
     secondNote =
         makeMe.aNote().notebookOwnedBy(currentUser.getUser()).title("Another Note Title").please();

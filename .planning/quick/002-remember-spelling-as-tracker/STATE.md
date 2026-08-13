@@ -4,8 +4,8 @@ This file is **only** for `.planning/quick/002-remember-spelling-as-tracker/`. D
 
 ```
 status: in-progress
-current_phase: 5
-current_phase_name: Spelling tests do not use the note flag
+current_phase: 6
+current_phase_name: Remove the Remember Spelling note setting
 last_updated: 2026-08-13
 ```
 
@@ -15,7 +15,7 @@ last_updated: 2026-08-13
 | 2 Remember spelling in UI | Behavior | done |
 | 3 Verify title first | Behavior | done |
 | 4 Offer only when it applies | Behavior | done |
-| 5 Spelling tests off the note flag | Structure | planned |
+| 5 Spelling tests off the note flag | Structure | done |
 | 6 Remove note setting | Behavior | planned |
 | 7 ADRs | Structure | planned |
 | 8 Remove Java/API field | Structure | planned |

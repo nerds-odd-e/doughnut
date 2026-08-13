@@ -15,7 +15,7 @@ class RecallPromptSpellingStemMaskingControllerTest extends RecallPromptControll
 
   @BeforeEach
   void setup() {
-    answerNote = ownedSpellingNote();
+    answerNote = ownedNote();
     memoryTracker = ownedSpellingTracker(answerNote);
   }
 

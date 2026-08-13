@@ -39,10 +39,6 @@ abstract class RecallPromptControllerTestBase extends ControllerTestBase {
     return makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
   }
 
-  Note ownedSpellingNote() {
-    return makeMe.aNote().notebookOwnedBy(currentUser.getUser()).rememberSpelling().please();
-  }
-
   MemoryTracker ownedTracker(Note note) {
     return makeMe.aMemoryTrackerFor(note).forgettingCurveAndNextRecallAt(200.0f).please();
   }
@@ -56,7 +52,7 @@ abstract class RecallPromptControllerTestBase extends ControllerTestBase {
   }
 
   MemoryTracker ownedSpellingTracker() {
-    return ownedSpellingTracker(ownedSpellingNote());
+    return ownedSpellingTracker(ownedNote());
   }
 
   RecallPrompt mcqPrompt(MemoryTracker tracker, Note note) {

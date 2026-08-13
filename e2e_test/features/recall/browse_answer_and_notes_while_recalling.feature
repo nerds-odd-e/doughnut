@@ -8,23 +8,24 @@ Feature: Browse answers and notes while recalling
   Background:
     Given I am logged in as an existing user
     And I have a notebook "English practice" with notes:
-      | Title    | Content                        | Remember Spelling |
-      | English  |                                |                   |
-      | sedition | Sedition means incite violence | true              |
-      | sedation | Put to sleep is sedation       |                   |
-      | medical  |                                |                   |
+      | Title    | Content                        |
+      | English  |                                |
+      | sedition | Sedition means incite violence |
+      | sedation | Put to sleep is sedation       |
+      | medical  |                                |
     And the notes "English" are skip-recalled
     And It's day 1
 
   Scenario: View last answered question when the quiz answer was correct
-    Given the note "sedition" was assimilated on day 1
+    Given the note "sedition" was assimilated as spelling on day 1
     When I visit recall for a due quiz question on day 2
     And I type my answer "sedition"
     Then I should see that my last spelling answer was correct with recall count 1
 
   @skipOptimizationDueToKnownNecessarySlowness
   Scenario: Browse notes while recalling and come back
-    Given I assimilate the note "sedition" with the option of remembering spelling
+    Given the note "sedition" was assimilated on day 1
+    And I assimilate the note "sedition" with the option of remembering spelling
     When I visit recall for a due quiz question on day 2
     And I type my answer "riot"
     Then I should see that my spelling answer "riot" is incorrect
@@ -35,13 +36,14 @@ Feature: Browse answers and notes while recalling
 
   Scenario: I can remove a note from further recalls
     Given the note "sedition" was assimilated on day 1
+    And the note "sedition" was assimilated as spelling on day 1
     When I visit recall for a due quiz question on day 2
     And I type my answer "sedition"
     And I choose to remove the last memory tracker from recalls
     Then On day 100 I should have "0/2/2" note for assimilation
 
   Scenario: I can revive a memory tracker removed from recalls
-    Given the note "sedition" was assimilated on day 1
+    Given the note "sedition" was assimilated as spelling on day 1
     When I visit recall for a due quiz question on day 2
     And I type my answer "sedition"
     And I choose to remove the last memory tracker from recalls

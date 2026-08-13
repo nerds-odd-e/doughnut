@@ -29,7 +29,6 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
         makeMe
             .aNote()
             .notebookOwnedBy(currentUser.getUser())
-            .rememberSpelling()
             .title("Shared Title")
             .aliases("color")
             .overlapPartner(partnerNote)
@@ -80,7 +79,6 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
         makeMe
             .aNote()
             .notebookOwnedBy(currentUser.getUser())
-            .rememberSpelling()
             .title("Shared Legacy")
             .wikiLinkUnderAliasesPartner(partner)
             .please();
@@ -118,7 +116,6 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
         makeMe
             .aNote()
             .notebookOwnedBy(currentUser.getUser())
-            .rememberSpelling()
             .title("Reviewed Alone")
             .overlapWikiLink("No Such Notebook:Missing Partner Title")
             .please();
@@ -134,7 +131,6 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
         makeMe
             .aNote()
             .notebookOwnedBy(currentUser.getUser())
-            .rememberSpelling()
             .title("Shared Unreadable")
             .overlapPartner(partner)
             .please();
@@ -148,7 +144,6 @@ class RecallPromptOverlapTryAgainTests extends RecallPromptControllerTestBase {
         makeMe
             .aNote()
             .notebookOwnedBy(currentUser.getUser())
-            .rememberSpelling()
             .title("Self Referential Title")
             .overlapWikiLink("Self Referential Title")
             .please();

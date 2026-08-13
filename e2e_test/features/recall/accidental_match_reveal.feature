@@ -8,13 +8,13 @@ Feature: Accidental match reveal
   Background:
     Given I am logged in as an existing user
     And I have a notebook "English practice" with notes:
-      | Title    | Content                        | Remember Spelling |
-      | English  |                                |                   |
-      | sedition | Sedition means incite violence | true              |
-      | sedation | Put to sleep is sedation       |                   |
+      | Title    | Content                        |
+      | English  |                                |
+      | sedition | Sedition means incite violence |
+      | sedation | Put to sleep is sedation       |
     And the notes "English" are skip-recalled
     And It's day 1
-    And the note "sedition" was assimilated on day 1
+    And the note "sedition" was assimilated as spelling on day 1
 
   Scenario: Accidental match reveals reviewed and matched notes
     When I visit recall for a due quiz question on day 2

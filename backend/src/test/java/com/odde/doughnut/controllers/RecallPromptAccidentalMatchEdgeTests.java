@@ -31,7 +31,7 @@ class RecallPromptAccidentalMatchEdgeTests extends RecallPromptControllerTestBas
 
   @BeforeEach
   void setup() {
-    answerNote = ownedSpellingNote();
+    answerNote = ownedNote();
     memoryTracker = ownedSpellingTracker(answerNote);
     recallPrompt = spellingPrompt(memoryTracker);
     Note secondNote =

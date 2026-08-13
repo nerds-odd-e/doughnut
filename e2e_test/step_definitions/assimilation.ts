@@ -44,6 +44,14 @@ Given(
   }
 )
 
+Given(
+  'the note {string} was assimilated as spelling on day {int}',
+  (noteTitle: string, day: number) => {
+    start.testability().backendTimeTravelTo(day, 8)
+    start.testability().assimilateNoteAsSpelling(noteTitle)
+  }
+)
+
 Given('the notes {string} are skip-recalled', (noteTitles: string) => {
   commonSenseSplit(noteTitles, ', ').forEach((title) => {
     start.testability().assimilateNoteSkippingRecall(title)
@@ -134,14 +142,13 @@ When('I assimilate the note {string}', (noteTitle: string) => {
   start.jumpToNotePage(noteTitle).moreOptions().assimilateNote()
 })
 
-Then(
+Given(
   'I assimilate the note {string} with the option of remembering spelling',
   (noteTitle: string) => {
-    start
-      .jumpToNotePage(noteTitle)
-      .moreOptions()
-      .openAssimilationSettings()
-      .assimilateWithSpellingOption()
+    start.jumpToNotePage(noteTitle).moreOptions().openAssimilationSettings()
+    start.assumeAssimilationPage().waitForAssimilationReady().rememberSpelling()
+    start.assumeAssimilationPage().verifySpellingWith(noteTitle)
+    start.assumeAssimilationPage().expectPopupClosed()
   }
 )
 
