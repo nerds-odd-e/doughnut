@@ -5,11 +5,12 @@ Feature: Spelling recall quiz
   Background:
     Given I am logged in as an existing user
     And I have a notebook "English practice" with notes:
-      | Title      | Content                                    | Skip Memory Tracking | Remember Spelling |
-      | English    |                                            | true                 |                   |
-      | sedition   | Sedition means incite violence             |                      | true              |
-      | LinkTarget | A note linked from spelling content        |                      |                   |
-      | Wikistudy  | Wikistudy uses [[LinkTarget]] for practice |                      | true              |
+      | Title      | Content                                    | Remember Spelling |
+      | English    |                                            |                   |
+      | sedition   | Sedition means incite violence             | true              |
+      | LinkTarget | A note linked from spelling content        |                   |
+      | Wikistudy  | Wikistudy uses [[LinkTarget]] for practice | true              |
+    And the notes "English" are skip-recalled
     And It's day 1
 
   Scenario: Spelling quiz accepts a correct answer

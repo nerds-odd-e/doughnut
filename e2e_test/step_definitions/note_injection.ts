@@ -66,24 +66,6 @@ Given(
 )
 
 Given(
-  'I have a notebook {string} with a note {string} which skips memory tracking',
-  (notebookName: string, noteTitle: string) => {
-    cy.get<string>('@currentLoginUser').then((username) =>
-      start.testability().injectNotes(
-        [
-          {
-            Title: noteTitle,
-            'Skip Memory Tracking': true,
-          },
-        ],
-        username,
-        notebookName
-      )
-    )
-  }
-)
-
-Given(
   'I have a notebook {string} with a note {string} and content {string}',
   (notebookName: string, noteTitle: string, content: string) => {
     injectNoteWithContentForCurrentUser(notebookName, noteTitle, content)

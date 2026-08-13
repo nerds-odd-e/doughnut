@@ -68,32 +68,11 @@ Removed `skipMemoryTracking` from `NoteRecallSetting`. Regenerated OpenAPI/clien
 
 ---
 
-### Phase 6 — Note inject no longer has Skip Memory Tracking — Behavior — planned
+### Phase 6 — Note inject no longer has Skip Memory Tracking — Behavior — done
 
-**Observable**
+Inject column removed. E2E uses `the notes "…" are skip-recalled` (assimilate-with-skip). Notebook skip scenarios unchanged. Shared `assimilateInjectedNote` helper.
 
-- Pre: Testability / E2E tables still accept `Skip Memory Tracking` on note inject.
-- Trigger: Inject notes for E2E.
-- Post: That column is gone. Notes that used `true` are skip-recalled via an explicit step (assimilate-with-skip). Notebook skip scenarios unchanged.
-
-**Tests first**
-
-- Add a Gherkin step that skip-recalls injected notes by title (testability assimilate with `skipMemoryTracking: true`).
-- Replace inject-column rows with that step. Titles that were `true`: English (recall/assimilation/CLI), Shape (bazaar background only), SibOne/SibTwo (`recall_quiz_ai_question`), Overlap/Partner (`overlap_try_again`).
-- Delete unused step `I have a notebook {string} with a note {string} which skips memory tracking`.
-- Remove `@JsonProperty("Skip Memory Tracking")` from `backend/src/main/java/com/odde/doughnut/testability/model/NotesTestData.java` (`NoteTestData`).
-
-**Do not change** bazaar “I change notebook … to skip recall”.
-
-**Verify** (targeted specs, not the full suite)
-
-```bash
-CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/recall/recall_pages.feature,e2e_test/features/bazaar/bazaar_subscription.feature,e2e_test/features/recall/recall_quiz_ai_question.feature,e2e_test/features/recall/overlap_try_again.feature
-```
-
-Add a spec to `--spec` if that file’s inject table changed and is not listed.
-
-**Stop-safe:** Product already ignores the flag. E2E uses skip-recall only.
+**Learning:** Bazaar Shape skip-recall must run as the notebook owner, then log out, so later scenarios keep a clean session. `cli_recall.feature` is `@ignore`; tables still converted.
 
 ---
 

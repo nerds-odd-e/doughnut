@@ -60,11 +60,6 @@ public class NotesTestData {
     @Setter
     private String content;
 
-    @JsonProperty("Skip Memory Tracking")
-    @Getter
-    @Setter
-    private Boolean skipMemoryTracking;
-
     @JsonProperty("Remember Spelling")
     @Setter
     private Boolean rememberSpelling;

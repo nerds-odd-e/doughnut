@@ -8,10 +8,11 @@ Feature: Overlap try again
   Background:
     Given I am logged in as an existing user
     And I have a notebook "Overlap practice" with notes:
-      | Title   | Content                  | Skip Memory Tracking | Remember Spelling |
-      | Overlap |                          | true                 |                   |
-      | colour  | Colour means a hue       |                      | true              |
-      | Partner | Partner note body        | true                 |                   |
+      | Title   | Content                  | Remember Spelling |
+      | Overlap |                          |                   |
+      | colour  | Colour means a hue       | true              |
+      | Partner | Partner note body        |                   |
+    And the notes "Overlap, Partner" are skip-recalled
     And note "colour" has content:
       """
       ---

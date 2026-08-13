@@ -4,11 +4,12 @@ Feature: Assimilation and Recall Pages
   Background:
     Given I am logged in as an existing user
     And I have a notebook "English practice" with notes:
-      | Title    | Content         | Image Url   | Skip Memory Tracking |
-      | English  |                 |             | true                 |
-      | Sedition | Incite violence |             |                      |
-      | Sedation | Put to sleep    |             |                      |
-      | Sedative | Sleep medicine  | a_slide.jpg |                      |
+      | Title    | Content         | Image Url   |
+      | English  |                 |             |
+      | Sedition | Incite violence |             |
+      | Sedation | Put to sleep    |             |
+      | Sedative | Sleep medicine  | a_slide.jpg |
+    And the notes "English" are skip-recalled
     And there is "similar to" relationship between note "Sedition" and "Sedation" in notebook "English practice"
 
   Scenario: Different assimilation pages for different notes

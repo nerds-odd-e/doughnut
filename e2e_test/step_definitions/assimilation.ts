@@ -44,6 +44,12 @@ Given(
   }
 )
 
+Given('the notes {string} are skip-recalled', (noteTitles: string) => {
+  commonSenseSplit(noteTitles, ', ').forEach((title) => {
+    start.testability().assimilateNoteSkippingRecall(title)
+  })
+})
+
 Given(
   'the notes {string} are assimilated as commissioned on day {int}',
   (noteTitles: string, day: number) => {

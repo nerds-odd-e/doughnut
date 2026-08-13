@@ -6,8 +6,9 @@ Feature: Assimilate with remembering spelling
   Background:
     Given I am logged in as an existing user
     And I have a notebook "English practice" with notes:
-      | Title   | Skip Memory Tracking |
-      | English | true                 |
+      | Title   |
+      | English |
+    And the notes "English" are skip-recalled
 
   Scenario Outline: Remembering spelling availability depends on note content
     Given I have a notebook "English practice" with notes:

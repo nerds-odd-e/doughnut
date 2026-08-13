@@ -15,7 +15,6 @@ import type {
 } from '@generated/doughnut-backend-api'
 import type { NotesTestDataWritable } from '@generated/doughnut-backend-api'
 import {
-  AssimilationController,
   ConversationMessageController,
   MemoryTrackerController,
   NoteController,
@@ -27,6 +26,7 @@ import {
   TextContentController,
 } from '@generated/doughnut-backend-api/sdk.gen'
 import { circleIdAlias } from './pageObjects/circlePage'
+import { assimilateTestabilityMethods } from './testabilityAssimilate'
 
 const hourOfDay = (days: number, hours: number) => {
   return new Date(1976, 5, 1 + days, hours)
@@ -568,42 +568,7 @@ const testability = () => {
       })
     },
 
-    assimilateNote(noteTitle: string) {
-      return this.getInjectedNoteIdByTitle(noteTitle).then((noteId) => {
-        return cy.wrap(
-          AssimilationController.assimilate({
-            body: { noteId, skipMemoryTracking: false },
-          }),
-          { log: false }
-        )
-      })
-    },
-
-    assimilateNoteAsCommissioned(noteTitle: string) {
-      return this.getInjectedNoteIdByTitle(noteTitle).then((noteId) => {
-        return cy.wrap(
-          AssimilationController.assimilate({
-            body: {
-              noteId,
-              skipMemoryTracking: false,
-              assimilateAsCommissioned: true,
-            },
-          }),
-          { log: false }
-        )
-      })
-    },
-
-    assimilateNoteProperty(noteTitle: string, propertyKey: string) {
-      return this.getInjectedNoteIdByTitle(noteTitle).then((noteId) => {
-        return cy.wrap(
-          AssimilationController.assimilate({
-            body: { noteId, propertyKey },
-          }),
-          { log: false }
-        )
-      })
-    },
+    ...assimilateTestabilityMethods,
 
     dueRecallPrompt() {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone

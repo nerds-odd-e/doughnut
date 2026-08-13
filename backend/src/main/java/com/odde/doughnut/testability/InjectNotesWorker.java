@@ -1,6 +1,5 @@
 package com.odde.doughnut.testability;
 
-import com.odde.doughnut.controllers.dto.AssimilationRequestDTO;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.DisplayName;
 import com.odde.doughnut.entities.Folder;
@@ -12,7 +11,6 @@ import com.odde.doughnut.entities.repositories.CircleRepository;
 import com.odde.doughnut.entities.repositories.FolderRepository;
 import com.odde.doughnut.entities.repositories.NotebookRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
-import com.odde.doughnut.services.MemoryTrackerService;
 import com.odde.doughnut.services.NotebookService;
 import com.odde.doughnut.services.WikiTitleCacheService;
 import com.odde.doughnut.testability.model.NotesTestData;
@@ -39,7 +37,6 @@ class InjectNotesWorker {
   @Autowired NotebookService notebookService;
   @Autowired FolderRepository folderRepository;
   @Autowired WikiTitleCacheService wikiTitleCacheService;
-  @Autowired MemoryTrackerService memoryTrackerService;
 
   Map<String, Integer> inject(NotesTestData notesTestData, User user) {
     if (Strings.isEmpty(notesTestData.getNotebookName())) {
@@ -60,28 +57,11 @@ class InjectNotesWorker {
     notesTestData.buildNoteTree(notebook, currentUTCTimestamp, titleNoteMap, this.entityPersister);
     applyExplicitFolderPlacements(injections, titleNoteMap, currentUTCTimestamp);
     notesTestData.saveByOriginalOrder(titleNoteMap, this.entityPersister);
-    skipRecallInjectedNotes(injections, titleNoteMap, user, currentUTCTimestamp);
     for (Note note : titleNoteMap.values()) {
       wikiTitleCacheService.refreshForNote(note, user);
     }
     return titleNoteMap.values().stream()
         .collect(Collectors.toMap(note -> note.getTitle(), Note::getId));
-  }
-
-  private void skipRecallInjectedNotes(
-      List<NoteTestData> injections,
-      Map<String, Note> titleNoteMap,
-      User user,
-      Timestamp currentUTCTimestamp) {
-    for (NoteTestData injection : injections) {
-      if (!Boolean.TRUE.equals(injection.getSkipMemoryTracking())) {
-        continue;
-      }
-      AssimilationRequestDTO request = new AssimilationRequestDTO();
-      request.noteId = titleNoteMap.get(injection.title).getId();
-      request.skipMemoryTracking = true;
-      memoryTrackerService.assimilate(request, user, currentUTCTimestamp);
-    }
   }
 
   private void applyExplicitFolderPlacements(

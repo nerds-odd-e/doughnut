@@ -5,11 +5,14 @@ Feature: Bazaar subscription
 
   Background:
     Given there are some notes for existing user "another_old_learner" in notebook "Shape"
-      | Title      | Skip Memory Tracking |
-      | Shape      | true                 |
-      | Square     |                      |
-      | Triangle   |                      |
-      | Big Square |                      |
+      | Title      |
+      | Shape      |
+      | Square     |
+      | Triangle   |
+      | Big Square |
+    And I am logged in as "another_old_learner"
+    And the notes "Shape" are skip-recalled
+    And my session is logged out
     And notebook "Shape" is shared to the Bazaar
 
   @skipOptimizationDueToKnownNecessarySlowness

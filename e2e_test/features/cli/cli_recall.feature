@@ -12,10 +12,11 @@ Feature: CLI recall
 
     Background:
       And I have a notebook "English practice" with notes:
-        | Title    | Content                        | Skip Memory Tracking |
-        | English  |                                | true                 |
-        | sedition | Sedition means incite violence |                      |
-        | sedation | **Put** to sleep is _sedation_ |                      |
+        | Title    | Content                        |
+        | English  |                                |
+        | sedition | Sedition means incite violence |
+        | sedation | **Put** to sleep is _sedation_ |
+      And the notes "English" are skip-recalled
 
     @disableOpenAiService
     Scenario: Recall status shows count when notes are due
@@ -89,9 +90,10 @@ Feature: CLI recall
 
     Background:
       And I have a notebook "English practice" with notes:
-        | Title    | Content                        | Skip Memory Tracking | Remember Spelling |
-        | English  |                                | true                 |                   |
-        | sedition | Sedition means incite violence |                      | true              |
+        | Title    | Content                        | Remember Spelling |
+        | English  |                                |                   |
+        | sedition | Sedition means incite violence | true              |
+      And the notes "English" are skip-recalled
 
     @disableOpenAiService
     Scenario: Spelling recall accepts a correct answer then just review

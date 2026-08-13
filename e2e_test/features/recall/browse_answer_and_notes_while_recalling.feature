@@ -8,11 +8,12 @@ Feature: Browse answers and notes while recalling
   Background:
     Given I am logged in as an existing user
     And I have a notebook "English practice" with notes:
-      | Title    | Content                        | Skip Memory Tracking | Remember Spelling |
-      | English  |                                | true                 |                   |
-      | sedition | Sedition means incite violence |                      | true              |
-      | sedation | Put to sleep is sedation       |                      |                   |
-      | medical  |                                |                      |                   |
+      | Title    | Content                        | Remember Spelling |
+      | English  |                                |                   |
+      | sedition | Sedition means incite violence | true              |
+      | sedation | Put to sleep is sedation       |                   |
+      | medical  |                                |                   |
+    And the notes "English" are skip-recalled
     And It's day 1
 
   Scenario: View last answered question when the quiz answer was correct

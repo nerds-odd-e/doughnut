@@ -8,10 +8,11 @@ Feature: Accidental match reveal
   Background:
     Given I am logged in as an existing user
     And I have a notebook "English practice" with notes:
-      | Title    | Content                        | Skip Memory Tracking | Remember Spelling |
-      | English  |                                | true                 |                   |
-      | sedition | Sedition means incite violence |                      | true              |
-      | sedation | Put to sleep is sedation       |                      |                   |
+      | Title    | Content                        | Remember Spelling |
+      | English  |                                |                   |
+      | sedition | Sedition means incite violence | true              |
+      | sedation | Put to sleep is sedation       |                   |
+    And the notes "English" are skip-recalled
     And It's day 1
     And the note "sedition" was assimilated on day 1
 
