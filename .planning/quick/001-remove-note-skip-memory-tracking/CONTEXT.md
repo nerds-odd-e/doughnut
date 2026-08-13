@@ -24,12 +24,17 @@ Remove **note-level** `skipMemoryTracking` (`NoteRecallSetting` / `note.skip_mem
 
 E2E `notebookPage.skipMemoryTracking()` is the **notebook** checkbox. Keep it.
 
-## How the note flag is used today
+## Remaining note-flag surface (after Phases 1–3)
 
-- **UI:** `NoteRecallSettingForm` checkbox (`field="skipMemoryTracking"` → label “Skip Memory Tracking”).
-- **Queues:** `NoteRepository.recallWhereClause` and `NotePropertyIndexRepository` (unassimilated properties + wiki-link target gate) skip rows when the flag is true.
-- **Settings save:** `updateNoteRecallSetting` copies the embeddable; it does **not** create/remove trackers. Checking the box after a tracker exists does not stop recall.
-- **Tests:** E2E inject column `Skip Memory Tracking`; Java `NoteBuilder.skipMemoryTracking()`. Typical use: keep a notebook-root (or sibling) note out of assimilation.
+Gone: recall-settings checkbox, `NoteBuilder.skipMemoryTracking()`, inject that set the flag (inject now skip-recalls).
+
+Still present:
+
+- **Queues:** `NoteRepository.recallWhereClause` and `NotePropertyIndexRepository` still skip rows when the flag is true (Phase 4).
+- **API / embeddable:** `NoteRecallSetting.skipMemoryTracking` (Phase 5).
+- **E2E inject column** `"Skip Memory Tracking"` on `NotesTestData` (Phase 6).
+- **DB:** `note.skip_memory_tracking` (Phase 7).
+- **Proposed ADR 0001** still describes skip on a note (Phase 8).
 
 CLI and MCP do not expose the note flag.
 
