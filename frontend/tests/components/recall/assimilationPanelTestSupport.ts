@@ -106,12 +106,6 @@ export function verifySpellingButtonEl() {
   ) as HTMLElement | null
 }
 
-export function setupRememberSpellingRecall() {
-  mockSdkService(NoteController, "getNoteInfo", {
-    recallSetting: { rememberSpelling: true },
-  })
-}
-
 export function assimilateButtonEl(
   wrapper: Awaited<ReturnType<typeof mountAssimilationPanel>>
 ) {

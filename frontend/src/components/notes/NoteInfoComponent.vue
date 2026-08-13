@@ -2,12 +2,9 @@
   <NoteRecallSettingForm
     v-bind="{
       noteId: note.id,
-      isLinkNote,
       noteRecallSetting: recallSetting,
-      noteContent: note.content,
     }"
     @level-changed="$emit('levelChanged', $event)"
-    @remember-spelling-changed="$emit('rememberSpellingChanged', $event)"
   />
   <h6 v-if="memoryTrackers.length">Memory Trackers</h6>
   <table v-if="memoryTrackers.length" class="daisy-table daisy-table-bordered">
@@ -40,7 +37,6 @@ import type {
 } from "@generated/doughnut-backend-api"
 import { computed, ref, watch } from "vue"
 import { useRouter } from "vue-router"
-import { relationTypeLabelFromNoteContent } from "@/models/relationTypeOptions"
 import NoteRecallSettingForm from "../recall/NoteRecallSettingForm.vue"
 import NoteInfoMemoryTracker from "./NoteInfoMemoryTracker.vue"
 
@@ -49,19 +45,14 @@ const props = defineProps<{
   noteRecallInfo: NoteRecallInfo
 }>()
 
-const emit = defineEmits<{
+defineEmits<{
   (e: "levelChanged", value: unknown): void
-  (e: "rememberSpellingChanged", value: boolean): void
 }>()
 
 const router = useRouter()
 
 const memoryTrackers = ref(props.noteRecallInfo.memoryTrackers ?? [])
 const recallSetting = computed(() => props.noteRecallInfo.recallSetting)
-
-const isLinkNote = computed(
-  () => relationTypeLabelFromNoteContent(props.note.content) !== undefined
-)
 
 watch(
   () => props.noteRecallInfo.memoryTrackers,

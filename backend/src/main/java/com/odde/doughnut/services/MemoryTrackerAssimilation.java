@@ -7,7 +7,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 
 /** Creates memory trackers for assimilate requests. */
@@ -69,39 +68,14 @@ final class MemoryTrackerAssimilation {
               MemoryTrackerType.UNDERSTANDING));
     }
 
-    List<MemoryTracker> existingUnderstandingTrackers =
-        existingTrackers.stream()
-            .filter(MemoryTracker::isNoteLevelTracker)
-            .filter(MemoryTracker::isUnderstanding)
-            .toList();
-
-    boolean spellingExists = hasNoteLevelType(existingTrackers, MemoryTrackerType.SPELLING);
-
-    boolean addSpellingOnly =
-        !existingUnderstandingTrackers.isEmpty()
-            && Boolean.TRUE.equals(note.getRecallSetting().getRememberSpelling())
-            && !spellingExists;
-
-    if (addSpellingOnly) {
-      return List.of(
-          createNoteLevelTracker(
-              note, currentUser, currentTime, skipMemoryTracking, MemoryTrackerType.SPELLING));
-    }
-
-    if (!existingUnderstandingTrackers.isEmpty()) {
-      return List.of();
-    }
-
-    List<MemoryTracker> trackers = new ArrayList<>();
-    trackers.add(
-        createNoteLevelTracker(
-            note, currentUser, currentTime, skipMemoryTracking, MemoryTrackerType.UNDERSTANDING));
-    if (Boolean.TRUE.equals(note.getRecallSetting().getRememberSpelling()) && !spellingExists) {
-      trackers.add(
-          createNoteLevelTracker(
-              note, currentUser, currentTime, skipMemoryTracking, MemoryTrackerType.SPELLING));
-    }
-    return trackers;
+    return assimilateAsNoteLevelType(
+        request,
+        existingTrackers,
+        note,
+        currentUser,
+        currentTime,
+        skipMemoryTracking,
+        MemoryTrackerType.UNDERSTANDING);
   }
 
   private List<MemoryTracker> assimilateAsNoteLevelType(

@@ -15,6 +15,7 @@ import {
   mockedTotalAssimilatedCount,
   mountAssimilationPanelReady,
   note,
+  opaqueContentBlockerEl,
   openAssimilateOptions,
   rememberSpellingButtonEl,
   setupAssimilationPanelTests,
@@ -36,6 +37,10 @@ describe("AssimilationPanel remember spelling", () => {
 
     await clickRememberSpelling(wrapper)
 
+    const opaqueLayer = opaqueContentBlockerEl()
+    expect(opaqueLayer).not.toBeNull()
+    expect(opaqueLayer?.style.zIndex).toBe("9989")
+    expect(opaqueLayer?.className).toContain("bg-black")
     expect(spellingVerificationPopupEl()).not.toBeNull()
     expect(assimilateSpy).not.toHaveBeenCalled()
   })

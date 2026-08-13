@@ -3386,8 +3386,6 @@ components:
           type: string
         Content:
           type: string
-        Remember Spelling:
-          type: boolean
         Image Url:
           type: string
         Image Mask:

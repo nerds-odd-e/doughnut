@@ -117,7 +117,6 @@ export type Randomization = {
 export type NoteTestData = {
     Title?: string;
     Content?: string;
-    'Remember Spelling'?: boolean;
     'Image Url'?: string;
     'Image Mask'?: string;
     /**

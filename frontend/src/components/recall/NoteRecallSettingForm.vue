@@ -7,16 +7,6 @@
     :options="levelOptions"
     @update:model-value="updateLevel"
   />
-
-  <CheckInput
-    v-if="!isLinkNote"
-    scope-name="recall_setting"
-    field="rememberSpelling"
-    :model-value="rememberSpellingValue"
-    :error-message="spellingDisabledMessage"
-    :disabled="isSpellingDisabled"
-    @update:model-value="updateModelValue({ rememberSpelling: $event })"
-  />
 </template>
 
 <script lang="ts">
@@ -26,27 +16,18 @@ import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { PropType } from "vue"
 import { defineComponent, computed, ref, watch } from "vue"
-import CheckInput from "../form/CheckInput.vue"
 import RadioButtons from "../form/RadioButtons.vue"
 
 export default defineComponent({
-  components: { CheckInput, RadioButtons },
+  components: { RadioButtons },
   props: {
     noteId: { type: Number, required: true },
     noteRecallSetting: {
       type: Object as PropType<NoteRecallSetting>,
       required: false,
     },
-    noteContent: {
-      type: String,
-      required: false,
-    },
-    isLinkNote: {
-      type: Boolean,
-      required: true,
-    },
   },
-  emits: ["levelChanged", "rememberSpellingChanged"],
+  emits: ["levelChanged"],
   setup(props, { emit }) {
     const formData = ref<NoteRecallSetting>(props.noteRecallSetting || {})
     const errors = ref<Partial<Record<keyof NoteRecallSetting, string>>>({})
@@ -59,21 +40,6 @@ export default defineComponent({
           formData.value = newValue
         }
       }
-    )
-
-    const isSpellingDisabled = computed(
-      () => !props.noteContent || props.noteContent.trim() === ""
-    )
-
-    const spellingDisabledMessage = computed(() =>
-      isSpellingDisabled.value
-        ? "Remember spelling note need to have content"
-        : errors.value.rememberSpelling
-    )
-
-    const rememberSpellingValue = computed(
-      () =>
-        !isSpellingDisabled.value && props.noteRecallSetting?.rememberSpelling
     )
 
     const levelAsString = computed(() =>
@@ -102,9 +68,6 @@ export default defineComponent({
         if (newValue.level !== undefined) {
           emit("levelChanged", newValue.level)
         }
-        if (newValue.rememberSpelling !== undefined) {
-          emit("rememberSpellingChanged", newValue.rememberSpelling)
-        }
       } else {
         // Error is handled by global interceptor (toast notification)
         // Extract field-level errors if available (for 400 validation errors)
@@ -120,9 +83,6 @@ export default defineComponent({
     return {
       formData,
       errors,
-      isSpellingDisabled,
-      spellingDisabledMessage,
-      rememberSpellingValue,
       levelAsString,
       levelOptions,
       updateModelValue,

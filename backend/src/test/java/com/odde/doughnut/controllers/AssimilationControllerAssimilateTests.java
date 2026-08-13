@@ -34,14 +34,15 @@ class AssimilationControllerAssimilateTests extends ControllerTestBase {
     }
 
     @Test
-    void shouldCreateTwoMemoryTrackersWhenRememberSpellingIsTrue() {
-      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).rememberSpelling().please();
+    void ordinaryAssimilateCreatesOnlyUnderstandingTracker() {
+      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+      note.getRecallSetting().setRememberSpelling(true);
 
       List<MemoryTracker> result =
           controller.assimilate(AssimilationControllerTestSupport.assimilateRequest(note));
 
-      assertThat(result, hasSize(2));
-      assertThat(result.stream().filter(MemoryTracker::isSpelling).count(), equalTo(1L));
+      assertThat(result, hasSize(1));
+      assertThat(result.get(0).getType(), equalTo(MemoryTrackerType.UNDERSTANDING));
     }
 
     @Test
@@ -135,18 +136,6 @@ class AssimilationControllerAssimilateTests extends ControllerTestBase {
       assertThat(
           memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), note.getId()),
           hasSize(1));
-    }
-
-    @Test
-    void shouldAddOnlySpellingTrackerWhenAddSpellingOnlyAndNoteHasTrackersButNoSpelling() {
-      Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).rememberSpelling().please();
-      makeMe.aMemoryTrackerFor(note).please();
-
-      List<MemoryTracker> result =
-          controller.assimilate(AssimilationControllerTestSupport.assimilateRequest(note));
-
-      assertThat(result, hasSize(1));
-      assertThat(result.get(0).getType(), equalTo(MemoryTrackerType.SPELLING));
     }
 
     @Test

@@ -1,6 +1,6 @@
 # Remember spelling as a memory tracker
 
-Status: in-progress (Phase 5 done)
+Status: in-progress (Phase 6 done)
 Plan state: [STATE.md](./STATE.md) (this folder only — do not edit `.planning/STATE.md`)
 
 Each phase is one commit. Type is Behavior or Structure. One observable behavior (or one structure change for the immediate next behavior).
@@ -11,7 +11,7 @@ Each phase is one commit. Type is Behavior or Structure. One observable behavior
 - **API:** `assimilateAsSpelling`, parallel to `assimilateAsCommissioned`.
 - **Queue / daily count:** understanding note-level trackers only. Spelling does not consume the queue or daily count. Stay on the note after Remember spelling.
 - **Verification:** existing title popup, attached to Remember spelling (Phase 3). Phase 2 may ship the action without verification (interim).
-- **Checkbox stays** until Phase 6. Do not remove the note field before the action exists.
+- **Checkbox removed** in Phase 6. Spelling trackers come only from Remember spelling / `assimilateAsSpelling`.
 - **Tests:** delete option-only tests in Phase 6. Keep spelling behavior; move fixtures off the note flag in Phases 4–5.
 - **ADRs:** 0001 and 0003 describe the current model only. Status stays Proposed.
 - **No** notebook-level default. **No** migration of old `remember_spelling` values.
@@ -100,7 +100,7 @@ No product change. Moved spelling-*behavior* fixtures off `rememberSpelling` / G
 ### Phase 6: Remove the Remember Spelling note setting
 
 Type: Behavior  
-Status: planned
+Status: done
 
 **Pre-condition:** Phases 2–5 done (action exists; spelling tests do not need the flag).
 
@@ -108,18 +108,9 @@ Status: planned
 
 **Post-condition:** No Remember Spelling checkbox. Ordinary Assimilate never creates a spelling tracker. Spelling trackers come only from Remember spelling / `assimilateAsSpelling`.
 
-**Delete** (option-only — do not retarget):
+Shipped: checkbox and flag-driven assimilate path removed. Ordinary assimilate uses `assimilateAsNoteLevelType(..., UNDERSTANDING)`. Java field and DB column remain for Phases 8–9.
 
-- E2E outline **Remembering spelling availability depends on note content**
-- `NoteRecallSettingForm.spec.ts` checkbox cases
-- AssimilationPanel add-spelling-only-via-flag cases
-- `shouldCreateTwoMemoryTrackersWhenRememberSpellingIsTrue`
-- `shouldAddOnlySpellingTrackerWhenAddSpellingOnly…`
-- `PredefinedQuestionTest.SpellingQuiz.shouldAlwaysChooseAIQuestionIfConfigured`
-
-Remove checkbox-driven verification steps and add-spelling-only UI that reads the flag. Drop `NotesTestData` **Remember Spelling** column and `NoteBuilder.rememberSpelling()` if unused.
-
-**Verify:** backend assimilate tests; frontend `NoteRecallSettingForm` + assimilation panel; `assimilate_with_remembering_spelling.feature` and `recall_quiz_spelling_question.feature`.
+**Learning:** Inject `NotesTestData` **Remember Spelling** column was dropped with the checkbox tests; OpenAPI/generated types followed. Do not remove `NoteRecallSetting.rememberSpelling` until Phase 8.
 
 ---
 

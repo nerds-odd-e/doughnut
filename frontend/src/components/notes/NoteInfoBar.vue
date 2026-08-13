@@ -4,7 +4,6 @@
     :note="displayedNote"
     :note-recall-info="noteRecallInfo"
     @level-changed="$emit('levelChanged', $event)"
-    @remember-spelling-changed="$emit('rememberSpellingChanged', $event)"
   />
 </template>
 
@@ -23,7 +22,6 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "levelChanged", value: unknown): void
-  (e: "rememberSpellingChanged", value: boolean): void
   (e: "noteRecallInfoLoaded", value: NoteRecallInfo): void
 }>()
 
@@ -44,10 +42,6 @@ const fetchData = async () => {
   )
   if (!error) {
     noteRecallInfo.value = data!
-    emit(
-      "rememberSpellingChanged",
-      data?.recallSetting?.rememberSpelling ?? false
-    )
     emit("noteRecallInfoLoaded", data!)
   }
 }

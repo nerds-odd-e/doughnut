@@ -6,7 +6,6 @@
     :assimilate-disabled="assimilateDisabled"
     :assimilating-property-key="assimilatingPropertyKey"
     @level-changed="emit('reloadNeeded')"
-    @remember-spelling-changed="onRememberSpellingChanged"
     @note-recall-info-loaded="onNoteRecallInfoLoaded"
     @assimilate="processAssimilate"
     @revive="processRevive"
@@ -40,10 +39,7 @@ import {
   useAssimilateUnit,
   type AssimilateEvent,
 } from "@/composables/useAssimilateUnit"
-import {
-  hasNoteLevelTrackerOfType,
-  hasUnderstandingNoteLevelTracker,
-} from "./noteLevelMemoryTrackers"
+import { hasUnderstandingNoteLevelTracker } from "./noteLevelMemoryTrackers"
 import {
   trackersToRevive,
   useReviveMemoryTracker,
@@ -71,29 +67,16 @@ const showSpellingPopup = computed(
 )
 const assimilatingPropertyKey = ref<string | null>(null)
 
-const rememberSpelling = ref(false)
 const noteInfoLoaded = ref(false)
 const noteRecallInfo = ref<NoteRecallInfo | null>(null)
-
-const onRememberSpellingChanged = (value: boolean) => {
-  rememberSpelling.value = value
-}
 
 const onNoteRecallInfoLoaded = (info: NoteRecallInfo) => {
   noteRecallInfo.value = info
   noteInfoLoaded.value = true
 }
 
-const hasNoteLevelMemoryTrackers = computed(() =>
+const assimilateDisabled = computed(() =>
   hasUnderstandingNoteLevelTracker(noteRecallInfo.value?.memoryTrackers)
-)
-const hasSpellingMemoryTracker = computed(() =>
-  hasNoteLevelTrackerOfType(noteRecallInfo.value?.memoryTrackers, "SPELLING")
-)
-const assimilateDisabled = computed(
-  () =>
-    hasNoteLevelMemoryTrackers.value &&
-    !(rememberSpelling.value && !hasSpellingMemoryTracker.value)
 )
 
 const processAssimilate = async ({
@@ -125,11 +108,6 @@ const processAssimilate = async ({
     if (!confirmed) {
       return
     }
-  }
-
-  if (!propertyKey && !skipMemoryTracking && rememberSpelling.value) {
-    pendingAssimilateAfterSpelling.value = { skipMemoryTracking: false }
-    return
   }
 
   await doAssimilate({ skipMemoryTracking, propertyKey })

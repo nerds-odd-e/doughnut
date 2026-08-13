@@ -176,18 +176,6 @@ When(
   }
 )
 
-Then('remembering spelling should be unavailable', () => {
-  start.assumeAssimilationPage().expectRememberingSpellingUnavailable()
-})
-
-Then('remembering spelling should be available', () => {
-  start.assumeAssimilationPage().expectRememberingSpellingAvailable()
-})
-
-When('I assimilate with remembering spelling', () => {
-  start.assumeAssimilationPage().proceedWithRememberingSpelling()
-})
-
 When('I verify spelling with {string}', (text: string) => {
   start.assumeAssimilationPage().verifySpellingWith(text)
 })

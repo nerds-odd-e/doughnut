@@ -13,7 +13,6 @@
       :note-id="note.id"
       :note="note"
       @level-changed="emit('levelChanged', $event)"
-      @remember-spelling-changed="emit('rememberSpellingChanged', $event)"
       @note-recall-info-loaded="onNoteRecallInfoLoaded"
     />
     <section
@@ -155,7 +154,6 @@ const { note, noteInfoLoaded, assimilateDisabled, assimilatingPropertyKey } =
 
 const emit = defineEmits<{
   (e: "levelChanged", value: unknown): void
-  (e: "rememberSpellingChanged", value: boolean): void
   (e: "noteRecallInfoLoaded", value: NoteRecallInfo): void
   (e: "assimilate", request: AssimilateEvent): void
   (e: "revive", request: { propertyKey?: string }): void

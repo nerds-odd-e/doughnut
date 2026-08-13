@@ -60,10 +60,6 @@ public class NotesTestData {
     @Setter
     private String content;
 
-    @JsonProperty("Remember Spelling")
-    @Setter
-    private Boolean rememberSpelling;
-
     @JsonProperty("Image Url")
     @Setter
     private String imageUrl;
@@ -88,9 +84,6 @@ public class NotesTestData {
       note.setTitle(new DisplayName(title));
       note.setContent(content);
       note.setUpdatedAt(currentUTCTimestamp);
-      if (rememberSpelling != null) {
-        note.getRecallSetting().setRememberSpelling(rememberSpelling);
-      }
 
       String url = imageUrl != null ? imageUrl.trim() : "";
       boolean hasImage = !Strings.isBlank(url);

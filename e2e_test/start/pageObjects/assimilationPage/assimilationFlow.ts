@@ -1,6 +1,5 @@
 import { commonSenseSplit } from 'support/string_util'
 import { waitUntilAppIsNotBusy } from '../../pageBase'
-import { form } from '../../forms'
 import { assimilationPropertyMemoryTrackerExpectations } from './propertyMemoryTrackerExpectations'
 import { assimilationPropertyFlow } from './assimilationPropertyFlow'
 import { assimilationRefinementLayoutExpectations } from './refinementLayoutExpectations'
@@ -108,25 +107,6 @@ export const assumeAssimilationPage = () => ({
     })
     return this
   },
-  proceedWithRememberingSpelling() {
-    this.waitForAssimilationReady()
-    this.checkRememberSpellingOption()
-    this.clickAssimilate()
-    return this
-  },
-  assimilateWithSpellingOption() {
-    waitForAssimilationNoteTitle()
-    cy.get(mainNoteHeadingTitleSelector)
-      .first()
-      .invoke('text')
-      .then((noteTitle: string) => {
-        this.proceedWithRememberingSpelling()
-        this.verifySpellingWith(noteTitle.trim())
-        this.expectPopupClosed()
-        waitUntilAppIsNotBusy()
-      })
-    return this
-  },
   assimilateOneNote({
     'Assimilation Type': assimilationType,
     Title: title,
@@ -197,11 +177,6 @@ export const assumeAssimilationPage = () => ({
     this.clickAssimilate()
     return this
   },
-  checkRememberSpellingOption() {
-    form.getField('Remember Spelling').check()
-    waitUntilAppIsNotBusy()
-    return this
-  },
   verifySpellingWith(text: string) {
     cy.get('[data-test="spelling-verification-popup"]').should('be.visible')
     cy.get('[data-test="spelling-verification-input"]')
@@ -221,17 +196,6 @@ export const assumeAssimilationPage = () => ({
       'contain.text',
       message
     )
-  },
-  expectRememberingSpellingUnavailable() {
-    form
-      .getField('Remember Spelling')
-      .expectError('Remember spelling note need to have content')
-      .shouldBeDisabled()
-    return this
-  },
-  expectRememberingSpellingAvailable() {
-    form.getField('Remember Spelling').expectNoError().shouldNotBeDisabled()
-    return this
   },
   expectAssimilateDisabled() {
     assimilateButton().should('be.disabled')

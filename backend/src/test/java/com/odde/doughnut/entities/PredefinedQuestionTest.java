@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -60,23 +59,6 @@ class PredefinedQuestionTest {
   private void stubAcceptedGeneration(MCQWithAnswer mcq) {
     openAiStructuredResponseMock.stubStructuredResponse(mcq);
     openAiStructuredResponseMock.stubStructuredResponse(accepting(mcq));
-  }
-
-  @Nested
-  class SpellingQuiz {
-    @Test
-    void shouldAlwaysChooseAIQuestionIfConfigured() {
-      Note note = makeMe.aNote().rememberSpelling().please();
-      makeMe.aNote("a necessary sibling as filling option").please();
-      MCQWithAnswer mcqWithAnswer = anUnshuffledMcq();
-      stubAcceptedGeneration(mcqWithAnswer);
-
-      PredefinedQuestion result = predefinedQuestionService.generateAFeasibleQuestion(note);
-
-      assertThat(
-          result.getMultipleChoicesQuestion().getQuestionStem(),
-          containsString(mcqWithAnswer.getQuestion().getQuestionStem()));
-    }
   }
 
   @Nested

@@ -1,5 +1,5 @@
 import { NoteController } from "@generated/doughnut-backend-api/sdk.gen"
-import { describe, expect, it, vi, beforeEach } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import {
   mockSdkService,
@@ -12,16 +12,11 @@ import {
   assimilateSpy,
   assimilatedCountOfTheDay,
   clickAssimilate,
-  clickVerifySpelling,
-  closeSpellingVerificationPopup,
   mockedRequestDueRecallsRefresh,
   mockedTotalAssimilatedCount,
   mountAssimilationPanelReady,
   note,
-  opaqueContentBlockerEl,
   setupAssimilationPanelTests,
-  setupRememberSpellingRecall,
-  spellingVerificationPopupEl,
 } from "./assimilationPanelTestSupport"
 
 vi.mock("@/composables/useRecallData")
@@ -55,49 +50,18 @@ describe("AssimilationPanel", () => {
       expect(assimilatedCountOfTheDay.value).toBe(2)
       expect(mockedRequestDueRecallsRefresh).toHaveBeenCalled()
     })
-  })
 
-  describe("NoteInfoBar", () => {
-    it("loads note recall info for settings", async () => {
-      const wrapper = await mountAssimilationPanelReady()
-      expect(
-        wrapper.findComponent({ name: "NoteRecallSettingForm" }).exists()
-      ).toBe(true)
-    })
-  })
-
-  describe("SpellingVerificationPopup", () => {
-    beforeEach(() => {
-      setupRememberSpellingRecall()
-    })
-
-    it("shows opaque layer to hide note content behind spelling verification", async () => {
-      const wrapper = await mountAssimilationPanelReady()
-
-      expect(opaqueContentBlockerEl()).toBeNull()
-
-      await clickAssimilate(wrapper)
-
-      const opaqueLayer = opaqueContentBlockerEl()
-      expect(opaqueLayer).not.toBeNull()
-      expect(opaqueLayer?.style.zIndex).toBe("9989")
-      expect(opaqueLayer?.className).toContain("bg-black")
-    })
-
-    it("closes spelling verification and restores assimilate panel without assimilating", async () => {
+    it("does not verify spelling on ordinary assimilate", async () => {
+      mockSdkService(NoteController, "getNoteInfo", {
+        recallSetting: { rememberSpelling: true },
+      })
       const wrapper = await mountAssimilationPanelReady()
 
       await clickAssimilate(wrapper)
-      expect(opaqueContentBlockerEl()).not.toBeNull()
-      expect(spellingVerificationPopupEl()).not.toBeNull()
-      expect(assimilateSpy).not.toHaveBeenCalled()
 
-      await closeSpellingVerificationPopup()
-
-      expect(opaqueContentBlockerEl()).toBeNull()
-      expect(spellingVerificationPopupEl()).toBeNull()
-      expect(assimilateSpy).not.toHaveBeenCalled()
-      expect(assimilateButtonEl(wrapper)).not.toBeNull()
+      expect(assimilateSpy).toHaveBeenCalledWith({
+        body: { noteId: note.id },
+      })
     })
   })
 
@@ -144,45 +108,13 @@ describe("AssimilationPanel", () => {
       expect(assimilateButtonEl(wrapper)?.hasAttribute("disabled")).toBe(true)
     })
 
-    it("disables assimilate when note has memory trackers and no add-spelling-only mode", async () => {
+    it("disables assimilate when note has memory trackers", async () => {
       mockSdkService(NoteController, "getNoteInfo", {
         memoryTrackers: [makeMe.aMemoryTracker.id(1).spelling(false).please()],
       })
       const wrapper = await mountAssimilationPanelReady()
 
       expect(assimilateButtonEl(wrapper)?.hasAttribute("disabled")).toBe(true)
-    })
-
-    it("enables assimilate when remember spelling on and no spelling tracker", async () => {
-      mockSdkService(NoteController, "getNoteInfo", {
-        recallSetting: { rememberSpelling: true },
-        memoryTrackers: [makeMe.aMemoryTracker.id(1).spelling(false).please()],
-      })
-      const wrapper = await mountAssimilationPanelReady()
-
-      expect(assimilateButtonEl(wrapper)?.hasAttribute("disabled")).toBe(false)
-    })
-
-    it("adds only spelling memory tracker when in add-spelling-only mode", async () => {
-      mockSdkService(NoteController, "getNoteInfo", {
-        recallSetting: { rememberSpelling: true },
-        memoryTrackers: [makeMe.aMemoryTracker.id(1).spelling(false).please()],
-      })
-      mockSdkService(NoteController, "verifySpelling", { correct: true })
-      assimilateSpy.mockResolvedValue(
-        wrapSdkResponse([makeMe.aMemoryTracker.id(2).spelling(true).please()])
-      )
-      const wrapper = await mountAssimilationPanelReady()
-
-      await clickAssimilate(wrapper)
-
-      await clickVerifySpelling()
-
-      expect(assimilateSpy).toHaveBeenCalledWith({
-        body: { noteId: note.id },
-      })
-      expect(mockedGoToNextAssimilation).toHaveBeenCalled()
-      expect(mockedRequestDueRecallsRefresh).toHaveBeenCalled()
     })
   })
 })

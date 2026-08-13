@@ -138,11 +138,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
     return this;
   }
 
-  public NoteBuilder rememberSpelling() {
-    entity.getRecallSetting().setRememberSpelling(true);
-    return this;
-  }
-
   /** Adds plain frontmatter aliases and refreshes the alias index after persist. */
   public NoteBuilder aliases(String... aliases) {
     frontmatterLists.addPlainAliases(aliases);

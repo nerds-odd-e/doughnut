@@ -10,18 +10,6 @@ Feature: Assimilate with remembering spelling
       | English |
     And the notes "English" are skip-recalled
 
-  Scenario Outline: Remembering spelling availability depends on note content
-    Given I have a notebook "English practice" with notes:
-      | Title | Content   |
-      | Word  | <content> |
-    When I am assimilating the note "Word"
-    Then remembering spelling should be <availability>
-
-    Examples:
-      | case                | content            | availability |
-      | note has no content |                    | unavailable  |
-      | note has definition | Definition content | available    |
-
   Scenario Outline: Remember spelling verifies the title
     Given I have a notebook "English practice" with notes:
       | Title        | Content             |
@@ -54,16 +42,6 @@ Feature: Assimilate with remembering spelling
     And I remember spelling
     When I verify spelling with "color"
     Then the spelling verification result for note "colour" should be "success"
-
-  Scenario: Add only spelling memory tracker when note already has trackers
-    Given I have a notebook "English practice" with notes:
-      | Title | Content             |
-      | Word  | Non-empty body text |
-    And the note "Word" was assimilated on day 1
-    When I am assimilating the note "Word"
-    And I assimilate with remembering spelling
-    And I verify spelling with "Word"
-    Then the spelling verification result for note "Word" should be "success"
 
   Scenario: Remember spelling creates a spelling tracker without assimilating
     Given I have a notebook "English practice" with notes:
