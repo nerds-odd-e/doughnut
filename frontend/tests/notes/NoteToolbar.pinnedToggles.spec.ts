@@ -1,12 +1,15 @@
 import makeMe from "doughnut-test-fixtures/makeMe"
 import {
   installMockResizeObserver,
-  narrowNoteToolbarNavWidth,
-  setNoteToolbarNavWidth,
+  layoutNoteToolbar,
+  overflowTogglesNavWidth,
+  restoreNoteToolbarWidthMocks,
 } from "@tests/helpers/mockNoteToolbarNavWidth"
 import { noteMoreOptionsTitles } from "@/components/notes/widgets/noteMoreOptionsTitles"
 import {
   mountNoteToolbar,
+  noteToolbarAction,
+  overflowMenuItem,
   resetNoteToolbarTestState,
 } from "@tests/notes/noteToolbarTestHelpers"
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest"
@@ -14,20 +17,10 @@ import { type VueWrapper, flushPromises } from "@vue/test-utils"
 
 const titles = noteMoreOptionsTitles
 
-function toolbarToggle(wrapper: VueWrapper, title: string) {
-  return wrapper.find(`[data-note-toolbar] button[title="${title}"]`)
-}
-
-function overflowToggle(title: string) {
-  return document.querySelector(
-    `[data-dropdown-portal-panel] button[title="${title}"]`
-  )
-}
-
 async function turnOnFromOverflow(wrapper: VueWrapper, title: string) {
-  await wrapper.find(`[title="${titles.overflowMenu}"]`).trigger("click")
+  await noteToolbarAction(wrapper, titles.overflowMenu).trigger("click")
   await flushPromises()
-  const button = overflowToggle(title) as HTMLButtonElement
+  const button = overflowMenuItem(title) as HTMLButtonElement
   expect(button, `${title} should be in the overflow menu`).toBeTruthy()
   button.click()
   await flushPromises()
@@ -38,18 +31,18 @@ async function expectPinnedOnNarrowToolbar(
   pinnedTitle: string,
   menuTitle: string
 ) {
-  const pinned = toolbarToggle(wrapper, pinnedTitle)
+  const pinned = noteToolbarAction(wrapper, pinnedTitle)
   expect(pinned.exists()).toBe(true)
   expect(pinned.classes()).toContain("daisy-btn-soft")
   expect(pinned.classes()).toContain("daisy-btn-primary")
   expect(pinned.classes()).toContain("shrink-0")
   expect(pinned.attributes("aria-pressed")).toBe("true")
 
-  await wrapper.find(`[title="${titles.overflowMenu}"]`).trigger("click")
+  await noteToolbarAction(wrapper, titles.overflowMenu).trigger("click")
   await flushPromises()
 
-  expect(overflowToggle(pinnedTitle)).toBeNull()
-  expect(overflowToggle(menuTitle)).not.toBeNull()
+  expect(overflowMenuItem(pinnedTitle)).toBeNull()
+  expect(overflowMenuItem(menuTitle)).not.toBeNull()
 }
 
 const pinnedToggleCases = [
@@ -72,6 +65,7 @@ describe("NoteToolbar pinned on-state toggles", () => {
   afterEach(() => {
     wrapper?.unmount()
     document.body.innerHTML = ""
+    restoreNoteToolbarWidthMocks()
     vi.unstubAllGlobals()
   })
 
@@ -85,8 +79,7 @@ describe("NoteToolbar pinned on-state toggles", () => {
     async ({ title, menuTitle }) => {
       const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
       wrapper = await mountNoteToolbar(noteRealm)
-      setNoteToolbarNavWidth(wrapper, narrowNoteToolbarNavWidth)
-      await flushPromises()
+      await layoutNoteToolbar(wrapper, overflowTogglesNavWidth())
 
       await turnOnFromOverflow(wrapper, title)
       await expectPinnedOnNarrowToolbar(wrapper, title, menuTitle)
@@ -98,18 +91,17 @@ describe("NoteToolbar pinned on-state toggles", () => {
     async ({ title }) => {
       const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
       wrapper = await mountNoteToolbar(noteRealm)
-      setNoteToolbarNavWidth(wrapper, narrowNoteToolbarNavWidth)
-      await flushPromises()
+      await layoutNoteToolbar(wrapper, overflowTogglesNavWidth())
 
       await turnOnFromOverflow(wrapper, title)
-      await toolbarToggle(wrapper, title).trigger("click")
+      await noteToolbarAction(wrapper, title).trigger("click")
       await flushPromises()
 
-      expect(toolbarToggle(wrapper, title).exists()).toBe(false)
+      expect(noteToolbarAction(wrapper, title).exists()).toBe(false)
 
-      await wrapper.find(`[title="${titles.overflowMenu}"]`).trigger("click")
+      await noteToolbarAction(wrapper, titles.overflowMenu).trigger("click")
       await flushPromises()
-      expect(overflowToggle(title)).not.toBeNull()
+      expect(overflowMenuItem(title)).not.toBeNull()
     }
   )
 })

@@ -2,7 +2,10 @@ import { SearchController } from "@generated/doughnut-backend-api/sdk.gen"
 import makeMe from "doughnut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { notebookSidebarClosedPlugin } from "@tests/helpers/notebookSidebarTestProvide"
-import { installMockResizeObserver } from "@tests/helpers/mockNoteToolbarNavWidth"
+import {
+  installMockResizeObserver,
+  restoreNoteToolbarWidthMocks,
+} from "@tests/helpers/mockNoteToolbarNavWidth"
 import {
   mountNoteToolbar,
   resetNoteToolbarTestState,
@@ -22,6 +25,7 @@ describe("NoteToolbar", () => {
   afterEach(() => {
     wrapper?.unmount()
     document.body.innerHTML = ""
+    restoreNoteToolbarWidthMocks()
     vi.unstubAllGlobals()
   })
 

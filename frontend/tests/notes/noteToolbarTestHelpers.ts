@@ -6,8 +6,17 @@ import helper, { mockSdkService } from "@tests/helpers"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 import { useNoteToolbarPanel } from "@/composables/useNoteToolbarPanel"
 import type { Router } from "vue-router"
-import type { VueWrapper } from "@vue/test-utils"
-import { flushPromises } from "@vue/test-utils"
+import { flushPromises, type VueWrapper } from "@vue/test-utils"
+
+export function noteToolbarAction(wrapper: VueWrapper, title: string) {
+  return wrapper.find(`[data-note-toolbar] [title="${title}"]`)
+}
+
+export function overflowMenuItem(title: string) {
+  return document.querySelector(
+    `[data-dropdown-portal-panel] button[title="${title}"]`
+  )
+}
 
 export function resetNoteToolbarTestState() {
   useAssimilationView().dismiss()

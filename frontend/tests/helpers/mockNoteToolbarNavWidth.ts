@@ -1,13 +1,84 @@
-import { NOTE_TOOLBAR_MORE_OPTIONS_INLINE_MIN_PX } from "@/composables/useNoteToolbarMoreOptionsInline"
-import type { VueWrapper } from "@vue/test-utils"
+import {
+  noteMoreOptionsTitles,
+  type NoteMoreOptionsActionId,
+} from "@/components/notes/widgets/noteMoreOptionsTitles"
+import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { vi } from "vitest"
 
 type ResizeObserverCallback = () => void
 
 const resizeObserverCallbacks: ResizeObserverCallback[] = []
 
+export const noteToolbarActionWidth = 40
+export const noteToolbarOverflowButtonWidth = 32
+export const allMoreOptionsWidth = noteToolbarActionWidth * 5
+
+type NoteToolbarOffsetWidthLayout = {
+  actionWidths: Partial<Record<NoteMoreOptionsActionId, number>>
+  overflowWidth: number
+  precedingWidth: number
+}
+
+let offsetWidthLayout: NoteToolbarOffsetWidthLayout | undefined
+let restoreOffsetWidth: (() => void) | undefined
+
+const originalOffsetWidth = Object.getOwnPropertyDescriptor(
+  HTMLElement.prototype,
+  "offsetWidth"
+)
+
+const moreOptionTitleToId = new Map(
+  (
+    Object.entries(noteMoreOptionsTitles) as [
+      keyof typeof noteMoreOptionsTitles,
+      string,
+    ][]
+  )
+    .filter(([id]) => id !== "overflowMenu")
+    .map(([id, title]) => [title, id as NoteMoreOptionsActionId])
+)
+
+function mockedOffsetWidth(el: HTMLElement): number | undefined {
+  if (!offsetWidthLayout) return
+  const title = el.getAttribute("title")
+  if (title === noteMoreOptionsTitles.overflowMenu) {
+    return offsetWidthLayout.overflowWidth
+  }
+  if (title && moreOptionTitleToId.has(title)) {
+    const id = moreOptionTitleToId.get(title)
+    if (id === undefined) return noteToolbarActionWidth
+    return offsetWidthLayout.actionWidths[id] ?? noteToolbarActionWidth
+  }
+  if (!el.closest("[data-note-toolbar]")) return
+  if (el.hasAttribute("data-note-toolbar")) return
+  return offsetWidthLayout.precedingWidth
+}
+
+function installOffsetWidthMock() {
+  if (!originalOffsetWidth?.get || restoreOffsetWidth) return
+  Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
+    configurable: true,
+    get() {
+      const mocked = mockedOffsetWidth(this as HTMLElement)
+      if (mocked !== undefined) return mocked
+      return originalOffsetWidth.get?.call(this) ?? 0
+    },
+  })
+  restoreOffsetWidth = () => {
+    Object.defineProperty(
+      HTMLElement.prototype,
+      "offsetWidth",
+      originalOffsetWidth
+    )
+    restoreOffsetWidth = undefined
+    offsetWidthLayout = undefined
+  }
+}
+
 export function installMockResizeObserver() {
   resizeObserverCallbacks.length = 0
+  offsetWidthLayout = undefined
+  installOffsetWidthMock()
   vi.stubGlobal(
     "ResizeObserver",
     class MockResizeObserver {
@@ -32,13 +103,17 @@ export function installMockResizeObserver() {
   )
 }
 
+export function restoreNoteToolbarWidthMocks() {
+  restoreOffsetWidth?.()
+}
+
 export function flushMockResizeObserver() {
   for (const callback of [...resizeObserverCallbacks]) {
     callback()
   }
 }
 
-export function setNoteToolbarNavWidth(wrapper: VueWrapper, width: number) {
+function setNoteToolbarNavWidth(wrapper: VueWrapper, width: number) {
   const nav = wrapper.find("[data-note-toolbar]").element as HTMLElement
   Object.defineProperty(nav, "clientWidth", {
     configurable: true,
@@ -47,7 +122,41 @@ export function setNoteToolbarNavWidth(wrapper: VueWrapper, width: number) {
   flushMockResizeObserver()
 }
 
-export const narrowNoteToolbarNavWidth =
-  NOTE_TOOLBAR_MORE_OPTIONS_INLINE_MIN_PX - 1
+export function setNoteToolbarMeasuredLayout(
+  wrapper: VueWrapper,
+  options: {
+    navWidth: number
+    actionWidths?: Partial<Record<NoteMoreOptionsActionId, number>>
+    overflowWidth?: number
+    precedingWidth?: number
+  }
+) {
+  offsetWidthLayout = {
+    actionWidths: options.actionWidths ?? {},
+    overflowWidth: options.overflowWidth ?? noteToolbarOverflowButtonWidth,
+    precedingWidth: options.precedingWidth ?? 0,
+  }
+  setNoteToolbarNavWidth(wrapper, options.navWidth)
+}
 
-export const wideNoteToolbarNavWidth = NOTE_TOOLBAR_MORE_OPTIONS_INLINE_MIN_PX
+export async function layoutNoteToolbar(wrapper: VueWrapper, navWidth: number) {
+  setNoteToolbarMeasuredLayout(wrapper, { navWidth })
+  await flushPromises()
+}
+
+/** All five more-options fit; overflow button is not needed. */
+export function allMoreOptionsFitNavWidth(precedingWidth = 0) {
+  return precedingWidth + allMoreOptionsWidth
+}
+
+/** Full set does not fit; remaining four plus overflow button do. */
+export function deleteOverflowNavWidth(precedingWidth = 0) {
+  return precedingWidth + allMoreOptionsWidth - 1
+}
+
+/** Off-state audio and assimilation overflow (pin tests). */
+export function overflowTogglesNavWidth(precedingWidth = 0) {
+  return (
+    precedingWidth + noteToolbarActionWidth * 2 + noteToolbarOverflowButtonWidth
+  )
+}

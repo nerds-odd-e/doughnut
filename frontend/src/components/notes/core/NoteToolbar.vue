@@ -55,7 +55,7 @@
         v-if="!readonly"
         ref="moreOptionsRef"
         :note="note"
-        :inline="showMoreOptionsInline"
+        :toolbar-nav="toolbarNavRef"
       />
     </div>
   </nav>
@@ -85,7 +85,6 @@ import { useAssimilationView } from "@/composables/useAssimilationView"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { useRouter } from "vue-router"
 import NoteToolbarMoreOptions from "../widgets/NoteToolbarMoreOptions.vue"
-import { useNoteToolbarMoreOptionsInline } from "@/composables/useNoteToolbarMoreOptionsInline"
 import { noteChromeToolbarNavClass } from "../noteChromeToolbarNavClass"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import NoteCreationNewButton from "../NoteCreationNewButton.vue"
@@ -124,7 +123,6 @@ const onAssimilationReloadNeeded = async () => {
   assimilationPanelKey.value += 1
 }
 const toolbarNavRef = ref<HTMLElement | null>(null)
-const { showMoreOptionsInline } = useNoteToolbarMoreOptionsInline(toolbarNavRef)
 const wikiLinkOrRelationshipPopButtonRef = ref<InstanceType<
   typeof PopButton
 > | null>(null)

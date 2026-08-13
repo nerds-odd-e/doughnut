@@ -1,14 +1,15 @@
 import makeMe from "doughnut-test-fixtures/makeMe"
-import { installMockResizeObserver } from "@tests/helpers/mockNoteToolbarNavWidth"
+import {
+  allMoreOptionsFitNavWidth,
+  installMockResizeObserver,
+  layoutNoteToolbar,
+  restoreNoteToolbarWidthMocks,
+} from "@tests/helpers/mockNoteToolbarNavWidth"
 import {
   mountNoteToolbar,
   resetNoteToolbarTestState,
 } from "@tests/notes/noteToolbarTestHelpers"
 import { noteMoreOptionsTitles } from "@/components/notes/widgets/noteMoreOptionsTitles"
-import {
-  setNoteToolbarNavWidth,
-  wideNoteToolbarNavWidth,
-} from "@tests/helpers/mockNoteToolbarNavWidth"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
@@ -20,6 +21,7 @@ describe("NoteToolbar assimilation panel", () => {
   afterEach(() => {
     wrapper?.unmount()
     document.body.innerHTML = ""
+    restoreNoteToolbarWidthMocks()
     vi.unstubAllGlobals()
   })
 
@@ -53,8 +55,7 @@ describe("NoteToolbar assimilation panel", () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
 
     wrapper = await mountNoteToolbar(noteRealm)
-    setNoteToolbarNavWidth(wrapper, wideNoteToolbarNavWidth)
-    await flushPromises()
+    await layoutNoteToolbar(wrapper, allMoreOptionsFitNavWidth())
     useAssimilationView().openForNote(noteRealm.note.id)
     await flushPromises()
 
