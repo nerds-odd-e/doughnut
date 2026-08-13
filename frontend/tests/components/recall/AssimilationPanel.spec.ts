@@ -29,40 +29,25 @@ vi.mock("@/composables/useGoToNextAssimilation", () => ({
 setupAssimilationPanelTests()
 
 describe("AssimilationPanel", () => {
-  describe("normal assimilation", () => {
-    it("advances via next assimilation and increments counts when assimilating", async () => {
-      assimilateSpy.mockResolvedValue(
-        wrapSdkResponse([
-          makeMe.aMemoryTracker.id(1).please(),
-          makeMe.aMemoryTracker.id(2).removedFromTracking(true).please(),
-          makeMe.aMemoryTracker.id(3).please(),
-        ])
-      )
-      const wrapper = await mountAssimilationPanelReady()
+  it("advances via next assimilation and increments counts when assimilating", async () => {
+    assimilateSpy.mockResolvedValue(
+      wrapSdkResponse([
+        makeMe.aMemoryTracker.id(1).please(),
+        makeMe.aMemoryTracker.id(2).removedFromTracking(true).please(),
+        makeMe.aMemoryTracker.id(3).please(),
+      ])
+    )
+    const wrapper = await mountAssimilationPanelReady()
 
-      await clickAssimilate(wrapper)
+    await clickAssimilate(wrapper)
 
-      expect(assimilateSpy).toHaveBeenCalledWith({
-        body: { noteId: note.id },
-      })
-      expect(mockedGoToNextAssimilation).toHaveBeenCalled()
-      expect(mockedTotalAssimilatedCount.value).toBe(2)
-      expect(assimilatedCountOfTheDay.value).toBe(2)
-      expect(mockedRequestDueRecallsRefresh).toHaveBeenCalled()
+    expect(assimilateSpy).toHaveBeenCalledWith({
+      body: { noteId: note.id },
     })
-
-    it("does not verify spelling on ordinary assimilate", async () => {
-      mockSdkService(NoteController, "getNoteInfo", {
-        recallSetting: { rememberSpelling: true },
-      })
-      const wrapper = await mountAssimilationPanelReady()
-
-      await clickAssimilate(wrapper)
-
-      expect(assimilateSpy).toHaveBeenCalledWith({
-        body: { noteId: note.id },
-      })
-    })
+    expect(mockedGoToNextAssimilation).toHaveBeenCalled()
+    expect(mockedTotalAssimilatedCount.value).toBe(2)
+    expect(assimilatedCountOfTheDay.value).toBe(2)
+    expect(mockedRequestDueRecallsRefresh).toHaveBeenCalled()
   })
 
   describe("assimilate when note has memory trackers", () => {

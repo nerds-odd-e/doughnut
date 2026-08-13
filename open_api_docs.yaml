@@ -3853,8 +3853,6 @@ components:
     NoteRecallSetting:
       type: object
       properties:
-        rememberSpelling:
-          type: boolean
         level:
           type: integer
           format: int32

@@ -36,7 +36,6 @@ class AssimilationControllerAssimilateTests extends ControllerTestBase {
     @Test
     void ordinaryAssimilateCreatesOnlyUnderstandingTracker() {
       Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-      note.getRecallSetting().setRememberSpelling(true);
 
       List<MemoryTracker> result =
           controller.assimilate(AssimilationControllerTestSupport.assimilateRequest(note));

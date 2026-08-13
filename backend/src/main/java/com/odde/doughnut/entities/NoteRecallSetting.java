@@ -8,10 +8,5 @@ import lombok.Setter;
 public class NoteRecallSetting {
   public static final Integer defaultLevel = 0;
 
-  @Column(name = "remember_spelling")
-  @Getter
-  @Setter
-  private Boolean rememberSpelling = false;
-
   @Getter @Setter private Integer level = defaultLevel;
 }

@@ -360,7 +360,6 @@ export type RelationshipLiteralSearchHit = {
 };
 
 export type NoteRecallSetting = {
-    rememberSpelling?: boolean;
     level?: number;
 };
 

@@ -1,6 +1,6 @@
 # Remember spelling as a memory tracker
 
-Status: in-progress (Phase 7 done)
+Status: in-progress (Phase 8 done)
 Plan state: [STATE.md](./STATE.md) (this folder only — do not edit `.planning/STATE.md`)
 
 Each phase is one commit. Type is Behavior or Structure. One observable behavior (or one structure change for the immediate next behavior).
@@ -128,13 +128,13 @@ Proposed ADRs record the Phase 6 product: spelling is a learner-created tracker;
 ### Phase 8: Remove `rememberSpelling` from the note setting type
 
 Type: Structure  
-Status: planned
+Status: done
 
 Unlocks Phase 9 (column unused in code).
 
-No user-visible change. Remove the property from `NoteRecallSetting`, API client (`pnpm generateTypeScript`), and leftover wiring. Existing tests pass.
+Removed the property from `NoteRecallSetting` and regenerated the API client. Remember spelling caret unchanged. DB column remains.
 
-**Verify:** `pnpm backend:test_only`; frontend recall-setting tests.
+**Learning:** Title-update tests now assert `level` as the remaining recall-setting field.
 
 ---
 
